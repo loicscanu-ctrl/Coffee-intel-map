@@ -1,20 +1,97 @@
 {
   "globalIntel": {
-    "supply": [
-      { "t": "Vietnam Harvest", "v": "Harvest delayed by stormsss. Estimated completion 65%.", "date": "Dec 22" },
-      { "t": "Brazil 25/26", "v": "Rains in Minas Gerais improved soil moisture.", "date": "Dec 20" }
-    ],
-    "demand": [
-      { "t": "EU Roasters", "v": "Coverage thin for Q1 2026. Spot demand increasing.", "date": "Dec 22" },
-      { "t": "USA", "v": "Green coffee stocks at ports fell to 5.8m bags.", "date": "Dec 21" }
-    ],
-    "stocks": [
-      { "t": "ICE Arabica", "v": "Grading halted. Total: 890k bags.", "date": "Dec 23" },
-      { "t": "ICE Robusta", "v": "Cert stocks stable at low levels.", "date": "Dec 23" }
-    ],
-    "futures": [
-      { "t": "COT Report", "v": "Non-commercials reduced net long by 2k lots.", "date": "Dec 20" },
-      { "t": "Open Interest", "v": "Declining as holidays approach.", "date": "Dec 22" }
-    ]
-  }
+  "supply": [
+    {
+      "t": "Vietnam Sales Resistance",
+      "v": "Farmers resistance to protect high VND prices.",
+      "date": "Dec 29"
+    },
+    {
+      "t": "Brazil Conilon Flow",
+      "v": "Cooabriel Type 7 at R$ 1,200. Strong export demand persists due to $254 discount vs London.",
+      "date": "Dec 29"
+    },
+    {
+      "t": "Honduras Production Leap",
+      "v": "IHCAFE 25/26 forecast at 5.35m bags vs 4.7m bags last year (+13.8%).",
+      "date": "Dec 29"
+    }
+  ],
+  "demand": [
+    {
+      "t": "German Tax Revenue",
+      "v": "Est. €1.05B for 2025, outperforming last year's €1.03B baseline.",
+      "date": "Dec 29"
+    },
+    {
+      "t": "US Retail Shift",
+      "v": "74% price rise in 5yrs driving rapid transition to RTD and cold brew.",
+      "date": "Dec 29"
+    },
+    {
+      "t": "China Demographic",
+      "v": "Net gain of 4.8M coffee drinkers as 2007 cohort replaces tea-drinking elderly.",
+      "date": "Dec 29"
+    }
+  ],
+  "stocks": [
+    {
+      "t": "ICE Arabica Certified",
+      "v": "456,477 bags. Honduras origins dominate 39.7% of total stock.",
+      "date": "Dec 26"
+    },
+    {
+      "t": "ICE Robusta Certified",
+      "v": "4,278 lots. Historically low levels maintaining backwardation.",
+      "date": "Dec 26"
+    }
+  ],
+  "futures": [
+    {
+      "t": "ITM Option OI",
+      "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
+      "date": "Dec 29"
+    }
+  ],
+  "ticker": [
+    {
+      "label": "KC MAR26",
+      "value": "350.25",
+      "trend": "up"
+    },
+    {
+      "label": "RC MAR26",
+      "value": "$3,858",
+      "trend": "up"
+    },
+    {
+      "label": "NY STOCKS",
+      "value": "456.4K",
+      "trend": "slow rebuild"
+    },
+    {
+      "label": "CONILON BRL",
+      "value": "R$ 1,200 (26/12)",
+      "trend": "up"
+    },
+    {
+      "label": "CONILON USD",
+      "value": "$3,603/MT (USD/BRL 5.55)",
+      "trend": "neutral"
+    },
+    {
+      "label": "LDN STOCKS",
+      "value": "4.2K",
+      "trend": "risk"
+    }
+  ],
+  "alerts": [
+    {
+      "t": "Vietnam Supply Bottleneck",
+      "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
+      "date": "Dec 29",
+      "loc": [12.6, 108.0]
+    }
+  ]
+}
 }
