@@ -160,11 +160,36 @@
     "trend": "up"
   },
   {
+    "label": "FARM",
+    "value": "1.47",
+    "trend": "up"
+  },
+  {
+    "label": "BRCC",
+    "value": "1.19",
+    "trend": "down"
+  },
+  {
+    "label": "CCL",
+    "value": "962.5",
+    "trend": "up"
+  },
+  {
+    "label": "STRS",
+    "value": "11,030",
+    "trend": "up"
+  },
+  {
+    "label": "JVA",
+    "value": "4.12",
+    "trend": "up"
+  },
+  {
     "label": "| TRADER: O32",
     "value": "0.95",
     "trend": "neutral"
   }
-  ],
+],
     
   "alerts": [
     {
