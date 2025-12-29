@@ -3,13 +3,18 @@
   "supply": [
     {
       "t": "Vietnam Sales Resistance",
-      "v": "Farmers resistance to protect high VND prices.",
+      "v": "Farmers resistance below 98k VND to protect high VND prices.",
+      "date": "Dec 29"
+    },
+    {
+      "t": "Indonesia Harvest Risk",
+      "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by landslides.",
       "date": "Dec 29"
     },
     {
       "t": "Brazil Conilon Flow",
-      "v": "Cooabriel Type 7 at R$ 1,200. Strong export demand persists due to $254 discount vs London.",
-      "date": "Dec 29"
+      "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
+      "date": "Dec 26"
     },
     {
       "t": "Honduras Production Leap",
@@ -17,23 +22,25 @@
       "date": "Dec 29"
     }
   ],
+    
   "demand": [
     {
-      "t": "German Tax Revenue",
-      "v": "Est. €1.05B for 2025, outperforming last year's €1.03B baseline.",
+      "t": "SJM Earnings Release",
+      "v": "Latest Q2-FY26 results released Nov 25, 2025; Café Bustelo sales grew 41%.",
+      "date": "Nov 25"
+    },
+    {
+      "t": "Corporate Reporting Log",
+      "v": "Last updates: KDP (Oct 24), SBUX (Oct 30), NESN (Oct 17), JDEP (July 31).",
       "date": "Dec 29"
     },
     {
-      "t": "US Retail Shift",
-      "v": "74% price rise in 5yrs driving rapid transition to RTD and cold brew.",
-      "date": "Dec 29"
-    },
-    {
-      "t": "China Demographic",
-      "v": "Net gain of 4.8M coffee drinkers as 2007 cohort replaces tea-drinking elderly.",
+      "t": "German Coffee Tax",
+      "v": "Total 2025 revenue projected at €1.05B vs €1.03B in 2024.",
       "date": "Dec 29"
     }
   ],
+    
   "stocks": [
     {
       "t": "ICE Arabica Certified",
@@ -46,6 +53,7 @@
       "date": "Dec 26"
     }
   ],
+    
   "futures": [
     {
       "t": "ITM Option OI",
@@ -65,11 +73,6 @@
       "trend": "up"
     },
     {
-      "label": "NY STOCKS",
-      "value": "456.4K",
-      "trend": "slow rebuild"
-    },
-    {
       "label": "CONILON BRL",
       "value": "R$ 1,200 (26/12)",
       "trend": "up"
@@ -80,17 +83,29 @@
       "trend": "neutral"
     },
     {
+      "label": "NY STOCKS",
+      "value": "456.4K",
+      "trend": "slow rebuild"
+    },
+    {
       "label": "LDN STOCKS",
       "value": "4.2K",
       "trend": "risk"
     }
   ],
+    
   "alerts": [
     {
       "t": "Vietnam Supply Bottleneck",
       "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
       "date": "Dec 29",
       "loc": [12.6, 108.0]
+    },
+        {
+      "t": "CRITICAL: Sumatra Disaster",
+      "v": "Cyclone Senyar & Floods: 1,100+ dead, 1/3 of Arabica farms submerged. Exports likely down 15%.",
+      "date": "Dec 29",
+      "loc": [3.59, 98.67]
     }
   ]
 }
