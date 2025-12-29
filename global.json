@@ -12,6 +12,12 @@
       "date": "Dec 29"
     },
     {
+      "t": "Uganda Record Exports",
+      "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags.",
+      "date": "Dec 29",
+      "loc": [0.31, 32.58]
+    },
+    {
       "t": "Brazil Conilon Flow",
       "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
       "date": "Dec 26"
@@ -58,6 +64,11 @@
     {
       "t": "ITM Option OI",
       "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
+      "date": "Dec 29"
+    },
+     {
+      "t": "OI",
+      "v": "DF OI H : 44,582 / NY OI H : 74,455 ",
       "date": "Dec 29"
     }
   ],
