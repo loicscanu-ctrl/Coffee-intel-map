@@ -474,16 +474,16 @@
                 }
             },
 
-            // VERSION SÉCURISÉE DE RENDERMAP (Empêche les crashs)
+// VERSION SÉCURISÉE (Protège contre les écrans blancs)
             renderMap: function() {
                 // 1. On efface tout proprement
                 Object.values(this.layers).forEach(layer => layer.clearLayers());
 
-                // 2. DESSIN DES ROUTES
+                // 2. DESSIN DES ROUTES (Sécurisé)
                 if (CoffeeData.routes && Array.isArray(CoffeeData.routes)) {
                     CoffeeData.routes.forEach(r => {
-                        // SÉCURITÉ : On vérifie que le chemin (path) existe
-                        if(r.path) { 
+                        // SÉCURITÉ : On vérifie que le chemin existe avant de dessiner
+                        if(r.path && r.path.length > 0) { 
                             L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
                                 .bindTooltip(r.name || "Route")
                                 .addTo(this.layers.logistics);
@@ -491,7 +491,7 @@
                     });
                 }
 
-                // 3. DESSIN DES PORTS
+                // 3. DESSIN DES PORTS (Sécurisé)
                 if (CoffeeData.ports && Array.isArray(CoffeeData.ports)) {
                     CoffeeData.ports.forEach(p => {
                         if(p.l && p.l.length === 2) { 
@@ -501,10 +501,10 @@
                     });
                 }
 
-                // 4. DESSIN DES PAYS
+                // 4. DESSIN DES PAYS (Sécurisé)
                 if(CoffeeData.countries) {
                     for (const [key, data] of Object.entries(CoffeeData.countries)) {
-                        // SÉCURITÉ : Si pas de GPS, on ignore ce pays
+                        // SÉCURITÉ : Si pas de GPS, on saute ce pays au lieu de faire planter la carte
                         if (!data.lat || !data.lng) continue;
 
                         const isProducer = data.type === 'producer';
@@ -532,10 +532,10 @@
                     }
                 }
 
-                // 5. DESSIN DES USINES
+                // 5. DESSIN DES USINES (Sécurisé)
                 if (CoffeeData.factories && Array.isArray(CoffeeData.factories)) {
                     CoffeeData.factories.forEach(fac => {
-                        // SÉCURITÉ : Si pas de coordonnées, on ignore l'usine
+                        // SÉCURITÉ : On vérifie les coordonnées
                         if (!fac.l || fac.l.length !== 2) return; 
 
                         const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
