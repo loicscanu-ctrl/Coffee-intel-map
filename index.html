@@ -156,50 +156,24 @@
     <div id="map"></div>
 
     <div class="absolute top-4 left-4 z-[1000] flex gap-2">
-        <!-- 1. Country Upload -->
-        <button onclick="document.getElementById('uploadCountry').click()" class="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-bold py-2 px-3 rounded border border-slate-600 flex items-center justify-center gap-2 shadow-lg transition-all" title="Update Country Stats (Prod/Stock)">
-            <i class="fa-solid fa-flag text-emerald-400"></i> COUNTRY DATA
-        </button>
-        <input type="file" id="uploadCountry" class="hidden" accept=".json">
-
-        <!-- 2. Global Upload -->
-        <button onclick="document.getElementById('uploadGlobal').click()" class="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-bold py-2 px-3 rounded border border-slate-600 flex items-center justify-center gap-2 shadow-lg transition-all" title="Update Global Intel & Alerts">
-            <i class="fa-solid fa-globe text-blue-400"></i> GLOBAL INTEL
-        </button>
-        <input type="file" id="uploadGlobal" class="hidden" accept=".json">
-
-        <!-- Download Button -->
         <button onclick="App.utils.downloadHTML()" class="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-bold py-2 px-3 rounded border border-slate-600 flex items-center justify-center gap-2 shadow-lg transition-all" title="Save Dashboard">
             <i class="fa-solid fa-download"></i>
         </button>
     </div>
 
-    <!-- GLOBAL INTELLIGENCE PANEL (Integrated Ticker) -->
     <div id="global-panel" class="absolute bottom-0 left-0 w-full h-[320px] bg-panel-bg border-t border-panel-border z-[1000] shadow-[0_-4px_20px_rgba(0,0,0,0.5)] flex flex-col backdrop-blur-md">
         
         <div id="panel-toggle" class="h-[36px] bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4 cursor-pointer hover:bg-slate-800 transition-colors" onclick="App.ui.togglePanel()">
-            <!-- Left: Title -->
             <div class="flex items-center gap-3 shrink-0">
                 <div class="font-mono font-bold text-sm text-gray-100 tracking-wider">GLOBAL MARKET INTEL</div>
             </div>
             
-            <!-- Center: OSINT Ticker (Integrated) -->
             <div class="osint-ticker-wrap">
                 <div class="osint-ticker">
-                    <!-- Default Static Ticker Items -->
-                    <span class="osint-item"><span class="osint-label">ARABICA</span> <span class="osint-val-down">BROKE 351.45</span></span>
-                    <span class="osint-item"><span class="osint-label">KC TARGET</span> <span class="osint-val-down">334.30 (RSI 24)</span></span>
-                    <span class="osint-item"><span class="osint-label">ROBUSTA</span> <span class="osint-val-down">$3677 (-$28)</span></span>
-                    <span class="osint-item"><span class="osint-label">RC SPREAD</span> <span class="osint-val-risk">F/H &lt;$100</span></span>
-                    <span class="osint-item"><span class="osint-label">ICE KC</span> <span class="osint-val-up">426,936 (+5.7k)</span></span>
-                    <span class="osint-item"><span class="osint-label">PENDING</span> <span class="osint-val-neutral">46,967 BAGS</span></span>
-                    <span class="osint-item"><span class="osint-label">ICE RC</span> <span class="osint-val-neutral">4,154 LOTS (+57)</span></span>
-                    <span class="osint-item"><span class="osint-label">GRADING</span> <span class="osint-val-up">BR/RW/PE PASS</span></span>
-                    <span class="osint-item"><span class="osint-label">MACRO</span> <span class="osint-val-neutral">CPI +2.7% / BRL SOFT</span></span>
+                    <span class="osint-item"><span class="osint-label">SYSTEM</span> <span class="osint-val-neutral">LOADING DATA...</span></span>
                 </div>
             </div>
 
-            <!-- Right: Toggle Icon -->
             <div class="text-gray-400 hover:text-white transition-transform duration-300 shrink-0" id="toggle-icon">
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
@@ -212,7 +186,7 @@
                     <i class="fa-solid fa-wheat-awn"></i> Supply & Harvest
                 </div>
                 <div id="col-supply" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">No active reports</div>
+                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
                 </div>
             </div>
 
@@ -221,7 +195,7 @@
                     <i class="fa-solid fa-cart-shopping"></i> Global Demand
                 </div>
                 <div id="col-demand" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">No active reports</div>
+                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
                 </div>
             </div>
 
@@ -230,7 +204,7 @@
                     <i class="fa-solid fa-cubes-stacked"></i> Certified Stocks
                 </div>
                 <div id="col-stocks" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">No active reports</div>
+                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
                 </div>
             </div>
 
@@ -239,14 +213,13 @@
                     <i class="fa-solid fa-chart-line"></i> Futures / COT / FX
                 </div>
                 <div id="col-futures" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">No active reports</div>
+                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- AI Modal (Dark Mode) -->
     <div id="modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1999] hidden" onclick="App.ui.closeAiModal()"></div>
     <div id="ai-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] max-w-[90%] max-h-[85vh] bg-slate-900 rounded-lg shadow-2xl z-[2000] hidden flex-col border border-slate-700">
         <div class="bg-slate-800 px-5 py-3 border-b border-slate-700 flex justify-between items-center rounded-t-lg">
@@ -259,10 +232,8 @@
         <div id="ai-modal-content" class="p-6 overflow-y-auto text-sm text-gray-300 leading-relaxed font-sans"></div>
     </div>
 
-    <!-- External Libs -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
 
-    <!-- Application Logic -->
     <script>
         // --- 1. CONFIG & DATA ---
         const CONFIG = {
@@ -273,33 +244,13 @@
         };
 
         const CoffeeData = {
-            // Initial Country Data
-            countries: {
-                // PRODUCERS (Now with Domestic Consumption 'cons')
-                "Vietnam": { type: "producer", lat: 14.0583, lng: 108.2772, prod: "29.90", cons: "3.50", stock: "Building", status: "Harvest Delayed", season: "Nov-Jan", intel: "Harvest delayed by 21 storms. Crop still projected +2.9m bags." },
-                "Brazil": { type: "producer", lat: -14.2350, lng: -51.9253, prod: "74.0 (Est)", cons: "22.50", stock: "High", status: "Crop Development", season: "May-Aug", intel: "H1 '26: 1.5m bag export catch-up expected. H2 '26: Forecasting 10m bag surplus." },
-                "Colombia": { type: "producer", lat: 4.5709, lng: -74.2973, prod: "13.50", cons: "2.20", stock: "Med", status: "Fly Crop Prep", season: "Oct-Dec", intel: "Large crop expected H1 '26. Tariffs removal leveling playing field." },
-                "Indonesia": { type: "producer", lat: -0.7893, lng: 113.9213, prod: "10.00", cons: "4.80", stock: "Low", status: "Off-Season", season: "Apr-Sep", intel: "Robusta demand surge (+8.2m global shift) keeping local premiums high." },
-                "Honduras": { type: "producer", lat: 15.199, lng: -86.2419, prod: "6.80", cons: "0.40", stock: "Building", status: "Active Harvest", season: "Dec-Mar", intel: "Delayed harvest coming online. Large crop expected to aid physical relief H1." },
-                "Ethiopia": { type: "producer", lat: 9.1450, lng: 40.4897, prod: "7.80", cons: "3.80", stock: "Med", status: "Harvest", season: "Nov-Feb", intel: "" },
-                "Uganda": { type: "producer", lat: 1.3733, lng: 32.2903, prod: "6.50", cons: "0.30", stock: "Med", status: "Harvest Tailing Off", season: "Nov-Feb", intel: "Benefiting from global Robusta switch. Exports solid." },
-                "India": { type: "producer", lat: 20.5937, lng: 78.9629, prod: "5.90", cons: "1.50", stock: "Low", status: "Early Harvest", season: "Jan-Mar", intel: "Robusta harvesting commencing. Demand aggressive for cheaper grades." },
-                
-                // CONSUMERS (New Nodes Added)
-                "USA": { type: "consumer", lat: 37.0902, lng: -95.7129, cons: "27.0", stock: "Critical", intel: "Stocks at 7-8 weeks cover. Tariff removal aids Brazil imports." },
-                "EU": { type: "consumer", lat: 54.5260, lng: 15.2551, cons: "40.5", stock: "Critical", intel: "Inventory depletion severe." },
-                "China": { type: "consumer", lat: 35.8617, lng: 104.1954, cons: "6.8", stock: "Low", intel: "" },
-                "Japan": { type: "consumer", lat: 36.2048, lng: 138.2529, cons: "7.1", stock: "2.20", intel: "" },
-                "South Korea": { type: "consumer", lat: 35.9078, lng: 127.7669, cons: "2.8", stock: "Stable", intel: "Specialty market growing." },
-                "Middle East (Iraq)": { type: "consumer", lat: 33.3152, lng: 44.3661, cons: "1.5", stock: "Med", intel: "Transit hub for region." },
-                "North Africa (Tunisia)": { type: "consumer", lat: 33.8869, lng: 9.5375, cons: "1.2", stock: "Low", intel: "Robusta import focus." }
-            },
+            // CES SECTIONS SERONT REMPLIES PAR LES FICHIERS JSON
+            // (countries.json, global.json, factories.json)
+            countries: {},
+            globalIntel: { supply: [], demand: [], stocks: [], futures: [] },
+            factories: [],
             
-            // Initial Global Intel
-            globalIntel: {
-                supply: [], demand: [], stocks: [], futures: []
-            },
-            
+            // --- DONNÉES STATIQUES (Restent dans le HTML) ---
             ports: [
                 // Origins
                 { n: "Santos", l: [-23.9, -46.3] },
@@ -339,395 +290,73 @@
                 { name: "Inland: Armenia -> Buenaventura", color: "#2c3e50", path: [[4.53, -75.67], [3.88, -77.06]] },
                 { name: "Inland: Armenia -> Cartagena", color: "#2c3e50", path: [[4.53, -75.67], [8.0, -76.0], [10.40, -75.52]] },
                 { name: "Inland: Comayagua -> Pto Cortes", color: "#2c3e50", path: [[14.46, -87.64], [15.84, -87.94]] },
-                { name: "Inland: Lampung -> Jakarta", color: "#2c3e50", path: [[-5.43, 105.26], [-5.9, 106.0], [-6.10, 106.88]] }, // Ferry crossing
+                { name: "Inland: Lampung -> Jakarta", color: "#2c3e50", path: [[-5.43, 105.26], [-5.9, 106.0], [-6.10, 106.88]] }, 
                 { name: "Inland: Uganda -> Mombasa", color: "#2c3e50", path: [[0.31, 32.58], [0.5, 34.5], [-1.3, 36.8], [-3.5, 38.5], [-4.05, 39.65]] },
                 { name: "Inland: Uganda -> Sudan", color: "#2c3e50", path: [[0.31, 32.58], [3.0, 32.0], [5.0, 31.5], [10.0, 32.0], [15.50, 32.56]] },
                 { name: "Inland: Chiapas -> Veracruz", color: "#2c3e50", path: [[14.90, -92.26], [16.5, -94.0], [18.0, -95.0], [19.20, -96.13]] },
 
-                // --- MARITIME ROUTES (Precision Navigation) ---
-
-                // 1. Brazil (Santos) -> Antwerp (Avoiding the 'Bulge' of Brazil)
+                // --- MARITIME ROUTES ---
                 { name: "Brazil (Santos) -> Antwerp", color: "#e74c3c", path: [
                     [-23.95, -46.3], [-24.5, -44.0], [-20.0, -36.0], [-10.0, -32.0], [0.0, -30.0], 
                     [15.0, -28.0], [30.0, -22.0], [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]
                 ]},
-
-                // 2. Brazil (Salvador) -> Antwerp
                 { name: "Brazil (Salvador) -> Antwerp", color: "#e74c3c", path: [
                     [-12.96, -38.5], [-11.5, -35.0], [-5.0, -32.0], [10.0, -30.0], [30.0, -22.0], 
                     [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]
                 ]},
-
-                // 3. Brazil (Santos) -> NY (Wide arc around Recife)
                 { name: "Brazil (Santos) -> NY", color: "#e74c3c", path: [
                     [-23.95, -46.3], [-24.0, -43.0], [-10.0, -33.0], [-5.0, -34.0], [5.0, -45.0], 
                     [15.0, -55.0], [25.0, -65.0], [32.0, -72.0], [40.68, -74.14]
                 ]},
-                // Brazil -> Japan (Eastbound via Good Hope & Malacca)
                 { name: "Brazil (Santos) -> Japan", color: "#e74c3c", path: [
-                    [-23.95, -46.3], [-32.0, -30.0], [-36.0, 15.0], // Atlantic -> Good Hope
-                    [-30.0, 70.0], [-10.0, 90.0], // Indian Ocean
-                    [5.9, 95.2], [3.0, 100.0], [1.26, 103.8], // Malacca Strait (Clean Entry)
-                    [10.0, 111.0], [18.0, 118.0], // South China Sea
-                    [21.0, 121.0], [24.0, 123.0], // Bashi Channel (Dodging Taiwan to the East)
-                    [30.0, 130.0], [35.6, 139.6] // Approach Japan
+                    [-23.95, -46.3], [-32.0, -30.0], [-36.0, 15.0], 
+                    [-30.0, 70.0], [-10.0, 90.0], 
+                    [5.9, 95.2], [3.0, 100.0], [1.26, 103.8], 
+                    [10.0, 111.0], [18.0, 118.0], 
+                    [21.0, 121.0], [24.0, 123.0], 
+                    [30.0, 130.0], [35.6, 139.6] 
                 ]},
-                
-                // 4. Asia -> Europe Trunk (High Precision: Malacca -> Sri Lanka -> Red Sea -> Med -> Gibraltar)
                 { name: "Asia -> Europe Trunk", color: "#16a085", path: [
-                    [1.26, 103.8], // Singapore
-                    [2.5, 101.5], [4.5, 99.0], [5.8, 95.5], // Malacca Strait (Zig Zag)
-                    [5.8, 80.4], // South of Sri Lanka (Dondra Head)
-                    [9.0, 70.0], [12.0, 55.0], [12.0, 45.0], // Arabian Sea
-                    [12.6, 43.3], // Bab el Mandeb
-                    [18.0, 40.0], [25.0, 36.0], [27.0, 34.5], [29.9, 32.5], // Red Sea Centerline
-                    [31.2, 32.3], // Suez North
-                    [33.0, 30.0], [34.0, 25.0], [37.5, 11], [37.5, 2], // Med (Avoiding Sicily/Crete)
-                    [35.95, -5.6], // Gibraltar
-                    [37.0, -10.0], [43.0, -10.5], [49.0, -5.0], // Atlantic Arc
-                    [51.5, 3.50], [51.26, 4.35] // Antwerp
+                    [1.26, 103.8], 
+                    [2.5, 101.5], [4.5, 99.0], [5.8, 95.5], 
+                    [5.8, 80.4], 
+                    [9.0, 70.0], [12.0, 55.0], [12.0, 45.0], 
+                    [12.6, 43.3], 
+                    [18.0, 40.0], [25.0, 36.0], [27.0, 34.5], [29.9, 32.5], 
+                    [31.2, 32.3], 
+                    [33.0, 30.0], [34.0, 25.0], [37.5, 11], [37.5, 2], 
+                    [35.95, -5.6], 
+                    [37.0, -10.0], [43.0, -10.5], [49.0, -5.0], 
+                    [51.5, 3.50], [51.26, 4.35] 
                 ]},
-
-                // 5. Jakarta -> Singapore Feeder (Avoiding Sumatra/Borneo collision)
                 { name: "Jakarta Feeder", color: "#d35400", path: [
                     [-6.10, 106.88], [-5.5, 107.0], [-3.0, 106.5], [-1.0, 105.0], [1.26, 103.8] 
                 ]},
-
-                // 6. Vietnam -> Singapore Feeder
                 { name: "Vietnam Feeder", color: "#2ecc71", path: [
                     [10.76, 106.78], [9.0, 107.5], [4.0, 106.0], [1.5, 104.5], [1.26, 103.8] 
                 ]},
-
-                // 7. Vietnam -> US West (Pacific Great Circle)
                 { name: "Vietnam -> US West", color: "#2ecc71", path: [
                     [[10.76, 106.78], [15.0, 115.0], [21.0, 121.0], [30.0, 135.0], [40.0, 160.0], [45.0, 180.0]], 
                     [[45.0, -180.0], [45.0, -160.0], [42.0, -140.0], [37.8, -122.4]]
                 ]},
-
-                // 8. Vietnam -> Tokyo (Coastal Route)
                 { name: "Vietnam -> Tokyo", color: "#2ecc71", path: [
                     [10.76, 106.78], [15.0, 112.0], [20.0, 118.0], [25.0, 123.0], [30.0, 128.0], [35.61, 139.78]
                 ]},
-
-                // 9. Uganda -> Trieste (via Suez)
                 { name: "Uganda -> Trieste", color: "#f39c12", path: [
-                    [-4.05, 39.65], [0.0, 45.0], [10.0, 52.0], [12.6, 43.3], // Mombasa to Red Sea
-                    [20.0, 39.0], [29.9, 32.5], [31.2, 32.3], // Red Sea to Suez
-                    [33.0, 29.0], [35.0, 22.0], [38.0, 18.0], [42.0, 15.0], [45.64, 13.76] // Med to Adriatic
+                    [-4.05, 39.65], [0.0, 45.0], [10.0, 52.0], [12.6, 43.3], 
+                    [20.0, 39.0], [29.9, 32.5], [31.2, 32.3], 
+                    [33.0, 29.0], [35.0, 22.0], [38.0, 18.0], [42.0, 15.0], [45.64, 13.76] 
                 ]},
-
-                // 10. LATAM
                 { name: "Colombia -> NY", color: "#9b59b6", path: [[10.4, -75.5],[12,-76],[19.5,-74.5],[24,-73],[32,-74],[40.7,-74]] },
                 { name: "Colombia -> Oakland", color: "#9b59b6", path: [[3.88, -77.0],[5,-80],[12,-90],[18,-104],[25,-114],[33,-120],[37.8,-122.4]] },
                 { name: "Honduras -> NOLA", color: "#3498db", path: [[15.8, -87.9],[18.5,-86.5],[21.8,-86],[24.5,-88],[29,-89],[29.9,-90]] },
                 { name: "Honduras -> Antwerp", color: "#3498db", path: [[15.8, -87.9],[18.5,-86.5],[21.8,-85.5],[24.5,-81],[27,-79.5],[35,-60],[45,-30],[49,-5], [51.22, 4.40]] },
-
-                // 11. Vietnam -> Tuticorin (Avoiding Sri Lanka Land)
                 { name: "Vietnam -> Tuticorin", color: "#00875a", path: [
-                    [10.76, 106.78], [3.0, 105.0], [1.26, 103.8], // To Singapore
-                    [5.0, 98.0], [5.8, 85.0], [5.8, 80.4], // Malacca -> South of Sri Lanka
-                    [6.5, 79.0], [8.75, 78.18] // Curve up to Tuticorin
+                    [10.76, 106.78], [3.0, 105.0], [1.26, 103.8], 
+                    [5.0, 98.0], [5.8, 85.0], [5.8, 80.4], 
+                    [6.5, 79.0], [8.75, 78.18] 
                 ]}
-                
-            ],
-
-            // Full Factory List Restored (Converted to compact format)
-            factories: [
-                // =========================================================================
-                // REGION: AMERICAS
-                // =========================================================================
-                // BRASIL
-                { n: "3 Corações Factory", l: [-3.892, -38.444], c: "Strauss/São Miguel", cap: "200k, Main distribution and roasting center." },
-                { n: "Melitta Avaré", l: [-23.116, -48.918], c: "Melitta", cap: "60k, Their most modern and highest-volume plant in the region." },
-                { n: "Cia. Iguaçu Factory", l: [-23.176, -50.648], c: "Iguaçu (Marubeni)", cap: "40k, Instant coffee giant (owned by Marubeni)." },
-                { n: "JDE Jundiaí", l: [-23.155, -46.945], c: "JDE Peet's", cap: "40k, Massive hub for brands like Pilão and L'OR." },
-                { n: "Nestlé Araras", l: [-22.345, -47.387], c: "Nestlé", cap: "25k, Historic Nescafé plant in Brazil." },
-                { n: "Cooxupé Japy", l: [-21.306, -46.721], c: "Cooxupé Co-op", cap: "15.6k, The roasting complex of the world's largest cooperative." },
-                { n: "Dolce Gusto MOC", l: [-16.694, -43.842], c: "Nestlé", cap: "15k, Exclusive high-tech capsule plant." },
-                { n: "Café Maringá (Cocamar)", l: [-23.447, -51.902], c: "Cocamar Co-op", cap: "12k, Industrial complex of the Cocamar cooperative." },
-                // CANADA
-                { n: "Mother Parkers Mississauga", l: [43.642, -79.675], c: "Mother Parkers", cap: "70k, Their largest roasting plant, located near the airport." },
-                { n: "Club Coffee Toronto", l: [43.708, -79.593], c: "Club Coffee", cap: "20k, North American leader in compostable capsules." },
-                { n: "Tim Hortons Roastery", l: [43.208, -79.972], c: "Tim Hortons", cap: "15k, Their roasting center of excellence (The Roastery)." },
-                // COLOMBIA
-                { n: "Colcafé Itagüí", l: [6.175, -75.599], c: "Nutresa", cap: "20k, Primary plant of the Nutresa Group." },
-                { n: "Buencafé Chinchiná", l: [4.975, -75.602], c: "FNC", cap: "11.5k, The FNCs (National Federation of Coffee Growers) freeze-dried coffee factory." },
-                // ECUADOR
-                { n: "El Café Guayaquil", l: [-2.148, -79.957], c: "El Café (EC)", cap: "15k, Industrial plant located on the Daule Highway." },
-                // MÉXICO
-                { n: "Cafiver Veracruz", l: [18.847, -97.054], c: "Cafiver", cap: "25k, Located in the Orizaba industrial corridor." },
-                { n: "Descamex Veracruz", l: [19.167, -96.208], c: "Descamex (Decaf)", cap: "20k, Water-process decaffeination plant." },
-                // USA
-                // ==========================================
-                { n: "Folgers NOLA Factory", l: [30.012, -90.015], c: "J.M. Smucker", cap: "300k, The largest single-site roastery in the US." },
-                { n: "Maxwell House Jacksonville", l: [30.324, -81.644], c: "Kraft Heinz", cap: "150k, Massive facility directly on the St. Johns River." },
-                { n: "Starbucks York Roastery", l: [39.981, -76.694], c: "SBUX", cap: "135k, One of the largest roasting plants in the world." },
-                { n: "Starbucks Minden Roastery", l: [39.030, -119.752], c: "SBUX", cap: "100k, Serves the entire Western US." },
-                { n: "Westrock Conway Factory", l: [35.056, -92.417], c: "Westrock", cap: "100k, Site of their new $300M expansion." },
-                { n: "MZB Suffolk (Wilroy Rd)", l: [36.758, -76.551], c: "Massimo Zanetti", cap: "100k, The engine for Walmart/Costco private labels." },
-                { n: "S&D Coffee Concord", l: [35.432, -80.605], c: "Westrock", cap: "80k, Major industrial hub for liquid coffee and beans." },
-                { n: "Peet's Alameda Roastery", l: [37.747, -122.234], c: "Peet's", cap: "60k, Their LEED Gold certified industrial hub." },
-                { n: "Keurig Dr Pepper VT", l: [44.341, -72.742], c: "KDP", cap: "60k, Primary K-Cup production hub." },
-                { n: "Farmer Brothers Northlake", l: [33.025, -97.231], c: "Farmer Bros", cap: "45k, Massive HQ and roasting plant near DFW." },
-                { n: "Eight O'Clock Landover", l: [38.932, -76.884], c: "Tata Consumer", cap: "25k, Owned by Tata Consumer Products." },
-                { n: "La Colombe Philadelphia", l: [39.986, -75.105], c: "La Colombe (Chobani)", cap: "20k" },
-                { n: "Segafredo Suffolk (Progress Rd)", l: [36.745, -76.568], c: "Massimo Zanetti", cap: "20k, Specialized facility near the main MZB plant." },
-                { n: "Tim Hortons Rochester", l: [43.048, -77.671], c: "Tim Hortons", cap: "15k, Major US-based industrial roasting site." },
-                { n: "Black Rifle Manchester", l: [35.471, -86.046], c: "BRCC", cap: "15k" },
-                { n: "Melitta Cherry Hill", l: [39.919, -74.996], c: "Melitta", cap: "15k, The primary Melitta roasting hub for the US." },
-                { n: "White Coffee LIC", l: [40.739, -73.921], c: "White Coffee Corp", cap: "12k, Historic LIC industrial roastery." },
-                { n: "Gavin LA (McDonald's)", l: [34.004, -118.238], c: "Gavin Coffee", cap: "12k, Key industrial roaster for West Coast fast food." },
-                { n: "Death Wish Round Lake", l: [42.936, -73.791], c: "Death Wish Coffee", cap: "6k" },
-                { n: "Starbucks Augusta (Soluble)", l: [33.354, -81.986], c: "SBUX", cap: "4k, Specialized soluble (Via) and extract plant." },
-                { n: "Mother Parkers Mississauga", l: [43.642, -79.675], c: "Mother Parkers", cap: "70k", note: "Canada's largest industrial roasting plant, located strategically near Toronto Pearson Airport." },
-                { n: "Coffee Holding Co. (La Junta)", l: [37.985, -103.542], c: "Coffee Holding Company", cap: "12k", note: "Primary US industrial roasting facility for proprietary and high-volume private label brands." },
-
-                // ==========================================
-                // REGION: ASIA
-                // ==========================================
-                // CHINA
-                { n: "Starbucks Kunshan Park", l: [31.350, 121.011], c: "SBUX (China)", cap: "60k" },
-                { n: "Luckin Pingnan Factory", l: [26.915, 119.005], c: "Luckin", cap: "30k" },
-                { n: "Nestlé Pu'er Hub", l: [22.785, 100.972], c: "Nestlé (CN)", cap: "20k" },
-                // INDIA
-                { n: "CCL Products Guntur", l: [16.326, 80.627], c: "CCL (India)", cap: "35k" },
-                { n: "Tata Coffee Kushalnagar", l: [12.466, 75.968], c: "Tata Consumer", cap: "10k" },
-                { n: "SLN Coffee Kudlur", l: [12.468, 75.970], c: "SLN", cap: "10k" },
-                { n: "Vidya Coffee Chikmagalur", l: [13.312, 75.775], c: "Vidya Coffee", cap: "25k", note: "Massive integrated industrial hub for roasted, ground, and instant coffee processing in India." },
-                // INDONESIA
-                { n: "Kapal Api Sidoarjo", l: [-7.356, 112.658], c: "Santos Jaya Abadi", cap: "80k" },
-                { n: "Mayora Tangerang", l: [-6.195, 106.568], c: "Mayora", cap: "50k" },
-                // JAPAN
-                { n: "Ajinomoto Suzuka", l: [34.855, 136.598], c: "Ajinomoto AGF", cap: "40k" },
-                { n: "UCC Rokko Island", l: [34.686, 135.267], c: "UCC", cap: "40k" },
-                { n: "Key Coffee Funabashi", l: [35.688, 139.991], c: "Key Coffee", cap: "30k" },
-                // MALAYSIA
-                { n: "Power Root Plentong", l: [1.522, 103.875], c: "Power Root (Alicafé)", cap: "18k" },
-                { n: "Super Food Permas Jaya", l: [1.503, 103.826], c: "Super/JDE", cap: "20k" },
-                { n: "HACO Shah Alam", l: [3.003, 101.520], c: "HACO", cap: "10k" },
-                { n: "Aik Cheong Melaka", l: [2.264, 102.223], c: "Aik Cheong", cap: "8k" },
-                { n: "Mister Coffee Bakri", l: [2.046, 102.668], c: "Mister Coffee", cap: "5k" }, // Muar Facility
-                { n: "Yit Foh Tenom", l: [5.094, 115.939], c: "Yit Foh", cap: "2k" },
-                // PAKISTAN
-                { n: "S-CAFE Korangi Industrial", l: [24.832, 67.118], c: "S-CAFE (PK)", cap: "2k, Pakistan's primary industrial roasting zone." },
-                // PHILIPPINES
-                { n: "URC Pasig Plant", l: [14.568, 121.066], c: "Universal Robina", cap: "15k, The massive Great Taste / Blend 45 hub." },
-                // SOUTH KOREA
-                { n: "Dongsuh Maxim Incheon", l: [37.525, 126.691], c: "Dongsuh", cap: "60k, The home of Maxim coffee in South Korea." },
-                // THAILAND
-                { n: "Boncafé Rayong Factory", l: [12.871, 101.144], c: "Segafredo (TH)", cap: "8k, Within the Rayong Industrial Park." },
-                { n: "Thabdheva Thapthai Lab", l: [20.245, 100.410], c: "Dheva Lab", cap: "1k, Specialized roasting lab in North Thailand." },
-                // VIETNAM
-                { n: "Nestlé Tri An Factory", l: [10.963, 107.012], c: "Nestlé", cap: "32k, One of the largest Nescafé plants in Asia." },
-                { n: "Iguacu Vietnam Plant", l: [10.938, 106.892], c: "Iguacu (BR)", cap: "15k, Specialized soluble plant." },
-                { n: "Olam Nhon Trach", l: [10.741, 106.915], c: "Olam", cap: "12k, High-volume industrial processing." },
-                { n: "Tata Coffee VSIP", l: [11.134, 106.697], c: "Tata Consumer", cap: "10k, Modern freeze-dried soluble facility." },
-                { n: "Instanta/LDC Binh Duong", l: [11.121, 106.678], c: "ILD Coffee", cap: "6k, Shared with LDC (ILD Coffee JV)." },
-                { n: "Vinacafé Binh Duong", l: [11.085, 106.634], c: "Masan Group", cap: "15k, High-capacity roastery and soluble line." },
-                // BANGLADESH
-                { n: "North End Dhaka Roastery", l: [23.821, 90.435], c: "North End (BD)", cap: "1k, Bangladesh's primary specialty roastery." },
-                // UZBEKISTAN
-                { n: "Coffee-Boom Industrial", l: [41.214, 69.215], c: "Coffee-Boom", cap: "3k, Massive central hub for Central Asia." },
-                // KAZAKHSTAN
-                { n: "Master Roasters Almaty", l: [43.342, 76.945], c: "Master Roasters", cap: "2k, Primary industrial roastery in Kazakhstan." },
-
-                // ==========================================
-                // REGION: EUROPE
-                // ==========================================
-               // ALBANIA
-                { n: "Caffè Nino Factory", l: [41.341, 19.682], c: "Nino (Albania)", cap: "3k, Key industrial corridor for Albanian exports." },
-                // AUSTRIA
-                { n: "Julius Meinl Vienna", l: [48.213, 16.321], c: "Julius Meinl", cap: "10k, Historic roasting hub in the 16th district." },
-                // BELARUS
-                { n: "Barista Minsk Factory", l: [53.842, 27.685], c: "Barista", cap: "4k, Located in the southern industrial zone." },
-                // BELGIUM
-                { n: "JDE Grimbergen Factory", l: [50.925, 4.412], c: "JDE Peet's", cap: "30k, Massive JDE Peet's roasting hub for Benelux." },
-                { n: "Cafea Liège Plant", l: [50.655, 5.584], c: "Cafea", cap: "20k, Soluble and liquid coffee production site." },
-                // BULGARIA
-                { n: "Spetema Bozhurishte", l: [42.756, 23.184], c: "Spetema (BG)", cap: "10k, Modern industrial complex outside Sofia." },
-                { n: "Nova Brasilia Plant", l: [42.812, 23.215], c: "JDE (BG)", cap: "8k, JDE's primary production hub for Bulgaria." },
-                // CROATIA
-                { n: "Franck Zagreb Factory", l: [45.808, 15.952], c: "Franck (Croatia)", cap: "15k, The historic heart of roasting in Croatia." },
-                // ESTONIA
-                { n: "Paulig Saue Factory", l: [59.324, 24.551], c: "Paulig (EE)", cap: "5k, Primary production hub for the Baltics." },
-                // FINLAND
-                { n: "Paulig Vuosaari Port", l: [60.215, 25.178], c: "Paulig", cap: "60k, Directly in the Port of Vuosaari for logistics." },
-                { n: "Meira Helsinki Plant", l: [60.191, 24.949], c: "Segafredo", cap: "10k, Historic city-industrial hybrid roastery." },
-                // FRANCE
-                { n: "Méo-Fichaux Lille", l: [50.621, 3.048], c: "Méo-Fichaux", cap: "35k, The North Star of French private label coffee." },
-                { n: "Segafredo Rouen Plant", l: [49.408, 1.092], c: "Massimo Zanetti", cap: "30k, Massimo Zanetti's primary French industrial hub." },
-                { n: "JDE Andrézieux Plant", l: [45.545, 4.272], c: "JDE Peet's", cap: "25k, The high-tech home of aluminum capsules." },
-                { n: "Carte Noire Lavérune", l: [43.585, 3.805], c: "Lavazza", cap: "25k, Lavazza's primary industrial facility in France." },
-                { n: "Cafe Sati Strasbourg", l: [48.572, 7.795], c: "Cafés Sati", cap: "10k, Major industrial hub on the Rhine river." },
-                { n: "Malongo La Gaude", l: [43.715, 7.142], c: "Malongo", cap: "7k, High-tech roastery in the Industrial zone of Nice." },
-                // GEORGIA/ARMENIA
-                { n: "Royal Armenia", l: [40.18, 44.51], c: "Royal Armenia", cap: "5k, Primary industrial roasting site in Armenia." },
-                { n: "Cherie", l: [41.71, 44.82], c: "Cherie (Georgia)", cap: "2k, Georgia's largest industrial roasting plant." },
-                // GERMANY
-                { n: "Jacobs Bremen Industrial", l: [53.078, 8.795], c: "JDE/Melitta", cap: "80k, The industrial heart of JDE/Jacobs in Germany." },
-                { n: "Tchibo Hamburg Plant", l: [53.535, 10.082], c: "Tchibo", cap: "60k, Massive roasting complex in the Billbrook zone." },
-                { n: "Bonita Rheine (Lidl)", l: [52.272, 7.428], c: "Schwarz Group", cap: "50k, Lidl's dedicated high-volume industrial roastery." },
-                { n: "Dallmayr Munich East", l: [48.162, 11.642], c: "Dallmayr", cap: "50k, Industrial operations in the eastern Munich belt." },
-                { n: "DEK Hamburg Factory", l: [53.546, 10.021], c: "Cafea Group", cap: "40k, Central hub for DEK private label instant coffee." },
-                { n: "Markus Kaffee (Aldi Nord)", l: [52.991, 8.874], c: "Melitta/Aldi", cap: "35k, Aldi Nord's primary high-volume roastery." },
-                { n: "NewCoffee (Aldi Süd)", l: [51.428, 6.879], c: "Aldi Süd", cap: "35k, Aldi Süd's massive industrial roasting site." },
-                { n: "DEK Berlin Instant", l: [52.458, 13.452], c: "Cafea Group", cap: "25k, Deutsche Extrakt Kaffee's secondary instant plant." },
-                { n: "Minges Bavaria Plant", l: [49.972, 10.885], c: "Minges", cap: "12k, High-volume Private Label specialist." },
-                // GREECE
-                { n: "Nestlé Oinofyta Plant", l: [38.312, 23.645], c: "Nestlé (GR)", cap: "20k, The industrial hub for Nestlé Greece." },
-                { n: "Coffee Island Roastery", l: [38.164, 21.652], c: "Coffee Island", cap: "12k, High-tech roastery for their massive retail chain." },
-                // HUNGARY
-                { n: "Tchibo Budaörs Plant", l: [47.452, 18.924], c: "Tchibo", cap: "15k, Strategic roastery on the M1 highway." },
-                { n: "Douwe Egberts Budapest", l: [47.461, 19.048], c: "JDE Peet's", cap: "12k, JDE Peet's primary Hungarian industrial hub." },
-                // ITALY
-                { n: "Lavazza Settimo Torinese", l: [45.141, 7.808], c: "Lavazza", cap: "85k, One of the most automated roasteries in Europe." },
-                { n: "Segafredo Bologna Plant", l: [44.428, 11.365], c: "Massimo Zanetti", cap: "20k, Massimo Zanetti's historic industrial heart." },
-                { n: "Kimbo Naples Factory", l: [40.918, 14.234], c: "Kimbo", cap: "20k, Located in the Northern Naples industrial belt." },
-                { n: "Procaffé Belluno", l: [46.155, 12.231], c: "Bristot/Bonomi", cap: "20k, Home of Bristot and Bonomi industrial roasting." },
-                { n: "Caffè Borbone Caivano", l: [40.965, 14.331], c: "Caffè Borbone", cap: "15k, Ultramodern plant for ESE pods and capsules." },
-                { n: "Pellini Bussolengo", l: [45.474, 10.842], c: "Pellini Caffè", cap: "12k, High-volume industrial espresso plant." },
-                { n: "Caffitaly Gaggio Montano", l: [44.205, 10.962], c: "Caffitaly", cap: "12k, The global center for Caffitaly capsule production." },
-                { n: "Goppion Preganziol", l: [45.602, 12.245], c: "Goppion", cap: "8k, Their primary industrial hub since 1968. Highly automated with a focus on premium espresso for the Veneto region." },
-                { n: "Mondicaffè Rome", l: [41.908, 12.585], c: "Torrefazione Giubileo", cap: "2k, Located in the eastern industrial belt of Rome (Tor Cervara). The Giubileo and CSC certified roastery of the city" },
-                { n: "DiniCaffè Florence", l: [43.763, 11.269], c: "DiniCaffè Srl", cap: "1k, An artisan-at-scale industrial roastery located in the historic heart of Florence, utilizing specialized hot-air roasting" },
-                { n: "Arcaffè Livorno", l: [43.574, 10.338], c: "Meschini Family", cap: "1k, Founding member of the CSC (Certified Specialty Coffee) consortium. High-tech roastery powered by a large photovoltaic system" },
-
-                // NETHERLANDS
-                { n: "JDE Utrecht Hub", l: [52.094, 5.092], c: "JDE Peet's", cap: "45k, JDE's massive global logistics and roasting hub." },
-                { n: "UCC Bolsward Plant", l: [53.064, 5.528], c: "UCC (Private Label)", cap: "20k, Key Private Label hub for the UK/Benelux market." },
-                { n: "Pelican Rouge Dordrecht", l: [51.785, 4.641], c: "Selecta Group", cap: "15k, Mass production for vending and retail brands." },
-                { n: "Euro-Caps Rotterdam", l: [51.921, 4.475], c: "Euro-Caps (PL)", cap: "15k, High-speed global capsule manufacturing hub." },
-                { n: "Ahold Delhaize Zaandam", l: [52.441, 4.815], c: "Ahold", cap: "15k", note: "The dedicated internal roastery for Albert Heijn and Delhaize supermarket chains." },
-                // NORWAY
-                { n: "Joh. Johannson Vestby", l: [59.601, 10.744], c: "Evergood/NorgesGruppen", cap: "12k, One of the world's most sustainable roasteries (LEED Gold)." },
-                { n: "Friele Bergen Factory", l: [60.316, 5.381], c: "JDE Peet's", cap: "10k, JDE Peet's historic and largest industrial base in Norway." },
-                { n: "Kjeldsberg Trondheim", l: [63.439, 10.421], c: "Kjeldsberg", cap: "8k, The primary roaster for Central/Northern Norway retail." },
-                // POLAND
-                { n: "Mokate Ustroń Complex", l: [49.728, 18.822], c: "Mokate Group", cap: "30k, Massive complex for instant mixes, roasting, and private label." },
-                { n: "Prima Poznań Factory", l: [52.418, 16.965], c: "JDE Peet's", cap: "25k, The industrial heart of JDE Peet's in Central/Eastern Europe." },
-                { n: "Instanta Żory Plant", l: [50.045, 18.675], c: "Instanta/LDC", cap: "12k, High-volume industrial hub for private label soluble/roasted." },
-                { n: "Coffee Promotion Żory", l: [50.046, 18.694], c: "Coffee Promotion", cap: "10k, Shared industrial zone with Instanta; high-speed automated packaging." },
-                // PORTUGAL
-                { n: "Delta Cafés Campo Maior", l: [39.012, -7.065], c: "Delta (PT)", cap: "25k, The Coffee City of Portugal; massive industrial site." },
-                // ROMANIA
-                { n: "Cafea Fortuna Factory", l: [44.471, 25.927], c: "Cafea Fortuna", cap: "10k, Located in the western logistics belt of Bucharest." },
-                { n: "Strauss Romania (Doncafé)", l: [44.407, 26.192], c: "Strauss Group", cap: "12k, Massive Doncafé plant in the eastern industrial zone." },
-                { n: "Amigo Soluble Plant", l: [44.428, 26.205], c: "Instanta/Amigo", cap: "8k, Historic plant for Amigo soluble (instant) coffee." },
-                // RUSSIA
-                { n: "Orimi Trade Factory", l: [59.831, 30.645], c: "Orimi (RU)", cap: "50k, Its primary industrial tea and coffee complex." },
-                { n: "JDE Gorelovo Factory", l: [59.771, 30.101], c: "JDE Peet's", cap: "30k, Massive production hub near Saint Petersburg." },
-                { n: "Poetti Tver (ex-Paulig)", l: [56.804, 35.923], c: "MilFoods LLC", cap: "25k, Former Paulig plant, now the center for Poetti." },
-                // SERBIA
-                { n: "Strauss Adriatic (Doncafé)", l: [44.861, 20.089], c: "Strauss Group", cap: "18k, The industrial heart of Doncafé for the Balkans." },
-                // SPAIN
-                { n: "Nestlé Girona Factory", l: [41.972, 2.815], c: "Nestlé", cap: "30k, Massive Nescafé and Dolce Gusto hub." },
-                { n: "Prosol Venta de Baños", l: [41.915, -4.492], c: "Productos Solubles", cap: "15k, Private Label Soluble giant (Lidl/Aldi supply)" },
-                { n: "UCC Logroño Plant", l: [42.451, -2.432], c: "UCC Europe", cap: "10k, High-volume industrial roasting for UCC Europe." },
-                { n: "Cafés Novell Vilafranca", l: [41.341, 1.705], c: "Cafés Novell", cap: "5k, Specialized industrial roasting and packaging." },
-                { n: "Cafés Baqué Iurreta", l: [43.175, -2.628], c: "Cafés Baqué", cap: "4k, Key industrial roaster for the Basque region" },
-                { n: "Incnasa Navarra", l: [42.766, -1.631], c: "INCNASA", cap: "15k", note: "Major Spanish industrial roaster for private label (located in Noain)." },
-                // SWEDEN
-                { n: "Gevalia Gävle Factory", l: [60.671, 17.152], c: "JDE Peet's", cap: "45k, The historic heart of roasting in Sweden." },
-                { n: "Löfbergs Karlstad Hub", l: [59.381, 13.511], c: "Löfbergs", cap: "30k, One of the most modern roasteries in Scandinavia" },
-
-                // SWITZERLAND
-                { n: "Nestlé Avenches (Nespresso)", l: [46.885, 7.045], c: "Nestlé", cap: "60k, The Holy Grail of Nespresso production." },
-                { n: "Delica Birsfelden Plant", l: [47.556, 7.621], c: "Migros Group", cap: "25k, Massive plant supplying the Swiss retail market." },
-                { n: "HACO Bern Factory", l: [46.938, 7.502], c: "HACO AG", cap: "8k, High-tech industrial soluble and extract hub." },
-
-                // UK
-                { n: "Costa Basildon Roastery", l: [51.581, 0.495], c: "Coca-Cola", cap: "45k, Coca-Cola's primary UK roasting super-hub" },
-                { n: "Nestlé Tutbury Plant", l: [52.855, -1.685], c: "Nestlé", cap: "35k, Massive Nescafé and Dolce Gusto production" },
-                { n: "Kenco Banbury Factory", l: [52.071, -1.345], c: "JDE Peet's", cap: "25k, Historic hub for Kenco and Tassimo production" },
-                { n: "UCC Dartford Roastery", l: [51.448, 0.225], c: "UCC Europe", cap: "15k, Key roastery for UK food service and retail" },
-
-                // UKRAINE
-                { n: "Galca Lviv Factory", l: [49.845, 24.032], c: "Galca Coffee", cap: "5k, The industrial heart of Ukrainian coffee culture" },
-                { n: "Coffeeton Kyiv Plant", l: [50.485, 30.458], c: "Coffeeton LLC", cap: "6k" },
-
-                // ==========================================
-                // REGION: AFRICA
-                // ==========================================
-                // ALGERIA
-                { n: "Facto Algiers", l: [36.752, 3.042], c: "Facto Group", cap: "25k" },
-                { n: "Café Sidi (Bouanaba)", l: [36.438, 6.632], c: "SIDI BOUANABA", cap: "12k, One of the most technologically advanced coffee factories in Eastern Algeria." },
-                { n: "Café Ennasr Sétif", l: [36.195, 5.415], c: "Ennasr Coffee", cap: "10k, Sétif is Algeria's Coffee Capital, and this plant is a major hub for retail distribution" },
-                { n: "Bensekhri Group Hub", l: [36.540, 4.676], c: "Ets Bensekhri", cap: "8k, A massive industrial group handling everything from conveyor belt manufacturing to coffee roasting and distribution." },
-                { n: "Cafés Dubois", l: [33.573, -7.589], c: "Dubois (Morocco)", cap: "8k" },
-
-                // CÔTE D'IVOIRE
-                { n: "Nestlé Abidjan", l: [5.36, -3.96], c: "Nestlé (CI)", cap: "40k" },
-                { n: "Capral Abidjan", l: [5.33, -4.03], c: "Nestlé/Capral", cap: "12k" },
-                // MOROCCO
-                { n: "Cafés Dubois", l: [33.5731, -7.5898], c: "Dubois (Morocco)", cap: "8k" },
-                // SENEGAL
-                { n: "TDK Dakar", l: [14.71, -17.46], c: "Café de Touba", cap: "3k" },
-                // SOUTH AFRICA
-                { n: "Nestlé Estcourt", l: [-29.011, 29.873], c: "Nestlé (SA)", cap: "35k" },
-                { n: "AVI Isando", l: [-26.138, 28.204], c: "AVI (SA)", cap: "18k" },
-                // TUNISIA
-                { n: "Mount Sunzu Mbala", l: [-8.84, 31.36], c: "Sunzu (ZM)", cap: "2k" },
-                // ZAMBIA
-                { n: "Ben Yedder", l: [36.80, 10.18], c: "Cafés Ben Yedder", cap: "5k" },
-                
-                // ==========================================
-                // REGION: MIDDLE EAST
-                // ==========================================
-                // EGYPT
-                { n: "Abdel Maboud Factory", l: [29.96, 31.48], c: "Al-Yemeni Café", cap: "20k, Claims the largest coffee plant in the region. Located in the New Cairo industrial belt" },
-                { n: "Shaheen Coffee Factory", l: [29.928, 30.888], c: "Shaheen (EG)", cap: "12k, The primary factory pin for roasting and packaging" },
-                { n: "Orouba Coffee Factory", l: [29.98, 30.95], c: "Orouba (EG)", cap: "10k, industrial site for large-scale manufacturing" },
-                { n: "Abu Auf (Samo Trading)", l: [29.970, 31.493], c: "Abu Auf", cap: "8.5k, Operated under Samo Trading Company (the parent industrial arm)" },
-                { n: "Misrcafe Factory", l: [30.267, 31.769], c: "Misr Coffee", cap: "4k,The original industrial hub for instant and roasted coffee in Egyp" },
-                // IRAN
-                { n: "Multicafe Factory", l: [36.388, 59.395], c: "Part Sazan (Iran)", cap: "6k" },
-                { n: "Parto Padideh Factory", l: [35.340, 51.215], c: "Opera Coffee (IR)", cap: "4k" },
-                // ISRAEL
-                { n: "Strauss Elite Factory", l: [31.936, 34.908], c: "Strauss Group", cap: "30k" },
-                // LEBANON
-                { n: "Café Najjar Factory", l: [33.876, 35.549], c: "Café Najjar", cap: "15k" },
-                { n: "Maatouk Roastery", l: [33.791, 35.518], c: "Maatouk", cap: "5k" },
-                // SAUDI ARABIA
-                { n: "Baja Industrial", l: [24.538, 46.852], c: "Baja (KSA)", cap: "10k" },
-                { n: "Bon Cafe Factory", l: [21.436, 39.261], c: "Bon Cafe (SA)", cap: "8k" },
-                { n: "Barn's Roastery", l: [21.365, 39.305], c: "Barn's (KSA)", cap: "8k" },
-                // TURKEY
-                { n: "Mehmet Efendi Industrial", l: [41.012, 29.176], c: "Kurukahveci", cap: "12k" },
-                // UAE
-                { n: "Nestlé Dubai South", l: [24.896, 55.138], c: "Nestlé", cap: "20k" },
-
-                // =========================================================================
-                // REGION: OCEANIA
-                // =========================================================================
-                // AUSTRALIA
-                { n: "Nestlé Gympie Factory", l: [-26.192, 152.668], c: "Nestlé (AU)", cap: "30k" },
-                { n: "Vittoria Silverwater", l: [-33.834, 151.050], c: "Cantarella Bros", cap: "15k" },
-                { n: "Grinders Fairfield", l: [-33.856, 150.935], c: "Coca-Cola (AU)", cap: "10k" },
-                { n: "Harris Wetherill Park", l: [-33.851, 150.908], c: "JDE Peet's", cap: "10k" },
-                { n: "The Bean Alliance Reservoir", l: [-37.708, 145.011], c: "Segafredo (AU)", cap: "8k" },
-
-                // NEW ZEALAND
-                { n: "UCC Avondale Factory", l: [-36.897, 174.693], c: "UCC (NZ)", cap: "10k"}
-            ],
-         // Initial Dashboard Data
-            globalIntel: {
-                supply: [
-                    { t: "Vietnam Harvest", v: "Harvest delayed by storms. Estimated completion 65%. Farmers holding back sales.", date: "Dec 22" },
-                    { t: "Brazil 25/26", v: "Rains in Minas Gerais improved soil moisture. Flowering looks solid.", date: "Dec 20" }
-                ],
-                demand: [
-                    { t: "EU Roasters", v: "Coverage thin for Q1 2026. Spot demand increasing.", date: "Dec 22" },
-                    { t: "USA", v: "Green coffee stocks at ports fell to 5.8m bags.", date: "Dec 21" }
-                ],
-                stocks: [
-                    { t: "ICE Arabica", v: "Grading halted. Total: 890k bags. (Risk of decline)", date: "Dec 23" },
-                    { t: "ICE Robusta", v: "Cert stocks stable at low levels.", date: "Dec 23" }
-                ],
-                futures: [
-                    { t: "COT Report", v: "Non-commercials reduced net long by 2k lots.", date: "Dec 20" },
-                    { t: "Open Interest", v: "Open interest declining as holidays approach.", date: "Dec 22" }
-                ]
-            }
+            ]
         };
 
 
@@ -736,7 +365,36 @@
             map: null,
             layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
             
-            init: function() {
+            init: async function() {
+                // 1. Charger les 3 fichiers JSON simultanément
+                try {
+                    const [countriesRes, globalRes, factoriesRes] = await Promise.all([
+                        fetch('./countries.json'),
+                        fetch('./global.json'),
+                        fetch('./factories.json')
+                    ]);
+
+                    // Vérification simple
+                    if (!countriesRes.ok || !globalRes.ok || !factoriesRes.ok) {
+                        throw new Error("Erreur lors du chargement d'un des fichiers JSON");
+                    }
+
+                    const countriesData = await countriesRes.json();
+                    const globalData = await globalRes.json();
+                    const factoriesData = await factoriesRes.json();
+                    
+                    // Fusionner toutes les données dans l'objet principal CoffeeData
+                    // Cela garde les Ports et Routes (qui sont restés dans le code HTML) intacts
+                    Object.assign(CoffeeData, countriesData, globalData, factoriesData);
+                    
+                    console.log("✅ Données (Pays, Global, Usines) chargées avec succès !");
+
+                } catch (e) {
+                    console.error("⚠️ Erreur de chargement :", e);
+                    alert("Attention: Impossible de charger les dernières données (Vérifiez la console).");
+                }
+
+                // 2. Initialisation normale de la carte (Code original)
                 this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
 
                 // Setup Layers and Panes
@@ -757,7 +415,7 @@
                 this.layers.factories = L.layerGroup().addTo(this.map);
                 this.layers.logistics = L.layerGroup().addTo(this.map);
                 this.layers.ports = L.layerGroup().addTo(this.map);
-                this.layers.intel = L.layerGroup().addTo(this.map); // Keeping this for legacy/safety, though merged into popups now
+                this.layers.intel = L.layerGroup().addTo(this.map);
                 this.layers.newsAlerts = L.layerGroup().addTo(this.map);
 
                 this.renderMap();
@@ -814,27 +472,33 @@
                 }
 
                 // Factories
-                CoffeeData.factories.forEach(fac => {
-                    const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
-                    L.marker(fac.l, { icon: icon })
-                        .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
-                        .addTo(this.layers.factories);
-                });
+                if (CoffeeData.factories) {
+                    CoffeeData.factories.forEach(fac => {
+                        const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
+                        L.marker(fac.l, { icon: icon })
+                            .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
+                            .addTo(this.layers.factories);
+                    });
+                }
 
                 // Routes
-                CoffeeData.routes.forEach(r => {
-                    L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
-                        .bindTooltip(r.name)
-                        .addTo(this.layers.logistics);
-                });
+                if (CoffeeData.routes) {
+                    CoffeeData.routes.forEach(r => {
+                        L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
+                            .bindTooltip(r.name)
+                            .addTo(this.layers.logistics);
+                    });
+                }
 
                 // Ports
-                CoffeeData.ports.forEach(p => {
-                    const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
-                    L.marker(p.l, { icon: icon })
-                        .bindPopup(`<div class="font-mono text-xs p-2 text-sky-300 bg-slate-900 border border-slate-700 rounded">Port of ${p.n}</div>`)
-                        .addTo(this.layers.ports);
-                });
+                if (CoffeeData.ports) {
+                    CoffeeData.ports.forEach(p => {
+                        const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
+                        L.marker(p.l, { icon: icon })
+                            .bindPopup(`<div class="font-mono text-xs p-2 text-sky-300 bg-slate-900 border border-slate-700 rounded">Port of ${p.n}</div>`)
+                            .addTo(this.layers.ports);
+                    });
+                }
             },
 
             // --- UI & DASHBOARD ---
@@ -850,7 +514,7 @@
                     const el = document.getElementById(id);
                     if (!el) return;
                     if (!items || items.length === 0) {
-                        el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">No data</div>';
+                        el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">Loading...</div>';
                         return;
                     }
                     el.innerHTML = items.map(i => `
@@ -879,7 +543,6 @@
                     document.getElementById('ai-modal').classList.add('flex');
                     document.getElementById('ai-modal-title').innerText = title;
                     document.getElementById('ai-modal-content').innerHTML = `<div class="flex items-center gap-3 text-gray-500"><i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}</div>`;
-                    // If it's the specific "AI BRIEF" button click
                     if(title === "Global Briefing") App.ai.generateGlobal();
                 },
                 closeAiModal: function() {
@@ -896,171 +559,24 @@
 
             // --- AI & UPLOADER ---
             ai: {
-                // Placeholder for potential future direct API calls
                 generateGlobal: function() {
-                    // Simulating an AI response for the demo
                     setTimeout(() => {
-                        App.ui.updateModalContent("<strong>AI Market Overview (Simulated)</strong><br><br>The coffee market is currently navigating a period of high volatility. <br>1. <strong>Brazil:</strong> Record exports in November have eased short-term supply fears, but the 25/26 crop is the main focus.<br>2. <strong>Vietnam:</strong> Harvest is delayed, supporting Robusta prices. <br>3. <strong>Logistics:</strong> Red Sea issues persist, adding costs.");
-                    }, 1000);
+                        App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed.<br>Updates are reflected in real-time.");
+                    }, 500);
                 },
                 analyzeCountry: async function(country) {
                     App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`);
-                    // Simulating an AI response
                     setTimeout(() => {
-                        App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Detailed analysis for ${country} would appear here based on real-time data.`);
+                        App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`);
                     }, 1000);
-                },
-                analyzeUpload: async function(text) {
-                    // NOTE: Real implementation requires a backend or valid API key.
-                    // This is a mockup of the expected JSON parsing logic.
-                    // In a real scenario, you'd send 'text' to Gemini here.
-                    
-                    console.log("Analyzing uploaded text (Simulated)...");
-                    
-                    // Allow the user to provide a valid JSON file directly
-                    try {
-                        return JSON.parse(text);
-                    } catch(e) {
-                        alert("For this demo, please upload a valid JSON file. Text analysis requires a live API key.");
-                        return null;
-                    }
                 }
             },
 
             uploader: {
+                // (Old uploader logic removed or simplified since we use direct GitHub edits now)
                 init: function() {
-                    const countryInput = document.getElementById('uploadCountry');
-                    const globalInput = document.getElementById('uploadGlobal');
-                    
-                    // Remove old event listeners by cloning nodes (clean slate)
-                    const newCountryInput = countryInput.cloneNode(true);
-                    const newGlobalInput = globalInput.cloneNode(true);
-                    
-                    countryInput.parentNode.replaceChild(newCountryInput, countryInput);
-                    globalInput.parentNode.replaceChild(newGlobalInput, globalInput);
-
-                    newCountryInput.addEventListener('change', (e) => this.processCountry(e.target.files[0]));
-                    newGlobalInput.addEventListener('change', (e) => this.processGlobal(e.target.files[0]));
-                },
-
-                // Handler for Country Data Upload
-                processCountry: function(file) {
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            // CLEANUP: Remove potential markdown code fences (```json ... ```)
-                            let cleanStr = e.target.result.replace(/```json/g, '').replace(/```/g, '').trim();
-                            
-                            const data = JSON.parse(cleanStr);
-                            
-                            for (const [key, val] of Object.entries(data)) {
-                                if (CoffeeData.countries[key]) {
-                                    Object.assign(CoffeeData.countries[key], val);
-                                }
-                            }
-                            App.renderMap();
-                            alert("Country Data Updated Successfully!");
-                        } catch(err) {
-                            console.error(err);
-                            alert("Error parsing Country JSON.\nCheck for trailing commas or missing quotes.");
-                        }
-                        document.getElementById('uploadCountry').value = '';
-                    };
-                    reader.readAsText(file);
-                },
-
-                // Handler for Global Intel Upload
-                processGlobal: function(file) {
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            // CLEANUP: Remove potential markdown code fences from AI generation
-                            let cleanStr = e.target.result.replace(/```json/g, '').replace(/```/g, '').trim();
-
-                            const data = JSON.parse(cleanStr);
-                            
-                            // Pass the data to the main update function
-                            App.updateData(data);
-                            
-                            alert("Global Market Intel Updated Successfully!");
-                            
-                        } catch(err) {
-                            console.error(err);
-                            alert("Error parsing Global JSON.\n1. Ensure no trailing commas.\n2. Ensure keys are in \"double quotes\".\n3. Remove any non-JSON text.");
-                        }
-                        document.getElementById('uploadGlobal').value = '';
-                    };
-                    reader.readAsText(file);
-                }
-            },
-
-            updateData: function(data) {
-                // 1. Update Country Intel
-                if (data.countries) {
-                    for (const [c, intel] of Object.entries(data.countries)) {
-                        if (CoffeeData.countries[c]) CoffeeData.countries[c].intel = intel;
-                    }
-                }
-                
-                // 2. Update Global Dashboard
-                // Logic updated to accept both "global: {...}" wrapper AND direct root keys (like your file)
-                if (data.global) {
-                    CoffeeData.globalIntel = data.global;
-                    App.ui.renderDashboard();
-                } else if (data.supply || data.demand || data.stocks || data.futures) {
-                    CoffeeData.globalIntel = data;
-                    App.ui.renderDashboard();
-                }
-                
-                // 3. Update Ticker
-                if (data.ticker && Array.isArray(data.ticker)) {
-                    const ticker = document.querySelector('.osint-ticker');
-                    if(ticker) {
-                        ticker.innerHTML = ''; // Clear old
-                        data.ticker.forEach(item => {
-                            let c = 'osint-val-neutral';
-                            if(item.trend === 'up') c = 'osint-val-up';
-                            if(item.trend === 'down') c = 'osint-val-down';
-                            if(item.trend === 'risk') c = 'osint-val-risk';
-                            
-                            const span = document.createElement('span');
-                            span.className = 'osint-item';
-                            // Ensure trend creates correct color class
-                            span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
-                            ticker.appendChild(span);
-                        });
-                    }
-                }
-
-                // 4. Update Map (Re-render popups)
-                App.renderMap();
-                
-                // 5. Handle Red Alerts (News Nodes)
-                if (data.alerts && Array.isArray(data.alerts)) {
-                    App.layers.newsAlerts.clearLayers();
-                    data.alerts.forEach(alert => {
-                        if(alert.loc) {
-                            const redPulseIcon = L.divIcon({ 
-                                className: 'custom', 
-                                html: `<div class="relative flex h-4 w-4">
-                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                          <span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span>
-                                       </div>` 
-                            });
-                            L.marker(alert.loc, { icon: redPulseIcon, pane: 'alertPane' })
-                                .bindPopup(`
-                                    <div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500">
-                                        <div class="font-bold text-red-400 mb-1 uppercase tracking-wide">${alert.t}</div>
-                                        <div class="text-gray-300 mb-2">${alert.v}</div>
-                                        <div class="text-[10px] opacity-50 text-right">${alert.date}</div>
-                                    </div>
-                                `)
-                                .addTo(App.layers.newsAlerts)
-                                .openPopup();
-                        }
-                    });
+                   // Optional: Keep this if you want to allow local file previews
+                   // otherwise, you can leave it empty if you only use GitHub edits.
                 }
             },
             
