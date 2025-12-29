@@ -359,106 +359,106 @@
 
 
 // --- 2. LOGIC ---
-        const App = {
-            map: null,
-            layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
-            
-            init: async function() {
-                // 1. Charger les 3 fichiers JSON avec timestamp pour éviter le cache
-                const timestamp = new Date().getTime();
+    const App = {
+        map: null,
+        layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
+        
+        init: async function() {
+            // --- 1. D'ABORD : INITIALISER LA CARTE (CRUCIAL : Doit être fait AVANT de charger les données) ---
+            this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
 
-                try {
-                    const [countriesRes, globalRes, factoriesRes] = await Promise.all([
-                        fetch('./countries.json?v=' + timestamp),
-                        fetch('./global.json?v=' + timestamp),
-                        fetch('./factories.json?v=' + timestamp)
-                    ]);
+            // Création des plans (Panes)
+            this.map.createPane('labelsPane');
+            this.map.getPane('labelsPane').style.zIndex = 550;
+            this.map.getPane('labelsPane').style.pointerEvents = 'none';
 
-                    // Si un fichier échoue, on continue quand même avec ce qu'on a
-                    if (countriesRes.ok) {
-                        const countriesData = await countriesRes.json();
-                        Object.assign(CoffeeData, countriesData);
-                    }
-                    
-                    if (globalRes.ok) {
-                        const globalData = await globalRes.json();
-                        Object.assign(CoffeeData, globalData);
-                    }
+            this.map.createPane('alertPane');
+            this.map.getPane('alertPane').style.zIndex = 650; 
+            this.map.getPane('alertPane').style.pointerEvents = 'none';
 
-                    if (factoriesRes.ok) {
-                        const factoriesData = await factoriesRes.json();
-                        Object.assign(CoffeeData, factoriesData);
-                    }
-                    
-                    console.log("✅ Données chargées avec succès !");
+            L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
+            L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-                    // --- FORCE L'INTERFACE À SE METTRE À JOUR ---
-                    if (CoffeeData.globalIntel) {
-                        App.updateData(CoffeeData.globalIntel);
-                    }
+            // Initialisation des calques (C'est ici que 'newsAlerts' est créé)
+            this.layers.producers = L.layerGroup().addTo(this.map);
+            this.layers.consumers = L.layerGroup().addTo(this.map);
+            this.layers.factories = L.layerGroup().addTo(this.map);
+            this.layers.logistics = L.layerGroup().addTo(this.map);
+            this.layers.ports = L.layerGroup().addTo(this.map);
+            this.layers.intel = L.layerGroup().addTo(this.map);
+            this.layers.newsAlerts = L.layerGroup().addTo(this.map); 
 
-                } catch (e) {
-                    console.error("⚠️ Erreur lors du chargement des données (Utilisation des données par défaut) :", e);
+            // --- 2. ENSUITE : CHARGER LES DONNÉES ---
+            const timestamp = new Date().getTime();
+
+            try {
+                const [countriesRes, globalRes, factoriesRes] = await Promise.all([
+                    fetch('./countries.json?v=' + timestamp),
+                    fetch('./global.json?v=' + timestamp),
+                    fetch('./factories.json?v=' + timestamp)
+                ]);
+
+                if (countriesRes.ok) {
+                    const countriesData = await countriesRes.json();
+                    Object.assign(CoffeeData, countriesData);
+                }
+                
+                if (globalRes.ok) {
+                    const globalData = await globalRes.json();
+                    Object.assign(CoffeeData, globalData);
                 }
 
-                // 2. Initialisation de la carte
-                this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
+                if (factoriesRes.ok) {
+                    const factoriesData = await factoriesRes.json();
+                    Object.assign(CoffeeData, factoriesData);
+                }
+                
+                console.log("✅ Données chargées avec succès !");
 
-                // Création des plans (Panes) pour gérer l'ordre d'affichage
-                this.map.createPane('labelsPane');
-                this.map.getPane('labelsPane').style.zIndex = 550;
-                this.map.getPane('labelsPane').style.pointerEvents = 'none';
-
-                this.map.createPane('alertPane');
-                this.map.getPane('alertPane').style.zIndex = 650; 
-                this.map.getPane('alertPane').style.pointerEvents = 'none';
-
-                L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
-                L.control.zoom({ position: 'topright' }).addTo(this.map);
-
-                // Initialisation des calques
-                this.layers.producers = L.layerGroup().addTo(this.map);
-                this.layers.consumers = L.layerGroup().addTo(this.map);
-                this.layers.factories = L.layerGroup().addTo(this.map);
-                this.layers.logistics = L.layerGroup().addTo(this.map);
-                this.layers.ports = L.layerGroup().addTo(this.map);
-                this.layers.intel = L.layerGroup().addTo(this.map);
-                this.layers.newsAlerts = L.layerGroup().addTo(this.map);
-
-                this.renderMap();
-                // uploader.init est vide maintenant car tout est automatique via GitHub
-                this.uploader.init();
-            },
-
-            // Fonction critique pour mettre à jour le Ticker et les Alertes
-            updateData: function(data) {
-                // 1. Mise à jour du Tableau de Bord (Supply/Demand/Stocks)
-                if(data) {
-                    CoffeeData.globalIntel = data;
-                    App.ui.renderDashboard();
+                // Maintenant on peut appeler updateData sans risque car les layers existent déjà
+                if (CoffeeData.globalIntel) {
+                    App.updateData(CoffeeData.globalIntel);
                 }
 
-                // 2. Mise à jour du Ticker (La bande défilante)
-                if (data && data.ticker && Array.isArray(data.ticker)) {
-                    const ticker = document.querySelector('.osint-ticker');
-                    if(ticker) {
-                        ticker.innerHTML = ''; // On efface "LOADING..."
-                        data.ticker.forEach(item => {
-                            let c = 'osint-val-neutral';
-                            if(item.trend === 'up') c = 'osint-val-up';
-                            if(item.trend === 'down') c = 'osint-val-down';
-                            if(item.trend === 'risk') c = 'osint-val-risk';
-                            
-                            const span = document.createElement('span');
-                            span.className = 'osint-item';
-                            span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
-                            ticker.appendChild(span);
-                        });
-                    }
-                }
+            } catch (e) {
+                console.error("⚠️ Erreur chargement données (mais la carte reste affichée) :", e);
+            }
 
-                // 3. Mise à jour des Alertes Rouges sur la carte (optionnel si dans global.json)
-                if (data && data.alerts && Array.isArray(data.alerts)) {
+            this.renderMap();
+            this.uploader.init();
+        },
+
+        // Fonction critique pour mettre à jour le Ticker et les Alertes
+        updateData: function(data) {
+            // 1. Mise à jour du Tableau de Bord
+            if(data) {
+                CoffeeData.globalIntel = data;
+                App.ui.renderDashboard();
+            }
+
+            // 2. Mise à jour du Ticker
+            if (data && data.ticker && Array.isArray(data.ticker)) {
+                const ticker = document.querySelector('.osint-ticker');
+                if(ticker) {
+                    ticker.innerHTML = ''; 
+                    data.ticker.forEach(item => {
+                        let c = 'osint-val-neutral';
+                        if(item.trend === 'up') c = 'osint-val-up';
+                        if(item.trend === 'down') c = 'osint-val-down';
+                        if(item.trend === 'risk') c = 'osint-val-risk';
+                        
+                        const span = document.createElement('span');
+                        span.className = 'osint-item';
+                        span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
+                        ticker.appendChild(span);
+                    });
+                }
+            }
+
+            // 3. Mise à jour des Alertes Rouges
+            if (data && data.alerts && Array.isArray(data.alerts)) {
+                // On vérifie que le layer existe bien avant d'essayer de le vider
+                if (App.layers && App.layers.newsAlerts) {
                     App.layers.newsAlerts.clearLayers();
                     data.alerts.forEach(alert => {
                         if(alert.loc) {
@@ -472,180 +472,178 @@
                         }
                     });
                 }
-            },
+            }
+        },
 
-// VERSION SÉCURISÉE (Protège contre les écrans blancs)
-            renderMap: function() {
-                // 1. On efface tout proprement
-                Object.values(this.layers).forEach(layer => layer.clearLayers());
+        // VERSION SÉCURISÉE DE RENDERMAP
+        renderMap: function() {
+            // 1. On efface tout proprement
+            Object.values(this.layers).forEach(layer => layer.clearLayers());
 
-                // 2. DESSIN DES ROUTES (Sécurisé)
-                if (CoffeeData.routes && Array.isArray(CoffeeData.routes)) {
-                    CoffeeData.routes.forEach(r => {
-                        // SÉCURITÉ : On vérifie que le chemin existe avant de dessiner
-                        if(r.path && r.path.length > 0) { 
-                            L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
-                                .bindTooltip(r.name || "Route")
-                                .addTo(this.layers.logistics);
-                        }
-                    });
-                }
-
-                // 3. DESSIN DES PORTS (Sécurisé)
-                if (CoffeeData.ports && Array.isArray(CoffeeData.ports)) {
-                    CoffeeData.ports.forEach(p => {
-                        if(p.l && p.l.length === 2) { 
-                            const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
-                            L.marker(p.l, { icon: icon }).bindPopup(`<div class="font-mono text-xs p-2 text-sky-300 bg-slate-900 border border-slate-700 rounded">Port of ${p.n}</div>`).addTo(this.layers.ports);
-                        }
-                    });
-                }
-
-                // 4. DESSIN DES PAYS (Sécurisé)
-                if(CoffeeData.countries) {
-                    for (const [key, data] of Object.entries(CoffeeData.countries)) {
-                        // SÉCURITÉ : Si pas de GPS, on saute ce pays au lieu de faire planter la carte
-                        if (!data.lat || !data.lng) continue;
-
-                        const isProducer = data.type === 'producer';
-                        const targetLayer = isProducer ? this.layers.producers : this.layers.consumers;
-                        const cssClass = isProducer ? (data.status === 'Active Harvest' ? 'data-icon producer harvesting' : 'data-icon producer') : 'data-icon consumer';
-                        
-                        const marker = L.marker([data.lat, data.lng], {
-                            icon: L.divIcon({ className: 'custom', html: `<div class="${cssClass} w-3 h-3"></div>` })
-                        });
-                        
-                        const intelHtml = data.intel ? `<div class="mb-2 p-1 bg-slate-800 rounded text-[10px] text-gray-300 border-l-2 border-emerald-500 pl-2 mt-1 italic">${data.intel}</div>` : '';
-                        
-                        let statsHtml = isProducer ? 
-                            `<div><span class="text-gray-400">PROD:</span> ${data.prod}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>` : 
-                            `<div><span class="text-gray-400">CONS:</span> ${data.cons}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>`;
-
-                        marker.bindPopup(`
-                            <div class="p-3 font-mono text-xs text-gray-100 bg-slate-900 border border-slate-700 rounded min-w-[180px]">
-                                <div class="font-bold text-sm mb-1 border-b border-slate-600 pb-1 text-white">${key}</div>
-                                <div class="grid grid-cols-2 gap-2 my-2 text-slate-300">${statsHtml}</div>
-                                ${intelHtml}
-                            </div>
-                        `);
-                        targetLayer.addLayer(marker);
+            // 2. DESSIN DES ROUTES
+            if (CoffeeData.routes && Array.isArray(CoffeeData.routes)) {
+                CoffeeData.routes.forEach(r => {
+                    if(r.path && r.path.length > 0) { 
+                        L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
+                            .bindTooltip(r.name || "Route")
+                            .addTo(this.layers.logistics);
                     }
-                }
+                });
+            }
 
-                // 5. DESSIN DES USINES (Sécurisé)
-                if (CoffeeData.factories && Array.isArray(CoffeeData.factories)) {
-                    CoffeeData.factories.forEach(fac => {
-                        // SÉCURITÉ : On vérifie les coordonnées
-                        if (!fac.l || fac.l.length !== 2) return; 
-
-                        const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
-                        L.marker(fac.l, { icon: icon })
-                            .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
-                            .addTo(this.layers.factories);
-                    });
-                }
-            },
-
-            // --- UI & DASHBOARD ---
-            ui: {
-                renderDashboard: function() {
-                    const d = CoffeeData.globalIntel;
-                    if(!d) return;
-                    this.fillColumn('col-supply', d.supply, 'border-cat-supply text-cat-supply');
-                    this.fillColumn('col-demand', d.demand, 'border-cat-demand text-cat-demand');
-                    this.fillColumn('col-stocks', d.stocks, 'border-cat-stocks text-cat-stocks');
-                    this.fillColumn('col-futures', d.futures, 'border-cat-futures text-cat-futures');
-                },
-                fillColumn: function(id, items, colorClass) {
-                    const el = document.getElementById(id);
-                    if (!el) return;
-                    if (!items || items.length === 0) {
-                        el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">Loading...</div>';
-                        return;
+            // 3. DESSIN DES PORTS
+            if (CoffeeData.ports && Array.isArray(CoffeeData.ports)) {
+                CoffeeData.ports.forEach(p => {
+                    if(p.l && p.l.length === 2) { 
+                        const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
+                        L.marker(p.l, { icon: icon }).bindPopup(`<div class="font-mono text-xs p-2 text-sky-300 bg-slate-900 border border-slate-700 rounded">Port of ${p.n}</div>`).addTo(this.layers.ports);
                     }
-                    el.innerHTML = items.map(i => `
-                        <div class="news-card ${colorClass}" style="border-color: currentColor; color: #e2e8f0;">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-bold text-[10px] opacity-70 uppercase tracking-wide">${i.t}</span>
-                                <span class="text-[9px] opacity-50">${i.date || ''}</span>
-                            </div>
-                            <div>${i.v}</div>
+                });
+            }
+
+            // 4. DESSIN DES PAYS
+            if(CoffeeData.countries) {
+                for (const [key, data] of Object.entries(CoffeeData.countries)) {
+                    if (!data.lat || !data.lng) continue;
+
+                    const isProducer = data.type === 'producer';
+                    const targetLayer = isProducer ? this.layers.producers : this.layers.consumers;
+                    const cssClass = isProducer ? (data.status === 'Active Harvest' ? 'data-icon producer harvesting' : 'data-icon producer') : 'data-icon consumer';
+                    
+                    const marker = L.marker([data.lat, data.lng], {
+                        icon: L.divIcon({ className: 'custom', html: `<div class="${cssClass} w-3 h-3"></div>` })
+                    });
+                    
+                    const intelHtml = data.intel ? `<div class="mb-2 p-1 bg-slate-800 rounded text-[10px] text-gray-300 border-l-2 border-emerald-500 pl-2 mt-1 italic">${data.intel}</div>` : '';
+                    
+                    let statsHtml = isProducer ? 
+                        `<div><span class="text-gray-400">PROD:</span> ${data.prod}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>` : 
+                        `<div><span class="text-gray-400">CONS:</span> ${data.cons}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>`;
+
+                    marker.bindPopup(`
+                        <div class="p-3 font-mono text-xs text-gray-100 bg-slate-900 border border-slate-700 rounded min-w-[180px]">
+                            <div class="font-bold text-sm mb-1 border-b border-slate-600 pb-1 text-white">${key}</div>
+                            <div class="grid grid-cols-2 gap-2 my-2 text-slate-300">${statsHtml}</div>
+                            ${intelHtml}
                         </div>
-                    `).join('');
-                },
-                togglePanel: function() {
-                    const panel = document.getElementById('global-panel');
-                    const icon = document.getElementById('toggle-icon');
-                    panel.classList.toggle('retracted');
-                    if (panel.classList.contains('retracted')) {
-                        icon.style.transform = 'rotate(180deg)';
-                    } else {
-                        icon.style.transform = 'rotate(0deg)';
-                    }
-                },
-                openAiModal: function(title, loadingText) {
-                    document.getElementById('modal-overlay').classList.remove('hidden');
-                    document.getElementById('ai-modal').classList.remove('hidden');
-                    document.getElementById('ai-modal').classList.add('flex');
-                    document.getElementById('ai-modal-title').innerText = title;
-                    document.getElementById('ai-modal-content').innerHTML = `<div class="flex items-center gap-3 text-gray-500"><i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}</div>`;
-                    if(title === "Global Briefing") App.ai.generateGlobal();
-                },
-                closeAiModal: function() {
-                    document.getElementById('modal-overlay').classList.add('hidden');
-                    document.getElementById('ai-modal').classList.add('hidden');
-                    document.getElementById('ai-modal').classList.remove('flex');
-                },
-                updateModalContent: function(text) {
-                    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
-                    document.getElementById('ai-modal-content').innerHTML = html;
-                }
-            },
-
-            // --- AI (Simulé pour l'instant) ---
-            ai: {
-                generateGlobal: function() {
-                    setTimeout(() => {
-                        App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed.<br>Updates are reflected in real-time.");
-                    }, 500);
-                },
-                analyzeCountry: async function(country) {
-                    App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`);
-                    setTimeout(() => {
-                        App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`);
-                    }, 1000);
-                }
-            },
-
-            uploader: {
-                init: function() {
-                   // Vide, car nous utilisons maintenant le chargement automatique GitHub
-                }
-            },
-            
-            // --- UTILITIES ---
-            utils: {
-                downloadHTML: function() {
-                    const htmlContent = document.documentElement.outerHTML;
-                    const blob = new Blob([htmlContent], {type: 'text/html'});
-                    const a = document.createElement('a');
-                    const url = URL.createObjectURL(blob);
-                    a.href = url;
-                    a.download = 'coffee_intel_dashboard.html';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 0);
+                    `);
+                    targetLayer.addLayer(marker);
                 }
             }
-        };
 
-        window.onload = function() { 
-            App.init(); 
-        };
+            // 5. DESSIN DES USINES
+            if (CoffeeData.factories && Array.isArray(CoffeeData.factories)) {
+                CoffeeData.factories.forEach(fac => {
+                    if (!fac.l || fac.l.length !== 2) return; 
+
+                    const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
+                    L.marker(fac.l, { icon: icon })
+                        .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
+                        .addTo(this.layers.factories);
+                });
+            }
+        },
+
+        // --- UI & DASHBOARD ---
+        ui: {
+            renderDashboard: function() {
+                const d = CoffeeData.globalIntel;
+                if(!d) return;
+                this.fillColumn('col-supply', d.supply, 'border-cat-supply text-cat-supply');
+                this.fillColumn('col-demand', d.demand, 'border-cat-demand text-cat-demand');
+                this.fillColumn('col-stocks', d.stocks, 'border-cat-stocks text-cat-stocks');
+                this.fillColumn('col-futures', d.futures, 'border-cat-futures text-cat-futures');
+            },
+            fillColumn: function(id, items, colorClass) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (!items || items.length === 0) {
+                    el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">Loading...</div>';
+                    return;
+                }
+                el.innerHTML = items.map(i => `
+                    <div class="news-card ${colorClass}" style="border-color: currentColor; color: #e2e8f0;">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-[10px] opacity-70 uppercase tracking-wide">${i.t}</span>
+                            <span class="text-[9px] opacity-50">${i.date || ''}</span>
+                        </div>
+                        <div>${i.v}</div>
+                    </div>
+                `).join('');
+            },
+            togglePanel: function() {
+                const panel = document.getElementById('global-panel');
+                const icon = document.getElementById('toggle-icon');
+                panel.classList.toggle('retracted');
+                if (panel.classList.contains('retracted')) {
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            },
+            openAiModal: function(title, loadingText) {
+                document.getElementById('modal-overlay').classList.remove('hidden');
+                document.getElementById('ai-modal').classList.remove('hidden');
+                document.getElementById('ai-modal').classList.add('flex');
+                document.getElementById('ai-modal-title').innerText = title;
+                document.getElementById('ai-modal-content').innerHTML = `<div class="flex items-center gap-3 text-gray-500"><i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}</div>`;
+                if(title === "Global Briefing") App.ai.generateGlobal();
+            },
+            closeAiModal: function() {
+                document.getElementById('modal-overlay').classList.add('hidden');
+                document.getElementById('ai-modal').classList.add('hidden');
+                document.getElementById('ai-modal').classList.remove('flex');
+            },
+            updateModalContent: function(text) {
+                let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
+                document.getElementById('ai-modal-content').innerHTML = html;
+            }
+        },
+
+        // --- AI (Simulé pour l'instant) ---
+        ai: {
+            generateGlobal: function() {
+                setTimeout(() => {
+                    App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed.<br>Updates are reflected in real-time.");
+                }, 500);
+            },
+            analyzeCountry: async function(country) {
+                App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`);
+                setTimeout(() => {
+                    App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`);
+                }, 1000);
+            }
+        },
+
+        uploader: {
+            init: function() {
+                // Vide, car nous utilisons maintenant le chargement automatique GitHub
+            }
+        },
+        
+        // --- UTILITIES ---
+        utils: {
+            downloadHTML: function() {
+                const htmlContent = document.documentElement.outerHTML;
+                const blob = new Blob([htmlContent], {type: 'text/html'});
+                const a = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                a.href = url;
+                a.download = 'coffee_intel_dashboard.html';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
+            }
+        }
+    };
+
+    window.onload = function() { 
+        App.init(); 
+    };
 </script>
 </body>
 </html>
