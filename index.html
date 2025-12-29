@@ -156,7 +156,7 @@
     <div id="map"></div>
 
     <div class="absolute top-4 left-4 z-[1000] flex gap-2">
-        <button onclick="App.utils.downloadHTML()" class="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-bold py-2 px-3 rounded border border-slate-600 flex items-center justify-center gap-2 shadow-lg transition-all" title="Save Dashboard">
+        <button onclick="App.utils.downloadHTML()" class="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-bold py-2 px-3 rounded border border-slate-600 flex items-center justify-center gap-2">
             <i class="fa-solid fa-download"></i>
         </button>
     </div>
@@ -383,6 +383,8 @@
                 this.layers.logistics = L.layerGroup().addTo(this.map);
                 this.layers.ports = L.layerGroup().addTo(this.map);
                 this.layers.newsAlerts = L.layerGroup().addTo(this.map);
+                // initialize intel layer to avoid null/undefined later
+                this.layers.intel = L.layerGroup().addTo(this.map);
 
                 // --- 2. CHARGER LES DONNÉES JSON (Anti-cache) ---
                 const timestamp = new Date().getTime();
@@ -444,15 +446,20 @@
 
                 // 3. Alertes Rouges sur la carte (Points clignotants)
                 if (data && data.alerts && Array.isArray(data.alerts)) {
-                    this.layers.newsAlerts.clearLayers();
+                    // defensive: ensure layer exists
+                    if (this.layers.newsAlerts && typeof this.layers.newsAlerts.clearLayers === 'function') {
+                        this.layers.newsAlerts.clearLayers();
+                    }
                     data.alerts.forEach(alert => {
                         if(alert.loc) {
                             const redPulseIcon = L.divIcon({ 
                                 className: 'custom', 
-                                html: `<div class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span></div>` 
+                                html: `<div class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span></div>`,
+                                iconSize: [16,16],
+                                iconAnchor: [8,8]
                             });
                             L.marker(alert.loc, { icon: redPulseIcon, pane: 'alertPane' })
-                                .bindPopup(`<div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500"><div class="font-bold text-red-400 mb-1 uppercase">${alert.t}</div><div class="text-gray-300">${alert.v}</div></div>`)
+                                .bindPopup(`<div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500"><div class="font-bold text-red-400 mb-1 uppercase">${alert.t || 'Alert'}</div><div>${alert.msg || ''}</div></div>`)
                                 .addTo(this.layers.newsAlerts);
                         }
                     });
@@ -463,7 +470,9 @@
             renderMap: function() {
                 // On efface tout proprement avant de redessiner
                 Object.values(this.layers).forEach(layer => {
-                    if (layer !== this.layers.newsAlerts) layer.clearLayers();
+                    if (layer && layer !== this.layers.newsAlerts && typeof layer.clearLayers === 'function') {
+                        layer.clearLayers();
+                    }
                 });
 
                 // Dessin des Routes
@@ -521,7 +530,7 @@
                         if (!fac.l || fac.l.length !== 2) return; 
                         const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
                         L.marker(fac.l, { icon: icon })
-                            .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
+                            .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c || ''}</span><br><span class="text-[10px] text-slate-400">${fac.info || ''}</span></div>`)
                             .addTo(this.layers.factories);
                     });
                 }
