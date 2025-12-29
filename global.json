@@ -72,6 +72,7 @@
       "date": "Dec 29"
     }
   ],
+
   "ticker": [
     {
       "label": "KC MAR26",
@@ -85,18 +86,23 @@
     },
     {
       "label": "CONILON BRL",
-      "value": "R$ 1,200 (26/12)",
-      "trend": "up"
+      "value": "R$ 1,200 (26/12), US$ 3603/MT ",
+      "trend": "neutral"
     },
     {
-      "label": "CONILON USD",
-      "value": "$3,603/MT (USD/BRL 5.55)",
+      "label": "USD/BRL",
+      "value": "5.55",
+      "trend": "neutral"
+    },
+        {
+      "label": "USD/VND",
+      "value": "26,088",
       "trend": "neutral"
     },
     {
       "label": "NY STOCKS",
       "value": "456.4K",
-      "trend": "slow rebuild"
+      "trend": "neutral"
     },
     {
       "label": "LDN STOCKS",
