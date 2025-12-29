@@ -127,7 +127,9 @@
                 { n: "London (Gateway)", l: [51.50, 0.50] },
                 { n: "Genoa", l: [44.41, 8.93] },
                 { n: "Algiers", l: [36.77, 3.06] },
-                { n: "Shanghai", l: [31.23, 121.47] } // Added Shanghai
+                { n: "Shanghai", l: [31.23, 121.47] },
+                { n: "Djibouti", l: [11.82, 43.14] },
+                { n: "Sydney", l: [-33.86, 151.20] }
             ],
             routes: [
                 // --- MAIN TRUNKS (White) ---
@@ -157,11 +159,10 @@
                         [36.0, 15.0] // Junction: South of Sicily/Malta
                     ]
                 },
-
-                // --- FEEDERS TO TRUNKS ---
                 { 
-                    name: "Asia -> Med Trunk (Feeder)", 
-                    color: "#16a085", 
+                    name: "Indian Ocean Trunk", 
+                    color: "#ffffff",
+                    weight: 4, 
                     path: [
                         [1.26, 103.8], [3.0, 100.5], [5.5, 98.0], [5.8, 95.5], // Malacca Strait
                         [5.8, 80.4], [10.0, 65.0], // Crossing Indian Ocean, staying North
@@ -169,12 +170,42 @@
                         [12.5, 45.0], [12.6, 43.3] // Joins Med Trunk at Bab el Mandeb
                     ]
                 },
+
+                // --- FEEDERS TO TRUNKS ---
                 { 
                     name: "Uganda -> Med Trunk (Feeder)", 
                     color: "#f39c12", 
                     path: [
-                        [0.31, 32.58], [0.63, 34.27], [0.51, 35.26], [-0.30, 36.08], [-1.29, 36.82], [-4.04, 39.66], // Land
+                        [-4.04, 39.66], // Mombasa Port
                         [-4.0, 42.0], [0.0, 48.0], [5.0, 55.0], [12.0, 52.0], [12.5, 45.0], [12.6, 43.3] // Sea to Bab el Mandeb
+                    ]
+                },
+                { 
+                    name: "Feeder: Djibouti -> Med Trunk", 
+                    color: "#f39c12", 
+                    path: [
+                        [11.82, 43.14], // Djibouti
+                        [12.2, 43.5], 
+                        [12.6, 43.3] // Joins at Bab el Mandeb
+                    ]
+                },
+                { 
+                    name: "Singapore -> Sydney", 
+                    color: "#e74c3c", 
+                    // Navigating the Indonesian Archipelago (Java Sea -> Banda Sea -> Torres Strait) to Australia
+                    path: [
+                        [1.26, 103.8],   // Singapore
+                        [-1.0, 105.0],   // South China Sea exit
+                        [-3.0, 107.0],   // Karimata Strait
+                        [-5.0, 112.0],   // Java Sea
+                        [-6.0, 120.0],   // Flores Sea
+                        [-7.5, 128.0],   // Banda Sea
+                        [-9.5, 135.0],   // Arafura Sea (North of Australia)
+                        [-10.2, 142.0],  // Torres Strait (Critical Choke Point)
+                        [-13.0, 146.0],  // Coral Sea (North)
+                        [-20.0, 152.0],  // Coral Sea (Offshore QLD)
+                        [-30.0, 154.0],  // Tasman Sea Approach
+                        [-33.86, 151.20] // Sydney
                     ]
                 },
 
@@ -247,7 +278,7 @@
                 },
                 { 
                     name: "Feeder: Jakarta -> Singapore", 
-                    color: "#d35400", 
+                    color: "#9b59b6", 
                     path: [[-6.10, 106.88], [-3.0, 106.0], [1.26, 103.8]] 
                 },
                 { 
@@ -331,6 +362,13 @@
                 },
                 
                 // --- INLAND / SHORT ROUTES ---
+                { name: "Inland: Uganda -> Mombasa", color: "#2c3e50", path: [[0.31, 32.58], [0.63, 34.27], [0.51, 35.26], [-0.30, 36.08], [-1.29, 36.82], [-4.04, 39.66]] },
+                { 
+                    name: "Inland: Ethiopia -> Djibouti", 
+                    color: "#2c3e50", 
+                    // Addis Ababa -> Adama -> Awash -> Djibouti (Rail/Road corridor)
+                    path: [[9.145, 40.4897], [8.54, 39.27], [9.0, 40.1], [9.6, 41.8], [11.82, 43.14]] 
+                },
                 { name: "Rail: Trieste -> Antwerp", color: "#2c3e50", path: [[45.64, 13.76], [46.6, 13.8], [47.8, 13.0], [48.1, 11.5], [48.7, 9.1], [50.0, 8.2], [50.3, 7.6], [50.9, 6.9], [51.26, 4.35]] },
                 { name: "Rail: Trieste -> Hamburg", color: "#2c3e50", path: [[45.64, 13.76], [46.6, 13.8], [47.8, 13.0], [49.4, 11.1], [51.3, 9.9], [53.53, 9.96]] },
                 { name: "Inland: Rondonia -> Santos", color: "#2c3e50", path: [[-11.4, -61.5], [-15.6, -56.1], [-18.9, -48.3], [-22.5, -47.0], [-23.95, -46.3]] },
