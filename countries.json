@@ -7,7 +7,7 @@
       "prod": "29.90",
       "cons": "3.50",
       "stock": "Building",
-      "status": "Harvest Delayed",
+      "status": "Harvest on",
       "season": "Nov-Jan",
       "intel": "Crop sold at[...]"
     },
@@ -20,7 +20,7 @@
       "stock": "High",
       "status": "Crop Development",
       "season": "May-Aug",
-      "intel": "H1 '26: 1.5m[...]"
+      "intel": "H1 '26: 1.5m bags to be released"
     },
     "Colombia": {
       "type": "producer",
@@ -31,7 +31,7 @@
       "stock": "Med",
       "status": "Fly Crop Prep",
       "season": "Oct-Dec",
-      "intel": "Large crop e[...]"
+      "intel": "Large crop"
     },
     "Indonesia": {
       "type": "producer",
@@ -42,7 +42,7 @@
       "stock": "Low",
       "status": "Off-Season",
       "season": "Apr-Sep",
-      "intel": "Robusta dema[...]"
+      "intel": "Strong Robusta demand"
     },
     "Honduras": {
       "type": "producer",
@@ -53,7 +53,7 @@
       "stock": "Building",
       "status": "Active Harvest",
       "season": "Dec-Mar",
-      "intel": "Delayed harv[...]"
+      "intel": "Delayed harvest, now on"
     },
     "Ethiopia": {
       "type": "producer",
@@ -75,7 +75,7 @@
       "stock": "Med",
       "status": "Harvest Tailing Off",
       "season": "Nov-Feb",
-      "intel": "Benefiting f[...]"
+      "intel": "Benefiting from high prices"
     },
     "India": {
       "type": "producer",
@@ -86,7 +86,7 @@
       "stock": "Low",
       "status": "Early Harvest",
       "season": "Jan-Mar",
-      "intel": "Robusta harv[...]"
+      "intel": "Robusta harvest"
     },
     "USA": {
       "type": "consumer",
