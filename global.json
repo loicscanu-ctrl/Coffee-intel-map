@@ -1,0 +1,20 @@
+{
+  "globalIntel": {
+    "supply": [
+      { "t": "Vietnam Harvest", "v": "Harvest delayed by storms. Estimated completion 65%.", "date": "Dec 22" },
+      { "t": "Brazil 25/26", "v": "Rains in Minas Gerais improved soil moisture.", "date": "Dec 20" }
+    ],
+    "demand": [
+      { "t": "EU Roasters", "v": "Coverage thin for Q1 2026. Spot demand increasing.", "date": "Dec 22" },
+      { "t": "USA", "v": "Green coffee stocks at ports fell to 5.8m bags.", "date": "Dec 21" }
+    ],
+    "stocks": [
+      { "t": "ICE Arabica", "v": "Grading halted. Total: 890k bags.", "date": "Dec 23" },
+      { "t": "ICE Robusta", "v": "Cert stocks stable at low levels.", "date": "Dec 23" }
+    ],
+    "futures": [
+      { "t": "COT Report", "v": "Non-commercials reduced net long by 2k lots.", "date": "Dec 20" },
+      { "t": "Open Interest", "v": "Declining as holidays approach.", "date": "Dec 22" }
+    ]
+  }
+}
