@@ -13,7 +13,7 @@
     "China": { "type": "consumer", "lat": 35.8617, "lng": 104.1954, "cons": "6.8", "stock": "Low", "intel": "" },
     "Japan": { "type": "consumer", "lat": 36.2048, "lng": 138.2529, "cons": "7.1", "stock": "2.20", "intel": "" },
     "South Korea": { "type": "consumer", "lat": 35.9078, "lng": 127.7669, "cons": "2.8", "stock": "Stable", "intel": "Specialty market growing." },
-    "Middle East (Iraq)": { "type": "consumer", "lat": 33.3152, "lng": 44.3661, "cons": "1.5", "stock": "Med", "intel": "Transit hub for region." },
-    "North Africa (Tunisia)": { "type": "consumer", "lat": 33.8869, "lng": 9.5375, "cons": "1.2", "stock": "Low", "intel": "Robusta import focus." }
+    "Middle East": { "type": "consumer", "lat": 33.3152, "lng": 44.3661, "cons": "1.5", "stock": "Med", "intel": "Transit hub for region." },
+    "North Africa": { "type": "consumer", "lat": 33.8869, "lng": 9.5375, "cons": "1.2", "stock": "Low", "intel": "Robusta import focus." }
   }
 }
