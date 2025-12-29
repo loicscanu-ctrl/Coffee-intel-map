@@ -90,7 +90,7 @@
     "trend": "up"
   },
   {
-    "label": "USD/BRL",
+    "label": "| FX: USD/BRL",
     "value": "5.58",
     "trend": "up"
   },
@@ -100,12 +100,17 @@
     "trend": "up"
   },
   {
-    "label": "NY STOCKS",
+    "label": "| CERTS: KC",
     "value": "456.5K",
     "trend": "up"
   },
   {
-    "label": "SBUX",
+    "label": "RC",
+    "value": "4.2K",
+    "trend": "neutral"
+  },
+  {
+    "label": "| COFFEE STOCKS | COFFEE CHAINS : SBUX",
     "value": "85.08",
     "trend": "up"
   },
@@ -125,7 +130,7 @@
     "trend": "up"
   },
   {
-    "label": "NESN",
+    "label": "| ROASTERS: NESN",
     "value": "78.02",
     "trend": "up"
   },
@@ -155,7 +160,7 @@
     "trend": "up"
   },
   {
-    "label": "O32",
+    "label": "| TRADER: O32",
     "value": "0.95",
     "trend": "neutral"
   }
