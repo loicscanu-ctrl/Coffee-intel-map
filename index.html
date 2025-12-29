@@ -17,17 +17,14 @@
                     colors: {
                         'panel-bg': 'rgba(15, 23, 42, 0.95)',
                         'panel-border': '#334155',
-                        'cat-supply': '#10b981', // Emerald
-                        'cat-demand': '#3b82f6', // Blue
-                        'cat-stocks': '#f59e0b', // Amber
-                        'cat-futures': '#8b5cf6', // Violet
+                        'cat-supply': '#10b981',
+                        'cat-demand': '#3b82f6',
+                        'cat-stocks': '#f59e0b',
+                        'cat-futures': '#8b5cf6',
                     },
                     fontFamily: {
                         mono: ['"JetBrains Mono"', 'monospace'],
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    transitionProperty: {
-                        'height': 'height, max-height, transform',
                     }
                 }
             }
@@ -37,118 +34,40 @@
     <style>
         body, html { height: 100%; margin: 0; background-color: #1a1a1a; color: #e5e5e5; overflow: hidden; }
         #map { height: 100%; width: 100%; z-index: 1; background: #242424; }
-        
-        /* --- Markers & Icons --- */
         .custom-icon { transition: all 0.2s ease-in-out; }
         
-        .data-icon {
-            border: 2px solid #fff; border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+        .data-icon { border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .data-icon.producer { background: #10b981; }
         .data-icon.consumer { background: #3b82f6; }
-        .data-icon.harvesting { 
-            background: #10b981; 
-            border: 2px solid #f59e0b; 
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
-            animation: pulse-ring 2s infinite;
-        }
+        .data-icon.harvesting { background: #10b981; border: 2px solid #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4); animation: pulse-ring 2s infinite; }
 
-        .factory-icon {
-            background: #6366f1; border: 1px solid #fff; border-radius: 3px;
-            color: white; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3); font-size: 9px;
-        }
+        .factory-icon { background: #6366f1; border: 1px solid #fff; border-radius: 3px; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3); font-size: 9px; }
         .factory-icon:hover { transform: scale(1.3); z-index: 900; background: #4f46e5; }
 
-        .port-icon {
-            background: #0ea5e9; border: 2px solid #fff; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 8px rgba(14, 165, 233, 0.6); color: #fff; font-size: 10px;
-        }
+        .port-icon { background: #0ea5e9; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(14, 165, 233, 0.6); color: #fff; font-size: 10px; }
         .port-icon:hover { transform: scale(1.2); z-index: 1000; }
 
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-
-        /* --- Trade Lane Animation --- */
-        @keyframes flow-motion {
-            to { stroke-dashoffset: -32; }
-        }
-        .route-flow {
-            stroke-dasharray: 8, 8 !important; 
-            animation: flow-motion 3s linear infinite;
-            will-change: stroke-dashoffset;
-        }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        @keyframes flow-motion { to { stroke-dashoffset: -32; } }
+        .route-flow { stroke-dasharray: 8, 8 !important; animation: flow-motion 3s linear infinite; will-change: stroke-dashoffset; }
         .route-flow:hover { stroke-width: 4px; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); }
 
-        /* --- Global Panel Styles --- */
-        #global-panel {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #global-panel.retracted {
-            transform: translateY(calc(100% - 36px)); /* Hide all except header bar */
-        }
+        #global-panel { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        #global-panel.retracted { transform: translateY(calc(100% - 36px)); }
         
-        .news-card {
-            background: rgba(30, 41, 59, 0.5);
-            border-left: 3px solid;
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            border-radius: 0 4px 4px 0;
-            font-size: 0.8rem;
-            line-height: 1.4;
-        }
-        .news-card:hover { background: rgba(30, 41, 59, 0.8); }
-
-        /* Scrollbar styling for panels */
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
-
-        /* Popups */
-        .leaflet-popup-content-wrapper {
-            background: rgba(15, 23, 42, 0.95);
-            color: #e2e8f0;
-            border: 1px solid #334155;
-            border-radius: 6px;
-        }
+        .news-card { background: rgba(30, 41, 59, 0.5); border-left: 3px solid; padding: 8px 12px; margin-bottom: 8px; border-radius: 0 4px 4px 0; font-size: 0.8rem; line-height: 1.4; }
+        .leaflet-popup-content-wrapper { background: rgba(15, 23, 42, 0.95); color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; }
         .leaflet-popup-tip { background: #334155; }
         
-        /* Integrated Ticker Styles */
-        .osint-ticker-wrap {
-            flex: 1; 
-            position: relative; 
-            overflow: hidden; 
-            background: transparent; 
-            display: flex; 
-            align-items: center;
-            margin: 0 20px;
-            height: 100%;
-            mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
-        }
-
-        .osint-ticker {
-            display: inline-block; white-space: nowrap; animation: osint-scroll 60s linear infinite;
-            padding-left: 100%; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #94a3b8;
-        }
-        
+        .osint-ticker-wrap { flex: 1; position: relative; overflow: hidden; background: transparent; display: flex; align-items: center; margin: 0 20px; height: 100%; mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent); }
+        .osint-ticker { display: inline-block; white-space: nowrap; animation: osint-scroll 60s linear infinite; padding-left: 100%; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #94a3b8; }
         .osint-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 6px; }
         .osint-val-up { color: #4ade80; font-weight: 700; }
         .osint-val-down { color: #f87171; font-weight: 700; }
         .osint-val-risk { color: #fb923c; font-weight: 700; }
         .osint-val-neutral { color: #38bdf8; font-weight: 700; }
         .osint-label { font-weight: 700; color: #cbd5e1; opacity: 0.8; }
-
-        @keyframes osint-scroll {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
-        }
+        @keyframes osint-scroll { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
     </style>
 </head>
 <body>
@@ -156,71 +75,28 @@
     <div id="map"></div>
 
     <div id="global-panel" class="absolute bottom-0 left-0 w-full h-[320px] bg-panel-bg border-t border-panel-border z-[1000] shadow-[0_-4px_20px_rgba(0,0,0,0.5)] flex flex-col backdrop-blur-md">
-        
         <div id="panel-toggle" class="h-[36px] bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4 cursor-pointer hover:bg-slate-800 transition-colors" onclick="App.ui.togglePanel()">
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="font-mono font-bold text-sm text-gray-100 tracking-wider">GLOBAL MARKET INTEL</div>
-            </div>
-            
+            <div class="flex items-center gap-3 shrink-0"><div class="font-mono font-bold text-sm text-gray-100 tracking-wider">GLOBAL MARKET INTEL</div></div>
             <div class="osint-ticker-wrap">
                 <div class="osint-ticker">
                     <span class="osint-item"><span class="osint-label">SYSTEM</span> <span class="osint-val-neutral">LOADING DATA...</span></span>
                 </div>
             </div>
-
-            <div class="text-gray-400 hover:text-white transition-transform duration-300 shrink-0" id="toggle-icon">
-                <i class="fa-solid fa-chevron-down"></i>
-            </div>
+            <div class="text-gray-400 hover:text-white transition-transform duration-300 shrink-0" id="toggle-icon"><i class="fa-solid fa-chevron-down"></i></div>
         </div>
 
         <div class="flex-1 grid grid-cols-4 divide-x divide-slate-700 overflow-hidden">
-            
-            <div class="flex flex-col min-h-0">
-                <div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-supply border-b border-slate-700 flex items-center gap-2 uppercase">
-                    <i class="fa-solid fa-wheat-awn"></i> Supply & Harvest
-                </div>
-                <div id="col-supply" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
-                </div>
-            </div>
-
-            <div class="flex flex-col min-h-0">
-                <div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-demand border-b border-slate-700 flex items-center gap-2 uppercase">
-                    <i class="fa-solid fa-cart-shopping"></i> Global Demand
-                </div>
-                <div id="col-demand" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
-                </div>
-            </div>
-
-            <div class="flex flex-col min-h-0">
-                <div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-stocks border-b border-slate-700 flex items-center gap-2 uppercase">
-                    <i class="fa-solid fa-cubes-stacked"></i> Certified Stocks
-                </div>
-                <div id="col-stocks" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
-                </div>
-            </div>
-
-            <div class="flex flex-col min-h-0">
-                <div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-futures border-b border-slate-700 flex items-center gap-2 uppercase">
-                    <i class="fa-solid fa-chart-line"></i> Futures / COT / FX
-                </div>
-                <div id="col-futures" class="p-3 overflow-y-auto custom-scroll flex-1">
-                    <div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div>
-                </div>
-            </div>
-
+            <div class="flex flex-col min-h-0"><div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-supply border-b border-slate-700 flex items-center gap-2 uppercase"><i class="fa-solid fa-wheat-awn"></i> Supply & Harvest</div><div id="col-supply" class="p-3 overflow-y-auto custom-scroll flex-1"><div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div></div></div>
+            <div class="flex flex-col min-h-0"><div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-demand border-b border-slate-700 flex items-center gap-2 uppercase"><i class="fa-solid fa-cart-shopping"></i> Global Demand</div><div id="col-demand" class="p-3 overflow-y-auto custom-scroll flex-1"><div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div></div></div>
+            <div class="flex flex-col min-h-0"><div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-stocks border-b border-slate-700 flex items-center gap-2 uppercase"><i class="fa-solid fa-cubes-stacked"></i> Certified Stocks</div><div id="col-stocks" class="p-3 overflow-y-auto custom-scroll flex-1"><div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div></div></div>
+            <div class="flex flex-col min-h-0"><div class="p-3 bg-slate-900/50 text-xs font-bold text-cat-futures border-b border-slate-700 flex items-center gap-2 uppercase"><i class="fa-solid fa-chart-line"></i> Futures / COT / FX</div><div id="col-futures" class="p-3 overflow-y-auto custom-scroll flex-1"><div class="text-gray-500 text-xs italic text-center mt-10">Loading...</div></div></div>
         </div>
     </div>
 
     <div id="modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1999] hidden" onclick="App.ui.closeAiModal()"></div>
     <div id="ai-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] max-w-[90%] max-h-[85vh] bg-slate-900 rounded-lg shadow-2xl z-[2000] hidden flex-col border border-slate-700">
         <div class="bg-slate-800 px-5 py-3 border-b border-slate-700 flex justify-between items-center rounded-t-lg">
-            <h3 class="font-bold text-gray-100 flex items-center gap-2">
-                <i class="fa-solid fa-microchip text-indigo-400"></i> 
-                <span id="ai-modal-title">Analysis</span>
-            </h3>
+            <h3 class="font-bold text-gray-100 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-400"></i> <span id="ai-modal-title">Analysis</span></h3>
             <button onclick="App.ui.closeAiModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
         </div>
         <div id="ai-modal-content" class="p-6 overflow-y-auto text-sm text-gray-300 leading-relaxed font-sans"></div>
@@ -228,10 +104,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
 
-<script>
-        // --- 1. CONFIG & DATA ---
+    <script>
         const CONFIG = {
-            apiKey: "", 
             mapTheme: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
             initView: [20, -10],
             initZoom: 3
@@ -239,39 +113,18 @@
 
         const CoffeeData = {
             countries: {},
-            globalIntel: { supply: [], demand: [], stocks: [], futures: [], ticker: [] },
+            globalIntel: { supply: [], demand: [], stocks: [], futures: [], ticker: [], alerts: [] },
             factories: [],
-            
-            // --- DONNÉES STATIQUES ---
             ports: [
-                // Origins
-                { n: "Santos", l: [-23.9, -46.3] },
-                { n: "Vitoria", l: [-20.3, -40.3] },
-                { n: "Salvador", l: [-12.97, -38.50] },
-                { n: "Cartagena", l: [10.4, -75.5] },
-                { n: "Buenaventura", l: [3.88, -77.0] },
-                { n: "Puerto Cortés", l: [15.8, -87.9] },
-                { n: "Veracruz", l: [19.17, -96.13] },
-                { n: "Ho Chi Minh City", l: [10.7, 106.6] },
-                { n: "Jakarta", l: [-6.1, 106.8] },
-                { n: "Mombasa", l: [-4.0, 39.6] },
-                { n: "Chennai", l: [13.08, 80.27] },
-                { n: "Tuticorin", l: [8.76, 78.13] },
-                
-                // Destinations & Hubs
-                { n: "Antwerp", l: [51.22, 4.40] },
-                { n: "Hamburg", l: [53.55, 9.99] },
-                { n: "Trieste", l: [45.65, 13.78] },
-                { n: "New York", l: [40.7, -74.0] },
-                { n: "New Orleans", l: [29.9, -90.0] },
-                { n: "Houston", l: [29.7, -95.1] },
-                { n: "Oakland", l: [37.8, -122.4] },
-                { n: "Tokyo", l: [35.6, 139.6] },
-                { n: "Singapore", l: [1.2, 103.8] }
+                { n: "Santos", l: [-23.9, -46.3] }, { n: "Vitoria", l: [-20.3, -40.3] }, { n: "Salvador", l: [-12.97, -38.50] },
+                { n: "Cartagena", l: [10.4, -75.5] }, { n: "Buenaventura", l: [3.88, -77.0] }, { n: "Puerto Cortés", l: [15.8, -87.9] },
+                { n: "Veracruz", l: [19.17, -96.13] }, { n: "Ho Chi Minh City", l: [10.7, 106.6] }, { n: "Jakarta", l: [-6.1, 106.8] },
+                { n: "Mombasa", l: [-4.0, 39.6] }, { n: "Chennai", l: [13.08, 80.27] }, { n: "Tuticorin", l: [8.76, 78.13] },
+                { n: "Antwerp", l: [51.22, 4.40] }, { n: "Hamburg", l: [53.55, 9.99] }, { n: "Trieste", l: [45.65, 13.78] },
+                { n: "New York", l: [40.7, -74.0] }, { n: "New Orleans", l: [29.9, -90.0] }, { n: "Houston", l: [29.7, -95.1] },
+                { n: "Oakland", l: [37.8, -122.4] }, { n: "Tokyo", l: [35.6, 139.6] }, { n: "Singapore", l: [1.2, 103.8] }
             ],
-
             routes: [
-                // --- INLAND LOGISTICS (Rail/Truck) ---
                 { name: "Rail: Trieste -> Antwerp", color: "#2c3e50", path: [[45.64, 13.76], [46.6, 13.4], [47.3, 11.4], [48.8, 9.2], [49.5, 8.5], [50.9, 6.9], [51.26, 4.35]] },
                 { name: "Rail: Trieste -> Hamburg", color: "#2c3e50", path: [[45.64, 13.76], [46.6, 13.8], [47.8, 13.0], [49.4, 11.1], [51.5, 9.9], [53.53, 9.96]] },
                 { name: "Inland: Rondonia -> Santos", color: "#2c3e50", path: [[-11.4, -61.5], [-15.6, -56.1], [-18.9, -48.3], [-22.5, -47.0], [-23.95, -46.3]] },
@@ -282,258 +135,218 @@
                 { name: "Inland: Armenia -> Buenaventura", color: "#2c3e50", path: [[4.53, -75.67], [3.88, -77.06]] },
                 { name: "Inland: Armenia -> Cartagena", color: "#2c3e50", path: [[4.53, -75.67], [8.0, -76.0], [10.40, -75.52]] },
                 { name: "Inland: Comayagua -> Pto Cortes", color: "#2c3e50", path: [[14.46, -87.64], [15.84, -87.94]] },
-                { name: "Inland: Lampung -> Jakarta", color: "#2c3e50", path: [[-5.43, 105.26], [-5.9, 106.0], [-6.10, 106.88]] }, 
+                { name: "Inland: Lampung -> Jakarta", color: "#2c3e50", path: [[-5.43, 105.26], [-5.9, 106.0], [-6.10, 106.88]] },
                 { name: "Inland: Uganda -> Mombasa", color: "#2c3e50", path: [[0.31, 32.58], [0.5, 34.5], [-1.3, 36.8], [-3.5, 38.5], [-4.05, 39.65]] },
                 { name: "Inland: Uganda -> Sudan", color: "#2c3e50", path: [[0.31, 32.58], [3.0, 32.0], [5.0, 31.5], [10.0, 32.0], [15.50, 32.56]] },
                 { name: "Inland: Chiapas -> Veracruz", color: "#2c3e50", path: [[14.90, -92.26], [16.5, -94.0], [18.0, -95.0], [19.20, -96.13]] },
-
-                // --- MARITIME ROUTES ---
-                { name: "Brazil (Santos) -> Antwerp", color: "#e74c3c", path: [
-                    [-23.95, -46.3], [-24.5, -44.0], [-20.0, -36.0], [-10.0, -32.0], [0.0, -30.0], 
-                    [15.0, -28.0], [30.0, -22.0], [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]
-                ]},
-                { name: "Brazil (Salvador) -> Antwerp", color: "#e74c3c", path: [
-                    [-12.96, -38.5], [-11.5, -35.0], [-5.0, -32.0], [10.0, -30.0], [30.0, -22.0], 
-                    [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]
-                ]},
-                { name: "Brazil (Santos) -> NY", color: "#e74c3c", path: [
-                    [-23.95, -46.3], [-24.0, -43.0], [-10.0, -33.0], [-5.0, -34.0], [5.0, -45.0], 
-                    [15.0, -55.0], [25.0, -65.0], [32.0, -72.0], [40.68, -74.14]
-                ]},
-                { name: "Brazil (Santos) -> Japan", color: "#e74c3c", path: [
-                    [-23.95, -46.3], [-32.0, -30.0], [-36.0, 15.0], 
-                    [-30.0, 70.0], [-10.0, 90.0], 
-                    [5.9, 95.2], [3.0, 100.0], [1.26, 103.8], 
-                    [10.0, 111.0], [18.0, 118.0], 
-                    [21.0, 121.0], [24.0, 123.0], 
-                    [30.0, 130.0], [35.6, 139.6] 
-                ]},
-                { name: "Asia -> Europe Trunk", color: "#16a085", path: [
-                    [1.26, 103.8], 
-                    [2.5, 101.5], [4.5, 99.0], [5.8, 95.5], 
-                    [5.8, 80.4], 
-                    [9.0, 70.0], [12.0, 55.0], [12.0, 45.0], 
-                    [12.6, 43.3], 
-                    [18.0, 40.0], [25.0, 36.0], [27.0, 34.5], [29.9, 32.5], 
-                    [31.2, 32.3], 
-                    [33.0, 30.0], [34.0, 25.0], [37.5, 11], [37.5, 2], 
-                    [35.95, -5.6], 
-                    [37.0, -10.0], [43.0, -10.5], [49.0, -5.0], 
-                    [51.5, 3.50], [51.26, 4.35] 
-                ]},
-                { name: "Jakarta Feeder", color: "#d35400", path: [
-                    [-6.10, 106.88], [-5.5, 107.0], [-3.0, 106.5], [-1.0, 105.0], [1.26, 103.8] 
-                ]},
-                { name: "Vietnam Feeder", color: "#2ecc71", path: [
-                    [10.76, 106.78], [9.0, 107.5], [4.0, 106.0], [1.5, 104.5], [1.26, 103.8] 
-                ]},
-                { name: "Vietnam -> US West", color: "#2ecc71", path: [
-                    [[10.76, 106.78], [15.0, 115.0], [21.0, 121.0], [30.0, 135.0], [40.0, 160.0], [45.0, 180.0]], 
-                    [[45.0, -180.0], [45.0, -160.0], [42.0, -140.0], [37.8, -122.4]]
-                ]},
-                { name: "Vietnam -> Tokyo", color: "#2ecc71", path: [
-                    [10.76, 106.78], [15.0, 112.0], [20.0, 118.0], [25.0, 123.0], [30.0, 128.0], [35.61, 139.78]
-                ]},
-                { name: "Uganda -> Trieste", color: "#f39c12", path: [
-                    [-4.05, 39.65], [0.0, 45.0], [10.0, 52.0], [12.6, 43.3], 
-                    [20.0, 39.0], [29.9, 32.5], [31.2, 32.3], 
-                    [33.0, 29.0], [35.0, 22.0], [38.0, 18.0], [42.0, 15.0], [45.64, 13.76] 
-                ]},
+                { name: "Brazil (Santos) -> Antwerp", color: "#e74c3c", path: [[-23.95, -46.3], [-24.5, -44.0], [-20.0, -36.0], [-10.0, -32.0], [0.0, -30.0], [15.0, -28.0], [30.0, -22.0], [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]]},
+                { name: "Brazil (Salvador) -> Antwerp", color: "#e74c3c", path: [[-12.96, -38.5], [-11.5, -35.0], [-5.0, -32.0], [10.0, -30.0], [30.0, -22.0], [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]]},
+                { name: "Brazil (Santos) -> NY", color: "#e74c3c", path: [[-23.95, -46.3], [-24.0, -43.0], [-10.0, -33.0], [-5.0, -34.0], [5.0, -45.0], [15.0, -55.0], [25.0, -65.0], [32.0, -72.0], [40.68, -74.14]]},
+                { name: "Brazil (Santos) -> Japan", color: "#e74c3c", path: [[-23.95, -46.3], [-32.0, -30.0], [-36.0, 15.0], [-30.0, 70.0], [-10.0, 90.0], [5.9, 95.2], [3.0, 100.0], [1.26, 103.8], [10.0, 111.0], [18.0, 118.0], [21.0, 121.0], [24.0, 123.0], [30.0, 130.0], [35.6, 139.6]]},
+                { name: "Asia -> Europe Trunk", color: "#16a085", path: [[1.26, 103.8], [2.5, 101.5], [4.5, 99.0], [5.8, 95.5], [5.8, 80.4], [9.0, 70.0], [12.0, 55.0], [12.0, 45.0], [12.6, 43.3], [18.0, 40.0], [25.0, 36.0], [27.0, 34.5], [29.9, 32.5], [31.2, 32.3], [33.0, 30.0], [34.0, 25.0], [37.5, 11], [37.5, 2], [35.95, -5.6], [37.0, -10.0], [43.0, -10.5], [49.0, -5.0], [51.5, 3.50], [51.26, 4.35]]},
+                { name: "Jakarta Feeder", color: "#d35400", path: [[-6.10, 106.88], [-5.5, 107.0], [-3.0, 106.5], [-1.0, 105.0], [1.26, 103.8]]},
+                { name: "Vietnam Feeder", color: "#2ecc71", path: [[10.76, 106.78], [9.0, 107.5], [4.0, 106.0], [1.5, 104.5], [1.26, 103.8]]},
+                { name: "Vietnam -> US West", color: "#2ecc71", path: [[[10.76, 106.78], [15.0, 115.0], [21.0, 121.0], [30.0, 135.0], [40.0, 160.0], [45.0, 180.0]], [[45.0, -180.0], [45.0, -160.0], [42.0, -140.0], [37.8, -122.4]]]},
+                { name: "Vietnam -> Tokyo", color: "#2ecc71", path: [[10.76, 106.78], [15.0, 112.0], [20.0, 118.0], [25.0, 123.0], [30.0, 128.0], [35.61, 139.78]]},
+                { name: "Uganda -> Trieste", color: "#f39c12", path: [[-4.05, 39.65], [0.0, 45.0], [10.0, 52.0], [12.6, 43.3], [20.0, 39.0], [29.9, 32.5], [31.2, 32.3], [33.0, 29.0], [35.0, 22.0], [38.0, 18.0], [42.0, 15.0], [45.64, 13.76]]},
                 { name: "Colombia -> NY", color: "#9b59b6", path: [[10.4, -75.5],[12,-76],[19.5,-74.5],[24,-73],[32,-74],[40.7,-74]] },
                 { name: "Colombia -> Oakland", color: "#9b59b6", path: [[3.88, -77.0],[5,-80],[12,-90],[18,-104],[25,-114],[33,-120],[37.8,-122.4]] },
                 { name: "Honduras -> NOLA", color: "#3498db", path: [[15.8, -87.9],[18.5,-86.5],[21.8,-86],[24.5,-88],[29,-89],[29.9,-90]] },
                 { name: "Honduras -> Antwerp", color: "#3498db", path: [[15.8, -87.9],[18.5,-86.5],[21.8,-85.5],[24.5,-81],[27,-79.5],[35,-60],[45,-30],[49,-5], [51.22, 4.40]] },
-                { name: "Vietnam -> Tuticorin", color: "#00875a", path: [
-                    [10.76, 106.78], [3.0, 105.0], [1.26, 103.8], 
-                    [5.0, 98.0], [5.8, 85.0], [5.8, 80.4], 
-                    [6.5, 79.0], [8.75, 78.18] 
-                ]}
+                { name: "Vietnam -> Tuticorin", color: "#00875a", path: [[10.76, 106.78], [3.0, 105.0], [1.26, 103.8], [5.0, 98.0], [5.8, 85.0], [5.8, 80.4], [6.5, 79.0], [8.75, 78.18]]}
             ]
         };
 
-
-// --- 2. LOGIC ---
-const App = {
-    map: null,
-    layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
-    
-    init: async function() {
-        // 1. Initialiser la carte et les calques
-        this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
-
-        this.map.createPane('labelsPane').style.zIndex = 550;
-        this.map.getPane('labelsPane').style.pointerEvents = 'none';
-        this.map.createPane('alertPane').style.zIndex = 650; 
-        this.map.getPane('alertPane').style.pointerEvents = 'none';
-
-        L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
-        L.control.zoom({ position: 'topright' }).addTo(this.map);
-
-        this.layers.producers = L.layerGroup().addTo(this.map);
-        this.layers.consumers = L.layerGroup().addTo(this.map);
-        this.layers.factories = L.layerGroup().addTo(this.map);
-        this.layers.logistics = L.layerGroup().addTo(this.map);
-        this.layers.ports = L.layerGroup().addTo(this.map);
-        this.layers.newsAlerts = L.layerGroup().addTo(this.map);
-        this.layers.intel = L.layerGroup().addTo(this.map);
-
-        // 2. Charger les données JSON (Anti-cache)
-        const timestamp = new Date().getTime();
-        try {
-            const [countriesRes, globalRes, factoriesRes] = await Promise.all([
-                fetch('./countries.json?v=' + timestamp),
-                fetch('./global.json?v=' + timestamp),
-                fetch('./factories.json?v=' + timestamp)
-            ]);
-
-            if (countriesRes.ok) Object.assign(CoffeeData, await countriesRes.json());
-            if (globalRes.ok) Object.assign(CoffeeData, await globalRes.json());
-            if (factoriesRes.ok) Object.assign(CoffeeData, await factoriesRes.json());
+        const App = {
+            map: null,
+            layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
             
-            console.log("✅ Données chargées.");
+            init: async function() {
+                // 1. Initialisation de la carte
+                this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
+                this.map.createPane('labelsPane').style.zIndex = 550;
+                this.map.getPane('labelsPane').style.pointerEvents = 'none';
+                this.map.createPane('alertPane').style.zIndex = 650; 
+                this.map.getPane('alertPane').style.pointerEvents = 'none';
 
-        } catch (e) {
-            console.error("⚠️ Erreur JSON :", e);
-        }
+                L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
+                L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-        // 3. Dessiner la carte et activer le Dashboard/Ticker/Alertes
-        this.renderMap();
-        if (CoffeeData.globalIntel) {
-            this.updateData(CoffeeData.globalIntel);
-        }
-    },
+                this.layers.producers = L.layerGroup().addTo(this.map);
+                this.layers.consumers = L.layerGroup().addTo(this.map);
+                this.layers.factories = L.layerGroup().addTo(this.map);
+                this.layers.logistics = L.layerGroup().addTo(this.map);
+                this.layers.ports = L.layerGroup().addTo(this.map);
+                this.layers.newsAlerts = L.layerGroup().addTo(this.map);
+                this.layers.intel = L.layerGroup().addTo(this.map);
 
-    updateData: function(data) {
-        // Dashboard
-        CoffeeData.globalIntel = data;
-        App.ui.renderDashboard();
+                // 2. Charger les données JSON (Anti-cache)
+                const timestamp = new Date().getTime();
+                try {
+                    const [countriesRes, globalRes, factoriesRes] = await Promise.all([
+                        fetch('./countries.json?v=' + timestamp),
+                        fetch('./global.json?v=' + timestamp),
+                        fetch('./factories.json?v=' + timestamp)
+                    ]);
 
-        // Ticker
-        if (data.ticker && Array.isArray(data.ticker)) {
-            const ticker = document.querySelector('.osint-ticker');
-            if(ticker) {
-                ticker.innerHTML = ''; 
-                data.ticker.forEach(item => {
-                    let c = 'osint-val-neutral';
-                    if(item.trend === 'up') c = 'osint-val-up';
-                    if(item.trend === 'down') c = 'osint-val-down';
-                    if(item.trend === 'risk') c = 'osint-val-risk';
-                    const span = document.createElement('span');
-                    span.className = 'osint-item';
-                    span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
-                    ticker.appendChild(span);
-                });
-            }
-        }
+                    if (countriesRes.ok) Object.assign(CoffeeData, await countriesRes.json());
+                    if (globalRes.ok) Object.assign(CoffeeData, await globalRes.json());
+                    if (factoriesRes.ok) Object.assign(CoffeeData, await factoriesRes.json());
+                    
+                    console.log("✅ Données chargées.");
 
-        // Alertes Rouges
-        if (data.alerts && Array.isArray(data.alerts)) {
-            this.layers.newsAlerts.clearLayers();
-            data.alerts.forEach(alert => {
-                if(alert.loc) {
-                    const redPulseIcon = L.divIcon({ 
-                        className: 'custom', 
-                        html: `<div class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span></div>`,
-                        iconSize: [16,16], iconAnchor: [8,8]
-                    });
-                    L.marker(alert.loc, { icon: redPulseIcon, pane: 'alertPane' })
-                        .bindPopup(`<div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500"><div class="font-bold text-red-400 mb-1 uppercase">${alert.t}</div><div>${alert.v}</div></div>`)
-                        .addTo(this.layers.newsAlerts);
+                } catch (e) {
+                    console.error("⚠️ Erreur JSON :", e);
                 }
-            });
-        }
-    },
 
-    renderMap: function() {
-        Object.values(this.layers).forEach(layer => {
-            if (layer && layer !== this.layers.newsAlerts) layer.clearLayers();
-        });
+                // 3. Dessiner la carte et activer les données
+                this.renderMap();
+                if (CoffeeData.globalIntel) {
+                    this.updateData(CoffeeData.globalIntel);
+                }
+            },
 
-        // Routes
-        if (CoffeeData.routes) {
-            CoffeeData.routes.forEach(r => {
-                L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' }).bindTooltip(r.name).addTo(this.layers.logistics);
-            });
-        }
+            updateData: function(data) {
+                // Mise à jour Dashboard
+                CoffeeData.globalIntel = data;
+                App.ui.renderDashboard();
 
-        // Ports
-        if (CoffeeData.ports) {
-            CoffeeData.ports.forEach(p => {
-                const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
-                L.marker(p.l, { icon: icon }).bindPopup(`Port of ${p.n}`).addTo(this.layers.ports);
-            });
-        }
+                // Mise à jour Ticker
+                if (data.ticker && Array.isArray(data.ticker)) {
+                    const ticker = document.querySelector('.osint-ticker');
+                    if(ticker) {
+                        ticker.innerHTML = ''; 
+                        data.ticker.forEach(item => {
+                            let c = 'osint-val-neutral';
+                            if(item.trend === 'up') c = 'osint-val-up';
+                            if(item.trend === 'down') c = 'osint-val-down';
+                            if(item.trend === 'risk') c = 'osint-val-risk';
+                            const span = document.createElement('span');
+                            span.className = 'osint-item';
+                            span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
+                            ticker.appendChild(span);
+                        });
+                    }
+                }
 
-        // Pays
-        if(CoffeeData.countries) {
-            for (const [key, data] of Object.entries(CoffeeData.countries)) {
-                const isProducer = data.type === 'producer';
-                const targetLayer = isProducer ? this.layers.producers : this.layers.consumers;
-                const cssClass = isProducer ? (data.status === 'Active Harvest' ? 'data-icon producer harvesting' : 'data-icon producer') : 'data-icon consumer';
-                const marker = L.marker([data.lat, data.lng], { icon: L.divIcon({ className: 'custom', html: `<div class="${cssClass} w-3 h-3"></div>` }) });
-                let statsHtml = isProducer ? `<div><span class="text-gray-400">PROD:</span> ${data.prod}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>` : `<div><span class="text-gray-400">CONS:</span> ${data.cons}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>`;
-                marker.bindPopup(`<div class="p-3 font-mono text-xs text-gray-100 bg-slate-900 border border-slate-700 rounded min-w-[180px]"><div class="font-bold text-sm mb-1 border-b border-slate-600 pb-1 text-white">${key}</div><div class="grid grid-cols-2 gap-2 my-2 text-slate-300">${statsHtml}</div>${data.intel ? `<div class="mb-2 p-1 bg-slate-800 rounded text-[10px] text-gray-300 border-l-2 border-emerald-500 pl-2 mt-1 italic">${data.intel}</div>` : ''}</div>`);
-                targetLayer.addLayer(marker);
-            }
-        }
+                // Mise à jour Alertes Rouges
+                if (data.alerts && Array.isArray(data.alerts)) {
+                    this.layers.newsAlerts.clearLayers();
+                    data.alerts.forEach(alert => {
+                        if(alert.loc) {
+                            const redPulseIcon = L.divIcon({ 
+                                className: 'custom', 
+                                html: `<div class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span></div>`,
+                                iconSize: [16,16], iconAnchor: [8,8]
+                            });
+                            L.marker(alert.loc, { icon: redPulseIcon, pane: 'alertPane' })
+                                .bindPopup(`<div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500"><div class="font-bold text-red-400 mb-1 uppercase">${alert.t || 'Alert'}</div><div>${alert.v || ''}</div></div>`)
+                                .addTo(this.layers.newsAlerts);
+                        }
+                    });
+                }
+            },
 
-        // Usines
-        if (CoffeeData.factories) {
-            CoffeeData.factories.forEach(fac => {
-                const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
-                L.marker(fac.l, { icon: icon }).bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`).addTo(this.layers.factories);
-            });
-        }
-    },
+            renderMap: function() {
+                Object.values(this.layers).forEach(layer => {
+                    if (layer && layer !== this.layers.newsAlerts && typeof layer.clearLayers === 'function') layer.clearLayers();
+                });
 
-    ui: {
-        renderDashboard: function() {
-            const d = CoffeeData.globalIntel;
-            if(!d) return;
-            this.fillColumn('col-supply', d.supply, 'border-cat-supply text-cat-supply');
-            this.fillColumn('col-demand', d.demand, 'border-cat-demand text-cat-demand');
-            this.fillColumn('col-stocks', d.stocks, 'border-cat-stocks text-cat-stocks');
-            this.fillColumn('col-futures', d.futures, 'border-cat-futures text-cat-futures');
-        },
-        fillColumn: function(id, items, colorClass) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (!items || items.length === 0) { el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">No data</div>'; return; }
-            el.innerHTML = items.map(i => `<div class="news-card ${colorClass}" style="border-color: currentColor; color: #e2e8f0;"><div class="flex justify-between items-center mb-1"><span class="font-bold text-[10px] opacity-70 uppercase tracking-wide">${i.t}</span><span class="text-[9px] opacity-50">${i.date || ''}</span></div><div>${i.v}</div></div>`).join('');
-        },
-        togglePanel: function() {
-            const panel = document.getElementById('global-panel');
-            const icon = document.getElementById('toggle-icon');
-            panel.classList.toggle('retracted');
-            icon.style.transform = panel.classList.contains('retracted') ? 'rotate(180deg)' : 'rotate(0deg)';
-        },
-        openAiModal: function(title, loadingText) {
-            document.getElementById('modal-overlay').classList.remove('hidden');
-            document.getElementById('ai-modal').classList.remove('hidden').classList.add('flex');
-            document.getElementById('ai-modal-title').innerText = title;
-            document.getElementById('ai-modal-content').innerHTML = `<div class="flex items-center gap-3 text-gray-500"><i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}</div>`;
-            if(title === "Global Briefing") App.ai.generateGlobal();
-        },
-        closeAiModal: function() {
-            document.getElementById('modal-overlay').classList.add('hidden');
-            document.getElementById('ai-modal').classList.add('hidden').classList.remove('flex');
-        },
-        updateModalContent: function(text) {
-            let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
-            document.getElementById('ai-modal-content').innerHTML = html;
-        }
-    },
+                // Routes
+                if (CoffeeData.routes) {
+                    CoffeeData.routes.forEach(r => {
+                        if(r.path) L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' }).bindTooltip(r.name).addTo(this.layers.logistics);
+                    });
+                }
 
-    ai: {
-        generateGlobal: function() { setTimeout(() => { App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed."); }, 500); },
-        analyzeCountry: async function(country) { App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`); setTimeout(() => { App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`); }, 1000); }
-    },
+                // Ports
+                if (CoffeeData.ports) {
+                    CoffeeData.ports.forEach(p => {
+                        if(p.l) {
+                            const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
+                            L.marker(p.l, { icon: icon }).bindPopup(`Port of ${p.n}`).addTo(this.layers.ports);
+                        }
+                    });
+                }
 
-    uploader: { init: function() {} }
-};
+                // Pays
+                if(CoffeeData.countries) {
+                    for (const [key, data] of Object.entries(CoffeeData.countries)) {
+                        if (!data.lat || !data.lng) continue;
+                        const isProducer = data.type === 'producer';
+                        const targetLayer = isProducer ? this.layers.producers : this.layers.consumers;
+                        const cssClass = isProducer ? (data.status === 'Active Harvest' ? 'data-icon producer harvesting' : 'data-icon producer') : 'data-icon consumer';
+                        const marker = L.marker([data.lat, data.lng], { icon: L.divIcon({ className: 'custom', html: `<div class="${cssClass} w-3 h-3"></div>` }) });
+                        let statsHtml = isProducer ? `<div><span class="text-gray-400">PROD:</span> ${data.prod}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>` : `<div><span class="text-gray-400">CONS:</span> ${data.cons}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>`;
+                        marker.bindPopup(`<div class="p-3 font-mono text-xs text-gray-100 bg-slate-900 border border-slate-700 rounded min-w-[180px]"><div class="font-bold text-sm mb-1 border-b border-slate-600 pb-1 text-white">${key}</div><div class="grid grid-cols-2 gap-2 my-2 text-slate-300">${statsHtml}</div>${data.intel ? `<div class="mb-2 p-1 bg-slate-800 rounded text-[10px] text-gray-300 border-l-2 border-emerald-500 pl-2 mt-1 italic">${data.intel}</div>` : ''}</div>`);
+                        targetLayer.addLayer(marker);
+                    }
+                }
 
-window.onload = function() { App.init(); };
+                // Usines
+                if (CoffeeData.factories) {
+                    CoffeeData.factories.forEach(fac => {
+                        if (fac.l) {
+                            const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
+                            L.marker(fac.l, { icon: icon }).bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c || ''}</span><br><span class="text-emerald-400">Cap: ${fac.cap || ''}</span></div>`).addTo(this.layers.factories);
+                        }
+                    });
+                }
+            },
+
+            ui: {
+                renderDashboard: function() {
+                    const d = CoffeeData.globalIntel;
+                    if(!d) return;
+                    this.fillColumn('col-supply', d.supply, 'border-cat-supply text-cat-supply');
+                    this.fillColumn('col-demand', d.demand, 'border-cat-demand text-cat-demand');
+                    this.fillColumn('col-stocks', d.stocks, 'border-cat-stocks text-cat-stocks');
+                    this.fillColumn('col-futures', d.futures, 'border-cat-futures text-cat-futures');
+                },
+                fillColumn: function(id, items, colorClass) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (!items || items.length === 0) { el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">No data</div>'; return; }
+                    el.innerHTML = items.map(i => `<div class="news-card ${colorClass}" style="border-color: currentColor; color: #e2e8f0;"><div class="flex justify-between items-center mb-1"><span class="font-bold text-[10px] opacity-70 uppercase tracking-wide">${i.t}</span><span class="text-[9px] opacity-50">${i.date || ''}</span></div><div>${i.v}</div></div>`).join('');
+                },
+                togglePanel: function() {
+                    const panel = document.getElementById('global-panel');
+                    const icon = document.getElementById('toggle-icon');
+                    panel.classList.toggle('retracted');
+                    icon.style.transform = panel.classList.contains('retracted') ? 'rotate(180deg)' : 'rotate(0deg)';
+                },
+                openAiModal: function(title, loadingText) {
+                    const overlay = document.getElementById('modal-overlay');
+                    const modal = document.getElementById('ai-modal');
+                    overlay.classList.remove('hidden');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    document.getElementById('ai-modal-title').innerText = title;
+                    document.getElementById('ai-modal-content').innerHTML = `<div class="flex items-center gap-3 text-gray-500"><i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}</div>`;
+                    if(title === "Global Briefing") App.ai.generateGlobal();
+                },
+                closeAiModal: function() {
+                    const overlay = document.getElementById('modal-overlay');
+                    const modal = document.getElementById('ai-modal');
+                    overlay.classList.add('hidden');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                },
+                updateModalContent: function(text) {
+                    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
+                    document.getElementById('ai-modal-content').innerHTML = html;
+                }
+            },
+
+            ai: {
+                generateGlobal: function() { setTimeout(() => { App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed."); }, 500); },
+                analyzeCountry: async function(country) { App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`); setTimeout(() => { App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`); }, 1000); }
+            },
+
+            uploader: { init: function() {} }
         };
+
+        window.onload = function() { App.init(); };
     </script>
 </body>
 </html>
