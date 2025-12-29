@@ -73,42 +73,92 @@
     }
   ],
 
-  "ticker": [
-    {
-      "label": "KC MAR26",
-      "value": "350.25",
-      "trend": "up"
-    },
-    {
-      "label": "RC MAR26",
-      "value": "$3,858",
-      "trend": "up"
-    },
-    {
-      "label": "CONILON BRL",
-      "value": "R$ 1,200 (26/12), US$ 3603/MT ",
-      "trend": "neutral"
-    },
-    {
-      "label": "USD/BRL",
-      "value": "5.55",
-      "trend": "neutral"
-    },
-        {
-      "label": "USD/VND",
-      "value": "26,088",
-      "trend": "neutral"
-    },
-    {
-      "label": "NY STOCKS",
-      "value": "456.4K",
-      "trend": "neutral"
-    },
-    {
-      "label": "LDN STOCKS",
-      "value": "4.2K",
-      "trend": "risk"
-    }
+"ticker": [
+  {
+    "label": "KC MAR26",
+    "value": "350.25",
+    "trend": "up"
+  },
+  {
+    "label": "RC MAR26",
+    "value": "$3,878",
+    "trend": "up"
+  },
+  {
+    "label": "CONILON BRL",
+    "value": "R$ 1,200, US$ 3,583/MT",
+    "trend": "up"
+  },
+  {
+    "label": "USD/BRL",
+    "value": "5.58",
+    "trend": "up"
+  },
+  {
+    "label": "USD/VND",
+    "value": "26,285",
+    "trend": "up"
+  },
+  {
+    "label": "NY STOCKS",
+    "value": "456.5K",
+    "trend": "up"
+  },
+  {
+    "label": "SBUX",
+    "value": "85.08",
+    "trend": "up"
+  },
+  {
+    "label": "BROS",
+    "value": "64.01",
+    "trend": "down"
+  },
+  {
+    "label": "LKNCY",
+    "value": "34.28",
+    "trend": "up"
+  },
+  {
+    "label": "JFC",
+    "value": "13.00",
+    "trend": "up"
+  },
+  {
+    "label": "NESN",
+    "value": "78.02",
+    "trend": "up"
+  },
+  {
+    "label": "SJM",
+    "value": "99.66",
+    "trend": "up"
+  },
+  {
+    "label": "KDP",
+    "value": "28.10",
+    "trend": "up"
+  },
+  {
+    "label": "KO",
+    "value": "69.87",
+    "trend": "down"
+  },
+  {
+    "label": "KHC",
+    "value": "24.13",
+    "trend": "up"
+  },
+  {
+    "label": "TATACONSUM",
+    "value": "1,194",
+    "trend": "up"
+  },
+  {
+    "label": "O32",
+    "value": "0.95",
+    "trend": "neutral"
+  }
   ],
     
   "alerts": [
