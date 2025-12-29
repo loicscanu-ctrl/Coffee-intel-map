@@ -1,20 +1,148 @@
 {
   "countries": {
-    "Vietnam": { "type": "producer", "lat": 14.0583, "lng": 108.2772, "prod": "29.90", "cons": "3.50", "stock": "Building", "status": "Harvest Delayed", "season": "Nov-Jan",     "intel": "Crop sold at 25%. Still projected +10% YoY." },
-    "Brazil": { "type": "producer", "lat": -14.2350, "lng": -51.9253, "prod": "74.0 (Est)", "cons": "22.50", "stock": "High", "status": "Crop Development", "season": "May-Aug",  "intel": "H1 '26: 1.5m bag export catch-up expected." },
-    "Colombia": { "type": "producer", "lat": 4.5709, "lng": -74.2973, "prod": "13.50", "cons": "2.20", "stock": "Med", "status": "Fly Crop Prep", "season": "Oct-Dec",            "intel": "Large crop expected H1 '26." },
-    "Indonesia": { "type": "producer", "lat": -0.7893, "lng": 113.9213, "prod": "10.00", "cons": "4.80", "stock": "Low", "status": "Off-Season", "season": "Apr-Sep",             "intel": "Robusta demand surge keeping local premiums high." },
-    "Honduras": { "type": "producer", "lat": 15.199, "lng": -86.2419, "prod": "6.80", "cons": "0.40", "stock": "Building", "status": "Active Harvest", "season": "Dec-Mar",       "intel": "Delayed harvest coming on." },
-    "Ethiopia": { "type": "producer", "lat": 9.1450, "lng": 40.4897, "prod": "7.80", "cons": "3.80", "stock": "Med", "status": "Harvest", "season": "Nov-Feb",                    "intel": "" },
-    "Uganda": { "type": "producer", "lat": 1.3733, "lng": 32.2903, "prod": "6.50", "cons": "0.30", "stock": "Med", "status": "Harvest Tailing Off", "season": "Nov-Feb",          "intel": "Benefiting from global Robusta switch." },
-    "India": { "type": "producer", "lat": 20.5937, "lng": 78.9629, "prod": "5.90", "cons": "1.50", "stock": "Low", "status": "Early Harvest", "season": "Jan-Mar",                "intel": "Robusta harvesting commencing." },
-    
-    "USA": { "type": "consumer", "lat": 37.0902, "lng": -95.7129, "cons": "27.0",        "stock": "Critical",  "intel": "Stocks at 7-8 weeks cover." },
-    "EU": { "type": "consumer", "lat": 54.5260, "lng": 15.2551, "cons": "40.5",          "stock": "Critical",  "intel": "Inventory depletion." },
-    "China": { "type": "consumer", "lat": 35.8617, "lng": 104.1954, "cons": "6.8",       "stock": "Low",       "intel": "" },
-    "Japan": { "type": "consumer", "lat": 36.2048, "lng": 138.2529, "cons": "7.1",       "stock": "2.20",      "intel": "" },
-    "South Korea": { "type": "consumer", "lat": 35.9078, "lng": 127.7669, "cons": "2.8", "stock": "Stable",    "intel": "Specialty market growing." },
-    "Middle East": { "type": "consumer", "lat": 33.3152, "lng": 44.3661, "cons": "1.5",  "stock": "Med",       "intel": "" },
-    "North Africa": { "type": "consumer", "lat": 33.8869, "lng": 9.5375, "cons": "1.2",  "stock": "Low",       "intel": "Robusta import focus." }
+    "Vietnam": {
+      "type": "producer",
+      "lat": 14.0583,
+      "lng": 108.2772,
+      "prod": "29.90",
+      "cons": "3.50",
+      "stock": "Building",
+      "status": "Harvest Delayed",
+      "season": "Nov-Jan",
+      "intel": "Crop sold at[...]"
+    },
+    "Brazil": {
+      "type": "producer",
+      "lat": -14.235,
+      "lng": -51.9253,
+      "prod": "74.0 (Est)",
+      "cons": "22.50",
+      "stock": "High",
+      "status": "Crop Development",
+      "season": "May-Aug",
+      "intel": "H1 '26: 1.5m[...]"
+    },
+    "Colombia": {
+      "type": "producer",
+      "lat": 4.5709,
+      "lng": -74.2973,
+      "prod": "13.50",
+      "cons": "2.20",
+      "stock": "Med",
+      "status": "Fly Crop Prep",
+      "season": "Oct-Dec",
+      "intel": "Large crop e[...]"
+    },
+    "Indonesia": {
+      "type": "producer",
+      "lat": -0.7893,
+      "lng": 113.9213,
+      "prod": "10.00",
+      "cons": "4.80",
+      "stock": "Low",
+      "status": "Off-Season",
+      "season": "Apr-Sep",
+      "intel": "Robusta dema[...]"
+    },
+    "Honduras": {
+      "type": "producer",
+      "lat": 15.199,
+      "lng": -86.2419,
+      "prod": "6.80",
+      "cons": "0.40",
+      "stock": "Building",
+      "status": "Active Harvest",
+      "season": "Dec-Mar",
+      "intel": "Delayed harv[...]"
+    },
+    "Ethiopia": {
+      "type": "producer",
+      "lat": 9.145,
+      "lng": 40.4897,
+      "prod": "7.80",
+      "cons": "3.80",
+      "stock": "Med",
+      "status": "Harvest",
+      "season": "Nov-Feb",
+      "intel": ""
+    },
+    "Uganda": {
+      "type": "producer",
+      "lat": 1.3733,
+      "lng": 32.2903,
+      "prod": "6.50",
+      "cons": "0.30",
+      "stock": "Med",
+      "status": "Harvest Tailing Off",
+      "season": "Nov-Feb",
+      "intel": "Benefiting f[...]"
+    },
+    "India": {
+      "type": "producer",
+      "lat": 20.5937,
+      "lng": 78.9629,
+      "prod": "5.90",
+      "cons": "1.50",
+      "stock": "Low",
+      "status": "Early Harvest",
+      "season": "Jan-Mar",
+      "intel": "Robusta harv[...]"
+    },
+    "USA": {
+      "type": "consumer",
+      "lat": 37.0902,
+      "lng": -95.7129,
+      "cons": "27.0",
+      "stock": "Critical",
+      "intel": "Stocks at 7-8 weeks cover."
+    },
+    "EU": {
+      "type": "consumer",
+      "lat": 54.526,
+      "lng": 15.2551,
+      "cons": "40.5",
+      "stock": "Critical",
+      "intel": "Inventory depletion."
+    },
+    "China": {
+      "type": "consumer",
+      "lat": 35.8617,
+      "lng": 104.1954,
+      "cons": "6.8",
+      "stock": "Low",
+      "intel": ""
+    },
+    "Japan": {
+      "type": "consumer",
+      "lat": 36.2048,
+      "lng": 138.2529,
+      "cons": "7.1",
+      "stock": "2.20",
+      "intel": ""
+    },
+    "South Korea": {
+      "type": "consumer",
+      "lat": 35.9078,
+      "lng": 127.7669,
+      "cons": "2.8",
+      "stock": "Stable",
+      "intel": "Specialty market growing."
+    },
+    "Middle East": {
+      "type": "consumer",
+      "lat": 33.3152,
+      "lng": 44.3661,
+      "cons": "1.5",
+      "stock": "Med",
+      "intel": ""
+    },
+    "North Africa": {
+      "type": "consumer",
+      "lat": 33.8869,
+      "lng": 9.5375,
+      "cons": "1.2",
+      "stock": "Low",
+      "intel": "Robusta import focus."
+    }
   }
 }
