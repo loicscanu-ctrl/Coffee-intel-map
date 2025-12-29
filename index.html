@@ -234,7 +234,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
 
-    <script>
+<script>
         // --- 1. CONFIG & DATA ---
         const CONFIG = {
             apiKey: "", 
@@ -244,13 +244,11 @@
         };
 
         const CoffeeData = {
-            // CES SECTIONS SERONT REMPLIES PAR LES FICHIERS JSON
-            // (countries.json, global.json, factories.json)
             countries: {},
-            globalIntel: { supply: [], demand: [], stocks: [], futures: [] },
+            globalIntel: { supply: [], demand: [], stocks: [], futures: [], ticker: [] },
             factories: [],
             
-            // --- DONNÉES STATIQUES (Restent dans le HTML) ---
+            // --- DONNÉES STATIQUES ---
             ports: [
                 // Origins
                 { n: "Santos", l: [-23.9, -46.3] },
@@ -360,74 +358,103 @@
         };
 
 
-        // --- 2. LOGIC ---
+       // --- 2. LOGIC ---
         const App = {
             map: null,
             layers: { producers: null, consumers: null, factories: null, logistics: null, ports: null, newsAlerts: null, intel: null },
             
             init: async function() {
-                // 1. Charger les 3 fichiers JSON simultanément
+                // ASTUCE: On ajoute un timestamp pour forcer le navigateur à ne pas utiliser le cache
+                const timestamp = new Date().getTime();
+
                 try {
                     const [countriesRes, globalRes, factoriesRes] = await Promise.all([
-                        fetch('./countries.json'),
-                        fetch('./global.json'),
-                        fetch('./factories.json')
+                        fetch('./countries.json?v=' + timestamp),
+                        fetch('./global.json?v=' + timestamp),
+                        fetch('./factories.json?v=' + timestamp)
                     ]);
 
-                    // Vérification simple
-                    if (!countriesRes.ok || !globalRes.ok || !factoriesRes.ok) {
-                        throw new Error("Erreur lors du chargement d'un des fichiers JSON");
-                    }
+                    if (!countriesRes.ok || !globalRes.ok || !factoriesRes.ok) throw new Error("Erreur chargement JSON");
 
                     const countriesData = await countriesRes.json();
                     const globalData = await globalRes.json();
                     const factoriesData = await factoriesRes.json();
                     
-                    // Fusionner toutes les données dans l'objet principal CoffeeData
-                    // Cela garde les Ports et Routes (qui sont restés dans le code HTML) intacts
                     Object.assign(CoffeeData, countriesData, globalData, factoriesData);
-                    
-                    console.log("✅ Données (Pays, Global, Usines) chargées avec succès !");
+                    console.log("✅ Données chargées avec succès !");
+
+                    // --- AJOUT CRUCIAL : Mettre à jour l'interface avec les nouvelles données ---
+                    if (CoffeeData.globalIntel) {
+                        App.updateData(CoffeeData.globalIntel);
+                    }
 
                 } catch (e) {
-                    console.error("⚠️ Erreur de chargement :", e);
-                    alert("Attention: Impossible de charger les dernières données (Vérifiez la console).");
+                    console.error("⚠️ Erreur :", e);
                 }
 
-                // 2. Initialisation normale de la carte (Code original)
                 this.map = L.map('map', { zoomControl: false, fadeAnimation: true }).setView(CONFIG.initView, CONFIG.initZoom);
+                this.map.createPane('labelsPane').style.zIndex = 550;
+                this.map.createPane('alertPane').style.zIndex = 650; 
 
-                // Setup Layers and Panes
-                this.map.createPane('labelsPane');
-                this.map.getPane('labelsPane').style.zIndex = 550;
-                this.map.getPane('labelsPane').style.pointerEvents = 'none';
-
-                this.map.createPane('alertPane');
-                this.map.getPane('alertPane').style.zIndex = 650; 
-                this.map.getPane('alertPane').style.pointerEvents = 'none';
-
-                L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
+                L.tileLayer(CONFIG.mapTheme, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.map);
                 L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-                // Initialize Layer Groups
                 this.layers.producers = L.layerGroup().addTo(this.map);
                 this.layers.consumers = L.layerGroup().addTo(this.map);
                 this.layers.factories = L.layerGroup().addTo(this.map);
                 this.layers.logistics = L.layerGroup().addTo(this.map);
                 this.layers.ports = L.layerGroup().addTo(this.map);
-                this.layers.intel = L.layerGroup().addTo(this.map);
                 this.layers.newsAlerts = L.layerGroup().addTo(this.map);
 
                 this.renderMap();
-                this.ui.renderDashboard();
                 this.uploader.init();
             },
 
+            // --- NOUVELLE FONCTION AJOUTÉE ---
+            updateData: function(data) {
+                // 1. Mise à jour du Tableau de Bord (Supply/Demand/Stocks)
+                CoffeeData.globalIntel = data;
+                App.ui.renderDashboard();
+
+                // 2. Mise à jour du Ticker (La bande défilante)
+                if (data.ticker && Array.isArray(data.ticker)) {
+                    const ticker = document.querySelector('.osint-ticker');
+                    if(ticker) {
+                        ticker.innerHTML = ''; // On efface "LOADING..."
+                        data.ticker.forEach(item => {
+                            let c = 'osint-val-neutral';
+                            if(item.trend === 'up') c = 'osint-val-up';
+                            if(item.trend === 'down') c = 'osint-val-down';
+                            if(item.trend === 'risk') c = 'osint-val-risk';
+                            
+                            const span = document.createElement('span');
+                            span.className = 'osint-item';
+                            span.innerHTML = `<span class="osint-label">${item.label}</span> <span class="${c}">${item.value}</span>`;
+                            ticker.appendChild(span);
+                        });
+                    }
+                }
+
+                // 3. Mise à jour des Alertes Rouges sur la carte
+                if (data.alerts && Array.isArray(data.alerts)) {
+                    App.layers.newsAlerts.clearLayers();
+                    data.alerts.forEach(alert => {
+                        if(alert.loc) {
+                            const redPulseIcon = L.divIcon({ 
+                                className: 'custom', 
+                                html: `<div class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white"></span></div>` 
+                            });
+                            L.marker(alert.loc, { icon: redPulseIcon, pane: 'alertPane' })
+                                .bindPopup(`<div class="font-mono text-xs p-2 text-white bg-slate-900 border-l-4 border-red-500"><div class="font-bold text-red-400 mb-1 uppercase">${alert.t}</div><div class="text-gray-300">${alert.v}</div></div>`)
+                                .addTo(App.layers.newsAlerts);
+                        }
+                    });
+                }
+            },
+
             renderMap: function() {
-                // Clear all layers
                 Object.values(this.layers).forEach(layer => layer.clearLayers());
 
-                // Countries
                 if(CoffeeData.countries) {
                     for (const [key, data] of Object.entries(CoffeeData.countries)) {
                         const isProducer = data.type === 'producer';
@@ -438,32 +465,16 @@
                             icon: L.divIcon({ className: 'custom', html: `<div class="${cssClass} w-3 h-3"></div>` })
                         });
                         
-                        // Intel Box in Popup
                         const intelHtml = data.intel ? `<div class="mb-2 p-1 bg-slate-800 rounded text-[10px] text-gray-300 border-l-2 border-emerald-500 pl-2 mt-1 italic">${data.intel}</div>` : '';
-                        const statusLine = isProducer ? `<div class="mt-1 text-emerald-400 font-bold text-[10px]">${data.status}</div>` : '';
                         
-                        // DYNAMIC DATA LINES: Show Cons for everyone
-                        let statsHtml = '';
-                        if (isProducer) {
-                            statsHtml = `
-                                <div><span class="text-gray-400">PROD:</span> ${data.prod}</div>
-                                <div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>
-                                <div class="col-span-2 border-t border-slate-700 pt-1 mt-1"><span class="text-gray-400">DOM. CONS:</span> ${data.cons || '-'}</div>
-                            `;
-                        } else {
-                            statsHtml = `
-                                <div><span class="text-gray-400">CONS:</span> ${data.cons}</div>
-                                <div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>
-                            `;
-                        }
+                        let statsHtml = isProducer ? 
+                            `<div><span class="text-gray-400">PROD:</span> ${data.prod}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>` : 
+                            `<div><span class="text-gray-400">CONS:</span> ${data.cons}</div><div><span class="text-gray-400">STOCK:</span> ${data.stock}</div>`;
 
                         marker.bindPopup(`
                             <div class="p-3 font-mono text-xs text-gray-100 bg-slate-900 border border-slate-700 rounded min-w-[180px]">
                                 <div class="font-bold text-sm mb-1 border-b border-slate-600 pb-1 text-white">${key}</div>
-                                <div class="grid grid-cols-2 gap-2 my-2 text-slate-300">
-                                    ${statsHtml}
-                                </div>
-                                ${statusLine}
+                                <div class="grid grid-cols-2 gap-2 my-2 text-slate-300">${statsHtml}</div>
                                 ${intelHtml}
                             </div>
                         `);
@@ -471,37 +482,21 @@
                     }
                 }
 
-                // Factories
-                if (CoffeeData.factories) {
-                    CoffeeData.factories.forEach(fac => {
-                        const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
-                        L.marker(fac.l, { icon: icon })
-                            .bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br><span class="text-slate-400">${fac.c}</span><br><span class="text-emerald-400">Cap: ${fac.cap}</span></div>`)
-                            .addTo(this.layers.factories);
-                    });
-                }
+                CoffeeData.factories.forEach(fac => {
+                    const icon = L.divIcon({ className: 'custom', html: `<div class='factory-icon w-4 h-4'><i class="fa-solid fa-industry"></i></div>` });
+                    L.marker(fac.l, { icon: icon }).bindPopup(`<div class="font-mono text-xs p-2 text-slate-200 bg-slate-900 border border-slate-700 rounded"><b>${fac.n}</b><br>${fac.c}</div>`).addTo(this.layers.factories);
+                });
 
-                // Routes
-                if (CoffeeData.routes) {
-                    CoffeeData.routes.forEach(r => {
-                        L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' })
-                            .bindTooltip(r.name)
-                            .addTo(this.layers.logistics);
-                    });
-                }
+                CoffeeData.routes.forEach(r => {
+                    L.polyline(r.path, { color: r.color, weight: 2, opacity: 0.8, className: 'route-flow' }).addTo(this.layers.logistics);
+                });
 
-                // Ports
-                if (CoffeeData.ports) {
-                    CoffeeData.ports.forEach(p => {
-                        const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
-                        L.marker(p.l, { icon: icon })
-                            .bindPopup(`<div class="font-mono text-xs p-2 text-sky-300 bg-slate-900 border border-slate-700 rounded">Port of ${p.n}</div>`)
-                            .addTo(this.layers.ports);
-                    });
-                }
+                CoffeeData.ports.forEach(p => {
+                    const icon = L.divIcon({ className: 'custom', html: `<div class='port-icon w-6 h-6'><i class="fa-solid fa-anchor"></i></div>` });
+                    L.marker(p.l, { icon: icon }).bindPopup(`Port of ${p.n}`).addTo(this.layers.ports);
+                });
             },
 
-            // --- UI & DASHBOARD ---
             ui: {
                 renderDashboard: function() {
                     const d = CoffeeData.globalIntel;
@@ -513,10 +508,7 @@
                 fillColumn: function(id, items, colorClass) {
                     const el = document.getElementById(id);
                     if (!el) return;
-                    if (!items || items.length === 0) {
-                        el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">Loading...</div>';
-                        return;
-                    }
+                    if (!items || items.length === 0) { el.innerHTML = '<div class="text-gray-500 text-xs italic text-center mt-4">Loading...</div>'; return; }
                     el.innerHTML = items.map(i => `
                         <div class="news-card ${colorClass}" style="border-color: currentColor; color: #e2e8f0;">
                             <div class="flex justify-between items-center mb-1">
@@ -524,18 +516,12 @@
                                 <span class="text-[9px] opacity-50">${i.date || ''}</span>
                             </div>
                             <div>${i.v}</div>
-                        </div>
-                    `).join('');
+                        </div>`).join('');
                 },
                 togglePanel: function() {
-                    const panel = document.getElementById('global-panel');
+                    document.getElementById('global-panel').classList.toggle('retracted');
                     const icon = document.getElementById('toggle-icon');
-                    panel.classList.toggle('retracted');
-                    if (panel.classList.contains('retracted')) {
-                        icon.style.transform = 'rotate(180deg)';
-                    } else {
-                        icon.style.transform = 'rotate(0deg)';
-                    }
+                    icon.style.transform = icon.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
                 },
                 openAiModal: function(title, loadingText) {
                     document.getElementById('modal-overlay').classList.remove('hidden');
@@ -551,57 +537,35 @@
                     document.getElementById('ai-modal').classList.remove('flex');
                 },
                 updateModalContent: function(text) {
-                    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
+                    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li class="ml-4 list-disc">$1</li>');
                     document.getElementById('ai-modal-content').innerHTML = html;
                 }
             },
 
-            // --- AI & UPLOADER ---
             ai: {
                 generateGlobal: function() {
-                    setTimeout(() => {
-                        App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed.<br>Updates are reflected in real-time.");
-                    }, 500);
+                    setTimeout(() => { App.ui.updateModalContent("<strong>AI Market Overview</strong><br><br>Data sourced from your JSON feed."); }, 500);
                 },
                 analyzeCountry: async function(country) {
                     App.ui.openAiModal(`${country} Deep Dive`, `Analyzing ${country}...`);
-                    setTimeout(() => {
-                        App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Analysis would pull from live feeds here.`);
-                    }, 1000);
+                    setTimeout(() => { App.ui.updateModalContent(`<strong>${country} Market Analysis</strong><br>Pulling live data...`); }, 1000);
                 }
             },
 
-            uploader: {
-                // (Old uploader logic removed or simplified since we use direct GitHub edits now)
-                init: function() {
-                   // Optional: Keep this if you want to allow local file previews
-                   // otherwise, you can leave it empty if you only use GitHub edits.
-                }
-            },
+            uploader: { init: function() {} }, // Vide car on utilise GitHub maintenant
             
-            // --- UTILITIES ---
             utils: {
                 downloadHTML: function() {
-                    const htmlContent = document.documentElement.outerHTML;
-                    const blob = new Blob([htmlContent], {type: 'text/html'});
+                    const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
                     const a = document.createElement('a');
-                    const url = URL.createObjectURL(blob);
-                    a.href = url;
+                    a.href = URL.createObjectURL(blob);
                     a.download = 'coffee_intel_dashboard.html';
-                    document.body.appendChild(a);
                     a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 0);
                 }
             }
         };
 
-        window.onload = function() { 
-            App.init(); 
-        };
+        window.onload = function() { App.init(); };
     </script>
 </body>
 </html>
