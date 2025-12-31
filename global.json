@@ -1,79 +1,75 @@
 {
   "globalIntel": {
-  "supply": [
-    {
-      "t": "Vietnam Sales Resistance",
-      "v": "Farmers resistance below 98k VND to protect high VND prices.",
-      "date": "Dec 29"
-    },
-    {
-      "t": "Indonesia Harvest Risk",
-      "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by landslides.",
-      "date": "Dec 29"
-    },
-    {
-      "t": "Uganda Record Exports",
-      "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags. FAQ at UGX 13k/kg.",
-      "date": "Dec 29",
-      "loc": [0.31, 32.58]
-    },
-    {
-      "t": "Brazil Conilon Flow",
-      "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
-      "date": "Dec 26"
-    },
-    {
-      "t": "Honduras Production Leap",
-      "v": "IHCAFE 25/26 forecast at 5.35m bags vs 4.7m bags last year (+13.8%).",
-      "date": "Dec 29"
-    }
-  ],
-    
-  "demand": [
-    {
-      "t": "SJM Earnings Release",
-      "v": "Latest Q2-FY26 results released Nov 25, 2025; Café Bustelo sales grew 41%.",
-      "date": "Nov 25"
-    },
-    {
-      "t": "Corporate Reporting Log",
-      "v": "Last updates: KDP (Oct 24), SBUX (Oct 30), NESN (Oct 17), JDEP (July 31).",
-      "date": "Dec 29"
-    },
-    {
-      "t": "German Coffee Tax",
-      "v": "Total 2025 revenue projected at €1.05B vs €1.03B in 2024.",
-      "date": "Dec 29"
-    }
-  ],
-    
-  "stocks": [
-    {
-      "t": "ICE Arabica Certified",
-      "v": "456,477 bags. Honduras origins dominate 39.7% of total stock.",
-      "date": "Dec 26"
-    },
-    {
-      "t": "ICE Robusta Certified",
-      "v": "4,278 lots. Historically low levels maintaining backwardation.",
-      "date": "Dec 26"
-    }
-  ],
-    
-  "futures": [
-    {
-      "t": "ITM Option OI",
-      "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
-      "date": "Dec 29"
-    },
-     {
-      "t": "OI",
-      "v": "DF OI H : 44,582 / NY OI H : 74,455 ",
-      "date": "Dec 29"
-    }
-  ],
-
-"ticker": [
+    "supply": [
+      {
+        "t": "Vietnam Sales Resistance",
+        "v": "Farmers resistance below 98k VND to protect high VND prices.",
+        "date": "Dec 29"
+      },
+      {
+        "t": "Indonesia Harvest Risk",
+        "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by landslides.",
+        "date": "Dec 29"
+      },
+      {
+        "t": "Uganda Record Exports",
+        "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags. FAQ at UGX 13k/kg.",
+        "date": "Dec 29",
+        "loc": [0.31, 32.58]
+      },
+      {
+        "t": "Brazil Conilon Flow",
+        "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
+        "date": "Dec 26"
+      },
+      {
+        "t": "Honduras Production Leap",
+        "v": "IHCAFE 25/26 forecast at 5.35m bags vs 4.7m bags last year (+13.8%).",
+        "date": "Dec 29"
+      }
+    ],
+    "demand": [
+      {
+        "t": "SJM Earnings Release",
+        "v": "Latest Q2-FY26 results released Nov 25, 2025; Café Bustelo sales grew 41%.",
+        "date": "Nov 25"
+      },
+      {
+        "t": "Corporate Reporting Log",
+        "v": "Last updates: KDP (Oct 24), SBUX (Oct 30), NESN (Oct 17), JDEP (July 31).",
+        "date": "Dec 29"
+      },
+      {
+        "t": "German Coffee Tax",
+        "v": "Total 2025 revenue projected at €1.05B vs €1.03B in 2024.",
+        "date": "Dec 29"
+      }
+    ],
+    "stocks": [
+      {
+        "t": "ICE Arabica Certified",
+        "v": "456,477 bags. Honduras origins dominate 39.7% of total stock.",
+        "date": "Dec 26"
+      },
+      {
+        "t": "ICE Robusta Certified",
+        "v": "4,278 lots. Historically low levels maintaining backwardation.",
+        "date": "Dec 26"
+      }
+    ],
+    "futures": [
+      {
+        "t": "ITM Option OI",
+        "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
+        "date": "Dec 29"
+      },
+      {
+        "t": "OI",
+        "v": "DF OI H : 44,582 / NY OI H : 74,455 ",
+        "date": "Dec 29"
+      }
+    ],
+    "ticker": [
       {
         "label": "KC MAR26",
         "value": "355.60",
@@ -95,20 +91,19 @@
         "trend": "up"
       }
     ],
-    
-  "alerts": [
-    {
-      "t": "Vietnam Supply Bottleneck",
-      "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
-      "date": "Dec 29",
-      "loc": [12.6, 108.0]
-    },
-        {
-      "t": "CRITICAL: Sumatra Disaster",
-      "v": "Cyclone Senyar & Floods: 1,100+ dead, 1/3 of Arabica farms submerged. Exports likely down 15%.",
-      "date": "Dec 29",
-      "loc": [3.59, 98.67]
-    }
-  ]
-}
+    "alerts": [
+      {
+        "t": "Vietnam Supply Bottleneck",
+        "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
+        "date": "Dec 29",
+        "loc": [12.6, 108.0]
+      },
+      {
+        "t": "CRITICAL: Sumatra Disaster",
+        "v": "Cyclone Senyar & Floods: 1,100+ dead, 1/3 of Arabica farms submerged. Exports likely down 15%.",
+        "date": "Dec 29",
+        "loc": [3.59, 98.67]
+      }
+    ]
+  }
 }
