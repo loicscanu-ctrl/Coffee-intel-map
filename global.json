@@ -95,16 +95,6 @@
         "trend": "up"
       }
     ],
-    "alerts": [
-      {
-        "t": "CRITICAL: Sumatra Flood",
-        "v": "Cyclone Senyar: 1,100+ dead, Gayo highlands devastated. 15% export drop expected.",
-        "date": "Dec 31",
-        "loc": [3.59, 98.67]
-      }
-    ]
-  }
-}
     
   "alerts": [
     {
