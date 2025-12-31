@@ -74,122 +74,37 @@
   ],
 
 "ticker": [
-  {
-    "label": "KC MAR26",
-    "value": "350.25",
-    "trend": "up"
-  },
-  {
-    "label": "RC MAR26",
-    "value": "$3,878",
-    "trend": "up"
-  },
-  {
-    "label": "CONILON BRL",
-    "value": "R$ 1,200, US$ 3,583/MT",
-    "trend": "up"
-  },
-  {
-    "label": "| FX: USD/BRL",
-    "value": "5.58",
-    "trend": "up"
-  },
-  {
-    "label": "USD/VND",
-    "value": "26,285",
-    "trend": "up"
-  },
-  {
-    "label": "| CERTS: KC",
-    "value": "456.5K",
-    "trend": "up"
-  },
-  {
-    "label": "RC",
-    "value": "4.2K",
-    "trend": "neutral"
-  },
-  {
-    "label": "| COFFEE STOCKS | COFFEE CHAINS : SBUX",
-    "value": "85.08",
-    "trend": "up"
-  },
-  {
-    "label": "BROS",
-    "value": "64.01",
-    "trend": "down"
-  },
-  {
-    "label": "LKNCY",
-    "value": "34.28",
-    "trend": "up"
-  },
-  {
-    "label": "JFC",
-    "value": "13.00",
-    "trend": "up"
-  },
-  {
-    "label": "| ROASTERS: NESN",
-    "value": "78.02",
-    "trend": "up"
-  },
-  {
-    "label": "SJM",
-    "value": "99.66",
-    "trend": "up"
-  },
-  {
-    "label": "KDP",
-    "value": "28.10",
-    "trend": "up"
-  },
-  {
-    "label": "KO",
-    "value": "69.87",
-    "trend": "down"
-  },
-  {
-    "label": "KHC",
-    "value": "24.13",
-    "trend": "up"
-  },
-  {
-    "label": "TATACONSUM",
-    "value": "1,194",
-    "trend": "up"
-  },
-  {
-    "label": "FARM",
-    "value": "1.47",
-    "trend": "up"
-  },
-  {
-    "label": "BRCC",
-    "value": "1.19",
-    "trend": "down"
-  },
-  {
-    "label": "CCL",
-    "value": "962.5",
-    "trend": "up"
-  },
-  {
-    "label": "STRS",
-    "value": "11,030",
-    "trend": "up"
-  },
-  {
-    "label": "| TRADER: JVA",
-    "value": "4.12",
-    "trend": "up"
-  },
-  {
-    "label": "O32",
-    "value": "0.95",
-    "trend": "neutral"
+      {
+        "label": "KC MAR26",
+        "value": "355.60",
+        "trend": "up"
+      },
+      {
+        "label": "RC MAR26",
+        "value": "$3,812",
+        "trend": "neutral"
+      },
+      {
+        "label": "USD/BRL",
+        "value": "5.48",
+        "trend": "down"
+      },
+      {
+        "label": "USD/VND",
+        "value": "26,295",
+        "trend": "up"
+      }
+    ],
+    "alerts": [
+      {
+        "t": "CRITICAL: Sumatra Flood",
+        "v": "Cyclone Senyar: 1,100+ dead, Gayo highlands devastated. 15% export drop expected.",
+        "date": "Dec 31",
+        "loc": [3.59, 98.67]
+      }
+    ]
   }
-],
+}
     
   "alerts": [
     {
