@@ -4,90 +4,138 @@
       {
         "t": "Vietnam Sales Resistance",
         "v": "Farmers resistance below 98k VND to protect high VND prices.",
-        "date": "Dec 29"
+        "date": "Jan 05"
       },
       {
         "t": "Indonesia Harvest Risk",
-        "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by landslides.",
-        "date": "Dec 29"
+        "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by Cyclone Senyar.",
+        "date": "Jan 05"
       },
       {
         "t": "Uganda Record Exports",
-        "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags. FAQ at UGX 13k/kg.",
-        "date": "Dec 29",
-        "loc": [0.31, 32.58]
+        "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags.",
+        "date": "Jan 05",
+        "loc": [
+          0.31,
+          32.58
+        ]
       },
       {
         "t": "Brazil Conilon Flow",
-        "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
-        "date": "Dec 26"
+        "v": "Cooabriel: Type 7 bid R$ 1,200. USD Equiv: $3,584/MT vs London $3,878.",
+        "date": "Jan 05"
       },
       {
         "t": "Honduras Production Leap",
-        "v": "IHCAFE 25/26 forecast at 5.35m bags vs 4.7m bags last year (+13.8%).",
-        "date": "Dec 29"
+        "v": "IHCAFE 25/26 forecast at 5.35m bags (+13.8%).",
+        "date": "Jan 05"
       }
     ],
     "demand": [
       {
         "t": "SJM Earnings Release",
-        "v": "Latest Q2-FY26 results released Nov 25, 2025; Café Bustelo sales grew 41%.",
-        "date": "Nov 25"
-      },
-      {
-        "t": "Corporate Reporting Log",
-        "v": "Last updates: KDP (Oct 24), SBUX (Oct 30), NESN (Oct 17), JDEP (July 31).",
-        "date": "Dec 29"
+        "v": "Latest Q2-FY26 results: Café Bustelo sales grew 41%.",
+        "date": "Jan 05"
       },
       {
         "t": "German Coffee Tax",
-        "v": "Total 2025 revenue projected at €1.05B vs €1.03B in 2024.",
-        "date": "Dec 29"
+        "v": "2025 revenue projected at €1.05B vs €1.03B in 2024.",
+        "date": "Jan 05"
       }
     ],
     "stocks": [
       {
         "t": "ICE Arabica Certified",
         "v": "456,477 bags. Honduras origins dominate 39.7% of total stock.",
-        "date": "Dec 26"
+        "date": "Jan 05"
       },
       {
         "t": "ICE Robusta Certified",
         "v": "4,278 lots. Historically low levels maintaining backwardation.",
-        "date": "Dec 26"
+        "date": "Jan 05"
       }
     ],
     "futures": [
       {
-        "t": "ITM Option OI",
+        "t": "KC ITM Option OI",
         "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
-        "date": "Dec 29"
+        "date": "Jan 05"
       },
       {
-        "t": "OI",
-        "v": "DF OI H : 44,582 / NY OI H : 74,455 ",
-        "date": "Dec 29"
+        "t": "OI RC",
+        "v": "RC H: 44,582, 84 days left to FND",
+        "date": "Jan 05"
+      },
+      {
+        "t": "OI KC",
+        "v": "KC H: 75,573, 78 days left to FND",
+        "date": "Jan 05"
       }
     ],
     "ticker": [
       {
         "label": "KC MAR26",
-        "value": "355.60",
+        "value": "350.25",
         "trend": "up"
       },
       {
         "label": "RC MAR26",
-        "value": "$3,812",
-        "trend": "neutral"
+        "value": "$3,878",
+        "trend": "up"
       },
       {
-        "label": "USD/BRL",
-        "value": "5.48",
-        "trend": "down"
+        "label": "CONILON BRL",
+        "value": "R$ 1,200 ($3,584/MT)",
+        "trend": "up"
+      },
+      {
+        "label": "| FX: USD/BRL",
+        "value": "5.58",
+        "trend": "up"
       },
       {
         "label": "USD/VND",
-        "value": "26,295",
+        "value": "26,285",
+        "trend": "up"
+      },
+      {
+        "label": "| CERTS: KC",
+        "value": "456.5K",
+        "trend": "up"
+      },
+      {
+        "label": "RC",
+        "value": "4.2K",
+        "trend": "neutral"
+      },
+      {
+        "label": "| COFFEE STOCKS | COFFEE CHAINS : SBUX",
+        "value": "85.08",
+        "trend": "up"
+      },
+      {
+        "label": "BROS",
+        "value": "64.01",
+        "trend": "down"
+      },
+      {
+        "label": "LKNCY",
+        "value": "34.28",
+        "trend": "up"
+      },
+      {
+        "label": "| ROASTERS: NESN",
+        "value": "78.02",
+        "trend": "up"
+      },
+      {
+        "label": "SJM",
+        "value": "99.66",
+        "trend": "up"
+      },
+      {
+        "label": "KDP",
+        "value": "28.10",
         "trend": "up"
       }
     ],
@@ -95,14 +143,20 @@
       {
         "t": "Vietnam Supply Bottleneck",
         "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
-        "date": "Dec 29",
-        "loc": [12.6, 108.0]
+        "date": "Jan 05",
+        "loc": [
+          12.6,
+          108.0
+        ]
       },
       {
         "t": "CRITICAL: Sumatra Disaster",
         "v": "Cyclone Senyar & Floods: 1,100+ dead, 1/3 of Arabica farms submerged. Exports likely down 15%.",
-        "date": "Dec 29",
-        "loc": [3.59, 98.67]
+        "date": "Jan 05",
+        "loc": [
+          3.59,
+          98.67
+        ]
       }
     ]
   }
