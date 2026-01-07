@@ -4,56 +4,56 @@
       "type": "producer",
       "lat": 14.0583,
       "lng": 108.2772,
-      "prod": "29.90",
-      "cons": "3.50",
-      "stock": "Building",
-      "status": "Harvest on",
+      "prod": "31.0 (Est)",
+      "cons": "3.60",
+      "stock": "High (Held)",
+      "status": "Harvest Peak",
       "season": "Nov-Jan",
-      "intel": "Crop sold at[...]"
+      "intel": "Farmers holding at 98.5k VND. Export value +56% YoY."
     },
     "Brazil": {
       "type": "producer",
       "lat": -14.235,
       "lng": -51.9253,
-      "prod": "74.0 (Est)",
-      "cons": "22.50",
-      "stock": "High",
+      "prod": "70.7 (FCST)",
+      "cons": "22.80",
+      "stock": "Building",
       "status": "Crop Development",
       "season": "May-Aug",
-      "intel": "Dryness in Minas"
+      "intel": "StoneX forecasts 70.7M bags (Rec). Weather erratic in Minas."
     },
     "Colombia": {
       "type": "producer",
       "lat": 4.5709,
       "lng": -74.2973,
-      "prod": "13.50",
+      "prod": "13.60",
       "cons": "2.20",
       "stock": "Med",
-      "status": "Fly Crop Prep",
+      "status": "Fly Crop",
       "season": "Oct-Dec",
-      "intel": "Large crop"
+      "intel": "Production steady. Focus on mitigating La Niña impact."
     },
     "Indonesia": {
       "type": "producer",
       "lat": -0.7893,
       "lng": 113.9213,
-      "prod": "10.00",
-      "cons": "4.80",
-      "stock": "Low",
-      "status": "Off-Season",
+      "prod": "9.70",
+      "cons": "4.90",
+      "stock": "Critical",
+      "status": "Logistics Crisis",
       "season": "Apr-Sep",
-      "intel": "Strong Robusta demand"
+      "intel": "Sumatra floods. Exports cut 15%. 1/3 Arabica farms hit."
     },
     "Honduras": {
       "type": "producer",
       "lat": 15.199,
       "lng": -86.2419,
-      "prod": "6.80",
-      "cons": "0.40",
-      "stock": "Building",
+      "prod": "5.80",
+      "cons": "0.34",
+      "stock": "High",
       "status": "Active Harvest",
       "season": "Dec-Mar",
-      "intel": "Delayed harvest, now on"
+      "intel": "Exports +11% YoY. Rust incidence low (2.9%)."
     },
     "Ethiopia": {
       "type": "producer",
@@ -64,61 +64,61 @@
       "stock": "Med",
       "status": "Harvest",
       "season": "Nov-Feb",
-      "intel": ""
+      "intel": "Exports trailing Uganda in volume."
     },
     "Uganda": {
       "type": "producer",
       "lat": 1.3733,
       "lng": 32.2903,
-      "prod": "6.50",
-      "cons": "0.30",
-      "stock": "Med",
-      "status": "Harvest Tailing Off",
+      "prod": "6.90",
+      "cons": "0.33",
+      "stock": "Low",
+      "status": "Export Peak",
       "season": "Nov-Feb",
-      "intel": "Benefiting from high prices"
+      "intel": "Africa's #1 exporter (8.4M bags). Record earnings."
     },
     "India": {
       "type": "producer",
       "lat": 20.5937,
       "lng": 78.9629,
-      "prod": "5.90",
-      "cons": "1.50",
+      "prod": "6.00",
+      "cons": "1.36",
       "stock": "Low",
       "status": "Early Harvest",
       "season": "Jan-Mar",
-      "intel": "Robusta harvest"
+      "intel": "Monsoon damaged yields. Arabica -3%, Robusta -2%."
     },
     "USA": {
       "type": "consumer",
       "lat": 37.0902,
       "lng": -95.7129,
-      "cons": "27.0",
-      "stock": "Critical",
-      "intel": "Stocks at 7-8 weeks cover."
+      "cons": "26.8",
+      "stock": "7-8 Weeks",
+      "intel": "Import demand steady despite high prices."
     },
     "EU": {
       "type": "consumer",
       "lat": 54.526,
       "lng": 15.2551,
-      "cons": "40.5",
-      "stock": "Critical",
-      "intel": "Inventory depletion."
+      "cons": "40.2",
+      "stock": "Stable",
+      "intel": "EUDR implementation delayed to Dec 2026."
     },
     "China": {
       "type": "consumer",
       "lat": 35.8617,
       "lng": 104.1954,
-      "cons": "6.8",
-      "stock": "Low",
-      "intel": ""
+      "cons": "7.1",
+      "stock": "Building",
+      "intel": "Import growth +20%. Luckin expanding."
     },
     "Japan": {
       "type": "consumer",
       "lat": 36.2048,
       "lng": 138.2529,
-      "cons": "7.1",
-      "stock": "2.20",
-      "intel": ""
+      "cons": "7.0",
+      "stock": "Low",
+      "intel": "Imports down 20% due to Yen weakness."
     },
     "South Korea": {
       "type": "consumer",
@@ -132,7 +132,7 @@
       "type": "consumer",
       "lat": 33.3152,
       "lng": 44.3661,
-      "cons": "1.5",
+      "cons": "1.6",
       "stock": "Med",
       "intel": ""
     },
@@ -140,9 +140,9 @@
       "type": "consumer",
       "lat": 33.8869,
       "lng": 9.5375,
-      "cons": "1.2",
+      "cons": "1.3",
       "stock": "Low",
-      "intel": "Robusta import focus."
+      "intel": "Strong demand for Ugandan Robusta."
     }
   }
 }
