@@ -26,104 +26,80 @@
     ],
     "demand": [
       {
-        "t": "Roaster Support",
-        "v": "Heavy industry buying observed on dips below 350 c/lb.",
-        "date": "Jan 07"
+        "t": "SJM Earnings",
+        "v": "Café Bustelo +41%. Strong demand for robusta-heavy blends.",
+        "date": "Jan 04"
       },
       {
-        "t": "Index Rebalancing",
-        "v": "Est. 4,000 lots of buying pressure expected this week.",
-        "date": "Jan 07"
+        "t": "German Tax",
+        "v": "Revenue stable €1.05B. Consumption inelastic.",
+        "date": "Jan 05"
       }
     ],
     "stocks": [
       {
-        "t": "ICE Arabica Certified",
-        "v": "456,477 bags. Slight recovery but historically tight.",
-        "date": "Jan 07"
+        "t": "ICE Arabica",
+        "v": "462.1k bags. Honduras flow dominating.",
+        "date": "Jan 08"
       },
       {
-        "t": "ICE Robusta Certified",
-        "v": "4,278 lots. Slight recovery from Dec lows.",
-        "date": "Jan 07"
+        "t": "ICE Robusta",
+        "v": "4.1k lots. Critical lows.",
+        "date": "Jan 08"
       }
     ],
     "futures": [
       {
-        "t": "CoT Positioning",
-        "v": "Speculators reduced net long by 52% since Nov. Market cleaner.",
-        "date": "Jan 07"
-      },
-      {
-        "t": "KC Momentum",
-        "v": "Broke resistance. New 4-week high. Support at 350.",
-        "date": "Jan 07"
+        "t": "KC Structure",
+        "v": "Squeeze risk delayed. Market waiting for Vietnam flush.",
+        "date": "Jan 08"
       }
     ],
     "ticker": [
       {
         "label": "KC MAR26",
-        "value": "378.60",
-        "trend": "up"
+        "value": "355.40",
+        "trend": "neutral"
       },
       {
         "label": "RC MAR26",
-        "value": "3,974",
-        "trend": "neutral"
-      },
-      {
-        "label": "CONILON BRL",
-        "value": "Building",
-        "trend": "up"
-      },
-      {
-        "label": "| FX: USD/BRL",
-        "value": "5.39",
+        "value": "$3,910",
         "trend": "down"
       },
       {
+        "label": "CONILON BRL",
+        "value": "R$ 1,210",
+        "trend": "neutral"
+      },
+      {
         "label": "USD/VND",
-        "value": "26,274",
-        "trend": "neutral"
-      },
-      {
-        "label": "| CERTS: KC",
-        "value": "456.5K",
-        "trend": "neutral"
-      },
-      {
-        "label": "RC",
-        "value": "4.3K",
-        "trend": "neutral"
-      },
-      {
-        "label": "| KEY STOCKS : SBUX",
-        "value": "95.50",
+        "value": "26,300",
         "trend": "up"
       },
       {
-        "label": "LKNCY",
-        "value": "36.10",
+        "label": "USD/BRL",
+        "value": "5.62",
         "trend": "up"
-      },
-      {
-        "label": "JDEP",
-        "value": "24.50",
-        "trend": "neutral"
       }
     ],
     "alerts": [
       {
-        "t": "CRITICAL: Sumatra Logistics",
-        "v": "Floods paralyzed logistics in N. Sumatra. 30-day delay expected.",
-        "date": "Jan 07",
-        "loc": [3.59, 98.67]
+        "t": "STRATEGY: Vietnam",
+        "v": "Wait for late Jan dip. Farmers must sell before Feb 10.",
+        "date": "Jan 08",
+        "loc": [
+          14.0583,
+          108.2772
+        ]
       },
       {
-        "t": "Vietnam Price Resistance",
-        "v": "Local price 98.5k VND creates spread squeeze against London.",
-        "date": "Jan 07",
-        "loc": [12.6, 108.0]
+        "t": "LOGISTICS: Sumatra",
+        "v": "Avoid spot purchases ex-Belawan. Switch to Honduras/Peru.",
+        "date": "Jan 08",
+        "loc": [
+          3.595,
+          98.672
+        ]
       }
     ]
   }
