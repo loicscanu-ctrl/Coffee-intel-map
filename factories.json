@@ -148,6 +148,7 @@
     { "n": "Costa Basildon Roastery", "l": [51.581, 0.495], "c": "Coca-Cola", "cap": "45k, Coca-Cola's primary UK roasting super-hub" },
     { "n": "Nestlé Tutbury Plant", "l": [52.855, -1.685], "c": "Nestlé", "cap": "35k, Massive Nescafé and Dolce Gusto production" },
     { "n": "Kenco Banbury Factory", "l": [52.071, -1.345], "c": "JDE Peet's", "cap": "25k, Historic hub for Kenco and Tassimo production" },
+    { "n": "Slumberjack Antrim Factory",  "l": [54.733, -6.206], "c": "Slumberjack (Clandeboye Agencies)", "cap": "2k, industrial roasting and automated packaging hub supplying major UK/Ireland retail chains." },
     { "n": "UCC Dartford Roastery", "l": [51.448, 0.225], "c": "UCC Europe", "cap": "15k, Key roastery for UK food service and retail" },
     { "n": "Galca Lviv Factory", "l": [49.845, 24.032], "c": "Galca Coffee", "cap": "5k, The industrial heart of Ukrainian coffee culture" },
     { "n": "Coffeeton Kyiv Plant", "l": [50.485, 30.458], "c": "Coffeeton LLC", "cap": "6k" },
