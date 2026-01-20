@@ -2,217 +2,43 @@
   "globalIntel": {
     "supply": [
       {
-        "t": "Vietnam Sales Resistance",
-        "v": "Farmers resistance below 98k VND to protect high VND prices.",
-        "date": "Dec 29"
+        "t": "Vietnam Harvest Recovery",
+        "v": "Harvest peak active; dry weather returning to Highlands after unseasonal Nov rains.",
+        "date": "Jan 20",
+        "loc": [14.05, 108.27]
       },
       {
-        "t": "Indonesia Harvest Risk",
-        "v": "Logistics paralyzed in Aceh/North Sumatra. 33% of Arabica crop impacted by landslides.",
-        "date": "Dec 29"
-      },
-      {
-        "t": "Uganda Record Exports",
-        "v": "Historic high of 8.4M bags exported. 25/26 production projection raised to 9.3M bags. FAQ at UGX 13k/kg.",
-        "date": "Dec 29",
-        "loc": [
-          0.31,
-          32.58
-        ]
-      },
-      {
-        "t": "Brazil Conilon Flow",
-        "v": "Cooabriel: Type 7 bid R$ 1,200. Equiv. to London H-240",
-        "date": "Dec 26"
-      },
-      {
-        "t": "Honduras Production Leap",
-        "v": "IHCAFE 25/26 forecast at 5.35m bags vs 4.7m bags last year (+13.8%).",
-        "date": "Dec 29"
+        "t": "Brazil 26/27 Recovery",
+        "v": "Initial 26/27 Arabica estimates point to 46.5-49M bags on positive biennial cycle.",
+        "date": "Jan 16",
+        "loc": [-18.51, -44.55]
       }
     ],
     "demand": [
       {
-        "t": "SJM Earnings Release",
-        "v": "Latest Q2-FY26 results released Nov 25, 2025; Café Bustelo sales grew 41%.",
-        "date": "Nov 25"
+        "t": "KDP/JDEP Offer Live",
+        "v": "Official $18B cash offer period (Jan 16 - Mar 27). Expected Q2 2026 close.",
+        "date": "Jan 16"
       },
       {
-        "t": "Corporate Reporting Log",
-        "v": "Last updates: KDP (Oct 24), SBUX (Oct 30), NESN (Oct 17), JDEP (July 31).",
-        "date": "Dec 29"
-      },
-      {
-        "t": "German Coffee Tax",
-        "v": "Total 2025 revenue projected at €1.05B vs €1.03B in 2024.",
-        "date": "Dec 29"
-      }
-    ],
-    "stocks": [
-      {
-        "t": "ICE Arabica Certified",
-        "v": "456,477 bags. Honduras origins dominate 39.7% of total stock.",
-        "date": "Dec 26"
-      },
-      {
-        "t": "ICE Robusta Certified",
-        "v": "4,278 lots. Historically low levels maintaining backwardation.",
-        "date": "Dec 26"
+        "t": "Nestlé Brazil Expansion",
+        "v": "R$ 1B investment in Araras facility for Nescafé modernization.",
+        "date": "Jan 14"
       }
     ],
     "futures": [
       {
-        "t": "KC ITM Option OI",
-        "v": "High ITM OI (~40k contracts) vs low volume creates extreme squeeze risk.",
-        "date": "Dec 29"
-      },
-      {
-        "t": "OI RC",
-        "v": "RC H : 44,582, 84 days left to FND ",
-        "date": "Dec 29"
-      },
-      {
-        "t": "OI KC",
-        "v": "KC H : 75,573, 78 days left to FND",
-        "date": "Dec 29"
+        "t": "COT Positioning",
+        "v": "Specs reduced net longs significantly to 23.6k lots vs 34.7k in late Dec.",
+        "date": "Jan 12"
       }
     ],
     "ticker": [
-      {
-        "label": "KC MAR26",
-        "value": "350.25",
-        "trend": "up"
-      },
-      {
-        "label": "RC MAR26",
-        "value": "$3,878",
-        "trend": "up"
-      },
-      {
-        "label": "CONILON BRL",
-        "value": "R$ 1,200, US$ 3,583/MT",
-        "trend": "up"
-      },
-      {
-        "label": "| FX: USD/BRL",
-        "value": "5.58",
-        "trend": "up"
-      },
-      {
-        "label": "USD/VND",
-        "value": "26,285",
-        "trend": "up"
-      },
-      {
-        "label": "| CERTS: KC",
-        "value": "456.5K",
-        "trend": "up"
-      },
-      {
-        "label": "RC",
-        "value": "4.2K",
-        "trend": "neutral"
-      },
-      {
-        "label": "| COFFEE STOCKS | COFFEE CHAINS : SBUX",
-        "value": "85.08",
-        "trend": "up"
-      },
-      {
-        "label": "BROS",
-        "value": "64.01",
-        "trend": "down"
-      },
-      {
-        "label": "LKNCY",
-        "value": "34.28",
-        "trend": "up"
-      },
-      {
-        "label": "JFC",
-        "value": "13.00",
-        "trend": "up"
-      },
-      {
-        "label": "| ROASTERS: NESN",
-        "value": "78.02",
-        "trend": "up"
-      },
-      {
-        "label": "SJM",
-        "value": "99.66",
-        "trend": "up"
-      },
-      {
-        "label": "KDP",
-        "value": "28.10",
-        "trend": "up"
-      },
-      {
-        "label": "KO",
-        "value": "69.87",
-        "trend": "down"
-      },
-      {
-        "label": "KHC",
-        "value": "24.13",
-        "trend": "up"
-      },
-      {
-        "label": "TATACONSUM",
-        "value": "1,194",
-        "trend": "up"
-      },
-      {
-        "label": "FARM",
-        "value": "1.47",
-        "trend": "up"
-      },
-      {
-        "label": "BRCC",
-        "value": "1.19",
-        "trend": "down"
-      },
-      {
-        "label": "CCL",
-        "value": "962.5",
-        "trend": "up"
-      },
-      {
-        "label": "STRS",
-        "value": "11,030",
-        "trend": "up"
-      },
-      {
-        "label": "| TRADER: JVA",
-        "value": "4.12",
-        "trend": "up"
-      },
-      {
-        "label": "O32",
-        "value": "0.95",
-        "trend": "neutral"
-      }
-    ],
-    "alerts": [
-      {
-        "t": "Vietnam Supply Bottleneck",
-        "v": "Slow selling pace (25.9%) ranging between 19% to 41% over past 5 years",
-        "date": "Dec 29",
-        "loc": [
-          12.6,
-          108.0
-        ]
-      },
-      {
-        "t": "CRITICAL: Sumatra Disaster",
-        "v": "Cyclone Senyar & Floods: 1,100+ dead, 1/3 of Arabica farms submerged. Exports likely down 15%.",
-        "date": "Dec 29",
-        "loc": [
-          3.59,
-          98.67
-        ]
-      }
+      { "label": "KC MAR26", "value": "355.08", "trend": "down" },
+      { "label": "RC MAR26", "value": "$3,878", "trend": "neutral" },
+      { "label": "VND LOCAL", "value": "98,500", "trend": "neutral" },
+      { "label": "JDEP (EUR)", "value": "€31.85", "trend": "up" },
+      { "label": "CERTS: KC", "value": "461.8K", "trend": "up" }
     ]
   }
 }
