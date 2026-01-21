@@ -2,43 +2,50 @@
   "globalIntel": {
     "supply": [
       {
-        "t": "Vietnam Harvest Recovery",
-        "v": "Harvest peak active; dry weather returning to Highlands after unseasonal Nov rains.",
-        "date": "Jan 20",
-        "loc": [14.05, 108.27]
+        "t": "Brazil Rain Relief",
+        "v": "Widespread showers forecast for Minas Gerais all week; easing dryness concerns.",
+        "date": "Jan 21",
+        "loc": [-18.51, -44.55]
       },
       {
-        "t": "Brazil 26/27 Recovery",
-        "v": "Initial 26/27 Arabica estimates point to 46.5-49M bags on positive biennial cycle.",
-        "date": "Jan 16",
-        "loc": [-18.51, -44.55]
+        "t": "Vietnam Price Floor",
+        "v": "Domestic prices stable at 99,300 VND/kg. Farmers leveraging global deficit.",
+        "date": "Jan 20",
+        "loc": [14.05, 108.27]
       }
     ],
     "demand": [
       {
-        "t": "KDP/JDEP Offer Live",
-        "v": "Official $18B cash offer period (Jan 16 - Mar 27). Expected Q2 2026 close.",
-        "date": "Jan 16"
+        "t": "Costa Sale Halted",
+        "v": "Coca-Cola ends talks with PE bidders; bids failed to meet £2bn valuation.",
+        "date": "Jan 15"
       },
       {
-        "t": "Nestlé Brazil Expansion",
-        "v": "R$ 1B investment in Araras facility for Nescafé modernization.",
-        "date": "Jan 14"
+        "t": "Nestlé Araras AI Hub",
+        "v": "R$ 1B investment to modernize century-old plant with Industry 4.0 tech.",
+        "date": "Nov 21"
       }
     ],
     "futures": [
       {
-        "t": "COT Positioning",
-        "v": "Specs reduced net longs significantly to 23.6k lots vs 34.7k in late Dec.",
-        "date": "Jan 12"
+        "t": "CoT Liquidation",
+        "v": "Managed Money reduced Arabica net-longs to 23,673 lots (down from 34.7k).",
+        "date": "Jan 16"
       }
     ],
     "ticker": [
-      { "label": "KC MAR26", "value": "355.08", "trend": "down" },
+      { "label": "KC MAR26", "value": "351.67", "trend": "down" },
       { "label": "RC MAR26", "value": "$3,878", "trend": "neutral" },
-      { "label": "VND LOCAL", "value": "98,500", "trend": "neutral" },
-      { "label": "JDEP (EUR)", "value": "€31.85", "trend": "up" },
-      { "label": "CERTS: KC", "value": "461.8K", "trend": "up" }
+      { "label": "VND LOCAL", "value": "99,300", "trend": "up" },
+      { "label": "JDEP (Offer)", "value": "€31.85", "trend": "neutral" }
+    ],
+    "alerts": [
+      {
+        "t": "Logistics Bottleneck (Sumatra)",
+        "v": "Cyclone Senyar damage to Aceh roads continues to delay Arabica shipments.",
+        "date": "Jan 21",
+        "loc": [3.59, 98.67]
+      }
     ]
   }
 }
