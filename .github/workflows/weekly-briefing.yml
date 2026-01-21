@@ -1,0 +1,47 @@
+name: Global Coffee Briefing
+
+on:
+  schedule:
+    # Cron syntax: Minute Hour Day Month DayOfWeek
+    # '0 10 * * *' = Runs at 10:00 UTC every day.
+    - cron: '0 10 * * *'
+  
+  # This allows you to click a "Run Now" button in the Actions tab for testing
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-intel:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Download your code to the virtual machine
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python 3.10
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Step 3: Install the Gemini library
+      - name: Install dependencies
+        run: pip install google-genai
+
+      # Step 4: Run your "Brain" script
+      # This uses the secret key you stored in GitHub Settings
+      - name: Run Analyst Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/update_coffee_intel.py
+
+      # Step 5: Save changes back to the repository
+      # This only commits if global.json actually changed
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "☕ Daily Briefing: Automated Market Update"
+          file_pattern: 'global.json'
