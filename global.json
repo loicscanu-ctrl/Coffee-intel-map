@@ -2,49 +2,119 @@
   "globalIntel": {
     "supply": [
       {
-        "t": "Brazil Rain Relief",
-        "v": "Widespread showers forecast for Minas Gerais all week; easing dryness concerns.",
-        "date": "Jan 21",
-        "loc": [-18.51, -44.55]
+        "t": "Vietnam Lunar New Year Liquidation",
+        "v": "Farmgate prices hit target VND 100.4k/kg. Farmers selling to repay debts and prepare for Tet. 20-25% of trees in blossoming stage.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 13, 14, 15]"
       },
       {
-        "t": "Vietnam Price Floor",
-        "v": "Domestic prices stable at 99,300 VND/kg. Farmers leveraging global deficit.",
-        "date": "Jan 20",
-        "loc": [14.05, 108.27]
+        "t": "Indonesia Cyclone Damage",
+        "v": "Cyclone Seedling 91S and excessive rain causing cherry drop in Temanggung (Central Java). Southern Sumatra remains average.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 17, 18]",
+        "loc": [-7.31, 110.17]
+      },
+      {
+        "t": "Brazil 2025 Export Recap",
+        "v": "Total 2025 shipments hit 40.049M bags. Germany (5.4M) overtook USA (5.3M) as the #1 destination. Dec exports were low at 3.13M bags.",
+        "date": "Jan 22",
+        "source": "Cazarini [cite: 133, 134]"
+      },
+      {
+        "t": "Uganda Crop Transition",
+        "v": "Main Drugar crop flow has stopped; Kampala availability scarce. Fly crop expected to start in early March.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 76, 77]"
       }
     ],
     "demand": [
       {
-        "t": "Costa Sale Halted",
-        "v": "Coca-Cola ends talks with PE bidders; bids failed to meet £2bn valuation.",
-        "date": "Jan 15"
+        "t": "Davos Macro Influence",
+        "v": "Davos dominated by AI and great-power politics. Global growth resilient despite U.S.-linked trade tensions.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 7, 8]"
       },
       {
-        "t": "Nestlé Araras AI Hub",
-        "v": "R$ 1B investment to modernize century-old plant with Industry 4.0 tech.",
-        "date": "Nov 21"
+        "t": "Ecuador-Colombia Tariff War",
+        "v": "President Noboa announced a 30% tariff on all Colombian products, citing security/drug trafficking concerns.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 51]"
+      }
+    ],
+    "stocks": [
+      {
+        "t": "ICE Arabica Certified",
+        "v": "442,459 bags. Marginal weekly increase. Shipments to the board are being discussed as potential relief.",
+        "date": "Jan 23",
+        "source": "Volcafe/Cazarini [cite: 19, 24, 132]"
+      },
+      {
+        "t": "ICE Robusta Certified",
+        "v": "4,532 lots. Increase driven by Indonesian gradings to satisfy January deliveries.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 19, 31]"
       }
     ],
     "futures": [
       {
-        "t": "CoT Liquidation",
-        "v": "Managed Money reduced Arabica net-longs to 23,673 lots (down from 34.7k).",
-        "date": "Jan 16"
+        "t": "Net Spec Position",
+        "v": "Arabica estimated net long 18k lots. Robusta estimated net long 5k lots.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 20]"
+      },
+      {
+        "t": "Technical Support/Resistance",
+        "v": "KC Support: 344.5, 334.3. Resistance: 380, 400. RC Support: 3665, 3500. Resistance: 4070, 4525.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 26, 27, 32, 33]"
       }
     ],
     "ticker": [
-      { "label": "KC MAR26", "value": "351.67", "trend": "down" },
-      { "label": "RC MAR26", "value": "$3,878", "trend": "neutral" },
-      { "label": "VND LOCAL", "value": "99,300", "trend": "up" },
-      { "label": "JDEP (Offer)", "value": "€31.85", "trend": "neutral" }
+      {
+        "label": "KC MAR26",
+        "value": "347.7",
+        "trend": "down",
+        "source": "Volcafe [cite: 22]"
+      },
+      {
+        "label": "RC MAR26",
+        "value": "$4,026",
+        "trend": "up",
+        "source": "Volcafe [cite: 22]"
+      },
+      {
+        "label": "USD/BRL",
+        "value": "5.28",
+        "trend": "down",
+        "source": "Cazarini [cite: 135]"
+      },
+      {
+        "label": "VND Farmgate",
+        "value": "100,400",
+        "trend": "up",
+        "source": "Volcafe [cite: 14]"
+      },
+      {
+        "label": "B3 (BMF) MAR",
+        "value": "425.8",
+        "trend": "down",
+        "source": "Volcafe [cite: 46]"
+      }
     ],
     "alerts": [
       {
-        "t": "Logistics Bottleneck (Sumatra)",
-        "v": "Cyclone Senyar damage to Aceh roads continues to delay Arabica shipments.",
-        "date": "Jan 21",
-        "loc": [3.59, 98.67]
+        "t": "Honduras Cold Front",
+        "v": "Heavy rainfall and low temperatures complicating harvesting; wet parchment holding at LPS 5,900/qnt.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 63, 64]",
+        "loc": [15.20, -86.24]
+      },
+      {
+        "t": "Costa Rica Election Watch",
+        "v": "Country 60% sold. Election Feb 2 creating a cautious market mood.",
+        "date": "Jan 23",
+        "source": "Volcafe [cite: 52, 54]",
+        "loc": [9.74, -83.75]
       }
     ]
   }
