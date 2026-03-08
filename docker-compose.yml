@@ -18,6 +18,7 @@ services:
       DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
     depends_on:
       - db
+    restart: on-failure
     volumes:
       - ./backend:/app
       - ./countries.json:/app/seed/countries.json
