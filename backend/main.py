@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
+from routes.news import router as news_router
+from routes.map import router as map_router
 
 app = FastAPI(title="Coffee Intel API")
 
@@ -10,6 +12,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(news_router)
+app.include_router(map_router)
 
 @app.on_event("startup")
 def startup():
