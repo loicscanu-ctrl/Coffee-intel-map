@@ -9,7 +9,7 @@ export default function CoffeeMap() {
   useEffect(() => {
     if (mapInstanceRef.current || !mapRef.current) return;
 
-    import("leaflet").then((L) => {
+    import("leaflet").then(async (L) => {
       // @ts-ignore
       import("leaflet/dist/leaflet.css");
 
@@ -53,6 +53,51 @@ export default function CoffeeMap() {
           iconAnchor: [12, 12],
         });
         Leaflet.marker(p.l, { icon }).bindPopup(`Port of ${p.n}`).addTo(portsLayer);
+      });
+
+      // Country pins
+      const { fetchMapCountries, fetchMapFactories } = await import("@/lib/api");
+
+      const countriesLayer = Leaflet.layerGroup().addTo(map);
+      fetchMapCountries().then((countries: any[]) => {
+        countries.forEach((c: any) => {
+          const isProducer = c.type === "producer";
+          const color = isProducer ? "#10b981" : "#3b82f6";
+          const icon = Leaflet.divIcon({
+            className: "",
+            html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:12px;height:12px;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6],
+          });
+          const d = c.data || {};
+          const statsHtml = isProducer
+            ? `<div>PROD: ${d.prod || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`
+            : `<div>CONS: ${d.cons || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`;
+          Leaflet.marker([c.lat, c.lng], { icon })
+            .bindPopup(
+              `<div style="font-family:monospace;font-size:12px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:4px;min-width:160px">` +
+              `<b>${c.name}</b><br>${statsHtml}` +
+              (d.intel ? `<br><i style="color:#94a3b8">${d.intel}</i>` : "") +
+              `</div>`
+            )
+            .addTo(countriesLayer);
+        });
+      });
+
+      // Factory pins
+      const factoriesLayer = Leaflet.layerGroup().addTo(map);
+      fetchMapFactories().then((factories: any[]) => {
+        factories.forEach((f: any) => {
+          const icon = Leaflet.divIcon({
+            className: "",
+            html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
+            iconSize: [16, 16],
+            iconAnchor: [8, 8],
+          });
+          Leaflet.marker([f.lat, f.lng], { icon })
+            .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
+            .addTo(factoriesLayer);
+        });
       });
     });
 
