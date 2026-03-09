@@ -26,14 +26,18 @@ def upsert_news_item(db, item: dict):
     existing = db.query(NewsItem).filter_by(title=item["title"]).first()
     if existing:
         return
-    db.add(NewsItem(
-        title=item["title"],
-        body=item.get("body", ""),
-        source=item.get("source", ""),
-        category=item.get("category", "general"),
-        lat=item.get("lat"),
-        lng=item.get("lng"),
-        tags=item.get("tags", []),
-        pub_date=datetime.utcnow(),
-    ))
-    db.commit()
+    try:
+        db.add(NewsItem(
+            title=item["title"],
+            body=item.get("body", ""),
+            source=item.get("source", ""),
+            category=item.get("category", "general"),
+            lat=item.get("lat"),
+            lng=item.get("lng"),
+            tags=item.get("tags", []),
+            pub_date=item.get("pub_date", datetime.utcnow()),
+        ))
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"[db] Failed to insert '{item.get('title')}': {e}")

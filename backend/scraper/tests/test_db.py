@@ -37,3 +37,19 @@ def test_upsert_skips_duplicate():
         "tags": ["futures", "arabica"],
     })
     db.add.assert_not_called()
+    db.commit.assert_not_called()
+
+
+def test_upsert_rolls_back_on_commit_error():
+    db = make_db()
+    db.commit.side_effect = Exception("DB error")
+    upsert_news_item(db, {
+        "title": "ICE Arabica – 2026-03-09",
+        "body": "test",
+        "source": "Barchart",
+        "category": "general",
+        "lat": 0.0,
+        "lng": 0.0,
+        "tags": [],
+    })
+    db.rollback.assert_called_once()
