@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
+import NewsFeed from "@/components/map/NewsFeed";
 
 const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
   ssr: false,
@@ -15,9 +16,12 @@ const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
 export default function MapPage() {
   const [selectedPin, setSelectedPin] = useState<any>(null);
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <CoffeeMap onPinClick={setSelectedPin} />
-      <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
+    <div className="w-full h-full flex flex-col">
+      <div className="flex-1 relative min-h-0">
+        <CoffeeMap onPinClick={setSelectedPin} />
+        <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
+      </div>
+      <NewsFeed />
     </div>
   );
 }
