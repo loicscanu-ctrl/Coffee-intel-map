@@ -1,0 +1,39 @@
+import os
+from datetime import datetime
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://coffee:coffee@localhost:5432/coffee_intel")
+
+_engine = None
+_Session = None
+
+def _get_engine():
+    global _engine, _Session
+    if _engine is None:
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+        _engine = create_engine(DATABASE_URL)
+        _Session = sessionmaker(bind=_engine)
+    return _engine
+
+def get_session():
+    _get_engine()
+    return _Session()
+
+def upsert_news_item(db, item: dict):
+    from models import NewsItem
+    existing = db.query(NewsItem).filter_by(title=item["title"]).first()
+    if existing:
+        return
+    db.add(NewsItem(
+        title=item["title"],
+        body=item.get("body", ""),
+        source=item.get("source", ""),
+        category=item.get("category", "general"),
+        lat=item.get("lat"),
+        lng=item.get("lng"),
+        tags=item.get("tags", []),
+        pub_date=datetime.utcnow(),
+    ))
+    db.commit()
