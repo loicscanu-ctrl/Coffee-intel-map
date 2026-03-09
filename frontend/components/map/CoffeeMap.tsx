@@ -2,7 +2,18 @@
 import { useEffect, useRef } from "react";
 import { PORTS, ROUTES, MAP_CONFIG } from "@/lib/mapData";
 
-export default function CoffeeMap() {
+interface CoffeeMapProps {
+  onPinClick?: (item: any) => void;
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  supply: "#ef4444",
+  demand: "#eab308",
+  macro: "#3b82f6",
+  general: "#6b7280",
+};
+
+export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
 
@@ -56,7 +67,7 @@ export default function CoffeeMap() {
       });
 
       // Country pins
-      const { fetchMapCountries, fetchMapFactories } = await import("@/lib/api");
+      const { fetchMapCountries, fetchMapFactories, fetchNews } = await import("@/lib/api");
 
       const countriesLayer = Leaflet.layerGroup().addTo(map);
       fetchMapCountries().then((countries: any[]) => {
@@ -98,6 +109,25 @@ export default function CoffeeMap() {
             .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
             .addTo(factoriesLayer);
         });
+      });
+
+      // News pins
+      const newsLayer = Leaflet.layerGroup().addTo(map);
+      fetchNews().then((items: any[]) => {
+        items
+          .filter((item: any) => item.lat != null && item.lng != null)
+          .forEach((item: any) => {
+            const color = CATEGORY_COLORS[item.category] || "#6b7280";
+            const icon = Leaflet.divIcon({
+              className: "",
+              html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:14px;height:14px;box-shadow:0 0 6px ${color}"></div>`,
+              iconSize: [14, 14],
+              iconAnchor: [7, 7],
+            });
+            Leaflet.marker([item.lat, item.lng], { icon })
+              .on("click", () => onPinClick && onPinClick(item))
+              .addTo(newsLayer);
+          });
       });
     });
 
