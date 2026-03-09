@@ -38,5 +38,15 @@ services:
       - /app/node_modules
       - /app/.next
 
+  scraper:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.scraper
+    environment:
+      DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
+    depends_on:
+      - db
+    restart: on-failure
+
 volumes:
   pgdata:
