@@ -9,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coffee -d coffee_intel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build: ./backend
@@ -17,7 +22,8 @@ services:
     environment:
       DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: on-failure
     volumes:
       - ./backend:/app
@@ -45,7 +51,8 @@ services:
     environment:
       DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: on-failure
 
 volumes:
