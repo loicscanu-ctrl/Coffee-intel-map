@@ -1,3 +1,11 @@
+"use client";
+import NewsFeedList from "@/components/NewsFeedList";
+
 export default function FuturesPage() {
-  return <div className="p-8 text-slate-400">Futures Exchange — coming soon</div>;
+  return (
+    <NewsFeedList
+      title="Futures Exchange"
+      filterFn={(item) => item.tags?.includes("futures")}
+    />
+  );
 }
