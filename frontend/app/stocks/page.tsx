@@ -1,3 +1,15 @@
+"use client";
+import NewsFeedList from "@/components/NewsFeedList";
+
 export default function StocksPage() {
-  return <div className="p-8 text-slate-400">Certified Stocks &amp; Spreads — coming soon</div>;
+  return (
+    <NewsFeedList
+      title="Certified Stocks & Spreads"
+      filterFn={(item) =>
+        item.tags?.includes("cot") ||
+        item.tags?.includes("stocks") ||
+        item.tags?.includes("technicals")
+      }
+    />
+  );
 }
