@@ -18,7 +18,3 @@ html, body {
   white-space: nowrap;
   animation: ticker-scroll 40s linear infinite;
 }
-
-.ticker-track:hover {
-  animation-play-state: paused;
-}
