@@ -23,8 +23,18 @@ def get_session():
 
 def upsert_news_item(db, item: dict):
     from models import NewsItem
-    existing = db.query(NewsItem).filter_by(title=item["title"]).first()
-    if existing:
+    # For price items, replace any existing entry from the same source
+    tags = item.get("tags", [])
+    replace_tags = {"price", "cot", "futures_chain"}
+    if replace_tags.intersection(tags) and item.get("source"):
+        # Also match by title prefix to distinguish KC vs RM futures chains
+        title_prefix = item["title"].split("–")[0].strip()
+        (db.query(NewsItem)
+           .filter(NewsItem.source == item["source"],
+                   NewsItem.title.like(f"{title_prefix}%"))
+           .delete(synchronize_session=False))
+        db.commit()
+    elif db.query(NewsItem).filter_by(title=item["title"]).first():
         return
     try:
         db.add(NewsItem(
@@ -35,6 +45,7 @@ def upsert_news_item(db, item: dict):
             lat=item.get("lat"),
             lng=item.get("lng"),
             tags=item.get("tags", []),
+            meta=item.get("meta"),
             pub_date=item.get("pub_date", datetime.utcnow()),
         ))
         db.commit()

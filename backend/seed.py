@@ -92,12 +92,33 @@ def seed_news(db):
         ))
     db.commit()
 
+PRICE_SEEDS = [
+    {"title": "USD/IDR FX Rate – seed", "body": "USD/IDR FX Rate price: 16280",  "tags": ["fx", "indonesia"]},
+    {"title": "USD/HNL FX Rate – seed", "body": "USD/HNL FX Rate price: 24.75",  "tags": ["fx", "honduras"]},
+    {"title": "USD/BRL FX Rate – seed", "body": "USD/BRL FX Rate price: 5.87",   "tags": ["fx", "brazil"]},
+    {"title": "USD/VND FX Rate – seed", "body": "USD/VND FX Rate price: 25380",  "tags": ["fx", "vietnam"]},
+]
+
+def seed_prices(db):
+    for item in PRICE_SEEDS:
+        if db.query(NewsItem).filter_by(title=item["title"]).first():
+            continue
+        db.add(NewsItem(
+            title=item["title"],
+            body=item["body"],
+            source="Seed (Barchart pending)",
+            category="general",
+            tags=item["tags"],
+        ))
+    db.commit()
+
 def run_seed():
     db = SessionLocal()
     try:
         seed_countries(db)
         seed_factories(db)
         seed_news(db)
+        seed_prices(db)
         print("✅ Seed complete")
     finally:
         db.close()

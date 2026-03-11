@@ -22,6 +22,7 @@ def get_news(category: Optional[str] = None, db: Session = Depends(get_db)):
             "lat": item.lat,
             "lng": item.lng,
             "tags": item.tags,
+            "meta": item.meta,
             "pub_date": item.pub_date.isoformat() if item.pub_date else None,
         }
         for item in items

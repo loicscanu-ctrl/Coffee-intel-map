@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"docker exec coffee-intel-map-db-1 psql -U coffee -d coffee_intel -c \"\"INSERT INTO news_feed \\(title, body, source, category, lat, lng, tags, pub_date, created_at\\) VALUES \\(''ICE NY Arabica - seed'', ''ICE NY Arabica price: 205.50'', ''Seed'', ''general'', 0, 0, ''[\\\\\"\"futures\\\\\"\",\\\\\"\"price\\\\\"\"]'', NOW\\(\\), NOW\\(\\)\\) ON CONFLICT DO NOTHING;\"\"\")",
+      "Bash(powershell -Command \"docker cp ''c:\\\\Users\\\\Loic Scanu\\\\Coffee-intel-map\\\\backend\\\\insert_prices.py'' coffee-intel-map-backend-1:/app/insert_prices.py; docker exec coffee-intel-map-backend-1 python insert_prices.py\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\LOICSC~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Loic-Scanu-Coffee-intel-map\\\\tasks\\\\bbj7e5p3t.output''\")",
+      "Bash(powershell -Command \"docker ps --format ''table {{.Names}}\\\\t{{.Status}}''\")",
+      "Bash(powershell -Command \"Invoke-WebRequest -Uri http://localhost:8000/api/news -UseBasicParsing | Select-Object -ExpandProperty Content\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\LOICSC~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Loic-Scanu-Coffee-intel-map\\\\tasks\\\\boi5u0grk.output''\")",
+      "Bash(powershell -Command \"docker exec coffee-intel-map-backend-1 python update_brl_seed.py\")",
+      "Bash(powershell -Command \"docker inspect --format=''{{.State.Status}}'' coffee-intel-map-backend-1\")",
+      "Bash(powershell -Command \"docker exec coffee-intel-map-backend-1 python -c \"\"import sys; sys.path.insert\\(0,''/app''\\); from database import SessionLocal; from models import NewsItem; db=SessionLocal\\(\\); [print\\(i.title, i.tags\\) for i in db.query\\(NewsItem\\).filter\\(NewsItem.tags.cast\\(''text''\\).contains\\(''price''\\)\\).all\\(\\)]; db.close\\(\\)\"\"\")",
+      "Bash(docker exec coffee-intel-map-scraper-1 ls /app/)",
+      "Bash(docker exec coffee-intel-map-scraper-1 ls //app/)",
+      "Bash(docker cp \"c:/Users/Loic Scanu/Coffee-intel-map/backend/test_giacaphe.py\" coffee-intel-map-scraper-1://app/test_giacaphe.py)",
+      "Bash(docker cp \"c:/Users/Loic Scanu/Coffee-intel-map/backend/scraper/sources/vietnam.py\" \"coffee-intel-map-scraper-1:/app/scraper/sources/vietnam.py\")",
+      "Bash(docker exec --user root coffee-intel-map-scraper-1 pip install playwright-stealth --quiet)"
+    ]
+  }
+}

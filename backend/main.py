@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from database import Base, engine
+from database import Base, engine, get_db
+from models import CertifiedStock
 from routes.news import router as news_router
 from routes.map import router as map_router
 
@@ -25,3 +27,8 @@ def startup():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/api/stocks")
+def get_stocks(db: Session = Depends(get_db)):
+    stocks = db.query(CertifiedStock).order_by(CertifiedStock.date.asc()).all()
+    return [{"date": s.date.isoformat(), "value": s.value} for s in stocks]

@@ -1,5 +1,6 @@
 sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 playwright==1.44.0
+playwright-stealth
 deep-translator==1.11.4
 beautifulsoup4==4.12.3

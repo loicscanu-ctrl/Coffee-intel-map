@@ -8,10 +8,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from playwright.async_api import async_playwright
 from scraper.db import get_session, upsert_news_item
-from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals
+from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals]
-INTERVAL_HOURS = 24
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda]
+SCHEDULED_HOUR_UTC = 7  # Run daily at 07:00 UTC
 
 async def run_all_scrapers():
     print("[scraper] Starting daily scrape run...")
@@ -36,11 +36,23 @@ async def run_all_scrapers():
         db.close()
     print(f"[scraper] Done. {total} items inserted.")
 
+def seconds_until_next_run():
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    next_run = now.replace(hour=SCHEDULED_HOUR_UTC, minute=0, second=0, microsecond=0)
+    if next_run <= now:
+        next_run += timedelta(days=1)
+    delta = (next_run - now).total_seconds()
+    print(f"[scraper] Next run scheduled at {next_run.strftime('%Y-%m-%d %H:%M UTC')} ({delta/3600:.1f}h from now)")
+    return delta
+
 def main():
+    # Run immediately on startup
+    asyncio.run(run_all_scrapers())
+    # Then run daily at 07:00 UTC
     while True:
+        time.sleep(seconds_until_next_run())
         asyncio.run(run_all_scrapers())
-        print(f"[scraper] Sleeping {INTERVAL_HOURS}h until next run...")
-        time.sleep(INTERVAL_HOURS * 3600)
 
 if __name__ == "__main__":
     main()

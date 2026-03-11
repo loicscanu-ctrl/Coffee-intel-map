@@ -12,6 +12,12 @@ export async function fetchMapFactories() {
   return res.json();
 }
 
+export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
+  const res = await fetch(`${API_URL}/api/stocks`);
+  if (!res.ok) throw new Error("Failed to fetch certified stocks");
+  return res.json();
+}
+
 export async function fetchNews(category?: string) {
   const url = category
     ? `${API_URL}/api/news?category=${category}`

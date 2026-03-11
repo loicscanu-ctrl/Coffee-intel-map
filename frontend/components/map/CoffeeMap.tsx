@@ -20,13 +20,21 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
   useEffect(() => {
     if (mapInstanceRef.current || !mapRef.current) return;
 
+    let cancelled = false;
+
     import("leaflet").then(async (L) => {
+      if (cancelled || !mapRef.current || (mapRef.current as any)._leaflet_id) return;
       // @ts-ignore
       import("leaflet/dist/leaflet.css");
 
-      const map = (L as any).default
-        ? (L as any).default.map(mapRef.current!, { zoomControl: false, fadeAnimation: true }).setView(MAP_CONFIG.initView, MAP_CONFIG.initZoom)
-        : (L as any).map(mapRef.current!, { zoomControl: false, fadeAnimation: true }).setView(MAP_CONFIG.initView, MAP_CONFIG.initZoom);
+      let map;
+      try {
+        map = (L as any).default
+          ? (L as any).default.map(mapRef.current!, { zoomControl: false, fadeAnimation: true }).setView(MAP_CONFIG.initView, MAP_CONFIG.initZoom)
+          : (L as any).map(mapRef.current!, { zoomControl: false, fadeAnimation: true }).setView(MAP_CONFIG.initView, MAP_CONFIG.initZoom);
+      } catch {
+        return;
+      }
 
       mapInstanceRef.current = map;
 
@@ -40,17 +48,31 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
 
       Leaflet.control.zoom({ position: "topright" }).addTo(map);
 
+      // Inject flow-dash animation CSS once
+      if (!document.getElementById("coffee-flow-anim")) {
+        const s = document.createElement("style");
+        s.id = "coffee-flow-anim";
+        s.textContent = `
+          @keyframes flowDash { to { stroke-dashoffset: -20; } }
+          .flow-route { stroke-dasharray: 12 8; animation: flowDash 1.4s linear infinite; }
+          .flow-route-trunk { stroke-dasharray: 16 8; animation: flowDash 1.8s linear infinite; }
+        `;
+        document.head.appendChild(s);
+      }
+
       // Logistics routes
       const logisticsLayer = Leaflet.layerGroup().addTo(map);
       ROUTES.forEach((r) => {
         if (r.path && r.path.length > 0) {
-          Leaflet.polyline(r.path, {
+          const line = Leaflet.polyline(r.path, {
             color: r.color,
             weight: r.weight || 2,
-            opacity: 0.8,
+            opacity: 0.85,
           })
             .bindTooltip(r.name)
             .addTo(logisticsLayer);
+          const el = (line as any)._path;
+          if (el) el.classList.add(r.weight && r.weight >= 4 ? "flow-route-trunk" : "flow-route");
         }
       });
 
@@ -132,8 +154,10 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
     });
 
     return () => {
+      cancelled = true;
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
+      if (mapRef.current) (mapRef.current as any)._leaflet_id = null;
     };
   }, []);
 
