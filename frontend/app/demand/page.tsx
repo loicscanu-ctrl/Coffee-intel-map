@@ -1,3 +1,10 @@
+import NewsFeedList from "@/components/NewsFeedList";
+
 export default function DemandPage() {
-  return <div className="p-8 text-slate-400">Demand — coming soon</div>;
+  return (
+    <NewsFeedList
+      title="Demand"
+      category="demand"
+    />
+  );
 }
