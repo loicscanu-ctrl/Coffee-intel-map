@@ -52,3 +52,21 @@ def upsert_news_item(db, item: dict):
     except Exception as e:
         db.rollback()
         print(f"[db] Failed to insert '{item.get('title')}': {e}")
+
+def upsert_freight_rate(index_code: str, rate_date, rate: float):
+    from models import FreightRate
+    db = get_session()
+    try:
+        existing = db.query(FreightRate).filter_by(
+            index_code=index_code, date=rate_date
+        ).first()
+        if existing:
+            existing.rate = rate
+        else:
+            db.add(FreightRate(index_code=index_code, date=rate_date, rate=rate))
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise  # Let the caller (scraper loop) decide how to handle failures
+    finally:
+        db.close()
