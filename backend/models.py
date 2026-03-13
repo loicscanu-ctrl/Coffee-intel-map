@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from sqlalchemy import String, Float, DateTime, Text, JSON, Date, Integer
+from sqlalchemy import String, Float, DateTime, Text, JSON, Date, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
 
@@ -44,3 +44,14 @@ class CertifiedStock(Base):
 
     date: Mapped[date] = mapped_column(Date, primary_key=True, index=True)
     value: Mapped[int] = mapped_column(Integer)
+
+class FreightRate(Base):
+    __tablename__ = "freight_rates"
+
+    id:         Mapped[int]      = mapped_column(primary_key=True)
+    index_code: Mapped[str]      = mapped_column(String(10), nullable=False)
+    date:       Mapped[date]     = mapped_column(Date, nullable=False)
+    rate:       Mapped[float]    = mapped_column(Float, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("index_code", "date", name="uq_freight_index_date"),)
