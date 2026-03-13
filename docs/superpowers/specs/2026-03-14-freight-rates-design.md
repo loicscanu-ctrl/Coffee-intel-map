@@ -11,7 +11,7 @@ Replace the hardcoded dummy freight rates in `frontend/app/freight/page.tsx` wit
 **Freightos Baltic Index (FBX)** via Playwright XHR interception on the public Freightos Terminal pages.
 
 - The FBX API is enterprise/paid-only; the Terminal web pages render chart data via an internal JSON API call that can be intercepted with Playwright.
-- 4 FBX indices are fetched, then mapped to 7 coffee routes via multipliers.
+- 3 FBX indices are fetched (FBX01, FBX03, FBX11), then mapped to 7 coffee routes via multipliers.
 - Update frequency: daily (run by the existing scraper cron).
 
 ## Route → FBX Mapping
@@ -28,13 +28,13 @@ Replace the hardcoded dummy freight rates in `frontend/app/freight/page.tsx` wit
 
 **Proxy rationale:** No public FBX index exists for South America→Europe or Africa→Europe in the export (headhaul) direction. FBX11 (East Asia→North Europe) moves directionally with the global container market and serves as a calibrated proxy. Proxy routes are clearly labelled `~est.` in the UI.
 
-**Unit:** USD/FEU (40ft container). FBX measures FEU, not TEU.
+**Unit:** USD/FEU (40ft container). FBX measures FEU. The existing page labels (`USD/TEU`, "20ft container") will be updated to `USD/FEU` and "40ft container" to match the actual data source.
 
 ## Architecture & Data Flow
 
 ```
 Playwright scraper (freightos.py)
-  └─ loads 4 Freightos Terminal pages (FBX01, FBX03, FBX11, FBX24)
+  └─ loads 3 Freightos Terminal pages (FBX01, FBX03, FBX11)
   └─ intercepts XHR → captures JSON chart history
   └─ upserts into freight_rates table (index_code, date, rate)
         ↓
@@ -50,35 +50,67 @@ frontend/app/freight/page.tsx
 
 ## Database
 
-**New table: `freight_rates`**
+**New model added to `backend/models.py`:**
 
-| Column | Type | Notes |
-|---|---|---|
-| id | serial PK | |
-| index_code | varchar | e.g. "FBX11" |
-| date | date | |
-| rate | float | USD/FEU |
-| created_at | timestamp | |
+```python
+class FreightRate(Base):
+    __tablename__ = "freight_rates"
+    id         = Column(Integer, primary_key=True)
+    index_code = Column(String, nullable=False)   # e.g. "FBX11"
+    date       = Column(Date, nullable=False)
+    rate       = Column(Float, nullable=False)    # USD/FEU
+    created_at = Column(DateTime, default=datetime.utcnow)
+    __table_args__ = (UniqueConstraint("index_code", "date"),)
+```
 
-Unique constraint on `(index_code, date)` — upsert on conflict.
-
-Added via Alembic migration.
+No Alembic — the project uses `Base.metadata.create_all(bind=engine)` at startup. Adding `FreightRate` to `backend/models.py` is sufficient; the table will be created automatically on next app start.
 
 ## Backend Components
 
 ### `backend/scraper/sources/freightos.py` (new)
-- Playwright scraper following same pattern as `barchart.py`
-- For each FBX page: load → intercept XHR chart data → parse JSON history
-- First run captures full available history (~1 year on Freightos charts)
-- Subsequent runs upsert by `(index_code, date)` — idempotent
-- Added to `ALL_SOURCES` in `backend/scraper/main.py`
 
-### `backend/api/routes/freight.py` (new)
-- `GET /api/freight` endpoint
+Playwright scraper following the same pattern as `barchart.py`.
+
+For each FBX index page (FBX01, FBX03, FBX11):
+1. Load the Freightos Terminal page (e.g. `https://terminal.freightos.com/fbx-11-china-to-northern-europe/`)
+2. Intercept XHR requests — the chart data arrives as a JSON response from an internal API endpoint (expected pattern: a fetch/XHR to a path containing `fbx` or `series` with a JSON body containing date/rate pairs)
+3. Parse the full history array from the JSON payload
+4. Call `upsert_freight_rate()` for each data point
+
+**Interception failure handling:** If no XHR matching the expected pattern is observed within 15 seconds, log a warning (`logger.warning("FBX{X}: no chart XHR intercepted, skipping")`) and continue. The scraper must not raise — a failed index leaves the previous DB data intact.
+
+**First run:** The Freightos Terminal charts display ~1 year of history. The first scrape captures and stores the full available history. Subsequent runs upsert by `(index_code, date)` — idempotent.
+
+### `backend/scraper/db.py` — add `upsert_freight_rate`
+
+```python
+def upsert_freight_rate(index_code: str, date: date, rate: float):
+    from models import FreightRate  # matches existing import pattern in scraper/db.py
+    db = get_session()
+    try:
+        existing = db.query(FreightRate).filter_by(index_code=index_code, date=date).first()
+        if existing:
+            existing.rate = rate
+        else:
+            db.add(FreightRate(index_code=index_code, date=date, rate=rate))
+        db.commit()
+    finally:
+        db.close()
+```
+
+**DB session acquisition in `freightos.py`:** `freightos.py` calls `upsert_freight_rate()` directly (no `db` parameter on `run()`). `upsert_freight_rate` opens and closes its own session via `get_session()` — the same pattern used by `scraper/db.py`. The `run(page)` signature stays consistent with all other scraper sources; `scraper/main.py` does not need to be modified.
+
+### `backend/routes/freight.py` (new)
+
+`GET /api/freight` endpoint.
+
 - Reads last 84 days per index from `freight_rates` table
 - Applies multipliers to produce 7 route objects
-- Computes `prev` as the rate from 7 days prior
-- Returns:
+- Computes `prev` as the most recent rate older than 7 days (not strictly 7 days prior — handles weekends, holidays, and scraper gaps gracefully)
+- If `prev` is not available (no data older than 7 days), sets `prev = rate` and `chg = 0`
+- Registered in `backend/main.py` alongside existing routers
+
+**Response shape:**
 
 ```json
 {
@@ -91,27 +123,42 @@ Added via Alembic migration.
       "rate": 2850,
       "prev": 2780,
       "unit": "USD/FEU",
-      "proxy": false,
-      "history": [
-        { "date": "2025-12-20", "rate": 3100 }
-      ]
+      "proxy": false
     }
+  ],
+  "history": [
+    { "date": "2025-12-20", "vn-eu": 3100, "br-eu": 1798, "vn-us": 3400, "et-eu": 2170 }
   ]
 }
 ```
 
-Registered in `backend/api/main.py`.
+The `history` array is a **merged time series** (one object per date, all routes as keys) so it can be passed directly to the existing Recharts `LineChart` with `dataKey` per route. Route IDs are used as keys. Missing values for a date are omitted (Recharts handles gaps). Only the 4 routes currently shown in the chart are included in `history` (vn-eu, br-eu, vn-us, et-eu) matching the existing `CHART_LINES`.
 
 ## Frontend Changes
 
 **`frontend/app/freight/page.tsx`**
 
 - Remove `FREIGHT_ROUTES`, `FREIGHT_HISTORY`, `CHART_LINES` static constants
-- Add `useEffect` fetch to `/api/freight` with loading state
-- Rate table: add `~est.` badge on proxy routes; change unit label to `USD/FEU`
-- Chart: use `route.history` arrays with real dates on X-axis
-- Add "Last updated: {date}" label below chart header
-- No layout changes — same two-panel structure (chart + table)
+- Add `useEffect` fetch to `/api/freight` with loading state (spinner/skeleton)
+- **Empty/error state:** If the API returns no routes (first deploy, scraper not yet run), display: "Freight data not yet available — check back after the next scraper run." No crash, no empty table.
+- Rate table:
+  - Add `~est.` badge on proxy routes (`proxy: true`)
+  - Change unit label from `USD/TEU` to `USD/FEU`
+  - Change "20ft container" to "40ft container"
+- Chart: use `history` array from API response with real dates on X-axis; `CHART_LINES` keys change from `"VN→EU"` to route IDs `"vn-eu"` etc.
+- Add "Last updated: {updated}" label below chart header
+
+No layout changes — same two-panel structure (chart on top, table below).
+
+**`chg` computation:** The `chg` value (rate minus prev) is computed on the frontend (`const chg = r.rate - r.prev`) — the API does not need to return it. This matches the existing pattern in `freight/page.tsx`.
+
+## Deployment Note
+
+The scraper runs inside Docker with no volume mount (`COPY scraper/ ./scraper/` bakes sources at build time). After adding `freightos.py`, a full image rebuild is required:
+```
+docker compose build scraper && docker compose up --force-recreate scraper
+```
+Without this, the cron will silently continue running the old image without the new scraper.
 
 ## Files Changed
 
@@ -119,8 +166,8 @@ Registered in `backend/api/main.py`.
 |---|---|
 | `backend/scraper/sources/freightos.py` | New |
 | `backend/scraper/main.py` | Add `freightos` to imports and `ALL_SOURCES` |
-| `backend/alembic/versions/XXXX_add_freight_rates.py` | New migration |
-| `backend/models/freight_rate.py` | New SQLAlchemy model |
-| `backend/api/routes/freight.py` | New endpoint |
-| `backend/api/main.py` | Register `/api/freight` router |
+| `backend/scraper/db.py` | Add `upsert_freight_rate()` helper |
+| `backend/models.py` | Add `FreightRate` model class |
+| `backend/routes/freight.py` | New endpoint |
+| `backend/main.py` | Register `/api/freight` router |
 | `frontend/app/freight/page.tsx` | Replace static data with live fetch |
