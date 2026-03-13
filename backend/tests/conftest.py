@@ -15,8 +15,11 @@ def db():
     """In-process session for model tests."""
     Base.metadata.create_all(engine)
     session = SessionLocal()
-    yield session
-    session.close()
+    try:
+        yield session
+    finally:
+        session.rollback()
+        session.close()
     Base.metadata.drop_all(engine)
 
 @pytest.fixture
