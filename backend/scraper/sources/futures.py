@@ -8,6 +8,7 @@ import zipfile
 import io
 import csv
 from datetime import date
+from scraper.db import upsert_cot_weekly
 
 _TODAY = lambda: date.today().isoformat()
 
@@ -258,6 +259,19 @@ def _make_ice_cot_item(latest: dict, prev: dict | None) -> dict:
         "other": {"long": oth_l, "short": oth_s, "spread": oth_sp, "d_long": oth_dl, "d_short": oth_ds},
         "nr":    {"long": nr_l, "short": nr_s, "d_long": nr_dl, "d_short": nr_ds},
     }
+    # Persist to cot_weekly for the CoT dashboard
+    try:
+        upsert_cot_weekly("ldn", report_date, {
+            "oi_total":    oi,
+            "pmpu_long":   pmpu_l,  "pmpu_short":  pmpu_s,
+            "swap_long":   swap_l,  "swap_short":  swap_s,  "swap_spread": swap_sp,
+            "mm_long":     mm_l,    "mm_short":    mm_s,    "mm_spread":   mm_sp,
+            "other_long":  oth_l,   "other_short": oth_s,   "other_spread": oth_sp,
+            "nr_long":     nr_l,    "nr_short":    nr_s,
+            "t_nr_long":   None,    "t_nr_short":  None,
+        })
+    except Exception as e:
+        print(f"[cot] Failed to upsert LDN cot_weekly for {report_date}: {e}")
     mm_net = mm_l - mm_s
     mm_net_sign = "+" if mm_net >= 0 else ""
     body = (
@@ -337,6 +351,18 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
         "other": {"long": oth_l, "short": oth_s, "spread": oth_sp, "d_long": oth_dl, "d_short": oth_ds},
         "nr":    {"long": nr_l, "short": nr_s, "d_long": nr_dl, "d_short": nr_ds},
     }
+    # Persist to cot_weekly for the CoT dashboard
+    try:
+        upsert_cot_weekly("ny", report_date, {
+            "oi_total":    oi,
+            "pmpu_long":   pmpu_l,  "pmpu_short":  pmpu_s,
+            "swap_long":   swap_l,  "swap_short":  swap_s,  "swap_spread": swap_sp,
+            "mm_long":     mm_l,    "mm_short":    mm_s,    "mm_spread":   mm_sp,
+            "other_long":  oth_l,   "other_short": oth_s,   "other_spread": oth_sp,
+            "nr_long":     nr_l,    "nr_short":    nr_s,
+        })
+    except Exception as e:
+        print(f"[cot] Failed to upsert NY cot_weekly for {report_date}: {e}")
     mm_net = mm_l - mm_s
     mm_net_sign = "+" if mm_net >= 0 else ""
     body = (
