@@ -5,6 +5,7 @@ from database import Base, engine, get_db
 from models import CertifiedStock
 from routes.news import router as news_router
 from routes.map import router as map_router
+from routes.freight import router as freight_router
 
 app = FastAPI(title="Coffee Intel API")
 
@@ -17,6 +18,7 @@ app.add_middleware(
 
 app.include_router(news_router)
 app.include_router(map_router)
+app.include_router(freight_router)
 
 @app.on_event("startup")
 def startup():

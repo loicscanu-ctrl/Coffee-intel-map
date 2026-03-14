@@ -7,7 +7,7 @@ SEED_DIR = os.path.join(os.path.dirname(__file__), "seed")
 
 def seed_countries(db):
     path = os.path.join(SEED_DIR, "countries.json")
-    if not os.path.exists(path):
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
         return
     with open(path) as f:
         data = json.load(f)
@@ -26,7 +26,7 @@ def seed_countries(db):
 
 def seed_factories(db):
     path = os.path.join(SEED_DIR, "factories.json")
-    if not os.path.exists(path):
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
         return
     with open(path) as f:
         data = json.load(f)
@@ -47,7 +47,7 @@ def seed_factories(db):
 
 def seed_news(db):
     path = os.path.join(SEED_DIR, "global.json")
-    if not os.path.exists(path):
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
         return
     with open(path) as f:
         data = json.load(f)
@@ -119,6 +119,6 @@ def run_seed():
         seed_factories(db)
         seed_news(db)
         seed_prices(db)
-        print("✅ Seed complete")
+        print("Seed complete")
     finally:
         db.close()
