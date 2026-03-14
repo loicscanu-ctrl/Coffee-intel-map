@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, ComposedChart,
-  ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine,
+  ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea,
 } from "recharts";
+import { fetchCot } from "@/lib/api";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -35,19 +36,163 @@ const MARGIN_OUTRIGHT   = 6000;
 const MARGIN_SPREAD     = 1200;
 const CENTS_LB_TO_USD_TON = 22.0462;
 
+// ── Real data transform ─────────────────────────────────────────────────────
+function transformApiData(rows: any[]): any[] {
+  if (!rows.length) return [];
+
+  let prevPriceNY  = 130;
+  let prevPriceLDN = 1800;
+  let cumulativeNominal = 0;
+  let cumulativeMargin  = 0;
+
+  // Pass 1: ordered for-loop — delta fields require access to previous row
+  const base: any[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const ny  = row.ny  ?? {};
+    const ldn = row.ldn ?? {};
+
+    const oiNY  = ny.oi_total  ?? 0;
+    const oiLDN = ldn.oi_total ?? 0;
+    const totalOI = oiNY + oiLDN;
+
+    // Spreading — from RAW API spread fields (NOT from the ny/ldn sub-objects below)
+    const spreadingNY  = (ny.swap_spread  ?? 0) + (ny.mm_spread  ?? 0) + (ny.other_spread  ?? 0);
+    const spreadingLDN = (ldn.swap_spread ?? 0) + (ldn.mm_spread ?? 0) + (ldn.other_spread ?? 0);
+    const spreadingTotal = spreadingNY + spreadingLDN;
+    const outrightTotal  = totalOI - spreadingTotal;
+
+    // Price carry-forward
+    const priceNY  = ny.price_ny   != null ? ny.price_ny   : prevPriceNY;
+    const priceLDN = ldn.price_ldn != null ? ldn.price_ldn : prevPriceLDN;
+    prevPriceNY  = priceNY;
+    prevPriceLDN = priceLDN;
+
+    const priceNY_USD_Ton  = priceNY * CENTS_LB_TO_USD_TON;
+    const avgPrice_USD_Ton = totalOI > 0
+      ? ((priceNY_USD_Ton * oiNY) + (priceLDN * oiLDN)) / totalOI
+      : 0;
+
+    // Delta OI
+    const prev       = base[i - 1] ?? null;
+    const deltaOINY  = prev ? oiNY  - prev.oiNY  : 0;
+    const deltaOILDN = prev ? oiLDN - prev.oiLDN : 0;
+
+    // Weekly nominal flow ($M)
+    const flowNY  = (deltaOINY  * priceNY  * 375) / 1_000_000;
+    const flowLDN = (deltaOILDN * priceLDN * 10)  / 1_000_000;
+    const weeklyNominalFlow = flowNY + flowLDN;
+
+    // Weekly margin flow ($M)
+    const prevSpread   = prev ? prev.spreadingTotal : 0;
+    const prevOutright = prev ? prev.outrightTotal  : 0;
+    const deltaSpread   = spreadingTotal - prevSpread;
+    const deltaOutright = outrightTotal  - prevOutright;
+    const weeklyMarginFlow =
+      ((deltaOutright * MARGIN_OUTRIGHT) + (deltaSpread * MARGIN_SPREAD)) / 1_000_000;
+
+    cumulativeNominal += weeklyNominalFlow;
+    cumulativeMargin  += weeklyMarginFlow;
+
+    const macroMarket = cumulativeNominal * 2.5;
+    const macroSofts  = cumulativeNominal * 1.5;
+
+    // ny/ldn sub-objects: camelCase OI fields used by Tabs 2-6
+    // nonRepLong (capital R) matches d.ny[`${cat}Long`] where cat="nonRep" in Tab 2
+    const nyObj = {
+      pmpuLong:    ny.pmpu_long   ?? 0,  pmpuShort:   ny.pmpu_short  ?? 0,
+      swapLong:    ny.swap_long   ?? 0,  swapShort:   ny.swap_short  ?? 0,
+      mmLong:      ny.mm_long     ?? 0,  mmShort:     ny.mm_short    ?? 0,
+      otherLong:   ny.other_long  ?? 0,  otherShort:  ny.other_short ?? 0,
+      nonRepLong:  ny.nr_long     ?? 0,  nonRepShort: ny.nr_short    ?? 0,
+    };
+    const ldnObj = {
+      pmpuLong:    ldn.pmpu_long  ?? 0,  pmpuShort:   ldn.pmpu_short  ?? 0,
+      swapLong:    ldn.swap_long  ?? 0,  swapShort:   ldn.swap_short  ?? 0,
+      mmLong:      ldn.mm_long    ?? 0,  mmShort:     ldn.mm_short    ?? 0,
+      otherLong:   ldn.other_long ?? 0,  otherShort:  ldn.other_short ?? 0,
+      nonRepLong:  ldn.nr_long    ?? 0,  nonRepShort: ldn.nr_short    ?? 0,
+    };
+
+    // tradersNY/LDN: lowercase keys used by Tab 5 dpCats loop as m.tr["nonrep"]
+    const tradersNY = {
+      pmpu:   ny.t_pmpu_long  ?? 0,
+      mm:     ny.t_mm_long    ?? 0,
+      swap:   ny.t_swap_long  ?? 0,
+      other:  ny.t_other_long ?? 0,
+      nonrep: ny.t_nr_long    ?? 0,
+    };
+    const tradersLDN = {
+      pmpu:   ldn.t_pmpu_long  ?? 0,
+      mm:     ldn.t_mm_long    ?? 0,
+      swap:   ldn.t_swap_long  ?? 0,
+      other:  ldn.t_other_long ?? 0,
+      nonrep: 0,  // ICE has no NR trader count
+    };
+
+    const pmpuShortMT_NY  = nyObj.pmpuShort  * ARABICA_MT_FACTOR;
+    const pmpuShortMT_LDN = ldnObj.pmpuShort * ROBUSTA_MT_FACTOR;
+    const efpMT = (ny.efp_ny ?? 0) * ARABICA_MT_FACTOR;
+
+    base.push({
+      id: i,
+      date: row.date,
+      priceNY, priceLDN, avgPrice_USD_Ton,
+      oiNY, oiLDN, totalOI,
+      spreadingTotal, outrightTotal,
+      weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
+      macroMarket, macroSofts,
+      ny: nyObj, ldn: ldnObj,
+      tradersNY, tradersLDN,
+      pmpuShortMT_NY, pmpuShortMT_LDN,
+      pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,
+      efpMT,
+      timeframe: "historical",
+    });
+  }
+
+  // Pass 2: timeframe buckets + 52-week rolling ranks
+  const n = base.length;
+  return base.map((d, i) => {
+    const timeframe =
+      i === n - 1                ? "current"    :
+      i === n - 2                ? "recent_1"   :
+      (i >= n - 6 && i <= n - 3) ? "recent_4"  :
+      (i >= n - 58 && i <= n - 7) ? "year"      :
+                                    "historical";
+
+    const slice  = base.slice(Math.max(0, i - 52), i + 1);
+    const prices = slice.map(s => s.priceNY);
+    const maxP   = Math.max(...prices);
+    const minP   = Math.min(...prices);
+    const net    = d.ny.mmLong - d.ny.mmShort;
+    const nets   = slice.map(s => s.ny.mmLong - s.ny.mmShort);
+    const maxNet = Math.max(...nets);
+    const minNet = Math.min(...nets);
+
+    return {
+      ...d,
+      timeframe,
+      priceRank: maxP !== minP ? ((d.priceNY - minP) / (maxP - minP)) * 100 : 50,
+      oiRank:    maxNet !== minNet ? ((net - minNet) / (maxNet - minNet)) * 100 : 50,
+    };
+  });
+}
+
 // ── Data generation ────────────────────────────────────────────────────────────
 function generateData() {
-  const weeks = 104;
+  const weeks = 1040; // ~20 years
   const data: any[] = [];
-  let priceNY = 165, priceLDN = 2450, oiNY = 210000, oiLDN = 130000;
+  let priceNY = 130, priceLDN = 1800, oiNY = 180000, oiLDN = 110000;
   let cumulativeNominal = 0, cumulativeMargin = 0;
 
   for (let i = 0; i < weeks; i++) {
-    const date = new Date(2023, 0, 1 + i * 7).toISOString().split("T")[0];
-    priceNY  += (Math.random() - 0.48) * 8;
-    priceLDN += (Math.random() - 0.48) * 60;
-    oiNY     += (Math.random() - 0.5)  * 5000;
-    oiLDN    += (Math.random() - 0.5)  * 3000;
+    // Start ~20 years ago (early 2006)
+    const date = new Date(2006, 0, 1 + i * 7).toISOString().split("T")[0];
+    priceNY  = Math.max(60,  Math.min(400, priceNY  + (Math.random() - 0.48) * 8));
+    priceLDN = Math.max(800, Math.min(5000, priceLDN + (Math.random() - 0.48) * 60));
+    oiNY     = Math.max(80000,  Math.min(380000, oiNY  + (Math.random() - 0.5) * 5000));
+    oiLDN    = Math.max(50000,  Math.min(250000, oiLDN + (Math.random() - 0.5) * 3000));
 
     const spreadingNY  = Math.floor(oiNY  * (0.18 + Math.random() * 0.04));
     const spreadingLDN = Math.floor(oiLDN * (0.10 + Math.random() * 0.03));
@@ -92,7 +237,10 @@ function generateData() {
     const ldnD = mkBreakdown(oiLDN, 150 + Math.floor(Math.random() * 40));
     const efp  = Math.floor(Math.random() * 1500);
 
-    const isRecent = i > weeks - 2, isMonth = i > weeks - 5, isYear = i > weeks - 53;
+    const isLast  = i === weeks - 1;
+    const isPrev1 = i === weeks - 2;
+    const isPrev4 = i >= weeks - 6 && i <= weeks - 3;
+    const isYear  = i >= weeks - 58 && i <= weeks - 7;
 
     data.push({
       id: i, date, priceNY, priceLDN, avgPrice_USD_Ton,
@@ -107,7 +255,7 @@ function generateData() {
       pmpuShortMT_LDN: ldnD.oi.pmpuShort * ROBUSTA_MT_FACTOR,
       pmpuShortMT:     (nyD.oi.pmpuShort * ARABICA_MT_FACTOR) + (ldnD.oi.pmpuShort * ROBUSTA_MT_FACTOR),
       efpMT: efp * ARABICA_MT_FACTOR,
-      timeframe: isRecent ? "current" : isMonth ? "month" : isYear ? "year" : "historical",
+      timeframe: isLast ? "current" : isPrev1 ? "recent_1" : isPrev4 ? "recent_4" : isYear ? "year" : "historical",
     });
   }
 
@@ -223,7 +371,19 @@ const CHART_STYLE = { backgroundColor: "#0f172a", borderColor: "#334155" };
 
 export default function CotDashboard() {
   const [step, setStep] = useState<Step>(1);
-  const data = useMemo(() => generateData(), []);
+  const [cotRows, setCotRows] = useState<any[] | null>(null);
+  const [cotError, setCotError] = useState(false);
+
+  useEffect(() => {
+    fetchCot()
+      .then(setCotRows)
+      .catch(() => setCotError(true));
+  }, []);
+
+  const data = useMemo(
+    () => (cotRows?.length ? transformApiData(cotRows) : generateData()),
+    [cotRows]
+  );
   const latest = data[data.length - 1];
 
   // Step 1
@@ -251,27 +411,49 @@ export default function CotDashboard() {
   const [dpMarkets, setDpMarkets] = useState({ ny: true, ldn: true });
   const [dpCats,    setDpCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: true });
 
-  const processedDpData = useMemo(() => data.map(d => {
-    const mkts = [
-      ...(dpMarkets.ny  ? [{ key: "ny",  mt: ARABICA_MT_FACTOR, tr: d.tradersNY  }] : []),
-      ...(dpMarkets.ldn ? [{ key: "ldn", mt: ROBUSTA_MT_FACTOR, tr: d.tradersLDN }] : []),
-    ];
-    let dpVol = 0, dpTraders = 0;
-    mkts.forEach(m => {
-      Object.keys(dpCats).forEach(cat => {
-        if ((dpCats as any)[cat]) {
-          dpVol     += ((d as any)[m.key][`${cat}Long`] + (d as any)[m.key][`${cat}Short`]) * m.mt;
-          dpTraders += (m.tr as any)[cat.toLowerCase()];
-        }
+  const processedDpData = useMemo(() => {
+    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
+      historical: [], year: [], recent_4: [], recent_1: [], current: [],
+    };
+    data.forEach(d => {
+      const mkts = [
+        ...(dpMarkets.ny  ? [{ key: "ny",  mt: ARABICA_MT_FACTOR, tr: d.tradersNY  }] : []),
+        ...(dpMarkets.ldn ? [{ key: "ldn", mt: ROBUSTA_MT_FACTOR, tr: d.tradersLDN }] : []),
+      ];
+      let dpLong = 0, dpShort = 0, dpTraders = 0;
+      mkts.forEach(m => {
+        Object.keys(dpCats).forEach(cat => {
+          if ((dpCats as any)[cat]) {
+            const oiKey = cat === "nonrep" ? "nonRep" : cat;
+            dpLong    += ((d as any)[m.key][`${oiKey}Long`])  * m.mt;
+            dpShort   += ((d as any)[m.key][`${oiKey}Short`]) * m.mt;
+            dpTraders += (m.tr as any)[cat];
+          }
+        });
       });
+      const tf = d.timeframe as string;
+      if (byTf[tf]) {
+        byTf[tf].push({ date: d.date, traders: dpTraders, oi: dpLong  });
+        byTf[tf].push({ date: d.date, traders: dpTraders, oi: -dpShort });
+      }
     });
-    return { ...d, dpVol, dpTraders };
-  }), [data, dpMarkets, dpCats]);
+    return byTf;
+  }, [data, dpMarkets, dpCats]);
 
   const recent52 = data.slice(-52);
 
   return (
     <div className="space-y-4">
+      {cotError && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs">
+          Live data unavailable — showing illustrative data
+        </div>
+      )}
+      {cotRows === null && !cotError && (
+        <div className="mb-3 h-2 rounded-full bg-slate-800 overflow-hidden">
+          <div className="h-full bg-slate-600 animate-pulse w-full" />
+        </div>
+      )}
       {/* Horizontal step nav */}
       <div className="flex items-center gap-1 flex-wrap border-b border-slate-700 pb-1">
         {NAV_STEPS.map(s => (
@@ -407,27 +589,43 @@ export default function CotDashboard() {
       {step === 5 && (
         <div>
           <SectionHeader icon="Droplets" title="5. Dry Powder Indicator"
-            subtitle="Visualizing min/max potential vs markets with significant participation upside." />
+            subtitle="Gross Long OI (positive) and Gross Short OI (negative) vs number of traders. Color = recency." />
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <MarketToggle markets={dpMarkets} set={k => setDpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
             <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+              <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis type="number" dataKey="dpTraders" name="Traders" stroke="#475569" fontSize={10} label={{ value: "Trader Count", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
-                <YAxis type="number" dataKey="dpVol" name="Volume (MT)" stroke="#475569" fontSize={10} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE} />
-                <Scatter data={processedDpData}>
-                  {processedDpData.map((entry, i) => (
-                    <Cell key={i} fill={
-                      entry.timeframe === "current"    ? "#ef4444" :
-                      entry.timeframe === "month"      ? "#f97316" :
-                      entry.timeframe === "year"       ? "#3b82f6" : "#334155"
-                    } fillOpacity={entry.timeframe === "historical" ? 0.2 : 0.8} />
-                  ))}
-                </Scatter>
+                <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
+                  label={{ value: "# traders", position: "insideBottom", offset: -10, fill: "#475569", fontSize: 10 }} />
+                <YAxis type="number" dataKey="oi" name="OI" stroke="#475569" fontSize={10}
+                  tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
+                  label={{ value: "OI (k ton equivalent)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
+                <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
+                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
+                  formatter={(v: any, name: string) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
+                  content={(props: any) => {
+                    const items = [...(props.payload ?? [])].reverse();
+                    return (
+                      <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 10, paddingTop: 8 }}>
+                        {items.map((e: any, i: number) => (
+                          <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, color: "#94a3b8" }}>
+                            <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: e.color, display: "inline-block" }} />
+                            {e.value}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
+                <Scatter name="Historic"   data={processedDpData.historical} fill="#bfdbfe" fillOpacity={0.18} size={12}  />
+                <Scatter name="Prior Y"    data={processedDpData.year}       fill="#3b82f6" fillOpacity={0.45} size={28}  />
+                <Scatter name="Prior 4W"   data={processedDpData.recent_4}   fill="#eab308" fillOpacity={0.9}  size={78}  />
+                <Scatter name="Prior week" data={processedDpData.recent_1}   fill="#c2410c" fillOpacity={1.0}  size={154} />
+                <Scatter name="Last CoT"   data={processedDpData.current}    fill="#ef4444" fillOpacity={1.0}  size={314} />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
@@ -439,18 +637,16 @@ export default function CotDashboard() {
         <div>
           <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
             subtitle="Mapping the convergence of Price Rank and Net Positioning Rank." />
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px] relative">
-            <div className="absolute inset-0 pointer-events-none grid grid-cols-2 grid-rows-2 opacity-10 m-10">
-              <div className="border border-slate-700 bg-slate-500/20" />
-              <div className="border border-slate-700 bg-red-500/40 flex items-center justify-center"><span className="text-[9px] font-bold text-red-400">OVERBOUGHT</span></div>
-              <div className="border border-slate-700 bg-emerald-500/40 flex items-center justify-center"><span className="text-[9px] font-bold text-emerald-400">OVERSOLD</span></div>
-              <div className="border border-slate-700 bg-slate-500/20" />
-            </div>
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                 <XAxis type="number" dataKey="oiRank"    domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Net Positioning Rank (%)", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
                 <YAxis type="number" dataKey="priceRank" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Price Rank (%)", angle: -90, position: "insideLeft", fill: "#475569", fontSize: 10 }} />
+                <ReferenceArea x1={0}  x2={25}  y1={0}  y2={25}  fill="#10b981" fillOpacity={0.08} stroke="#10b981" strokeOpacity={0.25}
+                  label={{ value: "OVERSOLD", position: "insideTopRight", fill: "#10b981", fontSize: 9, fontWeight: "bold" }} />
+                <ReferenceArea x1={75} x2={100} y1={75} y2={100} fill="#ef4444" fillOpacity={0.08} stroke="#ef4444" strokeOpacity={0.25}
+                  label={{ value: "OVERBOUGHT", position: "insideBottomLeft", fill: "#ef4444", fontSize: 9, fontWeight: "bold" }} />
                 <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
                 <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
                 <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE} />
