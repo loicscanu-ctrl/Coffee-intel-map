@@ -20,7 +20,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
         condition: service_healthy
@@ -50,7 +50,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.scraper
     environment:
-      DATABASE_URL: postgresql://coffee:coffee@db:5432/coffee_intel
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
         condition: service_healthy
