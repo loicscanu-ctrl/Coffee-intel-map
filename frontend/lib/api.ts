@@ -26,3 +26,9 @@ export async function fetchNews(category?: string) {
   if (!res.ok) throw new Error("Failed to fetch news");
   return res.json();
 }
+
+export async function fetchFreight() {
+  const res = await fetch(`${API_URL}/api/freight`);
+  if (!res.ok) throw new Error("Failed to fetch freight rates");
+  return res.json();
+}

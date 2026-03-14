@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
+import { fetchFreight } from "@/lib/api";
 
 type FreightRoute = {
   id: string;
@@ -32,8 +33,7 @@ export default function FreightPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/freight")
-      .then((r) => r.json())
+    fetchFreight()
       .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
