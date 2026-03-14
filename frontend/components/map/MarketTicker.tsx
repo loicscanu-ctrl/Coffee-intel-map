@@ -2,9 +2,12 @@
 import { useEffect, useState } from "react";
 import { fetchNews } from "@/lib/api";
 
+type TickerCategory = "futures" | "physical" | "fx";
+
 interface TickerItem {
   label: string;
   value: string;
+  category: TickerCategory;
 }
 
 const MONTH_CODES: Record<string, string> = {
@@ -127,7 +130,12 @@ function parseTickerItems(items: any[]): TickerItem[] {
         }
       }
 
-      return { label, value };
+      const category: TickerCategory =
+        item.tags?.includes("futures") ? "futures" :
+        item.tags?.includes("fx")      ? "fx" :
+        "physical";
+
+      return { label, value, category };
     });
 }
 
@@ -150,9 +158,32 @@ export default function MarketTicker() {
 
   if (tickers.length === 0) return null;
 
-  const tickerText = tickers
-    .map((t) => `${t.label}: ${t.value}`)
-    .join("   ·   ");
+  const COLOR: Record<TickerCategory, string> = {
+    futures:  "text-yellow-400",
+    physical: "text-yellow-600",
+    fx:       "text-sky-400",
+  };
+
+  const ORDER: TickerCategory[] = ["futures", "physical", "fx"];
+
+  const groups = ORDER
+    .map((cat) => tickers.filter((t) => t.category === cat))
+    .filter((g) => g.length > 0);
+
+  const tickerContent = groups.flatMap((group, gi) => {
+    const items = group.map((t, i) => (
+      <span key={`${t.label}-${i}`} className={`${COLOR[t.category]} font-mono`}>
+        {t.label}: {t.value}
+        {i < group.length - 1 && <span className="text-slate-500">{"   ·   "}</span>}
+      </span>
+    ));
+    if (gi < groups.length - 1) {
+      items.push(
+        <span key={`sep-${gi}`} className="text-slate-500 mx-3">|</span>
+      );
+    }
+    return items;
+  });
 
   return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 overflow-hidden flex items-center shrink-0">
@@ -171,8 +202,8 @@ export default function MarketTicker() {
           if (track) track.style.animationPlayState = "running";
         }}
       >
-        <span className="ticker-track text-xs text-slate-300 font-mono">
-          {tickerText}
+        <span className="ticker-track text-xs whitespace-nowrap">
+          {tickerContent}
         </span>
       </div>
     </div>
