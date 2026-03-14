@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchNews } from "@/lib/api";
+import CotDashboard from "@/components/futures/CotDashboard";
 
 interface Contract {
   contract: string;
@@ -554,7 +555,7 @@ function QuotationTab({ contracts = [], vndPrice, usdvnd }: { contracts?: Contra
 export default function FuturesPage() {
   const [allItems, setAllItems] = useState<NewsItem[]>([]);
   const [loading, setLoading]   = useState(true);
-  const [tab, setTab]           = useState<"exchange" | "quotation">("exchange");
+  const [tab, setTab]           = useState<"exchange" | "quotation" | "cot">("exchange");
 
   useEffect(() => {
     fetchNews()
@@ -579,7 +580,7 @@ export default function FuturesPage() {
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-slate-700">
         <h1 className="text-lg font-bold text-white mr-4">Futures</h1>
-        {(["exchange", "quotation"] as const).map(t => (
+        {(["exchange", "quotation", "cot"] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -622,6 +623,9 @@ export default function FuturesPage() {
           usdvnd={usdvnd}
         />
       )}
+
+      {/* CoT tab */}
+      {tab === "cot" && <CotDashboard />}
     </div>
   );
 }
