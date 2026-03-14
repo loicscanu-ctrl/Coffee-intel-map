@@ -16,11 +16,11 @@ File: `C:\Users\Loic Scanu\OneDrive - Tuan Loc Commodities\TradeTeam\COT report.
 
 | Sheet | Use | Rows | Date range |
 |-------|-----|------|------------|
-| `NY COT FO` | NY Arabica OI + trader counts | 967 | 2007-09-04 → 2026-03-10 |
-| `LDN COT FO` | LDN Robusta OI + trader counts | 598 | 2014-09-30 → 2026-03-10 |
+| `NY COT` | NY Arabica OI + trader counts (futures only) | ~967 | 2007-09-04 → 2026-03-10 |
+| `LDN COT` | LDN Robusta OI + trader counts (futures only) | ~598 | 2014-09-30 → 2026-03-10 |
 | `Other` | Daily prices, OI, volume, EFP, spread vol | 14 746 | 1973 → present |
 
-### `NY COT FO` / `LDN COT FO` column mapping (0-indexed, row 1 = header)
+### `NY COT` / `LDN COT` column mapping (0-indexed, row 1 = header; futures-only sheets)
 
 | Col (NY) | Col (LDN) | Excel header | DB field |
 |----------|-----------|-------------|----------|
@@ -183,8 +183,8 @@ DATABASE_URL=postgresql://... python -m seed.import_cot_excel \
 **Logic:**
 1. Read `Other` sheet using openpyxl `min_row=3` (rows 1–2 are headers) → build `prices: dict[date, dict]` keyed by `.date()`, values contain all Other-sheet fields (price_ny, price_ldn, structure_ny/ldn, exch_oi, vol, efp, spread_vol)
 2. Sort `prices` keys to allow binary-search for "most recent prior date" lookups
-3. Read `NY COT FO` using `min_row=2` (row 1 is header); skip rows where `row[0]` is None or not a datetime
-4. Read `LDN COT FO` using `min_row=2`; same skip condition
+3. Read `NY COT` using `min_row=2` (row 1 is header); skip rows where `row[0]` is None or not a datetime
+4. Read `LDN COT` using `min_row=2`; same skip condition
 5. For each row in each sheet:
    - Parse date from `row[0].date()`
    - Extract OI + trader fields per column mapping table above (column offsets are 0-indexed from the row tuple returned by openpyxl)
@@ -534,4 +534,4 @@ return base.map((d, i) => {
 
 - `backend/tests/test_cot_model.py`: upsert insert + update for `CotWeekly`; verify LDN row has `t_nr_long = None`
 - `backend/tests/test_cot_route.py`: empty DB returns `[]`; seeded rows produce correct merged structure with `nr_long` field present in JSON; `after` param filters with exclusive `>` comparison
-- Manual: run import script against local Docker DB, verify `SELECT COUNT(*) FROM cot_weekly` matches expected (967 NY + 598 LDN = 1565)
+- Manual: run import script against local Docker DB, verify `SELECT COUNT(*) FROM cot_weekly` matches expected row counts from `NY COT` + `LDN COT` sheets
