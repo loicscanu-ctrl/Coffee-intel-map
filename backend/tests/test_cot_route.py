@@ -95,3 +95,8 @@ def test_rows_sorted_ascending(client, session):
     resp = client.get("/api/cot")
     dates = [r["date"] for r in resp.json()]
     assert dates == sorted(dates)
+
+
+def test_after_param_invalid_date_returns_400(client):
+    resp = client.get("/api/cot?after=not-a-date")
+    assert resp.status_code == 400

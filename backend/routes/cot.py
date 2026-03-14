@@ -1,7 +1,7 @@
 # backend/routes/cot.py
 from datetime import date as DateType
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import CotWeekly
@@ -44,7 +44,10 @@ def get_cot(
 ):
     query = db.query(CotWeekly).order_by(CotWeekly.date.asc())
     if after:
-        cutoff = DateType.fromisoformat(after)
+        try:
+            cutoff = DateType.fromisoformat(after)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid 'after' date format. Use YYYY-MM-DD.")
         query = query.filter(CotWeekly.date > cutoff)
 
     # Group in Python — too many columns for SQL aggregation
