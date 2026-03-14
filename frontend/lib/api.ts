@@ -32,3 +32,12 @@ export async function fetchFreight() {
   if (!res.ok) throw new Error("Failed to fetch freight rates");
   return res.json();
 }
+
+export async function fetchCot(after?: string): Promise<any[]> {
+  const url = after
+    ? `${API_URL}/api/cot?after=${after}`
+    : `${API_URL}/api/cot`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch CoT data");
+  return res.json();
+}
