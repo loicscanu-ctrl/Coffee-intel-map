@@ -157,7 +157,7 @@ class CotWeekly(Base):
 | File | Action | Purpose |
 |------|--------|---------|
 | `backend/models.py` | Modify | Add `CotWeekly` model |
-| `backend/seed/import_cot_excel.py` | Create | One-time Excel → DB import |
+| `backend/import_cot_excel.py` | Create | One-time Excel → DB import |
 | `backend/routes/cot.py` | Create | `GET /api/cot` endpoint |
 | `backend/main.py` | Modify | Register `/api/cot` router |
 | `backend/scraper/sources/futures.py` | Modify | Also upsert to `cot_weekly` after weekly parse |
@@ -171,7 +171,8 @@ class CotWeekly(Base):
 
 Usage:
 ```bash
-DATABASE_URL=postgresql://... python -m seed.import_cot_excel \
+cd backend
+DATABASE_URL=postgresql://... python import_cot_excel.py \
   --file "C:/Users/Loic Scanu/OneDrive - Tuan Loc Commodities/TradeTeam/COT report.xlsx"
 ```
 
