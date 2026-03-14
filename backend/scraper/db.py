@@ -70,3 +70,21 @@ def upsert_freight_rate(index_code: str, rate_date, rate: float):
         raise  # Let the caller (scraper loop) decide how to handle failures
     finally:
         db.close()
+
+
+def upsert_cot_weekly(market: str, report_date, fields: dict):
+    from models import CotWeekly
+    db = get_session()
+    try:
+        existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
+        if existing:
+            for k, v in fields.items():
+                setattr(existing, k, v)
+        else:
+            db.add(CotWeekly(date=report_date, market=market, **fields))
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()

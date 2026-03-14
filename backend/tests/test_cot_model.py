@@ -43,3 +43,47 @@ def test_cot_weekly_ldn_nr_nullable(db):
     result = db.query(CotWeekly).filter_by(market="ldn").first()
     assert result.t_nr_long is None
     assert result.t_nr_short is None
+
+
+def test_upsert_cot_weekly_insert(scraper_db):
+    """upsert_cot_weekly inserts a new record when none exists."""
+    from scraper.db import upsert_cot_weekly, get_session
+    upsert_cot_weekly("ny", date(2026, 3, 11), {"oi_total": 150000, "mm_long": 25000})
+    db = get_session()
+    try:
+        result = db.query(CotWeekly).filter_by(market="ny").first()
+        assert result is not None
+        assert result.oi_total == 150000
+        assert result.mm_long == 25000
+    finally:
+        db.close()
+
+
+def test_upsert_cot_weekly_update(scraper_db):
+    """upsert_cot_weekly updates existing record on duplicate (date, market)."""
+    from scraper.db import upsert_cot_weekly, get_session
+    upsert_cot_weekly("ny", date(2026, 3, 11), {"oi_total": 150000})
+    upsert_cot_weekly("ny", date(2026, 3, 11), {"oi_total": 999999})
+    db = get_session()
+    try:
+        rows = db.query(CotWeekly).filter_by(market="ny").all()
+        assert len(rows) == 1
+        assert rows[0].oi_total == 999999
+    finally:
+        db.close()
+
+
+def test_upsert_cot_weekly_ldn_nr_none(scraper_db):
+    """LDN upsert with t_nr_long=None stores None, not 0."""
+    from scraper.db import upsert_cot_weekly, get_session
+    upsert_cot_weekly("ldn", date(2026, 3, 11), {
+        "oi_total": 80000,
+        "t_nr_long": None,
+        "t_nr_short": None,
+    })
+    db = get_session()
+    try:
+        result = db.query(CotWeekly).filter_by(market="ldn").first()
+        assert result.t_nr_long is None
+    finally:
+        db.close()
