@@ -115,3 +115,31 @@ class CotWeekly(Base):
     __table_args__ = (
         UniqueConstraint("date", "market", name="uq_cot_date_market"),
     )
+
+
+class CommodityCot(Base):
+    __tablename__ = "commodity_cot"
+
+    id:         Mapped[int]      = mapped_column(primary_key=True)
+    date:       Mapped[date]     = mapped_column(Date, nullable=False, index=True)
+    symbol:     Mapped[str]      = mapped_column(String(20), nullable=False)
+    mm_long:    Mapped[int | None] = mapped_column(Integer)
+    mm_short:   Mapped[int | None] = mapped_column(Integer)
+    mm_spread:  Mapped[int | None] = mapped_column(Integer)
+    oi_total:   Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("date", "symbol", name="uq_commodity_cot_date_symbol"),)
+
+
+class CommodityPrice(Base):
+    __tablename__ = "commodity_prices"
+
+    id:          Mapped[int]        = mapped_column(primary_key=True)
+    date:        Mapped[date]       = mapped_column(Date, nullable=False, index=True)
+    symbol:      Mapped[str]        = mapped_column(String(20), nullable=False)
+    close_price: Mapped[float | None] = mapped_column(Float)
+    currency:    Mapped[str]        = mapped_column(String(3), default="USD")
+    created_at:  Mapped[datetime]   = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("date", "symbol", name="uq_commodity_price_date_symbol"),)
