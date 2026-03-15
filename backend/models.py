@@ -139,7 +139,7 @@ class CommodityPrice(Base):
     date:        Mapped[date]       = mapped_column(Date, nullable=False, index=True)
     symbol:      Mapped[str]        = mapped_column(String(20), nullable=False)
     close_price: Mapped[float | None] = mapped_column(Float)
-    currency:    Mapped[str]        = mapped_column(String(3), default="USD")
+    currency:    Mapped[str]        = mapped_column(String(3), nullable=False, default="USD")
     created_at:  Mapped[datetime]   = mapped_column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("date", "symbol", name="uq_commodity_price_date_symbol"),)
