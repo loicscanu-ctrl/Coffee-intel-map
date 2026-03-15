@@ -356,7 +356,7 @@ def _fetch_yfinance_prices(symbols_dates: list) -> dict:
     results = {}
     for ticker, pairs in ticker_map.items():
         dates = sorted({dt for _, dt in pairs})
-        start = min(dates) - timedelta(days=3)
+        start = min(dates) - timedelta(days=7)
         end   = max(dates) + timedelta(days=1)
         try:
             hist = yf.download(ticker, start=start.isoformat(), end=end.isoformat(),
@@ -388,7 +388,8 @@ def _fetch_and_upsert(db) -> None:
         cftc_df = _download_cftc_df(year)
         if len(cftc_df) == 0:
             raise ValueError("empty")
-    except Exception:
+    except Exception as e:
+        print(f"[macro_cot] CFTC {year} unavailable ({e}), falling back to {year - 1}", file=sys.stderr)
         cftc_df = _download_cftc_df(year - 1)
 
     # Download ICE Europe — same fallback
@@ -396,7 +397,8 @@ def _fetch_and_upsert(db) -> None:
         ice_df = _download_ice_df(year)
         if len(ice_df) == 0:
             raise ValueError("empty")
-    except Exception:
+    except Exception as e:
+        print(f"[macro_cot] ICE {year} unavailable ({e}), falling back to {year - 1}", file=sys.stderr)
         ice_df = _download_ice_df(year - 1)
 
     cot_data = {}
