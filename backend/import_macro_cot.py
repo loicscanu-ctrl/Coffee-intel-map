@@ -8,11 +8,9 @@
 
 import os
 import sys
-import zipfile
 from datetime import date, timedelta
 
 import pandas as pd
-import requests
 import yfinance as yf
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -158,6 +156,11 @@ def main():
             upsert_commodity_cot(db, sym, report_date, fields)
             inserted_cot += 1
 
+        # Build {sym -> set of report_dates} from the COT rows we collected
+        sym_dates: dict[str, set] = {}
+        for sym, report_date, _ in cot_rows:
+            sym_dates.setdefault(sym, set()).add(report_date)
+
         inserted_prices = 0
         processed_proxies: set = set()
 
@@ -173,7 +176,10 @@ def main():
 
             elif src == "proxy":
                 proxy_sym = spec["price_proxy"]
-                proxy_price = price_cache.get((proxy_sym, report_date))
+                # Find the proxy symbol's COT date nearest to our report_date
+                proxy_dates = sym_dates.get(proxy_sym, set())
+                proxy_date = min(proxy_dates, key=lambda d: abs((d - report_date).days)) if proxy_dates else report_date
+                proxy_price = price_cache.get((proxy_sym, proxy_date))
                 if proxy_price is not None:
                     converted = proxy_price * spec["proxy_to_usd_per_mt_factor"]
                     upsert_commodity_price(db, sym, report_date, converted)
