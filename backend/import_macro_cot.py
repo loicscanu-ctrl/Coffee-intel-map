@@ -6,7 +6,6 @@
 #   cd backend
 #   DATABASE_URL=postgresql://... python import_macro_cot.py
 
-import io
 import os
 import sys
 import zipfile
