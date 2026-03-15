@@ -8,20 +8,28 @@ def upsert_commodity_cot(db, symbol: str, report_date, fields: dict) -> None:
     """
     from models import CommodityCot
     existing = db.query(CommodityCot).filter_by(date=report_date, symbol=symbol).first()
-    if existing:
-        for k, v in fields.items():
-            setattr(existing, k, v)
-    else:
-        db.add(CommodityCot(date=report_date, symbol=symbol, **fields))
-    db.commit()
+    try:
+        if existing:
+            for k, v in fields.items():
+                setattr(existing, k, v)
+        else:
+            db.add(CommodityCot(date=report_date, symbol=symbol, **fields))
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 
 def upsert_commodity_price(db, symbol: str, report_date, close_price_usd: float) -> None:
     """Insert or update a commodity_prices row. Price must already be in USD."""
     from models import CommodityPrice
     existing = db.query(CommodityPrice).filter_by(date=report_date, symbol=symbol).first()
-    if existing:
-        existing.close_price = close_price_usd
-    else:
-        db.add(CommodityPrice(date=report_date, symbol=symbol, close_price=close_price_usd))
-    db.commit()
+    try:
+        if existing:
+            existing.close_price = close_price_usd
+        else:
+            db.add(CommodityPrice(date=report_date, symbol=symbol, close_price=close_price_usd))
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
