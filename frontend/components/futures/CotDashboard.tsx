@@ -534,6 +534,11 @@ export default function CotDashboard() {
     return [Math.floor(mn - pad), Math.ceil(mx + pad)];
   }, [processedStructData]);
 
+  const macroChartData = useMemo(
+    () => transformMacroData(macroData, macroToggle),
+    [macroData, macroToggle]
+  );
+
   // Step 3
   const [cpMarkets, setCpMarkets] = useState({ ny: true, ldn: true });
   const [cpUnit,    setCpUnit]    = useState<CpUnit>("contracts");
@@ -650,7 +655,7 @@ export default function CotDashboard() {
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={transformMacroData(macroData, macroToggle)}
+              <AreaChart data={macroChartData}
                 margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
@@ -675,11 +680,11 @@ export default function CotDashboard() {
 
           {/* Panel B — Coffee % of Total */}
           <div style={{ marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: "#9ca3af" }}>Coffee % of Total Gross Exposure</span>
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>Coffee % of Total Gross Exposure (gross basis, independent of toggle)</span>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={transformMacroData(macroData, macroToggle)}
+              <LineChart data={macroChartData}
                 margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
