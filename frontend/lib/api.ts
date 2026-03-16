@@ -41,3 +41,31 @@ export async function fetchCot(after?: string): Promise<any[]> {
   if (!res.ok) throw new Error("Failed to fetch CoT data");
   return res.json();
 }
+
+export interface MacroCotEntry {
+  symbol: string;
+  sector: "hard" | "grains" | "meats" | "softs" | "micros";
+  name: string;
+  mm_long: number;
+  mm_short: number;
+  mm_spread: number;
+  oi_total: number;
+  close_price: number | null;
+  gross_exposure_usd: number | null;
+  net_exposure_usd: number | null;
+  initial_margin_usd: number;
+}
+
+export interface MacroCotWeek {
+  date: string;
+  commodities: MacroCotEntry[];
+}
+
+export async function fetchMacroCot(after?: string): Promise<MacroCotWeek[]> {
+  const url = after
+    ? `${API_URL}/api/macro-cot?after=${after}`
+    : `${API_URL}/api/macro-cot`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`macro-cot fetch failed: ${res.status}`);
+  return res.json();
+}
