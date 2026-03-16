@@ -13,7 +13,10 @@ router = APIRouter(prefix="/api/macro-cot", tags=["macro-cot"])
 
 
 def _to_contract_value(price: float, spec: dict) -> float:
-    """All price_unit variants resolve to price × contract_unit (all already in USD per unit)."""
+    """All price_unit variants resolve to price × contract_unit.
+    Prices stored in commodity_prices are always in USD per base unit — proxy-sourced
+    prices are converted at scrape time, so the formula is uniform across all symbols.
+    """
     return price * spec["contract_unit"]
 
 
@@ -39,7 +42,7 @@ def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
 
 @router.get("")
 def get_macro_cot(
-    after: Optional[str] = Query(None, description="ISO date lower bound YYYY-MM-DD"),
+    after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),
     db: Session = Depends(get_db),
 ):
     if after:
