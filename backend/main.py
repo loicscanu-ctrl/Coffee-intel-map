@@ -7,6 +7,7 @@ from routes.news import router as news_router
 from routes.map import router as map_router
 from routes.freight import router as freight_router
 from routes.cot import router as cot_router
+from routes.macro_cot import router as macro_cot_router
 
 app = FastAPI(title="Coffee Intel API")
 
@@ -21,6 +22,7 @@ app.include_router(news_router)
 app.include_router(map_router)
 app.include_router(freight_router)
 app.include_router(cot_router)
+app.include_router(macro_cot_router)
 
 @app.on_event("startup")
 def startup():
