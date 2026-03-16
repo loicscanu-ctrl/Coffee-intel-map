@@ -37,34 +37,44 @@ const MARGIN_SPREAD     = 1200;
 const CENTS_LB_TO_USD_TON = 22.0462;
 
 // ── Macro COT helpers ──────────────────────────────────────────────────────────
-const SECTORS = ["hard", "grains", "meats", "softs", "micros"] as const;
+const SECTORS = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;
 const SECTOR_COLORS: Record<string, string> = {
-  hard:   "#6366f1",
+  energy: "#f97316",
+  metals: "#6366f1",
   grains: "#f59e0b",
   meats:  "#ef4444",
   softs:  "#10b981",
   micros: "#8b5cf6",
 };
+const ENERGY_SYMBOLS = new Set(["wti", "brent", "natgas", "heating_oil", "rbob", "lsgo"]);
 
 function transformMacroData(
   weeks: MacroCotWeek[],
-  mode: "gross" | "net" | "margin"
-): { date: string; hard: number; grains: number; meats: number; softs: number; micros: number; coffeeShare: number | null }[] {
-  return weeks.map(week => {
-    const sectorTotals: Record<string, number> = { hard: 0, grains: 0, meats: 0, softs: 0, micros: 0 };
+  mode: "gross" | "gross_long" | "gross_short" | "net" | "margin"
+): { date: string; energy: number; metals: number; grains: number; meats: number; softs: number; micros: number; coffeeShare: number | null }[] {
+  return weeks.filter(w => w.date !== "2025-11-11").map(week => {
+    const sectorTotals: Record<string, number> = { energy: 0, metals: 0, grains: 0, meats: 0, softs: 0, micros: 0 };
     let coffeeGross = 0;
     let totalGross  = 0;
     let hasCoffeePrice = true;
 
     for (const c of week.commodities) {
+      const g = c.gross_exposure_usd;
+      const n = c.net_exposure_usd;
       const val =
-        mode === "gross"  ? c.gross_exposure_usd  :
-        mode === "net"    ? c.net_exposure_usd     :
+        mode === "gross"       ? g :
+        mode === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
+        mode === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
+        mode === "net"         ? n :
         c.initial_margin_usd;
 
       if (val == null) continue;
       const valB = val / 1e9;
-      sectorTotals[c.sector] = (sectorTotals[c.sector] ?? 0) + valB;
+      // Split "hard" into energy vs metals
+      const displaySector = c.sector === "hard"
+        ? (ENERGY_SYMBOLS.has(c.symbol) ? "energy" : "metals")
+        : c.sector;
+      sectorTotals[displaySector] = (sectorTotals[displaySector] ?? 0) + valB;
 
       if (c.symbol === "arabica" || c.symbol === "robusta") {
         if (c.gross_exposure_usd == null) hasCoffeePrice = false;
@@ -78,15 +88,19 @@ function transformMacroData(
       : null;
 
     return {
-      date: week.date,
-      hard:   sectorTotals.hard   ?? 0,
+      date:   week.date,
+      energy: sectorTotals.energy ?? 0,
+      metals: sectorTotals.metals ?? 0,
       grains: sectorTotals.grains ?? 0,
       meats:  sectorTotals.meats  ?? 0,
       softs:  sectorTotals.softs  ?? 0,
       micros: sectorTotals.micros ?? 0,
       coffeeShare,
     };
-  });
+  }).filter(row =>
+    Math.abs(row.energy) + Math.abs(row.metals) + Math.abs(row.grains) +
+    Math.abs(row.meats) + Math.abs(row.softs) + Math.abs(row.micros) > 0
+  );
 }
 
 // ── Real data transform ─────────────────────────────────────────────────────
@@ -481,7 +495,7 @@ export default function CotDashboard() {
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);
-  const [macroToggle, setMacroToggle] = useState<"gross" | "net" | "margin">("gross");
+  const [macroToggle, setMacroToggle] = useState<"gross" | "gross_long" | "gross_short" | "net" | "margin">("gross");
 
   useEffect(() => {
     fetchCot()
@@ -539,6 +553,51 @@ export default function CotDashboard() {
     () => transformMacroData(macroData, macroToggle),
     [macroData, macroToggle]
   );
+
+  const macroNetSplitData = useMemo(() => {
+    if (macroToggle !== "net") return null;
+    return macroChartData.map(row => {
+      const result: Record<string, any> = { date: row.date };
+      for (const s of SECTORS) {
+        const v = (row as any)[s] as number;
+        result[`${s}_pos`] = v > 0 ? v : 0;
+        result[`${s}_neg`] = v < 0 ? v : 0;
+      }
+      return result;
+    });
+  }, [macroChartData, macroToggle]);
+
+  const macroYDomain = useMemo(() => {
+    if (macroToggle !== "net" || !macroChartData.length) return undefined;
+    const allVals = macroChartData.flatMap(d =>
+      SECTORS.map(s => (d as any)[s] as number)
+    );
+    const min = Math.min(...allVals);
+    const max = Math.max(...allVals);
+    const pad = Math.max(Math.abs(min), Math.abs(max)) * 0.15;
+    return [+(min - pad).toFixed(2), +(max + pad).toFixed(2)] as [number, number];
+  }, [macroChartData, macroToggle]);
+
+  const macroKpis = useMemo(() => {
+    if (!macroData.length) return null;
+    const latestWeek = macroData[macroData.length - 1];
+    let grossLong = 0, grossShort = 0, totalMargin = 0;
+    for (const c of latestWeek.commodities) {
+      const g = c.gross_exposure_usd ?? 0;
+      const n = c.net_exposure_usd   ?? 0;
+      grossLong   += (g + n) / 2;
+      grossShort  += (g - n) / 2;
+      totalMargin += c.initial_margin_usd;
+    }
+    return {
+      totalGross:  grossLong + grossShort,
+      grossLong,
+      grossShort,
+      netExp:      grossLong - grossShort,
+      totalMargin,
+      date:        latestWeek.date,
+    };
+  }, [macroData]);
 
   // Step 3
   const [cpMarkets, setCpMarkets] = useState({ ny: true, ldn: true });
@@ -639,21 +698,56 @@ export default function CotDashboard() {
           )}
 
           {/* Toggle */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-            {(["gross", "net", "margin"] as const).map(m => (
-              <button
-                key={m}
-                onClick={() => setMacroToggle(m)}
-                style={{
-                  padding: "4px 12px", borderRadius: 4, border: "1px solid #374151",
-                  background: macroToggle === m ? "#4f46e5" : "#1f2937",
-                  color: "#f9fafb", cursor: "pointer", fontSize: 12,
-                }}
-              >
-                {m === "gross" ? "Gross Exposure" : m === "net" ? "Net Exposure" : "Initial Margin"}
-              </button>
-            ))}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+            {(["gross", "gross_long", "gross_short", "net", "margin"] as const).map(m => {
+              const labels: Record<string, string> = {
+                gross:       "Total Gross",
+                gross_long:  "Gross Long",
+                gross_short: "Gross Short",
+                net:         "Net Exposure",
+                margin:      "Initial Margin",
+              };
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMacroToggle(m)}
+                  style={{
+                    padding: "4px 12px", borderRadius: 4, border: "1px solid #374151",
+                    background: macroToggle === m ? "#4f46e5" : "#1f2937",
+                    color: "#f9fafb", cursor: "pointer", fontSize: 12,
+                  }}
+                >
+                  {labels[m]}
+                </button>
+              );
+            })}
           </div>
+
+          {/* KPI Toddles */}
+          {macroKpis && (() => {
+            const fmtB = (v: number) => `$${(v / 1e9).toFixed(1)}B`;
+            const kpis = [
+              { label: "Total Gross Exposure", value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
+              { label: "Gross Long Exposure",  value: fmtB(macroKpis.grossLong),   color: "#10b981" },
+              { label: "Gross Short Exposure", value: fmtB(macroKpis.grossShort),  color: "#ef4444" },
+              { label: "Net Exposure",         value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Initial Margin",       value: fmtB(macroKpis.totalMargin), color: "#f59e0b" },
+            ];
+            return (
+              <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                {kpis.map(k => (
+                  <div key={k.label} style={{
+                    flex: "1 1 140px", background: "#111827", border: "1px solid #1f2937",
+                    borderRadius: 8, padding: "10px 14px",
+                  }}>
+                    <div style={{ fontSize: 10, color: "#6b7280", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>{k.label}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: k.color, fontFamily: "monospace" }}>{k.value}</div>
+                    <div style={{ fontSize: 9, color: "#4b5563", marginTop: 2 }}>{macroKpis.date}</div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* Panel A — MM Exposure by Sector */}
           <div style={{ marginBottom: 8 }}>
@@ -661,52 +755,338 @@ export default function CotDashboard() {
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={macroChartData}
-                margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+              <AreaChart
+                data={macroToggle === "net" && macroNetSplitData ? macroNetSplitData : macroChartData}
+                margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
                   tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                 <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  tickFormatter={(v: number) => `$${v.toFixed(0)}B`} width={52} />
-                <Tooltip
-                  contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                  formatter={(v: any, name: any) => [`$${(v as number).toFixed(1)}B`, name]}
-                  labelFormatter={(l: any) => `Week: ${l}`}
-                />
+                  tickFormatter={(v: number) => `$${v.toFixed(0)}B`} width={52}
+                  domain={macroYDomain} />
+                {macroToggle === "net" && <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />}
+                {macroToggle === "net" ? (
+                  <Tooltip
+                    contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                    content={(props: any) => {
+                      if (!props.active || !props.payload) return null;
+                      const byLabel: Record<string, { value: number; color: string }> = {};
+                      for (const entry of props.payload) {
+                        const key = String(entry.dataKey);
+                        const sector = key.replace("_pos", "").replace("_neg", "");
+                        const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                        if (!byLabel[label]) byLabel[label] = { value: 0, color: SECTOR_COLORS[sector] };
+                        byLabel[label].value += entry.value || 0;
+                      }
+                      return (
+                        <div style={{ background: "#111827", border: "1px solid #374151", padding: "6px 10px", fontSize: 11, borderRadius: 4 }}>
+                          <p style={{ color: "#9ca3af", margin: "0 0 4px" }}>Week: {props.label}</p>
+                          {Object.entries(byLabel)
+                            .filter(([, d]) => Math.abs(d.value) >= 0.001)
+                            .sort((a, b) => b[1].value - a[1].value)
+                            .map(([label, d]) => (
+                              <p key={label} style={{ color: d.color, margin: "2px 0" }}>
+                                {label}: ${d.value.toFixed(1)}B
+                              </p>
+                            ))}
+                        </div>
+                      );
+                    }}
+                  />
+                ) : (
+                  <Tooltip
+                    contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                    formatter={(v: any, name: any) => [`$${(v as number).toFixed(1)}B`, name]}
+                    labelFormatter={(l: any) => `Week: ${l}`}
+                  />
+                )}
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                {SECTORS.map(sector => (
-                  <Area key={sector} type="monotone" dataKey={sector}
-                    stackId="1" name={sector.charAt(0).toUpperCase() + sector.slice(1)}
-                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
-                    fillOpacity={0.6} dot={false} />
-                ))}
+                {macroToggle === "net" ? (
+                  <>
+                    {SECTORS.map(sector => {
+                      const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                      return (
+                        <Area key={`${sector}_pos`} type="monotone" dataKey={`${sector}_pos`}
+                          stackId="pos" name={label}
+                          stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                          fillOpacity={0.6} dot={false} />
+                      );
+                    })}
+                    {SECTORS.map(sector => (
+                      <Area key={`${sector}_neg`} type="monotone" dataKey={`${sector}_neg`}
+                        stackId="neg" name={`${sector}_neg`}
+                        stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                        fillOpacity={0.6} dot={false} legendType="none" />
+                    ))}
+                  </>
+                ) : (
+                  SECTORS.map(sector => {
+                    const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                    return (
+                      <Area key={sector} type="monotone" dataKey={sector}
+                        stackId="1" name={label}
+                        stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                        fillOpacity={0.6} dot={false} />
+                    );
+                  })
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Panel B — Coffee % of Total */}
-          <div style={{ marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: "#9ca3af" }}>Coffee % of Total Gross Exposure (gross basis, independent of toggle)</span>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={macroChartData}
-                margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
-                <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  tickFormatter={(v: number) => `${v.toFixed(1)}%`} width={44} domain={[0, "auto"]} />
-                <Tooltip
-                  contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                  formatter={(v: any) => [`${(v as number).toFixed(2)}%`, "Coffee share"]}
-                />
-                <Line type="monotone" dataKey="coffeeShare" name="Coffee share"
-                  stroke="#f59e0b" dot={false} strokeWidth={1.5}
-                  connectNulls={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {/* Panel B — Weekly Change */}
+          {(() => {
+            const weeklyChangeData = macroChartData.slice(1).map((row, i) => {
+              const prev = macroChartData[i];
+              return {
+                date:   row.date,
+                energy: row.energy - prev.energy,
+                metals: row.metals - prev.metals,
+                grains: row.grains - prev.grains,
+                meats:  row.meats  - prev.meats,
+                softs:  row.softs  - prev.softs,
+                micros: row.micros - prev.micros,
+              };
+            });
+            return (
+              <>
+                <div style={{ marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: "#9ca3af" }}>Weekly Change by Sector (USD bn) — inflows positive, outflows negative</span>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={weeklyChangeData} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+                      <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: number) => `$${v.toFixed(1)}B`} width={52} />
+                      <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
+                      <Tooltip
+                        contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                        formatter={(v: any, name: any) => [`$${(v as number).toFixed(2)}B`, name]}
+                        labelFormatter={(l: any) => `Week: ${l}`}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                      {SECTORS.map(sector => {
+                        const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                        return (
+                          <Bar key={sector} dataKey={sector} stackId="1" name={label}
+                            fill={SECTOR_COLORS[sector]} />
+                        );
+                      })}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            );
+          })()}
+
+          {/* Panel C — MM Exposure on Softs (by contract) */}
+          {(() => {
+            const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
+              { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
+              { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
+              { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
+              { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
+              { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
+              { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
+              { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
+              { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
+            ];
+
+            const softChartData = macroData
+              .filter(w => w.date !== "2025-11-11")
+              .map(week => {
+                const row: Record<string, any> = { date: week.date };
+                for (const sym of SOFT_SYMBOLS) {
+                  const c = week.commodities.find(c => c.symbol === sym.key);
+                  if (!c) { row[sym.key] = 0; continue; }
+                  const g = c.gross_exposure_usd;
+                  const n = c.net_exposure_usd;
+                  const val =
+                    macroToggle === "gross"       ? g :
+                    macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
+                    macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
+                    macroToggle === "net"         ? n :
+                    c.initial_margin_usd;
+                  row[sym.key] = val != null ? val / 1e9 : 0;
+                }
+                return row;
+              })
+              .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0));
+
+            if (!softChartData.length) return null;
+
+            // For net mode: split pos/neg per contract
+            const softNetSplit = macroToggle === "net"
+              ? softChartData.map(row => {
+                  const r: Record<string, any> = { date: row.date };
+                  for (const s of SOFT_SYMBOLS) {
+                    const v = row[s.key] as number;
+                    r[`${s.key}_pos`] = v > 0 ? v : 0;
+                    r[`${s.key}_neg`] = v < 0 ? v : 0;
+                  }
+                  return r;
+                })
+              : null;
+
+            const softYDomain: [number, number] | undefined = macroToggle === "net" ? (() => {
+              const vals = softChartData.flatMap(row => SOFT_SYMBOLS.map(s => row[s.key] as number));
+              const mn = Math.min(...vals), mx = Math.max(...vals);
+              const pad = Math.max(Math.abs(mn), Math.abs(mx)) * 0.15;
+              return [+(mn - pad).toFixed(2), +(mx + pad).toFixed(2)];
+            })() : undefined;
+
+            return (
+              <>
+                <div style={{ marginBottom: 8, marginTop: 16 }}>
+                  <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure — Softs by Contract (USD bn)</span>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <AreaChart
+                      data={macroToggle === "net" && softNetSplit ? softNetSplit : softChartData}
+                      margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+                      <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: number) => `$${v.toFixed(2)}B`} width={58}
+                        domain={softYDomain} />
+                      {macroToggle === "net" && <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />}
+                      <Tooltip
+                        contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                        content={(props: any) => {
+                          if (!props.active || !props.payload) return null;
+                          const byLabel: Record<string, { value: number; color: string }> = {};
+                          for (const entry of props.payload) {
+                            const key = String(entry.dataKey).replace("_pos", "").replace("_neg", "");
+                            const sym = SOFT_SYMBOLS.find(s => s.key === key);
+                            if (!sym) continue;
+                            if (!byLabel[sym.label]) byLabel[sym.label] = { value: 0, color: sym.color };
+                            byLabel[sym.label].value += entry.value || 0;
+                          }
+                          return (
+                            <div style={{ background: "#111827", border: "1px solid #374151", padding: "6px 10px", fontSize: 11, borderRadius: 4 }}>
+                              <p style={{ color: "#9ca3af", margin: "0 0 4px" }}>Week: {props.label}</p>
+                              {Object.entries(byLabel)
+                                .filter(([, d]) => Math.abs(d.value) >= 0.0001)
+                                .sort((a, b) => b[1].value - a[1].value)
+                                .map(([label, d]) => (
+                                  <p key={label} style={{ color: d.color, margin: "2px 0" }}>
+                                    {label}: ${d.value.toFixed(2)}B
+                                  </p>
+                                ))}
+                            </div>
+                          );
+                        }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 10 }} />
+                      {macroToggle === "net" ? (
+                        <>
+                          {SOFT_SYMBOLS.map(s => (
+                            <Area key={`${s.key}_pos`} type="monotone" dataKey={`${s.key}_pos`}
+                              stackId="pos" name={s.label}
+                              stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
+                          ))}
+                          {SOFT_SYMBOLS.map(s => (
+                            <Area key={`${s.key}_neg`} type="monotone" dataKey={`${s.key}_neg`}
+                              stackId="neg" name={`${s.key}_neg`}
+                              stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} legendType="none" />
+                          ))}
+                        </>
+                      ) : (
+                        SOFT_SYMBOLS.map(s => (
+                          <Area key={s.key} type="monotone" dataKey={s.key}
+                            stackId="1" name={s.label}
+                            stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
+                        ))
+                      )}
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            );
+          })()}
+
+          {/* Panel D — Weekly Change by Contract (Softs) */}
+          {(() => {
+            const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
+              { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
+              { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
+              { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
+              { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
+              { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
+              { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
+              { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
+              { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
+            ];
+
+            const softBase = macroData
+              .filter(w => w.date !== "2025-11-11")
+              .map(week => {
+                const row: Record<string, any> = { date: week.date };
+                for (const sym of SOFT_SYMBOLS) {
+                  const c = week.commodities.find(c => c.symbol === sym.key);
+                  if (!c) { row[sym.key] = 0; continue; }
+                  const g = c.gross_exposure_usd;
+                  const n = c.net_exposure_usd;
+                  const val =
+                    macroToggle === "gross"       ? g :
+                    macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
+                    macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
+                    macroToggle === "net"         ? n :
+                    c.initial_margin_usd;
+                  row[sym.key] = val != null ? val / 1e9 : 0;
+                }
+                return row;
+              })
+              .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0));
+
+            if (softBase.length < 2) return null;
+
+            const weeklyChangeData = softBase.slice(1).map((row, i) => {
+              const prev = softBase[i];
+              const r: Record<string, any> = { date: row.date };
+              for (const s of SOFT_SYMBOLS) r[s.key] = (row[s.key] as number) - (prev[s.key] as number);
+              return r;
+            });
+
+            return (
+              <>
+                <div style={{ marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: "#9ca3af" }}>Weekly Change — Softs by Contract (USD bn) — inflows positive, outflows negative</span>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={weeklyChangeData} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+                      <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        tickFormatter={(v: number) => `$${v.toFixed(2)}B`} width={58} />
+                      <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
+                      <Tooltip
+                        contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                        formatter={(v: any, name: any) => {
+                          if (Math.abs(v) < 0.0001) return null;
+                          return [`$${(v as number).toFixed(2)}B`, name];
+                        }}
+                        labelFormatter={(l: any) => `Week: ${l}`}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 10 }} />
+                      {SOFT_SYMBOLS.map(s => (
+                        <Bar key={s.key} dataKey={s.key} stackId="1" name={s.label} fill={s.color} />
+                      ))}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 

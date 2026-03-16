@@ -1,0 +1,31 @@
+name: Commodity Prices Scraper
+
+on:
+  schedule:
+    # 22:55 UTC Tuesday = 23:55 CET (UTC+1 winter) / 00:55 CEST next day (UTC+2 summer)
+    # Runs after all major commodity markets (US, EU, Asia) have closed for the day.
+    # Tuesday is the CFTC COT snapshot date, so prices here match the weekly report.
+    - cron: '55 22 * * 2'
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install sqlalchemy psycopg2-binary pandas yfinance requests
+
+      - name: Run prices scraper
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.run_prices

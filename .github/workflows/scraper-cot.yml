@@ -1,0 +1,30 @@
+name: COT Positions Scraper
+
+on:
+  schedule:
+    # 21:00 UTC Friday = 4:00 PM ET winter / 5:00 PM ET summer
+    # CFTC releases every Friday at 3:30 PM ET — this gives a 30-90 min buffer.
+    - cron: '0 21 * * 5'
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install sqlalchemy psycopg2-binary pandas requests
+
+      - name: Run COT scraper
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.run_cot

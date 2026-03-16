@@ -99,14 +99,14 @@ def main():
             rows = _all_ice_rows(ice_df, sym, spec)
             if rows.empty:
                 continue
-            rows["_date_parsed"] = pd.to_datetime(rows[_ICE_DATE_COL], errors="coerce")
+            rows["_date_parsed"] = pd.to_datetime(rows[_ICE_DATE_COL], format="%y%m%d", errors="coerce")
             rows = rows.dropna(subset=["_date_parsed"])
             rows = rows[rows["_date_parsed"].dt.date >= CUTOFF]
             for _, row in rows.iterrows():
                 cot_rows.append((sym, row["_date_parsed"].date(), {
                     "mm_long":   _safe_int(row[_ICE_MM_LONG]),
                     "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
-                    "mm_spread": _safe_int(row.get(_ICE_MM_SPREAD, 0) or 0),
+                    "mm_spread": _safe_int(row[_ICE_MM_SPREAD]),
                     "oi_total":  _safe_int(row[_ICE_OI]),
                 }))
 
@@ -150,7 +150,9 @@ def main():
                 for offset in range(6):
                     check = dt2 - timedelta(days=offset)
                     if check in hist.index:
-                        price_cache[(sym2, dt2)] = float(hist.loc[check, "Close"])
+                        close = float(hist.loc[check, "Close"])
+                        mult  = COMMODITY_SPECS[sym2].get("yfinance_mult", 1.0)
+                        price_cache[(sym2, dt2)] = close * mult
                         break
             print(f"  {ticker}: OK")
         except Exception as e:

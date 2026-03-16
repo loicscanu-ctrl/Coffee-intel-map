@@ -17,7 +17,7 @@ COMMODITY_SPECS = {
   # ── Hard Commodities ─────────────────────────────────────────────────────────
   "wti": {
     "name": "WTI Crude Oil", "sector": "hard", "exchange": "NYMEX",
-    "cftc_filter": "CRUDE OIL, LIGHT SWEET - NEW YORK MERCANTILE EXCHANGE",
+    "cftc_filter": "WTI-PHYSICAL - NEW YORK MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "CL=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 1000, "price_unit": "usd_per_bbl", "currency": "USD",
@@ -34,7 +34,7 @@ COMMODITY_SPECS = {
   },
   "natgas": {
     "name": "Natural Gas (Henry Hub)", "sector": "hard", "exchange": "NYMEX",
-    "cftc_filter": "NATURAL GAS - NEW YORK MERCANTILE EXCHANGE",
+    "cftc_filter": "HENRY HUB - NEW YORK MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "NG=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 10000, "price_unit": "usd_per_mmbtu", "currency": "USD",
@@ -42,7 +42,7 @@ COMMODITY_SPECS = {
   },
   "heating_oil": {
     "name": "NY Harbor ULSD (Heating Oil)", "sector": "hard", "exchange": "NYMEX",
-    "cftc_filter": "N.Y. HARBOR ULSD FUTURES - NEW YORK MERCANTILE EXCHANGE",
+    "cftc_filter": "NY HARBOR ULSD - NEW YORK MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "HO=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 42000, "price_unit": "usd_per_gal", "currency": "USD",
@@ -50,7 +50,7 @@ COMMODITY_SPECS = {
   },
   "rbob": {
     "name": "RBOB Gasoline", "sector": "hard", "exchange": "NYMEX",
-    "cftc_filter": "RBOB GASOLINE - NEW YORK MERCANTILE EXCHANGE",
+    "cftc_filter": "GASOLINE RBOB - NEW YORK MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "RB=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 42000, "price_unit": "usd_per_gal", "currency": "USD",
@@ -59,7 +59,7 @@ COMMODITY_SPECS = {
   "lsgo": {
     "name": "Low Sulphur Gasoil", "sector": "hard", "exchange": "ICE Europe",
     "cftc_filter": None,
-    "ice_filter": "ICE Gas Oil Futures - ICE Futures Europe",
+    "ice_filter": "ICE Gasoil Futures - ICE Futures Europe",
     "yfinance_ticker": None, "price_proxy": "heating_oil",
     "price_source": "proxy",
     "proxy_to_usd_per_mt_factor": 264.17,
@@ -96,14 +96,18 @@ COMMODITY_SPECS = {
     "cftc_filter": "CORN - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZC=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZC=F quotes in cents/bushel — divide by 100 to get USD/bushel
+    "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
     "margin_outright_usd": 1073, "margin_spread_usd": 303,
   },
   "wheat": {
     "name": "Wheat (SRW)", "sector": "grains", "exchange": "CBOT",
-    "cftc_filter": "WHEAT - CHICAGO BOARD OF TRADE",
+    "cftc_filter": "WHEAT-SRW - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZW=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZW=F quotes in cents/bushel
+    "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
     "margin_outright_usd": 1815, "margin_spread_usd": 440,
   },
@@ -112,6 +116,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "SOYBEANS - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZS=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZS=F quotes in cents/bushel
+    "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
     "margin_outright_usd": 2200, "margin_spread_usd": 660,
   },
@@ -120,6 +126,7 @@ COMMODITY_SPECS = {
     "cftc_filter": "SOYBEAN MEAL - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZM=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZM=F quotes in USD/short ton — no conversion needed
     "contract_unit": 100, "price_unit": "usd_per_short_ton", "currency": "USD",
     "margin_outright_usd": 1705, "margin_spread_usd": 495,
   },
@@ -128,6 +135,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "SOYBEAN OIL - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZL=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZL=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 60000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 2310, "margin_spread_usd": 605,
   },
@@ -137,6 +146,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "LIVE CATTLE - CHICAGO MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "LE=F", "price_proxy": None,
     "price_source": "yfinance",
+    # LE=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 40000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 3630, "margin_spread_usd": 1100,
   },
@@ -145,6 +156,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "FEEDER CATTLE - CHICAGO MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "GF=F", "price_proxy": None,
     "price_source": "yfinance",
+    # GF=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 50000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 6600, "margin_spread_usd": 1595,
   },
@@ -153,6 +166,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "LEAN HOGS - CHICAGO MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "HE=F", "price_proxy": None,
     "price_source": "yfinance",
+    # HE=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 40000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 1870, "margin_spread_usd": 1760,
   },
@@ -162,14 +177,18 @@ COMMODITY_SPECS = {
     "cftc_filter": "COTTON NO. 2 - ICE FUTURES U.S.",
     "ice_filter": None, "yfinance_ticker": "CT=F", "price_proxy": None,
     "price_source": "yfinance",
+    # CT=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 50000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 1254, "margin_spread_usd": 364,
   },
   "sugar11": {
     "name": "Sugar No. 11", "sector": "softs", "exchange": "ICE US",
-    "cftc_filter": "SUGAR NO. 11 (WORLD) - ICE FUTURES U.S.",
+    "cftc_filter": "SUGAR NO. 11 - ICE FUTURES U.S.",
     "ice_filter": None, "yfinance_ticker": "SB=F", "price_proxy": None,
     "price_source": "yfinance",
+    # SB=F quotes in cents/lb (also used as proxy source for white_sugar)
+    "yfinance_mult": 0.01,
     "contract_unit": 112000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 838, "margin_spread_usd": 183,
   },
@@ -188,6 +207,8 @@ COMMODITY_SPECS = {
     "cftc_filter": "COFFEE C - ICE FUTURES U.S.",
     "ice_filter": None, "yfinance_ticker": "KC=F", "price_proxy": None,
     "price_source": "yfinance",
+    # KC=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 37500, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 7376, "margin_spread_usd": 830,
   },
@@ -212,18 +233,20 @@ COMMODITY_SPECS = {
     "name": "Cocoa London", "sector": "softs", "exchange": "ICE Europe",
     "cftc_filter": None,
     "ice_filter": "ICE Cocoa Futures - ICE Futures Europe",
-    # LCC=F is the ICE London Cocoa futures ticker on Yahoo Finance (GBP/MT).
-    # price_source "yfinance_gbp" fetches this in GBP then multiplies by GBPUSD=X.
-    "yfinance_ticker": "LCC=F", "price_proxy": None,
-    "price_source": "yfinance_gbp",
+    # LCC=F is delisted on Yahoo Finance; proxy off NY Cocoa (CC=F, USD/MT) instead.
+    "yfinance_ticker": None, "price_proxy": "cocoa_ny",
+    "price_source": "proxy",
+    "proxy_to_usd_per_mt_factor": 1.0,
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
     "margin_outright_usd": 7069, "margin_spread_usd": 700,  # *est*
   },
   "oj": {
     "name": "Orange Juice (FCOJ-A)", "sector": "softs", "exchange": "ICE US",
-    "cftc_filter": "FROZEN CONCENTRATED ORANGE JUICE - ICE FUTURES U.S.",
+    "cftc_filter": "FRZN CONCENTRATED ORANGE JUICE - ICE FUTURES U.S.",
     "ice_filter": None, "yfinance_ticker": "OJ=F", "price_proxy": None,
     "price_source": "yfinance",
+    # OJ=F quotes in cents/lb
+    "yfinance_mult": 0.01,
     "contract_unit": 15000, "price_unit": "usd_per_lb", "currency": "USD",
     "margin_outright_usd": 4775, "margin_spread_usd": 1881,
   },
@@ -233,14 +256,17 @@ COMMODITY_SPECS = {
     "cftc_filter": "OATS - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZO=F", "price_proxy": None,
     "price_source": "yfinance",
+    # ZO=F quotes in cents/bushel
+    "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
     "margin_outright_usd": 1375, "margin_spread_usd": 1100,
   },
   "lumber": {
     "name": "Lumber", "sector": "micros", "exchange": "CME",
-    "cftc_filter": "RANDOM LENGTH LUMBER - CHICAGO MERCANTILE EXCHANGE",
-    "ice_filter": None, "yfinance_ticker": "LBS=F", "price_proxy": None,
-    "price_source": "yfinance",
+    "cftc_filter": "LUMBER - CHICAGO MERCANTILE EXCHANGE",
+    # LBS=F is delisted on Yahoo Finance; no price source available.
+    "ice_filter": None, "yfinance_ticker": None, "price_proxy": None,
+    "price_source": None,
     "contract_unit": 110000, "price_unit": "usd_per_mbf", "currency": "USD",
     "margin_outright_usd": 9500, "margin_spread_usd": 950,
   },
@@ -248,7 +274,7 @@ COMMODITY_SPECS = {
     "name": "Rough Rice", "sector": "micros", "exchange": "CBOT",
     "cftc_filter": "ROUGH RICE - CHICAGO BOARD OF TRADE",
     "ice_filter": None, "yfinance_ticker": "ZR=F", "price_proxy": None,
-    "price_source": "yfinance",
+    "price_source": "yfinance", "yfinance_mult": 0.01,
     "contract_unit": 2000, "price_unit": "usd_per_cwt", "currency": "USD",
     "margin_outright_usd": 1375, "margin_spread_usd": 1265,
   },
@@ -262,13 +288,13 @@ _CFTC_MM_SHORT   = "M_Money_Positions_Short_All"
 _CFTC_MM_SPREAD  = "M_Money_Positions_Spread_All"
 _CFTC_OI         = "Open_Interest_All"
 
-# ICE Europe CSV column names — verify on first run against actual COTHist file
-_ICE_MARKET_COL  = "Contract"
-_ICE_DATE_COL    = "Date"
-_ICE_MM_LONG     = "Money Manager Longs"
-_ICE_MM_SHORT    = "Money Manager Shorts"
-_ICE_MM_SPREAD   = "Money Manager Spreads"
-_ICE_OI          = "Total Open Interest"
+# ICE Europe COT file uses the same CFTC disaggregated format with identical column names.
+_ICE_MARKET_COL  = "Market_and_Exchange_Names"
+_ICE_DATE_COL    = "As_of_Date_In_Form_YYMMDD"
+_ICE_MM_LONG     = "M_Money_Positions_Long_All"
+_ICE_MM_SHORT    = "M_Money_Positions_Short_All"
+_ICE_MM_SPREAD   = "M_Money_Positions_Spread_All"
+_ICE_OI          = "Open_Interest_All"
 
 
 def _safe_int(val, default: int = 0) -> int:
@@ -329,7 +355,8 @@ def _download_ice_df(year: int) -> pd.DataFrame:
     url = f"https://www.ice.com/publicdocs/futures/COTHist{year}.csv"
     resp = requests.get(url, timeout=60)
     resp.raise_for_status()
-    return pd.read_csv(io.StringIO(resp.text))
+    # ICE files may have a UTF-8 BOM on the first column — use utf-8-sig to strip it
+    return pd.read_csv(io.StringIO(resp.content.decode("utf-8-sig")), low_memory=False)
 
 
 def _parse_cftc(df: pd.DataFrame) -> dict:
@@ -371,14 +398,14 @@ def _parse_ice(df: pd.DataFrame) -> dict:
             print(f"[macro_cot] WARNING: no ICE rows matched '{filt}' for {sym}", file=sys.stderr)
             continue
         rows = rows.copy()
-        rows["_date_parsed"] = pd.to_datetime(rows[_ICE_DATE_COL], errors="coerce")
+        rows["_date_parsed"] = pd.to_datetime(rows[_ICE_DATE_COL], format="%y%m%d", errors="coerce")
         rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
         row = rows.iloc[0]
         report_date = row["_date_parsed"].date()
         results[sym] = (report_date, {
             "mm_long":   _safe_int(row[_ICE_MM_LONG]),
             "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
-            "mm_spread": _safe_int(row.get(_ICE_MM_SPREAD, 0) or 0),
+            "mm_spread": _safe_int(row[_ICE_MM_SPREAD]),
             "oi_total":  _safe_int(row[_ICE_OI]),
         })
     return results
@@ -414,7 +441,8 @@ def _fetch_yfinance_prices(symbols_dates: list) -> dict:
                     check = dt - timedelta(days=offset)
                     if check in hist.index:
                         close = float(hist.loc[check, "Close"])
-                        results[(sym, dt)] = close
+                        mult  = COMMODITY_SPECS[sym].get("yfinance_mult", 1.0)
+                        results[(sym, dt)] = close * mult
                         break
         except Exception as e:
             print(f"[macro_cot] yfinance error for {ticker}: {e}", file=sys.stderr)
