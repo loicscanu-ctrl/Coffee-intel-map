@@ -22,7 +22,7 @@ from scraper.sources.macro_cot import (
     _CFTC_MM_SPREAD, _CFTC_OI,
     _ICE_MARKET_COL, _ICE_DATE_COL, _ICE_MM_LONG, _ICE_MM_SHORT,
     _ICE_MM_SPREAD, _ICE_OI,
-    _download_cftc_df, _download_ice_df,
+    _download_cftc_df, _download_ice_df, _safe_int,
 )
 from models import CotWeekly
 
@@ -89,10 +89,10 @@ def main():
             rows = rows[rows["_date_parsed"].dt.date >= CUTOFF]
             for _, row in rows.iterrows():
                 cot_rows.append((sym, row["_date_parsed"].date(), {
-                    "mm_long":   int(row[_CFTC_MM_LONG]),
-                    "mm_short":  int(row[_CFTC_MM_SHORT]),
-                    "mm_spread": int(row[_CFTC_MM_SPREAD]),
-                    "oi_total":  int(row[_CFTC_OI]),
+                    "mm_long":   _safe_int(row[_CFTC_MM_LONG]),
+                    "mm_short":  _safe_int(row[_CFTC_MM_SHORT]),
+                    "mm_spread": _safe_int(row[_CFTC_MM_SPREAD]),
+                    "oi_total":  _safe_int(row[_CFTC_OI]),
                 }))
 
         elif spec.get("ice_filter"):
@@ -104,10 +104,10 @@ def main():
             rows = rows[rows["_date_parsed"].dt.date >= CUTOFF]
             for _, row in rows.iterrows():
                 cot_rows.append((sym, row["_date_parsed"].date(), {
-                    "mm_long":   int(row[_ICE_MM_LONG]),
-                    "mm_short":  int(row[_ICE_MM_SHORT]),
-                    "mm_spread": int(row.get(_ICE_MM_SPREAD, 0) or 0),
-                    "oi_total":  int(row[_ICE_OI]),
+                    "mm_long":   _safe_int(row[_ICE_MM_LONG]),
+                    "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
+                    "mm_spread": _safe_int(row.get(_ICE_MM_SPREAD, 0) or 0),
+                    "oi_total":  _safe_int(row[_ICE_OI]),
                 }))
 
     print(f"Collected {len(cot_rows)} COT rows across {WEEKS_BACK} weeks")

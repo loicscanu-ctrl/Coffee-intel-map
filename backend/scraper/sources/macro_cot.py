@@ -270,6 +270,19 @@ _ICE_MM_SPREAD   = "Money Manager Spreads"
 _ICE_OI          = "Total Open Interest"
 
 
+def _safe_int(val, default: int = 0) -> int:
+    """Cast val to int; return default on NaN/None/blank."""
+    try:
+        if pd.isna(val):
+            return default
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
+
+
 def _download_cftc_df(year: int) -> pd.DataFrame:
     url = f"https://www.cftc.gov/files/dea/history/fut_disagg_txt_{year}.zip"
     resp = requests.get(url, timeout=60)
@@ -305,10 +318,10 @@ def _parse_cftc(df: pd.DataFrame) -> dict:
         row = rows.iloc[0]
         report_date = row["_date_parsed"].date()
         results[sym] = (report_date, {
-            "mm_long":   int(row[_CFTC_MM_LONG]),
-            "mm_short":  int(row[_CFTC_MM_SHORT]),
-            "mm_spread": int(row[_CFTC_MM_SPREAD]),
-            "oi_total":  int(row[_CFTC_OI]),
+            "mm_long":   _safe_int(row[_CFTC_MM_LONG]),
+            "mm_short":  _safe_int(row[_CFTC_MM_SHORT]),
+            "mm_spread": _safe_int(row[_CFTC_MM_SPREAD]),
+            "oi_total":  _safe_int(row[_CFTC_OI]),
         })
     return results
 
@@ -331,10 +344,10 @@ def _parse_ice(df: pd.DataFrame) -> dict:
         row = rows.iloc[0]
         report_date = row["_date_parsed"].date()
         results[sym] = (report_date, {
-            "mm_long":   int(row[_ICE_MM_LONG]),
-            "mm_short":  int(row[_ICE_MM_SHORT]),
-            "mm_spread": int(row.get(_ICE_MM_SPREAD, 0) or 0),
-            "oi_total":  int(row[_ICE_OI]),
+            "mm_long":   _safe_int(row[_ICE_MM_LONG]),
+            "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
+            "mm_spread": _safe_int(row.get(_ICE_MM_SPREAD, 0) or 0),
+            "oi_total":  _safe_int(row[_ICE_OI]),
         })
     return results
 

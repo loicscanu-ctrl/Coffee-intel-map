@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from playwright.async_api import async_playwright
 from scraper.db import get_session, upsert_news_item
 from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos
+from scraper.sources import macro_cot as _macro_cot
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos]
 SCHEDULED_HOUR_UTC = 7  # Run daily at 07:00 UTC
@@ -31,6 +32,14 @@ async def run_all_scrapers():
                     print(f"[scraper] {name}: {len(items)} items")
                 except Exception as e:
                     print(f"[scraper] {name} failed: {e}")
+            # Side-channel scraper: updates commodity_cot + commodity_prices tables
+            # (does not yield news items — called separately from ALL_SOURCES loop)
+            try:
+                await _macro_cot.run(page)
+                print("[scraper] macro_cot: OK")
+            except Exception as e:
+                print(f"[scraper] macro_cot failed: {e}")
+
             await browser.close()
     finally:
         db.close()
