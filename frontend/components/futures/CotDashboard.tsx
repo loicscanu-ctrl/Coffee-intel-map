@@ -480,6 +480,7 @@ export default function CotDashboard() {
   const [cotRows, setCotRows] = useState<any[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
+  const [macroError, setMacroError] = useState(false);
   const [macroToggle, setMacroToggle] = useState<"gross" | "net" | "margin">("gross");
 
   useEffect(() => {
@@ -489,7 +490,7 @@ export default function CotDashboard() {
         setCotRows(rows);
       })
       .catch(() => setCotError(true));
-    fetchMacroCot().then(setMacroData).catch(() => {});
+    fetchMacroCot().then(setMacroData).catch(() => setMacroError(true));
   }, []);
 
   const data = useMemo(
@@ -631,6 +632,11 @@ export default function CotDashboard() {
         <div>
           <SectionHeader icon="Globe" title="1. Global Money Flow"
             subtitle="MM speculative exposure across 28 commodity markets (CFTC + ICE Europe). Toggle metric below." />
+          {macroError && (
+            <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs font-medium">
+              Macro COT data unavailable — run the backfill script and ensure the backend is running.
+            </div>
+          )}
 
           {/* Toggle */}
           <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>

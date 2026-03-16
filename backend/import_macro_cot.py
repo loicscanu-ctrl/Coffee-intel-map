@@ -22,7 +22,7 @@ from scraper.sources.macro_cot import (
     _CFTC_MM_SPREAD, _CFTC_OI,
     _ICE_MARKET_COL, _ICE_DATE_COL, _ICE_MM_LONG, _ICE_MM_SHORT,
     _ICE_MM_SPREAD, _ICE_OI,
-    _download_cftc_df, _download_ice_df, _safe_int,
+    _download_cftc_df, _download_ice_df, _safe_int, _fetch_gbpusd_rates,
 )
 from models import CotWeekly
 
@@ -112,10 +112,18 @@ def main():
 
     print(f"Collected {len(cot_rows)} COT rows across {WEEKS_BACK} weeks")
 
+    # Fetch GBP/USD rates for all yfinance_gbp dates (batch — one download covers all dates)
+    gbp_dates = {
+        dt for sym, dt, _ in cot_rows
+        if COMMODITY_SPECS[sym]["price_source"] == "yfinance_gbp"
+    }
+    print("Fetching GBP/USD rates..." if gbp_dates else "No yfinance_gbp symbols — skipping GBPUSD fetch")
+    gbpusd_cache = _fetch_gbpusd_rates(gbp_dates) if gbp_dates else {}
+
     # Batch-fetch yfinance prices — one download per ticker for the full date range
     yfinance_pairs = [
         (sym, dt) for sym, dt, _ in cot_rows
-        if COMMODITY_SPECS[sym]["price_source"] == "yfinance"
+        if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
     # Deduplicate by ticker, collect all dates
     ticker_dates: dict[str, set] = {}
@@ -172,6 +180,13 @@ def main():
                 price = price_cache.get((sym, report_date))
                 if price is not None:
                     upsert_commodity_price(db, sym, report_date, price)
+                    inserted_prices += 1
+
+            elif src == "yfinance_gbp":
+                price_gbp = price_cache.get((sym, report_date))
+                gbpusd    = gbpusd_cache.get(report_date)
+                if price_gbp is not None and gbpusd is not None:
+                    upsert_commodity_price(db, sym, report_date, price_gbp * gbpusd)
                     inserted_prices += 1
 
             elif src == "proxy":

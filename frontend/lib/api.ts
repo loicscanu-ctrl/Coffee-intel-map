@@ -35,7 +35,7 @@ export async function fetchFreight() {
 
 export async function fetchCot(after?: string): Promise<any[]> {
   const url = after
-    ? `${API_URL}/api/cot?after=${after}`
+    ? `${API_URL}/api/cot?after=${encodeURIComponent(after)}`
     : `${API_URL}/api/cot`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch CoT data");
@@ -63,7 +63,7 @@ export interface MacroCotWeek {
 
 export async function fetchMacroCot(after?: string): Promise<MacroCotWeek[]> {
   const url = after
-    ? `${API_URL}/api/macro-cot?after=${after}`
+    ? `${API_URL}/api/macro-cot?after=${encodeURIComponent(after)}`
     : `${API_URL}/api/macro-cot`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`macro-cot fetch failed: ${res.status}`);

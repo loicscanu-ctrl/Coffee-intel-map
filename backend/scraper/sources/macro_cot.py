@@ -212,9 +212,10 @@ COMMODITY_SPECS = {
     "name": "Cocoa London", "sector": "softs", "exchange": "ICE Europe",
     "cftc_filter": None,
     "ice_filter": "ICE Cocoa Futures - ICE Futures Europe",
-    "yfinance_ticker": None, "price_proxy": "cocoa_ny",
-    "price_source": "proxy",
-    "proxy_to_usd_per_mt_factor": 1.0,
+    # LCC=F is the ICE London Cocoa futures ticker on Yahoo Finance (GBP/MT).
+    # price_source "yfinance_gbp" fetches this in GBP then multiplies by GBPUSD=X.
+    "yfinance_ticker": "LCC=F", "price_proxy": None,
+    "price_source": "yfinance_gbp",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
     "margin_outright_usd": 7069, "margin_spread_usd": 700,  # *est*
   },
@@ -281,6 +282,37 @@ def _safe_int(val, default: int = 0) -> int:
         return int(val)
     except (TypeError, ValueError):
         return default
+
+
+_GBPUSD_TICKER = "GBPUSD=X"
+
+
+def _fetch_gbpusd_rates(dates: set) -> dict:
+    """Fetch GBP/USD spot rates for a set of dates via yfinance.
+    Returns {date: rate} using up to a 6-day lookback per date.
+    """
+    import yfinance as yf
+    if not dates:
+        return {}
+    start = min(dates) - timedelta(days=7)
+    end   = max(dates) + timedelta(days=1)
+    result = {}
+    try:
+        hist = yf.download(_GBPUSD_TICKER, start=start.isoformat(), end=end.isoformat(),
+                           interval="1d", auto_adjust=True, progress=False)
+        if hist.empty:
+            print(f"[macro_cot] WARNING: no GBPUSD data for range {start}–{end}", file=sys.stderr)
+            return result
+        hist.index = pd.to_datetime(hist.index).date
+        for dt in dates:
+            for offset in range(6):
+                check = dt - timedelta(days=offset)
+                if check in hist.index:
+                    result[dt] = float(hist.loc[check, "Close"])
+                    break
+    except Exception as e:
+        print(f"[macro_cot] GBPUSD fetch error: {e}", file=sys.stderr)
+    return result
 
 
 def _download_cftc_df(year: int) -> pd.DataFrame:
@@ -422,13 +454,21 @@ def _fetch_and_upsert(db) -> None:
     for sym, (report_date, fields) in cot_data.items():
         upsert_commodity_cot(db, sym, report_date, fields)
 
-    # Build yfinance fetch list (process yfinance symbols first so proxy symbols can reuse)
+    # Build yfinance fetch list (yfinance + yfinance_gbp both need price download)
     yfinance_pairs = [
         (sym, cot_data[sym][0])
         for sym in cot_data
-        if COMMODITY_SPECS[sym]["price_source"] == "yfinance"
+        if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
     price_cache = _fetch_yfinance_prices(yfinance_pairs)
+
+    # Fetch GBP/USD rates for any yfinance_gbp symbols
+    gbp_dates = {
+        cot_data[sym][0]
+        for sym in cot_data
+        if COMMODITY_SPECS[sym]["price_source"] == "yfinance_gbp"
+    }
+    gbpusd_cache = _fetch_gbpusd_rates(gbp_dates) if gbp_dates else {}
 
     for sym in cot_data:
         report_date = cot_data[sym][0]
@@ -441,6 +481,17 @@ def _fetch_and_upsert(db) -> None:
                 print(f"[macro_cot] WARNING: no yfinance price for {sym} on {report_date}", file=sys.stderr)
                 continue
             upsert_commodity_price(db, sym, report_date, price)
+
+        elif src == "yfinance_gbp":
+            price_gbp = price_cache.get((sym, report_date))
+            gbpusd    = gbpusd_cache.get(report_date)
+            if price_gbp is None:
+                print(f"[macro_cot] WARNING: no yfinance price for {sym} ({spec['yfinance_ticker']}) on {report_date}", file=sys.stderr)
+                continue
+            if gbpusd is None:
+                print(f"[macro_cot] WARNING: no GBPUSD rate for {report_date}, skipping {sym}", file=sys.stderr)
+                continue
+            upsert_commodity_price(db, sym, report_date, price_gbp * gbpusd)
 
         elif src == "proxy":
             proxy_sym = spec["price_proxy"]
