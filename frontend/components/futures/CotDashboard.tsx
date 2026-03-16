@@ -3,9 +3,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, ComposedChart,
-  ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea,
+  ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea, Label,
 } from "recharts";
-import { fetchCot } from "@/lib/api";
+import { fetchCot, fetchMacroCot, type MacroCotWeek } from "@/lib/api";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -36,9 +36,73 @@ const MARGIN_OUTRIGHT   = 6000;
 const MARGIN_SPREAD     = 1200;
 const CENTS_LB_TO_USD_TON = 22.0462;
 
+// ── Macro COT helpers ──────────────────────────────────────────────────────────
+const SECTORS = ["hard", "grains", "meats", "softs", "micros"] as const;
+const SECTOR_COLORS: Record<string, string> = {
+  hard:   "#6366f1",
+  grains: "#f59e0b",
+  meats:  "#ef4444",
+  softs:  "#10b981",
+  micros: "#8b5cf6",
+};
+
+function transformMacroData(
+  weeks: MacroCotWeek[],
+  mode: "gross" | "net" | "margin"
+): { date: string; hard: number; grains: number; meats: number; softs: number; micros: number; coffeeShare: number | null }[] {
+  return weeks.map(week => {
+    const sectorTotals: Record<string, number> = { hard: 0, grains: 0, meats: 0, softs: 0, micros: 0 };
+    let coffeeGross = 0;
+    let totalGross  = 0;
+    let hasCoffeePrice = true;
+
+    for (const c of week.commodities) {
+      const val =
+        mode === "gross"  ? c.gross_exposure_usd  :
+        mode === "net"    ? c.net_exposure_usd     :
+        c.initial_margin_usd;
+
+      if (val == null) continue;
+      const valB = val / 1e9;
+      sectorTotals[c.sector] = (sectorTotals[c.sector] ?? 0) + valB;
+
+      if (c.symbol === "arabica" || c.symbol === "robusta") {
+        if (c.gross_exposure_usd == null) hasCoffeePrice = false;
+        else coffeeGross += c.gross_exposure_usd;
+      }
+      if (c.gross_exposure_usd != null) totalGross += c.gross_exposure_usd;
+    }
+
+    const coffeeShare = (hasCoffeePrice && totalGross > 0)
+      ? (coffeeGross / totalGross) * 100
+      : null;
+
+    return {
+      date: week.date,
+      hard:   sectorTotals.hard   ?? 0,
+      grains: sectorTotals.grains ?? 0,
+      meats:  sectorTotals.meats  ?? 0,
+      softs:  sectorTotals.softs  ?? 0,
+      micros: sectorTotals.micros ?? 0,
+      coffeeShare,
+    };
+  });
+}
+
 // ── Real data transform ─────────────────────────────────────────────────────
 function transformApiData(rows: any[]): any[] {
   if (!rows.length) return [];
+
+  // Forward-fill missing market data (e.g. US holiday shifts NY release by 1 day)
+  let lastNY:  any = null;
+  let lastLDN: any = null;
+  const filledRows = rows.map(row => {
+    const ny  = row.ny  ?? lastNY  ?? null;
+    const ldn = row.ldn ?? lastLDN ?? null;
+    if (row.ny  != null) lastNY  = row.ny;
+    if (row.ldn != null) lastLDN = row.ldn;
+    return { ...row, ny, ldn };
+  });
 
   let prevPriceNY  = 130;
   let prevPriceLDN = 1800;
@@ -47,8 +111,8 @@ function transformApiData(rows: any[]): any[] {
 
   // Pass 1: ordered for-loop — delta fields require access to previous row
   const base: any[] = [];
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+  for (let i = 0; i < filledRows.length; i++) {
+    const row = filledRows[i];
     const ny  = row.ny  ?? {};
     const ldn = row.ldn ?? {};
 
@@ -94,9 +158,6 @@ function transformApiData(rows: any[]): any[] {
     cumulativeNominal += weeklyNominalFlow;
     cumulativeMargin  += weeklyMarginFlow;
 
-    const macroMarket = cumulativeNominal * 2.5;
-    const macroSofts  = cumulativeNominal * 1.5;
-
     // ny/ldn sub-objects: camelCase OI fields used by Tabs 2-6
     // nonRepLong (capital R) matches d.ny[`${cat}Long`] where cat="nonRep" in Tab 2
     const nyObj = {
@@ -141,7 +202,6 @@ function transformApiData(rows: any[]): any[] {
       oiNY, oiLDN, totalOI,
       spreadingTotal, outrightTotal,
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
-      macroMarket, macroSofts,
       ny: nyObj, ldn: ldnObj,
       tradersNY, tradersLDN,
       pmpuShortMT_NY, pmpuShortMT_LDN,
@@ -161,20 +221,30 @@ function transformApiData(rows: any[]): any[] {
       (i >= n - 58 && i <= n - 7) ? "year"      :
                                     "historical";
 
-    const slice  = base.slice(Math.max(0, i - 52), i + 1);
-    const prices = slice.map(s => s.priceNY);
-    const maxP   = Math.max(...prices);
-    const minP   = Math.min(...prices);
-    const net    = d.ny.mmLong - d.ny.mmShort;
-    const nets   = slice.map(s => s.ny.mmLong - s.ny.mmShort);
-    const maxNet = Math.max(...nets);
-    const minNet = Math.min(...nets);
+    const slice    = base.slice(Math.max(0, i - 52), i + 1);
+    const prices   = slice.map(s => s.priceNY);
+    const maxP     = Math.max(...prices);
+    const minP     = Math.min(...prices);
+    const net      = d.ny.mmLong - d.ny.mmShort;
+    const nets     = slice.map(s => s.ny.mmLong - s.ny.mmShort);
+    const maxNet   = Math.max(...nets);
+    const minNet   = Math.min(...nets);
+
+    const ldnPrices = slice.map(s => s.priceLDN);
+    const maxLP     = Math.max(...ldnPrices);
+    const minLP     = Math.min(...ldnPrices);
+    const netLDN    = d.ldn.mmLong - d.ldn.mmShort;
+    const netsLDN   = slice.map(s => s.ldn.mmLong - s.ldn.mmShort);
+    const maxNetLDN = Math.max(...netsLDN);
+    const minNetLDN = Math.min(...netsLDN);
 
     return {
       ...d,
       timeframe,
-      priceRank: maxP !== minP ? ((d.priceNY - minP) / (maxP - minP)) * 100 : 50,
-      oiRank:    maxNet !== minNet ? ((net - minNet) / (maxNet - minNet)) * 100 : 50,
+      priceRank:    maxP     !== minP     ? ((d.priceNY - minP)    / (maxP     - minP))     * 100 : 50,
+      oiRank:       maxNet   !== minNet   ? ((net       - minNet)   / (maxNet   - minNet))   * 100 : 50,
+      priceRankLDN: maxLP    !== minLP    ? ((d.priceLDN - minLP)   / (maxLP    - minLP))    * 100 : 50,
+      oiRankLDN:    maxNetLDN !== minNetLDN ? ((netLDN  - minNetLDN)/ (maxNetLDN - minNetLDN)) * 100 : 50,
     };
   });
 }
@@ -215,9 +285,6 @@ function generateData() {
     cumulativeNominal += weeklyNominalFlow;
     cumulativeMargin  += weeklyMarginFlow;
 
-    const macroMarket = cumulativeNominal * 2.5 + Math.sin(i / 10) * 500;
-    const macroSofts  = cumulativeNominal * 1.5 + Math.cos(i / 8)  * 200;
-
     const mkBreakdown = (oi: number, baseT: number) => ({
       oi: {
         pmpuLong:   oi * 0.05, pmpuShort:  oi * 0.45,
@@ -248,7 +315,6 @@ function generateData() {
       spreadingTotal: spreadingNY + spreadingLDN,
       outrightTotal: (oiNY + oiLDN) - (spreadingNY + spreadingLDN),
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
-      macroMarket, macroSofts,
       ny: nyD.oi, ldn: ldnD.oi,
       tradersNY: nyD.traders, tradersLDN: ldnD.traders,
       pmpuShortMT_NY:  nyD.oi.pmpuShort  * ARABICA_MT_FACTOR,
@@ -260,15 +326,21 @@ function generateData() {
   }
 
   return data.map((d, i) => {
-    const slice = data.slice(Math.max(0, i - 52), i + 1);
-    const maxP = Math.max(...slice.map(s => s.priceNY));
-    const minP = Math.min(...slice.map(s => s.priceNY));
-    const net  = d.ny.mmLong - d.ny.mmShort;
-    const nets = slice.map(s => s.ny.mmLong - s.ny.mmShort);
+    const slice    = data.slice(Math.max(0, i - 52), i + 1);
+    const maxP     = Math.max(...slice.map(s => s.priceNY));
+    const minP     = Math.min(...slice.map(s => s.priceNY));
+    const net      = d.ny.mmLong - d.ny.mmShort;
+    const nets     = slice.map(s => s.ny.mmLong - s.ny.mmShort);
+    const maxLP    = Math.max(...slice.map(s => s.priceLDN));
+    const minLP    = Math.min(...slice.map(s => s.priceLDN));
+    const netLDN   = d.ldn.mmLong - d.ldn.mmShort;
+    const netsLDN  = slice.map(s => s.ldn.mmLong - s.ldn.mmShort);
     return {
       ...d,
-      priceRank: ((d.priceNY - minP) / (maxP - minP)) * 100,
-      oiRank: ((net - Math.min(...nets)) / (Math.max(...nets) - Math.min(...nets))) * 100,
+      priceRank:    (maxP  - minP)  > 0 ? ((d.priceNY  - minP)  / (maxP  - minP))  * 100 : 50,
+      oiRank:       (Math.max(...nets)  - Math.min(...nets))  > 0 ? ((net    - Math.min(...nets))   / (Math.max(...nets)   - Math.min(...nets)))   * 100 : 50,
+      priceRankLDN: (maxLP - minLP) > 0 ? ((d.priceLDN - minLP) / (maxLP - minLP)) * 100 : 50,
+      oiRankLDN:    (Math.max(...netsLDN) - Math.min(...netsLDN)) > 0 ? ((netLDN - Math.min(...netsLDN)) / (Math.max(...netsLDN) - Math.min(...netsLDN))) * 100 : 50,
     };
   });
 }
@@ -289,41 +361,75 @@ function SectionHeader({ icon, title, subtitle }: { icon: string; title: string;
   );
 }
 
-function RadialCounterparty({ data }: { data: any[] }) {
-  const latest = data[data.length - 1];
+type CpUnit = "contracts" | "mt" | "usd";
+
+function RadialCounterparty({
+  latest, markets, unit,
+}: {
+  latest: any;
+  markets: { ny: boolean; ldn: boolean };
+  unit: CpUnit;
+}) {
+  const mtFactor  = (m: "ny" | "ldn") => m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
+  const usdPerMT  = (m: "ny" | "ldn") => m === "ny" ? latest.priceNY * CENTS_LB_TO_USD_TON : latest.priceLDN;
+
+  const convert = (contracts: number, m: "ny" | "ldn") => {
+    if (unit === "contracts") return contracts;
+    const mt = contracts * mtFactor(m);
+    return unit === "mt" ? mt : mt * usdPerMT(m);
+  };
+
+  const sum = (nyVal: number, ldnVal: number) => {
+    let v = 0;
+    if (markets.ny)  v += convert(nyVal,  "ny");
+    if (markets.ldn) v += convert(ldnVal, "ldn");
+    return v;
+  };
+
+  const fmtVal = (v: number) => {
+    if (unit === "usd")       return `$${(v / 1_000_000_000).toFixed(2)}B`;
+    if (unit === "mt")        return `${(v / 1_000).toFixed(0)}k MT`;
+    return `${(v / 1_000).toFixed(0)}k lots`;
+  };
+
   const longs = [
-    { name: "Managed Money",  value: latest.ny.mmLong    + latest.ldn.mmLong,   fill: "#f59e0b" },
-    { name: "Swap Dealers",   value: latest.ny.swapLong  + latest.ldn.swapLong,  fill: "#10b981" },
-    { name: "Industry (PMPU)",value: latest.ny.pmpuLong  + latest.ldn.pmpuLong,  fill: "#3b82f6" },
-    { name: "Other/Non-Rep",  value: latest.ny.otherLong + latest.ldn.otherLong, fill: "#64748b" },
+    { name: "Managed Money",   value: sum(latest.ny.mmLong,    latest.ldn.mmLong),    fill: "#f59e0b" },
+    { name: "Swap Dealers",    value: sum(latest.ny.swapLong,  latest.ldn.swapLong),   fill: "#10b981" },
+    { name: "Industry (PMPU)", value: sum(latest.ny.pmpuLong,  latest.ldn.pmpuLong),   fill: "#3b82f6" },
+    { name: "Other/Non-Rep",   value: sum(latest.ny.otherLong, latest.ldn.otherLong),  fill: "#64748b" },
   ];
   const shorts = [
-    { name: "Industry (PMPU)",value: latest.ny.pmpuShort  + latest.ldn.pmpuShort,  fill: "#3b82f6" },
-    { name: "Managed Money",  value: latest.ny.mmShort    + latest.ldn.mmShort,    fill: "#f59e0b" },
-    { name: "Swap Dealers",   value: latest.ny.swapShort  + latest.ldn.swapShort,  fill: "#10b981" },
-    { name: "Other/Non-Rep",  value: latest.ny.otherShort + latest.ldn.otherShort, fill: "#64748b" },
+    { name: "Industry (PMPU)", value: sum(latest.ny.pmpuShort,  latest.ldn.pmpuShort),  fill: "#3b82f6" },
+    { name: "Managed Money",   value: sum(latest.ny.mmShort,    latest.ldn.mmShort),    fill: "#f59e0b" },
+    { name: "Swap Dealers",    value: sum(latest.ny.swapShort,  latest.ldn.swapShort),  fill: "#10b981" },
+    { name: "Other/Non-Rep",   value: sum(latest.ny.otherShort, latest.ldn.otherShort), fill: "#64748b" },
   ];
   const tooltipStyle = { backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px" };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[320px]">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[340px]">
       {[{ label: "LONGS (Buyers)", color: "text-emerald-400", data: longs, dir: 1 },
-        { label: "SHORTS (Sellers)", color: "text-red-400",   data: shorts, dir: -1 }].map(side => (
-        <div key={side.label} className="relative h-full bg-slate-800/30 rounded-xl border border-slate-800/50 flex flex-col items-center justify-center p-4">
-          <h4 className={`absolute top-4 ${side.color} font-bold text-xs uppercase tracking-widest`}>{side.label}</h4>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={side.data} cx="50%" cy="50%"
-                startAngle={90} endAngle={90 + side.dir * 360}
-                innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="value">
-                {side.data.map((entry, i) => <Cell key={i} fill={entry.fill} stroke="rgba(0,0,0,0)" />)}
-              </Pie>
-              <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }} />
-              <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      ))}
+        { label: "SHORTS (Sellers)", color: "text-red-400",   data: shorts, dir: -1 }].map(side => {
+        const total = side.data.reduce((s, d) => s + d.value, 0);
+        return (
+          <div key={side.label} className="relative h-full bg-slate-800/30 rounded-xl border border-slate-800/50 flex flex-col items-center justify-center p-4">
+            <h4 className={`absolute top-4 ${side.color} font-bold text-xs uppercase tracking-widest`}>{side.label}</h4>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={side.data} cx="50%" cy="50%"
+                  startAngle={90} endAngle={90 + side.dir * 360}
+                  innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="value">
+                  {side.data.map((entry, i) => <Cell key={i} fill={entry.fill} stroke="rgba(0,0,0,0)" />)}
+                  <Label value={fmtVal(total)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" />
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }}
+                  formatter={(v: any, name: string) => [fmtVal(Number(v)), name]} />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -373,11 +479,17 @@ export default function CotDashboard() {
   const [step, setStep] = useState<Step>(1);
   const [cotRows, setCotRows] = useState<any[] | null>(null);
   const [cotError, setCotError] = useState(false);
+  const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
+  const [macroToggle, setMacroToggle] = useState<"gross" | "net" | "margin">("gross");
 
   useEffect(() => {
     fetchCot()
-      .then(setCotRows)
+      .then(rows => {
+        if (!rows.length) setCotError(true);
+        setCotRows(rows);
+      })
       .catch(() => setCotError(true));
+    fetchMacroCot().then(setMacroData).catch(() => {});
   }, []);
 
   const data = useMemo(
@@ -386,23 +498,45 @@ export default function CotDashboard() {
   );
   const latest = data[data.length - 1];
 
-  // Step 1
-  const [flowToggles, setFlowToggles] = useState({ market: true, softs: true, coffee: true });
-
   // Step 2
   const [structMarkets, setStructMarkets] = useState({ ny: true, ldn: false });
   const [structCats,    setStructCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: false });
+  const [structOIMode,  setStructOIMode]  = useState<"mt" | "usd">("mt");
 
   const processedStructData = useMemo(() => data.map(d => {
     const mkts = (structMarkets.ny ? ["ny"] : []).concat(structMarkets.ldn ? ["ldn"] : []);
     const agg: Record<string, number> = {};
-    ["pmpu", "mm", "swap", "other", "nonRep"].forEach(cat => {
-      agg[cat] = mkts.reduce((s, m) => s + (d as any)[m][`${cat}Long`] + (d as any)[m][`${cat}Short`], 0);
+    (["pmpu", "mm", "swap", "other", "nonRep"] as const).forEach(cat => {
+      let mt_val = 0, usd_val = 0;
+      mkts.forEach(m => {
+        const factor        = m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
+        const price_usd_ton = m === "ny" ? d.priceNY * CENTS_LB_TO_USD_TON : d.priceLDN;
+        const contracts     = (d as any)[m][`${cat}Long`] + (d as any)[m][`${cat}Short`];
+        mt_val  += contracts * factor;
+        usd_val += contracts * factor * price_usd_ton;
+      });
+      agg[cat]            = mt_val;
+      agg[`${cat}_usd`]   = usd_val / 1_000_000; // $M
     });
     const price = structMarkets.ny && structMarkets.ldn ? d.avgPrice_USD_Ton
       : structMarkets.ny ? d.priceNY : d.priceLDN;
     return { ...d, ...agg, displayPrice: price };
   }), [data, structMarkets]);
+
+  const structPriceDomain = useMemo((): [number, number] => {
+    const prices = processedStructData.slice(-52)
+      .map((d: any) => d.displayPrice)
+      .filter((p: any) => p != null && p > 0);
+    if (!prices.length) return [0, 500];
+    const mn  = Math.min(...prices);
+    const mx  = Math.max(...prices);
+    const pad = Math.max((mx - mn) * 0.15, mn * 0.03);
+    return [Math.floor(mn - pad), Math.ceil(mx + pad)];
+  }, [processedStructData]);
+
+  // Step 3
+  const [cpMarkets, setCpMarkets] = useState({ ny: true, ldn: true });
+  const [cpUnit,    setCpUnit]    = useState<CpUnit>("contracts");
 
   // Step 4
   const [indView, setIndView] = useState<"ny" | "ldn" | "combined">("combined");
@@ -440,13 +574,30 @@ export default function CotDashboard() {
     return byTf;
   }, [data, dpMarkets, dpCats]);
 
+  const dpDomain = useMemo(() => {
+    const all = Object.values(processedDpData).flat();
+    if (!all.length) return { x: [0, 1000] as [number, number], y: [-5000000, 5000000] as [number, number] };
+    const tVals = all.map(p => p.traders).filter(v => v > 0);
+    const oVals = all.map(p => p.oi);
+    const tMin  = tVals.length ? Math.min(...tVals) : 0;
+    const tMax  = tVals.length ? Math.max(...tVals) : 1000;
+    const oMin  = oVals.length ? Math.min(...oVals) : -5000000;
+    const oMax  = oVals.length ? Math.max(...oVals) : 5000000;
+    const tPad  = (tMax - tMin) * 0.1 || 10;
+    const oPad  = Math.max(Math.abs(oMax), Math.abs(oMin)) * 0.1;
+    return {
+      x: [Math.floor(tMin - tPad), Math.ceil(tMax + tPad)] as [number, number],
+      y: [Math.floor(oMin < 0 ? oMin * 1.1 : oMin - oPad), Math.ceil(oMax > 0 ? oMax * 1.1 : oMax + oPad)] as [number, number],
+    };
+  }, [processedDpData]);
+
   const recent52 = data.slice(-52);
 
   return (
     <div className="space-y-4">
       {cotError && (
-        <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs">
-          Live data unavailable — showing illustrative data
+        <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs font-medium">
+          Backend unavailable — showing illustrative data only (prices random, data ends ~Nov 2025). Start the backend server to load real CoT data.
         </div>
       )}
       {cotRows === null && !cotError && (
@@ -474,78 +625,150 @@ export default function CotDashboard() {
       {step === 1 && (
         <div>
           <SectionHeader icon="Globe" title="1. Global Money Flow"
-            subtitle="Cumulative Flow Analysis: Compare broad commodity flows vs specific coffee complex flows." />
-          <div className="flex flex-wrap gap-2 mb-4">
-            {[{ key: "market", label: "Commodity Market", color: "#94a3b8" },
-              { key: "softs",  label: "Soft Commodities", color: "#60a5fa" },
-              { key: "coffee", label: "Coffee Complex",   color: "#f59e0b" }].map(item => (
-              <button key={item.key}
-                onClick={() => setFlowToggles(p => ({ ...p, [item.key]: !(p as any)[item.key] }))}
-                className={`flex items-center gap-2 px-3 py-1 rounded border text-xs font-bold transition-all ${(flowToggles as any)[item.key] ? "bg-slate-800 border-slate-600 text-slate-100" : "bg-transparent border-slate-800 text-slate-500"}`}>
-                <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color, opacity: (flowToggles as any)[item.key] ? 1 : 0.3 }} />
-                {item.label}
+            subtitle="MM speculative exposure across 28 commodity markets (CFTC + ICE Europe). Toggle metric below." />
+
+          {/* Toggle */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            {(["gross", "net", "margin"] as const).map(m => (
+              <button
+                key={m}
+                onClick={() => setMacroToggle(m)}
+                style={{
+                  padding: "4px 12px", borderRadius: 4, border: "1px solid #374151",
+                  background: macroToggle === m ? "#4f46e5" : "#1f2937",
+                  color: "#f9fafb", cursor: "pointer", fontSize: 12,
+                }}
+              >
+                {m === "gross" ? "Gross Exposure" : m === "net" ? "Net Exposure" : "Initial Margin"}
               </button>
             ))}
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={recent52}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                <YAxis yAxisId="left"  stroke="#475569" fontSize={10} />
-                <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} />
-                <Tooltip contentStyle={CHART_STYLE} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                {flowToggles.market && <Line yAxisId="left" type="monotone" dataKey="macroMarket" name="Commodity Market" stroke="#94a3b8" strokeWidth={1} dot={false} strokeDasharray="3 3" />}
-                {flowToggles.softs  && <Line yAxisId="left" type="monotone" dataKey="macroSofts"  name="Soft Commodities" stroke="#60a5fa" strokeWidth={1} dot={false} strokeDasharray="3 3" />}
-                {flowToggles.coffee && <>
-                  <Bar  yAxisId="right" dataKey="weeklyMarginFlow"  name="Coffee Weekly Flow"     fill="#f59e0b" opacity={0.3} barSize={6} />
-                  <Line yAxisId="left"  type="monotone" dataKey="cumulativeNominal" name="Coffee Nominal (Cum)"    stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line yAxisId="left"  type="monotone" dataKey="cumulativeMargin"  name="Coffee Margin-Adj (Cum)" stroke="#10b981" strokeWidth={2} dot={false} strokeDasharray="5 5" />
-                </>}
-              </ComposedChart>
+
+          {/* Panel A — MM Exposure by Sector */}
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure by Sector (USD bn)</span>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
+            <ResponsiveContainer width="100%" height={260}>
+              <AreaChart data={transformMacroData(macroData, macroToggle)}
+                margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
+                  tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
+                  tickFormatter={(v: number) => `$${v.toFixed(0)}B`} width={52} />
+                <Tooltip
+                  contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                  formatter={(v: any, name: any) => [`$${(v as number).toFixed(1)}B`, name]}
+                  labelFormatter={(l: any) => `Week: ${l}`}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                {SECTORS.map(sector => (
+                  <Area key={sector} type="monotone" dataKey={sector}
+                    stackId="1" name={sector.charAt(0).toUpperCase() + sector.slice(1)}
+                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                    fillOpacity={0.6} dot={false} />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Panel B — Coffee % of Total */}
+          <div style={{ marginBottom: 6 }}>
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>Coffee % of Total Gross Exposure</span>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+            <ResponsiveContainer width="100%" height={120}>
+              <LineChart data={transformMacroData(macroData, macroToggle)}
+                margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
+                  tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
+                  tickFormatter={(v: number) => `${v.toFixed(1)}%`} width={44} domain={[0, "auto"]} />
+                <Tooltip
+                  contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
+                  formatter={(v: any) => [`${(v as number).toFixed(2)}%`, "Coffee share"]}
+                />
+                <Line type="monotone" dataKey="coffeeShare" name="Coffee share"
+                  stroke="#f59e0b" dot={false} strokeWidth={1.5}
+                  connectNulls={false} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
       )}
 
       {/* ── Step 2: Structural Integrity ── */}
-      {step === 2 && (
-        <div>
-          <SectionHeader icon="Activity" title="2. Structural Integrity (Gross OI)"
-            subtitle="Select Markets and Categories to analyze Open Interest composition." />
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <MarketToggle markets={structMarkets} set={k => setStructMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
-            <CatToggles cats={structCats} set={k => setStructCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
+      {step === 2 && (() => {
+        const sk = (cat: string) => structOIMode === "usd" ? `${cat}_usd` : cat;
+        const oiFmt = structOIMode === "usd"
+          ? (v: number) => `$${(v / 1000).toFixed(0)}B`
+          : (v: number) => `${(v / 1000).toFixed(0)}k`;
+        const oiLabel = structOIMode === "usd" ? "OI Value ($B)" : "OI (k MT)";
+        const priceFmt = (v: number) =>
+          structMarkets.ny && !structMarkets.ldn ? `${v.toFixed(0)}¢`
+          : `$${v.toFixed(0)}`;
+        return (
+          <div>
+            <SectionHeader icon="Activity" title="2. Structural Integrity (Gross OI)"
+              subtitle="Select Markets and Categories to analyze Open Interest composition." />
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <MarketToggle markets={structMarkets} set={k => setStructMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
+                <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                  {(["mt", "usd"] as const).map(m => (
+                    <button key={m} onClick={() => setStructOIMode(m)}
+                      className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${structOIMode === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+                      {m === "mt" ? "MT" : "USD Value"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <CatToggles cats={structCats} set={k => setStructCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
+            </div>
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={processedStructData.slice(-52)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={oiFmt}
+                    label={{ value: oiLabel, angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10}
+                    domain={structPriceDomain} tickFormatter={priceFmt} />
+                  <Tooltip contentStyle={CHART_STYLE} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  {structCats.pmpu   && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("pmpu")}   name="PMPU"               fill="#3b82f6" stroke="#3b82f6" />}
+                  {structCats.mm     && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("mm")}     name="Managed Money"      fill="#f59e0b" stroke="#f59e0b" />}
+                  {structCats.swap   && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("swap")}   name="Swap Dealers"       fill="#10b981" stroke="#10b981" />}
+                  {structCats.other  && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("other")}  name="Other Reportables"  fill="#64748b" stroke="#64748b" />}
+                  {structCats.nonrep && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("nonRep")} name="Non Reportables"    fill="#94a3b8" stroke="#94a3b8" />}
+                  <Line yAxisId="right" type="monotone" dataKey="displayPrice" name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={processedStructData.slice(-52)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                <YAxis yAxisId="left"  stroke="#475569" fontSize={10} />
-                <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} />
-                <Tooltip contentStyle={CHART_STYLE} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                {structCats.pmpu   && <Area yAxisId="left" type="monotone" stackId="1" dataKey="pmpu"   name="PMPU"               fill="#3b82f6" stroke="#3b82f6" />}
-                {structCats.mm     && <Area yAxisId="left" type="monotone" stackId="1" dataKey="mm"     name="Managed Money"      fill="#f59e0b" stroke="#f59e0b" />}
-                {structCats.swap   && <Area yAxisId="left" type="monotone" stackId="1" dataKey="swap"   name="Swap Dealers"       fill="#10b981" stroke="#10b981" />}
-                {structCats.other  && <Area yAxisId="left" type="monotone" stackId="1" dataKey="other"  name="Other Reportables"  fill="#64748b" stroke="#64748b" />}
-                {structCats.nonrep && <Area yAxisId="left" type="monotone" stackId="1" dataKey="nonRep" name="Non Reportables"    fill="#94a3b8" stroke="#94a3b8" />}
-                <Line yAxisId="right" type="monotone" dataKey="displayPrice" name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── Step 3: Counterparty ── */}
       {step === 3 && (
         <div>
           <SectionHeader icon="Users" title="3. Counterparty Mapping"
             subtitle="Liquidity Handshake: Analyzing the balance between Long and Short ownership." />
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <MarketToggle markets={cpMarkets} set={k => setCpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
+            <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+              {(["contracts", "mt", "usd"] as const).map(u => (
+                <button key={u} onClick={() => setCpUnit(u)}
+                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${cpUnit === u ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+                  {u === "contracts" ? "Lots" : u === "mt" ? "MT" : "USD Value"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <RadialCounterparty data={data} />
+            <RadialCounterparty latest={latest} markets={cpMarkets} unit={cpUnit} />
           </div>
         </div>
       )}
@@ -599,8 +822,10 @@ export default function CotDashboard() {
               <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                 <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
+                  domain={dpDomain.x}
                   label={{ value: "# traders", position: "insideBottom", offset: -10, fill: "#475569", fontSize: 10 }} />
                 <YAxis type="number" dataKey="oi" name="OI" stroke="#475569" fontSize={10}
+                  domain={dpDomain.y}
                   tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
                   label={{ value: "OI (k ton equivalent)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
                 <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
@@ -633,33 +858,56 @@ export default function CotDashboard() {
       )}
 
       {/* ── Step 6: Cycle Location ── */}
-      {step === 6 && (
-        <div>
-          <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
-            subtitle="Mapping the convergence of Price Rank and Net Positioning Rank." />
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis type="number" dataKey="oiRank"    domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Net Positioning Rank (%)", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
-                <YAxis type="number" dataKey="priceRank" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Price Rank (%)", angle: -90, position: "insideLeft", fill: "#475569", fontSize: 10 }} />
-                <ReferenceArea x1={0}  x2={25}  y1={0}  y2={25}  fill="#10b981" fillOpacity={0.08} stroke="#10b981" strokeOpacity={0.25}
-                  label={{ value: "OVERSOLD", position: "insideTopRight", fill: "#10b981", fontSize: 9, fontWeight: "bold" }} />
-                <ReferenceArea x1={75} x2={100} y1={75} y2={100} fill="#ef4444" fillOpacity={0.08} stroke="#ef4444" strokeOpacity={0.25}
-                  label={{ value: "OVERBOUGHT", position: "insideBottomLeft", fill: "#ef4444", fontSize: 9, fontWeight: "bold" }} />
-                <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
-                <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
-                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE} />
-                <Scatter data={recent52}>
-                  {recent52.map((_, i) => (
-                    <Cell key={i} fill={i === 51 ? "#ef4444" : "#64748b"} fillOpacity={i === 51 ? 1 : 0.4} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
+      {step === 6 && (() => {
+        const cycleColor = (d: any, market: "ny" | "ldn") => {
+          if (d.timeframe === "current")  return market === "ny" ? "#ef4444" : "#3b82f6";
+          if (d.timeframe === "recent_1") return market === "ny" ? "#f97316" : "#3b82f6";
+          return "#64748b";
+        };
+        const cycleOpacity = (d: any) => {
+          if (d.timeframe === "current")  return 1.0;
+          if (d.timeframe === "recent_1") return 0.75;
+          if (d.timeframe === "recent_4") return 0.45;
+          if (d.timeframe === "year")     return 0.25;
+          return 0.12;
+        };
+        const nyPts  = recent52.map(d => ({ x: d.oiRank,    y: d.priceRank,    timeframe: d.timeframe, date: d.date }));
+        const ldnPts = recent52.map(d => ({ x: d.oiRankLDN, y: d.priceRankLDN, timeframe: d.timeframe, date: d.date }));
+        return (
+          <div>
+            <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
+              subtitle="Mapping the convergence of Price Rank and Net Positioning Rank. Red = NY Arabica · Blue = LDN Robusta · Orange = last week." />
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis type="number" dataKey="x" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Net Positioning Rank (%)", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
+                  <YAxis type="number" dataKey="y" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Price Rank (%)", angle: -90, position: "insideLeft", fill: "#475569", fontSize: 10 }} />
+                  <ReferenceArea x1={0}  x2={25}  y1={0}  y2={25}  fill="#10b981" fillOpacity={0.08} stroke="#10b981" strokeOpacity={0.25}
+                    label={{ value: "OVERSOLD", position: "insideTopRight", fill: "#10b981", fontSize: 9, fontWeight: "bold" }} />
+                  <ReferenceArea x1={75} x2={100} y1={75} y2={100} fill="#ef4444" fillOpacity={0.08} stroke="#ef4444" strokeOpacity={0.25}
+                    label={{ value: "OVERBOUGHT", position: "insideBottomLeft", fill: "#ef4444", fontSize: 9, fontWeight: "bold" }} />
+                  <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
+                  <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
+                  <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
+                    formatter={(v: any, _: string, props: any) => [`${Number(v).toFixed(1)}%`, props.name]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Scatter name="NY Arabica" data={nyPts}>
+                    {nyPts.map((d, i) => (
+                      <Cell key={i} fill={cycleColor(d, "ny")} fillOpacity={cycleOpacity(d)} />
+                    ))}
+                  </Scatter>
+                  <Scatter name="LDN Robusta" data={ldnPts}>
+                    {ldnPts.map((d, i) => (
+                      <Cell key={i} fill={cycleColor(d, "ldn")} fillOpacity={cycleOpacity(d)} />
+                    ))}
+                  </Scatter>
+                </ScatterChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
