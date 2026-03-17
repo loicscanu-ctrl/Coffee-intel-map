@@ -92,7 +92,7 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
       const { fetchMapCountries, fetchMapFactories, fetchNews } = await import("@/lib/api");
 
       const countriesLayer = Leaflet.layerGroup().addTo(map);
-      fetchMapCountries().then((countries: any[]) => {
+      fetchMapCountries().catch(() => [] as any[]).then((countries: any[]) => {
         countries.forEach((c: any) => {
           const isProducer = c.type === "producer";
           const color = isProducer ? "#10b981" : "#3b82f6";
@@ -119,7 +119,7 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
 
       // Factory pins
       const factoriesLayer = Leaflet.layerGroup().addTo(map);
-      fetchMapFactories().then((factories: any[]) => {
+      fetchMapFactories().catch(() => [] as any[]).then((factories: any[]) => {
         factories.forEach((f: any) => {
           const icon = Leaflet.divIcon({
             className: "",
@@ -135,7 +135,7 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
 
       // News pins
       const newsLayer = Leaflet.layerGroup().addTo(map);
-      fetchNews().then((items: any[]) => {
+      fetchNews().catch(() => [] as any[]).then((items: any[]) => {
         items
           .filter((item: any) => item.lat != null && item.lng != null)
           .forEach((item: any) => {

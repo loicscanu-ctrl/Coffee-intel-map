@@ -23,18 +23,16 @@ def test_contract_value_usd_per_lb():
 
 
 def test_exposure_calc_null_price():
-    """gross/net exposure is None when price missing; initial_margin always computed."""
+    """gross/net exposure is None when price missing."""
     import sys, os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _compute_exposures
 
-    spec = {"price_unit": "usd_per_lb", "contract_unit": 37500,
-            "margin_outright_usd": 7376, "margin_spread_usd": 830}
+    spec = {"price_unit": "usd_per_lb", "contract_unit": 37500}
     result = _compute_exposures(mm_long=100, mm_short=50, mm_spread=10,
                                 close_price=None, spec=spec)
     assert result["gross_exposure_usd"] is None
     assert result["net_exposure_usd"] is None
-    assert result["initial_margin_usd"] == (100 + 50) * 7376 + 10 * 830
 
 
 def test_exposure_calc_with_price():
@@ -43,10 +41,8 @@ def test_exposure_calc_with_price():
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _compute_exposures
 
-    spec = {"price_unit": "usd_per_bbl", "contract_unit": 1000,
-            "margin_outright_usd": 4675, "margin_spread_usd": 420}
+    spec = {"price_unit": "usd_per_bbl", "contract_unit": 1000}
     result = _compute_exposures(mm_long=200, mm_short=100, mm_spread=20,
                                 close_price=80.0, spec=spec)
     assert result["gross_exposure_usd"] == pytest.approx((200 + 100) * 80_000.0)
     assert result["net_exposure_usd"]   == pytest.approx((200 - 100) * 80_000.0)
-    assert result["initial_margin_usd"] == (200 + 100) * 4675 + 20 * 420

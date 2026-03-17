@@ -92,6 +92,27 @@ export const S = StyleSheet.create({
   noChart:    { width: "100%", height: 200, backgroundColor: "#f1f5f9", justifyContent: "center", alignItems: "center", marginBottom: 6 },
   noChartTxt: { fontSize: 8, color: BRAND.slate400 },
 
+  // ── Tables ──
+  tableWrap:    { marginVertical: 6, borderWidth: 0.5, borderColor: "#e2e8f0", borderRadius: 3 },
+  tHeadRow:     { flexDirection: "row", backgroundColor: BRAND.dark, paddingVertical: 5, paddingHorizontal: 6 },
+  tDataRow:     { flexDirection: "row", paddingVertical: 3, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0" },
+  tDataRowAlt:  { flexDirection: "row", paddingVertical: 3, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", backgroundColor: "#f8fafc" },
+  tHCell:       { fontSize: 7, fontFamily: "Helvetica-Bold", color: BRAND.amber },
+  tHCellR:      { fontSize: 7, fontFamily: "Helvetica-Bold", color: BRAND.amber, textAlign: "right" },
+  tCell:        { fontSize: 7.5, color: BRAND.dark },
+  tCellR:       { fontSize: 7.5, color: BRAND.dark, textAlign: "right" },
+  tCellPos:     { fontSize: 7.5, color: BRAND.green, textAlign: "right", fontFamily: "Helvetica-Bold" },
+  tCellNeg:     { fontSize: 7.5, color: BRAND.red,   textAlign: "right", fontFamily: "Helvetica-Bold" },
+  tTotalRow:    { flexDirection: "row", backgroundColor: BRAND.dark, paddingVertical: 4, paddingHorizontal: 6, borderTopWidth: 0.5, borderTopColor: BRAND.amber },
+
+  // ── Bullets ──
+  bulletRow:     { flexDirection: "row", marginBottom: 4 },
+  bulletDot:     { fontSize: 8, color: BRAND.amber, marginRight: 5, width: 8 },
+  bulletText:    { fontSize: 8, color: "#374151", flex: 1, lineHeight: 1.45 },
+  bulletSubRow:  { flexDirection: "row", marginBottom: 3, marginLeft: 13 },
+  bulletSubDot:  { fontSize: 7.5, color: BRAND.slate400, marginRight: 4 },
+  bulletSubText: { fontSize: 7.5, color: BRAND.slate600, flex: 1, lineHeight: 1.4 },
+
   // ── Footer ──
   footer: {
     position: "absolute", bottom: 18, left: 40, right: 40,

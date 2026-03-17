@@ -53,7 +53,6 @@ export interface MacroCotEntry {
   close_price: number | null;
   gross_exposure_usd: number | null;
   net_exposure_usd: number | null;
-  initial_margin_usd: number;
 }
 
 export interface MacroCotWeek {

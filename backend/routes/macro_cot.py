@@ -22,21 +22,16 @@ def _to_contract_value(price: float, spec: dict) -> float:
 
 def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
                        close_price: Optional[float], spec: dict) -> dict:
-    initial_margin = (mm_long + mm_short) * spec["margin_outright_usd"] \
-                   + mm_spread             * spec["margin_spread_usd"]
-
     if close_price is None:
         return {
             "gross_exposure_usd": None,
             "net_exposure_usd":   None,
-            "initial_margin_usd": initial_margin,
         }
 
     cv = _to_contract_value(close_price, spec)
     return {
         "gross_exposure_usd": (mm_long + mm_short) * cv,
         "net_exposure_usd":   (mm_long - mm_short) * cv,
-        "initial_margin_usd": initial_margin,
     }
 
 

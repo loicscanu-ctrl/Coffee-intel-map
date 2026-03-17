@@ -74,6 +74,14 @@ const ENERGY_SYMS = new Set(["wti","brent","natgas","heating_oil","rbob","lsgo"]
 // Display sectors used for biggestMover label
 const DISPLAY_SECTORS = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;
 
+/** Percentile rank of value in history array (0 = min, 100 = max). */
+function percRank(value: number, history: number[], positiveOnly = true): number {
+  const valid = positiveOnly ? history.filter(h => h > 0) : history.filter(h => h !== 0);
+  if (valid.length === 0) return 50;
+  const below = valid.filter(h => h < value).length;
+  return (below / valid.length) * 100;
+}
+
 export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMetrics | null {
   if (macroData.length < 2) return null;
   const latest = macroData[macroData.length - 1];
@@ -111,6 +119,93 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
 
   const netExp = latest.commodities.reduce((s, c) => s + (c.net_exposure_usd ?? 0), 0);
 
+  // Pre-compute total gross per historical week (for share percentile)
+  const totalGrossHistory = macroData.map(w =>
+    w.commodities.reduce((s, c) => s + (c.gross_exposure_usd ?? 0), 0)
+  );
+
+  // Sector filter helper (reuses existing sectorGross)
+  const sectorFilter = (c: any, displaySector: string) => {
+    if (displaySector === "energy") return c.sector === "hard" &&  ENERGY_SYMS.has(c.symbol);
+    if (displaySector === "metals") return c.sector === "hard" && !ENERGY_SYMS.has(c.symbol);
+    return c.sector === displaySector;
+  };
+
+  // ── Sector breakdown (now with net, shareDelta, histRank) ──
+  const sectorBreakdown = DISPLAY_SECTORS.map(s => {
+    const gross  = sectorGross(latest, s);
+    const prevG  = sectorGross(prev, s);
+    const delta  = gross - prevG;
+    const net    = latest.commodities
+      .filter(c => sectorFilter(c, s))
+      .reduce((sum, c) => sum + (c.net_exposure_usd ?? 0), 0);
+    const curShare  = totalGross > 0 ? (gross / totalGross) * 100 : 0;
+    const prevShare = prevGross > 0  ? (prevG / prevGross) * 100  : 0;
+    const grossHistory = macroData.map(w =>
+      w.commodities.filter(c => sectorFilter(c, s)).reduce((sum, c) => sum + (c.gross_exposure_usd ?? 0), 0)
+    );
+    const shareHistory = grossHistory.map((g, i) =>
+      totalGrossHistory[i] > 0 ? (g / totalGrossHistory[i]) * 100 : 0
+    );
+    const netHistory = macroData.map(w =>
+      w.commodities.filter(c => sectorFilter(c, s)).reduce((sum, c) => sum + (c.net_exposure_usd ?? 0), 0)
+    );
+    return {
+      sector: s,
+      grossB:          gross / 1e9,
+      netB:            net   / 1e9,
+      deltaB:          delta / 1e9,
+      deltaPct:        prevG > 0 ? (delta / prevG) * 100 : 0,
+      shareOfTotalPct: curShare,
+      shareDeltaPp:    curShare - prevShare,
+      histRankGrossPct: percRank(gross, grossHistory),
+      histRankSharePct: percRank(curShare, shareHistory),
+      histRankNetPct: percRank(net, netHistory, false),
+    };
+  });
+
+  // ── Per-commodity table ──
+  const SECTOR_ORDER = ["energy", "metals", "grains", "meats", "softs", "micros"];
+  const commodityTable: import("./types").CommodityRow[] = latest.commodities
+    .filter(e => (e.gross_exposure_usd ?? 0) > 0)
+    .map(entry => {
+      const sym       = entry.symbol;
+      const dSector   = ENERGY_SYMS.has(sym) ? "energy" : (entry.sector === "hard" ? "metals" : entry.sector);
+      const prevEntry = prev.commodities.find(c => c.symbol === sym);
+      const curG      = entry.gross_exposure_usd  ?? 0;
+      const prevG2    = prevEntry?.gross_exposure_usd ?? 0;
+      const curN      = entry.net_exposure_usd     ?? 0;
+      const curShare  = totalGross > 0 ? (curG / totalGross) * 100  : 0;
+      const prevShare2 = prevGross > 0 ? (prevG2 / prevGross) * 100 : 0;
+      const grossHist  = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.gross_exposure_usd ?? 0);
+      const shareHist  = grossHist.map((g, i) => totalGrossHistory[i] > 0 ? (g / totalGrossHistory[i]) * 100 : 0);
+      const netHist = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.net_exposure_usd ?? 0);
+      return {
+        symbol: sym,
+        name:   entry.name,
+        displaySector: dSector,
+        isCoffee: sym === "arabica" || sym === "robusta",
+        grossB:          curG / 1e9,
+        netB:            curN / 1e9,
+        deltaB:          (curG - prevG2) / 1e9,
+        deltaPct:        prevG2 > 0 ? ((curG - prevG2) / prevG2) * 100 : 0,
+        shareOfTotalPct: curShare,
+        shareDeltaPp:    curShare - prevShare2,
+        histRankGrossPct: percRank(curG, grossHist),
+        histRankSharePct: percRank(curShare, shareHist),
+        histRankNetPct: percRank(curN, netHist, false),
+      };
+    })
+    .sort((a, b) => {
+      const ai = SECTOR_ORDER.indexOf(a.displaySector);
+      const bi = SECTOR_ORDER.indexOf(b.displaySector);
+      if (ai !== bi) return ai - bi;
+      return b.grossB - a.grossB;
+    });
+
+  // ── Net exposure WoW ──
+  const prevNetExp = prev.commodities.reduce((s, c) => s + (c.net_exposure_usd ?? 0), 0);
+
   return {
     date:               latest.date,
     totalGrossB:        totalGross  / 1e9,
@@ -121,6 +216,11 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
     biggestMoverDeltaB: biggest.delta / 1e9,
     coffeeSharePct:     totalGross > 0 ? (coffeeGross / totalGross) * 100 : 0,
     coffeeDeltaB:       (coffeeGross - coffeePrev) / 1e9,
+    coffeeGrossB:       coffeeGross / 1e9,
+    sectorBreakdown,
+    wowDeltaNetB:       (netExp - prevNetExp) / 1e9,
+    softsGrossB:        softsGross / 1e9,
+    commodityTable,
   };
 }
 

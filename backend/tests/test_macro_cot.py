@@ -10,7 +10,7 @@ def test_commodity_specs_all_required_fields():
     from scraper.sources.macro_cot import COMMODITY_SPECS
 
     required = {"name", "sector", "exchange", "price_source", "contract_unit",
-                "price_unit", "margin_outright_usd", "margin_spread_usd"}
+                "price_unit"}
     for sym, spec in COMMODITY_SPECS.items():
         missing = required - spec.keys()
         assert not missing, f"{sym} missing fields: {missing}"

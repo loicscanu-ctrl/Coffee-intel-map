@@ -11,7 +11,7 @@ import pandas as pd
 import requests
 
 # ── COMMODITY_SPECS ────────────────────────────────────────────────────────────
-# One entry per traded symbol. Margins from RJO Brien guide effective 3/14/2026.
+# One entry per traded symbol.
 # Entries marked *est* require manual verification at ice.com.
 COMMODITY_SPECS = {
   # ── Hard Commodities ─────────────────────────────────────────────────────────
@@ -21,7 +21,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "CL=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 1000, "price_unit": "usd_per_bbl", "currency": "USD",
-    "margin_outright_usd": 4675, "margin_spread_usd": 420,
   },
   "brent": {
     "name": "Brent Crude Oil", "sector": "hard", "exchange": "ICE Europe",
@@ -30,7 +29,6 @@ COMMODITY_SPECS = {
     "yfinance_ticker": "BZ=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 1000, "price_unit": "usd_per_bbl", "currency": "USD",
-    "margin_outright_usd": 4785, "margin_spread_usd": 540,
   },
   "natgas": {
     "name": "Natural Gas (Henry Hub)", "sector": "hard", "exchange": "NYMEX",
@@ -38,7 +36,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "NG=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 10000, "price_unit": "usd_per_mmbtu", "currency": "USD",
-    "margin_outright_usd": 6259, "margin_spread_usd": 570,
   },
   "heating_oil": {
     "name": "NY Harbor ULSD (Heating Oil)", "sector": "hard", "exchange": "NYMEX",
@@ -46,7 +43,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "HO=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 42000, "price_unit": "usd_per_gal", "currency": "USD",
-    "margin_outright_usd": 7596, "margin_spread_usd": 690,
   },
   "rbob": {
     "name": "RBOB Gasoline", "sector": "hard", "exchange": "NYMEX",
@@ -54,7 +50,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "RB=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 42000, "price_unit": "usd_per_gal", "currency": "USD",
-    "margin_outright_usd": 5988, "margin_spread_usd": 545,
   },
   "lsgo": {
     "name": "Low Sulphur Gasoil", "sector": "hard", "exchange": "ICE Europe",
@@ -64,7 +59,6 @@ COMMODITY_SPECS = {
     "price_source": "proxy",
     "proxy_to_usd_per_mt_factor": 264.17,
     "contract_unit": 100, "price_unit": "usd_per_mt", "currency": "USD",
-    "margin_outright_usd": 8993, "margin_spread_usd": 800,  # *est*
   },
   "gold": {
     "name": "Gold", "sector": "hard", "exchange": "COMEX",
@@ -72,7 +66,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "GC=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 100, "price_unit": "usd_per_oz", "currency": "USD",
-    "margin_outright_usd": 38905, "margin_spread_usd": 400,
   },
   "silver": {
     "name": "Silver", "sector": "hard", "exchange": "COMEX",
@@ -80,7 +73,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "SI=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 5000, "price_unit": "usd_per_oz", "currency": "USD",
-    "margin_outright_usd": 62304, "margin_spread_usd": 441,
   },
   "copper": {
     "name": "Copper", "sector": "hard", "exchange": "COMEX",
@@ -88,7 +80,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "HG=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 25000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 13200, "margin_spread_usd": 660,
   },
   # ── Grains ───────────────────────────────────────────────────────────────────
   "corn": {
@@ -99,7 +90,6 @@ COMMODITY_SPECS = {
     # ZC=F quotes in cents/bushel — divide by 100 to get USD/bushel
     "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
-    "margin_outright_usd": 1073, "margin_spread_usd": 303,
   },
   "wheat": {
     "name": "Wheat (SRW)", "sector": "grains", "exchange": "CBOT",
@@ -109,7 +99,6 @@ COMMODITY_SPECS = {
     # ZW=F quotes in cents/bushel
     "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
-    "margin_outright_usd": 1815, "margin_spread_usd": 440,
   },
   "soybeans": {
     "name": "Soybeans", "sector": "grains", "exchange": "CBOT",
@@ -119,7 +108,6 @@ COMMODITY_SPECS = {
     # ZS=F quotes in cents/bushel
     "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
-    "margin_outright_usd": 2200, "margin_spread_usd": 660,
   },
   "soy_meal": {
     "name": "Soybean Meal", "sector": "grains", "exchange": "CBOT",
@@ -128,7 +116,6 @@ COMMODITY_SPECS = {
     "price_source": "yfinance",
     # ZM=F quotes in USD/short ton — no conversion needed
     "contract_unit": 100, "price_unit": "usd_per_short_ton", "currency": "USD",
-    "margin_outright_usd": 1705, "margin_spread_usd": 495,
   },
   "soy_oil": {
     "name": "Soybean Oil", "sector": "grains", "exchange": "CBOT",
@@ -138,7 +125,6 @@ COMMODITY_SPECS = {
     # ZL=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 60000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 2310, "margin_spread_usd": 605,
   },
   # ── Meats ────────────────────────────────────────────────────────────────────
   "live_cattle": {
@@ -149,7 +135,6 @@ COMMODITY_SPECS = {
     # LE=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 40000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 3630, "margin_spread_usd": 1100,
   },
   "feeder_cattle": {
     "name": "Feeder Cattle", "sector": "meats", "exchange": "CME",
@@ -159,7 +144,6 @@ COMMODITY_SPECS = {
     # GF=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 50000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 6600, "margin_spread_usd": 1595,
   },
   "lean_hogs": {
     "name": "Lean Hogs", "sector": "meats", "exchange": "CME",
@@ -169,7 +153,6 @@ COMMODITY_SPECS = {
     # HE=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 40000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 1870, "margin_spread_usd": 1760,
   },
   # ── Softs ────────────────────────────────────────────────────────────────────
   "cotton": {
@@ -180,7 +163,6 @@ COMMODITY_SPECS = {
     # CT=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 50000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 1254, "margin_spread_usd": 364,
   },
   "sugar11": {
     "name": "Sugar No. 11", "sector": "softs", "exchange": "ICE US",
@@ -190,7 +172,6 @@ COMMODITY_SPECS = {
     # SB=F quotes in cents/lb (also used as proxy source for white_sugar)
     "yfinance_mult": 0.01,
     "contract_unit": 112000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 838, "margin_spread_usd": 183,
   },
   "white_sugar": {
     "name": "White Sugar No. 5", "sector": "softs", "exchange": "ICE Europe",
@@ -200,7 +181,6 @@ COMMODITY_SPECS = {
     "price_source": "proxy",
     "proxy_to_usd_per_mt_factor": 2204.62,
     "contract_unit": 50, "price_unit": "usd_per_mt", "currency": "USD",
-    "margin_outright_usd": 1526, "margin_spread_usd": 150,  # *est*
   },
   "arabica": {
     "name": "Coffee Arabica (C)", "sector": "softs", "exchange": "ICE US",
@@ -210,7 +190,6 @@ COMMODITY_SPECS = {
     # KC=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 37500, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 7376, "margin_spread_usd": 830,
   },
   "robusta": {
     "name": "Coffee Robusta", "sector": "softs", "exchange": "ICE Europe",
@@ -219,7 +198,6 @@ COMMODITY_SPECS = {
     "yfinance_ticker": None, "price_proxy": None,
     "price_source": "cot_weekly",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
-    "margin_outright_usd": 5000, "margin_spread_usd": 500,  # *est*
   },
   "cocoa_ny": {
     "name": "Cocoa NY", "sector": "softs", "exchange": "ICE US",
@@ -227,7 +205,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "CC=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
-    "margin_outright_usd": 4961, "margin_spread_usd": 535,
   },
   "cocoa_ldn": {
     "name": "Cocoa London", "sector": "softs", "exchange": "ICE Europe",
@@ -238,7 +215,6 @@ COMMODITY_SPECS = {
     "price_source": "proxy",
     "proxy_to_usd_per_mt_factor": 1.0,
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
-    "margin_outright_usd": 7069, "margin_spread_usd": 700,  # *est*
   },
   "oj": {
     "name": "Orange Juice (FCOJ-A)", "sector": "softs", "exchange": "ICE US",
@@ -248,7 +224,6 @@ COMMODITY_SPECS = {
     # OJ=F quotes in cents/lb
     "yfinance_mult": 0.01,
     "contract_unit": 15000, "price_unit": "usd_per_lb", "currency": "USD",
-    "margin_outright_usd": 4775, "margin_spread_usd": 1881,
   },
   # ── Micros ───────────────────────────────────────────────────────────────────
   "oats": {
@@ -259,7 +234,6 @@ COMMODITY_SPECS = {
     # ZO=F quotes in cents/bushel
     "yfinance_mult": 0.01,
     "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
-    "margin_outright_usd": 1375, "margin_spread_usd": 1100,
   },
   "lumber": {
     "name": "Lumber", "sector": "micros", "exchange": "CME",
@@ -268,7 +242,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": None, "price_proxy": None,
     "price_source": None,
     "contract_unit": 110000, "price_unit": "usd_per_mbf", "currency": "USD",
-    "margin_outright_usd": 9500, "margin_spread_usd": 950,
   },
   "rough_rice": {
     "name": "Rough Rice", "sector": "micros", "exchange": "CBOT",
@@ -276,7 +249,6 @@ COMMODITY_SPECS = {
     "ice_filter": None, "yfinance_ticker": "ZR=F", "price_proxy": None,
     "price_source": "yfinance", "yfinance_mult": 0.01,
     "contract_unit": 2000, "price_unit": "usd_per_cwt", "currency": "USD",
-    "margin_outright_usd": 1375, "margin_spread_usd": 1265,
   },
 }
 
@@ -371,6 +343,10 @@ def _parse_cftc(df: pd.DataFrame) -> dict:
         if rows.empty:
             print(f"[macro_cot] WARNING: no CFTC rows matched '{filt}' for {sym}", file=sys.stderr)
             continue
+        # Prefer exact match to avoid e.g. "E-MICRO GOLD" matching "GOLD - COMMODITY EXCHANGE INC."
+        exact = rows[rows[_CFTC_MARKET_COL].str.strip() == filt]
+        if not exact.empty:
+            rows = exact
         rows = rows.copy()
         rows["_date_parsed"] = pd.to_datetime(rows[_CFTC_DATE_COL], format="%y%m%d", errors="coerce")
         rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)

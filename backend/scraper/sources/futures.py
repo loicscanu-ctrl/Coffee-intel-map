@@ -386,6 +386,88 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# DRAFT: Barchart /futures-spreads spread volume scraper (NOT wired to run())
+# Scrapes the calendar spread contracts page to get per-spread-pair volume,
+# then aggregates by outright contract symbol so each contract gets a spread_vol.
+# Usage (manual testing only): await _scrape_spread_volume_draft(page)
+# ─────────────────────────────────────────────────────────────────────────────
+
+async def _scrape_spread_volume_draft(page) -> dict[str, int]:
+    """
+    DRAFT — not called from run().
+    Navigates to Barchart's /futures-spreads pages for KC and RM,
+    waits for JS rendering, extracts spread contract rows, and returns
+    a dict mapping outright contract symbol → aggregated spread volume.
+
+    Example return:
+      {"KCK26": 8420, "KCN26": 8420, "KCU26": 3100, ...}
+    Each contract's spread_vol is the sum of volumes of all spread pairs
+    that include that contract month.
+    """
+    import re as _re
+    spread_vol: dict[str, int] = {}
+
+    browser = page.context.browser
+    ctx = await browser.new_context(
+        user_agent=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        )
+    )
+    pg = await ctx.new_page()
+    try:
+        for root in ("KC", "RM"):
+            url = f"https://www.barchart.com/futures/quotes/{root}*0/futures-spreads"
+            await pg.goto(url, wait_until="domcontentloaded", timeout=30000)
+            await pg.wait_for_timeout(5000)  # wait for Vue/SPA to render
+
+            # Extract spread rows from the rendered DOM.
+            # Barchart renders a table where each row has data-symbol like "_S_SP_KCK26_KCN26"
+            # and shows volume. We grab all rows with that pattern.
+            rows = await pg.evaluate("""
+                () => {
+                    const results = [];
+                    // Try data-symbol rows first
+                    document.querySelectorAll('[data-symbol]').forEach(el => {
+                        const sym = el.getAttribute('data-symbol') || '';
+                        if (!sym.includes('_S_SP_')) return;
+                        // Look for volume cell (typically last numeric td)
+                        const cells = el.querySelectorAll('td');
+                        let vol = null;
+                        cells.forEach(td => {
+                            const txt = td.textContent.trim().replace(/,/g, '');
+                            if (/^\\d+$/.test(txt) && parseInt(txt) > 0) vol = parseInt(txt);
+                        });
+                        if (vol !== null) results.push({ sym, vol });
+                    });
+                    return results;
+                }
+            """)
+
+            for row in rows:
+                sym = row.get("sym", "")
+                vol = row.get("vol", 0)
+                if not vol:
+                    continue
+                # Parse legs from symbol like "_S_SP_KCK26_KCN26"
+                m = _re.match(r"_S_SP_([A-Z0-9]+)_([A-Z0-9]+)", sym)
+                if not m:
+                    continue
+                leg1, leg2 = m.group(1), m.group(2)
+                spread_vol[leg1] = spread_vol.get(leg1, 0) + vol
+                spread_vol[leg2] = spread_vol.get(leg2, 0) + vol
+
+            print(f"[futures draft] {root} spread vol: {len(rows)} spread pairs parsed")
+    except Exception as e:
+        print(f"[futures draft] spread volume scrape failed: {e}")
+    finally:
+        await ctx.close()
+
+    return spread_vol
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Entry point
 # ─────────────────────────────────────────────────────────────────────────────
 

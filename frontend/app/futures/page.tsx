@@ -10,6 +10,8 @@ interface Contract {
   chg: number;
   oi: number;
   volume: number;
+  spread_vol?: number;
+  efp_efs?: number;
   symbol: string;
 }
 
@@ -131,6 +133,8 @@ function ChainTable({ item }: { item: NewsItem }) {
             <th className="text-right px-2 py-2">Chg</th>
             <th className="text-right px-2 py-2">OI</th>
             <th className="text-right px-2 py-2">Vol</th>
+            <th className="text-right px-2 py-2">Spread Vol</th>
+            <th className="text-right px-2 py-2">EFP &amp; EFS</th>
           </tr>
         </thead>
         <tbody>
@@ -145,6 +149,8 @@ function ChainTable({ item }: { item: NewsItem }) {
                 <td className={`px-2 py-2 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
                 <td className="px-2 py-2 text-right">{fmt(c.oi)}</td>
                 <td className="px-2 py-2 text-right text-slate-400">{fmt(c.volume)}</td>
+                <td className="px-2 py-2 text-right text-slate-400">{c.spread_vol != null ? fmt(c.spread_vol) : "—"}</td>
+                <td className="px-2 py-2 text-right text-slate-400">{c.efp_efs != null ? fmt(c.efp_efs) : "—"}</td>
               </tr>
             );
           })}

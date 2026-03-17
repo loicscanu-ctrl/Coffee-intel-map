@@ -54,6 +54,22 @@ export interface MarketMetrics {
   };
 }
 
+export interface CommodityRow {
+  symbol: string;
+  name: string;
+  displaySector: string;        // "energy" | "metals" | "grains" | "meats" | "softs" | "micros"
+  isCoffee: boolean;            // true for arabica / robusta
+  grossB: number;               // current gross $B
+  netB: number;                 // current net $B
+  deltaB: number;               // WoW gross delta $B
+  deltaPct: number;             // WoW gross delta %
+  shareOfTotalPct: number;      // % of total gross
+  shareDeltaPp: number;         // WoW share change (percentage points)
+  histRankGrossPct: number;     // 0–100: position in full available history (0 = all-time low, 100 = all-time high)
+  histRankSharePct: number;     // same for share %
+  histRankNetPct: number;
+}
+
 export interface GlobalFlowMetrics {
   date: string;
   totalGrossB: number;      // USD billions
@@ -64,6 +80,22 @@ export interface GlobalFlowMetrics {
   biggestMoverDeltaB: number;
   coffeeSharePct: number;   // arabica+robusta combined % of total gross
   coffeeDeltaB: number;     // WoW change in coffee gross exposure
+  coffeeGrossB: number;     // current coffee gross USD billions
+  sectorBreakdown: Array<{
+    sector: string;
+    grossB: number;
+    netB: number;
+    deltaB: number;
+    deltaPct: number;         // WoW % change
+    shareOfTotalPct: number;  // % of total gross
+    shareDeltaPp: number;
+    histRankGrossPct: number;
+    histRankSharePct: number;
+    histRankNetPct: number;
+  }>;
+  wowDeltaNetB: number;         // WoW net exposure change $B
+  softsGrossB: number;          // current softs sector gross $B
+  commodityTable: CommodityRow[]; // all commodities sorted sector-then-gross-desc
 }
 
 export interface ReportData {
