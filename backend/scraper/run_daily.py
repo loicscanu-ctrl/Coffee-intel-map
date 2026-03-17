@@ -1,0 +1,8 @@
+# backend/scraper/run_daily.py
+# Single-run entrypoint for the daily scraper suite — called by GitHub Actions.
+# Runs all 10 news sources + macro_cot once, then exits.
+import asyncio
+from scraper.main import run_all_scrapers
+
+if __name__ == "__main__":
+    asyncio.run(run_all_scrapers())
