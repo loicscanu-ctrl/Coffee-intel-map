@@ -200,21 +200,12 @@ const SECTOR_LABELS: Record<string, string> = {
 };
 const SECTOR_ORDER = ["energy", "metals", "grains", "meats", "softs", "micros"];
 
-function RankBars({ grossRank, netRank, shareRank }: { grossRank: number; netRank: number; shareRank: number }) {
-  const bar = (rank: number) => {
-    const pct = Math.max(0, Math.min(100, rank));
-    const color = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
-    return (
-      <View style={{ width: "100%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginBottom: 1 }}>
-        <View style={{ width: `${pct}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
-      </View>
-    );
-  };
+function MiniBar({ rank }: { rank: number }) {
+  const pct   = Math.max(0, Math.min(100, rank));
+  const color = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
   return (
-    <View style={{ flex: 0.4, justifyContent: "center", paddingHorizontal: 2, paddingVertical: 2 }}>
-      {bar(grossRank)}
-      {bar(netRank)}
-      {bar(shareRank)}
+    <View style={{ width: "100%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 1 }}>
+      <View style={{ width: `${pct}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
     </View>
   );
 }
@@ -225,8 +216,8 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
   const dPct = (n: number) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(1)}%`;
   const dPp  = (n: number) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(2)}pp`;
 
-  // Column flex values: name | gross | net | Δ | Δ% | share | Δshare | bars(G/N/S)
-  const C = [1.8, 1.1, 1.0, 1.2, 0.7, 0.85, 0.8, 0.4];
+  // Column flex values: name | gross | net | Δ | Δ% | share | Δshare
+  const C = [1.8, 1.1, 1.0, 1.2, 0.7, 0.85, 0.8];
 
   const hdrCell  = (flex: number) => [S.tHCellR, { flex }];
   const hdrCellL = (flex: number) => [S.tHCell,  { flex }];
@@ -236,13 +227,21 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
     return (
       <View style={{ flexDirection: "row", paddingVertical: 2, paddingHorizontal: 6, backgroundColor: "#1e293b", borderBottomWidth: 0.5, borderBottomColor: "#334155" }}>
         <Text style={[S.tHCell, { flex: C[0], textTransform: "capitalize" }]}>{SECTOR_LABELS[sd.sector]}</Text>
-        <Text style={[S.tHCellR, { flex: C[1], fontSize: 6.5 }]}>{fB(sd.grossB)}</Text>
-        <Text style={[sd.netB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[2], fontSize: 6.5, textAlign: "right", fontFamily: "Helvetica-Bold" }]}>{sd.netB >= 0 ? "+" : "−"}{fB(sd.netB)}</Text>
+        <View style={{ flex: C[1], alignItems: "flex-end" }}>
+          <Text style={[S.tHCellR, { fontSize: 6.5 }]}>{fB(sd.grossB)}</Text>
+          <MiniBar rank={sd.histRankGrossPct} />
+        </View>
+        <View style={{ flex: C[2], alignItems: "flex-end" }}>
+          <Text style={[sd.netB >= 0 ? S.tCellPos : S.tCellNeg, { fontSize: 6.5, fontFamily: "Helvetica-Bold" }]}>{sd.netB >= 0 ? "+" : "−"}{fB(sd.netB)}</Text>
+          <MiniBar rank={sd.histRankNetPct} />
+        </View>
         <Text style={[sd.deltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[3], fontSize: 6.5, fontFamily: "Helvetica-Bold" }]}>{dB(sd.deltaB)}</Text>
         <Text style={[sd.deltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[4], fontSize: 6.5, fontFamily: "Helvetica-Bold" }]}>{dPct(sd.deltaPct)}</Text>
-        <Text style={[S.tHCellR, { flex: C[5], fontSize: 6.5 }]}>{sd.shareOfTotalPct.toFixed(1)}%</Text>
+        <View style={{ flex: C[5], alignItems: "flex-end" }}>
+          <Text style={[S.tHCellR, { fontSize: 6.5 }]}>{sd.shareOfTotalPct.toFixed(1)}%</Text>
+          <MiniBar rank={sd.histRankSharePct} />
+        </View>
         <Text style={[sd.shareDeltaPp >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[6], fontSize: 6.5, fontFamily: "Helvetica-Bold" }]}>{dPp(sd.shareDeltaPp)}</Text>
-        <RankBars grossRank={sd.histRankGrossPct} netRank={sd.histRankNetPct} shareRank={sd.histRankSharePct} />
       </View>
     );
   }
@@ -256,13 +255,21 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
     return (
       <View style={{ flexDirection: "row", paddingVertical: 1, paddingHorizontal: 6, backgroundColor: bg, borderBottomWidth: 0.3, borderBottomColor: "#e2e8f0" }}>
         <Text style={nameStyle}>{row.isCoffee ? "► " : ""}{row.name}</Text>
-        <Text style={[S.tCellR, { flex: C[1], fontSize: 6.5 }]}>{fB(row.grossB)}</Text>
-        <Text style={[row.netB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[2], fontSize: 6.5, textAlign: "right" }]}>{row.netB >= 0 ? "+" : "−"}{fB(row.netB)}</Text>
+        <View style={{ flex: C[1], alignItems: "flex-end" }}>
+          <Text style={[S.tCellR, { fontSize: 6.5 }]}>{fB(row.grossB)}</Text>
+          <MiniBar rank={row.histRankGrossPct} />
+        </View>
+        <View style={{ flex: C[2], alignItems: "flex-end" }}>
+          <Text style={[row.netB >= 0 ? S.tCellPos : S.tCellNeg, { fontSize: 6.5 }]}>{row.netB >= 0 ? "+" : "−"}{fB(row.netB)}</Text>
+          <MiniBar rank={row.histRankNetPct} />
+        </View>
         <Text style={[row.deltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[3], fontSize: 6.5 }]}>{dB(row.deltaB)}</Text>
         <Text style={[row.deltaPct >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[4], fontSize: 6.5 }]}>{dPct(row.deltaPct)}</Text>
-        <Text style={[S.tCellR, { flex: C[5], fontSize: 6.5 }]}>{row.shareOfTotalPct.toFixed(1)}%</Text>
+        <View style={{ flex: C[5], alignItems: "flex-end" }}>
+          <Text style={[S.tCellR, { fontSize: 6.5 }]}>{row.shareOfTotalPct.toFixed(1)}%</Text>
+          <MiniBar rank={row.histRankSharePct} />
+        </View>
         <Text style={[row.shareDeltaPp >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[6], fontSize: 6.5 }]}>{dPp(row.shareDeltaPp)}</Text>
-        <RankBars grossRank={row.histRankGrossPct} netRank={row.histRankNetPct} shareRank={row.histRankSharePct} />
       </View>
     );
   }
@@ -272,15 +279,21 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
       {/* Table header */}
       <View style={[S.tHeadRow, { paddingVertical: 3 }]}>
         <Text style={hdrCellL(C[0])}>COMMODITY</Text>
-        <Text style={hdrCell(C[1])}>GROSS $B</Text>
-        <Text style={hdrCell(C[2])}>NET $B</Text>
+        <View style={{ flex: C[1], alignItems: "flex-end" }}>
+          <Text style={S.tHCellR}>GROSS $B</Text>
+          <Text style={{ fontSize: 5, color: "#94a3b8" }}>◀ 5Y ▶</Text>
+        </View>
+        <View style={{ flex: C[2], alignItems: "flex-end" }}>
+          <Text style={S.tHCellR}>NET $B</Text>
+          <Text style={{ fontSize: 5, color: "#94a3b8" }}>◀ 5Y ▶</Text>
+        </View>
         <Text style={hdrCell(C[3])}>WoW Δ</Text>
         <Text style={hdrCell(C[4])}>Δ %</Text>
-        <Text style={hdrCell(C[5])}>SHARE %</Text>
-        <Text style={hdrCell(C[6])}>Δ SHR</Text>
-        <View style={{ flex: C[7], alignItems: "center" }}>
-          <Text style={{ fontSize: 5, color: "#94a3b8", textAlign: "center" }}>5Y{"\n"}G/N/S</Text>
+        <View style={{ flex: C[5], alignItems: "flex-end" }}>
+          <Text style={S.tHCellR}>SHARE %</Text>
+          <Text style={{ fontSize: 5, color: "#94a3b8" }}>◀ 5Y ▶</Text>
         </View>
+        <Text style={hdrCell(C[6])}>Δ SHR</Text>
       </View>
 
       {/* Sector groups */}
@@ -301,7 +314,7 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
         <Text style={[S.tHCell, { flex: C[0] }]}>TOTAL</Text>
         <Text style={[S.tHCellR, { flex: C[1] + C[2], fontSize: 6.5 }]}>${g.totalGrossB.toFixed(1)}B gross · ${g.netExpB.toFixed(1)}B net</Text>
         <Text style={[S.tHCellR, { flex: C[3], color: g.wowDeltaB >= 0 ? BRAND.green : BRAND.red, fontSize: 6.5 }]}>{g.wowDeltaB >= 0 ? "+" : "−"}${Math.abs(g.wowDeltaB).toFixed(2)}B</Text>
-        <Text style={[S.tHCellR, { flex: C[4] + C[5] + C[6] + C[7], fontSize: 6.5 }]}>100% share</Text>
+        <Text style={[S.tHCellR, { flex: C[4] + C[5] + C[6], fontSize: 6.5 }]}>100% share</Text>
       </View>
     </View>
   );
