@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, ComposedChart,
@@ -50,7 +50,7 @@ const ENERGY_SYMBOLS = new Set(["wti", "brent", "natgas", "heating_oil", "rbob",
 
 function transformMacroData(
   weeks: MacroCotWeek[],
-  mode: "gross" | "gross_long" | "gross_short" | "net" | "margin"
+  mode: "gross" | "gross_long" | "gross_short" | "net"
 ): { date: string; energy: number; metals: number; grains: number; meats: number; softs: number; micros: number; coffeeShare: number | null }[] {
   return weeks.filter(w => w.date !== "2025-11-11").map(week => {
     const sectorTotals: Record<string, number> = { energy: 0, metals: 0, grains: 0, meats: 0, softs: 0, micros: 0 };
@@ -65,8 +65,7 @@ function transformMacroData(
         mode === "gross"       ? g :
         mode === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
         mode === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
-        mode === "net"         ? n :
-        c.initial_margin_usd;
+        n;
 
       if (val == null) continue;
       const valB = val / 1e9;
@@ -175,18 +174,18 @@ function transformApiData(rows: any[]): any[] {
     // ny/ldn sub-objects: camelCase OI fields used by Tabs 2-6
     // nonRepLong (capital R) matches d.ny[`${cat}Long`] where cat="nonRep" in Tab 2
     const nyObj = {
-      pmpuLong:    ny.pmpu_long   ?? 0,  pmpuShort:   ny.pmpu_short  ?? 0,
-      swapLong:    ny.swap_long   ?? 0,  swapShort:   ny.swap_short  ?? 0,
-      mmLong:      ny.mm_long     ?? 0,  mmShort:     ny.mm_short    ?? 0,
-      otherLong:   ny.other_long  ?? 0,  otherShort:  ny.other_short ?? 0,
-      nonRepLong:  ny.nr_long     ?? 0,  nonRepShort: ny.nr_short    ?? 0,
+      pmpuLong:    ny.pmpu_long   ?? 0,  pmpuShort:   ny.pmpu_short  ?? 0,  pmpuSpread:   0,
+      swapLong:    ny.swap_long   ?? 0,  swapShort:   ny.swap_short  ?? 0,  swapSpread:   ny.swap_spread  ?? 0,
+      mmLong:      ny.mm_long     ?? 0,  mmShort:     ny.mm_short    ?? 0,  mmSpread:     ny.mm_spread    ?? 0,
+      otherLong:   ny.other_long  ?? 0,  otherShort:  ny.other_short ?? 0,  otherSpread:  ny.other_spread ?? 0,
+      nonRepLong:  ny.nr_long     ?? 0,  nonRepShort: ny.nr_short    ?? 0,  nonRepSpread: 0,
     };
     const ldnObj = {
-      pmpuLong:    ldn.pmpu_long  ?? 0,  pmpuShort:   ldn.pmpu_short  ?? 0,
-      swapLong:    ldn.swap_long  ?? 0,  swapShort:   ldn.swap_short  ?? 0,
-      mmLong:      ldn.mm_long    ?? 0,  mmShort:     ldn.mm_short    ?? 0,
-      otherLong:   ldn.other_long ?? 0,  otherShort:  ldn.other_short ?? 0,
-      nonRepLong:  ldn.nr_long    ?? 0,  nonRepShort: ldn.nr_short    ?? 0,
+      pmpuLong:    ldn.pmpu_long  ?? 0,  pmpuShort:   ldn.pmpu_short  ?? 0,  pmpuSpread:   0,
+      swapLong:    ldn.swap_long  ?? 0,  swapShort:   ldn.swap_short  ?? 0,  swapSpread:   ldn.swap_spread  ?? 0,
+      mmLong:      ldn.mm_long    ?? 0,  mmShort:     ldn.mm_short    ?? 0,  mmSpread:     ldn.mm_spread    ?? 0,
+      otherLong:   ldn.other_long ?? 0,  otherShort:  ldn.other_short ?? 0,  otherSpread:  ldn.other_spread ?? 0,
+      nonRepLong:  ldn.nr_long    ?? 0,  nonRepShort: ldn.nr_short    ?? 0,  nonRepSpread: 0,
     };
 
     // tradersNY/LDN: lowercase keys used by Tab 5 dpCats loop as m.tr["nonrep"]
@@ -205,8 +204,10 @@ function transformApiData(rows: any[]): any[] {
       nonrep: 0,  // ICE has no NR trader count
     };
 
-    const pmpuShortMT_NY  = nyObj.pmpuShort  * ARABICA_MT_FACTOR;
+    const pmpuShortMT_NY  = nyObj.pmpuShort * ARABICA_MT_FACTOR;
     const pmpuShortMT_LDN = ldnObj.pmpuShort * ROBUSTA_MT_FACTOR;
+    const pmpuLongMT_NY   = nyObj.pmpuLong  * ARABICA_MT_FACTOR;
+    const pmpuLongMT_LDN  = ldnObj.pmpuLong * ROBUSTA_MT_FACTOR;
     const efpMT = (ny.efp_ny ?? 0) * ARABICA_MT_FACTOR;
 
     base.push({
@@ -220,6 +221,8 @@ function transformApiData(rows: any[]): any[] {
       tradersNY, tradersLDN,
       pmpuShortMT_NY, pmpuShortMT_LDN,
       pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,
+      pmpuLongMT_NY, pmpuLongMT_LDN,
+      pmpuLongMT: pmpuLongMT_NY + pmpuLongMT_LDN,
       efpMT,
       timeframe: "historical",
     });
@@ -331,9 +334,12 @@ function generateData() {
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
       ny: nyD.oi, ldn: ldnD.oi,
       tradersNY: nyD.traders, tradersLDN: ldnD.traders,
-      pmpuShortMT_NY:  nyD.oi.pmpuShort  * ARABICA_MT_FACTOR,
+      pmpuShortMT_NY:  nyD.oi.pmpuShort * ARABICA_MT_FACTOR,
       pmpuShortMT_LDN: ldnD.oi.pmpuShort * ROBUSTA_MT_FACTOR,
       pmpuShortMT:     (nyD.oi.pmpuShort * ARABICA_MT_FACTOR) + (ldnD.oi.pmpuShort * ROBUSTA_MT_FACTOR),
+      pmpuLongMT_NY:   nyD.oi.pmpuLong  * ARABICA_MT_FACTOR,
+      pmpuLongMT_LDN:  ldnD.oi.pmpuLong * ROBUSTA_MT_FACTOR,
+      pmpuLongMT:      (nyD.oi.pmpuLong * ARABICA_MT_FACTOR) + (ldnD.oi.pmpuLong * ROBUSTA_MT_FACTOR),
       efpMT: efp * ARABICA_MT_FACTOR,
       timeframe: isLast ? "current" : isPrev1 ? "recent_1" : isPrev4 ? "recent_4" : isYear ? "year" : "historical",
     });
@@ -378,14 +384,16 @@ function SectionHeader({ icon, title, subtitle }: { icon: string; title: string;
 type CpUnit = "contracts" | "mt" | "usd";
 
 function RadialCounterparty({
-  latest, markets, unit,
+  latest, prev1, prev4, markets, unit,
 }: {
   latest: any;
+  prev1: any | null;
+  prev4: any | null;
   markets: { ny: boolean; ldn: boolean };
   unit: CpUnit;
 }) {
-  const mtFactor  = (m: "ny" | "ldn") => m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
-  const usdPerMT  = (m: "ny" | "ldn") => m === "ny" ? latest.priceNY * CENTS_LB_TO_USD_TON : latest.priceLDN;
+  const mtFactor = (m: "ny" | "ldn") => m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
+  const usdPerMT = (m: "ny" | "ldn") => m === "ny" ? latest.priceNY * CENTS_LB_TO_USD_TON : latest.priceLDN;
 
   const convert = (contracts: number, m: "ny" | "ldn") => {
     if (unit === "contracts") return contracts;
@@ -393,54 +401,120 @@ function RadialCounterparty({
     return unit === "mt" ? mt : mt * usdPerMT(m);
   };
 
-  const sum = (nyVal: number, ldnVal: number) => {
+  const sumRow = (row: any, nyFields: string | string[], ldnFields: string | string[]) => {
+    const nyFs  = Array.isArray(nyFields)  ? nyFields  : [nyFields];
+    const ldnFs = Array.isArray(ldnFields) ? ldnFields : [ldnFields];
     let v = 0;
-    if (markets.ny)  v += convert(nyVal,  "ny");
-    if (markets.ldn) v += convert(ldnVal, "ldn");
+    if (markets.ny)  nyFs.forEach(f  => { v += convert(row?.ny[f]  ?? 0, "ny");  });
+    if (markets.ldn) ldnFs.forEach(f => { v += convert(row?.ldn[f] ?? 0, "ldn"); });
     return v;
   };
 
   const fmtVal = (v: number) => {
-    if (unit === "usd")       return `$${(v / 1_000_000_000).toFixed(2)}B`;
-    if (unit === "mt")        return `${(v / 1_000).toFixed(0)}k MT`;
+    if (unit === "usd") return `$${(v / 1_000_000_000).toFixed(2)}B`;
+    if (unit === "mt")  return `${(v / 1_000).toFixed(0)}k MT`;
     return `${(v / 1_000).toFixed(0)}k lots`;
   };
 
-  const longs = [
-    { name: "Managed Money",   value: sum(latest.ny.mmLong,    latest.ldn.mmLong),    fill: "#f59e0b" },
-    { name: "Swap Dealers",    value: sum(latest.ny.swapLong,  latest.ldn.swapLong),   fill: "#10b981" },
-    { name: "Industry (PMPU)", value: sum(latest.ny.pmpuLong,  latest.ldn.pmpuLong),   fill: "#3b82f6" },
-    { name: "Other/Non-Rep",   value: sum(latest.ny.otherLong, latest.ldn.otherLong),  fill: "#64748b" },
+  const fmtDelta = (v: number) => {
+    const sign = v >= 0 ? "+" : "";
+    if (unit === "usd") return `${sign}$${(v / 1_000_000).toFixed(0)}M`;
+    if (unit === "mt")  return `${sign}${(v / 1_000).toFixed(1)}k`;
+    return `${sign}${(v / 1_000).toFixed(1)}k`;
+  };
+
+  const LONG_CATS: { name: string; fill: string; f: string | string[] }[] = [
+    { name: "MM",        fill: "#f59e0b", f: "mmLong"                         },
+    { name: "Swap",      fill: "#10b981", f: "swapLong"                       },
+    { name: "PMPU",      fill: "#3b82f6", f: "pmpuLong"                       },
+    { name: "Oth/NR",    fill: "#64748b", f: ["otherLong", "nonRepLong"]      },
   ];
-  const shorts = [
-    { name: "Industry (PMPU)", value: sum(latest.ny.pmpuShort,  latest.ldn.pmpuShort),  fill: "#3b82f6" },
-    { name: "Managed Money",   value: sum(latest.ny.mmShort,    latest.ldn.mmShort),    fill: "#f59e0b" },
-    { name: "Swap Dealers",    value: sum(latest.ny.swapShort,  latest.ldn.swapShort),  fill: "#10b981" },
-    { name: "Other/Non-Rep",   value: sum(latest.ny.otherShort, latest.ldn.otherShort), fill: "#64748b" },
+  const SHORT_CATS: { name: string; fill: string; f: string | string[] }[] = [
+    { name: "PMPU",      fill: "#3b82f6", f: "pmpuShort"                      },
+    { name: "MM",        fill: "#f59e0b", f: "mmShort"                        },
+    { name: "Swap",      fill: "#10b981", f: "swapShort"                      },
+    { name: "Oth/NR",    fill: "#64748b", f: ["otherShort", "nonRepShort"]    },
   ];
+
   const tooltipStyle = { backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px" };
 
+  const sides = [
+    { label: "LONGS (Buyers)",  color: "text-emerald-400", dir:  1, cats: LONG_CATS  },
+    { label: "SHORTS (Sellers)", color: "text-red-400",    dir: -1, cats: SHORT_CATS },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[340px]">
-      {[{ label: "LONGS (Buyers)", color: "text-emerald-400", data: longs, dir: 1 },
-        { label: "SHORTS (Sellers)", color: "text-red-400",   data: shorts, dir: -1 }].map(side => {
-        const total = side.data.reduce((s, d) => s + d.value, 0);
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[380px]">
+      {sides.map(side => {
+        const PIE_LABELS: Record<string, string> = { MM: "Managed Money", PMPU: "Industry (PMPU)", Swap: "Swap Dealers", "Oth/NR": "Other/Non-Rep" };
+        const pieData = side.cats.map(c => ({ name: PIE_LABELS[c.name] ?? c.name, value: sumRow(latest, c.f, c.f), fill: c.fill }));
+        const total   = pieData.reduce((s, d) => s + d.value, 0);
         return (
-          <div key={side.label} className="relative h-full bg-slate-800/30 rounded-xl border border-slate-800/50 flex flex-col items-center justify-center p-4">
-            <h4 className={`absolute top-4 ${side.color} font-bold text-xs uppercase tracking-widest`}>{side.label}</h4>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={side.data} cx="50%" cy="50%"
-                  startAngle={90} endAngle={90 + side.dir * 360}
-                  innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="value">
-                  {side.data.map((entry, i) => <Cell key={i} fill={entry.fill} stroke="rgba(0,0,0,0)" />)}
-                  <Label value={fmtVal(total)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" />
-                </Pie>
-                <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }}
-                  formatter={(v: any, name: string) => [fmtVal(Number(v)), name]} />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              </PieChart>
-            </ResponsiveContainer>
+          <div key={side.label} className="h-full bg-slate-800/30 rounded-xl border border-slate-800/50 flex flex-col p-4">
+            <h4 className={`${side.color} font-bold text-xs uppercase tracking-widest text-center mb-2`}>{side.label}</h4>
+            <div className="flex flex-row flex-1 min-h-0 gap-3">
+              {/* Pie */}
+              <div className="flex-1 min-w-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} cx="50%" cy="50%"
+                      startAngle={90} endAngle={90 + side.dir * 360}
+                      innerRadius={52} outerRadius={80} paddingAngle={2} dataKey="value">
+                      {pieData.map((entry, i) => <Cell key={i} fill={entry.fill} stroke="rgba(0,0,0,0)" />)}
+                      <Label value={fmtVal(total)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" />
+                    </Pie>
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }}
+                      formatter={(v: any, name: string) => [fmtVal(Number(v)), name]} />
+                    <Legend verticalAlign="bottom" height={32} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              {/* Delta panel */}
+              <div className="w-[130px] flex flex-col justify-center border-l border-slate-700/50 pl-3 gap-2.5">
+                <div className="grid grid-cols-3 text-[9px] text-slate-500 font-bold uppercase pb-1 border-b border-slate-700/50">
+                  <span></span>
+                  <span className="text-center">1W</span>
+                  <span className="text-center">4W</span>
+                </div>
+                {(() => {
+                  const rows = side.cats.map(cat => {
+                    const curr = sumRow(latest, cat.f, cat.f);
+                    const d1   = prev1 ? curr - sumRow(prev1, cat.f, cat.f) : null;
+                    const d4   = prev4 ? curr - sumRow(prev4, cat.f, cat.f) : null;
+                    return { ...cat, d1, d4 };
+                  });
+                  const tot1 = prev1 ? rows.reduce((s, r) => s + (r.d1 ?? 0), 0) : null;
+                  const tot4 = prev4 ? rows.reduce((s, r) => s + (r.d4 ?? 0), 0) : null;
+                  return (
+                    <>
+                      {rows.map(row => (
+                        <div key={row.name} className="grid grid-cols-3 items-center gap-1">
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: row.fill }} />
+                            <span className="text-[9px] text-slate-400 font-medium">{row.name}</span>
+                          </div>
+                          <span className={`text-[10px] font-semibold text-center tabular-nums ${row.d1 == null ? "text-slate-600" : row.d1 > 0 ? "text-emerald-400" : row.d1 < 0 ? "text-red-400" : "text-slate-500"}`}>
+                            {row.d1 == null ? "—" : fmtDelta(row.d1)}
+                          </span>
+                          <span className={`text-[10px] font-semibold text-center tabular-nums ${row.d4 == null ? "text-slate-600" : row.d4 > 0 ? "text-emerald-400" : row.d4 < 0 ? "text-red-400" : "text-slate-500"}`}>
+                            {row.d4 == null ? "—" : fmtDelta(row.d4)}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="grid grid-cols-3 items-center gap-1 pt-1.5 border-t border-slate-700/50">
+                        <span className="text-[9px] text-slate-300 font-bold uppercase">Total</span>
+                        <span className={`text-[10px] font-bold text-center tabular-nums ${tot1 == null ? "text-slate-600" : tot1 > 0 ? "text-emerald-300" : tot1 < 0 ? "text-red-300" : "text-slate-400"}`}>
+                          {tot1 == null ? "—" : fmtDelta(tot1)}
+                        </span>
+                        <span className={`text-[10px] font-bold text-center tabular-nums ${tot4 == null ? "text-slate-600" : tot4 > 0 ? "text-emerald-300" : tot4 < 0 ? "text-red-300" : "text-slate-400"}`}>
+                          {tot4 == null ? "—" : fmtDelta(tot4)}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
           </div>
         );
       })}
@@ -490,12 +564,20 @@ const CHART_STYLE = { backgroundColor: "#0f172a", borderColor: "#334155" };
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function CotDashboard() {
+  // PDF chart refs (one per section) — names match captureAllCharts() keys
+  const pdfRefGlobalFlow    = useRef<HTMLDivElement>(null);
+  const pdfRefStructural    = useRef<HTMLDivElement>(null);
+  const pdfRefCounterparty  = useRef<HTMLDivElement>(null);
+  const pdfRefIndustryPulse = useRef<HTMLDivElement>(null);
+  const pdfRefDryPowder     = useRef<HTMLDivElement>(null);
+  const pdfRefObosMatrix    = useRef<HTMLDivElement>(null);
+
   const [step, setStep] = useState<Step>(1);
   const [cotRows, setCotRows] = useState<any[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);
-  const [macroToggle, setMacroToggle] = useState<"gross" | "gross_long" | "gross_short" | "net" | "margin">("gross");
+  const [macroToggle, setMacroToggle] = useState<"gross" | "gross_long" | "gross_short" | "net">("gross");
 
   useEffect(() => {
     fetchCot()
@@ -517,6 +599,7 @@ export default function CotDashboard() {
   const [structMarkets, setStructMarkets] = useState({ ny: true, ldn: false });
   const [structCats,    setStructCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: false });
   const [structOIMode,  setStructOIMode]  = useState<"mt" | "usd">("mt");
+  const [structSide,    setStructSide]    = useState<"gross" | "long" | "short" | "spreading">("gross");
 
   const processedStructData = useMemo(() => data.map(d => {
     const mkts = (structMarkets.ny ? ["ny"] : []).concat(structMarkets.ldn ? ["ldn"] : []);
@@ -526,7 +609,12 @@ export default function CotDashboard() {
       mkts.forEach(m => {
         const factor        = m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
         const price_usd_ton = m === "ny" ? d.priceNY * CENTS_LB_TO_USD_TON : d.priceLDN;
-        const contracts     = (d as any)[m][`${cat}Long`] + (d as any)[m][`${cat}Short`];
+        const mData = (d as any)[m];
+        const contracts =
+          structSide === "long"      ? (mData[`${cat}Long`]   ?? 0) :
+          structSide === "short"     ? (mData[`${cat}Short`]  ?? 0) :
+          structSide === "spreading" ? (mData[`${cat}Spread`] ?? 0) :
+          (mData[`${cat}Long`] ?? 0) + (mData[`${cat}Short`] ?? 0);
         mt_val  += contracts * factor;
         usd_val += contracts * factor * price_usd_ton;
       });
@@ -536,7 +624,7 @@ export default function CotDashboard() {
     const price = structMarkets.ny && structMarkets.ldn ? d.avgPrice_USD_Ton
       : structMarkets.ny ? d.priceNY : d.priceLDN;
     return { ...d, ...agg, displayPrice: price };
-  }), [data, structMarkets]);
+  }), [data, structMarkets, structSide]);
 
   const structPriceDomain = useMemo((): [number, number] => {
     const prices = processedStructData.slice(-52)
@@ -581,21 +669,19 @@ export default function CotDashboard() {
   const macroKpis = useMemo(() => {
     if (!macroData.length) return null;
     const latestWeek = macroData[macroData.length - 1];
-    let grossLong = 0, grossShort = 0, totalMargin = 0;
+    let grossLong = 0, grossShort = 0;
     for (const c of latestWeek.commodities) {
       const g = c.gross_exposure_usd ?? 0;
       const n = c.net_exposure_usd   ?? 0;
-      grossLong   += (g + n) / 2;
-      grossShort  += (g - n) / 2;
-      totalMargin += c.initial_margin_usd;
+      grossLong  += (g + n) / 2;
+      grossShort += (g - n) / 2;
     }
     return {
-      totalGross:  grossLong + grossShort,
+      totalGross: grossLong + grossShort,
       grossLong,
       grossShort,
-      netExp:      grossLong - grossShort,
-      totalMargin,
-      date:        latestWeek.date,
+      netExp:     grossLong - grossShort,
+      date:       latestWeek.date,
     };
   }, [macroData]);
 
@@ -609,6 +695,84 @@ export default function CotDashboard() {
   // Step 5
   const [dpMarkets, setDpMarkets] = useState({ ny: true, ldn: true });
   const [dpCats,    setDpCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: true });
+
+  // Step 6
+  const [obosView, setObosView] = useState<"both" | "ny" | "ldn">("both");
+
+  // ── PDF download ──────────────────────────────────────────────────────────
+  const [pdfGenerating, setPdfGenerating] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!recent52.length || !macroData.length) return;
+    setPdfGenerating(true);
+    try {
+      const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
+      const capturedCharts = await captureAllCharts({
+        globalFlow:    pdfRefGlobalFlow,
+        structural:    pdfRefStructural,
+        counterparty:  pdfRefCounterparty,
+        industryPulse: pdfRefIndustryPulse,
+        dryPowder:     pdfRefDryPowder,
+        obosMatrix:    pdfRefObosMatrix,
+      });
+
+      const { buildGlobalFlowMetrics, buildMarketMetrics } = await import("@/lib/pdf/dataHelpers");
+      const globalFlow = buildGlobalFlowMetrics(macroData);
+      if (!globalFlow) throw new Error("Insufficient macro data");
+
+      // Pass `data` (raw /api/cot rows) — structure_ny, exch_oi_ny, t_mm_short only exist there
+      const rawData = data;
+      const ny  = buildMarketMetrics(recent52, rawData, "ny");
+      const ldn = buildMarketMetrics(recent52, rawData, "ldn");
+      if (!ny || !ldn) throw new Error("Insufficient COT data");
+
+      const cur = recent52[recent52.length - 1];
+      const cotDateObj = new Date(cur.date);
+      const cotDate = cotDateObj.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      const weekNum = Math.ceil(
+        (cotDateObj.getTime() - new Date(cotDateObj.getFullYear(), 0, 1).getTime()) / (7 * 86400000)
+      );
+
+      const reportData = {
+        weekNumber: weekNum,
+        year: cotDateObj.getFullYear(),
+        cotDate,
+        generatedAt: new Date().toISOString(),
+        globalFlow,
+        coffeeOverview: {
+          combinedNetLots:   (ny.mmLong - ny.mmShort) + (ldn.mmLong - ldn.mmShort),
+          combinedNetMT:     (ny.mmLong - ny.mmShort) * 5.625 + (ldn.mmLong - ldn.mmShort) * 10,
+          alignedDirection:  Math.sign(ny.mmLong - ny.mmShort) === Math.sign(ldn.mmLong - ldn.mmShort),
+          nyCombinedOiRank:  cur.oiRank    ?? 50,
+          ldnCombinedOiRank: cur.oiRankLDN ?? 50,
+        },
+        ny,
+        ldn,
+        charts: {
+          globalFlow:    capturedCharts.globalFlow    ?? null,
+          structural:    capturedCharts.structural    ?? null,
+          counterparty:  capturedCharts.counterparty  ?? null,
+          industryPulse: capturedCharts.industryPulse ?? null,
+          dryPowder:     capturedCharts.dryPowder     ?? null,
+          obosMatrix:    capturedCharts.obosMatrix     ?? null,
+        },
+      };
+
+      const { pdf } = await import("@react-pdf/renderer");
+      const { CotPdfReport } = await import("@/lib/pdf/PdfReport");
+      const blob = await pdf(<CotPdfReport d={reportData} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `COT-Report-Week${weekNum}-${cotDateObj.getFullYear()}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setPdfGenerating(false);
+    }
+  };
 
   const processedDpData = useMemo(() => {
     const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
@@ -684,6 +848,13 @@ export default function CotDashboard() {
         <span className="ml-auto text-[10px] text-slate-600 font-mono">
           NY {latest.priceNY.toFixed(2)}¢ · LDN ${latest.priceLDN.toFixed(0)}
         </span>
+        <button
+          onClick={handleDownloadPdf}
+          disabled={pdfGenerating || !recent52.length}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          {pdfGenerating ? "Generating…" : "↓ Download PDF"}
+        </button>
       </div>
 
       {/* ── Step 1: Global Money Flow ── */}
@@ -699,13 +870,12 @@ export default function CotDashboard() {
 
           {/* Toggle */}
           <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-            {(["gross", "gross_long", "gross_short", "net", "margin"] as const).map(m => {
+            {(["gross", "gross_long", "gross_short", "net"] as const).map(m => {
               const labels: Record<string, string> = {
                 gross:       "Total Gross",
                 gross_long:  "Gross Long",
                 gross_short: "Gross Short",
                 net:         "Net Exposure",
-                margin:      "Initial Margin",
               };
               return (
                 <button
@@ -731,7 +901,6 @@ export default function CotDashboard() {
               { label: "Gross Long Exposure",  value: fmtB(macroKpis.grossLong),   color: "#10b981" },
               { label: "Gross Short Exposure", value: fmtB(macroKpis.grossShort),  color: "#ef4444" },
               { label: "Net Exposure",         value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
-              { label: "Initial Margin",       value: fmtB(macroKpis.totalMargin), color: "#f59e0b" },
             ];
             return (
               <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
@@ -753,7 +922,7 @@ export default function CotDashboard() {
           <div style={{ marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure by Sector (USD bn)</span>
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
+          <div ref={pdfRefGlobalFlow} className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart
                 data={macroToggle === "net" && macroNetSplitData ? macroNetSplitData : macroChartData}
@@ -801,7 +970,20 @@ export default function CotDashboard() {
                     labelFormatter={(l: any) => `Week: ${l}`}
                   />
                 )}
-                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} content={(props: any) => {
+                  const order = ["energy", "metals", "grains", "meats", "softs", "micros"];
+                  const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
+                  return (
+                    <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
+                      {order.map(s => (
+                        <span key={s} style={{ display: "flex", alignItems: "center", gap: 5, color: "#d1d5db" }}>
+                          <span style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: SECTOR_COLORS[s], display: "inline-block" }} />
+                          {labelMap[s]}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                }} />
                 {macroToggle === "net" ? (
                   <>
                     {SECTORS.map(sector => {
@@ -909,8 +1091,7 @@ export default function CotDashboard() {
                     macroToggle === "gross"       ? g :
                     macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
                     macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
-                    macroToggle === "net"         ? n :
-                    c.initial_margin_usd;
+                    n;
                   row[sym.key] = val != null ? val / 1e9 : 0;
                 }
                 return row;
@@ -1038,8 +1219,7 @@ export default function CotDashboard() {
                     macroToggle === "gross"       ? g :
                     macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
                     macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
-                    macroToggle === "net"         ? n :
-                    c.initial_margin_usd;
+                    n;
                   row[sym.key] = val != null ? val / 1e9 : 0;
                 }
                 return row;
@@ -1115,10 +1295,18 @@ export default function CotDashboard() {
                     </button>
                   ))}
                 </div>
+                <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                  {(["gross", "long", "short", "spreading"] as const).map(s => (
+                    <button key={s} onClick={() => setStructSide(s)}
+                      className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${structSide === s ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+                      {s === "gross" ? "Gross" : s === "long" ? "Long" : s === "short" ? "Short" : "Spreading"}
+                    </button>
+                  ))}
+                </div>
               </div>
               <CatToggles cats={structCats} set={k => setStructCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
             </div>
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+            <div ref={pdfRefStructural} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={processedStructData.slice(-52)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1158,46 +1346,124 @@ export default function CotDashboard() {
               ))}
             </div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <RadialCounterparty latest={latest} markets={cpMarkets} unit={cpUnit} />
+          <div ref={pdfRefCounterparty} className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+            <RadialCounterparty
+              latest={latest}
+              prev1={data.length >= 2 ? data[data.length - 2] : null}
+              prev4={data.length >= 5 ? data[data.length - 5] : null}
+              markets={cpMarkets}
+              unit={cpUnit}
+            />
           </div>
         </div>
       )}
 
       {/* ── Step 4: Industry Pulse ── */}
-      {step === 4 && (
-        <div>
-          <SectionHeader icon="Factory" title="4. Industry Pulse (Metric Tons)"
-            subtitle="PMPU Short Coverage vs Price. Toggle Markets to see physical hedging depth." />
-          <div className="flex gap-1 mb-4 bg-slate-900 p-1 rounded-lg border border-slate-800 w-fit">
-            {(["ny", "ldn", "combined"] as const).map(m => (
-              <button key={m} onClick={() => setIndView(m)}
-                className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${indView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                {m}
-              </button>
-            ))}
+      {step === 4 && (() => {
+        const longKey  = indView === "ny" ? "pmpuLongMT_NY"  : indView === "ldn" ? "pmpuLongMT_LDN"  : "pmpuLongMT";
+        const shortKey = indView === "ny" ? "pmpuShortMT_NY" : indView === "ldn" ? "pmpuShortMT_LDN" : "pmpuShortMT";
+        const priceKey = indView === "ny" ? "priceNY"        : indView === "ldn" ? "priceLDN"         : "avgPrice_USD_Ton";
+        const mtFmt    = (v: number) => `${(v / 1000).toFixed(0)}k`;
+        const prices   = recent52.map(d => (d as any)[priceKey] as number).filter(v => v > 0);
+        const priceDomain: [number, number] = prices.length
+          ? [Math.floor(Math.min(...prices) / 100) * 100, Math.ceil(Math.max(...prices) / 100) * 100]
+          : [0, 500];
+        const mtVals   = recent52.flatMap(d => [(d as any)[longKey] as number, (d as any)[shortKey] as number]).filter(v => v > 0);
+        const mtDomain: [number, number] = mtVals.length
+          ? [Math.floor(Math.min(...mtVals) / 1000) * 1000, Math.ceil(Math.max(...mtVals) / 1000) * 1000]
+          : [0, 100000];
+
+        const deltaData = recent52.slice(1).map((d, i) => {
+          const dl = (d as any)[longKey]  - (recent52[i] as any)[longKey];
+          const ds = (d as any)[shortKey] - (recent52[i] as any)[shortKey];
+          const efp = (d as any).efpMT;
+          return {
+            date:       d.date,
+            deltaLong:  dl,
+            deltaShort: ds,
+            efpMT:      efp,
+            efpPctLong:  Math.abs(dl)  > 0 ? (efp / Math.abs(dl))  * 100 : null,
+            efpPctShort: Math.abs(ds)  > 0 ? (efp / Math.abs(ds))  * 100 : null,
+          };
+        });
+
+        return (
+          <div>
+            <SectionHeader icon="Factory" title="4. Industry Pulse (Metric Tons)"
+              subtitle="PMPU Gross Long & Short vs Price. Bottom panel: weekly position changes and EFP physical delivery." />
+            <div className="flex gap-1 mb-4 bg-slate-900 p-1 rounded-lg border border-slate-800 w-fit">
+              {(["ny", "ldn", "combined"] as const).map(m => (
+                <button key={m} onClick={() => setIndView(m)}
+                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${indView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+                  {m}
+                </button>
+              ))}
+            </div>
+
+            {/* Panel A — Gross Long & Short vs Price */}
+            <div ref={pdfRefIndustryPulse} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[320px] mb-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={recent52}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain}
+                    label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} />
+                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: string) => [
+                    name === "Price" ? v.toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name
+                  ]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Line yAxisId="left" type="monotone" dataKey={longKey}
+                    name="Industry Long (MT)"  stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line yAxisId="left" type="monotone" dataKey={shortKey}
+                    name="Industry Short (MT)" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line yAxisId="right" type="monotone" dataKey={priceKey}
+                    name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Panel B — Weekly Change + EFP */}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[280px] mb-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={deltaData} margin={{ right: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                  <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt}
+                    label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                  <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: string) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#10b981" opacity={0.8} barSize={6} />
+                  <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#3b82f6" opacity={0.8} barSize={6} />
+                  <Line type="monotone" dataKey="efpMT"
+                    name="EFP Physical" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Panel C — EFP % of Delta Long & Short */}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={deltaData} margin={{ right: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                  <YAxis stroke="#475569" fontSize={10} tickFormatter={v => `${v.toFixed(0)}%`}
+                    label={{ value: "%", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                  <ReferenceLine y={100} stroke="#475569" strokeDasharray="4 4" strokeOpacity={0.5} />
+                  <Tooltip contentStyle={CHART_STYLE}
+                    formatter={(v: any, name: string) => [v == null ? "n/a" : `${Number(v).toFixed(1)}%`, name]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Line type="monotone" dataKey="efpPctLong"  name="EFP % of Δ Long"
+                    stroke="#10b981" strokeWidth={1.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="efpPctShort" name="EFP % of Δ Short"
+                    stroke="#3b82f6" strokeWidth={1.5} dot={false} connectNulls={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={recent52}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                <YAxis yAxisId="left"  stroke="#475569" fontSize={10} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} />
-                <Tooltip contentStyle={CHART_STYLE} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                <Area yAxisId="left" type="monotone"
-                  dataKey={indView === "ny" ? "pmpuShortMT_NY" : indView === "ldn" ? "pmpuShortMT_LDN" : "pmpuShortMT"}
-                  name="Industry Short (MT)" fill="#3b82f6" fillOpacity={0.2} stroke="#3b82f6" />
-                <Bar  yAxisId="left"  dataKey="efpMT" name="EFP (Physical Delivery)" fill="#10b981" barSize={8} />
-                <Line yAxisId="right" type="monotone"
-                  dataKey={indView === "ny" ? "priceNY" : indView === "ldn" ? "priceLDN" : "avgPrice_USD_Ton"}
-                  name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── Step 5: Dry Powder ── */}
       {step === 5 && (
@@ -1208,7 +1474,7 @@ export default function CotDashboard() {
             <MarketToggle markets={dpMarkets} set={k => setDpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
             <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
+          <div ref={pdfRefDryPowder} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1268,7 +1534,15 @@ export default function CotDashboard() {
           <div>
             <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
               subtitle="Mapping the convergence of Price Rank and Net Positioning Rank. Red = NY Arabica · Blue = LDN Robusta · Orange = last week." />
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+            <div className="flex items-center gap-2 mb-3">
+              {(["both", "ny", "ldn"] as const).map(m => (
+                <button key={m} onClick={() => setObosView(m)}
+                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${obosView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+                  {m === "both" ? "NY + LDN" : m === "ny" ? "NY Arabica" : "LDN Robusta"}
+                </button>
+              ))}
+            </div>
+            <div ref={pdfRefObosMatrix} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1283,16 +1557,20 @@ export default function CotDashboard() {
                   <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
                     formatter={(v: any, _: string, props: any) => [`${Number(v).toFixed(1)}%`, props.name]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Scatter name="NY Arabica" data={nyPts}>
-                    {nyPts.map((d, i) => (
-                      <Cell key={i} fill={cycleColor(d, "ny")} fillOpacity={cycleOpacity(d)} />
-                    ))}
-                  </Scatter>
-                  <Scatter name="LDN Robusta" data={ldnPts}>
-                    {ldnPts.map((d, i) => (
-                      <Cell key={i} fill={cycleColor(d, "ldn")} fillOpacity={cycleOpacity(d)} />
-                    ))}
-                  </Scatter>
+                  {obosView !== "ldn" && (
+                    <Scatter name="NY Arabica" data={nyPts}>
+                      {nyPts.map((d, i) => (
+                        <Cell key={i} fill={cycleColor(d, "ny")} fillOpacity={cycleOpacity(d)} />
+                      ))}
+                    </Scatter>
+                  )}
+                  {obosView !== "ny" && (
+                    <Scatter name="LDN Robusta" data={ldnPts}>
+                      {ldnPts.map((d, i) => (
+                        <Cell key={i} fill={cycleColor(d, "ldn")} fillOpacity={cycleOpacity(d)} />
+                      ))}
+                    </Scatter>
+                  )}
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
