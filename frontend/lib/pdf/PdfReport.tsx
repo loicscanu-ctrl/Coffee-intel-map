@@ -204,7 +204,7 @@ function MiniBar({ rank }: { rank: number }) {
   const pct   = Math.max(0, Math.min(100, rank));
   const color = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
   return (
-    <View style={{ width: "50%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 1 }}>
+    <View style={{ width: "50%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 0 }}>
       <View style={{ width: `${pct}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
     </View>
   );
@@ -225,7 +225,7 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
   // Sector header row
   function SectorRow({ sd }: { sd: (typeof g.sectorBreakdown)[0] }) {
     return (
-      <View style={{ flexDirection: "row", paddingVertical: 2, paddingHorizontal: 6, backgroundColor: "#1e293b", borderBottomWidth: 0.5, borderBottomColor: "#334155" }}>
+      <View style={{ flexDirection: "row", paddingVertical: 1, paddingHorizontal: 6, backgroundColor: "#1e293b", borderBottomWidth: 0.5, borderBottomColor: "#334155" }}>
         <Text style={[S.tHCell, { flex: C[0], textTransform: "capitalize" }]}>{SECTOR_LABELS[sd.sector]}</Text>
         <View style={{ flex: C[1], alignItems: "flex-end" }}>
           <Text style={[S.tHCellR, { fontSize: 6.5 }]}>{fB(sd.grossB)}</Text>
@@ -253,7 +253,7 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
       ? [S.tCell, { flex: C[0], color: BRAND.amber, fontSize: 6.5, paddingLeft: 10 }]
       : [S.tCell, { flex: C[0], fontSize: 6.5, paddingLeft: 10 }];
     return (
-      <View style={{ flexDirection: "row", paddingVertical: 1, paddingHorizontal: 6, backgroundColor: bg, borderBottomWidth: 0.3, borderBottomColor: "#e2e8f0" }}>
+      <View style={{ flexDirection: "row", paddingVertical: 0, paddingHorizontal: 6, backgroundColor: bg, borderBottomWidth: 0.3, borderBottomColor: "#e2e8f0" }}>
         <Text style={nameStyle}>{row.isCoffee ? "► " : ""}{row.name}</Text>
         <View style={{ flex: C[1], alignItems: "flex-end" }}>
           <Text style={[S.tCellR, { fontSize: 6.5 }]}>{fB(row.grossB)}</Text>
@@ -275,9 +275,9 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
   }
 
   return (
-    <View style={S.tableWrap}>
+    <View style={[S.tableWrap, { marginVertical: 3 }]}>
       {/* Table header */}
-      <View style={[S.tHeadRow, { paddingVertical: 3 }]}>
+      <View style={[S.tHeadRow, { paddingVertical: 2 }]}>
         <Text style={hdrCellL(C[0])}>COMMODITY</Text>
         <View style={{ flex: C[1], alignItems: "flex-end" }}>
           <Text style={S.tHCellR}>GROSS $B</Text>
@@ -354,10 +354,16 @@ function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
   const ncByGross    = [...nonCoffee].sort((a, b) => Math.abs(b.deltaB)    - Math.abs(a.deltaB));
   const ncByNet      = [...nonCoffee].sort((a, b) => Math.abs(b.netDeltaB) - Math.abs(a.netDeltaB));
 
+  // Compact style shortcuts for sidebar placement
+  const bRow  = { marginBottom: 2 };
+  const bSub  = { marginBottom: 1 };
+  const bTxt  = { fontSize: 6.5, lineHeight: 1.3 };
+  const bSubT = { fontSize: 6.0, lineHeight: 1.3 };
+
   const subRow = (key: string, label: string, deltaB: number, pct: number) => (
-    <View key={key} style={[S.bulletSubRow, { marginLeft: 14 }]}>
-      <Text style={S.bulletSubDot}>·</Text>
-      <Text style={S.bulletSubText}>
+    <View key={key} style={[S.bulletSubRow, bSub, { marginLeft: 10 }]}>
+      <Text style={[S.bulletSubDot, { fontSize: 6 }]}>·</Text>
+      <Text style={[S.bulletSubText, bSubT]}>
         {label}: <Text style={cn(deltaB)}>{fD(deltaB)}</Text>
         {" "}(<Text style={cn(pct)}>{fPct(pct)}</Text>)
       </Text>
@@ -365,75 +371,75 @@ function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
   );
 
   return (
-    <View style={[S.commentBox, { marginTop: 0 }]}>
-      <Text style={[S.commentText, { fontFamily: BOLD, color: BRAND.dark, marginBottom: 3, fontSize: 7.5 }]}>
+    <View style={[S.commentBox, { marginTop: 0, marginBottom: 0, padding: 5 }]}>
+      <Text style={[S.commentText, { fontFamily: BOLD, color: BRAND.dark, marginBottom: 2, fontSize: 6.5 }]}>
         HIGHLIGHTS ON SPECULATIVE EXPOSURE
       </Text>
 
       {/* 1 — Total Gross */}
-      <View style={S.bulletRow}>
-        <Text style={S.bulletDot}>•</Text>
-        <Text style={S.bulletText}>
-          Total Gross exposure {dir(g.wowDeltaB)} to{" "}
-          <Text style={{ fontFamily: BOLD }}>{fB(g.totalGrossB)}</Text> this week, by{" "}
+      <View style={[S.bulletRow, bRow]}>
+        <Text style={[S.bulletDot, { fontSize: 7, width: 7 }]}>•</Text>
+        <Text style={[S.bulletText, bTxt]}>
+          Total Gross {dir(g.wowDeltaB)} to{" "}
+          <Text style={{ fontFamily: BOLD }}>{fB(g.totalGrossB)}</Text>, by{" "}
           <Text style={cn(g.wowDeltaB)}>{fD(g.wowDeltaB)}</Text>
           {" "}(<Text style={cn(totalPct)}>{fPct(totalPct)}</Text>)
         </Text>
       </View>
-      <View style={S.bulletSubRow}>
-        <Text style={S.bulletSubDot}>→</Text>
-        <Text style={S.bulletSubText}>Biggest gross movers:</Text>
+      <View style={[S.bulletSubRow, bSub]}>
+        <Text style={[S.bulletSubDot, { fontSize: 6 }]}>→</Text>
+        <Text style={[S.bulletSubText, bSubT]}>Biggest gross movers:</Text>
       </View>
       {top3Gross.map(c => subRow(c.symbol, c.name, c.deltaB, c.deltaPct))}
 
       {/* 2 — Total Net */}
-      <View style={[S.bulletRow, { marginTop: 3 }]}>
-        <Text style={S.bulletDot}>•</Text>
-        <Text style={S.bulletText}>
-          Total Net exposure at{" "}
+      <View style={[S.bulletRow, bRow, { marginTop: 2 }]}>
+        <Text style={[S.bulletDot, { fontSize: 7, width: 7 }]}>•</Text>
+        <Text style={[S.bulletText, bTxt]}>
+          Total Net at{" "}
           <Text style={{ fontFamily: BOLD }}>{fB(g.netExpB)}</Text>
           {" "}(<Text style={cn(g.wowDeltaNetB)}>{fD(g.wowDeltaNetB)}</Text>
           {" "}/ <Text style={cn(netPct)}>{fPct(netPct)}</Text>)
         </Text>
       </View>
-      <View style={S.bulletSubRow}>
-        <Text style={S.bulletSubDot}>→</Text>
-        <Text style={S.bulletSubText}>Biggest net movers:</Text>
+      <View style={[S.bulletSubRow, bSub]}>
+        <Text style={[S.bulletSubDot, { fontSize: 6 }]}>→</Text>
+        <Text style={[S.bulletSubText, bSubT]}>Biggest net movers:</Text>
       </View>
       {top3Net.map(c => subRow(c.symbol + "_net", c.name, c.netDeltaB, c.netDeltaPct))}
 
       {/* 3 — Softs Gross */}
       {softsSd && (
         <>
-          <View style={[S.bulletRow, { marginTop: 3 }]}>
-            <Text style={S.bulletDot}>•</Text>
-            <Text style={S.bulletText}>
-              Softs gross exposure {dir(softsSd.deltaB)} to{" "}
+          <View style={[S.bulletRow, bRow, { marginTop: 2 }]}>
+            <Text style={[S.bulletDot, { fontSize: 7, width: 7 }]}>•</Text>
+            <Text style={[S.bulletText, bTxt]}>
+              Softs gross {dir(softsSd.deltaB)} to{" "}
               <Text style={{ fontFamily: BOLD }}>{fB(softsSd.grossB)}</Text>, by{" "}
               <Text style={cn(softsSd.deltaB)}>{fD(softsSd.deltaB)}</Text>
               {" "}(<Text style={cn(softsSd.deltaPct)}>{fPct(softsSd.deltaPct)}</Text>)
             </Text>
           </View>
-          <View style={S.bulletSubRow}>
-            <Text style={S.bulletSubDot}>→</Text>
-            <Text style={S.bulletSubText}>Movers:</Text>
+          <View style={[S.bulletSubRow, bSub]}>
+            <Text style={[S.bulletSubDot, { fontSize: 6 }]}>→</Text>
+            <Text style={[S.bulletSubText, bSubT]}>Movers:</Text>
           </View>
           {coffeeComs.map(c => subRow(c.symbol, c.name, c.deltaB, c.deltaPct))}
           {ncByGross[0] && subRow(ncByGross[0].symbol + "_nc", ncByGross[0].name, ncByGross[0].deltaB, ncByGross[0].deltaPct)}
 
           {/* 4 — Softs Net */}
-          <View style={[S.bulletRow, { marginTop: 3 }]}>
-            <Text style={S.bulletDot}>•</Text>
-            <Text style={S.bulletText}>
-              Net exposure (Softs) at{" "}
+          <View style={[S.bulletRow, bRow, { marginTop: 2 }]}>
+            <Text style={[S.bulletDot, { fontSize: 7, width: 7 }]}>•</Text>
+            <Text style={[S.bulletText, bTxt]}>
+              Net (Softs) at{" "}
               <Text style={{ fontFamily: BOLD }}>{softsSd.netB >= 0 ? "" : "−"}{fB(softsSd.netB)}</Text>
               {" "}(<Text style={cn(softsSd.netDeltaB)}>{fD(softsSd.netDeltaB)}</Text>
               {" "}/ <Text style={cn(softsSd.netDeltaPct)}>{fPct(softsSd.netDeltaPct)}</Text>)
             </Text>
           </View>
-          <View style={S.bulletSubRow}>
-            <Text style={S.bulletSubDot}>→</Text>
-            <Text style={S.bulletSubText}>Movers:</Text>
+          <View style={[S.bulletSubRow, bSub]}>
+            <Text style={[S.bulletSubDot, { fontSize: 6 }]}>→</Text>
+            <Text style={[S.bulletSubText, bSubT]}>Movers:</Text>
           </View>
           {coffeeComs.map(c => subRow(c.symbol + "_net", c.name, c.netDeltaB, c.netDeltaPct))}
           {ncByNet[0] && subRow(ncByNet[0].symbol + "_ncnet", ncByNet[0].name, ncByNet[0].netDeltaB, ncByNet[0].netDeltaPct)}
@@ -566,30 +572,31 @@ export function CotPdfReport({ d }: { d: ReportData }) {
       <Page size="A4" style={S.page}>
         <PageHeader title="GLOBAL MONEY FLOW" sub={header} />
 
-        {/* Cover block + Highlights side by side */}
-        <View style={{ flexDirection: "row", marginBottom: 8, gap: 10 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={[S.coverTitle, { fontSize: 18 }]}>COT Weekly</Text>
-            <Text style={S.coverWeek}>Week {d.weekNumber}/{d.year}</Text>
-            <Text style={S.coverDate}>As per positioning of {d.cotDate}</Text>
-            <View style={S.coverDivider} />
-          </View>
-          <View style={{ flex: 2 }}>
-            <FlowAnalysis g={d.globalFlow} />
-          </View>
+        {/* Compact cover strip */}
+        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
+          <Text style={{ fontSize: 15, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>COT Weekly</Text>
+          <Text style={{ fontSize: 8, color: BRAND.slate400 }}>Week {d.weekNumber}/{d.year} · As per positioning of {d.cotDate}</Text>
         </View>
+        <View style={{ height: 1.5, backgroundColor: BRAND.amber, marginBottom: 5 }} />
 
         {/* KPIs */}
-        <View style={[S.kpiRow, { marginBottom: 6 }]}>
+        <View style={[S.kpiRow, { marginBottom: 5 }]}>
           <KpiPill label="Total Gross" value={`$${d.globalFlow.totalGrossB.toFixed(1)}B`} sub={`${d.globalFlow.wowDeltaB >= 0 ? "+" : ""}${d.globalFlow.wowDeltaB.toFixed(1)}B WoW`} color={d.globalFlow.wowDeltaB >= 0 ? BRAND.green : BRAND.red} />
           <KpiPill label="Net Exposure" value={`$${d.globalFlow.netExpB.toFixed(1)}B`} />
           <KpiPill label="Softs Share" value={`${d.globalFlow.softSharePct.toFixed(1)}%`} />
           <KpiPill label="Coffee Share" value={`${d.globalFlow.coffeeSharePct.toFixed(1)}%`} sub={`${d.globalFlow.coffeeDeltaB >= 0 ? "+" : ""}${d.globalFlow.coffeeDeltaB.toFixed(1)}B WoW`} />
         </View>
 
-        {/* Commodity breakdown table */}
-        <Text style={[S.subTitle, { marginTop: 2, marginBottom: 4 }]}>COMMODITY BREAKDOWN — WEEK-ON-WEEK · 5Y RANGE BARS: GREEN=UNDERINVESTED · RED=OVERINVESTED</Text>
-        <CommodityTable g={d.globalFlow} />
+        {/* Commodity breakdown table + Highlights side by side */}
+        <Text style={[S.subTitle, { marginTop: 0, marginBottom: 3, fontSize: 7 }]}>COMMODITY BREAKDOWN — WEEK-ON-WEEK · 5Y RANGE BARS: GREEN=UNDERINVESTED · RED=OVERINVESTED</Text>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flex: 3 }}>
+            <CommodityTable g={d.globalFlow} />
+          </View>
+          <View style={{ flex: 2 }}>
+            <FlowAnalysis g={d.globalFlow} />
+          </View>
+        </View>
 
         <PageFooter page={1} total={totalPages} date={ts} />
       </Page>
