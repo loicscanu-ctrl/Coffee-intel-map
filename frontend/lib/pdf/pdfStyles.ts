@@ -82,13 +82,32 @@ export const S = StyleSheet.create({
   flagOB: { fontSize: 8, color: BRAND.red,   fontFamily: "Helvetica-Bold" },
   flagOS: { fontSize: 8, color: BRAND.green, fontFamily: "Helvetica-Bold" },
   flagNeutral: { fontSize: 8, color: BRAND.slate600 },
+  flagRed:   { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND.red },
+  flagGreen: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND.green },
+  flagAmber: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND.amber },
 
-  // ── Chart image placeholder ──
-  chartImg:   { width: "100%", height: 200, marginBottom: 6 },
+  // ── Chart image ──
+  chartImg:     { width: "100%", objectFit: "contain", marginVertical: 6 },
+  chartCaption: { fontSize: 7.5, color: BRAND.slate400, marginTop: 2, marginBottom: 8, textAlign: "center" },
   noChart:    { width: "100%", height: 200, backgroundColor: "#f1f5f9", justifyContent: "center", alignItems: "center", marginBottom: 6 },
   noChartTxt: { fontSize: 8, color: BRAND.slate400 },
 
   // ── Footer ──
-  footer: { position: "absolute", bottom: 20, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between" },
+  footer: {
+    position: "absolute", bottom: 18, left: 40, right: 40,
+    flexDirection: "row", justifyContent: "space-between",
+    fontSize: 7, color: BRAND.slate400,
+    borderTopWidth: 0.5, borderTopColor: "#e2e8f0", paddingTop: 4,
+  },
   footerTxt: { fontSize: 7, color: BRAND.slate400 },
+
+  // ── Cover ──
+  coverTitle:   { fontSize: 28, fontFamily: "Helvetica-Bold", color: BRAND.dark, marginBottom: 4 },
+  coverWeek:    { fontSize: 14, color: BRAND.slate600, marginBottom: 2 },
+  coverDate:    { fontSize: 10, color: BRAND.slate400, marginBottom: 24 },
+  coverDivider: { height: 2, backgroundColor: BRAND.amber, marginBottom: 16 },
+
+  // ── Disclaimer ──
+  disclaimerTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: BRAND.dark, marginBottom: 8 },
+  disclaimerText:  { fontSize: 7.5, color: BRAND.slate600, lineHeight: 1.5, marginBottom: 6 },
 });
