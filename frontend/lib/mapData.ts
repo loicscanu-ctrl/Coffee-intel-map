@@ -20,6 +20,7 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Los Angeles", l: [33.7, -118.2] },
   { n: "Tokyo", l: [35.6, 139.6] },
   { n: "Singapore", l: [1.2, 103.8] },
+  { n: "Pacific", l: [40.0, -170.0] },
   { n: "Barcelona", l: [41.38, 2.17] },
   { n: "Le Havre", l: [49.49, 0.10] },
   { n: "Basel", l: [47.55, 7.59] },
@@ -270,11 +271,11 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
   // ASIA ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // Singapore → US West Coast (northern Pacific lane — distinct from Trans-Pacific trunk)
+  // Singapore → Central Pacific (northern Pacific lane, terminus in open Pacific)
   {
-    name: "Singapore → US West (Oakland)",
+    name: "Singapore → Pacific",
     color: "#2ecc71",
-    path: [[1.26, 103.8], [8.0, 112.0], [15.0, 125.0], [22.0, 138.0], [30.0, 155.0], [38.0, 170.0], [42.0, 180.0], [40.0, -165.0], [38.5, -140.0], [37.8, -122.4]],
+    path: [[1.26, 103.8], [8.0, 112.0], [15.0, 125.0], [22.0, 138.0], [30.0, 155.0], [38.0, 170.0], [40.0, -170.0]],
   },
 
   // Singapore → Sydney
