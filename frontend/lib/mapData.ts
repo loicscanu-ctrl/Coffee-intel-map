@@ -20,7 +20,6 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Los Angeles", l: [33.7, -118.2] },
   { n: "Tokyo", l: [35.6, 139.6] },
   { n: "Singapore", l: [1.2, 103.8] },
-  { n: "Pacific", l: [38.0, 158.0] },
   { n: "Barcelona", l: [41.38, 2.17] },
   { n: "Le Havre", l: [49.49, 0.10] },
   { n: "Basel", l: [47.55, 7.59] },
@@ -285,11 +284,11 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
     path: [[1.26, 103.8], [-1.0, 105.0], [-3.0, 107.0], [-5.0, 112.0], [-6.0, 120.0], [-7.5, 128.0], [-9.5, 135.0], [-10.2, 142.0], [-13.0, 146.0], [-20.0, 152.0], [-30.0, 154.0], [-33.86, 151.20]],
   },
 
-  // Shanghai deviation — branches off Singapore→Japan feeder near Kyushu
+  // Shanghai deviation — branches off Singapore→Japan lane at [30, 128]
   {
-    name: "Deviation: Japan feeder → Shanghai",
+    name: "Deviation Singapore → Shanghai",
     color: "#e74c3c",
-    path: [[28.0, 136.0], [30.0, 129.0], [31.23, 121.47]],
+    path: [[30.0, 128.0], [31.23, 121.47]],
   },
 
   // ═══════════════════════════════════════════════════════════
