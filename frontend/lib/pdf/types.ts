@@ -68,6 +68,8 @@ export interface CommodityRow {
   histRankGrossPct: number;     // 0–100: position in full available history (0 = all-time low, 100 = all-time high)
   histRankSharePct: number;     // same for share %
   histRankNetPct: number;
+  netDeltaB: number;            // WoW net exposure delta $B
+  netDeltaPct: number;          // WoW net exposure delta %
 }
 
 export interface GlobalFlowMetrics {
@@ -92,6 +94,8 @@ export interface GlobalFlowMetrics {
     histRankGrossPct: number;
     histRankSharePct: number;
     histRankNetPct: number;
+    netDeltaB: number;
+    netDeltaPct: number;
   }>;
   wowDeltaNetB: number;         // WoW net exposure change $B
   softsGrossB: number;          // current softs sector gross $B

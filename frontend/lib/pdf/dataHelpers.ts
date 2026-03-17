@@ -150,6 +150,10 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
     const netHistory = macroData.map(w =>
       w.commodities.filter(c => sectorFilter(c, s)).reduce((sum, c) => sum + (c.net_exposure_usd ?? 0), 0)
     );
+    const prevNet = prev.commodities
+      .filter(c => sectorFilter(c, s))
+      .reduce((sum, c) => sum + (c.net_exposure_usd ?? 0), 0);
+    const netDelta = net - prevNet;
     return {
       sector: s,
       grossB:          gross / 1e9,
@@ -161,6 +165,8 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
       histRankGrossPct: percRank(gross, grossHistory),
       histRankSharePct: percRank(curShare, shareHistory),
       histRankNetPct: percRank(net, netHistory, false),
+      netDeltaB:       netDelta / 1e9,
+      netDeltaPct:     prevNet !== 0 ? (netDelta / Math.abs(prevNet)) * 100 : 0,
     };
   });
 
@@ -175,11 +181,13 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
       const curG      = entry.gross_exposure_usd  ?? 0;
       const prevG2    = prevEntry?.gross_exposure_usd ?? 0;
       const curN      = entry.net_exposure_usd     ?? 0;
+      const prevN     = prevEntry?.net_exposure_usd    ?? 0;
       const curShare  = totalGross > 0 ? (curG / totalGross) * 100  : 0;
       const prevShare2 = prevGross > 0 ? (prevG2 / prevGross) * 100 : 0;
       const grossHist  = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.gross_exposure_usd ?? 0);
       const shareHist  = grossHist.map((g, i) => totalGrossHistory[i] > 0 ? (g / totalGrossHistory[i]) * 100 : 0);
       const netHist = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.net_exposure_usd ?? 0);
+      const netDelta = curN - prevN;
       return {
         symbol: sym,
         name:   entry.name,
@@ -194,6 +202,8 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
         histRankGrossPct: percRank(curG, grossHist),
         histRankSharePct: percRank(curShare, shareHist),
         histRankNetPct: percRank(curN, netHist, false),
+        netDeltaB:       netDelta / 1e9,
+        netDeltaPct:     prevN !== 0 ? (netDelta / Math.abs(prevN)) * 100 : 0,
       };
     })
     .sort((a, b) => {

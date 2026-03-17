@@ -322,118 +322,122 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
 
 // ── Page 1: Highlights with colored number spans ──────────────────────────────
 function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
-  const G    = "#065f46";  // dark green
-  const R    = "#7f1d1d";  // dark red
+  const G    = "#065f46";
+  const R    = "#7f1d1d";
   const BOLD = "Helvetica-Bold";
 
-  const cn  = (n: number): object => ({ color: n >= 0 ? G : R, fontFamily: BOLD });
-  const fAbs = (n: number, dec = 2) => `$${Math.abs(n).toFixed(dec)}B`;
-  const fPct = (n: number, dec = 1) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(dec)}%`;
-  const fPp  = (n: number)          => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(2)}pp`;
-  const fD   = (n: number, dec = 2) => `${n >= 0 ? "+" : "−"}${fAbs(n, dec)}`;
+  const cn   = (n: number): object => ({ color: n >= 0 ? G : R, fontFamily: BOLD });
+  const fD   = (n: number, dec = 2) => `${n >= 0 ? "+" : "−"}$${Math.abs(n).toFixed(dec)}B`;
+  const fPct = (n: number)          => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(1)}%`;
+  const fB   = (n: number, dec = 1) => `$${Math.abs(n).toFixed(dec)}B`;
 
-  const prevTotalB  = g.totalGrossB - g.wowDeltaB;
-  const totalWoWPct = prevTotalB > 0 ? (g.wowDeltaB / prevTotalB) * 100 : 0;
-  const prevNetB    = g.netExpB - g.wowDeltaNetB;
-  const netWoWPct   = prevNetB !== 0 ? (g.wowDeltaNetB / Math.abs(prevNetB)) * 100 : 0;
-  const softs       = g.sectorBreakdown.find(s => s.sector === "softs");
-  const coffeePrevB = g.coffeeGrossB - g.coffeeDeltaB;
-  const coffeePct   = coffeePrevB > 0 ? (g.coffeeDeltaB / coffeePrevB) * 100 : 0;
-  const coffeePrevTotalB = g.totalGrossB - g.wowDeltaB;
-  const coffeePrevShare  = coffeePrevTotalB > 0 ? ((g.coffeeGrossB - g.coffeeDeltaB) / coffeePrevTotalB) * 100 : 0;
-  const coffeeShareDelta = g.coffeeSharePct - coffeePrevShare;
-  const coffeeAsPctSofts = g.softsGrossB > 0 ? (g.coffeeGrossB / g.softsGrossB) * 100 : 0;
-  const biggestSd = g.sectorBreakdown.find(s => s.sector === g.biggestMoverSector);
-  const nyRow  = g.commodityTable.find(c => c.symbol === "arabica");
-  const ldnRow = g.commodityTable.find(c => c.symbol === "robusta");
-  const dir    = g.wowDeltaB >= 0 ? "expanded" : "contracted";
+  const prevTotalB = g.totalGrossB - g.wowDeltaB;
+  const totalPct   = prevTotalB > 0 ? (g.wowDeltaB / prevTotalB) * 100 : 0;
+  const prevNetB   = g.netExpB - g.wowDeltaNetB;
+  const netPct     = prevNetB !== 0 ? (g.wowDeltaNetB / Math.abs(prevNetB)) * 100 : 0;
+  const dir        = (n: number) => n >= 0 ? "expanded" : "contracted";
+
+  // Top 3 gross movers across all commodities
+  const top3Gross = [...g.commodityTable]
+    .sort((a, b) => Math.abs(b.deltaB) - Math.abs(a.deltaB))
+    .slice(0, 3);
+
+  // Top 3 net movers across all commodities
+  const top3Net = [...g.commodityTable]
+    .sort((a, b) => Math.abs(b.netDeltaB) - Math.abs(a.netDeltaB))
+    .slice(0, 3);
+
+  const softsSd      = g.sectorBreakdown.find(s => s.sector === "softs");
+  const softsComs    = g.commodityTable.filter(c => c.displaySector === "softs");
+  const coffeeComs   = softsComs.filter(c => c.isCoffee);
+  const nonCoffee    = softsComs.filter(c => !c.isCoffee);
+  const ncByGross    = [...nonCoffee].sort((a, b) => Math.abs(b.deltaB)    - Math.abs(a.deltaB));
+  const ncByNet      = [...nonCoffee].sort((a, b) => Math.abs(b.netDeltaB) - Math.abs(a.netDeltaB));
+
+  const subRow = (key: string, label: string, deltaB: number, pct: number) => (
+    <View key={key} style={[S.bulletSubRow, { marginLeft: 14 }]}>
+      <Text style={S.bulletSubDot}>·</Text>
+      <Text style={S.bulletSubText}>
+        {label}: <Text style={cn(deltaB)}>{fD(deltaB)}</Text>
+        {" "}(<Text style={cn(pct)}>{fPct(pct)}</Text>)
+      </Text>
+    </View>
+  );
 
   return (
-    <View style={[S.commentBox, { marginTop: 6 }]}>
-      <Text style={[S.commentText, { fontFamily: BOLD, color: BRAND.dark, marginBottom: 4, fontSize: 8 }]}>HIGHLIGHTS</Text>
+    <View style={[S.commentBox, { marginTop: 0 }]}>
+      <Text style={[S.commentText, { fontFamily: BOLD, color: BRAND.dark, marginBottom: 3, fontSize: 7.5 }]}>
+        HIGHLIGHTS ON SPECULATIVE EXPOSURE
+      </Text>
 
-      {/* Bullet 1 — total gross */}
+      {/* 1 — Total Gross */}
       <View style={S.bulletRow}>
         <Text style={S.bulletDot}>•</Text>
         <Text style={S.bulletText}>
-          Speculative gross exposure {dir} by{" "}
-          <Text style={cn(g.wowDeltaB)}>{fD(g.wowDeltaB)}</Text>{" "}
-          (<Text style={cn(totalWoWPct)}>{fPct(totalWoWPct)}</Text>
-          ) to <Text style={{ fontFamily: BOLD }}>${g.totalGrossB.toFixed(1)}B</Text> this week.
-        </Text>
-      </View>
-      <View style={S.bulletSubRow}>
-        <Text style={S.bulletSubDot}>*</Text>
-        <Text style={S.bulletSubText}>
-          Net exposure at <Text style={{ fontFamily: BOLD }}>${g.netExpB.toFixed(1)}B</Text>{" "}
-          (<Text style={cn(g.wowDeltaNetB)}>{fD(g.wowDeltaNetB)}</Text> /{" "}
-          <Text style={cn(netWoWPct)}>{fPct(netWoWPct)}</Text>)
+          Total Gross exposure {dir(g.wowDeltaB)} to{" "}
+          <Text style={{ fontFamily: BOLD }}>{fB(g.totalGrossB)}</Text> this week, by{" "}
+          <Text style={cn(g.wowDeltaB)}>{fD(g.wowDeltaB)}</Text>
+          {" "}(<Text style={cn(totalPct)}>{fPct(totalPct)}</Text>)
         </Text>
       </View>
       <View style={S.bulletSubRow}>
         <Text style={S.bulletSubDot}>→</Text>
-        <Text style={S.bulletSubText}>
-          Biggest mover: {SECTOR_LABELS[g.biggestMoverSector] ?? g.biggestMoverSector}{" "}
-          <Text style={cn(g.biggestMoverDeltaB)}>{fD(g.biggestMoverDeltaB)}</Text>{" "}
-          (<Text style={cn(biggestSd?.deltaPct ?? 0)}>{fPct(biggestSd?.deltaPct ?? 0)}</Text>)
-        </Text>
+        <Text style={S.bulletSubText}>Biggest gross movers:</Text>
       </View>
+      {top3Gross.map(c => subRow(c.symbol, c.name, c.deltaB, c.deltaPct))}
 
-      {/* Bullet 2 — softs */}
-      <View style={S.bulletRow}>
+      {/* 2 — Total Net */}
+      <View style={[S.bulletRow, { marginTop: 3 }]}>
         <Text style={S.bulletDot}>•</Text>
         <Text style={S.bulletText}>
-          Softs sector share at <Text style={{ fontFamily: BOLD }}>{softs?.shareOfTotalPct.toFixed(1) ?? "—"}%</Text> of total gross{" "}
-          (<Text style={cn(softs?.shareDeltaPp ?? 0)}>{fPp(softs?.shareDeltaPp ?? 0)}</Text>)
-        </Text>
-      </View>
-
-      {/* Bullet 3 — coffee */}
-      <View style={S.bulletRow}>
-        <Text style={S.bulletDot}>•</Text>
-        <Text style={S.bulletText}>
-          Coffee (Arabica + Robusta) {g.coffeeDeltaB >= 0 ? "rose" : "fell"} by{" "}
-          <Text style={cn(g.coffeeDeltaB)}>{fD(g.coffeeDeltaB)}</Text>{" "}
-          (<Text style={cn(coffeePct)}>{fPct(coffeePct)}</Text>
-          ), now <Text style={{ fontFamily: BOLD }}>${g.coffeeGrossB.toFixed(2)}B</Text>
+          Total Net exposure at{" "}
+          <Text style={{ fontFamily: BOLD }}>{fB(g.netExpB)}</Text>
+          {" "}(<Text style={cn(g.wowDeltaNetB)}>{fD(g.wowDeltaNetB)}</Text>
+          {" "}/ <Text style={cn(netPct)}>{fPct(netPct)}</Text>)
         </Text>
       </View>
       <View style={S.bulletSubRow}>
         <Text style={S.bulletSubDot}>→</Text>
-        <Text style={S.bulletSubText}>
-          <Text style={cn(coffeeShareDelta)}>{g.coffeeSharePct.toFixed(2)}%</Text> of total speculative gross{" "}
-          (<Text style={cn(coffeeShareDelta)}>{fPp(coffeeShareDelta)}</Text> WoW)
-        </Text>
+        <Text style={S.bulletSubText}>Biggest net movers:</Text>
       </View>
-      <View style={S.bulletSubRow}>
-        <Text style={S.bulletSubDot}>→</Text>
-        <Text style={S.bulletSubText}>
-          <Text style={{ fontFamily: BOLD }}>{coffeeAsPctSofts.toFixed(1)}%</Text> of total soft complex
-        </Text>
-      </View>
-      <View style={S.bulletSubRow}>
-        <Text style={S.bulletSubDot}>*</Text>
-        <Text style={S.bulletSubText}>Details of coffee speculative exposure evolution:</Text>
-      </View>
-      {nyRow && (
-        <View style={[S.bulletSubRow, { marginLeft: 22 }]}>
-          <Text style={S.bulletSubDot}>→</Text>
-          <Text style={S.bulletSubText}>
-            NY Arabica{" "}
-            <Text style={cn(nyRow.deltaB)}>{fD(nyRow.deltaB)}</Text>{" "}
-            (<Text style={cn(nyRow.deltaPct)}>{fPct(nyRow.deltaPct)}</Text>)
-          </Text>
-        </View>
-      )}
-      {ldnRow && (
-        <View style={[S.bulletSubRow, { marginLeft: 22 }]}>
-          <Text style={S.bulletSubDot}>→</Text>
-          <Text style={S.bulletSubText}>
-            LDN Robusta{" "}
-            <Text style={cn(ldnRow.deltaB)}>{fD(ldnRow.deltaB)}</Text>{" "}
-            (<Text style={cn(ldnRow.deltaPct)}>{fPct(ldnRow.deltaPct)}</Text>)
-          </Text>
-        </View>
+      {top3Net.map(c => subRow(c.symbol + "_net", c.name, c.netDeltaB, c.netDeltaPct))}
+
+      {/* 3 — Softs Gross */}
+      {softsSd && (
+        <>
+          <View style={[S.bulletRow, { marginTop: 3 }]}>
+            <Text style={S.bulletDot}>•</Text>
+            <Text style={S.bulletText}>
+              Softs gross exposure {dir(softsSd.deltaB)} to{" "}
+              <Text style={{ fontFamily: BOLD }}>{fB(softsSd.grossB)}</Text>, by{" "}
+              <Text style={cn(softsSd.deltaB)}>{fD(softsSd.deltaB)}</Text>
+              {" "}(<Text style={cn(softsSd.deltaPct)}>{fPct(softsSd.deltaPct)}</Text>)
+            </Text>
+          </View>
+          <View style={S.bulletSubRow}>
+            <Text style={S.bulletSubDot}>→</Text>
+            <Text style={S.bulletSubText}>Movers:</Text>
+          </View>
+          {coffeeComs.map(c => subRow(c.symbol, c.name, c.deltaB, c.deltaPct))}
+          {ncByGross[0] && subRow(ncByGross[0].symbol + "_nc", ncByGross[0].name, ncByGross[0].deltaB, ncByGross[0].deltaPct)}
+
+          {/* 4 — Softs Net */}
+          <View style={[S.bulletRow, { marginTop: 3 }]}>
+            <Text style={S.bulletDot}>•</Text>
+            <Text style={S.bulletText}>
+              Net exposure (Softs) at{" "}
+              <Text style={{ fontFamily: BOLD }}>{softsSd.netB >= 0 ? "" : "−"}{fB(softsSd.netB)}</Text>
+              {" "}(<Text style={cn(softsSd.netDeltaB)}>{fD(softsSd.netDeltaB)}</Text>
+              {" "}/ <Text style={cn(softsSd.netDeltaPct)}>{fPct(softsSd.netDeltaPct)}</Text>)
+            </Text>
+          </View>
+          <View style={S.bulletSubRow}>
+            <Text style={S.bulletSubDot}>→</Text>
+            <Text style={S.bulletSubText}>Movers:</Text>
+          </View>
+          {coffeeComs.map(c => subRow(c.symbol + "_net", c.name, c.netDeltaB, c.netDeltaPct))}
+          {ncByNet[0] && subRow(ncByNet[0].symbol + "_ncnet", ncByNet[0].name, ncByNet[0].netDeltaB, ncByNet[0].netDeltaPct)}
+        </>
       )}
     </View>
   );
