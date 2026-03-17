@@ -204,7 +204,7 @@ function MiniBar({ rank }: { rank: number }) {
   const pct   = Math.max(0, Math.min(100, rank));
   const color = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
   return (
-    <View style={{ width: "100%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 1 }}>
+    <View style={{ width: "50%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 1 }}>
       <View style={{ width: `${pct}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
     </View>
   );
@@ -562,12 +562,17 @@ export function CotPdfReport({ d }: { d: ReportData }) {
       <Page size="A4" style={S.page}>
         <PageHeader title="GLOBAL MONEY FLOW" sub={header} />
 
-        {/* Cover block */}
-        <View style={{ marginBottom: 8 }}>
-          <Text style={[S.coverTitle, { fontSize: 18 }]}>COT Weekly</Text>
-          <Text style={S.coverWeek}>Week {d.weekNumber}/{d.year}</Text>
-          <Text style={S.coverDate}>As per positioning of {d.cotDate}</Text>
-          <View style={S.coverDivider} />
+        {/* Cover block + Highlights side by side */}
+        <View style={{ flexDirection: "row", marginBottom: 8, gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={[S.coverTitle, { fontSize: 18 }]}>COT Weekly</Text>
+            <Text style={S.coverWeek}>Week {d.weekNumber}/{d.year}</Text>
+            <Text style={S.coverDate}>As per positioning of {d.cotDate}</Text>
+            <View style={S.coverDivider} />
+          </View>
+          <View style={{ flex: 2 }}>
+            <FlowAnalysis g={d.globalFlow} />
+          </View>
         </View>
 
         {/* KPIs */}
@@ -581,9 +586,6 @@ export function CotPdfReport({ d }: { d: ReportData }) {
         {/* Commodity breakdown table */}
         <Text style={[S.subTitle, { marginTop: 2, marginBottom: 4 }]}>COMMODITY BREAKDOWN — WEEK-ON-WEEK · 5Y RANGE BARS: GREEN=UNDERINVESTED · RED=OVERINVESTED</Text>
         <CommodityTable g={d.globalFlow} />
-
-        {/* Highlights */}
-        <FlowAnalysis g={d.globalFlow} />
 
         <PageFooter page={1} total={totalPages} date={ts} />
       </Page>
