@@ -12,7 +12,7 @@ from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, tech
 from scraper.sources import macro_cot as _macro_cot
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos]
-SCHEDULED_HOUR_UTC = 7  # Run daily at 07:00 UTC
+SCHEDULED_HOUR_UTC = 1  # Run daily at 01:00 UTC
 
 async def run_all_scrapers():
     print("[scraper] Starting daily scrape run...")

@@ -2,9 +2,9 @@ name: COT Positions Scraper
 
 on:
   schedule:
-    # 21:00 UTC Friday = 4:00 PM ET winter / 5:00 PM ET summer
-    # CFTC releases every Friday at 3:30 PM ET — this gives a 30-90 min buffer.
-    - cron: '0 21 * * 5'
+    # 20:00 UTC Friday = 3:00 PM ET winter / 4:00 PM ET summer
+    # CFTC releases every Friday at 3:30 PM ET — run at 20:00 UTC, retry manually if data not yet published.
+    - cron: '0 20 * * 5'
   workflow_dispatch:  # allow manual trigger from GitHub UI
 
 jobs:
