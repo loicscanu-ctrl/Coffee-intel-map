@@ -20,7 +20,7 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Los Angeles", l: [33.7, -118.2] },
   { n: "Tokyo", l: [35.6, 139.6] },
   { n: "Singapore", l: [1.2, 103.8] },
-  { n: "Pacific", l: [40.0, -170.0] },
+  { n: "Pacific", l: [38.0, 158.0] },
   { n: "Barcelona", l: [41.38, 2.17] },
   { n: "Le Havre", l: [49.49, 0.10] },
   { n: "Basel", l: [47.55, 7.59] },
@@ -271,11 +271,11 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
   // ASIA ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // Singapore → Central Pacific (northern Pacific lane, terminus in open Pacific)
+  // Singapore → Pacific (stops east of Japan — no antimeridian crossing)
   {
     name: "Singapore → Pacific",
     color: "#2ecc71",
-    path: [[1.26, 103.8], [8.0, 112.0], [15.0, 125.0], [22.0, 138.0], [30.0, 155.0], [38.0, 170.0], [40.0, -170.0]],
+    path: [[1.26, 103.8], [8.0, 112.0], [15.0, 125.0], [22.0, 138.0], [30.0, 150.0], [38.0, 158.0]],
   },
 
   // Singapore → Sydney
@@ -285,18 +285,11 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
     path: [[1.26, 103.8], [-1.0, 105.0], [-3.0, 107.0], [-5.0, 112.0], [-6.0, 120.0], [-7.5, 128.0], [-9.5, 135.0], [-10.2, 142.0], [-13.0, 146.0], [-20.0, 152.0], [-30.0, 154.0], [-33.86, 151.20]],
   },
 
-  // Shanghai deviation off Trans-Pacific trunk
+  // Shanghai deviation — branches off Singapore→Japan feeder near Kyushu
   {
-    name: "Deviation: Pacific → Shanghai",
+    name: "Deviation: Japan feeder → Shanghai",
     color: "#e74c3c",
-    path: [[12.0, 120.0], [22.0, 121.0], [31.23, 121.47]],
-  },
-
-  // Japan deviation off Trans-Pacific trunk
-  {
-    name: "Deviation: Pacific → Japan",
-    color: "#2ecc71",
-    path: [[18.0, 135.0], [28.0, 136.0], [35.61, 139.78]],
+    path: [[28.0, 136.0], [30.0, 129.0], [31.23, 121.47]],
   },
 
   // ═══════════════════════════════════════════════════════════
