@@ -895,7 +895,7 @@ export default function CotDashboard() {
 
           {/* KPI Toddles */}
           {macroKpis && (() => {
-            const fmtB = (v: number) => `$${(v / 1e9).toFixed(1)}B`;
+            const fmtB = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
             const kpis = [
               { label: "Total Gross Exposure", value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
               { label: "Gross Long Exposure",  value: fmtB(macroKpis.grossLong),   color: "#10b981" },
@@ -932,7 +932,7 @@ export default function CotDashboard() {
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
                   tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                 <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  tickFormatter={(v: number) => `$${v.toFixed(0)}B`} width={52}
+                  tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(0)}B`} width={52}
                   domain={macroYDomain} />
                 {macroToggle === "net" && <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />}
                 {macroToggle === "net" ? (
@@ -955,8 +955,8 @@ export default function CotDashboard() {
                             .filter(([, d]) => Math.abs(d.value) >= 0.001)
                             .sort((a, b) => b[1].value - a[1].value)
                             .map(([label, d]) => (
-                              <p key={label} style={{ color: d.color, margin: "2px 0" }}>
-                                {label}: ${d.value.toFixed(1)}B
+                              <p key={label} style={{ color: d.value < 0 ? "#dc2626" : d.color, margin: "2px 0" }}>
+                                {label}: {d.value < 0 ? "-$" : "$"}{Math.abs(d.value).toFixed(1)}B
                               </p>
                             ))}
                         </div>
@@ -966,7 +966,7 @@ export default function CotDashboard() {
                 ) : (
                   <Tooltip
                     contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                    formatter={(v: any, name: any) => [`$${(v as number).toFixed(1)}B`, name]}
+                    formatter={(v: any, name: any) => [`${(v as number) < 0 ? "-$" : "$"}${Math.abs(v as number).toFixed(1)}B`, name]}
                     labelFormatter={(l: any) => `Week: ${l}`}
                   />
                 )}
@@ -1043,11 +1043,11 @@ export default function CotDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
                         tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                       <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                        tickFormatter={(v: number) => `$${v.toFixed(1)}B`} width={52} />
+                        tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(1)}B`} width={52} />
                       <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
                       <Tooltip
                         contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                        formatter={(v: any, name: any) => [`$${(v as number).toFixed(2)}B`, name]}
+                        formatter={(v: any, name: any) => [`${(v as number) < 0 ? "-$" : "$"}${Math.abs(v as number).toFixed(2)}B`, name]}
                         labelFormatter={(l: any) => `Week: ${l}`}
                       />
                       <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -1135,7 +1135,7 @@ export default function CotDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
                         tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                       <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                        tickFormatter={(v: number) => `$${v.toFixed(2)}B`} width={58}
+                        tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(2)}B`} width={58}
                         domain={softYDomain} />
                       {macroToggle === "net" && <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />}
                       <Tooltip
@@ -1157,8 +1157,8 @@ export default function CotDashboard() {
                                 .filter(([, d]) => Math.abs(d.value) >= 0.0001)
                                 .sort((a, b) => b[1].value - a[1].value)
                                 .map(([label, d]) => (
-                                  <p key={label} style={{ color: d.color, margin: "2px 0" }}>
-                                    {label}: ${d.value.toFixed(2)}B
+                                  <p key={label} style={{ color: d.value < 0 ? "#dc2626" : d.color, margin: "2px 0" }}>
+                                    {label}: {d.value < 0 ? "-$" : "$"}{Math.abs(d.value).toFixed(2)}B
                                   </p>
                                 ))}
                             </div>
@@ -1247,13 +1247,13 @@ export default function CotDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }}
                         tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                       <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
-                        tickFormatter={(v: number) => `$${v.toFixed(2)}B`} width={58} />
+                        tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(2)}B`} width={58} />
                       <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
                       <Tooltip
                         contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
                         formatter={(v: any, name: any) => {
                           if (Math.abs(v) < 0.0001) return null;
-                          return [`$${(v as number).toFixed(2)}B`, name];
+                          return [`${(v as number) < 0 ? "-$" : "$"}${Math.abs(v as number).toFixed(2)}B`, name];
                         }}
                         labelFormatter={(l: any) => `Week: ${l}`}
                       />
