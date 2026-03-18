@@ -15,6 +15,48 @@ const mockFlow: GlobalFlowMetrics = {
   date: "2026-03-10", totalGrossB: 142, netExpB: 18,
   wowDeltaB: 4.2, softSharePct: 14, biggestMoverSector: "softs",
   biggestMoverDeltaB: 2.1, coffeeSharePct: 6.2, coffeeDeltaB: 0.8,
+  coffeeGrossB: 8.8,
+  wowDeltaNetB: 1.1,
+  softsGrossB: 19.9,
+  commodityTable: [],
+  sectorBreakdown: [
+    {
+      sector: "energy", grossB: 0, netB: 0, deltaB: 0, deltaPct: 0,
+      shareOfTotalPct: 0, shareDeltaPp: 0, histRankGrossPct: 50,
+      histRankSharePct: 50, histRankNetPct: 50, netDeltaB: 0, netDeltaPct: 0,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+    {
+      sector: "metals", grossB: 0, netB: 0, deltaB: 0, deltaPct: 0,
+      shareOfTotalPct: 0, shareDeltaPp: 0, histRankGrossPct: 50,
+      histRankSharePct: 50, histRankNetPct: 50, netDeltaB: 0, netDeltaPct: 0,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+    {
+      sector: "grains", grossB: 0, netB: 0, deltaB: 0, deltaPct: 0,
+      shareOfTotalPct: 0, shareDeltaPp: 0, histRankGrossPct: 50,
+      histRankSharePct: 50, histRankNetPct: 50, netDeltaB: 0, netDeltaPct: 0,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+    {
+      sector: "meats", grossB: 0, netB: 0, deltaB: 0, deltaPct: 0,
+      shareOfTotalPct: 0, shareDeltaPp: 0, histRankGrossPct: 50,
+      histRankSharePct: 50, histRankNetPct: 50, netDeltaB: 0, netDeltaPct: 0,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+    {
+      sector: "softs", grossB: 19.9, netB: 5, deltaB: 2.1, deltaPct: 11.8,
+      shareOfTotalPct: 14, shareDeltaPp: 0.5, histRankGrossPct: 70,
+      histRankSharePct: 65, histRankNetPct: 60, netDeltaB: 0.3, netDeltaPct: 6,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+    {
+      sector: "micros", grossB: 0, netB: 0, deltaB: 0, deltaPct: 0,
+      shareOfTotalPct: 0, shareDeltaPp: 0, histRankGrossPct: 50,
+      histRankSharePct: 50, histRankNetPct: 50, netDeltaB: 0, netDeltaPct: 0,
+      grossOiEffectB: null, grossPriceEffectB: null, netOiEffectB: null, netPriceEffectB: null,
+    },
+  ],
 };
 
 describe("globalFlowComment", () => {

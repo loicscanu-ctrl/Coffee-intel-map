@@ -272,14 +272,13 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
     const netDelta = net - prevNet;
 
     // Attribution subtotals: null if ALL commodities in sector have null; otherwise sum of non-null
-    const fields = ["grossOiEffectB", "grossPriceEffectB", "netOiEffectB", "netPriceEffectB"] as const;
-    const attrSubtotals = Object.fromEntries(fields.map(field => {
+    const attrVals = (field: "grossOiEffectB" | "grossPriceEffectB" | "netOiEffectB" | "netPriceEffectB") => {
       const vals = commodityTable
         .filter(c => c.displaySector === s)
         .map(c => c[field]);
       const nonNull = vals.filter((v): v is number => v !== null);
-      return [field, nonNull.length === 0 ? null : nonNull.reduce((a, b) => a + b, 0)];
-    }));
+      return nonNull.length === 0 ? null : nonNull.reduce((a, b) => a + b, 0);
+    };
 
     return {
       sector: s,
@@ -294,7 +293,10 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
       histRankNetPct: percRank(net, netHistory, false),
       netDeltaB:       netDelta / 1e9,
       netDeltaPct:     prevNet !== 0 ? (netDelta / Math.abs(prevNet)) * 100 : 0,
-      ...attrSubtotals,
+      grossOiEffectB:    attrVals("grossOiEffectB"),
+      grossPriceEffectB: attrVals("grossPriceEffectB"),
+      netOiEffectB:      attrVals("netOiEffectB"),
+      netPriceEffectB:   attrVals("netPriceEffectB"),
     };
   });
 
