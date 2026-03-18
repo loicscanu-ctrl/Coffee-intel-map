@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install playwright playwright-stealth sqlalchemy psycopg2-binary pandas requests yfinance
+        run: pip install playwright playwright-stealth sqlalchemy psycopg2-binary pandas requests yfinance deep_translator
 
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
