@@ -32,7 +32,7 @@ COMMODITY_SPECS = {
   },
   "natgas": {
     "name": "Natural Gas (Henry Hub)", "sector": "hard", "exchange": "NYMEX",
-    "cftc_filter": "HENRY HUB - NEW YORK MERCANTILE EXCHANGE",
+    "cftc_filter": "HENRY HUB LAST DAY FIN - NEW YORK MERCANTILE EXCHANGE",
     "ice_filter": None, "yfinance_ticker": "NG=F", "price_proxy": None,
     "price_source": "yfinance",
     "contract_unit": 10000, "price_unit": "usd_per_mmbtu", "currency": "USD",
