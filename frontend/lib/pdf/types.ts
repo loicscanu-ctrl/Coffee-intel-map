@@ -70,6 +70,12 @@ export interface CommodityRow {
   histRankNetPct: number;
   netDeltaB: number;            // WoW net exposure delta $B
   netDeltaPct: number;          // WoW net exposure delta %
+  // Attribution: WoW notional change split by cause ($B)
+  // null when price data is unavailable for either week, or no previous-week entry
+  grossOiEffectB:    number | null;
+  grossPriceEffectB: number | null;
+  netOiEffectB:      number | null;
+  netPriceEffectB:   number | null;
 }
 
 export interface GlobalFlowMetrics {
@@ -96,6 +102,12 @@ export interface GlobalFlowMetrics {
     histRankNetPct: number;
     netDeltaB: number;
     netDeltaPct: number;
+    // Attribution: WoW notional change split by cause ($B)
+    // null when price data is unavailable for either week, or no previous-week entry
+    grossOiEffectB:    number | null;
+    grossPriceEffectB: number | null;
+    netOiEffectB:      number | null;
+    netPriceEffectB:   number | null;
   }>;
   wowDeltaNetB: number;         // WoW net exposure change $B
   softsGrossB: number;          // current softs sector gross $B
@@ -125,5 +137,8 @@ export interface ReportData {
     industryPulse: string | null;
     dryPowder:     string | null;
     obosMatrix:    string | null;
+    macroGross:    string | null;
+    macroNet:      string | null;
+    softsContract: string | null;
   };
 }
