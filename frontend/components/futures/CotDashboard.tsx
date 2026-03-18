@@ -613,10 +613,11 @@ function AttributionTable({ gfm }: { gfm: GlobalFlowMetrics }) {
         <thead>
           <tr style={{ background: "#0f172a" }}>
             <th style={headerCell("left")}>Commodity</th>
-            <th style={headerCell()}>Net $B</th>
+            <th style={headerCell()}>Gross $B</th>
             <th style={headerCell()}>Gross WoW $B</th>
             <th style={headerCell()}>OI Δ</th>
             <th style={headerCell()}>Px Δ</th>
+            <th style={headerCell()}>Net $B</th>
             <th style={headerCell()}>Net WoW $B</th>
             <th style={headerCell()}>OI Δ</th>
             <th style={headerCell()}>Px Δ</th>
@@ -628,10 +629,11 @@ function AttributionTable({ gfm }: { gfm: GlobalFlowMetrics }) {
               {sd && (
                 <tr style={{ background: "#1e293b" }}>
                   <td style={{ ...nameCell(true, "#f9fafb"), paddingLeft: 8 }}>{label}</td>
-                  <td style={dataCell(attrColor(sd.netB), true)}>{fmtAttr(sd.netB)}</td>
+                  <td style={dataCell(attrColor(sd.grossB), true)}>{fmtAttr(sd.grossB)}</td>
                   <td style={dataCell(attrColor(sd.deltaB), true)}>{fmtAttr(sd.deltaB)}</td>
                   <td style={dataCell(attrColor(sd.grossOiEffectB), true)}>{fmtAttr(sd.grossOiEffectB)}</td>
                   <td style={dataCell(attrColor(sd.grossPriceEffectB), true)}>{fmtAttr(sd.grossPriceEffectB)}</td>
+                  <td style={dataCell(attrColor(sd.netB), true)}>{fmtAttr(sd.netB)}</td>
                   <td style={dataCell(attrColor(sd.netDeltaB), true)}>{fmtAttr(sd.netDeltaB)}</td>
                   <td style={dataCell(attrColor(sd.netOiEffectB), true)}>{fmtAttr(sd.netOiEffectB)}</td>
                   <td style={dataCell(attrColor(sd.netPriceEffectB), true)}>{fmtAttr(sd.netPriceEffectB)}</td>
@@ -642,10 +644,11 @@ function AttributionTable({ gfm }: { gfm: GlobalFlowMetrics }) {
                   <td style={nameCell(row.isCoffee, row.isCoffee ? "#f59e0b" : "#d1d5db")}>
                     {row.isCoffee ? "► " : ""}{row.name}
                   </td>
-                  <td style={dataCell(attrColor(row.netB))}>{fmtAttr(row.netB)}</td>
+                  <td style={dataCell(attrColor(row.grossB))}>{fmtAttr(row.grossB)}</td>
                   <td style={dataCell(attrColor(row.deltaB))}>{fmtAttr(row.deltaB)}</td>
                   <td style={dataCell(attrColor(row.grossOiEffectB))}>{fmtAttr(row.grossOiEffectB)}</td>
                   <td style={dataCell(attrColor(row.grossPriceEffectB))}>{fmtAttr(row.grossPriceEffectB)}</td>
+                  <td style={dataCell(attrColor(row.netB))}>{fmtAttr(row.netB)}</td>
                   <td style={dataCell(attrColor(row.netDeltaB))}>{fmtAttr(row.netDeltaB)}</td>
                   <td style={dataCell(attrColor(row.netOiEffectB))}>{fmtAttr(row.netOiEffectB)}</td>
                   <td style={dataCell(attrColor(row.netPriceEffectB))}>{fmtAttr(row.netPriceEffectB)}</td>
