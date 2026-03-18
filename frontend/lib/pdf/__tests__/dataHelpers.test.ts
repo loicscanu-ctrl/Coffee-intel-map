@@ -85,3 +85,131 @@ describe("computeOiSplit", () => {
     expect(result.forward).toBe(1000);
   });
 });
+
+import { buildGlobalFlowMetrics } from "../dataHelpers";
+import type { MacroCotWeek } from "@/lib/api";
+
+// Minimal MacroCotWeek factory
+function makeWeek(
+  date: string,
+  commodities: Array<{
+    symbol: string; sector: "hard" | "grains" | "meats" | "softs" | "micros";
+    mm_long: number; mm_short: number; close_price: number | null;
+  }>
+): MacroCotWeek {
+  return {
+    date,
+    commodities: commodities.map(c => ({
+      ...c,
+      name: c.symbol,
+      mm_spread: 0,
+      oi_total: c.mm_long + c.mm_short,
+      gross_exposure_usd: c.close_price != null
+        ? (c.mm_long + c.mm_short) * c.close_price * 1000
+        : null,
+      net_exposure_usd: c.close_price != null
+        ? (c.mm_long - c.mm_short) * c.close_price * 1000
+        : null,
+    })),
+  };
+}
+
+describe("buildGlobalFlowMetrics — attribution", () => {
+  const prev = makeWeek("2026-03-03", [
+    { symbol: "wti", sector: "hard", mm_long: 100, mm_short: 50, close_price: 80 },
+  ]);
+  const latest = makeWeek("2026-03-10", [
+    { symbol: "wti", sector: "hard", mm_long: 120, mm_short: 60, close_price: 90 },
+  ]);
+
+  it("grossOiEffectB: Δgross_oi × old_price × contract_unit / 1e9", () => {
+    // Δgross_oi = (120+60)-(100+50) = 30; old_price = 80; contract_unit(wti) = 1000
+    // = 30 × 80 × 1000 / 1e9 = 2_400_000 / 1e9 = 0.0024
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.grossOiEffectB).toBeCloseTo(0.0024, 6);
+  });
+
+  it("grossPriceEffectB: gross_oi_new × Δprice × contract_unit / 1e9", () => {
+    // gross_oi_new = 180; Δprice = 10; contract_unit = 1000
+    // = 180 × 10 × 1000 / 1e9 = 0.0018
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.grossPriceEffectB).toBeCloseTo(0.0018, 6);
+  });
+
+  it("invariant: grossOiEffect + grossPriceEffect === gross WoW change", () => {
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    const totalChange = wti!.deltaB; // gross WoW $B
+    expect((wti!.grossOiEffectB ?? 0) + (wti!.grossPriceEffectB ?? 0)).toBeCloseTo(totalChange, 6);
+  });
+
+  it("netOiEffectB: Δnet_oi × old_price × contract_unit / 1e9", () => {
+    // Δnet_oi = (120-60)-(100-50) = 60-50 = 10; old_price = 80; cu = 1000
+    // = 10 × 80 × 1000 / 1e9 = 0.0008
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.netOiEffectB).toBeCloseTo(0.0008, 6);
+  });
+
+  it("netPriceEffectB: net_oi_new × Δprice × contract_unit / 1e9", () => {
+    // net_oi_new = 120-60 = 60; Δprice = 10; cu = 1000
+    // = 60 × 10 × 1000 / 1e9 = 0.0006
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.netPriceEffectB).toBeCloseTo(0.0006, 6);
+  });
+
+  it("invariant: netOiEffect + netPriceEffect === net WoW change", () => {
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect((wti!.netOiEffectB ?? 0) + (wti!.netPriceEffectB ?? 0)).toBeCloseTo(wti!.netDeltaB, 6);
+  });
+
+  it("returns null for all effects when close_price is null in current week", () => {
+    const latestNullPrice = makeWeek("2026-03-10", [
+      { symbol: "wti", sector: "hard", mm_long: 120, mm_short: 60, close_price: null },
+    ]);
+    const result = buildGlobalFlowMetrics([prev, latestNullPrice]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.grossOiEffectB).toBeNull();
+    expect(wti?.grossPriceEffectB).toBeNull();
+  });
+
+  it("returns null for all effects when close_price is null in prev week", () => {
+    const prevNullPrice = makeWeek("2026-03-03", [
+      { symbol: "wti", sector: "hard", mm_long: 100, mm_short: 50, close_price: null },
+    ]);
+    const result = buildGlobalFlowMetrics([prevNullPrice, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.grossOiEffectB).toBeNull();
+  });
+
+  it("returns null for all effects when symbol is missing from previous week", () => {
+    const prevEmpty = makeWeek("2026-03-03", []);
+    const result = buildGlobalFlowMetrics([prevEmpty, latest]);
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(wti?.grossOiEffectB).toBeNull();
+  });
+
+  it("sector grossOiEffectB subtotal sums non-null commodity values", () => {
+    const result = buildGlobalFlowMetrics([prev, latest]);
+    const energySector = result?.sectorBreakdown.find(s => s.sector === "energy");
+    // WTI is the only energy commodity in this test — subtotal should equal wti's value
+    const wti = result?.commodityTable.find(c => c.symbol === "wti");
+    expect(energySector?.grossOiEffectB).toBeCloseTo(wti!.grossOiEffectB!, 6);
+  });
+
+  it("sector grossOiEffectB is null when all commodities in sector have null attribution", () => {
+    const prevNull = makeWeek("2026-03-03", [
+      { symbol: "wti", sector: "hard", mm_long: 100, mm_short: 50, close_price: null },
+    ]);
+    const latestNull = makeWeek("2026-03-10", [
+      { symbol: "wti", sector: "hard", mm_long: 120, mm_short: 60, close_price: null },
+    ]);
+    const result = buildGlobalFlowMetrics([prevNull, latestNull]);
+    const energySector = result?.sectorBreakdown.find(s => s.sector === "energy");
+    expect(energySector?.grossOiEffectB).toBeNull();
+  });
+});

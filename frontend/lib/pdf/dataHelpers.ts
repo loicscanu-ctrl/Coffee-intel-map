@@ -68,6 +68,41 @@ export function computeCounterpartyDeltas() { return {}; }
 
 // ── High-level builders ──────────────────────────────────────────────────────
 
+// Static contract_unit lookup — mirrors COMMODITY_SPECS in backend/scraper/sources/macro_cot.py.
+// close_price from the API is already normalized to USD per base unit
+// (e.g. ZC=F corn is stored as USD/bushel after the scraper divides cents by 100).
+// No additional unit conversion needed here.
+const COMMODITY_SPECS_FRONTEND: Record<string, { contract_unit: number }> = {
+  wti:           { contract_unit: 1000    },
+  brent:         { contract_unit: 1000    },
+  natgas:        { contract_unit: 10000   },
+  heating_oil:   { contract_unit: 42000   },
+  rbob:          { contract_unit: 42000   },
+  lsgo:          { contract_unit: 100     },
+  gold:          { contract_unit: 100     },
+  silver:        { contract_unit: 5000    },
+  copper:        { contract_unit: 25000   },
+  corn:          { contract_unit: 5000    },
+  wheat:         { contract_unit: 5000    },
+  soybeans:      { contract_unit: 5000    },
+  soy_meal:      { contract_unit: 100     },
+  soy_oil:       { contract_unit: 60000   },
+  live_cattle:   { contract_unit: 40000   },
+  feeder_cattle: { contract_unit: 50000   },
+  lean_hogs:     { contract_unit: 40000   },
+  sugar11:       { contract_unit: 112000  },
+  white_sugar:   { contract_unit: 50      },
+  cotton:        { contract_unit: 50000   },
+  arabica:       { contract_unit: 37500   },
+  robusta:       { contract_unit: 10      },
+  cocoa_ny:      { contract_unit: 10      },
+  cocoa_ldn:     { contract_unit: 10      },
+  oj:            { contract_unit: 15000   },
+  oats:          { contract_unit: 5000    },
+  rough_rice:    { contract_unit: 2000    },
+  lumber:        { contract_unit: 110000  },
+};
+
 // MacroCotEntry.sector values: "hard" | "grains" | "meats" | "softs" | "micros"
 // "hard" is split into energy vs metals using ENERGY_SYMS at display time only.
 const ENERGY_SYMS = new Set(["wti","brent","natgas","heating_oil","rbob","lsgo"]);
@@ -131,6 +166,87 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
     return c.sector === displaySector;
   };
 
+  // ── Per-commodity table ──
+  const SECTOR_ORDER = ["energy", "metals", "grains", "meats", "softs", "micros"];
+  const commodityTable: import("./types").CommodityRow[] = latest.commodities
+    .filter(e => (e.gross_exposure_usd ?? 0) > 0 || (e.mm_long + e.mm_short) > 0)
+    .map(entry => {
+      const sym       = entry.symbol;
+      const dSector   = ENERGY_SYMS.has(sym) ? "energy" : (entry.sector === "hard" ? "metals" : entry.sector);
+      const prevEntry = prev.commodities.find(c => c.symbol === sym);
+      const curG      = entry.gross_exposure_usd  ?? 0;
+      const prevG2    = prevEntry?.gross_exposure_usd ?? 0;
+      const curN      = entry.net_exposure_usd     ?? 0;
+      const prevN     = prevEntry?.net_exposure_usd    ?? 0;
+      const curShare  = totalGross > 0 ? (curG / totalGross) * 100  : 0;
+      const prevShare2 = prevGross > 0 ? (prevG2 / prevGross) * 100 : 0;
+      const grossHist  = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.gross_exposure_usd ?? 0);
+      const shareHist  = grossHist.map((g, i) => totalGrossHistory[i] > 0 ? (g / totalGrossHistory[i]) * 100 : 0);
+      const netHist = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.net_exposure_usd ?? 0);
+      const netDelta = curN - prevN;
+
+      // Attribution computation
+      const cu = COMMODITY_SPECS_FRONTEND[sym]?.contract_unit ?? null;
+      const prevMmLong  = prevEntry?.mm_long  ?? null;
+      const prevMmShort = prevEntry?.mm_short ?? null;
+      const prevPrice   = prevEntry?.close_price ?? null;
+      const curPrice    = entry.close_price ?? null;
+
+      // gross_oi = mm_long + mm_short (MM lots only, NOT oi_total which covers all participants)
+      // net_oi   = mm_long - mm_short
+      let grossOiEffectB:    number | null = null;
+      let grossPriceEffectB: number | null = null;
+      let netOiEffectB:      number | null = null;
+      let netPriceEffectB:   number | null = null;
+
+      if (
+        cu !== null &&
+        prevPrice !== null && curPrice !== null &&
+        prevMmLong !== null && prevMmShort !== null
+        // entry.mm_long / mm_short are typed as number (never null) per MacroCotEntry
+      ) {
+        const curMmLong  = entry.mm_long;
+        const curMmShort = entry.mm_short;
+        const dGrossOi   = (curMmLong + curMmShort) - (prevMmLong + prevMmShort);
+        const dNetOi     = (curMmLong - curMmShort)  - (prevMmLong - prevMmShort);
+        const dPrice     = curPrice - prevPrice;
+
+        // Price effect uses current-period quantity (deliberate — assigns interaction term to price)
+        grossOiEffectB    = (dGrossOi                  * prevPrice * cu) / 1e9;
+        grossPriceEffectB = ((curMmLong + curMmShort)  * dPrice    * cu) / 1e9;
+        netOiEffectB      = (dNetOi                    * prevPrice * cu) / 1e9;
+        netPriceEffectB   = ((curMmLong - curMmShort)  * dPrice    * cu) / 1e9;
+      }
+
+      return {
+        symbol: sym,
+        name:   entry.name,
+        displaySector: dSector,
+        isCoffee: sym === "arabica" || sym === "robusta",
+        grossB:          curG / 1e9,
+        netB:            curN / 1e9,
+        deltaB:          (curG - prevG2) / 1e9,
+        deltaPct:        prevG2 > 0 ? ((curG - prevG2) / prevG2) * 100 : 0,
+        shareOfTotalPct: curShare,
+        shareDeltaPp:    curShare - prevShare2,
+        histRankGrossPct: percRank(curG, grossHist),
+        histRankSharePct: percRank(curShare, shareHist),
+        histRankNetPct: percRank(curN, netHist, false),
+        netDeltaB:       netDelta / 1e9,
+        netDeltaPct:     prevN !== 0 ? (netDelta / Math.abs(prevN)) * 100 : 0,
+        grossOiEffectB,
+        grossPriceEffectB,
+        netOiEffectB,
+        netPriceEffectB,
+      };
+    })
+    .sort((a, b) => {
+      const ai = SECTOR_ORDER.indexOf(a.displaySector);
+      const bi = SECTOR_ORDER.indexOf(b.displaySector);
+      if (ai !== bi) return ai - bi;
+      return b.grossB - a.grossB;
+    });
+
   // ── Sector breakdown (now with net, shareDelta, histRank) ──
   const sectorBreakdown = DISPLAY_SECTORS.map(s => {
     const gross  = sectorGross(latest, s);
@@ -154,6 +270,17 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
       .filter(c => sectorFilter(c, s))
       .reduce((sum, c) => sum + (c.net_exposure_usd ?? 0), 0);
     const netDelta = net - prevNet;
+
+    // Attribution subtotals: null if ALL commodities in sector have null; otherwise sum of non-null
+    const fields = ["grossOiEffectB", "grossPriceEffectB", "netOiEffectB", "netPriceEffectB"] as const;
+    const attrSubtotals = Object.fromEntries(fields.map(field => {
+      const vals = commodityTable
+        .filter(c => c.displaySector === s)
+        .map(c => c[field]);
+      const nonNull = vals.filter((v): v is number => v !== null);
+      return [field, nonNull.length === 0 ? null : nonNull.reduce((a, b) => a + b, 0)];
+    }));
+
     return {
       sector: s,
       grossB:          gross / 1e9,
@@ -167,51 +294,9 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
       histRankNetPct: percRank(net, netHistory, false),
       netDeltaB:       netDelta / 1e9,
       netDeltaPct:     prevNet !== 0 ? (netDelta / Math.abs(prevNet)) * 100 : 0,
+      ...attrSubtotals,
     };
   });
-
-  // ── Per-commodity table ──
-  const SECTOR_ORDER = ["energy", "metals", "grains", "meats", "softs", "micros"];
-  const commodityTable: import("./types").CommodityRow[] = latest.commodities
-    .filter(e => (e.gross_exposure_usd ?? 0) > 0)
-    .map(entry => {
-      const sym       = entry.symbol;
-      const dSector   = ENERGY_SYMS.has(sym) ? "energy" : (entry.sector === "hard" ? "metals" : entry.sector);
-      const prevEntry = prev.commodities.find(c => c.symbol === sym);
-      const curG      = entry.gross_exposure_usd  ?? 0;
-      const prevG2    = prevEntry?.gross_exposure_usd ?? 0;
-      const curN      = entry.net_exposure_usd     ?? 0;
-      const prevN     = prevEntry?.net_exposure_usd    ?? 0;
-      const curShare  = totalGross > 0 ? (curG / totalGross) * 100  : 0;
-      const prevShare2 = prevGross > 0 ? (prevG2 / prevGross) * 100 : 0;
-      const grossHist  = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.gross_exposure_usd ?? 0);
-      const shareHist  = grossHist.map((g, i) => totalGrossHistory[i] > 0 ? (g / totalGrossHistory[i]) * 100 : 0);
-      const netHist = macroData.map(w => w.commodities.find(c => c.symbol === sym)?.net_exposure_usd ?? 0);
-      const netDelta = curN - prevN;
-      return {
-        symbol: sym,
-        name:   entry.name,
-        displaySector: dSector,
-        isCoffee: sym === "arabica" || sym === "robusta",
-        grossB:          curG / 1e9,
-        netB:            curN / 1e9,
-        deltaB:          (curG - prevG2) / 1e9,
-        deltaPct:        prevG2 > 0 ? ((curG - prevG2) / prevG2) * 100 : 0,
-        shareOfTotalPct: curShare,
-        shareDeltaPp:    curShare - prevShare2,
-        histRankGrossPct: percRank(curG, grossHist),
-        histRankSharePct: percRank(curShare, shareHist),
-        histRankNetPct: percRank(curN, netHist, false),
-        netDeltaB:       netDelta / 1e9,
-        netDeltaPct:     prevN !== 0 ? (netDelta / Math.abs(prevN)) * 100 : 0,
-      };
-    })
-    .sort((a, b) => {
-      const ai = SECTOR_ORDER.indexOf(a.displaySector);
-      const bi = SECTOR_ORDER.indexOf(b.displaySector);
-      if (ai !== bi) return ai - bi;
-      return b.grossB - a.grossB;
-    });
 
   // ── Net exposure WoW ──
   const prevNetExp = prev.commodities.reduce((s, c) => s + (c.net_exposure_usd ?? 0), 0);
