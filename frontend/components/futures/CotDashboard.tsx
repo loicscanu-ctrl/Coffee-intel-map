@@ -6,6 +6,8 @@ import {
   ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea, Label,
 } from "recharts";
 import { fetchCot, fetchMacroCot, type MacroCotWeek } from "@/lib/api";
+import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
+import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -52,7 +54,7 @@ function transformMacroData(
   weeks: MacroCotWeek[],
   mode: "gross" | "gross_long" | "gross_short" | "net"
 ): { date: string; energy: number; metals: number; grains: number; meats: number; softs: number; micros: number; coffeeShare: number | null }[] {
-  return weeks.filter(w => w.date !== "2025-11-11").map(week => {
+  return weeks.map(week => {
     const sectorTotals: Record<string, number> = { energy: 0, metals: 0, grains: 0, meats: 0, softs: 0, micros: 0 };
     let coffeeGross = 0;
     let totalGross  = 0;
@@ -571,6 +573,9 @@ export default function CotDashboard() {
   const pdfRefIndustryPulse = useRef<HTMLDivElement>(null);
   const pdfRefDryPowder     = useRef<HTMLDivElement>(null);
   const pdfRefObosMatrix    = useRef<HTMLDivElement>(null);
+  const pdfRefMacroGross    = useRef<HTMLDivElement>(null);
+  const pdfRefMacroNet      = useRef<HTMLDivElement>(null);
+  const pdfRefSoftsContract = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<Step>(1);
   const [cotRows, setCotRows] = useState<any[] | null>(null);
@@ -578,6 +583,7 @@ export default function CotDashboard() {
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);
   const [macroToggle, setMacroToggle] = useState<"gross" | "gross_long" | "gross_short" | "net">("gross");
+  const [step1View, setStep1View] = useState<"chart" | "table">("chart");
 
   useEffect(() => {
     fetchCot()
@@ -642,6 +648,12 @@ export default function CotDashboard() {
     [macroData, macroToggle]
   );
 
+  const globalFlowMetrics = useMemo(
+    (): GlobalFlowMetrics | null =>
+      macroData.length >= 2 ? buildGlobalFlowMetrics(macroData) : null,
+    [macroData]
+  );
+
   const macroNetSplitData = useMemo(() => {
     if (macroToggle !== "net") return null;
     return macroChartData.map(row => {
@@ -654,6 +666,69 @@ export default function CotDashboard() {
       return result;
     });
   }, [macroChartData, macroToggle]);
+
+  // PDF-only chart data — always computed in a fixed mode, independent of macroToggle
+  const PDF_SOFT_SYMBOLS = [
+    { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
+    { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
+    { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
+    { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
+    { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
+    { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
+    { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
+    { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
+  ] as const;
+
+  const pdfGrossData = useMemo(() => transformMacroData(macroData, "gross"), [macroData]);
+  const pdfNetData   = useMemo(() => transformMacroData(macroData, "net"),   [macroData]);
+
+  const pdfNetSplit = useMemo(() => pdfNetData.map(row => {
+    const r: Record<string, any> = { date: row.date };
+    for (const s of SECTORS) {
+      const v = (row as any)[s] as number;
+      r[`${s}_pos`] = v > 0 ? v : 0;
+      r[`${s}_neg`] = v < 0 ? v : 0;
+    }
+    return r;
+  }), [pdfNetData]);
+
+  const pdfNetYDomain = useMemo((): [number, number] | undefined => {
+    if (!pdfNetData.length) return undefined;
+    const allVals = pdfNetData.flatMap(d => SECTORS.map(s => (d as any)[s] as number));
+    const min = Math.min(...allVals), max = Math.max(...allVals);
+    const pad = Math.max(Math.abs(min), Math.abs(max)) * 0.15;
+    return [+(min - pad).toFixed(2), +(max + pad).toFixed(2)];
+  }, [pdfNetData]);
+
+  const pdfSoftNetBase = useMemo(() => macroData
+    .map(week => {
+      const row: Record<string, any> = { date: week.date };
+      for (const sym of PDF_SOFT_SYMBOLS) {
+        const c = week.commodities.find(c => c.symbol === sym.key);
+        row[sym.key] = (c?.net_exposure_usd ?? 0) / 1e9;
+      }
+      return row;
+    })
+    .filter(row => PDF_SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0)),
+  [macroData]);
+
+  const pdfSoftNetSplit = useMemo(() => pdfSoftNetBase.map(row => {
+    const r: Record<string, any> = { date: row.date };
+    for (const s of PDF_SOFT_SYMBOLS) {
+      const v = row[s.key] as number;
+      r[`${s.key}_pos`] = v > 0 ? v : 0;
+      r[`${s.key}_neg`] = v < 0 ? v : 0;
+    }
+    return r;
+  }), [pdfSoftNetBase]);
+
+  const pdfSoftNetYDomain = useMemo((): [number, number] | undefined => {
+    if (!pdfSoftNetBase.length) return undefined;
+    const vals = pdfSoftNetBase.flatMap(row => PDF_SOFT_SYMBOLS.map(s => row[s.key] as number));
+    const mn = Math.min(...vals), mx = Math.max(...vals);
+    const pad = Math.max(Math.abs(mn), Math.abs(mx)) * 0.15;
+    return [+(mn - pad).toFixed(2), +(mx + pad).toFixed(2)];
+  }, [pdfSoftNetBase]);
 
   const macroYDomain = useMemo(() => {
     if (macroToggle !== "net" || !macroChartData.length) return undefined;
@@ -714,6 +789,9 @@ export default function CotDashboard() {
         industryPulse: pdfRefIndustryPulse,
         dryPowder:     pdfRefDryPowder,
         obosMatrix:    pdfRefObosMatrix,
+        macroGross:    pdfRefMacroGross,
+        macroNet:      pdfRefMacroNet,
+        softsContract: pdfRefSoftsContract,
       });
 
       const { buildGlobalFlowMetrics, buildMarketMetrics } = await import("@/lib/pdf/dataHelpers");
@@ -755,6 +833,9 @@ export default function CotDashboard() {
           industryPulse: capturedCharts.industryPulse ?? null,
           dryPowder:     capturedCharts.dryPowder     ?? null,
           obosMatrix:    capturedCharts.obosMatrix     ?? null,
+          macroGross:    capturedCharts.macroGross    ?? null,
+          macroNet:      capturedCharts.macroNet      ?? null,
+          softsContract: capturedCharts.softsContract ?? null,
         },
       };
 
@@ -869,7 +950,23 @@ export default function CotDashboard() {
           )}
 
           {/* Toggle */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+            {/* View toggle — Chart or Attribution Table */}
+            {(["chart", "table"] as const).map(v => (
+              <button
+                key={v}
+                onClick={() => setStep1View(v)}
+                style={{
+                  padding: "4px 12px", borderRadius: 4, border: "1px solid #374151",
+                  background: step1View === v ? "#065f46" : "#1f2937",
+                  color: "#f9fafb", cursor: "pointer", fontSize: 12,
+                }}
+              >
+                {v === "chart" ? "Chart" : "Attribution Table"}
+              </button>
+            ))}
+            <span style={{ width: 1, height: 20, background: "#374151", margin: "0 4px" }} />
+            {/* Existing mode toggle — gross/net/long/short */}
             {(["gross", "gross_long", "gross_short", "net"] as const).map(m => {
               const labels: Record<string, string> = {
                 gross:       "Total Gross",
@@ -918,6 +1015,8 @@ export default function CotDashboard() {
             );
           })()}
 
+          {step1View === "chart" && (
+          <>
           {/* Panel A — MM Exposure by Sector */}
           <div style={{ marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure by Sector (USD bn)</span>
@@ -971,8 +1070,11 @@ export default function CotDashboard() {
                   />
                 )}
                 <Legend wrapperStyle={{ fontSize: 11 }} content={(props: any) => {
-                  const order = ["energy", "metals", "grains", "meats", "softs", "micros"];
                   const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
+                  const lastRow = macroChartData[macroChartData.length - 1];
+                  const order = lastRow
+                    ? [...SECTORS].sort((a, b) => Math.abs((lastRow as any)[b]) - Math.abs((lastRow as any)[a]))
+                    : [...SECTORS];
                   return (
                     <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
                       {order.map(s => (
@@ -1064,6 +1166,8 @@ export default function CotDashboard() {
               </>
             );
           })()}
+          </>
+          )}
 
           {/* Panel C — MM Exposure on Softs (by contract) */}
           {(() => {
@@ -1079,7 +1183,6 @@ export default function CotDashboard() {
             ];
 
             const softChartData = macroData
-              .filter(w => w.date !== "2025-11-11")
               .map(week => {
                 const row: Record<string, any> = { date: week.date };
                 for (const sym of SOFT_SYMBOLS) {
@@ -1207,7 +1310,6 @@ export default function CotDashboard() {
             ];
 
             const softBase = macroData
-              .filter(w => w.date !== "2025-11-11")
               .map(week => {
                 const row: Record<string, any> = { date: week.date };
                 for (const sym of SOFT_SYMBOLS) {
@@ -1577,6 +1679,98 @@ export default function CotDashboard() {
           </div>
         );
       })()}
+
+      {/* ── Hidden off-screen chart divs for PDF capture ── */}
+      {/* Always rendered regardless of current step so refs are mounted at PDF export time */}
+      <div style={{ position: "fixed", top: -9999, left: -9999, width: 800, pointerEvents: "none", opacity: 0 }}>
+        {/* Chart 1: Total Gross Exposure by Sector */}
+        <div ref={pdfRefMacroGross} style={{ background: "#0f172a", padding: 16, width: 800, height: 280 }}>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={pdfGrossData} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `$${Math.abs(v).toFixed(0)}B`} width={52} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              {SECTORS.map(sector => {
+                const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                return (
+                  <Area key={sector} type="monotone" dataKey={sector}
+                    stackId="1" name={label}
+                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                    fillOpacity={0.6} dot={false} />
+                );
+              })}
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Chart 2: Net MM Exposure by Sector */}
+        <div ref={pdfRefMacroNet} style={{ background: "#0f172a", padding: 16, width: 800, height: 280 }}>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={pdfNetSplit} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(0)}B`} width={52} domain={pdfNetYDomain} />
+              <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
+              <Legend wrapperStyle={{ fontSize: 11 }} content={(props: any) => {
+                const order = ["energy", "metals", "grains", "meats", "softs", "micros"];
+                const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
+                return (
+                  <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
+                    {order.map(s => (
+                      <span key={s} style={{ display: "flex", alignItems: "center", gap: 5, color: "#d1d5db" }}>
+                        <span style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: SECTOR_COLORS[s], display: "inline-block" }} />
+                        {labelMap[s]}
+                      </span>
+                    ))}
+                  </div>
+                );
+              }} />
+              {SECTORS.map(sector => {
+                const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
+                return (
+                  <Area key={`${sector}_pos`} type="monotone" dataKey={`${sector}_pos`}
+                    stackId="pos" name={label}
+                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                    fillOpacity={0.6} dot={false} />
+                );
+              })}
+              {SECTORS.map(sector => (
+                <Area key={`${sector}_neg`} type="monotone" dataKey={`${sector}_neg`}
+                  stackId="neg" name={`${sector}_neg`}
+                  stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
+                  fillOpacity={0.6} dot={false} legendType="none" />
+              ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Chart 3: Net MM Exposure — Softs by Contract */}
+        <div ref={pdfRefSoftsContract} style={{ background: "#0f172a", padding: 16, width: 800, height: 260 }}>
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart
+              data={pdfSoftNetSplit.length ? pdfSoftNetSplit : pdfSoftNetBase}
+              margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(2)}B`} width={58} domain={pdfSoftNetYDomain} />
+              <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              {PDF_SOFT_SYMBOLS.map(s => (
+                <Area key={`${s.key}_pos`} type="monotone" dataKey={`${s.key}_pos`}
+                  stackId="pos" name={s.label}
+                  stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
+              ))}
+              {PDF_SOFT_SYMBOLS.map(s => (
+                <Area key={`${s.key}_neg`} type="monotone" dataKey={`${s.key}_neg`}
+                  stackId="neg" name={`${s.key}_neg`}
+                  stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} legendType="none" />
+              ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }
