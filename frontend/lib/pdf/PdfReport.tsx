@@ -521,11 +521,14 @@ function CounterpartyMapBlock({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetri
         val:   (c as any)[cat.key]?.[side]  ?? 0,
         delta: (c as any)[cat.key]?.[dKey]  ?? 0,
       })).filter(r => r.val > 0);
+      const totalDelta = rows.reduce((s, r) => s + r.delta, 0);
       return (
         <View style={{ marginBottom: 5 }}>
           <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", paddingBottom: 1, marginBottom: 2 }}>
-            <Text style={{ flex: 1, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>{title}</Text>
-            <Text style={{ fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>{fmtN(total)}</Text>
+            <Text style={{ width: 52, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>{title}</Text>
+            <View style={{ flex: 1 }} />
+            <Text style={{ width: 34, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark, textAlign: "right" }}>{fmtN(total)}</Text>
+            <Text style={{ width: 32, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: totalDelta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(totalDelta)}</Text>
           </View>
           {rows.map(row => {
             const pct = total > 0 ? Math.max(0, Math.min(100, (row.val / total) * 100)) : 0;
@@ -558,10 +561,17 @@ function CounterpartyMapBlock({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetri
         {renderSide("short", totalShort, "SHORTS")}
         {spreadRows.length > 0 && (
           <View>
-            <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", paddingBottom: 1, marginBottom: 2 }}>
-              <Text style={{ flex: 1, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>SPREADING</Text>
-              <Text style={{ fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>{fmtN(totalSpread)}</Text>
-            </View>
+            {(() => {
+              const totalSpreadDelta = spreadRows.reduce((s, r) => s + r.delta, 0);
+              return (
+                <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", paddingBottom: 1, marginBottom: 2 }}>
+                  <Text style={{ width: 52, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>SPREADING</Text>
+                  <View style={{ flex: 1 }} />
+                  <Text style={{ width: 34, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark, textAlign: "right" }}>{fmtN(totalSpread)}</Text>
+                  <Text style={{ width: 32, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: totalSpreadDelta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(totalSpreadDelta)}</Text>
+                </View>
+              );
+            })()}
             {spreadRows.map(row => {
               const pct = totalSpread > 0 ? Math.max(0, Math.min(100, (row.val / totalSpread) * 100)) : 0;
               return (
