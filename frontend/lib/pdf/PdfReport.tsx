@@ -189,15 +189,6 @@ function ChartBlock({ title, src, comment, compact = false }: { title: string; s
 const NY_LOT_MT  = 17.009; // 37,500 lbs → MT
 const LDN_LOT_MT = 10.0;   // 10 MT / lot
 
-// ── Bullet helpers ────────────────────────────────────────────────────────────
-function Bullet({ text }: { text: string }) {
-  return (
-    <View style={S.bulletRow}>
-      <Text style={S.bulletDot}>•</Text>
-      <Text style={S.bulletText}>{text}</Text>
-    </View>
-  );
-}
 // ── Page 1: Commodity breakdown table (all commodities, grouped by sector) ────
 const SECTOR_LABELS: Record<string, string> = {
   energy: "Energy", metals: "Metals", grains: "Grains",
@@ -502,121 +493,99 @@ function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
   );
 }
 
-// ── Page 2: Coffee combined flow summary ──────────────────────────────────────
-function CotDisaggTable({ m, label }: { m: MarketMetrics; label: string }) {
-  const fmtN = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const fmtD = (n: number) => `${n >= 0 ? "+" : "-"}${fmtN(Math.abs(n))}`;
-  const fmtNZ = (n: number) => n === 0 ? "—" : fmtN(n);
-  const fmtDZ = (n: number) => n === 0 ? "—" : fmtD(n);
-  const c = m.cats;
+// ── Counterparty mapping block (replaces COT disagg tables on page 3) ─────────
+function CounterpartyMapBlock({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics }) {
+  const fmtN = (n: number) => Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const fmtD = (n: number) => `${n >= 0 ? "+" : "-"}${fmtN(n)}`;
+  const FS     = 5.5;
+  const FS_H   = 6.0;
 
-  type CatRow = { label: string; long: number; dLong: number; short: number; dShort: number; spread: number; dSpread: number };
-  const rows: CatRow[] = [
-    { label: "Prod./Merch. (PMPU)", long: c.pmpu.long,  dLong: c.pmpu.dLong,  short: c.pmpu.short,  dShort: c.pmpu.dShort,  spread: 0,             dSpread: 0              },
-    { label: "Swap Dealers",        long: c.swap.long,  dLong: c.swap.dLong,  short: c.swap.short,  dShort: c.swap.dShort,  spread: c.swap.spread,  dSpread: c.swap.dSpread  },
-    { label: "Managed Money",       long: c.mm.long,    dLong: c.mm.dLong,    short: c.mm.short,    dShort: c.mm.dShort,    spread: c.mm.spread,    dSpread: c.mm.dSpread    },
-    { label: "Other Reportables",   long: c.other.long, dLong: c.other.dLong, short: c.other.short, dShort: c.other.dShort, spread: c.other.spread, dSpread: c.other.dSpread },
-    { label: "Non-Reportables",     long: c.nr.long,    dLong: c.nr.dLong,    short: c.nr.short,    dShort: c.nr.dShort,    spread: 0,             dSpread: 0              },
-  ];
-  const totalLong   = rows.reduce((s, r) => s + r.long, 0);
-  const totalShort  = rows.reduce((s, r) => s + r.short, 0);
-  const totalSpread = rows.reduce((s, r) => s + r.spread, 0);
-  const FS = 6.0;
-  const hStyle  = (flex: number) => [S.tHCellR, { flex, fontSize: FS }];
-  const hStyleL = (flex: number) => [S.tHCell,  { flex, fontSize: FS }];
-  const dCell = (n: number, flex: number) => (
-    <Text style={[n > 0 ? S.tCellPos : n < 0 ? S.tCellNeg : S.tCellR, { flex, fontSize: FS }]}>{fmtDZ(n)}</Text>
-  );
+  const CATS = [
+    { key: "pmpu",  label: "PMPU",        color: "#3b82f6" },
+    { key: "swap",  label: "Swap Dealers", color: "#10b981" },
+    { key: "mm",    label: "Mng. Money",   color: "#f59e0b" },
+    { key: "other", label: "Other Rept.",  color: "#94a3b8" },
+    { key: "nr",    label: "Non-Rep.",     color: "#64748b" },
+  ] as const;
 
-  return (
-    <View style={{ flex: 1 }}>
-      {/* Table title */}
-      <View style={{ marginBottom: 2 }}>
-        <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: BRAND.amber }}>{label}</Text>
-        <Text style={{ fontSize: 5.5, color: BRAND.slate400, marginTop: 1 }}>Report: {m.date} · OI: {fmtN(c.oi)}</Text>
-      </View>
-      {/* Header */}
-      <View style={[S.tHeadRow, { paddingVertical: 2 }]}>
-        <Text style={hStyleL(1.8)}>Category</Text>
-        <Text style={hStyle(0.8)}>Long</Text>
-        <Text style={hStyle(0.65)}>ΔLong</Text>
-        <Text style={hStyle(0.8)}>Short</Text>
-        <Text style={hStyle(0.65)}>ΔShort</Text>
-        <Text style={hStyle(0.8)}>Spread</Text>
-        <Text style={hStyle(0.65)}>ΔSpread</Text>
-        <Text style={hStyle(0.65)}>Net</Text>
-      </View>
-      {/* Data rows */}
-      {rows.map((r, i) => (
-        <View key={r.label} style={i % 2 === 0 ? S.tDataRow : S.tDataRowAlt}>
-          <Text style={[S.tCellR, { flex: 1.8, fontSize: FS, color: BRAND.slate600 }]}>{r.label}</Text>
-          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtN(r.long)}</Text>
-          {dCell(r.dLong, 0.65)}
-          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtN(r.short)}</Text>
-          {dCell(r.dShort, 0.65)}
-          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtNZ(r.spread)}</Text>
-          {dCell(r.dSpread, 0.65)}
-          <Text style={[r.long - r.short >= 0 ? S.tCellPos : S.tCellNeg, { flex: 0.65, fontSize: FS }]}>{fmtD(r.long - r.short)}</Text>
+  function MarketBlock({ m, label }: { m: MarketMetrics; label: string }) {
+    const c           = m.cats;
+    const totalLong   = CATS.reduce((s, cat) => s + ((c as any)[cat.key]?.long  ?? 0), 0);
+    const totalShort  = CATS.reduce((s, cat) => s + ((c as any)[cat.key]?.short ?? 0), 0);
+    const totalSpread = (c.swap.spread ?? 0) + (c.mm.spread ?? 0) + (c.other.spread ?? 0);
+
+    const renderSide = (side: "long" | "short", total: number, title: string) => {
+      const dKey = side === "long" ? "dLong" : "dShort";
+      const rows = CATS.map(cat => ({
+        ...cat,
+        val:   (c as any)[cat.key]?.[side]  ?? 0,
+        delta: (c as any)[cat.key]?.[dKey]  ?? 0,
+      })).filter(r => r.val > 0);
+      return (
+        <View style={{ marginBottom: 5 }}>
+          <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", paddingBottom: 1, marginBottom: 2 }}>
+            <Text style={{ flex: 1, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>{title}</Text>
+            <Text style={{ fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>{fmtN(total)}</Text>
+          </View>
+          {rows.map(row => {
+            const pct = total > 0 ? Math.max(0, Math.min(100, (row.val / total) * 100)) : 0;
+            return (
+              <View key={row.key} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                <Text style={{ width: 52, fontSize: FS, color: row.color }}>{row.label}</Text>
+                <View style={{ flex: 1, height: 5, backgroundColor: "#f1f5f9", borderRadius: 1, marginRight: 4 }}>
+                  <View style={{ height: 5, width: `${pct}%` as any, backgroundColor: row.color, borderRadius: 1, opacity: 0.8 }} />
+                </View>
+                <Text style={{ width: 34, fontSize: FS, color: BRAND.dark, textAlign: "right" }}>{fmtN(row.val)}</Text>
+                <Text style={{ width: 32, fontSize: FS, color: row.delta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(row.delta)}</Text>
+              </View>
+            );
+          })}
         </View>
-      ))}
-      {/* Total row */}
-      <View style={{ flexDirection: "row", paddingVertical: 2, paddingHorizontal: 6, backgroundColor: "#1e293b", borderTopWidth: 0.5, borderTopColor: "#475569" }}>
-        <Text style={{ flex: 1.8, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white }}>Total</Text>
-        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalLong)}</Text>
-        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
-        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalShort)}</Text>
-        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
-        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalSpread)}</Text>
-        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
-        <Text style={[{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", textAlign: "right" }, totalLong - totalShort >= 0 ? { color: BRAND.green } : { color: BRAND.red }]}>{fmtD(totalLong - totalShort)}</Text>
+      );
+    };
+
+    const spreadRows = [
+      { key: "swap",  label: "Swap Dealers", color: "#10b981", val: c.swap.spread  ?? 0, delta: c.swap.dSpread  ?? 0 },
+      { key: "mm",    label: "Mng. Money",   color: "#f59e0b", val: c.mm.spread    ?? 0, delta: c.mm.dSpread    ?? 0 },
+      { key: "other", label: "Other Rept.",  color: "#94a3b8", val: c.other.spread ?? 0, delta: c.other.dSpread ?? 0 },
+    ].filter(r => r.val > 0);
+
+    return (
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: BRAND.amber, marginBottom: 1 }}>{label}</Text>
+        <Text style={{ fontSize: FS, color: BRAND.slate400, marginBottom: 4 }}>Report: {m.date} · Total OI: {fmtN(c.oi)}</Text>
+        {renderSide("long",  totalLong,  "LONGS")}
+        {renderSide("short", totalShort, "SHORTS")}
+        {spreadRows.length > 0 && (
+          <View>
+            <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e2e8f0", paddingBottom: 1, marginBottom: 2 }}>
+              <Text style={{ flex: 1, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>SPREADING</Text>
+              <Text style={{ fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>{fmtN(totalSpread)}</Text>
+            </View>
+            {spreadRows.map(row => (
+              <View key={row.key} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                <Text style={{ width: 52, fontSize: FS, color: row.color }}>{row.label}</Text>
+                <View style={{ flex: 1 }} />
+                <Text style={{ width: 34, fontSize: FS, color: BRAND.dark, textAlign: "right" }}>{fmtN(row.val)}</Text>
+                <Text style={{ width: 32, fontSize: FS, color: row.delta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(row.delta)}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
-    </View>
-  );
-}
-
-function CoffeeFlowSummary({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics }) {
-  const nyMmNetLots  = ny.mmLongChangeLots  - ny.mmShortChangeLots;
-  const ldnMmNetLots = ldn.mmLongChangeLots - ldn.mmShortChangeLots;
-  const nyMmNetMT    = nyMmNetLots  * NY_LOT_MT;
-  const ldnMmNetMT   = ldnMmNetLots * LDN_LOT_MT;
-  const combinedMmMT = nyMmNetMT + ldnMmNetMT;
-
-  // USD notional: NY ¢/lb × 22.046 = $/MT; LDN already $/MT
-  const nyMmUSD  = (nyMmNetMT  * ny.price  * 22.046) / 1e6;  // $M
-  const ldnMmUSD = (ldnMmNetMT * ldn.price)          / 1e6;  // $M
-  const combUSD  = nyMmUSD + ldnMmUSD;
-
-  // PMPU (producer hedge change, already in MT)
-  const nyPmpuMT   = ny.producerMTWoW;
-  const ldnPmpuMT  = ldn.producerMTWoW;
-  const combPmpuMT = nyPmpuMT + ldnPmpuMT;
-
-  const s    = (n: number) => n >= 0 ? "+" : "-";
-  const fMT  = (mt: number) => `${s(mt)}${(Math.abs(mt)/1000).toFixed(1)}k MT`;
-  const fUSD = (m:  number) => `${s(m)}$${Math.abs(m).toFixed(1)}M`;
-  const fL   = (l:  number) => `${s(l)}${(Math.abs(l)/1000).toFixed(1)}k lots`;
-
-  const aligned  = (ny.mmLong - ny.mmShort > 0) === (ldn.mmLong - ldn.mmShort > 0);
-  const nyDir    = ny.mmLong  - ny.mmShort  > 0 ? "net long" : "net short";
-  const ldnDir   = ldn.mmLong - ldn.mmShort > 0 ? "net long" : "net short";
+    );
+  }
 
   return (
-    <View style={S.commentBox}>
-      <Text style={[S.commentSignal, { marginBottom: 6 }]}>
-        Both coffee contracts — MM net position {combinedMmMT >= 0 ? "increased" : "decreased"} by {(Math.abs(combinedMmMT)/1000).toFixed(1)}k MT equiv. ({fUSD(combUSD)}) combined
-      </Text>
-      <Bullet text={`MM net change: NY ${fL(nyMmNetLots)} (${fMT(nyMmNetMT)}, ${fUSD(nyMmUSD)}) · LDN ${fL(ldnMmNetLots)} (${fMT(ldnMmNetMT)}, ${fUSD(ldnMmUSD)})`} />
-      <Bullet text={`Producer hedging (PMPU long Δ): NY ${fMT(nyPmpuMT)} · LDN ${fMT(ldnPmpuMT)} = combined ${fMT(combPmpuMT)}`} />
-      <Bullet text={
-        aligned
-          ? `Directional alignment: both contracts ${nyDir} — signals agree.`
-          : `Directional divergence: NY is ${nyDir}, LDN is ${ldnDir} — signals split.`
-      } />
+    <View style={{ flexDirection: "row", gap: 12, marginBottom: 8 }}>
+      <MarketBlock m={ldn} label="ICE Counterparty — Robusta (London)" />
+      <View style={{ width: 0.5, backgroundColor: "#e2e8f0" }} />
+      <MarketBlock m={ny}  label="CFTC Counterparty — Arabica (NY)" />
     </View>
   );
 }
 
-// ── Page 2: Coffee comparison table ───────────────────────────────────────────
+// ── Page 3: Coffee comparison table ───────────────────────────────────────────
 function CoffeeComparisonTable({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics }) {
   const s1  = (n: number) => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(1)}`;
   const kL  = (n: number) => `${n >= 0 ? "+" : "-"}${(Math.abs(n)/1000).toFixed(1)}k lots`;
@@ -759,14 +728,8 @@ export function CotPdfReport({ d }: { d: ReportData }) {
           );
         })()}
 
-        {/* COT Disaggregated tables — side by side */}
-        <View style={{ flexDirection: "row", gap: 8, marginBottom: 6 }}>
-          <CotDisaggTable m={d.ldn} label="ICE Disaggregated COT — Robusta (London)" />
-          <CotDisaggTable m={d.ny}  label="CFTC Disaggregated COT — Arabica (NY)" />
-        </View>
-
-        {/* Combined flow summary with bullets */}
-        <CoffeeFlowSummary ny={d.ny} ldn={d.ldn} />
+        {/* Counterparty mapping — replaces disagg tables */}
+        <CounterpartyMapBlock ny={d.ny} ldn={d.ldn} />
 
         {/* Side-by-side comparison table */}
         <Text style={S.subTitle}>FULL BREAKDOWN — NY ARABICA vs LDN ROBUSTA</Text>

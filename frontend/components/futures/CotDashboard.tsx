@@ -1703,12 +1703,12 @@ export default function CotDashboard() {
                     name === "Price" ? v.toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name
                   ]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Line yAxisId="left" type="monotone" dataKey={longKey}
-                    name="Industry Long (MT)"  stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line yAxisId="left" type="monotone" dataKey={shortKey}
-                    name="Industry Short (MT)" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Area yAxisId="left" type="monotone" dataKey={longKey}
+                    name="Industry Long (MT)"  stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} dot={false} />
+                  <Area yAxisId="left" type="monotone" dataKey={shortKey}
+                    name="Industry Short (MT)" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} dot={false} />
                   <Line yAxisId="right" type="monotone" dataKey={priceKey}
-                    name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
+                    name="Price" stroke="#f59e0b" strokeWidth={2} dot={false} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -1963,7 +1963,7 @@ export default function CotDashboard() {
 
       {/* ── Hidden off-screen charts for Industry Pulse and Dry Powder (PDF capture) ── */}
       <div style={{ position: "absolute", left: -9999, top: 0, pointerEvents: "none" }}>
-        <div ref={pdfRefIndNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+        <div ref={pdfRefIndNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={recent52}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -1971,13 +1971,14 @@ export default function CotDashboard() {
               <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
               <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
               <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_NY"  name="PMPU Long"  fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_NY" name="PMPU Short" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey="priceNY" name="Price" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
+              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_NY"  name="Industry Long (MT)" fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_NY" name="Industry Short (MT)" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
+              <Line yAxisId="right" type="monotone" dataKey="priceNY" name="Price (¢/lb)" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
-        <div ref={pdfRefIndLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+        <div ref={pdfRefIndLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={recent52}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -1985,19 +1986,21 @@ export default function CotDashboard() {
               <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
               <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
               <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_LDN"  name="PMPU Long"  fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_LDN" name="PMPU Short" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey="priceLDN" name="Price" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
+              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_LDN"  name="Industry Long (MT)" fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_LDN" name="Industry Short (MT)" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
+              <Line yAxisId="right" type="monotone" dataKey="priceLDN" name="Price ($/MT)" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
-        <div ref={pdfRefDpNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+        <div ref={pdfRefDpNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" />
-              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI" />
+              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" label={{ value: "# Traders", position: "bottom", offset: 0, fill: "#9ca3af", fontSize: 8 }} />
+              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI (MT)" />
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
               <Scatter name="Historic"   data={dpDataNyMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
               <Scatter name="Prior Y"    data={dpDataNyMm.year}       fill="#3b82f6" fillOpacity={0.45} />
               <Scatter name="Prior 4W"   data={dpDataNyMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
@@ -2006,13 +2009,14 @@ export default function CotDashboard() {
             </ScatterChart>
           </ResponsiveContainer>
         </div>
-        <div ref={pdfRefDpLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+        <div ref={pdfRefDpLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" />
-              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI" />
+              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" label={{ value: "# Traders", position: "bottom", offset: 0, fill: "#9ca3af", fontSize: 8 }} />
+              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI (MT)" />
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
               <Scatter name="Historic"   data={dpDataLdnMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
               <Scatter name="Prior Y"    data={dpDataLdnMm.year}       fill="#3b82f6" fillOpacity={0.45} />
               <Scatter name="Prior 4W"   data={dpDataLdnMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
