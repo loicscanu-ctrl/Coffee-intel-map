@@ -504,6 +504,25 @@ async def run(page) -> list[dict]:
             )
             results.append(cot_item)
             print(f"[futures] COT Arabica: {cot_item['title']}")
+            # Wire Barchart KC chain data into cot_weekly for NY
+            report_date_ny = cot_row["Report_Date_as_YYYY-MM-DD"]
+            if kc_contracts and len(kc_contracts) >= 1:
+                nearby_oi_ny = sum(c["oi"] or 0 for c in kc_contracts[:2])
+                structure_ny = (
+                    kc_contracts[1]["last"] - kc_contracts[0]["last"]
+                    if len(kc_contracts) >= 2
+                    and kc_contracts[0].get("last") is not None
+                    and kc_contracts[1].get("last") is not None
+                    else None
+                )
+                chain_fields: dict = {"exch_oi_ny": nearby_oi_ny}
+                if structure_ny is not None:
+                    chain_fields["structure_ny"] = structure_ny
+                try:
+                    upsert_cot_weekly("ny", report_date_ny, chain_fields)
+                    print(f"[futures] NY chain upserted: exch_oi={nearby_oi_ny}, structure={structure_ny}")
+                except Exception as e:
+                    print(f"[cot] Failed to upsert NY chain fields for {report_date_ny}: {e}")
     except Exception as e:
         print(f"[futures] CFTC COT failed: {e}")
 
@@ -515,6 +534,25 @@ async def run(page) -> list[dict]:
             ice_cot_item = _make_ice_cot_item(latest, prev)
             results.append(ice_cot_item)
             print(f"[futures] COT Robusta: {ice_cot_item['title']}")
+            # Wire Barchart RM chain data into cot_weekly for LDN
+            report_date_ldn = _ice_date_to_iso(latest.get("As_of_Date_Form_MM/DD/YYYY", ""))
+            if rm_contracts and len(rm_contracts) >= 1:
+                nearby_oi_ldn = sum(c["oi"] or 0 for c in rm_contracts[:2])
+                structure_ldn = (
+                    rm_contracts[1]["last"] - rm_contracts[0]["last"]
+                    if len(rm_contracts) >= 2
+                    and rm_contracts[0].get("last") is not None
+                    and rm_contracts[1].get("last") is not None
+                    else None
+                )
+                chain_fields_ldn: dict = {"exch_oi_ldn": nearby_oi_ldn}
+                if structure_ldn is not None:
+                    chain_fields_ldn["structure_ldn"] = structure_ldn
+                try:
+                    upsert_cot_weekly("ldn", report_date_ldn, chain_fields_ldn)
+                    print(f"[futures] LDN chain upserted: exch_oi={nearby_oi_ldn}, structure={structure_ldn}")
+                except Exception as e:
+                    print(f"[cot] Failed to upsert LDN chain fields for {report_date_ldn}: {e}")
     except Exception as e:
         print(f"[futures] ICE Robusta COT failed: {e}")
 

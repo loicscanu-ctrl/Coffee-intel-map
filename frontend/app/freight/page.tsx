@@ -77,7 +77,7 @@ export default function FreightPage() {
               <Tooltip
                 contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
                 labelStyle={{ color: "#94a3b8" }}
-                formatter={(v: number) => [`$${v.toLocaleString("en-US")}`, ""]}
+                formatter={(v: any) => [`$${Number(v).toLocaleString("en-US")}`, ""]}
               />
               <Legend
                 wrapperStyle={{ fontSize: 11, color: "#94a3b8" }}
