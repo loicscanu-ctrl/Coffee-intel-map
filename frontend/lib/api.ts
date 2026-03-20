@@ -1,45 +1,48 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+// Simple in-memory TTL cache (5 minutes) for client-side fetches.
+// Avoids re-fetching on tab switch for slow endpoints like /api/cot and /api/macro-cot.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const _cache = new Map<string, { data: any; ts: number }>();
+
+async function cachedFetch(url: string): Promise<any> {
+  const hit = _cache.get(url);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) return hit.data;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${url}`);
+  const data = await res.json();
+  _cache.set(url, { data, ts: Date.now() });
+  return data;
+}
+
 export async function fetchMapCountries() {
-  const res = await fetch(`${API_URL}/api/map/countries`);
-  if (!res.ok) throw new Error("Failed to fetch countries");
-  return res.json();
+  return cachedFetch(`${API_URL}/api/map/countries`);
 }
 
 export async function fetchMapFactories() {
-  const res = await fetch(`${API_URL}/api/map/factories`);
-  if (!res.ok) throw new Error("Failed to fetch factories");
-  return res.json();
+  return cachedFetch(`${API_URL}/api/map/factories`);
 }
 
 export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
-  const res = await fetch(`${API_URL}/api/stocks`);
-  if (!res.ok) throw new Error("Failed to fetch certified stocks");
-  return res.json();
+  return cachedFetch(`${API_URL}/api/stocks`);
 }
 
 export async function fetchNews(category?: string) {
   const url = category
     ? `${API_URL}/api/news?category=${category}`
     : `${API_URL}/api/news`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch news");
-  return res.json();
+  return cachedFetch(url);
 }
 
 export async function fetchFreight() {
-  const res = await fetch(`${API_URL}/api/freight`);
-  if (!res.ok) throw new Error("Failed to fetch freight rates");
-  return res.json();
+  return cachedFetch(`${API_URL}/api/freight`);
 }
 
 export async function fetchCot(after?: string): Promise<any[]> {
   const url = after
     ? `${API_URL}/api/cot?after=${encodeURIComponent(after)}`
     : `${API_URL}/api/cot`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch CoT data");
-  return res.json();
+  return cachedFetch(url);
 }
 
 export interface MacroCotEntry {
@@ -64,7 +67,5 @@ export async function fetchMacroCot(after?: string): Promise<MacroCotWeek[]> {
   const url = after
     ? `${API_URL}/api/macro-cot?after=${encodeURIComponent(after)}`
     : `${API_URL}/api/macro-cot`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`macro-cot fetch failed: ${res.status}`);
-  return res.json();
+  return cachedFetch(url);
 }
