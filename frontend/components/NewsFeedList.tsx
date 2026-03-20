@@ -51,7 +51,17 @@ export default function NewsFeedList({ category, filterFn, emptyMessage, title, 
   return (
     <div className="p-6 h-full overflow-y-auto">
       <h1 className="text-lg font-bold text-white mb-4">{title}</h1>
-      {loading && <p className="text-slate-500 text-sm">Loading…</p>}
+      {loading && (
+        <div className="animate-pulse space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="border border-slate-800 rounded-lg p-4 space-y-2">
+              <div className="h-4 bg-slate-700 rounded w-3/4" />
+              <div className="h-3 bg-slate-800 rounded w-full" />
+              <div className="h-3 bg-slate-800 rounded w-2/3" />
+            </div>
+          ))}
+        </div>
+      )}
       {!loading && items.length === 0 && (
         <p className="text-slate-500 text-sm italic">{emptyMessage ?? "No data yet — check back after the next scrape run."}</p>
       )}

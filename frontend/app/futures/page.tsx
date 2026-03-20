@@ -600,7 +600,13 @@ export default function FuturesPage() {
         ))}
       </div>
 
-      {loading && <p className="text-slate-500 text-sm">Loading…</p>}
+      {loading && (
+        <div className="animate-pulse space-y-3 mt-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-24 bg-slate-800 rounded-lg" />
+          ))}
+        </div>
+      )}
 
       {/* Exchange tab */}
       {tab === "exchange" && (
