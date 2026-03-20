@@ -1069,9 +1069,11 @@ export default function CotDashboard() {
             {s.label}
           </button>
         ))}
-        <span className="ml-auto text-[10px] text-slate-600 font-mono">
-          NY {latest.priceNY.toFixed(2)}¢ · LDN ${latest.priceLDN.toFixed(0)}
-        </span>
+        {cotRows !== null && (
+          <span className="ml-auto text-[10px] text-slate-600 font-mono">
+            NY {latest.priceNY.toFixed(2)}¢ · LDN ${latest.priceLDN.toFixed(0)}
+          </span>
+        )}
         <button
           onClick={handleDownloadPdf}
           disabled={pdfGenerating || !recent52.length}
