@@ -891,19 +891,13 @@ export default function CotDashboard() {
 
   // ── PDF download ──────────────────────────────────────────────────────────
   const [pdfGenerating, setPdfGenerating] = useState(false);
-  const [cachedCharts, setCachedCharts] = useState<Record<string, string | null> | null>(null);
 
-  // Pre-capture charts once data is ready so Download PDF is near-instant
-  // Uses data.length instead of recent52.length because recent52 is declared below
-  useEffect(() => {
-    if (!data.length || !macroData.length) return;
-    let cancelled = false;
-    const run = async () => {
-      // Small delay so charts have time to render after data loads
-      await new Promise(r => setTimeout(r, 800));
-      if (cancelled) return;
+  const handleDownloadPdf = async () => {
+    if (!recent52.length || !macroData.length) return;
+    setPdfGenerating(true);
+    try {
       const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
-      const result = await captureAllCharts({
+      const capturedCharts = await captureAllCharts({
         macroGross:    pdfRefMacroGross,
         macroNet:      pdfRefMacroNet,
         softsContract: pdfRefSoftsContract,
@@ -912,30 +906,6 @@ export default function CotDashboard() {
         dryPowderNy: pdfRefDpNY,
         dryPowderLdn: pdfRefDpLDN,
       });
-      if (!cancelled) setCachedCharts(result);
-    };
-    run();
-    return () => { cancelled = true; };
-  }, [data.length, macroData.length]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleDownloadPdf = async () => {
-    if (!recent52.length || !macroData.length) return;
-    setPdfGenerating(true);
-    try {
-      // Use pre-captured charts if available, otherwise capture now
-      let capturedCharts = cachedCharts;
-      if (!capturedCharts) {
-        const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
-        capturedCharts = await captureAllCharts({
-          macroGross:    pdfRefMacroGross,
-          macroNet:      pdfRefMacroNet,
-          softsContract: pdfRefSoftsContract,
-          indPulseNy:  pdfRefIndNY,
-          indPulseLdn: pdfRefIndLDN,
-          dryPowderNy: pdfRefDpNY,
-          dryPowderLdn: pdfRefDpLDN,
-        });
-      }
 
       const { buildGlobalFlowMetrics, buildMarketMetrics } = await import("@/lib/pdf/dataHelpers");
       const globalFlow = buildGlobalFlowMetrics(macroData);
