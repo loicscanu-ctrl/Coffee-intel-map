@@ -1,16 +1,19 @@
+"use client";
 // frontend/lib/pdf/PdfReport.tsx
 // NOTE: This file must only be imported via dynamic import() — never in SSR context.
 import React from "react";
+// Import via pdfEngine so the server webpack alias redirects it to the noop stub.
+// Never import @react-pdf/renderer directly here — the server compiler traces
+// through this file and would fail to resolve the browser-only package.
 import {
   Document, Page, View, Text, Image,
-} from "@react-pdf/renderer";
+} from "./pdfEngine";
+import type { Style } from "@react-pdf/types";
 import { S, BRAND } from "./pdfStyles";
 import type { ReportData, MarketMetrics } from "./types";
 import {
   marketOverviewComment, industryCoverageComment,
   mmPositioningComment, obosComment,
-  structuralComment, counterpartyComment,
-  industryPulseComment, dryPowderComment,
 } from "./comments";
 import type { GlobalFlowMetrics } from "./types";
 
@@ -51,9 +54,9 @@ function CommentBox({ text, isSignal = false, compact = false }: { text: string;
   );
 }
 
-function MetricRow({ label, value, flag, extraStyle }: { label: string; value: string; flag?: "red" | "green" | "amber"; extraStyle?: object }) {
+function MetricRow({ label, value, flag, extraStyle }: { label: string; value: string; flag?: "red" | "green" | "amber"; extraStyle?: Style }) {
   const valStyle = flag === "red" ? S.flagRed : flag === "green" ? S.flagGreen : flag === "amber" ? S.flagAmber : S.metricValue;
-  const rowStyle = extraStyle ? [S.metricRow, extraStyle] : S.metricRow;
+  const rowStyle: Style | Style[] = extraStyle ? [S.metricRow, extraStyle] : S.metricRow;
   return (
     <View style={rowStyle}>
       <Text style={S.metricLabel}>{label}</Text>
@@ -75,8 +78,9 @@ function KpiPill({ label, value, sub, color }: { label: string; value: string; s
 // ── Market deep-dive column (used for both NY and LDN) ───────────────────────
 
 function MarketColumn({ m, compact = false }: { m: MarketMetrics; compact?: boolean }) {
-  const s  = (n: number, dec = 1) => (n >= 0 ? "+" : "-") + Math.abs(n).toFixed(dec);
-  const kl = (n: number) => `${s(n / 1000)}k lots`;
+  const s   = (n: number, dec = 1) => (n >= 0 ? "+" : "-") + Math.abs(n).toFixed(dec);
+  const kl  = (n: number) => `${s(n / 1000)}k lots`;
+  const klN = (n: number | null) => n === null ? "N/A" : kl(n);
 
   const subTitleStyle = compact
     ? [S.subTitle, { marginTop: 3, marginBottom: 2 }]
@@ -91,14 +95,14 @@ function MarketColumn({ m, compact = false }: { m: MarketMetrics; compact?: bool
 
       {/* Overview */}
       <Text style={subTitleStyle}>OVERVIEW</Text>
-      <MetricRow label="Total OI change"    value={kl(m.oiChangeLots)}   extraStyle={mrStyle} />
-      <MetricRow label="Nearby (M1+M2)"     value={kl(m.oiChangeNearby)} extraStyle={mrStyle} />
-      <MetricRow label="Forward (M3+)"      value={kl(m.oiChangeForward)} extraStyle={mrStyle} />
+      <MetricRow label="Total OI change"    value={kl(m.oiChangeLots)}    extraStyle={mrStyle} />
+      <MetricRow label="Nearby (M1+M2)"     value={klN(m.oiChangeNearby)} extraStyle={mrStyle} />
+      <MetricRow label="Forward (M3+)"      value={klN(m.oiChangeForward)} extraStyle={mrStyle} />
       <MetricRow label="Price change"       value={`${s(m.priceChangePct)}% (${s(m.priceChangeAbs, 1)} ${m.priceUnit})`} extraStyle={mrStyle} />
       <MetricRow
         label="Front structure"
-        value={`${m.structureType} · ${s(m.annualizedRollPct)}% ann.`}
-        flag={m.structureType === "backwardation" && m.annualizedRollPct > 4.1 ? "green" : "amber"}
+        value={m.structureType === null ? "N/A" : `${m.structureType} · ${s(m.structureValue!, 2)} ${m.priceUnit} · ${s(m.annualizedRollPct!)}% ann.`}
+        flag={m.structureType === "backwardation" && (m.annualizedRollPct ?? 0) > 4.1 ? "green" : "amber"}
         extraStyle={mrStyle}
       />
       <CommentBox text={marketOverviewComment(m)} compact={compact} />
@@ -201,15 +205,6 @@ const SECTOR_LABELS: Record<string, string> = {
 };
 const SECTOR_ORDER = ["energy", "metals", "grains", "meats", "softs", "micros"];
 
-function MiniBar({ rank }: { rank: number }) {
-  const pct   = Math.max(0, Math.min(100, rank));
-  const color = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
-  return (
-    <View style={{ width: "50%", height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginTop: 0 }}>
-      <View style={{ width: `${pct}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
-    </View>
-  );
-}
 
 function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
   const fB   = (n: number) => `$${Math.abs(n).toFixed(2)}B`;
@@ -217,10 +212,10 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
   const dPct = (n: number) => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(1)}%`;
   const dPp  = (n: number) => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(2)}pp`;
 
-  // 13 columns: [0]name [1]grossB [2]grsWoW [3]grossOiΔ [4]grossPxΔ [5]grs%
+  // 14 columns: [0]name [1]grossB [2]grsWoW [3]grossOiΔ [4]grossPxΔ [5]grs%
   //             [6]netB  [7]netWoW [8]netOiΔ  [9]netPxΔ  [10]net%
-  //             [11]share% [12]Δshr
-  const C = [1.2, 0.75, 0.70, 0.60, 0.60, 0.50, 0.75, 0.70, 0.60, 0.60, 0.50, 0.65, 0.50];
+  //             [11]share% [12]Δshr [13]G/N/S bars
+  const C = [1.2, 0.75, 0.70, 0.60, 0.60, 0.50, 0.75, 0.70, 0.60, 0.60, 0.50, 0.65, 0.50, 0.50];
   const FS = 6;  // uniform font size for data cells
 
   const hR  = (flex: number) => [S.tHCellR, { flex, fontSize: FS }];
@@ -242,32 +237,44 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
         ? [S.tCellPos, { flex, fontSize: FS, fontFamily: "Helvetica-Bold" }]
         : [S.tCellNeg, { flex, fontSize: FS, fontFamily: "Helvetica-Bold" }];
 
+  // G/N/S stacked-bar cell: three unlabelled bars (Gross / Net / Share 5Y rank)
+  const rankCell = (gross: number, net: number, share: number) => {
+    const bar = (rank: number) => {
+      const pct = Math.max(0, Math.min(100, rank));
+      const col = pct > 75 ? "#dc2626" : pct < 25 ? "#059669" : "#d97706";
+      return (
+        <View style={{ height: 2, backgroundColor: "#e2e8f0", borderRadius: 1, marginBottom: 1 }}>
+          <View style={{ width: `${pct}%`, height: "100%", backgroundColor: col, borderRadius: 1 }} />
+        </View>
+      );
+    };
+    return (
+      <View style={{ flex: C[13], flexDirection: "column", justifyContent: "center", paddingHorizontal: 4 }}>
+        {bar(gross)}
+        {bar(net)}
+        {bar(share)}
+      </View>
+    );
+  };
+
   // Sector header row
   function SectorRow({ sd }: { sd: (typeof g.sectorBreakdown)[0] }) {
     return (
       <View style={{ flexDirection: "row", paddingVertical: 1, paddingHorizontal: 6, backgroundColor: "#1e293b", borderBottomWidth: 0.5, borderBottomColor: "#334155" }}>
         <Text style={[S.tHCell, { flex: C[0], fontSize: FS, textTransform: "capitalize" }]}>{SECTOR_LABELS[sd.sector]}</Text>
-        <View style={{ flex: C[1], alignItems: "flex-end" }}>
-          <Text style={[S.tHCellR, { fontSize: FS }]}>{fB(sd.grossB)}</Text>
-          <MiniBar rank={sd.histRankGrossPct} />
-        </View>
+        <Text style={[S.tHCellR, { flex: C[1], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{fB(sd.grossB)}</Text>
         <Text style={[sd.deltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[2], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{dB(sd.deltaB)}</Text>
         <Text style={sgnNB(sd.grossOiEffectB, C[3])}>{dBN(sd.grossOiEffectB)}</Text>
         <Text style={sgnNB(sd.grossPriceEffectB, C[4])}>{dBN(sd.grossPriceEffectB)}</Text>
         <Text style={[sd.deltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[5], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{dPct(sd.deltaPct)}</Text>
-        <View style={{ flex: C[6], alignItems: "flex-end" }}>
-          <Text style={[sd.netB >= 0 ? S.tCellPos : S.tCellNeg, { fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{sd.netB >= 0 ? "+" : "-"}{fB(sd.netB)}</Text>
-          <MiniBar rank={sd.histRankNetPct} />
-        </View>
+        <Text style={[sd.netB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[6], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{sd.netB >= 0 ? "+" : "-"}{fB(sd.netB)}</Text>
         <Text style={[sd.netDeltaB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[7], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{dB(sd.netDeltaB)}</Text>
         <Text style={sgnNB(sd.netOiEffectB, C[8])}>{dBN(sd.netOiEffectB)}</Text>
         <Text style={sgnNB(sd.netPriceEffectB, C[9])}>{dBN(sd.netPriceEffectB)}</Text>
         <Text style={[sd.netDeltaPct >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[10], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{dPct(sd.netDeltaPct)}</Text>
-        <View style={{ flex: C[11], alignItems: "flex-end" }}>
-          <Text style={[S.tHCellR, { fontSize: FS }]}>{sd.shareOfTotalPct.toFixed(1)}%</Text>
-          <MiniBar rank={sd.histRankSharePct} />
-        </View>
+        <Text style={[S.tHCellR, { flex: C[11], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{sd.shareOfTotalPct.toFixed(1)}%</Text>
         <Text style={[sd.shareDeltaPp >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[12], fontSize: FS, fontFamily: "Helvetica-Bold" }]}>{dPp(sd.shareDeltaPp)}</Text>
+        {rankCell(sd.histRankGrossPct, sd.histRankNetPct, sd.histRankSharePct)}
       </View>
     );
   }
@@ -279,29 +286,21 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
       ? [S.tCell, { flex: C[0], color: BRAND.amber, fontSize: FS, paddingLeft: 10 }]
       : [S.tCell, { flex: C[0], fontSize: FS, paddingLeft: 10 }];
     return (
-      <View style={{ flexDirection: "row", paddingVertical: 0, paddingHorizontal: 6, backgroundColor: bg, borderBottomWidth: 0.3, borderBottomColor: "#e2e8f0" }}>
+      <View style={{ flexDirection: "row", paddingVertical: 0.5, paddingHorizontal: 6, backgroundColor: bg, borderBottomWidth: 0.3, borderBottomColor: "#e2e8f0" }}>
         <Text style={nameStyle}>{row.isCoffee ? "► " : ""}{row.name}</Text>
-        <View style={{ flex: C[1], alignItems: "flex-end" }}>
-          <Text style={neu(0)}>{fB(row.grossB)}</Text>
-          <MiniBar rank={row.histRankGrossPct} />
-        </View>
+        <Text style={neu(C[1])}>{fB(row.grossB)}</Text>
         <Text style={sgn(row.deltaB, C[2])}>{dB(row.deltaB)}</Text>
         <Text style={sgnN(row.grossOiEffectB, C[3])}>{dBN(row.grossOiEffectB)}</Text>
         <Text style={sgnN(row.grossPriceEffectB, C[4])}>{dBN(row.grossPriceEffectB)}</Text>
         <Text style={sgn(row.deltaPct, C[5])}>{dPct(row.deltaPct)}</Text>
-        <View style={{ flex: C[6], alignItems: "flex-end" }}>
-          <Text style={[row.netB >= 0 ? S.tCellPos : S.tCellNeg, { fontSize: FS }]}>{row.netB >= 0 ? "+" : "-"}{fB(row.netB)}</Text>
-          <MiniBar rank={row.histRankNetPct} />
-        </View>
+        <Text style={[row.netB >= 0 ? S.tCellPos : S.tCellNeg, { flex: C[6], fontSize: FS }]}>{row.netB >= 0 ? "+" : "-"}{fB(row.netB)}</Text>
         <Text style={sgn(row.netDeltaB, C[7])}>{dB(row.netDeltaB)}</Text>
         <Text style={sgnN(row.netOiEffectB, C[8])}>{dBN(row.netOiEffectB)}</Text>
         <Text style={sgnN(row.netPriceEffectB, C[9])}>{dBN(row.netPriceEffectB)}</Text>
         <Text style={sgn(row.netDeltaPct, C[10])}>{dPct(row.netDeltaPct)}</Text>
-        <View style={{ flex: C[11], alignItems: "flex-end" }}>
-          <Text style={neu(0)}>{row.shareOfTotalPct.toFixed(1)}%</Text>
-          <MiniBar rank={row.histRankSharePct} />
-        </View>
+        <Text style={neu(C[11])}>{row.shareOfTotalPct.toFixed(1)}%</Text>
         <Text style={sgn(row.shareDeltaPp, C[12])}>{dPp(row.shareDeltaPp)}</Text>
+        {rankCell(row.histRankGrossPct, row.histRankNetPct, row.histRankSharePct)}
       </View>
     );
   }
@@ -323,6 +322,7 @@ function CommodityTable({ g }: { g: GlobalFlowMetrics }) {
         <Text style={hR(C[10])}>NET %</Text>
         <Text style={hR(C[11])}>SHARE %</Text>
         <Text style={hR(C[12])}>Δ SHR</Text>
+        <Text style={hR(C[13])}>G/N/S</Text>
       </View>
 
       {/* Sector groups */}
@@ -375,7 +375,7 @@ function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
   const R    = "#7f1d1d";
   const BOLD = "Helvetica-Bold";
 
-  const cn   = (n: number): object => ({ color: n >= 0 ? G : R, fontFamily: BOLD });
+  const cn   = (n: number): Style => ({ color: n >= 0 ? G : R, fontFamily: BOLD });
   const fD   = (n: number, dec = 2) => `${n >= 0 ? "+" : "-"}$${Math.abs(n).toFixed(dec)}B`;
   const fPct = (n: number)          => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(1)}%`;
   const fB   = (n: number, dec = 1) => `$${Math.abs(n).toFixed(dec)}B`;
@@ -503,6 +503,77 @@ function FlowAnalysis({ g }: { g: GlobalFlowMetrics }) {
 }
 
 // ── Page 2: Coffee combined flow summary ──────────────────────────────────────
+function CotDisaggTable({ m, label }: { m: MarketMetrics; label: string }) {
+  const fmtN = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const fmtD = (n: number) => `${n >= 0 ? "+" : "-"}${fmtN(Math.abs(n))}`;
+  const fmtNZ = (n: number) => n === 0 ? "—" : fmtN(n);
+  const fmtDZ = (n: number) => n === 0 ? "—" : fmtD(n);
+  const c = m.cats;
+
+  type CatRow = { label: string; long: number; dLong: number; short: number; dShort: number; spread: number; dSpread: number };
+  const rows: CatRow[] = [
+    { label: "Prod./Merch. (PMPU)", long: c.pmpu.long,  dLong: c.pmpu.dLong,  short: c.pmpu.short,  dShort: c.pmpu.dShort,  spread: 0,             dSpread: 0              },
+    { label: "Swap Dealers",        long: c.swap.long,  dLong: c.swap.dLong,  short: c.swap.short,  dShort: c.swap.dShort,  spread: c.swap.spread,  dSpread: c.swap.dSpread  },
+    { label: "Managed Money",       long: c.mm.long,    dLong: c.mm.dLong,    short: c.mm.short,    dShort: c.mm.dShort,    spread: c.mm.spread,    dSpread: c.mm.dSpread    },
+    { label: "Other Reportables",   long: c.other.long, dLong: c.other.dLong, short: c.other.short, dShort: c.other.dShort, spread: c.other.spread, dSpread: c.other.dSpread },
+    { label: "Non-Reportables",     long: c.nr.long,    dLong: c.nr.dLong,    short: c.nr.short,    dShort: c.nr.dShort,    spread: 0,             dSpread: 0              },
+  ];
+  const totalLong   = rows.reduce((s, r) => s + r.long, 0);
+  const totalShort  = rows.reduce((s, r) => s + r.short, 0);
+  const totalSpread = rows.reduce((s, r) => s + r.spread, 0);
+  const FS = 6.0;
+  const hStyle  = (flex: number) => [S.tHCellR, { flex, fontSize: FS }];
+  const hStyleL = (flex: number) => [S.tHCell,  { flex, fontSize: FS }];
+  const dCell = (n: number, flex: number) => (
+    <Text style={[n > 0 ? S.tCellPos : n < 0 ? S.tCellNeg : S.tCellR, { flex, fontSize: FS }]}>{fmtDZ(n)}</Text>
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Table title */}
+      <View style={{ marginBottom: 2 }}>
+        <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: BRAND.amber }}>{label}</Text>
+        <Text style={{ fontSize: 5.5, color: BRAND.slate400, marginTop: 1 }}>Report: {m.date} · OI: {fmtN(c.oi)}</Text>
+      </View>
+      {/* Header */}
+      <View style={[S.tHeadRow, { paddingVertical: 2 }]}>
+        <Text style={hStyleL(1.8)}>Category</Text>
+        <Text style={hStyle(0.8)}>Long</Text>
+        <Text style={hStyle(0.65)}>ΔLong</Text>
+        <Text style={hStyle(0.8)}>Short</Text>
+        <Text style={hStyle(0.65)}>ΔShort</Text>
+        <Text style={hStyle(0.8)}>Spread</Text>
+        <Text style={hStyle(0.65)}>ΔSpread</Text>
+        <Text style={hStyle(0.65)}>Net</Text>
+      </View>
+      {/* Data rows */}
+      {rows.map((r, i) => (
+        <View key={r.label} style={i % 2 === 0 ? S.tDataRow : S.tDataRowAlt}>
+          <Text style={[S.tCellR, { flex: 1.8, fontSize: FS, color: BRAND.slate600 }]}>{r.label}</Text>
+          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtN(r.long)}</Text>
+          {dCell(r.dLong, 0.65)}
+          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtN(r.short)}</Text>
+          {dCell(r.dShort, 0.65)}
+          <Text style={[S.tCellR, { flex: 0.8, fontSize: FS }]}>{fmtNZ(r.spread)}</Text>
+          {dCell(r.dSpread, 0.65)}
+          <Text style={[r.long - r.short >= 0 ? S.tCellPos : S.tCellNeg, { flex: 0.65, fontSize: FS }]}>{fmtD(r.long - r.short)}</Text>
+        </View>
+      ))}
+      {/* Total row */}
+      <View style={{ flexDirection: "row", paddingVertical: 2, paddingHorizontal: 6, backgroundColor: "#1e293b", borderTopWidth: 0.5, borderTopColor: "#475569" }}>
+        <Text style={{ flex: 1.8, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white }}>Total</Text>
+        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalLong)}</Text>
+        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
+        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalShort)}</Text>
+        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
+        <Text style={{ flex: 0.8,  fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.white, textAlign: "right" }}>{fmtN(totalSpread)}</Text>
+        <Text style={{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", color: BRAND.slate400, textAlign: "right" }}>—</Text>
+        <Text style={[{ flex: 0.65, fontSize: FS, fontFamily: "Helvetica-Bold", textAlign: "right" }, totalLong - totalShort >= 0 ? { color: BRAND.green } : { color: BRAND.red }]}>{fmtD(totalLong - totalShort)}</Text>
+      </View>
+    </View>
+  );
+}
+
 function CoffeeFlowSummary({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics }) {
   const nyMmNetLots  = ny.mmLongChangeLots  - ny.mmShortChangeLots;
   const ldnMmNetLots = ldn.mmLongChangeLots - ldn.mmShortChangeLots;
@@ -547,8 +618,9 @@ function CoffeeFlowSummary({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics 
 
 // ── Page 2: Coffee comparison table ───────────────────────────────────────────
 function CoffeeComparisonTable({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetrics }) {
-  const s1 = (n: number) => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(1)}`;
-  const kL = (n: number) => `${n >= 0 ? "+" : "-"}${(Math.abs(n)/1000).toFixed(1)}k lots`;
+  const s1  = (n: number) => `${n >= 0 ? "+" : "-"}${Math.abs(n).toFixed(1)}`;
+  const kL  = (n: number) => `${n >= 0 ? "+" : "-"}${(Math.abs(n)/1000).toFixed(1)}k lots`;
+  const kLN = (n: number | null) => n === null ? "N/A" : kL(n);
 
   type Row = [string, string, string, boolean?]; // [label, NY, LDN, isAlt]
   const rows: Row[] = [
@@ -556,29 +628,17 @@ function CoffeeComparisonTable({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetr
                          `${ldn.price.toFixed(0)} ${ldn.priceUnit}`],
     ["WoW Δ price",      `${s1(ny.priceChangePct)}% (${s1(ny.priceChangeAbs)} ${ny.priceUnit})`,
                          `${s1(ldn.priceChangePct)}% (${s1(ldn.priceChangeAbs)} ${ldn.priceUnit})`],
-    ["OI change WoW",    kL(ny.oiChangeLots),  kL(ldn.oiChangeLots)],
-    ["  Nearby (M1–M2)", kL(ny.oiChangeNearby), kL(ldn.oiChangeNearby)],
-    ["  Forward (M3+)",  kL(ny.oiChangeForward), kL(ldn.oiChangeForward)],
+    ["OI change WoW",    kL(ny.oiChangeLots),   kL(ldn.oiChangeLots)],
+    ["  Nearby (M1–M2)", kLN(ny.oiChangeNearby), kLN(ldn.oiChangeNearby)],
+    ["  Forward (M3+)",  kLN(ny.oiChangeForward), kLN(ldn.oiChangeForward)],
     ["Front structure",
-      `${ny.structureType === "backwardation" ? "Backwardation" : "Carry"} · ${s1(ny.annualizedRollPct)}% ann.`,
-      `${ldn.structureType === "backwardation" ? "Backwardation" : "Carry"} · ${s1(ldn.annualizedRollPct)}% ann.`],
+      ny.structureType  === null ? "N/A" : `${ny.structureType  === "backwardation" ? "Backwardation" : "Carry"} · ${s1(ny.structureValue!)} ${ny.priceUnit} · ${s1(ny.annualizedRollPct!)}% ann.`,
+      ldn.structureType === null ? "N/A" : `${ldn.structureType === "backwardation" ? "Backwardation" : "Carry"} · ${s1(ldn.structureValue!)} ${ldn.priceUnit} · ${s1(ldn.annualizedRollPct!)}% ann.`],
     ["MM Net (lots)",    kL(ny.mmLong - ny.mmShort),  kL(ldn.mmLong - ldn.mmShort)],
-    ["MM Longs",         `${(ny.mmLong/1000).toFixed(1)}k (${kL(ny.mmLongChangeLots)} WoW)`,
-                         `${(ldn.mmLong/1000).toFixed(1)}k (${kL(ldn.mmLongChangeLots)} WoW)`],
-    ["MM Shorts",        `${(ny.mmShort/1000).toFixed(1)}k (${kL(ny.mmShortChangeLots)} WoW)`,
-                         `${(ldn.mmShort/1000).toFixed(1)}k (${kL(ldn.mmShortChangeLots)} WoW)`],
     ["Funds maxed (L)",  `${ny.fundsMaxedLongPct.toFixed(1)}%`,  `${ldn.fundsMaxedLongPct.toFixed(1)}%`],
-    ["PMPU Prod cov.",
-      `${ny.producerCovPct.toFixed(0)}% · ${(ny.producerMT/1000).toFixed(0)}k MT (${s1(ny.producerMTWoW/1000)}k WoW)`,
-      `${ldn.producerCovPct.toFixed(0)}% · ${(ldn.producerMT/1000).toFixed(0)}k MT (${s1(ldn.producerMTWoW/1000)}k WoW)`],
-    ["PMPU Roaster cov.",
-      `${ny.roasterCovPct.toFixed(0)}% · ${(ny.roasterMT/1000).toFixed(0)}k MT`,
-      `${ldn.roasterCovPct.toFixed(0)}% · ${(ldn.roasterMT/1000).toFixed(0)}k MT`],
     ["OB/OS flag",
       ny.obosFlag  === "overbought" ? "⚠ OVERBOUGHT"  : ny.obosFlag  === "oversold" ? "⚠ OVERSOLD"  : "Neutral",
       ldn.obosFlag === "overbought" ? "⚠ OVERBOUGHT" : ldn.obosFlag === "oversold" ? "⚠ OVERSOLD" : "Neutral"],
-    ["Price / OI rank",  `${ny.priceRank.toFixed(0)}th / ${ny.oiRank.toFixed(0)}th pctl`,
-                         `${ldn.priceRank.toFixed(0)}th / ${ldn.oiRank.toFixed(0)}th pctl`],
     ["MM concentration", `${ny.mmConcentrationPct.toFixed(1)}% of OI`,
                          `${ldn.mmConcentrationPct.toFixed(1)}% of OI`],
   ];
@@ -612,7 +672,7 @@ function CoffeeComparisonTable({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetr
 export function CotPdfReport({ d }: { d: ReportData }) {
   const ts = d.generatedAt.slice(0, 10);
   const header = `Week ${d.weekNumber}/${d.year} · ${d.cotDate}`;
-  const totalPages = 7;
+  const totalPages = 4;
 
   return (
     <Document
@@ -678,11 +738,31 @@ export function CotPdfReport({ d }: { d: ReportData }) {
         <PageHeader title="COFFEE OVERVIEW" sub={header} />
         <Text style={S.sectionTitle}>Coffee — Combined NY + LDN</Text>
 
-        <View style={S.kpiRow}>
-          <KpiPill label="NY OI Rank"  value={`${d.coffeeOverview.nyCombinedOiRank.toFixed(0)}th pctl`}  color={d.coffeeOverview.nyCombinedOiRank  > 75 ? BRAND.red : d.coffeeOverview.nyCombinedOiRank  < 25 ? BRAND.green : BRAND.white} />
-          <KpiPill label="LDN OI Rank" value={`${d.coffeeOverview.ldnCombinedOiRank.toFixed(0)}th pctl`} color={d.coffeeOverview.ldnCombinedOiRank > 75 ? BRAND.red : d.coffeeOverview.ldnCombinedOiRank < 25 ? BRAND.green : BRAND.white} />
-          <KpiPill label="Combined Net" value={`${(d.coffeeOverview.combinedNetLots / 1000).toFixed(1)}k lots`} color={d.coffeeOverview.combinedNetLots >= 0 ? BRAND.green : BRAND.red} />
-          <KpiPill label="Alignment" value={d.coffeeOverview.alignedDirection ? "✓ Aligned" : "⚠ Diverging"} color={d.coffeeOverview.alignedDirection ? BRAND.green : BRAND.amber} />
+        {(() => {
+          // Combined speculative net in USD ($M)
+          const combinedNetUSD =
+            (d.ny.mmLong  - d.ny.mmShort)  * NY_LOT_MT  * d.ny.price  * 22.046 / 1e6 +
+            (d.ldn.mmLong - d.ldn.mmShort) * LDN_LOT_MT * d.ldn.price           / 1e6;
+          const absM = Math.abs(combinedNetUSD);
+          const netUSDStr = absM >= 1000
+            ? `${combinedNetUSD >= 0 ? "+" : "-"}$${(absM / 1000).toFixed(1)}B`
+            : `${combinedNetUSD >= 0 ? "+" : "-"}$${absM.toFixed(0)}M`;
+          // Industry coverage: combined PMPU gross long (producers)
+          const industryLongMT = (d.ny.producerMT + d.ldn.producerMT) / 1000;
+          return (
+            <View style={S.kpiRow}>
+              <KpiPill label="NY OI Rank"  value={`${d.coffeeOverview.nyCombinedOiRank.toFixed(0)}th pctl`}  color={d.coffeeOverview.nyCombinedOiRank  > 75 ? BRAND.red : d.coffeeOverview.nyCombinedOiRank  < 25 ? BRAND.green : BRAND.white} />
+              <KpiPill label="LDN OI Rank" value={`${d.coffeeOverview.ldnCombinedOiRank.toFixed(0)}th pctl`} color={d.coffeeOverview.ldnCombinedOiRank > 75 ? BRAND.red : d.coffeeOverview.ldnCombinedOiRank < 25 ? BRAND.green : BRAND.white} />
+              <KpiPill label="Combined spec. net" value={netUSDStr} color={combinedNetUSD >= 0 ? BRAND.green : BRAND.red} />
+              <KpiPill label="Industry coverage" value={`${industryLongMT.toFixed(0)}k MT`} />
+            </View>
+          );
+        })()}
+
+        {/* COT Disaggregated tables — side by side */}
+        <View style={{ flexDirection: "row", gap: 8, marginBottom: 6 }}>
+          <CotDisaggTable m={d.ldn} label="ICE Disaggregated COT — Robusta (London)" />
+          <CotDisaggTable m={d.ny}  label="CFTC Disaggregated COT — Arabica (NY)" />
         </View>
 
         {/* Combined flow summary with bullets */}
@@ -693,7 +773,7 @@ export function CotPdfReport({ d }: { d: ReportData }) {
         <CoffeeComparisonTable ny={d.ny} ldn={d.ldn} />
 
         <Text style={{ fontSize: 7, color: BRAND.slate400, marginTop: 8 }}>
-          → Deep-dive analysis per market on following pages
+          → Deep-dive analysis per market on following page
         </Text>
 
         <PageFooter page={3} total={totalPages} date={ts} />
@@ -709,56 +789,7 @@ export function CotPdfReport({ d }: { d: ReportData }) {
         <PageFooter page={4} total={totalPages} date={ts} />
       </Page>
 
-      {/* ── Page 5: Charts — Structural + Counterparty (cols), Industry Pulse (full) ── */}
-      <Page size="A4" style={S.page}>
-        <PageHeader title="MARKET STRUCTURE CHARTS" sub={header} />
-        <View style={[S.row, { gap: 12 }]}>
-          <View style={S.col}>
-            <ChartBlock
-              title="Structural Integrity — OI by Category"
-              src={d.charts.structural}
-              comment={structuralComment(d.ny, d.ldn)}
-            />
-          </View>
-          <View style={S.col}>
-            <ChartBlock
-              title="Counterparty — Liquidity Handshake"
-              src={d.charts.counterparty}
-              comment={counterpartyComment(d.ny, d.ldn)}
-            />
-          </View>
-        </View>
-        <ChartBlock
-          title="Industry Pulse — PMPU Gross Long & Short (NY + LDN)"
-          src={d.charts.industryPulse}
-          comment={industryPulseComment(d.ny, d.ldn)}
-        />
-        <PageFooter page={5} total={totalPages} date={ts} />
-      </Page>
-
-      {/* ── Page 6: Positioning — Dry Powder (left) + OB/OS Matrix (right) ── */}
-      <Page size="A4" style={S.page}>
-        <PageHeader title="POSITIONING INDICATORS" sub={header} />
-        <View style={[S.row, { gap: 12 }]}>
-          <View style={S.col}>
-            <ChartBlock
-              title="Dry Powder Indicator"
-              src={d.charts.dryPowder}
-              comment={dryPowderComment(d.ny, d.ldn)}
-            />
-          </View>
-          <View style={S.col}>
-            <ChartBlock
-              title="Cycle Location — OB/OS Matrix"
-              src={d.charts.obosMatrix}
-              comment={`NY: ${d.ny.obosFlag} (price ${d.ny.priceRank.toFixed(0)}th, OI ${d.ny.oiRank.toFixed(0)}th). LDN: ${d.ldn.obosFlag} (price ${d.ldn.priceRank.toFixed(0)}th, OI ${d.ldn.oiRank.toFixed(0)}th).`}
-            />
-          </View>
-        </View>
-        <PageFooter page={6} total={totalPages} date={ts} />
-      </Page>
-
-      {/* ── Page 7: Disclaimer ── */}
+      {/* ── Page 5: Disclaimer ── */}
       <Page size="A4" style={S.page}>
         <PageHeader title="DISCLAIMER" sub={header} />
         <Text style={S.disclaimerTitle}>Data Sources & Methodology</Text>
@@ -775,9 +806,9 @@ export function CotPdfReport({ d }: { d: ReportData }) {
           SD (Swap Dealers): financial intermediaries.{"\n"}
           OR (Other Reportables): other large reportable traders.{"\n"}
           NR (Non-Reportables): small traders below reporting threshold.{"\n"}
-          Funds % maxed: current MM position as % of 52-week maximum.{"\n"}
+          Funds % maxed: current MM position as % of 10-year maximum.{"\n"}
           Front roll: annualised spread between M1 and M2 contract, sign convention: positive = backwardation (roll income).{"\n"}
-          Coverage %: PMPU position normalised on 52-week min/max range.
+          Coverage %: PMPU position normalised on 10-year min/max range. Price/OI rank: 5-year percentile.
         </Text>
         <Text style={S.disclaimerTitle}>Disclaimer</Text>
         <Text style={S.disclaimerText}>
@@ -789,7 +820,7 @@ export function CotPdfReport({ d }: { d: ReportData }) {
         <Text style={[S.disclaimerText, { marginTop: 16, color: BRAND.slate400 }]}>
           Generated: {d.generatedAt} · Coffee Intel Map
         </Text>
-        <PageFooter page={7} total={totalPages} date={ts} />
+        <PageFooter page={4} total={totalPages} date={ts} />
       </Page>
 
     </Document>

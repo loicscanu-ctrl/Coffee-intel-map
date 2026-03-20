@@ -6,9 +6,9 @@ export interface MarketMetrics {
   date: string;             // COT report date e.g. "2026-03-10"
 
   // OI change
-  oiChangeLots: number;     // total WoW delta in lots
-  oiChangeNearby: number;   // lots change in first 2 contracts (exch_oi delta)
-  oiChangeForward: number;  // lots change in forward contracts (total - nearby delta)
+  oiChangeLots: number;             // total WoW delta in lots
+  oiChangeNearby: number | null;    // lots change in first 2 contracts (exch_oi delta); null = not populated by scraper
+  oiChangeForward: number | null;   // lots change in forward contracts (total - nearby delta); null = not populated by scraper
 
   // Price
   price: number;            // current price (cents/lb for NY, USD/MT for LDN)
@@ -17,10 +17,10 @@ export interface MarketMetrics {
   priceChangeAbs: number;   // absolute change in price units
 
   // Front structure
-  structureValue: number;   // M2 - M1 spread (same unit as price)
-  structurePrevValue: number;
-  structureType: "carry" | "backwardation"; // positive spread = carry; negative = backwardation
-  annualizedRollPct: number; // (structureValue / price) * (365/30) * 100, sign-flipped for carry convention
+  structureValue: number | null;       // M2 - M1 spread (same unit as price); null = not populated by scraper
+  structurePrevValue: number | null;
+  structureType: "carry" | "backwardation" | null; // null = data unavailable
+  annualizedRollPct: number | null;    // null = data unavailable
 
   // Industry coverage (min/max normalised over 52w history)
   producerCovPct: number;   // ((current - min52w) / (max52w - min52w)) * 100 — position within 52w range
@@ -51,6 +51,16 @@ export interface MarketMetrics {
   cp: {
     longs:  { pmpu: number; sd: number; mm: number; or: number; nr: number };
     shorts: { pmpu: number; sd: number; mm: number; or: number; nr: number };
+  };
+
+  // Full category breakdown (absolute current + WoW deltas)
+  cats: {
+    pmpu:  { long: number; short: number; dLong: number; dShort: number };
+    swap:  { long: number; short: number; spread: number; dLong: number; dShort: number; dSpread: number };
+    mm:    { long: number; short: number; spread: number; dLong: number; dShort: number; dSpread: number };
+    other: { long: number; short: number; spread: number; dLong: number; dShort: number; dSpread: number };
+    nr:    { long: number; short: number; dLong: number; dShort: number };
+    oi:    number;
   };
 }
 
@@ -131,14 +141,12 @@ export interface ReportData {
   ldn: MarketMetrics;
   // PNG data URLs for chart images (set during capture phase)
   charts: {
-    globalFlow:    string | null;
-    structural:    string | null;
-    counterparty:  string | null;
-    industryPulse: string | null;
-    dryPowder:     string | null;
-    obosMatrix:    string | null;
     macroGross:    string | null;
     macroNet:      string | null;
     softsContract: string | null;
+    indPulseNy:    string | null;
+    indPulseLdn:   string | null;
+    dryPowderNy:   string | null;
+    dryPowderLdn:  string | null;
   };
 }

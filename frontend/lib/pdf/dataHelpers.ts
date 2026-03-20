@@ -351,32 +351,39 @@ export function buildMarketMetrics(
   const curNY  = cur[mk];   // the ny/ldn sub-object from processed data
   const prevNY = prev[mk];
 
-  // OI split
-  const rawMk = rawCur?.[mk];
-  const rawPMk = rawPrev?.[mk];
-  const oiSplit = rawMk && rawPMk
-    ? computeOiSplit(
-        { oi_total: rawMk.oi_total ?? 0,  exch_oi_ny: isNY ? rawMk.exch_oi_ny  : rawMk.exch_oi_ldn  },
-        { oi_total: rawPMk.oi_total ?? 0, exch_oi_ny: isNY ? rawPMk.exch_oi_ny : rawPMk.exch_oi_ldn }
-      )
-    : { total: 0, nearby: 0, forward: 0 };
+  // Access forward-filled raw sub-objects (added by transformApiData for this purpose)
+  const rawMk  = isNY ? rawCur?.rawNy  : rawCur?.rawLdn;
+  const rawPMk = isNY ? rawPrev?.rawNy : rawPrev?.rawLdn;
 
-  // Structure / roll
-  const structureValue     = isNY ? (rawMk?.structure_ny ?? 0) : (rawMk?.structure_ldn ?? 0);
-  const structurePrevValue = isNY ? (rawPMk?.structure_ny ?? 0) : (rawPMk?.structure_ldn ?? 0);
-  const annualizedRollPct  = computeAnnualizedRoll(structureValue, price);
+  // OI total change: compute directly from processed oiNY/oiLDN (reliable from scraper)
+  const oiChangeLots = isNY ? (cur.oiNY - prev.oiNY) : (cur.oiLDN - prev.oiLDN);
 
-  // PMPU MT (industry coverage) — normalize over 52w
-  const pmpuLongMTs  = recent52.map(d => (isNY ? d.pmpuLongMT_NY  : d.pmpuLongMT_LDN)  ?? 0);
-  const pmpuShortMTs = recent52.map(d => (isNY ? d.pmpuShortMT_NY : d.pmpuShortMT_LDN) ?? 0);
+  // Nearby/forward split: only available when exch_oi_ny/ldn is populated in DB (manual import only)
+  const exchKey  = isNY ? "exch_oi_ny" : "exch_oi_ldn";
+  const exchCur  = rawMk?.[exchKey]  ?? null;
+  const exchPrev = rawPMk?.[exchKey] ?? null;
+  const oiChangeNearby  = (exchCur !== null && exchPrev !== null) ? (exchCur  - exchPrev) : null;
+  const oiChangeForward = oiChangeNearby !== null ? (oiChangeLots - oiChangeNearby) : null;
+
+  // Structure / roll: only available when structure_ny/ldn is populated in DB (manual import only)
+  const structKey      = isNY ? "structure_ny" : "structure_ldn";
+  const structureValue: number | null     = rawMk?.[structKey]  ?? null;
+  const structurePrevValue: number | null = rawPMk?.[structKey] ?? null;
+  const structureType  = structureValue === null ? null : structureValue <= 0 ? "backwardation" : "carry" as const;
+  const annualizedRollPct = structureValue !== null ? computeAnnualizedRoll(structureValue, price) : null;
+
+  // PMPU MT (industry coverage) — normalize over 10-year history
+  const hist10y      = rawData.slice(-520);
+  const pmpuLongMTs  = hist10y.map(d => (isNY ? d.pmpuLongMT_NY  : d.pmpuLongMT_LDN)  ?? 0);
+  const pmpuShortMTs = hist10y.map(d => (isNY ? d.pmpuShortMT_NY : d.pmpuShortMT_LDN) ?? 0);
   const prodMT    = isNY ? cur.pmpuLongMT_NY  : cur.pmpuLongMT_LDN;
   const roastMT   = isNY ? cur.pmpuShortMT_NY : cur.pmpuShortMT_LDN;
   const prodMTPrev  = isNY ? prev.pmpuLongMT_NY  : prev.pmpuLongMT_LDN;
   const roastMTPrev = isNY ? prev.pmpuShortMT_NY : prev.pmpuShortMT_LDN;
 
-  // Funds maxed
-  const mmLongs  = recent52.map(d => d[mk].mmLong  ?? 0);
-  const mmShorts = recent52.map(d => d[mk].mmShort ?? 0);
+  // Funds maxed — use 10-year history
+  const mmLongs  = hist10y.map(d => d[mk].mmLong  ?? 0);
+  const mmShorts = hist10y.map(d => d[mk].mmShort ?? 0);
 
   // Counterparty deltas (lots WoW)
   const cpDelta = (field: string, side: "long" | "short") => {
@@ -386,8 +393,7 @@ export function buildMarketMetrics(
 
   // Trader counts
   // tradersNY/LDN currently stores t_mm_long under key "mm" (long-side count only).
-  // t_mm_short is available in the raw COT row as row.ny.t_mm_short.
-  // Use rawCur for the short trader count to correctly detect position mismatch.
+  // t_mm_short is available in the raw COT row as rawMk.t_mm_short.
   const traders  = isNY ? cur.tradersNY  : cur.tradersLDN;
   const tMmLong  = traders?.mm ?? 0;
   // Both NY and LDN raw rows store the MM short trader count under "t_mm_short".
@@ -397,9 +403,9 @@ export function buildMarketMetrics(
     market:   isNY ? "NY Arabica" : "LDN Robusta",
     date:     cur.date,
 
-    oiChangeLots:    oiSplit.total,
-    oiChangeNearby:  oiSplit.nearby,
-    oiChangeForward: oiSplit.forward,
+    oiChangeLots,
+    oiChangeNearby,
+    oiChangeForward,
 
     price,
     priceUnit,
@@ -408,7 +414,7 @@ export function buildMarketMetrics(
 
     structureValue,
     structurePrevValue,
-    structureType:    structureValue <= 0 ? "backwardation" : "carry",
+    structureType,
     annualizedRollPct,
 
     // Coverage %: PMPU position normalised on 52-week min/max range (0% = 52w low, 100% = 52w high)
@@ -436,13 +442,26 @@ export function buildMarketMetrics(
     oiRank:             isNY ? cur.oiRank       : cur.oiRankLDN,
     // tMmLong = long-side trader count; tMmShort = short-side from raw row
     positionMismatch:   computePositionMismatch(curNY.mmLong, curNY.mmShort, tMmLong, tMmShort),
-    mmConcentrationPct: (curNY.oi_total ?? 0) > 0
-      ? ((curNY.mmLong + curNY.mmShort) / (curNY.oi_total ?? 1)) * 100
-      : 0,
+    // MM concentration: exclude spread OI (non-directional) from denominator
+    mmConcentrationPct: (() => {
+      const oiTotal    = isNY ? cur.oiNY : cur.oiLDN;
+      const spreadOI   = (curNY.swapSpread ?? 0) + (curNY.mmSpread ?? 0) + (curNY.otherSpread ?? 0);
+      const dirOI      = Math.max(0, oiTotal - spreadOI);
+      return dirOI > 0 ? ((curNY.mmLong + curNY.mmShort) / dirOI) * 100 : 0;
+    })(),
 
     cp: {
       longs:  { pmpu: cpDelta("pmpu","long"),  sd: cpDelta("swap","long"),  mm: cpDelta("mm","long"),  or: cpDelta("other","long"),  nr: cpDelta("nonRep","long")  },
       shorts: { pmpu: cpDelta("pmpu","short"), sd: cpDelta("swap","short"), mm: cpDelta("mm","short"), or: cpDelta("other","short"), nr: cpDelta("nonRep","short") },
+    },
+
+    cats: {
+      pmpu:  { long: curNY.pmpuLong,   short: curNY.pmpuShort,   dLong: cpDelta("pmpu","long"),   dShort: cpDelta("pmpu","short") },
+      swap:  { long: curNY.swapLong,   short: curNY.swapShort,   spread: curNY.swapSpread,   dLong: cpDelta("swap","long"),   dShort: cpDelta("swap","short"),   dSpread: (curNY.swapSpread  ?? 0) - (prevNY.swapSpread  ?? 0) },
+      mm:    { long: curNY.mmLong,     short: curNY.mmShort,     spread: curNY.mmSpread,     dLong: cpDelta("mm","long"),     dShort: cpDelta("mm","short"),     dSpread: (curNY.mmSpread    ?? 0) - (prevNY.mmSpread    ?? 0) },
+      other: { long: curNY.otherLong,  short: curNY.otherShort,  spread: curNY.otherSpread,  dLong: cpDelta("other","long"),  dShort: cpDelta("other","short"),  dSpread: (curNY.otherSpread ?? 0) - (prevNY.otherSpread ?? 0) },
+      nr:    { long: curNY.nonRepLong, short: curNY.nonRepShort, dLong: cpDelta("nonRep","long"), dShort: cpDelta("nonRep","short") },
+      oi:    isNY ? cur.oiNY : cur.oiLDN,
     },
   };
 }

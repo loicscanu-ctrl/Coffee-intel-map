@@ -6,6 +6,7 @@ const fmt1 = (n: number) => Math.abs(n).toFixed(1);
 const fmt0 = (n: number) => Math.abs(n).toFixed(0);
 const sign = (n: number) => (n >= 0 ? "+" : "−");
 const kLots = (n: number) => `${sign(n)}${fmt1(n / 1000)}k lots`;
+const kLotsOrNA = (n: number | null) => n === null ? "N/A" : kLots(n);
 const pct = (n: number) => `${sign(n)}${fmt1(n)}%`;
 
 // ── Page 1: Global Money Flow ─────────────────────────────────────────────────
@@ -40,12 +41,17 @@ export function coffeeOverviewComment(ny: MarketMetrics, ldn: MarketMetrics): st
 export function marketOverviewComment(m: MarketMetrics): string {
   const oiDir  = m.oiChangeLots >= 0 ? "added" : "shed";
   const pDir   = m.priceChangePct >= 0 ? "rose" : "fell";
-  const struct = m.structureType === "backwardation"
-    ? `backwardation at ${fmt1(Math.abs(m.annualizedRollPct))}% annualised roll (vs ${RISK_FREE_RATE}% RFR)`
-    : `front structure in carry at ${fmt1(Math.abs(m.annualizedRollPct))}% annualised roll`;
+  const struct = m.structureType === null
+    ? "front structure unavailable (manual data required)"
+    : m.structureType === "backwardation"
+      ? `backwardation at ${fmt1(Math.abs(m.annualizedRollPct!))}% annualised roll (vs ${RISK_FREE_RATE}% RFR)`
+      : `front structure in carry at ${fmt1(Math.abs(m.annualizedRollPct!))}% annualised roll`;
+  const nearbySplit = m.oiChangeNearby !== null
+    ? `nearby: ${kLots(m.oiChangeNearby)}, forward: ${kLotsOrNA(m.oiChangeForward)}`
+    : "nearby/forward split unavailable";
   return (
     `Total OI ${oiDir} ${fmt1(Math.abs(m.oiChangeLots / 1000))}k lots ` +
-    `(nearby: ${kLots(m.oiChangeNearby)}, forward: ${kLots(m.oiChangeForward)}). ` +
+    `(${nearbySplit}). ` +
     `Price ${pDir} ${fmt1(Math.abs(m.priceChangePct))}% (${sign(m.priceChangeAbs)}${fmt1(Math.abs(m.priceChangeAbs))} ${m.priceUnit}) on the COT week. ` +
     `Market in ${struct}.`
   );
@@ -65,9 +71,11 @@ export function industryCoverageComment(m: MarketMetrics): string {
 export function mmPositioningComment(m: MarketMetrics): string {
   const lDir = m.mmLongChangeLots  >= 0 ? "increasing longs"  : "liquidating longs";
   const sDir = m.mmShortChangeLots >= 0 ? "increasing shorts" : "liquidating shorts";
-  const rollSignal = m.annualizedRollPct > RISK_FREE_RATE
-    ? `Roll above RFR — further long building likely.`
-    : `Roll below RFR — less incentive to add longs.`;
+  const rollSignal = m.annualizedRollPct === null
+    ? ""
+    : m.annualizedRollPct > RISK_FREE_RATE
+      ? `Roll above RFR — further long building likely.`
+      : `Roll below RFR — less incentive to add longs.`;
   return (
     `MM ${lDir} (${kLots(m.mmLongChangeLots)} / ${pct(m.mmLongChangePct)} of position) ` +
     `and ${sDir} (${kLots(m.mmShortChangeLots)} / ${pct(m.mmShortChangePct)} of position). ` +

@@ -198,12 +198,26 @@ function transformApiData(rows: any[]): any[] {
       other:  ny.t_other_long ?? 0,
       nonrep: ny.t_nr_long    ?? 0,
     };
+    const tradersNY_short = {
+      pmpu:   ny.t_pmpu_short  ?? 0,
+      mm:     ny.t_mm_short    ?? 0,
+      swap:   ny.t_swap_short  ?? 0,
+      other:  ny.t_other_short ?? 0,
+      nonrep: ny.t_nr_short    ?? 0,
+    };
     const tradersLDN = {
       pmpu:   ldn.t_pmpu_long  ?? 0,
       mm:     ldn.t_mm_long    ?? 0,
       swap:   ldn.t_swap_long  ?? 0,
       other:  ldn.t_other_long ?? 0,
       nonrep: 0,  // ICE has no NR trader count
+    };
+    const tradersLDN_short = {
+      pmpu:   ldn.t_pmpu_short  ?? 0,
+      mm:     ldn.t_mm_short    ?? 0,
+      swap:   ldn.t_swap_short  ?? 0,
+      other:  ldn.t_other_short ?? 0,
+      nonrep: 0,
     };
 
     const pmpuShortMT_NY  = nyObj.pmpuShort * ARABICA_MT_FACTOR;
@@ -220,7 +234,9 @@ function transformApiData(rows: any[]): any[] {
       spreadingTotal, outrightTotal,
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
       ny: nyObj, ldn: ldnObj,
-      tradersNY, tradersLDN,
+      // Preserve forward-filled raw sub-objects for buildMarketMetrics (structure, exch_oi, t_mm_short)
+      rawNy: ny, rawLdn: ldn,
+      tradersNY, tradersNY_short, tradersLDN, tradersLDN_short,
       pmpuShortMT_NY, pmpuShortMT_LDN,
       pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,
       pmpuLongMT_NY, pmpuLongMT_LDN,
@@ -230,7 +246,7 @@ function transformApiData(rows: any[]): any[] {
     });
   }
 
-  // Pass 2: timeframe buckets + 52-week rolling ranks
+  // Pass 2: timeframe buckets + 5-year (260-week) rolling ranks
   const n = base.length;
   return base.map((d, i) => {
     const timeframe =
@@ -240,7 +256,7 @@ function transformApiData(rows: any[]): any[] {
       (i >= n - 58 && i <= n - 7) ? "year"      :
                                     "historical";
 
-    const slice    = base.slice(Math.max(0, i - 52), i + 1);
+    const slice    = base.slice(Math.max(0, i - 260), i + 1);
     const prices   = slice.map(s => s.priceNY);
     const maxP     = Math.max(...prices);
     const minP     = Math.min(...prices);
@@ -348,7 +364,7 @@ function generateData() {
   }
 
   return data.map((d, i) => {
-    const slice    = data.slice(Math.max(0, i - 52), i + 1);
+    const slice    = data.slice(Math.max(0, i - 260), i + 1);
     const maxP     = Math.max(...slice.map(s => s.priceNY));
     const minP     = Math.min(...slice.map(s => s.priceNY));
     const net      = d.ny.mmLong - d.ny.mmShort;
@@ -466,7 +482,7 @@ function RadialCounterparty({
                       <Label value={fmtVal(total)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" />
                     </Pie>
                     <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }}
-                      formatter={(v: any, name: string) => [fmtVal(Number(v)), name]} />
+                      formatter={(v: any, name: any) => [fmtVal(Number(v)), name]} />
                     <Legend verticalAlign="bottom" height={32} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -666,15 +682,13 @@ function AttributionTable({ gfm }: { gfm: GlobalFlowMetrics }) {
 
 export default function CotDashboard() {
   // PDF chart refs (one per section) — names match captureAllCharts() keys
-  const pdfRefGlobalFlow    = useRef<HTMLDivElement>(null);
-  const pdfRefStructural    = useRef<HTMLDivElement>(null);
-  const pdfRefCounterparty  = useRef<HTMLDivElement>(null);
-  const pdfRefIndustryPulse = useRef<HTMLDivElement>(null);
-  const pdfRefDryPowder     = useRef<HTMLDivElement>(null);
-  const pdfRefObosMatrix    = useRef<HTMLDivElement>(null);
   const pdfRefMacroGross    = useRef<HTMLDivElement>(null);
   const pdfRefMacroNet      = useRef<HTMLDivElement>(null);
   const pdfRefSoftsContract = useRef<HTMLDivElement>(null);
+  const pdfRefIndNY     = useRef<HTMLDivElement>(null);
+  const pdfRefIndLDN    = useRef<HTMLDivElement>(null);
+  const pdfRefDpNY      = useRef<HTMLDivElement>(null);
+  const pdfRefDpLDN     = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<Step>(1);
   const [cotRows, setCotRows] = useState<any[] | null>(null);
@@ -842,20 +856,22 @@ export default function CotDashboard() {
 
   const macroKpis = useMemo(() => {
     if (!macroData.length) return null;
-    const latestWeek = macroData[macroData.length - 1];
-    let grossLong = 0, grossShort = 0;
-    for (const c of latestWeek.commodities) {
-      const g = c.gross_exposure_usd ?? 0;
-      const n = c.net_exposure_usd   ?? 0;
-      grossLong  += (g + n) / 2;
-      grossShort += (g - n) / 2;
-    }
+    const weekTotals = (week: MacroCotWeek) => {
+      let g = 0, n = 0;
+      for (const c of week.commodities) {
+        g += c.gross_exposure_usd ?? 0;
+        n += c.net_exposure_usd   ?? 0;
+      }
+      return { gross: g, net: n };
+    };
+    const cur  = weekTotals(macroData[macroData.length - 1]);
+    const prev = macroData.length >= 2 ? weekTotals(macroData[macroData.length - 2]) : null;
     return {
-      totalGross: grossLong + grossShort,
-      grossLong,
-      grossShort,
-      netExp:     grossLong - grossShort,
-      date:       latestWeek.date,
+      totalGross: cur.gross,
+      netExp:     cur.net,
+      grossWoW:   prev ? cur.gross - prev.gross : null,
+      netWoW:     prev ? cur.net   - prev.net   : null,
+      date:       macroData[macroData.length - 1].date,
     };
   }, [macroData]);
 
@@ -875,23 +891,51 @@ export default function CotDashboard() {
 
   // ── PDF download ──────────────────────────────────────────────────────────
   const [pdfGenerating, setPdfGenerating] = useState(false);
+  const [cachedCharts, setCachedCharts] = useState<Record<string, string | null> | null>(null);
+
+  // Pre-capture charts once data is ready so Download PDF is near-instant
+  // Uses data.length instead of recent52.length because recent52 is declared below
+  useEffect(() => {
+    if (!data.length || !macroData.length) return;
+    let cancelled = false;
+    const run = async () => {
+      // Small delay so charts have time to render after data loads
+      await new Promise(r => setTimeout(r, 800));
+      if (cancelled) return;
+      const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
+      const result = await captureAllCharts({
+        macroGross:    pdfRefMacroGross,
+        macroNet:      pdfRefMacroNet,
+        softsContract: pdfRefSoftsContract,
+        indPulseNy:  pdfRefIndNY,
+        indPulseLdn: pdfRefIndLDN,
+        dryPowderNy: pdfRefDpNY,
+        dryPowderLdn: pdfRefDpLDN,
+      });
+      if (!cancelled) setCachedCharts(result);
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [data.length, macroData.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDownloadPdf = async () => {
     if (!recent52.length || !macroData.length) return;
     setPdfGenerating(true);
     try {
-      const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
-      const capturedCharts = await captureAllCharts({
-        globalFlow:    pdfRefGlobalFlow,
-        structural:    pdfRefStructural,
-        counterparty:  pdfRefCounterparty,
-        industryPulse: pdfRefIndustryPulse,
-        dryPowder:     pdfRefDryPowder,
-        obosMatrix:    pdfRefObosMatrix,
-        macroGross:    pdfRefMacroGross,
-        macroNet:      pdfRefMacroNet,
-        softsContract: pdfRefSoftsContract,
-      });
+      // Use pre-captured charts if available, otherwise capture now
+      let capturedCharts = cachedCharts;
+      if (!capturedCharts) {
+        const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
+        capturedCharts = await captureAllCharts({
+          macroGross:    pdfRefMacroGross,
+          macroNet:      pdfRefMacroNet,
+          softsContract: pdfRefSoftsContract,
+          indPulseNy:  pdfRefIndNY,
+          indPulseLdn: pdfRefIndLDN,
+          dryPowderNy: pdfRefDpNY,
+          dryPowderLdn: pdfRefDpLDN,
+        });
+      }
 
       const { buildGlobalFlowMetrics, buildMarketMetrics } = await import("@/lib/pdf/dataHelpers");
       const globalFlow = buildGlobalFlowMetrics(macroData);
@@ -926,19 +970,18 @@ export default function CotDashboard() {
         ny,
         ldn,
         charts: {
-          globalFlow:    capturedCharts.globalFlow    ?? null,
-          structural:    capturedCharts.structural    ?? null,
-          counterparty:  capturedCharts.counterparty  ?? null,
-          industryPulse: capturedCharts.industryPulse ?? null,
-          dryPowder:     capturedCharts.dryPowder     ?? null,
-          obosMatrix:    capturedCharts.obosMatrix     ?? null,
           macroGross:    capturedCharts.macroGross    ?? null,
           macroNet:      capturedCharts.macroNet      ?? null,
           softsContract: capturedCharts.softsContract ?? null,
+          indPulseNy:    capturedCharts.indPulseNy    ?? null,
+          indPulseLdn:   capturedCharts.indPulseLdn   ?? null,
+          dryPowderNy:   capturedCharts.dryPowderNy   ?? null,
+          dryPowderLdn:  capturedCharts.dryPowderLdn  ?? null,
         },
       };
 
-      const { pdf } = await import("@react-pdf/renderer");
+      if (typeof window === "undefined") return;
+      const { pdf } = await import("@/lib/pdf/pdfEngine");
       const { CotPdfReport } = await import("@/lib/pdf/PdfReport");
       const blob = await pdf(<CotPdfReport d={reportData} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -960,28 +1003,59 @@ export default function CotDashboard() {
     };
     data.forEach(d => {
       const mkts = [
-        ...(dpMarkets.ny  ? [{ key: "ny",  mt: ARABICA_MT_FACTOR, tr: d.tradersNY  }] : []),
-        ...(dpMarkets.ldn ? [{ key: "ldn", mt: ROBUSTA_MT_FACTOR, tr: d.tradersLDN }] : []),
+        ...(dpMarkets.ny  ? [{ key: "ny",  mt: ARABICA_MT_FACTOR, trL: d.tradersNY,  trS: (d as any).tradersNY_short  }] : []),
+        ...(dpMarkets.ldn ? [{ key: "ldn", mt: ROBUSTA_MT_FACTOR, trL: d.tradersLDN, trS: (d as any).tradersLDN_short }] : []),
       ];
-      let dpLong = 0, dpShort = 0, dpTraders = 0;
+      let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
       mkts.forEach(m => {
         Object.keys(dpCats).forEach(cat => {
           if ((dpCats as any)[cat]) {
             const oiKey = cat === "nonrep" ? "nonRep" : cat;
-            dpLong    += ((d as any)[m.key][`${oiKey}Long`])  * m.mt;
-            dpShort   += ((d as any)[m.key][`${oiKey}Short`]) * m.mt;
-            dpTraders += (m.tr as any)[cat];
+            dpLong         += ((d as any)[m.key][`${oiKey}Long`])  * m.mt;
+            dpShort        += ((d as any)[m.key][`${oiKey}Short`]) * m.mt;
+            dpTradersLong  += (m.trL as any)?.[cat] ?? 0;
+            dpTradersShort += (m.trS as any)?.[cat] ?? 0;
           }
         });
       });
       const tf = d.timeframe as string;
       if (byTf[tf]) {
-        byTf[tf].push({ date: d.date, traders: dpTraders, oi: dpLong  });
-        byTf[tf].push({ date: d.date, traders: dpTraders, oi: -dpShort });
+        byTf[tf].push({ date: d.date, traders: dpTradersLong,  oi: dpLong  });
+        byTf[tf].push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
       }
     });
     return byTf;
   }, [data, dpMarkets, dpCats]);
+
+  const dpDataNyMm = useMemo(() => {
+    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
+      historical: [], year: [], recent_4: [], recent_1: [], current: [],
+    };
+    data.forEach((d: any) => {
+      const dpLong         = (d.ny.mmLong)  * ARABICA_MT_FACTOR;
+      const dpShort        = (d.ny.mmShort) * ARABICA_MT_FACTOR;
+      const dpTradersLong  = d.tradersNY.mm ?? 0;
+      const dpTradersShort = d.rawNy?.t_mm_short ?? dpTradersLong;
+      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersLong,  oi: dpLong });
+      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
+    });
+    return byTf;
+  }, [data]);
+
+  const dpDataLdnMm = useMemo(() => {
+    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
+      historical: [], year: [], recent_4: [], recent_1: [], current: [],
+    };
+    data.forEach((d: any) => {
+      const dpLong         = (d.ldn.mmLong)  * ROBUSTA_MT_FACTOR;
+      const dpShort        = (d.ldn.mmShort) * ROBUSTA_MT_FACTOR;
+      const dpTradersLong  = d.tradersLDN.mm ?? 0;
+      const dpTradersShort = d.rawLdn?.t_mm_short ?? dpTradersLong;
+      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersLong,  oi: dpLong });
+      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
+    });
+    return byTf;
+  }, [data]);
 
   const dpDomain = useMemo(() => {
     const all = Object.values(processedDpData).flat();
@@ -1003,7 +1077,7 @@ export default function CotDashboard() {
   const recent52 = data.slice(-52);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" style={{ position: "relative" }}>
       {cotError && (
         <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs font-medium">
           Backend unavailable — showing illustrative data only (prices random, data ends ~Nov 2025). Start the backend server to load real CoT data.
@@ -1091,12 +1165,13 @@ export default function CotDashboard() {
 
           {/* KPI Toddles */}
           {macroKpis && (() => {
-            const fmtB = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
+            const fmtB  = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
+            const fmtWoW = (v: number | null) => v == null ? "—" : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`;
             const kpis = [
-              { label: "Total Gross Exposure", value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
-              { label: "Gross Long Exposure",  value: fmtB(macroKpis.grossLong),   color: "#10b981" },
-              { label: "Gross Short Exposure", value: fmtB(macroKpis.grossShort),  color: "#ef4444" },
-              { label: "Net Exposure",         value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Gross Exposure",     value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
+              { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: macroKpis.grossWoW == null ? "#6b7280" : macroKpis.grossWoW >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Net Exposure",       value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: macroKpis.netWoW == null ? "#6b7280" : macroKpis.netWoW >= 0 ? "#10b981" : "#ef4444" },
             ];
             return (
               <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
@@ -1120,7 +1195,12 @@ export default function CotDashboard() {
           <div style={{ marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure by Sector (USD bn)</span>
           </div>
-          <div ref={pdfRefGlobalFlow} className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
+          {!macroData.length && !macroError && (
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-center" style={{ height: 260, marginBottom: 16 }}>
+              <div className="h-2 w-32 rounded-full bg-slate-700 animate-pulse" />
+            </div>
+          )}
+          {macroData.length > 0 && <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart
                 data={macroToggle === "net" && macroNetSplitData ? macroNetSplitData : macroChartData}
@@ -1216,7 +1296,7 @@ export default function CotDashboard() {
                 )}
               </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </div>}
 
           {/* Panel B — Weekly Change */}
           {(() => {
@@ -1516,7 +1596,7 @@ export default function CotDashboard() {
               </div>
               <CatToggles cats={structCats} set={k => setStructCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
             </div>
-            <div ref={pdfRefStructural} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={processedStructData.slice(-52)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1556,7 +1636,7 @@ export default function CotDashboard() {
               ))}
             </div>
           </div>
-          <div ref={pdfRefCounterparty} className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <RadialCounterparty
               latest={latest}
               prev1={data.length >= 2 ? data[data.length - 2] : null}
@@ -1611,7 +1691,7 @@ export default function CotDashboard() {
             </div>
 
             {/* Panel A — Gross Long & Short vs Price */}
-            <div ref={pdfRefIndustryPulse} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[320px] mb-4">
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[320px] mb-4">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={recent52}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -1619,7 +1699,7 @@ export default function CotDashboard() {
                   <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain}
                     label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
                   <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} />
-                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: string) => [
+                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [
                     name === "Price" ? v.toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name
                   ]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
@@ -1642,7 +1722,7 @@ export default function CotDashboard() {
                   <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt}
                     label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
                   <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
-                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: string) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                   <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#10b981" opacity={0.8} barSize={6} />
                   <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#3b82f6" opacity={0.8} barSize={6} />
@@ -1662,7 +1742,7 @@ export default function CotDashboard() {
                     label={{ value: "%", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
                   <ReferenceLine y={100} stroke="#475569" strokeDasharray="4 4" strokeOpacity={0.5} />
                   <Tooltip contentStyle={CHART_STYLE}
-                    formatter={(v: any, name: string) => [v == null ? "n/a" : `${Number(v).toFixed(1)}%`, name]} />
+                    formatter={(v: any, name: any) => [v == null ? "n/a" : `${Number(v).toFixed(1)}%`, name]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                   <Line type="monotone" dataKey="efpPctLong"  name="EFP % of Δ Long"
                     stroke="#10b981" strokeWidth={1.5} dot={false} connectNulls={false} />
@@ -1684,7 +1764,7 @@ export default function CotDashboard() {
             <MarketToggle markets={dpMarkets} set={k => setDpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
             <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
           </div>
-          <div ref={pdfRefDryPowder} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1697,7 +1777,7 @@ export default function CotDashboard() {
                   label={{ value: "OI (k ton equivalent)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
                 <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
                 <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-                  formatter={(v: any, name: string) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                  formatter={(v: any, name: any) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
                 <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
                   content={(props: any) => {
                     const items = [...(props.payload ?? [])].reverse();
@@ -1713,11 +1793,12 @@ export default function CotDashboard() {
                     );
                   }}
                 />
-                <Scatter name="Historic"   data={processedDpData.historical} fill="#bfdbfe" fillOpacity={0.18} size={12}  />
-                <Scatter name="Prior Y"    data={processedDpData.year}       fill="#3b82f6" fillOpacity={0.45} size={28}  />
-                <Scatter name="Prior 4W"   data={processedDpData.recent_4}   fill="#eab308" fillOpacity={0.9}  size={78}  />
-                <Scatter name="Prior week" data={processedDpData.recent_1}   fill="#c2410c" fillOpacity={1.0}  size={154} />
-                <Scatter name="Last CoT"   data={processedDpData.current}    fill="#ef4444" fillOpacity={1.0}  size={314} />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <Scatter name="Historic"   data={processedDpData.historical} fill="#bfdbfe" fillOpacity={0.18} {...{ size: 12  } as any} />
+                <Scatter name="Prior Y"    data={processedDpData.year}       fill="#3b82f6" fillOpacity={0.45} {...{ size: 28  } as any} />
+                <Scatter name="Prior 4W"   data={processedDpData.recent_4}   fill="#eab308" fillOpacity={0.9}  {...{ size: 78  } as any} />
+                <Scatter name="Prior week" data={processedDpData.recent_1}   fill="#c2410c" fillOpacity={1.0}  {...{ size: 154 } as any} />
+                <Scatter name="Last CoT"   data={processedDpData.current}    fill="#ef4444" fillOpacity={1.0}  {...{ size: 314 } as any} />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
@@ -1752,7 +1833,7 @@ export default function CotDashboard() {
                 </button>
               ))}
             </div>
-            <div ref={pdfRefObosMatrix} className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -1765,7 +1846,7 @@ export default function CotDashboard() {
                   <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
                   <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
                   <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-                    formatter={(v: any, _: string, props: any) => [`${Number(v).toFixed(1)}%`, props.name]} />
+                    formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                   {obosView !== "ldn" && (
                     <Scatter name="NY Arabica" data={nyPts}>
@@ -1876,6 +1957,68 @@ export default function CotDashboard() {
                   stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} legendType="none" />
               ))}
             </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* ── Hidden off-screen charts for Industry Pulse and Dry Powder (PDF capture) ── */}
+      <div style={{ position: "absolute", left: -9999, top: 0, pointerEvents: "none" }}>
+        <div ref={pdfRefIndNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={recent52}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="date" stroke="#475569" fontSize={8} tickFormatter={(v: any) => v.slice(5)} />
+              <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
+              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
+              <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_NY"  name="PMPU Long"  fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_NY" name="PMPU Short" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
+              <Line yAxisId="right" type="monotone" dataKey="priceNY" name="Price" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+        <div ref={pdfRefIndLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={recent52}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="date" stroke="#475569" fontSize={8} tickFormatter={(v: any) => v.slice(5)} />
+              <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
+              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
+              <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_LDN"  name="PMPU Long"  fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_LDN" name="PMPU Short" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
+              <Line yAxisId="right" type="monotone" dataKey="priceLDN" name="Price" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+        <div ref={pdfRefDpNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" />
+              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI" />
+              <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+              <Scatter name="Historic"   data={dpDataNyMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
+              <Scatter name="Prior Y"    data={dpDataNyMm.year}       fill="#3b82f6" fillOpacity={0.45} />
+              <Scatter name="Prior 4W"   data={dpDataNyMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
+              <Scatter name="Prior week" data={dpDataNyMm.recent_1}   fill="#c2410c" fillOpacity={1.0}  />
+              <Scatter name="Last CoT"   data={dpDataNyMm.current}    fill="#ef4444" fillOpacity={1.0}  />
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+        <div ref={pdfRefDpLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" />
+              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI" />
+              <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+              <Scatter name="Historic"   data={dpDataLdnMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
+              <Scatter name="Prior Y"    data={dpDataLdnMm.year}       fill="#3b82f6" fillOpacity={0.45} />
+              <Scatter name="Prior 4W"   data={dpDataLdnMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
+              <Scatter name="Prior week" data={dpDataLdnMm.recent_1}   fill="#c2410c" fillOpacity={1.0}  />
+              <Scatter name="Last CoT"   data={dpDataLdnMm.current}    fill="#ef4444" fillOpacity={1.0}  />
+            </ScatterChart>
           </ResponsiveContainer>
         </div>
       </div>

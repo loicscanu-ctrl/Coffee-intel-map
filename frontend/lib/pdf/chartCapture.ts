@@ -1,9 +1,9 @@
+"use client";
 // frontend/lib/pdf/chartCapture.ts
-import html2canvas from "html2canvas";
+import html2canvas from "./canvasLib";
 
 /**
- * Captures a DOM element (typically a Recharts ResponsiveContainer wrapper)
- * as a PNG data URL suitable for embedding in @react-pdf/renderer.
+ * Captures a DOM element as a JPEG data URL for embedding in @react-pdf/renderer.
  * Returns null if the ref is not mounted.
  */
 export async function captureChartAsPng(
@@ -14,27 +14,27 @@ export async function captureChartAsPng(
   try {
     const canvas = await html2canvas(containerRef.current, {
       backgroundColor: bgColor,
-      scale: 2,          // 2× for retina-quality in PDF
+      scale: 1.5,
       logging: false,
       useCORS: true,
     });
-    return canvas.toDataURL("image/png");
+    return canvas.toDataURL("image/jpeg", 0.85);
   } catch {
     return null;
   }
 }
 
 /**
- * Captures all six charts in parallel. Any failed capture returns null
- * (the PDF page will show a placeholder instead of crashing).
+ * Captures the 7 charts needed for the PDF in parallel.
  */
 export async function captureAllCharts(refs: {
-  globalFlow:    React.RefObject<HTMLDivElement>;
-  structural:    React.RefObject<HTMLDivElement>;
-  counterparty:  React.RefObject<HTMLDivElement>;
-  industryPulse: React.RefObject<HTMLDivElement>;
-  dryPowder:     React.RefObject<HTMLDivElement>;
-  obosMatrix:    React.RefObject<HTMLDivElement>;
+  macroGross:    React.RefObject<HTMLDivElement>;
+  macroNet:      React.RefObject<HTMLDivElement>;
+  softsContract: React.RefObject<HTMLDivElement>;
+  indPulseNy:    React.RefObject<HTMLDivElement>;
+  indPulseLdn:   React.RefObject<HTMLDivElement>;
+  dryPowderNy:   React.RefObject<HTMLDivElement>;
+  dryPowderLdn:  React.RefObject<HTMLDivElement>;
 }): Promise<Record<string, string | null>> {
   const entries = await Promise.all(
     Object.entries(refs).map(async ([key, ref]) => [key, await captureChartAsPng(ref)])
