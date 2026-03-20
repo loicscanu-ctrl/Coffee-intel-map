@@ -883,11 +883,11 @@ export default function CotDashboard() {
   const [indView, setIndView] = useState<"ny" | "ldn" | "combined">("combined");
 
   // Step 5
-  const [dpMarkets, setDpMarkets] = useState({ ny: true, ldn: true });
-  const [dpCats,    setDpCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: true });
+  const [dpMarkets, setDpMarkets] = useState({ ny: true, ldn: false });
+  const [dpCats,    setDpCats]    = useState({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
 
   // Step 6
-  const [obosView, setObosView] = useState<"both" | "ny" | "ldn">("both");
+  const [obosView, setObosView] = useState<"ny" | "ldn">("ny");
 
   // ── PDF download ──────────────────────────────────────────────────────────
   const [pdfGenerating, setPdfGenerating] = useState(false);
@@ -1809,13 +1809,14 @@ export default function CotDashboard() {
       {step === 6 && (() => {
         const cycleColor = (d: any, market: "ny" | "ldn") => {
           if (d.timeframe === "current")  return market === "ny" ? "#ef4444" : "#3b82f6";
-          if (d.timeframe === "recent_1") return market === "ny" ? "#f97316" : "#3b82f6";
+          if (d.timeframe === "recent_1") return market === "ny" ? "#f97316" : "#f97316";
+          if (d.timeframe === "recent_4") return "#eab308"; // yellow — 4 weeks before last
           return "#64748b";
         };
         const cycleOpacity = (d: any) => {
           if (d.timeframe === "current")  return 1.0;
-          if (d.timeframe === "recent_1") return 0.75;
-          if (d.timeframe === "recent_4") return 0.45;
+          if (d.timeframe === "recent_1") return 0.85;
+          if (d.timeframe === "recent_4") return 0.75;
           if (d.timeframe === "year")     return 0.25;
           return 0.12;
         };
@@ -1824,12 +1825,12 @@ export default function CotDashboard() {
         return (
           <div>
             <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
-              subtitle="Mapping the convergence of Price Rank and Net Positioning Rank. Red = NY Arabica · Blue = LDN Robusta · Orange = last week." />
+              subtitle="X = MM Net Positioning 5Y rank · Y = Price 5Y rank · Red=last week · Orange=prior week · Yellow=prior 4 weeks · Grey=history." />
             <div className="flex items-center gap-2 mb-3">
-              {(["both", "ny", "ldn"] as const).map(m => (
+              {(["ny", "ldn"] as const).map(m => (
                 <button key={m} onClick={() => setObosView(m)}
                   className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${obosView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                  {m === "both" ? "NY + LDN" : m === "ny" ? "NY Arabica" : "LDN Robusta"}
+                  {m === "ny" ? "NY Arabica" : "LDN Robusta"}
                 </button>
               ))}
             </div>
@@ -1846,16 +1847,16 @@ export default function CotDashboard() {
                   <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
                   <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
                   <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-                    formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  {obosView !== "ldn" && (
+                    formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]}
+                    labelFormatter={(_: any, payload: any) => payload?.[0]?.payload?.date ?? ""} />
+                  {obosView === "ny" && (
                     <Scatter name="NY Arabica" data={nyPts}>
                       {nyPts.map((d, i) => (
                         <Cell key={i} fill={cycleColor(d, "ny")} fillOpacity={cycleOpacity(d)} />
                       ))}
                     </Scatter>
                   )}
-                  {obosView !== "ny" && (
+                  {obosView === "ldn" && (
                     <Scatter name="LDN Robusta" data={ldnPts}>
                       {ldnPts.map((d, i) => (
                         <Cell key={i} fill={cycleColor(d, "ldn")} fillOpacity={cycleOpacity(d)} />
