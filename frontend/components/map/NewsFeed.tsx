@@ -11,13 +11,19 @@ const BORDER_COLORS: Record<string, string> = {
   general: "border-gray-500",
 };
 
-export default function NewsFeed() {
-  const [items, setItems] = useState<any[]>([]);
+interface NewsFeedProps {
+  initialNews?: any[];
+}
+
+export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
+  const [items, setItems] = useState<any[]>(initialNews);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    fetchNews().then(setItems).catch(console.error);
-  }, []);
+    if (initialNews.length === 0) {
+      fetchNews().then(setItems).catch(console.error);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = filter === "all" ? items : items.filter((i) => i.category === filter);
 

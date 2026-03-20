@@ -2,10 +2,6 @@
 import { useEffect, useRef } from "react";
 import { PORTS, ROUTES, MAP_CONFIG } from "@/lib/mapData";
 
-interface CoffeeMapProps {
-  onPinClick?: (item: any) => void;
-}
-
 const CATEGORY_COLORS: Record<string, string> = {
   supply: "#ef4444",
   demand: "#eab308",
@@ -13,7 +9,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: "#6b7280",
 };
 
-export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
+interface CoffeeMapProps {
+  onPinClick?: (item: any) => void;
+  countries: any[];
+  factories: any[];
+  news: any[];
+}
+
+export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
 
@@ -88,69 +91,61 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
         Leaflet.marker(p.l, { icon }).bindPopup(`Port of ${p.n}`).addTo(portsLayer);
       });
 
-      // Country pins
-      const { fetchMapCountries, fetchMapFactories, fetchNews } = await import("@/lib/api");
-
+      // Country pins (from props)
       const countriesLayer = Leaflet.layerGroup().addTo(map);
-      fetchMapCountries().catch(() => [] as any[]).then((countries: any[]) => {
-        countries.forEach((c: any) => {
-          const isProducer = c.type === "producer";
-          const color = isProducer ? "#10b981" : "#3b82f6";
-          const icon = Leaflet.divIcon({
-            className: "",
-            html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:12px;height:12px;"></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6],
-          });
-          const d = c.data || {};
-          const statsHtml = isProducer
-            ? `<div>PROD: ${d.prod || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`
-            : `<div>CONS: ${d.cons || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`;
-          Leaflet.marker([c.lat, c.lng], { icon })
-            .bindPopup(
-              `<div style="font-family:monospace;font-size:12px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:4px;min-width:160px">` +
-              `<b>${c.name}</b><br>${statsHtml}` +
-              (d.intel ? `<br><i style="color:#94a3b8">${d.intel}</i>` : "") +
-              `</div>`
-            )
-            .addTo(countriesLayer);
+      countries.forEach((c: any) => {
+        const isProducer = c.type === "producer";
+        const color = isProducer ? "#10b981" : "#3b82f6";
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:12px;height:12px;"></div>`,
+          iconSize: [12, 12],
+          iconAnchor: [6, 6],
         });
+        const d = c.data || {};
+        const statsHtml = isProducer
+          ? `<div>PROD: ${d.prod || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`
+          : `<div>CONS: ${d.cons || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`;
+        Leaflet.marker([c.lat, c.lng], { icon })
+          .bindPopup(
+            `<div style="font-family:monospace;font-size:12px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:4px;min-width:160px">` +
+            `<b>${c.name}</b><br>${statsHtml}` +
+            (d.intel ? `<br><i style="color:#94a3b8">${d.intel}</i>` : "") +
+            `</div>`
+          )
+          .addTo(countriesLayer);
       });
 
-      // Factory pins
+      // Factory pins (from props)
       const factoriesLayer = Leaflet.layerGroup().addTo(map);
-      fetchMapFactories().catch(() => [] as any[]).then((factories: any[]) => {
-        factories.forEach((f: any) => {
-          const icon = Leaflet.divIcon({
-            className: "",
-            html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
-            iconSize: [16, 16],
-            iconAnchor: [8, 8],
-          });
-          Leaflet.marker([f.lat, f.lng], { icon })
-            .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
-            .addTo(factoriesLayer);
+      factories.forEach((f: any) => {
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
         });
+        Leaflet.marker([f.lat, f.lng], { icon })
+          .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
+          .addTo(factoriesLayer);
       });
 
-      // News pins
+      // News pins (from props)
       const newsLayer = Leaflet.layerGroup().addTo(map);
-      fetchNews().catch(() => [] as any[]).then((items: any[]) => {
-        items
-          .filter((item: any) => item.lat != null && item.lng != null)
-          .forEach((item: any) => {
-            const color = CATEGORY_COLORS[item.category] || "#6b7280";
-            const icon = Leaflet.divIcon({
-              className: "",
-              html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:14px;height:14px;box-shadow:0 0 6px ${color}"></div>`,
-              iconSize: [14, 14],
-              iconAnchor: [7, 7],
-            });
-            Leaflet.marker([item.lat, item.lng], { icon })
-              .on("click", () => onPinClick && onPinClick(item))
-              .addTo(newsLayer);
+      news
+        .filter((item: any) => item.lat != null && item.lng != null)
+        .forEach((item: any) => {
+          const color = CATEGORY_COLORS[item.category] || "#6b7280";
+          const icon = Leaflet.divIcon({
+            className: "",
+            html: `<div style="background:${color};border:2px solid #fff;border-radius:50%;width:14px;height:14px;box-shadow:0 0 6px ${color}"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
           });
-      });
+          Leaflet.marker([item.lat, item.lng], { icon })
+            .on("click", () => onPinClick && onPinClick(item))
+            .addTo(newsLayer);
+        });
     });
 
     return () => {
@@ -159,7 +154,7 @@ export default function CoffeeMap({ onPinClick }: CoffeeMapProps) {
       mapInstanceRef.current = null;
       if (mapRef.current) (mapRef.current as any)._leaflet_id = null;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div ref={mapRef} style={{ width: "100%", height: "100%" }} />;
 }

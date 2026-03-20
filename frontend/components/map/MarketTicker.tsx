@@ -141,8 +141,12 @@ function parseTickerItems(items: any[]): TickerItem[] {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function MarketTicker() {
-  const [tickers, setTickers] = useState<TickerItem[]>([]);
+interface MarketTickerProps {
+  initialNews?: any[];
+}
+
+export default function MarketTicker({ initialNews = [] }: MarketTickerProps) {
+  const [tickers, setTickers] = useState<TickerItem[]>(() => parseTickerItems(initialNews));
 
   const load = () => {
     fetchNews()
@@ -151,10 +155,11 @@ export default function MarketTicker() {
   };
 
   useEffect(() => {
-    load();
+    // Skip immediate fetch if we already have server-loaded data
+    if (initialNews.length === 0) load();
     const interval = setInterval(load, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (tickers.length === 0) return null;
 
