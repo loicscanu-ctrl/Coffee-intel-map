@@ -562,14 +562,19 @@ function CounterpartyMapBlock({ ny, ldn }: { ny: MarketMetrics; ldn: MarketMetri
               <Text style={{ flex: 1, fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.slate600 }}>SPREADING</Text>
               <Text style={{ fontSize: FS_H, fontFamily: "Helvetica-Bold", color: BRAND.dark }}>{fmtN(totalSpread)}</Text>
             </View>
-            {spreadRows.map(row => (
-              <View key={row.key} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
-                <Text style={{ width: 52, fontSize: FS, color: row.color }}>{row.label}</Text>
-                <View style={{ flex: 1 }} />
-                <Text style={{ width: 34, fontSize: FS, color: BRAND.dark, textAlign: "right" }}>{fmtN(row.val)}</Text>
-                <Text style={{ width: 32, fontSize: FS, color: row.delta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(row.delta)}</Text>
-              </View>
-            ))}
+            {spreadRows.map(row => {
+              const pct = totalSpread > 0 ? Math.max(0, Math.min(100, (row.val / totalSpread) * 100)) : 0;
+              return (
+                <View key={row.key} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                  <Text style={{ width: 52, fontSize: FS, color: row.color }}>{row.label}</Text>
+                  <View style={{ flex: 1, height: 5, backgroundColor: "#f1f5f9", borderRadius: 1, marginRight: 4 }}>
+                    <View style={{ height: 5, width: `${pct}%` as any, backgroundColor: row.color, borderRadius: 1, opacity: 0.8 }} />
+                  </View>
+                  <Text style={{ width: 34, fontSize: FS, color: BRAND.dark, textAlign: "right" }}>{fmtN(row.val)}</Text>
+                  <Text style={{ width: 32, fontSize: FS, color: row.delta >= 0 ? BRAND.green : BRAND.red, textAlign: "right" }}>{fmtD(row.delta)}</Text>
+                </View>
+              );
+            })}
           </View>
         )}
       </View>
