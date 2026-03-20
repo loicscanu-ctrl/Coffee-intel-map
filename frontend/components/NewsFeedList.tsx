@@ -31,18 +31,22 @@ interface Props {
   filterFn?: (item: NewsItem) => boolean;
   emptyMessage?: string;
   title: string;
+  initialItems?: NewsItem[];
 }
 
-export default function NewsFeedList({ category, filterFn, emptyMessage, title }: Props) {
-  const [items, setItems] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function NewsFeedList({ category, filterFn, emptyMessage, title, initialItems }: Props) {
+  const [items, setItems] = useState<NewsItem[]>(() =>
+    initialItems ? (filterFn ? initialItems.filter(filterFn) : initialItems) : []
+  );
+  const [loading, setLoading] = useState(!initialItems);
 
   useEffect(() => {
+    if (initialItems) return; // already have server-loaded data
     fetchNews(category)
       .then((data) => setItems(filterFn ? data.filter(filterFn) : data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [category]);
+  }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="p-6 h-full overflow-y-auto">
