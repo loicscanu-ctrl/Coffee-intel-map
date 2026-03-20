@@ -1,7 +1,7 @@
 # backend/routes/cot.py
 from datetime import date as DateType
 from typing import Optional
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Response
 from sqlalchemy.orm import Session
 from database import get_db
 from models import CotWeekly
@@ -39,9 +39,11 @@ def _row_to_dict(row: CotWeekly) -> dict:
 
 @router.get("")
 def get_cot(
+    response: Response,
     after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),
     db: Session = Depends(get_db),
 ):
+    response.headers["Cache-Control"] = "public, max-age=300"
     query = db.query(CotWeekly).order_by(CotWeekly.date.asc())
     if after:
         try:

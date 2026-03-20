@@ -1,6 +1,6 @@
 # backend/routes/freight.py
 from datetime import date, timedelta
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 from database import get_db
 from models import FreightRate
@@ -51,7 +51,8 @@ def _history_rows(db: Session, index_code: str, days: int = 84) -> list[FreightR
 
 
 @router.get("")
-def get_freight(db: Session = Depends(get_db)):
+def get_freight(response: Response, db: Session = Depends(get_db)):
+    response.headers["Cache-Control"] = "public, max-age=300"
     indices = {cfg[3] for cfg in ROUTE_CONFIG}
     latest = {idx: _latest_rate(db, idx) for idx in indices}
     prev   = {idx: _prev_rate(db, idx)   for idx in indices}

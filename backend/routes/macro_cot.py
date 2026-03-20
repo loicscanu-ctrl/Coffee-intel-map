@@ -2,7 +2,7 @@
 from datetime import date as DateType, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -37,9 +37,11 @@ def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
 
 @router.get("")
 def get_macro_cot(
+    response: Response,
     after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),
     db: Session = Depends(get_db),
 ):
+    response.headers["Cache-Control"] = "public, max-age=300"
     if after:
         try:
             cutoff = DateType.fromisoformat(after)
