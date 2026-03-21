@@ -1,4 +1,4 @@
-name: COT Positions Scraper
+name: COT Scraper (Positions + Prices)
 
 on:
   schedule:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install sqlalchemy psycopg2-binary pandas requests
+        run: pip install sqlalchemy psycopg2-binary pandas requests yfinance
 
       - name: Run COT scraper
         working-directory: backend
