@@ -2,8 +2,8 @@ fastapi
 uvicorn
 sqlalchemy
 psycopg2-binary
+python-dotenv
 pandas
 openpyxl
 xlrd
 requests
-yfinance>=0.2.40
