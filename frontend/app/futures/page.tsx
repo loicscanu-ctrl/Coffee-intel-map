@@ -164,10 +164,10 @@ const QUALITIES: Quality[] = [
   { key:"g3",    section:"GRADE 3  ·  SCREEN 12", label:"Standard",  desc:"FM 5%, 20-25%BB, MC 13%",           diff:-250           },
   { key:"g2",    section:"GRADE 2  ·  SCREEN 13", label:"★  Basis",  desc:"Standard, BB 5%, FM 1%, MC 13%",    diff:0,  isBasis:true },
   { key:"s16s",  section:"GRADE 1  ·  SCREEN 16", label:"Standard",  desc:"BB 2%, FM 0.5%, MC 12.5%",          diff:70             },
-  { key:"s16c",  section:"GRADE 1  ·  SCREEN 16", label:"Clean",     desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:120            },
+  { key:"s16c",  section:"GRADE 1  ·  SCREEN 16", label:"Clean",     desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:130            },
   { key:"s16wp", section:"GRADE 1  ·  SCREEN 16", label:"WP",        desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:190            },
   { key:"s18s",  section:"GRADE 1  ·  SCREEN 18", label:"Standard",  desc:"BB 2%, FM 0.5%, MC 12.5%",          diff:80             },
-  { key:"s18c",  section:"GRADE 1  ·  SCREEN 18", label:"Clean",     desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:130            },
+  { key:"s18c",  section:"GRADE 1  ·  SCREEN 18", label:"Clean",     desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:140            },
   { key:"s18wp", section:"GRADE 1  ·  SCREEN 18", label:"WP",        desc:"Black 0.1%, Broken 0.3%, FM 0.1%",  diff:200            },
 ];
 
