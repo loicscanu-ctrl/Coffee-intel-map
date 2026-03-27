@@ -196,7 +196,8 @@ COMMODITY_SPECS = {
     "cftc_filter": None,
     "ice_filter": "ICE Robusta Coffee Futures - ICE Futures Europe",
     "yfinance_ticker": None, "price_proxy": None,
-    "price_source": "cot_weekly",
+    "price_source": "stooq",
+    "stooq_ticker": "RM.F",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
   },
   "cocoa_ny": {
@@ -252,21 +253,47 @@ COMMODITY_SPECS = {
   },
 }
 
-# ── CFTC column name constants ─────────────────────────────────────────────────
+# ── CFTC / ICE column name constants (both files use the same disaggregated format) ──
 _CFTC_MARKET_COL = "Market_and_Exchange_Names"
 _CFTC_DATE_COL   = "As_of_Date_In_Form_YYMMDD"
+_CFTC_OI         = "Open_Interest_All"
 _CFTC_MM_LONG    = "M_Money_Positions_Long_All"
 _CFTC_MM_SHORT   = "M_Money_Positions_Short_All"
 _CFTC_MM_SPREAD  = "M_Money_Positions_Spread_All"
-_CFTC_OI         = "Open_Interest_All"
 
-# ICE Europe COT file uses the same CFTC disaggregated format with identical column names.
 _ICE_MARKET_COL  = "Market_and_Exchange_Names"
 _ICE_DATE_COL    = "As_of_Date_In_Form_YYMMDD"
+_ICE_OI          = "Open_Interest_All"
 _ICE_MM_LONG     = "M_Money_Positions_Long_All"
 _ICE_MM_SHORT    = "M_Money_Positions_Short_All"
 _ICE_MM_SPREAD   = "M_Money_Positions_Spread_All"
-_ICE_OI          = "Open_Interest_All"
+
+# Full position breakdown columns (identical names in CFTC and ICE disaggregated files)
+_COL_PMPU_LONG    = "Prod_Merc_Positions_Long_All"
+_COL_PMPU_SHORT   = "Prod_Merc_Positions_Short_All"
+_COL_SWAP_LONG    = "Swap_Positions_Long_All"
+_COL_SWAP_SHORT   = "Swap_Positions_Short_All"
+_COL_SWAP_SPREAD  = "Swap_Positions_Spread_All"
+_COL_OTHER_LONG   = "Other_Rept_Positions_Long_All"
+_COL_OTHER_SHORT  = "Other_Rept_Positions_Short_All"
+_COL_OTHER_SPREAD = "Other_Rept_Positions_Spread_All"
+_COL_NR_LONG      = "NonRept_Positions_Long_All"
+_COL_NR_SHORT     = "NonRept_Positions_Short_All"
+
+# Trader count columns (identical names in CFTC and ICE disaggregated files)
+_COL_T_PMPU_LONG    = "Traders_Prod_Merc_Long_All"
+_COL_T_PMPU_SHORT   = "Traders_Prod_Merc_Short_All"
+_COL_T_SWAP_LONG    = "Traders_Swap_Long_All"
+_COL_T_SWAP_SHORT   = "Traders_Swap_Short_All"
+_COL_T_SWAP_SPREAD  = "Traders_Swap_Spread_All"
+_COL_T_MM_LONG      = "Traders_M_Money_Long_All"
+_COL_T_MM_SHORT     = "Traders_M_Money_Short_All"
+_COL_T_MM_SPREAD    = "Traders_M_Money_Spread_All"
+_COL_T_OTHER_LONG   = "Traders_Other_Rept_Long_All"
+_COL_T_OTHER_SHORT  = "Traders_Other_Rept_Short_All"
+_COL_T_OTHER_SPREAD = "Traders_Other_Rept_Spread_All"
+_COL_T_NR_LONG      = "Traders_NonRept_Long_All"
+_COL_T_NR_SHORT     = "Traders_NonRept_Short_All"
 
 
 def _safe_int(val, default: int = 0) -> int:
@@ -279,6 +306,14 @@ def _safe_int(val, default: int = 0) -> int:
     try:
         return int(val)
     except (TypeError, ValueError):
+        return default
+
+
+def _row_int(row, col: str, default=0):
+    """Safely read an integer column from a pandas Series; return default if column absent."""
+    try:
+        return _safe_int(row[col], default)
+    except KeyError:
         return default
 
 
@@ -387,6 +422,91 @@ def _parse_ice(df: pd.DataFrame) -> dict:
     return results
 
 
+def _parse_full_symbol(df: pd.DataFrame, market_col: str, date_col: str,
+                       market_filter: str, has_nr_traders: bool = True):
+    """Extract full position breakdown + trader counts for one market filter.
+    Returns (report_date, fields_dict) or None if no rows matched.
+    Works with both CFTC and ICE disaggregated CSV files (same column format).
+    Only position/trader fields are returned — price fields are left for Excel import.
+    """
+    mask = df[market_col].str.contains(market_filter, na=False, regex=False)
+    rows = df[mask]
+    if rows.empty:
+        return None
+    exact = rows[rows[market_col].str.strip() == market_filter]
+    if not exact.empty:
+        rows = exact
+    rows = rows.copy()
+    rows["_date_parsed"] = pd.to_datetime(rows[date_col], format="%y%m%d", errors="coerce")
+    rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
+    row = rows.iloc[0]
+    report_date = row["_date_parsed"].date()
+
+    fields = {
+        "oi_total":      _row_int(row, _CFTC_OI),
+        "pmpu_long":     _row_int(row, _COL_PMPU_LONG),
+        "pmpu_short":    _row_int(row, _COL_PMPU_SHORT),
+        "swap_long":     _row_int(row, _COL_SWAP_LONG),
+        "swap_short":    _row_int(row, _COL_SWAP_SHORT),
+        "swap_spread":   _row_int(row, _COL_SWAP_SPREAD),
+        "mm_long":       _row_int(row, _CFTC_MM_LONG),
+        "mm_short":      _row_int(row, _CFTC_MM_SHORT),
+        "mm_spread":     _row_int(row, _CFTC_MM_SPREAD),
+        "other_long":    _row_int(row, _COL_OTHER_LONG),
+        "other_short":   _row_int(row, _COL_OTHER_SHORT),
+        "other_spread":  _row_int(row, _COL_OTHER_SPREAD),
+        "nr_long":       _row_int(row, _COL_NR_LONG),
+        "nr_short":      _row_int(row, _COL_NR_SHORT),
+        # Trader counts: use None (not 0) when column absent or value is 0
+        # so the UI can distinguish "no data" from "genuinely zero traders"
+        "t_pmpu_long":    _row_int(row, _COL_T_PMPU_LONG)    or None,
+        "t_pmpu_short":   _row_int(row, _COL_T_PMPU_SHORT)   or None,
+        "t_swap_long":    _row_int(row, _COL_T_SWAP_LONG)    or None,
+        "t_swap_short":   _row_int(row, _COL_T_SWAP_SHORT)   or None,
+        "t_swap_spread":  _row_int(row, _COL_T_SWAP_SPREAD)  or None,
+        "t_mm_long":      _row_int(row, _COL_T_MM_LONG)      or None,
+        "t_mm_short":     _row_int(row, _COL_T_MM_SHORT)     or None,
+        "t_mm_spread":    _row_int(row, _COL_T_MM_SPREAD)    or None,
+        "t_other_long":   _row_int(row, _COL_T_OTHER_LONG)   or None,
+        "t_other_short":  _row_int(row, _COL_T_OTHER_SHORT)  or None,
+        "t_other_spread": _row_int(row, _COL_T_OTHER_SPREAD) or None,
+        "t_nr_long":      (_row_int(row, _COL_T_NR_LONG)  or None) if has_nr_traders else None,
+        "t_nr_short":     (_row_int(row, _COL_T_NR_SHORT) or None) if has_nr_traders else None,
+    }
+    return report_date, fields
+
+
+def _fetch_stooq_prices(symbols_dates: list) -> dict:
+    """Fetch latest closing prices from stooq.com for [(symbol, date), ...].
+    Returns {(symbol, date): price}. Uses the latest-quote endpoint since
+    stooq does not provide historical data for continuous futures like RM.F.
+    The price is keyed by the COT report date even though it is the most
+    recent available quote (typically within a few days of the COT date).
+    """
+    results = {}
+    for sym, dt in symbols_dates:
+        ticker = COMMODITY_SPECS[sym].get("stooq_ticker", "")
+        if not ticker:
+            continue
+        url = f"https://stooq.com/q/l/?s={ticker}&f=sd2ohlcv&h&e=csv"
+        try:
+            resp = requests.get(url, timeout=15)
+            resp.raise_for_status()
+            df = pd.read_csv(io.StringIO(resp.text))
+            if df.empty or "Close" not in df.columns:
+                print(f"[macro_cot] stooq: no data for {ticker}", file=sys.stderr)
+                continue
+            price = float(df["Close"].iloc[0])
+            if price <= 0:
+                print(f"[macro_cot] stooq: invalid price {price} for {ticker}", file=sys.stderr)
+                continue
+            results[(sym, dt)] = price
+            print(f"[macro_cot] stooq {ticker}: {price} (keyed to COT date {dt})", file=sys.stderr)
+        except Exception as e:
+            print(f"[macro_cot] stooq error for {ticker}: {e}", file=sys.stderr)
+    return results
+
+
 def _fetch_yfinance_prices(symbols_dates: list) -> dict:
     """Batch-fetch prices for [(symbol, date), ...] using yfinance.
     Returns {(symbol, date): price_usd}. Groups by ticker to minimise API calls.
@@ -427,7 +547,7 @@ def _fetch_yfinance_prices(symbols_dates: list) -> dict:
 
 def _fetch_and_upsert(db) -> None:
     from scraper.db_macro import upsert_commodity_cot, upsert_commodity_price
-    from models import CotWeekly
+    from scraper.db import upsert_cot_weekly
 
     today = date.today()
     year  = today.year
@@ -454,9 +574,36 @@ def _fetch_and_upsert(db) -> None:
     cot_data.update(_parse_cftc(cftc_df))
     cot_data.update(_parse_ice(ice_df))
 
-    # Upsert COT rows
+    # Upsert COT rows into commodity_cot (all symbols)
     for sym, (report_date, fields) in cot_data.items():
         upsert_commodity_cot(db, sym, report_date, fields)
+
+    # ── Upsert full positions + trader counts into cot_weekly for arabica/robusta ──
+    # This keeps the Dry Powder chart current without requiring a manual Excel import.
+    # Only position/trader fields are written; price fields remain under Excel-import control.
+    arabica_full = _parse_full_symbol(
+        cftc_df, _CFTC_MARKET_COL, _CFTC_DATE_COL,
+        COMMODITY_SPECS["arabica"]["cftc_filter"],
+        has_nr_traders=True,
+    )
+    if arabica_full:
+        ard, arf = arabica_full
+        upsert_cot_weekly("ny", ard, arf)
+        print(f"[macro_cot] cot_weekly ny upserted for {ard}", file=sys.stderr)
+    else:
+        print("[macro_cot] WARNING: arabica full parse returned no data", file=sys.stderr)
+
+    robusta_full = _parse_full_symbol(
+        ice_df, _ICE_MARKET_COL, _ICE_DATE_COL,
+        COMMODITY_SPECS["robusta"]["ice_filter"],
+        has_nr_traders=False,
+    )
+    if robusta_full:
+        rbd, rbf = robusta_full
+        upsert_cot_weekly("ldn", rbd, rbf)
+        print(f"[macro_cot] cot_weekly ldn upserted for {rbd}", file=sys.stderr)
+    else:
+        print("[macro_cot] WARNING: robusta full parse returned no data", file=sys.stderr)
 
     # Build yfinance fetch list (yfinance + yfinance_gbp both need price download)
     yfinance_pairs = [
@@ -465,6 +612,14 @@ def _fetch_and_upsert(db) -> None:
         if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
     price_cache = _fetch_yfinance_prices(yfinance_pairs)
+
+    # Build stooq fetch list
+    stooq_pairs = [
+        (sym, cot_data[sym][0])
+        for sym in cot_data
+        if COMMODITY_SPECS[sym]["price_source"] == "stooq"
+    ]
+    stooq_cache = _fetch_stooq_prices(stooq_pairs)
 
     # Fetch GBP/USD rates for any yfinance_gbp symbols
     gbp_dates = {
@@ -508,15 +663,12 @@ def _fetch_and_upsert(db) -> None:
             converted = proxy_price * spec["proxy_to_usd_per_mt_factor"]
             upsert_commodity_price(db, sym, report_date, converted)
 
-        elif src == "cot_weekly":
-            # Robusta: read price_ldn from cot_weekly table for matching date
-            row = (db.query(CotWeekly)
-                     .filter_by(market="ldn", date=report_date)
-                     .first())
-            if row and row.price_ldn:
-                upsert_commodity_price(db, sym, report_date, float(row.price_ldn))
-            else:
-                print(f"[macro_cot] WARNING: no cot_weekly price_ldn for robusta on {report_date}", file=sys.stderr)
+        elif src == "stooq":
+            price = stooq_cache.get((sym, report_date))
+            if price is None:
+                print(f"[macro_cot] WARNING: no stooq price for {sym} on {report_date}", file=sys.stderr)
+                continue
+            upsert_commodity_price(db, sym, report_date, price)
 
 
 async def run(page):  # page unused — no browser needed

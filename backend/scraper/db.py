@@ -26,8 +26,14 @@ def upsert_news_item(db, item: dict):
     # For price items, replace any existing entry from the same source
     tags = item.get("tags", [])
     replace_tags = {"price", "cot", "futures_chain"}
-    if replace_tags.intersection(tags) and item.get("source"):
-        # Also match by title prefix to distinguish KC vs RM futures chains
+    if "futures" in tags and "price" in tags and item.get("source"):
+        # Futures chain: keep history — only replace same-date entry (title includes date)
+        (db.query(NewsItem)
+           .filter(NewsItem.title == item["title"])
+           .delete(synchronize_session=False))
+        db.commit()
+    elif replace_tags.intersection(tags) and item.get("source"):
+        # Other price items: replace by source + title prefix (no history needed)
         title_prefix = item["title"].split("–")[0].strip()
         (db.query(NewsItem)
            .filter(NewsItem.source == item["source"],

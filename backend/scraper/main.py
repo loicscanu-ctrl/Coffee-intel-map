@@ -8,10 +8,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from playwright.async_api import async_playwright
 from scraper.db import get_session, upsert_news_item
-from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea
+from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf
 from scraper.sources import macro_cot as _macro_cot
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf]
 SCHEDULED_HOUR_UTC = 1  # Run daily at 01:00 UTC
 
 async def run_all_scrapers():

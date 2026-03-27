@@ -1,6 +1,8 @@
 import { fetchNews, fetchMapCountries, fetchMapFactories } from "@/lib/api";
 import MapPageClient from "./MapPageClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function MapPage() {
   const [news, countries, factories] = await Promise.all([
     fetchNews().catch(() => []),

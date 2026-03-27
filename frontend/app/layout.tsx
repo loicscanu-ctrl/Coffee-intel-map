@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full">
       <body className={`${inter.className} h-full flex flex-col bg-gray-950`}>
         <TabNav />
-        <main className="flex-1 overflow-hidden">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </body>
     </html>
   );

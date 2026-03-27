@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchNews } from "@/lib/api";
+import OIHistoryTable from "@/components/futures/OIHistoryTable";
+import OIFndChart from "@/components/futures/OIFndChart";
 
 interface Contract {
   contract: string;
@@ -9,28 +11,7 @@ interface Contract {
   chg: number;
   oi: number;
   volume: number;
-  spread_vol?: number;
-  efp_efs?: number;
   symbol: string;
-}
-
-interface CotGroup {
-  long: number;
-  short: number;
-  spread?: number;
-  d_long: number;
-  d_short: number;
-  d_spread?: number;
-}
-
-interface CotData {
-  report_date: string;
-  open_interest: number;
-  pmpu: CotGroup;
-  swap: CotGroup;
-  mm: CotGroup;
-  other: CotGroup;
-  nr: CotGroup;
 }
 
 interface NewsItem {
@@ -58,10 +39,6 @@ function fmtChg(n: number) {
   if (n == null) return "—";
   return (n >= 0 ? "+" : "") + n.toFixed(2);
 }
-function fmtChgInt(n: number) {
-  if (n == null) return "—";
-  return (n >= 0 ? "+" : "") + n.toLocaleString();
-}
 
 // ─── First Notice Day ─────────────────────────────────────────────────────────
 
@@ -69,6 +46,13 @@ const LETTER_TO_MONTH: Record<string, number> = {
   F:1, G:2, H:3, J:4, K:5, M:6, N:7, Q:8, U:9, V:10, X:11, Z:12,
 };
 const MONTH_ABB = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function prevBizDay(dateStr: string): string {
+  const [y, m, d] = dateStr.slice(0, 10).split("-").map(Number);
+  const dt = new Date(y, m - 1, d - 1);
+  while (dt.getDay() === 0 || dt.getDay() === 6) dt.setDate(dt.getDate() - 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+}
 
 function firstBusinessDay(year: number, month: number): Date {
   // month is 1-indexed; returns first business day of that month
@@ -118,22 +102,20 @@ function ChainTable({ item }: { item: NewsItem }) {
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
-      <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-        <span className={`font-semibold text-sm ${accent}`}>{label}</span>
-        <span className="text-xs text-slate-500">Barchart · {item.pub_date?.slice(0, 10)}</span>
+      <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between min-h-[40px]">
+        <span className={`font-semibold text-sm whitespace-nowrap ${accent}`}>{label}</span>
+        <span className="text-xs text-slate-500 whitespace-nowrap ml-2">Barchart · {prevBizDay(item.pub_date ?? "")}</span>
       </div>
       <table className="w-full text-xs font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left  px-3 py-2 w-28">Contract</th>
-            <th className="text-center px-2 py-2 w-20">FND</th>
-            <th className="text-left  px-2 py-2 w-24">Expiry</th>
-            <th className="text-right px-3 py-2">Last ({unit})</th>
-            <th className="text-right px-2 py-2">Chg</th>
-            <th className="text-right px-2 py-2">OI</th>
-            <th className="text-right px-2 py-2">Vol</th>
-            <th className="text-right px-2 py-2">Spread Vol</th>
-            <th className="text-right px-2 py-2">EFP &amp; EFS</th>
+            <th className="text-left  px-3 py-2 w-28 whitespace-nowrap">Contract</th>
+            <th className="text-center px-2 py-2 w-20 whitespace-nowrap">FND</th>
+            <th className="text-left  px-2 py-2 w-24 whitespace-nowrap">Expiry</th>
+            <th className="text-right px-3 py-2 whitespace-nowrap">Last ({unit})</th>
+            <th className="text-right px-2 py-2 whitespace-nowrap">Chg</th>
+            <th className="text-right px-2 py-2 whitespace-nowrap">OI</th>
+            <th className="text-right px-2 py-2 whitespace-nowrap">Vol</th>
           </tr>
         </thead>
         <tbody>
@@ -148,77 +130,6 @@ function ChainTable({ item }: { item: NewsItem }) {
                 <td className={`px-2 py-2 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
                 <td className="px-2 py-2 text-right">{fmt(c.oi)}</td>
                 <td className="px-2 py-2 text-right text-slate-400">{fmt(c.volume)}</td>
-                <td className="px-2 py-2 text-right text-slate-400">{c.spread_vol != null ? fmt(c.spread_vol) : "—"}</td>
-                <td className="px-2 py-2 text-right text-slate-400">{c.efp_efs != null ? fmt(c.efp_efs) : "—"}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ─── COT Table ────────────────────────────────────────────────────────────────
-
-function CotTable({ item }: { item: NewsItem }) {
-  let cot: CotData | null = null;
-  try { cot = item.meta ? JSON.parse(item.meta) : null; } catch { return null; }
-  if (!cot) return null;
-
-  const isArabica = item.tags.includes("arabica");
-  const cotLabel  = isArabica
-    ? "CFTC Disaggregated COT — Coffee C (NY Arabica)"
-    : "ICE Disaggregated COT — Robusta Coffee (London)";
-  const accent = isArabica ? "text-blue-400" : "text-emerald-400";
-
-  const rows: { label: string; key: keyof CotData }[] = [
-    { label: "Producer / Merchant (PMPU)", key: "pmpu"  },
-    { label: "Swap Dealers",               key: "swap"  },
-    { label: "Managed Money (MM)",         key: "mm"    },
-    { label: "Other Reportables",          key: "other" },
-    { label: "Non-Reportables",            key: "nr"    },
-  ];
-
-  return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden mb-4">
-      <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-        <span className={`font-semibold text-sm ${accent}`}>{cotLabel}</span>
-        <span className="text-xs text-slate-500">
-          Report: {cot.report_date} · OI: {fmt(cot.open_interest)}
-        </span>
-      </div>
-      <table className="w-full text-xs font-mono">
-        <thead>
-          <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left  px-3 py-2 w-52">Category</th>
-            <th className="text-right px-3 py-2">Long</th>
-            <th className="text-right px-3 py-2">ΔLong</th>
-            <th className="text-right px-3 py-2">Short</th>
-            <th className="text-right px-3 py-2">ΔShort</th>
-            <th className="text-right px-3 py-2">Spreading</th>
-            <th className="text-right px-3 py-2">ΔSpread</th>
-            <th className="text-right px-3 py-2">Net</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(({ label, key }) => {
-            const g = cot![key] as CotGroup;
-            if (!g) return null;
-            const net      = g.long - g.short;
-            const netColor = net >= 0 ? "text-emerald-400" : "text-red-400";
-            const dlColor  = (g.d_long  ?? 0) >= 0 ? "text-emerald-400/70" : "text-red-400/70";
-            const dsColor  = (g.d_short ?? 0) >= 0 ? "text-emerald-400/70" : "text-red-400/70";
-            return (
-              <tr key={key} className="border-t border-slate-800 text-slate-300">
-                <td className="px-3 py-2 text-slate-400">{label}</td>
-                <td className="px-3 py-2 text-right">{fmt(g.long)}</td>
-                <td className={`px-3 py-2 text-right ${dlColor}`}>{fmtChgInt(g.d_long)}</td>
-                <td className="px-3 py-2 text-right">{fmt(g.short)}</td>
-                <td className={`px-3 py-2 text-right ${dsColor}`}>{fmtChgInt(g.d_short)}</td>
-                <td className="px-3 py-2 text-right text-slate-500">{g.spread != null ? fmt(g.spread) : "—"}</td>
-                <td className="px-3 py-2 text-right text-slate-500">{g.d_spread != null ? fmtChgInt(g.d_spread) : "—"}</td>
-                <td className={`px-3 py-2 text-right font-bold ${netColor}`}>{fmtChgInt(net)}</td>
               </tr>
             );
           })}
@@ -300,8 +211,9 @@ function QuotationTab({ contracts = [], vndPrice, usdvnd }: { contracts?: Contra
   // 8 shipping months base (stable, only depends on today)
   const monthsBase = useMemo(() => {
     const today = new Date();
+    const offset = today.getDate() >= 20 ? 1 : 0;
     return Array.from({ length: 8 }, (_, i) => {
-      const d  = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      const d  = new Date(today.getFullYear(), today.getMonth() + offset + i, 1);
       const mo = d.getMonth() + 1;
       const yr = d.getFullYear();
       const letter = SHIPMENT_TO_CONTRACT[mo];
@@ -571,7 +483,6 @@ export default function FuturesPage() {
 
   const items        = allItems.filter(i => i.tags?.includes("futures"));
   const chains       = items.filter(i => i.tags.includes("price") && i.meta);
-  const cots         = items.filter(i => i.tags.includes("cot")   && i.meta);
   const robustaChain = chains.find(i => i.tags.includes("robusta"));
   const arabicaChain = chains.find(i => i.tags.includes("arabica"));
 
@@ -616,12 +527,27 @@ export default function FuturesPage() {
               No futures data yet — check back after the next scrape run.
             </p>
           )}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {robustaChain && <ChainTable item={robustaChain} />}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {arabicaChain && <ChainTable item={arabicaChain} />}
+            {robustaChain && <ChainTable item={robustaChain} />}
           </div>
-          <div className="space-y-0 mt-4">
-            {cots.map(item => <CotTable key={item.id} item={item} />)}
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                NY OI — 7-day tracking
+              </h3>
+              <OIHistoryTable market="arabica" />
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                LDN OI — 7-day tracking
+              </h3>
+              <OIHistoryTable market="robusta" />
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <OIFndChart market="arabica" />
+            <OIFndChart market="robusta" />
           </div>
         </>
       )}

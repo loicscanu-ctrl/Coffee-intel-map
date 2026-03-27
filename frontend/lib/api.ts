@@ -16,11 +16,15 @@ async function cachedFetch(url: string): Promise<any> {
 }
 
 export async function fetchMapCountries() {
-  return cachedFetch(`${API_URL}/api/map/countries`);
+  const res = await fetch(`${API_URL}/api/map/countries`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+  return res.json();
 }
 
 export async function fetchMapFactories() {
-  return cachedFetch(`${API_URL}/api/map/factories`);
+  const res = await fetch(`${API_URL}/api/map/factories`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+  return res.json();
 }
 
 export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
@@ -31,7 +35,10 @@ export async function fetchNews(category?: string) {
   const url = category
     ? `${API_URL}/api/news?category=${category}`
     : `${API_URL}/api/news`;
-  return cachedFetch(url);
+  // no-store: bypass Next.js Data Cache so SSR always gets fresh news
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${url}`);
+  return res.json();
 }
 
 export async function fetchFreight() {

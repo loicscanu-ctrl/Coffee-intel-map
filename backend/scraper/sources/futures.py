@@ -8,9 +8,23 @@ import zipfile
 import io
 import csv
 from datetime import date
-from scraper.db import upsert_cot_weekly
+from scraper.db import upsert_cot_weekly, get_session
+from scraper.db_macro import upsert_commodity_price
 
-_TODAY = lambda: date.today().isoformat()
+def _oi_trade_date() -> str:
+    """Return the OI trade date as YYYY-MM-DD.
+    Barchart/ICE shows a 2-business-day lag: data fetched today reflects
+    positions as of 2 trading days ago."""
+    from datetime import timedelta
+    d = date.today()
+    skipped = 0
+    while skipped < 2:
+        d -= timedelta(days=1)
+        if d.weekday() < 5:
+            skipped += 1
+    return d.isoformat()
+
+_TODAY = _oi_trade_date
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Barchart – futures chain (price + OI per contract)
@@ -20,7 +34,7 @@ _BARCHART_CHAIN_URL = (
     "https://www.barchart.com/proxies/core-api/v1/quotes/get"
     "?symbol={sym}"
     "&fields=symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode"
-    "&orderBy=contractExpirationDate&orderDir=asc&limit=8&raw=1"
+    "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
 )
 
 _BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
@@ -57,7 +71,7 @@ async def _get_xsrf_and_fetch_chains(page) -> dict:
                 const h = { credentials: 'include', headers: { 'x-xsrf-token': xsrf, 'accept': 'application/json' } };
                 const base = 'https://www.barchart.com/proxies/core-api/v1/quotes/get';
                 const fields = 'symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode';
-                const opts = '&orderBy=contractExpirationDate&orderDir=asc&limit=8&raw=1';
+                const opts = '&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1';
 
                 const [kcResp, rmResp] = await Promise.all([
                     fetch(base + '?symbol=KC%5EF&fields=' + fields + opts, h),
@@ -386,88 +400,6 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DRAFT: Barchart /futures-spreads spread volume scraper (NOT wired to run())
-# Scrapes the calendar spread contracts page to get per-spread-pair volume,
-# then aggregates by outright contract symbol so each contract gets a spread_vol.
-# Usage (manual testing only): await _scrape_spread_volume_draft(page)
-# ─────────────────────────────────────────────────────────────────────────────
-
-async def _scrape_spread_volume_draft(page) -> dict[str, int]:
-    """
-    DRAFT — not called from run().
-    Navigates to Barchart's /futures-spreads pages for KC and RM,
-    waits for JS rendering, extracts spread contract rows, and returns
-    a dict mapping outright contract symbol → aggregated spread volume.
-
-    Example return:
-      {"KCK26": 8420, "KCN26": 8420, "KCU26": 3100, ...}
-    Each contract's spread_vol is the sum of volumes of all spread pairs
-    that include that contract month.
-    """
-    import re as _re
-    spread_vol: dict[str, int] = {}
-
-    browser = page.context.browser
-    ctx = await browser.new_context(
-        user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
-        )
-    )
-    pg = await ctx.new_page()
-    try:
-        for root in ("KC", "RM"):
-            url = f"https://www.barchart.com/futures/quotes/{root}*0/futures-spreads"
-            await pg.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await pg.wait_for_timeout(5000)  # wait for Vue/SPA to render
-
-            # Extract spread rows from the rendered DOM.
-            # Barchart renders a table where each row has data-symbol like "_S_SP_KCK26_KCN26"
-            # and shows volume. We grab all rows with that pattern.
-            rows = await pg.evaluate("""
-                () => {
-                    const results = [];
-                    // Try data-symbol rows first
-                    document.querySelectorAll('[data-symbol]').forEach(el => {
-                        const sym = el.getAttribute('data-symbol') || '';
-                        if (!sym.includes('_S_SP_')) return;
-                        // Look for volume cell (typically last numeric td)
-                        const cells = el.querySelectorAll('td');
-                        let vol = null;
-                        cells.forEach(td => {
-                            const txt = td.textContent.trim().replace(/,/g, '');
-                            if (/^\\d+$/.test(txt) && parseInt(txt) > 0) vol = parseInt(txt);
-                        });
-                        if (vol !== null) results.push({ sym, vol });
-                    });
-                    return results;
-                }
-            """)
-
-            for row in rows:
-                sym = row.get("sym", "")
-                vol = row.get("vol", 0)
-                if not vol:
-                    continue
-                # Parse legs from symbol like "_S_SP_KCK26_KCN26"
-                m = _re.match(r"_S_SP_([A-Z0-9]+)_([A-Z0-9]+)", sym)
-                if not m:
-                    continue
-                leg1, leg2 = m.group(1), m.group(2)
-                spread_vol[leg1] = spread_vol.get(leg1, 0) + vol
-                spread_vol[leg2] = spread_vol.get(leg2, 0) + vol
-
-            print(f"[futures draft] {root} spread vol: {len(rows)} spread pairs parsed")
-    except Exception as e:
-        print(f"[futures draft] spread volume scrape failed: {e}")
-    finally:
-        await ctx.close()
-
-    return spread_vol
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Entry point
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -553,6 +485,25 @@ async def run(page) -> list[dict]:
                     print(f"[futures] LDN chain upserted: exch_oi={nearby_oi_ldn}, structure={structure_ldn}")
                 except Exception as e:
                     print(f"[cot] Failed to upsert LDN chain fields for {report_date_ldn}: {e}")
+
+            # Store front-month RM price in commodity_prices (for Money Flow) and
+            # cot_weekly.price_ldn (for COT dashboard), both keyed by the COT report date.
+            # This means the price is always tied to the Tuesday COT date, not today.
+            front_rm_price = rm_contracts[0].get("last") if rm_contracts else None
+            if front_rm_price is not None:
+                try:
+                    _db = get_session()
+                    try:
+                        upsert_commodity_price(_db, "robusta", report_date_ldn, float(front_rm_price))
+                        print(f"[futures] Robusta price→commodity_prices: {report_date_ldn} = {front_rm_price} USD/MT")
+                    finally:
+                        _db.close()
+                except Exception as e:
+                    print(f"[futures] Failed to store robusta price in commodity_prices: {e}")
+                try:
+                    upsert_cot_weekly("ldn", report_date_ldn, {"price_ldn": float(front_rm_price)})
+                except Exception as e:
+                    print(f"[futures] Failed to store robusta price_ldn in cot_weekly: {e}")
     except Exception as e:
         print(f"[futures] ICE Robusta COT failed: {e}")
 

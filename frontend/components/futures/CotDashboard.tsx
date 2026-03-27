@@ -1,13 +1,22 @@
 "use client";
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, AreaChart, Area, BarChart, Bar, ComposedChart,
+  ResponsiveContainer, ComposedChart,
   ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea, Label,
 } from "recharts";
 import { fetchCot, fetchMacroCot, type MacroCotWeek } from "@/lib/api";
 import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
+import {
+  ARABICA_MT_FACTOR,
+  ROBUSTA_MT_FACTOR,
+  MARGIN_OUTRIGHT,
+  MARGIN_SPREAD,
+  CENTS_LB_TO_USD_TON,
+  transformApiData,
+} from "@/lib/cot/transformApiData";
+import { buildStandaloneHtml } from "@/lib/cot/standaloneTemplate";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -15,28 +24,21 @@ type Step = 1 | 2 | 3 | 4 | 5 | 6;
 // ── Inline SVG icons ───────────────────────────────────────────────────────────
 const ICONS: Record<string, React.ReactNode> = {
   Globe:    <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-  Activity: <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  Users:    <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
   Factory:  <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>,
   Droplets: <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7 2.9 7 2.9s-2.29 6.16-3.29 7.16C2.57 11.01 2 12.11 2 13.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 1 14 8c2 2 3 4.8 3 6.5s-1.8 3.5-4 3.5-4-1.5-4-3.5"/></svg>,
   Scale:    <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>,
+  Grid:    <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+  Sliders: <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>,
 };
 
 const NAV_STEPS = [
   { id: 1 as Step, icon: "Globe",    label: "Flow" },
-  { id: 2 as Step, icon: "Activity", label: "Structure" },
-  { id: 3 as Step, icon: "Users",    label: "Players" },
+  { id: 2 as Step, icon: "Grid",     label: "Heatmap" },
+  { id: 3 as Step, icon: "Sliders",  label: "Gauges" },
   { id: 4 as Step, icon: "Factory",  label: "Industry" },
   { id: 5 as Step, icon: "Droplets", label: "Dry Powder" },
   { id: 6 as Step, icon: "Scale",    label: "Cycle" },
 ];
-
-// ── Constants ──────────────────────────────────────────────────────────────────
-const ARABICA_MT_FACTOR = 17.01;
-const ROBUSTA_MT_FACTOR = 10.00;
-const MARGIN_OUTRIGHT   = 6000;
-const MARGIN_SPREAD     = 1200;
-const CENTS_LB_TO_USD_TON = 22.0462;
 
 // ── Macro COT helpers ──────────────────────────────────────────────────────────
 const SECTORS = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;
@@ -49,6 +51,17 @@ const SECTOR_COLORS: Record<string, string> = {
   micros: "#8b5cf6",
 };
 const ENERGY_SYMBOLS = new Set(["wti", "brent", "natgas", "heating_oil", "rbob", "lsgo"]);
+
+const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
+  { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
+  { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
+  { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
+  { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
+  { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
+  { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
+  { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
+  { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
+];
 
 function transformMacroData(
   weeks: MacroCotWeek[],
@@ -102,186 +115,6 @@ function transformMacroData(
     Math.abs(row.energy) + Math.abs(row.metals) + Math.abs(row.grains) +
     Math.abs(row.meats) + Math.abs(row.softs) + Math.abs(row.micros) > 0
   );
-}
-
-// ── Real data transform ─────────────────────────────────────────────────────
-function transformApiData(rows: any[]): any[] {
-  if (!rows.length) return [];
-
-  // Forward-fill missing market data (e.g. US holiday shifts NY release by 1 day)
-  let lastNY:  any = null;
-  let lastLDN: any = null;
-  const filledRows = rows.map(row => {
-    const ny  = row.ny  ?? lastNY  ?? null;
-    const ldn = row.ldn ?? lastLDN ?? null;
-    if (row.ny  != null) lastNY  = row.ny;
-    if (row.ldn != null) lastLDN = row.ldn;
-    return { ...row, ny, ldn };
-  });
-
-  let prevPriceNY  = 130;
-  let prevPriceLDN = 1800;
-  let cumulativeNominal = 0;
-  let cumulativeMargin  = 0;
-
-  // Pass 1: ordered for-loop — delta fields require access to previous row
-  const base: any[] = [];
-  for (let i = 0; i < filledRows.length; i++) {
-    const row = filledRows[i];
-    const ny  = row.ny  ?? {};
-    const ldn = row.ldn ?? {};
-
-    const oiNY  = ny.oi_total  ?? 0;
-    const oiLDN = ldn.oi_total ?? 0;
-    const totalOI = oiNY + oiLDN;
-
-    // Spreading — from RAW API spread fields (NOT from the ny/ldn sub-objects below)
-    const spreadingNY  = (ny.swap_spread  ?? 0) + (ny.mm_spread  ?? 0) + (ny.other_spread  ?? 0);
-    const spreadingLDN = (ldn.swap_spread ?? 0) + (ldn.mm_spread ?? 0) + (ldn.other_spread ?? 0);
-    const spreadingTotal = spreadingNY + spreadingLDN;
-    const outrightTotal  = totalOI - spreadingTotal;
-
-    // Price carry-forward
-    const priceNY  = ny.price_ny   != null ? ny.price_ny   : prevPriceNY;
-    const priceLDN = ldn.price_ldn != null ? ldn.price_ldn : prevPriceLDN;
-    prevPriceNY  = priceNY;
-    prevPriceLDN = priceLDN;
-
-    const priceNY_USD_Ton  = priceNY * CENTS_LB_TO_USD_TON;
-    const avgPrice_USD_Ton = totalOI > 0
-      ? ((priceNY_USD_Ton * oiNY) + (priceLDN * oiLDN)) / totalOI
-      : 0;
-
-    // Delta OI
-    const prev       = base[i - 1] ?? null;
-    const deltaOINY  = prev ? oiNY  - prev.oiNY  : 0;
-    const deltaOILDN = prev ? oiLDN - prev.oiLDN : 0;
-
-    // Weekly nominal flow ($M)
-    const flowNY  = (deltaOINY  * priceNY  * 375) / 1_000_000;
-    const flowLDN = (deltaOILDN * priceLDN * 10)  / 1_000_000;
-    const weeklyNominalFlow = flowNY + flowLDN;
-
-    // Weekly margin flow ($M)
-    const prevSpread   = prev ? prev.spreadingTotal : 0;
-    const prevOutright = prev ? prev.outrightTotal  : 0;
-    const deltaSpread   = spreadingTotal - prevSpread;
-    const deltaOutright = outrightTotal  - prevOutright;
-    const weeklyMarginFlow =
-      ((deltaOutright * MARGIN_OUTRIGHT) + (deltaSpread * MARGIN_SPREAD)) / 1_000_000;
-
-    cumulativeNominal += weeklyNominalFlow;
-    cumulativeMargin  += weeklyMarginFlow;
-
-    // ny/ldn sub-objects: camelCase OI fields used by Tabs 2-6
-    // nonRepLong (capital R) matches d.ny[`${cat}Long`] where cat="nonRep" in Tab 2
-    const nyObj = {
-      pmpuLong:    ny.pmpu_long   ?? 0,  pmpuShort:   ny.pmpu_short  ?? 0,  pmpuSpread:   0,
-      swapLong:    ny.swap_long   ?? 0,  swapShort:   ny.swap_short  ?? 0,  swapSpread:   ny.swap_spread  ?? 0,
-      mmLong:      ny.mm_long     ?? 0,  mmShort:     ny.mm_short    ?? 0,  mmSpread:     ny.mm_spread    ?? 0,
-      otherLong:   ny.other_long  ?? 0,  otherShort:  ny.other_short ?? 0,  otherSpread:  ny.other_spread ?? 0,
-      nonRepLong:  ny.nr_long     ?? 0,  nonRepShort: ny.nr_short    ?? 0,  nonRepSpread: 0,
-    };
-    const ldnObj = {
-      pmpuLong:    ldn.pmpu_long  ?? 0,  pmpuShort:   ldn.pmpu_short  ?? 0,  pmpuSpread:   0,
-      swapLong:    ldn.swap_long  ?? 0,  swapShort:   ldn.swap_short  ?? 0,  swapSpread:   ldn.swap_spread  ?? 0,
-      mmLong:      ldn.mm_long    ?? 0,  mmShort:     ldn.mm_short    ?? 0,  mmSpread:     ldn.mm_spread    ?? 0,
-      otherLong:   ldn.other_long ?? 0,  otherShort:  ldn.other_short ?? 0,  otherSpread:  ldn.other_spread ?? 0,
-      nonRepLong:  ldn.nr_long    ?? 0,  nonRepShort: ldn.nr_short    ?? 0,  nonRepSpread: 0,
-    };
-
-    // tradersNY/LDN: lowercase keys used by Tab 5 dpCats loop as m.tr["nonrep"]
-    const tradersNY = {
-      pmpu:   ny.t_pmpu_long  ?? 0,
-      mm:     ny.t_mm_long    ?? 0,
-      swap:   ny.t_swap_long  ?? 0,
-      other:  ny.t_other_long ?? 0,
-      nonrep: ny.t_nr_long    ?? 0,
-    };
-    const tradersNY_short = {
-      pmpu:   ny.t_pmpu_short  ?? 0,
-      mm:     ny.t_mm_short    ?? 0,
-      swap:   ny.t_swap_short  ?? 0,
-      other:  ny.t_other_short ?? 0,
-      nonrep: ny.t_nr_short    ?? 0,
-    };
-    const tradersLDN = {
-      pmpu:   ldn.t_pmpu_long  ?? 0,
-      mm:     ldn.t_mm_long    ?? 0,
-      swap:   ldn.t_swap_long  ?? 0,
-      other:  ldn.t_other_long ?? 0,
-      nonrep: 0,  // ICE has no NR trader count
-    };
-    const tradersLDN_short = {
-      pmpu:   ldn.t_pmpu_short  ?? 0,
-      mm:     ldn.t_mm_short    ?? 0,
-      swap:   ldn.t_swap_short  ?? 0,
-      other:  ldn.t_other_short ?? 0,
-      nonrep: 0,
-    };
-
-    const pmpuShortMT_NY  = nyObj.pmpuShort * ARABICA_MT_FACTOR;
-    const pmpuShortMT_LDN = ldnObj.pmpuShort * ROBUSTA_MT_FACTOR;
-    const pmpuLongMT_NY   = nyObj.pmpuLong  * ARABICA_MT_FACTOR;
-    const pmpuLongMT_LDN  = ldnObj.pmpuLong * ROBUSTA_MT_FACTOR;
-    const efpMT = (ny.efp_ny ?? 0) * ARABICA_MT_FACTOR;
-
-    base.push({
-      id: i,
-      date: row.date,
-      priceNY, priceLDN, avgPrice_USD_Ton,
-      oiNY, oiLDN, totalOI,
-      spreadingTotal, outrightTotal,
-      weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
-      ny: nyObj, ldn: ldnObj,
-      // Preserve forward-filled raw sub-objects for buildMarketMetrics (structure, exch_oi, t_mm_short)
-      rawNy: ny, rawLdn: ldn,
-      tradersNY, tradersNY_short, tradersLDN, tradersLDN_short,
-      pmpuShortMT_NY, pmpuShortMT_LDN,
-      pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,
-      pmpuLongMT_NY, pmpuLongMT_LDN,
-      pmpuLongMT: pmpuLongMT_NY + pmpuLongMT_LDN,
-      efpMT,
-      timeframe: "historical",
-    });
-  }
-
-  // Pass 2: timeframe buckets + 5-year (260-week) rolling ranks
-  const n = base.length;
-  return base.map((d, i) => {
-    const timeframe =
-      i === n - 1                ? "current"    :
-      i === n - 2                ? "recent_1"   :
-      (i >= n - 6 && i <= n - 3) ? "recent_4"  :
-      (i >= n - 58 && i <= n - 7) ? "year"      :
-                                    "historical";
-
-    const slice    = base.slice(Math.max(0, i - 260), i + 1);
-    const prices   = slice.map(s => s.priceNY);
-    const maxP     = Math.max(...prices);
-    const minP     = Math.min(...prices);
-    const net      = d.ny.mmLong - d.ny.mmShort;
-    const nets     = slice.map(s => s.ny.mmLong - s.ny.mmShort);
-    const maxNet   = Math.max(...nets);
-    const minNet   = Math.min(...nets);
-
-    const ldnPrices = slice.map(s => s.priceLDN);
-    const maxLP     = Math.max(...ldnPrices);
-    const minLP     = Math.min(...ldnPrices);
-    const netLDN    = d.ldn.mmLong - d.ldn.mmShort;
-    const netsLDN   = slice.map(s => s.ldn.mmLong - s.ldn.mmShort);
-    const maxNetLDN = Math.max(...netsLDN);
-    const minNetLDN = Math.min(...netsLDN);
-
-    return {
-      ...d,
-      timeframe,
-      priceRank:    maxP     !== minP     ? ((d.priceNY - minP)    / (maxP     - minP))     * 100 : 50,
-      oiRank:       maxNet   !== minNet   ? ((net       - minNet)   / (maxNet   - minNet))   * 100 : 50,
-      priceRankLDN: maxLP    !== minLP    ? ((d.priceLDN - minLP)   / (maxLP    - minLP))    * 100 : 50,
-      oiRankLDN:    maxNetLDN !== minNetLDN ? ((netLDN  - minNetLDN)/ (maxNetLDN - minNetLDN)) * 100 : 50,
-    };
-  });
 }
 
 // ── Data generation ────────────────────────────────────────────────────────────
@@ -401,141 +234,155 @@ function SectionHeader({ icon, title, subtitle }: { icon: string; title: string;
 
 type CpUnit = "contracts" | "mt" | "usd";
 
+const CP_CATS: { name: string; longF: string | string[]; shortF: string | string[]; longC: string; shortC: string }[] = [
+  { name: "PMPU",      longF: "pmpuLong",    shortF: "pmpuShort",    longC: "#92400e", shortC: "#92400e" },
+  { name: "Swap",      longF: "swapLong",    shortF: "swapShort",    longC: "#10b981", shortC: "#10b981" },
+  { name: "MM",        longF: "mmLong",      shortF: "mmShort",      longC: "#1e40af", shortC: "#1e40af" },
+  { name: "Other Rpt", longF: "otherLong",   shortF: "otherShort",   longC: "#38bdf8", shortC: "#38bdf8" },
+  { name: "Non-Rep",   longF: "nonRepLong",  shortF: "nonRepShort",  longC: "#64748b", shortC: "#64748b" },
+];
+const CP_SPREADS: { name: string; f: string; color: string }[] = [
+  { name: "MM",    f: "mmSpread",    color: "#f59e0b" },
+  { name: "Swap",  f: "swapSpread",  color: "#10b981" },
+  { name: "Other", f: "otherSpread", color: "#64748b" },
+];
+
 function RadialCounterparty({
-  latest, prev1, prev4, markets, unit,
+  latest, prev1, prev4, market, unit,
 }: {
   latest: any;
   prev1: any | null;
   prev4: any | null;
-  markets: { ny: boolean; ldn: boolean };
+  market: "ny" | "ldn";
   unit: CpUnit;
 }) {
-  const mtFactor = (m: "ny" | "ldn") => m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
-  const usdPerMT = (m: "ny" | "ldn") => m === "ny" ? latest.priceNY * CENTS_LB_TO_USD_TON : latest.priceLDN;
+  const mtFactor = market === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
+  const usdPerMT = market === "ny" ? latest.priceNY * CENTS_LB_TO_USD_TON : latest.priceLDN;
 
-  const convert = (contracts: number, m: "ny" | "ldn") => {
+  const cv = (row: any, field: string | string[]): number => {
+    const obj = row?.[market] ?? {};
+    const contracts: number = Array.isArray(field)
+      ? field.reduce((s: number, f: string) => s + (obj[f] ?? 0), 0)
+      : (obj[field] ?? 0);
     if (unit === "contracts") return contracts;
-    const mt = contracts * mtFactor(m);
-    return unit === "mt" ? mt : mt * usdPerMT(m);
+    const mt = contracts * mtFactor;
+    return unit === "mt" ? mt : mt * usdPerMT;
   };
 
-  const sumRow = (row: any, nyFields: string | string[], ldnFields: string | string[]) => {
-    const nyFs  = Array.isArray(nyFields)  ? nyFields  : [nyFields];
-    const ldnFs = Array.isArray(ldnFields) ? ldnFields : [ldnFields];
-    let v = 0;
-    if (markets.ny)  nyFs.forEach(f  => { v += convert(row?.ny[f]  ?? 0, "ny");  });
-    if (markets.ldn) ldnFs.forEach(f => { v += convert(row?.ldn[f] ?? 0, "ldn"); });
-    return v;
-  };
+  const gs = (row: any, f: string): number => row?.[market]?.[f] ?? 0;
 
-  const fmtVal = (v: number) => {
+  const fmtVal = (v: number): string => {
     if (unit === "usd") return `$${(v / 1_000_000_000).toFixed(2)}B`;
     if (unit === "mt")  return `${(v / 1_000).toFixed(0)}k MT`;
     return `${(v / 1_000).toFixed(0)}k lots`;
   };
-
-  const fmtDelta = (v: number) => {
+  const fmtDelta = (v: number): string => {
     const sign = v >= 0 ? "+" : "";
     if (unit === "usd") return `${sign}$${(v / 1_000_000).toFixed(0)}M`;
     if (unit === "mt")  return `${sign}${(v / 1_000).toFixed(1)}k`;
     return `${sign}${(v / 1_000).toFixed(1)}k`;
   };
+  const dc = (v: number | null, invert = false): string =>
+    v == null ? "text-slate-600" : v === 0 ? "text-slate-500"
+      : (invert ? v < 0 : v > 0) ? "text-emerald-400" : "text-red-400";
 
-  const LONG_CATS: { name: string; fill: string; f: string | string[] }[] = [
-    { name: "MM",        fill: "#f59e0b", f: "mmLong"                         },
-    { name: "Swap",      fill: "#10b981", f: "swapLong"                       },
-    { name: "PMPU",      fill: "#3b82f6", f: "pmpuLong"                       },
-    { name: "Oth/NR",    fill: "#64748b", f: ["otherLong", "nonRepLong"]      },
-  ];
-  const SHORT_CATS: { name: string; fill: string; f: string | string[] }[] = [
-    { name: "PMPU",      fill: "#3b82f6", f: "pmpuShort"                      },
-    { name: "MM",        fill: "#f59e0b", f: "mmShort"                        },
-    { name: "Swap",      fill: "#10b981", f: "swapShort"                      },
-    { name: "Oth/NR",    fill: "#64748b", f: ["otherShort", "nonRepShort"]    },
-  ];
+  const longData  = CP_CATS.map(c => ({ name: c.name + " Long",  value: cv(latest, c.longF),  fill: c.longC  }));
+  const shortData = CP_CATS.map(c => ({ name: c.name + " Short", value: cv(latest, c.shortF), fill: c.shortC }));
+  const pieData   = [...longData, ...shortData];
+  const totalLong = longData.reduce((s, d) => s + d.value, 0);
+  const oiTotal   = (market === "ny" ? latest.oiNY : latest.oiLDN) ?? 0;
+
+  const totalSpread     = CP_SPREADS.reduce((s, c) => s + gs(latest, c.f), 0);
+  const prevTotalSpread = prev1 ? CP_SPREADS.reduce((s, c) => s + gs(prev1, c.f), 0) : null;
+  const spreadWow       = prevTotalSpread != null ? totalSpread - prevTotalSpread : null;
 
   const tooltipStyle = { backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px" };
 
-  const sides = [
-    { label: "LONGS (Buyers)",  color: "text-emerald-400", dir:  1, cats: LONG_CATS  },
-    { label: "SHORTS (Sellers)", color: "text-red-400",    dir: -1, cats: SHORT_CATS },
-  ];
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[380px]">
-      {sides.map(side => {
-        const PIE_LABELS: Record<string, string> = { MM: "Managed Money", PMPU: "Industry (PMPU)", Swap: "Swap Dealers", "Oth/NR": "Other/Non-Rep" };
-        const pieData = side.cats.map(c => ({ name: PIE_LABELS[c.name] ?? c.name, value: sumRow(latest, c.f, c.f), fill: c.fill }));
-        const total   = pieData.reduce((s, d) => s + d.value, 0);
-        return (
-          <div key={side.label} className="h-full bg-slate-800/30 rounded-xl border border-slate-800/50 flex flex-col p-4">
-            <h4 className={`${side.color} font-bold text-xs uppercase tracking-widest text-center mb-2`}>{side.label}</h4>
-            <div className="flex flex-row flex-1 min-h-0 gap-3">
-              {/* Pie */}
-              <div className="flex-1 min-w-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={pieData} cx="50%" cy="50%"
-                      startAngle={90} endAngle={90 + side.dir * 360}
-                      innerRadius={52} outerRadius={80} paddingAngle={2} dataKey="value">
-                      {pieData.map((entry, i) => <Cell key={i} fill={entry.fill} stroke="rgba(0,0,0,0)" />)}
-                      <Label value={fmtVal(total)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" />
-                    </Pie>
-                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11 }}
-                      formatter={(v: any, name: any) => [fmtVal(Number(v)), name]} />
-                    <Legend verticalAlign="bottom" height={32} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-                  </PieChart>
-                </ResponsiveContainer>
+    <div>
+      {/* Combined half/half donut: longs on left, shorts on right */}
+      <div className="relative h-[220px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={pieData} cx="50%" cy="50%"
+              startAngle={90} endAngle={450}
+              innerRadius={46} outerRadius={82} paddingAngle={1} dataKey="value">
+              {pieData.map((_: any, i: number) => <Cell key={i} fill={pieData[i].fill} stroke="rgba(0,0,0,0)" />)}
+              <Label value={fmtVal(totalLong)} position="center" fill="#f1f5f9" fontSize={11} fontWeight="bold" dy={-7} />
+              <Label value={`OI: ${(oiTotal / 1000).toFixed(0)}k`} position="center" fill="#94a3b8" fontSize={9} dy={7} />
+            </Pie>
+            <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 10 }}
+              formatter={(v: any, name: any) => [fmtVal(Number(v)), name]} />
+          </PieChart>
+        </ResponsiveContainer>
+        <span className="absolute text-[8px] font-bold text-emerald-400 uppercase" style={{ top: "50%", left: 4, transform: "translateY(-50%)" }}>← L</span>
+        <span className="absolute text-[8px] font-bold text-red-400 uppercase" style={{ top: "50%", right: 4, transform: "translateY(-50%)" }}>S →</span>
+      </div>
+
+      {/* Delta table: L 1W | L 4W | S 1W | S 4W per category */}
+      <div className="mt-1">
+        <div className="grid pb-1 border-b border-slate-700/50 gap-1" style={{ gridTemplateColumns: "auto 1fr 1fr 1fr 1fr" }}>
+          <span></span>
+          <span className="text-[8px] text-emerald-700 font-bold text-center uppercase">L 1W</span>
+          <span className="text-[8px] text-emerald-700 font-bold text-center uppercase">L 4W</span>
+          <span className="text-[8px] text-red-700 font-bold text-center uppercase">S 1W</span>
+          <span className="text-[8px] text-red-700 font-bold text-center uppercase">S 4W</span>
+        </div>
+        {CP_CATS.map(cat => {
+          const ld1 = prev1 ? cv(latest, cat.longF)  - cv(prev1, cat.longF)  : null;
+          const ld4 = prev4 ? cv(latest, cat.longF)  - cv(prev4, cat.longF)  : null;
+          const sd1 = prev1 ? cv(latest, cat.shortF) - cv(prev1, cat.shortF) : null;
+          const sd4 = prev4 ? cv(latest, cat.shortF) - cv(prev4, cat.shortF) : null;
+          return (
+            <div key={cat.name} className="grid gap-1 py-0.5 items-center" style={{ gridTemplateColumns: "auto 1fr 1fr 1fr 1fr" }}>
+              <div className="flex items-center gap-1 pr-2">
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: cat.longC }} />
+                <span className="text-[8px] text-slate-400">{cat.name}</span>
               </div>
-              {/* Delta panel */}
-              <div className="w-[130px] flex flex-col justify-center border-l border-slate-700/50 pl-3 gap-2.5">
-                <div className="grid grid-cols-3 text-[9px] text-slate-500 font-bold uppercase pb-1 border-b border-slate-700/50">
-                  <span></span>
-                  <span className="text-center">1W</span>
-                  <span className="text-center">4W</span>
-                </div>
-                {(() => {
-                  const rows = side.cats.map(cat => {
-                    const curr = sumRow(latest, cat.f, cat.f);
-                    const d1   = prev1 ? curr - sumRow(prev1, cat.f, cat.f) : null;
-                    const d4   = prev4 ? curr - sumRow(prev4, cat.f, cat.f) : null;
-                    return { ...cat, d1, d4 };
-                  });
-                  const tot1 = prev1 ? rows.reduce((s, r) => s + (r.d1 ?? 0), 0) : null;
-                  const tot4 = prev4 ? rows.reduce((s, r) => s + (r.d4 ?? 0), 0) : null;
-                  return (
-                    <>
-                      {rows.map(row => (
-                        <div key={row.name} className="grid grid-cols-3 items-center gap-1">
-                          <div className="flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: row.fill }} />
-                            <span className="text-[9px] text-slate-400 font-medium">{row.name}</span>
-                          </div>
-                          <span className={`text-[10px] font-semibold text-center tabular-nums ${row.d1 == null ? "text-slate-600" : row.d1 > 0 ? "text-emerald-400" : row.d1 < 0 ? "text-red-400" : "text-slate-500"}`}>
-                            {row.d1 == null ? "—" : fmtDelta(row.d1)}
-                          </span>
-                          <span className={`text-[10px] font-semibold text-center tabular-nums ${row.d4 == null ? "text-slate-600" : row.d4 > 0 ? "text-emerald-400" : row.d4 < 0 ? "text-red-400" : "text-slate-500"}`}>
-                            {row.d4 == null ? "—" : fmtDelta(row.d4)}
-                          </span>
-                        </div>
-                      ))}
-                      <div className="grid grid-cols-3 items-center gap-1 pt-1.5 border-t border-slate-700/50">
-                        <span className="text-[9px] text-slate-300 font-bold uppercase">Total</span>
-                        <span className={`text-[10px] font-bold text-center tabular-nums ${tot1 == null ? "text-slate-600" : tot1 > 0 ? "text-emerald-300" : tot1 < 0 ? "text-red-300" : "text-slate-400"}`}>
-                          {tot1 == null ? "—" : fmtDelta(tot1)}
-                        </span>
-                        <span className={`text-[10px] font-bold text-center tabular-nums ${tot4 == null ? "text-slate-600" : tot4 > 0 ? "text-emerald-300" : tot4 < 0 ? "text-red-300" : "text-slate-400"}`}>
-                          {tot4 == null ? "—" : fmtDelta(tot4)}
-                        </span>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
+              <span className={`text-[9px] font-semibold text-center tabular-nums ${dc(ld1)}`}>{ld1 == null ? "—" : fmtDelta(ld1)}</span>
+              <span className={`text-[9px] font-semibold text-center tabular-nums ${dc(ld4)}`}>{ld4 == null ? "—" : fmtDelta(ld4)}</span>
+              <span className={`text-[9px] font-semibold text-center tabular-nums ${dc(sd1, true)}`}>{sd1 == null ? "—" : fmtDelta(sd1)}</span>
+              <span className={`text-[9px] font-semibold text-center tabular-nums ${dc(sd4, true)}`}>{sd4 == null ? "—" : fmtDelta(sd4)}</span>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Spreading section */}
+      <div className="mt-3 pt-2 border-t border-slate-700/50">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Spreading</span>
+          <span className="text-[9px] text-slate-500">
+            {(totalSpread / 1000).toFixed(1)}k lots
+            {spreadWow != null && (
+              <span className={`ml-1 font-bold ${spreadWow > 0 ? "text-emerald-400" : spreadWow < 0 ? "text-red-400" : "text-slate-500"}`}>
+                ({spreadWow >= 0 ? "+" : ""}{(spreadWow / 1000).toFixed(1)}k WoW)
+              </span>
+            )}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 text-[8px] text-slate-500 font-bold uppercase pb-0.5 border-b border-slate-700/50 gap-1">
+          <span></span>
+          <span className="text-center">Lots</span>
+          <span className="text-center">WoW</span>
+        </div>
+        {CP_SPREADS.map(cat => {
+          const cur = gs(latest, cat.f);
+          const wow = prev1 ? cur - gs(prev1, cat.f) : null;
+          return (
+            <div key={cat.name} className="grid grid-cols-3 items-center gap-1 py-0.5">
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                <span className="text-[8px] text-slate-400">{cat.name}</span>
+              </div>
+              <span className="text-[9px] text-slate-300 text-center tabular-nums">{(cur / 1000).toFixed(1)}k</span>
+              <span className={`text-[9px] text-center tabular-nums ${wow == null ? "text-slate-600" : wow > 0 ? "text-emerald-400" : wow < 0 ? "text-red-400" : "text-slate-500"}`}>
+                {wow == null ? "—" : (wow >= 0 ? "+" : "") + (wow / 1000).toFixed(1) + "k"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -678,18 +525,256 @@ function AttributionTable({ gfm }: { gfm: GlobalFlowMetrics }) {
   );
 }
 
+// ── Constants for sections 2 & 3 ───────────────────────────────────────────────
+const HM_CAT_COLORS: Record<string, string> = {
+  "PMPU": "#92400e", "Swap": "#10b981", "MM": "#1e40af",
+  "Other Rpt": "#38bdf8", "Non-Rep": "#64748b",
+};
+
+// ── Section 2: 13-Week Heatmap ─────────────────────────────────────────────────
+function CotHeatmap({ data }: { data: any[] }) {
+  const [market, setMarket] = useState<"ny" | "ldn">("ny");
+  const [mode, setMode]     = useState<"net" | "long" | "short">("net");
+  const weeks13 = data.slice(-13);
+
+  const lsFields = [
+    { label: "PMPU",      lf: "pmpuLong",   sf: "pmpuShort"   },
+    { label: "Swap",      lf: "swapLong",   sf: "swapShort"   },
+    { label: "MM",        lf: "mmLong",     sf: "mmShort"     },
+    { label: "Other Rpt", lf: "otherLong",  sf: "otherShort"  },
+    { label: "Non-Rep",   lf: "nonRepLong", sf: "nonRepShort" },
+  ];
+  const spreadFields = [
+    { label: "MM Spr",    key: "mmSpread",    color: "#a78bfa" },
+    { label: "Swap Spr",  key: "swapSpread",  color: "#34d399" },
+    { label: "Other Spr", key: "otherSpread", color: "#67e8f9" },
+  ];
+
+  const gv = (d: any, field: string) => (d[market]?.[field] ?? 0) as number;
+
+  const lsRows = lsFields.map(f => ({
+    label: f.label,
+    color: HM_CAT_COLORS[f.label] ?? "#64748b",
+    vals: weeks13.map((d: any) => {
+      if (mode === "long")  return gv(d, f.lf);
+      if (mode === "short") return gv(d, f.sf);
+      return gv(d, f.lf) - gv(d, f.sf);
+    }),
+  }));
+  const spreadRows = spreadFields.map(f => ({
+    label: f.label, color: f.color,
+    vals: weeks13.map((d: any) => gv(d, f.key)),
+  }));
+
+  const cellBg = (val: number, min: number, max: number, isSpread: boolean): string => {
+    if (max === min) return "#1e293b";
+    if (isSpread) {
+      const t = (val - min) / (max - min);
+      return `rgba(167,139,250,${(0.12 + t * 0.65).toFixed(2)})`;
+    }
+    if (mode === "net") {
+      const range = Math.max(Math.abs(min), Math.abs(max));
+      if (!range) return "#1e293b";
+      const t = val / range;
+      return t >= 0
+        ? `rgba(34,197,94,${(0.1 + t * 0.6).toFixed(2)})`
+        : `rgba(239,68,68,${(0.1 + (-t) * 0.6).toFixed(2)})`;
+    }
+    const t = (val - min) / (max - min);
+    return `rgba(99,102,241,${(0.1 + t * 0.65).toFixed(2)})`;
+  };
+
+  const renderRow = (row: { label: string; color: string; vals: number[] }, isSpread: boolean) => {
+    const min = Math.min(...row.vals), max = Math.max(...row.vals);
+    return (
+      <div key={row.label} style={{ display: "grid", gridTemplateColumns: `72px repeat(${weeks13.length}, 1fr)`, gap: 2, marginBottom: 2 }}>
+        <div style={{ fontSize: 10, color: row.color, fontWeight: 600, display: "flex", alignItems: "center" }}>{row.label}</div>
+        {row.vals.map((val, wi) => {
+          const isLast = wi === weeks13.length - 1;
+          const range = isSpread ? (max - min) : mode === "net" ? Math.max(Math.abs(min), Math.abs(max)) : (max - min);
+          const intensity = range > 0
+            ? (isSpread ? (val - min) / range : mode === "net" ? Math.abs(val) / range : (val - min) / range)
+            : 0;
+          return (
+            <div key={wi}
+              title={`${row.label} ${weeks13[wi].date}: ${Math.round(val).toLocaleString()} lots`}
+              style={{
+                background: cellBg(val, min, max, isSpread),
+                borderRadius: 3, height: 30,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 9,
+                color: intensity > 0.4 ? "rgba(255,255,255,0.9)" : "#475569",
+                fontWeight: isLast ? 700 : 400,
+                outline: isLast ? "2px solid #6366f1" : "none",
+                outlineOffset: "-1px",
+              }}>
+              {Math.abs(val) >= 1000 ? (Math.abs(val) / 1000).toFixed(0) + "k" : Math.round(val)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <SectionHeader icon="Grid" title="2. 13-Week Positioning Heatmap"
+        subtitle="Weekly position levels by category. Color intensity = level within each row's own 13-week range. Purple outline = latest week." />
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
+        <MarketToggle markets={{ ny: market === "ny", ldn: market === "ldn" }} set={(m: string) => setMarket(m as "ny" | "ldn")} />
+        <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+          {(["net", "long", "short"] as const).map(m => (
+            <button key={m} onClick={() => setMode(m)}
+              className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${mode === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
+              {m === "net" ? "Net" : m === "long" ? "Longs" : "Shorts"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-x-auto">
+        <div style={{ display: "grid", gridTemplateColumns: `72px repeat(${weeks13.length}, 1fr)`, gap: 2, marginBottom: 2 }}>
+          <div />
+          {weeks13.map((d: any, i: number) => (
+            <div key={i} style={{ fontSize: 9, color: i === weeks13.length - 1 ? "#a5b4fc" : "#475569", textAlign: "center" }}>
+              {String(d.date).slice(5)}
+            </div>
+          ))}
+        </div>
+        <div className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider mb-1">
+          {mode === "net" ? "Net (L − S)" : mode === "long" ? "Longs" : "Shorts"}
+        </div>
+        {lsRows.map(row => renderRow(row, false))}
+        <div style={{ borderTop: "1px dashed #334155", margin: "10px 0 6px" }} />
+        <div className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider mb-1">Spreading</div>
+        {spreadRows.map(row => renderRow(row, true))}
+        <div className="text-[9px] text-slate-700 mt-2">Hover for exact lots · Colors normalized per row · Purple = latest week</div>
+      </div>
+    </>
+  );
+}
+
+// ── Section 3: 52-Week Positioning Gauges ──────────────────────────────────────
+function CotGauges({ data }: { data: any[] }) {
+  const [market, setMarket] = useState<"ny" | "ldn">("ny");
+  const hist52 = data.slice(-52);
+  const curr = hist52[hist52.length - 1];
+  const prev = hist52.length >= 2 ? hist52[hist52.length - 2] : null;
+
+  type GRData = { label: string; color: string; curr: number; prev: number; min: number; max: number; pct: number; isSpread?: boolean };
+
+  const mkRow = (label: string, cat: string, field: string, isSpread?: boolean): GRData => {
+    const vals = hist52.map((d: any) => (d[market]?.[field] ?? 0) as number);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const cv = curr[market]?.[field] ?? 0;
+    const pv = prev?.[market]?.[field] ?? cv;
+    return { label, color: HM_CAT_COLORS[cat] ?? "#64748b", curr: cv, prev: pv, min, max,
+      pct: max > min ? (cv - min) / (max - min) * 100 : 50, isSpread };
+  };
+
+  const longRows: GRData[]  = [
+    mkRow("PMPU Long",    "PMPU",      "pmpuLong"),
+    mkRow("Swap Long",    "Swap",      "swapLong"),
+    mkRow("MM Long",      "MM",        "mmLong"),
+    mkRow("Other Long",   "Other Rpt", "otherLong"),
+    mkRow("Non-Rep Long", "Non-Rep",   "nonRepLong"),
+  ];
+  const shortRows: GRData[] = [
+    mkRow("PMPU Short",    "PMPU",      "pmpuShort"),
+    mkRow("Swap Short",    "Swap",      "swapShort"),
+    mkRow("MM Short",      "MM",        "mmShort"),
+    mkRow("Other Short",   "Other Rpt", "otherShort"),
+    mkRow("Non-Rep Short", "Non-Rep",   "nonRepShort"),
+  ];
+  const spreadRows: GRData[] = [
+    mkRow("MM Spread",    "MM",        "mmSpread",    true),
+    mkRow("Swap Spread",  "Swap",      "swapSpread",  true),
+    mkRow("Other Spread", "Other Rpt", "otherSpread", true),
+  ];
+
+  const extremes = [...longRows, ...shortRows].filter(r => r.pct >= 80 || r.pct <= 20);
+
+  const pctColor = (pct: number) => {
+    if (pct >= 80) return "#ef4444";
+    if (pct >= 60) return "#f97316";
+    if (pct <= 20) return "#22c55e";
+    if (pct <= 40) return "#84cc16";
+    return "#94a3b8";
+  };
+
+  const fmtLot = (v: number) => Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + "k" : String(Math.round(v));
+
+  const renderGauge = (r: GRData) => {
+    const pct = Math.max(0, Math.min(100, r.pct));
+    const prevPct = r.max > r.min ? Math.max(0, Math.min(100, (r.prev - r.min) / (r.max - r.min) * 100)) : 50;
+    const delta = r.curr - r.prev;
+    const color = r.isSpread ? "#a78bfa" : pctColor(pct);
+    return (
+      <div key={r.label} style={{ marginBottom: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, alignItems: "baseline" }}>
+          <span style={{ fontSize: 11, color: r.color, fontWeight: 600 }}>{r.label}</span>
+          <span style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ color: "#475569" }}>{fmtLot(r.curr)}</span>
+            <span style={{ color, fontWeight: 600 }}>{Math.round(pct)}th</span>
+            <span style={{ color: delta >= 0 ? "#22c55e" : "#ef4444", fontSize: 9 }}>
+              {delta >= 0 ? "▲" : "▼"} {fmtLot(Math.abs(delta))}
+            </span>
+          </span>
+        </div>
+        <div style={{ position: "relative", height: 11, background: "#1e293b", borderRadius: 6 }}>
+          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: color, borderRadius: 6, opacity: 0.28 }} />
+          <div style={{ position: "absolute", top: 1, left: `calc(${prevPct}% - 1px)`, width: 2, height: 9, background: "#60a5fa", borderRadius: 1, opacity: 0.6 }} title={`Prev: ${fmtLot(r.prev)}`} />
+          <div style={{ position: "absolute", top: 0.5, left: `calc(${pct}% - 5px)`, width: 10, height: 10, background: color, borderRadius: "50%", border: "2px solid #0f172a", boxShadow: `0 0 4px ${color}80` }} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+          <span style={{ fontSize: 9, color: "#334155" }}>{fmtLot(r.min)}</span>
+          <span style={{ fontSize: 9, color: "#334155" }}>{fmtLot(r.max)}</span>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <SectionHeader icon="Sliders" title="3. 52-Week Positioning Gauges"
+        subtitle="Current level vs. 52-week range. Colored dot = current week, blue tick = previous week. Red ≥80th pct · Green ≤20th." />
+      <div className="flex items-center gap-3 mb-4">
+        <MarketToggle markets={{ ny: market === "ny", ldn: market === "ldn" }} set={(m: string) => setMarket(m as "ny" | "ldn")} />
+      </div>
+      {extremes.length > 0 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 mb-4 flex flex-wrap gap-3">
+          <span className="text-[10px] text-slate-500 font-semibold self-center uppercase tracking-wider">Extremes:</span>
+          {extremes.map(r => (
+            <span key={r.label} style={{ fontSize: 11, color: pctColor(r.pct) }}>
+              {r.label} {Math.round(r.pct)}th
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <div className="grid grid-cols-2 gap-x-8">
+          <div>
+            <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Longs</div>
+            {longRows.map(renderGauge)}
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Shorts</div>
+            {shortRows.map(renderGauge)}
+          </div>
+        </div>
+        <div style={{ borderTop: "1px dashed #334155", marginTop: 16, paddingTop: 14 }}>
+          <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Spreading positions</div>
+          <div className="grid grid-cols-3 gap-x-8">
+            {spreadRows.map(renderGauge)}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function CotDashboard() {
-  // PDF chart refs (one per section) — names match captureAllCharts() keys
-  const pdfRefMacroGross    = useRef<HTMLDivElement>(null);
-  const pdfRefMacroNet      = useRef<HTMLDivElement>(null);
-  const pdfRefSoftsContract = useRef<HTMLDivElement>(null);
-  const pdfRefIndNY     = useRef<HTMLDivElement>(null);
-  const pdfRefIndLDN    = useRef<HTMLDivElement>(null);
-  const pdfRefDpNY      = useRef<HTMLDivElement>(null);
-  const pdfRefDpLDN     = useRef<HTMLDivElement>(null);
-
   const [step, setStep] = useState<Step>(1);
   const [cotRows, setCotRows] = useState<any[] | null>(null);
   const [cotError, setCotError] = useState(false);
@@ -714,47 +799,6 @@ export default function CotDashboard() {
   );
   const latest = data[data.length - 1];
 
-  // Step 2
-  const [structMarkets, setStructMarkets] = useState({ ny: true, ldn: false });
-  const [structCats,    setStructCats]    = useState({ pmpu: true, mm: true, swap: true, other: true, nonrep: false });
-  const [structOIMode,  setStructOIMode]  = useState<"mt" | "usd">("mt");
-  const [structSide,    setStructSide]    = useState<"gross" | "long" | "short" | "spreading">("gross");
-
-  const processedStructData = useMemo(() => data.map(d => {
-    const mkts = (structMarkets.ny ? ["ny"] : []).concat(structMarkets.ldn ? ["ldn"] : []);
-    const agg: Record<string, number> = {};
-    (["pmpu", "mm", "swap", "other", "nonRep"] as const).forEach(cat => {
-      let mt_val = 0, usd_val = 0;
-      mkts.forEach(m => {
-        const factor        = m === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
-        const price_usd_ton = m === "ny" ? d.priceNY * CENTS_LB_TO_USD_TON : d.priceLDN;
-        const mData = (d as any)[m];
-        const contracts =
-          structSide === "long"      ? (mData[`${cat}Long`]   ?? 0) :
-          structSide === "short"     ? (mData[`${cat}Short`]  ?? 0) :
-          structSide === "spreading" ? (mData[`${cat}Spread`] ?? 0) :
-          (mData[`${cat}Long`] ?? 0) + (mData[`${cat}Short`] ?? 0);
-        mt_val  += contracts * factor;
-        usd_val += contracts * factor * price_usd_ton;
-      });
-      agg[cat]            = mt_val;
-      agg[`${cat}_usd`]   = usd_val / 1_000_000; // $M
-    });
-    const price = structMarkets.ny && structMarkets.ldn ? d.avgPrice_USD_Ton
-      : structMarkets.ny ? d.priceNY : d.priceLDN;
-    return { ...d, ...agg, displayPrice: price };
-  }), [data, structMarkets, structSide]);
-
-  const structPriceDomain = useMemo((): [number, number] => {
-    const prices = processedStructData.slice(-52)
-      .map((d: any) => d.displayPrice)
-      .filter((p: any) => p != null && p > 0);
-    if (!prices.length) return [0, 500];
-    const mn  = Math.min(...prices);
-    const mx  = Math.max(...prices);
-    const pad = Math.max((mx - mn) * 0.15, mn * 0.03);
-    return [Math.floor(mn - pad), Math.ceil(mx + pad)];
-  }, [processedStructData]);
 
   const macroChartData = useMemo(
     () => transformMacroData(macroData, macroToggle),
@@ -779,69 +823,6 @@ export default function CotDashboard() {
       return result;
     });
   }, [macroChartData, macroToggle]);
-
-  // PDF-only chart data — always computed in a fixed mode, independent of macroToggle
-  const PDF_SOFT_SYMBOLS = [
-    { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
-    { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
-    { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
-    { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
-    { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
-    { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
-    { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
-    { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
-  ] as const;
-
-  const pdfGrossData = useMemo(() => transformMacroData(macroData, "gross"), [macroData]);
-  const pdfNetData   = useMemo(() => transformMacroData(macroData, "net"),   [macroData]);
-
-  const pdfNetSplit = useMemo(() => pdfNetData.map(row => {
-    const r: Record<string, any> = { date: row.date };
-    for (const s of SECTORS) {
-      const v = (row as any)[s] as number;
-      r[`${s}_pos`] = v > 0 ? v : 0;
-      r[`${s}_neg`] = v < 0 ? v : 0;
-    }
-    return r;
-  }), [pdfNetData]);
-
-  const pdfNetYDomain = useMemo((): [number, number] | undefined => {
-    if (!pdfNetData.length) return undefined;
-    const allVals = pdfNetData.flatMap(d => SECTORS.map(s => (d as any)[s] as number));
-    const min = Math.min(...allVals), max = Math.max(...allVals);
-    const pad = Math.max(Math.abs(min), Math.abs(max)) * 0.15;
-    return [+(min - pad).toFixed(2), +(max + pad).toFixed(2)];
-  }, [pdfNetData]);
-
-  const pdfSoftNetBase = useMemo(() => macroData
-    .map(week => {
-      const row: Record<string, any> = { date: week.date };
-      for (const sym of PDF_SOFT_SYMBOLS) {
-        const c = week.commodities.find(c => c.symbol === sym.key);
-        row[sym.key] = (c?.net_exposure_usd ?? 0) / 1e9;
-      }
-      return row;
-    })
-    .filter(row => PDF_SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0)),
-  [macroData]);
-
-  const pdfSoftNetSplit = useMemo(() => pdfSoftNetBase.map(row => {
-    const r: Record<string, any> = { date: row.date };
-    for (const s of PDF_SOFT_SYMBOLS) {
-      const v = row[s.key] as number;
-      r[`${s.key}_pos`] = v > 0 ? v : 0;
-      r[`${s.key}_neg`] = v < 0 ? v : 0;
-    }
-    return r;
-  }), [pdfSoftNetBase]);
-
-  const pdfSoftNetYDomain = useMemo((): [number, number] | undefined => {
-    if (!pdfSoftNetBase.length) return undefined;
-    const vals = pdfSoftNetBase.flatMap(row => PDF_SOFT_SYMBOLS.map(s => row[s.key] as number));
-    const mn = Math.min(...vals), mx = Math.max(...vals);
-    const pad = Math.max(Math.abs(mn), Math.abs(mx)) * 0.15;
-    return [+(mn - pad).toFixed(2), +(mx + pad).toFixed(2)];
-  }, [pdfSoftNetBase]);
 
   const macroYDomain = useMemo(() => {
     if (macroToggle !== "net" || !macroChartData.length) return undefined;
@@ -875,173 +856,136 @@ export default function CotDashboard() {
     };
   }, [macroData]);
 
-  // Step 3
-  const [cpMarkets, setCpMarkets] = useState({ ny: true, ldn: true });
-  const [cpUnit,    setCpUnit]    = useState<CpUnit>("contracts");
-
-  // Step 4
-  const [indView, setIndView] = useState<"ny" | "ldn" | "combined">("combined");
+  const softChartData = useMemo(() =>
+    macroData
+      .map(week => {
+        const row: Record<string, any> = { date: week.date };
+        for (const sym of SOFT_SYMBOLS) {
+          const c = week.commodities.find(c => c.symbol === sym.key);
+          if (!c) { row[sym.key] = 0; continue; }
+          const g = c.gross_exposure_usd;
+          const n = c.net_exposure_usd;
+          const val =
+            macroToggle === "gross"       ? g :
+            macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
+            macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
+            n;
+          row[sym.key] = val != null ? val / 1e9 : 0;
+        }
+        return row;
+      })
+      .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0)),
+    [macroData, macroToggle]);
 
   // Step 5
-  const [dpMarkets, setDpMarkets] = useState({ ny: true, ldn: false });
-  const [dpCats,    setDpCats]    = useState({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
+  const [dpCats, setDpCats] = useState({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
 
-  // Step 6
-  const [obosView, setObosView] = useState<"ny" | "ldn">("ny");
+  // ── HTML export ──────────────────────────────────────────────────────────────
+  const [exporting, setExporting] = useState(false);
 
-  // ── PDF download ──────────────────────────────────────────────────────────
-  const [pdfGenerating, setPdfGenerating] = useState(false);
+  useEffect(() => {
+    if (!exporting) return;
+    let cancelled = false;
 
-  const handleDownloadPdf = async () => {
-    if (!recent52.length || !macroData.length) return;
-    setPdfGenerating(true);
-    try {
-      const { captureAllCharts } = await import("@/lib/pdf/chartCapture");
-      const capturedCharts = await captureAllCharts({
-        macroGross:    pdfRefMacroGross,
-        macroNet:      pdfRefMacroNet,
-        softsContract: pdfRefSoftsContract,
-        indPulseNy:  pdfRefIndNY,
-        indPulseLdn: pdfRefIndLDN,
-        dryPowderNy: pdfRefDpNY,
-        dryPowderLdn: pdfRefDpLDN,
-      });
+    const doExport = async () => {
+      if (cancelled) return;
+      try {
+        // 1. Fetch CDN libraries (once — they get embedded in the file)
+        const CDN = {
+          react:     "https://unpkg.com/react@18.2.0/umd/react.production.min.js",
+          reactDom:  "https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js",
+          propTypes: "https://unpkg.com/prop-types@15.8.1/prop-types.min.js",
+          recharts:  "https://unpkg.com/recharts@2.12.7/umd/Recharts.js",
+          babel:     "https://unpkg.com/@babel/standalone/babel.min.js",
+        };
+        const [reactJs, reactDomJs, propTypesJs, rechartsJs, babelJs] = await Promise.all(
+          Object.values(CDN).map(url => fetch(url).then(r => { if (!r.ok) throw new Error(url); return r.text(); }))
+        );
 
-      const { buildGlobalFlowMetrics, buildMarketMetrics } = await import("@/lib/pdf/dataHelpers");
-      const globalFlow = buildGlobalFlowMetrics(macroData);
-      if (!globalFlow) throw new Error("Insufficient macro data");
+        // 2. Fetch compiled app CSS (Tailwind output — exact classes used in the app)
+        const linkEls = Array.from(document.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
+        const cssTexts = await Promise.all(linkEls.map(l => fetch(l.href).then(r => r.text()).catch(() => "")));
+        const inlineStyleEls = Array.from(document.querySelectorAll("style")).map(s => s.textContent ?? "");
+        const appCss = [...cssTexts, ...inlineStyleEls].join("\n");
 
-      // Pass `data` (raw /api/cot rows) — structure_ny, exch_oi_ny, t_mm_short only exist there
-      const rawData = data;
-      const ny  = buildMarketMetrics(recent52, rawData, "ny");
-      const ldn = buildMarketMetrics(recent52, rawData, "ldn");
-      if (!ny || !ldn) throw new Error("Insufficient COT data");
+        // 3. Build the standalone HTML
+        const dateStr = new Date().toISOString().split("T")[0];
+        const html = buildStandaloneHtml(
+          data,
+          macroData,
+          globalFlowMetrics ?? null,
+          dateStr,
+          reactJs, reactDomJs, propTypesJs, rechartsJs, babelJs,
+          appCss
+        );
 
-      const cur = recent52[recent52.length - 1];
-      const cotDateObj = new Date(cur.date);
-      const cotDate = cotDateObj.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-      const weekNum = Math.ceil(
-        (cotDateObj.getTime() - new Date(cotDateObj.getFullYear(), 0, 1).getTime()) / (7 * 86400000)
-      );
+        // 4. Download
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href = url;
+        a.download = `COT-Dashboard-${dateStr}.html`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("Export failed — check your internet connection and try again.\n" + String(err));
+      }
+      if (!cancelled) setExporting(false);
+    };
 
-      const reportData = {
-        weekNumber: weekNum,
-        year: cotDateObj.getFullYear(),
-        cotDate,
-        generatedAt: new Date().toISOString(),
-        globalFlow,
-        coffeeOverview: {
-          combinedNetLots:   (ny.mmLong - ny.mmShort) + (ldn.mmLong - ldn.mmShort),
-          combinedNetMT:     (ny.mmLong - ny.mmShort) * 5.625 + (ldn.mmLong - ldn.mmShort) * 10,
-          alignedDirection:  Math.sign(ny.mmLong - ny.mmShort) === Math.sign(ldn.mmLong - ldn.mmShort),
-          nyCombinedOiRank:  cur.oiRank    ?? 50,
-          ldnCombinedOiRank: cur.oiRankLDN ?? 50,
-        },
-        ny,
-        ldn,
-        charts: {
-          macroGross:    capturedCharts.macroGross    ?? null,
-          macroNet:      capturedCharts.macroNet      ?? null,
-          softsContract: capturedCharts.softsContract ?? null,
-          indPulseNy:    capturedCharts.indPulseNy    ?? null,
-          indPulseLdn:   capturedCharts.indPulseLdn   ?? null,
-          dryPowderNy:   capturedCharts.dryPowderNy   ?? null,
-          dryPowderLdn:  capturedCharts.dryPowderLdn  ?? null,
-        },
-      };
+    doExport();
+    return () => { cancelled = true; };
+  }, [exporting]);
 
-      if (typeof window === "undefined") return;
-      const { pdf } = await import("@/lib/pdf/pdfEngine");
-      const { CotPdfReport } = await import("@/lib/pdf/PdfReport");
-      const blob = await pdf(<CotPdfReport d={reportData} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `COT-Report-Week${weekNum}-${cotDateObj.getFullYear()}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-    } finally {
-      setPdfGenerating(false);
-    }
-  };
 
   const processedDpData = useMemo(() => {
-    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
-      historical: [], year: [], recent_4: [], recent_1: [], current: [],
-    };
-    data.forEach(d => {
-      const mkts = [
-        ...(dpMarkets.ny  ? [{ key: "ny",  mt: ARABICA_MT_FACTOR, trL: d.tradersNY,  trS: (d as any).tradersNY_short  }] : []),
-        ...(dpMarkets.ldn ? [{ key: "ldn", mt: ROBUSTA_MT_FACTOR, trL: d.tradersLDN, trS: (d as any).tradersLDN_short }] : []),
-      ];
-      let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
-      mkts.forEach(m => {
+    const compute = (market: "ny" | "ldn") => {
+      const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
+        historical: [], year: [], recent_4: [], recent_1: [], current: [],
+      };
+      const mt = market === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
+      data.forEach(d => {
+        const trL = market === "ny" ? d.tradersNY : d.tradersLDN;
+        const trS = market === "ny" ? (d as any).tradersNY_short : (d as any).tradersLDN_short;
+        let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
         Object.keys(dpCats).forEach(cat => {
           if ((dpCats as any)[cat]) {
             const oiKey = cat === "nonrep" ? "nonRep" : cat;
-            dpLong         += ((d as any)[m.key][`${oiKey}Long`])  * m.mt;
-            dpShort        += ((d as any)[m.key][`${oiKey}Short`]) * m.mt;
-            dpTradersLong  += (m.trL as any)?.[cat] ?? 0;
-            dpTradersShort += (m.trS as any)?.[cat] ?? 0;
+            dpLong         += ((d as any)[market][`${oiKey}Long`])  * mt;
+            dpShort        += ((d as any)[market][`${oiKey}Short`]) * mt;
+            dpTradersLong  += (trL as any)?.[cat] ?? 0;
+            dpTradersShort += (trS as any)?.[cat] ?? 0;
           }
         });
+        const tf = d.timeframe as string;
+        if (byTf[tf]) {
+          if (dpTradersLong  > 0) byTf[tf].push({ date: d.date, traders: dpTradersLong,  oi: dpLong  });
+          if (dpTradersShort > 0) byTf[tf].push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
+        }
       });
-      const tf = d.timeframe as string;
-      if (byTf[tf]) {
-        byTf[tf].push({ date: d.date, traders: dpTradersLong,  oi: dpLong  });
-        byTf[tf].push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
-      }
-    });
-    return byTf;
-  }, [data, dpMarkets, dpCats]);
-
-  const dpDataNyMm = useMemo(() => {
-    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
-      historical: [], year: [], recent_4: [], recent_1: [], current: [],
+      return byTf;
     };
-    data.forEach((d: any) => {
-      const dpLong         = (d.ny.mmLong)  * ARABICA_MT_FACTOR;
-      const dpShort        = (d.ny.mmShort) * ARABICA_MT_FACTOR;
-      const dpTradersLong  = d.tradersNY.mm ?? 0;
-      const dpTradersShort = d.rawNy?.t_mm_short ?? dpTradersLong;
-      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersLong,  oi: dpLong });
-      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
-    });
-    return byTf;
-  }, [data]);
-
-  const dpDataLdnMm = useMemo(() => {
-    const byTf: Record<string, { date: string; traders: number; oi: number }[]> = {
-      historical: [], year: [], recent_4: [], recent_1: [], current: [],
-    };
-    data.forEach((d: any) => {
-      const dpLong         = (d.ldn.mmLong)  * ROBUSTA_MT_FACTOR;
-      const dpShort        = (d.ldn.mmShort) * ROBUSTA_MT_FACTOR;
-      const dpTradersLong  = d.tradersLDN.mm ?? 0;
-      const dpTradersShort = d.rawLdn?.t_mm_short ?? dpTradersLong;
-      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersLong,  oi: dpLong });
-      byTf[d.timeframe]?.push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
-    });
-    return byTf;
-  }, [data]);
+    return { ny: compute("ny"), ldn: compute("ldn") };
+  }, [data, dpCats]);
 
   const dpDomain = useMemo(() => {
-    const all = Object.values(processedDpData).flat();
-    if (!all.length) return { x: [0, 1000] as [number, number], y: [-5000000, 5000000] as [number, number] };
-    const tVals = all.map(p => p.traders).filter(v => v > 0);
-    const oVals = all.map(p => p.oi);
-    const tMin  = tVals.length ? Math.min(...tVals) : 0;
-    const tMax  = tVals.length ? Math.max(...tVals) : 1000;
-    const oMin  = oVals.length ? Math.min(...oVals) : -5000000;
-    const oMax  = oVals.length ? Math.max(...oVals) : 5000000;
-    const tPad  = (tMax - tMin) * 0.1 || 10;
-    const oPad  = Math.max(Math.abs(oMax), Math.abs(oMin)) * 0.1;
-    return {
-      x: [Math.floor(tMin - tPad), Math.ceil(tMax + tPad)] as [number, number],
-      y: [Math.floor(oMin < 0 ? oMin * 1.1 : oMin - oPad), Math.ceil(oMax > 0 ? oMax * 1.1 : oMax + oPad)] as [number, number],
+    const calc = (byTf: Record<string, { date: string; traders: number; oi: number }[]>) => {
+      const all = Object.values(byTf).flat();
+      if (!all.length) return { x: [0, 1000] as [number, number], y: [-5000000, 5000000] as [number, number] };
+      const tVals = all.map(p => p.traders).filter(v => v > 0);
+      const oVals = all.map(p => p.oi);
+      const tMin  = tVals.length ? Math.min(...tVals) : 0;
+      const tMax  = tVals.length ? Math.max(...tVals) : 1000;
+      const oMin  = oVals.length ? Math.min(...oVals) : -5000000;
+      const oMax  = oVals.length ? Math.max(...oVals) : 5000000;
+      const tPad  = (tMax - tMin) * 0.1 || 10;
+      const oPad  = Math.max(Math.abs(oMax), Math.abs(oMin)) * 0.1;
+      return {
+        x: [Math.floor(tMin - tPad), Math.ceil(tMax + tPad)] as [number, number],
+        y: [Math.floor(oMin < 0 ? oMin * 1.1 : oMin - oPad), Math.ceil(oMax > 0 ? oMax * 1.1 : oMax + oPad)] as [number, number],
+      };
     };
+    return { ny: calc(processedDpData.ny), ldn: calc(processedDpData.ldn) };
   }, [processedDpData]);
 
   const recent52 = data.slice(-52);
@@ -1058,10 +1002,11 @@ export default function CotDashboard() {
           <div className="h-full bg-slate-600 animate-pulse w-full" />
         </div>
       )}
-      {/* Horizontal step nav */}
-      <div className="flex items-center gap-1 flex-wrap border-b border-slate-700 pb-1">
+      {/* Horizontal step nav — sticky, scrolls to section */}
+      <div className="flex items-center gap-1 flex-wrap border-b border-slate-700 pb-1 sticky top-0 z-10 bg-gray-900 pt-1">
         {NAV_STEPS.map(s => (
-          <button key={s.id} onClick={() => setStep(s.id)}
+          <button key={s.id} data-nav={String(s.id)}
+            onClick={() => { setStep(s.id); document.getElementById(`cot-section-${s.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
               step === s.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300"
             }`}>
@@ -1075,17 +1020,16 @@ export default function CotDashboard() {
           </span>
         )}
         <button
-          onClick={handleDownloadPdf}
-          disabled={pdfGenerating || !recent52.length}
+          onClick={() => setExporting(true)}
+          disabled={!recent52.length || exporting}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
-          {pdfGenerating ? "Generating…" : "↓ Download PDF"}
+          {exporting ? "Generating…" : "↓ Download HTML"}
         </button>
       </div>
 
       {/* ── Step 1: Global Money Flow ── */}
-      {step === 1 && (
-        <div>
+      <div id="cot-section-1">
           <SectionHeader icon="Globe" title="1. Global Money Flow"
             subtitle="MM speculative exposure across 28 commodity markets (CFTC + ICE Europe). Toggle metric below." />
           {macroError && (
@@ -1331,36 +1275,6 @@ export default function CotDashboard() {
 
           {/* Panel C — MM Exposure on Softs (by contract) */}
           {(() => {
-            const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
-              { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
-              { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
-              { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
-              { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
-              { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
-              { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
-              { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
-              { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
-            ];
-
-            const softChartData = macroData
-              .map(week => {
-                const row: Record<string, any> = { date: week.date };
-                for (const sym of SOFT_SYMBOLS) {
-                  const c = week.commodities.find(c => c.symbol === sym.key);
-                  if (!c) { row[sym.key] = 0; continue; }
-                  const g = c.gross_exposure_usd;
-                  const n = c.net_exposure_usd;
-                  const val =
-                    macroToggle === "gross"       ? g :
-                    macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
-                    macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
-                    n;
-                  row[sym.key] = val != null ? val / 1e9 : 0;
-                }
-                return row;
-              })
-              .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0));
-
             if (!softChartData.length) return null;
 
             // For net mode: split pos/neg per contract
@@ -1458,40 +1372,10 @@ export default function CotDashboard() {
 
           {/* Panel D — Weekly Change by Contract (Softs) */}
           {(() => {
-            const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
-              { key: "arabica",     label: "Arabica Coffee",  color: "#f59e0b" },
-              { key: "robusta",     label: "Robusta Coffee",  color: "#78350f" },
-              { key: "sugar11",     label: "Sugar No. 11",    color: "#a3e635" },
-              { key: "white_sugar", label: "White Sugar",     color: "#d1fae5" },
-              { key: "cotton",      label: "Cotton",          color: "#60a5fa" },
-              { key: "cocoa_ny",    label: "Cocoa NY",        color: "#a78bfa" },
-              { key: "cocoa_ldn",   label: "Cocoa London",    color: "#7c3aed" },
-              { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
-            ];
+            if (softChartData.length < 2) return null;
 
-            const softBase = macroData
-              .map(week => {
-                const row: Record<string, any> = { date: week.date };
-                for (const sym of SOFT_SYMBOLS) {
-                  const c = week.commodities.find(c => c.symbol === sym.key);
-                  if (!c) { row[sym.key] = 0; continue; }
-                  const g = c.gross_exposure_usd;
-                  const n = c.net_exposure_usd;
-                  const val =
-                    macroToggle === "gross"       ? g :
-                    macroToggle === "gross_long"  ? (g != null && n != null ? (g + n) / 2 : null) :
-                    macroToggle === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
-                    n;
-                  row[sym.key] = val != null ? val / 1e9 : 0;
-                }
-                return row;
-              })
-              .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0));
-
-            if (softBase.length < 2) return null;
-
-            const weeklyChangeData = softBase.slice(1).map((row, i) => {
-              const prev = softBase[i];
+            const weeklyChangeData = softChartData.slice(1).map((row, i) => {
+              const prev = softChartData[i];
               const r: Record<string, any> = { date: row.date };
               for (const s of SOFT_SYMBOLS) r[s.key] = (row[s.key] as number) - (prev[s.key] as number);
               return r;
@@ -1530,259 +1414,174 @@ export default function CotDashboard() {
             );
           })()}
         </div>
-      )}
 
-      {/* ── Step 2: Structural Integrity ── */}
-      {step === 2 && (() => {
-        const sk = (cat: string) => structOIMode === "usd" ? `${cat}_usd` : cat;
-        const oiFmt = structOIMode === "usd"
-          ? (v: number) => `$${(v / 1000).toFixed(0)}B`
-          : (v: number) => `${(v / 1000).toFixed(0)}k`;
-        const oiLabel = structOIMode === "usd" ? "OI Value ($B)" : "OI (k MT)";
-        const priceFmt = (v: number) =>
-          structMarkets.ny && !structMarkets.ldn ? `${v.toFixed(0)}¢`
-          : `$${v.toFixed(0)}`;
-        return (
-          <div>
-            <SectionHeader icon="Activity" title="2. Structural Integrity (Gross OI)"
-              subtitle="Select Markets and Categories to analyze Open Interest composition." />
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <MarketToggle markets={structMarkets} set={k => setStructMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
-                <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
-                  {(["mt", "usd"] as const).map(m => (
-                    <button key={m} onClick={() => setStructOIMode(m)}
-                      className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${structOIMode === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                      {m === "mt" ? "MT" : "USD Value"}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
-                  {(["gross", "long", "short", "spreading"] as const).map(s => (
-                    <button key={s} onClick={() => setStructSide(s)}
-                      className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${structSide === s ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                      {s === "gross" ? "Gross" : s === "long" ? "Long" : s === "short" ? "Short" : "Spreading"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <CatToggles cats={structCats} set={k => setStructCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
-            </div>
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={processedStructData.slice(-52)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={oiFmt}
-                    label={{ value: oiLabel, angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10}
-                    domain={structPriceDomain} tickFormatter={priceFmt} />
-                  <Tooltip contentStyle={CHART_STYLE} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  {structCats.pmpu   && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("pmpu")}   name="PMPU"               fill="#3b82f6" stroke="#3b82f6" />}
-                  {structCats.mm     && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("mm")}     name="Managed Money"      fill="#f59e0b" stroke="#f59e0b" />}
-                  {structCats.swap   && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("swap")}   name="Swap Dealers"       fill="#10b981" stroke="#10b981" />}
-                  {structCats.other  && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("other")}  name="Other Reportables"  fill="#64748b" stroke="#64748b" />}
-                  {structCats.nonrep && <Area yAxisId="left" type="monotone" stackId="1" dataKey={sk("nonRep")} name="Non Reportables"    fill="#94a3b8" stroke="#94a3b8" />}
-                  <Line yAxisId="right" type="monotone" dataKey="displayPrice" name="Price" stroke="#ffffff" strokeWidth={2} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        );
-      })()}
+      {/* ── Section 2: Heatmap ── */}
+      <div id="cot-section-2">
+        <CotHeatmap data={data} />
+      </div>
 
-      {/* ── Step 3: Counterparty ── */}
-      {step === 3 && (
-        <div>
-          <SectionHeader icon="Users" title="3. Counterparty Mapping"
-            subtitle="Liquidity Handshake: Analyzing the balance between Long and Short ownership." />
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <MarketToggle markets={cpMarkets} set={k => setCpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
-            <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
-              {(["contracts", "mt", "usd"] as const).map(u => (
-                <button key={u} onClick={() => setCpUnit(u)}
-                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${cpUnit === u ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                  {u === "contracts" ? "Lots" : u === "mt" ? "MT" : "USD Value"}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <RadialCounterparty
-              latest={latest}
-              prev1={data.length >= 2 ? data[data.length - 2] : null}
-              prev4={data.length >= 5 ? data[data.length - 5] : null}
-              markets={cpMarkets}
-              unit={cpUnit}
-            />
-          </div>
-        </div>
-      )}
+      {/* ── Section 3: Gauges ── */}
+      <div id="cot-section-3">
+        <CotGauges data={data} />
+      </div>
 
       {/* ── Step 4: Industry Pulse ── */}
-      {step === 4 && (() => {
-        const longKey  = indView === "ny" ? "pmpuLongMT_NY"  : indView === "ldn" ? "pmpuLongMT_LDN"  : "pmpuLongMT";
-        const shortKey = indView === "ny" ? "pmpuShortMT_NY" : indView === "ldn" ? "pmpuShortMT_LDN" : "pmpuShortMT";
-        const priceKey = indView === "ny" ? "priceNY"        : indView === "ldn" ? "priceLDN"         : "avgPrice_USD_Ton";
-        const mtFmt    = (v: number) => `${(v / 1000).toFixed(0)}k`;
-        const prices   = recent52.map(d => (d as any)[priceKey] as number).filter(v => v > 0);
-        const priceDomain: [number, number] = prices.length
-          ? [Math.floor(Math.min(...prices) / 100) * 100, Math.ceil(Math.max(...prices) / 100) * 100]
-          : [0, 500];
-        const mtVals   = recent52.flatMap(d => [(d as any)[longKey] as number, (d as any)[shortKey] as number]).filter(v => v > 0);
-        const mtDomain: [number, number] = mtVals.length
-          ? [Math.floor(Math.min(...mtVals) / 1000) * 1000, Math.ceil(Math.max(...mtVals) / 1000) * 1000]
-          : [0, 100000];
-
-        const deltaData = recent52.slice(1).map((d, i) => {
-          const dl = (d as any)[longKey]  - (recent52[i] as any)[longKey];
-          const ds = (d as any)[shortKey] - (recent52[i] as any)[shortKey];
-          const efp = (d as any).efpMT;
-          return {
-            date:       d.date,
-            deltaLong:  dl,
-            deltaShort: ds,
-            efpMT:      efp,
-            efpPctLong:  Math.abs(dl)  > 0 ? (efp / Math.abs(dl))  * 100 : null,
-            efpPctShort: Math.abs(ds)  > 0 ? (efp / Math.abs(ds))  * 100 : null,
-          };
-        });
-
+      <div id="cot-section-4">
+      {(() => {
+        const mtFmt = (v: number) => `${(v / 1000).toFixed(0)}k`;
+        const mkChart = (market: "ny" | "ldn") => {
+          const longKey  = market === "ny" ? "pmpuLongMT_NY"  : "pmpuLongMT_LDN";
+          const shortKey = market === "ny" ? "pmpuShortMT_NY" : "pmpuShortMT_LDN";
+          const priceKey = market === "ny" ? "priceNY"        : "priceLDN";
+          const prices   = recent52.map(d => (d as any)[priceKey] as number).filter(v => v > 0);
+          const priceDomain: [number, number] = prices.length
+            ? [Math.floor(Math.min(...prices) / 100) * 100, Math.ceil(Math.max(...prices) / 100) * 100]
+            : [0, 500];
+          const mtVals = recent52.flatMap(d => [(d as any)[longKey] as number, (d as any)[shortKey] as number]).filter(v => v > 0);
+          const mtDomain: [number, number] = mtVals.length
+            ? [Math.floor(Math.min(...mtVals) / 1000) * 1000, Math.ceil(Math.max(...mtVals) / 1000) * 1000]
+            : [0, 100000];
+          const deltaData = recent52.slice(1).map((d, i) => {
+            const dl  = (d as any)[longKey]  - (recent52[i] as any)[longKey];
+            const ds  = (d as any)[shortKey] - (recent52[i] as any)[shortKey];
+            const efp = market === "ny" ? (d as any).efpMT : 0;
+            return { date: d.date, deltaLong: dl, deltaShort: ds, efpMT: efp };
+          });
+          return (
+            <div>
+              {/* Panel A */}
+              <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[300px] mb-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={recent52}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                    <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain}
+                      label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} />
+                    <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [
+                      name === "Price" ? v.toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name
+                    ]} />
+                    <Legend wrapperStyle={{ fontSize: 10 }} />
+                    <Area yAxisId="left" type="monotone" dataKey={longKey}  name="Industry Long"  stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} dot={false} />
+                    <Area yAxisId="left" type="monotone" dataKey={shortKey} name="Industry Short" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} dot={false} />
+                    <Line yAxisId="right" type="monotone" dataKey={priceKey} name="Price" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+              {/* Panel B */}
+              <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[240px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={deltaData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
+                    <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt}
+                      label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+                    <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
+                    <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                    <Legend wrapperStyle={{ fontSize: 10 }} />
+                    <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#10b981" opacity={0.8} barSize={4} />
+                    <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#3b82f6" opacity={0.8} barSize={4} />
+                    {market === "ny" && <Line type="monotone" dataKey="efpMT" name="EFP Physical" stroke="#f59e0b" strokeWidth={1.5} dot={false} />}
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          );
+        };
         return (
           <div>
             <SectionHeader icon="Factory" title="4. Industry Pulse (Metric Tons)"
-              subtitle="PMPU Gross Long & Short vs Price. Bottom panel: weekly position changes and EFP physical delivery." />
-            <div className="flex gap-1 mb-4 bg-slate-900 p-1 rounded-lg border border-slate-800 w-fit">
-              {(["ny", "ldn", "combined"] as const).map(m => (
-                <button key={m} onClick={() => setIndView(m)}
-                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${indView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                  {m}
-                </button>
-              ))}
-            </div>
-
-            {/* Panel A — Gross Long & Short vs Price */}
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[320px] mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={recent52}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain}
-                    label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} />
-                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [
-                    name === "Price" ? v.toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name
-                  ]} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Area yAxisId="left" type="monotone" dataKey={longKey}
-                    name="Industry Long (MT)"  stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} dot={false} />
-                  <Area yAxisId="left" type="monotone" dataKey={shortKey}
-                    name="Industry Short (MT)" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} dot={false} />
-                  <Line yAxisId="right" type="monotone" dataKey={priceKey}
-                    name="Price" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Panel B — Weekly Change + EFP */}
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[280px] mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={deltaData} margin={{ right: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                  <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt}
-                    label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
-                  <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
-                  <Tooltip contentStyle={CHART_STYLE} formatter={(v: any, name: any) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#10b981" opacity={0.8} barSize={6} />
-                  <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#3b82f6" opacity={0.8} barSize={6} />
-                  <Line type="monotone" dataKey="efpMT"
-                    name="EFP Physical" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Panel C — EFP % of Delta Long & Short */}
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={deltaData} margin={{ right: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="#475569" fontSize={10} tickFormatter={v => v.slice(5)} />
-                  <YAxis stroke="#475569" fontSize={10} tickFormatter={v => `${v.toFixed(0)}%`}
-                    label={{ value: "%", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
-                  <ReferenceLine y={100} stroke="#475569" strokeDasharray="4 4" strokeOpacity={0.5} />
-                  <Tooltip contentStyle={CHART_STYLE}
-                    formatter={(v: any, name: any) => [v == null ? "n/a" : `${Number(v).toFixed(1)}%`, name]} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Line type="monotone" dataKey="efpPctLong"  name="EFP % of Δ Long"
-                    stroke="#10b981" strokeWidth={1.5} dot={false} connectNulls={false} />
-                  <Line type="monotone" dataKey="efpPctShort" name="EFP % of Δ Short"
-                    stroke="#3b82f6" strokeWidth={1.5} dot={false} connectNulls={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
+              subtitle="PMPU Gross Long & Short vs Price. Bottom: weekly position changes (NY includes EFP physical delivery)." />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 text-center">NY Arabica</p>
+                {mkChart("ny")}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 text-center">LDN Robusta</p>
+                {mkChart("ldn")}
+              </div>
             </div>
           </div>
         );
       })()}
+      </div>
 
       {/* ── Step 5: Dry Powder ── */}
-      {step === 5 && (
-        <div>
-          <SectionHeader icon="Droplets" title="5. Dry Powder Indicator"
-            subtitle="Gross Long OI (positive) and Gross Short OI (negative) vs number of traders. Color = recency." />
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <MarketToggle markets={dpMarkets} set={k => setDpMarkets(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} />
-            <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[460px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
-                  domain={dpDomain.x}
-                  label={{ value: "# traders", position: "insideBottom", offset: -10, fill: "#475569", fontSize: 10 }} />
-                <YAxis type="number" dataKey="oi" name="OI" stroke="#475569" fontSize={10}
-                  domain={dpDomain.y}
-                  tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
-                  label={{ value: "OI (k ton equivalent)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
-                <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
-                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-                  formatter={(v: any, name: any) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
-                <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
-                  content={(props: any) => {
-                    const items = [...(props.payload ?? [])].reverse();
-                    return (
-                      <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 10, paddingTop: 8 }}>
-                        {items.map((e: any, i: number) => (
-                          <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, color: "#94a3b8" }}>
-                            <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: e.color, display: "inline-block" }} />
-                            {e.value}
-                          </span>
-                        ))}
-                      </div>
-                    );
-                  }}
-                />
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Scatter name="Historic"   data={processedDpData.historical} fill="#bfdbfe" fillOpacity={0.18} {...{ size: 12  } as any} />
-                <Scatter name="Prior Y"    data={processedDpData.year}       fill="#3b82f6" fillOpacity={0.45} {...{ size: 28  } as any} />
-                <Scatter name="Prior 4W"   data={processedDpData.recent_4}   fill="#eab308" fillOpacity={0.9}  {...{ size: 78  } as any} />
-                <Scatter name="Prior week" data={processedDpData.recent_1}   fill="#c2410c" fillOpacity={1.0}  {...{ size: 154 } as any} />
-                <Scatter name="Last CoT"   data={processedDpData.current}    fill="#ef4444" fillOpacity={1.0}  {...{ size: 314 } as any} />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
+      <div id="cot-section-5">
+        <SectionHeader icon="Droplets" title="5. Dry Powder Indicator"
+          subtitle="Gross Long OI (positive) and Gross Short OI (negative) vs number of traders. Color = recency." />
+        <div className="flex items-center gap-3 mb-4">
+          <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />
         </div>
-      )}
+        {(() => {
+          const mkScatter = (market: "ny" | "ldn") => {
+            const d = processedDpData[market];
+            const dom = dpDomain[market];
+            const legendContent = (props: any) => {
+              const items = [...(props.payload ?? [])].reverse();
+              return (
+                <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 10, paddingTop: 8 }}>
+                  {items.map((e: any, i: number) => (
+                    <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, color: "#94a3b8" }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: e.color, display: "inline-block" }} />
+                      {e.value}
+                    </span>
+                  ))}
+                </div>
+              );
+            };
+            return (
+              <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
+                      domain={dom.x}
+                      label={{ value: "# traders", position: "insideBottom", offset: -10, fill: "#475569", fontSize: 10 }} />
+                    <YAxis type="number" dataKey="oi" name="OI" stroke="#475569" fontSize={10}
+                      domain={dom.y}
+                      tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
+                      label={{ value: "OI (k MT)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
+                    <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
+                    <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
+                      formatter={(v: any, name: any) => name === "# traders"
+                        ? [Math.round(Number(v)).toString(), name]
+                        : [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+                    <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }} content={legendContent} />
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    <Scatter name="Historic"   data={d.historical} fill="#bfdbfe" fillOpacity={0.18} {...{ size: 12  } as any} />
+                    <Scatter name="Prior Y"    data={d.year}       fill="#3b82f6" fillOpacity={0.45} {...{ size: 28  } as any} />
+                    <Scatter name="Prior 4W"   data={d.recent_4}   fill="#eab308" fillOpacity={0.9}  {...{ size: 78  } as any} />
+                    <Scatter name="Prior week" data={d.recent_1}   fill="#c2410c" fillOpacity={1.0}  {...{ size: 154 } as any} />
+                    <Scatter name="Last CoT"   data={d.current}    fill="#ef4444" fillOpacity={1.0}  {...{ size: 314 } as any} />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          };
+          return (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 text-center">NY Arabica</p>
+                {mkScatter("ny")}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 text-center">LDN Robusta</p>
+                {mkScatter("ldn")}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
 
       {/* ── Step 6: Cycle Location ── */}
-      {step === 6 && (() => {
+      <div id="cot-section-6">
+      {(() => {
         const cycleColor = (d: any, market: "ny" | "ldn") => {
           if (d.timeframe === "current")  return market === "ny" ? "#ef4444" : "#3b82f6";
-          if (d.timeframe === "recent_1") return market === "ny" ? "#f97316" : "#f97316";
-          if (d.timeframe === "recent_4") return "#eab308"; // yellow — 4 weeks before last
+          if (d.timeframe === "recent_1") return "#f97316";
+          if (d.timeframe === "recent_4") return "#eab308";
           return "#64748b";
         };
         const cycleOpacity = (d: any) => {
@@ -1794,211 +1593,52 @@ export default function CotDashboard() {
         };
         const nyPts  = recent52.map(d => ({ x: d.oiRank,    y: d.priceRank,    timeframe: d.timeframe, date: d.date }));
         const ldnPts = recent52.map(d => ({ x: d.oiRankLDN, y: d.priceRankLDN, timeframe: d.timeframe, date: d.date }));
+        const mkCycle = (pts: typeof nyPts, market: "ny" | "ldn") => (
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                <XAxis type="number" dataKey="x" domain={[0, 100]} stroke="#475569" fontSize={10}
+                  label={{ value: "Net Positioning Rank (%)", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
+                <YAxis type="number" dataKey="y" domain={[0, 100]} stroke="#475569" fontSize={10}
+                  label={{ value: "Price Rank (%)", angle: -90, position: "insideLeft", fill: "#475569", fontSize: 10 }} />
+                <ReferenceArea x1={0}  x2={25}  y1={0}  y2={25}  fill="#10b981" fillOpacity={0.08} stroke="#10b981" strokeOpacity={0.25}
+                  label={{ value: "OVERSOLD",   position: "insideTopRight",    fill: "#10b981", fontSize: 9, fontWeight: "bold" }} />
+                <ReferenceArea x1={75} x2={100} y1={75} y2={100} fill="#ef4444" fillOpacity={0.08} stroke="#ef4444" strokeOpacity={0.25}
+                  label={{ value: "OVERBOUGHT", position: "insideBottomLeft",  fill: "#ef4444", fontSize: 9, fontWeight: "bold" }} />
+                <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
+                <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
+                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
+                  formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]}
+                  labelFormatter={(_: any, payload: any) => payload?.[0]?.payload?.date ?? ""} />
+                <Scatter name={market === "ny" ? "NY Arabica" : "LDN Robusta"} data={pts}>
+                  {pts.map((d, i) => (
+                    <Cell key={i} fill={cycleColor(d, market)} fillOpacity={cycleOpacity(d)} />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+        );
         return (
           <div>
             <SectionHeader icon="Scale" title="6. Cycle Location (OB/OS Matrix)"
               subtitle="X = MM Net Positioning 5Y rank · Y = Price 5Y rank · Red=last week · Orange=prior week · Yellow=prior 4 weeks · Grey=history." />
-            <div className="flex items-center gap-2 mb-3">
-              {(["ny", "ldn"] as const).map(m => (
-                <button key={m} onClick={() => setObosView(m)}
-                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase transition-all ${obosView === m ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"}`}>
-                  {m === "ny" ? "NY Arabica" : "LDN Robusta"}
-                </button>
-              ))}
-            </div>
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis type="number" dataKey="x" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Net Positioning Rank (%)", position: "bottom", offset: 0, fill: "#475569", fontSize: 10 }} />
-                  <YAxis type="number" dataKey="y" domain={[0, 100]} stroke="#475569" fontSize={10} label={{ value: "Price Rank (%)", angle: -90, position: "insideLeft", fill: "#475569", fontSize: 10 }} />
-                  <ReferenceArea x1={0}  x2={25}  y1={0}  y2={25}  fill="#10b981" fillOpacity={0.08} stroke="#10b981" strokeOpacity={0.25}
-                    label={{ value: "OVERSOLD", position: "insideTopRight", fill: "#10b981", fontSize: 9, fontWeight: "bold" }} />
-                  <ReferenceArea x1={75} x2={100} y1={75} y2={100} fill="#ef4444" fillOpacity={0.08} stroke="#ef4444" strokeOpacity={0.25}
-                    label={{ value: "OVERBOUGHT", position: "insideBottomLeft", fill: "#ef4444", fontSize: 9, fontWeight: "bold" }} />
-                  <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
-                  <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
-                  <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-                    formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]}
-                    labelFormatter={(_: any, payload: any) => payload?.[0]?.payload?.date ?? ""} />
-                  {obosView === "ny" && (
-                    <Scatter name="NY Arabica" data={nyPts}>
-                      {nyPts.map((d, i) => (
-                        <Cell key={i} fill={cycleColor(d, "ny")} fillOpacity={cycleOpacity(d)} />
-                      ))}
-                    </Scatter>
-                  )}
-                  {obosView === "ldn" && (
-                    <Scatter name="LDN Robusta" data={ldnPts}>
-                      {ldnPts.map((d, i) => (
-                        <Cell key={i} fill={cycleColor(d, "ldn")} fillOpacity={cycleOpacity(d)} />
-                      ))}
-                    </Scatter>
-                  )}
-                </ScatterChart>
-              </ResponsiveContainer>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 text-center">NY Arabica</p>
+                {mkCycle(nyPts, "ny")}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 text-center">LDN Robusta</p>
+                {mkCycle(ldnPts, "ldn")}
+              </div>
             </div>
           </div>
         );
       })()}
-
-      {/* ── Hidden off-screen chart divs for PDF capture ── */}
-      {/* Always rendered regardless of current step so refs are mounted at PDF export time */}
-      <div style={{ position: "fixed", top: -9999, left: -9999, width: 800, pointerEvents: "none", opacity: 0 }}>
-        {/* Chart 1: Total Gross Exposure by Sector */}
-        <div ref={pdfRefMacroGross} style={{ background: "#0f172a", padding: 16, width: 800, height: 280 }}>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={pdfGrossData} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `$${Math.abs(v).toFixed(0)}B`} width={52} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              {SECTORS.map(sector => {
-                const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
-                return (
-                  <Area key={sector} type="monotone" dataKey={sector}
-                    stackId="1" name={label}
-                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
-                    fillOpacity={0.6} dot={false} />
-                );
-              })}
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Chart 2: Net MM Exposure by Sector */}
-        <div ref={pdfRefMacroNet} style={{ background: "#0f172a", padding: 16, width: 800, height: 280 }}>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={pdfNetSplit} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(0)}B`} width={52} domain={pdfNetYDomain} />
-              <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
-              <Legend wrapperStyle={{ fontSize: 11 }} content={(props: any) => {
-                const order = ["energy", "metals", "grains", "meats", "softs", "micros"];
-                const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
-                return (
-                  <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
-                    {order.map(s => (
-                      <span key={s} style={{ display: "flex", alignItems: "center", gap: 5, color: "#d1d5db" }}>
-                        <span style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: SECTOR_COLORS[s], display: "inline-block" }} />
-                        {labelMap[s]}
-                      </span>
-                    ))}
-                  </div>
-                );
-              }} />
-              {SECTORS.map(sector => {
-                const label = sector === "energy" ? "Energies" : sector === "metals" ? "Metals" : sector.charAt(0).toUpperCase() + sector.slice(1);
-                return (
-                  <Area key={`${sector}_pos`} type="monotone" dataKey={`${sector}_pos`}
-                    stackId="pos" name={label}
-                    stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
-                    fillOpacity={0.6} dot={false} />
-                );
-              })}
-              {SECTORS.map(sector => (
-                <Area key={`${sector}_neg`} type="monotone" dataKey={`${sector}_neg`}
-                  stackId="neg" name={`${sector}_neg`}
-                  stroke={SECTOR_COLORS[sector]} fill={SECTOR_COLORS[sector]}
-                  fillOpacity={0.6} dot={false} legendType="none" />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Chart 3: Net MM Exposure — Softs by Contract */}
-        <div ref={pdfRefSoftsContract} style={{ background: "#0f172a", padding: 16, width: 800, height: 260 }}>
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart
-              data={pdfSoftNetSplit.length ? pdfSoftNetSplit : pdfSoftNetBase}
-              margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(2)}B`} width={58} domain={pdfSoftNetYDomain} />
-              <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              {PDF_SOFT_SYMBOLS.map(s => (
-                <Area key={`${s.key}_pos`} type="monotone" dataKey={`${s.key}_pos`}
-                  stackId="pos" name={s.label}
-                  stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
-              ))}
-              {PDF_SOFT_SYMBOLS.map(s => (
-                <Area key={`${s.key}_neg`} type="monotone" dataKey={`${s.key}_neg`}
-                  stackId="neg" name={`${s.key}_neg`}
-                  stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} legendType="none" />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
       </div>
 
-      {/* ── Hidden off-screen charts for Industry Pulse and Dry Powder (PDF capture) ── */}
-      <div style={{ position: "absolute", left: -9999, top: 0, pointerEvents: "none" }}>
-        <div ref={pdfRefIndNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={recent52}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-              <XAxis dataKey="date" stroke="#475569" fontSize={8} tickFormatter={(v: any) => v.slice(5)} />
-              <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
-              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
-              <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
-              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_NY"  name="Industry Long (MT)" fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_NY" name="Industry Short (MT)" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey="priceNY" name="Price (¢/lb)" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-        <div ref={pdfRefIndLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={recent52}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-              <XAxis dataKey="date" stroke="#475569" fontSize={8} tickFormatter={(v: any) => v.slice(5)} />
-              <YAxis yAxisId="left" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} />
-              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} />
-              <Tooltip contentStyle={{ background: "#1e293b", border: "none", fontSize: 9 }} />
-              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuLongMT_LDN"  name="Industry Long (MT)" fill="#10b981" stroke="#10b981" fillOpacity={0.3} dot={false} />
-              <Area yAxisId="left" type="monotone" dataKey="pmpuShortMT_LDN" name="Industry Short (MT)" fill="#ef4444" stroke="#ef4444" fillOpacity={0.3} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey="priceLDN" name="Price ($/MT)" stroke="#f59e0b" strokeWidth={1.5} dot={false} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-        <div ref={pdfRefDpNY} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" label={{ value: "# Traders", position: "bottom", offset: 0, fill: "#9ca3af", fontSize: 8 }} />
-              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI (MT)" />
-              <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
-              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
-              <Scatter name="Historic"   data={dpDataNyMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
-              <Scatter name="Prior Y"    data={dpDataNyMm.year}       fill="#3b82f6" fillOpacity={0.45} />
-              <Scatter name="Prior 4W"   data={dpDataNyMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
-              <Scatter name="Prior week" data={dpDataNyMm.recent_1}   fill="#c2410c" fillOpacity={1.0}  />
-              <Scatter name="Last CoT"   data={dpDataNyMm.current}    fill="#ef4444" fillOpacity={1.0}  />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
-        <div ref={pdfRefDpLDN} style={{ background: "#0f172a", padding: 12, width: 600, height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis type="number" dataKey="traders" stroke="#475569" fontSize={8} name="traders" label={{ value: "# Traders", position: "bottom", offset: 0, fill: "#9ca3af", fontSize: 8 }} />
-              <YAxis type="number" dataKey="oi" stroke="#475569" fontSize={8} tickFormatter={(v: any) => `${(v/1000).toFixed(0)}k`} name="OI (MT)" />
-              <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
-              <Legend wrapperStyle={{ fontSize: 8, color: "#9ca3af" }} />
-              <Scatter name="Historic"   data={dpDataLdnMm.historical} fill="#bfdbfe" fillOpacity={0.18} />
-              <Scatter name="Prior Y"    data={dpDataLdnMm.year}       fill="#3b82f6" fillOpacity={0.45} />
-              <Scatter name="Prior 4W"   data={dpDataLdnMm.recent_4}   fill="#eab308" fillOpacity={0.9}  />
-              <Scatter name="Prior week" data={dpDataLdnMm.recent_1}   fill="#c2410c" fillOpacity={1.0}  />
-              <Scatter name="Last CoT"   data={dpDataLdnMm.current}    fill="#ef4444" fillOpacity={1.0}  />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
     </div>
   );
 }

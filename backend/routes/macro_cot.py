@@ -61,6 +61,14 @@ def get_macro_cot(
                     .all())
     price_map = {(p.date, p.symbol): p.close_price for p in price_rows}
 
+    # Per-symbol latest available price — used as fallback when exact date is missing
+    # (e.g. robusta price stored for a different date than the COT report date)
+    symbol_latest: dict[str, tuple[DateType, float]] = {}
+    for p in price_rows:
+        if p.close_price is not None:
+            if p.symbol not in symbol_latest or p.date > symbol_latest[p.symbol][0]:
+                symbol_latest[p.symbol] = (p.date, p.close_price)
+
     # Group by date
     weeks: dict[DateType, list] = {}
     for row in cot_rows:
@@ -72,6 +80,11 @@ def get_macro_cot(
         mm_short  = row.mm_short  or 0
         mm_spread = row.mm_spread or 0
         close_price = price_map.get((row.date, row.symbol))
+        if close_price is None:
+            # Fallback: nearest available price within 14 days
+            latest = symbol_latest.get(row.symbol)
+            if latest and abs((row.date - latest[0]).days) <= 14:
+                close_price = latest[1]
 
         exposures = _compute_exposures(mm_long, mm_short, mm_spread, close_price, spec)
 

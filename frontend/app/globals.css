@@ -18,3 +18,15 @@ html, body {
   white-space: nowrap;
   animation: ticker-scroll 40s linear infinite;
 }
+
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+  html, body {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11px;
+  }
+}

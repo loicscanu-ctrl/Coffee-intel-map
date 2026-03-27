@@ -26,6 +26,10 @@ function tickerLabel(item: any): string {
   const title: string = item.title ?? "";
   const body: string = item.body ?? "";
 
+  if (tags.includes("futures") && tags.includes("arabica") && tags.includes("b3")) {
+    const m = title.match(/\(([^)]+)\)/);
+    return m ? `B3 4/5 ${m[1]}` : "B3 4/5";
+  }
   if (tags.includes("futures") && tags.includes("arabica")) return contractCode(body, "KC");
   if (tags.includes("futures") && tags.includes("robusta")) return contractCode(body, "RC");
   if (title.includes("Vietnam Robusta"))  return "VN FAQ";
@@ -98,8 +102,9 @@ function parseTickerItems(items: any[]): TickerItem[] {
 
   return deduped.map((item) => {
       const label = tickerLabel(item);
+      const b3Match = label.startsWith("B3 4/5") && item.body?.match(/settlement:\s*([\d.]+)\s*USD\/sac/);
       const match = item.body?.match(/:\s*[^\d]*([0-9.,]+(?:\s+[A-Z][A-Z/a-z]+)?)/);
-      let value = match ? match[1] : "—";
+      let value = b3Match ? `${b3Match[1]} USD/sac` : (match ? match[1] : "—");
 
       // VN FAQ: "94.000 VND ($3,704)"
       if (label === "VN FAQ" && usdvnd) {
@@ -161,7 +166,12 @@ export default function MarketTicker({ initialNews = [] }: MarketTickerProps) {
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (tickers.length === 0) return null;
+  if (tickers.length === 0) return (
+    <div className="h-8 bg-slate-950 border-b border-slate-800 flex items-center shrink-0 px-3">
+      <span className="text-indigo-400 text-xs font-bold border-r border-slate-700 pr-3 mr-3">MARKETS</span>
+      <span className="text-slate-600 text-xs italic">No market data — waiting for scraper</span>
+    </div>
+  );
 
   const COLOR: Record<TickerCategory, string> = {
     futures:  "text-yellow-400",
