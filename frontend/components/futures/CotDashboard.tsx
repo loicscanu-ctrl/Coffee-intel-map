@@ -1081,19 +1081,36 @@ export default function CotDashboard() {
 
           {/* KPI Toddles */}
           {macroKpis && (() => {
-            const fmtB  = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
+            const fmtB   = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
             const fmtWoW = (v: number | null) => v == null ? "—" : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`;
+            const wowColor = (v: number | null) => v == null ? "#6b7280" : v >= 0 ? "#10b981" : "#ef4444";
+
+            // Attribution totals from sectorBreakdown (sum non-null across all sectors)
+            const sumAttr = (field: "grossOiEffectB" | "grossPriceEffectB" | "netOiEffectB" | "netPriceEffectB"): number | null => {
+              if (!globalFlowMetrics) return null;
+              const vals = globalFlowMetrics.sectorBreakdown.map(s => s[field]).filter((v): v is number => v !== null);
+              return vals.length === 0 ? null : vals.reduce((a, b) => a + b, 0);
+            };
+            const grossOiTotal  = sumAttr("grossOiEffectB");
+            const grossPxTotal  = sumAttr("grossPriceEffectB");
+            const netOiTotal    = sumAttr("netOiEffectB");
+            const netPxTotal    = sumAttr("netPriceEffectB");
+
             const kpis = [
               { label: "Gross Exposure",     value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
-              { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: macroKpis.grossWoW == null ? "#6b7280" : macroKpis.grossWoW >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: wowColor(macroKpis.grossWoW) },
+              { label: "Gross OI Δ",         value: fmtWoW(grossOiTotal),        color: wowColor(grossOiTotal) },
+              { label: "Gross Px Δ",         value: fmtWoW(grossPxTotal),        color: wowColor(grossPxTotal) },
               { label: "Net Exposure",       value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
-              { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: macroKpis.netWoW == null ? "#6b7280" : macroKpis.netWoW >= 0 ? "#10b981" : "#ef4444" },
+              { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: wowColor(macroKpis.netWoW) },
+              { label: "Net OI Δ",           value: fmtWoW(netOiTotal),          color: wowColor(netOiTotal) },
+              { label: "Net Px Δ",           value: fmtWoW(netPxTotal),          color: wowColor(netPxTotal) },
             ];
             return (
               <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
                 {kpis.map(k => (
                   <div key={k.label} style={{
-                    flex: "1 1 140px", background: "#111827", border: "1px solid #1f2937",
+                    flex: "1 1 120px", background: "#111827", border: "1px solid #1f2937",
                     borderRadius: 8, padding: "10px 14px",
                   }}>
                     <div style={{ fontSize: 10, color: "#6b7280", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>{k.label}</div>
