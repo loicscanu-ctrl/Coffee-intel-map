@@ -574,6 +574,10 @@ def _fetch_and_upsert(db) -> None:
     cot_data.update(_parse_cftc(cftc_df))
     cot_data.update(_parse_ice(ice_df))
 
+    # Log latest report dates per symbol (helps diagnose stale data)
+    dates_seen = sorted({str(rd) for (rd, _) in cot_data.values()})
+    print(f"[macro_cot] report dates in this run: {dates_seen}", file=sys.stderr)
+
     # Upsert COT rows into commodity_cot (all symbols)
     for sym, (report_date, fields) in cot_data.items():
         upsert_commodity_cot(db, sym, report_date, fields)
@@ -612,6 +616,7 @@ def _fetch_and_upsert(db) -> None:
         if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
     price_cache = _fetch_yfinance_prices(yfinance_pairs)
+    print(f"[macro_cot] yfinance prices fetched: { {str(k): round(v,4) for k,v in price_cache.items()} }", file=sys.stderr)
 
     # Build stooq fetch list
     stooq_pairs = [

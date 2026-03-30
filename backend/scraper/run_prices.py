@@ -22,7 +22,11 @@ from models import CotWeekly
 
 
 def main():
-    today = date.today()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", help="Override target date (YYYY-MM-DD). Defaults to today.")
+    args = parser.parse_args()
+    today = date.fromisoformat(args.date) if args.date else date.today()
     print(f"Fetching commodity prices for {today}")
 
     # Build (sym, date) pairs for all direct yfinance symbols.
