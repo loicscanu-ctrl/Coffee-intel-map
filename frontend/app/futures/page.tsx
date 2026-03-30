@@ -109,14 +109,14 @@ function ChainTable({ item }: { item: NewsItem }) {
       <table className="w-full text-xs font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left  px-3 py-2 w-28 whitespace-nowrap">Contract</th>
-            <th className="text-center px-2 py-2 w-20 whitespace-nowrap">FND</th>
-            <th className="text-left  px-2 py-2 w-24 whitespace-nowrap">Expiry</th>
-            <th className="text-right px-3 py-2 whitespace-nowrap">Last ({unit})</th>
-            <th className="text-right px-2 py-2 whitespace-nowrap">Chg</th>
-            <th className="text-right px-2 py-2 whitespace-nowrap">Spread</th>
-            <th className="text-right px-2 py-2 whitespace-nowrap">OI</th>
-            <th className="text-right px-2 py-2 whitespace-nowrap">Vol</th>
+            <th className="text-left  px-2 py-1 w-16 whitespace-nowrap">Contract</th>
+            <th className="text-center px-2 py-1 w-24 whitespace-nowrap">FND</th>
+            <th className="text-left  px-2 py-1 w-24 whitespace-nowrap">Expiry</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Last ({unit})</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Chg</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Spread</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">OI</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Vol</th>
           </tr>
         </thead>
         <tbody>
@@ -125,17 +125,17 @@ function ChainTable({ item }: { item: NewsItem }) {
             const nextLast = data!.contracts[i + 1]?.last;
             const spread = c.last != null && nextLast != null ? c.last - nextLast : null;
             return (
-              <tr key={c.symbol} className={`border-t border-slate-800 ${i === 0 ? "text-white" : "text-slate-300"}`}>
-                <td className="px-3 py-2 font-bold">{c.symbol}</td>
-                <td className="px-2 py-2 text-center text-amber-400/80">{firstNoticeDay(c.symbol)}</td>
-                <td className="px-2 py-2 text-slate-400">{c.expiry}</td>
-                <td className={`px-3 py-2 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(2)}</td>
-                <td className={`px-2 py-2 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
-                <td className={`px-2 py-2 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+              <tr key={c.symbol} className={`border-t border-slate-700 ${i === 0 ? "text-white bg-slate-800/60" : "text-slate-300"}`}>
+                <td className="px-2 py-1.5 font-bold">{c.symbol}</td>
+                <td className="px-2 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{firstNoticeDay(c.symbol)}</td>
+                <td className="px-2 py-1.5 text-slate-400">{c.expiry}</td>
+                <td className={`px-2 py-1.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(2)}</td>
+                <td className={`px-2 py-1.5 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
+                <td className={`px-2 py-1.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
                   {spread !== null ? (spread >= 0 ? "+" : "") + spread.toFixed(2) : "—"}
                 </td>
-                <td className="px-2 py-2 text-right">{fmt(c.oi)}</td>
-                <td className="px-2 py-2 text-right text-slate-400">{fmt(c.volume)}</td>
+                <td className="px-2 py-1.5 text-right">{fmt(c.oi)}</td>
+                <td className="px-2 py-1.5 text-right text-slate-400">{fmt(c.volume)}</td>
               </tr>
             );
           })}
