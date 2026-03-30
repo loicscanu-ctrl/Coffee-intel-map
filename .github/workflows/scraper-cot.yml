@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install sqlalchemy psycopg2-binary pandas requests yfinance
+        run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv
 
       - name: Run COT scraper
         working-directory: backend

@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install -r scraper/requirements.txt pandas requests yfinance
+        run: pip install -r scraper/requirements.txt pandas requests yfinance python-dotenv
 
       - name: Install Playwright browser
         run: playwright install chromium --with-deps

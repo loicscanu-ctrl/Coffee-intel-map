@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install playwright sqlalchemy psycopg2-binary
+        run: pip install playwright sqlalchemy psycopg2-binary python-dotenv
 
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
