@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, ComposedChart,
+  ResponsiveContainer, ComposedChart, AreaChart, Area, BarChart, Bar,
   ScatterChart, Scatter, Cell, PieChart, Pie, ReferenceLine, ReferenceArea, Label,
 } from "recharts";
 import { fetchCot, fetchMacroCot, type MacroCotWeek } from "@/lib/api";
