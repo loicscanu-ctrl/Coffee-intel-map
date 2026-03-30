@@ -1081,8 +1081,10 @@ export default function CotDashboard() {
 
           {/* KPI Toddles */}
           {macroKpis && (() => {
-            const fmtB   = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
-            const fmtWoW = (v: number | null) => v == null ? "—" : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`;
+            const fmtB    = (v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v / 1e9).toFixed(1)}B`;
+            const fmtWoW  = (v: number | null) => v == null ? "—" : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`;
+            // Attribution fields are already in $B (divided by 1e9 at compute time)
+            const fmtAttr = (v: number | null) => v == null ? "—" : `${v >= 0 ? "+" : "-"}$${Math.abs(v).toFixed(2)}B`;
             const wowColor = (v: number | null) => v == null ? "#6b7280" : v >= 0 ? "#10b981" : "#ef4444";
 
             // Attribution totals from sectorBreakdown (sum non-null across all sectors)
@@ -1099,12 +1101,12 @@ export default function CotDashboard() {
             const kpis = [
               { label: "Gross Exposure",     value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
               { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: wowColor(macroKpis.grossWoW) },
-              { label: "Gross OI Δ",         value: fmtWoW(grossOiTotal),        color: wowColor(grossOiTotal) },
-              { label: "Gross Px Δ",         value: fmtWoW(grossPxTotal),        color: wowColor(grossPxTotal) },
+              { label: "Gross OI Δ",         value: fmtAttr(grossOiTotal),       color: wowColor(grossOiTotal) },
+              { label: "Gross Px Δ",         value: fmtAttr(grossPxTotal),       color: wowColor(grossPxTotal) },
               { label: "Net Exposure",       value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
               { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: wowColor(macroKpis.netWoW) },
-              { label: "Net OI Δ",           value: fmtWoW(netOiTotal),          color: wowColor(netOiTotal) },
-              { label: "Net Px Δ",           value: fmtWoW(netPxTotal),          color: wowColor(netPxTotal) },
+              { label: "Net OI Δ",           value: fmtAttr(netOiTotal),         color: wowColor(netOiTotal) },
+              { label: "Net Px Δ",           value: fmtAttr(netPxTotal),         color: wowColor(netPxTotal) },
             ];
             return (
               <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
