@@ -336,6 +336,8 @@ def _fetch_gbpusd_rates(dates: set) -> dict:
         if hist.empty:
             print(f"[macro_cot] WARNING: no GBPUSD data for range {start}–{end}", file=sys.stderr)
             return result
+        if isinstance(hist.columns, pd.MultiIndex):
+            hist.columns = hist.columns.get_level_values(0)
         hist.index = pd.to_datetime(hist.index).date
         for dt in dates:
             for offset in range(6):
@@ -531,6 +533,8 @@ def _fetch_yfinance_prices(symbols_dates: list) -> dict:
                                interval="1d", auto_adjust=True, progress=False)
             if hist.empty:
                 continue
+            if isinstance(hist.columns, pd.MultiIndex):
+                hist.columns = hist.columns.get_level_values(0)
             hist.index = pd.to_datetime(hist.index).date
             for sym, dt in pairs:
                 for offset in range(6):
