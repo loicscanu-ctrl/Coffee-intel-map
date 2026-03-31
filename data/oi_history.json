@@ -1,6 +1,51 @@
 {
   "arabica": [
     {
+      "date": "2026-03-27",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 58271
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 45598
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 30301
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 24390
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 8082
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2104
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1026
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1716
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1560
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 372
+        }
+      ]
+    },
+    {
       "date": "2026-03-26",
       "contracts": [
         {
@@ -47,6 +92,47 @@
     }
   ],
   "robusta": [
+    {
+      "date": "2026-03-27",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 36280
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 31750
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 9817
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 4451
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 3861
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1265
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 509
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 281
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 206
+        }
+      ]
+    },
     {
       "date": "2026-03-26",
       "contracts": [
