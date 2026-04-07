@@ -1,0 +1,36 @@
+name: Scraper – Earnings
+
+on:
+  schedule:
+    # Runs quarterly, one week after each major earnings season ends:
+    # Feb 15 (Q4 season), May 15 (Q1 season), Aug 15 (Q2 season), Nov 15 (Q3 season)
+    - cron: "0 8 15 2,5,8,11 *"
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install yfinance pandas
+
+      - name: Run earnings scraper
+        run: python backend/scraper/fetch_earnings.py
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/earnings.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || git commit -m "data: update earnings.json [skip ci]" && git push
