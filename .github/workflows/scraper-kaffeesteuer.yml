@@ -1,0 +1,36 @@
+name: Scraper – Kaffeesteuer
+
+on:
+  schedule:
+    # 1st of each month at 08:00 UTC
+    # Reports are published on the 20th-23rd of the month after → safe buffer
+    - cron: "0 8 1 * *"
+  workflow_dispatch:   # allow manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pdfplumber beautifulsoup4 lxml
+
+      - name: Run Kaffeesteuer scraper
+        run: python backend/scraper/fetch_kaffeesteuer.py
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/kaffeesteuer.json
+          git diff --cached --quiet \
+            && echo "No changes — JSON already up to date." \
+            || git commit -m "data: update kaffeesteuer.json [skip ci]" && git push
