@@ -16,6 +16,7 @@ interface MarketInfo {
 interface FinancialPeriod {
   period_end: string;
   revenue: number | null;
+  cogs: number | null;
   gross_profit: number | null;
   net_income: number | null;
   net_debt: number | null;
@@ -161,6 +162,7 @@ export default function EarningsTable() {
               {/* Latest annual financials */}
               <th className="text-right px-2 py-1.5 whitespace-nowrap">Revenue</th>
               <th className="text-right px-2 py-1.5 whitespace-nowrap">Rev YoY</th>
+              <th className="text-right px-2 py-1.5 whitespace-nowrap">COGS</th>
               <th className="text-right px-2 py-1.5 whitespace-nowrap">Gross Profit</th>
               <th className="text-right px-2 py-1.5 whitespace-nowrap">GP YoY</th>
               <th className="text-right px-2 py-1.5 whitespace-nowrap">Net Income</th>
@@ -179,7 +181,7 @@ export default function EarningsTable() {
                 <>
                   {/* Group header row */}
                   <tr key={`hdr-${g}`} className="bg-slate-900/80">
-                    <td colSpan={17} className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800">
+                    <td colSpan={18} className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800">
                       {GROUP_LABELS[g]}
                     </td>
                   </tr>
@@ -228,6 +230,9 @@ export default function EarningsTable() {
                         </td>
                         <td className={`text-right px-2 py-1.5 whitespace-nowrap font-mono ${pctColor(fi?.revenue_yoy ?? null)}`}>
                           {fmtPct(fi?.revenue_yoy ?? null)}
+                        </td>
+                        <td className="text-right px-2 py-1.5 whitespace-nowrap font-mono text-red-300">
+                          {fmtB(fi?.cogs ?? null, cur)}
                         </td>
                         <td className="text-right px-2 py-1.5 whitespace-nowrap font-mono text-slate-200">
                           {fmtB(fi?.gross_profit ?? null, cur)}

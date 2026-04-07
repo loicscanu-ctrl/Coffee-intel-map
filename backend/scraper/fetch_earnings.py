@@ -70,6 +70,8 @@ def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
         rev  = _safe_float(fi.loc["Total Revenue", col])          if "Total Revenue" in fi.index else None
         gp   = _safe_float(fi.loc["Gross Profit", col])           if "Gross Profit"  in fi.index else None
         ni   = _safe_float(fi.loc["Net Income", col])             if "Net Income"    in fi.index else None
+        cogs_raw = _safe_float(fi.loc["Cost Of Revenue", col])    if "Cost Of Revenue" in fi.index else None
+        cogs = cogs_raw if cogs_raw is not None else (round(rev - gp, 4) if rev is not None and gp is not None else None)
 
         # Net debt from balance sheet — match nearest date
         net_debt = None
@@ -88,11 +90,12 @@ def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
                     net_debt = round(total_debt - cash, 4)
 
         periods.append({
-            "period_end":  period_end,
-            "revenue":     rev,
+            "period_end":   period_end,
+            "revenue":      rev,
+            "cogs":         cogs,
             "gross_profit": gp,
-            "net_income":  ni,
-            "net_debt":    net_debt,
+            "net_income":   ni,
+            "net_debt":     net_debt,
         })
 
     # Compute YoY% for most recent period
