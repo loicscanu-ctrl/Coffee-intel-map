@@ -55,10 +55,22 @@ def _pct_change(cur: float | None, prev: float | None) -> float | None:
     return round((cur / prev - 1) * 100, 1)
 
 
-def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
-    """Returns list of annual periods, most recent first."""
-    fi = t.income_stmt
-    bs = t.balance_sheet
+def _fetch_financials(t: yf.Ticker) -> tuple[list[dict], str]:
+    """Returns (periods, frequency) where frequency is 'quarterly' or 'annual'.
+    Prefers quarterly; falls back to annual for European reporters (NESN, JDEP).
+    Periods are most recent first, up to 8 quarters or 5 annual."""
+    qfi = t.quarterly_income_stmt
+    qbs = t.quarterly_balance_sheet
+    if not qfi.empty:
+        fi, bs, freq = qfi, qbs, "quarterly"
+    else:
+        fi, bs, freq = t.income_stmt, t.balance_sheet, "annual"
+    periods = _parse_periods(fi, bs)
+    return periods[:8], freq
+
+
+def _parse_periods(fi, bs) -> list[dict]:
+    """Extract financial periods from income statement + balance sheet DataFrames."""
     periods = []
 
     if fi.empty:
@@ -73,21 +85,20 @@ def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
         cogs_raw = _safe_float(fi.loc["Cost Of Revenue", col])    if "Cost Of Revenue" in fi.index else None
         cogs = cogs_raw if cogs_raw is not None else (round(rev - gp, 4) if rev is not None and gp is not None else None)
 
-        # Net debt from balance sheet — match nearest date
+        # Net debt: match balance sheet column closest to this period
         net_debt = None
         if not bs.empty:
             bs_dates = [c.date().isoformat() for c in bs.columns]
-            bs_col = None
             if period_end in bs_dates:
                 bs_col = bs.columns[bs_dates.index(period_end)]
-            elif bs_dates:
-                bs_col = bs.columns[0]  # nearest available
-
-            if bs_col is not None:
-                total_debt = _safe_float(bs.loc["Total Debt", bs_col]) if "Total Debt" in bs.index else None
-                cash       = _safe_float(bs.loc["Cash And Cash Equivalents", bs_col]) if "Cash And Cash Equivalents" in bs.index else None
-                if total_debt is not None and cash is not None:
-                    net_debt = round(total_debt - cash, 4)
+            else:
+                # pick closest date
+                diffs = [abs((pd.Timestamp(period_end) - c).days) for c in bs.columns]
+                bs_col = bs.columns[diffs.index(min(diffs))]
+            total_debt = _safe_float(bs.loc["Total Debt", bs_col]) if "Total Debt" in bs.index else None
+            cash       = _safe_float(bs.loc["Cash And Cash Equivalents", bs_col]) if "Cash And Cash Equivalents" in bs.index else None
+            if total_debt is not None and cash is not None:
+                net_debt = round(total_debt - cash, 4)
 
         periods.append({
             "period_end":   period_end,
@@ -98,9 +109,12 @@ def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
             "net_debt":     net_debt,
         })
 
-    # Compute YoY% for most recent period
-    if len(periods) >= 2:
-        cur, prev = periods[0], periods[1]
+    # Compute YoY% — compare each period to the one 4 positions later (same quarter prior year)
+    # For annual data (<=5 periods) use adjacent period instead
+    step = 4 if len(periods) > 5 else 1
+    for i in range(len(periods) - step):
+        cur  = periods[i]
+        prev = periods[i + step]
         cur["revenue_yoy"]      = _pct_change(cur["revenue"],      prev["revenue"])
         cur["cogs_yoy"]         = _pct_change(cur["cogs"],         prev["cogs"])
         cur["gross_profit_yoy"] = _pct_change(cur["gross_profit"], prev["gross_profit"])
@@ -172,20 +186,21 @@ def main():
         print(f"Fetching {sym} ({co['name']})...")
         try:
             t = yf.Ticker(sym)
-            financials    = _fetch_annual_financials(t)
-            earnings_dates = _fetch_earnings_dates(t)
-            market_info   = _fetch_info(t)
+            financials, frequency = _fetch_financials(t)
+            earnings_dates        = _fetch_earnings_dates(t)
+            market_info           = _fetch_info(t)
 
             results.append({
-                "ticker":        sym,
-                "name":          co["name"],
-                "group":         co["group"],
-                "scraped_at":    scraped_at,
-                "market":        market_info,
-                "financials":    financials,      # annual, most recent first
-                "earnings_dates": earnings_dates, # up to 8, most recent first
+                "ticker":         sym,
+                "name":           co["name"],
+                "group":          co["group"],
+                "scraped_at":     scraped_at,
+                "frequency":      frequency,
+                "market":         market_info,
+                "financials":     financials,
+                "earnings_dates": earnings_dates,
             })
-            print(f"  OK — {len(financials)} annual periods, {len(earnings_dates)} earnings dates")
+            print(f"  OK — {len(financials)} {frequency} periods, {len(earnings_dates)} earnings dates")
         except Exception as e:
             print(f"  ERROR: {e}", file=sys.stderr)
             results.append({

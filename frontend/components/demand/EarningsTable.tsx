@@ -38,6 +38,7 @@ interface Company {
   name: string;
   group: string;
   scraped_at: string;
+  frequency?: "quarterly" | "annual";
   market?: MarketInfo;
   financials?: FinancialPeriod[];
   earnings_dates?: EarningsDate[];
@@ -199,7 +200,12 @@ export default function EarningsTable() {
                       <tr key={co.ticker} className={`border-b border-slate-800 ${idx % 2 === 0 ? "bg-transparent" : "bg-slate-900/40"} hover:bg-slate-800/40`}>
                         {/* Company */}
                         <td className="px-2 py-1.5 whitespace-nowrap">
-                          <div className="font-semibold text-white">{co.ticker}</div>
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold text-white">{co.ticker}</span>
+                            <span className={`text-[9px] px-1 rounded font-bold ${co.frequency === "quarterly" ? "bg-sky-900/60 text-sky-400" : "bg-slate-700 text-slate-400"}`}>
+                              {co.frequency === "quarterly" ? "Q" : "A"}
+                            </span>
+                          </div>
                           <div className="text-[10px] text-slate-400">{co.name}</div>
                         </td>
                         {/* Stock */}
