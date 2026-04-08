@@ -102,6 +102,7 @@ def _fetch_annual_financials(t: yf.Ticker) -> list[dict]:
     if len(periods) >= 2:
         cur, prev = periods[0], periods[1]
         cur["revenue_yoy"]      = _pct_change(cur["revenue"],      prev["revenue"])
+        cur["cogs_yoy"]         = _pct_change(cur["cogs"],         prev["cogs"])
         cur["gross_profit_yoy"] = _pct_change(cur["gross_profit"], prev["gross_profit"])
         cur["net_income_yoy"]   = _pct_change(cur["net_income"],   prev["net_income"])
 

@@ -1,21 +1,21 @@
 {
-  "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+  "scraped_at": "2026-04-07T13:43:35.569383+00:00",
   "companies": [
     {
       "ticker": "SBUX",
       "name": "Starbucks",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 94.78,
+        "price": 94.53,
         "currency": "USD",
         "w52_high": 104.82,
         "w52_low": 75.5,
-        "mktcap": 107982848000.0,
-        "pe": 78.9833,
-        "forward_pe": 32.0934,
+        "mktcap": 107698028544.0,
+        "pe": 78.775,
+        "forward_pe": 32.0087,
         "ev_ebitda": 23.57,
-        "ytd_pct": 13.6
+        "ytd_pct": 13.3
       },
       "financials": [
         {
@@ -26,6 +26,7 @@
           "net_income": 1856400000.0,
           "net_debt": 23391700000.0,
           "revenue_yoy": 2.8,
+          "cogs_yoy": 8.5,
           "gross_profit_yoy": -12.8,
           "net_income_yoy": -50.6
         },
@@ -117,17 +118,17 @@
       "ticker": "BROS",
       "name": "Dutch Bros",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 53.03,
+        "price": 52.9771,
         "currency": "USD",
         "w52_high": 77.88,
         "w52_low": 44.58,
-        "mktcap": 8738463744.0,
-        "pe": 82.8594,
-        "forward_pe": 44.1891,
+        "mktcap": 8729747456.0,
+        "pe": 82.7767,
+        "forward_pe": 44.145,
         "ev_ebitda": 26.123,
-        "ytd_pct": -14.7
+        "ytd_pct": -14.8
       },
       "financials": [
         {
@@ -138,6 +139,7 @@
           "net_income": 79842000.0,
           "net_debt": 819618000.0,
           "revenue_yoy": 27.9,
+          "cogs_yoy": 29.0,
           "gross_profit_yoy": 24.6,
           "net_income_yoy": 126.5
         },
@@ -229,17 +231,17 @@
       "ticker": "WEST",
       "name": "Westrock Coffee",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 4.7,
+        "price": 4.64,
         "currency": "USD",
         "w52_high": 7.92,
         "w52_low": 3.59,
-        "mktcap": 455331808.0,
+        "mktcap": 449519072.0,
         "pe": null,
-        "forward_pe": 26.1111,
+        "forward_pe": 25.7778,
         "ev_ebitda": 63.083,
-        "ytd_pct": 15.5
+        "ytd_pct": 14.0
       },
       "financials": [
         {
@@ -250,6 +252,7 @@
           "net_income": -90445000.0,
           "net_debt": 531734000.0,
           "revenue_yoy": 39.8,
+          "cogs_yoy": 49.0,
           "gross_profit_yoy": -2.0,
           "net_income_yoy": 12.6
         },
@@ -341,17 +344,17 @@
       "ticker": "BRCC",
       "name": "Black Rifle Coffee",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 0.8053,
+        "price": 0.79,
         "currency": "USD",
         "w52_high": 2.395,
         "w52_low": 0.6,
-        "mktcap": 93793296.0,
+        "mktcap": 92011312.0,
         "pe": null,
-        "forward_pe": 26.8433,
+        "forward_pe": 26.3333,
         "ev_ebitda": -15.086,
-        "ytd_pct": -28.1
+        "ytd_pct": -29.5
       },
       "financials": [
         {
@@ -362,6 +365,7 @@
           "net_income": -11914000.0,
           "net_debt": 57705000.0,
           "revenue_yoy": 1.7,
+          "cogs_yoy": 13.0,
           "gross_profit_yoy": -14.4,
           "net_income_yoy": 303.6
         },
@@ -453,17 +457,17 @@
       "ticker": "DNUT",
       "name": "Krispy Kreme",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 3.45,
+        "price": 3.375,
         "currency": "USD",
         "w52_high": 5.73,
         "w52_low": 2.5,
-        "mktcap": 594089984.0,
+        "mktcap": 581174976.0,
         "pe": null,
-        "forward_pe": -42.7509,
+        "forward_pe": -41.8216,
         "ev_ebitda": 26.024,
-        "ytd_pct": -15.4
+        "ytd_pct": -17.3
       },
       "financials": [
         {
@@ -474,6 +478,7 @@
           "net_income": -515767000.0,
           "net_debt": 1382547000.0,
           "revenue_yoy": -8.6,
+          "cogs_yoy": -8.9,
           "gross_profit_yoy": -8.5,
           "net_income_yoy": -16764.5
         },
@@ -565,15 +570,15 @@
       "ticker": "KDP",
       "name": "Keurig Dr Pepper",
       "group": "conglomerate",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 25.7,
+        "price": 25.705,
         "currency": "USD",
         "w52_high": 35.94,
-        "w52_low": 24.875,
-        "mktcap": 34917720064.0,
-        "pe": 16.7974,
-        "forward_pe": 10.1703,
+        "w52_low": 24.88,
+        "mktcap": 34924511232.0,
+        "pe": 16.8007,
+        "forward_pe": 10.1723,
         "ev_ebitda": 11.78,
         "ytd_pct": -6.5
       },
@@ -586,6 +591,7 @@
           "net_income": 2079000000.0,
           "net_debt": 15115000000.0,
           "revenue_yoy": 8.2,
+          "cogs_yoy": 11.5,
           "gross_profit_yoy": 5.5,
           "net_income_yoy": 44.3
         },
@@ -677,17 +683,17 @@
       "ticker": "SJM",
       "name": "JM Smucker",
       "group": "conglomerate",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 95.22,
+        "price": 94.9502,
         "currency": "USD",
         "w52_high": 119.39,
         "w52_low": 93.3,
-        "mktcap": 10159433728.0,
+        "mktcap": 10130648064.0,
         "pe": null,
-        "forward_pe": 9.4586,
+        "forward_pe": 9.4318,
         "ev_ebitda": 9.38,
-        "ytd_pct": -0.5
+        "ytd_pct": -0.8
       },
       "financials": [
         {
@@ -698,6 +704,7 @@
           "net_income": -1230800000.0,
           "net_debt": 7691800000.0,
           "revenue_yoy": 6.7,
+          "cogs_yoy": 5.5,
           "gross_profit_yoy": 8.6,
           "net_income_yoy": -265.4
         },
@@ -789,17 +796,17 @@
       "ticker": "KHC",
       "name": "Kraft Heinz",
       "group": "conglomerate",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 23.57,
+        "price": 23.4015,
         "currency": "USD",
         "w52_high": 30.42,
         "w52_low": 21.035,
-        "mktcap": 27900864512.0,
+        "mktcap": 27701403648.0,
         "pe": null,
-        "forward_pe": 11.0076,
+        "forward_pe": 10.9289,
         "ev_ebitda": 7.892,
-        "ytd_pct": -1.7
+        "ytd_pct": -2.4
       },
       "financials": [
         {
@@ -810,6 +817,7 @@
           "net_income": -5846000000.0,
           "net_debt": 18604000000.0,
           "revenue_yoy": -3.5,
+          "cogs_yoy": -1.5,
           "gross_profit_yoy": -7.3,
           "net_income_yoy": -313.0
         },
@@ -901,17 +909,17 @@
       "ticker": "NESN.SW",
       "name": "Nestl\u00e9",
       "group": "conglomerate",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 79.15,
+        "price": 79.0,
         "currency": "CHF",
         "w52_high": 89.43,
         "w52_low": 69.9,
-        "mktcap": 203591204864.0,
-        "pe": 22.5499,
-        "forward_pe": 17.0242,
+        "mktcap": 203205378048.0,
+        "pe": 22.5071,
+        "forward_pe": 16.9919,
         "ev_ebitda": 15.221,
-        "ytd_pct": 3.5
+        "ytd_pct": 3.3
       },
       "financials": [
         {
@@ -922,6 +930,7 @@
           "net_income": 9033000000.0,
           "net_debt": 53573000000.0,
           "revenue_yoy": -2.0,
+          "cogs_yoy": 0.0,
           "gross_profit_yoy": -4.3,
           "net_income_yoy": -17.0
         },
@@ -983,7 +992,7 @@
       "ticker": "JDEP.AS",
       "name": "JDE Peet's",
       "group": "conglomerate",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
         "price": 31.8,
         "currency": "EUR",
@@ -1004,6 +1013,7 @@
           "net_income": 796000000.0,
           "net_debt": 3693000000.0,
           "revenue_yoy": 12.3,
+          "cogs_yoy": 22.3,
           "gross_profit_yoy": -4.9,
           "net_income_yoy": 41.9
         },
@@ -1065,17 +1075,17 @@
       "ticker": "QSR",
       "name": "Restaurant Brands",
       "group": "adjacent",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 77.23,
+        "price": 77.11,
         "currency": "USD",
         "w52_high": 77.95,
         "w52_low": 58.71,
-        "mktcap": 35206127616.0,
-        "pe": 29.365,
-        "forward_pe": 17.5461,
+        "mktcap": 35151421440.0,
+        "pe": 29.3194,
+        "forward_pe": 17.5188,
         "ev_ebitda": 15.236,
-        "ytd_pct": 14.9
+        "ytd_pct": 14.7
       },
       "financials": [
         {
@@ -1086,6 +1096,7 @@
           "net_income": 776000000.0,
           "net_debt": 14541000000.0,
           "revenue_yoy": 12.2,
+          "cogs_yoy": 16.0,
           "gross_profit_yoy": 5.6,
           "net_income_yoy": -24.0
         },
@@ -1177,17 +1188,17 @@
       "ticker": "KO",
       "name": "Coca-Cola",
       "group": "adjacent",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 77.22,
+        "price": 77.35,
         "currency": "USD",
         "w52_high": 82.0,
         "w52_low": 65.35,
-        "mktcap": 332366708736.0,
-        "pe": 25.4013,
-        "forward_pe": 22.3299,
+        "mktcap": 332926222336.0,
+        "pe": 25.4441,
+        "forward_pe": 22.3675,
         "ev_ebitda": 22.65,
-        "ytd_pct": 12.5
+        "ytd_pct": 12.7
       },
       "financials": [
         {
@@ -1198,6 +1209,7 @@
           "net_income": 13107000000.0,
           "net_debt": 35222000000.0,
           "revenue_yoy": 1.9,
+          "cogs_yoy": 0.4,
           "gross_profit_yoy": 2.8,
           "net_income_yoy": 23.3
         },
@@ -1289,7 +1301,7 @@
       "ticker": "FARM",
       "name": "Farmer Bros",
       "group": "micro",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
         "price": 1.26,
         "currency": "USD",
@@ -1310,6 +1322,7 @@
           "net_income": -14516000.0,
           "net_debt": 46568000.0,
           "revenue_yoy": 0.3,
+          "cogs_yoy": -6.7,
           "gross_profit_yoy": 11.2,
           "net_income_yoy": 274.6
         },
@@ -1401,17 +1414,17 @@
       "ticker": "JVA",
       "name": "Coffee Holding Co",
       "group": "micro",
-      "scraped_at": "2026-04-07T13:08:09.336416+00:00",
+      "scraped_at": "2026-04-07T13:43:35.569383+00:00",
       "market": {
-        "price": 4.28,
+        "price": 4.3,
         "currency": "USD",
         "w52_high": 5.63,
         "w52_low": 2.75,
-        "mktcap": 24432810.0,
-        "pe": 12.5882,
-        "forward_pe": 10.7,
+        "mktcap": 24546982.0,
+        "pe": 12.6471,
+        "forward_pe": 10.75,
         "ev_ebitda": 6.817,
-        "ytd_pct": 17.2
+        "ytd_pct": 17.7
       },
       "financials": [
         {
@@ -1422,6 +1435,7 @@
           "net_income": 1403439.0,
           "net_debt": 7690199.0,
           "revenue_yoy": 22.6,
+          "cogs_yoy": 29.3,
           "gross_profit_yoy": -3.9,
           "net_income_yoy": -36.7
         },
