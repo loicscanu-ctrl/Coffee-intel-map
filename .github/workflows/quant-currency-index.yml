@@ -1,0 +1,35 @@
+name: Quant – Coffee Currency Index
+
+on:
+  schedule:
+    # 21:30 UTC = 17:30 NY (after US markets close), Monday–Friday
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy
+
+      - name: Run Currency Index scraper
+        run: python -m backend.scraper.quant_model.fetch_currency_index
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/quant_report.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || git commit -m "data: update quant_report.json [skip ci]" && git push
