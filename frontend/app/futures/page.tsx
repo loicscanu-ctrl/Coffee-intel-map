@@ -97,42 +97,59 @@ function ChainTable({ item }: { item: NewsItem }) {
 
   const isArabica = item.tags.includes("arabica");
   const unit   = isArabica ? "¢/lb" : "$/t";
-  const label  = isArabica ? "ICE NY  —  Arabica (KC)" : "ICE London  —  Robusta (RC)";
+  const sublabel = isArabica ? "ICE NY · Arabica (KC)" : "ICE London · Robusta (RC)";
   const accent = isArabica ? "text-amber-400" : "text-emerald-400";
+
+  function fmtExpiry(raw: string): string {
+    // Try to parse various formats → "28 Apr" style
+    const d = new Date(raw);
+    if (!isNaN(d.getTime())) return `${d.getDate()} ${MONTH_ABB[d.getMonth() + 1]}`;
+    return raw; // fallback: show as-is
+  }
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
       <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between min-h-[40px]">
-        <span className={`font-semibold text-sm whitespace-nowrap ${accent}`}>{label}</span>
+        <div>
+          <span className="font-semibold text-sm text-white">Daily Quotes</span>
+          <span className={`text-xs ml-2 ${accent}`}>{sublabel}</span>
+        </div>
         <span className="text-xs text-slate-500 whitespace-nowrap ml-2">Barchart · {prevBizDay(item.pub_date ?? "")}</span>
       </div>
       <table className="w-full text-xs font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left  px-2 py-1 w-16 whitespace-nowrap">Contract</th>
-            <th className="text-center px-2 py-1 w-24 whitespace-nowrap">FND</th>
-            <th className="text-left  px-2 py-1 w-24 whitespace-nowrap">Expiry</th>
+            <th className="text-left  px-2 py-1 w-10 whitespace-nowrap">Ct.</th>
+            <th className="text-center px-2 py-1 w-20 whitespace-nowrap">FND</th>
+            <th className="text-center px-2 py-1 w-16 whitespace-nowrap">Expiry</th>
             <th className="text-right px-2 py-1 whitespace-nowrap">Last ({unit})</th>
             <th className="text-right px-2 py-1 whitespace-nowrap">Chg</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Spread</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Sprd</th>
+            <th className="text-right px-2 py-1 whitespace-nowrap">Sprd Chg</th>
             <th className="text-right px-2 py-1 whitespace-nowrap">OI</th>
             <th className="text-right px-2 py-1 whitespace-nowrap">Vol</th>
           </tr>
         </thead>
         <tbody>
           {data.contracts.map((c, i) => {
-            const chgColor = (c.chg ?? 0) >= 0 ? "text-emerald-400" : "text-red-400";
-            const nextLast = data!.contracts[i + 1]?.last;
-            const spread = c.last != null && nextLast != null ? c.last - nextLast : null;
+            const chgColor  = (c.chg ?? 0) >= 0 ? "text-emerald-400" : "text-red-400";
+            const next      = data!.contracts[i + 1];
+            const spread    = c.last != null && next?.last != null ? c.last - next.last : null;
+            const spreadChg = c.chg != null && next?.chg != null ? c.chg - next.chg : null;
+            // Extract 5-char contract name: e.g. "KCK25" from symbol
+            const shortSym  = c.symbol.replace(/^(KC|RC|RM)/, "$1").slice(0, 5);
             return (
               <tr key={c.symbol} className={`border-t border-slate-700 ${i === 0 ? "text-white bg-slate-800/60" : "text-slate-300"}`}>
-                <td className="px-2 py-1.5 font-bold">{c.symbol}</td>
+                <td className="px-2 py-1.5 font-bold whitespace-nowrap">{shortSym}</td>
                 <td className="px-2 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{firstNoticeDay(c.symbol)}</td>
-                <td className="px-2 py-1.5 text-slate-400">{c.expiry}</td>
+                <td className="px-2 py-1.5 text-center text-slate-500 whitespace-nowrap">{fmtExpiry(c.expiry)}</td>
                 <td className={`px-2 py-1.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(2)}</td>
                 <td className={`px-2 py-1.5 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
                 <td className={`px-2 py-1.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
                   {spread !== null ? (spread >= 0 ? "+" : "") + spread.toFixed(2) : "—"}
+                </td>
+                <td className={`px-2 py-1.5 text-right ${spreadChg === null ? "text-slate-600" : spreadChg >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+                  {spreadChg !== null ? (spreadChg >= 0 ? "+" : "") + spreadChg.toFixed(2) : "—"}
                 </td>
                 <td className="px-2 py-1.5 text-right">{fmt(c.oi)}</td>
                 <td className="px-2 py-1.5 text-right text-slate-400">{fmt(c.volume)}</td>
