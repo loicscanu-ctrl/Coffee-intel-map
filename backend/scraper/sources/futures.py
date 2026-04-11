@@ -11,20 +11,22 @@ from datetime import date
 from scraper.db import upsert_cot_weekly, get_session
 from scraper.db_macro import upsert_commodity_price
 
-def _oi_trade_date() -> str:
-    """Return the OI trade date as YYYY-MM-DD.
-    Barchart/ICE shows a 2-business-day lag: data fetched today reflects
-    positions as of 2 trading days ago."""
+def _prev_biz_day(n: int) -> str:
+    """Return today minus n business days as YYYY-MM-DD."""
     from datetime import timedelta
     d = date.today()
     skipped = 0
-    while skipped < 2:
+    while skipped < n:
         d -= timedelta(days=1)
         if d.weekday() < 5:
             skipped += 1
     return d.isoformat()
 
-_TODAY = _oi_trade_date
+def _pub_date() -> str:
+    """Publication date: T-1 business day (when ICE/Barchart published the data)."""
+    return _prev_biz_day(1)
+
+_TODAY = _pub_date
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Barchart – futures chain (price + OI per contract)
@@ -356,6 +358,35 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
     nr_dl   = _int(row["Change_in_NonRept_Long_All"])
     nr_ds   = _int(row["Change_in_NonRept_Short_All"])
 
+    # Old / Other crop split (CFTC Arabica only)
+    pmpu_l_old    = _int(row["Prod_Merc_Positions_Long_Old"])
+    pmpu_s_old    = _int(row["Prod_Merc_Positions_Short_Old"])
+    swap_l_old    = _int(row["Swap_Positions_Long_Old"])
+    swap_s_old    = _get(row, "Swap__Positions_Short_Old", "Swap_Positions_Short_Old")
+    swap_sp_old   = _get(row, "Swap__Positions_Spread_Old", "Swap_Positions_Spread_Old")
+    mm_l_old      = _int(row["M_Money_Positions_Long_Old"])
+    mm_s_old      = _int(row["M_Money_Positions_Short_Old"])
+    mm_sp_old     = _int(row["M_Money_Positions_Spread_Old"])
+    oth_l_old     = _int(row["Other_Rept_Positions_Long_Old"])
+    oth_s_old     = _int(row["Other_Rept_Positions_Short_Old"])
+    oth_sp_old    = _int(row["Other_Rept_Positions_Spread_Old"])
+    nr_l_old      = _int(row["NonRept_Positions_Long_Old"])
+    nr_s_old      = _int(row["NonRept_Positions_Short_Old"])
+
+    pmpu_l_other  = _int(row["Prod_Merc_Positions_Long_Other"])
+    pmpu_s_other  = _int(row["Prod_Merc_Positions_Short_Other"])
+    swap_l_other  = _int(row["Swap_Positions_Long_Other"])
+    swap_s_other  = _get(row, "Swap__Positions_Short_Other", "Swap_Positions_Short_Other")
+    swap_sp_other = _get(row, "Swap__Positions_Spread_Other", "Swap_Positions_Spread_Other")
+    mm_l_other    = _int(row["M_Money_Positions_Long_Other"])
+    mm_s_other    = _int(row["M_Money_Positions_Short_Other"])
+    mm_sp_other   = _int(row["M_Money_Positions_Spread_Other"])
+    oth_l_other   = _int(row["Other_Rept_Positions_Long_Other"])
+    oth_s_other   = _int(row["Other_Rept_Positions_Short_Other"])
+    oth_sp_other  = _int(row["Other_Rept_Positions_Spread_Other"])
+    nr_l_other    = _int(row["NonRept_Positions_Long_Other"])
+    nr_s_other    = _int(row["NonRept_Positions_Short_Other"])
+
     cot_struct = {
         "report_date": report_date,
         "open_interest": oi,
@@ -374,6 +405,16 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
             "mm_long":     mm_l,    "mm_short":    mm_s,    "mm_spread":   mm_sp,
             "other_long":  oth_l,   "other_short": oth_s,   "other_spread": oth_sp,
             "nr_long":     nr_l,    "nr_short":    nr_s,
+            "pmpu_long_old":    pmpu_l_old,   "pmpu_short_old":    pmpu_s_old,
+            "swap_long_old":    swap_l_old,   "swap_short_old":    swap_s_old,   "swap_spread_old":  swap_sp_old,
+            "mm_long_old":      mm_l_old,     "mm_short_old":      mm_s_old,     "mm_spread_old":    mm_sp_old,
+            "other_long_old":   oth_l_old,    "other_short_old":   oth_s_old,    "other_spread_old": oth_sp_old,
+            "nr_long_old":      nr_l_old,     "nr_short_old":      nr_s_old,
+            "pmpu_long_other":  pmpu_l_other, "pmpu_short_other":  pmpu_s_other,
+            "swap_long_other":  swap_l_other, "swap_short_other":  swap_s_other, "swap_spread_other":  swap_sp_other,
+            "mm_long_other":    mm_l_other,   "mm_short_other":    mm_s_other,   "mm_spread_other":    mm_sp_other,
+            "other_long_other": oth_l_other,  "other_short_other": oth_s_other,  "other_spread_other": oth_sp_other,
+            "nr_long_other":    nr_l_other,   "nr_short_other":    nr_s_other,
         })
     except Exception as e:
         print(f"[cot] Failed to upsert NY cot_weekly for {report_date}: {e}")

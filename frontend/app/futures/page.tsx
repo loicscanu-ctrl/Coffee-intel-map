@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { fetchNews } from "@/lib/api";
 import OIHistoryTable from "@/components/futures/OIHistoryTable";
 import OIFndChart from "@/components/futures/OIFndChart";
+import CotBacktestReport from "@/components/futures/CotBacktestReport";
 
 interface Contract {
   contract: string;
@@ -90,12 +91,12 @@ function firstNoticeDay(symbol: string): string {
 
 // ─── Futures Chain Table ──────────────────────────────────────────────────────
 
-function ChainTable({ item }: { item: NewsItem }) {
-  let data: { contracts: Contract[] } | null = null;
-  try { data = item.meta ? JSON.parse(item.meta) : null; } catch { return null; }
+interface ChainData { pub_date: string; contracts: Contract[]; }
+
+function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: ChainData }) {
   if (!data?.contracts?.length) return null;
 
-  const isArabica = item.tags.includes("arabica");
+  const isArabica = market === "arabica";
   const unit   = isArabica ? "¢/lb" : "$/t";
   const sublabel = isArabica ? "ICE NY · Arabica (KC)" : "ICE London · Robusta (RC)";
   const accent = isArabica ? "text-amber-400" : "text-emerald-400";
@@ -114,7 +115,7 @@ function ChainTable({ item }: { item: NewsItem }) {
           <span className="font-semibold text-sm text-white">Daily Quotes</span>
           <span className={`text-xs ml-2 ${accent}`}>{sublabel}</span>
         </div>
-        <span className="text-xs text-slate-500 whitespace-nowrap ml-2">Barchart · {prevBizDay(item.pub_date ?? "")}</span>
+        <span className="text-xs text-slate-500 whitespace-nowrap ml-2">Barchart · {data.pub_date ?? ""}</span>
       </div>
       <table className="w-full text-xs font-mono">
         <thead>
@@ -131,7 +132,7 @@ function ChainTable({ item }: { item: NewsItem }) {
           </tr>
         </thead>
         <tbody>
-          {data.contracts.map((c, i) => {
+          {data!.contracts.map((c, i) => {
             const chgColor  = (c.chg ?? 0) >= 0 ? "text-emerald-400" : "text-red-400";
             const next      = data!.contracts[i + 1];
             const spread    = c.last != null && next?.last != null ? c.last - next.last : null;
@@ -492,27 +493,37 @@ function QuotationTab({ contracts = [], vndPrice, usdvnd }: { contracts?: Contra
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function FuturesPage() {
-  const [allItems, setAllItems] = useState<NewsItem[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [tab, setTab]           = useState<"exchange" | "quotation">("exchange");
+interface FuturesChainJson {
+  arabica: ChainData | null;
+  robusta: ChainData | null;
+}
 
+export default function FuturesPage() {
+  const [chainJson, setChainJson] = useState<FuturesChainJson | null>(null);
+  const [allItems, setAllItems]   = useState<NewsItem[]>([]);
+  const [tab, setTab]             = useState<"exchange" | "quotation" | "research">("exchange");
+
+  // Chain data: instant from static JSON, no backend needed
   useEffect(() => {
-    fetchNews()
-      .then((data: NewsItem[]) => setAllItems(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    fetch("/data/futures_chain.json")
+      .then(r => r.json())
+      .then(setChainJson)
+      .catch(() => setChainJson({ arabica: null, robusta: null }));
   }, []);
 
-  const items        = allItems.filter(i => i.tags?.includes("futures"));
-  const chains       = items.filter(i => i.tags.includes("price") && i.meta);
-  const robustaChain = chains.find(i => i.tags.includes("robusta"));
-  const arabicaChain = chains.find(i => i.tags.includes("arabica"));
+  // News: only needed for VND price in quotation tab — tolerate delay
+  useEffect(() => {
+    fetchNews().then(setAllItems).catch(() => {});
+  }, []);
 
-  const vndItem  = allItems.find(i => i.tags?.includes("vietnam") && i.tags?.includes("price") && i.tags?.includes("robusta") && !i.tags?.includes("futures"));
+  const arabicaChain = chainJson?.arabica ?? null;
+  const robustaChain = chainJson?.robusta ?? null;
+  const loading      = chainJson === null;
+
+  const vndItem   = allItems.find(i => i.tags?.includes("vietnam") && i.tags?.includes("price") && i.tags?.includes("robusta") && !i.tags?.includes("futures"));
   const fxVndItem = allItems.find(i => i.tags?.includes("fx") && i.tags?.includes("vietnam"));
-  const vndPrice = vndItem   ? parseBodyPrice(vndItem.body)   : null;
-  const usdvnd   = fxVndItem ? parseBodyPrice(fxVndItem.body) : null;
+  const vndPrice  = vndItem   ? parseBodyPrice(vndItem.body)   : null;
+  const usdvnd    = fxVndItem ? parseBodyPrice(fxVndItem.body) : null;
 
   return (
     <div className="p-6 h-full overflow-y-auto space-y-4">
@@ -532,6 +543,17 @@ export default function FuturesPage() {
             {t}
           </button>
         ))}
+        <button
+          onClick={() => setTab("research")}
+          className={`px-4 py-2 text-sm font-medium rounded-t transition-colors flex items-center gap-1.5 ${
+            tab === "research"
+              ? "bg-slate-800 text-amber-400 border border-b-transparent border-slate-700 -mb-px"
+              : "text-slate-600 hover:text-slate-400"
+          }`}
+        >
+          <span className="text-[10px] bg-amber-900/60 text-amber-400 px-1 py-0.5 rounded font-bold tracking-wide">DRAFT</span>
+          Research
+        </button>
       </div>
 
       {loading && (
@@ -551,8 +573,8 @@ export default function FuturesPage() {
             </p>
           )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {arabicaChain && <ChainTable item={arabicaChain} />}
-            {robustaChain && <ChainTable item={robustaChain} />}
+            {arabicaChain && <ChainTable market="arabica" data={arabicaChain} />}
+            {robustaChain && <ChainTable market="robusta" data={robustaChain} />}
           </div>
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
@@ -578,11 +600,14 @@ export default function FuturesPage() {
       {/* Quotation tab */}
       {tab === "quotation" && (
         <QuotationTab
-          contracts={robustaChain?.meta ? (() => { try { return JSON.parse(robustaChain.meta!).contracts ?? []; } catch { return []; } })() : []}
+          contracts={robustaChain?.contracts ?? []}
           vndPrice={vndPrice}
           usdvnd={usdvnd}
         />
       )}
+
+      {/* Research tab — draft COT backtest report */}
+      {tab === "research" && <CotBacktestReport />}
 
     </div>
   );
