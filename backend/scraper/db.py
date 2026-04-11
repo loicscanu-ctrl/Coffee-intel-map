@@ -78,6 +78,33 @@ def upsert_freight_rate(index_code: str, rate_date, rate: float):
         db.close()
 
 
+def migrate_cot_weekly_columns():
+    """Add any missing columns to cot_weekly (safe to run repeatedly)."""
+    engine = _get_engine()
+    from sqlalchemy import text
+    new_cols = [
+        ("pmpu_long_old", "INTEGER"), ("pmpu_short_old", "INTEGER"),
+        ("swap_long_old", "INTEGER"), ("swap_short_old", "INTEGER"), ("swap_spread_old", "INTEGER"),
+        ("mm_long_old", "INTEGER"),   ("mm_short_old", "INTEGER"),   ("mm_spread_old", "INTEGER"),
+        ("other_long_old", "INTEGER"),("other_short_old", "INTEGER"),("other_spread_old", "INTEGER"),
+        ("nr_long_old", "INTEGER"),   ("nr_short_old", "INTEGER"),
+        ("pmpu_long_other", "INTEGER"),("pmpu_short_other", "INTEGER"),
+        ("swap_long_other", "INTEGER"),("swap_short_other", "INTEGER"),("swap_spread_other", "INTEGER"),
+        ("mm_long_other", "INTEGER"),  ("mm_short_other", "INTEGER"), ("mm_spread_other", "INTEGER"),
+        ("other_long_other", "INTEGER"),("other_short_other", "INTEGER"),("other_spread_other", "INTEGER"),
+        ("nr_long_other", "INTEGER"),  ("nr_short_other", "INTEGER"),
+    ]
+    with engine.connect() as conn:
+        for col, col_type in new_cols:
+            try:
+                conn.execute(text(
+                    f"ALTER TABLE cot_weekly ADD COLUMN IF NOT EXISTS {col} {col_type}"
+                ))
+                conn.commit()
+            except Exception as e:
+                print(f"[db] migrate col {col}: {e}")
+
+
 def upsert_cot_weekly(market: str, report_date, fields: dict):
     from models import CotWeekly
     db = get_session()
