@@ -514,9 +514,11 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
   const currentYear   = currentMonths[0]?.split("-")[0] ?? "2026";
   const prevYear      = prevMonths[0]?.split("-")[0] ?? "2025";
 
+  const currentCropKey = currentMonths.length > 0 ? cropYearKey(currentMonths[0]) : currentYear;
+  const prevCropKeyDest = currentMonths.length > 0 ? cropYearKey(prevMonths[0] ?? `${parseInt(currentYear) - 1}-04`) : prevYear;
   const ytdLabel = currentMonths.length > 0
-    ? `${monthLabel(currentMonths[0])}–${monthLabel(currentMonths[currentMonths.length - 1])} ${currentYear} YTD`
-    : `${currentYear} YTD`;
+    ? `Crop ${currentCropKey} — ${monthLabel(currentMonths[0])}–${monthLabel(currentMonths[currentMonths.length - 1])}`
+    : `Crop ${currentYear}`;
 
   // ── Aggregate by country ────────────────────────────────────────────────────
   const countryTotals = useMemo(() => {
@@ -624,12 +626,12 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
           <Tooltip contentStyle={TT_STYLE}
             formatter={(v: any, name: any) => [
               `${v} kt`,
-              name === "current" ? `${currentYear} YTD` : `${prevYear} same period`,
+              name === "current" ? `Crop ${currentCropKey} CTD` : `Crop ${prevCropKeyDest} same period`,
             ]} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={(v) => (
               <span style={{ color: "#cbd5e1" }}>
-                {v === "current" ? `${currentYear} YTD` : `${prevYear} same period`}
+                {v === "current" ? `Crop ${currentCropKey} CTD` : `Crop ${prevCropKeyDest} same period`}
               </span>
             )} />
           <Bar dataKey="prev"    name="prev"    fill={SLATE} opacity={0.55} />
@@ -648,7 +650,7 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
       <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-0.5 text-[10px]">
         <div className="col-span-2 grid grid-cols-2 gap-x-6 pb-1 border-b border-slate-700 text-slate-500 font-medium">
           <span>Destination</span>
-          <span className="text-right">YoY (same-period)</span>
+          <span className="text-right">Crop YoY (same period)</span>
         </div>
         {rows.map(r => (
           <div key={r.label} className="contents">
@@ -691,20 +693,27 @@ export default function BrazilTab() {
   const latest = series[series.length - 1];
   const prev   = series[series.length - 13]; // same month last year
 
-  const currentYear  = latest.date.split("-")[0];
-  const ytdCurrent   = series.filter(r => r.date.startsWith(currentYear));
-  const nMonths      = ytdCurrent.length;
-  const ytdPrevYear  = String(parseInt(currentYear) - 1);
-  const ytdPrev      = series.filter(r => {
-    const [y, m] = r.date.split("-");
-    return y === ytdPrevYear && parseInt(m) <= nMonths;
-  });
+  // Crop-to-date: Apr → latest month, using cropYearKey
+  const latestCropKey  = cropYearKey(latest.date);
+  const [cropStartY]   = latestCropKey.split("/").map(Number); // e.g. 2025 for "2025/26"
+  const prevCropKey    = `${cropStartY - 1}/${String(cropStartY).slice(2)}`;
 
-  const ytdTotal    = ytdCurrent.reduce((s, r) => s + r.total, 0);
-  const ytdPrevTotal = ytdPrev.reduce((s, r) => s + r.total, 0);
-  const ytdChg      = ytdPrevTotal > 0 ? Math.round((ytdTotal - ytdPrevTotal) / ytdPrevTotal * 100) : null;
-  const lyChg       = prev ? Math.round((latest.total - prev.total) / prev.total * 100) : null;
-  const ytdMonths   = ytdCurrent.map(r => monthLabel(r.date)).join("/");
+  // All months in the current crop year up to (and including) latest
+  const ctdCurrent = series.filter(r => cropYearKey(r.date) === latestCropKey);
+  // Same months in the previous crop year (same month indices)
+  const ctdMonthIndices = new Set(ctdCurrent.map(r => parseInt(r.date.split("-")[1])));
+  const ctdPrev    = series.filter(r =>
+    cropYearKey(r.date) === prevCropKey &&
+    ctdMonthIndices.has(parseInt(r.date.split("-")[1]))
+  );
+
+  const ctdTotal      = ctdCurrent.reduce((s, r) => s + r.total, 0);
+  const ctdPrevTotal  = ctdPrev.reduce((s, r) => s + r.total, 0);
+  const ctdChg        = ctdPrevTotal > 0 ? Math.round((ctdTotal - ctdPrevTotal) / ctdPrevTotal * 100) : null;
+  const lyChg         = prev ? Math.round((latest.total - prev.total) / prev.total * 100) : null;
+  const ctdMonthRange = ctdCurrent.length > 0
+    ? `${monthLabel(ctdCurrent[0].date)}–${monthLabel(ctdCurrent[ctdCurrent.length - 1].date)}`
+    : "";
 
   return (
     <div className="space-y-5">
@@ -734,14 +743,14 @@ export default function BrazilTab() {
           sub={prev ? `${bagsToKT(prev.total).toFixed(1)} kt in ${prev.date}` : ""}
         />
         <StatCard
-          label={`${ytdMonths} ${currentYear} YTD`}
-          value={`${bagsToKT(ytdTotal).toFixed(1)} kt`}
-          sub={`${(ytdTotal / 1000).toFixed(0)}k bags total`}
+          label={`Crop ${latestCropKey} — ${ctdMonthRange}`}
+          value={`${bagsToKT(ctdTotal).toFixed(1)} kt`}
+          sub={`${(ctdTotal / 1000).toFixed(0)}k bags crop-to-date`}
         />
         <StatCard
-          label={`YTD vs ${ytdPrevYear} same period`}
-          value={ytdChg !== null ? `${ytdChg > 0 ? "+" : ""}${ytdChg}%` : "—"}
-          sub={`${ytdPrevYear}: ${bagsToKT(ytdPrevTotal).toFixed(1)} kt`}
+          label={`vs crop ${prevCropKey} same period`}
+          value={ctdChg !== null ? `${ctdChg > 0 ? "+" : ""}${ctdChg}%` : "—"}
+          sub={`${prevCropKey}: ${bagsToKT(ctdPrevTotal).toFixed(1)} kt`}
         />
       </div>
 
