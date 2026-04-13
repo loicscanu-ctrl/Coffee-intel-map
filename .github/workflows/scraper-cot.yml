@@ -11,6 +11,8 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -23,8 +25,30 @@ jobs:
         working-directory: backend
         run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv
 
-      - name: Run COT scraper
+      - name: Run macro COT scraper (commodity positions + prices)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python -m scraper.run_cot
+
+      - name: Run Coffee C COT scraper (CFTC + ICE Robusta)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.run_cot_coffee
+
+      - name: Export static JSON files
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.export_static_json
+
+      - name: Commit updated static JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/cot.json \
+                  frontend/public/data/macro_cot.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || git commit -m "data: update COT static JSON [skip ci]" && git push
