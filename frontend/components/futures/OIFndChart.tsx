@@ -26,7 +26,7 @@ const STATIC_SERIES: Record<"robusta" | "arabica", Series[]> = {
     { symbol:"KCU25", label:"U25", fnd:"2025-08-21", data:[{day:-30,oi:70666},{day:-29,oi:70560},{day:-28,oi:68411},{day:-27,oi:66469},{day:-26,oi:65563},{day:-25,oi:65441},{day:-24,oi:64888},{day:-23,oi:64648},{day:-22,oi:64762},{day:-21,oi:64730},{day:-20,oi:64182},{day:-19,oi:63578},{day:-18,oi:63248},{day:-17,oi:62057},{day:-16,oi:61039},{day:-15,oi:60033},{day:-14,oi:59571},{day:-13,oi:58036},{day:-12,oi:57246},{day:-11,oi:56310},{day:-10,oi:52301},{day:-9,oi:45672},{day:-8,oi:36856},{day:-7,oi:28622},{day:-6,oi:23805},{day:-5,oi:19895},{day:-4,oi:15532},{day:-3,oi:12553},{day:-2,oi:9706},{day:-1,oi:5787},{day:0,oi:1326}] },
     { symbol:"KCZ25", label:"Z25", fnd:"2025-11-20", data:[{day:-30,oi:71888},{day:-29,oi:71822},{day:-28,oi:72230},{day:-27,oi:72600},{day:-26,oi:72319},{day:-25,oi:71223},{day:-24,oi:69916},{day:-23,oi:70466},{day:-22,oi:69963},{day:-21,oi:69938},{day:-20,oi:68924},{day:-19,oi:67523},{day:-18,oi:65912},{day:-17,oi:64465},{day:-16,oi:62232},{day:-15,oi:60078},{day:-14,oi:59273},{day:-13,oi:58684},{day:-12,oi:57123},{day:-11,oi:54996},{day:-10,oi:49619},{day:-9,oi:45835},{day:-8,oi:42630},{day:-7,oi:37993},{day:-6,oi:35306},{day:-5,oi:22345},{day:-4,oi:15340},{day:-3,oi:10964},{day:-2,oi:7534},{day:-1,oi:1806},{day:0,oi:1690}] },
     { symbol:"KCH26", label:"H26", fnd:"2026-02-19", data:[{day:-30,oi:76560},{day:-29,oi:77206},{day:-28,oi:74796},{day:-27,oi:74080},{day:-26,oi:72554},{day:-25,oi:72503},{day:-24,oi:71170},{day:-22,oi:70785},{day:-21,oi:68744},{day:-20,oi:67945},{day:-19,oi:67429},{day:-18,oi:67832},{day:-17,oi:66393},{day:-16,oi:64217},{day:-15,oi:62567},{day:-14,oi:61528},{day:-13,oi:60702},{day:-12,oi:58747},{day:-11,oi:57287},{day:-10,oi:53584},{day:-9,oi:49005},{day:-8,oi:43629},{day:-7,oi:37454},{day:-6,oi:30095},{day:-5,oi:17584},{day:-4,oi:10993},{day:-2,oi:8053},{day:-1,oi:4055},{day:0,oi:1294}] },
-    { symbol:"KCK26", label:"K26", fnd:"2026-04-22", data:[{day:-30,oi:73654},{day:-29,oi:70773},{day:-28,oi:70305},{day:-27,oi:70173},{day:-26,oi:70784},{day:-25,oi:68988},{day:-24,oi:68610},{day:-23,oi:68457},{day:-22,oi:66602},{day:-21,oi:64198},{day:-20,oi:63382}] },
+    { symbol:"KCK26", label:"K26", fnd:"2026-04-22", data:[{day:-30,oi:73654},{day:-29,oi:70773},{day:-28,oi:70305},{day:-27,oi:70173},{day:-26,oi:70784},{day:-25,oi:68988},{day:-24,oi:68610},{day:-23,oi:68457},{day:-22,oi:66602},{day:-21,oi:64198},{day:-20,oi:61395},{day:-19,oi:59558},{day:-18,oi:58271},{day:-17,oi:58305},{day:-16,oi:58799},{day:-15,oi:57211},{day:-14,oi:57211},{day:-13,oi:55365},{day:-12,oi:54345},{day:-11,oi:50999},{day:-10,oi:46545},{day:-9,oi:38438}] },
   ],
   robusta: [
     { symbol:"RMF25", label:"F25", fnd:"2024-12-26", data:[{day:-30,oi:36662},{day:-29,oi:37076},{day:-28,oi:37380},{day:-27,oi:36993},{day:-26,oi:35314},{day:-25,oi:35514},{day:-24,oi:35033},{day:-23,oi:34434},{day:-22,oi:33621},{day:-21,oi:33246},{day:-20,oi:31224},{day:-19,oi:29838},{day:-18,oi:28255},{day:-17,oi:25097},{day:-16,oi:23769},{day:-15,oi:21683},{day:-14,oi:20972},{day:-13,oi:20150},{day:-12,oi:19184},{day:-11,oi:15838},{day:-10,oi:14531},{day:-9,oi:13390},{day:-8,oi:12853},{day:-7,oi:11859},{day:-6,oi:9398},{day:-5,oi:5245},{day:-4,oi:3432},{day:-3,oi:2663},{day:-2,oi:1280}] },
@@ -65,20 +65,21 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
   const [isMock, setIsMock] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/futures/oi-fnd-chart?market=${market}`)
+    fetch(`/data/oi_fnd_chart.json`)
       .then(r => r.json())
-      .then((apiSeries: Series[]) => {
-        if (!apiSeries?.length) {
+      .then((json: { arabica: Series[]; robusta: Series[] }) => {
+        const apiSeries: Series[] = json?.[market] ?? [];
+        if (!apiSeries.length) {
           setSeries(STATIC_SERIES[market]);
           setIsMock(true);
           return;
         }
-        // Merge: start from static, overlay API data points per symbol
+        // Merge: start from static, overlay JSON data points per symbol
         const apiBySymbol = new Map(apiSeries.map(s => [s.symbol, s]));
         const merged = STATIC_SERIES[market].map(staticS => {
           const apiS = apiBySymbol.get(staticS.symbol);
           if (!apiS) return staticS;
-          // Union of days; API point takes precedence on collision
+          // Union of days; JSON point takes precedence on collision
           const apiDayMap = new Map(apiS.data.map(p => [p.day, p.oi]));
           const days = new Map(staticS.data.map(p => [p.day, p.oi]));
           apiDayMap.forEach((oi, day) => days.set(day, oi));
@@ -87,7 +88,7 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
             .sort((a, b) => a.day - b.day);
           return { ...staticS, data };
         });
-        // Add any new symbols from API not in static
+        // Add any new symbols from JSON not in static
         apiSeries.forEach(apiS => {
           if (!merged.find(s => s.symbol === apiS.symbol)) merged.push(apiS);
         });
