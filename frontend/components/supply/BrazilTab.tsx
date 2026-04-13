@@ -431,39 +431,48 @@ function MonthlyVolumeChart({ series }: { series: VolumeSeries[] }) {
 
 // ── Annual Trend ──────────────────────────────────────────────────────────────
 
+// Crop year: Apr Y → Mar Y+1, labelled "Y/Y+1" (e.g. "2024/25")
+function cropYearKey(ym: string): string {
+  const [y, m] = ym.split("-").map(Number);
+  return m >= 4 ? `${y}/${String(y + 1).slice(2)}` : `${y - 1}/${String(y).slice(2)}`;
+}
+
 function AnnualTrendChart({ series }: { series: VolumeSeries[] }) {
   const [since, setSince] = useState(2010);
 
   const annualData = useMemo(() => {
-    const byYear: Record<number, { arabica: number; conillon: number; soluvel: number; torrado: number }> = {};
+    const byCrop: Record<string, { arabica: number; conillon: number; soluvel: number; torrado: number; months: number }> = {};
     series.forEach(r => {
-      const y = parseInt(r.date.split("-")[0]);
-      if (!byYear[y]) byYear[y] = { arabica: 0, conillon: 0, soluvel: 0, torrado: 0 };
-      byYear[y].arabica  += r.arabica;
-      byYear[y].conillon += r.conillon;
-      byYear[y].soluvel  += r.soluvel;
-      byYear[y].torrado  += r.torrado;
+      const key = cropYearKey(r.date);
+      if (!byCrop[key]) byCrop[key] = { arabica: 0, conillon: 0, soluvel: 0, torrado: 0, months: 0 };
+      byCrop[key].arabica  += r.arabica;
+      byCrop[key].conillon += r.conillon;
+      byCrop[key].soluvel  += r.soluvel;
+      byCrop[key].torrado  += r.torrado;
+      byCrop[key].months   += 1;
     });
-    const latestYear = Math.max(...Object.keys(byYear).map(Number));
-    return Object.entries(byYear)
-      .filter(([y]) => parseInt(y) < latestYear)
-      .map(([y, v]) => ({
-        year:     y,
-        "Arabica (green)":  bagsToKT(v.arabica),
-        "Conillon (green)": bagsToKT(v.conillon),
-        "Soluble":          bagsToKT(v.soluvel),
-        "Roasted & Ground": bagsToKT(v.torrado),
+    // Latest crop key (sort lexicographically — "2025/26" > "2024/25")
+    const sortedKeys = Object.keys(byCrop).sort();
+    const latestKey  = sortedKeys[sortedKeys.length - 1];
+    return sortedKeys
+      .filter(k => k !== latestKey || byCrop[k].months === 12) // exclude incomplete current crop
+      .map(k => ({
+        year:               k,
+        startYear:          parseInt(k.split("/")[0]),
+        "Arabica (green)":  bagsToKT(byCrop[k].arabica),
+        "Conillon (green)": bagsToKT(byCrop[k].conillon),
+        "Soluble":          bagsToKT(byCrop[k].soluvel),
+        "Roasted & Ground": bagsToKT(byCrop[k].torrado),
       }))
-      .sort((a, b) => parseInt(a.year) - parseInt(b.year))
-      .filter(r => parseInt(r.year) >= since);
+      .filter(r => r.startYear >= since);
   }, [series, since]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
       <div className="flex items-center justify-between mb-1">
         <div>
-          <div className="text-sm font-semibold text-slate-200">Annual Export by Coffee Type</div>
-          <div className="text-[10px] text-slate-500">Thousand metric tons — complete years only</div>
+          <div className="text-sm font-semibold text-slate-200">Annual Export by Coffee Type — Crop Year (Apr–Mar)</div>
+          <div className="text-[10px] text-slate-500">Thousand metric tons — complete crop years only (Apr Y → Mar Y+1)</div>
         </div>
         <div className="flex gap-1">
           {[2000, 2010, 2015].map(y => (
