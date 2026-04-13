@@ -1,0 +1,6024 @@
+{
+  "source": "Cecafe",
+  "report": "Fevereiro 2026",
+  "updated": "2026-04-13",
+  "unit": "bags_60kg",
+  "series": [
+    {
+      "date": "1990-01",
+      "conillon": 52468,
+      "arabica": 1065752,
+      "total_verde": 1118220,
+      "torrado": 0,
+      "soluvel": 201506,
+      "total_industria": 201506,
+      "total": 1319726
+    },
+    {
+      "date": "1990-02",
+      "conillon": 143060,
+      "arabica": 933231,
+      "total_verde": 1076291,
+      "torrado": 0,
+      "soluvel": 214208,
+      "total_industria": 214208,
+      "total": 1290499
+    },
+    {
+      "date": "1990-03",
+      "conillon": 75235,
+      "arabica": 1215000,
+      "total_verde": 1290235,
+      "torrado": 0,
+      "soluvel": 225253,
+      "total_industria": 225253,
+      "total": 1515488
+    },
+    {
+      "date": "1990-04",
+      "conillon": 118122,
+      "arabica": 900599,
+      "total_verde": 1018721,
+      "torrado": 0,
+      "soluvel": 109949,
+      "total_industria": 109949,
+      "total": 1128670
+    },
+    {
+      "date": "1990-05",
+      "conillon": 104121,
+      "arabica": 855682,
+      "total_verde": 959803,
+      "torrado": 0,
+      "soluvel": 339583,
+      "total_industria": 339583,
+      "total": 1299386
+    },
+    {
+      "date": "1990-06",
+      "conillon": 98767,
+      "arabica": 1005956,
+      "total_verde": 1104723,
+      "torrado": 0,
+      "soluvel": 254316,
+      "total_industria": 254316,
+      "total": 1359039
+    },
+    {
+      "date": "1990-07",
+      "conillon": 117306,
+      "arabica": 611127,
+      "total_verde": 728433,
+      "torrado": 150,
+      "soluvel": 145586,
+      "total_industria": 145736,
+      "total": 874169
+    },
+    {
+      "date": "1990-08",
+      "conillon": 229047,
+      "arabica": 1086333,
+      "total_verde": 1315380,
+      "torrado": 0,
+      "soluvel": 191129,
+      "total_industria": 191129,
+      "total": 1506509
+    },
+    {
+      "date": "1990-09",
+      "conillon": 163439,
+      "arabica": 1075531,
+      "total_verde": 1238970,
+      "torrado": 139,
+      "soluvel": 225367,
+      "total_industria": 225506,
+      "total": 1464476
+    },
+    {
+      "date": "1990-10",
+      "conillon": 81134,
+      "arabica": 548070,
+      "total_verde": 629204,
+      "torrado": 0,
+      "soluvel": 98808,
+      "total_industria": 98808,
+      "total": 728012
+    },
+    {
+      "date": "1990-11",
+      "conillon": 412608,
+      "arabica": 1848290,
+      "total_verde": 2260898,
+      "torrado": 349,
+      "soluvel": 246157,
+      "total_industria": 246506,
+      "total": 2507404
+    },
+    {
+      "date": "1990-12",
+      "conillon": 459797,
+      "arabica": 1369188,
+      "total_verde": 1828985,
+      "torrado": 0,
+      "soluvel": 163686,
+      "total_industria": 163686,
+      "total": 1992671
+    },
+    {
+      "date": "1991-01",
+      "conillon": 454838,
+      "arabica": 1526567,
+      "total_verde": 1981405,
+      "torrado": 847,
+      "soluvel": 130371,
+      "total_industria": 131218,
+      "total": 2112623
+    },
+    {
+      "date": "1991-02",
+      "conillon": 261385,
+      "arabica": 601040,
+      "total_verde": 862425,
+      "torrado": 0,
+      "soluvel": 72998,
+      "total_industria": 72998,
+      "total": 935423
+    },
+    {
+      "date": "1991-03",
+      "conillon": 134297,
+      "arabica": 1575271,
+      "total_verde": 1709568,
+      "torrado": 853,
+      "soluvel": 136476,
+      "total_industria": 137329,
+      "total": 1846897
+    },
+    {
+      "date": "1991-04",
+      "conillon": 64963,
+      "arabica": 1114181,
+      "total_verde": 1179144,
+      "torrado": 169,
+      "soluvel": 191393,
+      "total_industria": 191562,
+      "total": 1370706
+    },
+    {
+      "date": "1991-05",
+      "conillon": 193803,
+      "arabica": 1122307,
+      "total_verde": 1316110,
+      "torrado": 167,
+      "soluvel": 164718,
+      "total_industria": 164885,
+      "total": 1480995
+    },
+    {
+      "date": "1991-06",
+      "conillon": 134108,
+      "arabica": 1028632,
+      "total_verde": 1162740,
+      "torrado": 0,
+      "soluvel": 108175,
+      "total_industria": 108175,
+      "total": 1270915
+    },
+    {
+      "date": "1991-07",
+      "conillon": 201225,
+      "arabica": 954959,
+      "total_verde": 1156184,
+      "torrado": 0,
+      "soluvel": 143930,
+      "total_industria": 143930,
+      "total": 1300114
+    },
+    {
+      "date": "1991-08",
+      "conillon": 671755,
+      "arabica": 1549204,
+      "total_verde": 2220959,
+      "torrado": 437,
+      "soluvel": 129158,
+      "total_industria": 129595,
+      "total": 2350554
+    },
+    {
+      "date": "1991-09",
+      "conillon": 422625,
+      "arabica": 1181847,
+      "total_verde": 1604472,
+      "torrado": 847,
+      "soluvel": 90554,
+      "total_industria": 91401,
+      "total": 1695873
+    },
+    {
+      "date": "1991-10",
+      "conillon": 506376,
+      "arabica": 1667990,
+      "total_verde": 2174366,
+      "torrado": 30,
+      "soluvel": 125571,
+      "total_industria": 125601,
+      "total": 2299967
+    },
+    {
+      "date": "1991-11",
+      "conillon": 357985,
+      "arabica": 1822609,
+      "total_verde": 2180594,
+      "torrado": 0,
+      "soluvel": 118833,
+      "total_industria": 118833,
+      "total": 2299427
+    },
+    {
+      "date": "1991-12",
+      "conillon": 333775,
+      "arabica": 1687167,
+      "total_verde": 2020942,
+      "torrado": 437,
+      "soluvel": 157045,
+      "total_industria": 157482,
+      "total": 2178424
+    },
+    {
+      "date": "1992-01",
+      "conillon": 259108,
+      "arabica": 1748702,
+      "total_verde": 2007810,
+      "torrado": 271,
+      "soluvel": 143585,
+      "total_industria": 143856,
+      "total": 2151666
+    },
+    {
+      "date": "1992-02",
+      "conillon": 129615,
+      "arabica": 1668912,
+      "total_verde": 1798527,
+      "torrado": 585,
+      "soluvel": 130777,
+      "total_industria": 131362,
+      "total": 1929889
+    },
+    {
+      "date": "1992-03",
+      "conillon": 94501,
+      "arabica": 1220741,
+      "total_verde": 1315242,
+      "torrado": 488,
+      "soluvel": 172320,
+      "total_industria": 172808,
+      "total": 1488050
+    },
+    {
+      "date": "1992-04",
+      "conillon": 142534,
+      "arabica": 1191310,
+      "total_verde": 1333844,
+      "torrado": 253,
+      "soluvel": 168503,
+      "total_industria": 168756,
+      "total": 1502600
+    },
+    {
+      "date": "1992-05",
+      "conillon": 128523,
+      "arabica": 1063019,
+      "total_verde": 1191542,
+      "torrado": 1306,
+      "soluvel": 153874,
+      "total_industria": 155180,
+      "total": 1346722
+    },
+    {
+      "date": "1992-06",
+      "conillon": 190129,
+      "arabica": 1022091,
+      "total_verde": 1212220,
+      "torrado": 448,
+      "soluvel": 160366,
+      "total_industria": 160814,
+      "total": 1373034
+    },
+    {
+      "date": "1992-07",
+      "conillon": 324002,
+      "arabica": 1161731,
+      "total_verde": 1485733,
+      "torrado": 1252,
+      "soluvel": 279455,
+      "total_industria": 280707,
+      "total": 1766440
+    },
+    {
+      "date": "1992-08",
+      "conillon": 247078,
+      "arabica": 1072021,
+      "total_verde": 1319099,
+      "torrado": 2546,
+      "soluvel": 163372,
+      "total_industria": 165918,
+      "total": 1485017
+    },
+    {
+      "date": "1992-09",
+      "conillon": 183112,
+      "arabica": 892373,
+      "total_verde": 1075485,
+      "torrado": 1476,
+      "soluvel": 278393,
+      "total_industria": 279869,
+      "total": 1355354
+    },
+    {
+      "date": "1992-10",
+      "conillon": 206309,
+      "arabica": 1176387,
+      "total_verde": 1382696,
+      "torrado": 2316,
+      "soluvel": 248938,
+      "total_industria": 251254,
+      "total": 1633950
+    },
+    {
+      "date": "1992-11",
+      "conillon": 68254,
+      "arabica": 867799,
+      "total_verde": 936053,
+      "torrado": 1583,
+      "soluvel": 221017,
+      "total_industria": 222600,
+      "total": 1158653
+    },
+    {
+      "date": "1992-12",
+      "conillon": 87860,
+      "arabica": 1264268,
+      "total_verde": 1352128,
+      "torrado": 1684,
+      "soluvel": 278514,
+      "total_industria": 280198,
+      "total": 1632326
+    },
+    {
+      "date": "1993-01",
+      "conillon": 25183,
+      "arabica": 571163,
+      "total_verde": 596346,
+      "torrado": 250,
+      "soluvel": 171928,
+      "total_industria": 172178,
+      "total": 768524
+    },
+    {
+      "date": "1993-02",
+      "conillon": 19967,
+      "arabica": 976685,
+      "total_verde": 996652,
+      "torrado": 612,
+      "soluvel": 219280,
+      "total_industria": 219892,
+      "total": 1216544
+    },
+    {
+      "date": "1993-03",
+      "conillon": 54438,
+      "arabica": 1242126,
+      "total_verde": 1296564,
+      "torrado": 477,
+      "soluvel": 232942,
+      "total_industria": 233419,
+      "total": 1529983
+    },
+    {
+      "date": "1993-04",
+      "conillon": 112620,
+      "arabica": 823411,
+      "total_verde": 936031,
+      "torrado": 80,
+      "soluvel": 143849,
+      "total_industria": 143929,
+      "total": 1079960
+    },
+    {
+      "date": "1993-05",
+      "conillon": 162935,
+      "arabica": 659082,
+      "total_verde": 822017,
+      "torrado": 0,
+      "soluvel": 186925,
+      "total_industria": 186925,
+      "total": 1008942
+    },
+    {
+      "date": "1993-06",
+      "conillon": 293092,
+      "arabica": 768310,
+      "total_verde": 1061402,
+      "torrado": 499,
+      "soluvel": 221023,
+      "total_industria": 221522,
+      "total": 1282924
+    },
+    {
+      "date": "1993-07",
+      "conillon": 541735,
+      "arabica": 920183,
+      "total_verde": 1461918,
+      "torrado": 1116,
+      "soluvel": 140913,
+      "total_industria": 142029,
+      "total": 1603947
+    },
+    {
+      "date": "1993-08",
+      "conillon": 502555,
+      "arabica": 1112044,
+      "total_verde": 1614599,
+      "torrado": 24,
+      "soluvel": 241078,
+      "total_industria": 241102,
+      "total": 1855701
+    },
+    {
+      "date": "1993-09",
+      "conillon": 391869,
+      "arabica": 1664951,
+      "total_verde": 2056820,
+      "torrado": 137,
+      "soluvel": 292428,
+      "total_industria": 292565,
+      "total": 2349385
+    },
+    {
+      "date": "1993-10",
+      "conillon": 272756,
+      "arabica": 1224323,
+      "total_verde": 1497079,
+      "torrado": 199,
+      "soluvel": 254481,
+      "total_industria": 254680,
+      "total": 1751759
+    },
+    {
+      "date": "1993-11",
+      "conillon": 159750,
+      "arabica": 1044290,
+      "total_verde": 1204040,
+      "torrado": 228,
+      "soluvel": 289733,
+      "total_industria": 289961,
+      "total": 1494001
+    },
+    {
+      "date": "1993-12",
+      "conillon": 281347,
+      "arabica": 1319848,
+      "total_verde": 1601195,
+      "torrado": 21,
+      "soluvel": 305521,
+      "total_industria": 305542,
+      "total": 1906737
+    },
+    {
+      "date": "1994-01",
+      "conillon": 114992,
+      "arabica": 1213171,
+      "total_verde": 1328163,
+      "torrado": 184,
+      "soluvel": 257708,
+      "total_industria": 257892,
+      "total": 1586055
+    },
+    {
+      "date": "1994-02",
+      "conillon": 75837,
+      "arabica": 1122072,
+      "total_verde": 1197909,
+      "torrado": 54,
+      "soluvel": 246736,
+      "total_industria": 246790,
+      "total": 1444699
+    },
+    {
+      "date": "1994-03",
+      "conillon": 41905,
+      "arabica": 1118495,
+      "total_verde": 1160400,
+      "torrado": 0,
+      "soluvel": 263878,
+      "total_industria": 263878,
+      "total": 1424278
+    },
+    {
+      "date": "1994-04",
+      "conillon": 40707,
+      "arabica": 575179,
+      "total_verde": 615886,
+      "torrado": 779,
+      "soluvel": 212631,
+      "total_industria": 213410,
+      "total": 829296
+    },
+    {
+      "date": "1994-05",
+      "conillon": 88910,
+      "arabica": 742958,
+      "total_verde": 831868,
+      "torrado": 1017,
+      "soluvel": 214361,
+      "total_industria": 215378,
+      "total": 1047246
+    },
+    {
+      "date": "1994-06",
+      "conillon": 201065,
+      "arabica": 794639,
+      "total_verde": 995704,
+      "torrado": 740,
+      "soluvel": 161336,
+      "total_industria": 162076,
+      "total": 1157780
+    },
+    {
+      "date": "1994-07",
+      "conillon": 279620,
+      "arabica": 805722,
+      "total_verde": 1085342,
+      "torrado": 391,
+      "soluvel": 204297,
+      "total_industria": 204688,
+      "total": 1290030
+    },
+    {
+      "date": "1994-08",
+      "conillon": 298246,
+      "arabica": 1176077,
+      "total_verde": 1474323,
+      "torrado": 89,
+      "soluvel": 229358,
+      "total_industria": 229447,
+      "total": 1703770
+    },
+    {
+      "date": "1994-09",
+      "conillon": 320144,
+      "arabica": 920620,
+      "total_verde": 1240764,
+      "torrado": 556,
+      "soluvel": 203106,
+      "total_industria": 203662,
+      "total": 1444426
+    },
+    {
+      "date": "1994-10",
+      "conillon": 235258,
+      "arabica": 1378526,
+      "total_verde": 1613784,
+      "torrado": 925,
+      "soluvel": 222251,
+      "total_industria": 223176,
+      "total": 1836960
+    },
+    {
+      "date": "1994-11",
+      "conillon": 216337,
+      "arabica": 1462858,
+      "total_verde": 1679195,
+      "torrado": 316,
+      "soluvel": 236596,
+      "total_industria": 236912,
+      "total": 1916107
+    },
+    {
+      "date": "1994-12",
+      "conillon": 221309,
+      "arabica": 1131222,
+      "total_verde": 1352531,
+      "torrado": 317,
+      "soluvel": 238300,
+      "total_industria": 238617,
+      "total": 1591148
+    },
+    {
+      "date": "1995-01",
+      "conillon": 123521,
+      "arabica": 753198,
+      "total_verde": 876719,
+      "torrado": 1297,
+      "soluvel": 140541,
+      "total_industria": 141838,
+      "total": 1018557
+    },
+    {
+      "date": "1995-02",
+      "conillon": 76165,
+      "arabica": 720839,
+      "total_verde": 797004,
+      "torrado": 1491,
+      "soluvel": 185297,
+      "total_industria": 186788,
+      "total": 983792
+    },
+    {
+      "date": "1995-03",
+      "conillon": 45976,
+      "arabica": 880451,
+      "total_verde": 926427,
+      "torrado": 63,
+      "soluvel": 190786,
+      "total_industria": 190849,
+      "total": 1117276
+    },
+    {
+      "date": "1995-04",
+      "conillon": 95045,
+      "arabica": 932245,
+      "total_verde": 1027290,
+      "torrado": 915,
+      "soluvel": 149155,
+      "total_industria": 150070,
+      "total": 1177360
+    },
+    {
+      "date": "1995-05",
+      "conillon": 83430,
+      "arabica": 965968,
+      "total_verde": 1049398,
+      "torrado": 458,
+      "soluvel": 140157,
+      "total_industria": 140615,
+      "total": 1190013
+    },
+    {
+      "date": "1995-06",
+      "conillon": 167204,
+      "arabica": 1120540,
+      "total_verde": 1287744,
+      "torrado": 1079,
+      "soluvel": 346997,
+      "total_industria": 348076,
+      "total": 1635820
+    },
+    {
+      "date": "1995-07",
+      "conillon": 156320,
+      "arabica": 799116,
+      "total_verde": 955436,
+      "torrado": 0,
+      "soluvel": 213535,
+      "total_industria": 213535,
+      "total": 1168971
+    },
+    {
+      "date": "1995-08",
+      "conillon": 222289,
+      "arabica": 934333,
+      "total_verde": 1156622,
+      "torrado": 316,
+      "soluvel": 261478,
+      "total_industria": 261794,
+      "total": 1418416
+    },
+    {
+      "date": "1995-09",
+      "conillon": 151664,
+      "arabica": 1131092,
+      "total_verde": 1282756,
+      "torrado": 847,
+      "soluvel": 223076,
+      "total_industria": 223923,
+      "total": 1506679
+    },
+    {
+      "date": "1995-10",
+      "conillon": 75960,
+      "arabica": 910329,
+      "total_verde": 986289,
+      "torrado": 2330,
+      "soluvel": 249093,
+      "total_industria": 251423,
+      "total": 1237712
+    },
+    {
+      "date": "1995-11",
+      "conillon": 65876,
+      "arabica": 734170,
+      "total_verde": 800046,
+      "torrado": 960,
+      "soluvel": 227239,
+      "total_industria": 228199,
+      "total": 1028245
+    },
+    {
+      "date": "1995-12",
+      "conillon": 25125,
+      "arabica": 758156,
+      "total_verde": 783281,
+      "torrado": 420,
+      "soluvel": 287306,
+      "total_industria": 287726,
+      "total": 1071007
+    },
+    {
+      "date": "1996-01",
+      "conillon": 18505,
+      "arabica": 570712,
+      "total_verde": 589217,
+      "torrado": 123,
+      "soluvel": 173749,
+      "total_industria": 173872,
+      "total": 763089
+    },
+    {
+      "date": "1996-02",
+      "conillon": 24710,
+      "arabica": 568357,
+      "total_verde": 593067,
+      "torrado": 734,
+      "soluvel": 196052,
+      "total_industria": 196786,
+      "total": 789853
+    },
+    {
+      "date": "1996-03",
+      "conillon": 10710,
+      "arabica": 572337,
+      "total_verde": 583047,
+      "torrado": 450,
+      "soluvel": 224410,
+      "total_industria": 224860,
+      "total": 807907
+    },
+    {
+      "date": "1996-04",
+      "conillon": 10450,
+      "arabica": 532450,
+      "total_verde": 542900,
+      "torrado": 535,
+      "soluvel": 189377,
+      "total_industria": 189912,
+      "total": 732812
+    },
+    {
+      "date": "1996-05",
+      "conillon": 72545,
+      "arabica": 622785,
+      "total_verde": 695330,
+      "torrado": 485,
+      "soluvel": 186512,
+      "total_industria": 186997,
+      "total": 882327
+    },
+    {
+      "date": "1996-06",
+      "conillon": 150415,
+      "arabica": 598356,
+      "total_verde": 748771,
+      "torrado": 2183,
+      "soluvel": 249921,
+      "total_industria": 252104,
+      "total": 1000875
+    },
+    {
+      "date": "1996-07",
+      "conillon": 249563,
+      "arabica": 913249,
+      "total_verde": 1162812,
+      "torrado": 475,
+      "soluvel": 186380,
+      "total_industria": 186855,
+      "total": 1349667
+    },
+    {
+      "date": "1996-08",
+      "conillon": 184485,
+      "arabica": 1405372,
+      "total_verde": 1589857,
+      "torrado": 426,
+      "soluvel": 230792,
+      "total_industria": 231218,
+      "total": 1821075
+    },
+    {
+      "date": "1996-09",
+      "conillon": 74467,
+      "arabica": 1082013,
+      "total_verde": 1156480,
+      "torrado": 237,
+      "soluvel": 172447,
+      "total_industria": 172684,
+      "total": 1329164
+    },
+    {
+      "date": "1996-10",
+      "conillon": 80160,
+      "arabica": 1827805,
+      "total_verde": 1907965,
+      "torrado": 1793,
+      "soluvel": 256604,
+      "total_industria": 258397,
+      "total": 2166362
+    },
+    {
+      "date": "1996-11",
+      "conillon": 42575,
+      "arabica": 1617143,
+      "total_verde": 1659718,
+      "torrado": 163,
+      "soluvel": 217852,
+      "total_industria": 218015,
+      "total": 1877733
+    },
+    {
+      "date": "1996-12",
+      "conillon": 41485,
+      "arabica": 1493571,
+      "total_verde": 1535056,
+      "torrado": 350,
+      "soluvel": 234293,
+      "total_industria": 234643,
+      "total": 1769699
+    },
+    {
+      "date": "1997-01",
+      "conillon": 23810,
+      "arabica": 1240874,
+      "total_verde": 1264684,
+      "torrado": 390,
+      "soluvel": 182010,
+      "total_industria": 182400,
+      "total": 1447084
+    },
+    {
+      "date": "1997-02",
+      "conillon": 27031,
+      "arabica": 1076394,
+      "total_verde": 1103425,
+      "torrado": 601,
+      "soluvel": 164401,
+      "total_industria": 165002,
+      "total": 1268427
+    },
+    {
+      "date": "1997-03",
+      "conillon": 20492,
+      "arabica": 1529601,
+      "total_verde": 1550093,
+      "torrado": 267,
+      "soluvel": 188865,
+      "total_industria": 189132,
+      "total": 1739225
+    },
+    {
+      "date": "1997-04",
+      "conillon": 39186,
+      "arabica": 1197325,
+      "total_verde": 1236511,
+      "torrado": 521,
+      "soluvel": 143030,
+      "total_industria": 143551,
+      "total": 1380062
+    },
+    {
+      "date": "1997-05",
+      "conillon": 74992,
+      "arabica": 1346488,
+      "total_verde": 1421480,
+      "torrado": 55,
+      "soluvel": 143851,
+      "total_industria": 143906,
+      "total": 1565386
+    },
+    {
+      "date": "1997-06",
+      "conillon": 102525,
+      "arabica": 904140,
+      "total_verde": 1006665,
+      "torrado": 85,
+      "soluvel": 168810,
+      "total_industria": 168895,
+      "total": 1175560
+    },
+    {
+      "date": "1997-07",
+      "conillon": 84755,
+      "arabica": 836700,
+      "total_verde": 921455,
+      "torrado": 43,
+      "soluvel": 259333,
+      "total_industria": 259376,
+      "total": 1180831
+    },
+    {
+      "date": "1997-08",
+      "conillon": 59277,
+      "arabica": 1134190,
+      "total_verde": 1193467,
+      "torrado": 256,
+      "soluvel": 240014,
+      "total_industria": 240270,
+      "total": 1433737
+    },
+    {
+      "date": "1997-09",
+      "conillon": 36720,
+      "arabica": 1247359,
+      "total_verde": 1284079,
+      "torrado": 0,
+      "soluvel": 240374,
+      "total_industria": 240374,
+      "total": 1524453
+    },
+    {
+      "date": "1997-10",
+      "conillon": 35470,
+      "arabica": 1289932,
+      "total_verde": 1325402,
+      "torrado": 182,
+      "soluvel": 224882,
+      "total_industria": 225064,
+      "total": 1550466
+    },
+    {
+      "date": "1997-11",
+      "conillon": 31374,
+      "arabica": 996742,
+      "total_verde": 1028116,
+      "torrado": 1187,
+      "soluvel": 135160,
+      "total_industria": 136347,
+      "total": 1164463
+    },
+    {
+      "date": "1997-12",
+      "conillon": 8795,
+      "arabica": 1089541,
+      "total_verde": 1098336,
+      "torrado": 683,
+      "soluvel": 243142,
+      "total_industria": 243825,
+      "total": 1342161
+    },
+    {
+      "date": "1998-01",
+      "conillon": 13640,
+      "arabica": 818449,
+      "total_verde": 832089,
+      "torrado": 19,
+      "soluvel": 139372,
+      "total_industria": 139391,
+      "total": 971480
+    },
+    {
+      "date": "1998-02",
+      "conillon": 9520,
+      "arabica": 945957,
+      "total_verde": 955477,
+      "torrado": 49,
+      "soluvel": 135891,
+      "total_industria": 135940,
+      "total": 1091417
+    },
+    {
+      "date": "1998-03",
+      "conillon": 13725,
+      "arabica": 725339,
+      "total_verde": 739064,
+      "torrado": 42,
+      "soluvel": 116877,
+      "total_industria": 116919,
+      "total": 855983
+    },
+    {
+      "date": "1998-04",
+      "conillon": 18630,
+      "arabica": 781977,
+      "total_verde": 800607,
+      "torrado": 300,
+      "soluvel": 116371,
+      "total_industria": 116671,
+      "total": 917278
+    },
+    {
+      "date": "1998-05",
+      "conillon": 82174,
+      "arabica": 935046,
+      "total_verde": 1017220,
+      "torrado": 317,
+      "soluvel": 148613,
+      "total_industria": 148930,
+      "total": 1166150
+    },
+    {
+      "date": "1998-06",
+      "conillon": 159897,
+      "arabica": 1122622,
+      "total_verde": 1282519,
+      "torrado": 212,
+      "soluvel": 146998,
+      "total_industria": 147210,
+      "total": 1429729
+    },
+    {
+      "date": "1998-07",
+      "conillon": 127345,
+      "arabica": 1537319,
+      "total_verde": 1664664,
+      "torrado": 80,
+      "soluvel": 191957,
+      "total_industria": 192037,
+      "total": 1856701
+    },
+    {
+      "date": "1998-08",
+      "conillon": 121993,
+      "arabica": 1580756,
+      "total_verde": 1702749,
+      "torrado": 19,
+      "soluvel": 145771,
+      "total_industria": 145790,
+      "total": 1848539
+    },
+    {
+      "date": "1998-09",
+      "conillon": 104663,
+      "arabica": 1949115,
+      "total_verde": 2053778,
+      "torrado": 10,
+      "soluvel": 123624,
+      "total_industria": 123634,
+      "total": 2177412
+    },
+    {
+      "date": "1998-10",
+      "conillon": 104687,
+      "arabica": 1915048,
+      "total_verde": 2019735,
+      "torrado": 328,
+      "soluvel": 109284,
+      "total_industria": 109612,
+      "total": 2129347
+    },
+    {
+      "date": "1998-11",
+      "conillon": 67125,
+      "arabica": 1632035,
+      "total_verde": 1699160,
+      "torrado": 698,
+      "soluvel": 166037,
+      "total_industria": 166735,
+      "total": 1865895
+    },
+    {
+      "date": "1998-12",
+      "conillon": 121000,
+      "arabica": 1673034,
+      "total_verde": 1794034,
+      "torrado": 349,
+      "soluvel": 121037,
+      "total_industria": 121386,
+      "total": 1915420
+    },
+    {
+      "date": "1999-01",
+      "conillon": 107948,
+      "arabica": 1300406,
+      "total_verde": 1408354,
+      "torrado": 67,
+      "soluvel": 136498,
+      "total_industria": 136565,
+      "total": 1544919
+    },
+    {
+      "date": "1999-02",
+      "conillon": 333235,
+      "arabica": 1517846,
+      "total_verde": 1851081,
+      "torrado": 29,
+      "soluvel": 162608,
+      "total_industria": 162637,
+      "total": 2013718
+    },
+    {
+      "date": "1999-03",
+      "conillon": 259442,
+      "arabica": 1826439,
+      "total_verde": 2085881,
+      "torrado": 1005,
+      "soluvel": 190073,
+      "total_industria": 191078,
+      "total": 2276959
+    },
+    {
+      "date": "1999-04",
+      "conillon": 112044,
+      "arabica": 1658824,
+      "total_verde": 1770868,
+      "torrado": 0,
+      "soluvel": 133497,
+      "total_industria": 133497,
+      "total": 1904365
+    },
+    {
+      "date": "1999-05",
+      "conillon": 198736,
+      "arabica": 1407250,
+      "total_verde": 1605986,
+      "torrado": 0,
+      "soluvel": 109270,
+      "total_industria": 109270,
+      "total": 1715256
+    },
+    {
+      "date": "1999-06",
+      "conillon": 158253,
+      "arabica": 1452811,
+      "total_verde": 1611064,
+      "torrado": 203,
+      "soluvel": 124346,
+      "total_industria": 124549,
+      "total": 1735613
+    },
+    {
+      "date": "1999-07",
+      "conillon": 243532,
+      "arabica": 1281582,
+      "total_verde": 1525114,
+      "torrado": 0,
+      "soluvel": 140144,
+      "total_industria": 140144,
+      "total": 1665258
+    },
+    {
+      "date": "1999-08",
+      "conillon": 270293,
+      "arabica": 1532662,
+      "total_verde": 1802955,
+      "torrado": 395,
+      "soluvel": 168928,
+      "total_industria": 169323,
+      "total": 1972278
+    },
+    {
+      "date": "1999-09",
+      "conillon": 249577,
+      "arabica": 1692334,
+      "total_verde": 1941911,
+      "torrado": 0,
+      "soluvel": 223520,
+      "total_industria": 223520,
+      "total": 2165431
+    },
+    {
+      "date": "1999-10",
+      "conillon": 163050,
+      "arabica": 1653609,
+      "total_verde": 1816659,
+      "torrado": 600,
+      "soluvel": 196686,
+      "total_industria": 197286,
+      "total": 2013945
+    },
+    {
+      "date": "1999-11",
+      "conillon": 109246,
+      "arabica": 1791646,
+      "total_verde": 1900892,
+      "torrado": 0,
+      "soluvel": 172237,
+      "total_industria": 172237,
+      "total": 2073129
+    },
+    {
+      "date": "1999-12",
+      "conillon": 101966,
+      "arabica": 1635254,
+      "total_verde": 1737220,
+      "torrado": 570,
+      "soluvel": 202881,
+      "total_industria": 203451,
+      "total": 1940671
+    },
+    {
+      "date": "2000-01",
+      "conillon": 29916,
+      "arabica": 1054156,
+      "total_verde": 1084072,
+      "torrado": 194,
+      "soluvel": 105184,
+      "total_industria": 105378,
+      "total": 1189450
+    },
+    {
+      "date": "2000-02",
+      "conillon": 24925,
+      "arabica": 1308197,
+      "total_verde": 1333122,
+      "torrado": 616,
+      "soluvel": 153575,
+      "total_industria": 154191,
+      "total": 1487313
+    },
+    {
+      "date": "2000-03",
+      "conillon": 28154,
+      "arabica": 1112455,
+      "total_verde": 1140609,
+      "torrado": 1022,
+      "soluvel": 117774,
+      "total_industria": 118796,
+      "total": 1259405
+    },
+    {
+      "date": "2000-04",
+      "conillon": 13426,
+      "arabica": 1188619,
+      "total_verde": 1202045,
+      "torrado": 608,
+      "soluvel": 159797,
+      "total_industria": 160405,
+      "total": 1362450
+    },
+    {
+      "date": "2000-05",
+      "conillon": 101522,
+      "arabica": 1218305,
+      "total_verde": 1319827,
+      "torrado": 1234,
+      "soluvel": 162003,
+      "total_industria": 163237,
+      "total": 1483064
+    },
+    {
+      "date": "2000-06",
+      "conillon": 169382,
+      "arabica": 1165792,
+      "total_verde": 1335174,
+      "torrado": 1933,
+      "soluvel": 208461,
+      "total_industria": 210394,
+      "total": 1545568
+    },
+    {
+      "date": "2000-07",
+      "conillon": 62419,
+      "arabica": 800317,
+      "total_verde": 862736,
+      "torrado": 2207,
+      "soluvel": 157379,
+      "total_industria": 159586,
+      "total": 1022322
+    },
+    {
+      "date": "2000-08",
+      "conillon": 111493,
+      "arabica": 1501966,
+      "total_verde": 1613459,
+      "torrado": 1358,
+      "soluvel": 176319,
+      "total_industria": 177677,
+      "total": 1791136
+    },
+    {
+      "date": "2000-09",
+      "conillon": 48920,
+      "arabica": 1403244,
+      "total_verde": 1452164,
+      "torrado": 1772,
+      "soluvel": 194723,
+      "total_industria": 196495,
+      "total": 1648659
+    },
+    {
+      "date": "2000-10",
+      "conillon": 47707,
+      "arabica": 1657841,
+      "total_verde": 1705548,
+      "torrado": 960,
+      "soluvel": 220776,
+      "total_industria": 221736,
+      "total": 1927284
+    },
+    {
+      "date": "2000-11",
+      "conillon": 19916,
+      "arabica": 1429407,
+      "total_verde": 1449323,
+      "torrado": 0,
+      "soluvel": 143057,
+      "total_industria": 143057,
+      "total": 1592380
+    },
+    {
+      "date": "2000-12",
+      "conillon": 20288,
+      "arabica": 1492639,
+      "total_verde": 1512927,
+      "torrado": 0,
+      "soluvel": 267168,
+      "total_industria": 267168,
+      "total": 1780095
+    },
+    {
+      "date": "2001-01",
+      "conillon": 27697,
+      "arabica": 1133778,
+      "total_verde": 1161475,
+      "torrado": 93,
+      "soluvel": 187789,
+      "total_industria": 187882,
+      "total": 1349357
+    },
+    {
+      "date": "2001-02",
+      "conillon": 6283,
+      "arabica": 1302483,
+      "total_verde": 1308766,
+      "torrado": 113,
+      "soluvel": 173543,
+      "total_industria": 173656,
+      "total": 1482422
+    },
+    {
+      "date": "2001-03",
+      "conillon": 24848,
+      "arabica": 1357573,
+      "total_verde": 1382421,
+      "torrado": 66,
+      "soluvel": 196722,
+      "total_industria": 196788,
+      "total": 1579209
+    },
+    {
+      "date": "2001-04",
+      "conillon": 18404,
+      "arabica": 1706298,
+      "total_verde": 1724702,
+      "torrado": 186,
+      "soluvel": 217120,
+      "total_industria": 217306,
+      "total": 1942008
+    },
+    {
+      "date": "2001-05",
+      "conillon": 57429,
+      "arabica": 1418597,
+      "total_verde": 1476026,
+      "torrado": 598,
+      "soluvel": 213733,
+      "total_industria": 214331,
+      "total": 1690357
+    },
+    {
+      "date": "2001-06",
+      "conillon": 66767,
+      "arabica": 1502077,
+      "total_verde": 1568844,
+      "torrado": 0,
+      "soluvel": 216312,
+      "total_industria": 216312,
+      "total": 1785156
+    },
+    {
+      "date": "2001-07",
+      "conillon": 110678,
+      "arabica": 1532605,
+      "total_verde": 1643283,
+      "torrado": 336,
+      "soluvel": 201305,
+      "total_industria": 201641,
+      "total": 1844924
+    },
+    {
+      "date": "2001-08",
+      "conillon": 125405,
+      "arabica": 2044008,
+      "total_verde": 2169413,
+      "torrado": 5808,
+      "soluvel": 196252,
+      "total_industria": 202060,
+      "total": 2371473
+    },
+    {
+      "date": "2001-09",
+      "conillon": 203575,
+      "arabica": 1979709,
+      "total_verde": 2183284,
+      "torrado": 8177,
+      "soluvel": 239590,
+      "total_industria": 247767,
+      "total": 2431051
+    },
+    {
+      "date": "2001-10",
+      "conillon": 185163,
+      "arabica": 1897390,
+      "total_verde": 2082553,
+      "torrado": 8322,
+      "soluvel": 216015,
+      "total_industria": 224337,
+      "total": 2306890
+    },
+    {
+      "date": "2001-11",
+      "conillon": 226834,
+      "arabica": 2179597,
+      "total_verde": 2406431,
+      "torrado": 8608,
+      "soluvel": 208057,
+      "total_industria": 216665,
+      "total": 2623096
+    },
+    {
+      "date": "2001-12",
+      "conillon": 161000,
+      "arabica": 1662437,
+      "total_verde": 1823437,
+      "torrado": 8547,
+      "soluvel": 227453,
+      "total_industria": 236000,
+      "total": 2059437
+    },
+    {
+      "date": "2002-01",
+      "conillon": 108228,
+      "arabica": 1367683,
+      "total_verde": 1475911,
+      "torrado": 5646,
+      "soluvel": 163620,
+      "total_industria": 169266,
+      "total": 1645177
+    },
+    {
+      "date": "2002-02",
+      "conillon": 148287,
+      "arabica": 1435164,
+      "total_verde": 1583451,
+      "torrado": 10420,
+      "soluvel": 180828,
+      "total_industria": 191248,
+      "total": 1774699
+    },
+    {
+      "date": "2002-03",
+      "conillon": 180588,
+      "arabica": 1507891,
+      "total_verde": 1688479,
+      "torrado": 3361,
+      "soluvel": 240660,
+      "total_industria": 244021,
+      "total": 1932500
+    },
+    {
+      "date": "2002-04",
+      "conillon": 270193,
+      "arabica": 1510913,
+      "total_verde": 1781106,
+      "torrado": 5540,
+      "soluvel": 176692,
+      "total_industria": 182232,
+      "total": 1963338
+    },
+    {
+      "date": "2002-05",
+      "conillon": 380525,
+      "arabica": 1301120,
+      "total_verde": 1681645,
+      "torrado": 7394,
+      "soluvel": 207982,
+      "total_industria": 215376,
+      "total": 1897021
+    },
+    {
+      "date": "2002-06",
+      "conillon": 487734,
+      "arabica": 1298388,
+      "total_verde": 1786122,
+      "torrado": 2360,
+      "soluvel": 216504,
+      "total_industria": 218864,
+      "total": 2004986
+    },
+    {
+      "date": "2002-07",
+      "conillon": 434706,
+      "arabica": 1733680,
+      "total_verde": 2168386,
+      "torrado": 10731,
+      "soluvel": 178920,
+      "total_industria": 189651,
+      "total": 2358037
+    },
+    {
+      "date": "2002-08",
+      "conillon": 529929,
+      "arabica": 2090682,
+      "total_verde": 2620611,
+      "torrado": 3284,
+      "soluvel": 222507,
+      "total_industria": 225791,
+      "total": 2846402
+    },
+    {
+      "date": "2002-09",
+      "conillon": 445467,
+      "arabica": 2227103,
+      "total_verde": 2672570,
+      "torrado": 5768,
+      "soluvel": 217379,
+      "total_industria": 223147,
+      "total": 2895717
+    },
+    {
+      "date": "2002-10",
+      "conillon": 530467,
+      "arabica": 2311437,
+      "total_verde": 2841904,
+      "torrado": 7090,
+      "soluvel": 218098,
+      "total_industria": 225188,
+      "total": 3067092
+    },
+    {
+      "date": "2002-11",
+      "conillon": 353404,
+      "arabica": 2327433,
+      "total_verde": 2680837,
+      "torrado": 1936,
+      "soluvel": 230358,
+      "total_industria": 232294,
+      "total": 2913131
+    },
+    {
+      "date": "2002-12",
+      "conillon": 427387,
+      "arabica": 2120654,
+      "total_verde": 2548041,
+      "torrado": 3099,
+      "soluvel": 292985,
+      "total_industria": 296084,
+      "total": 2844125
+    },
+    {
+      "date": "2003-01",
+      "conillon": 298124,
+      "arabica": 1790951,
+      "total_verde": 2089075,
+      "torrado": 9436,
+      "soluvel": 182558,
+      "total_industria": 191994,
+      "total": 2281069
+    },
+    {
+      "date": "2003-02",
+      "conillon": 328431,
+      "arabica": 1786215,
+      "total_verde": 2114646,
+      "torrado": 4133,
+      "soluvel": 246568,
+      "total_industria": 250701,
+      "total": 2365347
+    },
+    {
+      "date": "2003-03",
+      "conillon": 280265,
+      "arabica": 1498124,
+      "total_verde": 1778389,
+      "torrado": 3028,
+      "soluvel": 235032,
+      "total_industria": 238060,
+      "total": 2016449
+    },
+    {
+      "date": "2003-04",
+      "conillon": 243442,
+      "arabica": 1621545,
+      "total_verde": 1864987,
+      "torrado": 6067,
+      "soluvel": 201323,
+      "total_industria": 207390,
+      "total": 2072377
+    },
+    {
+      "date": "2003-05",
+      "conillon": 300926,
+      "arabica": 1469116,
+      "total_verde": 1770042,
+      "torrado": 7585,
+      "soluvel": 237484,
+      "total_industria": 245069,
+      "total": 2015111
+    },
+    {
+      "date": "2003-06",
+      "conillon": 227035,
+      "arabica": 1335201,
+      "total_verde": 1562236,
+      "torrado": 3237,
+      "soluvel": 248940,
+      "total_industria": 252177,
+      "total": 1814413
+    },
+    {
+      "date": "2003-07",
+      "conillon": 227197,
+      "arabica": 1314039,
+      "total_verde": 1541236,
+      "torrado": 6859,
+      "soluvel": 250195,
+      "total_industria": 257054,
+      "total": 1798290
+    },
+    {
+      "date": "2003-08",
+      "conillon": 239509,
+      "arabica": 1475757,
+      "total_verde": 1715266,
+      "torrado": 3730,
+      "soluvel": 210483,
+      "total_industria": 214213,
+      "total": 1929479
+    },
+    {
+      "date": "2003-09",
+      "conillon": 211034,
+      "arabica": 2062355,
+      "total_verde": 2273389,
+      "torrado": 8133,
+      "soluvel": 236065,
+      "total_industria": 244198,
+      "total": 2517587
+    },
+    {
+      "date": "2003-10",
+      "conillon": 175235,
+      "arabica": 1925906,
+      "total_verde": 2101141,
+      "torrado": 3095,
+      "soluvel": 234847,
+      "total_industria": 237942,
+      "total": 2339083
+    },
+    {
+      "date": "2003-11",
+      "conillon": 128540,
+      "arabica": 1724319,
+      "total_verde": 1852859,
+      "torrado": 2507,
+      "soluvel": 295867,
+      "total_industria": 298374,
+      "total": 2151233
+    },
+    {
+      "date": "2003-12",
+      "conillon": 72361,
+      "arabica": 2061951,
+      "total_verde": 2134312,
+      "torrado": 9306,
+      "soluvel": 268258,
+      "total_industria": 277564,
+      "total": 2411876
+    },
+    {
+      "date": "2004-01",
+      "conillon": 39039,
+      "arabica": 1590422,
+      "total_verde": 1629461,
+      "torrado": 2384,
+      "soluvel": 199353,
+      "total_industria": 201737,
+      "total": 1831198
+    },
+    {
+      "date": "2004-02",
+      "conillon": 35318,
+      "arabica": 1365145,
+      "total_verde": 1400463,
+      "torrado": 3651,
+      "soluvel": 157352,
+      "total_industria": 161003,
+      "total": 1561466
+    },
+    {
+      "date": "2004-03",
+      "conillon": 54298,
+      "arabica": 2087923,
+      "total_verde": 2142221,
+      "torrado": 5746,
+      "soluvel": 306523,
+      "total_industria": 312269,
+      "total": 2454490
+    },
+    {
+      "date": "2004-04",
+      "conillon": 31282,
+      "arabica": 1516196,
+      "total_verde": 1547478,
+      "torrado": 3832,
+      "soluvel": 287338,
+      "total_industria": 291170,
+      "total": 1838648
+    },
+    {
+      "date": "2004-05",
+      "conillon": 55041,
+      "arabica": 1694134,
+      "total_verde": 1749175,
+      "torrado": 3172,
+      "soluvel": 307582,
+      "total_industria": 310754,
+      "total": 2059929
+    },
+    {
+      "date": "2004-06",
+      "conillon": 81370,
+      "arabica": 1699526,
+      "total_verde": 1780896,
+      "torrado": 1429,
+      "soluvel": 279670,
+      "total_industria": 281099,
+      "total": 2061995
+    },
+    {
+      "date": "2004-07",
+      "conillon": 99155,
+      "arabica": 1584485,
+      "total_verde": 1683640,
+      "torrado": 2877,
+      "soluvel": 306139,
+      "total_industria": 309016,
+      "total": 1992656
+    },
+    {
+      "date": "2004-08",
+      "conillon": 99098,
+      "arabica": 1977359,
+      "total_verde": 2076457,
+      "torrado": 2373,
+      "soluvel": 302506,
+      "total_industria": 304879,
+      "total": 2381336
+    },
+    {
+      "date": "2004-09",
+      "conillon": 79147,
+      "arabica": 2011273,
+      "total_verde": 2090420,
+      "torrado": 1369,
+      "soluvel": 244056,
+      "total_industria": 245425,
+      "total": 2335845
+    },
+    {
+      "date": "2004-10",
+      "conillon": 52274,
+      "arabica": 2282537,
+      "total_verde": 2334811,
+      "torrado": 6531,
+      "soluvel": 224103,
+      "total_industria": 230634,
+      "total": 2565445
+    },
+    {
+      "date": "2004-11",
+      "conillon": 39872,
+      "arabica": 2279035,
+      "total_verde": 2318907,
+      "torrado": 1608,
+      "soluvel": 249550,
+      "total_industria": 251158,
+      "total": 2570065
+    },
+    {
+      "date": "2004-12",
+      "conillon": 58268,
+      "arabica": 2444053,
+      "total_verde": 2502321,
+      "torrado": 3311,
+      "soluvel": 319777,
+      "total_industria": 323088,
+      "total": 2825409
+    },
+    {
+      "date": "2005-01",
+      "conillon": 16512,
+      "arabica": 1980016,
+      "total_verde": 1996528,
+      "torrado": 4207,
+      "soluvel": 264733,
+      "total_industria": 268940,
+      "total": 2265468
+    },
+    {
+      "date": "2005-02",
+      "conillon": 31822,
+      "arabica": 1536097,
+      "total_verde": 1567919,
+      "torrado": 3642,
+      "soluvel": 248242,
+      "total_industria": 251884,
+      "total": 1819803
+    },
+    {
+      "date": "2005-03",
+      "conillon": 46877,
+      "arabica": 2452402,
+      "total_verde": 2499279,
+      "torrado": 4947,
+      "soluvel": 315360,
+      "total_industria": 320307,
+      "total": 2819586
+    },
+    {
+      "date": "2005-04",
+      "conillon": 43184,
+      "arabica": 1721432,
+      "total_verde": 1764616,
+      "torrado": 3894,
+      "soluvel": 265275,
+      "total_industria": 269169,
+      "total": 2033785
+    },
+    {
+      "date": "2005-05",
+      "conillon": 96314,
+      "arabica": 1799512,
+      "total_verde": 1895826,
+      "torrado": 5528,
+      "soluvel": 362515,
+      "total_industria": 368043,
+      "total": 2263869
+    },
+    {
+      "date": "2005-06",
+      "conillon": 162060,
+      "arabica": 1624943,
+      "total_verde": 1787003,
+      "torrado": 4867,
+      "soluvel": 265889,
+      "total_industria": 270756,
+      "total": 2057759
+    },
+    {
+      "date": "2005-07",
+      "conillon": 212131,
+      "arabica": 1427781,
+      "total_verde": 1639912,
+      "torrado": 7570,
+      "soluvel": 333089,
+      "total_industria": 340659,
+      "total": 1980571
+    },
+    {
+      "date": "2005-08",
+      "conillon": 188763,
+      "arabica": 1875030,
+      "total_verde": 2063793,
+      "torrado": 4182,
+      "soluvel": 278566,
+      "total_industria": 282748,
+      "total": 2346541
+    },
+    {
+      "date": "2005-09",
+      "conillon": 78311,
+      "arabica": 1536676,
+      "total_verde": 1614987,
+      "torrado": 5817,
+      "soluvel": 260105,
+      "total_industria": 265922,
+      "total": 1880909
+    },
+    {
+      "date": "2005-10",
+      "conillon": 106954,
+      "arabica": 1796779,
+      "total_verde": 1903733,
+      "torrado": 7907,
+      "soluvel": 273364,
+      "total_industria": 281271,
+      "total": 2185004
+    },
+    {
+      "date": "2005-11",
+      "conillon": 97668,
+      "arabica": 1853658,
+      "total_verde": 1951326,
+      "torrado": 2717,
+      "soluvel": 291044,
+      "total_industria": 293761,
+      "total": 2245087
+    },
+    {
+      "date": "2005-12",
+      "conillon": 25948,
+      "arabica": 1896217,
+      "total_verde": 1922165,
+      "torrado": 8966,
+      "soluvel": 366979,
+      "total_industria": 375945,
+      "total": 2298110
+    },
+    {
+      "date": "2006-01",
+      "conillon": 27468,
+      "arabica": 1620462,
+      "total_verde": 1647930,
+      "torrado": 5572,
+      "soluvel": 166880,
+      "total_industria": 172452,
+      "total": 1820382
+    },
+    {
+      "date": "2006-02",
+      "conillon": 37454,
+      "arabica": 1606172,
+      "total_verde": 1643626,
+      "torrado": 6043,
+      "soluvel": 193094,
+      "total_industria": 199137,
+      "total": 1842763
+    },
+    {
+      "date": "2006-03",
+      "conillon": 39410,
+      "arabica": 1844513,
+      "total_verde": 1883923,
+      "torrado": 9377,
+      "soluvel": 242198,
+      "total_industria": 251575,
+      "total": 2135498
+    },
+    {
+      "date": "2006-04",
+      "conillon": 20354,
+      "arabica": 1546450,
+      "total_verde": 1566804,
+      "torrado": 11029,
+      "soluvel": 253377,
+      "total_industria": 264406,
+      "total": 1831210
+    },
+    {
+      "date": "2006-05",
+      "conillon": 71485,
+      "arabica": 1865627,
+      "total_verde": 1937112,
+      "torrado": 16941,
+      "soluvel": 284073,
+      "total_industria": 301014,
+      "total": 2238126
+    },
+    {
+      "date": "2006-06",
+      "conillon": 76830,
+      "arabica": 1426529,
+      "total_verde": 1503359,
+      "torrado": 2222,
+      "soluvel": 250097,
+      "total_industria": 252319,
+      "total": 1755678
+    },
+    {
+      "date": "2006-07",
+      "conillon": 128426,
+      "arabica": 1476278,
+      "total_verde": 1604704,
+      "torrado": 2471,
+      "soluvel": 244466,
+      "total_industria": 246937,
+      "total": 1851641
+    },
+    {
+      "date": "2006-08",
+      "conillon": 186792,
+      "arabica": 2302657,
+      "total_verde": 2489449,
+      "torrado": 3479,
+      "soluvel": 308892,
+      "total_industria": 312371,
+      "total": 2801820
+    },
+    {
+      "date": "2006-09",
+      "conillon": 192680,
+      "arabica": 2127368,
+      "total_verde": 2320048,
+      "torrado": 6869,
+      "soluvel": 191754,
+      "total_industria": 198623,
+      "total": 2518671
+    },
+    {
+      "date": "2006-10",
+      "conillon": 241669,
+      "arabica": 2310880,
+      "total_verde": 2552549,
+      "torrado": 6297,
+      "soluvel": 222967,
+      "total_industria": 229264,
+      "total": 2781813
+    },
+    {
+      "date": "2006-11",
+      "conillon": 249353,
+      "arabica": 2482409,
+      "total_verde": 2731762,
+      "torrado": 11861,
+      "soluvel": 265252,
+      "total_industria": 277113,
+      "total": 3008875
+    },
+    {
+      "date": "2006-12",
+      "conillon": 94500,
+      "arabica": 2358197,
+      "total_verde": 2452697,
+      "torrado": 4579,
+      "soluvel": 340613,
+      "total_industria": 345192,
+      "total": 2797889
+    },
+    {
+      "date": "2007-01",
+      "conillon": 52894,
+      "arabica": 2042419,
+      "total_verde": 2095313,
+      "torrado": 2861,
+      "soluvel": 256636,
+      "total_industria": 259497,
+      "total": 2354810
+    },
+    {
+      "date": "2007-02",
+      "conillon": 18749,
+      "arabica": 1882844,
+      "total_verde": 1901593,
+      "torrado": 3589,
+      "soluvel": 228945,
+      "total_industria": 232534,
+      "total": 2134127
+    },
+    {
+      "date": "2007-03",
+      "conillon": 52601,
+      "arabica": 2102175,
+      "total_verde": 2154776,
+      "torrado": 3445,
+      "soluvel": 262164,
+      "total_industria": 265609,
+      "total": 2420385
+    },
+    {
+      "date": "2007-04",
+      "conillon": 28135,
+      "arabica": 1871463,
+      "total_verde": 1899598,
+      "torrado": 3127,
+      "soluvel": 245983,
+      "total_industria": 249110,
+      "total": 2148708
+    },
+    {
+      "date": "2007-05",
+      "conillon": 94209,
+      "arabica": 2130704,
+      "total_verde": 2224913,
+      "torrado": 4769,
+      "soluvel": 307639,
+      "total_industria": 312408,
+      "total": 2537321
+    },
+    {
+      "date": "2007-06",
+      "conillon": 141794,
+      "arabica": 1663631,
+      "total_verde": 1805425,
+      "torrado": 3524,
+      "soluvel": 289320,
+      "total_industria": 292844,
+      "total": 2098269
+    },
+    {
+      "date": "2007-07",
+      "conillon": 208960,
+      "arabica": 1724444,
+      "total_verde": 1933404,
+      "torrado": 4767,
+      "soluvel": 323176,
+      "total_industria": 327943,
+      "total": 2261347
+    },
+    {
+      "date": "2007-08",
+      "conillon": 175399,
+      "arabica": 1772561,
+      "total_verde": 1947960,
+      "torrado": 6758,
+      "soluvel": 286266,
+      "total_industria": 293024,
+      "total": 2240984
+    },
+    {
+      "date": "2007-09",
+      "conillon": 215962,
+      "arabica": 1725865,
+      "total_verde": 1941827,
+      "torrado": 13554,
+      "soluvel": 297962,
+      "total_industria": 311516,
+      "total": 2253343
+    },
+    {
+      "date": "2007-10",
+      "conillon": 239201,
+      "arabica": 2287582,
+      "total_verde": 2526783,
+      "torrado": 14453,
+      "soluvel": 294699,
+      "total_industria": 309152,
+      "total": 2835935
+    },
+    {
+      "date": "2007-11",
+      "conillon": 123020,
+      "arabica": 2106122,
+      "total_verde": 2229142,
+      "torrado": 15991,
+      "soluvel": 299268,
+      "total_industria": 315259,
+      "total": 2544401
+    },
+    {
+      "date": "2007-12",
+      "conillon": 50710,
+      "arabica": 2017089,
+      "total_verde": 2067799,
+      "torrado": 7714,
+      "soluvel": 281619,
+      "total_industria": 289333,
+      "total": 2357132
+    },
+    {
+      "date": "2008-01",
+      "conillon": 46762,
+      "arabica": 1895610,
+      "total_verde": 1942372,
+      "torrado": 8513,
+      "soluvel": 322661,
+      "total_industria": 331174,
+      "total": 2273546
+    },
+    {
+      "date": "2008-02",
+      "conillon": 35010,
+      "arabica": 1828897,
+      "total_verde": 1863907,
+      "torrado": 10262,
+      "soluvel": 271012,
+      "total_industria": 281274,
+      "total": 2145181
+    },
+    {
+      "date": "2008-03",
+      "conillon": 158977,
+      "arabica": 1871622,
+      "total_verde": 2030599,
+      "torrado": 12437,
+      "soluvel": 307917,
+      "total_industria": 320354,
+      "total": 2350953
+    },
+    {
+      "date": "2008-04",
+      "conillon": 131732,
+      "arabica": 1906240,
+      "total_verde": 2037972,
+      "torrado": 8884,
+      "soluvel": 302774,
+      "total_industria": 311658,
+      "total": 2349630
+    },
+    {
+      "date": "2008-05",
+      "conillon": 208392,
+      "arabica": 1483007,
+      "total_verde": 1691399,
+      "torrado": 11033,
+      "soluvel": 290568,
+      "total_industria": 301601,
+      "total": 1993000
+    },
+    {
+      "date": "2008-06",
+      "conillon": 140326,
+      "arabica": 1427742,
+      "total_verde": 1568068,
+      "torrado": 13528,
+      "soluvel": 260125,
+      "total_industria": 273653,
+      "total": 1841721
+    },
+    {
+      "date": "2008-07",
+      "conillon": 281901,
+      "arabica": 1498501,
+      "total_verde": 1780402,
+      "torrado": 11136,
+      "soluvel": 296119,
+      "total_industria": 307255,
+      "total": 2087657
+    },
+    {
+      "date": "2008-08",
+      "conillon": 297745,
+      "arabica": 1595616,
+      "total_verde": 1893361,
+      "torrado": 7124,
+      "soluvel": 297617,
+      "total_industria": 304741,
+      "total": 2198102
+    },
+    {
+      "date": "2008-09",
+      "conillon": 318523,
+      "arabica": 2386871,
+      "total_verde": 2705394,
+      "torrado": 12685,
+      "soluvel": 284332,
+      "total_industria": 297017,
+      "total": 3002411
+    },
+    {
+      "date": "2008-10",
+      "conillon": 198256,
+      "arabica": 2605947,
+      "total_verde": 2804203,
+      "torrado": 11691,
+      "soluvel": 262765,
+      "total_industria": 274456,
+      "total": 3078659
+    },
+    {
+      "date": "2008-11",
+      "conillon": 106829,
+      "arabica": 2616602,
+      "total_verde": 2723431,
+      "torrado": 2239,
+      "soluvel": 218455,
+      "total_industria": 220694,
+      "total": 2944125
+    },
+    {
+      "date": "2008-12",
+      "conillon": 154229,
+      "arabica": 2841470,
+      "total_verde": 2995699,
+      "torrado": 1422,
+      "soluvel": 250586,
+      "total_industria": 252008,
+      "total": 3247707
+    },
+    {
+      "date": "2009-01",
+      "conillon": 43165,
+      "arabica": 2063742,
+      "total_verde": 2106907,
+      "torrado": 1724,
+      "soluvel": 213974,
+      "total_industria": 215698,
+      "total": 2322605
+    },
+    {
+      "date": "2009-02",
+      "conillon": 41500,
+      "arabica": 2358498,
+      "total_verde": 2399998,
+      "torrado": 2022,
+      "soluvel": 224445,
+      "total_industria": 226467,
+      "total": 2626465
+    },
+    {
+      "date": "2009-03",
+      "conillon": 34338,
+      "arabica": 2301186,
+      "total_verde": 2335524,
+      "torrado": 16117,
+      "soluvel": 250185,
+      "total_industria": 266302,
+      "total": 2601826
+    },
+    {
+      "date": "2009-04",
+      "conillon": 69715,
+      "arabica": 2181716,
+      "total_verde": 2251431,
+      "torrado": 1826,
+      "soluvel": 252183,
+      "total_industria": 254009,
+      "total": 2505440
+    },
+    {
+      "date": "2009-05",
+      "conillon": 184696,
+      "arabica": 2069755,
+      "total_verde": 2254451,
+      "torrado": 9661,
+      "soluvel": 234246,
+      "total_industria": 243907,
+      "total": 2498358
+    },
+    {
+      "date": "2009-06",
+      "conillon": 136950,
+      "arabica": 2023848,
+      "total_verde": 2160798,
+      "torrado": 12763,
+      "soluvel": 224003,
+      "total_industria": 236766,
+      "total": 2397564
+    },
+    {
+      "date": "2009-07",
+      "conillon": 137832,
+      "arabica": 1858998,
+      "total_verde": 1996830,
+      "torrado": 16063,
+      "soluvel": 258079,
+      "total_industria": 274142,
+      "total": 2270972
+    },
+    {
+      "date": "2009-08",
+      "conillon": 135053,
+      "arabica": 2119904,
+      "total_verde": 2254957,
+      "torrado": 10871,
+      "soluvel": 213960,
+      "total_industria": 224831,
+      "total": 2479788
+    },
+    {
+      "date": "2009-09",
+      "conillon": 131654,
+      "arabica": 2287398,
+      "total_verde": 2419052,
+      "torrado": 7550,
+      "soluvel": 262386,
+      "total_industria": 269936,
+      "total": 2688988
+    },
+    {
+      "date": "2009-10",
+      "conillon": 68299,
+      "arabica": 2495745,
+      "total_verde": 2564044,
+      "torrado": 5190,
+      "soluvel": 263777,
+      "total_industria": 268967,
+      "total": 2833011
+    },
+    {
+      "date": "2009-11",
+      "conillon": 51994,
+      "arabica": 2299146,
+      "total_verde": 2351140,
+      "torrado": 2217,
+      "soluvel": 238751,
+      "total_industria": 240968,
+      "total": 2592108
+    },
+    {
+      "date": "2009-12",
+      "conillon": 80749,
+      "arabica": 2194752,
+      "total_verde": 2275501,
+      "torrado": 6424,
+      "soluvel": 276109,
+      "total_industria": 282533,
+      "total": 2558034
+    },
+    {
+      "date": "2010-01",
+      "conillon": 44047,
+      "arabica": 2206513,
+      "total_verde": 2250560,
+      "torrado": 3610,
+      "soluvel": 240759,
+      "total_industria": 244369,
+      "total": 2494929
+    },
+    {
+      "date": "2010-02",
+      "conillon": 22506,
+      "arabica": 2000575,
+      "total_verde": 2023081,
+      "torrado": 7971,
+      "soluvel": 237582,
+      "total_industria": 245553,
+      "total": 2268634
+    },
+    {
+      "date": "2010-03",
+      "conillon": 45839,
+      "arabica": 2349478,
+      "total_verde": 2395317,
+      "torrado": 4271,
+      "soluvel": 264587,
+      "total_industria": 268858,
+      "total": 2664175
+    },
+    {
+      "date": "2010-04",
+      "conillon": 22855,
+      "arabica": 1978257,
+      "total_verde": 2001112,
+      "torrado": 5069,
+      "soluvel": 300129,
+      "total_industria": 305198,
+      "total": 2306310
+    },
+    {
+      "date": "2010-05",
+      "conillon": 129675,
+      "arabica": 2095228,
+      "total_verde": 2224903,
+      "torrado": 4256,
+      "soluvel": 313399,
+      "total_industria": 317655,
+      "total": 2542558
+    },
+    {
+      "date": "2010-06",
+      "conillon": 165937,
+      "arabica": 1658186,
+      "total_verde": 1824123,
+      "torrado": 5762,
+      "soluvel": 316192,
+      "total_industria": 321954,
+      "total": 2146077
+    },
+    {
+      "date": "2010-07",
+      "conillon": 161200,
+      "arabica": 2027183,
+      "total_verde": 2188383,
+      "torrado": 4210,
+      "soluvel": 276839,
+      "total_industria": 281049,
+      "total": 2469432
+    },
+    {
+      "date": "2010-08",
+      "conillon": 133848,
+      "arabica": 2465948,
+      "total_verde": 2599796,
+      "torrado": 4713,
+      "soluvel": 215240,
+      "total_industria": 219953,
+      "total": 2819749
+    },
+    {
+      "date": "2010-09",
+      "conillon": 157028,
+      "arabica": 2828731,
+      "total_verde": 2985759,
+      "torrado": 5038,
+      "soluvel": 297647,
+      "total_industria": 302685,
+      "total": 3288444
+    },
+    {
+      "date": "2010-10",
+      "conillon": 114957,
+      "arabica": 3076669,
+      "total_verde": 3191626,
+      "torrado": 5782,
+      "soluvel": 308130,
+      "total_industria": 313912,
+      "total": 3505538
+    },
+    {
+      "date": "2010-11",
+      "conillon": 96502,
+      "arabica": 2830737,
+      "total_verde": 2927239,
+      "torrado": 5013,
+      "soluvel": 270248,
+      "total_industria": 275261,
+      "total": 3202500
+    },
+    {
+      "date": "2010-12",
+      "conillon": 74492,
+      "arabica": 3056632,
+      "total_verde": 3131124,
+      "torrado": 5448,
+      "soluvel": 321378,
+      "total_industria": 326826,
+      "total": 3457950
+    },
+    {
+      "date": "2011-01",
+      "conillon": 65597,
+      "arabica": 2527452,
+      "total_verde": 2593049,
+      "torrado": 5412,
+      "soluvel": 203324,
+      "total_industria": 208736,
+      "total": 2801785
+    },
+    {
+      "date": "2011-02",
+      "conillon": 53109,
+      "arabica": 2417655,
+      "total_verde": 2470764,
+      "torrado": 4784,
+      "soluvel": 264862,
+      "total_industria": 269646,
+      "total": 2740410
+    },
+    {
+      "date": "2011-03",
+      "conillon": 190848,
+      "arabica": 2213845,
+      "total_verde": 2404693,
+      "torrado": 5208,
+      "soluvel": 363399,
+      "total_industria": 368607,
+      "total": 2773300
+    },
+    {
+      "date": "2011-04",
+      "conillon": 322286,
+      "arabica": 2145720,
+      "total_verde": 2468006,
+      "torrado": 4945,
+      "soluvel": 305656,
+      "total_industria": 310601,
+      "total": 2778607
+    },
+    {
+      "date": "2011-05",
+      "conillon": 351306,
+      "arabica": 2054630,
+      "total_verde": 2405936,
+      "torrado": 7256,
+      "soluvel": 260768,
+      "total_industria": 268024,
+      "total": 2673960
+    },
+    {
+      "date": "2011-06",
+      "conillon": 414281,
+      "arabica": 2033609,
+      "total_verde": 2447890,
+      "torrado": 5998,
+      "soluvel": 305900,
+      "total_industria": 311898,
+      "total": 2759788
+    },
+    {
+      "date": "2011-07",
+      "conillon": 265744,
+      "arabica": 1531881,
+      "total_verde": 1797625,
+      "torrado": 4748,
+      "soluvel": 291460,
+      "total_industria": 296208,
+      "total": 2093833
+    },
+    {
+      "date": "2011-08",
+      "conillon": 322282,
+      "arabica": 2318377,
+      "total_verde": 2640659,
+      "torrado": 5248,
+      "soluvel": 315122,
+      "total_industria": 320370,
+      "total": 2961029
+    },
+    {
+      "date": "2011-09",
+      "conillon": 222287,
+      "arabica": 2399669,
+      "total_verde": 2621956,
+      "torrado": 5438,
+      "soluvel": 327383,
+      "total_industria": 332821,
+      "total": 2954777
+    },
+    {
+      "date": "2011-10",
+      "conillon": 236160,
+      "arabica": 2692803,
+      "total_verde": 2928963,
+      "torrado": 6085,
+      "soluvel": 251949,
+      "total_industria": 258034,
+      "total": 3186997
+    },
+    {
+      "date": "2011-11",
+      "conillon": 143336,
+      "arabica": 2608042,
+      "total_verde": 2751378,
+      "torrado": 4033,
+      "soluvel": 293753,
+      "total_industria": 297786,
+      "total": 3049164
+    },
+    {
+      "date": "2011-12",
+      "conillon": 76005,
+      "arabica": 2534438,
+      "total_verde": 2610443,
+      "torrado": 6223,
+      "soluvel": 415857,
+      "total_industria": 422080,
+      "total": 3032523
+    },
+    {
+      "date": "2012-01",
+      "conillon": 37419,
+      "arabica": 1898550,
+      "total_verde": 1935969,
+      "torrado": 3429,
+      "soluvel": 207169,
+      "total_industria": 210598,
+      "total": 2146567
+    },
+    {
+      "date": "2012-02",
+      "conillon": 53061,
+      "arabica": 1931246,
+      "total_verde": 1984307,
+      "torrado": 4178,
+      "soluvel": 254651,
+      "total_industria": 258829,
+      "total": 2243136
+    },
+    {
+      "date": "2012-03",
+      "conillon": 79136,
+      "arabica": 1925072,
+      "total_verde": 2004208,
+      "torrado": 4689,
+      "soluvel": 259831,
+      "total_industria": 264520,
+      "total": 2268728
+    },
+    {
+      "date": "2012-04",
+      "conillon": 19991,
+      "arabica": 1735701,
+      "total_verde": 1755692,
+      "torrado": 3136,
+      "soluvel": 273904,
+      "total_industria": 277040,
+      "total": 2032732
+    },
+    {
+      "date": "2012-05",
+      "conillon": 89085,
+      "arabica": 1725718,
+      "total_verde": 1814803,
+      "torrado": 3108,
+      "soluvel": 313989,
+      "total_industria": 317097,
+      "total": 2131900
+    },
+    {
+      "date": "2012-06",
+      "conillon": 185485,
+      "arabica": 1477297,
+      "total_verde": 1662782,
+      "torrado": 1762,
+      "soluvel": 264399,
+      "total_industria": 266161,
+      "total": 1928943
+    },
+    {
+      "date": "2012-07",
+      "conillon": 174326,
+      "arabica": 1680612,
+      "total_verde": 1854938,
+      "torrado": 4098,
+      "soluvel": 286179,
+      "total_industria": 290277,
+      "total": 2145215
+    },
+    {
+      "date": "2012-08",
+      "conillon": 233483,
+      "arabica": 2034171,
+      "total_verde": 2267654,
+      "torrado": 3795,
+      "soluvel": 356967,
+      "total_industria": 360762,
+      "total": 2628416
+    },
+    {
+      "date": "2012-09",
+      "conillon": 77079,
+      "arabica": 1883362,
+      "total_verde": 1960441,
+      "torrado": 3197,
+      "soluvel": 316315,
+      "total_industria": 319512,
+      "total": 2279953
+    },
+    {
+      "date": "2012-10",
+      "conillon": 60230,
+      "arabica": 2524839,
+      "total_verde": 2585069,
+      "torrado": 3093,
+      "soluvel": 347337,
+      "total_industria": 350430,
+      "total": 2935499
+    },
+    {
+      "date": "2012-11",
+      "conillon": 66468,
+      "arabica": 2479565,
+      "total_verde": 2546033,
+      "torrado": 2330,
+      "soluvel": 306711,
+      "total_industria": 309041,
+      "total": 2855074
+    },
+    {
+      "date": "2012-12",
+      "conillon": 69494,
+      "arabica": 2526232,
+      "total_verde": 2595726,
+      "torrado": 2101,
+      "soluvel": 357187,
+      "total_industria": 359288,
+      "total": 2955014
+    },
+    {
+      "date": "2013-01",
+      "conillon": 37588,
+      "arabica": 2251583,
+      "total_verde": 2289171,
+      "torrado": 1352,
+      "soluvel": 277349,
+      "total_industria": 278701,
+      "total": 2567872
+    },
+    {
+      "date": "2013-02",
+      "conillon": 38460,
+      "arabica": 1934337,
+      "total_verde": 1972797,
+      "torrado": 1675,
+      "soluvel": 258047,
+      "total_industria": 259722,
+      "total": 2232519
+    },
+    {
+      "date": "2013-03",
+      "conillon": 60304,
+      "arabica": 2204777,
+      "total_verde": 2265081,
+      "torrado": 2596,
+      "soluvel": 323715,
+      "total_industria": 326311,
+      "total": 2591392
+    },
+    {
+      "date": "2013-04",
+      "conillon": 114743,
+      "arabica": 2346785,
+      "total_verde": 2461528,
+      "torrado": 2796,
+      "soluvel": 311127,
+      "total_industria": 313923,
+      "total": 2775451
+    },
+    {
+      "date": "2013-05",
+      "conillon": 173065,
+      "arabica": 2105662,
+      "total_verde": 2278727,
+      "torrado": 1217,
+      "soluvel": 300902,
+      "total_industria": 302119,
+      "total": 2580846
+    },
+    {
+      "date": "2013-06",
+      "conillon": 138219,
+      "arabica": 1947223,
+      "total_verde": 2085442,
+      "torrado": 3411,
+      "soluvel": 274643,
+      "total_industria": 278054,
+      "total": 2363496
+    },
+    {
+      "date": "2013-07",
+      "conillon": 196277,
+      "arabica": 1737458,
+      "total_verde": 1933735,
+      "torrado": 2379,
+      "soluvel": 296650,
+      "total_industria": 299029,
+      "total": 2232764
+    },
+    {
+      "date": "2013-08",
+      "conillon": 134175,
+      "arabica": 2247530,
+      "total_verde": 2381705,
+      "torrado": 2079,
+      "soluvel": 276454,
+      "total_industria": 278533,
+      "total": 2660238
+    },
+    {
+      "date": "2013-09",
+      "conillon": 149231,
+      "arabica": 2249186,
+      "total_verde": 2398417,
+      "torrado": 1124,
+      "soluvel": 326993,
+      "total_industria": 328117,
+      "total": 2726534
+    },
+    {
+      "date": "2013-10",
+      "conillon": 99005,
+      "arabica": 2804538,
+      "total_verde": 2903543,
+      "torrado": 4310,
+      "soluvel": 327002,
+      "total_industria": 331312,
+      "total": 3234855
+    },
+    {
+      "date": "2013-11",
+      "conillon": 79228,
+      "arabica": 2369336,
+      "total_verde": 2448564,
+      "torrado": 3843,
+      "soluvel": 246652,
+      "total_industria": 250495,
+      "total": 2699059
+    },
+    {
+      "date": "2013-12",
+      "conillon": 88367,
+      "arabica": 2575671,
+      "total_verde": 2664038,
+      "torrado": 4064,
+      "soluvel": 327970,
+      "total_industria": 332034,
+      "total": 2996072
+    },
+    {
+      "date": "2014-01",
+      "conillon": 115403,
+      "arabica": 2365290,
+      "total_verde": 2480693,
+      "torrado": 1583,
+      "soluvel": 298079,
+      "total_industria": 299662,
+      "total": 2780355
+    },
+    {
+      "date": "2014-02",
+      "conillon": 148654,
+      "arabica": 2513572,
+      "total_verde": 2662226,
+      "torrado": 1786,
+      "soluvel": 265990,
+      "total_industria": 267776,
+      "total": 2930002
+    },
+    {
+      "date": "2014-03",
+      "conillon": 141849,
+      "arabica": 2394723,
+      "total_verde": 2536572,
+      "torrado": 1485,
+      "soluvel": 244499,
+      "total_industria": 245984,
+      "total": 2782556
+    },
+    {
+      "date": "2014-04",
+      "conillon": 207897,
+      "arabica": 2607295,
+      "total_verde": 2815192,
+      "torrado": 2096,
+      "soluvel": 300138,
+      "total_industria": 302234,
+      "total": 3117426
+    },
+    {
+      "date": "2014-05",
+      "conillon": 213502,
+      "arabica": 2507543,
+      "total_verde": 2721045,
+      "torrado": 1792,
+      "soluvel": 292836,
+      "total_industria": 294628,
+      "total": 3015673
+    },
+    {
+      "date": "2014-06",
+      "conillon": 368401,
+      "arabica": 2285829,
+      "total_verde": 2654230,
+      "torrado": 3200,
+      "soluvel": 303415,
+      "total_industria": 306615,
+      "total": 2960845
+    },
+    {
+      "date": "2014-07",
+      "conillon": 428747,
+      "arabica": 2273558,
+      "total_verde": 2702305,
+      "torrado": 2034,
+      "soluvel": 332716,
+      "total_industria": 334750,
+      "total": 3037055
+    },
+    {
+      "date": "2014-08",
+      "conillon": 386086,
+      "arabica": 2389590,
+      "total_verde": 2775676,
+      "torrado": 2569,
+      "soluvel": 317641,
+      "total_industria": 320210,
+      "total": 3095886
+    },
+    {
+      "date": "2014-09",
+      "conillon": 249505,
+      "arabica": 2410435,
+      "total_verde": 2659940,
+      "torrado": 3289,
+      "soluvel": 326364,
+      "total_industria": 329653,
+      "total": 2989593
+    },
+    {
+      "date": "2014-10",
+      "conillon": 279538,
+      "arabica": 2814343,
+      "total_verde": 3093881,
+      "torrado": 4064,
+      "soluvel": 248568,
+      "total_industria": 252632,
+      "total": 3346513
+    },
+    {
+      "date": "2014-11",
+      "conillon": 450196,
+      "arabica": 2492353,
+      "total_verde": 2942549,
+      "torrado": 1695,
+      "soluvel": 208928,
+      "total_industria": 210623,
+      "total": 3153172
+    },
+    {
+      "date": "2014-12",
+      "conillon": 463415,
+      "arabica": 2433890,
+      "total_verde": 2897305,
+      "torrado": 607,
+      "soluvel": 319846,
+      "total_industria": 320453,
+      "total": 3217758
+    },
+    {
+      "date": "2015-01",
+      "conillon": 344794,
+      "arabica": 2495627,
+      "total_verde": 2840421,
+      "torrado": 1079,
+      "soluvel": 216983,
+      "total_industria": 218062,
+      "total": 3058483
+    },
+    {
+      "date": "2015-02",
+      "conillon": 254532,
+      "arabica": 2229124,
+      "total_verde": 2483656,
+      "torrado": 2606,
+      "soluvel": 260763,
+      "total_industria": 263369,
+      "total": 2747025
+    },
+    {
+      "date": "2015-03",
+      "conillon": 348628,
+      "arabica": 2469248,
+      "total_verde": 2817876,
+      "torrado": 3578,
+      "soluvel": 313080,
+      "total_industria": 316658,
+      "total": 3134534
+    },
+    {
+      "date": "2015-04",
+      "conillon": 530599,
+      "arabica": 2353534,
+      "total_verde": 2884133,
+      "torrado": 1317,
+      "soluvel": 323780,
+      "total_industria": 325097,
+      "total": 3209230
+    },
+    {
+      "date": "2015-05",
+      "conillon": 413222,
+      "arabica": 2218582,
+      "total_verde": 2631804,
+      "torrado": 2008,
+      "soluvel": 296517,
+      "total_industria": 298525,
+      "total": 2930329
+    },
+    {
+      "date": "2015-06",
+      "conillon": 414995,
+      "arabica": 1936822,
+      "total_verde": 2351817,
+      "torrado": 3207,
+      "soluvel": 328768,
+      "total_industria": 331975,
+      "total": 2683792
+    },
+    {
+      "date": "2015-07",
+      "conillon": 411461,
+      "arabica": 2135974,
+      "total_verde": 2547435,
+      "torrado": 3459,
+      "soluvel": 328813,
+      "total_industria": 332272,
+      "total": 2879707
+    },
+    {
+      "date": "2015-08",
+      "conillon": 396050,
+      "arabica": 2197643,
+      "total_verde": 2593693,
+      "torrado": 2136,
+      "soluvel": 310231,
+      "total_industria": 312367,
+      "total": 2906060
+    },
+    {
+      "date": "2015-09",
+      "conillon": 335911,
+      "arabica": 2574174,
+      "total_verde": 2910085,
+      "torrado": 2313,
+      "soluvel": 278362,
+      "total_industria": 280675,
+      "total": 3190760
+    },
+    {
+      "date": "2015-10",
+      "conillon": 359906,
+      "arabica": 2845902,
+      "total_verde": 3205808,
+      "torrado": 3491,
+      "soluvel": 322367,
+      "total_industria": 325858,
+      "total": 3531666
+    },
+    {
+      "date": "2015-11",
+      "conillon": 293859,
+      "arabica": 2945838,
+      "total_verde": 3239697,
+      "torrado": 1381,
+      "soluvel": 256327,
+      "total_industria": 257708,
+      "total": 3497405
+    },
+    {
+      "date": "2015-12",
+      "conillon": 109996,
+      "arabica": 2822715,
+      "total_verde": 2932711,
+      "torrado": 2250,
+      "soluvel": 315031,
+      "total_industria": 317281,
+      "total": 3249992
+    },
+    {
+      "date": "2016-01",
+      "conillon": 78044,
+      "arabica": 2459977,
+      "total_verde": 2538021,
+      "torrado": 2046,
+      "soluvel": 268959,
+      "total_industria": 271005,
+      "total": 2809026
+    },
+    {
+      "date": "2016-02",
+      "conillon": 70205,
+      "arabica": 2552313,
+      "total_verde": 2622518,
+      "torrado": 2485,
+      "soluvel": 313358,
+      "total_industria": 315843,
+      "total": 2938361
+    },
+    {
+      "date": "2016-03",
+      "conillon": 61531,
+      "arabica": 2708814,
+      "total_verde": 2770345,
+      "torrado": 1992,
+      "soluvel": 330186,
+      "total_industria": 332178,
+      "total": 3102523
+    },
+    {
+      "date": "2016-04",
+      "conillon": 59647,
+      "arabica": 2124112,
+      "total_verde": 2183759,
+      "torrado": 1971,
+      "soluvel": 272495,
+      "total_industria": 274466,
+      "total": 2458225
+    },
+    {
+      "date": "2016-05",
+      "conillon": 68141,
+      "arabica": 2160920,
+      "total_verde": 2229061,
+      "torrado": 2002,
+      "soluvel": 297979,
+      "total_industria": 299981,
+      "total": 2529042
+    },
+    {
+      "date": "2016-06",
+      "conillon": 83464,
+      "arabica": 2013709,
+      "total_verde": 2097173,
+      "torrado": 2933,
+      "soluvel": 350841,
+      "total_industria": 353774,
+      "total": 2450947
+    },
+    {
+      "date": "2016-07",
+      "conillon": 38238,
+      "arabica": 1610508,
+      "total_verde": 1648746,
+      "torrado": 2837,
+      "soluvel": 315745,
+      "total_industria": 318582,
+      "total": 1967328
+    },
+    {
+      "date": "2016-08",
+      "conillon": 39647,
+      "arabica": 2656540,
+      "total_verde": 2696187,
+      "torrado": 3192,
+      "soluvel": 345109,
+      "total_industria": 348301,
+      "total": 3044488
+    },
+    {
+      "date": "2016-09",
+      "conillon": 30486,
+      "arabica": 2666802,
+      "total_verde": 2697288,
+      "torrado": 2694,
+      "soluvel": 368392,
+      "total_industria": 371086,
+      "total": 3068374
+    },
+    {
+      "date": "2016-10",
+      "conillon": 11483,
+      "arabica": 3006622,
+      "total_verde": 3018105,
+      "torrado": 3201,
+      "soluvel": 341758,
+      "total_industria": 344959,
+      "total": 3363064
+    },
+    {
+      "date": "2016-11",
+      "conillon": 28390,
+      "arabica": 2924414,
+      "total_verde": 2952804,
+      "torrado": 2930,
+      "soluvel": 321372,
+      "total_industria": 324302,
+      "total": 3277106
+    },
+    {
+      "date": "2016-12",
+      "conillon": 11037,
+      "arabica": 2901287,
+      "total_verde": 2912324,
+      "torrado": 1602,
+      "soluvel": 348556,
+      "total_industria": 350158,
+      "total": 3262482
+    },
+    {
+      "date": "2017-01",
+      "conillon": 22338,
+      "arabica": 2429067,
+      "total_verde": 2451405,
+      "torrado": 3143,
+      "soluvel": 192036,
+      "total_industria": 195179,
+      "total": 2646584
+    },
+    {
+      "date": "2017-02",
+      "conillon": 9862,
+      "arabica": 2304537,
+      "total_verde": 2314399,
+      "torrado": 2633,
+      "soluvel": 273920,
+      "total_industria": 276553,
+      "total": 2590952
+    },
+    {
+      "date": "2017-03",
+      "conillon": 20626,
+      "arabica": 2436589,
+      "total_verde": 2457215,
+      "torrado": 1681,
+      "soluvel": 375592,
+      "total_industria": 377273,
+      "total": 2834488
+    },
+    {
+      "date": "2017-04",
+      "conillon": 26611,
+      "arabica": 1937245,
+      "total_verde": 1963856,
+      "torrado": 2277,
+      "soluvel": 275399,
+      "total_industria": 277676,
+      "total": 2241532
+    },
+    {
+      "date": "2017-05",
+      "conillon": 19799,
+      "arabica": 2305022,
+      "total_verde": 2324821,
+      "torrado": 2245,
+      "soluvel": 275522,
+      "total_industria": 277767,
+      "total": 2602588
+    },
+    {
+      "date": "2017-06",
+      "conillon": 19908,
+      "arabica": 1875068,
+      "total_verde": 1894976,
+      "torrado": 2545,
+      "soluvel": 294101,
+      "total_industria": 296646,
+      "total": 2191622
+    },
+    {
+      "date": "2017-07",
+      "conillon": 20272,
+      "arabica": 1578300,
+      "total_verde": 1598572,
+      "torrado": 1274,
+      "soluvel": 275530,
+      "total_industria": 276804,
+      "total": 1875376
+    },
+    {
+      "date": "2017-08",
+      "conillon": 29972,
+      "arabica": 2274935,
+      "total_verde": 2304907,
+      "torrado": 1827,
+      "soluvel": 303492,
+      "total_industria": 305319,
+      "total": 2610226
+    },
+    {
+      "date": "2017-09",
+      "conillon": 24475,
+      "arabica": 2130292,
+      "total_verde": 2154767,
+      "torrado": 2192,
+      "soluvel": 284777,
+      "total_industria": 286969,
+      "total": 2441736
+    },
+    {
+      "date": "2017-10",
+      "conillon": 19228,
+      "arabica": 2570753,
+      "total_verde": 2589981,
+      "torrado": 1942,
+      "soluvel": 310190,
+      "total_industria": 312132,
+      "total": 2902113
+    },
+    {
+      "date": "2017-11",
+      "conillon": 36491,
+      "arabica": 2683908,
+      "total_verde": 2720399,
+      "torrado": 2440,
+      "soluvel": 242790,
+      "total_industria": 245230,
+      "total": 2965629
+    },
+    {
+      "date": "2017-12",
+      "conillon": 46487,
+      "arabica": 2597940,
+      "total_verde": 2644427,
+      "torrado": 2122,
+      "soluvel": 379559,
+      "total_industria": 381681,
+      "total": 3026108
+    },
+    {
+      "date": "2018-01",
+      "conillon": 12760,
+      "arabica": 2519381,
+      "total_verde": 2532141,
+      "torrado": 2614,
+      "soluvel": 185288,
+      "total_industria": 187902,
+      "total": 2720043
+    },
+    {
+      "date": "2018-02",
+      "conillon": 27829,
+      "arabica": 2208007,
+      "total_verde": 2235836,
+      "torrado": 1176,
+      "soluvel": 274681,
+      "total_industria": 275857,
+      "total": 2511693
+    },
+    {
+      "date": "2018-03",
+      "conillon": 76542,
+      "arabica": 2237524,
+      "total_verde": 2314066,
+      "torrado": 1737,
+      "soluvel": 382671,
+      "total_industria": 384408,
+      "total": 2698474
+    },
+    {
+      "date": "2018-04",
+      "conillon": 58214,
+      "arabica": 2026986,
+      "total_verde": 2085200,
+      "torrado": 739,
+      "soluvel": 302937,
+      "total_industria": 303676,
+      "total": 2388876
+    },
+    {
+      "date": "2018-05",
+      "conillon": 46621,
+      "arabica": 1440854,
+      "total_verde": 1487475,
+      "torrado": 573,
+      "soluvel": 241284,
+      "total_industria": 241857,
+      "total": 1729332
+    },
+    {
+      "date": "2018-06",
+      "conillon": 283940,
+      "arabica": 1986253,
+      "total_verde": 2270193,
+      "torrado": 1049,
+      "soluvel": 312486,
+      "total_industria": 313535,
+      "total": 2583728
+    },
+    {
+      "date": "2018-07",
+      "conillon": 369836,
+      "arabica": 1755475,
+      "total_verde": 2125311,
+      "torrado": 1665,
+      "soluvel": 338542,
+      "total_industria": 340207,
+      "total": 2465518
+    },
+    {
+      "date": "2018-08",
+      "conillon": 539627,
+      "arabica": 2622290,
+      "total_verde": 3161917,
+      "torrado": 2689,
+      "soluvel": 379883,
+      "total_industria": 382572,
+      "total": 3544489
+    },
+    {
+      "date": "2018-09",
+      "conillon": 292161,
+      "arabica": 2549930,
+      "total_verde": 2842091,
+      "torrado": 953,
+      "soluvel": 307878,
+      "total_industria": 308831,
+      "total": 3150922
+    },
+    {
+      "date": "2018-10",
+      "conillon": 368991,
+      "arabica": 3240734,
+      "total_verde": 3609725,
+      "torrado": 2083,
+      "soluvel": 326211,
+      "total_industria": 328294,
+      "total": 3938019
+    },
+    {
+      "date": "2018-11",
+      "conillon": 235423,
+      "arabica": 3362444,
+      "total_verde": 3597867,
+      "torrado": 2372,
+      "soluvel": 302813,
+      "total_industria": 305185,
+      "total": 3903052
+    },
+    {
+      "date": "2018-12",
+      "conillon": 168196,
+      "arabica": 3462143,
+      "total_verde": 3630339,
+      "torrado": 1576,
+      "soluvel": 372787,
+      "total_industria": 374363,
+      "total": 4004702
+    },
+    {
+      "date": "2019-01",
+      "conillon": 150609,
+      "arabica": 3073902,
+      "total_verde": 3224511,
+      "torrado": 1477,
+      "soluvel": 244684,
+      "total_industria": 246161,
+      "total": 3470672
+    },
+    {
+      "date": "2019-02",
+      "conillon": 212003,
+      "arabica": 3051113,
+      "total_verde": 3263116,
+      "torrado": 1220,
+      "soluvel": 310465,
+      "total_industria": 311685,
+      "total": 3574801
+    },
+    {
+      "date": "2019-03",
+      "conillon": 190880,
+      "arabica": 2557882,
+      "total_verde": 2748762,
+      "torrado": 2202,
+      "soluvel": 366311,
+      "total_industria": 368513,
+      "total": 3117275
+    },
+    {
+      "date": "2019-04",
+      "conillon": 240371,
+      "arabica": 2706379,
+      "total_verde": 2946750,
+      "torrado": 2319,
+      "soluvel": 318296,
+      "total_industria": 320615,
+      "total": 3267365
+    },
+    {
+      "date": "2019-05",
+      "conillon": 462472,
+      "arabica": 3025754,
+      "total_verde": 3488226,
+      "torrado": 1634,
+      "soluvel": 396854,
+      "total_industria": 398488,
+      "total": 3886714
+    },
+    {
+      "date": "2019-06",
+      "conillon": 383915,
+      "arabica": 2355971,
+      "total_verde": 2739886,
+      "torrado": 4099,
+      "soluvel": 358811,
+      "total_industria": 362910,
+      "total": 3102796
+    },
+    {
+      "date": "2019-07",
+      "conillon": 601684,
+      "arabica": 2438600,
+      "total_verde": 3040284,
+      "torrado": 2313,
+      "soluvel": 347971,
+      "total_industria": 350284,
+      "total": 3390568
+    },
+    {
+      "date": "2019-08",
+      "conillon": 461635,
+      "arabica": 2570815,
+      "total_verde": 3032450,
+      "torrado": 1851,
+      "soluvel": 334714,
+      "total_industria": 336565,
+      "total": 3369015
+    },
+    {
+      "date": "2019-09",
+      "conillon": 346970,
+      "arabica": 2800150,
+      "total_verde": 3147120,
+      "torrado": 2288,
+      "soluvel": 346098,
+      "total_industria": 348386,
+      "total": 3495506
+    },
+    {
+      "date": "2019-10",
+      "conillon": 359186,
+      "arabica": 2964909,
+      "total_verde": 3324095,
+      "torrado": 3485,
+      "soluvel": 342760,
+      "total_industria": 346245,
+      "total": 3670340
+    },
+    {
+      "date": "2019-11",
+      "conillon": 204055,
+      "arabica": 2757885,
+      "total_verde": 2961940,
+      "torrado": 1336,
+      "soluvel": 318833,
+      "total_industria": 320169,
+      "total": 3282109
+    },
+    {
+      "date": "2019-12",
+      "conillon": 345873,
+      "arabica": 2409528,
+      "total_verde": 2755401,
+      "torrado": 1809,
+      "soluvel": 315312,
+      "total_industria": 317121,
+      "total": 3072522
+    },
+    {
+      "date": "2020-01",
+      "conillon": 223828,
+      "arabica": 2922387,
+      "total_verde": 3146215,
+      "torrado": 2643,
+      "soluvel": 325394,
+      "total_industria": 328037,
+      "total": 3474252
+    },
+    {
+      "date": "2020-02",
+      "conillon": 218905,
+      "arabica": 2477429,
+      "total_verde": 2696334,
+      "torrado": 1733,
+      "soluvel": 310029,
+      "total_industria": 311762,
+      "total": 3008096
+    },
+    {
+      "date": "2020-03",
+      "conillon": 253550,
+      "arabica": 2898784,
+      "total_verde": 3152334,
+      "torrado": 2579,
+      "soluvel": 338639,
+      "total_industria": 341218,
+      "total": 3493552
+    },
+    {
+      "date": "2020-04",
+      "conillon": 316695,
+      "arabica": 2951535,
+      "total_verde": 3268230,
+      "torrado": 2504,
+      "soluvel": 371922,
+      "total_industria": 374426,
+      "total": 3642656
+    },
+    {
+      "date": "2020-05",
+      "conillon": 486571,
+      "arabica": 2457707,
+      "total_verde": 2944278,
+      "torrado": 2272,
+      "soluvel": 335163,
+      "total_industria": 337435,
+      "total": 3281713
+    },
+    {
+      "date": "2020-06",
+      "conillon": 638835,
+      "arabica": 2082022,
+      "total_verde": 2720857,
+      "torrado": 1328,
+      "soluvel": 353432,
+      "total_industria": 354760,
+      "total": 3075617
+    },
+    {
+      "date": "2020-07",
+      "conillon": 448158,
+      "arabica": 2421146,
+      "total_verde": 2869304,
+      "torrado": 1819,
+      "soluvel": 371171,
+      "total_industria": 372990,
+      "total": 3242294
+    },
+    {
+      "date": "2020-08",
+      "conillon": 474827,
+      "arabica": 2766801,
+      "total_verde": 3241628,
+      "torrado": 2374,
+      "soluvel": 329956,
+      "total_industria": 332330,
+      "total": 3573958
+    },
+    {
+      "date": "2020-09",
+      "conillon": 676325,
+      "arabica": 3225249,
+      "total_verde": 3901574,
+      "torrado": 2096,
+      "soluvel": 328171,
+      "total_industria": 330267,
+      "total": 4231841
+    },
+    {
+      "date": "2020-10",
+      "conillon": 470493,
+      "arabica": 3698281,
+      "total_verde": 4168774,
+      "torrado": 1407,
+      "soluvel": 333558,
+      "total_industria": 334965,
+      "total": 4503739
+    },
+    {
+      "date": "2020-11",
+      "conillon": 334632,
+      "arabica": 4080675,
+      "total_verde": 4415307,
+      "torrado": 1277,
+      "soluvel": 353642,
+      "total_industria": 354919,
+      "total": 4770226
+    },
+    {
+      "date": "2020-12",
+      "conillon": 384365,
+      "arabica": 3642367,
+      "total_verde": 4026732,
+      "torrado": 2543,
+      "soluvel": 380266,
+      "total_industria": 382809,
+      "total": 4409541
+    },
+    {
+      "date": "2021-01",
+      "conillon": 242217,
+      "arabica": 3138628,
+      "total_verde": 3380845,
+      "torrado": 1860,
+      "soluvel": 275879,
+      "total_industria": 277739,
+      "total": 3658584
+    },
+    {
+      "date": "2021-02",
+      "conillon": 313689,
+      "arabica": 3357482,
+      "total_verde": 3671171,
+      "torrado": 3198,
+      "soluvel": 308645,
+      "total_industria": 311843,
+      "total": 3983014
+    },
+    {
+      "date": "2021-03",
+      "conillon": 348268,
+      "arabica": 3119681,
+      "total_verde": 3467949,
+      "torrado": 3975,
+      "soluvel": 382348,
+      "total_industria": 386323,
+      "total": 3854272
+    },
+    {
+      "date": "2021-04",
+      "conillon": 336280,
+      "arabica": 3045766,
+      "total_verde": 3382046,
+      "torrado": 4873,
+      "soluvel": 312752,
+      "total_industria": 317625,
+      "total": 3699671
+    },
+    {
+      "date": "2021-05",
+      "conillon": 303723,
+      "arabica": 2083261,
+      "total_verde": 2386984,
+      "torrado": 3040,
+      "soluvel": 279416,
+      "total_industria": 282456,
+      "total": 2669440
+    },
+    {
+      "date": "2021-06",
+      "conillon": 398004,
+      "arabica": 2378747,
+      "total_verde": 2776751,
+      "torrado": 3946,
+      "soluvel": 297953,
+      "total_industria": 301899,
+      "total": 3078650
+    },
+    {
+      "date": "2021-07",
+      "conillon": 410766,
+      "arabica": 2163329,
+      "total_verde": 2574095,
+      "torrado": 3321,
+      "soluvel": 331043,
+      "total_industria": 334364,
+      "total": 2908459
+    },
+    {
+      "date": "2021-08",
+      "conillon": 345711,
+      "arabica": 2126832,
+      "total_verde": 2472543,
+      "torrado": 4981,
+      "soluvel": 353840,
+      "total_industria": 358821,
+      "total": 2831364
+    },
+    {
+      "date": "2021-09",
+      "conillon": 390102,
+      "arabica": 2168873,
+      "total_verde": 2558975,
+      "torrado": 4335,
+      "soluvel": 361187,
+      "total_industria": 365522,
+      "total": 2924497
+    },
+    {
+      "date": "2021-10",
+      "conillon": 301607,
+      "arabica": 2711027,
+      "total_verde": 3012634,
+      "torrado": 3932,
+      "soluvel": 312806,
+      "total_industria": 316738,
+      "total": 3329372
+    },
+    {
+      "date": "2021-11",
+      "conillon": 221353,
+      "arabica": 2625138,
+      "total_verde": 2846491,
+      "torrado": 5221,
+      "soluvel": 360421,
+      "total_industria": 365642,
+      "total": 3212133
+    },
+    {
+      "date": "2021-12",
+      "conillon": 143443,
+      "arabica": 3289660,
+      "total_verde": 3433103,
+      "torrado": 3593,
+      "soluvel": 456506,
+      "total_industria": 460099,
+      "total": 3893202
+    },
+    {
+      "date": "2022-01",
+      "conillon": 99847,
+      "arabica": 2993024,
+      "total_verde": 3092871,
+      "torrado": 3934,
+      "soluvel": 320429,
+      "total_industria": 324363,
+      "total": 3417234
+    },
+    {
+      "date": "2022-02",
+      "conillon": 143956,
+      "arabica": 3145752,
+      "total_verde": 3289708,
+      "torrado": 3357,
+      "soluvel": 297500,
+      "total_industria": 300857,
+      "total": 3590565
+    },
+    {
+      "date": "2022-03",
+      "conillon": 135661,
+      "arabica": 3314870,
+      "total_verde": 3450531,
+      "torrado": 5618,
+      "soluvel": 358963,
+      "total_industria": 364581,
+      "total": 3815112
+    },
+    {
+      "date": "2022-04",
+      "conillon": 142826,
+      "arabica": 2636147,
+      "total_verde": 2778973,
+      "torrado": 4025,
+      "soluvel": 252894,
+      "total_industria": 256919,
+      "total": 3035892
+    },
+    {
+      "date": "2022-05",
+      "conillon": 131806,
+      "arabica": 2528949,
+      "total_verde": 2660755,
+      "torrado": 4754,
+      "soluvel": 298588,
+      "total_industria": 303342,
+      "total": 2964097
+    },
+    {
+      "date": "2022-06",
+      "conillon": 143741,
+      "arabica": 2688927,
+      "total_verde": 2832668,
+      "torrado": 6447,
+      "soluvel": 350973,
+      "total_industria": 357420,
+      "total": 3190088
+    },
+    {
+      "date": "2022-07",
+      "conillon": 146239,
+      "arabica": 2052327,
+      "total_verde": 2198566,
+      "torrado": 3208,
+      "soluvel": 314000,
+      "total_industria": 317208,
+      "total": 2515774
+    },
+    {
+      "date": "2022-08",
+      "conillon": 128705,
+      "arabica": 2384133,
+      "total_verde": 2512838,
+      "torrado": 3878,
+      "soluvel": 320785,
+      "total_industria": 324663,
+      "total": 2837501
+    },
+    {
+      "date": "2022-09",
+      "conillon": 149757,
+      "arabica": 3009337,
+      "total_verde": 3159094,
+      "torrado": 4055,
+      "soluvel": 315388,
+      "total_industria": 319443,
+      "total": 3478537
+    },
+    {
+      "date": "2022-10",
+      "conillon": 114247,
+      "arabica": 3179637,
+      "total_verde": 3293884,
+      "torrado": 2574,
+      "soluvel": 293474,
+      "total_industria": 296048,
+      "total": 3589932
+    },
+    {
+      "date": "2022-11",
+      "conillon": 110021,
+      "arabica": 3345031,
+      "total_verde": 3455052,
+      "torrado": 5813,
+      "soluvel": 278350,
+      "total_industria": 284163,
+      "total": 3739215
+    },
+    {
+      "date": "2022-12",
+      "conillon": 61992,
+      "arabica": 2834098,
+      "total_verde": 2896090,
+      "torrado": 3958,
+      "soluvel": 337107,
+      "total_industria": 341065,
+      "total": 3237155
+    },
+    {
+      "date": "2023-01",
+      "conillon": 75853,
+      "arabica": 2445470,
+      "total_verde": 2521323,
+      "torrado": 3109,
+      "soluvel": 315398,
+      "total_industria": 318507,
+      "total": 2839830
+    },
+    {
+      "date": "2023-02",
+      "conillon": 87500,
+      "arabica": 2056006,
+      "total_verde": 2143506,
+      "torrado": 3878,
+      "soluvel": 280295,
+      "total_industria": 284173,
+      "total": 2427679
+    },
+    {
+      "date": "2023-03",
+      "conillon": 107267,
+      "arabica": 2693934,
+      "total_verde": 2801201,
+      "torrado": 3840,
+      "soluvel": 299325,
+      "total_industria": 303165,
+      "total": 3104366
+    },
+    {
+      "date": "2023-04",
+      "conillon": 124206,
+      "arabica": 2317015,
+      "total_verde": 2441221,
+      "torrado": 4324,
+      "soluvel": 315280,
+      "total_industria": 319604,
+      "total": 2760825
+    },
+    {
+      "date": "2023-05",
+      "conillon": 131689,
+      "arabica": 1990380,
+      "total_verde": 2122069,
+      "torrado": 4169,
+      "soluvel": 311497,
+      "total_industria": 315666,
+      "total": 2437735
+    },
+    {
+      "date": "2023-06",
+      "conillon": 230703,
+      "arabica": 2062196,
+      "total_verde": 2292899,
+      "torrado": 5132,
+      "soluvel": 331201,
+      "total_industria": 336333,
+      "total": 2629232
+    },
+    {
+      "date": "2023-07",
+      "conillon": 494527,
+      "arabica": 2204631,
+      "total_verde": 2699158,
+      "torrado": 3778,
+      "soluvel": 308693,
+      "total_industria": 312471,
+      "total": 3011629
+    },
+    {
+      "date": "2023-08",
+      "conillon": 703868,
+      "arabica": 2661207,
+      "total_verde": 3365075,
+      "torrado": 7220,
+      "soluvel": 335375,
+      "total_industria": 342595,
+      "total": 3707670
+    },
+    {
+      "date": "2023-09",
+      "conillon": 647088,
+      "arabica": 2421076,
+      "total_verde": 3068164,
+      "torrado": 3340,
+      "soluvel": 276870,
+      "total_industria": 280210,
+      "total": 3348374
+    },
+    {
+      "date": "2023-10",
+      "conillon": 686616,
+      "arabica": 3446935,
+      "total_verde": 4133551,
+      "torrado": 3578,
+      "soluvel": 279095,
+      "total_industria": 282673,
+      "total": 4416224
+    },
+    {
+      "date": "2023-11",
+      "conillon": 902266,
+      "arabica": 3278414,
+      "total_verde": 4180680,
+      "torrado": 4227,
+      "soluvel": 237309,
+      "total_industria": 241536,
+      "total": 4422216
+    },
+    {
+      "date": "2023-12",
+      "conillon": 535734,
+      "arabica": 3271514,
+      "total_verde": 3807248,
+      "torrado": 4669,
+      "soluvel": 331743,
+      "total_industria": 336412,
+      "total": 4143660
+    },
+    {
+      "date": "2024-01",
+      "conillon": 461307,
+      "arabica": 3286385,
+      "total_verde": 3747692,
+      "torrado": 1936,
+      "soluvel": 292918,
+      "total_industria": 294854,
+      "total": 4042546
+    },
+    {
+      "date": "2024-02",
+      "conillon": 566597,
+      "arabica": 2825076,
+      "total_verde": 3391673,
+      "torrado": 2942,
+      "soluvel": 257235,
+      "total_industria": 260177,
+      "total": 3651850
+    },
+    {
+      "date": "2024-03",
+      "conillon": 862569,
+      "arabica": 3152281,
+      "total_verde": 4014850,
+      "torrado": 4629,
+      "soluvel": 355841,
+      "total_industria": 360470,
+      "total": 4375320
+    },
+    {
+      "date": "2024-04",
+      "conillon": 685508,
+      "arabica": 3244334,
+      "total_verde": 3929842,
+      "torrado": 2886,
+      "soluvel": 343082,
+      "total_industria": 345968,
+      "total": 4275810
+    },
+    {
+      "date": "2024-05",
+      "conillon": 879905,
+      "arabica": 3181927,
+      "total_verde": 4061832,
+      "torrado": 4442,
+      "soluvel": 379555,
+      "total_industria": 383997,
+      "total": 4445829
+    },
+    {
+      "date": "2024-06",
+      "conillon": 823727,
+      "arabica": 2496588,
+      "total_verde": 3320315,
+      "torrado": 3247,
+      "soluvel": 289866,
+      "total_industria": 293113,
+      "total": 3613428
+    },
+    {
+      "date": "2024-07",
+      "conillon": 902637,
+      "arabica": 2497750,
+      "total_verde": 3400387,
+      "torrado": 5713,
+      "soluvel": 370696,
+      "total_industria": 376409,
+      "total": 3776796
+    },
+    {
+      "date": "2024-08",
+      "conillon": 945047,
+      "arabica": 2544312,
+      "total_verde": 3489359,
+      "torrado": 3836,
+      "soluvel": 320109,
+      "total_industria": 323945,
+      "total": 3813304
+    },
+    {
+      "date": "2024-09",
+      "conillon": 930992,
+      "arabica": 3299578,
+      "total_verde": 4230570,
+      "torrado": 4259,
+      "soluvel": 362889,
+      "total_industria": 367148,
+      "total": 4597718
+    },
+    {
+      "date": "2024-10",
+      "conillon": 927780,
+      "arabica": 3886694,
+      "total_verde": 4814474,
+      "torrado": 5033,
+      "soluvel": 356604,
+      "total_industria": 361637,
+      "total": 5176111
+    },
+    {
+      "date": "2024-11",
+      "conillon": 807051,
+      "arabica": 3701881,
+      "total_verde": 4508932,
+      "torrado": 6334,
+      "soluvel": 373699,
+      "total_industria": 380033,
+      "total": 4888965
+    },
+    {
+      "date": "2024-12",
+      "conillon": 571094,
+      "arabica": 2927388,
+      "total_verde": 3498482,
+      "torrado": 3763,
+      "soluvel": 424248,
+      "total_industria": 428011,
+      "total": 3926493
+    },
+    {
+      "date": "2025-01",
+      "conillon": 333801,
+      "arabica": 3310800,
+      "total_verde": 3644601,
+      "torrado": 5016,
+      "soluvel": 366225,
+      "total_industria": 371241,
+      "total": 4015842
+    },
+    {
+      "date": "2025-02",
+      "conillon": 230785,
+      "arabica": 2907707,
+      "total_verde": 3138492,
+      "torrado": 4076,
+      "soluvel": 281880,
+      "total_industria": 285956,
+      "total": 3424448
+    },
+    {
+      "date": "2025-03",
+      "conillon": 139002,
+      "arabica": 2824160,
+      "total_verde": 2963162,
+      "torrado": 4990,
+      "soluvel": 330097,
+      "total_industria": 335087,
+      "total": 3298249
+    },
+    {
+      "date": "2025-04",
+      "conillon": 104837,
+      "arabica": 2688108,
+      "total_verde": 2792945,
+      "torrado": 4599,
+      "soluvel": 306480,
+      "total_industria": 311079,
+      "total": 3104024
+    },
+    {
+      "date": "2025-05",
+      "conillon": 203686,
+      "arabica": 2414013,
+      "total_verde": 2617699,
+      "torrado": 3964,
+      "soluvel": 358301,
+      "total_industria": 362265,
+      "total": 2979964
+    },
+    {
+      "date": "2025-06",
+      "conillon": 477200,
+      "arabica": 1828485,
+      "total_verde": 2305685,
+      "torrado": 6420,
+      "soluvel": 305096,
+      "total_industria": 311516,
+      "total": 2617201
+    },
+    {
+      "date": "2025-07",
+      "conillon": 461625,
+      "arabica": 1992423,
+      "total_verde": 2454048,
+      "torrado": 5458,
+      "soluvel": 294842,
+      "total_industria": 300300,
+      "total": 2754348
+    },
+    {
+      "date": "2025-08",
+      "conillon": 621010,
+      "arabica": 2279652,
+      "total_verde": 2900662,
+      "torrado": 3585,
+      "soluvel": 267166,
+      "total_industria": 270751,
+      "total": 3171413
+    },
+    {
+      "date": "2025-09",
+      "conillon": 493018,
+      "arabica": 2977456,
+      "total_verde": 3470474,
+      "torrado": 5782,
+      "soluvel": 302178,
+      "total_industria": 307960,
+      "total": 3778434
+    },
+    {
+      "date": "2025-10",
+      "conillon": 448556,
+      "arabica": 3387562,
+      "total_verde": 3836118,
+      "torrado": 5923,
+      "soluvel": 306474,
+      "total_industria": 312397,
+      "total": 4148515
+    },
+    {
+      "date": "2025-11",
+      "conillon": 259323,
+      "arabica": 3064278,
+      "total_verde": 3323601,
+      "torrado": 5339,
+      "soluvel": 294793,
+      "total_industria": 300132,
+      "total": 3623733
+    },
+    {
+      "date": "2025-12",
+      "conillon": 222147,
+      "arabica": 2646077,
+      "total_verde": 2868224,
+      "torrado": 3550,
+      "soluvel": 279778,
+      "total_industria": 283328,
+      "total": 3151552
+    },
+    {
+      "date": "2026-01",
+      "conillon": 182225,
+      "arabica": 2354525,
+      "total_verde": 2536750,
+      "torrado": 2349,
+      "soluvel": 252638,
+      "total_industria": 254987,
+      "total": 2791737
+    },
+    {
+      "date": "2026-02",
+      "conillon": 226221,
+      "arabica": 2068301,
+      "total_verde": 2294522,
+      "torrado": 3223,
+      "soluvel": 320663,
+      "total_industria": 323886,
+      "total": 2618408
+    }
+  ],
+  "by_country": {
+    "months": [
+      "2026-01",
+      "2026-02"
+    ],
+    "countries": {
+      "ALEMANHA": {
+        "2026-01": 391970,
+        "2026-02": 394619
+      },
+      "E.U.A.": {
+        "2026-01": 385841,
+        "2026-02": 270157
+      },
+      "ITALIA": {
+        "2026-01": 285580,
+        "2026-02": 283018
+      },
+      "BELGICA": {
+        "2026-01": 180812,
+        "2026-02": 150935
+      },
+      "JAPAO": {
+        "2026-01": 169357,
+        "2026-02": 146459
+      },
+      "TURQUIA": {
+        "2026-01": 102675,
+        "2026-02": 110275
+      },
+      "REINO UNIDO": {
+        "2026-01": 51837,
+        "2026-02": 131483
+      },
+      "RUSSIAN FEDERATION": {
+        "2026-01": 120286,
+        "2026-02": 58736
+      },
+      "ESPANHA": {
+        "2026-01": 88485,
+        "2026-02": 84656
+      },
+      "PAISES BAIXOS (HOLANDA)": {
+        "2026-01": 100038,
+        "2026-02": 53785
+      },
+      "COREIA DO SUL (REPUBL.)": {
+        "2026-01": 69195,
+        "2026-02": 71262
+      },
+      "COLOMBIA": {
+        "2026-01": 70806,
+        "2026-02": 63243
+      },
+      "FRANCA": {
+        "2026-01": 70598,
+        "2026-02": 62700
+      },
+      "GRECIA": {
+        "2026-01": 54180,
+        "2026-02": 56490
+      },
+      "CANADA": {
+        "2026-01": 54057,
+        "2026-02": 55631
+      },
+      "ARGENTINA": {
+        "2026-01": 50178,
+        "2026-02": 53164
+      },
+      "MEXICO": {
+        "2026-01": 34276,
+        "2026-02": 56472
+      },
+      "SUECIA": {
+        "2026-01": 40876,
+        "2026-02": 47115
+      },
+      "FINLANDIA": {
+        "2026-01": 47560,
+        "2026-02": 34049
+      },
+      "EMIR.ARABES UNIDOS": {
+        "2026-01": 39048,
+        "2026-02": 24417
+      },
+      "POLONIA": {
+        "2026-01": 26913,
+        "2026-02": 24626
+      },
+      "MALASIA": {
+        "2026-01": 28623,
+        "2026-02": 17172
+      },
+      "LIBANO": {
+        "2026-01": 7160,
+        "2026-02": 34366
+      },
+      "CHINA": {
+        "2026-01": 18289,
+        "2026-02": 22640
+      },
+      "VIETNAM": {
+        "2026-01": 17065,
+        "2026-02": 20749
+      },
+      "AUSTRALIA": {
+        "2026-01": 19229,
+        "2026-02": 18045
+      },
+      "LETONIA (LATVIA)": {
+        "2026-01": 21918,
+        "2026-02": 14414
+      },
+      "ESLOVENIA": {
+        "2026-01": 23308,
+        "2026-02": 13003
+      },
+      "NORUEGA": {
+        "2026-01": 15650,
+        "2026-02": 19944
+      },
+      "ESTONIA": {
+        "2026-01": 10611,
+        "2026-02": 22466
+      },
+      "ARABIA SAUDITA": {
+        "2026-01": 15589,
+        "2026-02": 16705
+      },
+      "CHILE": {
+        "2026-01": 15285,
+        "2026-02": 15587
+      },
+      "JORDANIA": {
+        "2026-01": 15803,
+        "2026-02": 10370
+      },
+      "TAIWAN": {
+        "2026-01": 13536,
+        "2026-02": 8534
+      },
+      "INDONESIA": {
+        "2026-01": 11271,
+        "2026-02": 9017
+      },
+      "PERU": {
+        "2026-01": 6902,
+        "2026-02": 12146
+      },
+      "PORTUGAL": {
+        "2026-01": 9908,
+        "2026-02": 8190
+      },
+      "ISRAEL": {
+        "2026-01": 9153,
+        "2026-02": 8187
+      },
+      "DINAMARCA": {
+        "2026-01": 11204,
+        "2026-02": 4430
+      },
+      "EQUADOR": {
+        "2026-01": 8954,
+        "2026-02": 6294
+      },
+      "CROACIA": {
+        "2026-01": 5707,
+        "2026-02": 8320
+      },
+      "MONTENEGRO": {
+        "2026-01": 2640,
+        "2026-02": 9240
+      },
+      "REP. DOMINICANA": {
+        "2026-01": 11241,
+        "2026-02": 440
+      },
+      "NOVA ZELANDIA": {
+        "2026-01": 5038,
+        "2026-02": 6269
+      },
+      "URUGUAI": {
+        "2026-01": 5977,
+        "2026-02": 4513
+      },
+      "EL SALVADOR": {
+        "2026-01": 319,
+        "2026-02": 10012
+      },
+      "EGITO": {
+        "2026-01": 3493,
+        "2026-02": 5640
+      },
+      "ROMENIA": {
+        "2026-01": 3871,
+        "2026-02": 4317
+      },
+      "SIRIA": {
+        "2026-01": 2720,
+        "2026-02": 4840
+      },
+      "IRLANDA": {
+        "2026-01": 2856,
+        "2026-02": 4530
+      },
+      "AFRICA DO SUL": {
+        "2026-01": 3107,
+        "2026-02": 4004
+      },
+      "PARAGUAI": {
+        "2026-01": 3462,
+        "2026-02": 2849
+      },
+      "SINGAPURA": {
+        "2026-01": 2295,
+        "2026-02": 3773
+      },
+      "HONG KONG": {
+        "2026-01": 1968,
+        "2026-02": 3219
+      },
+      "GUATEMALA": {
+        "2026-01": 1517,
+        "2026-02": 3382
+      },
+      "CHIPRE": {
+        "2026-01": 1743,
+        "2026-02": 2800
+      },
+      "ARGELIA": {
+        "2026-01": 2200,
+        "2026-02": 2160
+      },
+      "ALBANIA": {
+        "2026-01": 1840,
+        "2026-02": 1760
+      },
+      "UCRANIA": {
+        "2026-01": 1628,
+        "2026-02": 1280
+      },
+      "BOLIVIA": {
+        "2026-01": 1210,
+        "2026-02": 1668
+      },
+      "LIBIA": {
+        "2026-01": 440,
+        "2026-02": 2285
+      },
+      "KUWEIT": {
+        "2026-01": 1909,
+        "2026-02": 412
+      },
+      "BULGARIA": {
+        "2026-01": 322,
+        "2026-02": 1966
+      },
+      "OMAN": {
+        "2026-01": 1184,
+        "2026-02": 980
+      },
+      "SUICA": {
+        "2026-01": 2009
+      },
+      "SERVIA": {
+        "2026-02": 1289
+      },
+      "QATAR": {
+        "2026-02": 1171
+      },
+      "MARROCOS": {
+        "2026-02": 1080
+      },
+      "MALTA": {
+        "2026-01": 320,
+        "2026-02": 678
+      },
+      "FILIPINAS": {
+        "2026-01": 320,
+        "2026-02": 576
+      },
+      "CAZAQUISTAO": {
+        "2026-02": 885
+      },
+      "CUBA": {
+        "2026-02": 880
+      },
+      "BAREIN": {
+        "2026-01": 450,
+        "2026-02": 362
+      },
+      "SENEGAL": {
+        "2026-01": 764
+      },
+      "LITUANIA": {
+        "2026-01": 760
+      },
+      "SURINAME": {
+        "2026-02": 750
+      },
+      "GANA": {
+        "2026-01": 749
+      },
+      "CAMBOJA": {
+        "2026-02": 640
+      },
+      "ARMENIA": {
+        "2026-01": 639
+      },
+      "QUENIA": {
+        "2026-01": 195,
+        "2026-02": 417
+      },
+      "TUNISIA": {
+        "2026-02": 542
+      },
+      "PAQUISTAO": {
+        "2026-01": 494,
+        "2026-02": 42
+      },
+      "GUIANA": {
+        "2026-01": 417,
+        "2026-02": 60
+      },
+      "GEORGIA": {
+        "2026-02": 393
+      },
+      "CABO VERDE": {
+        "2026-01": 320
+      },
+      "IRAQUE": {
+        "2026-01": 320
+      },
+      "ISLANDIA": {
+        "2026-02": 320
+      },
+      "MACAU": {
+        "2026-02": 320
+      },
+      "MONGOLIA": {
+        "2026-02": 320
+      },
+      "UZBEQUISTAO": {
+        "2026-01": 318
+      },
+      "REPUBL. TCHECA": {
+        "2026-02": 213
+      },
+      "ANTILHAS HOLANDESAS": {
+        "2026-02": 150
+      },
+      "MAURICIO": {
+        "2026-02": 69
+      },
+      "JAMAICA": {
+        "2026-02": 50
+      },
+      "VENEZUELA": {
+        "2026-01": 15
+      },
+      "TAILANDIA": {
+        "2026-02": 2
+      }
+    }
+  },
+  "by_country_prev": {
+    "months": [
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "countries": {
+      "ALEMANHA": {
+        "2025-01": 466809,
+        "2025-02": 517135,
+        "2025-03": 428729,
+        "2025-04": 380644,
+        "2025-05": 329458,
+        "2025-06": 274819,
+        "2025-07": 264884,
+        "2025-08": 415068,
+        "2025-09": 653998,
+        "2025-10": 592330,
+        "2025-11": 684054,
+        "2025-12": 401571
+      },
+      "E.U.A.": {
+        "2025-01": 723343,
+        "2025-02": 486713,
+        "2025-03": 602564,
+        "2025-04": 560669,
+        "2025-05": 503586,
+        "2025-06": 443991,
+        "2025-07": 407387,
+        "2025-08": 301099,
+        "2025-09": 335339,
+        "2025-10": 348185,
+        "2025-11": 333721,
+        "2025-12": 334861
+      },
+      "ITALIA": {
+        "2025-01": 269471,
+        "2025-02": 267442,
+        "2025-03": 266565,
+        "2025-04": 342572,
+        "2025-05": 230006,
+        "2025-06": 188751,
+        "2025-07": 168352,
+        "2025-08": 256113,
+        "2025-09": 334094,
+        "2025-10": 360066,
+        "2025-11": 235580,
+        "2025-12": 230380
+      },
+      "JAPAO": {
+        "2025-01": 248996,
+        "2025-02": 232928,
+        "2025-03": 195301,
+        "2025-04": 194562,
+        "2025-05": 218680,
+        "2025-06": 150606,
+        "2025-07": 217479,
+        "2025-08": 213185,
+        "2025-09": 219455,
+        "2025-10": 290867,
+        "2025-11": 237086,
+        "2025-12": 227679
+      },
+      "BELGICA": {
+        "2025-01": 207003,
+        "2025-02": 148777,
+        "2025-03": 148761,
+        "2025-04": 113764,
+        "2025-05": 191932,
+        "2025-06": 364872,
+        "2025-07": 202018,
+        "2025-08": 140643,
+        "2025-09": 184791,
+        "2025-10": 210937,
+        "2025-11": 237187,
+        "2025-12": 170548
+      },
+      "TURQUIA": {
+        "2025-01": 169378,
+        "2025-02": 190484,
+        "2025-03": 133312,
+        "2025-04": 107817,
+        "2025-05": 69600,
+        "2025-06": 50974,
+        "2025-07": 52714,
+        "2025-08": 111026,
+        "2025-09": 150802,
+        "2025-10": 181267,
+        "2025-11": 158080,
+        "2025-12": 179112
+      },
+      "PAISES BAIXOS (HOLANDA)": {
+        "2025-01": 133615,
+        "2025-02": 134543,
+        "2025-03": 149354,
+        "2025-04": 83231,
+        "2025-05": 104653,
+        "2025-06": 81452,
+        "2025-07": 128992,
+        "2025-08": 112039,
+        "2025-09": 153499,
+        "2025-10": 144447,
+        "2025-11": 139251,
+        "2025-12": 116848
+      },
+      "RUSSIAN FEDERATION": {
+        "2025-01": 124615,
+        "2025-02": 125924,
+        "2025-03": 120647,
+        "2025-04": 78472,
+        "2025-05": 114622,
+        "2025-06": 60806,
+        "2025-07": 107207,
+        "2025-08": 63243,
+        "2025-09": 66301,
+        "2025-10": 241964,
+        "2025-11": 116515,
+        "2025-12": 104729
+      },
+      "ESPANHA": {
+        "2025-01": 150734,
+        "2025-02": 133723,
+        "2025-03": 83016,
+        "2025-04": 86085,
+        "2025-05": 97346,
+        "2025-06": 63103,
+        "2025-07": 111431,
+        "2025-08": 94056,
+        "2025-09": 142378,
+        "2025-10": 80923,
+        "2025-11": 89891,
+        "2025-12": 89133
+      },
+      "CHINA": {
+        "2025-01": 143556,
+        "2025-02": 64100,
+        "2025-03": 72936,
+        "2025-04": 105540,
+        "2025-05": 87715,
+        "2025-06": 55862,
+        "2025-07": 31874,
+        "2025-08": 40174,
+        "2025-09": 103358,
+        "2025-10": 211782,
+        "2025-11": 126083,
+        "2025-12": 79632
+      },
+      "COREIA DO SUL (REPUBL.)": {
+        "2025-01": 90164,
+        "2025-02": 113340,
+        "2025-03": 85224,
+        "2025-04": 95810,
+        "2025-05": 97470,
+        "2025-06": 51958,
+        "2025-07": 66878,
+        "2025-08": 66975,
+        "2025-09": 67806,
+        "2025-10": 84629,
+        "2025-11": 69519,
+        "2025-12": 65527
+      },
+      "CANADA": {
+        "2025-01": 89053,
+        "2025-02": 66905,
+        "2025-03": 73236,
+        "2025-04": 72755,
+        "2025-05": 65925,
+        "2025-06": 35298,
+        "2025-07": 53201,
+        "2025-08": 78868,
+        "2025-09": 107936,
+        "2025-10": 101918,
+        "2025-11": 104136,
+        "2025-12": 94030
+      },
+      "MEXICO": {
+        "2025-01": 70878,
+        "2025-02": 77327,
+        "2025-03": 25834,
+        "2025-04": 7483,
+        "2025-05": 26564,
+        "2025-06": 32292,
+        "2025-07": 85728,
+        "2025-08": 251166,
+        "2025-09": 98568,
+        "2025-10": 90526,
+        "2025-11": 71938,
+        "2025-12": 86637
+      },
+      "FRANCA": {
+        "2025-01": 92198,
+        "2025-02": 61962,
+        "2025-03": 103873,
+        "2025-04": 90783,
+        "2025-05": 64037,
+        "2025-06": 74131,
+        "2025-07": 45573,
+        "2025-08": 56386,
+        "2025-09": 69660,
+        "2025-10": 63925,
+        "2025-11": 125617,
+        "2025-12": 56323
+      },
+      "REINO UNIDO": {
+        "2025-01": 90221,
+        "2025-02": 77953,
+        "2025-03": 58111,
+        "2025-04": 59060,
+        "2025-05": 53540,
+        "2025-06": 50599,
+        "2025-07": 76474,
+        "2025-08": 58327,
+        "2025-09": 86899,
+        "2025-10": 90892,
+        "2025-11": 94600,
+        "2025-12": 70473
+      },
+      "COLOMBIA": {
+        "2025-01": 26746,
+        "2025-02": 42601,
+        "2025-03": 25084,
+        "2025-04": 30591,
+        "2025-05": 62669,
+        "2025-06": 76515,
+        "2025-07": 100571,
+        "2025-08": 112948,
+        "2025-09": 107280,
+        "2025-10": 101634,
+        "2025-11": 66626,
+        "2025-12": 90178
+      },
+      "SUECIA": {
+        "2025-01": 79887,
+        "2025-02": 40896,
+        "2025-03": 52862,
+        "2025-04": 75561,
+        "2025-05": 64126,
+        "2025-06": 31893,
+        "2025-07": 59623,
+        "2025-08": 48439,
+        "2025-09": 43556,
+        "2025-10": 71252,
+        "2025-11": 35240,
+        "2025-12": 52061
+      },
+      "ARGENTINA": {
+        "2025-01": 56082,
+        "2025-02": 69484,
+        "2025-03": 49787,
+        "2025-04": 68263,
+        "2025-05": 99975,
+        "2025-06": 80116,
+        "2025-07": 52051,
+        "2025-08": 34745,
+        "2025-09": 32539,
+        "2025-10": 29680,
+        "2025-11": 33386,
+        "2025-12": 36840
+      },
+      "GRECIA": {
+        "2025-01": 37958,
+        "2025-02": 46175,
+        "2025-03": 43435,
+        "2025-04": 55876,
+        "2025-05": 48316,
+        "2025-06": 42169,
+        "2025-07": 63846,
+        "2025-08": 54302,
+        "2025-09": 47982,
+        "2025-10": 74781,
+        "2025-11": 31451,
+        "2025-12": 38748
+      },
+      "AUSTRALIA": {
+        "2025-01": 54724,
+        "2025-02": 38136,
+        "2025-03": 42173,
+        "2025-04": 36834,
+        "2025-05": 38739,
+        "2025-06": 13387,
+        "2025-07": 29634,
+        "2025-08": 25854,
+        "2025-09": 39883,
+        "2025-10": 53471,
+        "2025-11": 38685,
+        "2025-12": 32707
+      },
+      "MALASIA": {
+        "2025-01": 24731,
+        "2025-02": 22178,
+        "2025-03": 36006,
+        "2025-04": 38294,
+        "2025-05": 30939,
+        "2025-06": 24907,
+        "2025-07": 17036,
+        "2025-08": 37220,
+        "2025-09": 41314,
+        "2025-10": 36704,
+        "2025-11": 26564,
+        "2025-12": 23951
+      },
+      "VIETNAM": {
+        "2025-01": 80817,
+        "2025-02": 22293,
+        "2025-03": 7334,
+        "2025-04": 17245,
+        "2025-05": 6085,
+        "2025-06": 18193,
+        "2025-07": 26846,
+        "2025-08": 43940,
+        "2025-09": 66530,
+        "2025-10": 19848,
+        "2025-11": 27369,
+        "2025-12": 14653
+      },
+      "ESLOVENIA": {
+        "2025-01": 35605,
+        "2025-02": 40388,
+        "2025-03": 22529,
+        "2025-04": 18093,
+        "2025-05": 28576,
+        "2025-06": 8999,
+        "2025-07": 16189,
+        "2025-08": 29098,
+        "2025-09": 40309,
+        "2025-10": 33277,
+        "2025-11": 15952,
+        "2025-12": 31931
+      },
+      "FINLANDIA": {
+        "2025-01": 30600,
+        "2025-02": 26730,
+        "2025-03": 11880,
+        "2025-04": 16629,
+        "2025-05": 12600,
+        "2025-06": 14675,
+        "2025-07": 15840,
+        "2025-08": 32531,
+        "2025-09": 30120,
+        "2025-10": 42587,
+        "2025-11": 69773,
+        "2025-12": 16413
+      },
+      "POLONIA": {
+        "2025-01": 22814,
+        "2025-02": 12771,
+        "2025-03": 23255,
+        "2025-04": 14421,
+        "2025-05": 18252,
+        "2025-06": 15735,
+        "2025-07": 21031,
+        "2025-08": 39599,
+        "2025-09": 32249,
+        "2025-10": 35346,
+        "2025-11": 38537,
+        "2025-12": 42544
+      },
+      "INDONESIA": {
+        "2025-01": 37562,
+        "2025-02": 28694,
+        "2025-03": 19745,
+        "2025-04": 13268,
+        "2025-05": 16385,
+        "2025-06": 23899,
+        "2025-07": 20703,
+        "2025-08": 16385,
+        "2025-09": 35046,
+        "2025-10": 22819,
+        "2025-11": 28455,
+        "2025-12": 24659
+      },
+      "CHILE": {
+        "2025-01": 22831,
+        "2025-02": 35949,
+        "2025-03": 41597,
+        "2025-04": 22567,
+        "2025-05": 25632,
+        "2025-06": 16194,
+        "2025-07": 24751,
+        "2025-08": 32151,
+        "2025-09": 13544,
+        "2025-10": 16995,
+        "2025-11": 17060,
+        "2025-12": 15952
+      },
+      "EMIR.ARABES UNIDOS": {
+        "2025-01": 15248,
+        "2025-02": 9344,
+        "2025-03": 9124,
+        "2025-04": 13719,
+        "2025-05": 11179,
+        "2025-06": 14100,
+        "2025-07": 15515,
+        "2025-08": 27902,
+        "2025-09": 41016,
+        "2025-10": 28974,
+        "2025-11": 30054,
+        "2025-12": 51467
+      },
+      "TAIWAN": {
+        "2025-01": 16296,
+        "2025-02": 21271,
+        "2025-03": 22294,
+        "2025-04": 19073,
+        "2025-05": 17600,
+        "2025-06": 13088,
+        "2025-07": 27961,
+        "2025-08": 20031,
+        "2025-09": 17297,
+        "2025-10": 32639,
+        "2025-11": 10033,
+        "2025-12": 20543
+      },
+      "NORUEGA": {
+        "2025-01": 17167,
+        "2025-02": 20103,
+        "2025-03": 22079,
+        "2025-04": 21500,
+        "2025-05": 22600,
+        "2025-06": 20120,
+        "2025-07": 17374,
+        "2025-08": 19278,
+        "2025-09": 15476,
+        "2025-10": 27278,
+        "2025-11": 14068,
+        "2025-12": 11961
+      },
+      "ESTONIA": {
+        "2025-01": 39239,
+        "2025-02": 20701,
+        "2025-03": 23141,
+        "2025-04": 14474,
+        "2025-05": 11689,
+        "2025-06": 13378,
+        "2025-07": 13100,
+        "2025-08": 14780,
+        "2025-09": 23955,
+        "2025-10": 20815,
+        "2025-11": 20896,
+        "2025-12": 11999
+      },
+      "ARABIA SAUDITA": {
+        "2025-01": 31092,
+        "2025-02": 21641,
+        "2025-03": 9107,
+        "2025-04": 9837,
+        "2025-05": 15045,
+        "2025-06": 11163,
+        "2025-07": 10339,
+        "2025-08": 16589,
+        "2025-09": 18653,
+        "2025-10": 29068,
+        "2025-11": 12954,
+        "2025-12": 35396
+      },
+      "LIBANO": {
+        "2025-01": 25683,
+        "2025-02": 9488,
+        "2025-03": 27720,
+        "2025-04": 12959,
+        "2025-05": 7600,
+        "2025-06": 11160,
+        "2025-07": 13314,
+        "2025-08": 11795,
+        "2025-09": 16312,
+        "2025-10": 23457,
+        "2025-11": 23648,
+        "2025-12": 25208
+      },
+      "JORDANIA": {
+        "2025-01": 12625,
+        "2025-02": 8966,
+        "2025-03": 17520,
+        "2025-04": 10779,
+        "2025-05": 3000,
+        "2025-06": 7656,
+        "2025-07": 6141,
+        "2025-08": 29959,
+        "2025-09": 34080,
+        "2025-10": 16653,
+        "2025-11": 30680,
+        "2025-12": 20276
+      },
+      "EQUADOR": {
+        "2025-01": 14651,
+        "2025-02": 5435,
+        "2025-03": 6473,
+        "2025-04": 10494,
+        "2025-05": 6473,
+        "2025-06": 6317,
+        "2025-07": 14787,
+        "2025-08": 22396,
+        "2025-09": 22186,
+        "2025-10": 49037,
+        "2025-11": 16508,
+        "2025-12": 15448
+      },
+      "ARGELIA": {
+        "2025-01": 11720,
+        "2025-02": 8520,
+        "2025-03": 5160,
+        "2025-04": 13175,
+        "2025-05": 10201,
+        "2025-06": 6960,
+        "2025-07": 4042,
+        "2025-08": 33159,
+        "2025-09": 34625,
+        "2025-10": 39510,
+        "2025-11": 11507,
+        "2025-12": 5589
+      },
+      "AFRICA DO SUL": {
+        "2025-01": 8851,
+        "2025-02": 12314,
+        "2025-03": 31914,
+        "2025-04": 12626,
+        "2025-05": 13456,
+        "2025-06": 9161,
+        "2025-07": 16136,
+        "2025-08": 13143,
+        "2025-09": 5640,
+        "2025-10": 9040,
+        "2025-11": 8967,
+        "2025-12": 3022
+      },
+      "ISRAEL": {
+        "2025-01": 13748,
+        "2025-02": 9411,
+        "2025-03": 7100,
+        "2025-04": 6926,
+        "2025-05": 5647,
+        "2025-06": 10406,
+        "2025-07": 11753,
+        "2025-08": 10919,
+        "2025-09": 19878,
+        "2025-10": 9294,
+        "2025-11": 22262,
+        "2025-12": 16827
+      },
+      "PERU": {
+        "2025-01": 6168,
+        "2025-02": 10474,
+        "2025-03": 11517,
+        "2025-04": 20877,
+        "2025-05": 7033,
+        "2025-06": 18088,
+        "2025-07": 11691,
+        "2025-08": 7105,
+        "2025-09": 12765,
+        "2025-10": 12355,
+        "2025-11": 9945,
+        "2025-12": 11024
+      },
+      "LETONIA (LATVIA)": {
+        "2025-01": 11188,
+        "2025-02": 14018,
+        "2025-03": 9455,
+        "2025-04": 7014,
+        "2025-05": 10191,
+        "2025-06": 9269,
+        "2025-07": 3747,
+        "2025-08": 15180,
+        "2025-09": 11780,
+        "2025-10": 15384,
+        "2025-11": 15840,
+        "2025-12": 15288
+      },
+      "MONTENEGRO": {
+        "2025-01": 25881,
+        "2025-02": 7920,
+        "2025-03": 7920,
+        "2025-04": 2200,
+        "2025-05": 12320,
+        "2025-06": 13641,
+        "2025-07": 10560,
+        "2025-08": 11880,
+        "2025-09": 19683,
+        "2025-10": 5603,
+        "2025-11": 5280,
+        "2025-12": 7040
+      },
+      "TUNISIA": {
+        "2025-01": 3852,
+        "2025-02": 6720,
+        "2025-03": 52063,
+        "2025-04": 10356,
+        "2025-05": 15191,
+        "2025-06": 5000,
+        "2025-07": 2365,
+        "2025-08": 1813,
+        "2025-09": 10340,
+        "2025-10": 3333,
+        "2025-11": 3128,
+        "2025-12": 592
+      },
+      "PORTUGAL": {
+        "2025-01": 8479,
+        "2025-02": 7593,
+        "2025-03": 7400,
+        "2025-04": 9420,
+        "2025-05": 7830,
+        "2025-06": 8760,
+        "2025-07": 12360,
+        "2025-08": 10480,
+        "2025-09": 12036,
+        "2025-10": 12111,
+        "2025-11": 7358,
+        "2025-12": 8800
+      },
+      "DINAMARCA": {
+        "2025-01": 12734,
+        "2025-02": 10436,
+        "2025-03": 6280,
+        "2025-04": 10847,
+        "2025-05": 8290,
+        "2025-06": 5740,
+        "2025-07": 4274,
+        "2025-08": 12320,
+        "2025-09": 5997,
+        "2025-10": 8093,
+        "2025-11": 6639,
+        "2025-12": 13584
+      },
+      "REP. DOMINICANA": {
+        "2025-01": 27023,
+        "2025-02": 8108,
+        "2025-03": 3965,
+        "2025-04": 6943,
+        "2025-05": 97,
+        "2025-06": 3520,
+        "2025-07": 5082,
+        "2025-08": 385,
+        "2025-09": 8559,
+        "2025-10": 9308,
+        "2025-11": 13859,
+        "2025-12": 12500
+      },
+      "EGITO": {
+        "2025-01": 9245,
+        "2025-02": 3713,
+        "2025-03": 8295,
+        "2025-04": 9480,
+        "2025-05": 11173,
+        "2025-06": 4542,
+        "2025-07": 2640,
+        "2025-08": 11407,
+        "2025-09": 10638,
+        "2025-10": 8216,
+        "2025-11": 2960,
+        "2025-12": 12930
+      },
+      "CROACIA": {
+        "2025-01": 12839,
+        "2025-02": 4140,
+        "2025-03": 3943,
+        "2025-04": 5920,
+        "2025-05": 1800,
+        "2025-06": 2083,
+        "2025-07": 2078,
+        "2025-08": 12986,
+        "2025-09": 9807,
+        "2025-10": 10950,
+        "2025-11": 14150,
+        "2025-12": 9913
+      },
+      "LIBIA": {
+        "2025-01": 7920,
+        "2025-02": 5360,
+        "2025-03": 8597,
+        "2025-04": 4840,
+        "2025-05": 2200,
+        "2025-06": 4583,
+        "2025-07": 6223,
+        "2025-08": 11440,
+        "2025-09": 12999,
+        "2025-10": 13840,
+        "2025-11": 6743,
+        "2025-12": 3960
+      },
+      "NOVA ZELANDIA": {
+        "2025-01": 8580,
+        "2025-02": 5864,
+        "2025-03": 2919,
+        "2025-04": 9715,
+        "2025-05": 6842,
+        "2025-06": 6255,
+        "2025-07": 4917,
+        "2025-08": 1899,
+        "2025-09": 6179,
+        "2025-10": 5547,
+        "2025-11": 7568,
+        "2025-12": 8312
+      },
+      "SIRIA": {
+        "2025-01": 2200,
+        "2025-02": 440,
+        "2025-03": 2200,
+        "2025-04": 880,
+        "2025-06": 3840,
+        "2025-07": 3520,
+        "2025-08": 3960,
+        "2025-09": 6160,
+        "2025-10": 15840,
+        "2025-11": 7480,
+        "2025-12": 22880
+      },
+      "URUGUAI": {
+        "2025-01": 4047,
+        "2025-02": 4372,
+        "2025-03": 5026,
+        "2025-04": 11449,
+        "2025-05": 6398,
+        "2025-06": 3363,
+        "2025-07": 6217,
+        "2025-08": 3346,
+        "2025-09": 3822,
+        "2025-10": 3703,
+        "2025-11": 3930,
+        "2025-12": 3874
+      },
+      "ROMENIA": {
+        "2025-01": 3132,
+        "2025-02": 3136,
+        "2025-03": 5887,
+        "2025-04": 2581,
+        "2025-05": 4579,
+        "2025-06": 1944,
+        "2025-07": 1624,
+        "2025-08": 5504,
+        "2025-09": 7653,
+        "2025-10": 10912,
+        "2025-11": 5800,
+        "2025-12": 3917
+      },
+      "IRLANDA": {
+        "2025-01": 3840,
+        "2025-02": 4406,
+        "2025-03": 4811,
+        "2025-04": 6233,
+        "2025-05": 3746,
+        "2025-06": 3350,
+        "2025-07": 4997,
+        "2025-08": 3433,
+        "2025-09": 5979,
+        "2025-10": 6342,
+        "2025-11": 5144,
+        "2025-12": 3798
+      },
+      "GUATEMALA": {
+        "2025-01": 12783,
+        "2025-02": 16038,
+        "2025-03": 3741,
+        "2025-04": 10311,
+        "2025-05": 6779,
+        "2025-06": 1292,
+        "2025-07": 1129,
+        "2025-08": 522,
+        "2025-09": 522,
+        "2025-10": 142,
+        "2025-11": 608,
+        "2025-12": 185
+      },
+      "PARAGUAI": {
+        "2025-01": 2401,
+        "2025-02": 3783,
+        "2025-03": 2237,
+        "2025-04": 4929,
+        "2025-05": 4765,
+        "2025-06": 3840,
+        "2025-07": 5879,
+        "2025-08": 4612,
+        "2025-09": 5722,
+        "2025-10": 3461,
+        "2025-11": 4992,
+        "2025-12": 4198
+      },
+      "SINGAPURA": {
+        "2025-01": 16429,
+        "2025-02": 3029,
+        "2025-03": 5429,
+        "2025-04": 2742,
+        "2025-05": 5371,
+        "2025-06": 924,
+        "2025-07": 1731,
+        "2025-08": 1900,
+        "2025-09": 3354,
+        "2025-10": 2560,
+        "2025-11": 2835,
+        "2025-12": 4458
+      },
+      "EL SALVADOR": {
+        "2025-01": 1746,
+        "2025-02": 1252,
+        "2025-03": 7034,
+        "2025-04": 878,
+        "2025-05": 1082,
+        "2025-06": 1916,
+        "2025-07": 855,
+        "2025-08": 8083,
+        "2025-09": 7569,
+        "2025-10": 5267,
+        "2025-11": 8455,
+        "2025-12": 1880
+      },
+      "MYANMAR (BIRMANIA)": {
+        "2025-01": 2746,
+        "2025-02": 2746,
+        "2025-03": 4118,
+        "2025-05": 3431,
+        "2025-06": 6579,
+        "2025-08": 3432,
+        "2025-10": 7519,
+        "2025-11": 11278
+      },
+      "SERVIA": {
+        "2025-01": 3825,
+        "2025-02": 4259,
+        "2025-03": 5277,
+        "2025-04": 7777,
+        "2025-05": 1881,
+        "2025-06": 5917,
+        "2025-07": 1623,
+        "2025-08": 2131,
+        "2025-09": 2019,
+        "2025-10": 1145,
+        "2025-11": 1558,
+        "2025-12": 2716
+      },
+      "INDIA": {
+        "2025-01": 4160,
+        "2025-03": 2,
+        "2025-06": 3960,
+        "2025-07": 11880,
+        "2025-08": 11000,
+        "2025-09": 9000
+      },
+      "LITUANIA": {
+        "2025-01": 3180,
+        "2025-02": 1567,
+        "2025-03": 640,
+        "2025-04": 1567,
+        "2025-05": 1116,
+        "2025-06": 760,
+        "2025-07": 2159,
+        "2025-08": 1598,
+        "2025-09": 9431,
+        "2025-10": 8433,
+        "2025-11": 4458,
+        "2025-12": 1979
+      },
+      "PANAMA": {
+        "2025-01": 1000,
+        "2025-02": 1279,
+        "2025-03": 2092,
+        "2025-04": 2534,
+        "2025-05": 2611,
+        "2025-07": 6600,
+        "2025-08": 4382,
+        "2025-09": 4000,
+        "2025-10": 8129,
+        "2025-12": 319
+      },
+      "MARROCOS": {
+        "2025-01": 4800,
+        "2025-02": 320,
+        "2025-03": 1250,
+        "2025-04": 1250,
+        "2025-05": 833,
+        "2025-06": 440,
+        "2025-08": 7053,
+        "2025-09": 1920,
+        "2025-10": 11544,
+        "2025-11": 1410,
+        "2025-12": 1280
+      },
+      "ALBANIA": {
+        "2025-01": 3358,
+        "2025-03": 2360,
+        "2025-04": 1320,
+        "2025-05": 639,
+        "2025-06": 2599,
+        "2025-07": 440,
+        "2025-08": 1840,
+        "2025-09": 4319,
+        "2025-10": 5400,
+        "2025-11": 320,
+        "2025-12": 2359
+      },
+      "HONG KONG": {
+        "2025-01": 3576,
+        "2025-02": 1907,
+        "2025-03": 640,
+        "2025-04": 960,
+        "2025-05": 960,
+        "2025-06": 640,
+        "2025-07": 1600,
+        "2025-08": 1562,
+        "2025-09": 2048,
+        "2025-10": 3770,
+        "2025-11": 1954,
+        "2025-12": 1910
+      },
+      "CHIPRE": {
+        "2025-01": 960,
+        "2025-02": 1600,
+        "2025-03": 3960,
+        "2025-04": 640,
+        "2025-05": 1280,
+        "2025-06": 1280,
+        "2025-07": 1303,
+        "2025-08": 2560,
+        "2025-09": 2080,
+        "2025-10": 2240,
+        "2025-11": 320,
+        "2025-12": 728
+      },
+      "UCRANIA": {
+        "2025-01": 980,
+        "2025-03": 640,
+        "2025-05": 1930,
+        "2025-06": 1280,
+        "2025-07": 650,
+        "2025-08": 2570,
+        "2025-09": 2879,
+        "2025-10": 2250,
+        "2025-11": 640,
+        "2025-12": 4980
+      },
+      "OMAN": {
+        "2025-01": 999,
+        "2025-02": 2386,
+        "2025-03": 320,
+        "2025-04": 884,
+        "2025-05": 387,
+        "2025-06": 2160,
+        "2025-08": 1420,
+        "2025-09": 935,
+        "2025-10": 4688,
+        "2025-11": 695,
+        "2025-12": 2916
+      },
+      "BULGARIA": {
+        "2025-01": 1037,
+        "2025-02": 1883,
+        "2025-03": 678,
+        "2025-04": 2223,
+        "2025-05": 685,
+        "2025-06": 3286,
+        "2025-07": 1662,
+        "2025-09": 2099,
+        "2025-10": 2408,
+        "2025-11": 473,
+        "2025-12": 949
+      },
+      "KUWEIT": {
+        "2025-01": 884,
+        "2025-02": 840,
+        "2025-04": 1339,
+        "2025-05": 2361,
+        "2025-06": 640,
+        "2025-07": 1280,
+        "2025-08": 330,
+        "2025-09": 3706,
+        "2025-10": 983,
+        "2025-11": 1146,
+        "2025-12": 1297
+      },
+      "FILIPINAS": {
+        "2025-01": 760,
+        "2025-02": 640,
+        "2025-03": 760,
+        "2025-04": 3863,
+        "2025-05": 2103,
+        "2025-06": 1640,
+        "2025-07": 1200,
+        "2025-08": 1663,
+        "2025-09": 343,
+        "2025-10": 1080,
+        "2025-12": 320
+      },
+      "BOLIVIA": {
+        "2025-01": 794,
+        "2025-02": 509,
+        "2025-03": 1646,
+        "2025-04": 1212,
+        "2025-05": 2111,
+        "2025-06": 1616,
+        "2025-07": 1166,
+        "2025-08": 1004,
+        "2025-09": 1463,
+        "2025-10": 1200,
+        "2025-11": 978,
+        "2025-12": 480
+      },
+      "GANA": {
+        "2025-01": 1498,
+        "2025-02": 1498,
+        "2025-03": 749,
+        "2025-04": 749,
+        "2025-05": 749,
+        "2025-06": 749,
+        "2025-08": 1498,
+        "2025-09": 1498,
+        "2025-10": 1498,
+        "2025-11": 749,
+        "2025-12": 1498
+      },
+      "TAILANDIA": {
+        "2025-01": 320,
+        "2025-02": 7,
+        "2025-04": 960,
+        "2025-05": 960,
+        "2025-06": 4699,
+        "2025-07": 5075,
+        "2025-09": 2,
+        "2025-10": 7,
+        "2025-12": 362
+      },
+      "JAMAICA": {
+        "2025-01": 1114,
+        "2025-02": 130,
+        "2025-03": 1874,
+        "2025-04": 130,
+        "2025-05": 1011,
+        "2025-06": 815,
+        "2025-08": 975,
+        "2025-09": 1046,
+        "2025-10": 19,
+        "2025-12": 1512
+      },
+      "CUBA": {
+        "2025-05": 325,
+        "2025-08": 3330,
+        "2025-09": 1320,
+        "2025-11": 2640,
+        "2025-12": 880
+      },
+      "QUENIA": {
+        "2025-01": 1024,
+        "2025-02": 3342,
+        "2025-03": 728,
+        "2025-05": 1522,
+        "2025-07": 783,
+        "2025-10": 214,
+        "2025-12": 223
+      },
+      "CAZAQUISTAO": {
+        "2025-03": 959,
+        "2025-06": 433,
+        "2025-07": 207,
+        "2025-08": 2537,
+        "2025-10": 325,
+        "2025-11": 783,
+        "2025-12": 1668
+      },
+      "QATAR": {
+        "2025-01": 607,
+        "2025-03": 135,
+        "2025-04": 440,
+        "2025-05": 760,
+        "2025-08": 320,
+        "2025-09": 539,
+        "2025-10": 1414,
+        "2025-11": 1133,
+        "2025-12": 1364
+      },
+      "ESLOVAQUIA": {
+        "2025-01": 436,
+        "2025-03": 870,
+        "2025-04": 435,
+        "2025-05": 860,
+        "2025-06": 435,
+        "2025-07": 435,
+        "2025-09": 870,
+        "2025-10": 435,
+        "2025-11": 435,
+        "2025-12": 1075
+      },
+      "GEORGIA": {
+        "2025-01": 640,
+        "2025-05": 145,
+        "2025-08": 640,
+        "2025-09": 1240,
+        "2025-10": 1057,
+        "2025-11": 590,
+        "2025-12": 1810
+      },
+      "IRAQUE": {
+        "2025-01": 1668,
+        "2025-02": 626,
+        "2025-03": 509,
+        "2025-05": 1017,
+        "2025-06": 541,
+        "2025-07": 504,
+        "2025-12": 760
+      },
+      "GUIANA": {
+        "2025-01": 771,
+        "2025-04": 120,
+        "2025-05": 120,
+        "2025-07": 429,
+        "2025-09": 1605,
+        "2025-10": 1693,
+        "2025-12": 188
+      },
+      "COSTA RICA": {
+        "2025-01": 185,
+        "2025-02": 68,
+        "2025-06": 156,
+        "2025-08": 382,
+        "2025-09": 1088,
+        "2025-10": 2907,
+        "2025-11": 87
+      },
+      "MALTA": {
+        "2025-01": 415,
+        "2025-02": 376,
+        "2025-03": 408,
+        "2025-04": 662,
+        "2025-05": 205,
+        "2025-06": 662,
+        "2025-08": 802,
+        "2025-09": 518
+      },
+      "ISLANDIA": {
+        "2025-01": 659,
+        "2025-03": 1321,
+        "2025-04": 333,
+        "2025-05": 320,
+        "2025-06": 316,
+        "2025-08": 320,
+        "2025-11": 333,
+        "2025-12": 143
+      },
+      "ARMENIA": {
+        "2025-01": 639,
+        "2025-06": 320,
+        "2025-09": 1600,
+        "2025-11": 320,
+        "2025-12": 640
+      },
+      "SUICA": {
+        "2025-01": 320,
+        "2025-02": 407,
+        "2025-04": 1295,
+        "2025-07": 320,
+        "2025-11": 320,
+        "2025-12": 603
+      },
+      "SENEGAL": {
+        "2025-07": 1280,
+        "2025-08": 1080,
+        "2025-09": 640
+      },
+      "SURINAME": {
+        "2025-01": 252,
+        "2025-02": 252,
+        "2025-03": 109,
+        "2025-06": 1236,
+        "2025-09": 504,
+        "2025-11": 361
+      },
+      "AFEGANISTAO": {
+        "2025-05": 478,
+        "2025-07": 717,
+        "2025-10": 711,
+        "2025-12": 421
+      },
+      "BAREIN": {
+        "2025-01": 239,
+        "2025-02": 177,
+        "2025-08": 320,
+        "2025-09": 153,
+        "2025-10": 690,
+        "2025-11": 445,
+        "2025-12": 191
+      },
+      "UZBEQUISTAO": {
+        "2025-02": 433,
+        "2025-03": 318,
+        "2025-07": 639,
+        "2025-09": 639
+      },
+      "MAURICIO": {
+        "2025-01": 123,
+        "2025-02": 585,
+        "2025-05": 236,
+        "2025-06": 126,
+        "2025-07": 89,
+        "2025-08": 216,
+        "2025-10": 470
+      },
+      "CABO VERDE": {
+        "2025-05": 320,
+        "2025-07": 320,
+        "2025-10": 960
+      },
+      "REPUBL. TCHECA": {
+        "2025-01": 319,
+        "2025-05": 197,
+        "2025-08": 318,
+        "2025-09": 320,
+        "2025-11": 288
+      },
+      "NICARAGUA": {
+        "2025-01": 197,
+        "2025-02": 119,
+        "2025-03": 36,
+        "2025-04": 36,
+        "2025-06": 155,
+        "2025-08": 155,
+        "2025-09": 119,
+        "2025-10": 325,
+        "2025-11": 119,
+        "2025-12": 53
+      },
+      "BOSNIA-HERZEGOVINA": {
+        "2025-04": 667,
+        "2025-09": 640
+      },
+      "PAQUISTAO": {
+        "2025-02": 650,
+        "2025-04": 284,
+        "2025-11": 219
+      },
+      "IRAN": {
+        "2025-01": 364,
+        "2025-04": 364,
+        "2025-08": 364
+      },
+      "BIELO-RUSSIA": {
+        "2025-09": 320,
+        "2025-10": 640
+      },
+      "PALESTINA": {
+        "2025-10": 320,
+        "2025-11": 640
+      },
+      "AZERBAIDJAO": {
+        "2025-10": 699
+      },
+      "CAMBOJA": {
+        "2025-01": 320,
+        "2025-10": 320
+      },
+      "SOMALIA": {
+        "2025-11": 339,
+        "2025-12": 241
+      },
+      "UGANDA": {
+        "2025-07": 285,
+        "2025-08": 276
+      },
+      "RUANDA": {
+        "2025-02": 268,
+        "2025-09": 99
+      },
+      "DJIBUTI": {
+        "2025-02": 121,
+        "2025-03": 114,
+        "2025-11": 119
+      },
+      "BRUNEI DARUSSALAM": {
+        "2025-11": 343
+      },
+      "BANGLADESH": {
+        "2025-12": 295
+      },
+      "NIGERIA": {
+        "2025-05": 94,
+        "2025-09": 94,
+        "2025-11": 94
+      },
+      "MALDIVAS": {
+        "2025-05": 46,
+        "2025-10": 180
+      },
+      "LUXEMBURGO": {
+        "2025-11": 200
+      },
+      "SRI LANKA": {
+        "2025-06": 153
+      },
+      "FIJI": {
+        "2025-10": 136
+      },
+      "VENEZUELA": {
+        "2025-01": 14,
+        "2025-06": 120
+      },
+      "MADAGASCAR": {
+        "2025-12": 97
+      },
+      "COSTA DO MARFIM": {
+        "2025-06": 65
+      },
+      "ANGOLA": {
+        "2025-07": 3
+      }
+    }
+  }
+}
