@@ -2,6 +2,92 @@
 import { useEffect, useRef } from "react";
 import { PORTS, ROUTES, MAP_CONFIG } from "@/lib/mapData";
 
+// ── Hub → Portuguese country list (subset used for aggregation) ──────────────
+const HUB_COUNTRIES: Record<string, string[]> = {
+  "Nordics":            ["DINAMARCA","FINLANDIA","ISLANDIA","NORUEGA","SUECIA"],
+  "Central Europe":     ["ALEMANHA","BELGICA","FRANCA","IRLANDA","LUXEMBURGO","PAISES BAIXOS (HOLANDA)","REINO UNIDO","REPUBL. TCHECA","ESLOVAQUIA","SUICA"],
+  "South Europe":       ["ALBANIA","BOSNIA-HERZEGOVINA","CHIPRE","CROACIA","ESPANHA","ESLOVENIA","GRECIA","ITALIA","MALTA","MONTENEGRO","PORTUGAL","SERVIA"],
+  "Eastern Europe":     ["BULGARIA","ESTONIA","LETONIA (LATVIA)","LITUANIA","POLONIA","ROMENIA","UCRANIA"],
+  "North America":      ["CANADA","E.U.A.","MEXICO"],
+  "Latin America":      ["ARGENTINA","BOLIVIA","CHILE","COLOMBIA","COSTA RICA","CUBA","EQUADOR","EL SALVADOR","GUATEMALA","GUIANA","JAMAICA","NICARAGUA","PANAMA","PARAGUAI","PERU","REP. DOMINICANA","SURINAME","URUGUAI","VENEZUELA","ANTILHAS HOLANDESAS"],
+  "East Asia":          ["CHINA","COREIA DO SUL (REPUBL.)","HONG KONG","JAPAO","MACAU","MONGOLIA","TAIWAN"],
+  "SE Asia & Pacific":  ["AUSTRALIA","BRUNEI DARUSSALAM","CAMBOJA","FIJI","FILIPINAS","INDONESIA","MALASIA","MYANMAR (BIRMANIA)","NOVA ZELANDIA","SINGAPURA","TAILANDIA","VIETNAM"],
+  "Middle East":        ["ARABIA SAUDITA","BAREIN","DJIBUTI","EMIR.ARABES UNIDOS","IRAN","IRAQUE","ISRAEL","JORDANIA","KUWEIT","LIBANO","OMAN","PALESTINA","QATAR","SIRIA","TURQUIA"],
+  "North Africa":       ["ARGELIA","EGITO","LIBIA","MARROCOS","TUNISIA"],
+  "Sub-Saharan Africa": ["AFRICA DO SUL","ANGOLA","CABO VERDE","COSTA DO MARFIM","GANA","MADAGASCAR","MAURICIO","NIGERIA","QUENIA","RUANDA","SENEGAL","SOMALIA","UGANDA"],
+  "South Asia":         ["BANGLADESH","INDIA","MALDIVAS","PAQUISTAO","SRI LANKA"],
+  "Russia & CIS":       ["ARMENIA","AZERBAIDJAO","BIELO-RUSSIA","CAZAQUISTAO","GEORGIA","RUSSIAN FEDERATION","UZBEQUISTAO"],
+};
+
+function bagsToKT(bags: number) {
+  return Math.round((bags * 60) / 1e6 * 10) / 10;
+}
+
+interface CecafeCountryYear {
+  months: string[];
+  countries: Record<string, Record<string, number>>;
+}
+interface CecafeJson {
+  report: string;
+  by_country: CecafeCountryYear;
+  by_country_prev: CecafeCountryYear;
+}
+
+function buildRoutePopup(hubs: string[], cecafe: CecafeJson): string {
+  const { by_country, by_country_prev, report } = cecafe;
+  const currMonths = by_country.months ?? [];
+  const prevMonths = by_country_prev.months ?? [];
+
+  const rows = hubs.map(hub => {
+    const pts = HUB_COUNTRIES[hub] ?? [];
+    let curr = 0, prev = 0;
+    pts.forEach(pt => {
+      const mvC = by_country.countries?.[pt] ?? {};
+      const mvP = by_country_prev.countries?.[pt] ?? {};
+      curr += currMonths.reduce((s, m) => s + (mvC[m] ?? 0), 0);
+      prev += prevMonths.slice(0, currMonths.length).reduce((s, m) => s + (mvP[m] ?? 0), 0);
+    });
+    const kt = bagsToKT(curr);
+    const pct = prev > 0 ? Math.round((curr - prev) / prev * 100) : null;
+    const chgColor = pct === null ? "#94a3b8" : pct >= 0 ? "#4ade80" : "#f87171";
+    const chgStr = pct === null ? "—" : `${pct > 0 ? "+" : ""}${pct}%`;
+    return `<tr>
+      <td style="padding:2px 8px 2px 0;color:#cbd5e1">${hub}</td>
+      <td style="padding:2px 4px;text-align:right;color:#e2e8f0;font-weight:600">${kt} kt</td>
+      <td style="padding:2px 0 2px 8px;text-align:right;color:${chgColor}">${chgStr}</td>
+    </tr>`;
+  });
+
+  const total = hubs.reduce((s, hub) => {
+    const pts = HUB_COUNTRIES[hub] ?? [];
+    return s + pts.reduce((s2, pt) => {
+      const mv = by_country.countries?.[pt] ?? {};
+      return s2 + currMonths.reduce((s3, m) => s3 + (mv[m] ?? 0), 0);
+    }, 0);
+  }, 0);
+
+  const period = currMonths.length > 0
+    ? currMonths[0].slice(0, 7) + (currMonths.length > 1 ? ` → ${currMonths[currMonths.length - 1].slice(0, 7)}` : "")
+    : report;
+
+  return `<div style="font-family:monospace;font-size:11px;background:#0f172a;color:#e2e8f0;padding:10px 12px;border-radius:6px;min-width:240px;border:1px solid #334155">
+    <div style="color:#94a3b8;font-size:10px;margin-bottom:6px">🇧🇷 Cecafe exports · ${period}</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="color:#64748b;font-weight:normal;text-align:left;padding-bottom:4px;border-bottom:1px solid #1e293b">Hub</th>
+        <th style="color:#64748b;font-weight:normal;text-align:right;padding-bottom:4px;border-bottom:1px solid #1e293b">kt</th>
+        <th style="color:#64748b;font-weight:normal;text-align:right;padding-bottom:4px;border-bottom:1px solid #1e293b">YoY</th>
+      </tr></thead>
+      <tbody>${rows.join("")}</tbody>
+      <tfoot><tr>
+        <td style="padding-top:4px;border-top:1px solid #1e293b;color:#94a3b8">Total</td>
+        <td style="padding-top:4px;border-top:1px solid #1e293b;text-align:right;color:#f1f5f9;font-weight:700">${bagsToKT(total)} kt</td>
+        <td></td>
+      </tr></tfoot>
+    </table>
+  </div>`;
+}
+
 const CATEGORY_COLORS: Record<string, string> = {
   supply: "#ef4444",
   demand: "#eab308",
@@ -63,20 +149,59 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
         document.head.appendChild(s);
       }
 
+      // Load Cecafe data for route popups
+      let cecafeData: CecafeJson | null = null;
+      try {
+        const res = await fetch("/data/cecafe.json");
+        if (res.ok) cecafeData = await res.json();
+      } catch { /* silently skip */ }
+
       // Logistics routes
       const logisticsLayer = Leaflet.layerGroup().addTo(map);
       ROUTES.forEach((r) => {
-        if (r.path && r.path.length > 0) {
-          const line = Leaflet.polyline(r.path, {
-            color: r.color,
-            weight: r.weight || 2,
-            opacity: 0.85,
-          })
-            .bindTooltip(r.name)
-            .addTo(logisticsLayer);
-          const el = (line as any)._path;
-          if (el) el.classList.add(r.weight && r.weight >= 4 ? "flow-route-trunk" : "flow-route");
+        if (!r.path || r.path.length === 0) return;
+
+        // Visual line — not interactive so hover cursor doesn't fight with the hit area
+        const visualLine = Leaflet.polyline(r.path, {
+          color: r.color,
+          weight: r.weight || 2,
+          opacity: 0.85,
+          interactive: false,
+        }).addTo(logisticsLayer);
+        const el = (visualLine as any)._path;
+        if (el) el.classList.add(r.weight && r.weight >= 4 ? "flow-route-trunk" : "flow-route");
+
+        // Wide transparent hit-area on top for easy clicking
+        const hasExport = r.cecafeHubs && r.cecafeHubs.length > 0 && cecafeData;
+        const hitLine = Leaflet.polyline(r.path, {
+          color: "transparent",
+          weight: 20,
+          opacity: 0,
+          bubblingMouseEvents: false,
+        });
+
+        if (hasExport) {
+          const popupHtml = buildRoutePopup(r.cecafeHubs!, cecafeData!);
+          hitLine
+            .bindTooltip(`${r.name} — click for export data`, { sticky: true, className: "leaflet-tooltip-dark" })
+            .bindPopup(popupHtml, { maxWidth: 320, className: "cecafe-popup" });
+          // Inject popup CSS once
+          if (!document.getElementById("cecafe-popup-style")) {
+            const s = document.createElement("style");
+            s.id = "cecafe-popup-style";
+            s.textContent = `
+              .cecafe-popup .leaflet-popup-content-wrapper { background: transparent; box-shadow: none; padding: 0; }
+              .cecafe-popup .leaflet-popup-content { margin: 0; }
+              .cecafe-popup .leaflet-popup-tip-container { display: none; }
+              .leaflet-tooltip-dark { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; font-size: 10px; }
+            `;
+            document.head.appendChild(s);
+          }
+        } else {
+          hitLine.bindTooltip(r.name, { sticky: true });
         }
+
+        hitLine.addTo(logisticsLayer);
       });
 
       // Ports

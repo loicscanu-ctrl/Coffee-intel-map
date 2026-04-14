@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, ComposedChart, LineChart, Line, ReferenceLine,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, Cell,
 } from "recharts";
 
@@ -31,6 +32,15 @@ interface CecafeData {
   series: VolumeSeries[];
   by_country: CountryYear;
   by_country_prev: CountryYear;
+  by_country_arabica?: CountryYear;
+  by_country_arabica_prev?: CountryYear;
+  by_country_conillon?: CountryYear;
+  by_country_conillon_prev?: CountryYear;
+  by_country_soluvel?: CountryYear;
+  by_country_soluvel_prev?: CountryYear;
+  by_country_torrado?: CountryYear;
+  by_country_torrado_prev?: CountryYear;
+  by_country_history?: Record<string, CountryYear>;
 }
 
 // ── Country translation: Portuguese → English ─────────────────────────────────
@@ -353,6 +363,15 @@ const HUB_ORDER = [
 
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
 
+// ── Brazil domestic consumption (USDA/ICO estimates, 1000×60kg bags → kt) ────
+const BRAZIL_DOMESTIC_KT: Record<string, number> = {
+  "2005/06": 1062, "2006/07": 1074, "2007/08": 1086, "2008/09": 1104,
+  "2009/10": 1116, "2010/11": 1182, "2011/12": 1206, "2012/13": 1236,
+  "2013/14": 1260, "2014/15": 1290, "2015/16": 1254, "2016/17": 1278,
+  "2017/18": 1314, "2018/19": 1320, "2019/20": 1332, "2020/21": 1338,
+  "2021/22": 1380, "2022/23": 1398, "2023/24": 1434, "2024/25": 1446,
+};
+
 // ── StatCard ──────────────────────────────────────────────────────────────────
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -365,30 +384,201 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
   );
 }
 
+// ── Daily Export Registration ─────────────────────────────────────────────────
+
+interface DailyData {
+  updated: string;
+  arabica:  Record<string, Record<string, number>>; // "YYYY-MM" → { "1": cumBags, ... }
+  conillon: Record<string, Record<string, number>>;
+}
+
+/** Offset "YYYY-MM" by n months (negative = back) */
+function shiftMonth(ym: string, n: number): string {
+  const [y, m] = ym.split("-").map(Number);
+  const d = new Date(y, m - 1 + n, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function fmtBags(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}k`;
+  return String(n);
+}
+
+function shortMonthLabel(ym: string): string {
+  const [y, m] = ym.split("-").map(Number);
+  const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1];
+  return `${mo}-${String(y).slice(2)}`;
+}
+
+const DAILY_COLORS = {
+  current:  "#ef4444",  // red   — current month
+  prior:    "#eab308",  // yellow — prior month
+  ly:       "#22c55e",  // green — same month LY
+  max:      "#22d3ee",  // cyan  — historical max
+  min:      "#64748b",  // slate — historical min
+};
+
+function DailyRegChart({
+  title, monthsData, currentMonth,
+}: {
+  title: string;
+  monthsData: Record<string, Record<string, number>>;
+  currentMonth: string; // "YYYY-MM"
+}) {
+  const priorMonth = shiftMonth(currentMonth, -1);
+  const lyMonth    = shiftMonth(currentMonth, -12);
+
+  // All months available for this calendar month (for max/min)
+  const calMo = currentMonth.slice(5); // "MM"
+  const historicalMonths = Object.keys(monthsData).filter(
+    ym => ym.slice(5) === calMo && ym !== currentMonth && ym !== lyMonth
+  );
+
+  // Build per-day arrays (days 1..31)
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const get = (ym: string, day: number) => monthsData[ym]?.[String(day)] ?? null;
+
+  // Compute max/min day-by-day across historical months
+  const maxVals: (number | null)[] = days.map(d => {
+    const vals = historicalMonths.map(ym => get(ym, d)).filter((v): v is number => v !== null);
+    return vals.length > 0 ? Math.max(...vals) : null;
+  });
+  const minVals: (number | null)[] = days.map(d => {
+    const vals = historicalMonths.map(ym => get(ym, d)).filter((v): v is number => v !== null);
+    return vals.length > 0 ? Math.min(...vals) : null;
+  });
+
+  const chartData = days.map((d, i) => ({
+    day: d,
+    current: get(currentMonth, d),
+    prior:   get(priorMonth, d),
+    ly:      get(lyMonth, d),
+    max:     maxVals[i],
+    min:     minVals[i],
+  }));
+
+  // Last non-null day of current month for label
+  const lastCurrentDay = [...chartData].reverse().find(r => r.current !== null)?.day ?? 0;
+
+  const hasMax = maxVals.some(v => v !== null);
+  const hasMin = minVals.some(v => v !== null);
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+      <div className="text-sm font-semibold text-slate-200 mb-0.5">{title}</div>
+      <div className="text-[10px] text-slate-500 mb-2">Daily cumulative registrations (bags)</div>
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <XAxis dataKey="day" tick={{ fill: "#94a3b8", fontSize: 9 }} interval={1} />
+          <YAxis tickFormatter={fmtBags} tick={{ fill: "#94a3b8", fontSize: 9 }} width={46} />
+          <Tooltip
+            contentStyle={TT_STYLE}
+            formatter={(v: any, name: any) => [v !== null ? fmtBags(v) : "—", name]}
+            labelFormatter={(l: any) => `Day ${l}`}
+          />
+          <Legend wrapperStyle={{ fontSize: 9, paddingTop: 4 }}
+            formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
+          {hasMax && (
+            <Line type="monotone" dataKey="max" name={`Max`} stroke={DAILY_COLORS.max}
+              strokeWidth={1} strokeDasharray="4 3" dot={false} connectNulls />
+          )}
+          {hasMin && (
+            <Line type="monotone" dataKey="min" name={`Min`} stroke={DAILY_COLORS.min}
+              strokeWidth={1} strokeDasharray="4 3" dot={false} connectNulls />
+          )}
+          <Line type="monotone" dataKey="ly" name={shortMonthLabel(lyMonth)} stroke={DAILY_COLORS.ly}
+            strokeWidth={1.5} dot={false} connectNulls />
+          <Line type="monotone" dataKey="prior" name={shortMonthLabel(priorMonth)} stroke={DAILY_COLORS.prior}
+            strokeWidth={1.5} dot={false} connectNulls />
+          <Line type="monotone" dataKey="current" name={shortMonthLabel(currentMonth)} stroke={DAILY_COLORS.current}
+            strokeWidth={2.5} dot={(props: any) => {
+              if (props.payload?.day !== lastCurrentDay || props.payload?.current == null) return <g key={props.key} />;
+              return (
+                <g key={props.key}>
+                  <circle cx={props.cx} cy={props.cy} r={3} fill={DAILY_COLORS.current} />
+                  <text x={props.cx + 5} y={props.cy - 4} fill="#f87171" fontSize={9} fontFamily="monospace">
+                    {fmtBags(props.payload.current)}
+                  </text>
+                </g>
+              );
+            }}
+            connectNulls />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function DailyRegistrationSection() {
+  const [data, setData] = useState<DailyData | null>(null);
+
+  useEffect(() => {
+    fetch("/data/cecafe_daily.json")
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(setData)
+      .catch(() => {}); // section hidden if data not available
+  }, []);
+
+  if (!data) return null;
+
+  const currentMonth = data.updated.slice(0, 7);
+  // Only render if we have actual daily data for at least one month
+  const hasData = Object.keys(data.arabica).length > 0 || Object.keys(data.conillon).length > 0;
+  if (!hasData) return null;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <DailyRegChart
+        title="Brazil — Arabica Export Registration (Daily, Bags)"
+        monthsData={data.arabica}
+        currentMonth={currentMonth}
+      />
+      <DailyRegChart
+        title="Brazil — Conilon Export Registration (Daily, Bags)"
+        monthsData={data.conillon}
+        currentMonth={currentMonth}
+      />
+    </div>
+  );
+}
+
 // ── Monthly Volume Chart ──────────────────────────────────────────────────────
 
-function MonthlyVolumeChart({ series }: { series: VolumeSeries[] }) {
-  const [years, setYears] = useState(3);
+// Crop month order: Apr(4)…Dec(12), Jan(1)…Mar(3)
+const CROP_MONTH_ORDER = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
+const CROP_MONTH_LABELS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
 
-  const yearGroups = useMemo(() => {
-    const m: Record<number, Record<number, VolumeSeries>> = {};
+function MonthlyVolumeChart({ series, typeFilter }: { series: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+  const activeKey: SeriesKey = typeFilter ?? "total";
+  const [cropYears, setCropYears] = useState(3);
+
+  // Group by crop year key → month number → record
+  const cropGroups = useMemo(() => {
+    const m: Record<string, Record<number, VolumeSeries>> = {};
     series.forEach(r => {
-      const [y, mo] = r.date.split("-").map(Number);
-      if (!m[y]) m[y] = {};
-      m[y][mo] = r;
+      const key = cropYearKey(r.date);
+      const mo  = parseInt(r.date.split("-")[1]);
+      if (!m[key]) m[key] = {};
+      m[key][mo] = r;
     });
     return m;
   }, [series]);
 
-  const latestYear = Math.max(...Object.keys(yearGroups).map(Number));
-  const showYears  = Array.from({ length: years }, (_, i) => latestYear - i).reverse();
-  const YEAR_COLORS = ["#475569", "#64748b", "#94a3b8", "#60a5fa", GREEN];
+  const sortedCropKeys = Object.keys(cropGroups).sort(); // ascending = oldest first
+  const latestCrop     = sortedCropKeys[sortedCropKeys.length - 1];
+  const showCrops      = sortedCropKeys.slice(-cropYears).reverse(); // newest first → oldest on right
+  // Colors: newest=brightest (GREEN/blue) on left, oldest=darkest on right
+  const ALL_COLORS     = [GREEN, "#60a5fa", "#94a3b8", "#64748b", "#475569", "#334155"];
+  const YEAR_COLORS    = ALL_COLORS.slice(0, cropYears);
 
-  const chartData = MONTH_LABELS.map((label, mi) => {
-    const row: Record<string, number | string> = { month: label };
-    showYears.forEach(y => {
-      const d = yearGroups[y]?.[mi + 1];
-      row[String(y)] = d ? bagsToKT(d.total) : 0;
+  const chartData = CROP_MONTH_ORDER.map((mo, i) => {
+    const row: Record<string, number | string> = { month: CROP_MONTH_LABELS[i] };
+    showCrops.forEach(ck => {
+      const r = cropGroups[ck]?.[mo];
+      row[ck] = r ? bagsToKT(r[activeKey] ?? r.total) : 0;
     });
     return row;
   });
@@ -397,13 +587,15 @@ function MonthlyVolumeChart({ series }: { series: VolumeSeries[] }) {
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
       <div className="flex items-center justify-between mb-1">
         <div>
-          <div className="text-sm font-semibold text-slate-200">Monthly Export Volume — Total (All Types)</div>
-          <div className="text-[10px] text-slate-500">Thousand metric tons (60 kg bags)</div>
+          <div className="text-sm font-semibold text-slate-200">
+            Monthly Export Volume — {typeFilter ? TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label : "Total (All Types)"}
+          </div>
+          <div className="text-[10px] text-slate-500">Crop year (Apr–Mar) · Thousand metric tons (60 kg bags)</div>
         </div>
         <div className="flex gap-1">
           {[2, 3, 5].map(n => (
-            <button key={n} onClick={() => setYears(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${years === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+            <button key={n} onClick={() => setCropYears(n)}
+              className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
               {n}Y
             </button>
           ))}
@@ -414,13 +606,13 @@ function MonthlyVolumeChart({ series }: { series: VolumeSeries[] }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
-          <Tooltip contentStyle={TT_STYLE} formatter={(v: any, name: any) => [`${v} kt`, `Year ${name}`]} />
+          <Tooltip contentStyle={TT_STYLE} formatter={(v: any, name: any) => [`${v} kt`, `Crop ${name}`]} />
           <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8", paddingTop: 6 }}
-            formatter={v => <span style={{ color: "#cbd5e1" }}>Year {v}</span>} />
-          {showYears.map((y, i) => (
-            <Bar key={y} dataKey={String(y)} name={String(y)}
+            formatter={v => <span style={{ color: "#cbd5e1" }}>Crop {v}</span>} />
+          {showCrops.map((ck, i) => (
+            <Bar key={ck} dataKey={ck} name={ck}
               fill={YEAR_COLORS[i % YEAR_COLORS.length]}
-              opacity={y === latestYear ? 1 : 0.65}
+              opacity={ck === latestCrop ? 1 : 0.65}
             />
           ))}
         </BarChart>
@@ -437,42 +629,199 @@ function cropYearKey(ym: string): string {
   return m >= 4 ? `${y}/${String(y + 1).slice(2)}` : `${y - 1}/${String(y).slice(2)}`;
 }
 
-function AnnualTrendChart({ series }: { series: VolumeSeries[] }) {
+function AnnualTrendChart({ series, filteredSeries, typeFilter }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
   const [since, setSince] = useState(2010);
+  const isFiltered = !!filteredSeries;
+  const activeSeries = filteredSeries ?? series;
+  const activeKey: SeriesKey = typeFilter ?? "total";
 
   const annualData = useMemo(() => {
-    const byCrop: Record<string, { arabica: number; conillon: number; soluvel: number; torrado: number; months: number }> = {};
-    series.forEach(r => {
+    const byCrop: Record<string, { arabica: number; conillon: number; soluvel: number; torrado: number; total: number; months: number }> = {};
+    activeSeries.forEach(r => {
       const key = cropYearKey(r.date);
-      if (!byCrop[key]) byCrop[key] = { arabica: 0, conillon: 0, soluvel: 0, torrado: 0, months: 0 };
+      if (!byCrop[key]) byCrop[key] = { arabica: 0, conillon: 0, soluvel: 0, torrado: 0, total: 0, months: 0 };
       byCrop[key].arabica  += r.arabica;
       byCrop[key].conillon += r.conillon;
       byCrop[key].soluvel  += r.soluvel;
       byCrop[key].torrado  += r.torrado;
+      byCrop[key].total    += r.total;
       byCrop[key].months   += 1;
     });
-    // Latest crop key (sort lexicographically — "2025/26" > "2024/25")
     const sortedKeys = Object.keys(byCrop).sort();
     const latestKey  = sortedKeys[sortedKeys.length - 1];
+    const prevKey    = sortedKeys.length >= 2 ? sortedKeys[sortedKeys.length - 2] : null;
+    const latestData = byCrop[latestKey];
+    const prevData   = prevKey ? byCrop[prevKey] : null;
+
+    // Projection gap for incomplete current crop (skip if destination or type filter active)
+    const skipProj  = isFiltered || !!typeFilter;
+    let projGap = 0;
+    if (!skipProj && prevData && latestData.months < 12) {
+      const ctdMonths = new Set(
+        series.filter(r => cropYearKey(r.date) === latestKey).map(r => parseInt(r.date.split("-")[1]))
+      );
+      const prevCTD = series
+        .filter(r => cropYearKey(r.date) === prevKey && ctdMonths.has(parseInt(r.date.split("-")[1])))
+        .reduce((s, r) => s + r.arabica + r.conillon + r.soluvel + r.torrado, 0);
+      const currCTD = latestData.arabica + latestData.conillon + latestData.soluvel + latestData.torrado;
+      if (prevCTD > 0) {
+        const prevFull = prevData.arabica + prevData.conillon + prevData.soluvel + prevData.torrado;
+        projGap = Math.max(0, prevFull * (currCTD / prevCTD) - currCTD);
+      }
+    }
+
+    // Determine which bars to show
+    const showSingle = isFiltered || !!typeFilter;
+    const typeLabel = typeFilter
+      ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Selected")
+      : "Total";
+
     return sortedKeys
-      .filter(k => k !== latestKey || byCrop[k].months === 12) // exclude incomplete current crop
-      .map(k => ({
-        year:               k,
-        startYear:          parseInt(k.split("/")[0]),
-        "Arabica (green)":  bagsToKT(byCrop[k].arabica),
-        "Conillon (green)": bagsToKT(byCrop[k].conillon),
-        "Soluble":          bagsToKT(byCrop[k].soluvel),
-        "Roasted & Ground": bagsToKT(byCrop[k].torrado),
-      }))
+      .map(k => {
+        const d = byCrop[k];
+        const isIncomplete = k === latestKey && d.months < 12;
+        const row: Record<string, any> = {
+          year: k,
+          startYear: parseInt(k.split("/")[0]),
+          domestic:  (!isFiltered && !typeFilter) ? (BRAZIL_DOMESTIC_KT[k] ?? null) : null,
+          proj_gap:  isIncomplete ? Math.round(bagsToKT(projGap) * 10) / 10 : 0,
+        };
+        if (showSingle) {
+          row[typeLabel] = bagsToKT(d[activeKey]);
+        } else {
+          row["Arabica (green)"]  = bagsToKT(d.arabica);
+          row["Conillon (green)"] = bagsToKT(d.conillon);
+          row["Soluble"]          = bagsToKT(d.soluvel);
+          row["Roasted & Ground"] = bagsToKT(d.torrado);
+        }
+        return row;
+      })
       .filter(r => r.startYear >= since);
-  }, [series, since]);
+  }, [activeSeries, series, since, isFiltered, typeFilter, activeKey]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
       <div className="flex items-center justify-between mb-1">
         <div>
           <div className="text-sm font-semibold text-slate-200">Annual Export by Coffee Type — Crop Year (Apr–Mar)</div>
-          <div className="text-[10px] text-slate-500">Thousand metric tons — complete crop years only (Apr Y → Mar Y+1)</div>
+          <div className="text-[10px] text-slate-500">
+            kt · {isFiltered ? "Total exports for selected origin" : "incl. domestic consumption (USDA est.) · † projected full year"}
+          </div>
+        </div>
+        <div className="flex gap-1">
+          {[2000, 2010, 2015].map(y => (
+            <button key={y} onClick={() => setSince(y)}
+              className={`text-[10px] px-2 py-0.5 rounded ${since === y ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+              {y}+
+            </button>
+          ))}
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={280}>
+        <ComposedChart data={annualData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
+          <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
+          <Tooltip contentStyle={TT_STYLE}
+            formatter={(v: any, name: any) => {
+              if (name === "domestic") return [`${v} kt`, "Domestic consumption (USDA est.)"];
+              if (name === "proj_gap") return [`+${v} kt`, "Projected remaining"];
+              return [`${v} kt`, name];
+            }} />
+          <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
+            formatter={v => (
+              <span style={{ color: v === "domestic" ? "#f97316" : "#cbd5e1" }}>{
+                v === "domestic" ? "Domestic consump. (USDA)" :
+                v === "proj_gap" ? "† Projected" : v
+              }</span>
+            )} />
+          {(isFiltered || typeFilter)
+            ? <Bar dataKey={typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Total") : "Total"}
+                stackId="a" fill={typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.color ?? BLUE) : BLUE} />
+            : <>
+                <Bar dataKey="Arabica (green)"  stackId="a" fill={GREEN} />
+                <Bar dataKey="Conillon (green)" stackId="a" fill={TEAL}  />
+                <Bar dataKey="Soluble"          stackId="a" fill={AMBER} />
+                <Bar dataKey="Roasted & Ground" stackId="a" fill={BLUE}  />
+              </>
+          }
+          <Bar dataKey="proj_gap" stackId="a" fill="#818cf8" fillOpacity={0.35} stroke="#818cf8" strokeWidth={1} />
+          {!isFiltered && (
+            <Line dataKey="domestic" type="monotone" stroke="#f97316" strokeWidth={2}
+              strokeDasharray="5 3" dot={false} connectNulls />
+          )}
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ── Y/Y change by type ────────────────────────────────────────────────────────
+
+const TYPE_SERIES = [
+  { key: "arabica"  as const, label: "Arabica",  color: GREEN },
+  { key: "conillon" as const, label: "Conillon", color: TEAL  },
+  { key: "soluvel"  as const, label: "Soluble",  color: AMBER },
+  { key: "torrado"  as const, label: "Roasted",  color: BLUE  },
+];
+
+function YoYByTypeChart({ series, filteredSeries, typeFilter }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+  const [since, setSince] = useState(2010);
+  const isFiltered = !!filteredSeries;
+  const activeSeries = filteredSeries ?? series;
+  const showSingle = isFiltered || !!typeFilter;
+
+  const chartData = useMemo(() => {
+    const byCrop: Record<string, { arabica: number; conillon: number; soluvel: number; torrado: number; total: number; months: number }> = {};
+    activeSeries.forEach(r => {
+      const key = cropYearKey(r.date);
+      if (!byCrop[key]) byCrop[key] = { arabica: 0, conillon: 0, soluvel: 0, torrado: 0, total: 0, months: 0 };
+      byCrop[key].arabica  += r.arabica;
+      byCrop[key].conillon += r.conillon;
+      byCrop[key].soluvel  += r.soluvel;
+      byCrop[key].torrado  += r.torrado;
+      byCrop[key].total    += r.total;
+      byCrop[key].months   += 1;
+    });
+    const sortedKeys = Object.keys(byCrop).sort();
+    const latestKey  = sortedKeys[sortedKeys.length - 1];
+    const completeKeys = sortedKeys.filter(k => k !== latestKey || byCrop[k].months === 12);
+    const delta = (curr: number, prev: number) =>
+      prev > 0 ? Math.round(bagsToKT(curr - prev) * 10) / 10 : null;
+
+    return completeKeys
+      .slice(1)
+      .map((k, i) => {
+        const prev = byCrop[completeKeys[i]];
+        const curr = byCrop[k];
+        const row: Record<string, any> = { year: k, startYear: parseInt(k.split("/")[0]) };
+        if (showSingle) {
+          const tf = typeFilter;
+          const label = tf ? (TYPE_FILTER_OPTS.find(t => t.key === tf)?.label ?? "Total") : "Total";
+          const key   = tf ?? "total";
+          row[label] = delta(curr[key], prev[key]);
+        } else {
+          row["Arabica"]  = delta(curr.arabica,  prev.arabica);
+          row["Conillon"] = delta(curr.conillon, prev.conillon);
+          row["Soluble"]  = delta(curr.soluvel,  prev.soluvel);
+          row["Roasted"]  = delta(curr.torrado,  prev.torrado);
+        }
+        return row;
+      })
+      .filter(r => r.startYear >= since);
+  }, [activeSeries, since, showSingle, typeFilter]);
+
+  const bars = showSingle
+    ? [{ label: typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Total") : "Total",
+         color: typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.color ?? BLUE) : BLUE }]
+    : TYPE_SERIES.map(t => ({ label: t.label, color: t.color }));
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-1">
+        <div>
+          <div className="text-sm font-semibold text-slate-200">Y/Y Change by Coffee Type — Crop Year</div>
+          <div className="text-[10px] text-slate-500">Volume change vs prior crop year (kt) · complete crop years only</div>
         </div>
         <div className="flex gap-1">
           {[2000, 2010, 2015].map(y => (
@@ -484,57 +833,404 @@ function AnnualTrendChart({ series }: { series: VolumeSeries[] }) {
         </div>
       </div>
       <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={annualData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+        <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }} barCategoryGap="20%" barGap={2}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
           <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
-          <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
-          <Tooltip contentStyle={TT_STYLE} formatter={(v: any, name: any) => [`${v} kt`, name]} />
-          <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8", paddingTop: 6 }}
+          <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
+          <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
+          <Tooltip contentStyle={TT_STYLE} formatter={(v: any, name: any) => [v !== null ? `${v > 0 ? "+" : ""}${v} kt` : "—", name]} />
+          <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
-          <Bar dataKey="Arabica (green)"  stackId="a" fill={GREEN} />
-          <Bar dataKey="Conillon (green)" stackId="a" fill={TEAL}  />
-          <Bar dataKey="Soluble"          stackId="a" fill={AMBER} />
-          <Bar dataKey="Roasted & Ground" stackId="a" fill={BLUE}  />
+          {bars.map(b => (
+            <Bar key={b.label} dataKey={b.label} fill={b.color} radius={[2, 2, 0, 0]} maxBarSize={14} />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
+// ── Rolling average trend vs LY ───────────────────────────────────────────────
+
+// Ordered L1M → MAT (most recent on left, long-term reference on right)
+const WINDOWS = [
+  { label: "L1M", n: 1  },
+  { label: "L3M", n: 3  },
+  { label: "L6M", n: 6  },
+  { label: "MAT", n: 12 },
+];
+
+const WINDOW_COLORS: Record<string, string> = {
+  "MAT": "#475569",
+  "L6M": "#64748b",
+  "L3M": BLUE,
+  "L1M": GREEN,
+};
+
+function RollingAvgChart({ series, filteredSeries, typeFilter }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+  const isFiltered = !!filteredSeries;
+  const activeSeries = filteredSeries ?? series;
+  const showSingle = isFiltered || !!typeFilter;
+
+  const avg = (arr: VolumeSeries[], key: "arabica" | "conillon" | "soluvel" | "torrado" | "total") =>
+    arr.length > 0 ? arr.reduce((s, r) => s + r[key], 0) / arr.length : 0;
+
+  const delta = (curr: number, prev: number) =>
+    prev > 0 ? Math.round(bagsToKT(curr - prev) * 10) / 10 : null;
+
+  const TYPES_WITH_TOTAL = showSingle
+    ? [{ key: (typeFilter ?? "total") as SeriesKey, label: typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Total") : "Total" }]
+    : [
+        { key: "arabica"  as const, label: "Arabica"  },
+        { key: "conillon" as const, label: "Conillon" },
+        { key: "soluvel"  as const, label: "Soluble"  },
+        { key: "torrado"  as const, label: "Roasted"  },
+        { key: "total"    as const, label: "Total"    },
+      ];
+
+  const chartData = useMemo(() =>
+    TYPES_WITH_TOTAL.map(t => {
+      const row: Record<string, any> = { type: t.label };
+      WINDOWS.forEach(w => {
+        const curr = activeSeries.slice(-w.n);
+        const prev = activeSeries.slice(-(w.n + 12), -12);
+        row[w.label] = delta(avg(curr, t.key), avg(prev, t.key));
+      });
+      return row;
+    })
+  , [activeSeries, showSingle, typeFilter]);
+
+  const latest = activeSeries[activeSeries.length - 1]?.date ?? "";
+  const subtitle = latest ? `Latest: ${monthLabel(latest)} ${latest.split("-")[0]} · L1M→MAT = short-term to moving annual total` : "";
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+      <div className="mb-1">
+        <div className="text-sm font-semibold text-slate-200">Trend Tracker</div>
+        <div className="text-[10px] text-slate-500">
+          Volume delta vs same window one year prior (kt) · {subtitle}
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }} barCategoryGap="25%" barGap={2}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+          <XAxis dataKey="type" tick={{ fill: "#94a3b8", fontSize: 10 }} />
+          <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
+          <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
+          <Tooltip contentStyle={TT_STYLE}
+            formatter={(v: any, name: any) => [v !== null ? `${v > 0 ? "+" : ""}${v} kt` : "—", name]} />
+          <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
+            formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
+          {WINDOWS.map(w => (
+            <Bar key={w.label} dataKey={w.label} fill={WINDOW_COLORS[w.label]} radius={[2, 2, 0, 0]} maxBarSize={18} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ── Country/hub filter ────────────────────────────────────────────────────────
+
+function buildFilteredSeries(
+  ptCountries: string[],
+  history: Record<string, CountryYear>,
+  byPrev: CountryYear,
+  byCurrent: CountryYear,
+): VolumeSeries[] {
+  const monthly: Record<string, number> = {};
+  const sources = [...Object.values(history), byPrev, byCurrent];
+  for (const cy of sources) {
+    for (const pt of ptCountries) {
+      const mv = cy.countries?.[pt] ?? {};
+      for (const [ym, vol] of Object.entries(mv)) {
+        monthly[ym] = (monthly[ym] ?? 0) + vol;
+      }
+    }
+  }
+  return Object.entries(monthly)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, total]) => ({
+      date, total, arabica: 0, conillon: 0, soluvel: 0,
+      torrado: 0, total_verde: 0, total_industria: 0,
+    }));
+}
+
+type SeriesKey = "total" | "arabica" | "conillon" | "soluvel" | "torrado";
+interface FilterState { hub: string | null; country: string | null; type: SeriesKey | null; }
+
+const TYPE_FILTER_OPTS: { key: SeriesKey; label: string; color: string }[] = [
+  { key: "arabica",  label: "Arabica",  color: GREEN },
+  { key: "conillon", label: "Conillon", color: TEAL  },
+  { key: "soluvel",  label: "Soluble",  color: AMBER },
+  { key: "torrado",  label: "Roasted",  color: BLUE  },
+];
+
+function CountryHubFilter({
+  byCountry,
+  filter,
+  onChange,
+}: {
+  byCountry: CountryYear;
+  filter: FilterState;
+  onChange: (f: FilterState) => void;
+}) {
+  // Get countries present in current data, sorted by export volume
+  const sortedCountries = useMemo(() =>
+    Object.entries(byCountry.countries ?? {})
+      .sort((a, b) => Object.values(b[1]).reduce((s, v) => s + v, 0) - Object.values(a[1]).reduce((s, v) => s + v, 0))
+      .map(([pt]) => pt)
+  , [byCountry]);
+
+  const hubCountries = filter.hub
+    ? sortedCountries.filter(pt => COUNTRY_HUB[pt] === filter.hub)
+    : sortedCountries;
+
+  const isActive = filter.hub !== null || filter.country !== null || filter.type !== null;
+  const activeLabels = [
+    filter.type ? TYPE_FILTER_OPTS.find(t => t.key === filter.type)?.label : null,
+    filter.country ? toEn(filter.country) : filter.hub,
+  ].filter(Boolean).join(" · ");
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-slate-400 uppercase tracking-wide font-medium">Filter charts</span>
+        {isActive && (
+          <button onClick={() => onChange({ hub: null, country: null, type: null })}
+            className="text-[10px] px-2 py-0.5 rounded bg-indigo-800 text-indigo-200 hover:bg-indigo-700">
+            ✕ Clear ({activeLabels || "all"})
+          </button>
+        )}
+      </div>
+
+      {/* Coffee type pills */}
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-slate-500 w-14 shrink-0">Type</span>
+        <div className="flex flex-wrap gap-1">
+          {TYPE_FILTER_OPTS.map(t => (
+            <button key={t.key}
+              onClick={() => onChange({ ...filter, type: filter.type === t.key ? null : t.key })}
+              className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
+                filter.type === t.key
+                  ? "border-transparent text-slate-900 font-semibold"
+                  : "border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500"
+              }`}
+              style={filter.type === t.key ? { background: t.color } : { borderLeftColor: t.color, borderLeftWidth: 3 }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Hub pills */}
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-slate-500 w-14 shrink-0">Hub</span>
+        <div className="flex flex-wrap gap-1">
+          {HUB_ORDER.map(hub => (
+            <button key={hub}
+              onClick={() => onChange({ ...filter, hub: filter.hub === hub ? null : hub, country: null })}
+              className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
+                filter.hub === hub
+                  ? "border-indigo-500 bg-indigo-900 text-indigo-200"
+                  : "border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500"
+              }`}
+              style={filter.hub === hub ? {} : { borderLeftColor: HUB_COLORS[hub], borderLeftWidth: 3 }}>
+              {hub}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Country pills within selected hub */}
+      {hubCountries.length > 0 && (
+        <div className="flex items-start gap-2">
+          <span className="text-[10px] text-slate-500 w-14 shrink-0 pt-0.5">Country</span>
+          <div className="flex flex-wrap gap-1">
+            {hubCountries.slice(0, 20).map(pt => (
+              <button key={pt}
+                onClick={() => onChange({ ...filter, country: filter.country === pt ? null : pt })}
+                className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
+                  filter.country === pt
+                    ? "bg-indigo-700 text-white"
+                    : "bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+                }`}>
+                {toEn(pt)}
+              </button>
+            ))}
+            {hubCountries.length > 20 && (
+              <span className="text-[10px] text-slate-600 self-center">+{hubCountries.length - 20} more</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Country / Hub destination chart ──────────────────────────────────────────
 
-type ViewMode = "country" | "hub";
+type ViewMode  = "country" | "hub";
+type CoffeeType = "total" | "arabica" | "conillon" | "soluvel" | "torrado";
 
-function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear; byCountryPrev: CountryYear }) {
-  const [mode, setMode]   = useState<ViewMode>("country");
-  const [topN, setTopN]   = useState(15);
+const TYPE_LABELS: Record<CoffeeType, string> = {
+  total:    "Total",
+  arabica:  "Arabica",
+  conillon: "Conillon",
+  soluvel:  "Soluble",
+  torrado:  "Roasted",
+};
 
-  const currentMonths = byCountry.months ?? [];
-  const prevMonths    = byCountryPrev.months ?? [];
-  const currentYear   = currentMonths[0]?.split("-")[0] ?? "2026";
-  const prevYear      = prevMonths[0]?.split("-")[0] ?? "2025";
+const EMPTY_CY: CountryYear = { months: [], countries: {} };
 
-  const currentCropKey = currentMonths.length > 0 ? cropYearKey(currentMonths[0]) : currentYear;
-  const prevCropKeyDest = currentMonths.length > 0 ? cropYearKey(prevMonths[0] ?? `${parseInt(currentYear) - 1}-04`) : prevYear;
-  const ytdLabel = currentMonths.length > 0
-    ? `Crop ${currentCropKey} — ${monthLabel(currentMonths[0])}–${monthLabel(currentMonths[currentMonths.length - 1])}`
-    : `Crop ${currentYear}`;
+type DestWindow = "CTD" | "L1M" | "L3M" | "L6M" | "L12M";
+
+const DEST_WINDOWS: { label: DestWindow; n: number | null }[] = [
+  { label: "L1M",  n: 1  },
+  { label: "L3M",  n: 3  },
+  { label: "L6M",  n: 6  },
+  { label: "L12M", n: 12 },
+  { label: "CTD",  n: null },
+];
+
+// Offset a YYYY-MM string by -12 months
+function offsetYM(ym: string, months: number): string {
+  const [y, m] = ym.split("-").map(Number);
+  const d = new Date(y, m - 1 - months);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function DestinationChart({
+  byCountry, byCountryPrev,
+  byArabica, byArabicaPrev,
+  byConillon, byConillonPrev,
+  bySoluvel, bySoluvelPrev,
+  byTorrado, byTorradoPrev,
+  byCountryHistory,
+}: {
+  byCountry: CountryYear; byCountryPrev: CountryYear;
+  byArabica?: CountryYear; byArabicaPrev?: CountryYear;
+  byConillon?: CountryYear; byConillonPrev?: CountryYear;
+  bySoluvel?: CountryYear; bySoluvelPrev?: CountryYear;
+  byTorrado?: CountryYear; byTorradoPrev?: CountryYear;
+  byCountryHistory?: Record<string, CountryYear>;
+}) {
+  const [mode, setMode]           = useState<ViewMode>("country");
+  const [topN, setTopN]           = useState(15);
+  const [coffeeType, setCoffeeType] = useState<CoffeeType>("total");
+  const [destWindow, setDestWindow] = useState<DestWindow>("CTD");
+
+  // Build a merged flat map: country → ym → vol, across all available data
+  const mergedCountries = useMemo(() => {
+    const out: Record<string, Record<string, number>> = {};
+    const sources: CountryYear[] = [
+      ...Object.values(byCountryHistory ?? {}),
+      byCountryPrev,
+      byCountry,
+    ];
+    for (const cy of sources) {
+      for (const [pt, mv] of Object.entries(cy.countries ?? {})) {
+        if (!out[pt]) out[pt] = {};
+        for (const [ym, vol] of Object.entries(mv)) {
+          out[pt][ym] = (out[pt][ym] ?? 0) + vol;
+        }
+      }
+    }
+    return out;
+  }, [byCountry, byCountryPrev, byCountryHistory]);
+
+  // All available months (sorted)
+  const allMonths = useMemo(() => {
+    const set = new Set<string>();
+    [...Object.values(byCountryHistory ?? {}), byCountryPrev, byCountry].forEach(cy =>
+      (cy.months ?? []).forEach(m => set.add(m))
+    );
+    return Array.from(set).sort();
+  }, [byCountry, byCountryPrev, byCountryHistory]);
+
+  const latestMonth  = allMonths[allMonths.length - 1] ?? "";
+  const currentYear  = latestMonth.split("-")[0] ?? "2026";
+
+  // Determine which months to include for current window
+  const windowMonths: string[] = useMemo(() => {
+    if (destWindow === "CTD") {
+      // Crop-to-date: Apr of current crop year → latest
+      const ck = cropYearKey(latestMonth);
+      const cropStartYear = parseInt(ck.split("/")[0]);
+      const cropStart = `${cropStartYear}-04`;
+      return allMonths.filter(m => m >= cropStart && m <= latestMonth);
+    }
+    const n = DEST_WINDOWS.find(w => w.label === destWindow)!.n!;
+    return allMonths.slice(-n);
+  }, [destWindow, allMonths, latestMonth]);
+
+  // Prev year comparison: same months offset -12
+  const prevWindowMonths: string[] = useMemo(() =>
+    windowMonths.map(m => offsetYM(m, 12))
+  , [windowMonths]);
+
+  // Determine which source has the type data for prev window months
+  const activeData: CountryYear = (() => {
+    switch (coffeeType) {
+      case "arabica":  return byArabica  ?? EMPTY_CY;
+      case "conillon": return byConillon ?? EMPTY_CY;
+      case "soluvel":  return bySoluvel  ?? EMPTY_CY;
+      case "torrado":  return byTorrado  ?? EMPTY_CY;
+      default:         return byCountry;
+    }
+  })();
+  const activePrev: CountryYear = (() => {
+    switch (coffeeType) {
+      case "arabica":  return byArabicaPrev  ?? EMPTY_CY;
+      case "conillon": return byConillonPrev ?? EMPTY_CY;
+      case "soluvel":  return bySoluvelPrev  ?? EMPTY_CY;
+      case "torrado":  return byTorradoPrev  ?? EMPTY_CY;
+      default:         return byCountryPrev;
+    }
+  })();
+
+  // For type-specific data, we only have current + prev year (no deeper history)
+  // Use merged (total) for current window when spanning into history
+  const useTyped = coffeeType !== "total";
+
+  // Period labels
+  const wFirst = windowMonths[0] ?? "";
+  const wLast  = windowMonths[windowMonths.length - 1] ?? "";
+  const pwFirst = prevWindowMonths[0] ?? "";
+  const pwLast  = prevWindowMonths[prevWindowMonths.length - 1] ?? "";
+  const periodLabel = wFirst && wLast
+    ? wFirst === wLast ? `${monthLabel(wFirst)} ${wFirst.split("-")[0]}`
+      : `${monthLabel(wFirst)} ${wFirst.split("-")[0]}–${monthLabel(wLast)} ${wLast.split("-")[0]}`
+    : "";
+  const prevPeriodLabel = pwFirst && pwLast
+    ? pwFirst === pwLast ? `${monthLabel(pwFirst)} ${pwFirst.split("-")[0]}`
+      : `${monthLabel(pwFirst)} ${pwFirst.split("-")[0]}–${monthLabel(pwLast)} ${pwLast.split("-")[0]}`
+    : "";
 
   // ── Aggregate by country ────────────────────────────────────────────────────
   const countryTotals = useMemo(() => {
     const out: Record<string, { current: number; prev: number }> = {};
-    Object.entries(byCountry.countries ?? {}).forEach(([c, mv]) => {
-      out[c] = { current: Object.values(mv).reduce((a, b) => a + b, 0), prev: 0 };
-    });
-    Object.entries(byCountryPrev.countries ?? {}).forEach(([c, mv]) => {
-      const prevVal = prevMonths
-        .slice(0, currentMonths.length)
-        .reduce((s, m) => s + (mv[m] ?? 0), 0);
-      if (!out[c]) out[c] = { current: 0, prev: 0 };
-      out[c].prev = prevVal;
-    });
+
+    if (useTyped) {
+      // Type-specific: use activeData (current year) and activePrev only
+      Object.entries(activeData.countries ?? {}).forEach(([c, mv]) => {
+        const val = windowMonths.reduce((s, m) => s + (mv[m] ?? 0), 0);
+        if (val > 0) out[c] = { current: val, prev: 0 };
+      });
+      Object.entries(activePrev.countries ?? {}).forEach(([c, mv]) => {
+        const val = prevWindowMonths.reduce((s, m) => s + (mv[m] ?? 0), 0);
+        if (val > 0) { if (!out[c]) out[c] = { current: 0, prev: 0 }; out[c].prev = val; }
+      });
+    } else {
+      // Total: use merged map spanning all available history
+      Object.entries(mergedCountries).forEach(([c, mv]) => {
+        const curr = windowMonths.reduce((s, m) => s + (mv[m] ?? 0), 0);
+        const prev = prevWindowMonths.reduce((s, m) => s + (mv[m] ?? 0), 0);
+        if (curr > 0 || prev > 0) out[c] = { current: curr, prev };
+      });
+    }
     return out;
-  }, [byCountry, byCountryPrev, currentMonths, prevMonths]);
+  }, [mergedCountries, activeData, activePrev, windowMonths, prevWindowMonths, useTyped]);
 
   // ── Aggregate by hub ────────────────────────────────────────────────────────
   const hubTotals = useMemo(() => {
@@ -589,10 +1285,28 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
         <div>
           <div className="text-sm font-semibold text-slate-200">Export by Destination</div>
           <div className="text-[10px] text-slate-500">
-            {ytdLabel} (green) vs same period {prevYear} (grey) · Thousand metric tons
+            {TYPE_LABELS[coffeeType]} · {periodLabel} (green) vs {prevPeriodLabel} (grey) · Thousand metric tons
           </div>
         </div>
         <div className="flex flex-wrap gap-1">
+          {/* Window selector */}
+          <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+            {DEST_WINDOWS.map(w => (
+              <button key={w.label} onClick={() => setDestWindow(w.label)}
+                className={`text-[10px] px-2 py-0.5 rounded ${destWindow === w.label ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                {w.label}
+              </button>
+            ))}
+          </div>
+          {/* Coffee type selector */}
+          <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+            {(Object.keys(TYPE_LABELS) as CoffeeType[]).map(t => (
+              <button key={t} onClick={() => setCoffeeType(t)}
+                className={`text-[10px] px-2 py-0.5 rounded ${coffeeType === t ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-slate-200"}`}>
+                {TYPE_LABELS[t]}
+              </button>
+            ))}
+          </div>
           {/* View toggle */}
           <div className="flex gap-1 border border-slate-600 rounded p-0.5">
             {(["country", "hub"] as ViewMode[]).map(m => (
@@ -626,12 +1340,12 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
           <Tooltip contentStyle={TT_STYLE}
             formatter={(v: any, name: any) => [
               `${v} kt`,
-              name === "current" ? `Crop ${currentCropKey} CTD` : `Crop ${prevCropKeyDest} same period`,
+              name === "current" ? periodLabel : prevPeriodLabel,
             ]} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={(v) => (
               <span style={{ color: "#cbd5e1" }}>
-                {v === "current" ? `Crop ${currentCropKey} CTD` : `Crop ${prevCropKeyDest} same period`}
+                {v === "current" ? periodLabel : prevPeriodLabel}
               </span>
             )} />
           <Bar dataKey="prev"    name="prev"    fill={SLATE} opacity={0.55} />
@@ -670,8 +1384,9 @@ function DestinationChart({ byCountry, byCountryPrev }: { byCountry: CountryYear
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function BrazilTab() {
-  const [data, setData] = useState<CecafeData | null>(null);
+  const [data, setData]   = useState<CecafeData | null>(null);
   const [error, setError] = useState(false);
+  const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
 
   useEffect(() => {
     fetch("/data/cecafe.json")
@@ -679,6 +1394,20 @@ export default function BrazilTab() {
       .then(setData)
       .catch(() => setError(true));
   }, []);
+
+  // All hooks must be called before any conditional return
+  const filteredSeries = useMemo(() => {
+    if (!data) return undefined;
+    const { by_country_history, by_country_prev, by_country } = data;
+    const history = by_country_history ?? {};
+    const ptCountries = filter.country
+      ? [filter.country]
+      : filter.hub
+      ? Object.entries(COUNTRY_HUB).filter(([, h]) => h === filter.hub).map(([pt]) => pt)
+      : null;
+    if (!ptCountries) return undefined;
+    return buildFilteredSeries(ptCountries, history, by_country_prev ?? EMPTY_CY, by_country ?? EMPTY_CY);
+  }, [filter, data]);
 
   if (error) return (
     <div className="text-center text-slate-500 py-16 text-sm">
@@ -689,7 +1418,16 @@ export default function BrazilTab() {
     <div className="text-center text-slate-500 py-16 text-sm animate-pulse">Loading Cecafe data…</div>
   );
 
-  const { series, by_country, by_country_prev, report, updated } = data;
+  const {
+    series,
+    by_country, by_country_prev,
+    by_country_arabica, by_country_arabica_prev,
+    by_country_conillon, by_country_conillon_prev,
+    by_country_soluvel, by_country_soluvel_prev,
+    by_country_torrado, by_country_torrado_prev,
+    by_country_history,
+    report, updated,
+  } = data;
   const latest = series[series.length - 1];
   const prev   = series[series.length - 13]; // same month last year
 
@@ -730,6 +1468,9 @@ export default function BrazilTab() {
         </span>
       </div>
 
+      {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
+      <DailyRegistrationSection />
+
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
@@ -754,10 +1495,22 @@ export default function BrazilTab() {
         />
       </div>
 
+      {/* Origin filter */}
+      <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
+
       {/* Charts */}
-      <MonthlyVolumeChart series={series} />
-      <AnnualTrendChart   series={series} />
-      <DestinationChart   byCountry={by_country} byCountryPrev={by_country_prev} />
+      <MonthlyVolumeChart  series={filteredSeries ?? series} typeFilter={filter.type} />
+      <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+      <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+      <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+      <DestinationChart
+        byCountry={by_country}         byCountryPrev={by_country_prev}
+        byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
+        byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
+        bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}
+        byTorrado={by_country_torrado} byTorradoPrev={by_country_torrado_prev}
+        byCountryHistory={by_country_history}
+      />
     </div>
   );
 }

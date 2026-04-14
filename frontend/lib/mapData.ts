@@ -35,7 +35,14 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Gioia Tauro", l: [38.43, 15.91] },
 ];
 
-export const ROUTES: { name: string; color: string; weight?: number; path: [number, number][] }[] = [
+export const ROUTES: {
+  name: string;
+  color: string;
+  weight?: number;
+  path: [number, number][];
+  /** Cecafe hub names whose export volumes to show on click */
+  cecafeHubs?: string[];
+}[] = [
 
   // ═══════════════════════════════════════════════════════════
   // MAIN TRUNK: Singapore → Antwerp (Malacca → Indian Ocean → Suez → Med → Channel)
@@ -78,6 +85,7 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
       [51.8, 3.5],     // Turn toward Antwerp
       [51.26, 4.35],   // Antwerp
     ],
+    cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Middle East", "North Africa", "Russia & CIS"],
   },
 
   // North Sea spur: junction → Hamburg
@@ -190,6 +198,7 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
     name: "Brazil (Santos) → Channel Entry",
     color: "#e74c3c",
     path: [[-23.95, -46.3], [-25.0, -44.0], [-20.0, -36.0], [-10.0, -32.0], [-5.0, -31.0], [5.0, -28.0], [20.0, -25.0], [40.0, -15.0], [48.0, -7.0]],
+    cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Russia & CIS"],
   },
   {
     name: "Deviation: Salvador → Brazil Atlantic Route",
@@ -207,6 +216,7 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
     name: "Brazil (Santos) → NY",
     color: "#e74c3c",
     path: [[-23.95, -46.3], [-24.5, -44.0], [-20.0, -38.0], [-10.0, -34.0], [-5.0, -34.5], [5.0, -45.0], [15.0, -55.0], [25.0, -68.0], [32.0, -74.0], [38.0, -73.0], [40.5, -73.8]],
+    cecafeHubs: ["North America"],
   },
 
   // Brazil → Japan via Cape of Good Hope (approaches Singapore from south, then South China Sea to Japan)
@@ -235,6 +245,7 @@ export const ROUTES: { name: string; color: string; weight?: number; path: [numb
       [30.0, 128.0],
       [35.61, 139.78], // Tokyo
     ],
+    cecafeHubs: ["East Asia", "SE Asia & Pacific"],
   },
 
   // Honduras → Channel Entry

@@ -1,0 +1,36 @@
+name: Cecafe Daily Registration Scraper
+
+on:
+  schedule:
+    # Run every day at 09:00 UTC (06:00 Brasília) — Cecafe publishes previous day's data overnight
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pdfplumber
+
+      - name: Run daily registration scraper
+        run: python -m backend.scraper.fetch_cecafe_daily
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/cecafe_daily.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || git commit -m "data: cecafe daily registration $(date -u +%Y-%m-%d) [skip ci]" && git push

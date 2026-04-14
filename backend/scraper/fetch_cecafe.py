@@ -120,14 +120,18 @@ def _parse_int_br(s: str) -> int:
     return int(s.replace(".", "").replace(",", ""))
 
 
-def _extract_country_volumes(raw_zip: bytes, year: int) -> dict:
+def _extract_country_volumes(raw_zip: bytes, year: int, suffix: str = "") -> dict:
     """
-    Parse PaisDestino_mensal_volume_acumulado{YY}.pdf.
+    Parse PaisDestino_mensal_volume_acumulado{YY}[_{suffix}].pdf.
     Each row has 12 month columns + 1 total; only filled months are non-zero.
     Header line tells us which month indices map to real dates.
+    suffix: "" (total), "arabica", "conillon", "soluvel", "torrado"
     """
     yy = str(year)[-2:]
-    pdf_name = f"PaisDestino_mensal_volume_acumulado{yy}.pdf"
+    if suffix:
+        pdf_name = f"PaisDestino_mensal_volume_acumulado{yy}_{suffix}.pdf"
+    else:
+        pdf_name = f"PaisDestino_mensal_volume_acumulado{yy}.pdf"
 
     with zipfile.ZipFile(io.BytesIO(raw_zip)) as z:
         if pdf_name not in z.namelist():
@@ -214,17 +218,34 @@ def main():
     series = _extract_volume_series(raw)
     print(f"  {len(series)} months ({series[0]['date']} to {series[-1]['date']})")
 
-    # Country breakdown — current year
+    # Country breakdown — current year (total + by type)
     print(f"\n[3] Extracting country volumes for {y}...")
     country_current = _extract_country_volumes(raw, y)
+    type_current: dict[str, dict] = {}
+    for suffix in ("arabica", "conillon", "soluvel", "torrado"):
+        print(f"      → {suffix}...")
+        type_current[suffix] = _extract_country_volumes(raw, y, suffix=suffix)
 
     # Country breakdown — previous year (fetch Dec of prev year)
     prev_year = y - 1
     print(f"\n[4] Fetching previous year ({prev_year} Dec) for country comparison...")
     _, _, raw_prev = _find_latest(prev_year, 12, max_back=3)
-    country_prev = {}
+    country_prev: dict = {}
+    type_prev: dict[str, dict] = {}
     if raw_prev:
         country_prev = _extract_country_volumes(raw_prev, prev_year)
+        for suffix in ("arabica", "conillon", "soluvel", "torrado"):
+            print(f"      → prev {suffix}...")
+            type_prev[suffix] = _extract_country_volumes(raw_prev, prev_year, suffix=suffix)
+
+    # Historical country data — last 4 additional December zips (for country/hub filter)
+    print(f"\n[5] Fetching historical country data (Dec zips)...")
+    history: dict[str, dict] = {}
+    for hist_year in range(prev_year - 4, prev_year):  # e.g. 2021, 2022, 2023, 2024
+        print(f"  Year {hist_year}...")
+        _, _, raw_hist = _find_latest(hist_year, 12, max_back=2)
+        if raw_hist:
+            history[str(hist_year)] = _extract_country_volumes(raw_hist, hist_year)
 
     out = {
         "source":        "Cecafe",
@@ -232,8 +253,17 @@ def main():
         "updated":       today.isoformat(),
         "unit":          "bags_60kg",
         "series":        series,
-        "by_country":    country_current,
-        "by_country_prev": country_prev,
+        "by_country":              country_current,
+        "by_country_prev":         country_prev,
+        "by_country_arabica":      type_current.get("arabica", {}),
+        "by_country_arabica_prev": type_prev.get("arabica", {}),
+        "by_country_conillon":     type_current.get("conillon", {}),
+        "by_country_conillon_prev":type_prev.get("conillon", {}),
+        "by_country_soluvel":      type_current.get("soluvel", {}),
+        "by_country_soluvel_prev": type_prev.get("soluvel", {}),
+        "by_country_torrado":      type_current.get("torrado", {}),
+        "by_country_torrado_prev": type_prev.get("torrado", {}),
+        "by_country_history":      history,
     }
 
     path = OUT_DIR / "cecafe.json"
