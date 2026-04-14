@@ -1,27 +1,27 @@
 {
   "currency_index": {
-    "scraped_at": "2026-04-13T22:10:04.782676+00:00",
-    "index_value": 107.155328,
-    "daily_delta_i": 0.001732,
-    "daily_delta_pct": -0.220819,
-    "zscore": -2.548785,
-    "zscore_mean": 110.733485,
-    "zscore_std": 1.403868,
+    "scraped_at": "2026-04-14T22:11:53.497873+00:00",
+    "index_value": 107.158748,
+    "daily_delta_i": 0.002506,
+    "daily_delta_pct": 0.250668,
+    "zscore": -2.535786,
+    "zscore_mean": 110.731508,
+    "zscore_std": 1.408936,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.111888,
-        "contribution": -0.000574
+        "daily_chg": -0.241763,
+        "contribution": -0.00124
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": 0.018997,
+        "daily_chg": 0.018986,
         "contribution": 5e-05
       },
       {
@@ -29,80 +29,80 @@
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": -1.276721,
-        "contribution": -0.001634
+        "daily_chg": -1.736143,
+        "contribution": -0.002222
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": 0.339996,
-        "contribution": 0.000173
+        "daily_chg": 0.275127,
+        "contribution": 0.00014
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": -0.014831,
-        "contribution": -7e-06
+        "daily_chg": 2.615746,
+        "contribution": 0.001229
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.640082,
-        "contribution": 0.004308
+        "daily_chg": 1.064303,
+        "contribution": 0.007163
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": 0.137635,
-        "contribution": 0.000131
+        "daily_chg": -0.58178,
+        "contribution": -0.000553
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.954645,
-        "contribution": -0.000496
+        "daily_chg": -1.486225,
+        "contribution": -0.000773
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.023418,
-        "contribution": -1.2e-05
+        "daily_chg": -0.185998,
+        "contribution": -9.7e-05
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": -0.270566,
-        "contribution": -0.000124
+        "daily_chg": -0.799406,
+        "contribution": -0.000368
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": 0.320372,
-        "contribution": 0.000144
+        "daily_chg": -0.757675,
+        "contribution": -0.000341
       },
       {
         "ticker": "GBP=X",
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": -0.596695,
-        "contribution": -0.000227
+        "daily_chg": -1.26872,
+        "contribution": -0.000482
       }
     ],
     "history": [
@@ -220,13 +220,13 @@
       },
       {
         "date": "2026-04-13",
-        "value": 107.392471
+        "value": 106.890807
       },
       {
         "date": "2026-04-14",
-        "value": 107.155328
+        "value": 107.158748
       }
     ]
   },
-  "scraped_at": "2026-04-13T22:10:04.782676+00:00"
+  "scraped_at": "2026-04-14T22:11:53.497873+00:00"
 }
