@@ -7,6 +7,7 @@ interface Props {
 
 export default function ProductionCostPanel({ cost }: Props) {
   const margin = cost.kc_spot - cost.total_usd_per_bag;
+  const inputsUsd = cost.components.find((c) => c.label === "Inputs")?.usd ?? cost.inputs_detail.reduce((s, d) => s + d.usd, 0);
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-4">
@@ -56,7 +57,7 @@ export default function ProductionCostPanel({ cost }: Props) {
       {/* Inputs sub-breakdown */}
       <div className="border-l-2 border-blue-500 pl-3 bg-slate-900 rounded-r-lg p-3">
         <div className="text-[10px] text-blue-400 uppercase tracking-wide mb-2">
-          🌱 Inputs detail — ${cost.components[0].usd}/bag total
+          🌱 Inputs detail — ${inputsUsd}/bag total
         </div>
         <div className="space-y-1.5">
           {cost.inputs_detail.map((item) => (

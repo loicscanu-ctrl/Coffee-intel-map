@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import type { FarmerEconomicsData, RiskLevel, DayRisk } from "./farmerEconomicsData";
 import { computeRmse } from "./farmerEconomicsUtils";
@@ -79,12 +80,12 @@ export default function WeatherRiskPanel({ weather }: Props) {
           style={{ gridTemplateColumns: `80px repeat(14, 1fr)` }}
         >
           <div />
-          {dayLabels.map((d) => (
-            <div key={d} className="text-center text-slate-600">{d}</div>
+          {dayLabels.map((d, i) => (
+            <div key={i} className="text-center text-slate-600">{d}</div>
           ))}
           {weather.daily_frost.map((row) => (
-            <>
-              <div key={`${row.region}-label`} className="text-slate-400 flex items-center text-[9px]">
+            <React.Fragment key={row.region}>
+              <div className="text-slate-400 flex items-center text-[9px]">
                 {row.region}
               </div>
               {row.days.map((cell, i) => (
@@ -95,7 +96,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
                   {cell}
                 </div>
               ))}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
@@ -108,12 +109,12 @@ export default function WeatherRiskPanel({ weather }: Props) {
           style={{ gridTemplateColumns: `80px repeat(14, 1fr)` }}
         >
           <div />
-          {dayLabels.map((d) => (
-            <div key={d} className="text-center text-slate-600">{d}</div>
+          {dayLabels.map((d, i) => (
+            <div key={i} className="text-center text-slate-600">{d}</div>
           ))}
           {weather.daily_drought.map((row) => (
-            <>
-              <div key={`${row.region}-label`} className="text-slate-400 flex items-center text-[9px]">
+            <React.Fragment key={row.region}>
+              <div className="text-slate-400 flex items-center text-[9px]">
                 {row.region}
               </div>
               {row.days.map((cell, i) => (
@@ -124,7 +125,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
                   {cell}
                 </div>
               ))}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>

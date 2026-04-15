@@ -7,13 +7,14 @@ interface Props {
 }
 
 function KpiCard({
-  label, value, unit, yoyPct, source,
+  label, value, unit, yoyPct, source, invertColor = false,
 }: {
   label: string;
   value: string;
   unit: string;
   yoyPct: number;
   source: string;
+  invertColor?: boolean;
 }) {
   const up = yoyPct >= 0;
   return (
@@ -23,7 +24,7 @@ function KpiCard({
         <span className="text-xl font-extrabold text-slate-100">{value}</span>
         <span className="text-xs text-slate-500">{unit}</span>
       </div>
-      <div className={`text-xs font-semibold mb-2 ${up ? "text-red-400" : "text-green-400"}`}>
+      <div className={`text-xs font-semibold mb-2 ${up === invertColor ? "text-green-400" : "text-red-400"}`}>
         {up ? "▲" : "▼"} {Math.abs(yoyPct).toFixed(1)}% YoY
       </div>
       <div className="text-[9px] text-slate-600">{source}</div>
@@ -40,6 +41,7 @@ export default function AcreageYieldPanel({ acreage, yield_ }: Props) {
         unit="thousand ha"
         yoyPct={acreage.yoy_pct}
         source="CONAB 2025/26"
+        invertColor
       />
       <KpiCard
         label="Yield"
@@ -47,6 +49,7 @@ export default function AcreageYieldPanel({ acreage, yield_ }: Props) {
         unit="bags / ha"
         yoyPct={yield_.yoy_pct}
         source="CONAB 2025/26"
+        invertColor
       />
     </div>
   );
