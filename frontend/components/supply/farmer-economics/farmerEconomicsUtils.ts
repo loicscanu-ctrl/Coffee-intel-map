@@ -11,10 +11,13 @@ export function computeRmse(points: ForecastAccuracyPoint[]): number {
 
 /**
  * Number of filled dots (1–4) for ENSO impact intensity based on ONI magnitude.
+ *   < 0.5   → 1  (clamped; below threshold but non-zero)
  *   0.5–1.0 → 1  (mild)
  *   1.0–1.5 → 2  (moderate)
  *   1.5–2.0 → 3  (strong)
  *   > 2.0   → 4  (extreme)
+ * Values below 0.5 (ENSO-neutral) are intentionally clamped to 1 rather than 0
+ * because regional_impact rows are only shown when a phase is active.
  */
 export function oniToDots(oni: number): number {
   const abs = Math.abs(oni);

@@ -53,7 +53,7 @@ export interface FertilizerItem {
   price_usd_mt: number;
   mom_pct: number;
   sparkline: number[];   // 6 monthly prices, oldest first
-  input_weight: number;  // fraction of total inputs cost
+  input_weight: number;  // fraction of total inputs cost; not all input categories have a FertilizerItem entry (pesticides + lime excluded)
   base_usd_per_bag: number;
 }
 
@@ -109,7 +109,7 @@ export const BRAZIL_FARMER_DATA: FarmerEconomicsData = {
       { label: "Admin",         share: 0.05, usd:  7, color: "#475569" },
     ],
     inputs_detail: [
-      { label: "Nitrogen (urea / AN)",    share: 0.35, usd: 19 },
+      { label: "Nitrogen (urea / AN)",    share: 0.35, usd: 18 },
       { label: "Potassium (KCl)",         share: 0.25, usd: 14 },
       { label: "Phosphorus (MAP)",        share: 0.20, usd: 11 },
       { label: "Pesticides / fungicides", share: 0.15, usd:  8 },
@@ -143,6 +143,8 @@ export const BRAZIL_FARMER_DATA: FarmerEconomicsData = {
       { date: "Apr 13", forecast_c: 8.0,  actual_c: 7.6  },
       { date: "Apr 14", forecast_c: 10.2, actual_c: 9.8  },
     ],
+    // Pre-set display value; computed via computeRmse(forecast_accuracy) ≈ 1.0 over 7 sample days.
+    // This field allows overriding with a longer historical window value if needed.
     forecast_rmse: 1.1,
     forecast_region: "Sul de Minas",
   },
