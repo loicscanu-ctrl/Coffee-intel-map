@@ -5,6 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, Cell,
 } from "recharts";
+import BrazilFarmerEconomics from "./farmer-economics/BrazilFarmerEconomics";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1387,6 +1388,7 @@ export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
+  const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
 
   useEffect(() => {
     fetch("/data/cecafe.json")
@@ -1455,62 +1457,85 @@ export default function BrazilTab() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-slate-200">Brazil — Cecafe Export Data</h2>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            Report: {report} · Updated {updated} · Source: Cecafe (60 kg bags)
-          </p>
-        </div>
-        <span className="text-[10px] bg-green-900/50 text-green-400 px-2 py-0.5 rounded border border-green-800">
-          Arabica &amp; Conillon origin
-        </span>
+      {/* Sub-tab bar */}
+      <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
+        {(["exports", "farmer-economics"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setSubTab(t)}
+            className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+              subTab === t
+                ? "bg-slate-700 text-slate-100"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+            }`}
+          >
+            {t === "exports" ? "Exports" : "Farmer Economics"}
+          </button>
+        ))}
       </div>
 
-      {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
-      <DailyRegistrationSection />
+      {subTab === "farmer-economics" && <BrazilFarmerEconomics />}
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          label={`${latest.date} — total exports`}
-          value={`${bagsToKT(latest.total).toFixed(1)} kt`}
-          sub={`${(latest.total / 1000).toFixed(0)}k bags`}
-        />
-        <StatCard
-          label="vs same month last year"
-          value={lyChg !== null ? `${lyChg > 0 ? "+" : ""}${lyChg}%` : "—"}
-          sub={prev ? `${bagsToKT(prev.total).toFixed(1)} kt in ${prev.date}` : ""}
-        />
-        <StatCard
-          label={`Crop ${latestCropKey} — ${ctdMonthRange}`}
-          value={`${bagsToKT(ctdTotal).toFixed(1)} kt`}
-          sub={`${(ctdTotal / 1000).toFixed(0)}k bags crop-to-date`}
-        />
-        <StatCard
-          label={`vs crop ${prevCropKey} same period`}
-          value={ctdChg !== null ? `${ctdChg > 0 ? "+" : ""}${ctdChg}%` : "—"}
-          sub={`${prevCropKey}: ${bagsToKT(ctdPrevTotal).toFixed(1)} kt`}
-        />
-      </div>
+      {subTab === "exports" && (
+        <>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-slate-200">Brazil — Cecafe Export Data</h2>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Report: {report} · Updated {updated} · Source: Cecafe (60 kg bags)
+              </p>
+            </div>
+            <span className="text-[10px] bg-green-900/50 text-green-400 px-2 py-0.5 rounded border border-green-800">
+              Arabica &amp; Conillon origin
+            </span>
+          </div>
 
-      {/* Origin filter */}
-      <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
+          {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
+          <DailyRegistrationSection />
 
-      {/* Charts */}
-      <MonthlyVolumeChart  series={filteredSeries ?? series} typeFilter={filter.type} />
-      <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-      <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-      <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-      <DestinationChart
-        byCountry={by_country}         byCountryPrev={by_country_prev}
-        byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
-        byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
-        bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}
-        byTorrado={by_country_torrado} byTorradoPrev={by_country_torrado_prev}
-        byCountryHistory={by_country_history}
-      />
+          {/* KPI cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <StatCard
+              label={`${latest.date} — total exports`}
+              value={`${bagsToKT(latest.total).toFixed(1)} kt`}
+              sub={`${(latest.total / 1000).toFixed(0)}k bags`}
+            />
+            <StatCard
+              label="vs same month last year"
+              value={lyChg !== null ? `${lyChg > 0 ? "+" : ""}${lyChg}%` : "—"}
+              sub={prev ? `${bagsToKT(prev.total).toFixed(1)} kt in ${prev.date}` : ""}
+            />
+            <StatCard
+              label={`Crop ${latestCropKey} — ${ctdMonthRange}`}
+              value={`${bagsToKT(ctdTotal).toFixed(1)} kt`}
+              sub={`${(ctdTotal / 1000).toFixed(0)}k bags crop-to-date`}
+            />
+            <StatCard
+              label={`vs crop ${prevCropKey} same period`}
+              value={ctdChg !== null ? `${ctdChg > 0 ? "+" : ""}${ctdChg}%` : "—"}
+              sub={`${prevCropKey}: ${bagsToKT(ctdPrevTotal).toFixed(1)} kt`}
+            />
+          </div>
+
+          {/* Origin filter */}
+          <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
+
+          {/* Charts */}
+          <MonthlyVolumeChart  series={filteredSeries ?? series} typeFilter={filter.type} />
+          <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <DestinationChart
+            byCountry={by_country}         byCountryPrev={by_country_prev}
+            byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
+            byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
+            bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}
+            byTorrado={by_country_torrado} byTorradoPrev={by_country_torrado_prev}
+            byCountryHistory={by_country_history}
+          />
+        </>
+      )}
     </div>
   );
 }
