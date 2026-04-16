@@ -1,13 +1,4 @@
-import type { ForecastAccuracyPoint, FertilizerItem } from "./farmerEconomicsData";
-
-/**
- * Root mean square error between forecast and actual temperature arrays.
- */
-export function computeRmse(points: ForecastAccuracyPoint[]): number {
-  if (points.length === 0) return 0;
-  const sumSq = points.reduce((s, p) => s + (p.forecast_c - p.actual_c) ** 2, 0);
-  return Math.round(Math.sqrt(sumSq / points.length) * 10) / 10;
-}
+import type { FertilizerItem } from "./farmerEconomicsData";
 
 /**
  * Number of filled dots (1–4) for ENSO impact intensity based on ONI magnitude.
