@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import io
 import json
-from datetime import date
-from itertools import islice
+from collections import defaultdict
+from datetime import date, datetime
 
 import requests
 
@@ -94,7 +94,6 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
     precip = hourly["precipitation_probability"]
 
     # Group indices by calendar date (first 10 chars of ISO timestamp)
-    from collections import defaultdict
     day_indices: dict[str, list[int]] = defaultdict(list)
     for i, ts in enumerate(times):
         day_indices[ts[:10]].append(i)
@@ -102,23 +101,26 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
     days = []
     for day_str in sorted(day_indices):
         idxs = day_indices[day_str]
-        temps_day  = [temp[i]   for i in idxs]
-        dew_day    = [dew[i]    for i in idxs]
-        cloud_day  = [cloud[i]  for i in idxs]
-        wind_day   = [wind[i]   for i in idxs]
-        precip_day = [precip[i] for i in idxs]
+        temps_day  = [v for v in (temp[i]   for i in idxs) if v is not None]
+        dew_day    = [v for v in (dew[i]    for i in idxs) if v is not None]
+        cloud_day  = [v for v in (cloud[i]  for i in idxs) if v is not None]
+        wind_day   = [v for v in (wind[i]   for i in idxs) if v is not None]
+        precip_day = [v for v in (precip[i] for i in idxs) if v is not None]
+
+        if not temps_day:
+            continue
 
         min_t  = min(temps_day)
         max_t  = max(temps_day)
-        pp_max = max(precip_day)
+        pp_max = max(precip_day) if precip_day else 0.0
 
         days.append({
             "date":         day_str,
             "min_temp":     round(min_t, 1),
             "max_temp":     round(max_t, 1),
-            "dew_point":    round(sum(dew_day)   / len(dew_day),   1),
-            "cloud_cover":  round(sum(cloud_day)  / len(cloud_day), 1),
-            "wind_speed":   round(max(wind_day), 1),
+            "dew_point":    round(sum(dew_day)   / len(dew_day),   1) if dew_day   else 0.0,
+            "cloud_cover":  round(sum(cloud_day)  / len(cloud_day), 1) if cloud_day else 0.0,
+            "wind_speed":   round(max(wind_day), 1) if wind_day else 0.0,
             "precip_prob":  round(pp_max, 1),
             "frost_risk":   _frost_risk(min_t),
             "drought_risk": _drought_risk(pp_max),
@@ -159,12 +161,12 @@ def _parse_oni_text(text: str) -> list[dict]:
         return []
 
     # Last 3 = forecast
-    n_forecast = min(3, len(rows))
-    history_rows  = rows[:-n_forecast] if n_forecast else rows
-    forecast_rows = rows[-n_forecast:] if n_forecast else []
-
-    # Keep last 15 history rows
-    history_rows = history_rows[-15:]
+    N_FORECAST = 3
+    if len(rows) <= N_FORECAST:
+        # Too few rows to split — return all as history
+        return [{"month": r["month"], "value": r["value"]} for r in rows]
+    history_rows  = rows[:-N_FORECAST][-15:]
+    forecast_rows = rows[-N_FORECAST:]
 
     for r in forecast_rows:
         r["forecast"] = True
@@ -179,7 +181,7 @@ def _parse_oni_text(text: str) -> list[dict]:
 def _scrape_weather(db) -> None:
     """Fetch 14-day hourly forecast for each region, aggregate to daily, upsert."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     from models import WeatherSnapshot
     from sqlalchemy import delete
 
@@ -193,7 +195,7 @@ def _scrape_weather(db) -> None:
             daily_data = _aggregate_hourly_to_daily(hourly)
 
             db.execute(delete(WeatherSnapshot).where(WeatherSnapshot.region == region["name"]))
-            db.add(WeatherSnapshot(region=region["name"], daily_data=daily_data))
+            db.add(WeatherSnapshot(region=region["name"], daily_data=daily_data, scraped_at=datetime.utcnow()))
             db.commit()
             print(f"[farmer_economics] weather OK: {region['name']} ({len(daily_data)} days)")
         except Exception as e:
@@ -204,7 +206,7 @@ def _scrape_weather(db) -> None:
 def _scrape_enso(db) -> None:
     """Fetch NOAA ONI text, parse, store in NewsItem."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 
@@ -220,6 +222,7 @@ def _scrape_enso(db) -> None:
             category="supply",
             tags=["enso", "supply", "brazil"],
             meta=json.dumps({"oni_history": oni_history}),
+            pub_date=datetime.utcnow(),
         ))
         db.commit()
         print(f"[farmer_economics] ENSO OK ({len(oni_history)} rows)")
@@ -228,59 +231,73 @@ def _scrape_enso(db) -> None:
         print(f"[farmer_economics] ENSO FAILED: {e}")
 
 
+_FERTILIZER_TARGET_LABELS = {
+    "Urea, E. Europe (fob Bulk)":          "urea",
+    "DAP (fob US Gulf)":                    "dap",
+    "Potassium chloride (fob Vancouver)":   "kcl",
+}
+
+
+def _parse_world_bank_excel(content: bytes) -> dict:
+    """Parse World Bank CMO Pink Sheet Excel.
+
+    Returns {"urea_monthly": [...7 vals...], "dap_monthly": [...], "kcl_monthly": [...]}.
+    """
+    import openpyxl
+
+    wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True, read_only=True)
+
+    if "Monthly Prices" not in wb.sheetnames:
+        raise ValueError(f"Sheet 'Monthly Prices' not found. Available: {wb.sheetnames}")
+
+    ws = wb["Monthly Prices"]
+    result: dict[str, list[float]] = {}
+
+    for row in ws.iter_rows(values_only=True):
+        # Check every cell in the row for a label match
+        matched_key = None
+        label_col   = None
+        for col_idx, cell_val in enumerate(row):
+            if isinstance(cell_val, str):
+                stripped = cell_val.strip()
+                if stripped in _FERTILIZER_TARGET_LABELS:
+                    matched_key = _FERTILIZER_TARGET_LABELS[stripped]
+                    label_col   = col_idx
+                    break
+
+        if matched_key is None:
+            continue
+
+        # Collect numeric values from columns after the label column
+        nums = []
+        for cell_val in row[label_col + 1:]:
+            if isinstance(cell_val, (int, float)) and cell_val is not None:
+                nums.append(float(cell_val))
+
+        result[matched_key] = nums[-7:] if len(nums) >= 7 else nums
+
+        if len(result) == len(_FERTILIZER_TARGET_LABELS):
+            break  # found all labels
+
+    wb.close()
+    return {
+        "urea_monthly": result.get("urea", []),
+        "dap_monthly":  result.get("dap", []),
+        "kcl_monthly":  result.get("kcl", []),
+    }
+
+
 def _scrape_fertilizer_prices(db) -> None:
     """Download World Bank Excel, extract last 7 monthly values for urea/DAP/KCl."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
-    import openpyxl
-
-    TARGET_LABELS = {
-        "Urea, E. Europe (fob Bulk)":          "urea",
-        "DAP (fob US Gulf)":                    "dap",
-        "Potassium chloride (fob Vancouver)":   "kcl",
-    }
 
     try:
         resp = requests.get(WORLD_BANK_URL, timeout=120)
         resp.raise_for_status()
-        wb = openpyxl.load_workbook(io.BytesIO(resp.content), data_only=True, read_only=True)
-
-        if "Monthly Prices" not in wb.sheetnames:
-            raise ValueError(f"Sheet 'Monthly Prices' not found. Available: {wb.sheetnames}")
-
-        ws = wb["Monthly Prices"]
-
-        result: dict[str, list[float]] = {}
-
-        for row in ws.iter_rows(values_only=True):
-            # Check every cell in the row for a label match
-            matched_key = None
-            label_col   = None
-            for col_idx, cell_val in enumerate(row):
-                if isinstance(cell_val, str):
-                    stripped = cell_val.strip()
-                    if stripped in TARGET_LABELS:
-                        matched_key = TARGET_LABELS[stripped]
-                        label_col   = col_idx
-                        break
-
-            if matched_key is None:
-                continue
-
-            # Collect numeric values from columns after the label column
-            nums = []
-            for cell_val in row[label_col + 1:]:
-                if isinstance(cell_val, (int, float)) and cell_val is not None:
-                    nums.append(float(cell_val))
-
-            result[matched_key] = nums[-7:] if len(nums) >= 7 else nums
-
-            if len(result) == len(TARGET_LABELS):
-                break  # found all labels
-
-        wb.close()
+        parsed = _parse_world_bank_excel(resp.content)
 
         db.execute(delete(NewsItem).where(NewsItem.source == "World Bank"))
         db.add(NewsItem(
@@ -288,14 +305,11 @@ def _scrape_fertilizer_prices(db) -> None:
             source="World Bank",
             category="supply",
             tags=["fertilizer", "price", "supply", "brazil"],
-            meta=json.dumps({
-                "urea_monthly": result.get("urea", []),
-                "dap_monthly":  result.get("dap", []),
-                "kcl_monthly":  result.get("kcl", []),
-            }),
+            meta=json.dumps(parsed),
+            pub_date=datetime.utcnow(),
         ))
         db.commit()
-        print(f"[farmer_economics] fertilizer OK — keys: {list(result.keys())}")
+        print(f"[farmer_economics] fertilizer OK — keys: {[k for k, v in parsed.items() if v]}")
     except Exception as e:
         db.rollback()
         print(f"[farmer_economics] fertilizer FAILED: {e}")
