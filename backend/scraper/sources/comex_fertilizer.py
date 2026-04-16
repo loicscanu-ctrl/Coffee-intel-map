@@ -6,11 +6,8 @@ Called from run_monthly.py.
 """
 
 import os
-import sys
 import re
 from datetime import datetime, date
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 COMEX_STAT_URL = "https://comexstat.mdic.gov.br/pt/geral"
 
@@ -93,18 +90,14 @@ async def run(page, db) -> None:
     6. On ANY exception: db.rollback(), log the error, return gracefully
     """
     try:
-        from models import FertilizerImport
-    except ImportError:
-        import importlib.util, pathlib
-        spec = importlib.util.spec_from_file_location(
-            "models",
-            pathlib.Path(__file__).parents[2] / "models.py",
-        )
-        models_mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(models_mod)
-        FertilizerImport = models_mod.FertilizerImport
+        # Import block first — inside the outer try
+        try:
+            from models import FertilizerImport
+        except ImportError:
+            import sys, os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+            from models import FertilizerImport
 
-    try:
         print(f"[comex_fertilizer] Navigating to {COMEX_STAT_URL}")
         await page.goto(COMEX_STAT_URL, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(5000)
@@ -227,5 +220,4 @@ async def run(page, db) -> None:
 
     except Exception as e:
         db.rollback()
-        print(f"[comex_fertilizer] ERROR: {e}")
-        return
+        print(f"[comex_fertilizer] FAILED: {e} — retaining previous data")
