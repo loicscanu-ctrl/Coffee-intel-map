@@ -6,7 +6,7 @@ import {
 import type { FarmerEconomicsData, EnsoPhase, ImpactType } from "./farmerEconomicsData";
 
 interface Props {
-  enso: FarmerEconomicsData["enso"];
+  enso: NonNullable<FarmerEconomicsData["enso"]>;
 }
 
 const PHASE_STYLE: Record<EnsoPhase, { icon: string; label: string; border: string; text: string; bg: string }> = {

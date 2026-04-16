@@ -1,31 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
-  computeRmse,
   oniToDots,
   fertCostDelta,
   netFertImpact,
 } from "../../components/supply/farmer-economics/farmerEconomicsUtils";
 import type { FertilizerItem } from "../../components/supply/farmer-economics/farmerEconomicsData";
-
-describe("computeRmse", () => {
-  it("returns 0 for empty array", () => {
-    expect(computeRmse([])).toBe(0);
-  });
-  it("returns 0 when forecast equals actual", () => {
-    expect(computeRmse([{ date: "d", forecast_c: 5, actual_c: 5 }])).toBe(0);
-  });
-  it("computes correctly for a single point", () => {
-    // error = 2, RMSE = 2
-    expect(computeRmse([{ date: "d", forecast_c: 7, actual_c: 5 }])).toBe(2);
-  });
-  it("computes correctly for multiple points", () => {
-    // errors: 1, 1 → RMSE = 1
-    expect(computeRmse([
-      { date: "d1", forecast_c: 6, actual_c: 5 },
-      { date: "d2", forecast_c: 4, actual_c: 5 },
-    ])).toBe(1);
-  });
-});
 
 describe("oniToDots", () => {
   it("returns 1 for ONI 0.5–1.0", () => {

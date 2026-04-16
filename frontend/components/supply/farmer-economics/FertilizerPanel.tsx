@@ -1,5 +1,5 @@
 "use client";
-import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import type { FarmerEconomicsData, FertilizerItem } from "./farmerEconomicsData";
 import { fertCostDelta, netFertImpact } from "./farmerEconomicsUtils";
 
@@ -23,7 +23,6 @@ function FertCard({ item }: { item: FertilizerItem }) {
       </div>
       <div className="text-[8px] text-slate-600 mb-1">CFR Brazil</div>
 
-      {/* Sparkline */}
       <div className="h-10 mb-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={sparkData}>
@@ -41,12 +40,9 @@ function FertCard({ item }: { item: FertilizerItem }) {
         </ResponsiveContainer>
       </div>
 
-      {/* MoM change */}
       <div className={`text-[10px] font-semibold mb-1 ${priceRose ? "text-red-400" : "text-green-400"}`}>
         {priceRose ? "▲" : "▼"} {Math.abs(item.mom_pct).toFixed(1)}% MoM
       </div>
-
-      {/* Cost-per-bag impact badge */}
       <div className={`text-[9px] font-semibold px-1.5 py-0.5 rounded inline-block ${
         delta > 0 ? "bg-red-950 text-red-300" : delta < 0 ? "bg-green-950 text-green-300" : "bg-slate-800 text-slate-500"
       }`}>
@@ -58,6 +54,16 @@ function FertCard({ item }: { item: FertilizerItem }) {
 
 export default function FertilizerPanel({ fertilizer }: Props) {
   const net = netFertImpact(fertilizer.items);
+  const imports = fertilizer.imports;
+
+  // Bar chart data: total import volume (kt) by month
+  const importChartData = imports?.monthly.map((m) => ({
+    month:   m.month.slice(5),   // "2026-01" → "01"
+    total:   m.total_kt,
+    urea:    m.urea_kt,
+    kcl:     m.kcl_kt,
+    map_dap: m.map_dap_kt,
+  })) ?? [];
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
@@ -69,7 +75,6 @@ export default function FertilizerPanel({ fertilizer }: Props) {
         ))}
       </div>
 
-      {/* Net impact summary */}
       <div className="text-[10px] text-slate-500 pt-2 border-t border-slate-700">
         Net input cost impact:{" "}
         <span className={`font-bold ${net > 0 ? "text-amber-400" : "text-green-400"}`}>
@@ -77,6 +82,31 @@ export default function FertilizerPanel({ fertilizer }: Props) {
         </span>
         {" "}· Next application window: {fertilizer.next_application}
       </div>
+
+      {/* Fertilizer imports bar chart */}
+      {imports && importChartData.length > 0 && (
+        <div className="pt-2 border-t border-slate-700">
+          <div className="text-[9px] text-slate-400 mb-1 flex justify-between">
+            <span>Brazil Fertilizer Imports (kt)</span>
+            <span className="text-slate-600">Source: Comex Stat · {imports.last_updated}</span>
+          </div>
+          <div className="h-28">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={importChartData} barSize={6} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <XAxis dataKey="month" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={TT_STYLE}
+                  formatter={(v: unknown, name?: string | number) => [`${v} kt`, String(name ?? "")]}
+                />
+                <Bar dataKey="urea"    name="Urea"    fill="#3b82f6" stackId="a" />
+                <Bar dataKey="kcl"     name="KCl"     fill="#8b5cf6" stackId="a" />
+                <Bar dataKey="map_dap" name="MAP+DAP" fill="#22c55e" stackId="a" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
