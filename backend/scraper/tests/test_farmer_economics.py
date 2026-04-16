@@ -15,6 +15,8 @@ def test_fertilizer_import_has_expected_columns():
     assert {"id", "month", "ncm_code", "ncm_label", "net_weight_kg", "fob_usd", "scraped_at"}.issubset(cols)
 
 def test_fertilizer_import_unique_constraint():
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     from models import FertilizerImport
     constraints = {c.name for c in FertilizerImport.__table__.constraints}
     assert "uq_fert_import_month_ncm" in constraints

@@ -180,7 +180,7 @@ class WeatherSnapshot(Base):
     id:         Mapped[int]      = mapped_column(primary_key=True)
     region:     Mapped[str]      = mapped_column(String(100), nullable=False)
     scraped_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    daily_data: Mapped[dict]     = mapped_column(JSON, default=list)
+    daily_data: Mapped[list]     = mapped_column(JSON, default=list)
 
 
 class FertilizerImport(Base):
@@ -191,7 +191,7 @@ class FertilizerImport(Base):
     ncm_code:      Mapped[str]           = mapped_column(String(20), nullable=False)
     ncm_label:     Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     net_weight_kg: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    fob_usd:       Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fob_usd:       Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     scraped_at:    Mapped[datetime]      = mapped_column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("month", "ncm_code", name="uq_fert_import_month_ncm"),)

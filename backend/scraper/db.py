@@ -125,8 +125,6 @@ def upsert_cot_weekly(market: str, report_date, fields: dict):
 
 def create_farmer_economics_tables():
     """Create WeatherSnapshot and FertilizerImport tables if they don't exist."""
-    import sys
-    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
     from database import Base
     from models import WeatherSnapshot, FertilizerImport
     engine = _get_engine()
