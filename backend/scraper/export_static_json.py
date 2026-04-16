@@ -502,39 +502,57 @@ def export_farmer_economics(db) -> None:
                 latest_by_region[snap.region] = snap
 
         if latest_by_region:
-            weather_regions = []
+            regions_out           = []
+            daily_frost_out       = []
+            daily_drought_out     = []
+            current_conditions_out= []
+            scraped_at_out        = None
+
             for region_name in _REGIONS_ORDER:
                 snap = latest_by_region.get(region_name)
                 if snap is None:
                     continue
+                if scraped_at_out is None and snap.scraped_at:
+                    scraped_at_out = snap.scraped_at.isoformat() + "Z"
+
                 daily = snap.daily_data or []
-                week = daily[:7]
+                week  = daily[:7]
 
-                frost_risks   = [d.get("frost_risk",   "-") for d in week]
-                drought_risks = [d.get("drought_risk", "-") for d in week]
-                frost_badge   = _badge_from_risk_code(_worst_risk(frost_risks))
-                drought_badge = _badge_from_risk_code(_worst_risk(drought_risks))
+                frost_codes   = [d.get("frost_risk",   "-") for d in week]
+                drought_codes = [d.get("drought_risk", "-") for d in week]
+                frost_badge   = _badge_from_risk_code(_worst_risk(frost_codes))
+                drought_badge = _badge_from_risk_code(_worst_risk(drought_codes))
 
-                daily_frost  = [d.get("frost_risk",   "-") for d in week]
-                daily_drought= [d.get("drought_risk", "-") for d in week]
-
-                current = daily[0] if daily else {}
-                weather_regions.append({
-                    "region":       region_name,
-                    "frost_badge":  frost_badge,
-                    "drought_badge":drought_badge,
-                    "daily_frost":  daily_frost if any(v != "-" for v in daily_frost) else None,
-                    "daily_drought":daily_drought if any(v != "-" for v in daily_drought) else None,
-                    "current_conditions": {
-                        "max_temp":    current.get("max_temp"),
-                        "dew_point":   current.get("dew_point"),
-                        "cloud_cover": current.get("cloud_cover"),
-                        "wind_speed":  current.get("wind_speed"),
-                    },
-                    "scraped_at": snap.scraped_at.isoformat() + "Z" if snap.scraped_at else None,
+                regions_out.append({
+                    "name":    region_name,
+                    "frost":   frost_badge,
+                    "drought": drought_badge,
                 })
-            if weather_regions:
-                weather_out = {"regions": weather_regions}
+
+                frost_days   = [d.get("frost_risk",   "-") for d in daily]
+                drought_days = [d.get("drought_risk", "-") for d in daily]
+                if any(c != "-" for c in frost_days):
+                    daily_frost_out.append({"region": region_name, "days": frost_days})
+                if any(c != "-" for c in drought_days):
+                    daily_drought_out.append({"region": region_name, "days": drought_days})
+
+                today = daily[0] if daily else {}
+                current_conditions_out.append({
+                    "region":          region_name,
+                    "temp_c":          today.get("max_temp", 0),
+                    "dew_point_c":     today.get("dew_point", 0),
+                    "cloud_cover_pct": today.get("cloud_cover", 0),
+                    "wind_speed_kmh":  today.get("wind_speed", 0),
+                })
+
+            if regions_out:
+                weather_out = {
+                    "scraped_at":         scraped_at_out or date.today().isoformat(),
+                    "regions":            regions_out,
+                    "daily_frost":        daily_frost_out,
+                    "daily_drought":      daily_drought_out,
+                    "current_conditions": current_conditions_out,
+                }
     except Exception as e:
         print(f"  [farmer_economics] weather section error: {e}")
 
@@ -558,32 +576,38 @@ def export_farmer_economics(db) -> None:
                 for entry in _REGIONAL_IMPACT_BY_PHASE.get(phase, []):
                     regional_impact.append({**entry, "dots": dots})
 
-                # Forecast direction: last forecast point value
+                # Forecast direction: sentence describing trajectory
                 forecast_pts = [p for p in oni_history if p.get("forecast")]
+                non_forecast = [p for p in oni_history if not p.get("forecast")]
                 if forecast_pts:
-                    last_fc_val = forecast_pts[-1]["value"]
-                    forecast_direction = "rising" if last_fc_val > current_oni else ("falling" if last_fc_val < current_oni else "stable")
+                    last_val = forecast_pts[-1]["value"]
+                    last_month = forecast_pts[-1]["month"]
+                    if abs(last_val) < 0.5:
+                        forecast_direction = f"Neutral by {last_month}"
+                    elif last_val > 0:
+                        forecast_direction = f"El Niño persists through {last_month}"
+                    else:
+                        forecast_direction = f"La Niña persists through {last_month}"
                 else:
-                    forecast_direction = "stable"
+                    forecast_direction = ""
 
                 # Peak month: non-forecast point with highest |value|
-                non_forecast = [p for p in oni_history if not p.get("forecast")]
                 if non_forecast:
-                    peak_pt = max(non_forecast, key=lambda p: abs(p["value"]))
+                    peak_pt    = max(non_forecast, key=lambda p: abs(p["value"]))
                     peak_month = peak_pt["month"]
                 else:
-                    peak_month = None
+                    peak_month = ""
 
                 enso_out = {
                     "phase":              phase,
                     "intensity":          intensity,
-                    "current_oni":        current_oni,
-                    "dots":               dots,
+                    "oni":                current_oni,
+                    "peak_month":         peak_month,
+                    "forecast_direction": forecast_direction,
                     "oni_history":        oni_history,
                     "regional_impact":    regional_impact,
                     "historical_stat":    _HISTORICAL_STAT_BY_PHASE.get(phase, ""),
-                    "forecast_direction": forecast_direction,
-                    "peak_month":         peak_month,
+                    "last_updated":       str(enso_item.pub_date)[:10],
                 }
     except Exception as e:
         print(f"  [farmer_economics] ENSO section error: {e}")
@@ -606,16 +630,13 @@ def export_farmer_economics(db) -> None:
                 current_price = monthly[-1]
                 prev_price    = monthly[-2]
                 mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
-                sparkline = monthly[:6]
                 fert_items_out.append({
-                    "key":               key,
                     "name":              cfg["name"],
+                    "price_usd_mt":      round(current_price, 0),
+                    "mom_pct":           round(mom_pct, 1),
+                    "sparkline":         monthly[:6],
                     "input_weight":      cfg["input_weight"],
                     "base_usd_per_bag":  cfg["base_usd_per_bag"],
-                    "current_price":     round(current_price, 2),
-                    "prev_price":        round(prev_price, 2),
-                    "mom_pct":           round(mom_pct, 2),
-                    "sparkline":         sparkline,
                 })
     except Exception as e:
         print(f"  [farmer_economics] fertilizer prices section error: {e}")
@@ -668,7 +689,11 @@ def export_farmer_economics(db) -> None:
                 entry["total_kt"]       = round(entry["total_kt"],       1)
                 entry["total_fob_usd_m"]= round(entry["total_fob_usd_m"],2)
 
-            imports_out = sorted(months_data.values(), key=lambda x: x["month"])
+            last_import  = max(import_rows, key=lambda r: r.scraped_at)
+            imports_out  = {
+                "last_updated": last_import.scraped_at.strftime("%Y-%m-%d"),
+                "monthly":      sorted(months_data.values(), key=lambda x: x["month"]),
+            }
     except Exception as e:
         print(f"  [farmer_economics] fertilizer imports section error: {e}")
 
@@ -695,18 +720,16 @@ def export_farmer_economics(db) -> None:
             if area_cur is not None:
                 area_yoy = (area_cur - area_prev) / area_prev * 100 if area_prev else 0.0
                 acreage_out = {
-                    "harvested_area_kha":      area_cur,
-                    "prev_area_kha":           area_prev,
-                    "yoy_pct":                 round(area_yoy, 2),
-                    "source_label":            meta.get("source_label", "CONAB Safra"),
+                    "thousand_ha":  area_cur,
+                    "yoy_pct":      round(area_yoy, 1),
+                    "source_label": meta.get("source_label", "CONAB Safra"),
                 }
             if yld_cur is not None:
                 yld_yoy = (yld_cur - yld_prev) / yld_prev * 100 if yld_prev else 0.0
                 yield_out = {
-                    "yield_bags_ha":      yld_cur,
-                    "prev_yield_bags_ha": yld_prev,
-                    "yoy_pct":            round(yld_yoy, 2),
-                    "source_label":       meta.get("source_label", "CONAB Safra"),
+                    "bags_per_ha":  yld_cur,
+                    "yoy_pct":      round(yld_yoy, 1),
+                    "source_label": meta.get("source_label", "CONAB Safra"),
                 }
     except Exception as e:
         print(f"  [farmer_economics] acreage/yield section error: {e}")
@@ -782,16 +805,18 @@ def export_farmer_economics(db) -> None:
                 except Exception:
                     pass
 
+                yoy_pct = 0.0
+                if prev_total_brl:
+                    yoy_pct = round((total_brl - prev_total_brl) / prev_total_brl * 100, 1)
+
                 cost_out = {
-                    "season":              cost_season,
-                    "total_brl_per_bag":   total_brl,
-                    "prev_total_brl_per_bag": prev_total_brl,
-                    "total_usd_per_bag":   round(total_usd, 2) if total_usd is not None else None,
-                    "brl_usd":             brl_usd,
-                    "kc_spot_cents_lb":    kc_spot,
-                    "components":          components_out,
-                    "inputs_detail":       inputs_detail_out,
-                    "source_label":        meta.get("source_label", "CONAB Custos"),
+                    "total_usd_per_bag": round(total_usd, 1) if total_usd is not None else None,
+                    "yoy_pct":           yoy_pct,
+                    "season_label":      meta.get("source_label", "CONAB Custos"),
+                    "components":        components_out,
+                    "inputs_detail":     inputs_detail_out,
+                    "kc_spot":           kc_spot,
+                    "last_updated":      str(custos_item.pub_date)[:10],
                 }
     except Exception as e:
         print(f"  [farmer_economics] cost section error: {e}")
