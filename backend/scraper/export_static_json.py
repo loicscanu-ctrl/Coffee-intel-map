@@ -10,6 +10,7 @@ Writes to frontend/public/data/:
   cot.json             — COT weekly data (same shape as /api/cot)
   macro_cot.json       — Multi-commodity COT (same shape as /api/macro-cot)
   freight.json         — Freight rates + history (same shape as /api/freight)
+  farmer_economics.json — Brazil Farmer Economics tab (weather, ENSO, cost, acreage, fertilizer)
 
 Run after any scraper that updates the relevant tables:
     cd backend
@@ -644,11 +645,8 @@ def export_farmer_economics(db) -> None:
     # ── Fertilizer imports ────────────────────────────────────────────────────
     imports_out = None
     try:
-        cutoff = date.today().replace(day=1)
-        # Go back 12 months
-        cutoff_year  = cutoff.year - 1 if cutoff.month == 1 else cutoff.year
-        cutoff_month = 12 if cutoff.month == 1 else cutoff.month - 1
-        cutoff_date  = cutoff.replace(year=cutoff_year, month=cutoff_month)
+        today = date.today()
+        cutoff_date = date(today.year - 1, today.month, 1)
 
         import_rows = (
             db.query(FertilizerImport)
@@ -822,6 +820,11 @@ def export_farmer_economics(db) -> None:
         print(f"  [farmer_economics] cost section error: {e}")
 
     # ── Assemble & write ──────────────────────────────────────────────────────
+    if season is None:
+        _today = date.today()
+        _y = _today.year if _today.month >= 7 else _today.year - 1
+        season = f"{_y}/{str(_y + 1)[-2:]}"
+
     result = {
         "country":    "brazil",
         "season":     season,
