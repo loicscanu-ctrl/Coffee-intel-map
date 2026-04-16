@@ -181,7 +181,7 @@ def _parse_oni_text(text: str) -> list[dict]:
 def _scrape_weather(db) -> None:
     """Fetch 14-day hourly forecast for each region, aggregate to daily, upsert."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import WeatherSnapshot
     from sqlalchemy import delete
 
@@ -206,7 +206,7 @@ def _scrape_weather(db) -> None:
 def _scrape_enso(db) -> None:
     """Fetch NOAA ONI text, parse, store in NewsItem."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 
@@ -290,7 +290,7 @@ def _parse_world_bank_excel(content: bytes) -> dict:
 def _scrape_fertilizer_prices(db) -> None:
     """Download World Bank Excel, extract last 7 monthly values for urea/DAP/KCl."""
     import sys, os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 

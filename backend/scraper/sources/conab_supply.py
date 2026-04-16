@@ -28,7 +28,7 @@ _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 # Cost component mapping: regex pattern → (English label, hex color)
 _COST_COMPONENT_MAP = {
     r"insumo":               ("Inputs",        "#3b82f6"),
-    r"m[ãa]o.de.obra|m\.o": ("Labor",         "#22c55e"),
+    r"m[ãa]o.de.obra|m\.o\.": ("Labor",         "#22c55e"),
     r"mecaniza":             ("Mechanization", "#f59e0b"),
     r"arrendamento":         ("Land rent",     "#8b5cf6"),
     r"administra":           ("Admin",         "#475569"),
@@ -38,9 +38,9 @@ _COST_COMPONENT_MAP = {
 _INPUT_DETAIL_MAP = {
     r"nitrog|ur[eé]ia|sal.amonio": "Nitrogen (urea / AN)",
     r"pot[áa]ssio|kcl":           "Potassium (KCl)",
-    r"f[oó]sforo|map|dap":        "Phosphorus (MAP)",
+    r"f[oó]sforo|\bmap\b|\bdap\b":        "Phosphorus (MAP)",
     r"defensivo|pesticida":       "Pesticides / fungicides",
-    r"cal[cç]á|lime|corretivo":   "Lime / soil correction",
+    r"cal[cç][aá]r|lime|corretivo":   "Lime / soil correction",
 }
 
 
@@ -91,6 +91,15 @@ def _parse_conab_safra_html(html: str) -> dict | None:
                     }
 
     return None
+
+
+def _current_season() -> str:
+    """Return current crop-year label, e.g. '2025/26'. Brazil crop year starts July."""
+    today = date.today()
+    if today.month >= 7:
+        return f"{today.year}/{str(today.year + 1)[-2:]}"
+    else:
+        return f"{today.year - 1}/{str(today.year)[-2:]}"
 
 
 def _parse_conab_custos_excel(content: bytes, brl_usd: float) -> dict | None:
@@ -195,15 +204,6 @@ def _parse_conab_custos_excel(content: bytes, brl_usd: float) -> dict | None:
 # DB-writing helpers
 # ---------------------------------------------------------------------------
 
-def _current_season() -> str:
-    """Return current crop-year label, e.g. '2025/26'. Brazil crop year starts July."""
-    today = date.today()
-    if today.month >= 7:
-        return f"{today.year}/{str(today.year + 1)[-2:]}"
-    else:
-        return f"{today.year - 1}/{str(today.year)[-2:]}"
-
-
 def _get_brl_usd() -> float:
     """Fetch current BRL/USD rate via yfinance ticker 'BRL=X'. Return 5.0 on any failure."""
     try:
@@ -222,7 +222,7 @@ def _scrape_acreage_yield(db) -> None:
     """Fetch CONAB Safra page, parse HTML, upsert NewsItem."""
     import sys
     import os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 
@@ -274,7 +274,7 @@ def _scrape_production_cost(db) -> None:
     """Fetch CONAB Custos page, find first .xlsx/.xls link, download and parse."""
     import sys
     import os
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 
@@ -344,7 +344,7 @@ def _scrape_production_cost(db) -> None:
 # Entry point
 # ---------------------------------------------------------------------------
 
-async def run(db) -> None:
+def run(db) -> None:
     """Monthly entry point. Called from run_monthly.py."""
     _scrape_acreage_yield(db)
     _scrape_production_cost(db)
