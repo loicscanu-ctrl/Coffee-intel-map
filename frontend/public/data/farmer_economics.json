@@ -1,0 +1,15 @@
+{
+  "country": "brazil",
+  "season": "2025/26",
+  "scraped_at": "2026-04-16T00:00:00Z",
+  "cost": null,
+  "acreage": null,
+  "yield": null,
+  "weather": null,
+  "enso": null,
+  "fertilizer": {
+    "items": [],
+    "imports": null,
+    "next_application": "May\u2013Jun"
+  }
+}
