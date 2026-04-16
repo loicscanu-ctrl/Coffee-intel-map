@@ -10,6 +10,7 @@ from playwright.async_api import async_playwright
 from scraper.db import get_session, upsert_news_item
 from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf
 from scraper.sources import macro_cot as _macro_cot
+from scraper.sources import farmer_economics as _farmer_economics
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf]
 SCHEDULED_HOUR_UTC = 1  # Run daily at 01:00 UTC
@@ -39,6 +40,11 @@ async def run_all_scrapers():
                 print("[scraper] macro_cot: OK")
             except Exception as e:
                 print(f"[scraper] macro_cot failed: {e}")
+            try:
+                await _farmer_economics.run(page, db)
+                print("[scraper] farmer_economics: OK")
+            except Exception as e:
+                print(f"[scraper] farmer_economics failed: {e}")
 
             await browser.close()
     finally:
