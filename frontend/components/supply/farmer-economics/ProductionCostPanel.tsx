@@ -1,8 +1,16 @@
 "use client";
-import type { FarmerEconomicsData } from "./farmerEconomicsData";
+import type { CostComponent, InputDetail } from "./farmerEconomicsData";
 
 interface Props {
-  cost: FarmerEconomicsData["cost"];
+  cost: {
+    total_usd_per_bag: number;
+    yoy_pct: number;
+    season_label?: string;
+    components: CostComponent[];
+    inputs_detail: InputDetail[];
+    kc_spot: number;
+    last_updated?: string;
+  };
 }
 
 export default function ProductionCostPanel({ cost }: Props) {
@@ -14,7 +22,7 @@ export default function ProductionCostPanel({ cost }: Props) {
       {/* Header KPI */}
       <div>
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">
-          Production Cost — Brazil 2025/26
+          Production Cost — {cost.season_label ?? "CONAB Custos"}
         </div>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-extrabold text-slate-100">

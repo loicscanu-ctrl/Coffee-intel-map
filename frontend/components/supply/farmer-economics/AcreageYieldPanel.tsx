@@ -1,9 +1,8 @@
 "use client";
-import type { FarmerEconomicsData } from "./farmerEconomicsData";
 
 interface Props {
-  acreage: FarmerEconomicsData["acreage"];
-  yield_: FarmerEconomicsData["yield"];
+  acreage: { thousand_ha: number; yoy_pct: number; source_label?: string };
+  yield_:  { bags_per_ha: number; yoy_pct: number; source_label?: string };
 }
 
 function KpiCard({
@@ -40,7 +39,7 @@ export default function AcreageYieldPanel({ acreage, yield_ }: Props) {
         value={acreage.thousand_ha.toLocaleString()}
         unit="thousand ha"
         yoyPct={acreage.yoy_pct}
-        source="CONAB 2025/26"
+        source={acreage.source_label ?? "CONAB Safra"}
         invertColor
       />
       <KpiCard
@@ -48,7 +47,7 @@ export default function AcreageYieldPanel({ acreage, yield_ }: Props) {
         value={String(yield_.bags_per_ha)}
         unit="bags / ha"
         yoyPct={yield_.yoy_pct}
-        source="CONAB 2025/26"
+        source={yield_.source_label ?? "CONAB Safra"}
         invertColor
       />
     </div>
