@@ -172,3 +172,26 @@ class CommodityPrice(Base):
     created_at:  Mapped[datetime]   = mapped_column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("date", "symbol", name="uq_commodity_price_date_symbol"),)
+
+
+class WeatherSnapshot(Base):
+    __tablename__ = "weather_snapshots"
+
+    id:         Mapped[int]      = mapped_column(primary_key=True)
+    region:     Mapped[str]      = mapped_column(String(100), nullable=False)
+    scraped_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    daily_data: Mapped[dict]     = mapped_column(JSON, default=list)
+
+
+class FertilizerImport(Base):
+    __tablename__ = "fertilizer_imports"
+
+    id:            Mapped[int]           = mapped_column(primary_key=True)
+    month:         Mapped[date]          = mapped_column(Date, nullable=False)
+    ncm_code:      Mapped[str]           = mapped_column(String(20), nullable=False)
+    ncm_label:     Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    net_weight_kg: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fob_usd:       Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    scraped_at:    Mapped[datetime]      = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("month", "ncm_code", name="uq_fert_import_month_ncm"),)
