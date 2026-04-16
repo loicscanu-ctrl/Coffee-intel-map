@@ -1,14 +1,14 @@
-name: Daily News Scraper
+name: Monthly Scraper (CONAB + Comex Stat)
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 01:00 UTC daily
-  workflow_dispatch:      # allow manual trigger from GitHub UI
+    - cron: '0 2 5 * *'   # 02:00 UTC on the 5th of each month
+  workflow_dispatch:
 
 jobs:
-  scrape:
+  scrape-monthly:
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: write
 
@@ -26,11 +26,11 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run daily scraper
+      - name: Run monthly scraper
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.run_daily
+        run: python -m scraper.run_monthly
 
       - name: Export static JSON files
         working-directory: backend
@@ -42,13 +42,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/futures_chain.json \
-                  frontend/public/data/oi_fnd_chart.json \
-                  frontend/public/data/oi_history.json \
-                  frontend/public/data/cot.json \
-                  frontend/public/data/macro_cot.json \
-                  frontend/public/data/freight.json \
-                  frontend/public/data/farmer_economics.json
+          git add frontend/public/data/farmer_economics.json
           git diff --cached --quiet \
             && echo "No changes." \
-            || git commit -m "data: update static JSON [skip ci]" && git push
+            || git commit -m "data: update farmer_economics.json [skip ci]" && git push
