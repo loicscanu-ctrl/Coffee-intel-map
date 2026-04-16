@@ -1,16 +1,17 @@
 """
-comex_fertilizer.py — Monthly Playwright scraper for Brazil fertilizer imports.
-Source: Comex Stat MDIC (https://comexstat.mdic.gov.br/pt/geral)
-NCM Chapter 31: Urea, KCl, MAP, DAP.
+comex_fertilizer.py — Monthly scraper for Brazil fertilizer imports.
+Source: MDIC bulk CSV (balanca.economia.gov.br), filtered for NCM Chapter 31.
+Streams the yearly CSV files, filters Chapter 31 rows, aggregates by month.
 Called from run_monthly.py.
 """
 
+import io
 import os
 import re
+import sys
 from datetime import datetime, date
 
-COMEX_STAT_URL = "https://comexstat.mdic.gov.br/pt/geral"
-
+# NCM codes of interest (8-digit, Chapter 31)
 NCM_LABELS = {
     "31021010": "Urea",
     "31042010": "KCl",
@@ -18,12 +19,11 @@ NCM_LABELS = {
     "31054000": "DAP",
 }
 
-# Portuguese month abbreviations (case-insensitive lookup via .lower())
-_PT_MONTHS = {
-    "jan": 1, "fev": 2, "mar": 3, "abr": 4,
-    "mai": 5, "jun": 6, "jul": 7, "ago": 8,
-    "set": 9, "out": 10, "nov": 11, "dez": 12,
-}
+# Base URL pattern for MDIC bulk import CSV by year
+MDIC_URL = "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_{year}.csv"
+
+# Chapter 31 prefix for fast line-level filtering
+_CHAPTER_31_NCM_PREFIX = '"31'
 
 
 def _month_str_to_date(month_str: str) -> date | None:
@@ -31,8 +31,7 @@ def _month_str_to_date(month_str: str) -> date | None:
 
     Handles formats:
     - "2026-01"           → date(2026, 1, 1)
-    - "Jan/2026" or "jan/2026" → date(2026, 1, 1)  (PT month abbrev)
-    - Full PT month names like "Janeiro/2026" → date(2026, 1, 1)
+    - "Jan/2026" or "jan/2026" → date(2026, 1, 1)
     Returns None on unrecognised format.
     """
     if not month_str or not month_str.strip():
@@ -48,19 +47,6 @@ def _month_str_to_date(month_str: str) -> date | None:
         except ValueError:
             return None
 
-    # PT abbreviation or full month name: "<month_part>/<year>"
-    m = re.fullmatch(r"([A-Za-zç]+)/(\d{4})", s)
-    if m:
-        month_part = m.group(1).lower()
-        year = int(m.group(2))
-        # Try 3-letter abbreviation first
-        month_num = _PT_MONTHS.get(month_part[:3])
-        if month_num:
-            try:
-                return date(year, month_num, 1)
-            except ValueError:
-                return None
-
     return None
 
 
@@ -74,143 +60,137 @@ def _parse_int(s: str) -> int | None:
     return int(digits)
 
 
-async def run(page, db) -> None:
+def _stream_chapter31_rows(year: int) -> list[dict]:
     """
-    Navigate Comex Stat UI and extract NCM Chapter 31 fertilizer import data.
-    On failure, logs the error and retains existing DB data (does NOT raise).
+    Stream MDIC bulk CSV for `year`, return rows where NCM starts with 31.
+    Each row: {month: date, ncm_code: str, kg: int|None, fob_usd: float|None}
+    """
+    import requests
 
-    Strategy:
-    1. Navigate to COMEX_STAT_URL, wait for page to settle
-    2. Try to interact with the query form to filter by NCM Chapter 31
-    3. Extract data from the rendered table via page.evaluate()
-    4. For each row with a matching NCM code:
-       - Delete existing FertilizerImport(month=month_dt, ncm_code=ncm_code)
-       - Insert new FertilizerImport(month, ncm_code, ncm_label, net_weight_kg, fob_usd, scraped_at)
-    5. db.commit()
-    6. On ANY exception: db.rollback(), log the error, return gracefully
+    url = MDIC_URL.format(year=year)
+    try:
+        resp = requests.get(url, stream=True, timeout=120, verify=False)
+        resp.raise_for_status()
+    except Exception as e:
+        print(f"[comex_fertilizer] Could not fetch {url}: {e}")
+        return []
+
+    rows = []
+    header = None
+    # Suppress urllib3 InsecureRequestWarning for this known-safe gov URL
+    import warnings
+    warnings.filterwarnings("ignore", message="Unverified HTTPS request")
+
+    for raw_line in resp.iter_lines():
+        if isinstance(raw_line, bytes):
+            line = raw_line.decode("latin-1", errors="replace")
+        else:
+            line = raw_line
+
+        if header is None:
+            # First line is header
+            header = [c.strip('"') for c in line.split(";")]
+            continue
+
+        # Fast filter: only keep Chapter 31 lines
+        if _CHAPTER_31_NCM_PREFIX not in line:
+            continue
+
+        parts = [c.strip('"') for c in line.split(";")]
+        if len(parts) < len(header):
+            continue
+
+        row = dict(zip(header, parts))
+        ncm_code = row.get("CO_NCM", "")
+        if not ncm_code.startswith("31"):
+            continue
+
+        try:
+            yr  = int(row.get("CO_ANO", 0))
+            mo  = int(row.get("CO_MES", 0))
+            if yr < 2000 or mo < 1 or mo > 12:
+                continue
+            month_dt = date(yr, mo, 1)
+        except (ValueError, TypeError):
+            continue
+
+        try:
+            kg = int(row.get("KG_LIQUIDO", "") or 0)
+        except ValueError:
+            kg = None
+
+        try:
+            fob = float(row.get("VL_FOB", "") or 0)
+        except ValueError:
+            fob = None
+
+        rows.append({
+            "month":    month_dt,
+            "ncm_code": ncm_code,
+            "kg":       kg,
+            "fob_usd":  fob,
+        })
+
+    return rows
+
+
+async def run(page, db) -> None:  # noqa: ARG001  (page unused — kept for signature)
+    """
+    Download MDIC bulk CSVs for current and prior year, aggregate Chapter 31
+    fertilizer import rows, upsert into FertilizerImport table.
+    On failure, logs and retains existing data (does NOT raise).
     """
     try:
-        # Import block first — inside the outer try
         try:
             from models import FertilizerImport
         except ImportError:
-            import sys, os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
             from models import FertilizerImport
 
-        print(f"[comex_fertilizer] Navigating to {COMEX_STAT_URL}")
-        await page.goto(COMEX_STAT_URL, wait_until="domcontentloaded", timeout=60000)
-        await page.wait_for_timeout(5000)
+        today      = date.today()
+        this_year  = today.year
+        prior_year = this_year - 1
 
-        # Attempt to set NCM filter to Chapter 31 via the query form.
-        # The Comex Stat UI is an Angular SPA; selectors may change over time.
-        # This is best-effort — if anything fails we catch and bail gracefully.
+        all_rows: list[dict] = []
+        for year in (prior_year, this_year):
+            year_rows = _stream_chapter31_rows(year)
+            print(f"[comex_fertilizer] {year}: {len(year_rows)} Chapter-31 rows")
+            all_rows.extend(year_rows)
 
-        # Try clicking/typing in the NCM chapter filter field
-        ncm_input_selector = "input[placeholder*='NCM'], input[placeholder*='ncm'], input[aria-label*='NCM']"
-        try:
-            await page.wait_for_selector(ncm_input_selector, timeout=10000)
-            await page.fill(ncm_input_selector, "31")
-            await page.wait_for_timeout(2000)
-            # Press Enter or click a search/apply button
-            await page.keyboard.press("Enter")
-            await page.wait_for_timeout(3000)
-        except Exception as e:
-            print(f"[comex_fertilizer] NCM filter interaction failed (non-fatal): {e}")
+        if not all_rows:
+            print("[comex_fertilizer] No rows found — retaining previous data")
+            return
 
-        # Try to click a "Consultar" / "Pesquisar" / search button if present
-        try:
-            search_btn = page.locator(
-                "button:has-text('Consultar'), button:has-text('Pesquisar'), button:has-text('Buscar')"
-            ).first
-            await search_btn.click(timeout=5000)
-            await page.wait_for_timeout(5000)
-        except Exception:
-            pass  # No such button visible or timed out — continue
+        # Keep only last 12 months
+        cutoff = date(today.year - 1, today.month, 1)
+        all_rows = [r for r in all_rows if r["month"] >= cutoff]
 
-        # Extract table data via JS evaluation
-        rows = await page.evaluate("""
-            () => {
-                const results = [];
-                const tables = document.querySelectorAll('table');
-                tables.forEach(table => {
-                    const headers = [];
-                    const headerCells = table.querySelectorAll('thead th, thead td');
-                    headerCells.forEach(th => headers.push(th.innerText.trim()));
-
-                    table.querySelectorAll('tbody tr').forEach(tr => {
-                        const cells = tr.querySelectorAll('td');
-                        const row = {};
-                        cells.forEach((td, i) => {
-                            row[headers[i] || String(i)] = td.innerText.trim();
-                        });
-                        results.push(row);
-                    });
-                });
-                return results;
-            }
-        """)
+        # Aggregate: sum kg and fob per (month, ncm_code)
+        from collections import defaultdict
+        agg: dict[tuple, dict] = defaultdict(lambda: {"kg": 0, "fob_usd": 0.0})
+        for r in all_rows:
+            key = (r["month"], r["ncm_code"])
+            agg[key]["kg"]     += r["kg"]     or 0
+            agg[key]["fob_usd"] += r["fob_usd"] or 0.0
 
         inserted = 0
-        for row in rows:
-            # Normalise keys to lowercase for flexible matching
-            row_lower = {k.lower(): v for k, v in row.items()}
+        for (month_dt, ncm_code), totals in agg.items():
+            label = NCM_LABELS.get(ncm_code[:8])
+            if not label:
+                # Still store unknown Chapter 31 codes
+                label = f"NCM {ncm_code}"
 
-            # Find NCM code in the row
-            ncm_code = None
-            for key in ("ncm", "código ncm", "codigo ncm", "ncm_code", "0"):
-                val = row_lower.get(key, "")
-                # Strip non-digit characters and check if it matches a known code
-                candidate = re.sub(r"\D", "", val)
-                if candidate in NCM_LABELS:
-                    ncm_code = candidate
-                    break
-
-            if not ncm_code:
-                continue
-
-            # Find month value
-            month_dt = None
-            for key in ("mês", "mes", "month", "período", "periodo", "data", "1"):
-                val = row_lower.get(key, "")
-                month_dt = _month_str_to_date(val)
-                if month_dt:
-                    break
-
-            if not month_dt:
-                continue
-
-            # Net weight (kg)
-            net_kg = None
-            for key in ("kg líquido", "kg liquido", "peso líquido", "peso liquido",
-                        "net weight", "net_weight_kg", "2", "3"):
-                val = row_lower.get(key, "")
-                if val:
-                    net_kg = _parse_int(val)
-                    break
-
-            # FOB value (USD)
-            fob_usd = None
-            for key in ("us$ fob", "usd fob", "valor fob", "fob_usd",
-                        "fob usd", "valor us$ fob", "3", "4"):
-                val = row_lower.get(key, "")
-                if val:
-                    parsed = _parse_int(val)
-                    fob_usd = float(parsed) if parsed is not None else None
-                    break
-
-            # Upsert: delete existing then insert
             db.query(FertilizerImport).filter(
-                FertilizerImport.month == month_dt,
+                FertilizerImport.month    == month_dt,
                 FertilizerImport.ncm_code == ncm_code,
             ).delete(synchronize_session=False)
 
             db.add(FertilizerImport(
                 month=month_dt,
                 ncm_code=ncm_code,
-                ncm_label=NCM_LABELS[ncm_code],
-                net_weight_kg=net_kg,
-                fob_usd=fob_usd,
+                ncm_label=label,
+                net_weight_kg=totals["kg"],
+                fob_usd=round(totals["fob_usd"], 2),
                 scraped_at=datetime.utcnow(),
             ))
             inserted += 1
