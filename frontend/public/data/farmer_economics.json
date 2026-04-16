@@ -1,14 +1,304 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-16T00:00:00Z",
+  "scraped_at": "2026-04-16T11:51:47.450160Z",
   "cost": null,
   "acreage": null,
   "yield": null,
-  "weather": null,
-  "enso": null,
+  "weather": {
+    "scraped_at": "2026-04-16T11:46:39.065855Z",
+    "regions": [
+      {
+        "name": "Sul de Minas",
+        "frost": "NONE",
+        "drought": "HIGH"
+      },
+      {
+        "name": "Cerrado",
+        "frost": "NONE",
+        "drought": "HIGH"
+      },
+      {
+        "name": "Paran\u00e1",
+        "frost": "NONE",
+        "drought": "HIGH"
+      },
+      {
+        "name": "Esp\u00edrito Santo",
+        "frost": "NONE",
+        "drought": "HIGH"
+      }
+    ],
+    "daily_frost": [],
+    "daily_drought": [
+      {
+        "region": "Sul de Minas",
+        "days": [
+          "H",
+          "H",
+          "M",
+          "M",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "M",
+          "-",
+          "L",
+          "L",
+          "L"
+        ]
+      },
+      {
+        "region": "Cerrado",
+        "days": [
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "M",
+          "H",
+          "H",
+          "M",
+          "L",
+          "M",
+          "M"
+        ]
+      },
+      {
+        "region": "Paran\u00e1",
+        "days": [
+          "H",
+          "L",
+          "M",
+          "H",
+          "H",
+          "M",
+          "L",
+          "L",
+          "H",
+          "M",
+          "M",
+          "M",
+          "L",
+          "L"
+        ]
+      },
+      {
+        "region": "Esp\u00edrito Santo",
+        "days": [
+          "H",
+          "H",
+          "H",
+          "L",
+          "L",
+          "H",
+          "H",
+          "L",
+          "M",
+          "H",
+          "M",
+          "L",
+          "M",
+          "M"
+        ]
+      }
+    ],
+    "current_conditions": [
+      {
+        "region": "Sul de Minas",
+        "temp_c": 25.4,
+        "dew_point_c": 12.9,
+        "cloud_cover_pct": 38.0,
+        "wind_speed_kmh": 5.5
+      },
+      {
+        "region": "Cerrado",
+        "temp_c": 28.3,
+        "dew_point_c": 14.7,
+        "cloud_cover_pct": 31.3,
+        "wind_speed_kmh": 10.0
+      },
+      {
+        "region": "Paran\u00e1",
+        "temp_c": 28.3,
+        "dew_point_c": 17.0,
+        "cloud_cover_pct": 80.1,
+        "wind_speed_kmh": 11.7
+      },
+      {
+        "region": "Esp\u00edrito Santo",
+        "temp_c": 26.5,
+        "dew_point_c": 16.5,
+        "cloud_cover_pct": 48.5,
+        "wind_speed_kmh": 9.1
+      }
+    ]
+  },
+  "enso": {
+    "phase": "neutral",
+    "intensity": "Weak",
+    "oni": -0.55,
+    "peak_month": "Nov-25",
+    "forecast_direction": "Neutral by Feb-26",
+    "oni_history": [
+      {
+        "month": "Sep-24",
+        "value": -0.17
+      },
+      {
+        "month": "Oct-24",
+        "value": -0.21
+      },
+      {
+        "month": "Nov-24",
+        "value": -0.3
+      },
+      {
+        "month": "Dec-24",
+        "value": -0.42
+      },
+      {
+        "month": "Jan-25",
+        "value": -0.45
+      },
+      {
+        "month": "Feb-25",
+        "value": -0.24
+      },
+      {
+        "month": "Mar-25",
+        "value": -0.06
+      },
+      {
+        "month": "Apr-25",
+        "value": 0.02
+      },
+      {
+        "month": "May-25",
+        "value": -0.02
+      },
+      {
+        "month": "Jun-25",
+        "value": -0.04
+      },
+      {
+        "month": "Jul-25",
+        "value": -0.14
+      },
+      {
+        "month": "Aug-25",
+        "value": -0.28
+      },
+      {
+        "month": "Sep-25",
+        "value": -0.4
+      },
+      {
+        "month": "Oct-25",
+        "value": -0.51
+      },
+      {
+        "month": "Nov-25",
+        "value": -0.55
+      },
+      {
+        "month": "Dec-25",
+        "value": -0.54,
+        "forecast": true
+      },
+      {
+        "month": "Jan-26",
+        "value": -0.37,
+        "forecast": true
+      },
+      {
+        "month": "Feb-26",
+        "value": -0.16,
+        "forecast": true
+      }
+    ],
+    "regional_impact": [
+      {
+        "region": "Sul de Minas",
+        "type": "WARM",
+        "note": "near-normal conditions",
+        "dots": 1
+      },
+      {
+        "region": "Cerrado",
+        "type": "WARM",
+        "note": "near-normal conditions",
+        "dots": 1
+      },
+      {
+        "region": "Paran\u00e1",
+        "type": "WARM",
+        "note": "near-normal conditions",
+        "dots": 1
+      },
+      {
+        "region": "Esp\u00edrito Santo",
+        "type": "WARM",
+        "note": "near-normal conditions",
+        "dots": 1
+      }
+    ],
+    "historical_stat": "Neutral ENSO: near-average Brazil arabica output expected",
+    "last_updated": "2026-04-16"
+  },
   "fertilizer": {
-    "items": [],
+    "items": [
+      {
+        "name": "Urea (N)",
+        "price_usd_mt": 352.0,
+        "mom_pct": -0.1,
+        "sparkline": [
+          336.25,
+          342.5,
+          342.5,
+          337.5,
+          374.75,
+          352.3
+        ],
+        "input_weight": 0.35,
+        "base_usd_per_bag": 18.9
+      },
+      {
+        "name": "MAP (P)",
+        "price_usd_mt": 568.0,
+        "mom_pct": -1.1,
+        "sparkline": [
+          543.0,
+          539.4,
+          546.0,
+          554.75,
+          573.44,
+          574.5
+        ],
+        "input_weight": 0.2,
+        "base_usd_per_bag": 10.8
+      },
+      {
+        "name": "KCl (K)",
+        "price_usd_mt": 292.0,
+        "mom_pct": 4.1,
+        "sparkline": [
+          310.0,
+          300.63,
+          294.0,
+          286.88,
+          278.13,
+          281.0
+        ],
+        "input_weight": 0.25,
+        "base_usd_per_bag": 13.5
+      }
+    ],
     "imports": null,
     "next_application": "May\u2013Jun"
   }

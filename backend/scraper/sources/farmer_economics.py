@@ -231,18 +231,17 @@ def _scrape_enso(db) -> None:
         print(f"[farmer_economics] ENSO FAILED: {e}")
 
 
-_FERTILIZER_TARGET_LABELS = {
-    "Urea, E. Europe (fob Bulk)":          "urea",
-    "DAP (fob US Gulf)":                    "dap",
-    "Potassium chloride (fob Vancouver)":   "kcl",
-}
-
-
 def _parse_world_bank_excel(content: bytes) -> dict:
     """Parse World Bank CMO Pink Sheet Excel.
 
+    The sheet is wide-format:
+      - Row 4 (0-indexed): commodity header labels across columns
+      - Column A (index 0): month strings like "2024M12"
+      - Data at intersections
+
     Returns {"urea_monthly": [...7 vals...], "dap_monthly": [...], "kcl_monthly": [...]}.
     """
+    import re
     import openpyxl
 
     wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True, read_only=True)
@@ -251,39 +250,63 @@ def _parse_world_bank_excel(content: bytes) -> dict:
         raise ValueError(f"Sheet 'Monthly Prices' not found. Available: {wb.sheetnames}")
 
     ws = wb["Monthly Prices"]
-    result: dict[str, list[float]] = {}
-
-    for row in ws.iter_rows(values_only=True):
-        # Check every cell in the row for a label match
-        matched_key = None
-        label_col   = None
-        for col_idx, cell_val in enumerate(row):
-            if isinstance(cell_val, str):
-                stripped = cell_val.strip()
-                if stripped in _FERTILIZER_TARGET_LABELS:
-                    matched_key = _FERTILIZER_TARGET_LABELS[stripped]
-                    label_col   = col_idx
-                    break
-
-        if matched_key is None:
-            continue
-
-        # Collect numeric values from columns after the label column
-        nums = []
-        for cell_val in row[label_col + 1:]:
-            if isinstance(cell_val, (int, float)) and cell_val is not None:
-                nums.append(float(cell_val))
-
-        result[matched_key] = nums[-7:] if len(nums) >= 7 else nums
-
-        if len(result) == len(_FERTILIZER_TARGET_LABELS):
-            break  # found all labels
-
+    rows = list(ws.iter_rows(values_only=True))
     wb.close()
+
+    # Step 1: find the header row — the row that contains "DAP" somewhere
+    header_row_idx = None
+    for i, row in enumerate(rows):
+        for cell in row:
+            if isinstance(cell, str) and cell.strip().upper() == "DAP":
+                header_row_idx = i
+                break
+        if header_row_idx is not None:
+            break
+
+    if header_row_idx is None:
+        return {"urea_monthly": [], "dap_monthly": [], "kcl_monthly": []}
+
+    header = rows[header_row_idx]
+
+    # Step 2: find column indices for Urea, DAP, KCl
+    col_map: dict[str, int] = {}
+    for i, cell in enumerate(header):
+        if not isinstance(cell, str):
+            continue
+        s = cell.strip().lower()
+        if s == "urea" and "urea" not in col_map:
+            col_map["urea"] = i
+        elif s == "dap" and "dap" not in col_map:
+            col_map["dap"] = i
+        elif s.startswith("potassium chloride") and "kcl" not in col_map:
+            col_map["kcl"] = i
+
+    if not col_map:
+        return {"urea_monthly": [], "dap_monthly": [], "kcl_monthly": []}
+
+    # Step 3: collect data rows — column A matches "YYYYMxx"
+    month_re = re.compile(r"^\d{4}M\d{2}$")
+    data_rows = [
+        row for row in rows[header_row_idx + 1:]
+        if row and isinstance(row[0], str) and month_re.match(row[0].strip())
+    ]
+
+    # Step 4: extract last 7 numeric values per commodity
+    def _extract(key: str) -> list[float]:
+        if key not in col_map:
+            return []
+        col = col_map[key]
+        vals = []
+        for row in data_rows:
+            v = row[col] if col < len(row) else None
+            if isinstance(v, (int, float)) and v is not None:
+                vals.append(float(v))
+        return vals[-7:] if len(vals) >= 7 else vals
+
     return {
-        "urea_monthly": result.get("urea", []),
-        "dap_monthly":  result.get("dap", []),
-        "kcl_monthly":  result.get("kcl", []),
+        "urea_monthly": _extract("urea"),
+        "dap_monthly":  _extract("dap"),
+        "kcl_monthly":  _extract("kcl"),
     }
 
 
