@@ -102,7 +102,7 @@ export interface FarmerEconomicsData {
     regions: WeatherRegion[];
     daily_frost: DailyRiskRow[];
     daily_drought: DailyRiskRow[];
-    drought_detail: DroughtDetailRow[];
+    drought_detail?: DroughtDetailRow[];
     current_conditions: CurrentCondition[];
   } | null;
   enso: {

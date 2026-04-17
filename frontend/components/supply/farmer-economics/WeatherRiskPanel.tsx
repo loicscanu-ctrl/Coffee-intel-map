@@ -153,36 +153,44 @@ export default function WeatherRiskPanel({ weather }: Props) {
                       </tr>
 
                       {/* Expanded driver rows */}
-                      {isExpanded && detail && (
-                        <>
-                          {/* VPD row */}
+                      {isExpanded && (
+                        detail ? (
+                          <>
+                            {/* VPD row */}
+                            <tr>
+                              <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">VPD kPa</td>
+                              {detail.days.map((d, i) => (
+                                <td key={i} className={`text-center py-0.5 ${vpdCellClass(d.vpd)}`}>
+                                  {d.vpd.toFixed(1)}
+                                </td>
+                              ))}
+                            </tr>
+                            {/* Rain row */}
+                            <tr>
+                              <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Rain %</td>
+                              {detail.days.map((d, i) => (
+                                <td key={i} className={`text-center py-0.5 ${rainCellClass(d.precip_prob)}`}>
+                                  {d.precip_prob}
+                                </td>
+                              ))}
+                            </tr>
+                            {/* Soil moisture row */}
+                            <tr className="border-b border-slate-700">
+                              <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Soil SM</td>
+                              {detail.days.map((d, i) => (
+                                <td key={i} className={`text-center py-0.5 ${soilCellClass(d.soil_moisture)}`}>
+                                  {d.soil_moisture.toFixed(2)}
+                                </td>
+                              ))}
+                            </tr>
+                          </>
+                        ) : (
                           <tr>
-                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">VPD kPa</td>
-                            {detail.days.map((d, i) => (
-                              <td key={i} className={`text-center py-0.5 ${vpdCellClass(d.vpd)}`}>
-                                {d.vpd.toFixed(1)}
-                              </td>
-                            ))}
+                            <td colSpan={15} className="text-[7px] text-slate-600 italic pl-2 py-1">
+                              Driver data available after next scraper run
+                            </td>
                           </tr>
-                          {/* Rain row */}
-                          <tr>
-                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Rain %</td>
-                            {detail.days.map((d, i) => (
-                              <td key={i} className={`text-center py-0.5 ${rainCellClass(d.precip_prob)}`}>
-                                {d.precip_prob}
-                              </td>
-                            ))}
-                          </tr>
-                          {/* Soil moisture row */}
-                          <tr className="border-b border-slate-700">
-                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Soil SM</td>
-                            {detail.days.map((d, i) => (
-                              <td key={i} className={`text-center py-0.5 ${soilCellClass(d.soil_moisture)}`}>
-                                {d.soil_moisture.toFixed(2)}
-                              </td>
-                            ))}
-                          </tr>
-                        </>
+                        )
                       )}
                     </React.Fragment>
                   );
