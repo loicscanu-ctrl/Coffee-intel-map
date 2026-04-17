@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-17T04:56:34.706072Z",
+  "scraped_at": "2026-04-17T08:25:00.908273Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -58,12 +58,12 @@
     "source_label": "CONAB Safra Apr 2026"
   },
   "weather": {
-    "scraped_at": "2026-04-17T04:56:14.348510Z",
+    "scraped_at": "2026-04-17T08:24:47.390409Z",
     "regions": [
       {
         "name": "Sul de Minas",
         "frost": "NONE",
-        "drought": "HIGH"
+        "drought": "MED"
       },
       {
         "name": "Cerrado",
@@ -73,12 +73,12 @@
       {
         "name": "Paran\u00e1",
         "frost": "NONE",
-        "drought": "HIGH"
+        "drought": "MED"
       },
       {
         "name": "Esp\u00edrito Santo",
         "frost": "NONE",
-        "drought": "HIGH"
+        "drought": "MED"
       }
     ],
     "daily_frost": [],
@@ -86,77 +86,77 @@
       {
         "region": "Sul de Minas",
         "days": [
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
           "M",
           "M",
           "M",
           "M",
-          "H"
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M"
         ]
       },
       {
         "region": "Cerrado",
         "days": [
+          "M",
+          "M",
           "H",
           "H",
+          "M",
+          "M",
           "H",
+          "M",
+          "M",
+          "M",
           "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H"
+          "M",
+          "M",
+          "M"
         ]
       },
       {
         "region": "Paran\u00e1",
         "days": [
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H"
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "L"
         ]
       },
       {
         "region": "Esp\u00edrito Santo",
         "days": [
-          "M",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
-          "M",
-          "M",
-          "H",
+          "L",
           "M",
           "M",
           "M",
-          "H"
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "L",
+          "M",
+          "M",
+          "M"
         ]
       }
     ],
