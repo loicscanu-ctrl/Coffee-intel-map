@@ -506,6 +506,7 @@ def export_farmer_economics(db) -> None:
             regions_out           = []
             daily_frost_out       = []
             daily_drought_out     = []
+            drought_detail_out    = []
             current_conditions_out= []
             scraped_at_out        = None
 
@@ -536,6 +537,19 @@ def export_farmer_economics(db) -> None:
                     daily_frost_out.append({"region": region_name, "days": frost_days})
                 if any(c != "-" for c in drought_days):
                     daily_drought_out.append({"region": region_name, "days": drought_days})
+                    drought_detail_out.append({
+                        "region": region_name,
+                        "days": [
+                            {
+                                "date":          d.get("date", ""),
+                                "vpd":           d.get("vpd", 0.0),
+                                "precip_prob":   d.get("precip_prob", 0.0),
+                                "soil_moisture": d.get("soil_moisture", 0.0),
+                                "drought_risk":  d.get("drought_risk", "-"),
+                            }
+                            for d in daily
+                        ],
+                    })
 
                 today = daily[0] if daily else {}
                 current_conditions_out.append({
@@ -552,6 +566,7 @@ def export_farmer_economics(db) -> None:
                     "regions":            regions_out,
                     "daily_frost":        daily_frost_out,
                     "daily_drought":      daily_drought_out,
+                    "drought_detail":     drought_detail_out,
                     "current_conditions": current_conditions_out,
                 }
     except Exception as e:

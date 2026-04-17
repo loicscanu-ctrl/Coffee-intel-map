@@ -258,10 +258,11 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
             "dew_point":    round(mean_dew, 1),
             "cloud_cover":  round(sum(cloud_day) / len(cloud_day), 1) if cloud_day else 0.0,
             "wind_speed":   round(max(wind_day), 1) if wind_day else 0.0,
-            "precip_prob":  round(pp_max, 1),
+            "precip_prob":   round(pp_max, 1),
             "soil_moisture": round(root_zone, 3),
-            "frost_risk":   _frost_risk(min_t, cloud_at_min, wind_at_min, dew_at_min),
-            "drought_risk": _drought_risk(pp_max, vpd, root_zone, month),
+            "vpd":           round(vpd, 2),
+            "frost_risk":    _frost_risk(min_t, cloud_at_min, wind_at_min, dew_at_min),
+            "drought_risk":  _drought_risk(pp_max, vpd, root_zone, month),
         })
 
     return days

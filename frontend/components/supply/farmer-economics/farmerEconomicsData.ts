@@ -29,6 +29,19 @@ export interface DailyRiskRow {
   days: DayRisk[];  // length 14
 }
 
+export interface DroughtDayDetail {
+  date: string;
+  vpd: number;           // kPa
+  precip_prob: number;   // %
+  soil_moisture: number; // m³/m³ root-zone weighted
+  drought_risk: DayRisk;
+}
+
+export interface DroughtDetailRow {
+  region: string;
+  days: DroughtDayDetail[];
+}
+
 // Current conditions from today's weather snapshot (replaces ForecastAccuracyPoint)
 export interface CurrentCondition {
   region: string;
@@ -89,6 +102,7 @@ export interface FarmerEconomicsData {
     regions: WeatherRegion[];
     daily_frost: DailyRiskRow[];
     daily_drought: DailyRiskRow[];
+    drought_detail: DroughtDetailRow[];
     current_conditions: CurrentCondition[];
   } | null;
   enso: {
