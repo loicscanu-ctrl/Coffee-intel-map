@@ -88,7 +88,7 @@ export default function FertilizerPanel({ fertilizer }: Props) {
         <span>Fertilizer Prices</span>
         {fertilizer.prices_as_of && (
           <span className="text-[8px] text-slate-600 normal-case font-normal">
-            World Bank · {fertilizer.prices_as_of}
+            Comex Stat · FOB implied · {fertilizer.prices_as_of}
           </span>
         )}
       </div>

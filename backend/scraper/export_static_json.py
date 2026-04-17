@@ -661,6 +661,8 @@ def export_farmer_economics(db) -> None:
 
     # ── Fertilizer imports ────────────────────────────────────────────────────
     imports_out = None
+    comex_price_items: list = []
+    comex_prices_as_of: str | None = None
     try:
         today = date.today()
         cutoff_date = date(today.year - 3, today.month, 1)
@@ -672,42 +674,93 @@ def export_farmer_economics(db) -> None:
             .all()
         )
         if import_rows:
-            # Group by month string "YYYY-MM"
+            # Group by month string "YYYY-MM", tracking volume + FOB per type
             months_data: dict = {}
             for row in import_rows:
                 m_str = row.month.strftime("%Y-%m")
                 if m_str not in months_data:
                     months_data[m_str] = {
-                        "month":       m_str,
-                        "urea_kt":     0.0,
-                        "kcl_kt":      0.0,
-                        "map_dap_kt":  0.0,
-                        "total_kt":    0.0,
-                        "total_fob_usd_m": 0.0,
+                        "month":            m_str,
+                        "urea_kt":          0.0, "urea_fob":          0.0,
+                        "kcl_kt":           0.0, "kcl_fob":           0.0,
+                        "map_dap_kt":       0.0, "map_dap_fob":       0.0,
+                        "total_kt":         0.0,
+                        "total_fob_usd_m":  0.0,
                     }
-                label = (row.ncm_label or "").lower()
-                kt = (row.net_weight_kg or 0) / 1_000_000
+                label  = (row.ncm_label or "").lower()
+                kt     = (row.net_weight_kg or 0) / 1_000_000
+                fob_m  = (row.fob_usd or 0) / 1_000_000
                 if "ureia" in label or "urea" in label:
-                    months_data[m_str]["urea_kt"] += kt
+                    months_data[m_str]["urea_kt"]  += kt
+                    months_data[m_str]["urea_fob"] += fob_m
                 elif "kcl" in label or "cloreto de pot" in label or "potassio" in label or "potássio" in label:
-                    months_data[m_str]["kcl_kt"] += kt
+                    months_data[m_str]["kcl_kt"]   += kt
+                    months_data[m_str]["kcl_fob"]  += fob_m
                 elif "map" in label or "dap" in label or "fosfato" in label or "diamônio" in label or "diamonio" in label:
-                    months_data[m_str]["map_dap_kt"] += kt
-                months_data[m_str]["total_kt"]       += kt
-                months_data[m_str]["total_fob_usd_m"] += (row.fob_usd or 0) / 1_000_000
+                    months_data[m_str]["map_dap_kt"]  += kt
+                    months_data[m_str]["map_dap_fob"] += fob_m
+                months_data[m_str]["total_kt"]        += kt
+                months_data[m_str]["total_fob_usd_m"] += fob_m
 
-            # Round values
-            for entry in months_data.values():
-                entry["urea_kt"]        = round(entry["urea_kt"],        1)
-                entry["kcl_kt"]         = round(entry["kcl_kt"],         1)
-                entry["map_dap_kt"]     = round(entry["map_dap_kt"],     1)
-                entry["total_kt"]       = round(entry["total_kt"],       1)
-                entry["total_fob_usd_m"]= round(entry["total_fob_usd_m"],2)
+            # Compute implied FOB price (USD/mt) per type per month
+            def _implied_price(fob_m: float, kt: float) -> float | None:
+                """fob_m = millions USD, kt = kilotons → USD/mt"""
+                if kt < 0.5:   # ignore months with negligible volume
+                    return None
+                return round(fob_m * 1_000 / kt, 0)
 
-            last_import  = max(import_rows, key=lambda r: r.scraped_at)
-            imports_out  = {
+            sorted_months = sorted(months_data.values(), key=lambda x: x["month"])
+
+            # Round volume/value fields for output
+            monthly_out = []
+            for entry in sorted_months:
+                monthly_out.append({
+                    "month":           entry["month"],
+                    "urea_kt":         round(entry["urea_kt"],        1),
+                    "kcl_kt":          round(entry["kcl_kt"],         1),
+                    "map_dap_kt":      round(entry["map_dap_kt"],     1),
+                    "total_kt":        round(entry["total_kt"],       1),
+                    "total_fob_usd_m": round(entry["total_fob_usd_m"],2),
+                })
+
+            # Build price sparklines (last 7 months with valid data) per type
+            _COMEX_FERT = {
+                "urea":    {"name": "Urea (N)",  "kt_key": "urea_kt",    "fob_key": "urea_fob",    **_FERT_CONFIG["urea"]},
+                "map_dap": {"name": "MAP (P)",   "kt_key": "map_dap_kt", "fob_key": "map_dap_fob", **_FERT_CONFIG["dap"]},
+                "kcl":     {"name": "KCl (K)",   "kt_key": "kcl_kt",     "fob_key": "kcl_fob",     **_FERT_CONFIG["kcl"]},
+            }
+            for key, cfg in _COMEX_FERT.items():
+                prices_by_month = [
+                    (e["month"], _implied_price(e[cfg["fob_key"]], e[cfg["kt_key"]]))
+                    for e in sorted_months
+                ]
+                valid = [(m, p) for m, p in prices_by_month if p is not None]
+                if len(valid) < 2:
+                    continue
+                sparkline    = [p for _, p in valid[-7:]]
+                current_price = sparkline[-1]
+                prev_price    = sparkline[-2]
+                mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
+                comex_prices_as_of = valid[-1][0]  # "YYYY-MM"
+                comex_price_items.append({
+                    "name":             cfg["name"],
+                    "price_usd_mt":     current_price,
+                    "mom_pct":          round(mom_pct, 1),
+                    "sparkline":        sparkline,
+                    "input_weight":     cfg["input_weight"],
+                    "base_usd_per_bag": cfg["base_usd_per_bag"],
+                })
+
+            if comex_prices_as_of:
+                yr, mo = comex_prices_as_of.split("-")
+                _M = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+                      "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"}
+                comex_prices_as_of = f"{_M.get(mo, mo)}-{yr}"
+
+            last_import = max(import_rows, key=lambda r: r.scraped_at)
+            imports_out = {
                 "last_updated": last_import.scraped_at.strftime("%Y-%m-%d"),
-                "monthly":      sorted(months_data.values(), key=lambda x: x["month"]),
+                "monthly":      monthly_out,
             }
     except Exception as e:
         print(f"  [farmer_economics] fertilizer imports section error: {e}")
@@ -852,8 +905,10 @@ def export_farmer_economics(db) -> None:
         "weather":    weather_out,
         "enso":       enso_out,
         "fertilizer": {
-            "items":            fert_items_out,
-            "prices_as_of":     fert_prices_as_of,
+            # Prefer Comex-derived prices (same source as import volume, FOB Brazil)
+            # Fall back to World Bank if Comex data is insufficient
+            "items":            comex_price_items if comex_price_items else fert_items_out,
+            "prices_as_of":     comex_prices_as_of if comex_prices_as_of else fert_prices_as_of,
             "imports":          imports_out,
             "next_application": "May–Jun",
         },
