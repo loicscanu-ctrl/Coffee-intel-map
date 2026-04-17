@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import type { FarmerEconomicsData, RiskLevel, DayRisk, CurrentCondition, DroughtDayDetail } from "./farmerEconomicsData";
+import type { FarmerEconomicsData, RiskLevel, DayRisk, CurrentCondition } from "./farmerEconomicsData";
 
 interface Props {
   weather: NonNullable<FarmerEconomicsData["weather"]>;
@@ -27,60 +27,29 @@ const DROUGHT_CELL: Record<DayRisk, string> = {
   "-": "bg-slate-900 text-slate-600",
 };
 
-interface TooltipState {
-  region: string;
-  dayIndex: number;
-  detail: DroughtDayDetail;
-  x: number;
-  y: number;
+function vpdCellClass(vpd: number): string {
+  if (vpd > 2.5) return "bg-red-800 text-white";
+  if (vpd > 1.5) return "bg-orange-700 text-white";
+  if (vpd > 0.5) return "bg-yellow-700 text-white";
+  return "bg-green-900 text-green-300";
 }
 
-function DroughtTooltip({ tip }: { tip: TooltipState }) {
-  const d = tip.detail;
+function rainCellClass(pp: number): string {
+  if (pp < 15)  return "bg-red-800 text-white";
+  if (pp < 35)  return "bg-orange-700 text-white";
+  if (pp < 60)  return "bg-yellow-700 text-white";
+  return "bg-green-900 text-green-300";
+}
 
-  const vpdScore = d.vpd > 2.5 ? 3 : d.vpd > 1.5 ? 2 : d.vpd > 0.5 ? 1 : 0;
-  const ppScore  = d.precip_prob < 15 ? 3 : d.precip_prob < 35 ? 2 : d.precip_prob < 60 ? 1 : 0;
-  const modifier = d.soil_moisture > 0.28 ? "×0.50" : d.soil_moisture > 0.20 ? "×0.75" : d.soil_moisture < 0.15 ? "×1.50" : "×1.00";
-  const modifierColor = d.soil_moisture > 0.28 ? "text-green-400" : d.soil_moisture < 0.15 ? "text-red-400" : "text-slate-400";
-
-  return (
-    <div
-      className="fixed z-50 bg-slate-900 border border-slate-600 rounded-lg p-3 shadow-xl text-[10px] w-44 pointer-events-none"
-      style={{ left: tip.x + 12, top: tip.y - 10 }}
-    >
-      <div className="text-slate-300 font-semibold mb-2">{tip.region} · {d.date.slice(5)}</div>
-      <div className="space-y-1">
-        <div className="flex justify-between">
-          <span className="text-slate-500">VPD</span>
-          <span className="text-slate-200">{d.vpd.toFixed(2)} kPa <span className="text-slate-500">(score {vpdScore})</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-slate-500">Rain prob</span>
-          <span className="text-slate-200">{d.precip_prob}% <span className="text-slate-500">(score {ppScore})</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-slate-500">Root-zone SM</span>
-          <span className="text-slate-200">{d.soil_moisture.toFixed(3)} m³/m³</span>
-        </div>
-        <div className="flex justify-between border-t border-slate-700 pt-1 mt-1">
-          <span className="text-slate-500">Soil modifier</span>
-          <span className={modifierColor}>{modifier}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-slate-500">Result</span>
-          <span className={
-            d.drought_risk === "H" ? "text-amber-400 font-bold" :
-            d.drought_risk === "M" ? "text-amber-300 font-bold" :
-            d.drought_risk === "L" ? "text-green-400 font-bold" : "text-slate-500"
-          }>{d.drought_risk === "-" ? "—" : d.drought_risk}</span>
-        </div>
-      </div>
-    </div>
-  );
+function soilCellClass(sm: number): string {
+  if (sm > 0.28) return "bg-green-900 text-green-300";
+  if (sm > 0.20) return "bg-yellow-700 text-white";
+  if (sm > 0.15) return "bg-orange-700 text-white";
+  return "bg-red-800 text-white";
 }
 
 export default function WeatherRiskPanel({ weather }: Props) {
-  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
 
   const today = new Date();
   const dayLabels = Array.from({ length: 14 }, (_, i) => {
@@ -145,10 +114,13 @@ export default function WeatherRiskPanel({ weather }: Props) {
         </div>
       )}
 
-      {/* 14-day drought grid */}
+      {/* 14-day drought grid with expandable driver rows */}
       {weather.daily_drought.length > 0 && (
         <div>
-          <div className="text-[9px] text-amber-400 mb-1">14-Day Drought Risk</div>
+          <div className="text-[9px] text-amber-400 mb-1">
+            14-Day Drought Risk
+            <span className="text-slate-600 ml-1 normal-case font-normal">— click region to see drivers</span>
+          </div>
           <div className="overflow-x-auto">
             <table className="text-[8px] border-collapse w-full">
               <thead>
@@ -162,42 +134,86 @@ export default function WeatherRiskPanel({ weather }: Props) {
               <tbody>
                 {weather.daily_drought.map((row) => {
                   const detail = weather.drought_detail?.find(r => r.region === row.region);
+                  const isExpanded = expandedRegion === row.region;
+
                   return (
                     <React.Fragment key={row.region}>
+                      {/* Risk row */}
                       <tr>
-                        <td className="text-slate-400 pr-2 py-0.5 truncate max-w-[80px]">{row.region}</td>
-                        {row.days.map((d, i) => {
-                          const dayDetail = detail?.days[i];
-                          return (
-                            <td
-                              key={i}
-                              className={`text-center py-0.5 cursor-default ${DROUGHT_CELL[d]}`}
-                              onMouseEnter={dayDetail ? (e) => setTooltip({
-                                region: row.region,
-                                dayIndex: i,
-                                detail: dayDetail,
-                                x: e.clientX,
-                                y: e.clientY,
-                              }) : undefined}
-                              onMouseMove={dayDetail ? (e) => setTooltip(t => t ? { ...t, x: e.clientX, y: e.clientY } : null) : undefined}
-                              onMouseLeave={() => setTooltip(null)}
-                            >
-                              {d}
-                            </td>
-                          );
-                        })}
+                        <td
+                          className="text-slate-300 pr-2 py-0.5 truncate max-w-[80px] cursor-pointer select-none hover:text-amber-400 transition-colors"
+                          onClick={() => setExpandedRegion(isExpanded ? null : row.region)}
+                        >
+                          <span className="mr-0.5">{isExpanded ? "▼" : "▶"}</span>
+                          {row.region}
+                        </td>
+                        {row.days.map((d, i) => (
+                          <td key={i} className={`text-center py-0.5 ${DROUGHT_CELL[d]}`}>{d}</td>
+                        ))}
                       </tr>
+
+                      {/* Expanded driver rows */}
+                      {isExpanded && detail && (
+                        <>
+                          {/* VPD row */}
+                          <tr>
+                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">VPD kPa</td>
+                            {detail.days.map((d, i) => (
+                              <td key={i} className={`text-center py-0.5 ${vpdCellClass(d.vpd)}`}>
+                                {d.vpd.toFixed(1)}
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Rain row */}
+                          <tr>
+                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Rain %</td>
+                            {detail.days.map((d, i) => (
+                              <td key={i} className={`text-center py-0.5 ${rainCellClass(d.precip_prob)}`}>
+                                {d.precip_prob}
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Soil moisture row */}
+                          <tr className="border-b border-slate-700">
+                            <td className="text-slate-600 pr-2 py-0.5 pl-2 italic">Soil SM</td>
+                            {detail.days.map((d, i) => (
+                              <td key={i} className={`text-center py-0.5 ${soilCellClass(d.soil_moisture)}`}>
+                                {d.soil_moisture.toFixed(2)}
+                              </td>
+                            ))}
+                          </tr>
+                        </>
+                      )}
                     </React.Fragment>
                   );
                 })}
               </tbody>
             </table>
           </div>
+
+          {/* Legend */}
+          <div className="flex gap-3 mt-2 flex-wrap">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-red-800" />
+              <span className="text-[7px] text-slate-500">High stress</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-orange-700" />
+              <span className="text-[7px] text-slate-500">Moderate</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-yellow-700" />
+              <span className="text-[7px] text-slate-500">Low</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-green-900" />
+              <span className="text-[7px] text-slate-500">No stress</span>
+            </div>
+          </div>
         </div>
       )}
-      {tooltip && <DroughtTooltip tip={tooltip} />}
 
-      {/* Current Conditions (replaces Forecast Accuracy chart) */}
+      {/* Current Conditions */}
       {weather.current_conditions.length > 0 && (
         <div>
           <div className="text-[9px] text-slate-400 mb-2">Current Conditions (Today)</div>
