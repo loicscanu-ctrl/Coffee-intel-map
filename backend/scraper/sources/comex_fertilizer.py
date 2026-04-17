@@ -149,10 +149,9 @@ async def run(page, db) -> None:  # noqa: ARG001  (page unused — kept for sign
 
         today      = date.today()
         this_year  = today.year
-        prior_year = this_year - 1
 
         all_rows: list[dict] = []
-        for year in (prior_year, this_year):
+        for year in (this_year - 2, this_year - 1, this_year):
             year_rows = _stream_chapter31_rows(year)
             print(f"[comex_fertilizer] {year}: {len(year_rows)} Chapter-31 rows")
             all_rows.extend(year_rows)
@@ -161,8 +160,8 @@ async def run(page, db) -> None:  # noqa: ARG001  (page unused — kept for sign
             print("[comex_fertilizer] No rows found — retaining previous data")
             return
 
-        # Keep only last 12 months
-        cutoff = date(today.year - 1, today.month, 1)
+        # Keep last 36 months (3 years for YoY comparison)
+        cutoff = date(today.year - 3, today.month, 1)
         all_rows = [r for r in all_rows if r["month"] >= cutoff]
 
         # Aggregate: sum kg and fob per (month, ncm_code)

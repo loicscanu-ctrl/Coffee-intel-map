@@ -661,7 +661,7 @@ def export_farmer_economics(db) -> None:
     imports_out = None
     try:
         today = date.today()
-        cutoff_date = date(today.year - 1, today.month, 1)
+        cutoff_date = date(today.year - 3, today.month, 1)
 
         import_rows = (
             db.query(FertilizerImport)
