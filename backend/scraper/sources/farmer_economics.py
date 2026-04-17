@@ -26,7 +26,8 @@ OPEN_METEO_URL = (
     "https://api.open-meteo.com/v1/forecast"
     "?latitude={lat}&longitude={lon}"
     "&hourly=temperature_2m,dew_point_2m,cloud_cover,wind_speed_10m,precipitation_probability"
-    ",soil_moisture_0_to_7cm,soil_moisture_7_to_28cm,soil_moisture_28_to_100cm,soil_moisture_100_to_255cm"
+    ",soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm"
+    ",soil_moisture_9_to_27cm,soil_moisture_27_to_81cm"
     "&forecast_days=14&timezone=America/Sao_Paulo"
 )
 
@@ -84,17 +85,16 @@ def _frost_risk(min_temp: float, cloud_cover: float, wind_kmh: float, dew_point:
     return "-"
 
 
-def _root_zone_moisture(sm_0_7: float, sm_7_28: float, sm_28_100: float, sm_100_255: float) -> float:
+def _root_zone_moisture(sm_0_9: float, sm_9_27: float, sm_27_81: float) -> float:
     """Weighted root-zone soil moisture for coffee (m³/m³).
 
-    Weights reflect the depth distribution of active arabica roots in
-    Brazilian red latosol soils:
-        0–7 cm    (10%): surface layer, dries quickly, low root density
-        7–28 cm   (25%): shallow root zone
-        28–100 cm (45%): functional engine room — bulk of active roots
-        100–255 cm (20%): deep reserve / drought insurance
+    Uses Open-Meteo forecast depth bands (deepest available: 27–81 cm).
+    Weights reflect arabica root distribution in Brazilian red latosol:
+        0–9 cm   (10%): surface — dries quickly, low root density
+        9–27 cm  (25%): shallow root zone
+        27–81 cm (65%): engine room + deep reserve (combined, deepest layer available)
     """
-    return sm_0_7 * 0.10 + sm_7_28 * 0.25 + sm_28_100 * 0.45 + sm_100_255 * 0.20
+    return sm_0_9 * 0.10 + sm_9_27 * 0.25 + sm_27_81 * 0.65
 
 
 def _drought_risk(precip_prob: float, vpd: float, root_zone_sm: float, month: int) -> str:
@@ -111,9 +111,11 @@ def _drought_risk(precip_prob: float, vpd: float, root_zone_sm: float, month: in
         Sep–Oct (fruit fill / ripening onset): VPD 75% + Rain 25%
         All other months: VPD 60% + Rain 40%
 
-    Step C — Root-zone soil moisture gate:
-        > 0.30 m³/m³ → cap at L  (wet-feet buffer; tree not stressed)
-        < 0.15 m³/m³ → composite × 1.5  (empty reservoir penalty)
+    Step C — Root-zone soil moisture modifier (multiplicative, never a hard cap):
+        > 0.28 m³/m³ → composite × 0.50  (strong buffer; H still reachable at extreme VPD)
+        > 0.20 m³/m³ → composite × 0.75  (moderate buffer)
+        0.15–0.20    → composite × 1.00  (neutral)
+        < 0.15       → composite × 1.50  (empty reservoir amplifier)
 
     Step D — Classify: ≥ 2.0 → H,  ≥ 1.0 → M,  ≥ 0.4 → L,  else → —
     """
@@ -143,13 +145,13 @@ def _drought_risk(precip_prob: float, vpd: float, root_zone_sm: float, month: in
     else:
         composite = vpd_score * 0.60 + pp_score * 0.40
 
-    # Step C — root-zone soil moisture gate
-    if root_zone_sm > 0.30:
-        if composite >= 0.4:
-            return "L"
-        return "-"
+    # Step C — soil moisture modifier (multiplicative, never a hard cap)
+    if root_zone_sm > 0.28:
+        composite *= 0.50
+    elif root_zone_sm > 0.20:
+        composite *= 0.75
     elif root_zone_sm < 0.15:
-        composite *= 1.5
+        composite *= 1.50
 
     # Step D — classify
     if composite >= 2.0:
@@ -187,10 +189,12 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
     cloud  = hourly["cloud_cover"]
     wind   = hourly["wind_speed_10m"]
     precip = hourly["precipitation_probability"]
-    sm0    = hourly.get("soil_moisture_0_to_7cm",    [])
-    sm1    = hourly.get("soil_moisture_7_to_28cm",   [])
-    sm2    = hourly.get("soil_moisture_28_to_100cm", [])
-    sm3    = hourly.get("soil_moisture_100_to_255cm",[])
+    sm0    = hourly.get("soil_moisture_0_to_1cm",  [])
+    sm1    = hourly.get("soil_moisture_1_to_3cm",  [])
+    sm2    = hourly.get("soil_moisture_3_to_9cm",  [])
+    sm3    = hourly.get("soil_moisture_9_to_27cm", [])
+    sm4    = hourly.get("soil_moisture_27_to_81cm",[])
+
 
     def _safe(arr: list, i: int):
         return arr[i] if i < len(arr) else None
@@ -214,6 +218,7 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
         sm1_day    = [v for v in (_safe(sm1, i) for i in idxs) if v is not None]
         sm2_day    = [v for v in (_safe(sm2, i) for i in idxs) if v is not None]
         sm3_day    = [v for v in (_safe(sm3, i) for i in idxs) if v is not None]
+        sm4_day    = [v for v in (_safe(sm4, i) for i in idxs) if v is not None]
 
         if not temps_day:
             continue
@@ -222,12 +227,13 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
         max_t  = max(temps_day)
         pp_max = max(precip_day) if precip_day else 0.0
 
-        # Four-layer root-zone moisture (neutral fallback per layer if missing)
-        mean_sm0 = sum(sm0_day) / len(sm0_day) if sm0_day else 0.20
-        mean_sm1 = sum(sm1_day) / len(sm1_day) if sm1_day else 0.20
-        mean_sm2 = sum(sm2_day) / len(sm2_day) if sm2_day else 0.20
-        mean_sm3 = sum(sm3_day) / len(sm3_day) if sm3_day else 0.20
-        root_zone = _root_zone_moisture(mean_sm0, mean_sm1, mean_sm2, mean_sm3)
+        # Three-band root-zone moisture (surface avg / shallow / deep)
+        # Surface 0–9 cm: average of the three shallowest bands
+        surface_vals = sm0_day + sm1_day + sm2_day
+        mean_surface = sum(surface_vals) / len(surface_vals) if surface_vals else 0.22
+        mean_sm3 = sum(sm3_day) / len(sm3_day) if sm3_day else 0.22
+        mean_sm4 = sum(sm4_day) / len(sm4_day) if sm4_day else 0.24
+        root_zone = _root_zone_moisture(mean_surface, mean_sm3, mean_sm4)
 
         # --- Frost: use cloud/wind/dew at the hour of minimum temperature ---
         min_idx = min(idxs, key=lambda i: temp[i] if temp[i] is not None else float("inf"))
