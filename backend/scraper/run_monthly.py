@@ -21,7 +21,7 @@ async def run_monthly_scrapers():
             browser = await pw.chromium.launch(headless=True)
             page    = await browser.new_page()
             try:
-                conab_supply.run(db)
+                await conab_supply.run(page, db)
                 print("[scraper-monthly] conab_supply: OK")
             except Exception as e:
                 print(f"[scraper-monthly] conab_supply failed: {e}")
