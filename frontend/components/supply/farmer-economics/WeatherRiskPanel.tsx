@@ -103,7 +103,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
                     <tr>
                       <td className="text-slate-400 pr-2 py-0.5 truncate max-w-[80px]">{row.region}</td>
                       {row.days.map((d, i) => (
-                        <td key={i} className={`text-center py-0.5 ${FROST_CELL[d]}`}>{d}</td>
+                        <td key={i} className={`text-center py-0.5 ${FROST_CELL[d]}`}>{d === "-" ? "" : d}</td>
                       ))}
                     </tr>
                   </React.Fragment>
@@ -148,7 +148,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
                           {row.region}
                         </td>
                         {row.days.map((d, i) => (
-                          <td key={i} className={`text-center py-0.5 ${DROUGHT_CELL[d]}`}>{d}</td>
+                          <td key={i} className={`text-center py-0.5 ${DROUGHT_CELL[d]}`}>{d === "-" ? "" : d}</td>
                         ))}
                       </tr>
 
