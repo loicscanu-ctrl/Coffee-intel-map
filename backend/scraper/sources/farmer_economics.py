@@ -176,22 +176,23 @@ def _apply_drought_modifiers(days: list[dict], region_name: str) -> list[dict]:
     """
     PHENO = {8: 1.2, 9: 1.2, 10: 1.2, 1: 1.1, 2: 1.1}
 
-    # Apply phenology + Robusta override, store adjusted score
+    # Step 1 — Apply phenology only (no Robusta override yet)
     for day in days:
         month = int(day["date"][5:7])
         score = day.get("_drought_score_raw", 0.0)
         score *= PHENO.get(month, 1.0)
-        if region_name == "Espírito Santo" and day.get("vpd", 0.0) > 1.5:
-            score = max(score, 2.0)
         day["_drought_score"] = score
 
-    # Persistence penalty
+    # Step 2 — Persistence penalty (based on natural formula, before override)
     stressed = sum(1 for d in days if d["_drought_score"] > 1.0)
     penalty = 0.5 if len(days) >= 14 and stressed >= 10 else 0.0
 
-    # Final classify
+    # Step 3 — Final classify, applying Robusta override AFTER persistence
     for day in days:
         score = day["_drought_score"] + penalty
+        # Robusta override: floor at 1.5 (bottom of M) when VPD > 1.5 kPa
+        if region_name == "Espírito Santo" and day.get("vpd", 0.0) > 1.5:
+            score = max(score, 1.5)
         if score >= 2.5:
             day["drought_risk"] = "H"
         elif score >= 1.5:
