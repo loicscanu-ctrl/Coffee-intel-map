@@ -52,24 +52,70 @@ _MONTH_ABBR = {
 # Pure parsing helpers (no I/O, fully testable)
 # ---------------------------------------------------------------------------
 
-def _frost_risk(min_temp: float) -> str:
-    """Return H/M/L/- frost risk based on minimum temperature (°C)."""
-    if min_temp < 4:
+def _vpd_kpa(temp_c: float, dew_point_c: float) -> float:
+    """Vapour pressure deficit in kPa, computed from temperature and dew point."""
+    import math
+    e_sat = 0.6108 * math.exp(17.27 * temp_c    / (temp_c    + 237.3))
+    e_act = 0.6108 * math.exp(17.27 * dew_point_c / (dew_point_c + 237.3))
+    return max(0.0, round(e_sat - e_act, 3))
+
+
+def _frost_risk(min_temp: float, cloud_cover: float, wind_kmh: float, dew_point: float) -> str:
+    """Estimate leaf-surface temperature and return frost risk (H/M/L/-).
+
+    Radiation cooling lowers the surface below the 2m air temperature on
+    clear, calm nights. Formula:
+        T_surface = min_temp
+                    − (1 − cloud/100) × max(0, 5 − 0.4 × wind_kmh)
+                    − 0.5  if dew_point < 2°C  (dry air amplifies cooling)
+
+    Thresholds (°C):  < 0 → H,  0–3 → M,  3–6 → L,  ≥ 6 → —
+    """
+    radiation_cooling = (1 - cloud_cover / 100) * max(0.0, 5.0 - 0.4 * wind_kmh)
+    dew_correction    = 0.5 if dew_point < 2.0 else 0.0
+    t_surface = min_temp - radiation_cooling - dew_correction
+    if t_surface < 0:
         return "H"
-    if min_temp < 8:
+    if t_surface < 3:
         return "M"
-    if min_temp < 12:
+    if t_surface < 6:
         return "L"
     return "-"
 
 
-def _drought_risk(precip_prob: float) -> str:
-    """Return H/M/L/- drought risk based on max precipitation probability (%)."""
+def _drought_risk(precip_prob: float, vpd: float) -> str:
+    """Composite drought risk from VPD and precipitation probability (H/M/L/-).
+
+    VPD score  (weight 0.60): H > 2.5 kPa, M > 1.5, L > 0.8
+    Precip score (weight 0.40): H < 15%, M < 35%, L < 60%
+
+    Each component scores 0–3; weighted sum:
+        ≥ 2.0 → H,  ≥ 1.0 → M,  ≥ 0.4 → L,  < 0.4 → —
+    """
+    if vpd > 2.5:
+        vpd_score = 3
+    elif vpd > 1.5:
+        vpd_score = 2
+    elif vpd > 0.8:
+        vpd_score = 1
+    else:
+        vpd_score = 0
+
     if precip_prob < 15:
+        pp_score = 3
+    elif precip_prob < 35:
+        pp_score = 2
+    elif precip_prob < 60:
+        pp_score = 1
+    else:
+        pp_score = 0
+
+    composite = vpd_score * 0.60 + pp_score * 0.40
+    if composite >= 2.0:
         return "H"
-    if precip_prob < 35:
+    if composite >= 1.0:
         return "M"
-    if precip_prob < 60:
+    if composite >= 0.4:
         return "L"
     return "-"
 
@@ -82,11 +128,16 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
         time, temperature_2m, dew_point_2m, cloud_cover,
         wind_speed_10m, precipitation_probability
 
-    Returns a list of dicts, one per calendar day present in the data.
-    Each dict: {date, min_temp, max_temp, dew_point, cloud_cover,
-                wind_speed, precip_prob, frost_risk, drought_risk}
+    Frost risk uses conditions at the hour of minimum temperature (cloud,
+    wind, dew point at that moment, not daily averages) because radiation
+    frost is most severe when the air is coldest.
+
+    Drought risk uses daily-max VPD (max_temp + mean dew point) combined
+    with daily-max precipitation probability.
+
+    Returns a list of dicts, one per calendar day.
     """
-    times = hourly["time"]
+    times  = hourly["time"]
     temp   = hourly["temperature_2m"]
     dew    = hourly["dew_point_2m"]
     cloud  = hourly["cloud_cover"]
@@ -114,16 +165,32 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
         max_t  = max(temps_day)
         pp_max = max(precip_day) if precip_day else 0.0
 
+        # --- Frost: use cloud/wind/dew at the hour of minimum temperature ---
+        min_idx = min(idxs, key=lambda i: temp[i] if temp[i] is not None else float("inf"))
+        cloud_at_min = cloud[min_idx] if cloud[min_idx] is not None else (
+            sum(cloud_day) / len(cloud_day) if cloud_day else 0.0
+        )
+        wind_at_min  = wind[min_idx]  if wind[min_idx]  is not None else (
+            max(wind_day) if wind_day else 0.0
+        )
+        dew_at_min   = dew[min_idx]   if dew[min_idx]   is not None else (
+            sum(dew_day) / len(dew_day) if dew_day else 0.0
+        )
+
+        # --- Drought: VPD from daily max temp and mean dew point ---
+        mean_dew = sum(dew_day) / len(dew_day) if dew_day else 0.0
+        vpd = _vpd_kpa(max_t, mean_dew)
+
         days.append({
             "date":         day_str,
             "min_temp":     round(min_t, 1),
             "max_temp":     round(max_t, 1),
-            "dew_point":    round(sum(dew_day)   / len(dew_day),   1) if dew_day   else 0.0,
-            "cloud_cover":  round(sum(cloud_day)  / len(cloud_day), 1) if cloud_day else 0.0,
+            "dew_point":    round(mean_dew, 1),
+            "cloud_cover":  round(sum(cloud_day) / len(cloud_day), 1) if cloud_day else 0.0,
             "wind_speed":   round(max(wind_day), 1) if wind_day else 0.0,
             "precip_prob":  round(pp_max, 1),
-            "frost_risk":   _frost_risk(min_t),
-            "drought_risk": _drought_risk(pp_max),
+            "frost_risk":   _frost_risk(min_t, cloud_at_min, wind_at_min, dew_at_min),
+            "drought_risk": _drought_risk(pp_max, vpd),
         })
 
     return days

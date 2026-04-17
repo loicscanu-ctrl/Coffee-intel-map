@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-17T00:02:16.267473Z",
+  "scraped_at": "2026-04-17T04:56:34.706072Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -58,7 +58,7 @@
     "source_label": "CONAB Safra Apr 2026"
   },
   "weather": {
-    "scraped_at": "2026-04-16T11:46:39.065855Z",
+    "scraped_at": "2026-04-17T04:56:14.348510Z",
     "regions": [
       {
         "name": "Sul de Minas",
@@ -88,18 +88,18 @@
         "days": [
           "H",
           "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
           "M",
           "M",
-          "H",
-          "H",
-          "H",
-          "H",
-          "H",
           "M",
-          "-",
-          "L",
-          "L",
-          "L"
+          "M",
+          "H"
         ]
       },
       {
@@ -112,82 +112,82 @@
           "H",
           "H",
           "H",
-          "M",
           "H",
           "H",
-          "M",
-          "L",
-          "M",
-          "M"
+          "H",
+          "H",
+          "H",
+          "H",
+          "H"
         ]
       },
       {
         "region": "Paran\u00e1",
         "days": [
           "H",
-          "L",
-          "M",
           "H",
           "H",
-          "M",
-          "L",
-          "L",
           "H",
-          "M",
-          "M",
-          "M",
-          "L",
-          "L"
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H"
         ]
       },
       {
         "region": "Esp\u00edrito Santo",
         "days": [
+          "M",
           "H",
           "H",
           "H",
-          "L",
-          "L",
           "H",
           "H",
-          "L",
+          "H",
+          "M",
           "M",
           "H",
           "M",
-          "L",
           "M",
-          "M"
+          "M",
+          "H"
         ]
       }
     ],
     "current_conditions": [
       {
         "region": "Sul de Minas",
-        "temp_c": 25.4,
-        "dew_point_c": 12.9,
-        "cloud_cover_pct": 38.0,
-        "wind_speed_kmh": 5.5
+        "temp_c": 27.0,
+        "dew_point_c": 13.7,
+        "cloud_cover_pct": 41.3,
+        "wind_speed_kmh": 9.1
       },
       {
         "region": "Cerrado",
-        "temp_c": 28.3,
-        "dew_point_c": 14.7,
-        "cloud_cover_pct": 31.3,
-        "wind_speed_kmh": 10.0
+        "temp_c": 29.1,
+        "dew_point_c": 15.2,
+        "cloud_cover_pct": 52.2,
+        "wind_speed_kmh": 6.3
       },
       {
         "region": "Paran\u00e1",
-        "temp_c": 28.3,
-        "dew_point_c": 17.0,
-        "cloud_cover_pct": 80.1,
-        "wind_speed_kmh": 11.7
+        "temp_c": 29.9,
+        "dew_point_c": 17.6,
+        "cloud_cover_pct": 40.8,
+        "wind_speed_kmh": 13.3
       },
       {
         "region": "Esp\u00edrito Santo",
-        "temp_c": 26.5,
-        "dew_point_c": 16.5,
-        "cloud_cover_pct": 48.5,
-        "wind_speed_kmh": 9.1
+        "temp_c": 26.4,
+        "dew_point_c": 17.2,
+        "cloud_cover_pct": 82.7,
+        "wind_speed_kmh": 8.1
       }
     ]
   },
@@ -301,7 +301,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Brazil arabica output expected",
-    "last_updated": "2026-04-16"
+    "last_updated": "2026-04-17"
   },
   "fertilizer": {
     "items": [
