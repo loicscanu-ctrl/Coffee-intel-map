@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-17T10:47:09.152936Z",
+  "scraped_at": "2026-04-17T10:54:46.318438Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -765,6 +765,7 @@
         "base_usd_per_bag": 13.5
       }
     ],
+    "prices_as_of": "Dec-2024",
     "imports": {
       "last_updated": "2026-04-17",
       "monthly": [

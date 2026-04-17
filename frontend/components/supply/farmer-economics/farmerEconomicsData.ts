@@ -118,6 +118,7 @@ export interface FarmerEconomicsData {
   } | null;
   fertilizer: {
     items: FertilizerItem[];
+    prices_as_of?: string;   // e.g. "Feb-2026" — last month in World Bank Pink Sheet
     imports: {
       last_updated: string;
       monthly: FertilizerImportMonth[];

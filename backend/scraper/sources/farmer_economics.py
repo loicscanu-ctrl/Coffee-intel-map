@@ -495,10 +495,31 @@ def _parse_world_bank_excel(content: bytes) -> dict:
                 vals.append(float(v))
         return vals[-7:] if len(vals) >= 7 else vals
 
+    # Step 5: find last month string that has data for at least one commodity
+    last_data_month = None
+    _MONTH_MAP = {
+        "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+        "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec",
+    }
+    for row in reversed(data_rows):
+        if not row or not isinstance(row[0], str):
+            continue
+        has_data = any(
+            isinstance(row[col_map[k]], (int, float))
+            for k in col_map
+            if col_map[k] < len(row)
+        )
+        if has_data:
+            raw = row[0].strip()  # e.g. "2026M02"
+            yr, mo = raw[:4], raw[5:7]
+            last_data_month = f"{_MONTH_MAP.get(mo, mo)}-{yr}"
+            break
+
     return {
-        "urea_monthly": _extract("urea"),
-        "dap_monthly":  _extract("dap"),
-        "kcl_monthly":  _extract("kcl"),
+        "urea_monthly":    _extract("urea"),
+        "dap_monthly":     _extract("dap"),
+        "kcl_monthly":     _extract("kcl"),
+        "last_data_month": last_data_month,
     }
 
 

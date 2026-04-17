@@ -630,6 +630,7 @@ def export_farmer_economics(db) -> None:
 
     # ── Fertilizer prices ─────────────────────────────────────────────────────
     fert_items_out = []
+    fert_prices_as_of = None
     try:
         wb_item = (
             db.query(NewsItem)
@@ -639,6 +640,7 @@ def export_farmer_economics(db) -> None:
         )
         if wb_item:
             meta = json.loads(wb_item.meta or "{}")
+            fert_prices_as_of = meta.get("last_data_month")  # e.g. "Feb-2026"
             for key, cfg in _FERT_CONFIG.items():
                 monthly = meta.get(f"{key}_monthly", [])
                 if len(monthly) < 2:
@@ -851,6 +853,7 @@ def export_farmer_economics(db) -> None:
         "enso":       enso_out,
         "fertilizer": {
             "items":            fert_items_out,
+            "prices_as_of":     fert_prices_as_of,
             "imports":          imports_out,
             "next_application": "May–Jun",
         },

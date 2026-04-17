@@ -84,7 +84,14 @@ export default function FertilizerPanel({ fertilizer }: Props) {
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
-      <div className="text-[10px] text-slate-400 uppercase tracking-wide">Fertilizer Prices</div>
+      <div className="text-[10px] text-slate-400 uppercase tracking-wide flex items-baseline justify-between">
+        <span>Fertilizer Prices</span>
+        {fertilizer.prices_as_of && (
+          <span className="text-[8px] text-slate-600 normal-case font-normal">
+            World Bank · {fertilizer.prices_as_of}
+          </span>
+        )}
+      </div>
 
       <div className="flex gap-3">
         {fertilizer.items.map((item) => (
