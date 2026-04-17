@@ -1,16 +1,68 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-16T12:02:28.993026Z",
-  "cost": null,
-  "acreage": null,
-  "yield": null,
+  "scraped_at": "2026-04-17T04:16:21.103299Z",
+  "cost": {
+    "total_usd_per_bag": 188.9,
+    "yoy_pct": 0.0,
+    "season_label": "CONAB Custos Apr 2026",
+    "components": [
+      {
+        "label": "Mechanization",
+        "color": "#f59e0b",
+        "brl": 40.66,
+        "usd": 8.15,
+        "share": 0.0554
+      },
+      {
+        "label": "Labor",
+        "color": "#22c55e",
+        "brl": 400.39,
+        "usd": 80.29,
+        "share": 0.5458
+      },
+      {
+        "label": "Admin",
+        "color": "#475569",
+        "brl": 26.23,
+        "usd": 5.26,
+        "share": 0.0358
+      },
+      {
+        "label": "Inputs",
+        "color": "#3b82f6",
+        "brl": 225.98,
+        "usd": 45.31,
+        "share": 0.308
+      },
+      {
+        "label": "Land rent",
+        "color": "#8b5cf6",
+        "brl": 40.39,
+        "usd": 8.1,
+        "share": 0.0551
+      }
+    ],
+    "inputs_detail": [],
+    "kc_spot": null,
+    "last_updated": "2026-04-16"
+  },
+  "acreage": {
+    "thousand_ha": 1935.2,
+    "yoy_pct": 0.0,
+    "source_label": "CONAB Safra Apr 2026"
+  },
+  "yield": {
+    "bags_per_ha": 34.2,
+    "yoy_pct": 0.0,
+    "source_label": "CONAB Safra Apr 2026"
+  },
   "weather": {
-    "scraped_at": "2026-04-16T11:46:39.065855Z",
+    "scraped_at": "2026-04-17T04:16:08.037076Z",
     "regions": [
       {
         "name": "Sul de Minas",
-        "frost": "NONE",
+        "frost": "LOW",
         "drought": "HIGH"
       },
       {
@@ -29,25 +81,45 @@
         "drought": "HIGH"
       }
     ],
-    "daily_frost": [],
+    "daily_frost": [
+      {
+        "region": "Sul de Minas",
+        "days": [
+          "L",
+          "-",
+          "-",
+          "-",
+          "L",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-"
+        ]
+      }
+    ],
     "daily_drought": [
       {
         "region": "Sul de Minas",
         "days": [
           "H",
-          "H",
-          "M",
           "M",
           "H",
           "H",
           "H",
           "H",
           "H",
+          "H",
           "M",
-          "-",
           "L",
           "L",
-          "L"
+          "L",
+          "L",
+          "M"
         ]
       },
       {
@@ -60,11 +132,11 @@
           "H",
           "H",
           "H",
-          "M",
+          "H",
+          "H",
           "H",
           "H",
           "M",
-          "L",
           "M",
           "M"
         ]
@@ -72,20 +144,20 @@
       {
         "region": "Paran\u00e1",
         "days": [
+          "M",
+          "M",
           "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "H",
+          "M",
           "L",
           "M",
-          "H",
-          "H",
-          "M",
-          "L",
-          "L",
-          "H",
           "M",
           "M",
-          "M",
-          "L",
-          "L"
+          "M"
         ]
       },
       {
@@ -93,15 +165,15 @@
         "days": [
           "H",
           "H",
+          "M",
+          "M",
           "H",
-          "L",
-          "L",
           "H",
           "H",
-          "L",
           "M",
           "H",
           "M",
+          "L",
           "L",
           "M",
           "M"
@@ -111,31 +183,31 @@
     "current_conditions": [
       {
         "region": "Sul de Minas",
-        "temp_c": 25.4,
-        "dew_point_c": 12.9,
-        "cloud_cover_pct": 38.0,
-        "wind_speed_kmh": 5.5
+        "temp_c": 27.0,
+        "dew_point_c": 13.7,
+        "cloud_cover_pct": 41.3,
+        "wind_speed_kmh": 9.1
       },
       {
         "region": "Cerrado",
-        "temp_c": 28.3,
-        "dew_point_c": 14.7,
-        "cloud_cover_pct": 31.3,
-        "wind_speed_kmh": 10.0
+        "temp_c": 29.1,
+        "dew_point_c": 15.2,
+        "cloud_cover_pct": 52.2,
+        "wind_speed_kmh": 6.3
       },
       {
         "region": "Paran\u00e1",
-        "temp_c": 28.3,
-        "dew_point_c": 17.0,
-        "cloud_cover_pct": 80.1,
-        "wind_speed_kmh": 11.7
+        "temp_c": 29.9,
+        "dew_point_c": 17.6,
+        "cloud_cover_pct": 40.8,
+        "wind_speed_kmh": 13.3
       },
       {
         "region": "Esp\u00edrito Santo",
-        "temp_c": 26.5,
-        "dew_point_c": 16.5,
-        "cloud_cover_pct": 48.5,
-        "wind_speed_kmh": 9.1
+        "temp_c": 26.4,
+        "dew_point_c": 17.2,
+        "cloud_cover_pct": 82.7,
+        "wind_speed_kmh": 8.1
       }
     ]
   },
@@ -249,7 +321,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Brazil arabica output expected",
-    "last_updated": "2026-04-16"
+    "last_updated": "2026-04-17"
   },
   "fertilizer": {
     "items": [
