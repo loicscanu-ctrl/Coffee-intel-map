@@ -33,13 +33,13 @@ export default function BrazilFarmerEconomics() {
         {data.acreage && data.yield && (
           <AcreageYieldPanel acreage={data.acreage} yield_={data.yield} />
         )}
+        <FertilizerPanel fertilizer={data.fertilizer} />
       </div>
 
       {/* ── Right: Risk Signals ─────────────────────────────────── */}
       <div className="space-y-4">
         {data.weather    && <WeatherRiskPanel weather={data.weather} />}
         {data.enso       && <EnsoPanel enso={data.enso} />}
-        <FertilizerPanel fertilizer={data.fertilizer} />
       </div>
     </div>
   );
