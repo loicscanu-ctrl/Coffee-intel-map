@@ -711,16 +711,19 @@ def export_farmer_economics(db) -> None:
 
             sorted_months = sorted(months_data.values(), key=lambda x: x["month"])
 
-            # Round volume/value fields for output
+            # Round volume/value fields for output, include implied price per type
             monthly_out = []
             for entry in sorted_months:
                 monthly_out.append({
-                    "month":           entry["month"],
-                    "urea_kt":         round(entry["urea_kt"],        1),
-                    "kcl_kt":          round(entry["kcl_kt"],         1),
-                    "map_dap_kt":      round(entry["map_dap_kt"],     1),
-                    "total_kt":        round(entry["total_kt"],       1),
-                    "total_fob_usd_m": round(entry["total_fob_usd_m"],2),
+                    "month":              entry["month"],
+                    "urea_kt":            round(entry["urea_kt"],        1),
+                    "kcl_kt":             round(entry["kcl_kt"],         1),
+                    "map_dap_kt":         round(entry["map_dap_kt"],     1),
+                    "total_kt":           round(entry["total_kt"],       1),
+                    "total_fob_usd_m":    round(entry["total_fob_usd_m"],2),
+                    "urea_price_usd_mt":    _implied_price(entry["urea_fob"],    entry["urea_kt"]),
+                    "kcl_price_usd_mt":     _implied_price(entry["kcl_fob"],     entry["kcl_kt"]),
+                    "map_dap_price_usd_mt": _implied_price(entry["map_dap_fob"], entry["map_dap_kt"]),
                 })
 
             # Build price sparklines (last 7 months with valid data) per type

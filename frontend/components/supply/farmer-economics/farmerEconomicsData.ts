@@ -74,12 +74,15 @@ export interface FertilizerItem {
 }
 
 export interface FertilizerImportMonth {
-  month: string;         // "2026-01"
+  month: string;                    // "2026-01"
   urea_kt: number;
   kcl_kt: number;
   map_dap_kt: number;
   total_kt: number;
   total_fob_usd_m: number;
+  urea_price_usd_mt:    number | null;
+  kcl_price_usd_mt:     number | null;
+  map_dap_price_usd_mt: number | null;
 }
 
 export interface FarmerEconomicsData {

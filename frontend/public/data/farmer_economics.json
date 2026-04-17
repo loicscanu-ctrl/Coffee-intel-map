@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-17T11:09:01.616636Z",
+  "scraped_at": "2026-04-17T11:12:09.314937Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -778,7 +778,10 @@
           "kcl_kt": 28.8,
           "map_dap_kt": 261.1,
           "total_kt": 2761.3,
-          "total_fob_usd_m": 806.46
+          "total_fob_usd_m": 806.46,
+          "urea_price_usd_mt": 325.0,
+          "kcl_price_usd_mt": 284.0,
+          "map_dap_price_usd_mt": 448.0
         },
         {
           "month": "2024-02",
@@ -786,7 +789,10 @@
           "kcl_kt": 11.2,
           "map_dap_kt": 333.2,
           "total_kt": 1926.4,
-          "total_fob_usd_m": 639.84
+          "total_fob_usd_m": 639.84,
+          "urea_price_usd_mt": 330.0,
+          "kcl_price_usd_mt": 289.0,
+          "map_dap_price_usd_mt": 485.0
         },
         {
           "month": "2024-03",
@@ -794,7 +800,10 @@
           "kcl_kt": 41.8,
           "map_dap_kt": 286.7,
           "total_kt": 2475.4,
-          "total_fob_usd_m": 728.38
+          "total_fob_usd_m": 728.38,
+          "urea_price_usd_mt": 344.0,
+          "kcl_price_usd_mt": 263.0,
+          "map_dap_price_usd_mt": 502.0
         },
         {
           "month": "2024-04",
@@ -802,7 +811,10 @@
           "kcl_kt": 44.7,
           "map_dap_kt": 463.1,
           "total_kt": 3019.8,
-          "total_fob_usd_m": 904.63
+          "total_fob_usd_m": 904.63,
+          "urea_price_usd_mt": 326.0,
+          "kcl_price_usd_mt": 254.0,
+          "map_dap_price_usd_mt": 495.0
         },
         {
           "month": "2024-05",
@@ -810,7 +822,10 @@
           "kcl_kt": 62.6,
           "map_dap_kt": 407.2,
           "total_kt": 3412.3,
-          "total_fob_usd_m": 997.89
+          "total_fob_usd_m": 997.89,
+          "urea_price_usd_mt": 292.0,
+          "kcl_price_usd_mt": 274.0,
+          "map_dap_price_usd_mt": 506.0
         },
         {
           "month": "2024-06",
@@ -818,7 +833,10 @@
           "kcl_kt": 32.3,
           "map_dap_kt": 511.7,
           "total_kt": 4168.7,
-          "total_fob_usd_m": 1305.69
+          "total_fob_usd_m": 1305.69,
+          "urea_price_usd_mt": 291.0,
+          "kcl_price_usd_mt": 272.0,
+          "map_dap_price_usd_mt": 517.0
         },
         {
           "month": "2024-07",
@@ -826,7 +844,10 @@
           "kcl_kt": 60.5,
           "map_dap_kt": 643.1,
           "total_kt": 4470.3,
-          "total_fob_usd_m": 1429.36
+          "total_fob_usd_m": 1429.36,
+          "urea_price_usd_mt": 317.0,
+          "kcl_price_usd_mt": 274.0,
+          "map_dap_price_usd_mt": 516.0
         },
         {
           "month": "2024-08",
@@ -834,7 +855,10 @@
           "kcl_kt": 21.5,
           "map_dap_kt": 699.7,
           "total_kt": 4889.8,
-          "total_fob_usd_m": 1551.1
+          "total_fob_usd_m": 1551.1,
+          "urea_price_usd_mt": 320.0,
+          "kcl_price_usd_mt": 285.0,
+          "map_dap_price_usd_mt": 524.0
         },
         {
           "month": "2024-09",
@@ -842,7 +866,10 @@
           "kcl_kt": 22.9,
           "map_dap_kt": 540.7,
           "total_kt": 4636.6,
-          "total_fob_usd_m": 1499.01
+          "total_fob_usd_m": 1499.01,
+          "urea_price_usd_mt": 324.0,
+          "kcl_price_usd_mt": 277.0,
+          "map_dap_price_usd_mt": 558.0
         },
         {
           "month": "2024-10",
@@ -850,7 +877,10 @@
           "kcl_kt": 36.0,
           "map_dap_kt": 638.2,
           "total_kt": 4932.1,
-          "total_fob_usd_m": 1508.96
+          "total_fob_usd_m": 1508.96,
+          "urea_price_usd_mt": 329.0,
+          "kcl_price_usd_mt": 265.0,
+          "map_dap_price_usd_mt": 531.0
         },
         {
           "month": "2024-11",
@@ -858,7 +888,10 @@
           "kcl_kt": 25.6,
           "map_dap_kt": 553.2,
           "total_kt": 4148.9,
-          "total_fob_usd_m": 1246.29
+          "total_fob_usd_m": 1246.29,
+          "urea_price_usd_mt": 337.0,
+          "kcl_price_usd_mt": 242.0,
+          "map_dap_price_usd_mt": 498.0
         },
         {
           "month": "2024-12",
@@ -866,7 +899,10 @@
           "kcl_kt": 9.4,
           "map_dap_kt": 266.9,
           "total_kt": 3436.0,
-          "total_fob_usd_m": 963.82
+          "total_fob_usd_m": 963.82,
+          "urea_price_usd_mt": 331.0,
+          "kcl_price_usd_mt": 238.0,
+          "map_dap_price_usd_mt": 499.0
         },
         {
           "month": "2025-01",
@@ -874,7 +910,10 @@
           "kcl_kt": 10.3,
           "map_dap_kt": 442.0,
           "total_kt": 2990.1,
-          "total_fob_usd_m": 929.57
+          "total_fob_usd_m": 929.57,
+          "urea_price_usd_mt": 340.0,
+          "kcl_price_usd_mt": 234.0,
+          "map_dap_price_usd_mt": 528.0
         },
         {
           "month": "2025-02",
@@ -882,7 +921,10 @@
           "kcl_kt": 4.0,
           "map_dap_kt": 220.5,
           "total_kt": 2290.8,
-          "total_fob_usd_m": 726.14
+          "total_fob_usd_m": 726.14,
+          "urea_price_usd_mt": 369.0,
+          "kcl_price_usd_mt": 272.0,
+          "map_dap_price_usd_mt": 562.0
         },
         {
           "month": "2025-03",
@@ -890,7 +932,10 @@
           "kcl_kt": 11.1,
           "map_dap_kt": 289.0,
           "total_kt": 2609.0,
-          "total_fob_usd_m": 813.45
+          "total_fob_usd_m": 813.45,
+          "urea_price_usd_mt": 420.0,
+          "kcl_price_usd_mt": 268.0,
+          "map_dap_price_usd_mt": 577.0
         },
         {
           "month": "2025-04",
@@ -898,7 +943,10 @@
           "kcl_kt": 9.3,
           "map_dap_kt": 399.4,
           "total_kt": 3637.4,
-          "total_fob_usd_m": 1234.84
+          "total_fob_usd_m": 1234.84,
+          "urea_price_usd_mt": 369.0,
+          "kcl_price_usd_mt": 280.0,
+          "map_dap_price_usd_mt": 618.0
         },
         {
           "month": "2025-05",
@@ -906,7 +954,10 @@
           "kcl_kt": 23.1,
           "map_dap_kt": 440.2,
           "total_kt": 3741.2,
-          "total_fob_usd_m": 1260.57
+          "total_fob_usd_m": 1260.57,
+          "urea_price_usd_mt": 369.0,
+          "kcl_price_usd_mt": 295.0,
+          "map_dap_price_usd_mt": 591.0
         },
         {
           "month": "2025-06",
@@ -914,7 +965,10 @@
           "kcl_kt": 44.1,
           "map_dap_kt": 487.5,
           "total_kt": 4147.9,
-          "total_fob_usd_m": 1453.19
+          "total_fob_usd_m": 1453.19,
+          "urea_price_usd_mt": 373.0,
+          "kcl_price_usd_mt": 294.0,
+          "map_dap_price_usd_mt": 626.0
         },
         {
           "month": "2025-07",
@@ -922,7 +976,10 @@
           "kcl_kt": 26.7,
           "map_dap_kt": 467.5,
           "total_kt": 4793.8,
-          "total_fob_usd_m": 1739.62
+          "total_fob_usd_m": 1739.62,
+          "urea_price_usd_mt": 401.0,
+          "kcl_price_usd_mt": 279.0,
+          "map_dap_price_usd_mt": 604.0
         },
         {
           "month": "2025-08",
@@ -930,7 +987,10 @@
           "kcl_kt": 15.3,
           "map_dap_kt": 366.6,
           "total_kt": 5223.7,
-          "total_fob_usd_m": 1868.63
+          "total_fob_usd_m": 1868.63,
+          "urea_price_usd_mt": 413.0,
+          "kcl_price_usd_mt": 299.0,
+          "map_dap_price_usd_mt": 627.0
         },
         {
           "month": "2025-09",
@@ -938,7 +998,10 @@
           "kcl_kt": 45.3,
           "map_dap_kt": 356.2,
           "total_kt": 4312.3,
-          "total_fob_usd_m": 1553.32
+          "total_fob_usd_m": 1553.32,
+          "urea_price_usd_mt": 434.0,
+          "kcl_price_usd_mt": 339.0,
+          "map_dap_price_usd_mt": 579.0
         },
         {
           "month": "2025-10",
@@ -946,7 +1009,10 @@
           "kcl_kt": 39.1,
           "map_dap_kt": 479.9,
           "total_kt": 4565.6,
-          "total_fob_usd_m": 1613.26
+          "total_fob_usd_m": 1613.26,
+          "urea_price_usd_mt": 423.0,
+          "kcl_price_usd_mt": 319.0,
+          "map_dap_price_usd_mt": 586.0
         },
         {
           "month": "2025-11",
@@ -954,7 +1020,10 @@
           "kcl_kt": 0.0,
           "map_dap_kt": 324.2,
           "total_kt": 3361.0,
-          "total_fob_usd_m": 1093.11
+          "total_fob_usd_m": 1093.11,
+          "urea_price_usd_mt": 401.0,
+          "kcl_price_usd_mt": null,
+          "map_dap_price_usd_mt": 561.0
         },
         {
           "month": "2025-12",
@@ -962,7 +1031,10 @@
           "kcl_kt": 0.2,
           "map_dap_kt": 236.5,
           "total_kt": 3831.8,
-          "total_fob_usd_m": 1208.2
+          "total_fob_usd_m": 1208.2,
+          "urea_price_usd_mt": 392.0,
+          "kcl_price_usd_mt": null,
+          "map_dap_price_usd_mt": 551.0
         },
         {
           "month": "2026-01",
@@ -970,7 +1042,10 @@
           "kcl_kt": 19.1,
           "map_dap_kt": 306.2,
           "total_kt": 2860.1,
-          "total_fob_usd_m": 931.78
+          "total_fob_usd_m": 931.78,
+          "urea_price_usd_mt": 400.0,
+          "kcl_price_usd_mt": 309.0,
+          "map_dap_price_usd_mt": 561.0
         },
         {
           "month": "2026-02",
@@ -978,7 +1053,10 @@
           "kcl_kt": 30.2,
           "map_dap_kt": 162.5,
           "total_kt": 2335.9,
-          "total_fob_usd_m": 813.6
+          "total_fob_usd_m": 813.6,
+          "urea_price_usd_mt": 407.0,
+          "kcl_price_usd_mt": 340.0,
+          "map_dap_price_usd_mt": 639.0
         },
         {
           "month": "2026-03",
@@ -986,7 +1064,10 @@
           "kcl_kt": 14.3,
           "map_dap_kt": 354.8,
           "total_kt": 3418.2,
-          "total_fob_usd_m": 1307.76
+          "total_fob_usd_m": 1307.76,
+          "urea_price_usd_mt": 492.0,
+          "kcl_price_usd_mt": 351.0,
+          "map_dap_price_usd_mt": 651.0
         }
       ]
     },

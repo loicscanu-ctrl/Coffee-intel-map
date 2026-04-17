@@ -1,30 +1,32 @@
 "use client";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import {
+  ComposedChart, Bar, Line,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
+  LineChart,
+} from "recharts";
 import type { FarmerEconomicsData, FertilizerItem, FertilizerImportMonth } from "./farmerEconomicsData";
 import { fertCostDelta, netFertImpact } from "./farmerEconomicsUtils";
 
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const YEAR_COLORS: Record<string, string> = {
-  "2023": "#475569",
-  "2024": "#94a3b8",
-  "2025": "#f59e0b",
-  "2026": "#3b82f6",
-};
 
-function buildYoYData(monthly: FertilizerImportMonth[]) {
-  // Build { monthIdx: { "2024": total_kt, "2025": total_kt, ... } }
-  const byMonth: Record<number, Record<string, number>> = {};
-  for (const m of monthly) {
-    const [yr, mo] = m.month.split("-");
-    const idx = parseInt(mo) - 1;
-    if (!byMonth[idx]) byMonth[idx] = {};
-    byMonth[idx][yr] = (byMonth[idx][yr] ?? 0) + m.total_kt;
-  }
-  const years = [...new Set(monthly.map(m => m.month.slice(0, 4)))].sort();
-  return {
-    years,
-    rows: MONTH_ABBR.map((label, i) => ({ month: label, ...byMonth[i] })),
-  };
+function formatMonthLabel(m: string): string {
+  // "2024-01" → "Jan-24"
+  const [yr, mo] = m.split("-");
+  return `${MONTH_ABBR[parseInt(mo) - 1]}-${yr.slice(2)}`;
+}
+
+function buildChartData(monthly: FertilizerImportMonth[]) {
+  // Last 18 months for readability
+  const recent = monthly.slice(-18);
+  return recent.map((m) => ({
+    month:        formatMonthLabel(m.month),
+    urea_kt:      m.urea_kt,
+    kcl_kt:       m.kcl_kt,
+    map_dap_kt:   m.map_dap_kt,
+    urea_price:   m.urea_price_usd_mt,
+    kcl_price:    m.kcl_price_usd_mt,
+    map_price:    m.map_dap_price_usd_mt,
+  }));
 }
 
 interface Props {
@@ -80,7 +82,7 @@ export default function FertilizerPanel({ fertilizer }: Props) {
   const net = netFertImpact(fertilizer.items);
   const imports = fertilizer.imports;
 
-  const yoy = imports ? buildYoYData(imports.monthly) : null;
+  const chartData = imports ? buildChartData(imports.monthly) : [];
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
@@ -107,40 +109,44 @@ export default function FertilizerPanel({ fertilizer }: Props) {
         {" "}· Next application window: {fertilizer.next_application}
       </div>
 
-      {/* Fertilizer imports YoY line chart */}
-      {yoy && yoy.rows.length > 0 && (
+      {/* Volume + Price dual-axis chart */}
+      {chartData.length > 0 && (
         <div className="pt-2 border-t border-slate-700">
           <div className="text-[9px] text-slate-400 mb-1 flex justify-between">
-            <span>Brazil Fertilizer Imports — Total (kt, YoY)</span>
+            <span>
+              Brazil Imports (kt) &amp; FOB Price ($/mt)
+            </span>
             <span className="text-slate-600">Comex Stat · {imports!.last_updated}</span>
           </div>
-          <div className="h-32">
+          <div className="flex gap-3 mb-1 flex-wrap">
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-blue-500" /><span className="text-[7px] text-slate-500">Urea kt</span></div>
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-violet-500" /><span className="text-[7px] text-slate-500">KCl kt</span></div>
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-emerald-500" /><span className="text-[7px] text-slate-500">MAP kt</span></div>
+            <div className="flex items-center gap-1"><div className="w-3 h-0.5 bg-blue-300" /><span className="text-[7px] text-slate-500">Urea $/mt</span></div>
+            <div className="flex items-center gap-1"><div className="w-3 h-0.5 bg-violet-300" /><span className="text-[7px] text-slate-500">KCl $/mt</span></div>
+            <div className="flex items-center gap-1"><div className="w-3 h-0.5 bg-emerald-300" /><span className="text-[7px] text-slate-500">MAP $/mt</span></div>
+          </div>
+          <div className="h-36">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={yoy.rows} margin={{ top: 2, right: 4, left: -20, bottom: 0 }}>
-                <XAxis dataKey="month" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
+              <ComposedChart data={chartData} margin={{ top: 2, right: 28, left: -20, bottom: 0 }}>
+                <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} interval={2} />
+                <YAxis yAxisId="vol" orientation="left"  tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <YAxis yAxisId="prc" orientation="right" tick={{ fontSize: 7, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip
                   contentStyle={TT_STYLE}
-                  formatter={(v: unknown, name?: string | number) => [`${Number(v).toFixed(0)} kt`, String(name ?? "")]}
+                  formatter={(v: unknown, name?: string | number) => {
+                    const s = String(name ?? "");
+                    if (s.includes("price")) return [`$${Number(v).toFixed(0)}/mt`, s];
+                    return [`${Number(v).toFixed(0)} kt`, s];
+                  }}
                 />
-                <Legend
-                  wrapperStyle={{ fontSize: 8, color: "#94a3b8", paddingTop: 2 }}
-                  iconType="line"
-                  iconSize={8}
-                />
-                {yoy.years.map((yr) => (
-                  <Line
-                    key={yr}
-                    type="monotone"
-                    dataKey={yr}
-                    stroke={YEAR_COLORS[yr] ?? "#64748b"}
-                    strokeWidth={yr === yoy.years[yoy.years.length - 1] ? 2 : 1.5}
-                    strokeDasharray={yr === yoy.years[yoy.years.length - 1] ? undefined : undefined}
-                    dot={false}
-                    connectNulls
-                  />
-                ))}
-              </LineChart>
+                <Bar yAxisId="vol" dataKey="urea_kt"    name="Urea kt"  stackId="vol" fill="#3b82f6" />
+                <Bar yAxisId="vol" dataKey="kcl_kt"     name="KCl kt"   stackId="vol" fill="#8b5cf6" />
+                <Bar yAxisId="vol" dataKey="map_dap_kt" name="MAP kt"   stackId="vol" fill="#10b981" />
+                <Line yAxisId="prc" dataKey="urea_price"  name="Urea price"  type="monotone" stroke="#93c5fd" strokeWidth={1.5} dot={false} connectNulls />
+                <Line yAxisId="prc" dataKey="kcl_price"   name="KCl price"   type="monotone" stroke="#c4b5fd" strokeWidth={1.5} dot={false} connectNulls />
+                <Line yAxisId="prc" dataKey="map_price"   name="MAP price"   type="monotone" stroke="#6ee7b7" strokeWidth={1.5} dot={false} connectNulls />
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
