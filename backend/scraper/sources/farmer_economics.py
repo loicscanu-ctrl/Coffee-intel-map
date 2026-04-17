@@ -25,7 +25,8 @@ REGIONS = [
 OPEN_METEO_URL = (
     "https://api.open-meteo.com/v1/forecast"
     "?latitude={lat}&longitude={lon}"
-    "&hourly=temperature_2m,dew_point_2m,cloud_cover,wind_speed_10m,precipitation_probability,soil_moisture_0_to_7cm"
+    "&hourly=temperature_2m,dew_point_2m,cloud_cover,wind_speed_10m,precipitation_probability"
+    ",soil_moisture_0_to_7cm,soil_moisture_7_to_28cm,soil_moisture_28_to_100cm,soil_moisture_100_to_255cm"
     "&forecast_days=14&timezone=America/Sao_Paulo"
 )
 
@@ -83,28 +84,50 @@ def _frost_risk(min_temp: float, cloud_cover: float, wind_kmh: float, dew_point:
     return "-"
 
 
-def _drought_risk(precip_prob: float, vpd: float, soil_moisture: float) -> str:
-    """Composite drought risk from VPD, precipitation probability, and soil moisture.
+def _root_zone_moisture(sm_0_7: float, sm_7_28: float, sm_28_100: float, sm_100_255: float) -> float:
+    """Weighted root-zone soil moisture for coffee (m³/m³).
 
-    Soil moisture (m³/m³) acts as a gate:
-        > 0.30  → soil buffer is full; cap output at L (wet season carry-over)
-        0.15–0.30 → nominal; formula applies as-is
-        < 0.15  → soil is dry; composite amplified by 1.5×
-
-    VPD score  (weight 0.60): H > 2.5 kPa, M > 1.5, L > 0.8
-    Precip score (weight 0.40): H < 15%, M < 35%, L < 60%
-
-    Weighted sum thresholds: ≥ 2.0 → H,  ≥ 1.0 → M,  ≥ 0.4 → L,  < 0.4 → —
+    Weights reflect the depth distribution of active arabica roots in
+    Brazilian red latosol soils:
+        0–7 cm    (10%): surface layer, dries quickly, low root density
+        7–28 cm   (25%): shallow root zone
+        28–100 cm (45%): functional engine room — bulk of active roots
+        100–255 cm (20%): deep reserve / drought insurance
     """
+    return sm_0_7 * 0.10 + sm_7_28 * 0.25 + sm_28_100 * 0.45 + sm_100_255 * 0.20
+
+
+def _drought_risk(precip_prob: float, vpd: float, root_zone_sm: float, month: int) -> str:
+    """Coffee-specific drought risk (H/M/L/—).
+
+    Step A — VPD score (threshold lowered to 0.5 kPa to capture early
+    stomatal closure in arabica):
+        > 2.5 kPa → 3  (severe atmospheric demand)
+        > 1.5 kPa → 2  (moderate stress)
+        > 0.5 kPa → 1  (early physiological closure)
+        else      → 0
+
+    Step B — Weighted composite (seasonal shift):
+        Sep–Oct (fruit fill / ripening onset): VPD 75% + Rain 25%
+        All other months: VPD 60% + Rain 40%
+
+    Step C — Root-zone soil moisture gate:
+        > 0.30 m³/m³ → cap at L  (wet-feet buffer; tree not stressed)
+        < 0.15 m³/m³ → composite × 1.5  (empty reservoir penalty)
+
+    Step D — Classify: ≥ 2.0 → H,  ≥ 1.0 → M,  ≥ 0.4 → L,  else → —
+    """
+    # Step A — VPD score
     if vpd > 2.5:
         vpd_score = 3
     elif vpd > 1.5:
         vpd_score = 2
-    elif vpd > 0.8:
+    elif vpd > 0.5:
         vpd_score = 1
     else:
         vpd_score = 0
 
+    # Rain score
     if precip_prob < 15:
         pp_score = 3
     elif precip_prob < 35:
@@ -114,18 +137,21 @@ def _drought_risk(precip_prob: float, vpd: float, soil_moisture: float) -> str:
     else:
         pp_score = 0
 
-    composite = vpd_score * 0.60 + pp_score * 0.40
+    # Step B — seasonal weight shift
+    if month in (9, 10):
+        composite = vpd_score * 0.75 + pp_score * 0.25
+    else:
+        composite = vpd_score * 0.60 + pp_score * 0.40
 
-    # Soil moisture gate
-    if soil_moisture > 0.30:
-        # Soil reserves are ample — cap drought signal at L
+    # Step C — root-zone soil moisture gate
+    if root_zone_sm > 0.30:
         if composite >= 0.4:
             return "L"
         return "-"
-    elif soil_moisture < 0.15:
-        # Soil is depleted — amplify atmospheric stress
+    elif root_zone_sm < 0.15:
         composite *= 1.5
 
+    # Step D — classify
     if composite >= 2.0:
         return "H"
     if composite >= 1.0:
@@ -140,17 +166,18 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
     Aggregate Open-Meteo hourly data into daily dicts.
 
     Expected hourly keys:
-        time, temperature_2m, dew_point_2m, cloud_cover,
-        wind_speed_10m, precipitation_probability, soil_moisture_0_to_7cm
+        time, temperature_2m, dew_point_2m, cloud_cover, wind_speed_10m,
+        precipitation_probability, soil_moisture_0_to_7cm,
+        soil_moisture_7_to_28cm, soil_moisture_28_to_100cm,
+        soil_moisture_100_to_255cm
 
     Frost risk uses conditions at the hour of minimum temperature (cloud,
     wind, dew point at that moment, not daily averages) because radiation
     frost is most severe when the air is coldest.
 
-    Drought risk uses daily-max VPD (max_temp + mean dew point) combined
-    with daily-max precipitation probability and daily-mean soil moisture.
-    Soil moisture gates the drought signal: wet soil (>0.30 m³/m³) caps
-    risk at L; dry soil (<0.15 m³/m³) amplifies the composite score.
+    Drought risk uses a four-layer weighted root-zone soil moisture, daily-max
+    VPD (max_temp + mean dew point), and daily-max precipitation probability.
+    VPD weight shifts to 75% in September–October (fruit fill window).
 
     Returns a list of dicts, one per calendar day.
     """
@@ -160,7 +187,13 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
     cloud  = hourly["cloud_cover"]
     wind   = hourly["wind_speed_10m"]
     precip = hourly["precipitation_probability"]
-    soil   = hourly.get("soil_moisture_0_to_7cm", [])
+    sm0    = hourly.get("soil_moisture_0_to_7cm",    [])
+    sm1    = hourly.get("soil_moisture_7_to_28cm",   [])
+    sm2    = hourly.get("soil_moisture_28_to_100cm", [])
+    sm3    = hourly.get("soil_moisture_100_to_255cm",[])
+
+    def _safe(arr: list, i: int):
+        return arr[i] if i < len(arr) else None
 
     # Group indices by calendar date (first 10 chars of ISO timestamp)
     day_indices: dict[str, list[int]] = defaultdict(list)
@@ -169,13 +202,18 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
 
     days = []
     for day_str in sorted(day_indices):
-        idxs = day_indices[day_str]
+        idxs   = day_indices[day_str]
+        month  = int(day_str[5:7])
+
         temps_day  = [v for v in (temp[i]   for i in idxs) if v is not None]
         dew_day    = [v for v in (dew[i]    for i in idxs) if v is not None]
         cloud_day  = [v for v in (cloud[i]  for i in idxs) if v is not None]
         wind_day   = [v for v in (wind[i]   for i in idxs) if v is not None]
         precip_day = [v for v in (precip[i] for i in idxs) if v is not None]
-        soil_day   = [v for v in (soil[i] if i < len(soil) else None for i in idxs) if v is not None]
+        sm0_day    = [v for v in (_safe(sm0, i) for i in idxs) if v is not None]
+        sm1_day    = [v for v in (_safe(sm1, i) for i in idxs) if v is not None]
+        sm2_day    = [v for v in (_safe(sm2, i) for i in idxs) if v is not None]
+        sm3_day    = [v for v in (_safe(sm3, i) for i in idxs) if v is not None]
 
         if not temps_day:
             continue
@@ -183,7 +221,13 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
         min_t  = min(temps_day)
         max_t  = max(temps_day)
         pp_max = max(precip_day) if precip_day else 0.0
-        mean_soil = sum(soil_day) / len(soil_day) if soil_day else 0.20  # neutral fallback
+
+        # Four-layer root-zone moisture (neutral fallback per layer if missing)
+        mean_sm0 = sum(sm0_day) / len(sm0_day) if sm0_day else 0.20
+        mean_sm1 = sum(sm1_day) / len(sm1_day) if sm1_day else 0.20
+        mean_sm2 = sum(sm2_day) / len(sm2_day) if sm2_day else 0.20
+        mean_sm3 = sum(sm3_day) / len(sm3_day) if sm3_day else 0.20
+        root_zone = _root_zone_moisture(mean_sm0, mean_sm1, mean_sm2, mean_sm3)
 
         # --- Frost: use cloud/wind/dew at the hour of minimum temperature ---
         min_idx = min(idxs, key=lambda i: temp[i] if temp[i] is not None else float("inf"))
@@ -197,7 +241,7 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
             sum(dew_day) / len(dew_day) if dew_day else 0.0
         )
 
-        # --- Drought: VPD from daily max temp and mean dew point + soil moisture gate ---
+        # --- Drought: VPD from daily max temp and mean dew point ---
         mean_dew = sum(dew_day) / len(dew_day) if dew_day else 0.0
         vpd = _vpd_kpa(max_t, mean_dew)
 
@@ -209,9 +253,9 @@ def _aggregate_hourly_to_daily(hourly: dict) -> list[dict]:
             "cloud_cover":  round(sum(cloud_day) / len(cloud_day), 1) if cloud_day else 0.0,
             "wind_speed":   round(max(wind_day), 1) if wind_day else 0.0,
             "precip_prob":  round(pp_max, 1),
-            "soil_moisture": round(mean_soil, 3),
+            "soil_moisture": round(root_zone, 3),
             "frost_risk":   _frost_risk(min_t, cloud_at_min, wind_at_min, dew_at_min),
-            "drought_risk": _drought_risk(pp_max, vpd, mean_soil),
+            "drought_risk": _drought_risk(pp_max, vpd, root_zone, month),
         })
 
     return days
