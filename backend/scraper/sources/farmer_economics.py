@@ -38,9 +38,10 @@ _AWC = 0.20   # Available Water Capacity (m³/m³); field capacity ≈ 0.35
 
 NOAA_ONI_URL = "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
 
-WORLD_BANK_URL = (
+WORLD_BANK_COMMODITY_PAGE = "https://www.worldbank.org/en/research/commodity-markets"
+WORLD_BANK_FALLBACK_URL = (
     "https://thedocs.worldbank.org/en/doc/"
-    "5d903e848db1d1b83e0ec8f744e55570-0350012021/related/CMO-Historical-Data-Monthly.xlsx"
+    "74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
 )
 
 # Season code → calendar month number
@@ -523,6 +524,33 @@ def _parse_world_bank_excel(content: bytes) -> dict:
     }
 
 
+def _find_world_bank_excel_url() -> str:
+    """Scrape World Bank commodity-markets page to find the current Monthly Excel URL.
+
+    The document ID in the URL rotates with every file update, so we discover
+    it dynamically instead of hard-coding it. Falls back to WORLD_BANK_FALLBACK_URL
+    if the page is unreachable or no link is found.
+    """
+    import re as _re
+    try:
+        resp = requests.get(WORLD_BANK_COMMODITY_PAGE, timeout=30,
+                            headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        # Find any thedocs.worldbank.org link containing CMO-Historical-Data-Monthly.xlsx
+        match = _re.search(
+            r'https://thedocs\.worldbank\.org/en/doc/[^"\']+CMO-Historical-Data-Monthly\.xlsx',
+            resp.text,
+        )
+        if match:
+            url = match.group(0)
+            print(f"[farmer_economics] World Bank Excel URL discovered: {url}")
+            return url
+    except Exception as e:
+        print(f"[farmer_economics] Could not discover World Bank URL: {e}")
+    print(f"[farmer_economics] Falling back to: {WORLD_BANK_FALLBACK_URL}")
+    return WORLD_BANK_FALLBACK_URL
+
+
 def _scrape_fertilizer_prices(db) -> None:
     """Download World Bank Excel, extract last 7 monthly values for urea/DAP/KCl."""
     import sys, os
@@ -531,7 +559,8 @@ def _scrape_fertilizer_prices(db) -> None:
     from sqlalchemy import delete
 
     try:
-        resp = requests.get(WORLD_BANK_URL, timeout=120)
+        url = _find_world_bank_excel_url()
+        resp = requests.get(url, timeout=120)
         resp.raise_for_status()
         parsed = _parse_world_bank_excel(resp.content)
 
