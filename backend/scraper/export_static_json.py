@@ -30,6 +30,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from database import SessionLocal
 from models import NewsItem, CotWeekly, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport
 from scraper.sources.macro_cot import COMMODITY_SPECS
+from scraper.validate_export import (
+    safe_write_json,
+    validate_futures_chain,
+    validate_oi_fnd_chart,
+    validate_cot,
+    validate_macro_cot,
+    validate_freight,
+    validate_farmer_economics,
+)
 
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
@@ -115,9 +124,8 @@ def export_futures_chain(db) -> None:
             result[market] = None
 
     path = OUT_DIR / "futures_chain.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  futures_chain.json → arabica:{result['arabica'] is not None} robusta:{result['robusta'] is not None}")
+    written = safe_write_json(path, result, validate_futures_chain)
+    print(f"  futures_chain.json → written:{written} arabica:{result['arabica'] is not None} robusta:{result['robusta'] is not None}")
 
 
 # ── 2. OI FND chart ──────────────────────────────────────────────────────────
@@ -181,9 +189,8 @@ def export_oi_fnd_chart(db) -> None:
         result[market] = candidates
 
     path = OUT_DIR / "oi_fnd_chart.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  oi_fnd_chart.json → arabica:{len(result['arabica'])} robusta:{len(result['robusta'])} series")
+    written = safe_write_json(path, result, validate_oi_fnd_chart)
+    print(f"  oi_fnd_chart.json → written:{written} arabica:{len(result['arabica'])} robusta:{len(result['robusta'])} series")
 
 
 # ── 3. OI History (copy from /data/oi_history.json) ──────────────────────────
@@ -249,9 +256,8 @@ def export_cot(db) -> None:
     result = sorted(merged.values(), key=lambda x: x["date"])
 
     path = OUT_DIR / "cot.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  cot.json → {len(result)} weeks")
+    written = safe_write_json(path, result, validate_cot)
+    print(f"  cot.json → written:{written} {len(result)} weeks")
 
 
 # ── 5. Macro COT ─────────────────────────────────────────────────────────────
@@ -311,9 +317,8 @@ def export_macro_cot(db) -> None:
     ]
 
     path = OUT_DIR / "macro_cot.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  macro_cot.json → {len(result)} weeks")
+    written = safe_write_json(path, result, validate_macro_cot)
+    print(f"  macro_cot.json → written:{written} {len(result)} weeks")
 
 
 # ── 6. Freight ───────────────────────────────────────────────────────────────
@@ -400,9 +405,8 @@ def export_freight(db) -> None:
         }
 
     path = OUT_DIR / "freight.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  freight.json → {len(result.get('routes', []))} routes, {len(result.get('history', []))} history rows")
+    written = safe_write_json(path, result, validate_freight)
+    print(f"  freight.json → written:{written} {len(result.get('routes', []))} routes, {len(result.get('history', []))} history rows")
 
 
 # ── 7. Farmer Economics ───────────────────────────────────────────────────────
@@ -918,9 +922,8 @@ def export_farmer_economics(db) -> None:
     }
 
     path = OUT_DIR / "farmer_economics.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
-    print(f"  farmer_economics.json → cost:{cost_out is not None} weather:{weather_out is not None} enso:{enso_out is not None}")
+    written = safe_write_json(path, result, validate_farmer_economics)
+    print(f"  farmer_economics.json → written:{written} cost:{cost_out is not None} weather:{weather_out is not None} enso:{enso_out is not None}")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
