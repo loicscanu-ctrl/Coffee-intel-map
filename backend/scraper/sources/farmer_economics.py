@@ -331,8 +331,9 @@ def _parse_oni_text(text: str) -> list[dict]:
         DJF 2024 0.5 1.2
         ...
 
-    The last 3 data rows are treated as forecasts.
-    Returns last 15 history rows + up to 3 forecast rows.
+    All rows are historical 3-month running means. NOAA publishes with ~1-2 month
+    lag, so the most recent 3 seasons are marked preliminary (not yet finalized).
+    Returns the last 18 rows, with the final 3 flagged preliminary=True.
     """
     rows = []
     for line in text.splitlines():
@@ -353,18 +354,16 @@ def _parse_oni_text(text: str) -> list[dict]:
     if not rows:
         return []
 
-    # Last 3 = forecast
-    N_FORECAST = 3
-    if len(rows) <= N_FORECAST:
-        # Too few rows to split — return all as history
-        return [{"month": r["month"], "value": r["value"]} for r in rows]
-    history_rows  = rows[:-N_FORECAST][-15:]
-    forecast_rows = rows[-N_FORECAST:]
-
-    for r in forecast_rows:
-        r["forecast"] = True
-
-    return history_rows + forecast_rows
+    N_PRELIMINARY = 3
+    tail = rows[-18:]  # show 18 months of history
+    cutoff = len(tail) - N_PRELIMINARY
+    result = []
+    for i, r in enumerate(tail):
+        entry: dict = {"month": r["month"], "value": r["value"]}
+        if i >= cutoff:
+            entry["preliminary"] = True
+        result.append(entry)
+    return result
 
 
 # ---------------------------------------------------------------------------

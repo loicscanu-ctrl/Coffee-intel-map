@@ -27,8 +27,8 @@ const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRad
 export default function EnsoPanel({ enso }: Props) {
   const phase = PHASE_STYLE[enso.phase];
 
-  const barColor = (value: number, isForecast?: boolean) => {
-    if (isForecast) return "#94a3b8";
+  const barColor = (value: number, isPreliminary?: boolean) => {
+    if (isPreliminary) return value >= 0 ? "#7c5fa8" : "#4a7fa8";
     return value >= 0 ? "#a78bfa" : "#60a5fa";
   };
 
@@ -42,7 +42,7 @@ export default function EnsoPanel({ enso }: Props) {
           {phase.icon} {phase.label} — {enso.intensity} · ONI {enso.oni > 0 ? "+" : ""}{enso.oni}
         </div>
         <div className="text-[10px] text-slate-500 mt-0.5">
-          Peak: {enso.peak_month} · Weakening · Forecast: {enso.forecast_direction}
+          Peak: {enso.peak_month} · {enso.forecast_direction}
         </div>
       </div>
 
@@ -60,26 +60,25 @@ export default function EnsoPanel({ enso }: Props) {
             <ReferenceLine y={-0.5} stroke="#2563eb" strokeWidth={0.5} strokeDasharray="3 3" />
             <Tooltip
               contentStyle={TT_STYLE}
-              formatter={(v: unknown, _: unknown, props: { payload?: { forecast?: boolean } }) => [
+              formatter={(v: unknown, _: unknown, props: { payload?: { preliminary?: boolean } }) => [
                 `ONI ${Number(v) > 0 ? "+" : ""}${v}`,
-                props.payload?.forecast ? "Forecast" : "Historical",
+                props.payload?.preliminary ? "Preliminary" : "Confirmed",
               ]}
             />
             <Bar dataKey="value" maxBarSize={14} radius={[2, 2, 0, 0]}>
               {enso.oni_history.map((entry, i) => (
                 <Cell
                   key={i}
-                  fill={barColor(entry.value, entry.forecast)}
-                  fillOpacity={entry.forecast ? 0.4 : 0.85}
-                  stroke={entry.forecast ? "#94a3b8" : "none"}
-                  strokeDasharray={entry.forecast ? "3 2" : "0"}
+                  fill={barColor(entry.value, (entry as { preliminary?: boolean }).preliminary)}
+                  fillOpacity={(entry as { preliminary?: boolean }).preliminary ? 0.6 : 0.85}
+                  stroke="none"
                 />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
         <div className="text-[9px] text-slate-600 mt-1">
-          Solid = historical · Faded = NOAA 3-month forecast · Threshold ±0.5
+          Solid = confirmed · Faded = preliminary (NOAA ~2-month lag) · Threshold ±0.5
         </div>
       </div>
 

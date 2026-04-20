@@ -473,12 +473,17 @@ def _oni_to_dots(oni: float) -> int:
 
 
 def _derive_enso_phase(oni_history: list) -> tuple:
-    """Derive (phase, intensity, current_oni) from oni_history list."""
-    non_forecast = [p for p in oni_history if not p.get("forecast")]
-    if not non_forecast:
+    """Derive (phase, intensity, current_oni) from oni_history list.
+    Uses all entries — both confirmed and preliminary — since NOAA ONI
+    preliminary values are observation-based and reliable enough for phase detection.
+    The old 'forecast' key is also accepted for backwards compat with DB data."""
+    entries = [p for p in oni_history if not p.get("forecast")]  # strip legacy forecast entries
+    if not entries:
+        entries = oni_history  # fallback: use everything
+    if not entries:
         return "neutral", "Weak", 0.0
-    current_oni = non_forecast[-1]["value"]
-    recent = [p["value"] for p in non_forecast[-5:]]
+    current_oni = entries[-1]["value"]
+    recent = [p["value"] for p in entries[-5:]]
     if len(recent) >= 5 and all(v >= 0.5 for v in recent):
         phase = "el-nino"
     elif len(recent) >= 5 and all(v <= -0.5 for v in recent):
@@ -599,24 +604,22 @@ def export_farmer_economics(db) -> None:
                 for entry in _REGIONAL_IMPACT_BY_PHASE.get(phase, []):
                     regional_impact.append({**entry, "dots": dots})
 
-                # Forecast direction: sentence describing trajectory
-                forecast_pts = [p for p in oni_history if p.get("forecast")]
-                non_forecast = [p for p in oni_history if not p.get("forecast")]
-                if forecast_pts:
-                    last_val = forecast_pts[-1]["value"]
-                    last_month = forecast_pts[-1]["month"]
-                    if abs(last_val) < 0.5:
-                        forecast_direction = f"Neutral by {last_month}"
-                    elif last_val > 0:
-                        forecast_direction = f"El Niño persists through {last_month}"
-                    else:
-                        forecast_direction = f"La Niña persists through {last_month}"
-                else:
-                    forecast_direction = ""
+                # Forecast direction: trend-based sentence (NOAA ONI file is
+                # all historical — no real future forecasts available).
+                confirmed = [p for p in oni_history if not p.get("preliminary")]
+                recent_vals = [p["value"] for p in oni_history[-5:]]
+                trend = (recent_vals[-1] - recent_vals[0]) if len(recent_vals) >= 2 else 0
+                if phase == "neutral":
+                    forecast_direction = "Neutral · No strong signal for 2026"
+                elif phase == "el-nino":
+                    forecast_direction = "El Niño weakening" if trend < -0.15 else "El Niño conditions ongoing"
+                else:  # la-nina
+                    forecast_direction = "La Niña weakening toward neutral" if trend > 0.15 else "La Niña ongoing"
 
-                # Peak month: non-forecast point with highest |value|
-                if non_forecast:
-                    peak_pt    = max(non_forecast, key=lambda p: abs(p["value"]))
+                # Peak month: confirmed (non-preliminary) point with highest |value|
+                history_for_peak = confirmed if confirmed else oni_history
+                if history_for_peak:
+                    peak_pt    = max(history_for_peak, key=lambda p: abs(p["value"]))
                     peak_month = peak_pt["month"]
                 else:
                     peak_month = ""
