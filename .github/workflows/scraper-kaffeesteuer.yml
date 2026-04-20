@@ -23,8 +23,25 @@ jobs:
       - name: Install dependencies
         run: pip install requests pdfplumber beautifulsoup4 lxml
 
-      - name: Run Kaffeesteuer scraper
-        run: python backend/scraper/fetch_kaffeesteuer.py
+      - name: Run Kaffeesteuer scraper (3 attempts)
+        run: |
+          for attempt in 1 2 3; do
+            python backend/scraper/fetch_kaffeesteuer.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Validate output
+        run: |
+          python -c "
+          import json, sys, subprocess
+          sys.path.insert(0, 'backend')
+          from scraper.validate_export import validate_kaffeesteuer
+          data = json.load(open('frontend/public/data/kaffeesteuer.json'))
+          ok, reason = validate_kaffeesteuer(data)
+          if not ok:
+              print(f'[validate] kaffeesteuer.json FAILED: {reason} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/kaffeesteuer.json'])
+          "
 
       - name: Commit updated JSON if changed
         run: |
@@ -33,4 +50,4 @@ jobs:
           git add frontend/public/data/kaffeesteuer.json
           git diff --cached --quiet \
             && echo "No changes — JSON already up to date." \
-            || git commit -m "data: update kaffeesteuer.json [skip ci]" && git push
+            || (git commit -m "data: update kaffeesteuer.json [skip ci]" && git pull --rebase origin main && git push)

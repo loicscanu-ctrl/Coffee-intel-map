@@ -22,8 +22,25 @@ jobs:
       - name: Install dependencies
         run: pip install yfinance pandas numpy
 
-      - name: Run Currency Index scraper
-        run: python -m backend.scraper.quant_model.fetch_currency_index
+      - name: Run Currency Index scraper (3 attempts)
+        run: |
+          for attempt in 1 2 3; do
+            python -m backend.scraper.quant_model.fetch_currency_index && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Validate output
+        run: |
+          python -c "
+          import json, sys, subprocess
+          sys.path.insert(0, 'backend')
+          from scraper.validate_export import validate_quant_report
+          data = json.load(open('frontend/public/data/quant_report.json'))
+          ok, reason = validate_quant_report(data)
+          if not ok:
+              print(f'[validate] quant_report.json FAILED: {reason} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/quant_report.json'])
+          "
 
       - name: Commit updated JSON if changed
         run: |

@@ -23,8 +23,25 @@ jobs:
       - name: Install dependencies
         run: pip install yfinance pandas
 
-      - name: Run earnings scraper
-        run: python backend/scraper/fetch_earnings.py
+      - name: Run earnings scraper (3 attempts)
+        run: |
+          for attempt in 1 2 3; do
+            python backend/scraper/fetch_earnings.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Validate output
+        run: |
+          python -c "
+          import json, sys, subprocess
+          sys.path.insert(0, 'backend')
+          from scraper.validate_export import validate_earnings
+          data = json.load(open('frontend/public/data/earnings.json'))
+          ok, reason = validate_earnings(data)
+          if not ok:
+              print(f'[validate] earnings.json FAILED: {reason} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/earnings.json'])
+          "
 
       - name: Commit updated JSON if changed
         run: |

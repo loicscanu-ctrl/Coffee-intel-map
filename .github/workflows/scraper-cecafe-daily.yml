@@ -23,8 +23,25 @@ jobs:
       - name: Install dependencies
         run: pip install pdfplumber
 
-      - name: Run daily registration scraper
-        run: python -m backend.scraper.fetch_cecafe_daily
+      - name: Run Cecafe scraper (3 attempts)
+        run: |
+          for attempt in 1 2 3; do
+            python -m backend.scraper.fetch_cecafe_daily && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Validate output
+        run: |
+          python -c "
+          import json, sys, subprocess
+          sys.path.insert(0, 'backend')
+          from scraper.validate_export import validate_cecafe_daily
+          data = json.load(open('frontend/public/data/cecafe_daily.json'))
+          ok, reason = validate_cecafe_daily(data)
+          if not ok:
+              print(f'[validate] cecafe_daily.json FAILED: {reason} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/cecafe_daily.json'])
+          "
 
       - name: Commit updated JSON if changed
         run: |

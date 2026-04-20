@@ -3,7 +3,7 @@ name: Daily OI Snapshot
 on:
   schedule:
     - cron: "0 2 * * 1-5"   # 02:00 UTC every weekday (Mon–Fri)
-  workflow_dispatch:          # Allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   fetch-oi:
@@ -25,11 +25,28 @@ jobs:
           pip install playwright
           playwright install chromium --with-deps
 
-      - name: Fetch OI and update JSON
-        run: python backend/scraper/fetch_oi_json.py
+      - name: Fetch OI (3 attempts)
+        run: |
+          for attempt in 1 2 3; do
+            python backend/scraper/fetch_oi_json.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Copy OI history to frontend
         run: cp data/oi_history.json frontend/public/data/oi_history.json
+
+      - name: Validate output
+        run: |
+          python -c "
+          import json, sys, subprocess
+          sys.path.insert(0, 'backend')
+          from scraper.validate_export import validate_oi_history
+          data = json.load(open('frontend/public/data/oi_history.json'))
+          ok, reason = validate_oi_history(data)
+          if not ok:
+              print(f'[validate] oi_history.json FAILED: {reason} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'data/oi_history.json', 'frontend/public/data/oi_history.json'])
+          "
 
       - name: Commit updated OI data
         run: |
