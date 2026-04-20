@@ -3,14 +3,14 @@ name: Daily News Scraper
 on:
   schedule:
     - cron: '0 1 * * *'  # 01:00 UTC daily
-  workflow_dispatch:      # allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -26,29 +26,12 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run daily scraper
+      - name: Run daily scraper (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.run_daily
-
-      - name: Export static JSON files
-        working-directory: backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.export_static_json
-
-      - name: Commit updated static JSON if changed
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/futures_chain.json \
-                  frontend/public/data/oi_fnd_chart.json \
-                  frontend/public/data/oi_history.json \
-                  frontend/public/data/cot.json \
-                  frontend/public/data/macro_cot.json \
-                  frontend/public/data/freight.json \
-                  frontend/public/data/farmer_economics.json
-          git diff --cached --quiet \
-            && echo "No changes." \
-            || (git commit -m "data: update static JSON [skip ci]" && git pull --rebase origin main && git push)
+          for attempt in 1 2 3; do
+            python -m scraper.run_daily && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done

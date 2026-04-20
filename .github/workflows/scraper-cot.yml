@@ -5,14 +5,14 @@ on:
     # 20:00 UTC Friday = 3:00 PM ET winter / 4:00 PM ET summer
     # CFTC releases every Friday at 3:30 PM ET — run at 20:00 UTC, retry manually if data not yet published.
     - cron: '0 20 * * 5'
-  workflow_dispatch:  # allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -25,30 +25,22 @@ jobs:
         working-directory: backend
         run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv
 
-      - name: Run macro COT scraper (commodity positions + prices)
+      - name: Run macro COT scraper (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.run_cot
-
-      - name: Run Coffee C COT scraper (CFTC + ICE Robusta)
-        working-directory: backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.run_cot_coffee
-
-      - name: Export static JSON files
-        working-directory: backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.export_static_json
-
-      - name: Commit updated static JSON if changed
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/cot.json \
-                  frontend/public/data/macro_cot.json
-          git diff --cached --quiet \
-            && echo "No changes." \
-            || (git commit -m "data: update COT static JSON [skip ci]" && git pull --rebase origin main && git push)
+          for attempt in 1 2 3; do
+            python -m scraper.run_cot && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Run Coffee COT scraper (3 attempts)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.run_cot_coffee && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
