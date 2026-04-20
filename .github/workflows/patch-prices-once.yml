@@ -18,7 +18,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install sqlalchemy psycopg2-binary
+        run: pip install sqlalchemy psycopg2-binary python-dotenv
 
       - name: Run price patch
         working-directory: backend
