@@ -45,4 +45,4 @@ jobs:
           git add frontend/public/data/farmer_economics.json
           git diff --cached --quiet \
             && echo "No changes." \
-            || git commit -m "data: update farmer_economics.json [skip ci]" && git push
+            || (git commit -m "data: update farmer_economics.json [skip ci]" && git pull --rebase origin main && git push)

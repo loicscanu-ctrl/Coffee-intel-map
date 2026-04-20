@@ -51,4 +51,4 @@ jobs:
                   frontend/public/data/macro_cot.json
           git diff --cached --quiet \
             && echo "No changes." \
-            || git commit -m "data: update COT static JSON [skip ci]" && git push
+            || (git commit -m "data: update COT static JSON [skip ci]" && git pull --rebase origin main && git push)
