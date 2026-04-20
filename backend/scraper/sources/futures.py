@@ -23,8 +23,8 @@ def _prev_biz_day(n: int) -> str:
     return d.isoformat()
 
 def _pub_date() -> str:
-    """Trade date: T-2 business days (ICE OI has a 1-day lag; data scraped today reflects 2 days ago)."""
-    return _prev_biz_day(2)
+    """Trade date: T-1 business day (most recent completed trading session)."""
+    return _prev_biz_day(1)
 
 _TODAY = _pub_date
 
