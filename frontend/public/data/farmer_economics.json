@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-20T05:24:42.167778Z",
+  "scraped_at": "2026-04-20T05:27:31.889016Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -608,7 +608,7 @@
   "enso": {
     "phase": "neutral",
     "intensity": "Weak",
-    "oni": -0.55,
+    "oni": -0.16,
     "peak_month": "Nov-25",
     "forecast_direction": "Neutral \u00b7 No strong signal for 2026",
     "oni_history": [
@@ -675,17 +675,17 @@
       {
         "month": "Dec-25",
         "value": -0.54,
-        "forecast": true
+        "preliminary": true
       },
       {
         "month": "Jan-26",
         "value": -0.37,
-        "forecast": true
+        "preliminary": true
       },
       {
         "month": "Feb-26",
         "value": -0.16,
-        "forecast": true
+        "preliminary": true
       }
     ],
     "regional_impact": [
