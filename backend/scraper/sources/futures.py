@@ -23,10 +23,14 @@ def _prev_biz_day(n: int) -> str:
     return d.isoformat()
 
 def _pub_date() -> str:
-    """Trade date: T-1 business day (most recent completed trading session)."""
+    """Trade date for OI history: T-2 business days (ICE OI has a 1-day publication lag)."""
+    return _prev_biz_day(2)
+
+def _quote_date() -> str:
+    """Display date for Daily Quotes: T-1 business day (most recent completed session)."""
     return _prev_biz_day(1)
 
-_TODAY = _pub_date
+_TODAY = _pub_date   # T-2 — embedded in DB title, consumed by OI history API
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Barchart – futures chain (price + OI per contract)
@@ -150,7 +154,7 @@ def _make_chain_item(contracts: list[dict], product: str, source_sym: str) -> di
         "lat": 0.0,
         "lng": 0.0,
         "tags": tags,
-        "meta": json.dumps({"contracts": contracts}),
+        "meta": json.dumps({"contracts": contracts, "quote_date": _quote_date()}),
     }
 
 
@@ -526,25 +530,6 @@ async def run(page) -> list[dict]:
                     print(f"[futures] LDN chain upserted: exch_oi={nearby_oi_ldn}, structure={structure_ldn}")
                 except Exception as e:
                     print(f"[cot] Failed to upsert LDN chain fields for {report_date_ldn}: {e}")
-
-            # Store front-month RM price in commodity_prices (for Money Flow) and
-            # cot_weekly.price_ldn (for COT dashboard), both keyed by the COT report date.
-            # This means the price is always tied to the Tuesday COT date, not today.
-            front_rm_price = rm_contracts[0].get("last") if rm_contracts else None
-            if front_rm_price is not None:
-                try:
-                    _db = get_session()
-                    try:
-                        upsert_commodity_price(_db, "robusta", report_date_ldn, float(front_rm_price))
-                        print(f"[futures] Robusta price→commodity_prices: {report_date_ldn} = {front_rm_price} USD/MT")
-                    finally:
-                        _db.close()
-                except Exception as e:
-                    print(f"[futures] Failed to store robusta price in commodity_prices: {e}")
-                try:
-                    upsert_cot_weekly("ldn", report_date_ldn, {"price_ldn": float(front_rm_price)})
-                except Exception as e:
-                    print(f"[futures] Failed to store robusta price_ldn in cot_weekly: {e}")
     except Exception as e:
         print(f"[futures] ICE Robusta COT failed: {e}")
 

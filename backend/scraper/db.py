@@ -123,6 +123,30 @@ def upsert_cot_weekly(market: str, report_date, fields: dict):
         db.close()
 
 
+def upsert_cot_price(market: str, report_date, price_field: str, value: float) -> bool:
+    """Store a Tuesday settlement price in cot_weekly only if not already set.
+    Prices are immutable once recorded — never overwritten by subsequent runs.
+    Returns True if written, False if skipped (already set)."""
+    from models import CotWeekly
+    db = get_session()
+    try:
+        existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
+        if existing:
+            if getattr(existing, price_field) is not None:
+                print(f"[db] {market} {price_field} for {report_date} already set — skipping")
+                return False
+            setattr(existing, price_field, value)
+        else:
+            db.add(CotWeekly(date=report_date, market=market, **{price_field: value}))
+        db.commit()
+        return True
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
 def create_farmer_economics_tables():
     """Create WeatherSnapshot and FertilizerImport tables if they don't exist."""
     from database import Base

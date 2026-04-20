@@ -1,0 +1,40 @@
+name: Tuesday Coffee Settlement Prices
+
+on:
+  schedule:
+    # 21:00 UTC Tuesday — ICE London closes 16:30 UTC, ICE NY closes ~18:30 UTC.
+    # Fetches KC (NY Arabica) and RM (London Robusta) front-month settlement prices
+    # and stores them write-once in cot_weekly (price_ny / price_ldn).
+    - cron: '0 21 * * 2'
+  workflow_dispatch:
+
+jobs:
+  fetch-prices:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install sqlalchemy psycopg2-binary playwright python-dotenv
+
+      - name: Install Playwright browser
+        run: playwright install chromium --with-deps
+
+      - name: Fetch Tuesday settlement prices (3 attempts)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          for attempt in 1 2 3; do
+            python scraper/fetch_tuesday_prices.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done

@@ -116,8 +116,11 @@ def export_futures_chain(db) -> None:
                 if "–" in item.title
                 else str(item.pub_date)[:10]
             )
+            # quote_date (T-1) is the display date for Daily Quotes;
+            # date_str from the title is the T-2 trade date used by OI history.
+            pub_date = meta.get("quote_date") or date_str
             result[market] = {
-                "pub_date":  date_str,
+                "pub_date":  pub_date,
                 "contracts": meta.get("contracts", []),
             }
         except Exception:

@@ -226,6 +226,23 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
     return { val, uncertainty, daysSince, isActual };
   }
 
+  // When isActual=true, reconstruct what the estimate *would* have been using the prior COT anchor
+  function getEstimateForActual(dayIdx: number, row: CotEstRow, actualCotDate: string): number | null {
+    const prevCotDate = sortedCotDates.filter(d => d < actualCotDate).at(-1);
+    if (!prevCotDate) return null;
+    const prevCot = cotByDateRef.get(prevCotDate);
+    if (!prevCot) return null;
+    const prevNet = netFor(prevCot, row.cat);
+    if (prevNet == null) return null;
+    if (row.method === "prop_oi") {
+      const prevAnchorIdx = days.findIndex(d => d.date === prevCotDate);
+      const prevAnchorOI = prevAnchorIdx >= 0 ? totals[prevAnchorIdx].oi : 0;
+      const curOI = totals[dayIdx]?.oi ?? 0;
+      if (prevAnchorOI > 0 && curOI > 0) return Math.round(prevNet * curOI / prevAnchorOI);
+    }
+    return prevNet;
+  }
+
   // Header shows MM net estimate for most recent day
   const latestMmEst = estimate(0, COT_EST_ROWS[0]);
   const anchor0     = getAnchor(days[0]?.date ?? "");
@@ -244,7 +261,14 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
         {days.map((d, i) => {
           const mmEst = estimate(i, COT_EST_ROWS[0]);
           const anchor = getAnchor(d.date);
-          const daysLabel = anchor && !mmEst.isActual ? `+${mmEst.daysSince}d` : mmEst.isActual ? "actual" : "";
+          let daysLabel = "";
+          if (anchor && !mmEst.isActual) {
+            daysLabel = `+${mmEst.daysSince}d`;
+          } else if (mmEst.isActual && anchor) {
+            const estVal = getEstimateForActual(i, COT_EST_ROWS[0], anchor.cotDate);
+            const delta = mmEst.val != null && estVal != null ? mmEst.val - estVal : null;
+            daysLabel = delta != null ? `Δ${delta > 0 ? "+" : ""}${(delta / 1000).toFixed(1)}k` : "actual";
+          }
           return (<>
             <td key={d.date + "-est-val"} className="text-right px-2 py-1 border-l border-slate-800 text-amber-400/70 text-[10px] font-mono">
               {mmEst.val != null ? mmEst.val.toLocaleString() : "—"}
@@ -270,7 +294,7 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
                   {anchor ? `COT ${anchor.cotDate.slice(5)}` : "—"}
                 </td>
                 <td key={i + "-leg-unc"} className="text-center px-1 py-1 text-[9px] text-slate-700 italic">
-                  ±unc
+                  {getAnchor(days[i]?.date ?? "")?.cotDate === days[i]?.date ? "Δvs.est" : "±unc"}
                 </td>
               </>);
             })}
@@ -287,6 +311,9 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
               </td>
               {days.map((d, i) => {
                 const { val, uncertainty, isActual } = estimate(i, row);
+                const anchor = isActual ? getAnchor(d.date) : null;
+                const estVal = isActual && anchor ? getEstimateForActual(i, row, anchor.cotDate) : null;
+                const delta = isActual && val != null && estVal != null ? val - estVal : null;
                 return (<>
                   <td key={d.date + row.cat + "-v"}
                     className={`text-right px-2 py-1 border-l border-slate-800 font-mono
@@ -294,8 +321,12 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
                     {val != null ? val.toLocaleString() : "—"}
                   </td>
                   <td key={d.date + row.cat + "-u"}
-                    className="text-right px-2 py-1 text-[9px] text-slate-600 font-mono whitespace-nowrap">
-                    {val != null && !isActual ? `±${(uncertainty / 1000).toFixed(1)}k` : ""}
+                    className={`text-right px-2 py-1 text-[9px] font-mono whitespace-nowrap ${
+                      delta != null ? (delta > 0 ? "text-red-400" : delta < 0 ? "text-green-400" : "text-slate-600") : "text-slate-600"
+                    }`}>
+                    {!isActual && val != null ? `±${(uncertainty / 1000).toFixed(1)}k`
+                     : delta != null ? `Δ${delta > 0 ? "+" : ""}${delta.toLocaleString()}`
+                     : ""}
                   </td>
                 </>);
               })}
