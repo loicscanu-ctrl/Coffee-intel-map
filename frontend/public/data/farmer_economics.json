@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-20T05:27:31.889016Z",
+  "scraped_at": "2026-04-20T05:34:43.282134Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -686,6 +686,62 @@
         "month": "Feb-26",
         "value": -0.16,
         "preliminary": true
+      }
+    ],
+    "oni_forecast": [
+      {
+        "season": "MAM",
+        "la_nina": 0,
+        "neutral": 91,
+        "el_nino": 9
+      },
+      {
+        "season": "AMJ",
+        "la_nina": 0,
+        "neutral": 53,
+        "el_nino": 47
+      },
+      {
+        "season": "MJJ",
+        "la_nina": 0,
+        "neutral": 28,
+        "el_nino": 72
+      },
+      {
+        "season": "JJA",
+        "la_nina": 0,
+        "neutral": 20,
+        "el_nino": 80
+      },
+      {
+        "season": "JAS",
+        "la_nina": 1,
+        "neutral": 23,
+        "el_nino": 76
+      },
+      {
+        "season": "ASO",
+        "la_nina": 1,
+        "neutral": 21,
+        "el_nino": 78
+      },
+      {
+        "season": "SON",
+        "la_nina": 2,
+        "neutral": 20,
+        "el_nino": 78
+      },
+      {
+        "season": "OND",
+        "la_nina": 4,
+        "neutral": 23,
+        "el_nino": 73
+      },
+      {
+        "season": "NDJ",
+        "la_nina": 5,
+        "neutral": 22,
+        "el_nino": 73
       }
     ],
     "regional_impact": [

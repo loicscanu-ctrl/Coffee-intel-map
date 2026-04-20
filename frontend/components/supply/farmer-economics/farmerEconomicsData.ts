@@ -55,6 +55,14 @@ export interface OniHistoryPoint {
   month: string;      // "Oct-24"
   value: number;
   forecast?: boolean;
+  preliminary?: boolean;
+}
+
+export interface OniForecastPoint {
+  season: string;     // "MAM", "AMJ", …
+  la_nina: number | null;
+  neutral: number | null;
+  el_nino: number | null;
 }
 
 export interface RegionalImpact {
@@ -115,6 +123,7 @@ export interface FarmerEconomicsData {
     peak_month: string;
     forecast_direction: string;
     oni_history: OniHistoryPoint[];
+    oni_forecast: OniForecastPoint[];
     regional_impact: RegionalImpact[];
     historical_stat: string;
     last_updated: string;

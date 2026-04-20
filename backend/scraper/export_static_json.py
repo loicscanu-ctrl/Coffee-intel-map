@@ -624,6 +624,7 @@ def export_farmer_economics(db) -> None:
                 else:
                     peak_month = ""
 
+                oni_forecast = meta.get("oni_forecast", [])
                 enso_out = {
                     "phase":              phase,
                     "intensity":          intensity,
@@ -631,6 +632,7 @@ def export_farmer_economics(db) -> None:
                     "peak_month":         peak_month,
                     "forecast_direction": forecast_direction,
                     "oni_history":        oni_history,
+                    "oni_forecast":       oni_forecast,
                     "regional_impact":    regional_impact,
                     "historical_stat":    _HISTORICAL_STAT_BY_PHASE.get(phase, ""),
                     "last_updated":       str(enso_item.pub_date)[:10],

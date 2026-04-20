@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine, Tooltip,
   Cell, ResponsiveContainer,
 } from "recharts";
-import type { FarmerEconomicsData, EnsoPhase, ImpactType } from "./farmerEconomicsData";
+import type { FarmerEconomicsData, EnsoPhase, ImpactType, OniForecastPoint } from "./farmerEconomicsData";
 
 interface Props {
   enso: NonNullable<FarmerEconomicsData["enso"]>;
@@ -112,6 +112,38 @@ export default function EnsoPanel({ enso }: Props) {
           })}
         </div>
       </div>
+
+      {/* 6-month probability forecast */}
+      {enso.oni_forecast && enso.oni_forecast.length > 0 && (
+        <div>
+          <div className="text-[10px] text-slate-500 mb-1">
+            IRI/CPC phase probability — 9-season outlook
+          </div>
+          <ResponsiveContainer width="100%" height={90}>
+            <BarChart
+              data={enso.oni_forecast}
+              margin={{ top: 2, right: 4, bottom: 0, left: 0 }}
+              barSize={14}
+            >
+              <XAxis dataKey="season" tick={{ fill: "#475569", fontSize: 7 }} />
+              <YAxis domain={[0, 100]} tick={{ fill: "#475569", fontSize: 8 }} width={24} unit="%" />
+              <Tooltip
+                contentStyle={TT_STYLE}
+                formatter={(v: unknown, name: string) => [`${v}%`, name]}
+              />
+              <Bar dataKey="la_nina" name="La Niña"  stackId="p" fill="#60a5fa" fillOpacity={0.85} radius={[0,0,0,0]} />
+              <Bar dataKey="neutral" name="Neutral"   stackId="p" fill="#475569" fillOpacity={0.7}  radius={[0,0,0,0]} />
+              <Bar dataKey="el_nino" name="El Niño"  stackId="p" fill="#a78bfa" fillOpacity={0.85} radius={[2,2,0,0]} />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="flex gap-3 mt-1 text-[8px] text-slate-500">
+            <span><span className="inline-block w-2 h-2 rounded-sm bg-blue-400 mr-1"/>La Niña</span>
+            <span><span className="inline-block w-2 h-2 rounded-sm bg-slate-500 mr-1"/>Neutral</span>
+            <span><span className="inline-block w-2 h-2 rounded-sm bg-violet-400 mr-1"/>El Niño</span>
+            <span className="ml-auto">Source: IRI/CPC · Updated monthly</span>
+          </div>
+        </div>
+      )}
 
       {/* Historical stat */}
       <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-700">

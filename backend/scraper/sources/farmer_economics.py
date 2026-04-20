@@ -423,6 +423,100 @@ def _scrape_enso(db) -> None:
         print(f"[farmer_economics] ENSO FAILED: {e}")
 
 
+IRI_FORECAST_URL = "https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/"
+
+_SEASON_ORDER = ["DJF","JFM","FMA","MAM","AMJ","MJJ","JJA","JAS","ASO","SON","OND","NDJ"]
+
+
+def _scrape_enso_forecast(db) -> None:
+    """Fetch IRI/CPC ENSO probability table and append to the NOAA ONI item.
+
+    Table layout (column-oriented):
+        Season | La Nina | Neutral | El Nino
+        MAM    |   0     |   91    |    9
+        AMJ    |   0     |   53    |   47
+        ...
+    """
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    from models import NewsItem
+    from bs4 import BeautifulSoup
+
+    try:
+        resp = requests.get(IRI_FORECAST_URL, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        forecast: list[dict] = []
+        for table in soup.find_all("table"):
+            all_text = table.get_text()
+            if "La Nina" not in all_text and "La Ni\xf1a" not in all_text:
+                continue
+
+            rows = table.find_all("tr")
+            if not rows:
+                continue
+
+            # Header row: Season | La Nina | Neutral | El Nino
+            headers = [th.get_text(strip=True).lower() for th in rows[0].find_all(["th", "td"])]
+            try:
+                col_season  = headers.index("season")
+                col_lanina  = next(i for i, h in enumerate(headers) if "la" in h and ("nina" in h or "niña" in h))
+                col_neutral = next(i for i, h in enumerate(headers) if "neutral" in h)
+                col_elnino  = next(i for i, h in enumerate(headers) if "el" in h and ("nino" in h or "niño" in h))
+            except (ValueError, StopIteration):
+                continue
+
+            # Data rows
+            for row in rows[1:]:
+                cells = row.find_all(["td", "th"])
+                if len(cells) <= max(col_season, col_lanina, col_neutral, col_elnino):
+                    continue
+                season = cells[col_season].get_text(strip=True)
+                if len(season) != 3 or not season.isupper():
+                    continue
+
+                def _int(cell):
+                    try:
+                        return int(cell.get_text(strip=True).replace("%", ""))
+                    except ValueError:
+                        return None
+
+                forecast.append({
+                    "season":  season,
+                    "la_nina": _int(cells[col_lanina]),
+                    "neutral": _int(cells[col_neutral]),
+                    "el_nino": _int(cells[col_elnino]),
+                })
+
+            if forecast:
+                break
+
+        if not forecast:
+            print("[farmer_economics] ENSO forecast: probability table not found")
+            return
+
+        # Append to existing ONI NewsItem meta
+        enso_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "NOAA CPC")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if enso_item:
+            meta = json.loads(enso_item.meta or "{}")
+            meta["oni_forecast"] = forecast
+            enso_item.meta = json.dumps(meta)
+            db.commit()
+            print(f"[farmer_economics] ENSO forecast OK ({len(forecast)} seasons): "
+                  f"{[f['season'] for f in forecast]}")
+        else:
+            print("[farmer_economics] ENSO forecast: no ONI item to attach to")
+    except Exception as e:
+        db.rollback()
+        print(f"[farmer_economics] ENSO forecast FAILED: {e}")
+
+
 def _parse_world_bank_excel(content: bytes) -> dict:
     """Parse World Bank CMO Pink Sheet Excel.
 
@@ -590,4 +684,5 @@ async def run(page, db) -> None:
     """
     _scrape_weather(db)
     _scrape_enso(db)
+    _scrape_enso_forecast(db)
     _scrape_fertilizer_prices(db)
