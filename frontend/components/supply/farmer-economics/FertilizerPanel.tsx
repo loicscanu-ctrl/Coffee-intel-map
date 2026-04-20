@@ -6,6 +6,7 @@ import {
 } from "recharts";
 import type { FarmerEconomicsData, FertilizerItem, FertilizerImportMonth } from "./farmerEconomicsData";
 import { fertCostDelta, netFertImpact } from "./farmerEconomicsUtils";
+import { useDataFreshness } from "@/lib/useDataFreshness";
 
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -81,6 +82,7 @@ function FertCard({ item }: { item: FertilizerItem }) {
 export default function FertilizerPanel({ fertilizer }: Props) {
   const net = netFertImpact(fertilizer.items);
   const imports = fertilizer.imports;
+  const freshness = useDataFreshness(imports?.last_updated ?? undefined, 48);
 
   const chartData = imports ? buildChartData(imports.monthly) : [];
 
@@ -89,7 +91,13 @@ export default function FertilizerPanel({ fertilizer }: Props) {
       <div className="text-[10px] text-slate-400 uppercase tracking-wide flex items-baseline justify-between">
         <span>Fertilizer Prices</span>
         {fertilizer.prices_as_of && (
-          <span className="text-[8px] text-slate-600 normal-case font-normal">
+          <span className="text-[8px] text-slate-600 normal-case font-normal flex items-center gap-1">
+            {freshness === "stale" && (
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"
+                title={`Data may be stale (last updated: ${imports?.last_updated})`}
+              />
+            )}
             Comex Stat · FOB implied · {fertilizer.prices_as_of}
           </span>
         )}
