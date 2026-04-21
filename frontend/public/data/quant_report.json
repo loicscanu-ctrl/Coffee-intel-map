@@ -1,115 +1,111 @@
 {
   "currency_index": {
-    "scraped_at": "2026-04-20T22:09:52.209119+00:00",
-    "index_value": 104.867498,
-    "daily_delta_i": -0.003861,
-    "daily_delta_pct": -0.441373,
-    "zscore": -2.554932,
-    "zscore_mean": 108.547714,
-    "zscore_std": 1.440436,
+    "scraped_at": "2026-04-21T22:09:26.905195+00:00",
+    "index_value": 104.740572,
+    "daily_delta_i": 0.003639,
+    "daily_delta_pct": 0.223966,
+    "zscore": -2.585621,
+    "zscore_mean": 108.523535,
+    "zscore_std": 1.463077,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.643187,
-        "contribution": -0.0033
+        "daily_chg": 0.478551,
+        "contribution": 0.002455
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": 0.04943,
-        "contribution": 0.00013
+        "daily_chg": 0.045605,
+        "contribution": 0.000119
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": -0.870456,
-        "contribution": -0.001114
+        "daily_chg": -0.168214,
+        "contribution": -0.000215
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": 0.356246,
-        "contribution": 0.000182
+        "daily_chg": 0.023347,
+        "contribution": 1.2e-05
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": 1.825447,
-        "contribution": 0.000858
+        "daily_chg": 1.409684,
+        "contribution": 0.000663
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.07074,
-        "contribution": 0.000476
+        "daily_chg": 0.023494,
+        "contribution": 0.000158
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": -0.260692,
-        "contribution": -0.000248
+        "daily_chg": 0.152683,
+        "contribution": 0.000145
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.665225,
-        "contribution": -0.000346
+        "daily_chg": -0.33943,
+        "contribution": -0.000177
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.064509,
-        "contribution": -3.4e-05
+        "daily_chg": 0.048411,
+        "contribution": 2.5e-05
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": -0.43357,
-        "contribution": -0.000199
+        "daily_chg": -0.321052,
+        "contribution": -0.000148
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": -0.532505,
-        "contribution": -0.00024
+        "daily_chg": 1.455821,
+        "contribution": 0.000655
       },
       {
         "ticker": "GBP=X",
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": -0.069391,
-        "contribution": -2.6e-05
+        "daily_chg": -0.138885,
+        "contribution": -5.3e-05
       }
     ],
     "history": [
-      {
-        "date": "2026-03-11",
-        "value": 105.965254
-      },
       {
         "date": "2026-03-12",
         "value": 105.515993
@@ -220,13 +216,17 @@
       },
       {
         "date": "2026-04-20",
-        "value": 105.332407
+        "value": 105.03366
       },
       {
         "date": "2026-04-21",
-        "value": 104.867498
+        "value": 104.506513
+      },
+      {
+        "date": "2026-04-22",
+        "value": 104.740572
       }
     ]
   },
-  "scraped_at": "2026-04-20T22:09:52.209119+00:00"
+  "scraped_at": "2026-04-21T22:09:26.905195+00:00"
 }
