@@ -31,6 +31,61 @@ const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRad
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const YEAR_COLORS = ["#475569", "#64748b", "#3b82f6", "#22c55e", "#f59e0b"];
 
+const FERT_TYPES = ["urea_kt","kcl_kt","map_kt","dap_kt","an_kt","as_kt","superp_kt"] as const;
+type FertType = typeof FERT_TYPES[number];
+
+const FERT_COLORS: Record<FertType, string> = {
+  urea_kt: "#3b82f6", kcl_kt: "#8b5cf6", map_kt: "#10b981",
+  dap_kt: "#06b6d4", an_kt: "#f59e0b", as_kt: "#ec4899", superp_kt: "#84cc16",
+};
+const FERT_LABELS: Record<FertType, string> = {
+  urea_kt: "Urea", kcl_kt: "KCl", map_kt: "MAP",
+  dap_kt: "DAP", an_kt: "AN", as_kt: "AS", superp_kt: "Superp",
+};
+
+function brazilGetTypes(m: BrazilImportMonth): Record<FertType, number> {
+  return {
+    urea_kt: m.urea_kt ?? 0, kcl_kt: m.kcl_kt ?? 0,
+    map_kt: m.map_kt ?? 0, dap_kt: m.dap_kt ?? 0,
+    an_kt: m.an_kt ?? 0, as_kt: m.as_kt ?? 0, superp_kt: m.superp_kt ?? 0,
+  };
+}
+
+function BrazilStackedTooltip({ active, payload, label }: {
+  active?: boolean; payload?: Array<{ dataKey: string; value: number }>; label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  const byYear: Record<string, Record<string, number>> = {};
+  for (const entry of payload) {
+    if (!entry.value || entry.value <= 0) continue;
+    const parts = entry.dataKey.split("_");
+    const yr = parts[0];
+    if (!/^\d{4}$/.test(yr)) continue;
+    const type = parts.slice(1).join("_");
+    if (!byYear[yr]) byYear[yr] = {};
+    byYear[yr][type] = entry.value;
+  }
+  if (!Object.keys(byYear).length) return null;
+  return (
+    <div style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:6, padding:"8px 10px", fontSize:10 }}>
+      <div style={{ color:"#94a3b8", marginBottom:6, fontWeight:"bold" }}>{label}</div>
+      {Object.entries(byYear).sort().map(([yr, types]) => {
+        const total = Object.values(types).reduce((s,v) => s+v, 0);
+        return (
+          <div key={yr} style={{ marginBottom:4 }}>
+            <div style={{ color:"#e2e8f0", fontWeight:"bold", marginBottom:2 }}>{yr}: {total.toFixed(0)} kt</div>
+            {FERT_TYPES.filter(t => (types[t] ?? 0) > 0).map(t => (
+              <div key={t} style={{ color:FERT_COLORS[t], paddingLeft:8 }}>
+                {FERT_LABELS[t]}: {(types[t] ?? 0).toFixed(0)} kt
+              </div>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const HS_META: Record<string, { label: string; color: string }> = {
   "3102": { label: "Nitrogen / Urea",  color: "#3b82f6" },
   "3104": { label: "Potash (KCl)",     color: "#8b5cf6" },
@@ -69,103 +124,141 @@ function PriceCard({ item }: { item: FertPrice }) {
   );
 }
 
-// ── Brazil import chart — seasonal grouped view (same pattern as Vietnam) ──────
+// ── Brazil import chart — seasonal grouped stacked view ───────────────────────
 
 function BrazilImportChart({ monthly }: { monthly: BrazilImportMonth[] }) {
-  // Group by month number → one row per month, value per year
-  const byMonth: Record<number, Record<string, number>> = {};
-  const years = new Set<string>();
-  for (const m of monthly) {
-    const [yr, mo] = m.month.split("-");
-    const moIdx = parseInt(mo) - 1;
-    if (!byMonth[moIdx]) byMonth[moIdx] = {};
-    byMonth[moIdx][yr] = m.total_kt;
-    years.add(yr);
-  }
-  const sortedYears = Array.from(years).sort();
+  const [view, setView] = useState<"monthly" | "cumulative">("monthly");
 
-  const chartData = MONTH_ABBR.map((label, i) => {
-    const vals = Object.values(byMonth[i] || {}).filter(v => v > 0);
-    return {
-      month: label,
-      ...byMonth[i],
-      min_range: vals.length > 1 ? Math.min(...vals) : null,
-      max_range: vals.length > 1 ? Math.max(...vals) : null,
-    };
-  }).filter(row => sortedYears.some(yr => (row as Record<string, unknown>)[yr] != null));
+  const { byKey, sortedYears, lastMonthIdx } = useMemo(() => {
+    const byKey: Record<string, BrazilImportMonth> = {};
+    const years = new Set<string>();
+    const lastMonthIdx: Record<string, number> = {};
+    for (const m of monthly) {
+      byKey[m.month] = m;
+      const [yr, mo] = m.month.split("-");
+      years.add(yr);
+      const moIdx = parseInt(mo) - 1;
+      if (!(yr in lastMonthIdx) || moIdx > lastMonthIdx[yr]) lastMonthIdx[yr] = moIdx;
+    }
+    return { byKey, sortedYears: Array.from(years).sort(), lastMonthIdx };
+  }, [monthly]);
 
   const latestYear = sortedYears[sortedYears.length - 1];
   const latest = monthly[monthly.length - 1];
+
+  const chartData = useMemo(() => {
+    if (view === "monthly") {
+      return MONTH_ABBR.map((label, i) => {
+        const row: Record<string, string | number | null> = { month: label };
+        const yearTotals: number[] = [];
+        for (const yr of sortedYears) {
+          const m = byKey[`${yr}-${String(i + 1).padStart(2, "0")}`];
+          if (m) {
+            const types = brazilGetTypes(m);
+            for (const t of FERT_TYPES) row[`${yr}_${t}`] = types[t] || null;
+            yearTotals.push(m.total_kt);
+          } else {
+            for (const t of FERT_TYPES) row[`${yr}_${t}`] = null;
+          }
+        }
+        const vals = yearTotals.filter(v => v > 0);
+        row.min_range = vals.length > 1 ? Math.min(...vals) : null;
+        row.max_range = vals.length > 1 ? Math.max(...vals) : null;
+        return row;
+      }).filter(row => sortedYears.some(yr => (row as Record<string, unknown>)[`${yr}_urea_kt`] != null));
+    } else {
+      const cum: Record<string, Record<FertType, number>> = {};
+      for (const yr of sortedYears) cum[yr] = { urea_kt:0, kcl_kt:0, map_kt:0, dap_kt:0, an_kt:0, as_kt:0, superp_kt:0 };
+      return MONTH_ABBR.map((label, i) => {
+        const row: Record<string, string | number | null> = { month: label };
+        for (const yr of sortedYears) {
+          const m = byKey[`${yr}-${String(i + 1).padStart(2, "0")}`];
+          if (m) { const t = brazilGetTypes(m); for (const k of FERT_TYPES) cum[yr][k] += t[k]; }
+          if (i <= (lastMonthIdx[yr] ?? -1)) {
+            for (const t of FERT_TYPES) row[`${yr}_${t}`] = Math.round(cum[yr][t]) || null;
+          } else {
+            for (const t of FERT_TYPES) row[`${yr}_${t}`] = null;
+          }
+        }
+        return row;
+      });
+    }
+  }, [monthly, view, byKey, sortedYears, lastMonthIdx]);
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
       <div className="flex items-baseline justify-between flex-wrap gap-2">
         <div>
           <div className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Brazil Fertilizer Imports</div>
-          <div className="text-[8px] text-slate-600 mt-0.5">Comex Stat · HS 31 · all types · kt/month · {sortedYears[0]}–{latestYear}</div>
+          <div className="text-[8px] text-slate-600 mt-0.5">Comex Stat · HS 31 · kt · {sortedYears[0]}–{latestYear}</div>
         </div>
-        {latest && (
-          <div className="text-right">
-            <div className="text-[8px] text-slate-500">Latest ({fmtMo(latest.month)})</div>
-            <div className="text-sm font-bold text-amber-400">{latest.total_kt.toLocaleString()} kt</div>
+        <div className="flex items-center gap-2">
+          {latest && (
+            <div className="text-right">
+              <div className="text-[8px] text-slate-500">Latest ({fmtMo(latest.month)})</div>
+              <div className="text-sm font-bold text-amber-400">{latest.total_kt.toLocaleString()} kt</div>
+            </div>
+          )}
+          <div className="flex gap-0.5">
+            {(["monthly", "cumulative"] as const).map(v => (
+              <button key={v} onClick={() => setView(v)}
+                className={`px-2 py-0.5 rounded text-[8px] font-bold transition-colors ${
+                  view === v ? "bg-slate-600 text-slate-100" : "text-slate-500 hover:text-slate-400"
+                }`}>
+                {v === "monthly" ? "Monthly" : "Cumul."}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Grouped bar chart by month, one bar per year */}
-      <div className="h-48">
+      <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barCategoryGap="20%" barGap={2}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false}
               tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : `${v}`} />
-            <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, name: unknown) => {
-              const s = String(name);
-              if (s === "max_range" || s === "min_range") return [`${Number(v).toFixed(0)} kt`, s === "max_range" ? "3yr max" : "3yr min"];
-              return [`${Number(v).toFixed(0)} kt`, s];
-            }} />
-            {sortedYears.map((yr, i) => (
-              <Bar key={yr} dataKey={yr} name={yr} fill={YEAR_COLORS[i + (YEAR_COLORS.length - sortedYears.length)]}
-                opacity={yr === latestYear ? 1 : 0.65} radius={yr === latestYear ? [2,2,0,0] : [0,0,0,0]} />
-            ))}
-            <Line dataKey="min_range" stroke="#334155" strokeDasharray="3 2" strokeWidth={1} dot={false} legendType="none" />
-            <Line dataKey="max_range" stroke="#475569" strokeDasharray="3 2" strokeWidth={1} dot={false} legendType="none" />
+            <Tooltip content={<BrazilStackedTooltip />} />
+            {sortedYears.flatMap((yr, i) => {
+              const opacity = Math.max(0.4, 1 - (sortedYears.length - 1 - i) * 0.25);
+              return FERT_TYPES.map(t => (
+                <Bar key={`${yr}_${t}`} dataKey={`${yr}_${t}`} stackId={yr}
+                  fill={FERT_COLORS[t]} opacity={opacity} isAnimationActive={false} />
+              ));
+            })}
+            {view === "monthly" && <>
+              <Line dataKey="min_range" stroke="#334155" strokeDasharray="3 2" strokeWidth={1} dot={false} legendType="none" />
+              <Line dataKey="max_range" stroke="#475569" strokeDasharray="3 2" strokeWidth={1} dot={false} legendType="none" />
+            </>}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Year legend + type breakdown for latest month */}
-      <div className="flex items-start justify-between flex-wrap gap-3 border-t border-slate-700 pt-2">
-        <div className="flex flex-wrap gap-3">
-          {sortedYears.map((yr, i) => (
-            <span key={yr} className="flex items-center gap-1 text-[7px] text-slate-500">
-              <span className="w-2 h-2 rounded-sm" style={{ background: YEAR_COLORS[i + (YEAR_COLORS.length - sortedYears.length)] }} />
-              {yr}
+      <div className="flex items-start justify-between flex-wrap gap-2 border-t border-slate-700 pt-2">
+        <div className="flex flex-wrap gap-2">
+          {FERT_TYPES.map(t => (
+            <span key={t} className="flex items-center gap-1 text-[7px] text-slate-500">
+              <span className="w-2 h-2 rounded-sm" style={{ background: FERT_COLORS[t] }} />
+              {FERT_LABELS[t]}
             </span>
           ))}
-          <span className="flex items-center gap-1 text-[7px] text-slate-600">
-            <span className="w-3 h-px border-t border-dashed border-slate-500 inline-block" />3yr range
-          </span>
         </div>
-        {latest && (
-          <div className="flex flex-wrap gap-2 text-[7px] text-slate-500">
-            {[
-              { label: "Urea",   val: latest.urea_kt,    color: "#3b82f6" },
-              { label: "KCl",    val: latest.kcl_kt,     color: "#8b5cf6" },
-              { label: "MAP",    val: latest.map_kt,     color: "#10b981" },
-              { label: "DAP",    val: latest.dap_kt,     color: "#06b6d4" },
-              { label: "AN",     val: latest.an_kt,      color: "#f59e0b" },
-              { label: "AS",     val: latest.as_kt,      color: "#ec4899" },
-              { label: "Superp", val: latest.superp_kt,  color: "#84cc16" },
-            ].filter(x => x.val != null && x.val! > 0).map(x => (
-              <span key={x.label} className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: x.color }} />
-                {x.label}: {x.val!.toFixed(0)} kt
+        <div className="flex flex-wrap gap-2">
+          {sortedYears.map((yr, i) => {
+            const opacity = Math.max(0.4, 1 - (sortedYears.length - 1 - i) * 0.25);
+            return (
+              <span key={yr} className="flex items-center gap-1 text-[7px] text-slate-500">
+                <span className="w-2 h-2 rounded-sm bg-slate-400" style={{ opacity }} />{yr}
               </span>
-            ))}
-          </div>
-        )}
+            );
+          })}
+          {view === "monthly" && (
+            <span className="flex items-center gap-1 text-[7px] text-slate-600">
+              <span className="w-3 h-px border-t border-dashed border-slate-500 inline-block" />yr range
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
