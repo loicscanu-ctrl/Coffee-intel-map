@@ -1,0 +1,710 @@
+{
+  "updated": "2026-04-22T05:16:05Z",
+  "hs_codes": {
+    "3102": "Nitrogen fertilizers (incl Urea)",
+    "3104": "Potassic fertilizers",
+    "3105": "DAP / MAP / NPK"
+  },
+  "top_exporters": {
+    "3102": [
+      "643",
+      "156",
+      "818",
+      "682",
+      "012",
+      "634"
+    ],
+    "3104": [
+      "124",
+      "643",
+      "112",
+      "276",
+      "376",
+      "400"
+    ],
+    "3105": [
+      "504",
+      "156",
+      "643",
+      "840",
+      "818",
+      "400"
+    ]
+  },
+  "has_live_data": true,
+  "global_exports": {
+    "3102": [],
+    "3104": [
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 1833065.9,
+        "value_usd": 525662840.214
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 1023599.0,
+        "value_usd": 270126461.817
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 15.9,
+        "value_usd": 4130.866
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 786640.0,
+        "value_usd": 244419887.052
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 22811.0,
+        "value_usd": 11112360.479
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 15.9,
+        "value_usd": 4130.866
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 1023599.0,
+        "value_usd": 270126461.817
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 786640.0,
+        "value_usd": 244419887.052
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 22811.0,
+        "value_usd": 11112360.479
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202602",
+        "hs_code": "3104",
+        "qty_mt": 1833065.9,
+        "value_usd": 525662840.214
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 16065.0,
+        "value_usd": 7769910.881
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 12.1,
+        "value_usd": 3165.035
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 12.1,
+        "value_usd": 3165.035
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 899944.2,
+        "value_usd": 284210080.124
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 899944.2,
+        "value_usd": 284210080.124
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 1775363.4,
+        "value_usd": 528701729.714
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 859342.0,
+        "value_usd": 236718573.674
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 1775363.4,
+        "value_usd": 528701729.714
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 859342.0,
+        "value_usd": 236718573.674
+      },
+      {
+        "reporter": "Canada",
+        "reporter_code": "124",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 16065.0,
+        "value_usd": 7769910.881
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 228913.2,
+        "value_usd": 72837905
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 26.8,
+        "value_usd": 124407
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 166346.4,
+        "value_usd": 51831835
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 10151.4,
+        "value_usd": 3358339
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 22427.2,
+        "value_usd": 5593647
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 29887.9,
+        "value_usd": 11888996
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 0.0,
+        "value_usd": 18
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 73.4,
+        "value_usd": 40663
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 228913.2,
+        "value_usd": 72837905
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 26.8,
+        "value_usd": 124407
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 166346.4,
+        "value_usd": 51831835
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 10151.4,
+        "value_usd": 3358339
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 22427.2,
+        "value_usd": 5593647
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 29887.9,
+        "value_usd": 11888996
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 0.0,
+        "value_usd": 18
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 73.4,
+        "value_usd": 40663
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 228913.2,
+        "value_usd": 72837905
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 26.8,
+        "value_usd": 124407
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 166346.4,
+        "value_usd": 51831835
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 10151.4,
+        "value_usd": 3358339
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 22427.2,
+        "value_usd": 5593647
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 29887.9,
+        "value_usd": 11888996
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 0.0,
+        "value_usd": 18
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 73.4,
+        "value_usd": 40663
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 228913.2,
+        "value_usd": 72837905
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 26.8,
+        "value_usd": 124407
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 166346.4,
+        "value_usd": 51831835
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 10151.4,
+        "value_usd": 3358339
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 22427.2,
+        "value_usd": 5593647
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 29887.9,
+        "value_usd": 11888996
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 0.0,
+        "value_usd": 18
+      },
+      {
+        "reporter": "Germany",
+        "reporter_code": "276",
+        "period": "202601",
+        "hs_code": "3104",
+        "qty_mt": 73.4,
+        "value_usd": 40663
+      }
+    ],
+    "3105": []
+  },
+  "country_imports": {
+    "brazil": {
+      "3102": [
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202603",
+          "qty_mt": 24023.4,
+          "value_usd": 12298717
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202603",
+          "qty_mt": 739637.6,
+          "value_usd": 276513184
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202603",
+          "qty_mt": 32641.0,
+          "value_usd": 15755540
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202603",
+          "qty_mt": 588.0,
+          "value_usd": 270480
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202603",
+          "qty_mt": 796890.1,
+          "value_usd": 304837921
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202602",
+          "qty_mt": 802419.3,
+          "value_usd": 249981453
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202602",
+          "qty_mt": 2324.0,
+          "value_usd": 1048148
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202602",
+          "qty_mt": 28640.0,
+          "value_usd": 12160334
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202602",
+          "qty_mt": 737632.3,
+          "value_usd": 221900833
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3102",
+          "period": "202602",
+          "qty_mt": 33822.9,
+          "value_usd": 14872138
+        }
+      ],
+      "3104": [
+        {
+          "importer": "brazil",
+          "hs_code": "3104",
+          "period": "202603",
+          "qty_mt": 1394497.7,
+          "value_usd": 510670946
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3104",
+          "period": "202603",
+          "qty_mt": 644.0,
+          "value_usd": 236992
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3104",
+          "period": "202602",
+          "qty_mt": 392.0,
+          "value_usd": 147112
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3104",
+          "period": "202602",
+          "qty_mt": 922241.9,
+          "value_usd": 329449319
+        }
+      ],
+      "3105": [
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202603",
+          "qty_mt": 9.3,
+          "value_usd": 122517
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202603",
+          "qty_mt": 234.9,
+          "value_usd": 1366229
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202603",
+          "qty_mt": 486874.2,
+          "value_usd": 328412690
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202603",
+          "qty_mt": 486629.9,
+          "value_usd": 326923944
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202602",
+          "qty_mt": 141.0,
+          "value_usd": 581865
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202602",
+          "qty_mt": 293345.8,
+          "value_usd": 186793866
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202602",
+          "qty_mt": 5.3,
+          "value_usd": 86686
+        },
+        {
+          "importer": "brazil",
+          "hs_code": "3105",
+          "period": "202602",
+          "qty_mt": 293492.1,
+          "value_usd": 187462417
+        }
+      ]
+    },
+    "vietnam": {
+      "3102": [],
+      "3104": [],
+      "3105": []
+    }
+  },
+  "brazil_comex": {},
+  "static_seed": {
+    "note": "Static seed — replace with live API data once COMTRADE_API_KEY is set",
+    "global_exports_2024": {
+      "3102": [
+        {
+          "country": "Russia",
+          "qty_mt_k": 7800
+        },
+        {
+          "country": "China",
+          "qty_mt_k": 5200
+        },
+        {
+          "country": "Egypt",
+          "qty_mt_k": 2100
+        },
+        {
+          "country": "Saudi Arabia",
+          "qty_mt_k": 1900
+        },
+        {
+          "country": "Algeria",
+          "qty_mt_k": 1400
+        },
+        {
+          "country": "Qatar",
+          "qty_mt_k": 900
+        }
+      ],
+      "3104": [
+        {
+          "country": "Canada",
+          "qty_mt_k": 14000
+        },
+        {
+          "country": "Russia",
+          "qty_mt_k": 6200
+        },
+        {
+          "country": "Belarus",
+          "qty_mt_k": 5100
+        },
+        {
+          "country": "Germany",
+          "qty_mt_k": 2800
+        },
+        {
+          "country": "Israel",
+          "qty_mt_k": 1600
+        },
+        {
+          "country": "Jordan",
+          "qty_mt_k": 1100
+        }
+      ],
+      "3105": [
+        {
+          "country": "Morocco",
+          "qty_mt_k": 8900
+        },
+        {
+          "country": "China",
+          "qty_mt_k": 7400
+        },
+        {
+          "country": "Russia",
+          "qty_mt_k": 3200
+        },
+        {
+          "country": "USA",
+          "qty_mt_k": 2600
+        },
+        {
+          "country": "Egypt",
+          "qty_mt_k": 2000
+        },
+        {
+          "country": "Jordan",
+          "qty_mt_k": 1200
+        }
+      ]
+    }
+  }
+}

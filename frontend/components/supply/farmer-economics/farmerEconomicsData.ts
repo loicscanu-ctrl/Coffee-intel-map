@@ -22,6 +22,10 @@ export interface WeatherRegion {
   name: string;
   frost: RiskLevel;
   drought: RiskLevel;
+  csi_30d?: number;
+  csi_60d?: number;
+  csi_30d_level?: string;
+  csi_60d_level?: string;
 }
 
 export interface DailyRiskRow {
@@ -85,7 +89,12 @@ export interface FertilizerImportMonth {
   month: string;                    // "2026-01"
   urea_kt: number;
   kcl_kt: number;
-  map_dap_kt: number;
+  map_kt?: number;
+  dap_kt?: number;
+  an_kt?: number;
+  as_kt?: number;
+  superp_kt?: number;
+  map_dap_kt: number;               // map + dap combined (backward compat)
   total_kt: number;
   total_fob_usd_m: number;
   urea_price_usd_mt:    number | null;
@@ -93,21 +102,45 @@ export interface FertilizerImportMonth {
   map_dap_price_usd_mt: number | null;
 }
 
+export interface CostData {
+  total_usd_per_bag: number;
+  yoy_pct: number;
+  season_label: string;
+  components: CostComponent[];
+  inputs_detail: InputDetail[];
+  kc_spot?: number | null;
+  rc_spot?: number | null;
+  last_updated: string;
+}
+
+export interface BalanceSeasonRow {
+  season: string;
+  type: "on" | "off";
+  forecast: boolean;
+  production: { usda: number; conab: number; cecafe: number };
+  exports_ico: number;
+  consumption: number;
+}
+
+export interface BalanceSheet {
+  unit: string;
+  note: string;
+  seasons: BalanceSeasonRow[];
+}
+
 export interface FarmerEconomicsData {
   country: string;
   season: string;
   scraped_at: string;
-  cost: {
-    total_usd_per_bag: number;
-    yoy_pct: number;
-    season_label: string;
-    components: CostComponent[];
-    inputs_detail: InputDetail[];
-    kc_spot: number;
-    last_updated: string;
-  } | null;
+  cost: CostData | null;
+  cost_arabica: CostData | null;
+  cost_conilon: CostData | null;
   acreage: { thousand_ha: number; yoy_pct: number; source_label: string } | null;
   yield:   { bags_per_ha: number; yoy_pct: number; source_label: string } | null;
+  acreage_arabica: { thousand_ha: number; yoy_pct: number; source_label: string } | null;
+  yield_arabica:   { bags_per_ha: number; yoy_pct: number; source_label: string } | null;
+  acreage_conilon: { thousand_ha: number; yoy_pct: number; source_label: string } | null;
+  yield_conilon:   { bags_per_ha: number; yoy_pct: number; source_label: string } | null;
   weather: {
     scraped_at: string;
     regions: WeatherRegion[];
@@ -130,11 +163,12 @@ export interface FarmerEconomicsData {
   } | null;
   fertilizer: {
     items: FertilizerItem[];
-    prices_as_of?: string;   // e.g. "Mar-2026" — last month with Comex data (FOB implied price)
+    prices_as_of?: string;
     imports: {
       last_updated: string;
       monthly: FertilizerImportMonth[];
     } | null;
     next_application: string;
   };
+  balance_sheet?: BalanceSheet;
 }

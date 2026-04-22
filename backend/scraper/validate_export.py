@@ -74,6 +74,20 @@ def validate_cot(data: list) -> tuple[bool, str]:
     return True, "ok"
 
 
+def validate_cot_recent(data: list) -> tuple[bool, str]:
+    if not isinstance(data, list) or len(data) == 0:
+        return False, "empty list"
+    return True, "ok"
+
+
+def validate_health(data: dict) -> tuple[bool, str]:
+    if not isinstance(data, dict):
+        return False, "not a dict"
+    if "scrapers" not in data:
+        return False, "missing scrapers key"
+    return True, "ok"
+
+
 def validate_macro_cot(data: list) -> tuple[bool, str]:
     if not isinstance(data, list) or len(data) == 0:
         return False, "empty list"

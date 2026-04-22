@@ -35,9 +35,11 @@ from scraper.validate_export import (
     validate_futures_chain,
     validate_oi_fnd_chart,
     validate_cot,
+    validate_cot_recent,
     validate_macro_cot,
     validate_freight,
     validate_farmer_economics,
+    validate_health,
 )
 
 ROOT    = Path(__file__).resolve().parents[2]
@@ -261,6 +263,11 @@ def export_cot(db) -> None:
     path = OUT_DIR / "cot.json"
     written = safe_write_json(path, result, validate_cot)
     print(f"  cot.json → written:{written} {len(result)} weeks")
+
+    recent = result[-12:]
+    path_r = OUT_DIR / "cot_recent.json"
+    written_r = safe_write_json(path_r, recent, validate_cot_recent)
+    print(f"  cot_recent.json → written:{written_r} {len(recent)} weeks (tail)")
 
 
 # ── 5. Macro COT ─────────────────────────────────────────────────────────────
@@ -537,10 +544,17 @@ def export_farmer_economics(db) -> None:
                 frost_badge   = _badge_from_risk_code(_worst_risk(frost_codes))
                 drought_badge = _badge_from_risk_code(_worst_risk(drought_codes))
 
+                from scraper.sources.farmer_economics import _calc_csi
+                csi = _calc_csi(daily)
+
                 regions_out.append({
-                    "name":    region_name,
-                    "frost":   frost_badge,
-                    "drought": drought_badge,
+                    "name":           region_name,
+                    "frost":          frost_badge,
+                    "drought":        drought_badge,
+                    "csi_30d":        csi["csi_30d"],
+                    "csi_60d":        csi["csi_60d"],
+                    "csi_30d_level":  csi["csi_30d_level"],
+                    "csi_60d_level":  csi["csi_60d_level"],
                 })
 
                 frost_days   = [d.get("frost_risk",   "-") for d in daily]
@@ -686,33 +700,72 @@ def export_farmer_economics(db) -> None:
             .all()
         )
         if import_rows:
+            # NCM code → fertilizer type bucket (handles both old wrong codes + new correct codes)
+            _CODE_TO_TYPE: dict[str, str] = {
+                # Urea
+                "31021010": "urea", "31021090": "urea", "31028000": "urea",
+                # KCl — 31042010 was old wrong code kept for compat with existing DB rows
+                "31042010": "kcl",  "31042090": "kcl",
+                # MAP (monoammonium phosphate) — 31052000 was old wrong code
+                "31052000": "map",  "31054000": "map",
+                # DAP (diammonium phosphate)
+                "31053000": "dap",
+                # AN (ammonium nitrate)
+                "31023000": "an",
+                # AS (ammonium sulphate)
+                "31022100": "as",
+                # Superphosphate
+                "31031020": "superp", "31031030": "superp",
+                "31031100": "superp", "31031900": "superp",
+            }
+
+            def _row_type(row) -> str | None:
+                t = _CODE_TO_TYPE.get((row.ncm_code or "")[:8])
+                if t:
+                    return t
+                # Label fallback for old "NCM XXXXX" entries
+                lc = (row.ncm_label or "").lower()
+                if "urea" in lc or "ureia" in lc:
+                    return "urea"
+                if "kcl" in lc or "cloreto de pot" in lc:
+                    return "kcl"
+                if lc == "map":
+                    return "map"
+                if "dap" in lc or "diamônio" in lc or "diamonio" in lc:
+                    return "dap"
+                if lc == "an" or "nitrato" in lc:
+                    return "an"
+                if lc == "as" or "sulfato de amônio" in lc:
+                    return "as"
+                if "superphosphate" in lc or "superfosfato" in lc:
+                    return "superp"
+                return None
+
             # Group by month string "YYYY-MM", tracking volume + FOB per type
             months_data: dict = {}
             for row in import_rows:
                 m_str = row.month.strftime("%Y-%m")
                 if m_str not in months_data:
                     months_data[m_str] = {
-                        "month":            m_str,
-                        "urea_kt":          0.0, "urea_fob":          0.0,
-                        "kcl_kt":           0.0, "kcl_fob":           0.0,
-                        "map_dap_kt":       0.0, "map_dap_fob":       0.0,
-                        "total_kt":         0.0,
-                        "total_fob_usd_m":  0.0,
+                        "month":       m_str,
+                        "urea_kt":     0.0, "urea_fob":   0.0,
+                        "kcl_kt":      0.0, "kcl_fob":    0.0,
+                        "map_kt":      0.0, "map_fob":    0.0,
+                        "dap_kt":      0.0, "dap_fob":    0.0,
+                        "an_kt":       0.0, "an_fob":     0.0,
+                        "as_kt":       0.0, "as_fob":     0.0,
+                        "superp_kt":   0.0, "superp_fob": 0.0,
+                        "total_kt":    0.0,
+                        "total_fob_usd_m": 0.0,
                     }
-                label  = (row.ncm_label or "").lower()
-                kt     = (row.net_weight_kg or 0) / 1_000_000
-                fob_m  = (row.fob_usd or 0) / 1_000_000
-                if "ureia" in label or "urea" in label:
-                    months_data[m_str]["urea_kt"]  += kt
-                    months_data[m_str]["urea_fob"] += fob_m
-                elif "kcl" in label or "cloreto de pot" in label or "potassio" in label or "potássio" in label:
-                    months_data[m_str]["kcl_kt"]   += kt
-                    months_data[m_str]["kcl_fob"]  += fob_m
-                elif "map" in label or "dap" in label or "fosfato" in label or "diamônio" in label or "diamonio" in label:
-                    months_data[m_str]["map_dap_kt"]  += kt
-                    months_data[m_str]["map_dap_fob"] += fob_m
-                months_data[m_str]["total_kt"]        += kt
-                months_data[m_str]["total_fob_usd_m"] += fob_m
+                ftype = _row_type(row)
+                kt    = (row.net_weight_kg or 0) / 1_000_000
+                fob_m = (row.fob_usd or 0) / 1_000_000
+                if ftype:
+                    months_data[m_str][f"{ftype}_kt"]  += kt
+                    months_data[m_str][f"{ftype}_fob"] += fob_m
+                months_data[m_str]["total_kt"]         += kt
+                months_data[m_str]["total_fob_usd_m"]  += fob_m
 
             # Compute implied FOB price (USD/mt) per type per month
             def _implied_price(fob_m: float, kt: float) -> float | None:
@@ -726,23 +779,30 @@ def export_farmer_economics(db) -> None:
             # Round volume/value fields for output, include implied price per type
             monthly_out = []
             for entry in sorted_months:
+                map_dap_kt  = entry["map_kt"]  + entry["dap_kt"]
+                map_dap_fob = entry["map_fob"] + entry["dap_fob"]
                 monthly_out.append({
                     "month":              entry["month"],
-                    "urea_kt":            round(entry["urea_kt"],        1),
-                    "kcl_kt":             round(entry["kcl_kt"],         1),
-                    "map_dap_kt":         round(entry["map_dap_kt"],     1),
-                    "total_kt":           round(entry["total_kt"],       1),
-                    "total_fob_usd_m":    round(entry["total_fob_usd_m"],2),
-                    "urea_price_usd_mt":    _implied_price(entry["urea_fob"],    entry["urea_kt"]),
-                    "kcl_price_usd_mt":     _implied_price(entry["kcl_fob"],     entry["kcl_kt"]),
-                    "map_dap_price_usd_mt": _implied_price(entry["map_dap_fob"], entry["map_dap_kt"]),
+                    "urea_kt":            round(entry["urea_kt"],   1),
+                    "kcl_kt":             round(entry["kcl_kt"],    1),
+                    "map_kt":             round(entry["map_kt"],    1),
+                    "dap_kt":             round(entry["dap_kt"],    1),
+                    "an_kt":              round(entry["an_kt"],     1),
+                    "as_kt":              round(entry["as_kt"],     1),
+                    "superp_kt":          round(entry["superp_kt"], 1),
+                    "map_dap_kt":         round(map_dap_kt,         1),  # backward compat
+                    "total_kt":           round(entry["total_kt"],  1),
+                    "total_fob_usd_m":    round(entry["total_fob_usd_m"], 2),
+                    "urea_price_usd_mt":    _implied_price(entry["urea_fob"], entry["urea_kt"]),
+                    "kcl_price_usd_mt":     _implied_price(entry["kcl_fob"],  entry["kcl_kt"]),
+                    "map_dap_price_usd_mt": _implied_price(map_dap_fob,       map_dap_kt),
                 })
 
             # Build price sparklines (last 7 months with valid data) per type
             _COMEX_FERT = {
-                "urea":    {"name": "Urea (N)",  "kt_key": "urea_kt",    "fob_key": "urea_fob",    **_FERT_CONFIG["urea"]},
-                "map_dap": {"name": "MAP (P)",   "kt_key": "map_dap_kt", "fob_key": "map_dap_fob", **_FERT_CONFIG["dap"]},
-                "kcl":     {"name": "KCl (K)",   "kt_key": "kcl_kt",     "fob_key": "kcl_fob",     **_FERT_CONFIG["kcl"]},
+                "urea":    {"name": "Urea (N)", "kt_key": "urea_kt", "fob_key": "urea_fob", **_FERT_CONFIG["urea"]},
+                "map_dap": {"name": "MAP (P)",  "kt_key": "map_kt",  "fob_key": "map_fob",  **_FERT_CONFIG["dap"]},
+                "kcl":     {"name": "KCl (K)",  "kt_key": "kcl_kt",  "fob_key": "kcl_fob",  **_FERT_CONFIG["kcl"]},
             }
             for key, cfg in _COMEX_FERT.items():
                 prices_by_month = [
@@ -752,7 +812,7 @@ def export_farmer_economics(db) -> None:
                 valid = [(m, p) for m, p in prices_by_month if p is not None]
                 if len(valid) < 2:
                     continue
-                sparkline    = [p for _, p in valid[-7:]]
+                sparkline     = [p for _, p in valid[-7:]]
                 current_price = sparkline[-1]
                 prev_price    = sparkline[-2]
                 mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
@@ -817,90 +877,115 @@ def export_farmer_economics(db) -> None:
     except Exception as e:
         print(f"  [farmer_economics] acreage/yield section error: {e}")
 
-    # ── Cost ──────────────────────────────────────────────────────────────────
-    cost_out = None
-    try:
-        custos_item = (
+    # ── Cost helper ───────────────────────────────────────────────────────────
+    def _build_cost_out(db_source: str, spot_price: float | None, spot_field: str) -> dict | None:
+        item = (
             db.query(NewsItem)
-            .filter(NewsItem.source == "CONAB Custos")
+            .filter(NewsItem.source == db_source)
             .order_by(NewsItem.pub_date.desc())
             .first()
         )
-        if custos_item:
-            meta = json.loads(custos_item.meta or "{}")
-            total_brl     = meta.get("total_brl_per_bag")
-            prev_total_brl= meta.get("prev_total_brl_per_bag")
-            brl_usd       = meta.get("brl_usd", 5.0)
-            components    = meta.get("components_brl", [])
-            inputs_detail = meta.get("inputs_detail_brl", [])
-            cost_season   = meta.get("season")
-            if not season:
-                season = cost_season
+        if not item:
+            return None
+        meta          = json.loads(item.meta or "{}")
+        total_brl     = meta.get("total_brl_per_bag")
+        prev_total_brl= meta.get("prev_total_brl_per_bag")
+        brl_usd       = meta.get("brl_usd", 5.0)
+        components    = meta.get("components_brl", [])
+        inputs_detail = meta.get("inputs_detail_brl", [])
+        if total_brl is None:
+            return None
 
-            if total_brl is not None:
-                total_usd = total_brl / brl_usd if brl_usd else None
+        total_usd      = total_brl / brl_usd if brl_usd else None
+        total_comp_brl = sum(c.get("brl", 0) for c in components)
+        components_out = [
+            {
+                "label": c.get("label"),
+                "color": c.get("color"),
+                "brl":   c.get("brl", 0),
+                "usd":   round(c.get("brl", 0) / brl_usd, 2) if brl_usd else None,
+                "share": round(c.get("brl", 0) / total_comp_brl, 4) if total_comp_brl else 0.0,
+            }
+            for c in components
+        ]
+        inputs_total_brl  = sum(d.get("brl", 0) for d in inputs_detail)
+        inputs_detail_out = [
+            {
+                "label": d.get("label"),
+                "brl":   d.get("brl", 0),
+                "usd":   round(d.get("brl", 0) / brl_usd, 2) if brl_usd else None,
+                "share": round(d.get("brl", 0) / inputs_total_brl, 4) if inputs_total_brl else 0.0,
+            }
+            for d in inputs_detail
+        ]
+        yoy_pct = 0.0
+        if prev_total_brl:
+            yoy_pct = round((total_brl - prev_total_brl) / prev_total_brl * 100, 1)
+        return {
+            "total_usd_per_bag": round(total_usd, 1) if total_usd is not None else None,
+            "yoy_pct":           yoy_pct,
+            "season_label":      meta.get("source_label", db_source),
+            "components":        components_out,
+            "inputs_detail":     inputs_detail_out,
+            spot_field:          spot_price,
+            "last_updated":      str(item.pub_date)[:10],
+        }
 
-                # Total BRL of all components (for share calc)
-                total_comp_brl = sum(c.get("brl", 0) for c in components)
+    # ── Cost ──────────────────────────────────────────────────────────────────
+    cost_arabica_out = None
+    cost_conilon_out = None
+    try:
+        # KC spot from arabica futures
+        kc_spot = None
+        try:
+            arabica_item = next(
+                (i for i in
+                 db.query(NewsItem)
+                 .filter(NewsItem.meta.isnot(None))
+                 .order_by(NewsItem.pub_date.desc())
+                 .all()
+                 if "futures" in (i.tags or []) and "arabica" in (i.tags or [])),
+                None
+            )
+            if arabica_item:
+                ar_meta = json.loads(arabica_item.meta or "{}")
+                contracts = ar_meta.get("contracts", [])
+                if contracts:
+                    kc_spot = contracts[0].get("lastPrice")
+        except Exception:
+            pass
 
-                components_out = []
-                for c in components:
-                    brl = c.get("brl", 0)
-                    share = brl / total_comp_brl if total_comp_brl else 0.0
-                    components_out.append({
-                        "label":  c.get("label"),
-                        "color":  c.get("color"),
-                        "brl":    brl,
-                        "usd":    round(brl / brl_usd, 2) if brl_usd else None,
-                        "share":  round(share, 4),
-                    })
+        # RC spot from robusta futures ($/MT → $/bag: ×0.06)
+        rc_spot_per_bag = None
+        try:
+            robusta_item = next(
+                (i for i in
+                 db.query(NewsItem)
+                 .filter(NewsItem.meta.isnot(None))
+                 .order_by(NewsItem.pub_date.desc())
+                 .all()
+                 if "futures" in (i.tags or []) and "robusta" in (i.tags or [])),
+                None
+            )
+            if robusta_item:
+                rc_meta = json.loads(robusta_item.meta or "{}")
+                contracts = rc_meta.get("contracts", [])
+                if contracts:
+                    rc_usd_mt = contracts[0].get("lastPrice")
+                    if rc_usd_mt:
+                        rc_spot_per_bag = round(float(rc_usd_mt) * 0.06, 1)
+        except Exception:
+            pass
 
-                # Inputs total BRL for detail shares
-                inputs_total_brl = sum(d.get("brl", 0) for d in inputs_detail)
-                inputs_detail_out = []
-                for d in inputs_detail:
-                    brl = d.get("brl", 0)
-                    share = brl / inputs_total_brl if inputs_total_brl else 0.0
-                    inputs_detail_out.append({
-                        "label": d.get("label"),
-                        "brl":   brl,
-                        "usd":   round(brl / brl_usd, 2) if brl_usd else None,
-                        "share": round(share, 4),
-                    })
+        cost_arabica_out = _build_cost_out("CONAB Custos",         kc_spot,        "kc_spot")
+        cost_conilon_out = _build_cost_out("CONAB Custos Conilon", rc_spot_per_bag, "rc_spot")
 
-                # KC spot: from arabica futures NewsItem
-                kc_spot = None
-                try:
-                    arabica_item = next(
-                        (i for i in
-                         db.query(NewsItem)
-                         .filter(NewsItem.meta.isnot(None))
-                         .order_by(NewsItem.pub_date.desc())
-                         .all()
-                         if "futures" in (i.tags or []) and "arabica" in (i.tags or [])),
-                        None
-                    )
-                    if arabica_item:
-                        ar_meta = json.loads(arabica_item.meta or "{}")
-                        contracts = ar_meta.get("contracts", [])
-                        if contracts:
-                            kc_spot = contracts[0].get("lastPrice")
-                except Exception:
-                    pass
-
-                yoy_pct = 0.0
-                if prev_total_brl:
-                    yoy_pct = round((total_brl - prev_total_brl) / prev_total_brl * 100, 1)
-
-                cost_out = {
-                    "total_usd_per_bag": round(total_usd, 1) if total_usd is not None else None,
-                    "yoy_pct":           yoy_pct,
-                    "season_label":      meta.get("source_label", "CONAB Custos"),
-                    "components":        components_out,
-                    "inputs_detail":     inputs_detail_out,
-                    "kc_spot":           kc_spot,
-                    "last_updated":      str(custos_item.pub_date)[:10],
-                }
+        # Keep season from arabica item
+        if cost_arabica_out and not season:
+            arabica_item_c = (db.query(NewsItem).filter(NewsItem.source == "CONAB Custos")
+                               .order_by(NewsItem.pub_date.desc()).first())
+            if arabica_item_c:
+                season = json.loads(arabica_item_c.meta or "{}").get("season")
     except Exception as e:
         print(f"  [farmer_economics] cost section error: {e}")
 
@@ -914,7 +999,9 @@ def export_farmer_economics(db) -> None:
         "country":    "brazil",
         "season":     season,
         "scraped_at": datetime.utcnow().isoformat() + "Z",
-        "cost":       cost_out,
+        "cost":         cost_arabica_out,
+        "cost_arabica": cost_arabica_out,
+        "cost_conilon": cost_conilon_out,
         "acreage":    acreage_out,
         "yield":      yield_out,
         "weather":    weather_out,
@@ -931,7 +1018,95 @@ def export_farmer_economics(db) -> None:
 
     path = OUT_DIR / "farmer_economics.json"
     written = safe_write_json(path, result, validate_farmer_economics)
-    print(f"  farmer_economics.json → written:{written} cost:{cost_out is not None} weather:{weather_out is not None} enso:{enso_out is not None}")
+    print(f"  farmer_economics.json → written:{written} cost:{cost_arabica_out is not None} weather:{weather_out is not None} enso:{enso_out is not None}")
+
+
+# ── 8. Farmer Selling (Safras & Mercado) ─────────────────────────────────────
+
+def export_farmer_selling() -> None:
+    from scraper.sources.farmer_selling import build_farmer_selling
+    try:
+        result = build_farmer_selling()
+        if result:
+            ar = result.get("arabica", {}).get("brazil", {})
+            rb = result.get("robusta", {}).get("brazil", {})
+            print(f"  farmer_selling_brazil.json → arabica:{ar.get('current')}% robusta:{rb.get('current')}%")
+        else:
+            print("  farmer_selling_brazil.json → no update (parse failed or no change)")
+    except Exception as e:
+        print(f"  farmer_selling_brazil.json → FAILED: {e}")
+
+
+# ── 9. Vietnam Supply ────────────────────────────────────────────────────────
+
+def export_vietnam_supply() -> None:
+    """Fetch ICO Vietnam export data and write vietnam_supply.json."""
+    from scraper.sources.vietnam_supply import build_vietnam_supply
+    try:
+        data = build_vietnam_supply()
+        path = OUT_DIR / "vietnam_supply.json"
+        safe_write_json(path, data, lambda d: d.get("country") == "vietnam")
+        exports = data.get("exports") or {}
+        n = len(exports.get("monthly", []))
+        print(f"  vietnam_supply.json → {n} export months")
+    except Exception as e:
+        print(f"  vietnam_supply.json → FAILED: {e}")
+
+
+# ── 9. Health ─────────────────────────────────────────────────────────────────
+
+def export_health(db) -> None:
+    """Write health.json: last successful DB write timestamp per scraper."""
+
+    def _ts(val) -> str | None:
+        if val is None:
+            return None
+        return val.isoformat() if isinstance(val, (date, datetime)) else str(val)
+
+    scrapers: dict[str, str | None] = {}
+
+    # Futures (Barchart)
+    items = db.query(NewsItem).filter(NewsItem.meta.isnot(None)).order_by(NewsItem.pub_date.desc()).limit(50).all()
+    fi = next((i for i in items if "futures" in (i.tags or []) and "price" in (i.tags or [])), None)
+    scrapers["futures"] = _ts(fi.pub_date) if fi else None
+
+    # COT (coffee)
+    row = db.query(CotWeekly).order_by(CotWeekly.date.desc()).first()
+    scrapers["cot"] = _ts(row.date) if row else None
+
+    # Macro COT
+    row = db.query(CommodityCot).order_by(CommodityCot.date.desc()).first()
+    scrapers["macro_cot"] = _ts(row.date) if row else None
+
+    # Freight
+    row = db.query(FreightRate).order_by(FreightRate.date.desc()).first()
+    scrapers["freight"] = _ts(row.date) if row else None
+
+    # Weather (Brazil regions)
+    row = db.query(WeatherSnapshot).order_by(WeatherSnapshot.scraped_at.desc()).first()
+    scrapers["weather"] = _ts(row.scraped_at) if row else None
+
+    # ENSO / ONI
+    item = db.query(NewsItem).filter(NewsItem.source == "NOAA CPC").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["enso"] = _ts(item.pub_date) if item else None
+
+    # Fertilizer — World Bank
+    item = db.query(NewsItem).filter(NewsItem.source == "World Bank").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["fertilizer_wb"] = _ts(item.pub_date) if item else None
+
+    # Fertilizer — Comex imports
+    row = db.query(FertilizerImport).order_by(FertilizerImport.scraped_at.desc()).first()
+    scrapers["fertilizer_comex"] = _ts(row.scraped_at) if row else None
+
+    healthy = sum(1 for v in scrapers.values() if v)
+    result = {
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "scrapers":     scrapers,
+    }
+
+    path = OUT_DIR / "health.json"
+    safe_write_json(path, result, validate_health)
+    print(f"  health.json → {healthy}/{len(scrapers)} scrapers have data")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -947,6 +1122,9 @@ def main():
         export_macro_cot(db)
         export_freight(db)
         export_farmer_economics(db)
+        export_farmer_selling()
+        export_vietnam_supply()
+        export_health(db)
     finally:
         db.close()
     print(f"Done → {OUT_DIR}")

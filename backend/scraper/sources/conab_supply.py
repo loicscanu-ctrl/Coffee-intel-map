@@ -138,18 +138,12 @@ def _parse_conab_safra_xls(content: bytes) -> dict | None:
 
 
 def _select_custos_sheet_xls(wb) -> object:
-    """Pick the most recent Sul de Minas municipality sheet from the historical series XLS.
-
-    Sheet names follow the pattern '<Municipality>-<State>-<Year>' e.g. 'Guaxupé-MG-2024'.
-    Priority: Sul de Minas municipalities in MG (Guaxupé, Três Pontas, Patrocínio, S.S. Paraíso).
-    Returns the most recent year's sheet, or falls back to the first data sheet.
-    """
+    """Pick the most recent Sul de Minas municipality sheet from the arabica historical series XLS."""
     _SULDEMINAS_MUNI = ["guaxup", "tr\xeas pontas", "patroc", "s.s. para", "tres pontas"]
     sul_sheets = []
     for name in wb.sheet_names():
         name_l = name.lower()
         if any(m in name_l for m in _SULDEMINAS_MUNI):
-            # Extract year suffix e.g. '2024' or '2024-s.mec'
             year_match = re.search(r"(\d{4})", name)
             if year_match:
                 sul_sheets.append((int(year_match.group(1)), name))
@@ -158,7 +152,27 @@ def _select_custos_sheet_xls(wb) -> object:
         sul_sheets.sort(key=lambda t: t[0], reverse=True)
         return wb.sheet_by_name(sul_sheets[0][1])
 
-    # Fallback: first non-index sheet
+    for i, name in enumerate(wb.sheet_names()):
+        if "ndice" not in name.lower():
+            return wb.sheet_by_index(i)
+    return wb.sheet_by_index(0)
+
+
+def _select_conilon_sheet_xls(wb) -> object:
+    """Pick the most recent Espírito Santo municipality sheet from the conilon historical series XLS."""
+    _ES_MUNI = ["linhares", "colatina", "s\xe3o mateus", "sao mateus", "barra de s", "nova ven\xe9cia"]
+    es_sheets = []
+    for name in wb.sheet_names():
+        name_l = name.lower()
+        if any(m in name_l for m in _ES_MUNI):
+            year_match = re.search(r"(\d{4})", name)
+            if year_match:
+                es_sheets.append((int(year_match.group(1)), name))
+
+    if es_sheets:
+        es_sheets.sort(key=lambda t: t[0], reverse=True)
+        return wb.sheet_by_name(es_sheets[0][1])
+
     for i, name in enumerate(wb.sheet_names()):
         if "ndice" not in name.lower():
             return wb.sheet_by_index(i)
@@ -222,14 +236,14 @@ def _iter_custos_rows_xlsx(ws) -> list[tuple[str, float | None]]:
     return rows
 
 
-def _parse_conab_custos_excel(content: bytes, brl_usd: float) -> dict | None:
+def _parse_conab_custos_excel(
+    content: bytes,
+    brl_usd: float,
+    coffee_type: str = "arabica",
+) -> dict | None:
     """Parse CONAB Custos Excel (.xlsx or .xls). Supports historical series XLS format.
 
-    For each row: get label from col 0, then per-bag value from col 2 (xls) or
-    first positive value (xlsx).
-    - Group rows into _COST_COMPONENT_MAP categories (summed per category)
-    - Match _INPUT_DETAIL_MAP for sub-breakdown
-    - Total = "custo total" row value
+    coffee_type: "arabica" → Sul de Minas sheet; "conilon" → Espírito Santo sheet.
     Returns None if no components or no total found.
     """
     is_xlsx = content[:2] == b"PK"
@@ -237,13 +251,21 @@ def _parse_conab_custos_excel(content: bytes, brl_usd: float) -> dict | None:
     if is_xlsx:
         import openpyxl  # noqa: PLC0415
         wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True)
-        ws = wb["Sul de Minas"] if "Sul de Minas" in wb.sheetnames else wb.active
+        if coffee_type == "conilon":
+            # Conilon xlsx: try "Linhares" or "Espírito Santo" sheet, else active
+            ws = next(
+                (wb[n] for n in wb.sheetnames
+                 if any(k in n.lower() for k in ["linhares", "colatina", "esp\xedrito", "conilon"])),
+                wb.active,
+            )
+        else:
+            ws = wb["Sul de Minas"] if "Sul de Minas" in wb.sheetnames else wb.active
         pairs = _iter_custos_rows_xlsx(ws)
         wb.close()
     else:
         import xlrd  # noqa: PLC0415
         wb = xlrd.open_workbook(file_contents=content)
-        ws = _select_custos_sheet_xls(wb)
+        ws = _select_conilon_sheet_xls(wb) if coffee_type == "conilon" else _select_custos_sheet_xls(wb)
         pairs = _iter_custos_rows_xls(ws)
 
     # Aggregate into component buckets
@@ -291,7 +313,7 @@ def _parse_conab_custos_excel(content: bytes, brl_usd: float) -> dict | None:
         "brl_usd":              brl_usd,
         "components_brl":       components_brl,
         "inputs_detail_brl":    inputs_detail_brl,
-        "source_label":         f"CONAB Custos {date.today():%b %Y}",
+        "source_label":         f"CONAB Custos {coffee_type.capitalize()} {date.today():%b %Y}",
     }
 
 
@@ -422,11 +444,11 @@ def _scrape_acreage_yield(db) -> None:
         logger.error(f"[conab_supply] Safra FAILED: {e}")
 
 
-def _find_custos_xls_url() -> str | None:
+def _find_custos_xls_url(coffee_type: str = "arabica") -> str | None:
     """Fetch CONAB Custos Agrícolas tab content (plain HTML, no JS needed).
 
-    URL for Agrícolas tab: CONAB_CUSTOS_URL + '/copy_of_agricolas'
-    Returns direct download URL for the café arábica historical series XLS.
+    coffee_type: "arabica" or "conilon"
+    Returns direct download URL for the matching historical series XLS.
     """
     agricolas_url = CONAB_CUSTOS_URL + "/copy_of_agricolas"
     try:
@@ -434,72 +456,79 @@ def _find_custos_xls_url() -> str | None:
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
 
+        keywords = (
+            ["conilon", "conillon"]
+            if coffee_type == "conilon"
+            else ["arabica", "ar\xe1bica", "ar\u00e1bica"]
+        )
+
         for a in soup.find_all("a", href=True):
             href = a["href"]
-            text = a.get_text(strip=True)
-            if "arabica" in href.lower() or "ar\xe1bica" in text.lower() or "arabica" in text.lower():
-                if ".xls" in href.lower():
+            text = a.get_text(strip=True).lower()
+            href_l = href.lower()
+            if any(k in href_l or k in text for k in keywords):
+                if ".xls" in href_l:
                     return re.sub(r"/view$", "", href)
 
-        logger.warning("[conab_supply] Custos: no café arábica XLS link found")
+        logger.warning(f"[conab_supply] Custos: no café {coffee_type} XLS link found")
         return None
     except Exception as e:
-        logger.warning(f"[conab_supply] _find_custos_xls_url error: {e}")
+        logger.warning(f"[conab_supply] _find_custos_xls_url({coffee_type}) error: {e}")
         return None
 
 
-async def _scrape_production_cost(page, db) -> None:  # noqa: ARG001 (page kept for signature)
-    """Fetch CONAB Custos Agrícolas tab (plain HTML), find coffee arábica XLS, parse."""
+async def _scrape_production_cost(page, db, coffee_type: str = "arabica") -> None:  # noqa: ARG001
+    """Fetch CONAB Custos Agrícolas tab, find the matching coffee XLS, parse and store."""
     import sys
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from models import NewsItem
     from sqlalchemy import delete
 
+    db_source = "CONAB Custos" if coffee_type == "arabica" else "CONAB Custos Conilon"
+
     try:
         brl_usd = _get_brl_usd()
 
-        xlsx_url = _find_custos_xls_url()
+        xlsx_url = _find_custos_xls_url(coffee_type)
         if xlsx_url is None:
-            logger.warning("[conab_supply] Custos: no coffee xlsx link found — retaining previous data")
+            logger.warning(f"[conab_supply] Custos {coffee_type}: no XLS link — retaining previous data")
             return
 
         xls_resp = requests.get(xlsx_url, headers=_HEADERS, timeout=120)
         xls_resp.raise_for_status()
 
-        # Read previous total for YoY
         prev_total: float | None = None
-        existing = db.query(NewsItem).filter(NewsItem.source == "CONAB Custos").first()
+        existing = db.query(NewsItem).filter(NewsItem.source == db_source).first()
         if existing and existing.meta:
             try:
                 prev_total = json.loads(existing.meta).get("total_brl_per_bag")
             except (json.JSONDecodeError, TypeError):
                 prev_total = None
 
-        parsed = _parse_conab_custos_excel(xls_resp.content, brl_usd)
+        parsed = _parse_conab_custos_excel(xls_resp.content, brl_usd, coffee_type=coffee_type)
 
         if parsed is None:
-            logger.warning("[conab_supply] Custos: could not parse Excel — retaining previous data")
+            logger.warning(f"[conab_supply] Custos {coffee_type}: could not parse Excel — retaining")
             return
 
         parsed["prev_total_brl_per_bag"] = prev_total
 
-        db.execute(delete(NewsItem).where(NewsItem.source == "CONAB Custos"))
+        db.execute(delete(NewsItem).where(NewsItem.source == db_source))
         db.add(NewsItem(
-            title=f"CONAB Production Cost – {_current_season()}",
-            source="CONAB Custos",
+            title=f"CONAB Production Cost {coffee_type.capitalize()} – {_current_season()}",
+            source=db_source,
             category="supply",
-            tags=["conab", "supply", "brazil", "cost"],
+            tags=["conab", "supply", "brazil", "cost", coffee_type],
             meta=json.dumps(parsed),
             pub_date=datetime.utcnow(),
         ))
         db.commit()
-        print(f"[conab_supply] Custos OK — total={parsed['total_brl_per_bag']} BRL/bag, "
-              f"components={len(parsed['components_brl'])}")
+        print(f"[conab_supply] Custos {coffee_type} OK — total={parsed['total_brl_per_bag']} BRL/bag")
 
     except Exception as e:
         db.rollback()
-        logger.error(f"[conab_supply] Custos FAILED: {e}")
+        logger.error(f"[conab_supply] Custos {coffee_type} FAILED: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -507,8 +536,7 @@ async def _scrape_production_cost(page, db) -> None:  # noqa: ARG001 (page kept 
 # ---------------------------------------------------------------------------
 
 async def run(page, db) -> None:
-    """Monthly entry point. Called from run_monthly.py.
-    page: Playwright page (used for Custos JS-rendered tab).
-    """
+    """Monthly entry point. Called from run_monthly.py."""
     _scrape_acreage_yield(db)
-    await _scrape_production_cost(page, db)
+    await _scrape_production_cost(page, db, coffee_type="arabica")
+    await _scrape_production_cost(page, db, coffee_type="conilon")

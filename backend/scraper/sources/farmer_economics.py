@@ -29,7 +29,7 @@ OPEN_METEO_URL = (
     ",precipitation,precipitation_probability,et0_fao_evapotranspiration"
     ",soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm"
     ",soil_moisture_9_to_27cm,soil_moisture_27_to_81cm"
-    "&forecast_days=14&timezone=America/Sao_Paulo"
+    "&forecast_days=14&past_days=60&timezone=America/Sao_Paulo"
 )
 
 # Soil constants for Brazilian Oxisol (Latossolo)
@@ -157,6 +157,53 @@ def _drought_score(precip_mm: float, et0_mm: float, root_zone_sm: float) -> floa
     relief = min(1.5, effective / 5.0)
 
     return max(0.0, base + et0_adj - relief)
+
+
+def _effective_rain(precip_mm: float) -> float:
+    """Rain retained by root zone (same effectiveness factors as _drought_score)."""
+    if precip_mm < 3.0:
+        return precip_mm * 0.20
+    elif precip_mm < 10.0:
+        return precip_mm * 0.60
+    else:
+        return precip_mm * 0.90
+
+
+def _calc_csi(daily_rows: list[dict]) -> dict:
+    """Cumulative Stress Index from historical daily rows (past only, not forecast).
+
+    daily_deficit = max(0, et0_mm − effective_rain)
+    Returns csi_30d, csi_60d (mm) and their risk level (-, L, M, H).
+    Thresholds per 30-day window: <20→-, 20-40→L, 40-60→M, >60→H
+    """
+    from datetime import date as _date
+    today = _date.today().isoformat()
+    past = [d for d in daily_rows if d.get("date", "") < today]
+    past.sort(key=lambda d: d["date"])
+
+    deficits = [
+        max(0.0, d.get("et0_mm", 0.0) - _effective_rain(d.get("precip_mm", 0.0)))
+        for d in past
+    ]
+
+    def _level(val: float, n: int) -> str:
+        per30 = val * (30 / n) if n else 0
+        if per30 < 20:   return "-"
+        elif per30 < 40: return "L"
+        elif per30 < 60: return "M"
+        else:            return "H"
+
+    csi_30 = round(sum(deficits[-30:]), 1)
+    csi_60 = round(sum(deficits[-60:]), 1)
+    n30 = len(deficits[-30:])
+    n60 = len(deficits[-60:])
+
+    return {
+        "csi_30d":       csi_30,
+        "csi_60d":       csi_60,
+        "csi_30d_level": _level(csi_30, n30),
+        "csi_60d_level": _level(csi_60, n60),
+    }
 
 
 def _apply_drought_modifiers(days: list[dict], region_name: str) -> list[dict]:

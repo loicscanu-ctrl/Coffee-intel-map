@@ -3,6 +3,8 @@ comex_fertilizer.py — Monthly scraper for Brazil fertilizer imports.
 Source: MDIC bulk CSV (balanca.economia.gov.br), filtered for NCM Chapter 31.
 Streams the yearly CSV files, filters Chapter 31 rows, aggregates by month.
 Called from run_monthly.py.
+
+NCM codes sourced from Hedgepoint MDIC methodology (April 2026 report).
 """
 
 import io
@@ -11,12 +13,28 @@ import re
 import sys
 from datetime import datetime, date
 
-# NCM codes of interest (8-digit, Chapter 31)
+# NCM codes of interest (8-digit, all Chapter 31)
+# Keys → fertilizer type label stored in DB
 NCM_LABELS = {
+    # Urea
     "31021010": "Urea",
-    "31042010": "KCl",
-    "31052000": "MAP",
-    "31054000": "DAP",
+    "31021090": "Urea",
+    "31028000": "Urea",
+    # KCl (potassium chloride)
+    "31042090": "KCl",
+    # MAP (monoammonium phosphate) — 31054000 = ammonium dihydrogenorthophosphate
+    "31054000": "MAP",
+    # DAP (diammonium phosphate) — 31053000 = diammonium hydrogenorthophosphate
+    "31053000": "DAP",
+    # AN (ammonium nitrate)
+    "31023000": "AN",
+    # AS (ammonium sulphate)
+    "31022100": "AS",
+    # Superphosphate
+    "31031020": "Superphosphate",
+    "31031030": "Superphosphate",
+    "31031100": "Superphosphate",
+    "31031900": "Superphosphate",
 }
 
 # Base URL pattern for MDIC bulk import CSV by year
