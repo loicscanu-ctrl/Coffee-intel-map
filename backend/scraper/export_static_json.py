@@ -1185,12 +1185,29 @@ def export_latest_prices(db) -> None:
             lbl = f"B3 4/5 {mt.group(1)}" if mt else "B3 4/5"
             tickers.append({"label": lbl, "value": f"{val} USD/sac", "category": "futures"})
 
-    # VN FAQ
+    # VN FAQ — primary: PhysicalPrice; fallback: most recent NewsItem (no meta filter)
+    import re as _re2
     usd_vnd = pp["USD_VND"].price if "USD_VND" in pp else None
-    if "VN_FAQ" in pp and usd_vnd:
-        vnd_kg = int(pp["VN_FAQ"].price)
-        usd_mt = round(vnd_kg / usd_vnd * 1000)
-        fmt_vnd = f"{vnd_kg:,}".replace(",", ".")
+    vn_faq_vnd: int | None = None
+    if "VN_FAQ" in pp:
+        vn_faq_vnd = int(pp["VN_FAQ"].price)
+    else:
+        vn_news = (
+            db.query(NewsItem)
+            .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=30))
+            .order_by(NewsItem.pub_date.desc())
+            .all()
+        )
+        for it in vn_news:
+            if {"price", "vietnam"} <= set(it.tags or []) and "futures" not in (it.tags or []):
+                m = _re2.search(r"price:\s*([\d.]+)\s*VND/kg", it.body or "", _re2.I)
+                if m:
+                    raw = m.group(1)
+                    vn_faq_vnd = int(raw.replace(".", "")) if _re2.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
+                    break
+    if vn_faq_vnd and usd_vnd:
+        usd_mt = round(vn_faq_vnd / usd_vnd * 1000)
+        fmt_vnd = f"{vn_faq_vnd:,}".replace(",", ".")
         tickers.append({"label": "VN FAQ", "value": f"{fmt_vnd} VND (${usd_mt:,})", "category": "physical"})
 
     # CON T7
@@ -1226,7 +1243,7 @@ def export_latest_prices(db) -> None:
         "tickers": tickers,
     }
     path = OUT_DIR / "latest_prices.json"
-    written = safe_write_json(path, result, lambda d: len(d.get("tickers", [])) > 0)
+    written = safe_write_json(path, result, lambda d: (len(d.get("tickers", [])) > 0, "no tickers"))
     print(f"  latest_prices.json → written:{written} {len(tickers)} items "
           f"({'PhysicalPrice' if pp else 'NewsItem fallback'})")
 
@@ -1329,7 +1346,7 @@ def export_vn_physical_prices(db) -> None:
 
     recent = (
         db.query(NewsItem)
-        .filter(NewsItem.pub_date > (datetime.utcnow() - timedelta(days=7)))
+        .filter(NewsItem.pub_date > (datetime.utcnow() - timedelta(days=30)))
         .order_by(NewsItem.pub_date.desc())
         .all()
     )
@@ -1378,7 +1395,7 @@ def export_vn_physical_prices(db) -> None:
     }
 
     path = OUT_DIR / "vn_physical_prices.json"
-    written = safe_write_json(path, result, lambda d: d.get("vn_faq") is not None)
+    written = safe_write_json(path, result, lambda d: (d.get("vn_faq") is not None, "no vn_faq"))
     print(f"  vn_physical_prices.json → written:{written} {vnd_per_kg} VND/kg = ${usd_per_mt}/MT (rate:{round(usd_vnd)})")
 
 

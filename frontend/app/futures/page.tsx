@@ -152,35 +152,33 @@ function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Co
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden self-start hidden lg:block">
-      <div className="px-2 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
-        <span className="text-[9px] text-slate-400 whitespace-nowrap">¢/lb</span>
+      <div className="px-3 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
+        <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-widest whitespace-nowrap">Arbitrage</span>
       </div>
       <table className="text-[10px] font-mono w-full">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="px-2 py-1 text-center whitespace-nowrap text-amber-500/60">KC</th>
-            <th className="px-2 py-1 text-center whitespace-nowrap text-emerald-500/60">RC</th>
-            <th className="px-2 py-1 text-center whitespace-nowrap">×</th>
+            <th className="px-2 py-1 text-left whitespace-nowrap">Pair</th>
+            <th className="px-2 py-1 text-right whitespace-nowrap">¢/lb (×)</th>
           </tr>
         </thead>
         <tbody>
           {arabica.map((c, i) => {
-            const letter = c.symbol.match(/^KC([FGHJKMNQUVXZ])/i)?.[1]?.toUpperCase();
-            const rc = letter ? rcByLetter.get(letter) : null;
-            const kcCents = c.last;                    // KC already in ¢/lb
-            const rcCents = rc ? rc / 22.046 : null;   // RC: $/MT → ¢/lb
-            const ratio   = rcCents ? (kcCents / rcCents).toFixed(2) : null;
+            const letter  = c.symbol.match(/^KC([FGHJKMNQUVXZ])/i)?.[1]?.toUpperCase();
+            const rc      = letter ? rcByLetter.get(letter) : null;
+            const kcCents = c.last;
+            const rcCents = rc ? rc / 22.046 : null;
+            const spread  = rcCents != null ? kcCents - rcCents : null;
+            const ratio   = rc ? (c.last * 22.046 / rc).toFixed(2) : null;
+            const rcSym   = c.symbol.replace(/^KC/, "RC");
             const isFront = i === 0;
             return (
               <tr key={c.symbol} className={`border-t border-slate-700 ${isFront ? "bg-slate-800/60" : ""}`}>
-                <td className={`px-2 py-1.5 text-center ${isFront ? "text-amber-400" : "text-amber-400/50"}`}>
-                  {kcCents.toFixed(1)}
+                <td className={`px-2 py-1.5 whitespace-nowrap ${isFront ? "text-slate-200" : "text-slate-500"}`}>
+                  {c.symbol}-{rcSym}
                 </td>
-                <td className={`px-2 py-1.5 text-center ${isFront ? "text-emerald-400" : "text-emerald-400/50"}`}>
-                  {rcCents ? rcCents.toFixed(1) : "—"}
-                </td>
-                <td className={`px-2 py-1.5 text-center ${isFront ? "text-sky-300" : "text-slate-500"}`}>
-                  {ratio ? `×${ratio}` : "—"}
+                <td className={`px-2 py-1.5 text-right whitespace-nowrap ${isFront ? "text-sky-300" : "text-slate-500"}`}>
+                  {spread != null ? `${spread.toFixed(1)} (×${ratio})` : "—"}
                 </td>
               </tr>
             );
