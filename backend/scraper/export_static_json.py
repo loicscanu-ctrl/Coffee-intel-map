@@ -105,7 +105,9 @@ def export_futures_chain(db) -> None:
             (i for i in all_items
              if "futures" in (i.tags or [])
              and "price"   in (i.tags or [])
-             and market     in (i.tags or [])),
+             and market     in (i.tags or [])
+             and "b3"   not in (i.tags or [])
+             and json.loads(i.meta or "{}").get("contracts")),
             None,
         )
         if not item:
