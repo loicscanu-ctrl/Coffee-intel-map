@@ -60,7 +60,7 @@ function subtractBusinessDays(date: Date, n: number): Date {
 }
 
 function fmtDate(d: Date): string {
-  return `${d.getDate()} ${MONTH_ABB[d.getMonth() + 1]}`;
+  return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
 // "RK 05/26" → "RCK26", "AK 05/26" → "KCK26"
@@ -133,25 +133,35 @@ function RatioColumn({ arabica, robusta }: { arabica: AcapheContract[]; robusta:
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden self-start hidden lg:block">
-      <div className="px-3 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
-        <span className="text-[10px] text-slate-400 whitespace-nowrap">KC/RC ×</span>
+      <div className="px-2 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
+        <span className="text-[9px] text-slate-400 whitespace-nowrap">¢/lb</span>
       </div>
-      <table className="text-xs font-mono w-full">
+      <table className="text-[10px] font-mono w-full">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="px-3 py-1 text-center whitespace-nowrap">ratio</th>
+            <th className="px-2 py-1 text-center whitespace-nowrap text-amber-500/60">KC</th>
+            <th className="px-2 py-1 text-center whitespace-nowrap text-emerald-500/60">RC</th>
+            <th className="px-2 py-1 text-center whitespace-nowrap">×</th>
           </tr>
         </thead>
         <tbody>
           {arabica.map((c, i) => {
             const rc = rcByLetter.get(c.month[1]);
-            const kcUsd = c.last * 22.046;
-            const ratio = rc ? (kcUsd / rc).toFixed(2) : "—";
+            const kcCents = c.last;                      // KC already in ¢/lb
+            const rcCents = rc ? rc / 22.046 : null;     // RC: $/MT → ¢/lb
+            const kcUsdMt = c.last * 22.046;
+            const ratio   = rc ? (kcUsdMt / rc).toFixed(2) : null;
             const isFront = i === 0;
             return (
-              <tr key={c.month} className={`border-t border-slate-700 ${isFront ? "text-sky-300 bg-slate-800/60" : "text-slate-500"}`}>
-                <td className="px-3 py-1.5 text-center">
-                  {ratio !== "—" ? `×${ratio}` : "—"}
+              <tr key={c.month} className={`border-t border-slate-700 ${isFront ? "bg-slate-800/60" : ""}`}>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-amber-400" : "text-amber-400/50"}`}>
+                  {kcCents.toFixed(1)}
+                </td>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-emerald-400" : "text-emerald-400/50"}`}>
+                  {rcCents ? rcCents.toFixed(1) : "—"}
+                </td>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-sky-300" : "text-slate-500"}`}>
+                  {ratio ? `×${ratio}` : "—"}
                 </td>
               </tr>
             );
@@ -186,18 +196,18 @@ function ChainTable({
         <span className="text-xs text-slate-500 whitespace-nowrap ml-2">acaphe.com</span>
       </div>
 
-      <table className="w-full text-xs font-mono">
+      <table className="w-full text-[11px] font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left   px-2 py-1 w-10  whitespace-nowrap">Ct.</th>
-            <th className="text-center px-2 py-1 w-20  whitespace-nowrap">FND</th>
-            <th className="text-center px-2 py-1 w-16  whitespace-nowrap">Expiry</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">Last ({unit})</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">Chg</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">Sprd</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">Sprd Chg</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">OI</th>
-            <th className="text-right  px-2 py-1        whitespace-nowrap">Vol</th>
+            <th className="text-left   px-1.5 py-1 w-10  whitespace-nowrap">Ct.</th>
+            <th className="text-center px-1.5 py-1 w-14  whitespace-nowrap">FND</th>
+            <th className="text-center px-1.5 py-1 w-11  whitespace-nowrap">Exp.</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">Last ({unit})</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">Chg</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">Sprd</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">Sprd Chg</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">OI</th>
+            <th className="text-right  px-1.5 py-1        whitespace-nowrap">Vol</th>
           </tr>
         </thead>
         <tbody>
@@ -220,23 +230,23 @@ function ChainTable({
                 key={c.month}
                 className={`border-t border-slate-700 ${isFront ? "text-white bg-slate-800/60" : "text-slate-300"}`}
               >
-                <td className="px-2 py-1.5 font-bold whitespace-nowrap">{sym}</td>
-                <td className="px-2 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{fnd}</td>
-                <td className="px-2 py-1.5 text-center text-slate-500 whitespace-nowrap">{expiry}</td>
-                <td className={`px-2 py-1.5 text-right font-bold ${isFront ? accent : ""}`}>
+                <td className="px-1.5 py-1.5 font-bold whitespace-nowrap">{sym}</td>
+                <td className="px-1.5 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{fnd}</td>
+                <td className="px-1.5 py-1.5 text-center text-slate-500 whitespace-nowrap">{expiry}</td>
+                <td className={`px-1.5 py-1.5 text-right font-bold ${isFront ? accent : ""}`}>
                   {fmt(c.last, dec)}
                 </td>
-                <td className={`px-2 py-1.5 text-right ${chgColor}`}>
+                <td className={`px-1.5 py-1.5 text-right ${chgColor}`}>
                   {(c.change >= 0 ? "+" : "")}{c.change.toFixed(dec)}
                 </td>
-                <td className={`px-2 py-1.5 text-right ${sprdColor(spread)}`}>
+                <td className={`px-1.5 py-1.5 text-right ${sprdColor(spread)}`}>
                   {spread != null ? (spread >= 0 ? "+" : "") + spread.toFixed(dec) : "—"}
                 </td>
-                <td className={`px-2 py-1.5 text-right ${sprdColor(spreadChg)}`}>
+                <td className={`px-1.5 py-1.5 text-right ${sprdColor(spreadChg)}`}>
                   {spreadChg != null ? (spreadChg >= 0 ? "+" : "") + spreadChg.toFixed(dec) : "—"}
                 </td>
-                <td className="px-2 py-1.5 text-right">{fmt(c.oi)}</td>
-                <td className="px-2 py-1.5 text-right text-slate-400">{fmt(c.vol)}</td>
+                <td className="px-1.5 py-1.5 text-right">{fmt(c.oi)}</td>
+                <td className="px-1.5 py-1.5 text-right text-slate-400">{fmt(c.vol)}</td>
               </tr>
             );
           })}

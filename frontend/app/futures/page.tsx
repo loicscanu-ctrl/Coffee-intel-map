@@ -59,14 +59,10 @@ function firstNoticeDay(symbol: string): string {
   const monthNum = LETTER_TO_MONTH[letter.toUpperCase()];
   if (!monthNum) return "—";
   const year = 2000 + parseInt(yr);
-
-  // FND = N business days before the first business day of the delivery month
-  // KC (Coffee C / Arabica): 7 business days prior
-  // RC/RM (Robusta): 4 business days prior
   const days = product.toUpperCase() === "KC" ? 7 : 4;
   const fbdm = firstBusinessDay(year, monthNum);
   const fnd  = subtractBusinessDays(fbdm, days);
-  return `${fnd.getDate()} ${MONTH_ABB[fnd.getMonth() + 1]}`;
+  return `${fnd.getDate()}/${fnd.getMonth() + 1}`;
 }
 
 // ─── Futures Chain Table ──────────────────────────────────────────────────────
@@ -82,10 +78,9 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
   const accent = isArabica ? "text-amber-400" : "text-emerald-400";
 
   function fmtExpiry(raw: string): string {
-    // Try to parse various formats → "28 Apr" style
     const d = new Date(raw);
-    if (!isNaN(d.getTime())) return `${d.getDate()} ${MONTH_ABB[d.getMonth() + 1]}`;
-    return raw; // fallback: show as-is
+    if (!isNaN(d.getTime())) return `${d.getDate()}/${d.getMonth() + 1}`;
+    return raw;
   }
 
   return (
@@ -97,18 +92,18 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
         </div>
         <span className="text-xs text-slate-500 whitespace-nowrap ml-2">Barchart · {data.pub_date ?? ""}</span>
       </div>
-      <table className="w-full text-xs font-mono">
+      <table className="w-full text-[11px] font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left  px-2 py-1 w-10 whitespace-nowrap">Ct.</th>
-            <th className="text-center px-2 py-1 w-20 whitespace-nowrap">FND</th>
-            <th className="text-center px-2 py-1 w-16 whitespace-nowrap">Expiry</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Last ({unit})</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Chg</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Sprd</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Sprd Chg</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">OI</th>
-            <th className="text-right px-2 py-1 whitespace-nowrap">Vol</th>
+            <th className="text-left  px-1.5 py-1 w-10 whitespace-nowrap">Ct.</th>
+            <th className="text-center px-1.5 py-1 w-14 whitespace-nowrap">FND</th>
+            <th className="text-center px-1.5 py-1 w-11 whitespace-nowrap">Exp.</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">Last ({unit})</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">Chg</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">Sprd</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">Sprd Chg</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">OI</th>
+            <th className="text-right px-1.5 py-1 whitespace-nowrap">Vol</th>
           </tr>
         </thead>
         <tbody>
@@ -117,23 +112,76 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
             const next      = data!.contracts[i + 1];
             const spread    = c.last != null && next?.last != null ? c.last - next.last : null;
             const spreadChg = c.chg != null && next?.chg != null ? c.chg - next.chg : null;
-            // Extract 5-char contract name: e.g. "KCK25" from symbol
             const shortSym  = c.symbol.replace(/^(KC|RC|RM)/, "$1").slice(0, 5);
+            const dec       = isArabica ? 2 : 0;
             return (
               <tr key={c.symbol} className={`border-t border-slate-700 ${i === 0 ? "text-white bg-slate-800/60" : "text-slate-300"}`}>
-                <td className="px-2 py-1.5 font-bold whitespace-nowrap">{shortSym}</td>
-                <td className="px-2 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{firstNoticeDay(c.symbol)}</td>
-                <td className="px-2 py-1.5 text-center text-slate-500 whitespace-nowrap">{fmtExpiry(c.expiry)}</td>
-                <td className={`px-2 py-1.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(2)}</td>
-                <td className={`px-2 py-1.5 text-right ${chgColor}`}>{fmtChg(c.chg)}</td>
-                <td className={`px-2 py-1.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
-                  {spread !== null ? (spread >= 0 ? "+" : "") + spread.toFixed(2) : "—"}
+                <td className="px-1.5 py-1.5 font-bold whitespace-nowrap">{shortSym}</td>
+                <td className="px-1.5 py-1.5 text-center text-amber-400/80 whitespace-nowrap">{firstNoticeDay(c.symbol)}</td>
+                <td className="px-1.5 py-1.5 text-center text-slate-500 whitespace-nowrap">{fmtExpiry(c.expiry)}</td>
+                <td className={`px-1.5 py-1.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(dec)}</td>
+                <td className={`px-1.5 py-1.5 text-right ${chgColor}`}>{c.chg == null ? "—" : (c.chg >= 0 ? "+" : "") + c.chg.toFixed(dec)}</td>
+                <td className={`px-1.5 py-1.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+                  {spread !== null ? (spread >= 0 ? "+" : "") + spread.toFixed(dec) : "—"}
                 </td>
-                <td className={`px-2 py-1.5 text-right ${spreadChg === null ? "text-slate-600" : spreadChg >= 0 ? "text-sky-400" : "text-orange-400"}`}>
-                  {spreadChg !== null ? (spreadChg >= 0 ? "+" : "") + spreadChg.toFixed(2) : "—"}
+                <td className={`px-1.5 py-1.5 text-right ${spreadChg === null ? "text-slate-600" : spreadChg >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+                  {spreadChg !== null ? (spreadChg >= 0 ? "+" : "") + spreadChg.toFixed(dec) : "—"}
                 </td>
-                <td className="px-2 py-1.5 text-right">{fmt(c.oi)}</td>
-                <td className="px-2 py-1.5 text-right text-slate-400">{fmt(c.volume)}</td>
+                <td className="px-1.5 py-1.5 text-right">{fmt(c.oi)}</td>
+                <td className="px-1.5 py-1.5 text-right text-slate-400">{fmt(c.volume)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ─── KC/RC ¢/lb middle panel ──────────────────────────────────────────────────
+
+function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Contract[] }) {
+  const rcByLetter = new Map<string, number>();
+  robusta.forEach(c => {
+    const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])\d{2}$/i);
+    if (m) {
+      const key = m[1].toUpperCase();
+      if (!rcByLetter.has(key)) rcByLetter.set(key, c.last);
+    }
+  });
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden self-start hidden lg:block">
+      <div className="px-2 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
+        <span className="text-[9px] text-slate-400 whitespace-nowrap">¢/lb</span>
+      </div>
+      <table className="text-[10px] font-mono w-full">
+        <thead>
+          <tr className="text-slate-500 bg-slate-800/40">
+            <th className="px-2 py-1 text-center whitespace-nowrap text-amber-500/60">KC</th>
+            <th className="px-2 py-1 text-center whitespace-nowrap text-emerald-500/60">RC</th>
+            <th className="px-2 py-1 text-center whitespace-nowrap">×</th>
+          </tr>
+        </thead>
+        <tbody>
+          {arabica.map((c, i) => {
+            const letter = c.symbol.match(/^KC([FGHJKMNQUVXZ])/i)?.[1]?.toUpperCase();
+            const rc = letter ? rcByLetter.get(letter) : null;
+            const kcCents = c.last;                    // KC already in ¢/lb
+            const rcCents = rc ? rc / 22.046 : null;   // RC: $/MT → ¢/lb
+            const ratio   = rcCents ? (kcCents / rcCents).toFixed(2) : null;
+            const isFront = i === 0;
+            return (
+              <tr key={c.symbol} className={`border-t border-slate-700 ${isFront ? "bg-slate-800/60" : ""}`}>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-amber-400" : "text-amber-400/50"}`}>
+                  {kcCents.toFixed(1)}
+                </td>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-emerald-400" : "text-emerald-400/50"}`}>
+                  {rcCents ? rcCents.toFixed(1) : "—"}
+                </td>
+                <td className={`px-2 py-1.5 text-center ${isFront ? "text-sky-300" : "text-slate-500"}`}>
+                  {ratio ? `×${ratio}` : "—"}
+                </td>
               </tr>
             );
           })}
@@ -559,8 +607,14 @@ export default function FuturesPage() {
               No futures data yet — check back after the next scrape run.
             </p>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 items-start">
             {arabicaChain && <ChainTable market="arabica" data={arabicaChain} />}
+            {arabicaChain && robustaChain && (
+              <KcRcCentsPanel
+                arabica={arabicaChain.contracts}
+                robusta={robustaChain.contracts}
+              />
+            )}
             {robustaChain && <ChainTable market="robusta" data={robustaChain} />}
           </div>
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
