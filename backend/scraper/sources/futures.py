@@ -36,37 +36,102 @@ _TODAY = _pub_date   # T-2 — embedded in DB title, consumed by OI history API
 # Barchart – futures chain (price + OI per contract)
 # ─────────────────────────────────────────────────────────────────────────────
 
-_BARCHART_CHAIN_URL = (
+_BARCHART_API = (
     "https://www.barchart.com/proxies/core-api/v1/quotes/get"
     "?symbol={sym}"
     "&fields=symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode"
     "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
 )
+_BARCHART_HOME = "https://www.barchart.com/"
+_BC_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
 
-_BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
+# Contract months per product (letters → month numbers)
+_KC_MONTHS = [("H", 3), ("K", 5), ("N", 7), ("U", 9), ("Z", 12)]
+_RM_MONTHS = [("F", 1), ("H", 3), ("K", 5), ("N", 7), ("X", 11)]
 
 
-async def _get_xsrf_and_fetch_chains(page) -> dict:
+def _active_front_symbol(prefix: str, months: list) -> str:
+    """Return the nearest KC/RM contract letter+year that hasn't hit FND yet."""
+    from datetime import timedelta
+    today = date.today()
+    buffer = timedelta(days=12)  # ~8 biz days before 1st of month + small buffer
+    for yr in [today.year, today.year + 1]:
+        for letter, mnum in months:
+            first_of_month = date(yr, mnum, 1)
+            rough_fnd = first_of_month - buffer
+            if rough_fnd > today:
+                return f"{prefix}{letter}{str(yr)[-2:]}"
+    return f"{prefix}N{str(today.year)[-2:]}"  # safe fallback
+
+
+def _barchart_requests() -> dict:
     """
-    Loads Barchart to obtain a session cookie, then fetches KC and RM
-    futures chains from within the browser context (uses session cookies).
-    Returns dict with 'KC' and 'RM' contract lists.
+    Pure-HTTP Barchart fetch — no browser needed.
+    Works when CI IPs aren't blocked; ~10x faster than Playwright path.
+    """
+    import requests
+    sess = requests.Session()
+    headers = {
+        "User-Agent": _BC_UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+    }
+    try:
+        # Seed the session — picks up XSRF-TOKEN and session cookies
+        sess.get(_BARCHART_HOME, headers=headers, timeout=15)
+        xsrf = sess.cookies.get("XSRF-TOKEN", "")
+        if not xsrf:
+            print("[futures] barchart_requests: no XSRF cookie — skipping")
+            return {}
+        api_headers = {**headers, "x-xsrf-token": xsrf, "Accept": "application/json"}
+        fields = "symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode"
+        opts   = "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
+        base   = "https://www.barchart.com/proxies/core-api/v1/quotes/get"
+        kc_r = sess.get(f"{base}?symbol=KC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
+        rm_r = sess.get(f"{base}?symbol=RM%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
+        result = {}
+        if kc_r.ok:
+            result["kc"] = kc_r.json()
+        if rm_r.ok:
+            result["rm"] = rm_r.json()
+        if result:
+            print("[futures] barchart_requests: OK")
+        return result
+    except Exception as e:
+        print(f"[futures] barchart_requests failed: {e}")
+        return {}
+
+
+async def _barchart_playwright(page) -> dict:
+    """
+    Playwright-based Barchart fetch — heavier but handles JS-rendered cookies.
+    Used as fallback when pure-HTTP approach fails.
     """
     browser = page.context.browser
-    ctx = await browser.new_context(
-        user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
-        )
-    )
+    ctx = await browser.new_context(user_agent=_BC_UA)
     pg = await ctx.new_page()
     result = {}
     try:
-        await pg.goto(_BARCHART_INIT_URL, wait_until="domcontentloaded", timeout=30000)
-        await pg.wait_for_timeout(3000)
+        # Use the active front-month URL so we never hit an expired contract page
+        front_sym = _active_front_symbol("KC", _KC_MONTHS)
+        init_url = f"https://www.barchart.com/futures/quotes/{front_sym}/overview"
+        await pg.goto(init_url, wait_until="networkidle", timeout=45000)
 
-        # Fetch both chains from within the browser context (XSRF cookie available)
+        # Verify XSRF cookie is present before attempting API calls
+        for attempt in range(3):
+            cookies = await ctx.cookies()
+            xsrf = next((c["value"] for c in cookies if c["name"] == "XSRF-TOKEN"), None)
+            if xsrf:
+                break
+            await pg.wait_for_timeout(2000)
+        else:
+            print("[futures] playwright: XSRF cookie not found after 3 waits")
+            return {}
+
         data = await pg.evaluate(
             """async () => {
                 function getCookie(n) {
@@ -74,11 +139,11 @@ async def _get_xsrf_and_fetch_chains(page) -> dict:
                     return v ? decodeURIComponent(v[2]) : null;
                 }
                 const xsrf = getCookie('XSRF-TOKEN');
+                if (!xsrf) return null;
                 const h = { credentials: 'include', headers: { 'x-xsrf-token': xsrf, 'accept': 'application/json' } };
                 const base = 'https://www.barchart.com/proxies/core-api/v1/quotes/get';
                 const fields = 'symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode';
                 const opts = '&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1';
-
                 const [kcResp, rmResp] = await Promise.all([
                     fetch(base + '?symbol=KC%5EF&fields=' + fields + opts, h),
                     fetch(base + '?symbol=RM%5EF&fields=' + fields + opts, h),
@@ -89,22 +154,117 @@ async def _get_xsrf_and_fetch_chains(page) -> dict:
                 };
             }"""
         )
-        result = data or {}
+        if data:
+            result = data
+            print("[futures] playwright: OK")
     except Exception as e:
-        print(f"[futures] Barchart fetch error: {e}")
+        print(f"[futures] playwright failed: {e}")
     finally:
         await ctx.close()
     return result
 
 
+def _yfinance_fallback() -> dict:
+    """
+    Yahoo Finance fallback — always reachable from CI, no browser needed.
+    Builds a best-effort chain using known contract month letters.
+    OI not available; front ~2-3 contracts will have data.
+    """
+    try:
+        import yfinance as yf
+        from datetime import timedelta
+
+        def _candidate_symbols(prefix: str, months: list, yf_suffix: str) -> list:
+            today = date.today()
+            buffer = timedelta(days=12)
+            syms = []
+            for yr in [today.year, today.year + 1]:
+                for letter, mnum in months:
+                    if date(yr, mnum, 1) - buffer > today:
+                        syms.append(f"{prefix}{letter}{str(yr)[-2:]}{yf_suffix}")
+            return syms[:7]
+
+        kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
+        rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+
+        result = {}
+        for label, syms, product in [("kc", kc_syms, "KC"), ("rm", rm_syms, "RC")]:
+            contracts = []
+            for sym in syms:
+                try:
+                    hist = yf.Ticker(sym).history(period="3d", auto_adjust=False)
+                    if hist.empty:
+                        continue
+                    row  = hist.iloc[-1]
+                    prev = hist.iloc[-2] if len(hist) > 1 else None
+                    close = float(row["Close"])
+                    prev_close = float(prev["Close"]) if prev is not None else close
+                    chg   = round(close - prev_close, 2 if product == "KC" else 0)
+                    vol   = int(row["Volume"]) if not __import__("math").isnan(row["Volume"]) else 0
+                    # Reconstruct expiry from the symbol letters
+                    letter = sym[2]
+                    yr2    = sym[3:5]
+                    mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
+                    expiry = f"20{yr2}-{mnum:02d}-15"  # approximate mid-month
+                    bare_sym = sym.split(".")[0]
+                    contracts.append({
+                        "contract": f"{product} {letter}{yr2}",
+                        "expiry":   expiry,
+                        "last":     close,
+                        "chg":      chg,
+                        "oi":       None,
+                        "volume":   vol,
+                        "symbol":   bare_sym,
+                    })
+                except Exception:
+                    continue
+            if contracts:
+                result[label] = {"data": [{"raw": c} for c in contracts], "_yf": True}
+        if result:
+            print(f"[futures] yfinance fallback: kc={len(result.get('kc',{}).get('data',[]))} rm={len(result.get('rm',{}).get('data',[]))}")
+        return result
+    except Exception as e:
+        print(f"[futures] yfinance fallback failed: {e}")
+        return {}
+
+
+async def _fetch_chains(page) -> dict:
+    """Fetch futures chains: requests → Playwright → Yahoo Finance fallback."""
+    # 1. Fast path: pure HTTP (no browser overhead)
+    result = _barchart_requests()
+    if result.get("kc") or result.get("rm"):
+        return result
+
+    # 2. Playwright path (handles JS-rendered cookies)
+    result = await _barchart_playwright(page)
+    if result.get("kc") or result.get("rm"):
+        return result
+
+    # 3. Yahoo Finance — always reachable, no OI but price data guaranteed
+    print("[futures] Barchart unreachable — falling back to Yahoo Finance")
+    return _yfinance_fallback()
+
+
 def _parse_chain(raw_data: dict, label: str) -> list[dict]:
-    """Turn raw Barchart API response into a clean list of contract dicts."""
-    items = (raw_data or {}).get("data", [])
+    """Turn Barchart or Yahoo Finance API response into a clean list of contract dicts."""
+    if not raw_data:
+        return []
+    items = raw_data.get("data", [])
     from datetime import date, timedelta
     cutoff = date.today() + timedelta(days=14)
+
+    # Yahoo Finance fallback: data rows already have the final shape in "raw"
+    is_yf = raw_data.get("_yf", False)
+
     contracts = []
     for it in items:
         r = it.get("raw", it)
+
+        if is_yf:
+            # Already clean — pass through directly
+            contracts.append(r)
+            continue
+
         oi = r.get("openInterest")
         # Skip contracts with negligible OI
         if oi is not None and int(oi) < 100:
@@ -116,17 +276,15 @@ def _parse_chain(raw_data: dict, label: str) -> list[dict]:
                 continue
         except Exception:
             pass
-        contracts.append(
-            {
-                "contract": r.get("contractName", ""),
-                "expiry": r.get("contractExpirationDate", ""),
-                "last": r.get("lastPrice"),
-                "chg": r.get("priceChange"),
-                "oi": int(oi) if oi is not None else None,
-                "volume": r.get("volume"),
-                "symbol": r.get("symbol", ""),
-            }
-        )
+        contracts.append({
+            "contract": r.get("contractName", ""),
+            "expiry":   r.get("contractExpirationDate", ""),
+            "last":     r.get("lastPrice"),
+            "chg":      r.get("priceChange"),
+            "oi":       int(oi) if oi is not None else None,
+            "volume":   r.get("volume"),
+            "symbol":   r.get("symbol", ""),
+        })
     return contracts
 
 
@@ -450,10 +608,12 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
 
 async def run(page) -> list[dict]:
     results = []
+    kc_contracts: list = []
+    rm_contracts: list = []
 
-    # 1. Barchart futures chains
+    # 1. Barchart / Yahoo Finance futures chains
     try:
-        chains = await _get_xsrf_and_fetch_chains(page)
+        chains = await _fetch_chains(page)
         kc_contracts = _parse_chain(chains.get("kc"), "KC")
         rm_contracts = _parse_chain(chains.get("rm"), "RM")
 

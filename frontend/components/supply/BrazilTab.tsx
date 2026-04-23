@@ -354,6 +354,16 @@ const BLUE  = "#60a5fa";
 const SLATE = "#94a3b8";
 const TEAL  = "#2dd4bf";
 
+// Crop-year period palette: index 0 = most recent, ascending = older
+const CROP_YEAR_COLORS = [
+  "#ef4444",  // current    — red
+  "#f97316",  // prior-1    — dark orange
+  "#60a5fa",  // prior-2    — blue
+  "#64748b",  // prior-3    — gray
+  "#475569",  // prior-4    — darker gray
+  "#334155",  // prior-5    — darkest gray
+];
+
 const HUB_ORDER = [
   "Nordics","Central Europe","South Europe","Eastern Europe",
   "North America","Latin America",
@@ -392,6 +402,7 @@ interface DailyData {
   updated: string;
   arabica:  Record<string, Record<string, number>>; // "YYYY-MM" → { "1": cumBags, ... }
   conillon: Record<string, Record<string, number>>;
+  soluvel:  Record<string, Record<string, number>>;
 }
 
 /** Offset "YYYY-MM" by n months (negative = back) */
@@ -414,58 +425,56 @@ function shortMonthLabel(ym: string): string {
 }
 
 const DAILY_COLORS = {
-  current:  "#ef4444",  // red   — current month
-  prior:    "#eab308",  // yellow — prior month
-  ly:       "#22c55e",  // green — same month LY
-  max:      "#22d3ee",  // cyan  — historical max
-  min:      "#64748b",  // slate — historical min
+  current:  "#ef4444",  // red    — current month
+  prior:    "#f97316",  // orange — prior month (Mes interior)
+  ly:       "#22c55e",  // green  — same month last year
+  hist:     "#475569",  // slate  — historical same-month
+  solv_cur: "#38bdf8",  // sky    — soluvel current month
+  solv_pri: "#7dd3fc",  // light sky — soluvel prior month
 };
 
 function DailyRegChart({
-  title, monthsData, currentMonth,
+  title, monthsData, currentMonth, soluvelData,
 }: {
   title: string;
   monthsData: Record<string, Record<string, number>>;
   currentMonth: string; // "YYYY-MM"
+  soluvelData?: Record<string, Record<string, number>>;
 }) {
   const priorMonth = shiftMonth(currentMonth, -1);
   const lyMonth    = shiftMonth(currentMonth, -12);
 
-  // All months available for this calendar month (for max/min)
   const calMo = currentMonth.slice(5); // "MM"
-  const historicalMonths = Object.keys(monthsData).filter(
-    ym => ym.slice(5) === calMo && ym !== currentMonth && ym !== lyMonth
-  );
+  // Historical: same calendar month, excluding current and LY (prior month is different calMo, auto-excluded)
+  const historicalMonths = Object.keys(monthsData)
+    .filter(ym => ym.slice(5) === calMo && ym !== currentMonth && ym !== lyMonth)
+    .sort();
 
-  // Build per-day arrays (days 1..31)
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
-
   const get = (ym: string, day: number) => monthsData[ym]?.[String(day)] ?? null;
+  const getSolv = (ym: string, day: number) => soluvelData?.[ym]?.[String(day)] ?? null;
 
-  // Compute max/min day-by-day across historical months
-  const maxVals: (number | null)[] = days.map(d => {
-    const vals = historicalMonths.map(ym => get(ym, d)).filter((v): v is number => v !== null);
-    return vals.length > 0 ? Math.max(...vals) : null;
-  });
-  const minVals: (number | null)[] = days.map(d => {
-    const vals = historicalMonths.map(ym => get(ym, d)).filter((v): v is number => v !== null);
-    return vals.length > 0 ? Math.min(...vals) : null;
-  });
-
-  const chartData = days.map((d, i) => ({
+  const chartData = days.map(d => ({
     day: d,
-    current: get(currentMonth, d),
-    prior:   get(priorMonth, d),
-    ly:      get(lyMonth, d),
-    max:     maxVals[i],
-    min:     minVals[i],
+    current:  get(currentMonth, d),
+    prior:    get(priorMonth, d),
+    ly:       get(lyMonth, d),
+    solv_cur: getSolv(currentMonth, d),
+    solv_pri: getSolv(priorMonth, d),
+    ...Object.fromEntries(historicalMonths.map(ym => [ym, get(ym, d)])),
   }));
 
-  // Last non-null day of current month for label
   const lastCurrentDay = [...chartData].reverse().find(r => r.current !== null)?.day ?? 0;
 
-  const hasMax = maxVals.some(v => v !== null);
-  const hasMin = minVals.some(v => v !== null);
+  const hasPrior = Object.keys(monthsData[priorMonth] ?? {}).length > 0;
+  const hasLy    = Object.keys(monthsData[lyMonth]    ?? {}).length > 0;
+
+  const { priorFinal, lastPriorDay } = (() => {
+    const pd = monthsData[priorMonth] ?? {};
+    const keys = Object.keys(pd).map(Number).sort((a, b) => b - a);
+    if (keys.length === 0) return { priorFinal: null, lastPriorDay: 0 };
+    return { priorFinal: pd[String(keys[0])] ?? null, lastPriorDay: keys[0] };
+  })();
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -483,20 +492,33 @@ function DailyRegChart({
           />
           <Legend wrapperStyle={{ fontSize: 9, paddingTop: 4 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
-          {hasMax && (
-            <Line type="monotone" dataKey="max" name={`Max`} stroke={DAILY_COLORS.max}
-              strokeWidth={1} strokeDasharray="4 3" dot={false} connectNulls />
+          {historicalMonths.map(ym => (
+            <Line key={ym} type="monotone" dataKey={ym} name={shortMonthLabel(ym)}
+              stroke={DAILY_COLORS.hist} strokeWidth={1} dot={false} connectNulls opacity={0.5} />
+          ))}
+          {hasLy && (
+            <Line type="monotone" dataKey="ly" name={shortMonthLabel(lyMonth)}
+              stroke={DAILY_COLORS.ly} strokeWidth={1.5} dot={false} connectNulls />
           )}
-          {hasMin && (
-            <Line type="monotone" dataKey="min" name={`Min`} stroke={DAILY_COLORS.min}
-              strokeWidth={1} strokeDasharray="4 3" dot={false} connectNulls />
+          {hasPrior && (
+            <Line type="monotone" dataKey="prior"
+              name={`Last month${priorFinal != null ? ` · ${fmtBags(priorFinal)}` : ""}`}
+              stroke={DAILY_COLORS.prior} strokeWidth={1.5} strokeOpacity={0.7} connectNulls
+              dot={(props: any) => {
+                if (props.payload?.day !== lastPriorDay || props.payload?.prior == null) return <g key={props.key} />;
+                return (
+                  <g key={props.key}>
+                    <circle cx={props.cx} cy={props.cy} r={3} fill={DAILY_COLORS.prior} />
+                    <text x={props.cx + 5} y={props.cy - 4} fill="#fb923c" fontSize={9} fontFamily="monospace">
+                      {fmtBags(props.payload.prior)}
+                    </text>
+                  </g>
+                );
+              }} />
           )}
-          <Line type="monotone" dataKey="ly" name={shortMonthLabel(lyMonth)} stroke={DAILY_COLORS.ly}
-            strokeWidth={1.5} dot={false} connectNulls />
-          <Line type="monotone" dataKey="prior" name={shortMonthLabel(priorMonth)} stroke={DAILY_COLORS.prior}
-            strokeWidth={1.5} dot={false} connectNulls />
-          <Line type="monotone" dataKey="current" name={shortMonthLabel(currentMonth)} stroke={DAILY_COLORS.current}
-            strokeWidth={2.5} dot={(props: any) => {
+          <Line type="monotone" dataKey="current" name={shortMonthLabel(currentMonth)}
+            stroke={DAILY_COLORS.current} strokeWidth={2.5}
+            dot={(props: any) => {
               if (props.payload?.day !== lastCurrentDay || props.payload?.current == null) return <g key={props.key} />;
               return (
                 <g key={props.key}>
@@ -508,6 +530,18 @@ function DailyRegChart({
               );
             }}
             connectNulls />
+          {soluvelData && (
+            <Line type="monotone" dataKey="solv_cur"
+              name="Soluble"
+              stroke={DAILY_COLORS.solv_cur} strokeWidth={1.5} strokeDasharray="4 2"
+              dot={false} connectNulls />
+          )}
+          {soluvelData && (
+            <Line type="monotone" dataKey="solv_pri"
+              name="Soluble last month"
+              stroke={DAILY_COLORS.solv_pri} strokeWidth={1} strokeDasharray="4 2" strokeOpacity={0.7}
+              dot={false} connectNulls />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -542,6 +576,7 @@ function DailyRegistrationSection() {
         title="Brazil — Conilon Export Registration (Daily, Bags)"
         monthsData={data.conillon}
         currentMonth={currentMonth}
+        soluvelData={data.soluvel}
       />
     </div>
   );
@@ -553,9 +588,20 @@ function DailyRegistrationSection() {
 const CROP_MONTH_ORDER = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
 const CROP_MONTH_LABELS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
 
-function MonthlyVolumeChart({ series, typeFilter }: { series: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
+  series: VolumeSeries[];
+  typeFilter?: SeriesKey | null;
+  isFiltered?: boolean;
+}) {
   const activeKey: SeriesKey = typeFilter ?? "total";
   const [cropYears, setCropYears] = useState(3);
+  const [dailyData, setDailyData] = useState<DailyData | null>(null);
+
+  useEffect(() => {
+    if (isFiltered) { setDailyData(null); return; }
+    fetch("/data/cecafe_daily.json")
+      .then(r => r.json()).then(setDailyData).catch(() => {});
+  }, [isFiltered]);
 
   // Group by crop year key → month number → record
   const cropGroups = useMemo(() => {
@@ -569,15 +615,64 @@ function MonthlyVolumeChart({ series, typeFilter }: { series: VolumeSeries[]; ty
     return m;
   }, [series]);
 
-  const sortedCropKeys = Object.keys(cropGroups).sort(); // ascending = oldest first
+  const sortedCropKeys = Object.keys(cropGroups).sort();
   const latestCrop     = sortedCropKeys[sortedCropKeys.length - 1];
-  const showCrops      = sortedCropKeys.slice(-cropYears).reverse(); // newest first → oldest on right
-  // Colors: newest=brightest (GREEN/blue) on left, oldest=darkest on right
-  const ALL_COLORS     = [GREEN, "#60a5fa", "#94a3b8", "#64748b", "#475569", "#334155"];
-  const YEAR_COLORS    = ALL_COLORS.slice(0, cropYears);
+  const showCrops      = sortedCropKeys.slice(-cropYears).reverse();
+  const YEAR_COLORS    = CROP_YEAR_COLORS.slice(0, cropYears);
+
+  // Registration-based forecast for the current unreleased month
+  const forecast = useMemo(() => {
+    if (!dailyData) return null;
+    const ym = dailyData.updated.slice(0, 7); // "YYYY-MM"
+    if (series.some(r => r.date === ym)) return null; // Cecafe already released it
+
+    const [fy, fm] = ym.split("-").map(Number);
+    const daysInMonth = new Date(fy, fm, 0).getDate();
+
+    const latestVal = (monthMap: Record<string, Record<string, number>> | undefined) => {
+      const md = monthMap?.[ym] ?? {};
+      const keys = Object.keys(md).map(Number).sort((a, b) => b - a);
+      return keys.length ? { val: md[String(keys[0])], day: keys[0] } : { val: 0, day: 0 };
+    };
+
+    const arab = latestVal(dailyData.arabica);
+    const coni = latestVal(dailyData.conillon);
+    const solv = latestVal(dailyData.soluvel);
+
+    let cum = 0, refDay = 0;
+    switch (activeKey) {
+      case "arabica":  cum = arab.val; refDay = arab.day; break;
+      case "conillon": cum = coni.val; refDay = coni.day; break;
+      case "soluvel":  cum = solv.val; refDay = solv.day; break;
+      case "torrado": case "total_verde": case "total_industria": return null;
+      default:
+        refDay = Math.max(arab.day, coni.day, solv.day);
+        cum = arab.val + coni.val + solv.val;
+    }
+
+    if (!cum || !refDay) return null;
+    return {
+      kt:       Math.round(bagsToKT((cum / refDay) * daysInMonth) * 10) / 10,
+      monthNum: fm,
+      cropKey:  cropYearKey(ym),
+      refDay,
+      daysInMonth,
+    };
+  }, [dailyData, series, activeKey]);
+
+  // Fixed key so Bar is always in DOM — avoids recharts reordering on dynamic add
+  const EST_KEY = "__forecast__";
+
+  const estColor = (() => {
+    if (!forecast) return CROP_YEAR_COLORS[0];
+    const idx = showCrops.indexOf(forecast.cropKey);
+    return idx >= 0 ? YEAR_COLORS[idx] : CROP_YEAR_COLORS[0];
+  })();
 
   const chartData = CROP_MONTH_ORDER.map((mo, i) => {
     const row: Record<string, number | string> = { month: CROP_MONTH_LABELS[i] };
+    // Always include estimate key (0 when no forecast or wrong month) so bar slot is stable
+    row[EST_KEY] = forecast && mo === forecast.monthNum ? forecast.kt : 0;
     showCrops.forEach(ck => {
       const r = cropGroups[ck]?.[mo];
       row[ck] = r ? bagsToKT(r[activeKey] ?? r.total) : 0;
@@ -592,7 +687,14 @@ function MonthlyVolumeChart({ series, typeFilter }: { series: VolumeSeries[]; ty
           <div className="text-sm font-semibold text-slate-200">
             Monthly Export Volume — {typeFilter ? TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label : "Total (All Types)"}
           </div>
-          <div className="text-[10px] text-slate-500">Crop year (Apr–Mar) · Thousand metric tons (60 kg bags)</div>
+          <div className="text-[10px] text-slate-500">
+            Crop year (Apr–Mar) · Thousand metric tons (60 kg bags)
+            {forecast && (
+              <span className="ml-2 text-slate-600 italic">
+                · est. based on registrations day {forecast.refDay}/{forecast.daysInMonth}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex gap-1">
           {[2, 3, 5].map(n => (
@@ -608,9 +710,23 @@ function MonthlyVolumeChart({ series, typeFilter }: { series: VolumeSeries[]; ty
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
-          <Tooltip contentStyle={TT_STYLE} formatter={(v: any, name: any) => [`${v} kt`, `Crop ${name}`]} />
+          <Tooltip contentStyle={TT_STYLE}
+            formatter={(v: any, name: any) => [
+              `${v} kt${name === EST_KEY ? " (est.)" : ""}`,
+              name === EST_KEY ? `Crop ${forecast?.cropKey ?? ""} (forecast)` : `Crop ${name}`,
+            ]} />
           <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8", paddingTop: 6 }}
-            formatter={v => <span style={{ color: "#cbd5e1" }}>Crop {v}</span>} />
+            formatter={v => (
+              <span style={{ color: "#cbd5e1" }}>
+                {v === EST_KEY
+                  ? forecast ? `Crop ${forecast.cropKey} (est.)` : ""
+                  : `Crop ${v}`}
+              </span>
+            )} />
+          {/* Always first = leftmost; hidden until forecast loads */}
+          <Bar key={EST_KEY} dataKey={EST_KEY} name={EST_KEY}
+            fill={estColor} fillOpacity={forecast ? 0.35 : 0}
+            legendType={forecast ? "square" : "none"} />
           {showCrops.map((ck, i) => (
             <Bar key={ck} dataKey={ck} name={ck}
               fill={YEAR_COLORS[i % YEAR_COLORS.length]}
@@ -1185,19 +1301,19 @@ function CumulativePaceChart({ series, filteredSeries, typeFilter }: {
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>Crop {v}</span>} />
           {prior2Key && (
-            <Line type="monotone" dataKey={prior2Key} stroke="#475569"
+            <Line type="monotone" dataKey={prior2Key} stroke={CROP_YEAR_COLORS[2]}
               strokeWidth={1} dot={false} connectNulls />
           )}
-          <Line type="monotone" dataKey={prior1Key} stroke="#60a5fa"
+          <Line type="monotone" dataKey={prior1Key} stroke={CROP_YEAR_COLORS[1]}
             strokeWidth={1.5} dot={false} connectNulls />
-          <Line type="monotone" dataKey={currentKey} stroke="#ef4444"
+          <Line type="monotone" dataKey={currentKey} stroke={CROP_YEAR_COLORS[0]}
             strokeWidth={2.5} dot={(props: any) => {
               if (props.index !== lastIdx || props.payload?.[currentKey] == null) return <g key={props.key} />;
               return (
                 <g key={props.key}>
-                  <circle cx={props.cx} cy={props.cy} r={3} fill="#ef4444" />
-                  <text x={(props.cx ?? 0) + 6} y={(props.cy ?? 0) - 4} fill="#f87171" fontSize={9} fontFamily="monospace">
-                    {lastKt}kt
+                  <circle cx={props.cx} cy={props.cy} r={3} fill={CROP_YEAR_COLORS[0]} />
+                  <text x={props.cx} y={(props.cy ?? 0) + 16} fill="#f87171" fontSize={9} fontFamily="monospace" textAnchor="middle">
+                    {Number(lastKt).toLocaleString("en-US")}kt
                   </text>
                 </g>
               );
@@ -1839,7 +1955,7 @@ export default function BrazilTab() {
           <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
 
           {/* Charts */}
-          <MonthlyVolumeChart  series={filteredSeries ?? series} typeFilter={filter.type} />
+          <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} />
           <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <TypeShareChart series={series} />

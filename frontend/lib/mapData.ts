@@ -1,3 +1,4 @@
+// ── Origin ports (loading) ─────────────────────────────────────────────────────
 export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Santos", l: [-23.9, -46.3] },
   { n: "Vitoria", l: [-20.3, -40.3] },
@@ -35,6 +36,61 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Gioia Tauro", l: [38.43, 15.91] },
 ];
 
+// ── Destination hub markers (one per regional hub) ────────────────────────────
+// Hubs without an existing port in PORTS get a new marker here.
+export const HUB_PORTS: { hub: string; n: string; l: [number, number] }[] = [
+  { hub: "Nordics",            n: "Nordics Hub (Copenhagen)",      l: [55.68, 12.57] },
+  { hub: "Eastern Europe",     n: "Eastern Europe Hub (Gdansk)",   l: [54.35, 18.65] },
+  { hub: "Latin America",      n: "Latin America Hub (Buenos Aires)", l: [-34.61, -58.37] },
+  { hub: "Middle East",        n: "Middle East Hub (Dubai)",        l: [25.27, 55.30] },
+  { hub: "Russia & CIS",       n: "Russia & CIS Hub (St. Petersburg)", l: [59.94, 30.32] },
+  { hub: "Sub-Saharan Africa", n: "West Africa Hub (Lagos)",        l: [6.45, 3.40] },
+];
+
+// ── Basemap tile providers ────────────────────────────────────────────────────
+export const BASEMAPS = [
+  {
+    id: "dark",
+    label: "Dark",
+    desc: "High contrast — best for route visibility",
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    subdomains: "abcd",
+    attr: "© CARTO",
+  },
+  {
+    id: "light",
+    label: "Light",
+    desc: "Clean reference view with geographic detail",
+    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    subdomains: "abcd",
+    attr: "© CARTO",
+  },
+  {
+    id: "satellite",
+    label: "Satellite",
+    desc: "True color imagery — shows agriculture & land use",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    subdomains: "",
+    attr: "© Esri, Maxar",
+  },
+  {
+    id: "physical",
+    label: "Physical",
+    desc: "Terrain & climate zones — latitude bands visible",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",
+    subdomains: "",
+    attr: "© Esri",
+  },
+  {
+    id: "topo",
+    label: "Topo",
+    desc: "Topographic — altitude + lat/lon grid",
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    subdomains: "abc",
+    attr: "© OpenTopoMap contributors",
+  },
+];
+
 export const ROUTES: {
   name: string;
   color: string;
@@ -42,11 +98,12 @@ export const ROUTES: {
   path: [number, number][];
   /** Cecafe hub names whose export volumes to show on click */
   cecafeHubs?: string[];
+  /** VN Customs hub names whose export volumes to show on click */
+  vnHubs?: string[];
 }[] = [
 
   // ═══════════════════════════════════════════════════════════
   // MAIN TRUNK: Singapore → Antwerp (Malacca → Indian Ocean → Suez → Med → Channel)
-  // No other routes share these waypoints.
   // ═══════════════════════════════════════════════════════════
   {
     name: "Singapore → Antwerp (Main Trunk)",
@@ -59,7 +116,7 @@ export const ROUTES: {
       [5.8, 95.5],     // Bay of Bengal  ← Chennai feeder junction
       [5.8, 80.4],     // Indian Ocean   ← Tuticorin feeder junction
       [10.0, 65.0],    // Arabian Sea
-      [14.0, 55.0],    // Gulf of Aden approach
+      [14.0, 55.0],    // Gulf of Aden approach  ← Middle East spur junction
       [12.5, 45.0],    // Red Sea
       [12.6, 43.3],    // Bab-el-Mandeb  ← Uganda / Djibouti feeder junction
       [18.0, 40.0],    // Red Sea
@@ -102,23 +159,27 @@ export const ROUTES: {
     color: "#2ecc71",
     weight: 3,
     path: [
-      [22.0, -165.0],  // mid-Pacific (ships converge here from Asia)
+      [22.0, -165.0],
       [26.0, -148.0],
       [30.0, -133.0],
-      [33.7, -118.2],  // Los Angeles Port
+      [33.7, -118.2],
     ],
   },
 
   // ═══════════════════════════════════════════════════════════
-  // FEEDERS → MAIN TRUNK  (stop where they join the trunk)
+  // FEEDERS → MAIN TRUNK
   // ═══════════════════════════════════════════════════════════
 
-  // HCMC → Singapore
+  // HCMC → Singapore (with VN export popup)
   {
     name: "Feeder: HCMC → Singapore",
     color: "#2ecc71",
     path: [[10.76, 106.78], [8.0, 106.0], [3.0, 105.0], [1.26, 103.8]],
+    vnHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "North America",
+             "East Asia", "SE Asia & Pacific", "Middle East", "North Africa",
+             "Sub-Saharan Africa", "South Asia", "Russia & CIS"],
   },
+
   // Jakarta → Singapore
   {
     name: "Feeder: Jakarta → Singapore",
@@ -126,7 +187,7 @@ export const ROUTES: {
     path: [[-6.10, 106.88], [-3.0, 106.0], [1.26, 103.8]],
   },
 
-  // India spurs — branch from trunk, stop at India port
+  // India spurs
   {
     name: "Spur: Trunk → Tuticorin",
     color: "#00875a",
@@ -150,7 +211,58 @@ export const ROUTES: {
     path: [[11.82, 43.14], [12.2, 43.5], [12.6, 43.3]],
   },
 
-  // Mediterranean port spurs — branch from trunk
+  // ── NEW HUB SPURS ─────────────────────────────────────────
+  // Middle East hub: trunk junction → Gulf of Oman → Dubai
+  {
+    name: "Spur: Gulf of Aden → Dubai",
+    color: "#f39c12",
+    weight: 2,
+    path: [
+      [14.0, 55.0],   // Arabian Sea junction (main trunk)
+      [18.0, 57.5],   // Gulf of Aden / Oman approach
+      [22.5, 59.5],   // SE Oman coast
+      [24.5, 58.5],   // Muscat / Gulf of Oman
+      [25.5, 57.0],   // Strait of Hormuz E
+      [26.0, 56.2],   // Strait of Hormuz
+      [25.27, 55.30], // Dubai
+    ],
+  },
+
+  // Nordics hub: Hamburg → Copenhagen
+  {
+    name: "Spur: Hamburg → Copenhagen",
+    color: "#ffffff",
+    weight: 2,
+    path: [[53.55, 9.99], [54.3, 10.7], [55.0, 11.5], [55.68, 12.57]],
+  },
+
+  // Eastern Europe hub: Hamburg → Baltic → Gdansk
+  {
+    name: "Spur: Hamburg → Gdansk",
+    color: "#ffffff",
+    weight: 2,
+    path: [[53.55, 9.99], [54.0, 10.5], [54.2, 12.5], [54.3, 15.5], [54.35, 18.65]],
+  },
+
+  // Russia & CIS hub: Hamburg → Baltic → St. Petersburg
+  {
+    name: "Spur: Hamburg → St. Petersburg",
+    color: "#9b59b6",
+    weight: 2,
+    path: [
+      [53.55, 9.99],  // Hamburg
+      [54.0, 10.5],   // Kiel area
+      [55.0, 12.5],   // Oresund (Denmark/Sweden)
+      [55.5, 16.0],   // Baltic W
+      [56.5, 18.5],   // Baltic central
+      [57.5, 21.5],   // Baltic E (Latvia area)
+      [59.5, 24.5],   // Gulf of Finland W
+      [59.94, 30.32], // St. Petersburg
+    ],
+  },
+  // ─────────────────────────────────────────────────────────
+
+  // Mediterranean port spurs
   {
     name: "Spur: Med → Trieste",
     color: "#f39c12",
@@ -177,7 +289,7 @@ export const ROUTES: {
     path: [[37.5, 3.0], [39.0, 2.5], [41.38, 2.17]],
   },
 
-  // English Channel port spurs — branch from trunk
+  // English Channel port spurs
   {
     name: "Spur: Channel → Le Havre",
     color: "#16a085",
@@ -190,10 +302,10 @@ export const ROUTES: {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // AMERICAS ROUTES  (terminate at Channel entry or trunk junctions)
+  // AMERICAS ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // Brazil → Europe (terminates at Channel entry [48.0, -7.0])
+  // Brazil → Europe (terminates at Channel entry)
   {
     name: "Brazil (Santos) → Channel Entry",
     color: "#e74c3c",
@@ -211,7 +323,7 @@ export const ROUTES: {
     path: [[-20.3, -40.3], [-20.0, -38.0]],
   },
 
-  // Brazil → New York (direct Atlantic)
+  // Brazil → New York
   {
     name: "Brazil (Santos) → NY",
     color: "#e74c3c",
@@ -219,33 +331,74 @@ export const ROUTES: {
     cecafeHubs: ["North America"],
   },
 
-  // Brazil → Japan via Cape of Good Hope (approaches Singapore from south, then South China Sea to Japan)
+  // Brazil → Asia via Cape of Good Hope → Malacca Strait
   {
-    name: "Brazil (Santos) → Japan (Cape Route)",
+    name: "Brazil (Santos) → Asia (Cape Route via Malacca)",
     color: "#e74c3c",
     path: [
-      [-23.95, -46.3],
-      [-28.0, -40.0],
-      [-34.0, -20.0],
-      [-36.0, 0.0],
-      [-36.0, 15.0],
-      [-35.0, 25.0],
-      [-30.0, 50.0],
-      [-20.0, 70.0],
-      [-10.0, 80.0],
-      [-5.0, 88.0],
-      // Approach Singapore from the south — does NOT enter Malacca Strait trunk
-      [-1.0, 97.0],
-      [0.5, 102.0],
-      [1.26, 103.8],   // Singapore
-      // Continue to Japan via South China Sea (separate from Trans-Pacific trunk)
-      [8.0, 110.0],
-      [15.0, 116.0],
-      [22.0, 123.0],
-      [30.0, 128.0],
-      [35.61, 139.78], // Tokyo
+      [-23.95, -46.3],  // Santos
+      [-28.0, -40.0],   // S Atlantic
+      [-36.0, -20.0],   // Mid S Atlantic
+      [-40.0, 0.0],     // S Atlantic E
+      [-39.0, 18.0],    // W of Cape of Good Hope
+      [-34.36, 18.47],  // Cape of Good Hope
+      [-25.0, 33.0],    // Mozambique coast
+      [-15.0, 40.5],    // N Mozambique
+      [-8.0, 46.0],     // W Indian Ocean
+      [-3.0, 60.0],     // Central Indian Ocean
+      [4.0, 78.0],      // S of Sri Lanka
+      [5.8, 90.0],      // Andaman approach
+      [5.8, 95.5],      // Bay of Bengal ← joins trunk waypoint
+      [5.5, 98.0],      // Malacca Strait N ← joins trunk waypoint
+      [3.0, 100.5],     // Mid Malacca Strait ← joins trunk waypoint
+      [1.26, 103.8],    // Singapore
+      [8.0, 110.0],     // S China Sea
+      [15.0, 116.0],    // E of Philippines
+      [22.0, 123.0],    // Luzon Strait
+      [30.0, 128.0],    // East China Sea
+      [35.61, 139.78],  // Tokyo
     ],
     cecafeHubs: ["East Asia", "SE Asia & Pacific"],
+  },
+
+  // Brazil → Sub-Saharan Africa — West Africa
+  {
+    name: "Brazil (Santos) → West Africa",
+    color: "#e74c3c",
+    path: [[-23.95, -46.3], [-15.0, -36.0], [-5.0, -28.0], [0.0, -10.0], [3.0, -4.0], [5.35, -4.00], [6.45, 3.40]],
+    cecafeHubs: ["Sub-Saharan Africa"],
+  },
+
+  // Brazil → South Africa via Cape Route
+  {
+    name: "Brazil (Santos) → South Africa",
+    color: "#e74c3c",
+    path: [[-23.95, -46.3], [-28.0, -41.0], [-35.0, -25.0], [-36.0, 0.0], [-35.0, 18.0], [-34.36, 18.47], [-29.9, 31.0]],
+    cecafeHubs: ["Sub-Saharan Africa"],
+  },
+
+  // Brazil → North Africa (Casablanca)
+  {
+    name: "Brazil (Santos) → North Africa",
+    color: "#e74c3c",
+    path: [[-23.95, -46.3], [-10.0, -32.0], [5.0, -28.0], [20.0, -22.0], [28.0, -15.0], [33.6, -7.6]],
+    cecafeHubs: ["North Africa"],
+  },
+
+  // Brazil → Buenos Aires
+  {
+    name: "Brazil (Santos) → Buenos Aires",
+    color: "#e74c3c",
+    path: [[-23.95, -46.3], [-27.0, -47.5], [-30.0, -49.0], [-33.0, -52.0], [-34.6, -56.2], [-34.61, -58.37]],
+    cecafeHubs: ["Latin America"],
+  },
+
+  // Brazil → Lima via Cape Horn
+  {
+    name: "Brazil (Santos) → Lima",
+    color: "#e74c3c",
+    path: [[-23.95, -46.3], [-33.0, -50.0], [-40.0, -55.0], [-52.0, -58.0], [-56.0, -68.0], [-52.0, -72.0], [-40.0, -73.0], [-30.0, -75.0], [-20.0, -75.0], [-12.04, -77.12]],
+    cecafeHubs: ["Latin America"],
   },
 
   // Honduras → Channel Entry
@@ -281,21 +434,21 @@ export const ROUTES: {
   // ASIA ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // Singapore → Pacific (stops east of Japan — no antimeridian crossing)
+  // Singapore → Pacific
   {
     name: "Singapore → Pacific",
     color: "#2ecc71",
     path: [[1.26, 103.8], [8.0, 112.0], [15.0, 125.0], [22.0, 138.0], [30.0, 150.0], [38.0, 158.0]],
   },
 
-  // Singapore → Sydney
+  // Singapore → Sydney (via Java Sea, Torres Strait approach)
   {
     name: "Singapore → Sydney",
     color: "#e74c3c",
     path: [[1.26, 103.8], [-1.0, 105.0], [-3.0, 107.0], [-5.0, 112.0], [-6.0, 120.0], [-7.5, 128.0], [-9.5, 135.0], [-10.2, 142.0], [-13.0, 146.0], [-20.0, 152.0], [-30.0, 154.0], [-33.86, 151.20]],
   },
 
-  // Shanghai deviation — branches off Singapore→Japan lane at [30, 128]
+  // Shanghai deviation
   {
     name: "Deviation Singapore → Shanghai",
     color: "#e74c3c",

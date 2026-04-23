@@ -1,0 +1,35 @@
+{
+  "updated": "2026-04-22T09:32:00Z",
+  "source": "NCHMF – Bản tin dự báo nguồn nước thời hạn ngắn",
+  "source_url": "https://nchmf.gov.vn/kttv/vi-VN/1/nguon-nuoc-21-18.html",
+  "rivers": [
+    {
+      "river": "Dak Bla",
+      "river_vn": "ĐăkBla",
+      "provinces": [
+        "Gia Lai",
+        "Kon Tum"
+      ],
+      "station": "Kon Tum",
+      "actual_mm3": 6.17,
+      "tbnn_pct": -68.0,
+      "forecast_tbnn_pct": -67.0,
+      "signal": "critical"
+    },
+    {
+      "river": "Srepok",
+      "river_vn": "Srêpôk",
+      "provinces": [
+        "Dak Lak"
+      ],
+      "station": "Giang Sơn",
+      "actual_mm3": 10.3,
+      "tbnn_pct": -8.0,
+      "forecast_tbnn_pct": -9.0,
+      "signal": "normal"
+    }
+  ],
+  "bulletin_date": "2026-04-22",
+  "has_live_data": true,
+  "pdf_url": "https://kttv.gov.vn/upload/thuyvan1/2026/4/22/dbqg_nnhn_20260422_1500.pdf"
+}

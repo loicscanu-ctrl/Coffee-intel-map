@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { fetchNews } from "@/lib/api";
 import OIHistoryTable from "@/components/futures/OIHistoryTable";
 import OIFndChart from "@/components/futures/OIFndChart";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
+import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 
 interface Contract {
   contract: string;
@@ -15,27 +15,7 @@ interface Contract {
   symbol: string;
 }
 
-interface NewsItem {
-  id: number;
-  title: string;
-  body: string;
-  source: string;
-  tags: string[];
-  meta?: string | null;
-  pub_date: string;
-}
-
 function fmt(n: number) { return n?.toLocaleString() ?? "—"; }
-function parseBodyPrice(body: string): number | null {
-  const m = body.match(/price:\s*([\d.,]+)/i);
-  if (!m) return null;
-  const raw = m[1];
-  // Vietnamese thousands: "94.000" (2-3 digits + dot + exactly 3 digits) → 94000
-  const n = /^\d{2,3}\.\d{3}$/.test(raw)
-    ? parseInt(raw.replace(/\./g, ""), 10)
-    : parseFloat(raw.replace(/,/g, ""));
-  return isNaN(n) ? null : n;
-}
 function fmtChg(n: number) {
   if (n == null) return "—";
   return (n >= 0 ? "+" : "") + n.toFixed(2);
@@ -209,7 +189,7 @@ const CERT_OPTIONS = [
   { key: "rfa",  label: "RFA  (excl. 1.75 cts/lb buyer royalty fee)",  display: "+5 cts/lb · +60 USD/MT (Robusta)",  val: 60 },
 ];
 
-function QuotationTab({ contracts = [], vndPrice, usdvnd }: { contracts?: Contract[]; vndPrice?: number | null; usdvnd?: number | null }) {
+function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; vnFaqUsdMt?: number | null }) {
   const [basisOverride, setBasisOverride]     = useState<number | null>(null);
   const [freight, setFreight]                 = useState(0);
   const [financing, setFinancing]             = useState(0);
@@ -260,13 +240,13 @@ function QuotationTab({ contracts = [], vndPrice, usdvnd }: { contracts?: Contra
     return result;
   }, [monthsBase]);
 
-  // Default basis: (VND price / USDVND * 1000) − front RC price
+  // Default basis: VN FAQ USD/MT − front RC price
   const basisDefault = useMemo(() => {
     const frontLetter = monthsBase[0]?.letter;
     const frontPrice  = frontLetter ? rcPrices[frontLetter] : null;
-    if (vndPrice && usdvnd && frontPrice) return Math.round(vndPrice / usdvnd * 1000 - frontPrice);
+    if (vnFaqUsdMt && frontPrice) return Math.round(vnFaqUsdMt - frontPrice);
     return 150;
-  }, [vndPrice, usdvnd, rcPrices, monthsBase]);
+  }, [vnFaqUsdMt, rcPrices, monthsBase]);
 
   // basisOverride = null means use the computed default; non-null = user's manual value
   const basisDiff = basisOverride ?? basisDefault;
@@ -499,9 +479,9 @@ interface FuturesChainJson {
 }
 
 export default function FuturesPage() {
-  const [chainJson, setChainJson] = useState<FuturesChainJson | null>(null);
-  const [allItems, setAllItems]   = useState<NewsItem[]>([]);
-  const [tab, setTab]             = useState<"exchange" | "quotation" | "research">("exchange");
+  const [chainJson, setChainJson]   = useState<FuturesChainJson | null>(null);
+  const [vnFaqUsdMt, setVnFaqUsdMt] = useState<number | null>(null);
+  const [tab, setTab]               = useState<"exchange" | "quotation" | "research">("exchange");
 
   // Chain data: instant from static JSON, no backend needed
   useEffect(() => {
@@ -511,19 +491,16 @@ export default function FuturesPage() {
       .catch(() => setChainJson({ arabica: null, robusta: null }));
   }, []);
 
-  // News: only needed for VND price in quotation tab — tolerate delay
   useEffect(() => {
-    fetchNews().then(setAllItems).catch(() => {});
+    fetch("/data/vn_physical_prices.json")
+      .then(r => r.json())
+      .then((d: any) => { if (d?.vn_faq?.usd_per_mt) setVnFaqUsdMt(d.vn_faq.usd_per_mt); })
+      .catch(() => {});
   }, []);
 
   const arabicaChain = chainJson?.arabica ?? null;
   const robustaChain = chainJson?.robusta ?? null;
   const loading      = chainJson === null;
-
-  const vndItem   = allItems.find(i => i.tags?.includes("vietnam") && i.tags?.includes("price") && i.tags?.includes("robusta") && !i.tags?.includes("futures"));
-  const fxVndItem = allItems.find(i => i.tags?.includes("fx") && i.tags?.includes("vietnam"));
-  const vndPrice  = vndItem   ? parseBodyPrice(vndItem.body)   : null;
-  const usdvnd    = fxVndItem ? parseBodyPrice(fxVndItem.body) : null;
 
   return (
     <div className="p-6 h-full overflow-y-auto space-y-4">
@@ -556,17 +533,27 @@ export default function FuturesPage() {
         </button>
       </div>
 
-      {loading && (
-        <div className="animate-pulse space-y-3 mt-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-24 bg-slate-800 rounded-lg" />
-          ))}
-        </div>
-      )}
-
       {/* Exchange tab */}
       {tab === "exchange" && (
         <>
+          {/* Live quotes — acaphe.com (run acaphe_poller.py locally for real-time updates) */}
+          <AcapheLiveQuotes />
+
+          {/* Daily quotes separator */}
+          <div className="border-t border-slate-800 pt-4">
+            <h2 className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-3">
+              Daily Quotes · Barchart
+            </h2>
+          </div>
+
+          {loading && (
+            <div className="animate-pulse space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-24 bg-slate-800 rounded-lg" />
+              ))}
+            </div>
+          )}
+
           {!loading && !robustaChain && !arabicaChain && (
             <p className="text-slate-500 text-sm italic">
               No futures data yet — check back after the next scrape run.
@@ -601,8 +588,7 @@ export default function FuturesPage() {
       {tab === "quotation" && (
         <QuotationTab
           contracts={robustaChain?.contracts ?? []}
-          vndPrice={vndPrice}
-          usdvnd={usdvnd}
+          vnFaqUsdMt={vnFaqUsdMt}
         />
       )}
 

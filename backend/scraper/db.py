@@ -157,3 +157,164 @@ def create_farmer_economics_tables():
         FertilizerImport.__table__,
     ])
     print("[db] farmer_economics tables created/verified")
+
+
+def create_physical_prices_table():
+    """Create physical_prices table if it doesn't exist."""
+    from database import Base
+    from models import PhysicalPrice
+    engine = _get_engine()
+    Base.metadata.create_all(engine, tables=[PhysicalPrice.__table__])
+    print("[db] physical_prices table created/verified")
+
+
+def upsert_physical_price(db, *, symbol: str, price: float, currency: str,
+                          unit: str, source: str, price_date) -> None:
+    from models import PhysicalPrice
+    existing = db.query(PhysicalPrice).filter_by(symbol=symbol, price_date=price_date).first()
+    if existing:
+        existing.price = price
+        existing.source = source
+    else:
+        db.add(PhysicalPrice(
+            symbol=symbol, price=price, currency=currency,
+            unit=unit, source=source, price_date=price_date,
+        ))
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+
+
+def create_vn_local_prices_table():
+    """Create vn_local_prices table if it doesn't exist."""
+    from database import Base
+    from models import VnLocalPrice
+    engine = _get_engine()
+    Base.metadata.create_all(engine, tables=[VnLocalPrice.__table__])
+
+
+def upsert_vn_local_price(prices: dict, recorded_at) -> None:
+    """Insert a new VN local price snapshot. Keeps last 60 rows, purges older ones."""
+    from models import VnLocalPrice
+    db = get_session()
+    try:
+        db.add(VnLocalPrice(
+            recorded_at=recorded_at,
+            local_time=prices.get("local_time"),
+            prices=prices,
+        ))
+        db.commit()
+        # Purge rows older than the newest 60
+        subq = (
+            db.query(VnLocalPrice.id)
+            .order_by(VnLocalPrice.recorded_at.desc())
+            .limit(60)
+            .subquery()
+        )
+        db.query(VnLocalPrice).filter(~VnLocalPrice.id.in_(subq)).delete(synchronize_session=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
+def get_latest_vn_local_price() -> dict | None:
+    """Return the most recently captured VN local prices dict, or None."""
+    from models import VnLocalPrice
+    db = get_session()
+    try:
+        row = db.query(VnLocalPrice).order_by(VnLocalPrice.recorded_at.desc()).first()
+        if not row:
+            return None
+        return {"saved_at": row.recorded_at.isoformat() + "Z", **row.prices}
+    except Exception:
+        return None
+    finally:
+        db.close()
+
+
+def extract_physical_price(item: dict) -> dict | None:
+    """Parse a news item dict → PhysicalPrice kwargs, or None if not a structured price."""
+    import re
+    from datetime import date as _date
+    import json as _json
+
+    tags = set(item.get("tags", []))
+    body = item.get("body", "") or ""
+    source = item.get("source", "")
+    today = _date.today()
+
+    # FX rates
+    if "fx" in tags:
+        m = re.search(r"price:\s*([\d.,]+)", body, re.I)
+        if not m:
+            return None
+        rate = float(m.group(1).replace(",", ""))
+        sym_map = {
+            "brazil": "USD_BRL", "vietnam": "USD_VND", "indonesia": "USD_IDR",
+            "honduras": "USD_HNL", "uganda": "USD_UGX",
+        }
+        for country, sym in sym_map.items():
+            if country in tags:
+                return dict(symbol=sym, price=rate, currency="USD", unit="rate",
+                            source=source, price_date=today)
+        return None
+
+    # VN FAQ
+    if "price" in tags and "vietnam" in tags and "futures" not in tags:
+        m = re.search(r"price:\s*([\d.]+)\s*VND/kg", body, re.I)
+        if not m:
+            return None
+        raw = m.group(1)
+        vnd_kg = int(raw.replace(".", "")) if re.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
+        return dict(symbol="VN_FAQ", price=float(vnd_kg), currency="VND", unit="per_kg",
+                    source=source, price_date=today)
+
+    # UGA S15
+    if "price" in tags and "uganda" in tags and "futures" not in tags:
+        m = re.search(r"price:\s*([\d.]+)\s*USD/cwt", body, re.I)
+        if not m:
+            return None
+        return dict(symbol="UGA_S15", price=float(m.group(1)), currency="USD", unit="per_cwt",
+                    source=source, price_date=today)
+
+    # CON T7 (Cooabriel — /saca format)
+    if "price" in tags and "brazil" in tags and ("conilon" in tags or "robusta" in tags) and "futures" not in tags:
+        m = re.search(r"R\$\s*([\d.,]+)/saca", body, re.I)
+        if not m:
+            return None
+        brl_val = float(m.group(1).replace(".", "").replace(",", "."))
+        return dict(symbol="CON_T7", price=brl_val, currency="BRL", unit="per_saca",
+                    source=source, price_date=today)
+
+    # B3 ICF arabica settlement
+    if "futures" in tags and "price" in tags and "arabica" in tags and "b3" in tags:
+        m = re.search(r"settlement:\s*([\d.]+)\s*USD/sac", body, re.I)
+        if not m:
+            return None
+        return dict(symbol="B3_ICF", price=float(m.group(1)), currency="USD", unit="per_sac",
+                    source=source, price_date=today)
+
+    # KC / RC front month (from meta JSON)
+    if "futures" in tags and "price" in tags and "b3" not in tags:
+        meta_str = item.get("meta")
+        if not meta_str:
+            return None
+        try:
+            front = _json.loads(meta_str).get("contracts", [{}])[0]
+            last = front.get("last")
+            if last is None:
+                return None
+            if "arabica" in tags:
+                return dict(symbol="KC_FRONT", price=float(last), currency="USD", unit="cts_per_lb",
+                            source=source, price_date=today)
+            if "robusta" in tags:
+                return dict(symbol="RC_FRONT", price=float(last), currency="USD", unit="usd_per_mt",
+                            source=source, price_date=today)
+        except Exception:
+            pass
+
+    return None

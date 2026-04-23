@@ -1,0 +1,161 @@
+{
+  "updated": "2026-04-22",
+  "note": "COP: WASI Dak Lak COP Survey (Excel: Durian_Pepper_Coffee_Area_Yield_Production_COP 2025.xlsx). Balance sheet: USDA WASDE, MARD, ICO.",
+  "cost_robusta": {
+    "total_usd_per_bag": 112.3,
+    "total_usd_per_ton": 1871,
+    "total_usd_per_ton_excl_family": 1351,
+    "yoy_pct": 9.0,
+    "season_label": "2024/25 · WASI / Dak Lak",
+    "components": [
+      { "label": "Labour",   "share": 0.648, "usd": 1213, "color": "#6366f1" },
+      { "label": "Inputs",   "share": 0.167, "usd":  313, "color": "#22c55e" },
+      { "label": "Land",     "share": 0.159, "usd":  298, "color": "#f59e0b" },
+      { "label": "Overhead", "share": 0.025, "usd":   46, "color": "#64748b" }
+    ],
+    "inputs_detail": [
+      { "label": "Fertilizer · Compost", "share": 0.270, "usd":  85 },
+      { "label": "Fertilizer · Urea",    "share": 0.201, "usd":  63 },
+      { "label": "Fertilizer · K",       "share": 0.196, "usd":  61 },
+      { "label": "Fertilizer · P",       "share": 0.092, "usd":  29 },
+      { "label": "Petrol/Oil (irrig.)",  "share": 0.073, "usd":  23 },
+      { "label": "Fertilizer · SA (N)",  "share": 0.049, "usd":  15 },
+      { "label": "Pesticides",           "share": 0.051, "usd":  16 },
+      { "label": "Other inputs",         "share": 0.070, "usd":  22 }
+    ],
+    "sections": [
+      {
+        "number": 1, "label": "Inputs", "color": "#22c55e",
+        "usd_per_ha": 785.15, "usd_per_ton": 290.5,
+        "items": [
+          {
+            "label": "a) Fertilizer", "usd_per_ha": 684.01, "usd_per_ton": 253.3,
+            "items": [
+              { "label": "P Phosphorus",  "usd_per_ha": 77.92,  "usd_per_ton": 28.8 },
+              { "label": "N (SA)",        "usd_per_ha": 41.43,  "usd_per_ton": 15.3 },
+              { "label": "K Potassium",   "usd_per_ha": 165.77, "usd_per_ton": 61.4 },
+              { "label": "N (Urea)",      "usd_per_ha": 170.13, "usd_per_ton": 63.0 },
+              { "label": "Compost (10m³)","usd_per_ha": 228.77, "usd_per_ton": 84.7 }
+            ]
+          },
+          { "label": "b) Herbicides",    "usd_per_ha": 0,     "usd_per_ton": 0    },
+          { "label": "c) Pesticides",    "usd_per_ha": 42.73, "usd_per_ton": 15.8 },
+          { "label": "d) Other",         "usd_per_ha": 58.41, "usd_per_ton": 21.6 }
+        ]
+      },
+      {
+        "number": 2, "label": "Cultural Operations", "color": "#6366f1",
+        "usd_per_ha": 1580.63, "usd_per_ton": 585.2,
+        "family_usd_per_ha": 875.76, "hired_usd_per_ha": 643.20,
+        "items": [
+          {
+            "label": "Fertilizer Application", "usd_per_ha": 133.74, "usd_per_ton": 49.5,
+            "family_usd_per_ha": 93.62,  "hired_usd_per_ha": 40.12,
+            "family_usd_per_ton": 34.7,  "hired_usd_per_ton": 14.9
+          },
+          {
+            "label": "Pesticide Application",  "usd_per_ha": 43.74,  "usd_per_ton": 16.2,
+            "family_usd_per_ha": 21.87,  "hired_usd_per_ha": 21.87,
+            "family_usd_per_ton": 8.1,   "hired_usd_per_ton": 8.1
+          },
+          {
+            "label": "Soil Working & Weeding", "usd_per_ha": 244.81, "usd_per_ton": 90.6,
+            "family_usd_per_ha": 122.40, "hired_usd_per_ha": 122.40,
+            "family_usd_per_ton": 45.3,  "hired_usd_per_ton": 45.3
+          },
+          {
+            "label": "Pruning",                "usd_per_ha": 600.69, "usd_per_ton": 222.4,
+            "family_usd_per_ha": 300.35, "hired_usd_per_ha": 300.35,
+            "family_usd_per_ton": 111.2, "hired_usd_per_ton": 111.2
+          },
+          { "label": "Petrol/Oil (Irrigation)","usd_per_ha": 61.67,  "usd_per_ton": 22.8  },
+          {
+            "label": "Irrigation",             "usd_per_ha": 223.83, "usd_per_ton": 82.9,
+            "family_usd_per_ha": 201.44, "hired_usd_per_ha": 22.38,
+            "family_usd_per_ton": 74.6,  "hired_usd_per_ton": 8.3
+          },
+          {
+            "label": "Other",                  "usd_per_ha": 272.16, "usd_per_ton": 100.8,
+            "family_usd_per_ha": 136.08, "hired_usd_per_ha": 136.08,
+            "family_usd_per_ton": 50.4,  "hired_usd_per_ton": 50.4
+          }
+        ]
+      },
+      {
+        "number": 3, "label": "Harvesting & Processing", "color": "#a855f7",
+        "usd_per_ha": 1757.45, "usd_per_ton": 650.7,
+        "family_usd_per_ha": 527.24, "hired_usd_per_ha": 1230.21,
+        "items": [
+          {
+            "label": "Harvesting",      "usd_per_ha": 1540.30, "usd_per_ton": 570.3,
+            "family_usd_per_ha": 462.09, "hired_usd_per_ha": 1078.21,
+            "family_usd_per_ton": 171.1, "hired_usd_per_ton": 399.2
+          },
+          {
+            "label": "Drying & Bagging","usd_per_ha": 217.15,  "usd_per_ton": 80.4,
+            "family_usd_per_ha": 65.15,  "hired_usd_per_ha": 152.01,
+            "family_usd_per_ton": 24.1,  "hired_usd_per_ton": 56.3
+          }
+        ]
+      },
+      {
+        "number": 6, "label": "Depreciation",           "color": "#475569",
+        "usd_per_ha": 73.51, "usd_per_ton": 27.2, "items": []
+      },
+      {
+        "number": 7, "label": "Financial Costs",         "color": "#475569",
+        "usd_per_ha": 49.89, "usd_per_ton": 18.5, "items": []
+      },
+      {
+        "number": 8, "label": "Opp. Cost of Land",       "color": "#f59e0b",
+        "usd_per_ha": 805.57, "usd_per_ton": 298.3, "items": []
+      }
+    ],
+    "rc_spot": null,
+    "last_updated": "2026-04-23"
+  },
+  "acreage": {
+    "thousand_ha": 710.5,
+    "yoy_pct": 0.5,
+    "source_label": "MARD 2024/25"
+  },
+  "yield": {
+    "bags_per_ha": 45.0,
+    "yoy_pct": 0.6,
+    "source_label": "WASI COP Survey 2024/25 (2.701 mt/ha)"
+  },
+  "balance_sheet": {
+    "unit": "million 60kg bags",
+    "note": "Prod: avg(USDA, MARD, ICO). Exports: ICO. Consumption: domestic estimate.",
+    "seasons": [
+      {
+        "season": "2022/23",
+        "forecast": false,
+        "production": { "usda": 29.5, "mard": 30.2, "ico": 29.0 },
+        "exports_ico": 25.0,
+        "consumption": 3.1
+      },
+      {
+        "season": "2023/24",
+        "forecast": false,
+        "production": { "usda": 26.5, "mard": 27.0, "ico": 26.0 },
+        "exports_ico": 21.5,
+        "consumption": 3.2
+      },
+      {
+        "season": "2024/25",
+        "forecast": false,
+        "production": { "usda": 30.5, "mard": 30.0, "ico": 30.8 },
+        "exports_ico": 27.0,
+        "consumption": 3.3
+      },
+      {
+        "season": "2025/26",
+        "forecast": true,
+        "production": { "usda": 29.0, "mard": 28.5, "ico": 28.0 },
+        "exports_ico": 25.5,
+        "consumption": 3.4
+      }
+    ]
+  }
+}

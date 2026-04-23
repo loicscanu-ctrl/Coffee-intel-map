@@ -7,49 +7,86 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from playwright.async_api import async_playwright
-from scraper.db import get_session, upsert_news_item
+from scraper.db import get_session, upsert_news_item, upsert_physical_price, extract_physical_price
 from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf
 from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import farmer_economics as _farmer_economics
+from scraper.sources import dry_bulk as _dry_bulk
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf]
-SCHEDULED_HOUR_UTC = 1  # Run daily at 01:00 UTC
+SCHEDULED_HOUR_UTC = 1   # Run daily at 01:00 UTC
+CONCURRENCY       = 3    # Max parallel Playwright pages
+SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
+
+
+async def _run_one(source, browser, semaphore, db) -> int:
+    """Run one news source with its own page, under the concurrency semaphore."""
+    name = source.__name__.split(".")[-1]
+    async with semaphore:
+        page = await browser.new_page()
+        try:
+            items = await asyncio.wait_for(source.run(page), timeout=SCRAPER_TIMEOUT)
+            count = 0
+            for item in items:
+                upsert_news_item(db, item)
+                pp = extract_physical_price(item)
+                if pp:
+                    upsert_physical_price(db, **pp)
+                count += 1
+            print(f"[scraper] {name}: {count} items")
+            return count
+        except asyncio.TimeoutError:
+            print(f"[scraper] {name}: TIMEOUT after {SCRAPER_TIMEOUT}s — skipped")
+            return 0
+        except Exception as e:
+            print(f"[scraper] {name} failed: {e}")
+            return 0
+        finally:
+            await page.close()
+
+
+async def _run_side_channel(name, coro_fn, browser) -> None:
+    """Run a side-channel scraper (no news items returned) with its own page."""
+    page = await browser.new_page()
+    try:
+        await asyncio.wait_for(coro_fn(page), timeout=SCRAPER_TIMEOUT)
+        print(f"[scraper] {name}: OK")
+    except asyncio.TimeoutError:
+        print(f"[scraper] {name}: TIMEOUT after {SCRAPER_TIMEOUT}s — skipped")
+    except Exception as e:
+        print(f"[scraper] {name} failed: {e}")
+    finally:
+        await page.close()
+
 
 async def run_all_scrapers():
     print("[scraper] Starting daily scrape run...")
     db = get_session()
-    total = 0
     try:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
-            page = await browser.new_page()
-            for source in ALL_SOURCES:
-                name = source.__name__.split(".")[-1]
-                try:
-                    items = await source.run(page)
-                    for item in items:
-                        upsert_news_item(db, item)
-                        total += 1
-                    print(f"[scraper] {name}: {len(items)} items")
-                except Exception as e:
-                    print(f"[scraper] {name} failed: {e}")
-            # Side-channel scraper: updates commodity_cot + commodity_prices tables
-            # (does not yield news items — called separately from ALL_SOURCES loop)
-            try:
-                await _macro_cot.run(page)
-                print("[scraper] macro_cot: OK")
-            except Exception as e:
-                print(f"[scraper] macro_cot failed: {e}")
-            try:
-                await _farmer_economics.run(page, db)
-                print("[scraper] farmer_economics: OK")
-            except Exception as e:
-                print(f"[scraper] farmer_economics failed: {e}")
+            semaphore = asyncio.Semaphore(CONCURRENCY)
+
+            # Phase 1: all news sources in parallel (capped at CONCURRENCY pages)
+            tasks = [_run_one(source, browser, semaphore, db) for source in ALL_SOURCES]
+            counts = await asyncio.gather(*tasks)
+            total = sum(counts)
+
+            # Phase 2: side-channel scrapers — run sequentially (they write to
+            # their own tables and don't return news items)
+            db_ref = db
+            for name, coro_fn in [
+                ("macro_cot",        lambda p: _macro_cot.run(p)),
+                ("farmer_economics", lambda p: _farmer_economics.run(p, db_ref)),
+                ("dry_bulk",         lambda p: _dry_bulk.run(p, db_ref)),
+            ]:
+                await _run_side_channel(name, coro_fn, browser)
 
             await browser.close()
     finally:
         db.close()
     print(f"[scraper] Done. {total} items inserted.")
+
 
 def seconds_until_next_run():
     from datetime import datetime, timezone, timedelta
@@ -61,13 +98,13 @@ def seconds_until_next_run():
     print(f"[scraper] Next run scheduled at {next_run.strftime('%Y-%m-%d %H:%M UTC')} ({delta/3600:.1f}h from now)")
     return delta
 
+
 def main():
-    # Run immediately on startup
     asyncio.run(run_all_scrapers())
-    # Then run daily at 07:00 UTC
     while True:
         time.sleep(seconds_until_next_run())
         asyncio.run(run_all_scrapers())
+
 
 if __name__ == "__main__":
     main()

@@ -5,3 +5,11 @@ __pycache__/
 *.pyo
 *.db
 .env
+start_poller.bat
+stop_poller.bat
+node_modules/
+backend/scraper/cache/
+backend/scraper/acaphe_probe_api_calls.json
+backend/scraper/acaphe_probe_output.html
+backend/probe_customs.png
+backend/probe_stats.png

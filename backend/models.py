@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from typing import Optional
-from sqlalchemy import String, Float, DateTime, Text, JSON, Date, Integer, UniqueConstraint
+from sqlalchemy import String, Float, DateTime, Text, JSON, Date, Integer, UniqueConstraint, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
 
@@ -195,3 +195,33 @@ class FertilizerImport(Base):
     scraped_at:    Mapped[datetime]      = mapped_column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("month", "ncm_code", name="uq_fert_import_month_ncm"),)
+
+
+class VnLocalPrice(Base):
+    """One row per scrape session where Vietnam local prices were captured.
+    Stores the full prices dict as JSON; query latest row for the fallback display."""
+    __tablename__ = "vn_local_prices"
+
+    id:          Mapped[int]      = mapped_column(primary_key=True)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    local_time:  Mapped[str]      = mapped_column(String(20), nullable=True)
+    prices:      Mapped[dict]     = mapped_column(JSON, nullable=False)
+
+
+class PhysicalPrice(Base):
+    """One row per (symbol, price_date) — clean typed columns for historical charting."""
+    __tablename__ = "physical_prices"
+
+    id:         Mapped[int]      = mapped_column(primary_key=True)
+    symbol:     Mapped[str]      = mapped_column(String(32), nullable=False)
+    price:      Mapped[float]    = mapped_column(Float, nullable=False)
+    currency:   Mapped[str]      = mapped_column(String(8), nullable=False)
+    unit:       Mapped[str]      = mapped_column(String(16), nullable=False)
+    source:     Mapped[str]      = mapped_column(String(64), nullable=False, default="")
+    price_date: Mapped[date]     = mapped_column(Date, nullable=False)
+    scraped_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("symbol", "price_date", name="uq_physical_price_symbol_date"),
+        Index("ix_physical_prices_symbol_date", "symbol", "price_date"),
+    )

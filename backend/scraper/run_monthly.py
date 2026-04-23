@@ -8,7 +8,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from scraper.db import get_session, create_farmer_economics_tables
-from scraper.sources import conab_supply, comex_fertilizer
+from scraper.sources import conab_supply, comex_fertilizer, vn_fertilizer
 
 
 async def run_monthly_scrapers():
@@ -30,6 +30,11 @@ async def run_monthly_scrapers():
                 print("[scraper-monthly] comex_fertilizer: OK")
             except Exception as e:
                 print(f"[scraper-monthly] comex_fertilizer failed: {e}")
+            try:
+                await vn_fertilizer.run(page, db)
+                print("[scraper-monthly] vn_fertilizer: OK")
+            except Exception as e:
+                print(f"[scraper-monthly] vn_fertilizer failed: {e}")
             await browser.close()
     finally:
         db.close()

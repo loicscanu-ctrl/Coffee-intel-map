@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-04-23T00:00:00Z",
+  "tickers": [
+    { "label": "KCN26", "value": "289.15 (+6.50)", "category": "futures" },
+    { "label": "RCN26", "value": "3,404 (+65)", "category": "futures" },
+    { "label": "VN FAQ", "value": "94.000 VND ($3,704)", "category": "physical" },
+    { "label": "USD/BRL", "value": "5.81", "category": "fx" },
+    { "label": "USD/VND", "value": "25380", "category": "fx" }
+  ]
+}

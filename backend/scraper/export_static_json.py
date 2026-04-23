@@ -28,7 +28,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from database import SessionLocal
-from models import NewsItem, CotWeekly, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport
+from models import NewsItem, CotWeekly, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport, PhysicalPrice
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
     safe_write_json,
@@ -507,6 +507,27 @@ def _derive_enso_phase(oni_history: list) -> tuple:
     else:
         intensity = "Weak"
     return phase, intensity, current_oni
+
+
+def _load_dry_bulk_cache() -> dict | None:
+    """Read dry_bulk.json cache written by dry_bulk scraper."""
+    try:
+        from scraper.sources.dry_bulk import fetch_latest
+        return fetch_latest()
+    except Exception:
+        return None
+
+
+def _load_origins_cache() -> dict | None:
+    """Read br_fert_origins.json cache written by comex_fertilizer scraper."""
+    try:
+        cache_path = ROOT / "backend" / "scraper" / "cache" / "br_fert_origins.json"
+        if cache_path.exists():
+            data = json.loads(cache_path.read_text(encoding="utf-8"))
+            return data.get("origins")
+    except Exception:
+        pass
+    return None
 
 
 def export_farmer_economics(db) -> None:
@@ -1012,6 +1033,8 @@ def export_farmer_economics(db) -> None:
             "items":            comex_price_items if comex_price_items else fert_items_out,
             "prices_as_of":     comex_prices_as_of if comex_prices_as_of else fert_prices_as_of,
             "imports":          imports_out,
+            "import_origins":   _load_origins_cache(),
+            "dry_bulk":         _load_dry_bulk_cache(),
             "next_application": "May–Jun",
         },
     }
@@ -1037,6 +1060,26 @@ def export_farmer_selling() -> None:
         print(f"  farmer_selling_brazil.json → FAILED: {e}")
 
 
+# ── 9a. Vietnam Local Prices (Cecafe/acaphe fallback) ────────────────────────
+
+def export_vietnam_last() -> None:
+    """Read latest VN local prices from DB and write vietnam_last.json.
+    This persists morning prices that Cecafe/acaphe remove each afternoon."""
+    from scraper.db import get_latest_vn_local_price
+    path = OUT_DIR / "vietnam_last.json"
+    try:
+        snapshot = get_latest_vn_local_price()
+        if not snapshot:
+            print("  vietnam_last.json → no data in DB yet — skipped")
+            return
+        path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+        saved_at = snapshot.get("saved_at", "?")
+        bmt_bid  = snapshot.get("bmt_bid", "?")
+        print(f"  vietnam_last.json → BMT bid={bmt_bid}, recorded {saved_at}")
+    except Exception as e:
+        print(f"  vietnam_last.json → FAILED: {e}")
+
+
 # ── 9. Vietnam Supply ────────────────────────────────────────────────────────
 
 def export_vietnam_supply() -> None:
@@ -1045,12 +1088,296 @@ def export_vietnam_supply() -> None:
     try:
         data = build_vietnam_supply()
         path = OUT_DIR / "vietnam_supply.json"
-        safe_write_json(path, data, lambda d: d.get("country") == "vietnam")
+        safe_write_json(
+            path, data,
+            lambda d: (True, "ok") if d.get("country") == "vietnam" else (False, "country != vietnam"),
+        )
         exports = data.get("exports") or {}
         n = len(exports.get("monthly", []))
         print(f"  vietnam_supply.json → {n} export months")
     except Exception as e:
         print(f"  vietnam_supply.json → FAILED: {e}")
+
+
+# ── 10. Latest Prices (MarketTicker) ─────────────────────────────────────────
+
+def export_latest_prices(db) -> None:
+    """Pre-compute all ticker display values → latest_prices.json.
+    Primary source: physical_prices table (typed columns, indexed).
+    Fallback: NewsItem body parsing (used until physical_prices is populated)."""
+    import re as _re
+    import json as _json
+    from sqlalchemy import func
+
+    # ── Primary: PhysicalPrice table ─────────────────────────────────────────
+    cutoff = (datetime.utcnow() - timedelta(days=7)).date()
+    subq = (
+        db.query(PhysicalPrice.symbol, func.max(PhysicalPrice.price_date).label("max_date"))
+        .filter(PhysicalPrice.price_date >= cutoff)
+        .group_by(PhysicalPrice.symbol)
+        .subquery()
+    )
+    rows = (
+        db.query(PhysicalPrice)
+        .join(subq, (PhysicalPrice.symbol == subq.c.symbol) &
+                    (PhysicalPrice.price_date == subq.c.max_date))
+        .all()
+    )
+    pp = {r.symbol: r for r in rows}
+
+    # Also need the KC/RC chain meta (symbol label + change) which lives in NewsItem.meta
+    recent_news = (
+        db.query(NewsItem)
+        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7),
+                NewsItem.meta.isnot(None))
+        .order_by(NewsItem.pub_date.desc())
+        .all()
+    )
+    def _chain_item(market: str) -> dict | None:
+        for it in recent_news:
+            t = set(it.tags or [])
+            if "futures" in t and "price" in t and market in t and "b3" not in t:
+                try:
+                    return _json.loads(it.meta).get("contracts", [{}])[0]
+                except Exception:
+                    pass
+        return None
+
+    def _b3_item():
+        for it in recent_news:
+            t = set(it.tags or [])
+            if "futures" in t and "price" in t and "arabica" in t and "b3" in t:
+                return it
+        return None
+
+    tickers: list[dict] = []
+
+    # KC front month — symbol label + change from meta; price from PhysicalPrice if available
+    kc = _chain_item("arabica")
+    if kc:
+        last = pp["KC_FRONT"].price if "KC_FRONT" in pp else kc.get("last")
+        chg  = kc.get("chg", 0) or 0
+        sym  = kc.get("symbol", "KC")
+        if last is not None:
+            sign = "+" if chg >= 0 else ""
+            tickers.append({"label": sym, "value": f"{float(last):.2f} ({sign}{chg:.2f})", "category": "futures"})
+
+    # RC front month
+    rc = _chain_item("robusta")
+    if rc:
+        last = pp["RC_FRONT"].price if "RC_FRONT" in pp else rc.get("last")
+        chg  = rc.get("chg", 0) or 0
+        sym  = rc.get("symbol", "RC")
+        if last is not None:
+            sign = "+" if chg >= 0 else ""
+            tickers.append({"label": sym, "value": f"{int(last):,} ({sign}{int(chg)})", "category": "futures"})
+
+    # B3 ICF
+    b3it = _b3_item()
+    if b3it:
+        price = pp["B3_ICF"].price if "B3_ICF" in pp else None
+        ms = _re.search(r"settlement:\s*([\d.]+)\s*USD/sac", b3it.body or "", _re.I)
+        mt = _re.search(r"B3 ICF Arabica \(([^)]+)\)", b3it.title or "")
+        val = f"{price:.2f}" if price is not None else (ms.group(1) if ms else None)
+        if val:
+            lbl = f"B3 4/5 {mt.group(1)}" if mt else "B3 4/5"
+            tickers.append({"label": lbl, "value": f"{val} USD/sac", "category": "futures"})
+
+    # VN FAQ
+    usd_vnd = pp["USD_VND"].price if "USD_VND" in pp else None
+    if "VN_FAQ" in pp and usd_vnd:
+        vnd_kg = int(pp["VN_FAQ"].price)
+        usd_mt = round(vnd_kg / usd_vnd * 1000)
+        fmt_vnd = f"{vnd_kg:,}".replace(",", ".")
+        tickers.append({"label": "VN FAQ", "value": f"{fmt_vnd} VND (${usd_mt:,})", "category": "physical"})
+
+    # CON T7
+    usd_brl = pp["USD_BRL"].price if "USD_BRL" in pp else None
+    if "CON_T7" in pp and usd_brl:
+        brl = pp["CON_T7"].price
+        usd_mt = round(brl / usd_brl / 60 * 1000)
+        # Reformat BRL float to Brazilian "1.280,50" style
+        brl_str = f"{brl:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        tickers.append({"label": "CON T7", "value": f"{brl_str} BRL (${usd_mt:,})", "category": "physical"})
+
+    # UGA S15
+    if "UGA_S15" in pp:
+        cwt = pp["UGA_S15"].price
+        usd_mt = round(cwt * 22.046)
+        tickers.append({"label": "UGA S15", "value": f"{cwt:.2f} (${usd_mt:,})", "category": "physical"})
+
+    # FX rates
+    for sym, lbl in [("USD_BRL", "USD/BRL"), ("USD_VND", "USD/VND"),
+                     ("USD_IDR", "USD/IDR"), ("USD_HNL", "USD/HNL"), ("USD_UGX", "USD/UGX")]:
+        if sym in pp:
+            rate = pp[sym].price
+            value = str(int(round(rate))) if rate > 100 else f"{rate:.4f}"
+            tickers.append({"label": lbl, "value": value, "category": "fx"})
+
+    # ── Fallback to NewsItem parsing if PhysicalPrice has no data ────────────
+    if not tickers:
+        print("  latest_prices.json → physical_prices empty, falling back to NewsItem parsing")
+        tickers = _build_tickers_from_news(db)
+
+    result = {
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "tickers": tickers,
+    }
+    path = OUT_DIR / "latest_prices.json"
+    written = safe_write_json(path, result, lambda d: len(d.get("tickers", [])) > 0)
+    print(f"  latest_prices.json → written:{written} {len(tickers)} items "
+          f"({'PhysicalPrice' if pp else 'NewsItem fallback'})")
+
+
+def _build_tickers_from_news(db) -> list[dict]:
+    """Fallback: parse tickers from NewsItem.body (used before PhysicalPrice is populated)."""
+    import re as _re
+    import json as _json
+
+    recent = (
+        db.query(NewsItem)
+        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7))
+        .order_by(NewsItem.pub_date.desc())
+        .all()
+    )
+
+    def _first(must, exclude=None):
+        exc = set(exclude or [])
+        for it in recent:
+            t = set(it.tags or [])
+            if all(m in t for m in must) and not (exc & t):
+                return it
+        return None
+
+    def _fx(country):
+        it = _first(["fx", country])
+        if not it:
+            return None
+        m = _re.search(r"price:\s*([\d.,]+)", it.body or "", _re.I)
+        return float(m.group(1).replace(",", "")) if m else None
+
+    usd_brl = _fx("brazil")
+    usd_vnd = _fx("vietnam")
+    tickers = []
+
+    for market, prefix, int_price in [("arabica", "KC", False), ("robusta", "RC", True)]:
+        it = _first(["futures", "price", market], exclude=["b3"])
+        if it and it.meta:
+            try:
+                c = _json.loads(it.meta).get("contracts", [{}])[0]
+                sym, last, chg = c.get("symbol", prefix), c.get("last"), c.get("chg", 0) or 0
+                if last is not None:
+                    sign = "+" if chg >= 0 else ""
+                    val = f"{int(last):,} ({sign}{int(chg)})" if int_price else f"{last:.2f} ({sign}{chg:.2f})"
+                    tickers.append({"label": sym, "value": val, "category": "futures"})
+            except Exception:
+                pass
+
+    it = _first(["futures", "price", "arabica", "b3"])
+    if it:
+        ms = _re.search(r"settlement:\s*([\d.]+)\s*USD/sac", it.body or "", _re.I)
+        mt = _re.search(r"B3 ICF Arabica \(([^)]+)\)", it.title or "")
+        if ms:
+            tickers.append({"label": f"B3 4/5 {mt.group(1)}" if mt else "B3 4/5",
+                            "value": f"{ms.group(1)} USD/sac", "category": "futures"})
+
+    it = _first(["price", "vietnam"], exclude=["futures"])
+    if it and usd_vnd:
+        m = _re.search(r"price:\s*([\d.]+)\s*VND/kg", it.body or "", _re.I)
+        if m:
+            raw = m.group(1)
+            vnd_kg = int(raw.replace(".", "")) if _re.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
+            usd_mt = round(vnd_kg / usd_vnd * 1000)
+            tickers.append({"label": "VN FAQ",
+                            "value": f"{raw} VND (${usd_mt:,})", "category": "physical"})
+
+    it = _first(["price", "brazil", "conilon"], exclude=["futures"])
+    if it and usd_brl:
+        m = _re.search(r"R\$\s*([\d.,]+)/saca", it.body or "", _re.I)
+        if m:
+            brl_str = m.group(1)
+            brl_val = float(brl_str.replace(".", "").replace(",", "."))
+            usd_mt  = round(brl_val / usd_brl / 60 * 1000)
+            tickers.append({"label": "CON T7", "value": f"{brl_str} BRL (${usd_mt:,})", "category": "physical"})
+
+    it = _first(["price", "uganda"], exclude=["futures"])
+    if it:
+        m = _re.search(r"price:\s*([\d.]+)\s*USD/cwt", it.body or "", _re.I)
+        if m:
+            cwt = float(m.group(1))
+            tickers.append({"label": "UGA S15", "value": f"{cwt:.2f} (${round(cwt * 22.046):,})", "category": "physical"})
+
+    for country, lbl in [("brazil", "USD/BRL"), ("vietnam", "USD/VND"),
+                         ("indonesia", "USD/IDR"), ("honduras", "USD/HNL"), ("uganda", "USD/UGX")]:
+        it = _first(["fx", country])
+        if not it:
+            continue
+        m = _re.search(r"price:\s*([\d.,]+)", it.body or "", _re.I)
+        if m:
+            tickers.append({"label": lbl, "value": m.group(1), "category": "fx"})
+
+    return tickers
+
+
+# ── 11. VN Physical Prices ───────────────────────────────────────────────────
+
+def export_vn_physical_prices(db) -> None:
+    """Compute and write vn_physical_prices.json from latest VN FAQ + FX news items."""
+    import re as _re
+
+    recent = (
+        db.query(NewsItem)
+        .filter(NewsItem.pub_date > (datetime.utcnow() - timedelta(days=7)))
+        .order_by(NewsItem.pub_date.desc())
+        .all()
+    )
+
+    vn_item = next(
+        (i for i in recent
+         if "price"   in (i.tags or [])
+         and "robusta" in (i.tags or [])
+         and "vietnam" in (i.tags or [])
+         and "futures" not in (i.tags or [])),
+        None,
+    )
+    fx_item = next(
+        (i for i in recent
+         if "fx"      in (i.tags or [])
+         and "vietnam" in (i.tags or [])),
+        None,
+    )
+
+    if not vn_item or not fx_item:
+        print(f"  vn_physical_prices.json → skipped (vn:{vn_item is not None} fx:{fx_item is not None})")
+        return
+
+    m1 = _re.search(r"price:\s*([\d.]+)\s*VND/kg", vn_item.body or "", _re.I)
+    if not m1:
+        print("  vn_physical_prices.json → skipped (vnd parse failed)")
+        return
+    raw = m1.group(1)
+    vnd_per_kg = int(raw.replace(".", "")) if _re.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
+
+    m2 = _re.search(r"price:\s*([\d.,]+)", fx_item.body or "", _re.I)
+    if not m2:
+        print("  vn_physical_prices.json → skipped (fx parse failed)")
+        return
+    usd_vnd = float(m2.group(1).replace(",", ""))
+
+    usd_per_mt = round(vnd_per_kg / usd_vnd * 1000)
+
+    result = {
+        "updated": datetime.utcnow().isoformat() + "Z",
+        "vn_faq": {
+            "vnd_per_kg": vnd_per_kg,
+            "usd_per_mt": usd_per_mt,
+            "usd_vnd":    round(usd_vnd),
+        },
+    }
+
+    path = OUT_DIR / "vn_physical_prices.json"
+    written = safe_write_json(path, result, lambda d: d.get("vn_faq") is not None)
+    print(f"  vn_physical_prices.json → written:{written} {vnd_per_kg} VND/kg = ${usd_per_mt}/MT (rate:{round(usd_vnd)})")
 
 
 # ── 9. Health ─────────────────────────────────────────────────────────────────
@@ -1123,7 +1450,10 @@ def main():
         export_freight(db)
         export_farmer_economics(db)
         export_farmer_selling()
+        export_vietnam_last()
         export_vietnam_supply()
+        export_latest_prices(db)
+        export_vn_physical_prices(db)
         export_health(db)
     finally:
         db.close()

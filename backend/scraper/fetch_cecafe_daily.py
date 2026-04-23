@@ -70,13 +70,22 @@ def _parse_page(html: str) -> dict:
     """
     Returns:
       {
-        "ref_date":  date,          # date data is valid for
-        "arabica":   int,           # cumulative arabica bags (month-to-date)
-        "conillon":  int,           # cumulative conillon bags (month-to-date)
-        "prev_arabica":  int | None, # previous month final arabica total
-        "prev_conillon": int | None,
-        "prev_ym":   str | None,    # "YYYY-MM" of previous month
+        "ref_date":      date,   # date shown on page ("Informações recebidas até")
+        "arabica":       int,    # current month cumulative arabica bags
+        "conillon":      int,    # current month cumulative conilon bags
+        "soluvel":       int,    # current month cumulative soluvel bags
+        "prev_ym":       str,    # "YYYY-MM" of previous month
+        "prev_arabica":  int,    # same-day cumulative arabica last month
+        "prev_conillon": int,    # same-day cumulative conilon last month
+        "prev_soluvel":  int,    # same-day cumulative soluvel last month
       }
+
+    The TOTAIS row for "Emissão de Certificados de Origem" has 12 numbers:
+      [1] arabica_dia  [2] conillon_dia  [3] soluvel_dia  [4] total_dia
+      [5] arabica_acum [6] conillon_acum [7] soluvel_acum [8] total_acum
+      [9] arabica_prev [10] conillon_prev [11] soluvel_prev [12] total_prev
+
+    Columns 9-11 are "Mês Anterior" = same-day cumulative for prior month.
     """
     # Strip scripts/styles then convert to plain text
     clean = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', '',
@@ -85,34 +94,21 @@ def _parse_page(html: str) -> dict:
     text  = re.sub(r'\s+', ' ', clean).strip()
 
     # ── Reference date ────────────────────────────────────────────────────────
-    # "Informações recebidas até: 13/04/2026"
     date_m = re.search(r'recebidas\s+at[eé]:\s*(\d{2})/(\d{2})/(\d{4})', text, re.IGNORECASE)
     if not date_m:
         raise ValueError("Could not find reference date on page")
     ref_date = date(int(date_m.group(3)), int(date_m.group(2)), int(date_m.group(1)))
     print(f"  Reference date: {ref_date}")
 
-    # ── Current month block ───────────────────────────────────────────────────
-    # The page has three sections for current month:
-    #   1. Emissão de Certificados de Origem  ← this is export REGISTRATION
-    #   2. Unidades de Despachos Aduaneiros
-    #   3. Unidades de Embarques Marítimos
-    # We want section 1 (Certificates of Origin = registrations).
-    #
-    # Each section has a TOTAIS row with 12 numbers:
-    #   arabica_dia conillon_dia soluvel_dia total_dia
-    #   arabica_acum conillon_acum soluvel_acum total_acum
-    #   arabica_prev conillon_prev soluvel_prev total_prev
-
-    # Find first TOTAIS after "Certificados de Origem"
+    # ── TOTAIS row for Certificados de Origem ────────────────────────────────
     cert_idx = text.find("Certificados de Origem")
     if cert_idx < 0:
-        cert_idx = 0  # fallback to start
+        cert_idx = 0
 
     totais_m = re.search(
-        r'TOTAIS\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'  # movimento do dia
-        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'            # acumulado
-        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)',               # mês anterior
+        r'TOTAIS\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'  # dia: arabica conilon soluvel total
+        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'            # acum: arabica conilon soluvel total
+        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)',               # prev: arabica conilon soluvel total
         text[cert_idx:],
         re.IGNORECASE
     )
@@ -121,48 +117,27 @@ def _parse_page(html: str) -> dict:
 
     arabica_acum  = _parse_int_br(totais_m.group(5))
     conillon_acum = _parse_int_br(totais_m.group(6))
+    soluvel_acum  = _parse_int_br(totais_m.group(7))
     prev_arab     = _parse_int_br(totais_m.group(9))
     prev_coni     = _parse_int_br(totais_m.group(10))
-    print(f"  Acumulado  — Arabica: {arabica_acum:,}  Conillon: {conillon_acum:,}")
-    print(f"  Mês Anterior — Arabica: {prev_arab:,}  Conillon: {prev_coni:,}")
+    prev_solv     = _parse_int_br(totais_m.group(11))
 
-    # Previous month year-month
+    print(f"  Acumulado    — Arabica: {arabica_acum:,}  Conilon: {conillon_acum:,}  Soluvel: {soluvel_acum:,}")
+    print(f"  Mês Anterior — Arabica: {prev_arab:,}  Conilon: {prev_coni:,}  Soluvel: {prev_solv:,}")
+
     prev_month = ref_date.month - 1 or 12
     prev_year  = ref_date.year if ref_date.month > 1 else ref_date.year - 1
     prev_ym    = f"{prev_year}-{prev_month:02d}"
-
-    # ── Previous month FULL accumulation (from "Mês Anterior" tab section) ───
-    # After the current month tables, the page repeats with the prior month tab.
-    # We look for a second TOTAIS row with MUCH larger acumulado values.
-    # Strategy: find all TOTAIS matches and take the one whose acumulado >
-    # the current month's (since prev month is complete).
-    prev_acum_arab  = prev_arab   # fallback: use what was in current month's prev column
-    prev_acum_coni  = prev_coni
-
-    # Look for the previous month section explicitly
-    prev_section_m = re.search(
-        r'Mar[cç]o|Fevereiro|Janeiro|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro'
-        r'\s+\d{4}.*?TOTAIS\s+'
-        r'[\d\.]+\s+[\d\.]+\s+[\d\.]+\s+[\d\.]+\s+'
-        r'([\d\.]+)\s+([\d\.]+)',
-        text[cert_idx + 500:],  # skip current month
-        re.IGNORECASE | re.DOTALL
-    )
-    if prev_section_m and prev_section_m.group(1) and prev_section_m.group(2):
-        try:
-            prev_acum_arab = _parse_int_br(prev_section_m.group(1))
-            prev_acum_coni = _parse_int_br(prev_section_m.group(2))
-            print(f"  Prev month full — Arabica: {prev_acum_arab:,}  Conillon: {prev_acum_coni:,}")
-        except Exception:
-            pass  # keep fallback values
 
     return {
         "ref_date":      ref_date,
         "arabica":       arabica_acum,
         "conillon":      conillon_acum,
+        "soluvel":       soluvel_acum,
         "prev_ym":       prev_ym,
-        "prev_arabica":  prev_acum_arab,
-        "prev_conillon": prev_acum_coni,
+        "prev_arabica":  prev_arab,
+        "prev_conillon": prev_coni,
+        "prev_soluvel":  prev_solv,
     }
 
 
@@ -173,12 +148,13 @@ def main():
     print("=== Cecafe daily registration scraper (public, no login) ===")
 
     # 1. Load existing JSON
-    existing: dict = {"updated": "", "arabica": {}, "conillon": {}}
+    existing: dict = {"updated": "", "arabica": {}, "conillon": {}, "soluvel": {}}
     if OUT_PATH.exists():
         try:
             raw_json = json.loads(OUT_PATH.read_text(encoding="utf-8"))
             existing["arabica"]  = raw_json.get("arabica",  {})
             existing["conillon"] = raw_json.get("conillon", {})
+            existing["soluvel"]  = raw_json.get("soluvel",  {})
         except Exception:
             pass
 
@@ -200,31 +176,26 @@ def main():
     day   = str(ref.day)
 
     # 4. Merge current month data
-    if ym not in existing["arabica"]:
-        existing["arabica"][ym]  = {}
-    if ym not in existing["conillon"]:
-        existing["conillon"][ym] = {}
+    for key in ("arabica", "conillon", "soluvel"):
+        if ym not in existing[key]:
+            existing[key][ym] = {}
 
     existing["arabica"][ym][day]  = parsed["arabica"]
     existing["conillon"][ym][day] = parsed["conillon"]
-    print(f"\n[3] Stored {ym} day {day}: arabica={parsed['arabica']:,}  conillon={parsed['conillon']:,}")
+    existing["soluvel"][ym][day]  = parsed["soluvel"]
+    print(f"\n[3] Stored {ym} day {day}: arabica={parsed['arabica']:,}  conilon={parsed['conillon']:,}  soluvel={parsed['soluvel']:,}")
 
-    # 5. Also store previous month final total (for day 31/30/28 as endpoint)
-    prev_ym   = parsed["prev_ym"]
-    prev_year, prev_mo = map(int, prev_ym.split("-"))
-    import calendar
-    last_day = str(calendar.monthrange(prev_year, prev_mo)[1])
+    # 5. Store previous month same-day cumulative (Mês Anterior = same-day last month)
+    prev_ym = parsed["prev_ym"]
 
-    if prev_ym not in existing["arabica"]:
-        existing["arabica"][prev_ym]  = {}
-    if prev_ym not in existing["conillon"]:
-        existing["conillon"][prev_ym] = {}
+    for key in ("arabica", "conillon", "soluvel"):
+        if prev_ym not in existing[key]:
+            existing[key][prev_ym] = {}
 
-    # Only store if not already present (don't overwrite richer data)
-    if last_day not in existing["arabica"][prev_ym]:
-        existing["arabica"][prev_ym][last_day]  = parsed["prev_arabica"]
-        existing["conillon"][prev_ym][last_day] = parsed["prev_conillon"]
-        print(f"  Stored {prev_ym} day {last_day} (final): arabica={parsed['prev_arabica']:,}  conillon={parsed['prev_conillon']:,}")
+    existing["arabica"][prev_ym][day]  = parsed["prev_arabica"]
+    existing["conillon"][prev_ym][day] = parsed["prev_conillon"]
+    existing["soluvel"][prev_ym][day]  = parsed["prev_soluvel"]
+    print(f"  Stored {prev_ym} day {day} (same-day): arabica={parsed['prev_arabica']:,}  conilon={parsed['prev_conillon']:,}  soluvel={parsed['prev_soluvel']:,}")
 
     # 6. Save
     existing["updated"] = ref.isoformat()

@@ -1,0 +1,84 @@
+{
+  "_note": "Source: WASI / Dak Lak COP survey. Excel: 'Durian_Pepper_Coffee_Area_Yield_Production_COP 2025.xlsx'. Seasons = crop year (2024 column → 2024-25 crop year). COP excl. family labour = cash cost basis. COP incl. family labour = full economic cost.",
+  "updated": "2026-04-23",
+  "source": "WASI Dak Lak COP Survey · MARD",
+
+  "coffee_historical": {
+    "seasons": ["2015-16","2016-17","2017-18","2018-19","2019-20","2020-21","2021-22","2022-23","2023-24","2024-25","2025-26f"],
+    "fx_vnd_per_usd":  [22241, 22317, 22700, 23287, 23211, 23235, 22907, 23622, 23616, 24827, 25732],
+    "yield_mt_per_ha": [2.776, 2.513, 2.951, 2.715, 2.836, 2.633, 2.888, 2.763, 2.686, 2.701, 2.910],
+
+    "cop_per_ha_usd": {
+      "total_all_in":   [4350, 4372, 4415, 4369, 4442, 4291, 4704, 4584, 4609, 5052, 5472],
+      "inputs":         [881,  939,  705,  715,  722,  721,  807,  698,  658,  847,  926],
+      "labour_total":   [2412, 2379, 2671, 2638, 2699, 2553, 2859, 2876, 2964, 3276, 3647],
+      "labour_hired":   [1297, 1259, 1515, 1480, 1495, 1414, 1316, 1659, 1720, 1873, 2120],
+      "labour_family":  [1115, 1120, 1156, 1158, 1204, 1140, 1543, 1217, 1245, 1403, 1527],
+      "depreciation":   [75.2, 75.0, 73.7, 73.5, 73.5, 73.5, 73.5, 73.5, 73.5, 73.5, 73.5],
+      "financial_cost": [82.3, 83.0, 84.4, 83.8, 85.5, 81.9, 91.7, 89.4, 66.4, 49.9, 48.6],
+      "land_opp_cost":  [899, 896, 881, 859, 862, 861, 873, 847, 847, 806, 777]
+    },
+
+    "cop_per_ton_usd": {
+      "excl_family_labour": [1165, 1294, 1104, 1183, 1142, 1197, 1095, 1218, 1253, 1351, 1356],
+      "incl_family_labour": [1567, 1740, 1496, 1609, 1567, 1630, 1629, 1659, 1716, 1871, 1880]
+    },
+
+    "fob_usd": {
+      "processing_cost_per_ton": [62, 62, 67, 65, 65, 65, 65, 65, 65, 65, 70],
+      "total_fob_per_ton":       [1629, 1802, 1563, 1674, 1632, 1695, 1694, 1724, 1781, 1936, 1950]
+    },
+
+    "inputs_detail_usd_per_ha": {
+      "_note": "2024-25 only. Total matches SUMMARY row: Section-1 physical inputs (785.15) + petrol/oil for irrigation (61.67) from Section-2 Cultural Ops = 846.82.",
+      "season": "2024-25",
+      "fertilizer_p_phosphorus":    77.92,
+      "fertilizer_n_sa":            41.43,
+      "fertilizer_k_potassium":    165.77,
+      "fertilizer_n_urea":         170.13,
+      "fertilizer_compost":        228.77,
+      "fertilizer_total":          684.01,
+      "pesticides":                 42.73,
+      "other_inputs":               58.41,
+      "petrol_oil_irrigation":      61.67,
+      "total_inputs":              846.82
+    }
+  },
+
+  "pepper_2024": {
+    "_note": "Bearing farm (mature). Establishment cost amortized separately.",
+    "season": "2024",
+    "yield_mt_per_ha": 2.6,
+    "cop_per_ha_usd": 4983,
+    "cop_per_ton_usd": 1917,
+    "establishment_3yr_total_usd": 22066,
+    "gross_revenue_per_ha_usd": 13072,
+    "net_profit_per_ha_usd": 8089,
+    "price_usd_per_kg": 5.94
+  },
+
+  "durian_2024": {
+    "_note": "Mature bearing farm. High capital intensity.",
+    "season": "2024",
+    "yield_mt_per_ha": 15.77,
+    "cop_per_ha_usd": 8903,
+    "cop_per_ton_usd": 565,
+    "gross_revenue_per_ha_usd": 44636,
+    "net_profit_per_ha_usd": 35734,
+    "price_usd_per_kg": 2.83,
+    "national_production_tons": 1532690,
+    "national_bearing_area_ha": 97192
+  },
+
+  "crop_comparison_2024": {
+    "_note": "All values 2024 season. Coffee COP = excl. family labour basis for comparability.",
+    "crops": ["Coffee (Robusta)", "Pepper", "Durian"],
+    "yield_mt_per_ha":          [2.70,  2.60,  15.77],
+    "price_usd_per_kg":         [4.75,  5.94,   2.83],
+    "cop_per_ha_usd":           [5052,  4983,   8903],
+    "cop_per_ton_usd":          [1871,  1917,    565],
+    "gross_revenue_per_ha_usd": [12816, 13072,  44636],
+    "net_profit_per_ha_usd":    [7764,  8089,   35734],
+    "roi_x":                    [1.54,  1.62,    4.01]
+  }
+}

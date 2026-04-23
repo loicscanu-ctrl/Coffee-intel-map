@@ -13,6 +13,13 @@ const RISK_BADGE: Record<RiskLevel, { label: string; className: string }> = {
   NONE: { label: "—",    className: "bg-slate-800 text-slate-500 border border-slate-600" },
 };
 
+const CSI_BADGE: Record<string, { className: string }> = {
+  "H": { className: "bg-red-600 text-white" },
+  "M": { className: "bg-amber-500 text-black" },
+  "L": { className: "bg-green-700 text-white" },
+  "-": { className: "bg-slate-800 text-slate-500 border border-slate-600" },
+};
+
 const FROST_CELL: Record<DayRisk, string> = {
   "H": "bg-blue-900 text-white",
   "M": "bg-blue-600 text-white",
@@ -67,6 +74,8 @@ export default function WeatherRiskPanel({ weather }: Props) {
         {weather.regions.map((r) => {
           const frost   = RISK_BADGE[r.frost];
           const drought = RISK_BADGE[r.drought];
+          const csiLevel = r.csi_30d_level ?? "-";
+          const csi = CSI_BADGE[csiLevel] ?? CSI_BADGE["-"];
           return (
             <div key={r.name} className="bg-slate-900 rounded p-2 border border-slate-700">
               <div className="text-[10px] text-slate-400 mb-1 truncate">{r.name}</div>
@@ -77,6 +86,14 @@ export default function WeatherRiskPanel({ weather }: Props) {
                 <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${drought.className}`}>
                   ☀ {drought.label}
                 </span>
+                {r.csi_30d != null && (
+                  <span
+                    className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${csi.className}`}
+                    title={`30d CSI: ${r.csi_30d}mm · 60d: ${r.csi_60d}mm`}
+                  >
+                    ∑ {r.csi_30d}mm
+                  </span>
+                )}
               </div>
             </div>
           );

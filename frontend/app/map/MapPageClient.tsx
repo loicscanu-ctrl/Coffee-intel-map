@@ -22,14 +22,22 @@ interface MapPageClientProps {
 
 export default function MapPageClient({ news, countries, factories }: MapPageClientProps) {
   const [selectedPin, setSelectedPin] = useState<any>(null);
+  const [showFeed, setShowFeed] = useState(false);
   return (
     <div className="w-full h-full flex flex-col">
-      <MarketTicker initialNews={news} />
+      <MarketTicker />
       <div className="flex-1 relative min-h-0">
         <CoffeeMap onPinClick={setSelectedPin} countries={countries} factories={factories} news={news} />
         <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
+        {/* Toggle button — bottom-right corner of map */}
+        <button
+          onClick={() => setShowFeed(f => !f)}
+          className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-[10px] px-2 py-1 rounded shadow"
+        >
+          {showFeed ? "▼ Hide table" : "▲ Show table"}
+        </button>
       </div>
-      <NewsFeed initialNews={news} />
+      {showFeed && <NewsFeed initialNews={news} />}
     </div>
   );
 }

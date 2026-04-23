@@ -26,7 +26,9 @@ interface GlobalFertData {
   country_imports: Record<string, Record<string, ComtradeRow[]>>;
   static_seed: { global_exports_2024: Record<string, { country: string; qty_mt_k: number }[]> };
 }
-
+interface OriginCountry { code: string; name: string; kg_kt: number; share: number; }
+interface OriginEntry { countries: OriginCountry[]; states: { name: string; kg_kt: number }[]; }
+type ImportOrigins = Record<string, Record<string, OriginEntry>>;
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const YEAR_COLORS = ["#475569", "#64748b", "#3b82f6", "#22c55e", "#f59e0b"];
@@ -264,11 +266,73 @@ function BrazilImportChart({ monthly }: { monthly: BrazilImportMonth[] }) {
   );
 }
 
+// ── Brazil import country-of-origin breakdown ─────────────────────────────────
+
+const ORIGIN_LABEL_ORDER = ["Urea", "KCl", "MAP", "DAP", "AN", "AS", "Superphosphate"];
+const ORIGIN_COLORS: Record<string, string> = {
+  Urea: "#3b82f6", KCl: "#8b5cf6", MAP: "#10b981",
+  DAP: "#06b6d4", AN: "#f59e0b", AS: "#ec4899", Superphosphate: "#84cc16",
+};
+
+function BrazilOriginsPanel({ origins }: { origins: ImportOrigins }) {
+  const labels = ORIGIN_LABEL_ORDER.filter(l => origins[l]);
+  const availYears = Array.from(new Set(labels.flatMap(l => Object.keys(origins[l] ?? {})))).sort();
+  const latestYear = availYears[availYears.length - 1];
+  const [year, setYear] = useState(latestYear);
+
+  if (!latestYear) return null;
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+      <div className="flex items-baseline justify-between mb-3">
+        <div className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">
+          Brazil Imports · Origin Countries
+        </div>
+        <div className="flex gap-0.5">
+          {availYears.map(y => (
+            <button key={y} onClick={() => setYear(y)}
+              className={`px-2 py-0.5 rounded text-[8px] font-bold transition-colors ${
+                year === y ? "bg-slate-600 text-slate-100" : "text-slate-500 hover:text-slate-400"
+              }`}>
+              {y}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+        {labels.map(label => {
+          const entry = origins[label]?.[year];
+          if (!entry?.countries?.length) return null;
+          return (
+            <div key={label}>
+              <div className="text-[9px] font-bold mb-1 uppercase" style={{ color: ORIGIN_COLORS[label] ?? "#64748b" }}>
+                {label}
+              </div>
+              <div className="space-y-0.5">
+                {entry.countries.map(c => (
+                  <div key={c.code} className="flex items-center gap-1.5">
+                    <div className="h-1.5 rounded-full flex-shrink-0" style={{
+                      width: `${Math.max(8, c.share)}%`,
+                      maxWidth: "60%",
+                      background: ORIGIN_COLORS[label] ?? "#64748b",
+                      opacity: 0.7,
+                    }} />
+                    <span className="text-[8px] text-slate-300 truncate">{c.name}</span>
+                    <span className="text-[8px] text-slate-500 font-mono ml-auto flex-shrink-0">{c.share}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Global exports: stacked annual reference + live 3104 trend ────────────────
 
-function GlobalExportsPanel({ data, prices, pricesAsOf }: {
-  data: GlobalFertData; prices: FertPrice[]; pricesAsOf: string;
-}) {
+function GlobalExportsPanel({ data }: { data: GlobalFertData }) {
   // 2024 annual static_seed totals per HS code
   const seedTotals = Object.entries(data.static_seed.global_exports_2024).map(([hs, rows]) => ({
     hs,
@@ -298,7 +362,12 @@ function GlobalExportsPanel({ data, prices, pricesAsOf }: {
         <div className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">
           Global Export Volume · HS 3102 / 3104 / 3105
         </div>
-        <div className="text-[8px] text-slate-600 mt-0.5">2024 annual reference · UN Comtrade static seed</div>
+        <div className="text-[8px] text-slate-600 mt-0.5">
+          2024 annual reference · UN Comtrade static seed
+          {data.updated && (
+            <span className="ml-2 text-slate-700">· updated {new Date(data.updated).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })}</span>
+          )}
+        </div>
       </div>
 
       {/* 2024 stacked overview: total by HS code */}
@@ -419,38 +488,6 @@ function KeyExporterChart({ data }: { data: GlobalFertData }) {
   );
 }
 
-// ── Vessel leading indicator placeholder ──────────────────────────────────────
-
-function VesselLeadingIndicator() {
-  return (
-    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 border-dashed space-y-2">
-      <div className="flex items-baseline justify-between">
-        <div className="text-[10px] text-slate-500 uppercase tracking-wide font-bold">Bulk Carriers in Transit</div>
-        <div className="text-[8px] text-amber-500/70">Planned · requires MarineTraffic / MyShipTracking API</div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        {[
-          { port: "Bandar Abbas (Iran)", type: "Urea" },
-          { port: "St. Petersburg (Russia)", type: "Urea + Potash" },
-          { port: "Casablanca (Morocco/OCP)", type: "DAP/MAP" },
-          { port: "Qingdao (China)", type: "Urea + DAP" },
-        ].map(p => (
-          <div key={p.port} className="bg-slate-900/50 rounded p-2">
-            <div className="text-[9px] text-slate-400 font-medium">{p.port}</div>
-            <div className="text-[8px] text-slate-600">{p.type}</div>
-            <div className="text-[8px] text-slate-700 italic mt-0.5">Vessel count: —</div>
-          </div>
-        ))}
-      </div>
-      <div className="text-[8px] text-slate-700 italic">
-        Logic: bulk carrier departures from key origin ports = 30-day leading indicator before customs.
-        A 50%+ weekly drop signals supply disruption before official data confirms.
-        Free AIS data sources (MarineTraffic free tier, VesselFinder) lack bulk carrier filtering needed for this signal.
-      </div>
-    </div>
-  );
-}
-
 // ── Main tab ───────────────────────────────────────────────────────────────────
 
 export default function FertilizersTab() {
@@ -459,6 +496,7 @@ export default function FertilizersTab() {
   const [vnFert, setVnFert]         = useState<VnFertContext | null>(null);
   const [pricesAsOf, setPricesAsOf] = useState<string>("");
   const [globalFert, setGlobalFert] = useState<GlobalFertData | null>(null);
+  const [origins, setOrigins] = useState<ImportOrigins | null>(null);
 
   useEffect(() => {
     fetch("/data/farmer_economics.json")
@@ -467,6 +505,7 @@ export default function FertilizersTab() {
         setPrices(d.fertilizer?.items ?? null);
         setBrazil(d.fertilizer?.imports?.monthly ?? null);
         setPricesAsOf(d.fertilizer?.prices_as_of ?? "");
+        setOrigins(d.fertilizer?.import_origins ?? null);
       })
       .catch(() => {});
     fetch("/data/vietnam_supply.json")
@@ -511,6 +550,9 @@ export default function FertilizersTab() {
         )}
       </div>
 
+      {/* Brazil import origins */}
+      {origins && <BrazilOriginsPanel origins={origins} />}
+
       {/* Vietnam imports */}
       {vnFert && (
         <div>
@@ -527,7 +569,7 @@ export default function FertilizersTab() {
           <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
             Global Export Volume · HS 3102 / 3104 / 3105
           </h2>
-          <GlobalExportsPanel data={globalFert} prices={prices ?? []} pricesAsOf={pricesAsOf} />
+          <GlobalExportsPanel data={globalFert} />
         </div>
       )}
 
@@ -540,14 +582,6 @@ export default function FertilizersTab() {
           <KeyExporterChart data={globalFert} />
         </div>
       )}
-
-      {/* Vessel leading indicator */}
-      <div>
-        <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
-          Vessel Leading Indicator
-        </h2>
-        <VesselLeadingIndicator />
-      </div>
 
     </div>
   );

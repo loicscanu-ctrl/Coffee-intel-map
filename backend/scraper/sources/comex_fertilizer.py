@@ -8,10 +8,13 @@ NCM codes sourced from Hedgepoint MDIC methodology (April 2026 report).
 """
 
 import io
+import json
 import os
 import re
 import sys
+from collections import defaultdict
 from datetime import datetime, date
+from pathlib import Path
 
 # NCM codes of interest (8-digit, all Chapter 31)
 # Keys → fertilizer type label stored in DB
@@ -42,6 +45,38 @@ MDIC_URL = "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_{yea
 
 # Chapter 31 prefix for fast line-level filtering
 _CHAPTER_31_NCM_PREFIX = '"31'
+
+# Cache file for country-of-origin breakdown (no DB schema change needed)
+_ORIGINS_CACHE = Path(__file__).resolve().parents[1] / "cache" / "br_fert_origins.json"
+
+# MDIC CO_PAIS (ISO 3166-1 numeric) → country name for top fertilizer exporters
+_COUNTRY_NAMES: dict[str, str] = {
+    "156": "China",
+    "643": "Russia",
+    "124": "Canada",
+    "504": "Morocco",
+    "112": "Belarus",
+    "682": "Saudi Arabia",
+    "818": "Egypt",
+    "788": "Tunisia",
+    "528": "Netherlands",
+    "616": "Poland",
+    "840": "United States",
+    "804": "Ukraine",
+    "276": "Germany",
+    "484": "Mexico",
+    "032": "Argentina",
+    "076": "Brazil",
+    "752": "Sweden",
+    "056": "Belgium",
+    "414": "Kuwait",
+    "784": "UAE",
+    "036": "Australia",
+    "566": "Nigeria",
+    "191": "Croatia",
+    "040": "Austria",
+    "250": "France",
+}
 
 
 def _month_str_to_date(month_str: str) -> date | None:
@@ -81,7 +116,7 @@ def _parse_int(s: str) -> int | None:
 def _stream_chapter31_rows(year: int) -> list[dict]:
     """
     Stream MDIC bulk CSV for `year`, return rows where NCM starts with 31.
-    Each row: {month: date, ncm_code: str, kg: int|None, fob_usd: float|None}
+    Each row: {month: date, ncm_code: str, kg: int|None, fob_usd: float|None, country: str, state: str}
     """
     import requests
 
@@ -142,11 +177,16 @@ def _stream_chapter31_rows(year: int) -> list[dict]:
         except ValueError:
             fob = None
 
+        country_code = row.get("CO_PAIS", "").strip()
+        state        = row.get("SG_UF_NCM", "").strip()
+
         rows.append({
             "month":    month_dt,
             "ncm_code": ncm_code,
             "kg":       kg,
             "fob_usd":  fob,
+            "country":  country_code,
+            "state":    state,
         })
 
     return rows
@@ -183,7 +223,6 @@ async def run(page, db) -> None:  # noqa: ARG001  (page unused — kept for sign
         all_rows = [r for r in all_rows if r["month"] >= cutoff]
 
         # Aggregate: sum kg and fob per (month, ncm_code)
-        from collections import defaultdict
         agg: dict[tuple, dict] = defaultdict(lambda: {"kg": 0, "fob_usd": 0.0})
         for r in all_rows:
             key = (r["month"], r["ncm_code"])
@@ -215,6 +254,79 @@ async def run(page, db) -> None:  # noqa: ARG001  (page unused — kept for sign
         db.commit()
         print(f"[comex_fertilizer] Done. {inserted} rows upserted.")
 
+        # ── Country-of-origin breakdown (cache file, no schema change) ────────
+        try:
+            _write_origins_cache(all_rows)
+        except Exception as e:
+            print(f"[comex_fertilizer] origins cache failed: {e}")
+
     except Exception as e:
         db.rollback()
         print(f"[comex_fertilizer] FAILED: {e} — retaining previous data")
+
+
+def _write_origins_cache(rows: list[dict]) -> None:
+    """
+    Compute top-5 origin countries and top-5 entry states per fertilizer label
+    per calendar year. Write to _ORIGINS_CACHE as JSON.
+    Structure: {label: {year: {countries: [{name, kg_kt, share}], states: [{name, kg_kt}]}}}
+    """
+    # kg per (label, year, country) and (label, year, state)
+    by_country: dict[tuple, int] = defaultdict(int)
+    by_state:   dict[tuple, int] = defaultdict(int)
+
+    for r in rows:
+        label = NCM_LABELS.get((r["ncm_code"] or "")[:8])
+        if not label:
+            continue
+        year  = r["month"].year
+        kg    = r["kg"] or 0
+        if r["country"]:
+            by_country[(label, year, r["country"])] += kg
+        if r["state"]:
+            by_state[(label, year, r["state"])] += kg
+
+    # Summarise: top-5 per label+year
+    result: dict = {}
+    labels  = {k[0] for k in by_country} | {k[0] for k in by_state}
+    years   = {k[1] for k in by_country} | {k[1] for k in by_state}
+
+    for label in sorted(labels):
+        result[label] = {}
+        for year in sorted(years):
+            # Countries
+            country_rows = [
+                (code, kg) for (lbl, yr, code), kg in by_country.items()
+                if lbl == label and yr == year
+            ]
+            country_rows.sort(key=lambda x: -x[1])
+            total_kg = sum(kg for _, kg in country_rows) or 1
+            countries = [
+                {
+                    "code":   code,
+                    "name":   _COUNTRY_NAMES.get(code, f"Country {code}"),
+                    "kg_kt":  round(kg / 1000),
+                    "share":  round(kg / total_kg * 100, 1),
+                }
+                for code, kg in country_rows[:5]
+            ]
+
+            # States
+            state_rows = [
+                (state, kg) for (lbl, yr, state), kg in by_state.items()
+                if lbl == label and yr == year
+            ]
+            state_rows.sort(key=lambda x: -x[1])
+            states = [
+                {"name": state, "kg_kt": round(kg / 1000)}
+                for state, kg in state_rows[:5]
+            ]
+
+            result[label][str(year)] = {"countries": countries, "states": states}
+
+    _ORIGINS_CACHE.parent.mkdir(parents=True, exist_ok=True)
+    _ORIGINS_CACHE.write_text(
+        json.dumps({"updated": datetime.utcnow().isoformat() + "Z", "origins": result}, indent=2),
+        encoding="utf-8",
+    )
+    print(f"[comex_fertilizer] origins cache written → {_ORIGINS_CACHE.name}")

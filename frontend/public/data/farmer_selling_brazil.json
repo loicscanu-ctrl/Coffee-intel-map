@@ -1,0 +1,545 @@
+{
+  "source": "Hedgepoint Global Markets / Safras & Mercado",
+  "report_date": "2026-04-14",
+  "arabica": {
+    "brazil": {
+      "current": 83,
+      "prev_month": 80,
+      "avg_5y": 88
+    },
+    "regions": [
+      {
+        "label": "S. Minas",
+        "code": "SMG",
+        "current": 82,
+        "prev_month": 79,
+        "avg_5y": 88
+      },
+      {
+        "label": "Cerrado",
+        "code": "CER",
+        "current": 83,
+        "prev_month": 80,
+        "avg_5y": 90
+      },
+      {
+        "label": "Zona da Mata",
+        "code": "ZMT",
+        "current": 83,
+        "prev_month": 78,
+        "avg_5y": 88
+      },
+      {
+        "label": "Minas Gerais",
+        "code": "MG",
+        "current": 82,
+        "prev_month": 79,
+        "avg_5y": 89
+      },
+      {
+        "label": "São Paulo",
+        "code": "SP",
+        "current": 85,
+        "prev_month": 81,
+        "avg_5y": 89
+      },
+      {
+        "label": "Paraná",
+        "code": "PR",
+        "current": 97,
+        "prev_month": 95,
+        "avg_5y": 88
+      },
+      {
+        "label": "Bahia",
+        "code": "BA",
+        "current": 83,
+        "prev_month": 78,
+        "avg_5y": 88
+      },
+      {
+        "label": "Espírito Santo",
+        "code": "ES",
+        "current": 82,
+        "prev_month": 78,
+        "avg_5y": 86
+      },
+      {
+        "label": "Others",
+        "code": "OTH",
+        "current": 87,
+        "prev_month": 85,
+        "avg_5y": 93
+      }
+    ],
+    "progression_months": [
+      "Jul-25",
+      "Aug-25",
+      "Sep-25",
+      "Oct-25",
+      "Nov-25",
+      "Dec-25",
+      "Jan-26",
+      "Feb-26",
+      "Mar-26"
+    ],
+    "progression": [
+      {
+        "month": "Jul-25",
+        "Brazil": 34,
+        "SMG": 36,
+        "CER": 37,
+        "ZMT": 33,
+        "MG": 35,
+        "SP": 41,
+        "PR": 18,
+        "BA": 23,
+        "ES": 27,
+        "Others": 37
+      },
+      {
+        "month": "Aug-25",
+        "Brazil": 43,
+        "SMG": 44,
+        "CER": 45,
+        "ZMT": 43,
+        "MG": 44,
+        "SP": 47,
+        "PR": 26,
+        "BA": 37,
+        "ES": 36,
+        "Others": 45
+      },
+      {
+        "month": "Sep-25",
+        "Brazil": 53,
+        "SMG": 53,
+        "CER": 53,
+        "ZMT": 56,
+        "MG": 54,
+        "SP": 55,
+        "PR": 47,
+        "BA": 45,
+        "ES": 47,
+        "Others": 52
+      },
+      {
+        "month": "Oct-25",
+        "Brazil": 61,
+        "SMG": 59,
+        "CER": 63,
+        "ZMT": 64,
+        "MG": 61,
+        "SP": 63,
+        "PR": 65,
+        "BA": 57,
+        "ES": 60,
+        "Others": 65
+      },
+      {
+        "month": "Nov-25",
+        "Brazil": 67,
+        "SMG": 63,
+        "CER": 68,
+        "ZMT": 71,
+        "MG": 66,
+        "SP": 69,
+        "PR": 80,
+        "BA": 68,
+        "ES": 65,
+        "Others": 71
+      },
+      {
+        "month": "Dec-25",
+        "Brazil": 70,
+        "SMG": 69,
+        "CER": 73,
+        "ZMT": 68,
+        "MG": 70,
+        "SP": 71,
+        "PR": 90,
+        "BA": 69,
+        "ES": 67,
+        "Others": 75
+      },
+      {
+        "month": "Jan-26",
+        "Brazil": 73,
+        "SMG": 71,
+        "CER": 73,
+        "ZMT": 76,
+        "MG": 73,
+        "SP": 75,
+        "PR": 90,
+        "BA": 72,
+        "ES": 71,
+        "Others": 78
+      },
+      {
+        "month": "Feb-26",
+        "Brazil": 80,
+        "SMG": 79,
+        "CER": 80,
+        "ZMT": 78,
+        "MG": 79,
+        "SP": 81,
+        "PR": 95,
+        "BA": 78,
+        "ES": 78,
+        "Others": 85
+      },
+      {
+        "month": "Mar-26",
+        "Brazil": 83,
+        "SMG": 82,
+        "CER": 83,
+        "ZMT": 83,
+        "MG": 82,
+        "SP": 85,
+        "PR": 97,
+        "BA": 83,
+        "ES": 82,
+        "Others": 87
+      }
+    ],
+    "chart": [
+      {
+        "x": "Apr",
+        "avg": 22,
+        "y2223": 19,
+        "y2324": 17,
+        "y2425": 20,
+        "y2526": 22
+      },
+      {
+        "x": "May",
+        "avg": 24,
+        "y2223": 22,
+        "y2324": 20,
+        "y2425": 23,
+        "y2526": 24
+      },
+      {
+        "x": "Jun",
+        "avg": 29,
+        "y2223": 27,
+        "y2324": 25,
+        "y2425": 27,
+        "y2526": 29
+      },
+      {
+        "x": "Jul",
+        "avg": 34,
+        "y2223": 33,
+        "y2324": 31,
+        "y2425": 33,
+        "y2526": 34
+      },
+      {
+        "x": "Aug",
+        "avg": 43,
+        "y2223": 40,
+        "y2324": 40,
+        "y2425": 41,
+        "y2526": 43
+      },
+      {
+        "x": "Sep",
+        "avg": 53,
+        "y2223": 51,
+        "y2324": 48,
+        "y2425": 51,
+        "y2526": 53
+      },
+      {
+        "x": "Oct",
+        "avg": 61,
+        "y2223": 60,
+        "y2324": 57,
+        "y2425": 58,
+        "y2526": 61
+      },
+      {
+        "x": "Nov",
+        "avg": 67,
+        "y2223": 67,
+        "y2324": 62,
+        "y2425": 64,
+        "y2526": 67
+      },
+      {
+        "x": "Dec",
+        "avg": 70,
+        "y2223": 70,
+        "y2324": 65,
+        "y2425": 67,
+        "y2526": 70
+      },
+      {
+        "x": "Jan",
+        "avg": 73,
+        "y2223": 73,
+        "y2324": 68,
+        "y2425": 70,
+        "y2526": 73
+      },
+      {
+        "x": "Feb",
+        "avg": 80,
+        "y2223": 79,
+        "y2324": 75,
+        "y2425": 77,
+        "y2526": 80
+      },
+      {
+        "x": "Mar",
+        "avg": 83,
+        "y2223": 83,
+        "y2324": 79,
+        "y2425": 81,
+        "y2526": 83
+      },
+      {
+        "x": "Apr*",
+        "avg": 88,
+        "y2223": 88,
+        "y2324": 85,
+        "y2425": 87,
+        "y2526": null
+      }
+    ]
+  },
+  "robusta": {
+    "brazil": {
+      "current": 77,
+      "prev_month": 72,
+      "avg_5y": 95
+    },
+    "regions": [
+      {
+        "label": "Espírito Santo",
+        "code": "ES",
+        "current": 74,
+        "prev_month": 69,
+        "avg_5y": 95
+      },
+      {
+        "label": "Rondônia",
+        "code": "RON",
+        "current": 97,
+        "prev_month": 96,
+        "avg_5y": 99
+      },
+      {
+        "label": "Bahia",
+        "code": "BA",
+        "current": 75,
+        "prev_month": 71,
+        "avg_5y": 94
+      },
+      {
+        "label": "Others",
+        "code": "OTH",
+        "current": 81,
+        "prev_month": 78,
+        "avg_5y": 97
+      }
+    ],
+    "progression_months": [
+      "Jul-25",
+      "Aug-25",
+      "Sep-25",
+      "Oct-25",
+      "Nov-25",
+      "Dec-25",
+      "Jan-26",
+      "Feb-26",
+      "Mar-26"
+    ],
+    "progression": [
+      {
+        "month": "Jul-25",
+        "Brazil": 41,
+        "ES": 39,
+        "Rondônia": 48,
+        "BA": 43,
+        "Others": 46
+      },
+      {
+        "month": "Aug-25",
+        "Brazil": 51,
+        "ES": 50,
+        "Rondônia": 60,
+        "BA": 53,
+        "Others": 50
+      },
+      {
+        "month": "Sep-25",
+        "Brazil": 57,
+        "ES": 55,
+        "Rondônia": 68,
+        "BA": 58,
+        "Others": 56
+      },
+      {
+        "month": "Oct-25",
+        "Brazil": 58,
+        "ES": 57,
+        "Rondônia": 75,
+        "BA": 54,
+        "Others": 58
+      },
+      {
+        "month": "Nov-25",
+        "Brazil": 65,
+        "ES": 60,
+        "Rondônia": 80,
+        "BA": 63,
+        "Others": 66
+      },
+      {
+        "month": "Dec-25",
+        "Brazil": 66,
+        "ES": 63,
+        "Rondônia": 86,
+        "BA": 64,
+        "Others": 68
+      },
+      {
+        "month": "Jan-26",
+        "Brazil": 69,
+        "ES": 65,
+        "Rondônia": 92,
+        "BA": 66,
+        "Others": 71
+      },
+      {
+        "month": "Feb-26",
+        "Brazil": 72,
+        "ES": 69,
+        "Rondônia": 96,
+        "BA": 71,
+        "Others": 78
+      },
+      {
+        "month": "Mar-26",
+        "Brazil": 77,
+        "ES": 74,
+        "Rondônia": 97,
+        "BA": 75,
+        "Others": 81
+      },
+      {
+        "month": "Jul-??",
+        "Brazil": 77
+      }
+    ],
+    "chart": [
+      {
+        "x": "Apr",
+        "avg": 7,
+        "y2223": 6,
+        "y2324": 8,
+        "y2425": 7,
+        "y2526": 7
+      },
+      {
+        "x": "May",
+        "avg": 18,
+        "y2223": 17,
+        "y2324": 19,
+        "y2425": 18,
+        "y2526": 18
+      },
+      {
+        "x": "Jun",
+        "avg": 35,
+        "y2223": 33,
+        "y2324": 36,
+        "y2425": 34,
+        "y2526": 35
+      },
+      {
+        "x": "Jul",
+        "avg": 41,
+        "y2223": 40,
+        "y2324": 42,
+        "y2425": 41,
+        "y2526": 35
+      },
+      {
+        "x": "Aug",
+        "avg": 51,
+        "y2223": 50,
+        "y2324": 52,
+        "y2425": 51,
+        "y2526": 51
+      },
+      {
+        "x": "Sep",
+        "avg": 57,
+        "y2223": 56,
+        "y2324": 58,
+        "y2425": 57,
+        "y2526": 57
+      },
+      {
+        "x": "Oct",
+        "avg": 58,
+        "y2223": 57,
+        "y2324": 59,
+        "y2425": 58,
+        "y2526": 58
+      },
+      {
+        "x": "Nov",
+        "avg": 65,
+        "y2223": 64,
+        "y2324": 65,
+        "y2425": 64,
+        "y2526": 65
+      },
+      {
+        "x": "Dec",
+        "avg": 66,
+        "y2223": 65,
+        "y2324": 66,
+        "y2425": 65,
+        "y2526": 66
+      },
+      {
+        "x": "Jan",
+        "avg": 69,
+        "y2223": 68,
+        "y2324": 68,
+        "y2425": 68,
+        "y2526": 69
+      },
+      {
+        "x": "Feb",
+        "avg": 72,
+        "y2223": 71,
+        "y2324": 71,
+        "y2425": 71,
+        "y2526": 72
+      },
+      {
+        "x": "Mar",
+        "avg": 77,
+        "y2223": 76,
+        "y2324": 75,
+        "y2425": 76,
+        "y2526": 77
+      },
+      {
+        "x": "Apr*",
+        "avg": 95,
+        "y2223": 93,
+        "y2324": 91,
+        "y2425": 92,
+        "y2526": null
+      }
+    ]
+  },
+  "source_article": "https://safras.com.br/eng/larger-physical-availability-boosts-brazilian-coffee-sales-now-at-31-of-the-2025-26-crop/"
+}
