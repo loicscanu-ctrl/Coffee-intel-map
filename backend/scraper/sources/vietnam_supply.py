@@ -87,6 +87,47 @@ def _parse_ico_exports(content: str) -> list[dict]:
     return result
 
 
+def _fallback_from_vn_export_port() -> dict | None:
+    """Read monthly_total (MT) from vn_export_destination_port.json → k_bags."""
+    import json as _json
+    from pathlib import Path as _Path
+    port_file = (
+        _Path(__file__).resolve().parents[3]
+        / "frontend" / "public" / "data" / "vn_export_destination_port.json"
+    )
+    if not port_file.exists():
+        return None
+    try:
+        data = _json.loads(port_file.read_text(encoding="utf-8"))
+        mt_by_month: dict = data.get("monthly_total", {})
+        if not mt_by_month:
+            return None
+        months = sorted(mt_by_month.keys())
+        by_month: dict[str, float] = {}
+        for m in months:
+            by_month[m] = round(mt_by_month[m] / 60, 1)  # MT → thousand 60kg bags
+        monthly = []
+        for m in months:
+            y, mo = m.split("-")
+            prev_key = f"{int(y)-1}-{mo}"
+            prev = by_month.get(prev_key)
+            yoy = round((by_month[m] - prev) / prev * 100, 1) if prev else None
+            monthly.append({"month": m, "total_k_bags": by_month[m], "yoy_pct": yoy})
+        if len(monthly) > 36:
+            monthly = monthly[-36:]
+        last_month = monthly[-1]["month"]
+        logger.info(f"[vietnam_supply] ICO unavailable — using vn_export_destination_port fallback ({last_month})")
+        return {
+            "source":       "Vietnam Customs (vn_export_destination_port)",
+            "last_updated": last_month,
+            "unit":         "thousand_60kg_bags",
+            "monthly":      monthly,
+        }
+    except Exception as e:
+        logger.warning(f"[vietnam_supply] fallback read failed: {e}")
+        return None
+
+
 def fetch_exports() -> dict | None:
     """Fetch ICO CSV and return Vietnam export dict, or None on failure."""
     try:
@@ -94,7 +135,7 @@ def fetch_exports() -> dict | None:
         resp.raise_for_status()
         monthly = _parse_ico_exports(resp.text)
         if not monthly:
-            return None
+            return _fallback_from_vn_export_port()
         last_month = monthly[-1]["month"]
         return {
             "source":       "ICO",
@@ -104,7 +145,7 @@ def fetch_exports() -> dict | None:
         }
     except Exception as e:
         logger.warning(f"[vietnam_supply] ICO fetch failed: {e}")
-        return None
+        return _fallback_from_vn_export_port()
 
 
 # ── Fertilizer import context ──────────────────────────────────────────────────
