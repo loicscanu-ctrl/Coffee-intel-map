@@ -140,13 +140,16 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
 
 // ─── KC/RC ¢/lb middle panel ──────────────────────────────────────────────────
 
+const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"X", Z:"F" };
+
 function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Contract[] }) {
-  const rcByLetter = new Map<string, number>();
+  // Key: letter+2-digit-year e.g. "K26", "F27"
+  const rcByKey = new Map<string, number>();
   robusta.forEach(c => {
-    const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])\d{2}$/i);
+    const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])(\d{2})$/i);
     if (m) {
-      const key = m[1].toUpperCase();
-      if (!rcByLetter.has(key)) rcByLetter.set(key, c.last);
+      const key = m[1].toUpperCase() + m[2];
+      if (!rcByKey.has(key)) rcByKey.set(key, c.last);
     }
   });
 
@@ -155,29 +158,34 @@ function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Co
       <div className="px-3 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
         <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-widest whitespace-nowrap">Arbitrage</span>
       </div>
-      <table className="text-[10px] font-mono w-full">
+      <table className="text-[11px] font-mono w-full">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="px-2 py-1 text-left whitespace-nowrap">Pair</th>
-            <th className="px-2 py-1 text-right whitespace-nowrap">¢/lb (×)</th>
+            <th className="px-1.5 py-1 text-left whitespace-nowrap">Pair</th>
+            <th className="px-1.5 py-1 text-right whitespace-nowrap">¢/lb (×)</th>
           </tr>
         </thead>
         <tbody>
           {arabica.map((c, i) => {
-            const letter  = c.symbol.match(/^KC([FGHJKMNQUVXZ])/i)?.[1]?.toUpperCase();
-            const rc      = letter ? rcByLetter.get(letter) : null;
-            const kcCents = c.last;
-            const rcCents = rc ? rc / 22.046 : null;
-            const spread  = rcCents != null ? kcCents - rcCents : null;
-            const ratio   = rc ? (c.last * 22.046 / rc).toFixed(2) : null;
-            const rcSym   = c.symbol.replace(/^KC/, "RC");
-            const isFront = i === 0;
+            const km = c.symbol.match(/^KC([FGHJKMNQUVXZ])(\d{2})$/i);
+            if (!km) return null;
+            const kcLetter = km[1].toUpperCase();
+            const kcYr     = km[2];
+            const rcLetter = KC_TO_RC_LETTER[kcLetter] ?? kcLetter;
+            const rcYr     = kcLetter === "Z" ? String(parseInt(kcYr) + 1).slice(-2) : kcYr;
+            const rc       = rcByKey.get(rcLetter + rcYr);
+            const kcCents  = c.last;
+            const rcCents  = rc != null ? rc / 22.046 : null;
+            const spread   = rcCents != null ? kcCents - rcCents : null;
+            const ratio    = rc != null ? (c.last * 22.046 / rc).toFixed(2) : null;
+            const rcSym    = `RC${rcLetter}${rcYr}`;
+            const isFront  = i === 0;
             return (
               <tr key={c.symbol} className={`border-t border-slate-700 ${isFront ? "bg-slate-800/60" : ""}`}>
-                <td className={`px-2 py-1.5 whitespace-nowrap ${isFront ? "text-slate-200" : "text-slate-500"}`}>
+                <td className={`px-1.5 py-1.5 whitespace-nowrap ${isFront ? "text-slate-200" : "text-slate-500"}`}>
                   {c.symbol}-{rcSym}
                 </td>
-                <td className={`px-2 py-1.5 text-right whitespace-nowrap ${isFront ? "text-sky-300" : "text-slate-500"}`}>
+                <td className={`px-1.5 py-1.5 text-right whitespace-nowrap ${isFront ? "text-sky-300" : "text-slate-500"}`}>
                   {spread != null ? `${spread.toFixed(1)} (×${ratio})` : "—"}
                 </td>
               </tr>

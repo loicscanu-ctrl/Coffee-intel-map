@@ -5,11 +5,12 @@ on:
     - cron: '0 4 * * *'   # 04:00 UTC daily — 3 h after scraper-daily (01:00 UTC)
   workflow_dispatch:        # allow manual trigger from GitHub UI
   workflow_run:
-    workflows: ["Daily News Scraper"]
-    types: [completed]      # re-export whenever the scraper finishes (manual or scheduled)
+    workflows: ["Daily News Scraper", "COT Scraper (Positions + Prices)"]
+    types: [completed]
 
 jobs:
   export:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:

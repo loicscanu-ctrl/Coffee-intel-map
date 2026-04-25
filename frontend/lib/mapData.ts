@@ -1,8 +1,11 @@
 // ── Origin ports (loading) ─────────────────────────────────────────────────────
 export const PORTS: { n: string; l: [number, number] }[] = [
-  { n: "Santos", l: [-23.9, -46.3] },
-  { n: "Vitoria", l: [-20.3, -40.3] },
-  { n: "Salvador", l: [-12.97, -38.50] },
+  { n: "Santos",          l: [-23.9,  -46.3]  },
+  { n: "Paranaguá",       l: [-25.52, -48.53] },
+  { n: "Rio de Janeiro",  l: [-22.9,  -43.2]  },
+  { n: "Vitoria",         l: [-20.3,  -40.3]  },
+  { n: "Salvador",        l: [-12.97, -38.50] },
+  { n: "Varginha",        l: [-21.55, -45.43] },
   { n: "Cartagena", l: [10.4, -75.5] },
   { n: "Buenaventura", l: [3.88, -77.0] },
   { n: "Puerto Cortés", l: [15.8, -87.9] },
@@ -10,6 +13,7 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Ho Chi Minh City", l: [10.7, 106.6] },
   { n: "Jakarta", l: [-6.1, 106.8] },
   { n: "Mombasa", l: [-4.0, 39.6] },
+  { n: "Lagos", l: [6.45, 3.40] },
   { n: "Chennai", l: [13.08, 80.27] },
   { n: "Tuticorin", l: [8.76, 78.13] },
   { n: "Antwerp", l: [51.22, 4.40] },
@@ -39,12 +43,11 @@ export const PORTS: { n: string; l: [number, number] }[] = [
 // ── Destination hub markers (one per regional hub) ────────────────────────────
 // Hubs without an existing port in PORTS get a new marker here.
 export const HUB_PORTS: { hub: string; n: string; l: [number, number] }[] = [
-  { hub: "Nordics",            n: "Nordics Hub (Copenhagen)",      l: [55.68, 12.57] },
-  { hub: "Eastern Europe",     n: "Eastern Europe Hub (Gdansk)",   l: [54.35, 18.65] },
-  { hub: "Latin America",      n: "Latin America Hub (Buenos Aires)", l: [-34.61, -58.37] },
-  { hub: "Middle East",        n: "Middle East Hub (Dubai)",        l: [25.27, 55.30] },
-  { hub: "Russia & CIS",       n: "Russia & CIS Hub (St. Petersburg)", l: [59.94, 30.32] },
-  { hub: "Sub-Saharan Africa", n: "West Africa Hub (Lagos)",        l: [6.45, 3.40] },
+  { hub: "Nordics",        n: "Nordics Hub (Copenhagen)",          l: [55.68, 12.57] },
+  { hub: "Eastern Europe", n: "Eastern Europe Hub (Gdansk)",        l: [54.35, 18.65] },
+  { hub: "Latin America",  n: "Latin America Hub (Cartagena)",      l: [10.4, -75.5]  },
+  { hub: "Middle East",    n: "Middle East Hub (Dubai)",             l: [25.27, 55.30] },
+  { hub: "Russia & CIS",   n: "Russia & CIS Hub (St. Petersburg)",  l: [59.94, 30.32] },
 ];
 
 // ── Basemap tile providers ────────────────────────────────────────────────────
@@ -305,33 +308,19 @@ export const ROUTES: {
   // AMERICAS ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // Brazil → Europe (terminates at Channel entry)
+  // ── Brazil trunk routes (Santos origin) ─────────────────────────────────
   {
     name: "Brazil (Santos) → Channel Entry",
     color: "#e74c3c",
-    path: [[-23.95, -46.3], [-25.0, -44.0], [-20.0, -36.0], [-10.0, -32.0], [-5.0, -31.0], [5.0, -28.0], [20.0, -25.0], [40.0, -15.0], [48.0, -7.0]],
+    path: [[-23.95, -46.3], [-20.0, -40.0], [-10.0, -32.0], [-5.0, -31.0], [5.0, -28.0], [20.0, -25.0], [40.0, -15.0], [48.0, -7.0]],
     cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Russia & CIS"],
   },
   {
-    name: "Deviation: Salvador → Brazil Atlantic Route",
-    color: "#e74c3c",
-    path: [[-12.97, -38.50], [-13.0, -35.0], [-10.0, -32.0]],
-  },
-  {
-    name: "Deviation: Vitoria → Brazil Atlantic Route",
-    color: "#e74c3c",
-    path: [[-20.3, -40.3], [-20.0, -38.0]],
-  },
-
-  // Brazil → New York
-  {
     name: "Brazil (Santos) → NY",
     color: "#e74c3c",
-    path: [[-23.95, -46.3], [-24.5, -44.0], [-20.0, -38.0], [-10.0, -34.0], [-5.0, -34.5], [5.0, -45.0], [15.0, -55.0], [25.0, -68.0], [32.0, -74.0], [38.0, -73.0], [40.5, -73.8]],
+    path: [[-23.95, -46.3], [-20.0, -38.0], [-10.0, -34.0], [-5.0, -34.5], [5.0, -45.0], [15.0, -55.0], [25.0, -68.0], [32.0, -74.0], [38.0, -73.0], [40.5, -73.8]],
     cecafeHubs: ["North America"],
   },
-
-  // Brazil → Asia via Cape of Good Hope → Malacca Strait
   {
     name: "Brazil (Santos) → Asia (Cape Route via Malacca)",
     color: "#e74c3c",
@@ -348,9 +337,9 @@ export const ROUTES: {
       [-3.0, 60.0],     // Central Indian Ocean
       [4.0, 78.0],      // S of Sri Lanka
       [5.8, 90.0],      // Andaman approach
-      [5.8, 95.5],      // Bay of Bengal ← joins trunk waypoint
-      [5.5, 98.0],      // Malacca Strait N ← joins trunk waypoint
-      [3.0, 100.5],     // Mid Malacca Strait ← joins trunk waypoint
+      [5.8, 95.5],      // Bay of Bengal
+      [5.5, 98.0],      // Malacca Strait N
+      [3.0, 100.5],     // Mid Malacca Strait
       [1.26, 103.8],    // Singapore
       [8.0, 110.0],     // S China Sea
       [15.0, 116.0],    // E of Philippines
@@ -360,44 +349,34 @@ export const ROUTES: {
     ],
     cecafeHubs: ["East Asia", "SE Asia & Pacific"],
   },
-
-  // Brazil → Sub-Saharan Africa — West Africa
   {
     name: "Brazil (Santos) → West Africa",
     color: "#e74c3c",
     path: [[-23.95, -46.3], [-15.0, -36.0], [-5.0, -28.0], [0.0, -10.0], [3.0, -4.0], [5.35, -4.00], [6.45, 3.40]],
     cecafeHubs: ["Sub-Saharan Africa"],
   },
-
-  // Brazil → South Africa via Cape Route
-  {
-    name: "Brazil (Santos) → South Africa",
-    color: "#e74c3c",
-    path: [[-23.95, -46.3], [-28.0, -41.0], [-35.0, -25.0], [-36.0, 0.0], [-35.0, 18.0], [-34.36, 18.47], [-29.9, 31.0]],
-    cecafeHubs: ["Sub-Saharan Africa"],
-  },
-
-  // Brazil → North Africa (Casablanca)
   {
     name: "Brazil (Santos) → North Africa",
     color: "#e74c3c",
     path: [[-23.95, -46.3], [-10.0, -32.0], [5.0, -28.0], [20.0, -22.0], [28.0, -15.0], [33.6, -7.6]],
     cecafeHubs: ["North Africa"],
   },
-
-  // Brazil → Buenos Aires
+  // Conilon (robusta) route: Vitória → Cartagena via open Atlantic + Caribbean
   {
-    name: "Brazil (Santos) → Buenos Aires",
+    name: "Brazil (Vitória/Conilon) → Cartagena",
     color: "#e74c3c",
-    path: [[-23.95, -46.3], [-27.0, -47.5], [-30.0, -49.0], [-33.0, -52.0], [-34.6, -56.2], [-34.61, -58.37]],
-    cecafeHubs: ["Latin America"],
-  },
-
-  // Brazil → Lima via Cape Horn
-  {
-    name: "Brazil (Santos) → Lima",
-    color: "#e74c3c",
-    path: [[-23.95, -46.3], [-33.0, -50.0], [-40.0, -55.0], [-52.0, -58.0], [-56.0, -68.0], [-52.0, -72.0], [-40.0, -73.0], [-30.0, -75.0], [-20.0, -75.0], [-12.04, -77.12]],
+    path: [
+      [-20.3, -40.3],   // Vitória
+      [-10.0, -36.0],   // N along coast
+      [-4.0,  -34.5],   // near Cabo de São Roque (NE tip)
+      [0.0,   -34.0],   // open Atlantic — clear of Amazon delta
+      [5.0,   -46.0],   // Atlantic NW — clear of Guiana coast
+      [8.0,   -56.0],   // Atlantic off Suriname
+      [10.5,  -62.5],   // Caribbean, near Trinidad
+      [11.5,  -68.0],   // N of Venezuela coast
+      [11.0,  -73.0],   // approaching
+      [10.4,  -75.5],   // Cartagena
+    ],
     cecafeHubs: ["Latin America"],
   },
 

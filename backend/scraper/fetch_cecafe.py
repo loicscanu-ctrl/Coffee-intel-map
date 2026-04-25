@@ -223,7 +223,7 @@ def main():
     country_current = _extract_country_volumes(raw, y)
     type_current: dict[str, dict] = {}
     for suffix in ("arabica", "conillon", "soluvel", "torrado"):
-        print(f"      → {suffix}...")
+        print(f"      >>{suffix}...")
         type_current[suffix] = _extract_country_volumes(raw, y, suffix=suffix)
 
     # Country breakdown — previous year (fetch Dec of prev year)
@@ -235,7 +235,7 @@ def main():
     if raw_prev:
         country_prev = _extract_country_volumes(raw_prev, prev_year)
         for suffix in ("arabica", "conillon", "soluvel", "torrado"):
-            print(f"      → prev {suffix}...")
+            print(f"      >>prev {suffix}...")
             type_prev[suffix] = _extract_country_volumes(raw_prev, prev_year, suffix=suffix)
 
     # Historical country data — last 4 additional December zips (for country/hub filter)
@@ -269,7 +269,7 @@ def main():
     path = OUT_DIR / "cecafe.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
-    print(f"\nWritten → {path}  ({path.stat().st_size:,} bytes)")
+    print(f"\nWritten: {path}  ({path.stat().st_size:,} bytes)")
 
 
 if __name__ == "__main__":

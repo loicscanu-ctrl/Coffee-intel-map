@@ -104,23 +104,26 @@ export interface FertilizerImportMonth {
 
 export interface CopLineItem {
   label: string;
-  usd_per_ha: number;
+  usd_per_ha?: number;
   usd_per_ton: number;
   family_usd_per_ha?: number;
   hired_usd_per_ha?: number;
   family_usd_per_ton?: number;
   hired_usd_per_ton?: number;
+  note?: string;
   items?: CopLineItem[];
 }
 
 export interface CopSection {
   number: number;
   label: string;
-  usd_per_ha: number;
+  usd_per_ha?: number;   // absent for post-farm-gate sections (10+)
   usd_per_ton: number;
   family_usd_per_ha?: number;
   hired_usd_per_ha?: number;
   color: string;
+  unit?: string;         // "USD/ton" for post-farm-gate sections
+  note?: string;
   items: CopLineItem[];
 }
 
@@ -128,13 +131,14 @@ export interface CostData {
   total_usd_per_bag: number;
   total_usd_per_ton?: number;
   total_usd_per_ton_excl_family?: number;
+  fob_total_usd_per_ton?: number;
   yoy_pct: number;
   season_label: string;
   components: CostComponent[];
   inputs_detail: InputDetail[];
   sections?: CopSection[];
   kc_spot?: number | null;
-  rc_spot?: number | null;       // per-bag when using per-bag; per-ton when total_usd_per_ton present
+  rc_spot?: number | null;
   last_updated: string;
 }
 

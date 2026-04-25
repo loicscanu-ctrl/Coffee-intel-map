@@ -125,41 +125,50 @@ function secsAgo(iso: string): number {
   return Math.round((Date.now() - new Date(iso).getTime()) / 1000);
 }
 
-// ── KC/RC ratio column (one row per arabica contract, matched by month letter) ─
+// ── KC/RC ratio column (one row per arabica contract, mapped KC→RC with Z→F next year) ─
+
+const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"X", Z:"F" };
 
 function RatioColumn({ arabica, robusta }: { arabica: AcapheContract[]; robusta: AcapheContract[] }) {
-  const rcByLetter = new Map<string, number>();
-  robusta.forEach(c => rcByLetter.set(c.month[1], c.last));
+  // Key: letter+2-digit-year e.g. "K26", "F27"
+  const rcByKey = new Map<string, number>();
+  robusta.forEach(c => {
+    const key = c.month[1] + c.month.slice(-2);
+    if (!rcByKey.has(key)) rcByKey.set(key, c.last);
+  });
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden self-start hidden lg:block">
       <div className="px-3 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
         <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-widest whitespace-nowrap">Arbitrage</span>
       </div>
-      <table className="text-[10px] font-mono w-full">
+      <table className="text-[11px] font-mono w-full">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="px-2 py-1 text-left whitespace-nowrap">Pair</th>
-            <th className="px-2 py-1 text-right whitespace-nowrap">¢/lb (×)</th>
+            <th className="px-1.5 py-1 text-left whitespace-nowrap">Pair</th>
+            <th className="px-1.5 py-1 text-right whitespace-nowrap">¢/lb (×)</th>
           </tr>
         </thead>
         <tbody>
           {arabica.map((c, i) => {
-            const rc = rcByLetter.get(c.month[1]);
-            const kcCents = c.last;
-            const rcCents = rc ? rc / 22.046 : null;
-            const spread  = rcCents != null ? kcCents - rcCents : null;
-            const kcUsdMt = c.last * 22.046;
-            const ratio   = rc ? (kcUsdMt / rc).toFixed(2) : null;
-            const sym     = acapheToSymbol(c.month, true);
-            const rcSym   = acapheToSymbol(c.month, false);
-            const isFront = i === 0;
+            const kcLetter = c.month[1];
+            const kcYr     = c.month.slice(-2);
+            const rcLetter = KC_TO_RC_LETTER[kcLetter] ?? kcLetter;
+            const rcYr     = kcLetter === "Z" ? String(parseInt(kcYr) + 1).slice(-2) : kcYr;
+            const rc       = rcByKey.get(rcLetter + rcYr);
+            const kcCents  = c.last;
+            const rcCents  = rc != null ? rc / 22.046 : null;
+            const spread   = rcCents != null ? kcCents - rcCents : null;
+            const ratio    = rc != null ? (c.last * 22.046 / rc).toFixed(2) : null;
+            const sym      = acapheToSymbol(c.month, true);
+            const rcSym    = `RC${rcLetter}${rcYr}`;
+            const isFront  = i === 0;
             return (
               <tr key={c.month} className={`border-t border-slate-700 ${isFront ? "bg-slate-800/60" : ""}`}>
-                <td className={`px-2 py-1.5 whitespace-nowrap ${isFront ? "text-slate-200" : "text-slate-500"}`}>
+                <td className={`px-1.5 py-1.5 whitespace-nowrap ${isFront ? "text-slate-200" : "text-slate-500"}`}>
                   {sym}-{rcSym}
                 </td>
-                <td className={`px-2 py-1.5 text-right whitespace-nowrap ${isFront ? "text-sky-300" : "text-slate-500"}`}>
+                <td className={`px-1.5 py-1.5 text-right whitespace-nowrap ${isFront ? "text-sky-300" : "text-slate-500"}`}>
                   {spread != null ? `${spread.toFixed(1)} (×${ratio})` : "—"}
                 </td>
               </tr>

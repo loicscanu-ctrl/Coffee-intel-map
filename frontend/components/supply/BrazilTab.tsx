@@ -1379,7 +1379,6 @@ function CountryHubFilter({
   filter: FilterState;
   onChange: (f: FilterState) => void;
 }) {
-  // Get countries present in current data, sorted by export volume
   const sortedCountries = useMemo(() =>
     Object.entries(byCountry.countries ?? {})
       .sort((a, b) => Object.values(b[1]).reduce((s, v) => s + v, 0) - Object.values(a[1]).reduce((s, v) => s + v, 0))
@@ -1963,7 +1962,8 @@ export default function BrazilTab() {
           <SeasonalityHeatmap series={series} />
           <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <DestinationChart
-            byCountry={by_country}         byCountryPrev={by_country_prev}
+            byCountry={by_country}
+            byCountryPrev={by_country_prev}
             byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
             byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
             bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}

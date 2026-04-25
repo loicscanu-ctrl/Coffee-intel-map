@@ -257,14 +257,16 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       ROUTES.forEach((r) => {
         if (!r.path || r.path.length === 0) return;
 
+        const routeWeight = r.weight || 2;
+
         const visualLine = Leaflet.polyline(r.path, {
           color: r.color,
-          weight: r.weight || 2,
+          weight: routeWeight,
           opacity: 0.85,
           interactive: false,
         }).addTo(logisticsLayer);
         const el = (visualLine as any)._path;
-        if (el) el.classList.add(r.weight && r.weight >= 4 ? "flow-route-trunk" : "flow-route");
+        if (el) el.classList.add(routeWeight >= 4 ? "flow-route-trunk" : "flow-route");
 
         const hasCecafe = r.cecafeHubs && r.cecafeHubs.length > 0 && cecafeData;
         const hasVn = r.vnHubs && r.vnHubs.length > 0 && vnData;

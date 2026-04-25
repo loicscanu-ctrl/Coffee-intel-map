@@ -5,6 +5,7 @@
     "total_usd_per_bag": 112.3,
     "total_usd_per_ton": 1871,
     "total_usd_per_ton_excl_family": 1351,
+    "fob_total_usd_per_ton": 1936,
     "yoy_pct": 9.0,
     "season_label": "2024/25 · WASI / Dak Lak",
     "components": [
@@ -99,16 +100,62 @@
         ]
       },
       {
-        "number": 6, "label": "Depreciation",           "color": "#475569",
+        "number": 4, "label": "Management Costs", "color": "#475569",
+        "usd_per_ha": 0, "usd_per_ton": 0, "items": [
+          { "label": "Management costs", "usd_per_ha": 0, "usd_per_ton": 0 }
+        ]
+      },
+      {
+        "number": 5, "label": "Taxes", "color": "#475569",
+        "usd_per_ha": 0, "usd_per_ton": 0, "items": [
+          { "label": "Land taxes",  "usd_per_ha": 0, "usd_per_ton": 0 },
+          { "label": "Other taxes", "usd_per_ha": 0, "usd_per_ton": 0 }
+        ]
+      },
+      {
+        "number": 6, "label": "Depreciation",    "color": "#475569",
         "usd_per_ha": 73.51, "usd_per_ton": 27.2, "items": []
       },
       {
-        "number": 7, "label": "Financial Costs",         "color": "#475569",
+        "number": 7, "label": "Financial Costs", "color": "#475569",
         "usd_per_ha": 49.89, "usd_per_ton": 18.5, "items": []
       },
       {
-        "number": 8, "label": "Opp. Cost of Land",       "color": "#f59e0b",
+        "number": 8, "label": "Opp. Cost of Land", "color": "#f59e0b",
         "usd_per_ha": 805.57, "usd_per_ton": 298.3, "items": []
+      },
+      {
+        "number": 9, "label": "Opp. Cost of Labour", "color": "#475569",
+        "usd_per_ha": 0, "usd_per_ton": 0, "items": []
+      },
+      {
+        "number": 10, "label": "Processing Cost", "color": "#0ea5e9",
+        "unit": "USD/ton", "usd_per_ton": 17,
+        "note": "Hulling, milling, sorting at dry mill",
+        "items": [
+          { "label": "Processing cost", "usd_per_ton": 17 }
+        ]
+      },
+      {
+        "number": 11, "label": "Fobbing Cost (Transport to Port)", "color": "#0ea5e9",
+        "unit": "USD/ton", "usd_per_ton": 48,
+        "note": "Farm gate to FOB, bulk, Dak Lak origin",
+        "items": [
+          {
+            "label": "Transport to HCMC port", "usd_per_ton": 20,
+            "note": "Trucking Dak Lak → Ho Chi Minh City port"
+          },
+          {
+            "label": "Warehousing at port", "usd_per_ton": 4
+          },
+          {
+            "label": "Other (port fees, liner bags, docs, export taxes, interest)", "usd_per_ton": 24,
+            "items": [
+              { "label": "Interest / financing", "usd_per_ton": 4 },
+              { "label": "Port handling, materials, documentation, export taxes", "usd_per_ton": 20 }
+            ]
+          }
+        ]
       }
     ],
     "rc_spot": null,
