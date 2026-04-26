@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-04-25T05:42:54.229951Z",
+  "scraped_at": "2026-04-26T04:26:08.465804Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -104,14 +104,14 @@
     "source_label": "CONAB Safra Apr 2026"
   },
   "weather": {
-    "scraped_at": "2026-04-25T03:55:20.008415Z",
+    "scraped_at": "2026-04-26T04:25:25.525941Z",
     "regions": [
       {
         "name": "Sul de Minas",
         "frost": "NONE",
         "drought": "NONE",
-        "csi_30d": 89.6,
-        "csi_60d": 167.8,
+        "csi_30d": 89.5,
+        "csi_60d": 171.6,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -119,8 +119,8 @@
         "name": "Cerrado",
         "frost": "NONE",
         "drought": "NONE",
-        "csi_30d": 100.4,
-        "csi_60d": 157.9,
+        "csi_30d": 104.5,
+        "csi_60d": 162.1,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -128,8 +128,8 @@
         "name": "Paran\u00e1",
         "frost": "NONE",
         "drought": "LOW",
-        "csi_30d": 113.1,
-        "csi_60d": 210.9,
+        "csi_30d": 112.8,
+        "csi_60d": 210.7,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -137,8 +137,8 @@
         "name": "Esp\u00edrito Santo",
         "frost": "NONE",
         "drought": "MED",
-        "csi_30d": 91.0,
-        "csi_60d": 147.7,
+        "csi_30d": 90.0,
+        "csi_60d": 150.7,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }
@@ -178,7 +178,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -215,13 +214,14 @@
           "L",
           "M",
           "M",
+          "M",
+          "M",
+          "L",
+          "-",
           "L",
           "L",
           "L",
-          "L",
-          "L",
-          "L",
-          "L"
+          "-"
         ]
       },
       {
@@ -271,12 +271,10 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "-",
           "-",
           "-",
-          "L",
           "L",
           "L",
           "L",
@@ -294,7 +292,9 @@
           "M",
           "M",
           "M",
-          "L",
+          "M",
+          "M",
+          "M",
           "L",
           "L",
           "L",
@@ -311,7 +311,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -366,20 +365,21 @@
           "L",
           "L",
           "L",
-          "L",
           "-",
           "-",
           "-",
           "-",
+          "-",
+          "L",
+          "L",
+          "L",
+          "-",
+          "-",
           "L",
           "L",
           "L",
           "L",
-          "L",
-          "L",
-          "L",
-          "L",
-          "L"
+          "-"
         ]
       },
       {
@@ -389,7 +389,6 @@
           "-",
           "-",
           "-",
-          "-",
           "M",
           "M",
           "-",
@@ -454,10 +453,11 @@
           "M",
           "M",
           "M",
+          "M",
           "L",
-          "M",
-          "M",
-          "M",
+          "L",
+          "L",
+          "L",
           "M"
         ]
       }
@@ -466,13 +466,6 @@
       {
         "region": "Sul de Minas",
         "days": [
-          {
-            "date": "2026-02-24",
-            "vpd": 1.06,
-            "precip_prob": 100,
-            "soil_moisture": 0.373,
-            "drought_risk": "-"
-          },
           {
             "date": "2026-02-25",
             "vpd": 1.51,
@@ -888,114 +881,114 @@
           },
           {
             "date": "2026-04-25",
-            "vpd": 1.98,
+            "vpd": 1.88,
             "precip_prob": 0,
             "soil_moisture": 0.244,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-26",
-            "vpd": 2.35,
+            "vpd": 2.36,
             "precip_prob": 0,
             "soil_moisture": 0.241,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-27",
-            "vpd": 2.56,
-            "precip_prob": 2,
-            "soil_moisture": 0.238,
+            "vpd": 2.52,
+            "precip_prob": 0,
+            "soil_moisture": 0.239,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-28",
-            "vpd": 2.69,
-            "precip_prob": 6,
+            "vpd": 2.47,
+            "precip_prob": 4,
             "soil_moisture": 0.235,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-29",
-            "vpd": 2.69,
-            "precip_prob": 2,
+            "vpd": 2.42,
+            "precip_prob": 0,
             "soil_moisture": 0.232,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-30",
-            "vpd": 2.24,
-            "precip_prob": 2,
+            "vpd": 2.42,
+            "precip_prob": 0,
             "soil_moisture": 0.229,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-01",
-            "vpd": 2.56,
-            "precip_prob": 6,
-            "soil_moisture": 0.226,
+            "vpd": 2.52,
+            "precip_prob": 1,
+            "soil_moisture": 0.227,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-02",
-            "vpd": 2.52,
-            "precip_prob": 4,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "vpd": 2.48,
+            "precip_prob": 0,
+            "soil_moisture": 0.225,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-03",
-            "vpd": 1.9,
-            "precip_prob": 8,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "vpd": 2.55,
+            "precip_prob": 2,
+            "soil_moisture": 0.224,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-04",
-            "vpd": 1.97,
-            "precip_prob": 5,
+            "vpd": 2.53,
+            "precip_prob": 2,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-05",
-            "vpd": 2.22,
-            "precip_prob": 3,
+            "vpd": 2.0,
+            "precip_prob": 4,
             "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "drought_risk": "-"
           },
           {
             "date": "2026-05-06",
-            "vpd": 2.71,
+            "vpd": 1.37,
             "precip_prob": 8,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-07",
-            "vpd": 2.51,
-            "precip_prob": 14,
+            "vpd": 1.41,
+            "precip_prob": 12,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-08",
-            "vpd": 2.38,
+            "vpd": 1.63,
             "precip_prob": 16,
             "soil_moisture": 0.233,
             "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-09",
+            "vpd": 2.08,
+            "precip_prob": 12,
+            "soil_moisture": 0.233,
+            "drought_risk": "-"
           }
         ]
       },
       {
         "region": "Cerrado",
         "days": [
-          {
-            "date": "2026-02-24",
-            "vpd": 1.0,
-            "precip_prob": 100,
-            "soil_moisture": 0.379,
-            "drought_risk": "-"
-          },
           {
             "date": "2026-02-25",
             "vpd": 1.16,
@@ -1404,106 +1397,113 @@
           },
           {
             "date": "2026-04-24",
-            "vpd": 2.03,
+            "vpd": 2.02,
             "precip_prob": 0,
             "soil_moisture": 0.243,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-25",
-            "vpd": 2.33,
-            "precip_prob": 0,
+            "vpd": 2.25,
+            "precip_prob": 2,
             "soil_moisture": 0.241,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-26",
-            "vpd": 2.68,
-            "precip_prob": 0,
-            "soil_moisture": 0.238,
-            "drought_risk": "L"
-          },
-          {
-            "date": "2026-04-27",
-            "vpd": 3.04,
+            "vpd": 2.82,
             "precip_prob": 0,
             "soil_moisture": 0.234,
             "drought_risk": "L"
           },
           {
-            "date": "2026-04-28",
-            "vpd": 3.07,
-            "precip_prob": 2,
-            "soil_moisture": 0.232,
+            "date": "2026-04-27",
+            "vpd": 2.94,
+            "precip_prob": 0,
+            "soil_moisture": 0.231,
             "drought_risk": "L"
           },
           {
-            "date": "2026-04-29",
-            "vpd": 3.09,
+            "date": "2026-04-28",
+            "vpd": 3.13,
             "precip_prob": 0,
-            "soil_moisture": 0.229,
+            "soil_moisture": 0.228,
+            "drought_risk": "M"
+          },
+          {
+            "date": "2026-04-29",
+            "vpd": 2.87,
+            "precip_prob": 0,
+            "soil_moisture": 0.225,
             "drought_risk": "M"
           },
           {
             "date": "2026-04-30",
-            "vpd": 2.73,
+            "vpd": 2.69,
             "precip_prob": 0,
-            "soil_moisture": 0.226,
+            "soil_moisture": 0.222,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-01",
-            "vpd": 2.73,
+            "vpd": 2.58,
             "precip_prob": 0,
-            "soil_moisture": 0.224,
+            "soil_moisture": 0.22,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-02",
-            "vpd": 3.19,
+            "vpd": 3.0,
             "precip_prob": 0,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "soil_moisture": 0.217,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-03",
-            "vpd": 3.44,
+            "vpd": 3.16,
             "precip_prob": 0,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "soil_moisture": 0.217,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-04",
-            "vpd": 3.31,
+            "vpd": 3.3,
             "precip_prob": 0,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-05",
-            "vpd": 3.26,
+            "vpd": 3.24,
             "precip_prob": 0,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-06",
-            "vpd": 3.37,
-            "precip_prob": 0,
+            "vpd": 3.11,
+            "precip_prob": 2,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-07",
-            "vpd": 3.42,
-            "precip_prob": 4,
+            "vpd": 2.17,
+            "precip_prob": 2,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-08",
-            "vpd": 3.52,
-            "precip_prob": 6,
+            "vpd": 2.26,
+            "precip_prob": 4,
+            "soil_moisture": 0.233,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-09",
+            "vpd": 3.01,
+            "precip_prob": 4,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           }
@@ -1512,13 +1512,6 @@
       {
         "region": "Paran\u00e1",
         "days": [
-          {
-            "date": "2026-02-24",
-            "vpd": 1.97,
-            "precip_prob": 82,
-            "soil_moisture": 0.321,
-            "drought_risk": "-"
-          },
           {
             "date": "2026-02-25",
             "vpd": 1.36,
@@ -1927,121 +1920,121 @@
           },
           {
             "date": "2026-04-24",
-            "vpd": 2.31,
+            "vpd": 2.3,
             "precip_prob": 0,
-            "soil_moisture": 0.293,
+            "soil_moisture": 0.294,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-25",
-            "vpd": 2.78,
-            "precip_prob": 25,
-            "soil_moisture": 0.291,
-            "drought_risk": "L"
+            "vpd": 2.88,
+            "precip_prob": 33,
+            "soil_moisture": 0.296,
+            "drought_risk": "-"
           },
           {
             "date": "2026-04-26",
-            "vpd": 2.68,
-            "precip_prob": 55,
-            "soil_moisture": 0.288,
+            "vpd": 2.85,
+            "precip_prob": 45,
+            "soil_moisture": 0.295,
             "drought_risk": "-"
           },
           {
             "date": "2026-04-27",
-            "vpd": 0.68,
-            "precip_prob": 90,
-            "soil_moisture": 0.287,
+            "vpd": 0.37,
+            "precip_prob": 88,
+            "soil_moisture": 0.298,
             "drought_risk": "-"
           },
           {
             "date": "2026-04-28",
-            "vpd": 1.28,
-            "precip_prob": 78,
-            "soil_moisture": 0.288,
+            "vpd": 0.65,
+            "precip_prob": 88,
+            "soil_moisture": 0.301,
             "drought_risk": "-"
           },
           {
             "date": "2026-04-29",
-            "vpd": 1.57,
-            "precip_prob": 54,
-            "soil_moisture": 0.287,
+            "vpd": 1.28,
+            "precip_prob": 70,
+            "soil_moisture": 0.303,
             "drought_risk": "-"
           },
           {
             "date": "2026-04-30",
-            "vpd": 1.58,
-            "precip_prob": 40,
-            "soil_moisture": 0.292,
+            "vpd": 1.38,
+            "precip_prob": 24,
+            "soil_moisture": 0.3,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-01",
-            "vpd": 1.75,
-            "precip_prob": 13,
-            "soil_moisture": 0.292,
+            "vpd": 1.7,
+            "precip_prob": 2,
+            "soil_moisture": 0.297,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-02",
-            "vpd": 1.99,
-            "precip_prob": 10,
-            "soil_moisture": 0.233,
+            "vpd": 2.22,
+            "precip_prob": 7,
+            "soil_moisture": 0.294,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-03",
-            "vpd": 1.49,
-            "precip_prob": 7,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "vpd": 1.22,
+            "precip_prob": 20,
+            "soil_moisture": 0.293,
+            "drought_risk": "-"
           },
           {
             "date": "2026-05-04",
-            "vpd": 1.68,
-            "precip_prob": 4,
+            "vpd": 0.6,
+            "precip_prob": 12,
             "soil_moisture": 0.233,
-            "drought_risk": "L"
+            "drought_risk": "-"
           },
           {
             "date": "2026-05-05",
-            "vpd": 2.27,
-            "precip_prob": 10,
+            "vpd": 1.43,
+            "precip_prob": 14,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-06",
-            "vpd": 2.57,
-            "precip_prob": 10,
-            "soil_moisture": 0.233,
-            "drought_risk": "L"
-          },
-          {
-            "date": "2026-05-07",
-            "vpd": 2.43,
+            "vpd": 1.37,
             "precip_prob": 12,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
-            "date": "2026-05-08",
-            "vpd": 2.17,
-            "precip_prob": 10,
+            "date": "2026-05-07",
+            "vpd": 1.46,
+            "precip_prob": 9,
             "soil_moisture": 0.233,
             "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-08",
+            "vpd": 1.65,
+            "precip_prob": 19,
+            "soil_moisture": 0.233,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-09",
+            "vpd": 1.14,
+            "precip_prob": 19,
+            "soil_moisture": 0.233,
+            "drought_risk": "-"
           }
         ]
       },
       {
         "region": "Esp\u00edrito Santo",
         "days": [
-          {
-            "date": "2026-02-24",
-            "vpd": 0.48,
-            "precip_prob": 100,
-            "soil_moisture": 0.333,
-            "drought_risk": "-"
-          },
           {
             "date": "2026-02-25",
             "vpd": 1.29,
@@ -2457,99 +2450,106 @@
           },
           {
             "date": "2026-04-25",
-            "vpd": 1.45,
-            "precip_prob": 41,
-            "soil_moisture": 0.27,
+            "vpd": 1.31,
+            "precip_prob": 98,
+            "soil_moisture": 0.269,
             "drought_risk": "L"
           },
           {
             "date": "2026-04-26",
-            "vpd": 1.99,
+            "vpd": 1.81,
             "precip_prob": 4,
-            "soil_moisture": 0.267,
+            "soil_moisture": 0.266,
             "drought_risk": "M"
           },
           {
             "date": "2026-04-27",
             "vpd": 1.74,
-            "precip_prob": 8,
-            "soil_moisture": 0.264,
+            "precip_prob": 4,
+            "soil_moisture": 0.263,
             "drought_risk": "M"
           },
           {
             "date": "2026-04-28",
-            "vpd": 1.81,
-            "precip_prob": 2,
-            "soil_moisture": 0.262,
+            "vpd": 1.83,
+            "precip_prob": 0,
+            "soil_moisture": 0.26,
             "drought_risk": "M"
           },
           {
             "date": "2026-04-29",
-            "vpd": 1.86,
+            "vpd": 1.65,
             "precip_prob": 16,
-            "soil_moisture": 0.259,
+            "soil_moisture": 0.258,
             "drought_risk": "M"
           },
           {
             "date": "2026-04-30",
-            "vpd": 1.99,
-            "precip_prob": 2,
-            "soil_moisture": 0.256,
+            "vpd": 1.92,
+            "precip_prob": 0,
+            "soil_moisture": 0.255,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-01",
-            "vpd": 1.96,
-            "precip_prob": 4,
-            "soil_moisture": 0.254,
+            "vpd": 2.02,
+            "precip_prob": 6,
+            "soil_moisture": 0.253,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-02",
-            "vpd": 1.99,
-            "precip_prob": 8,
-            "soil_moisture": 0.233,
+            "vpd": 1.78,
+            "precip_prob": 2,
+            "soil_moisture": 0.25,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-03",
-            "vpd": 1.94,
-            "precip_prob": 6,
-            "soil_moisture": 0.233,
+            "vpd": 1.98,
+            "precip_prob": 2,
+            "soil_moisture": 0.249,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-04",
-            "vpd": 0.93,
-            "precip_prob": 14,
+            "vpd": 2.28,
+            "precip_prob": 12,
+            "soil_moisture": 0.233,
+            "drought_risk": "M"
+          },
+          {
+            "date": "2026-05-05",
+            "vpd": 1.05,
+            "precip_prob": 8,
             "soil_moisture": 0.233,
             "drought_risk": "L"
           },
           {
-            "date": "2026-05-05",
-            "vpd": 1.63,
-            "precip_prob": 4,
-            "soil_moisture": 0.233,
-            "drought_risk": "M"
-          },
-          {
             "date": "2026-05-06",
-            "vpd": 2.13,
-            "precip_prob": 22,
+            "vpd": 0.89,
+            "precip_prob": 18,
             "soil_moisture": 0.233,
-            "drought_risk": "M"
+            "drought_risk": "L"
           },
           {
             "date": "2026-05-07",
-            "vpd": 2.1,
-            "precip_prob": 18,
+            "vpd": 1.09,
+            "precip_prob": 20,
             "soil_moisture": 0.233,
-            "drought_risk": "M"
+            "drought_risk": "L"
           },
           {
             "date": "2026-05-08",
-            "vpd": 1.76,
-            "precip_prob": 16,
+            "vpd": 1.33,
+            "precip_prob": 32,
+            "soil_moisture": 0.233,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-09",
+            "vpd": 1.6,
+            "precip_prob": 20,
             "soil_moisture": 0.233,
             "drought_risk": "M"
           }
@@ -2559,31 +2559,31 @@
     "current_conditions": [
       {
         "region": "Sul de Minas",
-        "temp_c": 25.9,
-        "dew_point_c": 19.6,
-        "cloud_cover_pct": 98.8,
-        "wind_speed_kmh": 9.0
+        "temp_c": 28.2,
+        "dew_point_c": 19.9,
+        "cloud_cover_pct": 92.5,
+        "wind_speed_kmh": 12.3
       },
       {
         "region": "Cerrado",
-        "temp_c": 26.0,
-        "dew_point_c": 20.2,
-        "cloud_cover_pct": 98.5,
-        "wind_speed_kmh": 21.9
+        "temp_c": 26.9,
+        "dew_point_c": 20.3,
+        "cloud_cover_pct": 99.9,
+        "wind_speed_kmh": 21.4
       },
       {
         "region": "Paran\u00e1",
-        "temp_c": 30.3,
-        "dew_point_c": 20.1,
-        "cloud_cover_pct": 67.3,
-        "wind_speed_kmh": 14.7
+        "temp_c": 28.4,
+        "dew_point_c": 21.1,
+        "cloud_cover_pct": 86.7,
+        "wind_speed_kmh": 18.4
       },
       {
         "region": "Esp\u00edrito Santo",
-        "temp_c": 24.3,
-        "dew_point_c": 21.5,
+        "temp_c": 28.4,
+        "dew_point_c": 21.6,
         "cloud_cover_pct": 100.0,
-        "wind_speed_kmh": 11.8
+        "wind_speed_kmh": 12.4
       }
     ]
   },
@@ -2753,7 +2753,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Brazil arabica output expected",
-    "last_updated": "2026-04-25"
+    "last_updated": "2026-04-26"
   },
   "fertilizer": {
     "items": [
