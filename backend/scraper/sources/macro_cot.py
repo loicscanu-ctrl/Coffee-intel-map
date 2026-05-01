@@ -549,6 +549,11 @@ def _fetch_yfinance_prices(symbols_dates: list) -> dict:
     return results
 
 
+def _phase(name: str) -> None:
+    """Log a phase marker so CI logs make it obvious where the scraper died."""
+    print(f"[macro_cot] PHASE: {name}", file=sys.stderr, flush=True)
+
+
 def _fetch_and_upsert(db) -> None:
     from scraper.db_macro import upsert_commodity_cot, upsert_commodity_price
     from scraper.db import upsert_cot_weekly
@@ -557,6 +562,7 @@ def _fetch_and_upsert(db) -> None:
     year  = today.year
 
     # Download CFTC — fallback to prior year if current year returns 0 rows
+    _phase(f"download_cftc({year})")
     try:
         cftc_df = _download_cftc_df(year)
         if len(cftc_df) == 0:
@@ -564,8 +570,10 @@ def _fetch_and_upsert(db) -> None:
     except Exception as e:
         print(f"[macro_cot] CFTC {year} unavailable ({e}), falling back to {year - 1}", file=sys.stderr)
         cftc_df = _download_cftc_df(year - 1)
+    print(f"[macro_cot] CFTC rows: {len(cftc_df)}", file=sys.stderr)
 
     # Download ICE Europe — same fallback
+    _phase(f"download_ice({year})")
     try:
         ice_df = _download_ice_df(year)
         if len(ice_df) == 0:
@@ -573,7 +581,9 @@ def _fetch_and_upsert(db) -> None:
     except Exception as e:
         print(f"[macro_cot] ICE {year} unavailable ({e}), falling back to {year - 1}", file=sys.stderr)
         ice_df = _download_ice_df(year - 1)
+    print(f"[macro_cot] ICE rows: {len(ice_df)}", file=sys.stderr)
 
+    _phase("parse_positions")
     cot_data = {}
     cot_data.update(_parse_cftc(cftc_df))
     cot_data.update(_parse_ice(ice_df))
@@ -583,12 +593,14 @@ def _fetch_and_upsert(db) -> None:
     print(f"[macro_cot] report dates in this run: {dates_seen}", file=sys.stderr)
 
     # Upsert COT rows into commodity_cot (all symbols)
+    _phase(f"upsert_commodity_cot({len(cot_data)} symbols)")
     for sym, (report_date, fields) in cot_data.items():
         upsert_commodity_cot(db, sym, report_date, fields)
 
     # ── Upsert full positions + trader counts into cot_weekly for arabica/robusta ──
     # This keeps the Dry Powder chart current without requiring a manual Excel import.
     # Only position/trader fields are written; price fields remain under Excel-import control.
+    _phase("upsert_cot_weekly_coffee")
     arabica_full = _parse_full_symbol(
         cftc_df, _CFTC_MARKET_COL, _CFTC_DATE_COL,
         COMMODITY_SPECS["arabica"]["cftc_filter"],
@@ -619,6 +631,7 @@ def _fetch_and_upsert(db) -> None:
         for sym in cot_data
         if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
+    _phase(f"fetch_yfinance({len(yfinance_pairs)} pairs)")
     price_cache = _fetch_yfinance_prices(yfinance_pairs)
 
     # Build stooq fetch list
@@ -627,6 +640,7 @@ def _fetch_and_upsert(db) -> None:
         for sym in cot_data
         if COMMODITY_SPECS[sym]["price_source"] == "stooq"
     ]
+    _phase(f"fetch_stooq({len(stooq_pairs)} pairs)")
     stooq_cache = _fetch_stooq_prices(stooq_pairs)
 
     # Fetch GBP/USD rates for any yfinance_gbp symbols
@@ -635,8 +649,10 @@ def _fetch_and_upsert(db) -> None:
         for sym in cot_data
         if COMMODITY_SPECS[sym]["price_source"] == "yfinance_gbp"
     }
+    _phase(f"fetch_gbpusd({len(gbp_dates)} dates)")
     gbpusd_cache = _fetch_gbpusd_rates(gbp_dates) if gbp_dates else {}
 
+    _phase(f"upsert_prices({len(cot_data)} symbols)")
     for sym in cot_data:
         report_date = cot_data[sym][0]
         spec = COMMODITY_SPECS[sym]

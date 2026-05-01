@@ -45,14 +45,18 @@ async def _run_one(source, browser, semaphore, db) -> int:
             await page.close()
 
 
-async def _run_side_channel(name, coro_fn, browser) -> None:
-    """Run a side-channel scraper (no news items returned) with its own page."""
+async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEOUT) -> None:
+    """Run a side-channel scraper (no news items returned) with its own page.
+    timeout: per-source override. macro_cot in particular needs more headroom
+    than the news scrapers because it does ~25 sequential yfinance.download()
+    calls plus CFTC + ICE + stooq downloads.
+    """
     page = await browser.new_page()
     try:
-        await asyncio.wait_for(coro_fn(page), timeout=SCRAPER_TIMEOUT)
+        await asyncio.wait_for(coro_fn(page), timeout=timeout)
         print(f"[scraper] {name}: OK")
     except asyncio.TimeoutError:
-        print(f"[scraper] {name}: TIMEOUT after {SCRAPER_TIMEOUT}s — skipped")
+        print(f"[scraper] {name}: TIMEOUT after {timeout}s — skipped")
     except Exception as e:
         print(f"[scraper] {name} failed: {e}")
     finally:
@@ -73,14 +77,16 @@ async def run_all_scrapers():
             total = sum(counts)
 
             # Phase 2: side-channel scrapers — run sequentially (they write to
-            # their own tables and don't return news items)
+            # their own tables and don't return news items). Per-source timeout
+            # overrides: macro_cot does ~25 yfinance downloads + CFTC + ICE
+            # which routinely takes 3–5 minutes.
             db_ref = db
-            for name, coro_fn in [
-                ("macro_cot",        lambda p: _macro_cot.run(p)),
-                ("farmer_economics", lambda p: _farmer_economics.run(p, db_ref)),
-                ("dry_bulk",         lambda p: _dry_bulk.run(p, db_ref)),
+            for name, coro_fn, timeout in [
+                ("macro_cot",        lambda p: _macro_cot.run(p),                  420),
+                ("farmer_economics", lambda p: _farmer_economics.run(p, db_ref),   SCRAPER_TIMEOUT),
+                ("dry_bulk",         lambda p: _dry_bulk.run(p, db_ref),           SCRAPER_TIMEOUT),
             ]:
-                await _run_side_channel(name, coro_fn, browser)
+                await _run_side_channel(name, coro_fn, browser, timeout=timeout)
 
             await browser.close()
     finally:
