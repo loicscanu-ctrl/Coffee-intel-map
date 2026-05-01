@@ -13,8 +13,14 @@ const MOCK_DATA = [
 
 export default async function StocksPage() {
   const [stocksRaw, news] = await Promise.all([
-    fetchStocks().catch(() => []),
-    fetchNews().catch(() => []),
+    fetchStocks().catch((e) => {
+      console.error("[stocks] fetchStocks failed", e);
+      return [];
+    }),
+    fetchNews().catch((e) => {
+      console.error("[stocks] fetchNews failed", e);
+      return [];
+    }),
   ]);
   const stocks = stocksRaw.length > 0 ? stocksRaw : MOCK_DATA;
   return <StocksClient stocks={stocks} news={news} />;
