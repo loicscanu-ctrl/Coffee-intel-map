@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 1 * * *'  # 01:00 UTC daily
   workflow_dispatch:
+  # Run automatically when scraper source code lands on main, so a fix
+  # gets verified end-to-end without waiting for the next cron tick.
+  push:
+    branches: [main]
+    paths:
+      - 'backend/scraper/**'
 
 jobs:
   scrape:
