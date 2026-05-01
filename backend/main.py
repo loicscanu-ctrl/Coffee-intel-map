@@ -13,11 +13,12 @@ from routes.futures import router as futures_router
 
 app = FastAPI(title="Coffee Intel API")
 
-_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+_cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
-    allow_methods=["*"],
+    # API is read-only; pinning verbs avoids accidentally widening surface area.
+    allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -30,9 +31,13 @@ app.include_router(futures_router)
 
 @app.on_event("startup")
 def startup():
+    # create_all is idempotent and only adds missing tables, so it's safe to
+    # leave on. Seeding, however, is one-shot data insertion — gate it so
+    # production deployments don't waste startup time re-running upserts.
     Base.metadata.create_all(bind=engine)
-    from seed import run_seed
-    run_seed()
+    if os.getenv("SEED_ON_STARTUP", "1") == "1":
+        from seed import run_seed
+        run_seed()
 
 @app.get("/health")
 def health():
