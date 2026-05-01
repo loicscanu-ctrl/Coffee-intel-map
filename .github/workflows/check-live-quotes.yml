@@ -25,8 +25,11 @@ jobs:
         run: |
           set -u
           if [ -z "${UPSTASH_REDIS_REST_URL:-}" ] || [ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]; then
-            echo "::error::Upstash credentials not configured"
-            exit 1
+            # Skip rather than fail — the workflow is opt-in. Add
+            # UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN as
+            # GitHub repo secrets to enable the check.
+            echo "::warning::Upstash credentials not configured — skipping freshness check. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN as repo secrets to enable."
+            exit 0
           fi
 
           url="${UPSTASH_REDIS_REST_URL%/}/get/live_quotes"
