@@ -4,8 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { API_URL } from "@/lib/api";
 
 interface SeriesPoint { day: number; oi: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }

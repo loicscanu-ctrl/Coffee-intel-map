@@ -1,0 +1,83 @@
+name: Check Live Quotes Freshness
+
+# Reads `live_quotes` from Upstash Redis and pings Telegram if `fetched_at` is
+# older than STALE_HOURS. The acaphe_poller process runs outside GitHub Actions
+# (external host), so the existing `if: failure()` notifications never fire when
+# it dies silently. This workflow closes that gap.
+
+on:
+  schedule:
+    - cron: '15 * * * *'   # hourly at :15
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Fetch live_quotes and check age
+        env:
+          UPSTASH_REDIS_REST_URL:   ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          TELEGRAM_BOT_TOKEN:       ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:         ${{ secrets.TELEGRAM_CHAT_ID }}
+          STALE_HOURS:              "6"
+        run: |
+          set -u
+          if [ -z "${UPSTASH_REDIS_REST_URL:-}" ] || [ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]; then
+            echo "::error::Upstash credentials not configured"
+            exit 1
+          fi
+
+          url="${UPSTASH_REDIS_REST_URL%/}/get/live_quotes"
+          http_code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${UPSTASH_REDIS_REST_TOKEN}" "$url")
+
+          notify() {
+            local msg="$1"
+            echo "::error::$msg"
+            if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                -d "chat_id=${TELEGRAM_CHAT_ID}" \
+                -d "text=🚨 Live quotes alert — ${msg} — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+                >/dev/null || true
+            fi
+            exit 1
+          }
+
+          if [ "$http_code" != "200" ]; then
+            notify "Upstash GET returned HTTP ${http_code}"
+          fi
+
+          python - <<'PY' | tee /tmp/check.log
+          import json, os, sys
+          from datetime import datetime, timezone
+
+          stale_hours = float(os.environ.get("STALE_HOURS", "6"))
+          with open("/tmp/resp.json") as f:
+              wrapper = json.load(f)
+
+          result = wrapper.get("result")
+          if result in (None, ""):
+              print("STALE_REASON=Upstash key live_quotes is empty (poller never wrote, or key was evicted)")
+              sys.exit(2)
+
+          payload = json.loads(result) if isinstance(result, str) else result
+          fetched_at = payload.get("fetched_at")
+          if not fetched_at:
+              print("STALE_REASON=fetched_at missing from payload (poller may be misconfigured)")
+              sys.exit(3)
+
+          ts = datetime.fromisoformat(fetched_at.replace("Z", "+00:00"))
+          age_h = (datetime.now(timezone.utc) - ts).total_seconds() / 3600
+          print(f"fetched_at={fetched_at} age_hours={age_h:.2f} threshold={stale_hours}")
+          if age_h > stale_hours:
+              print(f"STALE_REASON=live_quotes is {age_h:.1f}h old (threshold {stale_hours}h) — poller is down")
+              sys.exit(4)
+          PY
+          rc=${PIPESTATUS[0]}
+          if [ "$rc" -ne 0 ]; then
+            reason=$(grep -m1 '^STALE_REASON=' /tmp/check.log | cut -d= -f2-)
+            notify "${reason:-freshness check failed (exit $rc)}"
+          fi
+          echo "Live quotes are fresh."
