@@ -13,6 +13,10 @@ if (typeof window !== "undefined" && !RAW_API_URL && window.location.hostname !=
 }
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 50;
+// Map preserves insertion order — re-inserting a key on hit makes it the most
+// recent, so eviction below targets the oldest entry. Bounded so the cache
+// can't grow indefinitely on a long-lived tab.
 const _cache = new Map<string, { data: any; ts: number }>();
 
 async function apiGet(path: string, init?: RequestInit): Promise<any> {
@@ -28,10 +32,22 @@ async function apiGet(path: string, init?: RequestInit): Promise<any> {
 async function cachedFetch(path: string): Promise<any> {
   const url = `${API_URL}${path}`;
   const hit = _cache.get(url);
-  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) return hit.data;
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    _cache.delete(url);
+    _cache.set(url, hit);
+    return hit.data;
+  }
   const data = await apiGet(path);
   _cache.set(url, { data, ts: Date.now() });
+  if (_cache.size > CACHE_MAX_ENTRIES) {
+    const oldest = _cache.keys().next().value;
+    if (oldest !== undefined) _cache.delete(oldest);
+  }
   return data;
+}
+
+export function clearApiCache(): void {
+  _cache.clear();
 }
 
 export async function fetchMapCountries() {
@@ -56,7 +72,22 @@ export async function fetchFreight() {
   return cachedFetch("/api/freight");
 }
 
-export async function fetchCot(after?: string): Promise<any[]> {
+export interface CotMarketRow {
+  pmpu_long: number | null;   pmpu_short: number | null;
+  swap_long: number | null;   swap_short: number | null;   swap_spread: number | null;
+  mm_long: number | null;     mm_short: number | null;     mm_spread: number | null;
+  other_long: number | null;  other_short: number | null;  other_spread: number | null;
+  nr_long: number | null;     nr_short: number | null;
+  oi_total?: number | null;
+}
+
+export interface CotWeekly {
+  date: string;
+  ny:  CotMarketRow | null;
+  ldn: CotMarketRow | null;
+}
+
+export async function fetchCot(after?: string): Promise<CotWeekly[]> {
   const path = after ? `/api/cot?after=${encodeURIComponent(after)}` : "/api/cot";
   return cachedFetch(path);
 }

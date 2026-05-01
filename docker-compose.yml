@@ -2,9 +2,11 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: coffee_intel
-      POSTGRES_USER: coffee
-      POSTGRES_PASSWORD: coffee
+      POSTGRES_DB:       ${POSTGRES_DB:-coffee_intel}
+      POSTGRES_USER:     ${POSTGRES_USER:-coffee}
+      # No default — compose will refuse to start if unset, so a misconfigured
+      # prod deploy fails loudly instead of using a public test password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required (set in .env)}
     ports:
       - "5432:5432"
     volumes:
