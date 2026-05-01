@@ -27,13 +27,14 @@ jobs:
           import json, os, sys
           from datetime import datetime, timezone
 
-          # Per-scraper staleness threshold in hours. Pick generous numbers to
-          # cover weekends and natural source cadences (CFTC COT is weekly,
-          # fertilizer reports are monthly, etc.).
+          # Per-scraper staleness threshold in hours. CFTC publishes COT
+          # reports as-of Tuesday on Friday evening, so by Friday morning the
+          # latest available data is legitimately ~10 days old by as-of date.
+          # 11 days gives one publication cycle of slack before alerting.
           THRESHOLDS_H = {
               "futures":          48,
-              "cot":              8 * 24,
-              "macro_cot":        8 * 24,
+              "cot":              11 * 24,
+              "macro_cot":        11 * 24,
               "freight":          48,
               "weather":          48,
               "enso":             48,
