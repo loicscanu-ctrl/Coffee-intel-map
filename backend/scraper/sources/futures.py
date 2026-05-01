@@ -167,10 +167,13 @@ async def _barchart_playwright(page) -> dict:
 def _yfinance_fallback() -> dict:
     """
     Yahoo Finance fallback — always reachable from CI, no browser needed.
-    Builds a best-effort chain using known contract month letters.
-    OI not available; front ~2-3 contracts will have data.
+    Builds a best-effort chain using known contract month letters; if Yahoo's
+    per-contract symbols return nothing (common for Robusta), falls back to
+    the continuous front-month symbol so we always emit at least a front quote.
+    OI is not exposed by Yahoo.
     """
     try:
+        import math
         import yfinance as yf
         from datetime import timedelta
 
@@ -184,44 +187,95 @@ def _yfinance_fallback() -> dict:
                         syms.append(f"{prefix}{letter}{str(yr)[-2:]}{yf_suffix}")
             return syms[:7]
 
+        def _quote_from_history(sym: str, decimals: int):
+            """Fetch last/prev close + volume from Yahoo. Returns None on no data."""
+            hist = yf.Ticker(sym).history(period="5d", auto_adjust=False)
+            if hist.empty:
+                return None
+            hist = hist.dropna(subset=["Close"])
+            if hist.empty:
+                return None
+            row  = hist.iloc[-1]
+            prev = hist.iloc[-2] if len(hist) > 1 else None
+            close = float(row["Close"])
+            prev_close = float(prev["Close"]) if prev is not None else close
+            vol_raw = row.get("Volume")
+            try:
+                vol = 0 if vol_raw is None or math.isnan(float(vol_raw)) else int(vol_raw)
+            except (TypeError, ValueError):
+                vol = 0
+            return {
+                "last":   round(close, decimals),
+                "chg":    round(close - prev_close, decimals),
+                "volume": vol,
+            }
+
         kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
+        # Per-contract Robusta on Yahoo is unreliable; we keep an attempt list
+        # but expect to fall through to the continuous-front symbol below.
         rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
 
         result = {}
-        for label, syms, product in [("kc", kc_syms, "KC"), ("rm", rm_syms, "RC")]:
+        for label, syms, product, decimals, cont_sym, cont_letter in [
+            ("kc", kc_syms, "KC", 2, "KC=F", _active_front_symbol("KC", _KC_MONTHS)),
+            ("rm", rm_syms, "RC", 0, "RM=F", _active_front_symbol("RM", _RM_MONTHS)),
+        ]:
             contracts = []
             for sym in syms:
                 try:
-                    hist = yf.Ticker(sym).history(period="3d", auto_adjust=False)
-                    if hist.empty:
-                        continue
-                    row  = hist.iloc[-1]
-                    prev = hist.iloc[-2] if len(hist) > 1 else None
-                    close = float(row["Close"])
-                    prev_close = float(prev["Close"]) if prev is not None else close
-                    chg   = round(close - prev_close, 2 if product == "KC" else 0)
-                    vol   = int(row["Volume"]) if not __import__("math").isnan(row["Volume"]) else 0
-                    # Reconstruct expiry from the symbol letters
-                    letter = sym[2]
-                    yr2    = sym[3:5]
-                    mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
-                    expiry = f"20{yr2}-{mnum:02d}-15"  # approximate mid-month
-                    bare_sym = sym.split(".")[0]
-                    contracts.append({
-                        "contract": f"{product} {letter}{yr2}",
-                        "expiry":   expiry,
-                        "last":     close,
-                        "chg":      chg,
-                        "oi":       None,
-                        "volume":   vol,
-                        "symbol":   bare_sym,
-                    })
-                except Exception:
+                    quote = _quote_from_history(sym, decimals)
+                except Exception as e:
+                    print(f"[futures] yfinance {sym}: {e}")
                     continue
+                if not quote:
+                    continue
+                letter = sym[2]
+                yr2    = sym[3:5]
+                mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
+                expiry = f"20{yr2}-{mnum:02d}-15"
+                contracts.append({
+                    "contract": f"{product} {letter}{yr2}",
+                    "expiry":   expiry,
+                    "last":     quote["last"],
+                    "chg":      quote["chg"],
+                    "oi":       None,
+                    "volume":   quote["volume"],
+                    "symbol":   sym.split(".")[0],
+                })
+
+            # Continuous front-month fallback — always populated on Yahoo.
+            if not contracts:
+                try:
+                    quote = _quote_from_history(cont_sym, decimals)
+                except Exception as e:
+                    print(f"[futures] yfinance {cont_sym}: {e}")
+                    quote = None
+                if quote:
+                    letter = cont_letter[2]
+                    yr2    = cont_letter[3:5]
+                    mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
+                    contracts.append({
+                        "contract": f"{product} {letter}{yr2} (continuous)",
+                        "expiry":   f"20{yr2}-{mnum:02d}-15",
+                        "last":     quote["last"],
+                        "chg":      quote["chg"],
+                        "oi":       None,
+                        "volume":   quote["volume"],
+                        "symbol":   cont_letter,
+                    })
+                    print(f"[futures] yfinance {label}: using continuous {cont_sym}")
+
             if contracts:
                 result[label] = {"data": [{"raw": c} for c in contracts], "_yf": True}
+
         if result:
-            print(f"[futures] yfinance fallback: kc={len(result.get('kc',{}).get('data',[]))} rm={len(result.get('rm',{}).get('data',[]))}")
+            print(
+                f"[futures] yfinance fallback: "
+                f"kc={len(result.get('kc',{}).get('data',[]))} "
+                f"rm={len(result.get('rm',{}).get('data',[]))}"
+            )
+        else:
+            print("[futures] yfinance fallback: no data from any symbol")
         return result
     except Exception as e:
         print(f"[futures] yfinance fallback failed: {e}")
@@ -288,17 +342,33 @@ def _parse_chain(raw_data: dict, label: str) -> list[dict]:
     return contracts
 
 
+def _fmt_num(v, decimals: int = 0) -> str:
+    if v is None:
+        return "?"
+    try:
+        return f"{v:,.{decimals}f}" if decimals else f"{int(v):,}"
+    except Exception:
+        return str(v)
+
+
 def _make_chain_item(contracts: list[dict], product: str, source_sym: str) -> dict | None:
     if not contracts:
         return None
     front = contracts[0]
     second = contracts[1] if len(contracts) > 1 else None
     chg_sign = "+" if (front.get("chg") or 0) >= 0 else ""
-    body_parts = [f"Front ({front['contract']}): {front['last']} ({chg_sign}{front['chg']}) OI:{front['oi']:,}"]
+    body_parts = [
+        f"Front ({front['contract']}): {_fmt_num(front.get('last'), 2)} "
+        f"({chg_sign}{front.get('chg') if front.get('chg') is not None else '?'}) "
+        f"OI:{_fmt_num(front.get('oi'))}"
+    ]
     if second:
         chg2 = second.get("chg") or 0
         sign2 = "+" if chg2 >= 0 else ""
-        body_parts.append(f"2nd ({second['contract']}): {second['last']} ({sign2}{chg2}) OI:{second['oi']:,}")
+        body_parts.append(
+            f"2nd ({second['contract']}): {_fmt_num(second.get('last'), 2)} "
+            f"({sign2}{chg2}) OI:{_fmt_num(second.get('oi'))}"
+        )
     tags = ["futures", "price"]
     if "Arabica" in product or source_sym == "KC":
         tags += ["arabica"]
