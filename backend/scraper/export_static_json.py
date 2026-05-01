@@ -27,6 +27,7 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cot_schema import serialize_cot_row
 from database import SessionLocal
 from models import NewsItem, CotWeekly, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport, PhysicalPrice
 from scraper.sources.macro_cot import COMMODITY_SPECS
@@ -214,44 +215,6 @@ def export_oi_history() -> None:
 
 # ── 4. COT weekly ─────────────────────────────────────────────────────────────
 
-def _cot_row_to_dict(row: CotWeekly) -> dict:
-    return {
-        "oi_total":       row.oi_total,
-        "pmpu_long":      row.pmpu_long,      "pmpu_short":     row.pmpu_short,
-        "swap_long":      row.swap_long,       "swap_short":     row.swap_short,
-        "swap_spread":    row.swap_spread,
-        "mm_long":        row.mm_long,         "mm_short":       row.mm_short,
-        "mm_spread":      row.mm_spread,
-        "other_long":     row.other_long,      "other_short":    row.other_short,
-        "other_spread":   row.other_spread,
-        "nr_long":        row.nr_long,         "nr_short":       row.nr_short,
-        "t_pmpu_long":    row.t_pmpu_long,     "t_pmpu_short":   row.t_pmpu_short,
-        "t_swap_long":    row.t_swap_long,     "t_swap_short":   row.t_swap_short,
-        "t_swap_spread":  row.t_swap_spread,
-        "t_mm_long":      row.t_mm_long,       "t_mm_short":     row.t_mm_short,
-        "t_mm_spread":    row.t_mm_spread,
-        "t_other_long":   row.t_other_long,    "t_other_short":  row.t_other_short,
-        "t_other_spread": row.t_other_spread,
-        "t_nr_long":      row.t_nr_long,       "t_nr_short":     row.t_nr_short,
-        # Old/Other crop split — NY (Arabica) only
-        "pmpu_long_old":     row.pmpu_long_old,    "pmpu_short_old":    row.pmpu_short_old,
-        "swap_long_old":     row.swap_long_old,    "swap_short_old":    row.swap_short_old,   "swap_spread_old":   row.swap_spread_old,
-        "mm_long_old":       row.mm_long_old,      "mm_short_old":      row.mm_short_old,     "mm_spread_old":     row.mm_spread_old,
-        "other_long_old":    row.other_long_old,   "other_short_old":   row.other_short_old,  "other_spread_old":  row.other_spread_old,
-        "nr_long_old":       row.nr_long_old,      "nr_short_old":      row.nr_short_old,
-        "pmpu_long_other":   row.pmpu_long_other,  "pmpu_short_other":  row.pmpu_short_other,
-        "swap_long_other":   row.swap_long_other,  "swap_short_other":  row.swap_short_other, "swap_spread_other": row.swap_spread_other,
-        "mm_long_other":     row.mm_long_other,    "mm_short_other":    row.mm_short_other,   "mm_spread_other":   row.mm_spread_other,
-        "other_long_other":  row.other_long_other, "other_short_other": row.other_short_other,"other_spread_other":row.other_spread_other,
-        "nr_long_other":     row.nr_long_other,    "nr_short_other":    row.nr_short_other,
-        "price_ny":       row.price_ny,        "price_ldn":      row.price_ldn,
-        "structure_ny":   row.structure_ny,    "structure_ldn":  row.structure_ldn,
-        "exch_oi_ny":     row.exch_oi_ny,      "exch_oi_ldn":    row.exch_oi_ldn,
-        "vol_ny":         row.vol_ny,          "vol_ldn":        row.vol_ldn,
-        "efp_ny":         row.efp_ny,          "efp_ldn":        row.efp_ldn,
-        "spread_vol_ny":  row.spread_vol_ny,   "spread_vol_ldn": row.spread_vol_ldn,
-    }
-
 def export_cot(db) -> None:
     rows = db.query(CotWeekly).order_by(CotWeekly.date.asc()).all()
     merged: dict = {}
@@ -259,7 +222,9 @@ def export_cot(db) -> None:
         d = row.date.isoformat()
         if d not in merged:
             merged[d] = {"date": d, "ny": None, "ldn": None}
-        merged[d][row.market] = _cot_row_to_dict(row)
+        # include_crop_split=True keeps the NY-only old/other crop fields
+        # that the CotDashboard frontend expects in cot.json.
+        merged[d][row.market] = serialize_cot_row(row, include_crop_split=True)
     result = sorted(merged.values(), key=lambda x: x["date"])
 
     path = OUT_DIR / "cot.json"
