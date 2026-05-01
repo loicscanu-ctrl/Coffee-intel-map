@@ -1,0 +1,98 @@
+name: Check Scrapers Freshness
+
+# Reads frontend/public/data/health.json and pings Telegram if any scraper's
+# last-run timestamp is older than its per-source threshold. Catches the case
+# where a single source inside the daily news scraper fails silently — the
+# workflow exits 0 (other sources succeeded), so the existing if: failure()
+# notifications never fire.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 07:00 UTC daily — 3 h after export-and-publish (04:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check scraper freshness
+        id: check
+        env:
+          HEALTH_FILE: frontend/public/data/health.json
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from datetime import datetime, timezone
+
+          # Per-scraper staleness threshold in hours. Pick generous numbers to
+          # cover weekends and natural source cadences (CFTC COT is weekly,
+          # fertilizer reports are monthly, etc.).
+          THRESHOLDS_H = {
+              "futures":          48,
+              "cot":              8 * 24,
+              "macro_cot":        8 * 24,
+              "freight":          48,
+              "weather":          48,
+              "enso":             48,
+              "fertilizer_wb":    35 * 24,
+              "fertilizer_comex": 35 * 24,
+          }
+          DEFAULT_H = 48
+
+          path = os.environ["HEALTH_FILE"]
+          with open(path) as f:
+              health = json.load(f)
+          scrapers = health.get("scrapers", {})
+
+          now = datetime.now(timezone.utc)
+          stale = []
+          for name, ts in scrapers.items():
+              if not ts:
+                  stale.append(f"{name}: never run")
+                  continue
+              # Accept either YYYY-MM-DD or full ISO timestamps.
+              try:
+                  if len(ts) == 10:
+                      dt = datetime.strptime(ts, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                  else:
+                      dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                      if dt.tzinfo is None:
+                          dt = dt.replace(tzinfo=timezone.utc)
+              except Exception as e:
+                  stale.append(f"{name}: unparseable timestamp '{ts}' ({e})")
+                  continue
+              age_h = (now - dt).total_seconds() / 3600
+              limit = THRESHOLDS_H.get(name, DEFAULT_H)
+              if age_h > limit:
+                  stale.append(f"{name}: {age_h/24:.1f}d old (limit {limit/24:.1f}d, last={ts})")
+
+          if stale:
+              msg = "Stale scrapers in health.json:\n" + "\n".join(f"• {s}" for s in stale)
+              print(msg)
+              with open(os.environ["GITHUB_OUTPUT"], "a") as g:
+                  g.write("stale<<EOF\n" + msg + "\nEOF\n")
+              sys.exit(1)
+          print(f"All {len(scrapers)} scrapers fresh.")
+          PY
+
+      - name: Notify Telegram on stale data
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+          STALE:              ${{ steps.check.outputs.stale }}
+        run: |
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+            echo "Telegram secrets not configured — skipping notification"
+            exit 0
+          fi
+          body="${STALE:-Scraper freshness check failed (no detail captured)}"
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          text=$(printf '🚨 Scrapers stale — see %s\n\n%s' "$run_url" "$body")
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${text}" \
+            >/dev/null || true
