@@ -3,6 +3,7 @@ from datetime import date as DateType, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, HTTPException, Response
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -10,6 +11,24 @@ from models import CommodityCot, CommodityPrice
 from scraper.sources.macro_cot import COMMODITY_SPECS
 
 router = APIRouter(prefix="/api/macro-cot", tags=["macro-cot"])
+
+
+class MacroCotEntry(BaseModel):
+    symbol: str
+    sector: str
+    name: str
+    mm_long: int
+    mm_short: int
+    mm_spread: int
+    oi_total: int
+    close_price: Optional[float] = None
+    gross_exposure_usd: Optional[float] = None
+    net_exposure_usd: Optional[float] = None
+
+
+class MacroCotWeekResponse(BaseModel):
+    date: str
+    commodities: list[MacroCotEntry]
 
 
 def _to_contract_value(price: float, spec: dict) -> float:
@@ -35,7 +54,7 @@ def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
     }
 
 
-@router.get("")
+@router.get("", response_model=list[MacroCotWeekResponse])
 def get_macro_cot(
     response: Response,
     after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),

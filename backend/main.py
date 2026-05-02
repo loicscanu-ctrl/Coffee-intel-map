@@ -1,9 +1,19 @@
 import os
 from fastapi import FastAPI, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine, get_db
 from models import CertifiedStock
+
+
+class HealthResponse(BaseModel):
+    status: str
+
+
+class StockPoint(BaseModel):
+    date: str
+    value: float
 from routes.news import router as news_router
 from routes.map import router as map_router
 from routes.freight import router as freight_router
@@ -39,11 +49,11 @@ def startup():
         from seed import run_seed
         run_seed()
 
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 def health():
     return {"status": "ok"}
 
-@app.get("/api/stocks")
+@app.get("/api/stocks", response_model=list[StockPoint])
 def get_stocks(db: Session = Depends(get_db)):
     stocks = db.query(CertifiedStock).order_by(CertifiedStock.date.asc()).all()
     return [{"date": s.date.isoformat(), "value": s.value} for s in stocks]

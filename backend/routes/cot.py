@@ -2,6 +2,7 @@
 from datetime import date as DateType
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, HTTPException, Response
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from cot_schema import positions_dict, serialize_cot_row
 from database import get_db
@@ -10,7 +11,65 @@ from models import CotPosition, CotWeekly
 router = APIRouter(prefix="/api/cot", tags=["cot"])
 
 
-@router.get("")
+class CotMarketResponse(BaseModel):
+    """Per-market CoT data for one week. Field set is locked by
+    backend/cot_schema.py; every field is optional because old historical
+    weeks may have NULLs from before the field existed in the schema."""
+
+    oi_total:      Optional[int] = None
+
+    # Position OI (all-crop)
+    pmpu_long:     Optional[int] = None
+    pmpu_short:    Optional[int] = None
+    swap_long:     Optional[int] = None
+    swap_short:    Optional[int] = None
+    swap_spread:   Optional[int] = None
+    mm_long:       Optional[int] = None
+    mm_short:      Optional[int] = None
+    mm_spread:     Optional[int] = None
+    other_long:    Optional[int] = None
+    other_short:   Optional[int] = None
+    other_spread:  Optional[int] = None
+    nr_long:       Optional[int] = None
+    nr_short:      Optional[int] = None
+
+    # Trader counts (all-crop only)
+    t_pmpu_long:    Optional[int] = None
+    t_pmpu_short:   Optional[int] = None
+    t_swap_long:    Optional[int] = None
+    t_swap_short:   Optional[int] = None
+    t_swap_spread:  Optional[int] = None
+    t_mm_long:      Optional[int] = None
+    t_mm_short:     Optional[int] = None
+    t_mm_spread:    Optional[int] = None
+    t_other_long:   Optional[int] = None
+    t_other_short:  Optional[int] = None
+    t_other_spread: Optional[int] = None
+    t_nr_long:      Optional[int] = None
+    t_nr_short:     Optional[int] = None
+
+    # Per-market scalars (joined from the COT Excel "Other" sheet)
+    price_ny:       Optional[float] = None
+    price_ldn:      Optional[float] = None
+    structure_ny:   Optional[float] = None
+    structure_ldn:  Optional[float] = None
+    exch_oi_ny:     Optional[int]   = None
+    exch_oi_ldn:    Optional[int]   = None
+    vol_ny:         Optional[int]   = None
+    vol_ldn:        Optional[int]   = None
+    efp_ny:         Optional[float] = None
+    efp_ldn:        Optional[float] = None
+    spread_vol_ny:  Optional[float] = None
+    spread_vol_ldn: Optional[float] = None
+
+
+class CotWeekResponse(BaseModel):
+    date: str
+    ny:   Optional[CotMarketResponse] = None
+    ldn:  Optional[CotMarketResponse] = None
+
+
+@router.get("", response_model=list[CotWeekResponse])
 def get_cot(
     response: Response,
     after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),

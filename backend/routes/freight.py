@@ -1,11 +1,34 @@
 # backend/routes/freight.py
 from datetime import date, timedelta
+from typing import Any
 from fastapi import APIRouter, Depends, Response
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from database import get_db
 from models import FreightRate
 
 router = APIRouter(prefix="/api/freight", tags=["freight"])
+
+
+class FreightRouteResponse(BaseModel):
+    id: str
+    from_: str = Field(..., alias="from")
+    to: str
+    rate: int
+    prev: int
+    unit: str
+    proxy: bool
+
+    model_config = {"populate_by_name": True}
+
+
+class FreightResponse(BaseModel):
+    updated: str
+    routes: list[FreightRouteResponse]
+    # History rows have a fixed "date" plus per-route columns whose keys
+    # vary (e.g. "vn-eu", "br-eu"). Keeping it as Any avoids over-specifying
+    # — the frontend already types this as Record<string, number | string>.
+    history: list[dict[str, Any]]
 
 # Route config: id, from, to, FBX index, multiplier, is_proxy
 ROUTE_CONFIG = [
@@ -50,7 +73,7 @@ def _history_rows(db: Session, index_code: str, days: int = 84) -> list[FreightR
     )
 
 
-@router.get("")
+@router.get("", response_model=FreightResponse)
 def get_freight(response: Response, db: Session = Depends(get_db)):
     response.headers["Cache-Control"] = "public, max-age=300"
     indices = {cfg[3] for cfg in ROUTE_CONFIG}
