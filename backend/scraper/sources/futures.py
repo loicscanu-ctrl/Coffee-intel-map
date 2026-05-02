@@ -763,4 +763,23 @@ async def run(page) -> list[dict]:
     except Exception as e:
         print(f"[futures] ICE Robusta COT failed: {e}")
 
+    # Escalate total chain-fetch failure. CriticalSourceError propagates
+    # through _run_one in main.py (which only swallows generic Exception)
+    # and fails the daily scraper, firing the existing if: failure()
+    # Telegram alert within an hour instead of waiting a day for the
+    # freshness check workflow.
+    #
+    # COT data is already safe at this point — _make_cot_item and
+    # _make_ice_cot_item write to cot_weekly via upsert_cot_weekly before
+    # returning, so api/cot keeps getting fresh data. The COT NewsItems
+    # we collected in `results` are lost on this raise, but they're
+    # cosmetic news-feed entries and the next day's run repopulates them.
+    if not kc_contracts and not rm_contracts:
+        from scraper.errors import CriticalSourceError
+        raise CriticalSourceError(
+            "futures: all chain fetchers (Barchart HTTP, Playwright, yfinance) "
+            "returned empty — futures_chain.json will not advance. "
+            "Likely cause: Barchart IP block plus yfinance symbol drift."
+        )
+
     return results
