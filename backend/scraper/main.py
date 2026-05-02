@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from playwright.async_api import async_playwright
 from scraper.db import get_session, upsert_news_item, upsert_physical_price, extract_physical_price
+from scraper.errors import CriticalSourceError
 from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf
 from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import farmer_economics as _farmer_economics
@@ -38,6 +39,11 @@ async def _run_one(source, browser, semaphore, db) -> int:
         except asyncio.TimeoutError:
             print(f"[scraper] {name}: TIMEOUT after {SCRAPER_TIMEOUT}s — skipped")
             return 0
+        except CriticalSourceError as e:
+            # Opt-out from the swallow-all default — this source signaled
+            # a total outage that should fail the workflow.
+            print(f"[scraper] {name} CRITICAL: {e}")
+            raise
         except Exception as e:
             print(f"[scraper] {name} failed: {e}")
             return 0
