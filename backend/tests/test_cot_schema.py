@@ -114,3 +114,119 @@ def test_total_field_count_matches_api_contract():
     full_out     = serialize_cot_row(_StubRow(), include_crop_split=True)
     assert len(api_out)  == len(_API_KEYS_IN_ORDER)
     assert len(full_out) == len(_API_KEYS_IN_ORDER) + len(_CROP_SPLIT_KEYS_IN_ORDER)
+
+
+# ── Wide → narrow parser tests (cot_position migration) ──────────────────────
+
+from cot_schema import field_to_position, position_rows_from_fields
+
+
+def test_field_to_position_basic_long_short_spread():
+    assert field_to_position("mm_long")     == ("all", "mm",   "long",   "oi")
+    assert field_to_position("pmpu_short")  == ("all", "pmpu", "short",  "oi")
+    assert field_to_position("swap_spread") == ("all", "swap", "spread", "oi")
+    assert field_to_position("nr_long")     == ("all", "nr",   "long",   "oi")
+
+
+def test_field_to_position_crop_split():
+    assert field_to_position("mm_long_old")     == ("old",   "mm",   "long",   "oi")
+    assert field_to_position("swap_spread_old") == ("old",   "swap", "spread", "oi")
+    assert field_to_position("mm_long_other")   == ("other", "mm",   "long",   "oi")
+    assert field_to_position("nr_short_other")  == ("other", "nr",   "short",  "oi")
+
+
+def test_field_to_position_trader_counts():
+    assert field_to_position("t_pmpu_long")    == ("all", "pmpu",  "long",   "traders")
+    assert field_to_position("t_swap_spread")  == ("all", "swap",  "spread", "traders")
+    assert field_to_position("t_nr_short")     == ("all", "nr",    "short",  "traders")
+
+
+def test_field_to_position_returns_none_for_non_position_fields():
+    assert field_to_position("oi_total")       is None
+    assert field_to_position("price_ny")       is None
+    assert field_to_position("price_ldn")      is None
+    assert field_to_position("structure_ny")   is None
+    assert field_to_position("exch_oi_ldn")    is None
+    assert field_to_position("efp_ny")         is None
+    assert field_to_position("vol_ny")         is None
+    assert field_to_position("spread_vol_ldn") is None
+    # The wide schema doesn't carry trader counts for crop != all
+    assert field_to_position("t_mm_long_old")    is None
+    assert field_to_position("t_swap_short_other") is None
+    # Garbage
+    assert field_to_position("not_a_field")    is None
+    assert field_to_position("mm_unknown")     is None
+    assert field_to_position("")               is None
+
+
+def test_field_to_position_pmpu_and_nr_have_no_spread():
+    # The wide schema doesn't carry spread for pmpu or nr — so these
+    # column names don't exist and shouldn't be parseable.
+    assert field_to_position("pmpu_spread")       is None
+    assert field_to_position("nr_spread")         is None
+    assert field_to_position("pmpu_spread_old")   is None
+    assert field_to_position("t_nr_spread")       is None
+
+
+def test_position_rows_from_fields_groups_oi_and_traders():
+    """OI and trader-count fields for the same (crop, cat, side) should
+    merge into a single row with both populated."""
+    fields = {
+        "mm_long":    50_000,
+        "mm_short":   20_000,
+        "mm_spread":   3_000,
+        "t_mm_long":      30,
+        "t_mm_short":     20,
+        "t_mm_spread":     5,
+    }
+    rows = position_rows_from_fields(fields)
+    by_side = {(r["category"], r["side"]): r for r in rows}
+    assert len(rows) == 3
+    assert by_side[("mm", "long")]   == {"crop": "all", "category": "mm", "side": "long",   "oi": 50_000, "traders": 30}
+    assert by_side[("mm", "short")]  == {"crop": "all", "category": "mm", "side": "short",  "oi": 20_000, "traders": 20}
+    assert by_side[("mm", "spread")] == {"crop": "all", "category": "mm", "side": "spread", "oi":  3_000, "traders":  5}
+
+
+def test_position_rows_from_fields_skips_non_position_fields():
+    """oi_total, price_ny and similar scalars stay in cot_weekly only."""
+    fields = {
+        "mm_long":      50_000,
+        "oi_total":    150_000,
+        "price_ny":     304.10,
+        "structure_ny":   -1.5,
+    }
+    rows = position_rows_from_fields(fields)
+    assert len(rows) == 1
+    assert rows[0]["category"] == "mm"
+    assert rows[0]["side"]     == "long"
+    assert rows[0]["oi"]       == 50_000
+
+
+def test_position_rows_from_fields_drops_all_none_rows():
+    """If only None values come in for a (crop, cat, side), don't emit a row."""
+    rows = position_rows_from_fields({"mm_long": None, "t_mm_long": None})
+    assert rows == []
+
+
+def test_position_rows_from_fields_partial_update_keeps_other_field_none():
+    """A caller updating only oi (not traders) should produce one row with
+    traders=None; the dual-write path will only overwrite the oi column on
+    the existing row, so this is the right shape."""
+    rows = position_rows_from_fields({"mm_long": 50_000})
+    assert rows == [{"crop": "all", "category": "mm", "side": "long",
+                     "oi": 50_000, "traders": None}]
+
+
+def test_position_rows_from_fields_handles_crop_split():
+    fields = {
+        "mm_long":          50_000,  # all
+        "mm_long_old":       8_000,
+        "mm_long_other":    42_000,
+        "swap_spread_old":   1_500,
+    }
+    rows = position_rows_from_fields(fields)
+    by_key = {(r["crop"], r["category"], r["side"]): r for r in rows}
+    assert by_key[("all",   "mm",   "long")]["oi"]   == 50_000
+    assert by_key[("old",   "mm",   "long")]["oi"]   ==  8_000
+    assert by_key[("other", "mm",   "long")]["oi"]   == 42_000
+    assert by_key[("old",   "swap", "spread")]["oi"] ==  1_500

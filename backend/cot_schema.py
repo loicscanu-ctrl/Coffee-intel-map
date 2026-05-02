@@ -74,3 +74,85 @@ def serialize_cot_row(row: Any, *, include_crop_split: bool = False) -> dict[str
     for name in _market_extra_field_names():
         out[name] = getattr(row, name, None)
     return out
+
+
+# ── Wide → narrow mapping (for the cot_position child table migration) ────────
+
+_CROP_SUFFIXES: dict[str, str] = {
+    "":       "all",
+    "_old":   "old",
+    "_other": "other",
+}
+_CATEGORIES_BY_NAME = {cat: sides for cat, sides in _CATEGORIES_WITH_SPREAD}
+
+
+def field_to_position(field_name: str) -> tuple[str, str, str, str] | None:
+    """Parse a wide-table column name into (crop, category, side, kind).
+
+    kind is "oi" for position fields and "traders" for the t_-prefixed
+    trader-count fields. Returns None for non-position fields like
+    oi_total, price_ny, structure_ny, etc.
+
+    Examples:
+        "mm_long"          -> ("all",   "mm",   "long",   "oi")
+        "swap_spread_old"  -> ("old",   "swap", "spread", "oi")
+        "t_pmpu_short"     -> ("all",   "pmpu", "short",  "traders")
+        "price_ny"         -> None
+    """
+    name = field_name
+    kind = "oi"
+    if name.startswith("t_"):
+        kind = "traders"
+        name = name[2:]
+
+    # Detect crop suffix (longest match wins so "_other" beats "")
+    crop = "all"
+    base = name
+    for suffix in ("_other", "_old"):
+        if name.endswith(suffix):
+            crop = _CROP_SUFFIXES[suffix]
+            base = name[: -len(suffix)]
+            break
+
+    # Trader counts only exist for crop=all in the wide schema
+    if kind == "traders" and crop != "all":
+        return None
+
+    parts = base.rsplit("_", 1)
+    if len(parts) != 2:
+        return None
+    cat, side = parts
+    sides = _CATEGORIES_BY_NAME.get(cat)
+    if not sides or side not in sides:
+        return None
+
+    return (crop, cat, side, kind)
+
+
+def position_rows_from_fields(fields: dict[str, Any]) -> list[dict[str, Any]]:
+    """Group a wide-style fields dict into one (crop, category, side) row per
+    physical position, merging the oi and traders values for each row.
+
+    Returns a list of dicts shaped like:
+        {"crop": "all", "category": "mm", "side": "long",
+         "oi": 50000, "traders": 30}
+
+    Only includes rows that have at least one non-None value in the input.
+    Used by upsert_cot_weekly to dual-write into the cot_position table.
+    """
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for field_name, value in fields.items():
+        parsed = field_to_position(field_name)
+        if parsed is None:
+            continue
+        crop, cat, side, kind = parsed
+        key = (crop, cat, side)
+        if key not in grouped:
+            grouped[key] = {"crop": crop, "category": cat, "side": side,
+                            "oi": None, "traders": None}
+        grouped[key][kind] = value
+    # Drop rows where both oi and traders are None (defensive — shouldn't
+    # happen since we only land here for parseable fields, but keeps the
+    # output table clean if a caller passes literal None values).
+    return [r for r in grouped.values()
+            if r["oi"] is not None or r["traders"] is not None]

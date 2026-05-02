@@ -106,7 +106,16 @@ def migrate_cot_weekly_columns():
 
 
 def upsert_cot_weekly(market: str, report_date, fields: dict):
-    from models import CotWeekly
+    """Write a CoT row.
+
+    Dual-writes during the cot_weekly → cot_position migration: every
+    position field in `fields` (mm_long, swap_spread_old, t_pmpu_long, …)
+    gets unpacked into the narrow CotPosition table while the wide
+    CotWeekly row keeps its existing shape so readers don't change. See
+    backend/cot_schema.py for the wide → narrow mapping.
+    """
+    from cot_schema import position_rows_from_fields
+    from models import CotPosition, CotWeekly
     db = get_session()
     try:
         existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
@@ -115,6 +124,36 @@ def upsert_cot_weekly(market: str, report_date, fields: dict):
                 setattr(existing, k, v)
         else:
             db.add(CotWeekly(date=report_date, market=market, **fields))
+
+        # Dual-write the position breakdown. Skip silently if the new table
+        # hasn't been migrated yet (e.g. fresh local dev DB) — the wide
+        # CotWeekly write above is still the source of truth.
+        try:
+            for pos in position_rows_from_fields(fields):
+                row = (
+                    db.query(CotPosition)
+                    .filter_by(date=report_date, market=market,
+                               crop=pos["crop"], category=pos["category"],
+                               side=pos["side"])
+                    .first()
+                )
+                if row:
+                    if pos["oi"] is not None:
+                        row.oi = pos["oi"]
+                    if pos["traders"] is not None:
+                        row.traders = pos["traders"]
+                else:
+                    db.add(CotPosition(
+                        date=report_date, market=market,
+                        crop=pos["crop"], category=pos["category"],
+                        side=pos["side"],
+                        oi=pos["oi"], traders=pos["traders"],
+                    ))
+        except Exception as e:
+            # Don't let dual-write breakage block the existing wide-table
+            # path during the migration window.
+            print(f"[db] cot_position dual-write failed: {e}")
+
         db.commit()
     except Exception:
         db.rollback()
@@ -166,6 +205,20 @@ def create_physical_prices_table():
     engine = _get_engine()
     Base.metadata.create_all(engine, tables=[PhysicalPrice.__table__])
     print("[db] physical_prices table created/verified")
+
+
+def create_cot_position_table():
+    """Create cot_position table if it doesn't exist.
+
+    Narrow / long form of CotWeekly's per-category position breakdown. Populated
+    by dual-write in upsert_cot_weekly during the migration; will become the
+    sole source of truth in a follow-up PR.
+    """
+    from database import Base
+    from models import CotPosition
+    engine = _get_engine()
+    Base.metadata.create_all(engine, tables=[CotPosition.__table__])
+    print("[db] cot_position table created/verified")
 
 
 def upsert_physical_price(db, *, symbol: str, price: float, currency: str,

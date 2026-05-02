@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from scraper.db import upsert_cot_price, migrate_cot_weekly_columns
+from scraper.db import upsert_cot_price, migrate_cot_weekly_columns, create_cot_position_table
 
 BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
 
@@ -92,6 +92,7 @@ def _front_price(raw: dict) -> float | None:
 
 async def main() -> None:
     migrate_cot_weekly_columns()
+    create_cot_position_table()
 
     tuesday = date.today().isoformat()
     print(f"[tuesday_prices] Fetching settlement prices for {tuesday} ...")
