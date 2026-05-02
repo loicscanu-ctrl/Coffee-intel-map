@@ -23,7 +23,7 @@
       "id": "vn-us",
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
-      "rate": 2675,
+      "rate": 2725,
       "prev": 2653,
       "unit": "USD/FEU",
       "proxy": false
@@ -59,7 +59,7 @@
       "id": "br-us",
       "from": "Santos",
       "to": "New York",
-      "rate": 1773,
+      "rate": 1943,
       "prev": 1714,
       "unit": "USD/FEU",
       "proxy": true
@@ -393,7 +393,7 @@
       "vn-eu": 2668,
       "br-eu": 1548,
       "et-eu": 1868,
-      "vn-us": 2675
+      "vn-us": 2725
     }
   ]
 }
