@@ -31,6 +31,9 @@ jobs:
           # reports as-of Tuesday on Friday evening, so by Friday morning the
           # latest available data is legitimately ~10 days old by as-of date.
           # 11 days gives one publication cycle of slack before alerting.
+          # The fertilizer sources are monthly (World Bank Pink Sheet on the
+          # 2nd of each month, MDIC Comex around the 12th–15th); 45 days
+          # gives one missed-cycle buffer.
           THRESHOLDS_H = {
               "futures":          48,
               "cot":              11 * 24,
@@ -38,8 +41,8 @@ jobs:
               "freight":          48,
               "weather":          48,
               "enso":             48,
-              "fertilizer_wb":    35 * 24,
-              "fertilizer_comex": 35 * 24,
+              "fertilizer_wb":    45 * 24,
+              "fertilizer_comex": 45 * 24,
           }
           DEFAULT_H = 48
 
