@@ -6,7 +6,9 @@ same ~50-field dict. cot_schema.serialize_cot_row generates it instead. The
 exact key set and order is part of the API/JSON contract — these tests fail
 loudly if anything regresses.
 """
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from cot_schema import serialize_cot_row
@@ -71,7 +73,7 @@ def test_export_shape_includes_crop_split_in_correct_position():
     out = serialize_cot_row(row, include_crop_split=True)
     # Crop split sits between trader counts and per-market extras —
     # right after t_nr_short, right before price_ny.
-    pivot = out_keys = list(out.keys())
+    pivot = list(out.keys())
     t_nr_short_idx  = pivot.index("t_nr_short")
     price_ny_idx    = pivot.index("price_ny")
     crop_block      = pivot[t_nr_short_idx + 1 : price_ny_idx]

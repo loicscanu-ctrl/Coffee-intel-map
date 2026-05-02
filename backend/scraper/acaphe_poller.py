@@ -12,7 +12,7 @@ import os
 import re
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -189,7 +189,7 @@ def transform(raw: list) -> dict:
         (arabica if is_arabica else robusta).append(entry)
 
     result: dict = {
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
+        "fetched_at": datetime.now(UTC).isoformat(),
         "now_time":   raw[0].get("now_time", "") if raw else "",
         "robusta":    robusta,
         "arabica":    arabica,
@@ -236,16 +236,17 @@ async def playwright_login() -> dict:
 
 def _save_vn_prices_to_db(viet: dict, fetched_at: str) -> None:
     """Store VN local prices to Postgres so the nightly export can publish them."""
-    import sys
     import os
+    import sys
     # Add backend dir to path so db/models are importable
     backend_dir = str(Path(__file__).parents[1])
     if backend_dir not in sys.path:
         sys.path.insert(0, backend_dir)
     try:
         os.environ.setdefault("DATABASE_URL", DATABASE_URL)
+        from datetime import datetime
+
         from scraper.db import create_vn_local_prices_table, upsert_vn_local_price
-        from datetime import datetime, timezone
         create_vn_local_prices_table()
         recorded_at = datetime.fromisoformat(fetched_at.replace("Z", "+00:00")).replace(tzinfo=None)
         upsert_vn_local_price(viet, recorded_at)
@@ -270,7 +271,7 @@ def fetch_and_save(cookies: dict) -> bool:
         if viet.get("bmt_bid") or viet.get("hcm_bid"):
             snapshot = {**viet, "saved_at": data["fetched_at"]}
             VIETNAM_LAST.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f"[acaphe] Vietnam snapshot saved (local)")
+            print("[acaphe] Vietnam snapshot saved (local)")
             if DATABASE_URL:
                 _save_vn_prices_to_db(viet, data["fetched_at"])
 

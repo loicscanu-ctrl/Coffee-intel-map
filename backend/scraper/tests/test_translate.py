@@ -1,5 +1,7 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from scraper.translate import translate_to_english
+
 
 def test_translate_english_passthrough():
     # English text should return unchanged without calling translator

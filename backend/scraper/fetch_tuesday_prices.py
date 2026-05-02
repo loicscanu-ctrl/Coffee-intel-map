@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from scraper.db import upsert_cot_price, create_cot_position_table, migrate_drop_cot_weekly_position_columns
+from scraper.db import create_cot_position_table, migrate_drop_cot_weekly_position_columns, upsert_cot_price
 
 BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
 

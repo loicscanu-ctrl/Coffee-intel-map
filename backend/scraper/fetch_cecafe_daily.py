@@ -29,7 +29,7 @@ import json
 import re
 import sys
 import urllib.request
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 
 ROOT     = Path(__file__).resolve().parents[2]
@@ -144,7 +144,6 @@ def _parse_page(html: str) -> dict:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    today = date.today()
     print("=== Cecafe daily registration scraper (public, no login) ===")
 
     # 1. Load existing JSON

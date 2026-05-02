@@ -1,6 +1,5 @@
 """Tests for validate_export.py — each validator has a passing and a failing case."""
-import pytest
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 
 
 def today_str():
@@ -53,9 +52,10 @@ def test_validate_futures_chain_too_few_contracts():
 # ── farmer_economics ──────────────────────────────────────────────────────────
 
 def test_validate_farmer_economics_passes():
+    from datetime import datetime
+
     from scraper.validate_export import validate_farmer_economics
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     good = {
         "weather": {"regions": []},
         "fertilizer": {"items": [{"name": "Urea"}]},
@@ -73,9 +73,10 @@ def test_validate_farmer_economics_null_weather():
 
 
 def test_validate_farmer_economics_empty_fertilizer():
+    from datetime import datetime
+
     from scraper.validate_export import validate_farmer_economics
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     bad = {"weather": {"regions": []}, "fertilizer": {"items": []}, "scraped_at": now}
     ok, _ = validate_farmer_economics(bad)
     assert not ok
@@ -227,6 +228,7 @@ def test_safe_write_json_writes_on_pass(tmp_path):
 
 def test_safe_write_json_keeps_old_on_fail(tmp_path):
     import json
+
     from scraper.validate_export import safe_write_json, validate_macro_cot
     dest = tmp_path / "macro_cot.json"
     dest.write_text(json.dumps([{"date": "2026-01-01"}]))

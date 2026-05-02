@@ -1,11 +1,8 @@
-import pytest
-from unittest.mock import patch, MagicMock
-import pandas as pd
-from datetime import date
 
 def test_commodity_specs_all_required_fields():
     """Every COMMODITY_SPECS entry has required fields."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.sources.macro_cot import COMMODITY_SPECS
 
@@ -18,7 +15,8 @@ def test_commodity_specs_all_required_fields():
 
 def test_commodity_specs_sector_values():
     """All sectors are one of the allowed values."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.sources.macro_cot import COMMODITY_SPECS
 
@@ -29,7 +27,8 @@ def test_commodity_specs_sector_values():
 
 def test_commodity_specs_proxy_has_factor():
     """Proxy price_source entries have proxy_to_usd_per_mt_factor."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.sources.macro_cot import COMMODITY_SPECS
 

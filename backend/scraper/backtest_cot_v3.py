@@ -14,7 +14,8 @@ New approaches beyond v2 (baseline, prop_oi, price_065, price_cal):
 Focus: all 5 categories, compare against v2 best (prop_oi / baseline).
 """
 
-import json, math, statistics
+import json
+import math
 
 with open("../../frontend/public/data/cot.json") as f:
     raw = json.load(f)

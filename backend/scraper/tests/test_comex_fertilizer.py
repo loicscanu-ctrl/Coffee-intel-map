@@ -1,4 +1,5 @@
 from datetime import date
+
 from scraper.sources.comex_fertilizer import _month_str_to_date, _parse_int
 
 

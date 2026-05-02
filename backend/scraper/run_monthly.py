@@ -2,13 +2,13 @@
 # Monthly runner: CONAB supply data + Comex Stat fertilizer imports.
 # Called by scraper-monthly.yml on the 5th of each month.
 import asyncio
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from scraper.db import get_session, create_farmer_economics_tables
-from scraper.sources import conab_supply, comex_fertilizer, vn_fertilizer
+from scraper.db import create_farmer_economics_tables, get_session
+from scraper.sources import comex_fertilizer, conab_supply, vn_fertilizer
 
 
 async def run_monthly_scrapers():

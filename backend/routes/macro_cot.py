@@ -1,8 +1,8 @@
 # backend/routes/macro_cot.py
-from datetime import date as DateType, timedelta
-from typing import Optional
+from datetime import date as DateType
+from datetime import timedelta
 
-from fastapi import APIRouter, Depends, Query, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -21,9 +21,9 @@ class MacroCotEntry(BaseModel):
     mm_short: int
     mm_spread: int
     oi_total: int
-    close_price: Optional[float] = None
-    gross_exposure_usd: Optional[float] = None
-    net_exposure_usd: Optional[float] = None
+    close_price: float | None = None
+    gross_exposure_usd: float | None = None
+    net_exposure_usd: float | None = None
 
 
 class MacroCotWeekResponse(BaseModel):
@@ -40,7 +40,7 @@ def _to_contract_value(price: float, spec: dict) -> float:
 
 
 def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
-                       close_price: Optional[float], spec: dict) -> dict:
+                       close_price: float | None, spec: dict) -> dict:
     if close_price is None:
         return {
             "gross_exposure_usd": None,
@@ -57,7 +57,7 @@ def _compute_exposures(mm_long: int, mm_short: int, mm_spread: int,
 @router.get("", response_model=list[MacroCotWeekResponse])
 def get_macro_cot(
     response: Response,
-    after: Optional[str] = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),
+    after: str | None = Query(None, description="Exclusive lower bound date YYYY-MM-DD"),
     db: Session = Depends(get_db),
 ):
     response.headers["Cache-Control"] = "public, max-age=300"
@@ -65,7 +65,7 @@ def get_macro_cot(
         try:
             cutoff = DateType.fromisoformat(after)
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid 'after' date. Use YYYY-MM-DD.")
+            raise HTTPException(status_code=400, detail="Invalid 'after' date. Use YYYY-MM-DD.") from None
     else:
         cutoff = DateType.today() - timedelta(weeks=52)
 

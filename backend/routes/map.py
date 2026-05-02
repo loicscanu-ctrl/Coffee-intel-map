@@ -1,7 +1,9 @@
 from typing import Any
+
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 from database import get_db
 from models import CountryIntel, Factory
 

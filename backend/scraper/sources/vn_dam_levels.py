@@ -159,7 +159,6 @@ def _extract_flow_table(pdf) -> list[dict]:
                     if river_key in line:
                         # Extract numbers from line
                         nums = re.findall(r"\d+(?:[,\.]\d+)?", line)
-                        tbnn_parts = re.findall(r"[<>~]\s*(?:TBNN\s*)?\d*", line)
                         actual = float(nums[0].replace(",", ".")) if nums else None
                         # Find the < or > before a number
                         pct_match = re.search(r"([<>])\s*(\d+)", line)
@@ -188,7 +187,6 @@ def _extract_flow_table(pdf) -> list[dict]:
                     # Cells: river | station | actual | tbnn_pct | day1..day9 | total | forecast_tbnn_pct
                     actual_str  = cells[2] if len(cells) > 2 else ""
                     tbnn1_str   = cells[3] if len(cells) > 3 else ""
-                    total_str   = cells[-2] if len(cells) > 2 else ""
                     tbnn2_str   = cells[-1] if len(cells) > 1 else ""
                     try:
                         actual = float(actual_str.replace(",", ".").replace(" ", ""))

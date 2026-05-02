@@ -1,5 +1,6 @@
 from scraper.sources.barchart import parse_barchart_price
 
+
 def test_parse_barchart_price_extracts_value():
     # Simulated page HTML containing price
     html = '<span data-testid="last-price">220.50</span>'

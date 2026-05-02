@@ -1,8 +1,10 @@
-from datetime import datetime, date
-from typing import Optional
-from sqlalchemy import String, Float, DateTime, Text, JSON, Date, Integer, UniqueConstraint, Index
+from datetime import date, datetime
+
+from sqlalchemy import JSON, Date, DateTime, Float, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+
 from database import Base
+
 
 class NewsItem(Base):
     __tablename__ = "news_feed"
@@ -176,9 +178,9 @@ class FertilizerImport(Base):
     id:            Mapped[int]           = mapped_column(primary_key=True)
     month:         Mapped[date]          = mapped_column(Date, nullable=False)
     ncm_code:      Mapped[str]           = mapped_column(String(20), nullable=False)
-    ncm_label:     Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    net_weight_kg: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    fob_usd:       Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    ncm_label:     Mapped[str | None] = mapped_column(String(100), nullable=True)
+    net_weight_kg: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    fob_usd:       Mapped[float | None] = mapped_column(Float, nullable=True)
     scraped_at:    Mapped[datetime]      = mapped_column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("month", "ncm_code", name="uq_fert_import_month_ncm"),)

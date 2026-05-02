@@ -1,18 +1,35 @@
 # backend/scraper/main.py
 import asyncio
-import time
-import sys
 import os
+import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from datetime import UTC
+
 from playwright.async_api import async_playwright
-from scraper.db import get_session, upsert_news_item, upsert_physical_price, extract_physical_price
+
+from scraper.db import extract_physical_price, get_session, upsert_news_item, upsert_physical_price
 from scraper.errors import CriticalSourceError
-from scraper.sources import barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf
-from scraper.sources import macro_cot as _macro_cot
-from scraper.sources import farmer_economics as _farmer_economics
+from scraper.sources import (
+    b3,
+    b3_icf,
+    barchart,
+    brazil,
+    cepea,
+    demand,
+    freightos,
+    futures,
+    origins,
+    rss,
+    technicals,
+    uganda,
+    vietnam,
+)
 from scraper.sources import dry_bulk as _dry_bulk
+from scraper.sources import farmer_economics as _farmer_economics
+from scraper.sources import macro_cot as _macro_cot
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf]
 SCHEDULED_HOUR_UTC = 1   # Run daily at 01:00 UTC
@@ -36,7 +53,7 @@ async def _run_one(source, browser, semaphore, db) -> int:
                 count += 1
             print(f"[scraper] {name}: {count} items")
             return count
-        except asyncio.TimeoutError:
+        except TimeoutError:
             print(f"[scraper] {name}: TIMEOUT after {SCRAPER_TIMEOUT}s — skipped")
             return 0
         except CriticalSourceError as e:
@@ -61,7 +78,7 @@ async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEO
     try:
         await asyncio.wait_for(coro_fn(page), timeout=timeout)
         print(f"[scraper] {name}: OK")
-    except asyncio.TimeoutError:
+    except TimeoutError:
         print(f"[scraper] {name}: TIMEOUT after {timeout}s — skipped")
     except Exception as e:
         print(f"[scraper] {name} failed: {e}")
@@ -101,8 +118,8 @@ async def run_all_scrapers():
 
 
 def seconds_until_next_run():
-    from datetime import datetime, timezone, timedelta
-    now = datetime.now(timezone.utc)
+    from datetime import datetime, timedelta
+    now = datetime.now(UTC)
     next_run = now.replace(hour=SCHEDULED_HOUR_UTC, minute=0, second=0, microsecond=0)
     if next_run <= now:
         next_run += timedelta(days=1)

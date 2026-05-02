@@ -1,8 +1,10 @@
 import os
-from fastapi import FastAPI, Depends
+
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
+
 from database import Base, engine, get_db
 from models import CertifiedStock
 
@@ -14,12 +16,12 @@ class HealthResponse(BaseModel):
 class StockPoint(BaseModel):
     date: str
     value: float
-from routes.news import router as news_router
-from routes.map import router as map_router
-from routes.freight import router as freight_router
 from routes.cot import router as cot_router
-from routes.macro_cot import router as macro_cot_router
+from routes.freight import router as freight_router
 from routes.futures import router as futures_router
+from routes.macro_cot import router as macro_cot_router
+from routes.map import router as map_router
+from routes.news import router as news_router
 
 app = FastAPI(title="Coffee Intel API")
 

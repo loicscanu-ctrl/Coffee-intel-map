@@ -13,12 +13,14 @@ from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from models import CotWeekly
 from scraper.db import get_session
 from scraper.db_macro import upsert_commodity_price
 from scraper.sources.macro_cot import (
-    COMMODITY_SPECS, _fetch_yfinance_prices, _fetch_gbpusd_rates,
+    COMMODITY_SPECS,
+    _fetch_gbpusd_rates,
+    _fetch_yfinance_prices,
 )
-from models import CotWeekly
 
 
 def main():

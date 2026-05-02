@@ -7,11 +7,12 @@ the same value. Wide CotWeekly behavior is unchanged — verified by the
 existing tests in test_cot_model.py and test_cot_route.py.
 """
 from datetime import date
+
 from models import CotPosition
 
 
 def test_dual_write_creates_position_rows(scraper_db):
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
 
     upsert_cot_weekly("ny", date(2026, 4, 28), {
         "oi_total":   150_000,           # market scalar — should NOT appear
@@ -46,7 +47,7 @@ def test_dual_write_creates_position_rows(scraper_db):
 
 def test_dual_write_handles_crop_split(scraper_db):
     """NY (Arabica) old/other crop fields land in cot_position with the right crop."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
 
     upsert_cot_weekly("ny", date(2026, 4, 28), {
         "mm_long":          50_000,
@@ -68,7 +69,7 @@ def test_dual_write_handles_crop_split(scraper_db):
 
 def test_dual_write_partial_update_does_not_clobber_traders(scraper_db):
     """A second upsert with only oi (no t_) must leave the existing traders count alone."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
 
     # First write: both oi and traders
     upsert_cot_weekly("ny", date(2026, 4, 28), {"mm_long": 50_000, "t_mm_long": 30})
@@ -91,7 +92,7 @@ def test_dual_write_partial_update_does_not_clobber_traders(scraper_db):
 def test_dual_write_skips_market_scalars(scraper_db):
     """price_ny / structure_ny / oi_total etc. live only in cot_weekly,
     never produce cot_position rows."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
 
     upsert_cot_weekly("ny", date(2026, 4, 28), {
         "oi_total":      150_000,
@@ -112,7 +113,7 @@ def test_dual_write_skips_market_scalars(scraper_db):
 
 def test_dual_write_ny_and_ldn_separated(scraper_db):
     """Same date, different markets — rows should not collide."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
 
     upsert_cot_weekly("ny",  date(2026, 4, 28), {"mm_long": 50_000})
     upsert_cot_weekly("ldn", date(2026, 4, 28), {"mm_long": 30_000})

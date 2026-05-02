@@ -7,12 +7,13 @@ Usage:
     cd backend
     python -m scraper.fetch_earnings
 """
-import json, sys
-from datetime import datetime, timezone
+import json
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -178,7 +179,7 @@ def _fetch_info(t: yf.Ticker) -> dict:
 
 def main():
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    scraped_at = datetime.now(timezone.utc).isoformat()
+    scraped_at = datetime.now(UTC).isoformat()
     results = []
 
     for co in COMPANIES:

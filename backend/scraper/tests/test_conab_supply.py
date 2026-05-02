@@ -2,18 +2,17 @@
 Tests for conab_supply.py — pure parsing helpers only (no HTTP calls).
 """
 import io
-import sys
 import os
+import sys
 
 # Make sure we can import the module under test
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from sources.conab_supply import (
     _brl_to_float,
-    _parse_conab_safra_html,
     _parse_conab_custos_excel,
+    _parse_conab_safra_html,
 )
-
 
 # ---------------------------------------------------------------------------
 # _brl_to_float

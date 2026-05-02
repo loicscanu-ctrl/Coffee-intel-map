@@ -8,8 +8,9 @@
 # Unit: USD per 60-kg sack
 # Available: 24/7 (previous day's settlement always present)
 
+from datetime import date
+
 import requests
-from datetime import date, datetime
 
 _TODAY = lambda: date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925  # Brazil centre

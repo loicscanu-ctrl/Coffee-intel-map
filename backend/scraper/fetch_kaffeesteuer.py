@@ -8,10 +8,15 @@ Usage:
     cd backend
     python -m scraper.fetch_kaffeesteuer
 """
-import sys, re, json, time, io
-import requests
-import pdfplumber
+import io
+import json
+import re
+import sys
+import time
 from pathlib import Path
+
+import pdfplumber
+import requests
 from bs4 import BeautifulSoup
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")

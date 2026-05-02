@@ -1,9 +1,11 @@
 # backend/routes/freight.py
 from datetime import date, timedelta
 from typing import Any
+
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+
 from database import get_db
 from models import FreightRate
 

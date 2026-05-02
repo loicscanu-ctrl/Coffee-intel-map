@@ -239,7 +239,7 @@ def main():
             type_prev[suffix] = _extract_country_volumes(raw_prev, prev_year, suffix=suffix)
 
     # Historical country data — last 4 additional December zips (for country/hub filter)
-    print(f"\n[5] Fetching historical country data (Dec zips)...")
+    print("\n[5] Fetching historical country data (Dec zips)...")
     history: dict[str, dict] = {}
     for hist_year in range(prev_year - 4, prev_year):  # e.g. 2021, 2022, 2023, 2024
         print(f"  Year {hist_year}...")

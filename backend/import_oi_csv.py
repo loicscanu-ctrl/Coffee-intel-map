@@ -23,11 +23,13 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 from dotenv import load_dotenv
+
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+from sqlalchemy.orm import sessionmaker
 
 from database import engine
 from models import NewsItem
-from sqlalchemy.orm import sessionmaker
 
 SessionLocal = sessionmaker(bind=engine)
 

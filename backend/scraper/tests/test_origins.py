@@ -1,4 +1,5 @@
-from scraper.sources.origins import parse_alfabean, parse_ihcafe, parse_uganda, parse_colombia
+from scraper.sources.origins import parse_alfabean, parse_colombia, parse_ihcafe, parse_uganda
+
 
 def test_parse_alfabean_extracts_price():
     html = '<td class="price-idr">45.000</td>'

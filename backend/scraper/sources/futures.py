@@ -2,14 +2,15 @@
 futures.py — Fetches ICE Arabica (KC) and ICE Robusta (RM) futures chain data
 from Barchart, plus CFTC Disaggregated COT for Coffee C.
 """
+import csv
+import io
 import json
 import urllib.request
 import zipfile
-import io
-import csv
 from datetime import date
-from scraper.db import upsert_cot_weekly, get_session
-from scraper.db_macro import upsert_commodity_price
+
+from scraper.db import upsert_cot_weekly
+
 
 def _prev_biz_day(n: int) -> str:
     """Return today minus n business days as YYYY-MM-DD."""
@@ -122,7 +123,7 @@ async def _barchart_playwright(page) -> dict:
         await pg.goto(init_url, wait_until="networkidle", timeout=45000)
 
         # Verify XSRF cookie is present before attempting API calls
-        for attempt in range(3):
+        for _ in range(3):
             cookies = await ctx.cookies()
             xsrf = next((c["value"] for c in cookies if c["name"] == "XSRF-TOKEN"), None)
             if xsrf:
@@ -174,8 +175,9 @@ def _yfinance_fallback() -> dict:
     """
     try:
         import math
-        import yfinance as yf
         from datetime import timedelta
+
+        import yfinance as yf
 
         def _candidate_symbols(prefix: str, months: list, yf_suffix: str) -> list:
             today = date.today()

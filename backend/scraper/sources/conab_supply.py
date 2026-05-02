@@ -390,11 +390,12 @@ def _find_safra_xls_url() -> str | None:
 
 def _scrape_acreage_yield(db) -> None:
     """Fetch CONAB Safra XLS from gov.br, parse BRASIL row, upsert NewsItem."""
-    import sys
     import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import NewsItem
     from sqlalchemy import delete
+
+    from models import NewsItem
 
     try:
         xls_url = _find_safra_xls_url()
@@ -479,11 +480,12 @@ def _find_custos_xls_url(coffee_type: str = "arabica") -> str | None:
 
 async def _scrape_production_cost(page, db, coffee_type: str = "arabica") -> None:  # noqa: ARG001
     """Fetch CONAB Custos Agrícolas tab, find the matching coffee XLS, parse and store."""
-    import sys
     import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import NewsItem
     from sqlalchemy import delete
+
+    from models import NewsItem
 
     db_source = "CONAB Custos" if coffee_type == "arabica" else "CONAB Custos Conilon"
 

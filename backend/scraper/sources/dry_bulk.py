@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, date
+from datetime import date, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -115,7 +115,8 @@ def fetch_latest() -> dict | None:
 
 
 if __name__ == "__main__":
-    import asyncio, sys
+    import asyncio
+    import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
