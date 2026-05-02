@@ -2,11 +2,35 @@ import json
 import re
 from datetime import date, timedelta
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import get_db
 from models import NewsItem
 
 router = APIRouter()
+
+
+class OIContract(BaseModel):
+    symbol: str
+    oi: int
+    chg: float
+
+
+class OIHistoryDay(BaseModel):
+    date: str
+    contracts: list[OIContract]
+
+
+class OIFndPoint(BaseModel):
+    day: int
+    oi: int
+
+
+class OIFndChartContract(BaseModel):
+    symbol: str
+    label: str
+    fnd: str
+    data: list[OIFndPoint]
 
 LETTER_TO_MONTH = {
     "F":1,"G":2,"H":3,"J":4,"K":5,"M":6,
@@ -52,7 +76,7 @@ def _trading_days_to(d1: date, fnd: date) -> int:
     return -count  # negative = days remaining before FND
 
 
-@router.get("/api/futures/oi-history")
+@router.get("/api/futures/oi-history", response_model=list[OIHistoryDay])
 def get_oi_history(
     market: str = Query("robusta", enum=["robusta", "arabica"]),
     days: int = Query(10, ge=1, le=60),
@@ -91,7 +115,7 @@ def get_oi_history(
     return result  # newest first → oldest last
 
 
-@router.get("/api/futures/oi-fnd-chart")
+@router.get("/api/futures/oi-fnd-chart", response_model=list[OIFndChartContract])
 def get_oi_fnd_chart(
     market: str = Query("robusta", enum=["robusta", "arabica"]),
     db: Session = Depends(get_db),
