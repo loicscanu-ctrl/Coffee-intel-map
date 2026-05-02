@@ -3,67 +3,94 @@
     "pub_date": "2026-05-01",
     "contracts": [
       {
-        "contract": "KC N26",
-        "expiry": "2026-07-15",
+        "contract": "Coffee (May '26)",
+        "expiry": "2026-05-18",
+        "last": 302,
+        "chg": 1.1,
+        "oi": 268,
+        "volume": 21,
+        "symbol": "KCK26"
+      },
+      {
+        "contract": "Coffee (Jul '26)",
+        "expiry": "2026-07-21",
         "last": 286.4,
         "chg": 0.85,
-        "oi": null,
-        "volume": 13007,
+        "oi": 80872,
+        "volume": 12986,
         "symbol": "KCN26"
       },
       {
-        "contract": "KC U26",
-        "expiry": "2026-09-15",
+        "contract": "Coffee (Sep '26)",
+        "expiry": "2026-09-18",
         "last": 275.9,
         "chg": 0.55,
-        "oi": null,
-        "volume": 6031,
+        "oi": 41930,
+        "volume": 6439,
         "symbol": "KCU26"
       },
       {
-        "contract": "KC Z26",
-        "expiry": "2026-12-15",
+        "contract": "Coffee (Dec '26)",
+        "expiry": "2026-12-18",
         "last": 267.5,
         "chg": -0.15,
-        "oi": null,
-        "volume": 3766,
+        "oi": 28092,
+        "volume": 4152,
         "symbol": "KCZ26"
       },
       {
-        "contract": "KC H27",
-        "expiry": "2027-03-15",
+        "contract": "Coffee (Mar '27)",
+        "expiry": "2027-03-18",
         "last": 264.85,
         "chg": -0.15,
-        "oi": null,
-        "volume": 1261,
+        "oi": 12024,
+        "volume": 1554,
         "symbol": "KCH27"
       },
       {
-        "contract": "KC K27",
-        "expiry": "2027-05-15",
+        "contract": "Coffee (May '27)",
+        "expiry": "2027-05-18",
         "last": 263.85,
         "chg": -0.05,
-        "oi": null,
-        "volume": 656,
+        "oi": 3450,
+        "volume": 646,
         "symbol": "KCK27"
       },
       {
-        "contract": "KC N27",
-        "expiry": "2027-07-15",
+        "contract": "Coffee (Jul '27)",
+        "expiry": "2027-07-20",
         "last": 263.1,
-        "chg": 0.0,
-        "oi": null,
-        "volume": 297,
+        "chg": 0,
+        "oi": 2240,
+        "volume": 289,
         "symbol": "KCN27"
       },
       {
-        "contract": "KC U27",
-        "expiry": "2027-09-15",
+        "contract": "Coffee (Sep '27)",
+        "expiry": "2027-09-20",
         "last": 261.05,
         "chg": 0.1,
-        "oi": null,
-        "volume": 74,
+        "oi": 1736,
+        "volume": 21,
         "symbol": "KCU27"
+      },
+      {
+        "contract": "Coffee (Dec '27)",
+        "expiry": "2027-12-20",
+        "last": 259.35,
+        "chg": 0.15,
+        "oi": 2144,
+        "volume": 12,
+        "symbol": "KCZ27"
+      },
+      {
+        "contract": "Coffee (Mar '28)",
+        "expiry": "2028-03-21",
+        "last": 258,
+        "chg": 0.3,
+        "oi": 526,
+        "volume": 2,
+        "symbol": "KCH28"
       }
     ]
   },
