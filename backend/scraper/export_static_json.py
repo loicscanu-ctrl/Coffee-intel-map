@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cot_schema import serialize_cot_row
 from database import SessionLocal
-from models import NewsItem, CotWeekly, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport, PhysicalPrice
+from models import NewsItem, CotWeekly, CotPosition, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport, PhysicalPrice
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
     safe_write_json,
@@ -217,14 +217,25 @@ def export_oi_history() -> None:
 
 def export_cot(db) -> None:
     rows = db.query(CotWeekly).order_by(CotWeekly.date.asc()).all()
+
+    # Bulk-load every CotPosition row once, then index by (date, market) for
+    # O(1) lookups in the row loop. Avoids N+1 queries on a 1.5k-row history.
+    pos_rows = db.query(CotPosition).all()
+    positions_by_week: dict[tuple, dict] = {}
+    for p in pos_rows:
+        positions_by_week.setdefault((p.date, p.market), {})[(p.crop, p.category, p.side)] = p
+
     merged: dict = {}
     for row in rows:
         d = row.date.isoformat()
         if d not in merged:
             merged[d] = {"date": d, "ny": None, "ldn": None}
+        positions = positions_by_week.get((row.date, row.market))
         # include_crop_split=True keeps the NY-only old/other crop fields
         # that the CotDashboard frontend expects in cot.json.
-        merged[d][row.market] = serialize_cot_row(row, include_crop_split=True)
+        merged[d][row.market] = serialize_cot_row(
+            row, positions=positions, include_crop_split=True,
+        )
     result = sorted(merged.values(), key=lambda x: x["date"])
 
     path = OUT_DIR / "cot.json"
