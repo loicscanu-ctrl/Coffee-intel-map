@@ -3,9 +3,9 @@ from datetime import date as DateType
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, HTTPException, Response
 from sqlalchemy.orm import Session
-from cot_schema import serialize_cot_row
+from cot_schema import positions_dict, serialize_cot_row
 from database import get_db
-from models import CotWeekly
+from models import CotPosition, CotWeekly
 
 router = APIRouter(prefix="/api/cot", tags=["cot"])
 
@@ -25,11 +25,29 @@ def get_cot(
             raise HTTPException(status_code=400, detail="Invalid 'after' date format. Use YYYY-MM-DD.")
         query = query.filter(CotWeekly.date > cutoff)
 
+    weekly_rows = query.all()
+    if not weekly_rows:
+        return []
+
+    # Bulk-load all CotPosition rows for the requested window in one query so
+    # we don't hit N+1. Keyed by (date, market) → {(crop, cat, side): row}.
+    pos_rows = (
+        db.query(CotPosition)
+        .filter(CotPosition.date >= weekly_rows[0].date)
+        .all()
+    )
+    positions_by_week: dict[tuple, dict] = {}
+    for p in pos_rows:
+        positions_by_week.setdefault((p.date, p.market), {})[(p.crop, p.category, p.side)] = p
+
     merged: dict[DateType, dict] = {}
-    for row in query.all():
+    for row in weekly_rows:
         d = row.date
         if d not in merged:
             merged[d] = {"date": d.isoformat(), "ny": None, "ldn": None}
-        merged[d][row.market] = serialize_cot_row(row, include_crop_split=False)
+        positions = positions_by_week.get((row.date, row.market))
+        merged[d][row.market] = serialize_cot_row(
+            row, positions=positions, include_crop_split=False,
+        )
 
     return sorted(merged.values(), key=lambda x: x["date"])

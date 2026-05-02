@@ -55,25 +55,77 @@ def _market_extra_field_names() -> list[str]:
     return [f"{base}_{mkt}" for base in _MARKET_EXTRAS for mkt in _MARKETS]
 
 
-def serialize_cot_row(row: Any, *, include_crop_split: bool = False) -> dict[str, Any]:
+def serialize_cot_row(row: Any, *, positions: Any = None,
+                      include_crop_split: bool = False) -> dict[str, Any]:
     """
-    Build the JSON-shaped dict for a CotWeekly row using getattr — same
-    field names, same key order as the prior hand-written copy-paste.
-    Set include_crop_split=True to include the NY-only old/other crop fields
-    (used by the static export but not the API).
+    Build the JSON-shaped dict for a CotWeekly row.
+
+    Position fields can come from two sources:
+      * `positions` is a dict keyed by ``(crop, category, side)`` mapping to
+        either a 2-tuple ``(oi, traders)`` or any object with ``.oi`` /
+        ``.traders`` attributes (e.g. a CotPosition ORM row). When provided,
+        position values come from this dict — the narrow `cot_position`
+        table is the source of truth.
+      * If `positions` is None, position values fall back to attributes on
+        `row` (the legacy wide-column path).
+
+    Market scalars (oi_total, price_ny, structure_ny, …) always come from
+    `row` since they live only in cot_weekly.
+
+    Set `include_crop_split=True` to include the NY-only old/other crop
+    fields (used by the static export but not the API).
     """
     out: dict[str, Any] = {"oi_total": getattr(row, "oi_total", None)}
-    for name in _position_field_names():
-        out[name] = getattr(row, name, None)
-    for name in _trader_count_field_names():
-        out[name] = getattr(row, name, None)
+
+    def _pos_value(crop: str, cat: str, side: str, kind: str) -> Any:
+        """Look up a position value. Prefers the narrow `positions` dict;
+        falls back to the wide column on `row` if the (crop, cat, side) key
+        isn't in the dict. Per-key (not per-week) fallback protects against
+        partial backfill states or new wide fields added between PRs."""
+        if positions is not None:
+            entry = positions.get((crop, cat, side))
+            if entry is not None:
+                if isinstance(entry, tuple):
+                    return entry[0] if kind == "oi" else entry[1]
+                return getattr(entry, kind, None)
+        return getattr(row, _build_field_name(crop, cat, side, kind), None)
+
+    # Positions (all-crop)
+    for cat, sides in _CATEGORIES_WITH_SPREAD:
+        for side in sides:
+            out[f"{cat}_{side}"] = _pos_value("all", cat, side, "oi")
+    # Trader counts (all-crop)
+    for cat, sides in _CATEGORIES_WITH_SPREAD:
+        for side in sides:
+            out[f"t_{cat}_{side}"] = _pos_value("all", cat, side, "traders")
+    # Crop split — old then other
     if include_crop_split:
-        for suffix in ("_old", "_other"):
-            for name in _position_field_names(suffix):
-                out[name] = getattr(row, name, None)
+        for crop_label, suffix in (("old", "_old"), ("other", "_other")):
+            for cat, sides in _CATEGORIES_WITH_SPREAD:
+                for side in sides:
+                    out[f"{cat}_{side}{suffix}"] = _pos_value(crop_label, cat, side, "oi")
+    # Market extras (always from row)
     for name in _market_extra_field_names():
         out[name] = getattr(row, name, None)
     return out
+
+
+def _build_field_name(crop: str, cat: str, side: str, kind: str) -> str:
+    """Inverse of field_to_position — builds the wide-column name from
+    ``(crop, category, side, kind)``. Used by the legacy fallback path
+    inside serialize_cot_row."""
+    suffix = "" if crop == "all" else f"_{crop}"
+    prefix = "t_" if kind == "traders" else ""
+    return f"{prefix}{cat}_{side}{suffix}"
+
+
+def positions_dict(rows: Any) -> dict[tuple[str, str, str], Any]:
+    """Index an iterable of CotPosition ORM rows by (crop, category, side).
+
+    Convenience for callers who load rows via SQLAlchemy and want the dict
+    shape that serialize_cot_row's `positions` parameter expects.
+    """
+    return {(r.crop, r.category, r.side): r for r in rows}
 
 
 # ── Wide → narrow mapping (for the cot_position child table migration) ────────

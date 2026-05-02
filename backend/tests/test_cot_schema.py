@@ -230,3 +230,148 @@ def test_position_rows_from_fields_handles_crop_split():
     assert by_key[("old",   "mm",   "long")]["oi"]   ==  8_000
     assert by_key[("other", "mm",   "long")]["oi"]   == 42_000
     assert by_key[("old",   "swap", "spread")]["oi"] ==  1_500
+
+
+# ── Narrow-read path tests (cot_position reader migration) ────────────────────
+
+class _StubPosition:
+    """Mimics a CotPosition ORM row."""
+    def __init__(self, oi=None, traders=None):
+        self.oi = oi
+        self.traders = traders
+
+
+def test_serialize_with_positions_prefers_narrow_over_wide():
+    """When a (crop, cat, side) row is in the positions dict, its value wins
+    over the wide row's column."""
+    row = _StubRow(
+        # Wide-row values that should be IGNORED when positions has the key
+        mm_long=999_999, mm_short=999_999, t_mm_long=999,
+        # Market scalars must still come from the row
+        oi_total=150_000, price_ny=304.10,
+    )
+    positions = {
+        ("all", "mm",   "long"):   _StubPosition(oi=50_000, traders=30),
+        ("all", "mm",   "short"):  _StubPosition(oi=20_000, traders=20),
+        ("all", "mm",   "spread"): _StubPosition(oi=5_000,  traders=5),
+        ("all", "pmpu", "long"):   _StubPosition(oi=80_000, traders=40),
+    }
+    out = serialize_cot_row(row, positions=positions, include_crop_split=False)
+
+    # Position values come from the dict, not the wide row's bogus values
+    assert out["mm_long"]    == 50_000
+    assert out["mm_short"]   == 20_000
+    assert out["mm_spread"]  == 5_000
+    assert out["t_mm_long"]  == 30
+    assert out["t_mm_short"] == 20
+    assert out["pmpu_long"]  == 80_000
+    # Market scalars still come from the row
+    assert out["oi_total"]   == 150_000
+    assert out["price_ny"]   == 304.10
+    # Key set + order are still locked
+    assert list(out.keys()) == _API_KEYS_IN_ORDER
+
+
+def test_serialize_falls_back_to_wide_for_keys_missing_from_positions_dict():
+    """Per-key fallback: if positions has SOME entries but not this specific
+    (crop, cat, side), the wide column on row is used instead of None.
+    Protects against partial backfill states or new fields added between PRs."""
+    row = _StubRow(
+        mm_long=50_000,         # has narrow entry → narrow wins (10000)
+        swap_long=30_000,       # NO narrow entry → wide value used
+        pmpu_long=None,         # NO narrow entry, wide is None → None
+    )
+    positions = {
+        ("all", "mm", "long"): _StubPosition(oi=10_000),
+    }
+    out = serialize_cot_row(row, positions=positions, include_crop_split=False)
+    assert out["mm_long"]   == 10_000   # from narrow
+    assert out["swap_long"] == 30_000   # from wide fallback
+    assert out["pmpu_long"] is None     # neither
+
+
+def test_serialize_with_tuple_positions():
+    """positions= also accepts (oi, traders) tuples, not just objects."""
+    row = _StubRow()
+    positions = {
+        ("all", "mm", "long"):  (50_000, 30),
+        ("all", "mm", "short"): (20_000, None),
+    }
+    out = serialize_cot_row(row, positions=positions, include_crop_split=False)
+    assert out["mm_long"]    == 50_000
+    assert out["t_mm_long"]  == 30
+    assert out["mm_short"]   == 20_000
+    assert out["t_mm_short"] is None
+
+
+def test_serialize_with_positions_handles_crop_split():
+    row = _StubRow()
+    positions = {
+        ("all",   "mm", "long"): _StubPosition(oi=50_000, traders=30),
+        ("old",   "mm", "long"): _StubPosition(oi=8_000),
+        ("other", "mm", "long"): _StubPosition(oi=42_000),
+    }
+    out = serialize_cot_row(row, positions=positions, include_crop_split=True)
+    assert out["mm_long"]       == 50_000
+    assert out["mm_long_old"]   == 8_000
+    assert out["mm_long_other"] == 42_000
+    # Order check: crop split sits between trader counts and per-market extras
+    keys = list(out.keys())
+    assert keys.index("mm_long_old") > keys.index("t_nr_short")
+    assert keys.index("mm_long_old") < keys.index("price_ny")
+
+
+def test_serialize_legacy_path_still_works_without_positions():
+    """When positions=None, the legacy wide-column path is used. Confirms
+    backward-compat for any caller not yet updated."""
+    row = _StubRow(mm_long=50_000, t_mm_long=30, oi_total=150_000)
+    out = serialize_cot_row(row, include_crop_split=False)
+    assert out["mm_long"]   == 50_000
+    assert out["t_mm_long"] == 30
+    assert out["oi_total"]  == 150_000
+
+
+def test_narrow_and_wide_produce_identical_output_when_data_matches():
+    """The actual wire-format invariant: when cot_position and cot_weekly
+    hold the same values, serialize must produce byte-identical dicts
+    regardless of which path we take. This is the contract that protects
+    api consumers across the reader migration."""
+    # Wide-row values
+    wide_row = _StubRow(
+        oi_total=150_000,
+        mm_long=50_000, mm_short=20_000, mm_spread=5_000,
+        pmpu_long=80_000, pmpu_short=40_000,
+        swap_long=30_000, swap_short=25_000, swap_spread=8_000,
+        nr_long=4_000, nr_short=3_000,
+        t_mm_long=30, t_mm_short=20, t_mm_spread=5,
+        t_pmpu_long=40, t_pmpu_short=35,
+        mm_long_old=8_000, mm_short_old=3_000,
+        mm_long_other=42_000, mm_short_other=17_000,
+        price_ny=304.10, structure_ny=-1.5,
+    )
+    # Equivalent narrow positions
+    positions = {
+        ("all", "mm",   "long"):   _StubPosition(oi=50_000, traders=30),
+        ("all", "mm",   "short"):  _StubPosition(oi=20_000, traders=20),
+        ("all", "mm",   "spread"): _StubPosition(oi=5_000,  traders=5),
+        ("all", "pmpu", "long"):   _StubPosition(oi=80_000, traders=40),
+        ("all", "pmpu", "short"):  _StubPosition(oi=40_000, traders=35),
+        ("all", "swap", "long"):   _StubPosition(oi=30_000),
+        ("all", "swap", "short"):  _StubPosition(oi=25_000),
+        ("all", "swap", "spread"): _StubPosition(oi=8_000),
+        ("all", "nr",   "long"):   _StubPosition(oi=4_000),
+        ("all", "nr",   "short"):  _StubPosition(oi=3_000),
+        ("old",   "mm", "long"):   _StubPosition(oi=8_000),
+        ("old",   "mm", "short"):  _StubPosition(oi=3_000),
+        ("other", "mm", "long"):   _StubPosition(oi=42_000),
+        ("other", "mm", "short"):  _StubPosition(oi=17_000),
+    }
+
+    wide_out   = serialize_cot_row(wide_row, include_crop_split=True)
+    narrow_out = serialize_cot_row(wide_row, positions=positions, include_crop_split=True)
+
+    # Same keys, same order
+    assert list(wide_out.keys()) == list(narrow_out.keys())
+    # Same values for every position field
+    for k in wide_out:
+        assert wide_out[k] == narrow_out[k], f"mismatch on key {k}: wide={wide_out[k]} narrow={narrow_out[k]}"
