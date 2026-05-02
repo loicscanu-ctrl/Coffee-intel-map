@@ -146,6 +146,38 @@ class CotWeekly(Base):
     )
 
 
+class CotPosition(Base):
+    """Narrow / long form of CotWeekly's per-category position breakdown.
+
+    One row per (date, market, crop, category, side) instead of one row with
+    ~120 columns. Populated by dual-write inside upsert_cot_weekly so callers
+    don't change. Reader code still uses CotWeekly during the migration; this
+    table will become the source of truth in a follow-up PR after backfill.
+
+    `oi`      = open interest in lots
+    `traders` = trader count (NULL for crop != "all" — wide schema only carries
+                trader counts for the all-crop split).
+    """
+    __tablename__ = "cot_position"
+
+    id:       Mapped[int]  = mapped_column(primary_key=True)
+    date:     Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    market:   Mapped[str]  = mapped_column(String(3), nullable=False)   # "ny" | "ldn"
+    crop:     Mapped[str]  = mapped_column(String(8), nullable=False)   # "all" | "old" | "other"
+    category: Mapped[str]  = mapped_column(String(8), nullable=False)   # pmpu | swap | mm | other | nr
+    side:     Mapped[str]  = mapped_column(String(8), nullable=False)   # long | short | spread
+
+    oi:       Mapped[int | None] = mapped_column(Integer)
+    traders:  Mapped[int | None] = mapped_column(Integer)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("date", "market", "crop", "category", "side",
+                         name="uq_cot_position"),
+    )
+
+
 class CommodityCot(Base):
     __tablename__ = "commodity_cot"
 
