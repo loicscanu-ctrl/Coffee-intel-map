@@ -59,73 +59,28 @@ class FreightRate(Base):
 
 
 class CotWeekly(Base):
+    """Per-week, per-market CoT marker row.
+
+    After the cot_weekly → cot_position migration this table holds only:
+      * The (date, market) "we have data for this week" key
+      * Market-level scalars from the COT Excel "Other" sheet
+        (open interest total, settlement price, structure, EFP, vol,
+        spread vol — all per market).
+
+    Per-category position breakdowns (mm_long, swap_spread_old, t_pmpu_long,
+    …) live in CotPosition. See backend/cot_schema.py for the parser that
+    routes fields to the right table.
+    """
     __tablename__ = "cot_weekly"
 
     id:     Mapped[int]  = mapped_column(primary_key=True)
     date:   Mapped[date] = mapped_column(Date, nullable=False, index=True)
     market: Mapped[str]  = mapped_column(String(3), nullable=False)  # "ny" | "ldn"
 
-    # CoT OI fields
-    oi_total:     Mapped[int | None] = mapped_column(Integer)
-    pmpu_long:    Mapped[int | None] = mapped_column(Integer)
-    pmpu_short:   Mapped[int | None] = mapped_column(Integer)
-    swap_long:    Mapped[int | None] = mapped_column(Integer)
-    swap_short:   Mapped[int | None] = mapped_column(Integer)
-    swap_spread:  Mapped[int | None] = mapped_column(Integer)
-    mm_long:      Mapped[int | None] = mapped_column(Integer)
-    mm_short:     Mapped[int | None] = mapped_column(Integer)
-    mm_spread:    Mapped[int | None] = mapped_column(Integer)
-    other_long:   Mapped[int | None] = mapped_column(Integer)
-    other_short:  Mapped[int | None] = mapped_column(Integer)
-    other_spread: Mapped[int | None] = mapped_column(Integer)
-    nr_long:      Mapped[int | None] = mapped_column(Integer)
-    nr_short:     Mapped[int | None] = mapped_column(Integer)
+    # Open interest total for this market+week
+    oi_total: Mapped[int | None] = mapped_column(Integer)
 
-    # Trader count fields
-    t_pmpu_long:    Mapped[int | None] = mapped_column(Integer)
-    t_pmpu_short:   Mapped[int | None] = mapped_column(Integer)
-    t_swap_long:    Mapped[int | None] = mapped_column(Integer)
-    t_swap_short:   Mapped[int | None] = mapped_column(Integer)
-    t_swap_spread:  Mapped[int | None] = mapped_column(Integer)
-    t_mm_long:      Mapped[int | None] = mapped_column(Integer)
-    t_mm_short:     Mapped[int | None] = mapped_column(Integer)
-    t_mm_spread:    Mapped[int | None] = mapped_column(Integer)
-    t_other_long:   Mapped[int | None] = mapped_column(Integer)
-    t_other_short:  Mapped[int | None] = mapped_column(Integer)
-    t_other_spread: Mapped[int | None] = mapped_column(Integer)
-    t_nr_long:      Mapped[int | None] = mapped_column(Integer)  # NY only; None for LDN
-    t_nr_short:     Mapped[int | None] = mapped_column(Integer)  # NY only; None for LDN
-
-    # Old/Other crop split — NY (CFTC Arabica) only; None for LDN (Robusta has no split)
-    pmpu_long_old:    Mapped[int | None] = mapped_column(Integer)
-    pmpu_short_old:   Mapped[int | None] = mapped_column(Integer)
-    swap_long_old:    Mapped[int | None] = mapped_column(Integer)
-    swap_short_old:   Mapped[int | None] = mapped_column(Integer)
-    swap_spread_old:  Mapped[int | None] = mapped_column(Integer)
-    mm_long_old:      Mapped[int | None] = mapped_column(Integer)
-    mm_short_old:     Mapped[int | None] = mapped_column(Integer)
-    mm_spread_old:    Mapped[int | None] = mapped_column(Integer)
-    other_long_old:   Mapped[int | None] = mapped_column(Integer)
-    other_short_old:  Mapped[int | None] = mapped_column(Integer)
-    other_spread_old: Mapped[int | None] = mapped_column(Integer)
-    nr_long_old:      Mapped[int | None] = mapped_column(Integer)
-    nr_short_old:     Mapped[int | None] = mapped_column(Integer)
-
-    pmpu_long_other:    Mapped[int | None] = mapped_column(Integer)
-    pmpu_short_other:   Mapped[int | None] = mapped_column(Integer)
-    swap_long_other:    Mapped[int | None] = mapped_column(Integer)
-    swap_short_other:   Mapped[int | None] = mapped_column(Integer)
-    swap_spread_other:  Mapped[int | None] = mapped_column(Integer)
-    mm_long_other:      Mapped[int | None] = mapped_column(Integer)
-    mm_short_other:     Mapped[int | None] = mapped_column(Integer)
-    mm_spread_other:    Mapped[int | None] = mapped_column(Integer)
-    other_long_other:   Mapped[int | None] = mapped_column(Integer)
-    other_short_other:  Mapped[int | None] = mapped_column(Integer)
-    other_spread_other: Mapped[int | None] = mapped_column(Integer)
-    nr_long_other:      Mapped[int | None] = mapped_column(Integer)
-    nr_short_other:     Mapped[int | None] = mapped_column(Integer)
-
-    # From Other sheet (joined by report date)
+    # From Other sheet (joined by report date) — market-level scalars
     price_ny:       Mapped[float | None] = mapped_column(Float)
     price_ldn:      Mapped[float | None] = mapped_column(Float)
     structure_ny:   Mapped[float | None] = mapped_column(Float)

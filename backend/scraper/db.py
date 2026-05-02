@@ -79,80 +79,115 @@ def upsert_freight_rate(index_code: str, rate_date, rate: float):
 
 
 def migrate_cot_weekly_columns():
-    """Add any missing columns to cot_weekly (safe to run repeatedly)."""
+    """No-op kept for backwards-compat with existing scraper entrypoints.
+
+    Older versions added per-category wide columns to cot_weekly. After the
+    cot_position migration those columns are dropped (see
+    migrate_drop_cot_weekly_position_columns) and per-category data lives in
+    CotPosition instead. Callers can keep importing this name without
+    changing their code.
+    """
+    return None
+
+
+def migrate_drop_cot_weekly_position_columns():
+    """Drop the wide per-category position columns from cot_weekly.
+
+    Idempotent (uses IF EXISTS). Run from scraper entrypoints alongside
+    create_cot_position_table so a fresh deploy converges to the new schema.
+
+    Position data lives in CotPosition now; cot_weekly only carries the
+    (date, market) key + market-level scalars.
+    """
     engine = _get_engine()
     from sqlalchemy import text
-    new_cols = [
-        ("pmpu_long_old", "INTEGER"), ("pmpu_short_old", "INTEGER"),
-        ("swap_long_old", "INTEGER"), ("swap_short_old", "INTEGER"), ("swap_spread_old", "INTEGER"),
-        ("mm_long_old", "INTEGER"),   ("mm_short_old", "INTEGER"),   ("mm_spread_old", "INTEGER"),
-        ("other_long_old", "INTEGER"),("other_short_old", "INTEGER"),("other_spread_old", "INTEGER"),
-        ("nr_long_old", "INTEGER"),   ("nr_short_old", "INTEGER"),
-        ("pmpu_long_other", "INTEGER"),("pmpu_short_other", "INTEGER"),
-        ("swap_long_other", "INTEGER"),("swap_short_other", "INTEGER"),("swap_spread_other", "INTEGER"),
-        ("mm_long_other", "INTEGER"),  ("mm_short_other", "INTEGER"), ("mm_spread_other", "INTEGER"),
-        ("other_long_other", "INTEGER"),("other_short_other", "INTEGER"),("other_spread_other", "INTEGER"),
-        ("nr_long_other", "INTEGER"),  ("nr_short_other", "INTEGER"),
+
+    cols_to_drop = [
+        # Position OI fields (all-crop)
+        "pmpu_long", "pmpu_short",
+        "swap_long", "swap_short", "swap_spread",
+        "mm_long", "mm_short", "mm_spread",
+        "other_long", "other_short", "other_spread",
+        "nr_long", "nr_short",
+        # Trader counts (all-crop only — wide schema never had crop-split traders)
+        "t_pmpu_long", "t_pmpu_short",
+        "t_swap_long", "t_swap_short", "t_swap_spread",
+        "t_mm_long", "t_mm_short", "t_mm_spread",
+        "t_other_long", "t_other_short", "t_other_spread",
+        "t_nr_long", "t_nr_short",
+        # Old-crop split (NY only)
+        "pmpu_long_old", "pmpu_short_old",
+        "swap_long_old", "swap_short_old", "swap_spread_old",
+        "mm_long_old", "mm_short_old", "mm_spread_old",
+        "other_long_old", "other_short_old", "other_spread_old",
+        "nr_long_old", "nr_short_old",
+        # Other-crop split
+        "pmpu_long_other", "pmpu_short_other",
+        "swap_long_other", "swap_short_other", "swap_spread_other",
+        "mm_long_other", "mm_short_other", "mm_spread_other",
+        "other_long_other", "other_short_other", "other_spread_other",
+        "nr_long_other", "nr_short_other",
     ]
+
     with engine.connect() as conn:
-        for col, col_type in new_cols:
+        dropped = 0
+        for col in cols_to_drop:
             try:
-                conn.execute(text(
-                    f"ALTER TABLE cot_weekly ADD COLUMN IF NOT EXISTS {col} {col_type}"
-                ))
+                conn.execute(text(f"ALTER TABLE cot_weekly DROP COLUMN IF EXISTS {col}"))
                 conn.commit()
+                dropped += 1
             except Exception as e:
-                print(f"[db] migrate col {col}: {e}")
+                print(f"[db] drop col {col}: {e}")
+    print(f"[db] migrate_drop_cot_weekly_position_columns: processed {dropped}/{len(cols_to_drop)} columns")
 
 
 def upsert_cot_weekly(market: str, report_date, fields: dict):
-    """Write a CoT row.
+    """Write a CoT week.
 
-    Dual-writes during the cot_weekly → cot_position migration: every
-    position field in `fields` (mm_long, swap_spread_old, t_pmpu_long, …)
-    gets unpacked into the narrow CotPosition table while the wide
-    CotWeekly row keeps its existing shape so readers don't change. See
-    backend/cot_schema.py for the wide → narrow mapping.
+    Position fields (mm_long, swap_spread_old, t_pmpu_long, …) are routed
+    to the narrow CotPosition table — the wide cot_weekly columns no
+    longer exist. Market scalars (oi_total, price_ny, structure_ny, …)
+    stay on CotWeekly. See backend/cot_schema.py for the field-name parser
+    that drives the routing.
+
+    The CotWeekly row is always upserted (even when only position fields
+    are passed) so the (date, market) key acts as the canonical "we have
+    data for this week" signal that the routes/exports filter on.
     """
-    from cot_schema import position_rows_from_fields
+    from cot_schema import field_to_position, position_rows_from_fields
     from models import CotPosition, CotWeekly
+
+    # Split: scalars stay on CotWeekly, position fields go to CotPosition.
+    scalar_fields = {k: v for k, v in fields.items() if field_to_position(k) is None}
+    position_rows = position_rows_from_fields(fields)
+
     db = get_session()
     try:
         existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
         if existing:
-            for k, v in fields.items():
+            for k, v in scalar_fields.items():
                 setattr(existing, k, v)
         else:
-            db.add(CotWeekly(date=report_date, market=market, **fields))
+            db.add(CotWeekly(date=report_date, market=market, **scalar_fields))
 
-        # Dual-write the position breakdown. Skip silently if the new table
-        # hasn't been migrated yet (e.g. fresh local dev DB) — the wide
-        # CotWeekly write above is still the source of truth.
-        try:
-            for pos in position_rows_from_fields(fields):
-                row = (
-                    db.query(CotPosition)
-                    .filter_by(date=report_date, market=market,
-                               crop=pos["crop"], category=pos["category"],
-                               side=pos["side"])
-                    .first()
-                )
-                if row:
-                    if pos["oi"] is not None:
-                        row.oi = pos["oi"]
-                    if pos["traders"] is not None:
-                        row.traders = pos["traders"]
-                else:
-                    db.add(CotPosition(
-                        date=report_date, market=market,
-                        crop=pos["crop"], category=pos["category"],
-                        side=pos["side"],
-                        oi=pos["oi"], traders=pos["traders"],
-                    ))
-        except Exception as e:
-            # Don't let dual-write breakage block the existing wide-table
-            # path during the migration window.
-            print(f"[db] cot_position dual-write failed: {e}")
+        for pos in position_rows:
+            row = (
+                db.query(CotPosition)
+                .filter_by(date=report_date, market=market,
+                           crop=pos["crop"], category=pos["category"],
+                           side=pos["side"])
+                .first()
+            )
+            if row:
+                if pos["oi"]      is not None: row.oi      = pos["oi"]
+                if pos["traders"] is not None: row.traders = pos["traders"]
+            else:
+                db.add(CotPosition(
+                    date=report_date, market=market,
+                    crop=pos["crop"], category=pos["category"],
+                    side=pos["side"],
+                    oi=pos["oi"], traders=pos["traders"],
+                ))
 
         db.commit()
     except Exception:

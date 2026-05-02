@@ -210,18 +210,6 @@ def position_rows_from_fields(fields: dict[str, Any]) -> list[dict[str, Any]]:
             if r["oi"] is not None or r["traders"] is not None]
 
 
-def cot_weekly_to_position_rows(row: Any) -> list[dict[str, Any]]:
-    """Read every position-shaped column off a CotWeekly ORM row and return the
-    corresponding cot_position rows. Used by the backfill script.
-
-    Mirrors the contract of position_rows_from_fields but pulls values from
-    the row's attributes instead of a fields dict, so the backfill script
-    doesn't need to enumerate column names by hand.
-    """
-    fields: dict[str, Any] = {}
-    for suffix in ("", "_old", "_other"):
-        for name in _position_field_names(suffix):
-            fields[name] = getattr(row, name, None)
-    for name in _trader_count_field_names():
-        fields[name] = getattr(row, name, None)
-    return position_rows_from_fields(fields)
+# Note: an earlier helper (cot_weekly_to_position_rows) was used by the
+# one-shot backfill in PR B. Now that the wide position columns are dropped
+# from cot_weekly, that helper would always return [] — removed.

@@ -8,13 +8,13 @@ Called by scraper-cot.yml after run_cot (macro positions).
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from scraper.db import migrate_cot_weekly_columns, create_cot_position_table
+from scraper.db import create_cot_position_table, migrate_drop_cot_weekly_position_columns
 from scraper.sources.futures import _fetch_cftc_cot, _make_cot_item, _fetch_ice_robusta_cot, _make_ice_cot_item
 
 
 def main():
-    migrate_cot_weekly_columns()
     create_cot_position_table()
+    migrate_drop_cot_weekly_position_columns()
 
     # CFTC – NY Arabica Coffee C
     cot_row = _fetch_cftc_cot()
