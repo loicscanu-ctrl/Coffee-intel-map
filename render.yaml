@@ -1,0 +1,40 @@
+# Render Blueprint for the acaphe live-quotes poller.
+#
+# Why this exists: the poller is a long-running process that needs to run
+# 24/7 to keep frontend's /api/live endpoint fresh. Running it on a laptop
+# means quotes go stale whenever the laptop is off or asleep — see PR #1's
+# check-live-quotes workflow which alerts on that exact condition.
+#
+# To deploy:
+#   1. Push this repo to GitHub (already done).
+#   2. In Render → New → Blueprint → connect this repo. Render reads this
+#      file and provisions the worker.
+#   3. Set the two required env vars in the Render dashboard:
+#        UPSTASH_REDIS_REST_URL
+#        UPSTASH_REDIS_REST_TOKEN
+#      Optionally set DATABASE_URL if you also want Vietnam physical
+#      prices persisted to Postgres.
+#   4. The worker starts polling. Within ~1 minute the live quotes start
+#      flowing and the freshness-check workflow stops alerting.
+#
+# Cost: a Starter worker is free tier-eligible (with limits) and ~$7/mo
+# beyond. The poller's CPU/RAM footprint is tiny — Chromium runs once
+# at startup, then it's just an HTTP-poll loop.
+
+services:
+  - type: worker
+    name: acaphe-poller
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.acaphe-poller
+    dockerContext: ./backend
+    plan: starter        # smallest paid tier; free tier OK if you accept sleep
+    autoDeploy: true     # redeploy on push to main when backend/scraper/ changes
+    envVars:
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false      # set in dashboard
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false      # set in dashboard
+      - key: DATABASE_URL
+        sync: false      # optional — set in dashboard if you want VN price persistence
+      - key: PYTHONUNBUFFERED
+        value: "1"
