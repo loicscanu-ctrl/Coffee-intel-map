@@ -419,10 +419,12 @@ def _parse_oni_text(text: str) -> list[dict]:
 
 def _scrape_weather(db) -> None:
     """Fetch 14-day hourly forecast for each region, aggregate to daily, upsert."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import WeatherSnapshot
     from sqlalchemy import delete
+
+    from models import WeatherSnapshot
 
     for region in REGIONS:
         url = OPEN_METEO_URL.format(lat=region["lat"], lon=region["lon"])
@@ -444,10 +446,12 @@ def _scrape_weather(db) -> None:
 
 def _scrape_enso(db) -> None:
     """Fetch NOAA ONI text, parse, store in NewsItem."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import NewsItem
     from sqlalchemy import delete
+
+    from models import NewsItem
 
     try:
         resp = requests.get(NOAA_ONI_URL, timeout=30)
@@ -484,10 +488,12 @@ def _scrape_enso_forecast(db) -> None:
         AMJ    |   0     |   53    |   47
         ...
     """
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import NewsItem
     from bs4 import BeautifulSoup
+
+    from models import NewsItem
 
     try:
         resp = requests.get(IRI_FORECAST_URL, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
@@ -575,6 +581,7 @@ def _parse_world_bank_excel(content: bytes) -> dict:
     Returns {"urea_monthly": [...7 vals...], "dap_monthly": [...], "kcl_monthly": [...]}.
     """
     import re
+
     import openpyxl
 
     wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True, read_only=True)
@@ -693,10 +700,12 @@ def _find_world_bank_excel_url() -> str:
 
 def _scrape_fertilizer_prices(db) -> None:
     """Download World Bank Excel, extract last 7 monthly values for urea/DAP/KCl."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import NewsItem
     from sqlalchemy import delete
+
+    from models import NewsItem
 
     try:
         url = _find_world_bank_excel_url()

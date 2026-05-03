@@ -7,13 +7,12 @@ Called from run_monthly.py.
 NCM codes sourced from Hedgepoint MDIC methodology (April 2026 report).
 """
 
-import io
 import json
 import os
 import re
 import sys
 from collections import defaultdict
-from datetime import datetime, date
+from datetime import date, datetime
 from pathlib import Path
 
 # NCM codes of interest (8-digit, all Chapter 31)

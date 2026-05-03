@@ -1,5 +1,6 @@
 from scraper.sources.vietnam import parse_giacaphe, parse_tintaynguyen, parse_vicofa
 
+
 def test_parse_giacaphe_extracts_price():
     html = '<td class="price">43.500</td>'
     result = parse_giacaphe(html)

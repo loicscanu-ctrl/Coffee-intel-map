@@ -1,6 +1,8 @@
 import re
 from datetime import date
+
 from bs4 import BeautifulSoup
+
 from scraper.translate import translate_to_english
 
 _TODAY = lambda: date.today().isoformat()

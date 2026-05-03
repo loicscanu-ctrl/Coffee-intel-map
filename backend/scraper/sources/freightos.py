@@ -1,7 +1,9 @@
 # backend/scraper/sources/freightos.py
+import os
 import re
+import sys
 from datetime import date
-import sys, os
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from scraper.db import upsert_freight_rate

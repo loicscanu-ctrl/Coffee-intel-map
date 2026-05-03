@@ -4,7 +4,8 @@ Adds: bias, error percentiles, directional accuracy, conditional MAE by regime,
 rolling MAE over time, and improvement-over-baseline stats.
 """
 
-import json, math, statistics
+import json
+import math
 
 with open("../../frontend/public/data/cot.json") as f:
     raw = json.load(f)
@@ -175,7 +176,7 @@ for cat in CATS:
         flag = " ★" if m["mae"] == min(r[a]["mae"] for a in ["baseline","prop_oi","price_065","price_cal"]) else ""
         print(f"  {ap:<16} {m['mae']:>6,} {m['rmse']:>6,} {m['bias']:>+6,} {m['p50']:>6,} {m['p75']:>6,} {m['p90']:>6,} {m['r2']:>7.4f} {m['dir_acc']:>6.1f}%{flag}")
 
-    print(f"\n  Regime MAE (baseline | prop_oi | price_065 | price_cal) — price(u/d) × OI(u/d)")
+    print("\n  Regime MAE (baseline | prop_oi | price_065 | price_cal) — price(u/d) × OI(u/d)")
     for regime_key in ["uu","ud","du","dd"]:
         label = {"uu":"Price+ OI+","ud":"Price+ OI-","du":"Price- OI+","dd":"Price- OI-"}[regime_key]
         vals  = [r["regime"][ap][regime_key] for ap in ["baseline","prop_oi","price_065","price_cal"]]

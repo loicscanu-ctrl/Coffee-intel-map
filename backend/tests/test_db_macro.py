@@ -1,11 +1,12 @@
-import pytest
-from unittest.mock import MagicMock, call
 from datetime import date
+from unittest.mock import MagicMock
+
 
 # We test the upsert logic by passing a mock db session
 def test_upsert_commodity_cot_insert():
     """New row is added when no existing row found."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.db_macro import upsert_commodity_cot
 
@@ -20,7 +21,8 @@ def test_upsert_commodity_cot_insert():
 
 def test_upsert_commodity_cot_update():
     """Existing row is updated, not duplicated."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.db_macro import upsert_commodity_cot
 
@@ -37,7 +39,8 @@ def test_upsert_commodity_cot_update():
 
 def test_upsert_commodity_price_insert():
     """New price row is added when absent."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from scraper.db_macro import upsert_commodity_price
 

@@ -11,8 +11,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from scraper.db import get_session
 from models import CommodityCot, CommodityPrice
+from scraper.db import get_session
 
 
 def main():
@@ -49,7 +49,7 @@ def main():
             if missing_prices:
                 print(f"  MISSING prices for : {missing_prices}")
             else:
-                print(f"  All prices present ✓")
+                print("  All prices present ✓")
 
             # Show OI totals
             total_oi = sum(r.oi_total or 0 for r in cot_rows)

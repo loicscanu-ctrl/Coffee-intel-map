@@ -12,8 +12,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from database import SessionLocal
-from scraper.sources.farmer_economics import _scrape_weather
 from scraper.export_static_json import export_farmer_economics
+from scraper.sources.farmer_economics import _scrape_weather
+
 
 def main():
     db = SessionLocal()

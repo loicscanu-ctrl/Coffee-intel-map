@@ -14,17 +14,28 @@ import pandas as pd
 import yfinance as yf
 
 sys.path.insert(0, os.path.dirname(__file__))
+from models import CotWeekly
 from scraper.db import get_session
 from scraper.db_macro import upsert_commodity_cot, upsert_commodity_price
 from scraper.sources.macro_cot import (
+    _CFTC_DATE_COL,
+    _CFTC_MARKET_COL,
+    _CFTC_MM_LONG,
+    _CFTC_MM_SHORT,
+    _CFTC_MM_SPREAD,
+    _CFTC_OI,
+    _ICE_DATE_COL,
+    _ICE_MARKET_COL,
+    _ICE_MM_LONG,
+    _ICE_MM_SHORT,
+    _ICE_MM_SPREAD,
+    _ICE_OI,
     COMMODITY_SPECS,
-    _CFTC_MARKET_COL, _CFTC_DATE_COL, _CFTC_MM_LONG, _CFTC_MM_SHORT,
-    _CFTC_MM_SPREAD, _CFTC_OI,
-    _ICE_MARKET_COL, _ICE_DATE_COL, _ICE_MM_LONG, _ICE_MM_SHORT,
-    _ICE_MM_SPREAD, _ICE_OI,
-    _download_cftc_df, _download_ice_df, _safe_int, _fetch_gbpusd_rates,
+    _download_cftc_df,
+    _download_ice_df,
+    _fetch_gbpusd_rates,
+    _safe_int,
 )
-from models import CotWeekly
 
 WEEKS_BACK = 52
 CUTOFF = date.today() - timedelta(weeks=WEEKS_BACK)

@@ -1,4 +1,5 @@
-from scraper.sources.brazil import parse_cooabriel, parse_noticiasagricolas, parse_cecafe
+from scraper.sources.brazil import parse_cecafe, parse_cooabriel, parse_noticiasagricolas
+
 
 def test_parse_cooabriel_extracts_price():
     html = '<td class="valor">R$ 1.250,00</td>'

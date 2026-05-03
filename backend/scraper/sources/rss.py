@@ -4,7 +4,7 @@
 import asyncio
 import html
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 
 import feedparser
@@ -49,14 +49,14 @@ def _parse_date(entry) -> datetime:
     """Return a timezone-aware datetime for an RSS entry."""
     # feedparser exposes published_parsed (time.struct_time, UTC)
     if hasattr(entry, "published_parsed") and entry.published_parsed:
-        return datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+        return datetime(*entry.published_parsed[:6], tzinfo=UTC)
     # Fallback: raw published string
     if hasattr(entry, "published") and entry.published:
         try:
             return parsedate_to_datetime(entry.published)
         except Exception:
             pass
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 BOILERPLATE_PATTERNS = [

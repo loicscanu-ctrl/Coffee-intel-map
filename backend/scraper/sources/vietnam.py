@@ -1,5 +1,6 @@
 import re
 from datetime import date
+
 from bs4 import BeautifulSoup
 
 _TODAY = lambda: date.today().isoformat()

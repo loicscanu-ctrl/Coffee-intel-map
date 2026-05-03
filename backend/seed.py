@@ -1,7 +1,8 @@
 import json
 import os
-from database import SessionLocal, engine, Base
-from models import NewsItem, CountryIntel, Factory
+
+from database import SessionLocal
+from models import CountryIntel, Factory, NewsItem
 
 SEED_DIR = os.path.join(os.path.dirname(__file__), "seed")
 

@@ -1,5 +1,6 @@
-from scraper.sources.demand import parse_bls_cpi, parse_ecf, parse_ajca
-from scraper.sources.technicals import parse_worldbank_fertilizer, parse_cftc_cot, parse_searates
+from scraper.sources.demand import parse_ajca, parse_bls_cpi, parse_ecf
+from scraper.sources.technicals import parse_cftc_cot, parse_searates, parse_worldbank_fertilizer
+
 
 def test_parse_bls_cpi_extracts_value():
     html = '<td class="datavalue">309.685</td>'

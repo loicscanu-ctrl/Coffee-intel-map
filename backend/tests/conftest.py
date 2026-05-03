@@ -1,14 +1,16 @@
 import os
+
 # Override DB URL before any project code is imported
 os.environ["DATABASE_URL"] = "sqlite:///./test.db"
 
 import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from database import Base, engine, SessionLocal
+
+from database import Base, SessionLocal, engine
+
 
 @pytest.fixture
 def db():

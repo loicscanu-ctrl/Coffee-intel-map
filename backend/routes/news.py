@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
@@ -13,20 +13,20 @@ router = APIRouter(prefix="/api/news", tags=["news"])
 class NewsItemResponse(BaseModel):
     id: int
     title: str
-    body: Optional[str] = None
-    source: Optional[str] = None
+    body: str | None = None
+    source: str | None = None
     category: str
-    lat: Optional[float] = None
-    lng: Optional[float] = None
-    tags: Optional[list[str]] = None
-    meta: Optional[Any] = None
-    pub_date: Optional[str] = None
+    lat: float | None = None
+    lng: float | None = None
+    tags: list[str] | None = None
+    meta: Any | None = None
+    pub_date: str | None = None
 
 
 @router.get("", response_model=list[NewsItemResponse])
 def get_news(
     response: Response,
-    category: Optional[str] = None,
+    category: str | None = None,
     limit: int = 100,
     db: Session = Depends(get_db),
 ):

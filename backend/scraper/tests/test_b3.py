@@ -1,5 +1,6 @@
 from scraper.sources.b3 import parse_b3
 
+
 def test_parse_b3_extracts_price():
     html = '<td class="quotation__last-value">R$ 1.350,00</td>'
     result = parse_b3(html)

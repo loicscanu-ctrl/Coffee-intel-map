@@ -1,10 +1,11 @@
+
 import pytest
-from unittest.mock import MagicMock, patch
-from datetime import date
+
 
 def test_contract_value_usd_per_bbl():
     """usd_per_bbl: price × contract_unit."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _to_contract_value
 
@@ -14,7 +15,8 @@ def test_contract_value_usd_per_bbl():
 
 def test_contract_value_usd_per_lb():
     """usd_per_lb: price × contract_unit."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _to_contract_value
 
@@ -24,7 +26,8 @@ def test_contract_value_usd_per_lb():
 
 def test_exposure_calc_null_price():
     """gross/net exposure is None when price missing."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _compute_exposures
 
@@ -37,7 +40,8 @@ def test_exposure_calc_null_price():
 
 def test_exposure_calc_with_price():
     """All fields populated when price present."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from routes.macro_cot import _compute_exposures
 

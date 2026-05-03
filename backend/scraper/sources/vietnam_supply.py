@@ -12,7 +12,7 @@ import csv
 import io
 import logging
 import re
-from datetime import datetime, date
+from datetime import datetime
 
 import requests
 

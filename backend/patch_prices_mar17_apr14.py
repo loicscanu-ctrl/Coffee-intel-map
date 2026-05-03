@@ -7,6 +7,7 @@ Run from repo root:  python backend/patch_prices_mar17_apr14.py
 """
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from scraper.db import upsert_cot_weekly

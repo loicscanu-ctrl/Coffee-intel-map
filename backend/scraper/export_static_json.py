@@ -19,8 +19,8 @@ Run after any scraper that updates the relevant tables:
 
 import json
 import re
-import sys
 import shutil
+import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -29,18 +29,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cot_schema import serialize_cot_row
 from database import SessionLocal
-from models import NewsItem, CotWeekly, CotPosition, CommodityCot, CommodityPrice, FreightRate, WeatherSnapshot, FertilizerImport, PhysicalPrice
+from models import (
+    CommodityCot,
+    CommodityPrice,
+    CotPosition,
+    CotWeekly,
+    FertilizerImport,
+    FreightRate,
+    NewsItem,
+    PhysicalPrice,
+    WeatherSnapshot,
+)
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
     safe_write_json,
-    validate_futures_chain,
-    validate_oi_fnd_chart,
     validate_cot,
     validate_cot_recent,
-    validate_macro_cot,
-    validate_freight,
     validate_farmer_economics,
+    validate_freight,
+    validate_futures_chain,
     validate_health,
+    validate_macro_cot,
+    validate_oi_fnd_chart,
 )
 
 ROOT    = Path(__file__).resolve().parents[2]
@@ -803,7 +813,7 @@ def export_farmer_economics(db) -> None:
                 "map_dap": {"name": "MAP (P)",  "kt_key": "map_kt",  "fob_key": "map_fob",  **_FERT_CONFIG["dap"]},
                 "kcl":     {"name": "KCl (K)",  "kt_key": "kcl_kt",  "fob_key": "kcl_fob",  **_FERT_CONFIG["kcl"]},
             }
-            for key, cfg in _COMEX_FERT.items():
+            for cfg in _COMEX_FERT.values():
                 prices_by_month = [
                     (e["month"], _implied_price(e[cfg["fob_key"]], e[cfg["kt_key"]]))
                     for e in sorted_months
@@ -1083,8 +1093,9 @@ def export_latest_prices(db) -> None:
     """Pre-compute all ticker display values → latest_prices.json.
     Primary source: physical_prices table (typed columns, indexed).
     Fallback: NewsItem body parsing (used until physical_prices is populated)."""
-    import re as _re
     import json as _json
+    import re as _re
+
     from sqlalchemy import func
 
     # ── Primary: PhysicalPrice table ─────────────────────────────────────────
@@ -1226,8 +1237,8 @@ def export_latest_prices(db) -> None:
 
 def _build_tickers_from_news(db) -> list[dict]:
     """Fallback: parse tickers from NewsItem.body (used before PhysicalPrice is populated)."""
-    import re as _re
     import json as _json
+    import re as _re
 
     recent = (
         db.query(NewsItem)

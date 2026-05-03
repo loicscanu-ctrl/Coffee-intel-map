@@ -1,14 +1,18 @@
 # backend/tests/test_freight_route.py
 # Note: conftest.py sets DATABASE_URL=sqlite before this file is imported
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-import pytest
 from datetime import date, timedelta
+
+import pytest
 from fastapi.testclient import TestClient
-from database import Base, engine, SessionLocal
-from models import FreightRate
+
 import main as app_main
+from database import Base, SessionLocal, engine
+from models import FreightRate
 
 
 @pytest.fixture(autouse=True)

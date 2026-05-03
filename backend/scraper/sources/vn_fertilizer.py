@@ -28,7 +28,7 @@ import json
 import logging
 import re
 import sys
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)

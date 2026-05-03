@@ -1,8 +1,10 @@
 import os
+
 from dotenv import load_dotenv
+
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://coffee:coffee@localhost:5432/coffee_intel")
 

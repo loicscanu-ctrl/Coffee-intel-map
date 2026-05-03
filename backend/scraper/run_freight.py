@@ -3,12 +3,13 @@ Standalone runner for the Freightos scraper.
 Used by GitHub Actions — runs only the freight scraper, not the full suite.
 """
 import asyncio
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from playwright.async_api import async_playwright
+
 from scraper.sources.freightos import run
 
 

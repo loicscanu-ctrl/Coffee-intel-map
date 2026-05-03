@@ -4,7 +4,8 @@ Walk-forward, 104-week warm-up, no look-ahead bias.
 Outputs JSON-ready results for CotBacktestReport.tsx.
 """
 
-import json, math, statistics
+import json
+import math
 
 with open("../../frontend/public/data/cot.json") as f:
     raw = json.load(f)

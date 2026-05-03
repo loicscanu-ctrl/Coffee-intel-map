@@ -21,7 +21,17 @@ ignore = [
     "E501",  # line length — many SQLAlchemy column declarations exceed 120
     "E402",  # module-level import not at top — used for sys.path tweaks
     "B008",  # function call in default arg — FastAPI Depends() pattern
+    # Stylistic preferences the codebase consistently breaks; not bugs.
+    "E701",  # multiple statements on one line (colon) — used for tight if-returns
+    "E702",  # multiple statements on one line (semicolon)
+    "E731",  # lambda assigned to a name — used for short-lived helpers
+    "E741",  # ambiguous var names like 'l' — column maps use single letters
+    "B905",  # zip() without strict= — adopted in 3.10+, not retrofitting now
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "scraper/sources/futures.py" = ["E741"]  # 'l' as loop var in column maps
+# Backtest scripts use closures that intentionally read the final value of
+# the enclosing loop variable. Subtle but not a bug; flagging would be noisy.
+"scraper/backtest_cot_v2.py" = ["B023"]
+"scraper/backtest_cot_v3.py" = ["B023"]

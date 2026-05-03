@@ -10,7 +10,6 @@ Run standalone:
 
 import asyncio
 import json
-import os
 import sys
 from datetime import date, timedelta
 from pathlib import Path

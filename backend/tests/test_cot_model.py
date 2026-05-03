@@ -1,4 +1,5 @@
 from datetime import date
+
 from models import CotPosition, CotWeekly
 
 
@@ -33,7 +34,7 @@ def test_cot_weekly_unique_constraint(db):
 
 def test_upsert_routes_position_fields_to_cot_position(scraper_db):
     """Position fields land in CotPosition; only scalars go to CotWeekly."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
     upsert_cot_weekly("ny", date(2026, 3, 11), {
         "oi_total": 150_000,
         "price_ny": 304.10,
@@ -58,7 +59,7 @@ def test_upsert_routes_position_fields_to_cot_position(scraper_db):
 
 def test_upsert_cot_weekly_update_scalar(scraper_db):
     """upsert_cot_weekly updates existing scalar on duplicate (date, market)."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
     upsert_cot_weekly("ny", date(2026, 3, 11), {"oi_total": 150_000})
     upsert_cot_weekly("ny", date(2026, 3, 11), {"oi_total": 999_999})
     db = get_session()
@@ -73,7 +74,7 @@ def test_upsert_cot_weekly_update_scalar(scraper_db):
 def test_upsert_creates_weekly_row_even_with_only_position_fields(scraper_db):
     """A caller passing only position fields still gets a CotWeekly row so
     routes/exports that filter on (date, market) keep working."""
-    from scraper.db import upsert_cot_weekly, get_session
+    from scraper.db import get_session, upsert_cot_weekly
     upsert_cot_weekly("ny", date(2026, 3, 11), {"mm_long": 25_000})
     db = get_session()
     try:

@@ -7,10 +7,9 @@ Each validate_* function receives the in-memory payload and returns
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
-from pathlib import Path
 import json
-
+from datetime import UTC, date, datetime
+from pathlib import Path
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -20,8 +19,8 @@ def _days_since_iso(iso_str: str) -> float:
         s = iso_str.replace("Z", "+00:00")
         dt = datetime.fromisoformat(s)
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return (datetime.now(timezone.utc) - dt).total_seconds() / 86400
+            dt = dt.replace(tzinfo=UTC)
+        return (datetime.now(UTC) - dt).total_seconds() / 86400
     except Exception:
         return float("inf")
 

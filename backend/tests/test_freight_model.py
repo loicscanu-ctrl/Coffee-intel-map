@@ -1,5 +1,7 @@
 from datetime import date
+
 from models import FreightRate
+
 
 def test_freight_rate_create(db):
     row = FreightRate(index_code="FBX11", date=date(2026, 3, 14), rate=2850.0)
@@ -11,8 +13,8 @@ def test_freight_rate_create(db):
 
 def test_freight_rate_unique_constraint(db):
     """Inserting duplicate (index_code, date) should raise."""
-    from sqlalchemy.exc import IntegrityError
     import pytest
+    from sqlalchemy.exc import IntegrityError
     db.add(FreightRate(index_code="FBX11", date=date(2026, 3, 14), rate=2850.0))
     db.commit()
     db.add(FreightRate(index_code="FBX11", date=date(2026, 3, 14), rate=9999.0))
@@ -21,7 +23,7 @@ def test_freight_rate_unique_constraint(db):
 
 def test_upsert_freight_rate_insert(scraper_db):
     """upsert_freight_rate inserts a new record when none exists."""
-    from scraper.db import upsert_freight_rate, get_session
+    from scraper.db import get_session, upsert_freight_rate
     upsert_freight_rate("FBX11", date(2026, 3, 14), 2850.0)
     db = get_session()
     try:
@@ -33,7 +35,7 @@ def test_upsert_freight_rate_insert(scraper_db):
 
 def test_upsert_freight_rate_update(scraper_db):
     """upsert_freight_rate updates an existing record on duplicate (index_code, date)."""
-    from scraper.db import upsert_freight_rate, get_session
+    from scraper.db import get_session, upsert_freight_rate
     upsert_freight_rate("FBX11", date(2026, 3, 14), 2850.0)
     upsert_freight_rate("FBX11", date(2026, 3, 14), 3000.0)
     db = get_session()

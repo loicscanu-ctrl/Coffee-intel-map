@@ -1,6 +1,7 @@
-import re
 import json as _json
+import re
 from datetime import date
+
 from bs4 import BeautifulSoup
 
 # Futures symbols — scraped from Barchart
@@ -65,9 +66,8 @@ async def scrape_fx_rates(page) -> list[dict]:
     today = date.today().isoformat()
     results = []
     try:
-        currencies = ",".join(FX_PAIRS.keys())
         await page.goto(
-            f"https://open.er-api.com/v6/latest/USD",
+            "https://open.er-api.com/v6/latest/USD",
             wait_until="domcontentloaded",
             timeout=15000,
         )

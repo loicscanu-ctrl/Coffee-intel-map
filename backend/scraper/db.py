@@ -1,6 +1,7 @@
 import os
-from datetime import datetime
 import sys
+from datetime import datetime
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://coffee:coffee@localhost:5432/coffee_intel")
@@ -224,7 +225,7 @@ def upsert_cot_price(market: str, report_date, price_field: str, value: float) -
 def create_farmer_economics_tables():
     """Create WeatherSnapshot and FertilizerImport tables if they don't exist."""
     from database import Base
-    from models import WeatherSnapshot, FertilizerImport
+    from models import FertilizerImport, WeatherSnapshot
     engine = _get_engine()
     Base.metadata.create_all(engine, tables=[
         WeatherSnapshot.__table__,
@@ -326,9 +327,9 @@ def get_latest_vn_local_price() -> dict | None:
 
 def extract_physical_price(item: dict) -> dict | None:
     """Parse a news item dict → PhysicalPrice kwargs, or None if not a structured price."""
+    import json as _json
     import re
     from datetime import date as _date
-    import json as _json
 
     tags = set(item.get("tags", []))
     body = item.get("body", "") or ""
