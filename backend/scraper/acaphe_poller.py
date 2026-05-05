@@ -295,9 +295,30 @@ def fetch_and_save(cookies: dict) -> bool:
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
 async def main():
-    cookies = await playwright_login()
-    print(f"[acaphe] Polling every {POLL_INTERVAL}s → {OUTPUT}")
+    """
+    Default: log in once via Playwright, then poll iquote.php every
+    POLL_INTERVAL seconds forever (intended for a long-running worker
+    on Render / your laptop / any always-on host).
 
+    With --once: log in, fetch a single snapshot, push to Upstash, exit.
+    Used by .github/workflows/poll-acaphe-quotes.yml so the dashboard
+    stays fresh without paying for a 24/7 worker — GitHub Actions runs
+    this on a 5-minute cron for free on public repos.
+    """
+    import argparse
+    parser = argparse.ArgumentParser(description=main.__doc__)
+    parser.add_argument("--once", action="store_true",
+                        help="Single fetch + push then exit (cron-friendly).")
+    args = parser.parse_args()
+
+    cookies = await playwright_login()
+
+    if args.once:
+        ok = fetch_and_save(cookies)
+        # Non-zero exit on failure so the workflow surfaces the problem.
+        sys.exit(0 if ok else 1)
+
+    print(f"[acaphe] Polling every {POLL_INTERVAL}s → {OUTPUT}")
     fails = 0
     while True:
         ok = fetch_and_save(cookies)
