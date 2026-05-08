@@ -15,8 +15,10 @@ name: Acaphe live quotes poll
 #   DATABASE_URL
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes
+  # Cron disabled — re-enable once Upstash secrets are configured.
+  # Keep workflow_dispatch so you can still trigger it manually for testing.
+  # schedule:
+  #   - cron: '*/5 * * * *'   # every 5 minutes
   workflow_dispatch:
 
 # If a previous run is still in progress when the next cron tick fires,
