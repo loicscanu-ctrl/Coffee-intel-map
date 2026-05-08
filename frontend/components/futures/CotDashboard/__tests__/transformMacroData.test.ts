@@ -94,16 +94,32 @@ describe("transformMacroData", () => {
     expect(out[0].coffeeShare).toBeCloseTo(33.33, 1);
   });
 
-  it("computes coffeeShare from whichever coffee variant has data", () => {
-    // NOTE locks current behavior: the early `continue` when val==null
-    // means a null arabica is skipped entirely (not flagged as missing),
-    // so the share is calculated from robusta alone. Possibly a bug worth
-    // revisiting, but locking it here keeps refactors safe.
+  it("returns null coffeeShare when either coffee variant lacks gross", () => {
+    // arabica has null gross, robusta has data. Even though robusta alone
+    // would yield 100%, the missing arabica should flip hasCoffeePrice to
+    // false so we don't publish a misleading share figure.
     const week = mkWeek([
       { symbol: "arabica", sector: "softs", gross_exposure_usd: null, net_exposure_usd: null },
       { symbol: "robusta", sector: "softs", gross_exposure_usd: 3e9,  net_exposure_usd: 1e9 },
     ]);
-    expect(transformMacroData([week], "gross")[0].coffeeShare).toBe(100);
+    expect(transformMacroData([week], "gross")[0].coffeeShare).toBeNull();
+  });
+
+  it("flags hasCoffeePrice=false in net mode too when arabica gross is null", () => {
+    // Bug regression: previously `if (val == null) continue` happened
+    // BEFORE the coffee-tracking block, so a null gross was never flagged
+    // when the mode was "net" (where the loop's val came from net, not
+    // gross). Now hasCoffeePrice tracking is decoupled from the mode.
+    const week = mkWeek([
+      { symbol: "arabica", sector: "softs", gross_exposure_usd: null, net_exposure_usd: -2e9 },
+      { symbol: "robusta", sector: "softs", gross_exposure_usd: 3e9,  net_exposure_usd:  1e9 },
+      { symbol: "corn",    sector: "grains", gross_exposure_usd: 5e9, net_exposure_usd: 1e9 },
+    ]);
+    // Sector totals (net mode): arabica's net is -2 → softs = -2 + 1 = -1;
+    // grains = 1. Row passes the all-zeroes filter.
+    const out = transformMacroData([week], "net");
+    expect(out).toHaveLength(1);
+    expect(out[0].coffeeShare).toBeNull();
   });
 
   it("returns null coffeeShare when total gross is zero", () => {

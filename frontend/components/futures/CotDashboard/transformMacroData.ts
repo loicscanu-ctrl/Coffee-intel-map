@@ -18,14 +18,20 @@ export function transformMacroData(weeks: MacroCotWeek[], mode: MacroToggle): Ma
         mode === "gross_short" ? (g != null && n != null ? (g - n) / 2 : null) :
         n;
 
-      if (val == null) continue;
-      const valB = val / 1e9;
-      // Split "hard" into energy vs metals
-      const displaySector = c.sector === "hard"
-        ? (ENERGY_SYMBOLS.has(c.symbol) ? "energy" : "metals")
-        : c.sector;
-      sectorTotals[displaySector] = (sectorTotals[displaySector] ?? 0) + valB;
+      // Per-sector aggregation depends on the chosen `val` for this mode.
+      if (val != null) {
+        const valB = val / 1e9;
+        // Split "hard" into energy vs metals
+        const displaySector = c.sector === "hard"
+          ? (ENERGY_SYMBOLS.has(c.symbol) ? "energy" : "metals")
+          : c.sector;
+        sectorTotals[displaySector] = (sectorTotals[displaySector] ?? 0) + valB;
+      }
 
+      // coffeeShare is mode-independent — always uses gross. Track it
+      // regardless of whether `val` was usable in this mode, otherwise
+      // a null arabica gross under "net" mode would silently make
+      // robusta-only into a 100% coffee-share figure.
       if (c.symbol === "arabica" || c.symbol === "robusta") {
         if (c.gross_exposure_usd == null) hasCoffeePrice = false;
         else coffeeGross += c.gross_exposure_usd;
