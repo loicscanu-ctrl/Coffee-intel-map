@@ -2,10 +2,11 @@ name: Monthly Scraper (CONAB + Comex Stat)
 
 on:
   schedule:
-    # 02:00 UTC on the 18th of each month — runs after MDIC has consolidated
-    # the prior month's trade data (typically 12th–15th of the following
-    # month) and CONAB's mid-month Brazil supply report is out.
-    - cron: '0 2 18 * *'
+    # 02:00 UTC on the 23rd of each month. Originally moved 5th → 18th in
+    # PR #7 to let MDIC finish its mid-month consolidation, but the
+    # following month still came up empty — pushed another 5 days to give
+    # MDIC + CONAB more buffer before the cron fires.
+    - cron: '0 2 23 * *'
   workflow_dispatch:
 
 jobs:
