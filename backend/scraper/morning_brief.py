@@ -109,6 +109,16 @@ def _cot_section() -> str:
     mm_net = mm_long - mm_short
     sign   = "+" if mm_net >= 0 else ""
 
+    # CFTC report covers positions as of Tuesday close, published Friday
+    age_str = ""
+    try:
+        report_date = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
+        days_old = (datetime.now(UTC) - report_date).days
+        if days_old > 0:
+            age_str = f" · {days_old}d old"
+    except (ValueError, TypeError):
+        pass
+
     # Week-on-week change if previous row exists
     wow_str = ""
     if len(cot_data) >= 2:
@@ -122,7 +132,7 @@ def _cot_section() -> str:
     pmpu_net = (ny.get("pmpu_long", 0) or 0) - (ny.get("pmpu_short", 0) or 0)
 
     return (
-        f"<b>CoT — NY Arabica</b> ({date_str})\n"
+        f"<b>CoT — NY Arabica</b> (report week {date_str}{age_str})\n"
         f"  MM net: <b>{sign}{mm_net:,} lots</b>{wow_str}\n"
         f"  Producers net: {'+' if pmpu_net >= 0 else ''}{pmpu_net:,} lots"
     )
