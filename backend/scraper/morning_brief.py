@@ -53,28 +53,21 @@ def _fmt_change(v) -> str:
 def _prices_section() -> str:
     lines = ["<b>Prices</b>"]
 
-    # Futures from acaphe_live.json
+    # Futures from acaphe_live.json — first row is always front month
     acaphe = _load("acaphe_live.json")
     if acaphe:
         arabica = acaphe.get("arabica", [])
         robusta = acaphe.get("robusta", [])
-        # Front month KC
-        for i, row in enumerate(arabica):
-            month = row.get("month", "")
-            if i == 0 or "KC" in month:
-                last = row.get("last")
-                chg  = row.get("change")
-                if last:
-                    lines.append(f"  KC ({month}): <b>{last:.2f}c/lb</b>{_fmt_change(chg)}")
-                break
-        # Front month RM robusta
-        for row in robusta:
-            month = row.get("month", "")
-            last  = row.get("last")
-            chg   = row.get("change")
+        if arabica:
+            row = arabica[0]
+            last = row.get("last")
             if last:
-                lines.append(f"  RC ({month}): <b>{last:.0f} USD/t</b>{_fmt_change(chg)}")
-                break
+                lines.append(f"  KC ({row.get('month', '')}): <b>{last:.2f}c/lb</b>{_fmt_change(row.get('change'))}")
+        if robusta:
+            row = robusta[0]
+            last = row.get("last")
+            if last:
+                lines.append(f"  RC ({row.get('month', '')}): <b>{last:.0f} USD/t</b>{_fmt_change(row.get('change'))}")
 
     # Physical prices from latest_prices.json
     latest = _load("latest_prices.json")
