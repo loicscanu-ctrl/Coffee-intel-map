@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 
 from scraper.translate import translate_to_english
 
+
 def _today() -> str:
     return date.today().isoformat()
 

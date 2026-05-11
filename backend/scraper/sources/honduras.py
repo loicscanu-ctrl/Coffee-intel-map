@@ -15,6 +15,7 @@ from datetime import date
 
 from scraper.sources._ico_common import fetch_ico_exports
 
+
 def _today() -> str:
     return date.today().isoformat()
 

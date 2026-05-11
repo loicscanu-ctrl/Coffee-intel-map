@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 
 from scraper.sources._ico_common import fetch_ico_exports
 
+
 def _today() -> str:
     return date.today().isoformat()
 _LAT, _LNG = 9.145, 40.489   # Ethiopia centroid
