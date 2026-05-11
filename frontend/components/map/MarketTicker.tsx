@@ -9,25 +9,47 @@ interface TickerItem {
   category: TickerCategory;
 }
 
+function timeAgo(iso: string): string {
+  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (secs < 60) return `${secs}s ago`;
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+  return `${Math.floor(secs / 86400)}d ago`;
+}
+
+function stalenessColor(iso: string): string {
+  const hours = (Date.now() - new Date(iso).getTime()) / 3_600_000;
+  if (hours < 6) return "text-emerald-500";
+  if (hours < 24) return "text-yellow-500";
+  return "text-red-500";
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function MarketTicker() {
   const [tickers, setTickers] = useState<TickerItem[]>([]);
+  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const load = () =>
       fetch("/data/latest_prices.json")
         .then(r => r.json())
-        .then((d: { tickers?: TickerItem[] }) => setTickers(d?.tickers ?? []))
+        .then((d: { tickers?: TickerItem[]; generated_at?: string }) => {
+          setTickers(d?.tickers ?? []);
+          setGeneratedAt(d?.generated_at ?? null);
+        })
         .catch((err) => console.error("[MarketTicker] fetch failed:", err));
     load();
     const interval = setInterval(load, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    // Re-render every minute so "X ago" stays accurate
+    const tick = setInterval(() => setTick(n => n + 1), 60_000);
+    return () => { clearInterval(interval); clearInterval(tick); };
   }, []);
 
   if (tickers.length === 0) return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 flex items-center shrink-0 px-3">
-      <span className="text-indigo-400 text-xs font-bold border-r border-slate-700 pr-3 mr-3">MARKETS</span>
+      <span className="text-indigo-400 text-xs font-bold border-r border-slate-700 pr-3 mr-3 shrink-0">MARKETS</span>
       <span className="text-slate-600 text-xs italic">No market data — waiting for scraper</span>
     </div>
   );
@@ -58,8 +80,14 @@ export default function MarketTicker() {
 
   return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 overflow-hidden flex items-center shrink-0">
-      <span className="text-indigo-400 text-xs font-bold px-3 shrink-0 border-r border-slate-700 mr-2">
-        MARKETS
+      <span className="flex flex-col justify-center px-3 shrink-0 border-r border-slate-700 mr-2 leading-none gap-0.5"
+        title={generatedAt ? `Generated: ${generatedAt}` : undefined}>
+        <span className="text-indigo-400 text-xs font-bold">MARKETS</span>
+        {generatedAt && (
+          <span className={`text-[9px] font-mono ${stalenessColor(generatedAt)}`}>
+            {timeAgo(generatedAt)}
+          </span>
+        )}
       </span>
       <div
         className="overflow-hidden flex-1 relative"
