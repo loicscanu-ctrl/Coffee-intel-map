@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-11T18:45:54.619669Z",
+  "scraped_at": "2026-05-11T19:29:27.655663Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
@@ -354,62 +354,7 @@
         "preliminary": true
       }
     ],
-    "oni_forecast": [
-      {
-        "season": "AMJ",
-        "la_nina": 0,
-        "neutral": 30,
-        "el_nino": 70
-      },
-      {
-        "season": "MJJ",
-        "la_nina": 0,
-        "neutral": 12,
-        "el_nino": 88
-      },
-      {
-        "season": "JJA",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "JAS",
-        "la_nina": 0,
-        "neutral": 6,
-        "el_nino": 94
-      },
-      {
-        "season": "ASO",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "SON",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "OND",
-        "la_nina": 1,
-        "neutral": 9,
-        "el_nino": 90
-      },
-      {
-        "season": "NDJ",
-        "la_nina": 1,
-        "neutral": 11,
-        "el_nino": 88
-      },
-      {
-        "season": "DJF",
-        "la_nina": 1,
-        "neutral": 11,
-        "el_nino": 88
-      }
-    ],
+    "oni_forecast": [],
     "regional_impact": [
       {
         "region": "Sidama/Yirgacheffe",

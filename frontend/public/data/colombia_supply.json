@@ -1,6 +1,6 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-05-11T18:45:52.422841Z",
+  "scraped_at": "2026-05-11T19:29:24.964593Z",
   "exports": null,
   "fnc_price": {
     "cop_per_carga": 2300000,
@@ -354,8 +354,8 @@
           "L",
           "L",
           "L",
-          "M",
-          "M",
+          "L",
+          "L",
           "L",
           "L"
         ]
@@ -2357,98 +2357,98 @@
           {
             "date": "2026-05-11",
             "precip_prob": 100,
-            "precip_mm": 13.9,
+            "precip_mm": 14.3,
             "soil_moisture": 0.342,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-12",
             "precip_prob": 99,
-            "precip_mm": 27.4,
+            "precip_mm": 14.6,
             "soil_moisture": 0.34,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-13",
             "precip_prob": 100,
-            "precip_mm": 22.8,
+            "precip_mm": 6.9,
             "soil_moisture": 0.342,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-14",
             "precip_prob": 100,
-            "precip_mm": 5.7,
+            "precip_mm": 27.5,
             "soil_moisture": 0.336,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-15",
             "precip_prob": 100,
-            "precip_mm": 5.7,
+            "precip_mm": 22.5,
             "soil_moisture": 0.332,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-16",
             "precip_prob": 100,
-            "precip_mm": 28.7,
+            "precip_mm": 21.0,
             "soil_moisture": 0.33,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-17",
             "precip_prob": 100,
-            "precip_mm": 17.4,
+            "precip_mm": 22.4,
             "soil_moisture": 0.324,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-18",
             "precip_prob": 100,
-            "precip_mm": 18.2,
+            "precip_mm": 33.4,
             "soil_moisture": 0.321,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-19",
             "precip_prob": 100,
-            "precip_mm": 28.2,
+            "precip_mm": 50.4,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-20",
             "precip_prob": 100,
-            "precip_mm": 9.6,
+            "precip_mm": 10.0,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-21",
             "precip_prob": 100,
-            "precip_mm": 4.8,
+            "precip_mm": 12.8,
             "soil_moisture": 0.313,
-            "drought_risk": "M"
+            "drought_risk": "L"
           },
           {
             "date": "2026-05-22",
             "precip_prob": 99,
-            "precip_mm": 9.2,
+            "precip_mm": 20.8,
             "soil_moisture": 0.313,
-            "drought_risk": "M"
+            "drought_risk": "L"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 100,
-            "precip_mm": 21.6,
+            "precip_mm": 13.6,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 100,
-            "precip_mm": 48.0,
+            "precip_mm": 21.6,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           }
@@ -2539,62 +2539,7 @@
         "preliminary": true
       }
     ],
-    "oni_forecast": [
-      {
-        "season": "AMJ",
-        "la_nina": 0,
-        "neutral": 30,
-        "el_nino": 70
-      },
-      {
-        "season": "MJJ",
-        "la_nina": 0,
-        "neutral": 12,
-        "el_nino": 88
-      },
-      {
-        "season": "JJA",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "JAS",
-        "la_nina": 0,
-        "neutral": 6,
-        "el_nino": 94
-      },
-      {
-        "season": "ASO",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "SON",
-        "la_nina": 0,
-        "neutral": 8,
-        "el_nino": 92
-      },
-      {
-        "season": "OND",
-        "la_nina": 1,
-        "neutral": 9,
-        "el_nino": 90
-      },
-      {
-        "season": "NDJ",
-        "la_nina": 1,
-        "neutral": 11,
-        "el_nino": 88
-      },
-      {
-        "season": "DJF",
-        "la_nina": 1,
-        "neutral": 11,
-        "el_nino": 88
-      }
-    ],
+    "oni_forecast": [],
     "regional_impact": [
       {
         "region": "Huila",
