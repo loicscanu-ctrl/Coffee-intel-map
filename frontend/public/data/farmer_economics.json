@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-05-11T10:27:05.053496Z",
+  "scraped_at": "2026-05-11T11:37:24.230035Z",
   "cost": {
     "total_usd_per_bag": 188.9,
     "yoy_pct": 0.0,
@@ -104,7 +104,7 @@
     "source_label": "CONAB Safra Apr 2026"
   },
   "weather": {
-    "scraped_at": "2026-05-11T10:26:17.743721Z",
+    "scraped_at": "2026-05-11T11:30:34.510407Z",
     "regions": [
       {
         "name": "Sul de Minas",

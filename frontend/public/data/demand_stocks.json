@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-05-11T11:37:33.504054Z",
+  "ecf": {
+    "source": "ECF",
+    "last_updated": "2026-05-11",
+    "monthly": [],
+    "latest_bags": 0,
+    "latest_m_bags": null
+  },
+  "japan": {
+    "source": "AJCA",
+    "last_updated": "2026-05",
+    "monthly_imports": [
+      {
+        "month": "2026-05",
+        "value_mt": 397272,
+        "note": "best-effort"
+      }
+    ],
+    "latest_mt": 397272,
+    "latest_bags": 6621200
+  }
+}

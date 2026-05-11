@@ -1,7 +1,193 @@
 {
-  "scraped_at": "2026-04-23T05:48:17.755221Z",
+  "scraped_at": "2026-05-11T11:37:29.553004Z",
   "country": "vietnam",
-  "exports": null,
+  "exports": {
+    "source": "Vietnam Customs (vn_export_destination_port)",
+    "last_updated": "2024-08",
+    "unit": "thousand_60kg_bags",
+    "monthly": [
+      {
+        "month": "2021-09",
+        "total_k_bags": 1562.3,
+        "yoy_pct": 5.5
+      },
+      {
+        "month": "2021-10",
+        "total_k_bags": 1473.5,
+        "yoy_pct": 17.6
+      },
+      {
+        "month": "2021-11",
+        "total_k_bags": 1672.7,
+        "yoy_pct": 35.7
+      },
+      {
+        "month": "2021-12",
+        "total_k_bags": 2698.4,
+        "yoy_pct": 28.3
+      },
+      {
+        "month": "2022-01",
+        "total_k_bags": 3615.7,
+        "yoy_pct": 43.4
+      },
+      {
+        "month": "2022-02",
+        "total_k_bags": 2136.0,
+        "yoy_pct": 11.5
+      },
+      {
+        "month": "2022-03",
+        "total_k_bags": 3293.0,
+        "yoy_pct": 27.6
+      },
+      {
+        "month": "2022-04",
+        "total_k_bags": 2377.3,
+        "yoy_pct": 19.1
+      },
+      {
+        "month": "2022-05",
+        "total_k_bags": 2170.6,
+        "yoy_pct": 9.4
+      },
+      {
+        "month": "2022-06",
+        "total_k_bags": 2132.3,
+        "yoy_pct": 9.9
+      },
+      {
+        "month": "2022-07",
+        "total_k_bags": 1870.8,
+        "yoy_pct": -1.1
+      },
+      {
+        "month": "2022-08",
+        "total_k_bags": 1714.4,
+        "yoy_pct": -5.8
+      },
+      {
+        "month": "2022-09",
+        "total_k_bags": 1452.3,
+        "yoy_pct": -7.0
+      },
+      {
+        "month": "2022-10",
+        "total_k_bags": 1243.1,
+        "yoy_pct": -15.6
+      },
+      {
+        "month": "2022-11",
+        "total_k_bags": 1929.6,
+        "yoy_pct": 15.4
+      },
+      {
+        "month": "2022-12",
+        "total_k_bags": 3083.9,
+        "yoy_pct": 14.3
+      },
+      {
+        "month": "2023-01",
+        "total_k_bags": 2241.0,
+        "yoy_pct": -38.0
+      },
+      {
+        "month": "2023-02",
+        "total_k_bags": 3501.2,
+        "yoy_pct": 63.9
+      },
+      {
+        "month": "2023-03",
+        "total_k_bags": 3290.9,
+        "yoy_pct": -0.1
+      },
+      {
+        "month": "2023-04",
+        "total_k_bags": 2567.5,
+        "yoy_pct": 8.0
+      },
+      {
+        "month": "2023-05",
+        "total_k_bags": 2279.6,
+        "yoy_pct": 5.0
+      },
+      {
+        "month": "2023-06",
+        "total_k_bags": 2151.1,
+        "yoy_pct": 0.9
+      },
+      {
+        "month": "2023-07",
+        "total_k_bags": 1619.9,
+        "yoy_pct": -13.4
+      },
+      {
+        "month": "2023-08",
+        "total_k_bags": 1163.2,
+        "yoy_pct": -32.2
+      },
+      {
+        "month": "2023-09",
+        "total_k_bags": 623.1,
+        "yoy_pct": -57.1
+      },
+      {
+        "month": "2023-10",
+        "total_k_bags": 492.2,
+        "yoy_pct": -60.4
+      },
+      {
+        "month": "2023-11",
+        "total_k_bags": 1725.1,
+        "yoy_pct": -10.6
+      },
+      {
+        "month": "2023-12",
+        "total_k_bags": 3142.0,
+        "yoy_pct": 1.9
+      },
+      {
+        "month": "2024-01",
+        "total_k_bags": 3678.5,
+        "yoy_pct": 64.1
+      },
+      {
+        "month": "2024-02",
+        "total_k_bags": 2455.9,
+        "yoy_pct": -29.9
+      },
+      {
+        "month": "2024-03",
+        "total_k_bags": 2862.0,
+        "yoy_pct": -13.0
+      },
+      {
+        "month": "2024-04",
+        "total_k_bags": 2286.9,
+        "yoy_pct": -10.9
+      },
+      {
+        "month": "2024-05",
+        "total_k_bags": 1359.6,
+        "yoy_pct": -40.4
+      },
+      {
+        "month": "2024-06",
+        "total_k_bags": 1064.8,
+        "yoy_pct": -50.5
+      },
+      {
+        "month": "2024-07",
+        "total_k_bags": 1081.7,
+        "yoy_pct": -33.2
+      },
+      {
+        "month": "2024-08",
+        "total_k_bags": 1045.0,
+        "yoy_pct": -10.2
+      }
+    ]
+  },
   "fertilizer_context": {
     "source": "Vietnam Customs (customs.gov.vn) 1n import reports",
     "note": "Vietnam imports ~4\u20135Mt/yr fertilizer. Urea mainly from China/Russia; NPK from China; Potash from Canada/Russia via Singapore.",
