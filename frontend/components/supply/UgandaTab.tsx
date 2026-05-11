@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-const UgandaExportPanel     = dynamic(() => import("@/components/supply/uganda/UgandaExportPanel"),     { ssr: false });
-const UgandaFarmerEconomics = dynamic(() => import("@/components/supply/uganda/UgandaFarmerEconomics"), { ssr: false });
-const UgandaDestPanel       = dynamic(() => import("@/components/supply/uganda/UgandaDestinationsPanel"), { ssr: false });
-const UgandaTradeActors     = dynamic(() => import("@/components/supply/uganda/UgandaTradeActorsPanel"),  { ssr: false });
+import UgandaExportPanel from "@/components/supply/uganda/UgandaExportPanel";
+import UgandaFarmerEconomics from "@/components/supply/uganda/UgandaFarmerEconomics";
+import UgandaDestPanel from "@/components/supply/uganda/UgandaDestinationsPanel";
+import UgandaTradeActors from "@/components/supply/uganda/UgandaTradeActorsPanel";
+// UgandaTab itself is dynamic-imported from supply/page.tsx with { ssr: false },
+// so these panels are already lazy-loaded as part of UgandaTab's chunk —
+// nested dynamic() would just add per-subtab RTTs without bundle-size benefit
+// (recharts and shared libs go into the vendor chunk regardless).
 
 type SubTab = "exports" | "destinations" | "trade-actors" | "farmer-economics";
 
