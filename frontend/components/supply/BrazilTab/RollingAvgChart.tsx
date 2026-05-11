@@ -5,7 +5,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { TT_STYLE, TYPE_FILTER_OPTS, WINDOWS, WINDOW_COLORS } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, monthLabel } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -59,7 +59,7 @@ export default function RollingAvgChart({ series, filteredSeries, typeFilter }: 
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
           <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: ValueType, name: NameType) => [v !== null ? `${Number(v) > 0 ? "+" : ""}${v} kt` : "—", name]} />
+            formatter={((v, name) => [v != null ? `${Number(v) > 0 ? "+" : ""}${v} kt` : "—", name as NameType]) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
           {WINDOWS.map(w => (

@@ -8,7 +8,7 @@ import {
   CROP_MONTH_LABELS, CROP_MONTH_ORDER, CROP_YEAR_COLORS, TT_STYLE,
   TYPE_FILTER_OPTS,
 } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { DailyData, SeriesKey, VolumeSeries } from "./types";
 
@@ -137,10 +137,10 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
           <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: ValueType, name: NameType) => [
+            formatter={((v, name) => [
               `${v} kt${name === EST_KEY ? " (est.)" : ""}`,
-              name === EST_KEY ? `Crop ${forecast?.cropKey ?? ""} (forecast)` : `Crop ${name}`,
-            ]} />
+              (name === EST_KEY ? `Crop ${forecast?.cropKey ?? ""} (forecast)` : `Crop ${name}`) as NameType,
+            ]) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8", paddingTop: 6 }}
             formatter={v => (
               <span style={{ color: "#cbd5e1" }}>
