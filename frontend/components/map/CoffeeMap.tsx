@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
-import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
+import { computeOriginPrices, findPriceForPin, type OriginPrice } from "@/lib/originPrices";
 
 // ── Hub → Portuguese country list (Cecafe) ────────────────────────────────────
 const HUB_COUNTRIES: Record<string, string[]> = {
@@ -182,7 +182,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const countryMarkersRef = useRef<Array<{ marker: LeafletMarker; name: string }>>([]);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
-  const [originPrices, setOriginPrices] = useState<Map<string, OriginPrice>>(new Map());
+  const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
 
   // Permanent price labels for origin pins. Read the two JSON files that
   // are already published by the export pipeline, compute USD + diff vs
@@ -433,7 +433,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   // tooltips on those existing markers when the price data refreshes.
   useEffect(() => {
     countryMarkersRef.current.forEach(({ marker, name }) => {
-      const price = originPrices.get(name.toLowerCase());
+      const price = findPriceForPin(originPrices, name);
       marker.unbindTooltip();
       if (price) {
         marker.bindTooltip(
