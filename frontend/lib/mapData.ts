@@ -335,8 +335,10 @@ export const ROUTES: {
   //   [-5.0, -32.0]   off Cabo de São Roque (Brazil's NE peak) — same coords
   //                   shared on all three routes so they visually overlap until
   //                   peeling off in the right places
-  // Gibraltar divergence point
-  //   [36.0, -5.3]    shared with main trunk and Med branch
+  // Med divergence point
+  //   [37.0, -12.0]   off Cape St. Vincent in the deep Atlantic; the main
+  //                   trunk continues N to the Channel, the Med branch peels
+  //                   off SE through Gibraltar.
 
   // ─────────────────────────────────────────────────────────────────────────
   // BRAZIL EAST TRUNK: Santos → St Petersburg
@@ -353,9 +355,8 @@ export const ROUTES: {
       [5.0,    -22.0],  // mid Atlantic, heading NE (away from Brazil's NE coast)
       [15.0,   -18.0],  //
       [25.0,   -15.0],  //
-      [33.0,   -10.0],  //
-      [36.0,   -5.3],   // Gibraltar (divergence 2: Med branch peels off)
-      [40.0,   -10.0],  // off Portugal, heading north
+      [33.0,   -12.0],  // off NW Africa
+      [37.0,   -12.0],  // off Cape St. Vincent (divergence 2: Med branch peels off SE)
       [43.0,   -11.0],  // Bay of Biscay
       [48.0,   -7.0],   // Channel entry
       [50.0,   -1.0],   // English Channel (Le Havre spur junction — existing)
@@ -412,22 +413,26 @@ export const ROUTES: {
     cecafeHubs: ["Latin America"],
   },
 
-  // Med branch: Gibraltar → Mersin. Reuses existing Med spurs at the
-  // [37.5, 3.0] / [37.5, 10.0] / [36.0, 15.0] junctions for Algiers,
-  // Barcelona, Genoa, Trieste and Gioia Tauro.
+  // Med branch: peels off the main trunk in the deep Atlantic off Cape St.
+  // Vincent, enters the Med at Gibraltar, then reuses the existing Med
+  // spurs at the [37.5, 3.0] / [37.5, 10.0] / [36.0, 15.0] junctions for
+  // Algiers, Barcelona, Genoa, Trieste and Gioia Tauro before continuing
+  // east to Mersin.
   {
-    name: "Brazil East Branch: Gibraltar → Mersin (Med)",
+    name: "Brazil East Branch: Atlantic → Mersin (via Gibraltar / Med)",
     color: "#e74c3c",
     weight: 3,
     path: [
-      [36.0,  -5.3],    // Gibraltar (shared with trunk)
-      [37.0,   0.0],    // near Ibiza
-      [37.5,   3.0],    // Western Med — Barcelona / Algiers junction (existing)
-      [37.5,  10.0],    // Western Med — Genoa junction (existing)
-      [36.0,  15.0],    // Central Med — Trieste / Gioia Tauro junction (existing)
-      [34.0,  25.0],    // Eastern Med
-      [36.0,  33.0],    // off Cyprus
-      [36.81, 34.63],   // Mersin
+      [37.0,  -12.0],   // divergence 2 — off Cape St. Vincent (shared with trunk)
+      [36.0,   -8.5],   // SW of Cape St. Vincent, heading SE
+      [36.0,   -5.3],   // Gibraltar
+      [37.0,    0.0],   // near Ibiza
+      [37.5,    3.0],   // Western Med — Barcelona / Algiers junction (existing)
+      [37.5,   10.0],   // Western Med — Genoa junction (existing)
+      [36.0,   15.0],   // Central Med — Trieste / Gioia Tauro junction (existing)
+      [34.0,   25.0],   // Eastern Med
+      [36.0,   33.0],   // off Cyprus
+      [36.81,  34.63],  // Mersin
     ],
     cecafeHubs: ["Middle East", "Eastern Europe"],
   },
