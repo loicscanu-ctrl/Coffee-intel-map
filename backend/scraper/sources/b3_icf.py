@@ -12,6 +12,7 @@ from datetime import date
 
 import requests
 
+
 def _today() -> str:
     return date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925  # Brazil centre

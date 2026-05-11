@@ -332,9 +332,13 @@ export const ROUTES: {
   // standalone Santos→Channel/NY routes are absorbed into these trunks.
 
   // Atlantic divergence point (shared waypoint for trunk + NY/Cartagena spurs)
-  //   [0.0, -25.0]    equatorial mid-Atlantic
-  // Gibraltar divergence point
-  //   [36.0, -5.3]    shared with main trunk and Med branch
+  //   [-5.0, -32.0]   off Cabo de São Roque (Brazil's NE peak) — same coords
+  //                   shared on all three routes so they visually overlap until
+  //                   peeling off in the right places
+  // Med divergence point
+  //   [37.0, -12.0]   off Cape St. Vincent in the deep Atlantic; the main
+  //                   trunk continues N to the Channel, the Med branch peels
+  //                   off SE through Gibraltar.
 
   // ─────────────────────────────────────────────────────────────────────────
   // BRAZIL EAST TRUNK: Santos → St Petersburg
@@ -347,13 +351,12 @@ export const ROUTES: {
       [-23.95, -46.3],  // Santos
       [-18.0,  -38.0],  // off Vitória (Vitória feeder joins here)
       [-10.0,  -32.0],  // mid Brazilian coast
-      [-5.0,   -30.0],  // off Cabo de São Roque
-      [0.0,    -25.0],  // Atlantic divergence 1 (NY + Cartagena peel off)
-      [10.0,   -22.0],  // mid Atlantic
-      [20.0,   -18.0],  //
-      [30.0,   -12.0],  //
-      [36.0,   -5.3],   // Gibraltar (divergence 2: Med branch peels off)
-      [40.0,   -10.0],  // off Portugal, heading north
+      [-5.0,   -32.0],  // off Cabo de São Roque (divergence 1: NY + Cartagena peel off)
+      [5.0,    -22.0],  // mid Atlantic, heading NE (away from Brazil's NE coast)
+      [15.0,   -18.0],  //
+      [25.0,   -15.0],  //
+      [33.0,   -12.0],  // off NW Africa
+      [37.0,   -12.0],  // off Cape St. Vincent (divergence 2: Med branch peels off SE)
       [43.0,   -11.0],  // Bay of Biscay
       [48.0,   -7.0],   // Channel entry
       [50.0,   -1.0],   // English Channel (Le Havre spur junction — existing)
@@ -369,52 +372,67 @@ export const ROUTES: {
     cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Russia & CIS"],
   },
 
-  // Atlantic divergence → NY (peels NW from the equatorial mid-Atlantic)
+  // Atlantic divergence → NY. Peels off at Cabo de São Roque, heads NNW
+  // through the open Atlantic well east of the Caribbean Antilles, then
+  // approaches the US coast off Cape Hatteras.
   {
     name: "Brazil East Spur: Atlantic → NY",
     color: "#e74c3c",
     path: [
-      [0.0,   -25.0],   // divergence 1 (shared with trunk)
-      [10.0,  -45.0],   // NW into the Caribbean approach
-      [20.0,  -60.0],   //
-      [30.0,  -72.0],   //
-      [38.0,  -73.0],   //
+      [-5.0,  -32.0],   // divergence 1 (shared with trunk)
+      [0.0,   -38.0],   // equatorial Atlantic, paralleling NE Brazil coast
+      [5.0,   -45.0],   // NE of Cabo Branco, well offshore
+      [15.0,  -50.0],   // mid Atlantic, east of the Lesser Antilles
+      [25.0,  -60.0],   // Atlantic, SE of Bermuda
+      [33.0,  -72.0],   // offshore Cape Hatteras
+      [38.0,  -73.0],   // offshore Delaware Bay
       [40.5,  -73.8],   // New York
     ],
     cecafeHubs: ["North America"],
   },
 
-  // Atlantic divergence → Cartagena (peels NW, splits south of NY route)
+  // Atlantic divergence → Cartagena. Peels off at Cabo de São Roque, hugs
+  // the Guianas coast offshore (~3°N of land), enters the Caribbean north
+  // of Trinidad, tracks N of Venezuela & the Goajira peninsula, and turns
+  // south to Cartagena.
   {
     name: "Brazil East Spur: Atlantic → Cartagena",
     color: "#e74c3c",
     path: [
-      [0.0,   -25.0],   // divergence 1 (shared with trunk)
-      [5.0,   -40.0],   //
-      [8.0,   -55.0],   // Atlantic off Suriname
-      [10.5,  -62.5],   // Caribbean, near Trinidad
-      [11.0,  -73.0],   // N Venezuela coast
+      [-5.0,  -32.0],   // divergence 1 (shared with trunk)
+      [0.0,   -38.0],   // equatorial Atlantic (shared with NY spur initially)
+      [5.0,   -45.0],   // NE of Cabo Branco (shared with NY spur)
+      [7.0,   -52.0],   // offshore French Guiana
+      [9.0,   -58.0],   // offshore Guyana / Suriname
+      [11.0,  -62.0],   // Caribbean, NW of Trinidad
+      [12.5,  -68.0],   // Caribbean, N of Curaçao
+      [13.0,  -73.0],   // N of the Goajira peninsula
+      [11.0,  -76.0],   // turning south toward Cartagena
       [10.4,  -75.5],   // Cartagena
     ],
     cecafeHubs: ["Latin America"],
   },
 
-  // Med branch: Gibraltar → Mersin. Reuses existing Med spurs at the
-  // [37.5, 3.0] / [37.5, 10.0] / [36.0, 15.0] junctions for Algiers,
-  // Barcelona, Genoa, Trieste and Gioia Tauro.
+  // Med branch: peels off the main trunk in the deep Atlantic off Cape St.
+  // Vincent, enters the Med at Gibraltar, then reuses the existing Med
+  // spurs at the [37.5, 3.0] / [37.5, 10.0] / [36.0, 15.0] junctions for
+  // Algiers, Barcelona, Genoa, Trieste and Gioia Tauro before continuing
+  // east to Mersin.
   {
-    name: "Brazil East Branch: Gibraltar → Mersin (Med)",
+    name: "Brazil East Branch: Atlantic → Mersin (via Gibraltar / Med)",
     color: "#e74c3c",
     weight: 3,
     path: [
-      [36.0,  -5.3],    // Gibraltar (shared with trunk)
-      [37.0,   0.0],    // near Ibiza
-      [37.5,   3.0],    // Western Med — Barcelona / Algiers junction (existing)
-      [37.5,  10.0],    // Western Med — Genoa junction (existing)
-      [36.0,  15.0],    // Central Med — Trieste / Gioia Tauro junction (existing)
-      [34.0,  25.0],    // Eastern Med
-      [36.0,  33.0],    // off Cyprus
-      [36.81, 34.63],   // Mersin
+      [37.0,  -12.0],   // divergence 2 — off Cape St. Vincent (shared with trunk)
+      [36.0,   -8.5],   // SW of Cape St. Vincent, heading SE
+      [36.0,   -5.3],   // Gibraltar
+      [37.0,    0.0],   // near Ibiza
+      [37.5,    3.0],   // Western Med — Barcelona / Algiers junction (existing)
+      [37.5,   10.0],   // Western Med — Genoa junction (existing)
+      [36.0,   15.0],   // Central Med — Trieste / Gioia Tauro junction (existing)
+      [34.0,   25.0],   // Eastern Med
+      [36.0,   33.0],   // off Cyprus
+      [36.81,  34.63],  // Mersin
     ],
     cecafeHubs: ["Middle East", "Eastern Europe"],
   },
@@ -452,14 +470,15 @@ export const ROUTES: {
       [-23.95, -46.3],  // Santos
       [-28.0,  -40.0],  // S Atlantic
       [-36.0,  -20.0],  // Mid S Atlantic
-      [-40.0,   0.0],   // S Atlantic E
-      [-39.0,  15.0],   // approaching Cape
-      [-34.0,  18.5],   // Cape of Good Hope (Cape Town spur junction)
-      [-30.0,  25.0],   // off South Africa
-      [-25.0,  33.0],   // Mozambique coast
-      [-15.0,  40.5],   //
-      [-8.0,   46.0],   // W Indian Ocean
-      [-3.0,   60.0],   // Central Indian Ocean
+      [-37.0,   0.0],   // S Atlantic E (stays at ~37°S to clear Africa to the south)
+      [-37.0,  15.0],   // S of Africa
+      [-36.0,  18.5],   // S of Cape Town (Cape Town spur peels off N here)
+      [-36.0,  22.0],   // rounding Cape Agulhas
+      [-37.0,  35.0],   // S Indian Ocean (well south of Madagascar)
+      [-32.0,  50.0],   // east of Madagascar's southern tip
+      [-20.0,  55.0],   // east of central Madagascar
+      [-10.0,  60.0],   // NE Indian Ocean (clear of all land)
+      [-3.0,   70.0],   // central Indian Ocean
       [4.0,    78.0],   // S of Sri Lanka
       [5.8,    80.4],   // Tuticorin spur junction (existing — reused)
       [5.8,    95.5],   // Bay of Bengal
@@ -467,7 +486,7 @@ export const ROUTES: {
       [3.0,   100.5],   // Mid Malacca
       [1.26,  103.8],   // Singapore (passing through)
       [8.0,   110.0],   // S China Sea
-      [15.0,  116.0],   // E of Philippines
+      [15.0,  116.0],   // S China Sea, W of Luzon
       [22.0,  123.0],   // Luzon Strait
       [30.0,  128.0],   // East China Sea (Shanghai spur junction — existing)
       [33.0,  134.0],   //
@@ -476,12 +495,13 @@ export const ROUTES: {
     cecafeHubs: ["East Asia", "SE Asia & Pacific", "Sub-Saharan Africa", "South Asia"],
   },
 
-  // Cape Town spur: short branch off the South Trunk at the Cape junction
+  // Cape Town spur: branch off the South Trunk at the sub-Cape junction,
+  // turning north into Table Bay to dock.
   {
     name: "Brazil South Spur: Cape Junction → Cape Town",
     color: "#e74c3c",
     weight: 2,
-    path: [[-34.0, 18.5], [-33.92, 18.42]],
+    path: [[-36.0, 18.5], [-34.5, 18.4], [-33.92, 18.42]],
   },
 
   // Honduras → Channel Entry

@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from scraper.sources._ico_common import fetch_ico_exports
 
+
 def _today() -> str:
     return date.today().isoformat()
 _LAT, _LNG = 1.3733, 32.2903   # Uganda

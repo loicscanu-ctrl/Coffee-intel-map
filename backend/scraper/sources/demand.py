@@ -3,6 +3,7 @@ from datetime import date
 
 from bs4 import BeautifulSoup
 
+
 def _today() -> str:
     return date.today().isoformat()
 
