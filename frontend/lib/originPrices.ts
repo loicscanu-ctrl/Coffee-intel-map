@@ -12,11 +12,22 @@
  */
 
 export interface OriginPrice {
-  countryName: string;     // canonical name for matching CountryPin.name
+  countryName: string;     // canonical name for the label header
+  matchKeys: string[];     // lowercase substrings that identify a country
+                           // pin (e.g. ["vietnam", "viet nam"]). Pin name
+                           // is matched case-insensitively against these.
   local: string;           // "88,300 VND/kg"
   usd: string;             // "$3,371/MT"
   diff: string;            // "+50 vs RC"   or  "−120 vs KC"
   diffColor: string;       // CSS color for the diff line
+}
+
+/** Find the OriginPrice that matches a country-pin name. Case-insensitive
+ *  substring match against the entry's matchKeys, so DB labels like
+ *  "Vietnam", "VIETNAM", "Viet Nam", "Brasil" all resolve correctly. */
+export function findPriceForPin(prices: OriginPrice[], pinName: string): OriginPrice | undefined {
+  const lc = pinName.toLowerCase();
+  return prices.find(p => p.matchKeys.some(k => lc.includes(k)));
 }
 
 interface Ticker { label: string; value: string; category: string }
@@ -60,8 +71,8 @@ function fmtDiff(usdPhys: number, benchmarkUsdMt: number): { diff: string; color
 export function computeOriginPrices(
   latest: LatestPrices | null,
   acaphe: AcapheLive | null,
-): Map<string, OriginPrice> {
-  const out = new Map<string, OriginPrice>();
+): OriginPrice[] {
+  const out: OriginPrice[] = [];
   if (!latest || !acaphe) return out;
 
   const tickers = new Map(latest.tickers.map(t => [t.label, t.value]));
@@ -77,8 +88,9 @@ export function computeOriginPrices(
     const { localStr, usd } = parsePhysical(vn);
     if (usd != null) {
       const { diff, color } = fmtDiff(usd, rcFront);
-      out.set("vietnam", {
+      out.push({
         countryName: "Vietnam",
+        matchKeys: ["vietnam", "viet nam"],
         local: `${localStr}/kg`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,
@@ -94,8 +106,9 @@ export function computeOriginPrices(
     const { localStr, usd } = parsePhysical(uga);
     if (usd != null) {
       const { diff, color } = fmtDiff(usd, rcFront);
-      out.set("uganda", {
+      out.push({
         countryName: "Uganda",
+        matchKeys: ["uganda"],
         local: `${localStr} USD/cwt`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,
@@ -111,8 +124,9 @@ export function computeOriginPrices(
     const { localStr, usd } = parsePhysical(con);
     if (usd != null) {
       const { diff, color } = fmtDiff(usd, rcFront);
-      out.set("brazil", {
+      out.push({
         countryName: "Brazil",
+        matchKeys: ["brazil", "brasil"],
         local: `${localStr}/bag (Conilon)`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,
