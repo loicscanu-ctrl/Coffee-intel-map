@@ -13,21 +13,15 @@
 
 export interface OriginPrice {
   countryName: string;     // canonical name for the label header
-  matchKeys: string[];     // lowercase substrings that identify a country
-                           // pin (e.g. ["vietnam", "viet nam"]). Pin name
-                           // is matched case-insensitively against these.
+  /** Anchor for the floating label on the map. Hardcoded to a meaningful
+   *  point inside the producing region so the label appears regardless of
+   *  whether a CountryIntel pin happens to be seeded for that country. */
+  lat: number;
+  lng: number;
   local: string;           // "88,300 VND/kg"
   usd: string;             // "$3,371/MT"
   diff: string;            // "+50 vs RC"   or  "−120 vs KC"
   diffColor: string;       // CSS color for the diff line
-}
-
-/** Find the OriginPrice that matches a country-pin name. Case-insensitive
- *  substring match against the entry's matchKeys, so DB labels like
- *  "Vietnam", "VIETNAM", "Viet Nam", "Brasil" all resolve correctly. */
-export function findPriceForPin(prices: OriginPrice[], pinName: string): OriginPrice | undefined {
-  const lc = pinName.toLowerCase();
-  return prices.find(p => p.matchKeys.some(k => lc.includes(k)));
 }
 
 interface Ticker { label: string; value: string; category: string }
@@ -90,7 +84,7 @@ export function computeOriginPrices(
       const { diff, color } = fmtDiff(usd, rcFront);
       out.push({
         countryName: "Vietnam",
-        matchKeys: ["vietnam", "viet nam"],
+        lat: 12.7,  lng: 108.0,   // Central Highlands (Buon Ma Thuot region)
         local: `${localStr}/kg`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,
@@ -108,7 +102,7 @@ export function computeOriginPrices(
       const { diff, color } = fmtDiff(usd, rcFront);
       out.push({
         countryName: "Uganda",
-        matchKeys: ["uganda"],
+        lat: 1.0,   lng: 32.5,    // Central Uganda (Kampala area)
         local: `${localStr} USD/cwt`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,
@@ -126,7 +120,7 @@ export function computeOriginPrices(
       const { diff, color } = fmtDiff(usd, rcFront);
       out.push({
         countryName: "Brazil",
-        matchKeys: ["brazil", "brasil"],
+        lat: -19.5, lng: -40.5,   // Espírito Santo (Conilon heartland)
         local: `${localStr}/bag (Conilon)`,
         usd:   `$${usd.toLocaleString()}/MT`,
         diff:  `${diff} vs RC`,

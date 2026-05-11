@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
-import { computeOriginPrices, findPriceForPin, type OriginPrice } from "@/lib/originPrices";
+import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
 
 // ── Hub → Portuguese country list (Cecafe) ────────────────────────────────────
 const HUB_COUNTRIES: Record<string, string[]> = {
@@ -179,7 +179,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const tileLayerRef = useRef<TileLayer | null>(null);
-  const countryMarkersRef = useRef<Array<{ marker: LeafletMarker; name: string }>>([]);
+  const priceMarkersRef = useRef<LeafletMarker[]>([]);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
@@ -341,10 +341,6 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       });
 
       // ── Country pins ──────────────────────────────────────────────────────
-      // Origin price tooltips are attached by a separate effect (depends on
-      // the async price fetch); we just store marker refs here so that
-      // effect can find them.
-      countryMarkersRef.current = [];
       const countriesLayer = Leaflet.layerGroup().addTo(map);
       (countries as CountryPin[]).forEach((c) => {
         const isProducer = c.type === "producer";
@@ -359,7 +355,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
         const statsHtml = isProducer
           ? `<div>PROD: ${d.prod || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`
           : `<div>CONS: ${d.cons || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`;
-        const marker = Leaflet.marker([c.lat, c.lng], { icon })
+        Leaflet.marker([c.lat, c.lng], { icon })
           .bindPopup(
             `<div style="font-family:monospace;font-size:12px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:4px;min-width:160px">` +
             `<b>${c.name}</b><br>${statsHtml}` +
@@ -367,7 +363,6 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
             `</div>`
           )
           .addTo(countriesLayer);
-        countryMarkersRef.current.push({ marker: marker as LeafletMarker, name: c.name });
       });
 
       // ── Factory pins ──────────────────────────────────────────────────────
@@ -428,24 +423,45 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
     });
   }, [activeBasemap]);
 
-  // Origin-price permanent tooltips: bind / rebind when prices load.
-  // Markers are created in the main map effect; this effect just toggles
-  // tooltips on those existing markers when the price data refreshes.
+  // Origin-price permanent labels: standalone markers at hardcoded
+  // producer-region coordinates. Independent of the CountryIntel pins,
+  // so labels appear even if that DB table is empty or uses unexpected
+  // names. Re-runs whenever the prices map refreshes.
   useEffect(() => {
-    countryMarkersRef.current.forEach(({ marker, name }) => {
-      const price = findPriceForPin(originPrices, name);
-      marker.unbindTooltip();
-      if (price) {
-        marker.bindTooltip(
-          `<div class="origin-price-tt-body">` +
-            `<div class="origin-price-tt-local">${price.local}</div>` +
-            `<div class="origin-price-tt-usd">${price.usd}</div>` +
-            `<div style="color:${price.diffColor}">${price.diff}</div>` +
-          `</div>`,
-          { permanent: true, direction: "right", offset: [8, 0], className: "origin-price-tt" },
-        );
-      }
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let cancelled = false;
+    import("leaflet").then((L) => {
+      if (cancelled) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+
+      // Drop any existing price markers from a previous render
+      priceMarkersRef.current.forEach(m => m.remove());
+      priceMarkersRef.current = [];
+
+      originPrices.forEach((price) => {
+        // Tiny anchor dot so users can see where the label points to
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `<div style="background:#fbbf24;border:1.5px solid #fff;border-radius:50%;width:8px;height:8px;box-shadow:0 0 4px rgba(251,191,36,0.6);"></div>`,
+          iconSize: [8, 8],
+          iconAnchor: [4, 4],
+        });
+        const m = Leaflet.marker([price.lat, price.lng], { icon })
+          .bindTooltip(
+            `<div class="origin-price-tt-body">` +
+              `<div class="origin-price-tt-name">${price.countryName}</div>` +
+              `<div class="origin-price-tt-local">${price.local}</div>` +
+              `<div class="origin-price-tt-usd">${price.usd}</div>` +
+              `<div style="color:${price.diffColor}">${price.diff}</div>` +
+            `</div>`,
+            { permanent: true, direction: "right", offset: [8, 0], className: "origin-price-tt" },
+          )
+          .addTo(map);
+        priceMarkersRef.current.push(m as LeafletMarker);
+      });
     });
+    return () => { cancelled = true; };
   }, [originPrices]);
 
   return (
