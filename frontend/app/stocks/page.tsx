@@ -1,4 +1,4 @@
-import { fetchStocks, fetchNews } from "@/lib/api";
+import { fetchStocks, fetchNews, type NewsItem } from "@/lib/api";
 import StocksClient from "./StocksClient";
 
 const MOCK_DATA = [
@@ -17,11 +17,11 @@ export default async function StocksPage() {
       console.error("[stocks] fetchStocks failed", e);
       return [];
     }),
-    fetchNews().catch((e) => {
+    fetchNews().catch((e): NewsItem[] => {
       console.error("[stocks] fetchNews failed", e);
       return [];
     }),
   ]);
   const stocks = stocksRaw.length > 0 ? stocksRaw : MOCK_DATA;
-  return <StocksClient stocks={stocks} news={news as unknown as { id: number; title: string; body: string; source: string; category: string; tags: string[]; pub_date: string }[]} />;
+  return <StocksClient stocks={stocks} news={news} />;
 }

@@ -62,10 +62,20 @@ export async function fetchStocks(): Promise<{ date: string; value: number }[]> 
   return cachedFetch("/api/stocks");
 }
 
-export async function fetchNews(category?: string) {
+export interface NewsItem {
+  id: number;
+  title: string;
+  body: string;
+  source: string;
+  category: string;
+  tags: string[];
+  pub_date: string;
+}
+
+export async function fetchNews(category?: string): Promise<NewsItem[]> {
   const path = category ? `/api/news?category=${encodeURIComponent(category)}` : "/api/news";
   // no-store: bypass Next.js Data Cache so SSR always gets fresh news
-  return apiGet(path, { cache: "no-store" });
+  return apiGet<NewsItem[]>(path, { cache: "no-store" });
 }
 
 export async function fetchFreight() {
