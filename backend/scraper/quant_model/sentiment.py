@@ -85,14 +85,12 @@ def run(db) -> dict:
     try:
         import google.generativeai as genai
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel(
+            "gemini-2.5-flash",
+            generation_config={"response_mime_type": "application/json"},
+        )
         response = model.generate_content(prompt)
-        raw = response.text.strip()
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        classifications = json.loads(raw.strip())
+        classifications = json.loads(response.text)
     except Exception as e:
         return {"available": False, "reason": f"Gemini API error: {e}"}
 
