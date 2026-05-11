@@ -27,9 +27,9 @@ from scraper.sources import (
     uganda,
     vietnam,
 )
-from scraper.sources import dry_bulk as _dry_bulk
 from scraper.sources import colombia as _colombia
 from scraper.sources import colombia_weather as _colombia_weather
+from scraper.sources import dry_bulk as _dry_bulk
 from scraper.sources import ecf_stocks as _ecf_stocks
 from scraper.sources import ethiopia as _ethiopia
 from scraper.sources import ethiopia_weather as _ethiopia_weather

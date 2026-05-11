@@ -8,8 +8,7 @@ El Nino = drier = bad; La Nina = wetter = positive.
 """
 from __future__ import annotations
 
-import json
-from datetime import date, timedelta, timezone, datetime
+from datetime import UTC, datetime
 
 import requests
 
@@ -100,7 +99,7 @@ def _fetch_region(lat: float, lng: float) -> list[dict]:
 
 def _process(raw: dict) -> list[dict]:
     hourly = raw.get("hourly", {})
-    daily_raw = raw.get("daily", {})
+    _daily_raw = raw.get("daily", {})
     times_h = hourly.get("time", [])
     temp_h  = hourly.get("temperature_2m", [])
     rh_h    = hourly.get("relative_humidity_2m", [])
@@ -181,7 +180,7 @@ def _process(raw: dict) -> list[dict]:
 
 async def run(page, db) -> None:
     from models import WeatherSnapshot
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     for region in _REGIONS:
         try:

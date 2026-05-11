@@ -15,16 +15,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dotenv import load_dotenv
+
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
+import json
+from datetime import date
 
 from database import SessionLocal
 from scraper.db import upsert_news_item
 from scraper.sources.colombia import _fetch_ico_exports as _co_exports
 from scraper.sources.honduras import _fetch_ico_exports as _hnd_exports
 from scraper.sources.indonesia import _fetch_ico_exports as _idn_exports
-
-import json
-from datetime import datetime, date
 
 
 def _today():

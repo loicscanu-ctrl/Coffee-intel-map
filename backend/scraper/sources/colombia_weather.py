@@ -7,7 +7,6 @@ Soil: Andisol (volcanic origin, higher PWP than Brazilian Oxisol).
 """
 from __future__ import annotations
 
-import json
 from collections import defaultdict
 from datetime import date, datetime
 
@@ -204,10 +203,12 @@ def _calc_csi(daily_rows: list[dict]) -> dict:
 
 def scrape(db) -> None:
     """Fetch Open-Meteo for each Colombian region, store as WeatherSnapshot."""
-    import sys, os
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-    from models import WeatherSnapshot
     from sqlalchemy import delete
+
+    from models import WeatherSnapshot
 
     for region in REGIONS:
         url = OPEN_METEO_URL.format(lat=region["lat"], lon=region["lon"])

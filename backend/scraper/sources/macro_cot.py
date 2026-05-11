@@ -585,6 +585,9 @@ def _phase(name: str) -> None:
 
 
 def _fetch_and_upsert(db) -> None:
+    from sqlalchemy import func
+
+    from models import CommodityCot
     from scraper.db import upsert_cot_weekly
     from scraper.db_macro import upsert_commodity_cot, upsert_commodity_price
 

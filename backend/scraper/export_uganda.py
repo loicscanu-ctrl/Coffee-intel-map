@@ -11,9 +11,8 @@ Data sources (in priority order):
 from __future__ import annotations
 
 import json
-import re
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -321,7 +320,7 @@ def export_uganda(db) -> None:
 
     result = {
         "country":    "uganda",
-        "scraped_at": datetime.now(timezone.utc).isoformat(),
+        "scraped_at": datetime.now(UTC).isoformat(),
         "exports":    exports_out,
         "ucda_detail": ucda_detail,
         "ucda_price": ucda_price_out,

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date, datetime
+from datetime import date
 
 import requests
 from bs4 import BeautifulSoup
@@ -42,8 +42,6 @@ def _parse_ajca_data(html: str) -> dict | None:
 
     # Look for tables with monthly data
     monthly_imports = []
-    monthly_stocks  = []
-
     tables = soup.find_all("table")
     for table in tables:
         rows = table.find_all("tr")

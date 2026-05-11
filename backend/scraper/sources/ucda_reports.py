@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from io import BytesIO
 
 import requests
@@ -85,7 +85,7 @@ def parse_pdf(pdf_bytes: bytes) -> dict | None:
                 "exporters":    exporters,
                 "destinations": destinations,
                 "buyers":       buyers,
-                "parsed_at":    datetime.now(timezone.utc).isoformat(),
+                "parsed_at":    datetime.now(UTC).isoformat(),
             }
     except Exception as e:
         print(f"[ucda_reports] parse error: {e}")
@@ -389,10 +389,9 @@ def _stored_months(db) -> set[str]:
 def _upsert_report(db, data: dict) -> None:
     import sys
     from pathlib import Path
-    from datetime import date
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
     from models import NewsItem
-    from sqlalchemy import update
 
     month = data["month"]
     title = f"Uganda UCDA Monthly Report - {month}"

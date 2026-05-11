@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -211,7 +211,7 @@ def _news_section(db) -> str:
         sys.path.insert(0, str(_REPO_ROOT / "backend"))
         from models import NewsItem
 
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+        cutoff = datetime.now(UTC) - timedelta(hours=24)
         items = (
             db.query(NewsItem)
             .filter(NewsItem.pub_date >= cutoff)
@@ -240,7 +240,7 @@ def _news_section(db) -> str:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def build_message(db=None) -> str:
-    now_utc = datetime.now(timezone.utc)
+    now_utc = datetime.now(UTC)
     header  = f"<b>Coffee Intel — {now_utc.strftime('%a %d %b %Y')}</b>"
 
     sections = [header]

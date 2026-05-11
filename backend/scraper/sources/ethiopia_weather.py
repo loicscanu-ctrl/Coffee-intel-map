@@ -7,8 +7,7 @@ Ethiopia has complex bimodal rainfall (long rains Feb-May, short rains Sep-Nov).
 """
 from __future__ import annotations
 
-import json
-from datetime import date, timedelta, timezone, datetime
+from datetime import UTC, datetime
 
 import requests
 
@@ -157,7 +156,7 @@ def _process(raw: dict) -> list[dict]:
 
 async def run(page, db) -> None:
     from models import WeatherSnapshot
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     for region in _REGIONS:
         try:

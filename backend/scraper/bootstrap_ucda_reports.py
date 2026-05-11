@@ -11,13 +11,14 @@ Run once:
 
 Expects DATABASE_URL env var.
 """
-import sys, time
+import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from database import SessionLocal
-from scraper.sources.ucda_reports import download_pdf, parse_pdf, _upsert_report, _stored_months
+from scraper.sources.ucda_reports import _stored_months, _upsert_report, download_pdf, parse_pdf
 
 _START_ID   = 1319
 _SCAN_BACK  = 800   # IDs 1319→519; ~800/21 ≈ 38 months = ~3 years history

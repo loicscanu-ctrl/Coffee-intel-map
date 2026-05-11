@@ -11,7 +11,7 @@ Scans IDs around 1319 down ~400 IDs to collect ~18+ months of reports.
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -148,7 +148,7 @@ def main():
 
     result = {
         "country":    "uganda",
-        "scraped_at": datetime.now(timezone.utc).isoformat(),
+        "scraped_at": datetime.now(UTC).isoformat(),
         "exports": {
             "source":       "UCDA Monthly Reports",
             "last_updated": last_month,
@@ -181,7 +181,7 @@ def main():
 
     out_path = OUT_DIR / "uganda_supply.json"
     out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nWrote uganda_supply.json:")
+    print("\nWrote uganda_supply.json:")
     print(f"  {len(reports)} reports parsed ({reports[0]['month']} -> {reports[-1]['month']})")
     print(f"  {len(monthly_series)} months in series")
     print(f"  {len(ucda_detail['exporters'])} exporters, {len(ucda_detail['destinations'])} destinations, {len(ucda_detail['buyers'])} buyers")

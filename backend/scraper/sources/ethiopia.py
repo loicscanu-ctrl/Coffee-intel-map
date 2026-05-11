@@ -102,7 +102,7 @@ def _fetch_ico_exports() -> list[dict]:
 def _extract_ecx_price(html: str) -> dict | None:
     """Try to extract ECX coffee price from HTML. Returns dict or None."""
     soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text(" ", strip=True)
+    _text = soup.get_text(" ", strip=True)
 
     # Pattern: "Coffee" near a number like "85.50" or "85,50"
     # ECX quotes Grade 1-5 prices in ETB/kg

@@ -5,7 +5,6 @@ import re
 from datetime import date, datetime
 
 import requests
-
 from bs4 import BeautifulSoup
 
 _TODAY = lambda: date.today().isoformat()

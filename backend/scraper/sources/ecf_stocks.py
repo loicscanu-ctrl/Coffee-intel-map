@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date, datetime
+from datetime import date
 
 import requests
 from bs4 import BeautifulSoup
