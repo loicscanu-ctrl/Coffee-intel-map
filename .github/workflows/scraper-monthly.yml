@@ -2,11 +2,12 @@ name: "3.3 – Monthly Scraper CONAB"
 
 on:
   schedule:
-    # 02:00 UTC on the 23rd of each month. Originally moved 5th → 18th in
-    # PR #7 to let MDIC finish its mid-month consolidation, but the
-    # following month still came up empty — pushed another 5 days to give
-    # MDIC + CONAB more buffer before the cron fires.
-    - cron: '0 2 23 * *'
+    # TEMPORARY: one-shot probe on May 12, 2026 at 02:00 UTC to check
+    # whether MDIC publishes by day 12. Previous schedule was day 23
+    # (set in commit history after PR #7's day-18 attempt also returned
+    # empty). If May 12 returns fresh data, switch to '0 2 12 * *' for
+    # a permanent earlier fetch; if empty, revert to day 23 or push later.
+    - cron: '0 2 12 5 *'
   workflow_dispatch:
 
 jobs:
