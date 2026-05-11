@@ -6,9 +6,20 @@ import {
   MARGIN_OUTRIGHT, MARGIN_SPREAD, CENTS_LB_TO_USD_TON,
 } from "@/lib/cot/transformApiData";
 
+interface GenRow {
+  id: number; date: string; priceNY: number; priceLDN: number; avgPrice_USD_Ton: number;
+  oiNY: number; oiLDN: number; totalOI: number; spreadingTotal: number; outrightTotal: number;
+  weeklyNominalFlow: number; weeklyMarginFlow: number; cumulativeNominal: number; cumulativeMargin: number;
+  ny: Record<string, number>; ldn: Record<string, number>;
+  tradersNY: Record<string, number>; tradersLDN: Record<string, number>;
+  pmpuShortMT_NY: number; pmpuShortMT_LDN: number; pmpuShortMT: number;
+  pmpuLongMT_NY: number; pmpuLongMT_LDN: number; pmpuLongMT: number;
+  efpMT: number; timeframe: string;
+}
+
 export function generateData() {
   const weeks = 1040; // ~20 years
-  const data: Record<string, unknown>[] = [];
+  const data: GenRow[] = [];
   let priceNY = 130, priceLDN = 1800, oiNY = 180000, oiLDN = 110000;
   let cumulativeNominal = 0, cumulativeMargin = 0;
 

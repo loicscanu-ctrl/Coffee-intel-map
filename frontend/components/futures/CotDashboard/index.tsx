@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCot, fetchMacroCot, type MacroCotWeek } from "@/lib/api";
+import { fetchCot, fetchMacroCot, type MacroCotWeek, type CotWeekly } from "@/lib/api";
 import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { transformApiData } from "@/lib/cot/transformApiData";
@@ -20,7 +20,7 @@ import Step6CycleLocation from "./Step6CycleLocation";
 
 export default function CotDashboard() {
   const [step, setStep] = useState<Step>(1);
-  const [cotRows, setCotRows] = useState<Record<string, unknown>[] | null>(null);
+  const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);
@@ -36,7 +36,7 @@ export default function CotDashboard() {
   }, []);
 
   const data = useMemo(
-    () => (cotRows?.length ? transformApiData(cotRows) : generateData()),
+    () => (cotRows?.length ? transformApiData(cotRows as unknown as import("@/lib/cot/types").CotRawRow[]) : generateData()),
     [cotRows]
   );
   const latest    = data[data.length - 1];

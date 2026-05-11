@@ -15,8 +15,8 @@ export default function CotGauges({ data }: { data: Record<string, unknown>[] })
   const mkRow = (label: string, cat: string, field: string, isSpread?: boolean): GRData => {
     const vals = hist52.map((d: Record<string, unknown>) => ((d[market] as Record<string, number>)?.[field] ?? 0) as number);
     const min = Math.min(...vals), max = Math.max(...vals);
-    const cv = curr[market]?.[field] ?? 0;
-    const pv = prev?.[market]?.[field] ?? cv;
+    const cv = (curr[market] as Record<string, number> | undefined)?.[field] ?? 0;
+    const pv = (prev?.[market] as Record<string, number> | undefined)?.[field] ?? cv;
     return { label, color: HM_CAT_COLORS[cat] ?? "#64748b", curr: cv, prev: pv, min, max,
       pct: max > min ? (cv - min) / (max - min) * 100 : 50, isSpread };
   };

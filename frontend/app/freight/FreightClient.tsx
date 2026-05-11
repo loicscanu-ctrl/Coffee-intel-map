@@ -15,7 +15,7 @@ type FreightRoute = {
   proxy: boolean;
 };
 
-type FreightData = {
+export type FreightData = {
   updated: string;
   routes: FreightRoute[];
   history: Record<string, number | string>[];

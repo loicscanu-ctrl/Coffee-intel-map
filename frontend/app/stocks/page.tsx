@@ -23,5 +23,5 @@ export default async function StocksPage() {
     }),
   ]);
   const stocks = stocksRaw.length > 0 ? stocksRaw : MOCK_DATA;
-  return <StocksClient stocks={stocks} news={news} />;
+  return <StocksClient stocks={stocks} news={news as unknown as { id: number; title: string; body: string; source: string; category: string; tags: string[]; pub_date: string }[]} />;
 }

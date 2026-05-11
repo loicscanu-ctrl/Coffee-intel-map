@@ -31,11 +31,11 @@ export default function MapPageClient() {
         if (cancelled) return;
         const [newsRes, countriesRes, factoriesRes] = results;
         const failures: string[] = [];
-        if (newsRes.status === "fulfilled") setNews(newsRes.value);
+        if (newsRes.status === "fulfilled") setNews(newsRes.value as unknown[]);
         else { console.error("[map] fetchNews failed", newsRes.reason); failures.push("news"); }
-        if (countriesRes.status === "fulfilled") setCountries(countriesRes.value);
+        if (countriesRes.status === "fulfilled") setCountries(countriesRes.value as unknown[]);
         else { console.error("[map] fetchMapCountries failed", countriesRes.reason); failures.push("countries"); }
-        if (factoriesRes.status === "fulfilled") setFactories(factoriesRes.value);
+        if (factoriesRes.status === "fulfilled") setFactories(factoriesRes.value as unknown[]);
         else { console.error("[map] fetchMapFactories failed", factoriesRes.reason); failures.push("factories"); }
         // Only surface the error on non-localhost deploys — locally the backend
         // simply may not be running, which is fine (map loads without pins/news).
@@ -70,7 +70,7 @@ export default function MapPageClient() {
         ) : (
           <>
             <CoffeeMap onPinClick={setSelectedPin} countries={countries} factories={factories} news={news} />
-            <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
+            <NewsSidebar item={selectedPin as (Record<string, string> | null)} onClose={() => setSelectedPin(null)} />
             <button
               onClick={() => setShowFeed(f => !f)}
               className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-[10px] px-2 py-1 rounded shadow"
@@ -80,7 +80,7 @@ export default function MapPageClient() {
           </>
         )}
       </div>
-      {showFeed && !loading && <NewsFeed initialNews={news} />}
+      {showFeed && !loading && <NewsFeed initialNews={news as { title?: string; pub_date?: string; category?: string }[]} />}
     </div>
   );
 }

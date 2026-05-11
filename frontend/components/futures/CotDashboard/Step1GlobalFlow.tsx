@@ -36,7 +36,7 @@ export default function Step1GlobalFlow({
     return macroChartData.map(row => {
       const result: Record<string, number | string> = { date: row.date };
       for (const s of SECTORS) {
-        const v = (row as Record<string, number>)[s];
+        const v = (row as unknown as Record<string, number>)[s];
         result[`${s}_pos`] = v > 0 ? v : 0;
         result[`${s}_neg`] = v < 0 ? v : 0;
       }
