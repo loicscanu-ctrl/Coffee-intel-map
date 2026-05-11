@@ -285,16 +285,22 @@ def _yfinance_fallback() -> dict:
 
 
 async def _fetch_chains(page) -> dict:
-    """Fetch futures chains: requests → Playwright → Yahoo Finance fallback."""
+    """Fetch futures chains: requests → Playwright → Yahoo Finance fallback.
+    In CI (GitHub Actions sets CI=true) Playwright is skipped — datacenter IPs
+    are blocked by Barchart and browser launch alone consumes most of the timeout."""
+    import os
+    in_ci = os.environ.get("CI") == "true"
+
     # 1. Fast path: pure HTTP (no browser overhead)
     result = _barchart_requests()
     if result.get("kc") or result.get("rm"):
         return result
 
-    # 2. Playwright path (handles JS-rendered cookies)
-    result = await _barchart_playwright(page)
-    if result.get("kc") or result.get("rm"):
-        return result
+    # 2. Playwright path — skip in CI where it always times out
+    if not in_ci:
+        result = await _barchart_playwright(page)
+        if result.get("kc") or result.get("rm"):
+            return result
 
     # 3. Yahoo Finance — always reachable, no OI but price data guaranteed
     print("[futures] Barchart unreachable — falling back to Yahoo Finance")
