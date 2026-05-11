@@ -1,32 +1,35 @@
 "use client";
 import { useState } from "react";
+import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
 import { HM_CAT_COLORS } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { MarketToggle } from "./Toggles";
 
-export default function CotHeatmap({ data }: { data: Record<string, unknown>[] }) {
+type PositionField = keyof CotMarketPositions;
+
+export default function CotHeatmap({ data }: { data: ProcessedCotRow[] }) {
   const [market, setMarket] = useState<"ny" | "ldn">("ny");
   const [mode, setMode]     = useState<"net" | "long" | "short">("net");
   const weeks13 = data.slice(-13);
-  const lsFields = [
+  const lsFields: { label: string; lf: PositionField; sf: PositionField }[] = [
     { label: "PMPU",      lf: "pmpuLong",   sf: "pmpuShort"   },
     { label: "Swap",      lf: "swapLong",   sf: "swapShort"   },
     { label: "MM",        lf: "mmLong",     sf: "mmShort"     },
     { label: "Other Rpt", lf: "otherLong",  sf: "otherShort"  },
     { label: "Non-Rep",   lf: "nonRepLong", sf: "nonRepShort" },
   ];
-  const spreadFields = [
+  const spreadFields: { label: string; key: PositionField; color: string }[] = [
     { label: "MM Spr",    key: "mmSpread",    color: "#a78bfa" },
     { label: "Swap Spr",  key: "swapSpread",  color: "#34d399" },
     { label: "Other Spr", key: "otherSpread", color: "#67e8f9" },
   ];
 
-  const gv = (d: Record<string, unknown>, field: string) => ((d[market] as Record<string, number>)?.[field] ?? 0) as number;
+  const gv = (d: ProcessedCotRow, field: PositionField) => d[market]?.[field] ?? 0;
 
   const lsRows = lsFields.map(f => ({
     label: f.label,
     color: HM_CAT_COLORS[f.label] ?? "#64748b",
-    vals: weeks13.map((d: Record<string, unknown>) => {
+    vals: weeks13.map(d => {
       if (mode === "long")  return gv(d, f.lf);
       if (mode === "short") return gv(d, f.sf);
       return gv(d, f.lf) - gv(d, f.sf);
@@ -34,7 +37,7 @@ export default function CotHeatmap({ data }: { data: Record<string, unknown>[] }
   }));
   const spreadRows = spreadFields.map(f => ({
     label: f.label, color: f.color,
-    vals: weeks13.map((d: Record<string, unknown>) => gv(d, f.key)),
+    vals: weeks13.map(d => gv(d, f.key)),
   }));
 
   const cellBg = (val: number, min: number, max: number, isSpread: boolean): string => {
@@ -105,9 +108,9 @@ export default function CotHeatmap({ data }: { data: Record<string, unknown>[] }
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-x-auto">
         <div style={{ display: "grid", gridTemplateColumns: `72px repeat(${weeks13.length}, 1fr)`, gap: 2, marginBottom: 2 }}>
           <div />
-          {weeks13.map((d: Record<string, unknown>, i: number) => (
+          {weeks13.map((d, i) => (
             <div key={i} style={{ fontSize: 9, color: i === weeks13.length - 1 ? "#a5b4fc" : "#475569", textAlign: "center" }}>
-              {String(d.date).slice(5)}
+              {d.date.slice(5)}
             </div>
           ))}
         </div>

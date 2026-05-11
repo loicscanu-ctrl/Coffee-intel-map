@@ -89,6 +89,8 @@ export interface NewsItem {
   /** Map pin coordinates — present on geo-tagged items, null/missing otherwise. */
   lat?: number | null;
   lng?: number | null;
+  /** Free-form JSON or URL stored by scrapers; consumers handle as opaque string. */
+  meta?: string | null;
 }
 
 export async function fetchNews(category?: string): Promise<NewsItem[]> {

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import type { Map as LeafletMap, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 
@@ -175,8 +176,8 @@ interface CoffeeMapProps {
 
 export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<{ remove(): void } | null>(null);
-  const tileLayerRef = useRef<{ remove(): void } | null>(null);
+  const mapInstanceRef = useRef<LeafletMap | null>(null);
+  const tileLayerRef = useRef<TileLayer | null>(null);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
 
@@ -390,7 +391,8 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
   // ── Basemap switcher (reacts to activeBasemap state) ──────────────────────
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    const map = mapInstanceRef.current;
+    if (!map) return;
     const bm = BASEMAPS.find((b) => b.id === activeBasemap);
     if (!bm) return;
     import("leaflet").then((L) => {
@@ -400,7 +402,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
         attribution: bm.attr,
         subdomains: bm.subdomains || "abc",
         maxZoom: 19,
-      }).addTo(mapInstanceRef.current);
+      }).addTo(map);
     });
   }, [activeBasemap]);
 

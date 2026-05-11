@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { fetchNews } from "@/lib/api";
+import { fetchNews, type NewsItem } from "@/lib/api";
 
 const CATEGORIES = ["all", "supply", "demand", "macro", "general"];
 
@@ -10,12 +10,6 @@ const BORDER_COLORS: Record<string, string> = {
   macro: "border-blue-500",
   general: "border-gray-500",
 };
-
-interface NewsItem {
-  title?: string;
-  pub_date?: string;
-  category?: string;
-}
 
 interface NewsFeedProps {
   initialNews?: NewsItem[];
