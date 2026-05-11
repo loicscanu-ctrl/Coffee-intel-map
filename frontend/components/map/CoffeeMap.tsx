@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import type { Map as LeafletMap, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
+import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 
 // ── Hub → Portuguese country list (Cecafe) ────────────────────────────────────
 const HUB_COUNTRIES: Record<string, string[]> = {
@@ -165,37 +167,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: "#6b7280",
 };
 
-interface CountryPin {
-  type: string;
-  lat: number;
-  lng: number;
-  name: string;
-  data?: { prod?: string; stock?: string; cons?: string; intel?: string };
-}
-interface FactoryPin {
-  lat: number;
-  lng: number;
-  name: string;
-  company?: string;
-  capacity?: string;
-}
-interface NewsPin {
-  lat?: number | null;
-  lng?: number | null;
-  category: string;
-}
-
 interface CoffeeMapProps {
-  onPinClick?: (item: unknown) => void;
-  countries: unknown[];
-  factories: unknown[];
-  news: unknown[];
+  onPinClick?: (item: NewsItem) => void;
+  countries: CountryPin[];
+  factories: FactoryPin[];
+  news: NewsItem[];
 }
 
 export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<{ remove(): void } | null>(null);
-  const tileLayerRef = useRef<{ remove(): void } | null>(null);
+  const mapInstanceRef = useRef<LeafletMap | null>(null);
+  const tileLayerRef = useRef<TileLayer | null>(null);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
 
@@ -383,8 +365,8 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       // ── News pins ─────────────────────────────────────────────────────────
       const newsLayer = Leaflet.layerGroup().addTo(map);
       news
-        .filter((item): item is NewsPin & { lat: number; lng: number } =>
-          (item as NewsPin).lat != null && (item as NewsPin).lng != null)
+        .filter((item): item is NewsItem & { lat: number; lng: number } =>
+          item.lat != null && item.lng != null)
         .forEach((item) => {
           const color = CATEGORY_COLORS[item.category] || "#6b7280";
           const icon = Leaflet.divIcon({
@@ -409,7 +391,8 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
   // ── Basemap switcher (reacts to activeBasemap state) ──────────────────────
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    const map = mapInstanceRef.current;
+    if (!map) return;
     const bm = BASEMAPS.find((b) => b.id === activeBasemap);
     if (!bm) return;
     import("leaflet").then((L) => {
@@ -419,7 +402,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
         attribution: bm.attr,
         subdomains: bm.subdomains || "abc",
         maxZoom: 19,
-      }).addTo(mapInstanceRef.current);
+      }).addTo(map);
     });
   }, [activeBasemap]);
 

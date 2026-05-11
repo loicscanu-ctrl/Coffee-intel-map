@@ -44,7 +44,7 @@ def _load(filename: str) -> dict | list | None:
 # ── Section builders ──────────────────────────────────────────────────────────
 
 def _fmt_change(v) -> str:
-    if v is None:
+    if not isinstance(v, (int, float)):
         return ""
     sign = "+" if v >= 0 else ""
     return f" ({sign}{v:.0f})"
@@ -53,28 +53,21 @@ def _fmt_change(v) -> str:
 def _prices_section() -> str:
     lines = ["<b>Prices</b>"]
 
-    # Futures from acaphe_live.json
+    # Futures from acaphe_live.json — first row is always front month
     acaphe = _load("acaphe_live.json")
     if acaphe:
         arabica = acaphe.get("arabica", [])
         robusta = acaphe.get("robusta", [])
-        # Front month KC
-        for i, row in enumerate(arabica):
-            month = row.get("month", "")
-            if i == 0 or "KC" in month:
-                last = row.get("last")
-                chg  = row.get("change")
-                if last:
-                    lines.append(f"  KC ({month}): <b>{last:.2f}c/lb</b>{_fmt_change(chg)}")
-                break
-        # Front month RM robusta
-        for row in robusta:
-            month = row.get("month", "")
-            last  = row.get("last")
-            chg   = row.get("change")
+        if arabica:
+            row = arabica[0]
+            last = row.get("last")
             if last:
-                lines.append(f"  RC ({month}): <b>{last:.0f} USD/t</b>{_fmt_change(chg)}")
-                break
+                lines.append(f"  KC ({row.get('month', '')}): <b>{last:.2f}c/lb</b>{_fmt_change(row.get('change'))}")
+        if robusta:
+            row = robusta[0]
+            last = row.get("last")
+            if last:
+                lines.append(f"  RC ({row.get('month', '')}): <b>{last:.0f} USD/t</b>{_fmt_change(row.get('change'))}")
 
     # Physical prices from latest_prices.json
     latest = _load("latest_prices.json")
@@ -116,6 +109,16 @@ def _cot_section() -> str:
     mm_net = mm_long - mm_short
     sign   = "+" if mm_net >= 0 else ""
 
+    # CFTC report covers positions as of Tuesday close, published Friday
+    age_str = ""
+    try:
+        report_date = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
+        days_old = (datetime.now(UTC) - report_date).days
+        if days_old > 0:
+            age_str = f" · {days_old}d old"
+    except (ValueError, TypeError):
+        pass
+
     # Week-on-week change if previous row exists
     wow_str = ""
     if len(cot_data) >= 2:
@@ -129,7 +132,7 @@ def _cot_section() -> str:
     pmpu_net = (ny.get("pmpu_long", 0) or 0) - (ny.get("pmpu_short", 0) or 0)
 
     return (
-        f"<b>CoT — NY Arabica</b> ({date_str})\n"
+        f"<b>CoT — NY Arabica</b> (report week {date_str}{age_str})\n"
         f"  MM net: <b>{sign}{mm_net:,} lots</b>{wow_str}\n"
         f"  Producers net: {'+' if pmpu_net >= 0 else ''}{pmpu_net:,} lots"
     )

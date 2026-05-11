@@ -12,7 +12,8 @@ from datetime import date
 
 from bs4 import BeautifulSoup
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925  # Brazil centre
 
 _URL = "https://www.cepea.org.br/en/indicator/coffee.aspx"
@@ -68,7 +69,7 @@ def _parse_price_table(html: str) -> tuple[str | None, str | None]:
 def _make_item(name: str, price: str, date_str: str, tags: list[str]) -> dict:
     label = f" ({date_str})" if date_str else ""
     return {
-        "title": f"CEPEA {name} – {_TODAY()}",
+        "title": f"CEPEA {name} – {_today()}",
         "body": f"CEPEA {name} price: R$ {price}/sack{label}",
         "source": "CEPEA/ESALQ",
         "category": "supply",

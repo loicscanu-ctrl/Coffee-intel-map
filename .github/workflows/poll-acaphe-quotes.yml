@@ -32,17 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Python dependencies
-        working-directory: backend
-        run: pip install --quiet -r scraper/requirements.txt psycopg2-binary
-
-      - name: Install Playwright Chromium
-        run: playwright install chromium --with-deps
-
       - name: Skip when Upstash secrets are missing
         id: gate
         env:
@@ -55,6 +44,20 @@ jobs:
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.skip == 'false'
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        if: steps.gate.outputs.skip == 'false'
+        working-directory: backend
+        run: pip install --quiet -r scraper/requirements.txt psycopg2-binary
+
+      - name: Install Playwright Chromium
+        if: steps.gate.outputs.skip == 'false'
+        run: playwright install chromium --with-deps
 
       - name: Poll once and push to Upstash
         if: steps.gate.outputs.skip == 'false'

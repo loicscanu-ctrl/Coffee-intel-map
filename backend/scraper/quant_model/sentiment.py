@@ -11,6 +11,7 @@ Usage (debug):
 import json
 import os
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -85,14 +86,22 @@ def run(db) -> dict:
     try:
         import google.generativeai as genai
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        raw = response.text.strip()
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        classifications = json.loads(raw.strip())
+        model = genai.GenerativeModel(
+            "gemini-2.5-flash",
+            generation_config={"response_mime_type": "application/json"},
+        )
+        last_err: Exception | None = None
+        for attempt in range(3):
+            try:
+                response = model.generate_content(prompt)
+                classifications = json.loads(response.text)
+                break
+            except Exception as e:
+                last_err = e
+                if attempt < 2:
+                    time.sleep(2 ** attempt)  # 1s, 2s
+        else:
+            raise last_err if last_err else RuntimeError("Gemini call failed")
     except Exception as e:
         return {"available": False, "reason": f"Gemini API error: {e}"}
 

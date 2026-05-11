@@ -4,14 +4,24 @@ import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { LegendProps } from "recharts";
 import { ARABICA_MT_FACTOR, ROBUSTA_MT_FACTOR } from "@/lib/cot/transformApiData";
+import type { CotMarketPositions, CotTradersGroup, ProcessedCotRow } from "@/lib/cot/types";
 import { CAT_ITEMS, CHART_STYLE } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { CatToggles } from "./Toggles";
 
-export default function Step5DryPowder({ data }: { data: Record<string, unknown>[] }) {
-  const [dpCats, setDpCats] = useState({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
+type PositionField = keyof CotMarketPositions;
+type TradersCat = keyof CotTradersGroup;
+type DpCatKey = "pmpu" | "mm" | "swap" | "other" | "nonrep";
+
+const OI_PREFIX: Record<DpCatKey, "pmpu" | "mm" | "swap" | "other" | "nonRep"> = {
+  pmpu: "pmpu", mm: "mm", swap: "swap", other: "other", nonrep: "nonRep",
+};
+
+export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
+  const [dpCats, setDpCats] = useState<Record<DpCatKey, boolean>>({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
 
   const processedDpData = useMemo(() => {
     const compute = (market: "ny" | "ldn") => {
@@ -20,20 +30,20 @@ export default function Step5DryPowder({ data }: { data: Record<string, unknown>
       };
       const mt = market === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
       data.forEach(d => {
-        const trL = (market === "ny" ? d.tradersNY : d.tradersLDN) as Record<string, number> | undefined;
-        const trS = (market === "ny" ? d.tradersNY_short : d.tradersLDN_short) as Record<string, number> | undefined;
+        const trL: CotTradersGroup | undefined = market === "ny" ? d.tradersNY : d.tradersLDN;
+        const trS: CotTradersGroup | undefined = market === "ny" ? d.tradersNY_short : d.tradersLDN_short;
         let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
-        Object.keys(dpCats).forEach(cat => {
-          if ((dpCats as Record<string, boolean>)[cat]) {
-            const oiKey = cat === "nonrep" ? "nonRep" : cat;
-            const mktOi = d[market] as Record<string, number>;
-            dpLong         += mktOi[`${oiKey}Long`]  * mt;
-            dpShort        += mktOi[`${oiKey}Short`] * mt;
-            dpTradersLong  += trL?.[cat] ?? 0;
-            dpTradersShort += trS?.[cat] ?? 0;
+        (Object.keys(dpCats) as DpCatKey[]).forEach(cat => {
+          if (dpCats[cat]) {
+            const prefix = OI_PREFIX[cat];
+            const mktOi = d[market];
+            dpLong         += mktOi[`${prefix}Long`  as PositionField] * mt;
+            dpShort        += mktOi[`${prefix}Short` as PositionField] * mt;
+            dpTradersLong  += trL?.[cat as TradersCat] ?? 0;
+            dpTradersShort += trS?.[cat as TradersCat] ?? 0;
           }
         });
-        const tf = d.timeframe as string;
+        const tf = d.timeframe;
         if (byTf[tf]) {
           if (dpTradersLong  > 0) byTf[tf].push({ date: d.date, traders: dpTradersLong,  oi: dpLong  });
           if (dpTradersShort > 0) byTf[tf].push({ date: d.date, traders: dpTradersShort, oi: -dpShort });
@@ -67,7 +77,7 @@ export default function Step5DryPowder({ data }: { data: Record<string, unknown>
   const mkScatter = (market: "ny" | "ldn") => {
     const d = processedDpData[market];
     const dom = dpDomain[market];
-    const legendContent = (props: { payload?: { color?: string; value?: string }[] }) => {
+    const legendContent: LegendProps["content"] = (props) => {
       const items = [...(props.payload ?? [])].reverse();
       return (
         <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 10, paddingTop: 8 }}>
@@ -94,9 +104,9 @@ export default function Step5DryPowder({ data }: { data: Record<string, unknown>
               label={{ value: "OI (k MT)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
             <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-              formatter={(v: ValueType, name: NameType) => name === "# traders"
-                ? [Math.round(Number(v)).toString(), name]
-                : [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
+              formatter={((v, name) => name === "# traders"
+                ? [Math.round(Number(v)).toString(), name as NameType]
+                : [`${(Number(v) / 1000).toFixed(1)}k MT`, name as NameType]) satisfies Formatter<ValueType, NameType>} />
             <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }} content={legendContent} />
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
             <Scatter name="Historic"   data={d.historical} fill="#bfdbfe" fillOpacity={0.18} {...{ size: 12  } as any} />

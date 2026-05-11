@@ -50,22 +50,53 @@ export function clearApiCache(): void {
   _cache.clear();
 }
 
-export async function fetchMapCountries() {
-  return apiGet("/api/map/countries", { cache: "no-store" });
+export interface CountryPin {
+  type: string;
+  lat: number;
+  lng: number;
+  name: string;
+  data?: { prod?: string; stock?: string; cons?: string; intel?: string };
 }
 
-export async function fetchMapFactories() {
-  return apiGet("/api/map/factories", { cache: "no-store" });
+export interface FactoryPin {
+  lat: number;
+  lng: number;
+  name: string;
+  company?: string;
+  capacity?: string;
+}
+
+export async function fetchMapCountries(): Promise<CountryPin[]> {
+  return apiGet<CountryPin[]>("/api/map/countries", { cache: "no-store" });
+}
+
+export async function fetchMapFactories(): Promise<FactoryPin[]> {
+  return apiGet<FactoryPin[]>("/api/map/factories", { cache: "no-store" });
 }
 
 export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
   return cachedFetch("/api/stocks");
 }
 
-export async function fetchNews(category?: string) {
+export interface NewsItem {
+  id: number;
+  title: string;
+  body: string;
+  source: string;
+  category: string;
+  tags: string[];
+  pub_date: string;
+  /** Map pin coordinates — present on geo-tagged items, null/missing otherwise. */
+  lat?: number | null;
+  lng?: number | null;
+  /** Free-form JSON or URL stored by scrapers; consumers handle as opaque string. */
+  meta?: string | null;
+}
+
+export async function fetchNews(category?: string): Promise<NewsItem[]> {
   const path = category ? `/api/news?category=${encodeURIComponent(category)}` : "/api/news";
   // no-store: bypass Next.js Data Cache so SSR always gets fresh news
-  return apiGet(path, { cache: "no-store" });
+  return apiGet<NewsItem[]>(path, { cache: "no-store" });
 }
 
 export async function fetchFreight() {

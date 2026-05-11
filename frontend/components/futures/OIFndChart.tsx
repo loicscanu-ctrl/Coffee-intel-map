@@ -4,6 +4,10 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { TooltipContentProps } from "recharts/types/component/Tooltip";
+
+type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
 
 interface SeriesPoint { day: number; oi: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }
@@ -141,8 +145,8 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
           />
           <Tooltip
             contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-            formatter={(v: unknown, name: unknown) => [`${v}K`, name]}
-            labelFormatter={l => `Day ${l} to FND`}
+            formatter={((v, name) => [`${v}K`, name as NameType]) satisfies Formatter<ValueType, NameType>}
+            labelFormatter={((l) => `Day ${l} to FND`) satisfies LabelFmt}
           />
           <Legend
             wrapperStyle={{ fontSize: 11, color: "#94a3b8", paddingTop: 8 }}

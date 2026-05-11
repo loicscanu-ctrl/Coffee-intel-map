@@ -12,7 +12,8 @@ from datetime import date
 
 import requests
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925  # Brazil centre
 _URL = "https://cotacao.b3.com.br/mds/api/v1/DerivativeQuotation/ICF"
 
@@ -77,7 +78,7 @@ async def run(page) -> list[dict]:
         print(f"[b3_icf] {symb} | ajuste={price} USD/sac | OI={oi} | mty={mty}")
 
         return [{
-            "title":    f"B3 ICF Arabica ({label}) – {_TODAY()}",
+            "title":    f"B3 ICF Arabica ({label}) – {_today()}",
             "body":     f"B3 Arabica 4/5 settlement: {price:.2f} USD/sac | OI: {oi} contracts | Expiry: {mty}",
             "source":   "B3",
             "category": "supply",

@@ -5,7 +5,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BLUE, TT_STYLE, TYPE_FILTER_OPTS, TYPE_SERIES } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -52,7 +52,7 @@ export default function YoYByTypeChart({ series, filteredSeries, typeFilter }: {
         }
         return row;
       })
-      .filter(r => r.startYear >= since);
+      .filter(r => (r.startYear as number) >= since);
   }, [activeSeries, since, showSingle, typeFilter]);
 
   const bars = showSingle
@@ -82,7 +82,7 @@ export default function YoYByTypeChart({ series, filteredSeries, typeFilter }: {
           <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
           <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
-          <Tooltip contentStyle={TT_STYLE} formatter={(v: ValueType, name: NameType) => [v !== null ? `${Number(v) > 0 ? "+" : ""}${v} kt` : "—", name]} />
+          <Tooltip contentStyle={TT_STYLE} formatter={((v, name) => [v != null ? `${Number(v) > 0 ? "+" : ""}${v} kt` : "—", name as NameType]) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
           {bars.map(b => (

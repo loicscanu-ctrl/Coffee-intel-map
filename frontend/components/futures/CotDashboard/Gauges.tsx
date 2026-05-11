@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
+import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
 import { HM_CAT_COLORS } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { MarketToggle } from "./Toggles";
 
-export default function CotGauges({ data }: { data: Record<string, unknown>[] }) {
+type PositionField = keyof CotMarketPositions;
+
+export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
   const [market, setMarket] = useState<"ny" | "ldn">("ny");
   const hist52 = data.slice(-52);
   const curr = hist52[hist52.length - 1];
@@ -12,11 +15,11 @@ export default function CotGauges({ data }: { data: Record<string, unknown>[] })
 
   type GRData = { label: string; color: string; curr: number; prev: number; min: number; max: number; pct: number; isSpread?: boolean };
 
-  const mkRow = (label: string, cat: string, field: string, isSpread?: boolean): GRData => {
-    const vals = hist52.map((d: Record<string, unknown>) => ((d[market] as Record<string, number>)?.[field] ?? 0) as number);
+  const mkRow = (label: string, cat: string, field: PositionField, isSpread?: boolean): GRData => {
+    const vals = hist52.map(d => d[market]?.[field] ?? 0);
     const min = Math.min(...vals), max = Math.max(...vals);
-    const cv = (curr[market] as Record<string, number> | undefined)?.[field] ?? 0;
-    const pv = (prev?.[market] as Record<string, number> | undefined)?.[field] ?? cv;
+    const cv = curr[market]?.[field] ?? 0;
+    const pv = prev?.[market]?.[field] ?? cv;
     return { label, color: HM_CAT_COLORS[cat] ?? "#64748b", curr: cv, prev: pv, min, max,
       pct: max > min ? (cv - min) / (max - min) * 100 : 50, isSpread };
   };

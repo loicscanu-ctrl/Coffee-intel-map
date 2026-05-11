@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 
 from scraper.translate import translate_to_english
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925
 
 def parse_cooabriel(html: str) -> dict | None:
@@ -74,7 +75,7 @@ def _extract_brl_from_text(text: str) -> str | None:
 def _make_conilon_item(price_brl: str, date_label: str = "") -> dict:
     label = f" ({date_label})" if date_label else ""
     return {
-        "title": f"Conilon Tipo 7 (Cooabriel) – {_TODAY()}",
+        "title": f"Conilon Tipo 7 (Cooabriel) – {_today()}",
         "body": f"Conilon Tipo 7 price: R$ {price_brl}/saca{label}",
         "source": "Cooabriel",
         "category": "supply",
@@ -89,7 +90,7 @@ def parse_noticiasagricolas(html: str) -> dict | None:
         return None
     text = tag.get_text(strip=True)
     return {
-        "title": f"Brazil Arabica Price (Noticiasagricolas) – {_TODAY()}",
+        "title": f"Brazil Arabica Price (Noticiasagricolas) – {_today()}",
         "body": translate_to_english(f"Arabica coffee price: {text}", "pt"),
         "source": "Noticiasagricolas",
         "category": "supply",
@@ -110,7 +111,7 @@ def parse_cecafe(html: str) -> dict | None:
         return None
     text = " | ".join(c.get_text(strip=True) for c in cells[:4])
     return {
-        "title": f"Brazil Coffee Exports (Cecafe) – {_TODAY()}",
+        "title": f"Brazil Coffee Exports (Cecafe) – {_today()}",
         "body": translate_to_english(f"Brazil coffee export data: {text}", "pt"),
         "source": "Cecafe",
         "category": "supply",

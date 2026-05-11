@@ -17,7 +17,8 @@ import requests
 from bs4 import BeautifulSoup
 
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 # ECF statistics pages — try in order
 _ECF_URLS = [
@@ -86,7 +87,7 @@ def _parse_ecf_stocks(html: str) -> list[dict] | None:
             pass
 
     if candidates:
-        return [{"period": _TODAY(), "value_raw": candidates[0], "note": "best-effort parse"}]
+        return [{"period": _today(), "value_raw": candidates[0], "note": "best-effort parse"}]
 
     return None
 
@@ -130,7 +131,7 @@ async def run(page) -> list[dict]:
     value_bags = latest.get("value_raw", 0)
 
     return [{
-        "title":    f"ECF European Port Stocks – {_TODAY()}",
+        "title":    f"ECF European Port Stocks – {_today()}",
         "body":     f"ECF European green coffee stocks: {value_bags:,} bags ({value_bags // 1_000_000:.1f}M bags). Source: {source_url}",
         "source":   "ECF",
         "category": "demand",
@@ -140,7 +141,7 @@ async def run(page) -> list[dict]:
         "meta":     json.dumps({
             "monthly":    stocks_data,
             "latest_bags": value_bags,
-            "as_of":       _TODAY(),
+            "as_of":       _today(),
             "source_url":  source_url,
         }),
     }]

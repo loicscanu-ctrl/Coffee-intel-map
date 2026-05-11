@@ -35,9 +35,11 @@ export interface ProcessedCotRow {
   rawNy?: Record<string, number | null>;
   rawLdn?: Record<string, number | null>;
   tradersNY: CotTradersGroup;
-  tradersNY_short: CotTradersGroup;
+  /** Only present on real data, not on synthetic mock rows. */
+  tradersNY_short?: CotTradersGroup;
   tradersLDN: CotTradersGroup;
-  tradersLDN_short: CotTradersGroup;
+  /** Only present on real data, not on synthetic mock rows. */
+  tradersLDN_short?: CotTradersGroup;
   pmpuShortMT_NY: number;
   pmpuShortMT_LDN: number;
   pmpuShortMT: number;

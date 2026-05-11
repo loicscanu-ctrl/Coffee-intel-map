@@ -4,15 +4,18 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import type { TooltipContentProps } from "recharts/types/component/Tooltip";
+
+type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
+const weekLabel: LabelFmt = (l) => `Week: ${l}`;
 import type { MacroCotWeek } from "@/lib/api";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import AttributionTable from "./AttributionTable";
 import SectionHeader from "./SectionHeader";
-import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS } from "./constants";
+import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS, type SectorKey } from "./constants";
 import { transformMacroData } from "./transformMacroData";
-import type { MacroToggle } from "./types";
+import type { MacroChartRow, MacroToggle } from "./types";
 
 export default function Step1GlobalFlow({
   macroData,
@@ -36,7 +39,7 @@ export default function Step1GlobalFlow({
     return macroChartData.map(row => {
       const result: Record<string, number | string> = { date: row.date };
       for (const s of SECTORS) {
-        const v = (row as unknown as Record<string, number>)[s];
+        const v = row[s as SectorKey];
         result[`${s}_pos`] = v > 0 ? v : 0;
         result[`${s}_neg`] = v < 0 ? v : 0;
       }
@@ -47,7 +50,7 @@ export default function Step1GlobalFlow({
   const macroYDomain = useMemo(() => {
     if (macroToggle !== "net" || !macroChartData.length) return undefined;
     const allVals = macroChartData.flatMap(d =>
-      SECTORS.map(s => (d as Record<string, number>)[s])
+      SECTORS.map(s => d[s as SectorKey])
     );
     const min = Math.min(...allVals);
     const max = Math.max(...allVals);
@@ -94,7 +97,7 @@ export default function Step1GlobalFlow({
         }
         return row;
       })
-      .filter(row => SOFT_SYMBOLS.some(s => Math.abs(row[s.key]) > 0)),
+      .filter(row => SOFT_SYMBOLS.some(s => Math.abs(Number(row[s.key] ?? 0)) > 0)),
     [macroData, macroToggle]);
 
   return (
@@ -207,7 +210,7 @@ export default function Step1GlobalFlow({
       {macroData.length > 0 && <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
         <ResponsiveContainer width="100%" height={260}>
           <AreaChart
-            data={macroToggle === "net" && macroNetSplitData ? macroNetSplitData : macroChartData}
+            data={macroToggle === "net" && macroNetSplitData ? (macroNetSplitData as unknown as MacroChartRow[]) : macroChartData}
             margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -248,15 +251,15 @@ export default function Step1GlobalFlow({
             ) : (
               <Tooltip
                 contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                formatter={(v: ValueType, name: NameType) => [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(1)}B`, name]}
-                labelFormatter={(l: string | number) => `Week: ${l}`}
+                formatter={((v, name) => [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(1)}B`, name as NameType]) satisfies Formatter<ValueType, NameType>}
+                labelFormatter={weekLabel}
               />
             )}
             <Legend wrapperStyle={{ fontSize: 11 }} content={() => {
               const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
               const lastRow = macroChartData[macroChartData.length - 1];
               const order = lastRow
-                ? [...SECTORS].sort((a, b) => Math.abs((lastRow as Record<string, number>)[b]) - Math.abs((lastRow as Record<string, number>)[a]))
+                ? [...SECTORS].sort((a, b) => Math.abs(lastRow[b]) - Math.abs(lastRow[a]))
                 : [...SECTORS];
               return (
                 <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
@@ -332,8 +335,8 @@ export default function Step1GlobalFlow({
                   <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
                   <Tooltip
                     contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                    formatter={(v: ValueType, name: NameType) => [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(2)}B`, name]}
-                    labelFormatter={(l: string | number) => `Week: ${l}`}
+                    formatter={((v, name) => [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(2)}B`, name as NameType]) satisfies Formatter<ValueType, NameType>}
+                    labelFormatter={weekLabel}
                   />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   {SECTORS.map(sector => {
@@ -485,11 +488,11 @@ export default function Step1GlobalFlow({
                   <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />
                   <Tooltip
                     contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
-                    formatter={(v: ValueType, name: NameType) => {
-                      if (Math.abs(Number(v)) < 0.0001) return null;
-                      return [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(2)}B`, name];
-                    }}
-                    labelFormatter={(l: string | number) => `Week: ${l}`}
+                    formatter={((v, name) => {
+                      if (Math.abs(Number(v)) < 0.0001) return "";
+                      return [`${Number(v) < 0 ? "-$" : "$"}${Math.abs(Number(v)).toFixed(2)}B`, name as NameType];
+                    }) satisfies Formatter<ValueType, NameType>}
+                    labelFormatter={weekLabel}
                   />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                   {SOFT_SYMBOLS.map(s => (

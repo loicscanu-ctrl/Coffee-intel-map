@@ -7,6 +7,7 @@ import {
 import {
   CROP_MONTH_LABELS, CROP_MONTH_ORDER, CROP_YEAR_COLORS, TT_STYLE,
 } from "./constants";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -85,7 +86,7 @@ export default function CumulativePaceChart({ series, filteredSeries, typeFilter
           <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: unknown, name: unknown) => [v !== null ? `${v} kt` : "—", `Crop ${name}`]} />
+            formatter={((v, name) => [v != null ? `${v} kt` : "—", `Crop ${name}` as NameType]) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>Crop {v}</span>} />
           {prior2Key && (
@@ -95,10 +96,11 @@ export default function CumulativePaceChart({ series, filteredSeries, typeFilter
           <Line type="monotone" dataKey={prior1Key} stroke={CROP_YEAR_COLORS[1]}
             strokeWidth={1.5} dot={false} connectNulls />
           <Line type="monotone" dataKey={currentKey} stroke={CROP_YEAR_COLORS[0]}
-            strokeWidth={2.5} dot={(props: { index: number; payload?: Record<string, number | null>; cx?: number; cy?: number; key?: string }) => {
-              if (props.index !== lastIdx || props.payload?.[currentKey] == null) return <g key={props.key} />;
+            strokeWidth={2.5} dot={(props) => {
+              const p = props.payload as Record<string, number | null> | undefined;
+              if (props.index !== lastIdx || p?.[currentKey] == null) return <g key={props.key as string} />;
               return (
-                <g key={props.key}>
+                <g key={props.key as string}>
                   <circle cx={props.cx} cy={props.cy} r={3} fill={CROP_YEAR_COLORS[0]} />
                   <text x={props.cx} y={(props.cy ?? 0) + 16} fill="#f87171" fontSize={9} fontFamily="monospace" textAnchor="middle">
                     {Number(lastKt).toLocaleString("en-US")}kt

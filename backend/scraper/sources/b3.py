@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 
 from scraper.translate import translate_to_english
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = -14.235, -51.925
 
 def parse_b3(html: str) -> dict | None:
@@ -17,7 +18,7 @@ def parse_b3(html: str) -> dict | None:
         return None
     text = tag if isinstance(tag, str) else tag.get_text(strip=True)
     return {
-        "title": f"B3 Brazil Coffee Futures – {_TODAY()}",
+        "title": f"B3 Brazil Coffee Futures – {_today()}",
         "body": translate_to_english(f"B3 Brazil coffee futures settlement: {text}", "pt"),
         "source": "B3",
         "category": "general",

@@ -8,7 +8,7 @@ import {
   DEST_WINDOWS, EMPTY_CY, GREEN, HUB_COLORS, HUB_ORDER, SLATE,
   TT_STYLE, TYPE_LABELS,
 } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey, getHub, monthLabel, offsetYM, toEn } from "./helpers";
 import type { CoffeeType, CountryYear, DestWindow, ViewMode } from "./types";
 
@@ -257,10 +257,10 @@ export default function DestinationChart({
           <YAxis type="category" dataKey="label" tick={{ fill: "#cbd5e1", fontSize: 9 }}
             width={mode === "hub" ? 125 : 135} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: ValueType, name: NameType) => [
+            formatter={((v, name) => [
               `${v} kt`,
-              name === "current" ? periodLabel : prevPeriodLabel,
-            ]} />
+              (name === "current" ? periodLabel : prevPeriodLabel) as NameType,
+            ]) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={(v) => (
               <span style={{ color: "#cbd5e1" }}>

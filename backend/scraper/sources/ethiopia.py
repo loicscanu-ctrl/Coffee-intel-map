@@ -11,24 +11,17 @@ Key grade: Grade 1/2 natural (Harrar, Sidama) and washed (Yirgacheffe, Limu).
 """
 from __future__ import annotations
 
-import csv
-import io
 import json
 import re
-from datetime import date, datetime
+from datetime import date
 
-import requests
 from bs4 import BeautifulSoup
 
-_TODAY = lambda: date.today().isoformat()
-_LAT, _LNG = 9.145, 40.489   # Ethiopia centroid
-_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
+from scraper.sources._ico_common import fetch_ico_exports
 
-_ICO_CSV_URL = (
-    "https://www.ico.org/historical/1990%20onwards/CSV/"
-    "2b%20-%20Exports%20of%20green%20coffee.csv"
-)
-_ETH_NAMES = {"ethiopia"}
+def _today() -> str:
+    return date.today().isoformat()
+_LAT, _LNG = 9.145, 40.489   # Ethiopia centroid
 
 # ECX (Ethiopian Coffee Exchange) — best-effort price scrape
 # ECX posts daily price reports; URL may vary by release
@@ -41,62 +34,6 @@ _ECX_URLS = [
 # Sanity check: ETB per kg, typical 50-150 ETB/kg
 _PRICE_MIN_ETB = 30.0
 _PRICE_MAX_ETB = 500.0
-
-
-def _parse_ico_ethiopia(content: str) -> list[dict]:
-    reader = csv.DictReader(io.StringIO(content))
-    rows = list(reader)
-    country_col = (reader.fieldnames or [""])[0]
-    eth_row = next(
-        (r for r in rows if r.get(country_col, "").strip().lower() in _ETH_NAMES),
-        None,
-    )
-    if eth_row is None:
-        return []
-
-    monthly: list[dict] = []
-    for col, val in eth_row.items():
-        if col == country_col:
-            continue
-        m = re.match(r"(\d{4})\s+([A-Za-z]{3})", col.strip())
-        if not m:
-            continue
-        try:
-            dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", "%Y %b")
-        except ValueError:
-            continue
-        try:
-            bags_k = float(str(val).replace(",", "").strip())
-        except (ValueError, TypeError):
-            continue
-        if bags_k <= 0:
-            continue
-        monthly.append({"month": f"{dt.year}-{dt.month:02d}", "total_k_bags": round(bags_k, 1)})
-
-    monthly.sort(key=lambda x: x["month"])
-    if len(monthly) > 48:
-        monthly = monthly[-48:]
-
-    by_month = {r["month"]: r["total_k_bags"] for r in monthly}
-    result = []
-    for r in monthly:
-        ym = r["month"]
-        yr, mo = ym.split("-")
-        ly = f"{int(yr) - 1}-{mo}"
-        ly_val = by_month.get(ly)
-        yoy = round((r["total_k_bags"] - ly_val) / ly_val * 100, 1) if ly_val and ly_val > 0 else None
-        result.append({**r, "yoy_pct": yoy})
-    return result
-
-
-def _fetch_ico_exports() -> list[dict]:
-    try:
-        r = requests.get(_ICO_CSV_URL, headers=_HEADERS, timeout=30)
-        r.raise_for_status()
-        return _parse_ico_ethiopia(r.text)
-    except Exception as e:
-        print(f"[ethiopia] ICO CSV fetch failed: {e}")
-        return []
 
 
 def _extract_ecx_price(html: str) -> dict | None:
@@ -130,7 +67,7 @@ def _extract_ecx_price(html: str) -> dict | None:
     price = Counter(candidates).most_common(1)[0][0]
     return {
         "etb_per_kg": price,
-        "as_of": _TODAY(),
+        "as_of": _today(),
         "source": "ECX",
         "grade": "All grades avg",
     }
@@ -154,7 +91,7 @@ async def run(page) -> list[dict]:
 
     if ecx_price:
         results.append({
-            "title":    f"Ethiopia ECX Coffee Price – {_TODAY()}",
+            "title":    f"Ethiopia ECX Coffee Price – {_today()}",
             "body":     f"ECX auction price: {ecx_price['etb_per_kg']:.2f} ETB/kg as of {ecx_price['as_of']}.",
             "source":   "ECX",
             "category": "supply",
@@ -167,7 +104,7 @@ async def run(page) -> list[dict]:
         print("[ethiopia] ECX price not found — skipping")
 
     # 2. ICO monthly exports (pure HTTP)
-    monthly = _fetch_ico_exports()
+    monthly = fetch_ico_exports({"ethiopia"}, "ethiopia")
     if monthly:
         last = monthly[-1]
         results.append({

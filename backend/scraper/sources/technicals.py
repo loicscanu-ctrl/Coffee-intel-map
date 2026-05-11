@@ -3,7 +3,8 @@ from datetime import date
 
 from bs4 import BeautifulSoup
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 def parse_cftc_cot(html: str) -> dict | None:
     soup = BeautifulSoup(html, "html.parser")
@@ -14,7 +15,7 @@ def parse_cftc_cot(html: str) -> dict | None:
         return None
     text = tag.get_text(strip=True)[:300]
     return {
-        "title": f"CFTC Commitments of Traders – {_TODAY()}",
+        "title": f"CFTC Commitments of Traders – {_today()}",
         "body": f"CoT Report: {text}",
         "source": "CFTC",
         "category": "general",
@@ -31,7 +32,7 @@ def parse_worldbank_fertilizer(html: str) -> dict | None:
     if not re.search(r"\d", text):
         return None
     return {
-        "title": f"World Bank Fertilizer Index – {_TODAY()}",
+        "title": f"World Bank Fertilizer Index – {_today()}",
         "body": f"Fertilizer commodity index: {text}",
         "source": "World Bank",
         "category": "supply",
@@ -46,7 +47,7 @@ def parse_searates(html: str) -> dict | None:
         return None
     text = tag.get_text(strip=True)[:300]
     return {
-        "title": f"Ocean Freight Rates (Searates) – {_TODAY()}",
+        "title": f"Ocean Freight Rates (Searates) – {_today()}",
         "body": f"Ocean freight market: {text}",
         "source": "Searates",
         "category": "general",

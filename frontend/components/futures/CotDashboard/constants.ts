@@ -16,6 +16,7 @@ export const NAV_STEPS = [
 // ── Macro COT (cross-commodity) palettes ──────────────────────────────────────
 
 export const SECTORS = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;
+export type SectorKey = typeof SECTORS[number];
 
 export const SECTOR_COLORS: Record<string, string> = {
   energy: "#f97316",

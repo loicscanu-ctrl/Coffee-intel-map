@@ -7,7 +7,7 @@ import {
 import {
   AMBER, BLUE, BRAZIL_DOMESTIC_KT, GREEN, TEAL, TT_STYLE, TYPE_FILTER_OPTS,
 } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -78,7 +78,7 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
         }
         return row;
       })
-      .filter(r => r.startYear >= since);
+      .filter(r => (r.startYear as number) >= since);
   }, [activeSeries, series, since, isFiltered, typeFilter, activeKey]);
 
   return (
@@ -105,11 +105,11 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
           <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: ValueType, name: NameType) => {
-              if (name === "domestic") return [`${v} kt`, "Domestic consumption (USDA est.)"];
-              if (name === "proj_gap") return [`+${v} kt`, "Projected remaining"];
-              return [`${v} kt`, name];
-            }} />
+            formatter={((v, name) => {
+              if (name === "domestic") return [`${v} kt`, "Domestic consumption (USDA est.)" as NameType];
+              if (name === "proj_gap") return [`+${v} kt`, "Projected remaining" as NameType];
+              return [`${v} kt`, name as NameType];
+            }) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => (
               <span style={{ color: v === "domestic" ? "#f97316" : "#cbd5e1" }}>{

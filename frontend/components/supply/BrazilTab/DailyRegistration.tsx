@@ -5,7 +5,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { DAILY_COLORS, TT_STYLE } from "./constants";
-import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { TooltipContentProps } from "recharts/types/component/Tooltip";
+
+type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
 import { fmtBags, shiftMonth, shortMonthLabel } from "./helpers";
 import type { DailyData } from "./types";
 
@@ -63,8 +66,8 @@ function DailyRegChart({
           <YAxis tickFormatter={fmtBags} tick={{ fill: "#94a3b8", fontSize: 9 }} width={46} />
           <Tooltip
             contentStyle={TT_STYLE}
-            formatter={(v: ValueType, name: NameType) => [v !== null ? fmtBags(Number(v)) : "—", name]}
-            labelFormatter={(l: string | number) => `Day ${l}`}
+            formatter={((v, name) => [v != null ? fmtBags(Number(v)) : "—", name as NameType]) satisfies Formatter<ValueType, NameType>}
+            labelFormatter={((l) => `Day ${l}`) satisfies LabelFmt}
           />
           <Legend wrapperStyle={{ fontSize: 9, paddingTop: 4 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
@@ -80,13 +83,14 @@ function DailyRegChart({
             <Line type="monotone" dataKey="prior"
               name={`Last month${priorFinal != null ? ` · ${fmtBags(priorFinal)}` : ""}`}
               stroke={DAILY_COLORS.prior} strokeWidth={1.5} strokeOpacity={0.7} connectNulls
-              dot={(props: { key?: string; cx?: number; cy?: number; payload?: Record<string, number | null> }) => {
-                if (props.payload?.day !== lastPriorDay || props.payload?.prior == null) return <g key={props.key} />;
+              dot={(props) => {
+                const p = props.payload as { day?: number; prior?: number | null } | undefined;
+                if (p?.day !== lastPriorDay || p.prior == null) return <g key={props.key as string} />;
                 return (
-                  <g key={props.key}>
+                  <g key={props.key as string}>
                     <circle cx={props.cx} cy={props.cy} r={3} fill={DAILY_COLORS.prior} />
                     <text x={(props.cx ?? 0) + 5} y={(props.cy ?? 0) - 4} fill="#fb923c" fontSize={9} fontFamily="monospace">
-                      {fmtBags(props.payload.prior)}
+                      {fmtBags(p.prior)}
                     </text>
                   </g>
                 );
@@ -94,13 +98,14 @@ function DailyRegChart({
           )}
           <Line type="monotone" dataKey="current" name={shortMonthLabel(currentMonth)}
             stroke={DAILY_COLORS.current} strokeWidth={2.5}
-            dot={(props: { key?: string; cx?: number; cy?: number; payload?: Record<string, number | null> }) => {
-              if (props.payload?.day !== lastCurrentDay || props.payload?.current == null) return <g key={props.key} />;
+            dot={(props) => {
+              const p = props.payload as { day?: number; current?: number | null } | undefined;
+              if (p?.day !== lastCurrentDay || p.current == null) return <g key={props.key as string} />;
               return (
-                <g key={props.key}>
+                <g key={props.key as string}>
                   <circle cx={props.cx} cy={props.cy} r={3} fill={DAILY_COLORS.current} />
                   <text x={(props.cx ?? 0) + 5} y={(props.cy ?? 0) - 4} fill="#f87171" fontSize={9} fontFamily="monospace">
-                    {fmtBags(props.payload.current)}
+                    {fmtBags(p.current)}
                   </text>
                 </g>
               );
