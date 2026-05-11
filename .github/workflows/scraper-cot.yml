@@ -1,4 +1,4 @@
-name: COT Scraper (Positions + Prices)
+name: "2.1 – COT Scraper"
 
 on:
   schedule:

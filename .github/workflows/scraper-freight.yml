@@ -1,4 +1,4 @@
-name: Freight Rate Scraper
+name: "1.2 – Freight Rate Scraper"
 
 on:
   schedule:

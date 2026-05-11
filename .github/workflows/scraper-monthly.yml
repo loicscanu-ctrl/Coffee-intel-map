@@ -1,4 +1,4 @@
-name: Monthly Scraper (CONAB + Comex Stat)
+name: "3.4 – Monthly Scraper CONAB"
 
 on:
   schedule:

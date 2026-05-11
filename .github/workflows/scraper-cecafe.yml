@@ -1,4 +1,4 @@
-name: Cecafe Export Scraper
+name: "3.2 – Cecafe Export Scraper"
 
 on:
   schedule:

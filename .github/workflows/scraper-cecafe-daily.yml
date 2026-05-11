@@ -1,4 +1,4 @@
-name: Cecafe Daily Registration Scraper
+name: "1.7 – Cecafe Daily Registration"
 
 on:
   schedule:

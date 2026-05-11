@@ -1,4 +1,4 @@
-name: Check Scrapers Freshness
+name: "1.5 – Check Scrapers Freshness"
 
 # Reads frontend/public/data/health.json and pings Telegram if any scraper's
 # last-run timestamp is older than its per-source threshold. Catches the case

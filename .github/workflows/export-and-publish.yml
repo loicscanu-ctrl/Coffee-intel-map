@@ -1,4 +1,4 @@
-name: Export and Publish Static JSON
+name: "1.4 – Export and Publish Static JSON"
 
 on:
   schedule:

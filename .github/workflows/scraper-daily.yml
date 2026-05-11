@@ -1,4 +1,4 @@
-name: Daily News Scraper
+name: "1.1 – Daily News Scraper"
 
 on:
   schedule:

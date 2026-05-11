@@ -1,4 +1,4 @@
-name: Scraper – Kaffeesteuer
+name: "3.1 – Kaffeesteuer Scraper"
 
 on:
   schedule:

@@ -1,4 +1,4 @@
-name: Scraper – Earnings
+name: "3.3 – Earnings Scraper"
 
 on:
   schedule:

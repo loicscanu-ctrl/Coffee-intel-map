@@ -1,4 +1,4 @@
-name: Tuesday Coffee Settlement Prices
+name: "2.2 – Tuesday Coffee Settlement Prices"
 
 on:
   schedule:

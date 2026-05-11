@@ -1,4 +1,4 @@
-name: Commodity Prices Scraper
+name: "2.3 – Commodity Prices Scraper"
 
 on:
   schedule:

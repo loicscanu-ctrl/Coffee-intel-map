@@ -1,4 +1,4 @@
-name: Check Live Quotes Freshness
+name: "1.8 – Check Live Quotes Freshness"
 
 # Reads `live_quotes` from Upstash Redis and pings Telegram if `fetched_at` is
 # older than STALE_HOURS. The acaphe_poller process runs outside GitHub Actions
