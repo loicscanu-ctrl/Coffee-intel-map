@@ -130,7 +130,7 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
 
 // ─── KC/RC ¢/lb middle panel ──────────────────────────────────────────────────
 
-const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"X", Z:"F" };
+const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"U", Z:"F" };
 
 function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Contract[] }) {
   // Key: letter+2-digit-year e.g. "K26", "F27"

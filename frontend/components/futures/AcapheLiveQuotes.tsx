@@ -106,7 +106,7 @@ function secsAgo(iso: string): number {
 
 // ── KC/RC ratio column (one row per arabica contract, mapped KC→RC with Z→F next year) ─
 
-const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"X", Z:"F" };
+const KC_TO_RC_LETTER: Record<string, string> = { H:"H", K:"K", N:"N", U:"U", Z:"F" };
 
 function RatioColumn({ arabica, robusta }: { arabica: AcapheContract[]; robusta: AcapheContract[] }) {
   // Key: letter+2-digit-year e.g. "K26", "F27"
