@@ -67,6 +67,7 @@ async def run(page) -> list[dict]:
         await page.wait_for_timeout(4000)
         html = await page.content()
         item = parse_uganda_price(html)
+        price_path = "/"
         if not item:
             for sub in ["/prices", "/component/allprices", "/index.php/prices", "/market-information"]:
                 try:
@@ -75,10 +76,12 @@ async def run(page) -> list[dict]:
                     html = await page.content()
                     item = parse_uganda_price(html)
                     if item:
+                        price_path = sub
                         break
                 except Exception:
                     continue
         if item:
+            print(f"[uganda] Screen 15 price found at {price_path}")
             results.append(item)
         else:
             print("[uganda] could not find Screen 15 price")
