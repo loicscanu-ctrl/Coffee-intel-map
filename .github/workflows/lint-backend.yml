@@ -1,4 +1,4 @@
-name: "0.2 – Backend Lint"
+name: "9.2 – Backend Lint"
 
 # Runs ruff on backend/ for every PR that touches Python files there.
 # The config (rule selection + ignores) lives in backend/pyproject.toml.

@@ -1,4 +1,4 @@
-name: "0.1 – CI Tests"
+name: "9.1 – CI Tests"
 
 on:
   push:
