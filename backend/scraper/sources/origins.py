@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 
 from scraper.translate import translate_to_english
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 COORDS = {
     "indonesia": (-0.789, 113.921),
@@ -28,7 +29,7 @@ def parse_alfabean(html: str) -> dict | None:
         return None
     lat, lng = COORDS["indonesia"]
     return {
-        "title": f"Indonesia Local Coffee Price (Alfabean) – {_TODAY()}",
+        "title": f"Indonesia Local Coffee Price (Alfabean) – {_today()}",
         "body": translate_to_english(f"Indonesia local coffee price: {text} IDR/kg", "id"),
         "source": "Alfabean",
         "category": "supply",
@@ -46,7 +47,7 @@ def parse_ihcafe(html: str) -> dict | None:
     text = tag if isinstance(tag, str) else tag.get_text(strip=True)
     lat, lng = COORDS["honduras"]
     return {
-        "title": f"Honduras Coffee Price (IHCafe) – {_TODAY()}",
+        "title": f"Honduras Coffee Price (IHCafe) – {_today()}",
         "body": translate_to_english(f"Honduras daily coffee price: {text}", "es"),
         "source": "IHCafe",
         "category": "supply",
@@ -64,7 +65,7 @@ def parse_uganda(html: str) -> dict | None:
     text = tag.get_text(strip=True)[:300]
     lat, lng = COORDS["uganda"]
     return {
-        "title": f"Uganda Coffee Export Data – {_TODAY()}",
+        "title": f"Uganda Coffee Export Data – {_today()}",
         "body": text,
         "source": "Uganda Coffee Board",
         "category": "supply",
@@ -82,7 +83,7 @@ def parse_colombia(html: str) -> dict | None:
     text = tag.get_text(strip=True)[:300]
     lat, lng = COORDS["colombia"]
     return {
-        "title": f"Colombia Coffee Stats (Federación de Cafeteros) – {_TODAY()}",
+        "title": f"Colombia Coffee Stats (Federación de Cafeteros) – {_today()}",
         "body": translate_to_english(text, "es"),
         "source": "Federación de Cafeteros",
         "category": "supply",

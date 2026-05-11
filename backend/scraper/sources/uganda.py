@@ -6,7 +6,8 @@ from bs4 import BeautifulSoup
 
 from scraper.sources._ico_common import fetch_ico_exports
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = 1.3733, 32.2903   # Uganda
 _URL = "https://ugandacoffee.go.ug/"
 
@@ -47,14 +48,14 @@ def parse_uganda_price(html: str) -> dict | None:
 
 def _make_price_item(price: float) -> dict:
     return {
-        "title":    f"Uganda Screen 15 – {_TODAY()}",
+        "title":    f"Uganda Screen 15 – {_today()}",
         "body":     f"Uganda Fine Robusta Screen 15 price: {price:.2f} USD/cwt",
         "source":   "UCDA",
         "category": "supply",
         "lat":      _LAT,
         "lng":      _LNG,
         "tags":     ["price", "robusta", "uganda"],
-        "meta":     json.dumps({"usd_cwt": price, "as_of": _TODAY(), "grade": "Screen 15"}),
+        "meta":     json.dumps({"usd_cwt": price, "as_of": _today(), "grade": "Screen 15"}),
     }
 
 

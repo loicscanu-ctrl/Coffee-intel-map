@@ -20,7 +20,8 @@ _HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)",
     "Accept-Language": "ja,en;q=0.9",
 }
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 _AJCA_URLS = [
     "https://www.ajca.or.jp/",
@@ -73,7 +74,7 @@ def _parse_ajca_data(html: str) -> dict | None:
             try:
                 val = int(m.group(1).replace(",", ""))
                 if _IMPORT_MIN_MT < val < _IMPORT_MAX_MT:
-                    monthly_imports.append({"month": _TODAY()[:7], "value_mt": val, "note": "best-effort"})
+                    monthly_imports.append({"month": _today()[:7], "value_mt": val, "note": "best-effort"})
                     break
             except ValueError:
                 pass

@@ -15,7 +15,8 @@ from datetime import date
 
 from scraper.sources._ico_common import fetch_ico_exports
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 
 # ── FNC precio interno ─────────────────────────────────────────────────────────
@@ -73,7 +74,7 @@ def _extract_precio_interno(html: str) -> dict | None:
     # Take the most common value (or largest if all unique)
     from collections import Counter
     most_common = Counter(candidates).most_common(1)[0][0]
-    return {"cop_per_carga": most_common, "as_of": _TODAY(), "source": "FNC"}
+    return {"cop_per_carga": most_common, "as_of": _today(), "source": "FNC"}
 
 
 async def run(page) -> list[dict]:
@@ -94,7 +95,7 @@ async def run(page) -> list[dict]:
 
     if precio:
         results.append({
-            "title":    f"Colombia FNC Precio Interno – {_TODAY()}",
+            "title":    f"Colombia FNC Precio Interno – {_today()}",
             "body":     f"FNC internal purchase price: {precio['cop_per_carga']:,} COP/carga (125 kg) as of {precio['as_of']}.",
             "source":   "FNC",
             "category": "supply",

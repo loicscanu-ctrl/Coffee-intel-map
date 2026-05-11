@@ -3,7 +3,8 @@ from datetime import date
 
 from bs4 import BeautifulSoup
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 def parse_ecf(html: str) -> dict | None:
     soup = BeautifulSoup(html, "html.parser")
@@ -12,7 +13,7 @@ def parse_ecf(html: str) -> dict | None:
         return None
     text = tag.get_text(strip=True)[:300]
     return {
-        "title": f"EU Port Coffee Stocks (ECF) – {_TODAY()}",
+        "title": f"EU Port Coffee Stocks (ECF) – {_today()}",
         "body": text,
         "source": "ECF",
         "category": "demand",
@@ -30,7 +31,7 @@ def parse_ajca(html: str) -> dict | None:
         return None
     text = rows[1].get_text(" | ", strip=True)[:300]
     return {
-        "title": f"Japan Coffee Stocks (AJCA) – {_TODAY()}",
+        "title": f"Japan Coffee Stocks (AJCA) – {_today()}",
         "body": text,
         "source": "AJCA",
         "category": "demand",
@@ -47,7 +48,7 @@ def parse_bls_cpi(html: str) -> dict | None:
         return None
     text = tag.get_text(strip=True)
     return {
-        "title": f"US CPI (BLS) – {_TODAY()}",
+        "title": f"US CPI (BLS) – {_today()}",
         "body": f"US Consumer Price Index: {text}",
         "source": "BLS",
         "category": "demand",

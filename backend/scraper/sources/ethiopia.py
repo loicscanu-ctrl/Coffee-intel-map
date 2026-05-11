@@ -19,7 +19,8 @@ from bs4 import BeautifulSoup
 
 from scraper.sources._ico_common import fetch_ico_exports
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = 9.145, 40.489   # Ethiopia centroid
 
 # ECX (Ethiopian Coffee Exchange) — best-effort price scrape
@@ -66,7 +67,7 @@ def _extract_ecx_price(html: str) -> dict | None:
     price = Counter(candidates).most_common(1)[0][0]
     return {
         "etb_per_kg": price,
-        "as_of": _TODAY(),
+        "as_of": _today(),
         "source": "ECX",
         "grade": "All grades avg",
     }
@@ -90,7 +91,7 @@ async def run(page) -> list[dict]:
 
     if ecx_price:
         results.append({
-            "title":    f"Ethiopia ECX Coffee Price – {_TODAY()}",
+            "title":    f"Ethiopia ECX Coffee Price – {_today()}",
             "body":     f"ECX auction price: {ecx_price['etb_per_kg']:.2f} ETB/kg as of {ecx_price['as_of']}.",
             "source":   "ECX",
             "category": "supply",

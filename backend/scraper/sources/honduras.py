@@ -15,7 +15,8 @@ from datetime import date
 
 from scraper.sources._ico_common import fetch_ico_exports
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 
 
 # ── IHCAFE precio de referencia ────────────────────────────────────────────────
@@ -56,7 +57,7 @@ def _extract_ihcafe_price(html: str) -> dict | None:
 
         from collections import Counter
         most_common = Counter(candidates).most_common(1)[0][0]
-        return {"hnl_per_quintal": most_common, "as_of": _TODAY(), "source": "IHCAFE"}
+        return {"hnl_per_quintal": most_common, "as_of": _today(), "source": "IHCAFE"}
     except Exception as e:
         print(f"[honduras] IHCAFE price extract failed: {e}")
         return None
@@ -80,7 +81,7 @@ async def run(page) -> list[dict]:
 
     if ihcafe_price:
         results.append({
-            "title":    f"Honduras IHCAFE Precio de Referencia – {_TODAY()}",
+            "title":    f"Honduras IHCAFE Precio de Referencia – {_today()}",
             "body":     (
                 f"IHCAFE reference price: {ihcafe_price['hnl_per_quintal']:,} HNL/quintal (46 kg) "
                 f"as of {ihcafe_price['as_of']}."

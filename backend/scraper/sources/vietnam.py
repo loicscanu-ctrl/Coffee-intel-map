@@ -3,7 +3,8 @@ from datetime import date
 
 from bs4 import BeautifulSoup
 
-_TODAY = lambda: date.today().isoformat()
+def _today() -> str:
+    return date.today().isoformat()
 _LAT, _LNG = 14.058, 108.277
 _URL = "https://giacaphe.com/gia-ca-phe-noi-dia/"
 
@@ -62,7 +63,7 @@ def parse_giacaphe_price(html: str) -> dict | None:
 def _make_item(price_vnd: int) -> dict:
     formatted = f"{price_vnd:,}".replace(",", ".")   # 115200 → "115.200"
     return {
-        "title": f"Vietnam Robusta – {_TODAY()}",
+        "title": f"Vietnam Robusta – {_today()}",
         "body": f"Vietnam Robusta price: {formatted} VND/kg",
         "source": "Giacaphe",
         "category": "supply",
