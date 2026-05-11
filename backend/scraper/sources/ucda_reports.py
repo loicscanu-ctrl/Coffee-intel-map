@@ -42,7 +42,8 @@ def download_pdf(doc_id: int) -> bytes | None:
         if r.status_code == 200 and "pdf" in ct.lower():
             return r.content
         return None
-    except Exception:
+    except Exception as e:
+        print(f"[ucda_reports] doc {doc_id} fetch failed: {type(e).__name__}: {e}")
         return None
 
 
