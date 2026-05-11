@@ -11,6 +11,7 @@ Usage (debug):
 import json
 import os
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -89,8 +90,18 @@ def run(db) -> dict:
             "gemini-2.5-flash",
             generation_config={"response_mime_type": "application/json"},
         )
-        response = model.generate_content(prompt)
-        classifications = json.loads(response.text)
+        last_err: Exception | None = None
+        for attempt in range(3):
+            try:
+                response = model.generate_content(prompt)
+                classifications = json.loads(response.text)
+                break
+            except Exception as e:
+                last_err = e
+                if attempt < 2:
+                    time.sleep(2 ** attempt)  # 1s, 2s
+        else:
+            raise last_err if last_err else RuntimeError("Gemini call failed")
     except Exception as e:
         return {"available": False, "reason": f"Gemini API error: {e}"}
 
