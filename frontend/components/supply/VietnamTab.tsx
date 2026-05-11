@@ -39,15 +39,15 @@ export default function VietnamTab() {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
       .then(setVnSupply)
-      .catch(() => {});
+      .catch((err) => console.error("[VietnamTab] vietnam_supply fetch failed:", err));
     fetch("/data/vn_export_destination_port.json")
       .then(r => r.json())
       .then(setExplorerData)
-      .catch(() => {});
+      .catch((err) => console.error("[VietnamTab] vn_export_destination_port fetch failed:", err));
     fetch("/data/vn_country_shares.json")
       .then(r => r.json())
       .then(setSharesData)
-      .catch(() => {});
+      .catch((err) => console.error("[VietnamTab] vn_country_shares fetch failed:", err));
   }, []);
 
   return (

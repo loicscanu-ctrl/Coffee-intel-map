@@ -1,0 +1,81 @@
+export interface CotTradersGroup {
+  pmpu: number;
+  mm: number;
+  swap: number;
+  other: number;
+  nonrep: number;
+}
+
+export interface CotMarketPositions {
+  pmpuLong: number;   pmpuShort: number;   pmpuSpread: number;
+  swapLong: number;   swapShort: number;   swapSpread: number;
+  mmLong: number;     mmShort: number;     mmSpread: number;
+  otherLong: number;  otherShort: number;  otherSpread: number;
+  nonRepLong: number; nonRepShort: number; nonRepSpread: number;
+}
+
+export interface ProcessedCotRow {
+  id: number;
+  date: string;
+  priceNY: number;
+  priceLDN: number;
+  avgPrice_USD_Ton: number;
+  oiNY: number;
+  oiLDN: number;
+  totalOI: number;
+  spreadingTotal: number;
+  outrightTotal: number;
+  weeklyNominalFlow: number;
+  weeklyMarginFlow: number;
+  cumulativeNominal: number;
+  cumulativeMargin: number;
+  ny: CotMarketPositions;
+  ldn: CotMarketPositions;
+  /** Forward-filled raw API sub-objects — only present in real data, not in mock. */
+  rawNy?: Record<string, number | null>;
+  rawLdn?: Record<string, number | null>;
+  tradersNY: CotTradersGroup;
+  tradersNY_short: CotTradersGroup;
+  tradersLDN: CotTradersGroup;
+  tradersLDN_short: CotTradersGroup;
+  pmpuShortMT_NY: number;
+  pmpuShortMT_LDN: number;
+  pmpuShortMT: number;
+  pmpuLongMT_NY: number;
+  pmpuLongMT_LDN: number;
+  pmpuLongMT: number;
+  efpMT: number;
+  timeframe: "current" | "recent_1" | "recent_4" | "year" | "historical";
+  priceRank: number;
+  oiRank: number;
+  priceRankLDN: number;
+  oiRankLDN: number;
+}
+
+/** Shape of one weekly row as returned by the COT API / static JSON. */
+export interface CotRawMarket {
+  oi_total?: number | null;
+  pmpu_long?: number | null; pmpu_short?: number | null;
+  swap_long?: number | null; swap_short?: number | null; swap_spread?: number | null;
+  mm_long?: number | null;   mm_short?: number | null;   mm_spread?: number | null;
+  other_long?: number | null; other_short?: number | null; other_spread?: number | null;
+  nr_long?: number | null;   nr_short?: number | null;
+  t_pmpu_long?: number | null; t_pmpu_short?: number | null;
+  t_swap_long?: number | null; t_swap_short?: number | null; t_swap_spread?: number | null;
+  t_mm_long?: number | null;   t_mm_short?: number | null;   t_mm_spread?: number | null;
+  t_other_long?: number | null; t_other_short?: number | null; t_other_spread?: number | null;
+  t_nr_long?: number | null;    t_nr_short?: number | null;
+  price_ny?: number | null; price_ldn?: number | null;
+  structure_ny?: number | null; structure_ldn?: number | null;
+  exch_oi_ny?: number | null;   exch_oi_ldn?: number | null;
+  vol_ny?: number | null; vol_ldn?: number | null;
+  efp_ny?: number | null; efp_ldn?: number | null;
+  spread_vol_ny?: number | null; spread_vol_ldn?: number | null;
+  [key: string]: number | null | undefined;
+}
+
+export interface CotRawRow {
+  date: string;
+  ny?: CotRawMarket | null;
+  ldn?: CotRawMarket | null;
+}

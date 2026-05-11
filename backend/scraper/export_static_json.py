@@ -1444,6 +1444,54 @@ def export_health(db) -> None:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def export_colombia(db) -> None:
+    try:
+        from scraper.export_colombia import export_colombia as _export_colombia
+        _export_colombia(db)
+    except Exception as e:
+        print(f"  colombia_supply.json → FAILED: {e}")
+
+
+def export_honduras(db) -> None:
+    try:
+        from scraper.export_honduras import export_honduras as _export_honduras
+        _export_honduras(db)
+    except Exception as e:
+        print(f"  honduras_supply.json → FAILED: {e}")
+
+
+def export_indonesia(db) -> None:
+    try:
+        from scraper.export_indonesia import export_indonesia as _export_indonesia
+        _export_indonesia(db)
+    except Exception as e:
+        print(f"  indonesia_supply.json → FAILED: {e}")
+
+
+def export_uganda(db) -> None:
+    try:
+        from scraper.export_uganda import export_uganda as _export_uganda
+        _export_uganda(db)
+    except Exception as e:
+        print(f"  uganda_supply.json → FAILED: {e}")
+
+
+def export_ethiopia(db) -> None:
+    try:
+        from scraper.export_ethiopia import export_ethiopia as _export_ethiopia
+        _export_ethiopia(db)
+    except Exception as e:
+        print(f"  ethiopia_supply.json → FAILED: {e}")
+
+
+def export_demand_stocks(db) -> None:
+    try:
+        from scraper.export_stocks import export_stocks as _export_stocks
+        _export_stocks(db)
+    except Exception as e:
+        print(f"  demand_stocks.json → FAILED: {e}")
+
+
 def main():
     print("Exporting static JSON files...")
     db = SessionLocal()
@@ -1458,6 +1506,12 @@ def main():
         export_farmer_selling()
         export_vietnam_last()
         export_vietnam_supply()
+        export_colombia(db)
+        export_honduras(db)
+        export_indonesia(db)
+        export_uganda(db)
+        export_ethiopia(db)
+        export_demand_stocks(db)
         export_latest_prices(db)
         export_vn_physical_prices(db)
         export_health(db)

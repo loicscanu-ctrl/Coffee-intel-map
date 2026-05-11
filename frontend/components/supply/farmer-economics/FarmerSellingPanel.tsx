@@ -188,7 +188,7 @@ export default function FarmerSellingPanel() {
     fetch("/data/farmer_selling_brazil.json")
       .then(r => r.json())
       .then(setData)
-      .catch(() => {});
+      .catch((err) => console.error("[FarmerSellingPanel] fetch failed:", err));
   }, []);
 
   if (!data) return null;

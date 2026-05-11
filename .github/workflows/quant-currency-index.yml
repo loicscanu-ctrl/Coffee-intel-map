@@ -20,13 +20,23 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy
+        run: pip install yfinance pandas numpy sqlalchemy psycopg2-binary anthropic
 
       - name: Run Currency Index scraper (3 attempts)
         run: |
           for attempt in 1 2 3; do
             python -m backend.scraper.quant_model.fetch_currency_index && break
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Run Sentiment + Robusta Factor model (3 attempts)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m backend.scraper.quant_model.run_quant && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 2m..." && sleep 120 || exit 1
           done
 
       - name: Validate output

@@ -17,27 +17,27 @@ const CACHE_MAX_ENTRIES = 50;
 // Map preserves insertion order — re-inserting a key on hit makes it the most
 // recent, so eviction below targets the oldest entry. Bounded so the cache
 // can't grow indefinitely on a long-lived tab.
-const _cache = new Map<string, { data: any; ts: number }>();
+const _cache = new Map<string, { data: unknown; ts: number }>();
 
-async function apiGet(path: string, init?: RequestInit): Promise<any> {
+async function apiGet<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const url = `${API_URL}${path}`;
   const res = await fetch(url, init);
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Fetch failed: ${res.status} ${url} ${body.slice(0, 200)}`);
   }
-  return res.json();
+  return res.json() as T;
 }
 
-async function cachedFetch(path: string): Promise<any> {
+async function cachedFetch<T = unknown>(path: string): Promise<T> {
   const url = `${API_URL}${path}`;
   const hit = _cache.get(url);
   if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
     _cache.delete(url);
     _cache.set(url, hit);
-    return hit.data;
+    return hit.data as T;
   }
-  const data = await apiGet(path);
+  const data = await apiGet<T>(path);
   _cache.set(url, { data, ts: Date.now() });
   if (_cache.size > CACHE_MAX_ENTRIES) {
     const oldest = _cache.keys().next().value;

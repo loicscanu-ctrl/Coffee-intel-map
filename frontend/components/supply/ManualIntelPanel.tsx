@@ -20,7 +20,7 @@ export default function ManualIntelPanel() {
     fetch(`/data/manual_intel.json?_=${Date.now()}`)
       .then((r) => r.json())
       .then(setData)
-      .catch(() => {});
+      .catch((err) => console.error("[ManualIntelPanel] fetch failed:", err));
   }, []);
 
   if (!data || data.entries.length === 0) return null;

@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine, Tooltip,
   Cell, ResponsiveContainer,
 } from "recharts";
-import type { FarmerEconomicsData, EnsoPhase, ImpactType, OniForecastPoint } from "./farmerEconomicsData";
+import type { FarmerEconomicsData, EnsoPhase, ImpactType } from "./farmerEconomicsData";
 
 interface Props {
   enso: NonNullable<FarmerEconomicsData["enso"]>;
@@ -129,7 +129,7 @@ export default function EnsoPanel({ enso }: Props) {
               <YAxis domain={[0, 100]} tick={{ fill: "#475569", fontSize: 8 }} width={24} unit="%" />
               <Tooltip
                 contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: string) => [`${v}%`, name]}
+                formatter={(v: unknown, name: unknown) => [`${v}%`, String(name ?? "")]}
               />
               <Bar dataKey="la_nina" name="La Niña"  stackId="p" fill="#60a5fa" fillOpacity={0.85} radius={[0,0,0,0]} />
               <Bar dataKey="neutral" name="Neutral"   stackId="p" fill="#475569" fillOpacity={0.7}  radius={[0,0,0,0]} />

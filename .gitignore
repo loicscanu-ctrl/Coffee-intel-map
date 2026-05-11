@@ -17,3 +17,4 @@ backend/scraper/probe_acaphe.py
 backend/scraper/test_acaphe_api.py
 backend/scraper/add_intel.py
 backend/patch_cot_apr7.py
+backend/patch_cot_swap_mar24_apr14.py

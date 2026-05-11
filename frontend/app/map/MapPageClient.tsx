@@ -16,12 +16,12 @@ const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
 });
 
 export default function MapPageClient() {
-  const [news, setNews] = useState<any[]>([]);
-  const [countries, setCountries] = useState<any[]>([]);
-  const [factories, setFactories] = useState<any[]>([]);
+  const [news, setNews] = useState<unknown[]>([]);
+  const [countries, setCountries] = useState<unknown[]>([]);
+  const [factories, setFactories] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPin, setSelectedPin] = useState<any>(null);
+  const [selectedPin, setSelectedPin] = useState<unknown>(null);
   const [showFeed, setShowFeed] = useState(false);
 
   useEffect(() => {

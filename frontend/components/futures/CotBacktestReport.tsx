@@ -136,12 +136,17 @@ function pctVsBaseline(cat: CatKey, ap: ApKey): string {
 
 // ── Tooltips ──────────────────────────────────────────────────────────────────
 
-function ChartTooltip({ active, payload, label, unit="" }: any) {
+function ChartTooltip({ active, payload, label, unit="" }: {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number | string; color?: string; fill?: string }>;
+  label?: string;
+  unit?: string;
+}) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-slate-800 border border-slate-600 rounded p-2 text-xs shadow">
       <div className="font-semibold text-slate-300 mb-1">{label}</div>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div key={p.name} style={{ color: p.color ?? p.fill }}>
           {p.name}: <span className="font-mono">{typeof p.value === "number" ? p.value.toLocaleString() : p.value}{unit && ` ${unit}`}</span>
         </div>
@@ -176,15 +181,6 @@ function Finding({ n, color, children }: { n: number; color: string; children: R
     </div>
   );
 }
-function ApBadge({ ap }: { ap: typeof APS[number] }) {
-  const isLit = ap.group === "literature";
-  return (
-    <span className={`inline-block text-[9px] font-bold px-1 py-0.5 rounded mr-1 ${isLit ? "bg-orange-900/40 text-orange-400" : "bg-slate-700 text-slate-400"}`}>
-      {isLit ? "LIT" : "V1"}
-    </span>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CotBacktestReport() {
 
@@ -193,19 +189,6 @@ export default function CotBacktestReport() {
     name: ap.label, mae: DATA.mm[ap.key].mae, fill: ap.color,
     isBest: ap.key === bestAp("mm"),
   }));
-
-  // Chart: % improvement vs baseline — best approach per cat
-  const improvData = CATS.map(cat => {
-    const best = bestAp(cat.key);
-    const bestMae = DATA[cat.key][best].mae;
-    const baseMae = DATA[cat.key].baseline.mae;
-    return {
-      cat: cat.label,
-      pct: -((baseMae - bestMae) / baseMae * 100),  // negative = improvement
-      fill: bestMae < baseMae ? "#22c55e" : "#64748b",
-      best,
-    };
-  });
 
   // Chart: directional accuracy for MM — all 7 approaches
   const mmDirData = APS.map(ap => ({
@@ -239,7 +222,7 @@ export default function CotBacktestReport() {
         </p>
         <p className="text-sm text-slate-300 leading-relaxed mb-3">
           The question: using <strong className="text-white">only data available daily</strong> — total open
-          interest (OI) by contract and close price — can we estimate each category's net position
+          interest (OI) by contract and close price — can we estimate each category&apos;s net position
           (Long − Short) between official releases with statistically meaningful accuracy?
         </p>
         <div className="bg-slate-800/40 rounded p-3 border border-slate-700 text-xs text-slate-400">
@@ -262,7 +245,7 @@ export default function CotBacktestReport() {
               <div>
                 <div className="text-sm font-semibold text-white mb-1">Machine learning on price + OI + COT + volume-at-price</div>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Peak Trading Research's <em>COT Today</em> model uses 10 years of price, open interest, and weekly COT data
+                  Peak Trading Research&apos;s <em>COT Today</em> model uses 10 years of price, open interest, and weekly COT data
                   fed into a machine learning model that re-calibrates continuously. The key differentiator is
                   <strong className="text-slate-200"> volume-at-price tracking</strong>: the model predicts expected
                   contracts to be traded at each price level, then adjusts based on actual exchange-reported volume —
@@ -277,13 +260,13 @@ export default function CotBacktestReport() {
             <div className="flex items-start gap-3">
               <div className="text-[10px] font-bold bg-orange-900/40 text-orange-400 px-2 py-1 rounded mt-0.5 whitespace-nowrap">ACADEMIC</div>
               <div>
-                <div className="text-sm font-semibold text-white mb-1">"Tracking Speculative Trading" — ridge regression on past returns</div>
+                <div className="text-sm font-semibold text-white mb-1">&quot;Tracking Speculative Trading&quot; — ridge regression on past returns</div>
                 <p className="text-xs text-slate-400 leading-relaxed mb-2">
                   Bianchi et al. (2023, <em>Journal of Financial Markets</em>) model the aggregate MM position as a
                   <strong className="text-slate-200"> weighted sum of past daily returns</strong>, estimated via generalized ridge regression.
                   Their core finding: trend signals (momentum) largely explain position <em>changes</em> of speculators across 23 commodities.
                   The basis (carry) and other signals do not improve the forecast. They report average R² {">"} 40% on weekly position
-                  <em> changes</em> — not levels. We implement this approach as "Momentum ridge" below.
+                  <em> changes</em> — not levels. We implement this approach as &quot;Momentum ridge&quot; below.
                   <span className="text-slate-500 italic"> (Source: ScienceDirect, doi:10.1016/j.finmar.2022.100728)</span>
                 </p>
                 <code className="text-[10px] bg-slate-900 rounded px-2 py-1 text-green-400 block">
@@ -299,7 +282,7 @@ export default function CotBacktestReport() {
               <div>
                 <div className="text-sm font-semibold text-white mb-1">Volatility-scaled momentum — AQR / Baltas-Kosowski style</div>
                 <p className="text-xs text-slate-400 leading-relaxed mb-2">
-                  A large body of CTA replication research (AQR "Demystifying Managed Futures", Baltas &amp; Kosowski 2013 SSRN) shows
+                  A large body of CTA replication research (AQR &quot;Demystifying Managed Futures&quot;, Baltas &amp; Kosowski 2013 SSRN) shows
                   that systematic trend followers size positions as <strong className="text-slate-200">momentum signal ÷ realized volatility</strong>.
                   A simple replication model on 16 futures explains {">"} 75% of CTA benchmark variation.
                   The intuition: CTAs add to positions as trends develop, and mechanically reduce size when volatility rises.
@@ -585,7 +568,7 @@ export default function CotBacktestReport() {
             The Hybrid reaches 61.4% — the highest of any model — by combining the OI scaling structure
             with the momentum directional signal. Importantly, the Momentum Ridge (from the academic paper)
             also reaches 59.2%, confirming that past returns carry real directional information even when
-            they don't help with magnitude.
+            they don&apos;t help with magnitude.
           </p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={mmDirData} margin={{ top:10, right:20, bottom:50, left:20 }}>
@@ -611,10 +594,10 @@ export default function CotBacktestReport() {
           </div>
           <p className="text-xs text-slate-400 mb-3">
             Splitting each week into one of four regimes reveals where each model fails.
-            The β=0.65 model collapses in "Price+·OI−" (8,875 lots) and "Price−·OI−" (7,855 lots) —
+            The β=0.65 model collapses in &quot;Price+·OI−&quot; (8,875 lots) and &quot;Price−·OI−&quot; (7,855 lots) —
             regimes where price and OI move in opposite directions, creating contradictory signals.
             These two regimes cover 43% of all weeks. Prop OI and Hybrid are much more stable across regimes.
-            "Price−·OI+" is the only regime where the β=0.65 model beats baseline (3,226 vs 4,382) —
+            &quot;Price−·OI+&quot; is the only regime where the β=0.65 model beats baseline (3,226 vs 4,382) —
             but only because the correct direction happens to align with the price signal.
           </p>
           <ResponsiveContainer width="100%" height={250}>
@@ -647,7 +630,7 @@ export default function CotBacktestReport() {
         <Finding n={2} color="bg-green-500/20 text-green-400">
           <strong className="text-white">The academic momentum model confirms direction but not magnitude.</strong>{" "}
           Momentum Ridge reaches 59.2% directional accuracy for MM (up from 51.5% baseline) — consistent with
-          Bianchi et al.'s finding that trend signals explain position changes. But this directional accuracy
+          Bianchi et al.&apos;s finding that trend signals explain position changes. But this directional accuracy
           does not translate into MAE improvement because the magnitude of position changes is dominated by noise.
           A correct direction with wrong magnitude is penalised as much as a wrong direction in the MAE metric.
         </Finding>
@@ -685,9 +668,9 @@ export default function CotBacktestReport() {
         </Finding>
 
         <Finding n={7} color="bg-slate-500/20 text-slate-300">
-          <strong className="text-white">The remaining frontier is volume-at-price data (Peak Trading's edge).</strong>{" "}
+          <strong className="text-white">The remaining frontier is volume-at-price data (Peak Trading&apos;s edge).</strong>{" "}
           Our exhaustive search across 7 approaches shows that with price + OI only, the improvement ceiling is ~4%.
-          Peak Trading's additional input — exchange-reported volume at each price level (intraday trade log) —
+          Peak Trading&apos;s additional input — exchange-reported volume at each price level (intraday trade log) —
           directly observes whether OI changes came from new longs, new shorts, or liquidations. This bypasses
           the fundamental limitation of our models. Without this data, the Hybrid approach (Prop OI + momentum)
           represents the practical optimum.

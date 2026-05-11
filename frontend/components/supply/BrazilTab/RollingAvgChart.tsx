@@ -4,7 +4,8 @@ import {
   BarChart, Bar, ReferenceLine, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
 } from "recharts";
-import { BLUE, TT_STYLE, TYPE_FILTER_OPTS, WINDOWS, WINDOW_COLORS } from "./constants";
+import { TT_STYLE, TYPE_FILTER_OPTS, WINDOWS, WINDOW_COLORS } from "./constants";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, monthLabel } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -19,27 +20,26 @@ export default function RollingAvgChart({ series, filteredSeries, typeFilter }: 
   const delta = (curr: number, prev: number) =>
     prev > 0 ? Math.round(bagsToKT(curr - prev) * 10) / 10 : null;
 
-  const TYPES_WITH_TOTAL = showSingle
-    ? [{ key: (typeFilter ?? "total") as SeriesKey, label: typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Total") : "Total" }]
-    : [
-        { key: "arabica"  as const, label: "Arabica"  },
-        { key: "conillon" as const, label: "Conillon" },
-        { key: "soluvel"  as const, label: "Soluble"  },
-        { key: "torrado"  as const, label: "Roasted"  },
-        { key: "total"    as const, label: "Total"    },
-      ];
-
-  const chartData = useMemo(() =>
-    TYPES_WITH_TOTAL.map(t => {
-      const row: Record<string, any> = { type: t.label };
+  const chartData = useMemo(() => {
+    const typesWithTotal = showSingle
+      ? [{ key: (typeFilter ?? "total") as SeriesKey, label: typeFilter ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Total") : "Total" }]
+      : [
+          { key: "arabica"  as const, label: "Arabica"  },
+          { key: "conillon" as const, label: "Conillon" },
+          { key: "soluvel"  as const, label: "Soluble"  },
+          { key: "torrado"  as const, label: "Roasted"  },
+          { key: "total"    as const, label: "Total"    },
+        ];
+    return typesWithTotal.map(t => {
+      const row: Record<string, number | string | null> = { type: t.label };
       WINDOWS.forEach(w => {
         const curr = activeSeries.slice(-w.n);
         const prev = activeSeries.slice(-(w.n + 12), -12);
         row[w.label] = delta(avg(curr, t.key), avg(prev, t.key));
       });
       return row;
-    })
-  , [activeSeries, showSingle, typeFilter]);
+    });
+  }, [activeSeries, showSingle, typeFilter]);
 
   const latest = activeSeries[activeSeries.length - 1]?.date ?? "";
   const subtitle = latest ? `Latest: ${monthLabel(latest)} ${latest.split("-")[0]} · L1M→MAT = short-term to moving annual total` : "";
@@ -59,7 +59,7 @@ export default function RollingAvgChart({ series, filteredSeries, typeFilter }: 
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={46} />
           <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: any, name: any) => [v !== null ? `${v > 0 ? "+" : ""}${v} kt` : "—", name]} />
+            formatter={(v: ValueType, name: NameType) => [v !== null ? `${Number(v) > 0 ? "+" : ""}${v} kt` : "—", name]} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
           {WINDOWS.map(w => (

@@ -4,6 +4,7 @@ import OIHistoryTable from "@/components/futures/OIHistoryTable";
 import OIFndChart from "@/components/futures/OIFndChart";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
+import { DataHealthBar } from "@/components/DataHealthBar";
 
 interface Contract {
   contract: string;
@@ -16,24 +17,13 @@ interface Contract {
 }
 
 function fmt(n: number) { return n?.toLocaleString() ?? "—"; }
-function fmtChg(n: number) {
-  if (n == null) return "—";
-  return (n >= 0 ? "+" : "") + n.toFixed(2);
-}
 
 // ─── First Notice Day ─────────────────────────────────────────────────────────
 
 const LETTER_TO_MONTH: Record<string, number> = {
   F:1, G:2, H:3, J:4, K:5, M:6, N:7, Q:8, U:9, V:10, X:11, Z:12,
 };
-const MONTH_ABB = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-function prevBizDay(dateStr: string): string {
-  const [y, m, d] = dateStr.slice(0, 10).split("-").map(Number);
-  const dt = new Date(y, m - 1, d - 1);
-  while (dt.getDay() === 0 || dt.getDay() === 6) dt.setDate(dt.getDate() - 1);
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
-}
+const MONTH_ABB = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"] as const;
 
 function firstBusinessDay(year: number, month: number): Date {
   // month is 1-indexed; returns first business day of that month
@@ -250,7 +240,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
 
   const toggleOption = (key: string) =>
-    setSelectedOptions(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
+    setSelectedOptions(prev => { const s = new Set(prev); if (s.has(key)) { s.delete(key); } else { s.add(key); } return s; });
 
   const optionsAddon = [...PACKING_OPTIONS, ...CERT_OPTIONS]
     .filter(o => selectedOptions.has(o.key))
@@ -548,8 +538,8 @@ export default function FuturesPage() {
   useEffect(() => {
     fetch("/data/vn_physical_prices.json")
       .then(r => r.json())
-      .then((d: any) => { if (d?.vn_faq?.usd_per_mt) setVnFaqUsdMt(d.vn_faq.usd_per_mt); })
-      .catch(() => {});
+      .then((d: { vn_faq?: { usd_per_mt?: number } }) => { if (d?.vn_faq?.usd_per_mt) setVnFaqUsdMt(d.vn_faq.usd_per_mt); })
+      .catch((err) => console.error("[FuturesPage] vn_physical_prices fetch failed:", err));
   }, []);
 
   const arabicaChain = chainJson?.arabica ?? null;
@@ -586,6 +576,8 @@ export default function FuturesPage() {
           Research
         </button>
       </div>
+
+      <DataHealthBar keys={["futures", "cot", "macro_cot"]} />
 
       {/* Exchange tab */}
       {tab === "exchange" && (

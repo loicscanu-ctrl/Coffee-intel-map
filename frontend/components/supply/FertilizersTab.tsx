@@ -31,7 +31,6 @@ interface OriginEntry { countries: OriginCountry[]; states: { name: string; kg_k
 type ImportOrigins = Record<string, Record<string, OriginEntry>>;
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const YEAR_COLORS = ["#475569", "#64748b", "#3b82f6", "#22c55e", "#f59e0b"];
 
 const FERT_TYPES = ["urea_kt","kcl_kt","map_kt","dap_kt","an_kt","as_kt","superp_kt"] as const;
 type FertType = typeof FERT_TYPES[number];
@@ -448,7 +447,7 @@ function KeyExporterChart({ data }: { data: GlobalFertData }) {
           <div className="text-[8px] text-slate-600 mt-0.5">2024 annual · UN Comtrade · kt</div>
         </div>
         <div className="flex gap-1">
-          {Object.entries(HS_META).map(([code, { label }]) => (
+          {Object.entries(HS_META).map(([code]) => (
             <button key={code} onClick={() => setSelected(code)}
               className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${
                 selected === code ? "text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"
@@ -507,15 +506,15 @@ export default function FertilizersTab() {
         setPricesAsOf(d.fertilizer?.prices_as_of ?? "");
         setOrigins(d.fertilizer?.import_origins ?? null);
       })
-      .catch(() => {});
+      .catch((err) => console.error("[FertilizersTab] farmer_economics fetch failed:", err));
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
       .then(d => setVnFert(d.fertilizer_context ?? null))
-      .catch(() => {});
+      .catch((err) => console.error("[FertilizersTab] vietnam_supply fetch failed:", err));
     fetch("/data/global_fertilizers.json")
       .then(r => r.json())
       .then(setGlobalFert)
-      .catch(() => {});
+      .catch((err) => console.error("[FertilizersTab] global_fertilizers fetch failed:", err));
   }, []);
 
   return (

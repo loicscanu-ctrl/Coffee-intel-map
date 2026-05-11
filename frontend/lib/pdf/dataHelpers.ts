@@ -1,6 +1,7 @@
 // frontend/lib/pdf/dataHelpers.ts
 import type { MarketMetrics, GlobalFlowMetrics } from "./types";
-import type { MacroCotWeek } from "@/lib/api";
+import type { MacroCotWeek, MacroCotEntry } from "@/lib/api";
+import type { ProcessedCotRow } from "@/lib/cot/types";
 
 // ── Primitive helpers ────────────────────────────────────────────────────────
 
@@ -160,7 +161,7 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
   );
 
   // Sector filter helper (reuses existing sectorGross)
-  const sectorFilter = (c: any, displaySector: string) => {
+  const sectorFilter = (c: MacroCotEntry, displaySector: string) => {
     if (displaySector === "energy") return c.sector === "hard" &&  ENERGY_SYMS.has(c.symbol);
     if (displaySector === "metals") return c.sector === "hard" && !ENERGY_SYMS.has(c.symbol);
     return c.sector === displaySector;
@@ -330,8 +331,8 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
  * @param market    — "ny" | "ldn"
  */
 export function buildMarketMetrics(
-  recent52: any[],
-  rawData:  any[],
+  recent52: ProcessedCotRow[],
+  rawData:  ProcessedCotRow[],
   market:   "ny" | "ldn"
 ): MarketMetrics | null {
   if (recent52.length < 2 || rawData.length < 2) return null;
@@ -388,7 +389,9 @@ export function buildMarketMetrics(
   // Counterparty deltas (lots WoW)
   const cpDelta = (field: string, side: "long" | "short") => {
     const k = field + (side === "long" ? "Long" : "Short");
-    return (cur[mk][k] ?? 0) - (prev[mk][k] ?? 0);
+    const curPos  = cur[mk]  as unknown as Record<string, number>;
+    const prevPos = prev[mk] as unknown as Record<string, number>;
+    return (curPos[k] ?? 0) - (prevPos[k] ?? 0);
   };
 
   // Trader counts

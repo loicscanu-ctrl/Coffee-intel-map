@@ -6,7 +6,6 @@ import {
   computeFundsMaxedPct,
   computeObosFlag,
   computePositionMismatch,
-  computeCounterpartyDeltas,
   computeOiSplit,
 } from "../dataHelpers";
 

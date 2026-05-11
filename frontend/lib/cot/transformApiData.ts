@@ -5,14 +5,15 @@ export const MARGIN_OUTRIGHT     = 6000;
 export const MARGIN_SPREAD       = 1200;
 export const CENTS_LB_TO_USD_TON = 22.0462;
 
+import type { CotRawRow, CotRawMarket, ProcessedCotRow, CotMarketPositions, CotTradersGroup } from "./types";
+
 // ── Real data transform ─────────────────────────────────────────────────────
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export function transformApiData(rows: any[]): any[] {
+export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
   if (!rows.length) return [];
 
   // Forward-fill missing market data (e.g. US holiday shifts NY release by 1 day)
-  let lastNY:  any = null;
-  let lastLDN: any = null;
+  let lastNY:  CotRawMarket | null = null;
+  let lastLDN: CotRawMarket | null = null;
   const filledRows = rows.map(row => {
     const ny  = row.ny  ?? lastNY  ?? null;
     const ldn = row.ldn ?? lastLDN ?? null;
@@ -27,11 +28,11 @@ export function transformApiData(rows: any[]): any[] {
   let cumulativeMargin  = 0;
 
   // Pass 1: ordered for-loop — delta fields require access to previous row
-  const base: any[] = [];
+  const base: ProcessedCotRow[] = [];
   for (let i = 0; i < filledRows.length; i++) {
     const row = filledRows[i];
-    const ny  = row.ny  ?? {};
-    const ldn = row.ldn ?? {};
+    const ny: CotRawMarket  = row.ny  ?? {};
+    const ldn: CotRawMarket = row.ldn ?? {};
 
     const oiNY  = ny.oi_total  ?? 0;
     const oiLDN = ldn.oi_total ?? 0;
@@ -77,14 +78,14 @@ export function transformApiData(rows: any[]): any[] {
 
     // ny/ldn sub-objects: camelCase OI fields used by Tabs 2-6
     // nonRepLong (capital R) matches d.ny[`${cat}Long`] where cat="nonRep" in Tab 2
-    const nyObj = {
+    const nyObj: CotMarketPositions = {
       pmpuLong:    ny.pmpu_long   ?? 0,  pmpuShort:   ny.pmpu_short  ?? 0,  pmpuSpread:   0,
       swapLong:    ny.swap_long   ?? 0,  swapShort:   ny.swap_short  ?? 0,  swapSpread:   ny.swap_spread  ?? 0,
       mmLong:      ny.mm_long     ?? 0,  mmShort:     ny.mm_short    ?? 0,  mmSpread:     ny.mm_spread    ?? 0,
       otherLong:   ny.other_long  ?? 0,  otherShort:  ny.other_short ?? 0,  otherSpread:  ny.other_spread ?? 0,
       nonRepLong:  ny.nr_long     ?? 0,  nonRepShort: ny.nr_short    ?? 0,  nonRepSpread: 0,
     };
-    const ldnObj = {
+    const ldnObj: CotMarketPositions = {
       pmpuLong:    ldn.pmpu_long  ?? 0,  pmpuShort:   ldn.pmpu_short  ?? 0,  pmpuSpread:   0,
       swapLong:    ldn.swap_long  ?? 0,  swapShort:   ldn.swap_short  ?? 0,  swapSpread:   ldn.swap_spread  ?? 0,
       mmLong:      ldn.mm_long    ?? 0,  mmShort:     ldn.mm_short    ?? 0,  mmSpread:     ldn.mm_spread    ?? 0,
@@ -93,28 +94,28 @@ export function transformApiData(rows: any[]): any[] {
     };
 
     // tradersNY/LDN: lowercase keys used by Tab 5 dpCats loop as m.tr["nonrep"]
-    const tradersNY = {
+    const tradersNY: CotTradersGroup = {
       pmpu:   ny.t_pmpu_long  ?? 0,
       mm:     ny.t_mm_long    ?? 0,
       swap:   ny.t_swap_long  ?? 0,
       other:  ny.t_other_long ?? 0,
       nonrep: ny.t_nr_long    ?? 0,
     };
-    const tradersNY_short = {
+    const tradersNY_short: CotTradersGroup = {
       pmpu:   ny.t_pmpu_short  ?? 0,
       mm:     ny.t_mm_short    ?? 0,
       swap:   ny.t_swap_short  ?? 0,
       other:  ny.t_other_short ?? 0,
       nonrep: ny.t_nr_short    ?? 0,
     };
-    const tradersLDN = {
+    const tradersLDN: CotTradersGroup = {
       pmpu:   ldn.t_pmpu_long  ?? 0,
       mm:     ldn.t_mm_long    ?? 0,
       swap:   ldn.t_swap_long  ?? 0,
       other:  ldn.t_other_long ?? 0,
       nonrep: 0,  // ICE has no NR trader count
     };
-    const tradersLDN_short = {
+    const tradersLDN_short: CotTradersGroup = {
       pmpu:   ldn.t_pmpu_short  ?? 0,
       mm:     ldn.t_mm_short    ?? 0,
       swap:   ldn.t_swap_short  ?? 0,
@@ -137,18 +138,21 @@ export function transformApiData(rows: any[]): any[] {
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
       ny: nyObj, ldn: ldnObj,
       // Preserve forward-filled raw sub-objects for buildMarketMetrics (structure, exch_oi, t_mm_short)
-      rawNy: ny, rawLdn: ldn,
+      rawNy: ny as Record<string, number | null>,
+      rawLdn: ldn as Record<string, number | null>,
       tradersNY, tradersNY_short, tradersLDN, tradersLDN_short,
       pmpuShortMT_NY, pmpuShortMT_LDN,
       pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,
       pmpuLongMT_NY, pmpuLongMT_LDN,
       pmpuLongMT: pmpuLongMT_NY + pmpuLongMT_LDN,
       efpMT,
-      timeframe: "historical",
+      timeframe: "historical" as const,
+      priceRank: 0, oiRank: 0, priceRankLDN: 0, oiRankLDN: 0,
     });
   }
 
   // Pass 2: timeframe buckets + 5-year (260-week) rolling ranks
+  // Single loop per row (no intermediate array allocations).
   const n = base.length;
   return base.map((d, i) => {
     const timeframe =
@@ -158,31 +162,31 @@ export function transformApiData(rows: any[]): any[] {
       (i >= n - 58 && i <= n - 7) ? "year"      :
                                     "historical";
 
-    const slice    = base.slice(Math.max(0, i - 260), i + 1);
-    const prices   = slice.map(s => s.priceNY);
-    const maxP     = Math.max(...prices);
-    const minP     = Math.min(...prices);
-    const net      = d.ny.mmLong - d.ny.mmShort;
-    const nets     = slice.map(s => s.ny.mmLong - s.ny.mmShort);
-    const maxNet   = Math.max(...nets);
-    const minNet   = Math.min(...nets);
+    let maxP = -Infinity, minP = Infinity;
+    let maxNet = -Infinity, minNet = Infinity;
+    let maxLP = -Infinity, minLP = Infinity;
+    let maxNetLDN = -Infinity, minNetLDN = Infinity;
+    for (let j = Math.max(0, i - 260); j <= i; j++) {
+      const s = base[j];
+      const p = s.priceNY, lp = s.priceLDN;
+      const net = s.ny.mmLong - s.ny.mmShort;
+      const netLDN = s.ldn.mmLong - s.ldn.mmShort;
+      if (p   > maxP)      maxP      = p;   if (p   < minP)      minP      = p;
+      if (net > maxNet)    maxNet    = net;  if (net < minNet)    minNet    = net;
+      if (lp  > maxLP)     maxLP     = lp;  if (lp  < minLP)     minLP     = lp;
+      if (netLDN > maxNetLDN) maxNetLDN = netLDN; if (netLDN < minNetLDN) minNetLDN = netLDN;
+    }
 
-    const ldnPrices = slice.map(s => s.priceLDN);
-    const maxLP     = Math.max(...ldnPrices);
-    const minLP     = Math.min(...ldnPrices);
-    const netLDN    = d.ldn.mmLong - d.ldn.mmShort;
-    const netsLDN   = slice.map(s => s.ldn.mmLong - s.ldn.mmShort);
-    const maxNetLDN = Math.max(...netsLDN);
-    const minNetLDN = Math.min(...netsLDN);
+    const net    = d.ny.mmLong  - d.ny.mmShort;
+    const netLDN = d.ldn.mmLong - d.ldn.mmShort;
 
     return {
       ...d,
       timeframe,
-      priceRank:    maxP     !== minP     ? ((d.priceNY - minP)    / (maxP     - minP))     * 100 : 50,
-      oiRank:       maxNet   !== minNet   ? ((net       - minNet)   / (maxNet   - minNet))   * 100 : 50,
-      priceRankLDN: maxLP    !== minLP    ? ((d.priceLDN - minLP)   / (maxLP    - minLP))    * 100 : 50,
-      oiRankLDN:    maxNetLDN !== minNetLDN ? ((netLDN  - minNetLDN)/ (maxNetLDN - minNetLDN)) * 100 : 50,
+      priceRank:    maxP      !== minP      ? ((d.priceNY  - minP)      / (maxP      - minP))      * 100 : 50,
+      oiRank:       maxNet    !== minNet    ? ((net         - minNet)    / (maxNet    - minNet))    * 100 : 50,
+      priceRankLDN: maxLP     !== minLP     ? ((d.priceLDN  - minLP)     / (maxLP     - minLP))     * 100 : 50,
+      oiRankLDN:    maxNetLDN !== minNetLDN ? ((netLDN      - minNetLDN) / (maxNetLDN - minNetLDN)) * 100 : 50,
     };
   });
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

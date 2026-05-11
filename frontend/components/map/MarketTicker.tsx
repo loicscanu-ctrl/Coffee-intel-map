@@ -18,8 +18,8 @@ export default function MarketTicker() {
     const load = () =>
       fetch("/data/latest_prices.json")
         .then(r => r.json())
-        .then((d: any) => setTickers(d?.tickers ?? []))
-        .catch(() => {});
+        .then((d: { tickers?: TickerItem[] }) => setTickers(d?.tickers ?? []))
+        .catch((err) => console.error("[MarketTicker] fetch failed:", err));
     load();
     const interval = setInterval(load, 5 * 60 * 1000);
     return () => clearInterval(interval);

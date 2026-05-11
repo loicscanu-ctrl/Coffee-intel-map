@@ -20,7 +20,7 @@ import Step6CycleLocation from "./Step6CycleLocation";
 
 export default function CotDashboard() {
   const [step, setStep] = useState<Step>(1);
-  const [cotRows, setCotRows] = useState<any[] | null>(null);
+  const [cotRows, setCotRows] = useState<Record<string, unknown>[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);

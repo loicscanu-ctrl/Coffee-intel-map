@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AMBER, BLUE, GREEN, TEAL, TT_STYLE } from "./constants";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { cropYearKey } from "./helpers";
 import type { VolumeSeries } from "./types";
 
@@ -62,7 +63,7 @@ export default function TypeShareChart({ series }: { series: VolumeSeries[] }) {
           <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
           <YAxis tickFormatter={v => `${v}%`} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} width={36} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: any, name: any) => [`${v}%`, name]} />
+            formatter={(v: ValueType, name: NameType) => [`${v}%`, name]} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={v => <span style={{ color: "#cbd5e1" }}>{v}</span>} />
           <Bar dataKey="Arabica"  stackId="s" fill={GREEN} />

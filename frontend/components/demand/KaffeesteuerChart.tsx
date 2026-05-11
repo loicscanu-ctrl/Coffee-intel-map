@@ -45,7 +45,7 @@ function buildSeries(raw: Record<string, number>): DataPoint[] {
   });
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: DataPoint }> }) => {
   if (!active || !payload?.length) return null;
   const d: DataPoint = payload[0]?.payload;
   return (
@@ -225,7 +225,7 @@ export default function KaffeesteuerChart() {
               domain={[800, 1200]} width={58} />
             <Tooltip
               contentStyle={{ backgroundColor: "#1e293b", borderColor: "#475569", fontSize: 12 }}
-              formatter={(v: any) => [`€${Number(v).toFixed(0)}M`, "Annual total"]}
+              formatter={(v: unknown) => [`€${Number(v).toFixed(0)}M`, "Annual total"]}
             />
             <Bar dataKey="total" radius={[2, 2, 0, 0]} fill="#6366f1" opacity={0.85} />
           </ComposedChart>

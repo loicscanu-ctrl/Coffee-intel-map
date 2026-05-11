@@ -1,0 +1,319 @@
+"""
+export_colombia.py
+Reads DB and writes frontend/public/data/colombia_supply.json.
+
+Sections:
+  exports    — ICO monthly green coffee exports (from colombia.py NewsItem)
+  fnc_price  — FNC precio interno COP/carga (from colombia.py NewsItem)
+  weather    — drought risk per Colombian region (WeatherSnapshot)
+  enso       — NOAA ONI + Colombia-specific regional impact (same ONI as Brazil)
+  mitaca     — static season calendar + current phase
+"""
+from __future__ import annotations
+
+import json
+import sys
+from datetime import date, datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from database import SessionLocal
+from models import NewsItem, WeatherSnapshot
+
+ROOT    = Path(__file__).resolve().parents[2]
+OUT_DIR = ROOT / "frontend" / "public" / "data"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+_COLOMBIA_REGIONS = ["Huila", "Nariño", "Antioquia", "Cauca", "Caldas"]
+
+_RISK_ORDER = {"-": 0, "L": 1, "M": 2, "H": 3}
+
+# Colombia ENSO impact (OPPOSITE to Brazil: El Niño → drier → bad)
+_COLOMBIA_ENSO_IMPACT = {
+    "el-nino": {
+        "regions": [
+            {"region": "Huila",     "type": "DRY",  "note": "ITCZ disruption, −25% rainfall vs norm."},
+            {"region": "Nariño",    "type": "DRY",  "note": "Pacific influence, below-avg moisture"},
+            {"region": "Antioquia", "type": "DRY",  "note": "reduced Intertropical front activity"},
+            {"region": "Cauca",     "type": "DRY",  "note": "water deficit at critical elevation"},
+            {"region": "Caldas",    "type": "DRY",  "note": "Eje Cafetero moisture deficit"},
+        ],
+        "historical_stat": "El Niño years avg. Colombia coffee output −8 to −15% vs neutral (CENICAFÉ)",
+    },
+    "la-nina": {
+        "regions": [
+            {"region": "Huila",     "type": "WET",  "note": "above-avg rainfall, flood/landslide risk"},
+            {"region": "Nariño",    "type": "WET",  "note": "excessive moisture, fungal disease risk"},
+            {"region": "Antioquia", "type": "WET",  "note": "above-avg rainfall, rot risk at harvest"},
+            {"region": "Cauca",     "type": "WET",  "note": "above-avg moisture, quality impact"},
+            {"region": "Caldas",    "type": "WET",  "note": "excess rain during flowering can reduce set"},
+        ],
+        "historical_stat": "La Niña brings excess rainfall — yield may hold but bean quality risks (fungal, rot)",
+    },
+    "neutral": {
+        "regions": [
+            {"region": "Huila",     "type": "WARM", "note": "near-normal bimodal rainfall"},
+            {"region": "Nariño",    "type": "WARM", "note": "near-normal conditions"},
+            {"region": "Antioquia", "type": "WARM", "note": "near-normal conditions"},
+            {"region": "Cauca",     "type": "WARM", "note": "near-normal conditions"},
+            {"region": "Caldas",    "type": "WARM", "note": "near-normal conditions"},
+        ],
+        "historical_stat": "Neutral ENSO: near-average Colombia arabica output expected",
+    },
+}
+
+# Same ONI season parsing as farmer_economics
+_SEASON_MONTH = {
+    "DJF": 1, "JFM": 2, "FMA": 3, "MAM": 4,
+    "AMJ": 5, "MJJ": 6, "JJA": 7, "JAS": 8,
+    "ASO": 9, "SON": 10, "OND": 11, "NDJ": 12,
+}
+
+
+def _worst_risk(risks: list) -> str:
+    return max(risks, key=lambda r: _RISK_ORDER.get(r, 0)) if risks else "-"
+
+
+def _badge(code: str) -> str:
+    return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
+
+
+def _oni_to_dots(oni: float) -> int:
+    a = abs(oni)
+    if a >= 2.0: return 4
+    if a >= 1.5: return 3
+    if a >= 1.0: return 2
+    return 1
+
+
+def _derive_enso_phase(oni_history: list) -> tuple:
+    entries = [p for p in oni_history if not p.get("forecast")]
+    if not entries:
+        entries = oni_history
+    if not entries:
+        return "neutral", "Weak", 0.0
+    current_oni = entries[-1]["value"]
+    recent = [p["value"] for p in entries[-5:]]
+    if len(recent) >= 5 and all(v >= 0.5 for v in recent):
+        phase = "el-nino"
+    elif len(recent) >= 5 and all(v <= -0.5 for v in recent):
+        phase = "la-nina"
+    else:
+        phase = "neutral"
+    abs_oni = abs(current_oni)
+    if abs_oni >= 2.0:    intensity = "Extreme"
+    elif abs_oni >= 1.5:  intensity = "Strong"
+    elif abs_oni >= 1.0:  intensity = "Moderate"
+    else:                 intensity = "Weak"
+    return phase, intensity, current_oni
+
+
+def _current_mitaca_phase() -> str:
+    mo = date.today().month
+    if mo in (9, 10):      return "flowering"
+    if mo in (4, 5, 6):    return "harvest"
+    if mo in (3, 11):      return "pre-harvest"
+    return "off-season"
+
+
+def export_colombia(db) -> None:
+    # ── 1. Exports (ICO) ──────────────────────────────────────────────────────
+    exports_out = None
+    try:
+        ico_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "ICO", NewsItem.title.like("Colombia%"))
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if ico_item:
+            meta = json.loads(ico_item.meta or "{}")
+            exports_out = {
+                "source":       "ICO",
+                "last_updated": meta.get("last_updated", ""),
+                "unit":         meta.get("unit", "thousand 60-kg bags"),
+                "monthly":      meta.get("monthly", []),
+            }
+    except Exception as e:
+        print(f"  [colombia] exports section error: {e}")
+
+    # ── 2. FNC precio interno ─────────────────────────────────────────────────
+    fnc_out = None
+    try:
+        fnc_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "FNC")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if fnc_item:
+            fnc_out = json.loads(fnc_item.meta or "{}")
+    except Exception as e:
+        print(f"  [colombia] FNC section error: {e}")
+
+    # ── 3. Weather (Colombia regions) ─────────────────────────────────────────
+    weather_out = None
+    try:
+        from scraper.sources.colombia_weather import _calc_csi
+
+        snapshots = (
+            db.query(WeatherSnapshot)
+            .filter(WeatherSnapshot.region.in_(_COLOMBIA_REGIONS))
+            .order_by(WeatherSnapshot.scraped_at.desc())
+            .all()
+        )
+        latest_by_region: dict = {}
+        for snap in snapshots:
+            if snap.region not in latest_by_region:
+                latest_by_region[snap.region] = snap
+
+        if latest_by_region:
+            regions_out = []
+            daily_drought_out = []
+            drought_detail_out = []
+            scraped_at_out = None
+
+            for region_name in _COLOMBIA_REGIONS:
+                snap = latest_by_region.get(region_name)
+                if snap is None:
+                    continue
+                if scraped_at_out is None and snap.scraped_at:
+                    scraped_at_out = snap.scraped_at.isoformat() + "Z"
+
+                daily = snap.daily_data or []
+                week  = daily[:7]
+                drought_codes = [d.get("drought_risk", "-") for d in week]
+                csi = _calc_csi(daily)
+
+                regions_out.append({
+                    "name":          region_name,
+                    "drought":       _badge(_worst_risk(drought_codes)),
+                    "csi_30d":       csi["csi_30d"],
+                    "csi_60d":       csi["csi_60d"],
+                    "csi_30d_level": csi["csi_30d_level"],
+                    "csi_60d_level": csi["csi_60d_level"],
+                })
+
+                drought_days = [d.get("drought_risk", "-") for d in daily]
+                if any(c != "-" for c in drought_days):
+                    daily_drought_out.append({"region": region_name, "days": drought_days})
+                    drought_detail_out.append({
+                        "region": region_name,
+                        "days": [
+                            {
+                                "date":          d.get("date", ""),
+                                "precip_prob":   d.get("precip_prob", 0.0),
+                                "precip_mm":     d.get("precip_mm", 0.0),
+                                "soil_moisture": d.get("soil_moisture", 0.0),
+                                "drought_risk":  d.get("drought_risk", "-"),
+                            }
+                            for d in daily
+                        ],
+                    })
+
+            if regions_out:
+                weather_out = {
+                    "scraped_at":    scraped_at_out or date.today().isoformat(),
+                    "regions":       regions_out,
+                    "daily_drought": daily_drought_out,
+                    "drought_detail": drought_detail_out,
+                }
+    except Exception as e:
+        print(f"  [colombia] weather section error: {e}")
+
+    # ── 4. ENSO (shared NOAA CPC source, Colombia-specific impact table) ──────
+    enso_out = None
+    try:
+        enso_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "NOAA CPC")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if enso_item:
+            meta = json.loads(enso_item.meta or "{}")
+            oni_history = meta.get("oni_history", [])
+            if oni_history:
+                phase, intensity, current_oni = _derive_enso_phase(oni_history)
+                dots = _oni_to_dots(current_oni)
+                impact_def = _COLOMBIA_ENSO_IMPACT.get(phase, _COLOMBIA_ENSO_IMPACT["neutral"])
+                regional_impact = [{**r, "dots": dots} for r in impact_def["regions"]]
+
+                recent_vals = [p["value"] for p in oni_history[-5:]]
+                trend = (recent_vals[-1] - recent_vals[0]) if len(recent_vals) >= 2 else 0
+                if phase == "neutral":
+                    forecast_direction = "Neutral · No strong signal for 2026"
+                elif phase == "el-nino":
+                    forecast_direction = "El Niño weakening" if trend < -0.15 else "El Niño conditions ongoing"
+                else:
+                    forecast_direction = "La Niña weakening toward neutral" if trend > 0.15 else "La Niña ongoing"
+
+                confirmed = [p for p in oni_history if not p.get("preliminary")]
+                history_for_peak = confirmed if confirmed else oni_history
+                peak_month = max(history_for_peak, key=lambda p: abs(p["value"]))["month"] if history_for_peak else ""
+
+                enso_out = {
+                    "phase":              phase,
+                    "intensity":          intensity,
+                    "oni":                current_oni,
+                    "peak_month":         peak_month,
+                    "forecast_direction": forecast_direction,
+                    "oni_history":        oni_history,
+                    "oni_forecast":       meta.get("oni_forecast", []),
+                    "regional_impact":    regional_impact,
+                    "historical_stat":    impact_def["historical_stat"],
+                    "last_updated":       str(enso_item.pub_date)[:10],
+                }
+    except Exception as e:
+        print(f"  [colombia] ENSO section error: {e}")
+
+    # ── 5. Mitaca season ──────────────────────────────────────────────────────
+    mitaca_phase = _current_mitaca_phase()
+    mitaca_out = {
+        "current_phase":       mitaca_phase,
+        "harvest_window":      "Apr–Jun",
+        "flowering_window":    "Sep–Oct",
+        "main_crop_harvest":   "Oct–Jan",
+        "main_crop_flowering": "Mar–May",
+        "description": (
+            "Colombia's unique bimodal rainfall pattern enables two crop cycles per year. "
+            "The main crop (cosecha principal) harvests Oct–Jan; "
+            "the Mitaca (second crop) harvests Apr–Jun."
+        ),
+    }
+
+    # ── Assemble & write ──────────────────────────────────────────────────────
+    result = {
+        "country":    "colombia",
+        "scraped_at": datetime.utcnow().isoformat() + "Z",
+        "exports":    exports_out,
+        "fnc_price":  fnc_out,
+        "weather":    weather_out,
+        "enso":       enso_out,
+        "mitaca":     mitaca_out,
+    }
+
+    path = OUT_DIR / "colombia_supply.json"
+    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(
+        f"  colombia_supply.json → "
+        f"exports:{exports_out is not None} "
+        f"fnc:{fnc_out is not None} "
+        f"weather:{weather_out is not None} "
+        f"enso:{enso_out is not None}"
+    )
+
+
+def main():
+    print("Exporting Colombia supply JSON...")
+    db = SessionLocal()
+    try:
+        export_colombia(db)
+    finally:
+        db.close()
+    print("Done")
+
+
+if __name__ == "__main__":
+    main()

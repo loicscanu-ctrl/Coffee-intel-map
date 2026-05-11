@@ -11,12 +11,18 @@ const BORDER_COLORS: Record<string, string> = {
   general: "border-gray-500",
 };
 
+interface NewsItem {
+  title?: string;
+  pub_date?: string;
+  category?: string;
+}
+
 interface NewsFeedProps {
-  initialNews?: any[];
+  initialNews?: NewsItem[];
 }
 
 export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
-  const [items, setItems] = useState<any[]>(initialNews);
+  const [items, setItems] = useState<NewsItem[]>(initialNews);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
@@ -25,7 +31,7 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function itemDate(item: any): number {
+  function itemDate(item: NewsItem): number {
     const m = item.title?.match(/[–-]\s*(\d{4}-\d{2}-\d{2})\s*$/);
     if (m) return new Date(m[1]).getTime();
     return new Date(item.pub_date ?? 0).getTime();

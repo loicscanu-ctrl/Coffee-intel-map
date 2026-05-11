@@ -1,16 +1,26 @@
 "use client";
 import { useState } from "react";
-import BrazilTab from "@/components/supply/BrazilTab";
-import VietnamTab from "@/components/supply/VietnamTab";
-import FertilizersTab from "@/components/supply/FertilizersTab";
+import dynamic from "next/dynamic";
+import { DataHealthBar } from "@/components/DataHealthBar";
+
+const BrazilTab      = dynamic(() => import("@/components/supply/BrazilTab"),      { ssr: false });
+const VietnamTab     = dynamic(() => import("@/components/supply/VietnamTab"),     { ssr: false });
+const FertilizersTab = dynamic(() => import("@/components/supply/FertilizersTab"), { ssr: false });
+const ColombiaTab    = dynamic(() => import("@/components/supply/ColombiaTab"),    { ssr: false });
+const HondurasTab    = dynamic(() => import("@/components/supply/HondurasTab"),    { ssr: false });
+const IndonesiaTab   = dynamic(() => import("@/components/supply/IndonesiaTab"),   { ssr: false });
+const UgandaTab      = dynamic(() => import("@/components/supply/UgandaTab"),      { ssr: false });
+const EthiopiaTab    = dynamic(() => import("@/components/supply/EthiopiaTab"),    { ssr: false });
 
 const TABS = [
   { id: "brazil",       label: "Brazil",       available: true  },
   { id: "vietnam",      label: "Vietnam",      available: true  },
   { id: "fertilizers",  label: "Fertilizers",  available: true  },
-  { id: "colombia",     label: "Colombia",     available: false },
-  { id: "ethiopia",     label: "Ethiopia",     available: false },
-  { id: "honduras",     label: "Honduras",     available: false },
+  { id: "colombia",     label: "Colombia",     available: true  },
+  { id: "honduras",     label: "Honduras",     available: true  },
+  { id: "indonesia",    label: "Indonesia",    available: true  },
+  { id: "uganda",       label: "Uganda",       available: true  },
+  { id: "ethiopia",     label: "Ethiopia",     available: true  },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -23,11 +33,14 @@ export default function SupplyPage() {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
 
         {/* Page header */}
-        <div>
-          <h1 className="text-xl font-bold text-slate-100">Supply Intelligence</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Production &amp; export data by origin country
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-slate-100">Supply Intelligence</h1>
+            <p className="text-xs text-slate-500 mt-1">
+              Production &amp; export data by origin country
+            </p>
+          </div>
+          <DataHealthBar keys={["weather", "enso", "fertilizer_wb", "fertilizer_comex", "freight"]} />
         </div>
 
         {/* Sub-tabs */}
@@ -59,6 +72,11 @@ export default function SupplyPage() {
         {tab === "brazil"      && <BrazilTab />}
         {tab === "vietnam"     && <VietnamTab />}
         {tab === "fertilizers" && <FertilizersTab />}
+        {tab === "colombia"    && <ColombiaTab />}
+        {tab === "honduras"    && <HondurasTab />}
+        {tab === "indonesia"   && <IndonesiaTab />}
+        {tab === "uganda"      && <UgandaTab />}
+        {tab === "ethiopia"    && <EthiopiaTab />}
       </div>
     </div>
   );

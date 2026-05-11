@@ -33,7 +33,7 @@ export default function StocksClient({ stocks, news }: Props) {
         <NewsFeedList
           title="Market News & Intel"
           initialItems={news}
-          filterFn={(item: any) => {
+          filterFn={(item: { tags?: string[]; category?: string }) => {
             const tags = item.tags?.map((t: string) => t.toLowerCase()) || [];
             return (
               tags.includes("stocks") &&

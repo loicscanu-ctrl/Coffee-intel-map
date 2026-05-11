@@ -4,7 +4,7 @@ import { HM_CAT_COLORS } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { MarketToggle } from "./Toggles";
 
-export default function CotHeatmap({ data }: { data: any[] }) {
+export default function CotHeatmap({ data }: { data: Record<string, unknown>[] }) {
   const [market, setMarket] = useState<"ny" | "ldn">("ny");
   const [mode, setMode]     = useState<"net" | "long" | "short">("net");
   const weeks13 = data.slice(-13);
@@ -21,12 +21,12 @@ export default function CotHeatmap({ data }: { data: any[] }) {
     { label: "Other Spr", key: "otherSpread", color: "#67e8f9" },
   ];
 
-  const gv = (d: any, field: string) => (d[market]?.[field] ?? 0) as number;
+  const gv = (d: Record<string, unknown>, field: string) => ((d[market] as Record<string, number>)?.[field] ?? 0) as number;
 
   const lsRows = lsFields.map(f => ({
     label: f.label,
     color: HM_CAT_COLORS[f.label] ?? "#64748b",
-    vals: weeks13.map((d: any) => {
+    vals: weeks13.map((d: Record<string, unknown>) => {
       if (mode === "long")  return gv(d, f.lf);
       if (mode === "short") return gv(d, f.sf);
       return gv(d, f.lf) - gv(d, f.sf);
@@ -34,7 +34,7 @@ export default function CotHeatmap({ data }: { data: any[] }) {
   }));
   const spreadRows = spreadFields.map(f => ({
     label: f.label, color: f.color,
-    vals: weeks13.map((d: any) => gv(d, f.key)),
+    vals: weeks13.map((d: Record<string, unknown>) => gv(d, f.key)),
   }));
 
   const cellBg = (val: number, min: number, max: number, isSpread: boolean): string => {
@@ -105,7 +105,7 @@ export default function CotHeatmap({ data }: { data: any[] }) {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-x-auto">
         <div style={{ display: "grid", gridTemplateColumns: `72px repeat(${weeks13.length}, 1fr)`, gap: 2, marginBottom: 2 }}>
           <div />
-          {weeks13.map((d: any, i: number) => (
+          {weeks13.map((d: Record<string, unknown>, i: number) => (
             <div key={i} style={{ fontSize: 9, color: i === weeks13.length - 1 ? "#a5b4fc" : "#475569", textAlign: "center" }}>
               {String(d.date).slice(5)}
             </div>

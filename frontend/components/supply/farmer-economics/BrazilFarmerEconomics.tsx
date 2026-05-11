@@ -12,14 +12,20 @@ import FarmerSellingPanel  from "./FarmerSellingPanel";
 
 export default function BrazilFarmerEconomics() {
   const [data, setData] = useState<FarmerEconomicsData | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch("/data/farmer_economics.json")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setData)
-      .catch((err) => console.error("[FarmerEconomics] fetch failed:", err));
+      .catch(() => setError(true));
   }, []);
 
+  if (error) return (
+    <div className="text-center text-slate-500 py-16 text-sm">
+      Farmer economics data unavailable — scraper may not have run yet.
+    </div>
+  );
   if (!data) {
     return (
       <div className="text-slate-500 text-sm py-12 text-center">

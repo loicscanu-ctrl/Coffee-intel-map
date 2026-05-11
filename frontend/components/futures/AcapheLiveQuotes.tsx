@@ -41,7 +41,6 @@ interface AcapheLiveData {
 const LETTER_TO_MONTH: Record<string, number> = {
   F:1, G:2, H:3, J:4, K:5, M:6, N:7, Q:8, U:9, V:10, X:11, Z:12,
 };
-const MONTH_ABB = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function firstBusinessDay(year: number, month: number): Date {
   const d = new Date(year, month - 1, 1);
@@ -92,26 +91,6 @@ function calcOptLtd(symbol: string): string {
   const fnd = calcFndDate(symbol);
   if (!fnd) return "—";
   return fmtDate(subtractBusinessDays(fnd, 8));
-}
-
-// Implied annualised carry between two consecutive contracts
-// carry = (back − front) / front × (365 / calendar days between FNDs) × 100
-function impliedCarry(front: AcapheContract, back: AcapheContract, isArabica: boolean): string {
-  if (front.last == null || back.last == null || front.last === 0) return "—";
-  const symF = acapheToSymbol(front.month, isArabica);
-  const symB = acapheToSymbol(back.month, isArabica);
-  const dF   = calcFndDate(symF);
-  const dB   = calcFndDate(symB);
-  if (!dF || !dB) return "—";
-  const days = (dB.getTime() - dF.getTime()) / 86_400_000;
-  if (days <= 0) return "—";
-  const rate = ((back.last - front.last) / front.last) * (365 / days) * 100;
-  return (rate >= 0 ? "+" : "") + rate.toFixed(1) + "%/yr";
-}
-
-// Month letter label: "RK 05/26" → "K", used for spread labels
-function spreadLabel(a: AcapheContract, b: AcapheContract): string {
-  return `${a.month[1]}/${b.month[1]}`;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -280,7 +259,7 @@ function VietnamPanel({ data }: { data: VietnamPrices }) {
       fetch("/data/vietnam_last.json")
         .then(r => r.ok ? r.json() : null)
         .then(d => d && setLast(d))
-        .catch(() => {});
+        .catch((err) => console.error("[AcapheLiveQuotes] vietnam_last fetch failed:", err));
     }
   }, [isLive]);
 
@@ -335,8 +314,8 @@ export default function AcapheLiveQuotes() {
     // Try live Redis-backed endpoint first; fall back to static snapshot
     fetch("/api/live")
       .then((r) => { if (!r.ok) throw new Error("live"); return r.json(); })
-      .then((d: AcapheLiveData) => {
-        if ((d as any).error) throw new Error("live");
+      .then((d: AcapheLiveData & { error?: string }) => {
+        if (d.error) throw new Error("live");
         setData(d); setAgo(secsAgo(d.fetched_at)); setError(false);
       })
       .catch(() =>

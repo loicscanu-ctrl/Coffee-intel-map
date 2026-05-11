@@ -133,7 +133,7 @@ export default function FreightClient({ data }: Props) {
     fetch("/data/farmer_economics.json")
       .then(r => r.json())
       .then(d => setDryBulk(d.fertilizer?.dry_bulk ?? null))
-      .catch(() => {});
+      .catch((err) => console.error("[FreightClient] fetch failed:", err));
   }, []);
 
   return (

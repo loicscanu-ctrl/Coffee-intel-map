@@ -1,0 +1,174 @@
+{
+  "country": "ethiopia",
+  "scraped_at": "2026-04-25T12:18:54.532660Z",
+  "exports": {
+    "source": "ICO (sample data)",
+    "last_updated": "2026-03",
+    "unit": "thousand 60-kg bags",
+    "monthly": [
+      {
+        "month": "2024-04",
+        "total_k_bags": 654.6,
+        "yoy_pct": -1.4
+      },
+      {
+        "month": "2024-05",
+        "total_k_bags": 624.7,
+        "yoy_pct": 6.3
+      },
+      {
+        "month": "2024-06",
+        "total_k_bags": 509.0,
+        "yoy_pct": -4.9
+      },
+      {
+        "month": "2024-07",
+        "total_k_bags": 374.5,
+        "yoy_pct": -7.8
+      },
+      {
+        "month": "2024-08",
+        "total_k_bags": 312.9,
+        "yoy_pct": -2.2
+      },
+      {
+        "month": "2024-09",
+        "total_k_bags": 371.6,
+        "yoy_pct": 5.3
+      },
+      {
+        "month": "2024-10",
+        "total_k_bags": 428.6,
+        "yoy_pct": -11.4
+      },
+      {
+        "month": "2024-11",
+        "total_k_bags": 596.3,
+        "yoy_pct": 4.0
+      },
+      {
+        "month": "2024-12",
+        "total_k_bags": 651.4,
+        "yoy_pct": 6.8
+      },
+      {
+        "month": "2025-01",
+        "total_k_bags": 547.6,
+        "yoy_pct": -7.1
+      },
+      {
+        "month": "2025-02",
+        "total_k_bags": 617.0,
+        "yoy_pct": 2.0
+      },
+      {
+        "month": "2025-03",
+        "total_k_bags": 690.2,
+        "yoy_pct": 7.4
+      },
+      {
+        "month": "2025-04",
+        "total_k_bags": 641.3,
+        "yoy_pct": -2.0
+      },
+      {
+        "month": "2025-05",
+        "total_k_bags": 579.8,
+        "yoy_pct": -7.2
+      },
+      {
+        "month": "2025-06",
+        "total_k_bags": 569.1,
+        "yoy_pct": 11.8
+      },
+      {
+        "month": "2025-07",
+        "total_k_bags": 396.5,
+        "yoy_pct": 5.9
+      },
+      {
+        "month": "2025-08",
+        "total_k_bags": 334.5,
+        "yoy_pct": 6.9
+      },
+      {
+        "month": "2025-09",
+        "total_k_bags": 380.6,
+        "yoy_pct": 2.4
+      },
+      {
+        "month": "2025-10",
+        "total_k_bags": 470.0,
+        "yoy_pct": 9.7
+      },
+      {
+        "month": "2025-11",
+        "total_k_bags": 532.3,
+        "yoy_pct": -10.7
+      },
+      {
+        "month": "2025-12",
+        "total_k_bags": 576.3,
+        "yoy_pct": -11.5
+      },
+      {
+        "month": "2026-01",
+        "total_k_bags": 581.5,
+        "yoy_pct": 6.2
+      },
+      {
+        "month": "2026-02",
+        "total_k_bags": 636.1,
+        "yoy_pct": 3.1
+      },
+      {
+        "month": "2026-03",
+        "total_k_bags": 668.5,
+        "yoy_pct": -3.1
+      }
+    ]
+  },
+  "ecx_price": null,
+  "weather": null,
+  "enso": null,
+  "harvest_cal": {
+    "main_crop_harvest": "Oct-Jan",
+    "main_crop_flowering": "Feb-Apr",
+    "second_crop_harvest": "Mar-May",
+    "second_crop_flowering": "Jun-Aug",
+    "description": "Ethiopia has a main harvest from October to January across all major regions. A smaller second crop harvests March-May in some western regions (Kaffa, Limu). 100% arabica; processing includes natural (Harrar, Sidama) and washed (Yirgacheffe, Limu)."
+  },
+  "grade_structure": {
+    "grades": [
+      {
+        "grade": "Grade 1",
+        "quality": "Specialty",
+        "defects": "0-3",
+        "regions": "Yirgacheffe, Sidama"
+      },
+      {
+        "grade": "Grade 2",
+        "quality": "Specialty",
+        "defects": "4-12",
+        "regions": "Sidama, Limu"
+      },
+      {
+        "grade": "Grade 3",
+        "quality": "Premium",
+        "defects": "13-25",
+        "regions": "Jimma, Harrar"
+      },
+      {
+        "grade": "Grade 4",
+        "quality": "Commercial",
+        "defects": "26-45",
+        "regions": "Various"
+      }
+    ],
+    "processing": {
+      "natural_pct": 65,
+      "washed_pct": 35,
+      "note": "Natural (dry) processing dominates in Harrar and Sidama; washed in Yirgacheffe and Limu."
+    }
+  }
+}

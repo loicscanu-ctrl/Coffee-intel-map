@@ -14,12 +14,12 @@ import { clearApiCache, fetchStocks } from "../api";
 
 type FetchMock = ReturnType<typeof vi.fn>;
 
-function mockJson(body: any, ok = true, status = 200) {
+function mockJson(body: unknown, ok = true, status = 200) {
   return {
     ok, status,
     json: async () => body,
     text: async () => JSON.stringify(body),
-  } as any;
+  } as unknown as Response;
 }
 
 

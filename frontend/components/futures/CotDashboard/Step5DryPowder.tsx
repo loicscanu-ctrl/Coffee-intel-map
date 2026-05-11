@@ -4,12 +4,13 @@ import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { ARABICA_MT_FACTOR, ROBUSTA_MT_FACTOR } from "@/lib/cot/transformApiData";
 import { CAT_ITEMS, CHART_STYLE } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { CatToggles } from "./Toggles";
 
-export default function Step5DryPowder({ data }: { data: any[] }) {
+export default function Step5DryPowder({ data }: { data: Record<string, unknown>[] }) {
   const [dpCats, setDpCats] = useState({ pmpu: false, mm: true, swap: false, other: false, nonrep: false });
 
   const processedDpData = useMemo(() => {
@@ -19,16 +20,17 @@ export default function Step5DryPowder({ data }: { data: any[] }) {
       };
       const mt = market === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
       data.forEach(d => {
-        const trL = market === "ny" ? d.tradersNY : d.tradersLDN;
-        const trS = market === "ny" ? (d as any).tradersNY_short : (d as any).tradersLDN_short;
+        const trL = (market === "ny" ? d.tradersNY : d.tradersLDN) as Record<string, number> | undefined;
+        const trS = (market === "ny" ? d.tradersNY_short : d.tradersLDN_short) as Record<string, number> | undefined;
         let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
         Object.keys(dpCats).forEach(cat => {
-          if ((dpCats as any)[cat]) {
+          if ((dpCats as Record<string, boolean>)[cat]) {
             const oiKey = cat === "nonrep" ? "nonRep" : cat;
-            dpLong         += ((d as any)[market][`${oiKey}Long`])  * mt;
-            dpShort        += ((d as any)[market][`${oiKey}Short`]) * mt;
-            dpTradersLong  += (trL as any)?.[cat] ?? 0;
-            dpTradersShort += (trS as any)?.[cat] ?? 0;
+            const mktOi = d[market] as Record<string, number>;
+            dpLong         += mktOi[`${oiKey}Long`]  * mt;
+            dpShort        += mktOi[`${oiKey}Short`] * mt;
+            dpTradersLong  += trL?.[cat] ?? 0;
+            dpTradersShort += trS?.[cat] ?? 0;
           }
         });
         const tf = d.timeframe as string;
@@ -65,11 +67,11 @@ export default function Step5DryPowder({ data }: { data: any[] }) {
   const mkScatter = (market: "ny" | "ldn") => {
     const d = processedDpData[market];
     const dom = dpDomain[market];
-    const legendContent = (props: any) => {
+    const legendContent = (props: { payload?: { color?: string; value?: string }[] }) => {
       const items = [...(props.payload ?? [])].reverse();
       return (
         <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 10, paddingTop: 8 }}>
-          {items.map((e: any, i: number) => (
+          {items.map((e, i: number) => (
             <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, color: "#94a3b8" }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: e.color, display: "inline-block" }} />
               {e.value}
@@ -92,16 +94,17 @@ export default function Step5DryPowder({ data }: { data: any[] }) {
               label={{ value: "OI (k MT)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
             <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-              formatter={(v: any, name: any) => name === "# traders"
+              formatter={(v: ValueType, name: NameType) => name === "# traders"
                 ? [Math.round(Number(v)).toString(), name]
                 : [`${(Number(v) / 1000).toFixed(1)}k MT`, name]} />
             <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }} content={legendContent} />
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {/* eslint-disable @typescript-eslint/no-explicit-any */}
             <Scatter name="Historic"   data={d.historical} fill="#bfdbfe" fillOpacity={0.18} {...{ size: 12  } as any} />
             <Scatter name="Prior Y"    data={d.year}       fill="#3b82f6" fillOpacity={0.45} {...{ size: 28  } as any} />
             <Scatter name="Prior 4W"   data={d.recent_4}   fill="#eab308" fillOpacity={0.9}  {...{ size: 78  } as any} />
             <Scatter name="Prior week" data={d.recent_1}   fill="#c2410c" fillOpacity={1.0}  {...{ size: 154 } as any} />
             <Scatter name="Last CoT"   data={d.current}    fill="#ef4444" fillOpacity={1.0}  {...{ size: 314 } as any} />
+            {/* eslint-enable @typescript-eslint/no-explicit-any */}
           </ScatterChart>
         </ResponsiveContainer>
       </div>

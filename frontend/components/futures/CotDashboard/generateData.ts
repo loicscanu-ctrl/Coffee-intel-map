@@ -8,7 +8,7 @@ import {
 
 export function generateData() {
   const weeks = 1040; // ~20 years
-  const data: any[] = [];
+  const data: Record<string, unknown>[] = [];
   let priceNY = 130, priceLDN = 1800, oiNY = 180000, oiLDN = 110000;
   let cumulativeNominal = 0, cumulativeMargin = 0;
 

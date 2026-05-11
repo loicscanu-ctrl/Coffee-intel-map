@@ -1,0 +1,130 @@
+"use client";
+import { useEffect, useState } from "react";
+import ColombiaExportPanel from "@/components/supply/colombia/ColombiaExportPanel";
+import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
+
+interface ColombiaSupply {
+  country: string;
+  scraped_at: string | null;
+  exports: {
+    source: string;
+    last_updated: string;
+    unit: string;
+    monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+  } | null;
+  fnc_price: {
+    cop_per_carga: number;
+    as_of: string;
+    source: string;
+  } | null;
+  weather: {
+    scraped_at: string;
+    regions: {
+      name: string;
+      drought: "HIGH" | "MED" | "LOW" | "NONE";
+      csi_30d?: number;
+      csi_30d_level?: string;
+      csi_60d?: number;
+      csi_60d_level?: string;
+    }[];
+    daily_drought: { region: string; days: ("H"|"M"|"L"|"-")[] }[];
+  } | null;
+  enso: {
+    phase: "el-nino" | "la-nina" | "neutral";
+    intensity: string;
+    oni: number;
+    peak_month: string;
+    forecast_direction: string;
+    oni_history: { month: string; value: number; preliminary?: boolean }[];
+    oni_forecast?: { season: string; la_nina: number | null; neutral: number | null; el_nino: number | null }[];
+    regional_impact: { region: string; type: string; note: string; dots: number }[];
+    historical_stat: string;
+    last_updated: string;
+  } | null;
+  mitaca: {
+    current_phase: string;
+    harvest_window: string;
+    flowering_window: string;
+    main_crop_harvest: string;
+    main_crop_flowering: string;
+    description: string;
+  };
+}
+
+const DEFAULT_MITACA = {
+  current_phase: "off-season",
+  harvest_window: "Apr–Jun",
+  flowering_window: "Sep–Oct",
+  main_crop_harvest: "Oct–Jan",
+  main_crop_flowering: "Mar–May",
+  description: "Colombia's unique bimodal rainfall pattern enables two crop cycles per year.",
+};
+
+export default function ColombiaTab() {
+  const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
+  const [data, setData] = useState<ColombiaSupply | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch("/data/colombia_supply.json")
+      .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
+      .then(setData)
+      .catch(() => setError(true));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {/* Sub-tab bar */}
+      <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
+        {(["exports", "farmer-economics"] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setSubTab(t)}
+            className={`px-3 py-1.5 rounded text-xs font-medium transition-colors capitalize ${
+              subTab === t
+                ? "bg-slate-700 text-slate-100"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+            }`}
+          >
+            {t === "farmer-economics" ? "Farmer Economics" : "Exports"}
+          </button>
+        ))}
+      </div>
+
+      {error && (
+        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
+          <div className="text-sm text-slate-400">Colombia data not yet available</div>
+          <div className="text-[10px] text-slate-600">
+            Requires at least one scraper run with <code className="text-slate-400">colombia</code> and{" "}
+            <code className="text-slate-400">colombia_weather</code> sources active.
+          </div>
+        </div>
+      )}
+
+      {!error && !data && (
+        <div className="text-xs text-slate-500 animate-pulse py-12 text-center">
+          Loading Colombia data…
+        </div>
+      )}
+
+      {data && subTab === "exports" && (
+        data.exports ? (
+          <ColombiaExportPanel exports={data.exports} />
+        ) : (
+          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
+            Export data not yet available — waiting for ICO CSV scrape
+          </div>
+        )
+      )}
+
+      {data && subTab === "farmer-economics" && (
+        <ColombiaFarmerEconomics
+          fnc_price={data.fnc_price}
+          weather={data.weather}
+          enso={data.enso}
+          mitaca={data.mitaca ?? DEFAULT_MITACA}
+        />
+      )}
+    </div>
+  );
+}

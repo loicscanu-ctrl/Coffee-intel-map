@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import type { CostData, CopSection, CopLineItem } from "./farmerEconomicsData";
+import type { CostData, CopLineItem } from "./farmerEconomicsData";
 
 interface Props {
   cost: CostData;

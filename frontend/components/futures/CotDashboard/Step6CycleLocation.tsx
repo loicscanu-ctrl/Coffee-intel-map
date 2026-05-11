@@ -3,25 +3,28 @@ import {
   ScatterChart, Scatter, Cell, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceArea, ReferenceLine,
 } from "recharts";
+import type { ValueType, NameType, Payload } from "recharts/types/component/DefaultTooltipContent";
 import { CHART_STYLE } from "./constants";
 import SectionHeader from "./SectionHeader";
 
-export default function Step6CycleLocation({ recent52 }: { recent52: any[] }) {
-  const cycleColor = (d: any, market: "ny" | "ldn") => {
+type CyclePoint = { x: number; y: number; timeframe: string; date: string };
+
+export default function Step6CycleLocation({ recent52 }: { recent52: Record<string, unknown>[] }) {
+  const cycleColor = (d: CyclePoint, market: "ny" | "ldn") => {
     if (d.timeframe === "current")  return market === "ny" ? "#ef4444" : "#3b82f6";
     if (d.timeframe === "recent_1") return "#f97316";
     if (d.timeframe === "recent_4") return "#eab308";
     return "#64748b";
   };
-  const cycleOpacity = (d: any) => {
+  const cycleOpacity = (d: CyclePoint) => {
     if (d.timeframe === "current")  return 1.0;
     if (d.timeframe === "recent_1") return 0.85;
     if (d.timeframe === "recent_4") return 0.75;
     if (d.timeframe === "year")     return 0.25;
     return 0.12;
   };
-  const nyPts  = recent52.map(d => ({ x: d.oiRank,    y: d.priceRank,    timeframe: d.timeframe, date: d.date }));
-  const ldnPts = recent52.map(d => ({ x: d.oiRankLDN, y: d.priceRankLDN, timeframe: d.timeframe, date: d.date }));
+  const nyPts  = recent52.map(d => ({ x: d.oiRank    as number, y: d.priceRank    as number, timeframe: d.timeframe as string, date: d.date as string }));
+  const ldnPts = recent52.map(d => ({ x: d.oiRankLDN as number, y: d.priceRankLDN as number, timeframe: d.timeframe as string, date: d.date as string }));
 
   const mkCycle = (pts: typeof nyPts, market: "ny" | "ldn") => (
     <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[400px]">
@@ -39,8 +42,8 @@ export default function Step6CycleLocation({ recent52 }: { recent52: any[] }) {
           <ReferenceLine x={50} stroke="#475569" strokeDasharray="5 5" />
           <ReferenceLine y={50} stroke="#475569" strokeDasharray="5 5" />
           <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
-            formatter={(v: any, _: any, props: any) => [`${Number(v).toFixed(1)}%`, props.name]}
-            labelFormatter={(_: any, payload: any) => payload?.[0]?.payload?.date ?? ""} />
+            formatter={(v: ValueType, _name: NameType, props: Payload<ValueType, NameType>) => [`${Number(v).toFixed(1)}%`, props.name]}
+            labelFormatter={(_label: string | number, payload: Payload<ValueType, NameType>[]) => payload?.[0]?.payload?.date ?? ""} />
           <Scatter name={market === "ny" ? "NY Arabica" : "LDN Robusta"} data={pts}>
             {pts.map((d, i) => (
               <Cell key={i} fill={cycleColor(d, market)} fillOpacity={cycleOpacity(d)} />

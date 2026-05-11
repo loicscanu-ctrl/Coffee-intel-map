@@ -7,6 +7,7 @@ import {
 import {
   AMBER, BLUE, BRAZIL_DOMESTIC_KT, GREEN, TEAL, TT_STYLE, TYPE_FILTER_OPTS,
 } from "./constants";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
@@ -61,7 +62,7 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
       .map(k => {
         const d = byCrop[k];
         const isIncomplete = k === latestKey && d.months < 12;
-        const row: Record<string, any> = {
+        const row: Record<string, number | string | null> = {
           year: k,
           startYear: parseInt(k.split("/")[0]),
           domestic:  (!isFiltered && !typeFilter) ? (BRAZIL_DOMESTIC_KT[k] ?? null) : null,
@@ -104,7 +105,7 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
           <XAxis dataKey="year" tick={{ fill: "#94a3b8", fontSize: 9 }} angle={-45} textAnchor="end" />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={(v: any, name: any) => {
+            formatter={(v: ValueType, name: NameType) => {
               if (name === "domestic") return [`${v} kt`, "Domestic consumption (USDA est.)"];
               if (name === "proj_gap") return [`+${v} kt`, "Projected remaining"];
               return [`${v} kt`, name];

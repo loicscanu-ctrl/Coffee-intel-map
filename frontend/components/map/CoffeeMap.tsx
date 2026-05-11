@@ -165,17 +165,37 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: "#6b7280",
 };
 
+interface CountryPin {
+  type: string;
+  lat: number;
+  lng: number;
+  name: string;
+  data?: { prod?: string; stock?: string; cons?: string; intel?: string };
+}
+interface FactoryPin {
+  lat: number;
+  lng: number;
+  name: string;
+  company?: string;
+  capacity?: string;
+}
+interface NewsPin {
+  lat?: number | null;
+  lng?: number | null;
+  category: string;
+}
+
 interface CoffeeMapProps {
-  onPinClick?: (item: any) => void;
-  countries: any[];
-  factories: any[];
-  news: any[];
+  onPinClick?: (item: unknown) => void;
+  countries: unknown[];
+  factories: unknown[];
+  news: unknown[];
 }
 
 export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const tileLayerRef = useRef<any>(null);
+  const mapInstanceRef = useRef<{ remove(): void } | null>(null);
+  const tileLayerRef = useRef<{ remove(): void } | null>(null);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
 
@@ -185,11 +205,12 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
     let cancelled = false;
 
     import("leaflet").then(async (L) => {
-      if (cancelled || !mapRef.current || (mapRef.current as any)._leaflet_id) return;
-      // @ts-ignore
+      if (cancelled || !mapRef.current || (mapRef.current as unknown as Record<string, unknown>)._leaflet_id) return;
+      // @ts-expect-error — leaflet CSS has no type declarations
       import("leaflet/dist/leaflet.css");
 
-      const Leaflet = (L as any).default || L;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const Leaflet: typeof L = ((L as unknown as { default?: typeof L }).default) || L;
 
       let map;
       try {
@@ -265,7 +286,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
           opacity: 0.85,
           interactive: false,
         }).addTo(logisticsLayer);
-        const el = (visualLine as any)._path;
+        const el = (visualLine as { _path?: Element })._path;
         if (el) el.classList.add(routeWeight >= 4 ? "flow-route-trunk" : "flow-route");
 
         const hasCecafe = r.cecafeHubs && r.cecafeHubs.length > 0 && cecafeData;
@@ -322,7 +343,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
       // ── Country pins ──────────────────────────────────────────────────────
       const countriesLayer = Leaflet.layerGroup().addTo(map);
-      countries.forEach((c: any) => {
+      (countries as CountryPin[]).forEach((c) => {
         const isProducer = c.type === "producer";
         const color = isProducer ? "#10b981" : "#3b82f6";
         const icon = Leaflet.divIcon({
@@ -347,7 +368,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
       // ── Factory pins ──────────────────────────────────────────────────────
       const factoriesLayer = Leaflet.layerGroup().addTo(map);
-      factories.forEach((f: any) => {
+      (factories as FactoryPin[]).forEach((f) => {
         const icon = Leaflet.divIcon({
           className: "",
           html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
@@ -362,8 +383,9 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       // ── News pins ─────────────────────────────────────────────────────────
       const newsLayer = Leaflet.layerGroup().addTo(map);
       news
-        .filter((item: any) => item.lat != null && item.lng != null)
-        .forEach((item: any) => {
+        .filter((item): item is NewsPin & { lat: number; lng: number } =>
+          (item as NewsPin).lat != null && (item as NewsPin).lng != null)
+        .forEach((item) => {
           const color = CATEGORY_COLORS[item.category] || "#6b7280";
           const icon = Leaflet.divIcon({
             className: "",
@@ -381,7 +403,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       cancelled = true;
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
-      if (mapRef.current) (mapRef.current as any)._leaflet_id = null;
+      if (mapRef.current) (mapRef.current as unknown as Record<string, unknown>)._leaflet_id = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -391,7 +413,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
     const bm = BASEMAPS.find((b) => b.id === activeBasemap);
     if (!bm) return;
     import("leaflet").then((L) => {
-      const Leaflet = (L as any).default || L;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
       if (tileLayerRef.current) tileLayerRef.current.remove();
       tileLayerRef.current = Leaflet.tileLayer(bm.url, {
         attribution: bm.attr,

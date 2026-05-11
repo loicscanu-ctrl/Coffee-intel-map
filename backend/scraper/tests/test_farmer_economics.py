@@ -63,39 +63,43 @@ def test_aggregate_hourly_to_daily_basic():
 
     assert len(days) == 2
 
-    # Day 1: min_temp=15, precip_prob_max=70 → frost="-", drought="-"
+    # Day 1: min_temp=15, cloud=50, wind=20 → radiation_cooling=0 → frost="-"
     assert days[0]["date"] == "2026-04-15"
     assert days[0]["min_temp"] == 15.0
     assert days[0]["frost_risk"] == "-"
-    assert days[0]["drought_risk"] == "-"
+    assert days[0]["drought_risk"] in ("H", "M", "L", "-")  # driven by soil model
 
-    # Day 2: min_temp=3, precip_prob_max=10 → frost="H", drought="H"
+    # Day 2: min_temp=3, cloud=80, wind=35 → radiation_cooling=0 (wind kills it) → frost="L"
     assert days[1]["date"] == "2026-04-16"
     assert days[1]["min_temp"] == 3.0
-    assert days[1]["frost_risk"] == "H"
-    assert days[1]["drought_risk"] == "H"
+    assert days[1]["frost_risk"] == "L"
+    assert days[1]["drought_risk"] in ("H", "M", "L", "-")
 
 
 def test_frost_risk_boundaries():
     fe = _import_fe()
+    # cloud=100, wind=0, dew=5 → radiation_cooling=0, no dew correction → t_surface=min_temp
+    assert fe._frost_risk(-0.1, 100, 0, 5) == "H"   # t_surface < 0
+    assert fe._frost_risk(0.0,  100, 0, 5) == "M"   # 0 ≤ t < 3
+    assert fe._frost_risk(2.9,  100, 0, 5) == "M"
+    assert fe._frost_risk(3.0,  100, 0, 5) == "L"   # 3 ≤ t < 6
+    assert fe._frost_risk(5.9,  100, 0, 5) == "L"
+    assert fe._frost_risk(6.0,  100, 0, 5) == "-"   # ≥ 6
 
-    assert fe._frost_risk(3.9)  == "H"   # < 4
-    assert fe._frost_risk(4.0)  == "M"   # == 4 → not < 4
-    assert fe._frost_risk(7.9)  == "M"   # < 8
-    assert fe._frost_risk(8.0)  == "L"   # == 8 → not < 8
-    assert fe._frost_risk(11.9) == "L"   # < 12
-    assert fe._frost_risk(12.0) == "-"   # >= 12
 
-
-def test_drought_risk_boundaries():
+def test_drought_score_boundaries():
     fe = _import_fe()
-
-    assert fe._drought_risk(14.9) == "H"  # < 15
-    assert fe._drought_risk(15.0) == "M"  # == 15 → not < 15
-    assert fe._drought_risk(34.9) == "M"  # < 35
-    assert fe._drought_risk(35.0) == "L"  # == 35 → not < 35
-    assert fe._drought_risk(59.9) == "L"  # < 60
-    assert fe._drought_risk(60.0) == "-"  # >= 60
+    # PWP=0.15, AWC=0.20 → rwc = (sm-0.15)/0.20 * 100; et0=0, precip=0
+    # sm=0.31 → rwc=80 → base=0.0 → score=0.0
+    assert fe._drought_score(0.0, 0.0, 0.31) == pytest.approx(0.0)
+    # sm=0.27 → rwc=60 → base=0.5
+    assert fe._drought_score(0.0, 0.0, 0.27) == pytest.approx(0.5)
+    # sm=0.23 → rwc=40 → base=1.0
+    assert fe._drought_score(0.0, 0.0, 0.23) == pytest.approx(1.0)
+    # sm=0.19 → rwc=20 → base=2.0
+    assert fe._drought_score(0.0, 0.0, 0.19) == pytest.approx(2.0)
+    # sm=0.14 → rwc<20 → base=3.0 (below PWP)
+    assert fe._drought_score(0.0, 0.0, 0.14) == pytest.approx(3.0)
 
 
 def test_parse_oni_text_extracts_history_and_forecast():
@@ -130,14 +134,14 @@ def test_parse_oni_text_extracts_history_and_forecast():
     # 15 history rows here so expect 15 + 3 = 18
     assert len(result) == 18
 
-    # Last 3 should be forecasts
-    assert result[-1].get("forecast") is True
-    assert result[-2].get("forecast") is True
-    assert result[-3].get("forecast") is True
+    # Last 3 should be preliminary (forecast) rows
+    assert result[-1].get("preliminary") is True
+    assert result[-2].get("preliminary") is True
+    assert result[-3].get("preliminary") is True
 
-    # History rows should NOT have "forecast" key
-    assert "forecast" not in result[0]
-    assert "forecast" not in result[-4]
+    # History rows should NOT have "preliminary" key
+    assert "preliminary" not in result[0]
+    assert "preliminary" not in result[-4]
 
     # Values should come from ANOM column
     assert result[-1]["value"] == pytest.approx(0.8)

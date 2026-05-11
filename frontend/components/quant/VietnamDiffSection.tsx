@@ -49,9 +49,6 @@ function QuantileBar({ value }: { value: number }) {
 }
 
 export default function VietnamDiffSection() {
-  const totalContrib = FACTORS.reduce((a, f) => a + f.contribution, 0);
-  const computedFinal = BASE + totalContrib;
-
   // SHAP waterfall order — largest magnitude first
   const shapFactors = [...FACTORS].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
 
@@ -62,6 +59,10 @@ export default function VietnamDiffSection() {
           <span className="text-[10px] font-bold uppercase tracking-widest text-sky-400 bg-sky-950/60 px-2 py-0.5 rounded">Section 4</span>
           <h2 className="text-base font-bold text-white">Vietnam Differential Forecast</h2>
           <span className="text-[10px] text-slate-500">MFA · Q-Range [−5, +5] · High-variance regime</span>
+        </div>
+        <div className="flex items-center gap-2 mt-1 px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-500 w-fit">
+          <span className="text-amber-400 font-bold">MOCK DATA</span>
+          <span>VN stocks-to-use pipeline not yet wired. Figures below are illustrative only.</span>
         </div>
         <p className="text-xs text-slate-400 mt-1 max-w-3xl">
           Same Multi-Factor Architecture as Robusta Futures but targeting the Vietnam differential.{" "}

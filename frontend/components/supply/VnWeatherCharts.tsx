@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ComposedChart, BarChart, Bar, LineChart, Line, Area,
+  ComposedChart, BarChart, Bar, Line, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
@@ -330,7 +330,7 @@ export default function VnWeatherCharts() {
         setData(d);
         setSelected(new Set(d.provinces.map((p) => p.name)));
       })
-      .catch(() => {});
+      .catch((err) => console.error("[VnWeatherCharts] vn_weather fetch failed:", err));
   }, []);
 
   function toggleProvince(name: string) {

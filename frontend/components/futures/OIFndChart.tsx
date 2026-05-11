@@ -4,7 +4,6 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-import { API_URL } from "@/lib/api";
 
 interface SeriesPoint { day: number; oi: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }
@@ -142,7 +141,7 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
           />
           <Tooltip
             contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-            formatter={(v: any, name: any) => [`${v}K`, name]}
+            formatter={(v: unknown, name: unknown) => [`${v}K`, name]}
             labelFormatter={l => `Day ${l} to FND`}
           />
           <Legend

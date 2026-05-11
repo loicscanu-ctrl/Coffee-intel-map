@@ -1,0 +1,181 @@
+{
+  "country": "indonesia",
+  "scraped_at": "2026-04-25T12:18:54.531695Z",
+  "exports": {
+    "source": "ICO (sample data)",
+    "last_updated": "2026-03",
+    "unit": "thousand 60-kg bags",
+    "monthly": [
+      {
+        "month": "2024-04",
+        "total_k_bags": 805.8,
+        "yoy_pct": -7.2
+      },
+      {
+        "month": "2024-05",
+        "total_k_bags": 856.7,
+        "yoy_pct": -1.6
+      },
+      {
+        "month": "2024-06",
+        "total_k_bags": 1010.5,
+        "yoy_pct": 5.3
+      },
+      {
+        "month": "2024-07",
+        "total_k_bags": 937.4,
+        "yoy_pct": 1.8
+      },
+      {
+        "month": "2024-08",
+        "total_k_bags": 838.3,
+        "yoy_pct": -12.4
+      },
+      {
+        "month": "2024-09",
+        "total_k_bags": 723.5,
+        "yoy_pct": -6.6
+      },
+      {
+        "month": "2024-10",
+        "total_k_bags": 694.7,
+        "yoy_pct": -2.6
+      },
+      {
+        "month": "2024-11",
+        "total_k_bags": 716.3,
+        "yoy_pct": 6.4
+      },
+      {
+        "month": "2024-12",
+        "total_k_bags": 694.0,
+        "yoy_pct": 3.7
+      },
+      {
+        "month": "2025-01",
+        "total_k_bags": 654.7,
+        "yoy_pct": 2.6
+      },
+      {
+        "month": "2025-02",
+        "total_k_bags": 580.4,
+        "yoy_pct": -8.2
+      },
+      {
+        "month": "2025-03",
+        "total_k_bags": 688.7,
+        "yoy_pct": -7.8
+      },
+      {
+        "month": "2025-04",
+        "total_k_bags": 884.0,
+        "yoy_pct": 9.7
+      },
+      {
+        "month": "2025-05",
+        "total_k_bags": 901.2,
+        "yoy_pct": 5.2
+      },
+      {
+        "month": "2025-06",
+        "total_k_bags": 1006.5,
+        "yoy_pct": -0.4
+      },
+      {
+        "month": "2025-07",
+        "total_k_bags": 990.0,
+        "yoy_pct": 5.6
+      },
+      {
+        "month": "2025-08",
+        "total_k_bags": 826.9,
+        "yoy_pct": -1.4
+      },
+      {
+        "month": "2025-09",
+        "total_k_bags": 807.5,
+        "yoy_pct": 11.6
+      },
+      {
+        "month": "2025-10",
+        "total_k_bags": 762.5,
+        "yoy_pct": 9.8
+      },
+      {
+        "month": "2025-11",
+        "total_k_bags": 706.2,
+        "yoy_pct": -1.4
+      },
+      {
+        "month": "2025-12",
+        "total_k_bags": 638.3,
+        "yoy_pct": -8.0
+      },
+      {
+        "month": "2026-01",
+        "total_k_bags": 678.0,
+        "yoy_pct": 3.6
+      },
+      {
+        "month": "2026-02",
+        "total_k_bags": 585.2,
+        "yoy_pct": 0.8
+      },
+      {
+        "month": "2026-03",
+        "total_k_bags": 694.7,
+        "yoy_pct": 0.9
+      }
+    ]
+  },
+  "weather": null,
+  "enso": null,
+  "harvest_windows": [
+    {
+      "island": "Sumatra (Robusta)",
+      "harvest": "Mar–Aug",
+      "flowering": "Oct–Dec",
+      "crop": "robusta"
+    },
+    {
+      "island": "Sumatra (Arabica)",
+      "harvest": "Oct–Mar",
+      "flowering": "Apr–Jun",
+      "crop": "arabica"
+    },
+    {
+      "island": "Java",
+      "harvest": "Jul–Sep",
+      "flowering": "Nov–Jan",
+      "crop": "mixed"
+    },
+    {
+      "island": "Sulawesi",
+      "harvest": "Oct–Mar",
+      "flowering": "Apr–Jun",
+      "crop": "arabica"
+    },
+    {
+      "island": "Flores",
+      "harvest": "Jun–Sep",
+      "flowering": "Jan–Mar",
+      "crop": "arabica"
+    }
+  ],
+  "production_mix": {
+    "robusta_pct": 75,
+    "arabica_pct": 25,
+    "note": "Indonesia is the world's 3rd largest robusta producer.",
+    "key_regions": {
+      "robusta": [
+        "Lampung",
+        "Java"
+      ],
+      "arabica": [
+        "Gayo",
+        "Toraja",
+        "Flores"
+      ]
+    }
+  }
+}

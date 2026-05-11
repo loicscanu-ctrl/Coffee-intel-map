@@ -95,7 +95,7 @@ export default function CumulativePaceChart({ series, filteredSeries, typeFilter
           <Line type="monotone" dataKey={prior1Key} stroke={CROP_YEAR_COLORS[1]}
             strokeWidth={1.5} dot={false} connectNulls />
           <Line type="monotone" dataKey={currentKey} stroke={CROP_YEAR_COLORS[0]}
-            strokeWidth={2.5} dot={(props: any) => {
+            strokeWidth={2.5} dot={(props: { index: number; payload?: Record<string, number | null>; cx?: number; cy?: number; key?: string }) => {
               if (props.index !== lastIdx || props.payload?.[currentKey] == null) return <g key={props.key} />;
               return (
                 <g key={props.key}>

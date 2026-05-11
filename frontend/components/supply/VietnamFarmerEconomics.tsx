@@ -64,14 +64,14 @@ export default function VietnamFarmerEconomics() {
     fetch("/data/vn_farmer_economics.json")
       .then(r => r.json())
       .then(setData)
-      .catch(() => {});
+      .catch((err) => console.error("[VietnamFarmerEconomics] vn_farmer_economics fetch failed:", err));
     fetch("/data/vn_physical_prices.json")
       .then(r => r.json())
-      .then((d: any) => {
+      .then((d: { vn_faq?: { usd_per_mt?: number } }) => {
         const price = d?.vn_faq?.usd_per_mt;
         if (price) setVnFaqSpot(price);
       })
-      .catch(() => {});
+      .catch((err) => console.error("[VietnamFarmerEconomics] vn_physical_prices fetch failed:", err));
   }, []);
 
   if (!data) {

@@ -591,6 +591,9 @@ def _fetch_and_upsert(db) -> None:
     today = date.today()
     year  = today.year
 
+    # Snapshot current max date before downloading — used for staleness guard below
+    prev_arabica_date = db.query(func.max(CommodityCot.date)).filter_by(symbol="arabica").scalar()
+
     # Download CFTC — fallback to prior year if current year returns 0 rows
     _phase(f"download_cftc({year})")
     try:
@@ -621,6 +624,15 @@ def _fetch_and_upsert(db) -> None:
     # Log latest report dates per symbol (helps diagnose stale data)
     dates_seen = sorted({str(rd) for (rd, _) in cot_data.values()})
     print(f"[macro_cot] report dates in this run: {dates_seen}", file=sys.stderr)
+
+    # Guard: if downloaded arabica date is not newer than DB, CFTC hasn't published yet.
+    # Raise so the CI retry loop fires and eventually triggers the Telegram failure alert.
+    new_arabica_date = cot_data.get("arabica", (None,))[0]
+    if prev_arabica_date is not None and new_arabica_date is not None and new_arabica_date <= prev_arabica_date:
+        raise ValueError(
+            f"[macro_cot] no new COT data — DB has {prev_arabica_date}, downloaded {new_arabica_date}. "
+            "CFTC may not have published yet; will retry."
+        )
 
     # Upsert COT rows into commodity_cot (all symbols)
     _phase(f"upsert_commodity_cot({len(cot_data)} symbols)")

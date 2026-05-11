@@ -1,74 +1,26 @@
 "use client";
+import { useEffect, useState } from "react";
 
 interface SentimentItem {
-  id: number;
   headline: string;
-  body: string;
   source: string;
   sentiment: "Bullish" | "Bearish" | "Neutral";
   confidence: number;
   tags: string[];
 }
 
-const ITEMS: SentimentItem[] = [
-  {
-    id: 1,
-    headline: "Brazil 2025/26 crop estimate revised lower on dry weather",
-    body: "CONAB revised its Brazil arabica estimate to 38.4 million bags, below its prior forecast of 40.1 million bags, citing persistent drought conditions in Minas Gerais during the flowering period.",
-    source: "Reuters",
-    sentiment: "Bullish",
-    confidence: 82.4,
-    tags: ["supply", "brazil", "arabica"],
-  },
-  {
-    id: 2,
-    headline: "Vietnam robusta exports decline 18% YoY in March",
-    body: "Vietnamese robusta exports fell to 145,000 tonnes in March, down 18% year-on-year, as domestic stocks remain critically low ahead of the April-May harvest. Premiums in the local market widened to record levels.",
-    source: "ICO",
-    sentiment: "Bullish",
-    confidence: 91.3,
-    tags: ["supply", "vietnam", "robusta"],
-  },
-  {
-    id: 3,
-    headline: "Starbucks Q2 same-store sales miss estimates by 3%",
-    body: "Starbucks reported global comparable store sales declined 1% in Q2, missing analyst consensus of +2.1%, driven by softness in the US market. Management guided cautiously for Q3 on consumer spending headwinds.",
-    source: "Bloomberg",
-    sentiment: "Bearish",
-    confidence: 74.8,
-    tags: ["demand", "earnings", "sbux"],
-  },
-  {
-    id: 4,
-    headline: "USD rally pressures commodity prices broadly",
-    body: "The DXY Index touched a two-month high at 105.8, putting broad pressure on dollar-denominated commodities. Coffee joined the selloff with arabica futures declining 1.2% on the session.",
-    source: "FT",
-    sentiment: "Bearish",
-    confidence: 68.2,
-    tags: ["macro", "fx", "arabica"],
-  },
-  {
-    id: 5,
-    headline: "ICO composite indicator remains range-bound near 230 cents/lb",
-    body: "The ICO composite price indicator has traded within a 220-240 cents/lb range for the third consecutive week, reflecting balanced supply and demand signals. Market participants await USDA WASDE revision.",
-    source: "ICO",
-    sentiment: "Neutral",
-    confidence: 55.6,
-    tags: ["prices", "ico"],
-  },
-  {
-    id: 6,
-    headline: "Managed money net long positions trimmed for second week",
-    body: "CFTC data shows managed money trimmed net long positions in arabica by 3,400 contracts to 48,200, reflecting cautious sentiment amid macro uncertainty. Commercial hedging activity increased.",
-    source: "CFTC",
-    sentiment: "Bearish",
-    confidence: 61.5,
-    tags: ["cot", "positioning", "arabica"],
-  },
-];
-
-const OVERALL_SENTIMENT: "Bullish" | "Bearish" | "Neutral" = "Bearish";
-const OVERALL_CONFIDENCE = 60.71;
+interface SentimentData {
+  available: boolean;
+  reason?: string;
+  scraped_at?: string;
+  overall_sentiment?: "Bullish" | "Bearish" | "Neutral";
+  overall_confidence?: number;
+  bull_count?: number;
+  bear_count?: number;
+  neutral_count?: number;
+  total?: number;
+  items?: SentimentItem[];
+}
 
 const SENT_COLOR = {
   Bullish: "text-emerald-400 bg-emerald-950/60 border-emerald-700",
@@ -81,122 +33,146 @@ const SENT_BAR = {
   Neutral: "bg-slate-600",
 };
 
-const bullCount = ITEMS.filter(i => i.sentiment === "Bullish").length;
-const bearCount = ITEMS.filter(i => i.sentiment === "Bearish").length;
-const neutCount = ITEMS.filter(i => i.sentiment === "Neutral").length;
-const total = ITEMS.length;
+function fmtAgo(iso: string): string {
+  const h = (Date.now() - Date.parse(iso)) / 3_600_000;
+  if (h < 1)  return `${Math.round(h * 60)}m ago`;
+  if (h < 24) return `${Math.round(h)}h ago`;
+  return `${Math.round(h / 24)}d ago`;
+}
 
 export default function SentimentSection() {
+  const [data, setData] = useState<SentimentData | null>(null);
+
+  useEffect(() => {
+    fetch("/data/quant_report.json")
+      .then(r => r.ok ? r.json() : null)
+      .then(j => setData(j?.sentiment ?? { available: false, reason: "No data" }))
+      .catch(() => setData({ available: false, reason: "Fetch failed" }));
+  }, []);
+
+  const loading = data === null;
+  const unavailable = data !== null && !data.available;
+
+  const items    = data?.items ?? [];
+  const total    = data?.total ?? 0;
+  const bull     = data?.bull_count ?? 0;
+  const bear     = data?.bear_count ?? 0;
+  const neutral  = data?.neutral_count ?? 0;
+  const overall  = data?.overall_sentiment ?? "Neutral";
+  const overallConf = data?.overall_confidence ?? 50;
+
   return (
     <section className="px-6 py-5 space-y-4">
       <div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded">Section 5</span>
           <h2 className="text-base font-bold text-white">Coffee News Sentiment Analysis</h2>
-          <span className="text-[10px] text-slate-500">NLP · Probabilistic classification · Confidence scoring</span>
+          <span className="text-[10px] text-slate-500">Claude AI · NLP classification · Confidence scoring</span>
         </div>
         <p className="text-xs text-slate-400 mt-1 max-w-3xl">
-          AI categorizes qualitative text into discrete sentiment vectors:{" "}
+          AI classifies recent coffee news headlines into discrete sentiment signals:{" "}
           <span className="text-emerald-400">Bullish</span>,{" "}
           <span className="text-red-400">Bearish</span>, or{" "}
           <span className="text-slate-400">Neutral</span>.
-          Each classification carries a pseudo-probability confidence score from the model&apos;s output distribution.
+          Confidence reflects model certainty (0–100%).
+          {data?.scraped_at && (
+            <span className="text-slate-600 ml-2">{fmtAgo(data.scraped_at)}</span>
+          )}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-        {/* Aggregate panel */}
-        <div className="xl:col-span-1 space-y-3">
-          {/* Overall verdict */}
-          <div className="bg-slate-900 rounded-lg p-4 text-center space-y-2">
-            <div className="text-[10px] text-slate-500 uppercase tracking-wider">Overall Sentiment</div>
-            <div className={`text-2xl font-bold ${SENT_COLOR[OVERALL_SENTIMENT].split(" ")[0]}`}>
-              {OVERALL_SENTIMENT}
-            </div>
-            <div className="text-xs text-slate-400">Confidence</div>
-            <div className="text-3xl font-bold font-mono text-white">{OVERALL_CONFIDENCE.toFixed(2)}%</div>
-            <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-              <div
-                className={`h-2 rounded-full ${SENT_BAR[OVERALL_SENTIMENT]}`}
-                style={{ width: `${OVERALL_CONFIDENCE}%` }}
-              />
-            </div>
-          </div>
+      {loading && (
+        <div className="text-xs text-slate-500 animate-pulse py-8 text-center">Loading sentiment data…</div>
+      )}
 
-          {/* Distribution */}
-          <div className="bg-slate-900 rounded-lg p-4 space-y-2">
-            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Distribution</div>
-            {(["Bullish", "Bearish", "Neutral"] as const).map(s => {
-              const count = s === "Bullish" ? bullCount : s === "Bearish" ? bearCount : neutCount;
-              const pct = (count / total) * 100;
-              return (
-                <div key={s} className="space-y-0.5">
-                  <div className="flex justify-between">
-                    <span className={`text-[11px] ${SENT_COLOR[s].split(" ")[0]}`}>{s}</span>
-                    <span className="text-[11px] font-mono text-slate-400">{count}/{total}</span>
-                  </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full">
-                    <div className={`h-1.5 rounded-full ${SENT_BAR[s]}`} style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Methodology note */}
-          <div className="bg-slate-900 rounded-lg p-4 space-y-1.5">
-            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Methodology</div>
-            <p className="text-[10px] text-slate-400 leading-relaxed">
-              Each news item is vectorized into a sentiment embedding. The model outputs a softmax probability
-              distribution across the three classes. The reported confidence is the maximum class probability,
-              representing the model&apos;s certainty in the dominant sentiment.
-            </p>
-            <div className="pt-1 space-y-1 font-mono text-[10px] text-slate-500">
-              <div>P(Bullish | text)</div>
-              <div>P(Bearish | text)</div>
-              <div>P(Neutral | text)</div>
-              <div className="text-slate-600">Σ = 1.0</div>
-            </div>
+      {unavailable && (
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-6 text-center space-y-2">
+          <div className="text-sm text-slate-400">Sentiment analysis not yet available</div>
+          <div className="text-[10px] text-slate-600">{data?.reason}</div>
+          <div className="text-[10px] text-slate-600 mt-1">
+            Add <code className="text-slate-400">ANTHROPIC_API_KEY</code> to GitHub Actions secrets to enable.
           </div>
         </div>
+      )}
 
-        {/* News items */}
-        <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {ITEMS.map((item) => (
-            <div key={item.id} className="bg-slate-900 rounded-lg p-3 space-y-2 border border-slate-800 hover:border-slate-700 transition-colors">
-              {/* Header */}
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-[11px] font-semibold text-slate-200 leading-tight">{item.headline}</span>
-                <span className={`shrink-0 text-[9px] px-1.5 py-0.5 rounded border font-bold ${SENT_COLOR[item.sentiment]}`}>
-                  {item.sentiment}
-                </span>
+      {!loading && !unavailable && (
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+          {/* Aggregate panel */}
+          <div className="xl:col-span-1 space-y-3">
+            <div className="bg-slate-900 rounded-lg p-4 text-center space-y-2">
+              <div className="text-[10px] text-slate-500 uppercase tracking-wider">Overall Sentiment</div>
+              <div className={`text-2xl font-bold ${SENT_COLOR[overall].split(" ")[0]}`}>{overall}</div>
+              <div className="text-xs text-slate-400">Confidence</div>
+              <div className="text-3xl font-bold font-mono text-white">{overallConf.toFixed(1)}%</div>
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div className={`h-2 rounded-full ${SENT_BAR[overall]}`} style={{ width: `${overallConf}%` }} />
               </div>
+            </div>
 
-              {/* Body */}
-              <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-3">{item.body}</p>
+            <div className="bg-slate-900 rounded-lg p-4 space-y-2">
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Distribution ({total} headlines)</div>
+              {(["Bullish", "Bearish", "Neutral"] as const).map(s => {
+                const count = s === "Bullish" ? bull : s === "Bearish" ? bear : neutral;
+                const pct   = total > 0 ? (count / total) * 100 : 0;
+                return (
+                  <div key={s} className="space-y-0.5">
+                    <div className="flex justify-between">
+                      <span className={`text-[11px] ${SENT_COLOR[s].split(" ")[0]}`}>{s}</span>
+                      <span className="text-[11px] font-mono text-slate-400">{count}/{total}</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-700 rounded-full">
+                      <div className={`h-1.5 rounded-full ${SENT_BAR[s]}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
-              {/* Footer */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {item.tags.map(tag => (
-                    <span key={tag} className="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">{tag}</span>
-                  ))}
+            <div className="bg-slate-900 rounded-lg p-4 space-y-1.5">
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Methodology</div>
+              <p className="text-[10px] text-slate-400 leading-relaxed">
+                Recent coffee news headlines scored by Claude (Haiku) via a single structured prompt.
+                Confidence reflects the model&apos;s self-reported certainty per headline.
+                Overall signal uses confidence-weighted majority vote.
+              </p>
+              <div className="pt-1 space-y-1 font-mono text-[10px] text-slate-500">
+                <div>P(Bullish | headline)</div>
+                <div>P(Bearish | headline)</div>
+                <div>P(Neutral | headline)</div>
+                <div className="text-slate-600">Model: claude-haiku-4-5</div>
+              </div>
+            </div>
+          </div>
+
+          {/* News cards */}
+          <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {items.map((item, idx) => (
+              <div key={idx} className="bg-slate-900 rounded-lg p-3 space-y-2 border border-slate-800 hover:border-slate-700 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[11px] font-semibold text-slate-200 leading-tight">{item.headline}</span>
+                  <span className={`shrink-0 text-[9px] px-1.5 py-0.5 rounded border font-bold ${SENT_COLOR[item.sentiment]}`}>
+                    {item.sentiment}
+                  </span>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="text-[9px] text-slate-500">{item.source}</div>
-                  <div className="text-[10px] font-mono font-bold text-white">{item.confidence.toFixed(1)}%</div>
-                  <div className="w-16 h-1 bg-slate-700 rounded-full mt-0.5 ml-auto">
-                    <div
-                      className={`h-1 rounded-full ${SENT_BAR[item.sentiment]}`}
-                      style={{ width: `${item.confidence}%` }}
-                    />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {item.tags.slice(0, 4).map(tag => (
+                      <span key={tag} className="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">{tag}</span>
+                    ))}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[9px] text-slate-500">{item.source}</div>
+                    <div className="text-[10px] font-mono font-bold text-white">{item.confidence.toFixed(1)}%</div>
+                    <div className="w-16 h-1 bg-slate-700 rounded-full mt-0.5 ml-auto">
+                      <div className={`h-1 rounded-full ${SENT_BAR[item.sentiment]}`} style={{ width: `${item.confidence}%` }} />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

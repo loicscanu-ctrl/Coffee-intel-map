@@ -99,6 +99,16 @@ def _month_str_to_date(month_str: str) -> date | None:
         except ValueError:
             return None
 
+    # Portuguese/English abbreviation: "Jan/2026"
+    _MONTHS = {"jan":1,"fev":2,"feb":2,"mar":3,"abr":4,"apr":4,"mai":5,"may":5,
+               "jun":6,"jul":7,"ago":8,"aug":8,"set":9,"sep":9,"out":10,"oct":10,
+               "nov":11,"dez":12,"dec":12}
+    m = re.fullmatch(r"([A-Za-z]{3})/(\d{4})", s)
+    if m:
+        month_num = _MONTHS.get(m.group(1).lower())
+        if month_num:
+            return date(int(m.group(2)), month_num, 1)
+
     return None
 
 

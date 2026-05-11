@@ -40,13 +40,17 @@ jobs:
           git add \
                   frontend/public/data/futures_chain.json \
                   frontend/public/data/oi_fnd_chart.json \
+                  frontend/public/data/oi_history.json \
                   frontend/public/data/cot.json \
                   frontend/public/data/cot_recent.json \
                   frontend/public/data/macro_cot.json \
                   frontend/public/data/freight.json \
                   frontend/public/data/farmer_economics.json \
-                  frontend/public/data/health.json
-          for f in frontend/public/data/vietnam_last.json; do
+                  frontend/public/data/farmer_selling_brazil.json \
+                  frontend/public/data/health.json \
+                  frontend/public/data/latest_prices.json \
+                  frontend/public/data/vietnam_supply.json
+          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json; do
             [ -f "$f" ] && git add "$f" || true
           done
           git diff --cached --quiet \

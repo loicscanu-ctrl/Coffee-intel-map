@@ -31,7 +31,7 @@ export async function GET() {
     // Upstash returns the value as a string — parse it
     const data = typeof result === "string" ? JSON.parse(result) : result;
     return NextResponse.json(data);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "fetch_failed" }, { status: 503 });
   }
 }

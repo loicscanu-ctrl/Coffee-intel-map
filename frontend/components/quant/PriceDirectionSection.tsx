@@ -72,6 +72,12 @@ export default function PriceDirectionSection() {
         <span className="text-[10px] text-slate-500">Robusta · First 30 Minutes · Triple Barrier Classification</span>
       </div>
 
+      {/* Data availability notice */}
+      <div className="flex items-center gap-2 px-3 py-2 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-500">
+        <span className="text-amber-400 font-bold">MOCK DATA</span>
+        <span>Requires intraday ICE RC price feed — not yet wired. Figures below are illustrative only.</span>
+      </div>
+
       {/* ── Summary table ──────────────────────────────────────── */}
       <div className="bg-slate-900 rounded-lg overflow-hidden">
         <table className="w-full text-xs border-collapse">

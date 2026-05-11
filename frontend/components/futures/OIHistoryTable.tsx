@@ -242,8 +242,8 @@ function CotEstimateSection({ days, totals, cotByDateRef, sortedCotDates }: {
     return prevNet;
   }
 
-  // Header shows MM net estimate for most recent day
-  const latestMmEst = estimate(0, COT_EST_ROWS[0]);
+  // Header shows MM net estimate for most recent day (computed but currently unused in display)
+  void estimate(0, COT_EST_ROWS[0]);
   const anchor0     = getAnchor(days[0]?.date ?? "");
 
   return (
@@ -681,7 +681,7 @@ export default function OIHistoryTable({ market }: { market: "robusta" | "arabic
   }, [market]);
 
   useEffect(() => {
-    fetch("/data/cot.json")
+    fetch("/data/cot_recent.json")
       .then(r => r.json())
       .then((rows: CotWeeklyRow[]) => {
         const mk2 = market === "arabica" ? "ny" : "ldn";
@@ -692,7 +692,7 @@ export default function OIHistoryTable({ market }: { market: "robusta" | "arabic
         }
         setCotByDate(map);
       })
-      .catch(() => {});
+      .catch((err) => console.error("[OIHistoryTable] cot fetch failed:", err));
   }, [market]);
 
   const symbols = Array.from(

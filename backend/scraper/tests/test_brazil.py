@@ -2,7 +2,11 @@ from scraper.sources.brazil import parse_cecafe, parse_cooabriel, parse_noticias
 
 
 def test_parse_cooabriel_extracts_price():
-    html = '<td class="valor">R$ 1.250,00</td>'
+    import json
+    data = {"props": {"pageProps": {"ssp": {"cotacoesCafe": {"cotacoes": [
+        {"nomeCafe": "Conilon 7", "preco": 1250.0}
+    ]}}}}}
+    html = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(data)}</script>'
     result = parse_cooabriel(html)
     assert result is not None
     assert result["source"] == "Cooabriel"

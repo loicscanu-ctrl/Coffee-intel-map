@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from sources.conab_supply import (
     _brl_to_float,
     _parse_conab_custos_excel,
-    _parse_conab_safra_html,
 )
 
 # ---------------------------------------------------------------------------
@@ -41,44 +40,6 @@ def test_brl_to_float_integer_format():
 
 def test_brl_to_float_plain_integer():
     assert _brl_to_float("100") == 100.0
-
-
-# ---------------------------------------------------------------------------
-# _parse_conab_safra_html
-# ---------------------------------------------------------------------------
-
-def test_parse_conab_safra_html_extracts_brazil_row():
-    html = """
-    <table>
-      <tr><th>Produto/UF</th><th>Área Colhida (mil ha)</th><th>Produtividade (sc/ha)</th></tr>
-      <tr><td>Brasil</td><td>2.240,5</td><td>32,1</td></tr>
-    </table>
-    """
-    result = _parse_conab_safra_html(html)
-    assert result is not None
-    assert result["harvested_area_kha"] == 2240.5
-    assert result["yield_bags_ha"] == 32.1
-
-
-def test_parse_conab_safra_html_case_insensitive():
-    html = """
-    <table>
-      <tr><td>BRASIL</td><td>1.500,0</td><td>28,5</td></tr>
-    </table>
-    """
-    result = _parse_conab_safra_html(html)
-    assert result is not None
-    assert result["harvested_area_kha"] == 1500.0
-    assert result["yield_bags_ha"] == 28.5
-
-
-def test_parse_conab_safra_html_returns_none_on_no_data():
-    html = "<html><body>sem dados</body></html>"
-    assert _parse_conab_safra_html(html) is None
-
-
-def test_parse_conab_safra_html_returns_none_on_empty():
-    assert _parse_conab_safra_html("") is None
 
 
 # ---------------------------------------------------------------------------
