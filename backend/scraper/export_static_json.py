@@ -1141,20 +1141,20 @@ def export_latest_prices(db) -> None:
 
     tickers: list[dict] = []
 
-    # KC front month — symbol label + change from meta; price from PhysicalPrice if available
+    # KC front month — price + change both from NewsItem.meta (same source as chain table)
     kc = _chain_item("arabica")
     if kc:
-        last = pp["KC_FRONT"].price if "KC_FRONT" in pp else kc.get("last")
+        last = kc.get("last")
         chg  = kc.get("chg", 0) or 0
         sym  = kc.get("symbol", "KC")
         if last is not None:
             sign = "+" if chg >= 0 else ""
             tickers.append({"label": sym, "value": f"{float(last):.2f} ({sign}{chg:.2f})", "category": "futures"})
 
-    # RC front month
+    # RC front month — same
     rc = _chain_item("robusta")
     if rc:
-        last = pp["RC_FRONT"].price if "RC_FRONT" in pp else rc.get("last")
+        last = rc.get("last")
         chg  = rc.get("chg", 0) or 0
         sym  = rc.get("symbol", "RC")
         if last is not None:
