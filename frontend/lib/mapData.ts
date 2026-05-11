@@ -13,7 +13,7 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Ho Chi Minh City", l: [10.7, 106.6] },
   { n: "Jakarta", l: [-6.1, 106.8] },
   { n: "Mombasa", l: [-4.0, 39.6] },
-  { n: "Lagos", l: [6.45, 3.40] },
+  { n: "Cape Town", l: [-33.92, 18.42] },
   { n: "Chennai", l: [13.08, 80.27] },
   { n: "Tuticorin", l: [8.76, 78.13] },
   { n: "Antwerp", l: [51.22, 4.40] },
@@ -38,6 +38,8 @@ export const PORTS: { n: string; l: [number, number] }[] = [
   { n: "Budapest", l: [47.49, 19.04] },
   { n: "Katowice", l: [50.26, 19.02] },
   { n: "Gioia Tauro", l: [38.43, 15.91] },
+  { n: "Mersin", l: [36.81, 34.63] },
+  { n: "Gothenburg", l: [57.71, 11.97] },
 ];
 
 // ── Destination hub markers (one per regional hub) ────────────────────────────
@@ -308,76 +310,178 @@ export const ROUTES: {
   // AMERICAS ROUTES
   // ═══════════════════════════════════════════════════════════
 
-  // ── Brazil trunk routes (Santos origin) ─────────────────────────────────
+  // ── Brazil trunks (Santos origin) ───────────────────────────────────────
+  //
+  // Architecture (cleaned up): two main trunks share Santos.
+  //
+  //   East trunk:  Santos → Atlantic divergence (NY + Cartagena peel off NW)
+  //                       → Gibraltar (Med branch peels off E to Mersin,
+  //                                    reusing existing Med spurs for
+  //                                    Algiers / Barcelona / Genoa / Trieste
+  //                                    / Gioia Tauro)
+  //                       → Bay of Biscay → Channel → North Sea → Baltic
+  //                       → St Petersburg, with spurs to Le Havre, London,
+  //                         Antwerp, Hamburg, Gothenburg.
+  //
+  //   South trunk: Santos → Cape Town (terminus spur) → Indian Ocean
+  //                       → Tuticorin spur → Malacca → Shanghai spur
+  //                       → Tokyo.
+  //
+  // Vitória feeds the East trunk in mid Atlantic. Old separate routes to
+  // West Africa, North Africa, the Conilon/Cartagena leg, and the two
+  // standalone Santos→Channel/NY routes are absorbed into these trunks.
+
+  // Atlantic divergence point (shared waypoint for trunk + NY/Cartagena spurs)
+  //   [0.0, -25.0]    equatorial mid-Atlantic
+  // Gibraltar divergence point
+  //   [36.0, -5.3]    shared with main trunk and Med branch
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BRAZIL EAST TRUNK: Santos → St Petersburg
+  // ─────────────────────────────────────────────────────────────────────────
   {
-    name: "Brazil (Santos) → Channel Entry",
+    name: "Brazil East Trunk: Santos → St Petersburg",
     color: "#e74c3c",
-    path: [[-23.95, -46.3], [-20.0, -40.0], [-10.0, -32.0], [-5.0, -31.0], [5.0, -28.0], [20.0, -25.0], [40.0, -15.0], [48.0, -7.0]],
-    cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Russia & CIS"],
-  },
-  {
-    name: "Brazil (Santos) → NY",
-    color: "#e74c3c",
-    path: [[-23.95, -46.3], [-20.0, -38.0], [-10.0, -34.0], [-5.0, -34.5], [5.0, -45.0], [15.0, -55.0], [25.0, -68.0], [32.0, -74.0], [38.0, -73.0], [40.5, -73.8]],
-    cecafeHubs: ["North America"],
-  },
-  {
-    name: "Brazil (Santos) → Asia (Cape Route via Malacca)",
-    color: "#e74c3c",
+    weight: 4,
     path: [
       [-23.95, -46.3],  // Santos
-      [-28.0, -40.0],   // S Atlantic
-      [-36.0, -20.0],   // Mid S Atlantic
-      [-40.0, 0.0],     // S Atlantic E
-      [-39.0, 18.0],    // W of Cape of Good Hope
-      [-34.36, 18.47],  // Cape of Good Hope
-      [-25.0, 33.0],    // Mozambique coast
-      [-15.0, 40.5],    // N Mozambique
-      [-8.0, 46.0],     // W Indian Ocean
-      [-3.0, 60.0],     // Central Indian Ocean
-      [4.0, 78.0],      // S of Sri Lanka
-      [5.8, 90.0],      // Andaman approach
-      [5.8, 95.5],      // Bay of Bengal
-      [5.5, 98.0],      // Malacca Strait N
-      [3.0, 100.5],     // Mid Malacca Strait
-      [1.26, 103.8],    // Singapore
-      [8.0, 110.0],     // S China Sea
-      [15.0, 116.0],    // E of Philippines
-      [22.0, 123.0],    // Luzon Strait
-      [30.0, 128.0],    // East China Sea
-      [35.61, 139.78],  // Tokyo
+      [-18.0,  -38.0],  // off Vitória (Vitória feeder joins here)
+      [-10.0,  -32.0],  // mid Brazilian coast
+      [-5.0,   -30.0],  // off Cabo de São Roque
+      [0.0,    -25.0],  // Atlantic divergence 1 (NY + Cartagena peel off)
+      [10.0,   -22.0],  // mid Atlantic
+      [20.0,   -18.0],  //
+      [30.0,   -12.0],  //
+      [36.0,   -5.3],   // Gibraltar (divergence 2: Med branch peels off)
+      [40.0,   -10.0],  // off Portugal, heading north
+      [43.0,   -11.0],  // Bay of Biscay
+      [48.0,   -7.0],   // Channel entry
+      [50.0,   -1.0],   // English Channel (Le Havre spur junction — existing)
+      [51.2,    1.8],   // Dover Strait (London spur junction — existing)
+      [52.0,    3.0],   // North Sea (Antwerp + Hamburg spur junctions)
+      [54.0,    8.0],   // North Sea N
+      [55.0,   12.5],   // Oresund (Gothenburg spur junction)
+      [56.5,   18.5],   // Baltic central
+      [57.5,   21.5],   // Baltic E
+      [59.5,   24.5],   // Gulf of Finland W
+      [59.94,  30.32],  // St Petersburg
     ],
-    cecafeHubs: ["East Asia", "SE Asia & Pacific"],
+    cecafeHubs: ["Nordics", "Central Europe", "South Europe", "Eastern Europe", "Russia & CIS"],
   },
+
+  // Atlantic divergence → NY (peels NW from the equatorial mid-Atlantic)
   {
-    name: "Brazil (Santos) → West Africa",
-    color: "#e74c3c",
-    path: [[-23.95, -46.3], [-15.0, -36.0], [-5.0, -28.0], [0.0, -10.0], [3.0, -4.0], [5.35, -4.00], [6.45, 3.40]],
-    cecafeHubs: ["Sub-Saharan Africa"],
-  },
-  {
-    name: "Brazil (Santos) → North Africa",
-    color: "#e74c3c",
-    path: [[-23.95, -46.3], [-10.0, -32.0], [5.0, -28.0], [20.0, -22.0], [28.0, -15.0], [33.6, -7.6]],
-    cecafeHubs: ["North Africa"],
-  },
-  // Conilon (robusta) route: Vitória → Cartagena via open Atlantic + Caribbean
-  {
-    name: "Brazil (Vitória/Conilon) → Cartagena",
+    name: "Brazil East Spur: Atlantic → NY",
     color: "#e74c3c",
     path: [
-      [-20.3, -40.3],   // Vitória
-      [-10.0, -36.0],   // N along coast
-      [-4.0,  -34.5],   // near Cabo de São Roque (NE tip)
-      [0.0,   -34.0],   // open Atlantic — clear of Amazon delta
-      [5.0,   -46.0],   // Atlantic NW — clear of Guiana coast
-      [8.0,   -56.0],   // Atlantic off Suriname
+      [0.0,   -25.0],   // divergence 1 (shared with trunk)
+      [10.0,  -45.0],   // NW into the Caribbean approach
+      [20.0,  -60.0],   //
+      [30.0,  -72.0],   //
+      [38.0,  -73.0],   //
+      [40.5,  -73.8],   // New York
+    ],
+    cecafeHubs: ["North America"],
+  },
+
+  // Atlantic divergence → Cartagena (peels NW, splits south of NY route)
+  {
+    name: "Brazil East Spur: Atlantic → Cartagena",
+    color: "#e74c3c",
+    path: [
+      [0.0,   -25.0],   // divergence 1 (shared with trunk)
+      [5.0,   -40.0],   //
+      [8.0,   -55.0],   // Atlantic off Suriname
       [10.5,  -62.5],   // Caribbean, near Trinidad
-      [11.5,  -68.0],   // N of Venezuela coast
-      [11.0,  -73.0],   // approaching
+      [11.0,  -73.0],   // N Venezuela coast
       [10.4,  -75.5],   // Cartagena
     ],
     cecafeHubs: ["Latin America"],
+  },
+
+  // Med branch: Gibraltar → Mersin. Reuses existing Med spurs at the
+  // [37.5, 3.0] / [37.5, 10.0] / [36.0, 15.0] junctions for Algiers,
+  // Barcelona, Genoa, Trieste and Gioia Tauro.
+  {
+    name: "Brazil East Branch: Gibraltar → Mersin (Med)",
+    color: "#e74c3c",
+    weight: 3,
+    path: [
+      [36.0,  -5.3],    // Gibraltar (shared with trunk)
+      [37.0,   0.0],    // near Ibiza
+      [37.5,   3.0],    // Western Med — Barcelona / Algiers junction (existing)
+      [37.5,  10.0],    // Western Med — Genoa junction (existing)
+      [36.0,  15.0],    // Central Med — Trieste / Gioia Tauro junction (existing)
+      [34.0,  25.0],    // Eastern Med
+      [36.0,  33.0],    // off Cyprus
+      [36.81, 34.63],   // Mersin
+    ],
+    cecafeHubs: ["Middle East", "Eastern Europe"],
+  },
+
+  // North-Europe spurs off the East Trunk
+  {
+    name: "Brazil East Spur: North Sea → Antwerp",
+    color: "#e74c3c",
+    weight: 2,
+    path: [[52.0, 3.0], [51.8, 3.5], [51.22, 4.40]],
+  },
+  {
+    name: "Brazil East Spur: Oresund → Gothenburg",
+    color: "#e74c3c",
+    weight: 2,
+    path: [[55.0, 12.5], [57.0, 12.0], [57.71, 11.97]],
+  },
+
+  // Vitória feeder: joins the East Trunk near the mid-Atlantic Brazilian coast
+  {
+    name: "Feeder: Vitória → Brazil East Trunk",
+    color: "#e74c3c",
+    weight: 2,
+    path: [[-20.3, -40.3], [-19.0, -39.0], [-18.0, -38.0]],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BRAZIL SOUTH TRUNK: Santos → Tokyo (via Cape, Tuticorin, Shanghai)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    name: "Brazil South Trunk: Santos → Tokyo",
+    color: "#e74c3c",
+    weight: 4,
+    path: [
+      [-23.95, -46.3],  // Santos
+      [-28.0,  -40.0],  // S Atlantic
+      [-36.0,  -20.0],  // Mid S Atlantic
+      [-40.0,   0.0],   // S Atlantic E
+      [-39.0,  15.0],   // approaching Cape
+      [-34.0,  18.5],   // Cape of Good Hope (Cape Town spur junction)
+      [-30.0,  25.0],   // off South Africa
+      [-25.0,  33.0],   // Mozambique coast
+      [-15.0,  40.5],   //
+      [-8.0,   46.0],   // W Indian Ocean
+      [-3.0,   60.0],   // Central Indian Ocean
+      [4.0,    78.0],   // S of Sri Lanka
+      [5.8,    80.4],   // Tuticorin spur junction (existing — reused)
+      [5.8,    95.5],   // Bay of Bengal
+      [5.5,    98.0],   // Malacca Strait N
+      [3.0,   100.5],   // Mid Malacca
+      [1.26,  103.8],   // Singapore (passing through)
+      [8.0,   110.0],   // S China Sea
+      [15.0,  116.0],   // E of Philippines
+      [22.0,  123.0],   // Luzon Strait
+      [30.0,  128.0],   // East China Sea (Shanghai spur junction — existing)
+      [33.0,  134.0],   //
+      [35.61, 139.78],  // Tokyo
+    ],
+    cecafeHubs: ["East Asia", "SE Asia & Pacific", "Sub-Saharan Africa", "South Asia"],
+  },
+
+  // Cape Town spur: short branch off the South Trunk at the Cape junction
+  {
+    name: "Brazil South Spur: Cape Junction → Cape Town",
+    color: "#e74c3c",
+    weight: 2,
+    path: [[-34.0, 18.5], [-33.92, 18.42]],
   },
 
   // Honduras → Channel Entry
