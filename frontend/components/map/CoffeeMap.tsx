@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { Map as LeafletMap, TileLayer } from "leaflet";
+import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
+import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
 
 // ── Hub → Portuguese country list (Cecafe) ────────────────────────────────────
 const HUB_COUNTRIES: Record<string, string[]> = {
@@ -178,8 +179,24 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const tileLayerRef = useRef<TileLayer | null>(null);
+  const countryMarkersRef = useRef<Array<{ marker: LeafletMarker; name: string }>>([]);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
+  const [originPrices, setOriginPrices] = useState<Map<string, OriginPrice>>(new Map());
+
+  // Permanent price labels for origin pins. Read the two JSON files that
+  // are already published by the export pipeline, compute USD + diff vs
+  // matching front month, and re-render whenever they refresh.
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetch("/data/latest_prices.json").then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch("/data/acaphe_live.json").then(r => r.ok ? r.json() : null).catch(() => null),
+    ]).then(([latest, acaphe]) => {
+      if (!cancelled) setOriginPrices(computeOriginPrices(latest, acaphe));
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // ── Map initialization (runs once) ────────────────────────────────────────
   useEffect(() => {
@@ -324,6 +341,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       });
 
       // ── Country pins ──────────────────────────────────────────────────────
+      // Origin price tooltips are attached by a separate effect (depends on
+      // the async price fetch); we just store marker refs here so that
+      // effect can find them.
+      countryMarkersRef.current = [];
       const countriesLayer = Leaflet.layerGroup().addTo(map);
       (countries as CountryPin[]).forEach((c) => {
         const isProducer = c.type === "producer";
@@ -338,7 +359,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
         const statsHtml = isProducer
           ? `<div>PROD: ${d.prod || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`
           : `<div>CONS: ${d.cons || "—"}</div><div>STOCK: ${d.stock || "—"}</div>`;
-        Leaflet.marker([c.lat, c.lng], { icon })
+        const marker = Leaflet.marker([c.lat, c.lng], { icon })
           .bindPopup(
             `<div style="font-family:monospace;font-size:12px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:4px;min-width:160px">` +
             `<b>${c.name}</b><br>${statsHtml}` +
@@ -346,6 +367,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
             `</div>`
           )
           .addTo(countriesLayer);
+        countryMarkersRef.current.push({ marker: marker as LeafletMarker, name: c.name });
       });
 
       // ── Factory pins ──────────────────────────────────────────────────────
@@ -405,6 +427,26 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       }).addTo(map);
     });
   }, [activeBasemap]);
+
+  // Origin-price permanent tooltips: bind / rebind when prices load.
+  // Markers are created in the main map effect; this effect just toggles
+  // tooltips on those existing markers when the price data refreshes.
+  useEffect(() => {
+    countryMarkersRef.current.forEach(({ marker, name }) => {
+      const price = originPrices.get(name.toLowerCase());
+      marker.unbindTooltip();
+      if (price) {
+        marker.bindTooltip(
+          `<div class="origin-price-tt-body">` +
+            `<div class="origin-price-tt-local">${price.local}</div>` +
+            `<div class="origin-price-tt-usd">${price.usd}</div>` +
+            `<div style="color:${price.diffColor}">${price.diff}</div>` +
+          `</div>`,
+          { permanent: true, direction: "right", offset: [8, 0], className: "origin-price-tt" },
+        );
+      }
+    });
+  }, [originPrices]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>

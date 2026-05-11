@@ -19,6 +19,37 @@ html, body {
   animation: ticker-scroll 40s linear infinite;
 }
 
+/* Permanent origin-price label on map pins.
+   Strip leaflet's default tooltip chrome so the inner styled box shows
+   through cleanly. */
+.leaflet-tooltip.origin-price-tt {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  white-space: nowrap;
+}
+.leaflet-tooltip.origin-price-tt::before {
+  display: none !important;
+}
+.origin-price-tt-body {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #334155;
+  border-radius: 3px;
+  padding: 3px 6px;
+}
+.origin-price-tt-local {
+  font-weight: 600;
+  color: #f1f5f9;
+}
+.origin-price-tt-usd {
+  color: #94a3b8;
+}
+
 @media print {
   @page {
     margin: 1.5cm;
