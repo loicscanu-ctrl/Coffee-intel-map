@@ -5,64 +5,64 @@
       {
         "contract": "KC N26",
         "expiry": "2026-07-15",
-        "last": 274.2,
-        "chg": 0.95,
+        "last": 274.8,
+        "chg": 1.55,
         "oi": null,
-        "volume": 17046,
+        "volume": 25289,
         "symbol": "KCN26"
       },
       {
         "contract": "KC U26",
         "expiry": "2026-09-15",
-        "last": 266.3,
-        "chg": 1.15,
+        "last": 267.15,
+        "chg": 2.0,
         "oi": null,
-        "volume": 7938,
+        "volume": 11448,
         "symbol": "KCU26"
       },
       {
         "contract": "KC Z26",
         "expiry": "2026-12-15",
-        "last": 259.4,
-        "chg": 0.55,
+        "last": 260.6,
+        "chg": 1.75,
         "oi": null,
-        "volume": 3917,
+        "volume": 5723,
         "symbol": "KCZ26"
       },
       {
         "contract": "KC H27",
         "expiry": "2027-03-15",
-        "last": 256.7,
-        "chg": 0.3,
+        "last": 258.0,
+        "chg": 1.6,
         "oi": null,
-        "volume": 1279,
+        "volume": 2052,
         "symbol": "KCH27"
       },
       {
         "contract": "KC K27",
         "expiry": "2027-05-15",
-        "last": 255.65,
-        "chg": 0.3,
+        "last": 256.95,
+        "chg": 1.6,
         "oi": null,
-        "volume": 630,
+        "volume": 501,
         "symbol": "KCK27"
       },
       {
         "contract": "KC N27",
         "expiry": "2027-07-15",
-        "last": 255.0,
-        "chg": 0.35,
+        "last": 256.25,
+        "chg": 1.6,
         "oi": null,
-        "volume": 133,
+        "volume": 391,
         "symbol": "KCN27"
       },
       {
         "contract": "KC U27",
         "expiry": "2027-09-15",
-        "last": 254.25,
-        "chg": 1.65,
+        "last": 254.4,
+        "chg": 1.8,
         "oi": null,
-        "volume": 43,
+        "volume": 120,
         "symbol": "KCU27"
       }
     ]
