@@ -5,19 +5,20 @@ import {
   ARABICA_MT_FACTOR, ROBUSTA_MT_FACTOR,
   MARGIN_OUTRIGHT, MARGIN_SPREAD, CENTS_LB_TO_USD_TON,
 } from "@/lib/cot/transformApiData";
+import type { CotMarketPositions, CotTradersGroup, ProcessedCotRow } from "@/lib/cot/types";
 
 interface GenRow {
   id: number; date: string; priceNY: number; priceLDN: number; avgPrice_USD_Ton: number;
   oiNY: number; oiLDN: number; totalOI: number; spreadingTotal: number; outrightTotal: number;
   weeklyNominalFlow: number; weeklyMarginFlow: number; cumulativeNominal: number; cumulativeMargin: number;
-  ny: Record<string, number>; ldn: Record<string, number>;
-  tradersNY: Record<string, number>; tradersLDN: Record<string, number>;
+  ny: CotMarketPositions; ldn: CotMarketPositions;
+  tradersNY: CotTradersGroup; tradersLDN: CotTradersGroup;
   pmpuShortMT_NY: number; pmpuShortMT_LDN: number; pmpuShortMT: number;
   pmpuLongMT_NY: number; pmpuLongMT_LDN: number; pmpuLongMT: number;
-  efpMT: number; timeframe: string;
+  efpMT: number; timeframe: ProcessedCotRow["timeframe"];
 }
 
-export function generateData() {
+export function generateData(): ProcessedCotRow[] {
   const weeks = 1040; // ~20 years
   const data: GenRow[] = [];
   let priceNY = 130, priceLDN = 1800, oiNY = 180000, oiLDN = 110000;
@@ -54,12 +55,12 @@ export function generateData() {
 
     const mkBreakdown = (oi: number, baseT: number) => ({
       oi: {
-        pmpuLong:   oi * 0.05, pmpuShort:  oi * 0.45,
-        mmLong:     oi * 0.175, mmShort:   oi * 0.075,
-        swapLong:   oi * 0.06,  swapShort:  oi * 0.04,
-        otherLong:  oi * 0.03,  otherShort: oi * 0.02,
-        nonRepLong: oi * 0.05,  nonRepShort: oi * 0.05,
-      },
+        pmpuLong:   oi * 0.05, pmpuShort:  oi * 0.45,  pmpuSpread:   0,
+        mmLong:     oi * 0.175, mmShort:   oi * 0.075, mmSpread:     0,
+        swapLong:   oi * 0.06,  swapShort:  oi * 0.04, swapSpread:   0,
+        otherLong:  oi * 0.03,  otherShort: oi * 0.02, otherSpread:  0,
+        nonRepLong: oi * 0.05,  nonRepShort: oi * 0.05, nonRepSpread: 0,
+      } satisfies CotMarketPositions,
       traders: {
         pmpu: Math.floor(baseT * 0.15), mm:     Math.floor(baseT * 0.15),
         swap: Math.floor(baseT * 0.05), other:  Math.floor(baseT * 0.10),
