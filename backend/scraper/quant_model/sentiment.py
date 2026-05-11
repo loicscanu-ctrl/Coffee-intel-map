@@ -1,7 +1,7 @@
 """
 sentiment.py
-Classify recent coffee news headlines as Bullish / Bearish / Neutral using Claude.
-Requires ANTHROPIC_API_KEY environment variable; returns {available: False} if absent.
+Classify recent coffee news headlines as Bullish / Bearish / Neutral using Gemini.
+Requires GEMINI_API_KEY environment variable; returns {available: False} if absent.
 
 Usage (debug):
     cd backend
@@ -57,9 +57,9 @@ def _relevant_news(db, days: int = 7, limit: int = 25) -> list[dict]:
 
 
 def run(db) -> dict:
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        return {"available": False, "reason": "ANTHROPIC_API_KEY not configured"}
+        return {"available": False, "reason": "GEMINI_API_KEY not configured"}
 
     news = _relevant_news(db)
     if not news:
@@ -83,21 +83,18 @@ def run(db) -> dict:
     )
 
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=api_key)
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = response.content[0].text.strip()
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+        raw = response.text.strip()
         if "```" in raw:
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
         classifications = json.loads(raw.strip())
     except Exception as e:
-        return {"available": False, "reason": f"Claude API error: {e}"}
+        return {"available": False, "reason": f"Gemini API error: {e}"}
 
     cls_map = {c["n"]: c for c in classifications}
 
