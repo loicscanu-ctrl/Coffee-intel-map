@@ -1,4 +1,4 @@
-name: "9.3 – Acaphe Live Quotes Poll"
+name: "0.1 – Acaphe Live Quotes Poll"
 
 # Polls acaphe.com via the --once mode of acaphe_poller.py and pushes the
 # latest snapshot to Upstash Redis. Runs every 5 minutes — the closest GH
