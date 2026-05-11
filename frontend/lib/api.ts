@@ -50,12 +50,28 @@ export function clearApiCache(): void {
   _cache.clear();
 }
 
-export async function fetchMapCountries() {
-  return apiGet("/api/map/countries", { cache: "no-store" });
+export interface CountryPin {
+  type: string;
+  lat: number;
+  lng: number;
+  name: string;
+  data?: { prod?: string; stock?: string; cons?: string; intel?: string };
 }
 
-export async function fetchMapFactories() {
-  return apiGet("/api/map/factories", { cache: "no-store" });
+export interface FactoryPin {
+  lat: number;
+  lng: number;
+  name: string;
+  company?: string;
+  capacity?: string;
+}
+
+export async function fetchMapCountries(): Promise<CountryPin[]> {
+  return apiGet<CountryPin[]>("/api/map/countries", { cache: "no-store" });
+}
+
+export async function fetchMapFactories(): Promise<FactoryPin[]> {
+  return apiGet<FactoryPin[]>("/api/map/factories", { cache: "no-store" });
 }
 
 export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
@@ -70,6 +86,9 @@ export interface NewsItem {
   category: string;
   tags: string[];
   pub_date: string;
+  /** Map pin coordinates — present on geo-tagged items, null/missing otherwise. */
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export async function fetchNews(category?: string): Promise<NewsItem[]> {

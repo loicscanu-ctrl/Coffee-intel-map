@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
 import NewsFeed from "@/components/map/NewsFeed";
 import MarketTicker from "@/components/map/MarketTicker";
-import { fetchMapCountries, fetchMapFactories, fetchNews } from "@/lib/api";
+import {
+  fetchMapCountries, fetchMapFactories, fetchNews,
+  type CountryPin, type FactoryPin, type NewsItem,
+} from "@/lib/api";
 
 const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
   ssr: false,
@@ -16,12 +19,12 @@ const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
 });
 
 export default function MapPageClient() {
-  const [news, setNews] = useState<unknown[]>([]);
-  const [countries, setCountries] = useState<unknown[]>([]);
-  const [factories, setFactories] = useState<unknown[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [countries, setCountries] = useState<CountryPin[]>([]);
+  const [factories, setFactories] = useState<FactoryPin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPin, setSelectedPin] = useState<unknown>(null);
+  const [selectedPin, setSelectedPin] = useState<NewsItem | null>(null);
   const [showFeed, setShowFeed] = useState(false);
 
   useEffect(() => {
@@ -31,11 +34,11 @@ export default function MapPageClient() {
         if (cancelled) return;
         const [newsRes, countriesRes, factoriesRes] = results;
         const failures: string[] = [];
-        if (newsRes.status === "fulfilled") setNews(newsRes.value as unknown[]);
+        if (newsRes.status === "fulfilled") setNews(newsRes.value);
         else { console.error("[map] fetchNews failed", newsRes.reason); failures.push("news"); }
-        if (countriesRes.status === "fulfilled") setCountries(countriesRes.value as unknown[]);
+        if (countriesRes.status === "fulfilled") setCountries(countriesRes.value);
         else { console.error("[map] fetchMapCountries failed", countriesRes.reason); failures.push("countries"); }
-        if (factoriesRes.status === "fulfilled") setFactories(factoriesRes.value as unknown[]);
+        if (factoriesRes.status === "fulfilled") setFactories(factoriesRes.value);
         else { console.error("[map] fetchMapFactories failed", factoriesRes.reason); failures.push("factories"); }
         // Only surface the error on non-localhost deploys — locally the backend
         // simply may not be running, which is fine (map loads without pins/news).
@@ -70,7 +73,7 @@ export default function MapPageClient() {
         ) : (
           <>
             <CoffeeMap onPinClick={setSelectedPin} countries={countries} factories={factories} news={news} />
-            <NewsSidebar item={selectedPin as (Record<string, string> | null)} onClose={() => setSelectedPin(null)} />
+            <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
             <button
               onClick={() => setShowFeed(f => !f)}
               className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-[10px] px-2 py-1 rounded shadow"
@@ -80,7 +83,7 @@ export default function MapPageClient() {
           </>
         )}
       </div>
-      {showFeed && !loading && <NewsFeed initialNews={news as { title?: string; pub_date?: string; category?: string }[]} />}
+      {showFeed && !loading && <NewsFeed initialNews={news} />}
     </div>
   );
 }
