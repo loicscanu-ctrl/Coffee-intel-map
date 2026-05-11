@@ -44,7 +44,7 @@ def _load(filename: str) -> dict | list | None:
 # ── Section builders ──────────────────────────────────────────────────────────
 
 def _fmt_change(v) -> str:
-    if v is None:
+    if not isinstance(v, (int, float)):
         return ""
     sign = "+" if v >= 0 else ""
     return f" ({sign}{v:.0f})"
