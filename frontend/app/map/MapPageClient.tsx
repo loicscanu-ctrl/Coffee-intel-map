@@ -37,10 +37,17 @@ export default function MapPageClient() {
         else { console.error("[map] fetchMapCountries failed", countriesRes.reason); failures.push("countries"); }
         if (factoriesRes.status === "fulfilled") setFactories(factoriesRes.value);
         else { console.error("[map] fetchMapFactories failed", factoriesRes.reason); failures.push("factories"); }
-        if (failures.length === results.length) {
-          setError("Couldn't reach the API. Check NEXT_PUBLIC_API_URL and that the backend is online.");
-        } else if (failures.length > 0) {
-          setError(`Some data failed to load: ${failures.join(", ")}.`);
+        // Only surface the error on non-localhost deploys — locally the backend
+        // simply may not be running, which is fine (map loads without pins/news).
+        const isLocal = typeof window !== "undefined" && (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        );
+        if (!isLocal && failures.length > 0) {
+          setError(failures.length === results.length
+            ? "Couldn't reach the API. Check NEXT_PUBLIC_API_URL and that the backend is online."
+            : `Some data failed to load: ${failures.join(", ")}.`
+          );
         }
         setLoading(false);
       });
