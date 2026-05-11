@@ -20,10 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: |
-          pip install -r requirements.txt \
-            pytest httpx \
-            beautifulsoup4 deep-translator yfinance
+        run: pip install -r requirements.txt pytest httpx
 
       - name: Run backend unit tests
         working-directory: backend

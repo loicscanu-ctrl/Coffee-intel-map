@@ -59,9 +59,9 @@ def _prices_section() -> str:
         arabica = acaphe.get("arabica", [])
         robusta = acaphe.get("robusta", [])
         # Front month KC
-        for row in arabica:
+        for i, row in enumerate(arabica):
             month = row.get("month", "")
-            if "KC" in month or ("KCK" in month) or (arabica.index(row) == 0):
+            if i == 0 or "KC" in month:
                 last = row.get("last")
                 chg  = row.get("change")
                 if last:

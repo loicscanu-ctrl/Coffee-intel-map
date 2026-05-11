@@ -120,12 +120,12 @@ async def run_all_scrapers():
                 ("macro_cot",         lambda p: _macro_cot.run(p),                               420),
                 ("farmer_economics",  lambda p: _farmer_economics.run(p, db_ref),                SCRAPER_TIMEOUT),
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
-                ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                SCRAPER_TIMEOUT),
-                ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                SCRAPER_TIMEOUT),
-                ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               SCRAPER_TIMEOUT),
-                ("uganda_weather",    lambda p: _uganda_weather.run(p, db_ref),                  SCRAPER_TIMEOUT),
-                ("ethiopia_weather",  lambda p: _ethiopia_weather.run(p, db_ref),                SCRAPER_TIMEOUT),
-                ("ucda_reports",      lambda p: _ucda_reports.run(p, db_ref, start_id=1319, scan_back=3), SCRAPER_TIMEOUT),
+                ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
+                ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
+                ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),
+                ("uganda_weather",    lambda p: _uganda_weather.run(p, db_ref),                  60),
+                ("ethiopia_weather",  lambda p: _ethiopia_weather.run(p, db_ref),                60),
+                ("ucda_reports",      lambda p: _ucda_reports.run(p, db_ref, start_id=1319, scan_back=30), SCRAPER_TIMEOUT),
             ]:
                 await _run_side_channel(name, coro_fn, browser, timeout=timeout)
 
