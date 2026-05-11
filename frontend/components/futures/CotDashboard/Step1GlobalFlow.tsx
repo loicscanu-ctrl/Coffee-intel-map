@@ -10,7 +10,7 @@ import type { MacroCotWeek } from "@/lib/api";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import AttributionTable from "./AttributionTable";
 import SectionHeader from "./SectionHeader";
-import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS } from "./constants";
+import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS, type SectorKey } from "./constants";
 import { transformMacroData } from "./transformMacroData";
 import type { MacroToggle } from "./types";
 
@@ -36,7 +36,7 @@ export default function Step1GlobalFlow({
     return macroChartData.map(row => {
       const result: Record<string, number | string> = { date: row.date };
       for (const s of SECTORS) {
-        const v = (row as unknown as Record<string, number>)[s];
+        const v = row[s as SectorKey];
         result[`${s}_pos`] = v > 0 ? v : 0;
         result[`${s}_neg`] = v < 0 ? v : 0;
       }
@@ -47,7 +47,7 @@ export default function Step1GlobalFlow({
   const macroYDomain = useMemo(() => {
     if (macroToggle !== "net" || !macroChartData.length) return undefined;
     const allVals = macroChartData.flatMap(d =>
-      SECTORS.map(s => (d as Record<string, number>)[s])
+      SECTORS.map(s => d[s as SectorKey])
     );
     const min = Math.min(...allVals);
     const max = Math.max(...allVals);
@@ -256,7 +256,7 @@ export default function Step1GlobalFlow({
               const labelMap: Record<string, string> = { energy: "Energies", metals: "Metals", grains: "Grains", meats: "Meats", softs: "Softs", micros: "Micros" };
               const lastRow = macroChartData[macroChartData.length - 1];
               const order = lastRow
-                ? [...SECTORS].sort((a, b) => Math.abs((lastRow as Record<string, number>)[b]) - Math.abs((lastRow as Record<string, number>)[a]))
+                ? [...SECTORS].sort((a, b) => Math.abs(lastRow[b]) - Math.abs(lastRow[a]))
                 : [...SECTORS];
               return (
                 <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", fontSize: 11, paddingTop: 4 }}>
