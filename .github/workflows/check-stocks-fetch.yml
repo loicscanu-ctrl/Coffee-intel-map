@@ -9,9 +9,18 @@ name: "Z – Stocks Fetch Smoke Test (diagnostic)"
 # plus manual workflow_dispatch.
 
 on:
-  # Manual only — this is a debugging tool, not part of the normal pipeline.
-  # Run via Actions → "Z – Stocks Fetch Smoke Test (diagnostic)" → Run workflow.
   workflow_dispatch:
+  # Re-enabled temporarily to probe AJCA + ECF. Will be reset to manual-only
+  # once the new scrapers are in place.
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'backend/scraper/probe_demand_sources.py'
+      - 'backend/scraper/sources/psd_coffee.py'
+      - 'backend/scraper/sources/ecf_stocks.py'
+      - 'backend/scraper/test_stocks_fetch.py'
+      - '.github/workflows/check-stocks-fetch.yml'
 
 jobs:
   probe:
@@ -53,6 +62,15 @@ jobs:
             echo "PSD_CACHE_OK=no" >> "$GITHUB_ENV"
           fi
 
+      - name: Stage 3 — AJCA + ECF source catalog probe
+        id: probe_sources
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          python -m scraper.probe_demand_sources 2>&1 | tee /tmp/probe_sources.txt
+          echo "probe_exit=$?" >> "$GITHUB_OUTPUT"
+
       - name: Assemble diagnostic report
         if: always()
         run: |
@@ -75,6 +93,11 @@ jobs:
             echo "## Stage 2 — real PSD scraper run"
             echo '```'
             cat /tmp/psd_run.txt 2>/dev/null || echo "(no PSD output)"
+            echo '```'
+            echo ""
+            echo "## Stage 3 — AJCA + ECF source catalog"
+            echo '```'
+            cat /tmp/probe_sources.txt 2>/dev/null || echo "(no probe output)"
             echo '```'
           } > _diagnostic/stocks-fetch-result.md
 
