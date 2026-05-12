@@ -227,10 +227,11 @@ async def playwright_login() -> dict:
         await page.wait_for_timeout(5_000)
 
         cookies = await ctx.cookies()
+        final_url = page.url
         await browser.close()
 
     cookie_dict = {c["name"]: c["value"] for c in cookies}
-    print(f"[acaphe] Login OK — {len(cookie_dict)} cookie(s): {list(cookie_dict.keys())}")
+    print(f"[acaphe] Login OK — {len(cookie_dict)} cookie(s): {list(cookie_dict.keys())} | url={final_url}")
     return cookie_dict
 
 
@@ -288,7 +289,10 @@ def fetch_and_save(cookies: dict) -> bool:
         )
         return True
     except Exception as exc:
-        print(f"[acaphe] ERROR: {exc}")
+        try:
+            print(f"[acaphe] ERROR: {exc} | status={resp.status_code} | body={resp.text[:300]!r}")
+        except Exception:
+            print(f"[acaphe] ERROR: {exc}")
         return False
 
 
