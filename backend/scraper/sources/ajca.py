@@ -39,7 +39,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-_HUB_URL    = "https://coffee.ajca.or.jp/data/"
+_HUB_URL    = "https://www.ajca.or.jp/data/"
 _CACHE_PATH = Path(__file__).resolve().parents[1] / "cache" / "ajca.json"
 
 _HEADERS = {

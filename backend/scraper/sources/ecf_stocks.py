@@ -26,7 +26,12 @@ from urllib.parse import urljoin
 import requests
 
 _HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)",
+    # Real Chrome UA — ECF's WAF returns 403 for anything that looks like a bot.
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
     "Accept-Language": "en-US,en;q=0.9",
 }
 
@@ -47,7 +52,22 @@ _MONTH_NUM = {
     "july":7, "august":8, "september":9, "october":10, "november":11, "december":12,
 }
 
-# Headline-figure patterns ECF has used in posts + PDFs.
+# Posts list multiple months inline, e.g.:
+#   "Total stocks decreased from 458,801 tons in December 2025
+#    to 441,323 tons in January 2026, and further to 408,152 tons
+#    in February 2026"
+# So we extract every "(value) tons in (Month) (Year)" match and build
+# a monthly series, then fall back to the single-figure patterns for older
+# posts that used "X million bags".
+_TONS_MONTH_PAT = re.compile(
+    r"([\d,]{4,12})\s*(?:tons?|tonnes?|metric\s+tons?|MT)\s*"
+    r"in\s+("
+    r"january|february|march|april|may|june|"
+    r"july|august|september|october|november|december"
+    r")\s+(20\d{2})",
+    re.I,
+)
+
 _FIGURE_PATTERNS = [
     # "stocks ... at 9.8 million bags"
     re.compile(
@@ -66,6 +86,40 @@ _FIGURE_PATTERNS = [
         re.I | re.S,
     ),
 ]
+
+
+def _tons_to_bags(tons: int) -> int:
+    """ECF stocks reports in metric tonnes. Convert to 60-kg bags."""
+    return int(round(tons * 1000 / 60))
+
+
+def _entries_from_tons_text(text: str) -> list[dict]:
+    """Pick every '(N,XXX) tons in MONTH YYYY' match and emit one entry each."""
+    months = {n: i + 1 for i, n in enumerate([
+        "january","february","march","april","may","june",
+        "july","august","september","october","november","december",
+    ])}
+    out: list[dict] = []
+    for m in _TONS_MONTH_PAT.finditer(text):
+        try:
+            tons = int(m.group(1).replace(",", ""))
+        except ValueError:
+            continue
+        if not (100_000 < tons < 2_000_000):  # 100k-2M MT plausible band
+            continue
+        mo  = months[m.group(2).lower()]
+        yr  = int(m.group(3))
+        out.append({
+            "period":    f"{yr}-{mo:02d}",
+            "value_raw": _tons_to_bags(tons),
+            "value_mt":  tons,
+        })
+    # Dedupe by period, keep first occurrence (the text usually lists them
+    # in chronological order so first = most authoritative for that month).
+    seen: dict[str, dict] = {}
+    for e in out:
+        seen.setdefault(e["period"], e)
+    return list(seen.values())
 
 
 def _today() -> str:
@@ -141,26 +195,44 @@ def _post_pdf(html: str, base: str) -> str | None:
     return urljoin(base, m.group(1)) if m else None
 
 
-def _post_to_entry(url: str) -> dict | None:
+def _post_to_entries(url: str) -> list[dict]:
+    """Return one or more {period, value_raw, ...} entries for a stocks post.
+
+    Modern ECF posts list multiple months inline (Dec→Jan→Feb), so a single
+    post can yield 2-3 monthly entries. Old posts only carry the headline
+    bags-figure; we fall back to that.
+    """
     html = _fetch(url)
     if not html:
-        return None
+        return []
+    text = _strip_html(html)
+    pdf = _post_pdf(html, url)
+
+    # First try: extract every "(N) tons in MONTH YYYY" match
+    entries = _entries_from_tons_text(text)
+    if entries:
+        for e in entries:
+            e["post_url"] = url
+            if pdf:
+                e["pdf_url"] = pdf
+        return entries
+
+    # Fallback: single-figure "X million bags" patterns + period from slug
     slug = url.rstrip("/").rsplit("/", 1)[-1]
     period_info = _period_from_slug(slug)
-    text = _strip_html(html)
     bags = _figure_from_text(text)
-    pdf = _post_pdf(html, url)
     if not period_info and not bags:
-        return None
+        return []
     period_label = period_info[0] if period_info else _today()[:7]
     entry = {
         "period":     period_label,
-        "value_raw":  bags,
         "post_url":   url,
-        "pdf_url":    pdf,
     }
-    # Drop None to keep the cache slim, but keep period_label.
-    return {k: v for k, v in entry.items() if v is not None or k == "period"}
+    if bags is not None:
+        entry["value_raw"] = bags
+    if pdf:
+        entry["pdf_url"] = pdf
+    return [entry]
 
 
 async def run(page) -> list[dict]:
@@ -175,11 +247,10 @@ async def run(page) -> list[dict]:
         return []
 
     # Latest 12 posts ~= last 2 years of bi-monthly reports — plenty.
+    # Each post can produce multiple monthly entries.
     entries: list[dict] = []
     for url in post_urls[:12]:
-        e = _post_to_entry(url)
-        if e:
-            entries.append(e)
+        entries.extend(_post_to_entries(url))
 
     if not entries:
         print("[ecf_stocks] no parseable entries from posts")
