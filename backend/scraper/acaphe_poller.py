@@ -219,19 +219,29 @@ async def playwright_login() -> dict:
         ctx = await browser.new_context(user_agent=HEADERS["User-Agent"])
         page = await ctx.new_page()
 
-        await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30_000)
-        await page.wait_for_timeout(2_000)
+        await page.goto(LOGIN_URL, wait_until="networkidle", timeout=30_000)
+
+        # Log visible inputs to detect login form structure changes
+        inputs = await page.query_selector_all("input")
+        input_types = [await i.get_attribute("type") or "text" for i in inputs]
+        print(f"[acaphe] Form inputs found: {input_types}")
+
         await page.fill('input[type="text"]',     USERNAME)
         await page.fill('input[type="password"]', PASSWORD)
-        await page.click('input[type="submit"]')
-        await page.wait_for_timeout(5_000)
 
-        cookies = await ctx.cookies()
+        # Wait for navigation triggered by submit rather than fixed sleep
+        async with page.expect_navigation(wait_until="networkidle", timeout=20_000):
+            await page.click('input[type="submit"]')
+
         final_url = page.url
+        title = await page.title()
+        cookies = await ctx.cookies()
         await browser.close()
 
     cookie_dict = {c["name"]: c["value"] for c in cookies}
-    print(f"[acaphe] Login OK — {len(cookie_dict)} cookie(s): {list(cookie_dict.keys())} | url={final_url}")
+    print(f"[acaphe] Post-login — url={final_url} | title={title!r} | cookies={list(cookie_dict.keys())}")
+    if LOGIN_URL in final_url:
+        print("[acaphe] WARNING: still on login page — credentials may be wrong or form selector changed")
     return cookie_dict
 
 
