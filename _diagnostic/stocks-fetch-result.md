@@ -1,8 +1,8 @@
 # Stocks-fetch diagnostic
 
-- commit: `54d055945a491a97ae5f143e316ba107d0d7cb4f`
-- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25760449229
-- date:   2026-05-12 20:31 UTC
+- commit: `3d594003caf067ed97e0fc24140f082a122cc309`
+- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25760591923
+- date:   2026-05-12 20:34 UTC
 
 ## Verdict
 - PSD scraper cache written : yes
@@ -474,17 +474,149 @@
 ```
 
 ## Stage 4 — real AJCA scraper run
-- cache file written: `no`
+- cache file written: `yes`
 
 ```
-[ajca] Could not extract figures from hub page — retaining cache
+[ajca] 2025 imports=359382 MT  consumption=397272 MT (30 pdfs indexed)
+```
+
+### First 4 KB of `ajca.json`
+```json
+{
+  "source": "AJCA",
+  "source_url": "https://www.ajca.or.jp/data/",
+  "last_updated": "2026-05-12",
+  "latest_year": "2025",
+  "latest_consumption_mt": 397272,
+  "latest_imports_mt": 359382,
+  "monthly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-import202603.pdf",
+  "monthly_exports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-export202603.pdf",
+  "supply_demand_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-jukyu202603.pdf",
+  "yearly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf",
+  "pdf_index": [
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-jukyu202603.pdf",
+      "kind": "data-jukyu",
+      "upload_year": "2026",
+      "upload_month": "05",
+      "data_period": "202603"
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-jukyu202603.pdf",
+      "kind": "data-jukyu",
+      "upload_year": "2026",
+      "upload_month": "05",
+      "data_period": "202603"
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf",
+      "kind": "data-yunyu-suii",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf",
+      "kind": "data-yunyu-suii",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf",
+      "kind": "data-24",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf",
+      "kind": "data-24",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-24-202603.pdf",
+      "kind": "data-24",
+      "upload_year": "2026",
+      "upload_month": "05",
+      "data_period": "202603"
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-24-202603.pdf",
+      "kind": "data-24",
+      "upload_year": "2026",
+      "upload_month": "05",
+      "data_period": "202603"
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf",
+      "kind": "data-gc-yunyuryo-tanka",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf",
+      "kind": "data-gc-yunyuryo-tanka",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf",
+      "kind": "data-rcic-yunyuryo-tanka",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf",
+      "kind": "data-rcic-yunyuryo-tanka",
+      "upload_year": "2026",
+      "upload_month": "03",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf",
+      "kind": "data7-import-nama",
+      "upload_year": "2025",
+      "upload_month": "09",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf",
+      "kind": "data7-import-nama",
+      "upload_year": "2025",
+      "upload_month": "09",
+      "data_period": null
+    },
+    {
+      "url": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/202
 ```
 
 ## Stage 5 — real ECF scraper run
 ```
-[ecf_stocks] no stocks posts found at category index
+[ecf_stocks] index pages: 4, posts: 1, yearly_pdfs: 12
 {
-  "count": 0,
-  "items": []
+  "count": 1,
+  "items": [
+    {
+      "title": "ECF European Port Stocks \u2013 2026-02",
+      "body": "ECF European green coffee stocks for 2026-02: 6,802,533 bags (6.8M). Source: https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
+      "source": "ECF",
+      "category": "demand",
+      "lat": 51.5,
+      "lng": 5.0,
+      "tags": [
+        "stocks",
+        "europe",
+        "ecf",
+        "demand"
+      ],
+      "meta": "{\"monthly\": [{\"period\": \"2025-12\", \"value_raw\": 7646683, \"value_mt\": 458801, \"post_url\": \"https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf\"}, {\"period\": \"2026-01\", \"value_raw\": 7355383, \"value_mt\": 441323, \"post_url\": \"https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf\"}, {\"period\": \"2026-02\", \"value_raw\": 6802533, \"value_mt\": 408152, \"post_url\": \"https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf\"}], \"latest_bags\": 6802533, \"as_of\": \"2026-05-12\", \"source_url\": \"https://www.ecf-coffee.org/category/publications/stocks/\", \"latest_post\": \"https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/\", \"latest_pdf\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf\", \"yearly_pdfs\": [{\"year\": \"2026\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf\"}, {\"year\": \"2025\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf\"}, {\"year\": \"2024\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf\"}, {\"year\": \"2023\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf\"}, {\"year\": \"2022\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf\"}, {\"year\": \"2021\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf\"}, {\"year\": \"2020\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf\"}, {\"year\": \"2019\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf\"}, {\"year\": \"2018\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf\"}, {\"year\": \"2017\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf\"}, {\"year\": \"2016\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf\"}, {\"year\": \"2015\", \"pdf_url\": \"https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf\"}]}"
+    }
+  ]
 }
 ```
