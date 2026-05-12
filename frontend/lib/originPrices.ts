@@ -44,6 +44,16 @@ function parsePhysical(value: string): { localStr: string; usd: number | null } 
   return { localStr: local, usd };
 }
 
+/** Parse VND/kg from "88.300 VND" (dot = thousands separator) → number */
+function parseVndKg(localStr: string): number | null {
+  const m = localStr.match(/([\d.]+)\s*VND/);
+  if (!m) return null;
+  // Vietnamese format: dots are thousands separators ("88.300" = 88300)
+  const cleaned = m[1].replace(/\./g, "");
+  const n = Number(cleaned);
+  return isNaN(n) ? null : n;
+}
+
 /** Arabica futures: ¢/lb → USD/MT. 1 MT = 2204.62 lb, 1¢ = $0.01.
  *  Exported for when arabica-origin pins (Colombia, Honduras, Ethiopia)
  *  are wired up — diff them against KC, not RC.
@@ -75,11 +85,22 @@ export function computeOriginPrices(
   // ¢/lb and needs conversion (used once arabica-origin pins are wired up).
   const rcFront = acaphe.robusta?.[0]?.last ?? null;
 
+  // USD/VND FX rate from tickers — recomputed fresh here rather than relying
+  // on the pre-baked $USD in the ticker string, which may be from a different
+  // timestamp than the live RC price.
+  const usdVndRaw = tickers.get("USD/VND");
+  const usdVnd = usdVndRaw ? Number(usdVndRaw) : null;
+
   // ── Vietnam (FAQ — robusta) ─────────────────────────────────────────────
   // Ticker: "VN FAQ" -> "88.300 VND ($3,371)"
   const vn = tickers.get("VN FAQ");
   if (vn && rcFront != null) {
-    const { localStr, usd } = parsePhysical(vn);
+    const { localStr } = parsePhysical(vn);
+    // Recompute USD/MT from VND + live FX rate to avoid stale pre-baked value
+    const vndKg = parseVndKg(localStr);
+    const usd = (vndKg != null && usdVnd != null && usdVnd > 0)
+      ? Math.round(vndKg / usdVnd * 1000)
+      : null;
     if (usd != null) {
       const { diff, color } = fmtDiff(usd, rcFront);
       out.push({
