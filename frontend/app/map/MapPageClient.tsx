@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
 import NewsFeed from "@/components/map/NewsFeed";
+import MapLegend from "@/components/map/MapLegend";
 import {
   fetchMapCountries, fetchMapFactories, fetchNews,
   type CountryPin, type FactoryPin, type NewsItem,
@@ -72,6 +73,7 @@ export default function MapPageClient() {
           <>
             <CoffeeMap onPinClick={setSelectedPin} countries={countries} factories={factories} news={news} />
             <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
+            <MapLegend />
             <button
               onClick={() => setShowFeed(f => !f)}
               className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-[10px] px-2 py-1 rounded shadow"
