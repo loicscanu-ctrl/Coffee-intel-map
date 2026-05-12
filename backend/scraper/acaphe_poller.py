@@ -28,7 +28,7 @@ REDIS_KEY     = "live_quotes"
 DATABASE_URL  = os.environ.get("DATABASE_URL", "")
 
 
-def _push_redis(data: dict) -> None:
+def _push_redis(data: dict, key: str = REDIS_KEY) -> None:
     """Push data to Upstash Redis via REST API. Silent no-op if not configured."""
     if not UPSTASH_URL or not UPSTASH_TOKEN:
         return
@@ -40,12 +40,12 @@ def _push_redis(data: dict) -> None:
                 "Authorization": f"Bearer {UPSTASH_TOKEN}",
                 "Content-Type":  "application/json",
             },
-            json=["SET", REDIS_KEY, payload],
+            json=["SET", key, payload],
             timeout=5,
         )
         resp.raise_for_status()
     except Exception as exc:
-        print(f"[acaphe][redis] push failed: {exc}")
+        print(f"[acaphe][redis] push failed ({key}): {exc}")
 API_URL       = "https://acaphe.com/iquote.php?v="
 LOGIN_URL     = "https://acaphe.com/"
 USERNAME      = "LBS"
@@ -272,7 +272,8 @@ def fetch_and_save(cookies: dict) -> bool:
         if viet.get("bmt_bid") or viet.get("hcm_bid"):
             snapshot = {**viet, "saved_at": data["fetched_at"]}
             VIETNAM_LAST.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
-            print("[acaphe] Vietnam snapshot saved (local)")
+            _push_redis(snapshot, key="vietnam_last")
+            print("[acaphe] Vietnam snapshot saved (local + Redis)")
             if DATABASE_URL:
                 _save_vn_prices_to_db(viet, data["fetched_at"])
 

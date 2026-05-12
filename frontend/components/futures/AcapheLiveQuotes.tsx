@@ -256,10 +256,16 @@ function VietnamPanel({ data }: { data: VietnamPrices }) {
 
   React.useEffect(() => {
     if (!isLive) {
-      fetch("/data/vietnam_last.json")
+      fetch("/api/vietnam-last")
         .then(r => r.ok ? r.json() : null)
-        .then(d => d && setLast(d))
-        .catch((err) => console.error("[AcapheLiveQuotes] vietnam_last fetch failed:", err));
+        .then(d => d && !d.error && setLast(d))
+        .catch(() => {
+          // Redis unavailable — fall back to static snapshot
+          fetch("/data/vietnam_last.json")
+            .then(r => r.ok ? r.json() : null)
+            .then(d => d && setLast(d))
+            .catch(() => {});
+        });
     }
   }, [isLive]);
 
