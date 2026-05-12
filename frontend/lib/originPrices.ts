@@ -87,11 +87,13 @@ export function computeOriginPrices(
   ) ?? null;
   const rcFront = rcContract?.last ?? null;
 
-  const kcContract = acaphe.arabica?.reduce<typeof acaphe.arabica[0] | null>(
-    (best, c) => ((c.oi ?? 0) > (best?.oi ?? 0) ? c : best), null
-  ) ?? null;
-  // KC trades in ¢/lb — convert to USD/MT for differential comparison
-  const kcFront = kcContract?.last != null ? kcCentsToUsdMt(kcContract.last) : null;
+  // KC highest-OI contract (¢/lb → USD/MT). Ready for arabica-origin pins.
+  const _kcFront = (() => {
+    const c = acaphe.arabica?.reduce<typeof acaphe.arabica[0] | null>(
+      (best, cur) => ((cur.oi ?? 0) > (best?.oi ?? 0) ? cur : best), null
+    ) ?? null;
+    return c?.last != null ? kcCentsToUsdMt(c.last) : null;
+  })();
 
   // USD/VND FX rate from tickers — recomputed fresh here rather than relying
   // on the pre-baked $USD in the ticker string, which may be from a different

@@ -12,7 +12,7 @@ import SectionHeader from "./SectionHeader";
 type CyclePoint = { x: number; y: number; timeframe: ProcessedCotRow["timeframe"]; date: string };
 
 export default function Step6CycleLocation({ recent52 }: { recent52: ProcessedCotRow[] }) {
-  const cycleColor = (d: CyclePoint, market: "ny" | "ldn") => {
+  const cycleColor = (d: CyclePoint, _market: "ny" | "ldn") => {
     if (d.timeframe === "current")  return "#ef4444";
     if (d.timeframe === "recent_1") return "#f97316";
     if (d.timeframe === "recent_4") return "#eab308";
