@@ -36,6 +36,19 @@ _HEADERS = {
 }
 
 _INDEX_URL = "https://www.ecf-coffee.org/category/publications/stocks/"
+# Post URLs (stocks-in-european-ports-…) live on news pages, NOT the stocks-
+# category page (which only lists yearly PDFs). Scan both for resilience.
+_INDEX_URLS = [
+    "https://www.ecf-coffee.org/category/whats-new/news/",
+    "https://www.ecf-coffee.org/category/news/",
+    "https://www.ecf-coffee.org/category/whats-new/news/page/2/",
+    _INDEX_URL,  # also scan stocks index in case ECF restructures
+]
+# Yearly PDFs are listed only on the stocks-category page.
+_YEARLY_PDF_PAT = re.compile(
+    r'href="(https?://[^"]*?/wp-content/uploads/[^"]*?(\d{4})-Stocks-European-Ports[^"]*?\.pdf)"',
+    re.I,
+)
 # Posts have slugs starting with "stocks-in-european-ports-".
 _POST_HREF = re.compile(
     r'href="(https?://(?:www\.)?ecf-coffee\.org/(stocks-in-european-ports-[^/"]+)/?)"',
@@ -236,15 +249,32 @@ def _post_to_entries(url: str) -> list[dict]:
 
 
 async def run(page) -> list[dict]:
-    index_html = _fetch(_INDEX_URL)
-    if not index_html:
-        print("[ecf_stocks] index page unreachable")
-        return []
+    # Collect post URLs across multiple ECF index pages.
+    post_urls: list[str] = []
+    yearly_pdfs: list[dict] = []
+    pages_seen = 0
+    for idx_url in _INDEX_URLS:
+        html = _fetch(idx_url)
+        if not html:
+            continue
+        pages_seen += 1
+        for m in _POST_HREF.finditer(html):
+            url = m.group(1)
+            if url not in post_urls:
+                post_urls.append(url)
+        # Yearly PDFs only appear on the stocks-category page.
+        for m in _YEARLY_PDF_PAT.finditer(html):
+            entry = {"year": m.group(2), "pdf_url": m.group(1)}
+            if entry not in yearly_pdfs:
+                yearly_pdfs.append(entry)
 
-    post_urls = _collect_posts(index_html)
-    if not post_urls:
-        print("[ecf_stocks] no stocks posts found at category index")
+    if pages_seen == 0:
+        print("[ecf_stocks] all index pages unreachable")
         return []
+    if not post_urls and not yearly_pdfs:
+        print("[ecf_stocks] no stocks posts or yearly PDFs found")
+        return []
+    print(f"[ecf_stocks] index pages: {pages_seen}, posts: {len(post_urls)}, yearly_pdfs: {len(yearly_pdfs)}")
 
     # Latest 12 posts ~= last 2 years of bi-monthly reports — plenty.
     # Each post can produce multiple monthly entries.
@@ -252,9 +282,32 @@ async def run(page) -> list[dict]:
     for url in post_urls[:12]:
         entries.extend(_post_to_entries(url))
 
-    if not entries:
-        print("[ecf_stocks] no parseable entries from posts")
+    if not entries and not yearly_pdfs:
+        print("[ecf_stocks] no parseable entries from posts and no yearly PDFs")
         return []
+
+    if not entries and yearly_pdfs:
+        # Posts didn't yield anything, but we did find at least the
+        # yearly PDFs — emit a minimal item so the frontend can at least
+        # link to the most recent annual report.
+        latest_pdf = sorted(yearly_pdfs, key=lambda y: y["year"], reverse=True)[0]
+        return [{
+            "title":    f"ECF European Port Stocks – yearly PDF {latest_pdf['year']}",
+            "body":     f"ECF yearly stocks report available at {latest_pdf['pdf_url']}",
+            "source":   "ECF",
+            "category": "demand",
+            "lat":      51.5,
+            "lng":      5.0,
+            "tags":     ["stocks", "europe", "ecf", "demand"],
+            "meta":     json.dumps({
+                "monthly":      [],
+                "latest_bags":  None,
+                "as_of":        _today(),
+                "source_url":   _INDEX_URL,
+                "yearly_pdfs":  yearly_pdfs,
+                "latest_pdf":   latest_pdf["pdf_url"],
+            }),
+        }]
 
     # Keep one entry per period (latest wins if duplicates).
     by_period: dict[str, dict] = {}
@@ -279,11 +332,12 @@ async def run(page) -> list[dict]:
         "lng":      5.0,
         "tags":     ["stocks", "europe", "ecf", "demand"],
         "meta":     json.dumps({
-            "monthly":     series,
-            "latest_bags": value_bags or None,
-            "as_of":       _today(),
-            "source_url":  _INDEX_URL,
-            "latest_post": latest.get("post_url"),
-            "latest_pdf":  latest.get("pdf_url"),
+            "monthly":      series,
+            "latest_bags":  value_bags or None,
+            "as_of":        _today(),
+            "source_url":   _INDEX_URL,
+            "latest_post":  latest.get("post_url"),
+            "latest_pdf":   latest.get("pdf_url"),
+            "yearly_pdfs":  yearly_pdfs,
         }),
     }]
