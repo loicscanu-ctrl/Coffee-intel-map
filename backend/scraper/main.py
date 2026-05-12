@@ -36,14 +36,15 @@ from scraper.sources import ethiopia_weather as _ethiopia_weather
 from scraper.sources import farmer_economics as _farmer_economics
 from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
+from scraper.sources import ice_certified as _ice_certified
 from scraper.sources import indonesia as _indonesia
 from scraper.sources import indonesia_weather as _indonesia_weather
-from scraper.sources import japan_stocks as _japan_stocks
 from scraper.sources import macro_cot as _macro_cot
+from scraper.sources import psd_japan as _psd_japan
 from scraper.sources import ucda_reports as _ucda_reports
 from scraper.sources import uganda_weather as _uganda_weather
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _indonesia, _ethiopia, _ecf_stocks, _japan_stocks]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, demand, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _indonesia, _ethiopia, _ecf_stocks]
 SCHEDULED_HOUR_UTC = 1   # Run daily at 01:00 UTC
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
@@ -123,6 +124,8 @@ async def run_all_scrapers():
                 ("macro_cot",         lambda p: _macro_cot.run(p),                               420),
                 ("farmer_economics",  lambda p: _farmer_economics.run(p, db_ref),                SCRAPER_TIMEOUT),
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
+                ("ice_certified",     lambda p: _ice_certified.run(p, db_ref),                   SCRAPER_TIMEOUT),
+                ("psd_japan",         lambda p: _psd_japan.run(p, db_ref),                       SCRAPER_TIMEOUT),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
                 ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),

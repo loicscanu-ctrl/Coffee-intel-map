@@ -21,6 +21,9 @@ const SCRAPER_CONFIGS: ScraperConfig[] = [
   { key: "enso",              label: "ENSO",       thresholdHours: 720  }, // monthly
   { key: "fertilizer_wb",     label: "Fert. WB",   thresholdHours: 720  },
   { key: "fertilizer_comex",  label: "Fert. Comex",thresholdHours: 720  },
+  { key: "ice_certified",     label: "ICE Stocks", thresholdHours: 48   },
+  { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // 60 days (monthly publish)
+  { key: "psd_japan",         label: "PSD Japan",  thresholdHours: 2160 }, // 90 days (annual publish)
 ];
 
 function fmtAge(isoTimestamp: string): string {

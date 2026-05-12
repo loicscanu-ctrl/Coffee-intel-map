@@ -6,5 +6,6 @@ python-dotenv
 pandas
 openpyxl
 xlrd
+pypdf
 requests
 google-generativeai
