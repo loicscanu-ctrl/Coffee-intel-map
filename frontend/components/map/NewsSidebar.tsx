@@ -31,12 +31,22 @@ export default function NewsSidebar({ item, onClose }: Props) {
   if (!item) return null;
   const colorClass = CATEGORY_COLORS[item.category] || CATEGORY_COLORS.general;
   return (
-    <div className="absolute top-0 right-0 h-full w-80 bg-slate-900/95 border-l border-slate-700 z-[1000] flex flex-col shadow-2xl">
+    <div
+      className="
+        absolute z-[1000] bg-slate-900/95 border-slate-700 shadow-2xl flex flex-col
+        inset-x-0 bottom-0 max-h-[60vh] border-t rounded-t-lg
+        sm:inset-x-auto sm:bottom-auto sm:top-0 sm:right-0 sm:h-full sm:max-h-none sm:w-80 sm:border-t-0 sm:border-l sm:rounded-none
+      "
+    >
       <div className="flex items-center justify-between p-4 border-b border-slate-700">
         <span className={`text-xs font-bold uppercase border-l-4 pl-2 ${colorClass}`}>
           {CATEGORY_LABELS[item.category] || item.category}
         </span>
-        <button onClick={onClose} className="text-slate-400 hover:text-white text-lg leading-none">×</button>
+        <button
+          onClick={onClose}
+          aria-label="Close news panel"
+          className="text-slate-400 hover:text-white text-xl leading-none px-2 -mr-2 py-1"
+        >×</button>
       </div>
       <div className="p-4 overflow-y-auto flex-1">
         <h3 className="font-bold text-white mb-3 leading-snug">{item.title}</h3>

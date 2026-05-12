@@ -76,7 +76,7 @@ export default function MapPageClient() {
             <MapLegend />
             <button
               onClick={() => setShowFeed(f => !f)}
-              className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-[10px] px-2 py-1 rounded shadow"
+              className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-xs sm:text-[10px] px-3 py-2 sm:px-2 sm:py-1 rounded shadow"
             >
               {showFeed ? "▼ Hide table" : "▲ Show table"}
             </button>

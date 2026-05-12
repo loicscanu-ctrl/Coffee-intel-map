@@ -144,7 +144,7 @@ function KcRcCentsPanel({ arabica, robusta }: { arabica: Contract[]; robusta: Co
   });
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden self-start hidden lg:block">
+    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-x-auto self-start">
       <div className="px-3 py-2 bg-slate-800 border-b border-slate-700 text-center min-h-[40px] flex items-center justify-center">
         <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-widest whitespace-nowrap">Arbitrage</span>
       </div>
