@@ -5,6 +5,7 @@ from Barchart, plus CFTC Disaggregated COT for Coffee C.
 import csv
 import io
 import json
+import time
 import urllib.request
 import zipfile
 from datetime import date
@@ -224,6 +225,7 @@ def _yfinance_fallback() -> dict:
         ]:
             contracts = []
             for sym in syms:
+                time.sleep(1)
                 try:
                     quote = _quote_from_history(sym, decimals)
                 except Exception as e:
@@ -247,6 +249,7 @@ def _yfinance_fallback() -> dict:
 
             # Continuous front-month fallback — always populated on Yahoo.
             if not contracts:
+                time.sleep(2)
                 try:
                     quote = _quote_from_history(cont_sym, decimals)
                 except Exception as e:

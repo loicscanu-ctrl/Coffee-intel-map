@@ -107,9 +107,12 @@ async def run_all_scrapers():
             semaphore = asyncio.Semaphore(CONCURRENCY)
 
             # Phase 1: all news sources in parallel (capped at CONCURRENCY pages)
+            # return_exceptions=True prevents one failing source from cancelling siblings.
+            # CriticalSourceError is collected and re-raised after all tasks complete.
             tasks = [_run_one(source, browser, semaphore, db) for source in ALL_SOURCES]
-            counts = await asyncio.gather(*tasks)
-            total = sum(counts)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            critical_errors = [r for r in results if isinstance(r, BaseException) and not isinstance(r, int)]
+            total = sum(r for r in results if isinstance(r, int))
 
             # Phase 2: side-channel scrapers — run sequentially (they write to
             # their own tables and don't return news items). Per-source timeout
@@ -133,6 +136,8 @@ async def run_all_scrapers():
     finally:
         db.close()
     print(f"[scraper] Done. {total} items inserted.")
+    if critical_errors:
+        raise critical_errors[0]
 
 
 def seconds_until_next_run():
