@@ -1,8 +1,8 @@
 # Stocks-fetch diagnostic
 
-- commit: `2e2a66bd715a4b6ac31abc0e3dbc5b35a5e6ad8f`
-- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25758596664
-- date:   2026-05-12 19:55 UTC
+- commit: `1cb126d06a76124ab31ecdb11074303126e4e1c4`
+- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25760286081
+- date:   2026-05-12 20:28 UTC
 
 ## Verdict
 - PSD scraper cache written : yes
@@ -357,164 +357,9 @@
 ════════════════════════════════════════════════════════════
   ECF — European Coffee Federation probe
 ════════════════════════════════════════════════════════════
-### ECF: https://www.ecf-coffee.org/
-  200 text/html; charset=UTF-8 52,967 bytes  magic=HTML
-  links of interest (29):
-    [    ] '(no text)'                                            https://www.ecf-coffee.org
-    [    ] 'About us'                                             https://www.ecf-coffee.org/about/
-    [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
-    [    ] 'Food safety & compliance'                             https://www.ecf-coffee.org/about/food-safety/
-    [    ] 'Responsible Sourcing & Consumption'                   https://www.ecf-coffee.org/about/sourcing/
-    [    ] 'International Trade'                                  https://www.ecf-coffee.org/about/international-trade/
-    [    ] 'Governance'                                           https://www.ecf-coffee.org/about/structure/
-    [    ] 'Secretariat'                                          https://www.ecf-coffee.org/about/secretariat/
-    [    ] 'Our network'                                          https://www.ecf-coffee.org/about/network/
-    [    ] 'Contact us'                                           https://www.ecf-coffee.org/contact-us/
-    [    ] 'Members'                                              https://www.ecf-coffee.org/category/members/
-    [    ] 'National Associations'                                https://www.ecf-coffee.org/category/members/national-associations/
-    [    ] 'Companies'                                            https://www.ecf-coffee.org/category/members/companies/
-    [    ] 'Become a Member'                                      https://www.ecf-coffee.org/membership/
-    [    ] 'Publications'                                         https://www.ecf-coffee.org/category/publications/
-    [    ] 'European Coffee Reports'                              https://www.ecf-coffee.org/category/publications/european-coffee-reports/
-    [    ] 'Guidelines documents'                                 https://www.ecf-coffee.org/category/publications/guidance-documents/
-    [    ] 'Stocks in European Ports'                             https://www.ecf-coffee.org/category/publications/stocks/
-    [    ] 'European Standard Contract for Coffee (ESCC)'         https://www.ecf-coffee.org/category/publications/contracts/
-    [    ] 'Press releases'                                       https://www.ecf-coffee.org/category/publications/press-releases/
-    [    ] 'Infographics'                                         https://www.ecf-coffee.org/category/publications/infographics/
-    [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
-    [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
-    [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Commission proposes including soluble coffee in EU'   https://www.ecf-coffee.org/soluble-coffee-enters-eudr-scope-under-commission-draftdelegated-act/
-    [    ] 'ECF participates in the launch of the Internationa'   https://www.ecf-coffee.org/ecf-participates-in-the-launch-of-the-international-trade-centre-brussels-office/
-    [    ] 'ECF Annual General Meeting 2026, Tallinn, Estonia'    https://www.ecf-coffee.org/ecf-annual-general-meeting-2026-tallinn-estonia/
-    [    ] 'Transport Packaging in the context of PPWR'           https://www.ecf-coffee.org/transport-packaging-in-the-context-of-ppwr/
-    [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
-  number/stock phrases:
-    … Brussels Office Read more Events ECF Annual General Meeting 2026, Tallinn, Estonia 19/05/2026 - 2
-
-### ECF: https://www.ecf-coffee.org/resources/statistics/
-  404 text/html; charset=UTF-8 45,391 bytes  magic=HTML
-  links of interest (25):
-    [    ] 'Return home?'                                         https://www.ecf-coffee.org
-    [    ] 'About us'                                             https://www.ecf-coffee.org/about/
-    [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
-    [    ] 'Food safety & compliance'                             https://www.ecf-coffee.org/about/food-safety/
-    [    ] 'Responsible Sourcing & Consumption'                   https://www.ecf-coffee.org/about/sourcing/
-    [    ] 'International Trade'                                  https://www.ecf-coffee.org/about/international-trade/
-    [    ] 'Governance'                                           https://www.ecf-coffee.org/about/structure/
-    [    ] 'Secretariat'                                          https://www.ecf-coffee.org/about/secretariat/
-    [    ] 'Our network'                                          https://www.ecf-coffee.org/about/network/
-    [    ] 'Contact us'                                           https://www.ecf-coffee.org/contact-us/
-    [    ] 'Members'                                              https://www.ecf-coffee.org/category/members/
-    [    ] 'National Associations'                                https://www.ecf-coffee.org/category/members/national-associations/
-    [    ] 'Companies'                                            https://www.ecf-coffee.org/category/members/companies/
-    [    ] 'Become a Member'                                      https://www.ecf-coffee.org/membership/
-    [    ] 'Publications'                                         https://www.ecf-coffee.org/category/publications/
-    [    ] 'European Coffee Reports'                              https://www.ecf-coffee.org/category/publications/european-coffee-reports/
-    [    ] 'Guidelines documents'                                 https://www.ecf-coffee.org/category/publications/guidance-documents/
-    [    ] 'Stocks in European Ports'                             https://www.ecf-coffee.org/category/publications/stocks/
-    [    ] 'European Standard Contract for Coffee (ESCC)'         https://www.ecf-coffee.org/category/publications/contracts/
-    [    ] 'Press releases'                                       https://www.ecf-coffee.org/category/publications/press-releases/
-    [    ] 'Infographics'                                         https://www.ecf-coffee.org/category/publications/infographics/
-    [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
-    [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
-    [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
-
-### ECF: https://www.ecf-coffee.org/resources/
-  404 text/html; charset=UTF-8 45,391 bytes  magic=HTML
-  links of interest (25):
-    [    ] 'Return home?'                                         https://www.ecf-coffee.org
-    [    ] 'About us'                                             https://www.ecf-coffee.org/about/
-    [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
-    [    ] 'Food safety & compliance'                             https://www.ecf-coffee.org/about/food-safety/
-    [    ] 'Responsible Sourcing & Consumption'                   https://www.ecf-coffee.org/about/sourcing/
-    [    ] 'International Trade'                                  https://www.ecf-coffee.org/about/international-trade/
-    [    ] 'Governance'                                           https://www.ecf-coffee.org/about/structure/
-    [    ] 'Secretariat'                                          https://www.ecf-coffee.org/about/secretariat/
-    [    ] 'Our network'                                          https://www.ecf-coffee.org/about/network/
-    [    ] 'Contact us'                                           https://www.ecf-coffee.org/contact-us/
-    [    ] 'Members'                                              https://www.ecf-coffee.org/category/members/
-    [    ] 'National Associations'                                https://www.ecf-coffee.org/category/members/national-associations/
-    [    ] 'Companies'                                            https://www.ecf-coffee.org/category/members/companies/
-    [    ] 'Become a Member'                                      https://www.ecf-coffee.org/membership/
-    [    ] 'Publications'                                         https://www.ecf-coffee.org/category/publications/
-    [    ] 'European Coffee Reports'                              https://www.ecf-coffee.org/category/publications/european-coffee-reports/
-    [    ] 'Guidelines documents'                                 https://www.ecf-coffee.org/category/publications/guidance-documents/
-    [    ] 'Stocks in European Ports'                             https://www.ecf-coffee.org/category/publications/stocks/
-    [    ] 'European Standard Contract for Coffee (ESCC)'         https://www.ecf-coffee.org/category/publications/contracts/
-    [    ] 'Press releases'                                       https://www.ecf-coffee.org/category/publications/press-releases/
-    [    ] 'Infographics'                                         https://www.ecf-coffee.org/category/publications/infographics/
-    [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
-    [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
-    [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
-
-### ECF: https://www.ecf-coffee.org/knowledge/statistics/
-  404 text/html; charset=UTF-8 45,391 bytes  magic=HTML
-  links of interest (25):
-    [    ] 'Return home?'                                         https://www.ecf-coffee.org
-    [    ] 'About us'                                             https://www.ecf-coffee.org/about/
-    [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
-    [    ] 'Food safety & compliance'                             https://www.ecf-coffee.org/about/food-safety/
-    [    ] 'Responsible Sourcing & Consumption'                   https://www.ecf-coffee.org/about/sourcing/
-    [    ] 'International Trade'                                  https://www.ecf-coffee.org/about/international-trade/
-    [    ] 'Governance'                                           https://www.ecf-coffee.org/about/structure/
-    [    ] 'Secretariat'                                          https://www.ecf-coffee.org/about/secretariat/
-    [    ] 'Our network'                                          https://www.ecf-coffee.org/about/network/
-    [    ] 'Contact us'                                           https://www.ecf-coffee.org/contact-us/
-    [    ] 'Members'                                              https://www.ecf-coffee.org/category/members/
-    [    ] 'National Associations'                                https://www.ecf-coffee.org/category/members/national-associations/
-    [    ] 'Companies'                                            https://www.ecf-coffee.org/category/members/companies/
-    [    ] 'Become a Member'                                      https://www.ecf-coffee.org/membership/
-    [    ] 'Publications'                                         https://www.ecf-coffee.org/category/publications/
-    [    ] 'European Coffee Reports'                              https://www.ecf-coffee.org/category/publications/european-coffee-reports/
-    [    ] 'Guidelines documents'                                 https://www.ecf-coffee.org/category/publications/guidance-documents/
-    [    ] 'Stocks in European Ports'                             https://www.ecf-coffee.org/category/publications/stocks/
-    [    ] 'European Standard Contract for Coffee (ESCC)'         https://www.ecf-coffee.org/category/publications/contracts/
-    [    ] 'Press releases'                                       https://www.ecf-coffee.org/category/publications/press-releases/
-    [    ] 'Infographics'                                         https://www.ecf-coffee.org/category/publications/infographics/
-    [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
-    [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
-    [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
-
-### ECF: https://www.ecf-coffee.org/knowledge/
-  404 text/html; charset=UTF-8 45,391 bytes  magic=HTML
-  links of interest (25):
-    [    ] 'Return home?'                                         https://www.ecf-coffee.org
-    [    ] 'About us'                                             https://www.ecf-coffee.org/about/
-    [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
-    [    ] 'Food safety & compliance'                             https://www.ecf-coffee.org/about/food-safety/
-    [    ] 'Responsible Sourcing & Consumption'                   https://www.ecf-coffee.org/about/sourcing/
-    [    ] 'International Trade'                                  https://www.ecf-coffee.org/about/international-trade/
-    [    ] 'Governance'                                           https://www.ecf-coffee.org/about/structure/
-    [    ] 'Secretariat'                                          https://www.ecf-coffee.org/about/secretariat/
-    [    ] 'Our network'                                          https://www.ecf-coffee.org/about/network/
-    [    ] 'Contact us'                                           https://www.ecf-coffee.org/contact-us/
-    [    ] 'Members'                                              https://www.ecf-coffee.org/category/members/
-    [    ] 'National Associations'                                https://www.ecf-coffee.org/category/members/national-associations/
-    [    ] 'Companies'                                            https://www.ecf-coffee.org/category/members/companies/
-    [    ] 'Become a Member'                                      https://www.ecf-coffee.org/membership/
-    [    ] 'Publications'                                         https://www.ecf-coffee.org/category/publications/
-    [    ] 'European Coffee Reports'                              https://www.ecf-coffee.org/category/publications/european-coffee-reports/
-    [    ] 'Guidelines documents'                                 https://www.ecf-coffee.org/category/publications/guidance-documents/
-    [    ] 'Stocks in European Ports'                             https://www.ecf-coffee.org/category/publications/stocks/
-    [    ] 'European Standard Contract for Coffee (ESCC)'         https://www.ecf-coffee.org/category/publications/contracts/
-    [    ] 'Press releases'                                       https://www.ecf-coffee.org/category/publications/press-releases/
-    [    ] 'Infographics'                                         https://www.ecf-coffee.org/category/publications/infographics/
-    [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
-    [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
-    [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
-
-### ECF: https://www.ecf-coffee.org/news/
-  200 image/jpeg 54,214 bytes  magic=?
-  -> https://www.ecf-coffee.org/wp-content/uploads/2020/10/news.jpg
-
-### ECF: https://www.ecf-coffee.org/publications/
-  200 text/html; charset=UTF-8 67,762 bytes  magic=HTML
-  links of interest (29):
+### ECF: https://www.ecf-coffee.org/category/publications/stocks/
+  200 text/html; charset=UTF-8 75,403 bytes  magic=HTML
+  links of interest (39):
     [    ] '(no text)'                                            https://www.ecf-coffee.org
     [    ] 'About us'                                             https://www.ecf-coffee.org/about/
     [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
@@ -540,14 +385,24 @@
     [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
     [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
     [    ] 'Position papers'                                      https://www.ecf-coffee.org/category/publications/position-papers/
-    [    ] '2'                                                    https://www.ecf-coffee.org/publications/page/2/
-    [    ] '3'                                                    https://www.ecf-coffee.org/publications/page/3/
-    [    ] '5'                                                    https://www.ecf-coffee.org/publications/page/5/
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf
+    [FILE] 'Download'                                             https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf
+    [    ] '2'                                                    https://www.ecf-coffee.org/category/publications/stocks/page/2/
     [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
 
-### ECF: https://www.ecf-coffee.org/category/news/
-  200 text/html; charset=UTF-8 75,154 bytes  magic=HTML
-  links of interest (40):
+### ECF: https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/
+  200 text/html; charset=UTF-8 52,880 bytes  magic=HTML
+  links of interest (26):
     [    ] '(no text)'                                            https://www.ecf-coffee.org
     [    ] 'About us'                                             https://www.ecf-coffee.org/about/
     [    ] 'Mission'                                              https://www.ecf-coffee.org/about/role-and-mission/
@@ -572,22 +427,16 @@
     [    ] 'News & Events'                                        https://www.ecf-coffee.org/category/whats-new/
     [    ] 'News'                                                 https://www.ecf-coffee.org/category/whats-new/news/
     [    ] 'Events & Meetings'                                    https://www.ecf-coffee.org/category/whats-new/events/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/soluble-coffee-enters-eudr-scope-under-commission-draftdelegated-act/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/ecf-participates-in-the-launch-of-the-international-trade-centre-brussels-office/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/ecf-brings-together-producing-country-missions-to-address-eu-sustainability-and-trade-implications-for-coffee/
-    [    ] '(no text)'                                            https://www.ecf-coffee.org/category/uncategorised/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/msc-awarded-ecf-best-shipping-line-of-the-year-2024-2025/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/environmental-footprint-methodology-for-coffee-shadow-pefcr-of-the-european-coffee-federation/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/european-coffee-report-2024-2025/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/european-coffee-report-2023-2024/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/ilos-vision-zero-fund-and-the-european-coffee-federation-collaborate-to-improve-occupational-safety-and-health-in-the-global-coffee-supply-chain/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/european-coffee-report-2022-2023/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/ignazio-messina-c-receives-the-ecf-best-shipping-line-of-the-year-award-for-the-coffee-year-2021-2022/
-    [    ] 'Read more'                                            https://www.ecf-coffee.org/the-german-coffee-association-has-launched-ear4u-a-grievance-mechanism-to-report-concerns-on-human-rights-and-environmental-risks/
-    [    ] '2'                                                    https://www.ecf-coffee.org/category/news/page/2/
-    [    ] '3'                                                    https://www.ecf-coffee.org/category/news/page/3/
+    [FILE] 'Download the full report'                             https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf
     [    ] 'Disclaimer'                                           https://www.ecf-coffee.org/disclaimer/
+  number/stock phrases:
+    … tocks in European Ports – January &amp; February 2026 25/03/2026 The European Coffee Federation
+    … cks in European Ports report , covering January and February 2026 . The report provides a bi-monthl
+    … ators across Europe. Key figures Total stocks decreased from 458,801 tons in December 2025 to 441,32
+    … figures Total stocks decreased from 458,801 tons in December 2025 to 441,323 tons in January 2026
+    … Total stocks decreased from 458,801 tons in December 2025 to 441,323 tons in January 2026 , and furt
+    … cember 2025 to 441,323 tons in January 2026 , and further to 408,152 tons in February 2026 The decli
+    … ns in January 2026 , and further to 408,152 tons in February 2026 The decline was observed across
 
 ════════════════════════════════════════════════════════════
   Sample file probes (10 files)
@@ -622,4 +471,20 @@
   206 application/pdf len=4096 magic=PDF
     https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-ic2024.pdf
     head: 25 50 44 46 2d 31 2e 36 0d 25 e2 e3 cf d3 0d 0a
+```
+
+## Stage 4 — real AJCA scraper run
+- cache file written: `no`
+
+```
+[ajca] Could not extract figures from hub page — retaining cache
+```
+
+## Stage 5 — real ECF scraper run
+```
+[ecf_stocks] index page unreachable
+{
+  "count": 0,
+  "items": []
+}
 ```
