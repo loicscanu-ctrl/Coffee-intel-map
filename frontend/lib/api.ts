@@ -74,10 +74,6 @@ export async function fetchMapFactories(): Promise<FactoryPin[]> {
   return apiGet<FactoryPin[]>("/api/map/factories", { cache: "no-store" });
 }
 
-export async function fetchStocks(): Promise<{ date: string; value: number }[]> {
-  return cachedFetch("/api/stocks");
-}
-
 export interface NewsItem {
   id: number;
   title: string;
