@@ -5,11 +5,11 @@
  *   - clearApiCache empties everything
  *   - TTL expiration falls back to a fresh fetch
  *
- * We exercise the cache through fetchStocks() since it goes through the
- * cachedFetch path with a stable URL.
+ * We exercise the cache through fetchFreight() since it takes no args and
+ * goes through the cachedFetch path with a stable URL.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { clearApiCache, fetchStocks } from "../api";
+import { clearApiCache, fetchFreight } from "../api";
 
 
 type FetchMock = ReturnType<typeof vi.fn>;
@@ -41,37 +41,37 @@ describe("lib/api cache", () => {
   });
 
   it("hits the network on a cache miss and reuses the response on hit", async () => {
-    await fetchStocks();
-    await fetchStocks();
+    await fetchFreight();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("re-fetches after the 5-minute TTL expires", async () => {
-    await fetchStocks();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // Advance just under TTL — still a hit
     vi.advanceTimersByTime(4 * 60 * 1000 + 59 * 1000);
-    await fetchStocks();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // Advance past TTL — refetch
     vi.advanceTimersByTime(2 * 1000);
-    await fetchStocks();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("clearApiCache forces the next call to refetch", async () => {
-    await fetchStocks();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     clearApiCache();
-    await fetchStocks();
+    await fetchFreight();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("rejects when fetch returns non-ok, with status in the error message", async () => {
     fetchMock.mockResolvedValueOnce(mockJson({ error: "boom" }, false, 503));
-    await expect(fetchStocks()).rejects.toThrow(/503/);
+    await expect(fetchFreight()).rejects.toThrow(/503/);
   });
 });
 
