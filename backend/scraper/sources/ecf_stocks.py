@@ -1,61 +1,70 @@
 """
-ecf_stocks.py — European Coffee Federation green coffee port stocks.
+ecf_stocks.py — European Coffee Federation port-stocks scraper.
 
-ECF publishes monthly stock totals for European ports. Their site does
-not expose the data in a structured HTML table — figures usually live
-in downloadable PDF press releases under /wp-content/uploads/. This
-scraper therefore:
+ECF publishes bi-monthly stock reports under
+  https://www.ecf-coffee.org/category/publications/stocks/
+as individual WordPress posts named e.g.
+  /stocks-in-european-ports-january-february-2026/
+Each post embeds an infographic + PDF with the headline figure.
 
-  1. Loads the ECF statistics / news page with Playwright.
-  2. Collects every link that points to a PDF / XLS(X) / CSV file whose
-     URL or anchor text hints at "stocks", "statistics", or "ECF".
-  3. Downloads each candidate file and extracts the stock figure with
-     regex patterns ECF has used historically.
-  4. Falls back to the rendered page text if no files surface.
-
-Writes a NewsItem with source="ECF" (matching what export_stocks.py
-already reads) so wiring this scraper through main.py is enough.
+Strategy:
+  1. GET the stocks-category index, find every "stocks-in-european-ports-*" post URL.
+  2. For each post (latest N), fetch its HTML and extract:
+       a) any linked PDF URL
+       b) inline "X.X million bags" / "X,XXX,XXX bags" / "X million 60-kg bags" phrases
+  3. Build a monthly series keyed by the period encoded in the post slug
+     ("january-february-2026" → 2026-02 etc.) and emit a NewsItem with the
+     same schema export_stocks.py already reads (source="ECF").
 """
 from __future__ import annotations
 
-import io
 import json
-import logging
 import re
 from datetime import date
 from urllib.parse import urljoin
 
-import pandas as pd
 import requests
 
-logger = logging.getLogger(__name__)
-
 _HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"
+    "User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)",
+    "Accept-Language": "en-US,en;q=0.9",
 }
 
-_ECF_URLS = [
-    "https://www.ecf-coffee.org/resources/statistics/",
-    "https://www.ecf-coffee.org/knowledge/statistics/",
-    "https://www.ecf-coffee.org/statistics/",
-    "https://www.ecf-coffee.org/news/",
-    "https://www.ecf-coffee.org/",
-]
+_INDEX_URL = "https://www.ecf-coffee.org/category/publications/stocks/"
+# Posts have slugs starting with "stocks-in-european-ports-".
+_POST_HREF = re.compile(
+    r'href="(https?://(?:www\.)?ecf-coffee\.org/(stocks-in-european-ports-[^/"]+)/?)"',
+    re.I,
+)
+# PDFs hosted under wp-content/uploads.
+_PDF_HREF = re.compile(
+    r'href="(https?://[^"]*?(?:wp-content/uploads|ecf-coffee\.org)[^"]*?\.pdf)"',
+    re.I,
+)
 
-# ECF aggregate EU port stocks usually fall in this band (in actual bags,
-# not thousands). Allow wide bounds so a tightening market doesn't break
-# us — these are just sanity gates.
-_STOCK_MIN_BAGS = 1_000_000
-_STOCK_MAX_BAGS = 30_000_000
+_MONTH_NUM = {
+    "january":1, "february":2, "march":3, "april":4, "may":5, "june":6,
+    "july":7, "august":8, "september":9, "october":10, "november":11, "december":12,
+}
 
-# Tokens that mark a link as worth downloading.
-_LINK_TOKENS = ("stock", "statistic", "ecf", "port", "europe")
-# File extensions we know how to parse.
-_FILE_EXTS = (".pdf", ".xls", ".xlsx", ".csv")
-
-_MONTH_NAMES = [
-    "january", "february", "march", "april", "may", "june",
-    "july", "august", "september", "october", "november", "december",
+# Headline-figure patterns ECF has used in posts + PDFs.
+_FIGURE_PATTERNS = [
+    # "stocks ... at 9.8 million bags"
+    re.compile(
+        r"stocks?[^.]{0,120}?at\s+([\d.,]+)\s*million\s+(?:60[- ]kg\s+)?bags",
+        re.I | re.S,
+    ),
+    # "Total stocks: 9,234,567 bags"
+    re.compile(
+        r"(?:total|european|stocks?)[^.]{0,60}?stocks?[^\d]{0,60}?([\d,]{6,12})\s*bags",
+        re.I | re.S,
+    ),
+    # "Stocks decreased to 8.9 million bags"
+    re.compile(
+        r"stocks?\s+(?:rose|fell|decreased|increased|reached|stand(?:ing|s)?\s+at)[^.]{0,80}?"
+        r"([\d.,]+)\s*million\s+bags",
+        re.I | re.S,
+    ),
 ]
 
 
@@ -63,284 +72,135 @@ def _today() -> str:
     return date.today().isoformat()
 
 
-# ── number / date helpers ─────────────────────────────────────────────────────
+def _period_from_slug(slug: str) -> tuple[str, int, int] | None:
+    """'stocks-in-european-ports-january-february-2026' → ('2026-02', 2026, 2).
 
-def _parse_int(raw: str) -> int | None:
-    """Parse '9,235,123' / '9 235 123' / '9.235.123' / '9235123' as int.
-
-    Heuristic on separators:
-      - if both '.' and ',' appear, the rightmost-of-them is the decimal mark
-      - otherwise treat '.', ',', ' ' as thousands separators
+    Uses the *second* month if the slug carries a range — that's the data-as-of
+    month ECF reports against. Single-month slugs are also supported.
     """
-    s = raw.strip()
-    if not s:
-        return None
-    # Drop any trailing decimal portion ("9,235.4" → 9235)
-    if "." in s and "," in s:
-        decimal = "." if s.rindex(".") > s.rindex(",") else ","
-        s = s.split(decimal)[0]
-    s = re.sub(r"[^\d]", "", s)
-    if not s:
-        return None
-    try:
-        return int(s)
-    except ValueError:
-        return None
-
-
-def _looks_like_bag_count(n: int) -> bool:
-    return _STOCK_MIN_BAGS <= n <= _STOCK_MAX_BAGS
-
-
-def _looks_like_thousand_bags(n: int) -> bool:
-    return _STOCK_MIN_BAGS // 1000 <= n <= _STOCK_MAX_BAGS // 1000
-
-
-def _coerce_bags(n: int) -> int | None:
-    """Return bag count or None if the value doesn't fit the expected range
-    even after scaling thousands → bags."""
-    if _looks_like_bag_count(n):
-        return n
-    if _looks_like_thousand_bags(n):
-        return n * 1000
-    return None
-
-
-def _guess_period(text: str) -> str:
-    """Pull 'Month YYYY' out of free text. Falls back to today's ISO."""
     m = re.search(
-        rf"({'|'.join(_MONTH_NAMES)})\s+(20\d{{2}})",
-        text, flags=re.I
+        rf"-({'|'.join(_MONTH_NUM)})(?:-({'|'.join(_MONTH_NUM)}))?-(\d{{4}})$",
+        slug.lower(),
     )
-    if m:
-        month_idx = _MONTH_NAMES.index(m.group(1).lower()) + 1
-        return f"{m.group(2)}-{month_idx:02d}"
-    return _today()[:7]
+    if not m:
+        return None
+    second = m.group(2) or m.group(1)
+    year = int(m.group(3))
+    month_num = _MONTH_NUM[second]
+    return f"{year}-{month_num:02d}", year, month_num
 
 
-# ── parsers per file type ────────────────────────────────────────────────────
-
-_TEXT_PATTERNS = [
-    # "European port stocks at end of January 2026: 9.8 million bags"
-    re.compile(
-        r"(?:european|eu)\s+(?:port\s+)?stocks?[^\d]{0,80}?"
-        r"(\d+(?:[.,]\d+)?)\s*(?:million|m\b)\s+bags?",
-        re.I | re.S,
-    ),
-    # "ECF stocks: 9,876,543 bags"
-    re.compile(
-        r"(?:ecf|european)\s+stocks?[^\d]{0,80}?"
-        r"([\d.,\s]{5,15})\s*bags?",
-        re.I | re.S,
-    ),
-    # Short-form "Total: 9.8 M bags"
-    re.compile(
-        r"total[^\d]{0,30}?(\d+(?:[.,]\d+)?)\s*(?:million|m\b)\s*bags?",
-        re.I | re.S,
-    ),
-]
-
-
-def _extract_from_text(text: str) -> dict | None:
-    for pat in _TEXT_PATTERNS:
+def _figure_from_text(text: str) -> int | None:
+    """Convert the best-matched headline figure to integer bags."""
+    for pat in _FIGURE_PATTERNS:
         m = pat.search(text)
         if not m:
             continue
         raw = m.group(1)
-        # Was this a "X.X million" form?
-        if pat.pattern.lower().count("million"):
+        if "million" in pat.pattern.lower():
             try:
-                bags = int(float(raw.replace(",", ".")) * 1_000_000)
+                return int(float(raw.replace(",", ".")) * 1_000_000)
             except ValueError:
                 continue
-        else:
-            n = _parse_int(raw)
-            if n is None:
-                continue
-            bags = _coerce_bags(n)
-            if bags is None:
-                continue
-        if not _looks_like_bag_count(bags):
+        try:
+            val = int(raw.replace(",", ""))
+        except ValueError:
             continue
-        return {
-            "period":    _guess_period(text[max(0, m.start() - 120):m.end() + 60]),
-            "value_raw": bags,
-        }
+        if val < 1_000_000:  # likely "9,234" meaning thousands of bags
+            val *= 1000
+        if 1_000_000 <= val <= 30_000_000:
+            return val
     return None
 
 
-def _parse_pdf(content: bytes) -> dict | None:
+def _strip_html(html: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+def _fetch(url: str) -> str | None:
     try:
-        from pypdf import PdfReader
-    except ImportError:
-        logger.warning("[ecf_stocks] pypdf not installed — skip PDF parse")
-        return None
-    try:
-        reader = PdfReader(io.BytesIO(content))
-        text = "\n".join(p.extract_text() or "" for p in reader.pages[:20])
-    except Exception as e:
-        logger.warning(f"[ecf_stocks] PDF read failed: {e}")
-        return None
-    return _extract_from_text(text)
-
-
-def _parse_spreadsheet(content: bytes, ext: str) -> dict | None:
-    """Look for a Total row across every sheet in the file."""
-    try:
-        if ext == ".csv":
-            dfs = {"csv": pd.read_csv(io.BytesIO(content))}
-        else:
-            dfs = pd.read_excel(io.BytesIO(content), sheet_name=None, header=None)
-    except Exception as e:
-        logger.warning(f"[ecf_stocks] spreadsheet read failed: {e}")
+        r = requests.get(url, headers=_HEADERS, timeout=25, allow_redirects=True)
+        if r.status_code != 200:
+            return None
+        return r.text
+    except Exception:
         return None
 
-    best: int | None = None
-    best_period: str | None = None
-    for _, df in dfs.items():
-        for _, row in df.iterrows():
-            cells = list(row)
-            label_cells = [str(c) for c in cells if isinstance(c, str)]
-            label = " ".join(label_cells).lower()
-            if "total" not in label and "stock" not in label:
-                continue
-            for c in cells:
-                if isinstance(c, (int, float)) and not pd.isna(c) and float(c).is_integer():
-                    bags = _coerce_bags(int(c))
-                    if bags and (best is None or bags > best):
-                        best = bags
-                        best_period = _guess_period(label) or _today()[:7]
 
-    if best is None:
-        return None
-    return {"period": best_period or _today()[:7], "value_raw": best}
-
-
-def _parse_file(content: bytes, url: str) -> dict | None:
-    lower = url.lower()
-    if lower.endswith(".pdf"):
-        return _parse_pdf(content)
-    for ext in (".xlsx", ".xls", ".csv"):
-        if lower.endswith(ext):
-            return _parse_spreadsheet(content, ext)
-    return None
-
-
-# ── orchestration ─────────────────────────────────────────────────────────────
-
-def _collect_candidate_links(html: str, base_url: str) -> list[str]:
-    """Find <a href> links that look like statistical files."""
-    candidates: list[tuple[int, str]] = []
-    for m in re.finditer(
-        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
-        html, flags=re.I | re.S,
-    ):
-        href = m.group(1)
-        text = re.sub(r"<[^>]+>", " ", m.group(2)).strip().lower()
-        lower_href = href.lower()
-        if not any(lower_href.endswith(ext) for ext in _FILE_EXTS):
-            continue
-        score = sum(tok in text or tok in lower_href for tok in _LINK_TOKENS)
-        if score == 0:
-            continue
-        full = urljoin(base_url, href)
-        candidates.append((score, full))
-
-    # Higher score first; dedupe while preserving order.
-    candidates.sort(key=lambda x: (-x[0], x[1]))
-    seen: set[str] = set()
-    out: list[str] = []
-    for _, url in candidates:
+def _collect_posts(index_html: str) -> list[str]:
+    seen: list[str] = []
+    for m in _POST_HREF.finditer(index_html):
+        url = m.group(1)
         if url not in seen:
-            seen.add(url)
-            out.append(url)
-    return out[:8]  # cap to avoid downloading everything
+            seen.append(url)
+    return seen
 
 
-async def _load_page_html(page, url: str) -> str | None:
-    """Try Playwright first; fall back to plain requests."""
-    try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=30_000)
-        await page.wait_for_timeout(2_500)
-        return await page.content()
-    except Exception as e:
-        logger.warning(f"[ecf_stocks] playwright {url} failed: {e}")
-    try:
-        r = requests.get(url, headers=_HEADERS, timeout=20)
-        if r.status_code == 200:
-            return r.text
-        logger.warning(f"[ecf_stocks] http {url}: {r.status_code}")
-    except Exception as e:
-        logger.warning(f"[ecf_stocks] http {url} failed: {e}")
-    return None
+def _post_pdf(html: str, base: str) -> str | None:
+    m = _PDF_HREF.search(html)
+    return urljoin(base, m.group(1)) if m else None
 
 
-def _download(url: str) -> bytes | None:
-    try:
-        r = requests.get(url, headers=_HEADERS, timeout=30)
-        r.raise_for_status()
-        return r.content
-    except Exception as e:
-        logger.warning(f"[ecf_stocks] download {url} failed: {e}")
+def _post_to_entry(url: str) -> dict | None:
+    html = _fetch(url)
+    if not html:
         return None
+    slug = url.rstrip("/").rsplit("/", 1)[-1]
+    period_info = _period_from_slug(slug)
+    text = _strip_html(html)
+    bags = _figure_from_text(text)
+    pdf = _post_pdf(html, url)
+    if not period_info and not bags:
+        return None
+    period_label = period_info[0] if period_info else _today()[:7]
+    entry = {
+        "period":     period_label,
+        "value_raw":  bags,
+        "post_url":   url,
+        "pdf_url":    pdf,
+    }
+    # Drop None to keep the cache slim, but keep period_label.
+    return {k: v for k, v in entry.items() if v is not None or k == "period"}
 
 
 async def run(page) -> list[dict]:
-    file_hits: list[dict] = []
-    text_hits: list[dict] = []
-    tried_files: list[str] = []
-    source_url: str | None = None
-
-    for url in _ECF_URLS:
-        html = await _load_page_html(page, url)
-        if not html:
-            continue
-
-        # (a) Try downloadable files
-        for link in _collect_candidate_links(html, url):
-            tried_files.append(link)
-            content = _download(link)
-            if not content:
-                continue
-            parsed = _parse_file(content, link)
-            if parsed:
-                parsed["source_link"] = link
-                file_hits.append(parsed)
-
-        # (b) Page text fallback
-        text = re.sub(r"<[^>]+>", " ", html)
-        parsed_text = _extract_from_text(text)
-        if parsed_text:
-            text_hits.append(parsed_text)
-
-        if file_hits or text_hits:
-            source_url = url
-            break
-
-    monthly = file_hits or text_hits
-    if not monthly:
-        print(
-            f"[ecf_stocks] No stock data parsed "
-            f"(tried {len(tried_files)} files, {len(_ECF_URLS)} pages)"
-        )
+    index_html = _fetch(_INDEX_URL)
+    if not index_html:
+        print("[ecf_stocks] index page unreachable")
         return []
 
-    # Deduplicate by period, keep the largest value (most likely the EU-total
-    # vs a sub-table).
-    by_period: dict[str, dict] = {}
-    for m in monthly:
-        p = m["period"]
-        if p not in by_period or m["value_raw"] > by_period[p]["value_raw"]:
-            by_period[p] = m
-    series = sorted(by_period.values(), key=lambda x: x["period"])
-    latest = series[-1]
-    value_bags = latest["value_raw"]
+    post_urls = _collect_posts(index_html)
+    if not post_urls:
+        print("[ecf_stocks] no stocks posts found at category index")
+        return []
 
+    # Latest 12 posts ~= last 2 years of bi-monthly reports — plenty.
+    entries: list[dict] = []
+    for url in post_urls[:12]:
+        e = _post_to_entry(url)
+        if e:
+            entries.append(e)
+
+    if not entries:
+        print("[ecf_stocks] no parseable entries from posts")
+        return []
+
+    # Keep one entry per period (latest wins if duplicates).
+    by_period: dict[str, dict] = {}
+    for e in entries:
+        prev = by_period.get(e["period"])
+        if not prev or (e.get("value_raw") and not prev.get("value_raw")):
+            by_period[e["period"]] = e
+    series = sorted(by_period.values(), key=lambda x: x["period"])
+    latest = next((e for e in reversed(series) if e.get("value_raw")), series[-1])
+
+    value_bags = latest.get("value_raw") or 0
     return [{
         "title":    f"ECF European Port Stocks – {latest['period']}",
         "body":     (
-            f"ECF European green coffee stocks: {value_bags:,} bags "
-            f"({value_bags / 1_000_000:.1f}M bags). Source: {source_url}"
+            f"ECF European green coffee stocks for {latest['period']}: "
+            f"{value_bags:,} bags ({value_bags / 1_000_000:.1f}M). "
+            f"Source: {latest.get('post_url', _INDEX_URL)}"
         ),
         "source":   "ECF",
         "category": "demand",
@@ -349,8 +209,10 @@ async def run(page) -> list[dict]:
         "tags":     ["stocks", "europe", "ecf", "demand"],
         "meta":     json.dumps({
             "monthly":     series,
-            "latest_bags": value_bags,
+            "latest_bags": value_bags or None,
             "as_of":       _today(),
-            "source_url":  source_url,
+            "source_url":  _INDEX_URL,
+            "latest_post": latest.get("post_url"),
+            "latest_pdf":  latest.get("pdf_url"),
         }),
     }]

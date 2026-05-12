@@ -1443,6 +1443,14 @@ def export_health(db) -> None:
     except Exception:
         scrapers["psd_coffee"] = None
 
+    # AJCA (Japan native source, from cache file)
+    try:
+        from scraper.sources import ajca as _ajca
+        aj = _ajca.fetch_latest()
+        scrapers["ajca"] = aj.get("last_updated") if aj else None
+    except Exception:
+        scrapers["ajca"] = None
+
     healthy = sum(1 for v in scrapers.values() if v)
     result = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
