@@ -9,19 +9,9 @@ name: "Z – Stocks Fetch Smoke Test (diagnostic)"
 # plus manual workflow_dispatch.
 
 on:
+  # Manual only — debugging tool, not part of the normal pipeline.
+  # Run via Actions → "Z – Stocks Fetch Smoke Test (diagnostic)" → Run workflow.
   workflow_dispatch:
-  # Re-enabled temporarily to probe AJCA + ECF. Will be reset to manual-only
-  # once the new scrapers are in place.
-  push:
-    branches-ignore:
-      - main
-    paths:
-      - 'backend/scraper/probe_demand_sources.py'
-      - 'backend/scraper/sources/ajca.py'
-      - 'backend/scraper/sources/psd_coffee.py'
-      - 'backend/scraper/sources/ecf_stocks.py'
-      - 'backend/scraper/test_stocks_fetch.py'
-      - '.github/workflows/check-stocks-fetch.yml'
 
 jobs:
   probe:
