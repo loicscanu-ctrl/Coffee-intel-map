@@ -1,15 +1,15 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-11T19:29:27.655663Z",
+  "scraped_at": "2026-05-12T06:00:21.061386Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-11",
+    "as_of": "2026-05-12",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-11T11:35:03.331406Z",
+    "scraped_at": "2026-05-12T05:57:21.452645Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -128,12 +128,12 @@
       {
         "region": "Kaffa",
         "days": [
-          "L",
           "M",
           "M",
           "M",
           "M",
           "M",
+          "-",
           "-",
           "-",
           "-",
@@ -388,7 +388,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-11"
+    "last_updated": "2026-05-12"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",
