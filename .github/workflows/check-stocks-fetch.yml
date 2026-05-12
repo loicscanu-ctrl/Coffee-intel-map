@@ -1,9 +1,9 @@
 name: "Z – Stocks Fetch Smoke Test (diagnostic)"
 
-# Diagnostic workflow that exercises the new ICE + PSD scrapers end-to-end
-# from a GitHub Actions runner (different network egress than the local
-# sandbox). Writes a markdown report to the step summary so the result is
-# readable via the check-run output, no logs API needed.
+# Diagnostic workflow that runs the USDA PSD scraper end-to-end from
+# a GitHub Actions runner and commits the result + cache contents back
+# to the branch under _diagnostic/ so the result is readable without
+# the workflow-logs API.
 #
 # Triggered on push to any non-main branch (so we don't run it on main),
 # plus manual workflow_dispatch.
@@ -13,8 +13,7 @@ on:
     branches-ignore:
       - main
     paths:
-      - 'backend/scraper/sources/ice_certified.py'
-      - 'backend/scraper/sources/psd_japan.py'
+      - 'backend/scraper/sources/psd_coffee.py'
       - 'backend/scraper/sources/ecf_stocks.py'
       - 'backend/scraper/test_stocks_fetch.py'
       - '.github/workflows/check-stocks-fetch.yml'
@@ -23,10 +22,9 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 10
     permissions:
       contents: write
-      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -35,13 +33,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install minimal Python deps
-        run: pip install pandas openpyxl xlrd requests pypdf playwright
+      - name: Install Python deps
+        run: pip install pandas openpyxl xlrd requests pypdf
 
-      - name: Install Playwright Chromium
-        run: playwright install chromium --with-deps
-
-      - name: Stage 1 — bare requests probe (ICE + PSD)
+      - name: Stage 1 — bare requests probe (test_stocks_fetch.py)
         id: probe
         continue-on-error: true
         working-directory: backend
@@ -50,109 +45,19 @@ jobs:
           python -m scraper.test_stocks_fetch | tee /tmp/probe.txt
           echo "exit=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Stage 1b — probe alternate ICE URLs (find the live path)
-        if: always()
-        continue-on-error: true
-        run: |
-          set +e
-          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-          echo "Probing ICE candidate URLs ..."  | tee /tmp/ice_alts.txt
-          for url in \
-            "https://www.theice.com/publicdocs/futures_us_reports/coffee/Coffee_C_Cert_Stocks.xls" \
-            "https://www.ice.com/publicdocs/futures_us_reports/coffee/Coffee_C_Cert_Stocks.xls" \
-            "https://www.ice.com/publicdocs/futures_us/coffee/Coffee_C_Cert_Stocks.xls" \
-            "https://www.ice.com/publicdocs/Coffee_C_Cert_Stocks.xls" \
-            "https://www.theice.com/publicdocs/futures/Coffee_C_Cert_Stocks.xls" \
-            "https://www.theice.com/marketdata/reports/126" \
-            "https://www.theice.com/marketdata/reports/datawarehouse/ConsolidatedEndOfDayReportPDF.shtml?selectedReport=ICE_FUTURES_US_COFFEE_C_CERTIFIED_INVENTORIES" \
-            "https://www.ice.com/products/15/Coffee-C-Futures/data" \
-            "https://www.theice.com/products/15/Coffee-C-Futures/data" \
-            "https://www.ice.com/marketdata/reports/126?selectedReport=126" \
-            "https://www.theice.com/marketdata/CertifiedReportsStocksCoffee.xls" \
-            "https://www.theice.com/clear_us/danotices" \
-            ; do
-            # -L follows redirects; -o /dev/null silences body; -w prints final status + URL
-            line=$(curl -s -L -A "$UA" --max-time 25 -o /tmp/body.bin -w "%{http_code} %{size_download} %{content_type} -> %{url_effective}" "$url")
-            echo "  $url"             | tee -a /tmp/ice_alts.txt
-            echo "    $line"          | tee -a /tmp/ice_alts.txt
-            # If we got 200 and it looks like an Excel file, dump the first 16 bytes hex
-            if [[ "$line" == 200* ]]; then
-              echo -n "    head(hex): " | tee -a /tmp/ice_alts.txt
-              xxd -l 16 /tmp/body.bin 2>/dev/null | head -1 | tee -a /tmp/ice_alts.txt
-            fi
-          done
-
-      - name: Stage 2 — real ICE scraper with Playwright fallback
-        id: ice
-        continue-on-error: true
-        working-directory: backend
-        run: |
-          set +e
-          python -m scraper.sources.ice_certified 2>&1 | tee /tmp/ice_run.txt
-          echo "ice_exit=$?" >> "$GITHUB_OUTPUT"
-          if [ -f scraper/cache/ice_certified.json ]; then
-            echo "ICE_CACHE_OK=yes" >> "$GITHUB_ENV"
-            head -c 4000 scraper/cache/ice_certified.json > /tmp/ice_cache_head.txt
-          else
-            echo "ICE_CACHE_OK=no" >> "$GITHUB_ENV"
-          fi
-
-      - name: Stage 3 — real PSD Japan scraper
+      - name: Stage 2 — real PSD scraper (EU + Japan)
         id: psd
         continue-on-error: true
         working-directory: backend
         run: |
           set +e
-          python -m scraper.sources.psd_japan 2>&1 | tee /tmp/psd_run.txt
+          python -m scraper.sources.psd_coffee 2>&1 | tee /tmp/psd_run.txt
           echo "psd_exit=$?" >> "$GITHUB_OUTPUT"
-          if [ -f scraper/cache/psd_japan.json ]; then
+          if [ -f scraper/cache/psd_coffee.json ]; then
             echo "PSD_CACHE_OK=yes" >> "$GITHUB_ENV"
-            head -c 4000 scraper/cache/psd_japan.json > /tmp/psd_cache_head.txt
           else
             echo "PSD_CACHE_OK=no" >> "$GITHUB_ENV"
           fi
-
-      - name: Render step summary
-        if: always()
-        run: |
-          {
-            echo "# Stocks-fetch diagnostic — $(date -u +'%Y-%m-%d %H:%M UTC')"
-            echo ""
-            echo "## Stage 1 — bare \`requests\` probe (test_stocks_fetch.py)"
-            echo '```'
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/probe.txt || echo "(no output)"
-            echo '```'
-            echo ""
-            echo "## Stage 2 — real ICE scraper (\`scraper.sources.ice_certified\`)"
-            echo "- cache file written: \`${ICE_CACHE_OK}\`"
-            echo ""
-            echo '```'
-            cat /tmp/ice_run.txt || echo "(no output)"
-            echo '```'
-            if [ -f /tmp/ice_cache_head.txt ]; then
-              echo ""
-              echo "### First 4 KB of \`ice_certified.json\`"
-              echo '```json'
-              cat /tmp/ice_cache_head.txt
-              echo ""
-              echo '```'
-            fi
-            echo ""
-            echo "## Stage 3 — real PSD Japan scraper (\`scraper.sources.psd_japan\`)"
-            echo "- cache file written: \`${PSD_CACHE_OK}\`"
-            echo ""
-            echo '```'
-            cat /tmp/psd_run.txt || echo "(no output)"
-            echo '```'
-            if [ -f /tmp/psd_cache_head.txt ]; then
-              echo ""
-              echo "### First 4 KB of \`psd_japan.json\`"
-              echo '```json'
-              cat /tmp/psd_cache_head.txt
-              echo ""
-              echo '```'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Assemble diagnostic report
         if: always()
@@ -164,46 +69,32 @@ jobs:
             echo "- commit: \`${GITHUB_SHA}\`"
             echo "- run:    https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo "- date:   $(date -u +'%Y-%m-%d %H:%M UTC')"
-            echo "- runner: ubuntu-22.04 ($(curl -s ifconfig.me || echo unknown))"
             echo ""
             echo "## Verdict"
-            echo "- ICE scraper cache written : ${ICE_CACHE_OK:-no}"
             echo "- PSD scraper cache written : ${PSD_CACHE_OK:-no}"
             echo ""
-            echo "## Stage 1 — bare requests probe (test_stocks_fetch.py)"
+            echo "## Stage 1 — bare requests probe"
             echo '```'
             sed 's/\x1b\[[0-9;]*m//g' /tmp/probe.txt 2>/dev/null || echo "(no probe output)"
             echo '```'
             echo ""
-            echo "## Stage 1b — alternate ICE URL probes"
-            echo '```'
-            cat /tmp/ice_alts.txt 2>/dev/null || echo "(no alt probe output)"
-            echo '```'
-            echo ""
-            echo "## Stage 2 — real ICE scraper run"
-            echo '```'
-            cat /tmp/ice_run.txt 2>/dev/null || echo "(no ICE output)"
-            echo '```'
-            echo ""
-            echo "## Stage 3 — real PSD Japan scraper run"
+            echo "## Stage 2 — real PSD scraper run"
             echo '```'
             cat /tmp/psd_run.txt 2>/dev/null || echo "(no PSD output)"
             echo '```'
           } > _diagnostic/stocks-fetch-result.md
 
-          if [ -f backend/scraper/cache/ice_certified.json ]; then
-            cp backend/scraper/cache/ice_certified.json _diagnostic/ice_certified.json
+          if [ -f backend/scraper/cache/psd_coffee.json ]; then
+            cp backend/scraper/cache/psd_coffee.json _diagnostic/psd_coffee.json
           fi
-          if [ -f backend/scraper/cache/psd_japan.json ]; then
-            cp backend/scraper/cache/psd_japan.json _diagnostic/psd_japan.json
-          fi
+          # Clean any stale artifacts from earlier iterations
+          rm -f _diagnostic/ice_certified.json _diagnostic/psd_japan.json 2>/dev/null
 
       - name: Commit diagnostic report back to branch
         if: always()
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Pull latest in case the branch moved (push amid concurrent work).
           git fetch origin "${GITHUB_REF_NAME}"
           git reset --soft "origin/${GITHUB_REF_NAME}" || true
           git add _diagnostic/
@@ -212,7 +103,6 @@ jobs:
             exit 0
           fi
           git commit -m "ci(diagnostic): stocks-fetch result for ${GITHUB_SHA::7}"
-          # Retry the push in case another job is racing us.
           for i in 1 2 3; do
             git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
             git pull --rebase origin "${GITHUB_REF_NAME}" || true

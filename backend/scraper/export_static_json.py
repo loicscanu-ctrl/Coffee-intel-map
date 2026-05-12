@@ -1431,25 +1431,17 @@ def export_health(db) -> None:
     row = db.query(FertilizerImport).order_by(FertilizerImport.scraped_at.desc()).first()
     scrapers["fertilizer_comex"] = _ts(row.scraped_at) if row else None
 
-    # ICE certified stocks (daily, from cache file)
-    try:
-        from scraper.sources import ice_certified as _ice_certified
-        ice = _ice_certified.fetch_latest()
-        scrapers["ice_certified"] = ice.get("scraped_at") if ice else None
-    except Exception:
-        scrapers["ice_certified"] = None
-
     # ECF European port stocks (monthly, from latest NewsItem)
     item = db.query(NewsItem).filter(NewsItem.source == "ECF").order_by(NewsItem.pub_date.desc()).first()
     scrapers["ecf"] = _ts(item.pub_date) if item else None
 
-    # USDA PSD Japan annual (from cache file)
+    # USDA PSD coffee (EU + Japan, annual, from cache file)
     try:
-        from scraper.sources import psd_japan as _psd_japan
-        pj = _psd_japan.fetch_latest()
-        scrapers["psd_japan"] = pj.get("last_updated") if pj else None
+        from scraper.sources import psd_coffee as _psd_coffee
+        pc = _psd_coffee.fetch_latest()
+        scrapers["psd_coffee"] = pc.get("last_updated") if pc else None
     except Exception:
-        scrapers["psd_japan"] = None
+        scrapers["psd_coffee"] = None
 
     healthy = sum(1 for v in scrapers.values() if v)
     result = {

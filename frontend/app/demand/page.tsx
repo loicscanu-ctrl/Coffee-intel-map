@@ -10,7 +10,7 @@ export default function DemandPage() {
       <PageHeader
         title="Demand"
         subtitle="Roaster earnings · taxes · stocks · consumption news"
-        healthKeys={["ice_certified", "ecf", "psd_japan"]}
+        healthKeys={["ecf", "psd_coffee"]}
       />
       <div className="border-b border-slate-700 bg-slate-950">
         <StocksPanel />

@@ -31,7 +31,6 @@ HEADERS = {
     )
 }
 
-ICE_URL = "https://www.theice.com/publicdocs/futures_us_reports/coffee/Coffee_C_Cert_Stocks.xls"
 PSD_URL = "https://apps.fas.usda.gov/psdonline/downloads/psd_coffee_csv.zip"
 
 OK   = "\033[32m✓\033[0m"
@@ -44,63 +43,10 @@ def hr(c="─"):
     print(c * 60)
 
 
-# ── ICE ──────────────────────────────────────────────────────────────────────
-
-def test_ice() -> bool:
-    print(f"\n[ICE] {ICE_URL}")
-    try:
-        r = requests.get(ICE_URL, headers=HEADERS, timeout=30)
-    except Exception as e:
-        print(f"  {FAIL} network error: {e}")
-        return False
-
-    print(f"  status     : {r.status_code}")
-    print(f"  bytes      : {len(r.content):,}")
-    print(f"  Content-Type: {r.headers.get('Content-Type', '?')}")
-
-    if r.status_code != 200:
-        print(f"  {FAIL} non-200 — ICE likely blocked this IP. Body preview:")
-        print(DIM + r.text[:200].replace("\n", " ") + RST)
-        return False
-
-    if len(r.content) < 1000:
-        print(f"  {FAIL} response too small to be a valid Excel file")
-        return False
-
-    # Try to parse
-    try:
-        import pandas as pd
-        df = pd.read_excel(io.BytesIO(r.content), header=None)
-        print(f"  sheet shape: {df.shape[0]} rows × {df.shape[1]} cols")
-    except Exception as e:
-        print(f"  {FAIL} pandas read_excel failed: {e}")
-        print(f"  (file may be HTML — first 200 chars: {r.content[:200]!r})")
-        return False
-
-    # Look for a Total row
-    found_total = False
-    found_port  = False
-    for _, row in df.iterrows():
-        cells = [c for c in row if c is not None]
-        if not cells:
-            continue
-        label = str(cells[0]).strip().lower() if isinstance(cells[0], str) else ""
-        if "total" in label:
-            found_total = True
-        if any(p in label for p in ("antwerp", "hamburg", "bremen", "trieste", "new orleans", "new york")):
-            found_port = True
-
-    if found_total and found_port:
-        print(f"  {OK} parse looks valid — found Total row + at least one port row")
-        return True
-    print(f"  {FAIL} no Total + port rows recognised (parser tweak needed)")
-    return False
-
-
-# ── PSD Japan ────────────────────────────────────────────────────────────────
+# ── USDA PSD ─────────────────────────────────────────────────────────────────
 
 def test_psd() -> bool:
-    print(f"\n[PSD Japan] {PSD_URL}")
+    print(f"\n[USDA PSD] {PSD_URL}")
     try:
         r = requests.get(PSD_URL, headers=HEADERS, timeout=60)
     except Exception as e:
@@ -134,17 +80,22 @@ def test_psd() -> bool:
     lines = text.splitlines()
     print(f"  csv rows    : {len(lines):,}")
 
-    japan_rows = [ln for ln in lines if "japan" in ln.lower()]
+    japan_rows = [ln for ln in lines if ',"Japan",' in ln]
+    eu_rows    = [ln for ln in lines if ',"European Union",' in ln]
     print(f"  Japan rows  : {len(japan_rows)}")
+    print(f"  EU rows     : {len(eu_rows)}")
 
-    if not japan_rows:
-        print(f"  {FAIL} no Japan rows — CSV schema may have changed")
+    if not japan_rows and not eu_rows:
+        print(f"  {FAIL} no Japan or EU rows — CSV schema may have changed")
         print(f"  header     : {lines[0][:200] if lines else '(empty)'}")
         return False
 
-    # Sample one row
-    print(f"  {OK} sample Japan row:")
-    print(DIM + "    " + japan_rows[0][:200] + RST)
+    if japan_rows:
+        print(f"  {OK} sample Japan row:")
+        print(DIM + "    " + japan_rows[0][:200] + RST)
+    if eu_rows:
+        print(f"  {OK} sample EU row:")
+        print(DIM + "    " + eu_rows[0][:200] + RST)
     return True
 
 
@@ -155,20 +106,16 @@ def main() -> int:
     print(" Stocks-scraper connectivity check ".center(60))
     hr("═")
 
-    ice_ok = test_ice()
     psd_ok = test_psd()
 
     hr("═")
-    print(f"  ICE Arabica certified : {OK if ice_ok else FAIL}")
-    print(f"  USDA PSD Japan        : {OK if psd_ok else FAIL}")
+    print(f"  USDA PSD coffee (EU + Japan) : {OK if psd_ok else FAIL}")
     hr("═")
 
-    if not (ice_ok or psd_ok):
+    if not psd_ok:
         print(
-            "Both sources failed. If you got 403s, the issue is bot protection — "
-            "the production scraper will retry via Playwright. If you got 200 but "
-            "the parser rejected the content, the schema has drifted (paste the "
-            "output and I'll adjust)."
+            "USDA PSD failed. If 403, the IP is blocked — try from a different "
+            "network. If 200 but parser rejected, the CSV schema has drifted."
         )
         return 1
     return 0
