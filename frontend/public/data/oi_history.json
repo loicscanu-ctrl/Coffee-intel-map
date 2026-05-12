@@ -1,6 +1,47 @@
 {
   "arabica": [
     {
+      "date": "2026-05-08",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81274
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 44325
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 30461
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12771
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3712
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2803
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1798
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2309
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 537
+        }
+      ]
+    },
+    {
       "date": "2026-05-07",
       "contracts": [
         {
@@ -1280,54 +1321,46 @@
           "oi": 372
         }
       ]
-    },
-    {
-      "date": "2026-03-26",
-      "contracts": [
-        {
-          "symbol": "KCK26",
-          "oi": 59558
-        },
-        {
-          "symbol": "KCN26",
-          "oi": 44385
-        },
-        {
-          "symbol": "KCU26",
-          "oi": 30291
-        },
-        {
-          "symbol": "KCZ26",
-          "oi": 24487
-        },
-        {
-          "symbol": "KCH27",
-          "oi": 7961
-        },
-        {
-          "symbol": "KCK27",
-          "oi": 1912
-        },
-        {
-          "symbol": "KCN27",
-          "oi": 996
-        },
-        {
-          "symbol": "KCU27",
-          "oi": 1697
-        },
-        {
-          "symbol": "KCZ27",
-          "oi": 1549
-        },
-        {
-          "symbol": "KCH28",
-          "oi": 352
-        }
-      ]
     }
   ],
   "robusta": [
+    {
+      "date": "2026-05-08",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 52988
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 17940
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7917
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5593
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2247
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 646
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 367
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 321
+        }
+      ]
+    },
     {
       "date": "2026-05-07",
       "contracts": [
