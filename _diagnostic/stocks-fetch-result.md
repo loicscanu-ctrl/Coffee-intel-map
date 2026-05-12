@@ -1,8 +1,8 @@
 # Stocks-fetch diagnostic
 
-- commit: `1cb126d06a76124ab31ecdb11074303126e4e1c4`
-- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25760286081
-- date:   2026-05-12 20:28 UTC
+- commit: `54d055945a491a97ae5f143e316ba107d0d7cb4f`
+- run:    https://github.com/loicscanu-ctrl/Coffee-intel-map/actions/runs/25760449229
+- date:   2026-05-12 20:31 UTC
 
 ## Verdict
 - PSD scraper cache written : yes
@@ -482,7 +482,7 @@
 
 ## Stage 5 — real ECF scraper run
 ```
-[ecf_stocks] index page unreachable
+[ecf_stocks] no stocks posts found at category index
 {
   "count": 0,
   "items": []
