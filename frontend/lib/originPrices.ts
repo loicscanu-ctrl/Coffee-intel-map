@@ -27,8 +27,8 @@ export interface OriginPrice {
 interface Ticker { label: string; value: string; category: string }
 interface LatestPrices { tickers: Ticker[] }
 interface AcapheLive {
-  robusta: Array<{ last: number | null }>;
-  arabica: Array<{ last: number | null }>;
+  robusta: Array<{ last: number | null; oi?: number | null }>;
+  arabica: Array<{ last: number | null; oi?: number | null }>;
 }
 
 /** Parse "88.300 VND ($3,371)" → { local: "88.300 VND", usd: 3371 }
@@ -81,9 +81,17 @@ export function computeOriginPrices(
 
   const tickers = new Map(latest.tickers.map(t => [t.label, t.value]));
 
-  // Front-month benchmarks (USD/MT). RC trades natively in USD/MT; KC is
-  // ¢/lb and needs conversion (used once arabica-origin pins are wired up).
-  const rcFront = acaphe.robusta?.[0]?.last ?? null;
+  // Benchmarks: contract with highest open interest (most liquid) for each market.
+  const rcContract = acaphe.robusta?.reduce<typeof acaphe.robusta[0] | null>(
+    (best, c) => ((c.oi ?? 0) > (best?.oi ?? 0) ? c : best), null
+  ) ?? null;
+  const rcFront = rcContract?.last ?? null;
+
+  const kcContract = acaphe.arabica?.reduce<typeof acaphe.arabica[0] | null>(
+    (best, c) => ((c.oi ?? 0) > (best?.oi ?? 0) ? c : best), null
+  ) ?? null;
+  // KC trades in ¢/lb — convert to USD/MT for differential comparison
+  const kcFront = kcContract?.last != null ? kcCentsToUsdMt(kcContract.last) : null;
 
   // USD/VND FX rate from tickers — recomputed fresh here rather than relying
   // on the pre-baked $USD in the ticker string, which may be from a different

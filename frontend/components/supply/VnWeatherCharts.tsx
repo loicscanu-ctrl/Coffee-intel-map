@@ -95,11 +95,17 @@ function ProvinceSelector({
 
 // ── 1. Daily Accumulated Rainfall (Dak Lak — fixed station) ──────────────────
 
-function DailyAccumChart({ daily }: { daily: DailyRow[] }) {
+function DailyAccumChart({ daily, updated }: { daily: DailyRow[]; updated: string }) {
+  const monthLabel = (() => {
+    const parts = updated.split("-");
+    if (parts.length < 2) return updated;
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+    return d.toLocaleString("en-US", { month: "long" }) + " " + parts[0];
+  })();
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
       <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-        Daily Accumulated Rainfall — April 2026 (mm)
+        Daily Accumulated Rainfall — {monthLabel} (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">Dak Lak · Buon Ma Thuot station · Band = 10yr min/max</div>
       <ResponsiveContainer width="100%" height={155}>
@@ -362,7 +368,7 @@ export default function VnWeatherCharts() {
       minRain:      r1(wsum(activeProv, (p) => p.monthly_min_rain[i])      / totalProd),
       maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
       lastYearRain: r1(wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd),
-      actual2026:   i < 3
+      actual2026:   activeProv.every((p) => p.monthly_actual_2026.length > i)
         ? r1(wsum(activeProv, (p) => p.monthly_actual_2026[i]) / totalProd)
         : null,
     }));
@@ -376,14 +382,15 @@ export default function VnWeatherCharts() {
       cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i])       / totalProd;
       cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i])       / totalProd;
       cumLY  += wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd;
-      if (i < 3) cum26 += wsum(activeProv, (p) => p.monthly_actual_2026[i]) / totalProd;
+      const hasActual = activeProv.every((p) => p.monthly_actual_2026.length > i);
+      if (hasActual) cum26 += wsum(activeProv, (p) => p.monthly_actual_2026[i]) / totalProd;
       return {
         month,
         cumAvg:      Math.round(cumAvg),
         cumMin:      Math.round(cumMin),
         cumMax:      Math.round(cumMax),
         cumLastYear: Math.round(cumLY),
-        cum2026:     i < 3 ? Math.round(cum26) : null,
+        cum2026:     hasActual ? Math.round(cum26) : null,
       };
     });
   }, [activeProv, totalProd]);
@@ -396,7 +403,7 @@ export default function VnWeatherCharts() {
       minTemp:      r1(wsum(activeProv, (p) => p.monthly_min_temp[i])        / totalProd),
       maxTemp:      r1(wsum(activeProv, (p) => p.monthly_max_temp[i])        / totalProd),
       lastYearTemp: r1(wsum(activeProv, (p) => p.monthly_last_year_temp[i])  / totalProd),
-      actual2026:   i < 3
+      actual2026:   activeProv.every((p) => p.monthly_actual_temp_2026.length > i)
         ? r1(wsum(activeProv, (p) => p.monthly_actual_temp_2026[i]) / totalProd)
         : null,
     }));
@@ -445,7 +452,7 @@ export default function VnWeatherCharts() {
 
       {/* 2×2 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <DailyAccumChart daily={data.daily_dak_lak} />
+        <DailyAccumChart daily={data.daily_dak_lak} updated={data.updated} />
         <MeanTempChart data={tempData} />
         <MonthlyRainChart data={monthlyRainData} />
         <CumulativeRainChart data={cumulativeData} />
