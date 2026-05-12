@@ -124,9 +124,16 @@ def _fetch_hub() -> str | None:
         return None
 
 
+def _strip_html(html: str) -> str:
+    """Strip tags so a phrase split across <strong>/<span> renders as flat text."""
+    text = re.sub(r"<[^>]+>", " ", html)
+    return re.sub(r"\s+", " ", text)
+
+
 def _parse_hub(html: str) -> dict | None:
-    cons_match = _CONS_PAT.search(html)
-    imp_match  = _IMP_PAT.search(html)
+    text = _strip_html(html)
+    cons_match = _CONS_PAT.search(text)
+    imp_match  = _IMP_PAT.search(text)
 
     consumption_mt: int | None = None
     imports_mt:     int | None = None
