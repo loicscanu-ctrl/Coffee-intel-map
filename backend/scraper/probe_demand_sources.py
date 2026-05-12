@@ -45,14 +45,10 @@ AJCA_PAGES = [
 ]
 
 ECF_PAGES = [
-    "https://www.ecf-coffee.org/",
-    "https://www.ecf-coffee.org/resources/statistics/",
-    "https://www.ecf-coffee.org/resources/",
-    "https://www.ecf-coffee.org/knowledge/statistics/",
-    "https://www.ecf-coffee.org/knowledge/",
-    "https://www.ecf-coffee.org/news/",
-    "https://www.ecf-coffee.org/publications/",
-    "https://www.ecf-coffee.org/category/news/",
+    # Stocks-category index — confirmed working
+    "https://www.ecf-coffee.org/category/publications/stocks/",
+    # Sample stocks-post URL — confirmed working from earlier probe
+    "https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
 ]
 
 FILE_EXTS = (".pdf", ".xls", ".xlsx", ".csv", ".zip")

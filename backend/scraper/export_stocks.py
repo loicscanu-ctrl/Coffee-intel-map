@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from database import SessionLocal
 from models import NewsItem
-from scraper.sources import psd_coffee
+from scraper.sources import ajca, psd_coffee
 
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
@@ -67,6 +67,28 @@ def _psd_section(market_key: str, db_data: dict | None) -> dict | None:
     }
 
 
+def _build_ajca() -> dict | None:
+    try:
+        data = ajca.fetch_latest()
+    except Exception as e:
+        print(f"  [stocks] AJCA fetch error: {e}")
+        return None
+    if not data:
+        return None
+    return {
+        "source":                data.get("source", "AJCA"),
+        "source_url":            data.get("source_url"),
+        "last_updated":          data.get("last_updated"),
+        "latest_year":           data.get("latest_year"),
+        "latest_imports_mt":     data.get("latest_imports_mt"),
+        "latest_consumption_mt": data.get("latest_consumption_mt"),
+        "monthly_imports_pdf":   data.get("monthly_imports_pdf"),
+        "monthly_exports_pdf":   data.get("monthly_exports_pdf"),
+        "supply_demand_pdf":     data.get("supply_demand_pdf"),
+        "yearly_imports_pdf":    data.get("yearly_imports_pdf"),
+    }
+
+
 def export_stocks(db) -> None:
     try:
         psd_data = psd_coffee.fetch_latest()
@@ -79,6 +101,7 @@ def export_stocks(db) -> None:
         "ecf":   _build_ecf(db),
         "eu":    _psd_section("eu",    psd_data),
         "japan": _psd_section("japan", psd_data),
+        "ajca":  _build_ajca(),
     }
     path = OUT_DIR / "demand_stocks.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -86,7 +109,8 @@ def export_stocks(db) -> None:
         f"  demand_stocks.json -> "
         f"ecf:{result['ecf'] is not None} "
         f"eu:{result['eu'] is not None} "
-        f"japan:{result['japan'] is not None}"
+        f"japan:{result['japan'] is not None} "
+        f"ajca:{result['ajca'] is not None}"
     )
 
 

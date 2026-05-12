@@ -38,11 +38,25 @@ interface PsdData {
   latest_stocks_mt: number | null;
 }
 
+interface AjcaData {
+  source: string;
+  source_url?: string | null;
+  last_updated: string;
+  latest_year: string | null;
+  latest_imports_mt: number | null;
+  latest_consumption_mt: number | null;
+  monthly_imports_pdf?: string | null;
+  monthly_exports_pdf?: string | null;
+  supply_demand_pdf?:   string | null;
+  yearly_imports_pdf?:  string | null;
+}
+
 interface StocksPayload {
   generated_at: string;
   ecf: EcfData | null;
   eu: PsdData | null;
   japan: PsdData | null;
+  ajca: AjcaData | null;
 }
 
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
@@ -199,6 +213,62 @@ function PsdPanel({
   );
 }
 
+// ── AJCA panel (Japan native source) ─────────────────────────────────────────
+
+function AjcaPanel({ ajca }: { ajca: AjcaData }) {
+  return (
+    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
+      <div className="flex items-baseline justify-between">
+        <div className="text-[10px] text-slate-400 uppercase tracking-wide">Japan Green Coffee — AJCA</div>
+        <div className="text-[8px] text-slate-600">AJCA · {ajca.last_updated}</div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+        <div>
+          <div className="text-slate-500 text-[9px] mb-0.5">Imports (green)</div>
+          <div className="text-sky-300 font-bold">{fmtThousands(ajca.latest_imports_mt)}</div>
+          <div className="text-[9px] text-slate-600">MT · {ajca.latest_year}</div>
+        </div>
+        <div>
+          <div className="text-slate-500 text-[9px] mb-0.5">Total consumption</div>
+          <div className="text-white font-bold">{fmtThousands(ajca.latest_consumption_mt)}</div>
+          <div className="text-[9px] text-slate-600">MT · {ajca.latest_year}</div>
+        </div>
+      </div>
+
+      <div className="text-[9px] text-slate-500 space-y-0.5">
+        {ajca.monthly_imports_pdf && (
+          <div>
+            Latest monthly imports PDF: {" "}
+            <a href={ajca.monthly_imports_pdf} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 underline">
+              j-import
+            </a>
+          </div>
+        )}
+        {ajca.supply_demand_pdf && (
+          <div>
+            Supply &amp; demand: {" "}
+            <a href={ajca.supply_demand_pdf} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 underline">
+              data-jukyu
+            </a>
+          </div>
+        )}
+        {ajca.source_url && (
+          <div>
+            <a href={ajca.source_url} target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-slate-400 underline">
+              All Japan Coffee Association →
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="text-[9px] text-slate-600">
+        Native Japanese source — All Japan Coffee Association statistics hub. Monthly PDF reports for imports / exports / supply-demand. Updates monthly.
+      </div>
+    </div>
+  );
+}
+
 // ── Page section ─────────────────────────────────────────────────────────────
 
 export default function StocksPanel() {
@@ -218,7 +288,7 @@ export default function StocksPanel() {
     );
   }
 
-  if (!data || (!data.ecf && !data.eu && !data.japan)) {
+  if (!data || (!data.ecf && !data.eu && !data.japan && !data.ajca)) {
     return (
       <div className="bg-slate-900 border-b border-slate-700 p-4">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">Consumer Market Stocks</div>
@@ -252,7 +322,9 @@ export default function StocksPanel() {
             ECF monthly data pending scraper run
           </div>
         )}
-        {data.japan ? (
+        {data.ajca ? (
+          <AjcaPanel ajca={data.ajca} />
+        ) : data.japan ? (
           <PsdPanel
             data={data.japan}
             title="Japan Green Coffee — Annual (USDA PSD)"
@@ -261,7 +333,7 @@ export default function StocksPanel() {
           />
         ) : (
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
-            Japan PSD data pending scraper run
+            Japan data pending scraper run (AJCA / PSD)
           </div>
         )}
       </div>

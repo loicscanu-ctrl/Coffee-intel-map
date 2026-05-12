@@ -17,6 +17,7 @@ on:
       - main
     paths:
       - 'backend/scraper/probe_demand_sources.py'
+      - 'backend/scraper/sources/ajca.py'
       - 'backend/scraper/sources/psd_coffee.py'
       - 'backend/scraper/sources/ecf_stocks.py'
       - 'backend/scraper/test_stocks_fetch.py'
@@ -71,6 +72,36 @@ jobs:
           python -m scraper.probe_demand_sources 2>&1 | tee /tmp/probe_sources.txt
           echo "probe_exit=$?" >> "$GITHUB_OUTPUT"
 
+      - name: Stage 4 — real AJCA scraper
+        id: ajca
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          python -m scraper.sources.ajca 2>&1 | tee /tmp/ajca_run.txt
+          echo "ajca_exit=$?" >> "$GITHUB_OUTPUT"
+          if [ -f scraper/cache/ajca.json ]; then
+            echo "AJCA_CACHE_OK=yes" >> "$GITHUB_ENV"
+            head -c 4000 scraper/cache/ajca.json > /tmp/ajca_cache_head.txt
+          else
+            echo "AJCA_CACHE_OK=no" >> "$GITHUB_ENV"
+          fi
+
+      - name: Stage 5 — real ECF scraper (returns NewsItems)
+        id: ecf
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          # ecf_stocks.run(page) is async; invoke via a tiny launcher.
+          python -c "
+import asyncio, json
+from scraper.sources import ecf_stocks
+items = asyncio.run(ecf_stocks.run(None))
+print(json.dumps({'count': len(items), 'items': items}, indent=2, default=str))
+" 2>&1 | tee /tmp/ecf_run.txt
+          echo "ecf_exit=$?" >> "$GITHUB_OUTPUT"
+
       - name: Assemble diagnostic report
         if: always()
         run: |
@@ -98,6 +129,26 @@ jobs:
             echo "## Stage 3 — AJCA + ECF source catalog"
             echo '```'
             cat /tmp/probe_sources.txt 2>/dev/null || echo "(no probe output)"
+            echo '```'
+            echo ""
+            echo "## Stage 4 — real AJCA scraper run"
+            echo "- cache file written: \`${AJCA_CACHE_OK:-no}\`"
+            echo ""
+            echo '```'
+            cat /tmp/ajca_run.txt 2>/dev/null || echo "(no ajca output)"
+            echo '```'
+            if [ -f /tmp/ajca_cache_head.txt ]; then
+              echo ""
+              echo "### First 4 KB of \`ajca.json\`"
+              echo '```json'
+              cat /tmp/ajca_cache_head.txt
+              echo ""
+              echo '```'
+            fi
+            echo ""
+            echo "## Stage 5 — real ECF scraper run"
+            echo '```'
+            cat /tmp/ecf_run.txt 2>/dev/null || echo "(no ecf output)"
             echo '```'
           } > _diagnostic/stocks-fetch-result.md
 
