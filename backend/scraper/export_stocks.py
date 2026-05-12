@@ -36,7 +36,7 @@ def _build_ecf(db) -> dict | None:
         if not item:
             return None
         meta = json.loads(item.meta or "{}")
-        latest_bags = meta.get("latest_bags", 0)
+        latest_bags = meta.get("latest_bags") or 0
         return {
             "source":        "ECF",
             "last_updated":  meta.get("as_of", str(item.pub_date)[:10]),
@@ -44,6 +44,9 @@ def _build_ecf(db) -> dict | None:
             "latest_bags":   latest_bags,
             "latest_m_bags": round(latest_bags / 1_000_000, 2) if latest_bags else None,
             "source_url":    meta.get("source_url"),
+            "latest_post":   meta.get("latest_post"),
+            "latest_pdf":    meta.get("latest_pdf"),
+            "yearly_pdfs":   meta.get("yearly_pdfs", []),
         }
     except Exception as e:
         print(f"  [stocks] ECF section error: {e}")

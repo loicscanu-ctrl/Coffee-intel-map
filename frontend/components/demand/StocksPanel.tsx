@@ -19,6 +19,9 @@ interface EcfData {
   latest_bags: number;
   latest_m_bags: number | null;
   source_url?: string | null;
+  latest_post?: string | null;
+  latest_pdf?: string | null;
+  yearly_pdfs?: { year: string; pdf_url: string }[];
 }
 
 interface PsdAnnualEntry {
@@ -133,16 +136,38 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
         </div>
       )}
 
-      <div className="text-[9px] text-slate-600">
-        European Coffee Federation — green coffee stocks in Hamburg, Antwerp, Trieste, Le Havre, Barcelona + other EU ports.
-        {ecf.source_url && (
-          <>
-            {" "}
-            <a href={ecf.source_url} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-slate-300 underline">
-              source
+      <div className="text-[9px] text-slate-500 space-y-0.5">
+        {ecf.latest_post && (
+          <div>
+            Latest report: {" "}
+            <a href={ecf.latest_post} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline">
+              post
             </a>
-          </>
+            {ecf.latest_pdf && (
+              <>
+                {" · "}
+                <a href={ecf.latest_pdf} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline">
+                  PDF
+                </a>
+              </>
+            )}
+          </div>
         )}
+        {ecf.yearly_pdfs && ecf.yearly_pdfs.length > 0 && (
+          <div>
+            Yearly: {ecf.yearly_pdfs.slice(0, 5).map((y, i) => (
+              <span key={y.year}>
+                {i > 0 && " · "}
+                <a href={y.pdf_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-200 underline">
+                  {y.year}
+                </a>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="text-[9px] text-slate-600">
+        European Coffee Federation — green coffee stocks at all EU ports. Reported in tonnes; values shown as 60-kg bags equivalent.
       </div>
     </div>
   );
