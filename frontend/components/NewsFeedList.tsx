@@ -30,7 +30,7 @@ interface Props {
   category?: string;
   filterFn?: (item: NewsItem) => boolean;
   emptyMessage?: string;
-  title: string;
+  title?: string;
   initialItems?: NewsItem[];
 }
 
@@ -50,7 +50,7 @@ export default function NewsFeedList({ category, filterFn, emptyMessage, title, 
 
   return (
     <div className="p-6 h-full overflow-y-auto">
-      <h1 className="text-lg font-bold text-white mb-4">{title}</h1>
+      {title && <h1 className="text-lg font-bold text-white mb-4">{title}</h1>}
       {loading && (
         <div className="animate-pulse space-y-3">
           {[...Array(5)].map((_, i) => (

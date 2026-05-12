@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { DataHealthBar } from "@/components/DataHealthBar";
+import PageHeader from "@/components/PageHeader";
 
 const BrazilTab      = dynamic(() => import("@/components/supply/BrazilTab"),      { ssr: false });
 const VietnamTab     = dynamic(() => import("@/components/supply/VietnamTab"),     { ssr: false });
@@ -30,18 +30,12 @@ export default function SupplyPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
+      <PageHeader
+        title="Supply Intelligence"
+        subtitle="Production & export data by origin country"
+        healthKeys={["weather", "enso", "fertilizer_wb", "fertilizer_comex", "freight"]}
+      />
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
-
-        {/* Page header */}
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-slate-100">Supply Intelligence</h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Production &amp; export data by origin country
-            </p>
-          </div>
-          <DataHealthBar keys={["weather", "enso", "fertilizer_wb", "fertilizer_comex", "freight"]} />
-        </div>
 
         {/* Sub-tabs */}
         <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit flex-wrap">
