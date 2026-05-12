@@ -180,9 +180,11 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const tileLayerRef = useRef<TileLayer | null>(null);
   const priceMarkersRef = useRef<LeafletMarker[]>([]);
+  const freightMarkersRef = useRef<LeafletMarker[]>([]);
   const [activeBasemap, setActiveBasemap] = useState("dark");
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
+  const [freightData, setFreightData] = useState<{ routes: { id: string; rate: number; prev: number }[] } | null>(null);
 
   // Permanent price labels for origin pins. Fetch latest_prices + live RC/KC.
   // Acaphe: try /api/live (Redis, updated every 15 min) first; fall back to
@@ -203,6 +205,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       if (!cancelled) setOriginPrices(computeOriginPrices(latest, acaphe));
     });
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    fetch("/data/freight.json").then(r => r.ok ? r.json() : null).then(setFreightData).catch(() => null);
   }, []);
 
   // ── Map initialization (runs once) ────────────────────────────────────────
@@ -470,6 +476,55 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
     });
     return () => { cancelled = true; };
   }, [originPrices]);
+
+  // ── Freight route labels ───────────────────────────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !freightData) return;
+    let cancelled = false;
+
+    // Routes derived from base freight data via fixed multipliers
+    const FREIGHT_ROUTES: {
+      baseId: string; multiplier: number; transitDays: number;
+      label: string; pos: [number, number];
+    }[] = [
+      { baseId: "vn-eu", multiplier: 0.90, transitDays: 27, label: "SGP → ANR", pos: [12.0, 58.0] },
+      { baseId: "br-eu", multiplier: 1.00, transitDays: 19, label: "STS → ANR", pos: [22.0, -26.0] },
+      { baseId: "co-eu", multiplier: 0.92, transitDays: 15, label: "HND → ANR", pos: [41.0, -36.0] },
+    ];
+
+    import("leaflet").then((L) => {
+      if (cancelled) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+      freightMarkersRef.current.forEach(m => m.remove());
+      freightMarkersRef.current = [];
+
+      FREIGHT_ROUTES.forEach(({ baseId, multiplier, transitDays, label, pos }) => {
+        const base = freightData.routes.find(r => r.id === baseId);
+        if (!base) return;
+        const rate = Math.round(base.rate * multiplier);
+        const prev = Math.round(base.prev * multiplier);
+        const pct  = prev > 0 ? ((rate - prev) / prev * 100) : 0;
+        const sign  = pct >= 0 ? "▲" : "▼";
+        const color = pct > 0 ? "#22c55e" : pct < 0 ? "#ef4444" : "#94a3b8";
+
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `<div style="background:rgba(15,23,42,0.88);border:1px solid #475569;border-radius:5px;padding:4px 7px;font-family:monospace;font-size:9px;color:#cbd5e1;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.6);pointer-events:none">
+            <div style="font-weight:700;color:#fff;letter-spacing:.04em">${label} · ${transitDays}d</div>
+            <div style="color:#e2e8f0">$${rate.toLocaleString()}/FEU</div>
+            <div style="color:${color}">${sign}${Math.abs(pct).toFixed(1)}% WoW</div>
+          </div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        });
+
+        const m = Leaflet.marker(pos, { icon, interactive: false }).addTo(map);
+        freightMarkersRef.current.push(m as LeafletMarker);
+      });
+    });
+    return () => { cancelled = true; };
+  }, [freightData]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
