@@ -5,6 +5,7 @@ import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { transformApiData } from "@/lib/cot/transformApiData";
 import { buildStandaloneHtml } from "@/lib/cot/standaloneTemplate";
+import { useUrlState } from "@/lib/useUrlState";
 
 import { NAV_STEPS } from "./constants";
 import { generateData } from "./generateData";
@@ -19,7 +20,10 @@ import Step5DryPowder from "./Step5DryPowder";
 import Step6CycleLocation from "./Step6CycleLocation";
 
 export default function CotDashboard() {
-  const [step, setStep] = useState<Step>(1);
+  const [step, setStep] = useUrlState<Step>("step", 1, (raw) => {
+    const n = Number(raw);
+    return ([1, 2, 3, 4, 5, 6] as number[]).includes(n) ? (n as Step) : 1;
+  });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);

@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
+import { useUrlState } from "@/lib/useUrlState";
 
 const BrazilTab      = dynamic(() => import("@/components/supply/BrazilTab"),      { ssr: false });
 const VietnamTab     = dynamic(() => import("@/components/supply/VietnamTab"),     { ssr: false });
@@ -25,8 +26,20 @@ const TABS = [
 
 type TabId = typeof TABS[number]["id"];
 
+const VALID_TAB_IDS = TABS.map(t => t.id) as readonly string[];
+
 export default function SupplyPage() {
-  const [tab, setTab] = useState<TabId>("brazil");
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+      <SupplyPageInner />
+    </Suspense>
+  );
+}
+
+function SupplyPageInner() {
+  const [tab, setTab] = useUrlState<TabId>("origin", "brazil", (raw) =>
+    (VALID_TAB_IDS.includes(raw) ? raw : "brazil") as TabId
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">

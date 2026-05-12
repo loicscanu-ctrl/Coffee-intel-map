@@ -4,6 +4,9 @@ import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaf
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
+import { useUrlState } from "@/lib/useUrlState";
+
+const VALID_BASEMAP_IDS = BASEMAPS.map(b => b.id);
 
 // ── Hub → Portuguese country list (Cecafe) ────────────────────────────────────
 const HUB_COUNTRIES: Record<string, string[]> = {
@@ -181,7 +184,9 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const tileLayerRef = useRef<TileLayer | null>(null);
   const priceMarkersRef = useRef<LeafletMarker[]>([]);
   const freightMarkersRef = useRef<LeafletMarker[]>([]);
-  const [activeBasemap, setActiveBasemap] = useState("dark");
+  const [activeBasemap, setActiveBasemap] = useUrlState<string>("basemap", "dark", (raw) =>
+    VALID_BASEMAP_IDS.includes(raw) ? raw : "dark"
+  );
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
   const [freightData, setFreightData] = useState<{ routes: { id: string; rate: number; prev: number }[] } | null>(null);
