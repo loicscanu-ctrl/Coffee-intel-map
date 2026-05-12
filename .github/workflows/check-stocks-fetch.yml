@@ -1,0 +1,180 @@
+name: "Z – Stocks Fetch Smoke Test (diagnostic)"
+
+# Diagnostic workflow that exercises the new ICE + PSD scrapers end-to-end
+# from a GitHub Actions runner (different network egress than the local
+# sandbox). Writes a markdown report to the step summary so the result is
+# readable via the check-run output, no logs API needed.
+#
+# Triggered on push to any non-main branch (so we don't run it on main),
+# plus manual workflow_dispatch.
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'backend/scraper/sources/ice_certified.py'
+      - 'backend/scraper/sources/psd_japan.py'
+      - 'backend/scraper/sources/ecf_stocks.py'
+      - 'backend/scraper/test_stocks_fetch.py'
+      - '.github/workflows/check-stocks-fetch.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install minimal Python deps
+        run: pip install pandas openpyxl xlrd requests pypdf playwright
+
+      - name: Install Playwright Chromium
+        run: playwright install chromium --with-deps
+
+      - name: Stage 1 — bare requests probe (ICE + PSD)
+        id: probe
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          python -m scraper.test_stocks_fetch | tee /tmp/probe.txt
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Stage 2 — real ICE scraper with Playwright fallback
+        id: ice
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          python -m scraper.sources.ice_certified 2>&1 | tee /tmp/ice_run.txt
+          echo "ice_exit=$?" >> "$GITHUB_OUTPUT"
+          if [ -f scraper/cache/ice_certified.json ]; then
+            echo "ICE_CACHE_OK=yes" >> "$GITHUB_ENV"
+            head -c 4000 scraper/cache/ice_certified.json > /tmp/ice_cache_head.txt
+          else
+            echo "ICE_CACHE_OK=no" >> "$GITHUB_ENV"
+          fi
+
+      - name: Stage 3 — real PSD Japan scraper
+        id: psd
+        continue-on-error: true
+        working-directory: backend
+        run: |
+          set +e
+          python -m scraper.sources.psd_japan 2>&1 | tee /tmp/psd_run.txt
+          echo "psd_exit=$?" >> "$GITHUB_OUTPUT"
+          if [ -f scraper/cache/psd_japan.json ]; then
+            echo "PSD_CACHE_OK=yes" >> "$GITHUB_ENV"
+            head -c 4000 scraper/cache/psd_japan.json > /tmp/psd_cache_head.txt
+          else
+            echo "PSD_CACHE_OK=no" >> "$GITHUB_ENV"
+          fi
+
+      - name: Render step summary
+        if: always()
+        run: |
+          {
+            echo "# Stocks-fetch diagnostic — $(date -u +'%Y-%m-%d %H:%M UTC')"
+            echo ""
+            echo "## Stage 1 — bare \`requests\` probe (test_stocks_fetch.py)"
+            echo '```'
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/probe.txt || echo "(no output)"
+            echo '```'
+            echo ""
+            echo "## Stage 2 — real ICE scraper (\`scraper.sources.ice_certified\`)"
+            echo "- cache file written: \`${ICE_CACHE_OK}\`"
+            echo ""
+            echo '```'
+            cat /tmp/ice_run.txt || echo "(no output)"
+            echo '```'
+            if [ -f /tmp/ice_cache_head.txt ]; then
+              echo ""
+              echo "### First 4 KB of \`ice_certified.json\`"
+              echo '```json'
+              cat /tmp/ice_cache_head.txt
+              echo ""
+              echo '```'
+            fi
+            echo ""
+            echo "## Stage 3 — real PSD Japan scraper (\`scraper.sources.psd_japan\`)"
+            echo "- cache file written: \`${PSD_CACHE_OK}\`"
+            echo ""
+            echo '```'
+            cat /tmp/psd_run.txt || echo "(no output)"
+            echo '```'
+            if [ -f /tmp/psd_cache_head.txt ]; then
+              echo ""
+              echo "### First 4 KB of \`psd_japan.json\`"
+              echo '```json'
+              cat /tmp/psd_cache_head.txt
+              echo ""
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish check-run with verdict
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const read = p => { try { return fs.readFileSync(p, 'utf8'); } catch { return ''; } };
+            const stripAnsi = s => s.replace(/\x1b\[[0-9;]*m/g, '');
+
+            const probe = stripAnsi(read('/tmp/probe.txt'));
+            const iceRun = read('/tmp/ice_run.txt');
+            const psdRun = read('/tmp/psd_run.txt');
+            const iceCacheOk = process.env.ICE_CACHE_OK === 'yes';
+            const psdCacheOk = process.env.PSD_CACHE_OK === 'yes';
+
+            const iceProbeOk = probe.includes('ICE Arabica certified : ✓');
+            const psdProbeOk = probe.includes('USDA PSD Japan        : ✓');
+
+            const verdict = [
+              `ICE probe (requests):  ${iceProbeOk ? 'PASS' : 'FAIL'}`,
+              `PSD probe (requests):  ${psdProbeOk ? 'PASS' : 'FAIL'}`,
+              `ICE scraper cache:     ${iceCacheOk ? 'WRITTEN' : 'EMPTY'}`,
+              `PSD scraper cache:     ${psdCacheOk ? 'WRITTEN' : 'EMPTY'}`,
+            ].join('\n');
+
+            const conclusion =
+              (iceCacheOk || psdCacheOk) ? 'success' :
+              'failure';
+
+            const summary = [
+              '```',
+              verdict,
+              '```',
+              '',
+              '### Probe output',
+              '```', probe.slice(-3000), '```',
+              '',
+              '### ICE scraper run',
+              '```', iceRun.slice(-3000), '```',
+              '',
+              '### PSD scraper run',
+              '```', psdRun.slice(-3000), '```',
+            ].join('\n');
+
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              name:  'stocks-fetch-diagnostic',
+              head_sha: context.sha,
+              status:    'completed',
+              conclusion,
+              output: {
+                title:   `Stocks fetch — ICE ${iceCacheOk ? 'ok' : 'X'} / PSD ${psdCacheOk ? 'ok' : 'X'}`,
+                summary,
+              },
+            });
