@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
 import NewsFeed from "@/components/map/NewsFeed";
-import MarketTicker from "@/components/map/MarketTicker";
 import {
   fetchMapCountries, fetchMapFactories, fetchNews,
   type CountryPin, type FactoryPin, type NewsItem,
@@ -59,7 +58,6 @@ export default function MapPageClient() {
 
   return (
     <div className="w-full h-full flex flex-col">
-      <MarketTicker />
       {error && (
         <div className="bg-red-900/40 border-b border-red-700 text-red-200 text-xs px-4 py-2">
           {error}

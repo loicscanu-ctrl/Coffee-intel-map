@@ -4,7 +4,7 @@ import OIHistoryTable from "@/components/futures/OIHistoryTable";
 import OIFndChart from "@/components/futures/OIFndChart";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
-import { DataHealthBar } from "@/components/DataHealthBar";
+import PageHeader from "@/components/PageHeader";
 
 interface Contract {
   contract: string;
@@ -547,10 +547,15 @@ export default function FuturesPage() {
   const loading      = chainJson === null;
 
   return (
-    <div className="p-6 h-full overflow-y-auto space-y-4">
+    <div className="h-full overflow-y-auto">
+      <PageHeader
+        title="Futures"
+        subtitle="ICE Arabica (KC) · ICE Robusta (RC) — chain, quotation & arbitrage"
+        healthKeys={["futures", "cot", "macro_cot"]}
+      />
+      <div className="p-6 space-y-4">
       {/* Tab bar */}
-      <div className="flex items-center gap-1 border-b border-slate-700">
-        <h1 className="text-lg font-bold text-white mr-4">Futures</h1>
+      <div className="flex items-center gap-1 border-b border-slate-700 flex-wrap">
         {(["exchange", "quotation"] as const).map(t => (
           <button
             key={t}
@@ -576,8 +581,6 @@ export default function FuturesPage() {
           Research
         </button>
       </div>
-
-      <DataHealthBar keys={["futures", "cot", "macro_cot"]} />
 
       {/* Exchange tab */}
       {tab === "exchange" && (
@@ -647,6 +650,7 @@ export default function FuturesPage() {
       {/* Research tab — draft COT backtest report */}
       {tab === "research" && <CotBacktestReport />}
 
+      </div>
     </div>
   );
 }

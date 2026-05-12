@@ -4,6 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   ComposedChart, Bar,
 } from "recharts";
+import PageHeader from "@/components/PageHeader";
 
 type FreightRoute = {
   id: string;
@@ -137,8 +138,13 @@ export default function FreightClient({ data }: Props) {
   }, []);
 
   return (
-    <div className="p-6 h-full overflow-y-auto space-y-4">
-      <h1 className="text-lg font-bold text-white">Freight</h1>
+    <div className="h-full overflow-y-auto">
+      <PageHeader
+        title="Freight"
+        subtitle="Container & dry-bulk freight indicators"
+        healthKeys={["freight"]}
+      />
+      <div className="p-6 space-y-4">
 
       {/* Container freight chart */}
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -243,6 +249,7 @@ export default function FreightClient({ data }: Props) {
           Loading dry bulk indicator…
         </div>
       )}
+      </div>
     </div>
   );
 }
