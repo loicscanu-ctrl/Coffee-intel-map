@@ -184,14 +184,21 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
 
-  // Permanent price labels for origin pins. Read the two JSON files that
-  // are already published by the export pipeline, compute USD + diff vs
-  // matching front month, and re-render whenever they refresh.
+  // Permanent price labels for origin pins. Fetch latest_prices + live RC/KC.
+  // Acaphe: try /api/live (Redis, updated every 15 min) first; fall back to
+  // the static snapshot so the map never goes blank.
   useEffect(() => {
     let cancelled = false;
+    const fetchAcaphe = () =>
+      fetch("/api/live", { cache: "no-store" })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(d => (d && !d.error) ? d : Promise.reject())
+        .catch(() =>
+          fetch("/data/acaphe_live.json").then(r => r.ok ? r.json() : null).catch(() => null)
+        );
     Promise.all([
       fetch("/data/latest_prices.json").then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch("/data/acaphe_live.json").then(r => r.ok ? r.json() : null).catch(() => null),
+      fetchAcaphe(),
     ]).then(([latest, acaphe]) => {
       if (!cancelled) setOriginPrices(computeOriginPrices(latest, acaphe));
     });
