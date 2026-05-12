@@ -1,10 +1,14 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import OIHistoryTable from "@/components/futures/OIHistoryTable";
 import OIFndChart from "@/components/futures/OIFndChart";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import PageHeader from "@/components/PageHeader";
+import { useUrlState } from "@/lib/useUrlState";
+
+type FuturesTab = "exchange" | "quotation" | "research";
+const FUTURES_TABS: FuturesTab[] = ["exchange", "quotation", "research"];
 
 interface Contract {
   contract: string;
@@ -523,9 +527,19 @@ interface FuturesChainJson {
 }
 
 export default function FuturesPage() {
+  return (
+    <Suspense fallback={<div className="h-full bg-slate-950" />}>
+      <FuturesPageInner />
+    </Suspense>
+  );
+}
+
+function FuturesPageInner() {
   const [chainJson, setChainJson]   = useState<FuturesChainJson | null>(null);
   const [vnFaqUsdMt, setVnFaqUsdMt] = useState<number | null>(null);
-  const [tab, setTab]               = useState<"exchange" | "quotation" | "research">("exchange");
+  const [tab, setTab]               = useUrlState<FuturesTab>("tab", "exchange", (raw) =>
+    (FUTURES_TABS as string[]).includes(raw) ? (raw as FuturesTab) : "exchange"
+  );
 
   // Chain data: instant from static JSON, no backend needed
   useEffect(() => {

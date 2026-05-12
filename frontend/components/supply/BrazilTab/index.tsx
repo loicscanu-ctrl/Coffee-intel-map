@@ -4,6 +4,9 @@ import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
 import { COUNTRY_HUB, EMPTY_CY } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
 import type { CecafeData, FilterState } from "./types";
+import { useUrlState } from "@/lib/useUrlState";
+
+type BrazilSubTab = "exports" | "farmer-economics";
 
 import StatCard from "./StatCard";
 import DailyRegistrationSection from "./DailyRegistration";
@@ -21,7 +24,9 @@ export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
-  const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
+  const [subTab, setSubTab] = useUrlState<BrazilSubTab>("brazilTab", "exports", (raw) =>
+    raw === "farmer-economics" ? "farmer-economics" : "exports"
+  );
 
   useEffect(() => {
     fetch("/data/cecafe.json")
