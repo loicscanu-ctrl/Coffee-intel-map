@@ -98,12 +98,6 @@ export function computeOriginPrices(
 
   const rcFront = mostLiquid(acaphe.robusta)?.last ?? null;
 
-  // KC highest-liquidity contract (¢/lb → USD/MT). Ready for arabica-origin pins.
-  const _kcFront = (() => {
-    const c = mostLiquid(acaphe.arabica);
-    return c?.last != null ? kcCentsToUsdMt(c.last) : null;
-  })();
-
   // USD/VND FX rate from tickers — recomputed fresh here rather than relying
   // on the pre-baked $USD in the ticker string, which may be from a different
   // timestamp than the live RC price.

@@ -12,7 +12,7 @@ import SectionHeader from "./SectionHeader";
 type CyclePoint = { x: number; y: number; timeframe: ProcessedCotRow["timeframe"]; date: string };
 
 export default function Step6CycleLocation({ recent52 }: { recent52: ProcessedCotRow[] }) {
-  const cycleColor = (d: CyclePoint, _market: "ny" | "ldn") => {
+  const cycleColor = (d: CyclePoint) => {
     if (d.timeframe === "current")  return "#ef4444";
     if (d.timeframe === "recent_1") return "#f97316";
     if (d.timeframe === "recent_4") return "#eab308";
@@ -48,7 +48,7 @@ export default function Step6CycleLocation({ recent52 }: { recent52: ProcessedCo
             labelFormatter={((_label, payload) => (payload as Payload<ValueType, NameType>[] | undefined)?.[0]?.payload?.date ?? "") satisfies NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>} />
           <Scatter name={market === "ny" ? "NY Arabica" : "LDN Robusta"} data={pts}>
             {pts.map((d, i) => (
-              <Cell key={i} fill={cycleColor(d, market)} fillOpacity={cycleOpacity(d)} />
+              <Cell key={i} fill={cycleColor(d)} fillOpacity={cycleOpacity(d)} />
             ))}
           </Scatter>
         </ScatterChart>
