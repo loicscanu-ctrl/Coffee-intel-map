@@ -45,8 +45,8 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
                 name === "Price" ? Number(v).toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name as NameType,
               ]) satisfies Formatter<ValueType, NameType>} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Area yAxisId="left" type="monotone" dataKey={longKey}  name="Industry Long"  stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} dot={false} />
-              <Area yAxisId="left" type="monotone" dataKey={shortKey} name="Industry Short" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey={longKey}  name="Industry Long"  stroke="#92400e" fill="#92400e" fillOpacity={0.3} strokeWidth={2} dot={false} />
+              <Area yAxisId="left" type="monotone" dataKey={shortKey} name="Industry Short" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} strokeWidth={2} dot={false} />
               <Line yAxisId="right" type="monotone" dataKey={priceKey} name="Price" stroke="#f59e0b" strokeWidth={2} dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
@@ -62,8 +62,8 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
               <Tooltip contentStyle={CHART_STYLE} formatter={((v, name) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name as NameType]) satisfies Formatter<ValueType, NameType>} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#10b981" opacity={0.8} barSize={4} />
-              <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#3b82f6" opacity={0.8} barSize={4} />
+              <Bar dataKey="deltaLong"  name="Δ Long (wk)"  fill="#92400e" opacity={0.8} barSize={4} />
+              <Bar dataKey="deltaShort" name="Δ Short (wk)" fill="#22c55e" opacity={0.8} barSize={4} />
               {market === "ny" && <Line type="monotone" dataKey="efpMT" name="EFP Physical" stroke="#f59e0b" strokeWidth={1.5} dot={false} />}
             </ComposedChart>
           </ResponsiveContainer>

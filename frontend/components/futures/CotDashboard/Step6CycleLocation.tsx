@@ -13,7 +13,7 @@ type CyclePoint = { x: number; y: number; timeframe: ProcessedCotRow["timeframe"
 
 export default function Step6CycleLocation({ recent52 }: { recent52: ProcessedCotRow[] }) {
   const cycleColor = (d: CyclePoint, market: "ny" | "ldn") => {
-    if (d.timeframe === "current")  return market === "ny" ? "#ef4444" : "#3b82f6";
+    if (d.timeframe === "current")  return "#ef4444";
     if (d.timeframe === "recent_1") return "#f97316";
     if (d.timeframe === "recent_4") return "#eab308";
     return "#64748b";

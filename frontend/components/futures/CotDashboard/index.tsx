@@ -143,6 +143,12 @@ export default function CotDashboard() {
         </button>
       </div>
 
+      {cotRows !== null && !cotError && (
+        <div className="text-[10px] text-slate-500 font-mono px-1">
+          COT data as of <span className="text-slate-400">{latest.date}</span>
+        </div>
+      )}
+
       <Step1GlobalFlow macroData={macroData} macroError={macroError} globalFlowMetrics={globalFlowMetrics} />
 
       <div id="cot-section-2"><CotHeatmap data={data} /></div>
