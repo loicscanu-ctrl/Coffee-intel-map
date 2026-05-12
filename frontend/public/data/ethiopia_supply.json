@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-12T06:00:21.061386Z",
+  "scraped_at": "2026-05-12T06:30:42.059638Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
@@ -9,7 +9,7 @@
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-12T05:57:21.452645Z",
+    "scraped_at": "2026-05-12T06:01:24.380534Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -22,8 +22,8 @@
       {
         "name": "Harrar",
         "drought": "HIGH",
-        "csi_30d": 0.374,
-        "csi_60d": 0.186,
+        "csi_30d": 0.326,
+        "csi_60d": 0.164,
         "csi_30d_level": "MED",
         "csi_60d_level": "LOW"
       },
@@ -57,7 +57,6 @@
         "region": "Harrar",
         "days": [
           "M",
-          "M",
           "H",
           "H",
           "H",
@@ -117,12 +116,13 @@
           "-",
           "-",
           "L",
-          "L",
-          "L",
-          "L",
-          "L",
           "M",
-          "M"
+          "L",
+          "L",
+          "-",
+          "L",
+          "L",
+          "L"
         ]
       },
       {
@@ -203,9 +203,9 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "M",
+          "-",
           "-",
           "-",
           "-",

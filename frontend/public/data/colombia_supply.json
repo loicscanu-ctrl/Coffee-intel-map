@@ -1,6 +1,6 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-05-12T06:00:19.201273Z",
+  "scraped_at": "2026-05-12T06:30:40.255453Z",
   "exports": null,
   "fnc_price": {
     "cop_per_carga": 2300000,
@@ -8,7 +8,7 @@
     "source": "FNC"
   },
   "weather": {
-    "scraped_at": "2026-05-12T05:57:03.748235Z",
+    "scraped_at": "2026-05-12T06:10:45.145362Z",
     "regions": [
       {
         "name": "Huila",
