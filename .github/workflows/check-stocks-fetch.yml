@@ -93,13 +93,7 @@ jobs:
         working-directory: backend
         run: |
           set +e
-          # ecf_stocks.run(page) is async; invoke via a tiny launcher.
-          python -c "
-import asyncio, json
-from scraper.sources import ecf_stocks
-items = asyncio.run(ecf_stocks.run(None))
-print(json.dumps({'count': len(items), 'items': items}, indent=2, default=str))
-" 2>&1 | tee /tmp/ecf_run.txt
+          python -c "import asyncio, json; from scraper.sources import ecf_stocks; r = asyncio.run(ecf_stocks.run(None)); print(json.dumps({'count': len(r), 'items': r}, indent=2, default=str))" 2>&1 | tee /tmp/ecf_run.txt
           echo "ecf_exit=$?" >> "$GITHUB_OUTPUT"
 
       - name: Assemble diagnostic report
