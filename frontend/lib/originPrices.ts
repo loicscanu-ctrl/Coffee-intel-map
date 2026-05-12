@@ -27,8 +27,8 @@ export interface OriginPrice {
 interface Ticker { label: string; value: string; category: string }
 interface LatestPrices { tickers: Ticker[] }
 interface AcapheLive {
-  robusta: Array<{ last: number | null; oi?: number | null }>;
-  arabica: Array<{ last: number | null; oi?: number | null }>;
+  robusta: Array<{ last: number | null; oi?: number | null; vol?: number | null }>;
+  arabica: Array<{ last: number | null; oi?: number | null; vol?: number | null }>;
 }
 
 /** Parse "88.300 VND ($3,371)" → { local: "88.300 VND", usd: 3371 }
@@ -81,17 +81,26 @@ export function computeOriginPrices(
 
   const tickers = new Map(latest.tickers.map(t => [t.label, t.value]));
 
-  // Benchmarks: contract with highest open interest (most liquid) for each market.
-  const rcContract = acaphe.robusta?.reduce<typeof acaphe.robusta[0] | null>(
-    (best, c) => ((c.oi ?? 0) > (best?.oi ?? 0) ? c : best), null
-  ) ?? null;
-  const rcFront = rcContract?.last ?? null;
+  // Pick most-liquid contract: highest OI, falling back to highest Vol if OI absent.
+  function mostLiquid<T extends { oi?: number | null; vol?: number | null; last: number | null }>(
+    contracts: T[] | null | undefined
+  ): T | null {
+    if (!contracts?.length) return null;
+    const hasOi = contracts.some(c => (c.oi ?? 0) > 0);
+    return contracts.reduce<T | null>(
+      (best, c) => {
+        const score = hasOi ? (c.oi ?? 0) : (c.vol ?? 0);
+        const bestScore = hasOi ? (best?.oi ?? 0) : (best?.vol ?? 0);
+        return score > bestScore ? c : best;
+      }, null
+    );
+  }
 
-  // KC highest-OI contract (¢/lb → USD/MT). Ready for arabica-origin pins.
+  const rcFront = mostLiquid(acaphe.robusta)?.last ?? null;
+
+  // KC highest-liquidity contract (¢/lb → USD/MT). Ready for arabica-origin pins.
   const _kcFront = (() => {
-    const c = acaphe.arabica?.reduce<typeof acaphe.arabica[0] | null>(
-      (best, cur) => ((cur.oi ?? 0) > (best?.oi ?? 0) ? cur : best), null
-    ) ?? null;
+    const c = mostLiquid(acaphe.arabica);
     return c?.last != null ? kcCentsToUsdMt(c.last) : null;
   })();
 
