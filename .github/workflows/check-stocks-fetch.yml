@@ -9,14 +9,8 @@ name: "Z – Stocks Fetch Smoke Test (diagnostic)"
 # plus manual workflow_dispatch.
 
 on:
-  push:
-    branches-ignore:
-      - main
-    paths:
-      - 'backend/scraper/sources/psd_coffee.py'
-      - 'backend/scraper/sources/ecf_stocks.py'
-      - 'backend/scraper/test_stocks_fetch.py'
-      - '.github/workflows/check-stocks-fetch.yml'
+  # Manual only — this is a debugging tool, not part of the normal pipeline.
+  # Run via Actions → "Z – Stocks Fetch Smoke Test (diagnostic)" → Run workflow.
   workflow_dispatch:
 
 jobs:
