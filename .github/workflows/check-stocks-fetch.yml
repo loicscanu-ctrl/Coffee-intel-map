@@ -50,6 +50,38 @@ jobs:
           python -m scraper.test_stocks_fetch | tee /tmp/probe.txt
           echo "exit=$?" >> "$GITHUB_OUTPUT"
 
+      - name: Stage 1b — probe alternate ICE URLs (find the live path)
+        if: always()
+        continue-on-error: true
+        run: |
+          set +e
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+          echo "Probing ICE candidate URLs ..."  | tee /tmp/ice_alts.txt
+          for url in \
+            "https://www.theice.com/publicdocs/futures_us_reports/coffee/Coffee_C_Cert_Stocks.xls" \
+            "https://www.ice.com/publicdocs/futures_us_reports/coffee/Coffee_C_Cert_Stocks.xls" \
+            "https://www.ice.com/publicdocs/futures_us/coffee/Coffee_C_Cert_Stocks.xls" \
+            "https://www.ice.com/publicdocs/Coffee_C_Cert_Stocks.xls" \
+            "https://www.theice.com/publicdocs/futures/Coffee_C_Cert_Stocks.xls" \
+            "https://www.theice.com/marketdata/reports/126" \
+            "https://www.theice.com/marketdata/reports/datawarehouse/ConsolidatedEndOfDayReportPDF.shtml?selectedReport=ICE_FUTURES_US_COFFEE_C_CERTIFIED_INVENTORIES" \
+            "https://www.ice.com/products/15/Coffee-C-Futures/data" \
+            "https://www.theice.com/products/15/Coffee-C-Futures/data" \
+            "https://www.ice.com/marketdata/reports/126?selectedReport=126" \
+            "https://www.theice.com/marketdata/CertifiedReportsStocksCoffee.xls" \
+            "https://www.theice.com/clear_us/danotices" \
+            ; do
+            # -L follows redirects; -o /dev/null silences body; -w prints final status + URL
+            line=$(curl -s -L -A "$UA" --max-time 25 -o /tmp/body.bin -w "%{http_code} %{size_download} %{content_type} -> %{url_effective}" "$url")
+            echo "  $url"             | tee -a /tmp/ice_alts.txt
+            echo "    $line"          | tee -a /tmp/ice_alts.txt
+            # If we got 200 and it looks like an Excel file, dump the first 16 bytes hex
+            if [[ "$line" == 200* ]]; then
+              echo -n "    head(hex): " | tee -a /tmp/ice_alts.txt
+              xxd -l 16 /tmp/body.bin 2>/dev/null | head -1 | tee -a /tmp/ice_alts.txt
+            fi
+          done
+
       - name: Stage 2 — real ICE scraper with Playwright fallback
         id: ice
         continue-on-error: true
@@ -141,6 +173,11 @@ jobs:
             echo "## Stage 1 — bare requests probe (test_stocks_fetch.py)"
             echo '```'
             sed 's/\x1b\[[0-9;]*m//g' /tmp/probe.txt 2>/dev/null || echo "(no probe output)"
+            echo '```'
+            echo ""
+            echo "## Stage 1b — alternate ICE URL probes"
+            echo '```'
+            cat /tmp/ice_alts.txt 2>/dev/null || echo "(no alt probe output)"
             echo '```'
             echo ""
             echo "## Stage 2 — real ICE scraper run"
