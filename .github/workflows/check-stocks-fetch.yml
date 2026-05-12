@@ -122,59 +122,63 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Publish check-run with verdict
+      - name: Assemble diagnostic report
         if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const read = p => { try { return fs.readFileSync(p, 'utf8'); } catch { return ''; } };
-            const stripAnsi = s => s.replace(/\x1b\[[0-9;]*m/g, '');
+        run: |
+          mkdir -p _diagnostic
+          {
+            echo "# Stocks-fetch diagnostic"
+            echo ""
+            echo "- commit: \`${GITHUB_SHA}\`"
+            echo "- run:    https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- date:   $(date -u +'%Y-%m-%d %H:%M UTC')"
+            echo "- runner: ubuntu-22.04 ($(curl -s ifconfig.me || echo unknown))"
+            echo ""
+            echo "## Verdict"
+            echo "- ICE scraper cache written : ${ICE_CACHE_OK:-no}"
+            echo "- PSD scraper cache written : ${PSD_CACHE_OK:-no}"
+            echo ""
+            echo "## Stage 1 — bare requests probe (test_stocks_fetch.py)"
+            echo '```'
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/probe.txt 2>/dev/null || echo "(no probe output)"
+            echo '```'
+            echo ""
+            echo "## Stage 2 — real ICE scraper run"
+            echo '```'
+            cat /tmp/ice_run.txt 2>/dev/null || echo "(no ICE output)"
+            echo '```'
+            echo ""
+            echo "## Stage 3 — real PSD Japan scraper run"
+            echo '```'
+            cat /tmp/psd_run.txt 2>/dev/null || echo "(no PSD output)"
+            echo '```'
+          } > _diagnostic/stocks-fetch-result.md
 
-            const probe = stripAnsi(read('/tmp/probe.txt'));
-            const iceRun = read('/tmp/ice_run.txt');
-            const psdRun = read('/tmp/psd_run.txt');
-            const iceCacheOk = process.env.ICE_CACHE_OK === 'yes';
-            const psdCacheOk = process.env.PSD_CACHE_OK === 'yes';
+          if [ -f backend/scraper/cache/ice_certified.json ]; then
+            cp backend/scraper/cache/ice_certified.json _diagnostic/ice_certified.json
+          fi
+          if [ -f backend/scraper/cache/psd_japan.json ]; then
+            cp backend/scraper/cache/psd_japan.json _diagnostic/psd_japan.json
+          fi
 
-            const iceProbeOk = probe.includes('ICE Arabica certified : ✓');
-            const psdProbeOk = probe.includes('USDA PSD Japan        : ✓');
-
-            const verdict = [
-              `ICE probe (requests):  ${iceProbeOk ? 'PASS' : 'FAIL'}`,
-              `PSD probe (requests):  ${psdProbeOk ? 'PASS' : 'FAIL'}`,
-              `ICE scraper cache:     ${iceCacheOk ? 'WRITTEN' : 'EMPTY'}`,
-              `PSD scraper cache:     ${psdCacheOk ? 'WRITTEN' : 'EMPTY'}`,
-            ].join('\n');
-
-            const conclusion =
-              (iceCacheOk || psdCacheOk) ? 'success' :
-              'failure';
-
-            const summary = [
-              '```',
-              verdict,
-              '```',
-              '',
-              '### Probe output',
-              '```', probe.slice(-3000), '```',
-              '',
-              '### ICE scraper run',
-              '```', iceRun.slice(-3000), '```',
-              '',
-              '### PSD scraper run',
-              '```', psdRun.slice(-3000), '```',
-            ].join('\n');
-
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo:  context.repo.repo,
-              name:  'stocks-fetch-diagnostic',
-              head_sha: context.sha,
-              status:    'completed',
-              conclusion,
-              output: {
-                title:   `Stocks fetch — ICE ${iceCacheOk ? 'ok' : 'X'} / PSD ${psdCacheOk ? 'ok' : 'X'}`,
-                summary,
-              },
-            });
+      - name: Commit diagnostic report back to branch
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Pull latest in case the branch moved (push amid concurrent work).
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --soft "origin/${GITHUB_REF_NAME}" || true
+          git add _diagnostic/
+          if git diff --cached --quiet; then
+            echo "No diagnostic changes to commit"
+            exit 0
+          fi
+          git commit -m "ci(diagnostic): stocks-fetch result for ${GITHUB_SHA::7}"
+          # Retry the push in case another job is racing us.
+          for i in 1 2 3; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            sleep $((i * 3))
+          done
+          echo "::warning::failed to push diagnostic report after 3 attempts"
