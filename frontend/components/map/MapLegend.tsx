@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import type { FactoryType } from "@/lib/api";
 
 interface LegendDotProps {
   color: string;
@@ -45,19 +46,86 @@ function LegendItem({ color, shape = "circle", label, sub }: LegendDotProps) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// Clickable variant for factory-type rows. When the user clicks, the type's
+// visibility on the map is toggled (managed by the parent). Hidden state is
+// rendered with reduced opacity + a strikethrough hint so it's obvious which
+// types are being filtered out.
+function ToggleableLegendItem({
+  color,
+  label,
+  sub,
+  hidden,
+  onClick,
+}: {
+  color: string;
+  label: string;
+  sub?: string;
+  hidden: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={!hidden}
+      className={`w-full flex items-start gap-2 py-0.5 px-1 -mx-1 rounded text-left hover:bg-slate-800/60 transition-colors ${
+        hidden ? "opacity-40" : ""
+      }`}
+    >
+      <span className="mt-[3px]">
+        <span
+          className="inline-block w-3 h-3 rounded-sm flex-shrink-0 border border-white/60"
+          style={{ background: color }}
+        />
+      </span>
+      <div className="text-[11px] leading-snug flex-1">
+        <span className={`text-slate-200 ${hidden ? "line-through" : ""}`}>{label}</span>
+        {sub && <span className="text-slate-500 ml-1">· {sub}</span>}
+      </div>
+    </button>
+  );
+}
+
+function Section({ title, children, hint }: { title: string; children: React.ReactNode; hint?: string }) {
   return (
     <div className="mb-3 last:mb-0">
-      <div className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">
-        {title}
+      <div className="flex items-baseline justify-between mb-1">
+        <div className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+          {title}
+        </div>
+        {hint && <div className="text-[9px] text-slate-600 italic">{hint}</div>}
       </div>
       {children}
     </div>
   );
 }
 
-export default function MapLegend() {
+interface MapLegendProps {
+  /** Set of factory `type` values currently hidden. Empty = all visible. */
+  hiddenFactoryTypes?: Set<FactoryType>;
+  /** Called when the user clicks a factory-type row to toggle it. */
+  onToggleFactoryType?: (t: FactoryType) => void;
+}
+
+const FACTORY_LEGEND_ROWS: Array<{ type: FactoryType; color: string; label: string; sub: string }> = [
+  { type: "mill",     color: "#a16207", label: "Origin mill",     sub: "M · dry/wet processing" },
+  { type: "roastery", color: "#7c2d12", label: "Roastery",        sub: "R" },
+  { type: "soluble",  color: "#fde68a", label: "Soluble (instant)", sub: "S" },
+  { type: "decaf",    color: "#16a34a", label: "Decaffeination",  sub: "D" },
+  { type: "capsules", color: "#94a3b8", label: "Capsules / pods", sub: "C" },
+  { type: "mixed",    color: "#6366f1", label: "Mixed-use plant", sub: "F" },
+  { type: "unknown",  color: "#475569", label: "Other / unknown", sub: "F" },
+];
+
+export default function MapLegend({ hiddenFactoryTypes, onToggleFactoryType }: MapLegendProps = {}) {
   const [open, setOpen] = useState(false);
+
+  // Both props arrive together from MapPageClient; default to noop + empty
+  // Set so the component remains usable when rendered without props.
+  const hidden = hiddenFactoryTypes ?? new Set<FactoryType>();
+  const toggle = onToggleFactoryType ?? (() => {});
+  const filterable = !!onToggleFactoryType;
+  const hiddenCount = hidden.size;
 
   return (
     <div className="absolute bottom-2 left-2 z-[1000]">
@@ -88,14 +156,30 @@ export default function MapLegend() {
             <LegendItem color="#3b82f6" label="Consumer country" />
           </Section>
 
-          <Section title="Factories">
-            <LegendItem color="#a16207" shape="square" label="Origin mill" sub="M · dry/wet processing" />
-            <LegendItem color="#7c2d12" shape="square" label="Roastery" sub="R" />
-            <LegendItem color="#fde68a" shape="square" label="Soluble (instant)" sub="S" />
-            <LegendItem color="#16a34a" shape="square" label="Decaffeination" sub="D" />
-            <LegendItem color="#94a3b8" shape="square" label="Capsules / pods" sub="C" />
-            <LegendItem color="#6366f1" shape="square" label="Mixed-use plant" sub="F" />
-            <LegendItem color="#475569" shape="square" label="Other / unknown" sub="F" />
+          <Section
+            title="Factories"
+            hint={filterable ? (hiddenCount > 0 ? `${hiddenCount} hidden · click to toggle` : "click to filter") : undefined}
+          >
+            {FACTORY_LEGEND_ROWS.map(row =>
+              filterable ? (
+                <ToggleableLegendItem
+                  key={row.type}
+                  color={row.color}
+                  label={row.label}
+                  sub={row.sub}
+                  hidden={hidden.has(row.type)}
+                  onClick={() => toggle(row.type)}
+                />
+              ) : (
+                <LegendItem
+                  key={row.type}
+                  color={row.color}
+                  shape="square"
+                  label={row.label}
+                  sub={row.sub}
+                />
+              )
+            )}
           </Section>
 
           <Section title="News pins">

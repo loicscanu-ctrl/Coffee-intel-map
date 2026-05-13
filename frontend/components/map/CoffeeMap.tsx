@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
+import type { LayerGroup as LeafletLayerGroup, Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
@@ -190,14 +190,19 @@ interface CoffeeMapProps {
   countries: CountryPin[];
   factories: FactoryPin[];
   news: NewsItem[];
+  /** Set of factory `type` values to hide; empty = all visible. */
+  hiddenFactoryTypes?: Set<string>;
 }
 
-export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
+export default function CoffeeMap({ onPinClick, countries, factories, news, hiddenFactoryTypes }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const tileLayerRef = useRef<TileLayer | null>(null);
   const priceMarkersRef = useRef<LeafletMarker[]>([]);
   const freightMarkersRef = useRef<LeafletMarker[]>([]);
+  // One Leaflet LayerGroup per factory type, so the filter UI can
+  // add/remove entire categories without re-instantiating markers.
+  const factoryLayersByTypeRef = useRef<Record<string, LeafletLayerGroup>>({});
   const [activeBasemap, setActiveBasemap] = useUrlState<string>("basemap", "dark", (raw) =>
     VALID_BASEMAP_IDS.includes(raw) ? raw : "dark"
   );
@@ -398,23 +403,67 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       });
 
       // ── Factory pins ──────────────────────────────────────────────────────
-      const factoriesLayer = Leaflet.layerGroup().addTo(map);
+      // Spread exactly-overlapping markers in a small circle so they're all
+      // individually clickable. We only displace pins that share IDENTICAL
+      // source coords (within float-equality on lat+lng) — near-duplicates
+      // already separate at city-level zoom. Displacement is ~50-100 m
+      // (0.0005°) so the marker still sits inside the same industrial zone.
+      const coordBuckets = new Map<string, FactoryPin[]>();
+      for (const f of factories as FactoryPin[]) {
+        const k = `${f.lat},${f.lng}`;
+        const list = coordBuckets.get(k);
+        if (list) list.push(f); else coordBuckets.set(k, [f]);
+      }
+      const factoryDisplayCoords = new Map<FactoryPin, [number, number]>();
+      coordBuckets.forEach((list) => {
+        if (list.length === 1) {
+          factoryDisplayCoords.set(list[0], [list[0].lat, list[0].lng]);
+          return;
+        }
+        // Deterministic ordering (alpha by name) so positions are stable.
+        const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name));
+        const N = sorted.length;
+        const radius = 0.0006;  // ~67 m at the equator
+        sorted.forEach((f, i) => {
+          const angle = (i * 2 * Math.PI) / N;
+          const dLat = radius * Math.sin(angle);
+          const dLng = radius * Math.cos(angle) / Math.cos(f.lat * Math.PI / 180);
+          factoryDisplayCoords.set(f, [f.lat + dLat, f.lng + dLng]);
+        });
+      });
+      // One LayerGroup per type, registered on the map. The filter useEffect
+      // below adds/removes whole groups when the user toggles types in the
+      // legend — avoids rebuilding markers on every toggle.
+      const layerByType: Record<string, LeafletLayerGroup> = {};
       (factories as FactoryPin[]).forEach((f) => {
         const t = (f.type as keyof typeof FACTORY_TYPE_STYLE) || "unknown";
         const style = FACTORY_TYPE_STYLE[t] ?? FACTORY_TYPE_STYLE.unknown;
+        // Scale the icon by capacity: sqrt(cap_kt / 30) clamped to [0.85, 1.5]
+        // so a 5 kt plant renders at ~14 px and a 80+ kt plant at ~24 px,
+        // without the largest entries (300 kt Folgers) blowing up the icon.
+        const cap = typeof f.cap_kt === "number" && f.cap_kt > 0 ? f.cap_kt : null;
+        const scale = cap ? Math.max(0.85, Math.min(1.5, Math.sqrt(cap / 30))) : 1;
+        const px = Math.round(16 * scale);
+        const fontPx = Math.max(8, Math.round(9 * scale));
         const icon = Leaflet.divIcon({
           className: "",
-          html: `<div style="background:${style.bg};color:${style.fg};border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${style.letter}</div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          html: `<div style="background:${style.bg};color:${style.fg};border:1px solid #fff;border-radius:3px;width:${px}px;height:${px}px;display:flex;align-items:center;justify-content:center;font-size:${fontPx}px;font-weight:700">${style.letter}</div>`,
+          iconSize: [px, px],
+          iconAnchor: [px / 2, px / 2],
         });
         const subtitle = f.type
           ? `<div style="color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:2px 0 4px">${style.label}</div>`
           : "";
-        Leaflet.marker([f.lat, f.lng], { icon })
-          .bindPopup(`<b>${f.name}</b>${subtitle}${f.company || ""}<br>Cap: ${f.capacity || ""}`)
-          .addTo(factoriesLayer);
+        const [displayLat, displayLng] = factoryDisplayCoords.get(f) ?? [f.lat, f.lng];
+        const capLine = f.capacity ? `<br>Cap: ${f.capacity}` : "";
+        const marker = Leaflet.marker([displayLat, displayLng], { icon })
+          .bindPopup(`<b>${f.name}</b>${subtitle}${f.company || ""}${capLine}`);
+        if (!layerByType[t]) layerByType[t] = Leaflet.layerGroup();
+        marker.addTo(layerByType[t]);
       });
+      // Add each type-group to the map; filter useEffect will toggle them.
+      for (const lg of Object.values(layerByType)) lg.addTo(map);
+      factoryLayersByTypeRef.current = layerByType;
 
       // ── News pins ─────────────────────────────────────────────────────────
       const newsLayer = Leaflet.layerGroup().addTo(map);
@@ -442,6 +491,19 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       if (mapRef.current) (mapRef.current as unknown as Record<string, unknown>)._leaflet_id = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Factory type filter (reacts to hiddenFactoryTypes prop) ──────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    const layers = factoryLayersByTypeRef.current;
+    for (const [type, layer] of Object.entries(layers)) {
+      const shouldHide = hiddenFactoryTypes?.has(type) ?? false;
+      const isOnMap = map.hasLayer(layer);
+      if (shouldHide && isOnMap) map.removeLayer(layer);
+      else if (!shouldHide && !isOnMap) layer.addTo(map);
+    }
+  }, [hiddenFactoryTypes]);
 
   // ── Basemap switcher (reacts to activeBasemap state) ──────────────────────
   useEffect(() => {

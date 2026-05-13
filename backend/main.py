@@ -54,6 +54,9 @@ def startup():
         conn.execute(text(
             "ALTER TABLE factories ADD COLUMN IF NOT EXISTS type VARCHAR(32)"
         ))
+        conn.execute(text(
+            "ALTER TABLE factories ADD COLUMN IF NOT EXISTS cap_kt DOUBLE PRECISION"
+        ))
     if os.getenv("SEED_ON_STARTUP", "1") == "1":
         from seed import run_seed
         run_seed()

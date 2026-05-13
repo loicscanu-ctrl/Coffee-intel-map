@@ -22,6 +22,7 @@ class FactoryOut(BaseModel):
     name: str
     company: str | None
     capacity: str | None
+    cap_kt: float | None
     type: str | None
     lat: float
     lng: float
@@ -46,6 +47,7 @@ def get_factories(response: Response, db: Session = Depends(get_db)) -> list[Fac
             name=f.name,
             company=f.company,
             capacity=f.capacity,
+            cap_kt=f.cap_kt,
             type=f.type,
             lat=f.lat,
             lng=f.lng,

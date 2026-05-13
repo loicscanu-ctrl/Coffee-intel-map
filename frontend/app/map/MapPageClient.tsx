@@ -1,12 +1,12 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
 import NewsFeed from "@/components/map/NewsFeed";
 import MapLegend from "@/components/map/MapLegend";
 import {
   fetchMapCountries, fetchMapFactories, fetchNews,
-  type CountryPin, type FactoryPin, type NewsItem,
+  type CountryPin, type FactoryPin, type FactoryType, type NewsItem,
 } from "@/lib/api";
 
 const CoffeeMap = dynamic(() => import("@/components/map/CoffeeMap"), {
@@ -26,6 +26,15 @@ export default function MapPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<NewsItem | null>(null);
   const [showFeed, setShowFeed] = useState(false);
+  // Per-type factory filter. Empty Set = all visible. Toggled via MapLegend.
+  const [hiddenFactoryTypes, setHiddenFactoryTypes] = useState<Set<FactoryType>>(() => new Set());
+  const toggleFactoryType = useCallback((t: FactoryType) => {
+    setHiddenFactoryTypes(prev => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t); else next.add(t);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,9 +80,18 @@ export default function MapPageClient() {
           </div>
         ) : (
           <>
-            <CoffeeMap onPinClick={setSelectedPin} countries={countries} factories={factories} news={news} />
+            <CoffeeMap
+              onPinClick={setSelectedPin}
+              countries={countries}
+              factories={factories}
+              news={news}
+              hiddenFactoryTypes={hiddenFactoryTypes}
+            />
             <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
-            <MapLegend />
+            <MapLegend
+              hiddenFactoryTypes={hiddenFactoryTypes}
+              onToggleFactoryType={toggleFactoryType}
+            />
             <button
               onClick={() => setShowFeed(f => !f)}
               className="absolute bottom-2 right-2 z-[1000] bg-slate-800/90 border border-slate-600 text-slate-300 hover:text-white text-xs sm:text-[10px] px-3 py-2 sm:px-2 sm:py-1 rounded shadow"

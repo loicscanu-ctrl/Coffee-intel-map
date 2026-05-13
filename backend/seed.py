@@ -1,10 +1,27 @@
 import json
 import os
+import re
 
 from database import SessionLocal
 from models import CountryIntel, Factory, NewsItem
 
 SEED_DIR = os.path.join(os.path.dirname(__file__), "seed")
+
+# Matches the leading "Xk" or "X.Xk" capacity prefix on factory descriptions.
+# Examples: "300k, The largest…" → 300.0; "15.6k, …" → 15.6; "0.5k, Geisha…" → 0.5.
+_CAP_KT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*k\b", re.IGNORECASE)
+
+
+def _parse_cap_kt(cap: str | None) -> float | None:
+    if not cap:
+        return None
+    m = _CAP_KT_RE.match(cap)
+    if not m:
+        return None
+    try:
+        return float(m.group(1))
+    except ValueError:
+        return None
 
 def seed_countries(db):
     path = os.path.join(SEED_DIR, "countries.json")
@@ -36,19 +53,24 @@ def seed_factories(db):
             continue
         name = fac.get("n", "")
         new_type = fac.get("t") or None
+        cap_str = fac.get("cap", "")
+        new_cap_kt = _parse_cap_kt(cap_str)
         existing = db.query(Factory).filter_by(name=name).first()
         if existing:
-            # Allow re-seeding to backfill the type column on rows inserted
-            # by an older build that didn't carry a type. Other fields are
+            # Allow re-seeding to backfill columns added in later schema
+            # revisions on rows inserted by an older build. Other fields are
             # treated as immutable to avoid clobbering manual DB edits.
             if existing.type is None and new_type is not None:
                 existing.type = new_type
+            if existing.cap_kt is None and new_cap_kt is not None:
+                existing.cap_kt = new_cap_kt
             continue
         db.add(Factory(
             name=name,
             company=fac.get("c", ""),
-            capacity=fac.get("cap", ""),
+            capacity=cap_str,
             type=new_type,
+            cap_kt=new_cap_kt,
             lat=fac["l"][0],
             lng=fac["l"][1],
         ))

@@ -73,6 +73,8 @@ export interface FactoryPin {
   name: string;
   company?: string;
   capacity?: string;
+  /** Numeric capacity in kilotonnes/year, parsed from the leading "Xk" in `capacity`. */
+  cap_kt?: number | null;
   type?: FactoryType | null;
 }
 
