@@ -1115,10 +1115,10 @@ def export_latest_prices(db) -> None:
     pp = {r.symbol: r for r in rows}
 
     # Also need the KC/RC chain meta (symbol label + change) which lives in NewsItem.meta
+    # Note: meta filter intentionally removed so that no-meta items (e.g. b3_icf) are found too
     recent_news = (
         db.query(NewsItem)
-        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7),
-                NewsItem.meta.isnot(None))
+        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7))
         .order_by(NewsItem.pub_date.desc())
         .all()
     )
@@ -1446,21 +1446,13 @@ def export_health(db) -> None:
     item = db.query(NewsItem).filter(NewsItem.source == "ECF").order_by(NewsItem.pub_date.desc()).first()
     scrapers["ecf"] = _ts(item.pub_date) if item else None
 
-    # USDA PSD coffee (EU + Japan, annual, from cache file)
-    try:
-        from scraper.sources import psd_coffee as _psd_coffee
-        pc = _psd_coffee.fetch_latest()
-        scrapers["psd_coffee"] = pc.get("last_updated") if pc else None
-    except Exception:
-        scrapers["psd_coffee"] = None
+    # USDA PSD coffee (EU + Japan, annual, from DB — cache file doesn't survive cross-job)
+    item = db.query(NewsItem).filter(NewsItem.source == "PSD Coffee").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["psd_coffee"] = _ts(item.pub_date) if item else None
 
-    # AJCA (Japan native source, from cache file)
-    try:
-        from scraper.sources import ajca as _ajca
-        aj = _ajca.fetch_latest()
-        scrapers["ajca"] = aj.get("last_updated") if aj else None
-    except Exception:
-        scrapers["ajca"] = None
+    # AJCA (Japan native source, from DB — cache file doesn't survive cross-job)
+    item = db.query(NewsItem).filter(NewsItem.source == "AJCA").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["ajca"] = _ts(item.pub_date) if item else None
 
     # CONAB Costs (arabica production cost, monthly)
     item = db.query(NewsItem).filter(NewsItem.source == "CONAB Custos").order_by(NewsItem.pub_date.desc()).first()

@@ -230,6 +230,22 @@ async def run(page, db) -> None:  # noqa: ARG001
             f"VN prod={vn.get('latest_production_mt')} MT "
             f"({len(producers)} countries)"
         )
+        # Persist to DB so export jobs on separate runners can fall back to DB
+        if db is not None:
+            from scraper.db import upsert_news_item
+            upsert_news_item(db, {
+                "title":    f"USDA PSD Coffee Data – {parsed['last_updated']}",
+                "body":     (
+                    f"PSD Coffee: EU imports={eu.get('latest_imports_mt')} MT, "
+                    f"Japan imports={jp.get('latest_imports_mt')} MT"
+                ),
+                "source":   "PSD Coffee",
+                "category": "demand",
+                "lat":      0.0,
+                "lng":      0.0,
+                "tags":     ["psd", "demand", "usda"],
+                "meta":     json.dumps(parsed),
+            })
     except Exception as e:
         print(f"[psd_coffee] FAILED: {e} — retaining cache")
 

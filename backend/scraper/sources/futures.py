@@ -94,7 +94,7 @@ def _barchart_requests() -> dict:
         opts   = "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
         base   = "https://www.barchart.com/proxies/core-api/v1/quotes/get"
         kc_r = sess.get(f"{base}?symbol=KC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
-        rm_r = sess.get(f"{base}?symbol=RM%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
+        rm_r = sess.get(f"{base}?symbol=RC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
         result = {}
         if kc_r.ok:
             result["kc"] = kc_r.json()
@@ -148,7 +148,7 @@ async def _barchart_playwright(page) -> dict:
                 const opts = '&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1';
                 const [kcResp, rmResp] = await Promise.all([
                     fetch(base + '?symbol=KC%5EF&fields=' + fields + opts, h),
-                    fetch(base + '?symbol=RM%5EF&fields=' + fields + opts, h),
+                    fetch(base + '?symbol=RC%5EF&fields=' + fields + opts, h),
                 ]);
                 return {
                     kc: kcResp.ok ? await kcResp.json() : null,
@@ -296,18 +296,28 @@ async def _fetch_chains(page) -> dict:
 
     # 1. Fast path: pure HTTP (no browser overhead)
     result = _barchart_requests()
-    if result.get("kc") or result.get("rm"):
+    if result.get("kc") and result.get("rm"):
         return result
 
     # 2. Playwright path — skip in CI where it always times out
     if not in_ci:
-        result = await _barchart_playwright(page)
-        if result.get("kc") or result.get("rm"):
+        pw = await _barchart_playwright(page)
+        for k in ("kc", "rm"):
+            if not result.get(k) and pw.get(k):
+                result[k] = pw[k]
+        if result.get("kc") and result.get("rm"):
             return result
 
-    # 3. Yahoo Finance — always reachable, no OI but price data guaranteed
-    print("[futures] Barchart unreachable — falling back to Yahoo Finance")
-    return _yfinance_fallback()
+    # 3. Yahoo Finance — supplement any still-missing side
+    if not result.get("kc") or not result.get("rm"):
+        missing = [k for k in ("kc", "rm") if not result.get(k)]
+        print(f"[futures] Barchart incomplete (missing: {missing}) — supplementing with Yahoo Finance")
+        yf = _yfinance_fallback()
+        for k in ("kc", "rm"):
+            if not result.get(k) and yf.get(k):
+                result[k] = yf[k]
+
+    return result
 
 
 def _parse_chain(raw_data: dict, label: str) -> list[dict]:
