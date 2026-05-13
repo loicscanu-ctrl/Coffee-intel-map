@@ -79,17 +79,39 @@ def _build_ajca() -> dict | None:
     if not data:
         return None
     return {
-        "source":                data.get("source", "AJCA"),
-        "source_url":            data.get("source_url"),
-        "last_updated":          data.get("last_updated"),
-        "latest_year":           data.get("latest_year"),
-        "latest_imports_mt":     data.get("latest_imports_mt"),
-        "latest_consumption_mt": data.get("latest_consumption_mt"),
-        "monthly_imports_pdf":   data.get("monthly_imports_pdf"),
-        "monthly_exports_pdf":   data.get("monthly_exports_pdf"),
-        "supply_demand_pdf":     data.get("supply_demand_pdf"),
-        "yearly_imports_pdf":    data.get("yearly_imports_pdf"),
+        "source":                 data.get("source", "AJCA"),
+        "source_url":             data.get("source_url"),
+        "last_updated":           data.get("last_updated"),
+        "latest_year":            data.get("latest_year"),
+        "latest_imports_mt":      data.get("latest_imports_mt"),
+        "latest_consumption_mt":  data.get("latest_consumption_mt"),
+        "monthly_imports_pdf":    data.get("monthly_imports_pdf"),
+        "monthly_exports_pdf":    data.get("monthly_exports_pdf"),
+        "supply_demand_pdf":      data.get("supply_demand_pdf"),
+        "yearly_imports_pdf":     data.get("yearly_imports_pdf"),
+        "latest_origin_breakdown": data.get("latest_origin_breakdown"),
+        "latest_origin_pdf":       data.get("latest_origin_pdf"),
     }
+
+
+def _psd_producers(psd_data: dict | None) -> dict | None:
+    """Return {country: {latest_year, production_mt, exports_mt, ...}} summary."""
+    if not psd_data:
+        return None
+    producers = psd_data.get("producers")
+    if not producers:
+        return None
+    out: dict[str, dict] = {}
+    for country, d in producers.items():
+        out[country] = {
+            "latest_year":            d.get("latest_year"),
+            "latest_production_mt":   d.get("latest_production_mt"),
+            "latest_exports_mt":      d.get("latest_exports_mt"),
+            "latest_consumption_mt":  d.get("latest_consumption_mt"),
+            "latest_stocks_mt":       d.get("latest_stocks_mt"),
+            "annual":                 d.get("annual", []),
+        }
+    return out or None
 
 
 def export_stocks(db) -> None:
@@ -101,19 +123,24 @@ def export_stocks(db) -> None:
 
     result = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "ecf":   _build_ecf(db),
-        "eu":    _psd_section("eu",    psd_data),
-        "japan": _psd_section("japan", psd_data),
-        "ajca":  _build_ajca(),
+        "ecf":      _build_ecf(db),
+        "eu":       _psd_section("eu",    psd_data),
+        "japan":    _psd_section("japan", psd_data),
+        "usa":      _psd_section("usa",   psd_data),
+        "ajca":     _build_ajca(),
+        "producers": _psd_producers(psd_data),
     }
     path = OUT_DIR / "demand_stocks.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    prod_count = len(result["producers"] or {})
     print(
         f"  demand_stocks.json -> "
         f"ecf:{result['ecf'] is not None} "
         f"eu:{result['eu'] is not None} "
         f"japan:{result['japan'] is not None} "
-        f"ajca:{result['ajca'] is not None}"
+        f"usa:{result['usa'] is not None} "
+        f"ajca:{result['ajca'] is not None} "
+        f"producers:{prod_count}"
     )
 
 

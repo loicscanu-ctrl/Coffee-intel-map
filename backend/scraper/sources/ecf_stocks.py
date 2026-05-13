@@ -18,11 +18,13 @@ Strategy:
 """
 from __future__ import annotations
 
+import io
 import json
 import re
 from datetime import date
 from urllib.parse import urljoin
 
+import pdfplumber
 import requests
 
 _HEADERS = {
@@ -248,6 +250,51 @@ def _post_to_entries(url: str) -> list[dict]:
     return [entry]
 
 
+def _parse_yearly_pdf(pdf_url: str, year: str) -> list[dict]:
+    """Download an ECF yearly PDF and extract monthly stock entries.
+
+    ECF yearly reports (YYYY-Stocks-European-Ports.pdf) contain the same
+    monthly tonnage data as the bi-monthly web posts, but covering the full
+    calendar year. Returns a list of {period, value_raw, value_mt, pdf_url}
+    entries (one per month found). Falls back to a single December entry if
+    only a headline bags figure is extractable.
+    """
+    try:
+        r = requests.get(pdf_url, headers=_HEADERS, timeout=60)
+        if r.status_code != 200:
+            return []
+        raw = r.content
+    except Exception as e:
+        print(f"[ecf_stocks] yearly PDF download failed ({year}): {e}")
+        return []
+
+    try:
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            # First 5 pages contain all headline figures in ECF yearly reports.
+            text = " ".join(page.extract_text() or "" for page in pdf.pages[:5])
+    except Exception as e:
+        print(f"[ecf_stocks] yearly PDF parse failed ({year}): {e}")
+        return []
+
+    entries = _entries_from_tons_text(text)
+    if entries:
+        for e in entries:
+            e["pdf_url"] = pdf_url
+            e["from_yearly_pdf"] = True
+        return entries
+
+    bags = _figure_from_text(text)
+    if bags:
+        return [{
+            "period":          f"{year}-12",
+            "value_raw":       bags,
+            "pdf_url":         pdf_url,
+            "from_yearly_pdf": True,
+        }]
+
+    return []
+
+
 async def run(page) -> list[dict]:
     # Collect post URLs across multiple ECF index pages.
     post_urls: list[str] = []
@@ -286,35 +333,28 @@ async def run(page) -> list[dict]:
         print("[ecf_stocks] no parseable entries from posts and no yearly PDFs")
         return []
 
-    if not entries and yearly_pdfs:
-        # Posts didn't yield anything, but we did find at least the
-        # yearly PDFs — emit a minimal item so the frontend can at least
-        # link to the most recent annual report.
-        latest_pdf = sorted(yearly_pdfs, key=lambda y: y["year"], reverse=True)[0]
-        return [{
-            "title":    f"ECF European Port Stocks – yearly PDF {latest_pdf['year']}",
-            "body":     f"ECF yearly stocks report available at {latest_pdf['pdf_url']}",
-            "source":   "ECF",
-            "category": "demand",
-            "lat":      51.5,
-            "lng":      5.0,
-            "tags":     ["stocks", "europe", "ecf", "demand"],
-            "meta":     json.dumps({
-                "monthly":      [],
-                "latest_bags":  None,
-                "as_of":        _today(),
-                "source_url":   _INDEX_URL,
-                "yearly_pdfs":  yearly_pdfs,
-                "latest_pdf":   latest_pdf["pdf_url"],
-            }),
-        }]
-
-    # Keep one entry per period (latest wins if duplicates).
+    # Post entries take priority. Build by_period from posts first.
     by_period: dict[str, dict] = {}
     for e in entries:
         prev = by_period.get(e["period"])
         if not prev or (e.get("value_raw") and not prev.get("value_raw")):
             by_period[e["period"]] = e
+
+    # Parse historical yearly PDFs and fill in gaps not covered by posts.
+    yearly_pdf_count = 0
+    if yearly_pdfs:
+        sorted_pdfs = sorted(yearly_pdfs, key=lambda y: y["year"])
+        for pdf_info in sorted_pdfs:
+            pdf_entries = _parse_yearly_pdf(pdf_info["pdf_url"], pdf_info["year"])
+            added = 0
+            for e in pdf_entries:
+                p = e.get("period", "")
+                if p and p not in by_period:
+                    by_period[p] = e
+                    added += 1
+            yearly_pdf_count += added
+            print(f"[ecf_stocks] yearly PDF {pdf_info['year']}: {len(pdf_entries)} extracted, {added} new periods")
+
     series = sorted(by_period.values(), key=lambda x: x["period"])
     latest = next((e for e in reversed(series) if e.get("value_raw")), series[-1])
 
@@ -332,12 +372,13 @@ async def run(page) -> list[dict]:
         "lng":      5.0,
         "tags":     ["stocks", "europe", "ecf", "demand"],
         "meta":     json.dumps({
-            "monthly":      series,
-            "latest_bags":  value_bags or None,
-            "as_of":        _today(),
-            "source_url":   _INDEX_URL,
-            "latest_post":  latest.get("post_url"),
-            "latest_pdf":   latest.get("pdf_url"),
-            "yearly_pdfs":  yearly_pdfs,
+            "monthly":            series,
+            "latest_bags":        value_bags or None,
+            "as_of":              _today(),
+            "source_url":         _INDEX_URL,
+            "latest_post":        latest.get("post_url"),
+            "latest_pdf":         latest.get("pdf_url"),
+            "yearly_pdfs":        yearly_pdfs,
+            "historical_periods": yearly_pdf_count,
         }),
     }]

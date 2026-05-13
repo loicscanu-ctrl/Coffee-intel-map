@@ -57,12 +57,32 @@ _ATTRS = {
     "Beans Imports":        "imports_mt",
     "Domestic Consumption": "consumption_mt",
     "Ending Stocks":        "stocks_mt",
+    "Production":           "production_mt",
+    "Bean Exports":         "exports_mt",
+    "Beans Exports":        "exports_mt",
+    "Beginning Stocks":     "begin_stocks_mt",
 }
 
-# Country names PSD uses. Accept several historical spellings.
+# Consuming markets (imports/consumption/stocks).
 _MARKETS = {
     "eu":    ("european union", "european union (27)", "european union-27", "eu-27"),
     "japan": ("japan",),
+    "usa":   ("united states",),
+    "korea": ("korea, south", "south korea"),
+}
+
+# Top producing countries (production/exports/domestic consumption).
+_PRODUCERS = {
+    "brazil":    ("brazil",),
+    "vietnam":   ("viet nam", "vietnam"),
+    "colombia":  ("colombia",),
+    "indonesia": ("indonesia",),
+    "honduras":  ("honduras",),
+    "ethiopia":  ("ethiopia",),
+    "uganda":    ("uganda",),
+    "india":     ("india",),
+    "peru":      ("peru",),
+    "mexico":    ("mexico",),
 }
 
 # PSD reports green coffee in thousands of 60-kg bags.
@@ -135,33 +155,46 @@ def _parse_market_rows(reader: csv.DictReader, country_aliases: tuple[str, ...])
     series = [{"year": y, **by_year[y]} for y in years]
     latest = series[-1]
     return {
-        "annual":                series,
-        "latest_year":           latest["year"],
-        "latest_imports_mt":     latest.get("imports_mt"),
-        "latest_consumption_mt": latest.get("consumption_mt"),
-        "latest_stocks_mt":      latest.get("stocks_mt"),
+        "annual":                 series,
+        "latest_year":            latest["year"],
+        "latest_imports_mt":      latest.get("imports_mt"),
+        "latest_consumption_mt":  latest.get("consumption_mt"),
+        "latest_stocks_mt":       latest.get("stocks_mt"),
+        "latest_production_mt":   latest.get("production_mt"),
+        "latest_exports_mt":      latest.get("exports_mt"),
+        "latest_begin_stocks_mt": latest.get("begin_stocks_mt"),
     }
 
 
 def _parse_psd(csv_bytes: bytes) -> dict | None:
     text = csv_bytes.decode("utf-8-sig", errors="replace")
+
     markets: dict[str, dict] = {}
     for short, aliases in _MARKETS.items():
-        # DictReader is single-pass; rebuild it per market.
         reader = csv.DictReader(io.StringIO(text))
         parsed = _parse_market_rows(reader, aliases)
         if parsed:
             markets[short] = parsed
         else:
-            logger.warning(f"[psd_coffee] no rows for {short} (aliases tried: {aliases})")
+            logger.warning(f"[psd_coffee] no rows for consuming market {short}")
 
-    if not markets:
+    producers: dict[str, dict] = {}
+    for short, aliases in _PRODUCERS.items():
+        reader = csv.DictReader(io.StringIO(text))
+        parsed = _parse_market_rows(reader, aliases)
+        if parsed:
+            producers[short] = parsed
+        else:
+            logger.warning(f"[psd_coffee] no rows for producer {short}")
+
+    if not markets and not producers:
         return None
 
     return {
         "source":       "USDA FAS PSD",
         "last_updated": datetime.utcnow().date().isoformat(),
         "markets":      markets,
+        "producers":    producers,
     }
 
 
@@ -181,13 +214,21 @@ async def run(page, db) -> None:  # noqa: ARG001
 
         eu = parsed["markets"].get("eu", {})
         jp = parsed["markets"].get("japan", {})
+        us = parsed["markets"].get("usa", {})
+        producers = parsed.get("producers", {})
+        br = producers.get("brazil", {})
+        vn = producers.get("vietnam", {})
         print(
-            f"[psd_coffee] EU {eu.get('latest_year', '?')} "
+            f"[psd_coffee] EU {eu.get('latest_year','?')} "
             f"imp={eu.get('latest_imports_mt')} MT "
             f"stocks={eu.get('latest_stocks_mt')} MT | "
-            f"Japan {jp.get('latest_year', '?')} "
-            f"imp={jp.get('latest_imports_mt')} MT "
-            f"stocks={jp.get('latest_stocks_mt')} MT"
+            f"Japan {jp.get('latest_year','?')} "
+            f"imp={jp.get('latest_imports_mt')} MT | "
+            f"USA {us.get('latest_year','?')} "
+            f"imp={us.get('latest_imports_mt')} MT | "
+            f"Producers: Brazil prod={br.get('latest_production_mt')} MT "
+            f"VN prod={vn.get('latest_production_mt')} MT "
+            f"({len(producers)} countries)"
         )
     except Exception as e:
         print(f"[psd_coffee] FAILED: {e} — retaining cache")
