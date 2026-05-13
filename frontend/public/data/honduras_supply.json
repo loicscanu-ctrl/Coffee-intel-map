@@ -1,10 +1,10 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-13T06:15:25.405099Z",
+  "scraped_at": "2026-05-13T07:02:35.374290Z",
   "exports": null,
   "ihcafe_price": null,
   "weather": {
-    "scraped_at": "2026-05-13T06:07:32.018096Z",
+    "scraped_at": "2026-05-13T06:42:42.082510Z",
     "regions": [
       {
         "name": "Copán",
@@ -386,7 +386,6 @@
           "H",
           "H",
           "H",
-          "H",
           "M",
           "M",
           "H",
@@ -445,6 +444,7 @@
           "M",
           "M",
           "M",
+          "L",
           "L",
           "L"
         ]
@@ -2547,13 +2547,6 @@
         "region": "Agalta",
         "days": [
           {
-            "date": "2026-03-13",
-            "precip_prob": 45,
-            "precip_mm": 0.6,
-            "soil_moisture": 0.201,
-            "drought_risk": "H"
-          },
-          {
             "date": "2026-03-14",
             "precip_prob": 13,
             "precip_mm": 0.0,
@@ -3061,6 +3054,13 @@
             "date": "2026-05-25",
             "precip_prob": 92,
             "precip_mm": 10.5,
+            "soil_moisture": 0.293,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-26",
+            "precip_prob": 94,
+            "precip_mm": 20.1,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           }
