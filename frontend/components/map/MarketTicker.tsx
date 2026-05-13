@@ -9,6 +9,20 @@ interface TickerItem {
   category: TickerCategory;
 }
 
+interface AcapheContract {
+  month: string;
+  last: number | null;
+  change: number;
+  vol: number | null;
+  oi: number | null;
+}
+
+interface AcapheData {
+  fetched_at: string;
+  robusta: AcapheContract[];
+  arabica: AcapheContract[];
+}
+
 function timeAgo(iso: string): string {
   const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (secs < 60) return `${secs}s ago`;
@@ -19,9 +33,40 @@ function timeAgo(iso: string): string {
 
 function stalenessColor(iso: string): string {
   const hours = (Date.now() - new Date(iso).getTime()) / 3_600_000;
-  if (hours < 6) return "text-emerald-500";
+  if (hours < 1) return "text-emerald-500";
   if (hours < 24) return "text-yellow-500";
   return "text-red-500";
+}
+
+// Pick the active front month: highest open interest (persists outside trading hours)
+function frontByOI(contracts: AcapheContract[]): AcapheContract | null {
+  if (!contracts.length) return null;
+  return contracts.reduce((best, c) =>
+    (c.oi ?? 0) > (best.oi ?? 0) ? c : best, contracts[0]);
+}
+
+// "AN 07/26" → "KCN26", "RN 07/26" → "RMN26"
+function acapheLabel(month: string, prefix: "KC" | "RM"): string {
+  const parts = month.trim().split(/\s+/);
+  if (parts.length < 2) return prefix;
+  const letter = parts[0].slice(-1);   // last char of "AN" / "RN"
+  const year   = parts[1].slice(-2);   // last 2 chars of "07/26" → "26"
+  return `${prefix}${letter}${year}`;
+}
+
+async function fetchAcaphe(): Promise<AcapheData | null> {
+  try {
+    const r = await fetch("/api/live");
+    if (r.ok) {
+      const d = await r.json();
+      if (!d.error && d.robusta && d.arabica) return d as AcapheData;
+    }
+  } catch { /* fall through */ }
+  try {
+    const r = await fetch(`/data/acaphe_live.json?_=${Date.now()}`);
+    if (r.ok) return await r.json() as AcapheData;
+  } catch { /* ignore */ }
+  return null;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -29,25 +74,65 @@ function stalenessColor(iso: string): string {
 export default function MarketTicker() {
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const [acaphe, setAcaphe] = useState<AcapheData | null>(null);
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    const load = () =>
-      fetch("/data/latest_prices.json")
-        .then(r => r.json())
-        .then((d: { tickers?: TickerItem[]; generated_at?: string }) => {
-          setTickers(d?.tickers ?? []);
-          setGeneratedAt(d?.generated_at ?? null);
-        })
-        .catch((err) => console.error("[MarketTicker] fetch failed:", err));
+    const load = () => Promise.all([
+      fetch("/data/latest_prices.json").then(r => r.json()).catch(() => null),
+      fetchAcaphe(),
+    ]).then(([prices, live]) => {
+      setTickers(prices?.tickers ?? []);
+      setGeneratedAt(prices?.generated_at ?? null);
+      if (live?.arabica && live?.robusta) setAcaphe(live);
+    });
     load();
     const interval = setInterval(load, 5 * 60 * 1000);
-    // Re-render every minute so "X ago" stays accurate
     const tick = setInterval(() => setTick(n => n + 1), 60_000);
     return () => { clearInterval(interval); clearInterval(tick); };
   }, []);
 
-  if (tickers.length === 0) return (
+  // Futures tickers: live Acaphe when available, else fall back to static
+  const futureTickers: TickerItem[] = (() => {
+    if (!acaphe) return tickers.filter(t => t.category === "futures");
+
+    const kc = frontByOI(acaphe.arabica);
+    const rc = frontByOI(acaphe.robusta);
+    const out: TickerItem[] = [];
+
+    if (kc?.last != null) {
+      const sign = kc.change >= 0 ? "+" : "";
+      out.push({
+        label: acapheLabel(kc.month, "KC"),
+        value: `${kc.last.toFixed(2)} (${sign}${kc.change.toFixed(2)})`,
+        category: "futures",
+      });
+    }
+    if (rc?.last != null) {
+      const sign = rc.change >= 0 ? "+" : "";
+      out.push({
+        label: acapheLabel(rc.month, "RM"),
+        value: `${Math.round(rc.last).toLocaleString()} (${sign}${Math.round(rc.change)})`,
+        category: "futures",
+      });
+    }
+
+    return out.length ? out : tickers.filter(t => t.category === "futures");
+  })();
+
+  const otherTickers = tickers.filter(t => t.category !== "futures");
+  const allTickers = [...futureTickers, ...otherTickers];
+
+  // Show most-recent timestamp between Acaphe and static file
+  const displayTs = (() => {
+    if (!acaphe) return generatedAt;
+    if (!generatedAt) return acaphe.fetched_at;
+    return new Date(acaphe.fetched_at) > new Date(generatedAt)
+      ? acaphe.fetched_at
+      : generatedAt;
+  })();
+
+  if (allTickers.length === 0) return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 flex items-center shrink-0 px-3">
       <span className="text-indigo-400 text-xs font-bold border-r border-slate-700 pr-3 mr-3 shrink-0">MARKETS</span>
       <span className="text-slate-600 text-xs italic">No market data — waiting for scraper</span>
@@ -62,7 +147,7 @@ export default function MarketTicker() {
 
   const ORDER: TickerCategory[] = ["futures", "physical", "fx"];
   const groups = ORDER
-    .map(cat => tickers.filter(t => t.category === cat))
+    .map(cat => allTickers.filter(t => t.category === cat))
     .filter(g => g.length > 0);
 
   const tickerContent = groups.flatMap((group, gi) => {
@@ -81,11 +166,11 @@ export default function MarketTicker() {
   return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 overflow-hidden flex items-center shrink-0">
       <span className="flex flex-col justify-center px-3 shrink-0 border-r border-slate-700 mr-2 leading-none gap-0.5"
-        title={generatedAt ? `Generated: ${generatedAt}` : undefined}>
+        title={displayTs ? `Data as of: ${displayTs}` : undefined}>
         <span className="text-indigo-400 text-xs font-bold">MARKETS</span>
-        {generatedAt && (
-          <span className={`text-[9px] font-mono ${stalenessColor(generatedAt)}`}>
-            {timeAgo(generatedAt)}
+        {displayTs && (
+          <span className={`text-[9px] font-mono ${stalenessColor(displayTs)}`}>
+            {timeAgo(displayTs)}
           </span>
         )}
       </span>
