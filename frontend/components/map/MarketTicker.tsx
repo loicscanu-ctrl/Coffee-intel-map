@@ -46,7 +46,7 @@ function frontByOI(contracts: AcapheContract[]): AcapheContract | null {
 }
 
 // "AN 07/26" → "KCN26", "RN 07/26" → "RMN26"
-function acapheLabel(month: string, prefix: "KC" | "RM"): string {
+function acapheLabel(month: string, prefix: "KC" | "RM" | "RC"): string {
   const parts = month.trim().split(/\s+/);
   if (parts.length < 2) return prefix;
   const letter = parts[0].slice(-1);   // last char of "AN" / "RN"
