@@ -12,6 +12,11 @@ from playwright.async_api import async_playwright
 
 from scraper.db import extract_physical_price, get_session, upsert_news_item, upsert_physical_price
 from scraper.errors import CriticalSourceError
+
+# Side-channel scrapers added in the feature branch — registered in the
+# side-channel block further down. ajca + psd_coffee write directly to
+# JSON caches consumed by export_stocks.py.
+from scraper.sources import ajca as _ajca
 from scraper.sources import (
     b3,
     b3_icf,
@@ -36,12 +41,8 @@ from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
-from scraper.sources import uganda_weather as _uganda_weather
-# Side-channel scrapers added in the feature branch — registered in the
-# side-channel block further down. ajca + psd_coffee write directly to
-# JSON caches consumed by export_stocks.py.
-from scraper.sources import ajca as _ajca
 from scraper.sources import psd_coffee as _psd_coffee
+from scraper.sources import uganda_weather as _uganda_weather
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
 SCHEDULED_HOUR_UTC = 1   # Run daily at 01:00 UTC

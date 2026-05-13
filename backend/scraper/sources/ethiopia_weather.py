@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-import requests
-
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 
 _REGIONS = [

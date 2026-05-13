@@ -10,8 +10,6 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import date, datetime
 
-import requests
-
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 
 REGIONS = [
@@ -192,7 +190,6 @@ def scrape(db) -> None:
     from sqlalchemy import delete
 
     from models import WeatherSnapshot
-
     from scraper.sources._open_meteo import get_json
     for region in REGIONS:
         url = OPEN_METEO_URL.format(lat=region["lat"], lon=region["lon"])
