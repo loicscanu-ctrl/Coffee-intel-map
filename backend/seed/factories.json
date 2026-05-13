@@ -343,6 +343,15 @@
     {"n": "Al-Mokha Coffee Hub", "l": [13.314, 43.243], "c": "Al-Mokha", "cap": "0.5k, Specialty Mokha-region coffee operation.", "t": "mill"},
     {"n": "Mzuzu Coffee Planters Coop Union", "l": [-11.466, 34.02], "c": "MZCPCU", "cap": "2k, Northern-Region cooperative union, Mzuzu.", "t": "mill"},
     {"n": "Satemwa Estates Thyolo", "l": [-16.067, 35.131], "c": "Satemwa Tea & Coffee", "cap": "1k, Long-running estate in Southern Malawi, tea + coffee.", "t": "mill"},
-    {"n": "Diogo Vaz Estate", "l": [0.342, 6.5], "c": "Diogo Vaz", "cap": "0.3k, São Tomé specialty estate, North-West coast.", "t": "mill"}
+    {"n": "Diogo Vaz Estate", "l": [0.342, 6.5], "c": "Diogo Vaz", "cap": "0.3k, São Tomé specialty estate, North-West coast.", "t": "mill"},
+    {"n": "Volcafe Peru Lima", "l": [-12.115, -77.04], "c": "Volcafe", "cap": "25k, Volcafe Peru SA exporter, San Isidro business district.", "t": "mill"},
+    {"n": "NKG Bero Indonesia Lampung", "l": [-5.397, 105.295], "c": "Neumann Kaffee Gruppe (Bero)", "cap": "20k, NKG's Indonesian Robusta operation, Bandar Lampung.", "t": "mill"},
+    {"n": "NKG Kappa India Bangalore", "l": [12.955, 77.62], "c": "Neumann Kaffee Gruppe (Kappa)", "cap": "15k, NKG India sourcing + processing, Bangalore.", "t": "mill"},
+    {"n": "NKG Coex Colombia Bogotá", "l": [4.682, -74.142], "c": "Neumann Kaffee Gruppe (Coex)", "cap": "18k, NKG Colombia green-coffee exporter, Bogotá.", "t": "mill"},
+    {"n": "LDC Brazil Santos", "l": [-23.964, -46.331], "c": "Louis Dreyfus Company", "cap": "25k, LDC Brazilian coffee export operation, Port of Santos.", "t": "mill"},
+    {"n": "LDC Indonesia Lampung", "l": [-5.405, 105.29], "c": "Louis Dreyfus Company", "cap": "12k, LDC Indonesian Robusta operation, Lampung.", "t": "mill"},
+    {"n": "ECOM SMS India Bangalore", "l": [12.955, 77.625], "c": "ECOM (Sustainable Mgmt Services)", "cap": "10k, ECOM India sourcing + sustainability hub, Bangalore.", "t": "mill"},
+    {"n": "Sucafina Specialty Carouge (Geneva)", "l": [46.181, 6.139], "c": "Sucafina (CDM Specialty)", "cap": "3k, Sucafina's specialty-coffee roastery + sourcing arm, near Geneva.", "t": "roastery"},
+    {"n": "Interamerican Coffee Bremen (NKG)", "l": [53.078, 8.795], "c": "Neumann Kaffee Gruppe (Interamerican)", "cap": "30k, NKG's European specialty + reserve coffee arm, Bremen port.", "t": "mill"}
   ]
 }
