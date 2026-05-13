@@ -205,12 +205,13 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
                 />
                 <Tooltip
                   contentStyle={TT_STYLE}
-                  formatter={(v: unknown, name: string) => {
+                  formatter={(v: unknown, name: unknown) => {
                     const labels: Record<string, string> = {
                       washed: "Arabica Washed", unwashed: "Arabica Unwashed",
                       robusta: "Robusta", other: "Other",
                     };
-                    return [`${Number(v).toLocaleString()}k MT`, labels[name] ?? name];
+                    const key = String(name ?? "");
+                    return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: 8 }}
@@ -360,7 +361,7 @@ function JapanPanel({ japan, ajca }: { japan: PsdData | null; ajca: AjcaData | n
               <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}k`} />
               <Tooltip
                 contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: string) => [
+                formatter={(v: unknown, name: unknown) => [
                   `${Number(v).toLocaleString()}k MT`,
                   name === "imports" ? "Imports" : name === "stocks" ? "End Stocks" : "Consumption",
                 ]}
@@ -556,7 +557,7 @@ function PsdAnalyticalPanel({ eu, japan, usa }: { eu: PsdData | null; japan: Psd
               />
               <Tooltip
                 contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: string) => [
+                formatter={(v: unknown, name: unknown) => [
                   `${Number(v).toLocaleString()}k MT`,
                   name === "imports" ? "Imports" : name === "consumption" ? "Consumption" : "End Stocks",
                 ]}
@@ -593,7 +594,7 @@ function PsdAnalyticalPanel({ eu, japan, usa }: { eu: PsdData | null; japan: Psd
               <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
               <Tooltip
                 contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: string) => {
+                formatter={(v: unknown, name: unknown) => {
                   const n = Number(v);
                   const label =
                     name === "dImports" ? "Import swing" :
