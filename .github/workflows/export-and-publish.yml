@@ -2,7 +2,7 @@ name: "1.4 – Export and Publish Static JSON"
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 23:00 UTC daily — 3 h after scraper-daily (20:00 UTC)
+    - cron: '30 1 * * *'   # 01:30 UTC daily — 30 min after scraper-daily (01:00 UTC)
   workflow_dispatch:        # allow manual trigger from GitHub UI
   workflow_run:
     workflows: ["1.1 – Daily News Scraper", "2.1 – COT Scraper"]
