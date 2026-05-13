@@ -327,6 +327,22 @@
     {"n": "Solubles Instantáneos Ecuador Guayaquil", "l": [-2.213, -79.89], "c": "SIE", "cap": "10k, Major Ecuadorian soluble plant, Guayaquil industrial belt.", "t": "soluble"},
     {"n": "FAPECAFES Loja", "l": [-3.992, -79.205], "c": "FAPECAFES Federation", "cap": "3k, Southern-Ecuador federation of small specialty cooperatives.", "t": "mill"},
     {"n": "AGRICAFÉ Bolivia Caranavi", "l": [-15.838, -67.567], "c": "AGRICAFÉ (Pedro Rodríguez)", "cap": "3k, Bolivia's flagship specialty exporter; Yungas dry mill.", "t": "mill"},
-    {"n": "FECAFEB La Paz", "l": [-16.5, -68.133], "c": "FECAFEB Federation", "cap": "5k, Bolivian federation of caficultor exporters; La Paz HQ.", "t": "mill"}
+    {"n": "FECAFEB La Paz", "l": [-16.5, -68.133], "c": "FECAFEB Federation", "cap": "5k, Bolivian federation of caficultor exporters; La Paz HQ.", "t": "mill"},
+    {"n": "Sucafina Côte d'Ivoire", "l": [5.27, -4.005], "c": "Sucafina", "cap": "30k, Sucafina CI Robusta operations, Abidjan/Vridi port.", "t": "mill"},
+    {"n": "ofi Côte d'Ivoire Abidjan", "l": [5.265, -4.0], "c": "ofi (Olam)", "cap": "50k, Olam Food Ingredients CI; major Robusta trader.", "t": "mill"},
+    {"n": "ECOM Atlantic Côte d'Ivoire", "l": [5.267, -3.998], "c": "ECOM Agroindustrial", "cap": "25k, ECOM Atlantic CI Robusta mill, Abidjan.", "t": "mill"},
+    {"n": "Sucden Coffee CI (CONACAFÉ)", "l": [5.272, -4.01], "c": "Sucden Coffee", "cap": "20k, Sucden's Ivorian Robusta operation.", "t": "mill"},
+    {"n": "CIPEXI Abidjan", "l": [5.26, -4.012], "c": "CIPEXI", "cap": "15k, Local CI Robusta exporter, Abidjan port.", "t": "mill"},
+    {"n": "Olam Cameroon Douala", "l": [4.045, 9.708], "c": "ofi (Olam)", "cap": "25k, Olam Food Ingredients Cameroon; Robusta export.", "t": "mill"},
+    {"n": "UCCAO Bafoussam", "l": [5.477, 10.418], "c": "UCCAO Coop", "cap": "12k, West-region cooperative union for Arabica, Bafoussam HQ.", "t": "mill"},
+    {"n": "Sicobela Douala", "l": [4.048, 9.712], "c": "Sicobela", "cap": "10k, Long-running Cameroonian coffee exporter, Douala.", "t": "mill"},
+    {"n": "Ndongo Essomba Douala", "l": [4.043, 9.705], "c": "Ndongo Essomba", "cap": "8k, Cameroonian-owned Robusta exporter.", "t": "mill"},
+    {"n": "Madacafé Antsirabe", "l": [-19.866, 47.04], "c": "Madacafé", "cap": "5k, Highland Robusta cooperative network, Antsirabe.", "t": "mill"},
+    {"n": "Sucafina Madagascar Tamatave", "l": [-18.15, 49.398], "c": "Sucafina", "cap": "8k, Sucafina Madagascar operation, port of Tamatave.", "t": "mill"},
+    {"n": "Mocha Mill Sana'a", "l": [15.359, 44.205], "c": "Mocha Mill", "cap": "1k, Specialty Yemeni coffee processor, Sana'a.", "t": "mill"},
+    {"n": "Al-Mokha Coffee Hub", "l": [13.314, 43.243], "c": "Al-Mokha", "cap": "0.5k, Specialty Mokha-region coffee operation.", "t": "mill"},
+    {"n": "Mzuzu Coffee Planters Coop Union", "l": [-11.466, 34.02], "c": "MZCPCU", "cap": "2k, Northern-Region cooperative union, Mzuzu.", "t": "mill"},
+    {"n": "Satemwa Estates Thyolo", "l": [-16.067, 35.131], "c": "Satemwa Tea & Coffee", "cap": "1k, Long-running estate in Southern Malawi, tea + coffee.", "t": "mill"},
+    {"n": "Diogo Vaz Estate", "l": [0.342, 6.5], "c": "Diogo Vaz", "cap": "0.3k, São Tomé specialty estate, North-West coast.", "t": "mill"}
   ]
 }
