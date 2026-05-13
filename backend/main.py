@@ -47,16 +47,23 @@ def startup():
     # leave on. Seeding, however, is one-shot data insertion — gate it so
     # production deployments don't waste startup time re-running upserts.
     Base.metadata.create_all(bind=engine)
-    # One-shot column-level migrations create_all can't handle. Idempotent
-    # via IF NOT EXISTS — Postgres ≥ 9.6.
-    from sqlalchemy import text
-    with engine.begin() as conn:
-        conn.execute(text(
-            "ALTER TABLE factories ADD COLUMN IF NOT EXISTS type VARCHAR(32)"
-        ))
-        conn.execute(text(
-            "ALTER TABLE factories ADD COLUMN IF NOT EXISTS cap_kt DOUBLE PRECISION"
-        ))
+    # One-shot column-level migrations create_all can't handle. We portably
+    # check whether each column exists before issuing ALTER, because
+    # `ADD COLUMN IF NOT EXISTS` is Postgres-only — SQLite (used in tests via
+    # conftest.py) doesn't understand it and rejects the statement at parse
+    # time.
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    if insp.has_table("factories"):
+        existing_cols = {c["name"] for c in insp.get_columns("factories")}
+        new_cols = [
+            ("type",   "VARCHAR(32)"),
+            ("cap_kt", "DOUBLE PRECISION"),
+        ]
+        with engine.begin() as conn:
+            for col, col_type in new_cols:
+                if col not in existing_cols:
+                    conn.execute(text(f"ALTER TABLE factories ADD COLUMN {col} {col_type}"))
     if os.getenv("SEED_ON_STARTUP", "1") == "1":
         from seed import run_seed
         run_seed()
