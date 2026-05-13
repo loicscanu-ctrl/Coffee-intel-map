@@ -86,7 +86,16 @@ export default function MapLegend() {
           <Section title="Country pins">
             <LegendItem color="#10b981" label="Producer country" />
             <LegendItem color="#3b82f6" label="Consumer country" />
-            <LegendItem color="#6366f1" shape="square" label="Roaster / factory" sub="F badge" />
+          </Section>
+
+          <Section title="Factories">
+            <LegendItem color="#a16207" shape="square" label="Origin mill" sub="M · dry/wet processing" />
+            <LegendItem color="#7c2d12" shape="square" label="Roastery" sub="R" />
+            <LegendItem color="#fde68a" shape="square" label="Soluble (instant)" sub="S" />
+            <LegendItem color="#16a34a" shape="square" label="Decaffeination" sub="D" />
+            <LegendItem color="#94a3b8" shape="square" label="Capsules / pods" sub="C" />
+            <LegendItem color="#6366f1" shape="square" label="Mixed-use plant" sub="F" />
+            <LegendItem color="#475569" shape="square" label="Other / unknown" sub="F" />
           </Section>
 
           <Section title="News pins">

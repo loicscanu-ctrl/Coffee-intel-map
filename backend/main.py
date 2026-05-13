@@ -47,6 +47,13 @@ def startup():
     # leave on. Seeding, however, is one-shot data insertion — gate it so
     # production deployments don't waste startup time re-running upserts.
     Base.metadata.create_all(bind=engine)
+    # One-shot column-level migrations create_all can't handle. Idempotent
+    # via IF NOT EXISTS — Postgres ≥ 9.6.
+    from sqlalchemy import text
+    with engine.begin() as conn:
+        conn.execute(text(
+            "ALTER TABLE factories ADD COLUMN IF NOT EXISTS type VARCHAR(32)"
+        ))
     if os.getenv("SEED_ON_STARTUP", "1") == "1":
         from seed import run_seed
         run_seed()

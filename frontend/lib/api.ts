@@ -58,12 +58,22 @@ export interface CountryPin {
   data?: { prod?: string; stock?: string; cons?: string; intel?: string };
 }
 
+export type FactoryType =
+  | "mill"
+  | "roastery"
+  | "soluble"
+  | "decaf"
+  | "capsules"
+  | "mixed"
+  | "unknown";
+
 export interface FactoryPin {
   lat: number;
   lng: number;
   name: string;
   company?: string;
   capacity?: string;
+  type?: FactoryType | null;
 }
 
 export async function fetchMapCountries(): Promise<CountryPin[]> {

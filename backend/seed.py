@@ -32,15 +32,23 @@ def seed_factories(db):
     with open(path) as f:
         data = json.load(f)
     for fac in data.get("factories", []):
-        existing = db.query(Factory).filter_by(name=fac.get("n", "")).first()
-        if existing:
-            continue
         if not fac.get("l"):
             continue
+        name = fac.get("n", "")
+        new_type = fac.get("t") or None
+        existing = db.query(Factory).filter_by(name=name).first()
+        if existing:
+            # Allow re-seeding to backfill the type column on rows inserted
+            # by an older build that didn't carry a type. Other fields are
+            # treated as immutable to avoid clobbering manual DB edits.
+            if existing.type is None and new_type is not None:
+                existing.type = new_type
+            continue
         db.add(Factory(
-            name=fac.get("n", ""),
+            name=name,
             company=fac.get("c", ""),
             capacity=fac.get("cap", ""),
+            type=new_type,
             lat=fac["l"][0],
             lng=fac["l"][1],
         ))

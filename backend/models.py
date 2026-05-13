@@ -39,6 +39,9 @@ class Factory(Base):
     name: Mapped[str] = mapped_column(String(200))
     company: Mapped[str] = mapped_column(String(200), nullable=True)
     capacity: Mapped[str] = mapped_column(String(500), nullable=True)
+    # One of: mill, roastery, soluble, decaf, capsules, mixed, unknown.
+    # Drives icon color + popup subtitle on the map; nullable for legacy rows.
+    type: Mapped[str] = mapped_column(String(32), nullable=True)
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
 

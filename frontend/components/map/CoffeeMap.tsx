@@ -171,6 +171,20 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: "#6b7280",
 };
 
+// Per-type styling for the F-pin (factory). bg = icon background,
+// fg = letter color, letter = single-char glyph in the square,
+// label = human-readable subtitle shown in the popup.
+// Kept in sync with MapLegend.tsx.
+const FACTORY_TYPE_STYLE: Record<string, { bg: string; fg: string; letter: string; label: string }> = {
+  mill:      { bg: "#a16207", fg: "#fff", letter: "M", label: "Origin mill / dry processing" },
+  roastery:  { bg: "#7c2d12", fg: "#fff", letter: "R", label: "Roastery" },
+  soluble:   { bg: "#fde68a", fg: "#1f2937", letter: "S", label: "Soluble (instant)" },
+  decaf:     { bg: "#16a34a", fg: "#fff", letter: "D", label: "Decaffeination" },
+  capsules:  { bg: "#94a3b8", fg: "#0f172a", letter: "C", label: "Capsules / pods" },
+  mixed:     { bg: "#6366f1", fg: "#fff", letter: "F", label: "Mixed-use plant" },
+  unknown:   { bg: "#475569", fg: "#cbd5e1", letter: "F", label: "Factory" },
+};
+
 interface CoffeeMapProps {
   onPinClick?: (item: NewsItem) => void;
   countries: CountryPin[];
@@ -386,14 +400,19 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       // ── Factory pins ──────────────────────────────────────────────────────
       const factoriesLayer = Leaflet.layerGroup().addTo(map);
       (factories as FactoryPin[]).forEach((f) => {
+        const t = (f.type as keyof typeof FACTORY_TYPE_STYLE) || "unknown";
+        const style = FACTORY_TYPE_STYLE[t] ?? FACTORY_TYPE_STYLE.unknown;
         const icon = Leaflet.divIcon({
           className: "",
-          html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
+          html: `<div style="background:${style.bg};color:${style.fg};border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${style.letter}</div>`,
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         });
+        const subtitle = f.type
+          ? `<div style="color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:2px 0 4px">${style.label}</div>`
+          : "";
         Leaflet.marker([f.lat, f.lng], { icon })
-          .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
+          .bindPopup(`<b>${f.name}</b>${subtitle}${f.company || ""}<br>Cap: ${f.capacity || ""}`)
           .addTo(factoriesLayer);
       });
 
