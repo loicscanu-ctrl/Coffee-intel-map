@@ -184,7 +184,7 @@ def export_oi_fnd_chart(db) -> None:
                     if not fnd:
                         continue
                     day_val = _trading_days_to(trade_date, fnd)
-                    if day_val < -30 or day_val > 0:
+                    if day_val < -45 or day_val > 0:
                         continue
                     series.setdefault(sym, []).append({"day": day_val, "oi": c.get("oi", 0)})
             except Exception:
@@ -1115,10 +1115,10 @@ def export_latest_prices(db) -> None:
     pp = {r.symbol: r for r in rows}
 
     # Also need the KC/RC chain meta (symbol label + change) which lives in NewsItem.meta
+    # Note: meta filter intentionally removed so that no-meta items (e.g. b3_icf) are found too
     recent_news = (
         db.query(NewsItem)
-        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7),
-                NewsItem.meta.isnot(None))
+        .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=7))
         .order_by(NewsItem.pub_date.desc())
         .all()
     )
@@ -1396,6 +1396,17 @@ def export_health(db) -> None:
             return None
         return val.isoformat() if isinstance(val, (date, datetime)) else str(val)
 
+    def _supply_ts(filename: str) -> str | None:
+        """Read scraped_at/updated from a supply JSON file written earlier in this run."""
+        try:
+            p = OUT_DIR / filename
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at") or d.get("updated")
+        except Exception:
+            pass
+        return None
+
     scrapers: dict[str, str | None] = {}
 
     # Futures (Barchart)
@@ -1435,21 +1446,33 @@ def export_health(db) -> None:
     item = db.query(NewsItem).filter(NewsItem.source == "ECF").order_by(NewsItem.pub_date.desc()).first()
     scrapers["ecf"] = _ts(item.pub_date) if item else None
 
-    # USDA PSD coffee (EU + Japan, annual, from cache file)
-    try:
-        from scraper.sources import psd_coffee as _psd_coffee
-        pc = _psd_coffee.fetch_latest()
-        scrapers["psd_coffee"] = pc.get("last_updated") if pc else None
-    except Exception:
-        scrapers["psd_coffee"] = None
+    # USDA PSD coffee (EU + Japan, annual, from DB — cache file doesn't survive cross-job)
+    item = db.query(NewsItem).filter(NewsItem.source == "PSD Coffee").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["psd_coffee"] = _ts(item.pub_date) if item else None
 
-    # AJCA (Japan native source, from cache file)
-    try:
-        from scraper.sources import ajca as _ajca
-        aj = _ajca.fetch_latest()
-        scrapers["ajca"] = aj.get("last_updated") if aj else None
-    except Exception:
-        scrapers["ajca"] = None
+    # AJCA (Japan native source, from DB — cache file doesn't survive cross-job)
+    item = db.query(NewsItem).filter(NewsItem.source == "AJCA").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["ajca"] = _ts(item.pub_date) if item else None
+
+    # CONAB Costs (arabica production cost, monthly)
+    item = db.query(NewsItem).filter(NewsItem.source == "CONAB Custos").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["conab_costs"] = _ts(item.pub_date) if item else None
+
+    # CONAB Safra (area/yield, monthly)
+    item = db.query(NewsItem).filter(NewsItem.source == "CONAB Safra").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["conab_safra"] = _ts(item.pub_date) if item else None
+
+    # Cecafe daily (updates every business day)
+    scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
+
+    # Origin export supply JSON files
+    scrapers["brazil_exports"]    = _supply_ts("cecafe.json")
+    scrapers["colombia_exports"]  = _supply_ts("colombia_supply.json")
+    scrapers["honduras_exports"]  = _supply_ts("honduras_supply.json")
+    scrapers["ethiopia_exports"]  = _supply_ts("ethiopia_supply.json")
+    scrapers["vietnam_exports"]   = _supply_ts("vietnam_supply.json")
+    scrapers["indonesia_exports"] = _supply_ts("indonesia_supply.json")
+    scrapers["uganda_exports"]    = _supply_ts("uganda_supply.json")
 
     healthy = sum(1 for v in scrapers.values() if v)
     result = {

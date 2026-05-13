@@ -111,6 +111,15 @@ async def _fetch_page(browser, select_conilon: bool = False) -> str | None:
         except Exception:
             await pg.wait_for_timeout(8000)
 
+        # Wait for the price table to actually populate (JS renders after load)
+        try:
+            await pg.wait_for_function(
+                "() => /\\d{1,3}(?:\\.\\d{3})*,\\d{2}/.test(document.body.innerText)",
+                timeout=20000,
+            )
+        except Exception:
+            await pg.wait_for_timeout(5000)
+
         if select_conilon:
             # Try to find a <select> containing "conilon" / "robusta" option
             # and choose it, then wait for the table to refresh.
@@ -124,7 +133,14 @@ async def _fetch_page(browser, select_conilon: bool = False) -> str | None:
                         value = await opt.get_attribute("value")
                         if value:
                             await sel.select_option(value=value)
-                            await pg.wait_for_timeout(3000)
+                            # Wait for price to re-render after product switch
+                            try:
+                                await pg.wait_for_function(
+                                    "() => /\\d{1,3}(?:\\.\\d{3})*,\\d{2}/.test(document.body.innerText)",
+                                    timeout=10000,
+                                )
+                            except Exception:
+                                await pg.wait_for_timeout(3000)
                             switched = True
                             break
                 if switched:
@@ -134,7 +150,10 @@ async def _fetch_page(browser, select_conilon: bool = False) -> str | None:
                 # Fallback: try numbered variant URL
                 await pg.goto(_URL.replace(".aspx", "/2.aspx"), wait_until="networkidle", timeout=30000)
                 try:
-                    await pg.wait_for_selector("table", timeout=10000)
+                    await pg.wait_for_function(
+                        "() => /\\d{1,3}(?:\\.\\d{3})*,\\d{2}/.test(document.body.innerText)",
+                        timeout=10000,
+                    )
                 except Exception:
                     await pg.wait_for_timeout(5000)
 

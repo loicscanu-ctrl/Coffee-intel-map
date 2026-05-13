@@ -24,7 +24,6 @@ import re
 from datetime import date
 from urllib.parse import urljoin
 
-import pdfplumber
 import requests
 
 _HEADERS = {
@@ -38,19 +37,12 @@ _HEADERS = {
 }
 
 _INDEX_URL = "https://www.ecf-coffee.org/category/publications/stocks/"
-# Post URLs (stocks-in-european-ports-…) live on news pages, NOT the stocks-
-# category page (which only lists yearly PDFs). Scan both for resilience.
 _INDEX_URLS = [
     "https://www.ecf-coffee.org/category/whats-new/news/",
     "https://www.ecf-coffee.org/category/news/",
     "https://www.ecf-coffee.org/category/whats-new/news/page/2/",
-    _INDEX_URL,  # also scan stocks index in case ECF restructures
+    _INDEX_URL,
 ]
-# Yearly PDFs are listed only on the stocks-category page.
-_YEARLY_PDF_PAT = re.compile(
-    r'href="(https?://[^"]*?/wp-content/uploads/[^"]*?(\d{4})-Stocks-European-Ports[^"]*?\.pdf)"',
-    re.I,
-)
 # Posts have slugs starting with "stocks-in-european-ports-".
 _POST_HREF = re.compile(
     r'href="(https?://(?:www\.)?ecf-coffee\.org/(stocks-in-european-ports-[^/"]+)/?)"',
@@ -182,6 +174,240 @@ def _figure_from_text(text: str) -> int | None:
     return None
 
 
+# ── PDF type-breakdown parser ─────────────────────────────────────────────────
+# ECF yearly PDFs (e.g. "2026-Stocks-European-Ports.pdf") include per-type
+# monthly series (Arabica Washed/Unwashed, Robusta) on pages 5-12.
+
+_PDF_YEAR_PAT = re.compile(r"(\d{4})-Stocks-European-Ports", re.I)
+
+# Which pdfplumber cell text maps to which DB field
+_TYPE_FIELD_MAP: dict[str, str] = {
+    "washed":     "arabica_washed_mt",
+    "mild":       "arabica_washed_mt",
+    "unwashed":   "arabica_unwashed_mt",
+    "brazilian":  "arabica_unwashed_mt",
+    "natural":    "arabica_unwashed_mt",
+    "robusta":    "robusta_mt",
+    "other":      "other_mt",
+}
+
+_PDF_MONTHS_EN = {
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+    **{m: i + 1 for i, m in enumerate([
+        "january","february","march","april","may","june",
+        "july","august","september","october","november","december",
+    ])},
+}
+
+# Numeric value plausibility: 20k-800k MT per type per month
+_MT_MIN, _MT_MAX = 20_000, 800_000
+# ECF often reports in "thousands of tonnes" (20-800) rather than absolute
+_MT_K_MIN, _MT_K_MAX = 20, 800
+
+
+def _cell_to_mt(cell: str | None) -> int | None:
+    if not cell:
+        return None
+    s = re.sub(r"[^\d]", "", str(cell).strip())
+    if not s:
+        return None
+    n = int(s)
+    if _MT_MIN <= n <= _MT_MAX:
+        return n
+    if _MT_K_MIN <= n <= _MT_K_MAX:
+        return n * 1_000
+    return None
+
+
+def _type_field(text: str) -> str | None:
+    t = text.strip().lower()
+    for key, field in _TYPE_FIELD_MAP.items():
+        if key in t:
+            return field
+    return None
+
+
+def _parse_table_for_breakdown(table: list, default_year: int) -> dict[str, dict]:
+    """
+    Try two layouts:
+      A) First row = month headers, first col = type label
+      B) First col = month/year label, remaining cols = types
+    Returns {period → {field → mt_value}}.
+    """
+    result: dict[str, dict] = {}
+    if not table or len(table) < 2:
+        return result
+
+    def _hdr(cell: object) -> str:
+        return str(cell or "").strip().lower()
+
+    header = [_hdr(c) for c in table[0]]
+
+    # ── Layout A: month columns, type rows ──────────────────────────────────
+    month_cols: dict[int, int] = {}
+    for ci, h in enumerate(header):
+        for abbr, mo in _PDF_MONTHS_EN.items():
+            if h == abbr or h.startswith(abbr + " ") or h.startswith(abbr + "-"):
+                month_cols[ci] = mo
+                break
+    if month_cols:
+        # Infer year from a column header that contains 4-digit year, else default
+        year_in_header = default_year
+        for h in header:
+            m = re.search(r"(20\d{2})", h)
+            if m:
+                year_in_header = int(m.group(1))
+                break
+        for row in table[1:]:
+            label = _hdr(row[0]) if row else ""
+            field = _type_field(label)
+            if not field:
+                continue
+            for ci, mo in month_cols.items():
+                if ci < len(row):
+                    val = _cell_to_mt(str(row[ci] or ""))
+                    if val:
+                        period = f"{year_in_header}-{mo:02d}"
+                        result.setdefault(period, {})[field] = val
+        if result:
+            return result
+
+    # ── Layout B: month/year rows, type columns ──────────────────────────────
+    type_cols: dict[int, str] = {}
+    for ci, h in enumerate(header):
+        field = _type_field(h)
+        if field:
+            type_cols[ci] = field
+    if type_cols:
+        for row in table[1:]:
+            label = _hdr(row[0]) if row else ""
+            mo = None
+            yr = default_year
+            for abbr, m_num in _PDF_MONTHS_EN.items():
+                if abbr in label:
+                    mo = m_num
+                    break
+            year_m = re.search(r"(20\d{2})", label)
+            if year_m:
+                yr = int(year_m.group(1))
+            if mo is None:
+                continue
+            period = f"{yr}-{mo:02d}"
+            for ci, field in type_cols.items():
+                if ci < len(row):
+                    val = _cell_to_mt(str(row[ci] or ""))
+                    if val:
+                        result.setdefault(period, {})[field] = val
+
+    return result
+
+
+def _parse_text_for_breakdown(text: str, default_year: int) -> dict[str, dict]:
+    """
+    Fallback text parser: detects type section headers, then reads
+    'Month [YYYY] value' patterns within each section.
+    """
+    result: dict[str, dict] = {}
+    current_field: str | None = None
+    current_year: int = default_year
+
+    for line in text.split("\n"):
+        ll = line.strip()
+        if not ll:
+            continue
+
+        # Section header detection (short line mentioning a type keyword)
+        if len(ll) < 80:
+            field = _type_field(ll)
+            if field:
+                current_field = field
+                # Reset year to default when entering new section
+                current_year = default_year
+
+        if current_field is None:
+            continue
+
+        # Year override in line
+        ym = re.search(r"(20\d{2})", ll)
+        if ym:
+            current_year = int(ym.group(1))
+
+        # Month + value on same line
+        ll_lower = ll.lower()
+        for abbr, mo in _PDF_MONTHS_EN.items():
+            if abbr in ll_lower:
+                nums = re.findall(r"[\d,]{4,}", ll)
+                for n in nums:
+                    val = _cell_to_mt(n)
+                    if val:
+                        period = f"{current_year}-{mo:02d}"
+                        result.setdefault(period, {})[current_field] = val
+                        break
+                break
+
+    return result
+
+
+def _fetch_bytes(url: str) -> bytes | None:
+    try:
+        r = requests.get(url, headers=_HEADERS, timeout=30)
+        if r.status_code == 200:
+            return r.content
+    except Exception:
+        pass
+    return None
+
+
+def _parse_pdf_type_breakdown(pdf_url: str) -> dict[str, dict]:
+    """
+    Download ECF PDF and extract per-type monthly breakdown from pages 5-12.
+    Returns {period → {arabica_washed_mt, arabica_unwashed_mt, robusta_mt, …}}.
+    """
+    try:
+        import pdfplumber
+    except ImportError:
+        print("[ecf_stocks] pdfplumber not installed — skipping type breakdown")
+        return {}
+
+    # Infer year from PDF URL
+    ym = _PDF_YEAR_PAT.search(pdf_url)
+    default_year = int(ym.group(1)) if ym else date.today().year
+
+    pdf_bytes = _fetch_bytes(pdf_url)
+    if not pdf_bytes:
+        print(f"[ecf_stocks] PDF download failed: {pdf_url}")
+        return {}
+
+    result: dict[str, dict] = {}
+    try:
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            pages = pdf.pages[4:min(13, len(pdf.pages))]  # pages 5-13 (1-indexed)
+            for page in pages:
+                # Table extraction first
+                for table in (page.extract_tables() or []):
+                    parsed = _parse_table_for_breakdown(table, default_year)
+                    for period, bd in parsed.items():
+                        result.setdefault(period, {}).update(bd)
+
+                # Text fallback for pages that mention type keywords
+                text = page.extract_text() or ""
+                if any(k in text.lower() for k in ["washed", "unwashed", "robusta", "mild", "natural"]):
+                    parsed = _parse_text_for_breakdown(text, default_year)
+                    for period, bd in parsed.items():
+                        # Only add fields not already found via table
+                        for field, val in bd.items():
+                            result.setdefault(period, {}).setdefault(field, val)
+    except Exception as e:
+        print(f"[ecf_stocks] PDF parse error: {e}")
+
+    if result:
+        print(f"[ecf_stocks] type breakdown: {len(result)} periods — {sorted(result)}")
+    else:
+        print("[ecf_stocks] type breakdown: nothing found in PDF pages 5-13")
+    return result
+
+
 def _strip_html(html: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
 
@@ -250,55 +476,9 @@ def _post_to_entries(url: str) -> list[dict]:
     return [entry]
 
 
-def _parse_yearly_pdf(pdf_url: str, year: str) -> list[dict]:
-    """Download an ECF yearly PDF and extract monthly stock entries.
-
-    ECF yearly reports (YYYY-Stocks-European-Ports.pdf) contain the same
-    monthly tonnage data as the bi-monthly web posts, but covering the full
-    calendar year. Returns a list of {period, value_raw, value_mt, pdf_url}
-    entries (one per month found). Falls back to a single December entry if
-    only a headline bags figure is extractable.
-    """
-    try:
-        r = requests.get(pdf_url, headers=_HEADERS, timeout=60)
-        if r.status_code != 200:
-            return []
-        raw = r.content
-    except Exception as e:
-        print(f"[ecf_stocks] yearly PDF download failed ({year}): {e}")
-        return []
-
-    try:
-        with pdfplumber.open(io.BytesIO(raw)) as pdf:
-            # First 5 pages contain all headline figures in ECF yearly reports.
-            text = " ".join(page.extract_text() or "" for page in pdf.pages[:5])
-    except Exception as e:
-        print(f"[ecf_stocks] yearly PDF parse failed ({year}): {e}")
-        return []
-
-    entries = _entries_from_tons_text(text)
-    if entries:
-        for e in entries:
-            e["pdf_url"] = pdf_url
-            e["from_yearly_pdf"] = True
-        return entries
-
-    bags = _figure_from_text(text)
-    if bags:
-        return [{
-            "period":          f"{year}-12",
-            "value_raw":       bags,
-            "pdf_url":         pdf_url,
-            "from_yearly_pdf": True,
-        }]
-
-    return []
-
 
 async def run(page) -> list[dict]:
-    # Collect post URLs across multiple ECF index pages.
     post_urls: list[str] = []
-    yearly_pdfs: list[dict] = []
     pages_seen = 0
     for idx_url in _INDEX_URLS:
         html = _fetch(idx_url)
@@ -309,54 +489,40 @@ async def run(page) -> list[dict]:
             url = m.group(1)
             if url not in post_urls:
                 post_urls.append(url)
-        # Yearly PDFs only appear on the stocks-category page.
-        for m in _YEARLY_PDF_PAT.finditer(html):
-            entry = {"year": m.group(2), "pdf_url": m.group(1)}
-            if entry not in yearly_pdfs:
-                yearly_pdfs.append(entry)
 
     if pages_seen == 0:
         print("[ecf_stocks] all index pages unreachable")
         return []
-    if not post_urls and not yearly_pdfs:
-        print("[ecf_stocks] no stocks posts or yearly PDFs found")
+    if not post_urls:
+        print("[ecf_stocks] no stocks posts found")
         return []
-    print(f"[ecf_stocks] index pages: {pages_seen}, posts: {len(post_urls)}, yearly_pdfs: {len(yearly_pdfs)}")
+    print(f"[ecf_stocks] index pages: {pages_seen}, posts: {len(post_urls)}")
 
-    # Latest 12 posts ~= last 2 years of bi-monthly reports — plenty.
-    # Each post can produce multiple monthly entries.
     entries: list[dict] = []
     for url in post_urls[:12]:
         entries.extend(_post_to_entries(url))
 
-    if not entries and not yearly_pdfs:
-        print("[ecf_stocks] no parseable entries from posts and no yearly PDFs")
+    if not entries:
+        print("[ecf_stocks] no parseable entries from posts")
         return []
 
-    # Post entries take priority. Build by_period from posts first.
     by_period: dict[str, dict] = {}
     for e in entries:
         prev = by_period.get(e["period"])
         if not prev or (e.get("value_raw") and not prev.get("value_raw")):
             by_period[e["period"]] = e
 
-    # Parse historical yearly PDFs and fill in gaps not covered by posts.
-    yearly_pdf_count = 0
-    if yearly_pdfs:
-        sorted_pdfs = sorted(yearly_pdfs, key=lambda y: y["year"])
-        for pdf_info in sorted_pdfs:
-            pdf_entries = _parse_yearly_pdf(pdf_info["pdf_url"], pdf_info["year"])
-            added = 0
-            for e in pdf_entries:
-                p = e.get("period", "")
-                if p and p not in by_period:
-                    by_period[p] = e
-                    added += 1
-            yearly_pdf_count += added
-            print(f"[ecf_stocks] yearly PDF {pdf_info['year']}: {len(pdf_entries)} extracted, {added} new periods")
-
     series = sorted(by_period.values(), key=lambda x: x["period"])
     latest = next((e for e in reversed(series) if e.get("value_raw")), series[-1])
+
+    # Fetch latest PDF and merge per-type breakdown into series entries
+    latest_pdf = latest.get("pdf_url")
+    if latest_pdf:
+        breakdown_by_period = _parse_pdf_type_breakdown(latest_pdf)
+        for entry in series:
+            bd = breakdown_by_period.get(entry["period"])
+            if bd:
+                entry.update(bd)
 
     value_bags = latest.get("value_raw") or 0
     return [{
@@ -372,13 +538,11 @@ async def run(page) -> list[dict]:
         "lng":      5.0,
         "tags":     ["stocks", "europe", "ecf", "demand"],
         "meta":     json.dumps({
-            "monthly":            series,
-            "latest_bags":        value_bags or None,
-            "as_of":              _today(),
-            "source_url":         _INDEX_URL,
-            "latest_post":        latest.get("post_url"),
-            "latest_pdf":         latest.get("pdf_url"),
-            "yearly_pdfs":        yearly_pdfs,
-            "historical_periods": yearly_pdf_count,
+            "monthly":     series,
+            "latest_bags": value_bags or None,
+            "as_of":       _today(),
+            "source_url":  _INDEX_URL,
+            "latest_post": latest.get("post_url"),
+            "latest_pdf":  latest.get("pdf_url"),
         }),
     }]

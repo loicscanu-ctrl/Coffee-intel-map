@@ -13,17 +13,33 @@ interface ScraperConfig {
 }
 
 const SCRAPER_CONFIGS: ScraperConfig[] = [
-  { key: "futures",           label: "Futures",    thresholdHours: 36   },
+  // Futures / market data
+  { key: "futures",           label: "Barchart",   thresholdHours: 36   },
   { key: "cot",               label: "COT",        thresholdHours: 192  }, // 8 days (weekly)
   { key: "macro_cot",         label: "Macro COT",  thresholdHours: 192  },
   { key: "freight",           label: "Freight",    thresholdHours: 48   },
+  // Weather / macro
   { key: "weather",           label: "Weather",    thresholdHours: 48   },
   { key: "enso",              label: "ENSO",       thresholdHours: 720  }, // monthly
+  // Fertilizer
   { key: "fertilizer_wb",     label: "Fert. WB",   thresholdHours: 720  },
   { key: "fertilizer_comex",  label: "Fert. Comex",thresholdHours: 720  },
+  // Demand stocks
   { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // 60 days (bi-monthly publish)
   { key: "psd_coffee",        label: "USDA PSD",   thresholdHours: 1440 }, // 60 days (monthly refresh)
   { key: "ajca",              label: "AJCA",       thresholdHours: 720  }, // 30 days (monthly publish)
+  // Farmer economics (Brazil)
+  { key: "conab_costs",       label: "CONAB Costs",thresholdHours: 720  }, // monthly
+  { key: "conab_safra",       label: "CONAB Safra",thresholdHours: 720  }, // monthly
+  // Origin export data
+  { key: "cecafe_daily",      label: "Cecafe Daily",thresholdHours: 36  }, // business-daily
+  { key: "brazil_exports",    label: "BR Exports", thresholdHours: 720  }, // monthly (Cecafe)
+  { key: "colombia_exports",  label: "CO Exports", thresholdHours: 48   },
+  { key: "honduras_exports",  label: "HN Exports", thresholdHours: 48   },
+  { key: "ethiopia_exports",  label: "ET Exports", thresholdHours: 48   },
+  { key: "vietnam_exports",   label: "VN Exports", thresholdHours: 48   },
+  { key: "indonesia_exports", label: "ID Exports", thresholdHours: 48   },
+  { key: "uganda_exports",    label: "UG Exports", thresholdHours: 48   },
 ];
 
 function fmtAge(isoTimestamp: string): string {

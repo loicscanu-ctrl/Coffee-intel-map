@@ -1,15 +1,15 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-12T06:30:42.059638Z",
+  "scraped_at": "2026-05-13T09:17:46.668492Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-12",
+    "as_of": "2026-05-13",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-12T06:01:24.380534Z",
+    "scraped_at": "2026-05-13T09:16:50.698768Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -22,16 +22,16 @@
       {
         "name": "Harrar",
         "drought": "HIGH",
-        "csi_30d": 0.326,
-        "csi_60d": 0.164,
+        "csi_30d": 0.28,
+        "csi_60d": 0.14,
         "csi_30d_level": "MED",
         "csi_60d_level": "LOW"
       },
       {
         "name": "Kaffa",
         "drought": "MED",
-        "csi_30d": 0.234,
-        "csi_60d": 0.116,
+        "csi_30d": 0.186,
+        "csi_60d": 0.094,
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW"
       },
@@ -56,7 +56,6 @@
       {
         "region": "Harrar",
         "days": [
-          "M",
           "H",
           "H",
           "H",
@@ -116,13 +115,14 @@
           "-",
           "-",
           "L",
+          "L",
+          "L",
+          "L",
+          "L",
+          "L",
+          "L",
           "M",
-          "L",
-          "L",
-          "-",
-          "L",
-          "L",
-          "L"
+          "M"
         ]
       },
       {
@@ -132,7 +132,7 @@
           "M",
           "M",
           "M",
-          "M",
+          "-",
           "-",
           "-",
           "-",
@@ -202,9 +202,9 @@
         "days": [
           "-",
           "-",
-          "-",
           "L",
           "M",
+          "-",
           "-",
           "-",
           "-",
@@ -388,7 +388,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-12"
+    "last_updated": "2026-05-13"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",

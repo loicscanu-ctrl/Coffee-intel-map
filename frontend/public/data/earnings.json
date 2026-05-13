@@ -1,24 +1,36 @@
 {
-  "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+  "scraped_at": "2026-05-13T07:18:23.039944+00:00",
   "companies": [
     {
       "ticker": "SBUX",
       "name": "Starbucks",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 95.21,
+        "price": 106.58,
         "currency": "USD",
-        "w52_high": 104.82,
-        "w52_low": 75.5,
-        "mktcap": 108472745984.0,
-        "pe": 79.3417,
-        "forward_pe": 32.239,
-        "ev_ebitda": 24.611,
-        "ytd_pct": 14.1
+        "w52_high": 108.04,
+        "w52_low": 77.99,
+        "mktcap": 121469222912.0,
+        "pe": 81.3588,
+        "forward_pe": 35.3599,
+        "ev_ebitda": 26.724,
+        "ytd_pct": 27.7
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 9531500000.0,
+          "cogs": 7617100000.0,
+          "gross_profit": 1914400000.0,
+          "net_income": 510900000.0,
+          "net_debt": 22859400000.0,
+          "revenue_yoy": 8.8,
+          "cogs_yoy": 10.2,
+          "gross_profit_yoy": 3.6,
+          "net_income_yoy": 33.0
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 9915100000.0,
@@ -26,10 +38,10 @@
           "gross_profit": 2089200000.0,
           "net_income": 293300000.0,
           "net_debt": 22057500000.0,
-          "revenue_yoy": 5.5,
-          "cogs_yoy": 10.3,
-          "gross_profit_yoy": -9.2,
-          "net_income_yoy": -62.4
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
         },
         {
           "period_end": "2025-09-30",
@@ -37,11 +49,7 @@
           "cogs": 7406400000.0,
           "gross_profit": 2162600000.0,
           "net_income": 133200000.0,
-          "net_debt": 23391700000.0,
-          "revenue_yoy": null,
-          "cogs_yoy": null,
-          "gross_profit_yoy": null,
-          "net_income_yoy": null
+          "net_debt": 23391700000.0
         },
         {
           "period_end": "2025-06-30",
@@ -60,14 +68,6 @@
           "net_debt": 23338100000.0
         },
         {
-          "period_end": "2024-12-31",
-          "revenue": 9397800000.0,
-          "cogs": 7096700000.0,
-          "gross_profit": 2301100000.0,
-          "net_income": 780800000.0,
-          "net_debt": 22200100000.0
-        },
-        {
           "period_end": "2024-09-30",
           "revenue": null,
           "cogs": null,
@@ -78,28 +78,34 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-04-28",
-          "eps_estimate": 0.41,
+          "date": "2026-07-28",
+          "eps_estimate": 0.65,
           "eps_actual": null,
           "surprise_pct": null
         },
         {
+          "date": "2026-04-28",
+          "eps_estimate": 0.44,
+          "eps_actual": 0.5,
+          "surprise_pct": 14.51
+        },
+        {
           "date": "2026-01-28",
-          "eps_estimate": 0.59,
-          "eps_actual": 0.56,
-          "surprise_pct": -4.59
+          "eps_estimate": 0.57,
+          "eps_actual": 0.26,
+          "surprise_pct": -54.31
         },
         {
           "date": "2025-10-29",
-          "eps_estimate": 0.56,
-          "eps_actual": 0.52,
-          "surprise_pct": -6.51
+          "eps_estimate": 0.52,
+          "eps_actual": 0.12,
+          "surprise_pct": -76.79
         },
         {
           "date": "2025-07-29",
           "eps_estimate": 0.65,
-          "eps_actual": 0.5,
-          "surprise_pct": -22.49
+          "eps_actual": 0.49,
+          "surprise_pct": -24.99
         },
         {
           "date": "2025-04-29",
@@ -118,12 +124,6 @@
           "eps_estimate": 0.89,
           "eps_actual": 0.8,
           "surprise_pct": -10.61
-        },
-        {
-          "date": "2024-07-30",
-          "eps_estimate": 0.93,
-          "eps_actual": 0.93,
-          "surprise_pct": -0.12
         }
       ]
     },
@@ -131,18 +131,18 @@
       "ticker": "BROS",
       "name": "Dutch Bros",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 53.03,
+        "price": 50.68,
         "currency": "USD",
         "w52_high": 77.88,
         "w52_low": 44.58,
-        "mktcap": 8738463744.0,
-        "pe": 82.8594,
-        "forward_pe": 44.1891,
-        "ev_ebitda": 27.32,
-        "ytd_pct": -14.7
+        "mktcap": 8852955136.0,
+        "pe": 79.1875,
+        "forward_pe": 41.2989,
+        "ev_ebitda": 26.912,
+        "ytd_pct": -18.5
       },
       "financials": [
         {
@@ -204,10 +204,16 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-05-06",
-          "eps_estimate": 0.16,
+          "date": "2026-08-05",
+          "eps_estimate": 0.29,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-05-06",
+          "eps_estimate": 0.15,
+          "eps_actual": 0.16,
+          "surprise_pct": 3.29
         },
         {
           "date": "2026-02-12",
@@ -224,8 +230,8 @@
         {
           "date": "2025-08-06",
           "eps_estimate": 0.18,
-          "eps_actual": 0.2,
-          "surprise_pct": 8.62
+          "eps_actual": 0.26,
+          "surprise_pct": 47.0
         },
         {
           "date": "2025-05-07",
@@ -244,12 +250,6 @@
           "eps_estimate": 0.12,
           "eps_actual": 0.16,
           "surprise_pct": 37.13
-        },
-        {
-          "date": "2024-08-07",
-          "eps_estimate": 0.13,
-          "eps_actual": 0.19,
-          "surprise_pct": 50.87
         }
       ]
     },
@@ -257,18 +257,18 @@
       "ticker": "WEST",
       "name": "Westrock Coffee",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 4.79,
+        "price": 8.65,
         "currency": "USD",
-        "w52_high": 7.92,
+        "w52_high": 8.976,
         "w52_low": 3.59,
-        "mktcap": 464050944.0,
+        "mktcap": 843876288.0,
         "pe": null,
-        "forward_pe": 26.6111,
-        "ev_ebitda": 64.871,
-        "ytd_pct": 17.7
+        "forward_pe": 48.0555,
+        "ev_ebitda": 39.263,
+        "ytd_pct": 112.5
       },
       "financials": [
         {
@@ -330,10 +330,16 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-05-07",
-          "eps_estimate": -0.01,
+          "date": "2026-08-06",
+          "eps_estimate": 0.03,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-05-07",
+          "eps_estimate": -0.15,
+          "eps_actual": -0.09,
+          "surprise_pct": 41.94
         },
         {
           "date": "2026-03-10",
@@ -370,12 +376,6 @@
           "eps_estimate": -0.06,
           "eps_actual": -0.16,
           "surprise_pct": -178.26
-        },
-        {
-          "date": "2024-08-08",
-          "eps_estimate": -0.06,
-          "eps_actual": -0.2,
-          "surprise_pct": -233.33
         }
       ]
     },
@@ -383,20 +383,32 @@
       "ticker": "BRCC",
       "name": "Black Rifle Coffee",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 0.8,
+        "price": 1.29,
         "currency": "USD",
-        "w52_high": 2.395,
+        "w52_high": 2.1,
         "w52_low": 0.6,
-        "mktcap": 93176008.0,
+        "mktcap": 150935168.0,
         "pe": null,
-        "forward_pe": 26.6667,
-        "ev_ebitda": -15.104,
-        "ytd_pct": -28.6
+        "forward_pe": 43.0,
+        "ev_ebitda": -61.342,
+        "ytd_pct": 15.2
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 109227000.0,
+          "cogs": 73139000.0,
+          "gross_profit": 36088000.0,
+          "net_income": -15000.0,
+          "net_debt": 51329000.0,
+          "revenue_yoy": -3.1,
+          "cogs_yoy": -4.5,
+          "gross_profit_yoy": -0.2,
+          "net_income_yoy": -99.5
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 112739000.0,
@@ -439,27 +451,21 @@
           "cogs": 57502000.0,
           "gross_profit": 32472000.0,
           "net_income": -2888000.0,
-          "net_debt": 95786000.0,
-          "revenue_yoy": -15.0,
-          "cogs_yoy": -12.2,
-          "gross_profit_yoy": -19.6,
-          "net_income_yoy": 16.4
-        },
-        {
-          "period_end": "2024-12-31",
-          "revenue": 105877000.0,
-          "cogs": 65494000.0,
-          "gross_profit": 40383000.0,
-          "net_income": -2482000.0,
-          "net_debt": 89887000.0
+          "net_debt": 95786000.0
         }
       ],
       "earnings_dates": [
         {
-          "date": "2026-05-04",
+          "date": "2026-08-03",
           "eps_estimate": -0.01,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-05-04",
+          "eps_estimate": -0.01,
+          "eps_actual": 0.02,
+          "surprise_pct": 293.0
         },
         {
           "date": "2026-03-02",
@@ -487,21 +493,15 @@
         },
         {
           "date": "2025-03-03",
-          "eps_estimate": 0.01,
-          "eps_actual": -0.03,
-          "surprise_pct": -700.0
+          "eps_estimate": -0.05,
+          "eps_actual": 0.06,
+          "surprise_pct": 210.4
         },
         {
           "date": "2024-11-04",
           "eps_estimate": -0.06,
           "eps_actual": 0.04,
           "surprise_pct": 164.72
-        },
-        {
-          "date": "2024-08-07",
-          "eps_estimate": -0.02,
-          "eps_actual": 0.07,
-          "surprise_pct": 507.92
         }
       ]
     },
@@ -509,20 +509,32 @@
       "ticker": "DNUT",
       "name": "Krispy Kreme",
       "group": "pure_coffee",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 3.32,
+        "price": 3.28,
         "currency": "USD",
         "w52_high": 5.73,
         "w52_low": 2.5,
-        "mktcap": 571704000.0,
+        "mktcap": 565472000.0,
         "pe": null,
-        "forward_pe": -41.14,
-        "ev_ebitda": 25.845,
-        "ytd_pct": -18.6
+        "forward_pe": 61.4117,
+        "ev_ebitda": 20.909,
+        "ytd_pct": -19.6
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": null,
+          "cogs": null,
+          "gross_profit": null,
+          "net_income": null,
+          "net_debt": 1382547000.0,
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 392367000.0,
@@ -582,16 +594,22 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-05-07",
-          "eps_estimate": -0.05,
+          "date": "2026-08-06",
+          "eps_estimate": -0.02,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-05-07",
+          "eps_estimate": -0.02,
+          "eps_actual": -0.05,
+          "surprise_pct": -136.18
         },
         {
           "date": "2026-02-26",
           "eps_estimate": 0.04,
           "eps_actual": 0.09,
-          "surprise_pct": 145.97
+          "surprise_pct": 153.88
         },
         {
           "date": "2025-11-06",
@@ -622,12 +640,6 @@
           "eps_estimate": 0.01,
           "eps_actual": -0.01,
           "surprise_pct": -185.4
-        },
-        {
-          "date": "2024-08-08",
-          "eps_estimate": 0.05,
-          "eps_actual": 0.05,
-          "surprise_pct": -1.38
         }
       ]
     },
@@ -635,20 +647,32 @@
       "ticker": "KDP",
       "name": "Keurig Dr Pepper",
       "group": "conglomerate",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 25.47,
+        "price": 29.17,
         "currency": "USD",
         "w52_high": 35.94,
         "w52_low": 24.88,
-        "mktcap": 34605223936.0,
-        "pe": 16.6471,
-        "forward_pe": 10.0857,
-        "ev_ebitda": 11.828,
-        "ytd_pct": -7.3
+        "mktcap": 39687520256.0,
+        "pe": 21.6074,
+        "forward_pe": 11.5521,
+        "ev_ebitda": 17.114,
+        "ytd_pct": 6.1
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 3976000000.0,
+          "cogs": 1878000000.0,
+          "gross_profit": 2098000000.0,
+          "net_income": 270000000.0,
+          "net_debt": 24809000000.0,
+          "revenue_yoy": 9.4,
+          "cogs_yoy": 13.8,
+          "gross_profit_yoy": 5.7,
+          "net_income_yoy": -47.8
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 4499000000.0,
@@ -656,10 +680,10 @@
           "gross_profit": 2419000000.0,
           "net_income": 353000000.0,
           "net_debt": 15115000000.0,
-          "revenue_yoy": 10.5,
-          "cogs_yoy": 16.0,
-          "gross_profit_yoy": 6.2,
-          "net_income_yoy": -345.1
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
         },
         {
           "period_end": "2025-09-30",
@@ -691,11 +715,11 @@
         },
         {
           "period_end": "2024-12-31",
-          "revenue": 4070000000.0,
-          "cogs": 1793000000.0,
-          "gross_profit": 2277000000.0,
-          "net_income": -144000000.0,
-          "net_debt": 15044000000.0
+          "revenue": null,
+          "cogs": null,
+          "gross_profit": null,
+          "net_income": null,
+          "net_debt": null
         },
         {
           "period_end": "2024-09-30",
@@ -708,10 +732,16 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-04-23",
-          "eps_estimate": 0.37,
+          "date": "2026-07-23",
+          "eps_estimate": 0.54,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-04-23",
+          "eps_estimate": 0.33,
+          "eps_actual": 0.2,
+          "surprise_pct": -39.18
         },
         {
           "date": "2026-02-24",
@@ -748,12 +778,6 @@
           "eps_estimate": 0.51,
           "eps_actual": 0.51,
           "surprise_pct": 0.79
-        },
-        {
-          "date": "2024-07-25",
-          "eps_estimate": 0.45,
-          "eps_actual": 0.45,
-          "surprise_pct": 0.27
         }
       ]
     },
@@ -761,18 +785,18 @@
       "ticker": "SJM",
       "name": "JM Smucker",
       "group": "conglomerate",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 94.15,
+        "price": 100.33,
         "currency": "USD",
         "w52_high": 119.39,
-        "w52_low": 93.3,
-        "mktcap": 10045271040.0,
+        "w52_low": 88.25,
+        "mktcap": 10700025856.0,
         "pe": null,
-        "forward_pe": 9.3524,
-        "ev_ebitda": 9.305,
-        "ytd_pct": -1.6
+        "forward_pe": 10.0759,
+        "ev_ebitda": 9.656,
+        "ytd_pct": 4.9
       },
       "financials": [
         {
@@ -805,11 +829,7 @@
           "cogs": 1638600000.0,
           "gross_profit": 474700000.0,
           "net_income": -43900000.0,
-          "net_debt": 8041300000.0,
-          "revenue_yoy": null,
-          "cogs_yoy": null,
-          "gross_profit_yoy": null,
-          "net_income_yoy": null
+          "net_debt": 8041300000.0
         },
         {
           "period_end": "2025-04-30",
@@ -829,14 +849,6 @@
         },
         {
           "period_end": "2024-10-31",
-          "revenue": null,
-          "cogs": null,
-          "gross_profit": null,
-          "net_income": null,
-          "net_debt": null
-        },
-        {
-          "period_end": "2024-07-31",
           "revenue": null,
           "cogs": null,
           "gross_profit": null,
@@ -899,20 +911,32 @@
       "ticker": "KHC",
       "name": "Kraft Heinz",
       "group": "conglomerate",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 23.18,
+        "price": 23.37,
         "currency": "USD",
-        "w52_high": 30.42,
+        "w52_high": 29.19,
         "w52_low": 21.035,
-        "mktcap": 27439204352.0,
+        "mktcap": 27711625216.0,
         "pe": null,
-        "forward_pe": 10.8255,
-        "ev_ebitda": 7.973,
-        "ytd_pct": -3.4
+        "forward_pe": 11.086,
+        "ev_ebitda": 7.789,
+        "ytd_pct": -2.6
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 6047000000.0,
+          "cogs": 3828000000.0,
+          "gross_profit": 2219000000.0,
+          "net_income": 798000000.0,
+          "net_debt": 17825000000.0,
+          "revenue_yoy": 0.8,
+          "cogs_yoy": -2.7,
+          "gross_profit_yoy": 7.5,
+          "net_income_yoy": 12.1
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 6354000000.0,
@@ -920,10 +944,10 @@
           "gross_profit": 2072000000.0,
           "net_income": 651000000.0,
           "net_debt": 18604000000.0,
-          "revenue_yoy": -3.4,
-          "cogs_yoy": -1.1,
-          "gross_profit_yoy": -7.7,
-          "net_income_yoy": -69.5
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
         },
         {
           "period_end": "2025-09-30",
@@ -955,11 +979,11 @@
         },
         {
           "period_end": "2024-12-31",
-          "revenue": 6576000000.0,
-          "cogs": 4331000000.0,
-          "gross_profit": 2245000000.0,
-          "net_income": 2131000000.0,
-          "net_debt": 18535000000.0
+          "revenue": null,
+          "cogs": null,
+          "gross_profit": null,
+          "net_income": null,
+          "net_debt": null
         },
         {
           "period_end": "2024-09-30",
@@ -972,10 +996,16 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-04-28",
-          "eps_estimate": 0.5,
+          "date": "2026-07-29",
+          "eps_estimate": 0.53,
           "eps_actual": null,
           "surprise_pct": null
+        },
+        {
+          "date": "2026-05-06",
+          "eps_estimate": 0.5,
+          "eps_actual": 0.58,
+          "surprise_pct": 15.38
         },
         {
           "date": "2026-02-11",
@@ -1009,15 +1039,9 @@
         },
         {
           "date": "2024-10-30",
-          "eps_estimate": 0.74,
-          "eps_actual": 0.75,
-          "surprise_pct": 1.16
-        },
-        {
-          "date": "2024-07-31",
-          "eps_estimate": 0.74,
-          "eps_actual": 0.78,
-          "surprise_pct": 5.75
+          "eps_estimate": 0.75,
+          "eps_actual": -0.24,
+          "surprise_pct": -132.0
         }
       ]
     },
@@ -1025,18 +1049,18 @@
       "ticker": "NESN.SW",
       "name": "Nestl\u00e9",
       "group": "conglomerate",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "annual",
       "market": {
-        "price": 78.24,
+        "price": 76.68,
         "currency": "CHF",
         "w52_high": 89.43,
         "w52_low": 69.9,
-        "mktcap": 201250471936.0,
-        "pe": 22.2906,
-        "forward_pe": 16.8284,
-        "ev_ebitda": 15.201,
-        "ytd_pct": 2.4
+        "mktcap": 197237817344.0,
+        "pe": 21.8462,
+        "forward_pe": 16.3533,
+        "ev_ebitda": 15.059,
+        "ytd_pct": 4.4
       },
       "financials": [
         {
@@ -1121,17 +1145,17 @@
       "ticker": "JDEP.AS",
       "name": "JDE Peet's",
       "group": "conglomerate",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "annual",
       "market": {
-        "price": 31.82,
+        "price": 31.84,
         "currency": "EUR",
-        "w52_high": 32.14,
-        "w52_low": 19.32,
-        "mktcap": 15447493632.0,
-        "pe": 19.764,
-        "forward_pe": 15.2695,
-        "ev_ebitda": 18.068,
+        "w52_high": 32.8,
+        "w52_low": 21.8,
+        "mktcap": 15457203200.0,
+        "pe": 19.7764,
+        "forward_pe": 15.207,
+        "ev_ebitda": 18.077,
         "ytd_pct": 1.0
       },
       "financials": [
@@ -1217,20 +1241,32 @@
       "ticker": "QSR",
       "name": "Restaurant Brands",
       "group": "adjacent",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 76.51,
+        "price": 78.3,
         "currency": "USD",
-        "w52_high": 77.95,
-        "w52_low": 58.71,
-        "mktcap": 34877906944.0,
-        "pe": 29.0913,
-        "forward_pe": 17.3825,
-        "ev_ebitda": 15.227,
-        "ytd_pct": 13.8
+        "w52_high": 81.96,
+        "w52_low": 61.33,
+        "mktcap": 35731181568.0,
+        "pe": 25.1769,
+        "forward_pe": 17.6409,
+        "ev_ebitda": 15.116,
+        "ytd_pct": 16.5
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 2264000000.0,
+          "cogs": 1501000000.0,
+          "gross_profit": 763000000.0,
+          "net_income": 338000000.0,
+          "net_debt": 14694000000.0,
+          "revenue_yoy": 7.3,
+          "cogs_yoy": 6.8,
+          "gross_profit_yoy": 8.4,
+          "net_income_yoy": 112.6
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 2466000000.0,
@@ -1238,10 +1274,10 @@
           "gross_profit": 831000000.0,
           "net_income": 113000000.0,
           "net_debt": 14541000000.0,
-          "revenue_yoy": 7.4,
-          "cogs_yoy": 5.3,
-          "gross_profit_yoy": 11.7,
-          "net_income_yoy": -56.4
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
         },
         {
           "period_end": "2025-09-30",
@@ -1273,11 +1309,11 @@
         },
         {
           "period_end": "2024-12-31",
-          "revenue": 2296000000.0,
-          "cogs": 1552000000.0,
-          "gross_profit": 744000000.0,
-          "net_income": 259000000.0,
-          "net_debt": 14622000000.0
+          "revenue": null,
+          "cogs": null,
+          "gross_profit": null,
+          "net_income": null,
+          "net_debt": null
         },
         {
           "period_end": "2024-09-30",
@@ -1285,33 +1321,39 @@
           "cogs": null,
           "gross_profit": null,
           "net_income": null,
-          "net_debt": 14622000000.0
+          "net_debt": null
         }
       ],
       "earnings_dates": [
         {
-          "date": "2026-05-06",
-          "eps_estimate": 0.83,
+          "date": "2026-08-06",
+          "eps_estimate": 1.04,
           "eps_actual": null,
           "surprise_pct": null
         },
         {
+          "date": "2026-05-06",
+          "eps_estimate": 0.83,
+          "eps_actual": 0.86,
+          "surprise_pct": 3.97
+        },
+        {
           "date": "2026-02-12",
-          "eps_estimate": 0.93,
-          "eps_actual": 0.34,
-          "surprise_pct": -63.38
+          "eps_estimate": 0.95,
+          "eps_actual": 0.96,
+          "surprise_pct": 1.31
         },
         {
           "date": "2025-10-30",
-          "eps_estimate": 0.96,
-          "eps_actual": 0.96,
-          "surprise_pct": 0.49
+          "eps_estimate": 1.0,
+          "eps_actual": 1.03,
+          "surprise_pct": 2.89
         },
         {
           "date": "2025-08-07",
-          "eps_estimate": 0.94,
-          "eps_actual": 0.57,
-          "surprise_pct": -39.23
+          "eps_estimate": 0.97,
+          "eps_actual": 0.94,
+          "surprise_pct": -2.86
         },
         {
           "date": "2025-05-08",
@@ -1330,12 +1372,6 @@
           "eps_estimate": 0.95,
           "eps_actual": 0.93,
           "surprise_pct": -2.43
-        },
-        {
-          "date": "2024-08-08",
-          "eps_estimate": 0.86,
-          "eps_actual": 0.86,
-          "surprise_pct": 0.26
         }
       ]
     },
@@ -1343,20 +1379,32 @@
       "ticker": "KO",
       "name": "Coca-Cola",
       "group": "adjacent",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 75.91,
+        "price": 80.03,
         "currency": "USD",
         "w52_high": 82.0,
         "w52_low": 65.35,
-        "mktcap": 326728286208.0,
-        "pe": 24.9704,
-        "forward_pe": 21.975,
-        "ev_ebitda": 22.433,
-        "ytd_pct": 10.6
+        "mktcap": 344327651328.0,
+        "pe": 25.1667,
+        "forward_pe": 22.9818,
+        "ev_ebitda": 22.566,
+        "ytd_pct": 16.6
       },
       "financials": [
+        {
+          "period_end": "2026-03-31",
+          "revenue": 12472000000.0,
+          "cogs": 4620000000.0,
+          "gross_profit": 7852000000.0,
+          "net_income": 3924000000.0,
+          "net_debt": 33316000000.0,
+          "revenue_yoy": 12.1,
+          "cogs_yoy": 11.0,
+          "gross_profit_yoy": 12.7,
+          "net_income_yoy": 17.8
+        },
         {
           "period_end": "2025-12-31",
           "revenue": 11822000000.0,
@@ -1364,10 +1412,10 @@
           "gross_profit": 7099000000.0,
           "net_income": 2271000000.0,
           "net_debt": 35222000000.0,
-          "revenue_yoy": 2.4,
-          "cogs_yoy": 2.4,
-          "gross_profit_yoy": 2.4,
-          "net_income_yoy": 3.5
+          "revenue_yoy": null,
+          "cogs_yoy": null,
+          "gross_profit_yoy": null,
+          "net_income_yoy": null
         },
         {
           "period_end": "2025-09-30",
@@ -1399,11 +1447,11 @@
         },
         {
           "period_end": "2024-12-31",
-          "revenue": 11544000000.0,
-          "cogs": 4613000000.0,
-          "gross_profit": 6931000000.0,
-          "net_income": 2195000000.0,
-          "net_debt": 33694000000.0
+          "revenue": null,
+          "cogs": null,
+          "gross_profit": null,
+          "net_income": null,
+          "net_debt": null
         },
         {
           "period_end": "2024-09-30",
@@ -1416,16 +1464,22 @@
       ],
       "earnings_dates": [
         {
-          "date": "2026-04-28",
-          "eps_estimate": 0.81,
+          "date": "2026-07-21",
+          "eps_estimate": 0.93,
           "eps_actual": null,
           "surprise_pct": null
         },
         {
+          "date": "2026-04-28",
+          "eps_estimate": 0.81,
+          "eps_actual": 0.86,
+          "surprise_pct": 5.88
+        },
+        {
           "date": "2026-02-10",
-          "eps_estimate": 0.56,
-          "eps_actual": 0.58,
-          "surprise_pct": 2.69
+          "eps_estimate": 0.54,
+          "eps_actual": 0.53,
+          "surprise_pct": -1.43
         },
         {
           "date": "2025-10-21",
@@ -1448,20 +1502,14 @@
         {
           "date": "2025-02-11",
           "eps_estimate": 0.52,
-          "eps_actual": 0.55,
-          "surprise_pct": 6.38
+          "eps_actual": 0.51,
+          "surprise_pct": -1.1
         },
         {
           "date": "2024-10-23",
           "eps_estimate": 0.75,
           "eps_actual": 0.77,
           "surprise_pct": 3.18
-        },
-        {
-          "date": "2024-07-23",
-          "eps_estimate": 0.81,
-          "eps_actual": 0.84,
-          "surprise_pct": 4.26
         }
       ]
     },
@@ -1469,18 +1517,18 @@
       "ticker": "FARM",
       "name": "Farmer Bros",
       "group": "micro",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 1.25,
+        "price": 1.28,
         "currency": "USD",
         "w52_high": 2.48,
         "w52_low": 1.21,
-        "mktcap": 27431102.0,
+        "mktcap": 28089448.0,
         "pe": null,
-        "forward_pe": -1.4706,
-        "ev_ebitda": 15.544,
-        "ytd_pct": -15.5
+        "forward_pe": -1.5059,
+        "ev_ebitda": 15.673,
+        "ytd_pct": -13.5
       },
       "financials": [
         {
@@ -1595,18 +1643,18 @@
       "ticker": "JVA",
       "name": "Coffee Holding Co",
       "group": "micro",
-      "scraped_at": "2026-04-08T04:02:25.229626+00:00",
+      "scraped_at": "2026-05-13T07:18:23.039944+00:00",
       "frequency": "quarterly",
       "market": {
-        "price": 4.28,
+        "price": 4.32,
         "currency": "USD",
         "w52_high": 5.63,
-        "w52_low": 2.75,
-        "mktcap": 24432810.0,
-        "pe": 12.5882,
-        "forward_pe": 10.7,
-        "ev_ebitda": 7.172,
-        "ytd_pct": 17.2
+        "w52_low": 2.93,
+        "mktcap": 24661152.0,
+        "pe": 12.7059,
+        "forward_pe": 10.8,
+        "ev_ebitda": 7.234,
+        "ytd_pct": 18.3
       },
       "financials": [
         {
@@ -1639,11 +1687,7 @@
           "cogs": 20997777.0,
           "gross_profit": 2912737.0,
           "net_income": -1205413.0,
-          "net_debt": 8007495.0,
-          "revenue_yoy": null,
-          "cogs_yoy": null,
-          "gross_profit_yoy": null,
-          "net_income_yoy": null
+          "net_debt": 8007495.0
         },
         {
           "period_end": "2025-04-30",
@@ -1663,14 +1707,6 @@
         },
         {
           "period_end": "2024-10-31",
-          "revenue": null,
-          "cogs": null,
-          "gross_profit": null,
-          "net_income": null,
-          "net_debt": null
-        },
-        {
-          "period_end": "2024-07-31",
           "revenue": null,
           "cogs": null,
           "gross_profit": null,

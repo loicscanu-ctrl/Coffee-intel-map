@@ -95,44 +95,54 @@ function ProvinceSelector({
 
 // ── 1. Daily Accumulated Rainfall (Dak Lak — fixed station) ──────────────────
 
-function DailyAccumChart({ daily, updated }: { daily: DailyRow[]; updated: string }) {
-  const monthLabel = (() => {
-    const parts = updated.split("-");
-    if (parts.length < 2) return updated;
-    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
-    return d.toLocaleString("en-US", { month: "long" }) + " " + parts[0];
-  })();
+function DailyAccumChart({
+  daily, updated, selectedYear, selectedMonthIdx,
+}: {
+  daily: DailyRow[];
+  updated: string;
+  selectedYear: number;
+  selectedMonthIdx: number;
+}) {
+  const parts = updated.split("-");
+  const dataYear  = parts.length >= 1 ? parseInt(parts[0]) : new Date().getFullYear();
+  const dataMonth = parts.length >= 2 ? parseInt(parts[1]) - 1 : 0; // 0-indexed
+
+  const monthLabel = MONTHS[selectedMonthIdx] + " " + selectedYear;
+  const isCurrentPeriod = selectedYear === dataYear && selectedMonthIdx === dataMonth;
+
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
       <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
         Daily Accumulated Rainfall — {monthLabel} (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">Dak Lak · Buon Ma Thuot station · Band = 10yr min/max</div>
-      <ResponsiveContainer width="100%" height={155}>
-        <ComposedChart data={daily} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-          <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
-            tickFormatter={(v) => `${v}`} interval={4} />
-          <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} />
-          <Tooltip contentStyle={TT} labelFormatter={(v) => `Day ${v}`}
-            formatter={(v: unknown) => [`${Number(v).toFixed(1)} mm`]} />
-          <Legend wrapperStyle={{ fontSize: 9 }} />
-          {/* 10yr range band */}
-          <Area type="monotone" dataKey="max_accum_mm" name="10yr max" fill="#1e3a5f"
-            stroke="none" opacity={0.5} legendType="none" />
-          <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
-            stroke="none" opacity={1} legendType="none" />
-          {/* Historical avg */}
-          <Line type="monotone" dataKey="avg_accum_mm" name="hist. avg"
-            stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
-          {/* 2025 */}
-          <Line type="monotone" dataKey="last_year_accum_mm" name="2025"
-            stroke="#93c5fd" strokeWidth={1.5} dot={false} />
-          {/* 2026 */}
-          <Line type="monotone" dataKey="accum_mm" name="2026"
-            stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} />
-        </ComposedChart>
-      </ResponsiveContainer>
+      {isCurrentPeriod ? (
+        <ResponsiveContainer width="100%" height={155}>
+          <ComposedChart data={daily} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+            <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
+              tickFormatter={(v) => `${v}`} interval={4} />
+            <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} />
+            <Tooltip contentStyle={TT} labelFormatter={(v) => `Day ${v}`}
+              formatter={(v: unknown) => [`${Number(v).toFixed(1)} mm`]} />
+            <Legend wrapperStyle={{ fontSize: 9 }} />
+            <Area type="monotone" dataKey="max_accum_mm" name="10yr max" fill="#1e3a5f"
+              stroke="none" opacity={0.5} legendType="none" />
+            <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
+              stroke="none" opacity={1} legendType="none" />
+            <Line type="monotone" dataKey="avg_accum_mm" name="hist. avg"
+              stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+            <Line type="monotone" dataKey="last_year_accum_mm" name="2025"
+              stroke="#93c5fd" strokeWidth={1.5} dot={false} />
+            <Line type="monotone" dataKey="accum_mm" name="2026"
+              stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-[155px] flex items-center justify-center text-[9px] text-slate-600 italic">
+          Daily station data only stored for current month ({MONTHS[dataMonth]} {dataYear})
+        </div>
+      )}
     </div>
   );
 }
@@ -328,6 +338,8 @@ function ForecastRainChart({ data }: { data: ForecastBarRow[] }) {
 export default function VnWeatherCharts() {
   const [data, setData] = useState<WeatherData | null>(null);
   const [selected, setSelected] = useState<Set<string> | null>(null);
+  const [selectedYear, setSelectedYear]   = useState<number>(new Date().getFullYear());
+  const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(new Date().getMonth());
 
   useEffect(() => {
     fetch("/data/vn_weather.json")
@@ -335,6 +347,12 @@ export default function VnWeatherCharts() {
       .then((d: WeatherData) => {
         setData(d);
         setSelected(new Set(d.provinces.map((p) => p.name)));
+        // Default to most recent month from data
+        const parts = d.updated.split("-");
+        if (parts.length >= 2) {
+          setSelectedYear(parseInt(parts[0]));
+          setSelectedMonthIdx(parseInt(parts[1]) - 1);
+        }
       })
       .catch((err) => console.error("[VnWeatherCharts] vn_weather fetch failed:", err));
   }, []);
@@ -427,6 +445,28 @@ export default function VnWeatherCharts() {
 
   const activeNames = activeProv.map((p) => p.name).join(", ");
 
+  // Month navigation helpers
+  const canGoPrev = selectedMonthIdx > 0 || selectedYear > 2020;
+  const canGoNext = !(selectedYear === new Date().getFullYear() && selectedMonthIdx >= new Date().getMonth());
+
+  function prevMonth() {
+    if (selectedMonthIdx === 0) {
+      setSelectedYear(y => y - 1);
+      setSelectedMonthIdx(11);
+    } else {
+      setSelectedMonthIdx(m => m - 1);
+    }
+  }
+
+  function nextMonth() {
+    if (selectedMonthIdx === 11) {
+      setSelectedYear(y => y + 1);
+      setSelectedMonthIdx(0);
+    } else {
+      setSelectedMonthIdx(m => m + 1);
+    }
+  }
+
   return (
     <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3">
       {/* Header */}
@@ -434,7 +474,27 @@ export default function VnWeatherCharts() {
         <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
           Weather · Vietnam Central Highlands
         </div>
-        <div className="text-[9px] text-slate-600">Updated {data.updated}</div>
+        <div className="flex items-center gap-2">
+          {/* Month/year selector */}
+          <button
+            onClick={prevMonth}
+            disabled={!canGoPrev}
+            className="px-1.5 py-0.5 rounded text-[10px] text-slate-400 hover:text-slate-200 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            ←
+          </button>
+          <span className="text-[10px] text-slate-300 font-medium w-20 text-center">
+            {MONTHS[selectedMonthIdx]} {selectedYear}
+          </span>
+          <button
+            onClick={nextMonth}
+            disabled={!canGoNext}
+            className="px-1.5 py-0.5 rounded text-[10px] text-slate-400 hover:text-slate-200 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            →
+          </button>
+          <span className="text-[9px] text-slate-600 ml-1">Updated {data.updated}</span>
+        </div>
       </div>
 
       {/* Province selector */}
@@ -452,7 +512,12 @@ export default function VnWeatherCharts() {
 
       {/* 2×2 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <DailyAccumChart daily={data.daily_dak_lak} updated={data.updated} />
+        <DailyAccumChart
+          daily={data.daily_dak_lak}
+          updated={data.updated}
+          selectedYear={selectedYear}
+          selectedMonthIdx={selectedMonthIdx}
+        />
         <MeanTempChart data={tempData} />
         <MonthlyRainChart data={monthlyRainData} />
         <CumulativeRainChart data={cumulativeData} />

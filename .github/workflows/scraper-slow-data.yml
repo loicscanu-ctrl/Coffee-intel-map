@@ -1,18 +1,14 @@
-name: "1.4 – Export and Publish Static JSON"
+name: "1.3 – Monthly Slow-Data Scraper (ECF · PSD · AJCA · UCDA)"
 
 on:
   schedule:
-    - cron: '30 1 * * *'   # 01:30 UTC daily — 30 min after scraper-daily (01:00 UTC)
-  workflow_dispatch:        # allow manual trigger from GitHub UI
-  workflow_run:
-    workflows: ["1.1 – Daily News Scraper", "2.3 – COT Scraper"]
-    types: [completed]
+    - cron: '0 3 1 * *'   # 03:00 UTC on the 1st of each month
+  workflow_dispatch:
 
 jobs:
-  export:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+  slow-data:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 45
     permissions:
       contents: write
 
@@ -25,9 +21,18 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl pdfplumber
 
-      - name: Export static JSON files
+      - name: Install Playwright browser
+        run: playwright install chromium --with-deps
+
+      - name: Run monthly scrapers
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.monthly_scraper
+
+      - name: Export static JSON
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -55,7 +60,7 @@ jobs:
           done
           git diff --cached --quiet \
             && echo "No changes." \
-            || (git commit -m "data: update static JSON [skip ci]" && git pull --rebase --autostash origin main && git push)
+            || (git commit -m "data: monthly slow-data update [skip ci]" && git pull --rebase --autostash origin main && git push)
 
       - name: Notify on failure
         if: failure()

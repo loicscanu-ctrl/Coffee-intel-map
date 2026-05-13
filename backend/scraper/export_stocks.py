@@ -70,12 +70,26 @@ def _psd_section(market_key: str, db_data: dict | None) -> dict | None:
     }
 
 
-def _build_ajca() -> dict | None:
+def _build_ajca(db=None) -> dict | None:
     try:
         data = ajca.fetch_latest()
     except Exception as e:
         print(f"  [stocks] AJCA fetch error: {e}")
-        return None
+        data = None
+    if not data and db is not None:
+        # Cache file missing (export runs on a fresh runner) — fall back to DB
+        item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "AJCA")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if item and item.meta:
+            try:
+                data = json.loads(item.meta)
+                print("  [stocks] AJCA: loaded from DB fallback")
+            except Exception:
+                pass
     if not data:
         return None
     return {
@@ -120,6 +134,20 @@ def export_stocks(db) -> None:
     except Exception as e:
         print(f"  [stocks] PSD fetch error: {e}")
         psd_data = None
+    if not psd_data:
+        # Cache file missing (export on fresh runner) — fall back to DB
+        item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "PSD Coffee")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if item and item.meta:
+            try:
+                psd_data = json.loads(item.meta)
+                print("  [stocks] PSD Coffee: loaded from DB fallback")
+            except Exception:
+                pass
 
     result = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
@@ -127,7 +155,7 @@ def export_stocks(db) -> None:
         "eu":       _psd_section("eu",    psd_data),
         "japan":    _psd_section("japan", psd_data),
         "usa":      _psd_section("usa",   psd_data),
-        "ajca":     _build_ajca(),
+        "ajca":     _build_ajca(db),
         "producers": _psd_producers(psd_data),
     }
     path = OUT_DIR / "demand_stocks.json"

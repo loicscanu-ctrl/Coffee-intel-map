@@ -322,6 +322,23 @@ async def run(page, db) -> None:  # noqa: ARG001
             f"consumption={parsed['latest_consumption_mt']} MT "
             f"({len(parsed['pdf_index'])} pdfs indexed)"
         )
+        # Persist to DB so export jobs on separate runners can fall back to DB
+        if db is not None:
+            from scraper.db import upsert_news_item
+            upsert_news_item(db, {
+                "title":    f"AJCA Japan Coffee Data – {parsed['last_updated']}",
+                "body":     (
+                    f"AJCA Japan {parsed['latest_year']}: "
+                    f"imports={parsed.get('latest_imports_mt')} MT, "
+                    f"consumption={parsed.get('latest_consumption_mt')} MT"
+                ),
+                "source":   "AJCA",
+                "category": "demand",
+                "lat":      35.689,
+                "lng":      139.692,
+                "tags":     ["japan", "demand", "imports"],
+                "meta":     json.dumps(parsed),
+            })
     except Exception as e:
         print(f"[ajca] FAILED: {e} — retaining cache")
 

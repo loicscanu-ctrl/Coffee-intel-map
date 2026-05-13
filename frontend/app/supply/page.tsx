@@ -15,13 +15,13 @@ const EthiopiaTab    = dynamic(() => import("@/components/supply/EthiopiaTab"), 
 
 const TABS = [
   { id: "brazil",       label: "Brazil",       available: true  },
-  { id: "vietnam",      label: "Vietnam",      available: true  },
-  { id: "fertilizers",  label: "Fertilizers",  available: true  },
   { id: "colombia",     label: "Colombia",     available: true  },
   { id: "honduras",     label: "Honduras",     available: true  },
+  { id: "ethiopia",     label: "Ethiopia",     available: true  },
+  { id: "vietnam",      label: "Vietnam",      available: true  },
   { id: "indonesia",    label: "Indonesia",    available: true  },
   { id: "uganda",       label: "Uganda",       available: true  },
-  { id: "ethiopia",     label: "Ethiopia",     available: true  },
+  { id: "fertilizers",  label: "Fertilizers",  available: true  },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -46,7 +46,7 @@ function SupplyPageInner() {
       <PageHeader
         title="Supply Intelligence"
         subtitle="Production & export data by origin country"
-        healthKeys={["weather", "enso", "fertilizer_wb", "fertilizer_comex", "freight"]}
+        healthKeys={["cecafe_daily", "brazil_exports", "colombia_exports", "honduras_exports", "ethiopia_exports", "vietnam_exports", "indonesia_exports", "uganda_exports", "weather", "conab_costs", "conab_safra", "enso", "fertilizer_wb", "fertilizer_comex", "freight"]}
       />
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
 

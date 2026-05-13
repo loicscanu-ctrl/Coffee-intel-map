@@ -195,9 +195,8 @@ COMMODITY_SPECS = {
     "name": "Coffee Robusta", "sector": "softs", "exchange": "ICE Europe",
     "cftc_filter": None,
     "ice_filter": "ICE Robusta Coffee Futures - ICE Futures Europe",
-    "yfinance_ticker": None, "price_proxy": None,
-    "price_source": "stooq",
-    "stooq_ticker": "RM.F",
+    "yfinance_ticker": "RM=F", "price_proxy": None,
+    "price_source": "yfinance",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
   },
   "cocoa_ny": {
