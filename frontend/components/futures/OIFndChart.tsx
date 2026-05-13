@@ -133,8 +133,8 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
           <XAxis
             dataKey="day"
             type="number"
-            domain={[-30, 0]}
-            tickCount={7}
+            domain={[-45, 0]}
+            tickCount={10}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
             label={{ value: "trading days to FND", position: "insideBottom", offset: -10, fill: "#64748b", fontSize: 11 }}
           />

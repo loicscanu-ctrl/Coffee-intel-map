@@ -18,11 +18,12 @@ import Step1GlobalFlow from "./Step1GlobalFlow";
 import Step4IndustryPulse from "./Step4IndustryPulse";
 import Step5DryPowder from "./Step5DryPowder";
 import Step6CycleLocation from "./Step6CycleLocation";
+import Step7Report from "./Step7Report";
 
 export default function CotDashboard() {
   const [step, setStep] = useUrlState<Step>("step", 1, (raw) => {
     const n = Number(raw);
-    return ([1, 2, 3, 4, 5, 6] as number[]).includes(n) ? (n as Step) : 1;
+    return ([1, 2, 3, 4, 5, 6, 7] as number[]).includes(n) ? (n as Step) : 1;
   });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
@@ -161,6 +162,7 @@ export default function CotDashboard() {
       <Step4IndustryPulse  recent52={recent52} />
       <Step5DryPowder      data={data} />
       <Step6CycleLocation  recent52={recent52} />
+      <Step7Report         data={data} recent52={recent52} />
     </div>
   );
 }

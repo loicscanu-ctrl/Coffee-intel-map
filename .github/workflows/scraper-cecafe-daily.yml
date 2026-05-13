@@ -24,9 +24,10 @@ jobs:
         run: pip install pdfplumber
 
       - name: Run Cecafe scraper (3 attempts)
+        working-directory: backend
         run: |
           for attempt in 1 2 3; do
-            python -m backend.scraper.fetch_cecafe_daily && break
+            python -m scraper.fetch_cecafe_daily && break
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 

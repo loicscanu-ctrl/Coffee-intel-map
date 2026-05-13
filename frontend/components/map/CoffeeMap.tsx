@@ -515,7 +515,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
         const icon = Leaflet.divIcon({
           className: "",
-          html: `<div style="background:rgba(15,23,42,0.88);border:1px solid #475569;border-radius:5px;padding:4px 7px;font-family:monospace;font-size:9px;color:#cbd5e1;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.6);pointer-events:none">
+          html: `<div style="display:inline-block;background:rgba(15,23,42,0.88);border:1px solid #475569;border-radius:5px;padding:4px 7px;font-family:monospace;font-size:9px;color:#cbd5e1;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.6);pointer-events:none">
             <div style="font-weight:700;color:#fff;letter-spacing:.04em">${label} · ${transitDays}d</div>
             <div style="color:#e2e8f0">$${rate.toLocaleString()}/FEU</div>
             <div style="color:${color}">${sign}${Math.abs(pct).toFixed(1)}% WoW</div>

@@ -184,7 +184,7 @@ def export_oi_fnd_chart(db) -> None:
                     if not fnd:
                         continue
                     day_val = _trading_days_to(trade_date, fnd)
-                    if day_val < -30 or day_val > 0:
+                    if day_val < -45 or day_val > 0:
                         continue
                     series.setdefault(sym, []).append({"day": day_val, "oi": c.get("oi", 0)})
             except Exception:
@@ -1396,6 +1396,17 @@ def export_health(db) -> None:
             return None
         return val.isoformat() if isinstance(val, (date, datetime)) else str(val)
 
+    def _supply_ts(filename: str) -> str | None:
+        """Read scraped_at/updated from a supply JSON file written earlier in this run."""
+        try:
+            p = OUT_DIR / filename
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at") or d.get("updated")
+        except Exception:
+            pass
+        return None
+
     scrapers: dict[str, str | None] = {}
 
     # Futures (Barchart)
@@ -1450,6 +1461,26 @@ def export_health(db) -> None:
         scrapers["ajca"] = aj.get("last_updated") if aj else None
     except Exception:
         scrapers["ajca"] = None
+
+    # CONAB Costs (arabica production cost, monthly)
+    item = db.query(NewsItem).filter(NewsItem.source == "CONAB Custos").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["conab_costs"] = _ts(item.pub_date) if item else None
+
+    # CONAB Safra (area/yield, monthly)
+    item = db.query(NewsItem).filter(NewsItem.source == "CONAB Safra").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["conab_safra"] = _ts(item.pub_date) if item else None
+
+    # Cecafe daily (updates every business day)
+    scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
+
+    # Origin export supply JSON files
+    scrapers["brazil_exports"]    = _supply_ts("cecafe.json")
+    scrapers["colombia_exports"]  = _supply_ts("colombia_supply.json")
+    scrapers["honduras_exports"]  = _supply_ts("honduras_supply.json")
+    scrapers["ethiopia_exports"]  = _supply_ts("ethiopia_supply.json")
+    scrapers["vietnam_exports"]   = _supply_ts("vietnam_supply.json")
+    scrapers["indonesia_exports"] = _supply_ts("indonesia_supply.json")
+    scrapers["uganda_exports"]    = _supply_ts("uganda_supply.json")
 
     healthy = sum(1 for v in scrapers.values() if v)
     result = {
