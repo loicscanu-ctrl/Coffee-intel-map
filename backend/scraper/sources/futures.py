@@ -795,12 +795,24 @@ async def run(page) -> list[dict]:
     # returning, so api/cot keeps getting fresh data. The COT NewsItems
     # we collected in `results` are lost on this raise, but they're
     # cosmetic news-feed entries and the next day's run repopulates them.
+    # If every chain-fetch path returned empty, log loudly but DON'T raise —
+    # the daily workflow has 25+ other sources that should still get to run
+    # and write data. The check-scrapers-freshness workflow will Telegram-alert
+    # within ~36 h on the stale futures key, which is the proper channel for
+    # data-staleness notifications. Earlier behavior (raise CriticalSourceError)
+    # killed the entire pipeline whenever Barchart's IP block + yfinance rate
+    # limit lined up — a daily occurrence — so all the other working sources
+    # also failed to land their data.
+    #
+    # COT data is already safe at this point — _make_cot_item and
+    # _make_ice_cot_item write to cot_weekly via upsert_cot_weekly before
+    # returning, so api/cot keeps getting fresh data.
     if not kc_contracts and not rm_contracts:
-        from scraper.errors import CriticalSourceError
-        raise CriticalSourceError(
-            "futures: all chain fetchers (Barchart HTTP, Playwright, yfinance) "
-            "returned empty — futures_chain.json will not advance. "
-            "Likely cause: Barchart IP block plus yfinance symbol drift."
+        print(
+            "[futures] WARNING: all chain fetchers (Barchart HTTP, Playwright, "
+            "yfinance) returned empty — futures_chain.json will not advance. "
+            "Likely cause: Barchart IP block + yfinance rate limit. "
+            "Freshness alert will fire if this persists past 36 h."
         )
 
     return results
