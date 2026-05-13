@@ -35,14 +35,25 @@ jobs:
           # 2nd of each month, MDIC Comex around the 12th–15th); 45 days
           # gives one missed-cycle buffer.
           THRESHOLDS_H = {
+              # Daily / near-daily sources (2-day buffer)
               "futures":          48,
-              "cot":              11 * 24,
-              "macro_cot":        11 * 24,
               "freight":          48,
               "weather":          48,
               "enso":             48,
-              "fertilizer_wb":    45 * 24,
-              "fertilizer_comex": 45 * 24,
+              # Weekly/rolling sources
+              "cot":              11 * 24,   # CFTC COT report (weekly, Fri PM)
+              "macro_cot":        11 * 24,
+              # Monthly sources (one missed cycle + buffer)
+              "fertilizer_wb":    45 * 24,   # World Bank Pink Sheet (monthly)
+              "fertilizer_comex": 45 * 24,   # MDIC Comex (monthly, mid-month)
+              "brazil_exports":   45 * 24,   # Cecafe monthly green-coffee report
+              "psd_coffee":       45 * 24,   # USDA PSD (monthly)
+              "ajca":             45 * 24,   # Japan AJCA (monthly)
+              "conab_costs":      45 * 24,   # CONAB costs (monthly)
+              "conab_safra":      45 * 24,   # CONAB safra (monthly)
+              "ecf":              90 * 24,   # ECF port stocks (bi-monthly)
+              # Daily business-day source — allow up to 10 days for gaps/holidays
+              "cecafe_daily":     10 * 24,
           }
           DEFAULT_H = 48
 
