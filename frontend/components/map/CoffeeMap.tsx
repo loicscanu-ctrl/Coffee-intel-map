@@ -185,6 +185,25 @@ const FACTORY_TYPE_STYLE: Record<string, { bg: string; fg: string; letter: strin
   unknown:   { bg: "#475569", fg: "#cbd5e1", letter: "F", label: "Factory" },
 };
 
+// World-clock anchors. Each is placed on the ~5°N parallel (Cape Coast
+// latitude) at a longitude roughly under each country, so they sit in the
+// equatorial ocean band of the world view without colliding with pins.
+const WORLD_CLOCKS: { city: string; tz: string; lat: number; lng: number }[] = [
+  { city: "Brazil",  tz: "America/Sao_Paulo",  lat: 5, lng: -50 },
+  { city: "Paris",   tz: "Europe/Paris",       lat: 5, lng:   0 },
+  { city: "Vietnam", tz: "Asia/Ho_Chi_Minh",   lat: 5, lng: 105 },
+];
+
+function formatClock(tz: string, now: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    hour:   "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(now);
+}
+
 interface CoffeeMapProps {
   onPinClick?: (item: NewsItem) => void;
   countries: CountryPin[];
@@ -203,6 +222,8 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
   // One Leaflet LayerGroup per factory type, so the filter UI can
   // add/remove entire categories without re-instantiating markers.
   const factoryLayersByTypeRef = useRef<Record<string, LeafletLayerGroup>>({});
+  // setInterval id for the world-clock tick loop; cleared on unmount.
+  const worldClockIntervalRef = useRef<number | null>(null);
   const [activeBasemap, setActiveBasemap] = useUrlState<string>("basemap", "dark", (raw) =>
     VALID_BASEMAP_IDS.includes(raw) ? raw : "dark"
   );
@@ -465,6 +486,39 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
       for (const lg of Object.values(layerByType)) lg.addTo(map);
       factoryLayersByTypeRef.current = layerByType;
 
+      // ── World clocks ──────────────────────────────────────────────────────
+      // Three live timezone clocks anchored on the ~5°N parallel (Cape Coast
+      // latitude) at Brazilian-Atlantic, Cape-Coast, and Gulf-of-Thailand
+      // longitudes. Updates every second via a single interval that mutates
+      // the inner DOM nodes — no React re-render needed.
+      const clocksLayer = Leaflet.layerGroup().addTo(map);
+      const clockMarkers: { marker: LeafletMarker; tz: string }[] = [];
+      WORLD_CLOCKS.forEach((c) => {
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `
+            <div style="background:rgba(15,23,42,0.92);border:1px solid #475569;border-radius:6px;padding:4px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);pointer-events:none;font-family:ui-monospace,Menlo,monospace">
+              <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;line-height:1">${c.city}</div>
+              <div data-clock="time" style="font-size:13px;font-weight:700;color:#fff;line-height:1.2;margin-top:2px">--:--:--</div>
+            </div>`,
+          iconSize: [78, 36],
+          iconAnchor: [39, 18],
+        });
+        const m = Leaflet.marker([c.lat, c.lng], { icon, interactive: false }).addTo(clocksLayer);
+        clockMarkers.push({ marker: m as LeafletMarker, tz: c.tz });
+      });
+      const tick = () => {
+        const now = new Date();
+        for (const cm of clockMarkers) {
+          const el = cm.marker.getElement();
+          if (!el) continue;
+          const timeEl = el.querySelector<HTMLElement>('[data-clock="time"]');
+          if (timeEl) timeEl.textContent = formatClock(cm.tz, now);
+        }
+      };
+      tick();
+      worldClockIntervalRef.current = window.setInterval(tick, 1000);
+
       // ── News pins ─────────────────────────────────────────────────────────
       const newsLayer = Leaflet.layerGroup().addTo(map);
       news
@@ -486,6 +540,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
 
     return () => {
       cancelled = true;
+      if (worldClockIntervalRef.current !== null) {
+        clearInterval(worldClockIntervalRef.current);
+        worldClockIntervalRef.current = null;
+      }
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
       if (mapRef.current) (mapRef.current as unknown as Record<string, unknown>)._leaflet_id = null;
