@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-import requests
-
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 
 _REGIONS = [
@@ -83,9 +81,8 @@ def _fetch_region(lat: float, lng: float) -> dict:
         "forecast_days": 7,
         "models":        "best_match",
     }
-    r = requests.get(_OM_URL, params=params, headers=_HEADERS, timeout=20)
-    r.raise_for_status()
-    return r.json()
+    from scraper.sources._open_meteo import get_json
+    return get_json(_OM_URL, params=params, headers=_HEADERS)
 
 
 def _process(raw: dict) -> list[dict]:

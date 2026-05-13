@@ -510,36 +510,66 @@ def _scrape_enso_forecast(db) -> None:
             if not rows:
                 continue
 
-            # Header row: Season | La Nina | Neutral | El Nino
+            # Try header-based column mapping first.
             headers = [th.get_text(strip=True).lower() for th in rows[0].find_all(["th", "td"])]
-            try:
-                col_season  = headers.index("season")
-                col_lanina  = next(i for i, h in enumerate(headers) if "la" in h and ("nina" in h or "niña" in h))
-                col_neutral = next(i for i, h in enumerate(headers) if "neutral" in h)
-                col_elnino  = next(i for i, h in enumerate(headers) if "el" in h and ("nino" in h or "niño" in h))
-            except (ValueError, StopIteration):
-                continue
+            col_season: int | None = None
+            col_lanina: int | None = None
+            col_neutral: int | None = None
+            col_elnino: int | None = None
+            for i, h in enumerate(headers):
+                if col_season is None and (
+                    h == "season" or "month" in h or "period" in h or "3-mo" in h
+                ):
+                    col_season = i
+                if col_lanina is None and "la" in h and ("nina" in h or "niña" in h):
+                    col_lanina = i
+                if col_neutral is None and "neutral" in h:
+                    col_neutral = i
+                if col_elnino is None and "el" in h and ("nino" in h or "niño" in h):
+                    col_elnino = i
 
-            # Data rows
+            def _int(cell):
+                try:
+                    return int(cell.get_text(strip=True).replace("%", "").strip())
+                except (ValueError, AttributeError):
+                    return None
+
+            # Data rows: pick by header positions if we know them, otherwise
+            # by content shape — a row whose first cell is a 3-letter season
+            # code (e.g. "MAM", "AMJ") followed by three integer cells.
             for row in rows[1:]:
                 cells = row.find_all(["td", "th"])
-                if len(cells) <= max(col_season, col_lanina, col_neutral, col_elnino):
+                if len(cells) < 4:
                     continue
-                season = cells[col_season].get_text(strip=True)
-                if len(season) != 3 or not season.isupper():
+                if col_season is not None:
+                    season = cells[col_season].get_text(strip=True)
+                else:
+                    season = cells[0].get_text(strip=True)
+                if len(season) != 3 or not season.isalpha() or not season.isupper():
                     continue
 
-                def _int(cell):
-                    try:
-                        return int(cell.get_text(strip=True).replace("%", ""))
-                    except ValueError:
-                        return None
+                if (
+                    col_lanina is not None
+                    and col_neutral is not None
+                    and col_elnino is not None
+                ):
+                    if len(cells) <= max(col_lanina, col_neutral, col_elnino):
+                        continue
+                    la, nu, el = _int(cells[col_lanina]), _int(cells[col_neutral]), _int(cells[col_elnino])
+                else:
+                    # Content-shape fallback: take the first three numbers
+                    # following the season cell, in the standard layout order.
+                    nums = [_int(c) for c in cells[1:5]]
+                    nums = [n for n in nums if n is not None]
+                    if len(nums) < 3:
+                        continue
+                    la, nu, el = nums[0], nums[1], nums[2]
 
                 forecast.append({
                     "season":  season,
-                    "la_nina": _int(cells[col_lanina]),
-                    "neutral": _int(cells[col_neutral]),
-                    "el_nino": _int(cells[col_elnino]),
+                    "la_nina": la,
+                    "neutral": nu,
+                    "el_nino": el,
                 })
 
             if forecast:

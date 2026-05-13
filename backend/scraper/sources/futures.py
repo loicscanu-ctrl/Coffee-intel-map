@@ -72,35 +72,92 @@ def _active_front_symbol(prefix: str, months: list) -> str:
 def _barchart_requests() -> dict:
     """
     Pure-HTTP Barchart fetch — no browser needed.
-    Works when CI IPs aren't blocked; ~10x faster than Playwright path.
+
+    Hardening notes vs the original v1:
+      - Warm the session with a contract-specific quote page before hitting
+        the proxy API. The proxy endpoint refuses sessions that haven't
+        navigated to a quote page first.
+      - Send Referer / Origin / Sec-Fetch-* headers so the request looks
+        like a real browser XHR, not a bare scrape.
+      - Log status codes + body excerpts on failure so we can actually
+        diagnose what's blocking (was previously silent on 403/429).
     """
     import requests
     sess = requests.Session()
-    headers = {
+    common_headers = {
         "User-Agent": _BC_UA,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Upgrade-Insecure-Requests": "1",
     }
     try:
-        # Seed the session — picks up XSRF-TOKEN and session cookies
-        sess.get(_BARCHART_HOME, headers=headers, timeout=15)
+        # Step 1: hit the homepage to set initial session cookies.
+        r0 = sess.get(_BARCHART_HOME, headers=common_headers, timeout=15)
+        if not r0.ok:
+            print(f"[futures] barchart_requests: homepage HTTP {r0.status_code} — bailing")
+            return {}
+
+        # Step 2: navigate to a real KC quote page. This is what an actual
+        # user browser would do before any XHR fires, and Barchart's proxy
+        # rejects sessions that lack this context.
+        kc_warm_url = "https://www.barchart.com/futures/quotes/KCY00/overview"
+        r_warm = sess.get(kc_warm_url, headers=common_headers, timeout=15)
+        if not r_warm.ok:
+            print(f"[futures] barchart_requests: warm-page HTTP {r_warm.status_code} — continuing anyway")
+
         xsrf = sess.cookies.get("XSRF-TOKEN", "")
         if not xsrf:
-            print("[futures] barchart_requests: no XSRF cookie — skipping")
+            cookie_names = list(sess.cookies.keys())
+            print(f"[futures] barchart_requests: no XSRF cookie after warm-up (cookies: {cookie_names}) — skipping")
             return {}
-        api_headers = {**headers, "x-xsrf-token": xsrf, "Accept": "application/json"}
+
+        # Step 3: API calls with explicit XHR headers so Barchart's WAF
+        # recognises them as legitimate page interactions.
+        api_headers = {
+            **common_headers,
+            "Accept": "application/json",
+            "x-xsrf-token": xsrf,
+            "Referer": kc_warm_url,
+            "Origin": "https://www.barchart.com",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+            "X-Requested-With": "XMLHttpRequest",
+        }
         fields = "symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode"
         opts   = "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
         base   = "https://www.barchart.com/proxies/core-api/v1/quotes/get"
-        kc_r = sess.get(f"{base}?symbol=KC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
-        rm_r = sess.get(f"{base}?symbol=RC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
-        result = {}
-        if kc_r.ok:
-            result["kc"] = kc_r.json()
-        if rm_r.ok:
-            result["rm"] = rm_r.json()
+
+        def _fetch_market(symbol_param: str, label: str) -> dict | None:
+            url = f"{base}?symbol={symbol_param}&fields={fields}{opts}"
+            r = sess.get(url, headers=api_headers, timeout=10)
+            if not r.ok:
+                preview = (r.text or "")[:200].replace("\n", " ")
+                print(f"[futures] barchart_requests {label}: HTTP {r.status_code} — body: {preview!r}")
+                return None
+            try:
+                payload = r.json()
+            except Exception as e:
+                print(f"[futures] barchart_requests {label}: non-JSON response ({e})")
+                return None
+            count = len(payload.get("data") or []) if isinstance(payload, dict) else 0
+            print(f"[futures] barchart_requests {label}: HTTP 200, {count} rows")
+            if count == 0:
+                return None
+            return payload
+
+        kc = _fetch_market("KC%5EF", "kc")
+        rm = _fetch_market("RC%5EF", "rm")
+
+        result: dict = {}
+        if kc:
+            result["kc"] = kc
+        if rm:
+            result["rm"] = rm
         if result:
-            print("[futures] barchart_requests: OK")
+            print(f"[futures] barchart_requests: returned {list(result.keys())}")
         return result
     except Exception as e:
         print(f"[futures] barchart_requests failed: {e}")
@@ -167,12 +224,21 @@ async def _barchart_playwright(page) -> dict:
 
 def _yfinance_fallback() -> dict:
     """
-    Yahoo Finance fallback — batches ALL contract symbols into ONE HTTP request
+    Yahoo Finance fallback — batches contract symbols into ONE HTTP request
     via yf.download() to avoid per-ticker rate limiting.
-    OI is not exposed by Yahoo.
+
+    Default shape (controlled by env FUTURES_YF_FULL_CHAIN=1) is *minimal*:
+    only the two continuous symbols KC=F + RM=F. Previously we shipped 16
+    expiry-specific tickers (KCH27.NYB, RCN27.NYL, …), which routinely
+    tripped Yahoo's per-IP rate limit on GH runners that already burn yf
+    calls elsewhere in the workflow. Two symbols rarely hit the limit;
+    even when one path is fully rate-limited we usually still recover.
+
+    OI is not exposed by Yahoo. Front-month price only.
     """
     try:
         import math
+        import os
         from datetime import timedelta
 
         import pandas as pd
@@ -188,8 +254,12 @@ def _yfinance_fallback() -> dict:
                         syms.append(f"{prefix}{letter}{str(yr)[-2:]}{yf_suffix}")
             return syms[:7]
 
-        kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
-        rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+        full_chain = os.environ.get("FUTURES_YF_FULL_CHAIN", "0") == "1"
+        if full_chain:
+            kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
+            rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+        else:
+            kc_syms, rm_syms = [], []
         cont_syms = ["KC=F", "RM=F"]
         all_syms = kc_syms + rm_syms + cont_syms
 
@@ -287,6 +357,86 @@ def _yfinance_fallback() -> dict:
         return {}
 
 
+def _stooq_fallback() -> dict:
+    """Stooq CSV fallback — last resort when Barchart + yfinance both fail.
+
+    Fetches the continuous front-month coffee quote (KC.F = Arabica, RC.F =
+    Robusta) from stooq.com's no-auth daily-history CSV endpoint. This is
+    already the same pattern macro_cot.py uses for stooq-backed prices, so
+    no new dependency or API key.
+
+    Limitation: stooq only exposes the continuous front, not the back-month
+    chain — so we populate a single-contract entry per market instead of
+    the usual 5-7. The dashboard's front-month price stays fresh; back-
+    months render as blank rows. Better than the whole table going stale.
+    """
+    try:
+        import io
+
+        import pandas as pd
+        import requests
+
+        result: dict = {}
+        for label, ticker, product, decimals, months in [
+            ("kc", "KC.F", "KC", 2, _KC_MONTHS),
+            ("rm", "RC.F", "RC", 0, _RM_MONTHS),
+        ]:
+            try:
+                # Daily history endpoint — gives last 5+ years, we use last 2 rows
+                # to compute the close + previous-close needed for `chg`.
+                url = f"https://stooq.com/q/d/l/?s={ticker}&i=d"
+                r = requests.get(url, timeout=20)
+                r.raise_for_status()
+                df = pd.read_csv(io.StringIO(r.text))
+                if df.empty or "Close" not in df.columns:
+                    print(f"[futures] stooq {ticker}: no data in CSV")
+                    continue
+
+                close = float(df["Close"].iloc[-1])
+                prev = float(df["Close"].iloc[-2]) if len(df) >= 2 else close
+                if close <= 0:
+                    print(f"[futures] stooq {ticker}: invalid close {close}")
+                    continue
+
+                vol = 0
+                if "Volume" in df.columns:
+                    try:
+                        vol_raw = df["Volume"].iloc[-1]
+                        if vol_raw and not pd.isna(vol_raw):
+                            vol = int(vol_raw)
+                    except (TypeError, ValueError):
+                        vol = 0
+
+                fs = _active_front_symbol(product, months)
+                letter = fs[2]
+                yr2 = fs[3:5]
+                mnum = next((m for letr, m in months if letr == letter), 1)
+                contract = {
+                    "contract": f"{product} {letter}{yr2} (continuous)",
+                    "expiry":   f"20{yr2}-{mnum:02d}-15",
+                    "last":     round(close, decimals),
+                    "chg":      round(close - prev, decimals),
+                    "oi":       None,
+                    "volume":   vol,
+                    "symbol":   fs,
+                }
+                result[label] = {"data": [{"raw": contract}], "_stooq": True}
+                print(f"[futures] stooq {ticker}: {close} (chg {round(close - prev, decimals)})")
+            except Exception as e:
+                print(f"[futures] stooq error for {ticker}: {e}")
+
+        if result:
+            kc_n = len(result.get("kc", {}).get("data", []))
+            rm_n = len(result.get("rm", {}).get("data", []))
+            print(f"[futures] stooq fallback: kc={kc_n} rm={rm_n}")
+        else:
+            print("[futures] stooq fallback: no data from either symbol")
+        return result
+    except Exception as e:
+        print(f"[futures] stooq fallback crashed: {e}")
+        return {}
+
+
 async def _fetch_chains(page) -> dict:
     """Fetch futures chains: requests → Playwright → Yahoo Finance fallback.
     In CI (GitHub Actions sets CI=true) Playwright is skipped — datacenter IPs
@@ -316,6 +466,18 @@ async def _fetch_chains(page) -> dict:
         for k in ("kc", "rm"):
             if not result.get(k) and yf.get(k):
                 result[k] = yf[k]
+
+    # 4. Stooq — last-resort continuous-front quote when Barchart + yfinance
+    # both fail. Doesn't give us back-month chain depth, but at least a fresh
+    # front-month price keeps futures_chain.json advancing instead of going
+    # fully empty (which used to throw the dashboard onto stale data).
+    if not result.get("kc") or not result.get("rm"):
+        missing = [k for k in ("kc", "rm") if not result.get(k)]
+        print(f"[futures] Yahoo still missing {missing} — trying Stooq CSV")
+        st = _stooq_fallback()
+        for k in ("kc", "rm"):
+            if not result.get(k) and st.get(k):
+                result[k] = st[k]
 
     return result
 
@@ -795,12 +957,24 @@ async def run(page) -> list[dict]:
     # returning, so api/cot keeps getting fresh data. The COT NewsItems
     # we collected in `results` are lost on this raise, but they're
     # cosmetic news-feed entries and the next day's run repopulates them.
+    # If every chain-fetch path returned empty, log loudly but DON'T raise —
+    # the daily workflow has 25+ other sources that should still get to run
+    # and write data. The check-scrapers-freshness workflow will Telegram-alert
+    # within ~36 h on the stale futures key, which is the proper channel for
+    # data-staleness notifications. Earlier behavior (raise CriticalSourceError)
+    # killed the entire pipeline whenever Barchart's IP block + yfinance rate
+    # limit lined up — a daily occurrence — so all the other working sources
+    # also failed to land their data.
+    #
+    # COT data is already safe at this point — _make_cot_item and
+    # _make_ice_cot_item write to cot_weekly via upsert_cot_weekly before
+    # returning, so api/cot keeps getting fresh data.
     if not kc_contracts and not rm_contracts:
-        from scraper.errors import CriticalSourceError
-        raise CriticalSourceError(
-            "futures: all chain fetchers (Barchart HTTP, Playwright, yfinance) "
-            "returned empty — futures_chain.json will not advance. "
-            "Likely cause: Barchart IP block plus yfinance symbol drift."
+        print(
+            "[futures] WARNING: all chain fetchers (Barchart HTTP, Playwright, "
+            "yfinance) returned empty — futures_chain.json will not advance. "
+            "Likely cause: Barchart IP block + yfinance rate limit. "
+            "Freshness alert will fire if this persists past 36 h."
         )
 
     return results
