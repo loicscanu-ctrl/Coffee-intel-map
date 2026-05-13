@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  ComposedChart, Bar, BarChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Legend, ReferenceLine,
 } from "recharts";
 
@@ -13,6 +13,10 @@ interface MonthlyEntry {
   value_raw?: number;
   value_mt?: number;
   note?: string;
+  arabica_washed_mt?: number | null;
+  arabica_unwashed_mt?: number | null;
+  robusta_mt?: number | null;
+  other_mt?: number | null;
 }
 
 interface EcfData {
@@ -124,7 +128,6 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
   const chartData = monthly.map(m => {
     const p = m.period ?? m.month ?? "";
     const mt = m.value_mt ?? null;
-    // YoY: same month previous year
     let yoy: number | null = null;
     if (mt != null && p.match(/(\d{4})-(\d{2})/)) {
       const match = p.match(/(\d{4})-(\d{2})/)!;
@@ -135,15 +138,19 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
     return {
       period: fmtPeriod(p),
       mt: mt != null ? Math.round(mt / 1000) : null,
+      washed:   m.arabica_washed_mt   != null ? Math.round(m.arabica_washed_mt   / 1000) : null,
+      unwashed: m.arabica_unwashed_mt != null ? Math.round(m.arabica_unwashed_mt / 1000) : null,
+      robusta:  m.robusta_mt          != null ? Math.round(m.robusta_mt          / 1000) : null,
+      other:    m.other_mt            != null ? Math.round(m.other_mt            / 1000) : null,
       yoy,
     };
   }).filter(d => d.mt != null);
 
   const latest = chartData[chartData.length - 1];
-  const latestMt = ecf.latest_bags ? ecf.latest_bags * 0.06 / 1000 : null; // bags → MT (÷1000 for k)
+  const latestMt = ecf.latest_bags ? ecf.latest_bags * 0.06 / 1000 : null;
   const latestBagsM = ecf.latest_m_bags ?? (ecf.latest_bags ? +(ecf.latest_bags / 1_000_000).toFixed(1) : null);
-
   const yoyArrow = latest?.yoy != null ? deltaArrow(latest.yoy) : null;
+  const hasBreakdown = chartData.some(d => d.washed != null || d.robusta != null);
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
@@ -179,34 +186,71 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
       </div>
 
       {chartData.length > 1 ? (
-        <div className="h-36">
+        <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-              <XAxis
-                dataKey="period"
-                tick={{ fontSize: 7, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-                interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
-              />
-              <YAxis
-                yAxisId="mt"
-                tick={{ fontSize: 7, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={v => `${v}k`}
-                domain={["auto", "auto"]}
-              />
-              <Tooltip
-                contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: string) => {
-                  if (name === "mt") return [`${Number(v).toLocaleString()}k MT`, "ECF Stocks"];
-                  return [`${Number(v).toFixed(1)}%`, "YoY Δ"];
-                }}
-              />
-              <Bar yAxisId="mt" dataKey="mt" fill="#6366f1" opacity={0.8} radius={[2,2,0,0]} />
-              <Line yAxisId="mt" dataKey="mt" type="monotone" stroke="#a5b4fc" strokeWidth={1.5} dot={{ r: 3, fill: "#a5b4fc" }} />
-            </ComposedChart>
+            {hasBreakdown ? (
+              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                <XAxis
+                  dataKey="period"
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
+                />
+                <YAxis
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={v => `${v}k`}
+                />
+                <Tooltip
+                  contentStyle={TT_STYLE}
+                  formatter={(v: unknown, name: string) => {
+                    const labels: Record<string, string> = {
+                      washed: "Arabica Washed", unwashed: "Arabica Unwashed",
+                      robusta: "Robusta", other: "Other",
+                    };
+                    return [`${Number(v).toLocaleString()}k MT`, labels[name] ?? name];
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: 8 }}
+                  formatter={(v: string) => ({
+                    washed: "Arabica Washed", unwashed: "Arabica Unwashed",
+                    robusta: "Robusta", other: "Other",
+                  }[v] ?? v)}
+                />
+                <Bar dataKey="washed"   stackId="s" fill="#6366f1" opacity={0.9} name="washed" />
+                <Bar dataKey="unwashed" stackId="s" fill="#8b5cf6" opacity={0.9} name="unwashed" />
+                <Bar dataKey="robusta"  stackId="s" fill="#a78bfa" opacity={0.9} radius={[2,2,0,0]} name="robusta" />
+                {chartData.some(d => d.other) && (
+                  <Bar dataKey="other" stackId="s" fill="#c4b5fd" opacity={0.8} radius={[2,2,0,0]} name="other" />
+                )}
+              </BarChart>
+            ) : (
+              <ComposedChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                <XAxis
+                  dataKey="period"
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
+                />
+                <YAxis
+                  yAxisId="mt"
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={v => `${v}k`}
+                  domain={["auto", "auto"]}
+                />
+                <Tooltip
+                  contentStyle={TT_STYLE}
+                  formatter={(v: unknown) => [`${Number(v).toLocaleString()}k MT`, "ECF Stocks"]}
+                />
+                <Bar yAxisId="mt" dataKey="mt" fill="#6366f1" opacity={0.8} radius={[2,2,0,0]} />
+                <Line yAxisId="mt" dataKey="mt" type="monotone" stroke="#a5b4fc" strokeWidth={1.5} dot={{ r: 3, fill: "#a5b4fc" }} />
+              </ComposedChart>
+            )}
           </ResponsiveContainer>
         </div>
       ) : (
@@ -216,8 +260,10 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
       )}
 
       <div className="text-[9px] text-slate-500 italic">
-        Note: ECF reports total port stocks only — no arabica/robusta type breakdown available.
-        YoY comparison appears once 13+ months are collected.
+        {hasBreakdown
+          ? "Type breakdown parsed from ECF PDF (Arabica Washed · Arabica Unwashed · Robusta)."
+          : "Type breakdown pending — parsed from ECF PDF on next monthly scraper run."}
+        {" "}YoY comparison appears once 13+ months are collected.
       </div>
 
       <div className="text-[9px] text-slate-500 space-y-0.5">
