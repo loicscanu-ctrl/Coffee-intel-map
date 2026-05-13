@@ -1,14 +1,19 @@
 {
-  "generated_at": "2026-05-13T07:02:37.711447Z",
+  "generated_at": "2026-05-13T08:34:12.456694Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "278.85 (-3.45)",
+      "value": "280.15 (-2.15)",
       "category": "futures"
     },
     {
       "label": "RMN26",
       "value": "3,432 (+19)",
+      "category": "futures"
+    },
+    {
+      "label": "B3 4/5 May '26",
+      "value": "373.85 USD/sac",
       "category": "futures"
     },
     {
@@ -23,7 +28,7 @@
     },
     {
       "label": "UGA S15",
-      "value": "166.93 ($3,680)",
+      "value": "169.28 ($3,732)",
       "category": "physical"
     },
     {
