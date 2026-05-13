@@ -1,10 +1,10 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-13T08:57:31.778863Z",
+  "scraped_at": "2026-05-13T09:17:45.268666Z",
   "exports": null,
   "ihcafe_price": null,
   "weather": {
-    "scraped_at": "2026-05-13T08:51:53.690218Z",
+    "scraped_at": "2026-05-13T09:16:03.197054Z",
     "regions": [
       {
         "name": "Copán",
