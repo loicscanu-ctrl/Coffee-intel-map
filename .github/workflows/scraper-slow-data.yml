@@ -1,0 +1,73 @@
+name: "1.3 – Monthly Slow-Data Scraper (ECF · PSD · AJCA · UCDA)"
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'   # 03:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+jobs:
+  slow-data:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl pdfplumber
+
+      - name: Install Playwright browser
+        run: playwright install chromium --with-deps
+
+      - name: Run monthly scrapers
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.monthly_scraper
+
+      - name: Export static JSON
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.export_static_json
+
+      - name: Commit updated static JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add \
+                  frontend/public/data/futures_chain.json \
+                  frontend/public/data/oi_fnd_chart.json \
+                  frontend/public/data/oi_history.json \
+                  frontend/public/data/cot.json \
+                  frontend/public/data/cot_recent.json \
+                  frontend/public/data/macro_cot.json \
+                  frontend/public/data/freight.json \
+                  frontend/public/data/farmer_economics.json \
+                  frontend/public/data/farmer_selling_brazil.json \
+                  frontend/public/data/health.json \
+                  frontend/public/data/latest_prices.json \
+                  frontend/public/data/vietnam_supply.json
+          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json; do
+            [ -f "$f" ] && git add "$f" || true
+          done
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || (git commit -m "data: monthly slow-data update [skip ci]" && git pull --rebase --autostash origin main && git push)
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

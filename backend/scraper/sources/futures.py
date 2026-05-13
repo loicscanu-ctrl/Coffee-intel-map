@@ -5,7 +5,6 @@ from Barchart, plus CFTC Disaggregated COT for Coffee C.
 import csv
 import io
 import json
-import time
 import urllib.request
 import zipfile
 from datetime import date
@@ -168,16 +167,15 @@ async def _barchart_playwright(page) -> dict:
 
 def _yfinance_fallback() -> dict:
     """
-    Yahoo Finance fallback — always reachable from CI, no browser needed.
-    Builds a best-effort chain using known contract month letters; if Yahoo's
-    per-contract symbols return nothing (common for Robusta), falls back to
-    the continuous front-month symbol so we always emit at least a front quote.
+    Yahoo Finance fallback — batches ALL contract symbols into ONE HTTP request
+    via yf.download() to avoid per-ticker rate limiting.
     OI is not exposed by Yahoo.
     """
     try:
         import math
         from datetime import timedelta
 
+        import pandas as pd
         import yfinance as yf
 
         def _candidate_symbols(prefix: str, months: list, yf_suffix: str) -> list:
@@ -190,83 +188,85 @@ def _yfinance_fallback() -> dict:
                         syms.append(f"{prefix}{letter}{str(yr)[-2:]}{yf_suffix}")
             return syms[:7]
 
-        def _quote_from_history(sym: str, decimals: int):
-            """Fetch last/prev close + volume from Yahoo. Returns None on no data."""
-            hist = yf.Ticker(sym).history(period="5d", auto_adjust=False)
-            if hist.empty:
-                return None
-            hist = hist.dropna(subset=["Close"])
-            if hist.empty:
-                return None
-            row  = hist.iloc[-1]
-            prev = hist.iloc[-2] if len(hist) > 1 else None
-            close = float(row["Close"])
-            prev_close = float(prev["Close"]) if prev is not None else close
-            vol_raw = row.get("Volume")
-            try:
-                vol = 0 if vol_raw is None or math.isnan(float(vol_raw)) else int(vol_raw)
-            except (TypeError, ValueError):
-                vol = 0
-            return {
-                "last":   round(close, decimals),
-                "chg":    round(close - prev_close, decimals),
-                "volume": vol,
-            }
-
         kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
-        # Per-contract Robusta on Yahoo is unreliable; we keep an attempt list
-        # but expect to fall through to the continuous-front symbol below.
         rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+        cont_syms = ["KC=F", "RM=F"]
+        all_syms = kc_syms + rm_syms + cont_syms
+
+        # Single batched download — one HTTP request, avoids per-ticker rate limiting
+        raw = yf.download(
+            tickers=all_syms,
+            period="5d",
+            auto_adjust=False,
+            progress=False,
+        )
+        is_multi = isinstance(raw.columns, pd.MultiIndex) if not raw.empty else False
+
+        def _get_sym_close(sym: str):
+            """Return (close, prev_close, vol) for latest session or None."""
+            if raw.empty:
+                return None
+            try:
+                if is_multi:
+                    if sym not in raw.columns.get_level_values(1):
+                        return None
+                    col = raw["Close"][sym].dropna()
+                else:
+                    col = raw["Close"].dropna() if "Close" in raw.columns else pd.Series(dtype=float)
+                if col.empty:
+                    return None
+                close = float(col.iloc[-1])
+                prev  = float(col.iloc[-2]) if len(col) > 1 else close
+                vol_col = (raw["Volume"][sym] if is_multi else raw.get("Volume", pd.Series()))
+                vol_raw = vol_col.iloc[-1] if not vol_col.empty else None
+                try:
+                    vol = 0 if vol_raw is None or math.isnan(float(vol_raw)) else int(vol_raw)
+                except (TypeError, ValueError):
+                    vol = 0
+                return close, prev, vol
+            except Exception:
+                return None
 
         result = {}
-        for label, syms, product, decimals, cont_sym, cont_letter in [
-            ("kc", kc_syms, "KC", 2, "KC=F", _active_front_symbol("KC", _KC_MONTHS)),
-            ("rm", rm_syms, "RC", 0, "RM=F", _active_front_symbol("RM", _RM_MONTHS)),
+        for label, syms, product, decimals, cont_sym, months in [
+            ("kc", kc_syms, "KC", 2, "KC=F", _KC_MONTHS),
+            ("rm", rm_syms, "RC", 0, "RM=F", _RM_MONTHS),
         ]:
             contracts = []
             for sym in syms:
-                time.sleep(1)
-                try:
-                    quote = _quote_from_history(sym, decimals)
-                except Exception as e:
-                    print(f"[futures] yfinance {sym}: {e}")
+                q = _get_sym_close(sym)
+                if not q:
                     continue
-                if not quote:
-                    continue
+                close, prev, vol = q
                 letter = sym[2]
                 yr2    = sym[3:5]
-                mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
-                expiry = f"20{yr2}-{mnum:02d}-15"
+                mnum   = next((m for l, m in months if l == letter), 1)
                 contracts.append({
                     "contract": f"{product} {letter}{yr2}",
-                    "expiry":   expiry,
-                    "last":     quote["last"],
-                    "chg":      quote["chg"],
+                    "expiry":   f"20{yr2}-{mnum:02d}-15",
+                    "last":     round(close, decimals),
+                    "chg":      round(close - prev, decimals),
                     "oi":       None,
-                    "volume":   quote["volume"],
+                    "volume":   vol,
                     "symbol":   sym.split(".")[0],
                 })
 
-            # Continuous front-month fallback — always populated on Yahoo.
             if not contracts:
-                time.sleep(2)
-                try:
-                    quote = _quote_from_history(cont_sym, decimals)
-                except Exception as e:
-                    print(f"[futures] yfinance {cont_sym}: {e}")
-                    quote = None
-                if quote:
-                    letter = cont_letter[2]
-                    yr2    = cont_letter[3:5]
-                    mnum   = next((m for l, m in (_KC_MONTHS if product == "KC" else _RM_MONTHS) if l == letter), 1)
+                q = _get_sym_close(cont_sym)
+                if q:
+                    close, prev, vol = q
+                    fs     = _active_front_symbol(product, months)
+                    letter = fs[2]
+                    yr2    = fs[3:5]
+                    mnum   = next((m for l, m in months if l == letter), 1)
                     contracts.append({
                         "contract": f"{product} {letter}{yr2} (continuous)",
                         "expiry":   f"20{yr2}-{mnum:02d}-15",
-                        "last":     quote["last"],
-                        "chg":      quote["chg"],
+                        "last":     round(close, decimals),
+                        "chg":      round(close - prev, decimals),
                         "oi":       None,
-                        "volume":   quote["volume"],
-                        "symbol":   cont_letter,
+                        "volume":   vol,
+                        "symbol":   fs,
                     })
                     print(f"[futures] yfinance {label}: using continuous {cont_sym}")
 
@@ -276,8 +276,8 @@ def _yfinance_fallback() -> dict:
         if result:
             print(
                 f"[futures] yfinance fallback: "
-                f"kc={len(result.get('kc',{}).get('data',[]))} "
-                f"rm={len(result.get('rm',{}).get('data',[]))}"
+                f"kc={len(result.get('kc', {}).get('data', []))} "
+                f"rm={len(result.get('rm', {}).get('data', []))}"
             )
         else:
             print("[futures] yfinance fallback: no data from any symbol")

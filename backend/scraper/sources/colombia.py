@@ -13,8 +13,6 @@ import json
 import re
 from datetime import date
 
-from scraper.sources._ico_common import fetch_ico_exports
-
 
 def _today() -> str:
     return date.today().isoformat()
@@ -104,28 +102,6 @@ async def run(page) -> list[dict]:
             "lng":      -74.297,
             "tags":     ["price", "colombia", "fnc", "precio-interno"],
             "meta":     json.dumps(precio),
-        })
-
-    # ── 2. ICO monthly exports (HTTP, no browser needed) ─────────────────────
-    monthly = fetch_ico_exports({"colombia"}, "colombia")
-    if monthly:
-        last = monthly[-1]
-        results.append({
-            "title":    f"Colombia Coffee Exports (ICO) – {last['month']}",
-            "body":     (
-                f"Colombia green coffee exports: {last['total_k_bags']:,}k bags in {last['month']}."
-                + (f" YoY: {last['yoy_pct']:+.1f}%" if last.get('yoy_pct') is not None else "")
-            ),
-            "source":   "ICO",
-            "category": "supply",
-            "lat":      4.571,
-            "lng":      -74.297,
-            "tags":     ["exports", "colombia", "ico"],
-            "meta":     json.dumps({
-                "monthly":      monthly,
-                "last_updated": last["month"],
-                "unit":         "thousand 60-kg bags",
-            }),
         })
 
     return results

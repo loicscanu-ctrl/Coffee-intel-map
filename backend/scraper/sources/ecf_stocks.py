@@ -18,13 +18,11 @@ Strategy:
 """
 from __future__ import annotations
 
-import io
 import json
 import re
 from datetime import date
 from urllib.parse import urljoin
 
-import pdfplumber
 import requests
 
 _HEADERS = {
@@ -38,19 +36,12 @@ _HEADERS = {
 }
 
 _INDEX_URL = "https://www.ecf-coffee.org/category/publications/stocks/"
-# Post URLs (stocks-in-european-ports-…) live on news pages, NOT the stocks-
-# category page (which only lists yearly PDFs). Scan both for resilience.
 _INDEX_URLS = [
     "https://www.ecf-coffee.org/category/whats-new/news/",
     "https://www.ecf-coffee.org/category/news/",
     "https://www.ecf-coffee.org/category/whats-new/news/page/2/",
-    _INDEX_URL,  # also scan stocks index in case ECF restructures
+    _INDEX_URL,
 ]
-# Yearly PDFs are listed only on the stocks-category page.
-_YEARLY_PDF_PAT = re.compile(
-    r'href="(https?://[^"]*?/wp-content/uploads/[^"]*?(\d{4})-Stocks-European-Ports[^"]*?\.pdf)"',
-    re.I,
-)
 # Posts have slugs starting with "stocks-in-european-ports-".
 _POST_HREF = re.compile(
     r'href="(https?://(?:www\.)?ecf-coffee\.org/(stocks-in-european-ports-[^/"]+)/?)"',
@@ -250,55 +241,9 @@ def _post_to_entries(url: str) -> list[dict]:
     return [entry]
 
 
-def _parse_yearly_pdf(pdf_url: str, year: str) -> list[dict]:
-    """Download an ECF yearly PDF and extract monthly stock entries.
-
-    ECF yearly reports (YYYY-Stocks-European-Ports.pdf) contain the same
-    monthly tonnage data as the bi-monthly web posts, but covering the full
-    calendar year. Returns a list of {period, value_raw, value_mt, pdf_url}
-    entries (one per month found). Falls back to a single December entry if
-    only a headline bags figure is extractable.
-    """
-    try:
-        r = requests.get(pdf_url, headers=_HEADERS, timeout=60)
-        if r.status_code != 200:
-            return []
-        raw = r.content
-    except Exception as e:
-        print(f"[ecf_stocks] yearly PDF download failed ({year}): {e}")
-        return []
-
-    try:
-        with pdfplumber.open(io.BytesIO(raw)) as pdf:
-            # First 5 pages contain all headline figures in ECF yearly reports.
-            text = " ".join(page.extract_text() or "" for page in pdf.pages[:5])
-    except Exception as e:
-        print(f"[ecf_stocks] yearly PDF parse failed ({year}): {e}")
-        return []
-
-    entries = _entries_from_tons_text(text)
-    if entries:
-        for e in entries:
-            e["pdf_url"] = pdf_url
-            e["from_yearly_pdf"] = True
-        return entries
-
-    bags = _figure_from_text(text)
-    if bags:
-        return [{
-            "period":          f"{year}-12",
-            "value_raw":       bags,
-            "pdf_url":         pdf_url,
-            "from_yearly_pdf": True,
-        }]
-
-    return []
-
 
 async def run(page) -> list[dict]:
-    # Collect post URLs across multiple ECF index pages.
     post_urls: list[str] = []
-    yearly_pdfs: list[dict] = []
     pages_seen = 0
     for idx_url in _INDEX_URLS:
         html = _fetch(idx_url)
@@ -309,51 +254,28 @@ async def run(page) -> list[dict]:
             url = m.group(1)
             if url not in post_urls:
                 post_urls.append(url)
-        # Yearly PDFs only appear on the stocks-category page.
-        for m in _YEARLY_PDF_PAT.finditer(html):
-            entry = {"year": m.group(2), "pdf_url": m.group(1)}
-            if entry not in yearly_pdfs:
-                yearly_pdfs.append(entry)
 
     if pages_seen == 0:
         print("[ecf_stocks] all index pages unreachable")
         return []
-    if not post_urls and not yearly_pdfs:
-        print("[ecf_stocks] no stocks posts or yearly PDFs found")
+    if not post_urls:
+        print("[ecf_stocks] no stocks posts found")
         return []
-    print(f"[ecf_stocks] index pages: {pages_seen}, posts: {len(post_urls)}, yearly_pdfs: {len(yearly_pdfs)}")
+    print(f"[ecf_stocks] index pages: {pages_seen}, posts: {len(post_urls)}")
 
-    # Latest 12 posts ~= last 2 years of bi-monthly reports — plenty.
-    # Each post can produce multiple monthly entries.
     entries: list[dict] = []
     for url in post_urls[:12]:
         entries.extend(_post_to_entries(url))
 
-    if not entries and not yearly_pdfs:
-        print("[ecf_stocks] no parseable entries from posts and no yearly PDFs")
+    if not entries:
+        print("[ecf_stocks] no parseable entries from posts")
         return []
 
-    # Post entries take priority. Build by_period from posts first.
     by_period: dict[str, dict] = {}
     for e in entries:
         prev = by_period.get(e["period"])
         if not prev or (e.get("value_raw") and not prev.get("value_raw")):
             by_period[e["period"]] = e
-
-    # Parse historical yearly PDFs and fill in gaps not covered by posts.
-    yearly_pdf_count = 0
-    if yearly_pdfs:
-        sorted_pdfs = sorted(yearly_pdfs, key=lambda y: y["year"])
-        for pdf_info in sorted_pdfs:
-            pdf_entries = _parse_yearly_pdf(pdf_info["pdf_url"], pdf_info["year"])
-            added = 0
-            for e in pdf_entries:
-                p = e.get("period", "")
-                if p and p not in by_period:
-                    by_period[p] = e
-                    added += 1
-            yearly_pdf_count += added
-            print(f"[ecf_stocks] yearly PDF {pdf_info['year']}: {len(pdf_entries)} extracted, {added} new periods")
 
     series = sorted(by_period.values(), key=lambda x: x["period"])
     latest = next((e for e in reversed(series) if e.get("value_raw")), series[-1])
@@ -372,13 +294,11 @@ async def run(page) -> list[dict]:
         "lng":      5.0,
         "tags":     ["stocks", "europe", "ecf", "demand"],
         "meta":     json.dumps({
-            "monthly":            series,
-            "latest_bags":        value_bags or None,
-            "as_of":              _today(),
-            "source_url":         _INDEX_URL,
-            "latest_post":        latest.get("post_url"),
-            "latest_pdf":         latest.get("pdf_url"),
-            "yearly_pdfs":        yearly_pdfs,
-            "historical_periods": yearly_pdf_count,
+            "monthly":     series,
+            "latest_bags": value_bags or None,
+            "as_of":       _today(),
+            "source_url":  _INDEX_URL,
+            "latest_post": latest.get("post_url"),
+            "latest_pdf":  latest.get("pdf_url"),
         }),
     }]
