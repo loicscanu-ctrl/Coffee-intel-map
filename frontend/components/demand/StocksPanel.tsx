@@ -196,7 +196,7 @@ function PsdPanel({
   accent: string;
   subtitle: string;
 }) {
-  const recent = data.annual.slice(-12);
+  const recent = (data.annual ?? []).slice(-12);
   const chartData = recent.map(p => ({
     year:    p.year,
     imports: p.imports_mt != null ? Math.round(p.imports_mt / 1000) : null,
