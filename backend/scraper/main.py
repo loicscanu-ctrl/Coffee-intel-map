@@ -12,6 +12,7 @@ from playwright.async_api import async_playwright
 
 from scraper.db import extract_physical_price, get_session, upsert_news_item, upsert_physical_price
 from scraper.errors import CriticalSourceError
+from scraper.sources import ajca as _ajca
 from scraper.sources import (
     b3,
     b3_icf,
@@ -36,7 +37,6 @@ from scraper.sources import ethiopia_weather as _ethiopia_weather
 from scraper.sources import farmer_economics as _farmer_economics
 from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
-from scraper.sources import ajca as _ajca
 from scraper.sources import indonesia as _indonesia
 from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
