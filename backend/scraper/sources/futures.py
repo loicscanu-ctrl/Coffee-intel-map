@@ -72,35 +72,92 @@ def _active_front_symbol(prefix: str, months: list) -> str:
 def _barchart_requests() -> dict:
     """
     Pure-HTTP Barchart fetch — no browser needed.
-    Works when CI IPs aren't blocked; ~10x faster than Playwright path.
+
+    Hardening notes vs the original v1:
+      - Warm the session with a contract-specific quote page before hitting
+        the proxy API. The proxy endpoint refuses sessions that haven't
+        navigated to a quote page first.
+      - Send Referer / Origin / Sec-Fetch-* headers so the request looks
+        like a real browser XHR, not a bare scrape.
+      - Log status codes + body excerpts on failure so we can actually
+        diagnose what's blocking (was previously silent on 403/429).
     """
     import requests
     sess = requests.Session()
-    headers = {
+    common_headers = {
         "User-Agent": _BC_UA,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Upgrade-Insecure-Requests": "1",
     }
     try:
-        # Seed the session — picks up XSRF-TOKEN and session cookies
-        sess.get(_BARCHART_HOME, headers=headers, timeout=15)
+        # Step 1: hit the homepage to set initial session cookies.
+        r0 = sess.get(_BARCHART_HOME, headers=common_headers, timeout=15)
+        if not r0.ok:
+            print(f"[futures] barchart_requests: homepage HTTP {r0.status_code} — bailing")
+            return {}
+
+        # Step 2: navigate to a real KC quote page. This is what an actual
+        # user browser would do before any XHR fires, and Barchart's proxy
+        # rejects sessions that lack this context.
+        kc_warm_url = "https://www.barchart.com/futures/quotes/KCY00/overview"
+        r_warm = sess.get(kc_warm_url, headers=common_headers, timeout=15)
+        if not r_warm.ok:
+            print(f"[futures] barchart_requests: warm-page HTTP {r_warm.status_code} — continuing anyway")
+
         xsrf = sess.cookies.get("XSRF-TOKEN", "")
         if not xsrf:
-            print("[futures] barchart_requests: no XSRF cookie — skipping")
+            cookie_names = list(sess.cookies.keys())
+            print(f"[futures] barchart_requests: no XSRF cookie after warm-up (cookies: {cookie_names}) — skipping")
             return {}
-        api_headers = {**headers, "x-xsrf-token": xsrf, "Accept": "application/json"}
+
+        # Step 3: API calls with explicit XHR headers so Barchart's WAF
+        # recognises them as legitimate page interactions.
+        api_headers = {
+            **common_headers,
+            "Accept": "application/json",
+            "x-xsrf-token": xsrf,
+            "Referer": kc_warm_url,
+            "Origin": "https://www.barchart.com",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+            "X-Requested-With": "XMLHttpRequest",
+        }
         fields = "symbol,contractName,contractExpirationDate,lastPrice,priceChange,openInterest,volume,symbolCode"
         opts   = "&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1"
         base   = "https://www.barchart.com/proxies/core-api/v1/quotes/get"
-        kc_r = sess.get(f"{base}?symbol=KC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
-        rm_r = sess.get(f"{base}?symbol=RC%5EF&fields={fields}{opts}", headers=api_headers, timeout=10)
-        result = {}
-        if kc_r.ok:
-            result["kc"] = kc_r.json()
-        if rm_r.ok:
-            result["rm"] = rm_r.json()
+
+        def _fetch_market(symbol_param: str, label: str) -> dict | None:
+            url = f"{base}?symbol={symbol_param}&fields={fields}{opts}"
+            r = sess.get(url, headers=api_headers, timeout=10)
+            if not r.ok:
+                preview = (r.text or "")[:200].replace("\n", " ")
+                print(f"[futures] barchart_requests {label}: HTTP {r.status_code} — body: {preview!r}")
+                return None
+            try:
+                payload = r.json()
+            except Exception as e:
+                print(f"[futures] barchart_requests {label}: non-JSON response ({e})")
+                return None
+            count = len(payload.get("data") or []) if isinstance(payload, dict) else 0
+            print(f"[futures] barchart_requests {label}: HTTP 200, {count} rows")
+            if count == 0:
+                return None
+            return payload
+
+        kc = _fetch_market("KC%5EF", "kc")
+        rm = _fetch_market("RC%5EF", "rm")
+
+        result: dict = {}
+        if kc:
+            result["kc"] = kc
+        if rm:
+            result["rm"] = rm
         if result:
-            print("[futures] barchart_requests: OK")
+            print(f"[futures] barchart_requests: returned {list(result.keys())}")
         return result
     except Exception as e:
         print(f"[futures] barchart_requests failed: {e}")
@@ -167,12 +224,21 @@ async def _barchart_playwright(page) -> dict:
 
 def _yfinance_fallback() -> dict:
     """
-    Yahoo Finance fallback — batches ALL contract symbols into ONE HTTP request
+    Yahoo Finance fallback — batches contract symbols into ONE HTTP request
     via yf.download() to avoid per-ticker rate limiting.
-    OI is not exposed by Yahoo.
+
+    Default shape (controlled by env FUTURES_YF_FULL_CHAIN=1) is *minimal*:
+    only the two continuous symbols KC=F + RM=F. Previously we shipped 16
+    expiry-specific tickers (KCH27.NYB, RCN27.NYL, …), which routinely
+    tripped Yahoo's per-IP rate limit on GH runners that already burn yf
+    calls elsewhere in the workflow. Two symbols rarely hit the limit;
+    even when one path is fully rate-limited we usually still recover.
+
+    OI is not exposed by Yahoo. Front-month price only.
     """
     try:
         import math
+        import os
         from datetime import timedelta
 
         import pandas as pd
@@ -188,8 +254,12 @@ def _yfinance_fallback() -> dict:
                         syms.append(f"{prefix}{letter}{str(yr)[-2:]}{yf_suffix}")
             return syms[:7]
 
-        kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
-        rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+        full_chain = os.environ.get("FUTURES_YF_FULL_CHAIN", "0") == "1"
+        if full_chain:
+            kc_syms = _candidate_symbols("KC", _KC_MONTHS, ".NYB")
+            rm_syms = _candidate_symbols("RC", _RM_MONTHS, ".NYL")
+        else:
+            kc_syms, rm_syms = [], []
         cont_syms = ["KC=F", "RM=F"]
         all_syms = kc_syms + rm_syms + cont_syms
 
