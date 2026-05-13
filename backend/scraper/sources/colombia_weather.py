@@ -210,12 +210,12 @@ def scrape(db) -> None:
 
     from models import WeatherSnapshot
 
+    from scraper.sources._open_meteo import get_json
     for region in REGIONS:
         url = OPEN_METEO_URL.format(lat=region["lat"], lon=region["lon"])
         try:
-            resp = requests.get(url, headers=_HEADERS, timeout=30)
-            resp.raise_for_status()
-            daily_data = _aggregate_hourly_to_daily(resp.json().get("hourly", {}))
+            data = get_json(url, headers=_HEADERS)
+            daily_data = _aggregate_hourly_to_daily(data.get("hourly", {}))
 
             db.execute(delete(WeatherSnapshot).where(WeatherSnapshot.region == region["name"]))
             db.add(WeatherSnapshot(

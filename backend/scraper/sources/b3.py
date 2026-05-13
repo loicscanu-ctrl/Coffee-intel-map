@@ -35,8 +35,13 @@ async def run(page) -> list[dict]:
     ]
     for url in urls:
         try:
-            await page.goto(url, wait_until="networkidle", timeout=45000)
-            await page.wait_for_timeout(4000)
+            # `networkidle` is too strict on b3.com.br — the page emits
+            # background telemetry forever, so we routinely hit the 45 s
+            # timeout. Use `domcontentloaded` (fires once the HTML is parsed)
+            # + a fixed JS-settle wait, which captures the table reliably
+            # without depending on the network ever going quiet.
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await page.wait_for_timeout(6000)
             html = await page.content()
             item = parse_b3(html)
             if item:

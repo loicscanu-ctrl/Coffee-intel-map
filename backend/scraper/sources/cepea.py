@@ -33,23 +33,35 @@ def _parse_price_table(html: str) -> tuple[str | None, str | None]:
     """
     Return (price_brl, date_str) from the first data row of the price table.
     CEPEA tables typically have columns: Date | Cash R$ | Var R$ | Var %
+    but column order and cell tag (td/th) varies — we try several strategies
+    so a layout tweak on cepea.org.br doesn't silently empty the result.
     Returns (None, None) if not found.
     """
     soup = BeautifulSoup(html, "html.parser")
 
-    # Strategy 1: table with id containing "table" or "dados"
+    # Strategy 1: table rows — accept any column ordering. Scan every cell
+    # for a date AND a BRL price; pair them if both appear in the same row.
     for table in soup.find_all("table"):
-        rows = table.find_all("tr")
-        for row in rows:
-            cells = row.find_all("td")
+        for row in table.find_all("tr"):
+            cells = row.find_all(["td", "th"])
             if len(cells) < 2:
                 continue
-            date_text  = cells[0].get_text(strip=True)
-            price_text = cells[1].get_text(strip=True)
-            price = _extract_brl(price_text)
-            dm    = _DATE_RE.match(date_text)
-            if price and dm:
-                return price, date_text
+            date_str: str | None = None
+            price_str: str | None = None
+            for cell in cells:
+                text = cell.get_text(strip=True)
+                if date_str is None:
+                    dm = _DATE_RE.search(text)
+                    if dm:
+                        date_str = dm.group(1)
+                if price_str is None:
+                    p = _extract_brl(text)
+                    if p:
+                        price_str = p
+                if date_str and price_str:
+                    break
+            if date_str and price_str:
+                return price_str, date_str
 
     # Strategy 2: any element containing a BRL price near a date
     for el in soup.find_all(string=_DATE_RE):
@@ -63,6 +75,23 @@ def _parse_price_table(html: str) -> tuple[str | None, str | None]:
             if price:
                 dm = _DATE_RE.search(str(el))
                 return price, dm.group(1) if dm else ""
+
+    # Strategy 3: scrape entire body text. Find the most recent date in the
+    # page and the BRL price nearest to it by character offset. Cheap last
+    # resort when the table markup has changed but the values are still
+    # printed somewhere in the rendered DOM.
+    body_text = soup.get_text(" ", strip=True)
+    date_hits = [(m.start(), m.group(1)) for m in _DATE_RE.finditer(body_text)]
+    price_hits = [(m.start(), m.group(1)) for m in _BRL_RE.finditer(body_text)]
+    if date_hits and price_hits:
+        # Use the latest-occurring date that has at least one price within
+        # 200 chars of it — typical "indicator" rows have price next to date.
+        for dpos, dstr in sorted(date_hits, reverse=True):
+            close_prices = [(abs(ppos - dpos), pstr) for ppos, pstr in price_hits
+                            if abs(ppos - dpos) < 200]
+            if close_prices:
+                close_prices.sort()
+                return close_prices[0][1], dstr
 
     return None, None
 
