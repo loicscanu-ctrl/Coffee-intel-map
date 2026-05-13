@@ -1,23 +1,90 @@
 {
-  "generated_at": "2026-05-12T06:30:42.281232Z",
+  "generated_at": "2026-05-13T06:15:27.427500Z",
   "ecf": {
     "source": "ECF",
-    "last_updated": "2026-05-12",
-    "monthly": [],
-    "latest_bags": 0,
-    "latest_m_bags": null
-  },
-  "japan": {
-    "source": "AJCA",
-    "last_updated": "2026-05",
-    "monthly_imports": [
+    "last_updated": "2026-05-13",
+    "monthly": [
       {
-        "month": "2026-05",
-        "value_mt": 397272,
-        "note": "best-effort"
+        "period": "2025-12",
+        "value_raw": 7646683,
+        "value_mt": 458801,
+        "post_url": "https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf"
+      },
+      {
+        "period": "2026-01",
+        "value_raw": 7355383,
+        "value_mt": 441323,
+        "post_url": "https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf"
+      },
+      {
+        "period": "2026-02",
+        "value_raw": 6802533,
+        "value_mt": 408152,
+        "post_url": "https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf"
       }
     ],
-    "latest_mt": 397272,
-    "latest_bags": 6621200
-  }
+    "latest_bags": 6802533,
+    "latest_m_bags": 6.8,
+    "source_url": "https://www.ecf-coffee.org/category/publications/stocks/",
+    "latest_post": "https://www.ecf-coffee.org/stocks-in-european-ports-january-february-2026/",
+    "latest_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf",
+    "yearly_pdfs": [
+      {
+        "year": "2026",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/03/2026-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2025",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2024",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2023",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2022",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2021",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf"
+      },
+      {
+        "year": "2020",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2019",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2018",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2017",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2016",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf"
+      },
+      {
+        "year": "2015",
+        "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf"
+      }
+    ]
+  },
+  "eu": null,
+  "japan": null,
+  "usa": null,
+  "ajca": null,
+  "producers": null
 }
