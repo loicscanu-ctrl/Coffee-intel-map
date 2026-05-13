@@ -287,6 +287,86 @@ def _yfinance_fallback() -> dict:
         return {}
 
 
+def _stooq_fallback() -> dict:
+    """Stooq CSV fallback — last resort when Barchart + yfinance both fail.
+
+    Fetches the continuous front-month coffee quote (KC.F = Arabica, RC.F =
+    Robusta) from stooq.com's no-auth daily-history CSV endpoint. This is
+    already the same pattern macro_cot.py uses for stooq-backed prices, so
+    no new dependency or API key.
+
+    Limitation: stooq only exposes the continuous front, not the back-month
+    chain — so we populate a single-contract entry per market instead of
+    the usual 5-7. The dashboard's front-month price stays fresh; back-
+    months render as blank rows. Better than the whole table going stale.
+    """
+    try:
+        import io
+
+        import pandas as pd
+        import requests
+
+        result: dict = {}
+        for label, ticker, product, decimals, months in [
+            ("kc", "KC.F", "KC", 2, _KC_MONTHS),
+            ("rm", "RC.F", "RC", 0, _RM_MONTHS),
+        ]:
+            try:
+                # Daily history endpoint — gives last 5+ years, we use last 2 rows
+                # to compute the close + previous-close needed for `chg`.
+                url = f"https://stooq.com/q/d/l/?s={ticker}&i=d"
+                r = requests.get(url, timeout=20)
+                r.raise_for_status()
+                df = pd.read_csv(io.StringIO(r.text))
+                if df.empty or "Close" not in df.columns:
+                    print(f"[futures] stooq {ticker}: no data in CSV")
+                    continue
+
+                close = float(df["Close"].iloc[-1])
+                prev = float(df["Close"].iloc[-2]) if len(df) >= 2 else close
+                if close <= 0:
+                    print(f"[futures] stooq {ticker}: invalid close {close}")
+                    continue
+
+                vol = 0
+                if "Volume" in df.columns:
+                    try:
+                        vol_raw = df["Volume"].iloc[-1]
+                        if vol_raw and not pd.isna(vol_raw):
+                            vol = int(vol_raw)
+                    except (TypeError, ValueError):
+                        vol = 0
+
+                fs = _active_front_symbol(product, months)
+                letter = fs[2]
+                yr2 = fs[3:5]
+                mnum = next((m for letr, m in months if letr == letter), 1)
+                contract = {
+                    "contract": f"{product} {letter}{yr2} (continuous)",
+                    "expiry":   f"20{yr2}-{mnum:02d}-15",
+                    "last":     round(close, decimals),
+                    "chg":      round(close - prev, decimals),
+                    "oi":       None,
+                    "volume":   vol,
+                    "symbol":   fs,
+                }
+                result[label] = {"data": [{"raw": contract}], "_stooq": True}
+                print(f"[futures] stooq {ticker}: {close} (chg {round(close - prev, decimals)})")
+            except Exception as e:
+                print(f"[futures] stooq error for {ticker}: {e}")
+
+        if result:
+            kc_n = len(result.get("kc", {}).get("data", []))
+            rm_n = len(result.get("rm", {}).get("data", []))
+            print(f"[futures] stooq fallback: kc={kc_n} rm={rm_n}")
+        else:
+            print("[futures] stooq fallback: no data from either symbol")
+        return result
+    except Exception as e:
+        print(f"[futures] stooq fallback crashed: {e}")
+        return {}
+
+
 async def _fetch_chains(page) -> dict:
     """Fetch futures chains: requests → Playwright → Yahoo Finance fallback.
     In CI (GitHub Actions sets CI=true) Playwright is skipped — datacenter IPs
@@ -316,6 +396,18 @@ async def _fetch_chains(page) -> dict:
         for k in ("kc", "rm"):
             if not result.get(k) and yf.get(k):
                 result[k] = yf[k]
+
+    # 4. Stooq — last-resort continuous-front quote when Barchart + yfinance
+    # both fail. Doesn't give us back-month chain depth, but at least a fresh
+    # front-month price keeps futures_chain.json advancing instead of going
+    # fully empty (which used to throw the dashboard onto stale data).
+    if not result.get("kc") or not result.get("rm"):
+        missing = [k for k in ("kc", "rm") if not result.get(k)]
+        print(f"[futures] Yahoo still missing {missing} — trying Stooq CSV")
+        st = _stooq_fallback()
+        for k in ("kc", "rm"):
+            if not result.get(k) and st.get(k):
+                result[k] = st[k]
 
     return result
 
