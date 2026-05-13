@@ -383,7 +383,7 @@ def _parse_pdf_type_breakdown(pdf_url: str) -> dict[str, dict]:
     try:
         with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
             pages = pdf.pages[4:min(13, len(pdf.pages))]  # pages 5-13 (1-indexed)
-            for pi, page in enumerate(pages):
+            for page in pages:
                 # Table extraction first
                 for table in (page.extract_tables() or []):
                     parsed = _parse_table_for_breakdown(table, default_year)
