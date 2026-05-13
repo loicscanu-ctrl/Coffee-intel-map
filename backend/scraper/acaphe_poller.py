@@ -246,10 +246,11 @@ async def playwright_login() -> dict:
 
 
 def _save_vn_prices_to_db(viet: dict, fetched_at: str) -> None:
-    """Store VN local prices to Postgres so the nightly export can publish them."""
+    """Store VN local prices to Postgres — one row per calendar day (UTC).
+    Subsequent appearances of VN data within the same day are skipped so the
+    DB accumulates one clean daily record for trend analysis."""
     import os
     import sys
-    # Add backend dir to path so db/models are importable
     backend_dir = str(Path(__file__).parents[1])
     if backend_dir not in sys.path:
         sys.path.insert(0, backend_dir)
@@ -257,11 +258,24 @@ def _save_vn_prices_to_db(viet: dict, fetched_at: str) -> None:
         os.environ.setdefault("DATABASE_URL", DATABASE_URL)
         from datetime import datetime
 
-        from scraper.db import create_vn_local_prices_table, upsert_vn_local_price
+        from scraper.db import (
+            create_vn_local_prices_table,
+            get_latest_vn_local_price,
+            upsert_vn_local_price,
+        )
         create_vn_local_prices_table()
         recorded_at = datetime.fromisoformat(fetched_at.replace("Z", "+00:00")).replace(tzinfo=None)
+        today_str   = recorded_at.date().isoformat()
+
+        latest = get_latest_vn_local_price()
+        if latest:
+            last_date = (latest.get("saved_at") or "")[:10]
+            if last_date == today_str:
+                print(f"[acaphe] VN prices for {today_str} already saved — skipping")
+                return
+
         upsert_vn_local_price(viet, recorded_at)
-        print("[acaphe] Vietnam prices saved to DB")
+        print(f"[acaphe] Vietnam prices saved to DB ({today_str})")
     except Exception as exc:
         print(f"[acaphe][db] write failed: {exc}")
 
@@ -275,17 +289,36 @@ def fetch_and_save(cookies: dict) -> bool:
         raw  = resp.json()
         data = transform(raw)
         OUTPUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-        _push_redis(data)
 
-        # Persist Vietnam prices whenever acaphe shows them (they disappear after morning)
+        # Vietnam persistence: save when live, inject last-known when absent
         viet = data.get("vietnam") or {}
         if viet.get("bmt_bid") or viet.get("hcm_bid"):
+            # VN data present — save snapshot to file, Redis, and DB (once per day)
             snapshot = {**viet, "saved_at": data["fetched_at"]}
             VIETNAM_LAST.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
             _push_redis(snapshot, key="vietnam_last")
             print("[acaphe] Vietnam snapshot saved (local + Redis)")
             if DATABASE_URL:
                 _save_vn_prices_to_db(viet, data["fetched_at"])
+        elif UPSTASH_URL and UPSTASH_TOKEN:
+            # VN data absent — inject the last-known snapshot into live_quotes
+            # so the UI never shows an empty VN panel after morning data disappears
+            try:
+                r = requests.get(
+                    f"{UPSTASH_URL}/get/vietnam_last",
+                    headers={"Authorization": f"Bearer {UPSTASH_TOKEN}"},
+                    timeout=5,
+                )
+                if r.ok:
+                    result = r.json().get("result")
+                    if result:
+                        last_vn = json.loads(result) if isinstance(result, str) else result
+                        data["vietnam"] = last_vn
+                        print("[acaphe] VN data absent — injected last-known snapshot")
+            except Exception as e:
+                print(f"[acaphe] VN inject failed: {e}")
+
+        _push_redis(data)
 
         viet     = data.get("vietnam", {}) or {}
         bmt_bid  = viet.get("bmt_bid", "?")

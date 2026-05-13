@@ -111,7 +111,7 @@ export default function MarketTicker() {
     if (rc?.last != null) {
       const sign = rc.change >= 0 ? "+" : "";
       out.push({
-        label: acapheLabel(rc.month, "RM"),
+        label: acapheLabel(rc.month, "RC"),
         value: `${Math.round(rc.last).toLocaleString()} (${sign}${Math.round(rc.change)})`,
         category: "futures",
       });
