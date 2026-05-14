@@ -2,7 +2,9 @@ sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 playwright==1.44.0
 playwright-stealth
-patchright
+# patchright is installed by the workflow as a separate step — pip's
+# resolver silently drops it from this file due to a conflict with
+# playwright==1.44.0. Used only by scraper/sources/vietnam.py for CF bypass.
 deep-translator==1.11.4
 beautifulsoup4==4.12.3
 feedparser==6.0.11
