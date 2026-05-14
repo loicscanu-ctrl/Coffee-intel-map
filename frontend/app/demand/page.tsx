@@ -3,7 +3,6 @@ import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
-import RetailCpiPanel from "@/components/demand/RetailCpiPanel";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
@@ -14,7 +13,7 @@ export default function DemandPage() {
     <div className="flex flex-col h-full overflow-y-auto">
       <PageHeader
         title="Demand"
-        subtitle="World consumption · growth markets · earnings · CPI · stocks · roasting mix"
+        subtitle="World consumption · growth markets · earnings · stocks · roasting mix"
         healthKeys={["ecf", "psd_coffee", "ajca", "population"]}
       />
       <div className="border-b border-slate-700 bg-slate-950">
@@ -31,9 +30,6 @@ export default function DemandPage() {
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <RoastingMixPanel />
-      </div>
-      <div className="border-b border-slate-700 bg-slate-950">
-        <RetailCpiPanel />
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <KaffeesteuerChart />
