@@ -1,10 +1,10 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-14T15:49:07.805970Z",
+  "scraped_at": "2026-05-14T16:24:31.509858Z",
   "exports": null,
   "ihcafe_price": null,
   "weather": {
-    "scraped_at": "2026-05-14T15:42:54.269166Z",
+    "scraped_at": "2026-05-14T16:14:07.631381Z",
     "regions": [
       {
         "name": "Copán",
@@ -1929,35 +1929,35 @@
           },
           {
             "date": "2026-05-15",
-            "precip_prob": 4,
+            "precip_prob": 2,
             "precip_mm": 0.0,
             "soil_moisture": 0.15,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-16",
-            "precip_prob": 37,
+            "precip_prob": 45,
             "precip_mm": 5.0,
             "soil_moisture": 0.148,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-17",
-            "precip_prob": 48,
+            "precip_prob": 52,
             "precip_mm": 1.1,
             "soil_moisture": 0.146,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-18",
-            "precip_prob": 36,
+            "precip_prob": 40,
             "precip_mm": 2.0,
             "soil_moisture": 0.143,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-19",
-            "precip_prob": 37,
+            "precip_prob": 40,
             "precip_mm": 1.6,
             "soil_moisture": 0.141,
             "drought_risk": "H"
