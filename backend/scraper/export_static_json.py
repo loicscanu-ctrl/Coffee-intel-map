@@ -148,6 +148,20 @@ def export_futures_chain(db) -> None:
 
 # ── 2. OI FND chart ──────────────────────────────────────────────────────────
 
+def _load_oi_history() -> dict:
+    """Load oi_history.json (written by fetch_oi_json.py / daily_oi.yml)."""
+    path = ROOT / "data" / "oi_history.json"
+    if not path.exists():
+        path = OUT_DIR / "oi_history.json"
+    if not path.exists():
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def export_oi_fnd_chart(db) -> None:
     all_items = (
         db.query(NewsItem)
@@ -161,15 +175,23 @@ def export_oi_fnd_chart(db) -> None:
     prev_yr   = str(today.year - 1)[-2:]
     allowed   = {cur_yr, prev_yr}
 
+    # Load oi_history.json — provides daily OI snapshots with full per-contract
+    # OI (Playwright-fetched from Barchart), filling the -45…-30 day gap where
+    # DB NewsItems may be missing OI (yfinance fallback doesn't supply OI).
+    oi_history = _load_oi_history()
+
     result = {}
     for market in ("arabica", "robusta"):
+        mkt_key = "arabica" if market == "arabica" else "robusta"
+        series: dict[str, dict[int, int]] = {}  # sym → {day → oi}
+
+        # 1. DB-derived points (from daily futures scraper)
         chain_items = [
             i for i in all_items
             if "futures" in (i.tags or [])
             and "price"   in (i.tags or [])
             and market     in (i.tags or [])
         ]
-        series: dict[str, list] = {}
         for item in chain_items:
             try:
                 meta       = json.loads(item.meta or "{}")
@@ -180,18 +202,42 @@ def export_oi_fnd_chart(db) -> None:
                 )
                 for c in meta.get("contracts", []):
                     sym = c.get("symbol", "")
+                    oi  = c.get("oi")
+                    if oi is None:
+                        continue
                     fnd = _calc_fnd(sym)
                     if not fnd:
                         continue
                     day_val = _trading_days_to(trade_date, fnd)
                     if day_val < -45 or day_val > 0:
                         continue
-                    series.setdefault(sym, []).append({"day": day_val, "oi": c.get("oi", 0)})
+                    series.setdefault(sym, {})[day_val] = oi
             except Exception:
                 pass
 
+        # 2. oi_history.json — fills in OI from the Playwright-fetched daily
+        #    snapshots (always has real OI, extends further back in time).
+        for snapshot in oi_history.get(mkt_key, []):
+            try:
+                snap_date = date.fromisoformat(snapshot["date"])
+            except Exception:
+                continue
+            for c in snapshot.get("contracts", []):
+                sym = c.get("symbol", "")
+                oi  = c.get("oi")
+                if oi is None:
+                    continue
+                fnd = _calc_fnd(sym)
+                if not fnd:
+                    continue
+                day_val = _trading_days_to(snap_date, fnd)
+                if day_val < -45 or day_val > 0:
+                    continue
+                # Don't overwrite DB-sourced point — DB is authoritative
+                series.setdefault(sym, {}).setdefault(day_val, oi)
+
         candidates = []
-        for sym, points in series.items():
+        for sym, day_map in series.items():
             if sym[-2:] not in allowed:
                 continue
             fnd = _calc_fnd(sym)
@@ -201,7 +247,10 @@ def export_oi_fnd_chart(db) -> None:
                 "symbol": sym,
                 "label":  sym.replace("RM", "").replace("KC", ""),
                 "fnd":    fnd.isoformat(),
-                "data":   sorted(points, key=lambda x: x["day"]),
+                "data":   sorted(
+                    [{"day": d, "oi": o} for d, o in day_map.items()],
+                    key=lambda x: x["day"],
+                ),
             })
         candidates.sort(key=lambda x: x["fnd"])
         result[market] = candidates
