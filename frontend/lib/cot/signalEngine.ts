@@ -384,8 +384,9 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     const label = mkt === "NY" ? "KC" : "RC";
     if (str === null) continue;
 
-    const back = str > 0;
-    const con  = str < 0;
+    // DB stores structure = deferred − front: negative = backwardation, positive = contango
+    const back = str < 0;
+    const con  = str > 0;
 
     if (back)
       add({ id:"CS1", name:"Backwardation Incentive", category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"info",  score: +1,
@@ -399,11 +400,11 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"CS4", name:"Contango Relief",         category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"info",  score:  0,
         text:`${label} in contango while roasters add coverage — forward prices cheaper than spot, incentivizes forward buying. Normal and sustainable.` });
 
-    if (back && pStr !== null && str > pStr && pct52(rs, i) <= 0.25)
+    if (back && pStr !== null && str < pStr && pct52(rs, i) <= 0.25)
       add({ id:"CS5", name:"Deepening Inversion",     category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"alert", score: +2,
         text:`${label} backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window.` });
 
-    if (back && pStr !== null && str < pStr)
+    if (back && pStr !== null && str > pStr)
       add({ id:"CS6", name:"Inversion Easing",        category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"warn",  score: -1,
         text:`${label} backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window.` });
 
