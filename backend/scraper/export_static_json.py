@@ -1536,6 +1536,34 @@ def export_health(db) -> None:
     item = db.query(NewsItem).filter(NewsItem.source == "CONAB Safra").order_by(NewsItem.pub_date.desc()).first()
     scrapers["conab_safra"] = _ts(item.pub_date) if item else None
 
+    # Quant currency index (12-currency basket, daily, written by quant export
+    # earlier in this run). Surfaces in the Macro tab's Coffee Currency Index
+    # section — tracking it here means a silent quant_report.json staleness
+    # gets caught by the freshness monitor.
+    def _qci_ts() -> str | None:
+        try:
+            p = OUT_DIR / "quant_report.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("currency_index", {}).get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["quant_currency_index"] = _qci_ts()
+
+    # Retail coffee CPI (BLS + Eurostat + BCB SGS, monthly). Surfaces in the
+    # Macro tab's Retail Inflation section.
+    def _cpi_ts() -> str | None:
+        try:
+            p = OUT_DIR / "retail_cpi.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("last_updated")
+        except Exception:
+            return None
+        return None
+    scrapers["retail_cpi"] = _cpi_ts()
+
     # Cecafe daily (updates every business day)
     scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
 

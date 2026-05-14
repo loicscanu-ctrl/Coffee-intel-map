@@ -3,6 +3,7 @@ import NewsFeedList from "@/components/NewsFeedList";
 import PageHeader from "@/components/PageHeader";
 import CurrencyIndexSection from "@/components/macro/CurrencyIndexSection";
 import CrossCommodityPanel from "@/components/macro/CrossCommodityPanel";
+import FreightContextPanel from "@/components/macro/FreightContextPanel";
 import RetailCpiPanel from "@/components/macro/RetailCpiPanel";
 
 export default function MacroPage() {
@@ -10,12 +11,13 @@ export default function MacroPage() {
     <div className="flex flex-col h-full overflow-y-auto bg-slate-950">
       <PageHeader
         title="Macro"
-        subtitle="FX · inflation · cross-commodity positioning · macro flow"
-        healthKeys={["macro_cot"]}
+        subtitle="FX · inflation · cross-commodity positioning · freight · macro flow"
+        healthKeys={["macro_cot", "freight", "quant_currency_index", "retail_cpi"]}
       />
       <div className="flex flex-col divide-y divide-slate-800">
         <CurrencyIndexSection />
         <CrossCommodityPanel />
+        <FreightContextPanel />
         <RetailCpiPanel />
       </div>
       <div className="flex-1 min-h-[400px] border-t border-slate-700">
