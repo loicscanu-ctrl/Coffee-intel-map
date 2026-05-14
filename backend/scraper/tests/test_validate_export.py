@@ -163,8 +163,16 @@ def test_validate_oi_history_empty():
 # ── quant_report ──────────────────────────────────────────────────────────────
 
 def test_validate_quant_report_passes():
+    from datetime import datetime, timezone
     from scraper.validate_export import validate_quant_report
-    ok, reason = validate_quant_report({"currency_index": [{"brl": 5.1}], "scraped_at": "2026-04-20"})
+    fresh = datetime.now(timezone.utc).isoformat()
+    ok, reason = validate_quant_report({
+        "currency_index": {
+            "scraped_at":  fresh,
+            "index_value": 105.4,
+            "currencies":  [{"daily_chg": 0.1}] * 12,
+        },
+    })
     assert ok, reason
 
 
@@ -172,6 +180,34 @@ def test_validate_quant_report_empty():
     from scraper.validate_export import validate_quant_report
     ok, _ = validate_quant_report({"currency_index": []})
     assert not ok
+
+
+def test_validate_quant_report_stale_rejected():
+    """6-day-old scraped_at should fail — guards against silent yfinance failures."""
+    from scraper.validate_export import validate_quant_report
+    ok, reason = validate_quant_report({
+        "currency_index": {
+            "scraped_at": "2026-05-08T00:00:00+00:00",
+            "currencies": [{"daily_chg": 0.1}] * 12,
+        },
+    })
+    assert not ok
+    assert "old" in reason
+
+
+def test_validate_quant_report_thin_data_rejected():
+    """If only a few currencies have daily_chg, the index is unreliable — reject."""
+    from datetime import datetime, timezone
+    from scraper.validate_export import validate_quant_report
+    fresh = datetime.now(timezone.utc).isoformat()
+    ok, reason = validate_quant_report({
+        "currency_index": {
+            "scraped_at": fresh,
+            "currencies": [{"daily_chg": None}] * 10 + [{"daily_chg": 0.1}] * 2,
+        },
+    })
+    assert not ok
+    assert "daily_chg" in reason
 
 
 # ── cecafe_daily ──────────────────────────────────────────────────────────────
