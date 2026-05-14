@@ -3,6 +3,7 @@ import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
+import RetailCpiPanel from "@/components/demand/RetailCpiPanel";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import PageHeader from "@/components/PageHeader";
@@ -26,6 +27,9 @@ export default function DemandPage() {
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <RoastingMixPanel />
+      </div>
+      <div className="border-b border-slate-700 bg-slate-950">
+        <RetailCpiPanel />
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <KaffeesteuerChart />
