@@ -12,6 +12,11 @@ from playwright.async_api import async_playwright
 
 from scraper.db import extract_physical_price, get_session, upsert_news_item, upsert_physical_price
 from scraper.errors import CriticalSourceError
+
+# Side-channel scrapers added in the feature branch — registered in the
+# side-channel block further down. ajca + psd_coffee write directly to
+# JSON caches consumed by export_stocks.py.
+from scraper.sources import ajca as _ajca
 from scraper.sources import (
     b3,
     b3_icf,
@@ -36,6 +41,7 @@ from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
+from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import uganda_weather as _uganda_weather
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
@@ -118,6 +124,8 @@ async def run_all_scrapers():
                 ("macro_cot",         lambda p: _macro_cot.run(p),                               420),
                 ("farmer_economics",  lambda p: _farmer_economics.run(p, db_ref),                SCRAPER_TIMEOUT),
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
+                ("psd_coffee",        lambda p: _psd_coffee.run(p, db_ref),                      SCRAPER_TIMEOUT),
+                ("ajca",              lambda p: _ajca.run(p, db_ref),                            SCRAPER_TIMEOUT),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
                 ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),

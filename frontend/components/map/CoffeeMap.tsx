@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
+import type { LayerGroup as LeafletLayerGroup, Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
@@ -171,19 +171,59 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: "#6b7280",
 };
 
+// Per-type styling for the F-pin (factory). bg = icon background,
+// fg = letter color, letter = single-char glyph in the square,
+// label = human-readable subtitle shown in the popup.
+// Kept in sync with MapLegend.tsx.
+const FACTORY_TYPE_STYLE: Record<string, { bg: string; fg: string; letter: string; label: string }> = {
+  mill:      { bg: "#a16207", fg: "#fff", letter: "M", label: "Origin mill / dry processing" },
+  roastery:  { bg: "#7c2d12", fg: "#fff", letter: "R", label: "Roastery" },
+  soluble:   { bg: "#fde68a", fg: "#1f2937", letter: "S", label: "Soluble (instant)" },
+  decaf:     { bg: "#16a34a", fg: "#fff", letter: "D", label: "Decaffeination" },
+  capsules:  { bg: "#94a3b8", fg: "#0f172a", letter: "C", label: "Capsules / pods" },
+  mixed:     { bg: "#6366f1", fg: "#fff", letter: "F", label: "Mixed-use plant" },
+  unknown:   { bg: "#475569", fg: "#cbd5e1", letter: "F", label: "Factory" },
+};
+
+// World-clock anchors. Each is placed on the ~5°N parallel (Cape Coast
+// latitude) at a longitude roughly under each country, so they sit in the
+// equatorial ocean band of the world view without colliding with pins.
+const WORLD_CLOCKS: { city: string; tz: string; lat: number; lng: number }[] = [
+  { city: "Brazil",  tz: "America/Sao_Paulo",  lat: 5, lng: -50 },
+  { city: "Paris",   tz: "Europe/Paris",       lat: 5, lng:   0 },
+  { city: "Vietnam", tz: "Asia/Ho_Chi_Minh",   lat: 5, lng: 105 },
+];
+
+function formatClock(tz: string, now: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    hour:   "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(now);
+}
+
 interface CoffeeMapProps {
   onPinClick?: (item: NewsItem) => void;
   countries: CountryPin[];
   factories: FactoryPin[];
   news: NewsItem[];
+  /** Set of factory `type` values to hide; empty = all visible. */
+  hiddenFactoryTypes?: Set<string>;
 }
 
-export default function CoffeeMap({ onPinClick, countries, factories, news }: CoffeeMapProps) {
+export default function CoffeeMap({ onPinClick, countries, factories, news, hiddenFactoryTypes }: CoffeeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const tileLayerRef = useRef<TileLayer | null>(null);
   const priceMarkersRef = useRef<LeafletMarker[]>([]);
   const freightMarkersRef = useRef<LeafletMarker[]>([]);
+  // One Leaflet LayerGroup per factory type, so the filter UI can
+  // add/remove entire categories without re-instantiating markers.
+  const factoryLayersByTypeRef = useRef<Record<string, LeafletLayerGroup>>({});
+  // setInterval id for the world-clock tick loop; cleared on unmount.
+  const worldClockIntervalRef = useRef<number | null>(null);
   const [activeBasemap, setActiveBasemap] = useUrlState<string>("basemap", "dark", (raw) =>
     VALID_BASEMAP_IDS.includes(raw) ? raw : "dark"
   );
@@ -384,18 +424,100 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
       });
 
       // ── Factory pins ──────────────────────────────────────────────────────
-      const factoriesLayer = Leaflet.layerGroup().addTo(map);
+      // Spread exactly-overlapping markers in a small circle so they're all
+      // individually clickable. We only displace pins that share IDENTICAL
+      // source coords (within float-equality on lat+lng) — near-duplicates
+      // already separate at city-level zoom. Displacement is ~50-100 m
+      // (0.0005°) so the marker still sits inside the same industrial zone.
+      const coordBuckets = new Map<string, FactoryPin[]>();
+      for (const f of factories as FactoryPin[]) {
+        const k = `${f.lat},${f.lng}`;
+        const list = coordBuckets.get(k);
+        if (list) list.push(f); else coordBuckets.set(k, [f]);
+      }
+      const factoryDisplayCoords = new Map<FactoryPin, [number, number]>();
+      coordBuckets.forEach((list) => {
+        if (list.length === 1) {
+          factoryDisplayCoords.set(list[0], [list[0].lat, list[0].lng]);
+          return;
+        }
+        // Deterministic ordering (alpha by name) so positions are stable.
+        const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name));
+        const N = sorted.length;
+        const radius = 0.0006;  // ~67 m at the equator
+        sorted.forEach((f, i) => {
+          const angle = (i * 2 * Math.PI) / N;
+          const dLat = radius * Math.sin(angle);
+          const dLng = radius * Math.cos(angle) / Math.cos(f.lat * Math.PI / 180);
+          factoryDisplayCoords.set(f, [f.lat + dLat, f.lng + dLng]);
+        });
+      });
+      // One LayerGroup per type, registered on the map. The filter useEffect
+      // below adds/removes whole groups when the user toggles types in the
+      // legend — avoids rebuilding markers on every toggle.
+      const layerByType: Record<string, LeafletLayerGroup> = {};
       (factories as FactoryPin[]).forEach((f) => {
+        const t = (f.type as keyof typeof FACTORY_TYPE_STYLE) || "unknown";
+        const style = FACTORY_TYPE_STYLE[t] ?? FACTORY_TYPE_STYLE.unknown;
+        // Scale the icon by capacity: sqrt(cap_kt / 30) clamped to [0.85, 1.5]
+        // so a 5 kt plant renders at ~14 px and a 80+ kt plant at ~24 px,
+        // without the largest entries (300 kt Folgers) blowing up the icon.
+        const cap = typeof f.cap_kt === "number" && f.cap_kt > 0 ? f.cap_kt : null;
+        const scale = cap ? Math.max(0.85, Math.min(1.5, Math.sqrt(cap / 30))) : 1;
+        const px = Math.round(16 * scale);
+        const fontPx = Math.max(8, Math.round(9 * scale));
         const icon = Leaflet.divIcon({
           className: "",
-          html: `<div style="background:#6366f1;border:1px solid #fff;border-radius:3px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">F</div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          html: `<div style="background:${style.bg};color:${style.fg};border:1px solid #fff;border-radius:3px;width:${px}px;height:${px}px;display:flex;align-items:center;justify-content:center;font-size:${fontPx}px;font-weight:700">${style.letter}</div>`,
+          iconSize: [px, px],
+          iconAnchor: [px / 2, px / 2],
         });
-        Leaflet.marker([f.lat, f.lng], { icon })
-          .bindPopup(`<b>${f.name}</b><br>${f.company || ""}<br>Cap: ${f.capacity || ""}`)
-          .addTo(factoriesLayer);
+        const subtitle = f.type
+          ? `<div style="color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:2px 0 4px">${style.label}</div>`
+          : "";
+        const [displayLat, displayLng] = factoryDisplayCoords.get(f) ?? [f.lat, f.lng];
+        const capLine = f.capacity ? `<br>Cap: ${f.capacity}` : "";
+        const marker = Leaflet.marker([displayLat, displayLng], { icon })
+          .bindPopup(`<b>${f.name}</b>${subtitle}${f.company || ""}${capLine}`);
+        if (!layerByType[t]) layerByType[t] = Leaflet.layerGroup();
+        marker.addTo(layerByType[t]);
       });
+      // Add each type-group to the map; filter useEffect will toggle them.
+      for (const lg of Object.values(layerByType)) lg.addTo(map);
+      factoryLayersByTypeRef.current = layerByType;
+
+      // ── World clocks ──────────────────────────────────────────────────────
+      // Three live timezone clocks anchored on the ~5°N parallel (Cape Coast
+      // latitude) at Brazilian-Atlantic, Cape-Coast, and Gulf-of-Thailand
+      // longitudes. Updates every second via a single interval that mutates
+      // the inner DOM nodes — no React re-render needed.
+      const clocksLayer = Leaflet.layerGroup().addTo(map);
+      const clockMarkers: { marker: LeafletMarker; tz: string }[] = [];
+      WORLD_CLOCKS.forEach((c) => {
+        const icon = Leaflet.divIcon({
+          className: "",
+          html: `
+            <div style="background:rgba(15,23,42,0.92);border:1px solid #475569;border-radius:6px;padding:4px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);pointer-events:none;font-family:ui-monospace,Menlo,monospace">
+              <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;line-height:1">${c.city}</div>
+              <div data-clock="time" style="font-size:13px;font-weight:700;color:#fff;line-height:1.2;margin-top:2px">--:--:--</div>
+            </div>`,
+          iconSize: [78, 36],
+          iconAnchor: [39, 18],
+        });
+        const m = Leaflet.marker([c.lat, c.lng], { icon, interactive: false }).addTo(clocksLayer);
+        clockMarkers.push({ marker: m as LeafletMarker, tz: c.tz });
+      });
+      const tick = () => {
+        const now = new Date();
+        for (const cm of clockMarkers) {
+          const el = cm.marker.getElement();
+          if (!el) continue;
+          const timeEl = el.querySelector<HTMLElement>('[data-clock="time"]');
+          if (timeEl) timeEl.textContent = formatClock(cm.tz, now);
+        }
+      };
+      tick();
+      worldClockIntervalRef.current = window.setInterval(tick, 1000);
 
       // ── News pins ─────────────────────────────────────────────────────────
       const newsLayer = Leaflet.layerGroup().addTo(map);
@@ -418,11 +540,28 @@ export default function CoffeeMap({ onPinClick, countries, factories, news }: Co
 
     return () => {
       cancelled = true;
+      if (worldClockIntervalRef.current !== null) {
+        clearInterval(worldClockIntervalRef.current);
+        worldClockIntervalRef.current = null;
+      }
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
       if (mapRef.current) (mapRef.current as unknown as Record<string, unknown>)._leaflet_id = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Factory type filter (reacts to hiddenFactoryTypes prop) ──────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    const layers = factoryLayersByTypeRef.current;
+    for (const [type, layer] of Object.entries(layers)) {
+      const shouldHide = hiddenFactoryTypes?.has(type) ?? false;
+      const isOnMap = map.hasLayer(layer);
+      if (shouldHide && isOnMap) map.removeLayer(layer);
+      else if (!shouldHide && !isOnMap) layer.addTo(map);
+    }
+  }, [hiddenFactoryTypes]);
 
   // ── Basemap switcher (reacts to activeBasemap state) ──────────────────────
   useEffect(() => {

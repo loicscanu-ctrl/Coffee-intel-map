@@ -39,6 +39,13 @@ class Factory(Base):
     name: Mapped[str] = mapped_column(String(200))
     company: Mapped[str] = mapped_column(String(200), nullable=True)
     capacity: Mapped[str] = mapped_column(String(500), nullable=True)
+    # Numeric capacity in kilotonnes/year (parsed from the leading "Xk" in
+    # `capacity`). Drives pin sizing in the frontend; nullable for legacy
+    # rows where the string didn't start with a parsable number.
+    cap_kt: Mapped[float] = mapped_column(Float, nullable=True)
+    # One of: mill, roastery, soluble, decaf, capsules, mixed, unknown.
+    # Drives icon color + popup subtitle on the map; nullable for legacy rows.
+    type: Mapped[str] = mapped_column(String(32), nullable=True)
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
 

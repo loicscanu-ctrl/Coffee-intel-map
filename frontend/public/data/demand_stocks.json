@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T09:17:46.848010Z",
+  "generated_at": "2026-05-14T05:06:26.215462Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -84,7 +84,7 @@
   },
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-13",
+    "last_updated": "2026-05-14",
     "annual": [
       {
         "year": "2002",
@@ -310,7 +310,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-13",
+    "last_updated": "2026-05-14",
     "annual": [
       {
         "year": "2002",
@@ -536,7 +536,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-13",
+    "last_updated": "2026-05-14",
     "annual": [
       {
         "year": "1960",
@@ -1141,7 +1141,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-05-13",
+    "last_updated": "2026-05-14",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
