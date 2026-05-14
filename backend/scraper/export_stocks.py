@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from database import SessionLocal
 from models import NewsItem
-from scraper.sources import ajca, population, psd_coffee
+from scraper.sources import ajca, population, psd_coffee, un_wpp_age
 
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
@@ -186,6 +186,30 @@ def _growth_markets(psd_data: dict | None, pop_data: dict | None) -> list[dict] 
     return out or None
 
 
+def _age_cohort(wpp_data: dict | None) -> dict | None:
+    """Slim 18+ cohort payload for the AgeCohortPanel."""
+    if not wpp_data:
+        return None
+    countries = wpp_data.get("countries", {}) or {}
+    if not countries:
+        return None
+    return {
+        "source":        wpp_data.get("source"),
+        "last_updated":  wpp_data.get("last_updated"),
+        "age_threshold": wpp_data.get("age_threshold", 18),
+        "countries":     {
+            short: {
+                "name":         d.get("name"),
+                "location_id":  d.get("location_id"),
+                "annual":       d.get("annual", []),
+                "latest_year":  d.get("latest_year"),
+                "latest_pop":   d.get("latest_pop"),
+            }
+            for short, d in countries.items()
+        },
+    }
+
+
 def _populations(pop_data: dict | None) -> dict | None:
     """Slim population payload — only what the frontend needs."""
     if not pop_data:
@@ -248,6 +272,25 @@ def export_stocks(db) -> None:
             except Exception:
                 pass
 
+    try:
+        wpp_data = un_wpp_age.fetch_latest()
+    except Exception as e:
+        print(f"  [stocks] UN WPP fetch error: {e}")
+        wpp_data = None
+    if not wpp_data:
+        item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "UN WPP")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if item and item.meta:
+            try:
+                wpp_data = json.loads(item.meta)
+                print("  [stocks] UN WPP: loaded from DB fallback")
+            except Exception:
+                pass
+
     result = {
         "generated_at":   datetime.utcnow().isoformat() + "Z",
         "ecf":            _build_ecf(db),
@@ -258,6 +301,7 @@ def export_stocks(db) -> None:
         "producers":      _psd_producers(psd_data),
         "growth_markets": _growth_markets(psd_data, pop_data),
         "populations":    _populations(pop_data),
+        "age_cohort_18plus": _age_cohort(wpp_data),
     }
     path = OUT_DIR / "demand_stocks.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

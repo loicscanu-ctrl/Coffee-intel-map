@@ -1,4 +1,5 @@
 import NewsFeedList from "@/components/NewsFeedList";
+import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
@@ -19,6 +20,9 @@ export default function DemandPage() {
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <GrowthMarketsPanel />
+      </div>
+      <div className="border-b border-slate-700 bg-slate-950">
+        <AgeCohortPanel />
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <RoastingMixPanel />
