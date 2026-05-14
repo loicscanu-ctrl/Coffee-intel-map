@@ -1578,6 +1578,19 @@ def export_health(db) -> None:
         return None
     scrapers["fx_history"] = _fx_history_ts()
 
+    # Origin prices history (Vietnam/Brazil/Uganda daily farmgate accumulator).
+    # Backs the Macro tab's Origin Prices time-series widget.
+    def _origin_prices_ts() -> str | None:
+        try:
+            p = OUT_DIR / "origin_prices_history.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["origin_prices"] = _origin_prices_ts()
+
     # Cecafe daily (updates every business day)
     scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
 
@@ -1712,6 +1725,8 @@ def main():
         export_retail_cpi(db)
         export_latest_prices(db)
         export_vn_physical_prices(db)
+        from scraper.sources.origin_prices_history import export_origin_prices_history
+        export_origin_prices_history(db)
         export_health(db)
     finally:
         db.close()
