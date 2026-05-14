@@ -131,17 +131,19 @@ export const COUNTRY_EN: Record<string, string> = {
 
 // ── Hub groupings ─────────────────────────────────────────────────────────────
 
-// Countries approved as ICE exchange delivery locations (KC arabica + RM robusta)
+// Countries with ICE-nominated delivery warehouses (KC arabica + RC robusta)
+// KC (ICE US): New York/Virginia/New Orleans/Houston/Miami, Bremen/Hamburg, Antwerp, Barcelona
+// RC (ICE Europe): Amsterdam/Rotterdam, Antwerp, Bremen/Hamburg, Genoa-Savona, Barcelona,
+//                  Le Havre, London/Liverpool/Felixstowe/Teesside/Humberside, New Orleans/New York
 export const ICE_PORT_COUNTRIES: readonly string[] = [
-  "E.U.A.",                    // USA — KC & RM
-  "BELGICA",                   // Belgium — KC & RM
-  "ALEMANHA",                  // Germany — KC & RM
-  "PAISES BAIXOS (HOLANDA)",   // Netherlands — KC & RM
-  "ITALIA",                    // Italy — KC & RM
-  "ESPANHA",                   // Spain — KC & RM
-  "FRANCA",                    // France — KC & RM
-  "MEXICO",                    // Mexico — KC
-  "COREIA DO SUL (REPUBL.)",   // South Korea — RM (Busan)
+  "E.U.A.",                    // USA — KC & RC
+  "BELGICA",                   // Belgium (Antwerp) — KC & RC
+  "ALEMANHA",                  // Germany (Bremen/Hamburg) — KC & RC
+  "ESPANHA",                   // Spain (Barcelona) — KC & RC
+  "PAISES BAIXOS (HOLANDA)",   // Netherlands (Amsterdam/Rotterdam) — RC
+  "FRANCA",                    // France (Le Havre) — RC
+  "ITALIA",                    // Italy (Genoa-Savona) — RC
+  "REINO UNIDO",               // UK (London/Liverpool/Felixstowe/Teesside/Humberside) — RC
 ];
 
 export const HUB_COLORS: Record<string, string> = {
