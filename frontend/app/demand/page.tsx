@@ -1,6 +1,7 @@
 import NewsFeedList from "@/components/NewsFeedList";
-import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import EarningsTable from "@/components/demand/EarningsTable";
+import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
+import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import PageHeader from "@/components/PageHeader";
@@ -10,11 +11,14 @@ export default function DemandPage() {
     <div className="flex flex-col h-full overflow-y-auto">
       <PageHeader
         title="Demand"
-        subtitle="Roaster earnings · taxes · stocks · roasting mix · consumption news"
-        healthKeys={["ecf", "psd_coffee", "ajca"]}
+        subtitle="Growth markets · earnings · taxes · stocks · roasting mix · consumption news"
+        healthKeys={["ecf", "psd_coffee", "ajca", "population"]}
       />
       <div className="border-b border-slate-700 bg-slate-950">
         <StocksPanel />
+      </div>
+      <div className="border-b border-slate-700 bg-slate-950">
+        <GrowthMarketsPanel />
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <RoastingMixPanel />

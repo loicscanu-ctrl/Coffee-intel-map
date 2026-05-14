@@ -41,6 +41,7 @@ from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
+from scraper.sources import population as _population
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import uganda_weather as _uganda_weather
 
@@ -126,6 +127,7 @@ async def run_all_scrapers():
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
                 ("psd_coffee",        lambda p: _psd_coffee.run(p, db_ref),                      SCRAPER_TIMEOUT),
                 ("ajca",              lambda p: _ajca.run(p, db_ref),                            SCRAPER_TIMEOUT),
+                ("population",        lambda p: _population.run(p, db_ref),                      120),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
                 ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),
