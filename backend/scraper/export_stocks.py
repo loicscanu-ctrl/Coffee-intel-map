@@ -210,6 +210,57 @@ def _age_cohort(wpp_data: dict | None) -> dict | None:
     }
 
 
+def _world_consumption(psd_data: dict | None) -> dict | None:
+    """Aggregate USDA PSD consumption across all tracked markets + producers,
+    plus a manually-maintained ICO reference number for the most recent
+    marketing year. The frontend renders a coverage % so the user can see
+    how much of the world we're actually summing.
+
+    ICO reference is updated by editing this dict when ICO publishes their
+    annual statistics (typically May/June for the prior marketing year).
+    """
+    if not psd_data:
+        return None
+    markets   = psd_data.get("markets", {}) or {}
+    producers = psd_data.get("producers", {}) or {}
+
+    total_tracked_mt = 0
+    latest_year      = None
+    countries_count  = 0
+    for d in {**markets, **producers}.values():
+        c = d.get("latest_consumption_mt")
+        if c is None:
+            continue
+        total_tracked_mt += c
+        countries_count  += 1
+        y = d.get("latest_year")
+        if y and (latest_year is None or y > latest_year):
+            latest_year = y
+
+    if total_tracked_mt <= 0:
+        return None
+
+    # ICO published "Total World Consumption" — marketing year 2023/24,
+    # from the ICO Coffee Market Report 2024. Update annually.
+    ico_reference = {
+        "marketing_year":         "2023/24",
+        "world_consumption_mt":   10_620_000,   # ≈ 177M 60-kg bags
+        "source":                 "ICO Coffee Market Report",
+        "source_url":             "https://www.ico.org/coffee-market-report.asp",
+        "note":                   "Manually updated when ICO publishes annual statistics.",
+    }
+
+    coverage_pct = round(total_tracked_mt / ico_reference["world_consumption_mt"] * 100.0, 1)
+
+    return {
+        "tracked_consumption_mt": total_tracked_mt,
+        "tracked_countries":      countries_count,
+        "tracked_latest_year":    latest_year,
+        "ico_reference":          ico_reference,
+        "tracked_vs_ico_pct":     coverage_pct,
+    }
+
+
 def _populations(pop_data: dict | None) -> dict | None:
     """Slim population payload — only what the frontend needs."""
     if not pop_data:
@@ -302,6 +353,7 @@ def export_stocks(db) -> None:
         "growth_markets": _growth_markets(psd_data, pop_data),
         "populations":    _populations(pop_data),
         "age_cohort_18plus": _age_cohort(wpp_data),
+        "world_consumption": _world_consumption(psd_data),
     }
     path = OUT_DIR / "demand_stocks.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

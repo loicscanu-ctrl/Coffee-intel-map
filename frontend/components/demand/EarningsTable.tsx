@@ -1,5 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import {
+  ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 interface MarketInfo {
   price: number | null;
@@ -105,10 +109,56 @@ function lastSurprise(dates: EarningsDate[] | undefined): { surprise: number | n
   return { surprise: past[0].surprise_pct, date: past[0].date };
 }
 
+const SPARK_TT_STYLE = {
+  background: "#0f172a",
+  border: "1px solid #334155",
+  borderRadius: 6,
+  fontSize: 10,
+};
+
+function FinancialSparkline({ company }: { company: Company }) {
+  const periods = (company.financials ?? [])
+    .filter(f => f.revenue != null || f.net_income != null)
+    .slice()
+    .reverse(); // backend ships newest-first, chart wants oldest-first
+  if (periods.length < 2) {
+    return <div className="text-[10px] text-slate-500 italic">Not enough historical periods to chart.</div>;
+  }
+  const cur = company.market?.currency ?? "USD";
+  const chartData = periods.map(p => ({
+    period:     p.period_end?.slice(0, 7) ?? "",
+    revenue:    p.revenue != null    ? +(p.revenue / 1e9).toFixed(2)    : null,
+    net_income: p.net_income != null ? +(p.net_income / 1e9).toFixed(2) : null,
+  }));
+  return (
+    <div className="h-32 px-1 pt-2 pb-1">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <XAxis dataKey="period" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="rev" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}B`} />
+          <YAxis yAxisId="ni" orientation="right" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}B`} />
+          <Tooltip
+            contentStyle={SPARK_TT_STYLE}
+            formatter={(v: unknown, name: unknown) => [
+              v == null ? "—" : `${Number(v).toFixed(2)}B ${cur}`,
+              name === "revenue" ? "Revenue" : "Net Income",
+            ]}
+          />
+          <Bar yAxisId="rev" dataKey="revenue" fill="#0ea5e9" opacity={0.6} radius={[2, 2, 0, 0]} name="revenue" />
+          <Line yAxisId="ni" dataKey="net_income" type="monotone" stroke="#f59e0b" strokeWidth={1.6} dot={{ r: 2, fill: "#f59e0b" }} name="net_income" />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+
 export default function EarningsTable() {
   const [data, setData] = useState<EarningsData | null>(null);
   const [error, setError] = useState(false);
   const [activeGroup, setActiveGroup] = useState<string>("all");
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch("/data/earnings.json")
@@ -196,11 +246,20 @@ export default function EarningsTable() {
                     const nextEd = nextEarningsDate(co.earnings_dates);
                     const periodEnd = fi?.period_end ?? "—";
 
+                    const isExpanded = expanded.has(co.ticker);
+                    const toggleExpand = () => setExpanded(prev => {
+                      const next = new Set(prev);
+                      if (next.has(co.ticker)) next.delete(co.ticker);
+                      else next.add(co.ticker);
+                      return next;
+                    });
                     return (
-                      <tr key={co.ticker} className={`border-b border-slate-800 ${idx % 2 === 0 ? "bg-transparent" : "bg-slate-900/40"} hover:bg-slate-800/40`}>
+                      <>
+                      <tr key={co.ticker} className={`border-b border-slate-800 ${idx % 2 === 0 ? "bg-transparent" : "bg-slate-900/40"} hover:bg-slate-800/40 cursor-pointer`} onClick={toggleExpand}>
                         {/* Company */}
                         <td className="px-2 py-1.5 whitespace-nowrap">
                           <div className="flex items-center gap-1">
+                            <span className="text-slate-500 text-[10px] w-2 inline-block">{isExpanded ? "▾" : "▸"}</span>
                             <span className="font-semibold text-white">{co.ticker}</span>
                             <span className={`text-[9px] px-1 rounded font-bold ${co.frequency === "quarterly" ? "bg-sky-900/60 text-sky-400" : "bg-slate-700 text-slate-400"}`}>
                               {co.frequency === "quarterly" ? "Q" : "A"}
@@ -271,6 +330,17 @@ export default function EarningsTable() {
                           {nextEd}
                         </td>
                       </tr>
+                      {isExpanded && (
+                        <tr key={`${co.ticker}-spark`} className="bg-slate-900/60 border-b border-slate-800">
+                          <td colSpan={19} className="px-2">
+                            <div className="text-[10px] text-slate-400 mt-1 mb-0.5 uppercase tracking-wide">
+                              Last {co.financials?.length ?? 0} {co.frequency === "quarterly" ? "quarters" : "years"} — revenue (bars, left) · net income (line, right)
+                            </div>
+                            <FinancialSparkline company={co} />
+                          </td>
+                        </tr>
+                      )}
+                      </>
                     );
                   })}
                 </>
