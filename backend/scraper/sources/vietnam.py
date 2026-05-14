@@ -90,13 +90,33 @@ async def run(page) -> list[dict]:
 
     try:
         await vn_page.goto(_URL, wait_until="domcontentloaded", timeout=30000)
+        selector_found = True
         try:
             await vn_page.wait_for_selector("._trung-binh-gia", timeout=15000)
         except Exception:
+            selector_found = False
             await vn_page.wait_for_timeout(8000)
         html = await vn_page.content()
         item = parse_giacaphe_price(html)
-        return [item] if item else []
+        if item:
+            return [item]
+
+        # Loud failure path — the scraper has historically returned []
+        # silently when the parser couldn't find a price. That hid a 22-day
+        # outage in April-May 2026. Now we dump enough diagnostics for the
+        # next failure to be obvious in the workflow logs.
+        page_len = len(html or "")
+        title    = await vn_page.title()
+        has_avg  = '_trung-binh-gia' in html
+        has_tbl  = '<table' in html
+        snippet  = (html[:400] if html else "").replace("\n", " ")
+        print(
+            f"[vietnam] PARSE FAILED — selector_found={selector_found} "
+            f"page_title={title!r} html_len={page_len} "
+            f"has_avg_class={has_avg} has_table={has_tbl}"
+        )
+        print(f"[vietnam] HTML head: {snippet!r}")
+        return []
     except Exception as e:
         print(f"[vietnam] {_URL} failed: {e}")
         return []
