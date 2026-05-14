@@ -1,0 +1,1624 @@
+{
+  "source": "BLS + Eurostat + BCB SGS",
+  "last_updated": "2026-05-14",
+  "series": {
+    "us": {
+      "name": "US — Roasted coffee (BLS CPI, SA)",
+      "source_url": "https://data.bls.gov/timeseries/CUSR0000SEFP02",
+      "monthly": [
+        {
+          "period": "2024-01",
+          "index": 156.204,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-02",
+          "index": 160.669,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-03",
+          "index": 158.268,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-04",
+          "index": 159.895,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-05",
+          "index": 160.965,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-06",
+          "index": 161.512,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-07",
+          "index": 159.776,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-08",
+          "index": 162.541,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-09",
+          "index": 161.153,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-10",
+          "index": 159.959,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-11",
+          "index": 160.124,
+          "yoy_pct": null
+        },
+        {
+          "period": "2024-12",
+          "index": 160.98,
+          "yoy_pct": null
+        },
+        {
+          "period": "2025-01",
+          "index": 161.974,
+          "yoy_pct": 3.69
+        },
+        {
+          "period": "2025-02",
+          "index": 162.74,
+          "yoy_pct": 1.29
+        },
+        {
+          "period": "2025-03",
+          "index": 161.666,
+          "yoy_pct": 2.15
+        },
+        {
+          "period": "2025-04",
+          "index": 164.657,
+          "yoy_pct": 2.98
+        },
+        {
+          "period": "2025-05",
+          "index": 164.863,
+          "yoy_pct": 2.42
+        },
+        {
+          "period": "2025-06",
+          "index": 164.005,
+          "yoy_pct": 1.54
+        },
+        {
+          "period": "2025-07",
+          "index": 163.955,
+          "yoy_pct": 2.62
+        },
+        {
+          "period": "2025-08",
+          "index": 166.396,
+          "yoy_pct": 2.37
+        },
+        {
+          "period": "2025-09",
+          "index": 163.833,
+          "yoy_pct": 1.66
+        },
+        {
+          "period": "2025-11",
+          "index": 168.74,
+          "yoy_pct": 5.38
+        },
+        {
+          "period": "2025-12",
+          "index": 167.047,
+          "yoy_pct": 3.77
+        },
+        {
+          "period": "2026-01",
+          "index": 162.293,
+          "yoy_pct": 0.2
+        },
+        {
+          "period": "2026-02",
+          "index": 168.012,
+          "yoy_pct": 3.24
+        },
+        {
+          "period": "2026-03",
+          "index": 163.147,
+          "yoy_pct": 0.92
+        },
+        {
+          "period": "2026-04",
+          "index": 163.876,
+          "yoy_pct": -0.47
+        }
+      ]
+    },
+    "eu": {
+      "name": "EU — Coffee HICP (Eurostat CP01211, EU27)",
+      "source_url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx",
+      "monthly": [
+        {
+          "period": "2016-12",
+          "index": 100.0,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-01",
+          "index": 101.69,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-02",
+          "index": 102.72,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-03",
+          "index": 103.18,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-04",
+          "index": 102.76,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-05",
+          "index": 103.55,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-06",
+          "index": 103.63,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-07",
+          "index": 104.09,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-08",
+          "index": 103.81,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-09",
+          "index": 103.83,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-10",
+          "index": 103.45,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-11",
+          "index": 103.25,
+          "yoy_pct": null
+        },
+        {
+          "period": "2017-12",
+          "index": 102.74,
+          "yoy_pct": 2.74
+        },
+        {
+          "period": "2018-01",
+          "index": 104.0,
+          "yoy_pct": 2.27
+        },
+        {
+          "period": "2018-02",
+          "index": 103.57,
+          "yoy_pct": 0.83
+        },
+        {
+          "period": "2018-03",
+          "index": 103.35,
+          "yoy_pct": 0.16
+        },
+        {
+          "period": "2018-04",
+          "index": 103.93,
+          "yoy_pct": 1.14
+        },
+        {
+          "period": "2018-05",
+          "index": 103.36,
+          "yoy_pct": -0.18
+        },
+        {
+          "period": "2018-06",
+          "index": 103.52,
+          "yoy_pct": -0.11
+        },
+        {
+          "period": "2018-07",
+          "index": 103.34,
+          "yoy_pct": -0.72
+        },
+        {
+          "period": "2018-08",
+          "index": 103.42,
+          "yoy_pct": -0.38
+        },
+        {
+          "period": "2018-09",
+          "index": 103.1,
+          "yoy_pct": -0.7
+        },
+        {
+          "period": "2018-10",
+          "index": 102.75,
+          "yoy_pct": -0.68
+        },
+        {
+          "period": "2018-11",
+          "index": 102.81,
+          "yoy_pct": -0.43
+        },
+        {
+          "period": "2018-12",
+          "index": 101.93,
+          "yoy_pct": -0.79
+        },
+        {
+          "period": "2019-01",
+          "index": 102.83,
+          "yoy_pct": -1.12
+        },
+        {
+          "period": "2019-02",
+          "index": 103.19,
+          "yoy_pct": -0.37
+        },
+        {
+          "period": "2019-03",
+          "index": 103.06,
+          "yoy_pct": -0.28
+        },
+        {
+          "period": "2019-04",
+          "index": 102.05,
+          "yoy_pct": -1.81
+        },
+        {
+          "period": "2019-05",
+          "index": 102.47,
+          "yoy_pct": -0.86
+        },
+        {
+          "period": "2019-06",
+          "index": 101.95,
+          "yoy_pct": -1.52
+        },
+        {
+          "period": "2019-07",
+          "index": 102.47,
+          "yoy_pct": -0.84
+        },
+        {
+          "period": "2019-08",
+          "index": 102.48,
+          "yoy_pct": -0.91
+        },
+        {
+          "period": "2019-09",
+          "index": 102.22,
+          "yoy_pct": -0.85
+        },
+        {
+          "period": "2019-10",
+          "index": 102.08,
+          "yoy_pct": -0.65
+        },
+        {
+          "period": "2019-11",
+          "index": 102.0,
+          "yoy_pct": -0.79
+        },
+        {
+          "period": "2019-12",
+          "index": 101.02,
+          "yoy_pct": -0.89
+        },
+        {
+          "period": "2020-01",
+          "index": 102.25,
+          "yoy_pct": -0.56
+        },
+        {
+          "period": "2020-02",
+          "index": 102.29,
+          "yoy_pct": -0.87
+        },
+        {
+          "period": "2020-03",
+          "index": 102.56,
+          "yoy_pct": -0.49
+        },
+        {
+          "period": "2020-04",
+          "index": 102.36,
+          "yoy_pct": 0.3
+        },
+        {
+          "period": "2020-05",
+          "index": 102.79,
+          "yoy_pct": 0.31
+        },
+        {
+          "period": "2020-06",
+          "index": 102.88,
+          "yoy_pct": 0.91
+        },
+        {
+          "period": "2020-07",
+          "index": 102.6,
+          "yoy_pct": 0.13
+        },
+        {
+          "period": "2020-08",
+          "index": 102.39,
+          "yoy_pct": -0.09
+        },
+        {
+          "period": "2020-09",
+          "index": 101.39,
+          "yoy_pct": -0.81
+        },
+        {
+          "period": "2020-10",
+          "index": 101.96,
+          "yoy_pct": -0.12
+        },
+        {
+          "period": "2020-11",
+          "index": 101.76,
+          "yoy_pct": -0.24
+        },
+        {
+          "period": "2020-12",
+          "index": 100.59,
+          "yoy_pct": -0.43
+        },
+        {
+          "period": "2021-01",
+          "index": 102.43,
+          "yoy_pct": 0.18
+        },
+        {
+          "period": "2021-02",
+          "index": 102.44,
+          "yoy_pct": 0.15
+        },
+        {
+          "period": "2021-03",
+          "index": 102.06,
+          "yoy_pct": -0.49
+        },
+        {
+          "period": "2021-04",
+          "index": 103.08,
+          "yoy_pct": 0.7
+        },
+        {
+          "period": "2021-05",
+          "index": 102.64,
+          "yoy_pct": -0.15
+        },
+        {
+          "period": "2021-06",
+          "index": 102.69,
+          "yoy_pct": -0.18
+        },
+        {
+          "period": "2021-07",
+          "index": 103.47,
+          "yoy_pct": 0.85
+        },
+        {
+          "period": "2021-08",
+          "index": 102.88,
+          "yoy_pct": 0.48
+        },
+        {
+          "period": "2021-09",
+          "index": 103.38,
+          "yoy_pct": 1.96
+        },
+        {
+          "period": "2021-10",
+          "index": 104.05,
+          "yoy_pct": 2.05
+        },
+        {
+          "period": "2021-11",
+          "index": 105.1,
+          "yoy_pct": 3.28
+        },
+        {
+          "period": "2021-12",
+          "index": 104.93,
+          "yoy_pct": 4.31
+        },
+        {
+          "period": "2022-01",
+          "index": 107.63,
+          "yoy_pct": 5.08
+        },
+        {
+          "period": "2022-02",
+          "index": 109.92,
+          "yoy_pct": 7.3
+        },
+        {
+          "period": "2022-03",
+          "index": 111.51,
+          "yoy_pct": 9.26
+        },
+        {
+          "period": "2022-04",
+          "index": 113.26,
+          "yoy_pct": 9.88
+        },
+        {
+          "period": "2022-05",
+          "index": 115.74,
+          "yoy_pct": 12.76
+        },
+        {
+          "period": "2022-06",
+          "index": 117.06,
+          "yoy_pct": 13.99
+        },
+        {
+          "period": "2022-07",
+          "index": 118.39,
+          "yoy_pct": 14.42
+        },
+        {
+          "period": "2022-08",
+          "index": 120.24,
+          "yoy_pct": 16.87
+        },
+        {
+          "period": "2022-09",
+          "index": 121.28,
+          "yoy_pct": 17.31
+        },
+        {
+          "period": "2022-10",
+          "index": 122.11,
+          "yoy_pct": 17.36
+        },
+        {
+          "period": "2022-11",
+          "index": 122.97,
+          "yoy_pct": 17.0
+        },
+        {
+          "period": "2022-12",
+          "index": 123.07,
+          "yoy_pct": 17.29
+        },
+        {
+          "period": "2023-01",
+          "index": 125.28,
+          "yoy_pct": 16.4
+        },
+        {
+          "period": "2023-02",
+          "index": 126.21,
+          "yoy_pct": 14.82
+        },
+        {
+          "period": "2023-03",
+          "index": 126.6,
+          "yoy_pct": 13.53
+        },
+        {
+          "period": "2023-04",
+          "index": 127.11,
+          "yoy_pct": 12.23
+        },
+        {
+          "period": "2023-05",
+          "index": 127.63,
+          "yoy_pct": 10.27
+        },
+        {
+          "period": "2023-06",
+          "index": 128.41,
+          "yoy_pct": 9.7
+        },
+        {
+          "period": "2023-07",
+          "index": 128.55,
+          "yoy_pct": 8.58
+        },
+        {
+          "period": "2023-08",
+          "index": 128.53,
+          "yoy_pct": 6.89
+        },
+        {
+          "period": "2023-09",
+          "index": 128.72,
+          "yoy_pct": 6.13
+        },
+        {
+          "period": "2023-10",
+          "index": 128.35,
+          "yoy_pct": 5.11
+        },
+        {
+          "period": "2023-11",
+          "index": 128.29,
+          "yoy_pct": 4.33
+        },
+        {
+          "period": "2023-12",
+          "index": 127.25,
+          "yoy_pct": 3.4
+        },
+        {
+          "period": "2024-01",
+          "index": 128.37,
+          "yoy_pct": 2.47
+        },
+        {
+          "period": "2024-02",
+          "index": 127.8,
+          "yoy_pct": 1.26
+        },
+        {
+          "period": "2024-03",
+          "index": 127.82,
+          "yoy_pct": 0.96
+        },
+        {
+          "period": "2024-04",
+          "index": 129.13,
+          "yoy_pct": 1.59
+        },
+        {
+          "period": "2024-05",
+          "index": 128.58,
+          "yoy_pct": 0.74
+        },
+        {
+          "period": "2024-06",
+          "index": 129.42,
+          "yoy_pct": 0.79
+        },
+        {
+          "period": "2024-07",
+          "index": 131.51,
+          "yoy_pct": 2.3
+        },
+        {
+          "period": "2024-08",
+          "index": 133.25,
+          "yoy_pct": 3.67
+        },
+        {
+          "period": "2024-09",
+          "index": 133.52,
+          "yoy_pct": 3.73
+        },
+        {
+          "period": "2024-10",
+          "index": 134.37,
+          "yoy_pct": 4.69
+        },
+        {
+          "period": "2024-11",
+          "index": 135.41,
+          "yoy_pct": 5.55
+        },
+        {
+          "period": "2024-12",
+          "index": 135.69,
+          "yoy_pct": 6.63
+        },
+        {
+          "period": "2025-01",
+          "index": 138.92,
+          "yoy_pct": 8.22
+        },
+        {
+          "period": "2025-02",
+          "index": 141.91,
+          "yoy_pct": 11.04
+        },
+        {
+          "period": "2025-03",
+          "index": 144.87,
+          "yoy_pct": 13.34
+        },
+        {
+          "period": "2025-04",
+          "index": 148.92,
+          "yoy_pct": 15.33
+        },
+        {
+          "period": "2025-05",
+          "index": 152.73,
+          "yoy_pct": 18.78
+        },
+        {
+          "period": "2025-06",
+          "index": 155.41,
+          "yoy_pct": 20.08
+        },
+        {
+          "period": "2025-07",
+          "index": 157.94,
+          "yoy_pct": 20.1
+        },
+        {
+          "period": "2025-08",
+          "index": 160.49,
+          "yoy_pct": 20.44
+        },
+        {
+          "period": "2025-09",
+          "index": 160.25,
+          "yoy_pct": 20.02
+        },
+        {
+          "period": "2025-10",
+          "index": 161.14,
+          "yoy_pct": 19.92
+        },
+        {
+          "period": "2025-11",
+          "index": 161.27,
+          "yoy_pct": 19.1
+        },
+        {
+          "period": "2025-12",
+          "index": 160.6,
+          "yoy_pct": 18.36
+        }
+      ]
+    },
+    "brazil": {
+      "name": "Brazil — Café moído (IPCA, BCB SGS 1635)",
+      "source_url": "https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarValores&seriesEscolhidas=1635",
+      "monthly": [
+        {
+          "period": "2011-01",
+          "index": 5616927.034,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-02",
+          "index": 5629845.9662,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-03",
+          "index": 5672069.8109,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-04",
+          "index": 5704967.8158,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-05",
+          "index": 5740909.113,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-06",
+          "index": 5725982.7494,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-07",
+          "index": 5706514.408,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-08",
+          "index": 5747601.3117,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-09",
+          "index": 5784385.9601,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-10",
+          "index": 5816778.5215,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-11",
+          "index": 5879599.7295,
+          "yoy_pct": null
+        },
+        {
+          "period": "2011-12",
+          "index": 5951918.8062,
+          "yoy_pct": null
+        },
+        {
+          "period": "2012-01",
+          "index": 6003105.308,
+          "yoy_pct": 6.88
+        },
+        {
+          "period": "2012-02",
+          "index": 6014511.208,
+          "yoy_pct": 6.83
+        },
+        {
+          "period": "2012-03",
+          "index": 6029547.4861,
+          "yoy_pct": 6.3
+        },
+        {
+          "period": "2012-04",
+          "index": 6060298.1782,
+          "yoy_pct": 6.23
+        },
+        {
+          "period": "2012-05",
+          "index": 6104538.3549,
+          "yoy_pct": 6.33
+        },
+        {
+          "period": "2012-06",
+          "index": 6146049.2158,
+          "yoy_pct": 7.34
+        },
+        {
+          "period": "2012-07",
+          "index": 6201978.2636,
+          "yoy_pct": 8.68
+        },
+        {
+          "period": "2012-08",
+          "index": 6256555.6723,
+          "yoy_pct": 8.86
+        },
+        {
+          "period": "2012-09",
+          "index": 6335388.2738,
+          "yoy_pct": 9.53
+        },
+        {
+          "period": "2012-10",
+          "index": 6421549.5543,
+          "yoy_pct": 10.4
+        },
+        {
+          "period": "2012-11",
+          "index": 6472279.7958,
+          "yoy_pct": 10.08
+        },
+        {
+          "period": "2012-12",
+          "index": 6538944.2777,
+          "yoy_pct": 9.86
+        },
+        {
+          "period": "2013-01",
+          "index": 6669069.2688,
+          "yoy_pct": 11.09
+        },
+        {
+          "period": "2013-02",
+          "index": 6765770.7732,
+          "yoy_pct": 12.49
+        },
+        {
+          "period": "2013-03",
+          "index": 6842900.56,
+          "yoy_pct": 13.49
+        },
+        {
+          "period": "2013-04",
+          "index": 6908592.4054,
+          "yoy_pct": 14.0
+        },
+        {
+          "period": "2013-05",
+          "index": 6930009.0419,
+          "yoy_pct": 13.52
+        },
+        {
+          "period": "2013-06",
+          "index": 6932781.0455,
+          "yoy_pct": 12.8
+        },
+        {
+          "period": "2013-07",
+          "index": 6909902.868,
+          "yoy_pct": 11.41
+        },
+        {
+          "period": "2013-08",
+          "index": 6910593.8583,
+          "yoy_pct": 10.45
+        },
+        {
+          "period": "2013-09",
+          "index": 6920268.6897,
+          "yoy_pct": 9.23
+        },
+        {
+          "period": "2013-10",
+          "index": 6991547.4572,
+          "yoy_pct": 8.88
+        },
+        {
+          "period": "2013-11",
+          "index": 7030700.123,
+          "yoy_pct": 8.63
+        },
+        {
+          "period": "2013-12",
+          "index": 7093273.3541,
+          "yoy_pct": 8.48
+        },
+        {
+          "period": "2014-01",
+          "index": 7152856.8503,
+          "yoy_pct": 7.25
+        },
+        {
+          "period": "2014-02",
+          "index": 7192912.8486,
+          "yoy_pct": 6.31
+        },
+        {
+          "period": "2014-03",
+          "index": 7331016.7753,
+          "yoy_pct": 7.13
+        },
+        {
+          "period": "2014-04",
+          "index": 7418255.8749,
+          "yoy_pct": 7.38
+        },
+        {
+          "period": "2014-05",
+          "index": 7461281.759,
+          "yoy_pct": 7.67
+        },
+        {
+          "period": "2014-06",
+          "index": 7453074.3491,
+          "yoy_pct": 7.5
+        },
+        {
+          "period": "2014-07",
+          "index": 7441894.7376,
+          "yoy_pct": 7.7
+        },
+        {
+          "period": "2014-08",
+          "index": 7430731.8955,
+          "yoy_pct": 7.53
+        },
+        {
+          "period": "2014-09",
+          "index": 7488691.6042,
+          "yoy_pct": 8.21
+        },
+        {
+          "period": "2014-10",
+          "index": 7523139.5856,
+          "yoy_pct": 7.6
+        },
+        {
+          "period": "2014-11",
+          "index": 7581067.7604,
+          "yoy_pct": 7.83
+        },
+        {
+          "period": "2014-12",
+          "index": 7662943.2922,
+          "yoy_pct": 8.03
+        },
+        {
+          "period": "2015-01",
+          "index": 7776354.853,
+          "yoy_pct": 8.72
+        },
+        {
+          "period": "2015-02",
+          "index": 7839343.3273,
+          "yoy_pct": 8.99
+        },
+        {
+          "period": "2015-03",
+          "index": 7931063.6442,
+          "yoy_pct": 8.19
+        },
+        {
+          "period": "2015-04",
+          "index": 8007994.9616,
+          "yoy_pct": 7.95
+        },
+        {
+          "period": "2015-05",
+          "index": 8117704.4925,
+          "yoy_pct": 8.8
+        },
+        {
+          "period": "2015-06",
+          "index": 8168846.0308,
+          "yoy_pct": 9.6
+        },
+        {
+          "period": "2015-07",
+          "index": 8221943.53,
+          "yoy_pct": 10.48
+        },
+        {
+          "period": "2015-08",
+          "index": 8221121.3357,
+          "yoy_pct": 10.64
+        },
+        {
+          "period": "2015-09",
+          "index": 8240852.0269,
+          "yoy_pct": 10.04
+        },
+        {
+          "period": "2015-10",
+          "index": 8304306.5875,
+          "yoy_pct": 10.38
+        },
+        {
+          "period": "2015-11",
+          "index": 8456275.398,
+          "yoy_pct": 11.54
+        },
+        {
+          "period": "2015-12",
+          "index": 8583119.529,
+          "yoy_pct": 12.01
+        },
+        {
+          "period": "2016-01",
+          "index": 8778814.6543,
+          "yoy_pct": 12.89
+        },
+        {
+          "period": "2016-02",
+          "index": 8871870.0896,
+          "yoy_pct": 13.17
+        },
+        {
+          "period": "2016-03",
+          "index": 8981881.2787,
+          "yoy_pct": 13.25
+        },
+        {
+          "period": "2016-04",
+          "index": 9079783.7847,
+          "yoy_pct": 13.38
+        },
+        {
+          "period": "2016-05",
+          "index": 9150606.0982,
+          "yoy_pct": 12.72
+        },
+        {
+          "period": "2016-06",
+          "index": 9215575.4015,
+          "yoy_pct": 12.81
+        },
+        {
+          "period": "2016-07",
+          "index": 9337220.9968,
+          "yoy_pct": 13.56
+        },
+        {
+          "period": "2016-08",
+          "index": 9365232.6598,
+          "yoy_pct": 13.92
+        },
+        {
+          "period": "2016-09",
+          "index": 9338073.4851,
+          "yoy_pct": 13.31
+        },
+        {
+          "period": "2016-10",
+          "index": 9333404.4483,
+          "yoy_pct": 12.39
+        },
+        {
+          "period": "2016-11",
+          "index": 9314737.6394,
+          "yoy_pct": 10.15
+        },
+        {
+          "period": "2016-12",
+          "index": 9322189.4295,
+          "yoy_pct": 8.61
+        },
+        {
+          "period": "2017-01",
+          "index": 9354817.0925,
+          "yoy_pct": 6.56
+        },
+        {
+          "period": "2017-02",
+          "index": 9312720.4156,
+          "yoy_pct": 4.97
+        },
+        {
+          "period": "2017-03",
+          "index": 9344383.665,
+          "yoy_pct": 4.04
+        },
+        {
+          "period": "2017-04",
+          "index": 9398581.0903,
+          "yoy_pct": 3.51
+        },
+        {
+          "period": "2017-05",
+          "index": 9365686.0565,
+          "yoy_pct": 2.35
+        },
+        {
+          "period": "2017-06",
+          "index": 9318857.6262,
+          "yoy_pct": 1.12
+        },
+        {
+          "period": "2017-07",
+          "index": 9275058.9953,
+          "yoy_pct": -0.67
+        },
+        {
+          "period": "2017-08",
+          "index": 9175815.8641,
+          "yoy_pct": -2.02
+        },
+        {
+          "period": "2017-09",
+          "index": 9138195.0191,
+          "yoy_pct": -2.14
+        },
+        {
+          "period": "2017-10",
+          "index": 9133625.9215,
+          "yoy_pct": -2.14
+        },
+        {
+          "period": "2017-11",
+          "index": 9098918.143,
+          "yoy_pct": -2.32
+        },
+        {
+          "period": "2017-12",
+          "index": 9148052.301,
+          "yoy_pct": -1.87
+        },
+        {
+          "period": "2018-01",
+          "index": 9215747.888,
+          "yoy_pct": -1.49
+        },
+        {
+          "period": "2018-02",
+          "index": 9185335.92,
+          "yoy_pct": -1.37
+        },
+        {
+          "period": "2018-03",
+          "index": 9191765.6552,
+          "yoy_pct": -1.63
+        },
+        {
+          "period": "2018-04",
+          "index": 9200038.2442,
+          "yoy_pct": -2.11
+        },
+        {
+          "period": "2018-05",
+          "index": 9229478.3666,
+          "yoy_pct": -1.45
+        },
+        {
+          "period": "2018-06",
+          "index": 9416836.7775,
+          "yoy_pct": 1.05
+        },
+        {
+          "period": "2018-07",
+          "index": 9405536.5733,
+          "yoy_pct": 1.41
+        },
+        {
+          "period": "2018-08",
+          "index": 9373557.749,
+          "yoy_pct": 2.16
+        },
+        {
+          "period": "2018-09",
+          "index": 9382931.3067,
+          "yoy_pct": 2.68
+        },
+        {
+          "period": "2018-10",
+          "index": 9438290.6014,
+          "yoy_pct": 3.34
+        },
+        {
+          "period": "2018-11",
+          "index": 9475099.9348,
+          "yoy_pct": 4.13
+        },
+        {
+          "period": "2018-12",
+          "index": 9516790.3745,
+          "yoy_pct": 4.03
+        },
+        {
+          "period": "2019-01",
+          "index": 9602441.4879,
+          "yoy_pct": 4.2
+        },
+        {
+          "period": "2019-02",
+          "index": 9677340.5315,
+          "yoy_pct": 5.36
+        },
+        {
+          "period": "2019-03",
+          "index": 9809920.0968,
+          "yoy_pct": 6.73
+        },
+        {
+          "period": "2019-04",
+          "index": 9871722.5934,
+          "yoy_pct": 7.3
+        },
+        {
+          "period": "2019-05",
+          "index": 9816440.9468,
+          "yoy_pct": 6.36
+        },
+        {
+          "period": "2019-06",
+          "index": 9791899.8445,
+          "yoy_pct": 3.98
+        },
+        {
+          "period": "2019-07",
+          "index": 9792879.0345,
+          "yoy_pct": 4.12
+        },
+        {
+          "period": "2019-08",
+          "index": 9758603.9578,
+          "yoy_pct": 4.11
+        },
+        {
+          "period": "2019-09",
+          "index": 9716641.9608,
+          "yoy_pct": 3.56
+        },
+        {
+          "period": "2019-10",
+          "index": 9721500.2818,
+          "yoy_pct": 3.0
+        },
+        {
+          "period": "2019-11",
+          "index": 9791495.0838,
+          "yoy_pct": 3.34
+        },
+        {
+          "period": "2019-12",
+          "index": 10122447.6177,
+          "yoy_pct": 6.36
+        },
+        {
+          "period": "2020-01",
+          "index": 10161925.1634,
+          "yoy_pct": 5.83
+        },
+        {
+          "period": "2020-02",
+          "index": 10173103.2811,
+          "yoy_pct": 5.12
+        },
+        {
+          "period": "2020-03",
+          "index": 10288059.3481,
+          "yoy_pct": 4.87
+        },
+        {
+          "period": "2020-04",
+          "index": 10472215.6105,
+          "yoy_pct": 6.08
+        },
+        {
+          "period": "2020-05",
+          "index": 10497348.9279,
+          "yoy_pct": 6.94
+        },
+        {
+          "period": "2020-06",
+          "index": 10537238.8539,
+          "yoy_pct": 7.61
+        },
+        {
+          "period": "2020-07",
+          "index": 10538292.5777,
+          "yoy_pct": 7.61
+        },
+        {
+          "period": "2020-08",
+          "index": 10620491.2598,
+          "yoy_pct": 8.83
+        },
+        {
+          "period": "2020-09",
+          "index": 10862638.4606,
+          "yoy_pct": 11.79
+        },
+        {
+          "period": "2020-10",
+          "index": 11072287.3829,
+          "yoy_pct": 13.89
+        },
+        {
+          "period": "2020-11",
+          "index": 11353523.4824,
+          "yoy_pct": 15.95
+        },
+        {
+          "period": "2020-12",
+          "index": 11551074.791,
+          "yoy_pct": 14.11
+        },
+        {
+          "period": "2021-01",
+          "index": 11668895.7538,
+          "yoy_pct": 14.83
+        },
+        {
+          "period": "2021-02",
+          "index": 11700401.7724,
+          "yoy_pct": 15.01
+        },
+        {
+          "period": "2021-03",
+          "index": 11715612.2947,
+          "yoy_pct": 13.88
+        },
+        {
+          "period": "2021-04",
+          "index": 11762474.7439,
+          "yoy_pct": 12.32
+        },
+        {
+          "period": "2021-05",
+          "index": 11814229.6327,
+          "yoy_pct": 12.54
+        },
+        {
+          "period": "2021-06",
+          "index": 11865030.8202,
+          "yoy_pct": 12.6
+        },
+        {
+          "period": "2021-07",
+          "index": 11936221.0051,
+          "yoy_pct": 13.27
+        },
+        {
+          "period": "2021-08",
+          "index": 12102134.477,
+          "yoy_pct": 13.95
+        },
+        {
+          "period": "2021-09",
+          "index": 12225576.2487,
+          "yoy_pct": 12.55
+        },
+        {
+          "period": "2021-10",
+          "index": 12368615.4908,
+          "yoy_pct": 11.71
+        },
+        {
+          "period": "2021-11",
+          "index": 12363668.0446,
+          "yoy_pct": 8.9
+        },
+        {
+          "period": "2021-12",
+          "index": 12467522.8562,
+          "yoy_pct": 7.93
+        },
+        {
+          "period": "2022-01",
+          "index": 12605912.3599,
+          "yoy_pct": 8.03
+        },
+        {
+          "period": "2022-02",
+          "index": 12767268.0381,
+          "yoy_pct": 9.12
+        },
+        {
+          "period": "2022-03",
+          "index": 13076235.9246,
+          "yoy_pct": 11.61
+        },
+        {
+          "period": "2022-04",
+          "index": 13345606.3847,
+          "yoy_pct": 13.46
+        },
+        {
+          "period": "2022-05",
+          "index": 13409665.2953,
+          "yoy_pct": 13.5
+        },
+        {
+          "period": "2022-06",
+          "index": 13516942.6177,
+          "yoy_pct": 13.92
+        },
+        {
+          "period": "2022-07",
+          "index": 13692662.8717,
+          "yoy_pct": 14.72
+        },
+        {
+          "period": "2022-08",
+          "index": 13725525.2626,
+          "yoy_pct": 13.41
+        },
+        {
+          "period": "2022-09",
+          "index": 13655525.0838,
+          "yoy_pct": 11.7
+        },
+        {
+          "period": "2022-10",
+          "index": 13753844.8644,
+          "yoy_pct": 11.2
+        },
+        {
+          "period": "2022-11",
+          "index": 13826740.2422,
+          "yoy_pct": 11.83
+        },
+        {
+          "period": "2022-12",
+          "index": 13917996.7278,
+          "yoy_pct": 11.63
+        },
+        {
+          "period": "2023-01",
+          "index": 14000112.9085,
+          "yoy_pct": 11.06
+        },
+        {
+          "period": "2023-02",
+          "index": 14022513.0891,
+          "yoy_pct": 9.83
+        },
+        {
+          "period": "2023-03",
+          "index": 14029524.3457,
+          "yoy_pct": 7.29
+        },
+        {
+          "period": "2023-04",
+          "index": 14129133.9685,
+          "yoy_pct": 5.87
+        },
+        {
+          "period": "2023-05",
+          "index": 14151740.5829,
+          "yoy_pct": 5.53
+        },
+        {
+          "period": "2023-06",
+          "index": 14058339.095,
+          "yoy_pct": 4.01
+        },
+        {
+          "period": "2023-07",
+          "index": 13993670.7352,
+          "yoy_pct": 2.2
+        },
+        {
+          "period": "2023-08",
+          "index": 13874724.5339,
+          "yoy_pct": 1.09
+        },
+        {
+          "period": "2023-09",
+          "index": 13776213.9897,
+          "yoy_pct": 0.88
+        },
+        {
+          "period": "2023-10",
+          "index": 13818920.2531,
+          "yoy_pct": 0.47
+        },
+        {
+          "period": "2023-11",
+          "index": 13905979.4507,
+          "yoy_pct": 0.57
+        },
+        {
+          "period": "2023-12",
+          "index": 14060335.8226,
+          "yoy_pct": 1.02
+        },
+        {
+          "period": "2024-01",
+          "index": 14254368.4569,
+          "yoy_pct": 1.82
+        },
+        {
+          "period": "2024-02",
+          "index": 14389784.9573,
+          "yoy_pct": 2.62
+        },
+        {
+          "period": "2024-03",
+          "index": 14466050.8176,
+          "yoy_pct": 3.11
+        },
+        {
+          "period": "2024-04",
+          "index": 14567313.1733,
+          "yoy_pct": 3.1
+        },
+        {
+          "period": "2024-05",
+          "index": 14657630.515,
+          "yoy_pct": 3.57
+        },
+        {
+          "period": "2024-06",
+          "index": 14722124.0892,
+          "yoy_pct": 4.72
+        },
+        {
+          "period": "2024-07",
+          "index": 14574902.8483,
+          "yoy_pct": 4.15
+        },
+        {
+          "period": "2024-08",
+          "index": 14510773.2758,
+          "yoy_pct": 4.58
+        },
+        {
+          "period": "2024-09",
+          "index": 14583327.1422,
+          "yoy_pct": 5.86
+        },
+        {
+          "period": "2024-10",
+          "index": 14737910.4099,
+          "yoy_pct": 6.65
+        },
+        {
+          "period": "2024-11",
+          "index": 14966348.0212,
+          "yoy_pct": 7.63
+        },
+        {
+          "period": "2024-12",
+          "index": 15142950.9279,
+          "yoy_pct": 7.7
+        },
+        {
+          "period": "2025-01",
+          "index": 15288323.2568,
+          "yoy_pct": 7.25
+        },
+        {
+          "period": "2025-02",
+          "index": 15395341.5196,
+          "yoy_pct": 6.99
+        },
+        {
+          "period": "2025-03",
+          "index": 15575467.0154,
+          "yoy_pct": 7.67
+        },
+        {
+          "period": "2025-04",
+          "index": 15703185.8449,
+          "yoy_pct": 7.8
+        },
+        {
+          "period": "2025-05",
+          "index": 15729881.2608,
+          "yoy_pct": 7.32
+        },
+        {
+          "period": "2025-06",
+          "index": 15701567.4746,
+          "yoy_pct": 6.65
+        },
+        {
+          "period": "2025-07",
+          "index": 15659173.2424,
+          "yoy_pct": 7.44
+        },
+        {
+          "period": "2025-08",
+          "index": 15587141.0455,
+          "yoy_pct": 7.42
+        },
+        {
+          "period": "2025-09",
+          "index": 15546614.4788,
+          "yoy_pct": 6.61
+        },
+        {
+          "period": "2025-10",
+          "index": 15548169.1402,
+          "yoy_pct": 5.5
+        },
+        {
+          "period": "2025-11",
+          "index": 15546614.3233,
+          "yoy_pct": 3.88
+        },
+        {
+          "period": "2025-12",
+          "index": 15588590.182,
+          "yoy_pct": 2.94
+        },
+        {
+          "period": "2026-01",
+          "index": 15624443.9394,
+          "yoy_pct": 2.2
+        },
+        {
+          "period": "2026-02",
+          "index": 15665067.4936,
+          "yoy_pct": 1.75
+        },
+        {
+          "period": "2026-03",
+          "index": 15909442.5465,
+          "yoy_pct": 2.14
+        },
+        {
+          "period": "2026-04",
+          "index": 16122629.0766,
+          "yoy_pct": 2.67
+        }
+      ]
+    }
+  }
+}
