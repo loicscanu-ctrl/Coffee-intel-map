@@ -37,15 +37,6 @@ const SEVERITY_LABEL: Record<SignalSeverity, string> = {
   alert: "text-red-400",
 };
 
-const MARKET_BADGE: Record<SignalMarket, string> = {
-  NY:  "bg-blue-900/40 text-blue-300 border border-blue-700/40",
-  LDN: "bg-violet-900/40 text-violet-300 border border-violet-700/40",
-};
-
-const MARKET_LABEL: Record<SignalMarket, string> = {
-  NY:  "KC · Arabica",
-  LDN: "RC · Robusta",
-};
 
 // ── Composite score gauge ─────────────────────────────────────────────────────
 
@@ -221,13 +212,17 @@ export default function Step8Analysis({
   // Only show warn/alert by default; info on demand
   const visible = showInfo ? signals : signals.filter(s => s.severity !== "info");
 
-  const groups = CATEGORY_ORDER
-    .map(cat => ({
-      cat,
-      label: CATEGORY_LABELS[cat],
-      sigs:  visible.filter(s => s.category === cat),
-    }))
-    .filter(g => g.sigs.length > 0);
+  function buildGroups(market: SignalMarket) {
+    return CATEGORY_ORDER
+      .map(cat => ({
+        cat,
+        label: CATEGORY_LABELS[cat],
+        sigs:  visible.filter(s => s.category === cat && s.market === market),
+      }))
+      .filter(g => g.sigs.length > 0);
+  }
+  const kcGroups  = buildGroups("NY");
+  const rcGroups  = buildGroups("LDN");
 
   return (
     <div id="cot-section-8" className="space-y-5">
@@ -284,52 +279,62 @@ export default function Step8Analysis({
         </div>
       )}
 
-      {/* Signal groups */}
-      {groups.map(({ cat, label, sigs }) => (
-        <div key={cat} className="space-y-1.5">
-          {/* Category header */}
-          <div className="flex items-center gap-2 px-1">
-            <span className="text-[9px] font-mono font-bold text-slate-600 uppercase tracking-widest">{cat}</span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wide">{label}</span>
-            <div className="flex-1 h-px bg-slate-800" />
-            <span className="text-[10px] text-slate-600">{sigs.length}</span>
-          </div>
+      {/* Two-column signal layout */}
+      <div className="grid grid-cols-2 gap-4 items-start">
+        {(["NY", "LDN"] as const).map(mkt => {
+          const isNY   = mkt === "NY";
+          const groups = isNY ? kcGroups : rcGroups;
+          const colTitle   = isNY ? "KC · Arabica" : "RC · Robusta";
+          const colBorder  = isNY ? "border-blue-900/40"   : "border-violet-900/40";
+          const colText    = isNY ? "text-blue-400"         : "text-violet-400";
+          return (
+            <div key={mkt} className="space-y-3">
+              {/* Column header */}
+              <div className={`text-[10px] font-semibold uppercase tracking-wide px-1 border-b pb-1 ${colText} ${colBorder}`}>
+                {colTitle}
+              </div>
 
-          {/* Signal cards */}
-          <div className="space-y-1">
-            {sigs.map(sig => (
-              <div
-                key={`${sig.id}-${sig.market}`}
-                className={`flex gap-2.5 items-start p-2.5 rounded-lg border ${SEVERITY_CARD[sig.severity]}`}
-              >
-                {/* Severity dot */}
-                <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${SEVERITY_DOT[sig.severity]}`} />
+              {groups.length === 0 && (
+                <div className="text-[10px] text-slate-600 px-1">No active signals</div>
+              )}
 
-                <div className="flex-1 min-w-0">
-                  {/* Rule ID · name · market badge · score */}
-                  <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                    <span className="text-[9px] font-mono text-slate-600">{sig.id}</span>
-                    <span className={`text-[11px] font-semibold ${SEVERITY_LABEL[sig.severity]}`}>
-                      {sig.name}
-                    </span>
-                    <span className={`text-[9px] px-1.5 py-px rounded font-medium ${MARKET_BADGE[sig.market]}`}>
-                      {MARKET_LABEL[sig.market]}
-                    </span>
-                    {sig.score !== 0 && (
-                      <span className={`text-[9px] font-mono font-bold ml-auto ${sig.score > 0 ? "text-green-400" : "text-red-400"}`}>
-                        {sig.score > 0 ? `+${sig.score}` : sig.score}
-                      </span>
-                    )}
+              {groups.map(({ cat, label, sigs }) => (
+                <div key={cat} className="space-y-1">
+                  {/* Category label */}
+                  <div className="flex items-center gap-2 px-1">
+                    <span className="text-[10px] text-slate-400 font-medium">{label}</span>
+                    <div className="flex-1 h-px bg-slate-800" />
+                    <span className="text-[10px] text-slate-600">{sigs.length}</span>
                   </div>
 
-                  {/* Interpretation */}
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{sig.text}</p>
+                  {/* Signal cards */}
+                  {sigs.map(sig => (
+                    <div
+                      key={sig.id}
+                      className={`flex gap-2 items-start p-2 rounded-lg border ${SEVERITY_CARD[sig.severity]}`}
+                    >
+                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${SEVERITY_DOT[sig.severity]}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                          <span className={`text-[11px] font-semibold ${SEVERITY_LABEL[sig.severity]}`}>
+                            {sig.name}
+                          </span>
+                          {sig.score !== 0 && (
+                            <span className={`text-[9px] font-mono font-bold ml-auto ${sig.score > 0 ? "text-green-400" : "text-red-400"}`}>
+                              {sig.score > 0 ? `+${sig.score}` : sig.score}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">{sig.text}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+              ))}
+            </div>
+          );
+        })}
+      </div>
 
       {signals.length === 0 && (
         <div className="text-center text-slate-600 text-xs py-8">
