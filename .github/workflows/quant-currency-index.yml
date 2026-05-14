@@ -20,13 +20,19 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy sqlalchemy psycopg2-binary google-generativeai
+        # yfinance pinned to a version known to work with the session= kwarg
+        # override (PR #46) — bare yfinance default UA was getting 403'd by
+        # Yahoo Finance on the GH Actions IP range starting 2026-05-11.
+        # `requests` is now an explicit dependency (used for the custom session).
+        run: pip install "yfinance==0.2.50" requests pandas numpy sqlalchemy psycopg2-binary google-generativeai
 
-      - name: Run Currency Index scraper (3 attempts)
+      - name: Run Currency Index scraper (3 attempts, 15m between)
+        # Yahoo Finance per-IP rate limits typically clear in ~15 minutes,
+        # not 5. Old 5-minute retry hit the same wall three times in a row.
         run: |
           for attempt in 1 2 3; do
             python -m backend.scraper.quant_model.fetch_currency_index && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 15m..." && sleep 900 || exit 1
           done
 
       - name: Run Sentiment + Robusta Factor model (3 attempts)

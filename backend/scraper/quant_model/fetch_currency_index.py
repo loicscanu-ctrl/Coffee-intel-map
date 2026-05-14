@@ -29,12 +29,37 @@ from pathlib import Path
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT       = Path(__file__).resolve().parents[3]
 OUT_PATH   = ROOT / "frontend" / "public" / "data" / "quant_report.json"
 FX_OUT     = ROOT / "frontend" / "public" / "data" / "fx_history.json"
+
+# yfinance hits query1.finance.yahoo.com directly. Default User-Agent is
+# "Python-urllib/..." which Yahoo aggressively rate-limits / 403s from
+# cloud-provider IP ranges (Azure, GCP — and GitHub Actions runners run
+# on Azure). Empirically reproduced 2026-05-11 onwards: workflow stopped
+# committing quant_report.json silently, all 12 tickers returning empty
+# DataFrames, "Run Currency Index scraper" step hitting sys.exit(1).
+#
+# Passing a Session with a real browser UA bypasses the default block —
+# this is the documented yfinance override path (`session=` kwarg accepted
+# by yf.download).
+def _build_session() -> requests.Session:
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept":          "application/json,text/plain,*/*",
+        "Accept-Language": "en-US,en;q=0.7",
+    })
+    return s
+
+_YF_SESSION = _build_session()
 FX_HISTORY_DAYS = 365  # ~1 year of daily closes per pair
 
 # ── Weights (USDA PSD 2023/24, normalized over tracked pairs) ─────────────────
@@ -86,15 +111,21 @@ def _safe_float(val) -> float | None:
 def _fetch_closes(ticker: str, period: str = "2y") -> pd.Series:
     """Download daily close prices for a ticker."""
     try:
-        hist = yf.download(ticker, period=period, interval="1d",
-                           auto_adjust=True, progress=False)
+        hist = yf.download(
+            ticker, period=period, interval="1d",
+            auto_adjust=True, progress=False,
+            session=_YF_SESSION,
+        )
         if isinstance(hist.columns, pd.MultiIndex):
             hist.columns = hist.columns.get_level_values(0)
         if hist.empty or "Close" not in hist.columns:
+            print(f"  WARNING: {ticker} returned empty DataFrame "
+                  f"(columns={list(hist.columns) if not hist.empty else 'EMPTY'})",
+                  file=sys.stderr)
             return pd.Series(dtype=float)
         return hist["Close"].dropna()
     except Exception as e:
-        print(f"  WARNING: could not fetch {ticker}: {e}", file=sys.stderr)
+        print(f"  WARNING: could not fetch {ticker}: {type(e).__name__}: {e}", file=sys.stderr)
         return pd.Series(dtype=float)
 
 
