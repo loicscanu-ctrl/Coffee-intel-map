@@ -37,7 +37,12 @@ jobs:
         # leaks Cloudflare uses to detect headless browsers. Used by vietnam.py
         # to get past giacaphe.com's CF JS challenge after stealth-rejection
         # was confirmed (see PR #36 / Apr 16 → May 14 2026 outage).
-        run: patchright install chromium
+        #
+        # Invoke via `python -m patchright` (not the `patchright` CLI shim) —
+        # the pip-installed entry point isn't reliably on PATH inside GitHub
+        # Actions setup-python environments. PR #36's initial install step
+        # failed with "patchright: command not found" exit 127.
+        run: python -m patchright install chromium
 
       - name: Run daily scraper (3 attempts)
         working-directory: backend
