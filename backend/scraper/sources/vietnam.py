@@ -90,6 +90,33 @@ async def run(page) -> list[dict]:
 
     try:
         await vn_page.goto(_URL, wait_until="domcontentloaded", timeout=30000)
+
+        # giacaphe.com went behind a Cloudflare JS challenge ~2026-04-16.
+        # The challenge page renders with title "Chờ một chút..." (Vietnamese
+        # localization of "Just a moment...") and only redirects to real
+        # content once the JS challenge solves — typically 4–12s, sometimes
+        # longer. Poll the title until it changes off the interstitial.
+        cf_titles = ("Chờ một chút", "Just a moment", "Un momento", "Un instant")
+        cf_waited_ms = 0
+        max_cf_wait_ms = 30000
+        poll_ms = 1000
+        cf_initial_title = await vn_page.title()
+        cf_detected = any(t in (cf_initial_title or "") for t in cf_titles)
+        while cf_waited_ms < max_cf_wait_ms:
+            current = await vn_page.title()
+            if not any(t in (current or "") for t in cf_titles):
+                break
+            await vn_page.wait_for_timeout(poll_ms)
+            cf_waited_ms += poll_ms
+        cf_final_title = await vn_page.title()
+        cf_passed = not any(t in (cf_final_title or "") for t in cf_titles)
+        if cf_detected:
+            print(
+                f"[vietnam] CF challenge detected (title={cf_initial_title!r}); "
+                f"waited {cf_waited_ms/1000:.1f}s, passed={cf_passed} "
+                f"(final title={cf_final_title!r})"
+            )
+
         selector_found = True
         try:
             await vn_page.wait_for_selector("._trung-binh-gia", timeout=15000)
@@ -102,7 +129,7 @@ async def run(page) -> list[dict]:
             return [item]
 
         # Loud failure path — the scraper has historically returned []
-        # silently when the parser couldn't find a price. That hid a 22-day
+        # silently when the parser couldn't find a price. That hid a 28-day
         # outage in April-May 2026. Now we dump enough diagnostics for the
         # next failure to be obvious in the workflow logs.
         page_len = len(html or "")
@@ -113,7 +140,8 @@ async def run(page) -> list[dict]:
         print(
             f"[vietnam] PARSE FAILED — selector_found={selector_found} "
             f"page_title={title!r} html_len={page_len} "
-            f"has_avg_class={has_avg} has_table={has_tbl}"
+            f"has_avg_class={has_avg} has_table={has_tbl} "
+            f"cf_detected={cf_detected} cf_passed={cf_passed}"
         )
         print(f"[vietnam] HTML head: {snippet!r}")
         return []
