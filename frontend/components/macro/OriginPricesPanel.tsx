@@ -31,7 +31,7 @@ const TT_STYLE = {
   fontSize: 10,
 };
 
-const ORIGIN_ORDER = ["vietnam", "brazil", "uganda"] as const;
+const ORIGIN_ORDER = ["vietnam", "brazil_arabica", "brazil_conilon", "uganda"] as const;
 type OriginKey = typeof ORIGIN_ORDER[number];
 
 type Window = "1M" | "3M" | "6M" | "1Y" | "2Y";
@@ -150,7 +150,7 @@ export default function OriginPricesPanel() {
           <h2 className="text-lg font-bold text-white">Origin Farmgate Prices</h2>
           <p className="text-xs text-slate-400">
             Local farmgate prices in each origin, rebased to 100 at the start of the window so cross-origin % moves are comparable.
-            Brazil Conilon is sourced from CEPEA/ESALQ via BCB SGS (multi-year archive on first run);
+            Brazil Arabica and Conilon are sourced from CEPEA/ESALQ via BCB SGS (multi-year archive on first run).
             Vietnam FAQ-2 and Uganda Screen 15 accumulate one row per day from their respective scrapers — sparse charts at first, fills in over time.
             Last update {new Date(data.scraped_at).toISOString().slice(0,10)}
           </p>
@@ -169,7 +169,7 @@ export default function OriginPricesPanel() {
       </div>
 
       {/* KPI strip — one per origin */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
         {stats.map(s => {
           const cls = s.pct == null ? "text-slate-500"
                     : s.pct >= 0   ? "text-emerald-400"

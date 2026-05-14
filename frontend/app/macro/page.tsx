@@ -5,6 +5,7 @@ import CurrencyIndexSection from "@/components/macro/CurrencyIndexSection";
 import FxTimeSeriesPanel from "@/components/macro/FxTimeSeriesPanel";
 import CrossCommodityPanel from "@/components/macro/CrossCommodityPanel";
 import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
+import FertilizerInputsPanel from "@/components/macro/FertilizerInputsPanel";
 import FreightContextPanel from "@/components/macro/FreightContextPanel";
 import RetailCpiPanel from "@/components/macro/RetailCpiPanel";
 
@@ -21,6 +22,7 @@ export default function MacroPage() {
         <FxTimeSeriesPanel />
         <CrossCommodityPanel />
         <OriginPricesPanel />
+        <FertilizerInputsPanel />
         <FreightContextPanel />
         <RetailCpiPanel />
       </div>

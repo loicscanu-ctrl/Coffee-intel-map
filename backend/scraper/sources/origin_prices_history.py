@@ -3,10 +3,11 @@ origin_prices_history.py
 Accumulates daily local farmgate prices per coffee origin into a single
 JSON file. Each export run appends today's row if not already present.
 
-Brazil bootstraps from BCB SGS (Brazilian Central Bank — Sistema Gerenciador
-de Séries), which mirrors CEPEA/ESALQ daily indicators back to ~1996.
-Vietnam and Uganda accumulate forward from the day this module first runs;
-backfill for those origins is deferred to a follow-up.
+Brazil (Arabica + Conilon) bootstraps from BCB SGS — Brazilian Central
+Bank's Sistema Gerenciador de Séries, which mirrors CEPEA/ESALQ daily
+indicators back to ~1996. Vietnam and Uganda accumulate forward from the
+day this module first runs; backfill for those origins is deferred to a
+follow-up (UCDA bulletins for UG; user-supplied file for VN).
 
 This module reads-then-writes so it MUST NOT run before the upstream
 files it depends on (vn_physical_prices.json, uganda_supply.json, Cooabriel
@@ -15,6 +16,7 @@ NewsItem) are themselves up-to-date for the day.
 
 import json
 import re
+import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -23,9 +25,21 @@ ROOT     = Path(__file__).resolve().parents[3]
 OUT_PATH = ROOT / "frontend" / "public" / "data" / "origin_prices_history.json"
 
 # BCB SGS series codes — daily CEPEA/ESALQ mirror, R$/saca de 60kg.
-SGS_CONILON = 4333  # Café Conilon (robusta) — Vitória ES indicator
-SGS_ARABICA = 4332  # Café Arábica — São Paulo SP indicator (reserved for later)
+SGS_ARABICA = 4332  # Café Arábica — São Paulo SP indicator (Cooxupé / Garça basis)
+SGS_CONILON = 4333  # Café Conilon  — Vitória ES indicator
 BACKFILL_YEARS = 2
+
+# Some Brazilian government endpoints reject bare-Python user agents (egress
+# from GH Actions runners has hit 403 with no UA). A standard browser UA
+# gets us through.
+HTTP_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept":          "application/json,text/plain,*/*",
+    "Accept-Language": "en-US,en;q=0.7",
+}
 
 ORIGINS = {
     "vietnam": {
@@ -35,7 +49,14 @@ ORIGINS = {
         "unit":     "per_kg",
         "color":    "#06b6d4",
     },
-    "brazil": {
+    "brazil_arabica": {
+        "name":     "Brazil Arabica (CEPEA/ESALQ)",
+        "source":   "BCB SGS 4332 (CEPEA daily mirror)",
+        "currency": "BRL",
+        "unit":     "per_saca_60kg",
+        "color":    "#a855f7",
+    },
+    "brazil_conilon": {
         "name":     "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
         "source":   "BCB SGS 4333 (CEPEA daily mirror)",
         "currency": "BRL",
@@ -62,7 +83,12 @@ def _load_existing() -> dict:
 
 
 def _fetch_bcb_sgs(series_code: int, lookback_years: int = BACKFILL_YEARS) -> list[dict]:
-    """Fetch a daily series from BCB SGS as [{date: YYYY-MM-DD, value: float}]."""
+    """Fetch a daily series from BCB SGS as [{date: YYYY-MM-DD, value: float}].
+
+    Loud error logging — when this returns empty we want to know why on the
+    next CI run rather than silently shipping a 1-row Brazil history again
+    (PR #44 hit exactly that failure mode and produced no diagnostic output).
+    """
     today = date.today()
     start = today - timedelta(days=lookback_years * 365)
     url = (
@@ -71,26 +97,51 @@ def _fetch_bcb_sgs(series_code: int, lookback_years: int = BACKFILL_YEARS) -> li
         f"&dataInicial={start.strftime('%d/%m/%Y')}"
         f"&dataFinal={today.strftime('%d/%m/%Y')}"
     )
+    req = urllib.request.Request(url, headers=HTTP_HEADERS)
     try:
-        with urllib.request.urlopen(url, timeout=30) as resp:
-            raw = json.loads(resp.read().decode("utf-8"))
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            status = resp.status
+            body   = resp.read().decode("utf-8", errors="replace")
+        if status != 200:
+            print(f"  BCB SGS {series_code} → HTTP {status} (body len={len(body)})")
+            return []
+        try:
+            raw = json.loads(body)
+        except json.JSONDecodeError as e:
+            snippet = body[:200].replace("\n", " ")
+            print(f"  BCB SGS {series_code} → JSON parse FAILED: {e}; body[:200]={snippet!r}")
+            return []
+        if not isinstance(raw, list) or not raw:
+            print(f"  BCB SGS {series_code} → unexpected payload shape (len={len(raw) if hasattr(raw,'__len__') else '?'})")
+            return []
         out: list[dict] = []
         for r in raw:
-            iso = datetime.strptime(r["data"], "%d/%m/%Y").date().isoformat()
-            v   = float(str(r["valor"]).replace(",", "."))
-            out.append({"date": iso, "value": v})
+            try:
+                iso = datetime.strptime(r["data"], "%d/%m/%Y").date().isoformat()
+                v   = float(str(r["valor"]).replace(",", "."))
+                out.append({"date": iso, "value": v})
+            except Exception as e:
+                print(f"  BCB SGS {series_code} → row parse skip ({e}): {r!r}")
+                continue
+        print(f"  BCB SGS {series_code} → {len(out)} rows over {lookback_years}y")
         return out
+    except urllib.error.HTTPError as e:
+        print(f"  BCB SGS {series_code} → HTTPError {e.code}: {e.reason}")
+        return []
+    except urllib.error.URLError as e:
+        print(f"  BCB SGS {series_code} → URLError: {e.reason}")
+        return []
     except Exception as e:
-        print(f"  BCB SGS {series_code} → FAILED: {e}")
+        print(f"  BCB SGS {series_code} → FAILED ({type(e).__name__}): {e}")
         return []
 
 
-def _backfill_brazil(history: list[dict]) -> list[dict]:
-    """If we have fewer than 30 days of Brazil history, pull BCB SGS Conilon."""
+def _backfill_from_sgs(history: list[dict], series_code: int, label: str) -> list[dict]:
+    """If we have fewer than 30 days, pull the full BCB SGS series."""
     if len(history) >= 30:
         return history
-    print(f"  brazil → backfilling from BCB SGS {SGS_CONILON} ({BACKFILL_YEARS}y)...")
-    fetched = _fetch_bcb_sgs(SGS_CONILON)
+    print(f"  {label} → backfilling from BCB SGS {series_code} ({BACKFILL_YEARS}y)...")
+    fetched = _fetch_bcb_sgs(series_code)
     if not fetched:
         return history
     by_date = {h["date"]: h for h in history}
@@ -98,7 +149,7 @@ def _backfill_brazil(history: list[dict]) -> list[dict]:
         if row["date"] not in by_date:
             by_date[row["date"]] = {"date": row["date"], "price": row["value"]}
     merged = sorted(by_date.values(), key=lambda r: r["date"])
-    print(f"  brazil → {len(merged)} rows after backfill")
+    print(f"  {label} → {len(merged)} rows after backfill")
     return merged
 
 
@@ -112,7 +163,7 @@ def _today_vn_price() -> float | None:
         return None
 
 
-def _today_brazil_price(db) -> float | None:
+def _today_brazil_conilon_price(db) -> float | None:
     """Read today's Conilon Tipo 7 price from the latest Cooabriel NewsItem."""
     try:
         from models import NewsItem
@@ -121,7 +172,6 @@ def _today_brazil_price(db) -> float | None:
                   .order_by(NewsItem.pub_date.desc()).first())
         if not item:
             return None
-        # Body shape: "Conilon Tipo 7 price: R$ 615,50/saca"
         m = re.search(r"R\$\s*([\d.]+,\d{2})", item.body or "")
         if not m:
             return None
@@ -156,6 +206,10 @@ def export_origin_prices_history(db) -> None:
     origins  = existing.get("origins") or {}
     today    = date.today().isoformat()
 
+    # Migrate legacy "brazil" key (Conilon only) from PR #44 → brazil_conilon.
+    if "brazil" in origins and "brazil_conilon" not in origins:
+        origins["brazil_conilon"] = origins.pop("brazil")
+
     # Seed origin slots with their static metadata; preserve existing history.
     for key, cfg in ORIGINS.items():
         slot = origins.get(key) or {}
@@ -167,16 +221,29 @@ def export_origin_prices_history(db) -> None:
         slot["history"]  = slot.get("history") or []
         origins[key] = slot
 
+    # Drop any obsolete keys (e.g. the migrated-away "brazil") to keep file clean.
+    for key in list(origins.keys()):
+        if key not in ORIGINS:
+            del origins[key]
+
     # Vietnam — append today's snapshot.
     origins["vietnam"]["history"] = _append_today(
         origins["vietnam"]["history"], today, _today_vn_price()
     )
 
-    # Brazil — append today's Cooabriel, then backfill from CEPEA on first run.
-    origins["brazil"]["history"] = _append_today(
-        origins["brazil"]["history"], today, _today_brazil_price(db)
+    # Brazil Conilon — append today's Cooabriel + backfill from SGS 4333 on first run.
+    origins["brazil_conilon"]["history"] = _append_today(
+        origins["brazil_conilon"]["history"], today, _today_brazil_conilon_price(db)
     )
-    origins["brazil"]["history"] = _backfill_brazil(origins["brazil"]["history"])
+    origins["brazil_conilon"]["history"] = _backfill_from_sgs(
+        origins["brazil_conilon"]["history"], SGS_CONILON, "brazil_conilon"
+    )
+
+    # Brazil Arabica — no daily NewsItem source today; backfill from SGS 4332.
+    # When/if we wire a daily arabica scraper, append_today will pick it up.
+    origins["brazil_arabica"]["history"] = _backfill_from_sgs(
+        origins["brazil_arabica"]["history"], SGS_ARABICA, "brazil_arabica"
+    )
 
     # Uganda — append today's UCDA Screen 15.
     origins["uganda"]["history"] = _append_today(
