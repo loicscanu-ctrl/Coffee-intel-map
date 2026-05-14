@@ -75,7 +75,38 @@ def _make_item(price_vnd: int) -> dict:
 
 
 async def run(page) -> list[dict]:
-    # Create a dedicated context with proper UA/locale to bypass Cloudflare
+    # giacaphe.com sits behind a Cloudflare JS challenge as of 2026-04-16.
+    # playwright + playwright-stealth was confirmed rejected (cf_passed=False
+    # even after a 30s patient-wait — see PR #35). Patchright is a Playwright
+    # fork that patches the runtime fingerprint leaks CF uses to detect
+    # headless browsers (cdc_ properties, runtime.enable leaks, navigator.webdriver
+    # bypass holes, etc.) — strictly more evasion than playwright-stealth.
+    #
+    # We launch patchright as a separate process inside this scraper rather than
+    # switching the global Playwright runtime, to keep blast radius minimal.
+    # If patchright is unavailable in the environment, we fall back to the
+    # original Playwright path (which will surface the CF failure via the
+    # loud-logging dump below — better than crashing the whole daily run).
+    try:
+        from patchright.async_api import async_playwright as patchright_pw
+        use_patchright = True
+    except ImportError as e:
+        print(f"[vietnam] patchright unavailable, falling back to playwright-stealth: {e}")
+        use_patchright = False
+
+    if use_patchright:
+        async with patchright_pw() as pw:
+            browser = await pw.chromium.launch(headless=True)
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                locale="vi-VN",
+            )
+            vn_page = await context.new_page()
+            try:
+                return await _scrape(vn_page, runtime="patchright")
+            finally:
+                await browser.close()
+
     browser = page.context.browser
     context = await browser.new_context(
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -87,15 +118,17 @@ async def run(page) -> list[dict]:
         await Stealth().apply_stealth_async(vn_page)
     except Exception as e:
         print(f"[vietnam] stealth init warning: {e}")
+    try:
+        return await _scrape(vn_page, runtime="playwright-stealth")
+    finally:
+        await context.close()
 
+
+async def _scrape(vn_page, *, runtime: str) -> list[dict]:
     try:
         await vn_page.goto(_URL, wait_until="domcontentloaded", timeout=30000)
 
-        # giacaphe.com went behind a Cloudflare JS challenge ~2026-04-16.
-        # The challenge page renders with title "Chờ một chút..." (Vietnamese
-        # localization of "Just a moment...") and only redirects to real
-        # content once the JS challenge solves — typically 4–12s, sometimes
-        # longer. Poll the title until it changes off the interstitial.
+        # CF challenge title localized per the Accept-Language we send (vi-VN).
         cf_titles = ("Chờ một chút", "Just a moment", "Un momento", "Un instant")
         cf_waited_ms = 0
         max_cf_wait_ms = 30000
@@ -112,7 +145,8 @@ async def run(page) -> list[dict]:
         cf_passed = not any(t in (cf_final_title or "") for t in cf_titles)
         if cf_detected:
             print(
-                f"[vietnam] CF challenge detected (title={cf_initial_title!r}); "
+                f"[vietnam] CF challenge detected via {runtime} "
+                f"(title={cf_initial_title!r}); "
                 f"waited {cf_waited_ms/1000:.1f}s, passed={cf_passed} "
                 f"(final title={cf_final_title!r})"
             )
@@ -128,17 +162,13 @@ async def run(page) -> list[dict]:
         if item:
             return [item]
 
-        # Loud failure path — the scraper has historically returned []
-        # silently when the parser couldn't find a price. That hid a 28-day
-        # outage in April-May 2026. Now we dump enough diagnostics for the
-        # next failure to be obvious in the workflow logs.
         page_len = len(html or "")
         title    = await vn_page.title()
         has_avg  = '_trung-binh-gia' in html
         has_tbl  = '<table' in html
         snippet  = (html[:400] if html else "").replace("\n", " ")
         print(
-            f"[vietnam] PARSE FAILED — selector_found={selector_found} "
+            f"[vietnam] PARSE FAILED via {runtime} — selector_found={selector_found} "
             f"page_title={title!r} html_len={page_len} "
             f"has_avg_class={has_avg} has_table={has_tbl} "
             f"cf_detected={cf_detected} cf_passed={cf_passed}"
@@ -146,7 +176,5 @@ async def run(page) -> list[dict]:
         print(f"[vietnam] HTML head: {snippet!r}")
         return []
     except Exception as e:
-        print(f"[vietnam] {_URL} failed: {e}")
+        print(f"[vietnam] {_URL} failed via {runtime}: {e}")
         return []
-    finally:
-        await context.close()
