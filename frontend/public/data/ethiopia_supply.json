@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-14T16:50:36.900725Z",
+  "scraped_at": "2026-05-14T16:52:33.923743Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
@@ -9,7 +9,7 @@
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-14T16:47:48.561583Z",
+    "scraped_at": "2026-05-14T16:51:31.105539Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
