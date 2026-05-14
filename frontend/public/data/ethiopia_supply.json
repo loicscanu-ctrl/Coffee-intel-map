@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-14T06:31:20.124231Z",
+  "scraped_at": "2026-05-14T06:37:29.681193Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
@@ -9,7 +9,7 @@
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-14T04:54:47.778787Z",
+    "scraped_at": "2026-05-14T06:34:56.890930Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -30,8 +30,8 @@
       {
         "name": "Kaffa",
         "drought": "MED",
-        "csi_30d": 0.186,
-        "csi_60d": 0.094,
+        "csi_30d": 0.14,
+        "csi_60d": 0.07,
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW"
       },
@@ -131,7 +131,7 @@
           "M",
           "M",
           "M",
-          "M",
+          "-",
           "-",
           "-",
           "-",
