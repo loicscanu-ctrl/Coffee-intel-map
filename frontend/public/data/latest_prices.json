@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-14T10:56:23.625405Z",
+  "generated_at": "2026-05-14T12:29:24.251096Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "278.45 (-2.30)",
+      "value": "279.55 (-1.20)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,520 (-40)",
+      "value": "3,522 (-38)",
       "category": "futures"
     },
     {
@@ -18,7 +18,7 @@
     },
     {
       "label": "VN FAQ",
-      "value": "88.300 VND ($3,362)",
+      "value": "88.900 VND ($3,384)",
       "category": "physical"
     },
     {

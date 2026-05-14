@@ -5,55 +5,46 @@
       {
         "contract": "Coffee (Jul '26)",
         "expiry": "2026-07-21",
-        "last": 278.45,
-        "chg": -2.3,
+        "last": 279.55,
+        "chg": -1.2,
         "oi": 80461,
-        "volume": 1605,
+        "volume": 3095,
         "symbol": "KCN26"
       },
       {
         "contract": "Coffee (Sep '26)",
         "expiry": "2026-09-18",
-        "last": 271.45,
-        "chg": -1.95,
+        "last": 272.1,
+        "chg": -1.3,
         "oi": 44873,
-        "volume": 787,
+        "volume": 1746,
         "symbol": "KCU26"
       },
       {
         "contract": "Coffee (Dec '26)",
         "expiry": "2026-12-18",
-        "last": 264.9,
-        "chg": -2.15,
+        "last": 265.55,
+        "chg": -1.5,
         "oi": 32156,
-        "volume": 305,
+        "volume": 960,
         "symbol": "KCZ26"
       },
       {
         "contract": "Coffee (Mar '27)",
         "expiry": "2027-03-18",
-        "last": 262.6,
-        "chg": -2.1,
+        "last": 263.3,
+        "chg": -1.4,
         "oi": 12989,
-        "volume": 93,
+        "volume": 157,
         "symbol": "KCH27"
-      },
-      {
-        "contract": "Coffee (Jul '27)",
-        "expiry": "2027-07-20",
-        "last": 262.2,
-        "chg": -1.25,
-        "oi": 3085,
-        "volume": 10,
-        "symbol": "KCN27"
       },
       {
         "contract": "Coffee (Sep '27)",
         "expiry": "2027-09-20",
-        "last": 259.4,
-        "chg": -2.15,
+        "last": 260.2,
+        "chg": -1.35,
         "oi": 1853,
-        "volume": 12,
+        "volume": 15,
         "symbol": "KCU27"
       },
       {
@@ -82,46 +73,46 @@
       {
         "contract": "Robusta Coffee 10-T (Jul '26)",
         "expiry": "2026-07-27",
-        "last": 3520,
-        "chg": -40,
+        "last": 3522,
+        "chg": -38,
         "oi": 54659,
-        "volume": 2881,
+        "volume": 4475,
         "symbol": "RMN26"
       },
       {
         "contract": "Robusta Coffee 10-T (Sep '26)",
         "expiry": "2026-09-24",
-        "last": 3404,
-        "chg": -36,
+        "last": 3403,
+        "chg": -37,
         "oi": 20586,
-        "volume": 1487,
+        "volume": 2235,
         "symbol": "RMU26"
       },
       {
         "contract": "Robusta Coffee 10-T (Nov '26)",
         "expiry": "2026-11-24",
-        "last": 3327,
-        "chg": -33,
+        "last": 3321,
+        "chg": -39,
         "oi": 9095,
-        "volume": 423,
+        "volume": 567,
         "symbol": "RMX26"
       },
       {
         "contract": "Robusta Coffee 10-T (Jan '27)",
         "expiry": "2027-01-25",
-        "last": 3258,
-        "chg": -32,
+        "last": 3261,
+        "chg": -29,
         "oi": 5770,
-        "volume": 84,
+        "volume": 115,
         "symbol": "RMF27"
       },
       {
         "contract": "Robusta Coffee 10-T (Mar '27)",
         "expiry": "2027-03-23",
-        "last": 3219,
-        "chg": -35,
+        "last": 3215,
+        "chg": -39,
         "oi": 2182,
-        "volume": 80,
+        "volume": 88,
         "symbol": "RMH27"
       },
       {
