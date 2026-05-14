@@ -11,10 +11,15 @@ import type { CotRawRow, CotRawMarket, ProcessedCotRow, CotMarketPositions, CotT
 export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
   if (!rows.length) return [];
 
+  // Drop price-only placeholder rows (CFTC not yet released for that week).
+  // These have price_ny/price_ldn but oi_total null on both markets.
+  const positioned = rows.filter(r => (r.ny?.oi_total != null) || (r.ldn?.oi_total != null));
+  if (!positioned.length) return [];
+
   // Forward-fill missing market data (e.g. US holiday shifts NY release by 1 day)
   let lastNY:  CotRawMarket | null = null;
   let lastLDN: CotRawMarket | null = null;
-  const filledRows = rows.map(row => {
+  const filledRows = positioned.map(row => {
     const ny  = row.ny  ?? lastNY  ?? null;
     const ldn = row.ldn ?? lastLDN ?? null;
     if (row.ny  != null) lastNY  = row.ny;
