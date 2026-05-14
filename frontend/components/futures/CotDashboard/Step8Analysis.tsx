@@ -187,8 +187,8 @@ function HistoricalHeatmap({ history }: { history: HistoricalWeek[] }) {
         <div className="h-4" />{/* date header spacer */}
         {CATEGORY_ORDER.map(cat => (
           <div key={cat} className="h-5 mb-px flex items-center">
-            <span className="text-[8px] font-mono font-bold text-slate-600 uppercase pr-2 whitespace-nowrap">
-              {cat}
+            <span className="text-[8px] text-slate-500 pr-2 whitespace-nowrap">
+              {CATEGORY_LABELS[cat]}
             </span>
           </div>
         ))}
