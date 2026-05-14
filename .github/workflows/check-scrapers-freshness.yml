@@ -42,6 +42,7 @@ jobs:
               "enso":                 48,
               "vietnam_price":        48,  # giacaphe.com via vietnam.py — silent-failed Apr 23 → May 14 2026
               "quant_currency_index": 48,  # Macro tab Coffee Currency Index (quant_report.json)
+              "fx_history":           96,  # Macro tab FX time-series; weekday-only workflow, 4-day buffer over weekends
               # Monthly source — Retail CPI series publishes on the 10th–15th of each month
               "retail_cpi":           45 * 24,
               # Weekly/rolling sources

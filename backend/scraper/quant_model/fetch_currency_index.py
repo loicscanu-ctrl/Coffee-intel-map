@@ -32,8 +32,10 @@ import numpy as np
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-ROOT     = Path(__file__).resolve().parents[3]
-OUT_PATH = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+ROOT       = Path(__file__).resolve().parents[3]
+OUT_PATH   = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+FX_OUT     = ROOT / "frontend" / "public" / "data" / "fx_history.json"
+FX_HISTORY_DAYS = 365  # ~1 year of daily closes per pair
 
 # ── Weights (USDA PSD 2023/24, normalized over tracked pairs) ─────────────────
 #
@@ -81,8 +83,8 @@ def _safe_float(val) -> float | None:
         return None
 
 
-def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
-    """Download daily close prices and return close-to-close % changes."""
+def _fetch_closes(ticker: str, period: str = "2y") -> pd.Series:
+    """Download daily close prices for a ticker."""
     try:
         hist = yf.download(ticker, period=period, interval="1d",
                            auto_adjust=True, progress=False)
@@ -90,11 +92,18 @@ def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
             hist.columns = hist.columns.get_level_values(0)
         if hist.empty or "Close" not in hist.columns:
             return pd.Series(dtype=float)
-        closes = hist["Close"].dropna()
-        return closes.pct_change().dropna()
+        return hist["Close"].dropna()
     except Exception as e:
         print(f"  WARNING: could not fetch {ticker}: {e}", file=sys.stderr)
         return pd.Series(dtype=float)
+
+
+def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
+    """Return close-to-close % changes for a ticker (legacy entrypoint)."""
+    closes = _fetch_closes(ticker, period=period)
+    if closes.empty:
+        return pd.Series(dtype=float)
+    return closes.pct_change().dropna()
 
 
 def _compute_index_series(
@@ -139,16 +148,19 @@ def main():
 
     print("Fetching FX data for Coffee Currency Index...")
 
-    # ── Fetch all returns ──────────────────────────────────────────────────────
-    exporter_returns: dict[str, pd.Series] = {}
+    # ── Fetch all closes (single download per pair; returns derived below) ────
+    exporter_closes: dict[str, pd.Series] = {}
     for ticker, name, _ in EXPORTERS:
         print(f"  {ticker} ({name})...")
-        exporter_returns[ticker] = _fetch_returns(ticker)
+        exporter_closes[ticker] = _fetch_closes(ticker)
 
-    importer_returns: dict[str, pd.Series] = {}
+    importer_closes: dict[str, pd.Series] = {}
     for ticker, name, _ in IMPORTERS:
         print(f"  {ticker} ({name})...")
-        importer_returns[ticker] = _fetch_returns(ticker)
+        importer_closes[ticker] = _fetch_closes(ticker)
+
+    exporter_returns = {t: s.pct_change().dropna() for t, s in exporter_closes.items()}
+    importer_returns = {t: s.pct_change().dropna() for t, s in importer_closes.items()}
 
     # ── Build index series ─────────────────────────────────────────────────────
     index_series = _compute_index_series(exporter_returns, importer_returns)
@@ -244,6 +256,51 @@ def main():
 
     print(f"\nCCI = {today_value:.2f}  ΔI = {total_delta_i:+.4f}  Z = {zscore:+.2f}")
     print(f"Saved → {OUT_PATH}")
+
+    # ── fx_history.json: per-pair daily closes for the FX time-series widget ──
+    # The Macro tab's CurrencyIndexSection shows the aggregate index. This file
+    # backs the FX time-series widget that drills into the individual pairs.
+    # We already downloaded 2y of closes above so this is essentially free.
+    fx_pairs: dict[str, dict] = {}
+    for ticker, name, w in EXPORTERS:
+        closes = exporter_closes.get(ticker)
+        if closes is None or closes.empty:
+            continue
+        tail = closes.tail(FX_HISTORY_DAYS)
+        fx_pairs[ticker] = {
+            "name":    name,
+            "type":    "export",
+            "weight":  w,
+            "history": [
+                {"date": dt.date().isoformat(), "close": _safe_float(val)}
+                for dt, val in tail.items()
+                if _safe_float(val) is not None
+            ],
+        }
+    for ticker, name, w in IMPORTERS:
+        closes = importer_closes.get(ticker)
+        if closes is None or closes.empty:
+            continue
+        tail = closes.tail(FX_HISTORY_DAYS)
+        fx_pairs[ticker] = {
+            "name":    name,
+            "type":    "import",
+            "weight":  w,
+            "history": [
+                {"date": dt.date().isoformat(), "close": _safe_float(val)}
+                for dt, val in tail.items()
+                if _safe_float(val) is not None
+            ],
+        }
+
+    fx_output = {
+        "scraped_at":   scraped_at,
+        "history_days": FX_HISTORY_DAYS,
+        "pairs":        fx_pairs,
+    }
+    with open(FX_OUT, "w", encoding="utf-8") as f:
+        json.dump(fx_output, f, indent=2)
+    print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs)")
 
 
 if __name__ == "__main__":
