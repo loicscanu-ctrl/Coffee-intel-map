@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import {
-  COUNTRY_HUB, HUB_COLORS, HUB_ORDER, TYPE_FILTER_OPTS,
+  COUNTRY_HUB, HUB_COLORS, HUB_ORDER, ICE_PORT_COUNTRIES, TYPE_FILTER_OPTS,
 } from "./constants";
 import { toEn } from "./helpers";
 import type { CountryYear, FilterState } from "./types";
@@ -21,7 +21,9 @@ export default function CountryHubFilter({
       .map(([pt]) => pt)
   , [byCountry]);
 
-  const hubCountries = filter.hub
+  const hubCountries = filter.hub === "ICE ports"
+    ? sortedCountries.filter(pt => (ICE_PORT_COUNTRIES as string[]).includes(pt))
+    : filter.hub
     ? sortedCountries.filter(pt => COUNTRY_HUB[pt] === filter.hub)
     : sortedCountries;
 

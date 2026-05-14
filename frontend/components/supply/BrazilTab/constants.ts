@@ -131,7 +131,21 @@ export const COUNTRY_EN: Record<string, string> = {
 
 // ── Hub groupings ─────────────────────────────────────────────────────────────
 
+// Countries approved as ICE exchange delivery locations (KC arabica + RM robusta)
+export const ICE_PORT_COUNTRIES: readonly string[] = [
+  "E.U.A.",                    // USA — KC & RM
+  "BELGICA",                   // Belgium — KC & RM
+  "ALEMANHA",                  // Germany — KC & RM
+  "PAISES BAIXOS (HOLANDA)",   // Netherlands — KC & RM
+  "ITALIA",                    // Italy — KC & RM
+  "ESPANHA",                   // Spain — KC & RM
+  "FRANCA",                    // France — KC & RM
+  "MEXICO",                    // Mexico — KC
+  "COREIA DO SUL (REPUBL.)",   // South Korea — RM (Busan)
+];
+
 export const HUB_COLORS: Record<string, string> = {
+  "ICE ports":           "#fde68a",
   "Nordics":             "#bfdbfe",
   "Central Europe":      "#60a5fa",
   "South Europe":        "#3b82f6",
@@ -286,6 +300,7 @@ export const COUNTRY_HUB: Record<string, string> = {
 };
 
 export const HUB_ORDER = [
+  "ICE ports",
   "Nordics","Central Europe","South Europe","Eastern Europe",
   "North America","Latin America",
   "East Asia","SE Asia & Pacific","Middle East","North Africa",
