@@ -1,6 +1,6 @@
 // Shared types for the CoT dashboard decomposition.
 
-export type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export type MacroToggle = "gross" | "gross_long" | "gross_short" | "net";
 
