@@ -32,6 +32,13 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
+      - name: Install Patchright browser
+        # Patchright is a Playwright fork that patches the runtime fingerprint
+        # leaks Cloudflare uses to detect headless browsers. Used by vietnam.py
+        # to get past giacaphe.com's CF JS challenge after stealth-rejection
+        # was confirmed (see PR #36 / Apr 16 → May 14 2026 outage).
+        run: patchright install chromium
+
       - name: Run daily scraper (3 attempts)
         working-directory: backend
         env:
