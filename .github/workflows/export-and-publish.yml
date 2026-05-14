@@ -61,7 +61,7 @@ jobs:
                   frontend/public/data/health.json \
                   frontend/public/data/latest_prices.json \
                   frontend/public/data/vietnam_supply.json
-          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json; do
+          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json frontend/public/data/origin_prices_history.json; do
             [ -f "$f" ] && git add "$f" || true
           done
           git diff --cached --quiet \
