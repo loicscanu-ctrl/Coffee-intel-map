@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-05-14T07:49:04.297434+00:00",
+  "scraped_at": "2026-05-14T08:09:08.426377+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-02",
@@ -1375,12 +1375,12 @@
     }
   },
   "ucda_price": {
-    "usd_cwt": 169.28,
+    "usd_cwt": 172.82,
     "as_of": "2026-05-14",
     "grade": "Screen 15"
   },
   "weather": {
-    "scraped_at": "2026-05-14T07:45:39.480513Z",
+    "scraped_at": "2026-05-14T08:04:42.870139Z",
     "regions": [
       {
         "name": "Kasese",
