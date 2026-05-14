@@ -163,9 +163,10 @@ def test_validate_oi_history_empty():
 # ── quant_report ──────────────────────────────────────────────────────────────
 
 def test_validate_quant_report_passes():
-    from datetime import datetime, timezone
+    from datetime import UTC, datetime
+
     from scraper.validate_export import validate_quant_report
-    fresh = datetime.now(timezone.utc).isoformat()
+    fresh = datetime.now(UTC).isoformat()
     ok, reason = validate_quant_report({
         "currency_index": {
             "scraped_at":  fresh,
@@ -197,9 +198,10 @@ def test_validate_quant_report_stale_rejected():
 
 def test_validate_quant_report_thin_data_rejected():
     """If only a few currencies have daily_chg, the index is unreliable — reject."""
-    from datetime import datetime, timezone
+    from datetime import UTC, datetime
+
     from scraper.validate_export import validate_quant_report
-    fresh = datetime.now(timezone.utc).isoformat()
+    fresh = datetime.now(UTC).isoformat()
     ok, reason = validate_quant_report({
         "currency_index": {
             "scraped_at": fresh,
