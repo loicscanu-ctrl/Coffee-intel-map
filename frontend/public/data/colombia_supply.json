@@ -1,6 +1,6 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-05-14T05:06:23.374223Z",
+  "scraped_at": "2026-05-14T06:31:17.815510Z",
   "exports": null,
   "fnc_price": {
     "cop_per_carga": 2303000,
@@ -20,7 +20,7 @@
       },
       {
         "name": "Nariño",
-        "drought": "MED",
+        "drought": "HIGH",
         "csi_30d": 32.0,
         "csi_60d": 78.6,
         "csi_30d_level": "L",
@@ -134,7 +134,6 @@
       {
         "region": "Nariño",
         "days": [
-          "L",
           "M",
           "M",
           "L",
@@ -207,6 +206,7 @@
           "H",
           "L",
           "L",
+          "M",
           "M"
         ]
       },
@@ -215,7 +215,6 @@
         "days": [
           "M",
           "M",
-          "M",
           "L",
           "L",
           "M",
@@ -285,6 +284,7 @@
           "H",
           "H",
           "H",
+          "L",
           "L",
           "L"
         ]
@@ -293,7 +293,6 @@
         "region": "Cauca",
         "days": [
           "L",
-          "L",
           "M",
           "L",
           "L",
@@ -363,6 +362,7 @@
           "H",
           "H",
           "H",
+          "M",
           "M",
           "M",
           "M"
@@ -372,7 +372,6 @@
         "region": "Caldas",
         "days": [
           "M",
-          "M",
           "H",
           "M",
           "L",
@@ -428,6 +427,7 @@
           "L",
           "L",
           "M",
+          "L",
           "L",
           "L",
           "L",
@@ -976,13 +976,6 @@
         "region": "Nariño",
         "days": [
           {
-            "date": "2026-03-14",
-            "precip_prob": 100,
-            "precip_mm": 4.6,
-            "soil_moisture": 0.337,
-            "drought_risk": "L"
-          },
-          {
             "date": "2026-03-15",
             "precip_prob": 55,
             "precip_mm": 1.6,
@@ -1492,19 +1485,19 @@
             "precip_mm": 6.6,
             "soil_moisture": 0.313,
             "drought_risk": "M"
+          },
+          {
+            "date": "2026-05-27",
+            "precip_prob": 77,
+            "precip_mm": 5.4,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
           }
         ]
       },
       {
         "region": "Antioquia",
         "days": [
-          {
-            "date": "2026-03-14",
-            "precip_prob": 100,
-            "precip_mm": 0.7,
-            "soil_moisture": 0.326,
-            "drought_risk": "M"
-          },
           {
             "date": "2026-03-15",
             "precip_prob": 76,
@@ -2015,19 +2008,19 @@
             "precip_mm": 14.0,
             "soil_moisture": 0.313,
             "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-27",
+            "precip_prob": 92,
+            "precip_mm": 18.8,
+            "soil_moisture": 0.313,
+            "drought_risk": "L"
           }
         ]
       },
       {
         "region": "Cauca",
         "days": [
-          {
-            "date": "2026-03-14",
-            "precip_prob": 100,
-            "precip_mm": 6.5,
-            "soil_moisture": 0.334,
-            "drought_risk": "L"
-          },
           {
             "date": "2026-03-15",
             "precip_prob": 100,
@@ -2538,19 +2531,19 @@
             "precip_mm": 4.6,
             "soil_moisture": 0.313,
             "drought_risk": "M"
+          },
+          {
+            "date": "2026-05-27",
+            "precip_prob": 100,
+            "precip_mm": 3.6,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
           }
         ]
       },
       {
         "region": "Caldas",
         "days": [
-          {
-            "date": "2026-03-14",
-            "precip_prob": 97,
-            "precip_mm": 0.4,
-            "soil_moisture": 0.332,
-            "drought_risk": "M"
-          },
           {
             "date": "2026-03-15",
             "precip_prob": 6,
@@ -3059,6 +3052,13 @@
             "date": "2026-05-26",
             "precip_prob": 100,
             "precip_mm": 10.6,
+            "soil_moisture": 0.313,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-05-27",
+            "precip_prob": 99,
+            "precip_mm": 16.6,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           }
