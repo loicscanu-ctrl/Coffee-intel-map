@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T07:08:01.345874Z",
+  "generated_at": "2026-05-14T07:27:29.657769Z",
   "scrapers": {
     "futures": "2026-05-14T06:52:56.081783",
     "cot": "2026-05-12",
@@ -16,11 +16,11 @@
     "conab_safra": "2026-05-12T05:39:30.560953",
     "cecafe_daily": "2026-05-08",
     "brazil_exports": "2026-05-13",
-    "colombia_exports": "2026-05-14T07:07:55.800544Z",
-    "honduras_exports": "2026-05-14T07:07:56.362266Z",
-    "ethiopia_exports": "2026-05-14T07:07:58.040702Z",
-    "vietnam_exports": "2026-05-14T07:07:54.972085Z",
-    "indonesia_exports": "2026-05-14T07:07:56.784884Z",
-    "uganda_exports": "2026-05-14T07:07:57.482198+00:00"
+    "colombia_exports": "2026-05-14T07:27:22.709906Z",
+    "honduras_exports": "2026-05-14T07:27:23.417251Z",
+    "ethiopia_exports": "2026-05-14T07:27:25.528875Z",
+    "vietnam_exports": "2026-05-14T07:27:21.665322Z",
+    "indonesia_exports": "2026-05-14T07:27:23.948740Z",
+    "uganda_exports": "2026-05-14T07:27:24.826841+00:00"
   }
 }
