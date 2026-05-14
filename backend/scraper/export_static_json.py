@@ -1535,6 +1535,14 @@ def export_demand_stocks(db) -> None:
         print(f"  demand_stocks.json → FAILED: {e}")
 
 
+def export_factory_mix_step() -> None:
+    try:
+        from scraper.export_factory_mix import export_factory_mix as _export_factory_mix
+        _export_factory_mix()
+    except Exception as e:
+        print(f"  factory_mix.json → FAILED: {e}")
+
+
 def main():
     print("Exporting static JSON files...")
     db = SessionLocal()
@@ -1555,6 +1563,7 @@ def main():
         export_uganda(db)
         export_ethiopia(db)
         export_demand_stocks(db)
+        export_factory_mix_step()
         export_latest_prices(db)
         export_vn_physical_prices(db)
         export_health(db)
