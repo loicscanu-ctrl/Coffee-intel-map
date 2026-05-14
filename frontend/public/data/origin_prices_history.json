@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-05-14T16:24:36.014611Z",
+  "scraped_at": "2026-05-14T16:50:39.668547Z",
   "origins": {
     "vietnam": {
       "name": "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
@@ -11,19 +11,6 @@
         {
           "date": "2026-05-14",
           "price": 88900.0
-        }
-      ]
-    },
-    "brazil": {
-      "name": "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
-      "source": "BCB SGS 4333 (CEPEA daily mirror)",
-      "currency": "BRL",
-      "unit": "per_saca_60kg",
-      "color": "#10b981",
-      "history": [
-        {
-          "date": "2026-05-14",
-          "price": 890.0
         }
       ]
     },
@@ -39,6 +26,27 @@
           "price": 172.82
         }
       ]
+    },
+    "brazil_conilon": {
+      "name": "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
+      "source": "BCB SGS 4333 (CEPEA daily mirror)",
+      "currency": "BRL",
+      "unit": "per_saca_60kg",
+      "color": "#10b981",
+      "history": [
+        {
+          "date": "2026-05-14",
+          "price": 890.0
+        }
+      ]
+    },
+    "brazil_arabica": {
+      "name": "Brazil Arabica (CEPEA/ESALQ)",
+      "source": "BCB SGS 4332 (CEPEA daily mirror)",
+      "currency": "BRL",
+      "unit": "per_saca_60kg",
+      "color": "#a855f7",
+      "history": []
     }
   }
 }
