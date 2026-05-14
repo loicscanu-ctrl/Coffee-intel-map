@@ -1,6 +1,5 @@
 import PriceDirectionSection from "@/components/quant/PriceDirectionSection";
 import RobustaForecastSection from "@/components/quant/RobustaForecastSection";
-import CurrencyIndexSection from "@/components/quant/CurrencyIndexSection";
 import VietnamDiffSection from "@/components/quant/VietnamDiffSection";
 import SentimentSection from "@/components/quant/SentimentSection";
 import PageHeader from "@/components/PageHeader";
@@ -15,7 +14,6 @@ export default function QuantPage() {
       <div className="flex flex-col divide-y divide-slate-800">
         <PriceDirectionSection />
         <RobustaForecastSection />
-        <CurrencyIndexSection />
         <VietnamDiffSection />
         <SentimentSection />
       </div>

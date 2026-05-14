@@ -1,16 +1,26 @@
 "use client";
 import NewsFeedList from "@/components/NewsFeedList";
 import PageHeader from "@/components/PageHeader";
+import CurrencyIndexSection from "@/components/macro/CurrencyIndexSection";
+import CrossCommodityPanel from "@/components/macro/CrossCommodityPanel";
+import RetailCpiPanel from "@/components/macro/RetailCpiPanel";
 
 export default function MacroPage() {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-y-auto bg-slate-950">
       <PageHeader
         title="Macro"
-        subtitle="FX · freight · fertilizer · CPI cross-market news"
+        subtitle="FX · inflation · cross-commodity positioning · macro flow"
+        healthKeys={["macro_cot"]}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex flex-col divide-y divide-slate-800">
+        <CurrencyIndexSection />
+        <CrossCommodityPanel />
+        <RetailCpiPanel />
+      </div>
+      <div className="flex-1 min-h-[400px] border-t border-slate-700">
         <NewsFeedList
+          title="Macro News"
           filterFn={(item) =>
             item.tags?.includes("fx") ||
             item.tags?.includes("freight") ||
