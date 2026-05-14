@@ -158,6 +158,8 @@ export default function CotDashboard() {
         </div>
       )}
 
+      <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
+
       <Step1GlobalFlow macroData={macroData} macroError={macroError} globalFlowMetrics={globalFlowMetrics} />
 
       <div id="cot-section-2"><CotHeatmap data={data} /></div>
@@ -167,7 +169,6 @@ export default function CotDashboard() {
       <Step5DryPowder      data={data} />
       <Step6CycleLocation  recent52={recent52} />
       <Step7Report         data={data} recent52={recent52} />
-      <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
     </div>
   );
 }

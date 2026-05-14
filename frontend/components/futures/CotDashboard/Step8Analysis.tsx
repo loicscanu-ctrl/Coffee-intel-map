@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import type { Signal, SignalSeverity, SignalMarket, HistoricalWeek } from "@/lib/cot/signalEngine";
 import { computeCompositeScores } from "@/lib/cot/signalEngine";
 
@@ -209,17 +210,22 @@ export default function Step8Analysis({
   signals: Signal[];
   historicalSignals?: HistoricalWeek[];
 }) {
+  const [showInfo, setShowInfo] = useState(false);
+
   const alerts = signals.filter(s => s.severity === "alert").length;
   const warns  = signals.filter(s => s.severity === "warn").length;
   const infos  = signals.filter(s => s.severity === "info").length;
 
   const { scoreNY, scoreLDN } = computeCompositeScores(signals);
 
+  // Only show warn/alert by default; info on demand
+  const visible = showInfo ? signals : signals.filter(s => s.severity !== "info");
+
   const groups = CATEGORY_ORDER
     .map(cat => ({
       cat,
       label: CATEGORY_LABELS[cat],
-      sigs:  signals.filter(s => s.category === cat),
+      sigs:  visible.filter(s => s.category === cat),
     }))
     .filter(g => g.sigs.length > 0);
 
@@ -233,7 +239,7 @@ export default function Step8Analysis({
             59 rules · proxies: pmpuShort = producers, pmpuLong = roasters · 52-week percentiles
           </p>
         </div>
-        <div className="flex gap-2 text-[10px] flex-wrap">
+        <div className="flex gap-2 text-[10px] flex-wrap items-center">
           {alerts > 0 && (
             <span className="px-2 py-0.5 rounded-full bg-red-900/40 text-red-400 border border-red-700/40 font-medium">
               {alerts} alert{alerts !== 1 ? "s" : ""}
@@ -245,9 +251,16 @@ export default function Step8Analysis({
             </span>
           )}
           {infos > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-              {infos} info
-            </span>
+            <button
+              onClick={() => setShowInfo(v => !v)}
+              className={`px-2 py-0.5 rounded-full border font-medium transition-colors ${
+                showInfo
+                  ? "bg-slate-700 text-slate-300 border-slate-500"
+                  : "bg-slate-800/60 text-slate-600 border-slate-700 hover:text-slate-400"
+              }`}
+            >
+              {infos} info {showInfo ? "▲" : "▼"}
+            </button>
           )}
           {signals.length === 0 && (
             <span className="text-slate-500">No signals triggered</span>
