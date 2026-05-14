@@ -36,11 +36,14 @@ jobs:
           # gives one missed-cycle buffer.
           THRESHOLDS_H = {
               # Daily / near-daily sources (2-day buffer)
-              "futures":          48,
-              "freight":          48,
-              "weather":          48,
-              "enso":             48,
-              "vietnam_price":    48,  # giacaphe.com via vietnam.py — silent-failed Apr 23 → May 14 2026
+              "futures":              48,
+              "freight":              48,
+              "weather":              48,
+              "enso":                 48,
+              "vietnam_price":        48,  # giacaphe.com via vietnam.py — silent-failed Apr 23 → May 14 2026
+              "quant_currency_index": 48,  # Macro tab Coffee Currency Index (quant_report.json)
+              # Monthly source — Retail CPI series publishes on the 10th–15th of each month
+              "retail_cpi":           45 * 24,
               # Weekly/rolling sources
               "cot":              11 * 24,   # CFTC COT report (weekly, Fri PM)
               "macro_cot":        11 * 24,

@@ -122,13 +122,21 @@ export default function CrossCommodityPanel() {
 
   return (
     <div className="p-4 space-y-4">
-      <div>
-        <h2 className="text-lg font-bold text-white">Cross-Commodity Performance</h2>
-        <p className="text-xs text-slate-400">
-          How coffee is moving relative to other commodity complexes.
-          When KC diverges from sugar/cocoa, the move is coffee-specific; when it tracks grains or WTI, it&apos;s being carried by macro flow.
-          Source: CFTC + ICE COT weekly close prices · as-of {asOf ?? "—"}
-        </p>
+      <div className="flex items-start justify-between flex-wrap gap-2">
+        <div>
+          <h2 className="text-lg font-bold text-white">Cross-Commodity Performance</h2>
+          <p className="text-xs text-slate-400">
+            How coffee is moving relative to other commodity complexes.
+            When KC diverges from sugar/cocoa, the move is coffee-specific; when it tracks grains or WTI, it&apos;s being carried by macro flow.
+            Source: CFTC + ICE COT weekly close prices · as-of {asOf ?? "—"}
+          </p>
+        </div>
+        <a
+          href="/cot#macro-cot"
+          className="text-[11px] text-sky-400 hover:text-sky-300 whitespace-nowrap"
+        >
+          View detailed positioning →
+        </a>
       </div>
 
       <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
