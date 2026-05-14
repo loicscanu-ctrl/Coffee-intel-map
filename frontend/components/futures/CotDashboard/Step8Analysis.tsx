@@ -1,5 +1,6 @@
 "use client";
-import type { Signal, SignalSeverity, SignalMarket } from "@/lib/cot/signalEngine";
+import type { Signal, SignalSeverity, SignalMarket, HistoricalWeek } from "@/lib/cot/signalEngine";
+import { computeCompositeScores } from "@/lib/cot/signalEngine";
 
 const CATEGORY_ORDER = ["CP","CR","CI","ML","MS","MI","MPI","MRI","CS","OB","SP"] as const;
 
@@ -45,10 +46,174 @@ const MARKET_LABEL: Record<SignalMarket, string> = {
   LDN: "RC · Robusta",
 };
 
-export default function Step8Analysis({ signals }: { signals: Signal[] }) {
+// ── Composite score gauge ─────────────────────────────────────────────────────
+
+type ScoreZone = "strongly-bearish" | "bearish" | "neutral" | "bullish" | "strongly-bullish";
+
+function scoreZone(s: number): ScoreZone {
+  if (s <= -5) return "strongly-bearish";
+  if (s <  -2) return "bearish";
+  if (s <=  2) return "neutral";
+  if (s <   5) return "bullish";
+  return "strongly-bullish";
+}
+
+const ZONE_COLOR: Record<ScoreZone, string> = {
+  "strongly-bearish":  "#ef4444",
+  "bearish":           "#f97316",
+  "neutral":           "#94a3b8",
+  "bullish":           "#22c55e",
+  "strongly-bullish":  "#10b981",
+};
+
+const ZONE_LABEL: Record<ScoreZone, string> = {
+  "strongly-bearish":  "Strongly Bearish",
+  "bearish":           "Bearish",
+  "neutral":           "Neutral",
+  "bullish":           "Bullish",
+  "strongly-bullish":  "Strongly Bullish",
+};
+
+/** Clamp score to [-10,10] and convert to 0–100% bar fill. */
+function scoreToFill(s: number): number {
+  const clamped = Math.max(-10, Math.min(10, s));
+  return ((clamped + 10) / 20) * 100;
+}
+
+function CompositeGauge({ label, score }: { label: string; score: number }) {
+  const zone  = scoreZone(score);
+  const fill  = scoreToFill(score);
+  const color = ZONE_COLOR[zone];
+  return (
+    <div className="flex-1 min-w-[140px] bg-slate-800/50 rounded-lg border border-slate-700/50 p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">{label}</span>
+        <span className="text-[11px] font-bold" style={{ color }}>{ZONE_LABEL[zone]}</span>
+      </div>
+      {/* Score bar: center = neutral, left = bearish, right = bullish */}
+      <div className="relative h-2 rounded-full bg-slate-700 overflow-hidden">
+        {/* Center tick */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-500 z-10" />
+        {score >= 0 ? (
+          <div
+            className="absolute top-0 bottom-0 rounded-r-full"
+            style={{ left: "50%", width: `${(fill - 50)}%`, backgroundColor: color }}
+          />
+        ) : (
+          <div
+            className="absolute top-0 bottom-0 rounded-l-full"
+            style={{ right: `${100 - fill}%`, width: `${50 - fill}%`, backgroundColor: color }}
+          />
+        )}
+      </div>
+      <div className="flex justify-between text-[9px] text-slate-600 font-mono">
+        <span>−10</span>
+        <span className="font-semibold" style={{ color }}>{score > 0 ? `+${score}` : score}</span>
+        <span>+10</span>
+      </div>
+    </div>
+  );
+}
+
+// ── 8-week history heatmap ────────────────────────────────────────────────────
+
+const HEATMAP_SEVERITY_BG: Record<SignalSeverity | "none", string> = {
+  none:  "bg-slate-800/30 text-slate-700",
+  info:  "bg-slate-700/60 text-slate-400",
+  warn:  "bg-amber-900/40 text-amber-400",
+  alert: "bg-red-900/40 text-red-400",
+};
+
+function topSeverity(sigs: Signal[]): SignalSeverity | "none" {
+  if (sigs.some(s => s.severity === "alert")) return "alert";
+  if (sigs.some(s => s.severity === "warn"))  return "warn";
+  if (sigs.length > 0)                        return "info";
+  return "none";
+}
+
+function HistoricalHeatmap({ history }: { history: HistoricalWeek[] }) {
+  if (!history.length) return null;
+  const weeks = history.slice(-8);
+
+  return (
+    <div className="space-y-2">
+      {/* Column headers (dates) */}
+      <div className="grid gap-px" style={{ gridTemplateColumns: `80px repeat(${weeks.length}, 1fr)` }}>
+        <div />
+        {weeks.map(w => (
+          <div key={w.date} className="text-[8px] font-mono text-slate-600 text-center truncate px-0.5">
+            {w.date.slice(5)} {/* MM-DD */}
+          </div>
+        ))}
+      </div>
+
+      {/* Category rows */}
+      {CATEGORY_ORDER.map(cat => (
+        <div key={cat} className="grid gap-px items-center" style={{ gridTemplateColumns: `80px repeat(${weeks.length}, 1fr)` }}>
+          <div className="flex items-center gap-1">
+            <span className="text-[8px] font-mono font-bold text-slate-600 uppercase">{cat}</span>
+          </div>
+          {weeks.map(w => {
+            const catSigs = w.signals.filter(s => s.category === cat);
+            const sev     = topSeverity(catSigs);
+            return (
+              <div
+                key={w.date}
+                title={catSigs.length ? `${catSigs.length} signal${catSigs.length > 1 ? "s" : ""}` : "—"}
+                className={`h-5 rounded-sm flex items-center justify-center text-[8px] font-bold ${HEATMAP_SEVERITY_BG[sev]}`}
+              >
+                {catSigs.length > 0 ? catSigs.length : "·"}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      {/* Score bar at the bottom */}
+      <div className="grid gap-px items-center mt-1" style={{ gridTemplateColumns: `80px repeat(${weeks.length}, 1fr)` }}>
+        <div className="text-[8px] font-mono text-slate-600 uppercase">NY score</div>
+        {weeks.map(w => {
+          const z = scoreZone(w.scoreNY);
+          return (
+            <div key={w.date} className="flex flex-col items-center gap-0.5">
+              <div className="text-[8px] font-mono font-bold" style={{ color: ZONE_COLOR[z] }}>
+                {w.scoreNY > 0 ? `+${w.scoreNY}` : w.scoreNY}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid gap-px items-center" style={{ gridTemplateColumns: `80px repeat(${weeks.length}, 1fr)` }}>
+        <div className="text-[8px] font-mono text-slate-600 uppercase">LDN score</div>
+        {weeks.map(w => {
+          const z = scoreZone(w.scoreLDN);
+          return (
+            <div key={w.date} className="flex flex-col items-center gap-0.5">
+              <div className="text-[8px] font-mono font-bold" style={{ color: ZONE_COLOR[z] }}>
+                {w.scoreLDN > 0 ? `+${w.scoreLDN}` : w.scoreLDN}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+export default function Step8Analysis({
+  signals,
+  historicalSignals,
+}: {
+  signals: Signal[];
+  historicalSignals?: HistoricalWeek[];
+}) {
   const alerts = signals.filter(s => s.severity === "alert").length;
   const warns  = signals.filter(s => s.severity === "warn").length;
   const infos  = signals.filter(s => s.severity === "info").length;
+
+  const { scoreNY, scoreLDN } = computeCompositeScores(signals);
 
   const groups = CATEGORY_ORDER
     .map(cat => ({
@@ -90,6 +255,22 @@ export default function Step8Analysis({ signals }: { signals: Signal[] }) {
         </div>
       </div>
 
+      {/* Composite score gauges */}
+      <div className="flex gap-3 flex-wrap">
+        <CompositeGauge label="KC · Arabica (NY)" score={scoreNY}  />
+        <CompositeGauge label="RC · Robusta (LDN)" score={scoreLDN} />
+      </div>
+
+      {/* 8-week signal history */}
+      {historicalSignals && historicalSignals.length > 0 && (
+        <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-3">
+          <div className="text-[10px] text-slate-500 font-medium mb-3 uppercase tracking-wide">
+            8-Week Signal History
+          </div>
+          <HistoricalHeatmap history={historicalSignals} />
+        </div>
+      )}
+
       {/* Signal groups */}
       {groups.map(({ cat, label, sigs }) => (
         <div key={cat} className="space-y-1.5">
@@ -112,7 +293,7 @@ export default function Step8Analysis({ signals }: { signals: Signal[] }) {
                 <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${SEVERITY_DOT[sig.severity]}`} />
 
                 <div className="flex-1 min-w-0">
-                  {/* Rule ID · name · market badge */}
+                  {/* Rule ID · name · market badge · score */}
                   <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                     <span className="text-[9px] font-mono text-slate-600">{sig.id}</span>
                     <span className={`text-[11px] font-semibold ${SEVERITY_LABEL[sig.severity]}`}>
@@ -121,6 +302,11 @@ export default function Step8Analysis({ signals }: { signals: Signal[] }) {
                     <span className={`text-[9px] px-1.5 py-px rounded font-medium ${MARKET_BADGE[sig.market]}`}>
                       {MARKET_LABEL[sig.market]}
                     </span>
+                    {sig.score !== 0 && (
+                      <span className={`text-[9px] font-mono font-bold ml-auto ${sig.score > 0 ? "text-green-400" : "text-red-400"}`}>
+                        {sig.score > 0 ? `+${sig.score}` : sig.score}
+                      </span>
+                    )}
                   </div>
 
                   {/* Interpretation */}

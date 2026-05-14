@@ -20,7 +20,7 @@ import Step5DryPowder from "./Step5DryPowder";
 import Step6CycleLocation from "./Step6CycleLocation";
 import Step7Report from "./Step7Report";
 import Step8Analysis from "./Step8Analysis";
-import { evaluateSignals } from "@/lib/cot/signalEngine";
+import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
   const [step, setStep] = useUrlState<Step>("step", 1, (raw) => {
@@ -48,7 +48,8 @@ export default function CotDashboard() {
   );
   const latest    = data[data.length - 1];
   const recent52  = data.slice(-52);
-  const signals   = useMemo(() => evaluateSignals(data), [data]);
+  const signals            = useMemo(() => evaluateSignals(data), [data]);
+  const historicalSignals  = useMemo(() => evaluateHistoricalSignals(data), [data]);
 
   const globalFlowMetrics = useMemo(
     (): GlobalFlowMetrics | null =>
@@ -166,7 +167,7 @@ export default function CotDashboard() {
       <Step5DryPowder      data={data} />
       <Step6CycleLocation  recent52={recent52} />
       <Step7Report         data={data} recent52={recent52} />
-      <div id="cot-section-8"><Step8Analysis signals={signals} /></div>
+      <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
     </div>
   );
 }
