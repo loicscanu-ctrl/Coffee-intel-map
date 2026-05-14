@@ -1,0 +1,101 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+interface FertilizerItem {
+  name:         string;
+  price_usd_mt: number;
+  mom_pct:      number;
+  input_weight: number;
+  base_usd_per_bag?: number;
+}
+
+interface FarmerEconomics {
+  fertilizer?: {
+    items?:          FertilizerItem[];
+    prices_as_of?:   string;
+    next_application?: string;
+  };
+}
+
+const COLOR: Record<string, string> = {
+  "Urea (N)": "#22c55e",
+  "MAP (P)":  "#3b82f6",
+  "KCl (K)":  "#f97316",
+};
+
+export default function FertilizerInputsPanel() {
+  const [data,  setData]  = useState<FarmerEconomics | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch("/data/farmer_economics.json")
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(setData)
+      .catch(() => setError(true));
+  }, []);
+
+  if (error) {
+    return (
+      <div className="p-4 text-xs text-slate-500">
+        Fertilizer input cost data unavailable.
+      </div>
+    );
+  }
+  const items = data?.fertilizer?.items;
+  if (!data || !items || items.length === 0) {
+    return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading fertilizer inputs…</div>;
+  }
+
+  return (
+    <div className="p-4 space-y-3">
+      <div className="flex items-start justify-between flex-wrap gap-2">
+        <div>
+          <h2 className="text-lg font-bold text-white">Fertilizer Inputs (N-P-K)</h2>
+          <p className="text-xs text-slate-400">
+            Headline N-P-K prices that drive coffee production cost on the supply side.
+            Heavy moves here compress farmer margins and feed into next-cycle break-even economics.
+            Source: World Bank Pink Sheet · {data.fertilizer?.prices_as_of ?? "—"}
+            {data.fertilizer?.next_application
+              ? ` · next application window: ${data.fertilizer.next_application}`
+              : ""}
+          </p>
+        </div>
+        <Link
+          href="/supply"
+          className="text-[11px] text-sky-400 hover:text-sky-300 whitespace-nowrap"
+        >
+          Full breakdown in Supply →
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        {items.map(it => {
+          const cls = it.mom_pct >= 0 ? "text-red-400" : "text-emerald-400";
+          return (
+            <div key={it.name} className="bg-slate-800 border border-slate-700 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-sm"
+                  style={{ background: COLOR[it.name] ?? "#64748b" }}
+                />
+                <span className="text-slate-200 text-[11px]">{it.name}</span>
+              </div>
+              <div className="flex items-baseline justify-between">
+                <div className="text-base font-bold font-mono text-slate-100">
+                  ${it.price_usd_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}<span className="text-[10px] text-slate-500 font-normal">/MT</span>
+                </div>
+                <div className={`text-sm font-bold font-mono ${cls}`}>
+                  {it.mom_pct >= 0 ? "+" : ""}{it.mom_pct.toFixed(1)}%
+                </div>
+              </div>
+              <div className="text-[9px] text-slate-500 mt-1">
+                {(it.input_weight * 100).toFixed(0)}% of coffee input mix · MoM change
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
