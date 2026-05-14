@@ -1564,6 +1564,20 @@ def export_health(db) -> None:
         return None
     scrapers["retail_cpi"] = _cpi_ts()
 
+    # FX history (12 currency pairs, daily closes, ~1 year window). Backs the
+    # Macro tab's FX Pair Time-Series widget. Written by the quant currency
+    # index workflow alongside quant_report.json.
+    def _fx_history_ts() -> str | None:
+        try:
+            p = OUT_DIR / "fx_history.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["fx_history"] = _fx_history_ts()
+
     # Cecafe daily (updates every business day)
     scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
 
