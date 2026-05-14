@@ -622,6 +622,79 @@ function PsdAnalyticalPanel({ eu, japan, usa }: { eu: PsdData | null; japan: Psd
   );
 }
 
+// ── Multi-region Stock-to-Use Comparative ────────────────────────────────────
+
+function StockToUseComparative({ eu, japan, usa }: { eu: PsdData | null; japan: PsdData | null; usa: PsdData | null }) {
+  const sources: Record<Region, PsdData | null> = { eu, japan, usa };
+  const yearSet = new Set<string>();
+  for (const region of Object.values(sources)) {
+    for (const r of region?.annual ?? []) yearSet.add(r.year);
+  }
+  const years = Array.from(yearSet).sort();
+  if (years.length < 2) return null;
+
+  function months(p: PsdAnnualEntry | undefined): number | null {
+    if (!p?.stocks_mt || !p?.consumption_mt) return null;
+    return +((p.stocks_mt / p.consumption_mt) * 12).toFixed(2);
+  }
+
+  const chartData = years.map(y => {
+    const find = (data: PsdData | null) => data?.annual.find(r => r.year === y);
+    return {
+      year: y.slice(2),
+      eu: months(find(eu)),
+      japan: months(find(japan)),
+      usa: months(find(usa)),
+    };
+  });
+
+  const latest = chartData[chartData.length - 1];
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
+      <div className="flex items-baseline justify-between flex-wrap gap-2">
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wide">Stock-to-Use Comparative</div>
+          <div className="text-[8px] text-slate-600 mt-0.5">months of consumption coverage · USDA PSD</div>
+        </div>
+        <div className="flex gap-3 text-[10px] font-mono">
+          <div><span className="text-emerald-400">EU</span> {latest?.eu?.toFixed(1) ?? "—"}mo</div>
+          <div><span className="text-sky-400">JP</span> {latest?.japan?.toFixed(1) ?? "—"}mo</div>
+          <div><span className="text-amber-400">US</span> {latest?.usa?.toFixed(1) ?? "—"}mo</div>
+        </div>
+      </div>
+
+      <div className="h-44">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+            <XAxis dataKey="year" tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} interval={2} />
+            <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}mo`} domain={[0, "auto"]} />
+            <ReferenceLine y={3} stroke="#dc2626" strokeDasharray="3 3" strokeOpacity={0.5} label={{ value: "critical", fontSize: 7, fill: "#dc2626", position: "right" }} />
+            <ReferenceLine y={5} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.5} label={{ value: "tight",    fontSize: 7, fill: "#f59e0b", position: "right" }} />
+            <Tooltip
+              contentStyle={TT_STYLE}
+              formatter={(v: unknown, name: unknown) => {
+                const label = name === "eu" ? "EU" : name === "japan" ? "Japan" : "USA";
+                return [v == null ? "—" : `${Number(v).toFixed(2)} months`, label];
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: 8 }} formatter={(v: string) => v === "eu" ? "EU" : v === "japan" ? "Japan" : "USA"} />
+            <Line dataKey="eu"    type="monotone" stroke="#10b981" strokeWidth={2} dot={false} connectNulls name="eu" />
+            <Line dataKey="japan" type="monotone" stroke="#0ea5e9" strokeWidth={2} dot={false} connectNulls name="japan" />
+            <Line dataKey="usa"   type="monotone" stroke="#f59e0b" strokeWidth={2} dot={false} connectNulls name="usa" />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="text-[9px] text-slate-500">
+        Lower = tighter pipeline (less buffer between ending stocks and a year of consumption).
+        Reference lines: <span className="text-amber-400">5 mo = tight</span>, <span className="text-red-400">3 mo = critical</span>.
+      </div>
+    </div>
+  );
+}
+
+
 // ── Page section ─────────────────────────────────────────────────────────────
 
 export default function StocksPanel() {
@@ -679,6 +752,11 @@ export default function StocksPanel() {
       {/* Row 2: PSD Analytical (full width, EU/Japan/USA tabs) */}
       {hasPsd && (
         <PsdAnalyticalPanel eu={data.eu} japan={data.japan} usa={data.usa} />
+      )}
+
+      {/* Row 3: Stock-to-Use Comparative (all 3 regions overlaid) */}
+      {hasPsd && (
+        <StockToUseComparative eu={data.eu} japan={data.japan} usa={data.usa} />
       )}
     </div>
   );

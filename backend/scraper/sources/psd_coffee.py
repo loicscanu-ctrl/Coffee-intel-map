@@ -64,14 +64,23 @@ _ATTRS = {
 }
 
 # Consuming markets (imports/consumption/stocks).
+# Mature: eu, japan, usa. Korea, China, Russia, Turkey, Philippines, Egypt
+# are the emerging-market growth set for the demand-tab Growth Markets panel.
 _MARKETS = {
-    "eu":    ("european union", "european union (27)", "european union-27", "eu-27"),
-    "japan": ("japan",),
-    "usa":   ("united states",),
-    "korea": ("korea, south", "south korea"),
+    "eu":          ("european union", "european union (27)", "european union-27", "eu-27"),
+    "japan":       ("japan",),
+    "usa":         ("united states",),
+    "korea":       ("korea, south", "south korea"),
+    "china":       ("china",),
+    "russia":      ("russia", "russian federation"),
+    "turkey":      ("turkey", "turkiye", "türkiye"),
+    "philippines": ("philippines",),
+    "egypt":       ("egypt",),
 }
 
 # Top producing countries (production/exports/domestic consumption).
+# These also have meaningful domestic consumption so they appear in the
+# Growth Markets ranking as well, sourced from this block.
 _PRODUCERS = {
     "brazil":    ("brazil",),
     "vietnam":   ("viet nam", "vietnam"),

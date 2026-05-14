@@ -1584,6 +1584,43 @@ def export_demand_stocks(db) -> None:
         print(f"  demand_stocks.json → FAILED: {e}")
 
 
+def export_factory_mix_step() -> None:
+    try:
+        from scraper.export_factory_mix import export_factory_mix as _export_factory_mix
+        _export_factory_mix()
+    except Exception as e:
+        print(f"  factory_mix.json → FAILED: {e}")
+
+
+def export_retail_cpi(db) -> None:
+    """Mirror the retail_cpi cache to /data so the frontend can read it directly."""
+    try:
+        from scraper.sources import retail_cpi as _retail_cpi
+        payload = _retail_cpi.fetch_latest()
+        if not payload:
+            from models import NewsItem
+            item = (
+                db.query(NewsItem)
+                .filter(NewsItem.source == "Retail CPI")
+                .order_by(NewsItem.pub_date.desc())
+                .first()
+            )
+            if item and item.meta:
+                try:
+                    payload = json.loads(item.meta)
+                except Exception:
+                    payload = None
+        if not payload:
+            print("  retail_cpi.json → no data")
+            return
+        path = OUT_DIR / "retail_cpi.json"
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        n = len(payload.get("series") or {})
+        print(f"  retail_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
+    except Exception as e:
+        print(f"  retail_cpi.json → FAILED: {e}")
+
+
 def main():
     print("Exporting static JSON files...")
     db = SessionLocal()
@@ -1604,6 +1641,8 @@ def main():
         export_uganda(db)
         export_ethiopia(db)
         export_demand_stocks(db)
+        export_factory_mix_step()
+        export_retail_cpi(db)
         export_latest_prices(db)
         export_vn_physical_prices(db)
         export_health(db)

@@ -20,6 +20,7 @@ from scraper.sources import ajca as _ajca
 from scraper.sources import ecf_stocks as _ecf_stocks
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import ucda_reports as _ucda_reports
+from scraper.sources import un_wpp_age as _un_wpp_age
 
 TIMEOUT = 300  # 5 min per source
 
@@ -52,6 +53,7 @@ async def run_monthly() -> None:
                 ("psd_coffee",   lambda p: _psd_coffee.run(p, db)),
                 ("ajca",         lambda p: _ajca.run(p, db)),
                 ("ucda_reports", lambda p: _ucda_reports.run(p, db, start_id=1319, scan_back=30)),
+                ("un_wpp_age",   lambda p: _un_wpp_age.run(p, db)),
             ]:
                 page = await browser.new_page()
                 try:
