@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
-import { COUNTRY_HUB, EMPTY_CY, ICE_PORT_COUNTRIES } from "./constants";
+import { COUNTRY_HUB, EMPTY_CY, ICE_KC_COUNTRIES, ICE_RC_COUNTRIES } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
 import type { CecafeData, FilterState } from "./types";
 import { useUrlState } from "@/lib/useUrlState";
@@ -42,8 +42,10 @@ export default function BrazilTab() {
     const history = by_country_history ?? {};
     const ptCountries = filter.country
       ? [filter.country]
-      : filter.hub === "ICE ports"
-      ? [...ICE_PORT_COUNTRIES]
+      : filter.hub === "ICE KC"
+      ? [...ICE_KC_COUNTRIES]
+      : filter.hub === "ICE RC"
+      ? [...ICE_RC_COUNTRIES]
       : filter.hub
       ? Object.entries(COUNTRY_HUB).filter(([, h]) => h === filter.hub).map(([pt]) => pt)
       : null;
