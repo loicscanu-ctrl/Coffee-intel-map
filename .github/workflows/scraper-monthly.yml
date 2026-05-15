@@ -47,8 +47,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Cache files persist scraper output between workflows so
           # export-and-publish.yml can pick it up on its next daily run.
+          # backend/scraper/cache/ is .gitignored (devs don't want local
+          # cache pollution) — force-add the specific files we publish.
           mkdir -p backend/scraper/cache
-          git add backend/scraper/cache/vn_fertilizer.json backend/scraper/cache/vn_coffee_export.json 2>/dev/null || true
+          git add -f backend/scraper/cache/vn_fertilizer.json backend/scraper/cache/vn_coffee_export.json 2>/dev/null || true
           git diff --cached --quiet \
             && echo "No cache changes." \
             || (git commit -m "data: monthly scraper cache update [skip ci]" \
