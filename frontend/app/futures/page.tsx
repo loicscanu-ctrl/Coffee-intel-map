@@ -263,7 +263,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   // 8 shipping months base (stable, only depends on today)
   const monthsBase = useMemo(() => {
     const today = new Date();
-    const offset = today.getDate() >= 20 ? 1 : 0;
+    const offset = today.getDate() >= 14 ? 1 : 0;
     return Array.from({ length: 8 }, (_, i) => {
       const d  = new Date(today.getFullYear(), today.getMonth() + offset + i, 1);
       const mo = d.getMonth() + 1;
