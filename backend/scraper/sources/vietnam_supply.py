@@ -6,30 +6,14 @@ Exports source chain (highest priority first):
      URL pattern: /en/data-and-statistics/{YYYY}/03/exports-and-imports-value-by-months-of-{YYYY}/
      The year-archive page hosts one .xlsx per month listing exports by main
      commodity. Coffee is broken out as its own line in tonnes.
-
-     **Cloud-IP block:** NSO returns 403 to all non-residential IPs (confirmed
-     2026-05-15 via direct fetch from sandbox + WebFetch + GH Actions runner —
-     all three got identical 21-byte 403 responses). To route around this we
-     proxy NSO requests through ScrapingBee with country_code=vn (residential
-     Vietnamese IP). This requires the SCRAPINGBEE_API_KEY secret to be set.
-     If the key is missing or credits run out, NSO is silently skipped and we
-     fall through to the next source.
   2. ICO historical CSV (www.ico.org/historical/...) — kept as legacy fallback,
-     also currently 403 from cloud IPs.
+     but currently returning 403 from cloud IPs as of 2026-05.
   3. Static snapshot vn_export_destination_port.json — frozen at 2024-08, final
      backstop so the chart never goes completely empty.
 
 Each source is attempted independently; results are merged by month with the
 higher-priority source winning. This was rebuilt 2026-05 after the ICO path
 silently died ~Sep 2024 and we'd been on the static fallback for 21 months.
-
-**Credit budget for ScrapingBee free tier (1000/month):** residential proxy
-costs 25 credits/call. At one NSO attempt per UTC day = ~25 credits/day for
-the index page + 25 × N for new xlsx files. To stay under 1000/month we
-enforce an idempotency check at the top of _fetch_nso_exports: if today's
-vietnam_supply.json was scraped today AND already has NSO in its source
-string, we reuse those rows and burn zero credits. If NSO was attempted
-today and failed (no NSO in source), we also skip — one daily attempt max.
 
 Fertilizer imports: same as before — Vietnam GSO / MARD monthly bulletin via
 the vn_fertilizer cache, with static metadata as default.
@@ -38,12 +22,9 @@ from __future__ import annotations
 
 import csv
 import io
-import json
 import logging
-import os
 import re
-from datetime import date, datetime, timedelta
-from pathlib import Path
+from datetime import date, datetime
 
 import requests
 
@@ -218,158 +199,26 @@ def _parse_nso_xlsx(content: bytes, source_url: str) -> list[dict]:
     return out
 
 
-_SCRAPINGBEE_ENDPOINT = "https://app.scrapingbee.com/api/v1/"
-_VN_SUPPLY_JSON = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "vietnam_supply.json"
-
-
-def _fetch_url(url: str, *, is_binary: bool = False) -> bytes | None:
-    """Fetch a URL. Direct first, then ScrapingBee residential proxy if blocked.
-
-    Returns the response body as bytes (None on total failure). Used by all NSO
-    fetches so we always try direct (free) before burning ScrapingBee credits.
-    """
-    # ── Direct attempt (no credits used) ──
-    try:
-        resp = requests.get(url, headers=_HEADERS, timeout=30)
-        if resp.status_code == 200 and len(resp.content) > 50:
-            print(f"  [vn_exports][direct] HTTP 200 ({len(resp.content)}b) {url[-60:]}")
-            return resp.content
-        print(f"  [vn_exports][direct] HTTP {resp.status_code} ({len(resp.content)}b) {url[-60:]}")
-    except Exception as e:
-        print(f"  [vn_exports][direct] {type(e).__name__}: {e} for {url[-60:]}")
-
-    # ── ScrapingBee fallback ──
-    api_key = os.environ.get("SCRAPINGBEE_API_KEY")
-    if not api_key:
-        print("  [vn_exports][scrapingbee] SCRAPINGBEE_API_KEY not set — skipping proxy")
-        return None
-
-    params = {
-        "api_key":      api_key,
-        "url":          url,
-        "render_js":    "false",       # NSO pages are static HTML; saves 5 credits/call
-        "country_code": "vn",          # Vietnamese residential IP — unblocks NSO
-        "premium_proxy": "true",       # required for country_code targeting
-    }
-    try:
-        resp = requests.get(_SCRAPINGBEE_ENDPOINT, params=params, timeout=90)
-        credits_used   = resp.headers.get("Spb-cost", "?")
-        credits_left   = resp.headers.get("Spb-credits-remaining", "?")
-        if resp.status_code == 200 and len(resp.content) > 50:
-            print(f"  [vn_exports][scrapingbee] HTTP 200 ({len(resp.content)}b, "
-                  f"cost={credits_used}, remaining={credits_left}) {url[-60:]}")
-            return resp.content
-        print(f"  [vn_exports][scrapingbee] HTTP {resp.status_code} "
-              f"(cost={credits_used}, remaining={credits_left}, body[:100]={resp.text[:100]!r})")
-    except Exception as e:
-        print(f"  [vn_exports][scrapingbee] {type(e).__name__}: {e}")
-
-    return None
-
-
 def _fetch_nso_year_page(year: int) -> str | None:
     """Try each candidate slug for the year-archive page. Return HTML on success."""
     for tpl in _NSO_YEAR_PAGE_TEMPLATES:
         url = tpl.format(year=year)
-        content = _fetch_url(url)
-        if content and b"xlsx" in content.lower():
-            return content.decode("utf-8", errors="replace")
+        try:
+            resp = requests.get(url, headers=_HEADERS, timeout=30)
+            print(f"  [vn_exports][NSO] {year} index → HTTP {resp.status_code} ({len(resp.content)}b) {url}")
+            if resp.status_code == 200 and "xlsx" in resp.text.lower():
+                return resp.text
+        except Exception as e:
+            print(f"  [vn_exports][NSO] {year} index → {type(e).__name__}: {e}")
     return None
-
-
-def _expected_latest_month() -> str:
-    """The latest month we expect NSO to have published by today.
-
-    NSO publishes with ~4-day lag (e.g. April data appears around May 4-5).
-    Before day 5 of the month, expect prev month; after, expect current month.
-    Used by idempotency to decide whether to bother re-checking.
-    """
-    today = date.today()
-    if today.day >= 5:
-        return today.strftime("%Y-%m")
-    # Before day 5: roll back to previous month
-    first_of_this_month = today.replace(day=1)
-    last_of_prev_month  = first_of_this_month - timedelta(days=1)
-    return last_of_prev_month.strftime("%Y-%m")
-
-
-def _nso_idempotency_decision() -> tuple[bool, list[dict]]:
-    """Decide whether to attempt a network NSO fetch right now.
-
-    Caps ScrapingBee spend tightly — NSO publishes monthly, so we only need
-    to check when we don't already have the expected latest month. Rules:
-
-      A. File missing, or first run after the SCRAPINGBEE_API_KEY was wired
-         (no NSO ever in source) → fetch. This is the cold-start case.
-      B. source contains "NSO" AND monthly[-1] >= expected_latest_month →
-         we have what NSO would tell us anyway → reuse, no fetch.
-      C. scraped_at == today (any source) → already attempted today on this
-         UTC day → reuse cached rows (may be empty if today's attempt failed),
-         no second attempt. Prevents 24 hourly runs each burning credits.
-      D. Else (yesterday's run or older, AND we don't have current data) →
-         fetch.
-
-    Credit budget at typical operating cost: 1 ScrapingBee attempt per day max
-    when we DON'T have current-month data; 0 attempts when we do. So roughly
-    25 credits/day during the ~5-day publication window each month, then 0
-    until the next month's window opens — well under the 1000/month free tier.
-    """
-    if not _VN_SUPPLY_JSON.exists():
-        return True, []
-    try:
-        data = json.loads(_VN_SUPPLY_JSON.read_text(encoding="utf-8"))
-    except Exception:
-        return True, []
-
-    exports = data.get("exports") or {}
-    source  = exports.get("source") or ""
-    monthly = exports.get("monthly") or []
-    cached  = [{"month": m["month"], "total_k_bags": m["total_k_bags"]} for m in monthly]
-    has_nso = "NSO" in source
-
-    expected = _expected_latest_month()
-    have_latest = bool(monthly) and monthly[-1]["month"] >= expected
-
-    # B: have what we'd fetch anyway → reuse
-    if has_nso and have_latest:
-        print(f"  [vn_exports][NSO] cache hit — have {monthly[-1]['month']} (expected ≥ {expected}) from {source}")
-        return False, cached
-
-    # Detect stale-data cold-start: monthly[-1] more than 60 days behind expected.
-    # When data is this old (e.g. on the static fallback after PR #47 didn't get
-    # past the cloud-IP block), we always retry, even if we've already attempted
-    # today — the credit cost of one stale-day retry is worth unblocking a months-
-    # old chart.
-    two_mo_ago_first = (date.today().replace(day=1) - timedelta(days=60)).strftime("%Y-%m")
-    data_is_stale = not monthly or monthly[-1]["month"] < two_mo_ago_first
-
-    # C: already attempted today AND we have reasonably-current data → wait
-    scraped_at = data.get("scraped_at") or ""
-    today_iso  = date.today().isoformat()
-    if scraped_at.startswith(today_iso) and not data_is_stale:
-        print(f"  [vn_exports][NSO] already attempted today (source={source!r}, "
-              f"latest={monthly[-1]['month'] if monthly else 'n/a'}) — waiting until tomorrow")
-        return False, cached
-
-    # A (cold-start, stale) or D (new day): fetch
-    if data_is_stale:
-        print(f"  [vn_exports][NSO] data is stale (latest={monthly[-1]['month'] if monthly else 'none'}, "
-              f"expected ≥ {two_mo_ago_first}) — attempting fetch regardless of today's prior run")
-    return True, []
 
 
 def _fetch_nso_exports() -> list[dict]:
     """Fetch monthly Vietnam coffee exports from NSO Vietnam.
 
-    Walks current year + previous 2 years of year-archive pages, downloads
-    each .xlsx via _fetch_url (direct → ScrapingBee fallback), and extracts
-    the coffee row. Idempotency check at top caps ScrapingBee usage at one
-    attempt per UTC day.
+    Walks the current year + previous 2 years of year-archive pages, downloads
+    each .xlsx linked from them, and extracts the coffee row.
     """
-    should_fetch, cached = _nso_idempotency_decision()
-    if not should_fetch:
-        return cached
-
     current_year = date.today().year
     collected: list[dict] = []
 
@@ -378,10 +227,12 @@ def _fetch_nso_exports() -> list[dict]:
         if html is None:
             continue
 
+        # Collect all .xlsx URLs from the page
         xlsx_urls = re.findall(
             r'href=["\']((?:https?://)?[^"\'\s>]+\.xlsx?)["\']',
             html, re.IGNORECASE,
         )
+        # Normalize relative URLs + dedupe
         norm: list[str] = []
         seen: set[str] = set()
         for u in xlsx_urls:
@@ -395,17 +246,17 @@ def _fetch_nso_exports() -> list[dict]:
         print(f"  [vn_exports][NSO] {year} → {len(norm)} unique xlsx link(s)")
 
         for xlsx_url in norm:
-            content = _fetch_url(xlsx_url, is_binary=True)
-            if not content:
-                continue
             try:
-                parsed = _parse_nso_xlsx(content, xlsx_url)
+                resp = requests.get(xlsx_url, headers=_HEADERS, timeout=60)
+                if resp.status_code != 200:
+                    print(f"    [NSO] {xlsx_url[-60:]} → HTTP {resp.status_code}")
+                    continue
+                parsed = _parse_nso_xlsx(resp.content, xlsx_url)
+                if parsed:
+                    print(f"    [NSO] {xlsx_url[-60:]} → {len(parsed)} month rows")
+                    collected.extend(parsed)
             except Exception as e:
-                print(f"    [NSO] {xlsx_url[-60:]} parse {type(e).__name__}: {e}")
-                continue
-            if parsed:
-                print(f"    [NSO] {xlsx_url[-60:]} → {len(parsed)} month rows")
-                collected.extend(parsed)
+                print(f"    [NSO] {xlsx_url[-60:]} → {type(e).__name__}: {e}")
 
     # Dedupe by month — first observation wins (we walk newest year first)
     by_month: dict[str, dict] = {}
