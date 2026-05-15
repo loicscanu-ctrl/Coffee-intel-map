@@ -1,10 +1,15 @@
 """
 vietnam_supply.py — scrape Vietnam coffee export data and fertilizer import context.
 
-Sources:
-  Exports:             ICO historical CSV (public, no auth required)
-  Fertilizer imports:  Vietnam General Statistics Office / MARD monthly bulletin
-                       (falls back to static known values when unreachable)
+Exports source chain (highest priority first):
+  1. Vietnam Customs 2x monthly bulletins (customs.gov.vn) — primary source as of
+     2026-05. Scraped by vn_coffee_export.run() in the monthly Playwright session,
+     persisted to backend/scraper/cache/vn_coffee_export.json. ~10-day publication
+     lag (e.g. Dec 2024 published Jan 10 2025). Same publication system as our
+     existing vn_fertilizer 1n imports, just filtered for type "2x" (xuất khẩu).
+  2. ICO historical CSV (www.ico.org) — legacy fallback. Started returning 403
+     from cloud IPs in Sep 2024 but kept in case the WAF behaviour reverses.
+  3. Static vn_export_destination_port.json — final backstop, frozen at 2024-08.
 """
 from __future__ import annotations
 
@@ -87,7 +92,49 @@ def _parse_ico_exports(content: str) -> list[dict]:
     return result
 
 
-def _fallback_from_vn_export_port() -> dict | None:
+def _fetch_customs_exports() -> list[dict]:
+    """Read monthly coffee exports from vn_coffee_export cache (tonnes → k_bags)."""
+    import json as _json
+    from pathlib import Path as _Path
+    cache = (
+        _Path(__file__).resolve().parents[2]
+        / "scraper" / "cache" / "vn_coffee_export.json"
+    )
+    if not cache.exists():
+        return []
+    try:
+        data = _json.loads(cache.read_text(encoding="utf-8"))
+        monthly = data.get("monthly") or []
+        out: list[dict] = []
+        for r in monthly:
+            t = r.get("tonnes") or 0
+            if t <= 0:
+                continue
+            out.append({
+                "month":        r["month"],
+                "total_k_bags": round(t / 60, 1),
+            })
+        return sorted(out, key=lambda r: r["month"])
+    except Exception as e:
+        logger.warning(f"[vietnam_supply] vn_coffee_export cache read failed: {e}")
+        return []
+
+
+def _fetch_ico_exports() -> list[dict]:
+    """Try ICO CSV. Empty list on any failure."""
+    try:
+        resp = requests.get(_ICO_CSV_URL, headers=_HEADERS, timeout=30)
+        if resp.status_code != 200:
+            return []
+        parsed = _parse_ico_exports(resp.text)
+        # _parse_ico_exports already adds yoy_pct + truncates; strip yoy for merge.
+        return [{"month": r["month"], "total_k_bags": r["total_k_bags"]} for r in parsed]
+    except Exception as e:
+        logger.warning(f"[vietnam_supply] ICO fetch failed: {e}")
+        return []
+
+
+def _fetch_static_exports() -> list[dict]:
     """Read monthly_total (MT) from vn_export_destination_port.json → k_bags."""
     import json as _json
     from pathlib import Path as _Path
@@ -96,56 +143,73 @@ def _fallback_from_vn_export_port() -> dict | None:
         / "frontend" / "public" / "data" / "vn_export_destination_port.json"
     )
     if not port_file.exists():
-        return None
+        return []
     try:
         data = _json.loads(port_file.read_text(encoding="utf-8"))
         mt_by_month: dict = data.get("monthly_total", {})
         if not mt_by_month:
-            return None
-        months = sorted(mt_by_month.keys())
-        by_month: dict[str, float] = {}
-        for m in months:
-            by_month[m] = round(mt_by_month[m] / 60, 1)  # MT → thousand 60kg bags
-        monthly = []
-        for m in months:
-            y, mo = m.split("-")
-            prev_key = f"{int(y)-1}-{mo}"
-            prev = by_month.get(prev_key)
-            yoy = round((by_month[m] - prev) / prev * 100, 1) if prev else None
-            monthly.append({"month": m, "total_k_bags": by_month[m], "yoy_pct": yoy})
-        if len(monthly) > 36:
-            monthly = monthly[-36:]
-        last_month = monthly[-1]["month"]
-        logger.info(f"[vietnam_supply] ICO unavailable — using vn_export_destination_port fallback ({last_month})")
-        return {
-            "source":       "Vietnam Customs (vn_export_destination_port)",
-            "last_updated": last_month,
-            "unit":         "thousand_60kg_bags",
-            "monthly":      monthly,
-        }
+            return []
+        return [
+            {"month": m, "total_k_bags": round(mt / 60, 1)}
+            for m, mt in sorted(mt_by_month.items())
+            if mt and mt > 0
+        ]
     except Exception as e:
-        logger.warning(f"[vietnam_supply] fallback read failed: {e}")
-        return None
+        logger.warning(f"[vietnam_supply] static fallback read failed: {e}")
+        return []
+
+
+def _compute_yoy(monthly: list[dict]) -> list[dict]:
+    by_month = {r["month"]: r["total_k_bags"] for r in monthly}
+    out: list[dict] = []
+    for r in monthly:
+        y, mo = r["month"].split("-")
+        prev = by_month.get(f"{int(y)-1}-{mo}")
+        yoy = round((r["total_k_bags"] - prev) / prev * 100, 1) if prev else None
+        out.append({**r, "yoy_pct": yoy})
+    return out
 
 
 def fetch_exports() -> dict | None:
-    """Fetch ICO CSV and return Vietnam export dict, or None on failure."""
-    try:
-        resp = requests.get(_ICO_CSV_URL, headers=_HEADERS, timeout=30)
-        resp.raise_for_status()
-        monthly = _parse_ico_exports(resp.text)
-        if not monthly:
-            return _fallback_from_vn_export_port()
-        last_month = monthly[-1]["month"]
-        return {
-            "source":       "ICO",
-            "last_updated": last_month,
-            "unit":         "thousand_60kg_bags",
-            "monthly":      monthly,
-        }
-    except Exception as e:
-        logger.warning(f"[vietnam_supply] ICO fetch failed: {e}")
-        return _fallback_from_vn_export_port()
+    """Run the source chain, merge by month with higher-priority sources winning.
+
+    Customs (cache) → ICO (live HTTP) → static. Keep the last 36 months,
+    compute YoY across the merged series, and report which sources contributed.
+    """
+    sources = [
+        ("Vietnam Customs (customs.gov.vn) 2x", _fetch_customs_exports),
+        ("ICO",                                  _fetch_ico_exports),
+        ("Vietnam Customs (static snapshot)",    _fetch_static_exports),
+    ]
+
+    by_month: dict[str, dict] = {}
+    for name, fn in sources:
+        try:
+            rows = fn()
+        except Exception as e:
+            logger.warning(f"[vietnam_supply] {name} threw {type(e).__name__}: {e}")
+            continue
+        for r in rows:
+            if r["month"] not in by_month:
+                by_month[r["month"]] = {**r, "_source": name}
+
+    if not by_month:
+        return None
+
+    all_months = sorted(by_month.keys())
+    full = [{"month": m, "total_k_bags": by_month[m]["total_k_bags"]} for m in all_months]
+    full = _compute_yoy(full)
+    monthly = full[-36:]
+
+    window_months = {r["month"] for r in monthly}
+    sources_used = sorted({by_month[m]["_source"] for m in window_months})
+
+    return {
+        "source":       " + ".join(sources_used),
+        "last_updated": monthly[-1]["month"],
+        "unit":         "thousand_60kg_bags",
+        "monthly":      monthly,
+    }
 
 
 # ── Fertilizer import context ──────────────────────────────────────────────────
