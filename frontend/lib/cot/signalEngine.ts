@@ -37,13 +37,13 @@ function dir(prev: number, curr: number): Dir {
   return "flat";
 }
 
-/** 52-week percentile rank of values[idx] within its trailing 52-week window. 0=min, 1=max. */
+/** 52-week min-max percentile of values[idx] — matches the Gauges display formula: (current−min)/(max−min). */
 function pct52(values: number[], idx: number): number {
   const start  = Math.max(0, idx - 51);
   const window = values.slice(start, idx + 1);
-  const v      = values[idx];
-  const below  = window.filter(x => x <= v).length;
-  return window.length > 0 ? below / window.length : 0.5;
+  const min    = Math.min(...window);
+  const max    = Math.max(...window);
+  return max > min ? (values[idx] - min) / (max - min) : 0.5;
 }
 
 const isHigh = (s: number[], i: number) => pct52(s, i) >= 0.75;
