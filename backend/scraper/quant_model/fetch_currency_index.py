@@ -29,7 +29,6 @@ from pathlib import Path
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -37,18 +36,38 @@ ROOT       = Path(__file__).resolve().parents[3]
 OUT_PATH   = ROOT / "frontend" / "public" / "data" / "quant_report.json"
 FX_OUT     = ROOT / "frontend" / "public" / "data" / "fx_history.json"
 
-# yfinance hits query1.finance.yahoo.com directly. Default User-Agent is
-# "Python-urllib/..." which Yahoo aggressively rate-limits / 403s from
-# cloud-provider IP ranges (Azure, GCP — and GitHub Actions runners run
-# on Azure). Empirically reproduced 2026-05-11 onwards: workflow stopped
-# committing quant_report.json silently, all 12 tickers returning empty
-# DataFrames, "Run Currency Index scraper" step hitting sys.exit(1).
+# yfinance hits query1.finance.yahoo.com directly. From cloud-provider IP
+# ranges (Azure / GH Actions) Yahoo blocks bare-UA Python clients AND, since
+# late-April 2026, has been Cloudflare-protecting the crumb-token endpoint
+# yfinance scrapes for auth. Previous fix (PR #46) supplied a Chrome UA via
+# requests.Session — that bypassed the static UA filter but the TLS
+# fingerprint was still flagged at the Cloudflare layer, so the crumb fetch
+# returned an HTML challenge page, JSON-parse failed, every subsequent
+# ticker call returned empty body → JSONDecodeError. Observed 2026-05-14
+# 22:37 UTC run: all 12 tickers identical "Expecting value: line 1 column 1".
 #
-# Passing a Session with a real browser UA bypasses the default block —
-# this is the documented yfinance override path (`session=` kwarg accepted
-# by yf.download).
-def _build_session() -> requests.Session:
-    s = requests.Session()
+# Fix: switch the underlying transport to curl_cffi, which uses
+# libcurl-impersonate and mimics Chrome's exact TLS fingerprint (JA3 / ALPN /
+# extension order). yfinance accepts a curl_cffi.requests.Session via its
+# `session=` kwarg — same API surface as requests.Session, drop-in.
+try:
+    from curl_cffi import requests as cffi_requests
+    _HAVE_CURL_CFFI = True
+except ImportError:
+    import requests as cffi_requests  # fallback so dev environments without curl_cffi still import
+    _HAVE_CURL_CFFI = False
+    print("  WARNING: curl_cffi not installed — falling back to requests.Session "
+          "(Yahoo crumb auth will likely fail on cloud IPs)", file=sys.stderr)
+
+def _build_session():
+    """Build a yfinance-compatible session that survives Yahoo's bot detection."""
+    if _HAVE_CURL_CFFI:
+        # impersonate="chrome124" reproduces Chrome 124's TLS handshake.
+        # Yahoo's Cloudflare front then sees a "real" browser and serves
+        # the JSON crumb endpoint instead of an HTML challenge.
+        s = cffi_requests.Session(impersonate="chrome124")
+        return s
+    s = cffi_requests.Session()
     s.headers.update({
         "User-Agent": (
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
