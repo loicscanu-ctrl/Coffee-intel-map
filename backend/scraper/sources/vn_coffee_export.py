@@ -1,28 +1,25 @@
 """
 vn_coffee_export.py — Monthly scraper for Vietnam coffee export data.
 
-Source: Vietnam Customs Statistical Publication portal (same system as vn_fertilizer)
-  https://www.customs.gov.vn/index.jsp?pageId=441&cid=192
+Two-path source strategy against Vietnam Customs:
 
-Differs from vn_fertilizer in one thing: the publication filter. Imports are
-type "1n" (nhập khẩu, all-trader). Exports are type "2x" (xuất khẩu, by
-commodity). Customs publishes monthly export bulletins as PDFs with filenames
-like `{YYYY}-t{MM}-2x(vn-sb).pdf`, e.g.
-  https://files.customs.gov.vn/CustomsCMS/TONG_CUC/2025/1/10/2024-t12-2x(vn-sb).pdf
-(December 2024 exports, published Jan 10, 2025 — ~10 day publication lag).
+  Path A (primary): direct PDF URL prediction.
+    Customs publishes monthly export bulletins at a predictable path on
+    files.customs.gov.vn:
+      /CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{pub_d}/{data_y}-t{data_m}-2x(vn-sb).pdf
+    The publication date is typically the 8th–18th of the FOLLOWING month
+    (e.g. December 2024 published 2025/1/10). We just iterate candidate
+    days and download whichever URL responds 200. No portal session needed.
+
+  Path B (fallback): customs portal + bridge API (vn_fertilizer pattern).
+    Loads www.customs.gov.vn/index.jsp?pageId=441 via Playwright, calls
+    LayDanhSachMoiCongBoServlet to enumerate publications, filters for "2x".
+    Used only if path A returned nothing — also gives us diagnostic visibility
+    into why the bridge fails when it does.
 
 Each 2x bulletin contains the full HS-chapter commodity table for the month.
 Coffee ("Cà phê") appears as a single row whose period_qty column gives that
 month's exports in tonnes. We convert to thousand 60kg bags downstream.
-
-Flow:
-  1. Playwright opens customs portal (establishes session cookies).
-  2. page.evaluate() calls LayDanhSachMoiCongBoServlet via the bridge proxy.
-  3. Filter publications for type "2x" (export commodity bulletins).
-  4. Download each PDF via requests (files.customs.gov.vn is open access).
-  5. pdfplumber finds the "Cà phê" row and reads period + cumulative tonnes.
-  6. Write to backend/scraper/cache/vn_coffee_export.json
-     (read by vietnam_supply.fetch_exports() at export time).
 
 Column layout in 2x PDFs (0-indexed, assumed parallel to 1n template):
   [0] row index  [1] commodity  [2] unit  [3] period_qty  [4] period_usd
@@ -39,7 +36,7 @@ import logging
 import re
 import sys
 import unicodedata
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -163,7 +160,116 @@ def _extract_coffee_row(pdf_bytes: bytes) -> dict | None:
         return None
 
 
-# ── portal helpers ──────────────────────────────────────────────────────────────
+# ── URL-prediction (path A) ─────────────────────────────────────────────────────
+
+# Where customs hosts the published PDFs. No auth, but TLS cert is sometimes
+# misconfigured so we verify=False (matches vn_fertilizer's _download_pdf).
+_FILES_HOST = "https://files.customs.gov.vn"
+
+
+def _months_to_try(months_back: int = 18) -> list[tuple[int, int]]:
+    """Last `months_back` completed months, oldest first (e.g. for May 2026 → starts at Nov 2024)."""
+    today = date.today()
+    y, m = today.year, today.month - 1
+    if m == 0:
+        m, y = 12, y - 1
+    out: list[tuple[int, int]] = []
+    for _ in range(months_back):
+        out.append((y, m))
+        m -= 1
+        if m == 0:
+            m, y = 12, y - 1
+    return sorted(out)
+
+
+def _candidate_pdf_urls(data_year: int, data_month: int) -> list[str]:
+    """Generate likely PDF URLs for one data month.
+
+    Publication month = data_month + 1. Publication day varies but clusters
+    around the 10th — we try 8..20 in plausibility order. Both lowercase
+    'tN' (modern convention, observed 2024+) and uppercase 'TN' (older
+    bulletins) are emitted in case customs is inconsistent.
+    """
+    pub_year, pub_month = data_year, data_month + 1
+    if pub_month > 12:
+        pub_month = 1
+        pub_year += 1
+
+    # Plausibility-ordered days; first hit wins so order matters for HTTP cost.
+    day_order = [10, 11, 9, 12, 8, 13, 14, 15, 7, 16, 6, 17, 5, 18, 19, 20]
+
+    urls: list[str] = []
+    for tprefix in ("t", "T"):
+        for mfmt in (str(data_month), f"{data_month:02d}"):
+            stem = f"{data_year}-{tprefix}{mfmt}-2x(vn-sb).pdf"
+            for d in day_order:
+                urls.append(f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_year}/{pub_month}/{d}/{stem}")
+    # Dedupe while preserving order (data_month and f"{data_month:02d}" collide for 10–12).
+    seen: set[str] = set()
+    out: list[str] = []
+    for u in urls:
+        if u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+def _try_download_pdf(url: str) -> bytes | None:
+    """GET the URL; return PDF bytes on 200 + valid magic, else None.
+
+    Distinguishes 404 (URL wrong → try next candidate) from 403 (Cloudflare
+    or similar → URL pattern probably right but we're blocked) via logging.
+    """
+    import requests
+    try:
+        resp = requests.get(url, timeout=30, verify=False, allow_redirects=True)
+        if resp.status_code == 200 and b"%PDF" in resp.content[:10]:
+            return resp.content
+        if resp.status_code == 403:
+            logger.warning(f"[vn_coffee_export] 403 on {url} — host accessible but blocked")
+        # 404 is expected for wrong candidate days — silent.
+        return None
+    except Exception as e:
+        logger.warning(f"[vn_coffee_export] GET {url} threw {type(e).__name__}: {e}")
+        return None
+
+
+def _find_pdf_for_month(year: int, month: int) -> tuple[str, bytes] | None:
+    """Try candidate URLs for (year, month); return (url, bytes) on first hit."""
+    for url in _candidate_pdf_urls(year, month):
+        body = _try_download_pdf(url)
+        if body:
+            return url, body
+    return None
+
+
+def _harvest_via_url_prediction(months_back: int = 18) -> dict[str, dict]:
+    """Path A: discover bulletins by guessing the publication URL.
+
+    Returns {month_key: extracted_dict} for every month where we found a PDF
+    AND successfully parsed a coffee row from it.
+    """
+    per_month: dict[str, dict] = {}
+    targets = _months_to_try(months_back)
+    print(f"[vn_coffee_export] [pathA] trying {len(targets)} months via URL prediction")
+    for (y, mo) in targets:
+        key = f"{y}-{mo:02d}"
+        hit = _find_pdf_for_month(y, mo)
+        if not hit:
+            print(f"[vn_coffee_export] [pathA] {key}: no PDF at predicted URLs")
+            continue
+        url, pdf_bytes = hit
+        extracted = _extract_coffee_row(pdf_bytes)
+        if not extracted:
+            print(f"[vn_coffee_export] [pathA] {key}: PDF fetched but no coffee row — {url.rsplit('/', 1)[-1]}")
+            continue
+        per_month[key] = extracted
+        print(f"[vn_coffee_export] [pathA] {key}: period={extracted['period_qty_tonnes']:.0f}t "
+              f"ytd={extracted['ytd_cum_qty_tonnes']:.0f}t (pub {url.split('/TONG_CUC/', 1)[1].split('/', 3)[:3]})")
+    return per_month
+
+
+# ── portal helpers (path B fallback) ────────────────────────────────────────────
 
 async def _fetch_publication_list(page) -> list[dict]:
     """Call LayDanhSachMoiCongBoServlet via page.evaluate() (browser session required).
@@ -305,70 +411,78 @@ def _derive_monthly_rows(raw: dict[str, dict]) -> list[dict]:
 
 # ── main runner ─────────────────────────────────────────────────────────────────
 
+async def _harvest_via_bridge(page) -> dict[str, dict]:
+    """Path B: portal session + bridge API to enumerate publications.
+
+    Returns the same {month_key: extracted_dict} shape as path A. Heavy
+    diagnostics inside _fetch_publication_list will surface any portal /
+    bridge issues to the workflow log.
+    """
+    per_month: dict[str, dict] = {}
+    print("[vn_coffee_export] [pathB] navigating to customs portal...")
+    await page.goto(_PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
+    await page.wait_for_timeout(2_000)
+
+    publications = await _fetch_publication_list(page)
+    print(f"[vn_coffee_export] [pathB] got {len(publications)} publications")
+
+    if not publications:
+        return per_month
+
+    pubs_2x: list[dict] = []
+    for pub in publications:
+        file_url  = pub.get("fileSoBo") or pub.get("filePath") or pub.get("url") or ""
+        type_code = pub.get("loaiBaoCao") or pub.get("type") or pub.get("reportType") or ""
+        name      = pub.get("tenBaoCao") or pub.get("name") or pub.get("title") or ""
+        combined  = f"{file_url} {type_code} {name}"
+        if not _is_2x(combined):
+            continue
+        month = _period_to_month(combined)
+        if month:
+            pubs_2x.append({"month": month, "url": file_url, "raw": combined})
+
+    print(f"[vn_coffee_export] [pathB] {len(pubs_2x)} 2x bulletins identified")
+    if not pubs_2x:
+        return per_month
+
+    by_month: dict[str, str] = {}
+    for pub in pubs_2x:
+        by_month.setdefault(pub["month"], pub["url"])
+
+    for month, url in sorted(by_month.items()):
+        pdf_bytes = _download_pdf(url)
+        if not pdf_bytes:
+            print(f"[vn_coffee_export] [pathB] {month}: PDF download failed")
+            continue
+        extracted = _extract_coffee_row(pdf_bytes)
+        if not extracted:
+            print(f"[vn_coffee_export] [pathB] {month}: no coffee row found")
+            continue
+        per_month[month] = extracted
+        print(f"[vn_coffee_export] [pathB] {month}: period={extracted['period_qty_tonnes']:.0f}t "
+              f"ytd={extracted['ytd_cum_qty_tonnes']:.0f}t")
+    return per_month
+
+
 async def run(page, db) -> None:  # noqa: ARG001
     """Scrape Vietnam Customs coffee export data, write to cache.
 
-    On any failure: logs and retains existing cache (does NOT raise).
+    Two paths attempted in order: URL prediction (no portal needed) and the
+    portal+bridge API. On total failure: logs and retains existing cache.
     """
     import warnings
     warnings.filterwarnings("ignore", message="Unverified HTTPS request")
 
     try:
-        print("[vn_coffee_export] Navigating to Vietnam Customs portal...")
-        await page.goto(_PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
-        await page.wait_for_timeout(2_000)
-
-        publications = await _fetch_publication_list(page)
-        print(f"[vn_coffee_export] Got {len(publications)} publications")
-
-        if not publications:
-            print("[vn_coffee_export] No publications returned — retaining cache")
-            return
-
-        # Filter for 2x bulletins (monthly exports by commodity).
-        pubs_2x: list[dict] = []
-        for pub in publications:
-            file_url  = pub.get("fileSoBo") or pub.get("filePath") or pub.get("url") or ""
-            type_code = pub.get("loaiBaoCao") or pub.get("type") or pub.get("reportType") or ""
-            name      = pub.get("tenBaoCao") or pub.get("name") or pub.get("title") or ""
-            combined  = f"{file_url} {type_code} {name}"
-
-            if not _is_2x(combined):
-                continue
-
-            month = _period_to_month(combined)
-            if month:
-                pubs_2x.append({"month": month, "url": file_url, "raw": combined})
-
-        print(f"[vn_coffee_export] {len(pubs_2x)} 2x bulletins identified")
-
-        if not pubs_2x:
-            print("[vn_coffee_export] No 2x publications found — retaining cache")
-            return
-
-        # Deduplicate by month (keep latest URL — Customs sometimes republishes
-        # with revisions). The API order is newest-first so first wins.
-        by_month: dict[str, str] = {}
-        for pub in pubs_2x:
-            by_month.setdefault(pub["month"], pub["url"])
-
-        # Download and parse each PDF
-        per_month: dict[str, dict] = {}
-        for month, url in sorted(by_month.items()):
-            pdf_bytes = _download_pdf(url)
-            if not pdf_bytes:
-                print(f"[vn_coffee_export] {month}: PDF download failed — skipping")
-                continue
-            extracted = _extract_coffee_row(pdf_bytes)
-            if not extracted:
-                print(f"[vn_coffee_export] {month}: no coffee row found")
-                continue
-            per_month[month] = extracted
-            print(f"[vn_coffee_export] {month}: period={extracted['period_qty_tonnes']:.0f}t "
-                  f"ytd={extracted['ytd_cum_qty_tonnes']:.0f}t")
+        # Path A: direct URL prediction — fast, no Playwright dependency.
+        per_month = _harvest_via_url_prediction(months_back=18)
 
         if not per_month:
-            print("[vn_coffee_export] No data extracted — retaining cache")
+            print("[vn_coffee_export] path A returned nothing — trying path B (bridge API)")
+            per_month = await _harvest_via_bridge(page)
+
+        if not per_month:
+            print("[vn_coffee_export] both paths failed — retaining cache")
             return
 
         monthly = _derive_monthly_rows(per_month)
