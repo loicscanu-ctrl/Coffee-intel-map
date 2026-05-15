@@ -9,6 +9,8 @@ function App() {
   var data               = baked.processed;
   var macroData          = baked.macroData;
   var globalFlowMetrics  = baked.globalFlowMetrics;
+  var signals            = baked.signals || [];
+  var historicalSignals  = baked.historicalSignals || [];
   var recent52           = data.slice(-52);
   var latest             = data[data.length - 1];
   var prev1              = data.length >= 2 ? data[data.length - 2] : null;
@@ -289,9 +291,10 @@ function App() {
   };
 
   var NAV = [
-    { id:"section-1", icon:"Globe",    label:"Flow"       },
+    { id:"section-8", icon:"Signals",  label:"Signals"    },
     { id:"section-2", icon:"Grid",     label:"Heatmap"    },
     { id:"section-3", icon:"Sliders",  label:"Gauges"     },
+    { id:"section-1", icon:"Globe",    label:"Flow"       },
     { id:"section-4", icon:"Factory",  label:"Industry"   },
     { id:"section-5", icon:"Droplets", label:"Dry Powder" },
     { id:"section-6", icon:"Scale",    label:"Cycle"      },
@@ -478,6 +481,11 @@ function App() {
             <AttributionTable gfm={globalFlowMetrics} />
           </div>
         )}
+      </div>
+
+      {/* ── Section 8: Signals ───────────────────────────────────────────────── */}
+      <div id="section-8">
+        <SignalsSection signals={signals} historicalSignals={historicalSignals} />
       </div>
 
       {/* ── Section 2: Heatmap ───────────────────────────────────────────────── */}

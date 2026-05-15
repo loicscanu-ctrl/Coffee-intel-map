@@ -91,6 +91,8 @@ export default function CotDashboard() {
           data,
           macroData,
           globalFlowMetrics ?? null,
+          signals,
+          historicalSignals,
           dateStr,
           reactJs, reactDomJs, propTypesJs, rechartsJs, babelJs,
           appCss
