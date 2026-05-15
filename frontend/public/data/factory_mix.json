@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-14T06:11:03.595867Z",
+  "generated_at": "2026-05-15T11:42:13.550009Z",
   "source": "backend/seed/factories.json",
   "note": "Consumer-side capacity only (mills excluded). Capacity in kilo-tonnes/year, parsed best-effort.",
-  "total_kt": 5801.1,
+  "total_kt": 5731.1,
   "global_by_type": {
     "roastery": 3540.0,
-    "soluble": 646.5,
+    "soluble": 626.5,
     "capsules": 252.0,
     "decaf": 20.0,
-    "mixed": 1342.6
+    "mixed": 1292.6
   },
   "regions": [
     {
@@ -24,13 +24,13 @@
     },
     {
       "name": "North America",
-      "total_kt": 1562.0,
+      "total_kt": 1492.0,
       "by_type": {
         "roastery": 1023.0,
-        "soluble": 24.0,
+        "soluble": 4.0,
         "capsules": 80.0,
         "decaf": 20.0,
-        "mixed": 415.0
+        "mixed": 365.0
       }
     },
     {
