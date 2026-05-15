@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-15T04:58:07.271127Z",
+  "generated_at": "2026-05-15T04:59:56.192307Z",
   "scrapers": {
     "futures": "2026-05-15T04:49:07.836392",
     "cot": "2026-05-12",
     "macro_cot": "2026-05-05",
     "freight": "2026-05-15",
-    "weather": "2026-05-15T04:57:56.834574",
+    "weather": "2026-05-15T04:58:14.844575",
     "enso": "2026-05-15T04:51:24.448516",
     "fertilizer_wb": "2026-05-15T04:51:40.589976",
     "fertilizer_comex": "2026-05-12T05:44:11.172597",
@@ -18,14 +18,14 @@
     "quant_currency_index": "2026-05-08T22:30:41.710647+00:00",
     "retail_cpi": "2026-05-15",
     "fx_history": null,
-    "origin_prices": "2026-05-15T04:58:04.773113Z",
+    "origin_prices": "2026-05-15T04:59:53.764435Z",
     "cecafe_daily": "2026-05-08",
     "brazil_exports": "2026-05-13",
-    "colombia_exports": "2026-05-15T04:57:58.720724Z",
-    "honduras_exports": "2026-05-15T04:57:59.317003Z",
-    "ethiopia_exports": "2026-05-15T04:58:01.101211Z",
-    "vietnam_exports": "2026-05-15T04:57:57.840926Z",
-    "indonesia_exports": "2026-05-15T04:57:59.765499Z",
-    "uganda_exports": "2026-05-15T04:58:00.505196+00:00"
+    "colombia_exports": "2026-05-15T04:59:47.971994Z",
+    "honduras_exports": "2026-05-15T04:59:48.558228Z",
+    "ethiopia_exports": "2026-05-15T04:59:50.301076Z",
+    "vietnam_exports": "2026-05-15T04:59:47.113561Z",
+    "indonesia_exports": "2026-05-15T04:59:48.998071Z",
+    "uganda_exports": "2026-05-15T04:59:49.721581+00:00"
   }
 }
