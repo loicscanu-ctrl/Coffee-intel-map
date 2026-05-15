@@ -166,33 +166,83 @@ def _extract_coffee_row(pdf_bytes: bytes) -> dict | None:
 # ── portal helpers ──────────────────────────────────────────────────────────────
 
 async def _fetch_publication_list(page) -> list[dict]:
-    """Call LayDanhSachMoiCongBoServlet via page.evaluate() (browser session required)."""
+    """Call LayDanhSachMoiCongBoServlet via page.evaluate() (browser session required).
+
+    Heavy diagnostics: the previous version silently returned [] on any
+    structural surprise. Both vn_fertilizer and vn_coffee_export observed
+    'Got 0 publications' in production, so we now log the page state and
+    the raw bridge response to figure out where the data is hiding.
+    """
     try:
+        print(f"[vn_coffee_export] page.url after goto: {page.url}")
+        try:
+            title = await page.title()
+            body_preview = await page.evaluate("() => document.body ? document.body.innerText.slice(0, 400) : ''")
+            print(f"[vn_coffee_export] page title: {title!r}")
+            print(f"[vn_coffee_export] body preview: {body_preview!r}")
+        except Exception as e:
+            print(f"[vn_coffee_export] page introspection failed: {e}")
+
+        # Try the bridge API. Return the raw response so we can see what came back.
         result = await page.evaluate(f"""async () => {{
-            const resp = await fetch(
-                '{_BRIDGE_URL}',
-                {{
-                    method: 'POST',
-                    headers: {{
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'x-requested-with': 'XMLHttpRequest'
-                    }},
-                    body: JSON.stringify({{"pageId": "441", "pageSize": 200, "pageIndex": 1}})
-                }}
-            );
-            if (!resp.ok) return null;
-            return resp.json();
+            try {{
+                const resp = await fetch(
+                    '{_BRIDGE_URL}',
+                    {{
+                        method: 'POST',
+                        headers: {{
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'x-requested-with': 'XMLHttpRequest'
+                        }},
+                        body: JSON.stringify({{"pageId": "441", "pageSize": 200, "pageIndex": 1}})
+                    }}
+                );
+                const text = await resp.text();
+                let parsed = null;
+                try {{ parsed = JSON.parse(text); }} catch {{}}
+                return {{
+                    status:       resp.status,
+                    ok:           resp.ok,
+                    final_url:    resp.url,
+                    body_len:     text.length,
+                    body_preview: text.slice(0, 800),
+                    parsed:       parsed
+                }};
+            }} catch (e) {{
+                return {{ error: e.toString() }};
+            }}
         }}""")
-        if not result:
+
+        print(f"[vn_coffee_export] bridge raw status={result.get('status')} ok={result.get('ok')} "
+              f"len={result.get('body_len')} final_url={result.get('final_url')!r}")
+        if result.get("error"):
+            print(f"[vn_coffee_export] bridge JS error: {result['error']}")
             return []
-        if isinstance(result, list):
-            return result
-        for key in ("data", "list", "items", "records", "danhSach"):
-            if isinstance(result.get(key), list):
-                return result[key]
+        body_preview = result.get("body_preview", "")
+        if body_preview:
+            print(f"[vn_coffee_export] bridge body_preview: {body_preview!r}")
+
+        parsed = result.get("parsed")
+        if parsed is None:
+            print("[vn_coffee_export] bridge response was not JSON")
+            return []
+        if isinstance(parsed, list):
+            print(f"[vn_coffee_export] bridge returned top-level array, len={len(parsed)}")
+            return parsed
+        if isinstance(parsed, dict):
+            print(f"[vn_coffee_export] bridge returned object, keys={list(parsed.keys())}")
+            for key in ("data", "list", "items", "records", "danhSach", "result", "Data", "rows"):
+                if isinstance(parsed.get(key), list):
+                    print(f"[vn_coffee_export] using key {key!r}, len={len(parsed[key])}")
+                    return parsed[key]
+            # No expected key matched — log the first item-like value if any.
+            for k, v in parsed.items():
+                if isinstance(v, list) and v:
+                    print(f"[vn_coffee_export] unexpected key {k!r} with list of {len(v)} — using it")
+                    return v
         return []
     except Exception as e:
-        logger.warning(f"[vn_coffee_export] publication list fetch failed: {e}")
+        print(f"[vn_coffee_export] publication list fetch threw {type(e).__name__}: {e}")
         return []
 
 
