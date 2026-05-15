@@ -43,19 +43,28 @@ jobs:
 
       - name: Commit scraped cache files if changed
         run: |
+          set -x  # echo every command + result to the log
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Cache files persist scraper output between workflows so
-          # export-and-publish.yml can pick it up on its next daily run.
-          # backend/scraper/cache/ is .gitignored (devs don't want local
-          # cache pollution) — force-add the specific files we publish.
+          echo "[diag] checked-out commit: $GITHUB_SHA"
+          echo "[diag] ref: $GITHUB_REF_NAME"
+          echo "[diag] cache dir before commit:"
+          ls -la backend/scraper/cache/ || echo "  (cache dir missing)"
+          # backend/scraper/cache/ is .gitignored locally; force-add the files
+          # we publish so they actually land in the repo.
           mkdir -p backend/scraper/cache
-          git add -f backend/scraper/cache/vn_fertilizer.json backend/scraper/cache/vn_coffee_export.json 2>/dev/null || true
-          git diff --cached --quiet \
-            && echo "No cache changes." \
-            || (git commit -m "data: monthly scraper cache update [skip ci]" \
-                && git pull --rebase --autostash origin "${GITHUB_REF_NAME}" \
-                && git push origin "HEAD:${GITHUB_REF_NAME}")
+          # Don't suppress errors — we want to see them.
+          git add -f backend/scraper/cache/vn_fertilizer.json || echo "  (vn_fertilizer.json not added)"
+          git add -f backend/scraper/cache/vn_coffee_export.json || echo "  (vn_coffee_export.json not added)"
+          echo "[diag] staged files:"
+          git diff --cached --name-only
+          if git diff --cached --quiet; then
+            echo "No cache changes."
+          else
+            git commit -m "data: monthly scraper cache update [skip ci]"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Notify on failure
         if: failure()
