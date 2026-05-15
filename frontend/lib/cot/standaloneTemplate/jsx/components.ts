@@ -458,10 +458,10 @@ function RadialCounterparty({ latest, prev1, prev4, market, unit }) {
 }
 
 // ── Section 8: Signal Analysis ────────────────────────────────────────────────
-var SIG_CATEGORY_ORDER = ["CP","CR","CI","ML","MS","MI","MPI","MRI","CS","OB","SP"];
+var SIG_CATEGORY_ORDER = ["CP","CR","CI","ML","MS","MI","TC","MPI","MRI","CS","OB","SP"];
 var SIG_CATEGORY_LABELS = {
   CP:"Producer Behavior", CR:"Roaster Behavior", CI:"Commercial Interaction",
-  ML:"MM Longs", MS:"MM Shorts", MI:"MM Interaction",
+  ML:"MM Longs", MS:"MM Shorts", MI:"MM Interaction", TC:"Trader Count",
   MPI:"MM x Producers", MRI:"MM x Roasters",
   CS:"Curve Structure", OB:"Overbought / Oversold", SP:"Spreading",
 };

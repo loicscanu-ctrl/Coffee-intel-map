@@ -13,6 +13,8 @@ export interface Signal {
   /** Directional score: positive = bullish, negative = bearish, 0 = neutral */
   score: number;
   text: string;
+  /** WoW move size relative to the position series. */
+  magnitude?: "small" | "medium" | "large";
 }
 
 export interface HistoricalWeek {
@@ -51,6 +53,21 @@ function pct52(values: number[], idx: number): number {
 const isHigh = (s: number[], i: number) => pct52(s, i) >= 0.75;
 const isLow  = (s: number[], i: number) => pct52(s, i) <= 0.25;
 
+export type Magnitude = "small" | "medium" | "large";
+/** WoW magnitude: small <5%, medium 5–12%, large >12%. */
+function mag(prev: number, curr: number): Magnitude {
+  const base = Math.abs(prev) || 1;
+  const pct  = Math.abs((curr - prev) / base);
+  if (pct < 0.05) return "small";
+  if (pct < 0.12) return "medium";
+  return "large";
+}
+/** Signed lot delta string, e.g. "+5.2k lots" or "−800 lots". */
+function fmtLots(delta: number): string {
+  const a = Math.abs(delta);
+  return (delta >= 0 ? "+" : "−") + (a >= 1000 ? (a / 1000).toFixed(1) + "k" : String(Math.round(a))) + " lots";
+}
+
 // ── Main engine ───────────────────────────────────────────────────────────────
 
 /**
@@ -82,6 +99,23 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
   const nyPrices  = rows.map(r => r.priceNY);
   const ldnPrices = rows.map(r => r.priceLDN);
 
+  // ── Net MM OI (long − short) ──────────────────────────────────────────────
+  const nyMmNet   = rows.map(r => r.ny.mmLong  - r.ny.mmShort);
+  const ldnMmNet  = rows.map(r => r.ldn.mmLong - r.ldn.mmShort);
+
+  // ── Trader counts (# entities per category, long and short sides) ─────────
+  const nyMmLongT   = rows.map(r => r.tradersNY.mm);
+  const nyMmShortT  = rows.map(r => r.tradersNY_short?.mm  ?? 0);
+  const ldnMmLongT  = rows.map(r => r.tradersLDN.mm);
+  const ldnMmShortT = rows.map(r => r.tradersLDN_short?.mm ?? 0);
+  const nyMmNetT    = rows.map(r => r.tradersNY.mm - (r.tradersNY_short?.mm   ?? 0));
+  const ldnMmNetT   = rows.map(r => r.tradersLDN.mm - (r.tradersLDN_short?.mm ?? 0));
+
+  const nyProdShortT  = rows.map(r => r.tradersNY_short?.pmpu   ?? 0);
+  const ldnProdShortT = rows.map(r => r.tradersLDN_short?.pmpu  ?? 0);
+  const nyRoastLongT  = rows.map(r => r.tradersNY.pmpu);
+  const ldnRoastLongT = rows.map(r => r.tradersLDN.pmpu);
+
   // ── WoW directions ────────────────────────────────────────────────────────
   type Mkt = "NY" | "LDN";
 
@@ -104,6 +138,32 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
   const priceDir: Record<Mkt, Dir> = {
     NY:  dir(prev.priceNY,  curr.priceNY),
     LDN: dir(prev.priceLDN, curr.priceLDN),
+  };
+
+  // ── Trader count WoW directions ───────────────────────────────────────────
+  const mmLongTDir: Record<Mkt, Dir> = {
+    NY:  dir(nyMmLongT[i - 1],   nyMmLongT[i]),
+    LDN: dir(ldnMmLongT[i - 1],  ldnMmLongT[i]),
+  };
+  const mmShortTDir: Record<Mkt, Dir> = {
+    NY:  dir(nyMmShortT[i - 1],  nyMmShortT[i]),
+    LDN: dir(ldnMmShortT[i - 1], ldnMmShortT[i]),
+  };
+  const mmNetTDir: Record<Mkt, Dir> = {
+    NY:  dir(nyMmNetT[i - 1],   nyMmNetT[i]),
+    LDN: dir(ldnMmNetT[i - 1],  ldnMmNetT[i]),
+  };
+  const mmNetDir: Record<Mkt, Dir> = {
+    NY:  dir(nyMmNet[i - 1],   nyMmNet[i]),
+    LDN: dir(ldnMmNet[i - 1],  ldnMmNet[i]),
+  };
+  const prodShortTDir: Record<Mkt, Dir> = {
+    NY:  dir(nyProdShortT[i - 1],  nyProdShortT[i]),
+    LDN: dir(ldnProdShortT[i - 1], ldnProdShortT[i]),
+  };
+  const roastLongTDir: Record<Mkt, Dir> = {
+    NY:  dir(nyRoastLongT[i - 1],  nyRoastLongT[i]),
+    LDN: dir(ldnRoastLongT[i - 1], ldnRoastLongT[i]),
   };
 
   // ── OB/OS: 52-week price percentile (0–100) ───────────────────────────────
@@ -156,6 +216,10 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (isLow(ps, i))
       add({ id:"CP6", name:"Producer Dry Powder",  category:"CP", categoryLabel:"Producer", market:mkt, severity:"alert", score: -3,
         text:"Producers significantly under-hedged (<25th pct, 52-week) — large potential selling overhang ahead." });
+
+    if (pd === "up" && prodShortTDir[mkt] === "down")
+      add({ id:"CP7", name:"Producer Concentration", category:"CP", categoryLabel:"Producer", market:mkt, severity:"warn",  score: -1,
+        text:"Producer short OI rising while number of hedging entities falls — fewer, larger hedges being placed. Concentrated positioning makes the hedge book more binary: a single actor decision can shift the curve." });
   }
 
   // ── CR — Roaster Behavior ─────────────────────────────────────────────────
@@ -185,8 +249,12 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
         text:"Roasters dangerously under-covered (<25th pct) into rising price — high risk of being forced to buy at unfavorable levels." });
 
     if (isHigh(rs, i))
-      add({ id:"CR6", name:"Roaster Dry Powder",  category:"CR", categoryLabel:"Roaster", market:mkt, severity:"warn",  score: -2,
+      add({ id:"CR6", name:"Roaster Dry Powder",    category:"CR", categoryLabel:"Roaster", market:mkt, severity:"warn",  score: -2,
         text:"Roasters near fully covered (>75th pct) — limited additional buying capacity from this actor." });
+
+    if (rd === "up" && roastLongTDir[mkt] === "down")
+      add({ id:"CR7", name:"Roaster Concentration", category:"CR", categoryLabel:"Roaster", market:mkt, severity:"warn",  score: +1,
+        text:"Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact." });
   }
 
   // ── CI — Commercial Interaction ───────────────────────────────────────────
@@ -203,8 +271,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
         text:"Both commercials aligned bearish — strong fundamental supply pressure signal." });
 
     if (pd === "up"   && rd === "up")
-      add({ id:"CI3", name:"Commercial Divergence",          category:"CI", categoryLabel:"Commercial", market:mkt, severity:"info",  score:  0,
-        text:"Producers and roasters on opposite sides — normal hedging flow, market in balance." });
+      add({ id:"CI3", name:"Normal Commercial Flow",         category:"CI", categoryLabel:"Commercial", market:mkt, severity:"info",  score:  0,
+        text:"Producers and roasters both active on their respective sides — healthy two-sided commercial flow, market in equilibrium." });
 
     if (pd === "flat" && rd === "flat")
       add({ id:"CI4", name:"Commercial Vacuum",              category:"CI", categoryLabel:"Commercial", market:mkt, severity:"alert", score:  0,
@@ -214,10 +282,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
   // ── ML — MM Longs Behavior ────────────────────────────────────────────────
   for (const mkt of ["NY", "LDN"] as const) {
     const ml  = mmLDir[mkt];
-    const ms  = mmSDir[mkt];
     const pr  = priceDir[mkt];
     const mls = mkt === "NY" ? nyMmL : ldnMmL;
-    void ms;
 
     if (ml === "up" && pr === "up" && !isHigh(mls, i))
       add({ id:"ML1", name:"Fund Bullish Entry",      category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"info",  score: +1,
@@ -239,9 +305,17 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"ML5", name:"Fund Long Exit",          category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"warn",  score: -2,
         text:"Funds reducing longs despite rising price — may reflect lack of conviction or profit taking after a strong rally. Check cross-commodity allocation." });
 
-    if (isHigh(mls, i) && pr !== "up")
-      add({ id:"ML6", name:"Fund Long Overhang",      category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"alert", score: -3,
-        text:"Large speculative long position (>75th pct) with no price follow-through — significant liquidation risk." });
+    if (isHigh(mls, i) && pr === "down")
+      add({ id:"ML6", name:"Fund Long Overhang",       category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"alert", score: -3,
+        text:"Large speculative long position (>75th pct) with price already reversing — liquidation underway, momentum risk elevated." });
+
+    if (isHigh(mls, i) && pr === "flat")
+      add({ id:"ML6W", name:"Fund Long Overhang (Watch)", category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"warn", score: -2,
+        text:"Large speculative long position (>75th pct) with stalling price — momentum failing to follow, liquidation risk if price doesn't resume." });
+
+    if (ml === "up" && mmLongTDir[mkt] === "down")
+      add({ id:"ML7", name:"Long Concentration",       category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"warn",  score: -1,
+        text:"MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade." });
   }
 
   // ── MS — MM Shorts Behavior ───────────────────────────────────────────────
@@ -274,9 +348,17 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"MS5", name:"Reluctant Short Cover",    category:"MS", categoryLabel:"MM Shorts", market:mkt, severity:"warn",  score: +1,
         text:"Funds covering shorts despite falling price — may signal exhaustion of bearish thesis." });
 
-    if (isHigh(mss, i) && pr !== "down")
-      add({ id:"MS6", name:"Fund Short Squeeze Risk",  category:"MS", categoryLabel:"MM Shorts", market:mkt, severity:"alert", score: +3,
-        text:"Large speculative short position (>75th pct) with no price follow-through — significant short squeeze risk." });
+    if (isHigh(mss, i) && pr === "up")
+      add({ id:"MS6", name:"Fund Short Squeeze Risk",     category:"MS", categoryLabel:"MM Shorts", market:mkt, severity:"alert", score: +3,
+        text:"Large speculative short position (>75th pct) with price already rising — short squeeze underway, covering pressure accelerating." });
+
+    if (isHigh(mss, i) && pr === "flat")
+      add({ id:"MS6W", name:"Fund Short Squeeze (Watch)", category:"MS", categoryLabel:"MM Shorts", market:mkt, severity:"warn",  score: +2,
+        text:"Large speculative short position (>75th pct) with price stalling — bears failing to push through, squeeze risk if price reverses." });
+
+    if (ms === "up" && mmShortTDir[mkt] === "down")
+      add({ id:"MS7", name:"Short Concentration",         category:"MS", categoryLabel:"MM Shorts", market:mkt, severity:"warn",  score: +1,
+        text:"MM short OI rising while number of short traders falls — fewer, larger short positions. Concentration increases squeeze fragility: a stop-out by one large actor can compress the market rapidly." });
   }
 
   // ── MI — MM Longs × MM Shorts Interaction ────────────────────────────────
@@ -299,6 +381,15 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "down" && ms === "down")
       add({ id:"MI4", name:"Speculative Retreat",            category:"MI", categoryLabel:"MM Interaction", market:mkt, severity:"info",  score:  0,
         text:"Both sides reducing — check net change and cross-commodity allocation to determine if this is coffee-specific or broader deleveraging." });
+
+    const mmNetS = mkt === "NY" ? nyMmNet : ldnMmNet;
+    if (isHigh(mmNetS, i))
+      add({ id:"MI5", name:"Net Long Exhaustion",            category:"MI", categoryLabel:"MM Interaction", market:mkt, severity:"warn",  score: -2,
+        text:"MM net long position near 52-week high (>75th pct) — speculative net longs at extreme, limited room to add. Mean-reversion risk elevated." });
+
+    if (isLow(mmNetS, i))
+      add({ id:"MI6", name:"Net Short Exhaustion",           category:"MI", categoryLabel:"MM Interaction", market:mkt, severity:"warn",  score: +2,
+        text:"MM net position near 52-week low (<25th pct) — speculative net shorts at extreme, limited room to extend. Short-covering catalyst risk elevated." });
   }
 
   // ── MPI — MM × Producers Interaction ─────────────────────────────────────
@@ -328,10 +419,6 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "down" && pd === "down" && pr === "up")
       add({ id:"MPI5", name:"Divergence Signal",                 category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"warn",  score: -1,
         text:"Funds reducing longs while producers lift hedges into rising price — neither actor convinced by the rally. Check if funds are near historical max (profit taking) or early in rally (lack of conviction)." });
-
-    if (isHigh(mls, i) && isLow(ps, i))
-      add({ id:"MPI6", name:"Fund Overhang vs Producer Pressure",category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"alert", score: -3,
-        text:"Funds near long exhaustion (>75th pct) while producers significantly under-hedged (<25th pct) — large selling overhang ahead with limited fund buying capacity remaining. Bearish structural risk." });
 
     if (ml === "up"   && pd === "up"   && pr === "flat")
       add({ id:"MPI7", name:"Natural Market Balance",            category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"info",  score:  0,
@@ -370,9 +457,17 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"MRI6", name:"Roaster Coverage Opportunity",  category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"info",  score: +1,
         text:"Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline." });
 
-    if ((ml === "up" || ml === "down") && rd === "flat" && pd === "flat")
-      add({ id:"MRI7", name:"Full Commercial Vacuum",        category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"alert", score:  0,
-        text:"No commercial activity on either side — market entirely speculative. Highly fragile, vulnerable to sharp reversal when commercials re-engage." });
+  }
+
+  // ── TC — Trader Count vs Net Position Mismatch ───────────────────────────
+  for (const mkt of ["NY", "LDN"] as const) {
+    if (mmNetDir[mkt] === "up" && mmNetTDir[mkt] === "down")
+      add({ id:"TC1", name:"Bullish Concentration",  category:"TC", categoryLabel:"Trader Count", market:mkt, severity:"warn",  score: -1,
+        text:"MM net position growing bullish while net trader count shrinks — the bullish move is driven by fewer actors. Concentration increases reversal fragility." });
+
+    if (mmNetDir[mkt] === "down" && mmNetTDir[mkt] === "up")
+      add({ id:"TC2", name:"Bearish Distribution",   category:"TC", categoryLabel:"Trader Count", market:mkt, severity:"info",  score:  0,
+        text:"MM net position turning more bearish while net trader count expands — broad-based shift in sentiment, more participants positioning short. Distributed, not concentrated." });
   }
 
   // ── CS — Curve Structure ──────────────────────────────────────────────────
@@ -440,10 +535,6 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"OB4", name:"Oversold but Vulnerable",  category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
         text:`${label} oversold but producers significantly under-hedged (<25th pct) — potential recovery capped by producer selling overhang. Bounce likely limited.` });
 
-    if (obos >= 20 && obos <= 80)
-      add({ id:"OB5", name:"Neutral Zone",             category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"info",  score:  0,
-        text:`${label} neither overbought nor oversold (${obos.toFixed(0)}th pct) — no technical pressure in either direction. Positioning and fundamentals are the primary drivers.` });
-
     if (obos > 80 && pr === "down")
       add({ id:"OB6", name:"Divergence Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"alert", score: -3,
         text:`${label} overbought but price already falling — momentum turning. Check weekly change in trader counts: if also falling, unwind is broad-based.` });
@@ -468,7 +559,7 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"SP2", name:"Spreading Decrease",     category:"SP", categoryLabel:"Spreading", market:mkt, severity:"info",  score:  0,
         text:"Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next." });
 
-    if (spDir === "up" && str !== null && pStr !== null && str > 0 && str > pStr)
+    if (spDir === "up" && str !== null && pStr !== null && str < 0 && str < pStr)
       add({ id:"SP3", name:"Spreading vs Inversion", category:"SP", categoryLabel:"Spreading", market:mkt, severity:"warn",  score:  0,
         text:"Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital." });
   }
@@ -500,7 +591,9 @@ export function evaluateHistoricalSignals(rows: ProcessedCotRow[], weeks = 8): H
   for (let end = start; end <= rows.length; end++) {
     const slice   = rows.slice(0, end);
     const sigs    = evaluateSignals(slice);
-    const { scoreNY, scoreLDN } = computeCompositeScores(sigs);
+    const raw = computeCompositeScores(sigs);
+    const scoreNY  = Math.max(-10, Math.min(10, Math.round(raw.scoreNY)));
+    const scoreLDN = Math.max(-10, Math.min(10, Math.round(raw.scoreLDN)));
     const row = rows[end - 1];
     result.push({ date: row.date, signals: sigs, scoreNY, scoreLDN, priceNY: row.priceNY, priceLDN: row.priceLDN });
   }

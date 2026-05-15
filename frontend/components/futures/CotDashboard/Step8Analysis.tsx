@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { Signal, SignalSeverity, SignalMarket, HistoricalWeek } from "@/lib/cot/signalEngine";
 import { computeCompositeScores } from "@/lib/cot/signalEngine";
 
-const CATEGORY_ORDER = ["CP","CR","CI","ML","MS","MI","MPI","MRI","CS","OB","SP"] as const;
+const CATEGORY_ORDER = ["CP","CR","CI","ML","MS","MI","TC","MPI","MRI","CS","OB","SP"] as const;
 
 const CATEGORY_LABELS: Record<string, string> = {
   CP:  "Producer Behavior",
@@ -12,6 +12,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   ML:  "MM Longs",
   MS:  "MM Shorts",
   MI:  "MM Interaction",
+  TC:  "Trader Count",
   MPI: "MM × Producers",
   MRI: "MM × Roasters",
   CS:  "Curve Structure",
