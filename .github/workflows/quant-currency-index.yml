@@ -21,10 +21,11 @@ jobs:
 
       - name: Install dependencies
         # yfinance pinned to a version known to work with the session= kwarg
-        # override (PR #46) — bare yfinance default UA was getting 403'd by
-        # Yahoo Finance on the GH Actions IP range starting 2026-05-11.
-        # `requests` is now an explicit dependency (used for the custom session).
-        run: pip install "yfinance==0.2.50" requests pandas numpy sqlalchemy psycopg2-binary google-generativeai
+        # override. curl_cffi added in PR #48 after PR #46's UA-only fix
+        # turned out to be insufficient — Yahoo's Cloudflare layer also
+        # filters on TLS fingerprint, so we need libcurl-impersonate to
+        # mimic Chrome's full handshake (not just the UA header).
+        run: pip install "yfinance==0.2.50" "curl_cffi>=0.7,<1.0" requests pandas numpy sqlalchemy psycopg2-binary google-generativeai
 
       - name: Run Currency Index scraper (3 attempts, 15m between)
         # Yahoo Finance per-IP rate limits typically clear in ~15 minutes,
