@@ -6,9 +6,9 @@ import type { Step } from "./types";
 
 export const NAV_STEPS = [
   { id: 8 as Step, icon: "Signals",   label: "Signals" },
-  { id: 1 as Step, icon: "Globe",     label: "Flow" },
   { id: 2 as Step, icon: "Grid",      label: "Heatmap" },
   { id: 3 as Step, icon: "Sliders",   label: "Gauges" },
+  { id: 1 as Step, icon: "Globe",     label: "Flow" },
   { id: 4 as Step, icon: "Factory",   label: "Industry" },
   { id: 5 as Step, icon: "Droplets",  label: "Dry Powder" },
   { id: 6 as Step, icon: "Scale",     label: "Cycle" },
