@@ -41,14 +41,7 @@ jobs:
       - name: Export static JSON files
         working-directory: backend
         env:
-          DATABASE_URL:         ${{ secrets.DATABASE_URL }}
-          # ScrapingBee proxy key — used by vietnam_supply.py to route NSO Vietnam
-          # requests through a residential Vietnamese IP, since NSO 403s all cloud
-          # IP traffic. Optional: if the secret is missing the scraper silently
-          # falls through to ICO + static fallback. Free tier = 1000 credits/month,
-          # residential proxy = 25 credits/call; idempotency check inside
-          # _fetch_nso_exports caps usage at one attempt per UTC day.
-          SCRAPINGBEE_API_KEY:  ${{ secrets.SCRAPINGBEE_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python -m scraper.export_static_json
 
       - name: Commit updated static JSON if changed
