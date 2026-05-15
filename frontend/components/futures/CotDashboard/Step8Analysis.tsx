@@ -141,6 +141,14 @@ function HeatmapMarketCols({ weeks, market }: { weeks: HistoricalWeek[]; market:
           </div>
         ))}
       </div>
+      {/* Price row */}
+      <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
+        {weeks.map(w => (
+          <div key={w.date} className="text-[8px] font-mono text-amber-500/80 text-center truncate h-4 flex items-center justify-center">
+            {market === "NY" ? w.priceNY.toFixed(0) : w.priceLDN.toFixed(0)}
+          </div>
+        ))}
+      </div>
       {/* Category rows */}
       {CATEGORY_ORDER.map(cat => (
         <div key={cat} className="grid gap-px" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
@@ -185,6 +193,7 @@ function HistoricalHeatmap({ history }: { history: HistoricalWeek[] }) {
       {/* Shared row labels */}
       <div className="shrink-0 flex flex-col">
         <div className="h-4" />{/* date header spacer */}
+        <div className="h-4" />{/* price row spacer */}
         {CATEGORY_ORDER.map(cat => (
           <div key={cat} className="h-5 mb-px flex items-center">
             <span className="text-[8px] text-slate-500 pr-2 whitespace-nowrap">

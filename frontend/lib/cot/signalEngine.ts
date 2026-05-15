@@ -22,6 +22,8 @@ export interface HistoricalWeek {
   scoreNY: number;
   /** Net composite score for LDN (RC) */
   scoreLDN: number;
+  priceNY: number;
+  priceLDN: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -499,7 +501,8 @@ export function evaluateHistoricalSignals(rows: ProcessedCotRow[], weeks = 8): H
     const slice   = rows.slice(0, end);
     const sigs    = evaluateSignals(slice);
     const { scoreNY, scoreLDN } = computeCompositeScores(sigs);
-    result.push({ date: rows[end - 1].date, signals: sigs, scoreNY, scoreLDN });
+    const row = rows[end - 1];
+    result.push({ date: row.date, signals: sigs, scoreNY, scoreLDN, priceNY: row.priceNY, priceLDN: row.priceLDN });
   }
   return result;
 }

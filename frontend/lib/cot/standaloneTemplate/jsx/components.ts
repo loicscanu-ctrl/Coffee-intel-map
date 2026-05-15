@@ -563,6 +563,12 @@ function SigHistoricalCols({ weeks, market }) {
           return <div key={w.date} style={{ fontSize:8, fontFamily:"monospace", color:"#475569", textAlign:"center", overflow:"hidden", whiteSpace:"nowrap" }}>{String(w.date).slice(5)}</div>;
         })}
       </div>
+      <div style={{ display:"grid", gap:2, gridTemplateColumns:"repeat("+n+", 1fr)" }}>
+        {weeks.map(function(w) {
+          var price = market === "NY" ? w.priceNY : w.priceLDN;
+          return <div key={w.date} style={{ fontSize:8, fontFamily:"monospace", color:"rgba(251,191,36,0.8)", textAlign:"center", height:16, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", whiteSpace:"nowrap" }}>{price != null ? price.toFixed(0) : "-"}</div>;
+        })}
+      </div>
       {SIG_CATEGORY_ORDER.map(function(cat) {
         return (
           <div key={cat} style={{ display:"grid", gap:2, gridTemplateColumns:"repeat("+n+", 1fr)", marginTop:1 }}>
@@ -648,6 +654,7 @@ function SignalsSection({ signals, historicalSignals }) {
           <div style={{ fontSize:10, color:"#64748b", fontWeight:500, marginBottom:12, textTransform:"uppercase", letterSpacing:"0.05em" }}>8-Week Signal History</div>
           <div style={{ display:"flex", gap:8, overflowX:"auto" }}>
             <div style={{ flexShrink:0, display:"flex", flexDirection:"column" }}>
+              <div style={{ height:16 }} />
               <div style={{ height:16 }} />
               {SIG_CATEGORY_ORDER.map(function(cat) {
                 return <div key={cat} style={{ height:20, marginTop:1, display:"flex", alignItems:"center" }}><span style={{ fontSize:8, color:"#64748b", whiteSpace:"nowrap", paddingRight:8 }}>{SIG_CATEGORY_LABELS[cat]}</span></div>;
