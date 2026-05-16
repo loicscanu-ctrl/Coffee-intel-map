@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-05-16T04:51:03.514865Z",
+  "scraped_at": "2026-05-16T12:49:57.891002Z",
   "cost": {
     "total_usd_per_bag": 222.7,
     "yoy_pct": 0.0,
@@ -45,7 +45,7 @@
     ],
     "inputs_detail": [],
     "kc_spot": null,
-    "last_updated": "2026-05-15"
+    "last_updated": "2026-05-16"
   },
   "cost_arabica": {
     "total_usd_per_bag": 222.7,
@@ -90,7 +90,7 @@
     ],
     "inputs_detail": [],
     "kc_spot": null,
-    "last_updated": "2026-05-15"
+    "last_updated": "2026-05-16"
   },
   "cost_conilon": {
     "total_usd_per_bag": 129.9,
@@ -135,7 +135,7 @@
     ],
     "inputs_detail": [],
     "rc_spot": null,
-    "last_updated": "2026-05-15"
+    "last_updated": "2026-05-16"
   },
   "acreage": {
     "thousand_ha": 1935.2,
@@ -2877,7 +2877,7 @@
     ],
     "prices_as_of": "Apr-2026",
     "imports": {
-      "last_updated": "2026-05-15",
+      "last_updated": "2026-05-16",
       "monthly": [
         {
           "month": "2024-01",
