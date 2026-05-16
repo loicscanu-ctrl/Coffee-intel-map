@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-05-16T07:40:42.680495Z",
+  "scraped_at": "2026-05-16T11:18:41.497829Z",
   "source": "Vietnam Customs (customs.gov.vn) 2x monthly export bulletins",
   "unit": "tonnes",
   "monthly": [
@@ -8,105 +8,340 @@
       "tonnes": 63019.0,
       "period_qty_tonnes": 63019.0,
       "ytd_cum_qty_tonnes": 388.0,
-      "ytd_diff_tonnes": null
+      "ytd_diff_tonnes": null,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "63.019",
+        "351.682.371",
+        "38,8",
+        "35,4",
+        "1.217.493",
+        "4.933.144.321",
+        "-14,0",
+        "35,4"
+      ]
     },
     {
       "month": "2024-12",
       "tonnes": 127655.0,
       "period_qty_tonnes": 127655.0,
       "ytd_cum_qty_tonnes": 1026.0,
-      "ytd_diff_tonnes": 638.0
+      "ytd_diff_tonnes": 638.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "127.655",
+        "686.556.852",
+        "102,6",
+        "95,2",
+        "1.345.202",
+        "5.620.173.588",
+        "-17,1",
+        "32,5"
+      ]
     },
     {
       "month": "2025-01",
       "tonnes": 134005.0,
       "period_qty_tonnes": 134005.0,
       "ytd_cum_qty_tonnes": 50.0,
-      "ytd_diff_tonnes": 50.0
+      "ytd_diff_tonnes": 50.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "134.005",
+        "728.965.818",
+        "5,0",
+        "6,2",
+        "134.005",
+        "728.965.818",
+        "-43,7",
+        "0,3"
+      ]
     },
     {
       "month": "2025-02",
       "tonnes": 169832.0,
       "period_qty_tonnes": 169832.0,
       "ytd_cum_qty_tonnes": 267.0,
-      "ytd_diff_tonnes": 217.0
+      "ytd_diff_tonnes": 217.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "169.832",
+        "964.308.331",
+        "26,7",
+        "32,3",
+        "309.505",
+        "1.721.138.489",
+        "-22,0",
+        "37,2"
+      ]
+    },
+    {
+      "month": "2025-03",
+      "tonnes": 181115.0,
+      "period_qty_tonnes": 181115.0,
+      "ytd_cum_qty_tonnes": 66.0,
+      "ytd_diff_tonnes": 0.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "181.115",
+        "1.063.739.859",
+        "6,6",
+        "10,3",
+        "495.780",
+        "2.811.105.696",
+        "-15,3",
+        "45,8"
+      ]
     },
     {
       "month": "2025-04",
       "tonnes": 166606.0,
       "period_qty_tonnes": 166606.0,
       "ytd_cum_qty_tonnes": 80.0,
-      "ytd_diff_tonnes": 0.0
+      "ytd_diff_tonnes": 14.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "166.606",
+        "965.829.324",
+        "-8,0",
+        "-9,2",
+        "665.889",
+        "3.795.688.539",
+        "-9,4",
+        "51,8"
+      ]
     },
     {
       "month": "2025-05",
       "tonnes": 148762.0,
       "period_qty_tonnes": 148762.0,
       "ytd_cum_qty_tonnes": 107.0,
-      "ytd_diff_tonnes": 27.0
+      "ytd_diff_tonnes": 27.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "148.762",
+        "859.905.271",
+        "-10,7",
+        "-11,0",
+        "823.908",
+        "4.704.079.102",
+        "-0,6",
+        "62,3"
+      ]
     },
     {
       "month": "2025-06",
       "tonnes": 117983.0,
       "period_qty_tonnes": 117983.0,
       "ytd_cum_qty_tonnes": 207.0,
-      "ytd_diff_tonnes": 100.0
+      "ytd_diff_tonnes": 100.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "117.983",
+        "677.919.254",
+        "-20,7",
+        "-21,2",
+        "947.102",
+        "5.403.350.274",
+        "4,5",
+        "66,2"
+      ]
     },
     {
       "month": "2025-07",
       "tonnes": 101979.0,
       "period_qty_tonnes": 101979.0,
       "ytd_cum_qty_tonnes": 136.0,
-      "ytd_diff_tonnes": 0.0
+      "ytd_diff_tonnes": 0.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "101.979",
+        "555.809.045",
+        "-13,6",
+        "-18,0",
+        "1.055.766",
+        "5.992.277.326",
+        "7,4",
+        "64,9"
+      ]
     },
     {
       "month": "2025-08",
       "tonnes": 84062.0,
       "period_qty_tonnes": 84062.0,
       "ytd_cum_qty_tonnes": 176.0,
-      "ytd_diff_tonnes": 40.0
+      "ytd_diff_tonnes": 40.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "84.062",
+        "459.993.691",
+        "-17,6",
+        "-17,2",
+        "1.148.972",
+        "6.499.660.583",
+        "8,6",
+        "61,1"
+      ]
     },
     {
       "month": "2025-09",
       "tonnes": 81099.0,
       "period_qty_tonnes": 81099.0,
       "ytd_cum_qty_tonnes": 35.0,
-      "ytd_diff_tonnes": 0.0
+      "ytd_diff_tonnes": 0.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "81.099",
+        "462.283.325",
+        "-3,5",
+        "0,5",
+        "1.239.715",
+        "7.010.973.110",
+        "11,7",
+        "62,2"
+      ]
     },
     {
       "month": "2025-10",
       "tonnes": 68316.0,
       "period_qty_tonnes": 68316.0,
       "ytd_cum_qty_tonnes": 158.0,
-      "ytd_diff_tonnes": 123.0
+      "ytd_diff_tonnes": 123.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "68.316",
+        "394.438.498",
+        "-15,8",
+        "-14,7",
+        "1.310.311",
+        "7.416.444.818",
+        "13,4",
+        "61,9"
+      ]
     },
     {
       "month": "2025-11",
       "tonnes": 88812.0,
       "period_qty_tonnes": 88812.0,
       "ytd_cum_qty_tonnes": 300.0,
-      "ytd_diff_tonnes": 142.0
+      "ytd_diff_tonnes": 142.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "88.812",
+        "507.583.299",
+        "30,0",
+        "28,7",
+        "1.401.983",
+        "7.936.436.799",
+        "15,1",
+        "60,9"
+      ]
     },
     {
       "month": "2025-12",
       "tonnes": 182967.0,
       "period_qty_tonnes": 182967.0,
       "ytd_cum_qty_tonnes": 1060.0,
-      "ytd_diff_tonnes": 760.0
+      "ytd_diff_tonnes": 760.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "182.967",
+        "947.992.767",
+        "106,0",
+        "86,8",
+        "1.592.288",
+        "8.923.706.490",
+        "18,3",
+        "58,8"
+      ]
+    },
+    {
+      "month": "2026-02",
+      "tonnes": 142337.0,
+      "period_qty_tonnes": 142337.0,
+      "ytd_cum_qty_tonnes": 366.0,
+      "ytd_diff_tonnes": 366.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "142.337",
+        "671.511.842",
+        "-36,6",
+        "-37,9",
+        "367.270",
+        "1.755.075.096",
+        "14,5",
+        "-1,3"
+      ]
     },
     {
       "month": "2026-03",
       "tonnes": 221975.0,
       "period_qty_tonnes": 221975.0,
       "ytd_cum_qty_tonnes": 560.0,
-      "ytd_diff_tonnes": 560.0
+      "ytd_diff_tonnes": 194.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "221.975",
+        "990.162.173",
+        "56,0",
+        "47,5",
+        "590.498",
+        "2.749.880.822",
+        "12,5",
+        "-7,1"
+      ]
     },
     {
       "month": "2026-04",
       "tonnes": 189894.0,
       "period_qty_tonnes": 189894.0,
       "ytd_cum_qty_tonnes": 152.0,
-      "ytd_diff_tonnes": 0.0
+      "ytd_diff_tonnes": 0.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "189.894",
+        "822.538.422",
+        "-15,2",
+        "-17,5",
+        "782.017",
+        "3.578.105.898",
+        "11,7",
+        "-9,8"
+      ]
     }
   ]
 }
