@@ -84,7 +84,7 @@ def _fetch_feed(feed_cfg: dict) -> list[dict]:
         print(f"[rss] {feed_cfg['source']}: fetch failed — {e}")
         return []
 
-    parsed = feedparser.parse(resp.text)
+    parsed = feedparser.parse(resp.content)
     items = []
 
     for entry in parsed.entries[:MAX_ITEMS_PER_FEED]:

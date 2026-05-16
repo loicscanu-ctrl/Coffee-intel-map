@@ -148,6 +148,20 @@ def export_futures_chain(db) -> None:
 
 # ── 2. OI FND chart ──────────────────────────────────────────────────────────
 
+def _load_oi_history() -> dict:
+    """Load oi_history.json (written by fetch_oi_json.py / daily_oi.yml)."""
+    path = ROOT / "data" / "oi_history.json"
+    if not path.exists():
+        path = OUT_DIR / "oi_history.json"
+    if not path.exists():
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def export_oi_fnd_chart(db) -> None:
     all_items = (
         db.query(NewsItem)
@@ -161,15 +175,23 @@ def export_oi_fnd_chart(db) -> None:
     prev_yr   = str(today.year - 1)[-2:]
     allowed   = {cur_yr, prev_yr}
 
+    # Load oi_history.json — provides daily OI snapshots with full per-contract
+    # OI (Playwright-fetched from Barchart), filling the -45…-30 day gap where
+    # DB NewsItems may be missing OI (yfinance fallback doesn't supply OI).
+    oi_history = _load_oi_history()
+
     result = {}
     for market in ("arabica", "robusta"):
+        mkt_key = "arabica" if market == "arabica" else "robusta"
+        series: dict[str, dict[int, int]] = {}  # sym → {day → oi}
+
+        # 1. DB-derived points (from daily futures scraper)
         chain_items = [
             i for i in all_items
             if "futures" in (i.tags or [])
             and "price"   in (i.tags or [])
             and market     in (i.tags or [])
         ]
-        series: dict[str, list] = {}
         for item in chain_items:
             try:
                 meta       = json.loads(item.meta or "{}")
@@ -180,18 +202,42 @@ def export_oi_fnd_chart(db) -> None:
                 )
                 for c in meta.get("contracts", []):
                     sym = c.get("symbol", "")
+                    oi  = c.get("oi")
+                    if oi is None:
+                        continue
                     fnd = _calc_fnd(sym)
                     if not fnd:
                         continue
                     day_val = _trading_days_to(trade_date, fnd)
                     if day_val < -45 or day_val > 0:
                         continue
-                    series.setdefault(sym, []).append({"day": day_val, "oi": c.get("oi", 0)})
+                    series.setdefault(sym, {})[day_val] = oi
             except Exception:
                 pass
 
+        # 2. oi_history.json — fills in OI from the Playwright-fetched daily
+        #    snapshots (always has real OI, extends further back in time).
+        for snapshot in oi_history.get(mkt_key, []):
+            try:
+                snap_date = date.fromisoformat(snapshot["date"])
+            except Exception:
+                continue
+            for c in snapshot.get("contracts", []):
+                sym = c.get("symbol", "")
+                oi  = c.get("oi")
+                if oi is None:
+                    continue
+                fnd = _calc_fnd(sym)
+                if not fnd:
+                    continue
+                day_val = _trading_days_to(snap_date, fnd)
+                if day_val < -45 or day_val > 0:
+                    continue
+                # Don't overwrite DB-sourced point — DB is authoritative
+                series.setdefault(sym, {}).setdefault(day_val, oi)
+
         candidates = []
-        for sym, points in series.items():
+        for sym, day_map in series.items():
             if sym[-2:] not in allowed:
                 continue
             fnd = _calc_fnd(sym)
@@ -201,7 +247,10 @@ def export_oi_fnd_chart(db) -> None:
                 "symbol": sym,
                 "label":  sym.replace("RM", "").replace("KC", ""),
                 "fnd":    fnd.isoformat(),
-                "data":   sorted(points, key=lambda x: x["day"]),
+                "data":   sorted(
+                    [{"day": d, "oi": o} for d, o in day_map.items()],
+                    key=lambda x: x["day"],
+                ),
             })
         candidates.sort(key=lambda x: x["fnd"])
         result[market] = candidates
@@ -1331,6 +1380,12 @@ def export_vn_physical_prices(db) -> None:
     """Compute and write vn_physical_prices.json from latest VN FAQ + FX news items."""
     import re as _re
 
+    # Two windows: a 30-day pool to find an item, but a 48h freshness gate
+    # on whatever we find. Without this gate the export was happily writing
+    # a 22-day-old price with a fresh `updated` timestamp on every run,
+    # masking a silent failure of the vietnam.py scraper.
+    STALE_AFTER_HOURS = 48
+
     recent = (
         db.query(NewsItem)
         .filter(NewsItem.pub_date > (datetime.utcnow() - timedelta(days=30)))
@@ -1355,6 +1410,17 @@ def export_vn_physical_prices(db) -> None:
 
     if not vn_item or not fx_item:
         print(f"  vn_physical_prices.json → skipped (vn:{vn_item is not None} fx:{fx_item is not None})")
+        return
+
+    vn_age_h = (datetime.utcnow() - vn_item.pub_date).total_seconds() / 3600
+    if vn_age_h > STALE_AFTER_HOURS:
+        # Leave the existing file alone so its `updated` timestamp stops
+        # advancing — that's exactly the freshness signal the monitor needs.
+        print(
+            f"  vn_physical_prices.json → SKIPPED (stale): vn_item is "
+            f"{vn_age_h:.1f}h old (> {STALE_AFTER_HOURS}h threshold). "
+            "Vietnam price scraper likely failing silently."
+        )
         return
 
     m1 = _re.search(r"price:\s*([\d.]+)\s*VND/kg", vn_item.body or "", _re.I)
@@ -1450,6 +1516,14 @@ def export_health(db) -> None:
     item = db.query(NewsItem).filter(NewsItem.source == "PSD Coffee").order_by(NewsItem.pub_date.desc()).first()
     scrapers["psd_coffee"] = _ts(item.pub_date) if item else None
 
+    # Vietnam Robusta retail price (giacaphe.com via vietnam.py scraper).
+    # Tracked separately from vietnam_exports (the supply scraper) — the price
+    # scraper failed silently between Apr 23 and May 14 2026 without anyone
+    # noticing because it wasn't surfaced here. 48h threshold in the freshness
+    # workflow will alert on the next outage.
+    item = db.query(NewsItem).filter(NewsItem.source == "Giacaphe").order_by(NewsItem.pub_date.desc()).first()
+    scrapers["vietnam_price"] = _ts(item.pub_date) if item else None
+
     # AJCA (Japan native source, from DB — cache file doesn't survive cross-job)
     item = db.query(NewsItem).filter(NewsItem.source == "AJCA").order_by(NewsItem.pub_date.desc()).first()
     scrapers["ajca"] = _ts(item.pub_date) if item else None
@@ -1461,6 +1535,61 @@ def export_health(db) -> None:
     # CONAB Safra (area/yield, monthly)
     item = db.query(NewsItem).filter(NewsItem.source == "CONAB Safra").order_by(NewsItem.pub_date.desc()).first()
     scrapers["conab_safra"] = _ts(item.pub_date) if item else None
+
+    # Quant currency index (12-currency basket, daily, written by quant export
+    # earlier in this run). Surfaces in the Macro tab's Coffee Currency Index
+    # section — tracking it here means a silent quant_report.json staleness
+    # gets caught by the freshness monitor.
+    def _qci_ts() -> str | None:
+        try:
+            p = OUT_DIR / "quant_report.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("currency_index", {}).get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["quant_currency_index"] = _qci_ts()
+
+    # Retail coffee CPI (BLS + Eurostat + BCB SGS, monthly). Surfaces in the
+    # Macro tab's Retail Inflation section.
+    def _cpi_ts() -> str | None:
+        try:
+            p = OUT_DIR / "retail_cpi.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("last_updated")
+        except Exception:
+            return None
+        return None
+    scrapers["retail_cpi"] = _cpi_ts()
+
+    # FX history (12 currency pairs, daily closes, ~1 year window). Backs the
+    # Macro tab's FX Pair Time-Series widget. Written by the quant currency
+    # index workflow alongside quant_report.json.
+    def _fx_history_ts() -> str | None:
+        try:
+            p = OUT_DIR / "fx_history.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["fx_history"] = _fx_history_ts()
+
+    # Origin prices history (Vietnam/Brazil/Uganda daily farmgate accumulator).
+    # Backs the Macro tab's Origin Prices time-series widget.
+    def _origin_prices_ts() -> str | None:
+        try:
+            p = OUT_DIR / "origin_prices_history.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("scraped_at")
+        except Exception:
+            return None
+        return None
+    scrapers["origin_prices"] = _origin_prices_ts()
 
     # Cecafe daily (updates every business day)
     scrapers["cecafe_daily"]      = _supply_ts("cecafe_daily.json")
@@ -1596,6 +1725,8 @@ def main():
         export_retail_cpi(db)
         export_latest_prices(db)
         export_vn_physical_prices(db)
+        from scraper.sources.origin_prices_history import export_origin_prices_history
+        export_origin_prices_history(db)
         export_health(db)
     finally:
         db.close()

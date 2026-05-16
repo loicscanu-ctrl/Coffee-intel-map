@@ -32,6 +32,29 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
+      - name: Install Patchright (Python + Chromium)
+        # Patchright is a Playwright fork that patches the runtime fingerprint
+        # leaks Cloudflare uses to detect headless browsers. Used by vietnam.py
+        # to get past giacaphe.com's CF JS challenge after stealth-rejection
+        # was confirmed (see PR #36 / Apr 16 → May 14 2026 outage).
+        #
+        # We install it as an explicit step rather than relying on the
+        # requirements.txt line because pip's resolver was silently dropping
+        # patchright from the requirements install (likely a transitive
+        # version conflict with playwright==1.44.0) — yielding a "No module
+        # named patchright" failure two PRs in a row (#36, #38).
+        # Explicit install surfaces any resolver conflict with a real error.
+        run: |
+          set -e
+          echo "=== Before explicit install ==="
+          pip show patchright 2>/dev/null || echo "  not installed by requirements.txt"
+          echo "=== pip install patchright ==="
+          pip install patchright
+          echo "=== After install ==="
+          pip show patchright
+          echo "=== Installing chromium for patchright ==="
+          python -m patchright install chromium
+
       - name: Run daily scraper (3 attempts)
         working-directory: backend
         env:

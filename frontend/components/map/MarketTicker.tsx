@@ -123,14 +123,10 @@ export default function MarketTicker() {
   const otherTickers = tickers.filter(t => t.category !== "futures");
   const allTickers = [...futureTickers, ...otherTickers];
 
-  // Show most-recent timestamp between Acaphe and static file
-  const displayTs = (() => {
-    if (!acaphe) return generatedAt;
-    if (!generatedAt) return acaphe.fetched_at;
-    return new Date(acaphe.fetched_at) > new Date(generatedAt)
-      ? acaphe.fetched_at
-      : generatedAt;
-  })();
+  const futuresTs  = acaphe?.fetched_at ?? null;
+  const staticTs   = generatedAt;
+  // Use acaphe ts for KC/RC, static ts for FX/physical
+  const hasFutures = futureTickers.length > 0 && futuresTs;
 
   if (allTickers.length === 0) return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 flex items-center shrink-0 px-3">
@@ -158,22 +154,36 @@ export default function MarketTicker() {
       </span>
     ));
     if (gi < groups.length - 1) {
-      items.push(<span key={`sep-${gi}`} className="text-slate-500 mx-3">|</span>);
+      items.push(<span key={`sep-${gi}`} className="text-slate-500 mx-4">{"  |  "}</span>);
     }
     return items;
   });
 
   return (
     <div className="h-8 bg-slate-950 border-b border-slate-800 overflow-hidden flex items-center shrink-0">
-      <span className="flex flex-col justify-center px-3 shrink-0 border-r border-slate-700 mr-2 leading-none gap-0.5"
-        title={displayTs ? `Data as of: ${displayTs}` : undefined}>
-        <span className="text-indigo-400 text-xs font-bold">MARKETS</span>
-        {displayTs && (
-          <span className={`text-[9px] font-mono ${stalenessColor(displayTs)}`}>
-            {timeAgo(displayTs)}
-          </span>
-        )}
+      {/* Fixed label — two staleness stamps, one per source */}
+      <span className="flex flex-col justify-center px-3 shrink-0 border-r border-slate-700 mr-2 leading-none gap-0.5">
+        <span className="text-indigo-400 text-xs font-bold tracking-wide">MARKETS</span>
+        <span className="text-[8px] font-mono flex gap-1.5">
+          {hasFutures && (
+            <span className={stalenessColor(futuresTs!)}
+              title={`KC/RC via Acaphe — ${futuresTs}`}>
+              KC/RC {timeAgo(futuresTs!)}
+            </span>
+          )}
+          {hasFutures && staticTs && (
+            <span className="text-slate-600">·</span>
+          )}
+          {staticTs && (
+            <span className={stalenessColor(staticTs)}
+              title={`FX & physical via scraper — ${staticTs}`}>
+              FX {timeAgo(staticTs)}
+            </span>
+          )}
+        </span>
       </span>
+
+      {/* Scrolling band — content duplicated for seamless loop */}
       <div
         className="overflow-hidden flex-1 relative"
         style={{ cursor: "default" }}
@@ -187,7 +197,9 @@ export default function MarketTicker() {
         }}
       >
         <span className="ticker-track text-xs whitespace-nowrap">
-          {tickerContent}
+          {/* Two identical copies — animation moves -50% so the seam is invisible */}
+          <span className="inline-block pr-16">{tickerContent}</span>
+          <span className="inline-block pr-16" aria-hidden="true">{tickerContent}</span>
         </span>
       </div>
     </div>

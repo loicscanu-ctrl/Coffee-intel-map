@@ -9,7 +9,6 @@ const TABS = [
   { href: "/supply", label: "Supply" },
   { href: "/demand", label: "Demand" },
   { href: "/macro", label: "Macro" },
-  { href: "/quant", label: "Quant Report" },
   { href: "/map", label: "News & Intel" },
 ];
 

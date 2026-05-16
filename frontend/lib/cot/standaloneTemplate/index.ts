@@ -14,6 +14,8 @@ export function buildStandaloneHtml(
   processed: any[],
   macroData: any[],
   globalFlowMetrics: any,
+  signals: any[],
+  historicalSignals: any[],
   dateStr: string,
   reactJs: string,
   reactDomJs: string,
@@ -25,7 +27,7 @@ export function buildStandaloneHtml(
   const safe = (obj: unknown) =>
     JSON.stringify(obj).replace(/<\/script>/gi, "<\\/script>");
 
-  const bakedJson = safe({ processed, macroData, globalFlowMetrics });
+  const bakedJson = safe({ processed, macroData, globalFlowMetrics, signals, historicalSignals });
 
   const jsx = JSX_PREAMBLE + JSX_COMPONENTS + JSX_APP;
 

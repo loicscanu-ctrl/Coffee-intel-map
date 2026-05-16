@@ -149,7 +149,7 @@ def _barchart_requests() -> dict:
             return payload
 
         kc = _fetch_market("KC%5EF", "kc")
-        rm = _fetch_market("RC%5EF", "rm")
+        rm = _fetch_market("RM%5EF", "rm")
 
         result: dict = {}
         if kc:
@@ -177,7 +177,8 @@ async def _barchart_playwright(page) -> dict:
         # Use the active front-month URL so we never hit an expired contract page
         front_sym = _active_front_symbol("KC", _KC_MONTHS)
         init_url = f"https://www.barchart.com/futures/quotes/{front_sym}/overview"
-        await pg.goto(init_url, wait_until="networkidle", timeout=45000)
+        await pg.goto(init_url, wait_until="domcontentloaded", timeout=30000)
+        await pg.wait_for_timeout(3000)
 
         # Verify XSRF cookie is present before attempting API calls
         for _ in range(3):
@@ -204,7 +205,7 @@ async def _barchart_playwright(page) -> dict:
                 const opts = '&orderBy=contractExpirationDate&orderDir=asc&limit=12&raw=1';
                 const [kcResp, rmResp] = await Promise.all([
                     fetch(base + '?symbol=KC%5EF&fields=' + fields + opts, h),
-                    fetch(base + '?symbol=RC%5EF&fields=' + fields + opts, h),
+                    fetch(base + '?symbol=RM%5EF&fields=' + fields + opts, h),
                 ]);
                 return {
                     kc: kcResp.ok ? await kcResp.json() : null,
@@ -439,26 +440,23 @@ def _stooq_fallback() -> dict:
 
 async def _fetch_chains(page) -> dict:
     """Fetch futures chains: requests → Playwright → Yahoo Finance fallback.
-    In CI (GitHub Actions sets CI=true) Playwright is skipped — datacenter IPs
-    are blocked by Barchart and browser launch alone consumes most of the timeout."""
-    import os
-    in_ci = os.environ.get("CI") == "true"
+    Playwright works in CI (fetch_oi_json.py uses same approach daily) so we no
+    longer skip it — only the pure-HTTP XSRF path is unreliable on datacenter IPs."""
 
-    # 1. Fast path: pure HTTP (no browser overhead)
+    # 1. Fast path: pure HTTP (no browser overhead, works when not IP-blocked)
     result = _barchart_requests()
     if result.get("kc") and result.get("rm"):
         return result
 
-    # 2. Playwright path — skip in CI where it always times out
-    if not in_ci:
-        pw = await _barchart_playwright(page)
-        for k in ("kc", "rm"):
-            if not result.get(k) and pw.get(k):
-                result[k] = pw[k]
-        if result.get("kc") and result.get("rm"):
-            return result
+    # 2. Playwright — spin up a browser context and make authenticated API calls
+    pw = await _barchart_playwright(page)
+    for k in ("kc", "rm"):
+        if not result.get(k) and pw.get(k):
+            result[k] = pw[k]
+    if result.get("kc") and result.get("rm"):
+        return result
 
-    # 3. Yahoo Finance — supplement any still-missing side
+    # 3. Yahoo Finance — KC works (KC*.NYB symbols); RM not available on Yahoo
     if not result.get("kc") or not result.get("rm"):
         missing = [k for k in ("kc", "rm") if not result.get(k)]
         print(f"[futures] Barchart incomplete (missing: {missing}) — supplementing with Yahoo Finance")

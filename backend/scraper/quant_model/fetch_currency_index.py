@@ -32,8 +32,54 @@ import numpy as np
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-ROOT     = Path(__file__).resolve().parents[3]
-OUT_PATH = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+ROOT       = Path(__file__).resolve().parents[3]
+OUT_PATH   = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+FX_OUT     = ROOT / "frontend" / "public" / "data" / "fx_history.json"
+
+# yfinance hits query1.finance.yahoo.com directly. From cloud-provider IP
+# ranges (Azure / GH Actions) Yahoo blocks bare-UA Python clients AND, since
+# late-April 2026, has been Cloudflare-protecting the crumb-token endpoint
+# yfinance scrapes for auth. Previous fix (PR #46) supplied a Chrome UA via
+# requests.Session — that bypassed the static UA filter but the TLS
+# fingerprint was still flagged at the Cloudflare layer, so the crumb fetch
+# returned an HTML challenge page, JSON-parse failed, every subsequent
+# ticker call returned empty body → JSONDecodeError. Observed 2026-05-14
+# 22:37 UTC run: all 12 tickers identical "Expecting value: line 1 column 1".
+#
+# Fix: switch the underlying transport to curl_cffi, which uses
+# libcurl-impersonate and mimics Chrome's exact TLS fingerprint (JA3 / ALPN /
+# extension order). yfinance accepts a curl_cffi.requests.Session via its
+# `session=` kwarg — same API surface as requests.Session, drop-in.
+try:
+    from curl_cffi import requests as cffi_requests
+    _HAVE_CURL_CFFI = True
+except ImportError:
+    import requests as cffi_requests  # fallback so dev environments without curl_cffi still import
+    _HAVE_CURL_CFFI = False
+    print("  WARNING: curl_cffi not installed — falling back to requests.Session "
+          "(Yahoo crumb auth will likely fail on cloud IPs)", file=sys.stderr)
+
+def _build_session():
+    """Build a yfinance-compatible session that survives Yahoo's bot detection."""
+    if _HAVE_CURL_CFFI:
+        # impersonate="chrome124" reproduces Chrome 124's TLS handshake.
+        # Yahoo's Cloudflare front then sees a "real" browser and serves
+        # the JSON crumb endpoint instead of an HTML challenge.
+        s = cffi_requests.Session(impersonate="chrome124")
+        return s
+    s = cffi_requests.Session()
+    s.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept":          "application/json,text/plain,*/*",
+        "Accept-Language": "en-US,en;q=0.7",
+    })
+    return s
+
+_YF_SESSION = _build_session()
+FX_HISTORY_DAYS = 365  # ~1 year of daily closes per pair
 
 # ── Weights (USDA PSD 2023/24, normalized over tracked pairs) ─────────────────
 #
@@ -81,20 +127,33 @@ def _safe_float(val) -> float | None:
         return None
 
 
-def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
-    """Download daily close prices and return close-to-close % changes."""
+def _fetch_closes(ticker: str, period: str = "2y") -> pd.Series:
+    """Download daily close prices for a ticker."""
     try:
-        hist = yf.download(ticker, period=period, interval="1d",
-                           auto_adjust=True, progress=False)
+        hist = yf.download(
+            ticker, period=period, interval="1d",
+            auto_adjust=True, progress=False,
+            session=_YF_SESSION,
+        )
         if isinstance(hist.columns, pd.MultiIndex):
             hist.columns = hist.columns.get_level_values(0)
         if hist.empty or "Close" not in hist.columns:
+            print(f"  WARNING: {ticker} returned empty DataFrame "
+                  f"(columns={list(hist.columns) if not hist.empty else 'EMPTY'})",
+                  file=sys.stderr)
             return pd.Series(dtype=float)
-        closes = hist["Close"].dropna()
-        return closes.pct_change().dropna()
+        return hist["Close"].dropna()
     except Exception as e:
-        print(f"  WARNING: could not fetch {ticker}: {e}", file=sys.stderr)
+        print(f"  WARNING: could not fetch {ticker}: {type(e).__name__}: {e}", file=sys.stderr)
         return pd.Series(dtype=float)
+
+
+def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
+    """Return close-to-close % changes for a ticker (legacy entrypoint)."""
+    closes = _fetch_closes(ticker, period=period)
+    if closes.empty:
+        return pd.Series(dtype=float)
+    return closes.pct_change().dropna()
 
 
 def _compute_index_series(
@@ -139,16 +198,19 @@ def main():
 
     print("Fetching FX data for Coffee Currency Index...")
 
-    # ── Fetch all returns ──────────────────────────────────────────────────────
-    exporter_returns: dict[str, pd.Series] = {}
+    # ── Fetch all closes (single download per pair; returns derived below) ────
+    exporter_closes: dict[str, pd.Series] = {}
     for ticker, name, _ in EXPORTERS:
         print(f"  {ticker} ({name})...")
-        exporter_returns[ticker] = _fetch_returns(ticker)
+        exporter_closes[ticker] = _fetch_closes(ticker)
 
-    importer_returns: dict[str, pd.Series] = {}
+    importer_closes: dict[str, pd.Series] = {}
     for ticker, name, _ in IMPORTERS:
         print(f"  {ticker} ({name})...")
-        importer_returns[ticker] = _fetch_returns(ticker)
+        importer_closes[ticker] = _fetch_closes(ticker)
+
+    exporter_returns = {t: s.pct_change().dropna() for t, s in exporter_closes.items()}
+    importer_returns = {t: s.pct_change().dropna() for t, s in importer_closes.items()}
 
     # ── Build index series ─────────────────────────────────────────────────────
     index_series = _compute_index_series(exporter_returns, importer_returns)
@@ -244,6 +306,51 @@ def main():
 
     print(f"\nCCI = {today_value:.2f}  ΔI = {total_delta_i:+.4f}  Z = {zscore:+.2f}")
     print(f"Saved → {OUT_PATH}")
+
+    # ── fx_history.json: per-pair daily closes for the FX time-series widget ──
+    # The Macro tab's CurrencyIndexSection shows the aggregate index. This file
+    # backs the FX time-series widget that drills into the individual pairs.
+    # We already downloaded 2y of closes above so this is essentially free.
+    fx_pairs: dict[str, dict] = {}
+    for ticker, name, w in EXPORTERS:
+        closes = exporter_closes.get(ticker)
+        if closes is None or closes.empty:
+            continue
+        tail = closes.tail(FX_HISTORY_DAYS)
+        fx_pairs[ticker] = {
+            "name":    name,
+            "type":    "export",
+            "weight":  w,
+            "history": [
+                {"date": dt.date().isoformat(), "close": _safe_float(val)}
+                for dt, val in tail.items()
+                if _safe_float(val) is not None
+            ],
+        }
+    for ticker, name, w in IMPORTERS:
+        closes = importer_closes.get(ticker)
+        if closes is None or closes.empty:
+            continue
+        tail = closes.tail(FX_HISTORY_DAYS)
+        fx_pairs[ticker] = {
+            "name":    name,
+            "type":    "import",
+            "weight":  w,
+            "history": [
+                {"date": dt.date().isoformat(), "close": _safe_float(val)}
+                for dt, val in tail.items()
+                if _safe_float(val) is not None
+            ],
+        }
+
+    fx_output = {
+        "scraped_at":   scraped_at,
+        "history_days": FX_HISTORY_DAYS,
+        "pairs":        fx_pairs,
+    }
+    with open(FX_OUT, "w", encoding="utf-8") as f:
+        json.dump(fx_output, f, indent=2)
+    print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs)")
 
 
 if __name__ == "__main__":

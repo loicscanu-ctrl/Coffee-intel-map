@@ -123,8 +123,37 @@ def validate_oi_history(data: dict) -> tuple[bool, str]:
 def validate_quant_report(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
-    if not data.get("currency_index"):
+    ci = data.get("currency_index")
+    if not ci:
         return False, "currency_index is empty"
+
+    # Staleness gate — if yfinance silently degrades (the 2026-05-11
+    # onwards Yahoo Finance / GH Actions IP block produced empty-output
+    # runs that still wrote a CCI section from the previous run via the
+    # merge-into-existing logic), reject so the workflow's git checkout
+    # fallback keeps the prior good file rather than committing stale data.
+    scraped_at = ci.get("scraped_at") if isinstance(ci, dict) else None
+    if not scraped_at:
+        return False, "currency_index.scraped_at missing"
+    try:
+        from datetime import UTC, datetime, timedelta
+        dt = datetime.fromisoformat(str(scraped_at).replace("Z", "+00:00"))
+        age = datetime.now(UTC) - dt
+        if age > timedelta(days=3):
+            return False, f"currency_index.scraped_at is {age.days}d old"
+    except Exception as e:
+        return False, f"could not parse scraped_at ({e})"
+
+    # currency_index.currencies must be non-empty and at least half the
+    # 12 tracked pairs must have a non-null daily_chg — otherwise the
+    # downstream sum would be biased by all the implicit zeros.
+    currencies = ci.get("currencies") if isinstance(ci, dict) else None
+    if not currencies or not isinstance(currencies, list):
+        return False, "currency_index.currencies missing or wrong type"
+    with_chg = sum(1 for c in currencies if c.get("daily_chg") is not None)
+    if with_chg < len(currencies) // 2:
+        return False, f"only {with_chg}/{len(currencies)} currencies have daily_chg"
+
     return True, "ok"
 
 

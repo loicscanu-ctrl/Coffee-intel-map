@@ -131,7 +131,32 @@ export const COUNTRY_EN: Record<string, string> = {
 
 // ── Hub groupings ─────────────────────────────────────────────────────────────
 
+// ICE KC (Coffee C arabica, ICE US): New York/Virginia/New Orleans/Houston/Miami,
+//   Bremen/Hamburg, Antwerp, Barcelona
+export const ICE_KC_COUNTRIES: readonly string[] = [
+  "E.U.A.",      // USA
+  "BELGICA",     // Belgium (Antwerp)
+  "ALEMANHA",    // Germany (Bremen/Hamburg)
+  "ESPANHA",     // Spain (Barcelona)
+];
+
+// ICE RC (Robusta, ICE Europe): Amsterdam/Rotterdam, Antwerp, Bremen/Hamburg,
+//   Genoa-Savona, Barcelona, Le Havre, London/Liverpool/Felixstowe/Teesside/Humberside,
+//   New Orleans/New York
+export const ICE_RC_COUNTRIES: readonly string[] = [
+  "E.U.A.",                    // USA (New Orleans/New York)
+  "BELGICA",                   // Belgium (Antwerp)
+  "ALEMANHA",                  // Germany (Bremen/Hamburg)
+  "ESPANHA",                   // Spain (Barcelona)
+  "PAISES BAIXOS (HOLANDA)",   // Netherlands (Amsterdam/Rotterdam)
+  "FRANCA",                    // France (Le Havre)
+  "ITALIA",                    // Italy (Genoa-Savona)
+  "REINO UNIDO",               // UK (London/Liverpool/Felixstowe/Teesside/Humberside)
+];
+
 export const HUB_COLORS: Record<string, string> = {
+  "ICE KC":              "#fde68a",
+  "ICE RC":              "#fcd34d",
   "Nordics":             "#bfdbfe",
   "Central Europe":      "#60a5fa",
   "South Europe":        "#3b82f6",
@@ -286,6 +311,7 @@ export const COUNTRY_HUB: Record<string, string> = {
 };
 
 export const HUB_ORDER = [
+  "ICE KC", "ICE RC",
   "Nordics","Central Europe","South Europe","Eastern Europe",
   "North America","Latin America",
   "East Asia","SE Asia & Pacific","Middle East","North Africa",

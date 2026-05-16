@@ -2,26 +2,87 @@ name: "1.6 – Morning Brief"
 
 on:
   schedule:
-    - cron: '30 2 * * *'   # 02:30 UTC daily — 1 h after export-and-publish (01:30 UTC)
+    # 03:00 UTC = 10:00 Vietnam time (UTC+7). Primary delivery target.
+    # Upstream chain ends well before this:
+    #   01:00 UTC  scraper-daily       (~30-50 min)
+    #   01:30 UTC  export-and-publish  (~10 min)
+    #   02:00 UTC  scraper-freight     (~5 min)
+    #   02:00 UTC  daily_oi            (~3 min)
+    # → all done by ~02:15 UTC, leaving 45 min headroom before 10am VN.
+    - cron: '0 3 * * *'
+  workflow_run:
+    # Safety net for skipped scheduled runs. GH Actions cron has a known
+    # skip rate during peak load (esp. :00/:30 minute slots) — empirically
+    # observed 2026-05-15: 01:30 UTC export-and-publish skipped, didn't bot-commit
+    # until 04:58 UTC; the 02:30 UTC brief never fired and no failure alert
+    # was sent (because it never started, so the on-failure step couldn't run).
+    #
+    # When export-and-publish completes successfully, this workflow ALSO fires.
+    # A guard step inside the job ensures the brief only sends once per UTC day:
+    # if today's brief already went out (via cron or earlier workflow_run), the
+    # job exits silently. So this is purely additive — never causes a double-send.
+    workflows: ["1.4 – Export and Publish Static JSON"]
+    types: [completed]
   workflow_dispatch:        # manual trigger from GitHub UI
+
+# Force serialization across all triggers — prevents two concurrent runs racing
+# on the once-per-day idempotency check below.
+concurrency:
+  group: morning-brief
+  cancel-in-progress: false
 
 jobs:
   brief:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
+    # Only run on the workflow_run trigger if the upstream succeeded.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Idempotency guard — skip if brief already sent today
+        id: guard
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:     ${{ github.repository }}
+          THIS_RUN: ${{ github.run_id }}
+        run: |
+          today=$(date -u +%Y-%m-%d)
+          export today THIS_RUN
+          prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/actions/workflows/morning-brief.yml/runs?status=success&per_page=20" \
+            | python3 -c "
+          import json, sys, os
+          d = json.load(sys.stdin)
+          today    = os.environ['today']
+          this_run = os.environ['THIS_RUN']
+          for r in d.get('workflow_runs', []):
+              if str(r['id']) == this_run:
+                  continue
+              if r.get('updated_at', '').startswith(today):
+                  print(r['id']); break
+          ")
+          if [ -n "$prior" ]; then
+            echo "Brief already sent today via run $prior — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No prior successful run today. Proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.guard.outputs.skip != 'true'
         with:
           python-version: '3.11'
 
       - name: Install Python dependencies
+        if: steps.guard.outputs.skip != 'true'
         working-directory: backend
         run: pip install -r scraper/requirements.txt requests python-dotenv
 
       - name: Send morning brief
+        if: steps.guard.outputs.skip != 'true'
         working-directory: backend
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

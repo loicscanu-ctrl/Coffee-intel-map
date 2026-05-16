@@ -8,6 +8,17 @@ on:
     workflows: ["1.1 – Daily News Scraper", "2.3 – COT Scraper"]
     types: [completed]
 
+# Serialize overlapping runs onto a single queue. Without this, two
+# back-to-back triggers (e.g. 1.1 and 2.3 both finishing within a few
+# minutes, or a manual dispatch landing during a scheduled run) each
+# regenerate the JSON files and race to `git push origin main`. The
+# loser then fails its `git pull --rebase` with merge conflicts on
+# every changed JSON file. queueing them serially means the later run
+# starts from an up-to-date main and re-exports cleanly.
+concurrency:
+  group: export-and-publish
+  cancel-in-progress: false
+
 jobs:
   export:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
@@ -50,7 +61,7 @@ jobs:
                   frontend/public/data/health.json \
                   frontend/public/data/latest_prices.json \
                   frontend/public/data/vietnam_supply.json
-          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json; do
+          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json frontend/public/data/origin_prices_history.json; do
             [ -f "$f" ] && git add "$f" || true
           done
           git diff --cached --quiet \

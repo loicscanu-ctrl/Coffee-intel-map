@@ -2,6 +2,9 @@ sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 playwright==1.44.0
 playwright-stealth
+# patchright is installed by the workflow as a separate step — pip's
+# resolver silently drops it from this file due to a conflict with
+# playwright==1.44.0. Used only by scraper/sources/vietnam.py for CF bypass.
 deep-translator==1.11.4
 beautifulsoup4==4.12.3
 feedparser==6.0.11
@@ -9,3 +12,8 @@ requests==2.32.3
 pdfplumber==0.11.4
 openpyxl==3.1.5
 yfinance==0.2.54
+# curl_cffi mimics Chrome's TLS fingerprint so yfinance can fetch Yahoo's
+# Cloudflare-protected crumb-token endpoint from cloud IPs (PR #48).
+# Without this, yfinance gets HTML challenge pages, JSON-parse fails, and
+# every ticker call returns empty body → JSONDecodeError.
+curl_cffi>=0.7,<1.0
