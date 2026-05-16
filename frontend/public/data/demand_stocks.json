@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T21:05:48.987969Z",
+  "generated_at": "2026-05-16T04:41:17.494192Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -84,7 +84,7 @@
   },
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-16",
     "annual": [
       {
         "year": "2002",
@@ -310,7 +310,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-16",
     "annual": [
       {
         "year": "2002",
@@ -536,7 +536,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-16",
     "annual": [
       {
         "year": "1960",
@@ -1141,7 +1141,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-16",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
@@ -12623,7 +12623,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-16",
     "countries": {
       "eu": {
         "name": "European Union",

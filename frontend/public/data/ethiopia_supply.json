@@ -1,15 +1,15 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-15T21:05:48.412482Z",
+  "scraped_at": "2026-05-16T04:41:16.921329Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-15",
+    "as_of": "2026-05-16",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-15T05:47:28.115363Z",
+    "scraped_at": "2026-05-16T04:39:24.395704Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -21,8 +21,8 @@
       },
       {
         "name": "Harrar",
-        "drought": "HIGH",
-        "csi_30d": 0.186,
+        "drought": "MED",
+        "csi_30d": 0.14,
         "csi_60d": 0.116,
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW"
@@ -30,8 +30,8 @@
       {
         "name": "Kaffa",
         "drought": "MED",
-        "csi_30d": 0.094,
-        "csi_60d": 0.046,
+        "csi_30d": 0.046,
+        "csi_60d": 0.024,
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW"
       },
@@ -56,7 +56,6 @@
       {
         "region": "Harrar",
         "days": [
-          "H",
           "M",
           "M",
           "M",
@@ -117,7 +116,8 @@
           "L",
           "M",
           "M",
-          "L",
+          "M",
+          "M",
           "L",
           "M",
           "M",
@@ -129,7 +129,7 @@
         "region": "Kaffa",
         "days": [
           "M",
-          "M",
+          "-",
           "-",
           "-",
           "-",
@@ -200,8 +200,8 @@
       {
         "region": "Limu",
         "days": [
-          "L",
           "M",
+          "-",
           "-",
           "-",
           "-",
@@ -388,7 +388,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-15"
+    "last_updated": "2026-05-16"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",
