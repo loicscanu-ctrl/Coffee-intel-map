@@ -519,7 +519,11 @@ async def run(page, db) -> None:  # noqa: ARG001
 
     try:
         # Path A: direct URL prediction — fast, no Playwright dependency.
-        per_month = _harvest_via_url_prediction(months_back=18)
+        # 30 months covers ~2.5 years of history, which: (a) reaches the
+        # Sept 2024 transition point where the static fallback ends, so we
+        # don't leave dead zones in the chart, and (b) gives us enough
+        # YoY baseline for 2026 months.
+        per_month = _harvest_via_url_prediction(months_back=30)
 
         if not per_month:
             print("[vn_coffee_export] path A returned nothing — trying path B (bridge API)")
