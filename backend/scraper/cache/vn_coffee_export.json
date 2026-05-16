@@ -1,0 +1,112 @@
+{
+  "scraped_at": "2026-05-16T07:40:42.680495Z",
+  "source": "Vietnam Customs (customs.gov.vn) 2x monthly export bulletins",
+  "unit": "tonnes",
+  "monthly": [
+    {
+      "month": "2024-11",
+      "tonnes": 63019.0,
+      "period_qty_tonnes": 63019.0,
+      "ytd_cum_qty_tonnes": 388.0,
+      "ytd_diff_tonnes": null
+    },
+    {
+      "month": "2024-12",
+      "tonnes": 127655.0,
+      "period_qty_tonnes": 127655.0,
+      "ytd_cum_qty_tonnes": 1026.0,
+      "ytd_diff_tonnes": 638.0
+    },
+    {
+      "month": "2025-01",
+      "tonnes": 134005.0,
+      "period_qty_tonnes": 134005.0,
+      "ytd_cum_qty_tonnes": 50.0,
+      "ytd_diff_tonnes": 50.0
+    },
+    {
+      "month": "2025-02",
+      "tonnes": 169832.0,
+      "period_qty_tonnes": 169832.0,
+      "ytd_cum_qty_tonnes": 267.0,
+      "ytd_diff_tonnes": 217.0
+    },
+    {
+      "month": "2025-04",
+      "tonnes": 166606.0,
+      "period_qty_tonnes": 166606.0,
+      "ytd_cum_qty_tonnes": 80.0,
+      "ytd_diff_tonnes": 0.0
+    },
+    {
+      "month": "2025-05",
+      "tonnes": 148762.0,
+      "period_qty_tonnes": 148762.0,
+      "ytd_cum_qty_tonnes": 107.0,
+      "ytd_diff_tonnes": 27.0
+    },
+    {
+      "month": "2025-06",
+      "tonnes": 117983.0,
+      "period_qty_tonnes": 117983.0,
+      "ytd_cum_qty_tonnes": 207.0,
+      "ytd_diff_tonnes": 100.0
+    },
+    {
+      "month": "2025-07",
+      "tonnes": 101979.0,
+      "period_qty_tonnes": 101979.0,
+      "ytd_cum_qty_tonnes": 136.0,
+      "ytd_diff_tonnes": 0.0
+    },
+    {
+      "month": "2025-08",
+      "tonnes": 84062.0,
+      "period_qty_tonnes": 84062.0,
+      "ytd_cum_qty_tonnes": 176.0,
+      "ytd_diff_tonnes": 40.0
+    },
+    {
+      "month": "2025-09",
+      "tonnes": 81099.0,
+      "period_qty_tonnes": 81099.0,
+      "ytd_cum_qty_tonnes": 35.0,
+      "ytd_diff_tonnes": 0.0
+    },
+    {
+      "month": "2025-10",
+      "tonnes": 68316.0,
+      "period_qty_tonnes": 68316.0,
+      "ytd_cum_qty_tonnes": 158.0,
+      "ytd_diff_tonnes": 123.0
+    },
+    {
+      "month": "2025-11",
+      "tonnes": 88812.0,
+      "period_qty_tonnes": 88812.0,
+      "ytd_cum_qty_tonnes": 300.0,
+      "ytd_diff_tonnes": 142.0
+    },
+    {
+      "month": "2025-12",
+      "tonnes": 182967.0,
+      "period_qty_tonnes": 182967.0,
+      "ytd_cum_qty_tonnes": 1060.0,
+      "ytd_diff_tonnes": 760.0
+    },
+    {
+      "month": "2026-03",
+      "tonnes": 221975.0,
+      "period_qty_tonnes": 221975.0,
+      "ytd_cum_qty_tonnes": 560.0,
+      "ytd_diff_tonnes": 560.0
+    },
+    {
+      "month": "2026-04",
+      "tonnes": 189894.0,
+      "period_qty_tonnes": 189894.0,
+      "ytd_cum_qty_tonnes": 152.0,
+      "ytd_diff_tonnes": 0.0
+    }
+  ]
+}
