@@ -185,26 +185,31 @@ def _months_to_try(months_back: int = 18) -> list[tuple[int, int]]:
 def _candidate_pdf_urls(data_year: int, data_month: int) -> list[str]:
     """Generate likely PDF URLs for one data month.
 
-    Publication month = data_month + 1. Publication day varies but clusters
-    around the 10th — we try 8..20 in plausibility order. Both lowercase
-    'tN' (modern convention, observed 2024+) and uppercase 'TN' (older
-    bulletins) are emitted in case customs is inconsistent.
+    Publication month = data_month + 1. Publication day clusters around the
+    7th but can drift; we try 1..28 in plausibility order. Tried both
+    lowercase 'tN' (modern, 2024+) and uppercase 'TN' (older), and both
+    lowercase '(vn-sb)' (modern) and uppercase '(VN-SB)' (older) suffixes.
     """
     pub_year, pub_month = data_year, data_month + 1
     if pub_month > 12:
         pub_month = 1
         pub_year += 1
 
-    # Plausibility-ordered days; first hit wins so order matters for HTTP cost.
-    day_order = [10, 11, 9, 12, 8, 13, 14, 15, 7, 16, 6, 17, 5, 18, 19, 20]
+    # Plausibility-ordered days. The first 16 (5–20) cover all observed
+    # publication dates; the rest are insurance for outliers.
+    day_order = [
+        7, 8, 6, 9, 10, 11, 5, 12, 13, 14, 15, 4, 16, 17, 3, 18, 19, 2,
+        20, 21, 1, 22, 23, 24, 25, 26, 27, 28,
+    ]
 
     urls: list[str] = []
     for tprefix in ("t", "T"):
         for mfmt in (str(data_month), f"{data_month:02d}"):
-            stem = f"{data_year}-{tprefix}{mfmt}-2x(vn-sb).pdf"
-            for d in day_order:
-                urls.append(f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_year}/{pub_month}/{d}/{stem}")
-    # Dedupe while preserving order (data_month and f"{data_month:02d}" collide for 10–12).
+            for suffix in ("(vn-sb)", "(VN-SB)"):
+                stem = f"{data_year}-{tprefix}{mfmt}-2x{suffix}.pdf"
+                for d in day_order:
+                    urls.append(f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_year}/{pub_month}/{d}/{stem}")
+    # Dedupe while preserving order.
     seen: set[str] = set()
     out: list[str] = []
     for u in urls:
@@ -266,6 +271,11 @@ def _harvest_via_url_prediction(months_back: int = 18) -> dict[str, dict]:
         per_month[key] = extracted
         print(f"[vn_coffee_export] [pathA] {key}: period={extracted['period_qty_tonnes']:.0f}t "
               f"ytd={extracted['ytd_cum_qty_tonnes']:.0f}t (pub {url.split('/TONG_CUC/', 1)[1].split('/', 3)[:3]})")
+        # Print raw_row so column-mapping issues are visible in logs even
+        # before the cache file lands. Truncate at 12 cells; coffee row is
+        # typically 7-9 cells.
+        rr = extracted.get("raw_row") or []
+        print(f"[vn_coffee_export] [pathA] {key}: raw_row={rr[:12]}")
     return per_month
 
 
@@ -405,6 +415,7 @@ def _derive_monthly_rows(raw: dict[str, dict]) -> list[dict]:
             "period_qty_tonnes":  round(period, 1),
             "ytd_cum_qty_tonnes": round(ytd, 1),
             "ytd_diff_tonnes":    round(ytd_diff, 1) if ytd_diff is not None else None,
+            "raw_row":            cur.get("raw_row"),
         })
     return out
 
