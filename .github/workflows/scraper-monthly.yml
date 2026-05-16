@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +40,31 @@ jobs:
             python -m scraper.run_monthly && break
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
+
+      - name: Commit scraped cache files if changed
+        run: |
+          set -x  # echo every command + result to the log
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "[diag] checked-out commit: $GITHUB_SHA"
+          echo "[diag] ref: $GITHUB_REF_NAME"
+          echo "[diag] cache dir before commit:"
+          ls -la backend/scraper/cache/ || echo "  (cache dir missing)"
+          # backend/scraper/cache/ is .gitignored locally; force-add the files
+          # we publish so they actually land in the repo.
+          mkdir -p backend/scraper/cache
+          # Don't suppress errors — we want to see them.
+          git add -f backend/scraper/cache/vn_fertilizer.json || echo "  (vn_fertilizer.json not added)"
+          git add -f backend/scraper/cache/vn_coffee_export.json || echo "  (vn_coffee_export.json not added)"
+          echo "[diag] staged files:"
+          git diff --cached --name-only
+          if git diff --cached --quiet; then
+            echo "No cache changes."
+          else
+            git commit -m "data: monthly scraper cache update [skip ci]"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Notify on failure
         if: failure()

@@ -2,18 +2,31 @@
 vietnam_supply.py — scrape Vietnam coffee export data and fertilizer import context.
 
 Exports source chain (highest priority first):
-  1. NSO Vietnam (www.nso.gov.vn) — monthly cadence, ~4-day publication lag.
-     URL pattern: /en/data-and-statistics/{YYYY}/03/exports-and-imports-value-by-months-of-{YYYY}/
+  1. Vietnam Customs 2x monthly bulletins (customs.gov.vn) — primary source as of
+     2026-05. Scraped by vn_coffee_export.run() in the monthly Playwright session,
+     persisted to backend/scraper/cache/vn_coffee_export.json. ~10-day publication
+     lag (e.g. Dec 2024 published Jan 10 2025). Same publication system as our
+     existing vn_fertilizer 1n imports, just filtered for type "2x" (xuất khẩu).
+  2. NSO Vietnam (www.nso.gov.vn) — secondary, monthly cadence with ~4-day
+     publication lag. URL pattern:
+       /en/data-and-statistics/{YYYY}/03/exports-and-imports-value-by-months-of-{YYYY}/
      The year-archive page hosts one .xlsx per month listing exports by main
-     commodity. Coffee is broken out as its own line in tonnes.
-  2. ICO historical CSV (www.ico.org/historical/...) — kept as legacy fallback,
-     but currently returning 403 from cloud IPs as of 2026-05.
-  3. Static snapshot vn_export_destination_port.json — frozen at 2024-08, final
+     commodity. Coffee is broken out as its own line in tonnes. Currently
+     returning 403 from cloud IPs but kept as a backup tier in case the WAF
+     behaviour relaxes.
+  3. ICO historical CSV (www.ico.org/historical/...) — legacy fallback,
+     currently 403'd from cloud IPs (same root cause as NSO).
+  4. Static snapshot vn_export_destination_port.json — frozen at 2024-08, final
      backstop so the chart never goes completely empty.
 
 Each source is attempted independently; results are merged by month with the
-higher-priority source winning. This was rebuilt 2026-05 after the ICO path
-silently died ~Sep 2024 and we'd been on the static fallback for 21 months.
+higher-priority source winning. Customs was added 2026-05 after diagnosis
+revealed that ICO had silently 403'd since Sep 2024 (leaving the chart frozen
+for 21 months on the static fallback) and the subsequent NSO scraper also
+failed from cloud IPs. The bypass: tap the same Vietnam Customs publication
+system that vn_fertilizer.py already uses, filtered for type 2x (exports) and
+fetched via direct URL prediction on files.customs.gov.vn (no portal session
+needed for the data files themselves).
 
 Fertilizer imports: same as before — Vietnam GSO / MARD monthly bulletin via
 the vn_fertilizer cache, with static metadata as default.
@@ -59,7 +72,46 @@ _VIET_NAMES = {"viet nam", "vietnam", "viet-nam"}
 # Coffee detection in NSO xlsx — match any cell mentioning coffee in EN or VN
 _COFFEE_RX = re.compile(r"\bcoffee\b|\bcà\s*phê\b", re.IGNORECASE)
 
-# ── ICO CSV parser (unchanged) ────────────────────────────────────────────────
+# ── Customs scraper cache reader (priority 1) ────────────────────────────────
+
+def _fetch_customs_exports() -> list[dict]:
+    """Read monthly coffee exports from vn_coffee_export cache (tonnes → k_bags).
+
+    The cache is populated by backend/scraper/sources/vn_coffee_export.run() in
+    the monthly Playwright session, then committed to git by scraper-monthly.yml
+    so this function sees it on subsequent export-and-publish runs.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+    cache = (
+        _Path(__file__).resolve().parents[2]
+        / "scraper" / "cache" / "vn_coffee_export.json"
+    )
+    if not cache.exists():
+        print("  [vn_exports][Customs] cache file not found — skipping")
+        return []
+    try:
+        data = _json.loads(cache.read_text(encoding="utf-8"))
+        monthly = data.get("monthly") or []
+        out: list[dict] = []
+        for r in monthly:
+            t = r.get("tonnes") or 0
+            if t <= 0:
+                continue
+            out.append({
+                "month":        r["month"],
+                "total_k_bags": round(t / 60, 1),
+            })
+        out.sort(key=lambda r: r["month"])
+        print(f"  [vn_exports][Customs] {len(out)} months from cache "
+              f"(latest: {out[-1]['month'] if out else 'none'})")
+        return out
+    except Exception as e:
+        print(f"  [vn_exports][Customs] cache read failed ({type(e).__name__}): {e}")
+        return []
+
+
+# ── ICO CSV parser ────────────────────────────────────────────────────────────
 
 def _parse_ico_exports(content: str) -> list[dict]:
     """Parse ICO green coffee export CSV. Returns list of {month, total_k_bags}."""
@@ -265,7 +317,7 @@ def _fetch_nso_exports() -> list[dict]:
     return sorted(by_month.values(), key=lambda r: r["month"])
 
 
-# ── Static fallback (unchanged) ───────────────────────────────────────────────
+# ── Static fallback ───────────────────────────────────────────────────────────
 
 def _fetch_static_exports() -> list[dict]:
     """Read monthly_total (MT) from vn_export_destination_port.json → k_bags."""
@@ -309,14 +361,16 @@ def _compute_yoy(monthly: list[dict]) -> list[dict]:
 def fetch_exports() -> dict | None:
     """Run the source chain and return a merged result.
 
-    Sources in priority order: NSO → ICO → static. The first source that
-    contributes a given month wins; remaining sources only fill gaps. We keep
-    the last 36 months of merged data, computing YoY across the merged series.
+    Sources in priority order: Customs → NSO → ICO → static. The first source
+    that contributes a given month wins; remaining sources only fill gaps. We
+    keep the last 36 months of merged data, computing YoY across the merged
+    series.
     """
     sources = [
-        ("NSO Vietnam",                                   _fetch_nso_exports),
-        ("ICO",                                           _fetch_ico_exports),
-        ("Vietnam Customs (vn_export_destination_port)",  _fetch_static_exports),
+        ("Vietnam Customs (customs.gov.vn) 2x",            _fetch_customs_exports),
+        ("NSO Vietnam",                                    _fetch_nso_exports),
+        ("ICO",                                            _fetch_ico_exports),
+        ("Vietnam Customs (vn_export_destination_port)",   _fetch_static_exports),
     ]
 
     by_month: dict[str, dict] = {}  # month → {total_k_bags, source}

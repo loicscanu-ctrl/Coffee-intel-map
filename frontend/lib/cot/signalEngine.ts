@@ -55,7 +55,7 @@ const isLow  = (s: number[], i: number) => pct52(s, i) <= 0.25;
 
 export type Magnitude = "small" | "medium" | "large";
 /** WoW magnitude: small <5%, medium 5–12%, large >12%. */
-function mag(prev: number, curr: number): Magnitude {
+function _mag(prev: number, curr: number): Magnitude {
   const base = Math.abs(prev) || 1;
   const pct  = Math.abs((curr - prev) / base);
   if (pct < 0.05) return "small";
@@ -63,7 +63,7 @@ function mag(prev: number, curr: number): Magnitude {
   return "large";
 }
 /** Signed lot delta string, e.g. "+5.2k lots" or "−800 lots". */
-function fmtLots(delta: number): string {
+function _fmtLots(delta: number): string {
   const a = Math.abs(delta);
   return (delta >= 0 ? "+" : "−") + (a >= 1000 ? (a / 1000).toFixed(1) + "k" : String(Math.round(a))) + " lots";
 }
@@ -394,11 +394,11 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
 
   // ── MPI — MM × Producers Interaction ─────────────────────────────────────
   for (const mkt of ["NY", "LDN"] as const) {
-    const ml  = mmLDir[mkt];
-    const pd  = prodDir[mkt];
-    const pr  = priceDir[mkt];
-    const mls = mkt === "NY" ? nyMmL : ldnMmL;
-    const ps  = mkt === "NY" ? nyProdS : ldnProdS;
+    const ml   = mmLDir[mkt];
+    const pd   = prodDir[mkt];
+    const pr   = priceDir[mkt];
+    const _mls = mkt === "NY" ? nyMmL : ldnMmL;
+    const _ps  = mkt === "NY" ? nyProdS : ldnProdS;
 
     if (ml === "up"   && pd === "up"   && pr === "up")
       add({ id:"MPI1", name:"Classic Bullish Flow",              category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"info",  score: +2,
@@ -427,11 +427,11 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
 
   // ── MRI — MM × Roasters Interaction ──────────────────────────────────────
   for (const mkt of ["NY", "LDN"] as const) {
-    const ml = mmLDir[mkt];
-    const rd = roastDir[mkt];
-    const pd = prodDir[mkt];
-    const pr = priceDir[mkt];
-    const rs = mkt === "NY" ? nyRoastL : ldnRoastL;
+    const ml  = mmLDir[mkt];
+    const rd  = roastDir[mkt];
+    const _pd = prodDir[mkt];
+    const pr  = priceDir[mkt];
+    const rs  = mkt === "NY" ? nyRoastL : ldnRoastL;
 
     if (ml === "up" && rd === "up" && pr === "up" && !isLow(rs, i))
       add({ id:"MRI1", name:"Double Buying Pressure",        category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"warn",  score: +2,
