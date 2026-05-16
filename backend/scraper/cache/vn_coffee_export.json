@@ -7,9 +7,7 @@
       "month": "2024-11",
       "tonnes": 63019.0,
       "period_qty_tonnes": 63019.0,
-      "period_usd": 351682371.0,
       "ytd_cum_qty_tonnes": 1217493.0,
-      "ytd_cum_usd": 4933144321.0,
       "ytd_diff_tonnes": null,
       "raw_row": [
         "4",
@@ -29,9 +27,7 @@
       "month": "2024-12",
       "tonnes": 127655.0,
       "period_qty_tonnes": 127655.0,
-      "period_usd": 686556852.0,
       "ytd_cum_qty_tonnes": 1345202.0,
-      "ytd_cum_usd": 5620173588.0,
       "ytd_diff_tonnes": 127709.0,
       "raw_row": [
         "4",
@@ -51,9 +47,7 @@
       "month": "2025-01",
       "tonnes": 134005.0,
       "period_qty_tonnes": 134005.0,
-      "period_usd": 728965818.0,
       "ytd_cum_qty_tonnes": 134005.0,
-      "ytd_cum_usd": 728965818.0,
       "ytd_diff_tonnes": 134005.0,
       "raw_row": [
         "4",
@@ -73,9 +67,7 @@
       "month": "2025-02",
       "tonnes": 169832.0,
       "period_qty_tonnes": 169832.0,
-      "period_usd": 964308331.0,
       "ytd_cum_qty_tonnes": 309505.0,
-      "ytd_cum_usd": 1721138489.0,
       "ytd_diff_tonnes": 175500.0,
       "raw_row": [
         "4",
@@ -95,9 +87,7 @@
       "month": "2025-03",
       "tonnes": 181115.0,
       "period_qty_tonnes": 181115.0,
-      "period_usd": 1063739859.0,
       "ytd_cum_qty_tonnes": 495780.0,
-      "ytd_cum_usd": 2811105696.0,
       "ytd_diff_tonnes": 186275.0,
       "raw_row": [
         "4",
@@ -117,9 +107,7 @@
       "month": "2025-04",
       "tonnes": 166606.0,
       "period_qty_tonnes": 166606.0,
-      "period_usd": 965829324.0,
       "ytd_cum_qty_tonnes": 665889.0,
-      "ytd_cum_usd": 3795688539.0,
       "ytd_diff_tonnes": 170109.0,
       "raw_row": [
         "4",
@@ -139,9 +127,7 @@
       "month": "2025-05",
       "tonnes": 148762.0,
       "period_qty_tonnes": 148762.0,
-      "period_usd": 859905271.0,
       "ytd_cum_qty_tonnes": 823908.0,
-      "ytd_cum_usd": 4704079102.0,
       "ytd_diff_tonnes": 158019.0,
       "raw_row": [
         "4",
@@ -161,9 +147,7 @@
       "month": "2025-06",
       "tonnes": 117983.0,
       "period_qty_tonnes": 117983.0,
-      "period_usd": 677919254.0,
       "ytd_cum_qty_tonnes": 947102.0,
-      "ytd_cum_usd": 5403350274.0,
       "ytd_diff_tonnes": 123194.0,
       "raw_row": [
         "4",
@@ -183,9 +167,7 @@
       "month": "2025-07",
       "tonnes": 101979.0,
       "period_qty_tonnes": 101979.0,
-      "period_usd": 555809045.0,
       "ytd_cum_qty_tonnes": 1055766.0,
-      "ytd_cum_usd": 5992277326.0,
       "ytd_diff_tonnes": 108664.0,
       "raw_row": [
         "4",
@@ -205,9 +187,7 @@
       "month": "2025-08",
       "tonnes": 84062.0,
       "period_qty_tonnes": 84062.0,
-      "period_usd": 459993691.0,
       "ytd_cum_qty_tonnes": 1148972.0,
-      "ytd_cum_usd": 6499660583.0,
       "ytd_diff_tonnes": 93206.0,
       "raw_row": [
         "4",
@@ -227,9 +207,7 @@
       "month": "2025-09",
       "tonnes": 81099.0,
       "period_qty_tonnes": 81099.0,
-      "period_usd": 462283325.0,
       "ytd_cum_qty_tonnes": 1239715.0,
-      "ytd_cum_usd": 7010973110.0,
       "ytd_diff_tonnes": 90743.0,
       "raw_row": [
         "4",
@@ -249,9 +227,7 @@
       "month": "2025-10",
       "tonnes": 68316.0,
       "period_qty_tonnes": 68316.0,
-      "period_usd": 394438498.0,
       "ytd_cum_qty_tonnes": 1310311.0,
-      "ytd_cum_usd": 7416444818.0,
       "ytd_diff_tonnes": 70596.0,
       "raw_row": [
         "4",
@@ -271,9 +247,7 @@
       "month": "2025-11",
       "tonnes": 88812.0,
       "period_qty_tonnes": 88812.0,
-      "period_usd": 507583299.0,
       "ytd_cum_qty_tonnes": 1401983.0,
-      "ytd_cum_usd": 7936436799.0,
       "ytd_diff_tonnes": 91672.0,
       "raw_row": [
         "4",
@@ -293,9 +267,7 @@
       "month": "2025-12",
       "tonnes": 182967.0,
       "period_qty_tonnes": 182967.0,
-      "period_usd": 947992767.0,
       "ytd_cum_qty_tonnes": 1592288.0,
-      "ytd_cum_usd": 8923706490.0,
       "ytd_diff_tonnes": 190305.0,
       "raw_row": [
         "4",
@@ -315,9 +287,7 @@
       "month": "2026-02",
       "tonnes": 142337.0,
       "period_qty_tonnes": 142337.0,
-      "period_usd": 671511842.0,
       "ytd_cum_qty_tonnes": 367270.0,
-      "ytd_cum_usd": 1755075096.0,
       "ytd_diff_tonnes": 367270.0,
       "raw_row": [
         "4",
@@ -337,9 +307,7 @@
       "month": "2026-03",
       "tonnes": 221975.0,
       "period_qty_tonnes": 221975.0,
-      "period_usd": 990162173.0,
       "ytd_cum_qty_tonnes": 590498.0,
-      "ytd_cum_usd": 2749880822.0,
       "ytd_diff_tonnes": 223228.0,
       "raw_row": [
         "4",
@@ -359,9 +327,7 @@
       "month": "2026-04",
       "tonnes": 189894.0,
       "period_qty_tonnes": 189894.0,
-      "period_usd": 822538422.0,
       "ytd_cum_qty_tonnes": 782017.0,
-      "ytd_cum_usd": 3578105898.0,
       "ytd_diff_tonnes": 191519.0,
       "raw_row": [
         "4",

@@ -140,24 +140,22 @@ def _is_2x(code: str) -> bool:
 # ── PDF parsing ─────────────────────────────────────────────────────────────────
 
 def _extract_coffee_row(pdf_bytes: bytes) -> dict | None:
-    """Parse a Vietnam Customs 2x export PDF, return the coffee row's numeric cells.
+    """Parse a Vietnam Customs 2x export PDF, return the coffee row's tonnage cells.
 
-    Returns {period_qty_tonnes, period_usd, ytd_cum_qty_tonnes, ytd_cum_usd,
-    raw_row} or None if no coffee row was found / parse failed.
-
-    Strategy: scan every table on every page; find any row whose commodity
-    cell matches /cà phê/i.
+    Returns {period_qty_tonnes, ytd_cum_qty_tonnes, raw_row} or None.
 
     Column layout in 2x export bulletins (verified empirically from 17 months
-    of cached raw_row data — DIFFERS from the 1n imports template):
+    of cached raw_row data — DIFFERS from the 1n imports template). We only
+    extract tonnage columns; USD/YoY columns are visible in raw_row if
+    anyone wants them later.
       [0]  row index               '4'
       [1]  commodity (Cà phê)
       [2]  unit (Tấn)
-      [3]  period qty (tonnes)     '63.019'
+      [3]  period qty (tonnes)     '63.019'           ← extracted
       [4]  period USD              '351.682.371'
       [5]  period qty YoY %        '38,8'
       [6]  period USD YoY %        '35,4'
-      [7]  YTD cumulative qty      '1.217.493'
+      [7]  YTD cumulative qty      '1.217.493'        ← extracted
       [8]  YTD cumulative USD      '4.933.144.321'
       [9]  YTD qty YoY %           '-14,0'
       [10] YTD USD YoY %           '35,4'
@@ -185,9 +183,7 @@ def _extract_coffee_row(pdf_bytes: bytes) -> dict | None:
 
                         return {
                             "period_qty_tonnes":  round(nums[3] if len(nums) > 3 else 0.0, 1),
-                            "period_usd":         round(nums[4] if len(nums) > 4 else 0.0, 0),
                             "ytd_cum_qty_tonnes": round(nums[7] if len(nums) > 7 else 0.0, 1),
-                            "ytd_cum_usd":        round(nums[8] if len(nums) > 8 else 0.0, 0),
                             "raw_row":            [str(c).strip() if c else "" for c in raw],
                         }
         return None
@@ -450,9 +446,7 @@ def _derive_monthly_rows(raw: dict[str, dict]) -> list[dict]:
             "month":              m,
             "tonnes":             round(tonnes, 1),
             "period_qty_tonnes":  round(period, 1),
-            "period_usd":         cur.get("period_usd"),
             "ytd_cum_qty_tonnes": round(ytd, 1),
-            "ytd_cum_usd":        cur.get("ytd_cum_usd"),
             "ytd_diff_tonnes":    round(ytd_diff, 1) if ytd_diff is not None else None,
             "raw_row":            cur.get("raw_row"),
         })
