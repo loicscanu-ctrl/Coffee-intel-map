@@ -23,12 +23,13 @@ Usage:
 
 import json
 import sys
-from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-import yfinance as yf
-import pandas as pd
 import numpy as np
+import pandas as pd
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -36,49 +37,22 @@ ROOT       = Path(__file__).resolve().parents[3]
 OUT_PATH   = ROOT / "frontend" / "public" / "data" / "quant_report.json"
 FX_OUT     = ROOT / "frontend" / "public" / "data" / "fx_history.json"
 
-# yfinance hits query1.finance.yahoo.com directly. From cloud-provider IP
-# ranges (Azure / GH Actions) Yahoo blocks bare-UA Python clients AND, since
-# late-April 2026, has been Cloudflare-protecting the crumb-token endpoint
-# yfinance scrapes for auth. Previous fix (PR #46) supplied a Chrome UA via
-# requests.Session — that bypassed the static UA filter but the TLS
-# fingerprint was still flagged at the Cloudflare layer, so the crumb fetch
-# returned an HTML challenge page, JSON-parse failed, every subsequent
-# ticker call returned empty body → JSONDecodeError. Observed 2026-05-14
-# 22:37 UTC run: all 12 tickers identical "Expecting value: line 1 column 1".
+# FX source: @fawazahmed0/currency-api via jsDelivr CDN.
 #
-# Fix: switch the underlying transport to curl_cffi, which uses
-# libcurl-impersonate and mimics Chrome's exact TLS fingerprint (JA3 / ALPN /
-# extension order). yfinance accepts a curl_cffi.requests.Session via its
-# `session=` kwarg — same API surface as requests.Session, drop-in.
-try:
-    from curl_cffi import requests as cffi_requests
-    _HAVE_CURL_CFFI = True
-except ImportError:
-    import requests as cffi_requests  # fallback so dev environments without curl_cffi still import
-    _HAVE_CURL_CFFI = False
-    print("  WARNING: curl_cffi not installed — falling back to requests.Session "
-          "(Yahoo crumb auth will likely fail on cloud IPs)", file=sys.stderr)
+# Why we're not on yfinance anymore: Yahoo Finance + cloud IPs has been a
+# series of escalating cat-and-mouse fixes — first a UA override (PR #46),
+# then curl_cffi TLS impersonation (PR #48), and as of May 2026 the
+# workflow still produces empty data on every scheduled run. The freshness
+# alert in 1.5 catches it ~3 days late.
+#
+# jsDelivr serves a static JSON file per date that contains USD-base rates
+# for 150+ currencies, updated daily from open FX feeds. No auth, no
+# Cloudflare, no rate limit, no fingerprint games — it's a CDN-cached
+# static file. We fetch ~365 daily snapshots concurrently (~36s total) and
+# pivot into per-ticker Series matching yfinance's old shape so the rest
+# of this module is unchanged.
 
-def _build_session():
-    """Build a yfinance-compatible session that survives Yahoo's bot detection."""
-    if _HAVE_CURL_CFFI:
-        # impersonate="chrome124" reproduces Chrome 124's TLS handshake.
-        # Yahoo's Cloudflare front then sees a "real" browser and serves
-        # the JSON crumb endpoint instead of an HTML challenge.
-        s = cffi_requests.Session(impersonate="chrome124")
-        return s
-    s = cffi_requests.Session()
-    s.headers.update({
-        "User-Agent": (
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-        ),
-        "Accept":          "application/json,text/plain,*/*",
-        "Accept-Language": "en-US,en;q=0.7",
-    })
-    return s
-
-_YF_SESSION = _build_session()
+_FX_API_BASE = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api"
 FX_HISTORY_DAYS = 365  # ~1 year of daily closes per pair
 
 # ── Weights (USDA PSD 2023/24, normalized over tracked pairs) ─────────────────
@@ -127,30 +101,96 @@ def _safe_float(val) -> float | None:
         return None
 
 
-def _fetch_closes(ticker: str, period: str = "2y") -> pd.Series:
-    """Download daily close prices for a ticker."""
+def _ticker_to_currency(ticker: str) -> tuple[str, bool]:
+    """Map yfinance-style FX ticker to (currency_code, invert_flag) for the FX API.
+
+    yfinance ticker conventions (preserved here so the index math stays identical):
+      "BRL=X"     → USDBRL ticker: 5.04 BRL per USD → ('brl', invert=False)
+                    jsDelivr's usd.brl gives the same number; use directly.
+      "EURUSD=X"  → EURUSD ticker: 1.08 USD per EUR → ('eur', invert=True)
+                    jsDelivr's usd.eur gives 0.927 (EUR per USD), so we
+                    return 1/0.927 = 1.079 to match yfinance's convention.
+
+    All our tracked tickers follow one of these two forms — single 3-letter
+    code → USDXXX (no invert), six-letter XXXUSD → invert.
+    """
+    t = ticker.replace("=X", "").upper()
+    if len(t) == 6 and t.endswith("USD"):
+        return t[:3].lower(), True
+    return t.lower(), False
+
+
+def _fetch_one_date(date_str: str, wanted: set[str]) -> dict[str, float] | None:
+    """Fetch USD-base rates for a single date. Returns {currency: rate} or None.
+
+    date_str = "YYYY-MM-DD" for historical, "latest" for today.
+    wanted = set of currency codes we care about (lowercase ISO 4217).
+    """
+    url = f"{_FX_API_BASE}@{date_str}/v1/currencies/usd.json"
     try:
-        hist = yf.download(
-            ticker, period=period, interval="1d",
-            auto_adjust=True, progress=False,
-            session=_YF_SESSION,
+        r = requests.get(url, timeout=15)
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        usd = data.get("usd", {})
+        return {c: usd[c] for c in wanted if c in usd and usd[c] is not None}
+    except Exception:
+        return None
+
+
+def _fetch_all_closes(tickers: list[str], days: int = FX_HISTORY_DAYS) -> dict[str, pd.Series]:
+    """Fetch ~days of historical USD-base FX closes for all tickers in parallel.
+
+    Returns {ticker: pd.Series indexed by date}. Each Series has the same
+    units as yfinance's `Close` would (preserving invert convention for EURUSD).
+    """
+    ticker_meta = {t: _ticker_to_currency(t) for t in tickers}
+    wanted_currencies = {c for c, _ in ticker_meta.values()}
+
+    today = date.today()
+    # Today's snapshot may not have a tagged version yet; use 'latest'.
+    # Historical dates use 'YYYY-MM-DD'.
+    date_keys = ["latest"] + [(today - timedelta(days=d)).isoformat() for d in range(1, days)]
+
+    rates_by_date: dict[str, dict[str, float]] = {}
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        results = ex.map(
+            lambda d: (d, _fetch_one_date(d, wanted_currencies)),
+            date_keys,
         )
-        if isinstance(hist.columns, pd.MultiIndex):
-            hist.columns = hist.columns.get_level_values(0)
-        if hist.empty or "Close" not in hist.columns:
-            print(f"  WARNING: {ticker} returned empty DataFrame "
-                  f"(columns={list(hist.columns) if not hist.empty else 'EMPTY'})",
-                  file=sys.stderr)
-            return pd.Series(dtype=float)
-        return hist["Close"].dropna()
-    except Exception as e:
-        print(f"  WARNING: could not fetch {ticker}: {type(e).__name__}: {e}", file=sys.stderr)
-        return pd.Series(dtype=float)
+        for date_key, rates in results:
+            if rates:
+                # Resolve 'latest' to today's date for indexing.
+                resolved = today.isoformat() if date_key == "latest" else date_key
+                rates_by_date[resolved] = rates
+
+    print(f"  [fx-api] {len(rates_by_date)}/{len(date_keys)} dates fetched from jsDelivr",
+          file=sys.stderr)
+
+    out: dict[str, pd.Series] = {}
+    for ticker, (currency, invert) in ticker_meta.items():
+        series_data: dict[pd.Timestamp, float] = {}
+        for date_str, rates in rates_by_date.items():
+            v = rates.get(currency)
+            if v is None or v == 0:
+                continue
+            series_data[pd.Timestamp(date_str)] = (1.0 / v) if invert else v
+        if not series_data:
+            print(f"  WARNING: no data for {ticker} (currency='{currency}')", file=sys.stderr)
+            out[ticker] = pd.Series(dtype=float)
+        else:
+            out[ticker] = pd.Series(series_data).sort_index().dropna()
+    return out
 
 
-def _fetch_returns(ticker: str, period: str = "2y") -> pd.Series:
+def _fetch_closes(ticker: str) -> pd.Series:
+    """Legacy single-ticker wrapper. Prefer _fetch_all_closes for bulk use."""
+    return _fetch_all_closes([ticker]).get(ticker, pd.Series(dtype=float))
+
+
+def _fetch_returns(ticker: str) -> pd.Series:
     """Return close-to-close % changes for a ticker (legacy entrypoint)."""
-    closes = _fetch_closes(ticker, period=period)
+    closes = _fetch_closes(ticker)
     if closes.empty:
         return pd.Series(dtype=float)
     return closes.pct_change().dropna()
@@ -198,16 +238,16 @@ def main():
 
     print("Fetching FX data for Coffee Currency Index...")
 
-    # ── Fetch all closes (single download per pair; returns derived below) ────
-    exporter_closes: dict[str, pd.Series] = {}
-    for ticker, name, _ in EXPORTERS:
-        print(f"  {ticker} ({name})...")
-        exporter_closes[ticker] = _fetch_closes(ticker)
+    # ── Bulk fetch all closes in one parallel pass ─────────────────────────────
+    all_tickers = [t for t, _, _ in EXPORTERS] + [t for t, _, _ in IMPORTERS]
+    all_closes = _fetch_all_closes(all_tickers)
 
-    importer_closes: dict[str, pd.Series] = {}
-    for ticker, name, _ in IMPORTERS:
-        print(f"  {ticker} ({name})...")
-        importer_closes[ticker] = _fetch_closes(ticker)
+    exporter_closes = {t: all_closes.get(t, pd.Series(dtype=float)) for t, _, _ in EXPORTERS}
+    importer_closes = {t: all_closes.get(t, pd.Series(dtype=float)) for t, _, _ in IMPORTERS}
+
+    for ticker, name, _ in EXPORTERS + IMPORTERS:
+        n = len(all_closes.get(ticker, pd.Series(dtype=float)))
+        print(f"  {ticker} ({name}): {n} closes")
 
     exporter_returns = {t: s.pct_change().dropna() for t, s in exporter_closes.items()}
     importer_returns = {t: s.pct_change().dropna() for t, s in importer_closes.items()}

@@ -57,6 +57,12 @@ jobs:
           if not ok:
               print(f'[validate] quant_report.json FAILED: {reason} — restoring HEAD version')
               subprocess.run(['git', 'checkout', '--', 'frontend/public/data/quant_report.json'])
+              # Exit non-zero so the workflow step fails loudly and the
+              # 'Notify on failure' step below fires a Telegram alert.
+              # Previously this branch silently exited 0, the commit step
+              # printed 'No changes.', and the only signal was the
+              # downstream 1.5 freshness check days later.
+              sys.exit(1)
           "
 
       - name: Commit updated JSON if changed
