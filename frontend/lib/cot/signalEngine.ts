@@ -3,6 +3,14 @@ import type { ProcessedCotRow } from "./types";
 export type SignalSeverity = "info" | "warn" | "alert";
 export type SignalMarket   = "NY" | "LDN";
 
+/** In-page deep link rendered as a chip alongside a signal. */
+export interface SignalLink {
+  /** Short chip label shown to the user, e.g. "Global Flow". */
+  label: string;
+  /** Anchor or route, e.g. "#cot-section-1" or "/macro#softs". */
+  href:  string;
+}
+
 export interface Signal {
   id: string;
   name: string;
@@ -16,7 +24,17 @@ export interface Signal {
   /** WoW move size of the rule's primary driver (or percentile-distance for
    *  percentile-driven rules). Populated by the engine on every signal. */
   magnitude: "small" | "medium" | "large";
+  /** Optional in-page links to dashboard sections that complement the rule
+   *  text. Rendered as chips by the UI. */
+  links?: SignalLink[];
 }
+
+// ── Deep-link targets used by aspirational-text rules ────────────────────────
+const LINK_FLOW      : SignalLink = { label: "Global Flow",  href: "#cot-section-1" };
+const LINK_GAUGES    : SignalLink = { label: "Gauges",       href: "#cot-section-3" };
+const LINK_INDUSTRY  : SignalLink = { label: "Industry",     href: "#cot-section-4" };
+const LINK_DRYPOWDER : SignalLink = { label: "Dry Powder",   href: "#cot-section-5" };
+const LINK_CYCLE     : SignalLink = { label: "Cycle",        href: "#cot-section-6" };
 
 export interface HistoricalWeek {
   date: string;
@@ -444,7 +462,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "up" && pr === "down")
       add({ id:"ML3", name:"Contrarian Fund Buying",  category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"warn",  score: +1,
         magnitude: magMmL[mkt],
-        text:"Funds buying into weakness — contrarian positioning. Check OI logs for sequence and verify against the brother contract." });
+        links: [LINK_FLOW],
+        text:"Funds buying into weakness — contrarian positioning. Cross-reference OI sequence and the brother contract." });
 
     if (ml === "down" && pr === "down")
       add({ id:"ML4", name:"Fund Long Liquidation",   category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"info",  score: -1,
@@ -454,7 +473,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "down" && pr === "up")
       add({ id:"ML5", name:"Fund Long Exit",          category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"warn",  score: -2,
         magnitude: magMmL[mkt],
-        text:"Funds reducing longs despite rising price — may reflect lack of conviction or profit taking after a strong rally. Check cross-commodity allocation." });
+        links: [LINK_FLOW],
+        text:"Funds reducing longs despite rising price — may reflect lack of conviction or profit taking after a strong rally." });
 
     if (isHigh(mls, i) && pr === "down")
       add({ id:"ML6", name:"Fund Long Overhang",       category:"ML", categoryLabel:"MM Longs", market:mkt, severity:"alert", score: -3,
@@ -541,12 +561,14 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "up"   && ms === "up")
       add({ id:"MI3", name:"Speculative Confusion",          category:"MI", categoryLabel:"MM Interaction", market:mkt, severity:"warn",  score:  0,
         magnitude: magBig(magMmL[mkt], magMmS[mkt]),
-        text:"Both sides growing — check net position to assess which side dominates. Cross-commodity check recommended." });
+        links: [LINK_GAUGES, LINK_FLOW],
+        text:"Both sides growing — net position will decide which side dominates." });
 
     if (ml === "down" && ms === "down")
       add({ id:"MI4", name:"Speculative Retreat",            category:"MI", categoryLabel:"MM Interaction", market:mkt, severity:"info",  score:  0,
         magnitude: magBig(magMmL[mkt], magMmS[mkt]),
-        text:"Both sides reducing — check net change and cross-commodity allocation to determine if this is coffee-specific or broader deleveraging." });
+        links: [LINK_FLOW],
+        text:"Both sides reducing — net change will reveal whether this is coffee-specific or broader deleveraging." });
 
     const mmNetS = mkt === "NY" ? nyMmNet : ldnMmNet;
     if (isHigh(mmNetS, i))
@@ -576,7 +598,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "up"   && pd === "up"   && pr === "down")
       add({ id:"MPI2", name:"Forced Market",                     category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"warn",  score: -2,
         magnitude: magBig(magMmL[mkt], magProd[mkt]),
-        text:"Funds buying against producer selling into falling price — check min/max levels of both actors and daily OI sequence to identify the dominant pressure." });
+        links: [LINK_GAUGES, LINK_FLOW],
+        text:"Funds buying against producer selling into falling price — min/max levels of both actors and daily OI sequence reveal the dominant pressure." });
 
     if (ml === "up"   && pd === "down" && pr === "up")
       add({ id:"MPI3", name:"Squeeze Setup",                     category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"alert", score: +3,
@@ -586,7 +609,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "down" && pd === "up"   && pr === "down")
       add({ id:"MPI4", name:"Bearish Capitulation",              category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"alert", score: -3,
         magnitude: magBig(magMmL[mkt], magProd[mkt]),
-        text:"Funds liquidating longs while producers add hedges — broad bearish alignment. Confirm with roaster behavior: if roasters also reducing coverage, conviction is across all actors." });
+        links: [LINK_GAUGES],
+        text:"Funds liquidating longs while producers add hedges — broad bearish alignment. Roaster behavior confirms breadth: if they're also reducing coverage, conviction is across all actors." });
 
     if (ml === "down" && pd === "down" && pr === "up")
       add({ id:"MPI5", name:"Divergence Signal",                 category:"MPI", categoryLabel:"MM × Producer", market:mkt, severity:"warn",  score: -1,
@@ -620,7 +644,7 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "up" && rd === "down" && pr === "up")
       add({ id:"MRI3", name:"Contrarian Divergence",         category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"warn",  score: -1,
         magnitude: magBig(magMmL[mkt], magRoast[mkt]),
-        text:"Funds adding longs while roasters reduce coverage into rising price — check the alternative contract for blend switching. Undermines bullish thesis if substitution confirmed." });
+        text:`Funds adding longs while roasters reduce coverage into rising price — the brother contract (${mkt === "NY" ? "LDN" : "NY"}, shown opposite) reveals whether blend switching is at play. Substitution would undermine the bullish thesis.` });
 
     if (ml === "down" && rd === "down" && pr === "down")
       add({ id:"MRI4", name:"Bearish Convergence",           category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"alert", score: -3,
@@ -630,7 +654,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (ml === "up" && rd === "flat" && pr === "up")
       add({ id:"MRI5", name:"Fund Buying vs Roaster Absence",category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"warn",  score:  0,
         magnitude: magMmL[mkt],
-        text:"Funds driving price higher but roasters not participating — rally sustainable only if roasters are eventually forced to cover. Check roaster coverage percentile and calendar spread carry costs." });
+        links: [LINK_DRYPOWDER, LINK_CYCLE],
+        text:"Funds driving price higher but roasters not participating — rally sustainable only if roasters are eventually forced to cover. Roaster coverage percentile and calendar spread carry costs gate the squeeze." });
 
     if (ml === "down" && rd === "up" && pr === "down")
       add({ id:"MRI6", name:"Roaster Coverage Opportunity",  category:"MRI", categoryLabel:"MM × Roaster", market:mkt, severity:"info",  score: +1,
@@ -710,7 +735,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (obos > THRESHOLDS.OB_HIGH && !isLow(rs, i))
       add({ id:"OB1", name:"Overbought Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: -2,
         magnitude: magFromPct(obos / 100, "high"),
-        text:`${label} technically overbought (>${THRESHOLDS.OB_HIGH}th pct, 52-week) with funds near capacity — upside limited. Monitor calendar spread: if inversion weakens, holding costs may accelerate long liquidation.` });
+        links: [LINK_CYCLE],
+        text:`${label} technically overbought (>${THRESHOLDS.OB_HIGH}th pct, 52-week) with funds near capacity — upside limited. If calendar-spread inversion weakens, holding costs may accelerate long liquidation.` });
 
     if (obos > THRESHOLDS.OB_HIGH && isLow(rs, i))
       add({ id:"OB2", name:"Overbought but Supported", category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
@@ -730,7 +756,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (obos > THRESHOLDS.OB_HIGH && pr === "down")
       add({ id:"OB6", name:"Divergence Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"alert", score: -3,
         magnitude: magBig(magFromPct(obos / 100, "high"), magPrice[mkt]),
-        text:`${label} overbought but price already falling — momentum turning. Check weekly change in trader counts: if also falling, unwind is broad-based.` });
+        links: [LINK_INDUSTRY],
+        text:`${label} overbought but price already falling — momentum turning. Weekly change in trader counts reveals breadth: if also falling, the unwind is broad-based.` });
 
     if (obos < THRESHOLDS.OB_LOW && pr === "up")
       add({ id:"OB7", name:"Oversold Divergence",      category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: +2,
@@ -748,7 +775,8 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     if (spDir === "up" && pr !== "up")
       add({ id:"SP1", name:"Spreading Increase",     category:"SP", categoryLabel:"Spreading", market:mkt, severity:"info",  score:  0,
         magnitude: magSpread[mkt],
-        text:"Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move. Cross-check against calendar spread direction." });
+        links: [LINK_CYCLE],
+        text:"Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way." });
 
     if (spDir === "down")
       add({ id:"SP2", name:"Spreading Decrease",     category:"SP", categoryLabel:"Spreading", market:mkt, severity:"info",  score:  0,

@@ -367,6 +367,24 @@ export default function Step8Analysis({
                           )}
                         </div>
                         <p className="text-[10px] text-slate-400 leading-relaxed">{sig.text}</p>
+                        {sig.links && sig.links.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {sig.links.map(l => (
+                              <a key={l.href}
+                                href={l.href}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  const id = l.href.startsWith("#") ? l.href.slice(1) : null;
+                                  if (id) document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                  else window.location.href = l.href;
+                                }}
+                                className="text-[9px] font-medium px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 hover:text-amber-400 transition-colors"
+                              >
+                                → {l.label}
+                              </a>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
