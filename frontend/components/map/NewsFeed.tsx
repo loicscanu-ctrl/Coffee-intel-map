@@ -11,6 +11,49 @@ const BORDER_COLORS: Record<string, string> = {
   general: "border-gray-500",
 };
 
+/**
+ * Extract the most informative data label from a news item's body.
+ * Tries (in order):
+ *   - "R$ 1.234,50 / saca" → "1.234,50 BRL / saca"
+ *   - "USD 250 / lb"       → "250 USD / lb"
+ *   - "$1.50"              → "1.50 USD"
+ *   - Numeric magnitudes with units ("123.4 kt", "5.2 mln bags")
+ * Returns null if no recognisable label can be extracted — the caller then
+ * falls back to title-only rendering.
+ */
+function extractDataLabel(body: string | null | undefined): string | null {
+  if (!body) return null;
+
+  // Brazilian real with optional "/unit" — "R$ 900/saca" or "R$ 1.234,50 / sack"
+  const brl = body.match(/R\$\s*([\d.,]+)\s*(?:\/\s*([A-Za-zçãáéõ]+))?/);
+  if (brl) {
+    const unit = brl[2] ? ` / ${brl[2]}` : "";
+    return `${brl[1]} BRL${unit}`;
+  }
+
+  // USD prefix — "USD 250.5/lb"
+  const usd = body.match(/USD\s*([\d.,]+)\s*(?:\/\s*([A-Za-z]+))?/);
+  if (usd) {
+    const unit = usd[2] ? ` / ${usd[2]}` : "";
+    return `${usd[1]} USD${unit}`;
+  }
+
+  // Bare dollar sign — "$1.50"
+  const usdSign = body.match(/\$\s*([\d.,]+)\s*(?:\/\s*([A-Za-z]+))?/);
+  if (usdSign) {
+    const unit = usdSign[2] ? ` / ${usdSign[2]}` : "";
+    return `${usdSign[1]} USD${unit}`;
+  }
+
+  // Volume-style magnitudes — "123.4 kt", "5.2 mln bags", "4.5 million tonnes"
+  const vol = body.match(/(\d[\d.,]*)\s*(kt|mln|million|thousand|bags|tonnes|t|k_bags)/i);
+  if (vol) {
+    return `${vol[1]} ${vol[2]}`;
+  }
+
+  return null;
+}
+
 interface NewsFeedProps {
   initialNews?: NewsItem[];
 }
@@ -63,19 +106,17 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
           const hashtag = item.category === "general" && item.source
             ? "#" + item.source.toLowerCase().replace(/\s+/g, "")
             : null;
-          const title = item.meta
-            ? <a href={item.meta} target="_blank" rel="noopener noreferrer"
-                 className="font-bold text-white hover:text-indigo-300 transition-colors">
-                {item.title}
-              </a>
-            : <span className="font-bold text-white">{item.title}</span>;
+          const dataLabel = extractDataLabel(item.body);
 
           return (
             <div
               key={item.id}
               className={`border-l-2 pl-3 text-xs ${BORDER_COLORS[item.category] || "border-gray-500"}`}
             >
-              {title}
+              <span className="font-bold text-white">{item.title}</span>
+              {dataLabel && (
+                <span className="text-amber-400 ml-1.5 font-mono">: {dataLabel}</span>
+              )}
               {pubDate && (
                 <span className="text-slate-500 ml-2">{pubDate}</span>
               )}
