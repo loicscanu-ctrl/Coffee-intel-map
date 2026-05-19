@@ -70,13 +70,29 @@ async def _fetch_chains() -> dict:
 
 
 def _front_price(raw: dict) -> float | None:
-    """Return the lastPrice of the front contract with OI >= 100."""
+    """Return the lastPrice of the contract with the largest open interest.
+
+    Previously this took the first non-near-expiry contract with OI >= 100,
+    which is usually the front-month spec. The new rule (per user request)
+    is to follow whichever contract actually carries the most liquidity —
+    typically the same as the front month, but during the roll window the
+    weight shifts to the next contract before the front goes into FND.
+    Anchoring the COT-Tuesday price to the max-OI contract means the
+    Industry Pulse chart's price track always reflects the contract the
+    bulk of the market is positioning in.
+
+    Contracts within 14 days of expiry are still excluded — those last few
+    days of OI on a near-expiring contract are dominated by delivery
+    mechanics, not speculative positioning, and would distort the chart.
+    """
     from datetime import timedelta
     cutoff = date.today() + timedelta(days=14)
+    best: tuple[int, float] | None = None
     for it in (raw or {}).get("data", []):
         r = it.get("raw", it)
         oi = r.get("openInterest")
-        if oi is not None and int(oi) < 100:
+        price = r.get("lastPrice")
+        if oi is None or price is None:
             continue
         exp_str = r.get("contractExpirationDate", "")
         try:
@@ -84,10 +100,10 @@ def _front_price(raw: dict) -> float | None:
                 continue
         except Exception:
             pass
-        price = r.get("lastPrice")
-        if price is not None:
-            return float(price)
-    return None
+        oi_int = int(oi)
+        if best is None or oi_int > best[0]:
+            best = (oi_int, float(price))
+    return best[1] if best else None
 
 
 async def main() -> None:
