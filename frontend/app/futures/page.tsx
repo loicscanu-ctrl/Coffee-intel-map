@@ -1,7 +1,5 @@
 "use client";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
-import OIHistoryTable from "@/components/futures/OIHistoryTable";
-import OIFndChart from "@/components/futures/OIFndChart";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import PageHeader from "@/components/PageHeader";
@@ -632,24 +630,9 @@ function FuturesPageInner() {
             )}
             {robustaChain && <ChainTable market="robusta" data={robustaChain} />}
           </div>
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                NY OI — 7-day tracking
-              </h3>
-              <OIHistoryTable market="arabica" />
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                LDN OI — 7-day tracking
-              </h3>
-              <OIHistoryTable market="robusta" />
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <OIFndChart market="arabica" />
-            <OIFndChart market="robusta" />
-          </div>
+          {/* OI 7-day tracking (NY & LDN OIHistoryTable + OIFndChart) was
+              here pre-2026-05; moved to /cot section 2 so the positioning
+              context lives next to the COT signal output. */}
         </>
       )}
 

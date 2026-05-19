@@ -123,7 +123,7 @@ export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
 
   return (
     <div id="cot-section-5">
-      <SectionHeader icon="Droplets" title="5. Dry Powder Indicator"
+      <SectionHeader icon="Droplets" title="7. Dry Powder Indicator"
         subtitle="Gross Long OI (positive) and Gross Short OI (negative) vs number of traders. Color = recency." />
       <div className="flex items-center gap-3 mb-4">
         <CatToggles cats={dpCats} set={k => setDpCats(p => ({ ...p, [k]: !p[k as keyof typeof p] }))} items={CAT_ITEMS} />

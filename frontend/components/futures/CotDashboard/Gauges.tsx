@@ -88,7 +88,7 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
 
   return (
     <>
-      <SectionHeader icon="Sliders" title="3. 52-Week Positioning Gauges"
+      <SectionHeader icon="Sliders" title="4. 52-Week Positioning Gauges"
         subtitle="Current level vs. 52-week range. Colored dot = current week, blue tick = previous week. Red ≥80th pct · Green ≤20th." />
       <div className="flex items-center gap-3 mb-4">
         <MarketToggle markets={{ ny: market === "ny", ldn: market === "ldn" }} set={(m: string) => setMarket(m as "ny" | "ldn")} />
