@@ -120,7 +120,10 @@ def _prices_section() -> str:
         c1, c2 = chain[0], chain[1]
         c3 = chain[2] if len(chain) >= 3 else None
 
-        def _row(contract: dict) -> str:
+        # Loop-bound vars (`dp`, `unit`, `label`) are pinned via default args
+        # so ruff's B023 sees the binding as static — closures rebuilt every
+        # iteration anyway, the defaults just make the binding explicit.
+        def _row(contract: dict, dp: int = dp, unit: str = unit, label: str = label) -> str:
             month = _month_code(contract.get("month", ""))
             price = contract.get("last")
             chg   = contract.get("change")
@@ -136,7 +139,7 @@ def _prices_section() -> str:
                 out.append(line)
 
         # Calendar spreads — front/second, second/third
-        def _spread_line(a: dict, b: dict) -> str | None:
+        def _spread_line(a: dict, b: dict, dp: int = dp) -> str | None:
             af, bf = a.get("last"), b.get("last")
             ap, bp = a.get("prev"), b.get("prev")
             if af is None or bf is None:
