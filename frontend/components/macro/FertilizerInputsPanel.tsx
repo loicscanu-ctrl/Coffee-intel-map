@@ -45,17 +45,12 @@ export default function FertilizerInputsPanel() {
       .catch(() => setError(true));
   }, []);
 
-  if (error) {
-    return (
-      <div className="p-4 text-xs text-slate-500">
-        Fertilizer input cost data unavailable.
-      </div>
-    );
-  }
+  // ── Hooks must run before any early return (rules-of-hooks) ──────────────
+  // Both useMemo and the conditional branches that follow depend on `items`,
+  // so the merge runs every render — the previous version had useMemo
+  // sitting after `if (error) return …` which broke Vercel's build (eslint
+  // react-hooks/rules-of-hooks).
   const items = data?.fertilizer?.items;
-  // Merge each fertilizer's history into a single { month, "Urea (N)": p, "MAP (P)": p, "KCl (K)": p }
-  // shape so recharts can render one line per item on the same axis. Built
-  // even when items is empty so the hook order is stable across re-renders.
   const chartData = useMemo(() => {
     if (!items) return [];
     const monthMap = new Map<string, Record<string, number | string>>();
@@ -71,6 +66,13 @@ export default function FertilizerInputsPanel() {
     );
   }, [items]);
 
+  if (error) {
+    return (
+      <div className="p-4 text-xs text-slate-500">
+        Fertilizer input cost data unavailable.
+      </div>
+    );
+  }
   if (!data || !items || items.length === 0) {
     return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading fertilizer inputs…</div>;
   }
