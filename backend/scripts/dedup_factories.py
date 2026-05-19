@@ -86,6 +86,13 @@ _MOJIBAKE_MAP: dict[str, str] = {
 }
 
 
+# Max number of recovery passes to attempt. Each pass undoes one layer of
+# UTF-8-as-Latin-1 corruption. Double-encoded names like "CafÃƒÂ©s" (the
+# corruption applied twice) need 2 passes to reach "Cafés". 3 caps the
+# worst-case observed in the wild with headroom.
+_DEMOJIBAKE_MAX_PASSES = 3
+
+
 def _demojibake(s: str) -> str | None:
     """Recover a UTF-8 string that was decoded as Latin-1 on insertion.
 
@@ -97,30 +104,44 @@ def _demojibake(s: str) -> str | None:
         "CafÃ©s Novell Vilafranca".encode("latin-1").decode("utf-8")
             == "Cafés Novell Vilafranca"
 
-    Fallback: when the round-trip fails (partial mojibake — some chars
-    already proper UTF-8 break the latin-1 encode step), substitute the
-    known mojibake sequences via `_MOJIBAKE_MAP`.
+    Iterates the round-trip up to _DEMOJIBAKE_MAX_PASSES times so
+    double-encoded strings (e.g. "CafÃƒÂ©s" — the corruption applied
+    twice) also recover.
+
+    Fallback: when a pass's round-trip fails (partial mojibake — some
+    chars already proper UTF-8 break the latin-1 encode step), substitute
+    the known mojibake sequences via `_MOJIBAKE_MAP`.
 
     Returns the recovered string if it differs from the input AND contains
     at least one non-ASCII character (guards against accidental conversion
     of strings that legitimately contain `Ã`). Returns None when no
     recovery is possible.
     """
-    # Primary path: full latin-1 round-trip.
-    try:
-        fixed = s.encode("latin-1").decode("utf-8")
-        if fixed != s and any(ord(c) > 127 for c in fixed):
-            return fixed
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        pass
+    cur = s
+    for _ in range(_DEMOJIBAKE_MAX_PASSES):
+        # Primary path: full latin-1 round-trip.
+        next_val: str | None = None
+        try:
+            candidate = cur.encode("latin-1").decode("utf-8")
+            if candidate != cur:
+                next_val = candidate
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
 
-    # Fallback path: regex substitution for partial mojibake.
-    fixed = s
-    for moji, proper in _MOJIBAKE_MAP.items():
-        fixed = fixed.replace(moji, proper)
-    if fixed != s and any(ord(c) > 127 for c in fixed):
-        return fixed
+        # Fallback path: regex substitution for partial mojibake.
+        if next_val is None:
+            candidate = cur
+            for moji, proper in _MOJIBAKE_MAP.items():
+                candidate = candidate.replace(moji, proper)
+            if candidate != cur:
+                next_val = candidate
 
+        if next_val is None:
+            break  # Converged: no further recovery possible.
+        cur = next_val
+
+    if cur != s and any(ord(c) > 127 for c in cur):
+        return cur
     return None
 
 

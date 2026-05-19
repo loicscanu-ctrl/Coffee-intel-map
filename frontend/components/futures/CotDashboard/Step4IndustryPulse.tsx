@@ -27,6 +27,10 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
     // reference line on the price chart so the reader can see when the
     // price track jumps to a different underlying contract (the max-OI
     // rule rolls liquidity as the front goes into FND).
+    //
+    // The `prev && curr` truthy guard is load-bearing: it ensures the first
+    // legacy → first-max-OI transition (null → "KCH6" etc., May 2026 onwards)
+    // is NOT marked as a contract switch. Don't simplify to `prev !== curr`.
     const switches: { date: string; from: string; to: string }[] = [];
     for (let i = 1; i < recent52.length; i++) {
       const prev = recent52[i - 1][contractKey];

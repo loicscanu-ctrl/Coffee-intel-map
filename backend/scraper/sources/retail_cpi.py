@@ -52,6 +52,13 @@ _BLS_SERIES = "CUSR0000SEFP02"
 _EUROSTAT_DATAFLOW = "prc_hicp_midx"
 _BCB_SGS = 1635
 
+# Max acceptable lag (in months) on the EU27_2020 aggregate before falling
+# back to the DE/FR/IT/ES weighted basket. Eurostat publishes the aggregate
+# 2-3 weeks after the member-state releases, so a lag of 1-2 months on the
+# 1st of the month is the steady state. >2 months means Eurostat itself is
+# behind (observed at ~5 months for CP01211 in mid-2026).
+_EUROSTAT_FRESHNESS_THRESHOLD_MONTHS = 2
+
 _PERIOD_TO_MONTH = {f"M{i:02d}": f"{i:02d}" for i in range(1, 13)}
 
 
@@ -235,7 +242,7 @@ def _fetch_eurostat() -> dict | None:
         return (today.year - y) * 12 + (today.month - m)
 
     aggregate_lag = _months_behind(aggregate_latest)
-    if aggregate and aggregate_lag <= 2:
+    if aggregate and aggregate_lag <= _EUROSTAT_FRESHNESS_THRESHOLD_MONTHS:
         logger.info(f"[retail_cpi] Eurostat EU27_2020 fresh ({aggregate_latest}, "
                     f"{aggregate_lag}mo lag) — using aggregate")
         return {

@@ -30,11 +30,16 @@ export interface Signal {
 }
 
 // ── Deep-link targets used by aspirational-text rules ────────────────────────
-const LINK_FLOW      : SignalLink = { label: "Global Flow",  href: "#cot-section-1" };
-const LINK_GAUGES    : SignalLink = { label: "Gauges",       href: "#cot-section-3" };
-const LINK_INDUSTRY  : SignalLink = { label: "Industry",     href: "#cot-section-4" };
-const LINK_DRYPOWDER : SignalLink = { label: "Dry Powder",   href: "#cot-section-5" };
-const LINK_CYCLE     : SignalLink = { label: "Cycle",        href: "#cot-section-6" };
+// Section IDs (`cot-section-N`) are STABLE URL slugs, decoupled from display
+// order — see NAV_STEPS in `../../components/futures/CotDashboard/constants.ts`.
+// Display order can be reshuffled (e.g. PR #72 moved Signals to position 1)
+// without touching these hrefs. Labels here describe the destination
+// semantically, not by display number, so they survive renumberings.
+const LINK_FLOW      : SignalLink = { label: "Global Flow",  href: "#cot-section-1" }; // → Step1GlobalFlow
+const LINK_GAUGES    : SignalLink = { label: "Gauges",       href: "#cot-section-3" }; // → CotGauges
+const LINK_INDUSTRY  : SignalLink = { label: "Industry",     href: "#cot-section-4" }; // → Step4IndustryPulse
+const LINK_DRYPOWDER : SignalLink = { label: "Dry Powder",   href: "#cot-section-5" }; // → Step5DryPowder
+const LINK_CYCLE     : SignalLink = { label: "Cycle",        href: "#cot-section-6" }; // → Step6CycleLocation
 
 export interface HistoricalWeek {
   date: string;
