@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T03:44:25.875666Z",
+  "generated_at": "2026-05-19T05:16:46.677810Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -10739,8 +10739,8 @@
       "name": "South Korea",
       "latest_year": "2025",
       "consumption_mt": 204000,
-      "population": 51751065,
-      "per_capita_kg": 3.94,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12399,8 +12399,8 @@
       "name": "Egypt",
       "latest_year": "2025",
       "consumption_mt": 60000,
-      "population": 116538258,
-      "per_capita_kg": 0.51,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12690,18 +12690,6 @@
         "iso3": "PHL",
         "latest_year": "2024",
         "latest_population": 115843670
-      },
-      "egypt": {
-        "name": "Egypt",
-        "iso3": "EGY",
-        "latest_year": "2024",
-        "latest_population": 116538258
-      },
-      "korea": {
-        "name": "South Korea",
-        "iso3": "KOR",
-        "latest_year": "2024",
-        "latest_population": 51751065
       },
       "ethiopia": {
         "name": "Ethiopia",
