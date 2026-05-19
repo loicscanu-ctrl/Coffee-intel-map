@@ -1,6 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import {
+  CartesianGrid, Legend, Line, LineChart, ResponsiveContainer,
+  Tooltip, XAxis, YAxis,
+} from "recharts";
+
+interface FertilizerHistoryPoint {
+  month: string;   // "YYYY-MM"
+  price: number;   // USD/MT
+}
 
 interface FertilizerItem {
   name:         string;
@@ -8,6 +17,7 @@ interface FertilizerItem {
   mom_pct:      number;
   input_weight: number;
   base_usd_per_bag?: number;
+  history?:     FertilizerHistoryPoint[];
 }
 
 interface FarmerEconomics {
@@ -43,6 +53,24 @@ export default function FertilizerInputsPanel() {
     );
   }
   const items = data?.fertilizer?.items;
+  // Merge each fertilizer's history into a single { month, "Urea (N)": p, "MAP (P)": p, "KCl (K)": p }
+  // shape so recharts can render one line per item on the same axis. Built
+  // even when items is empty so the hook order is stable across re-renders.
+  const chartData = useMemo(() => {
+    if (!items) return [];
+    const monthMap = new Map<string, Record<string, number | string>>();
+    for (const it of items) {
+      for (const pt of it.history ?? []) {
+        const row = monthMap.get(pt.month) ?? { month: pt.month };
+        row[it.name] = pt.price;
+        monthMap.set(pt.month, row);
+      }
+    }
+    return Array.from(monthMap.values()).sort((a, b) =>
+      String(a.month).localeCompare(String(b.month)),
+    );
+  }, [items]);
+
   if (!data || !items || items.length === 0) {
     return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading fertilizer inputs…</div>;
   }
@@ -96,6 +124,56 @@ export default function FertilizerInputsPanel() {
           );
         })}
       </div>
+
+      {chartData.length >= 2 && (
+        <div className="mt-2 bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">
+              Historical prices (USD/MT)
+            </h3>
+            <span className="text-[9px] text-slate-600 font-mono">
+              {chartData[0].month} → {chartData[chartData.length - 1].month}
+            </span>
+          </div>
+          <div className="h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 4, right: 12, bottom: 0, left: -10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  stroke="#475569"
+                  fontSize={9}
+                  tickFormatter={(v: string) => v.slice(2)}   /* "2026-04" → "26-04" */
+                  minTickGap={28}
+                />
+                <YAxis
+                  stroke="#475569"
+                  fontSize={9}
+                  domain={["auto", "auto"]}
+                  tickFormatter={(v: number) => `$${v.toFixed(0)}`}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", fontSize: 11 }}
+                  formatter={(v) => [`$${Number(v).toFixed(0)}/MT`, ""] as [string, string]}
+                />
+                <Legend wrapperStyle={{ fontSize: 10 }} />
+                {items.map((it) => (
+                  <Line
+                    key={it.name}
+                    type="monotone"
+                    dataKey={it.name}
+                    name={it.name}
+                    stroke={COLOR[it.name] ?? "#64748b"}
+                    strokeWidth={2}
+                    dot={false}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

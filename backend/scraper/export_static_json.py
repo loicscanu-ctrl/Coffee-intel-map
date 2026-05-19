@@ -732,11 +732,17 @@ def export_farmer_economics(db) -> None:
                 current_price = monthly[-1]
                 prev_price    = monthly[-2]
                 mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
+                # Long-form history (5y monthly with dates) backs the new
+                # Macro-tab fertilizer chart. Falls back to the legacy
+                # sparkline array if the WB parser didn't populate _history
+                # (older NewsItem rows from before that field was added).
+                history = meta.get(f"{key}_history", [])
                 fert_items_out.append({
                     "name":              cfg["name"],
                     "price_usd_mt":      round(current_price, 0),
                     "mom_pct":           round(mom_pct, 1),
                     "sparkline":         monthly[:6],
+                    "history":           history,
                     "input_weight":      cfg["input_weight"],
                     "base_usd_per_bag":  cfg["base_usd_per_bag"],
                 })
