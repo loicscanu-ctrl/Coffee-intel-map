@@ -95,18 +95,26 @@ export function dir(prev: number, curr: number): Dir {
  * Uses an absolute flat band rather than a percentage — a 1% change in a
  * 40-trader count is 0.4, so the ratio-based `dir()` essentially never
  * reports "flat" for count series and the count-comparison rules fire on
- * noise. `dirCount` uses an absolute-units flat band (default 2 traders).
+ * noise.
+ *
+ * Default flat band scales with the magnitude of `prev`:
+ *   flat = max(DIR_FLAT_COUNT, 5% of |prev|)
+ * This keeps the absolute-2 floor for small NY MM counts (~30-50 traders →
+ * 5% = 1.5-2.5, floor kicks in) while preventing high-count categories
+ * (~100+ traders → 5% = 5+) from firing on single-trader noise. Pass an
+ * explicit `flat` to override.
  *
  * Returns "unknown" when either endpoint is null — see the LDN note above.
  */
 export function dirCount(
   prev: number | null,
   curr: number | null,
-  flat: number = THRESHOLDS.DIR_FLAT_COUNT,
+  flat?: number,
 ): DirCount {
   if (prev == null || curr == null) return "unknown";
+  const band = flat ?? Math.max(THRESHOLDS.DIR_FLAT_COUNT, 0.05 * Math.abs(prev));
   const delta = curr - prev;
-  if (Math.abs(delta) < flat) return "flat";
+  if (Math.abs(delta) < band) return "flat";
   return delta > 0 ? "up" : "down";
 }
 
@@ -837,12 +845,26 @@ const CATEGORY_WEIGHTS: Record<string, number> = {
   TC: 0.25, OB: 0.25, CS: 0.25, SP: 0.25,
 };
 
+/**
+ * Magnitude weights for the composite score. A "large" CP3 carries more
+ * conviction than a "small" CP3, so it should contribute more to the gauge.
+ *   small  → 0.5  (just past the gate, low conviction)
+ *   medium → 1.0  (baseline)
+ *   large  → 1.5  (well past the gate / large WoW move)
+ */
+const MAGNITUDE_WEIGHTS: Record<Magnitude, number> = {
+  small:  0.5,
+  medium: 1.0,
+  large:  1.5,
+};
+
 export function computeCompositeScores(signals: Signal[]): { scoreNY: number; scoreLDN: number } {
   let scoreNY  = 0;
   let scoreLDN = 0;
   for (const s of signals) {
-    const w = CATEGORY_WEIGHTS[s.category] ?? 1.0;
-    const weighted = s.score * w;
+    const cw = CATEGORY_WEIGHTS[s.category]  ?? 1.0;
+    const mw = MAGNITUDE_WEIGHTS[s.magnitude] ?? 1.0;
+    const weighted = s.score * cw * mw;
     if (s.market === "NY")  scoreNY  += weighted;
     else                    scoreLDN += weighted;
   }

@@ -196,6 +196,19 @@ describe("dirCount", () => {
     expect(dirCount(30, 33, 5)).toBe("flat");
     expect(dirCount(30, 36, 5)).toBe("up");
   });
+
+  it("default band scales with prev: 5% with a floor of DIR_FLAT_COUNT", () => {
+    // prev=30 → band = max(2, 1.5) = 2; small counts behave as before.
+    expect(dirCount(30, 31)).toBe("flat");
+    expect(dirCount(30, 32)).toBe("up");
+    // prev=100 → band = max(2, 5) = 5; previously a 2-trader move would
+    // register as "up", now it's flat (less sensitive on high-count series).
+    expect(dirCount(100, 102)).toBe("flat");
+    expect(dirCount(100, 106)).toBe("up");
+    // prev=200 → band = max(2, 10) = 10.
+    expect(dirCount(200, 209)).toBe("flat");
+    expect(dirCount(200, 211)).toBe("up");
+  });
 });
 
 describe("pct52", () => {

@@ -94,14 +94,19 @@ function scoreToFill(s: number): number {
   return ((clamped + 10) / 20) * 100;
 }
 
-function CompositeGauge({ label, score }: { label: string; score: number }) {
+function CompositeGauge({ label, score, note }: { label: string; score: number; note?: string }) {
   const zone  = scoreZone(score);
   const fill  = scoreToFill(score);
   const color = ZONE_COLOR[zone];
   return (
     <div className="flex-1 min-w-[140px] bg-slate-800/50 rounded-lg border border-slate-700/50 p-3 space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">{label}</span>
+        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest flex items-center gap-1">
+          {label}
+          {note && (
+            <span title={note} className="text-slate-600 cursor-help text-[9px]">ⓘ</span>
+          )}
+        </span>
         <span className="text-[11px] font-bold" style={{ color }}>{ZONE_LABEL[zone]}</span>
       </div>
       <div className="relative h-2 rounded-full bg-slate-700 overflow-hidden">
@@ -320,7 +325,11 @@ export default function Step8Analysis({
       {/* Composite score gauges */}
       <div className="flex gap-3 flex-wrap">
         <CompositeGauge label="KC · Arabica (NY)"  score={scoreNY}  />
-        <CompositeGauge label="RC · Robusta (LDN)" score={scoreLDN} />
+        <CompositeGauge
+          label="RC · Robusta (LDN)"
+          score={scoreLDN}
+          note="ICE doesn't publish short-side trader-count breakouts for Robusta. Four count-based rules (CP7, MS7, TC1, TC2) can't fire on LDN, so the RC composite has a slightly narrower expressivity range than NY."
+        />
       </div>
 
       {/* 8-week signal history */}
