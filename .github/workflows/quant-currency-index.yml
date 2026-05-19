@@ -28,6 +28,7 @@ jobs:
         run: pip install "yfinance==0.2.50" "curl_cffi>=0.7,<1.0" requests pandas numpy sqlalchemy psycopg2-binary google-generativeai python-dotenv
 
       - name: Run Currency Index scraper (3 attempts, 15m between)
+        id: fetch_cci
         # Yahoo Finance per-IP rate limits typically clear in ~15 minutes,
         # not 5. Old 5-minute retry hit the same wall three times in a row.
         run: |
@@ -36,17 +37,11 @@ jobs:
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 15m..." && sleep 900 || exit 1
           done
 
-      - name: Run Sentiment + Robusta Factor model (3 attempts)
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          for attempt in 1 2 3; do
-            python -m backend.scraper.quant_model.run_quant && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 2m..." && sleep 120 || exit 1
-          done
-
-      - name: Validate output
+      - name: Validate CCI output
+        # Validate immediately after fetch so a bad CCI doesn't get committed
+        # below. The validator only checks the currency_index section — it
+        # doesn't require Robusta/sentiment fields, which is exactly why we
+        # can commit here BEFORE the (often flaky) Robusta step.
         run: |
           python -c "
           import json, sys, subprocess
@@ -57,23 +52,66 @@ jobs:
           if not ok:
               print(f'[validate] quant_report.json FAILED: {reason} — restoring HEAD version')
               subprocess.run(['git', 'checkout', '--', 'frontend/public/data/quant_report.json'])
-              # Exit non-zero so the workflow step fails loudly and the
-              # 'Notify on failure' step below fires a Telegram alert.
-              # Previously this branch silently exited 0, the commit step
-              # printed 'No changes.', and the only signal was the
-              # downstream 1.5 freshness check days later.
               sys.exit(1)
           "
 
-      - name: Commit updated JSON if changed
+      - name: Commit CCI + fx_history (before Robusta)
+        # Decoupled from the Robusta step. PR #54 migrated fetch_currency_index
+        # to jsDelivr (works), but robusta_factors.py still uses yfinance
+        # (intermittently blocked on GH Actions IPs). Previously, a yfinance
+        # failure aborted the whole workflow before this commit step, and
+        # the daily CCI update never landed in the repo — quant_report.json
+        # stuck on 2026-05-08 for 9+ days before the freshness check 1.5
+        # caught it, and fx_history.json was never committed at all.
+        # Committing here means CCI + fx_history update daily regardless of
+        # what Robusta does downstream.
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/data/quant_report.json
           [ -f frontend/public/data/fx_history.json ] && git add frontend/public/data/fx_history.json || true
           git diff --cached --quiet \
-            && echo "No changes." \
-            || (git commit -m "data: update quant_report + fx_history [skip ci]" && git pull --rebase --autostash origin main && git push)
+            && echo "No CCI changes." \
+            || (git commit -m "data: update CCI + fx_history [skip ci]" && git pull --rebase --autostash origin main && git push)
+
+      - name: Run Sentiment + Robusta Factor model (3 attempts)
+        id: run_quant
+        # continue-on-error so a Robusta failure (yfinance blocked on GH IPs)
+        # doesn't strand the CCI commit above. The freshness check workflow
+        # 1.5 still catches a persistently-failing run_quant via its own
+        # threshold on whatever output run_quant produces.
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m backend.scraper.quant_model.run_quant && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 2m..." && sleep 120 || exit 1
+          done
+
+      - name: Commit Robusta additions (only if Robusta succeeded)
+        if: steps.run_quant.outcome == 'success'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/quant_report.json
+          git diff --cached --quiet \
+            && echo "No Robusta changes." \
+            || (git commit -m "data: update Robusta factors [skip ci]" && git pull --rebase --autostash origin main && git push)
+
+      - name: Notify on Robusta-only failure
+        # Separate from the workflow failure path below. Robusta failure no
+        # longer blocks CCI commits, but we still want a Telegram heads-up
+        # so we know it's been failing for a while.
+        if: steps.run_quant.outcome == 'failure'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=⚠ ${{ github.workflow }} — Robusta step failed (CCI + fx_history still committed) — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
 
       - name: Notify on failure
         if: failure()

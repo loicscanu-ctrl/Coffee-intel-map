@@ -429,8 +429,45 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
       // source coords (within float-equality on lat+lng) — near-duplicates
       // already separate at city-level zoom. Displacement is ~50-100 m
       // (0.0005°) so the marker still sits inside the same industrial zone.
-      const coordBuckets = new Map<string, FactoryPin[]>();
+
+      // Defensive dedup BEFORE bucketing. The live DB has occasionally
+      // accumulated stale rows from older seed iterations — visible as
+      // factories rendered twice at the same coord (e.g. Dallmayr Berlin
+      // showing as both F = mixed and R = roastery). If two entries share
+      // identical coords AND one carries a specific type (mill / roastery /
+      // soluble / decaf / capsules) while the other is the generic
+      // "mixed" / "unknown" / null, the generic one is the stale duplicate
+      // and we drop it. Same-coord entries with two SPECIFIC types
+      // (e.g. one roastery + one mill) are left alone — they're real
+      // co-located distinct facilities.
+      const SPECIFIC_TYPES = new Set(["mill", "roastery", "soluble", "decaf", "capsules"]);
+      const dedupBuckets = new Map<string, FactoryPin[]>();
       for (const f of factories as FactoryPin[]) {
+        const k = `${f.lat},${f.lng}`;
+        const list = dedupBuckets.get(k);
+        if (list) list.push(f); else dedupBuckets.set(k, [f]);
+      }
+      const dedupedFactories: FactoryPin[] = [];
+      dedupBuckets.forEach((list) => {
+        if (list.length === 1) {
+          dedupedFactories.push(list[0]);
+          return;
+        }
+        const hasSpecific = list.some((f: FactoryPin) => !!f.type && SPECIFIC_TYPES.has(f.type));
+        if (!hasSpecific) {
+          // All entries are generic — keep them all (no signal to choose).
+          dedupedFactories.push(...list);
+          return;
+        }
+        // Drop generic-type ("mixed" / "unknown" / null) when a sibling
+        // carries a specific type at the same coord.
+        for (const f of list) {
+          if (f.type && SPECIFIC_TYPES.has(f.type)) dedupedFactories.push(f);
+        }
+      });
+
+      const coordBuckets = new Map<string, FactoryPin[]>();
+      for (const f of dedupedFactories) {
         const k = `${f.lat},${f.lng}`;
         const list = coordBuckets.get(k);
         if (list) list.push(f); else coordBuckets.set(k, [f]);
@@ -456,7 +493,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
       // below adds/removes whole groups when the user toggles types in the
       // legend — avoids rebuilding markers on every toggle.
       const layerByType: Record<string, LeafletLayerGroup> = {};
-      (factories as FactoryPin[]).forEach((f) => {
+      dedupedFactories.forEach((f) => {
         const t = (f.type as keyof typeof FACTORY_TYPE_STYLE) || "unknown";
         const style = FACTORY_TYPE_STYLE[t] ?? FACTORY_TYPE_STYLE.unknown;
         // Scale the icon by capacity: sqrt(cap_kt / 30) clamped to [0.85, 1.5]

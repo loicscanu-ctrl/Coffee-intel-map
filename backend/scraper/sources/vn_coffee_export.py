@@ -218,30 +218,49 @@ def _months_to_try(months_back: int = 18) -> list[tuple[int, int]]:
 def _candidate_pdf_urls(data_year: int, data_month: int) -> list[str]:
     """Generate likely PDF URLs for one data month.
 
-    Publication month = data_month + 1. Publication day clusters around the
-    7th but can drift; we try 1..28 in plausibility order. Tried both
-    lowercase 'tN' (modern, 2024+) and uppercase 'TN' (older), and both
-    lowercase '(vn-sb)' (modern) and uppercase '(VN-SB)' (older) suffixes.
-    """
-    pub_year, pub_month = data_year, data_month + 1
-    if pub_month > 12:
-        pub_month = 1
-        pub_year += 1
+    Publication month is normally data_month + 1 (e.g. Jan data → Feb pub).
+    Vietnam Customs occasionally slips this by another month — most often
+    around Tết (Lunar New Year) when Jan data lands in March — so we also
+    enumerate data_month + 2 as a backup, with a smaller day window.
 
-    # Plausibility-ordered days. The first 16 (5–20) cover all observed
-    # publication dates; the rest are insurance for outliers.
+    Publication day clusters around the 7th but can drift; we try 1..28 in
+    plausibility order. Both lowercase 'tN' (modern, 2024+) and uppercase
+    'TN' (older), and both lowercase '(vn-sb)' (modern) and uppercase
+    '(VN-SB)' (older) suffixes are tried.
+    """
+    def _shift(year: int, month: int, by: int) -> tuple[int, int]:
+        m = month + by
+        y = year
+        while m > 12:
+            m -= 12
+            y += 1
+        return y, m
+
+    pub_y1, pub_m1 = _shift(data_year, data_month, 1)
+    pub_y2, pub_m2 = _shift(data_year, data_month, 2)
+
+    # Plausibility-ordered days for the primary window. The first 16 (5–20)
+    # cover all observed publication dates; the rest are insurance for
+    # outliers.
     day_order = [
         7, 8, 6, 9, 10, 11, 5, 12, 13, 14, 15, 4, 16, 17, 3, 18, 19, 2,
         20, 21, 1, 22, 23, 24, 25, 26, 27, 28,
     ]
+    # Backup window (data_month + 2): narrower band, only the most plausible
+    # late-publication days. Keeps the URL fan-out from doubling.
+    backup_days = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 4, 3, 2, 1]
 
     urls: list[str] = []
-    for tprefix in ("t", "T"):
-        for mfmt in (str(data_month), f"{data_month:02d}"):
-            for suffix in ("(vn-sb)", "(VN-SB)"):
-                stem = f"{data_year}-{tprefix}{mfmt}-2x{suffix}.pdf"
-                for d in day_order:
-                    urls.append(f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_year}/{pub_month}/{d}/{stem}")
+    for pub_year, pub_month, days in (
+        (pub_y1, pub_m1, day_order),
+        (pub_y2, pub_m2, backup_days),
+    ):
+        for tprefix in ("t", "T"):
+            for mfmt in (str(data_month), f"{data_month:02d}"):
+                for suffix in ("(vn-sb)", "(VN-SB)"):
+                    stem = f"{data_year}-{tprefix}{mfmt}-2x{suffix}.pdf"
+                    for d in days:
+                        urls.append(f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_year}/{pub_month}/{d}/{stem}")
     # Dedupe while preserving order.
     seen: set[str] = set()
     out: list[str] = []

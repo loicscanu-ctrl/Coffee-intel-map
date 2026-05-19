@@ -180,6 +180,34 @@ def _today_brazil_conilon_price(db) -> float | None:
         return None
 
 
+def _today_brazil_arabica_price(db) -> float | None:
+    """Read today's Arabica price from the latest CEPEA/ESALQ NewsItem.
+
+    The CEPEA scraper writes two items per run — title pattern
+    'CEPEA Arabica – YYYY-MM-DD' and 'CEPEA Conilon (Robusta) – ...'. We
+    filter to the Arabica title so we don't accidentally read the Conilon
+    price. Body format: 'CEPEA Arabica price: R$ 1.234,50/sack (DD/MM/YYYY)'.
+
+    This complements the BCB SGS 4332 backfill — when 4332 returns empty
+    (the failure mode that produced an empty brazil_arabica history in
+    origin_prices_history.json), the CEPEA daily price is the live source.
+    """
+    try:
+        from models import NewsItem
+        item = (db.query(NewsItem)
+                  .filter(NewsItem.source == "CEPEA/ESALQ")
+                  .filter(NewsItem.title.like("CEPEA Arabica%"))
+                  .order_by(NewsItem.pub_date.desc()).first())
+        if not item:
+            return None
+        m = re.search(r"R\$\s*([\d.]+,\d{2})", item.body or "")
+        if not m:
+            return None
+        return float(m.group(1).replace(".", "").replace(",", "."))
+    except Exception:
+        return None
+
+
 def _today_uganda_price() -> float | None:
     """Read today's UCDA Screen 15 farmgate price from uganda_supply.json."""
     p = ROOT / "frontend" / "public" / "data" / "uganda_supply.json"
@@ -239,8 +267,15 @@ def export_origin_prices_history(db) -> None:
         origins["brazil_conilon"]["history"], SGS_CONILON, "brazil_conilon"
     )
 
-    # Brazil Arabica — no daily NewsItem source today; backfill from SGS 4332.
-    # When/if we wire a daily arabica scraper, append_today will pick it up.
+    # Brazil Arabica — append today's CEPEA/ESALQ price (when the cepea
+    # scraper has run today) and backfill from BCB SGS 4332 on first run.
+    # The backfill went stale in production (SGS 4332 has been returning
+    # empty since at least the 18 May 2026 daily run — visible in
+    # origin_prices_history.json where brazil_arabica.history was []),
+    # so the daily CEPEA news item is now the primary source.
+    origins["brazil_arabica"]["history"] = _append_today(
+        origins["brazil_arabica"]["history"], today, _today_brazil_arabica_price(db)
+    )
     origins["brazil_arabica"]["history"] = _backfill_from_sgs(
         origins["brazil_arabica"]["history"], SGS_ARABICA, "brazil_arabica"
     )
