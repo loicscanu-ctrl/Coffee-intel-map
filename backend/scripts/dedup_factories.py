@@ -70,6 +70,60 @@ CONFIRMED_ORPHANS: dict[str, str] = {
 }
 
 
+# Common UTF-8-as-Latin-1 mojibake sequences observed in factory names.
+# Used as a regex fallback when the full latin-1 round-trip fails (which
+# happens on PARTIALLY mojibake'd strings — e.g. "CafÃ© Maringá", where
+# "Café" got Latin-1-corrupted but "á" survived as proper UTF-8 because
+# it was decoded from a different code path).
+_MOJIBAKE_MAP: dict[str, str] = {
+    "Ã©": "é", "Ã¨": "è", "Ãª": "ê", "Ã«": "ë",
+    "Ã¡": "á", "Ã ": "à", "Ã¢": "â", "Ã£": "ã", "Ã¤": "ä",
+    "Ã­": "í", "Ã¬": "ì", "Ã®": "î", "Ã¯": "ï",
+    "Ã³": "ó", "Ã²": "ò", "Ã´": "ô", "Ãµ": "õ", "Ã¶": "ö",
+    "Ãº": "ú", "Ã¹": "ù", "Ã»": "û", "Ã¼": "ü",
+    "Ã±": "ñ", "Ã§": "ç", "ÃŸ": "ß",
+    "Ã\x81": "Á", "Ã‰": "É", "Ã\x8d": "Í", "Ã“": "Ó", "Ãš": "Ú",
+}
+
+
+def _demojibake(s: str) -> str | None:
+    """Recover a UTF-8 string that was decoded as Latin-1 on insertion.
+
+    The production DB has accumulated rows whose names appear as e.g.
+    "CafÃ©s Novell Vilafranca" — the UTF-8 bytes for `é` (`\\xc3\\xa9`)
+    misinterpreted as the Latin-1 sequence `Ã©`. A round-trip through
+    `latin-1` encode → `utf-8` decode undoes the corruption:
+
+        "CafÃ©s Novell Vilafranca".encode("latin-1").decode("utf-8")
+            == "Cafés Novell Vilafranca"
+
+    Fallback: when the round-trip fails (partial mojibake — some chars
+    already proper UTF-8 break the latin-1 encode step), substitute the
+    known mojibake sequences via `_MOJIBAKE_MAP`.
+
+    Returns the recovered string if it differs from the input AND contains
+    at least one non-ASCII character (guards against accidental conversion
+    of strings that legitimately contain `Ã`). Returns None when no
+    recovery is possible.
+    """
+    # Primary path: full latin-1 round-trip.
+    try:
+        fixed = s.encode("latin-1").decode("utf-8")
+        if fixed != s and any(ord(c) > 127 for c in fixed):
+            return fixed
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+
+    # Fallback path: regex substitution for partial mojibake.
+    fixed = s
+    for moji, proper in _MOJIBAKE_MAP.items():
+        fixed = fixed.replace(moji, proper)
+    if fixed != s and any(ord(c) > 127 for c in fixed):
+        return fixed
+
+    return None
+
+
 def _create_archive_table_if_needed(db) -> None:
     """Best-effort archive table creation; works on both Postgres and SQLite."""
     dialect = engine.dialect.name
@@ -173,18 +227,27 @@ def main() -> int:
 
         canonical: list[Factory] = []
         confirmed_orphans: list[Factory] = []
+        mojibake_orphans: list[tuple[Factory, str]] = []  # (row, recovered_name)
         other_orphans: list[Factory] = []
 
         for r in all_rows:
             if r.name in CONFIRMED_ORPHANS:
                 confirmed_orphans.append(r)
-            elif r.name not in seed_names:
-                other_orphans.append(r)
-            else:
+                continue
+            if r.name in seed_names:
                 canonical.append(r)
+                continue
+            # Try demojibake — if the recovered name matches a seed entry,
+            # this is a mojibake duplicate of that canonical row.
+            recovered = _demojibake(r.name)
+            if recovered and recovered in seed_names:
+                mojibake_orphans.append((r, recovered))
+                continue
+            other_orphans.append(r)
 
-        print(f"  Canonical (in current seed):        {len(canonical)}")
-        print(f"  Confirmed orphans (will be deleted): {len(confirmed_orphans)}")
+        print(f"  Canonical (in current seed):            {len(canonical)}")
+        print(f"  Confirmed orphans (will be deleted):    {len(confirmed_orphans)}")
+        print(f"  Mojibake orphans (will be deleted):     {len(mojibake_orphans)}")
         print(f"  Other orphans (review before applying): {len(other_orphans)}")
         print()
 
@@ -199,6 +262,20 @@ def main() -> int:
                 print(f"  {i}. \"{r.name}\"")
                 print(f"       company={r.company!r}  type={r.type!r}  coord=({r.lat}, {r.lng})  cap_kt={r.cap_kt}")
                 print(f"       → likely canonical: \"{replacement}\" ({coord_match})")
+            print()
+
+        if mojibake_orphans:
+            print("MOJIBAKE ORPHANS — deleted on --apply:")
+            print("(UTF-8 names mis-decoded as Latin-1 on some past insert. The")
+            print(" canonical row with the same name in proper UTF-8 already exists")
+            print(" in the seed AND in the DB.)")
+            print()
+            for i, (r, recovered) in enumerate(
+                sorted(mojibake_orphans, key=lambda pair: pair[0].name), 1
+            ):
+                print(f"  {i}. \"{r.name}\"")
+                print(f"       company={r.company!r}  type={r.type!r}  coord=({r.lat}, {r.lng})  cap_kt={r.cap_kt}")
+                print(f"       → recovered UTF-8: \"{recovered}\" (matches a seed entry)")
             print()
 
         if other_orphans:
@@ -221,7 +298,7 @@ def main() -> int:
                     print(f"      {near_str}")
             print()
 
-        if not (confirmed_orphans or other_orphans):
+        if not (confirmed_orphans or mojibake_orphans or other_orphans):
             print("No orphan rows found. DB is clean.")
             return 0
 
@@ -229,16 +306,19 @@ def main() -> int:
             print("DRY RUN — no DB changes. Pass --apply to delete.")
             return 0
 
-        to_delete = confirmed_orphans + other_orphans
+        mojibake_rows = [r for r, _ in mojibake_orphans]
+        to_delete = confirmed_orphans + mojibake_rows + other_orphans
 
         if not args.no_archive:
             _create_archive_table_if_needed(db)
+            mojibake_name_set = {r.name for r in mojibake_rows}
             for r in to_delete:
-                reason = (
-                    "dedup_factories.py: known-orphan rename/consolidation"
-                    if r.name in CONFIRMED_ORPHANS
-                    else "dedup_factories.py: name not in current backend/seed/factories.json"
-                )
+                if r.name in CONFIRMED_ORPHANS:
+                    reason = "dedup_factories.py: known-orphan rename/consolidation"
+                elif r.name in mojibake_name_set:
+                    reason = "dedup_factories.py: UTF-8/Latin-1 mojibake duplicate of canonical row"
+                else:
+                    reason = "dedup_factories.py: name not in current backend/seed/factories.json"
                 _archive_row(db, r, reason)
             db.commit()
             print(f"Archived {len(to_delete)} row(s) to factories_archive.")
