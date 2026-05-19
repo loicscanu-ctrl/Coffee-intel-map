@@ -1,9 +1,9 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-19T06:28:39.993308Z",
+  "scraped_at": "2026-05-19T06:31:16.437845Z",
   "exports": null,
   "weather": {
-    "scraped_at": "2026-05-19T06:23:10.836087Z",
+    "scraped_at": "2026-05-19T06:28:59.260895Z",
     "regions": [
       {
         "name": "Lampung",
