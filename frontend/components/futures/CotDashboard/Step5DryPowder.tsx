@@ -7,7 +7,7 @@ import {
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import type { LegendProps } from "recharts";
 import { ARABICA_MT_FACTOR, ROBUSTA_MT_FACTOR } from "@/lib/cot/transformApiData";
-import type { CotMarketPositions, CotTradersGroup, ProcessedCotRow } from "@/lib/cot/types";
+import type { CotMarketPositions, CotTradersGroup, CotTradersGroupShort, ProcessedCotRow } from "@/lib/cot/types";
 import { CAT_ITEMS, CHART_STYLE } from "./constants";
 import SectionHeader from "./SectionHeader";
 import { CatToggles } from "./Toggles";
@@ -31,7 +31,7 @@ export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
       const mt = market === "ny" ? ARABICA_MT_FACTOR : ROBUSTA_MT_FACTOR;
       data.forEach(d => {
         const trL: CotTradersGroup | undefined = market === "ny" ? d.tradersNY : d.tradersLDN;
-        const trS: CotTradersGroup | undefined = market === "ny" ? d.tradersNY_short : d.tradersLDN_short;
+        const trS: CotTradersGroupShort | undefined = market === "ny" ? d.tradersNY_short : d.tradersLDN_short;
         let dpLong = 0, dpShort = 0, dpTradersLong = 0, dpTradersShort = 0;
         (Object.keys(dpCats) as DpCatKey[]).forEach(cat => {
           if (dpCats[cat]) {

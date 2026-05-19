@@ -430,10 +430,14 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
         magnitude: magBig(magProd[mkt], magRoast[mkt]),
         text:"Both commercials aligned bearish — strong fundamental supply pressure signal." });
 
-    if (pd === "up"   && rd === "up")
+    // CI3 stays gated off pr=down: when both sides are active but price is
+    // falling, CP2 ("Forced Liquidation", −2) fires concurrently and the
+    // "equilibrium" framing here would contradict it. Restrict to pr=up
+    // (genuine two-sided demand) or pr=flat (true equilibrium).
+    if (pd === "up"   && rd === "up"   && priceDir[mkt] !== "down")
       add({ id:"CI3", name:"Normal Commercial Flow",         category:"CI", categoryLabel:"Commercial", market:mkt, severity:"info",  score:  0,
         magnitude: magBig(magProd[mkt], magRoast[mkt]),
-        text:"Producers and roasters both active on their respective sides — healthy two-sided commercial flow, market in equilibrium." });
+        text:"Producers and roasters both active on their respective sides — healthy two-sided commercial flow." });
 
     if (pd === "flat" && rd === "flat")
       add({ id:"CI4", name:"Commercial Vacuum",              category:"CI", categoryLabel:"Commercial", market:mkt, severity:"alert", score:  0,

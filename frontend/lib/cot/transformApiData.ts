@@ -5,7 +5,7 @@ export const MARGIN_OUTRIGHT     = 6000;
 export const MARGIN_SPREAD       = 1200;
 export const CENTS_LB_TO_USD_TON = 22.0462;
 
-import type { CotRawRow, CotRawMarket, ProcessedCotRow, CotMarketPositions, CotTradersGroup } from "./types";
+import type { CotRawRow, CotRawMarket, ProcessedCotRow, CotMarketPositions, CotTradersGroup, CotTradersGroupShort } from "./types";
 
 // ── Real data transform ─────────────────────────────────────────────────────
 export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
@@ -106,13 +106,21 @@ export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
       other:  ny.t_other_long ?? 0,
       nonrep: ny.t_nr_long    ?? 0,
     };
-    const tradersNY_short: CotTradersGroup = {
-      pmpu:   ny.t_pmpu_short  ?? 0,
-      mm:     ny.t_mm_short    ?? 0,
-      swap:   ny.t_swap_short  ?? 0,
-      other:  ny.t_other_short ?? 0,
-      nonrep: ny.t_nr_short    ?? 0,
+    // Short-side counts are nullable: ICE/LDN omits them, and `signalEngine`
+    // relies on nulls flowing through so `dirCount` returns "unknown" and
+    // count-comparison rules skip cleanly. Coalescing to 0 here would silently
+    // make `mmNetTDir.LDN` track long-count direction and corrupt TC1/TC2.
+    // Omit the subobject entirely when every short field is null so consumers
+    // (and `signalEngine.ts:204-219`) see `undefined`.
+    const nyShort: CotTradersGroupShort = {
+      pmpu:   ny.t_pmpu_short  ?? null,
+      mm:     ny.t_mm_short    ?? null,
+      swap:   ny.t_swap_short  ?? null,
+      other:  ny.t_other_short ?? null,
+      nonrep: ny.t_nr_short    ?? null,
     };
+    const tradersNY_short = Object.values(nyShort).every(v => v === null) ? undefined : nyShort;
+
     const tradersLDN: CotTradersGroup = {
       pmpu:   ldn.t_pmpu_long  ?? 0,
       mm:     ldn.t_mm_long    ?? 0,
@@ -120,13 +128,14 @@ export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
       other:  ldn.t_other_long ?? 0,
       nonrep: 0,  // ICE has no NR trader count
     };
-    const tradersLDN_short: CotTradersGroup = {
-      pmpu:   ldn.t_pmpu_short  ?? 0,
-      mm:     ldn.t_mm_short    ?? 0,
-      swap:   ldn.t_swap_short  ?? 0,
-      other:  ldn.t_other_short ?? 0,
-      nonrep: 0,
+    const ldnShort: CotTradersGroupShort = {
+      pmpu:   ldn.t_pmpu_short  ?? null,
+      mm:     ldn.t_mm_short    ?? null,
+      swap:   ldn.t_swap_short  ?? null,
+      other:  ldn.t_other_short ?? null,
+      nonrep: null,  // ICE has no NR trader count
     };
+    const tradersLDN_short = Object.values(ldnShort).every(v => v === null) ? undefined : ldnShort;
 
     const pmpuShortMT_NY  = nyObj.pmpuShort * ARABICA_MT_FACTOR;
     const pmpuShortMT_LDN = ldnObj.pmpuShort * ROBUSTA_MT_FACTOR;

@@ -6,6 +6,18 @@ export interface CotTradersGroup {
   nonrep: number;
 }
 
+/** Trader-count group for short-side breakouts. Fields are nullable because
+ *  ICE/LDN doesn't publish them (Robusta `t_*_short` arrive as null from the
+ *  API). `transformApiData` propagates the nulls so `signalEngine.dirCount`
+ *  reports "unknown" and count-comparison rules skip cleanly. */
+export interface CotTradersGroupShort {
+  pmpu: number | null;
+  mm: number | null;
+  swap: number | null;
+  other: number | null;
+  nonrep: number | null;
+}
+
 export interface CotMarketPositions {
   pmpuLong: number;   pmpuShort: number;   pmpuSpread: number;
   swapLong: number;   swapShort: number;   swapSpread: number;
@@ -42,11 +54,14 @@ export interface ProcessedCotRow {
   rawNy?: Record<string, number | null>;
   rawLdn?: Record<string, number | null>;
   tradersNY: CotTradersGroup;
-  /** Only present on real data, not on synthetic mock rows. */
-  tradersNY_short?: CotTradersGroup;
+  /** Only present on real data, not on synthetic mock rows. Fields may be
+   *  null when the exchange omits the breakout (LDN short side on Robusta);
+   *  the subobject itself is omitted when every short field is null. */
+  tradersNY_short?: CotTradersGroupShort;
   tradersLDN: CotTradersGroup;
-  /** Only present on real data, not on synthetic mock rows. */
-  tradersLDN_short?: CotTradersGroup;
+  /** Only present on real data, not on synthetic mock rows. See note on
+   *  `tradersNY_short` for the null-tolerance contract. */
+  tradersLDN_short?: CotTradersGroupShort;
   pmpuShortMT_NY: number;
   pmpuShortMT_LDN: number;
   pmpuShortMT: number;

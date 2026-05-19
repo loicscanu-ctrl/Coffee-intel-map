@@ -11,10 +11,12 @@ import {
   computeCompositeScores,
   __THRESHOLDS as THRESHOLDS,
 } from "../signalEngine";
+import { transformApiData } from "../transformApiData";
 import type {
   ProcessedCotRow,
   CotMarketPositions,
   CotTradersGroup,
+  CotRawRow,
 } from "../types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -437,5 +439,159 @@ describe("THRESHOLDS", () => {
   it("DIR_FLAT_PCT is 1% and DIR_FLAT_COUNT is 2 traders", () => {
     expect(THRESHOLDS.DIR_FLAT_PCT).toBe(0.01);
     expect(THRESHOLDS.DIR_FLAT_COUNT).toBe(2);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. CI3 gating — should not fire on pr=down (text contradicts CP2 firing)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("CI3 gating", () => {
+  it("does not fire when pr === 'down' (would contradict CP2 'Forced Liquidation')", () => {
+    // pd=up + rd=up + pr=down: CP2 fires (warn, −2), CR1 fires (info, 0).
+    // CI3 must NOT fire — "market in equilibrium" framing contradicts the
+    // forced-liquidation narrative.
+    const rows = buildHistory([
+      { ny: { pmpuShort: 200, pmpuLong: 60 }, priceNY: 200 },
+      { ny: { pmpuShort: 220, pmpuLong: 66 }, priceNY: 190 },
+    ]);
+    const ny = idsFor(evaluateSignals(rows), "NY");
+    expect(ny.has("CP2")).toBe(true);
+    expect(ny.has("CI3")).toBe(false);
+  });
+
+  it("fires when pr === 'up' (genuine two-sided demand)", () => {
+    const rows = buildHistory([
+      { ny: { pmpuShort: 200, pmpuLong: 60 }, priceNY: 200 },
+      { ny: { pmpuShort: 220, pmpuLong: 66 }, priceNY: 210 },
+    ]);
+    const ny = idsFor(evaluateSignals(rows), "NY");
+    expect(ny.has("CI3")).toBe(true);
+  });
+
+  it("fires when pr === 'flat' (true equilibrium)", () => {
+    const rows = buildHistory([
+      { ny: { pmpuShort: 200, pmpuLong: 60 }, priceNY: 200 },
+      { ny: { pmpuShort: 220, pmpuLong: 66 }, priceNY: 200.5 }, // within DIR_FLAT_PCT
+    ]);
+    const ny = idsFor(evaluateSignals(rows), "NY");
+    expect(ny.has("CI3")).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. End-to-end null tolerance — `transformApiData` → `evaluateSignals`
+//
+// `signalEngine` is null-safe: count-comparison rules skip when short-side
+// trader counts are null (LDN/Robusta omits these). That contract only holds
+// if `transformApiData` propagates the nulls. Earlier this transformer
+// coalesced `?? 0`, which silently made `mmNetTDir.LDN` track long-count
+// direction and corrupted TC1/TC2/MS7/CP7 on LDN.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("transformApiData → evaluateSignals (null short-side counts)", () => {
+  // Realistic LDN scenario: every row has positions but `t_*_short` are null
+  // (Robusta breakouts not published). 52 rows so percentile calcs are valid.
+  function buildRawLdnRows(): CotRawRow[] {
+    const rows: CotRawRow[] = [];
+    for (let i = 0; i < 52; i++) {
+      const t = (Math.sin((i / 12) * Math.PI * 2) + 1) / 2;
+      rows.push({
+        date: `2026-01-${String((i % 28) + 1).padStart(2, "0")}`,
+        ny: {
+          oi_total: 200_000,
+          pmpu_long: 60 + t * 40, pmpu_short: 150 + t * 100,
+          swap_long: 50, swap_short: 30, swap_spread: 5,
+          mm_long: 50 + t * 60, mm_short: 30 + t * 40, mm_spread: 30,
+          other_long: 20, other_short: 15, other_spread: 10,
+          nr_long: 10, nr_short: 8,
+          t_pmpu_long: 15, t_pmpu_short: 12,
+          t_swap_long: 12, t_swap_short: 8,
+          t_mm_long: 35,   t_mm_short: 25,
+          t_other_long: 8, t_other_short: 6,
+          t_nr_long: 5,    t_nr_short: 4,
+          price_ny: 180 + t * 60,
+          structure_ny: -2,
+        },
+        ldn: {
+          oi_total: 120_000,
+          pmpu_long: 60 + t * 40, pmpu_short: 150 + t * 100,
+          swap_long: 50, swap_short: 30, swap_spread: 5,
+          mm_long: 50 + t * 60, mm_short: 30 + t * 40, mm_spread: 30,
+          other_long: 20, other_short: 15, other_spread: 10,
+          nr_long: 10, nr_short: 8,
+          t_pmpu_long: 15,
+          t_swap_long: 12,
+          t_mm_long: 35,
+          t_other_long: 8,
+          // The four critical nulls — what ICE actually delivers for Robusta.
+          t_pmpu_short: null,
+          t_swap_short: null,
+          t_mm_short:   null,
+          t_other_short: null,
+          t_nr_long: 5,
+          price_ldn: 2400 + t * 200,
+          structure_ldn: -2,
+        },
+      });
+    }
+    return rows;
+  }
+
+  it("omits tradersLDN_short when every short field is null", () => {
+    const processed = transformApiData(buildRawLdnRows());
+    expect(processed.length).toBe(52);
+    for (const row of processed) {
+      expect(row.tradersLDN_short).toBeUndefined();
+    }
+  });
+
+  it("preserves tradersNY_short with non-null values", () => {
+    const processed = transformApiData(buildRawLdnRows());
+    const last = processed[processed.length - 1];
+    expect(last.tradersNY_short).toBeDefined();
+    expect(last.tradersNY_short!.mm).toBe(25);
+    expect(last.tradersNY_short!.pmpu).toBe(12);
+  });
+
+  it("does not fire LDN count-comparison rules (TC1/TC2/MS7/CP7) when short counts are null", () => {
+    // Set up directional state on LDN that WOULD trigger MS7/TC1/TC2/CP7 if
+    // short counts were known to be falling. With nulls, dirCount returns
+    // "unknown" → rules skip cleanly.
+    const raw = buildRawLdnRows();
+    // Force the last week into a state where count rules would otherwise fire
+    raw[51].ldn!.pmpu_short = 250;  // pmpuShort up sharply → pd="up"
+    raw[51].ldn!.mm_long    = 110;  // mmLong up
+    raw[51].ldn!.mm_short   = 70;   // mmShort up
+    raw[51].ldn!.price_ldn  = 2700;
+
+    const processed = transformApiData(raw);
+    const signals   = evaluateSignals(processed);
+    const ldn       = new Set(signals.filter(s => s.market === "LDN").map(s => s.id));
+
+    expect(ldn.has("TC1")).toBe(false);
+    expect(ldn.has("TC2")).toBe(false);
+    expect(ldn.has("MS7")).toBe(false);
+    expect(ldn.has("CP7")).toBe(false);
+  });
+
+  it("ldnMmShortT-driven rules do NOT fire even when long-count direction would suggest they should", () => {
+    // Regression guard against the `?? 0` bug: if `t_mm_short` is null but
+    // gets coalesced to 0, `mmNetTDir.LDN` ends up tracking long-count
+    // direction. A rising tradersLDN.mm count would then mis-trigger TC1/TC2.
+    const raw = buildRawLdnRows();
+    // Sharply rise long-side counts week-over-week.
+    raw[50].ldn!.t_mm_long  = 30;
+    raw[51].ldn!.t_mm_long  = 80;   // +50 traders WoW
+    raw[51].ldn!.mm_long    = 130;
+    raw[51].ldn!.mm_short   = 50;
+    raw[51].ldn!.price_ldn  = 2700;
+
+    const processed = transformApiData(raw);
+    const signals   = evaluateSignals(processed);
+    const tc1       = signals.find(s => s.id === "TC1" && s.market === "LDN");
+    const tc2       = signals.find(s => s.id === "TC2" && s.market === "LDN");
+    expect(tc1).toBeUndefined();
+    expect(tc2).toBeUndefined();
   });
 });
