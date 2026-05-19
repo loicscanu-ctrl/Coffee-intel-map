@@ -74,6 +74,8 @@ def _drought_score(precip_mm: float, et0_mm: float, root_zone_sm: float) -> floa
 
 def _apply_drought_modifiers(days: list[dict]) -> list[dict]:
     """Colombia phenology: Aug–Oct (Mitaca flowering + main crop dev) ×1.2; Mar–May (main flowering) ×1.15."""
+    from ._weather_baseline import seasonal_z_score, has_baseline
+
     PHENO = {8: 1.2, 9: 1.2, 10: 1.2, 3: 1.15, 4: 1.15, 5: 1.15}
 
     for day in days:
@@ -84,16 +86,44 @@ def _apply_drought_modifiers(days: list[dict]) -> list[dict]:
     stressed = sum(1 for d in days if d["_drought_score"] > 1.0)
     penalty = 0.5 if len(days) >= 14 and stressed >= 10 else 0.0
 
+    # Aggregate the current period's precip by calendar month so we can ask
+    # the baseline whether it's anomalous for the season. Without this,
+    # Colombia's natural Dec-Feb dry season flags drought every year.
+    precip_by_month: dict[int, float] = {}
+    for day in days:
+        m = int(day["date"][5:7])
+        p = day.get("precip_mm")
+        if p is not None:
+            precip_by_month[m] = precip_by_month.get(m, 0.0) + p
+
+    seasonal_overrides_active = has_baseline("colombia")
+
     for day in days:
         score = day["_drought_score"] + penalty
         if score >= 2.5:
-            day["drought_risk"] = "H"
+            risk = "H"
         elif score >= 1.5:
-            day["drought_risk"] = "M"
+            risk = "M"
         elif score >= 0.5:
-            day["drought_risk"] = "L"
+            risk = "L"
         else:
-            day["drought_risk"] = "-"
+            risk = "-"
+
+        # Seasonal-baseline downgrade: a HIGH (or MEDIUM) reading is the
+        # NORM for this region × month when current precip sits within 1σ
+        # of the historical mean. Downgrade by one notch in that case.
+        # Only fires if the baseline JSON has been populated for Colombia.
+        if seasonal_overrides_active and risk in ("H", "M"):
+            month = int(day["date"][5:7])
+            cur_precip = precip_by_month.get(month, 0.0)
+            z = seasonal_z_score("colombia", month, cur_precip, metric="precip")
+            if z is not None and z > -1.0:
+                # Current precip is within (or above) the normal range for
+                # this calendar month — not an anomaly. Downgrade one notch.
+                risk = "M" if risk == "H" else "L"
+                day["_seasonal_downgrade"] = True
+
+        day["drought_risk"] = risk
         day.pop("_drought_score_raw", None)
         day.pop("_drought_score", None)
 
