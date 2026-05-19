@@ -50,6 +50,17 @@ function nameClass(sig: Signal): string {
   return sig.severity === "alert" ? "text-amber-400" : "text-slate-400";
 }
 
+// "small" magnitude → no chip (kept off to reduce noise). "medium" → neutral
+// gray. "large" → severity-tinted, matching the signal direction.
+function magnitudeChipClass(sig: Signal): string {
+  if (sig.magnitude === "large") {
+    if (sig.score > 0) return "bg-green-900/30 text-green-300 border border-green-700/50";
+    if (sig.score < 0) return "bg-red-900/30   text-red-300   border border-red-700/50";
+    return "bg-amber-900/30 text-amber-300 border border-amber-700/50";
+  }
+  return "bg-slate-800/60 text-slate-400 border border-slate-700/50";
+}
+
 // ── Composite score gauge ─────────────────────────────────────────────────────
 
 type ScoreZone = "strongly-bearish" | "bearish" | "neutral" | "bullish" | "strongly-bullish";
@@ -344,6 +355,11 @@ export default function Step8Analysis({
                           <span className={`text-[11px] font-semibold ${nameClass(sig)}`}>
                             {sig.name}
                           </span>
+                          {sig.magnitude !== "small" && (
+                            <span className={`text-[8px] font-semibold uppercase tracking-wider px-1.5 py-px rounded ${magnitudeChipClass(sig)}`}>
+                              {sig.magnitude}
+                            </span>
+                          )}
                           {sig.score !== 0 && (
                             <span className={`text-[9px] font-mono font-bold ml-auto ${sig.score > 0 ? "text-green-400" : "text-red-400"}`}>
                               {fmt(sig.score)}
