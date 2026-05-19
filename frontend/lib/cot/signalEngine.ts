@@ -57,7 +57,7 @@ type Dir = "up" | "down" | "flat";
 type DirCount = Dir | "unknown";
 
 /** WoW % change direction with a configurable flat threshold (default 1%). */
-function dir(prev: number, curr: number): Dir {
+export function dir(prev: number, curr: number): Dir {
   const base = Math.abs(prev) || 1;
   const chg  = (curr - prev) / base;
   if (chg >  THRESHOLDS.DIR_FLAT_PCT) return "up";
@@ -74,7 +74,7 @@ function dir(prev: number, curr: number): Dir {
  *
  * Returns "unknown" when either endpoint is null — see the LDN note above.
  */
-function dirCount(
+export function dirCount(
   prev: number | null,
   curr: number | null,
   flat: number = THRESHOLDS.DIR_FLAT_COUNT,
@@ -86,7 +86,7 @@ function dirCount(
 }
 
 /** 52-week min-max percentile of values[idx] — matches the Gauges display formula: (current−min)/(max−min). */
-function pct52(values: number[], idx: number): number {
+export function pct52(values: number[], idx: number): number {
   const start  = Math.max(0, idx - 51);
   const window = values.slice(start, idx + 1);
   const min    = Math.min(...window);
@@ -94,8 +94,12 @@ function pct52(values: number[], idx: number): number {
   return max > min ? (values[idx] - min) / (max - min) : 0.5;
 }
 
-const isHigh = (s: number[], i: number) => pct52(s, i) >= THRESHOLDS.PCT_HIGH;
-const isLow  = (s: number[], i: number) => pct52(s, i) <= THRESHOLDS.PCT_LOW;
+export const isHigh = (s: number[], i: number) => pct52(s, i) >= THRESHOLDS.PCT_HIGH;
+export const isLow  = (s: number[], i: number) => pct52(s, i) <= THRESHOLDS.PCT_LOW;
+
+// Re-exported for tests; not part of the public engine API otherwise.
+export { THRESHOLDS as __THRESHOLDS };
+export type { Dir as __Dir, DirCount as __DirCount };
 
 export type Magnitude = "small" | "medium" | "large";
 /** WoW magnitude: small <5%, medium 5–12%, large >12%. */
