@@ -86,17 +86,32 @@ def _parse_page(html: str) -> dict:
       [9] arabica_prev [10] conillon_prev [11] soluvel_prev [12] total_prev
 
     Columns 9-11 are "Mês Anterior" = same-day cumulative for prior month.
+    Tolerates:
+      * Footnote markers after numbers ("123.456*", "123.456¹") — Cecafe
+        occasionally annotates retroactive corrections this way.
+      * 8-column variant (no Mês Anterior block) — fallback for layouts
+        where the prior-month column is dropped during the cross-year
+        transition. prev_* fields are set to None in that case.
+      * Variable whitespace / non-breaking spaces between cells.
     """
     # Strip scripts/styles then convert to plain text
     clean = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', '',
                    html, flags=re.DOTALL | re.IGNORECASE)
     clean = re.sub(r'<[^>]+>', ' ', clean)
+    # Normalise non-breaking spaces + Brazilian footnote markers before
+    # collapsing whitespace, so the TOTAIS regex sees a stable token stream.
+    clean = clean.replace("\xa0", " ").replace("&nbsp;", " ")
     text  = re.sub(r'\s+', ' ', clean).strip()
 
     # ── Reference date ────────────────────────────────────────────────────────
     date_m = re.search(r'recebidas\s+at[eé]:\s*(\d{2})/(\d{2})/(\d{4})', text, re.IGNORECASE)
     if not date_m:
-        raise ValueError("Could not find reference date on page")
+        idx = text.lower().find('recebidas')
+        snippet = text[max(0, idx - 40): idx + 200] if idx >= 0 else text[:400]
+        raise ValueError(
+            "Could not find reference date on page. "
+            f"Page-text excerpt: ...{snippet!r}..."
+        )
     ref_date = date(int(date_m.group(3)), int(date_m.group(2)), int(date_m.group(1)))
     print(f"  Reference date: {ref_date}")
 
@@ -105,22 +120,54 @@ def _parse_page(html: str) -> dict:
     if cert_idx < 0:
         cert_idx = 0
 
-    totais_m = re.search(
-        r'TOTAIS\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'  # dia: arabica conilon soluvel total
-        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+'            # acum: arabica conilon soluvel total
-        r'([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)',               # prev: arabica conilon soluvel total
-        text[cert_idx:],
-        re.IGNORECASE
-    )
-    if not totais_m:
-        raise ValueError("Could not find TOTAIS row for Certificados de Origem")
+    # Number pattern — Brazilian thousands ("123.456") with optional trailing
+    # footnote marker (*, ¹-⁹, †). Used by both 12-col and 8-col fallback.
+    _NUM = r'([\d\.]+)[\*¹²³⁴⁵⁶⁷⁸⁹†]?'
+    _SEP = r'\s+'
 
-    arabica_acum  = _parse_int_br(totais_m.group(5))
-    conillon_acum = _parse_int_br(totais_m.group(6))
-    soluvel_acum  = _parse_int_br(totais_m.group(7))
-    prev_arab     = _parse_int_br(totais_m.group(9))
-    prev_coni     = _parse_int_br(totais_m.group(10))
-    prev_solv     = _parse_int_br(totais_m.group(11))
+    # Primary: 12-number row (dia + acum + Mês Anterior).
+    totais_12 = re.compile(
+        r'TOTAIS' + _SEP + (_NUM + _SEP) * 11 + _NUM,
+        re.IGNORECASE,
+    )
+    # Fallback: 8-number row (dia + acum only — no Mês Anterior block).
+    totais_8 = re.compile(
+        r'TOTAIS' + _SEP + (_NUM + _SEP) * 7 + _NUM,
+        re.IGNORECASE,
+    )
+
+    body = text[cert_idx:]
+    totais_m = totais_12.search(body)
+    prev_arab: int | None = None
+    prev_coni: int | None = None
+    prev_solv: int | None = None
+
+    if totais_m:
+        arabica_acum  = _parse_int_br(totais_m.group(5))
+        conillon_acum = _parse_int_br(totais_m.group(6))
+        soluvel_acum  = _parse_int_br(totais_m.group(7))
+        prev_arab     = _parse_int_br(totais_m.group(9))
+        prev_coni     = _parse_int_br(totais_m.group(10))
+        prev_solv     = _parse_int_br(totais_m.group(11))
+    else:
+        # Fallback: 8 columns means Mês Anterior was dropped. Keep going so
+        # the current-month line still records — prev_* stay None.
+        totais_m = totais_8.search(body)
+        if not totais_m:
+            # Dump a body snippet around the most likely TOTAIS location so the
+            # CI log shows what's actually on the page, not just a generic
+            # "could not find" message. Most-likely location: just after the
+            # "Certificados de Origem" anchor.
+            snippet = body[:1200].replace("\n", " ")
+            raise ValueError(
+                f"Could not find TOTAIS row for Certificados de Origem "
+                f"(tried 12-col and 8-col patterns). Body snippet (1.2kb): "
+                f"{snippet!r}"
+            )
+        print("  [parse] WARNING: fell back to 8-column layout (no Mês Anterior)")
+        arabica_acum  = _parse_int_br(totais_m.group(5))
+        conillon_acum = _parse_int_br(totais_m.group(6))
+        soluvel_acum  = _parse_int_br(totais_m.group(7))
 
     print(f"  Acumulado    — Arabica: {arabica_acum:,}  Conilon: {conillon_acum:,}  Soluvel: {soluvel_acum:,}")
     print(f"  Mês Anterior — Arabica: {prev_arab:,}  Conilon: {prev_coni:,}  Soluvel: {prev_solv:,}")
@@ -167,7 +214,23 @@ def main():
     try:
         parsed = _parse_page(html)
     except ValueError as e:
+        # Dump the fetched HTML to a debug file so the next CI run's
+        # artefact upload preserves it for offline inspection. Without this
+        # the only signal was "Could not find TOTAIS" with no way to see
+        # what's actually on the page — which is exactly the position the
+        # cecafe_daily scraper has been in since 2026-05-15.
+        debug_path = OUT_DIR.parent / "debug" / "cecafe_daily_last_failed.html"
+        try:
+            debug_path.parent.mkdir(parents=True, exist_ok=True)
+            debug_path.write_text(html, encoding="utf-8")
+            print(f"  saved page HTML to {debug_path}  ({len(html):,} chars)")
+        except Exception as write_err:
+            print(f"  (could not save debug HTML: {write_err})")
         print(f"  ERROR: {e}")
+        # Retain existing JSON unchanged. Exit non-zero so the workflow's
+        # retry loop / failure-alert path fires, but the JSON file still has
+        # the last good data — frontend keeps rendering instead of showing
+        # an empty chart.
         sys.exit(1)
 
     ref   = parsed["ref_date"]
