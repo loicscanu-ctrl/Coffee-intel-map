@@ -661,7 +661,14 @@ def _parse_world_bank_excel(content: bytes) -> dict:
         if row and isinstance(row[0], str) and month_re.match(row[0].strip())
     ]
 
-    # Step 4: extract last 7 numeric values per commodity
+    # Step 4: extract numeric values per commodity.
+    #   * `_monthly`: last 7 values (legacy — backs the sparkline on the panel cards)
+    #   * `_history`: last 60 months as [{month: "YYYY-MM", price: float}] — backs the
+    #                 historical price chart on the Macro tab's FertilizerInputsPanel.
+    #                 5y of monthly data covers two coffee cycles plus the post-COVID
+    #                 inflation spike (Apr 2022 peak) so the reader sees the regime.
+    _HISTORY_MONTHS = 60
+
     def _extract(key: str) -> list[float]:
         if key not in col_map:
             return []
@@ -672,6 +679,22 @@ def _parse_world_bank_excel(content: bytes) -> dict:
             if isinstance(v, (int, float)) and v is not None:
                 vals.append(float(v))
         return vals[-7:] if len(vals) >= 7 else vals
+
+    def _extract_history(key: str) -> list[dict]:
+        if key not in col_map:
+            return []
+        col = col_map[key]
+        pairs: list[dict] = []
+        for row in data_rows:
+            v = row[col] if col < len(row) else None
+            if not isinstance(v, (int, float)) or v is None:
+                continue
+            raw = (row[0] or "").strip()  # "YYYYMxx"
+            if len(raw) < 7:
+                continue
+            iso_month = f"{raw[:4]}-{raw[5:7]}"
+            pairs.append({"month": iso_month, "price": round(float(v), 1)})
+        return pairs[-_HISTORY_MONTHS:] if len(pairs) > _HISTORY_MONTHS else pairs
 
     # Step 5: find last month string that has data for at least one commodity
     last_data_month = None
@@ -697,6 +720,9 @@ def _parse_world_bank_excel(content: bytes) -> dict:
         "urea_monthly":    _extract("urea"),
         "dap_monthly":     _extract("dap"),
         "kcl_monthly":     _extract("kcl"),
+        "urea_history":    _extract_history("urea"),
+        "dap_history":     _extract_history("dap"),
+        "kcl_history":     _extract_history("kcl"),
         "last_data_month": last_data_month,
     }
 
