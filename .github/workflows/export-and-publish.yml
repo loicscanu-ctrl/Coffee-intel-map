@@ -46,6 +46,7 @@ jobs:
 
       - name: Commit updated static JSON if changed
         run: |
+          set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add \
@@ -64,9 +65,36 @@ jobs:
           for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json frontend/public/data/origin_prices_history.json; do
             [ -f "$f" ] && git add "$f" || true
           done
-          git diff --cached --quiet \
-            && echo "No changes." \
-            || (git commit -m "data: update static JSON [skip ci]" && git pull --rebase --autostash origin main && git push)
+
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git commit -m "data: update static JSON [skip ci]"
+
+          # Rebase strategy — scraper-produced JSON is canonical:
+          #
+          # The export job runs concurrently with several other workflows
+          # that also commit to main (1.3 daily OI snapshot, 2.3 COT scraper,
+          # 1.9 quant currency index, etc.). The `concurrency.group` block
+          # above queues *this* workflow's runs serially, but it does NOT
+          # gate against unrelated workflows pushing between the time we
+          # `checkout@v4` and reach the push below — and those other
+          # workflows write to the same `frontend/public/data/` files.
+          #
+          # On conflict, our locally-regenerated JSON is always the right
+          # answer: export_static_json.py reads from the DB and produces
+          # the exact published shape, so taking our version doesn't lose
+          # data — the other workflow's JSON contents were either already
+          # in the DB (so our export contains them) or are from a different
+          # file we didn't touch (so no conflict).
+          #
+          # `--strategy-option=theirs` during a rebase keeps the side being
+          # replayed (our commit), discarding the rebase-target side (main).
+          # Files we didn't `git add` flow through from main unchanged.
+          git pull --rebase --autostash --strategy-option=theirs origin main
+          git push
 
       - name: Notify on failure
         if: failure()
