@@ -110,32 +110,34 @@ def _fetch_bls() -> dict | None:
     }
 
 
-def _fetch_eurostat() -> dict | None:
-    """Eurostat HICP monthly index for coffee (CP01211) across EU27."""
+def _fetch_eurostat_series(geo: str) -> list[dict] | None:
+    """Fetch one Eurostat HICP coffee series for the given geo code.
+
+    Returns a sorted list of {"period": "YYYY-MM", "index": float} dicts
+    or None on any fetch / parse failure. Caller decides what to do with
+    the result — composing a basket vs. picking a single one.
+    """
     url = (
         "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
         f"{_EUROSTAT_DATAFLOW}"
-        "?format=JSON&lang=EN&unit=I15&coicop=CP01211&geo=EU27_2020"
+        f"?format=JSON&lang=EN&unit=I15&coicop=CP01211&geo={geo}"
     )
     try:
         r = requests.get(url, headers=_HEADERS, timeout=30)
         r.raise_for_status()
         body = r.json()
     except Exception as e:
-        logger.warning(f"[retail_cpi] Eurostat fetch failed: {e}")
+        logger.warning(f"[retail_cpi] Eurostat {geo} fetch failed: {e}")
         return None
 
-    # Eurostat JSON-stat: dimension.time.category.index maps period → ordinal,
-    # value (dict or list) maps that ordinal → measurement.
     try:
         time_cat = body["dimension"]["time"]["category"]
         time_idx = time_cat["index"]
         values   = body["value"]
     except (KeyError, TypeError):
-        logger.warning("[retail_cpi] Eurostat: unexpected JSON-stat shape")
+        logger.warning(f"[retail_cpi] Eurostat {geo}: unexpected JSON-stat shape")
         return None
 
-    # time_idx can be a dict (period→ordinal) or a list of periods
     if isinstance(time_idx, dict):
         periods = sorted(time_idx.keys(), key=lambda p: time_idx[p])
     elif isinstance(time_idx, list):
@@ -145,7 +147,6 @@ def _fetch_eurostat() -> dict | None:
 
     rows: list[dict] = []
     for i, period in enumerate(periods):
-        # period format is "2024-01"; values keyed either by str(i) or i
         raw = values.get(str(i)) if isinstance(values, dict) else values[i] if i < len(values) else None
         if raw is None:
             continue
@@ -154,13 +155,118 @@ def _fetch_eurostat() -> dict | None:
         except (TypeError, ValueError):
             continue
     rows.sort(key=lambda r: r["period"])
-    if not rows:
+    return rows if rows else None
+
+
+# Coffee-consumption weights for the EU member-state fallback basket.
+# Source: ICO consumption stats 2023/24 — DE/FR/IT/ES cover ~68% of EU27
+# bag volume and publish HICP coffee 2-3 weeks after month-end, well
+# ahead of the EU27_2020 aggregate (which has been running a ~5-month lag
+# on CP01211 — observed Dec 2025 latest as of mid-May 2026). Weights here
+# are normalised within the four-country basket; the resulting index is a
+# proxy, not a true EU27 figure, but it tracks the aggregate closely and
+# lets the demand-tab chart stay current.
+_EU_BASKET_WEIGHTS: dict[str, float] = {
+    "DE": 0.412,   # Germany
+    "FR": 0.221,   # France
+    "IT": 0.250,   # Italy
+    "ES": 0.117,   # Spain
+}
+
+
+def _fetch_eurostat_basket() -> list[dict] | None:
+    """Synthesise an EU coffee CPI from DE/FR/IT/ES weighted average.
+
+    For each period present in all 4 series, compute the weighted mean of
+    the indices. Periods missing from any contributor are dropped (we
+    require all four to keep the basket coherent — silently substituting
+    last-known values would smear the YoY signal).
+    """
+    per_country: dict[str, list[dict]] = {}
+    for geo in _EU_BASKET_WEIGHTS:
+        series = _fetch_eurostat_series(geo)
+        if not series:
+            logger.warning(f"[retail_cpi] EU basket: {geo} fetch returned no data")
+            return None
+        per_country[geo] = series
+
+    # Build a (period -> { geo: index }) map, then keep periods with all 4.
+    by_period: dict[str, dict[str, float]] = {}
+    for geo, rows in per_country.items():
+        for row in rows:
+            by_period.setdefault(row["period"], {})[geo] = row["index"]
+
+    complete = [p for p, vals in by_period.items() if len(vals) == len(_EU_BASKET_WEIGHTS)]
+    if not complete:
         return None
-    return {
-        "name":       "EU — Coffee HICP (Eurostat CP01211, EU27)",
-        "source_url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx",
-        "monthly":    _yoy_series(rows),
-    }
+    complete.sort()
+    out: list[dict] = []
+    for period in complete:
+        vals = by_period[period]
+        weighted = sum(vals[geo] * _EU_BASKET_WEIGHTS[geo] for geo in _EU_BASKET_WEIGHTS)
+        out.append({"period": period, "index": round(weighted, 3)})
+    return out
+
+
+def _fetch_eurostat() -> dict | None:
+    """Eurostat HICP monthly index for coffee (CP01211).
+
+    Tries EU27_2020 aggregate first — that's the true headline figure
+    when it's current. If the aggregate is more than 2 months behind
+    today (Eurostat's lag for this series has been observed at ~5 months
+    in mid-2026), falls back to a weighted DE/FR/IT/ES member-state
+    basket which publishes 2-3 weeks after month-end. The series name in
+    the JSON cache marks which path was used so the frontend can label
+    accordingly.
+    """
+    from datetime import date
+
+    aggregate = _fetch_eurostat_series("EU27_2020")
+    today = date.today()
+    aggregate_latest = aggregate[-1]["period"] if aggregate else None
+
+    def _months_behind(period: str | None) -> int:
+        if not period or len(period) < 7:
+            return 9999
+        try:
+            y, m = int(period[:4]), int(period[5:7])
+        except ValueError:
+            return 9999
+        return (today.year - y) * 12 + (today.month - m)
+
+    aggregate_lag = _months_behind(aggregate_latest)
+    if aggregate and aggregate_lag <= 2:
+        logger.info(f"[retail_cpi] Eurostat EU27_2020 fresh ({aggregate_latest}, "
+                    f"{aggregate_lag}mo lag) — using aggregate")
+        return {
+            "name":       "EU — Coffee HICP (Eurostat CP01211, EU27)",
+            "source_url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx",
+            "monthly":    _yoy_series(aggregate),
+        }
+
+    if aggregate:
+        logger.warning(f"[retail_cpi] Eurostat EU27_2020 stale ({aggregate_latest}, "
+                       f"{aggregate_lag}mo behind) — trying DE/FR/IT/ES basket fallback")
+    basket = _fetch_eurostat_basket()
+    if basket:
+        basket_latest = basket[-1]["period"]
+        logger.info(f"[retail_cpi] EU basket fallback: latest={basket_latest}, "
+                    f"{len(basket)} periods")
+        return {
+            "name":       "EU — Coffee HICP (DE/FR/IT/ES basket proxy)",
+            "source_url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx",
+            "monthly":    _yoy_series(basket),
+        }
+
+    # Basket also failed — fall back to whatever aggregate we have, even stale.
+    if aggregate:
+        logger.warning("[retail_cpi] EU basket failed — returning stale aggregate")
+        return {
+            "name":       "EU — Coffee HICP (Eurostat CP01211, EU27 — stale)",
+            "source_url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx",
+            "monthly":    _yoy_series(aggregate),
+        }
+    return None
 
 
 def _fetch_kc_futures() -> dict | None:
