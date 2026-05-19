@@ -394,10 +394,35 @@ async def run(page, db) -> None:  # noqa: ARG001
         print(f"[retail_cpi] OK: {n}/4 series ({names}), last_updated={payload['last_updated']}")
 
         if db is not None:
+            # Build a headline-stat body so the news table / Telegram brief can
+            # extract a meaningful data label per source — previously this read
+            # "Retail coffee CPI series fetched: us, eu, brazil" with no numbers,
+            # so the NewsFeed dispatcher (which keys on `source` = "Retail CPI")
+            # had nothing to surface. New format includes the most-recent YoY %
+            # for each region in a stable "US: X%, EU: Y%, Brazil: Z%" shape
+            # that the source-specific regex in NewsFeed.tsx now matches.
+            yoy_parts: list[str] = []
+            for region, label in (("us", "US"), ("eu", "EU"), ("brazil", "Brazil")):
+                series = payload["series"].get(region, {})
+                monthly = series.get("monthly") or []
+                if not monthly:
+                    continue
+                latest = monthly[-1]
+                yoy = latest.get("yoy_pct")
+                if yoy is None:
+                    continue
+                sign = "+" if yoy >= 0 else ""
+                yoy_parts.append(f"{label}: {sign}{yoy:.2f}%")
+            body = (
+                "Retail coffee CPI YoY — " + ", ".join(yoy_parts)
+                if yoy_parts
+                else f"Retail coffee CPI series fetched: {names}"
+            )
+
             from scraper.db import upsert_news_item
             upsert_news_item(db, {
                 "title":    f"Retail Coffee CPI – {payload['last_updated']}",
-                "body":     f"Retail coffee CPI series fetched: {names}",
+                "body":     body,
                 "source":   "Retail CPI",
                 "category": "demand",
                 "lat":      0.0,
