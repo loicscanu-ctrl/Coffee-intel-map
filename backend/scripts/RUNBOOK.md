@@ -10,6 +10,22 @@ Action runner — these are intentionally manual).
 
 ---
 
+## 0. (Recommended) Audit the switch dates before backfilling
+
+```bash
+DATABASE_URL=sqlite:///:memory: python backend/scripts/audit_contract_switches.py --weeks 260
+```
+
+Read-only. Prints every contract switch the backfill script would produce
+for the last 5 years, along with the source (`history` from oi_history.json
+where available, else `heuristic`) and an `expected window` derived from
+ICE's published FND calendar. Cross-checks the recent switches against
+`oi_history.json` ground truth — the most recent NY K→N flip lines up
+to the day. Use this to gain confidence in the heuristic dates before
+committing them to prod.
+
+---
+
 ## 1. `backfill_max_oi_prices.py` — rebuild the COT price track under the max-OI rule
 
 **What it does**: For every row in `cot_weekly`, recomputes

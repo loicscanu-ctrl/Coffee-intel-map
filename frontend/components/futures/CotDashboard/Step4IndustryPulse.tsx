@@ -19,7 +19,7 @@ type MtKey = "pmpuLongMT_NY" | "pmpuLongMT_LDN" | "pmpuShortMT_NY" | "pmpuShortM
 const COLOR_SHORT = "#92400e";  // amber-900 — farmers
 const COLOR_LONG  = "#22c55e";  // green-500 — roasters
 const COLOR_PRICE = "#f59e0b";  // amber-500 — price line
-const COLOR_SWITCH = "#ec4899"; // pink-500 — contract switch markers
+const COLOR_SWITCH = "#3b82f6"; // blue-500 — contract switch markers (circles on price line)
 
 // Time-window options (weeks).
 const WINDOW_OPTIONS: { label: string; weeks: number }[] = [
@@ -50,20 +50,20 @@ export default function Step4IndustryPulse({ data }: { data: ProcessedCotRow[] }
       ? [Math.floor(Math.min(...prices) / 100) * 100, Math.ceil(Math.max(...prices) / 100) * 100]
       : [0, 500];
 
-    // Detect week-to-week contract switches. Each switch becomes a vertical
-    // reference line on the price chart so the reader can see when the
-    // price track jumps to a different underlying contract (the max-OI
-    // rule rolls liquidity as the front goes into FND).
+    // Detect week-to-week contract switches. Each switch becomes a small
+    // blue circle on the price line at that week, so the reader sees
+    // exactly when the price track jumped to a different underlying
+    // contract (the max-OI rule rolls liquidity as the front goes into FND).
     //
     // The `prev && curr` truthy guard is load-bearing: it ensures the first
     // legacy → first-max-OI transition (null → "KCH6" etc.) is NOT marked
     // as a contract switch. Don't simplify to `prev !== curr`.
-    const switches: { date: string; from: string; to: string }[] = [];
+    const switchByDate = new Map<string, { from: string; to: string }>();
     for (let i = 1; i < windowed.length; i++) {
       const prev = windowed[i - 1][contractKey];
       const curr = windowed[i][contractKey];
       if (prev && curr && prev !== curr) {
-        switches.push({ date: windowed[i].date, from: prev, to: curr });
+        switchByDate.set(windowed[i].date, { from: prev, to: curr });
       }
     }
     const mtVals = windowed.flatMap(d => [d[longKey], d[shortKey]]).filter(v => v > 0);
@@ -94,23 +94,52 @@ export default function Step4IndustryPulse({ data }: { data: ProcessedCotRow[] }
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Line yAxisId="left"  type="monotone" dataKey={longKey}  name="Industry Long (roasters)"  stroke={COLOR_LONG}  strokeWidth={2} dot={false} />
               <Line yAxisId="left"  type="monotone" dataKey={shortKey} name="Industry Short (farmers)"  stroke={COLOR_SHORT} strokeWidth={2} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey={priceKey} name="Price"                     stroke={COLOR_PRICE} strokeWidth={2} dot={false} />
-              {switches.map(sw => (
-                <ReferenceLine
-                  key={`switch-${sw.date}`}
-                  yAxisId="right"
-                  x={sw.date}
-                  stroke={COLOR_SWITCH}
-                  strokeDasharray="3 3"
-                  strokeWidth={1.5}
-                  label={showSwitchLabels ? {
-                    value: `→ ${sw.to}`,
-                    position: "top",
-                    fill: COLOR_SWITCH,
-                    fontSize: 9,
-                  } : undefined}
-                />
-              ))}
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey={priceKey}
+                name="Price"
+                stroke={COLOR_PRICE}
+                strokeWidth={2}
+                // Custom dot: blue circle only on weeks where the underlying
+                // contract changed. Every other point renders nothing (the
+                // function returns an invisible 0×0 element so recharts is happy).
+                dot={(props: { cx?: number; cy?: number; payload?: { date?: string } }) => {
+                  const sw = props.payload?.date ? switchByDate.get(props.payload.date) : undefined;
+                  if (!sw || props.cx == null || props.cy == null) {
+                    // Recharts requires a ReactElement return; render an empty
+                    // group rather than null to satisfy the type contract.
+                    return <g key={`empty-${props.payload?.date ?? "x"}`} />;
+                  }
+                  return (
+                    <g key={`sw-${props.payload?.date}`}>
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={5}
+                        fill={COLOR_SWITCH}
+                        stroke="#0f172a"
+                        strokeWidth={1.5}
+                      >
+                        <title>{`Contract switch: ${sw.from} → ${sw.to}`}</title>
+                      </circle>
+                      {showSwitchLabels && (
+                        <text
+                          x={props.cx}
+                          y={props.cy - 10}
+                          fill={COLOR_SWITCH}
+                          fontSize={9}
+                          textAnchor="middle"
+                        >
+                          → {sw.to}
+                        </text>
+                      )}
+                    </g>
+                  );
+                }}
+                // activeDot keeps the hover-highlight behaviour intact.
+                activeDot={{ r: 5, fill: COLOR_PRICE }}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
