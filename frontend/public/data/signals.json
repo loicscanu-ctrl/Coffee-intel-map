@@ -235,17 +235,6 @@
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
     },
     {
-      "id": "SP3",
-      "name": "Spreading vs Inversion",
-      "category": "SP",
-      "categoryLabel": "Spreading",
-      "market": "NY",
-      "severity": "warn",
-      "score": 0,
-      "magnitude": "small",
-      "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
-    },
-    {
       "id": "SP1",
       "name": "Spreading Increase",
       "category": "SP",
@@ -2511,17 +2500,6 @@
           "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
         },
         {
-          "id": "SP3",
-          "name": "Spreading vs Inversion",
-          "category": "SP",
-          "categoryLabel": "Spreading",
-          "market": "NY",
-          "severity": "warn",
-          "score": 0,
-          "magnitude": "small",
-          "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
-        },
-        {
           "id": "SP1",
           "name": "Spreading Increase",
           "category": "SP",
@@ -2556,5 +2534,5 @@
       "priceLDN": 3482
     }
   ],
-  "generatedAt": "2026-05-19T09:20:58.290Z"
+  "generatedAt": "2026-05-19T10:01:21.314Z"
 }
