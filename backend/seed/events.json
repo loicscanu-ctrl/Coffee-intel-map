@@ -1,0 +1,46 @@
+{
+  "_schema": {
+    "description": "Upcoming scheduled events that the morning brief surfaces in the 'next 24h to watch' section. Hand-maintained — there is no public feed that aggregates these for the coffee complex.",
+    "entry_shape": {
+      "date":     "YYYY-MM-DD (UTC) — the day the event is scheduled to publish",
+      "time":     "HH:MM (UTC), optional — used to filter sub-24h instead of sub-day",
+      "category": "wasde | ico | vietnam_customs | cecafe | fnd | central_bank | other",
+      "title":    "Short display title shown in the brief",
+      "url":      "Source URL where the published data will appear, optional",
+      "notes":    "Free-text rationale or watch-list reason, optional"
+    },
+    "selection_rule": "morning_brief.py filters to entries within +24h of the run timestamp (or +0..+1 days when only `date` is set).",
+    "maintainer_note": "Add new entries here when scheduling is known. Re-publish events for next year by date arithmetic in the brief — do NOT carry stale past entries forward."
+  },
+  "events": [
+    {
+      "date":     "2026-06-12",
+      "time":     "12:00",
+      "category": "wasde",
+      "title":    "USDA WASDE — June 2026 report",
+      "url":      "https://www.usda.gov/oce/commodity/wasde",
+      "notes":    "Mid-month coffee S&D update; world ending stocks revision usually moves Robusta carry."
+    },
+    {
+      "date":     "2026-05-29",
+      "category": "ico",
+      "title":    "ICO Coffee Market Report — May 2026",
+      "url":      "https://www.ico.org/show_news.asp?id=905",
+      "notes":    "Monthly composite indicator + export figures; published end of month."
+    },
+    {
+      "date":     "2026-05-20",
+      "category": "cecafe",
+      "title":    "Cecafé April 2026 monthly export figures",
+      "url":      "https://www.cecafe.com.br",
+      "notes":    "Brazil monthly exports — usually 15-20 of the month following."
+    },
+    {
+      "date":     "2026-05-22",
+      "time":     "13:30",
+      "category": "fnd",
+      "title":    "KCN26 (KC July 2026) First Notice Day approaches",
+      "notes":    "Watch for max-OI roll into KCU26 in the prior 17 business days."
+    }
+  ]
+}

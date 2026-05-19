@@ -1,0 +1,35 @@
+{
+  "_schema": {
+    "description": "Per-region, per-month rainfall and temperature baselines used by the seasonal-anomaly drought filter. Without this, the drought flag fires whenever absolute soil moisture is low — even in regions naturally dry for the time of year (e.g. Brazilian Cerrado in July). With seasonal baselines, drought is flagged only when current conditions sit > N standard deviations BELOW the historical norm for THAT region × month.",
+    "entry_shape": {
+      "region_key": {
+        "_meta":      "Free-text label, lat/lng or source attribution",
+        "precip_mm_monthly": {
+          "1":  { "mean": 0.0, "std": 0.0, "p10": 0.0, "p90": 0.0 },
+          "...": "one entry per calendar month 1..12"
+        },
+        "temp_c_monthly": {
+          "1":  { "mean": 0.0, "std": 0.0 },
+          "...": "one entry per calendar month 1..12"
+        }
+      }
+    },
+    "backfill_plan": [
+      "1. Pull CHIRPS daily precipitation 1991-2020 for each region polygon",
+      "2. Pull ERA5 daily 2m temperature 1991-2020 for the same polygons",
+      "3. Aggregate to month-level: mean, std, p10, p90 per (region, calendar_month)",
+      "4. Emit JSON with the schema above",
+      "5. Wire `seasonal_z_score(region, month, current_value)` into _drought_score in each `*_weather.py`"
+    ],
+    "consumers": [
+      "backend/scraper/sources/colombia_weather.py — _drought_score",
+      "backend/scraper/sources/honduras_weather.py — _drought_score",
+      "backend/scraper/sources/ethiopia_weather.py — _drought_score",
+      "backend/scraper/sources/uganda_weather.py — _drought_score",
+      "backend/scraper/sources/indonesia_weather.py — _drought_score"
+    ],
+    "status": "scaffold — backfill pending. Until populated, the seasonal filter is bypassed and existing absolute-threshold drought logic continues to apply."
+  },
+  "regions": {
+  }
+}
