@@ -12,18 +12,75 @@ const BORDER_COLORS: Record<string, string> = {
 };
 
 /**
- * Extract the most informative data label from a news item's body.
+ * Source-specific extractors. Each one knows the exact body format produced
+ * by its scraper and returns the headline data label for that source. The
+ * dispatcher below tries the source's extractor first, then falls back to
+ * the generic regex chain.
+ *
+ * Adding a new source: pin the body format the scraper writes, add an entry
+ * here keyed by NewsItem.source, return a short label string (we keep the
+ * "X UNIT" / "X UNIT / per" shape so the rendered chip stays compact).
+ *
+ * If you change a scraper's body format, update its extractor here AND in
+ * backend/scraper/morning_brief.py — the Telegram brief uses a Python mirror.
+ */
+const SOURCE_EXTRACTORS: Record<string, (body: string) => string | null> = {
+  // UCDA — "Uganda Fine Robusta Screen 15 price: 166.97 USD/cwt"
+  "UCDA": (body) => {
+    const m = body.match(/([\d.,]+)\s*USD\s*\/\s*cwt/i);
+    return m ? `${m[1]} USD / cwt` : null;
+  },
+  // Giacaphe — "Vietnam Robusta price: 87.100 VND/kg"
+  "Giacaphe": (body) => {
+    const m = body.match(/([\d.,]+)\s*VND\s*\/\s*kg/i);
+    return m ? `${m[1]} VND / kg` : null;
+  },
+  // B3 — "B3 Arabica 4/5 settlement: 360.30 USD/sac | OI: 12345 ..."
+  "B3": (body) => {
+    const m = body.match(/([\d.,]+)\s*USD\s*\/\s*sac/i);
+    return m ? `${m[1]} USD / sac` : null;
+  },
+  // Cooabriel — "Conilon Tipo 7 price: R$ 900,00/saca"
+  "Cooabriel": (body) => {
+    const m = body.match(/R\$\s*([\d.,]+)\s*\/\s*saca/i);
+    return m ? `${m[1]} BRL / saca` : null;
+  },
+  // CEPEA/ESALQ — "CEPEA Arabica price: R$ 1.234,50/sack (DD/MM/YYYY)"
+  "CEPEA/ESALQ": (body) => {
+    const m = body.match(/R\$\s*([\d.,]+)\s*\/\s*sack/i);
+    return m ? `${m[1]} BRL / sack` : null;
+  },
+  // AJCA — "AJCA Japan 2024: imports=359382 MT, consumption=397272 MT"
+  "AJCA": (body) => {
+    const imp = body.match(/imports\s*=\s*([\d.,]+)\s*MT/i);
+    const con = body.match(/consumption\s*=\s*([\d.,]+)\s*MT/i);
+    if (imp && con) return `imp ${imp[1]} / cons ${con[1]} MT`;
+    if (imp) return `imports ${imp[1]} MT`;
+    if (con) return `consumption ${con[1]} MT`;
+    return null;
+  },
+  // Retail CPI — body is updated by retail_cpi.py to include the YoY numbers
+  "Retail CPI": (body) => {
+    const m = body.match(/US:\s*([+-]?[\d.,]+%)[^E]*EU:\s*([+-]?[\d.,]+%)[^B]*Brazil:\s*([+-]?[\d.,]+%)/i);
+    if (m) return `US ${m[1]} · EU ${m[2]} · BR ${m[3]}`;
+    return null;
+  },
+  // UCDA monthly report — "Uganda coffee exports 2026-04: 12345 bags"
+  "UCDA_REPORT": (body) => {
+    const m = body.match(/([\d.,]+)\s*bags/i);
+    return m ? `${m[1]} bags` : null;
+  },
+};
+
+/**
+ * Generic fallback for sources without a specialist extractor.
  * Tries (in order):
  *   - "R$ 1.234,50 / saca" → "1.234,50 BRL / saca"
  *   - "USD 250 / lb"       → "250 USD / lb"
  *   - "$1.50"              → "1.50 USD"
  *   - Numeric magnitudes with units ("123.4 kt", "5.2 mln bags")
- * Returns null if no recognisable label can be extracted — the caller then
- * falls back to title-only rendering.
  */
-function extractDataLabel(body: string | null | undefined): string | null {
-  if (!body) return null;
-
+function _genericExtract(body: string): string | null {
   // Brazilian real with optional "/unit" — "R$ 900/saca" or "R$ 1.234,50 / sack"
   const brl = body.match(/R\$\s*([\d.,]+)\s*(?:\/\s*([A-Za-zçãáéõ]+))?/);
   if (brl) {
@@ -52,6 +109,23 @@ function extractDataLabel(body: string | null | undefined): string | null {
   }
 
   return null;
+}
+
+/**
+ * Extract the most informative data label from a news item.
+ * Tries a source-specific extractor first (matches NewsItem.source), then
+ * falls back to a generic regex chain. Returns null if no label can be
+ * extracted — caller falls back to title-only rendering.
+ */
+function extractDataLabel(item: { body?: string | null; source?: string | null }): string | null {
+  const body = item.body;
+  if (!body) return null;
+  const source = item.source;
+  if (source && SOURCE_EXTRACTORS[source]) {
+    const sourceLabel = SOURCE_EXTRACTORS[source](body);
+    if (sourceLabel) return sourceLabel;
+  }
+  return _genericExtract(body);
 }
 
 interface NewsFeedProps {
@@ -106,7 +180,7 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
           const hashtag = item.category === "general" && item.source
             ? "#" + item.source.toLowerCase().replace(/\s+/g, "")
             : null;
-          const dataLabel = extractDataLabel(item.body);
+          const dataLabel = extractDataLabel(item);
 
           return (
             <div
