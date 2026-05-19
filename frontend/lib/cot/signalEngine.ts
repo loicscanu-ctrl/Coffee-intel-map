@@ -766,12 +766,38 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
 
 // ── Composite score helpers ───────────────────────────────────────────────────
 
+/**
+ * Category weights for the composite score.
+ *
+ * Multiple rules can fire on the same underlying market state — e.g. a
+ * bullish flow lights up CP3 (producer) + CR2 (roaster) + CI1 (commercial
+ * interaction) + ML1 (fund long) + MPI1 (MM×Producer) all at once. Treating
+ * each as a fresh +score triple-counts the evidence and inflates the
+ * composite. Tiered weighting gives interaction and meta categories
+ * diminishing returns so each unit of evidence is counted once at full
+ * strength.
+ *
+ *   Primitive (direct observations of one actor) : weight 1.00
+ *   Interaction (cross-actor / multi-driver)     : weight 0.50
+ *   Meta / structure / context                    : weight 0.25
+ */
+const CATEGORY_WEIGHTS: Record<string, number> = {
+  // Primitive actor categories
+  CP: 1.0, CR: 1.0, ML: 1.0, MS: 1.0,
+  // Interaction categories — combinations of primitives, halved
+  CI: 0.5, MI: 0.5, MPI: 0.5, MRI: 0.5,
+  // Meta / structure / context — quarter weight
+  TC: 0.25, OB: 0.25, CS: 0.25, SP: 0.25,
+};
+
 export function computeCompositeScores(signals: Signal[]): { scoreNY: number; scoreLDN: number } {
   let scoreNY  = 0;
   let scoreLDN = 0;
   for (const s of signals) {
-    if (s.market === "NY")  scoreNY  += s.score;
-    else                    scoreLDN += s.score;
+    const w = CATEGORY_WEIGHTS[s.category] ?? 1.0;
+    const weighted = s.score * w;
+    if (s.market === "NY")  scoreNY  += weighted;
+    else                    scoreLDN += weighted;
   }
   return { scoreNY, scoreLDN };
 }
