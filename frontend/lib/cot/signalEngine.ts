@@ -81,7 +81,18 @@ const THRESHOLDS = {
 type Dir = "up" | "down" | "flat";
 type DirCount = Dir | "unknown";
 
-/** WoW % change direction with a configurable flat threshold (default 1%). */
+/**
+ * WoW % change direction with a configurable flat threshold (default 1%).
+ *
+ * Near-zero `prev`: `base = |prev| || 1` falls back to 1 to avoid divide-by-zero.
+ * One consequence — for series that legitimately cross zero (e.g.
+ * curve structure), a small 0.01 → -0.01 flip is divided by 0.01 and
+ * registers as a "down" move of huge magnitude. The downstream rules
+ * either gate on signs (`str < 0` for backwardation) or accept the
+ * direction without re-checking the magnitude, so this is currently
+ * harmless — but be cautious about adding rules that depend on `mag()`
+ * for zero-crossing series.
+ */
 export function dir(prev: number, curr: number): Dir {
   const base = Math.abs(prev) || 1;
   const chg  = (curr - prev) / base;
@@ -876,6 +887,14 @@ export function computeCompositeScores(signals: Signal[]): { scoreNY: number; sc
 /**
  * Evaluate signals for each of the last `weeks` weeks.
  * Each call uses the full history up to that point for accurate percentile calcs.
+ *
+ * IMPORTANT — known off-by-one (locked behaviour): the loop iterates
+ * `for (end = max(1, n - weeks); end <= n; end++)` which produces
+ * `weeks + 1` entries when `n > weeks` (e.g. n=60, weeks=8 → 9 entries).
+ * This is intentional and pinned by the test suite. The 8-week heatmap UI
+ * slices `history.slice(-8)` so the extra leading entry is dropped at the
+ * presentation layer. Do not "fix" without coordinating the UI slice and
+ * the back-test bookkeeping.
  */
 export function evaluateHistoricalSignals(rows: ProcessedCotRow[], weeks = 8): HistoricalWeek[] {
   const result: HistoricalWeek[] = [];
