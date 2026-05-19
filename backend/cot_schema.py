@@ -30,8 +30,13 @@ _CATEGORIES_WITH_SPREAD: tuple[tuple[str, tuple[str, ...]], ...] = (
 
 # Per-market data points joined onto the weekly row from the COT Excel
 # "Other" sheet. Same names for ny/ldn variants.
+#
+# `price_contract` (added 2026-05) is the futures contract symbol whose
+# lastPrice was recorded into `price_{ny,ldn}` for that Tuesday — the
+# Industry Pulse chart uses week-to-week contract changes to render
+# switch markers (PR following the max-OI rule change).
 _MARKET_EXTRAS: tuple[str, ...] = (
-    "price", "structure", "exch_oi", "vol", "efp", "spread_vol",
+    "price", "price_contract", "structure", "exch_oi", "vol", "efp", "spread_vol",
 )
 _MARKETS: tuple[str, ...] = ("ny", "ldn")
 

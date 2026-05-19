@@ -198,11 +198,26 @@ def upsert_cot_weekly(market: str, report_date, fields: dict):
         db.close()
 
 
-def upsert_cot_price(market: str, report_date, price_field: str, value: float) -> bool:
+def upsert_cot_price(
+    market: str,
+    report_date,
+    price_field: str,
+    value: float,
+    *,
+    contract: str | None = None,
+) -> bool:
     """Store a Tuesday settlement price in cot_weekly only if not already set.
+
     Prices are immutable once recorded — never overwritten by subsequent runs.
-    Returns True if written, False if skipped (already set)."""
+    The matching `price_contract_{ny,ldn}` field records which futures contract
+    the price came from, so the Industry Pulse chart can mark week-to-week
+    contract switches (the fetch_tuesday_prices script now picks the max-OI
+    contract, which can change as liquidity rolls forward).
+
+    Returns True if written, False if skipped (already set).
+    """
     from models import CotWeekly
+    contract_field = "price_contract_ny" if price_field == "price_ny" else "price_contract_ldn"
     db = get_session()
     try:
         existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
@@ -211,8 +226,13 @@ def upsert_cot_price(market: str, report_date, price_field: str, value: float) -
                 print(f"[db] {market} {price_field} for {report_date} already set — skipping")
                 return False
             setattr(existing, price_field, value)
+            if contract is not None:
+                setattr(existing, contract_field, contract)
         else:
-            db.add(CotWeekly(date=report_date, market=market, **{price_field: value}))
+            payload = {price_field: value}
+            if contract is not None:
+                payload[contract_field] = contract
+            db.add(CotWeekly(date=report_date, market=market, **payload))
         db.commit()
         return True
     except Exception:

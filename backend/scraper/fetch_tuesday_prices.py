@@ -69,8 +69,8 @@ async def _fetch_chains() -> dict:
     return result
 
 
-def _front_price(raw: dict) -> float | None:
-    """Return the lastPrice of the contract with the largest open interest.
+def _max_oi_contract(raw: dict) -> tuple[float, str] | None:
+    """Return (lastPrice, symbol) for the contract with the largest open interest.
 
     Previously this took the first non-near-expiry contract with OI >= 100,
     which is usually the front-month spec. The new rule (per user request)
@@ -84,14 +84,19 @@ def _front_price(raw: dict) -> float | None:
     Contracts within 14 days of expiry are still excluded — those last few
     days of OI on a near-expiring contract are dominated by delivery
     mechanics, not speculative positioning, and would distort the chart.
+
+    Returns the contract symbol alongside the price so it can be persisted
+    to `price_contract_{ny,ldn}` — the Industry Pulse chart uses week-to-week
+    contract changes to render switch markers.
     """
     from datetime import timedelta
     cutoff = date.today() + timedelta(days=14)
-    best: tuple[int, float] | None = None
+    best: tuple[int, float, str] | None = None
     for it in (raw or {}).get("data", []):
         r = it.get("raw", it)
         oi = r.get("openInterest")
         price = r.get("lastPrice")
+        symbol = r.get("symbol") or ""
         if oi is None or price is None:
             continue
         exp_str = r.get("contractExpirationDate", "")
@@ -102,8 +107,16 @@ def _front_price(raw: dict) -> float | None:
             pass
         oi_int = int(oi)
         if best is None or oi_int > best[0]:
-            best = (oi_int, float(price))
-    return best[1] if best else None
+            best = (oi_int, float(price), str(symbol))
+    if best is None:
+        return None
+    return best[1], best[2]
+
+
+def _front_price(raw: dict) -> float | None:
+    """Back-compat shim used by callers that only want the price."""
+    hit = _max_oi_contract(raw)
+    return hit[0] if hit else None
 
 
 async def main() -> None:
@@ -115,24 +128,26 @@ async def main() -> None:
 
     chains = await _fetch_chains()
 
-    kc_price = _front_price(chains.get("kc"))
-    rm_price = _front_price(chains.get("rm"))
+    kc_hit = _max_oi_contract(chains.get("kc"))
+    rm_hit = _max_oi_contract(chains.get("rm"))
+    kc_price, kc_contract = kc_hit if kc_hit else (None, None)
+    rm_price, rm_contract = rm_hit if rm_hit else (None, None)
 
     if kc_price is None and rm_price is None:
         print("[tuesday_prices] No prices fetched — aborting.")
         sys.exit(1)
 
     if kc_price is not None:
-        written = upsert_cot_price("ny", tuesday, "price_ny", kc_price)
+        written = upsert_cot_price("ny", tuesday, "price_ny", kc_price, contract=kc_contract)
         status = "written" if written else "skipped (already set)"
-        print(f"[tuesday_prices] NY  price_ny  {tuesday} = {kc_price}¢/lb  → {status}")
+        print(f"[tuesday_prices] NY  price_ny  {tuesday} = {kc_price}¢/lb  [{kc_contract}]  → {status}")
     else:
         print("[tuesday_prices] WARNING: no KC front price available")
 
     if rm_price is not None:
-        written = upsert_cot_price("ldn", tuesday, "price_ldn", rm_price)
+        written = upsert_cot_price("ldn", tuesday, "price_ldn", rm_price, contract=rm_contract)
         status = "written" if written else "skipped (already set)"
-        print(f"[tuesday_prices] LDN price_ldn {tuesday} = ${rm_price}/MT  → {status}")
+        print(f"[tuesday_prices] LDN price_ldn {tuesday} = ${rm_price}/MT  [{rm_contract}]  → {status}")
     else:
         print("[tuesday_prices] WARNING: no RM front price available")
 
