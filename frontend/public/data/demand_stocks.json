@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T05:43:03.766820Z",
+  "generated_at": "2026-05-19T03:44:25.875666Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -84,7 +84,7 @@
   },
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-18",
+    "last_updated": "2026-05-19",
     "annual": [
       {
         "year": "2002",
@@ -310,7 +310,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-18",
+    "last_updated": "2026-05-19",
     "annual": [
       {
         "year": "2002",
@@ -536,7 +536,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-18",
+    "last_updated": "2026-05-19",
     "annual": [
       {
         "year": "1960",
@@ -1141,7 +1141,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-05-18",
+    "last_updated": "2026-05-19",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
@@ -8701,8 +8701,8 @@
       "name": "Vietnam",
       "latest_year": "2025",
       "consumption_mt": 294000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 100987686,
+      "per_capita_kg": 2.91,
       "annual": [
         {
           "year": "1960",
@@ -9305,8 +9305,8 @@
       "name": "Indonesia",
       "latest_year": "2025",
       "consumption_mt": 288600,
-      "population": 283487931,
-      "per_capita_kg": 1.02,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -12623,7 +12623,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-05-18",
+    "last_updated": "2026-05-19",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12661,11 +12661,11 @@
         "latest_year": "2024",
         "latest_population": 211998573
       },
-      "indonesia": {
-        "name": "Indonesia",
-        "iso3": "IDN",
+      "vietnam": {
+        "name": "Vietnam",
+        "iso3": "VNM",
         "latest_year": "2024",
-        "latest_population": 283487931
+        "latest_population": 100987686
       },
       "russia": {
         "name": "Russia",
