@@ -413,6 +413,21 @@ describe("evaluateHistoricalSignals", () => {
 // 5. THRESHOLDS sanity (post PR-A tightening)
 // ─────────────────────────────────────────────────────────────────────────────
 
+describe("SignalLink wiring", () => {
+  it("attaches links to rules with deep-link targets", () => {
+    // ML3 fires on ml=up + pr=down with !isHigh — set up that exact state.
+    const rows = buildHistory([
+      { ny: { mmLong: 80 }, priceNY: 200 },
+      { ny: { mmLong: 86 }, priceNY: 190 },  // ml↑, pr↓
+    ]);
+    const ml3 = evaluateSignals(rows).find((s) => s.id === "ML3" && s.market === "NY");
+    expect(ml3).toBeDefined();
+    expect(ml3?.links).toBeDefined();
+    expect(ml3!.links!.length).toBeGreaterThan(0);
+    expect(ml3!.links![0].href.startsWith("#cot-section-")).toBe(true);
+  });
+});
+
 describe("THRESHOLDS", () => {
   it("OB_HIGH and OB_LOW align with PCT_HIGH and PCT_LOW (in percent units)", () => {
     expect(THRESHOLDS.OB_HIGH).toBe(THRESHOLDS.PCT_HIGH * 100);
