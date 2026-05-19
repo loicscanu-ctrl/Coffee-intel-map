@@ -30,15 +30,59 @@ export interface HistoricalWeek {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-type Dir = "up" | "down" | "flat";
+/**
+ * Tunable thresholds for the rule engine. Hoisted here so a future back-test
+ * pass can tweak them without grepping the rule bodies.
+ *
+ * OB_HIGH / OB_LOW are kept aligned with PCT_HIGH / PCT_LOW so the
+ * overbought/oversold price-percentile gate behaves consistently with
+ * the position-percentile gate (`isHigh` / `isLow`).
+ *
+ * NOTE on trader counts: LDN short-side breakouts (`t_*_short` on Robusta)
+ * are unpublished and arrive as `null`. The short-count time-series below
+ * therefore carry nulls on LDN rows, and `dirCount` returns "unknown" when
+ * either endpoint is null — count-comparison rules naturally skip in that
+ * case.
+ */
+const THRESHOLDS = {
+  PCT_HIGH:        0.75,
+  PCT_LOW:         0.25,
+  OB_HIGH:         75,   // was 80, aligned with PCT_HIGH
+  OB_LOW:          25,   // was 20, aligned with PCT_LOW
+  DIR_FLAT_PCT:    0.01,
+  DIR_FLAT_COUNT:  2,
+} as const;
 
-/** WoW % change direction with 1% flat threshold. */
+type Dir = "up" | "down" | "flat";
+type DirCount = Dir | "unknown";
+
+/** WoW % change direction with a configurable flat threshold (default 1%). */
 function dir(prev: number, curr: number): Dir {
   const base = Math.abs(prev) || 1;
   const chg  = (curr - prev) / base;
-  if (chg >  0.01) return "up";
-  if (chg < -0.01) return "down";
+  if (chg >  THRESHOLDS.DIR_FLAT_PCT) return "up";
+  if (chg < -THRESHOLDS.DIR_FLAT_PCT) return "down";
   return "flat";
+}
+
+/**
+ * Direction for absolute-units series (trader counts, structure values).
+ * Uses an absolute flat band rather than a percentage — a 1% change in a
+ * 40-trader count is 0.4, so the ratio-based `dir()` essentially never
+ * reports "flat" for count series and the count-comparison rules fire on
+ * noise. `dirCount` uses an absolute-units flat band (default 2 traders).
+ *
+ * Returns "unknown" when either endpoint is null — see the LDN note above.
+ */
+function dirCount(
+  prev: number | null,
+  curr: number | null,
+  flat: number = THRESHOLDS.DIR_FLAT_COUNT,
+): DirCount {
+  if (prev == null || curr == null) return "unknown";
+  const delta = curr - prev;
+  if (Math.abs(delta) < flat) return "flat";
+  return delta > 0 ? "up" : "down";
 }
 
 /** 52-week min-max percentile of values[idx] — matches the Gauges display formula: (current−min)/(max−min). */
@@ -50,8 +94,8 @@ function pct52(values: number[], idx: number): number {
   return max > min ? (values[idx] - min) / (max - min) : 0.5;
 }
 
-const isHigh = (s: number[], i: number) => pct52(s, i) >= 0.75;
-const isLow  = (s: number[], i: number) => pct52(s, i) <= 0.25;
+const isHigh = (s: number[], i: number) => pct52(s, i) >= THRESHOLDS.PCT_HIGH;
+const isLow  = (s: number[], i: number) => pct52(s, i) <= THRESHOLDS.PCT_LOW;
 
 export type Magnitude = "small" | "medium" | "large";
 /** WoW magnitude: small <5%, medium 5–12%, large >12%. */
@@ -104,15 +148,26 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
   const ldnMmNet  = rows.map(r => r.ldn.mmLong - r.ldn.mmShort);
 
   // ── Trader counts (# entities per category, long and short sides) ─────────
+  // Long-side counts are always reported. Short-side counts (`tradersNY_short`,
+  // `tradersLDN_short`) are optional in the schema and arrive as `null` on
+  // LDN (Robusta doesn't publish the breakouts). Carry the nulls through so
+  // `dirCount` can report "unknown" and downstream count-comparison rules
+  // skip cleanly on LDN.
   const nyMmLongT   = rows.map(r => r.tradersNY.mm);
-  const nyMmShortT  = rows.map(r => r.tradersNY_short?.mm  ?? 0);
+  const nyMmShortT  = rows.map(r => r.tradersNY_short?.mm  ?? null);
   const ldnMmLongT  = rows.map(r => r.tradersLDN.mm);
-  const ldnMmShortT = rows.map(r => r.tradersLDN_short?.mm ?? 0);
-  const nyMmNetT    = rows.map(r => r.tradersNY.mm - (r.tradersNY_short?.mm   ?? 0));
-  const ldnMmNetT   = rows.map(r => r.tradersLDN.mm - (r.tradersLDN_short?.mm ?? 0));
+  const ldnMmShortT = rows.map(r => r.tradersLDN_short?.mm ?? null);
+  const nyMmNetT    = rows.map(r => {
+    const s = r.tradersNY_short?.mm;
+    return s == null ? null : r.tradersNY.mm - s;
+  });
+  const ldnMmNetT   = rows.map(r => {
+    const s = r.tradersLDN_short?.mm;
+    return s == null ? null : r.tradersLDN.mm - s;
+  });
 
-  const nyProdShortT  = rows.map(r => r.tradersNY_short?.pmpu   ?? 0);
-  const ldnProdShortT = rows.map(r => r.tradersLDN_short?.pmpu  ?? 0);
+  const nyProdShortT  = rows.map(r => r.tradersNY_short?.pmpu   ?? null);
+  const ldnProdShortT = rows.map(r => r.tradersLDN_short?.pmpu  ?? null);
   const nyRoastLongT  = rows.map(r => r.tradersNY.pmpu);
   const ldnRoastLongT = rows.map(r => r.tradersLDN.pmpu);
 
@@ -141,29 +196,35 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
   };
 
   // ── Trader count WoW directions ───────────────────────────────────────────
-  const mmLongTDir: Record<Mkt, Dir> = {
-    NY:  dir(nyMmLongT[i - 1],   nyMmLongT[i]),
-    LDN: dir(ldnMmLongT[i - 1],  ldnMmLongT[i]),
+  // Trader counts use `dirCount` (absolute-units flat band) — a 1% change in
+  // a 30-trader count is 0.3, so the ratio-based `dir()` essentially never
+  // reports "flat" and the count-comparison rules fire on noise.
+  // Short-side direction records can produce "unknown" on LDN where the
+  // raw `t_*_short` fields arrive as null (Robusta doesn't publish them).
+  const mmLongTDir: Record<Mkt, DirCount> = {
+    NY:  dirCount(nyMmLongT[i - 1],   nyMmLongT[i]),
+    LDN: dirCount(ldnMmLongT[i - 1],  ldnMmLongT[i]),
   };
-  const mmShortTDir: Record<Mkt, Dir> = {
-    NY:  dir(nyMmShortT[i - 1],  nyMmShortT[i]),
-    LDN: dir(ldnMmShortT[i - 1], ldnMmShortT[i]),
+  const mmShortTDir: Record<Mkt, DirCount> = {
+    NY:  dirCount(nyMmShortT[i - 1],  nyMmShortT[i]),
+    LDN: dirCount(ldnMmShortT[i - 1], ldnMmShortT[i]),
   };
-  const mmNetTDir: Record<Mkt, Dir> = {
-    NY:  dir(nyMmNetT[i - 1],   nyMmNetT[i]),
-    LDN: dir(ldnMmNetT[i - 1],  ldnMmNetT[i]),
+  const mmNetTDir: Record<Mkt, DirCount> = {
+    NY:  dirCount(nyMmNetT[i - 1],   nyMmNetT[i]),
+    LDN: dirCount(ldnMmNetT[i - 1],  ldnMmNetT[i]),
   };
+  // mmNetDir uses positions (OI sums), not counts — stays on `dir()`.
   const mmNetDir: Record<Mkt, Dir> = {
     NY:  dir(nyMmNet[i - 1],   nyMmNet[i]),
     LDN: dir(ldnMmNet[i - 1],  ldnMmNet[i]),
   };
-  const prodShortTDir: Record<Mkt, Dir> = {
-    NY:  dir(nyProdShortT[i - 1],  nyProdShortT[i]),
-    LDN: dir(ldnProdShortT[i - 1], ldnProdShortT[i]),
+  const prodShortTDir: Record<Mkt, DirCount> = {
+    NY:  dirCount(nyProdShortT[i - 1],  nyProdShortT[i]),
+    LDN: dirCount(ldnProdShortT[i - 1], ldnProdShortT[i]),
   };
-  const roastLongTDir: Record<Mkt, Dir> = {
-    NY:  dir(nyRoastLongT[i - 1],  nyRoastLongT[i]),
-    LDN: dir(ldnRoastLongT[i - 1], ldnRoastLongT[i]),
+  const roastLongTDir: Record<Mkt, DirCount> = {
+    NY:  dirCount(nyRoastLongT[i - 1],  nyRoastLongT[i]),
+    LDN: dirCount(ldnRoastLongT[i - 1], ldnRoastLongT[i]),
   };
 
   // ── OB/OS: 52-week price percentile (0–100) ───────────────────────────────
@@ -497,7 +558,7 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
       add({ id:"CS4", name:"Contango Relief",         category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"info",  score:  0,
         text:`${label} in contango while roasters add coverage — forward prices cheaper than spot, incentivizes forward buying. Normal and sustainable.` });
 
-    if (back && pStr !== null && str < pStr && pct52(rs, i) <= 0.25)
+    if (back && pStr !== null && str < pStr && isLow(rs, i))
       add({ id:"CS5", name:"Deepening Inversion",     category:"CS", categoryLabel:"Curve Structure", market:mkt, severity:"alert", score: +2,
         text:`${label} backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window.` });
 
@@ -519,27 +580,27 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     const ps    = mkt === "NY" ? nyProdS  : ldnProdS;
     const label = mkt === "NY" ? "KC" : "RC";
 
-    if (obos > 80 && !isLow(rs, i))
+    if (obos > THRESHOLDS.OB_HIGH && !isLow(rs, i))
       add({ id:"OB1", name:"Overbought Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: -2,
         text:`${label} technically overbought (>80th pct, 52-week) with funds near capacity — upside limited. Monitor calendar spread: if inversion weakens, holding costs may accelerate long liquidation.` });
 
-    if (obos > 80 && isLow(rs, i))
+    if (obos > THRESHOLDS.OB_HIGH && isLow(rs, i))
       add({ id:"OB2", name:"Overbought but Supported", category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
         text:`${label} overbought but roasters significantly under-covered (<25th pct) — technical selling pressure offset by structural commercial demand. Correction likely shallow.` });
 
-    if (obos < 20 && isLow(mls, i))
+    if (obos < THRESHOLDS.OB_LOW && isLow(mls, i))
       add({ id:"OB3", name:"Oversold Opportunity",     category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: +2,
         text:`${label} technically oversold (<20th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst.` });
 
-    if (obos < 20 && isLow(ps, i))
+    if (obos < THRESHOLDS.OB_LOW && isLow(ps, i))
       add({ id:"OB4", name:"Oversold but Vulnerable",  category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
         text:`${label} oversold but producers significantly under-hedged (<25th pct) — potential recovery capped by producer selling overhang. Bounce likely limited.` });
 
-    if (obos > 80 && pr === "down")
+    if (obos > THRESHOLDS.OB_HIGH && pr === "down")
       add({ id:"OB6", name:"Divergence Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"alert", score: -3,
         text:`${label} overbought but price already falling — momentum turning. Check weekly change in trader counts: if also falling, unwind is broad-based.` });
 
-    if (obos < 20 && pr === "up")
+    if (obos < THRESHOLDS.OB_LOW && pr === "up")
       add({ id:"OB7", name:"Oversold Divergence",      category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: +2,
         text:`${label} technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage.` });
   }
