@@ -10,6 +10,26 @@ Action runner — these are intentionally manual).
 
 ---
 
+## ⚠️ Known issue (May 2026) — Stooq continuous-front-month trap
+
+The `backfill_max_oi_prices.py` script (workflow `0.1`) re-fetched prices
+from Stooq using per-month symbols like `kc.k26`, assuming they were
+absolute per-contract series. They are not — Stooq stitches each symbol
+into a continuous front-month stream, returning front-month-by-FND
+prices until that contract becomes front, then switching to the named
+contract's data. Result: max-OI labels were attached to continuous-
+front-month prices, with a 2-3 week misalignment around each roll.
+
+**Fix path**: use workflow `0.2 – Relabel COT contracts to FND-based
+front-month` to rewrite the labels so they match the price source. See
+`relabel_contracts_to_frontmonth.py` below for details.
+
+**Proper fix (deferred)**: integrate Interactive Brokers via `ib_insync`
+to fetch true per-contract historical data; this allows max-OI labels
+to be used legitimately. Code skeleton: see Step C below.
+
+---
+
 ## 0. (Recommended) Audit the switch dates before backfilling
 
 ```bash
@@ -161,3 +181,67 @@ order:
 
 Both can be re-run after `--apply` if you re-discover orphans / re-tune the
 max-OI rule — they're idempotent against their own previous applications.
+
+---
+
+## Step B — `relabel_contracts_to_frontmonth.py` (run when Stooq stitching bug is detected)
+
+Rewrites every existing `price_contract_{ny,ldn}` value on `cot_weekly`
+rows to the FND-based front-month, matching the continuous-front-month
+prices already stored. Idempotent. Manual rollback via
+`cot_weekly_price_archive` (preserved from the original backfill).
+
+```bash
+export DATABASE_URL='postgresql://...'
+
+# Dry-run — prints every row whose label would change.
+python backend/scripts/relabel_contracts_to_frontmonth.py
+
+# Apply (default --weeks=520 covers 10y of history).
+python backend/scripts/relabel_contracts_to_frontmonth.py --apply
+
+# Re-export so cot.json reflects the new labels.
+python -m backend.scraper.export_static_json
+
+# Refresh signals.json since cot.json changed.
+cd frontend && npm run export:signals
+```
+
+Or use the one-shot GitHub Actions workflow `0.2 – Relabel COT contracts
+to FND-based front-month` which wraps all of the above.
+
+---
+
+## Step C — True per-contract data via Interactive Brokers (deferred)
+
+To restore the max-OI labelling convention legitimately, swap Stooq for
+a data source that provides absolute per-contract historical bars. The
+cleanest path is `ib_insync` against a running TWS / IB Gateway instance.
+
+Skeleton (untested — needs an IB account, Gateway running, paper or live):
+
+```python
+from ib_insync import IB, Future, util
+
+ib = IB()
+ib.connect('127.0.0.1', 7497, clientId=1)
+
+def get_per_contract_history(symbol, yymm, end_dt='', duration='2 M'):
+    fut = Future(symbol=symbol, lastTradeDateOrContractMonth=yymm,
+                 exchange='NYBOT')  # or 'ICEEU' for Robusta
+    ib.qualifyContracts(fut)
+    bars = ib.reqHistoricalData(
+        fut, endDateTime=end_dt, durationStr=duration,
+        barSizeSetting='1 day', whatToShow='TRADES',
+        useRTH=True, formatDate=1,
+    )
+    return util.df(bars)
+
+# For each historical Tuesday in cot_weekly: figure out max-OI contract,
+# pull that contract's actual close, write to price_ny / price_contract_ny.
+# Idempotent loop similar to backfill_max_oi_prices.py but with real data.
+```
+
+Wire this into a new workflow once IB credentials are available. Until
+then, the FND-based labels from Step B are correct for what the chart
+actually displays (continuous-front-month price track).

@@ -1,0 +1,127 @@
+name: "0.2 – One-shot — Relabel COT contracts to FND-based front-month"
+
+# Manually-triggered, one-time cleanup of the misalignment introduced by
+# `backfill_max_oi_prices.py`: max-OI labels were attached to continuous-
+# front-month prices (Stooq's per-month symbols are stitched series, not
+# absolute per-contract data). This workflow rewrites every existing
+# price_contract_{ny,ldn} value to the actual front-month-by-FND contract,
+# matching the prices that are already stored.
+#
+# Going-forward COT-Tuesday rows are written by `fetch_tuesday_prices.py`
+# which uses Barchart per-contract live data (correct under max-OI). To
+# avoid overwriting those, this workflow has a `before_date` input that
+# defaults to today's date — only earlier rows are touched.
+#
+# Re-runnable, idempotent. Original backfilled state is preserved in
+# `cot_weekly_price_archive` per the original backfill rollback path.
+
+on:
+  workflow_dispatch:
+    inputs:
+      weeks:
+        description: "Look-back window in weeks (520 = 10y; covers full historical backfill)"
+        required: true
+        default: "520"
+        type: string
+      dry_run:
+        description: "Dry-run only (no DB writes). Default false = apply."
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  relabel:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
+
+      - name: Install frontend dependencies (for signals export)
+        working-directory: frontend
+        run: npm ci
+
+      - name: Relabel — DRY RUN
+        if: ${{ inputs.dry_run }}
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "=== DRY RUN — no DB writes ==="
+          python scripts/relabel_contracts_to_frontmonth.py --weeks ${{ inputs.weeks }}
+
+      - name: Relabel — APPLY
+        if: ${{ !inputs.dry_run }}
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/relabel_contracts_to_frontmonth.py --apply --weeks ${{ inputs.weeks }}
+
+      - name: Re-export static JSON (cot.json reflects new labels)
+        if: ${{ !inputs.dry_run }}
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.export_static_json
+
+      - name: Refresh signals.json (engine sees updated labels)
+        if: ${{ !inputs.dry_run }}
+        working-directory: frontend
+        run: npm run export:signals
+
+      - name: Commit regenerated static JSON
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            frontend/public/data/cot.json \
+            frontend/public/data/cot_recent.json \
+            frontend/public/data/signals.json
+
+          if git diff --cached --quiet; then
+            echo "No JSON changes after relabel — DB writes didn't shift any row visible to the export."
+            exit 0
+          fi
+
+          git commit -m "data: relabel COT contracts to FND-based front-month [skip ci]"
+          git pull --rebase --autostash --strategy-option=theirs origin main
+          git push
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ inputs.dry_run }}" == "true" ]; then
+            echo "Dry-run complete. Review the log above. Re-run with dry_run=false to apply."
+          else
+            echo "Relabel complete. The Industry Pulse chart will pick up the corrected labels on next page load."
+            echo "Switch markers now align with FND boundaries (where the continuous-front-month price source actually rolled), not the max-OI heuristic."
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

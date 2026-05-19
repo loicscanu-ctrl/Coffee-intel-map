@@ -3,27 +3,37 @@
 audit_contract_switches.py — preview the switches the backfill would produce
 and verify them against the available historical OI data.
 
-Two pieces of evidence:
+⚠️ HISTORICAL NOTE — STOOQ DATA-FEED BUG (May 2026)
+---------------------------------------------------
+The original `backfill_max_oi_prices.py` script relied on Stooq per-month
+symbols like `kc.k24` assuming they were absolute per-contract series.
+External verification confirmed Stooq stitches these into continuous
+front-month streams (each symbol holds front-month prices until that
+contract becomes front, then continues with the named contract's data).
+As a result, every backfilled row got a max-OI label attached to a
+front-month-by-FND price — labels and prices were misaligned by 2-3
+weeks around each roll. This was corrected by `relabel_contracts_to_frontmonth.py`
+which restored FND-based labels matching the price source.
+
+This audit still computes the heuristic max-OI switch dates so they can be
+compared against the FND-based labels actually stored. The script's
+output is now informational — the chart itself uses the FND-based labels
+that align with the continuous-front-month price track.
+
+Two pieces of evidence used here:
 
   1. `oi_history.json` (30-day rolling per-contract OI snapshot from the
      ICE chain scraper) — AUTHORITATIVE for ~Apr 2 → May 15. Use it to
-     check that the script's heuristic dates the recent K→N switches at
-     the actual day the OI crossed over.
+     compare what the heuristic predicted vs what the data shows.
 
-  2. The FND-minus-N heuristic the script uses for everything older. We
-     can't verify these from a primary source without per-contract OI
-     archives, but we can:
-       - list every switch date the script will write
-       - confirm each one falls inside its expected pre-FND window
-       - flag any anomalies (e.g. two consecutive switches a week apart)
+  2. The FND-minus-N heuristic — purely calendar-based, no primary
+     source to verify pre-2026 dates against. Still print them with
+     expected windows so anomalies surface.
 
 Run:
     python backend/scripts/audit_contract_switches.py
     python backend/scripts/audit_contract_switches.py --weeks 156    # 3y view
     python backend/scripts/audit_contract_switches.py --market ldn   # one market
-
-Output is read-only. Run this BEFORE triggering the backfill workflow if
-you want to eyeball the switch dates.
 """
 from __future__ import annotations
 
@@ -42,24 +52,25 @@ from backfill_max_oi_prices import (  # noqa: E402
     KC_CONTRACTS, RC_CONTRACTS, LETTER_TO_MONTH,
     ROLL_WINDOW_DAYS_BY_MARKET,
     _first_notice_day, _front_and_second, _contract_symbol,
-    _subtract_business_days, _max_oi_from_history, _load_oi_history,
+    _max_oi_from_history, _load_oi_history,
 )
 
 COT_JSON = ROOT / "frontend" / "public" / "data" / "cot.json"
 
 
 def _max_oi_heuristic(market: str, tuesday: date) -> tuple[str, int] | None:
-    """Mirror of backfill_max_oi_prices._pick_contract heuristic path.
+    """Mirror of backfill_max_oi_prices._max_oi_by_heuristic.
 
-    If Tuesday is within ROLL_WINDOW_DAYS of front's FND, the second
-    contract is assumed to be max-OI; otherwise the front month is.
+    Production script uses CALENDAR days for the roll-window cutoff (not
+    business days). Keeping that here so this audit matches what the
+    backfill actually does.
     """
     front, second = _front_and_second(market, tuesday)
     if front is None:
         return None
     front_letter, front_year = front
     front_fnd = _first_notice_day(market, front_letter, front_year)
-    roll_cutoff = _subtract_business_days(front_fnd, ROLL_WINDOW_DAYS_BY_MARKET[market])
+    roll_cutoff = front_fnd - timedelta(days=ROLL_WINDOW_DAYS_BY_MARKET[market])
     if tuesday >= roll_cutoff and second is not None:
         return second
     return front
@@ -83,12 +94,13 @@ def _all_tuesdays(weeks: int) -> list[date]:
 
 def _expected_switch_window(market: str, switch_from: tuple[str, int]) -> tuple[date, date]:
     """A switch FROM the old contract is triggered when `tuesday >=
-    (FND(old) - ROLL_WINDOW)`. So the expected switch date is the first
-    Tuesday at or after that cutoff. ±10 calendar days tolerance.
+    (FND(old) - ROLL_WINDOW calendar days)`. So the expected switch date
+    is the first Tuesday at or after that cutoff. ±10 calendar days
+    tolerance for anomaly detection.
     """
     letter, year = switch_from
     fnd = _first_notice_day(market, letter, year)
-    cutoff = _subtract_business_days(fnd, ROLL_WINDOW_DAYS_BY_MARKET[market])
+    cutoff = fnd - timedelta(days=ROLL_WINDOW_DAYS_BY_MARKET[market])
     return cutoff - timedelta(days=10), cutoff + timedelta(days=10)
 
 
