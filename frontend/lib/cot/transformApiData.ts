@@ -138,13 +138,21 @@ export function transformApiData(rows: CotRawRow[]): ProcessedCotRow[] {
       id: i,
       date: row.date,
       priceNY, priceLDN, avgPrice_USD_Ton,
+      // Contract symbols whose lastPrice was sampled into priceNY / priceLDN
+      // on this COT Tuesday. May 2026+ rows have this set; legacy rows are
+      // null. Step4IndustryPulse uses week-to-week changes to mark switches.
+      priceContractNY:  (ny.price_contract_ny  ?? null) as string | null,
+      priceContractLDN: (ldn.price_contract_ldn ?? null) as string | null,
       oiNY, oiLDN, totalOI,
       spreadingTotal, outrightTotal,
       weeklyNominalFlow, weeklyMarginFlow, cumulativeNominal, cumulativeMargin,
       ny: nyObj, ldn: ldnObj,
-      // Preserve forward-filled raw sub-objects for buildMarketMetrics (structure, exch_oi, t_mm_short)
-      rawNy: ny as Record<string, number | null>,
-      rawLdn: ldn as Record<string, number | null>,
+      // Preserve forward-filled raw sub-objects for buildMarketMetrics
+      // (structure, exch_oi, t_mm_short). String-typed contract fields are
+      // hoisted to priceContract{NY,LDN} above, so this cast to the numeric
+      // shape is safe.
+      rawNy: ny as unknown as Record<string, number | null>,
+      rawLdn: ldn as unknown as Record<string, number | null>,
       tradersNY, tradersNY_short, tradersLDN, tradersLDN_short,
       pmpuShortMT_NY, pmpuShortMT_LDN,
       pmpuShortMT: pmpuShortMT_NY + pmpuShortMT_LDN,

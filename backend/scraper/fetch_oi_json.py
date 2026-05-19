@@ -79,6 +79,14 @@ async def _fetch_chains() -> dict:
 
 
 def _parse(raw: dict, min_oi: int = 100) -> list[dict]:
+    """Extract per-contract (symbol, oi, last_price) from the Barchart payload.
+
+    Snapshotting `last_price` alongside `oi` lets a future operator reconstruct
+    the COT-Tuesday max-OI price for any day in the 30-day window — the
+    Industry Pulse chart now uses max-OI as the price anchor (see
+    fetch_tuesday_prices.py::_front_price), and without the per-contract
+    price recorded here, the price track can only be revised going forward.
+    """
     from datetime import date, timedelta
     cutoff = date.today() + timedelta(days=14)
     contracts = []
@@ -93,7 +101,14 @@ def _parse(raw: dict, min_oi: int = 100) -> list[dict]:
                 continue
         except Exception:
             pass
-        contracts.append({"symbol": r.get("symbol", ""), "oi": int(oi)})
+        entry = {"symbol": r.get("symbol", ""), "oi": int(oi)}
+        last_price = r.get("lastPrice")
+        if last_price is not None:
+            try:
+                entry["last_price"] = float(last_price)
+            except (TypeError, ValueError):
+                pass
+        contracts.append(entry)
     return contracts
 
 

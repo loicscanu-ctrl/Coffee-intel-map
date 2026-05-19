@@ -16,10 +16,25 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
     const longKey:  MtKey = market === "ny" ? "pmpuLongMT_NY"  : "pmpuLongMT_LDN";
     const shortKey: MtKey = market === "ny" ? "pmpuShortMT_NY" : "pmpuShortMT_LDN";
     const priceKey: "priceNY" | "priceLDN" = market === "ny" ? "priceNY" : "priceLDN";
+    const contractKey: "priceContractNY" | "priceContractLDN" =
+      market === "ny" ? "priceContractNY" : "priceContractLDN";
     const prices   = recent52.map(d => d[priceKey]).filter(v => v > 0);
     const priceDomain: [number, number] = prices.length
       ? [Math.floor(Math.min(...prices) / 100) * 100, Math.ceil(Math.max(...prices) / 100) * 100]
       : [0, 500];
+
+    // Detect week-to-week contract switches. Each switch becomes a vertical
+    // reference line on the price chart so the reader can see when the
+    // price track jumps to a different underlying contract (the max-OI
+    // rule rolls liquidity as the front goes into FND).
+    const switches: { date: string; from: string; to: string }[] = [];
+    for (let i = 1; i < recent52.length; i++) {
+      const prev = recent52[i - 1][contractKey];
+      const curr = recent52[i][contractKey];
+      if (prev && curr && prev !== curr) {
+        switches.push({ date: recent52[i].date, from: prev, to: curr });
+      }
+    }
     const mtVals = recent52.flatMap(d => [d[longKey], d[shortKey]]).filter(v => v > 0);
     const mtDomain: [number, number] = mtVals.length
       ? [Math.floor(Math.min(...mtVals) / 1000) * 1000, Math.ceil(Math.max(...mtVals) / 1000) * 1000]
@@ -48,6 +63,22 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
               <Area yAxisId="left" type="monotone" dataKey={longKey}  name="Industry Long"  stroke="#92400e" fill="#92400e" fillOpacity={0.3} strokeWidth={2} dot={false} />
               <Area yAxisId="left" type="monotone" dataKey={shortKey} name="Industry Short" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} strokeWidth={2} dot={false} />
               <Line yAxisId="right" type="monotone" dataKey={priceKey} name="Price" stroke="#f59e0b" strokeWidth={2} dot={false} />
+              {switches.map(sw => (
+                <ReferenceLine
+                  key={`switch-${sw.date}`}
+                  yAxisId="right"
+                  x={sw.date}
+                  stroke="#ec4899"
+                  strokeDasharray="3 3"
+                  strokeWidth={1.5}
+                  label={{
+                    value: `→ ${sw.to}`,
+                    position: "top",
+                    fill: "#ec4899",
+                    fontSize: 9,
+                  }}
+                />
+              ))}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -74,7 +105,7 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
   return (
     <div id="cot-section-4">
       <SectionHeader icon="Factory" title="4. Industry Pulse (Metric Tons)"
-        subtitle="PMPU Gross Long & Short vs Price. Bottom: weekly position changes (NY includes EFP physical delivery)." />
+        subtitle="PMPU Gross Long & Short vs Price (max-OI contract; pink dashed line marks weeks where the price track switched to a new contract). Bottom: weekly position changes (NY includes EFP physical delivery)." />
       <div className="grid grid-cols-2 gap-4">
         <div>
           <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 text-center">NY Arabica</p>

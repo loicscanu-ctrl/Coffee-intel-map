@@ -92,6 +92,12 @@ class CotWeekly(Base):
     # From Other sheet (joined by report date) — market-level scalars
     price_ny:       Mapped[float | None] = mapped_column(Float)
     price_ldn:      Mapped[float | None] = mapped_column(Float)
+    # Contract symbol whose lastPrice was recorded into price_{ny,ldn} for
+    # this Tuesday. Populated by fetch_tuesday_prices.py from May 2026 on;
+    # NULL for legacy rows. The Industry Pulse chart uses contract changes
+    # week-to-week to render switch markers.
+    price_contract_ny:  Mapped[str | None] = mapped_column(String(20))
+    price_contract_ldn: Mapped[str | None] = mapped_column(String(20))
     structure_ny:   Mapped[float | None] = mapped_column(Float)
     structure_ldn:  Mapped[float | None] = mapped_column(Float)
     exch_oi_ny:     Mapped[int | None]   = mapped_column(Integer)

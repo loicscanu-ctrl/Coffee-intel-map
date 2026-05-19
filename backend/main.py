@@ -64,6 +64,16 @@ def startup():
             for col, col_type in new_cols:
                 if col not in existing_cols:
                     conn.execute(text(f"ALTER TABLE factories ADD COLUMN {col} {col_type}"))
+    if insp.has_table("cot_weekly"):
+        existing_cols = {c["name"] for c in insp.get_columns("cot_weekly")}
+        new_cols = [
+            ("price_contract_ny",  "VARCHAR(20)"),
+            ("price_contract_ldn", "VARCHAR(20)"),
+        ]
+        with engine.begin() as conn:
+            for col, col_type in new_cols:
+                if col not in existing_cols:
+                    conn.execute(text(f"ALTER TABLE cot_weekly ADD COLUMN {col} {col_type}"))
     if os.getenv("SEED_ON_STARTUP", "1") == "1":
         from seed import run_seed
         run_seed()

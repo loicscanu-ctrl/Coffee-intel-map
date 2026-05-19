@@ -19,6 +19,11 @@ export interface ProcessedCotRow {
   date: string;
   priceNY: number;
   priceLDN: number;
+  /** Futures contract that priceNY/priceLDN were sampled from on the COT
+   *  Tuesday (max-OI contract; PR following the contract-switch markers).
+   *  Optional — null on legacy rows. */
+  priceContractNY?: string | null;
+  priceContractLDN?: string | null;
   avgPrice_USD_Ton: number;
   oiNY: number;
   oiLDN: number;
@@ -31,7 +36,9 @@ export interface ProcessedCotRow {
   cumulativeMargin: number;
   ny: CotMarketPositions;
   ldn: CotMarketPositions;
-  /** Forward-filled raw API sub-objects — only present in real data, not in mock. */
+  /** Forward-filled raw API sub-objects — only present in real data, not in mock.
+   *  Numeric subset only; the string-typed `price_contract_*` fields live on
+   *  this row's top-level `priceContractNY`/`priceContractLDN` instead. */
   rawNy?: Record<string, number | null>;
   rawLdn?: Record<string, number | null>;
   tradersNY: CotTradersGroup;
@@ -68,12 +75,16 @@ export interface CotRawMarket {
   t_other_long?: number | null; t_other_short?: number | null; t_other_spread?: number | null;
   t_nr_long?: number | null;    t_nr_short?: number | null;
   price_ny?: number | null; price_ldn?: number | null;
+  /** Futures contract whose lastPrice was recorded into price_* on the COT
+   *  Tuesday for this row. Populated from May 2026 onwards (max-OI rule);
+   *  NULL on legacy rows. Industry Pulse marks switches between weeks. */
+  price_contract_ny?: string | null; price_contract_ldn?: string | null;
   structure_ny?: number | null; structure_ldn?: number | null;
   exch_oi_ny?: number | null;   exch_oi_ldn?: number | null;
   vol_ny?: number | null; vol_ldn?: number | null;
   efp_ny?: number | null; efp_ldn?: number | null;
   spread_vol_ny?: number | null; spread_vol_ldn?: number | null;
-  [key: string]: number | null | undefined;
+  [key: string]: number | string | null | undefined;
 }
 
 export interface CotRawRow {
