@@ -1,0 +1,9 @@
+Touch this file (commit any change to it) to trigger a DRY-RUN of the
+backfill-per-contract.yml workflow. The workflow runs against prod DB
+but writes nothing — output is posted to Telegram and visible in the
+GitHub Actions UI.
+
+Useful when the user is off-laptop and needs to preview backfill output
+on their phone.
+
+Last triggered: 2026-05-19T16:30Z — claude

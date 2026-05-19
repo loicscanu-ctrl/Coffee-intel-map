@@ -1,0 +1,8 @@
+Touch this file (commit any change to it) to trigger an APPLY of the
+backfill-per-contract.yml workflow. This WRITES to prod DB (rollback via
+cot_weekly_price_archive) and commits regenerated static JSON.
+
+Only touch this after a successful dry-run review. Output is posted to
+Telegram and visible in the GitHub Actions UI.
+
+Last triggered: never
