@@ -248,7 +248,7 @@ export default function CotDashboard() {
 
       <div id="cot-section-1"><Step1GlobalFlow macroData={macroData} macroError={macroError} globalFlowMetrics={globalFlowMetrics} /></div>
 
-      <div id="cot-section-4"><Step4IndustryPulse  recent52={recent52} /></div>
+      <div id="cot-section-4"><Step4IndustryPulse  data={data} /></div>
       <div id="cot-section-5"><Step5DryPowder      data={data} /></div>
       <div id="cot-section-6"><Step6CycleLocation  recent52={recent52} /></div>
       <div id="cot-section-7"><Step7Report         data={data} recent52={recent52} /></div>
