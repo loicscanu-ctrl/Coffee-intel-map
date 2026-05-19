@@ -39,6 +39,7 @@ _API_KEYS_IN_ORDER = [
     "t_nr_long",   "t_nr_short",
     # Per-market extras
     "price_ny", "price_ldn",
+    "price_contract_ny", "price_contract_ldn",
     "structure_ny", "structure_ldn",
     "exch_oi_ny", "exch_oi_ldn",
     "vol_ny", "vol_ldn",
