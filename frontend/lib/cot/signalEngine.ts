@@ -70,6 +70,12 @@ const THRESHOLDS = {
   OB_LOW:          25,   // was 20, aligned with PCT_LOW
   DIR_FLAT_PCT:    0.01,
   DIR_FLAT_COUNT:  2,
+  // Magnitude band offsets for percentile-driven rules. medium = threshold +
+  // MAG_MEDIUM_OFFSET; large = threshold + MAG_LARGE_OFFSET (mirrored for
+  // the low side). Derived from THRESHOLDS so a future PCT_HIGH/LOW change
+  // shifts the magnitude bands automatically.
+  MAG_MEDIUM_OFFSET: 0.05,
+  MAG_LARGE_OFFSET:  0.15,
 } as const;
 
 type Dir = "up" | "down" | "flat";
@@ -134,17 +140,23 @@ export function mag(prev: number, curr: number): Magnitude {
 /**
  * Magnitude for percentile-driven rules. `kind="high"` means the rule
  * fires when pct ≥ PCT_HIGH; magnitude grows as pct climbs further past
- * the threshold. `kind="low"` is the mirror.
+ * the threshold. `kind="low"` is the mirror. Band edges are derived from
+ * THRESHOLDS so tightening PCT_HIGH/LOW shifts the magnitude buckets
+ * automatically.
+ *
+ * Current numerics (PCT_HIGH=0.75, MEDIUM=+0.05, LARGE=+0.15):
+ *   high: small 0.75–0.80, medium 0.80–0.90, large ≥ 0.90
+ *   low:  small 0.20–0.25, medium 0.10–0.20, large ≤ 0.10
  */
 export function magFromPct(pct: number, kind: "high" | "low"): Magnitude {
   if (kind === "high") {
-    if (pct >= 0.90) return "large";
-    if (pct >= 0.80) return "medium";
-    return "small"; // 0.75–0.80: just past the threshold
+    if (pct >= THRESHOLDS.PCT_HIGH + THRESHOLDS.MAG_LARGE_OFFSET)  return "large";
+    if (pct >= THRESHOLDS.PCT_HIGH + THRESHOLDS.MAG_MEDIUM_OFFSET) return "medium";
+    return "small";
   }
-  if (pct <= 0.10) return "large";
-  if (pct <= 0.20) return "medium";
-  return "small";   // 0.20–0.25: just past the threshold
+  if (pct <= THRESHOLDS.PCT_LOW - THRESHOLDS.MAG_LARGE_OFFSET)  return "large";
+  if (pct <= THRESHOLDS.PCT_LOW - THRESHOLDS.MAG_MEDIUM_OFFSET) return "medium";
+  return "small";
 }
 
 const MAG_ORDER: Record<Magnitude, number> = { small: 0, medium: 1, large: 2 };
@@ -736,34 +748,37 @@ export function evaluateSignals(rows: ProcessedCotRow[]): Signal[] {
     const ps    = mkt === "NY" ? nyProdS  : ldnProdS;
     const label = mkt === "NY" ? "KC" : "RC";
 
-    if (obos > THRESHOLDS.OB_HIGH && !isLow(rs, i))
+    // OB gates use >= / <= (inclusive) to match isHigh / isLow's boundary
+    // behaviour. At exactly pct52 = PCT_HIGH, isHigh(rs,i) fires and so does
+    // any OB rule that gates on obos >= OB_HIGH.
+    if (obos >= THRESHOLDS.OB_HIGH && !isLow(rs, i))
       add({ id:"OB1", name:"Overbought Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: -2,
         magnitude: magFromPct(obos / 100, "high"),
         links: [LINK_CYCLE],
-        text:`${label} technically overbought (>${THRESHOLDS.OB_HIGH}th pct, 52-week) with funds near capacity — upside limited. If calendar-spread inversion weakens, holding costs may accelerate long liquidation.` });
+        text:`${label} technically overbought (≥${THRESHOLDS.OB_HIGH}th pct, 52-week) with funds near capacity — upside limited. If calendar-spread inversion weakens, holding costs may accelerate long liquidation.` });
 
-    if (obos > THRESHOLDS.OB_HIGH && isLow(rs, i))
+    if (obos >= THRESHOLDS.OB_HIGH && isLow(rs, i))
       add({ id:"OB2", name:"Overbought but Supported", category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
         magnitude: magBig(magFromPct(obos / 100, "high"), magFromPct(pct52(rs, i), "low")),
-        text:`${label} overbought but roasters significantly under-covered (<25th pct) — technical selling pressure offset by structural commercial demand. Correction likely shallow.` });
+        text:`${label} overbought but roasters significantly under-covered (≤25th pct) — technical selling pressure offset by structural commercial demand. Correction likely shallow.` });
 
-    if (obos < THRESHOLDS.OB_LOW && isLow(mls, i))
+    if (obos <= THRESHOLDS.OB_LOW && isLow(mls, i))
       add({ id:"OB3", name:"Oversold Opportunity",     category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: +2,
         magnitude: magBig(magFromPct(obos / 100, "low"), magFromPct(pct52(mls, i), "low")),
-        text:`${label} technically oversold (<${THRESHOLDS.OB_LOW}th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst.` });
+        text:`${label} technically oversold (≤${THRESHOLDS.OB_LOW}th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst.` });
 
-    if (obos < THRESHOLDS.OB_LOW && isLow(ps, i))
+    if (obos <= THRESHOLDS.OB_LOW && isLow(ps, i))
       add({ id:"OB4", name:"Oversold but Vulnerable",  category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score:  0,
         magnitude: magBig(magFromPct(obos / 100, "low"), magFromPct(pct52(ps, i), "low")),
-        text:`${label} oversold but producers significantly under-hedged (<25th pct) — potential recovery capped by producer selling overhang. Bounce likely limited.` });
+        text:`${label} oversold but producers significantly under-hedged (≤25th pct) — potential recovery capped by producer selling overhang. Bounce likely limited.` });
 
-    if (obos > THRESHOLDS.OB_HIGH && pr === "down")
+    if (obos >= THRESHOLDS.OB_HIGH && pr === "down")
       add({ id:"OB6", name:"Divergence Warning",       category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"alert", score: -3,
         magnitude: magBig(magFromPct(obos / 100, "high"), magPrice[mkt]),
         links: [LINK_INDUSTRY],
         text:`${label} overbought but price already falling — momentum turning. Weekly change in trader counts reveals breadth: if also falling, the unwind is broad-based.` });
 
-    if (obos < THRESHOLDS.OB_LOW && pr === "up")
+    if (obos <= THRESHOLDS.OB_LOW && pr === "up")
       add({ id:"OB7", name:"Oversold Divergence",      category:"OB", categoryLabel:"OB/OS", market:mkt, severity:"warn",  score: +2,
         magnitude: magBig(magFromPct(obos / 100, "low"), magPrice[mkt]),
         text:`${label} technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage.` });

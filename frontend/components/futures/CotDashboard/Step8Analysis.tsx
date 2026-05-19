@@ -251,7 +251,20 @@ export default function Step8Analysis({
   const warns  = signals.filter(s => s.severity === "warn").length;
   const infos  = signals.filter(s => s.severity === "info").length;
 
-  const { scoreNY, scoreLDN } = computeCompositeScores(signals);
+  // Use the last historical-week entry's score when available so the live
+  // gauge agrees with the heatmap (both clamp+round). Falls back to a fresh
+  // compute if historicalSignals isn't supplied.
+  const lastWeek  = historicalSignals?.[historicalSignals.length - 1];
+  const composite = lastWeek
+    ? { scoreNY: lastWeek.scoreNY, scoreLDN: lastWeek.scoreLDN }
+    : (() => {
+        const raw = computeCompositeScores(signals);
+        return {
+          scoreNY:  Math.max(-10, Math.min(10, Math.round(raw.scoreNY))),
+          scoreLDN: Math.max(-10, Math.min(10, Math.round(raw.scoreLDN))),
+        };
+      })();
+  const { scoreNY, scoreLDN } = composite;
 
   const visible = showInfo ? signals : signals.filter(s => s.severity !== "info");
 
