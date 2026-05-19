@@ -46,6 +46,24 @@ def _load(filename: str) -> dict | list | None:
         return None
 
 
+_SEED_DIR = _REPO_ROOT / "backend" / "seed"
+
+def _load_seed(filename: str) -> dict | list | None:
+    """Read a hand-maintained reference JSON from backend/seed/.
+
+    Distinct from `_load`, which targets the dynamic scraper output in
+    `frontend/public/data/`. Used for `events.json` (next-24h watchlist)
+    and similar curated lookups.
+    """
+    path = _SEED_DIR / filename
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 # ── Number / unit formatting ──────────────────────────────────────────────────
 
 def _signed(v: float, decimals: int = 2) -> str:
@@ -320,19 +338,33 @@ def _fx_section() -> str:
     return "<b>FX</b>\n" + "\n".join(rows)
 
 
-# ── CoT section (kept simple — full signal listing deferred to Phase 2) ──────
+# ── CoT section ───────────────────────────────────────────────────────────────
+
+def _score_zone(s: float) -> str:
+    """Mirror Step8Analysis.scoreZone — used to label composite scores."""
+    if s <= -5: return "Strongly Bearish"
+    if s <  -2: return "Bearish"
+    if s <=  2: return "Neutral"
+    if s <   5: return "Bullish"
+    return "Strongly Bullish"
+
 
 def _cot_section() -> str:
-    """Latest MM net for NY + age. Signals listing waits on Phase 2
-    (Python port of signalEngine OR pre-export from the frontend build)."""
+    """Latest MM net + composite score + per-rule signals from signals.json.
+
+    Reads `signals.json` (produced by `frontend/scripts/export-signals.mjs`)
+    for the rule-based output, and `cot_recent.json` for the MM-net header
+    line. Falls back to the MM-net-only view if signals.json isn't present
+    (e.g. first run after deploy, before the export workflow has executed).
+    """
     cot_data = _load("cot_recent.json")
     if not cot_data or not isinstance(cot_data, list):
         return ""
 
-    latest = cot_data[-1]
+    latest   = cot_data[-1]
     date_str = latest.get("date", "?")
-    ny  = latest.get("ny", {})
-    ldn = latest.get("ldn", {})
+    ny       = latest.get("ny", {})
+    ldn      = latest.get("ldn", {})
 
     def _net(side: dict) -> int | None:
         ml = side.get("mm_long"); ms = side.get("mm_short")
@@ -359,11 +391,117 @@ def _cot_section() -> str:
             return ""
         return f" (WoW {_signed(curr - prev_net, 0)})"
 
+    # Header with composite score if signals.json is available.
+    signals_doc = _load("signals.json")
+    if isinstance(signals_doc, dict):
+        ny_score  = signals_doc.get("scoreNY",  0)
+        ldn_score = signals_doc.get("scoreLDN", 0)
+        composite_line = (
+            f"  Composite: NY <b>{_signed(ny_score, 0)}</b> ({_score_zone(ny_score)})"
+            f" · LDN <b>{_signed(ldn_score, 0)}</b> ({_score_zone(ldn_score)})"
+        )
+    else:
+        composite_line = ""
+
     lines = [f"<b>CoT</b> (report week {date_str}{age_str})"]
+    if composite_line:
+        lines.append(composite_line)
     if ny_net is not None:
         lines.append(f"  NY MM net: <b>{_signed(ny_net, 0)} lots</b>{_net_change(ny_net, prev.get('ny', {}))}")
     if ldn_net is not None:
         lines.append(f"  LDN MM net: <b>{_signed(ldn_net, 0)} lots</b>{_net_change(ldn_net, prev.get('ldn', {}))}")
+
+    # Per-rule signals: all alerts + all warns, info skipped.
+    if isinstance(signals_doc, dict):
+        sigs = signals_doc.get("signals") or []
+        notable = [s for s in sigs if s.get("severity") in ("alert", "warn")]
+        # Sort: alerts first, then warns; within each, by |score|*magnitude desc.
+        _SEV_ORDER = {"alert": 0, "warn": 1}
+        _MAG_W = {"large": 1.5, "medium": 1.0, "small": 0.5}
+        notable.sort(key=lambda s: (
+            _SEV_ORDER.get(s.get("severity"), 99),
+            -abs(s.get("score") or 0) * _MAG_W.get(s.get("magnitude", "small"), 1.0),
+        ))
+        if notable:
+            lines.append("")
+            lines.append("  <i>Signals</i>:")
+            for s in notable:
+                sev   = (s.get("severity") or "info").upper()
+                sid   = s.get("id", "?")
+                name  = s.get("name", "")
+                mkt   = s.get("market", "?")
+                score = s.get("score") or 0
+                mag   = s.get("magnitude", "small")
+                # Compact: • [WARN] CP3 NY +2 (large) — Bullish De-hedging
+                score_str = f"{_signed(score, 0)}" if score else "0"
+                mag_str   = f" ({mag})" if mag and mag != "small" else ""
+                lines.append(f"  • [{sev}] {sid} {mkt} {score_str}{mag_str} — {name}")
+
+    return "\n".join(lines)
+
+
+# ── Next-24h watchlist ────────────────────────────────────────────────────────
+
+def _events_section() -> str:
+    """'Next 24h to watch' — scheduled events from backend/seed/events.json.
+
+    Selection rule: entries whose `date` is within [today, today+1] (UTC).
+    Entries with `time` (HH:MM) are filtered to a stricter +24h window when
+    we have a precise timestamp; date-only entries fire on the day-of.
+    """
+    doc = _load_seed("events.json")
+    if not isinstance(doc, dict):
+        return ""
+    events = doc.get("events") or []
+    if not events:
+        return ""
+
+    now    = datetime.now(UTC)
+    today  = now.date()
+    tomorrow = today + timedelta(days=1)
+    cutoff = now + timedelta(hours=24)
+
+    relevant: list[dict] = []
+    for ev in events:
+        date_str = ev.get("date")
+        if not date_str:
+            continue
+        try:
+            ev_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            continue
+        if ev_date not in (today, tomorrow):
+            continue
+        # Apply optional time filter when present.
+        time_str = ev.get("time")
+        if time_str:
+            try:
+                hh, mm = time_str.split(":")
+                ev_dt = datetime(ev_date.year, ev_date.month, ev_date.day,
+                                 int(hh), int(mm), tzinfo=UTC)
+                if ev_dt < now or ev_dt > cutoff:
+                    continue
+            except ValueError:
+                pass
+        relevant.append(ev)
+
+    if not relevant:
+        return ""
+
+    relevant.sort(key=lambda e: (e.get("date", ""), e.get("time", "99:99")))
+
+    lines = ["<b>📅 Next 24h to watch</b>"]
+    for ev in relevant:
+        date_str = ev["date"]
+        time_str = ev.get("time", "")
+        when = f"{date_str}" + (f" {time_str}Z" if time_str else "")
+        title = ev.get("title", "(untitled)")
+        cat   = ev.get("category", "")
+        cat_tag = f"[{cat}] " if cat else ""
+        lines.append(f"  • {when} — {cat_tag}{title}")
+        notes = ev.get("notes")
+        if notes:
+            lines.append(f"    <i>{notes}</i>")
     return "\n".join(lines)
 
 
@@ -669,6 +807,7 @@ def build_message(db=None) -> str:
     header  = f"<b>Coffee Intel — {now_utc.strftime('%a %d %b %Y')}</b>"
 
     static_sections = [
+        _events_section,        # "Next 24h to watch" — top of brief, highest visibility
         _prices_section,
         _cost_detail_section,
         _fx_section,
