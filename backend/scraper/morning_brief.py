@@ -428,17 +428,109 @@ def _freight_section() -> str:
 
 
 # ── News section — inline data label extraction ──────────────────────────────
+#
+# Mirrors frontend/components/map/NewsFeed.tsx::extractDataLabel. The two
+# extractors must stay in sync — when adding a new source, edit BOTH files.
+# Source-specific extractors run first (matched by NewsItem.source); a
+# generic regex chain backs off when no specialist matches.
 
-# Mirrors frontend/components/map/NewsFeed.tsx::extractDataLabel.
 _RE_BRL = re.compile(r"R\$\s*([\d.,]+)\s*(?:/\s*([A-Za-zçãáéõ]+))?")
 _RE_USD_PREFIX = re.compile(r"USD\s*([\d.,]+)\s*(?:/\s*([A-Za-z]+))?")
 _RE_DOLLAR     = re.compile(r"\$\s*([\d.,]+)\s*(?:/\s*([A-Za-z]+))?")
 _RE_VOLUME     = re.compile(r"(\d[\d.,]*)\s*(kt|mln|million|thousand|bags|tonnes|k_bags)", re.IGNORECASE)
 
+# Source-specific patterns. Each function takes the body string and returns
+# a compact label or None. Keyed by NewsItem.source.
+_RE_UCDA          = re.compile(r"([\d.,]+)\s*USD\s*/\s*cwt", re.IGNORECASE)
+_RE_GIACAPHE      = re.compile(r"([\d.,]+)\s*VND\s*/\s*kg",  re.IGNORECASE)
+_RE_B3            = re.compile(r"([\d.,]+)\s*USD\s*/\s*sac", re.IGNORECASE)
+_RE_COOABRIEL     = re.compile(r"R\$\s*([\d.,]+)\s*/\s*saca", re.IGNORECASE)
+_RE_CEPEA         = re.compile(r"R\$\s*([\d.,]+)\s*/\s*sack", re.IGNORECASE)
+_RE_AJCA_IMP      = re.compile(r"imports\s*=\s*([\d.,]+)\s*MT", re.IGNORECASE)
+_RE_AJCA_CONS     = re.compile(r"consumption\s*=\s*([\d.,]+)\s*MT", re.IGNORECASE)
+_RE_AJCA_STOCKS   = re.compile(r"stocks\s*=\s*([\d.,]+)\s*MT", re.IGNORECASE)
+_RE_AJCA_YOY      = re.compile(r"YoY\s*=\s*([+-]?[\d.,]+%)", re.IGNORECASE)
+_RE_RETAIL_CPI    = re.compile(
+    r"US:\s*([+-]?[\d.,]+%)[^E]*EU:\s*([+-]?[\d.,]+%)[^B]*Brazil:\s*([+-]?[\d.,]+%)",
+    re.IGNORECASE,
+)
+_RE_UCDA_REPORT   = re.compile(r"([\d.,]+)\s*bags", re.IGNORECASE)
 
-def _extract_data_label(body: str | None) -> str | None:
+
+def _extract_ucda(body: str) -> str | None:
+    m = _RE_UCDA.search(body)
+    return f"{m.group(1)} USD / cwt" if m else None
+
+
+def _extract_giacaphe(body: str) -> str | None:
+    m = _RE_GIACAPHE.search(body)
+    return f"{m.group(1)} VND / kg" if m else None
+
+
+def _extract_b3(body: str) -> str | None:
+    m = _RE_B3.search(body)
+    return f"{m.group(1)} USD / sac" if m else None
+
+
+def _extract_cooabriel(body: str) -> str | None:
+    m = _RE_COOABRIEL.search(body)
+    return f"{m.group(1)} BRL / saca" if m else None
+
+
+def _extract_cepea(body: str) -> str | None:
+    m = _RE_CEPEA.search(body)
+    return f"{m.group(1)} BRL / sack" if m else None
+
+
+def _extract_ajca(body: str) -> str | None:
+    """AJCA Japan — pick the densest data line from imports / consumption /
+    stocks / YoY. Stocks + YoY are populated only when the source scraper
+    has the prev-year / inventory snapshot to hand; degrades to imports +
+    consumption alone otherwise."""
+    imp    = _RE_AJCA_IMP.search(body)
+    cons   = _RE_AJCA_CONS.search(body)
+    stocks = _RE_AJCA_STOCKS.search(body)
+    yoy    = _RE_AJCA_YOY.search(body)
+    parts: list[str] = []
+    if stocks: parts.append(f"stocks {stocks.group(1)} MT")
+    if imp:    parts.append(f"imp {imp.group(1)} MT")
+    if cons:   parts.append(f"cons {cons.group(1)} MT")
+    if yoy:    parts.append(f"YoY {yoy.group(1)}")
+    return " · ".join(parts) if parts else None
+
+
+def _extract_retail_cpi(body: str) -> str | None:
+    m = _RE_RETAIL_CPI.search(body)
+    if not m:
+        return None
+    return f"US {m.group(1)} · EU {m.group(2)} · BR {m.group(3)}"
+
+
+def _extract_ucda_report(body: str) -> str | None:
+    m = _RE_UCDA_REPORT.search(body)
+    return f"{m.group(1)} bags" if m else None
+
+
+_SOURCE_EXTRACTORS: dict[str, callable] = {
+    "UCDA":         _extract_ucda,
+    "Giacaphe":     _extract_giacaphe,
+    "B3":           _extract_b3,
+    "Cooabriel":    _extract_cooabriel,
+    "CEPEA/ESALQ":  _extract_cepea,
+    "AJCA":         _extract_ajca,
+    "Retail CPI":   _extract_retail_cpi,
+    "UCDA_REPORT":  _extract_ucda_report,
+}
+
+
+def _extract_data_label(body: str | None, source: str | None = None) -> str | None:
+    """Source-first dispatch; generic regex fallback."""
     if not body:
         return None
+    if source and source in _SOURCE_EXTRACTORS:
+        specific = _SOURCE_EXTRACTORS[source](body)
+        if specific:
+            return specific
     m = _RE_BRL.search(body)
     if m:
         unit = f" / {m.group(2)}" if m.group(2) else ""
@@ -484,7 +576,7 @@ def _news_section(db) -> str:
         by_cat: dict[str, list[tuple[str, str | None]]] = {}
         for it in items:
             cat = (it.category or "general").upper()
-            label = _extract_data_label(it.body)
+            label = _extract_data_label(it.body, it.source)
             by_cat.setdefault(cat, []).append((it.title or "", label))
 
         lines = ["<b>News (last 24h)</b>"]

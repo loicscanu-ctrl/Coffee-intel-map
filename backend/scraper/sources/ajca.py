@@ -43,6 +43,10 @@ logger = logging.getLogger(__name__)
 
 _HUB_URL    = "https://www.ajca.or.jp/data/"
 _CACHE_PATH = Path(__file__).resolve().parents[1] / "cache" / "ajca.json"
+# Multi-year history file, distinct from the latest-state cache. Stores
+# {year_str: {imports_mt, consumption_mt, stocks_mt}}. Appended on every
+# successful parse so the next run can compute YoY change vs prev period.
+_HISTORY_PATH = Path(__file__).resolve().parents[1] / "cache" / "ajca_history.json"
 
 _HEADERS = {
     "User-Agent": (
@@ -61,6 +65,13 @@ _CONS_PAT  = re.compile(
 # "2025年のコーヒー生豆の輸入量 359,382 トン" → imports 359382
 _IMP_PAT   = re.compile(
     r"(20\d{2})\s*年\s*の\s*コーヒー\s*生豆\s*の\s*輸入量\s*([\d,]+)\s*トン",
+)
+# Defensive stocks pattern — AJCA occasionally publishes inventory figures
+# alongside imports/consumption with phrasing like "在庫" (zaiko, "stocks").
+# Captures any phrase ending in 在庫 followed by digits + トン. Fires only
+# when the hub page surfaces it; returns None otherwise.
+_STOCKS_PAT = re.compile(
+    r"(?:在庫|ストック)\s*(?:量)?\s*([\d,]+)\s*トン",
 )
 
 # Reasonable range gate (Japan imports ≈ 350-450k MT/yr historically).
@@ -249,13 +260,31 @@ def _strip_html(html: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
+def _load_history() -> dict:
+    if not _HISTORY_PATH.exists():
+        return {}
+    try:
+        return json.loads(_HISTORY_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_history(history: dict) -> None:
+    _HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _HISTORY_PATH.write_text(
+        json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8",
+    )
+
+
 def _parse_hub(html: str) -> dict | None:
     text = _strip_html(html)
-    cons_match = _CONS_PAT.search(text)
-    imp_match  = _IMP_PAT.search(text)
+    cons_match   = _CONS_PAT.search(text)
+    imp_match    = _IMP_PAT.search(text)
+    stocks_match = _STOCKS_PAT.search(text)
 
     consumption_mt: int | None = None
     imports_mt:     int | None = None
+    stocks_mt:      int | None = None
     consumption_year: str | None = None
     imports_year:     str | None = None
 
@@ -265,26 +294,71 @@ def _parse_hub(html: str) -> dict | None:
     if imp_match:
         imports_year = imp_match.group(1)
         imports_mt   = _parse_mt(imp_match.group(2))
+    if stocks_match:
+        stocks_mt = _parse_mt(stocks_match.group(1))
 
     if consumption_mt is None and imports_mt is None:
         return None
 
     latest_year = imports_year or consumption_year
 
+    # YoY deltas from the accumulating history cache. Falls through cleanly
+    # when no prior-year snapshot is available (first run, or after a cache
+    # wipe) — we report None rather than synthesising a fake delta.
+    history = _load_history()
+    prev_imports_mt:     int | None = None
+    prev_consumption_mt: int | None = None
+    prev_stocks_mt:      int | None = None
+    if latest_year:
+        prev_year = str(int(latest_year) - 1)
+        prev = history.get(prev_year) or {}
+        prev_imports_mt     = prev.get("imports_mt")
+        prev_consumption_mt = prev.get("consumption_mt")
+        prev_stocks_mt      = prev.get("stocks_mt")
+
+    def _pct_delta(curr: int | None, prev: int | None) -> float | None:
+        if curr is None or prev is None or prev == 0:
+            return None
+        return round((curr - prev) / prev * 100, 1)
+
+    imports_yoy_pct     = _pct_delta(imports_mt,     prev_imports_mt)
+    consumption_yoy_pct = _pct_delta(consumption_mt, prev_consumption_mt)
+    stocks_yoy_pct      = _pct_delta(stocks_mt,      prev_stocks_mt)
+
+    # Append the current snapshot so next run sees it as `prev`. Only write
+    # when at least one figure is present — avoids a partial-year clobber.
+    if latest_year and (imports_mt is not None or consumption_mt is not None
+                        or stocks_mt is not None):
+        history[latest_year] = {
+            k: v for k, v in (
+                ("imports_mt",     imports_mt),
+                ("consumption_mt", consumption_mt),
+                ("stocks_mt",      stocks_mt),
+            ) if v is not None
+        }
+        _save_history(history)
+
     pdf_index = _collect_pdf_index(html)
 
     return {
-        "source":                 "AJCA",
-        "source_url":             _HUB_URL,
-        "last_updated":           datetime.utcnow().date().isoformat(),
-        "latest_year":            latest_year,
-        "latest_consumption_mt":  consumption_mt,
-        "latest_imports_mt":      imports_mt,
-        "monthly_imports_pdf":    _latest_pdf_by_kind(pdf_index, "j-import"),
-        "monthly_exports_pdf":    _latest_pdf_by_kind(pdf_index, "j-export"),
-        "supply_demand_pdf":      _latest_pdf_by_kind(pdf_index, "data-jukyu"),
-        "yearly_imports_pdf":     _latest_pdf_by_kind(pdf_index, "data-yunyu-suii"),
-        "pdf_index":              pdf_index,
+        "source":                  "AJCA",
+        "source_url":              _HUB_URL,
+        "last_updated":            datetime.utcnow().date().isoformat(),
+        "latest_year":             latest_year,
+        "latest_consumption_mt":   consumption_mt,
+        "latest_imports_mt":       imports_mt,
+        "latest_stocks_mt":        stocks_mt,
+        "prev_imports_mt":         prev_imports_mt,
+        "prev_consumption_mt":     prev_consumption_mt,
+        "prev_stocks_mt":          prev_stocks_mt,
+        "imports_yoy_pct":         imports_yoy_pct,
+        "consumption_yoy_pct":     consumption_yoy_pct,
+        "stocks_yoy_pct":          stocks_yoy_pct,
+        "monthly_imports_pdf":     _latest_pdf_by_kind(pdf_index, "j-import"),
+        "monthly_exports_pdf":     _latest_pdf_by_kind(pdf_index, "j-export"),
+        "supply_demand_pdf":       _latest_pdf_by_kind(pdf_index, "data-jukyu"),
+        "yearly_imports_pdf":      _latest_pdf_by_kind(pdf_index, "data-yunyu-suii"),
+        "pdf_index":               pdf_index,
     }
 
 
@@ -322,16 +396,31 @@ async def run(page, db) -> None:  # noqa: ARG001
             f"consumption={parsed['latest_consumption_mt']} MT "
             f"({len(parsed['pdf_index'])} pdfs indexed)"
         )
-        # Persist to DB so export jobs on separate runners can fall back to DB
+        # Persist to DB so export jobs on separate runners can fall back to DB.
+        # Body now includes optional stocks + YoY tokens. The frontend
+        # NewsFeed.tsx + morning_brief.py AJCA-specific extractors regex
+        # these out — see _SOURCE_EXTRACTORS["AJCA"]. Missing values are
+        # omitted entirely so the line stays compact when stocks / YoY
+        # aren't yet available (first run after a cache wipe, or hub page
+        # doesn't expose stocks).
         if db is not None:
+            body_parts = [f"AJCA Japan {parsed['latest_year']}:"]
+            if parsed.get("latest_imports_mt") is not None:
+                body_parts.append(f"imports={parsed['latest_imports_mt']} MT")
+            if parsed.get("latest_consumption_mt") is not None:
+                body_parts.append(f"consumption={parsed['latest_consumption_mt']} MT")
+            if parsed.get("latest_stocks_mt") is not None:
+                body_parts.append(f"stocks={parsed['latest_stocks_mt']} MT")
+            if parsed.get("imports_yoy_pct") is not None:
+                yoy = parsed["imports_yoy_pct"]
+                sign = "+" if yoy >= 0 else ""
+                body_parts.append(f"YoY={sign}{yoy:.1f}%")
+            body = body_parts[0] + " " + ", ".join(body_parts[1:])
+
             from scraper.db import upsert_news_item
             upsert_news_item(db, {
                 "title":    f"AJCA Japan Coffee Data – {parsed['last_updated']}",
-                "body":     (
-                    f"AJCA Japan {parsed['latest_year']}: "
-                    f"imports={parsed.get('latest_imports_mt')} MT, "
-                    f"consumption={parsed.get('latest_consumption_mt')} MT"
-                ),
+                "body":     body,
                 "source":   "AJCA",
                 "category": "demand",
                 "lat":      35.689,
