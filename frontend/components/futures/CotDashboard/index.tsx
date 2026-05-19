@@ -20,12 +20,14 @@ import Step5DryPowder from "./Step5DryPowder";
 import Step6CycleLocation from "./Step6CycleLocation";
 import Step7Report from "./Step7Report";
 import Step8Analysis from "./Step8Analysis";
+import OIHistoryTable from "@/components/futures/OIHistoryTable";
+import OIFndChart from "@/components/futures/OIFndChart";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
   const [step, setStep] = useUrlState<Step>("step", 1, (raw) => {
     const n = Number(raw);
-    return ([1, 2, 3, 4, 5, 6, 7, 8] as number[]).includes(n) ? (n as Step) : 1;
+    return ([1, 2, 3, 4, 5, 6, 7, 8, 9] as number[]).includes(n) ? (n as Step) : 1;
   });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
@@ -161,6 +163,32 @@ export default function CotDashboard() {
       )}
 
       <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
+
+      {/* 2. NY & London OI — 7-Day Tracking. Moved from /futures Exchange
+          tab so positioning context sits next to the COT signal output. */}
+      <div id="cot-section-9" className="space-y-3">
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-1">
+          2. NY & London OI — 7-Day Tracking
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              NY OI
+            </h3>
+            <OIHistoryTable market="arabica" />
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              LDN OI
+            </h3>
+            <OIHistoryTable market="robusta" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <OIFndChart market="arabica" />
+          <OIFndChart market="robusta" />
+        </div>
+      </div>
 
       <div id="cot-section-2"><CotHeatmap data={data} /></div>
       <div id="cot-section-3"><CotGauges data={data} /></div>

@@ -104,7 +104,7 @@ export default function Step4IndustryPulse({ recent52 }: { recent52: ProcessedCo
   };
   return (
     <div id="cot-section-4">
-      <SectionHeader icon="Factory" title="4. Industry Pulse (Metric Tons)"
+      <SectionHeader icon="Factory" title="6. Industry Pulse (Metric Tons)"
         subtitle="PMPU Gross Long & Short vs Price (max-OI contract; pink dashed line marks weeks where the price track switched to a new contract). Bottom: weekly position changes (NY includes EFP physical delivery)." />
       <div className="grid grid-cols-2 gap-4">
         <div>

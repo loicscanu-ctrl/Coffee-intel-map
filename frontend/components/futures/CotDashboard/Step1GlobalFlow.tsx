@@ -102,7 +102,7 @@ export default function Step1GlobalFlow({
 
   return (
     <div id="cot-section-1">
-      <SectionHeader icon="Globe" title="1. Global Money Flow"
+      <SectionHeader icon="Globe" title="5. Global Money Flow"
         subtitle="MM speculative exposure across 28 commodity markets (CFTC + ICE Europe). Toggle metric below." />
       {macroError && (
         <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs font-medium">

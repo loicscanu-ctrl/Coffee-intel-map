@@ -178,7 +178,7 @@ export default function Step7Report({ data, recent52 }: Props) {
   return (
     <div id="cot-section-7" className="space-y-3">
       <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-1">
-        COT Report — Automated Positioning Analysis
+        9. COT Report — Automated Positioning Analysis
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {blocks.map((block, i) => {
