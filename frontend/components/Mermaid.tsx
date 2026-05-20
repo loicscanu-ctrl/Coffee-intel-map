@@ -16,22 +16,9 @@ function parseEdges(chart: string): Array<[string, string]> {
   return out;
 }
 
-/** Transitive closure of `start` over `adj` (excludes `start`). */
-function closure(start: string, adj: Map<string, string[]>): Set<string> {
-  const seen = new Set<string>();
-  const stack = [...(adj.get(start) ?? [])];
-  while (stack.length) {
-    const n = stack.pop()!;
-    if (seen.has(n)) continue;
-    seen.add(n);
-    for (const m of adj.get(n) ?? []) if (!seen.has(m)) stack.push(m);
-  }
-  return seen;
-}
-
-/** Wire click-to-trace on the rendered SVG: clicking a node highlights its full
- *  upstream sources and downstream consumers end-to-end and fades the rest.
- *  Returns a cleanup that detaches the listener. */
+/** Wire click-to-highlight on the rendered SVG: clicking a node highlights it,
+ *  its directly connected neighbours, and the arrows between them, fading the
+ *  rest. Returns a cleanup that detaches the listener. */
 function setupTrace(container: HTMLDivElement, chart: string): () => void {
   const svg = container.querySelector("svg");
   if (!svg) return () => {};
@@ -77,18 +64,12 @@ function setupTrace(container: HTMLDivElement, chart: string): () => void {
     if (selected === id) { selected = null; clear(); return; }
     selected = id;
     clear();
-    const anc = closure(id, rev);
-    const desc = closure(id, fwd);
-    const up = new Set<string>(anc); up.add(id);
-    const down = new Set<string>(desc); down.add(id);
     svg.classList.add("mmd-sel");
     nodeById.get(id)?.classList.add("mmd-on");
-    anc.forEach((n) => nodeById.get(n)?.classList.add("mmd-on"));
-    desc.forEach((n) => nodeById.get(n)?.classList.add("mmd-on"));
+    (fwd.get(id) ?? []).forEach((n) => nodeById.get(n)?.classList.add("mmd-on"));
+    (rev.get(id) ?? []).forEach((n) => nodeById.get(n)?.classList.add("mmd-on"));
     edges.forEach(([u, v], i) => {
-      const onUp = up.has(u) && up.has(v);
-      const onDown = down.has(u) && down.has(v);
-      if (onUp || onDown) {
+      if (u === id || v === id) {
         pathByIdx.get(i)?.classList.add("mmd-on");
         labelByIdx.get(i)?.classList.add("mmd-on");
       }
@@ -135,6 +116,7 @@ export default function Mermaid({
           startOnLoad: false,
           theme: "dark",
           securityLevel: "loose",
+          flowchart: { curve: "linear" },
           themeVariables: {
             fontSize: "13px",
             darkMode: true,
