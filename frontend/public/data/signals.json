@@ -192,7 +192,7 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "medium",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -233,6 +233,17 @@
         }
       ],
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
+    },
+    {
+      "id": "SP3",
+      "name": "Spreading vs Inversion",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "NY",
+      "severity": "warn",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     },
     {
       "id": "SP1",
@@ -2457,7 +2468,7 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "medium",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2500,6 +2511,17 @@
           "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
         },
         {
+          "id": "SP3",
+          "name": "Spreading vs Inversion",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "NY",
+          "severity": "warn",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
+        },
+        {
           "id": "SP1",
           "name": "Spreading Increase",
           "category": "SP",
@@ -2534,5 +2556,5 @@
       "priceLDN": 3482
     }
   ],
-  "generatedAt": "2026-05-19T23:45:56.282Z"
+  "generatedAt": "2026-05-20T05:15:25.901Z"
 }

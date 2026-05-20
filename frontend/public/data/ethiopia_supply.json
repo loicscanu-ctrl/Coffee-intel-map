@@ -1,15 +1,15 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-19T10:01:14.290725Z",
+  "scraped_at": "2026-05-20T05:15:18.978775Z",
   "exports": null,
   "ecx_price": {
-    "etb_per_kg": 300.0,
-    "as_of": "2026-05-19",
+    "etb_per_kg": 404.0,
+    "as_of": "2026-05-20",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-19T09:57:14.997517Z",
+    "scraped_at": "2026-05-20T05:12:10.587036Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -53,78 +53,6 @@
       }
     ],
     "daily_drought": [
-      {
-        "region": "Sidama/Yirgacheffe",
-        "days": [
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "L",
-          "L",
-          "L",
-          "M"
-        ]
-      },
       {
         "region": "Harrar",
         "days": [
@@ -264,8 +192,8 @@
           "-",
           "-",
           "-",
-          "-",
-          "-",
+          "L",
+          "L",
           "L"
         ]
       }
@@ -388,7 +316,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-19"
+    "last_updated": "2026-05-20"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",
