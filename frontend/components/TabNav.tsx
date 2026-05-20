@@ -10,6 +10,7 @@ const TABS = [
   { href: "/demand", label: "Demand" },
   { href: "/macro", label: "Macro" },
   { href: "/map", label: "News & Intel" },
+  { href: "/data-map", label: "Data Map" },
 ];
 
 export default function TabNav() {
