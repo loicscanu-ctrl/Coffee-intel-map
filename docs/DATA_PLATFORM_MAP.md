@@ -251,12 +251,12 @@ flowchart LR
   J_ev[/events.json · seed/]
   J_intel[/manual_intel.json/]
   J_news[(news_feed · country_intel)]
-  J_fact[/factories.json → /api/map/factories/]
-  J_ctry[/countries.json → /api/map/countries/]
+  J_fact["factories.json → /api/map/factories"]
+  J_ctry["countries.json → /api/map/countries"]
 
   %% ================= COT TAB =================
   subgraph COT["COT tab"]
-    c_ip{{Industry Pulse: price+PMPU+switch}}
+    c_ip{{"Industry Pulse: price+PMPU+switch"}}
     c_sig{{Signals · severity}}
     c_gau{{Gauges}}
     c_hm{{Heatmap}}
@@ -264,7 +264,7 @@ flowchart LR
     c_dp{{Dry Powder}}
     c_cyc{{Cycle Location}}
     c_rep{{Report · backtest}}
-    c_oi{{OI 7-day (CotWeekly)}}
+    c_oi{{"OI 7-day (CotWeekly)"}}
     c_oifnd{{OI Evolution to FND}}
   end
 
@@ -297,7 +297,7 @@ flowchart LR
     d_grow{{Growth Markets}}
     d_world{{World Consumption}}
     d_earn{{Roaster Earnings}}
-    d_tax{{Kaffeesteuer (DE tax)}}
+    d_tax{{"Kaffeesteuer (DE tax)"}}
     d_mix{{Roasting Mix}}
   end
 
