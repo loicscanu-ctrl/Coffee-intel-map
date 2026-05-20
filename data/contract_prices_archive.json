@@ -1,13 +1,15 @@
 {
   "_meta": {
-    "description": "Permanent per-contract daily price+OI archive. NEVER trimmed. Accumulates Barchart chain snapshots so we build true per-contract history over time. oi_history.json is the 30-day rolling view; this is the full record. Stored ascending by date.",
+    "description": "Permanent per-contract daily price+OI archive. Each entry carries TWO dates: price_date (N-1 biz day, when last_price settled) and oi_date (N-2 biz days, when OI was reported). last_price belongs to price_date; oi to oi_date. Sorted ascending by price_date. Retains ~5y (1320 trading days). Industry Pulse sources its price line from here.",
     "source": "Barchart core-api/v1/quotes/get via fetch_oi_json.py",
     "started": "2026-05-20",
-    "seeded_from": "oi_history.json 30-day window on first archive creation"
+    "seeded_from": "oi_history.json 30-day window; price_date = oi_date + 1 biz day for seed rows"
   },
   "arabica": [
     {
-      "date": "2026-04-06",
+      "fetch_date": null,
+      "price_date": "2026-04-07",
+      "oi_date": "2026-04-06",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -52,7 +54,9 @@
       ]
     },
     {
-      "date": "2026-04-07",
+      "fetch_date": null,
+      "price_date": "2026-04-08",
+      "oi_date": "2026-04-07",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -97,7 +101,9 @@
       ]
     },
     {
-      "date": "2026-04-08",
+      "fetch_date": null,
+      "price_date": "2026-04-09",
+      "oi_date": "2026-04-08",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -142,7 +148,9 @@
       ]
     },
     {
-      "date": "2026-04-09",
+      "fetch_date": null,
+      "price_date": "2026-04-10",
+      "oi_date": "2026-04-09",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -187,7 +195,9 @@
       ]
     },
     {
-      "date": "2026-04-10",
+      "fetch_date": null,
+      "price_date": "2026-04-13",
+      "oi_date": "2026-04-10",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -232,7 +242,9 @@
       ]
     },
     {
-      "date": "2026-04-13",
+      "fetch_date": null,
+      "price_date": "2026-04-14",
+      "oi_date": "2026-04-13",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -277,7 +289,9 @@
       ]
     },
     {
-      "date": "2026-04-14",
+      "fetch_date": null,
+      "price_date": "2026-04-15",
+      "oi_date": "2026-04-14",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -322,7 +336,9 @@
       ]
     },
     {
-      "date": "2026-04-15",
+      "fetch_date": null,
+      "price_date": "2026-04-16",
+      "oi_date": "2026-04-15",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -367,7 +383,9 @@
       ]
     },
     {
-      "date": "2026-04-17",
+      "fetch_date": null,
+      "price_date": "2026-04-20",
+      "oi_date": "2026-04-17",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -412,7 +430,9 @@
       ]
     },
     {
-      "date": "2026-04-20",
+      "fetch_date": null,
+      "price_date": "2026-04-21",
+      "oi_date": "2026-04-20",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -457,7 +477,9 @@
       ]
     },
     {
-      "date": "2026-04-21",
+      "fetch_date": null,
+      "price_date": "2026-04-22",
+      "oi_date": "2026-04-21",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -502,7 +524,9 @@
       ]
     },
     {
-      "date": "2026-04-22",
+      "fetch_date": null,
+      "price_date": "2026-04-23",
+      "oi_date": "2026-04-22",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -547,7 +571,9 @@
       ]
     },
     {
-      "date": "2026-04-23",
+      "fetch_date": null,
+      "price_date": "2026-04-24",
+      "oi_date": "2026-04-23",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -592,7 +618,9 @@
       ]
     },
     {
-      "date": "2026-04-24",
+      "fetch_date": null,
+      "price_date": "2026-04-27",
+      "oi_date": "2026-04-24",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -637,7 +665,9 @@
       ]
     },
     {
-      "date": "2026-04-27",
+      "fetch_date": null,
+      "price_date": "2026-04-28",
+      "oi_date": "2026-04-27",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -682,7 +712,9 @@
       ]
     },
     {
-      "date": "2026-04-28",
+      "fetch_date": null,
+      "price_date": "2026-04-29",
+      "oi_date": "2026-04-28",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -727,7 +759,9 @@
       ]
     },
     {
-      "date": "2026-04-29",
+      "fetch_date": null,
+      "price_date": "2026-04-30",
+      "oi_date": "2026-04-29",
       "contracts": [
         {
           "symbol": "KCK26",
@@ -772,7 +806,9 @@
       ]
     },
     {
-      "date": "2026-04-30",
+      "fetch_date": null,
+      "price_date": "2026-05-01",
+      "oi_date": "2026-04-30",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -813,7 +849,9 @@
       ]
     },
     {
-      "date": "2026-05-01",
+      "fetch_date": null,
+      "price_date": "2026-05-04",
+      "oi_date": "2026-05-01",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -854,7 +892,9 @@
       ]
     },
     {
-      "date": "2026-05-04",
+      "fetch_date": null,
+      "price_date": "2026-05-05",
+      "oi_date": "2026-05-04",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -895,7 +935,9 @@
       ]
     },
     {
-      "date": "2026-05-05",
+      "fetch_date": null,
+      "price_date": "2026-05-06",
+      "oi_date": "2026-05-05",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -936,7 +978,9 @@
       ]
     },
     {
-      "date": "2026-05-06",
+      "fetch_date": null,
+      "price_date": "2026-05-07",
+      "oi_date": "2026-05-06",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -977,7 +1021,9 @@
       ]
     },
     {
-      "date": "2026-05-07",
+      "fetch_date": null,
+      "price_date": "2026-05-08",
+      "oi_date": "2026-05-07",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1018,7 +1064,9 @@
       ]
     },
     {
-      "date": "2026-05-08",
+      "fetch_date": null,
+      "price_date": "2026-05-11",
+      "oi_date": "2026-05-08",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1059,7 +1107,9 @@
       ]
     },
     {
-      "date": "2026-05-11",
+      "fetch_date": null,
+      "price_date": "2026-05-12",
+      "oi_date": "2026-05-11",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1100,7 +1150,9 @@
       ]
     },
     {
-      "date": "2026-05-12",
+      "fetch_date": null,
+      "price_date": "2026-05-13",
+      "oi_date": "2026-05-12",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1141,7 +1193,9 @@
       ]
     },
     {
-      "date": "2026-05-13",
+      "fetch_date": null,
+      "price_date": "2026-05-14",
+      "oi_date": "2026-05-13",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1182,7 +1236,9 @@
       ]
     },
     {
-      "date": "2026-05-14",
+      "fetch_date": null,
+      "price_date": "2026-05-15",
+      "oi_date": "2026-05-14",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1223,7 +1279,9 @@
       ]
     },
     {
-      "date": "2026-05-15",
+      "fetch_date": null,
+      "price_date": "2026-05-18",
+      "oi_date": "2026-05-15",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1264,7 +1322,9 @@
       ]
     },
     {
-      "date": "2026-05-18",
+      "fetch_date": null,
+      "price_date": "2026-05-19",
+      "oi_date": "2026-05-18",
       "contracts": [
         {
           "symbol": "KCN26",
@@ -1316,7 +1376,9 @@
   ],
   "robusta": [
     {
-      "date": "2026-04-06",
+      "fetch_date": null,
+      "price_date": "2026-04-07",
+      "oi_date": "2026-04-06",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1357,7 +1419,9 @@
       ]
     },
     {
-      "date": "2026-04-07",
+      "fetch_date": null,
+      "price_date": "2026-04-08",
+      "oi_date": "2026-04-07",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1398,7 +1462,9 @@
       ]
     },
     {
-      "date": "2026-04-08",
+      "fetch_date": null,
+      "price_date": "2026-04-09",
+      "oi_date": "2026-04-08",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1439,7 +1505,9 @@
       ]
     },
     {
-      "date": "2026-04-09",
+      "fetch_date": null,
+      "price_date": "2026-04-10",
+      "oi_date": "2026-04-09",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1480,7 +1548,9 @@
       ]
     },
     {
-      "date": "2026-04-10",
+      "fetch_date": null,
+      "price_date": "2026-04-13",
+      "oi_date": "2026-04-10",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1521,7 +1591,9 @@
       ]
     },
     {
-      "date": "2026-04-13",
+      "fetch_date": null,
+      "price_date": "2026-04-14",
+      "oi_date": "2026-04-13",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1562,7 +1634,9 @@
       ]
     },
     {
-      "date": "2026-04-14",
+      "fetch_date": null,
+      "price_date": "2026-04-15",
+      "oi_date": "2026-04-14",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1603,7 +1677,9 @@
       ]
     },
     {
-      "date": "2026-04-15",
+      "fetch_date": null,
+      "price_date": "2026-04-16",
+      "oi_date": "2026-04-15",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1644,7 +1720,9 @@
       ]
     },
     {
-      "date": "2026-04-17",
+      "fetch_date": null,
+      "price_date": "2026-04-20",
+      "oi_date": "2026-04-17",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1685,7 +1763,9 @@
       ]
     },
     {
-      "date": "2026-04-20",
+      "fetch_date": null,
+      "price_date": "2026-04-21",
+      "oi_date": "2026-04-20",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1726,7 +1806,9 @@
       ]
     },
     {
-      "date": "2026-04-21",
+      "fetch_date": null,
+      "price_date": "2026-04-22",
+      "oi_date": "2026-04-21",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1767,7 +1849,9 @@
       ]
     },
     {
-      "date": "2026-04-22",
+      "fetch_date": null,
+      "price_date": "2026-04-23",
+      "oi_date": "2026-04-22",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1808,7 +1892,9 @@
       ]
     },
     {
-      "date": "2026-04-23",
+      "fetch_date": null,
+      "price_date": "2026-04-24",
+      "oi_date": "2026-04-23",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1849,7 +1935,9 @@
       ]
     },
     {
-      "date": "2026-04-24",
+      "fetch_date": null,
+      "price_date": "2026-04-27",
+      "oi_date": "2026-04-24",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1890,7 +1978,9 @@
       ]
     },
     {
-      "date": "2026-04-27",
+      "fetch_date": null,
+      "price_date": "2026-04-28",
+      "oi_date": "2026-04-27",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1931,7 +2021,9 @@
       ]
     },
     {
-      "date": "2026-04-28",
+      "fetch_date": null,
+      "price_date": "2026-04-29",
+      "oi_date": "2026-04-28",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -1972,7 +2064,9 @@
       ]
     },
     {
-      "date": "2026-04-29",
+      "fetch_date": null,
+      "price_date": "2026-04-30",
+      "oi_date": "2026-04-29",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -2013,7 +2107,9 @@
       ]
     },
     {
-      "date": "2026-04-30",
+      "fetch_date": null,
+      "price_date": "2026-05-01",
+      "oi_date": "2026-04-30",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -2054,7 +2150,9 @@
       ]
     },
     {
-      "date": "2026-05-01",
+      "fetch_date": null,
+      "price_date": "2026-05-04",
+      "oi_date": "2026-05-01",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -2067,7 +2165,9 @@
       ]
     },
     {
-      "date": "2026-05-04",
+      "fetch_date": null,
+      "price_date": "2026-05-05",
+      "oi_date": "2026-05-04",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -2108,7 +2208,9 @@
       ]
     },
     {
-      "date": "2026-05-05",
+      "fetch_date": null,
+      "price_date": "2026-05-06",
+      "oi_date": "2026-05-05",
       "contracts": [
         {
           "symbol": "RMK26",
@@ -2149,7 +2251,9 @@
       ]
     },
     {
-      "date": "2026-05-06",
+      "fetch_date": null,
+      "price_date": "2026-05-07",
+      "oi_date": "2026-05-06",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2186,7 +2290,9 @@
       ]
     },
     {
-      "date": "2026-05-07",
+      "fetch_date": null,
+      "price_date": "2026-05-08",
+      "oi_date": "2026-05-07",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2223,7 +2329,9 @@
       ]
     },
     {
-      "date": "2026-05-08",
+      "fetch_date": null,
+      "price_date": "2026-05-11",
+      "oi_date": "2026-05-08",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2260,7 +2368,9 @@
       ]
     },
     {
-      "date": "2026-05-11",
+      "fetch_date": null,
+      "price_date": "2026-05-12",
+      "oi_date": "2026-05-11",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2297,7 +2407,9 @@
       ]
     },
     {
-      "date": "2026-05-12",
+      "fetch_date": null,
+      "price_date": "2026-05-13",
+      "oi_date": "2026-05-12",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2334,7 +2446,9 @@
       ]
     },
     {
-      "date": "2026-05-13",
+      "fetch_date": null,
+      "price_date": "2026-05-14",
+      "oi_date": "2026-05-13",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2371,7 +2485,9 @@
       ]
     },
     {
-      "date": "2026-05-14",
+      "fetch_date": null,
+      "price_date": "2026-05-15",
+      "oi_date": "2026-05-14",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2408,7 +2524,9 @@
       ]
     },
     {
-      "date": "2026-05-15",
+      "fetch_date": null,
+      "price_date": "2026-05-18",
+      "oi_date": "2026-05-15",
       "contracts": [
         {
           "symbol": "RMN26",
@@ -2445,7 +2563,9 @@
       ]
     },
     {
-      "date": "2026-05-18",
+      "fetch_date": null,
+      "price_date": "2026-05-19",
+      "oi_date": "2026-05-18",
       "contracts": [
         {
           "symbol": "RMN26",

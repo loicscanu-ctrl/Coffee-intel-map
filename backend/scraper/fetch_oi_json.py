@@ -25,12 +25,21 @@ ROOT = Path(__file__).resolve().parents[2]   # …/Coffee-intel-map
 DATA_FILE = ROOT / "data" / "oi_history.json"
 ARCHIVE_FILE = ROOT / "data" / "contract_prices_archive.json"
 MAX_DAYS = 30
+# Permanent archive retention: 5 years of trading days. The Industry Pulse
+# chart has a 5Y window, so we keep at least that much per-contract history
+# to source the price line from. ~261 trading days/yr × 5 + buffer.
+ARCHIVE_MAX_DAYS = 1320
 
 BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
 
 
 def _prev_biz_day(d: date, n: int = 2) -> str:
-    """Return d minus n business days as YYYY-MM-DD (ICE OI has a 2-day lag)."""
+    """Return d minus n business days as YYYY-MM-DD.
+
+    The 2 am fetch sees, per Barchart's reporting lag:
+      n=1 → the PRICE date (previous business day's settlement)
+      n=2 → the OI date   (ICE open-interest is published a further day behind)
+    """
     count = 0
     while count < n:
         d -= timedelta(days=1)
@@ -150,10 +159,14 @@ def _load_archive() -> dict:
     return {
         "_meta": {
             "description": (
-                "Permanent per-contract daily price+OI archive. NEVER trimmed. "
-                "Accumulates Barchart chain snapshots so we build true per-contract "
-                "history over time. oi_history.json is the 30-day rolling view; this "
-                "is the full record. Stored ascending by date."
+                "Permanent per-contract daily price+OI archive. Each entry carries "
+                "TWO dates because the 2 am fetch sees them on different lags: "
+                "`price_date` (N-1 biz day) is when each contract's last_price "
+                "settled; `oi_date` (N-2 biz days) is when the open-interest was "
+                "reported. `last_price` belongs to price_date, `oi` belongs to "
+                "oi_date. Sorted ascending by price_date. Retains "
+                f"{ARCHIVE_MAX_DAYS} trading days (~5y) — the Industry Pulse chart "
+                "sources its price line from here."
             ),
             "source": "Barchart core-api/v1/quotes/get via fetch_oi_json.py",
             "started": date.today().isoformat(),
@@ -164,14 +177,17 @@ def _load_archive() -> dict:
 
 
 def _append_archive(archive: dict, market: str, snapshot: dict) -> None:
-    """Append snapshot to the unbounded archive (ascending by date), dedup
-    on date. No trimming — this is the permanent record."""
+    """Append a dual-dated snapshot to the archive (ascending by price_date),
+    dedup on price_date, then trim to ARCHIVE_MAX_DAYS most-recent entries."""
     entries: list = archive.setdefault(market, [])
-    if any(e.get("date") == snapshot["date"] for e in entries):
-        print(f"[fetch_oi_json] archive: {market} {snapshot['date']} already present, skipping.")
+    if any(e.get("price_date") == snapshot["price_date"] for e in entries):
+        print(f"[fetch_oi_json] archive: {market} price_date {snapshot['price_date']} already present, skipping.")
         return
     entries.append(snapshot)
-    entries.sort(key=lambda e: e.get("date", ""))
+    entries.sort(key=lambda e: e.get("price_date", ""))
+    # Trim oldest beyond the 5y retention window.
+    if len(entries) > ARCHIVE_MAX_DAYS:
+        archive[market] = entries[-ARCHIVE_MAX_DAYS:]
 
 
 def _save_archive(archive: dict) -> None:
@@ -187,8 +203,10 @@ async def main() -> None:
     kc = _parse(chains.get("kc"))
     rm = _parse(chains.get("rm"))
 
-    trade_date = _prev_biz_day(date.today(), n=2)
-    print(f"[fetch_oi_json] Trade date (T-2): {trade_date}")
+    today = date.today()
+    oi_date    = _prev_biz_day(today, n=2)   # OI lag: N-2 biz days
+    price_date = _prev_biz_day(today, n=1)   # price: N-1 biz day
+    print(f"[fetch_oi_json] fetch={today.isoformat()}  price_date(N-1)={price_date}  oi_date(N-2)={oi_date}")
     print(f"[fetch_oi_json] Arabica contracts: {[c['symbol'] for c in kc]}")
     print(f"[fetch_oi_json] Robusta contracts:  {[c['symbol'] for c in rm]}")
 
@@ -199,20 +217,27 @@ async def main() -> None:
     history = _load_history()
     archive = _load_archive()
 
+    # oi_history.json: stamped at oi_date (N-2) — feeds the OI 7-day table,
+    # which only reads `oi`. Structure unchanged.
+    # archive: dual-dated — last_price belongs to price_date (N-1), oi to oi_date.
     if kc:
-        snap = {"date": trade_date, "contracts": kc}
-        _prepend(history, "arabica", snap)
-        _append_archive(archive, "arabica", snap)
+        _prepend(history, "arabica", {"date": oi_date, "contracts": kc})
+        _append_archive(archive, "arabica", {
+            "fetch_date": today.isoformat(), "price_date": price_date,
+            "oi_date": oi_date, "contracts": kc,
+        })
     if rm:
-        snap = {"date": trade_date, "contracts": rm}
-        _prepend(history, "robusta", snap)
-        _append_archive(archive, "robusta", snap)
+        _prepend(history, "robusta", {"date": oi_date, "contracts": rm})
+        _append_archive(archive, "robusta", {
+            "fetch_date": today.isoformat(), "price_date": price_date,
+            "oi_date": oi_date, "contracts": rm,
+        })
 
     _save_history(history)
     _save_archive(archive)
     arch_counts = f"arabica={len(archive.get('arabica', []))} robusta={len(archive.get('robusta', []))}"
-    print(f"[fetch_oi_json] Saved 30-day window to {DATA_FILE}")
-    print(f"[fetch_oi_json] Appended to permanent archive {ARCHIVE_FILE} ({arch_counts} days total)")
+    print(f"[fetch_oi_json] Saved 30-day OI window to {DATA_FILE} (date={oi_date})")
+    print(f"[fetch_oi_json] Appended to permanent archive {ARCHIVE_FILE} ({arch_counts} days, price_date={price_date})")
 
 
 if __name__ == "__main__":
