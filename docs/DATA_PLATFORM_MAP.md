@@ -175,6 +175,112 @@ flowchart TD
 | | `farmer_selling_brazil.json` | `FarmerSellingPanel` | **Supply · Farmer Selling** |
 | | `*_supply.json` (colombia/vietnam/…) | per-country tabs | **Supply · country pages**; **Map** |
 
+### 4c. Workflow → visual map (diagram)
+
+```mermaid
+flowchart LR
+    %% ---------------- WORKFLOWS ----------------
+    W13[/"1.3 Daily OI<br/>02:00 M-F"/]
+    W23[/"2.3 COT + rebuild<br/>Fri 20:00"/]
+    W19[/"1.9 Quant CCI<br/>21:30 M-F"/]
+    WPOLL[/"Acaphe poll<br/>15m"/]
+    W11[/"1.1 News"/]
+    W12[/"1.2 Freight"/]
+    W17[/"1.7 Cecafe daily"/]
+    W22[/"2.2 Commodity prices"/]
+    W3B[/"1.3b Slow-data<br/>ECF·PSD·AJCA"/]
+    W31[/"3.1 Kaffeesteuer"/]
+    W32[/"3.2 Cecafe export"/]
+    W33[/"3.3 CONAB"/]
+    W41[/"4.1 Earnings"/]
+    W16[/"1.6 Morning brief"/]
+
+    ARC[("contract_prices_archive.json<br/>★ single coffee OI+price")]
+
+    %% ---------------- COT TAB ----------------
+    subgraph COT["COT tab"]
+        c_ip{{Industry Pulse<br/>price + PMPU + switch dots}}
+        c_sig{{Signals + gauges + heatmap}}
+        c_flow{{Global Flow / Dry Powder / Cycle / Report}}
+        c_oifnd{{OI Evolution to FND}}
+    end
+
+    %% ---------------- FUTURES TAB ----------------
+    subgraph FUT["Futures tab"]
+        f_quote{{Daily Live Quotes}}
+        f_oi{{OI 7-day table}}
+        f_oifnd{{OI Evolution to FND}}
+    end
+
+    %% ---------------- MACRO TAB ----------------
+    subgraph MAC["Macro tab"]
+        m_cci{{Coffee Currency Index}}
+        m_fx{{FX Pair Time-Series}}
+        m_xc{{Cross-Commodity MM}}
+        m_fr{{Freight Context}}
+        m_cpi{{Retail CPI}}
+        m_fert{{Fertilizer Inputs / Origin Prices}}
+    end
+
+    %% ---------------- DEMAND TAB ----------------
+    subgraph DEM["Demand tab"]
+        d_stk{{Stocks}}
+        d_mix{{Roasting Mix}}
+        d_earn{{Roaster Earnings}}
+        d_tax{{Kaffeesteuer}}
+    end
+
+    %% ---------------- SUPPLY TAB ----------------
+    subgraph SUP["Supply tab"]
+        s_br{{Brazil Daily Registration}}
+        s_farm{{Farmer Economics / Selling}}
+        s_fert{{Fertilizers}}
+        s_ctry{{Country pages}}
+    end
+
+    %% ---------------- MAP ----------------
+    subgraph MAP["Map"]
+        mp_px{{Price labels + ticker}}
+        mp_exp{{Brazil exports}}
+        mp_news{{News / country intel}}
+    end
+
+    TG{{Telegram brief}}
+
+    %% ---------------- EDGES ----------------
+    W13 --> ARC
+    ARC --> f_oi
+    ARC --> c_oifnd
+    ARC --> f_oifnd
+    ARC -->|max-OI rebuild via 2.3| c_ip
+
+    W23 --> c_ip
+    W23 --> c_sig
+    W23 --> c_flow
+    W23 --> m_xc
+    W23 --> TG
+
+    W19 --> m_cci
+    W19 --> m_fx
+    WPOLL --> f_quote
+    W12 --> m_fr
+    W22 --> mp_px
+    W3B --> d_stk
+    W31 --> d_tax
+    W41 --> d_earn
+    W32 --> mp_exp
+    W33 --> m_fert
+    W33 --> s_farm
+    W17 --> s_br
+    W11 --> mp_news
+    W16 --> TG
+
+    %% standalone / manual content
+    W3B -.-> d_mix
+    W33 -.-> s_fert
+    W11 -.-> s_ctry
+```
+
 ### 4b. By dashboard tab (reverse view)
 
 - **COT** (`/cot`): Industry Pulse, Signals, Gauges, Heatmap, Global Flow, Dry Powder, Cycle, Report ← `cot.json` + `signals.json`; OI 7-day + OI→FND ← archive.
