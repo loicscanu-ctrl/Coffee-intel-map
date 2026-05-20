@@ -1,2 +1,2 @@
 Touch to DRY-RUN workflow 0.4 (rebuild cot prices from archive). Telegram summary, no writes.
-Last: never
+Last: 2026-05-20T13:10Z claude (review historical max-OI rebuild diff)
