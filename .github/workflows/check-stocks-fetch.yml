@@ -157,7 +157,7 @@ jobs:
           git commit -m "ci(diagnostic): stocks-fetch result for ${GITHUB_SHA::7}"
           for i in 1 2 3; do
             git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git pull --rebase --strategy-option=theirs origin "${GITHUB_REF_NAME}" || true
             sleep $((i * 3))
           done
           echo "::warning::failed to push diagnostic report after 3 attempts"
