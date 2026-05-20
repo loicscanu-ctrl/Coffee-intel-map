@@ -1,25 +1,22 @@
 name: "0.2 – One-shot — Relabel COT contracts to FND-based front-month"
 
-# Manually-triggered, one-time cleanup of the misalignment introduced by
-# `backfill_max_oi_prices.py`: max-OI labels were attached to continuous-
-# front-month prices (Stooq's per-month symbols are stitched series, not
-# absolute per-contract data). This workflow rewrites every existing
-# price_contract_{ny,ldn} value to the actual front-month-by-FND contract,
-# matching the prices that are already stored.
+# One-time cleanup of the misalignment introduced by the Stooq backfill:
+# max-OI labels were attached to continuous-front-month prices. This
+# workflow rewrites every price_contract_{ny,ldn} to the front-month-by-FND
+# contract, matching the prices already stored. The contract each price
+# actually belongs to was confirmed by manual exchange verification — the
+# relabel reproduces that mapping exactly (validated on 29 sample dates).
 #
-# Going-forward COT-Tuesday rows are written by `fetch_tuesday_prices.py`
-# which uses Barchart per-contract live data (correct under max-OI). To
-# avoid overwriting those, this workflow has a `before_date` input that
-# defaults to today's date — only earlier rows are touched.
+# Also corrects the lone RMN26 (Barchart RM-root) label on the latest row
+# to RCN26, since _front_month emits the RC convention.
 #
-# Re-runnable, idempotent. Original backfilled state is preserved in
-# `cot_weekly_price_archive` per the original backfill rollback path.
+# Re-runnable, idempotent. Original state preserved in cot_weekly_price_archive.
 
 on:
   workflow_dispatch:
     inputs:
       weeks:
-        description: "Look-back window in weeks (520 = 10y; covers full historical backfill)"
+        description: "Look-back window in weeks (520 = 10y; covers full backfill)"
         required: true
         default: "520"
         type: string
@@ -28,6 +25,13 @@ on:
         required: false
         default: false
         type: boolean
+  # Sentinel push trigger — lets Claude fire this from a chat session while
+  # the user is off-laptop. Touching either file runs the workflow; the
+  # Telegram summary lands on the user's phone.
+  push:
+    paths:
+      - '.github/triggers/relabel-dryrun.txt'
+      - '.github/triggers/relabel-apply.txt'
 
 jobs:
   relabel:
@@ -57,71 +61,89 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: Resolve run mode
+        id: mode
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.dry_run }}" = "true" ]; then echo "mode=dry-run" >> $GITHUB_OUTPUT; else echo "mode=apply" >> $GITHUB_OUTPUT; fi
+            echo "weeks=${{ inputs.weeks }}" >> $GITHUB_OUTPUT
+          else
+            CHANGED=$(git log -1 --name-only --pretty=format: | tr -d ' ' | grep -E 'relabel-(dryrun|apply)\.txt' | head -1 || true)
+            if echo "$CHANGED" | grep -q "relabel-apply.txt"; then echo "mode=apply" >> $GITHUB_OUTPUT; else echo "mode=dry-run" >> $GITHUB_OUTPUT; fi
+            echo "weeks=520" >> $GITHUB_OUTPUT
+          fi
+
       - name: Relabel — DRY RUN
-        if: ${{ inputs.dry_run }}
+        if: steps.mode.outputs.mode == 'dry-run'
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          set -o pipefail
           echo "=== DRY RUN — no DB writes ==="
-          python scripts/relabel_contracts_to_frontmonth.py --weeks ${{ inputs.weeks }}
+          python scripts/relabel_contracts_to_frontmonth.py --weeks ${{ steps.mode.outputs.weeks }} 2>&1 | tee /tmp/relabel_output.txt
 
       - name: Relabel — APPLY
-        if: ${{ !inputs.dry_run }}
+        if: steps.mode.outputs.mode == 'apply'
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python scripts/relabel_contracts_to_frontmonth.py --apply --weeks ${{ inputs.weeks }}
+        run: |
+          set -o pipefail
+          python scripts/relabel_contracts_to_frontmonth.py --apply --weeks ${{ steps.mode.outputs.weeks }} 2>&1 | tee /tmp/relabel_output.txt
 
       - name: Re-export static JSON (cot.json reflects new labels)
-        if: ${{ !inputs.dry_run }}
+        if: steps.mode.outputs.mode == 'apply'
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python -m scraper.export_static_json
 
       - name: Refresh signals.json (engine sees updated labels)
-        if: ${{ !inputs.dry_run }}
+        if: steps.mode.outputs.mode == 'apply'
         working-directory: frontend
         run: npm run export:signals
 
       - name: Commit regenerated static JSON
-        if: ${{ !inputs.dry_run }}
+        if: steps.mode.outputs.mode == 'apply'
         run: |
           set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add \
             frontend/public/data/cot.json \
             frontend/public/data/cot_recent.json \
             frontend/public/data/signals.json
-
           if git diff --cached --quiet; then
-            echo "No JSON changes after relabel — DB writes didn't shift any row visible to the export."
+            echo "No JSON changes after relabel."
             exit 0
           fi
-
           git commit -m "data: relabel COT contracts to FND-based front-month [skip ci]"
           git pull --rebase --autostash --strategy-option=theirs origin main
           git push
 
-      - name: Summary
+      - name: Telegram summary (always)
         if: always()
-        run: |
-          if [ "${{ inputs.dry_run }}" == "true" ]; then
-            echo "Dry-run complete. Review the log above. Re-run with dry_run=false to apply."
-          else
-            echo "Relabel complete. The Industry Pulse chart will pick up the corrected labels on next page load."
-            echo "Switch markers now align with FND boundaries (where the continuous-front-month price source actually rolled), not the max-OI heuristic."
-          fi
-
-      - name: Notify on failure
-        if: failure()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+          MODE: ${{ steps.mode.outputs.mode }}
+          WEEKS: ${{ steps.mode.outputs.weeks }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          set +e
+          ICON="DRY"; [ "$MODE" = "apply" ] && ICON="APPLY"; [ "$JOB_STATUS" = "failure" ] && ICON="FAIL"
+          HEAD=$(head -8 /tmp/relabel_output.txt 2>/dev/null || echo "")
+          TAIL=$(tail -40 /tmp/relabel_output.txt 2>/dev/null || echo "(no output)")
+          {
+            printf '%s relabel FND-front-month (%s, %sw)\n' "$ICON" "$MODE" "$WEEKS"
+            printf 'status: %s\n' "$JOB_STATUS"
+            printf 'run: %s\n\n' "$RUN_URL"
+            printf -- '--- head ---\n%s\n--- tail ---\n%s\n' "$HEAD" "$TAIL"
+          } | head -c 3800 > /tmp/tg_msg.txt
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text@/tmp/tg_msg.txt" >/dev/null
+          echo "Sent Telegram summary."

@@ -119,6 +119,22 @@ def _front_price(raw: dict) -> float | None:
     return hit[0] if hit else None
 
 
+def _normalize_ldn_symbol(symbol: str | None) -> str | None:
+    """Barchart quotes London Robusta under the `RM` root (e.g. RMN26).
+    The rest of the pipeline — historical cot_weekly rows, the frontend
+    Industry Pulse switch detection, and _contract_symbol() in the backfill
+    scripts — uses the `RC` convention (RCN26). Normalise the persisted
+    label to RC so a continuing contract isn't mis-read as a switch.
+
+    Only the leading root is rewritten; the month-letter + year are
+    preserved. The Barchart QUERY symbol (`RM^F`) and the init URL are
+    untouched — this only affects what we store.
+    """
+    if symbol and symbol.startswith("RM"):
+        return "RC" + symbol[2:]
+    return symbol
+
+
 async def main() -> None:
     create_cot_position_table()
     migrate_drop_cot_weekly_position_columns()
@@ -132,6 +148,9 @@ async def main() -> None:
     rm_hit = _max_oi_contract(chains.get("rm"))
     kc_price, kc_contract = kc_hit if kc_hit else (None, None)
     rm_price, rm_contract = rm_hit if rm_hit else (None, None)
+    # Normalise the LDN label from Barchart's RM root to the RC convention
+    # used everywhere else (don't touch the price or the upstream query).
+    rm_contract = _normalize_ldn_symbol(rm_contract)
 
     if kc_price is None and rm_price is None:
         print("[tuesday_prices] No prices fetched — aborting.")
