@@ -152,48 +152,73 @@ def _prepend(history: dict, market: str, snapshot: dict) -> None:
     history[market] = entries[:MAX_DAYS]
 
 
+def _norm_symbol(sym: str) -> tuple[str, str] | None:
+    """KCN26 → ('arabica','KCN26'); RMN26 → ('robusta','RCN26')."""
+    s = (sym or "").strip().upper()
+    if s.startswith("KC"):
+        return "arabica", s
+    if s.startswith("RM"):
+        return "robusta", "RC" + s[2:]
+    if s.startswith("RC"):
+        return "robusta", s
+    return None
+
+
 def _load_archive() -> dict:
+    """Date-keyed per-contract OI+price archive:
+        {market: {YYYY-MM-DD: {SYMBOL: {oi, price}}}}
+    OI is written under oi_date (N-2), price under price_date (N-1); each
+    trading date accumulates both over successive fetches."""
     if ARCHIVE_FILE.exists():
         with open(ARCHIVE_FILE, encoding="utf-8") as f:
             return json.load(f)
     return {
         "_meta": {
             "description": (
-                "Permanent per-contract daily price+OI archive. Each entry carries "
-                "TWO dates because the 2 am fetch sees them on different lags: "
-                "`price_date` (N-1 biz day) is when each contract's last_price "
-                "settled; `oi_date` (N-2 biz days) is when the open-interest was "
-                "reported. `last_price` belongs to price_date, `oi` belongs to "
-                "oi_date. Sorted ascending by price_date. Retains "
-                f"{ARCHIVE_MAX_DAYS} trading days (~5y) — the Industry Pulse chart "
-                "sources its price line from here."
+                "Authoritative per-contract daily OI + price history, date-keyed. "
+                "Each date → {contract: {oi, price}}. OI stamped at oi_date (N-2), "
+                "price at price_date (N-1). RM robusta symbols stored as RC. "
+                "Industry Pulse sources its price line from here."
             ),
-            "source": "Barchart core-api/v1/quotes/get via fetch_oi_json.py",
             "started": date.today().isoformat(),
+            "sources": [],
         },
-        "arabica": [],
-        "robusta": [],
+        "arabica": {},
+        "robusta": {},
     }
 
 
-def _append_archive(archive: dict, market: str, snapshot: dict) -> None:
-    """Append a dual-dated snapshot to the archive (ascending by price_date),
-    dedup on price_date, then trim to ARCHIVE_MAX_DAYS most-recent entries."""
-    entries: list = archive.setdefault(market, [])
-    if any(e.get("price_date") == snapshot["price_date"] for e in entries):
-        print(f"[fetch_oi_json] archive: {market} price_date {snapshot['price_date']} already present, skipping.")
-        return
-    entries.append(snapshot)
-    entries.sort(key=lambda e: e.get("price_date", ""))
-    # Trim oldest beyond the 5y retention window.
-    if len(entries) > ARCHIVE_MAX_DAYS:
-        archive[market] = entries[-ARCHIVE_MAX_DAYS:]
+def _write_cells(archive: dict, contracts: list[dict], oi_date: str, price_date: str) -> None:
+    """Write each contract's OI under oi_date and price under price_date,
+    normalizing RM→RC. Merges into existing cells without clobbering the
+    other field."""
+    for c in contracts:
+        ms = _norm_symbol(c.get("symbol", ""))
+        if not ms:
+            continue
+        market, sym = ms
+        if c.get("oi") is not None:
+            archive.setdefault(market, {}).setdefault(oi_date, {}).setdefault(sym, {})["oi"] = c["oi"]
+        if c.get("last_price") is not None:
+            archive.setdefault(market, {}).setdefault(price_date, {}).setdefault(sym, {})["price"] = c["last_price"]
+
+
+def _trim_archive(archive: dict) -> None:
+    """Drop date keys older than the 5y retention window."""
+    from datetime import datetime
+    cutoff_ord = date.today().toordinal() - ARCHIVE_MAX_DAYS * 7 // 5  # ~calendar span for N trading days
+    for market in ("arabica", "robusta"):
+        days = archive.get(market, {})
+        stale = [d for d in days if datetime.strptime(d, "%Y-%m-%d").date().toordinal() < cutoff_ord]
+        for d in stale:
+            del days[d]
 
 
 def _save_archive(archive: dict) -> None:
     ARCHIVE_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(ARCHIVE_FILE, "w", encoding="utf-8") as f:
-        json.dump(archive, f, indent=2)
+        # Compact — this file grows to ~1MB over 5y; no need for indent.
+        json.dump(archive, f, separators=(",", ":"))
 
 
 async def main() -> None:
@@ -219,25 +244,21 @@ async def main() -> None:
 
     # oi_history.json: stamped at oi_date (N-2) — feeds the OI 7-day table,
     # which only reads `oi`. Structure unchanged.
-    # archive: dual-dated — last_price belongs to price_date (N-1), oi to oi_date.
     if kc:
         _prepend(history, "arabica", {"date": oi_date, "contracts": kc})
-        _append_archive(archive, "arabica", {
-            "fetch_date": today.isoformat(), "price_date": price_date,
-            "oi_date": oi_date, "contracts": kc,
-        })
     if rm:
         _prepend(history, "robusta", {"date": oi_date, "contracts": rm})
-        _append_archive(archive, "robusta", {
-            "fetch_date": today.isoformat(), "price_date": price_date,
-            "oi_date": oi_date, "contracts": rm,
-        })
+
+    # Date-keyed archive: OI → oi_date (N-2), price → price_date (N-1).
+    _write_cells(archive, kc, oi_date, price_date)
+    _write_cells(archive, rm, oi_date, price_date)
+    _trim_archive(archive)
 
     _save_history(history)
     _save_archive(archive)
-    arch_counts = f"arabica={len(archive.get('arabica', []))} robusta={len(archive.get('robusta', []))}"
-    print(f"[fetch_oi_json] Saved 30-day OI window to {DATA_FILE} (date={oi_date})")
-    print(f"[fetch_oi_json] Appended to permanent archive {ARCHIVE_FILE} ({arch_counts} days, price_date={price_date})")
+    arch_counts = f"arabica={len(archive.get('arabica', {}))} robusta={len(archive.get('robusta', {}))} dates"
+    print(f"[fetch_oi_json] Saved 30-day OI window to {DATA_FILE} (oi_date={oi_date})")
+    print(f"[fetch_oi_json] Updated archive {ARCHIVE_FILE} ({arch_counts}); oi→{oi_date} price→{price_date}")
 
 
 if __name__ == "__main__":
