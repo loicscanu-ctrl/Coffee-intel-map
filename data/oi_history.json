@@ -1,6 +1,56 @@
 {
   "arabica": [
     {
+      "date": "2026-05-18",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 78136,
+          "last_price": 270.15
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 49218,
+          "last_price": 262.15
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 34863,
+          "last_price": 254.65
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13596,
+          "last_price": 252.35
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4307,
+          "last_price": 251.65
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3276,
+          "last_price": 251.4
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1918,
+          "last_price": 250.45
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2443,
+          "last_price": 249.2
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 561,
+          "last_price": 248.7
+        }
+      ]
+    },
+    {
       "date": "2026-05-15",
       "contracts": [
         {
@@ -1256,54 +1306,54 @@
           "oi": 415
         }
       ]
-    },
-    {
-      "date": "2026-04-03",
-      "contracts": [
-        {
-          "symbol": "KCK26",
-          "oi": 55365
-        },
-        {
-          "symbol": "KCN26",
-          "oi": 49591
-        },
-        {
-          "symbol": "KCU26",
-          "oi": 30818
-        },
-        {
-          "symbol": "KCZ26",
-          "oi": 24366
-        },
-        {
-          "symbol": "KCH27",
-          "oi": 8512
-        },
-        {
-          "symbol": "KCK27",
-          "oi": 2233
-        },
-        {
-          "symbol": "KCN27",
-          "oi": 1031
-        },
-        {
-          "symbol": "KCU27",
-          "oi": 1668
-        },
-        {
-          "symbol": "KCZ27",
-          "oi": 1585
-        },
-        {
-          "symbol": "KCH28",
-          "oi": 415
-        }
-      ]
     }
   ],
   "robusta": [
+    {
+      "date": "2026-05-18",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 49446,
+          "last_price": 3345.0
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 20473,
+          "last_price": 3208.0
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 10757,
+          "last_price": 3136.0
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5875,
+          "last_price": 3074.0
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2002,
+          "last_price": 3043.0
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 966,
+          "last_price": 3021.0
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 438,
+          "last_price": 3003.0
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 328,
+          "last_price": 2986.0
+        }
+      ]
+    },
     {
       "date": "2026-05-15",
       "contracts": [
@@ -2422,47 +2472,6 @@
         {
           "symbol": "RMK27",
           "oi": 505
-        },
-        {
-          "symbol": "RMN27",
-          "oi": 286
-        },
-        {
-          "symbol": "RMU27",
-          "oi": 206
-        }
-      ]
-    },
-    {
-      "date": "2026-04-02",
-      "contracts": [
-        {
-          "symbol": "RMK26",
-          "oi": 33294
-        },
-        {
-          "symbol": "RMN26",
-          "oi": 37021
-        },
-        {
-          "symbol": "RMU26",
-          "oi": 9760
-        },
-        {
-          "symbol": "RMX26",
-          "oi": 4654
-        },
-        {
-          "symbol": "RMF27",
-          "oi": 3988
-        },
-        {
-          "symbol": "RMH27",
-          "oi": 1335
-        },
-        {
-          "symbol": "RMK27",
-          "oi": 496
         },
         {
           "symbol": "RMN27",
