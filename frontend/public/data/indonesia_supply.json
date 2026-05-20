@@ -1,6 +1,6 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-20T13:18:25.376107Z",
+  "scraped_at": "2026-05-20T13:23:03.641812Z",
   "exports": null,
   "weather": {
     "scraped_at": "2026-05-20T13:18:01.567023Z",
@@ -428,7 +428,7 @@
           "H",
           "H",
           "H",
-          "M",
+          "H",
           "M",
           "H",
           "H",
@@ -2962,35 +2962,35 @@
           {
             "date": "2026-05-20",
             "precip_prob": 100,
-            "precip_mm": 5.3,
+            "precip_mm": 6.0,
             "soil_moisture": 0.195,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-21",
             "precip_prob": 61,
-            "precip_mm": 0.3,
+            "precip_mm": 0.7,
             "soil_moisture": 0.191,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-22",
             "precip_prob": 100,
-            "precip_mm": 9.2,
+            "precip_mm": 5.8,
             "soil_moisture": 0.189,
-            "drought_risk": "M"
+            "drought_risk": "H"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 100,
-            "precip_mm": 12.9,
+            "precip_mm": 16.4,
             "soil_moisture": 0.186,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 88,
-            "precip_mm": 2.1,
+            "precip_mm": 1.5,
             "soil_moisture": 0.183,
             "drought_risk": "H"
           },
@@ -3004,7 +3004,7 @@
           {
             "date": "2026-05-26",
             "precip_prob": 86,
-            "precip_mm": 0.6,
+            "precip_mm": 0.3,
             "soil_moisture": 0.18,
             "drought_risk": "H"
           },
