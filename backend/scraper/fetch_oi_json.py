@@ -16,8 +16,12 @@ Run standalone:
 
 import asyncio
 import json
+import os
 import sys
 from datetime import date, timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import symbols  # noqa: E402  (sibling module: KC/RM/RC conventions)
 from pathlib import Path
 
 # Resolve project root (works both from repo root and from backend/)
@@ -128,40 +132,43 @@ def _parse(raw: dict, min_oi: int = 100) -> list[dict]:
     return contracts
 
 
-def _load_history() -> dict:
-    if DATA_FILE.exists():
-        with open(DATA_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return {"arabica": [], "robusta": []}
-
-
 def _save_history(history: dict) -> None:
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
 
-def _prepend(history: dict, market: str, snapshot: dict) -> None:
-    entries: list = history.setdefault(market, [])
-    # Skip if date already recorded
-    if entries and entries[0]["date"] == snapshot["date"]:
-        print(f"[fetch_oi_json] {market} {snapshot['date']} already recorded, skipping.")
-        return
-    entries.insert(0, snapshot)
-    # Keep only MAX_DAYS most recent
-    history[market] = entries[:MAX_DAYS]
+def _derive_oi_history_from_archive(archive: dict) -> dict:
+    """Build the 30-day rolling oi_history.json view FROM the archive — the
+    single OI source of truth. Returns {market: [{date, contracts:[{symbol,
+    oi, last_price?}]}]} newest-first, symbols in DISPLAY form (RM for
+    robusta) to match the futures-page OI table. Only dates that actually
+    carry OI are included (price-only N-1 rows are excluded)."""
+    out: dict = {}
+    for market in ("arabica", "robusta"):
+        dated = []
+        for d, cells in archive.get(market, {}).items():
+            contracts = []
+            for s, v in cells.items():
+                if v.get("oi") is None:
+                    continue
+                entry = {"symbol": symbols.to_display(s), "oi": v["oi"]}
+                if v.get("price") is not None:
+                    entry["last_price"] = v["price"]
+                contracts.append(entry)
+            if contracts:
+                dated.append((d, contracts))
+        dated.sort(key=lambda x: x[0], reverse=True)
+        out[market] = [{"date": d, "contracts": cs} for d, cs in dated[:MAX_DAYS]]
+    return out
 
 
 def _norm_symbol(sym: str) -> tuple[str, str] | None:
-    """KCN26 → ('arabica','KCN26'); RMN26 → ('robusta','RCN26')."""
-    s = (sym or "").strip().upper()
-    if s.startswith("KC"):
-        return "arabica", s
-    if s.startswith("RM"):
-        return "robusta", "RC" + s[2:]
-    if s.startswith("RC"):
-        return "robusta", s
-    return None
+    """('RMN26') → ('robusta','RCN26'); ('KCN26') → ('arabica','KCN26')."""
+    market = symbols.market_of(sym)
+    if not market:
+        return None
+    return market, symbols.to_canonical(sym)
 
 
 def _load_archive() -> dict:
@@ -239,20 +246,16 @@ async def main() -> None:
         print("[fetch_oi_json] No data fetched — aborting.")
         sys.exit(1)
 
-    history = _load_history()
     archive = _load_archive()
 
-    # oi_history.json: stamped at oi_date (N-2) — feeds the OI 7-day table,
-    # which only reads `oi`. Structure unchanged.
-    if kc:
-        _prepend(history, "arabica", {"date": oi_date, "contracts": kc})
-    if rm:
-        _prepend(history, "robusta", {"date": oi_date, "contracts": rm})
-
-    # Date-keyed archive: OI → oi_date (N-2), price → price_date (N-1).
+    # Single OI source: write the fetch into the date-keyed archive first
+    # (OI → oi_date N-2, price → price_date N-1), then DERIVE the 30-day
+    # oi_history.json view from it. No independently-maintained OI file.
     _write_cells(archive, kc, oi_date, price_date)
     _write_cells(archive, rm, oi_date, price_date)
     _trim_archive(archive)
+
+    history = _derive_oi_history_from_archive(archive)
 
     _save_history(history)
     _save_archive(archive)

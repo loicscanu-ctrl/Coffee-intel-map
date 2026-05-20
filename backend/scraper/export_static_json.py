@@ -40,6 +40,7 @@ from models import (
     PhysicalPrice,
     WeatherSnapshot,
 )
+from scraper import symbols as _sym
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
     safe_write_json,
@@ -270,7 +271,7 @@ def export_oi_fnd_chart(db) -> None:
                 oi = cell.get("oi")
                 if oi is None:
                     continue
-                chart_sym = ("RM" + sym[2:]) if (mkt_key == "robusta" and sym.startswith("RC")) else sym
+                chart_sym = _sym.to_display(sym)  # RC→RM for the FND chart convention
                 fnd = _calc_fnd(chart_sym)
                 if not fnd:
                     continue

@@ -45,6 +45,17 @@ jobs:
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
+      # Set cot_weekly prices + contract labels from the per-contract archive
+      # (true max-OI). Replaces the standalone Tuesday price fetch (old 2.1):
+      # by Friday the daily OI snapshot (1.3) has filled this week's Tuesday
+      # OI + price into the archive, so the rebuild sets the latest COT-Tuesday
+      # price here. Idempotent; only changed rows are written.
+      - name: Rebuild COT prices from archive (true max-OI)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/rebuild_cot_prices_from_archive.py --apply
+
       - name: Notify on failure
         if: failure()
         env:
