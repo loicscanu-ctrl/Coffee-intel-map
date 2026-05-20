@@ -262,7 +262,13 @@ def export_oi_fnd_chart(db) -> None:
         #    Archive stores robusta as RC; this chart's pipeline (and frontend
         #    STATIC_SERIES) uses RM, so convert RC→RM here for merge consistency.
         archive_market = contract_archive.get(mkt_key, {})
+        # Only the last ~120 calendar days can contain a -45..0 trading-day
+        # point for a still-current contract, so skip the rest of the 5-year
+        # archive up front (avoids a full ~2,700-date scan every export).
+        archive_cutoff = (today - timedelta(days=120)).isoformat()
         for snap_date_str, contracts in archive_market.items():
+            if snap_date_str < archive_cutoff:
+                continue
             try:
                 snap_date = date.fromisoformat(snap_date_str)
             except Exception:
@@ -341,9 +347,17 @@ def export_cot(db) -> None:
         )
     result = sorted(merged.values(), key=lambda x: x["date"])
 
+    # Publish only the window the dashboard renders. The COT signal engine uses
+    # 52-week percentiles (+8-week historical look-back) and the Industry Pulse
+    # has a 5Y (260-week) view, so 312 weeks (~6y) amply covers every visual
+    # with margin. Full history stays in the DB and is served by /api/cot for
+    # anyone who needs it. Trimming drops cot.json from ~3 MB (980 wk) to ~1 MB.
+    COT_PUBLISH_WEEKS = 312
+    published = result[-COT_PUBLISH_WEEKS:]
+
     path = OUT_DIR / "cot.json"
-    written = safe_write_json(path, result, validate_cot)
-    print(f"  cot.json → written:{written} {len(result)} weeks")
+    written = safe_write_json(path, published, validate_cot)
+    print(f"  cot.json → written:{written} {len(published)} weeks (of {len(result)} total)")
 
     recent = result[-12:]
     path_r = OUT_DIR / "cot_recent.json"
@@ -1757,7 +1771,10 @@ def main():
     try:
         export_futures_chain(db)
         export_oi_fnd_chart(db)
-        export_oi_history()
+        # oi_history.json is owned solely by the Daily OI workflow (1.3), which
+        # derives it from the archive and publishes it. The export no longer
+        # re-copies it (avoids a double-write that could clobber 1.3's fresher
+        # copy with a stale one). export_oi_history() is retained for manual use.
         export_cot(db)
         export_macro_cot(db)
         export_freight(db)

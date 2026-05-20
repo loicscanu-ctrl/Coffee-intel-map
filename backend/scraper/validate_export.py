@@ -198,7 +198,20 @@ def safe_write_json(path, payload, validate_fn, indent: int = 2) -> bool:
         print(f"[validate] {name} FAILED: {reason} — keeping existing file")
         return False
 
+    serialized = json.dumps(payload, indent=indent)
+
+    # Content short-circuit: if the file already holds identical data, skip the
+    # rewrite. Makes the export idempotent (re-running changes nothing) and
+    # avoids pointless .tmp churn for the ~21 files regenerated each run.
+    p = Path(path)
+    if p.exists():
+        try:
+            if json.loads(p.read_text(encoding="utf-8")) == payload:
+                return False
+        except Exception:
+            pass  # unreadable/corrupt existing file → fall through and rewrite
+
     tmp = Path(str(path) + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=indent), encoding="utf-8")
+    tmp.write_text(serialized, encoding="utf-8")
     tmp.replace(path)
     return True

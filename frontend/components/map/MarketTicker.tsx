@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { cachedFetchStatic } from "@/lib/api";
 
 type TickerCategory = "futures" | "physical" | "fx";
 
@@ -78,18 +79,30 @@ export default function MarketTicker() {
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    const load = () => Promise.all([
-      fetch("/data/latest_prices.json").then(r => r.json()).catch(() => null),
-      fetchAcaphe(),
-    ]).then(([prices, live]) => {
-      setTickers(prices?.tickers ?? []);
-      setGeneratedAt(prices?.generated_at ?? null);
-      if (live?.arabica && live?.robusta) setAcaphe(live);
-    });
+    const load = () => {
+      // The ticker is global (every tab); don't poll while the tab is
+      // backgrounded — resume on visibilitychange below.
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+      return Promise.all([
+        // Shared cache: latest_prices.json is also read by CoffeeMap — one
+        // request serves both within the 5-min window.
+        cachedFetchStatic<{ tickers?: TickerItem[]; generated_at?: string }>("/data/latest_prices.json").catch(() => null),
+        fetchAcaphe(),
+      ]).then(([prices, live]) => {
+        setTickers(prices?.tickers ?? []);
+        setGeneratedAt(prices?.generated_at ?? null);
+        if (live?.arabica && live?.robusta) setAcaphe(live);
+      });
+    };
     load();
     const interval = setInterval(load, 5 * 60 * 1000);
     const tick = setInterval(() => setTick(n => n + 1), 60_000);
-    return () => { clearInterval(interval); clearInterval(tick); };
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      clearInterval(interval); clearInterval(tick);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   // Futures tickers: live Acaphe when available, else fall back to static

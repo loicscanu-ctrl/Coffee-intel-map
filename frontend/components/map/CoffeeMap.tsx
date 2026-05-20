@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { LayerGroup as LeafletLayerGroup, Map as LeafletMap, Marker as LeafletMarker, TileLayer } from "leaflet";
 import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
+import { cachedFetchStatic } from "@/lib/api";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
 import { useUrlState } from "@/lib/useUrlState";
@@ -244,10 +245,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
           fetch("/data/acaphe_live.json").then(r => r.ok ? r.json() : null).catch(() => null)
         );
     Promise.all([
-      fetch("/data/latest_prices.json").then(r => r.ok ? r.json() : null).catch(() => null),
+      cachedFetchStatic("/data/latest_prices.json").catch(() => null),
       fetchAcaphe(),
     ]).then(([latest, acaphe]) => {
-      if (!cancelled) setOriginPrices(computeOriginPrices(latest, acaphe));
+      if (!cancelled) setOriginPrices(computeOriginPrices(latest as Parameters<typeof computeOriginPrices>[0], acaphe));
     });
     return () => { cancelled = true; };
   }, []);

@@ -52,11 +52,23 @@ jobs:
         if: steps.gate.outputs.skip == 'false'
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install Python dependencies
         if: steps.gate.outputs.skip == 'false'
         working-directory: backend
         run: pip install --quiet -r scraper/requirements.txt psycopg2-binary
+
+      # Cache the chromium binary (~120 MB) across the ~50 runs/week. On a hit,
+      # `playwright install` skips the download; --with-deps still ensures OS
+      # libs (fast on the ubuntu-22.04 image where most are preinstalled).
+      - name: Cache Playwright browser
+        if: steps.gate.outputs.skip == 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
 
       - name: Install Playwright Chromium
         if: steps.gate.outputs.skip == 'false'

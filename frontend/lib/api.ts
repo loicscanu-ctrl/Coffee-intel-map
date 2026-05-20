@@ -50,6 +50,41 @@ export function clearApiCache(): void {
   _cache.clear();
 }
 
+/**
+ * Cached fetch for static `/data/*.json` files, sharing the same TTL cache as
+ * cachedFetch. Several components (MarketTicker, CoffeeMap, AcapheLiveQuotes)
+ * independently read the same static file on a page; this de-duplicates those
+ * into one network request within the 5-minute window. Also de-dupes
+ * concurrent in-flight requests for the same path.
+ */
+const _inflight = new Map<string, Promise<unknown>>();
+export async function cachedFetchStatic<T = unknown>(path: string): Promise<T> {
+  const key = `static:${path}`;
+  const hit = _cache.get(key);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    _cache.delete(key);
+    _cache.set(key, hit);
+    return hit.data as T;
+  }
+  const existing = _inflight.get(key);
+  if (existing) return existing as Promise<T>;
+
+  const p = (async () => {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${path}`);
+    const data = (await res.json()) as T;
+    _cache.set(key, { data, ts: Date.now() });
+    if (_cache.size > CACHE_MAX_ENTRIES) {
+      const oldest = _cache.keys().next().value;
+      if (oldest !== undefined) _cache.delete(oldest);
+    }
+    return data;
+  })().finally(() => _inflight.delete(key));
+
+  _inflight.set(key, p);
+  return p;
+}
+
 export interface CountryPin {
   type: string;
   lat: number;

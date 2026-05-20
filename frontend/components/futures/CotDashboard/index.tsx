@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCot, fetchMacroCot, type MacroCotWeek, type CotWeekly } from "@/lib/api";
+import { fetchMacroCot, type MacroCotWeek, type CotWeekly } from "@/lib/api";
 import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { transformApiData } from "@/lib/cot/transformApiData";
@@ -31,57 +31,27 @@ export default function CotDashboard() {
   });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
-  // Tracks where cotRows came from so we can show the right loading/banner state:
-  //   "static" — bundled snapshot from /data/cot.json (real data, may be a few
-  //              hours stale; produced by the daily export-and-publish workflow).
-  //   "live"   — fresh from /api/cot (may include intra-export updates).
-  //   null     — neither path has resolved yet.
-  const [cotSource, setCotSource] = useState<"static" | "live" | null>(null);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
   const [macroError, setMacroError] = useState(false);
 
   useEffect(() => {
-    // Two parallel paths populate cotRows; whichever resolves first determines
-    // the first paint. Live data, when it arrives, replaces static unconditionally
-    // — it's at most a few hours fresher and the engine recomputes against it.
-    //
-    // The static path makes the loading flash show real (recent) data instead of
-    // the obviously-fake `generateData()` mock that the page used to render
-    // during the API round-trip.
+    // Single source: the static cot.json published by the daily export
+    // (export_static_json → workflow 1.4). COT is a WEEKLY series, so the
+    // static snapshot is as fresh as a live /api/cot fetch would be — and
+    // it's a CDN-cached file, so we skip the redundant 3 MB live re-fetch
+    // (and the backend dependency) entirely. Full history stays in the DB /
+    // /api/cot for anyone who needs it; the published file is trimmed to the
+    // window the dashboard actually renders (see export_cot).
     fetch("/data/cot.json")
       .then(r => (r.ok ? r.json() : null))
       .then((rows: CotWeekly[] | null) => {
-        if (!rows || !Array.isArray(rows) || rows.length === 0) return;
-        // Only set if the live API hasn't already taken over. Comparing source
-        // (not just cotRows) catches the case where live resolved with empty.
-        setCotSource(prev => {
-          if (prev === "live") return prev;
-          setCotRows(rows as CotWeekly[]);
-          return "static";
-        });
-      })
-      .catch(() => { /* static path is best-effort */ });
-
-    fetchCot()
-      .then(rows => {
-        if (!rows.length) {
-          // Live returned empty — only surface as error if static also failed.
-          setCotSource(prev => {
-            if (prev === null) setCotError(true);
-            return prev;
-          });
+        if (!rows || !Array.isArray(rows) || rows.length === 0) {
+          setCotError(true);   // no static data → fall back to mock + banner
           return;
         }
-        setCotRows(rows);
-        setCotSource("live");
+        setCotRows(rows as CotWeekly[]);
       })
-      .catch(() => {
-        // Live failed — keep static if we have it, otherwise show error+mock.
-        setCotSource(prev => {
-          if (prev === null) setCotError(true);
-          return prev;
-        });
-      });
+      .catch(() => setCotError(true));
 
     fetchMacroCot().then(setMacroData).catch(() => setMacroError(true));
   }, []);
@@ -162,25 +132,16 @@ export default function CotDashboard() {
 
   return (
     <div className="space-y-4" style={{ position: "relative" }}>
-      {/* Only show "illustrative data" warning when BOTH paths failed and we're
-          truly on mock data. If static loaded, we're showing real (if slightly
-          stale) data and the banner would be misleading. */}
-      {cotError && cotSource === null && (
+      {/* Mock-data warning only when the static cot.json failed to load. */}
+      {cotError && (
         <div className="mb-3 px-3 py-2 rounded-lg bg-amber-900/30 border border-amber-700/50 text-amber-400 text-xs font-medium">
-          Backend unavailable — showing illustrative data only (prices random, data ends ~Nov 2025). Start the backend server to load real CoT data.
+          Data unavailable — showing illustrative data only (prices random, data ends ~Nov 2025).
         </div>
       )}
-      {/* Loading bar only while we have NO data at all (neither static nor live).
-          Once static resolves, the page snaps to real data and the bar hides. */}
+      {/* Loading bar only while the static snapshot hasn't resolved yet. */}
       {cotRows === null && !cotError && (
         <div className="mb-3 h-2 rounded-full bg-slate-800 overflow-hidden">
           <div className="h-full bg-slate-600 animate-pulse w-full" />
-        </div>
-      )}
-      {/* Subtle hint when we're on the static snapshot waiting for live. */}
-      {cotSource === "static" && (
-        <div className="mb-1 text-[9px] text-slate-600 font-mono px-1">
-          showing daily snapshot · fetching latest…
         </div>
       )}
       {/* Horizontal step nav — sticky, scrolls to section */}

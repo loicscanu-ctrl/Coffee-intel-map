@@ -29,6 +29,12 @@ jobs:
         working-directory: backend
         run: pip install -r scraper/requirements.txt pandas requests yfinance python-dotenv openpyxl
 
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
+
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
