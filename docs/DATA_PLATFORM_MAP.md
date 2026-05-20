@@ -175,11 +175,10 @@ flowchart TD
 | | `farmer_selling_brazil.json` | `FarmerSellingPanel` | **Supply · Farmer Selling** |
 | | `*_supply.json` (colombia/vietnam/…) | per-country tabs | **Supply · country pages**; **Map** |
 
-### 4c. Full pipeline (exhaustive mega-diagram) — every source · frequency → store → JSON → visual → Telegram
+### 4c. Full pipeline (exhaustive, color-coded by tab)
 
 ```mermaid
 flowchart LR
-  %% ================= FETCHERS (source · frequency) =================
   subgraph DAILY["Daily / intraday"]
     direction TB
     W13["1.3 Daily OI · 02:00 M-F<br/>Barchart core-api (KC+RM chain)"]
@@ -209,53 +208,51 @@ flowchart LR
     WENSO["ENSO/ONI · NOAA"]
     WCNTRY["Origin supply · ICO·USDA·customs<br/>(CO·VN·ET·HN·ID·UG)"]
   end
-
-  %% ================= STORE =================
   ARC[("★ contract_prices_archive.json<br/>5y per-contract OI+price · RC")]
   DB[(Postgres · 13 tables)]
-  EXP{{"1.4 Export & Publish · 01:30 + on-2.3"}}
-
-  %% ================= PUBLISHED JSON =================
-  J_oi[/oi_history.json/]
-  J_fnd[/oi_fnd_chart.json/]
-  J_chain[/futures_chain.json/]
-  J_cot[/cot.json · cot_recent.json/]
-  J_sig[/signals.json/]
-  J_mac[/macro_cot.json/]
-  J_q[/quant_report.json/]
-  J_fx[/fx_history.json/]
-  J_aca[/acaphe_live.json/]
-  J_lp[/latest_prices.json/]
-  J_fr[/freight.json/]
-  J_orig[/origin_prices_history.json/]
-  J_cpi[/retail_cpi.json/]
-  J_fe[/farmer_economics.json/]
-  J_fsell[/farmer_selling_brazil.json/]
-  J_ferts[/global_fertilizers.json/]
-  J_stk[/demand_stocks.json/]
-  J_mix[/factory_mix.json/]
-  J_earn[/earnings.json/]
-  J_tax[/kaffeesteuer.json/]
-  J_cec[/cecafe.json/]
-  J_cecd[/cecafe_daily.json/]
-  J_co[/colombia_supply.json/]
-  J_et[/ethiopia_supply.json/]
-  J_hn[/honduras_supply.json/]
-  J_id[/indonesia_supply.json/]
-  J_ug[/uganda_supply.json/]
-  J_vn[/vietnam_supply.json/]
-  J_vnx[/vn_country_shares · vn_export_destination_port/]
-  J_vnfe[/vn_farmer_economics · vn_physical_prices/]
-  J_vnwl[/vn_water_levels.json/]
-  J_vnw[/vn_weather.json/]
-  J_ev[/events.json · seed/]
-  J_intel[/manual_intel.json/]
-  J_news[(news_feed · country_intel)]
-  J_fact["factories.json → /api/map/factories"]
-  J_ctry["countries.json → /api/map/countries"]
-
-  %% ================= COT TAB =================
+  EXP{{"1.4 Export &amp; Publish · 02:30 + on 1.1/1.3/2.3"}}
+  subgraph JSON["Published JSON / DB tables"]
+    direction TB
+    J_oi[/oi_history.json · owned by 1.3/]
+    J_fnd[/oi_fnd_chart.json/]
+    J_chain[/futures_chain.json/]
+    J_cot[/cot.json 312wk · cot_recent.json/]
+    J_sig[/signals.json/]
+    J_mac[/macro_cot.json/]
+    J_q[/quant_report.json/]
+    J_fx[/fx_history.json/]
+    J_aca[/acaphe_live.json/]
+    J_lp[/latest_prices.json/]
+    J_fr[/freight.json/]
+    J_orig[/origin_prices_history.json/]
+    J_cpi[/retail_cpi.json/]
+    J_fe[/farmer_economics.json/]
+    J_fsell[/farmer_selling_brazil.json/]
+    J_ferts[/global_fertilizers.json/]
+    J_stk[/demand_stocks.json/]
+    J_mix[/factory_mix.json/]
+    J_earn[/earnings.json/]
+    J_tax[/kaffeesteuer.json/]
+    J_cec[/cecafe.json/]
+    J_cecd[/cecafe_daily.json/]
+    J_co[/colombia_supply.json/]
+    J_et[/ethiopia_supply.json/]
+    J_hn[/honduras_supply.json/]
+    J_id[/indonesia_supply.json/]
+    J_ug[/uganda_supply.json/]
+    J_vn[/vietnam_supply.json/]
+    J_vnx[/vn_country_shares · vn_export_destination_port/]
+    J_vnfe[/vn_farmer_economics · vn_physical_prices/]
+    J_vnwl[/vn_water_levels.json/]
+    J_vnw[/vn_weather.json/]
+    J_ev[/events.json · seed/]
+    J_intel[/manual_intel.json/]
+    J_news[(news_feed · country_intel)]
+    J_fact["factories.json → /api/map/factories"]
+    J_ctry["countries.json → /api/map/countries"]
+  end
   subgraph COT["COT tab"]
+    direction TB
     c_ip{{"Industry Pulse: price+PMPU+switch"}}
     c_sig{{Signals · severity}}
     c_gau{{Gauges}}
@@ -267,17 +264,15 @@ flowchart LR
     c_oi{{"OI 7-day (CotWeekly)"}}
     c_oifnd{{OI Evolution to FND}}
   end
-
-  %% ================= FUTURES TAB =================
   subgraph FUT["Futures tab"]
+    direction TB
     f_quote{{Daily Live Quotes}}
     f_chain{{Futures chain}}
     f_oi{{OI 7-day table}}
     f_oifnd{{OI Evolution to FND}}
   end
-
-  %% ================= MACRO TAB =================
   subgraph MAC["Macro tab"]
+    direction TB
     m_xc{{Cross-Commodity MM}}
     m_cci{{Coffee Currency Index}}
     m_fx{{FX Pair Time-Series}}
@@ -286,9 +281,8 @@ flowchart LR
     m_fert{{Fertilizer Inputs}}
     m_orig{{Origin Prices}}
   end
-
-  %% ================= DEMAND TAB =================
   subgraph DEM["Demand tab"]
+    direction TB
     d_stk{{ICE/ECF Stocks}}
     d_ecf{{ECF panel}}
     d_psd{{PSD analytical}}
@@ -300,42 +294,32 @@ flowchart LR
     d_tax{{"Kaffeesteuer (DE tax)"}}
     d_mix{{Roasting Mix}}
   end
-
-  %% ================= SUPPLY TAB =================
   subgraph SUP["Supply tab"]
-    subgraph SBR["Brazil"]
-      s_br{{Daily Registration}}
-      s_mv{{Monthly Volume}}
-      s_exp{{Export Charts}}
-      s_bfe{{Farmer Economics}}
-      s_sell{{Farmer Selling}}
-      s_cec{{Monthly exports}}
-    end
-    subgraph SVN["Vietnam"]
-      s_vnexp{{Export Explorer}}
-      s_vndest{{Destination Estimate}}
-      s_vnbal{{Balance Sheet}}
-      s_vnfe{{Farmer Economics}}
-      s_vnwl{{Water Levels}}
-      s_vnw{{Weather Charts}}
-    end
-    subgraph SCO["Colombia"]
-      s_coexp{{Export + Farmer Econ + Weather}}
-    end
-    subgraph SOTH["Ethiopia · Honduras · Indonesia · Uganda"]
-      s_et{{Ethiopia tab}}
-      s_hn{{Honduras tab}}
-      s_id{{Indonesia tab}}
-      s_ug{{Uganda tab + destinations + trade actors}}
-    end
+    direction TB
+    s_br{{BR Daily Registration}}
+    s_mv{{BR Monthly Volume}}
+    s_exp{{BR Export Charts}}
+    s_bfe{{BR Farmer Economics}}
+    s_sell{{BR Farmer Selling}}
+    s_cec{{BR Monthly exports}}
+    s_vnexp{{VN Export Explorer}}
+    s_vndest{{VN Destination Estimate}}
+    s_vnbal{{VN Balance Sheet}}
+    s_vnfe{{VN Farmer Economics}}
+    s_vnwl{{VN Water Levels}}
+    s_vnw{{VN Weather Charts}}
+    s_coexp{{Colombia}}
+    s_et{{Ethiopia}}
+    s_hn{{Honduras}}
+    s_id{{Indonesia}}
+    s_ug{{Uganda}}
     s_fert{{Fertilizers tab}}
     s_intel{{Manual Intel}}
   end
-
-  %% ================= MAP / NEWS & INTEL TAB =================
-  subgraph MAP["Map / News & Intel tab"]
+  subgraph MAP["Map / News &amp; Intel tab"]
+    direction TB
     mp_base{{CoffeeMap base}}
-    mp_country{{Country pins + intel popups}}
+    mp_country{{Country pins + intel}}
     mp_factory{{Factory pins}}
     mp_price{{Price labels}}
     mp_exp{{Exports overlay}}
@@ -344,13 +328,8 @@ flowchart LR
     mp_legend{{Map legend}}
     mp_news{{News Feed / Sidebar}}
   end
-
-  %% ================= GLOBAL TICKER BAND (all tabs) =================
-  TICKER{{"🎫 Market Ticker — GLOBAL band (app/layout, every tab)<br/>KC + RC live · FX"}}
-
+  TICKER{{"🎫 Market Ticker — GLOBAL band (every tab)<br/>KC + RC live · FX"}}
   TG{{"📲 Telegram morning brief · 03:00<br/>LAST step — 9 sections"}}
-
-  %% ================= EDGES: fetch → store =================
   W13 --> ARC
   W23 -->|positions| DB
   ARC -->|max-OI rebuild| DB
@@ -363,8 +342,6 @@ flowchart LR
   WCPI --> DB
   WPOP --> DB
   WENSO --> DB
-
-  %% ================= store → JSON =================
   ARC -->|derive 30d| J_oi
   ARC -->|FND export| J_fnd
   DB --> EXP
@@ -377,7 +354,8 @@ flowchart LR
   W41 --> J_earn
   WFERT --> J_ferts
   EXP --> J_chain
-  EXP --> J_cot --> J_sig
+  EXP --> J_cot
+  J_cot --> J_sig
   EXP --> J_mac
   EXP --> J_lp
   EXP --> J_orig
@@ -397,8 +375,6 @@ flowchart LR
   EXP --> J_vnfe
   EXP --> J_vnwl
   EXP --> J_vnw
-
-  %% ================= JSON → COT =================
   J_cot --> c_ip
   J_cot --> c_sig
   J_sig --> c_sig
@@ -411,14 +387,10 @@ flowchart LR
   J_cot --> c_rep
   J_cot --> c_oi
   J_fnd --> c_oifnd
-
-  %% ================= JSON → FUTURES =================
   J_aca --> f_quote
   J_chain --> f_chain
   J_oi --> f_oi
   J_fnd --> f_oifnd
-
-  %% ================= JSON → MACRO =================
   J_mac --> m_xc
   J_q --> m_cci
   J_fx --> m_fx
@@ -426,8 +398,6 @@ flowchart LR
   J_cpi --> m_cpi
   J_fe --> m_fert
   J_orig --> m_orig
-
-  %% ================= JSON → DEMAND =================
   J_stk --> d_stk
   J_stk --> d_ecf
   J_stk --> d_psd
@@ -438,8 +408,6 @@ flowchart LR
   J_earn --> d_earn
   J_tax --> d_tax
   J_mix --> d_mix
-
-  %% ================= JSON → SUPPLY =================
   J_cecd --> s_br
   J_cecd --> s_mv
   J_cecd --> s_exp
@@ -461,8 +429,6 @@ flowchart LR
   J_fe --> s_fert
   J_vn --> s_fert
   J_intel --> s_intel
-
-  %% ================= JSON → MAP =================
   J_ctry --> mp_country
   J_news --> mp_country
   J_fact --> mp_factory
@@ -472,14 +438,8 @@ flowchart LR
   J_fr --> mp_freight
   J_vnx --> mp_vnport
   J_news --> mp_news
-  mp_country --- mp_base
-  mp_factory --- mp_base
-
-  %% ================= GLOBAL TICKER BAND =================
   J_aca --> TICKER
   J_lp --> TICKER
-
-  %% ================= Telegram (9 sections) =================
   J_aca -->|prices·cost| TG
   J_lp -->|fx| TG
   J_orig -->|cost| TG
@@ -496,6 +456,147 @@ flowchart LR
   J_q -->|macro| TG
   J_mac -->|macro MM| TG
   J_news -->|news| TG
+  classDef scr fill:#0f172a,stroke:#334155,color:#94a3b8;
+  classDef store fill:#450a0a,stroke:#ef4444,color:#fecaca;
+  classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
+  classDef cot fill:#172554,stroke:#3b82f6,color:#bfdbfe;
+  classDef fut fill:#2e1065,stroke:#8b5cf6,color:#ddd6fe;
+  classDef mac fill:#042f2e,stroke:#14b8a6,color:#99f6e4;
+  classDef dem fill:#451a03,stroke:#f59e0b,color:#fde68a;
+  classDef sup fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
+  classDef map fill:#500724,stroke:#ec4899,color:#fbcfe8;
+  classDef tg fill:#083344,stroke:#22d3ee,color:#a5f3fc;
+  classDef tk fill:#2e1065,stroke:#a78bfa,color:#e9d5ff;
+  class W13 scr;
+  class WPOLL scr;
+  class W11 scr;
+  class WORIG scr;
+  class WMET scr;
+  class W12 scr;
+  class W17 scr;
+  class W19 scr;
+  class W23 scr;
+  class W22 scr;
+  class W3B scr;
+  class W31 scr;
+  class W32 scr;
+  class W33 scr;
+  class W41 scr;
+  class WCPI scr;
+  class WFERT scr;
+  class WPOP scr;
+  class WENSO scr;
+  class WCNTRY scr;
+  class ARC store;
+  class DB store;
+  class EXP store;
+  class J_oi json;
+  class J_fnd json;
+  class J_chain json;
+  class J_cot json;
+  class J_sig json;
+  class J_mac json;
+  class J_q json;
+  class J_fx json;
+  class J_aca json;
+  class J_lp json;
+  class J_fr json;
+  class J_orig json;
+  class J_cpi json;
+  class J_fe json;
+  class J_fsell json;
+  class J_ferts json;
+  class J_stk json;
+  class J_mix json;
+  class J_earn json;
+  class J_tax json;
+  class J_cec json;
+  class J_cecd json;
+  class J_co json;
+  class J_et json;
+  class J_hn json;
+  class J_id json;
+  class J_ug json;
+  class J_vn json;
+  class J_vnx json;
+  class J_vnfe json;
+  class J_vnwl json;
+  class J_vnw json;
+  class J_ev json;
+  class J_intel json;
+  class J_news json;
+  class J_fact json;
+  class J_ctry json;
+  class c_ip cot;
+  class c_sig cot;
+  class c_gau cot;
+  class c_hm cot;
+  class c_flow cot;
+  class c_dp cot;
+  class c_cyc cot;
+  class c_rep cot;
+  class c_oi cot;
+  class c_oifnd cot;
+  class f_quote fut;
+  class f_chain fut;
+  class f_oi fut;
+  class f_oifnd fut;
+  class m_xc mac;
+  class m_cci mac;
+  class m_fx mac;
+  class m_fr mac;
+  class m_cpi mac;
+  class m_fert mac;
+  class m_orig mac;
+  class d_stk dem;
+  class d_ecf dem;
+  class d_psd dem;
+  class d_jp dem;
+  class d_age dem;
+  class d_grow dem;
+  class d_world dem;
+  class d_earn dem;
+  class d_tax dem;
+  class d_mix dem;
+  class s_br sup;
+  class s_mv sup;
+  class s_exp sup;
+  class s_bfe sup;
+  class s_sell sup;
+  class s_cec sup;
+  class s_vnexp sup;
+  class s_vndest sup;
+  class s_vnbal sup;
+  class s_vnfe sup;
+  class s_vnwl sup;
+  class s_vnw sup;
+  class s_coexp sup;
+  class s_et sup;
+  class s_hn sup;
+  class s_id sup;
+  class s_ug sup;
+  class s_fert sup;
+  class s_intel sup;
+  class mp_base map;
+  class mp_country map;
+  class mp_factory map;
+  class mp_price map;
+  class mp_exp map;
+  class mp_freight map;
+  class mp_vnport map;
+  class mp_legend map;
+  class mp_news map;
+  class TICKER tk;
+  class TG tg;
+  linkStyle default stroke:#475569,stroke-width:1px;
+  linkStyle 45,46,47,48,49,50,51,52,53,54,55,56 stroke:#3b82f6,stroke-width:1.5px;
+  linkStyle 57,58,59,60 stroke:#8b5cf6,stroke-width:1.5px;
+  linkStyle 61,62,63,64,65,66,67 stroke:#14b8a6,stroke-width:1.5px;
+  linkStyle 68,69,70,71,72,73,74,75,76,77 stroke:#f59e0b,stroke-width:1.5px;
+  linkStyle 78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98 stroke:#84cc16,stroke-width:1.5px;
+  linkStyle 99,100,101,102,103,104,105,106,107 stroke:#ec4899,stroke-width:1.5px;
+  linkStyle 110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125 stroke:#22d3ee,stroke-width:1.5px;
+  linkStyle 108,109 stroke:#a78bfa,stroke-width:1.5px;
 ```
 
 ### 4b. By dashboard tab (reverse view)
