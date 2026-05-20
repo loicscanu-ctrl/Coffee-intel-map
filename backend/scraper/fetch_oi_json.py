@@ -4,6 +4,12 @@ Fetches KC (Arabica) and RM (Robusta) OI chain data from Barchart using
 Playwright, then prepends today's snapshot to data/oi_history.json.
 Keeps the last 30 trading-day snapshots per market.
 
+ALSO appends the same snapshot to data/contract_prices_archive.json — an
+UNBOUNDED, never-trimmed per-contract price+OI history. oi_history.json is
+the 30-day rolling window the frontend's OI tables read; the archive is the
+permanent record so we accumulate true per-contract daily prices over time
+(the data we lacked when the Stooq backfill went wrong — see RUNBOOK).
+
 Run standalone:
     python backend/scraper/fetch_oi_json.py
 """
@@ -17,6 +23,7 @@ from pathlib import Path
 # Resolve project root (works both from repo root and from backend/)
 ROOT = Path(__file__).resolve().parents[2]   # …/Coffee-intel-map
 DATA_FILE = ROOT / "data" / "oi_history.json"
+ARCHIVE_FILE = ROOT / "data" / "contract_prices_archive.json"
 MAX_DAYS = 30
 
 BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
@@ -136,6 +143,43 @@ def _prepend(history: dict, market: str, snapshot: dict) -> None:
     history[market] = entries[:MAX_DAYS]
 
 
+def _load_archive() -> dict:
+    if ARCHIVE_FILE.exists():
+        with open(ARCHIVE_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {
+        "_meta": {
+            "description": (
+                "Permanent per-contract daily price+OI archive. NEVER trimmed. "
+                "Accumulates Barchart chain snapshots so we build true per-contract "
+                "history over time. oi_history.json is the 30-day rolling view; this "
+                "is the full record. Stored ascending by date."
+            ),
+            "source": "Barchart core-api/v1/quotes/get via fetch_oi_json.py",
+            "started": date.today().isoformat(),
+        },
+        "arabica": [],
+        "robusta": [],
+    }
+
+
+def _append_archive(archive: dict, market: str, snapshot: dict) -> None:
+    """Append snapshot to the unbounded archive (ascending by date), dedup
+    on date. No trimming — this is the permanent record."""
+    entries: list = archive.setdefault(market, [])
+    if any(e.get("date") == snapshot["date"] for e in entries):
+        print(f"[fetch_oi_json] archive: {market} {snapshot['date']} already present, skipping.")
+        return
+    entries.append(snapshot)
+    entries.sort(key=lambda e: e.get("date", ""))
+
+
+def _save_archive(archive: dict) -> None:
+    ARCHIVE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(ARCHIVE_FILE, "w", encoding="utf-8") as f:
+        json.dump(archive, f, indent=2)
+
+
 async def main() -> None:
     print("[fetch_oi_json] Fetching OI chains from Barchart...")
     chains = await _fetch_chains()
@@ -153,14 +197,22 @@ async def main() -> None:
         sys.exit(1)
 
     history = _load_history()
+    archive = _load_archive()
 
     if kc:
-        _prepend(history, "arabica", {"date": trade_date, "contracts": kc})
+        snap = {"date": trade_date, "contracts": kc}
+        _prepend(history, "arabica", snap)
+        _append_archive(archive, "arabica", snap)
     if rm:
-        _prepend(history, "robusta", {"date": trade_date, "contracts": rm})
+        snap = {"date": trade_date, "contracts": rm}
+        _prepend(history, "robusta", snap)
+        _append_archive(archive, "robusta", snap)
 
     _save_history(history)
-    print(f"[fetch_oi_json] Saved to {DATA_FILE}")
+    _save_archive(archive)
+    arch_counts = f"arabica={len(archive.get('arabica', []))} robusta={len(archive.get('robusta', []))}"
+    print(f"[fetch_oi_json] Saved 30-day window to {DATA_FILE}")
+    print(f"[fetch_oi_json] Appended to permanent archive {ARCHIVE_FILE} ({arch_counts} days total)")
 
 
 if __name__ == "__main__":

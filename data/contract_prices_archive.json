@@ -1,0 +1,2493 @@
+{
+  "_meta": {
+    "description": "Permanent per-contract daily price+OI archive. NEVER trimmed. Accumulates Barchart chain snapshots so we build true per-contract history over time. oi_history.json is the 30-day rolling view; this is the full record. Stored ascending by date.",
+    "source": "Barchart core-api/v1/quotes/get via fetch_oi_json.py",
+    "started": "2026-05-20",
+    "seeded_from": "oi_history.json 30-day window on first archive creation"
+  },
+  "arabica": [
+    {
+      "date": "2026-04-06",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 54345
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 50637
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 30990
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 24188
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 8593
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2241
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1027
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1669
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1587
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 415
+        }
+      ]
+    },
+    {
+      "date": "2026-04-07",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 50999
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 53498
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 31331
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 24608
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 8831
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2240
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1026
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1564
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1625
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 418
+        }
+      ]
+    },
+    {
+      "date": "2026-04-08",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 46545
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 57685
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 31679
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 24956
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 9169
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2224
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1026
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1583
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1663
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 420
+        }
+      ]
+    },
+    {
+      "date": "2026-04-09",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 38438
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 64256
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 31929
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 25688
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 9412
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2222
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 991
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1578
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1706
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 439
+        }
+      ]
+    },
+    {
+      "date": "2026-04-10",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 29816
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 68842
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 32213
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 25800
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 9808
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2230
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 972
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1577
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1751
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 440
+        }
+      ]
+    },
+    {
+      "date": "2026-04-13",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 23116
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 71682
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 32608
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26018
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 9991
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2257
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 966
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1566
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1776
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 440
+        }
+      ]
+    },
+    {
+      "date": "2026-04-14",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 16767
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 73952
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 34205
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26422
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10132
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2299
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 972
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1586
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1782
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 446
+        }
+      ]
+    },
+    {
+      "date": "2026-04-15",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 11712
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 74691
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 35919
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26146
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10291
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2386
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1041
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1601
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1786
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 448
+        }
+      ]
+    },
+    {
+      "date": "2026-04-17",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 6906
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 76740
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 36021
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26094
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10381
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2787
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1250
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1546
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1798
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 453
+        }
+      ]
+    },
+    {
+      "date": "2026-04-20",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 4194
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 77246
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 36316
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26214
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10379
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2844
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1260
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1607
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1950
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 460
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 1739
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 78328
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 36835
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26995
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10669
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 2909
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1377
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1560
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1965
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 493
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 1205
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 79873
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 38169
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 26841
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 10995
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3158
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1612
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1617
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1964
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 496
+        }
+      ]
+    },
+    {
+      "date": "2026-04-23",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 959
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 81848
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 39344
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 27515
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 11317
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3294
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1804
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1651
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 1982
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 501
+        }
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 570
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 81558
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 40415
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 27883
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 11567
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3320
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1880
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1705
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2030
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 506
+        }
+      ]
+    },
+    {
+      "date": "2026-04-27",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 424
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 80650
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 40499
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 27407
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 11882
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3256
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 1992
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1732
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2090
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 509
+        }
+      ]
+    },
+    {
+      "date": "2026-04-28",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 372
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 80574
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 40740
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 27750
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12039
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3370
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2043
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1732
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2103
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 516
+        }
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "contracts": [
+        {
+          "symbol": "KCK26",
+          "oi": 310
+        },
+        {
+          "symbol": "KCN26",
+          "oi": 80789
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 41580
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 27994
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12128
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3458
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2099
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1741
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2112
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 521
+        }
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 80872
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 41930
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 28092
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12024
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3450
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2240
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1736
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2144
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 526
+        }
+      ]
+    },
+    {
+      "date": "2026-05-01",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81405
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 42421
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 28239
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12114
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3509
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2361
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1736
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2154
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 527
+        }
+      ]
+    },
+    {
+      "date": "2026-05-04",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81794
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 41983
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 28368
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12241
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3493
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2374
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1737
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2184
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 525
+        }
+      ]
+    },
+    {
+      "date": "2026-05-05",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81830
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 42360
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 28641
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12569
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3430
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2447
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1781
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2282
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 529
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81340
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 43671
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 29171
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12609
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3437
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2544
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1763
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2302
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 531
+        }
+      ]
+    },
+    {
+      "date": "2026-05-07",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81685
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 44657
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 29690
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12471
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3395
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2746
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1793
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2304
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 532
+        }
+      ]
+    },
+    {
+      "date": "2026-05-08",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81274
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 44325
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 30461
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12771
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3712
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2803
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1798
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2309
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 537
+        }
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 81495
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 44544
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 31178
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12963
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3847
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 2914
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1851
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2296
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 531
+        }
+      ]
+    },
+    {
+      "date": "2026-05-12",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 80461
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 44873
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 32156
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 12989
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 3910
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3085
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1853
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2294
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 543
+        }
+      ]
+    },
+    {
+      "date": "2026-05-13",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 80066
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 45258
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 32632
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13199
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4100
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3154
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1888
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2315
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 531
+        }
+      ]
+    },
+    {
+      "date": "2026-05-14",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 78604
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 46580
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 33209
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13401
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4218
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3203
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1892
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2317
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 531
+        }
+      ]
+    },
+    {
+      "date": "2026-05-15",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 77981
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 48443
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 34149
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13545
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4260
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3211
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1897
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2421
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 531
+        }
+      ]
+    },
+    {
+      "date": "2026-05-18",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 78136,
+          "last_price": 270.15
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 49218,
+          "last_price": 262.15
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 34863,
+          "last_price": 254.65
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13596,
+          "last_price": 252.35
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4307,
+          "last_price": 251.65
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3276,
+          "last_price": 251.4
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1918,
+          "last_price": 250.45
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2443,
+          "last_price": 249.2
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 561,
+          "last_price": 248.7
+        }
+      ]
+    }
+  ],
+  "robusta": [
+    {
+      "date": "2026-04-06",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 29781
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 39095
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 10078
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 4676
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4008
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1338
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 505
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 286
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 206
+        }
+      ]
+    },
+    {
+      "date": "2026-04-07",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 25983
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 41295
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 10454
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 4943
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 3994
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1264
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 507
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 285
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 208
+        }
+      ]
+    },
+    {
+      "date": "2026-04-08",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 23285
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 44573
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 11190
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5092
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4048
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1269
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 552
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 285
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 208
+        }
+      ]
+    },
+    {
+      "date": "2026-04-09",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 22161
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 45926
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 11506
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5225
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4199
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1304
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 571
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 309
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 208
+        }
+      ]
+    },
+    {
+      "date": "2026-04-10",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 21479
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 46843
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 12042
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5331
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4058
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1699
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 591
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 307
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 221
+        }
+      ]
+    },
+    {
+      "date": "2026-04-13",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 18911
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 48815
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 12155
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5451
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4234
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1749
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 577
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 338
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 226
+        }
+      ]
+    },
+    {
+      "date": "2026-04-14",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 17127
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 51393
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 12302
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5340
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4266
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1729
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 577
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 342
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 226
+        }
+      ]
+    },
+    {
+      "date": "2026-04-15",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 13655
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 51663
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 12393
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5255
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4322
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1774
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 577
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 348
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 236
+        }
+      ]
+    },
+    {
+      "date": "2026-04-17",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 10898
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 50983
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 12564
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5466
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4398
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1847
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 574
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 348
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 236
+        }
+      ]
+    },
+    {
+      "date": "2026-04-20",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 8687
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 52785
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 13090
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5797
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4602
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1852
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 575
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 346
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 236
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 7305
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 52526
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 13552
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 5907
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4659
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1898
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 587
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 333
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 236
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 5966
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 54083
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 13582
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 6163
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4870
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1873
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 626
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 361
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 258
+        }
+      ]
+    },
+    {
+      "date": "2026-04-23",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 3820
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 54829
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 13849
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 6516
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 4894
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1951
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 634
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 359
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 271
+        }
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1965
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 54765
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14149
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 6542
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5006
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1959
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 624
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 361
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-04-27",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1939
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 54471
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14288
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 6691
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5055
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2042
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 653
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 375
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-04-28",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1921
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 54633
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14580
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 6990
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5107
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1998
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 648
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 373
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1785
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 53147
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14704
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7110
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5139
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1981
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 645
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 372
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1074
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 52125
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14566
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7356
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5156
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2059
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 646
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 372
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-05-01",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1074
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-05-04",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 1074
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 52884
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14926
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7442
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5336
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2141
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 649
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 372
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 304
+        }
+      ]
+    },
+    {
+      "date": "2026-05-05",
+      "contracts": [
+        {
+          "symbol": "RMK26",
+          "oi": 987
+        },
+        {
+          "symbol": "RMN26",
+          "oi": 52979
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 14920
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7367
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5544
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2268
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 644
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 366
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 321
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 53183
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 15362
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7541
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5557
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2260
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 640
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 367
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 321
+        }
+      ]
+    },
+    {
+      "date": "2026-05-07",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 52781
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 16488
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7638
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5536
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2227
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 644
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 367
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 321
+        }
+      ]
+    },
+    {
+      "date": "2026-05-08",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 52988
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 17940
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 7917
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5593
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2247
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 646
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 367
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 321
+        }
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 54237
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 19141
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 8671
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5766
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2237
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 638
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 406
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 355
+        }
+      ]
+    },
+    {
+      "date": "2026-05-12",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 53438
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 19767
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 8998
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5787
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2191
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 643
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 411
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 347
+        }
+      ]
+    },
+    {
+      "date": "2026-05-13",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 54659
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 20586
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 9095
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5770
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2182
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 646
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 411
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 345
+        }
+      ]
+    },
+    {
+      "date": "2026-05-14",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 52516
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 20620
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 9177
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5726
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2133
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 696
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 419
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 333
+        }
+      ]
+    },
+    {
+      "date": "2026-05-15",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 49871
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 20427
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 10042
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5711
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 1970
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 967
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 426
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 338
+        }
+      ]
+    },
+    {
+      "date": "2026-05-18",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 49446,
+          "last_price": 3345.0
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 20473,
+          "last_price": 3208.0
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 10757,
+          "last_price": 3136.0
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 5875,
+          "last_price": 3074.0
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2002,
+          "last_price": 3043.0
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 966,
+          "last_price": 3021.0
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 438,
+          "last_price": 3003.0
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 328,
+          "last_price": 2986.0
+        }
+      ]
+    }
+  ]
+}
