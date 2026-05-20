@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-05-20T08:07:52.050191+00:00",
+  "scraped_at": "2026-05-20T09:19:40.208549+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-02",
@@ -1380,7 +1380,7 @@
     "grade": "Screen 15"
   },
   "weather": {
-    "scraped_at": "2026-05-20T08:03:32.189766Z",
+    "scraped_at": "2026-05-20T09:13:59.007902Z",
     "regions": [
       {
         "name": "Kasese",

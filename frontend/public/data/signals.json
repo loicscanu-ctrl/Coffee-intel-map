@@ -192,7 +192,7 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "medium",
+      "magnitude": "small",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -203,7 +203,7 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -242,7 +242,7 @@
       "market": "NY",
       "severity": "warn",
       "score": 0,
-      "magnitude": "medium",
+      "magnitude": "small",
       "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     },
     {
@@ -270,7 +270,7 @@
       "market": "LDN",
       "severity": "warn",
       "score": 0,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     }
   ],
@@ -2468,7 +2468,7 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "medium",
+          "magnitude": "small",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2479,7 +2479,7 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "large",
+          "magnitude": "medium",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2518,7 +2518,7 @@
           "market": "NY",
           "severity": "warn",
           "score": 0,
-          "magnitude": "medium",
+          "magnitude": "small",
           "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         },
         {
@@ -2546,7 +2546,7 @@
           "market": "LDN",
           "severity": "warn",
           "score": 0,
-          "magnitude": "large",
+          "magnitude": "medium",
           "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         }
       ],
@@ -2556,5 +2556,5 @@
       "priceLDN": 3482
     }
   ],
-  "generatedAt": "2026-05-20T08:07:58.909Z"
+  "generatedAt": "2026-05-20T09:19:47.039Z"
 }
