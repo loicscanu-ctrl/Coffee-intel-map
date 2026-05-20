@@ -209,7 +209,7 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "medium",
+      "magnitude": "small",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -2425,7 +2425,7 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "medium",
+          "magnitude": "small",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2496,5 +2496,5 @@
       "priceLDN": 3482
     }
   ],
-  "generatedAt": "2026-05-20T14:47:58.112Z"
+  "generatedAt": "2026-05-20T16:20:14.909Z"
 }
