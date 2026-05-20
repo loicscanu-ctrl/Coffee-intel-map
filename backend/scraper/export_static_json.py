@@ -162,6 +162,22 @@ def _load_oi_history() -> dict:
         return {}
 
 
+def _load_contract_archive() -> dict:
+    """Load the date-keyed per-contract OI+price archive
+    (data/contract_prices_archive.json). Shape:
+        {market: {YYYY-MM-DD: {SYMBOL: {oi, price}}}}
+    This is the 5-year authoritative source — far deeper than the 30-day
+    oi_history.json. RM robusta symbols are already normalized to RC here."""
+    path = ROOT / "data" / "contract_prices_archive.json"
+    if not path.exists():
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def export_oi_fnd_chart(db) -> None:
     all_items = (
         db.query(NewsItem)
@@ -179,6 +195,9 @@ def export_oi_fnd_chart(db) -> None:
     # OI (Playwright-fetched from Barchart), filling the -45…-30 day gap where
     # DB NewsItems may be missing OI (yfinance fallback doesn't supply OI).
     oi_history = _load_oi_history()
+    # Load the 5-year per-contract archive — the deepest OI source, gives a
+    # complete -45..0 window for every contract.
+    contract_archive = _load_contract_archive()
 
     result = {}
     for market in ("arabica", "robusta"):
@@ -235,6 +254,30 @@ def export_oi_fnd_chart(db) -> None:
                     continue
                 # Don't overwrite DB-sourced point — DB is authoritative
                 series.setdefault(sym, {}).setdefault(day_val, oi)
+
+        # 3. contract_prices_archive.json — the 5-year authoritative per-contract
+        #    OI history. Deepest source: gives a complete -45..0 window for
+        #    every contract (oi_history only reaches ~21 trading days back).
+        #    Archive stores robusta as RC; this chart's pipeline (and frontend
+        #    STATIC_SERIES) uses RM, so convert RC→RM here for merge consistency.
+        archive_market = contract_archive.get(mkt_key, {})
+        for snap_date_str, contracts in archive_market.items():
+            try:
+                snap_date = date.fromisoformat(snap_date_str)
+            except Exception:
+                continue
+            for sym, cell in contracts.items():
+                oi = cell.get("oi")
+                if oi is None:
+                    continue
+                chart_sym = ("RM" + sym[2:]) if (mkt_key == "robusta" and sym.startswith("RC")) else sym
+                fnd = _calc_fnd(chart_sym)
+                if not fnd:
+                    continue
+                day_val = _trading_days_to(snap_date, fnd)
+                if day_val < -45 or day_val > 0:
+                    continue
+                series.setdefault(chart_sym, {}).setdefault(day_val, oi)
 
         candidates = []
         for sym, day_map in series.items():
