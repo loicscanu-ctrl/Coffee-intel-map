@@ -112,6 +112,8 @@ const FULL = `flowchart LR
   J_ev[/events.json · seed/]
   J_intel[/manual_intel.json/]
   J_news[(news_feed · country_intel)]
+  J_fact[/factories.json → /api/map/factories/]
+  J_ctry[/countries.json → /api/map/countries/]
 
   %% ================= COT TAB =================
   subgraph COT["COT tab"]
@@ -191,12 +193,21 @@ const FULL = `flowchart LR
     s_intel{{Manual Intel}}
   end
 
-  %% ================= MAP =================
-  subgraph MAP["Map / News & Intel"]
-    mp_map{{CoffeeMap: price·exports·freight·VN-port layers}}
-    mp_tick{{Market Ticker}}
-    mp_news{{News Feed + country intel}}
+  %% ================= MAP / NEWS & INTEL TAB =================
+  subgraph MAP["Map / News & Intel tab"]
+    mp_base{{CoffeeMap base}}
+    mp_country{{Country pins + intel popups}}
+    mp_factory{{Factory pins}}
+    mp_price{{Price labels}}
+    mp_exp{{Exports overlay}}
+    mp_freight{{Freight overlay}}
+    mp_vnport{{VN port-flow arrows}}
+    mp_legend{{Map legend}}
+    mp_news{{News Feed / Sidebar}}
   end
+
+  %% ================= GLOBAL TICKER BAND (all tabs) =================
+  TICKER{{"🎫 Market Ticker — GLOBAL band (app/layout, every tab)<br/>KC + RC live · FX"}}
 
   TG{{"📲 Telegram morning brief · 03:00<br/>LAST step — 9 sections"}}
 
@@ -313,13 +324,21 @@ const FULL = `flowchart LR
   J_intel --> s_intel
 
   %% ================= JSON → MAP =================
-  J_lp --> mp_map
-  J_cec --> mp_map
-  J_fr --> mp_map
-  J_vnx --> mp_map
-  J_lp --> mp_tick
-  J_aca --> mp_tick
+  J_ctry --> mp_country
+  J_news --> mp_country
+  J_fact --> mp_factory
+  J_lp --> mp_price
+  J_aca --> mp_price
+  J_cec --> mp_exp
+  J_fr --> mp_freight
+  J_vnx --> mp_vnport
   J_news --> mp_news
+  mp_country --- mp_base
+  mp_factory --- mp_base
+
+  %% ================= GLOBAL TICKER BAND =================
+  J_aca --> TICKER
+  J_lp --> TICKER
 
   %% ================= Telegram (9 sections) =================
   J_aca -->|prices·cost| TG
