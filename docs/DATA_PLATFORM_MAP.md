@@ -140,19 +140,51 @@ flowchart TD
 
 ## 4. Visual → source (the "what feeds what")
 
-| Visual | Source | Ultimately from |
-|---|---|---|
-| **COT · Industry Pulse** (price, PMPU, switch dots) | `cot.json` | archive (price, max-OI) + DB (positions) |
-| COT · Signals / gauges / heatmap | `cot.json` → signalEngine | DB positions + archive price |
-| COT · Global Flow / Dry Powder / Cycle | `cot.json` + `macro_cot.json` | DB |
-| **COT · OI Evolution to FND** | `oi_fnd_chart.json` | **archive** |
-| Futures · OI 7-day table | `oi_history.json` | **archive (30d view)** |
-| Futures · daily quotes | `acaphe_live.json` | acaphe poll |
-| Macro · cross-commodity MM | `macro_cot.json` | DB `commodity_cot` (2.3) |
-| Macro · CCI + FX | `quant_report.json`+`fx_history.json` | 1.9 |
-| Macro · Retail CPI / Fertilizers | `retail_cpi.json`/`global_fertilizers.json` | scrapers |
-| Map · factories / origin / supply | `factories.json` + `*_supply.json` | DB + scrapers |
-| Telegram brief | `signals.json` + `events.json` + JSON | archive + DB |
+### 4a. Per-workflow → exact dashboard visual
+
+| Workflow | DB/JSON output | Component | Tab · Visual |
+|---|---|---|---|
+| **1.3 Daily OI** | `oi_history.json` | `OIHistoryTable` | **Futures · OI 7-day table** (+ COT §2) |
+| | `oi_fnd_chart.json` | `OIFndChart` | **Futures + COT · OI Evolution to FND** |
+| | archive→(2.3 rebuild)→`cot.json` price | `Step4IndustryPulse` | **COT · Industry Pulse — price line + switch dots** |
+| **1.1 Daily News** | DB `news_feed` | `/api/news`, map labels | **Map · news labels / table**; Telegram news |
+| | DB `country_intel` | `CoffeeMap` popups | **Map · country intel** |
+| **1.2 Freight** | `freight.json` | `FreightContextPanel` | **Macro · Freight Context**; Telegram freight |
+| **1.4 Export & Publish** | *(all static JSON)* | — | *plumbing — feeds every JSON-backed visual* |
+| **1.5 Fresh check** | — | — | *Telegram alert only* |
+| **1.6 Morning Brief** | reads `signals.json`,`events.json`,JSON | — | **Telegram brief** (the message itself) |
+| **1.7 Cecafe Daily** | `cecafe_daily.json` | `DailyRegistration` | **Supply · Brazil · Daily Registration**; Telegram |
+| **1.9 Quant CCI** | `quant_report.json` | `CurrencyIndexSection` | **Macro · Coffee Currency Index** |
+| | `fx_history.json` | `FxTimeSeriesPanel` | **Macro · FX Pair Time-Series** |
+| **Acaphe poll** | `acaphe_live.json` | `AcapheLiveQuotes` | **Futures · Daily Live Quotes** |
+| **1.3b Slow-Data** (ECF·PSD·AJCA·UCDA) | `demand_stocks.json` | `StocksPanel` | **Demand · Stocks (ICE certified + PSD)** |
+| **2.2 Commodity Prices** | DB `commodity_prices` → `latest_prices.json` | `CoffeeMap` | **Map · price labels + header ticker** |
+| **2.3 COT Scraper + rebuild** | `cot.json` | `Step1/4/5/6/7/8` | **COT · Signals, Gauges, Heatmap, Global Flow, Industry Pulse (positions), Dry Powder, Cycle, Report** |
+| | `macro_cot.json` | `CrossCommodityPanel` | **Macro · Cross-Commodity MM** |
+| | `signals.json` | morning_brief | **Telegram · CoT signals** |
+| | archive rebuild → `cot.json` price | `Step4IndustryPulse` | **COT · Industry Pulse price (true max-OI)** |
+| **3.1 Kaffeesteuer** | `kaffeesteuer.json` | `KaffeesteuerChart` | **Demand · Kaffeesteuer (DE tax)** |
+| **3.2 Cecafe Export** | `cecafe.json` | `CoffeeMap` | **Map · Brazil monthly exports** |
+| **3.3 CONAB** | `farmer_economics.json` | `FertilizerInputsPanel` / `FarmerSellingPanel` | **Macro · Fertilizer Inputs** + **Supply · Farmer Economics** |
+| **4.1 Earnings** | `earnings.json` | `EarningsTable` | **Demand · Roaster Earnings** |
+| _various / manual_ | `factory_mix.json` | `RoastingMixPanel` | **Demand · Roasting Mix** |
+| | `global_fertilizers.json` | `FertilizersTab` | **Supply · Fertilizers** |
+| | `manual_intel.json` | `ManualIntelPanel` | **Supply · Manual Intel** |
+| | `retail_cpi.json` | `RetailCpiPanel` | **Macro · Retail CPI** |
+| | `origin_prices_history.json` | `OriginPricesPanel` | **Macro · Origin Prices** |
+| | `farmer_selling_brazil.json` | `FarmerSellingPanel` | **Supply · Farmer Selling** |
+| | `*_supply.json` (colombia/vietnam/…) | per-country tabs | **Supply · country pages**; **Map** |
+
+### 4b. By dashboard tab (reverse view)
+
+- **COT** (`/cot`): Industry Pulse, Signals, Gauges, Heatmap, Global Flow, Dry Powder, Cycle, Report ← `cot.json` + `signals.json`; OI 7-day + OI→FND ← archive.
+- **Futures** (`/futures`): daily quotes ← `acaphe_live.json`; chain ← `futures_chain.json`; OI table ← `oi_history.json`; OI→FND ← `oi_fnd_chart.json`.
+- **Macro** (`/macro`): CCI ← `quant_report.json`; FX ← `fx_history.json`; cross-commodity MM ← `macro_cot.json`; freight ← `freight.json`; retail CPI ← `retail_cpi.json`; fertilizer inputs/origin prices ← `farmer_economics.json`/`origin_prices_history.json`.
+- **Demand** (`/demand`): stocks ← `demand_stocks.json`; roasting mix ← `factory_mix.json`; earnings ← `earnings.json`; DE tax ← `kaffeesteuer.json`.
+- **Supply** (`/supply`): Brazil daily reg ← `cecafe_daily.json`; fertilizers ← `global_fertilizers.json`; farmer economics ← `farmer_*`; manual intel ← `manual_intel.json`; country pages ← `*_supply.json`.
+- **Map** (`/map`): price labels ← `latest_prices.json`; exports ← `cecafe.json`; intel/news ← `/api/news`+`country_intel`.
+
+
 
 ---
 
