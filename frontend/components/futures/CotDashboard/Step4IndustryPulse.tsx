@@ -168,7 +168,7 @@ export default function Step4IndustryPulse({ data }: { data: ProcessedCotRow[] }
   return (
     <div id="cot-section-4">
       <SectionHeader icon="Factory" title="6. Industry Pulse (Metric Tons)"
-        subtitle="PMPU Gross Long & Short vs Price (max-OI contract; pink dashed line marks weeks where the price track switched to a new contract). Bottom: weekly position changes (NY includes EFP physical delivery)." />
+        subtitle="PMPU Gross Long (roasters, green) & Short (farmers, brown) vs Price. Blue circles on the price line mark weeks where the underlying contract changed. Bottom: weekly position changes (NY includes EFP physical delivery)." />
 
       {/* Time-window selector */}
       <div className="flex items-center gap-1 mb-3 px-1">
