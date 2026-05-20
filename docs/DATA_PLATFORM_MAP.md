@@ -175,46 +175,50 @@ flowchart TD
 | | `farmer_selling_brazil.json` | `FarmerSellingPanel` | **Supply · Farmer Selling** |
 | | `*_supply.json` (colombia/vietnam/…) | per-country tabs | **Supply · country pages**; **Map** |
 
-### 4c. Full pipeline — source · frequency → store → JSON → visual → Telegram
+### 4c. Full pipeline (exhaustive) — every source · frequency → store → JSON → visual → Telegram
 
 ```mermaid
 flowchart LR
-  %% ============ FETCHERS (source · frequency) ============
-  subgraph DAILY["Daily / intraday fetchers"]
+  %% ================= FETCHERS (source · frequency) =================
+  subgraph DAILY["Daily / intraday"]
     direction TB
-    W13["1.3 Daily OI · 02:00 Mon-Fri<br/>src: Barchart core-api (KC+RM chain)"]
-    WPOLL["Acaphe poll · every 15m (1-19h)<br/>src: acaphe live quotes"]
-    W11["1.1 Daily News · 01:00<br/>src: RSS·B3·CEPEA·Cooabriel"]
-    WORIG["Origin prices (in 1.1) · 01:00<br/>src: BCB·giacaphe·FNC·IHCAFE·UCDA·ECX"]
-    WMET["Origin weather (in 1.1) · 01:00<br/>src: Open-Meteo (7 origins)"]
-    W12["1.2 Freight · 02:00<br/>src: Freightos·Yahoo dry-bulk"]
-    W17["1.7 Cecafe daily · 09:00<br/>src: B3 / cecafe.com.br"]
-    W19["1.9 Quant CCI · 21:30 Mon-Fri<br/>src: jsDelivr FX·yfinance"]
+    W13["1.3 Daily OI · 02:00 M-F<br/>Barchart core-api (KC+RM chain)"]
+    WPOLL["Acaphe poll · /15m (1-19h)<br/>acaphe live quotes"]
+    W11["1.1 News · 01:00<br/>RSS·B3·CEPEA·Cooabriel·AJCA"]
+    WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
+    WMET["Origin weather (1.1) · 01:00<br/>Open-Meteo ×7 origins"]
+    W12["1.2 Freight · 02:00<br/>Freightos·Yahoo dry-bulk"]
+    W17["1.7 Cecafe daily · 09:00<br/>B3 / cecafe.com.br"]
+    W19["1.9 Quant CCI · 21:30 M-F<br/>jsDelivr FX·yfinance"]
   end
-  subgraph WEEKLY["Weekly fetchers"]
+  subgraph WEEKLY["Weekly"]
     direction TB
-    W23["2.3 COT + max-OI rebuild · Fri 20:00<br/>src: CFTC disagg report"]
-    W22["2.2 Commodity prices · Tue 22:55<br/>src: Barchart"]
+    W23["2.3 COT + max-OI rebuild · Fri 20:00<br/>CFTC disagg report"]
+    W22["2.2 Commodity prices · Tue 22:55<br/>Barchart"]
   end
-  subgraph PERIODIC["Monthly / periodic fetchers"]
+  subgraph PERIODIC["Monthly / periodic"]
     direction TB
-    W3B["1.3b Slow-data · 1st of month<br/>src: ECF·USDA PSD·AJCA·UCDA"]
-    W31["3.1 Kaffeesteuer · 1st of month<br/>src: DESTATIS"]
-    W32["3.2 Cecafe export · 15th<br/>src: cecafe.com.br"]
-    W33["3.3 CONAB · yearly (May)<br/>src: conab.gov.br"]
-    W41["4.1 Earnings · quarterly<br/>src: roaster filings"]
-    WCPI["Retail CPI (in 1.4) <br/>src: BLS·Eurostat·BCB"]
-    WFERT["Global fertilizers<br/>src: UN Comtrade·World Bank"]
+    W3B["1.3b Slow-data · 1st/mo<br/>ECF stocks·USDA PSD·AJCA·UCDA"]
+    W31["3.1 Kaffeesteuer · 1st/mo · DESTATIS"]
+    W32["3.2 Cecafe export · 15th · cecafe"]
+    W33["3.3 CONAB · May · conab.gov.br"]
+    W41["4.1 Earnings · quarterly · filings"]
+    WCPI["Retail CPI · BLS·Eurostat·BCB"]
+    WFERT["Fertilizers · UN Comtrade·World Bank"]
+    WPOP["Population/age · UN WPP·World Bank"]
+    WENSO["ENSO/ONI · NOAA"]
+    WCNTRY["Origin supply · ICO·USDA·customs<br/>(CO·VN·ET·HN·ID·UG)"]
   end
 
-  %% ============ STORE ============
-  ARC[("★ contract_prices_archive.json<br/>5y per-contract OI+price · RC canonical")]
+  %% ================= STORE =================
+  ARC[("★ contract_prices_archive.json<br/>5y per-contract OI+price · RC")]
   DB[(Postgres · 13 tables)]
-  EXP{{"1.4 Export & Publish · 01:30 + on-2.3<br/>DB + archive → static JSON"}}
+  EXP{{"1.4 Export & Publish · 01:30 + on-2.3"}}
 
-  %% ============ PUBLISHED JSON ============
+  %% ================= PUBLISHED JSON =================
   J_oi[/oi_history.json/]
   J_fnd[/oi_fnd_chart.json/]
+  J_chain[/futures_chain.json/]
   J_cot[/cot.json · cot_recent.json/]
   J_sig[/signals.json/]
   J_mac[/macro_cot.json/]
@@ -224,76 +228,132 @@ flowchart LR
   J_lp[/latest_prices.json/]
   J_fr[/freight.json/]
   J_orig[/origin_prices_history.json/]
-  J_sup[/7x *_supply.json/]
-  J_cec[/cecafe.json/]
-  J_cecd[/cecafe_daily.json/]
+  J_cpi[/retail_cpi.json/]
+  J_fe[/farmer_economics.json/]
+  J_fsell[/farmer_selling_brazil.json/]
+  J_ferts[/global_fertilizers.json/]
   J_stk[/demand_stocks.json/]
   J_mix[/factory_mix.json/]
   J_earn[/earnings.json/]
   J_tax[/kaffeesteuer.json/]
-  J_cpi[/retail_cpi.json/]
-  J_ferts[/global_fertilizers.json/]
-  J_farm[/farmer_economics.json · farmer_selling_brazil.json/]
+  J_cec[/cecafe.json/]
+  J_cecd[/cecafe_daily.json/]
+  J_co[/colombia_supply.json/]
+  J_et[/ethiopia_supply.json/]
+  J_hn[/honduras_supply.json/]
+  J_id[/indonesia_supply.json/]
+  J_ug[/uganda_supply.json/]
+  J_vn[/vietnam_supply.json/]
+  J_vnx[/vn_country_shares · vn_export_destination_port/]
+  J_vnfe[/vn_farmer_economics · vn_physical_prices/]
+  J_vnwl[/vn_water_levels.json/]
+  J_vnw[/vn_weather.json/]
   J_ev[/events.json · seed/]
+  J_intel[/manual_intel.json/]
   J_news[(news_feed · country_intel)]
 
-  %% ============ VISUALS ============
+  %% ================= COT TAB =================
   subgraph COT["COT tab"]
-    c_ip{{Industry Pulse: price+PMPU+switch dots}}
-    c_sig{{Signals · gauges · heatmap}}
-    c_flow{{Global Flow · Dry Powder · Cycle · Report}}
+    c_ip{{Industry Pulse: price+PMPU+switch}}
+    c_sig{{Signals · severity}}
+    c_gau{{Gauges}}
+    c_hm{{Heatmap}}
+    c_flow{{Global Flow}}
+    c_dp{{Dry Powder}}
+    c_cyc{{Cycle Location}}
+    c_rep{{Report · backtest}}
+    c_oi{{OI 7-day (CotWeekly)}}
     c_oifnd{{OI Evolution to FND}}
   end
+
+  %% ================= FUTURES TAB =================
   subgraph FUT["Futures tab"]
     f_quote{{Daily Live Quotes}}
+    f_chain{{Futures chain}}
     f_oi{{OI 7-day table}}
     f_oifnd{{OI Evolution to FND}}
   end
+
+  %% ================= MACRO TAB =================
   subgraph MAC["Macro tab"]
+    m_xc{{Cross-Commodity MM}}
     m_cci{{Coffee Currency Index}}
     m_fx{{FX Pair Time-Series}}
-    m_xc{{Cross-Commodity MM}}
     m_fr{{Freight Context}}
     m_cpi{{Retail CPI}}
-    m_fert{{Fertilizer Inputs · Origin Prices}}
+    m_fert{{Fertilizer Inputs}}
+    m_orig{{Origin Prices}}
   end
+
+  %% ================= DEMAND TAB =================
   subgraph DEM["Demand tab"]
-    d_stk{{Stocks}}
-    d_mix{{Roasting Mix}}
+    d_stk{{ICE/ECF Stocks}}
+    d_ecf{{ECF panel}}
+    d_psd{{PSD analytical}}
+    d_jp{{Japan/AJCA panel}}
+    d_age{{Age Cohort}}
+    d_grow{{Growth Markets}}
+    d_world{{World Consumption}}
     d_earn{{Roaster Earnings}}
-    d_tax{{Kaffeesteuer}}
+    d_tax{{Kaffeesteuer (DE tax)}}
+    d_mix{{Roasting Mix}}
   end
+
+  %% ================= SUPPLY TAB =================
   subgraph SUP["Supply tab"]
-    s_br{{Brazil Daily Registration}}
-    s_farm{{Farmer Economics · Selling}}
-    s_fert{{Fertilizers}}
-    s_ctry{{Country pages}}
+    subgraph SBR["Brazil"]
+      s_br{{Daily Registration}}
+      s_mv{{Monthly Volume}}
+      s_exp{{Export Charts}}
+      s_bfe{{Farmer Economics}}
+      s_sell{{Farmer Selling}}
+      s_cec{{Monthly exports}}
+    end
+    subgraph SVN["Vietnam"]
+      s_vnexp{{Export Explorer}}
+      s_vndest{{Destination Estimate}}
+      s_vnbal{{Balance Sheet}}
+      s_vnfe{{Farmer Economics}}
+      s_vnwl{{Water Levels}}
+      s_vnw{{Weather Charts}}
+    end
+    subgraph SCO["Colombia"]
+      s_coexp{{Export + Farmer Econ + Weather}}
+    end
+    subgraph SOTH["Ethiopia · Honduras · Indonesia · Uganda"]
+      s_et{{Ethiopia tab}}
+      s_hn{{Honduras tab}}
+      s_id{{Indonesia tab}}
+      s_ug{{Uganda tab + destinations + trade actors}}
+    end
+    s_fert{{Fertilizers tab}}
+    s_intel{{Manual Intel}}
   end
+
+  %% ================= MAP =================
   subgraph MAP["Map / News & Intel"]
-    mp_px{{Price labels + ticker}}
-    mp_exp{{Brazil exports}}
-    mp_news{{News table · country intel}}
+    mp_map{{CoffeeMap: price·exports·freight·VN-port layers}}
+    mp_tick{{Market Ticker}}
+    mp_news{{News Feed + country intel}}
   end
 
-  TG{{"📲 Telegram morning brief · 03:00<br/>LAST step — aggregates 9 sections"}}
+  TG{{"📲 Telegram morning brief · 03:00<br/>LAST step — 9 sections"}}
 
-  %% ===== fetch → store =====
+  %% ================= EDGES: fetch → store =================
   W13 --> ARC
   W23 -->|positions| DB
   ARC -->|max-OI rebuild| DB
   W22 --> DB
-  W11 --> J_news
   WORIG --> DB
   WMET --> DB
+  WCNTRY --> DB
   W3B --> DB
-  W31 --> DB
-  W32 --> DB
   W33 --> DB
-  W41 --> DB
   WCPI --> DB
-  WFERT --> DB
+  WPOP --> DB
+  WENSO --> DB
 
-  %% ===== store → export → JSON =====
+  %% ================= store → JSON =================
   ARC -->|derive 30d| J_oi
   ARC -->|FND export| J_fnd
   DB --> EXP
@@ -301,61 +361,120 @@ flowchart LR
   W19 --> J_q
   W19 --> J_fx
   W12 --> J_fr
+  W17 --> J_cecd
+  W31 --> J_tax
+  W41 --> J_earn
+  WFERT --> J_ferts
+  EXP --> J_chain
   EXP --> J_cot --> J_sig
   EXP --> J_mac
   EXP --> J_lp
   EXP --> J_orig
-  EXP --> J_sup
-  EXP --> J_cec
-  W17 --> J_cecd
+  EXP --> J_cpi
+  EXP --> J_fe
+  EXP --> J_fsell
   EXP --> J_stk
   EXP --> J_mix
-  W41 --> J_earn
-  W31 --> J_tax
-  EXP --> J_cpi
-  WFERT --> J_ferts
-  EXP --> J_farm
-  EXP --> J_fnd
+  EXP --> J_cec
+  EXP --> J_co
+  EXP --> J_et
+  EXP --> J_hn
+  EXP --> J_id
+  EXP --> J_ug
+  EXP --> J_vn
+  EXP --> J_vnx
+  EXP --> J_vnfe
+  EXP --> J_vnwl
+  EXP --> J_vnw
 
-  %% ===== JSON → visuals =====
-  J_oi --> f_oi
-  J_fnd --> f_oifnd
-  J_fnd --> c_oifnd
+  %% ================= JSON → COT =================
   J_cot --> c_ip
   J_cot --> c_sig
-  J_cot --> c_flow
   J_sig --> c_sig
+  J_cot --> c_gau
+  J_cot --> c_hm
+  J_cot --> c_flow
+  J_mac --> c_flow
+  J_cot --> c_dp
+  J_cot --> c_cyc
+  J_cot --> c_rep
+  J_cot --> c_oi
+  J_fnd --> c_oifnd
+
+  %% ================= JSON → FUTURES =================
   J_aca --> f_quote
+  J_chain --> f_chain
+  J_oi --> f_oi
+  J_fnd --> f_oifnd
+
+  %% ================= JSON → MACRO =================
   J_mac --> m_xc
   J_q --> m_cci
   J_fx --> m_fx
   J_fr --> m_fr
   J_cpi --> m_cpi
-  J_farm --> m_fert
-  J_orig --> m_fert
-  J_lp --> mp_px
-  J_cec --> mp_exp
-  J_news --> mp_news
+  J_fe --> m_fert
+  J_orig --> m_orig
+
+  %% ================= JSON → DEMAND =================
   J_stk --> d_stk
-  J_mix --> d_mix
+  J_stk --> d_ecf
+  J_stk --> d_psd
+  J_stk --> d_jp
+  J_stk --> d_age
+  J_stk --> d_grow
+  J_stk --> d_world
   J_earn --> d_earn
   J_tax --> d_tax
-  J_cecd --> s_br
-  J_farm --> s_farm
-  J_ferts --> s_fert
-  J_sup --> s_ctry
-  J_sup --> mp_px
+  J_mix --> d_mix
 
-  %% ===== Telegram brief: the 9 sections it pulls (LAST step) =====
+  %% ================= JSON → SUPPLY =================
+  J_cecd --> s_br
+  J_cecd --> s_mv
+  J_cecd --> s_exp
+  J_fe --> s_bfe
+  J_fsell --> s_sell
+  J_cec --> s_cec
+  J_vn --> s_vnexp
+  J_vnx --> s_vndest
+  J_vn --> s_vnbal
+  J_vnfe --> s_vnfe
+  J_vnwl --> s_vnwl
+  J_vnw --> s_vnw
+  J_co --> s_coexp
+  J_et --> s_et
+  J_hn --> s_hn
+  J_id --> s_id
+  J_ug --> s_ug
+  J_ferts --> s_fert
+  J_fe --> s_fert
+  J_vn --> s_fert
+  J_intel --> s_intel
+
+  %% ================= JSON → MAP =================
+  J_lp --> mp_map
+  J_cec --> mp_map
+  J_fr --> mp_map
+  J_vnx --> mp_map
+  J_lp --> mp_tick
+  J_aca --> mp_tick
+  J_news --> mp_news
+
+  %% ================= Telegram (9 sections) =================
   J_aca -->|prices·cost| TG
-  J_lp -->|prices·fx| TG
+  J_lp -->|fx| TG
   J_orig -->|cost| TG
   J_cot -->|CoT| TG
-  J_sig -->|CoT signals| TG
+  J_sig -->|signals| TG
   J_ev -->|next-24h| TG
-  J_sup -->|weather alerts| TG
+  J_co -->|weather| TG
+  J_vn -->|weather| TG
+  J_et -->|weather| TG
+  J_hn -->|weather| TG
+  J_id -->|weather| TG
+  J_ug -->|weather| TG
   J_fr -->|freight| TG
-  J_q -->|macro CCI| TG
+  J_q -->|macro| TG
   J_mac -->|macro MM| TG
   J_news -->|news| TG
 ```
