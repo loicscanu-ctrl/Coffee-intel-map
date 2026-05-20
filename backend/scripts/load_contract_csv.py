@@ -39,21 +39,27 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = REPO_ROOT / "data" / "contract_prices_archive.json"
+sys.path.insert(0, str(REPO_ROOT / "backend" / "scraper"))
+import symbols as _sym  # noqa: E402
 
 # Keep 5y + buffer of trading days, matching the Industry Pulse 5Y window.
 RETENTION_DAYS = 366 * 6  # calendar-day span ~6y; trims clearly-ancient rows only
 
 
-def _market_and_symbol(contract: str) -> tuple[str, str] | None:
-    """KCN26 → ('arabica','KCN26'); RMN26 → ('robusta','RCN26')."""
-    c = contract.strip().upper()
-    if c.startswith("KC"):
-        return "arabica", c
-    if c.startswith("RM"):
-        return "robusta", "RC" + c[2:]
-    if c.startswith("RC"):
-        return "robusta", c
-    return None
+def _market_and_symbol(contract: str, root: str | None = None) -> tuple[str, str] | None:
+    """Resolve a CSV contract cell to (market, canonical_symbol).
+
+    Accepts full symbols (KCN26, RMN26, RCN26) or bare month+year (N26) when
+    a `root` (KC/RM) is supplied — the bulk price CSVs are bare per-file.
+    Canonical = RC for robusta (via symbols.to_canonical).
+    """
+    c = (contract or "").strip().upper()
+    if not _sym.parse(c) and root:
+        c = f"{root.upper()}{c}"          # bare 'N26' + root 'RM' → 'RMN26'
+    market = _sym.market_of(c)
+    if not market:
+        return None
+    return market, _sym.to_canonical(c)
 
 
 def _load_archive() -> dict:
@@ -120,6 +126,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--kind", required=True, choices=["oi", "price"])
     ap.add_argument("--csv", required=True)
+    ap.add_argument("--root", choices=["KC", "RM", "RC"], default=None,
+                    help="Prefix for bare contract cells (e.g. 'N26'). Use KC for "
+                         "the arabica price CSV, RM for the robusta price CSV.")
     ap.add_argument("--dry-run", action="store_true", help="Parse + report, don't write.")
     args = ap.parse_args()
 
@@ -142,10 +151,11 @@ def main() -> int:
         field = "oi"
         cast = lambda v: int(float(v))
     else:
-        val_col = headers.get("price") or headers.get("close") or headers.get("last_price") or headers.get("settle")
+        val_col = (headers.get("last") or headers.get("settle") or headers.get("close")
+                   or headers.get("price") or headers.get("last_price"))
         field = "price"
         cast = lambda v: float(v)
-    date_col = headers.get("date")
+    date_col = headers.get("date") or headers.get("trade_date")
     contract_col = headers.get("contract") or headers.get("symbol")
     if not (val_col and date_col and contract_col):
         print(f"[load] missing required columns. Found headers: {list(headers.values())}", file=sys.stderr)
@@ -153,7 +163,7 @@ def main() -> int:
 
     stats = {"arabica": 0, "robusta": 0, "skipped": 0, "bad": 0}
     for r in rows:
-        ms = _market_and_symbol(r[contract_col])
+        ms = _market_and_symbol(r[contract_col], root=args.root)
         if not ms:
             stats["skipped"] += 1
             continue

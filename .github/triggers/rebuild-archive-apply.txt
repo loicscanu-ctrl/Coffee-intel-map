@@ -1,0 +1,2 @@
+Touch to APPLY workflow 0.4 (rebuild cot prices from archive → DB + re-export). Rollback via cot_weekly_price_archive.
+Last: never

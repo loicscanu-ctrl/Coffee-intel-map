@@ -1,0 +1,2 @@
+Touch to DRY-RUN workflow 0.4 (rebuild cot prices from archive). Telegram summary, no writes.
+Last: never
