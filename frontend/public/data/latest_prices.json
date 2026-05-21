@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-21T06:35:22.382044Z",
+  "generated_at": "2026-05-21T16:55:41.076765Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "268.30 (-1.85)",
+      "value": "274.15 (+5.85)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,328 (+0)",
+      "value": "3,400 (+72)",
       "category": "futures"
     },
     {
@@ -23,12 +23,12 @@
     },
     {
       "label": "CON T7",
-      "value": "860,00 BRL ($2,849)",
+      "value": "870,00 BRL ($2,882)",
       "category": "physical"
     },
     {
       "label": "UGA S15",
-      "value": "163.07 ($3,595)",
+      "value": "162.29 ($3,578)",
       "category": "physical"
     },
     {
