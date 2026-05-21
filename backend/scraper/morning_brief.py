@@ -517,7 +517,10 @@ def _weather_alerts_section() -> str:
     """
     alerts = []
     files = [
-        ("brazil_supply",    "Brazil"),
+        # Brazil weather lives in farmer_economics.json (weather.regions[]),
+        # not a brazil_supply.json (which is never published) — read it there so
+        # Sul-de-Minas / Cerrado drought + CSI alerts actually fire.
+        ("farmer_economics", "Brazil"),
         ("vietnam_supply",   "Vietnam"),
         ("colombia_supply",  "Colombia"),
         ("honduras_supply",  "Honduras"),

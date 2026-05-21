@@ -118,7 +118,13 @@ export async function fetchMapCountries(): Promise<CountryPin[]> {
 }
 
 export async function fetchMapFactories(): Promise<FactoryPin[]> {
-  return apiGet<FactoryPin[]>("/api/map/factories", { cache: "no-store" });
+  // Static-first: factory locations are reference data published to
+  // /data/factories.json. Fall back to the live API if a backend is configured.
+  try {
+    return await cachedFetchStatic<FactoryPin[]>("/data/factories.json");
+  } catch {
+    return apiGet<FactoryPin[]>("/api/map/factories", { cache: "no-store" });
+  }
 }
 
 export interface NewsItem {
@@ -162,8 +168,16 @@ export interface CotWeekly {
 }
 
 export async function fetchCot(after?: string): Promise<CotWeekly[]> {
-  const path = after ? `/api/cot?after=${encodeURIComponent(after)}` : "/api/cot";
-  return cachedFetch(path);
+  // Static-first: the daily export publishes /data/cot.json (the source of
+  // truth for this static-deployed site). Fall back to the live API only if
+  // the static file can't be served (e.g. a deploy that does run the backend).
+  try {
+    const all = await cachedFetchStatic<CotWeekly[]>("/data/cot.json");
+    return after ? all.filter(w => w.date > after) : all;
+  } catch {
+    const path = after ? `/api/cot?after=${encodeURIComponent(after)}` : "/api/cot";
+    return cachedFetch(path);
+  }
 }
 
 export interface MacroCotEntry {
@@ -185,6 +199,12 @@ export interface MacroCotWeek {
 }
 
 export async function fetchMacroCot(after?: string): Promise<MacroCotWeek[]> {
-  const path = after ? `/api/macro-cot?after=${encodeURIComponent(after)}` : "/api/macro-cot";
-  return cachedFetch(path);
+  // Static-first (see fetchCot): the export publishes /data/macro_cot.json.
+  try {
+    const all = await cachedFetchStatic<MacroCotWeek[]>("/data/macro_cot.json");
+    return after ? all.filter(w => w.date > after) : all;
+  } catch {
+    const path = after ? `/api/macro-cot?after=${encodeURIComponent(after)}` : "/api/macro-cot";
+    return cachedFetch(path);
+  }
 }

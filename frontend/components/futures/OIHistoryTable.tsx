@@ -668,14 +668,21 @@ export default function OIHistoryTable({ market }: { market: "robusta" | "arabic
     }
 
     Promise.all([
+      // Committed static export — the source of truth for this static site.
+      fetch("/data/oi_history.json")
+        .then(r => r.json())
+        .then((j: Record<string, DayData[]>) => j[market] ?? [])
+        .catch(() => [] as DayData[]),
       fetch(`${API_URL}/api/futures/oi-history?market=${market}&days=30`)
         .then(r => r.json()).catch(() => [] as DayData[]),
       fetch(GITHUB_OI_URL)
         .then(r => r.json())
         .then((j: Record<string, DayData[]>) => j[market] ?? [])
         .catch(() => [] as DayData[]),
-    ]).then(([localDays, githubDays]: [DayData[], DayData[]]) => {
-      const merged = mergeSources([STATIC_HISTORY[market], githubDays, localDays]);
+    ]).then(([staticDays, localDays, githubDays]: [DayData[], DayData[], DayData[]]) => {
+      // Freshest committed file first so it wins on overlapping dates; the API,
+      // GitHub raw, and embedded snapshot only backfill dates/symbols it lacks.
+      const merged = mergeSources([staticDays, localDays, githubDays, STATIC_HISTORY[market]]);
       if (merged.length) setDays(merged);
     });
   }, [market]);

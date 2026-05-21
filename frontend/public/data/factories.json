@@ -1,0 +1,3377 @@
+[
+{
+"lat": -3.892,
+"lng": -38.444,
+"name": "3 Corações Factory",
+"company": "Strauss/São Miguel",
+"capacity": "200k, Main distribution and roasting center.",
+"cap_kt": 200.0,
+"type": "mixed"
+},
+{
+"lat": -23.116,
+"lng": -48.918,
+"name": "Melitta Avaré",
+"company": "Melitta",
+"capacity": "60k, Their most modern and highest-volume plant in the region.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": -23.176,
+"lng": -50.648,
+"name": "Cia. Iguaçu Factory",
+"company": "Iguaçu (Marubeni)",
+"capacity": "40k, Instant coffee giant (owned by Marubeni).",
+"cap_kt": 40.0,
+"type": "soluble"
+},
+{
+"lat": -23.155,
+"lng": -46.945,
+"name": "JDE Jundiaí",
+"company": "JDE Peet's",
+"capacity": "40k, Massive hub for brands like Pilão and L'OR.",
+"cap_kt": 40.0,
+"type": "roastery"
+},
+{
+"lat": -22.345,
+"lng": -47.387,
+"name": "Nestlé Araras",
+"company": "Nestlé",
+"capacity": "25k, Historic Nescafé plant in Brazil.",
+"cap_kt": 25.0,
+"type": "mixed"
+},
+{
+"lat": -21.306,
+"lng": -46.721,
+"name": "Cooxupé Japy",
+"company": "Cooxupé Co-op",
+"capacity": "15.6k, The roasting complex of the world's largest cooperative.",
+"cap_kt": 15.6,
+"type": "mixed"
+},
+{
+"lat": -16.694,
+"lng": -43.842,
+"name": "Dolce Gusto MOC",
+"company": "Nestlé",
+"capacity": "15k, Exclusive high-tech capsule plant.",
+"cap_kt": 15.0,
+"type": "capsules"
+},
+{
+"lat": -23.447,
+"lng": -51.902,
+"name": "Café Maringá (Cocamar)",
+"company": "Cocamar Co-op",
+"capacity": "12k, Industrial complex of the Cocamar cooperative.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 43.708,
+"lng": -79.593,
+"name": "Club Coffee Toronto",
+"company": "Club Coffee",
+"capacity": "20k, North American leader in compostable capsules.",
+"cap_kt": 20.0,
+"type": "capsules"
+},
+{
+"lat": 43.208,
+"lng": -79.972,
+"name": "Tim Hortons Roastery",
+"company": "Tim Hortons",
+"capacity": "15k, Their roasting center of excellence (The Roastery).",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 6.175,
+"lng": -75.599,
+"name": "Colcafé Itagüí",
+"company": "Nutresa",
+"capacity": "20k, Primary plant of the Nutresa Group.",
+"cap_kt": 20.0,
+"type": "mixed"
+},
+{
+"lat": 4.975,
+"lng": -75.602,
+"name": "Buencafé Chinchiná",
+"company": "FNC",
+"capacity": "11.5k, The FNCs (National Federation of Coffee Growers) freeze-dried coffee factory.",
+"cap_kt": 11.5,
+"type": "soluble"
+},
+{
+"lat": -2.148,
+"lng": -79.957,
+"name": "El Café Guayaquil",
+"company": "El Café (EC)",
+"capacity": "15k, Industrial plant located on the Daule Highway.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 18.847,
+"lng": -97.054,
+"name": "Cafiver Veracruz",
+"company": "Cafiver",
+"capacity": "25k, Located in the Orizaba industrial corridor.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 19.167,
+"lng": -96.208,
+"name": "Descamex Veracruz",
+"company": "Descamex (Decaf)",
+"capacity": "20k, Water-process decaffeination plant.",
+"cap_kt": 20.0,
+"type": "decaf"
+},
+{
+"lat": 30.012,
+"lng": -90.015,
+"name": "Folgers NOLA Factory",
+"company": "J.M. Smucker",
+"capacity": "300k, The largest single-site roastery in the US.",
+"cap_kt": 300.0,
+"type": "roastery"
+},
+{
+"lat": 30.324,
+"lng": -81.644,
+"name": "Maxwell House Jacksonville",
+"company": "Kraft Heinz",
+"capacity": "150k, Massive facility directly on the St. Johns River.",
+"cap_kt": 150.0,
+"type": "mixed"
+},
+{
+"lat": 39.981,
+"lng": -76.694,
+"name": "Starbucks York Roastery",
+"company": "SBUX",
+"capacity": "135k, One of the largest roasting plants in the world.",
+"cap_kt": 135.0,
+"type": "roastery"
+},
+{
+"lat": 39.03,
+"lng": -119.752,
+"name": "Starbucks Minden Roastery",
+"company": "SBUX",
+"capacity": "100k, Serves the entire Western US.",
+"cap_kt": 100.0,
+"type": "roastery"
+},
+{
+"lat": 35.056,
+"lng": -92.417,
+"name": "Westrock Conway Complex",
+"company": "Westrock",
+"capacity": "120k total (100k roastery + 20k extract/RTD hub for Monster/SBUX). Site of their new $300M expansion.",
+"cap_kt": 120.0,
+"type": "mixed"
+},
+{
+"lat": 35.432,
+"lng": -80.605,
+"name": "Westrock Concord (ex-S&D)",
+"company": "Westrock",
+"capacity": "80k, 'The Heavyweight'. Major commodity hub handling massive contracts for McDonald's and Dunkin'.",
+"cap_kt": 80.0,
+"type": "mixed"
+},
+{
+"lat": 34.769,
+"lng": -92.269,
+"name": "Westrock N. Little Rock",
+"company": "Westrock",
+"capacity": "15k, 'The Retail Hub'. Packaging center for Private Label (Walmart/Great Value, Kroger).",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": 1.492,
+"lng": 103.741,
+"name": "Westrock Johor Bahru",
+"company": "Westrock",
+"capacity": "5k, 'The Bridgehead'. Regional export hub for Asia-Pacific markets.",
+"cap_kt": 5.0,
+"type": "mixed"
+},
+{
+"lat": 36.758,
+"lng": -76.551,
+"name": "MZB Suffolk (Wilroy Rd)",
+"company": "Massimo Zanetti",
+"capacity": "100k, The engine for Walmart/Costco private labels.",
+"cap_kt": 100.0,
+"type": "roastery"
+},
+{
+"lat": 37.747,
+"lng": -122.234,
+"name": "Peet's Alameda Roastery",
+"company": "Peet's",
+"capacity": "60k, Their LEED Gold certified industrial hub.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": 44.341,
+"lng": -72.742,
+"name": "Keurig Dr Pepper VT",
+"company": "KDP",
+"capacity": "60k, Primary K-Cup production hub.",
+"cap_kt": 60.0,
+"type": "capsules"
+},
+{
+"lat": 33.025,
+"lng": -97.231,
+"name": "Farmer Brothers Northlake",
+"company": "Farmer Bros",
+"capacity": "45k, Massive HQ and roasting plant near DFW.",
+"cap_kt": 45.0,
+"type": "roastery"
+},
+{
+"lat": 38.932,
+"lng": -76.884,
+"name": "Eight O'Clock Landover",
+"company": "Tata Consumer",
+"capacity": "25k, Owned by Tata Consumer Products.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 39.986,
+"lng": -75.105,
+"name": "La Colombe Philadelphia",
+"company": "La Colombe (Chobani)",
+"capacity": "20k",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 36.745,
+"lng": -76.568,
+"name": "Segafredo Suffolk (Progress Rd)",
+"company": "Massimo Zanetti",
+"capacity": "20k, Specialized facility near the main MZB plant.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 43.048,
+"lng": -77.671,
+"name": "Tim Hortons Rochester",
+"company": "Tim Hortons",
+"capacity": "15k, Major US-based industrial roasting site.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 35.471,
+"lng": -86.046,
+"name": "Black Rifle Manchester",
+"company": "BRCC",
+"capacity": "15k",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 39.919,
+"lng": -74.996,
+"name": "Melitta Cherry Hill",
+"company": "Melitta",
+"capacity": "15k, The primary Melitta roasting hub for the US.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 40.739,
+"lng": -73.921,
+"name": "White Coffee LIC",
+"company": "White Coffee Corp",
+"capacity": "12k, Historic LIC industrial roastery.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 34.004,
+"lng": -118.238,
+"name": "Gavin LA (McDonald's)",
+"company": "Gavin Coffee",
+"capacity": "12k, Key industrial roaster for West Coast fast food.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 42.936,
+"lng": -73.791,
+"name": "Death Wish Round Lake",
+"company": "Death Wish Coffee",
+"capacity": "6k",
+"cap_kt": 6.0,
+"type": "roastery"
+},
+{
+"lat": 33.354,
+"lng": -81.986,
+"name": "Starbucks Augusta (Soluble)",
+"company": "SBUX",
+"capacity": "4k, Specialized soluble (Via) and extract plant.",
+"cap_kt": 4.0,
+"type": "soluble"
+},
+{
+"lat": 43.642,
+"lng": -79.675,
+"name": "Mother Parkers Mississauga",
+"company": "Mother Parkers",
+"capacity": "70k",
+"cap_kt": 70.0,
+"type": "roastery"
+},
+{
+"lat": 37.985,
+"lng": -103.542,
+"name": "Coffee Holding Co. (La Junta)",
+"company": "Coffee Holding Company",
+"capacity": "12k",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 16.326,
+"lng": 80.627,
+"name": "CCL Products Guntur",
+"company": "CCL (India)",
+"capacity": "35k",
+"cap_kt": 35.0,
+"type": "soluble"
+},
+{
+"lat": 12.466,
+"lng": 75.968,
+"name": "Tata Coffee Kushalnagar",
+"company": "Tata Consumer",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 12.468,
+"lng": 75.97,
+"name": "SLN Coffee Kudlur",
+"company": "SLN",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": -7.356,
+"lng": 112.658,
+"name": "Kapal Api Sidoarjo",
+"company": "Santos Jaya Abadi",
+"capacity": "80k",
+"cap_kt": 80.0,
+"type": "roastery"
+},
+{
+"lat": -6.195,
+"lng": 106.568,
+"name": "Mayora Tangerang",
+"company": "Mayora",
+"capacity": "50k",
+"cap_kt": 50.0,
+"type": "roastery"
+},
+{
+"lat": 34.855,
+"lng": 136.598,
+"name": "Ajinomoto Suzuka",
+"company": "Ajinomoto AGF",
+"capacity": "40k",
+"cap_kt": 40.0,
+"type": "mixed"
+},
+{
+"lat": 34.686,
+"lng": 135.267,
+"name": "UCC Rokko Island",
+"company": "UCC",
+"capacity": "40k",
+"cap_kt": 40.0,
+"type": "roastery"
+},
+{
+"lat": 35.688,
+"lng": 139.991,
+"name": "Key Coffee Funabashi",
+"company": "Key Coffee",
+"capacity": "30k",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 1.522,
+"lng": 103.875,
+"name": "Power Root Plentong",
+"company": "Power Root (Alicafé)",
+"capacity": "18k",
+"cap_kt": 18.0,
+"type": "mixed"
+},
+{
+"lat": 1.503,
+"lng": 103.826,
+"name": "Super Food Permas Jaya",
+"company": "Super/JDE",
+"capacity": "20k",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 3.003,
+"lng": 101.52,
+"name": "HACO Shah Alam",
+"company": "HACO",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 2.264,
+"lng": 102.223,
+"name": "Aik Cheong Melaka",
+"company": "Aik Cheong",
+"capacity": "8k",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 2.046,
+"lng": 102.668,
+"name": "Mister Coffee Bakri",
+"company": "Mister Coffee",
+"capacity": "5k",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 5.094,
+"lng": 115.939,
+"name": "Yit Foh Tenom",
+"company": "Yit Foh",
+"capacity": "2k",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 24.832,
+"lng": 67.118,
+"name": "S-CAFE Korangi Industrial",
+"company": "S-CAFE (PK)",
+"capacity": "2k, Pakistan's primary industrial roasting zone.",
+"cap_kt": 2.0,
+"type": "soluble"
+},
+{
+"lat": 14.568,
+"lng": 121.066,
+"name": "URC Pasig Plant",
+"company": "Universal Robina",
+"capacity": "15k, The massive Great Taste / Blend 45 hub.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 37.525,
+"lng": 126.691,
+"name": "Dongsuh Maxim Incheon",
+"company": "Dongsuh",
+"capacity": "60k, The home of Maxim coffee in South Korea.",
+"cap_kt": 60.0,
+"type": "soluble"
+},
+{
+"lat": 12.871,
+"lng": 101.144,
+"name": "Boncafé Rayong Factory",
+"company": "Segafredo (TH)",
+"capacity": "8k, Within the Rayong Industrial Park.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 20.245,
+"lng": 100.41,
+"name": "Thabdheva Thapthai Lab",
+"company": "Dheva Lab",
+"capacity": "1k, Specialized roasting lab in North Thailand.",
+"cap_kt": 1.0,
+"type": "roastery"
+},
+{
+"lat": 10.963,
+"lng": 107.012,
+"name": "Nestlé Tri An Factory",
+"company": "Nestlé",
+"capacity": "32k, One of the largest Nescafé plants in Asia.",
+"cap_kt": 32.0,
+"type": "soluble"
+},
+{
+"lat": 10.938,
+"lng": 106.892,
+"name": "Iguacu Vietnam Plant",
+"company": "Iguacu (BR)",
+"capacity": "15k, Specialized soluble plant.",
+"cap_kt": 15.0,
+"type": "soluble"
+},
+{
+"lat": 10.741,
+"lng": 106.915,
+"name": "Olam Nhon Trach",
+"company": "Olam",
+"capacity": "12k, High-volume industrial processing.",
+"cap_kt": 12.0,
+"type": "mixed"
+},
+{
+"lat": 11.134,
+"lng": 106.697,
+"name": "Tata Coffee VSIP",
+"company": "Tata Consumer",
+"capacity": "10k, Modern freeze-dried soluble facility.",
+"cap_kt": 10.0,
+"type": "soluble"
+},
+{
+"lat": 11.121,
+"lng": 106.678,
+"name": "Instanta/LDC Binh Duong",
+"company": "ILD Coffee",
+"capacity": "6k, Shared with LDC (ILD Coffee JV).",
+"cap_kt": 6.0,
+"type": "soluble"
+},
+{
+"lat": 11.085,
+"lng": 106.634,
+"name": "Vinacafé Binh Duong",
+"company": "Masan Group",
+"capacity": "15k, High-capacity roastery and soluble line.",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": 23.821,
+"lng": 90.435,
+"name": "North End Dhaka Roastery",
+"company": "North End (BD)",
+"capacity": "1k, Bangladesh's primary specialty roastery.",
+"cap_kt": 1.0,
+"type": "roastery"
+},
+{
+"lat": 41.214,
+"lng": 69.215,
+"name": "Coffee-Boom Industrial",
+"company": "Coffee-Boom",
+"capacity": "3k, Massive central hub for Central Asia.",
+"cap_kt": 3.0,
+"type": "roastery"
+},
+{
+"lat": 43.342,
+"lng": 76.945,
+"name": "Master Roasters Almaty",
+"company": "Master Roasters",
+"capacity": "2k, Primary industrial roastery in Kazakhstan.",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 41.341,
+"lng": 19.682,
+"name": "Caffè Nino Factory",
+"company": "Nino (Albania)",
+"capacity": "3k, Key industrial corridor for Albanian exports.",
+"cap_kt": 3.0,
+"type": "roastery"
+},
+{
+"lat": 48.213,
+"lng": 16.321,
+"name": "Julius Meinl Vienna",
+"company": "Julius Meinl",
+"capacity": "10k, Historic roasting hub in the 16th district.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 53.842,
+"lng": 27.685,
+"name": "Barista Minsk Factory",
+"company": "Barista",
+"capacity": "4k, Located in the southern industrial zone.",
+"cap_kt": 4.0,
+"type": "roastery"
+},
+{
+"lat": 50.925,
+"lng": 4.412,
+"name": "JDE Grimbergen Factory",
+"company": "JDE Peet's",
+"capacity": "30k, Massive JDE Peet's roasting hub for Benelux.",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 50.655,
+"lng": 5.584,
+"name": "Cafea Liège Plant",
+"company": "Cafea",
+"capacity": "20k, Soluble and liquid coffee production site.",
+"cap_kt": 20.0,
+"type": "soluble"
+},
+{
+"lat": 42.756,
+"lng": 23.184,
+"name": "Spetema Bozhurishte",
+"company": "Spetema (BG)",
+"capacity": "10k, Modern industrial complex outside Sofia.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 42.812,
+"lng": 23.215,
+"name": "Nova Brasilia Plant",
+"company": "JDE (BG)",
+"capacity": "8k, JDE's primary production hub for Bulgaria.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 45.808,
+"lng": 15.952,
+"name": "Franck Zagreb Factory",
+"company": "Franck (Croatia)",
+"capacity": "15k, The historic heart of roasting in Croatia.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 59.324,
+"lng": 24.551,
+"name": "Paulig Saue Factory",
+"company": "Paulig (EE)",
+"capacity": "5k, Primary production hub for the Baltics.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 60.215,
+"lng": 25.178,
+"name": "Paulig Vuosaari Port",
+"company": "Paulig",
+"capacity": "60k, Directly in the Port of Vuosaari for logistics.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": 60.191,
+"lng": 24.949,
+"name": "Meira Helsinki Plant",
+"company": "Segafredo",
+"capacity": "10k, Historic city-industrial hybrid roastery.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 50.621,
+"lng": 3.048,
+"name": "Méo-Fichaux Lille",
+"company": "Méo-Fichaux",
+"capacity": "35k, The North Star of French private label coffee.",
+"cap_kt": 35.0,
+"type": "roastery"
+},
+{
+"lat": 49.408,
+"lng": 1.092,
+"name": "Segafredo Rouen Plant",
+"company": "Massimo Zanetti",
+"capacity": "30k, Massimo Zanetti's primary French industrial hub.",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 45.545,
+"lng": 4.272,
+"name": "JDE Andrézieux Plant",
+"company": "JDE Peet's",
+"capacity": "25k, The high-tech home of aluminum capsules.",
+"cap_kt": 25.0,
+"type": "capsules"
+},
+{
+"lat": 43.585,
+"lng": 3.805,
+"name": "Carte Noire Lavérune",
+"company": "Lavazza",
+"capacity": "25k, Lavazza's primary industrial facility in France.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 48.572,
+"lng": 7.795,
+"name": "Cafe Sati Strasbourg",
+"company": "Cafés Sati",
+"capacity": "10k, Major industrial hub on the Rhine river.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 43.715,
+"lng": 7.142,
+"name": "Malongo La Gaude",
+"company": "Malongo",
+"capacity": "7k, High-tech roastery in the Industrial zone of Nice.",
+"cap_kt": 7.0,
+"type": "roastery"
+},
+{
+"lat": 40.18,
+"lng": 44.51,
+"name": "Royal Armenia",
+"company": "Royal Armenia",
+"capacity": "5k, Primary industrial roasting site in Armenia.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 41.71,
+"lng": 44.82,
+"name": "Cherie",
+"company": "Cherie (Georgia)",
+"capacity": "2k, Georgia's largest industrial roasting plant.",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 53.078,
+"lng": 8.795,
+"name": "Jacobs Bremen Industrial",
+"company": "JDE/Melitta",
+"capacity": "80k, The industrial heart of JDE/Jacobs in Germany.",
+"cap_kt": 80.0,
+"type": "roastery"
+},
+{
+"lat": 53.535,
+"lng": 10.082,
+"name": "Tchibo Hamburg Plant",
+"company": "Tchibo",
+"capacity": "60k, Massive roasting complex in the Billbrook zone.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": 52.272,
+"lng": 7.428,
+"name": "Bonita Rheine (Lidl)",
+"company": "Schwarz Group",
+"capacity": "50k, Lidl's dedicated high-volume industrial roastery.",
+"cap_kt": 50.0,
+"type": "roastery"
+},
+{
+"lat": 48.115,
+"lng": 11.605,
+"name": "Dallmayr Munich (Perlach)",
+"company": "Dallmayr",
+"capacity": "35k, Core industrial plant for Prodomo and high-margin retail lines.",
+"cap_kt": 35.0,
+"type": "roastery"
+},
+{
+"lat": 52.464,
+"lng": 13.435,
+"name": "Dallmayr Berlin (Neukölln)",
+"company": "Dallmayr",
+"capacity": "28k, Major hub for capsule production and NE Germany distribution.",
+"cap_kt": 28.0,
+"type": "mixed"
+},
+{
+"lat": 53.076,
+"lng": 8.794,
+"name": "Dallmayr Bremen (Azul)",
+"company": "Dallmayr/Azul",
+"capacity": "15k, Port-side logistics center and primary roastery for Azul brand.",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": 52.278,
+"lng": 10.518,
+"name": "Dallmayr Braunschweig",
+"company": "Dallmayr",
+"capacity": "10k, High-volume industrial roasting for Central German retail.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 51.514,
+"lng": 7.463,
+"name": "Dallmayr Dortmund",
+"company": "Dallmayr",
+"capacity": "8k, Regional distribution hub for the West German urban belt.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 53.546,
+"lng": 10.021,
+"name": "DEK Hamburg Factory",
+"company": "Cafea Group",
+"capacity": "40k, Central hub for DEK private label instant coffee.",
+"cap_kt": 40.0,
+"type": "soluble"
+},
+{
+"lat": 52.991,
+"lng": 8.874,
+"name": "Markus Kaffee (Aldi Nord)",
+"company": "Melitta/Aldi",
+"capacity": "35k, Aldi Nord's primary high-volume roastery.",
+"cap_kt": 35.0,
+"type": "roastery"
+},
+{
+"lat": 51.428,
+"lng": 6.879,
+"name": "NewCoffee (Aldi Süd)",
+"company": "Aldi Süd",
+"capacity": "35k, Aldi Süd's massive industrial roasting site.",
+"cap_kt": 35.0,
+"type": "roastery"
+},
+{
+"lat": 52.458,
+"lng": 13.452,
+"name": "DEK Berlin Instant",
+"company": "Cafea Group",
+"capacity": "25k, Deutsche Extrakt Kaffee's secondary instant plant.",
+"cap_kt": 25.0,
+"type": "soluble"
+},
+{
+"lat": 49.972,
+"lng": 10.885,
+"name": "Minges Bavaria Plant",
+"company": "Minges",
+"capacity": "12k, High-volume Private Label specialist.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 38.312,
+"lng": 23.645,
+"name": "Nestlé Oinofyta Plant",
+"company": "Nestlé (GR)",
+"capacity": "20k, The industrial hub for Nestlé Greece.",
+"cap_kt": 20.0,
+"type": "soluble"
+},
+{
+"lat": 38.164,
+"lng": 21.652,
+"name": "Coffee Island Roastery",
+"company": "Coffee Island",
+"capacity": "12k, High-tech roastery for their massive retail chain.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 47.452,
+"lng": 18.924,
+"name": "Tchibo Budaörs Plant",
+"company": "Tchibo",
+"capacity": "15k, Strategic roastery on the M1 highway.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 47.461,
+"lng": 19.048,
+"name": "Douwe Egberts Budapest",
+"company": "JDE Peet's",
+"capacity": "12k, JDE Peet's primary Hungarian industrial hub.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 45.141,
+"lng": 7.808,
+"name": "Lavazza Settimo Torinese",
+"company": "Lavazza",
+"capacity": "85k, One of the most automated roasteries in Europe.",
+"cap_kt": 85.0,
+"type": "roastery"
+},
+{
+"lat": 44.428,
+"lng": 11.365,
+"name": "Segafredo Bologna Plant",
+"company": "Massimo Zanetti",
+"capacity": "20k, Massimo Zanetti's historic industrial heart.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 40.918,
+"lng": 14.234,
+"name": "Kimbo Naples Factory",
+"company": "Kimbo",
+"capacity": "20k, Located in the Northern Naples industrial belt.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 46.155,
+"lng": 12.231,
+"name": "Procaffé Belluno",
+"company": "Bristot/Bonomi",
+"capacity": "20k, Home of Bristot and Bonomi industrial roasting.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 40.965,
+"lng": 14.331,
+"name": "Caffè Borbone Caivano",
+"company": "Caffè Borbone",
+"capacity": "15k, Ultramodern plant for ESE pods and capsules.",
+"cap_kt": 15.0,
+"type": "capsules"
+},
+{
+"lat": 45.474,
+"lng": 10.842,
+"name": "Pellini Bussolengo",
+"company": "Pellini Caffè",
+"capacity": "12k, High-volume industrial espresso plant.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 44.205,
+"lng": 10.962,
+"name": "Caffitaly Gaggio Montano",
+"company": "Caffitaly",
+"capacity": "12k, The global center for Caffitaly capsule production.",
+"cap_kt": 12.0,
+"type": "capsules"
+},
+{
+"lat": 45.602,
+"lng": 12.245,
+"name": "Goppion Preganziol",
+"company": "Goppion",
+"capacity": "8k, Their primary industrial hub since 1968. Highly automated with a focus on premium espresso for the Veneto region.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 41.908,
+"lng": 12.585,
+"name": "Mondicaffè Rome",
+"company": "Torrefazione Giubileo",
+"capacity": "2k, Located in the eastern industrial belt of Rome (Tor Cervara). The Giubileo and CSC certified roastery of the city",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 43.763,
+"lng": 11.269,
+"name": "DiniCaffè Florence",
+"company": "DiniCaffè Srl",
+"capacity": "1k, An artisan-at-scale industrial roastery located in the historic heart of Florence, utilizing specialized hot-air roasting",
+"cap_kt": 1.0,
+"type": "roastery"
+},
+{
+"lat": 43.574,
+"lng": 10.338,
+"name": "Arcaffè Livorno",
+"company": "Meschini Family",
+"capacity": "1k, Founding member of the CSC (Certified Specialty Coffee) consortium. High-tech roastery powered by a large photovoltaic system",
+"cap_kt": 1.0,
+"type": "roastery"
+},
+{
+"lat": 52.094,
+"lng": 5.092,
+"name": "JDE Utrecht Hub",
+"company": "JDE Peet's",
+"capacity": "45k, JDE's massive global logistics and roasting hub.",
+"cap_kt": 45.0,
+"type": "roastery"
+},
+{
+"lat": 53.064,
+"lng": 5.528,
+"name": "UCC Bolsward Plant",
+"company": "UCC (Private Label)",
+"capacity": "20k, Key Private Label hub for the UK/Benelux market.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 51.785,
+"lng": 4.641,
+"name": "Pelican Rouge Dordrecht",
+"company": "Selecta Group",
+"capacity": "15k, Mass production for vending and retail brands.",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": 51.921,
+"lng": 4.475,
+"name": "Euro-Caps Rotterdam",
+"company": "Euro-Caps (PL)",
+"capacity": "15k, High-speed global capsule manufacturing hub.",
+"cap_kt": 15.0,
+"type": "capsules"
+},
+{
+"lat": 59.601,
+"lng": 10.744,
+"name": "Joh. Johannson Vestby",
+"company": "Evergood/NorgesGruppen",
+"capacity": "12k, One of the world's most sustainable roasteries (LEED Gold).",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 60.316,
+"lng": 5.381,
+"name": "Friele Bergen Factory",
+"company": "JDE Peet's",
+"capacity": "10k, JDE Peet's historic and largest industrial base in Norway.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 63.439,
+"lng": 10.421,
+"name": "Kjeldsberg Trondheim",
+"company": "Kjeldsberg",
+"capacity": "8k, The primary roaster for Central/Northern Norway retail.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 49.728,
+"lng": 18.822,
+"name": "Mokate Ustroń Complex",
+"company": "Mokate Group",
+"capacity": "30k, Massive complex for instant mixes, roasting, and private label.",
+"cap_kt": 30.0,
+"type": "mixed"
+},
+{
+"lat": 52.418,
+"lng": 16.965,
+"name": "Prima Poznań Factory",
+"company": "JDE Peet's",
+"capacity": "25k, The industrial heart of JDE Peet's in Central/Eastern Europe.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 50.045,
+"lng": 18.675,
+"name": "Instanta Żory Plant",
+"company": "Instanta/LDC",
+"capacity": "12k, High-volume industrial hub for private label soluble/roasted.",
+"cap_kt": 12.0,
+"type": "soluble"
+},
+{
+"lat": 50.046,
+"lng": 18.694,
+"name": "Coffee Promotion Żory",
+"company": "Coffee Promotion",
+"capacity": "10k, Shared industrial zone with Instanta; high-speed automated packaging.",
+"cap_kt": 10.0,
+"type": "soluble"
+},
+{
+"lat": 39.012,
+"lng": -7.065,
+"name": "Delta Cafés Campo Maior",
+"company": "Delta (PT)",
+"capacity": "25k, The Coffee City of Portugal; massive industrial site.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 44.471,
+"lng": 25.927,
+"name": "Cafea Fortuna Factory",
+"company": "Cafea Fortuna",
+"capacity": "10k, Located in the western logistics belt of Bucharest.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 44.407,
+"lng": 26.192,
+"name": "Strauss Romania (Doncafé)",
+"company": "Strauss Group",
+"capacity": "12k, Massive Doncafé plant in the eastern industrial zone.",
+"cap_kt": 12.0,
+"type": "mixed"
+},
+{
+"lat": 44.428,
+"lng": 26.205,
+"name": "Amigo Soluble Plant",
+"company": "Instanta/Amigo",
+"capacity": "8k, Historic plant for Amigo soluble (instant) coffee.",
+"cap_kt": 8.0,
+"type": "soluble"
+},
+{
+"lat": 59.831,
+"lng": 30.645,
+"name": "Orimi Trade Factory",
+"company": "Orimi (RU)",
+"capacity": "50k, Its primary industrial tea and coffee complex.",
+"cap_kt": 50.0,
+"type": "roastery"
+},
+{
+"lat": 59.771,
+"lng": 30.101,
+"name": "JDE Gorelovo Factory",
+"company": "JDE Peet's",
+"capacity": "30k, Massive production hub near Saint Petersburg.",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 56.804,
+"lng": 35.923,
+"name": "Poetti Tver (ex-Paulig)",
+"company": "MilFoods LLC",
+"capacity": "25k, Former Paulig plant, now the center for Poetti.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 44.861,
+"lng": 20.089,
+"name": "Strauss Adriatic (Doncafé)",
+"company": "Strauss Group",
+"capacity": "18k, The industrial heart of Doncafé for the Balkans.",
+"cap_kt": 18.0,
+"type": "mixed"
+},
+{
+"lat": 41.972,
+"lng": 2.815,
+"name": "Nestlé Girona Factory",
+"company": "Nestlé",
+"capacity": "30k, Massive Nescafé and Dolce Gusto hub.",
+"cap_kt": 30.0,
+"type": "mixed"
+},
+{
+"lat": 41.915,
+"lng": -4.492,
+"name": "Prosol Venta de Baños",
+"company": "Productos Solubles",
+"capacity": "15k, Private Label Soluble giant (Lidl/Aldi supply)",
+"cap_kt": 15.0,
+"type": "soluble"
+},
+{
+"lat": 42.451,
+"lng": -2.432,
+"name": "UCC Logroño Plant",
+"company": "UCC Europe",
+"capacity": "10k, High-volume industrial roasting for UCC Europe.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 41.341,
+"lng": 1.705,
+"name": "Cafés Novell Vilafranca",
+"company": "Cafés Novell",
+"capacity": "5k, Specialized industrial roasting and packaging.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 43.175,
+"lng": -2.628,
+"name": "Cafés Baqué Iurreta",
+"company": "Cafés Baqué",
+"capacity": "4k, Key industrial roaster for the Basque region",
+"cap_kt": 4.0,
+"type": "roastery"
+},
+{
+"lat": 60.671,
+"lng": 17.152,
+"name": "Gevalia Gävle Factory",
+"company": "JDE Peet's",
+"capacity": "45k, The historic heart of roasting in Sweden.",
+"cap_kt": 45.0,
+"type": "roastery"
+},
+{
+"lat": 59.381,
+"lng": 13.511,
+"name": "Löfbergs Karlstad Hub",
+"company": "Löfbergs",
+"capacity": "30k, One of the most modern roasteries in Scandinavia",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 46.885,
+"lng": 7.045,
+"name": "Nestlé Avenches (Nespresso)",
+"company": "Nestlé",
+"capacity": "60k, The Holy Grail of Nespresso production.",
+"cap_kt": 60.0,
+"type": "capsules"
+},
+{
+"lat": 47.556,
+"lng": 7.621,
+"name": "Delica Birsfelden Plant",
+"company": "Migros Group",
+"capacity": "25k, Massive plant supplying the Swiss retail market.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 46.938,
+"lng": 7.502,
+"name": "HACO Bern Factory",
+"company": "HACO AG",
+"capacity": "8k, High-tech industrial soluble and extract hub.",
+"cap_kt": 8.0,
+"type": "soluble"
+},
+{
+"lat": 51.581,
+"lng": 0.495,
+"name": "Costa Basildon Roastery",
+"company": "Coca-Cola",
+"capacity": "45k, Coca-Cola's primary UK roasting super-hub",
+"cap_kt": 45.0,
+"type": "roastery"
+},
+{
+"lat": 52.855,
+"lng": -1.685,
+"name": "Nestlé Tutbury Plant",
+"company": "Nestlé",
+"capacity": "35k, Massive Nescafé and Dolce Gusto production",
+"cap_kt": 35.0,
+"type": "mixed"
+},
+{
+"lat": 52.071,
+"lng": -1.345,
+"name": "Kenco Banbury Factory",
+"company": "JDE Peet's",
+"capacity": "25k, Historic hub for Kenco and Tassimo production",
+"cap_kt": 25.0,
+"type": "mixed"
+},
+{
+"lat": 54.733,
+"lng": -6.206,
+"name": "Slumberjack Antrim Factory",
+"company": "Slumberjack (Clandeboye Agencies)",
+"capacity": "2k, industrial roasting and automated packaging hub supplying major UK/Ireland retail chains.",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 51.448,
+"lng": 0.225,
+"name": "UCC Dartford Roastery",
+"company": "UCC Europe",
+"capacity": "15k, Key roastery for UK food service and retail",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 49.845,
+"lng": 24.032,
+"name": "Galca Lviv Factory",
+"company": "Galca Coffee",
+"capacity": "5k, The industrial heart of Ukrainian coffee culture",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 50.485,
+"lng": 30.458,
+"name": "Coffeeton Kyiv Plant",
+"company": "Coffeeton LLC",
+"capacity": "6k",
+"cap_kt": 6.0,
+"type": "roastery"
+},
+{
+"lat": 36.752,
+"lng": 3.042,
+"name": "Facto Algiers",
+"company": "Facto Group",
+"capacity": "25k",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 36.438,
+"lng": 6.632,
+"name": "Café Sidi (Bouanaba)",
+"company": "SIDI BOUANABA",
+"capacity": "12k, One of the most technologically advanced coffee factories in Eastern Algeria.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 36.195,
+"lng": 5.415,
+"name": "Café Ennasr Sétif",
+"company": "Ennasr Coffee",
+"capacity": "10k, Sétif is Algeria's Coffee Capital, and this plant is a major hub for retail distribution",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 36.54,
+"lng": 4.676,
+"name": "Bensekhri Group Hub",
+"company": "Ets Bensekhri",
+"capacity": "8k, A massive industrial group handling everything from conveyor belt manufacturing to coffee roasting and distribution.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 33.573,
+"lng": -7.589,
+"name": "Cafés Dubois",
+"company": "Dubois (Morocco)",
+"capacity": "8k",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 5.36,
+"lng": -3.96,
+"name": "Nestlé Abidjan",
+"company": "Nestlé (CI)",
+"capacity": "40k",
+"cap_kt": 40.0,
+"type": "mixed"
+},
+{
+"lat": 5.33,
+"lng": -4.03,
+"name": "Capral Abidjan",
+"company": "Nestlé/Capral",
+"capacity": "12k",
+"cap_kt": 12.0,
+"type": "mixed"
+},
+{
+"lat": 14.71,
+"lng": -17.46,
+"name": "TDK Dakar",
+"company": "Café de Touba",
+"capacity": "3k",
+"cap_kt": 3.0,
+"type": "roastery"
+},
+{
+"lat": -29.011,
+"lng": 29.873,
+"name": "Nestlé Estcourt",
+"company": "Nestlé (SA)",
+"capacity": "35k",
+"cap_kt": 35.0,
+"type": "mixed"
+},
+{
+"lat": -26.138,
+"lng": 28.204,
+"name": "AVI Isando",
+"company": "AVI (SA)",
+"capacity": "18k",
+"cap_kt": 18.0,
+"type": "roastery"
+},
+{
+"lat": -8.84,
+"lng": 31.36,
+"name": "Mount Sunzu Mbala",
+"company": "Sunzu (ZM)",
+"capacity": "2k",
+"cap_kt": 2.0,
+"type": "roastery"
+},
+{
+"lat": 36.8,
+"lng": 10.18,
+"name": "Ben Yedder",
+"company": "Cafés Ben Yedder",
+"capacity": "5k",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 29.96,
+"lng": 31.48,
+"name": "Abdel Maboud Factory",
+"company": "Al-Yemeni Café",
+"capacity": "20k, Claims the largest coffee plant in the region. Located in the New Cairo industrial belt",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 29.928,
+"lng": 30.888,
+"name": "Shaheen Coffee Factory",
+"company": "Shaheen (EG)",
+"capacity": "12k, The primary factory pin for roasting and packaging",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 29.98,
+"lng": 30.95,
+"name": "Orouba Coffee Factory",
+"company": "Orouba (EG)",
+"capacity": "10k, industrial site for large-scale manufacturing",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 29.97,
+"lng": 31.493,
+"name": "Abu Auf (Samo Trading)",
+"company": "Abu Auf",
+"capacity": "8.5k, Operated under Samo Trading Company (the parent industrial arm)",
+"cap_kt": 8.5,
+"type": "roastery"
+},
+{
+"lat": 30.267,
+"lng": 31.769,
+"name": "Misrcafe Factory",
+"company": "Misr Coffee",
+"capacity": "4k, The original industrial hub for instant and roasted coffee in Egypt",
+"cap_kt": 4.0,
+"type": "mixed"
+},
+{
+"lat": 36.388,
+"lng": 59.395,
+"name": "Multicafe Factory",
+"company": "Part Sazan (Iran)",
+"capacity": "6k",
+"cap_kt": 6.0,
+"type": "roastery"
+},
+{
+"lat": 35.34,
+"lng": 51.215,
+"name": "Parto Padideh Factory",
+"company": "Opera Coffee (IR)",
+"capacity": "4k",
+"cap_kt": 4.0,
+"type": "roastery"
+},
+{
+"lat": 31.936,
+"lng": 34.908,
+"name": "Strauss Elite Factory",
+"company": "Strauss Group",
+"capacity": "30k",
+"cap_kt": 30.0,
+"type": "mixed"
+},
+{
+"lat": 33.876,
+"lng": 35.549,
+"name": "Café Najjar Factory",
+"company": "Café Najjar",
+"capacity": "15k",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 33.791,
+"lng": 35.518,
+"name": "Maatouk Roastery",
+"company": "Maatouk",
+"capacity": "5k",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 24.538,
+"lng": 46.852,
+"name": "Baja Industrial",
+"company": "Baja (KSA)",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 21.436,
+"lng": 39.261,
+"name": "Bon Cafe Factory",
+"company": "Bon Cafe (SA)",
+"capacity": "8k",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 21.365,
+"lng": 39.305,
+"name": "Barn's Roastery",
+"company": "Barn's (KSA)",
+"capacity": "8k",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 41.012,
+"lng": 29.176,
+"name": "Mehmet Efendi Industrial",
+"company": "Kurukahveci",
+"capacity": "12k",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 24.896,
+"lng": 55.138,
+"name": "Nestlé Dubai South",
+"company": "Nestlé",
+"capacity": "20k",
+"cap_kt": 20.0,
+"type": "mixed"
+},
+{
+"lat": -26.192,
+"lng": 152.668,
+"name": "Nestlé Gympie Factory",
+"company": "Nestlé (AU)",
+"capacity": "30k",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": -33.834,
+"lng": 151.05,
+"name": "Vittoria Silverwater",
+"company": "Cantarella Bros",
+"capacity": "15k",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": -33.856,
+"lng": 150.935,
+"name": "Grinders Fairfield",
+"company": "Coca-Cola (AU)",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": -33.851,
+"lng": 150.908,
+"name": "Harris Wetherill Park",
+"company": "JDE Peet's",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": -37.708,
+"lng": 145.011,
+"name": "The Bean Alliance Reservoir",
+"company": "Segafredo (AU)",
+"capacity": "8k",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": -36.897,
+"lng": 174.693,
+"name": "UCC Avondale Factory",
+"company": "UCC (NZ)",
+"capacity": "10k",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 31.332,
+"lng": 121.031,
+"name": "Starbucks CIP Kunshan",
+"company": "Starbucks",
+"capacity": "13.5k, Energy-efficient 'bean-to-cup' vertical integration hub.",
+"cap_kt": 13.5,
+"type": "roastery"
+},
+{
+"lat": 24.484,
+"lng": 118.032,
+"name": "Luckin Xiamen Super Factory",
+"company": "Luckin",
+"capacity": "55k, Global benchmark for automated industrial roasting.",
+"cap_kt": 55.0,
+"type": "roastery"
+},
+{
+"lat": 31.35,
+"lng": 120.978,
+"name": "Luckin Kunshan Plant",
+"company": "Luckin",
+"capacity": "30k, Intelligent manufacturing hub for the Yangtze River Delta.",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": 22.788,
+"lng": 100.972,
+"name": "Nestlé Pu'er Center",
+"company": "Nestlé",
+"capacity": "10k, Strategic center for Yunnan origin development and R&D.",
+"cap_kt": 10.0,
+"type": "mixed"
+},
+{
+"lat": 26.913,
+"lng": 118.981,
+"name": "Luckin Pingnan Base",
+"company": "Luckin",
+"capacity": "15k, Regional supply chain node for Southern China.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 34.981,
+"lng": 126.784,
+"name": "Nam Yang Naju Hub",
+"company": "Nam Yang Dairy",
+"capacity": "20k, World-class freeze-drying and roasting facility for French Café brand.",
+"cap_kt": 20.0,
+"type": "mixed"
+},
+{
+"lat": 19.682,
+"lng": 110.334,
+"name": "D.Co Hainan (Daka)",
+"company": "Daka International",
+"capacity": "15k, Strategic supply node for Southern China and Southeast Asia export.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 12.688,
+"lng": 108.044,
+"name": "Trung Nguyên BMT Coffee City",
+"company": "Trung Nguyên Legend",
+"capacity": "60k, Largest Vietnamese coffee roaster, HQ in Buôn Ma Thuột.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": 21.273,
+"lng": 106.196,
+"name": "Trung Nguyên Bắc Giang",
+"company": "Trung Nguyên",
+"capacity": "30k, G7 instant coffee plant in Bắc Giang industrial zone.",
+"cap_kt": 30.0,
+"type": "soluble"
+},
+{
+"lat": 11.18,
+"lng": 106.66,
+"name": "King Coffee Bình Dương",
+"company": "TNI Corporation",
+"capacity": "15k, Mỹ Phước industrial park, Lê Hoàng Diệp Thảo group.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 21.115,
+"lng": 106.045,
+"name": "Highlands Coffee Bắc Ninh",
+"company": "Jollibee Foods",
+"capacity": "12k, VSIP Bắc Niinh roastery supplying retail Highlands chain.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 12.243,
+"lng": 109.196,
+"name": "Mê Trang Nha Trang",
+"company": "Mê Trang JSC",
+"capacity": "8k, Coastal roastery serving central Vietnam retail.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 12.682,
+"lng": 108.045,
+"name": "Sucafina Vietnam BMT",
+"company": "Sucafina",
+"capacity": "25k, Green-coffee export mill in Buôn Ma Thuột.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 12.678,
+"lng": 108.04,
+"name": "LDC Vietnam BMT Mill",
+"company": "Louis Dreyfus Company",
+"capacity": "30k, Standalone green-coffee mill (separate from the LDC/Instanta soluble JV).",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": 12.681,
+"lng": 108.048,
+"name": "NKG Vietnam BMT",
+"company": "Neumann Kaffee Gruppe",
+"capacity": "25k, Trader mill in Buôn Ma Thuột for export.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 12.68,
+"lng": 108.046,
+"name": "ECOM Atlantic Vietnam",
+"company": "ECOM Agroindustrial",
+"capacity": "25k, Atlantic Commodities green-coffee mill.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 12.677,
+"lng": 108.038,
+"name": "Simexco Đắk Lắk",
+"company": "Simexco DakLak",
+"capacity": "40k, State-owned export house, one of Vietnam's largest green-coffee exporters.",
+"cap_kt": 40.0,
+"type": "mill"
+},
+{
+"lat": 12.683,
+"lng": 108.043,
+"name": "Intimex Group BMT",
+"company": "Intimex Group",
+"capacity": "50k, Major Vietnamese green-coffee exporter, plant in BMT industrial zone.",
+"cap_kt": 50.0,
+"type": "mill"
+},
+{
+"lat": -5.469,
+"lng": 105.319,
+"name": "Nestlé Panjang Lampung",
+"company": "Nestlé",
+"capacity": "25k, Nescafé soluble flagship for SE Asia, port of Panjang.",
+"cap_kt": 25.0,
+"type": "soluble"
+},
+{
+"lat": -5.398,
+"lng": 105.295,
+"name": "ofi Indonesia Lampung",
+"company": "Olam Food Ingredients",
+"capacity": "30k, Robusta export mill in Bandar Lampung.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": -5.396,
+"lng": 105.298,
+"name": "Sucafina Indonesia Lampung",
+"company": "Sucafina",
+"capacity": "20k, Robusta green-coffee mill, Lampung export hub.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": -5.42,
+"lng": 105.262,
+"name": "Volcafe / Asal Jaya Lampung",
+"company": "Volcafe (Asal Jaya)",
+"capacity": "25k, Volcafe-owned Robusta exporter.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": -5.413,
+"lng": 105.29,
+"name": "Aman Jaya Lampung",
+"company": "Aman Jaya",
+"capacity": "15k, Local Robusta exporter, Bandar Lampung.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 3.567,
+"lng": 98.703,
+"name": "Indo Cafco Medan",
+"company": "ECOM (Indo Cafco)",
+"capacity": "20k, North Sumatra Arabica export mill (Mandheling).",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": -3.018,
+"lng": 119.886,
+"name": "Toarco Jaya Toraja",
+"company": "Key Coffee JV",
+"capacity": "3k, Washed-Arabica processing in Sulawesi (Toarco brand).",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": -6.305,
+"lng": 107.099,
+"name": "Indofood Indocafé Cibitung",
+"company": "Indofood Sukses Makmur",
+"capacity": "25k, Bekasi roastery + soluble line for Indocafé brand.",
+"cap_kt": 25.0,
+"type": "mixed"
+},
+{
+"lat": 12.117,
+"lng": 76.681,
+"name": "Nestlé Nanjangud",
+"company": "Nestlé India",
+"capacity": "30k, Karnataka Nescafé hub, instant + R&G.",
+"cap_kt": 30.0,
+"type": "soluble"
+},
+{
+"lat": 11.522,
+"lng": 76.701,
+"name": "Nestlé Choladi (Nilgiris)",
+"company": "Nestlé India",
+"capacity": "10k, Tamil Nadu Nescafé soluble plant.",
+"cap_kt": 10.0,
+"type": "soluble"
+},
+{
+"lat": 18.788,
+"lng": 73.341,
+"name": "HUL Bru Khopoli",
+"company": "Hindustan Unilever",
+"capacity": "20k, Bru instant coffee plant, Maharashtra.",
+"cap_kt": 20.0,
+"type": "soluble"
+},
+{
+"lat": 13.572,
+"lng": 80.02,
+"name": "CCL Sri City",
+"company": "CCL Products",
+"capacity": "17k, Soluble export plant in Sri City SEZ (Andhra Pradesh).",
+"cap_kt": 17.0,
+"type": "soluble"
+},
+{
+"lat": 17.715,
+"lng": 83.151,
+"name": "CCL Duvvada (Vizag)",
+"company": "CCL Products",
+"capacity": "10k, Soluble plant near Visakhapatnam port.",
+"cap_kt": 10.0,
+"type": "soluble"
+},
+{
+"lat": 9.997,
+"lng": 77.477,
+"name": "Tata Coffee Theni",
+"company": "Tata Consumer",
+"capacity": "15k, Tamil Nadu curing + green-coffee plant.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 13.005,
+"lng": 76.099,
+"name": "ofi India Hassan",
+"company": "Olam Food Ingredients",
+"capacity": "15k, Karnataka green-coffee processing.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 12.42,
+"lng": 75.737,
+"name": "Allanasons Coorg Curing",
+"company": "Allanasons Group",
+"capacity": "10k, Coorg/Kodagu curing works for export.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": 13.317,
+"lng": 75.768,
+"name": "Café Coffee Day Chikmagalur",
+"company": "Coffee Day Global",
+"capacity": "12k, Karnataka roastery + estate processing.",
+"cap_kt": 12.0,
+"type": "mixed"
+},
+{
+"lat": 22.034,
+"lng": 96.466,
+"name": "Genius Coffee Pyin Oo Lwin",
+"company": "Genius Shan Highlands Coffee",
+"capacity": "2k, Mandalay-region specialty processing + roastery.",
+"cap_kt": 2.0,
+"type": "mixed"
+},
+{
+"lat": 21.984,
+"lng": 96.084,
+"name": "Mandalay Coffee Group",
+"company": "Mandalay Coffee Group",
+"capacity": "1k, Shan State green-coffee processing.",
+"cap_kt": 1.0,
+"type": "mill"
+},
+{
+"lat": 15.116,
+"lng": 105.798,
+"name": "Dao Heuang Pakse (Dao Coffee)",
+"company": "Dao Heuang Group",
+"capacity": "15k, Largest Lao coffee company; Pakse soluble + roastery.",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": 15.187,
+"lng": 106.227,
+"name": "Sinouk Coffee Bolaven",
+"company": "Sinouk Coffee",
+"capacity": "2k, Paksong estate-to-roastery, Bolaven Plateau.",
+"cap_kt": 2.0,
+"type": "mixed"
+},
+{
+"lat": 15.18,
+"lng": 106.22,
+"name": "Outspan Bolovens",
+"company": "ofi (Olam)",
+"capacity": "5k, Bolaven-Plateau green-coffee processing.",
+"cap_kt": 5.0,
+"type": "mill"
+},
+{
+"lat": 8.483,
+"lng": 124.638,
+"name": "Nestlé Cagayan de Oro",
+"company": "Nestlé",
+"capacity": "25k, Mindanao Nescafé hub, largest Philippine coffee plant.",
+"cap_kt": 25.0,
+"type": "soluble"
+},
+{
+"lat": 13.954,
+"lng": 121.169,
+"name": "Nestlé Lipa Batangas",
+"company": "Nestlé",
+"capacity": "8k, Nescafé Tasty Cup plant, Luzon.",
+"cap_kt": 8.0,
+"type": "soluble"
+},
+{
+"lat": -6.084,
+"lng": 145.385,
+"name": "Monpi Coffee Exports Goroka",
+"company": "ECOM (Monpi)",
+"capacity": "5k, Eastern Highlands green-coffee mill + export.",
+"cap_kt": 5.0,
+"type": "mill"
+},
+{
+"lat": -6.08,
+"lng": 145.39,
+"name": "NKW Coffee Goroka",
+"company": "NKW Group",
+"capacity": "3k, PNG-owned green-coffee processor in Goroka.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": -6.297,
+"lng": 145.864,
+"name": "Kongo Coffee Kainantu",
+"company": "Kongo Coffee",
+"capacity": "2k, Kainantu (Eastern Highlands) processing.",
+"cap_kt": 2.0,
+"type": "mill"
+},
+{
+"lat": 22.77,
+"lng": 100.973,
+"name": "Hogood Coffee Pu'er",
+"company": "Hogood",
+"capacity": "20k, China's largest Yunnan-origin coffee processor (soluble + green).",
+"cap_kt": 20.0,
+"type": "soluble"
+},
+{
+"lat": 22.798,
+"lng": 100.987,
+"name": "Aini Group Pu'er",
+"company": "Aini Group",
+"capacity": "10k, Pu'er-based Yunnan processor + roastery.",
+"cap_kt": 10.0,
+"type": "mixed"
+},
+{
+"lat": 24.453,
+"lng": 98.58,
+"name": "Manlao River Coffee Dehong",
+"company": "Manlao River Coffee",
+"capacity": "3k, Dehong Prefecture (NW Yunnan) mill.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": 19.789,
+"lng": 99.61,
+"name": "Doi Chaang Coffee",
+"company": "Doi Chaang Coffee Original",
+"capacity": "2k, Chiang Rai estate-to-roastery operation.",
+"cap_kt": 2.0,
+"type": "mixed"
+},
+{
+"lat": 20.27,
+"lng": 99.834,
+"name": "Doi Tung Royal Project",
+"company": "Mae Fah Luang Foundation",
+"capacity": "1k, Royal Project coffee mill, Chiang Rai.",
+"cap_kt": 1.0,
+"type": "mill"
+},
+{
+"lat": 8.88,
+"lng": 38.787,
+"name": "Moplaco Trading Akaki",
+"company": "Moplaco (Heleanna Georgalis)",
+"capacity": "12k, Top private Ethiopian exporter, Akaki industrial belt south of Addis.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 8.992,
+"lng": 38.768,
+"name": "Oromia Coffee Farmers Coop Union",
+"company": "OCFCU",
+"capacity": "30k, Largest Ethiopian cooperative union; HQ + dry mill in Addis.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": 6.302,
+"lng": 38.207,
+"name": "Yirgacheffe Coffee Farmers Coop Union",
+"company": "YCFCU",
+"capacity": "20k, Iconic Yirgacheffe-area cooperative network, dry mill at Dilla.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 7.06,
+"lng": 38.476,
+"name": "Sidama Coffee Farmers Coop Union",
+"company": "SCFCU",
+"capacity": "15k, Hawassa-based Sidama cooperative union dry mill.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 8.875,
+"lng": 38.794,
+"name": "Ethio Agri-CEFT Akaki",
+"company": "Ethio Agri-CEFT (MIDROC)",
+"capacity": "10k, MIDROC-group private exporter, Akaki.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": 5.323,
+"lng": 39.586,
+"name": "NKG Bero Negele Bona",
+"company": "Neumann Kaffee Gruppe (Bero)",
+"capacity": "8k, Guji-region hulling station, Negele Borena.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": 7.06,
+"lng": 38.48,
+"name": "Daye Bensa Hawassa",
+"company": "Daye Bensa Coffee",
+"capacity": "5k, Sidama specialty exporter, Hawassa dry mill.",
+"cap_kt": 5.0,
+"type": "mill"
+},
+{
+"lat": -1.314,
+"lng": 36.857,
+"name": "Sasini Coffee Nairobi",
+"company": "Sasini PLC",
+"capacity": "15k, Kenya's largest integrated grower/processor/roaster, Industrial Area.",
+"cap_kt": 15.0,
+"type": "mixed"
+},
+{
+"lat": -1.323,
+"lng": 36.855,
+"name": "Dormans Coffee Nairobi",
+"company": "Dormans (C.Dorman)",
+"capacity": "8k, Long-standing Kenyan roaster + trader, Industrial Area.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": -1.317,
+"lng": 36.86,
+"name": "Ibero Kenya Nairobi (NKG)",
+"company": "Neumann Kaffee Gruppe",
+"capacity": "12k, NKG green-coffee mill, Nairobi Industrial Area.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -1.316,
+"lng": 36.862,
+"name": "Taylor Winch Kenya (Volcafe)",
+"company": "Volcafe (Taylor Winch)",
+"capacity": "10k, Volcafe-owned Kenya mill, Nairobi.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": -1.318,
+"lng": 36.866,
+"name": "ofi Kenya Nairobi",
+"company": "ofi (Olam)",
+"capacity": "12k, Olam Food Ingredients Kenya mill.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -1.038,
+"lng": 37.087,
+"name": "Thika Coffee Mills",
+"company": "Sasini-aligned",
+"capacity": "6k, Thika dry mill, north of Nairobi.",
+"cap_kt": 6.0,
+"type": "mill"
+},
+{
+"lat": 0.319,
+"lng": 32.624,
+"name": "Kyagalanyi Coffee Kampala (Volcafe)",
+"company": "Volcafe (Kyagalanyi)",
+"capacity": "25k, Uganda's largest Volcafe-owned Robusta exporter, Kampala.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 0.317,
+"lng": 32.617,
+"name": "Ugacof Kampala (Sucafina)",
+"company": "Sucafina (Ugacof)",
+"capacity": "25k, Sucafina-owned Uganda exporter, Industrial Area Kampala.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 0.323,
+"lng": 32.625,
+"name": "ofi Uganda Bugolobi",
+"company": "ofi (Olam)",
+"capacity": "20k, Olam Food Ingredients Uganda mill, Bugolobi.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 0.357,
+"lng": 32.535,
+"name": "NUCAFE Wakiso",
+"company": "NUCAFE",
+"capacity": "8k, Farmer-owned union, Namanve Industrial Park.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": 1.082,
+"lng": 34.176,
+"name": "Kawacom Uganda Mbale (NKG)",
+"company": "Neumann Kaffee Gruppe (Kawacom)",
+"capacity": "12k, NKG Robusta + Arabica mill in Mbale.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -3.346,
+"lng": 37.345,
+"name": "TCCCO Moshi (Curing Works)",
+"company": "Tanzania Coffee Curing Co",
+"capacity": "20k, Historic main curing works at the foot of Kilimanjaro.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": -3.341,
+"lng": 37.339,
+"name": "ofi Tanzania Moshi",
+"company": "ofi (Olam)",
+"capacity": "15k, Olam Food Ingredients Tanzania mill, Moshi.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": -3.34,
+"lng": 37.341,
+"name": "Sucafina Tanzania Moshi",
+"company": "Sucafina",
+"capacity": "15k, Sucafina-owned Moshi dry mill.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": -3.342,
+"lng": 37.338,
+"name": "Ibero Tanzania Moshi (NKG)",
+"company": "Neumann Kaffee Gruppe",
+"capacity": "12k, NKG Ibero Moshi mill.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -3.349,
+"lng": 37.331,
+"name": "KNCU Moshi",
+"company": "Kilimanjaro Native Coop Union",
+"capacity": "10k, Africa's oldest cooperative union dry mill.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": -1.939,
+"lng": 30.135,
+"name": "Rwacof Kigali (Sucafina)",
+"company": "Sucafina (Rwacof)",
+"capacity": "18k, Rwanda's largest exporter, Sucafina-owned, Kigali SEZ.",
+"cap_kt": 18.0,
+"type": "mill"
+},
+{
+"lat": -1.953,
+"lng": 30.062,
+"name": "Rwashoscco Kigali",
+"company": "Rwashoscco",
+"capacity": "6k, Federation of Rwandan cooperatives, Kigali.",
+"cap_kt": 6.0,
+"type": "mill"
+},
+{
+"lat": -1.943,
+"lng": 30.14,
+"name": "ofi Rwanda Kigali",
+"company": "ofi (Olam)",
+"capacity": "10k, Olam Food Ingredients Rwanda mill, Kigali SEZ.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": -1.953,
+"lng": 30.09,
+"name": "Bourbon Coffee Roastery Kigali",
+"company": "Bourbon Coffee",
+"capacity": "1k, Rwanda's flagship specialty roastery + cafe chain.",
+"cap_kt": 1.0,
+"type": "roastery"
+},
+{
+"lat": -3.38,
+"lng": 29.367,
+"name": "Sucafina Burundi (Sogestal)",
+"company": "Sucafina (Sogestal Kayanza)",
+"capacity": "12k, Sucafina's Burundi operation, Bujumbura HQ.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -3.383,
+"lng": 29.37,
+"name": "Webcor Burundi Bujumbura (NKG)",
+"company": "Neumann Kaffee Gruppe (Webcor)",
+"capacity": "8k, NKG Burundi mill, Bujumbura.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": -2.928,
+"lng": 29.626,
+"name": "Long Miles Coffee Kayanza",
+"company": "Long Miles Coffee Project",
+"capacity": "1k, Specialty washing-station network in Kayanza highlands.",
+"cap_kt": 1.0,
+"type": "mill"
+},
+{
+"lat": -1.679,
+"lng": 29.23,
+"name": "Virunga Coffee Goma",
+"company": "Virunga Coffee",
+"capacity": "4k, North Kivu specialty coffee exporter, Goma.",
+"cap_kt": 4.0,
+"type": "mill"
+},
+{
+"lat": -1.952,
+"lng": 29.117,
+"name": "SOPACDI Minova",
+"company": "SOPACDI Coop",
+"capacity": "3k, South Kivu cooperative, Lake Kivu shore.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": 14.595,
+"lng": -90.514,
+"name": "FEDECOCAGUA Guatemala City",
+"company": "FEDECOCAGUA",
+"capacity": "25k, Federation of ~150 Guatemalan cooperatives; largest cooperative exporter.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 14.602,
+"lng": -90.516,
+"name": "ofi Guatemala",
+"company": "ofi (Olam)",
+"capacity": "18k, Olam Food Ingredients Guatemala mill, zona 12 industrial belt.",
+"cap_kt": 18.0,
+"type": "mill"
+},
+{
+"lat": 14.604,
+"lng": -90.518,
+"name": "Volcafe Guatemala (Coex)",
+"company": "Volcafe / Coex",
+"capacity": "15k, Volcafe-owned Guatemalan exporter.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 14.598,
+"lng": -90.521,
+"name": "Sucafina Guatemala (Cafsa)",
+"company": "Sucafina (Cafsa)",
+"capacity": "15k, Sucafina-owned Cafsa exporter, Guatemala City.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 14.601,
+"lng": -90.523,
+"name": "ECOM Guatemala (Atlantic)",
+"company": "ECOM Agroindustrial",
+"capacity": "15k, ECOM Atlantic Guatemala mill.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 14.607,
+"lng": -90.515,
+"name": "NKG Bero Guatemala",
+"company": "Neumann Kaffee Gruppe",
+"capacity": "12k, NKG green-coffee mill, Guatemala City.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 14.557,
+"lng": -90.733,
+"name": "Bella Vista Coffee Mill Antigua",
+"company": "Bella Vista",
+"capacity": "3k, Antigua-region specialty dry mill; many micro-lots.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": 15.504,
+"lng": -88.025,
+"name": "NKG Becamo San Pedro Sula",
+"company": "Neumann Kaffee Gruppe (Becamo)",
+"capacity": "35k, Honduras's largest exporter; NKG flagship in Central America.",
+"cap_kt": 35.0,
+"type": "mill"
+},
+{
+"lat": 15.51,
+"lng": -88.028,
+"name": "CISA Exportadora Honduras",
+"company": "ECOM Agroindustrial (CISA HN)",
+"capacity": "25k, ECOM-owned CISA Honduras dry mill, San Pedro Sula.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 14.766,
+"lng": -88.781,
+"name": "Beneficio Las Tres Marías (Volcafe HN)",
+"company": "Volcafe Honduras",
+"capacity": "20k, Volcafe-owned dry mill near Santa Rosa de Copán.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 15.508,
+"lng": -88.03,
+"name": "ofi Honduras San Pedro Sula",
+"company": "ofi (Olam)",
+"capacity": "18k, Olam Food Ingredients Honduras mill.",
+"cap_kt": 18.0,
+"type": "mill"
+},
+{
+"lat": 14.771,
+"lng": -88.788,
+"name": "Sucafina Honduras (Santa Rosa)",
+"company": "Sucafina",
+"capacity": "15k, Sucafina Honduras beneficio, Santa Rosa de Copán region.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 14.555,
+"lng": -88.633,
+"name": "Cocafelol Las Flores Lempira",
+"company": "Cocafelol Coop",
+"capacity": "4k, Lempira-department cooperative dry mill.",
+"cap_kt": 4.0,
+"type": "mill"
+},
+{
+"lat": 12.926,
+"lng": -85.917,
+"name": "Atlantic Coffee Nicaragua",
+"company": "ECOM Agroindustrial",
+"capacity": "20k, ECOM Atlantic Nicaragua mill, Matagalpa.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 12.122,
+"lng": -86.252,
+"name": "Sucafina Nicaragua (ex-CISA Café)",
+"company": "Sucafina",
+"capacity": "25k, Former CISA Café Nicaragua (Mercon Group) acquired by Sucafina after Mercon's 2023 Chapter 11.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 12.114,
+"lng": -86.236,
+"name": "Café Soluble Managua (Presto)",
+"company": "Café Soluble S.A.",
+"capacity": "8k, Nicaragua's main soluble plant; Presto brand under Nestlé license.",
+"cap_kt": 8.0,
+"type": "soluble"
+},
+{
+"lat": 9.946,
+"lng": -84.085,
+"name": "Volcafe Costa Rica",
+"company": "Volcafe (Cafetalera)",
+"capacity": "15k, Volcafe Costa Rica mill, San José metro.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 9.948,
+"lng": -84.09,
+"name": "ECOM Costa Rica (Atlantic)",
+"company": "ECOM Agroindustrial",
+"capacity": "12k, ECOM Atlantic Costa Rica.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 9.658,
+"lng": -83.952,
+"name": "Coopedota Santa María de Dota",
+"company": "Coopedota R.L.",
+"capacity": "4k, Carbon-neutral Tarrazú-region cooperative mill.",
+"cap_kt": 4.0,
+"type": "mill"
+},
+{
+"lat": 9.661,
+"lng": -83.974,
+"name": "Coopetarrazú San Marcos",
+"company": "Coopetarrazú R.L.",
+"capacity": "8k, Largest Tarrazú-region cooperative dry mill.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": 9.998,
+"lng": -84.118,
+"name": "Café Britt Heredia",
+"company": "Café Britt",
+"capacity": "5k, Costa Rica's flagship specialty roaster; Heredia hq + tourism plant.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 13.687,
+"lng": -89.184,
+"name": "UNEX Beneficio Las Cruces",
+"company": "Unión de Exportadores (UNEX)",
+"capacity": "18k, El Salvador's largest exporter, San Salvador metro mill.",
+"cap_kt": 18.0,
+"type": "mill"
+},
+{
+"lat": 13.704,
+"lng": -89.22,
+"name": "ECOM El Salvador",
+"company": "ECOM Agroindustrial",
+"capacity": "10k, ECOM Atlantic El Salvador mill.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": 13.857,
+"lng": -89.846,
+"name": "Cuscachapa Cooperative",
+"company": "Cuscachapa Coop",
+"capacity": "3k, Apaneca-Ilamatepec coop dry mill, Sonsonate department.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": 8.812,
+"lng": -82.473,
+"name": "Hacienda La Esmeralda Boquete",
+"company": "Peterson Family",
+"capacity": "0.5k, Geisha pioneer; Boquete highland processing.",
+"cap_kt": 0.5,
+"type": "mill"
+},
+{
+"lat": 8.778,
+"lng": -82.435,
+"name": "Café Janson Boquete",
+"company": "Janson Family",
+"capacity": "0.3k, Boquete specialty estate + mill.",
+"cap_kt": 0.3,
+"type": "mill"
+},
+{
+"lat": 19.184,
+"lng": -96.14,
+"name": "AMSA Veracruz",
+"company": "ECOM (AMSA)",
+"capacity": "40k, Largest Mexican coffee exporter, ECOM-owned, Veracruz state.",
+"cap_kt": 40.0,
+"type": "mill"
+},
+{
+"lat": 19.453,
+"lng": -96.964,
+"name": "ofi Mexico Coatepec",
+"company": "ofi (Olam)",
+"capacity": "25k, Olam Food Ingredients Mexico, Coatepec.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 14.901,
+"lng": -92.26,
+"name": "Becamo Mexico Tapachula (NKG)",
+"company": "Neumann Kaffee Gruppe",
+"capacity": "20k, NKG mill in Tapachula, Chiapas (Mexico's #2 coffee state).",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 19.453,
+"lng": -96.961,
+"name": "Sucafina Mexico Coatepec",
+"company": "Sucafina",
+"capacity": "12k, Sucafina Mexico operation, Coatepec.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 18.892,
+"lng": -96.933,
+"name": "Café Sello Rojo Córdoba",
+"company": "Manuel Carrasco",
+"capacity": "8k, Sello Rojo brand roastery, Córdoba (Veracruz coffee belt).",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": -21.305,
+"lng": -46.711,
+"name": "Cooxupé Guaxupé HQ",
+"company": "Cooxupé Co-op",
+"capacity": "80k, World's largest coffee cooperative; main dry mill at HQ, Sul de Minas.",
+"cap_kt": 80.0,
+"type": "mill"
+},
+{
+"lat": -21.557,
+"lng": -45.443,
+"name": "Minasul Varginha",
+"company": "Minasul Co-op",
+"capacity": "40k, Major Sul de Minas cooperative; dry mill + warehousing in Varginha.",
+"cap_kt": 40.0,
+"type": "mill"
+},
+{
+"lat": -21.367,
+"lng": -45.51,
+"name": "Cocatrel Três Pontas",
+"company": "Cocatrel Co-op",
+"capacity": "25k, Três Pontas cooperative, Sul de Minas heartland.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": -20.916,
+"lng": -47.122,
+"name": "Cooparaíso São Sebastião do Paraíso",
+"company": "Cooparaíso Co-op",
+"capacity": "30k, Sul de Minas cooperative in São Sebastião do Paraíso.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": -18.945,
+"lng": -46.992,
+"name": "Expocaccer Patrocínio",
+"company": "Cerrado Cooperatives Council",
+"capacity": "35k, Cerrado-Mineiro cooperative export arm in Patrocínio.",
+"cap_kt": 35.0,
+"type": "mill"
+},
+{
+"lat": -18.992,
+"lng": -40.541,
+"name": "Cooabriel São Gabriel da Palha",
+"company": "Cooabriel Co-op",
+"capacity": "50k, Largest Conilon (Robusta) cooperative in Espírito Santo.",
+"cap_kt": 50.0,
+"type": "mill"
+},
+{
+"lat": -19.391,
+"lng": -40.073,
+"name": "Realcafé Solúvel Linhares",
+"company": "Realcafé",
+"capacity": "25k, Major Brazilian soluble plant in Espírito Santo's Conilon belt.",
+"cap_kt": 25.0,
+"type": "soluble"
+},
+{
+"lat": -21.137,
+"lng": -48.973,
+"name": "Cocam Catanduva",
+"company": "Cocam",
+"capacity": "15k, São Paulo-state soluble plant, private label specialist.",
+"cap_kt": 15.0,
+"type": "soluble"
+},
+{
+"lat": -23.961,
+"lng": -46.33,
+"name": "NKG Stockler Santos",
+"company": "Neumann Kaffee Gruppe (Stockler)",
+"capacity": "80k, NKG's largest Brazilian green-coffee operation, Port of Santos.",
+"cap_kt": 80.0,
+"type": "mill"
+},
+{
+"lat": -23.964,
+"lng": -46.328,
+"name": "Atlantic Coffee Brazil Santos",
+"company": "ECOM Agroindustrial",
+"capacity": "60k, ECOM Atlantic Brazil; Santos export mill.",
+"cap_kt": 60.0,
+"type": "mill"
+},
+{
+"lat": -23.965,
+"lng": -46.326,
+"name": "ofi Brazil Santos",
+"company": "ofi (Olam)",
+"capacity": "60k, Olam Food Ingredients Brazil; Port of Santos.",
+"cap_kt": 60.0,
+"type": "mill"
+},
+{
+"lat": -23.962,
+"lng": -46.331,
+"name": "Sucafina Brazil Santos",
+"company": "Sucafina",
+"capacity": "50k, Sucafina Brazil green-coffee mill, Santos.",
+"cap_kt": 50.0,
+"type": "mill"
+},
+{
+"lat": -23.963,
+"lng": -46.327,
+"name": "Volcafe Brazil Santos",
+"company": "Volcafe",
+"capacity": "55k, Volcafe Brazil green-coffee mill, Santos.",
+"cap_kt": 55.0,
+"type": "mill"
+},
+{
+"lat": -23.547,
+"lng": -46.633,
+"name": "JDE Pilão São Paulo",
+"company": "JDE Peet's",
+"capacity": "60k, Pilão / Café do Ponto roastery hub for the São Paulo metro.",
+"cap_kt": 60.0,
+"type": "roastery"
+},
+{
+"lat": 4.683,
+"lng": -74.143,
+"name": "Carcafé Bogotá (Volcafe)",
+"company": "Volcafe (Carcafé)",
+"capacity": "40k, Volcafe's largest Latin-American operation, Bogotá airport corridor.",
+"cap_kt": 40.0,
+"type": "mill"
+},
+{
+"lat": 4.685,
+"lng": -74.14,
+"name": "Sucafina Colombia Bogotá",
+"company": "Sucafina",
+"capacity": "25k, Sucafina Colombia exporter, Bogotá.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 4.682,
+"lng": -74.145,
+"name": "ofi Colombia Bogotá",
+"company": "ofi (Olam)",
+"capacity": "30k, Olam Food Ingredients Colombia, Bogotá.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": 5.067,
+"lng": -75.522,
+"name": "Almacafé Manizales (FNC)",
+"company": "FNC (Almacafé)",
+"capacity": "35k, FNC's warehousing + dry-milling arm; main Manizales facility.",
+"cap_kt": 35.0,
+"type": "mill"
+},
+{
+"lat": 5.069,
+"lng": -75.518,
+"name": "Casa Luker Manizales",
+"company": "Casa Luker",
+"capacity": "10k, Caldas-region roastery + chocolate plant; coffee export operation.",
+"cap_kt": 10.0,
+"type": "mixed"
+},
+{
+"lat": 6.244,
+"lng": -75.581,
+"name": "Coop. Caficultores de Antioquia",
+"company": "Antioquia Coop",
+"capacity": "15k, Antioquia department cooperative dry mill, Medellín.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": -6.768,
+"lng": -79.844,
+"name": "Perales Huancaruna (Perhusa) Chiclayo",
+"company": "Perhusa",
+"capacity": "50k, Peru's largest private coffee exporter, Chiclayo industrial zone.",
+"cap_kt": 50.0,
+"type": "mill"
+},
+{
+"lat": -6.77,
+"lng": -79.842,
+"name": "Outspan Peru Chiclayo (ofi)",
+"company": "ofi (Olam Outspan)",
+"capacity": "30k, Olam Food Ingredients Peru, Chiclayo.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": -5.708,
+"lng": -78.808,
+"name": "Sol&Café Jaén",
+"company": "Sol&Café Coop",
+"capacity": "12k, Major Cajamarca-region cooperative, Jaén dry mill.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": -5.194,
+"lng": -80.632,
+"name": "Norandino Piura",
+"company": "Norandino Coop",
+"capacity": "10k, Piura highlands cooperative federation (Cajamarca + Piura origins).",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": -14.214,
+"lng": -69.14,
+"name": "CECOVASA Puno",
+"company": "CECOVASA Coop",
+"capacity": "8k, Sandia Valley (Puno) cooperative; specialty Arabica.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": -11.722,
+"lng": -74.566,
+"name": "CAC Pangoa Junín",
+"company": "CAC Pangoa",
+"capacity": "6k, Junín-region cooperative central, Pangoa.",
+"cap_kt": 6.0,
+"type": "mill"
+},
+{
+"lat": -2.213,
+"lng": -79.89,
+"name": "Solubles Instantáneos Ecuador Guayaquil",
+"company": "SIE",
+"capacity": "10k, Major Ecuadorian soluble plant, Guayaquil industrial belt.",
+"cap_kt": 10.0,
+"type": "soluble"
+},
+{
+"lat": -3.992,
+"lng": -79.205,
+"name": "FAPECAFES Loja",
+"company": "FAPECAFES Federation",
+"capacity": "3k, Southern-Ecuador federation of small specialty cooperatives.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": -15.838,
+"lng": -67.567,
+"name": "AGRICAFÉ Bolivia Caranavi",
+"company": "AGRICAFÉ (Pedro Rodríguez)",
+"capacity": "3k, Bolivia's flagship specialty exporter; Yungas dry mill.",
+"cap_kt": 3.0,
+"type": "mill"
+},
+{
+"lat": -16.5,
+"lng": -68.133,
+"name": "FECAFEB La Paz",
+"company": "FECAFEB Federation",
+"capacity": "5k, Bolivian federation of caficultor exporters; La Paz HQ.",
+"cap_kt": 5.0,
+"type": "mill"
+},
+{
+"lat": 5.27,
+"lng": -4.005,
+"name": "Sucafina Côte d'Ivoire",
+"company": "Sucafina",
+"capacity": "30k, Sucafina CI Robusta operations, Abidjan/Vridi port.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": 5.265,
+"lng": -4.0,
+"name": "ofi Côte d'Ivoire Abidjan",
+"company": "ofi (Olam)",
+"capacity": "50k, Olam Food Ingredients CI; major Robusta trader.",
+"cap_kt": 50.0,
+"type": "mill"
+},
+{
+"lat": 5.267,
+"lng": -3.998,
+"name": "ECOM Atlantic Côte d'Ivoire",
+"company": "ECOM Agroindustrial",
+"capacity": "25k, ECOM Atlantic CI Robusta mill, Abidjan.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 5.272,
+"lng": -4.01,
+"name": "Sucden Coffee CI (CONACAFÉ)",
+"company": "Sucden Coffee",
+"capacity": "20k, Sucden's Ivorian Robusta operation.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 5.26,
+"lng": -4.012,
+"name": "CIPEXI Abidjan",
+"company": "CIPEXI",
+"capacity": "15k, Local CI Robusta exporter, Abidjan port.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 4.045,
+"lng": 9.708,
+"name": "Olam Cameroon Douala",
+"company": "ofi (Olam)",
+"capacity": "25k, Olam Food Ingredients Cameroon; Robusta export.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": 5.477,
+"lng": 10.418,
+"name": "UCCAO Bafoussam",
+"company": "UCCAO Coop",
+"capacity": "12k, West-region cooperative union for Arabica, Bafoussam HQ.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 4.048,
+"lng": 9.712,
+"name": "Sicobela Douala",
+"company": "Sicobela",
+"capacity": "10k, Long-running Cameroonian coffee exporter, Douala.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": 4.043,
+"lng": 9.705,
+"name": "Ndongo Essomba Douala",
+"company": "Ndongo Essomba",
+"capacity": "8k, Cameroonian-owned Robusta exporter.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": -19.866,
+"lng": 47.04,
+"name": "Madacafé Antsirabe",
+"company": "Madacafé",
+"capacity": "5k, Highland Robusta cooperative network, Antsirabe.",
+"cap_kt": 5.0,
+"type": "mill"
+},
+{
+"lat": -18.15,
+"lng": 49.398,
+"name": "Sucafina Madagascar Tamatave",
+"company": "Sucafina",
+"capacity": "8k, Sucafina Madagascar operation, port of Tamatave.",
+"cap_kt": 8.0,
+"type": "mill"
+},
+{
+"lat": 15.359,
+"lng": 44.205,
+"name": "Mocha Mill Sana'a",
+"company": "Mocha Mill",
+"capacity": "1k, Specialty Yemeni coffee processor, Sana'a.",
+"cap_kt": 1.0,
+"type": "mill"
+},
+{
+"lat": 13.314,
+"lng": 43.243,
+"name": "Al-Mokha Coffee Hub",
+"company": "Al-Mokha",
+"capacity": "0.5k, Specialty Mokha-region coffee operation.",
+"cap_kt": 0.5,
+"type": "mill"
+},
+{
+"lat": -11.466,
+"lng": 34.02,
+"name": "Mzuzu Coffee Planters Coop Union",
+"company": "MZCPCU",
+"capacity": "2k, Northern-Region cooperative union, Mzuzu.",
+"cap_kt": 2.0,
+"type": "mill"
+},
+{
+"lat": -16.067,
+"lng": 35.131,
+"name": "Satemwa Estates Thyolo",
+"company": "Satemwa Tea & Coffee",
+"capacity": "1k, Long-running estate in Southern Malawi, tea + coffee.",
+"cap_kt": 1.0,
+"type": "mill"
+},
+{
+"lat": 0.342,
+"lng": 6.5,
+"name": "Diogo Vaz Estate",
+"company": "Diogo Vaz",
+"capacity": "0.3k, São Tomé specialty estate, North-West coast.",
+"cap_kt": 0.3,
+"type": "mill"
+},
+{
+"lat": -12.115,
+"lng": -77.04,
+"name": "Volcafe Peru Lima",
+"company": "Volcafe",
+"capacity": "25k, Volcafe Peru SA exporter, San Isidro business district.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": -5.401,
+"lng": 105.291,
+"name": "NKG Bero Indonesia Lampung",
+"company": "Neumann Kaffee Gruppe (Bero)",
+"capacity": "20k, NKG's Indonesian Robusta operation, Bandar Lampung.",
+"cap_kt": 20.0,
+"type": "mill"
+},
+{
+"lat": 12.955,
+"lng": 77.62,
+"name": "NKG Kappa India Bangalore",
+"company": "Neumann Kaffee Gruppe (Kappa)",
+"capacity": "15k, NKG India sourcing + processing, Bangalore.",
+"cap_kt": 15.0,
+"type": "mill"
+},
+{
+"lat": 4.682,
+"lng": -74.142,
+"name": "NKG Coex Colombia Bogotá",
+"company": "Neumann Kaffee Gruppe (Coex)",
+"capacity": "18k, NKG Colombia green-coffee exporter, Bogotá.",
+"cap_kt": 18.0,
+"type": "mill"
+},
+{
+"lat": -23.964,
+"lng": -46.331,
+"name": "LDC Brazil Santos",
+"company": "Louis Dreyfus Company",
+"capacity": "25k, LDC Brazilian coffee export operation, Port of Santos.",
+"cap_kt": 25.0,
+"type": "mill"
+},
+{
+"lat": -5.405,
+"lng": 105.29,
+"name": "LDC Indonesia Lampung",
+"company": "Louis Dreyfus Company",
+"capacity": "12k, LDC Indonesian Robusta operation, Lampung.",
+"cap_kt": 12.0,
+"type": "mill"
+},
+{
+"lat": 12.955,
+"lng": 77.625,
+"name": "ECOM SMS India Bangalore",
+"company": "ECOM (Sustainable Mgmt Services)",
+"capacity": "10k, ECOM India sourcing + sustainability hub, Bangalore.",
+"cap_kt": 10.0,
+"type": "mill"
+},
+{
+"lat": 46.181,
+"lng": 6.139,
+"name": "Sucafina Specialty Carouge (Geneva)",
+"company": "Sucafina (CDM Specialty)",
+"capacity": "3k, Sucafina's specialty-coffee roastery + sourcing arm, near Geneva.",
+"cap_kt": 3.0,
+"type": "roastery"
+},
+{
+"lat": 53.074,
+"lng": 8.795,
+"name": "Interamerican Coffee Bremen (NKG)",
+"company": "Neumann Kaffee Gruppe (Interamerican)",
+"capacity": "30k, NKG's European specialty + reserve coffee arm, Bremen port.",
+"cap_kt": 30.0,
+"type": "mill"
+},
+{
+"lat": 45.652,
+"lng": 13.77,
+"name": "illycaffè Trieste",
+"company": "illycaffè SpA",
+"capacity": "30k, illy's flagship Trieste roastery + capsule plant; mono-arabica focus.",
+"cap_kt": 30.0,
+"type": "mixed"
+},
+{
+"lat": 41.512,
+"lng": 14.273,
+"name": "Lavazza Pozzilli (Molise)",
+"company": "Lavazza",
+"capacity": "30k, Lavazza's secondary plant in Molise; dedicated capsule + pod production.",
+"cap_kt": 30.0,
+"type": "capsules"
+},
+{
+"lat": 44.949,
+"lng": 7.77,
+"name": "Caffè Vergnano Santena",
+"company": "Caffè Vergnano",
+"capacity": "15k, Historic Piedmont roastery near Turin; family-owned since 1882.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 45.622,
+"lng": 13.815,
+"name": "Hausbrandt Trieste",
+"company": "Hausbrandt Trieste 1892",
+"capacity": "10k, Major Trieste roaster, sibling to illy in the same coffee city.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 41.539,
+"lng": 2.207,
+"name": "Cafés Marcilla Mollet del Vallès",
+"company": "Mondelez (JDE-aligned)",
+"capacity": "25k, Marcilla flagship near Barcelona, historic Spanish brand.",
+"cap_kt": 25.0,
+"type": "roastery"
+},
+{
+"lat": 37.378,
+"lng": -5.953,
+"name": "Cafés Saimaza Sevilla",
+"company": "Mondelez (Saimaza)",
+"capacity": "15k, Sevilla roastery for the Saimaza brand.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 43.421,
+"lng": -5.823,
+"name": "Cafento Llanera Asturias",
+"company": "Cafento",
+"capacity": "20k, Major Spanish private-label and HORECA roaster.",
+"cap_kt": 20.0,
+"type": "roastery"
+},
+{
+"lat": 40.46,
+"lng": -3.66,
+"name": "Cafés La Estrella Madrid",
+"company": "Cafés La Estrella",
+"capacity": "10k, Historic Madrid roaster, traditional Spanish café culture.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 56.046,
+"lng": 12.694,
+"name": "Zoégas Helsingborg",
+"company": "Nestlé (Zoégas)",
+"capacity": "18k, Nestlé-owned Zoégas plant in southern Sweden; dark roast specialist.",
+"cap_kt": 18.0,
+"type": "roastery"
+},
+{
+"lat": 59.358,
+"lng": 18.0,
+"name": "Arvid Nordquist Solna",
+"company": "Arvid Nordquist",
+"capacity": "12k, Stockholm-area Swedish specialty roaster.",
+"cap_kt": 12.0,
+"type": "roastery"
+},
+{
+"lat": 56.122,
+"lng": 10.165,
+"name": "BKI Kaffe Højbjerg",
+"company": "BKI Foods",
+"capacity": "15k, Danish roaster; major private-label supplier (Belgium-owned).",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 59.911,
+"lng": 10.77,
+"name": "Solberg & Hansen Oslo",
+"company": "Solberg & Hansen",
+"capacity": "5k, Norway's flagship specialty roaster, est. 1879.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 56.3,
+"lng": 38.135,
+"name": "Tchibo Sergiev Posad",
+"company": "Tchibo Russia",
+"capacity": "15k, Tchibo's Russian production site, Moscow Oblast.",
+"cap_kt": 15.0,
+"type": "roastery"
+},
+{
+"lat": 50.434,
+"lng": 40.108,
+"name": "Strauss Russia Pavlovskaya",
+"company": "Strauss Group",
+"capacity": "20k, Strauss Russia coffee plant, Voronezh region.",
+"cap_kt": 20.0,
+"type": "mixed"
+},
+{
+"lat": 24.752,
+"lng": 121.76,
+"name": "King Car (Mr Brown) Yilan",
+"company": "King Car Group",
+"capacity": "35k, Taiwan beverage giant; Mr Brown canned coffee + roastery.",
+"cap_kt": 35.0,
+"type": "mixed"
+},
+{
+"lat": 25.075,
+"lng": 121.535,
+"name": "85°C Bakery Café Taipei",
+"company": "85°C Daily Café",
+"capacity": "10k, Taiwan flagship roastery for the global bakery-café chain.",
+"cap_kt": 10.0,
+"type": "roastery"
+},
+{
+"lat": 22.336,
+"lng": 114.169,
+"name": "Pacific Coffee Hong Kong",
+"company": "Pacific Coffee Co",
+"capacity": "5k, Hong Kong's largest specialty café chain roastery, Cheung Sha Wan.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 36.991,
+"lng": 127.118,
+"name": "Maeil Dairies Pyeongtaek (Caffènoir)",
+"company": "Maeil Dairies",
+"capacity": "20k, Korean dairy giant's coffee/RTD line, Pyeongtaek.",
+"cap_kt": 20.0,
+"type": "mixed"
+},
+{
+"lat": 37.241,
+"lng": 127.179,
+"name": "Hollys Coffee Roastery Yongin",
+"company": "Hollys F&B",
+"capacity": "8k, Hollys Coffee Korean cafe chain central roastery.",
+"cap_kt": 8.0,
+"type": "roastery"
+},
+{
+"lat": 37.829,
+"lng": -122.293,
+"name": "Blue Bottle Oakland",
+"company": "Blue Bottle Coffee (Nestlé)",
+"capacity": "5k, Jack London Square flagship roastery, third-wave pioneer.",
+"cap_kt": 5.0,
+"type": "roastery"
+},
+{
+"lat": 45.519,
+"lng": -122.667,
+"name": "Stumptown Portland",
+"company": "Stumptown (Peet's)",
+"capacity": "4k, Portland flagship roastery, third-wave reference operator.",
+"cap_kt": 4.0,
+"type": "roastery"
+},
+{
+"lat": 41.948,
+"lng": -87.687,
+"name": "Intelligentsia Chicago",
+"company": "Intelligentsia (Peet's)",
+"capacity": "4k, Chicago Roasting Works, third-wave reference.",
+"cap_kt": 4.0,
+"type": "roastery"
+},
+{
+"lat": -25.444,
+"lng": -49.19,
+"name": "Café Damasco Pinhais",
+"company": "Café Damasco",
+"capacity": "30k, Major southern Brazilian roaster, Curitiba metro.",
+"cap_kt": 30.0,
+"type": "roastery"
+},
+{
+"lat": -7.115,
+"lng": -34.88,
+"name": "Café São Braz João Pessoa",
+"company": "Café São Braz",
+"capacity": "35k, Largest northeastern Brazilian roaster, Paraíba state.",
+"cap_kt": 35.0,
+"type": "roastery"
+}
+]

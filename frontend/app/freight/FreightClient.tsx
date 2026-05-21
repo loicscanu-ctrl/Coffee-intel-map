@@ -129,12 +129,14 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 
 export default function FreightClient({ data }: Props) {
   const [dryBulk, setDryBulk] = useState<DryBulkData | null>(null);
+  const [dryLoaded, setDryLoaded] = useState(false);
 
   useEffect(() => {
     fetch("/data/farmer_economics.json")
       .then(r => r.json())
       .then(d => setDryBulk(d.fertilizer?.dry_bulk ?? null))
-      .catch((err) => console.error("[FreightClient] fetch failed:", err));
+      .catch((err) => console.error("[FreightClient] fetch failed:", err))
+      .finally(() => setDryLoaded(true));
   }, []);
 
   return (
@@ -246,7 +248,9 @@ export default function FreightClient({ data }: Props) {
         <BdryPanel data={dryBulk} />
       ) : (
         <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 text-[10px] text-slate-600 italic">
-          Loading dry bulk indicator…
+          {dryLoaded
+            ? "Dry bulk freight indicator not yet available — pending the next dry-bulk scrape."
+            : "Loading dry bulk indicator…"}
         </div>
       )}
       </div>

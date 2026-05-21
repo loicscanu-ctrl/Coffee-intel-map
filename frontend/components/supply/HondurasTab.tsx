@@ -67,7 +67,7 @@ export default function HondurasTab() {
   useEffect(() => {
     fetch("/data/honduras_supply.json")
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
-      .then(setData)
+      .then((d) => { setData(d); if (!d.exports) setSubTab("farmer-economics"); })
       .catch(() => setError(true));
   }, []);
 

@@ -223,11 +223,10 @@ flowchart LR
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   J_cot[/cot.json · 312wk/]
-  J_sig[/signals.json/]
   J_mac[/macro_cot.json/]
   J_fnd[/oi_fnd_chart.json/]
   ip{{Industry Pulse}}
-  sig{{Signals}}
+  sig{{"Signals · computed in-browser from cot.json"}}
   gau{{Gauges}}
   hm{{Heatmap}}
   flow{{Global Flow}}
@@ -240,11 +239,9 @@ flowchart LR
   W23 --> DB --> EXP
   EXP --> J_cot
   EXP --> J_mac
-  J_cot --> J_sig
   ARC --> J_fnd
   J_cot --> ip
   J_cot --> sig
-  J_sig --> sig
   J_cot --> gau
   J_cot --> hm
   J_cot --> flow
@@ -263,7 +260,7 @@ flowchart LR
   class W13,W23 scr;
   class ARC,DB store;
   class EXP proc;
-  class J_cot,J_sig,J_mac,J_fnd json;
+  class J_cot,J_mac,J_fnd json;
   class ip,sig,gau,hm,flow,dp,cyc,rep,oi,oifnd vis;
 ```
 
@@ -271,19 +268,26 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  W12["1.2 Freight · 02:00 daily<br/>Freightos · Yahoo dry-bulk"]
+  W12["1.2 Freight · 02:00 daily<br/>Freightos containers"]
+  WDRY["Yahoo dry-bulk<br/>(BDRY proxy)"]
   J_fr[/freight.json/]
+  J_fe[/farmer_economics.json · fertilizer.dry_bulk/]
   ctx{{Freight Context Panel}}
-  W12 --> J_fr --> ctx
+  rate{{Rate Evolution + Spot table}}
+  dry{{Dry Bulk Indicator}}
+  W12 --> J_fr
+  J_fr --> ctx
+  J_fr --> rate
+  WDRY --> J_fe --> dry
 
   classDef scr fill:#0f172a,stroke:#334155,color:#94a3b8;
   classDef store fill:#450a0a,stroke:#ef4444,color:#fecaca;
   classDef proc fill:#1f2937,stroke:#64748b,color:#cbd5e1;
   classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
   classDef vis fill:#082f49,stroke:#0ea5e9,color:#bae6fd;
-  class W12 scr;
-  class J_fr json;
-  class ctx vis;
+  class W12,WDRY scr;
+  class J_fr,J_fe json;
+  class ctx,rate,dry vis;
 ```
 
 #### Supply
@@ -489,13 +493,14 @@ flowchart LR
   W32["3.2 Cecafe export · 15th"]
   W12["1.2 Freight · 02:00"]
   WCNTRY["Origin supply (VN ports)"]
-  DB[(Postgres)]
+  DB[(Postgres · live API only)]
   EXP{{"1.4 Export · 02:30"}}
+  SEED["seed/factories.json"]
   J_lp[/latest_prices.json/]
   J_aca[/acaphe_live.json/]
-  J_news[(news_feed · country_intel)]
-  J_ctry["countries.json → /api/map"]
-  J_fact["factories.json → /api/map"]
+  J_news[("/api/news · DB · live-only")]
+  J_ctry[("/api/map/countries · DB · live-only")]
+  J_fact[/factories.json · static/]
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
   J_vnx[/vn_export_destination_port/]
@@ -509,11 +514,12 @@ flowchart LR
   news{{News Feed / Sidebar}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
-  W11 --> DB --> J_news
+  W11 --> DB
+  DB --> J_news
   J_news --> country
   J_news --> news
   DB --> J_ctry --> country
-  DB --> J_fact --> factory
+  SEED --> J_fact --> factory
   W32 --> J_cec --> exports
   W12 --> J_fr --> freight
   WCNTRY --> J_vnx --> vnport
@@ -523,10 +529,10 @@ flowchart LR
   classDef proc fill:#1f2937,stroke:#64748b,color:#cbd5e1;
   classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
   classDef vis fill:#500724,stroke:#ec4899,color:#fbcfe8;
-  class W22,WPOLL,W11,W32,W12,WCNTRY scr;
-  class DB store;
+  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED scr;
+  class DB,J_news,J_ctry store;
   class EXP proc;
-  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx json;
+  class J_lp,J_aca,J_fact,J_cec,J_fr,J_vnx json;
   class base,price,country,factory,exports,freight,vnport,news vis;
 ```
 
@@ -570,10 +576,9 @@ flowchart LR
   class TICKER,TG vis;
 ```
 
-
 ### 4b. By dashboard tab (reverse view)
 
-- **COT** (`/cot`): Industry Pulse, Signals, Gauges, Heatmap, Global Flow, Dry Powder, Cycle, Report ← `cot.json` + `signals.json`; OI 7-day + OI→FND ← archive.
+- **COT** (`/cot`): Industry Pulse, Signals (computed in-browser from `cot.json`), Gauges, Heatmap, Global Flow (`macro_cot.json`), Dry Powder, Cycle, Report ← `cot.json`; OI 7-day ← `oi_history.json`, OI→FND ← `oi_fnd_chart.json`. (`signals.json` feeds only the Telegram brief.)
 - **Futures** (`/futures`): daily quotes ← `acaphe_live.json`; chain ← `futures_chain.json`; OI table ← `oi_history.json`; OI→FND ← `oi_fnd_chart.json`.
 - **Macro** (`/macro`): CCI ← `quant_report.json`; FX ← `fx_history.json`; cross-commodity MM ← `macro_cot.json`; freight ← `freight.json`; retail CPI ← `retail_cpi.json`; fertilizer inputs/origin prices ← `farmer_economics.json`/`origin_prices_history.json`.
 - **Demand** (`/demand`): stocks ← `demand_stocks.json`; roasting mix ← `factory_mix.json`; earnings ← `earnings.json`; DE tax ← `kaffeesteuer.json`.

@@ -69,6 +69,14 @@ export default function OriginPricesPanel() {
       .catch(() => setError(true));
   }, []);
 
+  // Only render origins that actually have a price history — otherwise an
+  // origin like brazil_arabica (no published series yet) shows a dead "—" card
+  // and a blank line.
+  const presentOrigins = useMemo<OriginKey[]>(
+    () => ORIGIN_ORDER.filter(k => (data?.origins?.[k]?.history?.length ?? 0) > 0),
+    [data]
+  );
+
   const chartData = useMemo(() => {
     if (!data) return [];
     const days = WINDOW_DAYS[window];
@@ -79,7 +87,7 @@ export default function OriginPricesPanel() {
     const cutoffIso = cutoff.toISOString().slice(0, 10);
 
     const dateSet = new Set<string>();
-    for (const k of ORIGIN_ORDER) {
+    for (const k of presentOrigins) {
       const hist = data.origins[k]?.history;
       if (!hist) continue;
       for (const h of hist) if (h.date >= cutoffIso) dateSet.add(h.date);
@@ -89,7 +97,7 @@ export default function OriginPricesPanel() {
 
     // Rebase each series to 100 at first available point in window
     const base: Record<string, number | null> = {};
-    for (const k of ORIGIN_ORDER) {
+    for (const k of presentOrigins) {
       const hist = data.origins[k]?.history.filter(h => h.date >= cutoffIso);
       const first = hist?.find(h => h.price > 0)?.price ?? null;
       base[k] = first;
@@ -97,7 +105,7 @@ export default function OriginPricesPanel() {
 
     return dates.map(d => {
       const row: Record<string, number | string | null> = { date: d, label: fmtDateLabel(d) };
-      for (const k of ORIGIN_ORDER) {
+      for (const k of presentOrigins) {
         const hist = data.origins[k]?.history;
         const point = hist?.find(h => h.date === d);
         const b = base[k];
@@ -105,7 +113,7 @@ export default function OriginPricesPanel() {
       }
       return row;
     });
-  }, [data, window]);
+  }, [data, window, presentOrigins]);
 
   const stats = useMemo(() => {
     if (!data) return [] as { key: OriginKey; name: string; latest: HistoryPoint | null; pct: number | null; color: string; unit: string; currency: string; source: string; count: number }[];
@@ -114,7 +122,7 @@ export default function OriginPricesPanel() {
     cutoff.setDate(cutoff.getDate() - days);
     const cutoffIso = cutoff.toISOString().slice(0, 10);
 
-    return ORIGIN_ORDER.map(k => {
+    return presentOrigins.map(k => {
       const o = data.origins[k];
       if (!o) {
         return { key: k, name: k, latest: null, pct: null, color: "#64748b", unit: "", currency: "", source: "", count: 0 };
@@ -129,7 +137,7 @@ export default function OriginPricesPanel() {
         source: o.source, count: inWindow.length,
       };
     });
-  }, [data, window]);
+  }, [data, window, presentOrigins]);
 
   if (error) {
     return (
@@ -213,7 +221,7 @@ export default function OriginPricesPanel() {
               />
               <Legend wrapperStyle={{ fontSize: 10 }} iconSize={8} />
               <ReferenceLine y={100} stroke="#475569" strokeDasharray="3 3" />
-              {ORIGIN_ORDER.map(k => {
+              {presentOrigins.map(k => {
                 const o = data.origins[k];
                 if (!o) return null;
                 return (

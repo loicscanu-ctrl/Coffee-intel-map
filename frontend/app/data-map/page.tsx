@@ -67,11 +67,10 @@ const COT = `flowchart LR
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   J_cot[/cot.json · 312wk/]
-  J_sig[/signals.json/]
   J_mac[/macro_cot.json/]
   J_fnd[/oi_fnd_chart.json/]
   ip{{Industry Pulse}}
-  sig{{Signals}}
+  sig{{"Signals · computed in-browser from cot.json"}}
   gau{{Gauges}}
   hm{{Heatmap}}
   flow{{Global Flow}}
@@ -84,11 +83,9 @@ const COT = `flowchart LR
   W23 --> DB --> EXP
   EXP --> J_cot
   EXP --> J_mac
-  J_cot --> J_sig
   ARC --> J_fnd
   J_cot --> ip
   J_cot --> sig
-  J_sig --> sig
   J_cot --> gau
   J_cot --> hm
   J_cot --> flow
@@ -103,19 +100,26 @@ ${DEFS}
   class W13,W23 scr;
   class ARC,DB store;
   class EXP proc;
-  class J_cot,J_sig,J_mac,J_fnd json;
+  class J_cot,J_mac,J_fnd json;
   class ip,sig,gau,hm,flow,dp,cyc,rep,oi,oifnd vis;`;
 
 const FREIGHT = `flowchart LR
-  W12["1.2 Freight · 02:00 daily<br/>Freightos · Yahoo dry-bulk"]
+  W12["1.2 Freight · 02:00 daily<br/>Freightos containers"]
+  WDRY["Yahoo dry-bulk<br/>(BDRY proxy)"]
   J_fr[/freight.json/]
+  J_fe[/farmer_economics.json · fertilizer.dry_bulk/]
   ctx{{Freight Context Panel}}
-  W12 --> J_fr --> ctx
+  rate{{Rate Evolution + Spot table}}
+  dry{{Dry Bulk Indicator}}
+  W12 --> J_fr
+  J_fr --> ctx
+  J_fr --> rate
+  WDRY --> J_fe --> dry
 ${DEFS}
   classDef vis fill:#082f49,stroke:#0ea5e9,color:#bae6fd;
-  class W12 scr;
-  class J_fr json;
-  class ctx vis;`;
+  class W12,WDRY scr;
+  class J_fr,J_fe json;
+  class ctx,rate,dry vis;`;
 
 const SUPPLY = `flowchart LR
   W17["1.7 Cecafe daily · 09:00<br/>B3 · cecafe.com.br"]
@@ -293,13 +297,14 @@ const NEWSMAP = `flowchart LR
   W32["3.2 Cecafe export · 15th"]
   W12["1.2 Freight · 02:00"]
   WCNTRY["Origin supply (VN ports)"]
-  DB[(Postgres)]
+  DB[(Postgres · live API only)]
   EXP{{"1.4 Export · 02:30"}}
+  SEED["seed/factories.json"]
   J_lp[/latest_prices.json/]
   J_aca[/acaphe_live.json/]
-  J_news[(news_feed · country_intel)]
-  J_ctry["countries.json → /api/map"]
-  J_fact["factories.json → /api/map"]
+  J_news[("/api/news · DB · live-only")]
+  J_ctry[("/api/map/countries · DB · live-only")]
+  J_fact[/factories.json · static/]
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
   J_vnx[/vn_export_destination_port/]
@@ -313,20 +318,21 @@ const NEWSMAP = `flowchart LR
   news{{News Feed / Sidebar}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
-  W11 --> DB --> J_news
+  W11 --> DB
+  DB --> J_news
   J_news --> country
   J_news --> news
   DB --> J_ctry --> country
-  DB --> J_fact --> factory
+  SEED --> J_fact --> factory
   W32 --> J_cec --> exports
   W12 --> J_fr --> freight
   WCNTRY --> J_vnx --> vnport
 ${DEFS}
   classDef vis fill:#500724,stroke:#ec4899,color:#fbcfe8;
-  class W22,WPOLL,W11,W32,W12,WCNTRY scr;
-  class DB store;
+  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED scr;
+  class DB,J_news,J_ctry store;
   class EXP proc;
-  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx json;
+  class J_lp,J_aca,J_fact,J_cec,J_fr,J_vnx json;
   class base,price,country,factory,exports,freight,vnport,news vis;`;
 
 const GLOBAL = `flowchart LR
