@@ -5,74 +5,65 @@
       {
         "contract": "Coffee (Jul '26)",
         "expiry": "2026-07-21",
-        "last": 274.15,
-        "chg": 5.85,
+        "last": 273.4,
+        "chg": 5.1,
         "oi": 75945,
-        "volume": 11318,
+        "volume": 12560,
         "symbol": "KCN26"
       },
       {
         "contract": "Coffee (Sep '26)",
         "expiry": "2026-09-18",
-        "last": 266.1,
-        "chg": 5.6,
+        "last": 265.5,
+        "chg": 5,
         "oi": 52216,
-        "volume": 9472,
+        "volume": 10422,
         "symbol": "KCU26"
       },
       {
         "contract": "Coffee (Dec '26)",
         "expiry": "2026-12-18",
-        "last": 257.85,
-        "chg": 4.95,
+        "last": 257.25,
+        "chg": 4.35,
         "oi": 36558,
-        "volume": 5341,
+        "volume": 5721,
         "symbol": "KCZ26"
       },
       {
         "contract": "Coffee (Mar '27)",
         "expiry": "2027-03-18",
-        "last": 255.4,
-        "chg": 4.75,
+        "last": 254.95,
+        "chg": 4.3,
         "oi": 13621,
-        "volume": 1604,
+        "volume": 1759,
         "symbol": "KCH27"
       },
       {
         "contract": "Coffee (May '27)",
         "expiry": "2027-05-18",
-        "last": 254.35,
-        "chg": 4.4,
+        "last": 254.3,
+        "chg": 4.35,
         "oi": 4385,
-        "volume": 495,
+        "volume": 539,
         "symbol": "KCK27"
       },
       {
         "contract": "Coffee (Jul '27)",
         "expiry": "2027-07-20",
-        "last": 254.15,
-        "chg": 4.4,
+        "last": 254.05,
+        "chg": 4.3,
         "oi": 3534,
-        "volume": 256,
+        "volume": 284,
         "symbol": "KCN27"
       },
       {
         "contract": "Coffee (Sep '27)",
         "expiry": "2027-09-20",
-        "last": 253,
-        "chg": 4.2,
+        "last": 252.95,
+        "chg": 4.15,
         "oi": 1923,
-        "volume": 49,
+        "volume": 64,
         "symbol": "KCU27"
-      },
-      {
-        "contract": "Coffee (Dec '27)",
-        "expiry": "2027-12-20",
-        "last": 251.3,
-        "chg": 3.6,
-        "oi": 2453,
-        "volume": 63,
-        "symbol": "KCZ27"
       }
     ]
   },
@@ -82,10 +73,10 @@
       {
         "contract": "Robusta Coffee 10-T (Jul '26)",
         "expiry": "2026-07-27",
-        "last": 3400,
-        "chg": 72,
+        "last": 3399,
+        "chg": 71,
         "oi": 48013,
-        "volume": 7560,
+        "volume": 7562,
         "symbol": "RMN26"
       },
       {
@@ -94,34 +85,34 @@
         "last": 3265,
         "chg": 51,
         "oi": 23090,
-        "volume": 4908,
+        "volume": 4911,
         "symbol": "RMU26"
       },
       {
         "contract": "Robusta Coffee 10-T (Nov '26)",
         "expiry": "2026-11-24",
-        "last": 3192,
-        "chg": 48,
+        "last": 3195,
+        "chg": 51,
         "oi": 11761,
-        "volume": 1521,
+        "volume": 1524,
         "symbol": "RMX26"
       },
       {
         "contract": "Robusta Coffee 10-T (Jan '27)",
         "expiry": "2027-01-25",
-        "last": 3130,
-        "chg": 52,
+        "last": 3127,
+        "chg": 49,
         "oi": 6031,
-        "volume": 871,
+        "volume": 875,
         "symbol": "RMF27"
       },
       {
         "contract": "Robusta Coffee 10-T (Mar '27)",
         "expiry": "2027-03-23",
-        "last": 3095,
-        "chg": 54,
+        "last": 3089,
+        "chg": 48,
         "oi": 2147,
-        "volume": 414,
+        "volume": 437,
         "symbol": "RMH27"
       },
       {
@@ -130,14 +121,14 @@
         "last": 3062,
         "chg": 48,
         "oi": 1031,
-        "volume": 89,
+        "volume": 100,
         "symbol": "RMK27"
       },
       {
         "contract": "Robusta Coffee 10-T (Jul '27)",
         "expiry": "2027-07-26",
-        "last": 3046,
-        "chg": 50,
+        "last": 3045,
+        "chg": 49,
         "oi": 480,
         "volume": 37,
         "symbol": "RMN27"
@@ -145,8 +136,8 @@
       {
         "contract": "Robusta Coffee 10-T (Sep '27)",
         "expiry": "2027-09-24",
-        "last": 3033,
-        "chg": 53,
+        "last": 3031,
+        "chg": 51,
         "oi": 320,
         "volume": 35,
         "symbol": "RMU27"
