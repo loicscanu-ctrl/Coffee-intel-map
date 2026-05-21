@@ -8,6 +8,26 @@ _Last updated: 2026-05-20 (post archive-unification + true max-OI rebuild)_
       (2026-03-25) and the live archive's start (~2026-04-06). Those COT-Tuesdays
       keep their pre-rebuild price. _User to supply the gap OI data; load with
       `load_contract_csv.py --kind oi`._
+- [ ] **Origin export data for Colombia / Honduras / Indonesia / Ethiopia**
+      (`exports: null` today). Root cause: the ICO CSV path is dead — `ico.org`
+      now 403s and trade tables are paywalled; and only `sources/indonesia.py`
+      ever called it (CO/HN/ET scrape price only, never exports). **Recommended
+      fix:** extend the already-working USDA PSD parser
+      (`sources/psd_coffee.py`, `apps.fas.usda.gov/psdonline/downloads/psd_coffee_csv.zip`,
+      no auth) to emit each country's `Exports` attribute — covers all four in
+      one source (annual, not monthly; export panels need an annual shape).
+      Monthly alternatives: FNC xlsx (Colombia), BPS table (Indonesia),
+      IHCAFE/INE PDF (Honduras), ECTA/FAS GAIN PDF (Ethiopia).
+- [ ] **Stale `acaphe_live.json`** (snapshot ~27 days old) — `/api/live`
+      (Upstash) returns 503 so the ticker, map price labels, origin-price diffs
+      and the Telegram brief fall back to a stale snapshot. Needs the acaphe
+      poller running with its secrets. _Deferred._
+- [ ] **Data gaps to backfill** (panels render but a series is empty):
+      `demand_stocks.json` → `age_cohort_18plus` (null) and ECF
+      `arabica_washed_mt`/`robusta_mt` (null); `retail_cpi.json` → no
+      `kc_futures` series; `origin_prices_history.json` → `brazil_arabica`
+      history empty; `farmer_economics.json` → `fertilizer.dry_bulk` /
+      `import_origins` null. _Deferred — upstream scraper output, not bugs._
 - [ ] (someday) Migrate FND chart + frontend `STATIC_SERIES` to RC so the
       DISPLAY=RM conversion can be dropped entirely (cosmetic; low priority).
 
@@ -493,13 +513,14 @@ flowchart LR
   W32["3.2 Cecafe export · 15th"]
   W12["1.2 Freight · 02:00"]
   WCNTRY["Origin supply (VN ports)"]
-  DB[(Postgres · live API only)]
+  DB[(Postgres · news_feed)]
   EXP{{"1.4 Export · 02:30"}}
   SEED["seed/factories.json"]
+  SUP[/supply JSONs · CO·VN·UG·BR·…/]
   J_lp[/latest_prices.json/]
   J_aca[/acaphe_live.json/]
-  J_news[("/api/news · DB · live-only")]
-  J_ctry[("/api/map/countries · DB · live-only")]
+  J_news[/news.json · static/]
+  J_ctry[/countries.json · static from supply/]
   J_fact[/factories.json · static/]
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
@@ -514,11 +535,11 @@ flowchart LR
   news{{News Feed / Sidebar}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
-  W11 --> DB
-  DB --> J_news
+  W11 --> DB --> EXP
+  EXP --> J_news
   J_news --> country
   J_news --> news
-  DB --> J_ctry --> country
+  SUP --> J_ctry --> country
   SEED --> J_fact --> factory
   W32 --> J_cec --> exports
   W12 --> J_fr --> freight
@@ -529,10 +550,10 @@ flowchart LR
   classDef proc fill:#1f2937,stroke:#64748b,color:#cbd5e1;
   classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
   classDef vis fill:#500724,stroke:#ec4899,color:#fbcfe8;
-  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED scr;
-  class DB,J_news,J_ctry store;
+  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED,SUP scr;
+  class DB store;
   class EXP proc;
-  class J_lp,J_aca,J_fact,J_cec,J_fr,J_vnx json;
+  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx json;
   class base,price,country,factory,exports,freight,vnport,news vis;
 ```
 

@@ -297,13 +297,14 @@ const NEWSMAP = `flowchart LR
   W32["3.2 Cecafe export · 15th"]
   W12["1.2 Freight · 02:00"]
   WCNTRY["Origin supply (VN ports)"]
-  DB[(Postgres · live API only)]
+  DB[(Postgres · news_feed)]
   EXP{{"1.4 Export · 02:30"}}
   SEED["seed/factories.json"]
+  SUP[/supply JSONs · CO·VN·UG·BR·…/]
   J_lp[/latest_prices.json/]
   J_aca[/acaphe_live.json/]
-  J_news[("/api/news · DB · live-only")]
-  J_ctry[("/api/map/countries · DB · live-only")]
+  J_news[/news.json · static/]
+  J_ctry[/countries.json · static from supply/]
   J_fact[/factories.json · static/]
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
@@ -318,21 +319,21 @@ const NEWSMAP = `flowchart LR
   news{{News Feed / Sidebar}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
-  W11 --> DB
-  DB --> J_news
+  W11 --> DB --> EXP
+  EXP --> J_news
   J_news --> country
   J_news --> news
-  DB --> J_ctry --> country
+  SUP --> J_ctry --> country
   SEED --> J_fact --> factory
   W32 --> J_cec --> exports
   W12 --> J_fr --> freight
   WCNTRY --> J_vnx --> vnport
 ${DEFS}
   classDef vis fill:#500724,stroke:#ec4899,color:#fbcfe8;
-  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED scr;
-  class DB,J_news,J_ctry store;
+  class W22,WPOLL,W11,W32,W12,WCNTRY,SEED,SUP scr;
+  class DB store;
   class EXP proc;
-  class J_lp,J_aca,J_fact,J_cec,J_fr,J_vnx json;
+  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx json;
   class base,price,country,factory,exports,freight,vnport,news vis;`;
 
 const GLOBAL = `flowchart LR

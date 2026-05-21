@@ -114,7 +114,13 @@ export interface FactoryPin {
 }
 
 export async function fetchMapCountries(): Promise<CountryPin[]> {
-  return apiGet<CountryPin[]>("/api/map/countries", { cache: "no-store" });
+  // Static-first: producer pins are published to /data/countries.json from the
+  // supply-tab data. Fall back to the live API if a backend is configured.
+  try {
+    return await cachedFetchStatic<CountryPin[]>("/data/countries.json");
+  } catch {
+    return apiGet<CountryPin[]>("/api/map/countries", { cache: "no-store" });
+  }
 }
 
 export async function fetchMapFactories(): Promise<FactoryPin[]> {
@@ -143,9 +149,16 @@ export interface NewsItem {
 }
 
 export async function fetchNews(category?: string): Promise<NewsItem[]> {
-  const path = category ? `/api/news?category=${encodeURIComponent(category)}` : "/api/news";
-  // no-store: bypass Next.js Data Cache so SSR always gets fresh news
-  return apiGet<NewsItem[]>(path, { cache: "no-store" });
+  // Static-first: the export publishes the recent feed to /data/news.json
+  // (unfiltered), so apply any category filter client-side. Fall back to the
+  // live API only if the static file isn't served.
+  try {
+    const all = await cachedFetchStatic<NewsItem[]>("/data/news.json");
+    return category ? all.filter(n => n.category === category) : all;
+  } catch {
+    const path = category ? `/api/news?category=${encodeURIComponent(category)}` : "/api/news";
+    return apiGet<NewsItem[]>(path, { cache: "no-store" });
+  }
 }
 
 export async function fetchFreight() {
