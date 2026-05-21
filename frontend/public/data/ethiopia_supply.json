@@ -1,10 +1,10 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-20T16:20:07.063736Z",
+  "scraped_at": "2026-05-21T05:20:33.793667Z",
   "exports": null,
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-20",
+    "as_of": "2026-05-21",
     "source": "ECX",
     "grade": "All grades avg"
   },
@@ -23,7 +23,7 @@
         "name": "Harrar",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.14,
+        "csi_60d": 0.164,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW"
       },
@@ -106,7 +106,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -122,7 +121,8 @@
           "M",
           "M",
           "M",
-          "M"
+          "M",
+          "L"
         ]
       },
       {
@@ -191,7 +191,7 @@
           "-",
           "-",
           "-",
-          "-",
+          "L",
           "L",
           "L",
           "L"
@@ -316,7 +316,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-20"
+    "last_updated": "2026-05-21"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",
