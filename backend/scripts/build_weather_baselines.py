@@ -180,14 +180,18 @@ def aggregate(daily: dict) -> dict:
 
 
 def _mtd_daily_envelope(times: list[str], precips: list[float | None]) -> dict:
-    """Per (calendar month, day-of-month) min/max/mean of month-to-date
+    """Per (calendar month, day-of-month) low/high/mean of month-to-date
     accumulated rainfall across all baseline years.
 
     For each year×month we walk days in order accumulating precip, recording the
-    running total at each day; then across years we reduce to min/max/mean. Lets
-    the brief say "MTD 42mm vs historical 18–96mm for this date". `times` is the
+    running total at each day; then across years we reduce to a band. Lets the
+    brief say "MTD 42mm vs historical 18–96mm for this date". `times` is the
     ascending daily date list from Open-Meteo; Feb-29 is contributed only by
     leap years and reduces naturally.
+
+    The `min`/`max` band is the 10th/90th percentile across years, NOT the
+    absolute extremes — a single freak drought or flood year shouldn't define
+    the "normal" range, so the tails are trimmed for a realistic envelope.
     """
     # month → day → [mtd_total per year]
     by_md: dict[int, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
@@ -209,8 +213,8 @@ def _mtd_daily_envelope(times: list[str], precips: list[float | None]) -> dict:
                 continue
             sv = sorted(vals)
             day_stats[str(d)] = {
-                "min":  round(sv[0], 1),
-                "max":  round(sv[-1], 1),
+                "min":  round(percentile(sv, 0.10), 1),
+                "max":  round(percentile(sv, 0.90), 1),
                 "mean": round(statistics.fmean(sv), 1),
                 "n":    len(sv),
             }

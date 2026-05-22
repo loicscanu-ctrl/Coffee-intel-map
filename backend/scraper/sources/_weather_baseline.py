@@ -93,8 +93,10 @@ def has_baseline(region: str) -> bool:
 
 
 def mtd_rain_envelope(region: str, month: int, day: int) -> tuple[float, float, float] | None:
-    """Historical (min, max, mean) of month-to-date accumulated rainfall for
-    (region, calendar month, day-of-month), across the baseline years.
+    """Historical (low, high, mean) of month-to-date accumulated rainfall for
+    (region, calendar month, day-of-month), across the baseline years. The
+    low/high band is the trimmed 10th/90th percentile (exceptional drought/flood
+    years are excluded), so it reads as a realistic "normal" range.
 
     Returns None when the `precip_mm_mtd_daily` block hasn't been built for
     this region/date — callers then omit the envelope and show MTD only.
