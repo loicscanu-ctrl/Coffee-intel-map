@@ -77,6 +77,16 @@ def _fmt_brl(n: float) -> str:
     """Brazilian decimal format: 900.0 → '900,00'."""
     return f"{n:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
 
+def _pct_change(change: float | None, prev: float | None) -> float | None:
+    """Day-on-day percent move. acaphe's `change_pct` is null, so derive it
+    from the absolute `change` and prior settle (`prev`)."""
+    if not isinstance(change, (int, float)) or not isinstance(prev, (int, float)) or prev == 0:
+        return None
+    return change / prev * 100
+
+def _section_header(title: str) -> str:
+    return f"<b>━ {title.upper()}</b>"
+
 
 # ── Futures section ───────────────────────────────────────────────────────────
 
@@ -119,12 +129,14 @@ def _spread(curr_front: float, curr_back: float,
 
 
 def _prices_section() -> str:
-    """Two front non-FND contracts + the next two calendar spreads, per market."""
+    """Two front non-FND contracts + the next two calendar spreads, per market,
+    with a term-structure cue and the KC–RC arb."""
     acaphe = _load("acaphe_live.json")
     if not acaphe:
         return ""
 
-    out = ["<b>Prices</b>"]
+    out = [_section_header("Prices")]
+    fronts: dict[str, float] = {}  # label → front last (for the arb line)
 
     for label, key, unit, dp in [
         ("KC", "arabica", "c/lb",   2),
@@ -137,6 +149,8 @@ def _prices_section() -> str:
         # First, second, third (for the second spread). Third is optional.
         c1, c2 = chain[0], chain[1]
         c3 = chain[2] if len(chain) >= 3 else None
+        if isinstance(c1.get("last"), (int, float)):
+            fronts[label] = float(c1["last"])
 
         # Loop-bound vars (`dp`, `unit`, `label`) are pinned via default args
         # so ruff's B023 sees the binding as static — closures rebuilt every
@@ -148,7 +162,12 @@ def _prices_section() -> str:
             if price is None:
                 return ""
             price_str = f"{price:.{dp}f} {unit}"
-            chg_str   = f" ({_signed(chg, dp)})" if isinstance(chg, (int, float)) else ""
+            pct = _pct_change(chg, contract.get("prev"))
+            if isinstance(chg, (int, float)):
+                pct_str = f" / {_signed(pct, 1)}%" if pct is not None else ""
+                chg_str = f" ({_signed(chg, dp)}{pct_str})"
+            else:
+                chg_str = ""
             return f"{label} {month}: <b>{price_str}</b>{chg_str}"
 
         for c in [c1, c2]:
@@ -177,7 +196,17 @@ def _prices_section() -> str:
             if sp2:
                 out.append(sp2)
 
+        # Term-structure cue from the front/second spread sign.
+        f1, f2 = c1.get("last"), c2.get("last")
+        if isinstance(f1, (int, float)) and isinstance(f2, (int, float)) and f1 != f2:
+            out.append(f"  structure: {'backwardated' if f1 > f2 else 'contango'}")
+
         out.append("")  # blank between KC and RC blocks
+
+    # KC–RC arb in c/lb (KC front − RC front converted from USD/t).
+    if "KC" in fronts and "RC" in fronts:
+        arb = fronts["KC"] - fronts["RC"] / CENTS_LB_TO_USD_TON
+        out.append(f"Arb KC–RC: <b>{arb:.1f} c/lb</b>")
 
     return "\n".join(out).rstrip()
 
@@ -319,23 +348,15 @@ def _cost_detail_section() -> str:
             usd_t, kc_month, kc_usd_t,
         )
 
-    return "\n".join(lines) if lines else ""
-
-
-# ── FX section ────────────────────────────────────────────────────────────────
-
-def _fx_section() -> str:
-    latest = _load("latest_prices.json")
-    if not latest:
+    if not lines:
         return ""
-    keep = {"USD/BRL", "USD/VND", "USD/IDR"}
-    rows = []
-    for t in latest.get("tickers", []):
-        if t.get("category") == "fx" and t.get("label") in keep:
-            rows.append(f"  {t['label']}={t['value']}")
-    if not rows:
-        return ""
-    return "<b>FX</b>\n" + "\n".join(rows)
+
+    # FX rates fold into this block (template groups them under differentials).
+    fx_rows = [f"  {lbl}={fx[lbl]:g}" for lbl in ("USD/BRL", "USD/VND", "USD/IDR") if lbl in fx]
+    if fx_rows:
+        lines.append("  <i>FX</i>: " + " · ".join(r.strip() for r in fx_rows))
+
+    return _section_header("Cost / Differentials") + "\n" + "\n".join(lines)
 
 
 # ── CoT section ───────────────────────────────────────────────────────────────
@@ -403,7 +424,7 @@ def _cot_section() -> str:
     else:
         composite_line = ""
 
-    lines = [f"<b>CoT</b> (report week {date_str}{age_str})"]
+    lines = [_section_header("Positioning"), f"  CoT report week {date_str}{age_str}"]
     if composite_line:
         lines.append(composite_line)
     if ny_net is not None:
@@ -440,26 +461,150 @@ def _cot_section() -> str:
     return "\n".join(lines)
 
 
+# ── Open interest & rollover ──────────────────────────────────────────────────
+
+def _oi_section() -> str:
+    """Front-contract OI + day-on-day change + a rollover cue (front's share of
+    total OI falling = positions rolling to the next contract). Reads
+    `oi_history.json` (per-date `contracts[]` ordered front-first)."""
+    doc = _load("oi_history.json")
+    if not isinstance(doc, dict):
+        return ""
+    out = [_section_header("OI & Rollover")]
+    had = False
+    for label, key in [("KC", "arabica"), ("RC", "robusta")]:
+        series = doc.get(key)
+        if not isinstance(series, list) or not series:
+            continue
+        latest = series[-1]
+        prev   = series[-2] if len(series) >= 2 else None
+        contracts = latest.get("contracts") or []
+        if not contracts:
+            continue
+
+        # The liquid benchmark is the max-OI contract (matches the price front,
+        # which drops the expiring/FND month). contracts[0] is the nearest by
+        # expiry — if that isn't the liquid one, it's rolling out.
+        total  = sum((c.get("oi") or 0) for c in contracts)
+        liquid = max(contracts, key=lambda c: c.get("oi") or 0)
+        loi    = liquid.get("oi") or 0
+        share  = (loi / total * 100) if total else None
+
+        dod = None
+        if prev:
+            pf = {c.get("symbol"): c for c in (prev.get("contracts") or [])}.get(liquid.get("symbol"))
+            if pf and isinstance(pf.get("oi"), (int, float)):
+                dod = loi - pf["oi"]
+
+        line = f"  {label}: {liquid.get('symbol', '?')} OI {int(loi):,}"
+        if dod is not None:
+            line += f" ({_signed(dod, 0)})"
+        if share is not None:
+            line += f" · {share:.0f}% of OI"
+        nearest = contracts[0]
+        if nearest.get("symbol") != liquid.get("symbol") and (nearest.get("oi") or 0) > 0:
+            line += f" · {nearest.get('symbol')} rolling out"
+        out.append(line)
+        had = True
+    return "\n".join(out) if had else ""
+
+
+# ── Brazil daily exports (Cecafe) ─────────────────────────────────────────────
+
+def _brazil_exports_section() -> str:
+    """Latest month-to-date Cecafe export certifications (bags) for arabica +
+    conilon, with pace vs the prior month on the same calendar day."""
+    doc = _load("cecafe_daily.json")
+    if not isinstance(doc, dict):
+        return ""
+    out = [_section_header("Brazil daily exports")]
+    had = False
+    for label, key in [("Arabica", "arabica"), ("Conilon", "conillon")]:
+        months = doc.get(key)
+        if not isinstance(months, dict) or not months:
+            continue
+        cur_m = max(months.keys())
+        days  = months[cur_m]
+        if not days:
+            continue
+        last_day = max(days.keys(), key=lambda d: int(d))
+        cum = days[last_day]
+        if not isinstance(cum, (int, float)):
+            continue
+        line = f"  {label}: {int(cum):,} bags MTD (through {cur_m}-{int(last_day):02d})"
+        ordered = sorted(months.keys())
+        idx = ordered.index(cur_m)
+        if idx > 0:
+            pv = months[ordered[idx - 1]].get(last_day)
+            if isinstance(pv, (int, float)) and pv:
+                line += f" · {_signed((cum - pv) / pv * 100, 0)}% vs prev mo same day"
+        out.append(line)
+        had = True
+    updated = doc.get("updated")
+    if had and updated:
+        out.append(f"  <i>updated {updated}</i>")
+    return "\n".join(out) if had else ""
+
+
+# ── Certified / port stocks ───────────────────────────────────────────────────
+
+def _stocks_section() -> str:
+    """Latest ECF European-port stocks (MT) + month-on-month change — a green-
+    coffee tightness gauge. Reads `demand_stocks.json` (`ecf.monthly[]`)."""
+    doc = _load("demand_stocks.json")
+    if not isinstance(doc, dict):
+        return ""
+    monthly = (doc.get("ecf") or {}).get("monthly") or []
+    if not monthly:
+        return ""
+    last = monthly[-1]
+    val  = last.get("value_mt")
+    if not isinstance(val, (int, float)):
+        return ""
+    line = f"  EU port stocks (ECF): {int(val):,} MT ({last.get('period', '')})"
+    prev = monthly[-2] if len(monthly) >= 2 else None
+    if prev and isinstance(prev.get("value_mt"), (int, float)):
+        line += f" · {_signed(val - prev['value_mt'], 0)} MoM"
+    return _section_header("Certified stocks") + "\n" + line
+
+
+def _retail_cpi_line() -> str:
+    """One-line retail-coffee CPI YoY across US/EU/BR. Appended under Macro.
+    Reads `retail_cpi.json` (`series.<code>.monthly[].yoy_pct`)."""
+    doc = _load("retail_cpi.json")
+    if not isinstance(doc, dict):
+        return ""
+    series = doc.get("series") or {}
+    parts = []
+    for code, label in [("us", "US"), ("eu", "EU"), ("brazil", "BR")]:
+        m = (series.get(code) or {}).get("monthly") or []
+        yoy = m[-1].get("yoy_pct") if m else None
+        if isinstance(yoy, (int, float)):
+            parts.append(f"{label} {_signed(yoy, 1)}%")
+    return "  <i>Retail CPI YoY</i>: " + " · ".join(parts) if parts else ""
+
+
 # ── Next-24h watchlist ────────────────────────────────────────────────────────
 
-def _events_section() -> str:
-    """'Next 24h to watch' — scheduled events from backend/seed/events.json.
+def _relevant_events() -> list[dict]:
+    """Scheduled events from backend/seed/events.json within the next ~48h,
+    sorted soonest-first. Shared by the Catalysts section and the TAKE line.
 
-    Selection rule: entries whose `date` is within [today, today+1] (UTC).
-    Entries with `time` (HH:MM) are filtered to a stricter +24h window when
-    we have a precise timestamp; date-only entries fire on the day-of.
+    Selection rule: entries whose `date` is within [today, today+2] (UTC).
+    Entries with `time` (HH:MM) are filtered to a stricter +48h window when we
+    have a precise timestamp; date-only entries fire on the day-of.
     """
     doc = _load_seed("events.json")
     if not isinstance(doc, dict):
-        return ""
+        return []
     events = doc.get("events") or []
     if not events:
-        return ""
+        return []
 
     now    = datetime.now(UTC)
     today  = now.date()
-    tomorrow = today + timedelta(days=1)
-    cutoff = now + timedelta(hours=24)
+    window = {today + timedelta(days=d) for d in range(3)}  # today .. +2 (≈48h)
+    cutoff = now + timedelta(hours=48)
 
     relevant: list[dict] = []
     for ev in events:
@@ -470,7 +615,7 @@ def _events_section() -> str:
             ev_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
             continue
-        if ev_date not in (today, tomorrow):
+        if ev_date not in window:
             continue
         # Apply optional time filter when present.
         time_str = ev.get("time")
@@ -485,12 +630,16 @@ def _events_section() -> str:
                 pass
         relevant.append(ev)
 
+    relevant.sort(key=lambda e: (e.get("date", ""), e.get("time", "99:99")))
+    return relevant
+
+
+def _events_section() -> str:
+    relevant = _relevant_events()
     if not relevant:
         return ""
 
-    relevant.sort(key=lambda e: (e.get("date", ""), e.get("time", "99:99")))
-
-    lines = ["<b>📅 Next 24h to watch</b>"]
+    lines = [_section_header("Catalysts (next 48h)")]
     for ev in relevant:
         date_str = ev["date"]
         time_str = ev.get("time", "")
@@ -505,48 +654,104 @@ def _events_section() -> str:
     return "\n".join(lines)
 
 
-# ── Weather alerts (kept as-is — seasonal-baseline filtering is Phase 2) ─────
+# ── Supply & weather ──────────────────────────────────────────────────────────
 
-def _weather_alerts_section() -> str:
-    """Collect HIGH drought or CSI alerts across all country supply JSONs.
+# Country supply JSONs carrying a weather.regions[] block. Brazil weather lives
+# in farmer_economics.json (no brazil_supply.json is published).
+_SUPPLY_FILES = [
+    ("farmer_economics", "Brazil"),
+    ("vietnam_supply",   "Vietnam"),
+    ("colombia_supply",  "Colombia"),
+    ("honduras_supply",  "Honduras"),
+    ("indonesia_supply", "Indonesia"),
+    ("uganda_supply",    "Uganda"),
+    ("ethiopia_supply",  "Ethiopia"),
+]
 
-    NOTE: doesn't filter for seasonality yet. A region's DROUGHT=HIGH may
-    be a normal dry-season reading rather than an anomaly — the seasonal
-    filter (Phase 2) needs per-region monthly baselines that don't exist
-    in the current data files.
-    """
-    alerts = []
-    files = [
-        # Brazil weather lives in farmer_economics.json (weather.regions[]),
-        # not a brazil_supply.json (which is never published) — read it there so
-        # Sul-de-Minas / Cerrado drought + CSI alerts actually fire.
-        ("farmer_economics", "Brazil"),
-        ("vietnam_supply",   "Vietnam"),
-        ("colombia_supply",  "Colombia"),
-        ("honduras_supply",  "Honduras"),
-        ("indonesia_supply", "Indonesia"),
-        ("uganda_supply",    "Uganda"),
-        ("ethiopia_supply",  "Ethiopia"),
-    ]
-    for fname, country in files:
+
+def _rain_cue(mtd: float, lo: float, hi: float) -> str:
+    """Where this month-to-date rainfall sits inside the historical envelope
+    for the same calendar date."""
+    if mtd < lo:
+        return "record-dry"
+    if mtd > hi:
+        return "record-wet"
+    span = hi - lo
+    if span <= 0:
+        return "normal"
+    frac = (mtd - lo) / span
+    if frac <= 0.25:
+        return "dry"
+    if frac >= 0.75:
+        return "wet"
+    return "normal"
+
+
+def _weather_rows() -> list[dict]:
+    """Per-area weather rows from the country supply JSONs. Each row carries the
+    drought/CSI flags plus — when the export has populated them (Track B) — the
+    month-to-date rainfall and its historical envelope for today's date."""
+    rows: list[dict] = []
+    for fname, country in _SUPPLY_FILES:
         data = _load(f"{fname}.json")
-        if not data:
-            continue
-        weather = data.get("weather")
+        weather = data.get("weather") if isinstance(data, dict) else None
         if not weather:
             continue
         for reg in weather.get("regions", []):
-            name   = reg.get("name", "?")
-            drought = reg.get("drought", "NONE")
-            csi_30  = reg.get("csi_30d_level", "NONE")
-            if drought == "HIGH":
-                alerts.append(f"  DROUGHT HIGH — {country}/{name}")
-            if csi_30 == "HIGH":
-                alerts.append(f"  CSI HIGH — {country}/{name}")
+            mtd = reg.get("rain_mtd_mm")
+            lo  = reg.get("rain_hist_min")
+            hi  = reg.get("rain_hist_max")
+            has_rain = all(isinstance(v, (int, float)) for v in (mtd, lo, hi))
+            rows.append({
+                "country": country,
+                "name":    reg.get("name", "?"),
+                "drought": reg.get("drought", "NONE"),
+                "csi":     reg.get("csi_30d_level", "NONE"),
+                "mtd":     mtd if has_rain else None,
+                "lo":      lo  if has_rain else None,
+                "hi":      hi  if has_rain else None,
+                "cue":     _rain_cue(mtd, lo, hi) if has_rain else None,
+            })
+    return rows
 
-    if not alerts:
+
+def _supply_weather_section() -> str:
+    """Per-area month-to-date rain vs the historical high/low for today's date,
+    with a drought/CSI tag as a secondary cue. Falls back to a HIGH-alert list
+    when the rainfall envelope hasn't been populated yet (baseline backfill /
+    export change pending)."""
+    rows = _weather_rows()
+    if not rows:
         return ""
-    return "<b>Weather Alerts</b>\n" + "\n".join(alerts)
+
+    out = [_section_header("Supply & Weather")]
+    rain_rows = [r for r in rows if r["mtd"] is not None]
+
+    if rain_rows:
+        for r in rain_rows:
+            tag_bits = []
+            if r["drought"] == "HIGH":
+                tag_bits.append("drought HIGH")
+            if r["csi"] == "HIGH":
+                tag_bits.append("CSI HIGH")
+            tag = (" · " + ", ".join(tag_bits)) if tag_bits else ""
+            out.append(
+                f"  {r['country']}/{r['name']}: MTD {r['mtd']:.0f}mm · "
+                f"hist {r['lo']:.0f}–{r['hi']:.0f} (this date) · {r['cue']}{tag}"
+            )
+    else:
+        # Envelope not available yet — preserve the original HIGH-alert behaviour.
+        alerts = []
+        for r in rows:
+            if r["drought"] == "HIGH":
+                alerts.append(f"  DROUGHT HIGH — {r['country']}/{r['name']}")
+            if r["csi"] == "HIGH":
+                alerts.append(f"  CSI HIGH — {r['country']}/{r['name']}")
+        if len(out) == 1 and not alerts:
+            return ""
+        out.extend(alerts)
+
+    return "\n".join(out)
 
 
 # ── Freight ───────────────────────────────────────────────────────────────────
@@ -556,7 +761,7 @@ def _freight_section() -> str:
     if not data:
         return ""
     routes = data.get("routes", [])
-    lines = ["<b>Freight (USD/FEU)</b>"]
+    lines = [_section_header("Freight (USD/FEU)")]
     key_routes = {"vn-eu", "br-eu", "vn-us"}
     for r in routes:
         if r.get("id") in key_routes:
@@ -720,7 +925,7 @@ def _news_section(db) -> str:
             label = _extract_data_label(it.body, it.source)
             by_cat.setdefault(cat, []).append((it.title or "", label))
 
-        lines = ["<b>News (last 24h)</b>"]
+        lines = [_section_header("News (last 24h)")]
         for cat, rows in by_cat.items():
             lines.append(f"  [{cat}]")
             for title, label in rows[:3]:
@@ -798,26 +1003,131 @@ def _macro_section() -> str:
             parts = [f"{s} {_signed(c, 1)}%" for s, c in items[:4]]
             lines.append(f"  {sector_label}: {', '.join(parts)}")
 
+    cpi = _retail_cpi_line()
+    if cpi:
+        lines.append(cpi)
+
     if not lines:
         return ""
-    return "<b>Macro</b>\n" + "\n".join(lines)
+    return _section_header("Macro") + "\n" + "\n".join(lines)
+
+
+# ── TAKE: interpretive synthesis ──────────────────────────────────────────────
+
+def _take_section() -> str:
+    """One-line, rule-based read of the tape: KC front move, managed-money
+    stance, the most stretched supply/weather area, and the next catalyst.
+    Pure synthesis of data the other sections already load — no model call."""
+    bits: list[str] = []
+
+    acaphe = _load("acaphe_live.json")
+    if isinstance(acaphe, dict):
+        chain = _active_contracts(acaphe.get("arabica", []))
+        if chain and isinstance(chain[0].get("last"), (int, float)):
+            f = chain[0]
+            pct = _pct_change(f.get("change"), f.get("prev"))
+            pct_str = f" ({_signed(pct, 1)}%)" if pct is not None else ""
+            bits.append(f"KC {f['last']:.0f}c{pct_str}")
+
+    # Positioning: MM net direction + composite zone.
+    pos_bits: list[str] = []
+    cot = _load("cot_recent.json")
+    if isinstance(cot, list) and cot:
+        ny = cot[-1].get("ny", {})
+        ml, ms = ny.get("mm_long"), ny.get("mm_short")
+        if isinstance(ml, (int, float)) and isinstance(ms, (int, float)):
+            pos_bits.append("MM net long" if ml - ms > 0 else "MM net short")
+    sig = _load("signals.json")
+    if isinstance(sig, dict) and isinstance(sig.get("scoreNY"), (int, float)):
+        pos_bits.append(f"NY {_score_zone(sig['scoreNY'])}")
+    if pos_bits:
+        bits.append(", ".join(pos_bits))
+
+    # Supply cue: driest area inside its historical envelope, else a HIGH flag.
+    rows = _weather_rows()
+    def _frac(r: dict) -> float:
+        span = r["hi"] - r["lo"]
+        return (r["mtd"] - r["lo"]) / span if span > 0 else 0.5
+    rain_rows = [r for r in rows if r["mtd"] is not None]
+    cue = None
+    if rain_rows:
+        driest = min(rain_rows, key=_frac)
+        if _frac(driest) <= 0.25:
+            cue = f"{driest['name']} {driest['cue']}"
+    if cue is None:
+        highs = [r for r in rows if r["drought"] == "HIGH" or r["csi"] == "HIGH"]
+        if highs:
+            cue = f"{highs[0]['name']} drought HIGH"
+    if cue:
+        bits.append(cue)
+
+    if not bits:
+        return ""
+
+    take = "; ".join(bits)
+    evs = _relevant_events()
+    if evs:
+        take += f". Watch {evs[0].get('title', '')}"
+    return f"<b>TAKE</b>  {take}"
+
+
+# ── Message chunking ──────────────────────────────────────────────────────────
+
+def _split_message(text: str, limit: int = 3900) -> list[str]:
+    """Pack whole sections into ≤`limit`-char chunks for Telegram's 4096 cap.
+
+    Splits on the blank-line section boundaries `build_message` uses so HTML
+    tags never break across a chunk. A single oversized section falls back to a
+    line-level split, then a hard character cut as a last resort."""
+    chunks: list[str] = []
+    cur = ""
+
+    def _flush() -> None:
+        nonlocal cur
+        if cur:
+            chunks.append(cur)
+            cur = ""
+
+    for block in text.split("\n\n"):
+        candidate = block if not cur else f"{cur}\n\n{block}"
+        if len(candidate) <= limit:
+            cur = candidate
+            continue
+        _flush()
+        if len(block) <= limit:
+            cur = block
+            continue
+        for line in block.split("\n"):
+            cand2 = line if not cur else f"{cur}\n{line}"
+            if len(cand2) <= limit:
+                cur = cand2
+            else:
+                _flush()
+                cur = line if len(line) <= limit else line[:limit]
+                if len(line) > limit:
+                    _flush()
+    _flush()
+    return chunks or [text[:limit]]
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def build_message(db=None) -> str:
     now_utc = datetime.now(UTC)
-    header  = f"<b>Coffee Intel — {now_utc.strftime('%a %d %b %Y')}</b>"
+    header  = f"<b>☕ Coffee Intel — {now_utc.strftime('%a %d %b %Y')}</b>"
 
     static_sections = [
-        _events_section,        # "Next 24h to watch" — top of brief, highest visibility
+        _take_section,
         _prices_section,
         _cost_detail_section,
-        _fx_section,
         _cot_section,
-        _weather_alerts_section,
+        _oi_section,
+        _supply_weather_section,
+        _brazil_exports_section,
+        _stocks_section,
         _freight_section,
         _macro_section,
+        _events_section,        # Catalysts — moved below the data blocks
     ]
 
     sections = [header]
@@ -872,7 +1182,10 @@ def main():
         print("[morning_brief] Message preview:\n")
         print(msg)
         print()
-        send_telegram(msg)
+        chunks = _split_message(msg)
+        for i, chunk in enumerate(chunks, 1):
+            body = chunk if len(chunks) == 1 else f"<i>({i}/{len(chunks)})</i>\n{chunk}"
+            send_telegram(body)
     finally:
         if db:
             db.close()

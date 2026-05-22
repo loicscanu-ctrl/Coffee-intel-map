@@ -90,3 +90,70 @@ def has_baseline(region: str) -> bool:
     """Quick check used by callers that gate the seasonal filter on data availability."""
     doc = _load_baselines()
     return region in (doc.get("regions") or {})
+
+
+def mtd_rain_envelope(region: str, month: int, day: int) -> tuple[float, float, float] | None:
+    """Historical (min, max, mean) of month-to-date accumulated rainfall for
+    (region, calendar month, day-of-month), across the baseline years.
+
+    Returns None when the `precip_mm_mtd_daily` block hasn't been built for
+    this region/date — callers then omit the envelope and show MTD only.
+    """
+    doc = _load_baselines()
+    region_doc = (doc.get("regions") or {}).get(region)
+    if not region_doc:
+        return None
+    daily = region_doc.get("precip_mm_mtd_daily") or {}
+    stats = (daily.get(str(month)) or {}).get(str(day))
+    if not stats:
+        return None
+    lo, hi, mean = stats.get("min"), stats.get("max"), stats.get("mean")
+    if lo is None or hi is None:
+        return None
+    return float(lo), float(hi), float(mean if mean is not None else (lo + hi) / 2)
+
+
+def mtd_rain_fields(daily_data: list[dict], region_key: str, today=None) -> dict:
+    """Export helper: the three rain fields the morning brief reads, ready to
+    merge into a `weather.regions[]` entry. Returns `{}` when MTD rain can't be
+    computed or the historical envelope for the region/date is missing, so
+    callers can `region.update(mtd_rain_fields(...))` unconditionally.
+
+    `region_key` is the per-country baseline key ("colombia", "brazil", …).
+    """
+    from datetime import date as _date
+    today = today or _date.today()
+    mtd = mtd_rain_mm(daily_data, today)
+    if mtd is None:
+        return {}
+    fields: dict = {"rain_mtd_mm": round(mtd, 1)}
+    env = mtd_rain_envelope(region_key, today.month, today.day)
+    if env:
+        lo, hi, _mean = env
+        fields["rain_hist_min"] = lo
+        fields["rain_hist_max"] = hi
+    return fields
+
+
+def mtd_rain_mm(daily_data: list[dict], today) -> float | None:
+    """Sum of `precip_mm` over the current calendar month from a region's
+    `WeatherSnapshot.daily_data` (60-day window comfortably covers any MTD).
+
+    `today` is a date; entries are `{"date": "YYYY-MM-DD", "precip_mm": float}`.
+    Returns None when no in-month daily values are present.
+    """
+    total = None
+    for d in daily_data or []:
+        ds = d.get("date")
+        if not ds or len(ds) < 7:
+            continue
+        try:
+            y, mo = int(ds[:4]), int(ds[5:7])
+        except ValueError:
+            continue
+        if y != today.year or mo != today.month:
+            continue
+        p = d.get("precip_mm")
+        if isinstance(p, (int, float)):
+            total = (total or 0.0) + p
+    return total

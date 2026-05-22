@@ -660,6 +660,7 @@ def export_farmer_economics(db) -> None:
                 frost_badge   = _badge_from_risk_code(_worst_risk(frost_codes))
                 drought_badge = _badge_from_risk_code(_worst_risk(drought_codes))
 
+                from scraper.sources._weather_baseline import mtd_rain_fields
                 from scraper.sources.farmer_economics import _calc_csi
                 csi = _calc_csi(daily)
 
@@ -672,6 +673,9 @@ def export_farmer_economics(db) -> None:
                     "csi_30d_level":  csi["csi_30d_level"],
                     "csi_60d_level":  csi["csi_60d_level"],
                 })
+                # Brazil's baseline representative point is the Cerrado.
+                if region_name == "Cerrado":
+                    regions_out[-1].update(mtd_rain_fields(daily, "brazil"))
 
                 frost_days   = [d.get("frost_risk",   "-") for d in daily]
                 drought_days = [d.get("drought_risk", "-") for d in daily]

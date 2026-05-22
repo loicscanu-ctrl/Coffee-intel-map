@@ -142,6 +142,7 @@ def export_indonesia(db) -> None:
     # ── 2. Weather ────────────────────────────────────────────────────────────
     weather_out = None
     try:
+        from scraper.sources._weather_baseline import mtd_rain_fields
         from scraper.sources.indonesia_weather import _calc_csi
 
         snapshots = (
@@ -181,6 +182,8 @@ def export_indonesia(db) -> None:
                     "csi_30d_level": csi["csi_30d_level"],
                     "csi_60d_level": csi["csi_60d_level"],
                 })
+                if region_name == "Lampung":
+                    regions_out[-1].update(mtd_rain_fields(daily, "indonesia"))
 
                 drought_days = [d.get("drought_risk", "-") for d in daily]
                 if any(c != "-" for c in drought_days):

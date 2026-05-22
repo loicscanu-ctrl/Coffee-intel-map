@@ -235,6 +235,7 @@ def export_uganda(db) -> None:
     # 3. Weather
     weather_out = None
     try:
+        from scraper.sources._weather_baseline import mtd_rain_fields
         from scraper.sources.uganda_weather import _calc_csi
 
         snapshots = (
@@ -271,6 +272,8 @@ def export_uganda(db) -> None:
                     "csi_30d_level": csi["csi_30d_level"],
                     "csi_60d_level": csi["csi_60d_level"],
                 })
+                if rname == "Mt Elgon":
+                    regions_out[-1].update(mtd_rain_fields(daily, "uganda"))
                 drought_days = [d.get("drought_risk", "-") for d in daily]
                 if any(c != "-" for c in drought_days):
                     daily_drought_out.append({"region": rname, "days": drought_days})

@@ -159,7 +159,52 @@ def aggregate(daily: dict) -> dict:
                 "std":  round(statistics.pstdev(ts) if len(ts) > 1 else 0.0, 2),
                 "n":    len(ts),
             }
-    return {"precip_mm_monthly": precip_stats, "temp_c_monthly": temp_stats}
+
+    return {
+        "precip_mm_monthly":   precip_stats,
+        "temp_c_monthly":      temp_stats,
+        "precip_mm_mtd_daily": _mtd_daily_envelope(times, precips),
+    }
+
+
+def _mtd_daily_envelope(times: list[str], precips: list[float | None]) -> dict:
+    """Per (calendar month, day-of-month) min/max/mean of month-to-date
+    accumulated rainfall across all baseline years.
+
+    For each year×month we walk days in order accumulating precip, recording the
+    running total at each day; then across years we reduce to min/max/mean. Lets
+    the brief say "MTD 42mm vs historical 18–96mm for this date". `times` is the
+    ascending daily date list from Open-Meteo; Feb-29 is contributed only by
+    leap years and reduces naturally.
+    """
+    # month → day → [mtd_total per year]
+    by_md: dict[int, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+    cur_key: tuple[int, int] | None = None
+    acc = 0.0
+    for t, p in zip(times, precips):
+        y, mo, d = int(t[:4]), int(t[5:7]), int(t[8:10])
+        if (y, mo) != cur_key:
+            cur_key = (y, mo)
+            acc = 0.0
+        acc += p or 0.0
+        by_md[mo][d].append(acc)
+
+    out: dict[str, dict] = {}
+    for mo in range(1, 13):
+        day_stats: dict[str, dict] = {}
+        for d, vals in sorted(by_md.get(mo, {}).items()):
+            if not vals:
+                continue
+            sv = sorted(vals)
+            day_stats[str(d)] = {
+                "min":  round(sv[0], 1),
+                "max":  round(sv[-1], 1),
+                "mean": round(statistics.fmean(sv), 1),
+                "n":    len(sv),
+            }
+        if day_stats:
+            out[str(mo)] = day_stats
+    return out
 
 
 def main():

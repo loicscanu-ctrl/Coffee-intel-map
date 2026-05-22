@@ -11,6 +11,10 @@
         "temp_c_monthly": {
           "1":  { "mean": 0.0, "std": 0.0 },
           "...": "one entry per calendar month 1..12"
+        },
+        "precip_mm_mtd_daily": {
+          "5":  { "22": { "min": 0.0, "max": 0.0, "mean": 0.0, "n": 0 } },
+          "...": "month -> day-of-month -> min/max/mean of month-to-date accumulated rain across baseline years. Powers the morning brief's 'MTD vs historical hi/lo for this date' line via mtd_rain_envelope()."
         }
       }
     },
