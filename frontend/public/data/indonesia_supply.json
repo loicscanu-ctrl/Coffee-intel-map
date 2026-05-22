@@ -1,9 +1,346 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-21T19:19:50.505370Z",
-  "exports": null,
+  "scraped_at": "2026-05-22T00:56:58.863244Z",
+  "exports": {
+    "source": "USDA FAS PSD",
+    "last_updated": "2026-05-22",
+    "unit": "thousand 60-kg bags (marketing year)",
+    "monthly": [],
+    "annual": [
+      {
+        "year": "1960",
+        "total_k_bags": 641.0,
+        "yoy_pct": null
+      },
+      {
+        "year": "1961",
+        "total_k_bags": 1151.0,
+        "yoy_pct": 79.6
+      },
+      {
+        "year": "1962",
+        "total_k_bags": 1035.0,
+        "yoy_pct": -10.1
+      },
+      {
+        "year": "1963",
+        "total_k_bags": 1511.0,
+        "yoy_pct": 46.0
+      },
+      {
+        "year": "1964",
+        "total_k_bags": 1222.0,
+        "yoy_pct": -19.1
+      },
+      {
+        "year": "1965",
+        "total_k_bags": 1409.0,
+        "yoy_pct": 15.3
+      },
+      {
+        "year": "1966",
+        "total_k_bags": 1646.0,
+        "yoy_pct": 16.8
+      },
+      {
+        "year": "1967",
+        "total_k_bags": 2183.0,
+        "yoy_pct": 32.6
+      },
+      {
+        "year": "1968",
+        "total_k_bags": 1514.0,
+        "yoy_pct": -30.6
+      },
+      {
+        "year": "1969",
+        "total_k_bags": 1647.0,
+        "yoy_pct": 8.8
+      },
+      {
+        "year": "1970",
+        "total_k_bags": 1193.0,
+        "yoy_pct": -27.6
+      },
+      {
+        "year": "1971",
+        "total_k_bags": 1530.0,
+        "yoy_pct": 28.2
+      },
+      {
+        "year": "1972",
+        "total_k_bags": 1461.0,
+        "yoy_pct": -4.5
+      },
+      {
+        "year": "1973",
+        "total_k_bags": 1531.0,
+        "yoy_pct": 4.8
+      },
+      {
+        "year": "1974",
+        "total_k_bags": 1692.0,
+        "yoy_pct": 10.5
+      },
+      {
+        "year": "1975",
+        "total_k_bags": 2186.0,
+        "yoy_pct": 29.2
+      },
+      {
+        "year": "1976",
+        "total_k_bags": 2335.0,
+        "yoy_pct": 6.8
+      },
+      {
+        "year": "1977",
+        "total_k_bags": 2875.0,
+        "yoy_pct": 23.1
+      },
+      {
+        "year": "1978",
+        "total_k_bags": 3706.0,
+        "yoy_pct": 28.9
+      },
+      {
+        "year": "1979",
+        "total_k_bags": 3759.0,
+        "yoy_pct": 1.4
+      },
+      {
+        "year": "1980",
+        "total_k_bags": 3873.0,
+        "yoy_pct": 3.0
+      },
+      {
+        "year": "1981",
+        "total_k_bags": 3480.0,
+        "yoy_pct": -10.1
+      },
+      {
+        "year": "1982",
+        "total_k_bags": 3843.0,
+        "yoy_pct": 10.4
+      },
+      {
+        "year": "1983",
+        "total_k_bags": 4381.0,
+        "yoy_pct": 14.0
+      },
+      {
+        "year": "1984",
+        "total_k_bags": 4972.0,
+        "yoy_pct": 13.5
+      },
+      {
+        "year": "1985",
+        "total_k_bags": 4685.0,
+        "yoy_pct": -5.8
+      },
+      {
+        "year": "1986",
+        "total_k_bags": 4919.0,
+        "yoy_pct": 5.0
+      },
+      {
+        "year": "1987",
+        "total_k_bags": 4442.0,
+        "yoy_pct": -9.7
+      },
+      {
+        "year": "1988",
+        "total_k_bags": 5199.0,
+        "yoy_pct": 17.0
+      },
+      {
+        "year": "1989",
+        "total_k_bags": 6436.0,
+        "yoy_pct": 23.8
+      },
+      {
+        "year": "1990",
+        "total_k_bags": 6919.0,
+        "yoy_pct": 7.5
+      },
+      {
+        "year": "1991",
+        "total_k_bags": 5597.0,
+        "yoy_pct": -19.1
+      },
+      {
+        "year": "1992",
+        "total_k_bags": 5146.0,
+        "yoy_pct": -8.1
+      },
+      {
+        "year": "1993",
+        "total_k_bags": 5356.0,
+        "yoy_pct": 4.1
+      },
+      {
+        "year": "1994",
+        "total_k_bags": 4445.0,
+        "yoy_pct": -17.0
+      },
+      {
+        "year": "1995",
+        "total_k_bags": 4288.0,
+        "yoy_pct": -3.5
+      },
+      {
+        "year": "1996",
+        "total_k_bags": 6398.0,
+        "yoy_pct": 49.2
+      },
+      {
+        "year": "1997",
+        "total_k_bags": 5037.0,
+        "yoy_pct": -21.3
+      },
+      {
+        "year": "1998",
+        "total_k_bags": 6019.0,
+        "yoy_pct": 19.5
+      },
+      {
+        "year": "1999",
+        "total_k_bags": 5625.0,
+        "yoy_pct": -6.5
+      },
+      {
+        "year": "2000",
+        "total_k_bags": 5494.0,
+        "yoy_pct": -2.3
+      },
+      {
+        "year": "2001",
+        "total_k_bags": 4700.0,
+        "yoy_pct": -14.5
+      },
+      {
+        "year": "2002",
+        "total_k_bags": 5400.0,
+        "yoy_pct": 14.9
+      },
+      {
+        "year": "2003",
+        "total_k_bags": 5600.0,
+        "yoy_pct": 3.7
+      },
+      {
+        "year": "2004",
+        "total_k_bags": 6400.0,
+        "yoy_pct": 14.3
+      },
+      {
+        "year": "2005",
+        "total_k_bags": 7700.0,
+        "yoy_pct": 20.3
+      },
+      {
+        "year": "2006",
+        "total_k_bags": 6000.0,
+        "yoy_pct": -22.1
+      },
+      {
+        "year": "2007",
+        "total_k_bags": 5510.0,
+        "yoy_pct": -8.2
+      },
+      {
+        "year": "2008",
+        "total_k_bags": 6625.0,
+        "yoy_pct": 20.2
+      },
+      {
+        "year": "2009",
+        "total_k_bags": 7425.0,
+        "yoy_pct": 12.1
+      },
+      {
+        "year": "2010",
+        "total_k_bags": 7415.0,
+        "yoy_pct": -0.1
+      },
+      {
+        "year": "2011",
+        "total_k_bags": 4620.0,
+        "yoy_pct": -37.7
+      },
+      {
+        "year": "2012",
+        "total_k_bags": 8290.0,
+        "yoy_pct": 79.4
+      },
+      {
+        "year": "2013",
+        "total_k_bags": 8540.0,
+        "yoy_pct": 3.0
+      },
+      {
+        "year": "2014",
+        "total_k_bags": 6770.0,
+        "yoy_pct": -20.7
+      },
+      {
+        "year": "2015",
+        "total_k_bags": 7938.0,
+        "yoy_pct": 17.3
+      },
+      {
+        "year": "2016",
+        "total_k_bags": 7309.0,
+        "yoy_pct": -7.9
+      },
+      {
+        "year": "2017",
+        "total_k_bags": 6940.0,
+        "yoy_pct": -5.0
+      },
+      {
+        "year": "2018",
+        "total_k_bags": 4907.0,
+        "yoy_pct": -29.3
+      },
+      {
+        "year": "2019",
+        "total_k_bags": 6096.0,
+        "yoy_pct": 24.2
+      },
+      {
+        "year": "2020",
+        "total_k_bags": 6466.0,
+        "yoy_pct": 6.1
+      },
+      {
+        "year": "2021",
+        "total_k_bags": 6335.0,
+        "yoy_pct": -2.0
+      },
+      {
+        "year": "2022",
+        "total_k_bags": 6735.0,
+        "yoy_pct": 6.3
+      },
+      {
+        "year": "2023",
+        "total_k_bags": 4285.0,
+        "yoy_pct": -36.4
+      },
+      {
+        "year": "2024",
+        "total_k_bags": 6135.0,
+        "yoy_pct": 43.2
+      },
+      {
+        "year": "2025",
+        "total_k_bags": 7800.0,
+        "yoy_pct": 27.1
+      }
+    ]
+  },
   "weather": {
-    "scraped_at": "2026-05-21T19:14:00.312302Z",
+    "scraped_at": "2026-05-22T00:52:53.181437Z",
     "regions": [
       {
         "name": "Lampung",
@@ -16,32 +353,32 @@
       {
         "name": "Gayo",
         "drought": "MED",
-        "csi_30d": 47.3,
-        "csi_60d": 88.7,
+        "csi_30d": 47.8,
+        "csi_60d": 92.8,
         "csi_30d_level": "M",
         "csi_60d_level": "M"
       },
       {
         "name": "Java",
         "drought": "LOW",
-        "csi_30d": 85.5,
-        "csi_60d": 132.3,
+        "csi_30d": 89.1,
+        "csi_60d": 135.9,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
       {
         "name": "Toraja",
         "drought": "NONE",
-        "csi_30d": 34.1,
-        "csi_60d": 75.2,
+        "csi_30d": 31.9,
+        "csi_60d": 77.3,
         "csi_30d_level": "L",
         "csi_60d_level": "L"
       },
       {
         "name": "Flores",
         "drought": "LOW",
-        "csi_30d": 76.6,
-        "csi_60d": 142.8,
+        "csi_30d": 76.8,
+        "csi_60d": 146.4,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }
@@ -190,10 +527,10 @@
           "L",
           "L",
           "M",
+          "M",
           "L",
           "L",
-          "L",
-          "L",
+          "M",
           "L",
           "H",
           "H",
@@ -870,43 +1207,43 @@
           {
             "date": "2026-05-22",
             "precip_prob": 92,
-            "precip_mm": 0.9,
-            "soil_moisture": 0.448,
+            "precip_mm": 3.9,
+            "soil_moisture": 0.449,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 92,
-            "precip_mm": 23.2,
-            "soil_moisture": 0.445,
+            "precip_mm": 7.8,
+            "soil_moisture": 0.449,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 92,
-            "precip_mm": 5.2,
-            "soil_moisture": 0.446,
+            "precip_mm": 2.0,
+            "soil_moisture": 0.453,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 61,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.444,
+            "precip_mm": 0.5,
+            "soil_moisture": 0.449,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 49,
-            "precip_mm": 2.7,
-            "soil_moisture": 0.439,
+            "precip_mm": 6.3,
+            "soil_moisture": 0.445,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 43,
-            "precip_mm": 0.3,
-            "soil_moisture": 0.435,
+            "precip_mm": 1.8,
+            "soil_moisture": 0.436,
             "drought_risk": "L"
           },
           {
@@ -1393,42 +1730,42 @@
           {
             "date": "2026-05-22",
             "precip_prob": 31,
-            "precip_mm": 0.1,
+            "precip_mm": 0.3,
             "soil_moisture": 0.315,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 61,
-            "precip_mm": 2.0,
-            "soil_moisture": 0.308,
-            "drought_risk": "L"
+            "precip_mm": 0.4,
+            "soil_moisture": 0.309,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 78,
-            "precip_mm": 2.4,
-            "soil_moisture": 0.303,
+            "precip_mm": 5.0,
+            "soil_moisture": 0.304,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 55,
-            "precip_mm": 1.2,
-            "soil_moisture": 0.298,
+            "precip_mm": 0.8,
+            "soil_moisture": 0.299,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 57,
-            "precip_mm": 0.3,
+            "precip_mm": 0.6,
             "soil_moisture": 0.293,
-            "drought_risk": "L"
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 61,
-            "precip_mm": 0.3,
+            "precip_mm": 0.9,
             "soil_moisture": 0.288,
             "drought_risk": "L"
           },
@@ -1916,42 +2253,42 @@
           {
             "date": "2026-05-22",
             "precip_prob": 100,
-            "precip_mm": 3.2,
-            "soil_moisture": 0.396,
+            "precip_mm": 5.9,
+            "soil_moisture": 0.398,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 99,
-            "precip_mm": 4.0,
-            "soil_moisture": 0.393,
+            "precip_mm": 6.3,
+            "soil_moisture": 0.395,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 98,
-            "precip_mm": 2.7,
-            "soil_moisture": 0.392,
+            "precip_mm": 1.9,
+            "soil_moisture": 0.393,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 96,
-            "precip_mm": 9.5,
-            "soil_moisture": 0.393,
+            "precip_mm": 5.5,
+            "soil_moisture": 0.392,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 71,
-            "precip_mm": 2.4,
-            "soil_moisture": 0.389,
+            "precip_mm": 8.1,
+            "soil_moisture": 0.39,
             "drought_risk": "L"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 71,
-            "precip_mm": 3.6,
+            "precip_mm": 1.8,
             "soil_moisture": 0.388,
             "drought_risk": "L"
           },
@@ -2439,49 +2776,49 @@
           {
             "date": "2026-05-22",
             "precip_prob": 100,
-            "precip_mm": 14.8,
+            "precip_mm": 11.4,
             "soil_moisture": 0.393,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 100,
-            "precip_mm": 9.3,
-            "soil_moisture": 0.397,
+            "precip_mm": 12.3,
+            "soil_moisture": 0.396,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 100,
-            "precip_mm": 15.9,
+            "precip_mm": 9.9,
             "soil_moisture": 0.396,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 100,
-            "precip_mm": 8.1,
+            "precip_mm": 16.6,
             "soil_moisture": 0.395,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 100,
-            "precip_mm": 9.9,
-            "soil_moisture": 0.399,
+            "precip_mm": 6.0,
+            "soil_moisture": 0.403,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 100,
-            "precip_mm": 13.9,
-            "soil_moisture": 0.402,
+            "precip_mm": 8.7,
+            "soil_moisture": 0.403,
             "drought_risk": "-"
           },
           {
             "date": "2026-05-28",
             "precip_prob": 90,
-            "precip_mm": 8.6,
+            "precip_mm": 8.4,
             "soil_moisture": 0.404,
             "drought_risk": "-"
           },
@@ -2962,36 +3299,36 @@
           {
             "date": "2026-05-22",
             "precip_prob": 100,
-            "precip_mm": 5.0,
-            "soil_moisture": 0.191,
+            "precip_mm": 4.6,
+            "soil_moisture": 0.192,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 100,
-            "precip_mm": 2.5,
-            "soil_moisture": 0.188,
+            "precip_mm": 2.7,
+            "soil_moisture": 0.189,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 100,
-            "precip_mm": 1.0,
-            "soil_moisture": 0.186,
+            "precip_mm": 2.6,
+            "soil_moisture": 0.187,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 73,
             "precip_mm": 0.0,
-            "soil_moisture": 0.183,
+            "soil_moisture": 0.184,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 92,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.18,
+            "precip_mm": 0.9,
+            "soil_moisture": 0.181,
             "drought_risk": "H"
           },
           {
@@ -3178,7 +3515,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Indonesia coffee output expected",
-    "last_updated": "2026-05-21"
+    "last_updated": "2026-05-22"
   },
   "production_mix": {
     "robusta_pct": 75,
