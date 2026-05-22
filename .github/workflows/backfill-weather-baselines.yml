@@ -19,6 +19,12 @@ name: "0.2 – One-shot — Build weather baselines (Open-Meteo climatology)"
 # NOT scheduled — workflow_dispatch only. Safe to re-run; it overwrites the seed.
 
 on:
+  # TEMPORARY re-fire trigger (removed in the next commit).
+  push:
+    branches:
+      - claude/review-cot-logic-QmQ2W
+    paths:
+      - .github/workflows/backfill-weather-baselines.yml
   workflow_dispatch:
     inputs:
       regions:
@@ -80,6 +86,9 @@ jobs:
           # Preserve it, then switch to main so the commit lands there regardless
           # of which branch this workflow was dispatched from.
           cp backend/seed/weather_baselines.json "$RUNNER_TEMP/weather_baselines.json"
+          # --write dirtied the tracked seed in the working tree; revert it so the
+          # branch switch is clean (the built copy is safe in RUNNER_TEMP).
+          git checkout -- backend/seed/weather_baselines.json
           git fetch origin main
           git checkout -B main origin/main
           cp "$RUNNER_TEMP/weather_baselines.json" backend/seed/weather_baselines.json
