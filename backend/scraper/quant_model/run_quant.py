@@ -27,15 +27,26 @@ OUT_PATH = ROOT / "frontend" / "public" / "data" / "quant_report.json"
 def main() -> None:
     db = SessionLocal()
     try:
+        # Each sub-model is isolated: a transient failure (Gemini quota, a
+        # network blip, etc.) becomes an {available: False} section instead of
+        # crashing the whole step — so the workflow's Robusta step stops
+        # hard-failing. CCI + fx_history are already committed beforehand, and
+        # the freshness check (1.5) still flags a persistently-stale report.
         print("Running sentiment analysis...")
-        sent = sentiment_mod.run(db)
+        try:
+            sent = sentiment_mod.run(db)
+        except Exception as e:  # noqa: BLE001
+            sent = {"available": False, "reason": f"sentiment crashed: {e}"}
         if sent.get("available"):
             print(f"  Sentiment: {sent['overall_sentiment']} ({sent['overall_confidence']}%) — {sent['total']} headlines")
         else:
             print(f"  Sentiment unavailable: {sent.get('reason')}")
 
         print("Running robusta factor model...")
-        factors = factors_mod.run(db)
+        try:
+            factors = factors_mod.run(db)
+        except Exception as e:  # noqa: BLE001
+            factors = {"available": False, "reason": f"robusta crashed: {e}"}
         if factors.get("available"):
             pred = factors.get("prediction", {})
             model = factors.get("model", {})

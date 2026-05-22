@@ -4,7 +4,7 @@ Multi-factor OLS scoring model for Robusta (RC) futures direction.
 
 Factors (all z-scored vs 52-week rolling window):
   1. Managed Money Net Positioning — ICE Robusta COT (market=ldn)
-  2. USD Index (DXY) — via yfinance, resampled to weekly
+  2. USD Index (DXY) — via Stooq (dx.f), resampled to weekly
   3. RC Price Momentum 4w — 4-week ROC of price_ldn
   4. RC Price Momentum 13w — 13-week ROC of price_ldn
   5. KC-RC Spread — arabica premium over robusta (USD/MT)
@@ -26,7 +26,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -35,6 +35,42 @@ from database import SessionLocal
 from models import CotWeekly
 
 _WINDOW = 52  # rolling z-score window in weeks
+_STOOQ_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; coffee-intel/1.0)"}
+
+
+def _fetch_dxy_weekly(start: str) -> "pd.Series | None":
+    """US Dollar Index weekly closes from Stooq (dx.f) — free CSV, no auth.
+
+    Replaces the old yfinance DXY fetch, which Yahoo rate-limits/blocks on
+    GitHub Actions IPs (the recurring 1.9 Robusta-step failures). Returns a
+    weekly series resampled to COT Tuesdays, or None on failure.
+    """
+    url = "https://stooq.com/q/d/l/?s=dx.f&i=w"
+    try:
+        r = requests.get(url, headers=_STOOQ_HEADERS, timeout=20)
+        r.raise_for_status()
+        text = r.text
+    except Exception:
+        return None
+    lines = text.strip().splitlines()
+    if len(lines) < 2:
+        return None
+    dates, closes = [], []
+    for line in lines[1:]:
+        parts = line.split(",")
+        if len(parts) < 5:
+            continue
+        try:
+            dates.append(pd.Timestamp(parts[0]))
+            closes.append(float(parts[4]))
+        except (ValueError, TypeError):
+            continue
+    if not closes:
+        return None
+    s = pd.Series(closes, index=pd.DatetimeIndex(dates)).sort_index()
+    s = s[s.index >= pd.Timestamp(start)]
+    s.index = s.index.normalize()
+    return s.resample("W-TUE").last().ffill()
 
 
 def _zscore_rolling(series: pd.Series, window: int = _WINDOW) -> pd.Series:
@@ -93,23 +129,12 @@ def run(db) -> dict:
         "kc_price": kc_prices_usd,
     }, index=pd.DatetimeIndex(dates)).sort_index()
 
-    # ── 2. Fetch DXY (weekly, resample to match COT Tuesdays) ─────────────────
+    # ── 2. Fetch DXY (weekly, Stooq → resampled to COT Tuesdays) ──────────────
     start = (df.index[0] - pd.Timedelta(days=14)).strftime("%Y-%m-%d")
-    dxy_ok = False
-    for ticker in ("DX-Y.NYB", "DX=F"):
-        try:
-            raw = yf.download(ticker, start=start, interval="1wk",
-                              auto_adjust=True, progress=False)
-            if not raw.empty:
-                dxy_s = raw["Close"].squeeze()
-                dxy_s.index = pd.to_datetime(dxy_s.index).normalize()
-                dxy_s = dxy_s.resample("W-TUE").last().ffill()
-                df = df.join(dxy_s.rename("dxy"), how="left")
-                dxy_ok = True
-                break
-        except Exception:
-            pass
-    if not dxy_ok:
+    dxy_s = _fetch_dxy_weekly(start)
+    if dxy_s is not None and not dxy_s.empty:
+        df = df.join(dxy_s.rename("dxy"), how="left")
+    else:
         df["dxy"] = np.nan
 
     # ── 3. Compute z-scored factors ───────────────────────────────────────────

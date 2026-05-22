@@ -26,12 +26,12 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        # yfinance pinned to a version known to work with the session= kwarg
-        # override. curl_cffi kept for the Sentiment + Robusta step which
-        # still uses yfinance via robusta_factors.py (fetch_currency_index
-        # was migrated to jsDelivr in PR #54). python-dotenv is needed by
-        # backend/database.py, which run_quant.py imports.
-        run: pip install "yfinance==0.2.50" "curl_cffi>=0.7,<1.0" requests pandas numpy sqlalchemy psycopg2-binary google-generativeai python-dotenv
+        # yfinance/curl_cffi dropped: fetch_currency_index uses jsDelivr and
+        # robusta_factors now pulls DXY from Stooq (dx.f), so nothing in the
+        # quant model talks to Yahoo anymore — which is what kept blocking on
+        # GitHub Actions IPs. python-dotenv is needed by backend/database.py,
+        # which run_quant.py imports.
+        run: pip install requests pandas numpy sqlalchemy psycopg2-binary google-generativeai python-dotenv
 
       - name: Run Currency Index scraper (3 attempts, 15m between)
         id: fetch_cci
