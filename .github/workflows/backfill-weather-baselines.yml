@@ -19,6 +19,11 @@ name: "0.2 – One-shot — Build weather baselines (Open-Meteo climatology)"
 # NOT scheduled — workflow_dispatch only. Safe to re-run; it overwrites the seed.
 
 on:
+  # Tag trigger lets a one-off `git push` of the `weather-baselines-build*` tag
+  # fire this from an environment that can't call the workflow_dispatch API.
+  push:
+    tags:
+      - 'weather-baselines-build*'
   workflow_dispatch:
     inputs:
       regions:
