@@ -8,16 +8,15 @@ _Last updated: 2026-05-20 (post archive-unification + true max-OI rebuild)_
       (2026-03-25) and the live archive's start (~2026-04-06). Those COT-Tuesdays
       keep their pre-rebuild price. _User to supply the gap OI data; load with
       `load_contract_csv.py --kind oi`._
-- [ ] **Origin export data for Colombia / Honduras / Indonesia / Ethiopia**
-      (`exports: null` today). Root cause: the ICO CSV path is dead — `ico.org`
-      now 403s and trade tables are paywalled; and only `sources/indonesia.py`
-      ever called it (CO/HN/ET scrape price only, never exports). **Recommended
-      fix:** extend the already-working USDA PSD parser
-      (`sources/psd_coffee.py`, `apps.fas.usda.gov/psdonline/downloads/psd_coffee_csv.zip`,
-      no auth) to emit each country's `Exports` attribute — covers all four in
-      one source (annual, not monthly; export panels need an annual shape).
-      Monthly alternatives: FNC xlsx (Colombia), BPS table (Indonesia),
-      IHCAFE/INE PDF (Honduras), ECTA/FAS GAIN PDF (Ethiopia).
+- [x] **Origin export data for Colombia / Honduras / Indonesia / Ethiopia**
+      — DONE (annual). The dead ICO path is replaced by a USDA PSD fallback:
+      `psd_coffee` already parses each producer's annual Bean Exports;
+      `psd_country_exports.py` reshapes it and each `export_*.py` uses it when
+      ICO is absent; the Supply tabs render it via `AnnualExportsPanel`.
+      Populates on the next export-and-publish run.
+  - [ ] (follow-up) MONTHLY granularity for these four — needs per-country
+        national scrapers: FNC xlsx (Colombia), BPS table (Indonesia),
+        IHCAFE/INE PDF (Honduras), ECTA/FAS GAIN PDF (Ethiopia).
 - [ ] **Stale `acaphe_live.json`** (snapshot ~27 days old) — `/api/live`
       (Upstash) returns 503 so the ticker, map price labels, origin-price diffs
       and the Telegram brief fall back to a stale snapshot. Needs the acaphe
