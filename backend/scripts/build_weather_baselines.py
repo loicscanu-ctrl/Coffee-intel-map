@@ -89,9 +89,21 @@ def fetch_daily(lat: float, lon: float) -> dict:
         "daily":      "precipitation_sum,temperature_2m_mean",
         "timezone":   "UTC",
     }
-    r = requests.get(ARCHIVE_URL, params=params, timeout=60)
-    r.raise_for_status()
-    return r.json()
+    # Open-Meteo rate-limits bursts (HTTP 429); retry with exponential backoff
+    # so trailing regions don't get dropped from a multi-region run.
+    last_exc: Exception | None = None
+    for attempt in range(4):
+        try:
+            r = requests.get(ARCHIVE_URL, params=params, timeout=60)
+            if r.status_code == 429 or r.status_code >= 500:
+                raise requests.HTTPError(f"{r.status_code} retryable from Open-Meteo")
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:  # noqa: BLE001 — retry any transient fetch error
+            last_exc = e
+            if attempt < 3:
+                time.sleep(2 ** (attempt + 1))  # 2s, 4s, 8s
+    raise last_exc  # type: ignore[misc]
 
 
 def percentile(sorted_vals: list[float], p: float) -> float:
@@ -238,16 +250,20 @@ def main():
             "lng":   cfg["lon"],
             **stats,
         }
-        time.sleep(1)  # gentle rate-limit even though we're well under the cap
+        time.sleep(3)  # spacing to stay clear of Open-Meteo's burst rate-limit
 
-    # Preserve the _schema block from the existing seed file.
+    # Merge into the existing seed: preserve the _schema block AND any regions
+    # built by a previous run, so a partial/subset run can't drop regions that
+    # already succeeded. Newly-built regions overwrite their prior entry.
     existing = json.loads(BASELINE_PATH.read_text(encoding="utf-8")) if BASELINE_PATH.exists() else {}
     schema   = existing.get("_schema", {})
+    merged_regions = {**(existing.get("regions") or {}), **regions_out}
     schema["status"] = (
-        f"populated — built {len(regions_out)} regions from Open-Meteo archive "
-        f"({START_DATE} to {END_DATE})"
+        f"populated — {len(merged_regions)} regions total "
+        f"(this run built {len(regions_out)}: {', '.join(regions_out) or 'none'}) "
+        f"from Open-Meteo archive ({START_DATE} to {END_DATE})"
     )
-    doc = {"_schema": schema, "regions": regions_out}
+    doc = {"_schema": schema, "regions": merged_regions}
 
     payload = json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
     print(f"[build_weather_baselines] aggregated {len(regions_out)} regions")

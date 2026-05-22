@@ -19,6 +19,12 @@ name: "0.2 – One-shot — Build weather baselines (Open-Meteo climatology)"
 # NOT scheduled — workflow_dispatch only. Safe to re-run; it overwrites the seed.
 
 on:
+  # TEMPORARY re-fire trigger (removed in the next commit).
+  push:
+    branches:
+      - claude/review-cot-logic-QmQ2W
+    paths:
+      - .github/workflows/backfill-weather-baselines.yml
   workflow_dispatch:
     inputs:
       regions:
@@ -58,6 +64,14 @@ jobs:
           ARGS=""
           [ -n "$REGIONS" ] && ARGS="--regions $REGIONS"
           python backend/scripts/build_weather_baselines.py $ARGS
+
+      - name: Overlay main's current seed (so merge preserves already-built regions)
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git fetch origin main
+          # If main already has a seed, start the merge from it; the build then
+          # adds/refreshes regions on top instead of replacing the whole file.
+          git show origin/main:backend/seed/weather_baselines.json > backend/seed/weather_baselines.json 2>/dev/null || true
 
       - name: Build baselines — APPLY
         if: ${{ !inputs.dry_run }}
