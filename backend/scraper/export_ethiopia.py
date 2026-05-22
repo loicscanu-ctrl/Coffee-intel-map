@@ -110,6 +110,15 @@ def export_ethiopia(db) -> None:
     except Exception as e:
         print(f"  [ethiopia] exports section error: {e}")
 
+    # Fall back to USDA PSD annual exports when ICO monthly data is absent
+    # (it never lands for this origin — see psd_country_exports).
+    if exports_out is None:
+        try:
+            from scraper.psd_country_exports import psd_country_exports
+            exports_out = psd_country_exports(db, "ethiopia")
+        except Exception as e:
+            print(f"  [ethiopia] PSD exports fallback error: {e}")
+
     # 2. ECX price
     ecx_out = None
     try:

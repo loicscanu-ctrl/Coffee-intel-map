@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import IndonesiaExportPanel from "@/components/supply/indonesia/IndonesiaExportPanel";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
+import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface IndonesiaSupply {
   country: string;
@@ -11,6 +12,7 @@ interface IndonesiaSupply {
     last_updated: string;
     unit: string;
     monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+    annual?: { year: string; total_k_bags: number; yoy_pct: number | null }[];
   } | null;
   weather: {
     scraped_at: string;
@@ -111,11 +113,13 @@ export default function IndonesiaTab() {
       )}
 
       {data && subTab === "exports" && (
-        data.exports ? (
+        data.exports?.annual?.length ? (
+          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Indonesia Green Coffee Exports" />
+        ) : data.exports?.monthly?.length ? (
           <IndonesiaExportPanel exports={data.exports} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — waiting for ICO CSV scrape
+            Export data not yet available — pending the next USDA PSD scrape.
           </div>
         )
       )}

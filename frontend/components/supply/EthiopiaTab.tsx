@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import EthiopiaExportPanel from "@/components/supply/ethiopia/EthiopiaExportPanel";
 import EthiopiaFarmerEconomics from "@/components/supply/ethiopia/EthiopiaFarmerEconomics";
+import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface EthiopiaSupply {
   country: string;
@@ -11,6 +12,7 @@ interface EthiopiaSupply {
     last_updated: string;
     unit: string;
     monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+    annual?: { year: string; total_k_bags: number; yoy_pct: number | null }[];
   } | null;
   ecx_price: {
     etb_per_kg: number;
@@ -110,11 +112,13 @@ export default function EthiopiaTab() {
       )}
 
       {data && subTab === "exports" && (
-        data.exports ? (
+        data.exports?.annual?.length ? (
+          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Ethiopia Green Coffee Exports" />
+        ) : data.exports?.monthly?.length ? (
           <EthiopiaExportPanel exports={data.exports} ecx_price={data.ecx_price ?? null} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — waiting for ICO CSV scrape
+            Export data not yet available — pending the next USDA PSD scrape.
           </div>
         )
       )}

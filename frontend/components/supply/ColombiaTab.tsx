@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import ColombiaExportPanel from "@/components/supply/colombia/ColombiaExportPanel";
 import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
+import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface ColombiaSupply {
   country: string;
@@ -11,6 +12,7 @@ interface ColombiaSupply {
     last_updated: string;
     unit: string;
     monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+    annual?: { year: string; total_k_bags: number; yoy_pct: number | null }[];
   } | null;
   fnc_price: {
     cop_per_carga: number;
@@ -108,11 +110,13 @@ export default function ColombiaTab() {
       )}
 
       {data && subTab === "exports" && (
-        data.exports ? (
+        data.exports?.annual?.length ? (
+          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Colombia Green Coffee Exports" />
+        ) : data.exports?.monthly?.length ? (
           <ColombiaExportPanel exports={data.exports} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — waiting for ICO CSV scrape
+            Export data not yet available — pending the next USDA PSD scrape.
           </div>
         )
       )}

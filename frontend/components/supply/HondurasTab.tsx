@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import HondurasExportPanel from "@/components/supply/honduras/HondurasExportPanel";
 import HondurasFarmerEconomics from "@/components/supply/honduras/HondurasFarmerEconomics";
+import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface HondurasSupply {
   country: string;
@@ -11,6 +12,7 @@ interface HondurasSupply {
     last_updated: string;
     unit: string;
     monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+    annual?: { year: string; total_k_bags: number; yoy_pct: number | null }[];
   } | null;
   ihcafe_price: {
     hnl_per_quintal: number;
@@ -106,11 +108,13 @@ export default function HondurasTab() {
       )}
 
       {data && subTab === "exports" && (
-        data.exports ? (
+        data.exports?.annual?.length ? (
+          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Honduras Green Coffee Exports" />
+        ) : data.exports?.monthly?.length ? (
           <HondurasExportPanel exports={data.exports} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — waiting for ICO CSV scrape
+            Export data not yet available — pending the next USDA PSD scrape.
           </div>
         )
       )}

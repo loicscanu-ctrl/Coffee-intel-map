@@ -138,6 +138,15 @@ def export_colombia(db) -> None:
     except Exception as e:
         print(f"  [colombia] exports section error: {e}")
 
+    # Fall back to USDA PSD annual exports when ICO monthly data is absent
+    # (it never lands for this origin — see psd_country_exports).
+    if exports_out is None:
+        try:
+            from scraper.psd_country_exports import psd_country_exports
+            exports_out = psd_country_exports(db, "colombia")
+        except Exception as e:
+            print(f"  [colombia] PSD exports fallback error: {e}")
+
     # ── 2. FNC precio interno ─────────────────────────────────────────────────
     fnc_out = None
     try:
