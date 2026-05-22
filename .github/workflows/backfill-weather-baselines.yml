@@ -19,12 +19,6 @@ name: "0.2 – One-shot — Build weather baselines (Open-Meteo climatology)"
 # NOT scheduled — workflow_dispatch only. Safe to re-run; it overwrites the seed.
 
 on:
-  # TEMPORARY re-fire trigger (removed in the next commit).
-  push:
-    branches:
-      - claude/review-cot-logic-QmQ2W
-    paths:
-      - .github/workflows/backfill-weather-baselines.yml
   workflow_dispatch:
     inputs:
       regions:
