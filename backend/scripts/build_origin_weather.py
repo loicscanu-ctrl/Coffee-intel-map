@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import socket
 import statistics
 import sys
 import time
@@ -33,6 +34,12 @@ from collections import defaultdict
 from pathlib import Path
 
 import requests
+import urllib3.util.connection as urllib3_conn
+
+# GitHub-hosted runners have no IPv6 route; Open-Meteo's CDN returns AAAA
+# records, so the default getaddrinfo (IPv6-first) fails with
+# "[Errno 101] Network is unreachable". Force IPv4-only resolution.
+urllib3_conn.allowed_gai_family = lambda: socket.AF_INET
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
@@ -135,7 +142,8 @@ def _get(url: str, params: dict) -> dict:
     last_exc: Exception | None = None
     for attempt in range(5):
         try:
-            r = requests.get(url, params=params, timeout=90)
+            # (connect, read): short connect so an unreachable host fails fast.
+            r = requests.get(url, params=params, timeout=(10, 60))
             if r.status_code == 429 or r.status_code >= 500:
                 raise requests.HTTPError(f"{r.status_code} retryable from Open-Meteo")
             r.raise_for_status()
@@ -145,6 +153,22 @@ def _get(url: str, params: dict) -> dict:
             if attempt < 4:
                 time.sleep(2 ** (attempt + 1))  # 2,4,8,16s
     raise last_exc  # type: ignore[misc]
+
+
+def preflight() -> None:
+    """Fail fast (and loud) if Open-Meteo is unreachable, instead of letting
+    every region time out and running the job into its wall-clock limit."""
+    try:
+        _get(ARCHIVE_URL, {
+            "latitude": 0, "longitude": 0,
+            "start_date": "2020-01-01", "end_date": "2020-01-02",
+            "daily": "precipitation_sum", "timezone": "UTC",
+        })
+        print("[preflight] Open-Meteo reachable (IPv4).", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"[preflight] FATAL — Open-Meteo unreachable from this runner: {e}",
+              file=sys.stderr)
+        sys.exit(2)
 
 
 def fetch_archive(lat: float, lon: float) -> dict:
@@ -334,7 +358,7 @@ def build_origin(key: str) -> dict:
         provinces.append(prov)
         if i == 0:
             first_daily, first_fc = daily, fc
-        time.sleep(2)  # spacing under Open-Meteo's burst limit
+        time.sleep(1)  # spacing under Open-Meteo's burst limit
 
     daily_rows, forecast_7d = build_daily_station(first_daily, first_fc)
 
@@ -370,6 +394,9 @@ def main():
     selected = args.origins or list(ORIGINS.keys())
     print(f"[build_origin_weather] {len(selected)} origins · {ARCHIVE_START}→{ARCHIVE_END}")
 
+    preflight()
+
+    ok = 0
     for key in selected:
         if key not in ORIGINS:
             print(f"  [skip] unknown origin: {key}", file=sys.stderr)
@@ -388,6 +415,12 @@ def main():
         else:
             print(f"  [preview] {key}: {len(doc['provinces'])} regions; "
                   f"first 600 chars:\n{payload[:600]}")
+        ok += 1
+
+    if ok == 0:
+        print("[build_origin_weather] FATAL — no origin produced; failing.", file=sys.stderr)
+        sys.exit(1)
+    print(f"[build_origin_weather] done — {ok}/{len(selected)} origins.")
 
 
 if __name__ == "__main__":
