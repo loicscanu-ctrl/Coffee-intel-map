@@ -55,10 +55,10 @@ sys.path.insert(0, str(REPO_ROOT / "backend" / "scripts"))
 # Re-use the calendar helpers from the original backfill — same FND math,
 # same KC/RC contract letter sets.
 from backfill_max_oi_prices import (  # noqa: E402
-    _next_contract_after,
     _contract_symbol,
+    _next_contract_after,
 )
-from sqlalchemy import text  # noqa: E402
+
 from database import SessionLocal  # noqa: E402
 from models import CotWeekly  # noqa: E402
 

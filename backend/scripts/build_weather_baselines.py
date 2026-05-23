@@ -145,7 +145,7 @@ def aggregate(daily: dict) -> dict:
     precip_by_month: dict[int, list[float]] = defaultdict(list)
     temp_by_month:   dict[int, list[float]] = defaultdict(list)
 
-    for (y, m), total in monthly_precip.items():
+    for (_y, m), total in monthly_precip.items():
         precip_by_month[m].append(total)
     for (y, m), s in monthly_temp_sum.items():
         cnt = monthly_temp_cnt[(y, m)]

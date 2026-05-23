@@ -55,21 +55,20 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 sys.path.insert(0, str(REPO_ROOT / "backend" / "scripts"))
 
-from sqlalchemy import text  # noqa: E402
 
 # Re-use the calendar + max-OI heuristic from the existing backfill.
+import yfinance as yf  # noqa: E402
 from backfill_max_oi_prices import (  # noqa: E402
-    _max_oi_by_heuristic,
-    _max_oi_from_history,
-    _load_oi_history,
+    _archive_row,
     _contract_symbol,
     _create_archive,
-    _archive_row,
+    _load_oi_history,
+    _max_oi_by_heuristic,
+    _max_oi_from_history,
 )
+
 from database import SessionLocal  # noqa: E402
 from models import CotWeekly  # noqa: E402
-
-import yfinance as yf  # noqa: E402
 
 # ── Yahoo per-contract ticker suffix lists ───────────────────────────────────
 # NY (NYBOT Arabica): `.NYB` is the verified, single-suffix convention.
