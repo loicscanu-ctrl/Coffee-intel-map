@@ -1,9 +1,14 @@
 # Coffee Intel Map — Data Platform Map
 
-_Last updated: 2026-05-23 (added 1.10 daily weather fetch/accumulate → per-origin Weather charts)_
+_Last updated: 2026-05-23 (1.7 now pings the Vercel deploy hook to publish `[skip ci]` data commits)_
 
 ## TODO / open items
 
+- [ ] **Add `VERCEL_DEPLOY_HOOK` repo secret** — without it the daily redeploy
+      (step in 1.7) no-ops and production stays stale on `[skip ci]` data commits.
+      Vercel → Settings → Git → Deploy Hooks → create one on `main`, copy the URL →
+      GitHub repo Settings → Secrets and variables → Actions → new secret
+      `VERCEL_DEPLOY_HOOK`. _One-time; everything else is already wired._
 - [ ] **8-day OI gap (2026-03-26 → 2026-04-05)** — between the bulk OI CSV's end
       (2026-03-25) and the live archive's start (~2026-04-06). Those COT-Tuesdays
       keep their pre-rebuild price. _User to supply the gap OI data; load with
