@@ -139,6 +139,7 @@ flowchart TD
 | 1.7 | Cecafe Daily | 09:00 daily | BR registrations | `cecafe_daily.json` |
 | 1.9 | Quant CCI | 21:30 Mon-Fri | FX + Robusta factors | `quant_report.json`+`fx_history.json` |
 | **1.10** | **Weather Fetch & Accumulate** | 05:40 daily | per-origin rain+temp, Open-Meteo **forecast** API (`api.open-meteo.com`); **independent of 1.4** | `weather_history/{origin}.json` (accumulator) → rebuilds `{origin}_weather.json` ×6 |
+| **1.11** | **Vercel Redeploy** | 11:00 daily | *(pings Vercel deploy hook)* | publishes the day's committed JSON — data commits are `[skip ci]` so Vercel won't deploy them on its own |
 | Acaphe | Live Quotes Poll | every 15m | live quotes | `acaphe_live.json` |
 | 2.2 | Commodity Prices | Tue 22:55 | all-commodity prices | DB `commodity_prices` |
 | **2.3** | COT Scraper **+ archive price rebuild** | Fri 20:00 | CFTC COT (all commodities + coffee) → DB; **then rebuild cot_weekly prices from archive (max-OI)** | DB |
