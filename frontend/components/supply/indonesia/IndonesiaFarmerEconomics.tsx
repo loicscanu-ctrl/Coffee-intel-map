@@ -3,6 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine,
   Tooltip, Cell, ResponsiveContainer,
 } from "recharts";
+import WeatherCharts from "../WeatherCharts";
 
 type RiskLevel = "HIGH" | "MED" | "LOW" | "NONE";
 type DayRisk   = "H" | "M" | "L" | "-";
@@ -217,6 +218,9 @@ export default function IndonesiaFarmerEconomics({ weather, enso, harvest_window
           ))}
         </div>
       </div>
+
+      {/* ── Weather — climatology charts (Vietnam format) ────────────── */}
+      <WeatherCharts dataUrl="/data/indonesia_weather.json" title="Weather · Indonesia" />
 
       {/* ── Weather ──────────────────────────────────────────────────── */}
       {weather ? (
