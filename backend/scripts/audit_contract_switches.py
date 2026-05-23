@@ -49,10 +49,12 @@ sys.path.insert(0, str(ROOT / "backend" / "scripts"))
 
 # Re-use the exact same calendar + roll-window logic the backfill applies.
 from backfill_max_oi_prices import (  # noqa: E402
-    KC_CONTRACTS, RC_CONTRACTS, LETTER_TO_MONTH,
     ROLL_WINDOW_DAYS_BY_MARKET,
-    _first_notice_day, _front_and_second, _contract_symbol,
-    _max_oi_from_history, _load_oi_history,
+    _contract_symbol,
+    _first_notice_day,
+    _front_and_second,
+    _load_oi_history,
+    _max_oi_from_history,
 )
 
 COT_JSON = ROOT / "frontend" / "public" / "data" / "cot.json"

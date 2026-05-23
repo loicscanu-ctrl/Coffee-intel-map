@@ -74,7 +74,7 @@ def _drought_score(precip_mm: float, et0_mm: float, root_zone_sm: float) -> floa
 
 def _apply_drought_modifiers(days: list[dict]) -> list[dict]:
     """Colombia phenology: Aug–Oct (Mitaca flowering + main crop dev) ×1.2; Mar–May (main flowering) ×1.15."""
-    from ._weather_baseline import seasonal_z_score, has_baseline
+    from ._weather_baseline import has_baseline, seasonal_z_score
 
     PHENO = {8: 1.2, 9: 1.2, 10: 1.2, 3: 1.15, 4: 1.15, 5: 1.15}
 

@@ -89,9 +89,21 @@ def fetch_daily(lat: float, lon: float) -> dict:
         "daily":      "precipitation_sum,temperature_2m_mean",
         "timezone":   "UTC",
     }
-    r = requests.get(ARCHIVE_URL, params=params, timeout=60)
-    r.raise_for_status()
-    return r.json()
+    # Open-Meteo rate-limits bursts (HTTP 429); retry with exponential backoff
+    # so trailing regions don't get dropped from a multi-region run.
+    last_exc: Exception | None = None
+    for attempt in range(4):
+        try:
+            r = requests.get(ARCHIVE_URL, params=params, timeout=60)
+            if r.status_code == 429 or r.status_code >= 500:
+                raise requests.HTTPError(f"{r.status_code} retryable from Open-Meteo")
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:  # noqa: BLE001 — retry any transient fetch error
+            last_exc = e
+            if attempt < 3:
+                time.sleep(2 ** (attempt + 1))  # 2s, 4s, 8s
+    raise last_exc  # type: ignore[misc]
 
 
 def percentile(sorted_vals: list[float], p: float) -> float:
@@ -133,7 +145,7 @@ def aggregate(daily: dict) -> dict:
     precip_by_month: dict[int, list[float]] = defaultdict(list)
     temp_by_month:   dict[int, list[float]] = defaultdict(list)
 
-    for (y, m), total in monthly_precip.items():
+    for (_y, m), total in monthly_precip.items():
         precip_by_month[m].append(total)
     for (y, m), s in monthly_temp_sum.items():
         cnt = monthly_temp_cnt[(y, m)]
@@ -159,7 +171,56 @@ def aggregate(daily: dict) -> dict:
                 "std":  round(statistics.pstdev(ts) if len(ts) > 1 else 0.0, 2),
                 "n":    len(ts),
             }
-    return {"precip_mm_monthly": precip_stats, "temp_c_monthly": temp_stats}
+
+    return {
+        "precip_mm_monthly":   precip_stats,
+        "temp_c_monthly":      temp_stats,
+        "precip_mm_mtd_daily": _mtd_daily_envelope(times, precips),
+    }
+
+
+def _mtd_daily_envelope(times: list[str], precips: list[float | None]) -> dict:
+    """Per (calendar month, day-of-month) low/high/mean of month-to-date
+    accumulated rainfall across all baseline years.
+
+    For each year×month we walk days in order accumulating precip, recording the
+    running total at each day; then across years we reduce to a band. Lets the
+    brief say "MTD 42mm vs historical 18–96mm for this date". `times` is the
+    ascending daily date list from Open-Meteo; Feb-29 is contributed only by
+    leap years and reduces naturally.
+
+    The `min`/`max` band is the 10th/90th percentile across years, NOT the
+    absolute extremes — a single freak drought or flood year shouldn't define
+    the "normal" range, so the tails are trimmed for a realistic envelope.
+    """
+    # month → day → [mtd_total per year]
+    by_md: dict[int, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+    cur_key: tuple[int, int] | None = None
+    acc = 0.0
+    for t, p in zip(times, precips):
+        y, mo, d = int(t[:4]), int(t[5:7]), int(t[8:10])
+        if (y, mo) != cur_key:
+            cur_key = (y, mo)
+            acc = 0.0
+        acc += p or 0.0
+        by_md[mo][d].append(acc)
+
+    out: dict[str, dict] = {}
+    for mo in range(1, 13):
+        day_stats: dict[str, dict] = {}
+        for d, vals in sorted(by_md.get(mo, {}).items()):
+            if not vals:
+                continue
+            sv = sorted(vals)
+            day_stats[str(d)] = {
+                "min":  round(percentile(sv, 0.10), 1),
+                "max":  round(percentile(sv, 0.90), 1),
+                "mean": round(statistics.fmean(sv), 1),
+                "n":    len(sv),
+            }
+        if day_stats:
+            out[str(mo)] = day_stats
+    return out
 
 
 def main():
@@ -193,16 +254,20 @@ def main():
             "lng":   cfg["lon"],
             **stats,
         }
-        time.sleep(1)  # gentle rate-limit even though we're well under the cap
+        time.sleep(3)  # spacing to stay clear of Open-Meteo's burst rate-limit
 
-    # Preserve the _schema block from the existing seed file.
+    # Merge into the existing seed: preserve the _schema block AND any regions
+    # built by a previous run, so a partial/subset run can't drop regions that
+    # already succeeded. Newly-built regions overwrite their prior entry.
     existing = json.loads(BASELINE_PATH.read_text(encoding="utf-8")) if BASELINE_PATH.exists() else {}
     schema   = existing.get("_schema", {})
+    merged_regions = {**(existing.get("regions") or {}), **regions_out}
     schema["status"] = (
-        f"populated — built {len(regions_out)} regions from Open-Meteo archive "
-        f"({START_DATE} to {END_DATE})"
+        f"populated — {len(merged_regions)} regions total "
+        f"(this run built {len(regions_out)}: {', '.join(regions_out) or 'none'}) "
+        f"from Open-Meteo archive ({START_DATE} to {END_DATE})"
     )
-    doc = {"_schema": schema, "regions": regions_out}
+    doc = {"_schema": schema, "regions": merged_regions}
 
     payload = json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
     print(f"[build_weather_baselines] aggregated {len(regions_out)} regions")

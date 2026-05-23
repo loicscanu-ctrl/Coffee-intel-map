@@ -164,6 +164,7 @@ def export_colombia(db) -> None:
     # ── 3. Weather (Colombia regions) ─────────────────────────────────────────
     weather_out = None
     try:
+        from scraper.sources._weather_baseline import mtd_rain_fields
         from scraper.sources.colombia_weather import _calc_csi
 
         snapshots = (
@@ -203,6 +204,10 @@ def export_colombia(db) -> None:
                     "csi_30d_level": csi["csi_30d_level"],
                     "csi_60d_level": csi["csi_60d_level"],
                 })
+                # Month-to-date rain vs historical envelope, on the country's
+                # baseline representative region only (one rain row per country).
+                if region_name == "Huila":
+                    regions_out[-1].update(mtd_rain_fields(daily, "colombia"))
 
                 drought_days = [d.get("drought_risk", "-") for d in daily]
                 if any(c != "-" for c in drought_days):

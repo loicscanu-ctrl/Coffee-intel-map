@@ -31,7 +31,6 @@ import sys
 import time
 import urllib.parse
 import urllib.request
-from datetime import date
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -123,7 +122,7 @@ def verify_one(market: str, switch: dict, by_date: dict, ordered: list[str]) -> 
 
     print(f"\n  Switch {switch['from']} → {switch['to']} on {switch['date']}")
     ok_all = True
-    for role, d, contract, sym, closes in rows:
+    for role, d, contract, _sym, closes in rows:
         stored_side = by_date[d].get(market) or {}
         stored = stored_side.get(f"price_{market}")
         stooq  = closes.get(d)
