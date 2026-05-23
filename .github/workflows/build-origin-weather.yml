@@ -9,12 +9,6 @@ name: "0.3 – Build per-origin weather data (Open-Meteo)"
 # workflow_dispatch (manual) + a monthly schedule to refresh actuals/forecast.
 
 on:
-  # TEMPORARY re-fire trigger (removed in the next commit).
-  push:
-    branches:
-      - claude/supply-weather-charts
-    paths:
-      - .github/workflows/build-origin-weather.yml
   schedule:
     - cron: "17 4 1 * *"   # 04:17 UTC on the 1st of each month
   workflow_dispatch:
