@@ -333,7 +333,7 @@ def _forecast_list(fc: dict) -> list[dict]:
     d = fc["daily"]
     out = []
     for i, date in enumerate(d["time"]):
-        y, m, day = int(date[:4]), int(date[5:7]), int(date[8:10])
+        m, day = int(date[5:7]), int(date[8:10])
         out.append({
             "date": date,
             "label": f"{MONTHS[m - 1]} {day}",
