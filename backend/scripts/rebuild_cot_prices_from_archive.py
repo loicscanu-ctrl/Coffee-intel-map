@@ -40,10 +40,10 @@ sys.path.insert(0, str(REPO_ROOT / "backend" / "scraper"))
 sys.path.insert(0, str(REPO_ROOT / "backend" / "scripts"))
 
 import symbols as sym  # noqa: E402
-from sqlalchemy import text  # noqa: E402
+from backfill_max_oi_prices import _archive_row, _create_archive, _first_notice_day  # noqa: E402
+
 from database import SessionLocal  # noqa: E402
 from models import CotWeekly  # noqa: E402
-from backfill_max_oi_prices import _create_archive, _archive_row, _first_notice_day  # noqa: E402
 
 ARCHIVE = REPO_ROOT / "data" / "contract_prices_archive.json"
 

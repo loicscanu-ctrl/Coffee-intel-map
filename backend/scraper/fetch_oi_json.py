@@ -21,8 +21,9 @@ import sys
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import symbols  # noqa: E402  (sibling module: KC/RM/RC conventions)
 from pathlib import Path
+
+import symbols  # noqa: E402  (sibling module: KC/RM/RC conventions)
 
 # Resolve project root (works both from repo root and from backend/)
 ROOT = Path(__file__).resolve().parents[2]   # …/Coffee-intel-map

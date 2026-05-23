@@ -3,6 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine,
   Tooltip, Cell, ResponsiveContainer,
 } from "recharts";
+import WeatherCharts from "../WeatherCharts";
 
 type RiskLevel = "HIGH" | "MED" | "LOW" | "NONE";
 type DayRisk   = "H" | "M" | "L" | "-";
@@ -57,16 +58,6 @@ interface Props {
   harvest_cal: HarvestCal;
 }
 
-const RISK_COLOR: Record<RiskLevel, string> = {
-  HIGH: "text-red-400 bg-red-950/60 border-red-700",
-  MED:  "text-amber-400 bg-amber-950/60 border-amber-700",
-  LOW:  "text-yellow-400 bg-yellow-950/60 border-yellow-800",
-  NONE: "text-slate-400 bg-slate-800/60 border-slate-600",
-};
-
-const DAY_DROUGHT: Record<DayRisk, string> = { H: "bg-red-600",    M: "bg-amber-500", L: "bg-yellow-600", "-": "bg-slate-700" };
-const DAY_FROST:   Record<DayRisk, string> = { H: "bg-blue-500",   M: "bg-cyan-600",  L: "bg-sky-700",    "-": "bg-slate-700" };
-
 const PHASE_STYLE = {
   "el-nino": { label: "El Niño",  border: "border-purple-500", text: "text-purple-300", bg: "bg-purple-950" },
   "la-nina": { label: "La Niña",  border: "border-blue-400",   text: "text-blue-300",   bg: "bg-blue-950"   },
@@ -110,7 +101,7 @@ const PHASE_LABEL: Record<string, string> = {
   off:         "Off-season",
 };
 
-export default function HondurasFarmerEconomics({ ihcafe_price, weather, enso, harvest_cal }: Props) {
+export default function HondurasFarmerEconomics({ ihcafe_price, enso, harvest_cal }: Props) {
   const currentMonth = new Date().getMonth();
 
   return (
@@ -188,69 +179,8 @@ export default function HondurasFarmerEconomics({ ihcafe_price, weather, enso, h
         <p className="text-[9px] text-slate-500 mt-2 leading-relaxed">{harvest_cal.description}</p>
       </div>
 
-      {/* ── Weather ──────────────────────────────────────────────────────── */}
-      {weather ? (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wide">Weather Risk by Region (14-day)</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-            {weather.regions.map(r => {
-              const droughtRow = weather.daily_drought.find(d => d.region === r.name);
-              const frostRow   = weather.daily_frost?.find(d => d.region === r.name);
-              return (
-                <div key={r.name} className="bg-slate-900/60 rounded p-2 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-200">{r.name}</span>
-                    <div className="flex gap-1">
-                      <span className={`text-[9px] px-1 py-0.5 rounded border font-bold ${RISK_COLOR[r.drought]}`}>
-                        D:{r.drought}
-                      </span>
-                      {r.frost !== "NONE" && (
-                        <span className="text-[9px] px-1 py-0.5 rounded border font-bold text-blue-400 bg-blue-950/60 border-blue-700">
-                          F:{r.frost}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {droughtRow && (
-                    <div>
-                      <div className="text-[8px] text-slate-600 mb-0.5">Drought</div>
-                      <div className="flex gap-px">
-                        {droughtRow.days.slice(0, 14).map((d, i) => (
-                          <div key={i} className={`flex-1 h-1.5 rounded-sm ${DAY_DROUGHT[d as DayRisk]}`} title={`Day ${i+1}: ${d}`} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {frostRow && frostRow.days.some(d => d !== "-") && (
-                    <div>
-                      <div className="text-[8px] text-slate-600 mb-0.5">Frost</div>
-                      <div className="flex gap-px">
-                        {frostRow.days.slice(0, 14).map((d, i) => (
-                          <div key={i} className={`flex-1 h-1.5 rounded-sm ${DAY_FROST[d as DayRisk]}`} title={`Day ${i+1}: ${d}`} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {r.csi_30d !== undefined && (
-                    <div className="text-[9px] text-slate-500">
-                      CSI 30d: <span className={`font-mono ${r.csi_30d_level === "H" ? "text-red-400" : r.csi_30d_level === "M" ? "text-amber-400" : "text-slate-400"}`}>{r.csi_30d}</span>
-                      {" "}· 60d: <span className={`font-mono ${r.csi_60d_level === "H" ? "text-red-400" : r.csi_60d_level === "M" ? "text-amber-400" : "text-slate-400"}`}>{r.csi_60d}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <div className="text-[9px] text-slate-600">
-            D = Drought risk · F = Frost risk (high-altitude plots only: Copán, Montecillos).
-            CSI = Cumulative Stress Index (mm ET₀ deficit). Source: Open-Meteo.
-          </div>
-        </div>
-      ) : (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-xs text-slate-500">
-          Weather data not yet available
-        </div>
-      )}
+      {/* ── Weather — climatology charts (Vietnam format) ────────────────── */}
+      <WeatherCharts dataUrl="/data/honduras_weather.json" title="Weather · Honduras" />
 
       {/* ── ENSO ─────────────────────────────────────────────────────────── */}
       {enso ? (() => {

@@ -124,7 +124,7 @@ def build_events(year: int = 2026) -> list[dict]:
     out: list[dict] = []
 
     # WASDE
-    for date_str, time_et in WASDE_2026_DATES:
+    for date_str, _time_et in WASDE_2026_DATES:
         out.append({
             "date":     date_str,
             "time":     "17:00",  # 12:00 ET → 17:00 UTC (winter; close enough for watchlist)

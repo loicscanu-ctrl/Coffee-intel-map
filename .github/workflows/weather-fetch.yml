@@ -1,0 +1,74 @@
+name: "1.10 – Daily Weather Fetch & Accumulate"
+
+# Dedicated, independent weather pipeline — decoupled from "1.4 Export and
+# Publish". Each day it fetches daily rain + temperature for every origin's
+# producing regions from Open-Meteo's forecast API (api.open-meteo.com — the
+# reachable host; the archive host is blocked), appends the actuals into the
+# per-origin accumulator backend/seed/weather_history/{origin}.json, and
+# rebuilds frontend/public/data/{origin}_weather.json (the file the charts
+# read). The history grows daily; the charts' actual/daily/forecast series are
+# live, while the climatology bands stay seeded until real history fills a year.
+
+on:
+  schedule:
+    - cron: "40 5 * * *"   # 05:40 UTC daily — independent of 1.4 (02:30) and scrapers
+  workflow_dispatch:
+    inputs:
+      origins:
+        description: "Space-separated origin keys, or blank for all"
+        required: false
+        default: ""
+        type: string
+
+concurrency:
+  group: weather-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch + accumulate + rebuild
+        env:
+          ORIGINS: ${{ inputs.origins }}
+        run: |
+          ARGS="--write"
+          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
+          python backend/scripts/fetch_origin_weather.py $ARGS
+
+      - name: Commit updated weather data
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/seed/weather_history/*.json frontend/public/data/*_weather.json
+          if git diff --cached --quiet; then
+            echo "No weather change."
+            exit 0
+          fi
+          git commit -m "data: daily weather fetch + accumulate [skip ci]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
