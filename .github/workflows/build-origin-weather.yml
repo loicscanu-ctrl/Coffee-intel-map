@@ -9,8 +9,11 @@ name: "0.3 – Build per-origin weather data (Open-Meteo)"
 # workflow_dispatch (manual) + a monthly schedule to refresh actuals/forecast.
 
 on:
-  schedule:
-    - cron: "17 4 1 * *"   # 04:17 UTC on the 1st of each month
+  # NOTE: Open-Meteo is NOT on this environment's egress allowlist (sandbox
+  # returns 403; runner connect-times-out), so this live build cannot run today.
+  # workflow_dispatch-only — trigger manually if/when Open-Meteo is allowlisted.
+  # Until then, frontend/public/data/{origin}_weather.json is produced by the
+  # no-network static seed: backend/scripts/seed_origin_weather.py.
   workflow_dispatch:
     inputs:
       origins:
