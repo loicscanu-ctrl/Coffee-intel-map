@@ -1,6 +1,6 @@
 # Coffee Intel Map — Data Platform Map
 
-_Last updated: 2026-05-20 (post archive-unification + true max-OI rebuild)_
+_Last updated: 2026-05-23 (added 1.10 daily weather fetch/accumulate → per-origin Weather charts)_
 
 ## TODO / open items
 
@@ -42,6 +42,7 @@ flowchart TD
         CFTC[CFTC COT report]
         JSD[jsDelivr FX]
         ACA[acaphe / giacaphe / Cecafe / ICO ...]
+        OM[Open-Meteo forecast API]
     end
 
     %% ---------- FETCHERS ----------
@@ -50,6 +51,7 @@ flowchart TD
     F19[["1.9 Quant CCI<br/>21:30 Mon-Fri"]]
     FPOLL[["Acaphe poll<br/>every 15m"]]
     FNEWS[["1.1/1.2/1.7/3.x<br/>news·freight·origin"]]
+    F110[["1.10 Weather Fetch<br/>05:40 daily · independent"]]
 
     %% ---------- CANONICAL STORE ----------
     ARC[("contract_prices_archive.json<br/>★ SINGLE coffee OI+price source<br/>date-keyed · RC canonical · 5y")]
@@ -68,6 +70,7 @@ flowchart TD
     QJ[/quant_report.json · fx_history.json/]
     ACJ[/acaphe_live.json/]
     ORIG[/origin · supply · freight JSON/]
+    WX[/"{origin}_weather.json ×6<br/>+ weather_history accumulator"/]
 
     %% ---------- VISUALS ----------
     V_IP{{COT · Industry Pulse<br/>price + PMPU + switch dots}}
@@ -80,6 +83,7 @@ flowchart TD
     V_QUOTE{{Futures · daily quotes}}
     V_MAP{{Map · origin/supply}}
     V_TG{{Telegram morning brief}}
+    V_WX{{Supply · per-origin Weather charts}}
 
     %% ---------- EDGES: fetch ----------
     BC --> F13 --> ARC
@@ -115,6 +119,9 @@ flowchart TD
     QJ --> V_CCI
     ACJ --> V_QUOTE
     ORIG --> V_MAP
+
+    %% weather (independent of 1.4 export)
+    OM --> F110 --> WX --> V_WX
 ```
 
 ---
@@ -131,6 +138,7 @@ flowchart TD
 | 1.6 | Morning Brief | 03:00 daily | *(reads JSON)* | Telegram |
 | 1.7 | Cecafe Daily | 09:00 daily | BR registrations | `cecafe_daily.json` |
 | 1.9 | Quant CCI | 21:30 Mon-Fri | FX + Robusta factors | `quant_report.json`+`fx_history.json` |
+| **1.10** | **Weather Fetch & Accumulate** | 05:40 daily | per-origin rain+temp, Open-Meteo **forecast** API (`api.open-meteo.com`); **independent of 1.4** | `weather_history/{origin}.json` (accumulator) → rebuilds `{origin}_weather.json` ×6 |
 | Acaphe | Live Quotes Poll | every 15m | live quotes | `acaphe_live.json` |
 | 2.2 | Commodity Prices | Tue 22:55 | all-commodity prices | DB `commodity_prices` |
 | **2.3** | COT Scraper **+ archive price rebuild** | Fri 20:00 | CFTC COT (all commodities + coffee) → DB; **then rebuild cot_weekly prices from archive (max-OI)** | DB |
@@ -153,6 +161,9 @@ flowchart TD
 | `cot_recent.json` | 1.4 | last 12 weeks |
 | `signals.json` | export-signals.mjs | current + 8wk |
 | `oi_fnd_chart.json` | 1.4 ← archive | cur+prev yr contracts, −45..0d |
+| `backend/seed/weather_history/{origin}.json` ×6 | **1.10** daily append (idempotent) | grows indefinitely — the accumulated daily-actuals record |
+| `frontend/public/data/{origin}_weather.json` ×6 | **1.10** (seed climatology + live actuals/forecast) | rebuilt daily |
+| `vn_weather.json` | static seed (not fetched) | manual |
 | 11 other DB tables / ~30 JSON | various | permanent |
 
 ---
@@ -175,6 +186,7 @@ flowchart TD
 | **1.7 Cecafe Daily** | `cecafe_daily.json` | `DailyRegistration` | **Supply · Brazil · Daily Registration**; Telegram |
 | **1.9 Quant CCI** | `quant_report.json` | `CurrencyIndexSection` | **Macro · Coffee Currency Index** |
 | | `fx_history.json` | `FxTimeSeriesPanel` | **Macro · FX Pair Time-Series** |
+| **1.10 Weather Fetch** | `{origin}_weather.json` ×6 | `WeatherCharts` | **Supply · each origin · Weather charts** — monthly rain, cumulative YTD, mean temp, daily MTD accumulation, 7-day forecast (replaced the legacy drought/frost strip panels) |
 | **Acaphe poll** | `acaphe_live.json` | `AcapheLiveQuotes` | **Futures · Daily Live Quotes** |
 | **1.3b Slow-Data** (ECF·PSD·AJCA·UCDA) | `demand_stocks.json` | `StocksPanel` | **Demand · Stocks (ICE certified + PSD)** |
 | **2.2 Commodity Prices** | DB `commodity_prices` → `latest_prices.json` | `CoffeeMap` | **Map · price labels + header ticker** |
@@ -336,6 +348,9 @@ flowchart LR
   J_ug[/uganda_supply.json/]
   J_ferts[/global_fertilizers.json/]
   J_intel[/manual_intel.json/]
+  W110["1.10 Weather Fetch · 05:40 daily<br/>api.open-meteo.com forecast · independent of 1.4"]
+  J_whist[/"weather_history/{origin}.json<br/>(daily accumulator ×6)"/]
+  J_owx[/"{brazil·colombia·honduras·<br/>indonesia·uganda·ethiopia}_weather.json"/]
   br{{BR Daily Registration}}
   mv{{BR Monthly Volume}}
   brexp{{BR Export Charts}}
@@ -355,6 +370,7 @@ flowchart LR
   ug{{Uganda}}
   fert{{Fertilizers}}
   intel{{Manual Intel}}
+  owx{{Per-origin Weather charts<br/>BR·CO·HN·ID·UG·ET}}
   W17 --> J_cecd
   J_cecd --> br
   J_cecd --> mv
@@ -394,15 +410,18 @@ flowchart LR
   J_vn --> fert
   J_intel --> intel
 
+  %% 1.10 weather — independent daily fetch → accumulate → per-origin charts
+  W110 --> J_whist --> J_owx --> owx
+
   classDef scr fill:#0f172a,stroke:#334155,color:#94a3b8;
   classDef store fill:#450a0a,stroke:#ef4444,color:#fecaca;
   classDef proc fill:#1f2937,stroke:#64748b,color:#cbd5e1;
   classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W33,WCNTRY,WFERT,WINTEL scr;
+  class W17,W32,W33,WCNTRY,WFERT,WINTEL,W110 scr;
   class EXP proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel vis;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_whist,J_owx json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel,owx vis;
 ```
 
 #### Demand
