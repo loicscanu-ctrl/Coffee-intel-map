@@ -50,7 +50,7 @@ HISTORY_DIR = REPO_ROOT / "backend" / "seed" / "weather_history"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelWeather/1.0)"}
 PAST_DAYS = 92
-FORECAST_DAYS = 7
+FORECAST_DAYS = 8  # today + 7 future days (the 7 future days populate the chart)
 
 TODAY = dt.date.today()
 CUR_YEAR = TODAY.year
