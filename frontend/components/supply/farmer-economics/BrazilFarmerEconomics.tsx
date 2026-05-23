@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import type { FarmerEconomicsData } from "./farmerEconomicsData";
 import ProductionCostPanel from "./ProductionCostPanel";
 import AcreageYieldPanel   from "./AcreageYieldPanel";
-import WeatherRiskPanel    from "./WeatherRiskPanel";
 import EnsoPanel           from "./EnsoPanel";
 import FertilizerPanel     from "./FertilizerPanel";
 import ManualIntelPanel    from "../ManualIntelPanel";
@@ -71,7 +70,6 @@ export default function BrazilFarmerEconomics() {
 
         {/* Right */}
         <div className="space-y-4">
-          {data.weather    && <WeatherRiskPanel weather={data.weather} />}
           {data.enso       && <EnsoPanel enso={data.enso} />}
           <ManualIntelPanel />
         </div>

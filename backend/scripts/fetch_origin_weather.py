@@ -326,11 +326,19 @@ def build_origin(origin: str, write: bool) -> None:
     regions = ORIGINS[origin]
     hist = load_history(origin)
     forecasts: dict[str, list[dict]] = {}
+    fetched = 0
     for rc in regions:
         print(f"  [{origin}] fetch {rc['name']} ({rc['lat']:.2f},{rc['lon']:.2f}) …", flush=True)
-        daily = fetch_region(rc["lat"], rc["lon"])
-        forecasts[rc["name"]] = upsert(hist, rc["name"], daily)
+        try:
+            daily = fetch_region(rc["lat"], rc["lon"])
+            forecasts[rc["name"]] = upsert(hist, rc["name"], daily)
+            fetched += 1
+        except Exception as e:  # noqa: BLE001 — a flaky region must not abort the origin
+            print(f"  [warn] {origin}/{rc['name']} fetch failed, keeping prior data: {e}",
+                  file=sys.stderr)
         time.sleep(1)
+    if fetched == 0:
+        raise RuntimeError("all regions failed to fetch")
 
     doc = rebuild_chart(origin, hist, forecasts)
     if doc is None:

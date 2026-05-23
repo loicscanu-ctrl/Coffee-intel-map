@@ -58,20 +58,6 @@ interface Props {
   mitaca: MitacaData;
 }
 
-const RISK_COLOR: Record<RiskLevel, string> = {
-  HIGH: "text-red-400 bg-red-950/60 border-red-700",
-  MED:  "text-amber-400 bg-amber-950/60 border-amber-700",
-  LOW:  "text-yellow-400 bg-yellow-950/60 border-yellow-800",
-  NONE: "text-slate-400 bg-slate-800/60 border-slate-600",
-};
-
-const DAY_COLOR: Record<DayRisk, string> = {
-  H: "bg-red-600",
-  M: "bg-amber-500",
-  L: "bg-yellow-600",
-  "-": "bg-slate-700",
-};
-
 const PHASE_STYLE = {
   "el-nino": { label: "El Niño",  border: "border-purple-500", text: "text-purple-300", bg: "bg-purple-950" },
   "la-nina": { label: "La Niña",  border: "border-blue-400",   text: "text-blue-300",   bg: "bg-blue-950"   },
@@ -117,7 +103,7 @@ const CROP_LABEL: Record<string, string> = {
   "off":            "Off-season",
 };
 
-export default function ColombiaFarmerEconomics({ fnc_price, weather, enso, mitaca }: Props) {
+export default function ColombiaFarmerEconomics({ fnc_price, enso, mitaca }: Props) {
   const currentMonth = new Date().getMonth(); // 0-indexed
 
   return (
@@ -191,54 +177,6 @@ export default function ColombiaFarmerEconomics({ fnc_price, weather, enso, mita
 
       {/* ── Weather — climatology charts (Vietnam format) ────────────────── */}
       <WeatherCharts dataUrl="/data/colombia_weather.json" title="Weather · Colombia" />
-
-      {/* ── Weather — Drought Risk ───────────────────────────────────────── */}
-      {weather ? (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wide">Drought Risk by Region (14-day)</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-            {weather.regions.map(r => (
-              <div key={r.name} className="bg-slate-900/60 rounded p-2 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-200">{r.name}</span>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded border font-bold ${RISK_COLOR[r.drought]}`}>
-                    {r.drought}
-                  </span>
-                </div>
-                {/* 14-day strip */}
-                {(() => {
-                  const row = weather.daily_drought.find(d => d.region === r.name);
-                  return row ? (
-                    <div className="flex gap-px">
-                      {row.days.slice(0, 14).map((d, i) => (
-                        <div
-                          key={i}
-                          className={`flex-1 h-2 rounded-sm ${DAY_COLOR[d as DayRisk]}`}
-                          title={`Day ${i + 1}: ${d}`}
-                        />
-                      ))}
-                    </div>
-                  ) : null;
-                })()}
-                {r.csi_30d !== undefined && (
-                  <div className="text-[9px] text-slate-500">
-                    CSI 30d: <span className={`font-mono ${r.csi_30d_level === "H" ? "text-red-400" : r.csi_30d_level === "M" ? "text-amber-400" : "text-slate-400"}`}>{r.csi_30d}</span>
-                    {" "}· CSI 60d: <span className={`font-mono ${r.csi_60d_level === "H" ? "text-red-400" : r.csi_60d_level === "M" ? "text-amber-400" : "text-slate-400"}`}>{r.csi_60d}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="text-[9px] text-slate-600">
-            No frost risk in Colombian coffee belt (1200–2200 m) · Drought from El Niño is the primary weather risk.
-            CSI = Cumulative Stress Index (mm ET₀ deficit, normalized per 30 days). Source: Open-Meteo.
-          </div>
-        </div>
-      ) : (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-xs text-slate-500">
-          Weather data not yet available
-        </div>
-      )}
 
       {/* ── ENSO Impact (Colombia) ───────────────────────────────────────── */}
       {enso ? (() => {
