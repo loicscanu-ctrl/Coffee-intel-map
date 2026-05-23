@@ -136,10 +136,9 @@ flowchart TD
 | 1.4 | **Export & Publish** | 01:30 daily + on-2.3 | *(reads DB + archive)* | ~17 static JSON + signals |
 | 1.5 | Check Scrapers Fresh | 07:00 daily | *(reads health.json)* | Telegram |
 | 1.6 | Morning Brief | 03:00 daily | *(reads JSON)* | Telegram |
-| 1.7 | Cecafe Daily | 09:00 daily | BR registrations | `cecafe_daily.json` |
+| 1.7 | Cecafe Daily | 09:00 daily | BR registrations | `cecafe_daily.json` (also pings Vercel deploy hook¹ to publish the day's `[skip ci]` data commits) |
 | 1.9 | Quant CCI | 21:30 Mon-Fri | FX + Robusta factors | `quant_report.json`+`fx_history.json` |
 | **1.10** | **Weather Fetch & Accumulate** | 05:40 daily | per-origin rain+temp, Open-Meteo **forecast** API (`api.open-meteo.com`); **independent of 1.4** | `weather_history/{origin}.json` (accumulator) → rebuilds `{origin}_weather.json` ×6 |
-| **1.11** | **Vercel Redeploy** | 11:00 daily | *(pings Vercel deploy hook)* | publishes the day's committed JSON — data commits are `[skip ci]` so Vercel won't deploy them on its own |
 | Acaphe | Live Quotes Poll | every 15m | live quotes | `acaphe_live.json` |
 | 2.2 | Commodity Prices | Tue 22:55 | all-commodity prices | DB `commodity_prices` |
 | **2.3** | COT Scraper **+ archive price rebuild** | Fri 20:00 | CFTC COT (all commodities + coffee) → DB; **then rebuild cot_weekly prices from archive (max-OI)** | DB |
@@ -147,6 +146,8 @@ flowchart TD
 | 0.1–0.4 | One-shot backfills | manual | *(archive loads, rebuilds)* | DB / archive |
 
 **Retired:** ~~2.1 Tuesday Coffee Settlement Prices~~ — replaced by the archive rebuild step inside 2.3.
+
+> ¹ All data workflows commit JSON with `[skip ci]`, which Vercel ignores, so production never auto-rebuilds on data. The last daily scraper (1.7, ~09:10 UTC) POSTs the Vercel **deploy hook** once to publish the day's accumulated commits. Requires repo secret `VERCEL_DEPLOY_HOOK` (Vercel → Settings → Git → Deploy Hooks); no-ops if unset.
 
 ---
 
