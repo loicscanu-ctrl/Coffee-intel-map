@@ -1,6 +1,6 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-23T05:53:04.891217Z",
+  "scraped_at": "2026-05-23T11:47:25.244355Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-23",
@@ -341,16 +341,19 @@
   },
   "ihcafe_price": null,
   "weather": {
-    "scraped_at": "2026-05-23T04:43:07.062682Z",
+    "scraped_at": "2026-05-23T11:36:30.534801Z",
     "regions": [
       {
         "name": "Copán",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 160.8,
-        "csi_60d": 271.0,
+        "csi_30d": 160.5,
+        "csi_60d": 270.7,
         "csi_30d_level": "H",
-        "csi_60d_level": "H"
+        "csi_60d_level": "H",
+        "rain_mtd_mm": 108.5,
+        "rain_hist_min": 32.1,
+        "rain_hist_max": 155.9
       },
       {
         "name": "Santa Bárbara",
@@ -398,7 +401,6 @@
           "H",
           "H",
           "H",
-          "H",
           "M",
           "H",
           "H",
@@ -458,14 +460,15 @@
           "H",
           "H",
           "H",
-          "H",
+          "M",
           "H",
           "H",
           "H",
           "H",
           "L",
+          "L",
           "M",
-          "M",
+          "L",
           "L",
           "L"
         ]
@@ -620,9 +623,9 @@
           "H",
           "H",
           "H",
-          "H",
           "L",
-          "L",
+          "M",
+          "M",
           "L",
           "L",
           "L"
@@ -696,10 +699,10 @@
           "H",
           "H",
           "H",
+          "H",
           "M",
           "M",
-          "M",
-          "M",
+          "L",
           "L",
           "L",
           "L",
@@ -713,7 +716,6 @@
           "H",
           "H",
           "H",
-          "H",
           "M",
           "M",
           "H",
@@ -778,12 +780,13 @@
           "H",
           "H",
           "M",
-          "H",
+          "M",
           "L",
           "L",
           "L",
           "L",
-          "M"
+          "L",
+          "L"
         ]
       }
     ],
@@ -791,13 +794,6 @@
       {
         "region": "Copán",
         "days": [
-          {
-            "date": "2026-03-23",
-            "precip_prob": 0,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.22,
-            "drought_risk": "H"
-          },
           {
             "date": "2026-03-24",
             "precip_prob": 0,
@@ -1214,98 +1210,105 @@
           {
             "date": "2026-05-22",
             "precip_prob": 43,
-            "precip_mm": 0.4,
+            "precip_mm": 1.7,
             "soil_moisture": 0.221,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-23",
             "precip_prob": 80,
-            "precip_mm": 4.4,
+            "precip_mm": 11.1,
             "soil_moisture": 0.224,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 87,
-            "precip_mm": 8.6,
-            "soil_moisture": 0.233,
+            "precip_mm": 9.0,
+            "soil_moisture": 0.232,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 88,
-            "precip_mm": 1.8,
-            "soil_moisture": 0.236,
+            "precip_mm": 9.7,
+            "soil_moisture": 0.234,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 88,
-            "precip_mm": 24.6,
-            "soil_moisture": 0.235,
-            "drought_risk": "H"
+            "precip_mm": 12.5,
+            "soil_moisture": 0.237,
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 94,
-            "precip_mm": 5.5,
+            "precip_mm": 7.2,
             "soil_moisture": 0.24,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-28",
             "precip_prob": 98,
-            "precip_mm": 10.3,
-            "soil_moisture": 0.249,
+            "precip_mm": 12.1,
+            "soil_moisture": 0.248,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-29",
             "precip_prob": 96,
-            "precip_mm": 2.8,
+            "precip_mm": 12.3,
             "soil_moisture": 0.254,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-30",
             "precip_prob": 96,
-            "precip_mm": 9.2,
+            "precip_mm": 5.8,
             "soil_moisture": 0.254,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-31",
             "precip_prob": 90,
-            "precip_mm": 7.7,
+            "precip_mm": 7.5,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-01",
             "precip_prob": 90,
-            "precip_mm": 3.0,
+            "precip_mm": 3.3,
             "soil_moisture": 0.293,
-            "drought_risk": "M"
+            "drought_risk": "L"
           },
           {
             "date": "2026-06-02",
             "precip_prob": 91,
-            "precip_mm": 2.9,
+            "precip_mm": 0.4,
             "soil_moisture": 0.293,
             "drought_risk": "M"
           },
           {
             "date": "2026-06-03",
             "precip_prob": 96,
-            "precip_mm": 12.6,
+            "precip_mm": 3.6,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-04",
             "precip_prob": 95,
-            "precip_mm": 10.8,
+            "precip_mm": 4.2,
+            "soil_moisture": 0.293,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-06-05",
+            "precip_prob": 74,
+            "precip_mm": 17.6,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           }
@@ -1838,43 +1841,29 @@
         "region": "Montecillos",
         "days": [
           {
-            "date": "2026-03-22",
-            "precip_prob": 0,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.151,
-            "drought_risk": "H"
-          },
-          {
-            "date": "2026-03-23",
-            "precip_prob": 10,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.153,
-            "drought_risk": "H"
-          },
-          {
             "date": "2026-03-24",
-            "precip_prob": 31,
+            "precip_prob": 0,
             "precip_mm": 0.0,
             "soil_moisture": 0.154,
             "drought_risk": "H"
           },
           {
             "date": "2026-03-25",
-            "precip_prob": 41,
+            "precip_prob": 10,
             "precip_mm": 0.0,
             "soil_moisture": 0.154,
             "drought_risk": "H"
           },
           {
             "date": "2026-03-26",
-            "precip_prob": 92,
+            "precip_prob": 58,
             "precip_mm": 0.7,
             "soil_moisture": 0.157,
             "drought_risk": "H"
           },
           {
             "date": "2026-03-27",
-            "precip_prob": 51,
+            "precip_prob": 66,
             "precip_mm": 1.5,
             "soil_moisture": 0.16,
             "drought_risk": "H"
@@ -2260,98 +2249,112 @@
           {
             "date": "2026-05-21",
             "precip_prob": 25,
-            "precip_mm": 0.3,
+            "precip_mm": 0.4,
             "soil_moisture": 0.15,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-22",
-            "precip_prob": 57,
-            "precip_mm": 1.3,
-            "soil_moisture": 0.149,
+            "precip_prob": 27,
+            "precip_mm": 1.0,
+            "soil_moisture": 0.15,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-23",
-            "precip_prob": 77,
-            "precip_mm": 1.9,
-            "soil_moisture": 0.15,
+            "precip_prob": 74,
+            "precip_mm": 4.9,
+            "soil_moisture": 0.152,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-24",
-            "precip_prob": 74,
-            "precip_mm": 2.4,
-            "soil_moisture": 0.15,
+            "precip_prob": 58,
+            "precip_mm": 2.8,
+            "soil_moisture": 0.154,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-25",
-            "precip_prob": 65,
-            "precip_mm": 0.3,
-            "soil_moisture": 0.146,
+            "precip_prob": 62,
+            "precip_mm": 0.7,
+            "soil_moisture": 0.152,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-26",
-            "precip_prob": 51,
-            "precip_mm": 0.6,
-            "soil_moisture": 0.144,
+            "precip_prob": 43,
+            "precip_mm": 1.2,
+            "soil_moisture": 0.149,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-27",
-            "precip_prob": 95,
-            "precip_mm": 11.1,
-            "soil_moisture": 0.145,
+            "precip_prob": 92,
+            "precip_mm": 9.9,
+            "soil_moisture": 0.151,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-28",
             "precip_prob": 94,
-            "precip_mm": 10.0,
-            "soil_moisture": 0.146,
+            "precip_mm": 5.7,
+            "soil_moisture": 0.148,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-29",
-            "precip_prob": 94,
-            "precip_mm": 13.5,
-            "soil_moisture": 0.149,
+            "precip_prob": 96,
+            "precip_mm": 19.8,
+            "soil_moisture": 0.161,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-30",
-            "precip_prob": 94,
-            "precip_mm": 9.8,
-            "soil_moisture": 0.293,
-            "drought_risk": "L"
+            "precip_prob": 98,
+            "precip_mm": 16.8,
+            "soil_moisture": 0.162,
+            "drought_risk": "H"
           },
           {
             "date": "2026-05-31",
             "precip_prob": 94,
-            "precip_mm": 4.9,
+            "precip_mm": 12.7,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-01",
-            "precip_prob": 96,
-            "precip_mm": 11.7,
+            "precip_prob": 92,
+            "precip_mm": 1.7,
             "soil_moisture": 0.293,
-            "drought_risk": "L"
+            "drought_risk": "M"
           },
           {
             "date": "2026-06-02",
-            "precip_prob": 95,
-            "precip_mm": 7.5,
+            "precip_prob": 92,
+            "precip_mm": 0.6,
+            "soil_moisture": 0.293,
+            "drought_risk": "M"
+          },
+          {
+            "date": "2026-06-03",
+            "precip_prob": 98,
+            "precip_mm": 8.3,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
-            "date": "2026-06-03",
-            "precip_prob": 90,
-            "precip_mm": 3.2,
+            "date": "2026-06-04",
+            "precip_prob": 76,
+            "precip_mm": 15.5,
+            "soil_moisture": 0.293,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-06-05",
+            "precip_prob": 59,
+            "precip_mm": 12.2,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           }
@@ -2360,13 +2363,6 @@
       {
         "region": "El Paraíso",
         "days": [
-          {
-            "date": "2026-03-23",
-            "precip_prob": 0,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.154,
-            "drought_risk": "H"
-          },
           {
             "date": "2026-03-24",
             "precip_prob": 58,
@@ -2790,91 +2786,98 @@
           {
             "date": "2026-05-23",
             "precip_prob": 95,
-            "precip_mm": 2.3,
+            "precip_mm": 5.4,
             "soil_moisture": 0.148,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 82,
-            "precip_mm": 6.6,
-            "soil_moisture": 0.146,
+            "precip_mm": 2.7,
+            "soil_moisture": 0.148,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 59,
-            "precip_mm": 3.7,
-            "soil_moisture": 0.144,
+            "precip_mm": 4.6,
+            "soil_moisture": 0.145,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 57,
-            "precip_mm": 0.7,
-            "soil_moisture": 0.142,
+            "precip_mm": 3.3,
+            "soil_moisture": 0.143,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 96,
-            "precip_mm": 10.1,
-            "soil_moisture": 0.141,
-            "drought_risk": "M"
+            "precip_mm": 10.2,
+            "soil_moisture": 0.143,
+            "drought_risk": "H"
           },
           {
             "date": "2026-05-28",
             "precip_prob": 100,
-            "precip_mm": 16.1,
+            "precip_mm": 8.3,
             "soil_moisture": 0.146,
-            "drought_risk": "M"
+            "drought_risk": "H"
           },
           {
             "date": "2026-05-29",
             "precip_prob": 100,
-            "precip_mm": 11.2,
+            "precip_mm": 28.9,
             "soil_moisture": 0.159,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-30",
             "precip_prob": 94,
-            "precip_mm": 17.0,
+            "precip_mm": 12.7,
             "soil_moisture": 0.161,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-31",
             "precip_prob": 96,
-            "precip_mm": 7.8,
+            "precip_mm": 15.4,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-01",
             "precip_prob": 88,
-            "precip_mm": 34.8,
+            "precip_mm": 9.1,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-02",
             "precip_prob": 92,
-            "precip_mm": 17.6,
+            "precip_mm": 8.0,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-03",
             "precip_prob": 92,
-            "precip_mm": 12.5,
+            "precip_mm": 12.4,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-04",
             "precip_prob": 75,
-            "precip_mm": 4.3,
+            "precip_mm": 13.4,
+            "soil_moisture": 0.293,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-06-05",
+            "precip_prob": 61,
+            "precip_mm": 9.4,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           }
@@ -2883,13 +2886,6 @@
       {
         "region": "Agalta",
         "days": [
-          {
-            "date": "2026-03-23",
-            "precip_prob": 3,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.215,
-            "drought_risk": "H"
-          },
           {
             "date": "2026-03-24",
             "precip_prob": 6,
@@ -3313,70 +3309,70 @@
           {
             "date": "2026-05-23",
             "precip_prob": 98,
-            "precip_mm": 2.3,
-            "soil_moisture": 0.162,
+            "precip_mm": 3.3,
+            "soil_moisture": 0.163,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-24",
             "precip_prob": 85,
-            "precip_mm": 3.4,
-            "soil_moisture": 0.162,
+            "precip_mm": 1.9,
+            "soil_moisture": 0.165,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-25",
             "precip_prob": 74,
-            "precip_mm": 1.8,
-            "soil_moisture": 0.162,
+            "precip_mm": 2.6,
+            "soil_moisture": 0.166,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-26",
             "precip_prob": 62,
             "precip_mm": 0.0,
-            "soil_moisture": 0.159,
+            "soil_moisture": 0.163,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-27",
             "precip_prob": 96,
-            "precip_mm": 7.5,
-            "soil_moisture": 0.158,
+            "precip_mm": 8.4,
+            "soil_moisture": 0.161,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-28",
             "precip_prob": 98,
-            "precip_mm": 8.0,
-            "soil_moisture": 0.156,
+            "precip_mm": 5.7,
+            "soil_moisture": 0.157,
             "drought_risk": "H"
           },
           {
             "date": "2026-05-29",
             "precip_prob": 97,
-            "precip_mm": 10.2,
+            "precip_mm": 22.7,
             "soil_moisture": 0.157,
             "drought_risk": "M"
           },
           {
             "date": "2026-05-30",
             "precip_prob": 94,
-            "precip_mm": 14.1,
+            "precip_mm": 19.0,
             "soil_moisture": 0.16,
-            "drought_risk": "H"
+            "drought_risk": "M"
           },
           {
             "date": "2026-05-31",
             "precip_prob": 94,
-            "precip_mm": 9.2,
+            "precip_mm": 9.9,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-01",
             "precip_prob": 86,
-            "precip_mm": 6.1,
+            "precip_mm": 6.3,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
@@ -3390,16 +3386,23 @@
           {
             "date": "2026-06-03",
             "precip_prob": 88,
-            "precip_mm": 7.8,
+            "precip_mm": 17.0,
             "soil_moisture": 0.293,
             "drought_risk": "L"
           },
           {
             "date": "2026-06-04",
             "precip_prob": 65,
-            "precip_mm": 0.6,
+            "precip_mm": 12.1,
             "soil_moisture": 0.293,
-            "drought_risk": "M"
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-06-05",
+            "precip_prob": 59,
+            "precip_mm": 4.9,
+            "soil_moisture": 0.293,
+            "drought_risk": "L"
           }
         ]
       }
