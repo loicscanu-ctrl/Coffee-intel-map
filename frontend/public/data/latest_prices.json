@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T11:47:29.084832Z",
+  "generated_at": "2026-05-24T05:16:43.567936Z",
   "tickers": [
     {
       "label": "KCN26",
@@ -18,12 +18,12 @@
     },
     {
       "label": "VN FAQ",
-      "value": "88.000 VND ($3,361)",
+      "value": "88.000 VND ($3,355)",
       "category": "physical"
     },
     {
       "label": "CON T7",
-      "value": "870,00 BRL ($2,893)",
+      "value": "870,00 BRL ($2,894)",
       "category": "physical"
     },
     {
@@ -33,27 +33,27 @@
     },
     {
       "label": "USD/BRL",
-      "value": "5.0118",
+      "value": "5.0109",
       "category": "fx"
     },
     {
       "label": "USD/VND",
-      "value": "26183",
+      "value": "26227",
       "category": "fx"
     },
     {
       "label": "USD/IDR",
-      "value": "17715",
+      "value": "17710",
       "category": "fx"
     },
     {
       "label": "USD/HNL",
-      "value": "26.6118",
+      "value": "26.6127",
       "category": "fx"
     },
     {
       "label": "USD/UGX",
-      "value": "3756",
+      "value": "3753",
       "category": "fx"
     }
   ]
