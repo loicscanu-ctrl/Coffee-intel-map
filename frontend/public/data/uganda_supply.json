@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-05-24T17:03:19.381687+00:00",
+  "scraped_at": "2026-05-24T23:03:16.206608+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-03",
@@ -53,13 +53,21 @@
       },
       {
         "month": "2024-06",
-        "total_bags": 614710,
-        "total_k_bags": 614.7
+        "total_bags": 667591,
+        "robusta_bags": 614710,
+        "arabica_bags": 52881,
+        "total_k_bags": 667.6,
+        "robusta_k_bags": 614.7,
+        "arabica_k_bags": 52.9
       },
       {
         "month": "2024-07",
-        "total_bags": 772352,
-        "total_k_bags": 772.4
+        "total_bags": 821501,
+        "robusta_bags": 772352,
+        "arabica_bags": 49149,
+        "total_k_bags": 821.5,
+        "robusta_k_bags": 772.4,
+        "arabica_k_bags": 49.1
       },
       {
         "month": "2024-08",
@@ -164,17 +172,29 @@
       },
       {
         "month": "2025-06",
-        "total_bags": 907058,
-        "total_value_usd": 248566312,
-        "yoy_pct": 47.56,
-        "total_k_bags": 907.1
+        "total_bags": 1014062,
+        "robusta_bags": 907058,
+        "arabica_bags": 107004,
+        "robusta_pct": 89.4,
+        "arabica_pct": 10.6,
+        "total_value_usd": 289600293,
+        "yoy_pct": 51.9,
+        "total_k_bags": 1014.1,
+        "robusta_k_bags": 907.1,
+        "arabica_k_bags": 107.0
       },
       {
         "month": "2025-07",
-        "total_bags": 914448,
-        "total_value_usd": 220539474,
-        "yoy_pct": 18.4,
-        "total_k_bags": 914.4
+        "total_bags": 997105,
+        "robusta_bags": 914448,
+        "arabica_bags": 82657,
+        "robusta_pct": 91.7,
+        "arabica_pct": 8.3,
+        "total_value_usd": 250603113,
+        "yoy_pct": 21.38,
+        "total_k_bags": 997.1,
+        "robusta_k_bags": 914.4,
+        "arabica_k_bags": 82.7
       },
       {
         "month": "2025-08",
@@ -270,9 +290,15 @@
       {
         "month": "2026-03",
         "total_bags": 671152,
+        "robusta_bags": 567405,
+        "arabica_bags": 103747,
+        "robusta_pct": 84.5,
+        "arabica_pct": 15.5,
         "total_value_usd": 173366323,
         "yoy_pct": 3.19,
-        "total_k_bags": 671.2
+        "total_k_bags": 671.2,
+        "robusta_k_bags": 567.4,
+        "arabica_k_bags": 103.7
       }
     ]
   },
