@@ -1,0 +1,215 @@
+# UCDA parse-gap debug — 2026-03
+# reason: implausible split: robusta(567405)+arabica(3)=567408 vs total(671152)
+# parsed summary: {"month": "2026-03", "robusta_bags_py": 530067.0, "robusta_value_py": 156575076.0, "robusta_bags": 567405.0, "robusta_value": 124001859.0, "arabica_bags_py": 120321.0, "arabica_value_py": 4.0, "arabica_bags": 3.0, "arabica_value": null, "total_bags_py": 650388.0, "total_value_py": 200551178.0, "total_bags": 671152.0, "total_value": 173366323.0, "yoy_qty_pct": 3.19, "yoy_val_pct": -13.56}
+
+===== EXTRACTED TEXT (first 2 pages) =====
+COFFEE YEAR 2025/26-ISSUE6
+MONTHLY COFFEE REPORT-MARCH2026
+KeyHighlights Coffee exports for twelve months (April 2025-March
+A total of 671,152 60-kg bags of coffee valued at US$ 2026) totaled 8.8 million 60kgbags worth US$ 2.4
+billion (UGX 8.8 Trillion) compared to 6.9 million 60kg
+173.37 million (UGX 646.75 billion) were exported in
+bags worth US$ 1.8 billion (UGX 6.6 trillion) in the
+March 2026 at an average price of US$ 4.31/kilogram,
+previous year (April 2024- March 2025). This
+US cents 32 lower than US$ 4.63/Kilogram in February
+represents an increase of 28% and 36% in quantity and
+2026, and US cents 83 lower than the US$5.14/kilogram
+valuerespectively.
+in March 2025. This was an increase of 3.19% in
+quantity and a decrease of 13.56% in value compared to 70% of the total export volume was exported by top 10
+exporters with Ugacof leading in terms of market share
+thesamemonthlastyear(2025).
+(12.66%) out of 83 companies which performed
+Farm-gate prices for Robusta Kiboko averaged UGX 5,650 during the month compared to 66% in the month of
+per kilogram; FAQ UGX 12,000 per kilogram, Arabica February 2026.(Annex1)
+parchment UGX 15,000 per kilogram and Drugar UGX
+14,500 per kilogram. Mt. Elgon A+ had the highest price
+registered.(US$ 9.84perkilogram).
+Coffee export volumes during the month were higher than
+1.Coffeeexports
+March of last year on account of increased coffee
+Coffee exports in March 2026, totaled to 671,152 60-kilo
+production. Coffee prices during the month however declined
+bags worth US$ 173.37 million (UGX 646.75 billion). This
+comprised of 567,405 bags of Robusta valued at US$ 134.0 compared to February 2026 in line with the decrease at the
+million ( UGX 499.90 billion) and 103,747 bags of Arabica globallevelduetoimprovedglobalsupplyoutlook.
+valued at US$ 39.36 million(UGX146.85billion) (seeTable 1).
+This was an increase of 3.19% and a decrease of 13.56% in Coffee exports for twelve months (April 2025-March 2026)
+quantity and value respectively compared to the same month totaled 8.8 million bags worth US$ 2.4 billion (UGX 8.8 Trillion)
+last year (March 2025). Robusta increased by 7.04% in compared to 6.9 million bags worth US$ 1.8 billion (UGX 6.6
+quantity and decreased by 20.80% in value while Arabica trillion) in the previous year (April 2024- March 2025). This
+exports decreasedby13.77%and10.49%inquantityandvalue represents an increase of 28% and 36% in quantity and value
+respectivelycomparedtothesamemonthlastyear.
+respectively.
+Fig1:TrendofTotalQuantityandValueofCoffee Exports,April 2025 -March2026
+1,200,000 350
+995,211
+979,702
+1,000,000 300
+s g a b
+g k 0 6 ;y
+titn
+a
+468 000 000 ,,, 000 000 000 687,299
+2
+17 289,785 2 43 286 251856,677 203839,801
+2 17 678,5 19 81 4 630,64 11
+8
+3499,84 14
+4
+9566,53 13
+6
+0638,697 176 871,15 12 7 3
+122
+0
+55
+0
+00 n o illim
+$ S U e
+u la V
+u Q 100
+200,000 50
+- 0
+April May June July August September October November December January February March
+Quantity Value
+Table1:ComparisonofCoffeeExportsofMarch 2025andMarch 2026
+2025 2026 %age Change
+Period/Coffee Type
+Qty(60-kg bags) Value (US $) Qty(60-kg bags) Value (US $) Qty Value
+Robusta
+530,067 156,575,076 567,405 124,001,859 7.04 -20.80
+Arabica
+120,321 4 3 , 9 7 6 ,102 103,747 39,364,464 -13.77 -10.49
+March Total
+650,388 200,551,178 671,152 173,366,323 3.19 -13.56
+2.Exportsby Typeand Grade The share of Sustainable/washed coffee to total Robusta
+Table 2 shows coffee exports by type, grade and average price exports was 0.95% higherthan0.5%inFebruary2026.
+realized for each grade during the month of March 2026. Arabica fetched anaverage price of US$6.32 per kilogram US
+The average export price was US$ 4.31 per kilogram, US cents cents 40 lower than the previous month (US$ 6.72). The
+32 lower than February 2026 (US$ 4.63/kilogram). Robusta highest price was for Mt. Elgon A+ sold at US$ 9.84 per
+exports accounted for 85% of total exports, higher than 79% kilogram. It was followed by Mt. Elgon PB sold at US$ 8.82
+in February 2026. The average Robusta price was US$ 3.94 per kilogram. Drugar was sold at US$ 6.38 per kilogram,
+per kilogram,lowerthanUS$4.06perkilograminFebruary2026. US cents36lower than US$6.74 per kilogram the previous
+The highest price was for Organic Robusta sold at US$ 5.12 month, and was 39% of total Arabica exports higher than
+33% the previous month. The share of sustainable
+perkilogram,followedby Screen17soldatUS$4.26perkilogram.
+Arabica exports to total Arabica exports was 6%,
+lowerthan11%inFebruary2026.
+Table2:CoffeeExportsbyType,Grade&UnitPrice inMarch2026
+Quantity60- UnitPrice
+CoffeeType %-AgeQuantity ValueInUS$ %-Age Value
+KilogramBags US$/Kilogram
+Total 671,152 173,366,323 4.31
+Organic Robusta 2,280 0.40 700,155 0.52 5.12
+Washed Robusta 3,110 0.55 770,091 0.57 4.13
+Screen 18 71,204 12.55 17,628,677 13.16 4.13
+Screen 17 34,516 6.08 8,813,613 6.58 4.26
+Screen 15 267,192 47.09 63,850,815 47.65 3.98
+Screen 14 29,841 5.26 6,968,616 5.20 3.89
+Screen 12 88,615 15.62 21,129,371 15.77 3.97
+BHP 1199 38,206 6.73 7,768,235 5.80 3.39
+Other Robustas 32,441 5.72 6,372,285 4.76 3.27
+Total Robusta 567,405 100.00 134,001,859 100.00 3.94
+Sustainable Arabica 928 0.89 453,038 1.15 8.14
+Mt Elgon A+ 1,378 1.33 813,497 2.07 9.84
+Mt Elgon A 2,876 2.77 1,205,950 3.06 6.99
+Mt Elgon PB 310 0.30 164,022 0.42 8.82
+BugisuA+ 660 0.64 190,725 0.48 4.82
+BugisuAA 10,235 9.87 3,960,678 10.06 6.45
+BugisuA 6,000 5.78 2,293,454 5.83 6.37
+BugisuC 1,080 1.04 457,717 1.16 7.06
+BugisuAB 18,470 17.80 7,453,363 18.93 6.73
+BugisuPB 45 0.04 16,548 0.04 6.13
+BugisuCPB 1,307 1.26 472,253 1.20 6.02
+Mixed Arabica 320 0.31 107,937 0.27 5.62
+Wugar 8,984 8.66 3,487,887 8.86 6.47
+Drugar 40,173 38.72 15,377,945 39.07 6.38
+Other Arabicas 10,981 10.58 2,909,449 7.39 4.42
+Total Arabica 103,747 100.00 39,364,464 100.00 6.32
+3.IndividualExporterPerformance
+Figure2:Top10ExportingCompaniesbypercentagemarketshare
+Figure 2 shows the top 10 export companies’ performance in the
+month of March 2026. Ugacof (U) Ltd had the highest market
+12.66
+share of 12.66%compared to highestof14.43%inFebruary2026. 14.00
+It was followed by Kyagalanyi coffee Ltd 9.04% (8.73%), Olam 11 02 .. 00 00 9.04 8.41 8.27 8.09
+Uganda Ltd 8.41% (5.87%), Export Trading Company (U) Ltd 8.27% 8.00 6.37 5.73 5.08
+(6.20%),JberCoffeeLtd8.09%(8.20%),IdealQualityCommoditiesLtd 6.00 3.59
+2.40
+6.37% (5.32%), Louis Dreyfus Company (U) Ltd 5.73% (6.60%), 4.00
+Touton Uganda Limited 5.08% (4.67%), Kawacom (U) Ltd 3.59% 2.00
+-
+(2.81%) and Ibero (U) Ltd 2.40% (2.15%) *The figures in brackets
+represent percentage marketshareheldinFebruary 2026.Thetop
+10 exporters held a market share of 70% higher than 66% the
+previous month. Out of the 83 exporters who exported, 32
+exported both Robusta and Arabica coffee, 36 exported Robusta
+Coffee only while 15 exported Arabica coffee only. Annex 1
+showsadetailedlistofexporters’performanceinMarch2026
+4. Coffee ExportsByDestination
+5. Foreignbuyers ofUgandaCoffee
+The destinations of Uganda’s coffee exports during themonth
+of March 2026 are shown in Fig 3 (details in Annex 2). Italy Annex 4 shows a list of Uganda coffee foreign buyers in March
+remained with the highest market share 32.17% compared 2026.Thetop10buyersheldamarketshareof54.23%higherthan
+to 28.80% last month. It was followed by Sudan 11.14%
+52.67% the previous month. Sucafina led with a market share of
+(9.95%), Germany 7.96% (8.41%), India 6.56% (7.95%) and
+12.80%compared to 15.00%inFebruary2026. It wasfollowedby
+Morocco 5.99% (7.26%). *The figures in brackets represent
+OlamInternationalwith8.28%(7.14%), LouisDreyfus6.12% (6.85%),
+percentage market share held in February 2026. The first 10
+Volcafe 5.18% (6.35%), Touton SA 5.08% (4.67%), Ecom
+major destinations of Uganda coffee took a market share of
+Agroindustrialist 4.22% (3.17%), Koninklijke Douwe Egberts 3.91%
+81% compared to 79% the previous month. Coffee exports
+to African countries totaled 143,342 bags, a market share of (1.55%),Strauss3.31%,BernhardRothfos2.99% (2.90%)andAldwami
+21% compared to 140,6
+
+===== STRUCTURAL TABLES (first 3 pages) =====
+
+--- page 0 table 0 ---
+Period/Coffee Type | 2025 |  | 2026 |  | %age Change | 
+ | Qty(60-kg bags) | Value (US $) | Qty(60-kg bags) | Value (US $) | Qty | Value
+Robusta | 530,067 | 156,575,076 | 567,405 | 124,001,859 | 7.04 | -20.80
+Arabica | 120,321 | 4 3 , 9 7 6 ,102 | 103,747 | 39,364,464 | -13.77 | -10.49
+March Total | 650,388 | 200,551,178 | 671,152 | 173,366,323 | 3.19 | -13.56
+
+--- page 1 table 0 ---
+Total | 671,152 |  | 173,366,323 |  | 4.31
+
+--- page 1 table 1 ---
+Washed Robusta | 3,110 | 0.55 | 770,091 | 0.57 | 4.13
+
+--- page 1 table 2 ---
+Screen 17 | 34,516 | 6.08 | 8,813,613 | 6.58 | 4.26
+
+--- page 1 table 3 ---
+Screen 14 | 29,841 | 5.26 | 6,968,616 | 5.20 | 3.89
+
+--- page 1 table 4 ---
+BHP 1199 | 38,206 | 6.73 | 7,768,235 | 5.80 | 3.39
+
+--- page 1 table 5 ---
+Total Robusta | 567,405 | 100.00 | 134,001,859 | 100.00 | 3.94
+
+--- page 1 table 6 ---
+Mt Elgon A+ | 1,378 | 1.33 | 813,497 | 2.07 | 9.84
+
+--- page 1 table 7 ---
+Mt Elgon PB | 310 | 0.30 | 164,022 | 0.42 | 8.82
+
+--- page 1 table 8 ---
+BugisuAA | 10,235 | 9.87 | 3,960,678 | 10.06 | 6.45
+
+--- page 1 table 9 ---
+BugisuC | 1,080 | 1.04 | 457,717 | 1.16 | 7.06
+
+--- page 1 table 10 ---
+BugisuPB | 45 | 0.04 | 16,548 | 0.04 | 6.13
+
+--- page 1 table 11 ---
+Mixed Arabica | 320 | 0.31 | 107,937 | 0.27 | 5.62
+
+--- page 1 table 12 ---
+Drugar | 40,173 | 38.72 | 15,377,945 | 39.07 | 6.38
