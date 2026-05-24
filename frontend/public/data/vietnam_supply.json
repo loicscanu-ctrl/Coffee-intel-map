@@ -172,6 +172,12 @@
         "yoy_pct": 43.3
       },
       {
+        "month": "2026-01",
+        "total_k_bags": 3748.9,
+        "yoy_pct": 67.9,
+        "derived_from_ytd": true
+      },
+      {
         "month": "2026-02",
         "total_k_bags": 2372.3,
         "yoy_pct": -16.2
@@ -190,12 +196,12 @@
   },
   "fertilizer_context": {
     "source": "Vietnam Customs (customs.gov.vn) 1n import reports",
-    "note": "Vietnam imports ~4\u20135Mt/yr fertilizer. Urea mainly from China/Russia; NPK from China; Potash from Canada/Russia via Singapore.",
+    "note": "Vietnam imports ~4–5Mt/yr fertilizer. Urea mainly from China/Russia; NPK from China; Potash from Canada/Russia via Singapore.",
     "key_suppliers": {
       "urea": "China (60%), Russia (25%), Middle East (15%)",
       "npk": "China (80%+)",
       "potash": "Canada/Russia via Singapore"
     },
-    "price_sensitivity": "Vietnam urea prices lag global CFR by ~2\u20134 weeks via China trading channel."
+    "price_sensitivity": "Vietnam urea prices lag global CFR by ~2–4 weeks via China trading channel."
   }
 }

@@ -74,6 +74,66 @@ _COFFEE_RX = re.compile(r"\bcoffee\b|\bcà\s*phê\b", re.IGNORECASE)
 
 # ── Customs scraper cache reader (priority 1) ────────────────────────────────
 
+def _backfill_from_ytd(monthly: list[dict]) -> list[dict]:
+    """Recover a month missing from the cache using its successor's calendar
+    year-to-date cumulative.
+
+    The customs 2x bulletins carry a calendar-YTD cumulative alongside each
+    month's own quantity, so a gap can be reconstructed exactly:
+        period(prev) = ytd_cum(next) - period(next) - ytd_cum(prev-1)
+    (with ytd_cum(prev-1)=0 when prev is January). This is how Jan-2026 — whose
+    own bulletin was never captured — is recovered from the Feb-2026 cumulative.
+    """
+    by = {r.get("month"): r for r in monthly if r.get("month")}
+    if not by:
+        return monthly
+    # Only self-heal *recent* gaps (a freshly-missed bulletin); never rewrite
+    # deep history, where another source may already hold a vetted value.
+    latest = max(by)
+    ly, lmm = int(latest[:4]), int(latest[5:7])
+    cutoff = (ly * 12 + lmm) - 15
+    added: list[dict] = []
+    for r in monthly:
+        m = r.get("month")
+        if not m:
+            continue
+        y, mm = int(m[:4]), int(m[5:7])
+        if mm == 1:                       # January's YTD resets — can't reach December
+            continue
+        prev = f"{y}-{mm - 1:02d}"
+        py, pmm = int(prev[:4]), int(prev[5:7])
+        if py * 12 + pmm < cutoff:        # too old — leave established history alone
+            continue
+        if prev in by:
+            continue
+        ytd_n = r.get("ytd_cum_qty_tonnes")
+        per_n = r.get("period_qty_tonnes") or r.get("tonnes")
+        if not ytd_n or not per_n:
+            continue
+        ytd_prev = ytd_n - per_n          # cumulative through the missing month
+        if mm - 1 == 1:                   # missing month is January → period == cumulative
+            per_prev = ytd_prev
+        else:
+            pp = f"{y}-{mm - 2:02d}"
+            ytd_pp = by[pp].get("ytd_cum_qty_tonnes") if pp in by else None
+            if not ytd_pp:
+                continue
+            per_prev = ytd_prev - ytd_pp
+        if per_prev <= 0:
+            continue
+        added.append({
+            "month": prev,
+            "tonnes": round(per_prev),
+            "period_qty_tonnes": round(per_prev),
+            "ytd_cum_qty_tonnes": round(ytd_prev),
+            "derived_from_ytd": True,
+        })
+    if added:
+        print(f"  [vn_exports][Customs] backfilled {len(added)} month(s) from YTD "
+              f"cumulative: {', '.join(a['month'] for a in added)}")
+    return monthly + added
+
+
 def _fetch_customs_exports() -> list[dict]:
     """Read monthly coffee exports from vn_coffee_export cache (tonnes → k_bags).
 
@@ -92,7 +152,7 @@ def _fetch_customs_exports() -> list[dict]:
         return []
     try:
         data = _json.loads(cache.read_text(encoding="utf-8"))
-        monthly = data.get("monthly") or []
+        monthly = _backfill_from_ytd(data.get("monthly") or [])
         out: list[dict] = []
         for r in monthly:
             t = r.get("tonnes") or 0

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
-import VietnamExportExplorer from "@/components/supply/VietnamExportExplorer";
 import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEstimate";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 
@@ -25,14 +24,11 @@ interface VietnamSupply {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ExportExplorerData = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SharesData = any;
 
 export default function VietnamTab() {
   const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
-  const [explorerData, setExplorerData] = useState<ExportExplorerData | null>(null);
   const [sharesData, setSharesData] = useState<SharesData | null>(null);
 
   useEffect(() => {
@@ -40,10 +36,6 @@ export default function VietnamTab() {
       .then(r => r.json())
       .then(setVnSupply)
       .catch((err) => console.error("[VietnamTab] vietnam_supply fetch failed:", err));
-    fetch("/data/vn_export_destination_port.json")
-      .then(r => r.json())
-      .then(setExplorerData)
-      .catch((err) => console.error("[VietnamTab] vn_export_destination_port fetch failed:", err));
     fetch("/data/vn_country_shares.json")
       .then(r => r.json())
       .then(setSharesData)
@@ -109,15 +101,6 @@ export default function VietnamTab() {
             </div>
           )}
 
-          {/* Export structure explorer */}
-          {explorerData && (
-            <div>
-              <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
-                Export Structure · Vietnam Customs
-              </h2>
-              <VietnamExportExplorer data={explorerData} />
-            </div>
-          )}
         </div>
       )}
     </div>
