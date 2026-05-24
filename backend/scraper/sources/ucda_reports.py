@@ -146,7 +146,17 @@ def parse_pdf(pdf_bytes: bytes) -> dict | None:
             if not report_month:
                 return None
 
-            summary      = _parse_summary(full_text, report_month)
+            # Table 1 lives on page 0/1; pdfplumber's structural extraction is
+            # far more reliable than regex over flattened text (which scrambles
+            # the 2-year columns on some layouts).
+            page_tables: list = []
+            for pg in pdf.pages[:2]:
+                try:
+                    page_tables.extend(pg.extract_tables() or [])
+                except Exception:
+                    pass
+
+            summary      = _parse_summary(full_text, report_month, page_tables)
 
             # Self-diagnostic: dump raw text + structural tables when the
             # Table-1 split is missing OR implausible. "Implausible" mirrors
@@ -199,48 +209,97 @@ def _clean_num(s: str) -> float | None:
         return None
 
 
-def _parse_summary(text: str, month: str) -> dict:
-    """Extract Table 1: robusta/arabica split for current + prior year."""
+def _summary_from_tables(tables: list) -> dict:
+    """Extract Table 1 (robusta/arabica/total, prior + current year) from
+    pdfplumber's structural tables. Column order is consistent across reports:
+    label · PY-qty · PY-value · CY-qty · CY-value · %qty · %val. Row order and
+    the total-row label vary ("JuneTotal", "March Total", ...), so rows are
+    matched by content, not position. Per-cell numeric cleaning also repairs
+    OCR-spaced values like "4 3 , 9 7 6 ,102"."""
+    def classify(label: str) -> str | None:
+        n = re.sub(r"[^a-z]", "", (label or "").lower())
+        if "total" in n:   return "total"      # "JuneTotal" / "March Total"
+        if "robusta" in n: return "robusta"
+        if "arabica" in n: return "arabica"
+        return None
+
+    for tbl in tables or []:
+        rows: dict[str, list[float]] = {}
+        for row in tbl or []:
+            if not row:
+                continue
+            kind = classify(row[0])
+            if not kind or kind in rows:
+                continue
+            nums = [v for c in row[1:] if (v := _clean_num(c)) is not None]
+            if len(nums) >= 4:
+                rows[kind] = nums
+        if {"robusta", "arabica", "total"} <= rows.keys():
+            out: dict = {}
+            for kind in ("robusta", "arabica", "total"):
+                n = rows[kind]
+                out[f"{kind}_bags_py"]  = n[0]
+                out[f"{kind}_value_py"] = n[1]
+                out[f"{kind}_bags"]     = n[2]
+                out[f"{kind}_value"]    = n[3]
+            t = rows["total"]
+            if len(t) >= 5: out["yoy_qty_pct"] = t[4]
+            if len(t) >= 6: out["yoy_val_pct"] = t[5]
+            return out
+    return {}
+
+
+def _parse_summary(text: str, month: str, tables: list | None = None) -> dict:
+    """Extract Table 1: robusta/arabica split for current + prior year.
+
+    Prefers pdfplumber's structural table extraction; falls back to regex over
+    flattened text only when the table is absent or its split doesn't reconcile
+    (robusta+arabica within 5% of total, robusta>=arabica)."""
     out: dict = {"month": month}
 
-    # Robusta row: "Robusta 476,471 138,181,685 512,237 124,659,354 7.51 -9.79"
-    m = re.search(
-        r"Robusta\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)"
-        r"(?:\s+([-\d.]+))?\s*([-\d.]+)?",
-        text,
-    )
-    if m:
-        out["robusta_bags_py"] = _clean_num(m.group(1))
-        out["robusta_value_py"] = _clean_num(m.group(2))
-        out["robusta_bags"]     = _clean_num(m.group(3))
-        out["robusta_value"]    = _clean_num(m.group(4))
+    tbl = _summary_from_tables(tables or [])
+    if _split_reconciles(tbl):
+        out.update(tbl)
+    else:
+        # Regex fallback. Robusta row:
+        # "Robusta 476,471 138,181,685 512,237 124,659,354 7.51 -9.79"
+        m = re.search(
+            r"Robusta\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)"
+            r"(?:\s+([-\d.]+))?\s*([-\d.]+)?",
+            text,
+        )
+        if m:
+            out["robusta_bags_py"] = _clean_num(m.group(1))
+            out["robusta_value_py"] = _clean_num(m.group(2))
+            out["robusta_bags"]     = _clean_num(m.group(3))
+            out["robusta_value"]    = _clean_num(m.group(4))
 
-    # Arabica row (sometimes split across lines)
-    m = re.search(
-        r"Arabica\s*\n?\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)",
-        text,
-    )
-    if m:
-        out["arabica_bags_py"] = _clean_num(m.group(1))
-        out["arabica_value_py"] = _clean_num(m.group(2))
-        out["arabica_bags"]    = _clean_num(m.group(3))
-        out["arabica_value"]   = _clean_num(m.group(4))
+        # Arabica row (sometimes split across lines)
+        m = re.search(
+            r"Arabica\s*\n?\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)",
+            text,
+        )
+        if m:
+            out["arabica_bags_py"] = _clean_num(m.group(1))
+            out["arabica_value_py"] = _clean_num(m.group(2))
+            out["arabica_bags"]    = _clean_num(m.group(3))
+            out["arabica_value"]   = _clean_num(m.group(4))
 
-    # Total row: match "Total\n567,226 ... 651,933 ..."  or "February Total\n..."
-    m = re.search(
-        r"(?:Total)\s*\n?\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)"
-        r"(?:\s+([-\d.]+))?\s*([-\d.]+)?",
-        text,
-    )
-    if m:
-        out["total_bags_py"]  = _clean_num(m.group(1))
-        out["total_value_py"] = _clean_num(m.group(2))
-        out["total_bags"]     = _clean_num(m.group(3))
-        out["total_value"]    = _clean_num(m.group(4))
-        if m.group(5):
-            out["yoy_qty_pct"]  = _clean_num(m.group(5))
-        if m.group(6):
-            out["yoy_val_pct"]  = _clean_num(m.group(6))
+        # Total row: "Total\n567,226 ... 651,933 ..." or "February Total\n..."
+        m = re.search(
+            r"(?:Total)\s*\n?\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)"
+            r"(?:\s+([-\d.]+))?\s*([-\d.]+)?",
+            text,
+        )
+        if m:
+            out["total_bags_py"]  = _clean_num(m.group(1))
+            out["total_value_py"] = _clean_num(m.group(2))
+            out["total_bags"]     = _clean_num(m.group(3))
+            out["total_value"]    = _clean_num(m.group(4))
+            if m.group(5):
+                out["yoy_qty_pct"]  = _clean_num(m.group(5))
+            if m.group(6):
+                out["yoy_val_pct"]  = _clean_num(m.group(6))
 
     # Average price from key highlights prose
     mp = re.search(
