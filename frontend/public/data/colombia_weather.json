@@ -1,6 +1,6 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-23",
+  "updated": "2026-05-24",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Colombia",
@@ -211,11 +211,11 @@
         130
       ],
       "monthly_actual_cur": [
-        93.1,
-        111.7,
-        167.6,
-        223.4,
-        145.4
+        null,
+        null,
+        195.9,
+        125.3,
+        72.8
       ],
       "monthly_avg_temp": [
         22.4,
@@ -274,20 +274,20 @@
         22.5
       ],
       "monthly_actual_temp_cur": [
-        22.1,
-        22.4,
-        22.5,
-        22.4,
-        22.1
+        null,
+        null,
+        null,
+        20.7,
+        22.4
       ],
       "forecast_7d_rain": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        9.0,
+        3.0,
+        5.3,
+        11.8,
+        24.4,
+        9.2,
+        3.2
       ]
     },
     {
@@ -356,7 +356,7 @@
         null,
         149.8,
         232.4,
-        50.9
+        51.1
       ],
       "monthly_avg_temp": [
         19.4,
@@ -419,15 +419,16 @@
         null,
         null,
         18.1,
-        18.6
+        18.7
       ],
       "forecast_7d_rain": [
-        1.7,
-        3.3,
-        4.2,
-        10.0,
-        14.0,
-        15.8
+        2.8,
+        3.7,
+        4.7,
+        11.2,
+        15.9,
+        8.0,
+        8.8
       ]
     },
     {
@@ -496,7 +497,7 @@
         null,
         144.9,
         189.8,
-        340.2
+        365.7
       ],
       "monthly_avg_temp": [
         18.4,
@@ -559,15 +560,16 @@
         null,
         null,
         15.6,
-        16.0
+        16.1
       ],
       "forecast_7d_rain": [
-        9.4,
-        22.0,
-        52.0,
-        42.7,
-        35.5,
-        46.0
+        26.5,
+        34.2,
+        33.1,
+        38.5,
+        31.7,
+        22.2,
+        34.0
       ]
     },
     {
@@ -636,7 +638,7 @@
         null,
         175.7,
         289.1,
-        122.7
+        122.6
       ],
       "monthly_avg_temp": [
         14.3,
@@ -702,12 +704,13 @@
         15.1
       ],
       "forecast_7d_rain": [
-        1.4,
-        5.2,
-        1.0,
-        5.4,
-        6.3,
-        19.2
+        1.8,
+        1.2,
+        1.7,
+        7.8,
+        12.0,
+        6.6,
+        5.4
       ]
     }
   ],
