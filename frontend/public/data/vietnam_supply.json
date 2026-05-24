@@ -1,16 +1,11 @@
 {
-  "scraped_at": "2026-05-24T06:22:35.341542Z",
+  "scraped_at": "2026-05-24T11:07:38.867843Z",
   "country": "vietnam",
   "exports": {
     "source": "Vietnam Customs (customs.gov.vn) 2x + Vietnam Customs (vn_export_destination_port)",
     "last_updated": "2026-04",
     "unit": "thousand_60kg_bags",
     "monthly": [
-      {
-        "month": "2023-04",
-        "total_k_bags": 2567.5,
-        "yoy_pct": 8.0
-      },
       {
         "month": "2023-05",
         "total_k_bags": 2279.6,
@@ -174,8 +169,7 @@
       {
         "month": "2026-01",
         "total_k_bags": 3748.9,
-        "yoy_pct": 67.9,
-        "derived_from_ytd": true
+        "yoy_pct": 67.9
       },
       {
         "month": "2026-02",
@@ -196,12 +190,12 @@
   },
   "fertilizer_context": {
     "source": "Vietnam Customs (customs.gov.vn) 1n import reports",
-    "note": "Vietnam imports ~4–5Mt/yr fertilizer. Urea mainly from China/Russia; NPK from China; Potash from Canada/Russia via Singapore.",
+    "note": "Vietnam imports ~4\u20135Mt/yr fertilizer. Urea mainly from China/Russia; NPK from China; Potash from Canada/Russia via Singapore.",
     "key_suppliers": {
       "urea": "China (60%), Russia (25%), Middle East (15%)",
       "npk": "China (80%+)",
       "potash": "Canada/Russia via Singapore"
     },
-    "price_sensitivity": "Vietnam urea prices lag global CFR by ~2–4 weeks via China trading channel."
+    "price_sensitivity": "Vietnam urea prices lag global CFR by ~2\u20134 weeks via China trading channel."
   }
 }
