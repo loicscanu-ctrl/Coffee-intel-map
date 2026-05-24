@@ -101,9 +101,10 @@ function ProvinceSelector({
 // ── 1. Daily Accumulated Rainfall (reference station) ────────────────────────
 
 function DailyAccumChart({
-  daily, station, updated, curYear, lastYear, selectedYear, selectedMonthIdx,
+  daily, forecast, station, updated, curYear, lastYear, selectedYear, selectedMonthIdx,
 }: {
   daily: DailyRow[];
+  forecast: ForecastRow[];
   station: string;
   updated: string;
   curYear: number;
@@ -118,15 +119,41 @@ function DailyAccumChart({
   const monthLabel = MONTHS[selectedMonthIdx] + " " + selectedYear;
   const isCurrentPeriod = selectedYear === dataYear && selectedMonthIdx === dataMonth;
 
+  // Extend the current-year accumulation into the future with the 7-day
+  // forecast (same reference station), drawn dotted to flag it as projected.
+  // Forecast rain is cumulated onto the last actual accum value; only forecast
+  // days that fall within the displayed month are included.
+  const chartData = useMemo(() => {
+    type Row = Partial<DailyRow> & { day: number; forecast_accum_mm?: number | null };
+    const rows: Row[] = daily.map((d) => ({ ...d }));
+    const lastActual = [...daily].reverse().find((d) => d.accum_mm != null);
+    if (!lastActual) return rows;
+
+    const byDay = new Map<number, Row>(rows.map((r) => [r.day, r]));
+    // Anchor the dotted line on the last actual point so the two lines join.
+    byDay.get(lastActual.day)!.forecast_accum_mm = lastActual.accum_mm;
+
+    let acc = lastActual.accum_mm ?? 0;
+    for (const f of forecast) {
+      const [y, m, d] = f.date.split("-").map(Number);
+      if (y !== dataYear || m - 1 !== dataMonth || d <= lastActual.day) continue;
+      acc += f.rain_mm;
+      const existing = byDay.get(d);
+      if (existing) existing.forecast_accum_mm = r1(acc);
+      else byDay.set(d, { day: d, forecast_accum_mm: r1(acc) });
+    }
+    return Array.from(byDay.values()).sort((a, b) => a.day - b.day);
+  }, [daily, forecast, dataYear, dataMonth]);
+
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
       <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
         Daily Accumulated Rainfall — {monthLabel} (mm)
       </div>
-      <div className="text-[8px] text-slate-600 mb-1">{station} station · Band = 10yr min/max</div>
+      <div className="text-[8px] text-slate-600 mb-1">{station} station · Band = 10yr min/max · Dotted = 7-day forecast</div>
       {isCurrentPeriod ? (
         <ResponsiveContainer width="100%" height={155}>
-          <ComposedChart data={daily} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
               tickFormatter={(v) => `${v}`} interval={4} />
@@ -144,6 +171,9 @@ function DailyAccumChart({
               stroke="#93c5fd" strokeWidth={1.5} dot={false} />
             <Line type="monotone" dataKey="accum_mm" name={`${curYear}`}
               stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
+            <Line type="monotone" dataKey="forecast_accum_mm" name={`${curYear} forecast`}
+              stroke="#38bdf8" strokeWidth={2} strokeDasharray="2 3" dot={false}
+              activeDot={{ r: 3 }} connectNulls opacity={0.85} />
           </ComposedChart>
         </ResponsiveContainer>
       ) : (
@@ -542,6 +572,7 @@ export default function WeatherCharts({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <DailyAccumChart
           daily={data.daily_station}
+          forecast={data.forecast_7d}
           station={data.station}
           updated={data.updated}
           curYear={data.cur_year}
