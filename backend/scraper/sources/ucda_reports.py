@@ -74,21 +74,38 @@ def download_pdf_url(url: str) -> bytes | None:
 
 # ── PDF parsing ───────────────────────────────────────────────────────────────
 
+def _split_reconciles(s: dict) -> bool:
+    """True iff the robusta/arabica split is present AND plausible — same test
+    the exporter (_build_monthly_series) applies before keeping the split."""
+    rob, arab, tot = s.get("robusta_bags"), s.get("arabica_bags"), s.get("total_bags")
+    if not (rob and arab and tot):
+        return False
+    return abs((rob + arab) - tot) / tot < 0.05 and rob >= arab
+
+
 def _dump_parse_debug(pdf, full_text: str, month: str, summary: dict) -> None:
     """Write raw text + structural tables for a report whose Table-1 split
     failed to parse. Committed by the monthly workflow so the parser can be
     hardened from real output (no manual figure entry needed)."""
     try:
         from pathlib import Path
+        rob, arab, tot = (summary.get("robusta_bags"),
+                          summary.get("arabica_bags"),
+                          summary.get("total_bags"))
         missing = [k for k in ("robusta_bags", "arabica_bags", "total_bags")
                    if not summary.get(k)]
-        print(f"[ucda_reports] PARSE GAP {month}: missing {missing} — dumping debug")
+        if missing:
+            reason = f"missing {missing}"
+        else:
+            reason = (f"implausible split: robusta({rob:.0f})+arabica({arab:.0f})"
+                      f"={rob + arab:.0f} vs total({tot:.0f})")
+        print(f"[ucda_reports] PARSE GAP {month}: {reason} — dumping debug")
 
         out_dir = Path(__file__).resolve().parents[1] / "cache" / "ucda_debug"
         out_dir.mkdir(parents=True, exist_ok=True)
 
         lines = [f"# UCDA parse-gap debug — {month}",
-                 f"# missing fields: {missing}",
+                 f"# reason: {reason}",
                  f"# parsed summary: {json.dumps(summary, ensure_ascii=False)}",
                  "", "===== EXTRACTED TEXT (first 2 pages) ====="]
         lines.append(full_text[:8000])
@@ -131,11 +148,15 @@ def parse_pdf(pdf_bytes: bytes) -> dict | None:
 
             summary      = _parse_summary(full_text, report_month)
 
-            # Self-diagnostic: a valid report that yields no robusta/arabica
-            # split (or no total) means the Table-1 layout defeated the regex.
-            # Dump the raw text + structural tables so the parser can be fixed
-            # from real output instead of silently rendering a blank month.
-            if not all(summary.get(k) for k in ("robusta_bags", "arabica_bags", "total_bags")):
+            # Self-diagnostic: dump raw text + structural tables when the
+            # Table-1 split is missing OR implausible. "Implausible" mirrors
+            # the reconciliation the exporter uses (robusta+arabica must be
+            # within 5% of total, and robusta>=arabica) — a present-but-wrong
+            # split passes a naive presence check yet is silently dropped
+            # downstream, leaving a blank month. Dumping here surfaces the
+            # real layout (and the wrong values grabbed) so the parser can be
+            # fixed precisely instead of by manual entry.
+            if not _split_reconciles(summary):
                 _dump_parse_debug(pdf, full_text, report_month, summary)
 
             trend_12m    = _parse_trend(pages_text[0], report_month)
