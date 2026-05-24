@@ -68,6 +68,9 @@ jobs:
           # Don't suppress errors — we want to see them.
           git add -f backend/scraper/cache/vn_fertilizer.json || echo "  (vn_fertilizer.json not added)"
           git add -f backend/scraper/cache/vn_coffee_export.json || echo "  (vn_coffee_export.json not added)"
+          # UCDA parse-gap diagnostics (only present when a report's Table-1
+          # split failed to parse) — committed so the parser can be hardened.
+          git add -f backend/scraper/cache/ucda_debug/*.txt 2>/dev/null || echo "  (no ucda_debug files)"
           echo "[diag] staged files:"
           git diff --cached --name-only
           if git diff --cached --quiet; then

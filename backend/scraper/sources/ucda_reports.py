@@ -74,6 +74,41 @@ def download_pdf_url(url: str) -> bytes | None:
 
 # ── PDF parsing ───────────────────────────────────────────────────────────────
 
+def _dump_parse_debug(pdf, full_text: str, month: str, summary: dict) -> None:
+    """Write raw text + structural tables for a report whose Table-1 split
+    failed to parse. Committed by the monthly workflow so the parser can be
+    hardened from real output (no manual figure entry needed)."""
+    try:
+        from pathlib import Path
+        missing = [k for k in ("robusta_bags", "arabica_bags", "total_bags")
+                   if not summary.get(k)]
+        print(f"[ucda_reports] PARSE GAP {month}: missing {missing} — dumping debug")
+
+        out_dir = Path(__file__).resolve().parents[1] / "cache" / "ucda_debug"
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        lines = [f"# UCDA parse-gap debug — {month}",
+                 f"# missing fields: {missing}",
+                 f"# parsed summary: {json.dumps(summary, ensure_ascii=False)}",
+                 "", "===== EXTRACTED TEXT (first 2 pages) ====="]
+        lines.append(full_text[:8000])
+        lines.append("\n===== STRUCTURAL TABLES (first 3 pages) =====")
+        for i, pg in enumerate(pdf.pages[:3]):
+            try:
+                tables = pg.extract_tables() or []
+            except Exception as e:
+                tables = []
+                lines.append(f"[page {i}] extract_tables error: {e}")
+            for j, tbl in enumerate(tables):
+                lines.append(f"\n--- page {i} table {j} ---")
+                for row in tbl:
+                    lines.append(" | ".join("" if c is None else str(c) for c in row))
+
+        (out_dir / f"{month}.txt").write_text("\n".join(lines), encoding="utf-8")
+    except Exception as e:
+        print(f"[ucda_reports] debug dump failed for {month}: {e}")
+
+
 def parse_pdf(pdf_bytes: bytes) -> dict | None:
     try:
         import pdfplumber
@@ -95,6 +130,14 @@ def parse_pdf(pdf_bytes: bytes) -> dict | None:
                 return None
 
             summary      = _parse_summary(full_text, report_month)
+
+            # Self-diagnostic: a valid report that yields no robusta/arabica
+            # split (or no total) means the Table-1 layout defeated the regex.
+            # Dump the raw text + structural tables so the parser can be fixed
+            # from real output instead of silently rendering a blank month.
+            if not all(summary.get(k) for k in ("robusta_bags", "arabica_bags", "total_bags")):
+                _dump_parse_debug(pdf, full_text, report_month, summary)
+
             trend_12m    = _parse_trend(pages_text[0], report_month)
             farmgate     = _parse_farmgate(full_text)
             grades       = _parse_grades(pdf, full_text)
