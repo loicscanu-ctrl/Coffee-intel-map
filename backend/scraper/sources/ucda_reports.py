@@ -25,6 +25,17 @@ _HEADERS   = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 _TIMEOUT   = 30
 _MAX_HTTP_FAILS = 15  # stop after this many consecutive HTTP errors (404/timeout)
 
+# Reports newer than the legacy numeric-ID scheme are published as direct files
+# under /sites/default/files/. The ID scan never reaches them (and never probes
+# IDs above its hardcoded start), so list such reports here — they are fetched
+# and re-parsed on every run (overwriting any stale/partial stored copy).
+# Add new monthly-report URLs here as UCDA publishes them.
+KNOWN_REPORT_URLS = [
+    "https://ugandacoffee.go.ug/sites/default/files/2026-05/06-March%202026%20Report%20pptx%281%29_Final.pdf",
+    "https://ugandacoffee.go.ug/sites/default/files/2025-07/09-June%202025%20Report%20pptx%281%29.pdf",
+    "https://ugandacoffee.go.ug/sites/default/files/2025-08/10-July%202025%20Report%20pptx..pdfI_.pdf",
+]
+
 _MONTHS = {
     "january": 1, "february": 2, "march": 3, "april": 4,
     "may": 5, "june": 6, "july": 7, "august": 8,
@@ -44,6 +55,20 @@ def download_pdf(doc_id: int) -> bytes | None:
         return None
     except Exception as e:
         print(f"[ucda_reports] doc {doc_id} fetch failed: {type(e).__name__}: {e}")
+        return None
+
+
+def download_pdf_url(url: str) -> bytes | None:
+    """Fetch a report by full URL (e.g. a /sites/default/files/ direct link)."""
+    try:
+        r = requests.get(url, headers=_HEADERS, timeout=_TIMEOUT, allow_redirects=True)
+        ct = r.headers.get("Content-Type", "")
+        if r.status_code == 200 and ("pdf" in ct.lower() or url.lower().endswith(".pdf")):
+            return r.content
+        print(f"[ucda_reports] {url} → HTTP {r.status_code} ({ct})")
+        return None
+    except Exception as e:
+        print(f"[ucda_reports] url fetch failed: {type(e).__name__}: {e}")
         return None
 
 
@@ -426,40 +451,67 @@ def _upsert_report(db, data: dict) -> None:
 
 # ── Public run function ───────────────────────────────────────────────────────
 
-async def run(page, db, start_id: int = 1319, scan_back: int = 60) -> None:
-    """Side-channel: download and parse UCDA PDFs, store new months in DB."""
+async def run(page, db, start_id: int = 1319, scan_back: int = 60,
+              scan_forward: int = 250) -> None:
+    """Side-channel: download and parse UCDA PDFs, store new months in DB.
+
+    Discovery has three passes:
+      1. backward ID scan  (start_id → start_id-scan_back) — recent legacy IDs;
+      2. forward ID scan   (start_id+1 → start_id+scan_forward) — newer reports
+         get *higher* IDs, which the original backward-only scan never reached;
+      3. KNOWN_REPORT_URLS — explicit direct-file links, always re-parsed.
+    """
     stored = _stored_months(db)
     print(f"[ucda_reports] already stored: {len(stored)} months")
-
-    http_fails = 0   # only count HTTP errors (404, timeout) — NOT wrong-type PDFs
     new_count = 0
 
-    for doc_id in range(start_id, start_id - scan_back - 1, -1):
-        pdf_bytes = download_pdf(doc_id)
+    def _scan(ids) -> int:
+        n = 0
+        http_fails = 0  # only count HTTP errors (404/timeout), not wrong-type PDFs
+        for doc_id in ids:
+            pdf_bytes = download_pdf(doc_id)
+            if pdf_bytes is None:
+                http_fails += 1
+                if http_fails >= _MAX_HTTP_FAILS:
+                    print(f"[ucda_reports] {_MAX_HTTP_FAILS} consecutive HTTP errors — stopping scan")
+                    break
+                continue
+            http_fails = 0
+            data = parse_pdf(pdf_bytes)
+            if data is None:
+                continue  # not a monthly report (e.g. daily analysis PDF)
+            month = data["month"]
+            if month in stored:
+                continue
+            _upsert_report(db, data)
+            stored.add(month)
+            n += 1
+            bags = data["summary"].get("total_bags", "?")
+            print(f"[ucda_reports] ID {doc_id} ({month}): {bags} bags — stored")
+            time.sleep(0.4)
+        return n
+
+    new_count += _scan(range(start_id, start_id - scan_back - 1, -1))
+    new_count += _scan(range(start_id + 1, start_id + scan_forward + 1))
+
+    # Explicit direct-file reports (newer hosting scheme / known gaps).
+    # Always re-parse and upsert so corrected parses overwrite partial copies.
+    for url in KNOWN_REPORT_URLS:
+        pdf_bytes = download_pdf_url(url)
         if pdf_bytes is None:
-            http_fails += 1
-            if http_fails >= _MAX_HTTP_FAILS:
-                print(f"[ucda_reports] {_MAX_HTTP_FAILS} consecutive HTTP errors — stopping")
-                break
             continue
-
-        http_fails = 0  # reset on any successful PDF download
-
         data = parse_pdf(pdf_bytes)
         if data is None:
-            # Not a monthly report (e.g. daily analysis PDF) — skip silently
+            print(f"[ucda_reports] known URL parsed to non-report: {url}")
             continue
-
         month = data["month"]
-
-        if month in stored:
-            continue
-
+        was_new = month not in stored
         _upsert_report(db, data)
         stored.add(month)
-        new_count += 1
+        if was_new:
+            new_count += 1
         bags = data["summary"].get("total_bags", "?")
-        print(f"[ucda_reports] ID {doc_id} ({month}): {bags} bags — stored")
+        print(f"[ucda_reports] URL ({month}): {bags} bags — {'stored' if was_new else 're-parsed'}")
         time.sleep(0.4)
 
     print(f"[ucda_reports] Done. {new_count} new reports stored.")
