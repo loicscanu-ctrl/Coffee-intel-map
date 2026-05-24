@@ -1,6 +1,7 @@
 # backend/scraper/run_monthly.py
-# Monthly runner: CONAB supply data + Comex Stat fertilizer imports.
-# Called by scraper-monthly.yml on the 5th of each month.
+# Monthly runner: CONAB supply, Comex Stat + Vietnam fertilizer, Vietnam coffee
+# exports, and UCDA (Uganda) monthly reports.
+# Called by scraper-monthly.yml on the 12th of each month.
 import asyncio
 import os
 import sys

@@ -2,12 +2,9 @@ name: "3.3 – Monthly Scraper CONAB"
 
 on:
   schedule:
-    # TEMPORARY: one-shot probe on May 12, 2026 at 02:00 UTC to check
-    # whether MDIC publishes by day 12. Previous schedule was day 23
-    # (set in commit history after PR #7's day-18 attempt also returned
-    # empty). If May 12 returns fresh data, switch to '0 2 12 * *' for
-    # a permanent earlier fetch; if empty, revert to day 23 or push later.
-    - cron: '0 2 12 5 *'
+    # Runs the 12th of every month at 02:00 UTC. Covers CONAB/MDIC, Vietnam
+    # exports/fertilizer, and the UCDA (Uganda) monthly report scraper.
+    - cron: '0 2 12 * *'
   workflow_dispatch:
 
 concurrency:
