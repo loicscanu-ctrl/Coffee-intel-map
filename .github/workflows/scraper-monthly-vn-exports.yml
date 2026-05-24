@@ -1,10 +1,8 @@
-name: "3.3 – Monthly Scraper CONAB"
+name: "3.3.4 – Monthly Scraper · Vietnam Coffee Exports"
 
 on:
   schedule:
-    # Runs the 12th of every month at 02:00 UTC. Covers CONAB/MDIC, Vietnam
-    # exports/fertilizer, and the UCDA (Uganda) monthly report scraper.
-    - cron: '0 2 12 * *'
+    - cron: '30 4 12 * *'   # 12th of each month, 04:30 UTC
   workflow_dispatch:
 
 concurrency:
@@ -12,12 +10,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  scrape-monthly:
+  scrape:
     runs-on: ubuntu-22.04
-    timeout-minutes: 45
+    timeout-minutes: 30
     permissions:
       contents: write
-
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +26,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install -r scraper/requirements.txt pandas requests yfinance python-dotenv openpyxl xlrd
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl xlrd
 
       - name: Cache Playwright browser
         uses: actions/cache@v4
@@ -40,40 +37,28 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run monthly scraper (3 attempts)
+      - name: Run Vietnam coffee export scraper (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           for attempt in 1 2 3; do
-            python -m scraper.run_monthly && break
+            python -m scraper.run_monthly vn_export && break
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
-      - name: Commit scraped cache files if changed
+      - name: Commit cache file if changed
         run: |
-          set -x  # echo every command + result to the log
+          set -x
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          echo "[diag] checked-out commit: $GITHUB_SHA"
-          echo "[diag] ref: $GITHUB_REF_NAME"
-          echo "[diag] cache dir before commit:"
-          ls -la backend/scraper/cache/ || echo "  (cache dir missing)"
-          # backend/scraper/cache/ is .gitignored locally; force-add the files
-          # we publish so they actually land in the repo.
           mkdir -p backend/scraper/cache
-          # Don't suppress errors — we want to see them.
-          git add -f backend/scraper/cache/vn_fertilizer.json || echo "  (vn_fertilizer.json not added)"
+          # backend/scraper/cache/ is .gitignored locally; force-add the file.
           git add -f backend/scraper/cache/vn_coffee_export.json || echo "  (vn_coffee_export.json not added)"
-          # UCDA parse-gap diagnostics (only present when a report's Table-1
-          # split failed to parse) — committed so the parser can be hardened.
-          git add -f backend/scraper/cache/ucda_debug/*.txt 2>/dev/null || echo "  (no ucda_debug files)"
-          echo "[diag] staged files:"
-          git diff --cached --name-only
           if git diff --cached --quiet; then
             echo "No cache changes."
           else
-            git commit -m "data: monthly scraper cache update [skip ci]"
+            git commit -m "data: vn_coffee_export monthly update [skip ci]"
             git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
