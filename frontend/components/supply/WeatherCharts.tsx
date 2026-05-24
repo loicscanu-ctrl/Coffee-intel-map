@@ -241,6 +241,7 @@ interface CumRainRow {
   cumMax: number;
   cumLastYear: number;
   cumCur: number | null;
+  cumProj: number | null;
 }
 
 function CumulativeRainChart({ data, curYear, lastYear }: { data: CumRainRow[]; curYear: number; lastYear: number }) {
@@ -252,7 +253,7 @@ function CumulativeRainChart({ data, curYear, lastYear }: { data: CumRainRow[]; 
         Cumulative YTD Rainfall (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">
-        Pro-rata prod-weighted · {curYear} through {lastActualMonth ?? "—"} · Band = 10yr min/max
+        Pro-rata prod-weighted · {curYear} through {lastActualMonth ?? "—"} · Band = 10yr min/max · Amber dots = projected month-end (MTD+forecast trend)
       </div>
       <ResponsiveContainer width="100%" height={155}>
         <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
@@ -279,6 +280,10 @@ function CumulativeRainChart({ data, curYear, lastYear }: { data: CumRainRow[]; 
           {lastActualMonth && <ReferenceLine x={lastActualMonth} stroke="#334155" strokeDasharray="2 2" />}
           <Line type="monotone" dataKey="cumCur" name={`${curYear}`}
             stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
+          {/* projected current-month-end (month-to-date + forecast trend, extrapolated) */}
+          <Line type="monotone" dataKey="cumProj" name={`${curYear} proj.`}
+            stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="2 3"
+            dot={{ r: 2, fill: "#fbbf24", strokeWidth: 0 }} activeDot={{ r: 3 }} connectNulls={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -442,9 +447,9 @@ export default function WeatherCharts({
   }, [activeProv, totalProd]);
 
   const cumulativeData = useMemo<CumRainRow[]>(() => {
-    if (!totalProd) return [];
+    if (!data || !totalProd) return [];
     let cumAvg = 0, cumMin = 0, cumMax = 0, cumLY = 0, cumC = 0;
-    return MONTHS.map((month, i) => {
+    const rows: CumRainRow[] = MONTHS.map((month, i) => {
       cumAvg += wsum(activeProv, (p) => p.monthly_avg_rain[i])       / totalProd;
       cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i])       / totalProd;
       cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i])       / totalProd;
@@ -458,9 +463,41 @@ export default function WeatherCharts({
         cumMax:      Math.round(cumMax),
         cumLastYear: Math.round(cumLY),
         cumCur:      hasActual ? Math.round(cumC) : null,
+        cumProj:     null,
       };
     });
-  }, [activeProv, totalProd]);
+
+    // Project the current (partial) month to month-end: average daily rate over
+    // the known window (month-to-date actuals + 7-day forecast) extrapolated
+    // across the whole month. Drawn dissociated from the actual line.
+    const curIdx = rows.reduce((acc, r, i) => (r.cumCur !== null ? i : acc), -1);
+    if (curIdx >= 0) {
+      const parts = data.updated.split("-");
+      const curYearNum  = parseInt(parts[0]);
+      const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
+      const daysInMonth = new Date(curYearNum, curIdx + 1, 0).getDate();
+
+      let fcRain = 0, fcDays = 0;
+      data.forecast_7d.forEach((f, i) => {
+        const [y, m] = f.date.split("-").map(Number);
+        if (y === curYearNum && m - 1 === curIdx) {
+          fcRain += wsum(activeProv, (p) => p.forecast_7d_rain[i] ?? 0) / totalProd;
+          fcDays += 1;
+        }
+      });
+
+      const mtd       = wsum(activeProv, (p) => p.monthly_actual_cur[curIdx]) / totalProd;
+      const prevCum   = (rows[curIdx].cumCur as number) - mtd;
+      const knownDays = daysElapsed + fcDays;
+      if (knownDays > 0) {
+        const avgDaily   = (mtd + fcRain) / knownDays;
+        const projEndCum = prevCum + avgDaily * daysInMonth;
+        if (curIdx > 0) rows[curIdx - 1].cumProj = rows[curIdx - 1].cumCur; // anchor on the actual line
+        rows[curIdx].cumProj = Math.round(projEndCum);
+      }
+    }
+    return rows;
+  }, [data, activeProv, totalProd]);
 
   const tempData = useMemo<TempRow[]>(() => {
     if (!totalProd) return [];
