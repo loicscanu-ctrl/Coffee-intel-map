@@ -147,7 +147,8 @@ flowchart TD
 | Acaphe | Live Quotes Poll | every 15m | live quotes | `acaphe_live.json` |
 | 2.2 | Commodity Prices | Tue 22:55 | all-commodity prices | DB `commodity_prices` |
 | **2.3** | COT Scraper **+ archive price rebuild** | Fri 20:00 | CFTC COT (all commodities + coffee) → DB; **then rebuild cot_weekly prices from archive (max-OI)** | DB |
-| 3.1/3.2/3.3/4.1 | Kaffeesteuer / Cecafe / CONAB / Earnings | monthly+ | tax/exports/costs/earnings | DB / JSON |
+| 3.1/3.2/4.1 | Kaffeesteuer / Cecafe / Earnings | monthly+ | tax/exports/earnings | DB / JSON |
+| 3.3.1–3.3.5 | CONAB · BR Fertilizer · VN Fertilizer · VN Coffee Exports · Uganda UCDA | monthly (12th; UG 14th) | supply/costs/exports | DB / JSON |
 | 0.1–0.4 | One-shot backfills | manual | *(archive loads, rebuilds)* | DB / archive |
 
 **Retired:** ~~2.1 Tuesday Coffee Settlement Prices~~ — replaced by the archive rebuild step inside 2.3.
@@ -203,7 +204,11 @@ flowchart TD
 | | archive rebuild → `cot.json` price | `Step4IndustryPulse` | **COT · Industry Pulse price (true max-OI)** |
 | **3.1 Kaffeesteuer** | `kaffeesteuer.json` | `KaffeesteuerChart` | **Demand · Kaffeesteuer (DE tax)** |
 | **3.2 Cecafe Export** | `cecafe.json` | `CoffeeMap` | **Map · Brazil monthly exports** |
-| **3.3 CONAB** | `farmer_economics.json` | `FertilizerInputsPanel` / `FarmerSellingPanel` | **Macro · Fertilizer Inputs** + **Supply · Farmer Economics** |
+| **3.3.1 CONAB** | `farmer_economics.json` | `FarmerSellingPanel` | **Supply · Brazil Farmer Economics** |
+| **3.3.2 BR Fertilizer** | `farmer_economics.json` | `FertilizerInputsPanel` | **Macro · Fertilizer Inputs (Brazil)** |
+| **3.3.3 VN Fertilizer** | `vn_fertilizer.json` | `VnFarmerEconomics` | **Supply · VN Farmer Economics (fertilizer cost)** |
+| **3.3.4 VN Coffee Exports** | `vn_coffee_export.json` → `vietnam_supply.json` | `VnExportExplorer` / `VnBalanceSheet` | **Supply · VN Export Explorer + Balance Sheet** |
+| **3.3.5 Uganda UCDA** | `uganda_supply.json` | `UgandaTab` | **Supply · Uganda (exports, robusta/arabica split, grades, destinations)** |
 | **4.1 Earnings** | `earnings.json` | `EarningsTable` | **Demand · Roaster Earnings** |
 | _various / manual_ | `factory_mix.json` | `RoastingMixPanel` | **Demand · Roasting Mix** |
 | | `global_fertilizers.json` | `FertilizersTab` | **Supply · Fertilizers** |
@@ -334,10 +339,15 @@ flowchart LR
 flowchart LR
   W17["1.7 Cecafe daily · 09:00<br/>B3 · cecafe.com.br"]
   W32["3.2 Cecafe export · 15th<br/>cecafe"]
-  W33["3.3 CONAB · May<br/>conab.gov.br"]
-  WCNTRY["Origin supply<br/>ICO · USDA · customs<br/>(CO·VN·ET·HN·ID·UG)"]
+  W331["3.3.1 CONAB · 12th<br/>conab.gov.br"]
+  W332["3.3.2 BR Fertilizer · 12th<br/>Comex Stat"]
+  W333["3.3.3 VN Fertilizer · 12th<br/>VN Customs"]
+  W334["3.3.4 VN Coffee Exports · 12th<br/>VN Customs"]
+  W335["3.3.5 Uganda UCDA · 14th<br/>ugandacoffee.go.ug"]
+  WCNTRY["Origin supply<br/>ICO · USDA · customs<br/>(CO·VN·ET·HN·ID)"]
   WFERT["Fertilizers · UN Comtrade · World Bank"]
   WINTEL["manual intel"]
+  DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   J_cecd[/cecafe_daily.json/]
   J_cec[/cecafe.json/]
@@ -383,7 +393,12 @@ flowchart LR
   J_cecd --> mv
   J_cecd --> brexp
   W32 --> J_cec --> cec
-  W33 --> EXP
+  W331 --> DB
+  W332 --> DB
+  W335 --> DB
+  DB --> EXP
+  W333 --> EXP
+  W334 --> EXP
   WCNTRY --> EXP
   WFERT --> J_ferts
   WINTEL --> J_intel
@@ -425,7 +440,8 @@ flowchart LR
   classDef proc fill:#1f2937,stroke:#64748b,color:#cbd5e1;
   classDef json fill:#1e293b,stroke:#475569,color:#cbd5e1;
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W33,WCNTRY,WFERT,WINTEL,W110 scr;
+  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,W110 scr;
+  class DB store;
   class EXP proc;
   class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_whist,J_owx json;
   class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel,owx vis;
@@ -489,7 +505,7 @@ flowchart LR
   W23["2.3 COT · Fri 20:00 · CFTC"]
   WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
   WCPI["Retail CPI · BLS · Eurostat · BCB"]
-  W33["3.3 CONAB · May · conab.gov.br"]
+  W33["3.3.1–3.3.3 CONAB + Fertilizer · 12th<br/>conab.gov.br · Comex · VN Customs"]
   EXP{{"1.4 Export · 02:30"}}
   J_mac[/macro_cot.json/]
   J_q[/quant_report.json/]

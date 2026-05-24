@@ -124,10 +124,15 @@ ${DEFS}
 const SUPPLY = `flowchart LR
   W17["1.7 Cecafe daily · 09:00<br/>B3 · cecafe.com.br"]
   W32["3.2 Cecafe export · 15th<br/>cecafe"]
-  W33["3.3 CONAB · May<br/>conab.gov.br"]
-  WCNTRY["Origin supply<br/>ICO · USDA · customs<br/>(CO·VN·ET·HN·ID·UG)"]
+  W331["3.3.1 CONAB · 12th<br/>conab.gov.br"]
+  W332["3.3.2 BR Fertilizer · 12th<br/>Comex Stat"]
+  W333["3.3.3 VN Fertilizer · 12th<br/>VN Customs"]
+  W334["3.3.4 VN Coffee Exports · 12th<br/>VN Customs"]
+  W335["3.3.5 Uganda UCDA · 14th<br/>ugandacoffee.go.ug"]
+  WCNTRY["Origin supply<br/>ICO · USDA · customs<br/>(CO·VN·ET·HN·ID)"]
   WFERT["Fertilizers · UN Comtrade · World Bank"]
   WINTEL["manual intel"]
+  DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   J_cecd[/cecafe_daily.json/]
   J_cec[/cecafe.json/]
@@ -169,7 +174,12 @@ const SUPPLY = `flowchart LR
   J_cecd --> mv
   J_cecd --> brexp
   W32 --> J_cec --> cec
-  W33 --> EXP
+  W331 --> DB
+  W332 --> DB
+  W335 --> DB
+  DB --> EXP
+  W333 --> EXP
+  W334 --> EXP
   WCNTRY --> EXP
   WFERT --> J_ferts
   WINTEL --> J_intel
@@ -204,7 +214,8 @@ const SUPPLY = `flowchart LR
   J_intel --> intel
 ${DEFS}
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W33,WCNTRY,WFERT,WINTEL scr;
+  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL scr;
+  class DB store;
   class EXP proc;
   class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel json;
   class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel vis;`;
@@ -256,7 +267,7 @@ const MACRO = `flowchart LR
   W23["2.3 COT · Fri 20:00 · CFTC"]
   WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
   WCPI["Retail CPI · BLS · Eurostat · BCB"]
-  W33["3.3 CONAB · May · conab.gov.br"]
+  W33["3.3.1–3.3.3 CONAB + Fertilizer · 12th<br/>conab.gov.br · Comex · VN Customs"]
   EXP{{"1.4 Export · 02:30"}}
   J_mac[/macro_cot.json/]
   J_q[/quant_report.json/]
@@ -401,14 +412,18 @@ const ROWS: Row[] = [
   { wf: "2.3 COT + rebuild", output: "signals.json", component: "morning_brief", visual: "Telegram · CoT signals" },
   { wf: "3.1 Kaffeesteuer", output: "kaffeesteuer.json", component: "KaffeesteuerChart", visual: "Demand · Kaffeesteuer (DE tax)" },
   { wf: "3.2 Cecafe Export", output: "cecafe.json", component: "CoffeeMap", visual: "Map · Brazil monthly exports" },
-  { wf: "3.3 CONAB", output: "farmer_economics.json", component: "FertilizerInputsPanel · FarmerSellingPanel", visual: "Macro · Fertilizer Inputs + Supply · Farmer Economics" },
+  { wf: "3.3.1 CONAB", output: "farmer_economics.json", component: "FarmerSellingPanel", visual: "Supply · Brazil Farmer Economics" },
+  { wf: "3.3.2 BR Fertilizer", output: "farmer_economics.json", component: "FertilizerInputsPanel", visual: "Macro · Fertilizer Inputs (Brazil)" },
+  { wf: "3.3.3 VN Fertilizer", output: "vn_fertilizer.json", component: "VnFarmerEconomics", visual: "Supply · VN Farmer Economics (fertilizer cost)" },
+  { wf: "3.3.4 VN Coffee Exports", output: "vn_coffee_export.json → vietnam_supply.json", component: "VnExportExplorer · VnBalanceSheet", visual: "Supply · VN Export Explorer + Balance Sheet" },
+  { wf: "3.3.5 Uganda UCDA", output: "uganda_supply.json", component: "UgandaTab", visual: "Supply · Uganda (exports, split, grades, destinations)" },
   { wf: "4.1 Earnings", output: "earnings.json", component: "EarningsTable", visual: "Demand · Roaster Earnings" },
   { wf: "various / manual", output: "factory_mix.json", component: "RoastingMixPanel", visual: "Demand · Roasting Mix" },
   { wf: "various / manual", output: "global_fertilizers.json", component: "FertilizersTab", visual: "Supply · Fertilizers" },
   { wf: "various / manual", output: "manual_intel.json", component: "ManualIntelPanel", visual: "Supply · Manual Intel" },
   { wf: "various / manual", output: "retail_cpi.json", component: "RetailCpiPanel", visual: "Macro · Retail CPI" },
   { wf: "various / manual", output: "origin_prices_history.json", component: "OriginPricesPanel", visual: "Macro · Origin Prices" },
-  { wf: "various / manual", output: "*_supply.json", component: "country tabs", visual: "Supply · country pages + Map" },
+  { wf: "various / manual", output: "*_supply.json (CO·ET·HN·ID)", component: "country tabs", visual: "Supply · country pages + Map (UG now via 3.3.5)" },
 ];
 
 function WorkflowTable() {
