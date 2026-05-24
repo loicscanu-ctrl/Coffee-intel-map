@@ -16,6 +16,7 @@ interface Province {
   monthly_avg_rain: number[];
   monthly_min_rain: number[];
   monthly_max_rain: number[];
+  monthly_dry_warn?: number[];
   monthly_last_year_rain: number[];
   monthly_actual_cur: number[];
   monthly_avg_temp: number[];
@@ -165,7 +166,7 @@ function DailyAccumChart({
               stroke="none" opacity={0.5} legendType="none" />
             <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
               stroke="none" opacity={1} legendType="none" />
-            <Line type="monotone" dataKey="avg_accum_mm" name="hist. avg"
+            <Line type="monotone" dataKey="avg_accum_mm" name="30yr avg"
               stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
             <Line type="monotone" dataKey="last_year_accum_mm" name={`${lastYear}`}
               stroke="#93c5fd" strokeWidth={1.5} dot={false} />
@@ -194,9 +195,11 @@ interface MonthlyRainRow {
   maxRain: number;
   lastYearRain: number;
   actualCur: number | null;
+  dryWarn: number;   // drought-risk threshold (≤P20 of last 30yr); 0 = no data
 }
 
 function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[]; curYear: number; lastYear: number }) {
+  const hasZone = data.some((d) => d.dryWarn > d.minRain);
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
       <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
@@ -204,6 +207,7 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
       </div>
       <div className="text-[8px] text-slate-600 mb-1">
         Pro-rata prod-weighted · Blue = {curYear} · Light blue = {lastYear} · Band = 10yr min/max
+        {hasZone && " · Orange = drought-risk zone (below 30yr P20)"}
       </div>
       <ResponsiveContainer width="100%" height={155}>
         <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barCategoryGap="30%">
@@ -215,9 +219,15 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
             return `${Number(v).toFixed(1)} mm`;
           }} />
           <Legend wrapperStyle={{ fontSize: 9 }} />
-          {/* 10yr range band — rendered first (behind bars) */}
+          {/* 10yr range band — rendered first (behind bars).
+              Paint order matters: max (blue) → dry-warning (orange) → min (bg)
+              so the visible orange is confined to [min, dryWarn] and the bg
+              area masks everything below the 10yr min. */}
           <Area type="monotone" dataKey="maxRain" name="10yr max" fill="#1e3a5f"
             stroke="none" opacity={0.5} legendType="none" />
+          <Area type="monotone" dataKey="dryWarn" name="drought-risk (≤P20)"
+            fill="#fb923c" stroke="none" opacity={0.4} isAnimationActive={false}
+            legendType={hasZone ? "rect" : "none"} />
           <Area type="monotone" dataKey="minRain" name="10yr min" fill="#0f172a"
             stroke="none" opacity={1} legendType="none" />
           {/* last-year and current-year bars */}
@@ -434,16 +444,22 @@ export default function WeatherCharts({
 
   const monthlyRainData = useMemo<MonthlyRainRow[]>(() => {
     if (!totalProd) return [];
-    return MONTHS.map((month, i) => ({
-      month,
-      avgRain:      r1(wsum(activeProv, (p) => p.monthly_avg_rain[i])      / totalProd),
-      minRain:      r1(wsum(activeProv, (p) => p.monthly_min_rain[i])      / totalProd),
-      maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
-      lastYearRain: r1(wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd),
-      actualCur:    activeProv.every((p) => p.monthly_actual_cur.length > i)
-        ? r1(wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd)
-        : null,
-    }));
+    const hasDryWarn = activeProv.every((p) => Array.isArray(p.monthly_dry_warn) && p.monthly_dry_warn.length === 12);
+    return MONTHS.map((month, i) => {
+      const minRain = r1(wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd);
+      const dryWarn = hasDryWarn ? r1(wsum(activeProv, (p) => p.monthly_dry_warn![i]) / totalProd) : 0;
+      return {
+        month,
+        avgRain:      r1(wsum(activeProv, (p) => p.monthly_avg_rain[i])      / totalProd),
+        minRain,
+        maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
+        lastYearRain: r1(wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd),
+        actualCur:    activeProv.every((p) => p.monthly_actual_cur.length > i)
+          ? r1(wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd)
+          : null,
+        dryWarn,
+      };
+    });
   }, [activeProv, totalProd]);
 
   const cumulativeData = useMemo<CumRainRow[]>(() => {

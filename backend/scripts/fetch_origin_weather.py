@@ -266,13 +266,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
                       if int(date[:4]) == CUR_YEAR and int(date[5:7]) == cur_month)
     daily_rows = []
     if cur_days:
+        last_actual = max(cur_days)
         accum = 0.0
         ly_accum = 0.0
-        for d in range(1, max(cur_days) + 1):
+        # Emit the whole month so the climatology band/avg/last-year lines span
+        # past the forecast window; current-year accum is null after the last
+        # actual day (the chart bridges that gap with the forecast projection).
+        for d in range(1, dim + 1):
             key = f"{CUR_YEAR}-{cur_month:02d}-{d:02d}"
             v = ref_hist.get(key, {})
             rain = v.get("rain", 0.0) or 0.0
-            accum += rain
             lyk = f"{LAST_YEAR}-{cur_month:02d}-{d:02d}"
             lv = ref_hist.get(lyk)
             avg_accum = month_norm * (d / dim)
@@ -281,10 +284,17 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
                 ly_val = r1(ly_accum)
             else:
                 ly_val = r1(avg_accum * 1.08)
+            if d <= last_actual:
+                accum += rain
+                rain_out: float = r1(rain)
+                accum_out: float | None = r1(accum)
+            else:
+                rain_out = 0.0
+                accum_out = None
             daily_rows.append({
                 "day": d,
-                "rain_mm": r1(rain),
-                "accum_mm": r1(accum),
+                "rain_mm": rain_out,
+                "accum_mm": accum_out,
                 "avg_accum_mm": r1(avg_accum),
                 "min_accum_mm": r1(avg_accum * 0.6),
                 "max_accum_mm": r1(avg_accum * 1.5),

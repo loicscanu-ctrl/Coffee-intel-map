@@ -52,6 +52,8 @@ CUR_YEAR = TODAY.year
 LAST_YEAR = CUR_YEAR - 1
 NORMAL_START, NORMAL_END = 1991, 2020          # 30yr normal
 RANGE_START, RANGE_END = CUR_YEAR - 10, CUR_YEAR - 1  # 10yr min/max band
+DRY_START, DRY_END = CUR_YEAR - 30, CUR_YEAR - 1  # last 30yr, drought-risk window
+DRY_PCTL = 0.20                                # ≤P20 of the last 30yr = "too dry"
 ARCHIVE_START = f"{NORMAL_START}-01-01"
 # Archive lags ~5 days; pull through a week ago to stay inside available data.
 ARCHIVE_END = (TODAY - dt.timedelta(days=6)).isoformat()
@@ -233,6 +235,19 @@ def _range(by_year: dict[tuple[int, int], float], month: int, y0: int, y1: int):
     return min(vals), max(vals)
 
 
+def _pctl(by_year: dict[tuple[int, int], float], month: int, y0: int, y1: int, q: float) -> float:
+    """Linear-interpolated q-quantile (0..1) of monthly totals over [y0, y1]."""
+    vals = sorted(v for (y, m), v in by_year.items() if m == month and y0 <= y <= y1)
+    if not vals:
+        return 0.0
+    if len(vals) == 1:
+        return vals[0]
+    pos = q * (len(vals) - 1)
+    lo = int(pos)
+    hi = min(lo + 1, len(vals) - 1)
+    return vals[lo] + (vals[hi] - vals[lo]) * (pos - lo)
+
+
 def _year_series(by_year: dict[tuple[int, int], float], year: int, full: bool):
     """12-length list for `year`; if not full, truncated at the last month present."""
     out = []
@@ -261,6 +276,7 @@ def build_region(cfg: dict) -> dict:
         "monthly_avg_rain":       [r1(_normal(rain_by, m, NORMAL_START, NORMAL_END)) for m in range(1, 13)],
         "monthly_min_rain":       [r1(_range(rain_by, m, RANGE_START, RANGE_END)[0]) for m in range(1, 13)],
         "monthly_max_rain":       [r1(_range(rain_by, m, RANGE_START, RANGE_END)[1]) for m in range(1, 13)],
+        "monthly_dry_warn":       [r1(_pctl(rain_by, m, DRY_START, DRY_END, DRY_PCTL)) for m in range(1, 13)],
         "monthly_last_year_rain": _year_series(rain_by, LAST_YEAR, full=True),
         "monthly_actual_cur":     _year_series(rain_by, CUR_YEAR, full=False),
         "monthly_avg_temp":       [r1(_normal(temp_by, m, NORMAL_START, NORMAL_END)) for m in range(1, 13)],

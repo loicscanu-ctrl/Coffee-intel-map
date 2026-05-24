@@ -158,6 +158,9 @@ def build_region(rc: dict, total_prod: int) -> dict:
     min_rain = [a * 0.55 for a in avg_rain]
     max_rain = [a * 1.5 for a in avg_rain]
     last_year_rain = [a * 1.06 for a in avg_rain]
+    # Drought-risk threshold ≈ 20th percentile of the last-30yr distribution.
+    # Rainfall is right-skewed, so P20 sits well below the mean (~0.70×normal).
+    dry_warn = [a * 0.70 for a in avg_rain]
 
     # Current-year-to-date actuals: completed months + the partial current month.
     actual_rain = []
@@ -188,6 +191,7 @@ def build_region(rc: dict, total_prod: int) -> dict:
         "monthly_avg_rain":        [round(x) for x in avg_rain],
         "monthly_min_rain":        [round(x) for x in min_rain],
         "monthly_max_rain":        [round(x) for x in max_rain],
+        "monthly_dry_warn":        [round(x) for x in dry_warn],
         "monthly_last_year_rain":  [round(x) for x in last_year_rain],
         "monthly_actual_cur":      [r1(x) for x in actual_rain],
         "monthly_avg_temp":        [r1(x) for x in avg_temp],
@@ -216,15 +220,25 @@ def build_daily_station(rc_name: str, avg_rain: list[float], avg_temp: list[floa
     mtd_total = month_norm * (last_day / dim) * 1.0  # ~normal pace
     daily_rain = [month_norm * (last_day / dim) * (w / wsum) for w in weights]
 
+    # Emit every day of the month so the climatology band/avg/last-year lines
+    # span the whole month (incl. the forecast window). Current-year accum is
+    # null after the last actual day — the chart fills that gap with the
+    # forecast projection.
     rows = []
     accum = 0.0
-    for i, d in enumerate(range(1, last_day + 1)):
-        accum += daily_rain[i]
+    for d in range(1, dim + 1):
         avg_accum = month_norm * (d / dim)
+        if d <= last_day:
+            accum += daily_rain[d - 1]
+            rain_mm = r1(daily_rain[d - 1])
+            accum_mm = r1(accum)
+        else:
+            rain_mm = 0.0
+            accum_mm = None
         rows.append({
             "day": d,
-            "rain_mm": r1(daily_rain[i]),
-            "accum_mm": r1(accum),
+            "rain_mm": rain_mm,
+            "accum_mm": accum_mm,
             "avg_accum_mm": r1(avg_accum),
             "min_accum_mm": r1(avg_accum * 0.6),
             "max_accum_mm": r1(avg_accum * 1.5),

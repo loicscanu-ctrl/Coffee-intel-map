@@ -56,6 +56,20 @@
         118,
         45
       ],
+      "monthly_dry_warn": [
+        2,
+        4,
+        22,
+        51,
+        141,
+        196,
+        214,
+        232,
+        186,
+        132,
+        50,
+        10
+      ],
       "monthly_last_year_rain": [
         4,
         8,
@@ -196,6 +210,20 @@
         312,
         158,
         72
+      ],
+      "monthly_dry_warn": [
+        10,
+        7,
+        29,
+        91,
+        168,
+        186,
+        189,
+        186,
+        200,
+        150,
+        66,
+        21
       ],
       "monthly_last_year_rain": [
         18,
@@ -338,6 +366,20 @@
         145,
         68
       ],
+      "monthly_dry_warn": [
+        8,
+        13,
+        39,
+        84,
+        168,
+        200,
+        188,
+        206,
+        178,
+        136,
+        62,
+        20
+      ],
       "monthly_last_year_rain": [
         15,
         22,
@@ -479,6 +521,20 @@
         132,
         45
       ],
+      "monthly_dry_warn": [
+        4,
+        7,
+        27,
+        62,
+        160,
+        217,
+        230,
+        252,
+        206,
+        164,
+        56,
+        13
+      ],
       "monthly_last_year_rain": [
         6,
         12,
@@ -619,6 +675,20 @@
         282,
         118,
         45
+      ],
+      "monthly_dry_warn": [
+        4,
+        6,
+        20,
+        52,
+        122,
+        153,
+        164,
+        178,
+        150,
+        136,
+        50,
+        13
       ],
       "monthly_last_year_rain": [
         8,
@@ -834,6 +904,196 @@
       "min_accum_mm": 45.6,
       "max_accum_mm": 115.2,
       "last_year_accum_mm": 117.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 13,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 84.3,
+      "min_accum_mm": 50.6,
+      "max_accum_mm": 126.4,
+      "last_year_accum_mm": 91.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 14,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 90.8,
+      "min_accum_mm": 54.5,
+      "max_accum_mm": 136.2,
+      "last_year_accum_mm": 98.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 15,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 97.3,
+      "min_accum_mm": 58.4,
+      "max_accum_mm": 145.9,
+      "last_year_accum_mm": 105.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 16,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 103.7,
+      "min_accum_mm": 62.2,
+      "max_accum_mm": 155.6,
+      "last_year_accum_mm": 112.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 17,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 110.2,
+      "min_accum_mm": 66.1,
+      "max_accum_mm": 165.3,
+      "last_year_accum_mm": 119.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 18,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 116.7,
+      "min_accum_mm": 70.0,
+      "max_accum_mm": 175.1,
+      "last_year_accum_mm": 126.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 19,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 123.2,
+      "min_accum_mm": 73.9,
+      "max_accum_mm": 184.8,
+      "last_year_accum_mm": 133.0,
+      "temp_c": 23.1
+    },
+    {
+      "day": 20,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 129.7,
+      "min_accum_mm": 77.8,
+      "max_accum_mm": 194.5,
+      "last_year_accum_mm": 140.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 21,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 136.2,
+      "min_accum_mm": 81.7,
+      "max_accum_mm": 204.2,
+      "last_year_accum_mm": 147.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 22,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 142.6,
+      "min_accum_mm": 85.6,
+      "max_accum_mm": 214.0,
+      "last_year_accum_mm": 154.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 23,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 149.1,
+      "min_accum_mm": 89.5,
+      "max_accum_mm": 223.7,
+      "last_year_accum_mm": 161.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 24,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 155.6,
+      "min_accum_mm": 93.4,
+      "max_accum_mm": 233.4,
+      "last_year_accum_mm": 168.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 25,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 162.1,
+      "min_accum_mm": 97.3,
+      "max_accum_mm": 243.1,
+      "last_year_accum_mm": 175.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 26,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 168.6,
+      "min_accum_mm": 101.1,
+      "max_accum_mm": 252.9,
+      "last_year_accum_mm": 182.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 27,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 175.1,
+      "min_accum_mm": 105.0,
+      "max_accum_mm": 262.6,
+      "last_year_accum_mm": 189.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 28,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 181.5,
+      "min_accum_mm": 108.9,
+      "max_accum_mm": 272.3,
+      "last_year_accum_mm": 196.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 29,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 188.0,
+      "min_accum_mm": 112.8,
+      "max_accum_mm": 282.0,
+      "last_year_accum_mm": 203.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 30,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 194.5,
+      "min_accum_mm": 116.7,
+      "max_accum_mm": 291.8,
+      "last_year_accum_mm": 210.1,
+      "temp_c": 23.1
+    },
+    {
+      "day": 31,
+      "rain_mm": 0.0,
+      "accum_mm": null,
+      "avg_accum_mm": 201.0,
+      "min_accum_mm": 120.6,
+      "max_accum_mm": 301.5,
+      "last_year_accum_mm": 217.1,
       "temp_c": 23.1
     }
   ],
