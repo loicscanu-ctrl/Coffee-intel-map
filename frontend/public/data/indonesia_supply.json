@@ -1,6 +1,6 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-24T23:03:15.515673Z",
+  "scraped_at": "2026-05-24T23:05:22.888581Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-24",
@@ -381,7 +381,7 @@
         "name": "Flores",
         "drought": "LOW",
         "csi_30d": 72.0,
-        "csi_60d": 142.5,
+        "csi_60d": 139.6,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }
@@ -715,7 +715,6 @@
           "L",
           "L",
           "L",
-          "L",
           "M",
           "L",
           "L",
@@ -775,6 +774,7 @@
           "H",
           "H",
           "H",
+          "M",
           "M",
           "M",
           "M",
@@ -2880,13 +2880,6 @@
         "region": "Flores",
         "days": [
           {
-            "date": "2026-03-25",
-            "precip_prob": 100,
-            "precip_mm": 2.1,
-            "soil_moisture": 0.318,
-            "drought_risk": "L"
-          },
-          {
             "date": "2026-03-26",
             "precip_prob": 100,
             "precip_mm": 13.5,
@@ -3331,7 +3324,7 @@
             "date": "2026-05-28",
             "precip_prob": 8,
             "precip_mm": 0.0,
-            "soil_moisture": 0.175,
+            "soil_moisture": 0.176,
             "drought_risk": "H"
           },
           {
@@ -3344,7 +3337,7 @@
           {
             "date": "2026-05-30",
             "precip_prob": 30,
-            "precip_mm": 0.6,
+            "precip_mm": 0.0,
             "soil_moisture": 0.171,
             "drought_risk": "H"
           },
@@ -3393,6 +3386,13 @@
           {
             "date": "2026-06-06",
             "precip_prob": 19,
+            "precip_mm": 0.0,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
+          },
+          {
+            "date": "2026-06-07",
+            "precip_prob": 26,
             "precip_mm": 0.0,
             "soil_moisture": 0.313,
             "drought_risk": "M"
