@@ -1,5 +1,18 @@
 # TODO / follow-ups
 
+## Brazil farmer-selling (Safras) — verify the crop-rollover fix (commit cf79f51)
+The scraper (`backend/scraper/sources/farmer_selling.py`) was frozen at
+report_date 2026-04-14 because the "% only rises within a season" guard rejected
+the 2026/27 crop reset. Fixed to be crop-year-aware (seeded crop_year 2025/26).
+**Verify:**
+- [ ] After the next nightly 1.4 export (or a manual `scraper-slow-data` run),
+      check the log line `farmer_selling_brazil.json → arabica:X% robusta:Y%`.
+- [ ] If it instead logs "no update (parse failed or no change)" AND Safras has a
+      newer sales article, the cause is a Safras page/structure change — update the
+      selectors in `_find_latest_article_url` / `_parse_article`.
+- [ ] Confirm `farmer_selling_brazil.json` report_date advances past 2026-04-14 and
+      % sold reflects the 2026/27 crop once Safras publishes it.
+
 ## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
 The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
 trigger and gates `npm ci` + signals to COT-relevant runs.
