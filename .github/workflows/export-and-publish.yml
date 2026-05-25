@@ -37,6 +37,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Map each trigger to the slice of topics it actually affects, so a single
+      # upstream scraper doesn't force a full 22-topic re-export. cron / manual
+      # dispatch / an unrecognised upstream all fall back to a full export.
+      # `signals` (which needs `npm ci`) only runs when cot.json can change.
+      - name: Decide export scope
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          RUN_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          topics=""; signals=false
+          if [ "$EVENT" = "schedule" ] || [ "$EVENT" = "workflow_dispatch" ]; then
+            signals=true                       # full export + signals
+          else
+            case "$RUN_NAME" in
+              *"COT Scraper"*)        topics="cot,macro_cot,oi_fnd_chart"; signals=true ;;
+              *"Daily OI Snapshot"*)  topics="futures_chain,oi_fnd_chart,latest_prices" ;;
+              *"Daily News Scraper"*) topics="news,latest_prices,vn_physical_prices,retail_cpi" ;;
+              *)                      signals=true ;;   # unknown upstream → full, safe
+            esac
+          fi
+          {
+            echo "topics=$topics"
+            echo "signals=$signals"
+          } >> "$GITHUB_OUTPUT"
+          echo "scope: event=$EVENT name='$RUN_NAME' → topics='${topics:-ALL}' signals=$signals"
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -44,6 +71,7 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - uses: actions/setup-node@v4
+        if: steps.scope.outputs.signals == 'true'
         with:
           node-version: '20'
           cache: 'npm'
@@ -54,6 +82,7 @@ jobs:
         run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
 
       - name: Install frontend dev dependencies (for signal export)
+        if: steps.scope.outputs.signals == 'true'
         working-directory: frontend
         run: npm ci
 
@@ -61,9 +90,16 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.export_static_json
+          ONLY: ${{ steps.scope.outputs.topics }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            python -m scraper.export_static_json --only "$ONLY"
+          else
+            python -m scraper.export_static_json
+          fi
 
       - name: Export rule-based COT signals (signals.json)
+        if: steps.scope.outputs.signals == 'true'
         working-directory: frontend
         run: npm run export:signals
 
