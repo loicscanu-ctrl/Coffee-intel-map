@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { ProcessedCotRow } from "@/lib/cot/types";
+import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
 const lotsSigned = (v: number) => `${v >= 0 ? "+" : ""}${(v / 1000).toFixed(1)} k lots`;
+const lotsAbs    = (v: number) => `${(Math.abs(v) / 1000).toFixed(1)} k lots`;
 const pctSigned  = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`;
 const pct1       = (v: number) => `${v.toFixed(1)}%`;
 const kTons      = (mt: number) => `${(mt / 1000).toFixed(1)} k tons`;
@@ -39,59 +40,79 @@ type PostCot = {
   priceChangeAbs: number; priceChangePct: number;
   invertedNow: number; inCarry: boolean; movingToward: "backwardation" | "carry";
   mmLongDelta: number; mmShortDelta: number;
-  producerLotsDelta: number; roasterLotsDelta: number; counterpartyOther: boolean;
+  producerLotsDelta: number; roasterLotsDelta: number; othersDelta: number;
 };
 
-const PRICE_DEADBAND_PCT = 0.1; // ignore sub-0.1% daily moves as directionless
+const PRICE_DEADBAND_PCT = 0.1;  // ignore sub-0.1% daily moves as directionless
+const PRICE_REF_PCT      = 1.0;  // a 1% day = unit conviction
+const PRICE_SCALE_MIN    = 0.25; // floor / cap on the price-magnitude scaler (#4)
+const PRICE_SCALE_MAX    = 2.0;
+const FLOW_THRESHOLD     = 50;   // lots below which a leg reads "stable/holding"
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
-function buildPostCot(days: OiDay[] | undefined, cotDate: string, mmLong: number, mmShort: number): PostCot | null {
+function buildPostCot(days: OiDay[] | undefined, cotDate: string, pos: CotMarketPositions): PostCot | null {
   if (!days?.length) return null;
   const latest = days[0];                              // newest-first
-  const anchor = days.find(d => d.date <= cotDate);    // COT day (or last trading day ≤ it)
-  if (!anchor || latest.date <= cotDate) return null;
+  const anchorIdx = days.findIndex(d => d.date <= cotDate);
+  if (anchorIdx < 0 || latest.date <= cotDate) return null;
+  const anchor = days[anchorIdx];
 
   const tot    = (d: OiDay) => d.contracts.reduce((s, c) => s + num(c.oi), 0);
   const nearby = (d: OiDay) => d.contracts.slice(0, 2).reduce((s, c) => s + num(c.oi), 0);
+  const maxOI  = (d: OiDay) => d.contracts.reduce((a, c) => (num(c.oi) > num(a.oi) ? c : a), d.contracts[0]);
+  const samePx = (d: OiDay, sym: string) => num(d.contracts.find(c => c.symbol === sym)?.last_price) || num(d.contracts[0]?.last_price);
+
+  // ── Endpoint facts (COT day → latest) for the displayed OI / price / structure
   const oiL = tot(latest), oiA = tot(anchor);
   const oiChange = oiL - oiA;
   const nearbyChange = nearby(latest) - nearby(anchor);
-
-  // Price: most-liquid (max-OI) contract on the latest day, same symbol on the anchor day.
-  const front = latest.contracts.reduce((a, c) => (num(c.oi) > num(a.oi) ? c : a), latest.contracts[0]);
-  const pL = num(front?.last_price);
-  const pA = num(anchor.contracts.find(c => c.symbol === front?.symbol)?.last_price) || num(anchor.contracts[0]?.last_price);
+  const front = maxOI(latest);
+  const pL = num(front?.last_price), pA = samePx(anchor, front?.symbol ?? "");
   const priceChangeAbs = pL - pA;
-  const priceChangePct = pA ? (priceChangeAbs / pA) * 100 : 0;
-
-  // Front structure (M2 − M1) by expiry → inversion %, and the direction it moved.
   const struct = (d: OiDay) => num(d.contracts[1]?.last_price) - num(d.contracts[0]?.last_price);
   const fpx    = (d: OiDay) => num(d.contracts[0]?.last_price) || 1;
-  const sL = struct(latest), sA = struct(anchor);
-  const invL = (-sL / fpx(latest)) * 100, invA = (-sA / fpx(anchor)) * 100;
+  const invL = (-struct(latest) / fpx(latest)) * 100, invA = (-struct(anchor) / fpx(anchor)) * 100;
 
-  const ratio = oiA > 0 ? oiL / oiA : 1; // proportional-OI MM nowcast (matches OIHistoryTable)
-  const mmLongDelta  = mmLong  * (ratio - 1);
-  const mmShortDelta = mmShort * (ratio - 1);
+  // ── Positioning estimate, accumulated day-by-day (#3) over the post-COT window.
+  // Per day, the OI×price regime (#1) decides which leg moves and its sign:
+  //   price↑/OI↑ fresh longs · price↓/OI↑ fresh shorts · price↑/OI↓ short-cover · price↓/OI↓ long-liq
+  // MM is credited its share of that day's |ΔOI|, scaled by the price move (#4).
+  // The opposite side is the counterparty (#2 — both legs handled across regimes),
+  // split between industry and swaps/other reportables by their COT share (#5).
+  const mmShareOI    = clamp((pos.mmLong + pos.mmShort) / (2 * (oiA || 1)), 0, 0.5);
+  const shortNonMM   = pos.pmpuShort + pos.swapShort + pos.otherShort + pos.nonRepShort;
+  const longNonMM    = pos.pmpuLong  + pos.swapLong  + pos.otherLong  + pos.nonRepLong;
+  const prodShare    = shortNonMM > 0 ? clamp(pos.pmpuShort / shortNonMM, 0, 1) : 0;
+  const roastShare   = longNonMM  > 0 ? clamp(pos.pmpuLong  / longNonMM,  0, 1) : 0;
 
-  // Industry-as-counterparty model. MM's estimated NET flow needs an opposite side.
-  // Commercials take it when the price move fits their hedging incentive, capped by
-  // the new OI created; otherwise the flow is assumed to sit with swaps / other rept.
-  const mmNetDelta = mmLongDelta - mmShortDelta;
-  const newOI = Math.max(oiChange, 0);
-  const priceDir = priceChangePct > PRICE_DEADBAND_PCT ? 1 : priceChangePct < -PRICE_DEADBAND_PCT ? -1 : 0;
-  let producerLotsDelta = 0, roasterLotsDelta = 0;
-  if (mmNetDelta > 0 && priceDir > 0)      producerLotsDelta = Math.min(mmNetDelta, newOI);   // funds buy into ↑ → producers sell
-  else if (mmNetDelta < 0 && priceDir < 0) roasterLotsDelta  = Math.min(-mmNetDelta, newOI);  // funds sell into ↓ → roasters buy
-  const counterpartyOther = newOI > 0 && producerLotsDelta === 0 && roasterLotsDelta === 0;
+  const win = days.slice(0, anchorIdx + 1).reverse(); // chronological: anchor → latest
+  let mmLongDelta = 0, mmShortDelta = 0, producerLotsDelta = 0, roasterLotsDelta = 0, othersDelta = 0;
+  for (let i = 1; i < win.length; i++) {
+    const prev = win[i - 1], cur = win[i];
+    const d = tot(cur) - tot(prev);
+    const fc = maxOI(cur);
+    const pc = num(fc?.last_price), pp = samePx(prev, fc?.symbol ?? "");
+    if (!pp) continue;
+    const pct = ((pc - pp) / pp) * 100;
+    if (Math.abs(pct) < PRICE_DEADBAND_PCT) continue;          // directionless day
+    const up = pct > 0;
+    const amt = mmShareOI * clamp(Math.abs(pct) / PRICE_REF_PCT, PRICE_SCALE_MIN, PRICE_SCALE_MAX) * d;
+    if (d >= 0) {
+      if (up) { mmLongDelta  += amt; producerLotsDelta += amt * prodShare;  othersDelta += amt * (1 - prodShare); }
+      else    { mmShortDelta += amt; roasterLotsDelta  += amt * roastShare; othersDelta += amt * (1 - roastShare); }
+    } else {
+      if (up) { mmShortDelta += amt; roasterLotsDelta  += amt * roastShare; othersDelta += amt * (1 - roastShare); }
+      else    { mmLongDelta  += amt; producerLotsDelta += amt * prodShare;  othersDelta += amt * (1 - prodShare); }
+    }
+  }
 
   return {
     cotDate: anchor.date, latestDate: latest.date,
     oiChange, nearbyChange, forwardChange: oiChange - nearbyChange,
-    priceChangeAbs, priceChangePct,
-    invertedNow: Math.abs(invL), inCarry: sL > 0,
+    priceChangeAbs, priceChangePct: pA ? (priceChangeAbs / pA) * 100 : 0,
+    invertedNow: Math.abs(invL), inCarry: struct(latest) > 0,
     movingToward: invL > invA ? "backwardation" : "carry",
-    mmLongDelta, mmShortDelta,
-    producerLotsDelta, roasterLotsDelta, counterpartyOther,
+    mmLongDelta, mmShortDelta, producerLotsDelta, roasterLotsDelta, othersDelta,
   };
 }
 
@@ -168,22 +189,26 @@ function MarketColumn({ m, prevPrice, letters, label, post }: {
               {" "}with a structure moving toward {post.movingToward}, now {post.inCarry ? "in carry" : "inverted"} at {pct1(post.invertedNow)}.
             </Bullet>
             <Bullet>
-              Roasters&rsquo; coverage probably {post.roasterLotsDelta > 0
-                ? <>increasing ~{lotsSigned(post.roasterLotsDelta)} long — buying into the price dip, counterparty to MM</>
-                : <>stable{post.priceChangePct > PRICE_DEADBAND_PCT ? " — reluctant to chase price higher" : ""}</>}.
+              Roasters&rsquo; coverage probably {post.roasterLotsDelta > FLOW_THRESHOLD
+                ? <>increasing ~{lotsAbs(post.roasterLotsDelta)} long — buying into weakness, counterparty to MM</>
+                : post.roasterLotsDelta < -FLOW_THRESHOLD
+                ? <>reducing ~{lotsAbs(post.roasterLotsDelta)} long — trimming into strength</>
+                : "stable"}.
             </Bullet>
             <Bullet>
-              Producers&rsquo; coverage probably {post.producerLotsDelta > 0
-                ? <>increasing ~{lotsSigned(post.producerLotsDelta)} short — selling into the price rise, counterparty to MM</>
-                : <>stable{post.priceChangePct < -PRICE_DEADBAND_PCT ? " — reluctant to sell into weakness" : ""}</>}.
+              Producers&rsquo; coverage probably {post.producerLotsDelta > FLOW_THRESHOLD
+                ? <>increasing ~{lotsAbs(post.producerLotsDelta)} short — selling into strength, counterparty to MM</>
+                : post.producerLotsDelta < -FLOW_THRESHOLD
+                ? <>reducing ~{lotsAbs(post.producerLotsDelta)} short — covering into weakness</>
+                : "stable"}.
             </Bullet>
             <Bullet>
-              MM probably {post.mmLongDelta < 0 ? "liquidating" : post.mmLongDelta > 0 ? "building" : "holding"} longs ({lotsSigned(post.mmLongDelta)})
-              {" "}and {post.mmShortDelta > 0 ? "increasing" : post.mmShortDelta < 0 ? "covering" : "holding"} shorts ({lotsSigned(post.mmShortDelta)}){" "}
-              <span className="text-slate-600">(est. &prop;OI)</span>.
+              MM probably {post.mmLongDelta < -FLOW_THRESHOLD ? "liquidating" : post.mmLongDelta > FLOW_THRESHOLD ? "building" : "holding"} longs ({lotsSigned(post.mmLongDelta)})
+              {" "}and {post.mmShortDelta > FLOW_THRESHOLD ? "increasing" : post.mmShortDelta < -FLOW_THRESHOLD ? "covering" : "holding"} shorts ({lotsSigned(post.mmShortDelta)}){" "}
+              <span className="text-slate-600">(est. OI&times;price regime)</span>.
             </Bullet>
-            {post.counterpartyOther && (
-              <Bullet sub>counterparty to MM likely via swaps / other reportables (price move not aligned with commercial hedging)</Bullet>
+            {Math.abs(post.othersDelta) > FLOW_THRESHOLD && (
+              <Bullet sub>swaps / other reportables absorbing ~{lotsAbs(post.othersDelta)} of the counterparty flow</Bullet>
             )}
           </ul>
         </div>
@@ -214,8 +239,8 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
     return {
       lettersNy:  nearestLetters(oi?.arabica),
       lettersLdn: nearestLetters(oi?.robusta),
-      postNy:  last ? buildPostCot(oi?.arabica, cotDate, num(last.ny?.mmLong),  num(last.ny?.mmShort))  : null,
-      postLdn: last ? buildPostCot(oi?.robusta, cotDate, num(last.ldn?.mmLong), num(last.ldn?.mmShort)) : null,
+      postNy:  last ? buildPostCot(oi?.arabica, cotDate, last.ny)  : null,
+      postLdn: last ? buildPostCot(oi?.robusta, cotDate, last.ldn) : null,
     };
   }, [oi, data]);
 
