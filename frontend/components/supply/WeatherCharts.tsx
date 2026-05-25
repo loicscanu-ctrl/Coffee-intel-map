@@ -25,6 +25,8 @@ interface Province {
   monthly_last_year_temp: number[];
   monthly_actual_temp_cur: number[];
   forecast_7d_rain: number[];
+  daily_accum_cur?: (number | null)[];   // per-day cumulative rain, current month
+  daily_accum_ly?: (number | null)[];    // per-day cumulative rain, last year same month
 }
 
 interface DailyRow {
@@ -106,11 +108,11 @@ function ProvinceSelector({
 // ── 1. Daily Accumulated Rainfall (reference station) ────────────────────────
 
 function DailyAccumChart({
-  daily, forecast, station, updated, curYear, lastYear, selectedYear, selectedMonthIdx,
+  daily, forecast, sourceLabel, updated, curYear, lastYear, selectedYear, selectedMonthIdx,
 }: {
   daily: DailyRow[];
   forecast: ForecastRow[];
-  station: string;
+  sourceLabel: string;
   updated: string;
   curYear: number;
   lastYear: number;
@@ -155,7 +157,7 @@ function DailyAccumChart({
       <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
         Daily Accumulated Rainfall — {monthLabel} (mm)
       </div>
-      <div className="text-[8px] text-slate-600 mb-1">{station} station · Band = 10yr min/max · Dotted = 7-day forecast</div>
+      <div className="text-[8px] text-slate-600 mb-1">{sourceLabel} · Band = 10yr min/max · Dotted = 7-day forecast</div>
       {isCurrentPeriod ? (
         <ResponsiveContainer width="100%" height={155}>
           <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
@@ -614,6 +616,41 @@ export default function WeatherCharts({
     }));
   }, [data, activeProv, totalProd]);
 
+  // Prod-weighted daily accumulation across selected regions (falls back to the
+  // single reference station when per-province daily series aren't in the data yet).
+  const weightedDaily = useMemo<DailyRow[] | null>(() => {
+    if (!data || !totalProd) return null;
+    if (!activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur.length)) return null;
+    const [yr, mo] = data.updated.split("-").map(Number);
+    const mIdx = mo - 1;
+    const dim = new Date(yr, mIdx + 1, 0).getDate();
+    const wAvgMonth = wsum(activeProv, (p) => p.monthly_avg_rain[mIdx]) / totalProd;
+    const haveLY = activeProv.every((p) => Array.isArray(p.daily_accum_ly) && p.daily_accum_ly!.length);
+    const rows: DailyRow[] = [];
+    for (let d = 1; d <= dim; d++) {
+      const i = d - 1;
+      const allCur = activeProv.every((p) => p.daily_accum_cur![i] != null);
+      const avg_accum = r1(wAvgMonth * (d / dim));
+      const lyOk = haveLY && activeProv.every((p) => p.daily_accum_ly![i] != null);
+      rows.push({
+        day: d,
+        rain_mm: 0,
+        accum_mm: allCur ? r1(wsum(activeProv, (p) => p.daily_accum_cur![i] as number) / totalProd) : null,
+        avg_accum_mm: avg_accum,
+        min_accum_mm: r1(avg_accum * 0.6),
+        max_accum_mm: r1(avg_accum * 1.5),
+        last_year_accum_mm: lyOk ? r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd) : r1(avg_accum * 1.08),
+        temp_c: 0,
+      });
+    }
+    return rows;
+  }, [data, activeProv, totalProd]);
+
+  const weightedForecast = useMemo<ForecastRow[]>(() => {
+    if (!data || !totalProd) return [];
+    return data.forecast_7d.map((f, i) => ({ ...f, rain_mm: r1(wsum(activeProv, (p) => p.forecast_7d_rain[i] ?? 0) / totalProd) }));
+  }, [data, activeProv, totalProd]);
+
   // Production-at-risk: per active region, project the current month and flag it
   // if the projection lands in its drought-risk zone (< 30yr P20, else < 60% of normal).
   const risk = useMemo<{ month: string; regions: RiskRegion[] } | null>(() => {
@@ -727,9 +764,11 @@ export default function WeatherCharts({
       {/* 2×2 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <DailyAccumChart
-          daily={data.daily_station}
-          forecast={data.forecast_7d}
-          station={data.station}
+          daily={weightedDaily ?? data.daily_station}
+          forecast={weightedDaily ? weightedForecast : data.forecast_7d}
+          sourceLabel={weightedDaily
+            ? `Prod-weighted · ${activeProv.length} region${activeProv.length > 1 ? "s" : ""}`
+            : `${data.station} station`}
           updated={data.updated}
           curYear={data.cur_year}
           lastYear={data.last_year}

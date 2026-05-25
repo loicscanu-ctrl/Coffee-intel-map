@@ -247,6 +247,24 @@ def _trim_trailing_none(xs: list) -> list:
     return xs
 
 
+def _daily_accum(reg_hist: dict, year: int, month: int, dim: int) -> list[float | None]:
+    """Per-day cumulative rain (mm) through day d of (year, month); None for days
+    with no history yet (so the current month is null after the last actual day).
+    Returns [] when the month has no data at all (caller falls back)."""
+    out: list[float | None] = []
+    acc = 0.0
+    seen = False
+    for d in range(1, dim + 1):
+        v = reg_hist.get(f"{year}-{month:02d}-{d:02d}")
+        if v is not None and v.get("rain") is not None:
+            acc += v["rain"] or 0.0
+            seen = True
+            out.append(r1(acc))
+        else:
+            out.append(None)
+    return out if seen else []
+
+
 def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> dict | None:
     path = DATA_DIR / f"{origin}_weather.json"
     if not path.exists():
@@ -254,10 +272,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         return None
     doc = json.loads(path.read_text(encoding="utf-8"))
     cur_month = TODAY.month
+    dim_cur = DAYS_IN_MONTH[cur_month - 1]
     regions_hist = hist["regions"]
 
     for prov in doc["provinces"]:
         rh = regions_hist.get(prov["name"], {})
+        # Per-province daily accumulation for the current month (+ last year) so
+        # the frontend can prod-weight the Daily Accumulated chart across the
+        # selected regions, not just the single reference station.
+        prov["daily_accum_cur"] = _daily_accum(rh, CUR_YEAR, cur_month, dim_cur)
+        prov["daily_accum_ly"]  = _daily_accum(rh, LAST_YEAR, cur_month, dim_cur)
         # Current-year actuals (live, accumulating). Keep seed where history is absent.
         act_r = _trim_trailing_none(_year_actuals_rain(rh, CUR_YEAR, cur_month))
         act_t = _trim_trailing_none(_year_actuals_temp(rh, CUR_YEAR, cur_month))
