@@ -100,6 +100,16 @@ ORIGINS: dict[str, list[dict]] = {
         {"name": "Kaffa", "lat": 7.27, "lon": 36.23},
         {"name": "Harrar","lat": 9.31, "lon": 42.12},
     ],
+    # Vietnam Central Highlands. Names MUST match vn_weather.json provinces — the
+    # rebuild keeps that seed's curated climatology and only refreshes actuals,
+    # daily MTD and forecast from live Open-Meteo, so VN stops going stale.
+    "vn": [
+        {"name": "Dak Lak",  "lat": 12.67, "lon": 108.05},
+        {"name": "Lam Dong", "lat": 11.94, "lon": 108.44},
+        {"name": "Dak Nong", "lat": 12.00, "lon": 107.69},
+        {"name": "Gia Lai",  "lat": 13.98, "lon": 108.00},
+        {"name": "Kon Tum",  "lat": 14.35, "lon": 108.00},
+    ],
 }
 
 

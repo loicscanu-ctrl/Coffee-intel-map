@@ -21,15 +21,15 @@ To confirm:
 Frontend now renders missing months as gaps (not 0) and shows per-region crop
 share in the filter. Remaining items are in the data pipeline:
 
-- [ ] **Vietnam weather is stale & not auto-refreshed.** `vn_weather.json` is a
-      static seed (`backend/scripts/seed_origin_weather.py` / vn source), updated
-      manually (`updated` stuck at 2026-05-12), and is NOT in the daily Open-Meteo
-      builder's `ORIGINS` (`backend/scripts/build_origin_weather.py`). health.json
-      has a single `.scrapers.weather` timestamp (the origin/drought scrape) that
-      does NOT represent the VN seed, so freshness shows green while VN actuals are
-      frozen. Fix: add `vietnam` to `build_origin_weather.py` ORIGINS (real fix —
-      refreshes daily + gives it Jan/Feb), or at minimum track vn_weather freshness
-      in export_health and surface staleness.
+- [x] **Vietnam weather stale — FIXED (pending next run).** Added `vn` to the
+      DAILY pipeline (`fetch_origin_weather.py` ORIGINS), which refreshes
+      `vn_weather.json` actuals/daily/forecast from live Open-Meteo while keeping
+      its curated climatology. `doc["updated"]` is stamped to TODAY, so the
+      freshness blind spot resolves on its own. **Verify after the next
+      `weather-fetch` run (05:40 UTC):** vn_weather.json `updated` = today and
+      actual_cur advances daily. NOTE: VN's curated Jan/Feb actuals will be
+      replaced by live history (Mar→ only, like other origins) since the forecast
+      API only exposes ~92 past days.
 - [ ] **Jan/Feb (and early-year temp) actuals missing for all scraped origins.**
       `monthly_actual_cur` begins in March; `monthly_actual_temp_cur` even later.
       Investigate `_year_series`/assembly in build_origin_weather.py — the
