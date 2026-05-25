@@ -12,8 +12,8 @@
     {
       "name": "Dak Lak",
       "station": "Buon Ma Thuot",
-      "prod_mt_k": 540,
-      "weight": 0.407,
+      "prod_mt_k": 480,
+      "weight": 0.24,
       "monthly_avg_rain": [
         3,
         6,
@@ -201,8 +201,8 @@
     {
       "name": "Lam Dong",
       "station": "Da Lat",
-      "prod_mt_k": 295,
-      "weight": 0.222,
+      "prod_mt_k": 580,
+      "weight": 0.29,
       "monthly_avg_rain": [
         14,
         10,
@@ -390,8 +390,8 @@
     {
       "name": "Dak Nong",
       "station": "Gia Nghia",
-      "prod_mt_k": 242,
-      "weight": 0.182,
+      "prod_mt_k": 500,
+      "weight": 0.25,
       "monthly_avg_rain": [
         12,
         18,
@@ -579,8 +579,8 @@
     {
       "name": "Gia Lai",
       "station": "Pleiku",
-      "prod_mt_k": 208,
-      "weight": 0.157,
+      "prod_mt_k": 320,
+      "weight": 0.16,
       "monthly_avg_rain": [
         5,
         10,
@@ -768,8 +768,8 @@
     {
       "name": "Kon Tum",
       "station": "Kon Tum",
-      "prod_mt_k": 43,
-      "weight": 0.032,
+      "prod_mt_k": 120,
+      "weight": 0.06,
       "monthly_avg_rain": [
         6,
         9,
