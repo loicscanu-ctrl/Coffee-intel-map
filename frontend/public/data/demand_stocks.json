@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T18:07:12.301964Z",
+  "generated_at": "2026-05-25T18:28:25.401847Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -12399,8 +12399,8 @@
       "name": "Egypt",
       "latest_year": "2025",
       "consumption_mt": 60000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 116538258,
+      "per_capita_kg": 0.51,
       "annual": [
         {
           "year": "2002",
@@ -12696,6 +12696,12 @@
         "iso3": "PHL",
         "latest_year": "2024",
         "latest_population": 115843670
+      },
+      "egypt": {
+        "name": "Egypt",
+        "iso3": "EGY",
+        "latest_year": "2024",
+        "latest_population": 116538258
       },
       "korea": {
         "name": "South Korea",
