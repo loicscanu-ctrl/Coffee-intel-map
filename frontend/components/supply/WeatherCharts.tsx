@@ -404,6 +404,8 @@ function ForecastRainChart({ data }: { data: ForecastBarRow[] }) {
 // SHARE of selected production whose projected current-month rainfall is in its
 // own drought-risk zone (below the 30yr P20, or <60% of normal where P20 is
 // absent), and names the stressed regions — something the average can't mask.
+// Only evaluated in months that are climatologically rainy for the region (a dry
+// month with low rain isn't a drought signal).
 
 interface RiskRegion { name: string; weight: number; ratio: number; risk: boolean }
 
@@ -413,7 +415,7 @@ function ProductionAtRisk({ month, regions }: { month: string; regions: RiskRegi
   if (!flagged.length) {
     return (
       <div className="text-[9px] text-emerald-400/80 bg-emerald-950/20 border border-emerald-900/40 rounded px-2 py-1">
-        ✓ All selected regions near or above normal rainfall ({month}, projected)
+        ✓ No drought-risk regions in season ({month}, projected)
       </div>
     );
   }
@@ -674,9 +676,14 @@ export default function WeatherCharts({
       data.forecast_7d.forEach((f, i) => { if (fcInMonth[i]) fcRain += p.forecast_7d_rain[i] ?? 0; });
       const proj = known > 0 ? ((mtd + fcRain) / known) * daysInMonth : mtd;
       const avg  = p.monthly_avg_rain[curIdx] || 0;
+      // Only flag drought risk in months that are climatologically rainy for this
+      // region — in the dry season low rain is normal (and for some crops desirable),
+      // so a deficit then isn't a stress signal.
+      const meanMonthly  = p.monthly_avg_rain.reduce((a, b) => a + b, 0) / 12;
+      const rainExpected = avg >= 0.5 * meanMonthly;
       const p20  = (p.monthly_dry_warn && p.monthly_dry_warn[curIdx]) || 0;
       const ratio = avg > 0 ? proj / avg : 1;
-      const isRisk = p20 > 0 ? proj < p20 : ratio < 0.6;
+      const isRisk = rainExpected && (p20 > 0 ? proj < p20 : ratio < 0.6);
       regions.push({ name: p.name, weight: p.prod_mt_k / totalProd, ratio, risk: isRisk });
     }
     return regions.length ? { month: MONTHS[curIdx], regions } : null;
