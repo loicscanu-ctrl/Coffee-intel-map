@@ -21,28 +21,21 @@ To confirm:
 Frontend now renders missing months as gaps (not 0) and shows per-region crop
 share in the filter. Remaining items are in the data pipeline:
 
-- [x] **Vietnam weather stale — FIXED (pending next run).** Added `vn` to the
-      DAILY pipeline (`fetch_origin_weather.py` ORIGINS), which refreshes
-      `vn_weather.json` actuals/daily/forecast from live Open-Meteo while keeping
-      its curated climatology. `doc["updated"]` is stamped to TODAY, so the
-      freshness blind spot resolves on its own. **Verify after the next
-      `weather-fetch` run (05:40 UTC):** vn_weather.json `updated` = today and
-      actual_cur advances daily. NOTE: VN's curated Jan/Feb actuals will be
-      replaced by live history (Mar→ only, like other origins) since the forecast
-      API only exposes ~92 past days.
-- [ ] **Backfill Jan/early-Feb 2026 actuals — RUN the new backfill workflow.**
-      Correction to an earlier note: the history store
-      (`backend/seed/weather_history/{origin}.json`) is append-only and already
-      persists everything from ~2026-02-20 onward (it never deletes), so going
-      forward nothing is lost. Jan 1–Feb 19 are simply pre-accumulation (daily
-      pipeline started ~late Feb; the forecast API only reaches 92 days back).
-      New `backfill_weather_history.py` + "0.4 – Backfill weather history" workflow
-      fetch those days from the Open-Meteo ARCHIVE host and fill the gap
-      (idempotent). **TODO:** dispatch the workflow once and confirm Jan/Feb appear.
-      RISK: the archive host may be blocked from CI (the daily fetcher uses the
-      forecast host for that reason) — if the run fails at preflight, archive
-      egress isn't allowlisted and Jan/Feb 2026 stays a one-time gap (next year is
-      covered by daily accumulation regardless).
+- [x] **Vietnam weather stale — DONE & verified.** `vn` added to the daily
+      pipeline; `vn_weather.json` now `updated=2026-05-25` with a `weather_history/vn.json`
+      created. Refreshes daily; freshness blind spot resolved.
+- [~] **Backfill Jan/early-Feb 2026 — archive reachable; first run PARTIAL, fixes
+      applied, RE-RUN needed.** Archive host IS reachable from CI (IPv4 forcing
+      worked). First dispatch filled Brazil/Honduras/Uganda/VN (Jan→May rain), but:
+      (1) Colombia/Ethiopia/Indonesia aborted — one flaky region failed the whole
+      origin; (2) Feb/Mar **temps** stayed null — the forecast API leaves tmean=null
+      on older past-days, the backfill skipped already-present dates, and the daily
+      `upsert` clobbered good values with null.
+      FIXES (committed): `backfill_weather_history.py` now survives a flaky region
+      and fills missing FIELDS (not just missing dates); `fetch_origin_weather.upsert`
+      now merges instead of overwriting a non-null with null.
+      **TODO:** re-dispatch "0.4 – Backfill weather history" (all origins) → should
+      fill the 3 remaining origins' Jan/Feb and recover Feb/Mar temps everywhere.
 - [ ] **Honduras May rainfall ~16% of normal is REAL, not a bug** (other 6 origins
       66–123% via the same builder; daily station ~7mm MTD). Likely a genuine
       early-rainy-season deficit — worth a drought-risk flag. Re-check once May is

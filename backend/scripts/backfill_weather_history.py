@@ -93,15 +93,30 @@ def backfill(origin: str, start: str, end: str, write: bool) -> int:
     hist = load_history(origin)
     added = 0
     for rc in regions:
-        d = fetch_archive(rc["lat"], rc["lon"], start, end)["daily"]
+        try:
+            d = fetch_archive(rc["lat"], rc["lon"], start, end)["daily"]
+        except Exception as e:  # noqa: BLE001 — a flaky region must not abort the origin
+            print(f"  [{origin}] {rc['name']}: FETCH FAILED, skipping region: {e}", file=sys.stderr)
+            continue
         times, pr, tm = d["time"], d["precipitation_sum"], d["temperature_2m_mean"]
         reg = hist["regions"].setdefault(rc["name"], {})
         for i, date in enumerate(times):
-            if date in reg:
-                continue  # never overwrite an accumulated day
-            rain = pr[i] if pr[i] is not None else 0.0
-            reg[date] = {"rain": r1(rain), "tmean": round(tm[i], 1) if tm[i] is not None else None}
-            added += 1
+            arch_rain = r1(pr[i]) if pr[i] is not None else 0.0
+            arch_tmean = round(tm[i], 1) if tm[i] is not None else None
+            prev = reg.get(date)
+            if prev is None:
+                reg[date] = {"rain": arch_rain, "tmean": arch_tmean}
+                added += 1
+            else:
+                # Fill only MISSING fields — never overwrite an accumulated value.
+                # The forecast API leaves tmean=null on older past-days; the
+                # archive has it, so this recovers those temps too.
+                if prev.get("rain") is None and arch_rain is not None:
+                    prev["rain"] = arch_rain
+                    added += 1
+                if prev.get("tmean") is None and arch_tmean is not None:
+                    prev["tmean"] = arch_tmean
+                    added += 1
         print(f"  [{origin}] {rc['name']}: {len(times)} archive days", flush=True)
         time.sleep(1)  # spacing under Open-Meteo's burst limit
     if write:

@@ -185,8 +185,15 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
         rain = pr[i] if pr[i] is not None else 0.0
         row = {"rain": r1(rain), "tmax": tx[i], "tmin": tn[i], "tmean": tm[i]}
         if date <= today_iso:
-            reg[date] = {"rain": r1(rain),
-                         "tmean": round(tm[i], 1) if tm[i] is not None else None}
+            # Merge, don't clobber: the forecast API returns tmean=null for many
+            # older past-days, so never overwrite a known value (e.g. one filled
+            # by the archive backfill) with a null on a later run.
+            new_tmean = round(tm[i], 1) if tm[i] is not None else None
+            prev = reg.get(date, {})
+            reg[date] = {
+                "rain":  r1(rain) if rain is not None else prev.get("rain"),
+                "tmean": new_tmean if new_tmean is not None else prev.get("tmean"),
+            }
         else:
             forecast.append({"date": date, **{k: row[k] for k in ("rain", "tmax", "tmin")}})
     return forecast
