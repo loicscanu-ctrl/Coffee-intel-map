@@ -58,15 +58,19 @@ MONTH_ABBR = {
 }
 
 
-# ── Listing page: find most recent sales article ──────────────────────────────
+# ── Listing page: collect candidate sales articles ────────────────────────────
 
-def _find_latest_article_url(session: requests.Session) -> str | None:
+def _find_sales_article_urls(session: requests.Session) -> list[str]:
+    """All candidate 'sales/% sold' article URLs on the listing, in DOM order
+    (deduped). The newest isn't necessarily first — Safras links featured/older
+    posts high in the DOM — so the caller fetches each and picks the most recent
+    by crop-year + survey date."""
     try:
         r = session.get(LISTING_URL, headers=HEADERS, timeout=20)
         r.raise_for_status()
     except Exception as e:
         log.error("Failed to fetch listing: %s", e)
-        return None
+        return []
 
     soup = BeautifulSoup(r.text, "html.parser")
 
@@ -79,25 +83,29 @@ def _find_latest_article_url(session: requests.Session) -> str | None:
             return False
         return any(kw in t for kw in SALES_KEYWORDS)
 
+    urls: list[str] = []
     for tag in soup.find_all("a", href=True):
         href = str(tag.get("href", ""))
         title = tag.get_text(strip=True)
-        if not href.startswith("http"):
+        if not href.startswith("http") or "coffee" not in href:
             continue
-        if _is_sales(title) and "coffee" in href:
-            log.info("Found article: %s", href)
-            return href
+        if _is_sales(title) and href not in urls:
+            urls.append(href)
+    log.info("Found %d candidate sales article(s)", len(urls))
+    return urls
 
-    # Fallback: look inside article/h2/h3 elements
-    for article in soup.find_all(["article", "div"], class_=re.compile(r"post|entry|article", re.I)):
-        for a in article.find_all("a", href=True):
-            title = a.get_text(strip=True)
-            href = str(a.get("href", ""))
-            if _is_sales(title):
-                log.info("Fallback found: %s", href)
-                return href
 
-    return None
+def _crop_month_index(month_num: int) -> int:
+    """Brazilian crop year starts in July — map calendar month to crop-month
+    (Jul=1 … Jun=12) so within a crop year a later survey ranks as more recent."""
+    return ((month_num - 7) % 12) + 1 if month_num else 0
+
+
+def _recency_key(parsed: dict[str, Any]) -> tuple[str, int, int]:
+    """Sort key for 'most recent' = (crop_year, crop-month, survey day)."""
+    cy = parsed.get("crop_year") or "0000/00"
+    m = _month_name_to_number(parsed.get("survey_month_name", "")) or 0
+    return (cy, _crop_month_index(m), int(parsed.get("survey_day") or 0))
 
 
 # ── Article parsing ───────────────────────────────────────────────────────────
@@ -328,22 +336,37 @@ def build_farmer_selling(db=None) -> dict:
 
     session = requests.Session()
 
-    article_url = _find_latest_article_url(session)
-    if not article_url:
+    urls = _find_sales_article_urls(session)
+    if not urls:
         log.warning("No sales article found on Safras listing page")
         return data
 
-    try:
-        r = session.get(article_url, headers=HEADERS, timeout=20)
-        r.raise_for_status()
-    except Exception as e:
-        log.error("Failed to fetch article %s: %s", article_url, e)
+    # Fetch the candidates and keep the genuinely most-recent one (the listing
+    # links featured/older posts high in the DOM, so first-match isn't newest).
+    best: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
+    for url in urls[:8]:
+        try:
+            r = session.get(url, headers=HEADERS, timeout=20)
+            r.raise_for_status()
+        except Exception as e:
+            log.warning("Fetch failed %s: %s", url, e)
+            continue
+        parsed = _parse_article(r.text)
+        if not parsed:
+            continue
+        key = _recency_key(parsed)
+        log.info("candidate crop=%s %s %s arabica=%s%% robusta=%s%% key=%s — %s",
+                 parsed.get("crop_year"), parsed.get("survey_month_name"), parsed.get("survey_day"),
+                 parsed.get("arabica_pct"), parsed.get("robusta_pct"), key, url)
+        if best is None or key > best[0]:
+            best = (key, parsed, url)
+
+    if best is None:
+        log.warning("No parseable sales article among %d candidate(s)", len(urls))
         return data
 
-    parsed = _parse_article(r.text)
-    if not parsed:
-        log.warning("Article parsing returned nothing")
-        return data
+    _, parsed, article_url = best
+    log.info("Selected most-recent article (key=%s): %s", best[0], article_url)
 
     if not _apply_to_json(data, parsed):
         log.info("No changes detected — JSON unchanged")
