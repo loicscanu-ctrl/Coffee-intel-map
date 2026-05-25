@@ -85,8 +85,8 @@
         35
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        33.6,
+        5.3,
         8.9,
         22.2,
         7.3
@@ -148,7 +148,7 @@
         20.8
       ],
       "monthly_actual_temp_cur": [
-        null,
+        21.0,
         null,
         null,
         24.0,
@@ -240,8 +240,8 @@
         45
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        59.6,
+        11.2,
         60.3,
         54.3,
         34.1
@@ -303,7 +303,7 @@
         21.8
       ],
       "monthly_actual_temp_cur": [
-        null,
+        17.7,
         null,
         null,
         21.5,
@@ -395,8 +395,8 @@
         41
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        158.6,
+        17.2,
         79.2,
         52.8,
         40.0
@@ -458,7 +458,7 @@
         22.7
       ],
       "monthly_actual_temp_cur": [
-        null,
+        22.0,
         null,
         null,
         25.9,
@@ -550,11 +550,11 @@
         41
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        75.9,
+        29.1,
         17.7,
         32.7,
-        10.1
+        14.1
       ],
       "monthly_avg_temp": [
         20.1,
@@ -613,20 +613,20 @@
         19.9
       ],
       "monthly_actual_temp_cur": [
-        null,
+        16.9,
         null,
         null,
         20.8,
         23.2
       ],
       "forecast_7d_rain": [
-        2.5,
-        1.9,
-        9.0,
-        21.1,
-        53.8,
-        23.9,
-        12.1
+        0.2,
+        8.5,
+        13.3,
+        56.6,
+        13.7,
+        3.9,
+        11.1
       ]
     },
     {
@@ -705,8 +705,8 @@
         38
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        63.6,
+        6.6,
         51.2,
         64.8,
         15.8
@@ -768,7 +768,7 @@
         22.8
       ],
       "monthly_actual_temp_cur": [
-        null,
+        23.2,
         null,
         null,
         26.3,

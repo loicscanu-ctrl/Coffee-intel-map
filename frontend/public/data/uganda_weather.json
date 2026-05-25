@@ -85,8 +85,8 @@
         89
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        57.7,
+        109.7,
         55.5,
         84.9,
         81.5
@@ -148,7 +148,7 @@
         22.9
       ],
       "monthly_actual_temp_cur": [
-        null,
+        21.7,
         null,
         null,
         20.5,
@@ -240,8 +240,8 @@
         70
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        25.3,
+        41.9,
         57.2,
         97.2,
         92.6
@@ -303,7 +303,7 @@
         25.0
       ],
       "monthly_actual_temp_cur": [
-        null,
+        25.0,
         null,
         null,
         24.1,
@@ -395,8 +395,8 @@
         111
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        23.1,
+        72.3,
         140.6,
         107.6,
         161.3
@@ -458,7 +458,7 @@
         20.9
       ],
       "monthly_actual_temp_cur": [
-        null,
+        21.0,
         null,
         null,
         19.5,
@@ -550,8 +550,8 @@
         96
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        47.7,
+        89.1,
         181.6,
         330.0,
         262.3
@@ -613,7 +613,7 @@
         22.9
       ],
       "monthly_actual_temp_cur": [
-        null,
+        23.8,
         null,
         null,
         22.5,
@@ -705,8 +705,8 @@
         111
       ],
       "monthly_actual_cur": [
-        null,
-        null,
+        10.1,
+        28.2,
         177.4,
         62.9,
         106.0
@@ -768,7 +768,7 @@
         19.9
       ],
       "monthly_actual_temp_cur": [
-        null,
+        25.0,
         null,
         null,
         23.2,
