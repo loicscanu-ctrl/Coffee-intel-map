@@ -258,21 +258,29 @@ def _apply_to_json(data: dict, parsed: dict[str, Any]) -> bool:
 
         brazil = data[variety]["brazil"]
         old_current = brazil.get("current", 0)
+        stored_crop = brazil.get("crop_year")
+        parsed_crop = parsed.get("crop_year")
+        # A new crop year legitimately resets % sold to a low value. Only apply the
+        # "within a season % sold only rises" guard when we're in the SAME season;
+        # accept the reset when the article's crop year is newer than the stored one.
+        new_season = bool(parsed_crop and stored_crop and parsed_crop > stored_crop)
 
-        if new_pct != old_current:
-            # Guard: skip if scraped value is significantly lower than stored value.
-            # Within a season, selling % only goes up. A much lower number means the
-            # scraper found an older article than what we already have seeded.
-            if new_pct < old_current - 5:
+        if new_pct != old_current or new_season:
+            # Guard: skip a much-lower value only within the same season (likely an
+            # older article); a newer crop year is a real reset, not a regression.
+            if new_pct < old_current - 5 and not new_season:
                 log.info(
-                    "%s: scraped %d%% << stored %d%% — likely older article, skipping",
-                    variety, new_pct, old_current,
+                    "%s: scraped %d%% << stored %d%% (crop %s) — likely older article, skipping",
+                    variety, new_pct, old_current, stored_crop,
                 )
                 continue
-            brazil["prev_month"] = old_current
+            brazil["prev_month"] = new_pct if new_season else old_current
             brazil["current"]    = new_pct
+            if parsed_crop:
+                brazil["crop_year"] = parsed_crop
             changed = True
-            log.info("%s: %d%% → %d%%", variety, old_current, new_pct)
+            log.info("%s: %d%% → %d%%%s", variety, old_current, new_pct,
+                     f" (new crop {parsed_crop})" if new_season else "")
 
         if parsed.get("avg_5y") is not None:
             old_avg = brazil.get("avg_5y")

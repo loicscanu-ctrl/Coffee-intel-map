@@ -5,7 +5,8 @@
     "brazil": {
       "current": 83,
       "prev_month": 80,
-      "avg_5y": 88
+      "avg_5y": 88,
+      "crop_year": "2025/26"
     },
     "regions": [
       {
@@ -313,7 +314,8 @@
     "brazil": {
       "current": 77,
       "prev_month": 72,
-      "avg_5y": 95
+      "avg_5y": 95,
+      "crop_year": "2025/26"
     },
     "regions": [
       {
