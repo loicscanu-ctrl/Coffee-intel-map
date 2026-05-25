@@ -13,6 +13,7 @@ import { ICONS } from "./icons";
 import type { Step } from "./types";
 
 import Overview from "./Overview";
+import Research from "./Research";
 import CotGauges from "./Gauges";
 import CotHeatmap from "./Heatmap";
 import Step1GlobalFlow from "./Step1GlobalFlow";
@@ -28,7 +29,7 @@ import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngi
 export default function CotDashboard() {
   const [step, setStep] = useUrlState<Step>("step", 10, (raw) => {
     const n = Number(raw);
-    return ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number[]).includes(n) ? (n as Step) : 10;
+    return ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as number[]).includes(n) ? (n as Step) : 10;
   });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
@@ -217,6 +218,8 @@ export default function CotDashboard() {
 
       {/* Signals moved to the end of the report. */}
       <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
+
+      <div id="cot-section-11"><Research /></div>
     </div>
   );
 }
