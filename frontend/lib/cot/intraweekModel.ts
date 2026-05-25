@@ -23,10 +23,13 @@ export interface IntraweekParams {
   scaleMin: number;     // floor on the price-magnitude scaler
   scaleMax: number;     // cap on the price-magnitude scaler
   mmShareMult: number;  // multiplier on MM's derived share of OI (tuning knob)
+  confLow: number;      // |industry signal| (lots) below which a call is low-confidence
+  confHigh: number;     // |industry signal| (lots) above which a call is high-confidence
 }
 
 export const DEFAULT_PARAMS: IntraweekParams = {
   deadbandPct: 0.1, refPct: 1.0, scaleMin: 0.25, scaleMax: 2.0, mmShareMult: 1.0,
+  confLow: 200, confHigh: 600,
 };
 
 // Per-market multipliers fitted on the 5-year archive (scripts/backtest-intraweek.mjs,
@@ -34,8 +37,20 @@ export const DEFAULT_PARAMS: IntraweekParams = {
 // Arabica wants a higher MM share of OI flow, Robusta a lower one. Directional
 // accuracy (~66-69% on MM-net / producers / roasters) is what the model is for;
 // the magnitude lever only moves MAE ~8%, so treat the lot sizes as rough.
-export const NY_PARAMS:  IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 2.0 };
-export const LDN_PARAMS: IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 0.5 };
+//
+// confLow/confHigh: 33rd/67th percentiles of |producer|+|roaster| signal from the
+// same backtest. Industry direction is only ~60% in the low tercile but ~82-86%
+// in the high tercile — so the displayed estimate carries a confidence tier.
+export const NY_PARAMS:  IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 2.0, confLow: 290, confHigh: 775 };
+export const LDN_PARAMS: IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 0.5, confLow: 90,  confHigh: 260 };
+
+export type Confidence = "low" | "medium" | "high";
+/** Directional confidence of an industry call from its signal magnitude (lots). */
+export function confidenceTier(absLots: number, params: IntraweekParams): Confidence {
+  if (absLots >= params.confHigh) return "high";
+  if (absLots <  params.confLow)  return "low";
+  return "medium";
+}
 
 export type IntraweekFlow = {
   mmLongDelta: number; mmShortDelta: number;

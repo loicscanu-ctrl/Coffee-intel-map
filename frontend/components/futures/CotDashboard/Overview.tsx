@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ProcessedCotRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
-import { buildPostCot, LDN_PARAMS, NY_PARAMS, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
+import { buildPostCot, confidenceTier, LDN_PARAMS, NY_PARAMS, type IntraweekParams, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
@@ -35,6 +35,18 @@ function nearestLetters(days: OiDay[] | undefined): string | null {
 }
 
 
+// Backtested directional hit-rate per confidence tier (5y archive).
+const CONF_META = {
+  high:   { label: "high conf",   cls: "text-emerald-400 border-emerald-700/50", hint: "≈82-86% directional hit-rate (5y backtest)" },
+  medium: { label: "med conf",    cls: "text-amber-400 border-amber-700/50",     hint: "≈67-69% directional hit-rate (5y backtest)" },
+  low:    { label: "low conf",    cls: "text-slate-500 border-slate-700",        hint: "≈60% — near base rate; treat as tentative" },
+} as const;
+
+function ConfChip({ lots, params }: { lots: number; params: IntraweekParams }) {
+  const meta = CONF_META[confidenceTier(Math.abs(lots), params)];
+  return <span title={meta.hint} className={`ml-1 px-1 py-px rounded border text-[9px] uppercase tracking-wide ${meta.cls}`}>{meta.label}</span>;
+}
+
 function Bullet({ children, sub }: { children: React.ReactNode; sub?: boolean }) {
   return (
     <li className={`flex gap-2 ${sub ? "ml-4 text-slate-400" : "text-slate-300"}`}>
@@ -44,8 +56,8 @@ function Bullet({ children, sub }: { children: React.ReactNode; sub?: boolean })
   );
 }
 
-function MarketColumn({ m, prevPrice, letters, label, post }: {
-  m: MarketMetrics; prevPrice: number; letters: string | null; label: string; post: PostCot | null;
+function MarketColumn({ m, prevPrice, letters, label, post, params }: {
+  m: MarketMetrics; prevPrice: number; letters: string | null; label: string; post: PostCot | null; params: IntraweekParams;
 }) {
   const isNY = m.market === "NY Arabica";
   const priceAbs = isNY ? priceAbsNY(m.priceChangeAbs) : priceAbsLDN(m.priceChangeAbs);
@@ -109,16 +121,16 @@ function MarketColumn({ m, prevPrice, letters, label, post }: {
             </Bullet>
             <Bullet>
               Roasters&rsquo; coverage probably {post.roasterLotsDelta > FLOW_THRESHOLD
-                ? <>increasing ~{lotsAbs(post.roasterLotsDelta)} long — buying into weakness, counterparty to MM</>
+                ? <>increasing ~{lotsAbs(post.roasterLotsDelta)} long — buying into weakness, counterparty to MM<ConfChip lots={post.roasterLotsDelta} params={params} /></>
                 : post.roasterLotsDelta < -FLOW_THRESHOLD
-                ? <>reducing ~{lotsAbs(post.roasterLotsDelta)} long — trimming into strength</>
+                ? <>reducing ~{lotsAbs(post.roasterLotsDelta)} long — trimming into strength<ConfChip lots={post.roasterLotsDelta} params={params} /></>
                 : "stable"}.
             </Bullet>
             <Bullet>
               Producers&rsquo; coverage probably {post.producerLotsDelta > FLOW_THRESHOLD
-                ? <>increasing ~{lotsAbs(post.producerLotsDelta)} short — selling into strength, counterparty to MM</>
+                ? <>increasing ~{lotsAbs(post.producerLotsDelta)} short — selling into strength, counterparty to MM<ConfChip lots={post.producerLotsDelta} params={params} /></>
                 : post.producerLotsDelta < -FLOW_THRESHOLD
-                ? <>reducing ~{lotsAbs(post.producerLotsDelta)} short — covering into weakness</>
+                ? <>reducing ~{lotsAbs(post.producerLotsDelta)} short — covering into weakness<ConfChip lots={post.producerLotsDelta} params={params} /></>
                 : "stable"}.
             </Bullet>
             <Bullet>
@@ -172,8 +184,8 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
         subtitle="Weekly positioning summary per market — OI, price/structure, industry coverage and managed-money flow vs. the prior COT week, plus an intraweek update from the COT day to the latest data." />
       {ny && ldn ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <MarketColumn m={ny}  prevPrice={prevPriceNY}  letters={lettersNy}  label="Arabica · NY"  post={postNy} />
-          <MarketColumn m={ldn} prevPrice={prevPriceLDN} letters={lettersLdn} label="Robusta · LDN" post={postLdn} />
+          <MarketColumn m={ny}  prevPrice={prevPriceNY}  letters={lettersNy}  label="Arabica · NY"  post={postNy}  params={NY_PARAMS} />
+          <MarketColumn m={ldn} prevPrice={prevPriceLDN} letters={lettersLdn} label="Robusta · LDN" post={postLdn} params={LDN_PARAMS} />
         </div>
       ) : (
         <div className="text-xs text-slate-500 px-1">Insufficient history to build the overview.</div>

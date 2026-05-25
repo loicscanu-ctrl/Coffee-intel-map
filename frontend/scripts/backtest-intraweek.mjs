@@ -30,7 +30,7 @@ const __dirname  = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT  = resolve(__dirname, "..", "..");
 const DATA       = resolve(__dirname, "..", "public", "data");
 
-const { estimateIntraweekFlow, DEFAULT_PARAMS } = await import("../lib/cot/intraweekModel.ts");
+const { estimateIntraweekFlow, DEFAULT_PARAMS, NY_PARAMS, LDN_PARAMS } = await import("../lib/cot/intraweekModel.ts");
 
 const n = (x) => (typeof x === "number" ? x : 0);
 const posOf = (raw) => ({
@@ -57,8 +57,8 @@ const toDays = (mkt) =>
     .sort((a, b) => a.date.localeCompare(b.date));
 
 const MARKETS = [
-  { name: "Arabica / NY",  side: "ny",  days: toDays("arabica") },
-  { name: "Robusta / LDN", side: "ldn", days: toDays("robusta") },
+  { name: "Arabica / NY",  side: "ny",  days: toDays("arabica"), params: NY_PARAMS },
+  { name: "Robusta / LDN", side: "ldn", days: toDays("robusta"), params: LDN_PARAMS },
 ];
 
 /** Scorable intervals for one market: {pos, win(asc), actual{}, oiRatio, mmNetW}. */
@@ -177,6 +177,27 @@ for (const m of MARKETS) {
     if (!best || o < best.o) best = { mult: +mult.toFixed(2), o };
   }
   console.log(`  ${m.name.padEnd(14)} MAE@mult ${cells.join("  ")}  | argmin≈${best.mult}  | dir ${dh}/${dn}`);
+}
+
+// ── industry directional confidence by signal magnitude (terciles) ────────────
+// Industry calls are only ~base-rate when the signal is weak, but ~82-86% when
+// strong. These cuts feed NY_PARAMS / LDN_PARAMS confLow/confHigh.
+console.log(`\n=== Industry directional accuracy by |signal| tercile ===`);
+const pctl = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.floor(p * (s.length - 1))] ?? 0; };
+for (const m of MARKETS) {
+  const rows = byMarket[m.name];
+  if (!rows.length) continue;
+  const samples = [];
+  for (const r of rows) {
+    const f = estimateIntraweekFlow(r.win, r.pos, m.params);
+    for (const [pred, act] of [[f.producerLotsDelta, r.actual.producer], [f.roasterLotsDelta, r.actual.roaster]]) {
+      if (Math.abs(act) < SIGN_FLOOR || pred === 0) continue;
+      samples.push({ mag: Math.abs(pred), hit: Math.sign(pred) === Math.sign(act) });
+    }
+  }
+  const lo = pctl(samples.map(s => s.mag), 0.33), hi = pctl(samples.map(s => s.mag), 0.67);
+  const hr = (f) => { const a = samples.filter(f); return a.length ? Math.round((100 * a.filter(s => s.hit).length) / a.length) : 0; };
+  console.log(`  ${m.name.padEnd(14)} cuts low<${Math.round(lo)} high>${Math.round(hi)} lots  |  hit: low ${hr(s => s.mag < lo)}%  mid ${hr(s => s.mag >= lo && s.mag <= hi)}%  high ${hr(s => s.mag > hi)}%  (n=${samples.length})`);
 }
 
 console.log(`\nDefault params: ${JSON.stringify(DEFAULT_PARAMS)}`);

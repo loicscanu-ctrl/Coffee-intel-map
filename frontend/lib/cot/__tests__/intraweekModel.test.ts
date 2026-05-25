@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateIntraweekFlow, type OiDay } from "../intraweekModel";
+import { confidenceTier, estimateIntraweekFlow, NY_PARAMS, type OiDay } from "../intraweekModel";
 import type { CotMarketPositions } from "../types";
 
 // Symmetric COT positions: producers (pmpu short) and roasters (pmpu long) each
@@ -52,5 +52,13 @@ describe("estimateIntraweekFlow regimes", () => {
     const f = estimateIntraweekFlow([day("2026-05-19", 1000, 100), day("2026-05-20", 1100, 105)], POS);
     // prodShare = 0.5 here, so producers and 'others' each take half the short side.
     expect(f.producerLotsDelta).toBeCloseTo(f.othersDelta, 6);
+  });
+});
+
+describe("confidenceTier", () => {
+  it("maps |signal| to backtest-calibrated tiers", () => {
+    expect(confidenceTier(NY_PARAMS.confHigh + 1, NY_PARAMS)).toBe("high");
+    expect(confidenceTier(NY_PARAMS.confLow - 1, NY_PARAMS)).toBe("low");
+    expect(confidenceTier((NY_PARAMS.confLow + NY_PARAMS.confHigh) / 2, NY_PARAMS)).toBe("medium");
   });
 });
