@@ -3,16 +3,14 @@ import { useEffect, useState } from "react";
 import EthiopiaExportPanel from "@/components/supply/ethiopia/EthiopiaExportPanel";
 import EthiopiaFarmerEconomics from "@/components/supply/ethiopia/EthiopiaFarmerEconomics";
 import EthiopiaSupplyDemand from "@/components/supply/ethiopia/EthiopiaSupplyDemand";
-import EthiopiaSDChartTest from "@/components/supply/ethiopia/EthiopiaSDChartTest";
 import EthiopiaStoneXExport from "@/components/supply/ethiopia/EthiopiaStoneXExport";
 import EthiopiaStoneXFarming from "@/components/supply/ethiopia/EthiopiaStoneXFarming";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
-type EthiopiaSubTab = "exports" | "supply-demand" | "chart-test" | "farmer-economics";
+type EthiopiaSubTab = "exports" | "supply-demand" | "farmer-economics";
 const SUB_TABS: { id: EthiopiaSubTab; label: string }[] = [
   { id: "exports",          label: "Exports" },
   { id: "supply-demand",    label: "Supply & Demand" },
-  { id: "chart-test",       label: "Chart test" },
   { id: "farmer-economics", label: "Farmer Economics" },
 ];
 
@@ -112,11 +110,8 @@ export default function EthiopiaTab() {
       {/* Supply & Demand is StoneX static research — independent of the scraper feed. */}
       {subTab === "supply-demand" && <EthiopiaSupplyDemand />}
 
-      {/* TEMP: chart-style comparison for the S&D balance. Remove once a style is chosen. */}
-      {subTab === "chart-test" && <EthiopiaSDChartTest />}
-
       {/* The scraper-fed banners only matter for the data-dependent sub-tabs. */}
-      {error && subTab !== "supply-demand" && subTab !== "chart-test" && (
+      {error && subTab !== "supply-demand" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Ethiopia data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -126,7 +121,7 @@ export default function EthiopiaTab() {
         </div>
       )}
 
-      {!error && !data && subTab !== "supply-demand" && subTab !== "chart-test" && (
+      {!error && !data && subTab !== "supply-demand" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">Loading Ethiopia data...</div>
       )}
 

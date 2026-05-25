@@ -1,5 +1,5 @@
 "use client";
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, CartesianGrid } from "recharts";
+import { ComposedChart, Bar, Line, LabelList, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, CartesianGrid, ReferenceLine } from "recharts";
 import {
   SD_BALANCE, PRODUCTION_BY_REGION, PRODUCTION_TOTAL, DOMESTIC_CONSUMPTION,
   FORECAST_2627, HEADLINE, STONEX_META, type RegionRow,
@@ -22,6 +22,17 @@ function StoneXHeader({ title }: { title: string }) {
 export default function EthiopiaSupplyDemand() {
   const sd = SD_BALANCE.map(r => ({ ...r }));
   const cons = DOMESTIC_CONSUMPTION.series_mBags.map(d => ({ ...d, k: d.value * 1000 }));
+  const balance = SD_BALANCE.map(r => {
+    const delta = r.ending - r.opening;
+    return {
+      year: r.year, opening: r.opening, exports: r.exports, consumption: r.consumption,
+      stockBuild: Math.max(delta, 0), stockDraw: Math.min(delta, 0), production: r.production,
+    };
+  });
+  const segLabel = (v: unknown) => {
+    const n = Number(v);
+    return n && Math.abs(n) >= 1 ? Math.round(n).toLocaleString() : "";
+  };
 
   return (
     <div className="space-y-3">
@@ -56,18 +67,31 @@ export default function EthiopiaSupplyDemand() {
       {/* S&D balance */}
       <div className={CARD}>
         <StoneXHeader title="Supply & Demand Balance (thousand 60-kg bags)" />
-        <div className="h-44">
+        <div className="h-60">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={sd} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
+            <ComposedChart data={balance} stackOffset="sign" margin={{ top: 14, right: 8, left: -6, bottom: 0 }}>
               <CartesianGrid stroke="#1e293b" vertical={false} />
-              <XAxis dataKey="year" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}M`} />
+              <ReferenceLine y={0} stroke="#475569" />
               <Tooltip contentStyle={TT} formatter={(v: unknown, n) => [`${Number(v).toLocaleString()}k bags`, String(n)]} />
               <Legend wrapperStyle={{ fontSize: 9 }} />
-              <Bar dataKey="production"  name="Production"  fill="#22c55e" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="exports"     name="Exports"     fill="#f59e0b" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="consumption" name="Consumption" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-              <Line dataKey="ending"     name="Ending stocks" type="monotone" stroke="#e2e8f0" strokeWidth={1.5} dot={{ r: 2 }} />
+              <Bar dataKey="opening"     name="Opening"     stackId="a" fill="#64748b">
+                <LabelList dataKey="opening"     position="center" fontSize={8} fill="#f8fafc" formatter={segLabel} />
+              </Bar>
+              <Bar dataKey="exports"     name="Exports"     stackId="a" fill="#f59e0b">
+                <LabelList dataKey="exports"     position="center" fontSize={8} fill="#1e293b" formatter={segLabel} />
+              </Bar>
+              <Bar dataKey="consumption" name="Consumption" stackId="a" fill="#3b82f6">
+                <LabelList dataKey="consumption" position="center" fontSize={8} fill="#f8fafc" formatter={segLabel} />
+              </Bar>
+              <Bar dataKey="stockBuild"  name="Stock build" stackId="a" fill="#22c55e" radius={[2, 2, 0, 0]}>
+                <LabelList dataKey="stockBuild"  position="center" fontSize={8} fill="#0b1220" formatter={segLabel} />
+              </Bar>
+              <Bar dataKey="stockDraw"   name="Stock draw"  stackId="a" fill="#ef4444">
+                <LabelList dataKey="stockDraw"   position="center" fontSize={8} fill="#f8fafc" formatter={segLabel} />
+              </Bar>
+              <Line dataKey="production" name="Production"  type="monotone" stroke="#a78bfa" strokeWidth={1.5} dot={{ r: 2 }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -99,8 +123,10 @@ export default function EthiopiaSupplyDemand() {
             </tbody>
           </table>
         </div>
-        <div className="text-[9px] text-slate-500">
-          Lower exports (-30%) and weaker consumption let ending stocks recover to 1.794M bags after 2024/25&apos;s record drain.
+        <div className="text-[9px] text-slate-500 leading-relaxed">
+          Each column = total supply: Opening + Exports + Consumption + stock change. The upper three segments sum to Production
+          (purple line). Green = stock build; red below the axis = destock (exports/consumption drew down stocks, e.g. 24/25&apos;s
+          record drain). Lower exports (-30%) and weaker consumption let 25/26 ending stocks recover to 1.794M bags.
         </div>
       </div>
 
