@@ -1,6 +1,5 @@
 "use client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import WeatherCharts from "../WeatherCharts";
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
@@ -129,8 +128,6 @@ export default function EthiopiaFarmerEconomics({
         <div className="text-[9px] text-slate-500">{harvest_cal.description}</div>
       </div>
 
-      {/* Weather — climatology charts (Vietnam format) */}
-      <WeatherCharts dataUrl="/data/ethiopia_weather.json" title="Weather · Ethiopia" />
 
       {/* ENSO */}
       {enso ? (

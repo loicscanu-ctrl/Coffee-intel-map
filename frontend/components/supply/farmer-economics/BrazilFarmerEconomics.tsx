@@ -8,7 +8,6 @@ import FertilizerPanel     from "./FertilizerPanel";
 import ManualIntelPanel    from "../ManualIntelPanel";
 import BalanceSheetPanel   from "./BalanceSheetPanel";
 import FarmerSellingPanel  from "./FarmerSellingPanel";
-import WeatherCharts       from "../WeatherCharts";
 
 export default function BrazilFarmerEconomics() {
   const [data, setData] = useState<FarmerEconomicsData | null>(null);
@@ -44,8 +43,6 @@ export default function BrazilFarmerEconomics() {
       {/* ── Farmer Selling Pace (full width) ──────────────────── */}
       <FarmerSellingPanel />
 
-      {/* ── Weather — climatology charts (Vietnam format, full width) ── */}
-      <WeatherCharts dataUrl="/data/brazil_weather.json" title="Weather · Brazil" />
 
       {/* ── Two-column: Fundamentals + Risk Signals ───────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-5">

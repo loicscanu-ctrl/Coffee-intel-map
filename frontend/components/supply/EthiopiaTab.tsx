@@ -5,13 +5,15 @@ import EthiopiaFarmerEconomics from "@/components/supply/ethiopia/EthiopiaFarmer
 import EthiopiaSupplyDemand from "@/components/supply/ethiopia/EthiopiaSupplyDemand";
 import EthiopiaStoneXExport from "@/components/supply/ethiopia/EthiopiaStoneXExport";
 import EthiopiaStoneXFarming from "@/components/supply/ethiopia/EthiopiaStoneXFarming";
+import WeatherCharts from "@/components/supply/WeatherCharts";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
-type EthiopiaSubTab = "exports" | "supply-demand" | "farmer-economics";
+type EthiopiaSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather";
 const SUB_TABS: { id: EthiopiaSubTab; label: string }[] = [
   { id: "exports",          label: "Exports" },
   { id: "supply-demand",    label: "Supply & Demand" },
   { id: "farmer-economics", label: "Farmer Economics" },
+  { id: "weather",          label: "Weather" },
 ];
 
 interface EthiopiaSupply {
@@ -107,11 +109,12 @@ export default function EthiopiaTab() {
         ))}
       </div>
 
-      {/* Supply & Demand is StoneX static research — independent of the scraper feed. */}
+      {/* Supply & Demand (StoneX static research) and Weather are independent of the scraper feed. */}
       {subTab === "supply-demand" && <EthiopiaSupplyDemand />}
+      {subTab === "weather" && <WeatherCharts dataUrl="/data/ethiopia_weather.json" title="Weather · Ethiopia" />}
 
       {/* The scraper-fed banners only matter for the data-dependent sub-tabs. */}
-      {error && subTab !== "supply-demand" && (
+      {error && subTab !== "supply-demand" && subTab !== "weather" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Ethiopia data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -121,7 +124,7 @@ export default function EthiopiaTab() {
         </div>
       )}
 
-      {!error && !data && subTab !== "supply-demand" && (
+      {!error && !data && subTab !== "supply-demand" && subTab !== "weather" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">Loading Ethiopia data...</div>
       )}
 

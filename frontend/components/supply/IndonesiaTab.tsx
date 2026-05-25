@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import IndonesiaExportPanel from "@/components/supply/indonesia/IndonesiaExportPanel";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
+import WeatherCharts from "@/components/supply/WeatherCharts";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface IndonesiaSupply {
@@ -67,7 +68,7 @@ const DEFAULT_HARVEST: IndonesiaSupply["harvest_windows"] = [
 ];
 
 export default function IndonesiaTab() {
-  const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
+  const [subTab, setSubTab] = useState<"exports" | "farmer-economics" | "weather">("exports");
   const [data, setData] = useState<IndonesiaSupply | null>(null);
   const [error, setError] = useState(false);
 
@@ -81,7 +82,7 @@ export default function IndonesiaTab() {
   return (
     <div className="space-y-4">
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "farmer-economics"] as const).map(t => (
+        {(["exports", "farmer-economics", "weather"] as const).map(t => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -91,12 +92,12 @@ export default function IndonesiaTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "farmer-economics" ? "Farmer Economics" : "Exports"}
+            {t === "farmer-economics" ? "Farmer Economics" : t === "weather" ? "Weather" : "Exports"}
           </button>
         ))}
       </div>
 
-      {error && (
+      {error && subTab !== "weather" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Indonesia data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -106,11 +107,13 @@ export default function IndonesiaTab() {
         </div>
       )}
 
-      {!error && !data && (
+      {!error && !data && subTab !== "weather" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">
           Loading Indonesia data…
         </div>
       )}
+
+      {subTab === "weather" && <WeatherCharts dataUrl="/data/indonesia_weather.json" title="Weather · Indonesia" />}
 
       {data && subTab === "exports" && (
         data.exports?.annual?.length ? (

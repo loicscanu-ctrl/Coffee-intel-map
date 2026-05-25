@@ -3,7 +3,6 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine,
   Tooltip, Cell, ResponsiveContainer,
 } from "recharts";
-import WeatherCharts from "../WeatherCharts";
 
 type RiskLevel = "HIGH" | "MED" | "LOW" | "NONE";
 type DayRisk   = "H" | "M" | "L" | "-";
@@ -175,8 +174,6 @@ export default function ColombiaFarmerEconomics({ fnc_price, enso, mitaca }: Pro
         <p className="text-[9px] text-slate-500 mt-2 leading-relaxed">{mitaca.description}</p>
       </div>
 
-      {/* ── Weather — climatology charts (Vietnam format) ────────────────── */}
-      <WeatherCharts dataUrl="/data/colombia_weather.json" title="Weather · Colombia" />
 
       {/* ── ENSO Impact (Colombia) ───────────────────────────────────────── */}
       {enso ? (() => {

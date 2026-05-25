@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import UgandaExportPanel from "@/components/supply/uganda/UgandaExportPanel";
 import UgandaFarmerEconomics from "@/components/supply/uganda/UgandaFarmerEconomics";
+import WeatherCharts from "@/components/supply/WeatherCharts";
 import UgandaDestPanel from "@/components/supply/uganda/UgandaDestinationsPanel";
 import UgandaTradeActors from "@/components/supply/uganda/UgandaTradeActorsPanel";
 // UgandaTab itself is dynamic-imported from supply/page.tsx with { ssr: false },
@@ -9,13 +10,14 @@ import UgandaTradeActors from "@/components/supply/uganda/UgandaTradeActorsPanel
 // nested dynamic() would just add per-subtab RTTs without bundle-size benefit
 // (recharts and shared libs go into the vendor chunk regardless).
 
-type SubTab = "exports" | "destinations" | "trade-actors" | "farmer-economics";
+type SubTab = "exports" | "destinations" | "trade-actors" | "farmer-economics" | "weather";
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: "exports",          label: "Exports" },
   { id: "destinations",     label: "Destinations" },
   { id: "trade-actors",     label: "Exporters / Buyers" },
   { id: "farmer-economics", label: "Farmer Economics" },
+  { id: "weather",          label: "Weather" },
 ];
 
 interface ExportMonth {
@@ -113,7 +115,7 @@ export default function UgandaTab() {
         ))}
       </div>
 
-      {error && (
+      {error && subTab !== "weather" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Uganda data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -122,11 +124,13 @@ export default function UgandaTab() {
         </div>
       )}
 
-      {!error && !data && (
+      {!error && !data && subTab !== "weather" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">
           Loading Uganda data...
         </div>
       )}
+
+      {subTab === "weather" && <WeatherCharts dataUrl="/data/uganda_weather.json" title="Weather · Uganda" />}
 
       {data && subTab === "exports" && (
         data.exports ? (

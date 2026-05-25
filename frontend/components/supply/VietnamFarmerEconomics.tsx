@@ -6,7 +6,6 @@ import AcreageYieldPanel   from "@/components/supply/farmer-economics/AcreageYie
 import VnBalanceSheetPanel from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
 import type { VnBalanceSheet } from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
 import VnWaterLevels       from "@/components/supply/VnWaterLevels";
-import VnWeatherCharts     from "@/components/supply/VnWeatherCharts";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -106,8 +105,6 @@ export default function VietnamFarmerEconomics() {
         </div>
       </div>
 
-      {/* Weather charts — full width */}
-      <VnWeatherCharts />
     </div>
   );
 }
