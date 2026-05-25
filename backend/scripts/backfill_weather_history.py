@@ -60,7 +60,7 @@ def fetch_archive(lat: float, lon: float, start: str, end: str) -> dict:
     params = {
         "latitude": lat, "longitude": lon,
         "start_date": start, "end_date": end,
-        "daily": "precipitation_sum,temperature_2m_mean",
+        "daily": "precipitation_sum,temperature_2m_mean,temperature_2m_max,temperature_2m_min",
         "timezone": "UTC",
     }
     last: Exception | None = None
@@ -98,11 +98,17 @@ def backfill(origin: str, start: str, end: str, write: bool) -> int:
         except Exception as e:  # noqa: BLE001 — a flaky region must not abort the origin
             print(f"  [{origin}] {rc['name']}: FETCH FAILED, skipping region: {e}", file=sys.stderr)
             continue
-        times, pr, tm = d["time"], d["precipitation_sum"], d["temperature_2m_mean"]
+        times, pr = d["time"], d["precipitation_sum"]
+        tm, tx, tn = d["temperature_2m_mean"], d["temperature_2m_max"], d["temperature_2m_min"]
         reg = hist["regions"].setdefault(rc["name"], {})
         for i, date in enumerate(times):
             arch_rain = r1(pr[i]) if pr[i] is not None else 0.0
-            arch_tmean = round(tm[i], 1) if tm[i] is not None else None
+            # Some archive grid cells return a null mean but have max/min — fall
+            # back to (max+min)/2 so the temp series doesn't gap (e.g. Jimma, Copán).
+            mean = tm[i]
+            if mean is None and tx[i] is not None and tn[i] is not None:
+                mean = (tx[i] + tn[i]) / 2
+            arch_tmean = round(mean, 1) if mean is not None else None
             prev = reg.get(date)
             if prev is None:
                 reg[date] = {"rain": arch_rain, "tmean": arch_tmean}

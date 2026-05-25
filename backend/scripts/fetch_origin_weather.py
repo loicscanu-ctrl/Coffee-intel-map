@@ -187,8 +187,12 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
         if date <= today_iso:
             # Merge, don't clobber: the forecast API returns tmean=null for many
             # older past-days, so never overwrite a known value (e.g. one filled
-            # by the archive backfill) with a null on a later run.
-            new_tmean = round(tm[i], 1) if tm[i] is not None else None
+            # by the archive backfill) with a null on a later run. Fall back to
+            # (max+min)/2 when the mean itself is null but the extremes aren't.
+            mean = tm[i]
+            if mean is None and tx[i] is not None and tn[i] is not None:
+                mean = (tx[i] + tn[i]) / 2
+            new_tmean = round(mean, 1) if mean is not None else None
             prev = reg.get(date, {})
             reg[date] = {
                 "rain":  r1(rain) if rain is not None else prev.get("rain"),

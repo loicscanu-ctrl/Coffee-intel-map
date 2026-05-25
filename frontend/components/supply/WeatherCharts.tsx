@@ -199,6 +199,7 @@ interface MonthlyRainRow {
   maxRain: number;
   lastYearRain: number;
   actualCur: number | null;
+  proj: number;      // current (partial) month: projected remainder to month-end; 0 otherwise
   dryWarn: number;   // drought-risk threshold (≤P20 of last 30yr); 0 = no data
 }
 
@@ -210,7 +211,7 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
         Monthly Rainfall (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">
-        Pro-rata prod-weighted · Blue = {curYear} · Light blue = {lastYear} · Band = 10yr min/max
+        Pro-rata prod-weighted · Blue = {curYear} (MTD) · Faded = projected month-end · Light blue = {lastYear} · Band = 10yr min/max
         {hasZone && " · Orange = drought-risk zone (below 30yr P20)"}
       </div>
       <ResponsiveContainer width="100%" height={155}>
@@ -234,9 +235,11 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
             legendType={hasZone ? "rect" : "none"} />
           <Area type="monotone" dataKey="minRain" name="10yr min" fill="#0f172a"
             stroke="none" opacity={1} legendType="none" />
-          {/* last-year and current-year bars */}
+          {/* last-year and current-year bars — current month stacks MTD (solid) +
+              projected remainder (faded) so it's comparable to the full-month band */}
           <Bar dataKey="lastYearRain" name={`${lastYear}`} fill="#93c5fd" opacity={0.7} radius={[2, 2, 0, 0]} />
-          <Bar dataKey="actualCur" name={`${curYear}`} fill="#38bdf8" opacity={0.9} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="actualCur" name={`${curYear}`} stackId="cur" fill="#38bdf8" opacity={0.9} />
+          <Bar dataKey="proj" name={`${curYear} proj.`} stackId="cur" fill="#38bdf8" opacity={0.3} radius={[2, 2, 0, 0]} />
           {/* 30yr avg line */}
           <Line type="monotone" dataKey="avgRain" name="30yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
@@ -447,9 +450,9 @@ export default function WeatherCharts({
   );
 
   const monthlyRainData = useMemo<MonthlyRainRow[]>(() => {
-    if (!totalProd) return [];
+    if (!data || !totalProd) return [];
     const hasDryWarn = activeProv.every((p) => Array.isArray(p.monthly_dry_warn) && p.monthly_dry_warn.length === 12);
-    return MONTHS.map((month, i) => {
+    const rows: MonthlyRainRow[] = MONTHS.map((month, i) => {
       const minRain = r1(wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd);
       const dryWarn = hasDryWarn ? r1(wsum(activeProv, (p) => p.monthly_dry_warn![i]) / totalProd) : 0;
       return {
@@ -461,10 +464,37 @@ export default function WeatherCharts({
         actualCur:    activeProv.every((p) => p.monthly_actual_cur[i] != null)
           ? r1(wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd)
           : null,
+        proj: 0,
         dryWarn,
       };
     });
-  }, [activeProv, totalProd]);
+
+    // Current (partial) month → project to month-end so the bar is comparable to
+    // the full-month climatology (same basis as the cumulative chart & the daily
+    // forecast): avg daily rate over (MTD + 7-day forecast) × days-in-month.
+    const curIdx = rows.reduce((acc, r, i) => (r.actualCur !== null ? i : acc), -1);
+    if (curIdx >= 0) {
+      const parts = data.updated.split("-");
+      const curYearNum  = parseInt(parts[0]);
+      const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
+      const daysInMonth = new Date(curYearNum, curIdx + 1, 0).getDate();
+      let fcRain = 0, fcDays = 0;
+      data.forecast_7d.forEach((f, i) => {
+        const [y, m] = f.date.split("-").map(Number);
+        if (y === curYearNum && m - 1 === curIdx) {
+          fcRain += wsum(activeProv, (p) => p.forecast_7d_rain[i] ?? 0) / totalProd;
+          fcDays += 1;
+        }
+      });
+      const mtd = rows[curIdx].actualCur as number;
+      const knownDays = daysElapsed + fcDays;
+      if (knownDays > 0) {
+        const projEnd = ((mtd + fcRain) / knownDays) * daysInMonth;
+        rows[curIdx].proj = Math.max(r1(projEnd) - mtd, 0);
+      }
+    }
+    return rows;
+  }, [data, activeProv, totalProd]);
 
   const cumulativeData = useMemo<CumRainRow[]>(() => {
     if (!data || !totalProd) return [];
