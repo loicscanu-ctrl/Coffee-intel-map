@@ -44,13 +44,11 @@ share in the filter. Remaining items are in the data pipeline:
 - [x] **Production-at-risk readout** added — surfaces the % of selected production
       whose projected current-month rainfall is in its drought-risk zone, naming the
       regions (counters weighted-average masking). Frontend-only, live.
-- [~] **Daily Accumulated chart now prod-weighted — needs a fetch run to populate.**
-      `fetch_origin_weather.rebuild_chart` now emits per-province `daily_accum_cur`/
-      `daily_accum_ly`; the frontend weights the daily chart across selected regions
-      (label "Prod-weighted · N regions"). Until the next `weather-fetch` (or 0.4)
-      run repopulates the JSON with those fields, the frontend falls back to the
-      single reference station gracefully. **TODO:** confirm after the next run that
-      the daily chart shows "Prod-weighted" and responds to the region filter.
+- [x] **Daily Accumulated chart prod-weighted — DONE & verified.** After the 0.4
+      run, all 7 origins have populated per-province `daily_accum_cur` (through
+      day 25), so the daily chart now weights across selected regions and responds
+      to the filter. `daily_accum_ly` is empty (no 2025 daily history) → last-year
+      line uses the climatology fallback, as designed.
 - [ ] **Honduras May rainfall ~16% of normal is REAL, not a bug** (other 6 origins
       66–123% via the same builder; daily station ~7mm MTD). Likely a genuine
       early-rainy-season deficit — worth a drought-risk flag. Re-check once May is
