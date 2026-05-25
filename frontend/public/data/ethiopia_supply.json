@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-25T06:53:22.824525Z",
+  "scraped_at": "2026-05-25T18:03:13.915433Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-25",
@@ -340,7 +340,7 @@
     ]
   },
   "ecx_price": {
-    "etb_per_kg": 404.0,
+    "etb_per_kg": 300.0,
     "as_of": "2026-05-25",
     "source": "ECX",
     "grade": "All grades avg"
@@ -457,10 +457,10 @@
           "M",
           "M",
           "M",
-          "L",
-          "L",
-          "L",
           "M",
+          "M",
+          "M",
+          "L",
           "L",
           "-"
         ]
