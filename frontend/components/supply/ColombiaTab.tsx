@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ColombiaExportPanel from "@/components/supply/colombia/ColombiaExportPanel";
 import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
+import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface ColombiaSupply {
@@ -64,7 +65,7 @@ const DEFAULT_MITACA = {
 };
 
 export default function ColombiaTab() {
-  const [subTab, setSubTab] = useState<"exports" | "farmer-economics" | "weather">("exports");
+  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
   const [data, setData] = useState<ColombiaSupply | null>(null);
   const [error, setError] = useState(false);
 
@@ -79,7 +80,7 @@ export default function ColombiaTab() {
     <div className="space-y-4">
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "farmer-economics", "weather"] as const).map(t => (
+        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map(t => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -89,12 +90,12 @@ export default function ColombiaTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "farmer-economics" ? "Farmer Economics" : t === "weather" ? "Weather" : "Exports"}
+            {t === "farmer-economics" ? "Farmer Economics" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Exports"}
           </button>
         ))}
       </div>
 
-      {error && subTab !== "weather" && (
+      {error && subTab !== "weather" && subTab !== "supply-demand" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Colombia data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -104,12 +105,13 @@ export default function ColombiaTab() {
         </div>
       )}
 
-      {!error && !data && subTab !== "weather" && (
+      {!error && !data && subTab !== "weather" && subTab !== "supply-demand" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">
           Loading Colombia data…
         </div>
       )}
 
+      {subTab === "supply-demand" && <SupplyDemandBalance origin="colombia" label="Colombia" />}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/colombia_weather.json" title="Weather · Colombia" />}
 
       {data && subTab === "exports" && (
