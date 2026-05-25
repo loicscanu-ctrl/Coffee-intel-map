@@ -1,0 +1,93 @@
+name: "0.4 – Backfill weather history (Open-Meteo archive)"
+
+# One-shot historical backfill: fills backend/seed/weather_history/{origin}.json
+# for calendar days the daily forecast pipeline (92-day window) can't reach —
+# e.g. Jan/early-Feb 2026, before daily accumulation started. Idempotent: only
+# adds missing days, never overwrites accumulated ones. After backfilling, it
+# rebuilds the chart JSON so the recovered months show up immediately.
+#
+# Manual only. The archive host (archive-api.open-meteo.com) is not always
+# reachable from CI; if it times out the backfill step fails cleanly and nothing
+# is committed.
+on:
+  workflow_dispatch:
+    inputs:
+      origins:
+        description: "Space-separated origin keys, or blank for all (incl. vn)"
+        required: false
+        default: ""
+        type: string
+      start:
+        description: "Inclusive start date YYYY-MM-DD (default: Jan 1 this year)"
+        required: false
+        default: ""
+        type: string
+      end:
+        description: "Inclusive end date YYYY-MM-DD (default: today − 6 days)"
+        required: false
+        default: ""
+        type: string
+
+concurrency:
+  group: weather-fetch          # share the daily fetcher's queue — same files
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Backfill history from archive
+        env:
+          ORIGINS: ${{ inputs.origins }}
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
+        run: |
+          ARGS="--write"
+          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
+          [ -n "$START" ] && ARGS="$ARGS --start $START"
+          [ -n "$END" ] && ARGS="$ARGS --end $END"
+          python backend/scripts/backfill_weather_history.py $ARGS
+
+      - name: Rebuild chart JSON from the now-fuller history
+        env:
+          ORIGINS: ${{ inputs.origins }}
+        run: |
+          ARGS="--write"
+          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
+          python backend/scripts/fetch_origin_weather.py $ARGS
+
+      - name: Commit backfilled history + refreshed charts
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/seed/weather_history/*.json frontend/public/data/*_weather.json
+          if git diff --cached --quiet; then
+            echo "No backfill change."
+            exit 0
+          fi
+          git commit -m "data: backfill early-year weather history from archive [skip ci]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed (archive host likely unreachable) — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

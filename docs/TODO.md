@@ -30,10 +30,19 @@ share in the filter. Remaining items are in the data pipeline:
       actual_cur advances daily. NOTE: VN's curated Jan/Feb actuals will be
       replaced by live history (Mar→ only, like other origins) since the forecast
       API only exposes ~92 past days.
-- [ ] **Jan/Feb (and early-year temp) actuals missing for all scraped origins.**
-      `monthly_actual_cur` begins in March; `monthly_actual_temp_cur` even later.
-      Investigate `_year_series`/assembly in build_origin_weather.py — the
-      current-year actual series should start at January (archive covers it).
+- [ ] **Backfill Jan/early-Feb 2026 actuals — RUN the new backfill workflow.**
+      Correction to an earlier note: the history store
+      (`backend/seed/weather_history/{origin}.json`) is append-only and already
+      persists everything from ~2026-02-20 onward (it never deletes), so going
+      forward nothing is lost. Jan 1–Feb 19 are simply pre-accumulation (daily
+      pipeline started ~late Feb; the forecast API only reaches 92 days back).
+      New `backfill_weather_history.py` + "0.4 – Backfill weather history" workflow
+      fetch those days from the Open-Meteo ARCHIVE host and fill the gap
+      (idempotent). **TODO:** dispatch the workflow once and confirm Jan/Feb appear.
+      RISK: the archive host may be blocked from CI (the daily fetcher uses the
+      forecast host for that reason) — if the run fails at preflight, archive
+      egress isn't allowlisted and Jan/Feb 2026 stays a one-time gap (next year is
+      covered by daily accumulation regardless).
 - [ ] **Honduras May rainfall ~16% of normal is REAL, not a bug** (other 6 origins
       66–123% via the same builder; daily station ~7mm MTD). Likely a genuine
       early-rainy-season deficit — worth a drought-risk flag. Re-check once May is
