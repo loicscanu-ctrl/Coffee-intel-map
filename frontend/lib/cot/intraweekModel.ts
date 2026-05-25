@@ -26,12 +26,16 @@ export interface IntraweekParams {
 }
 
 export const DEFAULT_PARAMS: IntraweekParams = {
-  // mmShareMult 0.5: scripts/backtest-intraweek.mjs shows the raw OI-share
-  // attribution overshoots realized COT moves (esp. Robusta); halving it roughly
-  // halves the magnitude error while leaving directional accuracy untouched.
-  // Revisit as oi_history accumulates more weeks.
-  deadbandPct: 0.1, refPct: 1.0, scaleMin: 0.25, scaleMax: 2.0, mmShareMult: 0.5,
+  deadbandPct: 0.1, refPct: 1.0, scaleMin: 0.25, scaleMax: 2.0, mmShareMult: 1.0,
 };
+
+// Per-market multipliers fitted on the 5-year archive (scripts/backtest-intraweek.mjs,
+// ~250 COT weeks/market). The objMAE curve is monotonic in opposite directions:
+// Arabica wants a higher MM share of OI flow, Robusta a lower one. Directional
+// accuracy (~66-69% on MM-net / producers / roasters) is what the model is for;
+// the magnitude lever only moves MAE ~8%, so treat the lot sizes as rough.
+export const NY_PARAMS:  IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 2.0 };
+export const LDN_PARAMS: IntraweekParams = { ...DEFAULT_PARAMS, mmShareMult: 0.5 };
 
 export type IntraweekFlow = {
   mmLongDelta: number; mmShortDelta: number;

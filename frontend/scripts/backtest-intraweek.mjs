@@ -5,27 +5,30 @@
  *
  * Run with:  node --import tsx scripts/backtest-intraweek.mjs
  *
+ * Data: data/contract_prices_archive.json — the permanent ~5-year daily
+ * per-contract OI+price archive (2021→present), NOT the 30-day public
+ * oi_history.json the live dashboard serves. Each date carries price@N-1 and
+ * oi@N-2 biz days (a ~1-day internal lag we accept as backtest noise).
+ *
  * Methodology:
- *   1. Read cot.json (weekly truth) + oi_history.json (daily per-contract OI/price).
- *   2. For each consecutive COT pair (W → W+1) whose span is covered by daily OI,
- *      run estimateIntraweekFlow() over the [W … W+1] window using W's positions.
- *   3. Compare the predicted category deltas to the realized COT-to-COT change:
+ *   1. Read cot.json (weekly truth) + the archive (daily OI/price).
+ *   2. For each consecutive COT pair (W → W+1) whose span is covered by daily
+ *      data, run estimateIntraweekFlow() over the [W … W+1] window using W's
+ *      positions.
+ *   3. Compare predicted category deltas to the realized COT-to-COT change:
  *        MM net, MM long, MM short, producers (PMPU short), roasters (PMPU long).
  *   4. Report per-category sign-accuracy + MAE vs. two baselines:
  *        - "zero":  predict no change          (MAE = mean |actual|)
  *        - "∝OI":   old model, MM net × (OI ratio − 1)   [MM net only]
- *   5. Sweep mmShareMult × refPct and print the grid ranked by combined MAE.
- *
- * NOTE: oi_history.json is a short rolling window (~30 days), so only a handful
- * of COT weeks are scorable today. The harness is built to stay valid as the
- * daily history accumulates — re-run it whenever oi_history grows.
+ *   5. Sweep mmShareMult × refPct, then fit the best per-market mmShareMult.
  */
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA = resolve(__dirname, "..", "public", "data");
+const __dirname  = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT  = resolve(__dirname, "..", "..");
+const DATA       = resolve(__dirname, "..", "public", "data");
 
 const { estimateIntraweekFlow, DEFAULT_PARAMS } = await import("../lib/cot/intraweekModel.ts");
 
@@ -39,17 +42,27 @@ const posOf = (raw) => ({
 });
 const totOI = (day) => day.contracts.reduce((s, c) => s + n(c.oi), 0);
 
-const cot = JSON.parse(await readFile(resolve(DATA, "cot.json"), "utf8"));
-const oi  = JSON.parse(await readFile(resolve(DATA, "oi_history.json"), "utf8"));
+const cot     = JSON.parse(await readFile(resolve(DATA, "cot.json"), "utf8"));
+const archive = JSON.parse(await readFile(resolve(REPO_ROOT, "data", "contract_prices_archive.json"), "utf8"));
+
+// Archive {date:{symbol:{oi,price}}} → ascending OiDay[] (front-first contract
+// order is preserved from the archive). Drop days without a real OI snapshot.
+const toDays = (mkt) =>
+  Object.entries(archive[mkt])
+    .map(([date, cons]) => ({
+      date,
+      contracts: Object.entries(cons).map(([symbol, v]) => ({ symbol, oi: n(v.oi), last_price: n(v.price) })),
+    }))
+    .filter((d) => totOI(d) > 1000)
+    .sort((a, b) => a.date.localeCompare(b.date));
 
 const MARKETS = [
-  { name: "Arabica / NY",  side: "ny",  oiKey: "arabica" },
-  { name: "Robusta / LDN", side: "ldn", oiKey: "robusta" },
+  { name: "Arabica / NY",  side: "ny",  days: toDays("arabica") },
+  { name: "Robusta / LDN", side: "ldn", days: toDays("robusta") },
 ];
 
-/** Build the list of scorable intervals: {posW, window(asc), actual{}}. */
-function intervals(side, oiKey) {
-  const daysAsc = [...oi[oiKey]].sort((a, b) => a.date.localeCompare(b.date));
+/** Scorable intervals for one market: {pos, win(asc), actual{}, oiRatio, mmNetW}. */
+function intervals(side, daysAsc) {
   const out = [];
   for (let i = 0; i < cot.length - 1; i++) {
     const W = cot[i], Wn = cot[i + 1];
@@ -105,22 +118,26 @@ function score(allRows, params) {
   return { acc, prop: { mae: propAE / (propN || 1), zmae: propZae / (propN || 1) } };
 }
 
-// ── per-market report at default params ───────────────────────────────────────
 const fmt = (x) => (x / 1000).toFixed(2) + "k";
+const objMAEof = (acc, nrows) => (acc.mmNet.ae + acc.producer.ae + acc.roaster.ae) / (3 * (nrows || 1));
+
+// ── per-market report at default params ───────────────────────────────────────
+const byMarket = {};
 let combined = [];
 for (const m of MARKETS) {
-  const rows = intervals(m.side, m.oiKey);
+  const rows = intervals(m.side, m.days);
+  byMarket[m.name] = rows;
   combined = combined.concat(rows);
-  console.log(`\n=== ${m.name} — ${rows.length} scorable interval(s) ===`);
-  console.log("  " + rows.map((r) => `${r.from.slice(5)}→${r.to.slice(5)}`).join("  "));
+  const span = rows.length ? `${rows[0].from} → ${rows[rows.length - 1].to}` : "—";
+  console.log(`\n=== ${m.name} — ${rows.length} scorable interval(s)  (${span}) ===`);
   if (!rows.length) continue;
   const { acc, prop } = score(rows, DEFAULT_PARAMS);
-  console.log("  category    signHit   modelMAE    zeroMAE     skill");
+  console.log("  category    signHit    modelMAE    zeroMAE     skill");
   for (const c of CATS) {
     const s = acc[c.key];
     const skill = s.zae ? (1 - s.ae / s.zae) : 0;
-    const hit = s.dirN ? `${s.hit}/${s.dirN}` : "  n/a";
-    console.log(`  ${c.label.padEnd(10)}  ${hit.padStart(6)}   ${fmt(s.ae / s.n).padStart(8)}   ${fmt(s.zae / s.n).padStart(8)}   ${(skill * 100).toFixed(0).padStart(5)}%`);
+    const hit = s.dirN ? `${s.hit}/${s.dirN} (${Math.round((100 * s.hit) / s.dirN)}%)` : "n/a";
+    console.log(`  ${c.label.padEnd(10)}  ${hit.padStart(11)}  ${fmt(s.ae / s.n).padStart(8)}   ${fmt(s.zae / s.n).padStart(8)}   ${(skill * 100).toFixed(0).padStart(5)}%`);
   }
   console.log(`  MM net ∝OI baseline MAE: ${fmt(prop.mae)} (vs zero ${fmt(prop.zmae)})`);
 }
@@ -128,18 +145,38 @@ for (const m of MARKETS) {
 // ── parameter sweep (combined across markets) ─────────────────────────────────
 console.log(`\n=== Parameter sweep (combined, ${combined.length} intervals) — ranked by MM-net+producer+roaster MAE ===`);
 const grid = [];
-for (const mmShareMult of [0.5, 0.75, 1, 1.5, 2, 3])
+for (const mmShareMult of [0.25, 0.5, 0.75, 1, 1.5, 2, 3])
   for (const refPct of [0.5, 1, 2]) {
-    const params = { ...DEFAULT_PARAMS, mmShareMult, refPct };
-    const { acc } = score(combined, params);
-    const objMAE = (acc.mmNet.ae + acc.producer.ae + acc.roaster.ae) / (3 * (combined.length || 1));
-    const dirHit = (acc.mmNet.hit + acc.producer.hit + acc.roaster.hit);
-    const dirN   = (acc.mmNet.dirN + acc.producer.dirN + acc.roaster.dirN);
-    grid.push({ mmShareMult, refPct, objMAE, dirHit, dirN });
+    const { acc } = score(combined, { ...DEFAULT_PARAMS, mmShareMult, refPct });
+    grid.push({ mmShareMult, refPct, objMAE: objMAEof(acc, combined.length),
+      dirHit: acc.mmNet.hit + acc.producer.hit + acc.roaster.hit,
+      dirN:   acc.mmNet.dirN + acc.producer.dirN + acc.roaster.dirN });
   }
 grid.sort((a, b) => a.objMAE - b.objMAE);
 console.log("  mmShareMult  refPct   objMAE     dirHit");
-for (const g of grid)
+for (const g of grid.slice(0, 8))
   console.log(`  ${String(g.mmShareMult).padStart(9)}  ${String(g.refPct).padStart(5)}   ${fmt(g.objMAE).padStart(7)}   ${g.dirHit}/${g.dirN}`);
+
+// ── per-market mmShareMult curve + argmin (refPct fixed at default) ───────────
+console.log(`\n=== Per-market mmShareMult sensitivity (refPct=${DEFAULT_PARAMS.refPct}) — objMAE + direction ===`);
+const REF_MULTS = [0.25, 0.5, 1, 1.5, 2];
+for (const m of MARKETS) {
+  const rows = byMarket[m.name];
+  if (!rows.length) continue;
+  const cells = REF_MULTS.map((mult) => {
+    const { acc } = score(rows, { ...DEFAULT_PARAMS, mmShareMult: mult });
+    return `${mult}:${fmt(objMAEof(acc, rows.length))}`;
+  });
+  // dir hit-rate is mult-invariant (sign of a positive-scaled prediction) — show once
+  const { acc } = score(rows, DEFAULT_PARAMS);
+  const dh = acc.mmNet.hit + acc.producer.hit + acc.roaster.hit;
+  const dn = acc.mmNet.dirN + acc.producer.dirN + acc.roaster.dirN;
+  let best = null;
+  for (let mult = 0.1; mult <= 2.5001; mult += 0.05) {
+    const o = objMAEof(score(rows, { ...DEFAULT_PARAMS, mmShareMult: mult }).acc, rows.length);
+    if (!best || o < best.o) best = { mult: +mult.toFixed(2), o };
+  }
+  console.log(`  ${m.name.padEnd(14)} MAE@mult ${cells.join("  ")}  | argmin≈${best.mult}  | dir ${dh}/${dn}`);
+}
 
 console.log(`\nDefault params: ${JSON.stringify(DEFAULT_PARAMS)}`);

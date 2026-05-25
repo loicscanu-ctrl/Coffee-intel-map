@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ProcessedCotRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
-import { buildPostCot, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
+import { buildPostCot, LDN_PARAMS, NY_PARAMS, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
@@ -158,8 +158,8 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
     return {
       lettersNy:  nearestLetters(oi?.arabica),
       lettersLdn: nearestLetters(oi?.robusta),
-      postNy:  last ? buildPostCot(oi?.arabica, cotDate, last.ny)  : null,
-      postLdn: last ? buildPostCot(oi?.robusta, cotDate, last.ldn) : null,
+      postNy:  last ? buildPostCot(oi?.arabica, cotDate, last.ny,  NY_PARAMS)  : null,
+      postLdn: last ? buildPostCot(oi?.robusta, cotDate, last.ldn, LDN_PARAMS) : null,
     };
   }, [oi, data]);
 
