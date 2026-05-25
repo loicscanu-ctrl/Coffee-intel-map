@@ -76,22 +76,26 @@ function ProvinceSelector({
   selected: Set<string>;
   onToggle: (name: string) => void;
 }) {
+  const totalProd = provinces.reduce((s, p) => s + p.prod_mt_k, 0) || 1;
   return (
     <div className="flex flex-wrap gap-1.5 items-center">
       <span className="text-[8px] text-slate-600 uppercase tracking-wider mr-0.5">Filter:</span>
       {provinces.map((p) => {
         const active = selected.has(p.name);
+        const share = Math.round((p.prod_mt_k / totalProd) * 100);
         return (
           <button
             key={p.name}
             onClick={() => onToggle(p.name)}
-            className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors border ${
+            title={`${p.name} · ${p.prod_mt_k.toLocaleString()}k MT · ${share}% of crop`}
+            className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors border leading-tight ${
               active
                 ? "bg-slate-700 text-slate-200 border-slate-500"
                 : "bg-transparent text-slate-600 border-slate-700"
             }`}
           >
-            {p.name}
+            <span className="block">{p.name}</span>
+            <span className={`block text-[7px] ${active ? "text-amber-400/90" : "text-slate-600"}`}>{share}% of crop</span>
           </button>
         );
       })}
@@ -454,7 +458,7 @@ export default function WeatherCharts({
         minRain,
         maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
         lastYearRain: r1(wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd),
-        actualCur:    activeProv.every((p) => p.monthly_actual_cur.length > i)
+        actualCur:    activeProv.every((p) => p.monthly_actual_cur[i] != null)
           ? r1(wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd)
           : null,
         dryWarn,
@@ -470,7 +474,7 @@ export default function WeatherCharts({
       cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i])       / totalProd;
       cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i])       / totalProd;
       cumLY  += wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd;
-      const hasActual = activeProv.every((p) => p.monthly_actual_cur.length > i);
+      const hasActual = activeProv.every((p) => p.monthly_actual_cur[i] != null);
       if (hasActual) cumC += wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd;
       return {
         month,
@@ -523,7 +527,7 @@ export default function WeatherCharts({
       minTemp:      r1(wsum(activeProv, (p) => p.monthly_min_temp[i])        / totalProd),
       maxTemp:      r1(wsum(activeProv, (p) => p.monthly_max_temp[i])        / totalProd),
       lastYearTemp: r1(wsum(activeProv, (p) => p.monthly_last_year_temp[i])  / totalProd),
-      actualCur:    activeProv.every((p) => p.monthly_actual_temp_cur.length > i)
+      actualCur:    activeProv.every((p) => p.monthly_actual_temp_cur[i] != null)
         ? r1(wsum(activeProv, (p) => p.monthly_actual_temp_cur[i]) / totalProd)
         : null,
     }));
