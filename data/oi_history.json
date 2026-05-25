@@ -1,6 +1,56 @@
 {
   "arabica": [
     {
+      "date": "2026-05-21",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 74930,
+          "last_price": 273.4
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 53520,
+          "last_price": 265.5
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 37238,
+          "last_price": 257.25
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 13575,
+          "last_price": 254.95
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 4451,
+          "last_price": 254.3
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 3643,
+          "last_price": 254.05
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1915,
+          "last_price": 252.95
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2501,
+          "last_price": 251.7
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 562,
+          "last_price": 250.85
+        }
+      ]
+    },
+    {
       "date": "2026-05-20",
       "contracts": [
         {
@@ -1517,61 +1567,6 @@
           "symbol": "KCH28",
           "oi": 439,
           "last_price": 251.05
-        }
-      ]
-    },
-    {
-      "date": "2026-04-08",
-      "contracts": [
-        {
-          "symbol": "KCK26",
-          "oi": 46545,
-          "last_price": 294.05
-        },
-        {
-          "symbol": "KCN26",
-          "oi": 57685,
-          "last_price": 289.3
-        },
-        {
-          "symbol": "KCU26",
-          "oi": 31679,
-          "last_price": 275.95
-        },
-        {
-          "symbol": "KCZ26",
-          "oi": 24956,
-          "last_price": 266.55
-        },
-        {
-          "symbol": "KCH27",
-          "oi": 9169,
-          "last_price": 262.15
-        },
-        {
-          "symbol": "KCK27",
-          "oi": 2224,
-          "last_price": 260.1
-        },
-        {
-          "symbol": "KCN27",
-          "oi": 1026,
-          "last_price": 258.55
-        },
-        {
-          "symbol": "KCU27",
-          "oi": 1583,
-          "last_price": 256.25
-        },
-        {
-          "symbol": "KCZ27",
-          "oi": 1663,
-          "last_price": 253.6
-        },
-        {
-          "symbol": "KCH28",
-          "oi": 420,
-          "last_price": 251.15
         }
       ]
     }
