@@ -12,8 +12,10 @@ trigger and gates `npm ci` + signals to COT-relevant runs.
 - [ ] **COT slice** — confirm on the next 2.3 run: commits only
       `cot.json`/`cot_recent.json`/`macro_cot.json`/`oi_fnd_chart.json` (+ `signals.json`).
       (Same mechanism as the verified news path, different topic list.)
-- [ ] **Daily-OI slice** — confirm on the next 1.3 run:
-      `futures_chain.json`/`oi_fnd_chart.json`/`latest_prices.json`, no `npm ci`.
+- [x] **Daily-OI slice CONFIRMED.** Commit `086c803` (1.4 fired by a manual 1.3,
+      2026-05-25 11:16) touched only `latest_prices.json` + `health.json`
+      (`futures_chain`/`oi_fnd_chart` re-exported but unchanged) — no `signals.json`,
+      none of the other ~18 topics. Scoping + npm/signals gating confirmed.
 - [ ] **Full export** — confirm a cron/dispatch run still writes everything + signals.
 - Safety net: the nightly cron runs a full export, so a missed file self-heals.
 
