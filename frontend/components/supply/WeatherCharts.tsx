@@ -397,6 +397,41 @@ function ForecastRainChart({ data }: { data: ForecastBarRow[] }) {
   );
 }
 
+// ── Production-at-risk readout ─────────────────────────────────────────────────
+// A prod-weighted average can hide a small region in drought. This surfaces the
+// SHARE of selected production whose projected current-month rainfall is in its
+// own drought-risk zone (below the 30yr P20, or <60% of normal where P20 is
+// absent), and names the stressed regions — something the average can't mask.
+
+interface RiskRegion { name: string; weight: number; ratio: number; risk: boolean }
+
+function ProductionAtRisk({ month, regions }: { month: string; regions: RiskRegion[] }) {
+  const flagged = regions.filter((r) => r.risk).sort((a, b) => b.weight - a.weight);
+  const atRiskPct = flagged.reduce((s, r) => s + r.weight, 0) * 100;
+  if (!flagged.length) {
+    return (
+      <div className="text-[9px] text-emerald-400/80 bg-emerald-950/20 border border-emerald-900/40 rounded px-2 py-1">
+        ✓ All selected regions near or above normal rainfall ({month}, projected)
+      </div>
+    );
+  }
+  return (
+    <div className="text-[9px] bg-amber-950/30 border border-amber-900/50 rounded px-2 py-1.5 space-y-1">
+      <div className="text-amber-300 font-semibold">
+        ⚠ {atRiskPct.toFixed(0)}% of selected production below drought-risk rainfall ({month}, projected)
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-slate-400">
+        {flagged.map((r) => (
+          <span key={r.name}>
+            {r.name} <span className="text-slate-500">({(r.weight * 100).toFixed(0)}%)</span> —{" "}
+            <span className="text-amber-400/90">{(r.ratio * 100).toFixed(0)}% of normal</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function WeatherCharts({
@@ -579,6 +614,37 @@ export default function WeatherCharts({
     }));
   }, [data, activeProv, totalProd]);
 
+  // Production-at-risk: per active region, project the current month and flag it
+  // if the projection lands in its drought-risk zone (< 30yr P20, else < 60% of normal).
+  const risk = useMemo<{ month: string; regions: RiskRegion[] } | null>(() => {
+    if (!data || !totalProd) return null;
+    const parts = data.updated.split("-");
+    const curYearNum  = parseInt(parts[0]);
+    const curIdx      = parseInt(parts[1]) - 1;
+    const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
+    const daysInMonth = new Date(curYearNum, curIdx + 1, 0).getDate();
+    const fcInMonth = data.forecast_7d.map((f) => {
+      const [y, m] = f.date.split("-").map(Number);
+      return y === curYearNum && m - 1 === curIdx;
+    });
+    const fcDays = fcInMonth.filter(Boolean).length;
+    const known  = daysElapsed + fcDays;
+    const regions: RiskRegion[] = [];
+    for (const p of activeProv) {
+      const mtd = p.monthly_actual_cur[curIdx];
+      if (mtd == null) continue;
+      let fcRain = 0;
+      data.forecast_7d.forEach((f, i) => { if (fcInMonth[i]) fcRain += p.forecast_7d_rain[i] ?? 0; });
+      const proj = known > 0 ? ((mtd + fcRain) / known) * daysInMonth : mtd;
+      const avg  = p.monthly_avg_rain[curIdx] || 0;
+      const p20  = (p.monthly_dry_warn && p.monthly_dry_warn[curIdx]) || 0;
+      const ratio = avg > 0 ? proj / avg : 1;
+      const isRisk = p20 > 0 ? proj < p20 : ratio < 0.6;
+      regions.push({ name: p.name, weight: p.prod_mt_k / totalProd, ratio, risk: isRisk });
+    }
+    return regions.length ? { month: MONTHS[curIdx], regions } : null;
+  }, [data, activeProv, totalProd]);
+
   if (!data || !selected) {
     return (
       <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-500 text-xs italic animate-pulse">
@@ -654,6 +720,9 @@ export default function WeatherCharts({
         Weighted across: {activeNames} · total {(totalProd / 1000).toFixed(0)}k MT
         {fullProd > 0 && ` (${((totalProd / fullProd) * 100).toFixed(0)}% ${data.share_label ?? data.label})`}
       </div>
+
+      {/* Production-at-risk — surfaces localized drought the weighted average hides */}
+      {risk && <ProductionAtRisk month={risk.month} regions={risk.regions} />}
 
       {/* 2×2 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
