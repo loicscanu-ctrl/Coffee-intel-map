@@ -149,8 +149,8 @@
       ],
       "monthly_actual_temp_cur": [
         21.2,
-        null,
-        null,
+        21.8,
+        21.6,
         21.0,
         20.0
       ],
@@ -304,8 +304,8 @@
       ],
       "monthly_actual_temp_cur": [
         21.3,
-        null,
-        null,
+        21.6,
+        21.5,
         22.0,
         21.2
       ],
@@ -459,8 +459,8 @@
       ],
       "monthly_actual_temp_cur": [
         26.7,
-        null,
-        null,
+        27.8,
+        26.3,
         26.4,
         25.2
       ],
@@ -614,8 +614,8 @@
       ],
       "monthly_actual_temp_cur": [
         23.6,
-        null,
-        null,
+        24.8,
+        24.0,
         23.0,
         18.4
       ],
