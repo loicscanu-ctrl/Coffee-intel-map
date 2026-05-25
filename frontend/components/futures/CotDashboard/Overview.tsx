@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
+import type { ProcessedCotRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
+import { buildPostCot, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
@@ -20,9 +21,9 @@ const priceAbsNY  = (v: number, signed = false) => `${signed && v >= 0 ? "+" : "
 const priceAbsLDN = (v: number, signed = false) =>
   signed ? `${v >= 0 ? "+" : "-"}$${Math.abs(Math.round(v))} per ton` : `$${Math.round(v)} per ton`;
 
+const FLOW_THRESHOLD = 50; // lots below which a leg reads "stable/holding"
+
 const OI_HISTORY_URL = "/data/oi_history.json";
-type OiContract = { symbol: string; oi: number; last_price: number };
-type OiDay = { date: string; contracts: OiContract[] };
 type OiHistory = { arabica?: OiDay[]; robusta?: OiDay[] };
 
 /** Nearest-two active contract letters, e.g. "N and U". days[] is newest-first. */
@@ -33,88 +34,6 @@ function nearestLetters(days: OiDay[] | undefined): string | null {
   return letters.length === 2 ? `${letters[0]} and ${letters[1]}` : letters[0] ?? null;
 }
 
-// ── post-COT intraweek snapshot, computed from daily per-contract OI/price ─────
-type PostCot = {
-  cotDate: string; latestDate: string;
-  oiChange: number; nearbyChange: number; forwardChange: number;
-  priceChangeAbs: number; priceChangePct: number;
-  invertedNow: number; inCarry: boolean; movingToward: "backwardation" | "carry";
-  mmLongDelta: number; mmShortDelta: number;
-  producerLotsDelta: number; roasterLotsDelta: number; othersDelta: number;
-};
-
-const PRICE_DEADBAND_PCT = 0.1;  // ignore sub-0.1% daily moves as directionless
-const PRICE_REF_PCT      = 1.0;  // a 1% day = unit conviction
-const PRICE_SCALE_MIN    = 0.25; // floor / cap on the price-magnitude scaler (#4)
-const PRICE_SCALE_MAX    = 2.0;
-const FLOW_THRESHOLD     = 50;   // lots below which a leg reads "stable/holding"
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-
-function buildPostCot(days: OiDay[] | undefined, cotDate: string, pos: CotMarketPositions): PostCot | null {
-  if (!days?.length) return null;
-  const latest = days[0];                              // newest-first
-  const anchorIdx = days.findIndex(d => d.date <= cotDate);
-  if (anchorIdx < 0 || latest.date <= cotDate) return null;
-  const anchor = days[anchorIdx];
-
-  const tot    = (d: OiDay) => d.contracts.reduce((s, c) => s + num(c.oi), 0);
-  const nearby = (d: OiDay) => d.contracts.slice(0, 2).reduce((s, c) => s + num(c.oi), 0);
-  const maxOI  = (d: OiDay) => d.contracts.reduce((a, c) => (num(c.oi) > num(a.oi) ? c : a), d.contracts[0]);
-  const samePx = (d: OiDay, sym: string) => num(d.contracts.find(c => c.symbol === sym)?.last_price) || num(d.contracts[0]?.last_price);
-
-  // ── Endpoint facts (COT day → latest) for the displayed OI / price / structure
-  const oiL = tot(latest), oiA = tot(anchor);
-  const oiChange = oiL - oiA;
-  const nearbyChange = nearby(latest) - nearby(anchor);
-  const front = maxOI(latest);
-  const pL = num(front?.last_price), pA = samePx(anchor, front?.symbol ?? "");
-  const priceChangeAbs = pL - pA;
-  const struct = (d: OiDay) => num(d.contracts[1]?.last_price) - num(d.contracts[0]?.last_price);
-  const fpx    = (d: OiDay) => num(d.contracts[0]?.last_price) || 1;
-  const invL = (-struct(latest) / fpx(latest)) * 100, invA = (-struct(anchor) / fpx(anchor)) * 100;
-
-  // ── Positioning estimate, accumulated day-by-day (#3) over the post-COT window.
-  // Per day, the OI×price regime (#1) decides which leg moves and its sign:
-  //   price↑/OI↑ fresh longs · price↓/OI↑ fresh shorts · price↑/OI↓ short-cover · price↓/OI↓ long-liq
-  // MM is credited its share of that day's |ΔOI|, scaled by the price move (#4).
-  // The opposite side is the counterparty (#2 — both legs handled across regimes),
-  // split between industry and swaps/other reportables by their COT share (#5).
-  const mmShareOI    = clamp((pos.mmLong + pos.mmShort) / (2 * (oiA || 1)), 0, 0.5);
-  const shortNonMM   = pos.pmpuShort + pos.swapShort + pos.otherShort + pos.nonRepShort;
-  const longNonMM    = pos.pmpuLong  + pos.swapLong  + pos.otherLong  + pos.nonRepLong;
-  const prodShare    = shortNonMM > 0 ? clamp(pos.pmpuShort / shortNonMM, 0, 1) : 0;
-  const roastShare   = longNonMM  > 0 ? clamp(pos.pmpuLong  / longNonMM,  0, 1) : 0;
-
-  const win = days.slice(0, anchorIdx + 1).reverse(); // chronological: anchor → latest
-  let mmLongDelta = 0, mmShortDelta = 0, producerLotsDelta = 0, roasterLotsDelta = 0, othersDelta = 0;
-  for (let i = 1; i < win.length; i++) {
-    const prev = win[i - 1], cur = win[i];
-    const d = tot(cur) - tot(prev);
-    const fc = maxOI(cur);
-    const pc = num(fc?.last_price), pp = samePx(prev, fc?.symbol ?? "");
-    if (!pp) continue;
-    const pct = ((pc - pp) / pp) * 100;
-    if (Math.abs(pct) < PRICE_DEADBAND_PCT) continue;          // directionless day
-    const up = pct > 0;
-    const amt = mmShareOI * clamp(Math.abs(pct) / PRICE_REF_PCT, PRICE_SCALE_MIN, PRICE_SCALE_MAX) * d;
-    if (d >= 0) {
-      if (up) { mmLongDelta  += amt; producerLotsDelta += amt * prodShare;  othersDelta += amt * (1 - prodShare); }
-      else    { mmShortDelta += amt; roasterLotsDelta  += amt * roastShare; othersDelta += amt * (1 - roastShare); }
-    } else {
-      if (up) { mmShortDelta += amt; roasterLotsDelta  += amt * roastShare; othersDelta += amt * (1 - roastShare); }
-      else    { mmLongDelta  += amt; producerLotsDelta += amt * prodShare;  othersDelta += amt * (1 - prodShare); }
-    }
-  }
-
-  return {
-    cotDate: anchor.date, latestDate: latest.date,
-    oiChange, nearbyChange, forwardChange: oiChange - nearbyChange,
-    priceChangeAbs, priceChangePct: pA ? (priceChangeAbs / pA) * 100 : 0,
-    invertedNow: Math.abs(invL), inCarry: struct(latest) > 0,
-    movingToward: invL > invA ? "backwardation" : "carry",
-    mmLongDelta, mmShortDelta, producerLotsDelta, roasterLotsDelta, othersDelta,
-  };
-}
 
 function Bullet({ children, sub }: { children: React.ReactNode; sub?: boolean }) {
   return (
