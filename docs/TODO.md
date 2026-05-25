@@ -1,21 +1,21 @@
 # TODO / follow-ups
 
-## CI — verify the sliced 1.4 export (commit 75398fb)
-The "1.4 – Export and Publish" workflow now exports only the topic slice tied to
-each trigger (and gates `npm ci` + signals to COT-relevant runs). This was
-validated locally (py-compile, YAML parse, backward-compatible `main()`), but
-**not yet exercised in production**.
+## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
+The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
+trigger and gates `npm ci` + signals to COT-relevant runs.
 
-To confirm:
-- [ ] Run a manual `workflow_dispatch` of 1.4 → should do a FULL export + signals.
-- [ ] After the next **2.3 COT Scraper** run, check 1.4 committed only
+- [x] **News slice CONFIRMED.** Commit `4cac0f0` (1.4 run, 2026-05-25 09:32)
+      touched exactly `news.json`, `latest_prices.json`, `vn_physical_prices.json`
+      + `health.json` (always-on) and **no `signals.json`** — i.e. it sliced to the
+      news topics, skipped the other ~18, and kept the npm/signals gate off. Proves
+      the scope-decision, `--only` filter, health-always-runs, and signals-gating.
+- [ ] **COT slice** — confirm on the next 2.3 run: commits only
       `cot.json`/`cot_recent.json`/`macro_cot.json`/`oi_fnd_chart.json` (+ `signals.json`).
-- [ ] After the next **1.3 Daily OI** run, check it touched only
-      `futures_chain.json`/`oi_fnd_chart.json`/`latest_prices.json` and skipped `npm ci`.
-- [ ] After the next **1.1 News** run, check it touched only the news/news-derived
-      price files and skipped `npm ci`.
-- Safety net: the nightly cron still runs a full export, so a missed file
-  self-heals within a day.
+      (Same mechanism as the verified news path, different topic list.)
+- [ ] **Daily-OI slice** — confirm on the next 1.3 run:
+      `futures_chain.json`/`oi_fnd_chart.json`/`latest_prices.json`, no `npm ci`.
+- [ ] **Full export** — confirm a cron/dispatch run still writes everything + signals.
+- Safety net: the nightly cron runs a full export, so a missed file self-heals.
 
 ## Weather — backend follow-ups (frontend rendering fixed in WeatherCharts)
 Frontend now renders missing months as gaps (not 0) and shows per-region crop
