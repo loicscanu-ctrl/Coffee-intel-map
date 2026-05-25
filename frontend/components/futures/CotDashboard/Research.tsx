@@ -1,6 +1,14 @@
 "use client";
+import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
+import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import SectionHeader from "./SectionHeader";
+
+type Sub = "model" | "backtest";
+const SUBS: { id: Sub; label: string }[] = [
+  { id: "model",    label: "Intraweek model" },
+  { id: "backtest", label: "COT backtest report" },
+];
 
 function H({ children }: { children: React.ReactNode }) {
   return <h4 className="text-sm font-bold text-amber-400 mt-5 mb-2">{children}</h4>;
@@ -18,12 +26,8 @@ function LI({ children }: { children: React.ReactNode }) {
 const Code = ({ children }: { children: React.ReactNode }) =>
   <code className="px-1 py-px rounded bg-slate-800 text-slate-200 text-[11px]">{children}</code>;
 
-export default function Research() {
+function IntraweekMethodology() {
   return (
-    <>
-      <SectionHeader icon="Book" title="11. Research — Methodology"
-        subtitle="How the Overview's 'post COT' intraweek estimate is built, what it can and can't do, and how it was validated." />
-
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
 
         <H>What problem it solves</H>
@@ -124,6 +128,28 @@ export default function Research() {
           <Code>lib/cot/intraweekModel.ts</Code>.
         </P>
       </div>
+  );
+}
+
+export default function Research() {
+  const [sub, setSub] = useState<Sub>("model");
+  return (
+    <>
+      <SectionHeader icon="Book" title="11. Research — Methodology"
+        subtitle="The thinking behind the COT analytics: the intraweek positioning model, and the standalone COT backtest report." />
+
+      <div className="flex items-center gap-1 flex-wrap mb-4">
+        {SUBS.map(s => (
+          <button key={s.id} onClick={() => setSub(s.id)}
+            className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+              sub === s.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300 border border-transparent"
+            }`}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {sub === "model" ? <IntraweekMethodology /> : <CotBacktestReport />}
     </>
   );
 }
