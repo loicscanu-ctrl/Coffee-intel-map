@@ -2,7 +2,17 @@
 import { useEffect, useState } from "react";
 import EthiopiaExportPanel from "@/components/supply/ethiopia/EthiopiaExportPanel";
 import EthiopiaFarmerEconomics from "@/components/supply/ethiopia/EthiopiaFarmerEconomics";
+import EthiopiaSupplyDemand from "@/components/supply/ethiopia/EthiopiaSupplyDemand";
+import EthiopiaStoneXExport from "@/components/supply/ethiopia/EthiopiaStoneXExport";
+import EthiopiaStoneXFarming from "@/components/supply/ethiopia/EthiopiaStoneXFarming";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
+
+type EthiopiaSubTab = "exports" | "supply-demand" | "farmer-economics";
+const SUB_TABS: { id: EthiopiaSubTab; label: string }[] = [
+  { id: "exports",          label: "Exports" },
+  { id: "supply-demand",    label: "Supply & Demand" },
+  { id: "farmer-economics", label: "Farmer Economics" },
+];
 
 interface EthiopiaSupply {
   country: string;
@@ -68,7 +78,7 @@ const DEFAULT_GRADES = {
 };
 
 export default function EthiopiaTab() {
-  const [subTab, setSubTab] = useState<"exports" | "farmer-economics">("exports");
+  const [subTab, setSubTab] = useState<EthiopiaSubTab>("exports");
   const [data, setData] = useState<EthiopiaSupply | null>(null);
   const [error, setError] = useState(false);
 
@@ -82,22 +92,26 @@ export default function EthiopiaTab() {
   return (
     <div className="space-y-4">
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "farmer-economics"] as const).map(t => (
+        {SUB_TABS.map(t => (
           <button
-            key={t}
-            onClick={() => setSubTab(t)}
+            key={t.id}
+            onClick={() => setSubTab(t.id)}
             className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-              subTab === t
+              subTab === t.id
                 ? "bg-slate-700 text-slate-100"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "farmer-economics" ? "Farmer Economics" : "Exports"}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {error && (
+      {/* Supply & Demand is StoneX static research — independent of the scraper feed. */}
+      {subTab === "supply-demand" && <EthiopiaSupplyDemand />}
+
+      {/* The scraper-fed banners only matter for the data-dependent sub-tabs. */}
+      {error && subTab !== "supply-demand" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
           <div className="text-sm text-slate-400">Ethiopia data not yet available</div>
           <div className="text-[10px] text-slate-600">
@@ -107,29 +121,37 @@ export default function EthiopiaTab() {
         </div>
       )}
 
-      {!error && !data && (
+      {!error && !data && subTab !== "supply-demand" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">Loading Ethiopia data...</div>
       )}
 
-      {data && subTab === "exports" && (
-        data.exports?.annual?.length ? (
-          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Ethiopia Green Coffee Exports" />
-        ) : data.exports?.monthly?.length ? (
-          <EthiopiaExportPanel exports={data.exports} ecx_price={data.ecx_price ?? null} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — pending the next USDA PSD scrape.
-          </div>
-        )
+      {subTab === "exports" && (
+        <div className="space-y-3">
+          {data && (
+            data.exports?.annual?.length ? (
+              <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Ethiopia Green Coffee Exports" />
+            ) : data.exports?.monthly?.length ? (
+              <EthiopiaExportPanel exports={data.exports} ecx_price={data.ecx_price ?? null} />
+            ) : (
+              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
+                Export data not yet available — pending the next USDA PSD scrape.
+              </div>
+            )
+          )}
+          <EthiopiaStoneXExport />
+        </div>
       )}
 
       {data && subTab === "farmer-economics" && (
-        <EthiopiaFarmerEconomics
-          weather={data.weather}
-          enso={data.enso}
-          harvest_cal={data.harvest_cal ?? DEFAULT_HARVEST}
-          grade_structure={data.grade_structure ?? DEFAULT_GRADES}
-        />
+        <div className="space-y-3">
+          <EthiopiaFarmerEconomics
+            weather={data.weather}
+            enso={data.enso}
+            harvest_cal={data.harvest_cal ?? DEFAULT_HARVEST}
+            grade_structure={data.grade_structure ?? DEFAULT_GRADES}
+          />
+          <EthiopiaStoneXFarming />
+        </div>
       )}
     </div>
   );
