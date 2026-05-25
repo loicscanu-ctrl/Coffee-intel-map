@@ -24,18 +24,10 @@ share in the filter. Remaining items are in the data pipeline:
 - [x] **Vietnam weather stale — DONE & verified.** `vn` added to the daily
       pipeline; `vn_weather.json` now `updated=2026-05-25` with a `weather_history/vn.json`
       created. Refreshes daily; freshness blind spot resolved.
-- [~] **Backfill Jan/early-Feb 2026 — archive reachable; first run PARTIAL, fixes
-      applied, RE-RUN needed.** Archive host IS reachable from CI (IPv4 forcing
-      worked). First dispatch filled Brazil/Honduras/Uganda/VN (Jan→May rain), but:
-      (1) Colombia/Ethiopia/Indonesia aborted — one flaky region failed the whole
-      origin; (2) Feb/Mar **temps** stayed null — the forecast API leaves tmean=null
-      on older past-days, the backfill skipped already-present dates, and the daily
-      `upsert` clobbered good values with null.
-      FIXES (committed): `backfill_weather_history.py` now survives a flaky region
-      and fills missing FIELDS (not just missing dates); `fetch_origin_weather.upsert`
-      now merges instead of overwriting a non-null with null.
-      **TODO:** re-dispatch "0.4 – Backfill weather history" (all origins) → should
-      fill the 3 remaining origins' Jan/Feb and recover Feb/Mar temps everywhere.
+- [x] **Backfill Jan/early-Feb 2026 — DONE & verified.** Archive reachable from
+      CI; after the region-resilience + fill-null-fields + merge-upsert fixes, the
+      re-run filled all 7 origins with complete Jan–May rain AND temperature (no
+      gaps). Daily accumulation preserves it going forward.
 - [ ] **Honduras May rainfall ~16% of normal is REAL, not a bug** (other 6 origins
       66–123% via the same builder; daily station ~7mm MTD). Likely a genuine
       early-rainy-season deficit — worth a drought-risk flag. Re-check once May is
