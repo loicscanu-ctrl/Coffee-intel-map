@@ -1,17 +1,17 @@
 # TODO / follow-ups
 
-## Brazil farmer-selling (Safras) — verify the crop-rollover fix (commit cf79f51)
-The scraper (`backend/scraper/sources/farmer_selling.py`) was frozen at
-report_date 2026-04-14 because the "% only rises within a season" guard rejected
-the 2026/27 crop reset. Fixed to be crop-year-aware (seeded crop_year 2025/26).
-**Verify:**
-- [ ] After the next nightly 1.4 export (or a manual `scraper-slow-data` run),
-      check the log line `farmer_selling_brazil.json → arabica:X% robusta:Y%`.
-- [ ] If it instead logs "no update (parse failed or no change)" AND Safras has a
-      newer sales article, the cause is a Safras page/structure change — update the
-      selectors in `_find_latest_article_url` / `_parse_article`.
-- [ ] Confirm `farmer_selling_brazil.json` report_date advances past 2026-04-14 and
-      % sold reflects the 2026/27 crop once Safras publishes it.
+## Brazil farmer-selling (Safras) — verify the fixes (commits cf79f51 + 51c9e88)
+ROOT CAUSE FOUND (via the new export log): `_find_latest_article_url` returned the
+first DOM sales link — a featured **July 2025 '31% of 2025/26'** post — and the
+crop-year guard correctly skipped it (31% « stored 83%), so data froze at 2026-04-14.
+Fixes: (a) collect ALL candidate articles and pick the most-recent by
+(crop_year, crop-month, survey day); (b) crop-year-aware guard accepts a new-crop
+reset; (c) export now logs each candidate + the selected one.
+**Verify after the next 1.4 run:**
+- [ ] Log shows multiple `candidate …` lines and a `Selected most-recent article …`.
+- [ ] If the newest Safras survey > April 2026, `farmer_selling_brazil.json` updates
+      (report_date advances, % reflects it). If April is still newest, it stays 83%/77%
+      (correct — not a bug).
 
 ## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
 The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
