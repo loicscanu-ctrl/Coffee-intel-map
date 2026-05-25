@@ -290,7 +290,7 @@ export default function Step8Analysis({
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-slate-200">1. Rule-Based Signal Analysis</h3>
+          <h3 className="text-sm font-semibold text-slate-200">10. Rule-Based Signal Analysis</h3>
           <p className="text-[10px] text-slate-500 mt-0.5">
             59 rules · proxies: pmpuShort = producers, pmpuLong = roasters · 52-week percentiles
           </p>

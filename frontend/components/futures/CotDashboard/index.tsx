@@ -12,6 +12,7 @@ import { generateData } from "./generateData";
 import { ICONS } from "./icons";
 import type { Step } from "./types";
 
+import Overview from "./Overview";
 import CotGauges from "./Gauges";
 import CotHeatmap from "./Heatmap";
 import Step1GlobalFlow from "./Step1GlobalFlow";
@@ -25,9 +26,9 @@ import OIFndChart from "@/components/futures/OIFndChart";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
-  const [step, setStep] = useUrlState<Step>("step", 1, (raw) => {
+  const [step, setStep] = useUrlState<Step>("step", 10, (raw) => {
     const n = Number(raw);
-    return ([1, 2, 3, 4, 5, 6, 7, 8, 9] as number[]).includes(n) ? (n as Step) : 1;
+    return ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number[]).includes(n) ? (n as Step) : 10;
   });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
@@ -176,7 +177,7 @@ export default function CotDashboard() {
         </div>
       )}
 
-      <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
+      <div id="cot-section-10"><Overview data={data} /></div>
 
       {/* 2. NY & London OI — 7-Day Tracking. Moved from /futures Exchange
           tab so positioning context sits next to the COT signal output. */}
@@ -213,6 +214,9 @@ export default function CotDashboard() {
       <div id="cot-section-5"><Step5DryPowder      data={data} /></div>
       <div id="cot-section-6"><Step6CycleLocation  recent52={recent52} /></div>
       <div id="cot-section-7"><Step7Report         data={data} recent52={recent52} /></div>
+
+      {/* Signals moved to the end of the report. */}
+      <div id="cot-section-8"><Step8Analysis signals={signals} historicalSignals={historicalSignals} /></div>
     </div>
   );
 }

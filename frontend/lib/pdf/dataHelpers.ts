@@ -377,10 +377,12 @@ export function buildMarketMetrics(
   const hist10y      = rawData.slice(-520);
   const pmpuLongMTs  = hist10y.map(d => (isNY ? d.pmpuLongMT_NY  : d.pmpuLongMT_LDN)  ?? 0);
   const pmpuShortMTs = hist10y.map(d => (isNY ? d.pmpuShortMT_NY : d.pmpuShortMT_LDN) ?? 0);
-  const prodMT    = isNY ? cur.pmpuLongMT_NY  : cur.pmpuLongMT_LDN;
-  const roastMT   = isNY ? cur.pmpuShortMT_NY : cur.pmpuShortMT_LDN;
-  const prodMTPrev  = isNY ? prev.pmpuLongMT_NY  : prev.pmpuLongMT_LDN;
-  const roastMTPrev = isNY ? prev.pmpuShortMT_NY : prev.pmpuShortMT_LDN;
+  // Roasters/commercial buyers hedge LONG; producers/farmers hedge SHORT —
+  // matches Step4IndustryPulse's convention (long=roasters, short=producers).
+  const roastMT     = isNY ? cur.pmpuLongMT_NY   : cur.pmpuLongMT_LDN;
+  const prodMT      = isNY ? cur.pmpuShortMT_NY  : cur.pmpuShortMT_LDN;
+  const roastMTPrev = isNY ? prev.pmpuLongMT_NY  : prev.pmpuLongMT_LDN;
+  const prodMTPrev  = isNY ? prev.pmpuShortMT_NY : prev.pmpuShortMT_LDN;
 
   // Funds maxed — use 10-year history
   const mmLongs  = hist10y.map(d => d[mk].mmLong  ?? 0);
@@ -421,10 +423,10 @@ export function buildMarketMetrics(
     annualizedRollPct,
 
     // Coverage %: PMPU position normalised on 52-week min/max range (0% = 52w low, 100% = 52w high)
-    producerCovPct:  computeCovPct(prodMT,  Math.min(...pmpuLongMTs),  Math.max(...pmpuLongMTs)),
+    producerCovPct:  computeCovPct(prodMT,  Math.min(...pmpuShortMTs), Math.max(...pmpuShortMTs)),
     producerMT:      prodMT,
     producerMTWoW:   prodMT - prodMTPrev,
-    roasterCovPct:   computeCovPct(roastMT, Math.min(...pmpuShortMTs), Math.max(...pmpuShortMTs)),
+    roasterCovPct:   computeCovPct(roastMT, Math.min(...pmpuLongMTs),  Math.max(...pmpuLongMTs)),
     roasterMT:       roastMT,
     roasterMTWoW:    roastMT - roastMTPrev,
 

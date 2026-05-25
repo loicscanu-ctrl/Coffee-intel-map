@@ -1,21 +1,19 @@
 "use client";
-import { useState } from "react";
 import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
 import { HM_CAT_COLORS } from "./constants";
 import SectionHeader from "./SectionHeader";
-import { MarketToggle } from "./Toggles";
 
 type PositionField = keyof CotMarketPositions;
+type Mkt = "ny" | "ldn";
 
 export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
-  const [market, setMarket] = useState<"ny" | "ldn">("ny");
   const hist52 = data.slice(-52);
   const curr = hist52[hist52.length - 1];
   const prev = hist52.length >= 2 ? hist52[hist52.length - 2] : null;
 
   type GRData = { label: string; color: string; curr: number; prev: number; min: number; max: number; pct: number; isSpread?: boolean };
 
-  const mkRow = (label: string, cat: string, field: PositionField, isSpread?: boolean): GRData => {
+  const mkRow = (market: Mkt, label: string, cat: string, field: PositionField, isSpread?: boolean): GRData => {
     const vals = hist52.map(d => d[market]?.[field] ?? 0);
     const min = Math.min(...vals), max = Math.max(...vals);
     const cv = curr[market]?.[field] ?? 0;
@@ -24,27 +22,30 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
       pct: max > min ? (cv - min) / (max - min) * 100 : 50, isSpread };
   };
 
-  const longRows: GRData[]  = [
-    mkRow("PMPU Long",    "PMPU",      "pmpuLong"),
-    mkRow("Swap Long",    "Swap",      "swapLong"),
-    mkRow("MM Long",      "MM",        "mmLong"),
-    mkRow("Other Long",   "Other Rpt", "otherLong"),
-    mkRow("Non-Rep Long", "Non-Rep",   "nonRepLong"),
-  ];
-  const shortRows: GRData[] = [
-    mkRow("PMPU Short",    "PMPU",      "pmpuShort"),
-    mkRow("Swap Short",    "Swap",      "swapShort"),
-    mkRow("MM Short",      "MM",        "mmShort"),
-    mkRow("Other Short",   "Other Rpt", "otherShort"),
-    mkRow("Non-Rep Short", "Non-Rep",   "nonRepShort"),
-  ];
-  const spreadRows: GRData[] = [
-    mkRow("MM Spread",    "MM",        "mmSpread",    true),
-    mkRow("Swap Spread",  "Swap",      "swapSpread",  true),
-    mkRow("Other Spread", "Other Rpt", "otherSpread", true),
-  ];
+  const marketRows = (market: Mkt) => ({
+    longRows: [
+      mkRow(market, "PMPU Long",    "PMPU",      "pmpuLong"),
+      mkRow(market, "Swap Long",    "Swap",      "swapLong"),
+      mkRow(market, "MM Long",      "MM",        "mmLong"),
+      mkRow(market, "Other Long",   "Other Rpt", "otherLong"),
+      mkRow(market, "Non-Rep Long", "Non-Rep",   "nonRepLong"),
+    ],
+    shortRows: [
+      mkRow(market, "PMPU Short",    "PMPU",      "pmpuShort"),
+      mkRow(market, "Swap Short",    "Swap",      "swapShort"),
+      mkRow(market, "MM Short",      "MM",        "mmShort"),
+      mkRow(market, "Other Short",   "Other Rpt", "otherShort"),
+      mkRow(market, "Non-Rep Short", "Non-Rep",   "nonRepShort"),
+    ],
+    spreadRows: [
+      mkRow(market, "MM Spread",    "MM",        "mmSpread",    true),
+      mkRow(market, "Swap Spread",  "Swap",      "swapSpread",  true),
+      mkRow(market, "Other Spread", "Other Rpt", "otherSpread", true),
+    ],
+  });
 
-  const extremes = [...longRows, ...shortRows].filter(r => r.pct >= 80 || r.pct <= 20);
+  const ny  = marketRows("ny");
+  const ldn = marketRows("ldn");
 
   const pctColor = (pct: number) => {
     if (pct >= 80) return "#ef4444";
@@ -53,6 +54,11 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
     if (pct <= 40) return "#84cc16";
     return "#94a3b8";
   };
+
+  const extremes = [
+    ...[...ny.longRows, ...ny.shortRows].map(r => ({ ...r, mkt: "NY" })),
+    ...[...ldn.longRows, ...ldn.shortRows].map(r => ({ ...r, mkt: "LDN" })),
+  ].filter(r => r.pct >= 80 || r.pct <= 20);
 
   const fmtLot = (v: number) => Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + "k" : String(Math.round(v));
 
@@ -86,39 +92,42 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
     );
   };
 
+  const subHead = (t: string) => (
+    <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3 mt-1">{t}</div>
+  );
+
+  const marketColumn = (title: string, rows: ReturnType<typeof marketRows>) => (
+    <div>
+      <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">{title}</div>
+      {subHead("Longs")}
+      {rows.longRows.map(renderGauge)}
+      {subHead("Shorts")}
+      {rows.shortRows.map(renderGauge)}
+      <div style={{ borderTop: "1px dashed #334155", marginTop: 12, paddingTop: 10 }}>
+        {subHead("Spreading positions")}
+        {rows.spreadRows.map(renderGauge)}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <SectionHeader icon="Sliders" title="4. 52-Week Positioning Gauges"
-        subtitle="Current level vs. 52-week range. Colored dot = current week, blue tick = previous week. Red ≥80th pct · Green ≤20th." />
-      <div className="flex items-center gap-3 mb-4">
-        <MarketToggle markets={{ ny: market === "ny", ldn: market === "ldn" }} set={(m: string) => setMarket(m as "ny" | "ldn")} />
-      </div>
+        subtitle="Current level vs. 52-week range, per market (Arabica left · Robusta right). Longs then shorts. Colored dot = current week, blue tick = previous week. Red ≥80th pct · Green ≤20th." />
       {extremes.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 mb-4 flex flex-wrap gap-3">
           <span className="text-[10px] text-slate-500 font-semibold self-center uppercase tracking-wider">Extremes:</span>
           {extremes.map(r => (
-            <span key={r.label} style={{ fontSize: 11, color: pctColor(r.pct) }}>
-              {r.label} {Math.round(r.pct)}th
+            <span key={`${r.mkt}-${r.label}`} style={{ fontSize: 11, color: pctColor(r.pct) }}>
+              {r.mkt} {r.label} {Math.round(r.pct)}th
             </span>
           ))}
         </div>
       )}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div className="grid grid-cols-2 gap-x-8">
-          <div>
-            <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Longs</div>
-            {longRows.map(renderGauge)}
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Shorts</div>
-            {shortRows.map(renderGauge)}
-          </div>
-        </div>
-        <div style={{ borderTop: "1px dashed #334155", marginTop: 16, paddingTop: 14 }}>
-          <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Spreading positions</div>
-          <div className="grid grid-cols-3 gap-x-8">
-            {spreadRows.map(renderGauge)}
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
+          {marketColumn("Arabica · NY", ny)}
+          {marketColumn("Robusta · LDN", ldn)}
         </div>
       </div>
     </>
