@@ -1152,15 +1152,31 @@ def export_farmer_economics(db) -> None:
 # ── 8. Farmer Selling (Safras & Mercado) ─────────────────────────────────────
 
 def export_farmer_selling() -> None:
+    import logging as _logging
+    from scraper.sources import farmer_selling as _fs
     from scraper.sources.farmer_selling import build_farmer_selling
+    # Surface the scraper's INFO diagnostics (article found / parsed values / skip
+    # reason) in the export log — export_static_json sets up no logging, so these
+    # are otherwise swallowed and staleness is impossible to diagnose from the log.
+    if not _fs.log.handlers:
+        _h = _logging.StreamHandler(sys.stdout)
+        _h.setFormatter(_logging.Formatter("    [farmer_selling] %(message)s"))
+        _fs.log.addHandler(_h)
+        _fs.log.setLevel(_logging.INFO)
+        _fs.log.propagate = False
     try:
+        before = (OUT_DIR / "farmer_selling_brazil.json")
+        before_txt = before.read_text(encoding="utf-8") if before.exists() else ""
         result = build_farmer_selling()
+        after_txt = before.read_text(encoding="utf-8") if before.exists() else ""
+        changed = after_txt != before_txt
         if result:
             ar = result.get("arabica", {}).get("brazil", {})
             rb = result.get("robusta", {}).get("brazil", {})
-            print(f"  farmer_selling_brazil.json → arabica:{ar.get('current')}% robusta:{rb.get('current')}%")
+            print(f"  farmer_selling_brazil.json → arabica:{ar.get('current')}% robusta:{rb.get('current')}% "
+                  f"({'UPDATED' if changed else 'unchanged'}, report {result.get('report_date')})")
         else:
-            print("  farmer_selling_brazil.json → no update (parse failed or no change)")
+            print("  farmer_selling_brazil.json → no update (no bs4 / file missing)")
     except Exception as e:
         print(f"  farmer_selling_brazil.json → FAILED: {e}")
 
