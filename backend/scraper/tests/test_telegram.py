@@ -64,10 +64,11 @@ def test_quote_parse_addons():
 
 def test_quote_differential():
     from telegram.handlers.quote import compute_months
-    rows = compute_months(basis=-100, rc_prices={"N": 3487}, today_month=6,
-                          today_day=1, addons=0)
-    assert rows[0][2] == -100   # Jun: basis + 0*30
-    assert rows[1][2] == -70    # Jul: basis + 1*30
+    # today_month=5 (May), offset=0 → i=0→May(N), i=1→Jun(N), same contract
+    rows = compute_months(basis=-100, rc_prices={"N": 3487, "U": 3372, "X": 3292, "F": 3222},
+                          today_month=5, today_day=1, addons=0)
+    assert rows[0][2] == -100   # May: basis + 0*30
+    assert rows[1][2] == -70    # Jun: basis + 1*30
 
 
 def test_parse_command():
