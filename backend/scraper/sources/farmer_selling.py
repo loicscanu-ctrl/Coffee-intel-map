@@ -90,10 +90,15 @@ def _rss_sales_urls(session: requests.Session) -> list[str]:
         for it in items:
             lm = re.search(r"<link>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</link>", it, re.S | re.I)
             tm = re.search(r"<title>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</title>", it, re.S | re.I)
+            dm = re.search(r"<pubDate>\s*(.*?)\s*</pubDate>", it, re.S | re.I)
             if not lm:
                 continue
             href = lm.group(1).strip()
             title = tm.group(1).strip() if tm else ""
+            # Log every item so we can see if a recent sales article is being
+            # missed by the keyword filter vs. Safras simply not publishing one.
+            log.info("RSS item: %s | sales=%s | %s", (dm.group(1).strip() if dm else "?"),
+                     _is_sales(title), title[:90])
             if href.startswith("http") and _is_sales(title) and href not in urls:
                 urls.append(href)
         if items:
