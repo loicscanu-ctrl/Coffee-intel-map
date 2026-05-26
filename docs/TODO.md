@@ -21,8 +21,12 @@ GitHub runners, so the build runs in CI (no local step).
       blank origins = all). It commits `backend/seed/spi_30yr_baselines.json`;
       the next weather-fetch run then emits `spi_1`/`spi_3`/`spi_month` per
       region. Safe to dry-run first.
-- [ ] **VHI** (third weather index) — NOAA STAR weekly satellite files, filtered
-      by region bounding boxes. Not started.
+- [ ] **VHI** — NOAA STAR weekly Vegetation Health Index, bbox-averaged per
+      region into `{origin}_weather.json` (`vhi`/`vhi_week`). Scraper + weekly
+      workflow (`0.5`) shipped; parsing/aggregation unit-tested. **Verify on the
+      first CI run** that `VHI_URL`/CSV format match NOAA's live product — only
+      `fetch_vhi.py`'s fetch/parse layer would need tweaking if not (the bbox
+      aggregation is format-agnostic).
 
 ## Phase-3 cut — delete the price-regex fallback (target: on/after 2026-06-09)
 The exporters strangler is at Phase 2 (dual-read) + a CI gate. The fallback
