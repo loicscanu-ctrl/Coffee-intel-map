@@ -1466,15 +1466,33 @@ def _build_tickers_from_news(db) -> list[dict]:
 
 # ── 11. VN Physical Prices ───────────────────────────────────────────────────
 
-def export_vn_physical_prices(db) -> None:
-    """Compute and write vn_physical_prices.json from latest VN FAQ + FX news items."""
-    import re as _re
+def _vn_faq_from_physical(db, stale_hours: int):
+    """(vnd_per_kg, usd_vnd, status) from PhysicalPrice. status ∈ ok|stale|missing.
 
-    # Two windows: a 30-day pool to find an item, but a 48h freshness gate
-    # on whatever we find. Without this gate the export was happily writing
-    # a 22-day-old price with a fresh `updated` timestamp on every run,
-    # masking a silent failure of the vietnam.py scraper.
-    STALE_AFTER_HOURS = 48
+    `stale` means we found a VN_FAQ row but it is older than the freshness
+    threshold (the scraper has likely been failing silently) — the caller skips
+    the write so the file's `updated` timestamp stops advancing.
+    """
+    vn = (db.query(PhysicalPrice)
+            .filter(PhysicalPrice.symbol == "VN_FAQ")
+            .order_by(PhysicalPrice.price_date.desc(), PhysicalPrice.scraped_at.desc())
+            .first())
+    fx = (db.query(PhysicalPrice)
+            .filter(PhysicalPrice.symbol == "USD_VND")
+            .order_by(PhysicalPrice.price_date.desc(), PhysicalPrice.scraped_at.desc())
+            .first())
+    if not vn or not fx:
+        return None, None, "missing"
+    age_h = (datetime.utcnow() - vn.scraped_at).total_seconds() / 3600
+    if age_h > stale_hours:
+        return None, None, "stale"
+    return int(vn.price), float(fx.price), "ok"
+
+
+def _vn_faq_from_news(db, stale_hours: int):
+    """Transitional fallback: (vnd_per_kg, usd_vnd, status) parsed from NewsItem
+    bodies via regex. Kept until the PhysicalPrice path is verified in prod."""
+    import re as _re
 
     recent = (
         db.query(NewsItem)
@@ -1482,52 +1500,60 @@ def export_vn_physical_prices(db) -> None:
         .order_by(NewsItem.pub_date.desc())
         .all()
     )
-
     vn_item = next(
         (i for i in recent
-         if "price"   in (i.tags or [])
-         and "robusta" in (i.tags or [])
-         and "vietnam" in (i.tags or [])
-         and "futures" not in (i.tags or [])),
+         if "price" in (i.tags or []) and "robusta" in (i.tags or [])
+         and "vietnam" in (i.tags or []) and "futures" not in (i.tags or [])),
         None,
     )
     fx_item = next(
-        (i for i in recent
-         if "fx"      in (i.tags or [])
-         and "vietnam" in (i.tags or [])),
+        (i for i in recent if "fx" in (i.tags or []) and "vietnam" in (i.tags or [])),
         None,
     )
-
     if not vn_item or not fx_item:
-        print(f"  vn_physical_prices.json → skipped (vn:{vn_item is not None} fx:{fx_item is not None})")
-        return
-
-    vn_age_h = (datetime.utcnow() - vn_item.pub_date).total_seconds() / 3600
-    if vn_age_h > STALE_AFTER_HOURS:
-        # Leave the existing file alone so its `updated` timestamp stops
-        # advancing — that's exactly the freshness signal the monitor needs.
-        print(
-            f"  vn_physical_prices.json → SKIPPED (stale): vn_item is "
-            f"{vn_age_h:.1f}h old (> {STALE_AFTER_HOURS}h threshold). "
-            "Vietnam price scraper likely failing silently."
-        )
-        return
-
+        return None, None, "missing"
+    age_h = (datetime.utcnow() - vn_item.pub_date).total_seconds() / 3600
+    if age_h > stale_hours:
+        return None, None, "stale"
     m1 = _re.search(r"price:\s*([\d.]+)\s*VND/kg", vn_item.body or "", _re.I)
-    if not m1:
-        print("  vn_physical_prices.json → skipped (vnd parse failed)")
-        return
+    m2 = _re.search(r"price:\s*([\d.,]+)", fx_item.body or "", _re.I)
+    if not m1 or not m2:
+        return None, None, "missing"
     raw = m1.group(1)
     vnd_per_kg = int(raw.replace(".", "")) if _re.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
-
-    m2 = _re.search(r"price:\s*([\d.,]+)", fx_item.body or "", _re.I)
-    if not m2:
-        print("  vn_physical_prices.json → skipped (fx parse failed)")
-        return
     usd_vnd = float(m2.group(1).replace(",", ""))
+    return vnd_per_kg, usd_vnd, "ok"
+
+
+def export_vn_physical_prices(db) -> None:
+    """vn_physical_prices.json from the latest VN FAQ + USD/VND.
+
+    Primary: PhysicalPrice (structured at scrape time). Fallback: NewsItem body
+    regex, kept until the migration is verified (sets the Phase-3 signal flag).
+    A 48h freshness gate on the source data stops the file's `updated` timestamp
+    from advancing on stale data — the signal the freshness monitor relies on.
+    """
+    STALE_AFTER_HOURS = 48
+
+    vnd_per_kg, usd_vnd, status = _vn_faq_from_physical(db, STALE_AFTER_HOURS)
+    if status == "stale":
+        print(f"  vn_physical_prices.json → SKIPPED (stale): VN_FAQ PhysicalPrice > {STALE_AFTER_HOURS}h old.")
+        return
+    if status == "missing":
+        vnd_per_kg, usd_vnd, status = _vn_faq_from_news(db, STALE_AFTER_HOURS)
+        if status == "stale":
+            print(f"  vn_physical_prices.json → SKIPPED (stale): VN news item > {STALE_AFTER_HOURS}h old.")
+            return
+        if status == "ok":
+            global _LATEST_PRICES_FALLBACK
+            _LATEST_PRICES_FALLBACK = True
+            print("  vn_physical_prices.json → WARN FELL BACK to NewsItem regex parsing")
+
+    if status != "ok":
+        print("  vn_physical_prices.json → skipped (no VN FAQ data)")
+        return
 
     usd_per_mt = round(vnd_per_kg / usd_vnd * 1000)
-
     result = {
         "updated": datetime.utcnow().isoformat() + "Z",
         "vn_faq": {
