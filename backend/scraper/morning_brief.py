@@ -191,24 +191,13 @@ def send_telegram(text: str) -> bool:
 
 
 def main():
-    db = None
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        try:
-            from database import SessionLocal
-            db = SessionLocal()
-        except Exception as e:
-            print(f"[morning_brief] DB connect failed: {e}")
-
-    try:
-        msg = build_message(db)
-        print("[morning_brief] Message preview:\n")
-        print(msg.encode("ascii", "replace").decode())
-        print()
-        send_telegram(msg)
-    finally:
-        if db:
-            db.close()
+    # The brief reads only the published static JSON (no DB) and posts once, so
+    # there's no DB connection and no heavy deps — just build and send.
+    msg = build_message()
+    print("[morning_brief] Message preview:\n")
+    print(msg.encode("ascii", "replace").decode())
+    print()
+    send_telegram(msg)
 
 
 if __name__ == "__main__":

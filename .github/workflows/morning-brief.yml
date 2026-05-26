@@ -78,8 +78,11 @@ jobs:
 
       - name: Install Python dependencies
         if: steps.guard.outputs.skip != 'true'
-        working-directory: backend
-        run: pip install -r scraper/requirements.txt requests python-dotenv
+        # The brief reads published static JSON + posts to Telegram — it needs
+        # only `requests`, NOT the full scraper stack (playwright/scipy/yfinance/
+        # curl_cffi/…). Installing the whole requirements file is what made this
+        # job slow; the minimal install drops it from minutes to seconds.
+        run: pip install requests
 
       - name: Send morning brief
         if: steps.guard.outputs.skip != 'true'
@@ -87,7 +90,6 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-          DATABASE_URL:       ${{ secrets.DATABASE_URL }}
         run: python -m scraper.morning_brief
 
       - name: Notify on failure
