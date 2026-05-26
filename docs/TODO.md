@@ -1,22 +1,19 @@
 # TODO / follow-ups
 
-## Brazil farmer-selling (Safras) — verify the fixes (commits cf79f51 + 51c9e88)
-ROOT CAUSE FOUND (via the new export log): `_find_latest_article_url` returned the
-first DOM sales link — a featured **July 2025 '31% of 2025/26'** post — and the
-crop-year guard correctly skipped it (31% « stored 83%), so data froze at 2026-04-14.
-Fixes: (a) collect ALL candidate articles and pick the most-recent by
-(crop_year, crop-month, survey day); (b) crop-year-aware guard accepts a new-crop
-reset; (c) export now logs each candidate + the selected one.
-**Verify after the next 1.4 run (commit 12689f2 — PT feeds + harvest):**
-- [ ] Sales: log shows PT RSS feeds tried (`RSS https://safras.com.br/…/feed/ → …`)
-      and whether any PT `comercializado` survey newer than Jul-2025 is found/selected.
-      PT feed URLs are best-guess — if all PT feeds log "failed", I need the real PT
-      coffee-category feed URL (check the live Safras PT site).
-- [ ] Harvest: log shows `kind=harvest` candidates + a `harvest: X%` line, and
-      `farmer_selling_brazil.json` gains a `harvest` block → the new "Harvest pace ·
-      Brazil" card renders in Brazil → Farmer Economics.
-- [ ] Sales value: if no newer survey surfaces, it stays 83%/77% (unsourced seed) —
-      revisit whether to reset to the latest sourced figure.
+## Brazil farmer-selling (Safras) — RESOLVED (harvest live; sales scraper correct)
+Scraper now discovers via coffee-category RSS (EN + PT), classifies sales vs
+harvest, requires a %-in-title (rejects price/estimate/other-crop noise), picks
+the most-recent by crop-year + May-start survey month, and is crop-year-aware.
+- [x] **Harvest pace LIVE** — `harvest` block committed (77%, 2025/26, as of Jul 16);
+      "Harvest pace · Brazil" card renders. Auto-flips to 2026/27 when Safras posts a
+      %-harvest article for the new crop.
+- [x] **Sales scraper correct** — only true surveys are Jul-25 (31%) + Feb-25 (88%);
+      newest (31%) is guard-skipped vs the seed, no noise selected. Will advance on
+      the next EN/PT commercialization survey with a % headline.
+- [ ] **Product decision (open):** the displayed 83%/77% is an unsourced seed (newer
+      than any sourced article). Keep it, or reset to the latest sourced figure so the
+      panel is fully scraper-driven? Harvest=77% (Jul-2025) is also last-crop until a
+      2026/27 %-harvest article appears.
 
 ## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
 The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
