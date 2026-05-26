@@ -8,10 +8,14 @@ Fixes: (a) collect ALL candidate articles and pick the most-recent by
 (crop_year, crop-month, survey day); (b) crop-year-aware guard accepts a new-crop
 reset; (c) export now logs each candidate + the selected one.
 **Verify after the next 1.4 run:**
-- [ ] Log shows multiple `candidate …` lines and a `Selected most-recent article …`.
-- [ ] If the newest Safras survey > April 2026, `farmer_selling_brazil.json` updates
-      (report_date advances, % reflects it). If April is still newest, it stays 83%/77%
-      (correct — not a bug).
+- [ ] Log shows an `RSS … → N items, M sales article(s)` line and ideally a
+      candidate **newer than April 2026** (the HTML scan only saw stale featured
+      posts: 2025/26@31% Jul-2025 + 2024/25@88% Feb-2025). RSS discovery added in
+      commit 455da9a.
+- [ ] If RSS surfaces a post-April-2026 survey, `farmer_selling_brazil.json` updates.
+      If not, our stored 83%/77% (April 2026) is genuinely the latest and is
+      correctly preserved — and worth checking the live Safras page to confirm
+      whether a newer English sales article exists at all.
 
 ## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
 The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
