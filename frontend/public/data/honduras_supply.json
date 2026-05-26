@@ -1,6 +1,6 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-26T04:46:29.686478Z",
+  "scraped_at": "2026-05-26T04:54:55.776479Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-26",
@@ -341,7 +341,7 @@
   },
   "ihcafe_price": null,
   "weather": {
-    "scraped_at": "2026-05-26T04:34:46.616115Z",
+    "scraped_at": "2026-05-26T04:50:29.491747Z",
     "regions": [
       {
         "name": "Copán",

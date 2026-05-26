@@ -1,6 +1,6 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-26T04:46:30.151541Z",
+  "scraped_at": "2026-05-26T04:54:56.229594Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-26",
@@ -340,7 +340,7 @@
     ]
   },
   "weather": {
-    "scraped_at": "2026-05-26T04:37:22.856422Z",
+    "scraped_at": "2026-05-26T04:53:05.426884Z",
     "regions": [
       {
         "name": "Lampung",
