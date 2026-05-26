@@ -1,6 +1,6 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-25",
+  "updated": "2026-05-26",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Indonesia",
@@ -276,9 +276,9 @@
       "monthly_actual_cur": [
         155.9,
         164.1,
-        195.1,
+        66.7,
         305.6,
-        207.9
+        204.1
       ],
       "monthly_avg_temp": [
         20.0,
@@ -339,18 +339,18 @@
       "monthly_actual_temp_cur": [
         19.4,
         19.4,
-        19.9,
+        20.0,
         20.2,
         20.3
       ],
       "forecast_7d_rain": [
-        2.1,
-        0.8,
-        0.5,
-        0.0,
-        1.8,
         1.2,
-        1.2
+        0.8,
+        0.0,
+        0.9,
+        0.9,
+        1.2,
+        0.0
       ],
       "daily_accum_cur": [
         12.8,
@@ -377,8 +377,8 @@
         180.0,
         192.4,
         195.6,
-        207.9,
-        null,
+        199.3,
+        204.1,
         null,
         null,
         null,
@@ -465,9 +465,9 @@
       "monthly_actual_cur": [
         227.8,
         281.4,
-        312.3,
+        63.0,
         102.2,
-        41.6
+        43.6
       ],
       "monthly_avg_temp": [
         22.0,
@@ -530,11 +530,11 @@
         24.4,
         24.4,
         25.6,
-        26.1
+        26.0
       ],
       "forecast_7d_rain": [
-        0.5,
-        1.9,
+        2.6,
+        0.0,
         0.0,
         0.0,
         0.0,
@@ -567,7 +567,7 @@
         41.0,
         41.6,
         41.6,
-        null,
+        43.6,
         null,
         null,
         null,
@@ -654,9 +654,9 @@
       "monthly_actual_cur": [
         97.0,
         118.2,
-        276.8,
+        51.4,
         194.3,
-        230.4
+        232.5
       ],
       "monthly_avg_temp": [
         21.0,
@@ -717,18 +717,18 @@
       "monthly_actual_temp_cur": [
         21.6,
         21.7,
-        22.1,
+        22.2,
         21.8,
         21.9
       ],
       "forecast_7d_rain": [
-        3.9,
-        5.1,
-        7.0,
-        7.9,
-        4.2,
+        17.6,
+        6.3,
+        6.7,
         4.8,
-        6.0
+        2.1,
+        1.8,
+        1.5
       ],
       "daily_accum_cur": [
         21.7,
@@ -755,8 +755,8 @@
         198.2,
         213.7,
         227.6,
-        230.4,
-        null,
+        230.0,
+        232.5,
         null,
         null,
         null,
@@ -843,9 +843,9 @@
       "monthly_actual_cur": [
         225.3,
         155.8,
-        100.3,
+        52.7,
         155.8,
-        124.5
+        128.4
       ],
       "monthly_avg_temp": [
         22.5,
@@ -911,13 +911,13 @@
         18.8
       ],
       "forecast_7d_rain": [
-        2.7,
+        2.0,
         1.6,
-        3.1,
-        2.1,
+        1.0,
+        1.5,
         0.0,
         0.0,
-        1.2
+        0.0
       ],
       "daily_accum_cur": [
         4.0,
@@ -945,7 +945,7 @@
         124.4,
         124.5,
         124.5,
-        null,
+        128.4,
         null,
         null,
         null,
