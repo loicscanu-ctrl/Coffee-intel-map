@@ -29,8 +29,7 @@ trigger and gates `npm ci` + signals to COT-relevant runs.
       2026-05-25 11:16) touched only `latest_prices.json` + `health.json`
       (`futures_chain`/`oi_fnd_chart` re-exported but unchanged) — no `signals.json`,
       none of the other ~18 topics. Scoping + npm/signals gating confirmed.
-- [ ] **Full export** — confirm a cron/dispatch run still writes everything + signals.
-      ✅ CONFIRMED: commit `5770cdb` (full dispatch) wrote 14 files incl. `signals.json`,
+- [x] **Full export — CONFIRMED.** Commit `5770cdb` (full dispatch) wrote 14 files incl. `signals.json`,
       `farmer_economics`, `demand_stocks` + all supply files (not the 4-file news slice).
 - Safety net: the nightly cron runs a full export, so a missed file self-heals.
 
