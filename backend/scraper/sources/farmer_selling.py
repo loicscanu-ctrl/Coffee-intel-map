@@ -23,6 +23,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote_plus
 
 import requests
 
@@ -31,6 +32,12 @@ try:
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
+
+try:
+    import feedparser
+    HAS_FEEDPARSER = True
+except ImportError:
+    HAS_FEEDPARSER = False
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +78,23 @@ OTHER_CROPS = ["soybean", "soja", "corn", "milho", "sugar", "açúcar", "acucar"
 RSS_FEEDS = [
     LISTING_URL.rstrip("/") + "/feed/",            # /eng/commodity/coffee/feed/ (EN)
     "https://safras.com.br/commodity/cafe/feed/",  # PT coffee category
+]
+
+# "Echo" discovery — Safras numbers reliably re-publish through Brazilian
+# agribusiness outlets within hours, so we mine Google News (pt-BR) for those
+# secondary reports. This sidesteps the Safras portal's bot/paywall blocks while
+# still sourcing their gold-standard commercialization figures.
+def _gnews(query: str) -> str:
+    return (
+        "https://news.google.com/rss/search?q="
+        + quote_plus(query)
+        + "&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+    )
+
+GOOGLE_NEWS_FEEDS = [
+    _gnews('"Safras & Mercado" comercialização café'),
+    _gnews('"Safras" café "vendas antecipadas" safra'),
+    _gnews('comercialização café arábica conilon safra Safras'),
 ]
 
 
@@ -130,11 +154,53 @@ def _rss_sales_urls(session: requests.Session) -> list[str]:
     return urls
 
 
+def _is_echo_candidate(title: str) -> bool:
+    """Looser than _is_candidate: Google-News echo headlines often carry the %
+    in the body rather than the title, so accept any coffee sales/harvest item
+    (or one mentioning comercialização/safra) that isn't another crop."""
+    t = title.lower()
+    if not any(c in t for c in ("coffee", "café", "cafe")):
+        return False
+    if any(c in t for c in OTHER_CROPS):
+        return False
+    return _is_sales(title) or _is_harvest(title) or "comercializ" in t or "safra" in t
+
+
+def _google_news_urls(limit_per_feed: int = 8) -> list[str]:
+    """Echo discovery: candidate article URLs from Google News (pt-BR) RSS.
+    Requires feedparser (in requirements); a no-op if it's unavailable. Google
+    News `link`s are redirects — the caller fetches+parses them like any other
+    candidate and simply finds nothing if a redirect doesn't resolve."""
+    if not HAS_FEEDPARSER:
+        log.info("feedparser unavailable — skipping Google News echo discovery")
+        return []
+    urls: list[str] = []
+    for feed in GOOGLE_NEWS_FEEDS:
+        try:
+            parsed = feedparser.parse(feed)
+        except Exception as e:  # noqa: BLE001
+            log.info("Google News feed failed: %s", e)
+            continue
+        n = 0
+        for entry in getattr(parsed, "entries", [])[:limit_per_feed]:
+            title = getattr(entry, "title", "") or ""
+            link = getattr(entry, "link", "") or ""
+            if link.startswith("http") and _is_echo_candidate(title) and link not in urls:
+                urls.append(link)
+                n += 1
+        log.info("GNews %s → %d candidate(s)", feed[:55], n)
+    return urls
+
+
 def _find_sales_article_urls(session: requests.Session) -> list[str]:
-    """Candidate sales + harvest article URLs — RSS feeds first (newest posts),
-    then the HTML listing as a fallback. Deduped. The caller fetches each and
-    routes/picks the most recent by crop-year + survey date."""
+    """Candidate sales + harvest article URLs — Safras RSS feeds first (newest
+    posts), then the Google-News echo feeds, then the HTML listing as a
+    fallback. Deduped. The caller fetches each and routes/picks the most recent
+    by crop-year + survey date."""
     urls: list[str] = list(_rss_sales_urls(session))
+    for u in _google_news_urls():
+        if u not in urls:
+            urls.append(u)
 
     try:
         r = session.get(LISTING_URL, headers=HEADERS, timeout=20)
@@ -176,6 +242,75 @@ def _extract_pct(text: str, *patterns: str) -> int | None:
             except (IndexError, ValueError):
                 pass
     return None
+
+
+# ── Dual-crop commercialization parsing ───────────────────────────────────────
+# Safras reports two crop years at once: the current/old crop's overall
+# commercialization and the new crop's *advance* sales (split arabica/conilon).
+# We locate each crop-year token (e.g. "2026/27") and read the percentages in
+# the text window that follows it — the breakdown sits next to its crop-year.
+
+_CROP_YEAR_RE = re.compile(r"\b(20\d{2})/(\d{2})\b")
+
+
+def _pct_in_range(val: int | None) -> int | None:
+    return val if val is not None and 0 <= val <= 100 else None
+
+
+def _kw_pct_span(window: str, keyword: str) -> tuple[int | None, tuple[int, int] | None]:
+    """Percentage tied to a keyword (value, digit-span) in either order within a
+    short span: '20% do arábica' or 'arábica soma 20%'. Returns the matched
+    digits' span so the caller can consume it before reading the next variety —
+    that's what stops 'conilon' from grabbing arabica's figure."""
+    kw = f"(?:{keyword})"  # group the keyword so a '|' alternation can't swallow the pattern
+    m = (re.search(r"(\d{1,3})\s*%[^%]{0,30}?" + kw, window, re.I)
+         or re.search(kw + r"[^%]{0,30}?(\d{1,3})\s*%", window, re.I))
+    if not m:
+        return None, None
+    return _pct_in_range(int(m.group(1))), m.span(1)
+
+
+def _first_pct(window: str) -> int | None:
+    m = re.search(r"(\d{1,3})\s*%", window)
+    return _pct_in_range(int(m.group(1))) if m else None
+
+
+def _parse_dual_crop(text: str) -> dict[str, dict[str, int]] | None:
+    """Parse {crop_year: {overall/arabica/conilon _sold_pct}} from article text.
+
+    Heuristic: for each crop-year token, scan the window up to the next crop
+    year (or ~400 chars). The first % is the overall figure; arabica/conilon
+    are read by keyword proximity. Calibrated to typical Safras-echo phrasing;
+    refined against live CI articles over time.
+    """
+    t = re.sub(r"\s+", " ", text or "")
+    years = list(_CROP_YEAR_RE.finditer(t))
+    if not years:
+        return None
+    crops: dict[str, dict[str, int]] = {}
+    for i, m in enumerate(years):
+        cy = f"{m.group(1)}/{m.group(2)}"
+        start = m.end()
+        end = years[i + 1].start() if i + 1 < len(years) else min(len(t), start + 400)
+        win = t[start:end]
+        rec: dict[str, int] = {}
+        ov = _first_pct(win)
+        ar, ar_span = _kw_pct_span(win, r"ar[aá]bica")
+        # Consume arabica's digits before reading conilon, so an adjacent
+        # "20% … arábica e 10% … conilon" doesn't let conilon match the 20.
+        co_win = win
+        if ar_span:
+            co_win = win[:ar_span[0]] + " " * (ar_span[1] - ar_span[0]) + win[ar_span[1]:]
+        co, _ = _kw_pct_span(co_win, r"conil?l?on|robusta")
+        if ov is not None:
+            rec["overall_sold_pct"] = ov
+        if ar is not None:
+            rec["arabica_sold_pct"] = ar
+        if co is not None:
+            rec["conilon_sold_pct"] = co
+        if rec:
+            crops.setdefault(cy, {}).update(rec)
+    return crops or None
 
 
 def _parse_article(html: str) -> dict[str, Any] | None:
@@ -441,6 +576,10 @@ def build_farmer_selling(db=None) -> dict:
     # match isn't newest; recency = crop_year, crop-month, survey day).
     best_sales: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
     best_harvest: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
+    # Dual-crop "echo" read: keep the single most-complete two-crop-year report
+    # (scored by how many overall/arabica/conilon cells it fills), so we don't
+    # splice stale and fresh figures across different articles.
+    best_dual: tuple[int, dict[str, dict[str, int]]] | None = None
     for url in urls[:20]:
         try:
             r = session.get(url, headers=HEADERS, timeout=20)
@@ -448,6 +587,13 @@ def build_farmer_selling(db=None) -> dict:
         except Exception as e:
             log.warning("Fetch failed %s: %s", url, e)
             continue
+        # Run BEFORE _parse_article (which is Safras-structure-specific and
+        # returns None for echo outlets): dual-crop parsing works on any text.
+        dual = _parse_dual_crop(r.text)
+        if dual:
+            score = sum(1 for rec in dual.values() for v in rec.values() if v is not None)
+            if best_dual is None or score > best_dual[0]:
+                best_dual = (score, dual)
         parsed = _parse_article(r.text)
         if not parsed:
             continue
@@ -478,6 +624,28 @@ def build_farmer_selling(db=None) -> dict:
             data["harvest"] = new_h
             changed = True
             log.info("harvest: %s%% (crop %s, %s)", new_h["current"], new_h["crop_year"], hurl)
+
+    # Additive dual-crop block (current crop's overall commercialization + new
+    # crop's advance sales). Kept alongside the existing rich single-crop fields
+    # so the live panel is unaffected; the UI sprint will read data["crops"].
+    if best_dual is not None:
+        current_cy = ((data.get("arabica") or {}).get("brazil") or {}).get("crop_year") or ""
+        crops_out: dict[str, dict[str, Any]] = {}
+        for cy, pcts in best_dual[1].items():
+            crops_out[cy] = {
+                "status": "new_crop_advance" if (current_cy and cy > current_cy) else "current_crop",
+                "overall_sold_pct": pcts.get("overall_sold_pct"),
+                "arabica_sold_pct": pcts.get("arabica_sold_pct"),
+                "conilon_sold_pct": pcts.get("conilon_sold_pct"),
+            }
+        if crops_out and data.get("crops") != crops_out:
+            data["crops"] = crops_out
+            data["crops_meta"] = {
+                "updated": datetime.utcnow().strftime("%Y-%m-%d"),
+                "source": "Safras & Mercado (via News Echo)",
+            }
+            changed = True
+            log.info("crops (dual): %s", crops_out)
 
     if best_sales is not None:
         _, parsed, article_url = best_sales
