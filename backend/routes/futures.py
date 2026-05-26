@@ -1,11 +1,12 @@
 import json
-import re
-from datetime import date, timedelta
+from datetime import date
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from contract_dates import calc_fnd as _calc_fnd
+from contract_dates import trading_days_to as _trading_days_to
 from database import get_db
 from models import NewsItem
 
@@ -33,49 +34,6 @@ class OIFndChartContract(BaseModel):
     label: str
     fnd: str
     data: list[OIFndPoint]
-
-LETTER_TO_MONTH = {
-    "F":1,"G":2,"H":3,"J":4,"K":5,"M":6,
-    "N":7,"Q":8,"U":9,"V":10,"X":11,"Z":12
-}
-
-def _first_business_day(year: int, month: int) -> date:
-    d = date(year, month, 1)
-    while d.weekday() >= 5:
-        d += timedelta(days=1)
-    return d
-
-def _subtract_business_days(d: date, n: int) -> date:
-    remaining = n
-    while remaining > 0:
-        d -= timedelta(days=1)
-        if d.weekday() < 5:
-            remaining -= 1
-    return d
-
-def _calc_fnd(symbol: str):
-    m = re.match(r'^(KC|RM|RC)([FGHJKMNQUVXZ])(\d{2})$', symbol, re.I)
-    if not m:
-        return None
-    product, letter, yr = m.group(1), m.group(2).upper(), int(m.group(3))
-    month_num = LETTER_TO_MONTH.get(letter)
-    if not month_num:
-        return None
-    days_before = 7 if product.upper() == "KC" else 4
-    fbdm = _first_business_day(2000 + yr, month_num)
-    return _subtract_business_days(fbdm, days_before)
-
-def _trading_days_to(d1: date, fnd: date) -> int:
-    """Signed trading days from d1 to fnd (negative = before FND)."""
-    if d1 >= fnd:
-        return 0
-    count = 0
-    cur = d1
-    while cur < fnd:
-        cur += timedelta(days=1)
-        if cur.weekday() < 5:
-            count += 1
-    return -count  # negative = days remaining before FND
 
 
 @router.get("/api/futures/oi-history", response_model=list[OIHistoryDay])
