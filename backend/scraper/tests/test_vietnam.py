@@ -21,3 +21,12 @@ def test_parse_giacaphe_price_rejects_out_of_range():
     html = "<table><tr><td>43.500</td></tr></table>"
     result = parse_giacaphe_price(html)
     assert result is None
+
+
+def test_parse_giacaphe_emits_structured_price_data():
+    """Phase 1: the scraper attaches a clean typed price, not just a body string."""
+    html = "<table><tr><td>115.200</td></tr></table>"
+    result = parse_giacaphe_price(html)
+    assert result["price_data"] == {
+        "symbol": "VN_FAQ", "price": 115200.0, "currency": "VND", "unit": "per_kg",
+    }

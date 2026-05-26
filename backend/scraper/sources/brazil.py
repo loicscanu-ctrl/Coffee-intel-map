@@ -75,7 +75,7 @@ def _extract_brl_from_text(text: str) -> str | None:
 
 def _make_conilon_item(price_brl: str, date_label: str = "") -> dict:
     label = f" ({date_label})" if date_label else ""
-    return {
+    item = {
         "title": f"Conilon Tipo 7 (Cooabriel) – {_today()}",
         "body": f"Conilon Tipo 7 price: R$ {price_brl}/saca{label}",
         "source": "Cooabriel",
@@ -83,6 +83,17 @@ def _make_conilon_item(price_brl: str, date_label: str = "") -> dict:
         "lat": _LAT, "lng": _LNG,
         "tags": ["price", "brazil", "conilon"],
     }
+    # Structured price for the exporter — parse the Brazilian-formatted string
+    # ('1.280,50' → 1280.50) once here instead of re-regexing `body` downstream.
+    try:
+        item["price_data"] = {
+            "symbol": "CON_T7",
+            "price": float(price_brl.replace(".", "").replace(",", ".")),
+            "currency": "BRL", "unit": "per_saca",
+        }
+    except ValueError:
+        pass
+    return item
 
 def parse_noticiasagricolas(html: str) -> dict | None:
     soup = BeautifulSoup(html, "html.parser")

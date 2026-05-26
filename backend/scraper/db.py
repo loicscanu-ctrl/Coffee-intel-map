@@ -356,6 +356,19 @@ def extract_physical_price(item: dict) -> dict | None:
     source = item.get("source", "")
     today = _date.today()
 
+    # ── Phase 1: prefer structured price_data emitted by the scraper ─────────
+    # The scraper already holds the clean number at scrape time; reading it
+    # directly avoids re-parsing the human-readable `body` string (the regex
+    # branches below are the transitional fallback for un-migrated sources).
+    pd = item.get("price_data")
+    if isinstance(pd, dict) and pd.get("symbol") and pd.get("price") is not None:
+        try:
+            return dict(symbol=pd["symbol"], price=float(pd["price"]),
+                        currency=pd.get("currency", ""), unit=pd.get("unit", ""),
+                        source=source, price_date=today)
+        except (TypeError, ValueError):
+            pass  # malformed price_data → fall through to regex
+
     # FX rates
     if "fx" in tags:
         m = re.search(r"price:\s*([\d.,]+)", body, re.I)

@@ -94,6 +94,9 @@ async def scrape_fx_rates(page) -> list[dict]:
                 "lat": lat,
                 "lng": lng,
                 "tags": tags,
+                # Structured rate for the exporter — avoids re-parsing `body`.
+                "price_data": {"symbol": f"USD_{currency}", "price": float(rate),
+                               "currency": "USD", "unit": "rate"},
             })
             print(f"[barchart] FX: USD/{currency} = {formatted}")
     except Exception as e:

@@ -71,6 +71,9 @@ def _make_item(price_vnd: int) -> dict:
         "lat": _LAT,
         "lng": _LNG,
         "tags": ["price", "robusta", "vietnam"],
+        # Structured price for the exporter — avoids re-parsing `body`.
+        "price_data": {"symbol": "VN_FAQ", "price": float(price_vnd),
+                       "currency": "VND", "unit": "per_kg"},
     }
 
 

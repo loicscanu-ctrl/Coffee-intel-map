@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from unittest.mock import MagicMock
 
-from scraper.db import upsert_news_item
+from scraper.db import extract_physical_price, upsert_news_item
 
 
 def make_db():
@@ -56,3 +56,43 @@ def test_upsert_rolls_back_on_commit_error():
         "tags": [],
     })
     db.rollback.assert_called_once()
+
+
+# ── extract_physical_price: structured price_data (Phase 1) ───────────────────
+
+def test_extract_prefers_structured_price_data():
+    """price_data wins over body — and a wrong body would NOT be re-parsed."""
+    pp = extract_physical_price({
+        "tags": ["price", "vietnam"],
+        "body": "Vietnam Robusta price: 10.000 VND/kg",  # deliberately wrong
+        "source": "Giacaphe",
+        "price_data": {"symbol": "VN_FAQ", "price": 115200.0,
+                       "currency": "VND", "unit": "per_kg"},
+    })
+    assert pp["symbol"] == "VN_FAQ"
+    assert pp["price"] == 115200.0          # from price_data, not the 10.000 body
+    assert pp["currency"] == "VND" and pp["unit"] == "per_kg"
+    assert pp["source"] == "Giacaphe"
+
+
+def test_extract_falls_back_to_regex_without_price_data():
+    """Un-migrated items (no price_data) still parse via the body regex."""
+    pp = extract_physical_price({
+        "tags": ["price", "uganda"],
+        "body": "Uganda Fine Robusta Screen 15 price: 245.50 USD/cwt",
+        "source": "UCDA",
+    })
+    assert pp["symbol"] == "UGA_S15"
+    assert pp["price"] == 245.50
+
+
+def test_extract_malformed_price_data_falls_through():
+    """A non-numeric price_data must not crash — it falls back to regex."""
+    pp = extract_physical_price({
+        "tags": ["price", "uganda"],
+        "body": "Uganda Fine Robusta Screen 15 price: 245.50 USD/cwt",
+        "source": "UCDA",
+        "price_data": {"symbol": "UGA_S15", "price": "not-a-number"},
+    })
+    assert pp["symbol"] == "UGA_S15"
+    assert pp["price"] == 245.50            # regex fallback kicked in

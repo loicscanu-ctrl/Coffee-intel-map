@@ -55,6 +55,9 @@ def _make_price_item(price: float) -> dict:
         "lng":      _LNG,
         "tags":     ["price", "robusta", "uganda"],
         "meta":     json.dumps({"usd_cwt": price, "as_of": _today(), "grade": "Screen 15"}),
+        # Structured price for the exporter — avoids re-parsing `body`.
+        "price_data": {"symbol": "UGA_S15", "price": float(price),
+                       "currency": "USD", "unit": "per_cwt"},
     }
 
 

@@ -8,6 +8,7 @@
 # Unit: USD per 60-kg sack
 # Available: 24/7 (previous day's settlement always present)
 
+import json
 from datetime import date
 
 import requests
@@ -86,6 +87,11 @@ async def run(page) -> list[dict]:
             "lat":      _LAT,
             "lng":      _LNG,
             "tags":     ["price", "futures", "brazil", "arabica", "b3"],
+            # label_month is the display adornment the ticker needs; carrying it
+            # in structured meta lets the exporter drop its title regex.
+            "meta":     json.dumps({"label_month": label, "usd_sac": price, "oi": oi, "mty": mty}),
+            "price_data": {"symbol": "B3_ICF", "price": float(price),
+                           "currency": "USD", "unit": "per_sac"},
         }]
 
     except Exception as e:
