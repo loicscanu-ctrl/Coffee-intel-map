@@ -37,11 +37,20 @@ interface SellingData {
   chart: ChartPoint[];
 }
 
+interface HarvestPace {
+  current: number;
+  crop_year?: string | null;
+  survey_label?: string;
+  report_date?: string;
+  source_article?: string;
+}
+
 interface FarmerSellingFile {
   source: string;
   report_date: string;
   arabica: SellingData;
   robusta: SellingData;
+  harvest?: HarvestPace | null;
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -222,6 +231,30 @@ export default function FarmerSellingPanel() {
           ))}
         </div>
       </div>
+
+      {/* Harvest pace (crop-wide; Safras) */}
+      {data.harvest && typeof data.harvest.current === "number" && (
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center gap-4">
+          <div>
+            <div className="text-[8px] text-slate-500 uppercase tracking-wide mb-1">
+              Harvest pace · Brazil{data.harvest.crop_year ? ` · ${data.harvest.crop_year}` : ""}
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-extrabold text-amber-400">{data.harvest.current}</span>
+              <span className="text-sm text-slate-500">% reaped</span>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="w-full max-w-xs bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, data.harvest.current)}%` }} />
+            </div>
+          </div>
+          <div className="text-right text-[7px] text-slate-600">
+            {data.harvest.survey_label ? `as of ${data.harvest.survey_label}` : ""}
+            {data.harvest.report_date ? ` · upd ${data.harvest.report_date}` : ""}
+          </div>
+        </div>
+      )}
 
       {/* Brazil headline */}
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center gap-6">

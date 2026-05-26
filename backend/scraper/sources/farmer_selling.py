@@ -58,26 +58,42 @@ MONTH_ABBR = {
 }
 
 
-# ── Listing page: collect candidate sales articles ────────────────────────────
+# ── Listing/feed: collect candidate sales + harvest articles (EN + PT) ─────────
 
-SALES_KEYWORDS   = ["sold", "sales", "commerciali", "negotiated", "selling", "growers"]
-HARVEST_KEYWORDS = ["harvest", "harvesting", "colheita", "crop progress", "harvest in brazil"]
+SALES_KEYWORDS   = ["sold", "sales", "commerciali", "negotiated", "selling", "growers",
+                    "comerciali", "vendid", "negociad", "vendas"]
+HARVEST_KEYWORDS = ["harvest", "harvesting", "reaped", "colheita", "colhid", "colher"]
 
-# Safras is WordPress — derive the coffee-category RSS feed (server-rendered,
-# reliably lists the most recent posts) from the listing URL, plus the site feed.
-RSS_FEEDS = [LISTING_URL.rstrip("/") + "/feed/", "https://safras.com.br/eng/feed/"]
+# Safras is WordPress. English coffee feed + site feed, plus best-guess Portuguese
+# feeds (the PT site posts sales/harvest updates more often than the English one).
+RSS_FEEDS = [
+    LISTING_URL.rstrip("/") + "/feed/",            # /eng/commodity/coffee/feed/
+    "https://safras.com.br/eng/feed/",             # English site feed
+    "https://safras.com.br/commodity/cafe/feed/",  # PT coffee category (guess)
+    "https://safras.com.br/cafe/feed/",            # PT coffee (guess)
+    "https://safras.com.br/feed/",                 # PT main site feed
+]
+
+
+def _is_harvest(title: str) -> bool:
+    return any(kw in title.lower() for kw in HARVEST_KEYWORDS)
 
 
 def _is_sales(title: str) -> bool:
     t = title.lower()
-    if any(kw in t for kw in HARVEST_KEYWORDS):
+    if _is_harvest(t):           # harvest-progress articles aren't sales surveys
         return False
     return any(kw in t for kw in SALES_KEYWORDS)
 
 
+def _is_candidate(title: str) -> bool:
+    return _is_sales(title) or _is_harvest(title)
+
+
 def _rss_sales_urls(session: requests.Session) -> list[str]:
-    """Sales-article URLs from the WordPress RSS feed (the reliable source of the
-    newest posts — the HTML listing only renders a few featured/older links)."""
+    """Candidate (sales OR harvest) article URLs from the WordPress RSS feeds —
+    the reliable source of the newest posts (the HTML listing only renders a few
+    featured/older links). Tries each feed; returns the first feed with hits."""
     for feed in RSS_FEEDS:
         try:
             r = session.get(feed, headers=HEADERS, timeout=20)
@@ -97,21 +113,21 @@ def _rss_sales_urls(session: requests.Session) -> list[str]:
             title = tm.group(1).strip() if tm else ""
             # Log every item so we can see if a recent sales article is being
             # missed by the keyword filter vs. Safras simply not publishing one.
-            log.info("RSS item: %s | sales=%s | %s", (dm.group(1).strip() if dm else "?"),
-                     _is_sales(title), title[:90])
-            if href.startswith("http") and _is_sales(title) and href not in urls:
+            kind = "harvest" if _is_harvest(title) else ("sales" if _is_sales(title) else "—")
+            log.info("RSS item: %s | %s | %s", (dm.group(1).strip() if dm else "?"), kind, title[:90])
+            if href.startswith("http") and _is_candidate(title) and href not in urls:
                 urls.append(href)
         if items:
-            log.info("RSS %s → %d items, %d sales article(s)", feed, len(items), len(urls))
+            log.info("RSS %s → %d items, %d candidate(s)", feed, len(items), len(urls))
             if urls:
                 return urls
     return []
 
 
 def _find_sales_article_urls(session: requests.Session) -> list[str]:
-    """Candidate 'sales/% sold' article URLs — RSS feed first (newest posts),
+    """Candidate sales + harvest article URLs — RSS feeds first (newest posts),
     then the HTML listing as a fallback. Deduped. The caller fetches each and
-    picks the most recent by crop-year + survey date."""
+    routes/picks the most recent by crop-year + survey date."""
     urls: list[str] = list(_rss_sales_urls(session))
 
     try:
@@ -121,12 +137,12 @@ def _find_sales_article_urls(session: requests.Session) -> list[str]:
         for tag in soup.find_all("a", href=True):
             href = str(tag.get("href", ""))
             title = tag.get_text(strip=True)
-            if href.startswith("http") and _is_sales(title) and href not in urls:
+            if href.startswith("http") and _is_candidate(title) and href not in urls:
                 urls.append(href)
     except Exception as e:
         log.error("Failed to fetch listing: %s", e)
 
-    log.info("Found %d candidate sales article(s) total", len(urls))
+    log.info("Found %d candidate article(s) total", len(urls))
     return urls
 
 
@@ -176,12 +192,22 @@ def _parse_article(html: str) -> dict[str, Any] | None:
 
     result: dict[str, Any] = {}
 
+    # ── Article kind (harvest-progress vs sales survey) from its own headline ──
+    headline = ""
+    h1 = soup.find("h1")
+    if h1:
+        headline = h1.get_text(" ", strip=True)
+    elif soup.title:
+        headline = soup.title.get_text(" ", strip=True)
+    result["headline"] = headline
+    result["kind"] = "harvest" if _is_harvest(headline) else "sales"
+
     # ── Crop year ─────────────────────────────────────────────────────────────
     cy_m = re.search(r"\b(\d{4}/\d{2})\b", text)
     if cy_m:
         result["crop_year"] = cy_m.group(1)
 
-    # ── Survey date  ("as of July 9", "through February 11") ─────────────────
+    # ── Survey date  (EN "as of July 9" / "through February 11"; PT "em 9 de julho") ──
     date_m = re.search(
         r"(?:as of|through)\s+([A-Za-z]+)\s+(\d{1,2})(?:,\s*(\d{4}))?",
         text, re.IGNORECASE,
@@ -191,8 +217,15 @@ def _parse_article(html: str) -> dict[str, Any] | None:
         result["survey_day"]        = int(date_m.group(2))
         if date_m.group(3):
             result["survey_year"] = int(date_m.group(3))
+    else:
+        pt_m = re.search(r"(?:em|at[ée])\s+(\d{1,2})\s+de\s+([A-Za-zçÇ]+)(?:\s+de\s+(\d{4}))?", text, re.IGNORECASE)
+        if pt_m:
+            result["survey_day"]        = int(pt_m.group(1))
+            result["survey_month_name"] = pt_m.group(2)
+            if pt_m.group(3):
+                result["survey_year"] = int(pt_m.group(3))
 
-    # ── Overall % sold ────────────────────────────────────────────────────────
+    # ── Overall % sold (EN + PT) ───────────────────────────────────────────────
     result["overall_pct"] = _extract_pct(
         text,
         r"(\d{1,3})%\s+of\s+(?:the\s+)?\d{4}/\d{2}\s+crop",
@@ -200,6 +233,19 @@ def _parse_article(html: str) -> dict[str, Any] | None:
         r"(\d{1,3})%\s+of\s+(?:Brazil'?s?\s+)?\d{4}/\d{2}",
         r"already\s+(?:sold|negotiated)\s+(\d{1,3})%",
         r"(\d{1,3})%\s+of\s+production\s+had\s+already\s+been\s+sold",
+        r"comercializ\w*[^.!?]{0,40}?(\d{1,3})%",          # PT "comercializou 31%"
+        r"(\d{1,3})%\s+(?:da|do)\s+(?:safra|caf[ée])\s+\d{4}/\d{2}",  # PT "31% da safra 2025/26"
+        r"vendid\w*[^.!?]{0,40}?(\d{1,3})%",
+    )
+
+    # ── Harvest progress % (used only when kind == 'harvest') ──────────────────
+    result["harvest_pct"] = _extract_pct(
+        text,
+        r"(?:reaching|reached|hits?|at)\s+(\d{1,3})%\s+of\s+(?:production|the\s+\d{4}/\d{2}|\d{4}/\d{2})",
+        r"(\d{1,3})%\s+of\s+(?:the\s+)?(?:\d{4}/\d{2}\s+)?(?:coffee\s+)?(?:crop|season|production)\s+(?:is\s+|has\s+been\s+|was\s+)?(?:reaped|harvested)",
+        r"(\d{1,3})%\s+of\s+production",
+        r"colheita\w*[^.!?]{0,80}?(\d{1,3})%",             # PT
+        r"(\d{1,3})%\s+colhid",                             # PT "X% colhido"
     )
 
     # ── Arabica % ─────────────────────────────────────────────────────────────
@@ -247,6 +293,10 @@ def _month_name_to_number(name: str) -> int | None:
         "january": 1, "february": 2, "march": 3, "april": 4,
         "may": 5, "june": 6, "july": 7, "august": 8,
         "september": 9, "october": 10, "november": 11, "december": 12,
+        # Portuguese
+        "janeiro": 1, "fevereiro": 2, "março": 3, "marco": 3, "abril": 4,
+        "maio": 5, "junho": 6, "julho": 7, "agosto": 8,
+        "setembro": 9, "outubro": 10, "novembro": 11, "dezembro": 12,
     }
     return months.get(name.lower())
 
@@ -373,13 +423,15 @@ def build_farmer_selling(db=None) -> dict:
 
     urls = _find_sales_article_urls(session)
     if not urls:
-        log.warning("No sales article found on Safras listing page")
+        log.warning("No candidate article found on Safras listing/feeds")
         return data
 
-    # Fetch the candidates and keep the genuinely most-recent one (the listing
-    # links featured/older posts high in the DOM, so first-match isn't newest).
-    best: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
-    for url in urls[:8]:
+    # Fetch candidates, route each by kind, and keep the most-recent sales AND
+    # harvest article (the listing links featured/older posts high, so first
+    # match isn't newest; recency = crop_year, crop-month, survey day).
+    best_sales: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
+    best_harvest: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
+    for url in urls[:10]:
         try:
             r = session.get(url, headers=HEADERS, timeout=20)
             r.raise_for_status()
@@ -390,25 +442,44 @@ def build_farmer_selling(db=None) -> dict:
         if not parsed:
             continue
         key = _recency_key(parsed)
-        log.info("candidate crop=%s %s %s arabica=%s%% robusta=%s%% key=%s — %s",
-                 parsed.get("crop_year"), parsed.get("survey_month_name"), parsed.get("survey_day"),
-                 parsed.get("arabica_pct"), parsed.get("robusta_pct"), key, url)
-        if best is None or key > best[0]:
-            best = (key, parsed, url)
+        log.info("candidate kind=%s crop=%s %s %s a=%s%% r=%s%% harvest=%s%% key=%s — %s",
+                 parsed.get("kind"), parsed.get("crop_year"), parsed.get("survey_month_name"),
+                 parsed.get("survey_day"), parsed.get("arabica_pct"), parsed.get("robusta_pct"),
+                 parsed.get("harvest_pct"), key, url)
+        if parsed.get("kind") == "harvest":
+            if parsed.get("harvest_pct") is not None and (best_harvest is None or key > best_harvest[0]):
+                best_harvest = (key, parsed, url)
+        else:
+            if best_sales is None or key > best_sales[0]:
+                best_sales = (key, parsed, url)
 
-    if best is None:
-        log.warning("No parseable sales article among %d candidate(s)", len(urls))
-        return data
+    changed = False
 
-    _, parsed, article_url = best
-    log.info("Selected most-recent article (key=%s): %s", best[0], article_url)
+    if best_harvest is not None:
+        _, hp, hurl = best_harvest
+        new_h = {
+            "current": hp["harvest_pct"],
+            "crop_year": hp.get("crop_year"),
+            "survey_label": (f"{hp.get('survey_month_name','')} {hp.get('survey_day','')}".strip()),
+            "report_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "source_article": hurl,
+        }
+        if data.get("harvest") != new_h:
+            data["harvest"] = new_h
+            changed = True
+            log.info("harvest: %s%% (crop %s, %s)", new_h["current"], new_h["crop_year"], hurl)
 
-    if not _apply_to_json(data, parsed):
+    if best_sales is not None:
+        _, parsed, article_url = best_sales
+        log.info("Selected most-recent SALES article (key=%s): %s", best_sales[0], article_url)
+        if _apply_to_json(data, parsed):
+            data["report_date"]    = datetime.utcnow().strftime("%Y-%m-%d")
+            data["source_article"] = article_url
+            changed = True
+
+    if not changed:
         log.info("No changes detected — JSON unchanged")
         return data
-
-    data["report_date"]   = datetime.utcnow().strftime("%Y-%m-%d")
-    data["source_article"] = article_url
 
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     log.info("farmer_selling_brazil.json updated (%d bytes)", OUT_PATH.stat().st_size)
