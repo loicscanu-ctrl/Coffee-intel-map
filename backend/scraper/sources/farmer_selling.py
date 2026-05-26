@@ -63,15 +63,14 @@ MONTH_ABBR = {
 SALES_KEYWORDS   = ["sold", "sales", "commerciali", "negotiated", "selling", "growers",
                     "comerciali", "vendid", "negociad", "vendas"]
 HARVEST_KEYWORDS = ["harvest", "harvesting", "reaped", "colheita", "colhid", "colher"]
-
-# Safras is WordPress. English coffee feed + site feed, plus best-guess Portuguese
-# feeds (the PT site posts sales/harvest updates more often than the English one).
+# Other commodities that share the site/feeds — reject so corn/soy "harvest" or
+# soybean "commercialization" headlines don't leak in.
+OTHER_CROPS = ["soybean", "soja", "corn", "milho", "sugar", "açúcar", "acucar",
+               "wheat", "trigo", "cotton", "algod", "ethanol", "etanol", "cattle", "boi", "suíno"]
+# Coffee-category RSS feeds only (the all-commodity site feeds are full of noise).
 RSS_FEEDS = [
-    LISTING_URL.rstrip("/") + "/feed/",            # /eng/commodity/coffee/feed/
-    "https://safras.com.br/eng/feed/",             # English site feed
-    "https://safras.com.br/commodity/cafe/feed/",  # PT coffee category (guess)
-    "https://safras.com.br/cafe/feed/",            # PT coffee (guess)
-    "https://safras.com.br/feed/",                 # PT main site feed
+    LISTING_URL.rstrip("/") + "/feed/",            # /eng/commodity/coffee/feed/ (EN)
+    "https://safras.com.br/commodity/cafe/feed/",  # PT coffee category
 ]
 
 
@@ -87,6 +86,15 @@ def _is_sales(title: str) -> bool:
 
 
 def _is_candidate(title: str) -> bool:
+    """A pace/survey article: about coffee, carries a % in the headline (price/
+    market commentary and production-estimate posts don't), and isn't another crop."""
+    t = title.lower()
+    if "%" not in title:
+        return False
+    if not any(c in t for c in ("coffee", "café", "cafe")):
+        return False
+    if any(c in t for c in OTHER_CROPS):
+        return False
     return _is_sales(title) or _is_harvest(title)
 
 
@@ -145,9 +153,9 @@ def _find_sales_article_urls(session: requests.Session) -> list[str]:
 
 
 def _crop_month_index(month_num: int) -> int:
-    """Brazilian crop year starts in July — map calendar month to crop-month
-    (Jul=1 … Jun=12) so within a crop year a later survey ranks as more recent."""
-    return ((month_num - 7) % 12) + 1 if month_num else 0
+    """Coffee survey timeline within a crop-year label runs ~May→Apr (harvest
+    starts in May), so map May=1 … Apr=12 to order surveys chronologically."""
+    return ((month_num - 5) % 12) + 1 if month_num else 0
 
 
 def _recency_key(parsed: dict[str, Any]) -> tuple[str, int, int]:
