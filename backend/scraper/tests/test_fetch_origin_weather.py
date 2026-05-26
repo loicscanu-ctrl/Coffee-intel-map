@@ -57,6 +57,17 @@ def test_monthly_rain_returns_totals_and_counts():
     assert counts == {"2026-04": 2, "2026-05": 1}   # day counts → SPI completeness gate
 
 
+def test_spi_target_skips_zero_filled_and_partial_months():
+    # Mirrors a real history: Jan/Feb real, Mar/Apr full-length but all-zero
+    # (missing data), May = current/partial. SPI must target Feb, not Apr.
+    cur_monthly = {"2026-01": 235.6, "2026-02": 95.5, "2026-03": 0.0,
+                   "2026-04": 0.0, "2026-05": 110.0}
+    month_days = {"2026-01": 31, "2026-02": 28, "2026-03": 31, "2026-04": 30, "2026-05": 26}
+    assert f._spi_target_month(cur_monthly, month_days, "2026-05") == "2026-02"
+    # all candidate months zero/partial → no eligible month → None
+    assert f._spi_target_month({"2026-04": 0.0}, {"2026-04": 30}, "2026-05") is None
+
+
 def test_upsert_stores_essm_in_history():
     past = (f.TODAY - __import__("datetime").timedelta(days=1)).isoformat()
     daily = {

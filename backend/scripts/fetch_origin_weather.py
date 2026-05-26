@@ -194,6 +194,17 @@ def _month_complete(ym: str, month_days: dict[str, int]) -> bool:
     return month_days.get(ym, 0) >= calendar.monthrange(y, m)[1] - 2
 
 
+def _spi_target_month(cur_monthly: dict[str, float], month_days: dict[str, int],
+                      cur_key: str) -> str | None:
+    """Latest month eligible for SPI: strictly before the (partial) current
+    month, near-complete in the history, AND with non-zero rain. The non-zero
+    rule excludes full-length but entirely-0 mm months (missing data written as
+    zeros), which would otherwise pin SPI to its clamp floor. None if none."""
+    done = sorted(k for k in cur_monthly
+                  if k < cur_key and cur_monthly[k] > 0 and _month_complete(k, month_days))
+    return done[-1] if done else None
+
+
 # ── HTTP ─────────────────────────────────────────────────────────────────────
 def _get(params: dict) -> dict:
     last: Exception | None = None
@@ -388,18 +399,17 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
             prov["essm_fraction"] = essm[-1][1]
             prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-14:]]
         # SPI-1 / SPI-3 from the committed 30-yr baseline + live monthly rain.
-        # Target the latest month that is BOTH past (current month is partial)
-        # AND near-complete in the history (≥ days_in_month − 2). Skipping
-        # partial months avoids feeding a half-empty (~0 mm) total into the
-        # gamma fit, which would otherwise pin SPI to its −4.75 clamp floor.
+        # Target the latest month that is past (current is partial), near-complete
+        # in the history (≥ days−2), AND has non-zero rain. The non-zero check is
+        # essential: some history months are full-length but entirely 0.0 mm
+        # (missing data written as zeros) — feeding that into the gamma fit pins
+        # SPI to its −4.75 clamp floor. Skipping them targets the last month with
+        # real rain instead (or omits SPI if none qualifies).
         calib = _SPI_BASE.get("origins", {}).get(origin, {}).get(prov["name"])
         if HAS_SPI and calib:
             cur_monthly, month_days = _monthly_rain(rh)
-            cur_key = f"{CUR_YEAR}-{cur_month:02d}"
-            done = sorted(k for k in cur_monthly
-                          if k < cur_key and _month_complete(k, month_days))
-            if done:
-                tgt = done[-1]
+            tgt = _spi_target_month(cur_monthly, month_days, f"{CUR_YEAR}-{cur_month:02d}")
+            if tgt:
                 s1 = spi_calc.spi_for_month(calib, cur_monthly, tgt, 1)
                 s3 = spi_calc.spi_for_month(calib, cur_monthly, tgt, 3)
                 if s1 is not None:
