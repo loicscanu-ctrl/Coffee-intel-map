@@ -45,6 +45,16 @@ urllib3_conn.allowed_gai_family = lambda: socket.AF_INET
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
 HISTORY_DIR = REPO_ROOT / "backend" / "seed" / "weather_history"
+SPI_SEED_PATH = REPO_ROOT / "backend" / "seed" / "spi_30yr_baselines.json"
+
+# SPI is computed in CI from the committed 30-yr baseline (build_spi_baselines.py,
+# run locally) + the current month's rain — no archive call in CI. Guarded: if
+# scipy is unavailable or the seed isn't committed yet, SPI is simply omitted.
+try:
+    import spi_calc
+    HAS_SPI = True
+except Exception:  # noqa: BLE001  (scipy missing, etc.)
+    HAS_SPI = False
 
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelWeather/1.0)"}
@@ -146,6 +156,28 @@ def _daily_essm(hourly: dict | None) -> dict[str, float]:
         if vals:
             by_date.setdefault(ts[:10], []).append(sum(vals) / len(vals))
     return {d: round(sum(v) / len(v), 3) for d, v in by_date.items() if v}
+
+
+def _load_spi_baselines() -> dict:
+    if HAS_SPI and SPI_SEED_PATH.exists():
+        try:
+            return json.loads(SPI_SEED_PATH.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            pass
+    return {}
+
+
+_SPI_BASE = _load_spi_baselines()
+
+
+def _monthly_rain(reg_hist: dict) -> dict[str, float]:
+    """Region history rows → {'YYYY-MM': total rain mm} (current/recent months)."""
+    out: dict[str, float] = {}
+    for date, v in reg_hist.items():
+        if isinstance(v, dict) and v.get("rain") is not None:
+            ym = date[:7]
+            out[ym] = round(out.get(ym, 0.0) + v["rain"], 1)
+    return out
 
 
 # ── HTTP ─────────────────────────────────────────────────────────────────────
@@ -341,6 +373,23 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         if essm:
             prov["essm_fraction"] = essm[-1][1]
             prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-14:]]
+        # SPI-1 / SPI-3 from the committed 30-yr baseline + live monthly rain.
+        # Targets the last COMPLETE month (the current month is partial).
+        calib = _SPI_BASE.get("origins", {}).get(origin, {}).get(prov["name"])
+        if HAS_SPI and calib:
+            cur_monthly = _monthly_rain(rh)
+            cur_key = f"{CUR_YEAR}-{cur_month:02d}"
+            done = sorted(k for k in cur_monthly if k < cur_key)
+            if done:
+                tgt = done[-1]
+                s1 = spi_calc.spi_for_month(calib, cur_monthly, tgt, 1)
+                s3 = spi_calc.spi_for_month(calib, cur_monthly, tgt, 3)
+                if s1 is not None:
+                    prov["spi_1"] = s1
+                if s3 is not None:
+                    prov["spi_3"] = s3
+                if s1 is not None or s3 is not None:
+                    prov["spi_month"] = tgt
 
     # Daily month-to-date accumulation for the reference (first) province.
     ref = doc["provinces"][0]

@@ -39,7 +39,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests scipy   # scipy (+numpy) powers the SPI gamma-fit
 
       - name: Fetch + accumulate + rebuild
         env:
