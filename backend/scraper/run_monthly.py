@@ -70,7 +70,7 @@ async def run_all() -> None:
     create_farmer_economics_tables()
     db = get_session()
     try:
-        for key, (label, fn, needs_browser) in SOURCES.items():
+        for _key, (label, fn, needs_browser) in SOURCES.items():
             try:
                 await _run(fn, needs_browser, db)
                 print(f"[scraper-monthly] {label}: OK")

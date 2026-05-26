@@ -31,6 +31,7 @@ def test_is_allowed_missing_message():
 def test_cot_handle_no_data(tmp_path, monkeypatch):
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     import importlib
+
     import telegram.data as td
     importlib.reload(td)
     import telegram.handlers.cot as cot_mod

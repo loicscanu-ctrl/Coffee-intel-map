@@ -49,7 +49,11 @@ urllib3_conn.allowed_gai_family = lambda: socket.AF_INET
 # two stay in lockstep (same region names, same on-disk format).
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fetch_origin_weather import (  # noqa: E402
-    ORIGINS, HEADERS, load_history, save_history, r1,
+    HEADERS,
+    ORIGINS,
+    load_history,
+    r1,
+    save_history,
 )
 
 ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"

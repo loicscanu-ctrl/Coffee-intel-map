@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import re
 from datetime import UTC, datetime
+
 from telegram.data import load
 
 STC = {1:"H",2:"H",3:"K",4:"K",5:"N",6:"N",7:"U",8:"U",9:"X",10:"X",11:"F",12:"F"}

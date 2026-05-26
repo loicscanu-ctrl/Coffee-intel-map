@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from fastapi import APIRouter, Request, Response
+
 from telegram.auth import is_allowed
-from telegram.sender import send_message
 from telegram.commands import DISPATCH
+from telegram.sender import send_message
 
 router = APIRouter()
 

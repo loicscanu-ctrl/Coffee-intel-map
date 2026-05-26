@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import os
+
 import requests
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")

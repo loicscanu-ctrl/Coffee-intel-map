@@ -1,14 +1,17 @@
 from __future__ import annotations
+
 from telegram.handlers import (
+    brazil,
     brief,
     cot,
-    brazil,
     ecf,
-    help as help_handler,
     kaffeesteuer,
     prices,
     quote,
     run,
+)
+from telegram.handlers import (
+    help as help_handler,
 )
 
 DISPATCH: dict[str, object] = {

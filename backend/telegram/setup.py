@@ -7,6 +7,7 @@ Usage:
 Idempotent — safe to run multiple times (Telegram ignores duplicate setWebhook to same URL).
 """
 import os
+
 import requests
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
