@@ -1,8 +1,8 @@
 """Shared ICE coffee contract date math — First Notice Day (FND) and
 trading-day offsets for KC/RC/RM contract symbols.
 
-Previously copy-pasted across scraper/export_static_json.py, routes/futures.py,
-import_oi_csv.py and a couple of scripts. Centralised here so the FND rule
+Previously copy-pasted across scraper/export_static_json.py, routes/futures.py
+and a couple of scripts. Centralised here so the FND rule
 (which must match the frontend's `firstNoticeDay`) lives in exactly one place.
 Holidays are intentionally NOT adjusted — the calculation matches the frontend,
 which also ignores exchange holidays.
