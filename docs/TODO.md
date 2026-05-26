@@ -1,5 +1,22 @@
 # TODO / follow-ups
 
+## Phase-3 cut — delete the price-regex fallback (target: on/after 2026-06-09)
+The exporters strangler is at Phase 2 (dual-read) + a CI gate. The fallback
+regex is the safety net; delete it only after production proves the structured
+`price_data` path handled exports cleanly for 14 straight days.
+- **Readiness criterion:** `frontend/public/data/health.json` never emits
+  `latest_prices_used_regex_fallback` for 14 consecutive days (≥ ~5–10 trading
+  days, covering a weekend + any contract rollover). Automated by
+  `.github/workflows/phase3-readiness-check.yml`, which pings Telegram with a
+  GO / NOT-ready verdict from 2026-06-09 onward.
+- [ ] **When GO fires, delete:** `_build_tickers_from_news` and `_vn_faq_from_news`
+      in `backend/scraper/exporters/prices.py`; the regex branches in
+      `extract_physical_price` (`backend/scraper/db.py`) below the
+      `price_data` short-circuit. Leave the structured path as the only one.
+      The `latest_prices` fallback `if not tickers:` block + the health-flag
+      signal + the CI gate can then go too. Unit tests already pin the
+      structured path, so the suite flags anything still leaning on the regex.
+
 ## Brazil farmer-selling (Safras) — RESOLVED (harvest live; sales scraper correct)
 Scraper now discovers via coffee-category RSS (EN + PT), classifies sales vs
 harvest, requires a %-in-title (rejects price/estimate/other-crop noise), picks

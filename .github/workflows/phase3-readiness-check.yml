@@ -1,0 +1,74 @@
+name: "Phase-3 readiness — price regex fallback"
+
+# Strangler-fig validation gate. The price exporters run a structured
+# (PhysicalPrice / price_data) primary path with a NewsItem-regex fallback;
+# export_health writes `latest_prices_used_regex_fallback` into health.json
+# whenever the fallback fires. This job watches that telemetry and, once the
+# structured path has handled 14 straight days with zero fallbacks, pings
+# Telegram with a GO so the fallback regex can be deleted with confidence.
+#
+# It only speaks during a short reminder window starting at the target date
+# (TARGET .. TARGET+6) to avoid indefinite daily pings; run it any time via
+# the manual dispatch.
+
+on:
+  schedule:
+    - cron: '0 8 * * *'      # daily 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # full history — we scan past health.json blobs
+
+      - name: Evaluate 14-day fallback telemetry
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -euo pipefail
+          TARGET=2026-06-09                       # 14 days after the 2026-05-26 go-live
+          WINDOW_END=2026-06-15                    # stop pinging after the reminder window
+          TODAY=$(date -u +%F)
+          HEALTH=frontend/public/data/health.json
+          WARN=latest_prices_used_regex_fallback
+
+          send() {
+            [ -n "${TELEGRAM_BOT_TOKEN:-}" ] || { echo "(no telegram secret; would send: $1)"; return; }
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=$1" >/dev/null || true
+          }
+
+          if [ "$TODAY" \< "$TARGET" ]; then
+            echo "Today $TODAY is before target $TARGET — not evaluating yet."
+            exit 0
+          fi
+          if [ "$WINDOW_END" \< "$TODAY" ]; then
+            echo "Past the reminder window ($TARGET..$WINDOW_END) — staying silent. Use manual dispatch to re-check."
+            exit 0
+          fi
+
+          # Scan every committed version of health.json in the last 14 days for the warning.
+          commits=$(git log --since="14 days ago" --format=%H -- "$HEALTH" || true)
+          n=$(printf '%s\n' "$commits" | grep -c . || true)
+          dirty=""
+          for c in $commits; do
+            if git show "$c:$HEALTH" 2>/dev/null | grep -q "$WARN"; then
+              dirty="$dirty $(git show -s --format=%cs "$c")"
+            fi
+          done
+
+          echo "Today=$TODAY  health.json updates in window=$n  fallback dates:${dirty:- none}"
+
+          if [ "$n" -lt 5 ]; then
+            send "⚠️ Phase-3 check: only $n health.json updates in the last 14 days — the export pipeline may not be running daily. Not declaring GO; investigate before the cut."
+          elif [ -n "$dirty" ]; then
+            send "⏳ Phase-3 NOT ready: latest_prices regex fallback fired in the last 14 days (dates:$dirty). The 14-day clean clock resets — check the price scrapers before deleting the fallback."
+          else
+            send "✅ Phase-3 GO: $n clean health.json exports over 14 days, zero latest_prices regex fallbacks. Safe to delete the fallback — see docs/TODO.md (prices.py _build_tickers_from_news / _vn_faq_from_news + db.py extract_physical_price regex)."
+          fi
