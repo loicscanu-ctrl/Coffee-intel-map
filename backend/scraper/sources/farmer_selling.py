@@ -60,38 +60,68 @@ MONTH_ABBR = {
 
 # ── Listing page: collect candidate sales articles ────────────────────────────
 
+SALES_KEYWORDS   = ["sold", "sales", "commerciali", "negotiated", "selling", "growers"]
+HARVEST_KEYWORDS = ["harvest", "harvesting", "colheita", "crop progress", "harvest in brazil"]
+
+# Safras is WordPress — derive the coffee-category RSS feed (server-rendered,
+# reliably lists the most recent posts) from the listing URL, plus the site feed.
+RSS_FEEDS = [LISTING_URL.rstrip("/") + "/feed/", "https://safras.com.br/eng/feed/"]
+
+
+def _is_sales(title: str) -> bool:
+    t = title.lower()
+    if any(kw in t for kw in HARVEST_KEYWORDS):
+        return False
+    return any(kw in t for kw in SALES_KEYWORDS)
+
+
+def _rss_sales_urls(session: requests.Session) -> list[str]:
+    """Sales-article URLs from the WordPress RSS feed (the reliable source of the
+    newest posts — the HTML listing only renders a few featured/older links)."""
+    for feed in RSS_FEEDS:
+        try:
+            r = session.get(feed, headers=HEADERS, timeout=20)
+            r.raise_for_status()
+        except Exception as e:
+            log.info("RSS feed %s failed: %s", feed, e)
+            continue
+        items = re.findall(r"<item\b.*?</item>", r.text, re.S | re.I)
+        urls: list[str] = []
+        for it in items:
+            lm = re.search(r"<link>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</link>", it, re.S | re.I)
+            tm = re.search(r"<title>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</title>", it, re.S | re.I)
+            if not lm:
+                continue
+            href = lm.group(1).strip()
+            title = tm.group(1).strip() if tm else ""
+            if href.startswith("http") and _is_sales(title) and href not in urls:
+                urls.append(href)
+        if items:
+            log.info("RSS %s → %d items, %d sales article(s)", feed, len(items), len(urls))
+            if urls:
+                return urls
+    return []
+
+
 def _find_sales_article_urls(session: requests.Session) -> list[str]:
-    """All candidate 'sales/% sold' article URLs on the listing, in DOM order
-    (deduped). The newest isn't necessarily first — Safras links featured/older
-    posts high in the DOM — so the caller fetches each and picks the most recent
-    by crop-year + survey date."""
+    """Candidate 'sales/% sold' article URLs — RSS feed first (newest posts),
+    then the HTML listing as a fallback. Deduped. The caller fetches each and
+    picks the most recent by crop-year + survey date."""
+    urls: list[str] = list(_rss_sales_urls(session))
+
     try:
         r = session.get(LISTING_URL, headers=HEADERS, timeout=20)
         r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for tag in soup.find_all("a", href=True):
+            href = str(tag.get("href", ""))
+            title = tag.get_text(strip=True)
+            if href.startswith("http") and _is_sales(title) and href not in urls:
+                urls.append(href)
     except Exception as e:
         log.error("Failed to fetch listing: %s", e)
-        return []
 
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    SALES_KEYWORDS   = ["sold", "sales", "commerciali", "negotiated", "selling", "growers"]
-    HARVEST_KEYWORDS = ["harvest", "harvesting", "colheita", "crop progress", "harvest in brazil"]
-
-    def _is_sales(title: str) -> bool:
-        t = title.lower()
-        if any(kw in t for kw in HARVEST_KEYWORDS):
-            return False
-        return any(kw in t for kw in SALES_KEYWORDS)
-
-    urls: list[str] = []
-    for tag in soup.find_all("a", href=True):
-        href = str(tag.get("href", ""))
-        title = tag.get_text(strip=True)
-        if not href.startswith("http") or "coffee" not in href:
-            continue
-        if _is_sales(title) and href not in urls:
-            urls.append(href)
-    log.info("Found %d candidate sales article(s)", len(urls))
+    log.info("Found %d candidate sales article(s) total", len(urls))
     return urls
 
 
