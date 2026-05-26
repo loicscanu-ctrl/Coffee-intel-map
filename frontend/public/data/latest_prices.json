@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-26T13:06:17.481533Z",
+  "generated_at": "2026-05-26T15:28:30.271919Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "274.75 (+2.40)",
+      "value": "274.10 (+1.75)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,501 (+45)",
+      "value": "3,519 (+63)",
       "category": "futures"
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "label": "CON T7",
-      "value": "870,00 BRL ($2,893)",
+      "value": "890,00 BRL ($2,959)",
       "category": "physical"
     },
     {
