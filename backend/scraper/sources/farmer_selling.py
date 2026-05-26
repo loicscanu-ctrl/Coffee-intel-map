@@ -93,7 +93,9 @@ def _is_candidate(title: str) -> bool:
 def _rss_sales_urls(session: requests.Session) -> list[str]:
     """Candidate (sales OR harvest) article URLs from the WordPress RSS feeds —
     the reliable source of the newest posts (the HTML listing only renders a few
-    featured/older links). Tries each feed; returns the first feed with hits."""
+    featured/older links). Aggregates across ALL feeds (EN + PT) so a newer PT
+    survey isn't hidden behind the English feed; deduped by URL."""
+    urls: list[str] = []
     for feed in RSS_FEEDS:
         try:
             r = session.get(feed, headers=HEADERS, timeout=20)
@@ -102,7 +104,7 @@ def _rss_sales_urls(session: requests.Session) -> list[str]:
             log.info("RSS feed %s failed: %s", feed, e)
             continue
         items = re.findall(r"<item\b.*?</item>", r.text, re.S | re.I)
-        urls: list[str] = []
+        n_cand = 0
         for it in items:
             lm = re.search(r"<link>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</link>", it, re.S | re.I)
             tm = re.search(r"<title>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</title>", it, re.S | re.I)
@@ -111,17 +113,13 @@ def _rss_sales_urls(session: requests.Session) -> list[str]:
                 continue
             href = lm.group(1).strip()
             title = tm.group(1).strip() if tm else ""
-            # Log every item so we can see if a recent sales article is being
-            # missed by the keyword filter vs. Safras simply not publishing one.
             kind = "harvest" if _is_harvest(title) else ("sales" if _is_sales(title) else "—")
             log.info("RSS item: %s | %s | %s", (dm.group(1).strip() if dm else "?"), kind, title[:90])
             if href.startswith("http") and _is_candidate(title) and href not in urls:
                 urls.append(href)
-        if items:
-            log.info("RSS %s → %d items, %d candidate(s)", feed, len(items), len(urls))
-            if urls:
-                return urls
-    return []
+                n_cand += 1
+        log.info("RSS %s → %d items, %d new candidate(s)", feed, len(items), n_cand)
+    return urls
 
 
 def _find_sales_article_urls(session: requests.Session) -> list[str]:
@@ -239,14 +237,18 @@ def _parse_article(html: str) -> dict[str, Any] | None:
     )
 
     # ── Harvest progress % (used only when kind == 'harvest') ──────────────────
-    result["harvest_pct"] = _extract_pct(
-        text,
-        r"(?:reaching|reached|hits?|at)\s+(\d{1,3})%\s+of\s+(?:production|the\s+\d{4}/\d{2}|\d{4}/\d{2})",
-        r"(\d{1,3})%\s+of\s+(?:the\s+)?(?:\d{4}/\d{2}\s+)?(?:coffee\s+)?(?:crop|season|production)\s+(?:is\s+|has\s+been\s+|was\s+)?(?:reaped|harvested)",
+    # Prefer the HEADLINE — it carries the clean national total ("reaching 77% of
+    # production"); the body has regional sub-figures (e.g. conilon 93%) that the
+    # regex would otherwise grab. Fall back to the body only if the headline lacks it.
+    _harvest_pats = (
         r"(\d{1,3})%\s+of\s+production",
+        r"(\d{1,3})%\s+of\s+(?:the\s+)?\d{4}/\d{2}\s+(?:season|crop)",
+        r"(?:reaching|reached|hits?|at)\s+(\d{1,3})%",
+        r"(\d{1,3})%\s+of\s+(?:the\s+)?(?:\d{4}/\d{2}\s+)?(?:coffee\s+)?(?:crop|season|production)\s+(?:is\s+|has\s+been\s+|was\s+)?(?:reaped|harvested)",
         r"colheita\w*[^.!?]{0,80}?(\d{1,3})%",             # PT
         r"(\d{1,3})%\s+colhid",                             # PT "X% colhido"
     )
+    result["harvest_pct"] = _extract_pct(headline, *_harvest_pats) or _extract_pct(text, *_harvest_pats)
 
     # ── Arabica % ─────────────────────────────────────────────────────────────
     result["arabica_pct"] = _extract_pct(
@@ -431,7 +433,7 @@ def build_farmer_selling(db=None) -> dict:
     # match isn't newest; recency = crop_year, crop-month, survey day).
     best_sales: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
     best_harvest: tuple[tuple[str, int, int], dict[str, Any], str] | None = None
-    for url in urls[:10]:
+    for url in urls[:20]:
         try:
             r = session.get(url, headers=HEADERS, timeout=20)
             r.raise_for_status()
