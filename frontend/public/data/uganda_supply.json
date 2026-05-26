@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-05-26T04:31:04.572661+00:00",
+  "scraped_at": "2026-05-26T04:46:30.623378+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-03",
@@ -722,13 +722,13 @@
     "grade": "Screen 15"
   },
   "weather": {
-    "scraped_at": "2026-05-25T18:23:04.941146Z",
+    "scraped_at": "2026-05-26T04:39:58.190785Z",
     "regions": [
       {
         "name": "Kasese",
-        "drought": "MED",
+        "drought": "HIGH",
         "csi_30d": 1.0,
-        "csi_60d": 0.864,
+        "csi_60d": 0.886,
         "csi_30d_level": "HIGH",
         "csi_60d_level": "HIGH"
       },
@@ -747,7 +747,7 @@
         "csi_60d": 0.046,
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW",
-        "rain_mtd_mm": 151.4,
+        "rain_mtd_mm": 151.0,
         "rain_hist_min": 199.8,
         "rain_hist_max": 610.0
       },
@@ -763,7 +763,7 @@
         "name": "Masaka",
         "drought": "MED",
         "csi_30d": 1.0,
-        "csi_60d": 0.98,
+        "csi_60d": 0.956,
         "csi_30d_level": "HIGH",
         "csi_60d_level": "HIGH"
       }
@@ -773,7 +773,6 @@
         "region": "Kasese",
         "days": [
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -838,7 +837,8 @@
           "H",
           "H",
           "H",
-          "H"
+          "H",
+          "M"
         ]
       },
       {
@@ -851,7 +851,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "-",
@@ -904,6 +903,7 @@
           "-",
           "-",
           "-",
+          "L",
           "L",
           "L",
           "L",
@@ -928,7 +928,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -982,6 +981,7 @@
           "L",
           "L",
           "L",
+          "-",
           "-"
         ]
       },
@@ -1045,11 +1045,11 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -1077,7 +1077,6 @@
           "M",
           "M",
           "M",
-          "M",
           "L",
           "M",
           "L",
@@ -1126,7 +1125,8 @@
           "M",
           "M",
           "M",
-          "M"
+          "M",
+          "L"
         ]
       }
     ]
