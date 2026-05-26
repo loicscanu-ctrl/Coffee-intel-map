@@ -262,31 +262,39 @@ def safe_write_json(path, payload, validate_fn, indent: int = 2, sanity_fn=None)
         print(f"[validate] {name} FAILED: {reason} — keeping existing file")
         return False
 
-    # Read the existing file once — used for both the sanity guard and the
+    serialized = json.dumps(payload, indent=indent)
+
+    # Read the existing file once (as text) — reused by the sanity guard and the
     # content short-circuit below.
     p = Path(path)
-    old_payload = None
+    existing = None
     if p.exists():
         try:
-            old_payload = json.loads(p.read_text(encoding="utf-8"))
+            existing = p.read_text(encoding="utf-8")
         except Exception:
-            old_payload = None  # unreadable/corrupt → treat as no prior
+            existing = None  # unreadable/corrupt → treat as no prior
 
-    # Cross-run sanity guard (volatility). Only runs when we have a prior good
-    # file to compare against, so a clean first write is never blocked.
-    if sanity_fn is not None and old_payload is not None:
-        ok2, reason2 = sanity_fn(old_payload, payload)
-        if not ok2:
-            print(f"[validate] {Path(path).name} SANITY FAILED: {reason2} — keeping existing file")
-            return False
+    # Cross-run sanity guard (volatility). It needs the parsed prior payload, so
+    # we only pay the json.loads cost when a guard is actually supplied — not on
+    # every one of the ~21 files. Skipped on the first-ever write.
+    if sanity_fn is not None and existing is not None:
+        try:
+            old_payload = json.loads(existing)
+        except Exception:
+            old_payload = None
+        if old_payload is not None:
+            ok2, reason2 = sanity_fn(old_payload, payload)
+            if not ok2:
+                print(f"[validate] {Path(path).name} SANITY FAILED: {reason2} — keeping existing file")
+                return False
 
-    # Content short-circuit: if the file already holds identical data, skip the
-    # rewrite. Makes the export idempotent (re-running changes nothing) and
-    # avoids pointless .tmp churn for the ~21 files regenerated each run.
-    if old_payload is not None and old_payload == payload:
+    # Content short-circuit: these files are always written as
+    # json.dumps(payload, indent=indent), so comparing the on-disk text to the
+    # freshly-serialized string is exact and skips a CPU-heavy JSON re-parse.
+    # Makes the export idempotent and avoids pointless .tmp churn.
+    if existing == serialized:
         return False
 
-    serialized = json.dumps(payload, indent=indent)
     tmp = Path(str(path) + ".tmp")
     tmp.write_text(serialized, encoding="utf-8")
     tmp.replace(path)

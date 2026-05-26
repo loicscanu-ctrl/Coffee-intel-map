@@ -52,7 +52,11 @@ async def _run_one(source, browser, semaphore, db) -> int:
     """Run one news source with its own page, under the concurrency semaphore."""
     name = source.__name__.split(".")[-1]
     async with semaphore:
-        page = await browser.new_page()
+        # Isolated context per source — pristine cookies / cache / localStorage,
+        # so a CAPTCHA or poisoned cookie state in one scraper can't bleed into a
+        # concurrent one sharing the browser's default context.
+        context = await browser.new_context()
+        page = await context.new_page()
         try:
             items = await asyncio.wait_for(source.run(page), timeout=SCRAPER_TIMEOUT)
             count = 0
@@ -76,7 +80,7 @@ async def _run_one(source, browser, semaphore, db) -> int:
             print(f"[scraper] {name} failed: {e}")
             return 0
         finally:
-            await page.close()
+            await context.close()  # closes the page too and tears down the sandbox
 
 
 async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEOUT) -> None:

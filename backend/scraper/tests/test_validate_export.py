@@ -264,6 +264,17 @@ def test_safe_write_json_writes_on_pass(tmp_path):
     assert dest.exists()
 
 
+def test_safe_write_json_idempotent_skip(tmp_path):
+    """Re-writing identical data is a no-op (string short-circuit, no re-parse)."""
+    from scraper.validate_export import safe_write_json, validate_macro_cot
+    dest = tmp_path / "macro_cot.json"
+    payload = [{"date": "2026-04-01"}]
+    assert safe_write_json(dest, payload, validate_macro_cot) is True     # first write
+    mtime = dest.stat().st_mtime_ns
+    assert safe_write_json(dest, payload, validate_macro_cot) is False     # identical → skip
+    assert dest.stat().st_mtime_ns == mtime                               # file untouched
+
+
 def test_safe_write_json_keeps_old_on_fail(tmp_path):
     import json
 
