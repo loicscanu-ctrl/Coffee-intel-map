@@ -30,6 +30,8 @@ trigger and gates `npm ci` + signals to COT-relevant runs.
       (`futures_chain`/`oi_fnd_chart` re-exported but unchanged) — no `signals.json`,
       none of the other ~18 topics. Scoping + npm/signals gating confirmed.
 - [ ] **Full export** — confirm a cron/dispatch run still writes everything + signals.
+      ✅ CONFIRMED: commit `5770cdb` (full dispatch) wrote 14 files incl. `signals.json`,
+      `farmer_economics`, `demand_stocks` + all supply files (not the 4-file news slice).
 - Safety net: the nightly cron runs a full export, so a missed file self-heals.
 
 ## Weather — backend follow-ups (frontend rendering fixed in WeatherCharts)
@@ -43,12 +45,9 @@ share in the filter. Remaining items are in the data pipeline:
       CI; after the region-resilience + fill-null-fields + merge-upsert fixes, the
       re-run filled all 7 origins with complete Jan–May rain AND temperature (no
       gaps). Daily accumulation preserves it going forward.
-- [ ] **Temp gap for 2 provinces — RE-RUN 0.4 backfill.** Ethiopia/Jimma (Jan-Mar)
-      and Honduras/Copán (Feb-Mar) still have null temp because those archive cells
-      returned a null `temperature_2m_mean` (rain was fine), and the chart blanks a
-      month if any selected province is null. FIX (committed): backfill + daily
-      fetch now fall back to `(tmax+tmin)/2` when the mean is null. Re-dispatch
-      "0.4 – Backfill weather history" to fill them.
+- [x] **Temp gap for Jimma/Copán — DONE & verified.** The 0.4 re-run with the
+      `(tmax+tmin)/2` fallback filled them; all 7 origins now have complete
+      Jan–May temperatures (no nulls).
 - [x] **Monthly Rainfall current-month now projected to month-end** (weighted,
       same basis as the cumulative chart) so the partial month is comparable to the
       full-month climatology — fixes the "VN 112.5 vs daily 129.9" confusion. The
@@ -62,7 +61,7 @@ share in the filter. Remaining items are in the data pipeline:
       day 25), so the daily chart now weights across selected regions and responds
       to the filter. `daily_accum_ly` is empty (no 2025 daily history) → last-year
       line uses the climatology fallback, as designed.
-- [ ] **Honduras May rainfall ~16% of normal is REAL, not a bug** (other 6 origins
-      66–123% via the same builder; daily station ~7mm MTD). Likely a genuine
-      early-rainy-season deficit — worth a drought-risk flag. Re-check once May is
-      complete (figure is month-to-date through ~May 24).
+- [ ] **Honduras May rainfall deficit — monitor (not a bug).** Already surfaced by
+      the production-at-risk readout (Honduras flags ~72% of production below
+      drought-risk rainfall). Re-check once May is complete to see if late rains
+      narrowed the gap (the figure is month-to-date).
