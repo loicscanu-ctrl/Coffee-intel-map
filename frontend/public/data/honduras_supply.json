@@ -1,6 +1,6 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-05-25T18:28:23.562553Z",
+  "scraped_at": "2026-05-26T04:20:07.563355Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-25",
@@ -347,19 +347,19 @@
         "name": "Copán",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 159.3,
-        "csi_60d": 270.6,
+        "csi_30d": 157.7,
+        "csi_60d": 271.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H",
         "rain_mtd_mm": 108.7,
-        "rain_hist_min": 38.4,
-        "rain_hist_max": 180.5
+        "rain_hist_min": 51.6,
+        "rain_hist_max": 183.4
       },
       {
         "name": "Santa Bárbara",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 160.1,
+        "csi_30d": 154.4,
         "csi_60d": 263.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
@@ -368,8 +368,8 @@
         "name": "Montecillos",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 171.3,
-        "csi_60d": 296.5,
+        "csi_30d": 169.8,
+        "csi_60d": 297.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -377,8 +377,8 @@
         "name": "El Paraíso",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 165.9,
-        "csi_60d": 288.3,
+        "csi_30d": 165.6,
+        "csi_60d": 288.7,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -386,8 +386,8 @@
         "name": "Agalta",
         "frost": "NONE",
         "drought": "HIGH",
-        "csi_30d": 164.4,
-        "csi_60d": 276.2,
+        "csi_30d": 164.3,
+        "csi_60d": 277.6,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }

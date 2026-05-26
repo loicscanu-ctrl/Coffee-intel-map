@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2025/26",
-  "scraped_at": "2026-05-25T18:28:09.984858Z",
+  "scraped_at": "2026-05-26T04:19:51.221312Z",
   "cost": {
     "total_usd_per_bag": 222.7,
     "yoy_pct": 0.0,
@@ -154,8 +154,8 @@
         "name": "Sul de Minas",
         "frost": "NONE",
         "drought": "LOW",
-        "csi_30d": 85.4,
-        "csi_60d": 175.0,
+        "csi_30d": 84.0,
+        "csi_60d": 173.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
@@ -163,20 +163,20 @@
         "name": "Cerrado",
         "frost": "NONE",
         "drought": "LOW",
-        "csi_30d": 115.6,
-        "csi_60d": 216.0,
+        "csi_30d": 114.9,
+        "csi_60d": 219.4,
         "csi_30d_level": "H",
         "csi_60d_level": "H",
         "rain_mtd_mm": 13.4,
-        "rain_hist_min": 3.0,
+        "rain_hist_min": 3.3,
         "rain_hist_max": 55.5
       },
       {
         "name": "Paran\u00e1",
         "frost": "NONE",
         "drought": "LOW",
-        "csi_30d": 52.4,
-        "csi_60d": 165.5,
+        "csi_30d": 48.4,
+        "csi_60d": 161.3,
         "csi_30d_level": "M",
         "csi_60d_level": "H"
       },
@@ -184,8 +184,8 @@
         "name": "Esp\u00edrito Santo",
         "frost": "NONE",
         "drought": "NONE",
-        "csi_30d": 81.1,
-        "csi_60d": 172.1,
+        "csi_30d": 80.9,
+        "csi_60d": 170.9,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }

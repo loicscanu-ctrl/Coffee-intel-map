@@ -1,6 +1,6 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-25T18:28:24.015230Z",
+  "scraped_at": "2026-05-26T04:20:08.219259Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-25",
@@ -350,38 +350,38 @@
         "csi_30d_level": "M",
         "csi_60d_level": "M",
         "rain_mtd_mm": 169.6,
-        "rain_hist_min": 107.5,
-        "rain_hist_max": 218.8
+        "rain_hist_min": 113.2,
+        "rain_hist_max": 238.6
       },
       {
         "name": "Gayo",
         "drought": "LOW",
-        "csi_30d": 41.5,
-        "csi_60d": 77.7,
+        "csi_30d": 44.1,
+        "csi_60d": 80.3,
         "csi_30d_level": "M",
-        "csi_60d_level": "L"
+        "csi_60d_level": "M"
       },
       {
         "name": "Java",
         "drought": "LOW",
-        "csi_30d": 84.3,
-        "csi_60d": 134.7,
+        "csi_30d": 83.3,
+        "csi_60d": 138.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       },
       {
         "name": "Toraja",
         "drought": "NONE",
-        "csi_30d": 17.7,
-        "csi_60d": 75.7,
+        "csi_30d": 19.2,
+        "csi_60d": 78.7,
         "csi_30d_level": "-",
         "csi_60d_level": "L"
       },
       {
         "name": "Flores",
         "drought": "LOW",
-        "csi_30d": 71.6,
-        "csi_60d": 143.5,
+        "csi_30d": 72.4,
+        "csi_60d": 147.5,
         "csi_30d_level": "H",
         "csi_60d_level": "H"
       }

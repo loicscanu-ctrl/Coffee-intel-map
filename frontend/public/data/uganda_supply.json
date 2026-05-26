@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-05-25T18:28:24.467928+00:00",
+  "scraped_at": "2026-05-26T04:20:08.877213+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-03",
@@ -748,8 +748,8 @@
         "csi_30d_level": "LOW",
         "csi_60d_level": "LOW",
         "rain_mtd_mm": 151.4,
-        "rain_hist_min": 191.6,
-        "rain_hist_max": 586.0
+        "rain_hist_min": 199.8,
+        "rain_hist_max": 610.0
       },
       {
         "name": "Rwenzori",
