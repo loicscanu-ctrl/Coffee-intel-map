@@ -4,6 +4,7 @@ import pathlib
 import sys
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "scripts"))
 
@@ -39,7 +40,8 @@ def test_grid_region_mean_drops_fill_values():
 
 def test_read_vhi_netcdf_roundtrip(tmp_path):
     # Write a synthetic NOAA-like NetCDF and confirm the reader extracts it.
-    from netCDF4 import Dataset
+    # netCDF4 is only installed in the 0.5 VHI workflow, not the 9.1 test env.
+    Dataset = pytest.importorskip("netCDF4").Dataset
     p = tmp_path / "VHP.nc"
     ds = Dataset(p, "w", format="NETCDF4")
     ds.createDimension("latitude", 4)
@@ -58,7 +60,7 @@ def test_read_vhi_netcdf_roundtrip(tmp_path):
 
 def test_read_vhi_netcdf_derives_grid_without_coords(tmp_path):
     # No lat/lon vars → reader derives a regular grid from NOAA bounds.
-    from netCDF4 import Dataset
+    Dataset = pytest.importorskip("netCDF4").Dataset
     p = tmp_path / "VHP_nocoord.nc"
     ds = Dataset(p, "w", format="NETCDF4")
     ds.createDimension("y", 10); ds.createDimension("x", 20)
