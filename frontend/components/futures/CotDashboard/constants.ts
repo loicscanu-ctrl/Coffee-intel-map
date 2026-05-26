@@ -18,7 +18,6 @@ export const NAV_STEPS = [
   { id: 6 as Step,  icon: "Scale",     label: "Cycle" },       //  8.
   { id: 7 as Step,  icon: "FileText",  label: "Report" },      //  9.
   { id: 8 as Step,  icon: "Signals",   label: "Signals" },     // 10. Signals (moved to end)
-  { id: 11 as Step, icon: "Book",      label: "Research" },    // 11. Methodology write-up
 ];
 
 // ── Macro COT (cross-commodity) palettes ──────────────────────────────────────

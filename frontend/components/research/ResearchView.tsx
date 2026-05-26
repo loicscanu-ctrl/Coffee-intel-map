@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
-import SectionHeader from "./SectionHeader";
 
 type Sub = "model" | "backtest";
 const SUBS: { id: Sub; label: string }[] = [
@@ -131,13 +130,10 @@ function IntraweekMethodology() {
   );
 }
 
-export default function Research() {
+export default function ResearchView() {
   const [sub, setSub] = useState<Sub>("model");
   return (
     <>
-      <SectionHeader icon="Book" title="11. Research — Methodology"
-        subtitle="The thinking behind the COT analytics: the intraweek positioning model, and the standalone COT backtest report." />
-
       <div className="flex items-center gap-1 flex-wrap mb-4">
         {SUBS.map(s => (
           <button key={s.id} onClick={() => setSub(s.id)}

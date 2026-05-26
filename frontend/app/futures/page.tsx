@@ -1,12 +1,11 @@
 "use client";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
-import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type FuturesTab = "exchange" | "quotation" | "research";
-const FUTURES_TABS: FuturesTab[] = ["exchange", "quotation", "research"];
+type FuturesTab = "exchange" | "quotation";
+const FUTURES_TABS: FuturesTab[] = ["exchange", "quotation"];
 
 interface Contract {
   contract: string;
@@ -581,17 +580,6 @@ function FuturesPageInner() {
             {t}
           </button>
         ))}
-        <button
-          onClick={() => setTab("research")}
-          className={`px-4 py-2 text-sm font-medium rounded-t transition-colors flex items-center gap-1.5 ${
-            tab === "research"
-              ? "bg-slate-800 text-amber-400 border border-b-transparent border-slate-700 -mb-px"
-              : "text-slate-600 hover:text-slate-400"
-          }`}
-        >
-          <span className="text-[10px] bg-amber-900/60 text-amber-400 px-1 py-0.5 rounded font-bold tracking-wide">DRAFT</span>
-          Research
-        </button>
       </div>
 
       {/* Exchange tab */}
@@ -643,9 +631,6 @@ function FuturesPageInner() {
           vnFaqUsdMt={vnFaqUsdMt}
         />
       )}
-
-      {/* Research tab — draft COT backtest report */}
-      {tab === "research" && <CotBacktestReport />}
 
       </div>
     </div>

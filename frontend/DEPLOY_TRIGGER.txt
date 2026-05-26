@@ -1,2 +1,0 @@
-Deploy trigger / build marker. Bump to force a fresh Vercel build.
-last: 2026-05-26T05:19Z — verify COT Research tab (section 11) is live.
