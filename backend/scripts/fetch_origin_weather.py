@@ -47,9 +47,10 @@ DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
 HISTORY_DIR = REPO_ROOT / "backend" / "seed" / "weather_history"
 SPI_SEED_PATH = REPO_ROOT / "backend" / "seed" / "spi_30yr_baselines.json"
 
-# SPI is computed in CI from the committed 30-yr baseline (build_spi_baselines.py,
-# run locally) + the current month's rain — no archive call in CI. Guarded: if
-# scipy is unavailable or the seed isn't committed yet, SPI is simply omitted.
+# SPI is computed in CI from the committed 30-yr baseline (built one-shot by the
+# build-spi-baselines workflow) + the current month's rain — no archive call at
+# daily runtime. Guarded: if scipy is unavailable or the seed isn't committed
+# yet, SPI is simply omitted.
 try:
     import spi_calc
     HAS_SPI = True

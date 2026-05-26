@@ -13,6 +13,17 @@ collects echo data; the live fetch was not testable in the sandbox.
       commercialization + new-crop advance sales) and formally retire the
       static 83% seed in favour of `data["crops"]`.
 
+## Weather — activate SPI (run the one-shot baseline workflow)
+SPI-1/SPI-3 are wired into fetch_origin_weather.py but dormant until the 30-yr
+calibration seed exists. The archive host is sandbox-blocked but reachable from
+GitHub runners, so the build runs in CI (no local step).
+- [ ] **Dispatch `0.3 – One-shot — Build SPI baselines`** (workflow_dispatch,
+      blank origins = all). It commits `backend/seed/spi_30yr_baselines.json`;
+      the next weather-fetch run then emits `spi_1`/`spi_3`/`spi_month` per
+      region. Safe to dry-run first.
+- [ ] **VHI** (third weather index) — NOAA STAR weekly satellite files, filtered
+      by region bounding boxes. Not started.
+
 ## Phase-3 cut — delete the price-regex fallback (target: on/after 2026-06-09)
 The exporters strangler is at Phase 2 (dual-read) + a CI gate. The fallback
 regex is the safety net; delete it only after production proves the structured
