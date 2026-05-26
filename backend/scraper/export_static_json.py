@@ -41,6 +41,8 @@ from models import (
     WeatherSnapshot,
 )
 from scraper import symbols as _sym
+from scraper.enso import derive_enso_phase as _derive_enso_phase
+from scraper.enso import oni_to_dots as _oni_to_dots
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
     price_swing_guard,
@@ -579,45 +581,8 @@ def _badge_from_risk_code(code: str) -> str:
     return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
 
 
-def _oni_to_dots(oni: float) -> int:
-    a = abs(oni)
-    if a >= 2.0:
-        return 4
-    if a >= 1.5:
-        return 3
-    if a >= 1.0:
-        return 2
-    return 1
 
 
-def _derive_enso_phase(oni_history: list) -> tuple:
-    """Derive (phase, intensity, current_oni) from oni_history list.
-    Uses all entries — both confirmed and preliminary — since NOAA ONI
-    preliminary values are observation-based and reliable enough for phase detection.
-    The old 'forecast' key is also accepted for backwards compat with DB data."""
-    entries = [p for p in oni_history if not p.get("forecast")]  # strip legacy forecast entries
-    if not entries:
-        entries = oni_history  # fallback: use everything
-    if not entries:
-        return "neutral", "Weak", 0.0
-    current_oni = entries[-1]["value"]
-    recent = [p["value"] for p in entries[-5:]]
-    if len(recent) >= 5 and all(v >= 0.5 for v in recent):
-        phase = "el-nino"
-    elif len(recent) >= 5 and all(v <= -0.5 for v in recent):
-        phase = "la-nina"
-    else:
-        phase = "neutral"
-    abs_oni = abs(current_oni)
-    if abs_oni >= 2.0:
-        intensity = "Extreme"
-    elif abs_oni >= 1.5:
-        intensity = "Strong"
-    elif abs_oni >= 1.0:
-        intensity = "Moderate"
-    else:
-        intensity = "Weak"
-    return phase, intensity, current_oni
 
 
 def _load_dry_bulk_cache() -> dict | None:
@@ -1169,6 +1134,7 @@ def export_farmer_economics(db) -> None:
 
 def export_farmer_selling() -> None:
     import logging as _logging
+
     from scraper.sources import farmer_selling as _fs
     from scraper.sources.farmer_selling import build_farmer_selling
     # Surface the scraper's INFO diagnostics (article found / parsed values / skip

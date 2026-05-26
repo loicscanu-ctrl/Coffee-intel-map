@@ -16,6 +16,9 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+from scraper.enso import derive_enso_phase as _derive_enso_phase
+from scraper.enso import oni_to_dots as _oni_to_dots
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from database import SessionLocal
@@ -79,34 +82,8 @@ def _badge(code: str) -> str:
     return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
 
 
-def _oni_to_dots(oni: float) -> int:
-    a = abs(oni)
-    if a >= 2.0: return 4
-    if a >= 1.5: return 3
-    if a >= 1.0: return 2
-    return 1
 
 
-def _derive_enso_phase(oni_history: list) -> tuple:
-    entries = [p for p in oni_history if not p.get("forecast")]
-    if not entries:
-        entries = oni_history
-    if not entries:
-        return "neutral", "Weak", 0.0
-    current_oni = entries[-1]["value"]
-    recent = [p["value"] for p in entries[-5:]]
-    if len(recent) >= 5 and all(v >= 0.5 for v in recent):
-        phase = "el-nino"
-    elif len(recent) >= 5 and all(v <= -0.5 for v in recent):
-        phase = "la-nina"
-    else:
-        phase = "neutral"
-    abs_oni = abs(current_oni)
-    if abs_oni >= 2.0:    intensity = "Extreme"
-    elif abs_oni >= 1.5:  intensity = "Strong"
-    elif abs_oni >= 1.0:  intensity = "Moderate"
-    else:                 intensity = "Weak"
-    return phase, intensity, current_oni
 
 
 def _current_mitaca_phase() -> str:
