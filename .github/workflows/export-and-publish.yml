@@ -157,6 +157,22 @@ jobs:
           git pull --rebase --autostash --strategy-option=theirs origin main
           git push
 
+      # Phase-3 sunset gate: export_static_json writes a `warnings` entry into
+      # health.json when latest_prices/vn_physical_prices had to fall back to
+      # NewsItem regex parsing (PhysicalPrice was empty). This runs AFTER the
+      # commit on purpose — the fallback output is valid and still publishes —
+      # but fails the run (and fires the Telegram notifier) so a fallback never
+      # passes silently. A clean green history here is the evidence needed to
+      # delete the regex fallback entirely.
+      - name: Gate — assert no price regex fallback
+        run: |
+          HEALTH=frontend/public/data/health.json
+          if [ -f "$HEALTH" ] && grep -q "latest_prices_used_regex_fallback" "$HEALTH"; then
+            echo "::error::Price export fell back to NewsItem regex (PhysicalPrice empty). Check the price scrapers (vietnam/brazil/uganda/b3_icf/barchart) before sunsetting the regex."
+            exit 1
+          fi
+          echo "OK — structured PhysicalPrice path used (no regex fallback)."
+
       - name: Notify on failure
         if: failure()
         env:
