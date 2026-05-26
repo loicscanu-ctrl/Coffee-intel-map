@@ -1,33 +1,30 @@
 #!/usr/bin/env python3
 """fetch_vhi.py — weekly NOAA STAR Vegetation Health Index (VHI) per coffee region.
 
-Downloads the weekly NOAA STAR VHI product, bounding-box-averages it around each
-origin region's coordinates, and writes `vhi` (+ `vhi_week`) additively into
-frontend/public/data/{origin}_weather.json — same pattern as ESSM/SPI, charts
-untouched. VHI 0–100: <40 stressed vegetation, >60 healthy.
+NOAA STAR's Blended-VHP product is a weekly **gridded NetCDF** (4 km global), not
+a CSV. This downloads the latest weekly file, reads the VHI grid, bounding-box
+averages it around each origin region's coordinates, and writes `vhi`/`vhi_week`
+additively into frontend/public/data/{origin}_weather.json — same pattern as
+ESSM/SPI, charts untouched. VHI 0–100: <40 = stressed vegetation, >60 = healthy.
 
-Runs in CI (.github/workflows/build-vhi.yml) — the NOAA host is blocked from the
-Claude sandbox, so the live fetch/format is validated on first dispatch.
+Runs in CI (.github/workflows/build-vhi.yml). The NOAA host is blocked from the
+Claude sandbox, so the URL pattern / variable names / grid geometry below are
+coded to NOAA STAR's documented conventions and VALIDATED ON THE FIRST CI RUN —
+the function logs exactly what it fetched/found (vars, dims, grid extent) so any
+mismatch is a one-line fix in the reader, not the bbox math.
 
-    python backend/scripts/fetch_vhi.py            # preview (network-dependent)
-    python backend/scripts/fetch_vhi.py --write    # write into {origin}_weather.json
-
-IMPORTANT — verify on first CI run: VHI_URL and the CSV column layout are coded
-to the documented "weekly CSV/TXT with lat/lon/VHI" product. parse_vhi_csv()
-detects columns by header keyword (robust to order), but if NOAA serves a
-different shape (e.g. gridded NetCDF), only the fetch/parse layer needs updating
-— the bbox aggregation (region_vhi) is format-agnostic.
+    python backend/scripts/fetch_vhi.py            # preview (needs network + netCDF4)
+    python backend/scripts/fetch_vhi.py --write
 """
 from __future__ import annotations
 
 import argparse
-import csv
 import datetime as dt
-import io
 import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -37,74 +34,98 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
 HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelVHI/1.0)"}
 
-# NOAA STAR weekly Vegetation Health product. Templated by ISO year+week; the
-# scraper walks back a few weeks to the latest published file. VERIFY the host
-# path on first CI dispatch (see module docstring).
-VHI_URL = ("https://www.star.nesdis.noaa.gov/pub/corp/scsb/wguo/data/"
-           "Blended_VH_4km/csv/VHI_weekly_{year}_wk{week:02d}.csv")
+# NOAA STAR Blended-VHP weekly 4 km global NetCDF.
+# e.g. .../VHP.G04.C07.npp.P2026021.SM.SMN.nc  (PYYYY + 3-digit ISO week)
+VHI_DIR = "https://www.star.nesdis.noaa.gov/data/pub0018/VHPdata4km/VH/"
+SATS = ("npp", "j01")                 # SNPP, then NOAA-20 as fallback
+VHI_VARS = ("VHI", "vhi")
+LAT_VARS = ("latitude", "lat", "Latitude", "LAT")
+LON_VARS = ("longitude", "lon", "Longitude", "LON")
+# Fallback regular-grid extent if the file carries no lat/lon coord vars
+# (NOAA STAR 4 km global grid, N→S / W→E).
+GRID_LAT_TOP, GRID_LAT_BOTTOM = 75.024, -55.152
+GRID_LON_LEFT, GRID_LON_RIGHT = -180.0, 180.0
 
 BBOX_DELTA = 0.75   # ± degrees around each region's point → a regional box
 
 
-def fetch_csv_text(year: int, week: int) -> str | None:
-    url = VHI_URL.format(year=year, week=week)
+def _download(url: str) -> bytes | None:
     try:
-        r = requests.get(url, headers=HEADERS, timeout=60)
-        if r.status_code == 200 and r.text.strip():
-            return r.text
+        r = requests.get(url, headers=HEADERS, timeout=120)
+        if r.status_code == 200 and r.content:
+            return r.content
+        print(f"  [vhi] {r.status_code} {url}", file=sys.stderr)
     except Exception as e:  # noqa: BLE001
         print(f"  [vhi] fetch {url} failed: {e}", file=sys.stderr)
     return None
 
 
-def latest_csv_text(today: dt.date | None = None, lookback: int = 5) -> tuple[str | None, str | None]:
-    """Walk back up to `lookback` ISO weeks to the newest published file.
-    Returns (csv_text, 'YYYY-Www') or (None, None)."""
+def _coord(ds, names) -> np.ndarray | None:
+    for n in names:
+        if n in ds.variables:
+            return np.ma.filled(ds.variables[n][:].astype("float64"), np.nan).ravel()
+    return None
+
+
+def read_vhi_netcdf(raw: bytes) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
+    """(lats_1d, lons_1d, vhi_2d) from NetCDF bytes, or None. Logs what it found."""
+    from netCDF4 import Dataset
+    try:
+        ds = Dataset("inmem.nc", mode="r", memory=raw)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [vhi] netCDF open failed: {e}", file=sys.stderr)
+        return None
+    var = next((ds.variables[n] for n in VHI_VARS if n in ds.variables), None)
+    if var is None:
+        print(f"  [vhi] no VHI variable; available: {list(ds.variables)}", file=sys.stderr)
+        return None
+    vhi = np.ma.filled(var[:].astype("float64"), np.nan).squeeze()
+    if vhi.ndim != 2:
+        print(f"  [vhi] unexpected VHI shape {vhi.shape}", file=sys.stderr)
+        return None
+    lats = _coord(ds, LAT_VARS)
+    lons = _coord(ds, LON_VARS)
+    h, w = vhi.shape
+    if lats is None or lons is None or lats.size != h or lons.size != w:
+        lats = np.linspace(GRID_LAT_TOP, GRID_LAT_BOTTOM, h)
+        lons = np.linspace(GRID_LON_LEFT, GRID_LON_RIGHT, w)
+        print(f"  [vhi] derived {h}x{w} grid from bounds (no usable coord vars)")
+    print(f"  [vhi] grid {vhi.shape}, lat {lats[0]:.2f}→{lats[-1]:.2f}, "
+          f"lon {lons[0]:.2f}→{lons[-1]:.2f}")
+    return lats, lons, vhi
+
+
+def latest_vhi_grid(today: dt.date | None = None, lookback: int = 4):
+    """Walk back up to `lookback` ISO weeks (and both sats) to the newest file.
+    Returns ((lats, lons, vhi), 'YYYY-Www') or (None, None)."""
     today = today or dt.date.today()
     for back in range(lookback):
         d = today - dt.timedelta(weeks=back)
         year, week, _ = d.isocalendar()
-        text = fetch_csv_text(year, week)
-        if text:
-            return text, f"{year}-W{week:02d}"
+        for sat in SATS:
+            raw = _download(VHI_DIR + f"VHP.G04.C07.{sat}.P{year}{week:03d}.SM.SMN.nc")
+            if raw:
+                grid = read_vhi_netcdf(raw)
+                if grid is not None:
+                    return grid, f"{year}-W{week:02d}"
     return None, None
 
 
-def parse_vhi_csv(text: str) -> list[tuple[float, float, float]]:
-    """Parse (lat, lon, vhi) rows. Columns detected by header keyword so order
-    doesn't matter; rows that don't parse or fall outside valid ranges are skipped."""
-    rows: list[tuple[float, float, float]] = []
-    ilat = ilon = ivhi = None
-    for raw in csv.reader(io.StringIO(text)):
-        if not raw:
-            continue
-        if ilat is None:
-            low = [c.strip().lower() for c in raw]
-            if any("lat" in c for c in low) and any(("lon" in c or "lng" in c) for c in low):
-                ilat = next(i for i, c in enumerate(low) if "lat" in c)
-                ilon = next(i for i, c in enumerate(low) if "lon" in c or "lng" in c)
-                ivhi = next((i for i, c in enumerate(low) if "vhi" in c), None)
-            continue
-        if ivhi is None:
-            break
-        try:
-            lat, lon, vhi = float(raw[ilat]), float(raw[ilon]), float(raw[ivhi])
-        except (ValueError, IndexError):
-            continue
-        if -90 <= lat <= 90 and -180 <= lon <= 180 and 0 <= vhi <= 100:
-            rows.append((lat, lon, vhi))
-    return rows
+def grid_region_mean(lats: np.ndarray, lons: np.ndarray, vhi: np.ndarray,
+                     lat0: float, lon0: float, delta: float = BBOX_DELTA) -> float | None:
+    """Mean VHI over the ±delta° box around (lat0, lon0). 0–100 only (drops
+    NaN/fill); None if no valid cells in the box."""
+    lat_mask = np.abs(lats - lat0) <= delta
+    lon_mask = np.abs(lons - lon0) <= delta
+    if not lat_mask.any() or not lon_mask.any():
+        return None
+    sub = vhi[np.ix_(lat_mask, lon_mask)]
+    sub = sub[np.isfinite(sub) & (sub >= 0) & (sub <= 100)]
+    return round(float(sub.mean()), 1) if sub.size else None
 
 
-def region_vhi(rows: list[tuple[float, float, float]], lat: float, lon: float,
-               delta: float = BBOX_DELTA) -> float | None:
-    """Mean VHI of all grid points within ±delta° of (lat, lon)."""
-    vals = [v for (la, lo, v) in rows if abs(la - lat) <= delta and abs(lo - lon) <= delta]
-    return round(sum(vals) / len(vals), 1) if vals else None
-
-
-def apply_to_weather(origin: str, rows: list, week_label: str, write: bool) -> int:
-    """Set province['vhi'] from the bbox mean. Returns number of regions updated."""
+def apply_to_weather(origin: str, grid, week_label: str, write: bool) -> int:
+    lats, lons, vhi = grid
     path = DATA_DIR / f"{origin}_weather.json"
     if not path.exists():
         return 0
@@ -115,7 +136,7 @@ def apply_to_weather(origin: str, rows: list, week_label: str, write: bool) -> i
         c = coords.get(prov["name"])
         if not c:
             continue
-        v = region_vhi(rows, c["lat"], c["lon"])
+        v = grid_region_mean(lats, lons, vhi, c["lat"], c["lon"])
         if v is not None:
             prov["vhi"] = v
             n += 1
@@ -132,18 +153,13 @@ def main() -> None:
     ap.add_argument("--origins", nargs="*", default=list(ORIGINS))
     args = ap.parse_args()
 
-    text, week_label = latest_csv_text()
-    if not text:
-        print("[vhi] no VHI file found in the lookback window — skipping (no change).")
-        return
-    rows = parse_vhi_csv(text)
-    print(f"[vhi] {week_label}: parsed {len(rows)} grid points")
-    if not rows:
-        print("[vhi] parsed 0 points — format may have changed; skipping.")
+    grid, week_label = latest_vhi_grid()
+    if grid is None:
+        print("[vhi] no VHI file readable in the lookback window — skipping (no change).")
         return
     for origin in args.origins:
-        n = apply_to_weather(origin, rows, week_label, args.write)
-        print(f"  {origin}: {n} regions updated")
+        n = apply_to_weather(origin, grid, week_label, args.write)
+        print(f"  {origin}: {n} regions updated ({week_label})")
 
 
 if __name__ == "__main__":

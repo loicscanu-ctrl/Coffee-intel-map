@@ -32,7 +32,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests netCDF4 numpy   # netCDF4 reads NOAA STAR's gridded VHI
 
       - name: Fetch + apply VHI
         env:
