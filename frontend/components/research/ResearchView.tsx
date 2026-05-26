@@ -3,11 +3,11 @@ import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 
-type Sub = "model" | "backtest" | "frost";
-const SUBS: { id: Sub; label: string }[] = [
-  { id: "model",    label: "Intraweek model" },
-  { id: "backtest", label: "COT backtest report" },
-  { id: "frost",    label: "Frost risk" },
+type Cat = "cot" | "weather" | "contracts";
+const CATS: { id: Cat; label: string }[] = [
+  { id: "cot",       label: "COT & positioning" },
+  { id: "weather",   label: "Weather" },
+  { id: "contracts", label: "Contract rules" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -228,24 +228,135 @@ function FrostRiskMethodology() {
   );
 }
 
+// Newspaper-style article card — serif headline over a double rule, justified
+// body. Used for the side-by-side contract-rule columns.
+function Article({ kicker, title, dateline, children }: {
+  kicker?: string; title: string; dateline?: string; children: React.ReactNode;
+}) {
+  return (
+    <article className="bg-slate-900 border border-slate-700 rounded-xl p-5 font-serif">
+      {kicker && (
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
+      )}
+      <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1 pb-2 border-b-2 border-double border-slate-600">
+        {title}
+      </h3>
+      {dateline && (
+        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-3 mt-2">{dateline}</div>
+      )}
+      <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
+        {children}
+      </div>
+    </article>
+  );
+}
+
+function Spec({ k, children }: { k: string; children: React.ReactNode }) {
+  return (
+    <p className="mb-1.5">
+      <span className="font-semibold text-slate-200">{k}: </span>
+      <span className="text-slate-300">{children}</span>
+    </p>
+  );
+}
+
+function PdfLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 mt-4 px-3 py-1.5 rounded bg-amber-900/40 border border-amber-700/50 text-amber-300 text-[11px] font-sans font-semibold hover:bg-amber-900/60 transition-colors">
+      <span aria-hidden>📄</span> {children}
+    </a>
+  );
+}
+
+function ContractRules() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+
+      <Article kicker="ICE Futures U.S." title={"Coffee “C” Futures (Arabica · KC)"} dateline="Chapter 8 · Coffee “C” Rules">
+        <p className="mb-3">
+          The Coffee &ldquo;C&rdquo; contract is the world benchmark for <strong>washed Arabica</strong>. The rulebook
+          opens with a notice that ICE is <em>phasing it out</em>: a new Arabica contract was slated to list in fall 2025,
+          no Coffee &ldquo;C&rdquo; futures are listed beyond the <strong>March 2028</strong> month, and only options on
+          March-2028-and-earlier futures will continue.
+        </p>
+        <Spec k="Lot size">37,500 lb of washed Arabica (one growth).</Spec>
+        <Spec k="Deliverable growths">Brazil, Colombia, Costa Rica, Guatemala, Honduras, Mexico, Peru, Uganda and ~12
+          others; <strong>Vietnam added from the May 2027 month</strong>.</Spec>
+        <Spec k="Grade standard">Sound, free of unwashed/aged cup flavours, good roasting quality; no more than
+          <strong> 15 full imperfections</strong> below the growth basis (Colombian: max 10).</Spec>
+        <Spec k="Delivery months">March, May, July, September, December; listed up to 60 months out.</Spec>
+        <Spec k="Price / tick">Quoted in cents per pound; minimum fluctuation <strong>0.05¢/lb</strong> — i.e.
+          <strong> $18.75 per contract</strong>.</Spec>
+        <Spec k="Price basis">A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
+          Honduras, Uganda from the Mar 2026 month) with Board-set differentials for other growths and grades.</Spec>
+        <Spec k="Delivery mechanism">Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
+          7 business days after the Delivery Notice.</Spec>
+        <Spec k="Key dates">Last Notice Day = 7th business day before the last business day of the delivery month;
+          Last Trading Day = the business day before Last Notice Day.</Spec>
+        <Spec k="Delivery points">Licensed warehouses at the Port of New York District, New Orleans, Miami, Houston,
+          Virginia, Antwerp, Hamburg/Bremen and Barcelona.</Spec>
+        <Spec k="Packaging">Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
+          deforestation (EUDR) appendices apply.</Spec>
+        <PdfLink href="https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf">Full rulebook on ICE (PDF)</PdfLink>
+      </Article>
+
+      <Article kicker="ICE Futures Europe" title={"Robusta Coffee Futures (RC · Section GGGG)"} dateline="Section GGGG · Contract Rules">
+        <p className="mb-3">
+          The London Robusta contract — rulebook <strong>Section GGGG</strong> — is the global benchmark for
+          <strong> Robusta</strong> (<em>Coffea canephora</em>). It is sized and priced per <strong>tonne</strong> and
+          settles into European/UK/US warehouse delivery, with a tiered quality-class allowance schedule rather than a
+          single deliverable grade.
+        </p>
+        <Spec k="Lot size">Nominal <strong>10 tonnes</strong> net, one Origin and shipment period, from no more than two
+          parcels.</Spec>
+        <Spec k="Origin">Any country freely available for export.</Spec>
+        <Spec k="Quality classes (per 300 g)">Premium (≤0.5% defects, 90% over Screen 15) <strong>+$30/t</strong>;
+          Class 1 (≤3% defects, Screen 14) <strong>at par</strong>; Class 2 <strong>−$30/t</strong>; Class 3
+          <strong> −$60/t</strong>; Class 4 (≤8% defects, Screen 12) <strong>−$90/t</strong>.</Spec>
+        <Spec k="Not tenderable">&gt;8% defects, &lt;90% over Screen 12 round, &gt;1% foreign matter, foreign odour, or
+          not sound Robusta.</Spec>
+        <Spec k="Price / tick">Quoted in US$ per tonne; minimum fluctuation <strong>$1/tonne = $10 per lot</strong>.</Spec>
+        <Spec k="Age allowance">−$5/tonne per month for grading age 13–48 months; −$10/tonne per month from 49 months.</Spec>
+        <Spec k="Packaging">Bags ≤80 kg gross; bulk in FIBCs of 900–1,100 kg.</Spec>
+        <Spec k="Delivery areas">Amsterdam, Antwerp, Barcelona, Bremen, Felixstowe, Genoa-Savona, Hamburg, Le Havre,
+          London (Tilbury), New Orleans, New York, Rotterdam, Trieste.</Spec>
+        <Spec k="Customs">EU delivery is into a Customs Warehouse retaining <strong>non-Union status</strong>;
+          UK / New Orleans / New York lots must be cleared into free circulation.</Spec>
+        <Spec k="Key dates">Last Trading Day = 4th business day before the last business day of the delivery month;
+          First Notice Day = 4th business day before its first business day.</Spec>
+        <Spec k="Invoicing">EDSP × Net Weight, less Age, Class, Weight, Rent, Import-Duty and Transition-Stock
+          allowances. EU/UK lots require validated deforestation (DDI) data.</Spec>
+        <PdfLink href="https://www.ice.com/publicdocs/contractregs/105_SECTION_GGGG.pdf">Full rulebook on ICE (PDF)</PdfLink>
+      </Article>
+
+    </div>
+  );
+}
+
 export default function ResearchView() {
-  const [sub, setSub] = useState<Sub>("model");
+  const [cat, setCat] = useState<Cat>("cot");
   return (
     <>
       <div className="flex items-center gap-1 flex-wrap mb-4">
-        {SUBS.map(s => (
-          <button key={s.id} onClick={() => setSub(s.id)}
+        {CATS.map(c => (
+          <button key={c.id} onClick={() => setCat(c.id)}
             className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-              sub === s.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300 border border-transparent"
+              cat === c.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300 border border-transparent"
             }`}>
-            {s.label}
+            {c.label}
           </button>
         ))}
       </div>
 
-      {sub === "model" && <IntraweekMethodology />}
-      {sub === "backtest" && <CotBacktestReport />}
-      {sub === "frost" && <FrostRiskMethodology />}
+      {cat === "cot" && (
+        <div className="space-y-4">
+          <IntraweekMethodology />
+          <CotBacktestReport />
+        </div>
+      )}
+      {cat === "weather" && <FrostRiskMethodology />}
+      {cat === "contracts" && <ContractRules />}
     </>
   );
 }
