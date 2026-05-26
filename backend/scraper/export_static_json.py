@@ -59,6 +59,11 @@ ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Phase 3 sunset signal: set True when export_latest_prices has to fall back to
+# NewsItem regex parsing (i.e. PhysicalPrice was empty). Surfaced in health.json
+# so CI can assert it stays False before we delete the regex fallback entirely.
+_LATEST_PRICES_FALLBACK = False
+
 # ── helpers shared with routes/futures.py ────────────────────────────────────
 
 LETTER_TO_MONTH = {
@@ -1238,7 +1243,6 @@ def export_latest_prices(db) -> None:
     Primary source: physical_prices table (typed columns, indexed).
     Fallback: NewsItem body parsing (used until physical_prices is populated)."""
     import json as _json
-    import re as _re
 
     from sqlalchemy import func
 
@@ -1305,37 +1309,21 @@ def export_latest_prices(db) -> None:
             sign = "+" if chg >= 0 else ""
             tickers.append({"label": sym, "value": f"{int(last):,} ({sign}{int(chg)})", "category": "futures"})
 
-    # B3 ICF
+    # B3 ICF — settlement from PhysicalPrice; the contract-month label comes
+    # from the scraper's structured meta (no body/title regex).
     b3it = _b3_item()
-    if b3it:
-        price = pp["B3_ICF"].price if "B3_ICF" in pp else None
-        ms = _re.search(r"settlement:\s*([\d.]+)\s*USD/sac", b3it.body or "", _re.I)
-        mt = _re.search(r"B3 ICF Arabica \(([^)]+)\)", b3it.title or "")
-        val = f"{price:.2f}" if price is not None else (ms.group(1) if ms else None)
-        if val:
-            lbl = f"B3 4/5 {mt.group(1)}" if mt else "B3 4/5"
-            tickers.append({"label": lbl, "value": f"{val} USD/sac", "category": "futures"})
+    if b3it and "B3_ICF" in pp:
+        price = pp["B3_ICF"].price
+        try:
+            label_month = (_json.loads(b3it.meta or "{}") or {}).get("label_month")
+        except Exception:
+            label_month = None
+        lbl = f"B3 4/5 {label_month}" if label_month else "B3 4/5"
+        tickers.append({"label": lbl, "value": f"{price:.2f} USD/sac", "category": "futures"})
 
-    # VN FAQ — primary: PhysicalPrice; fallback: most recent NewsItem (no meta filter)
-    import re as _re2
+    # VN FAQ — from PhysicalPrice (structured at scrape time).
     usd_vnd = pp["USD_VND"].price if "USD_VND" in pp else None
-    vn_faq_vnd: int | None = None
-    if "VN_FAQ" in pp:
-        vn_faq_vnd = int(pp["VN_FAQ"].price)
-    else:
-        vn_news = (
-            db.query(NewsItem)
-            .filter(NewsItem.pub_date > datetime.utcnow() - timedelta(days=30))
-            .order_by(NewsItem.pub_date.desc())
-            .all()
-        )
-        for it in vn_news:
-            if {"price", "vietnam"} <= set(it.tags or []) and "futures" not in (it.tags or []):
-                m = _re2.search(r"price:\s*([\d.]+)\s*VND/kg", it.body or "", _re2.I)
-                if m:
-                    raw = m.group(1)
-                    vn_faq_vnd = int(raw.replace(".", "")) if _re2.match(r"^\d{2,3}\.\d{3}$", raw) else int(float(raw))
-                    break
+    vn_faq_vnd = int(pp["VN_FAQ"].price) if "VN_FAQ" in pp else None
     if vn_faq_vnd and usd_vnd:
         usd_mt = round(vn_faq_vnd / usd_vnd * 1000)
         fmt_vnd = f"{vn_faq_vnd:,}".replace(",", ".")
@@ -1366,7 +1354,9 @@ def export_latest_prices(db) -> None:
 
     # ── Fallback to NewsItem parsing if PhysicalPrice has no data ────────────
     if not tickers:
-        print("  latest_prices.json → physical_prices empty, falling back to NewsItem parsing")
+        global _LATEST_PRICES_FALLBACK
+        _LATEST_PRICES_FALLBACK = True
+        print("  latest_prices.json → WARN PhysicalPrice empty, FELL BACK to NewsItem regex parsing")
         tickers = _build_tickers_from_news(db)
 
     result = {
@@ -1708,6 +1698,11 @@ def export_health(db) -> None:
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "scrapers":     scrapers,
     }
+    # Phase 3 sunset signal — present only when latest_prices had to use the
+    # legacy regex fallback. CI/ops can alert on this; once it stays absent we
+    # can delete _build_tickers_from_news and the extract_physical_price regex.
+    if _LATEST_PRICES_FALLBACK:
+        result["warnings"] = ["latest_prices_used_regex_fallback"]
 
     path = OUT_DIR / "health.json"
     safe_write_json(path, result, validate_health)
