@@ -7,15 +7,16 @@ crop-year guard correctly skipped it (31% « stored 83%), so data froze at 2026-
 Fixes: (a) collect ALL candidate articles and pick the most-recent by
 (crop_year, crop-month, survey day); (b) crop-year-aware guard accepts a new-crop
 reset; (c) export now logs each candidate + the selected one.
-**Verify after the next 1.4 run:**
-- [ ] Log shows an `RSS … → N items, M sales article(s)` line and ideally a
-      candidate **newer than April 2026** (the HTML scan only saw stale featured
-      posts: 2025/26@31% Jul-2025 + 2024/25@88% Feb-2025). RSS discovery added in
-      commit 455da9a.
-- [ ] If RSS surfaces a post-April-2026 survey, `farmer_selling_brazil.json` updates.
-      If not, our stored 83%/77% (April 2026) is genuinely the latest and is
-      correctly preserved — and worth checking the live Safras page to confirm
-      whether a newer English sales article exists at all.
+**Verify after the next 1.4 run (commit 12689f2 — PT feeds + harvest):**
+- [ ] Sales: log shows PT RSS feeds tried (`RSS https://safras.com.br/…/feed/ → …`)
+      and whether any PT `comercializado` survey newer than Jul-2025 is found/selected.
+      PT feed URLs are best-guess — if all PT feeds log "failed", I need the real PT
+      coffee-category feed URL (check the live Safras PT site).
+- [ ] Harvest: log shows `kind=harvest` candidates + a `harvest: X%` line, and
+      `farmer_selling_brazil.json` gains a `harvest` block → the new "Harvest pace ·
+      Brazil" card renders in Brazil → Farmer Economics.
+- [ ] Sales value: if no newer survey surfaces, it stays 83%/77% (unsourced seed) —
+      revisit whether to reset to the latest sourced figure.
 
 ## CI — sliced 1.4 export (commit 75398fb) — mechanism VERIFIED in production
 The "1.4 – Export and Publish" workflow exports only the topic slice tied to each
