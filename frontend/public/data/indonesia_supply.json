@@ -1,9 +1,9 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-05-26T04:27:15.379197Z",
+  "scraped_at": "2026-05-26T04:31:03.901373Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-25",
+    "last_updated": "2026-05-26",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
@@ -3518,7 +3518,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Indonesia coffee output expected",
-    "last_updated": "2026-05-25"
+    "last_updated": "2026-05-26"
   },
   "production_mix": {
     "robusta_pct": 75,

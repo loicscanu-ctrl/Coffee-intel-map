@@ -1,9 +1,9 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-26T04:27:16.310741Z",
+  "scraped_at": "2026-05-26T04:31:05.389673Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-25",
+    "last_updated": "2026-05-26",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
@@ -341,7 +341,7 @@
   },
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-25",
+    "as_of": "2026-05-26",
     "source": "ECX",
     "grade": "All grades avg"
   },
@@ -656,7 +656,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-25"
+    "last_updated": "2026-05-26"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",

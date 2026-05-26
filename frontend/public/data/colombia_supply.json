@@ -1,9 +1,9 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-05-26T04:27:14.444781Z",
+  "scraped_at": "2026-05-26T04:31:02.416692Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-25",
+    "last_updated": "2026-05-26",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
@@ -341,7 +341,7 @@
   },
   "fnc_price": {
     "cop_per_carga": 2200000,
-    "as_of": "2026-05-25",
+    "as_of": "2026-05-26",
     "source": "FNC"
   },
   "weather": {
@@ -3523,7 +3523,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Colombia arabica output expected",
-    "last_updated": "2026-05-25"
+    "last_updated": "2026-05-26"
   },
   "mitaca": {
     "current_phase": "harvest",
