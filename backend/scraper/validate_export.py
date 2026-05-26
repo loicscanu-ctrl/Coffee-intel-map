@@ -8,6 +8,7 @@ Each validate_* function receives the in-memory payload and returns
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -31,6 +32,64 @@ def _days_since_date(date_str: str) -> int:
         return (date.today() - date.fromisoformat(date_str)).days
     except Exception:
         return 9999
+
+
+def _first_number(value) -> float | None:
+    """Parse the leading numeric value out of a ticker `value` field.
+
+    Ticker values are display strings, e.g. '273.45', '100,000 VND ($1,234)',
+    '1.0552 (…)'. We compare the first number (thousands-separators stripped):
+        '100,000 VND ($1,234)' → 100000.0
+        '1.0552 (…)'           → 1.0552
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    if not isinstance(value, str):
+        return None
+    m = re.search(r"-?\d[\d,]*\.?\d*", value)
+    if not m:
+        return None
+    try:
+        return float(m.group(0).replace(",", ""))
+    except ValueError:
+        return None
+
+
+# ── cross-run sanity (volatility) guards ──────────────────────────────────────
+
+def price_swing_guard(threshold: float = 0.30):
+    """Build an (old, new) -> (ok, reason) guard for latest_prices-shaped data.
+
+    Rejects the new payload when any ticker's leading numeric value moved more
+    than `threshold` (fractional) versus the same-label ticker in the previous
+    good file. This catches unit/parse breaks that pass type, shape and
+    freshness checks — e.g. the VN FAQ price read as 10,000 instead of 100,000
+    VND, or an FX rate dropping a digit.
+    """
+    def _check(old: dict, new: dict) -> tuple[bool, str]:
+        if not isinstance(old, dict) or not isinstance(new, dict):
+            return True, "ok"  # nothing comparable → don't block
+        old_by_label = {
+            t.get("label"): t.get("value")
+            for t in (old.get("tickers") or [])
+            if isinstance(t, dict)
+        }
+        for t in (new.get("tickers") or []):
+            if not isinstance(t, dict):
+                continue
+            new_v = _first_number(t.get("value"))
+            old_v = _first_number(old_by_label.get(t.get("label")))
+            if old_v is None or new_v is None or old_v == 0:
+                continue
+            change = abs(new_v - old_v) / abs(old_v)
+            if change > threshold:
+                return False, (
+                    f"{t.get('label')} swung {change * 100:.0f}% "
+                    f"({old_v:g} → {new_v:g}), suspected parsing error"
+                )
+        return True, "ok"
+
+    return _check
 
 
 # ── validators ────────────────────────────────────────────────────────────────
@@ -185,12 +244,17 @@ def validate_kaffeesteuer(data: dict) -> tuple[bool, str]:
 
 # ── write helper ──────────────────────────────────────────────────────────────
 
-def safe_write_json(path, payload, validate_fn, indent: int = 2) -> bool:
+def safe_write_json(path, payload, validate_fn, indent: int = 2, sanity_fn=None) -> bool:
     """
     Validate payload then write to path atomically via a .tmp file.
 
-    Returns True if written, False if validation failed.
-    On failure the existing file at `path` is left untouched.
+    `validate_fn(payload) -> (ok, reason)` checks the new payload in isolation
+    (shape, freshness). `sanity_fn(old_payload, new_payload) -> (ok, reason)` is
+    an optional cross-run guard compared against the last good file (e.g. a
+    volatility/price-swing check); it is skipped on the first-ever write.
+
+    Returns True if written, False if validation/sanity failed or the content
+    is unchanged. On failure the existing file at `path` is left untouched.
     """
     ok, reason = validate_fn(payload)
     if not ok:
@@ -198,19 +262,31 @@ def safe_write_json(path, payload, validate_fn, indent: int = 2) -> bool:
         print(f"[validate] {name} FAILED: {reason} — keeping existing file")
         return False
 
-    serialized = json.dumps(payload, indent=indent)
+    # Read the existing file once — used for both the sanity guard and the
+    # content short-circuit below.
+    p = Path(path)
+    old_payload = None
+    if p.exists():
+        try:
+            old_payload = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            old_payload = None  # unreadable/corrupt → treat as no prior
+
+    # Cross-run sanity guard (volatility). Only runs when we have a prior good
+    # file to compare against, so a clean first write is never blocked.
+    if sanity_fn is not None and old_payload is not None:
+        ok2, reason2 = sanity_fn(old_payload, payload)
+        if not ok2:
+            print(f"[validate] {Path(path).name} SANITY FAILED: {reason2} — keeping existing file")
+            return False
 
     # Content short-circuit: if the file already holds identical data, skip the
     # rewrite. Makes the export idempotent (re-running changes nothing) and
     # avoids pointless .tmp churn for the ~21 files regenerated each run.
-    p = Path(path)
-    if p.exists():
-        try:
-            if json.loads(p.read_text(encoding="utf-8")) == payload:
-                return False
-        except Exception:
-            pass  # unreadable/corrupt existing file → fall through and rewrite
+    if old_payload is not None and old_payload == payload:
+        return False
 
+    serialized = json.dumps(payload, indent=indent)
     tmp = Path(str(path) + ".tmp")
     tmp.write_text(serialized, encoding="utf-8")
     tmp.replace(path)

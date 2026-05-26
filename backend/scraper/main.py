@@ -2,11 +2,8 @@
 import asyncio
 import os
 import sys
-import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from datetime import UTC
 
 from playwright.async_api import async_playwright
 
@@ -47,7 +44,6 @@ from scraper.sources import retail_cpi as _retail_cpi
 from scraper.sources import uganda_weather as _uganda_weather
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
-SCHEDULED_HOUR_UTC = 1   # Run daily at 01:00 UTC
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 
@@ -146,22 +142,14 @@ async def run_all_scrapers():
         raise critical_errors[0]
 
 
-def seconds_until_next_run():
-    from datetime import datetime, timedelta
-    now = datetime.now(UTC)
-    next_run = now.replace(hour=SCHEDULED_HOUR_UTC, minute=0, second=0, microsecond=0)
-    if next_run <= now:
-        next_run += timedelta(days=1)
-    delta = (next_run - now).total_seconds()
-    print(f"[scraper] Next run scheduled at {next_run.strftime('%Y-%m-%d %H:%M UTC')} ({delta/3600:.1f}h from now)")
-    return delta
-
-
 def main():
+    # Run once and exit. Scheduling is owned by an external scheduler, not an
+    # in-process sleep loop: production runs the per-topic GitHub Actions cron
+    # workflows (scraper-daily, scraper-cot, scraper-prices, …), and local dev
+    # invokes this module via docker-compose. A long-lived `while True` loop is
+    # fragile — a restart just after the scheduled hour would sleep ~24h and
+    # skip the day — so the daily cadence lives in the scheduler instead.
     asyncio.run(run_all_scrapers())
-    while True:
-        time.sleep(seconds_until_next_run())
-        asyncio.run(run_all_scrapers())
 
 
 if __name__ == "__main__":

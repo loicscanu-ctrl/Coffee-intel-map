@@ -43,6 +43,7 @@ from models import (
 from scraper import symbols as _sym
 from scraper.sources.macro_cot import COMMODITY_SPECS
 from scraper.validate_export import (
+    price_swing_guard,
     safe_write_json,
     validate_cot,
     validate_cot_recent,
@@ -104,9 +105,15 @@ def _trading_days_to(d1: date, fnd: date) -> int:
 # ── 1. Futures chain (Daily Quotes) ──────────────────────────────────────────
 
 def export_futures_chain(db) -> None:
+    # Bound the scan to a recent window rather than pulling the entire
+    # news_feed history into memory: we only need the latest chain per market
+    # (the validator rejects pub_date > 7d old anyway). Tag membership stays a
+    # Python filter because `tags` is a JSON column, not a Postgres array, so a
+    # DB-side array containment filter wouldn't be portable to the SQLite tests.
+    cutoff = datetime.utcnow() - timedelta(days=120)
     all_items = (
         db.query(NewsItem)
-        .filter(NewsItem.meta.isnot(None))
+        .filter(NewsItem.meta.isnot(None), NewsItem.pub_date >= cutoff)
         .order_by(NewsItem.pub_date.desc())
         .all()
     )
@@ -180,9 +187,13 @@ def _load_contract_archive() -> dict:
 
 
 def export_oi_fnd_chart(db) -> None:
+    # Same memory bound as export_futures_chain: the FND series only needs the
+    # last ~45 trading days of chain snapshots, so a 120-day calendar window is
+    # ample while keeping the query from scanning the whole news_feed history.
+    cutoff = datetime.utcnow() - timedelta(days=120)
     all_items = (
         db.query(NewsItem)
-        .filter(NewsItem.meta.isnot(None))
+        .filter(NewsItem.meta.isnot(None), NewsItem.pub_date >= cutoff)
         .order_by(NewsItem.pub_date.asc())
         .all()
     )
@@ -1363,7 +1374,12 @@ def export_latest_prices(db) -> None:
         "tickers": tickers,
     }
     path = OUT_DIR / "latest_prices.json"
-    written = safe_write_json(path, result, lambda d: (len(d.get("tickers", [])) > 0, "no tickers"))
+    written = safe_write_json(
+        path,
+        result,
+        lambda d: (len(d.get("tickers", [])) > 0, "no tickers"),
+        sanity_fn=price_swing_guard(0.30),
+    )
     print(f"  latest_prices.json → written:{written} {len(tickers)} items "
           f"({'PhysicalPrice' if pp else 'NewsItem fallback'})")
 

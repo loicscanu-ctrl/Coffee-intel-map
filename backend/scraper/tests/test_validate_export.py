@@ -274,3 +274,53 @@ def test_safe_write_json_keeps_old_on_fail(tmp_path):
     assert result is False
     data = json.loads(dest.read_text())
     assert data == [{"date": "2026-01-01"}]   # old data preserved
+
+
+# ── price_swing_guard (volatility) ────────────────────────────────────────────
+
+def _ok_validator(_d):
+    return True, "ok"
+
+
+def test_price_swing_guard_passes_small_move():
+    from scraper.validate_export import price_swing_guard
+    old = {"tickers": [{"label": "VN FAQ", "value": "100,000 VND ($1,234)"}]}
+    new = {"tickers": [{"label": "VN FAQ", "value": "102,000 VND ($1,250)"}]}  # +2%
+    ok, reason = price_swing_guard(0.30)(old, new)
+    assert ok, reason
+
+
+def test_price_swing_guard_rejects_unit_error():
+    """VN FAQ parsed as 10,000 instead of 100,000 VND — a 90% drop — is rejected."""
+    from scraper.validate_export import price_swing_guard
+    old = {"tickers": [{"label": "VN FAQ", "value": "100,000 VND ($1,234)"}]}
+    new = {"tickers": [{"label": "VN FAQ", "value": "10,000 VND ($123)"}]}
+    ok, reason = price_swing_guard(0.30)(old, new)
+    assert not ok
+    assert "VN FAQ" in reason and "parsing error" in reason
+
+
+def test_price_swing_guard_first_write_not_blocked(tmp_path):
+    """No prior file → sanity guard is skipped, write proceeds."""
+    import json
+
+    from scraper.validate_export import price_swing_guard, safe_write_json
+    dest = tmp_path / "latest_prices.json"
+    payload = {"tickers": [{"label": "KC1", "value": "273.45"}]}
+    written = safe_write_json(dest, payload, _ok_validator, sanity_fn=price_swing_guard(0.30))
+    assert written is True
+    assert json.loads(dest.read_text()) == payload
+
+
+def test_safe_write_json_sanity_keeps_old_on_swing(tmp_path):
+    """A >30% swing vs the prior good file is rejected; the old file is kept."""
+    import json
+
+    from scraper.validate_export import price_swing_guard, safe_write_json
+    dest = tmp_path / "latest_prices.json"
+    good = {"tickers": [{"label": "KC1", "value": "273.45"}]}
+    dest.write_text(json.dumps(good))
+    bad = {"tickers": [{"label": "KC1", "value": "27.35"}]}  # ~90% drop
+    written = safe_write_json(dest, bad, _ok_validator, sanity_fn=price_swing_guard(0.30))
+    assert written is False
+    assert json.loads(dest.read_text()) == good   # old data preserved
