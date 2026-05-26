@@ -1,5 +1,18 @@
 # TODO / follow-ups
 
+## Brazil farmer-selling "echo" — tune against live data + dual-crop UI (Step 3)
+Backend shipped: Google-News (pt-BR) echo discovery + crop-year-aware dual-crop
+parser writing an additive `crops` block to farmer_selling_brazil.json. CI now
+collects echo data; the live fetch was not testable in the sandbox.
+- [ ] **Tune the regex against real echoes.** Watch the first CI runs'
+      `[farmer_selling]` logs / the `crops` block; the `_parse_dual_crop`
+      heuristic is calibrated to canonical Safras phrasing and will need
+      adjustment for real article variance (and 4-digit `2026/2027` forms).
+- [ ] **Step 3 — dual-crop UI.** Once the `crops` shape is stable in prod,
+      update `FarmerSellingPanel.tsx` to dual progress bars (current-crop
+      commercialization + new-crop advance sales) and formally retire the
+      static 83% seed in favour of `data["crops"]`.
+
 ## Phase-3 cut — delete the price-regex fallback (target: on/after 2026-06-09)
 The exporters strangler is at Phase 2 (dual-read) + a CI gate. The fallback
 regex is the safety net; delete it only after production proves the structured

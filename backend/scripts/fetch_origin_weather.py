@@ -117,6 +117,37 @@ def r1(x: float) -> float:
     return round(x, 1)
 
 
+# Open-Meteo *forecast*-API soil-moisture layers (0–81 cm). The archive/ERA5
+# `0_to_7cm…28_to_100cm` layers aren't available on the forecast endpoint that
+# CI can reach, so we use these. ESSM = per-hour unweighted mean of the
+# available layers, averaged over the day → a single 0–1 soil-moisture fraction.
+SOIL_LAYERS = (
+    "soil_moisture_0_to_1cm",
+    "soil_moisture_1_to_3cm",
+    "soil_moisture_3_to_9cm",
+    "soil_moisture_9_to_27cm",
+    "soil_moisture_27_to_81cm",
+)
+
+
+def _daily_essm(hourly: dict | None) -> dict[str, float]:
+    """Map date → daily Estimated Soil Moisture (0–1 fraction) from an
+    Open-Meteo hourly block. Each hour's ESSM is the unweighted mean of the
+    available soil layers; the day's ESSM is the mean over its hours."""
+    if not hourly or "time" not in hourly:
+        return {}
+    times = hourly["time"]
+    layers = [hourly[k] for k in SOIL_LAYERS if k in hourly]
+    if not layers:
+        return {}
+    by_date: dict[str, list[float]] = {}
+    for i, ts in enumerate(times):
+        vals = [col[i] for col in layers if i < len(col) and col[i] is not None]
+        if vals:
+            by_date.setdefault(ts[:10], []).append(sum(vals) / len(vals))
+    return {d: round(sum(v) / len(v), 3) for d, v in by_date.items() if v}
+
+
 # ── HTTP ─────────────────────────────────────────────────────────────────────
 def _get(params: dict) -> dict:
     last: Exception | None = None
@@ -148,6 +179,7 @@ def fetch_region(lat: float, lon: float) -> dict:
     return _get({
         "latitude": lat, "longitude": lon,
         "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min,temperature_2m_mean",
+        "hourly": ",".join(SOIL_LAYERS),   # soil moisture → daily ESSM
         "past_days": PAST_DAYS, "forecast_days": FORECAST_DAYS, "timezone": "auto",
     })
 
@@ -178,6 +210,7 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
     tx = d["temperature_2m_max"]
     tn = d["temperature_2m_min"]
     tm = d["temperature_2m_mean"]
+    essm_by_date = _daily_essm(daily.get("hourly"))
     reg = hist["regions"].setdefault(region, {})
     today_iso = TODAY.isoformat()
     forecast = []
@@ -194,9 +227,11 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
                 mean = (tx[i] + tn[i]) / 2
             new_tmean = round(mean, 1) if mean is not None else None
             prev = reg.get(date, {})
+            new_essm = essm_by_date.get(date)
             reg[date] = {
                 "rain":  r1(rain) if rain is not None else prev.get("rain"),
                 "tmean": new_tmean if new_tmean is not None else prev.get("tmean"),
+                "essm":  new_essm if new_essm is not None else prev.get("essm"),
             }
         else:
             forecast.append({"date": date, **{k: row[k] for k in ("rain", "tmax", "tmin")}})
@@ -300,6 +335,12 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         fc = forecasts.get(prov["name"], [])
         if fc:
             prov["forecast_7d_rain"] = [r1(f["rain"]) for f in fc]
+        # Estimated Soil Moisture (0–1 fraction): latest reading + recent series.
+        essm = sorted((d, v["essm"]) for d, v in rh.items()
+                      if isinstance(v, dict) and v.get("essm") is not None)
+        if essm:
+            prov["essm_fraction"] = essm[-1][1]
+            prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-14:]]
 
     # Daily month-to-date accumulation for the reference (first) province.
     ref = doc["provinces"][0]
