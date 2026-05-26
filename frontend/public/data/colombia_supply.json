@@ -1,6 +1,6 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-05-26T05:06:49.863996Z",
+  "scraped_at": "2026-05-26T06:32:01.952076Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-26",
@@ -345,7 +345,7 @@
     "source": "FNC"
   },
   "weather": {
-    "scraped_at": "2026-05-26T05:05:35.322495Z",
+    "scraped_at": "2026-05-26T06:04:00.189947Z",
     "regions": [
       {
         "name": "Huila",

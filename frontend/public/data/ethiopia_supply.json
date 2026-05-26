@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-26T05:06:52.820706Z",
+  "scraped_at": "2026-05-26T06:32:04.916636Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05-26",
@@ -346,7 +346,7 @@
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-26T05:03:26.783008Z",
+    "scraped_at": "2026-05-26T06:28:00.526873Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
