@@ -806,7 +806,7 @@
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.377,
+      "essm_fraction": 0.376,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -814,7 +814,7 @@
         },
         {
           "date": "2026-05-26",
-          "essm": 0.377
+          "essm": 0.376
         }
       ]
     }
