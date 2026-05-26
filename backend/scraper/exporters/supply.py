@@ -1,0 +1,717 @@
+"""Supply-side exporters (Brazil farmer economics + selling, Vietnam, per-origin)."""
+import json
+import sys
+from datetime import date, datetime
+
+from models import (
+    FertilizerImport,
+    NewsItem,
+    WeatherSnapshot,
+)
+from scraper.enso import derive_enso_phase as _derive_enso_phase
+from scraper.enso import oni_to_dots as _oni_to_dots
+from scraper.exporters.base import OUT_DIR, ROOT
+from scraper.validate_export import (
+    safe_write_json,
+    validate_farmer_economics,
+)
+
+_RISK_ORDER = {"-": 0, "L": 1, "M": 2, "H": 3}
+
+
+_REGIONAL_IMPACT_BY_PHASE = {
+    "el-nino": [
+        {"region": "Sul de Minas",   "type": "DRY",  "note": "rainfall −18% vs norm."},
+        {"region": "Cerrado",        "type": "DRY",  "note": "moisture deficit critical"},
+        {"region": "Paraná",         "type": "COLD", "note": "frost window +12 days"},
+        {"region": "Espírito Santo", "type": "WET",  "note": "above-avg rainfall"},
+    ],
+    "la-nina": [
+        {"region": "Sul de Minas",   "type": "WET",  "note": "above-avg rainfall"},
+        {"region": "Cerrado",        "type": "WET",  "note": "above-avg rainfall"},
+        {"region": "Paraná",         "type": "WARM", "note": "reduced frost risk"},
+        {"region": "Espírito Santo", "type": "DRY",  "note": "below-avg rainfall"},
+    ],
+    "neutral": [
+        {"region": "Sul de Minas",   "type": "WARM", "note": "near-normal conditions"},
+        {"region": "Cerrado",        "type": "WARM", "note": "near-normal conditions"},
+        {"region": "Paraná",         "type": "WARM", "note": "near-normal conditions"},
+        {"region": "Espírito Santo", "type": "WARM", "note": "near-normal conditions"},
+    ],
+}
+
+
+_HISTORICAL_STAT_BY_PHASE = {
+    "el-nino": "El Niño years avg. Brazil arabica output −4.2% vs neutral",
+    "la-nina": "La Niña years avg. Brazil arabica output +2.1% vs neutral",
+    "neutral":  "Neutral ENSO: near-average Brazil arabica output expected",
+}
+
+
+_FERT_CONFIG = {
+    "urea": {"name": "Urea (N)", "input_weight": 0.35, "base_usd_per_bag": 18.9},
+    "dap":  {"name": "MAP (P)",  "input_weight": 0.20, "base_usd_per_bag": 10.8},
+    "kcl":  {"name": "KCl (K)",  "input_weight": 0.25, "base_usd_per_bag": 13.5},
+}
+
+
+def _worst_risk(risks: list) -> str:
+    """Return the worst risk code from a list (H > M > L > -)."""
+    if not risks:
+        return "-"
+    return max(risks, key=lambda r: _RISK_ORDER.get(r, 0))
+
+
+def _badge_from_risk_code(code: str) -> str:
+    return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
+
+
+def _load_dry_bulk_cache() -> dict | None:
+    """Read dry_bulk.json cache written by dry_bulk scraper."""
+    try:
+        from scraper.sources.dry_bulk import fetch_latest
+        return fetch_latest()
+    except Exception:
+        return None
+
+
+def _load_origins_cache() -> dict | None:
+    """Read br_fert_origins.json cache written by comex_fertilizer scraper."""
+    try:
+        cache_path = ROOT / "backend" / "scraper" / "cache" / "br_fert_origins.json"
+        if cache_path.exists():
+            data = json.loads(cache_path.read_text(encoding="utf-8"))
+            return data.get("origins")
+    except Exception:
+        pass
+    return None
+
+
+def export_farmer_economics(db) -> None:
+    _REGIONS_ORDER = ["Sul de Minas", "Cerrado", "Paraná", "Espírito Santo"]
+
+    # ── Weather ──────────────────────────────────────────────────────────────
+    weather_out = None
+    try:
+        snapshots = db.query(WeatherSnapshot).order_by(WeatherSnapshot.scraped_at.desc()).all()
+        latest_by_region = {}
+        for snap in snapshots:
+            if snap.region not in latest_by_region:
+                latest_by_region[snap.region] = snap
+
+        if latest_by_region:
+            regions_out           = []
+            daily_frost_out       = []
+            daily_drought_out     = []
+            drought_detail_out    = []
+            current_conditions_out= []
+            scraped_at_out        = None
+
+            for region_name in _REGIONS_ORDER:
+                snap = latest_by_region.get(region_name)
+                if snap is None:
+                    continue
+                if scraped_at_out is None and snap.scraped_at:
+                    scraped_at_out = snap.scraped_at.isoformat() + "Z"
+
+                daily = snap.daily_data or []
+                week  = daily[:7]
+
+                frost_codes   = [d.get("frost_risk",   "-") for d in week]
+                drought_codes = [d.get("drought_risk", "-") for d in week]
+                frost_badge   = _badge_from_risk_code(_worst_risk(frost_codes))
+                drought_badge = _badge_from_risk_code(_worst_risk(drought_codes))
+
+                from scraper.sources._weather_baseline import mtd_rain_fields
+                from scraper.sources.farmer_economics import _calc_csi
+                csi = _calc_csi(daily)
+
+                regions_out.append({
+                    "name":           region_name,
+                    "frost":          frost_badge,
+                    "drought":        drought_badge,
+                    "csi_30d":        csi["csi_30d"],
+                    "csi_60d":        csi["csi_60d"],
+                    "csi_30d_level":  csi["csi_30d_level"],
+                    "csi_60d_level":  csi["csi_60d_level"],
+                })
+                # Brazil's baseline representative point is the Cerrado.
+                if region_name == "Cerrado":
+                    regions_out[-1].update(mtd_rain_fields(daily, "brazil"))
+
+                frost_days   = [d.get("frost_risk",   "-") for d in daily]
+                drought_days = [d.get("drought_risk", "-") for d in daily]
+                if any(c != "-" for c in frost_days):
+                    daily_frost_out.append({"region": region_name, "days": frost_days})
+                if any(c != "-" for c in drought_days):
+                    daily_drought_out.append({"region": region_name, "days": drought_days})
+                    drought_detail_out.append({
+                        "region": region_name,
+                        "days": [
+                            {
+                                "date":          d.get("date", ""),
+                                "vpd":           d.get("vpd", 0.0),
+                                "precip_prob":   d.get("precip_prob", 0.0),
+                                "soil_moisture": d.get("soil_moisture", 0.0),
+                                "drought_risk":  d.get("drought_risk", "-"),
+                            }
+                            for d in daily
+                        ],
+                    })
+
+                today = daily[0] if daily else {}
+                current_conditions_out.append({
+                    "region":          region_name,
+                    "temp_c":          today.get("max_temp", 0),
+                    "dew_point_c":     today.get("dew_point", 0),
+                    "cloud_cover_pct": today.get("cloud_cover", 0),
+                    "wind_speed_kmh":  today.get("wind_speed", 0),
+                })
+
+            if regions_out:
+                weather_out = {
+                    "scraped_at":         scraped_at_out or date.today().isoformat(),
+                    "regions":            regions_out,
+                    "daily_frost":        daily_frost_out,
+                    "daily_drought":      daily_drought_out,
+                    "drought_detail":     drought_detail_out,
+                    "current_conditions": current_conditions_out,
+                }
+    except Exception as e:
+        print(f"  [farmer_economics] weather section error: {e}")
+
+    # ── ENSO ─────────────────────────────────────────────────────────────────
+    enso_out = None
+    try:
+        enso_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "NOAA CPC")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if enso_item:
+            meta = json.loads(enso_item.meta or "{}")
+            oni_history = meta.get("oni_history", [])
+            if oni_history:
+                phase, intensity, current_oni = _derive_enso_phase(oni_history)
+                dots = _oni_to_dots(current_oni)
+
+                regional_impact = []
+                for entry in _REGIONAL_IMPACT_BY_PHASE.get(phase, []):
+                    regional_impact.append({**entry, "dots": dots})
+
+                # Forecast direction: trend-based sentence (NOAA ONI file is
+                # all historical — no real future forecasts available).
+                confirmed = [p for p in oni_history if not p.get("preliminary")]
+                recent_vals = [p["value"] for p in oni_history[-5:]]
+                trend = (recent_vals[-1] - recent_vals[0]) if len(recent_vals) >= 2 else 0
+                if phase == "neutral":
+                    forecast_direction = "Neutral · No strong signal for 2026"
+                elif phase == "el-nino":
+                    forecast_direction = "El Niño weakening" if trend < -0.15 else "El Niño conditions ongoing"
+                else:  # la-nina
+                    forecast_direction = "La Niña weakening toward neutral" if trend > 0.15 else "La Niña ongoing"
+
+                # Peak month: confirmed (non-preliminary) point with highest |value|
+                history_for_peak = confirmed if confirmed else oni_history
+                if history_for_peak:
+                    peak_pt    = max(history_for_peak, key=lambda p: abs(p["value"]))
+                    peak_month = peak_pt["month"]
+                else:
+                    peak_month = ""
+
+                oni_forecast = meta.get("oni_forecast", [])
+                enso_out = {
+                    "phase":              phase,
+                    "intensity":          intensity,
+                    "oni":                current_oni,
+                    "peak_month":         peak_month,
+                    "forecast_direction": forecast_direction,
+                    "oni_history":        oni_history,
+                    "oni_forecast":       oni_forecast,
+                    "regional_impact":    regional_impact,
+                    "historical_stat":    _HISTORICAL_STAT_BY_PHASE.get(phase, ""),
+                    "last_updated":       str(enso_item.pub_date)[:10],
+                }
+    except Exception as e:
+        print(f"  [farmer_economics] ENSO section error: {e}")
+
+    # ── Fertilizer prices ─────────────────────────────────────────────────────
+    fert_items_out = []
+    fert_prices_as_of = None
+    try:
+        wb_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "World Bank")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if wb_item:
+            meta = json.loads(wb_item.meta or "{}")
+            fert_prices_as_of = meta.get("last_data_month")  # e.g. "Feb-2026"
+            for key, cfg in _FERT_CONFIG.items():
+                monthly = meta.get(f"{key}_monthly", [])
+                if len(monthly) < 2:
+                    continue
+                current_price = monthly[-1]
+                prev_price    = monthly[-2]
+                mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
+                # Long-form history (5y monthly with dates) backs the new
+                # Macro-tab fertilizer chart. Falls back to the legacy
+                # sparkline array if the WB parser didn't populate _history
+                # (older NewsItem rows from before that field was added).
+                history = meta.get(f"{key}_history", [])
+                fert_items_out.append({
+                    "name":              cfg["name"],
+                    "price_usd_mt":      round(current_price, 0),
+                    "mom_pct":           round(mom_pct, 1),
+                    "sparkline":         monthly[:6],
+                    "history":           history,
+                    "input_weight":      cfg["input_weight"],
+                    "base_usd_per_bag":  cfg["base_usd_per_bag"],
+                })
+    except Exception as e:
+        print(f"  [farmer_economics] fertilizer prices section error: {e}")
+
+    # ── Fertilizer imports ────────────────────────────────────────────────────
+    imports_out = None
+    comex_price_items: list = []
+    comex_prices_as_of: str | None = None
+    try:
+        today = date.today()
+        cutoff_date = date(today.year - 3, today.month, 1)
+
+        import_rows = (
+            db.query(FertilizerImport)
+            .filter(FertilizerImport.month >= cutoff_date)
+            .order_by(FertilizerImport.month.asc())
+            .all()
+        )
+        if import_rows:
+            # NCM code → fertilizer type bucket (handles both old wrong codes + new correct codes)
+            _CODE_TO_TYPE: dict[str, str] = {
+                # Urea
+                "31021010": "urea", "31021090": "urea", "31028000": "urea",
+                # KCl — 31042010 was old wrong code kept for compat with existing DB rows
+                "31042010": "kcl",  "31042090": "kcl",
+                # MAP (monoammonium phosphate) — 31052000 was old wrong code
+                "31052000": "map",  "31054000": "map",
+                # DAP (diammonium phosphate)
+                "31053000": "dap",
+                # AN (ammonium nitrate)
+                "31023000": "an",
+                # AS (ammonium sulphate)
+                "31022100": "as",
+                # Superphosphate
+                "31031020": "superp", "31031030": "superp",
+                "31031100": "superp", "31031900": "superp",
+            }
+
+            def _row_type(row) -> str | None:
+                t = _CODE_TO_TYPE.get((row.ncm_code or "")[:8])
+                if t:
+                    return t
+                # Label fallback for old "NCM XXXXX" entries
+                lc = (row.ncm_label or "").lower()
+                if "urea" in lc or "ureia" in lc:
+                    return "urea"
+                if "kcl" in lc or "cloreto de pot" in lc:
+                    return "kcl"
+                if lc == "map":
+                    return "map"
+                if "dap" in lc or "diamônio" in lc or "diamonio" in lc:
+                    return "dap"
+                if lc == "an" or "nitrato" in lc:
+                    return "an"
+                if lc == "as" or "sulfato de amônio" in lc:
+                    return "as"
+                if "superphosphate" in lc or "superfosfato" in lc:
+                    return "superp"
+                return None
+
+            # Group by month string "YYYY-MM", tracking volume + FOB per type
+            months_data: dict = {}
+            for row in import_rows:
+                m_str = row.month.strftime("%Y-%m")
+                if m_str not in months_data:
+                    months_data[m_str] = {
+                        "month":       m_str,
+                        "urea_kt":     0.0, "urea_fob":   0.0,
+                        "kcl_kt":      0.0, "kcl_fob":    0.0,
+                        "map_kt":      0.0, "map_fob":    0.0,
+                        "dap_kt":      0.0, "dap_fob":    0.0,
+                        "an_kt":       0.0, "an_fob":     0.0,
+                        "as_kt":       0.0, "as_fob":     0.0,
+                        "superp_kt":   0.0, "superp_fob": 0.0,
+                        "total_kt":    0.0,
+                        "total_fob_usd_m": 0.0,
+                    }
+                ftype = _row_type(row)
+                kt    = (row.net_weight_kg or 0) / 1_000_000
+                fob_m = (row.fob_usd or 0) / 1_000_000
+                if ftype:
+                    months_data[m_str][f"{ftype}_kt"]  += kt
+                    months_data[m_str][f"{ftype}_fob"] += fob_m
+                months_data[m_str]["total_kt"]         += kt
+                months_data[m_str]["total_fob_usd_m"]  += fob_m
+
+            # Compute implied FOB price (USD/mt) per type per month
+            def _implied_price(fob_m: float, kt: float) -> float | None:
+                """fob_m = millions USD, kt = kilotons → USD/mt"""
+                if kt < 0.5:   # ignore months with negligible volume
+                    return None
+                return round(fob_m * 1_000 / kt, 0)
+
+            sorted_months = sorted(months_data.values(), key=lambda x: x["month"])
+
+            # Round volume/value fields for output, include implied price per type
+            monthly_out = []
+            for entry in sorted_months:
+                map_dap_kt  = entry["map_kt"]  + entry["dap_kt"]
+                map_dap_fob = entry["map_fob"] + entry["dap_fob"]
+                monthly_out.append({
+                    "month":              entry["month"],
+                    "urea_kt":            round(entry["urea_kt"],   1),
+                    "kcl_kt":             round(entry["kcl_kt"],    1),
+                    "map_kt":             round(entry["map_kt"],    1),
+                    "dap_kt":             round(entry["dap_kt"],    1),
+                    "an_kt":              round(entry["an_kt"],     1),
+                    "as_kt":              round(entry["as_kt"],     1),
+                    "superp_kt":          round(entry["superp_kt"], 1),
+                    "map_dap_kt":         round(map_dap_kt,         1),  # backward compat
+                    "total_kt":           round(entry["total_kt"],  1),
+                    "total_fob_usd_m":    round(entry["total_fob_usd_m"], 2),
+                    "urea_price_usd_mt":    _implied_price(entry["urea_fob"], entry["urea_kt"]),
+                    "kcl_price_usd_mt":     _implied_price(entry["kcl_fob"],  entry["kcl_kt"]),
+                    "map_dap_price_usd_mt": _implied_price(map_dap_fob,       map_dap_kt),
+                })
+
+            # Build price sparklines (last 7 months with valid data) per type
+            _COMEX_FERT = {
+                "urea":    {"name": "Urea (N)", "kt_key": "urea_kt", "fob_key": "urea_fob", **_FERT_CONFIG["urea"]},
+                "map_dap": {"name": "MAP (P)",  "kt_key": "map_kt",  "fob_key": "map_fob",  **_FERT_CONFIG["dap"]},
+                "kcl":     {"name": "KCl (K)",  "kt_key": "kcl_kt",  "fob_key": "kcl_fob",  **_FERT_CONFIG["kcl"]},
+            }
+            for cfg in _COMEX_FERT.values():
+                prices_by_month = [
+                    (e["month"], _implied_price(e[cfg["fob_key"]], e[cfg["kt_key"]]))
+                    for e in sorted_months
+                ]
+                valid = [(m, p) for m, p in prices_by_month if p is not None]
+                if len(valid) < 2:
+                    continue
+                sparkline     = [p for _, p in valid[-7:]]
+                current_price = sparkline[-1]
+                prev_price    = sparkline[-2]
+                mom_pct = (current_price - prev_price) / prev_price * 100 if prev_price else 0.0
+                comex_prices_as_of = valid[-1][0]  # "YYYY-MM"
+                comex_price_items.append({
+                    "name":             cfg["name"],
+                    "price_usd_mt":     current_price,
+                    "mom_pct":          round(mom_pct, 1),
+                    "sparkline":        sparkline,
+                    "input_weight":     cfg["input_weight"],
+                    "base_usd_per_bag": cfg["base_usd_per_bag"],
+                })
+
+            if comex_prices_as_of:
+                yr, mo = comex_prices_as_of.split("-")
+                _M = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+                      "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"}
+                comex_prices_as_of = f"{_M.get(mo, mo)}-{yr}"
+
+            last_import = max(import_rows, key=lambda r: r.scraped_at)
+            imports_out = {
+                "last_updated": last_import.scraped_at.strftime("%Y-%m-%d"),
+                "monthly":      monthly_out,
+            }
+    except Exception as e:
+        print(f"  [farmer_economics] fertilizer imports section error: {e}")
+
+    # ── Acreage / Yield ───────────────────────────────────────────────────────
+    acreage_out = None
+    yield_out   = None
+    season      = None
+    try:
+        safra_item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == "CONAB Safra")
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if safra_item:
+            meta   = json.loads(safra_item.meta or "{}")
+            season = meta.get("season")
+
+            area_cur  = meta.get("harvested_area_kha")
+            area_prev = meta.get("prev_area_kha")
+            yld_cur   = meta.get("yield_bags_ha")
+            yld_prev  = meta.get("prev_yield_bags_ha")
+
+            if area_cur is not None:
+                area_yoy = (area_cur - area_prev) / area_prev * 100 if area_prev else 0.0
+                acreage_out = {
+                    "thousand_ha":  area_cur,
+                    "yoy_pct":      round(area_yoy, 1),
+                    "source_label": meta.get("source_label", "CONAB Safra"),
+                }
+            if yld_cur is not None:
+                yld_yoy = (yld_cur - yld_prev) / yld_prev * 100 if yld_prev else 0.0
+                yield_out = {
+                    "bags_per_ha":  yld_cur,
+                    "yoy_pct":      round(yld_yoy, 1),
+                    "source_label": meta.get("source_label", "CONAB Safra"),
+                }
+    except Exception as e:
+        print(f"  [farmer_economics] acreage/yield section error: {e}")
+
+    # ── Cost helper ───────────────────────────────────────────────────────────
+    def _build_cost_out(db_source: str, spot_price: float | None, spot_field: str) -> dict | None:
+        item = (
+            db.query(NewsItem)
+            .filter(NewsItem.source == db_source)
+            .order_by(NewsItem.pub_date.desc())
+            .first()
+        )
+        if not item:
+            return None
+        meta          = json.loads(item.meta or "{}")
+        total_brl     = meta.get("total_brl_per_bag")
+        prev_total_brl= meta.get("prev_total_brl_per_bag")
+        brl_usd       = meta.get("brl_usd", 5.0)
+        components    = meta.get("components_brl", [])
+        inputs_detail = meta.get("inputs_detail_brl", [])
+        if total_brl is None:
+            return None
+
+        total_usd      = total_brl / brl_usd if brl_usd else None
+        total_comp_brl = sum(c.get("brl", 0) for c in components)
+        components_out = [
+            {
+                "label": c.get("label"),
+                "color": c.get("color"),
+                "brl":   c.get("brl", 0),
+                "usd":   round(c.get("brl", 0) / brl_usd, 2) if brl_usd else None,
+                "share": round(c.get("brl", 0) / total_comp_brl, 4) if total_comp_brl else 0.0,
+            }
+            for c in components
+        ]
+        inputs_total_brl  = sum(d.get("brl", 0) for d in inputs_detail)
+        inputs_detail_out = [
+            {
+                "label": d.get("label"),
+                "brl":   d.get("brl", 0),
+                "usd":   round(d.get("brl", 0) / brl_usd, 2) if brl_usd else None,
+                "share": round(d.get("brl", 0) / inputs_total_brl, 4) if inputs_total_brl else 0.0,
+            }
+            for d in inputs_detail
+        ]
+        yoy_pct = 0.0
+        if prev_total_brl:
+            yoy_pct = round((total_brl - prev_total_brl) / prev_total_brl * 100, 1)
+        return {
+            "total_usd_per_bag": round(total_usd, 1) if total_usd is not None else None,
+            "yoy_pct":           yoy_pct,
+            "season_label":      meta.get("source_label", db_source),
+            "components":        components_out,
+            "inputs_detail":     inputs_detail_out,
+            spot_field:          spot_price,
+            "last_updated":      str(item.pub_date)[:10],
+        }
+
+    # ── Cost ──────────────────────────────────────────────────────────────────
+    cost_arabica_out = None
+    cost_conilon_out = None
+    try:
+        # KC spot from arabica futures
+        kc_spot = None
+        try:
+            arabica_item = next(
+                (i for i in
+                 db.query(NewsItem)
+                 .filter(NewsItem.meta.isnot(None))
+                 .order_by(NewsItem.pub_date.desc())
+                 .all()
+                 if "futures" in (i.tags or []) and "arabica" in (i.tags or [])),
+                None
+            )
+            if arabica_item:
+                ar_meta = json.loads(arabica_item.meta or "{}")
+                contracts = ar_meta.get("contracts", [])
+                if contracts:
+                    kc_spot = contracts[0].get("lastPrice")
+        except Exception:
+            pass
+
+        # RC spot from robusta futures ($/MT → $/bag: ×0.06)
+        rc_spot_per_bag = None
+        try:
+            robusta_item = next(
+                (i for i in
+                 db.query(NewsItem)
+                 .filter(NewsItem.meta.isnot(None))
+                 .order_by(NewsItem.pub_date.desc())
+                 .all()
+                 if "futures" in (i.tags or []) and "robusta" in (i.tags or [])),
+                None
+            )
+            if robusta_item:
+                rc_meta = json.loads(robusta_item.meta or "{}")
+                contracts = rc_meta.get("contracts", [])
+                if contracts:
+                    rc_usd_mt = contracts[0].get("lastPrice")
+                    if rc_usd_mt:
+                        rc_spot_per_bag = round(float(rc_usd_mt) * 0.06, 1)
+        except Exception:
+            pass
+
+        cost_arabica_out = _build_cost_out("CONAB Custos",         kc_spot,        "kc_spot")
+        cost_conilon_out = _build_cost_out("CONAB Custos Conilon", rc_spot_per_bag, "rc_spot")
+
+        # Keep season from arabica item
+        if cost_arabica_out and not season:
+            arabica_item_c = (db.query(NewsItem).filter(NewsItem.source == "CONAB Custos")
+                               .order_by(NewsItem.pub_date.desc()).first())
+            if arabica_item_c:
+                season = json.loads(arabica_item_c.meta or "{}").get("season")
+    except Exception as e:
+        print(f"  [farmer_economics] cost section error: {e}")
+
+    # ── Assemble & write ──────────────────────────────────────────────────────
+    if season is None:
+        _today = date.today()
+        _y = _today.year if _today.month >= 7 else _today.year - 1
+        season = f"{_y}/{str(_y + 1)[-2:]}"
+
+    result = {
+        "country":    "brazil",
+        "season":     season,
+        "scraped_at": datetime.utcnow().isoformat() + "Z",
+        "cost":         cost_arabica_out,
+        "cost_arabica": cost_arabica_out,
+        "cost_conilon": cost_conilon_out,
+        "acreage":    acreage_out,
+        "yield":      yield_out,
+        "weather":    weather_out,
+        "enso":       enso_out,
+        "fertilizer": {
+            # Prefer Comex-derived prices (same source as import volume, FOB Brazil)
+            # Fall back to World Bank if Comex data is insufficient
+            "items":            comex_price_items if comex_price_items else fert_items_out,
+            "prices_as_of":     comex_prices_as_of if comex_prices_as_of else fert_prices_as_of,
+            "imports":          imports_out,
+            "import_origins":   _load_origins_cache(),
+            "dry_bulk":         _load_dry_bulk_cache(),
+            "next_application": "May–Jun",
+        },
+    }
+
+    path = OUT_DIR / "farmer_economics.json"
+    written = safe_write_json(path, result, validate_farmer_economics)
+    print(f"  farmer_economics.json → written:{written} cost:{cost_arabica_out is not None} weather:{weather_out is not None} enso:{enso_out is not None}")
+
+
+def export_farmer_selling() -> None:
+    import logging as _logging
+
+    from scraper.sources import farmer_selling as _fs
+    from scraper.sources.farmer_selling import build_farmer_selling
+    # Surface the scraper's INFO diagnostics (article found / parsed values / skip
+    # reason) in the export log — export_static_json sets up no logging, so these
+    # are otherwise swallowed and staleness is impossible to diagnose from the log.
+    if not _fs.log.handlers:
+        _h = _logging.StreamHandler(sys.stdout)
+        _h.setFormatter(_logging.Formatter("    [farmer_selling] %(message)s"))
+        _fs.log.addHandler(_h)
+        _fs.log.setLevel(_logging.INFO)
+        _fs.log.propagate = False
+    try:
+        before = (OUT_DIR / "farmer_selling_brazil.json")
+        before_txt = before.read_text(encoding="utf-8") if before.exists() else ""
+        result = build_farmer_selling()
+        after_txt = before.read_text(encoding="utf-8") if before.exists() else ""
+        changed = after_txt != before_txt
+        if result:
+            ar = result.get("arabica", {}).get("brazil", {})
+            rb = result.get("robusta", {}).get("brazil", {})
+            print(f"  farmer_selling_brazil.json → arabica:{ar.get('current')}% robusta:{rb.get('current')}% "
+                  f"({'UPDATED' if changed else 'unchanged'}, report {result.get('report_date')})")
+        else:
+            print("  farmer_selling_brazil.json → no update (no bs4 / file missing)")
+    except Exception as e:
+        print(f"  farmer_selling_brazil.json → FAILED: {e}")
+
+
+def export_vietnam_last() -> None:
+    """Read latest VN local prices from DB and write vietnam_last.json.
+    This persists morning prices that Cecafe/acaphe remove each afternoon."""
+    from scraper.db import get_latest_vn_local_price
+    path = OUT_DIR / "vietnam_last.json"
+    try:
+        snapshot = get_latest_vn_local_price()
+        if not snapshot:
+            print("  vietnam_last.json → no data in DB yet — skipped")
+            return
+        path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+        saved_at = snapshot.get("saved_at", "?")
+        bmt_bid  = snapshot.get("bmt_bid", "?")
+        print(f"  vietnam_last.json → BMT bid={bmt_bid}, recorded {saved_at}")
+    except Exception as e:
+        print(f"  vietnam_last.json → FAILED: {e}")
+
+
+def export_vietnam_supply() -> None:
+    """Fetch ICO Vietnam export data and write vietnam_supply.json."""
+    from scraper.sources.vietnam_supply import build_vietnam_supply
+    try:
+        data = build_vietnam_supply()
+        path = OUT_DIR / "vietnam_supply.json"
+        safe_write_json(
+            path, data,
+            lambda d: (True, "ok") if d.get("country") == "vietnam" else (False, "country != vietnam"),
+        )
+        exports = data.get("exports") or {}
+        n = len(exports.get("monthly", []))
+        print(f"  vietnam_supply.json → {n} export months")
+    except Exception as e:
+        print(f"  vietnam_supply.json → FAILED: {e}")
+
+
+def export_colombia(db) -> None:
+    try:
+        from scraper.export_colombia import export_colombia as _export_colombia
+        _export_colombia(db)
+    except Exception as e:
+        print(f"  colombia_supply.json → FAILED: {e}")
+
+
+def export_honduras(db) -> None:
+    try:
+        from scraper.export_honduras import export_honduras as _export_honduras
+        _export_honduras(db)
+    except Exception as e:
+        print(f"  honduras_supply.json → FAILED: {e}")
+
+
+def export_indonesia(db) -> None:
+    try:
+        from scraper.export_indonesia import export_indonesia as _export_indonesia
+        _export_indonesia(db)
+    except Exception as e:
+        print(f"  indonesia_supply.json → FAILED: {e}")
+
+
+def export_uganda(db) -> None:
+    try:
+        from scraper.export_uganda import export_uganda as _export_uganda
+        _export_uganda(db)
+    except Exception as e:
+        print(f"  uganda_supply.json → FAILED: {e}")
+
+
+def export_ethiopia(db) -> None:
+    try:
+        from scraper.export_ethiopia import export_ethiopia as _export_ethiopia
+        _export_ethiopia(db)
+    except Exception as e:
+        print(f"  ethiopia_supply.json → FAILED: {e}")

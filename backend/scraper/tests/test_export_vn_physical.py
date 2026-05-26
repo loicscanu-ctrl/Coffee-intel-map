@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-from scraper.export_static_json import _vn_faq_from_physical
+from scraper.exporters.prices import _vn_faq_from_physical
 
 
 def _pp(symbol, price, scraped_at):

@@ -1,0 +1,127 @@
+"""Macro exporters (freight routes, retail CPI)."""
+import json
+from datetime import date, timedelta
+
+from models import (
+    FreightRate,
+)
+from scraper.exporters.base import OUT_DIR
+from scraper.validate_export import (
+    safe_write_json,
+    validate_freight,
+)
+
+ROUTE_CONFIG = [
+    ("vn-eu",  "Ho Chi Minh", "Rotterdam",   "FBX11", 1.00, False),
+    ("vn-ham", "Ho Chi Minh", "Hamburg",     "FBX11", 1.02, False),
+    ("vn-us",  "Ho Chi Minh", "Los Angeles", "FBX01", 1.00, False),
+    ("br-eu",  "Santos",      "Rotterdam",   "FBX11", 0.58, True),
+    ("co-eu",  "Cartagena",   "Rotterdam",   "FBX11", 0.55, True),
+    ("et-eu",  "Djibouti",    "Rotterdam",   "FBX11", 0.70, True),
+    ("br-us",  "Santos",      "New York",    "FBX03", 0.45, True),
+]
+
+
+def export_freight(db) -> None:
+    indices   = {cfg[3] for cfg in ROUTE_CONFIG}
+    cutoff_wk = date.today() - timedelta(days=7)
+    cutoff_84 = date.today() - timedelta(days=84)
+
+    latest, prev = {}, {}
+    for idx in indices:
+        row = (
+            db.query(FreightRate)
+            .filter(FreightRate.index_code == idx)
+            .order_by(FreightRate.date.desc())
+            .first()
+        )
+        latest[idx] = row
+        row2 = (
+            db.query(FreightRate)
+            .filter(FreightRate.index_code == idx, FreightRate.date < cutoff_wk)
+            .order_by(FreightRate.date.desc())
+            .first()
+        )
+        prev[idx] = row2
+
+    if all(v is None for v in latest.values()):
+        result = {"updated": date.today().isoformat(), "routes": [], "history": []}
+    else:
+        routes = []
+        for route_id, from_, to, index, mult, is_proxy in ROUTE_CONFIG:
+            latest_row = latest.get(index)
+            if latest_row is None:
+                continue
+            prev_row = prev.get(index)
+            rate     = round(latest_row.rate * mult)
+            prev_rate = round(prev_row.rate * mult) if prev_row else rate
+            routes.append({
+                "id": route_id, "from": from_, "to": to,
+                "rate": rate, "prev": prev_rate, "unit": "USD/FEU", "proxy": is_proxy,
+            })
+
+        fbx11_rows = (
+            db.query(FreightRate)
+            .filter(FreightRate.index_code == "FBX11", FreightRate.date >= cutoff_84)
+            .order_by(FreightRate.date.asc()).all()
+        )
+        fbx01_rows = (
+            db.query(FreightRate)
+            .filter(FreightRate.index_code == "FBX01", FreightRate.date >= cutoff_84)
+            .order_by(FreightRate.date.asc()).all()
+        )
+        history_by_date: dict = {}
+        for row in fbx11_rows:
+            d = row.date.isoformat()
+            history_by_date.setdefault(d, {"date": d})
+            history_by_date[d]["vn-eu"] = round(row.rate * 1.00)
+            history_by_date[d]["br-eu"] = round(row.rate * 0.58)
+            history_by_date[d]["et-eu"] = round(row.rate * 0.70)
+        for row in fbx01_rows:
+            d = row.date.isoformat()
+            history_by_date.setdefault(d, {"date": d})
+            history_by_date[d]["vn-us"] = round(row.rate * 1.00)
+
+        updated = max(
+            (r.date for r in latest.values() if r is not None),
+            default=date.today()
+        ).isoformat()
+
+        result = {
+            "updated": updated,
+            "routes":  routes,
+            "history": sorted(history_by_date.values(), key=lambda x: x["date"]),
+        }
+
+    path = OUT_DIR / "freight.json"
+    written = safe_write_json(path, result, validate_freight)
+    print(f"  freight.json → written:{written} {len(result.get('routes', []))} routes, {len(result.get('history', []))} history rows")
+
+
+def export_retail_cpi(db) -> None:
+    """Mirror the retail_cpi cache to /data so the frontend can read it directly."""
+    try:
+        from scraper.sources import retail_cpi as _retail_cpi
+        payload = _retail_cpi.fetch_latest()
+        if not payload:
+            from models import NewsItem
+            item = (
+                db.query(NewsItem)
+                .filter(NewsItem.source == "Retail CPI")
+                .order_by(NewsItem.pub_date.desc())
+                .first()
+            )
+            if item and item.meta:
+                try:
+                    payload = json.loads(item.meta)
+                except Exception:
+                    payload = None
+        if not payload:
+            print("  retail_cpi.json → no data")
+            return
+        path = OUT_DIR / "retail_cpi.json"
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        n = len(payload.get("series") or {})
+        print(f"  retail_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
+    except Exception as e:
+        print(f"  retail_cpi.json → FAILED: {e}")
