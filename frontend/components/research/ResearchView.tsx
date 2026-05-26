@@ -3,10 +3,11 @@ import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 
-type Sub = "model" | "backtest";
+type Sub = "model" | "backtest" | "frost";
 const SUBS: { id: Sub; label: string }[] = [
   { id: "model",    label: "Intraweek model" },
   { id: "backtest", label: "COT backtest report" },
+  { id: "frost",    label: "Frost risk" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -130,6 +131,103 @@ function IntraweekMethodology() {
   );
 }
 
+function FrostRiskMethodology() {
+  return (
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+
+        <H>Why frost is the trade that matters</H>
+        <P>
+          Frost is the single largest <strong>tail risk</strong> in coffee. Unlike drought, which trims a crop at the
+          margin, a hard radiative frost in the southern Brazilian Arabica belt can kill leaf, scorch cherries and, in
+          the worst case, set back trees for two seasons. The historical record is brutal and fast: the &ldquo;Black
+          Frost&rdquo; of <strong>July 1975</strong> wiped out the bulk of Paraná&rsquo;s crop and is the reference event
+          for the entire industry; <strong>June/July 1994</strong> saw two frosts that roughly doubled the price; and the
+          <strong> July 2021</strong> freeze pushed Arabica from ~$1.20 to over $2.40/lb inside a few months. Each was a
+          step-change, not a drift. The point of a frost monitor is therefore not precision — it is to flag, ahead of the
+          news, that the <em>conditions for a step-change exist tonight</em>.
+        </P>
+
+        <H>The physics: air temperature is not the answer</H>
+        <P>
+          The naïve approach — &ldquo;frost when the 2 m air temperature hits 0 °C&rdquo; — systematically misses real
+          frost events. Damaging frosts in the Brazilian winter are overwhelmingly <strong>radiative</strong>: on a
+          clear, calm, dry night the ground and leaf surface radiate heat to space and cool <em>well below</em> the air
+          temperature measured at the standard 2 m height. Plants are routinely damaged at recorded air temperatures of
+          3–5 °C. So the model estimates the quantity that actually matters — the <strong>leaf-surface temperature</strong>
+          — from the variables that govern radiative cooling.
+        </P>
+
+        <H>The model</H>
+        <P>
+          For each representative point we pull hourly forecast + recent history from Open-Meteo
+          (<Code>temperature_2m, dew_point_2m, cloud_cover, wind_speed_10m</Code>), take the daily minimum-temperature
+          hour, and estimate surface temperature as:
+        </P>
+        <P>
+          <Code>T_surface = T_min − (1 − cloud/100) × max(0, 5 − 0.4 × wind_kmh) − 0.5·[dew &lt; 2°C]</Code>
+        </P>
+        <ul className="space-y-1">
+          <LI><strong>Radiation term.</strong> <Code>(1 − cloud/100)</Code> switches the cooling off under overcast
+            skies (clouds re-radiate heat back down) and on fully to a ~5 °C deficit under clear skies. The
+            <Code>max(0, 5 − 0.4 × wind)</Code> factor kills the deficit once wind mixes the boundary layer — by ~12 km/h
+            there is effectively no radiative drop. This is why a cold-but-windy or cold-but-cloudy night is <em>safe</em>
+            while a milder, clear, dead-calm night is dangerous.</LI>
+          <LI><strong>Dry-air correction.</strong> A further −0.5 °C when dew point is below 2 °C: dry air holds little
+            latent heat, so there is no condensation to buffer the fall, and the surface keeps dropping.</LI>
+        </ul>
+        <P>Surface temperature then maps to a four-level risk code:</P>
+        <ul className="space-y-1">
+          <LI><span className="text-blue-300 font-semibold">H</span> — <Code>T_surface &lt; 0 °C</Code>: damaging frost likely.</LI>
+          <LI><span className="text-blue-400 font-semibold">M</span> — <Code>0–3 °C</Code>: frost possible in low-lying pockets.</LI>
+          <LI><span className="text-slate-300 font-semibold">L</span> — <Code>3–6 °C</Code>: cold, watch the trend.</LI>
+          <LI><span className="text-slate-500 font-semibold">—</span> — <Code>≥ 6 °C</Code>: no frost concern.</LI>
+        </ul>
+
+        <H>Where we look</H>
+        <P>
+          Frost risk is point-sampled at the growing regions that actually freeze, not country-wide averages. In
+          Brazil: <Code>Sul de Minas</Code>, <Code>Cerrado</Code>, <Code>Paraná</Code> (the southernmost and
+          highest-risk belt) and <Code>Espírito Santo</Code> (Conilon/Robusta — included for completeness, rarely at
+          frost risk). A secondary check runs only at Honduras&rsquo; high-altitude plots
+          (<Code>Copán</Code>, <Code>Montecillos</Code>, &gt;1800 m), where frost is rare but possible. Each region shows
+          a <strong>7-day worst-case badge</strong> (the most severe code in the coming week) plus a
+          <strong> 14-day daily grid</strong> so an approaching cold front is visible days out.
+        </P>
+
+        <H>What was considered and deliberately left out</H>
+        <ul className="space-y-1">
+          <LI><strong>ENSO phase.</strong> El Niño/La Niña shift the frost window (the export carries context text like
+            &ldquo;Paraná frost window +12 days&rdquo;), but the phase does <em>not</em> algorithmically move the
+            temperature thresholds — it is decision context, not a model input, to keep the rule transparent.</LI>
+          <LI><strong>Cold-air pooling / topography.</strong> Frost collects in valley bottoms that a single
+            representative point cannot resolve. The &ldquo;M&rdquo; band (0–3 °C) is the practical hedge for this — it
+            flags nights where sheltered low spots will freeze even if the point estimate does not.</LI>
+          <LI><strong>Historical-recurrence probability.</strong> The 1975/1994/2021 events are background context, not
+            terms in the formula. This is a <em>physical nowcast</em> of tonight&rsquo;s conditions, not a climatological
+            frequency model.</LI>
+        </ul>
+
+        <H>Caveats</H>
+        <ul className="space-y-1">
+          <LI>It is a <strong>forecast-driven estimate</strong> and inherits the Open-Meteo forecast error; treat the
+            outer days of the 14-day grid as indicative, not firm.</LI>
+          <LI>Point sampling means the badge is a regional proxy — localized frost in unsampled micro-climates can occur
+            without the badge lighting up.</LI>
+          <LI>The rule runs year-round but is only materially informative in the austral winter (≈ May–August); in summer
+            it will correctly read &ldquo;—&rdquo; every night.</LI>
+        </ul>
+
+        <H>Where it lives</H>
+        <P>
+          The estimate is computed in <Code>backend/scraper/sources/farmer_economics.py</Code> (<Code>_frost_risk</Code>),
+          mirrored for Honduras in <Code>honduras_weather.py</Code>, published into <Code>farmer_economics.json</Code>,
+          and rendered as the badges + 14-day grid in the <Code>WeatherRiskPanel</Code> on each origin&rsquo;s Farmer
+          Economics tab.
+        </P>
+      </div>
+  );
+}
+
 export default function ResearchView() {
   const [sub, setSub] = useState<Sub>("model");
   return (
@@ -145,7 +243,9 @@ export default function ResearchView() {
         ))}
       </div>
 
-      {sub === "model" ? <IntraweekMethodology /> : <CotBacktestReport />}
+      {sub === "model" && <IntraweekMethodology />}
+      {sub === "backtest" && <CotBacktestReport />}
+      {sub === "frost" && <FrostRiskMethodology />}
     </>
   );
 }
