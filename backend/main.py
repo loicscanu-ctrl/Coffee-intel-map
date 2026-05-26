@@ -22,6 +22,7 @@ from routes.futures import router as futures_router
 from routes.macro_cot import router as macro_cot_router
 from routes.map import router as map_router
 from routes.news import router as news_router
+from telegram.router import router as telegram_router
 
 app = FastAPI(title="Coffee Intel API")
 
@@ -40,6 +41,7 @@ app.include_router(freight_router)
 app.include_router(cot_router)
 app.include_router(macro_cot_router)
 app.include_router(futures_router)
+app.include_router(telegram_router, prefix="/telegram")
 
 @app.on_event("startup")
 def startup():
