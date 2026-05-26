@@ -28,6 +28,7 @@ Usage (no DB; files only):
 from __future__ import annotations
 
 import argparse
+import calendar
 import datetime as dt
 import json
 import socket
@@ -171,14 +172,26 @@ def _load_spi_baselines() -> dict:
 _SPI_BASE = _load_spi_baselines()
 
 
-def _monthly_rain(reg_hist: dict) -> dict[str, float]:
-    """Region history rows → {'YYYY-MM': total rain mm} (current/recent months)."""
-    out: dict[str, float] = {}
+def _monthly_rain(reg_hist: dict) -> tuple[dict[str, float], dict[str, int]]:
+    """Region history rows → ({'YYYY-MM': total rain mm}, {'YYYY-MM': day count}).
+    The day count lets SPI skip partially-covered months (a half-empty month
+    would otherwise read as near-zero rain and pin SPI to its clamp floor)."""
+    totals: dict[str, float] = {}
+    counts: dict[str, int] = {}
     for date, v in reg_hist.items():
         if isinstance(v, dict) and v.get("rain") is not None:
             ym = date[:7]
-            out[ym] = round(out.get(ym, 0.0) + v["rain"], 1)
-    return out
+            totals[ym] = round(totals.get(ym, 0.0) + v["rain"], 1)
+            counts[ym] = counts.get(ym, 0) + 1
+    return totals, counts
+
+
+def _month_complete(ym: str, month_days: dict[str, int]) -> bool:
+    """True if the history covers ≥ (days_in_month − 2) days of `ym` — enough to
+    treat its rain total as complete for SPI (vs a partial ~0 mm month that would
+    pin SPI to its clamp floor)."""
+    y, m = (int(x) for x in ym.split("-"))
+    return month_days.get(ym, 0) >= calendar.monthrange(y, m)[1] - 2
 
 
 # ── HTTP ─────────────────────────────────────────────────────────────────────
@@ -375,12 +388,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
             prov["essm_fraction"] = essm[-1][1]
             prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-14:]]
         # SPI-1 / SPI-3 from the committed 30-yr baseline + live monthly rain.
-        # Targets the last COMPLETE month (the current month is partial).
+        # Target the latest month that is BOTH past (current month is partial)
+        # AND near-complete in the history (≥ days_in_month − 2). Skipping
+        # partial months avoids feeding a half-empty (~0 mm) total into the
+        # gamma fit, which would otherwise pin SPI to its −4.75 clamp floor.
         calib = _SPI_BASE.get("origins", {}).get(origin, {}).get(prov["name"])
         if HAS_SPI and calib:
-            cur_monthly = _monthly_rain(rh)
+            cur_monthly, month_days = _monthly_rain(rh)
             cur_key = f"{CUR_YEAR}-{cur_month:02d}"
-            done = sorted(k for k in cur_monthly if k < cur_key)
+            done = sorted(k for k in cur_monthly
+                          if k < cur_key and _month_complete(k, month_days))
             if done:
                 tgt = done[-1]
                 s1 = spi_calc.spi_for_month(calib, cur_monthly, tgt, 1)

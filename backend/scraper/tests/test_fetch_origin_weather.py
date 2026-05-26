@@ -45,6 +45,18 @@ def test_fetch_region_requests_soil_layers(monkeypatch):
         assert layer in captured["hourly"]
 
 
+def test_monthly_rain_returns_totals_and_counts():
+    rh = {
+        "2026-04-01": {"rain": 6.0}, "2026-04-02": {"rain": 4.0},
+        "2026-05-01": {"rain": 2.0},
+        "2026-03-01": {"rain": None},        # null rain ignored
+        "bad": "not-a-dict",
+    }
+    totals, counts = f._monthly_rain(rh)
+    assert totals == {"2026-04": 10.0, "2026-05": 2.0}
+    assert counts == {"2026-04": 2, "2026-05": 1}   # day counts → SPI completeness gate
+
+
 def test_upsert_stores_essm_in_history():
     past = (f.TODAY - __import__("datetime").timedelta(days=1)).isoformat()
     daily = {
