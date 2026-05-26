@@ -87,9 +87,9 @@
       "monthly_actual_cur": [
         368.4,
         258.8,
-        303.1,
-        261.8,
-        200.4
+        0.0,
+        0.0,
+        117.4
       ],
       "monthly_avg_temp": [
         26.5,
@@ -152,51 +152,65 @@
         26.2,
         26.2,
         27.1,
-        27.3
+        27.4
       ],
       "forecast_7d_rain": [
-        16.4,
-        11.6,
-        2.8,
-        25.5,
         0.0,
+        0.0,
+        0.2,
+        1.5,
+        0.9,
         0.0,
         0.0
       ],
       "daily_accum_cur": [
-        8.1,
-        29.8,
-        40.9,
-        48.5,
-        63.1,
-        78.8,
-        80.0,
-        80.0,
-        81.8,
-        86.1,
-        91.7,
-        112.9,
-        116.0,
-        116.6,
-        129.5,
-        144.1,
-        147.6,
-        149.6,
-        151.9,
-        155.8,
-        165.3,
-        169.2,
-        179.6,
-        187.9,
-        200.4,
-        null,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.8,
+        6.1,
+        11.7,
+        32.9,
+        36.0,
+        36.6,
+        49.5,
+        64.1,
+        67.6,
+        69.6,
+        71.9,
+        75.8,
+        85.3,
+        89.2,
+        99.6,
+        107.9,
+        112.8,
+        117.4,
         null,
         null,
         null,
         null,
         null
       ],
-      "daily_accum_ly": []
+      "daily_accum_ly": [],
+      "essm_fraction": 0.311,
+      "essm_recent": [
+        {
+          "date": "2026-05-25",
+          "essm": 0.317
+        },
+        {
+          "date": "2026-05-26",
+          "essm": 0.311
+        }
+      ],
+      "spi_1": -4.75,
+      "spi_3": -4.75,
+      "spi_month": "2026-04"
     },
     {
       "name": "Gayo",
@@ -276,9 +290,9 @@
       "monthly_actual_cur": [
         155.9,
         164.1,
-        66.7,
-        305.6,
-        204.1
+        0.0,
+        0.0,
+        92.6
       ],
       "monthly_avg_temp": [
         20.0,
@@ -344,48 +358,62 @@
         20.3
       ],
       "forecast_7d_rain": [
-        1.2,
         0.8,
-        0.0,
-        0.9,
-        0.9,
+        1.7,
+        0.1,
         1.2,
+        0.9,
+        0.9,
         0.0
       ],
       "daily_accum_cur": [
-        12.8,
-        33.5,
-        47.9,
-        63.0,
-        72.8,
-        83.2,
-        112.2,
-        117.4,
-        120.5,
-        130.6,
-        136.7,
-        141.4,
-        154.4,
-        156.9,
-        157.6,
-        158.0,
-        158.0,
-        167.9,
-        172.0,
-        177.7,
-        179.2,
-        180.0,
-        192.4,
-        195.6,
-        199.3,
-        204.1,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        5.2,
+        8.3,
+        18.4,
+        24.5,
+        29.2,
+        42.2,
+        44.7,
+        45.4,
+        45.8,
+        45.8,
+        55.7,
+        59.8,
+        65.5,
+        67.0,
+        67.8,
+        80.2,
+        83.4,
+        87.1,
+        92.6,
         null,
         null,
         null,
         null,
         null
       ],
-      "daily_accum_ly": []
+      "daily_accum_ly": [],
+      "essm_fraction": 0.343,
+      "essm_recent": [
+        {
+          "date": "2026-05-25",
+          "essm": 0.35
+        },
+        {
+          "date": "2026-05-26",
+          "essm": 0.343
+        }
+      ],
+      "spi_1": -4.75,
+      "spi_3": -4.75,
+      "spi_month": "2026-04"
     },
     {
       "name": "Java",
@@ -465,9 +493,9 @@
       "monthly_actual_cur": [
         227.8,
         281.4,
-        63.0,
-        102.2,
-        43.6
+        0.0,
+        0.0,
+        21.0
       ],
       "monthly_avg_temp": [
         22.0,
@@ -530,11 +558,11 @@
         24.4,
         24.4,
         25.6,
-        26.0
+        26.1
       ],
       "forecast_7d_rain": [
-        2.6,
-        0.0,
+        3.9,
+        1.2,
         0.0,
         0.0,
         0.0,
@@ -542,39 +570,53 @@
         0.0
       ],
       "daily_accum_cur": [
-        22.0,
-        23.1,
-        23.1,
-        23.1,
-        23.1,
-        23.1,
-        23.1,
-        23.1,
-        23.4,
-        24.0,
-        24.0,
-        24.0,
-        24.0,
-        24.2,
-        24.2,
-        27.7,
-        31.3,
-        35.4,
-        37.6,
-        38.6,
-        40.0,
-        41.0,
-        41.0,
-        41.6,
-        41.6,
-        43.6,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.3,
+        0.9,
+        0.9,
+        0.9,
+        0.9,
+        1.1,
+        1.1,
+        4.6,
+        8.2,
+        12.3,
+        14.5,
+        15.5,
+        16.9,
+        17.9,
+        17.9,
+        18.5,
+        18.5,
+        21.0,
         null,
         null,
         null,
         null,
         null
       ],
-      "daily_accum_ly": []
+      "daily_accum_ly": [],
+      "essm_fraction": 0.23,
+      "essm_recent": [
+        {
+          "date": "2026-05-25",
+          "essm": 0.228
+        },
+        {
+          "date": "2026-05-26",
+          "essm": 0.23
+        }
+      ],
+      "spi_1": -4.75,
+      "spi_3": -4.75,
+      "spi_month": "2026-04"
     },
     {
       "name": "Toraja",
@@ -654,9 +696,9 @@
       "monthly_actual_cur": [
         97.0,
         118.2,
-        51.4,
-        194.3,
-        232.5
+        0.0,
+        0.0,
+        161.9
       ],
       "monthly_avg_temp": [
         21.0,
@@ -722,48 +764,62 @@
         21.9
       ],
       "forecast_7d_rain": [
-        17.6,
-        6.3,
-        6.7,
-        4.8,
-        2.1,
-        1.8,
+        6.9,
+        7.0,
+        5.2,
+        4.2,
+        3.9,
+        2.4,
         1.5
       ],
       "daily_accum_cur": [
-        21.7,
-        38.9,
-        44.3,
-        52.2,
-        61.6,
-        64.5,
-        72.0,
-        78.7,
-        84.6,
-        97.2,
-        100.5,
-        108.7,
-        111.8,
-        119.6,
-        141.1,
-        151.1,
-        163.2,
-        169.4,
-        180.8,
-        186.7,
-        190.5,
-        198.2,
-        213.7,
-        227.6,
-        230.0,
-        232.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        6.7,
+        12.6,
+        25.2,
+        28.5,
+        36.7,
+        39.8,
+        47.6,
+        69.1,
+        79.1,
+        91.2,
+        97.4,
+        108.8,
+        114.7,
+        118.5,
+        126.2,
+        141.7,
+        155.6,
+        158.0,
+        161.9,
         null,
         null,
         null,
         null,
         null
       ],
-      "daily_accum_ly": []
+      "daily_accum_ly": [],
+      "essm_fraction": 0.363,
+      "essm_recent": [
+        {
+          "date": "2026-05-25",
+          "essm": 0.366
+        },
+        {
+          "date": "2026-05-26",
+          "essm": 0.363
+        }
+      ],
+      "spi_1": -4.75,
+      "spi_3": -4.75,
+      "spi_month": "2026-04"
     },
     {
       "name": "Flores",
@@ -843,9 +899,9 @@
       "monthly_actual_cur": [
         225.3,
         155.8,
-        52.7,
-        155.8,
-        128.4
+        0.0,
+        0.0,
+        117.1
       ],
       "monthly_avg_temp": [
         22.5,
@@ -911,55 +967,66 @@
         18.8
       ],
       "forecast_7d_rain": [
-        2.0,
-        1.6,
-        1.0,
+        3.4,
         1.5,
+        0.3,
+        0.9,
         0.0,
         0.0,
         0.0
       ],
       "daily_accum_cur": [
-        4.0,
-        4.0,
-        5.6,
-        7.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        3.8,
         7.9,
-        10.5,
-        11.1,
-        14.9,
-        19.0,
-        21.0,
-        22.7,
-        25.7,
-        32.3,
-        36.4,
-        50.2,
-        58.2,
-        73.4,
-        102.3,
-        108.1,
-        113.7,
-        113.8,
-        120.9,
-        124.4,
-        124.5,
-        124.5,
-        128.4,
+        9.9,
+        11.6,
+        14.6,
+        21.2,
+        25.3,
+        39.1,
+        47.1,
+        62.3,
+        91.2,
+        97.0,
+        102.6,
+        102.7,
+        109.8,
+        113.3,
+        113.4,
+        113.4,
+        117.1,
         null,
         null,
         null,
         null,
         null
       ],
-      "daily_accum_ly": []
+      "daily_accum_ly": [],
+      "essm_fraction": 0.23,
+      "essm_recent": [
+        {
+          "date": "2026-05-25",
+          "essm": 0.232
+        },
+        {
+          "date": "2026-05-26",
+          "essm": 0.23
+        }
+      ]
     }
   ],
   "daily_station": [
     {
       "day": 1,
-      "rain_mm": 8.1,
-      "accum_mm": 8.1,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 3.8,
       "min_accum_mm": 2.3,
       "max_accum_mm": 5.8,
@@ -968,8 +1035,8 @@
     },
     {
       "day": 2,
-      "rain_mm": 21.7,
-      "accum_mm": 29.8,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 7.7,
       "min_accum_mm": 4.6,
       "max_accum_mm": 11.5,
@@ -978,8 +1045,8 @@
     },
     {
       "day": 3,
-      "rain_mm": 11.1,
-      "accum_mm": 40.9,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 11.5,
       "min_accum_mm": 6.9,
       "max_accum_mm": 17.3,
@@ -988,8 +1055,8 @@
     },
     {
       "day": 4,
-      "rain_mm": 7.6,
-      "accum_mm": 48.5,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 15.4,
       "min_accum_mm": 9.2,
       "max_accum_mm": 23.0,
@@ -998,8 +1065,8 @@
     },
     {
       "day": 5,
-      "rain_mm": 14.6,
-      "accum_mm": 63.1,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 19.2,
       "min_accum_mm": 11.5,
       "max_accum_mm": 28.8,
@@ -1008,8 +1075,8 @@
     },
     {
       "day": 6,
-      "rain_mm": 15.7,
-      "accum_mm": 78.8,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 23.0,
       "min_accum_mm": 13.8,
       "max_accum_mm": 34.5,
@@ -1018,18 +1085,18 @@
     },
     {
       "day": 7,
-      "rain_mm": 1.2,
-      "accum_mm": 80.0,
+      "rain_mm": 0.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 26.9,
       "min_accum_mm": 16.1,
       "max_accum_mm": 40.3,
       "last_year_accum_mm": 29.0,
-      "temp_c": 27.2
+      "temp_c": 28.2
     },
     {
       "day": 8,
       "rain_mm": 0.0,
-      "accum_mm": 80.0,
+      "accum_mm": 0.0,
       "avg_accum_mm": 30.7,
       "min_accum_mm": 18.4,
       "max_accum_mm": 46.1,
@@ -1039,7 +1106,7 @@
     {
       "day": 9,
       "rain_mm": 1.8,
-      "accum_mm": 81.8,
+      "accum_mm": 1.8,
       "avg_accum_mm": 34.5,
       "min_accum_mm": 20.7,
       "max_accum_mm": 51.8,
@@ -1049,7 +1116,7 @@
     {
       "day": 10,
       "rain_mm": 4.3,
-      "accum_mm": 86.1,
+      "accum_mm": 6.1,
       "avg_accum_mm": 38.4,
       "min_accum_mm": 23.0,
       "max_accum_mm": 57.6,
@@ -1059,7 +1126,7 @@
     {
       "day": 11,
       "rain_mm": 5.6,
-      "accum_mm": 91.7,
+      "accum_mm": 11.7,
       "avg_accum_mm": 42.2,
       "min_accum_mm": 25.3,
       "max_accum_mm": 63.3,
@@ -1069,7 +1136,7 @@
     {
       "day": 12,
       "rain_mm": 21.2,
-      "accum_mm": 112.9,
+      "accum_mm": 32.9,
       "avg_accum_mm": 46.1,
       "min_accum_mm": 27.6,
       "max_accum_mm": 69.1,
@@ -1079,7 +1146,7 @@
     {
       "day": 13,
       "rain_mm": 3.1,
-      "accum_mm": 116.0,
+      "accum_mm": 36.0,
       "avg_accum_mm": 49.9,
       "min_accum_mm": 29.9,
       "max_accum_mm": 74.9,
@@ -1089,7 +1156,7 @@
     {
       "day": 14,
       "rain_mm": 0.6,
-      "accum_mm": 116.6,
+      "accum_mm": 36.6,
       "avg_accum_mm": 53.7,
       "min_accum_mm": 32.2,
       "max_accum_mm": 80.6,
@@ -1099,7 +1166,7 @@
     {
       "day": 15,
       "rain_mm": 12.9,
-      "accum_mm": 129.5,
+      "accum_mm": 49.5,
       "avg_accum_mm": 57.6,
       "min_accum_mm": 34.5,
       "max_accum_mm": 86.4,
@@ -1109,7 +1176,7 @@
     {
       "day": 16,
       "rain_mm": 14.6,
-      "accum_mm": 144.1,
+      "accum_mm": 64.1,
       "avg_accum_mm": 61.4,
       "min_accum_mm": 36.9,
       "max_accum_mm": 92.1,
@@ -1119,7 +1186,7 @@
     {
       "day": 17,
       "rain_mm": 3.5,
-      "accum_mm": 147.6,
+      "accum_mm": 67.6,
       "avg_accum_mm": 65.3,
       "min_accum_mm": 39.2,
       "max_accum_mm": 97.9,
@@ -1129,7 +1196,7 @@
     {
       "day": 18,
       "rain_mm": 2.0,
-      "accum_mm": 149.6,
+      "accum_mm": 69.6,
       "avg_accum_mm": 69.1,
       "min_accum_mm": 41.5,
       "max_accum_mm": 103.6,
@@ -1139,7 +1206,7 @@
     {
       "day": 19,
       "rain_mm": 2.3,
-      "accum_mm": 151.9,
+      "accum_mm": 71.9,
       "avg_accum_mm": 72.9,
       "min_accum_mm": 43.8,
       "max_accum_mm": 109.4,
@@ -1149,7 +1216,7 @@
     {
       "day": 20,
       "rain_mm": 3.9,
-      "accum_mm": 155.8,
+      "accum_mm": 75.8,
       "avg_accum_mm": 76.8,
       "min_accum_mm": 46.1,
       "max_accum_mm": 115.2,
@@ -1159,7 +1226,7 @@
     {
       "day": 21,
       "rain_mm": 9.5,
-      "accum_mm": 165.3,
+      "accum_mm": 85.3,
       "avg_accum_mm": 80.6,
       "min_accum_mm": 48.4,
       "max_accum_mm": 120.9,
@@ -1169,7 +1236,7 @@
     {
       "day": 22,
       "rain_mm": 3.9,
-      "accum_mm": 169.2,
+      "accum_mm": 89.2,
       "avg_accum_mm": 84.5,
       "min_accum_mm": 50.7,
       "max_accum_mm": 126.7,
@@ -1179,7 +1246,7 @@
     {
       "day": 23,
       "rain_mm": 10.4,
-      "accum_mm": 179.6,
+      "accum_mm": 99.6,
       "avg_accum_mm": 88.3,
       "min_accum_mm": 53.0,
       "max_accum_mm": 132.4,
@@ -1189,7 +1256,7 @@
     {
       "day": 24,
       "rain_mm": 8.3,
-      "accum_mm": 187.9,
+      "accum_mm": 107.9,
       "avg_accum_mm": 92.1,
       "min_accum_mm": 55.3,
       "max_accum_mm": 138.2,
@@ -1198,23 +1265,23 @@
     },
     {
       "day": 25,
-      "rain_mm": 12.5,
-      "accum_mm": 200.4,
+      "rain_mm": 4.9,
+      "accum_mm": 112.8,
       "avg_accum_mm": 96.0,
       "min_accum_mm": 57.6,
       "max_accum_mm": 144.0,
       "last_year_accum_mm": 103.6,
-      "temp_c": 26.8
+      "temp_c": 27.1
     },
     {
       "day": 26,
-      "rain_mm": 0.0,
-      "accum_mm": null,
+      "rain_mm": 4.6,
+      "accum_mm": 117.4,
       "avg_accum_mm": 99.8,
       "min_accum_mm": 59.9,
       "max_accum_mm": 149.7,
       "last_year_accum_mm": 107.8,
-      "temp_c": 0.0
+      "temp_c": 27.9
     },
     {
       "day": 27,
@@ -1269,53 +1336,53 @@
   ],
   "forecast_7d": [
     {
-      "date": "2026-05-26",
-      "label": "May 26",
-      "rain_mm": 16.4,
-      "temp_max_c": 30.7,
-      "temp_min_c": 24.1
-    },
-    {
       "date": "2026-05-27",
       "label": "May 27",
-      "rain_mm": 11.6,
-      "temp_max_c": 30.5,
-      "temp_min_c": 23.5
+      "rain_mm": 0.0,
+      "temp_max_c": 32.2,
+      "temp_min_c": 24.2
     },
     {
       "date": "2026-05-28",
       "label": "May 28",
-      "rain_mm": 2.8,
-      "temp_max_c": 32.1,
-      "temp_min_c": 22.6
+      "rain_mm": 0.0,
+      "temp_max_c": 31.9,
+      "temp_min_c": 21.8
     },
     {
       "date": "2026-05-29",
       "label": "May 29",
-      "rain_mm": 25.5,
+      "rain_mm": 0.2,
       "temp_max_c": 31.2,
-      "temp_min_c": 23.7
+      "temp_min_c": 21.2
     },
     {
       "date": "2026-05-30",
       "label": "May 30",
-      "rain_mm": 0.0,
-      "temp_max_c": 31.3,
-      "temp_min_c": 21.9
+      "rain_mm": 1.5,
+      "temp_max_c": 30.8,
+      "temp_min_c": 20.9
     },
     {
       "date": "2026-05-31",
       "label": "May 31",
-      "rain_mm": 0.0,
-      "temp_max_c": 31.7,
-      "temp_min_c": 20.0
+      "rain_mm": 0.9,
+      "temp_max_c": 30.7,
+      "temp_min_c": 23.0
     },
     {
       "date": "2026-06-01",
       "label": "Jun 1",
       "rain_mm": 0.0,
-      "temp_max_c": 31.0,
-      "temp_min_c": 22.8
+      "temp_max_c": 31.6,
+      "temp_min_c": 19.9
+    },
+    {
+      "date": "2026-06-02",
+      "label": "Jun 2",
+      "rain_mm": 0.0,
+      "temp_max_c": 31.1,
+      "temp_min_c": 22.1
     }
   ]
 }
