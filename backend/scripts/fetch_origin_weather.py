@@ -272,13 +272,14 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
     today_iso = TODAY.isoformat()
     forecast = []
     for i, date in enumerate(times):
-        rain = pr[i] if pr[i] is not None else 0.0
-        row = {"rain": r1(rain), "tmax": tx[i], "tmin": tn[i], "tmean": tm[i]}
+        raw_rain = pr[i]   # may be None — the API returns null for missing days
         if date <= today_iso:
-            # Merge, don't clobber: the forecast API returns tmean=null for many
-            # older past-days, so never overwrite a known value (e.g. one filled
-            # by the archive backfill) with a null on a later run. Fall back to
-            # (max+min)/2 when the mean itself is null but the extremes aren't.
+            # Merge, don't clobber: the forecast API returns null precip/tmean for
+            # many older past-days, so never overwrite a known value (e.g. one
+            # filled by the archive backfill) with a null on a later run. A null
+            # precip must NOT be stored as 0.0 — that silently zero-fills real rain
+            # (the Mar/Apr all-zero months that broke SPI). Fall back to (max+min)/2
+            # when the mean itself is null but the extremes aren't.
             mean = tm[i]
             if mean is None and tx[i] is not None and tn[i] is not None:
                 mean = (tx[i] + tn[i]) / 2
@@ -286,12 +287,14 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
             prev = reg.get(date, {})
             new_essm = essm_by_date.get(date)
             reg[date] = {
-                "rain":  r1(rain) if rain is not None else prev.get("rain"),
+                "rain":  r1(raw_rain) if raw_rain is not None else prev.get("rain"),
                 "tmean": new_tmean if new_tmean is not None else prev.get("tmean"),
                 "essm":  new_essm if new_essm is not None else prev.get("essm"),
             }
         else:
-            forecast.append({"date": date, **{k: row[k] for k in ("rain", "tmax", "tmin")}})
+            # Future forecast rows are display-only; 0.0 for a null is fine here.
+            forecast.append({"date": date, "rain": r1(raw_rain or 0.0),
+                             "tmax": tx[i], "tmin": tn[i]})
     return forecast
 
 

@@ -106,7 +106,7 @@ def backfill(origin: str, start: str, end: str, write: bool) -> int:
         tm, tx, tn = d["temperature_2m_mean"], d["temperature_2m_max"], d["temperature_2m_min"]
         reg = hist["regions"].setdefault(rc["name"], {})
         for i, date in enumerate(times):
-            arch_rain = r1(pr[i]) if pr[i] is not None else 0.0
+            arch_rain = r1(pr[i]) if pr[i] is not None else None
             # Some archive grid cells return a null mean but have max/min — fall
             # back to (max+min)/2 so the temp series doesn't gap (e.g. Jimma, Copán).
             mean = tm[i]
@@ -118,10 +118,12 @@ def backfill(origin: str, start: str, end: str, write: bool) -> int:
                 reg[date] = {"rain": arch_rain, "tmean": arch_tmean}
                 added += 1
             else:
-                # Fill only MISSING fields — never overwrite an accumulated value.
-                # The forecast API leaves tmean=null on older past-days; the
-                # archive has it, so this recovers those temps too.
-                if prev.get("rain") is None and arch_rain is not None:
+                # Fill missing fields, and REPAIR zero-fill corruption: the daily
+                # fetch used to store null precip as 0.0, leaving whole months of
+                # bogus 0.0 rain (broke SPI). The archive reanalysis is the gold
+                # standard for past days, so let it overwrite a stored 0.0/None —
+                # but never a real accumulated value (>0), which the daily fetch owns.
+                if arch_rain is not None and not prev.get("rain"):
                     prev["rain"] = arch_rain
                     added += 1
                 if prev.get("tmean") is None and arch_tmean is not None:

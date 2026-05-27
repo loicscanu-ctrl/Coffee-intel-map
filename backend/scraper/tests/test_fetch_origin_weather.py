@@ -88,3 +88,23 @@ def test_upsert_stores_essm_in_history():
     f.upsert(hist, "Cerrado", daily)
     assert hist["regions"]["Cerrado"][past]["essm"] == 0.3
     assert hist["regions"]["Cerrado"][past]["rain"] == 5.0   # existing fields intact
+
+
+def test_upsert_null_rain_does_not_clobber_real_history():
+    # Regression: the daily fetch used to store null precip as 0.0, zero-filling
+    # real rain (the Mar/Apr all-zero months that broke SPI). A null on a past day
+    # must KEEP the previously accumulated value, not overwrite it with 0.
+    past = (f.TODAY - __import__("datetime").timedelta(days=1)).isoformat()
+    daily = {
+        "daily": {
+            "time": [past],
+            "precipitation_sum": [None],          # API returns null for this past day
+            "temperature_2m_max": [28.0],
+            "temperature_2m_min": [16.0],
+            "temperature_2m_mean": [22.0],
+        },
+        "hourly": {"time": [], },
+    }
+    hist = {"regions": {"Cerrado": {past: {"rain": 12.4, "tmean": 21.0}}}}
+    f.upsert(hist, "Cerrado", daily)
+    assert hist["regions"]["Cerrado"][past]["rain"] == 12.4   # real rain preserved
