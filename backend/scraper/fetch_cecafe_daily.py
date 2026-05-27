@@ -37,6 +37,22 @@ OUT_DIR  = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_PATH = OUT_DIR / "cecafe_daily.json"
 
+# Debug captures live at repo root (NOT under frontend/public, so they're never
+# deployed) and are never git-added by the workflow — the workflow uploads this
+# dir as a CI artifact so the fetched page can be inspected offline.
+DEBUG_DIR = ROOT / "debug"
+
+
+def _dump_html(name: str, html: str) -> None:
+    """Persist a fetched page to debug/ for CI-artifact inspection (best-effort)."""
+    try:
+        DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+        path = DEBUG_DIR / name
+        path.write_text(html, encoding="utf-8")
+        print(f"  [debug] saved page HTML to {path}  ({len(html):,} chars)")
+    except Exception as e:  # noqa: BLE001
+        print(f"  [debug] could not save page HTML: {e}")
+
 DAILY_URL = "https://www.cecafe.com.br/dados-estatisticos/exportacoes-brasileiras/resumo-diario/"
 
 
@@ -195,12 +211,14 @@ def main():
 
     # 1. Load existing JSON
     existing: dict = {"updated": "", "arabica": {}, "conillon": {}, "soluvel": {}}
+    prev_updated = ""
     if OUT_PATH.exists():
         try:
             raw_json = json.loads(OUT_PATH.read_text(encoding="utf-8"))
             existing["arabica"]  = raw_json.get("arabica",  {})
             existing["conillon"] = raw_json.get("conillon", {})
             existing["soluvel"]  = raw_json.get("soluvel",  {})
+            prev_updated = raw_json.get("updated", "")
         except Exception:
             pass
 
@@ -208,24 +226,19 @@ def main():
     print(f"\n[1] Fetching {DAILY_URL}...")
     html = _fetch_page()
     print(f"  Page size: {len(html):,} chars")
+    # Always capture the fetched page so a green-but-stale run is diagnosable
+    # (the parser only dumped on exceptions; the "data unchanged" case never hit
+    # that path, leaving us blind to whether the page itself stopped advancing).
+    _dump_html("cecafe_daily_last_fetch.html", html)
 
     # 3. Parse
     print("\n[2] Parsing data...")
     try:
         parsed = _parse_page(html)
     except ValueError as e:
-        # Dump the fetched HTML to a debug file so the next CI run's
-        # artefact upload preserves it for offline inspection. Without this
-        # the only signal was "Could not find TOTAIS" with no way to see
-        # what's actually on the page — which is exactly the position the
-        # cecafe_daily scraper has been in since 2026-05-15.
-        debug_path = OUT_DIR.parent / "debug" / "cecafe_daily_last_failed.html"
-        try:
-            debug_path.parent.mkdir(parents=True, exist_ok=True)
-            debug_path.write_text(html, encoding="utf-8")
-            print(f"  saved page HTML to {debug_path}  ({len(html):,} chars)")
-        except Exception as write_err:
-            print(f"  (could not save debug HTML: {write_err})")
+        # The fetched page was already captured above (cecafe_daily_last_fetch);
+        # also keep a distinctly-named copy of the failing page for clarity.
+        _dump_html("cecafe_daily_last_failed.html", html)
         print(f"  ERROR: {e}")
         # Retain existing JSON unchanged. Exit non-zero so the workflow's
         # retry loop / failure-alert path fires, but the JSON file still has
@@ -236,6 +249,16 @@ def main():
     ref   = parsed["ref_date"]
     ym    = f"{ref.year}-{ref.month:02d}"
     day   = str(ref.day)
+
+    # Diagnostic: distinguish "Cecafe hasn't advanced the page" from a stale
+    # parse. If the page's reference date equals the last date we stored, no new
+    # day will be appended and the run goes green with no commit — which is the
+    # exact symptom of being "stuck". Surface it loudly in the log.
+    if prev_updated and ref.isoformat() == prev_updated:
+        print(f"  [diag] page reference date {ref.isoformat()} == last stored "
+              f"date — source has NOT published a newer day (nothing to commit).")
+    elif prev_updated:
+        print(f"  [diag] page advanced: {prev_updated} -> {ref.isoformat()}")
 
     # 4. Merge current month data
     for key in ("arabica", "conillon", "soluvel"):

@@ -8,6 +8,7 @@ __pycache__/
 start_poller.bat
 stop_poller.bat
 node_modules/
+debug/
 backend/scraper/cache/
 backend/scraper/acaphe_probe_api_calls.json
 backend/scraper/acaphe_probe_output.html
