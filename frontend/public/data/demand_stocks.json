@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T06:32:05.454187Z",
+  "generated_at": "2026-05-27T06:46:50.946990Z",
   "ecf": {
     "source": "ECF",
     "last_updated": "2026-05-13",
@@ -84,7 +84,7 @@
   },
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-26",
+    "last_updated": "2026-05-27",
     "annual": [
       {
         "year": "2002",
@@ -310,7 +310,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-26",
+    "last_updated": "2026-05-27",
     "annual": [
       {
         "year": "2002",
@@ -536,7 +536,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-26",
+    "last_updated": "2026-05-27",
     "annual": [
       {
         "year": "1960",
@@ -1141,7 +1141,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-05-26",
+    "last_updated": "2026-05-27",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
@@ -7871,8 +7871,8 @@
       "name": "Philippines",
       "latest_year": "2025",
       "consumption_mt": 405000,
-      "population": 115843670,
-      "per_capita_kg": 3.5,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -12623,7 +12623,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-05-26",
+    "last_updated": "2026-05-27",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12690,12 +12690,6 @@
         "iso3": "TUR",
         "latest_year": "2024",
         "latest_population": 85518661
-      },
-      "philippines": {
-        "name": "Philippines",
-        "iso3": "PHL",
-        "latest_year": "2024",
-        "latest_population": 115843670
       },
       "egypt": {
         "name": "Egypt",
