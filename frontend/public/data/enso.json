@@ -83,38 +83,340 @@
   ],
   "oni_forecast": [],
   "historical_stat": "Neutral ENSO: near-average Brazil arabica output expected",
-  "analogs": [],
-  "oni_history_long": [],
+  "analogs": [
+    {
+      "year": 2017,
+      "mse": 0.0136,
+      "series": [
+        {
+          "offset": -5,
+          "value": -0.64
+        },
+        {
+          "offset": -4,
+          "value": -0.6
+        },
+        {
+          "offset": -3,
+          "value": -0.45
+        },
+        {
+          "offset": -2,
+          "value": -0.19
+        },
+        {
+          "offset": -1,
+          "value": -0.02
+        },
+        {
+          "offset": 0,
+          "value": 0.18
+        },
+        {
+          "offset": 1,
+          "value": 0.31
+        },
+        {
+          "offset": 2,
+          "value": 0.4
+        },
+        {
+          "offset": 3,
+          "value": 0.39
+        },
+        {
+          "offset": 4,
+          "value": 0.19
+        },
+        {
+          "offset": 5,
+          "value": -0.07
+        },
+        {
+          "offset": 6,
+          "value": -0.34
+        }
+      ]
+    },
+    {
+      "year": 1997,
+      "mse": 0.0216,
+      "series": [
+        {
+          "offset": -5,
+          "value": -0.4
+        },
+        {
+          "offset": -4,
+          "value": -0.45
+        },
+        {
+          "offset": -3,
+          "value": -0.49
+        },
+        {
+          "offset": -2,
+          "value": -0.5
+        },
+        {
+          "offset": -1,
+          "value": -0.36
+        },
+        {
+          "offset": 0,
+          "value": -0.1
+        },
+        {
+          "offset": 1,
+          "value": 0.28
+        },
+        {
+          "offset": 2,
+          "value": 0.75
+        },
+        {
+          "offset": 3,
+          "value": 1.22
+        },
+        {
+          "offset": 4,
+          "value": 1.6
+        },
+        {
+          "offset": 5,
+          "value": 1.9
+        },
+        {
+          "offset": 6,
+          "value": 2.14
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "mse": 0.0351,
+      "series": [
+        {
+          "offset": -5,
+          "value": -0.21
+        },
+        {
+          "offset": -4,
+          "value": -0.3
+        },
+        {
+          "offset": -3,
+          "value": -0.42
+        },
+        {
+          "offset": -2,
+          "value": -0.45
+        },
+        {
+          "offset": -1,
+          "value": -0.24
+        },
+        {
+          "offset": 0,
+          "value": -0.06
+        },
+        {
+          "offset": 1,
+          "value": 0.02
+        },
+        {
+          "offset": 2,
+          "value": -0.02
+        },
+        {
+          "offset": 3,
+          "value": -0.04
+        },
+        {
+          "offset": 4,
+          "value": -0.14
+        },
+        {
+          "offset": 5,
+          "value": -0.28
+        },
+        {
+          "offset": 6,
+          "value": -0.4
+        }
+      ]
+    }
+  ],
+  "oni_history_long": [
+    {
+      "year": 2024,
+      "month": 4,
+      "label": "Apr-24",
+      "value": 0.82
+    },
+    {
+      "year": 2024,
+      "month": 5,
+      "label": "May-24",
+      "value": 0.49
+    },
+    {
+      "year": 2024,
+      "month": 6,
+      "label": "Jun-24",
+      "value": 0.22
+    },
+    {
+      "year": 2024,
+      "month": 7,
+      "label": "Jul-24",
+      "value": 0.08
+    },
+    {
+      "year": 2024,
+      "month": 8,
+      "label": "Aug-24",
+      "value": -0.07
+    },
+    {
+      "year": 2024,
+      "month": 9,
+      "label": "Sep-24",
+      "value": -0.17
+    },
+    {
+      "year": 2024,
+      "month": 10,
+      "label": "Oct-24",
+      "value": -0.21
+    },
+    {
+      "year": 2024,
+      "month": 11,
+      "label": "Nov-24",
+      "value": -0.3
+    },
+    {
+      "year": 2024,
+      "month": 12,
+      "label": "Dec-24",
+      "value": -0.42
+    },
+    {
+      "year": 2025,
+      "month": 1,
+      "label": "Jan-25",
+      "value": -0.45
+    },
+    {
+      "year": 2025,
+      "month": 2,
+      "label": "Feb-25",
+      "value": -0.24
+    },
+    {
+      "year": 2025,
+      "month": 3,
+      "label": "Mar-25",
+      "value": -0.06
+    },
+    {
+      "year": 2025,
+      "month": 4,
+      "label": "Apr-25",
+      "value": 0.02
+    },
+    {
+      "year": 2025,
+      "month": 5,
+      "label": "May-25",
+      "value": -0.02
+    },
+    {
+      "year": 2025,
+      "month": 6,
+      "label": "Jun-25",
+      "value": -0.04
+    },
+    {
+      "year": 2025,
+      "month": 7,
+      "label": "Jul-25",
+      "value": -0.14
+    },
+    {
+      "year": 2025,
+      "month": 8,
+      "label": "Aug-25",
+      "value": -0.28
+    },
+    {
+      "year": 2025,
+      "month": 9,
+      "label": "Sep-25",
+      "value": -0.4
+    },
+    {
+      "year": 2025,
+      "month": 10,
+      "label": "Oct-25",
+      "value": -0.51
+    },
+    {
+      "year": 2025,
+      "month": 11,
+      "label": "Nov-25",
+      "value": -0.55
+    },
+    {
+      "year": 2025,
+      "month": 12,
+      "label": "Dec-25",
+      "value": -0.54
+    },
+    {
+      "year": 2026,
+      "month": 1,
+      "label": "Jan-26",
+      "value": -0.37
+    },
+    {
+      "year": 2026,
+      "month": 2,
+      "label": "Feb-26",
+      "value": -0.15
+    },
+    {
+      "year": 2026,
+      "month": 3,
+      "label": "Mar-26",
+      "value": 0.11
+    }
+  ],
   "current_window": [
     {
       "offset": -5,
-      "value": -0.51,
-      "label": "Oct-25"
+      "value": -0.51
     },
     {
       "offset": -4,
-      "value": -0.55,
-      "label": "Nov-25"
+      "value": -0.55
     },
     {
       "offset": -3,
-      "value": -0.54,
-      "label": "Dec-25"
+      "value": -0.54
     },
     {
       "offset": -2,
-      "value": -0.37,
-      "label": "Jan-26"
+      "value": -0.37
     },
     {
       "offset": -1,
-      "value": -0.15,
-      "label": "Feb-26"
+      "value": -0.15
     },
     {
       "offset": 0,
-      "value": 0.11,
-      "label": "Mar-26"
+      "value": 0.11
     }
   ],
   "risk": {
@@ -466,5 +768,5 @@
       "low": 34
     }
   },
-  "last_updated": "2026-05-26"
+  "last_updated": "2026-05-27"
 }
