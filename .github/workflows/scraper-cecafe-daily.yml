@@ -71,16 +71,9 @@ jobs:
             && echo "No changes." \
             || (git commit -m "data: cecafe daily registration $(date -u +%Y-%m-%d) [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
 
-      # Data commits use [skip ci], which Vercel ignores — so ping the deploy
-      # hook once here (last daily scraper) to publish the day's fresh JSON.
-      # No-ops until the VERCEL_DEPLOY_HOOK secret is set.
-      - name: Redeploy Vercel
-        if: success()
-        run: |
-          [ -n "${{ secrets.VERCEL_DEPLOY_HOOK }}" ] \
-            && curl -s -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}" >/dev/null \
-            && echo "Vercel deploy triggered." \
-            || echo "VERCEL_DEPLOY_HOOK not set — skipping redeploy."
+      # Vercel redeploy is handled by the standalone "1.12 – Daily Publish"
+      # workflow (10:00 UTC, after this job), so a flaky Cecafe fetch no longer
+      # blocks the daily deploy.
 
       - name: Notify on failure
         if: failure()

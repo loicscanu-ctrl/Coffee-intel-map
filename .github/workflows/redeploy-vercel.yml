@@ -1,0 +1,43 @@
+name: "1.12 – Daily Publish (Vercel redeploy)"
+
+# Triggers a Vercel production deploy of the current main.
+#
+# WHY standalone: daily data commits use [skip ci], which Vercel's git
+# integration ignores — so fresh JSON never deploys on its own. This pings the
+# Vercel Deploy Hook to force a rebuild. It used to live on the last daily
+# scraper (1.7 Cecafe), but that scraper is flaky (Cecafe intermittently times
+# out CI IPs), which made deploys hostage to the least-reliable source. Decoupled
+# here so the site publishes every day regardless of any single scraper.
+#
+# Schedule: 10:00 UTC — after the last daily data job (1.7 Cecafe, 09:00, plus
+# its ~25-min retry budget), so this deploy captures the full day's committed
+# data. workflow_dispatch gives a manual "deploy now" button in the Actions tab.
+#
+# No-op until the VERCEL_DEPLOY_HOOK repo secret is set.
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-redeploy
+  cancel-in-progress: false
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Vercel deploy hook
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "VERCEL_DEPLOY_HOOK not set — nothing to do."
+            exit 0
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}")
+          echo "Vercel deploy hook responded HTTP $code"
+          case "$code" in
+            2*) echo "Deploy triggered." ;;
+            *)  echo "::error::Vercel deploy hook returned HTTP $code"; exit 1 ;;
+          esac
