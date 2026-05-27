@@ -585,7 +585,16 @@ def _scrape_enso_forecast(db) -> None:
         forecast = parse_iri_probability_table(resp.text)
 
         if not forecast:
-            print("[farmer_economics] ENSO forecast: probability table not found")
+            # Distinguish "page has no parseable table" (image/JS-rendered, or
+            # layout changed) from a fetch problem. raise_for_status already
+            # turns a 403/blocked response into the except branch below, so
+            # reaching here means we got HTML but found no probability table.
+            html = resp.text or ""
+            n_tables = html.lower().count("<table")
+            has_lanina = ("la nina" in html.lower()) or ("la ni\xf1a" in html.lower())
+            print(f"[farmer_economics] ENSO forecast: probability table not found "
+                  f"(HTTP {resp.status_code}, {len(html):,} chars, {n_tables} <table> "
+                  f"tags, La-Nina-text={has_lanina}) — IRI likely image/JS-rendered.")
             return
 
         # Append to existing ONI NewsItem meta
