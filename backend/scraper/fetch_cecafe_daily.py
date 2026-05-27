@@ -68,7 +68,7 @@ def _fetch_page() -> str:
         ("Accept-Encoding", "gzip, deflate"),
         ("Connection", "keep-alive"),
     ]
-    resp = opener.open(DAILY_URL, timeout=20)
+    resp = opener.open(DAILY_URL, timeout=45)
     raw = resp.read()
     try:
         return gzip.decompress(raw).decode("utf-8", errors="ignore")

@@ -13,7 +13,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 4 fetch attempts with 5-min gaps + a 45s socket timeout each can take
+    # ~16 min when Cecafe is flaky; keep the job cap comfortably above that so
+    # the retries actually run (the old 10-min cap killed the job mid-retry).
+    timeout-minutes: 25
     permissions:
       contents: write
 
@@ -29,12 +32,12 @@ jobs:
       - name: Install dependencies
         run: pip install pdfplumber
 
-      - name: Run Cecafe scraper (3 attempts)
+      - name: Run Cecafe scraper (4 attempts)
         working-directory: backend
         run: |
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4; do
             python -m scraper.fetch_cecafe_daily && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+            [ $attempt -lt 4 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
       - name: Upload fetched page (diagnostics)
