@@ -1,6 +1,6 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-26",
+  "updated": "2026-05-27",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Colombia",
@@ -208,9 +208,9 @@
           "essm": 0.306
         }
       ],
-      "spi_1": -4.75,
+      "spi_1": -1.4,
       "spi_3": -4.75,
-      "spi_month": "2026-04"
+      "spi_month": "2026-02"
     },
     {
       "name": "Antioquia",
@@ -292,7 +292,7 @@
         144.8,
         0.0,
         0.0,
-        47.9
+        50.9
       ],
       "monthly_avg_temp": [
         22.4,
@@ -355,16 +355,16 @@
         19.9,
         20.3,
         20.7,
-        22.3
+        22.4
       ],
       "forecast_7d_rain": [
-        0.5,
-        11.8,
-        9.9,
-        15.5,
-        1.6,
-        0.6,
-        0.6
+        4.3,
+        17.7,
+        8.7,
+        6.2,
+        6.0,
+        14.2,
+        4.4
       ],
       "daily_accum_cur": [
         0.0,
@@ -392,18 +392,18 @@
         37.4,
         40.4,
         46.3,
-        47.9,
-        null,
+        47.7,
+        50.9,
         null,
         null,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "spi_1": -4.75,
+      "spi_1": -0.08,
       "spi_3": -4.75,
-      "spi_month": "2026-04",
-      "essm_fraction": 0.188,
+      "spi_month": "2026-02",
+      "essm_fraction": 0.182,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -412,6 +412,10 @@
         {
           "date": "2026-05-26",
           "essm": 0.188
+        },
+        {
+          "date": "2026-05-27",
+          "essm": 0.182
         }
       ]
     },
@@ -495,7 +499,7 @@
         99.3,
         0.0,
         0.0,
-        45.6
+        46.4
       ],
       "monthly_avg_temp": [
         19.4,
@@ -558,16 +562,16 @@
         17.4,
         18.0,
         18.1,
-        18.8
+        18.9
       ],
       "forecast_7d_rain": [
-        1.4,
-        10.8,
-        11.7,
-        16.3,
-        6.9,
-        15.6,
-        12.4
+        5.7,
+        15.0,
+        15.1,
+        8.2,
+        18.0,
+        11.4,
+        14.4
       ],
       "daily_accum_cur": [
         0.0,
@@ -595,15 +599,15 @@
         41.0,
         42.9,
         43.9,
-        45.6,
-        null,
+        45.2,
+        46.4,
         null,
         null,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.252,
+      "essm_fraction": 0.244,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -611,12 +615,16 @@
         },
         {
           "date": "2026-05-26",
-          "essm": 0.252
+          "essm": 0.256
+        },
+        {
+          "date": "2026-05-27",
+          "essm": 0.244
         }
       ],
-      "spi_1": -4.75,
+      "spi_1": -2.15,
       "spi_3": -4.35,
-      "spi_month": "2026-04"
+      "spi_month": "2026-02"
     },
     {
       "name": "Caldas",
@@ -698,7 +706,7 @@
         286.2,
         0.0,
         0.0,
-        305.4
+        327.8
       ],
       "monthly_avg_temp": [
         18.4,
@@ -764,13 +772,13 @@
         16.0
       ],
       "forecast_7d_rain": [
-        26.1,
-        20.4,
-        27.2,
-        21.4,
-        19.4,
-        9.0,
-        24.8
+        10.7,
+        32.8,
+        29.8,
+        17.7,
+        6.9,
+        5.6,
+        14.4
       ],
       "daily_accum_cur": [
         0.0,
@@ -798,15 +806,15 @@
         230.3,
         268.9,
         284.1,
-        305.4,
-        null,
+        306.6,
+        327.8,
         null,
         null,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.321,
+      "essm_fraction": 0.306,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -814,12 +822,16 @@
         },
         {
           "date": "2026-05-26",
-          "essm": 0.321
+          "essm": 0.32
+        },
+        {
+          "date": "2026-05-27",
+          "essm": 0.306
         }
       ],
-      "spi_1": -4.75,
+      "spi_1": -1.25,
       "spi_3": -3.43,
-      "spi_month": "2026-04"
+      "spi_month": "2026-02"
     },
     {
       "name": "Nariño",
@@ -901,7 +913,7 @@
         335.8,
         0.0,
         0.0,
-        87.3
+        86.6
       ],
       "monthly_avg_temp": [
         14.3,
@@ -964,16 +976,16 @@
         13.0,
         13.9,
         13.7,
-        15.1
+        15.2
       ],
       "forecast_7d_rain": [
-        0.0,
-        7.9,
-        16.3,
-        20.1,
-        14.7,
-        7.2,
-        10.2
+        16.9,
+        19.2,
+        11.5,
+        10.5,
+        10.8,
+        9.4,
+        3.0
       ],
       "daily_accum_cur": [
         0.0,
@@ -1001,15 +1013,15 @@
         82.8,
         82.8,
         85.1,
-        87.3,
-        null,
+        85.4,
+        86.6,
         null,
         null,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.227,
+      "essm_fraction": 0.222,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -1018,6 +1030,10 @@
         {
           "date": "2026-05-26",
           "essm": 0.227
+        },
+        {
+          "date": "2026-05-27",
+          "essm": 0.222
         }
       ]
     }
