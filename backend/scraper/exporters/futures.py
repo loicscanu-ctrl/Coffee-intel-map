@@ -186,10 +186,13 @@ def export_oi_fnd_chart(db) -> None:
         #    Archive stores robusta as RC; this chart's pipeline (and frontend
         #    STATIC_SERIES) uses RM, so convert RC→RM here for merge consistency.
         archive_market = contract_archive.get(mkt_key, {})
-        # Only the last ~120 calendar days can contain a -45..0 trading-day
-        # point for a still-current contract, so skip the rest of the 5-year
-        # archive up front (avoids a full ~2,700-date scan every export).
-        archive_cutoff = (today - timedelta(days=120)).isoformat()
+        # Bound the 5-year archive scan, but keep enough history that a
+        # recently-expired contract still gets its FULL -45..0 window. 45
+        # trading days ≈ 63 calendar days, so a contract whose FND was up to
+        # ~4 months ago still has its day -45 within ~200 days. The old 120-day
+        # bound silently truncated those early points (e.g. KCH26 started at
+        # -17 instead of -45) even though the archive holds them.
+        archive_cutoff = (today - timedelta(days=200)).isoformat()
         for snap_date_str, contracts in archive_market.items():
             if snap_date_str < archive_cutoff:
                 continue

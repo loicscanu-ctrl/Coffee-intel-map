@@ -162,7 +162,10 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
                 stroke={isNext ? NEXT_CONTRACT_COLOR : COLORS[i % COLORS.length]}
                 strokeWidth={isNext ? 2.5 : 1.5}
                 dot={false}
-                connectNulls={false}
+                // Bridge exchange-holiday gaps: trading_days_to counts Mon–Fri
+                // but not ICE holidays, so a holiday leaves a 1-day hole at a
+                // per-contract index. connectNulls keeps each line continuous.
+                connectNulls={true}
               />
             );
           })}
