@@ -64,6 +64,13 @@ def _exporters(db):
         except Exception as e:  # noqa: BLE001
             print(f"  countries.json → skipped ({e})")
 
+    def _enso_intel():
+        try:
+            from scraper.build_enso_intel import export_enso_intel
+            export_enso_intel()
+        except Exception as e:  # noqa: BLE001
+            print(f"  enso.json → skipped ({e})")
+
     return [
         ("futures_chain",         lambda: export_futures_chain(db)),
         ("oi_fnd_chart",          lambda: export_oi_fnd_chart(db)),
@@ -87,6 +94,7 @@ def _exporters(db):
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
         ("news",                  _news),
         ("country_pins",          _country_pins),
+        ("enso",                  _enso_intel),
         ("health",                lambda: export_health(db)),
     ]
 
