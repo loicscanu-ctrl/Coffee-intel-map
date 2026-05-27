@@ -228,13 +228,13 @@ function FrostRiskMethodology() {
   );
 }
 
-// Newspaper-style article card — serif headline over a double rule, justified
+// Newspaper-style article card — bold headline over a double rule, justified
 // body. Used for the side-by-side contract-rule columns.
 function Article({ kicker, title, dateline, children }: {
   kicker?: string; title: string; dateline?: string; children: React.ReactNode;
 }) {
   return (
-    <article className="bg-slate-900 border border-slate-700 rounded-xl p-5 font-serif">
+    <article className="bg-slate-900 border border-slate-700 rounded-xl p-5">
       {kicker && (
         <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
       )}
