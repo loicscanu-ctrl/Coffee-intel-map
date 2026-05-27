@@ -8,6 +8,7 @@ import FertilizerPanel     from "./FertilizerPanel";
 import ManualIntelPanel    from "../ManualIntelPanel";
 import BalanceSheetPanel   from "./BalanceSheetPanel";
 import FarmerSellingPanel  from "./FarmerSellingPanel";
+import WeatherRiskPanel    from "./WeatherRiskPanel";
 
 export default function BrazilFarmerEconomics() {
   const [data, setData] = useState<FarmerEconomicsData | null>(null);
@@ -71,6 +72,9 @@ export default function BrazilFarmerEconomics() {
           <ManualIntelPanel />
         </div>
       </div>
+
+      {/* ── Weather Risk: frost + drought monitor (full width) ──── */}
+      {data.weather && <WeatherRiskPanel weather={data.weather} />}
     </div>
   );
 }
