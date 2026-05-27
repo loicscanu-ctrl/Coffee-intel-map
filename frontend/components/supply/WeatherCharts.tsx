@@ -27,6 +27,8 @@ interface Province {
   forecast_7d_rain: number[];
   daily_accum_cur?: (number | null)[];   // per-day cumulative rain, current month
   daily_accum_ly?: (number | null)[];    // per-day cumulative rain, last year same month
+  essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
+  essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
 }
 
 interface DailyRow {
@@ -438,6 +440,31 @@ function ProductionAtRisk({ month, regions }: { month: string; regions: RiskRegi
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
+// ── Surface soil moisture (ESSM) ───────────────────────────────────────────────
+interface SoilRow { label: string; essm: number }
+
+function SoilMoistureChart({ data }: { data: SoilRow[] }) {
+  if (!data.length) return null;
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
+      <div className="text-xs font-semibold text-slate-300 mb-0.5">Surface Soil Moisture (last {data.length} days)</div>
+      <div className="text-[9px] text-slate-500 mb-2">
+        Prod-weighted daily ESSM · 0–1 volumetric fraction (0–81 cm) · dashed line = dry threshold
+      </div>
+      <ResponsiveContainer width="100%" height={200}>
+        <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 9 }} interval="preserveStartEnd" />
+          <YAxis domain={[0, "auto"]} tick={{ fill: "#94a3b8", fontSize: 9 }} width={34} tickFormatter={(v) => Number(v).toFixed(2)} />
+          <Tooltip contentStyle={TT} formatter={(v) => [Number(v).toFixed(3), "ESSM"]} />
+          <ReferenceLine y={0.15} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.5} />
+          <Area type="monotone" dataKey="essm" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.22} strokeWidth={2} dot={false} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export default function WeatherCharts({
   dataUrl,
   title,
@@ -482,6 +509,22 @@ export default function WeatherCharts({
     if (!data || !selected) return [];
     return data.provinces.filter((p) => selected.has(p.name));
   }, [data, selected]);
+
+  // Prod-weighted daily surface soil moisture (ESSM) across selected regions.
+  const soilData = useMemo<SoilRow[]>(() => {
+    const sum = new Map<string, number>();    // date → Σ(essm·prod)
+    const wgt = new Map<string, number>();     // date → Σ(prod) present that date
+    for (const p of activeProv) {
+      for (const r of p.essm_recent ?? []) {
+        if (r?.essm == null) continue;
+        sum.set(r.date, (sum.get(r.date) ?? 0) + r.essm * p.prod_mt_k);
+        wgt.set(r.date, (wgt.get(r.date) ?? 0) + p.prod_mt_k);
+      }
+    }
+    return Array.from(sum.keys())
+      .sort()
+      .map((date) => ({ label: date.slice(5), essm: sum.get(date)! / (wgt.get(date) || 1) }));
+  }, [activeProv]);
 
   const totalProd = useMemo(
     () => activeProv.reduce((s, p) => s + p.prod_mt_k, 0),
@@ -785,6 +828,7 @@ export default function WeatherCharts({
         <MeanTempChart data={tempData} curYear={data.cur_year} lastYear={data.last_year} domain={tempDomain} />
         <MonthlyRainChart data={monthlyRainData} curYear={data.cur_year} lastYear={data.last_year} />
         <CumulativeRainChart data={cumulativeData} curYear={data.cur_year} lastYear={data.last_year} />
+        <SoilMoistureChart data={soilData} />
       </div>
 
       {/* Full-width forecast */}
