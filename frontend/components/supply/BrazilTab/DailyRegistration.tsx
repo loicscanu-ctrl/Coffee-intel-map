@@ -131,6 +131,7 @@ function DailyRegChart({
 
 export default function DailyRegistrationSection() {
   const [data, setData] = useState<DailyData | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/data/cecafe_daily.json")
@@ -141,24 +142,70 @@ export default function DailyRegistrationSection() {
 
   if (!data) return null;
 
-  const currentMonth = data.updated.slice(0, 7);
   // Only render if we have actual daily data for at least one month
   const hasData = Object.keys(data.arabica).length > 0 || Object.keys(data.conillon).length > 0;
   if (!hasData) return null;
 
+  // Months with daily data, newest-first; the latest is the live one.
+  const availableMonths = Array.from(
+    new Set([...Object.keys(data.arabica), ...Object.keys(data.conillon)]),
+  ).sort().reverse();
+  const latestMonth = data.updated.slice(0, 7);
+  const currentMonth =
+    selectedMonth && availableMonths.includes(selectedMonth)
+      ? selectedMonth
+      : (availableMonths[0] ?? latestMonth);
+
+  const idx = availableMonths.indexOf(currentMonth);
+  const hasOlder = idx < availableMonths.length - 1;
+  const hasNewer = idx > 0;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <DailyRegChart
-        title="Brazil — Arabica Export Registration (Daily, Bags)"
-        monthsData={data.arabica}
-        currentMonth={currentMonth}
-      />
-      <DailyRegChart
-        title="Brazil — Conilon Export Registration (Daily, Bags)"
-        monthsData={data.conillon}
-        currentMonth={currentMonth}
-        soluvelData={data.soluvel}
-      />
+    <div className="space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="text-sm font-semibold text-slate-200">Brazil — Daily Export Registration</div>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedMonth(availableMonths[idx + 1])}
+            disabled={!hasOlder}
+            aria-label="Previous month"
+            className="px-2 py-1 rounded border border-slate-700 text-slate-300 text-xs leading-none disabled:opacity-30 enabled:hover:bg-slate-800"
+          >‹</button>
+          <select
+            value={currentMonth}
+            onChange={e => setSelectedMonth(e.target.value)}
+            aria-label="Select month"
+            className="bg-slate-800 border border-slate-700 rounded text-slate-200 text-xs px-2 py-1"
+          >
+            {availableMonths.map(ym => (
+              <option key={ym} value={ym}>
+                {shortMonthLabel(ym)}{ym === latestMonth ? " (latest)" : ""}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setSelectedMonth(availableMonths[idx - 1])}
+            disabled={!hasNewer}
+            aria-label="Next month"
+            className="px-2 py-1 rounded border border-slate-700 text-slate-300 text-xs leading-none disabled:opacity-30 enabled:hover:bg-slate-800"
+          >›</button>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <DailyRegChart
+          title="Arabica Export Registration (Daily, Bags)"
+          monthsData={data.arabica}
+          currentMonth={currentMonth}
+        />
+        <DailyRegChart
+          title="Conilon Export Registration (Daily, Bags)"
+          monthsData={data.conillon}
+          currentMonth={currentMonth}
+          soluvelData={data.soluvel}
+        />
+      </div>
     </div>
   );
 }
