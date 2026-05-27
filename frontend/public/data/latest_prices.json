@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-27T06:46:51.645387Z",
+  "generated_at": "2026-05-27T10:42:22.964434Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "274.00 (+1.65)",
+      "value": "276.30 (+2.30)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,519 (+63)",
+      "value": "3,511 (-8)",
       "category": "futures"
     },
     {
