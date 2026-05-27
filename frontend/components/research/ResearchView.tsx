@@ -3,11 +3,12 @@ import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 
-type Cat = "cot" | "weather" | "contracts";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts";
 const CATS: { id: Cat; label: string }[] = [
-  { id: "cot",       label: "COT & positioning" },
-  { id: "weather",   label: "Weather" },
-  { id: "contracts", label: "Contract rules" },
+  { id: "cot",        label: "COT & positioning" },
+  { id: "weather",    label: "Weather" },
+  { id: "fertilizer", label: "Fertilizer" },
+  { id: "contracts",  label: "Contract rules" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -334,6 +335,78 @@ function ContractRules() {
   );
 }
 
+function FertilizerMethodology() {
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+      <H>Why fertilizer is a coffee signal</H>
+      <P>
+        Fertilizer is the largest cash input on a coffee farm and the one that swings most violently with the global
+        energy and macro cycle. It matters on two clocks. <strong>Short term</strong> it is a cost-push lever: when urea
+        or potash spike, the farm-gate break-even rises and marginal growers come under margin pressure.{" "}
+        <strong>Medium term</strong> it is a yield lever &mdash; when fertilizer turns expensive relative to the coffee
+        price, growers cut application rates, and coffee, a perennial, pays that back as weaker bean fill and lighter
+        crops one to two seasons <em>later</em>. The fertilizer page is therefore a leading read on future supply, not
+        just a current cost line.
+      </P>
+
+      <H>The three nutrients we track</H>
+      <ul className="space-y-1">
+        <LI><strong>Nitrogen &mdash; Urea (N).</strong> Drives vegetative growth and is the single biggest nutrient
+          demand for coffee; its price is tied to natural gas, so it moves with the energy complex.</LI>
+        <LI><strong>Phosphate &mdash; MAP/DAP (P).</strong> Root and cherry development; priced off ammonia, sulphur and
+          phosphate rock.</LI>
+        <LI><strong>Potassium &mdash; KCl / potash (K).</strong> Coffee is a notably heavy potassium feeder &mdash; K
+          governs bean filling in the cherry-development window. Potash supply is concentrated in a handful of producers
+          (Canada, Russia, Belarus), so it carries supply-shock and sanction risk.</LI>
+      </ul>
+
+      <H>Data sources</H>
+      <ul className="space-y-1">
+        <LI><strong>Benchmark prices</strong> &mdash; the World Bank <em>Commodity Markets &ldquo;Pink Sheet&rdquo;</em>{" "}
+          monthly series for Urea, DAP and KCl (<Code>urea_monthly</Code>, <Code>dap_monthly</Code>,{" "}
+          <Code>kcl_monthly</Code> plus full history). The source Excel&rsquo;s document ID rotates on every update, so
+          the scraper discovers the current URL dynamically rather than hard-coding it.</LI>
+        <LI><strong>Import volumes &amp; origins</strong> &mdash; Comex-Stat (Brazil) and Vietnam customs data for monthly
+          fertilizer imports and the country-of-origin mix, surfacing import dependence and origin concentration.</LI>
+        <LI><strong>Application calendar</strong> &mdash; the agronomic window that flags when the next major fertilizer
+          pass falls in the crop cycle, so a price spike can be read against whether buying is imminent or months off.</LI>
+      </ul>
+
+      <H>How it transmits to the crop</H>
+      <P>
+        Brazil and Vietnam &mdash; the two largest origins &mdash; import the large majority of their fertilizer, so the
+        delivered cost is the World Bank benchmark <em>plus</em> ocean freight <em>plus</em> the local-currency move
+        (BRL, VND). The farm-gate input cost is thus a three-way function of nutrient price, freight and FX &mdash; which
+        is why a flat dollar urea price can still squeeze a Brazilian grower if the real weakens.
+      </P>
+      <P>
+        The reference shock is <strong>2021&ndash;22</strong>: natural-gas prices drove urea up while the Russia/Belarus
+        disruption tightened potash, lifting all three nutrients to multi-year highs. Growers responded by trimming
+        application &mdash; the kind of move that surfaces in yields with a lag, which is why the panel pairs current
+        prices with the longer history.
+      </P>
+
+      <H>Where it shows up in the app</H>
+      <ul className="space-y-1">
+        <LI><strong>Macro tab</strong> &mdash; the fertilizer-inputs panel plots the World Bank price history for the
+          three nutrients.</LI>
+        <LI><strong>Supply &rarr; Farmer Economics</strong> &mdash; current nutrient prices, the Brazil/Vietnam import
+          mix and the application calendar, feeding the production-cost / break-even view.</LI>
+      </ul>
+
+      <H>Caveats</H>
+      <ul className="space-y-1">
+        <LI>The Pink Sheet is a <strong>global benchmark</strong>, not a farm-gate price: real delivered cost adds
+          freight, FX, blending and retail margin, and varies by region.</LI>
+        <LI>The price&rarr;yield link is <strong>real but lagged and noisy</strong> &mdash; weather usually dominates any
+          single season, so read fertilizer as slow background pressure, not a timing signal.</LI>
+        <LI>Benchmark prices are <strong>monthly</strong> and import data lags by weeks; treat the read as a trend, not a
+          daily mark.</LI>
+      </ul>
+    </div>
+  );
+}
+
 export default function ResearchView() {
   const [cat, setCat] = useState<Cat>("cot");
   return (
@@ -356,6 +429,7 @@ export default function ResearchView() {
         </div>
       )}
       {cat === "weather" && <FrostRiskMethodology />}
+      {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
     </>
   );
