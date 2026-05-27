@@ -1,5 +1,0 @@
-Touch this file to trigger an APPLY of relabel-frontmonth.yml (workflow 0.2).
-Rewrites price_contract_{ny,ldn} to FND-based front-month, re-exports JSON,
-commits. Rollback via cot_weekly_price_archive.
-
-Last triggered: 2026-05-19T23:55Z — claude (relabel to fix Stooq max-OI/price misalignment, validated against user's manual exchange verification)

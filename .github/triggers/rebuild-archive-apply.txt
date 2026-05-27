@@ -1,2 +1,0 @@
-Touch to APPLY workflow 0.4 (rebuild cot prices from archive → DB + re-export). Rollback via cot_weekly_price_archive.
-Last: 2026-05-20T13:25Z claude (apply true max-OI rebuild, user confirmed dry-run looked right)

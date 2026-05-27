@@ -1,4 +1,4 @@
-name: "0.4 – Build ONI history seed (NOAA CPC 1980→present)"
+name: "0.6 – Monthly — Build ONI history seed (NOAA CPC 1980→present)"
 
 # Builds backend/seed/oni_history_full.json — the long ONI record the ENSO
 # historical-analog engine needs (enso_analogs.find_analogs). The live

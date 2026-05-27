@@ -1,4 +1,0 @@
-Touch this file to trigger a DRY-RUN of relabel-frontmonth.yml (workflow 0.2).
-No DB writes; Telegram summary + Actions log only.
-
-Last triggered: never
