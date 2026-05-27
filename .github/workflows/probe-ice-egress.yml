@@ -8,6 +8,11 @@ name: "Z – Probe: ICE certified-stocks egress (diagnostic)"
 
 on:
   workflow_dispatch:
+    inputs:
+      data_url:
+        description: "Optional: a candidate ICE data/API URL (from the DevTools Network tab) to fetch + preview"
+        required: false
+        default: ""
 
 jobs:
   probe:
@@ -24,6 +29,8 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Probe ICE certified-stock endpoints
+        env:
+          ICE_DATA_URL: ${{ inputs.data_url }}
         run: python backend/scraper/probe_ice_stocks.py
 
       - name: Upload fetched sample bodies (diagnostics)

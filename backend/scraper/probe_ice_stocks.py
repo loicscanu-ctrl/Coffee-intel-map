@@ -20,6 +20,8 @@ Always exits 0 — a red run would hide the logs we want.
 """
 from __future__ import annotations
 
+import json as _json
+import os
 import sys
 from pathlib import Path
 
@@ -115,6 +117,64 @@ def _preview_html(name: str, html: str) -> None:
                 break
 
 
+def _preview_data(name: str, r: requests.Response) -> None:
+    """Content-aware preview of a candidate DATA endpoint (JSON / CSV / HTML / PDF)."""
+    ctype = r.headers.get("Content-Type", "")
+    raw = r.content or b""
+    text = r.text or ""
+    low = ctype.lower()
+    print(f"  ── data preview: {name} (HTTP {r.status_code}, {len(raw):,} B, {ctype}) ──")
+    DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+
+    stripped = text.lstrip()
+    if "json" in low or stripped[:1] in "{[":
+        try:
+            obj = r.json()
+            (DEBUG_DIR / f"{name}.json").write_bytes(raw)
+            if isinstance(obj, dict):
+                print(f"    JSON object — keys: {list(obj.keys())[:25]}")
+            elif isinstance(obj, list):
+                print(f"    JSON array — len={len(obj)}; first: {_json.dumps(obj[0])[:400] if obj else '∅'}")
+            print(f"    head: {_json.dumps(obj)[:1800]}")
+            return
+        except Exception:  # noqa: BLE001
+            pass
+    if "csv" in low or "text/plain" in low or ("," in stripped[:200] and "<html" not in stripped[:200].lower()):
+        (DEBUG_DIR / f"{name}.csv").write_bytes(raw)
+        lines = [ln for ln in text.splitlines() if ln.strip()][:25]
+        print("    first non-empty lines:")
+        for ln in lines:
+            print(f"      {ln[:200]}")
+        return
+    if raw[:4] == b"%PDF" or "pdf" in low:
+        (DEBUG_DIR / f"{name}.pdf").write_bytes(raw)
+        print("    PDF (saved) — would parse with pdfplumber.")
+        return
+    _preview_html(name, text)
+
+
+def _probe_extra_url(url: str) -> None:
+    """Test a user-supplied candidate data URL (captured from the DevTools Network tab),
+    mimicking the page's XHR (browser UA + XHR header + Referer)."""
+    print(f"\n=== USER-SUPPLIED DATA URL ===\n• {url}")
+    headers = {
+        **BROWSER_HEADERS,
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept": "application/json, text/csv, text/plain, */*",
+        "Referer": "https://www.theice.com/marketdata/reports/coffee/CertifiedStocks.shtml",
+    }
+    try:
+        r = requests.get(url, headers=headers, timeout=25, allow_redirects=True)
+        print(f"    HTTP {r.status_code} | {len(r.content or b''):,} B | {r.headers.get('Content-Type','')}")
+        if r.status_code == 200 and r.content:
+            _preview_data("user_data_url", r)
+        else:
+            head = (r.content or b"")[:500].decode("utf-8", "ignore")
+            print(f"    non-200 / empty. body head: {head[:300]!r}")
+    except requests.exceptions.RequestException as e:
+        print(f"    ERROR: {type(e).__name__}: {str(e)[:120]}")
+
+
 def _attempt(name: str, url: str, headers: dict, tag: str) -> tuple[int | None, str, str]:
     label = f"{name} [{tag}]"
     try:
@@ -143,7 +203,12 @@ def main() -> None:
         if status == 200 and "HTML" in verdict and html:
             _preview_html(name, html)
         print()
-    print("=== done — saved bodies in", DEBUG_DIR, "(artifact `ice-probe`) ===")
+
+    extra = (os.environ.get("ICE_DATA_URL") or "").strip()
+    if extra:
+        _probe_extra_url(extra)
+
+    print("\n=== done — saved bodies in", DEBUG_DIR, "(artifact `ice-probe`) ===")
     sys.exit(0)
 
 
