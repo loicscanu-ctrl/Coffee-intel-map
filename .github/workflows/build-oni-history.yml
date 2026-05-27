@@ -1,0 +1,77 @@
+name: "0.4 – Build ONI history seed (NOAA CPC 1980→present)"
+
+# Builds backend/seed/oni_history_full.json — the long ONI record the ENSO
+# historical-analog engine needs (enso_analogs.find_analogs). The live
+# farmer-economics scraper keeps only 18 months; this keeps the full series.
+#
+# WHY a workflow: NOAA CPC (www.cpc.ncep.noaa.gov) is NOT on the Claude Code
+# sandbox egress allowlist (403), but GitHub runners have open egress — so the
+# fetch runs here. NOAA refreshes ONI ~monthly, so this runs on a monthly cron
+# (plus manual dispatch). Until the seed exists, analogs are simply omitted
+# (graceful) — the rest of the ENSO tab still renders.
+
+on:
+  schedule:
+    - cron: '0 6 10 * *'   # 10th of each month, 06:00 UTC (after NOAA's monthly update)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry-run only (preview, no commit). Default false = apply."
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-oni-history:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests numpy
+
+      - name: Build ONI history — DRY RUN (preview only)
+        if: ${{ inputs.dry_run }}
+        run: python backend/scripts/build_oni_history.py
+
+      - name: Build ONI history — APPLY
+        if: ${{ !inputs.dry_run }}
+        run: python backend/scripts/build_oni_history.py --write
+
+      - name: Commit seed to main
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp backend/seed/oni_history_full.json "$RUNNER_TEMP/oni.json"
+          git checkout -- backend/seed/oni_history_full.json 2>/dev/null || true
+          git fetch origin main
+          git checkout -B main origin/main
+          cp "$RUNNER_TEMP/oni.json" backend/seed/oni_history_full.json
+          git add backend/seed/oni_history_full.json
+          if git diff --cached --quiet; then
+            echo "No change to oni_history_full.json — seed already current."
+            exit 0
+          fi
+          git commit -m "data: build ONI history seed (NOAA CPC 1980→present) [skip ci]"
+          git pull --rebase --autostash origin main
+          git push origin main
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed (NOAA CPC likely unreachable) — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

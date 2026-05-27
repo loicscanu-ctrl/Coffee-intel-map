@@ -185,3 +185,50 @@ def test_parse_oni_text_month_labels():
     # NDJ 2025 → month=12, year=2025 → "Dec-25"
     ndj_row = next(r for r in result if r["month"] == "Dec-25")
     assert ndj_row is not None
+
+
+_IRI_FIXTURE = """
+<html><body>
+<table>
+  <tr><th>Season</th><th>La Nina</th><th>Neutral</th><th>El Nino</th></tr>
+  <tr><td>MAM</td><td>0</td><td>91%</td><td>9</td></tr>
+  <tr><td>AMJ</td><td>0</td><td>53</td><td>47</td></tr>
+  <tr><td>MJJ</td><td>5</td><td>40</td><td>55</td></tr>
+</table>
+</body></html>
+"""
+
+_IRI_FIXTURE_NO_HEADER = """
+<html><body>
+<table>
+  <tr><td>3-month period</td><td>La Ni&ntilde;a</td><td>Neutral</td><td>El Ni&ntilde;o</td></tr>
+  <tr><td>JAS</td><td>10</td><td>60</td><td>30</td></tr>
+  <tr><td>foo</td><td>x</td><td>y</td><td>z</td></tr>
+</table>
+</body></html>
+"""
+
+
+def test_parse_iri_probability_table_header_mapped():
+    pytest.importorskip("bs4")
+    fe = _import_fe()
+    rows = fe.parse_iri_probability_table(_IRI_FIXTURE)
+    assert len(rows) == 3
+    assert rows[0] == {"season": "MAM", "la_nina": 0, "neutral": 91, "el_nino": 9}
+    assert rows[1]["el_nino"] == 47
+    # probabilities should sum to ~100 per season
+    for r in rows:
+        assert 95 <= r["la_nina"] + r["neutral"] + r["el_nino"] <= 105
+
+
+def test_parse_iri_probability_table_skips_non_season_rows():
+    pytest.importorskip("bs4")
+    fe = _import_fe()
+    rows = fe.parse_iri_probability_table(_IRI_FIXTURE_NO_HEADER)
+    assert [r["season"] for r in rows] == ["JAS"]
+
+
+def test_parse_iri_probability_table_empty_when_no_table():
+    pytest.importorskip("bs4")
+    fe = _import_fe()
+    assert fe.parse_iri_probability_table("<html><body>no tables</body></html>") == []

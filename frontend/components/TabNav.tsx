@@ -11,6 +11,7 @@ const TABS = [
   { href: "/macro", label: "Macro" },
   { href: "/map", label: "News & Intel" },
   { href: "/data-map", label: "Data Map" },
+  { href: "/enso", label: "ENSO" },
   { href: "/research", label: "Research" },
 ];
 
