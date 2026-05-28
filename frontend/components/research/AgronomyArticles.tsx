@@ -56,16 +56,77 @@ function AgronomyCard({ kicker, title, briefing, children }: {
 
 // ── Article 1: Rain / Supply Shock ────────────────────────────────────────────
 
-function CropCycleTimeline() {
+function RainfedCycleTimeline() {
   const mx = (m: number) => m * 50;
   const BAR_Y = 8, BAR_H = 26;
   return (
     <div>
       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
-        Robusta seasonal cycle · Central Highlands Vietnam
+        Rainfed farms · No irrigation (blossoming delayed to May)
       </p>
-      <svg viewBox="0 0 600 105" className="w-full rounded overflow-hidden">
-        <rect width="600" height="105" fill="#0f172a" />
+      <svg viewBox="0 0 600 100" className="w-full rounded overflow-hidden">
+        <rect width="600" height="100" fill="#0f172a" />
+        {/* Dry / Dormancy: Jan–Apr (4 months) */}
+        <rect x={mx(0)} y={BAR_Y} width={200} height={BAR_H} fill="#1e3a5f" rx={2} />
+        {/* Blossoming: May–Jun */}
+        <rect x={mx(4)} y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
+        {/* Fruit Development: Jul–Dec */}
+        <rect x={mx(6)} y={BAR_Y} width={300} height={BAR_H} fill="#14532d" rx={2} />
+        {/* Rain trigger marker */}
+        <line x1={mx(4)} y1={BAR_Y - 2} x2={mx(4)} y2={BAR_Y + BAR_H + 4}
+          stroke="#38bdf8" strokeWidth={1.5} />
+        <circle cx={mx(4)} cy={BAR_Y - 4} r={3} fill="#38bdf8" />
+        {/* Harvest wraps to next year — arrow + label at right edge */}
+        <line x1={570} y1={BAR_Y + BAR_H / 2} x2={595} y2={BAR_Y + BAR_H / 2}
+          stroke="#fde68a" strokeWidth={1.5} markerEnd="url(#arr)" />
+        <defs>
+          <marker id="arr" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+            <path d="M0,0 L5,2.5 L0,5 Z" fill="#fde68a" />
+          </marker>
+        </defs>
+        {/* Month labels */}
+        {["J","F","M","A","M","J","J","A","S","O","N","D"].map((lbl, i) => (
+          <text key={i} x={mx(i) + 25} y={50} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
+        ))}
+        {/* Band labels */}
+        <text x={100}      y={24} textAnchor="middle" fontSize={7}   fill="#bfdbfe" fontWeight="600">Dry / Dormancy</text>
+        <text x={mx(4)+50} y={18} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Blossoming</text>
+        <text x={mx(9)}    y={24} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Fruit Development</text>
+        {/* Below-axis */}
+        <text x={mx(4)} y={63} textAnchor="middle" fontSize={7.5} fill="#38bdf8">☔ Rain</text>
+        <text x={mx(4)} y={73} textAnchor="middle" fontSize={7.5} fill="#38bdf8">triggers bloom</text>
+        <text x={585}   y={63} textAnchor="middle" fontSize={7}   fill="#fde68a">Harvest</text>
+        <text x={585}   y={73} textAnchor="middle" fontSize={7}   fill="#fde68a">Feb–Apr</text>
+        {/* Legend */}
+        <rect x={10}  y={84} width={8} height={6} fill="#1e3a5f" opacity={0.9} rx={1} />
+        <text x={21}  y={90} fontSize={7.5} fill="#94a3b8">Dry / Dormancy (4 mo)</text>
+        <rect x={155} y={84} width={8} height={6} fill="#14532d" opacity={0.9} rx={1} />
+        <text x={166} y={90} fontSize={7.5} fill="#94a3b8">Fruit dev.</text>
+        <circle cx={240} cy={87} r={3} fill="#38bdf8" />
+        <text x={246} y={90} fontSize={7.5} fill="#38bdf8">Rain trigger (May)</text>
+        <rect x={380} y={84} width={14} height={6} fill="#fde68a" opacity={0.4} rx={1} />
+        <text x={397} y={90} fontSize={7.5} fill="#fde68a">Harvest wraps → next year</text>
+      </svg>
+    </div>
+  );
+}
+
+function CropCycleTimeline() {
+  const mx = (m: number) => m * 50;
+  const BAR_Y = 8, BAR_H = 26;
+  // Irrigation cycles: Feb (#1 bloom trigger), Mar (#2), Apr (#3) — every 25–30 days
+  const IRRIG = [
+    { m: 1, label: "#1 bloom", sub: "trigger", r: 3, sw: 1.5 },
+    { m: 2, label: "#2",       sub: "",        r: 2, sw: 1   },
+    { m: 3, label: "#3",       sub: "",        r: 2, sw: 1   },
+  ];
+  return (
+    <div>
+      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
+        Robusta seasonal cycle · Central Highlands Vietnam (irrigated farms)
+      </p>
+      <svg viewBox="0 0 600 112" className="w-full rounded overflow-hidden">
+        <rect width="600" height="112" fill="#0f172a" />
         {/* Phase bands */}
         <rect x={mx(0)} y={BAR_Y} width={100} height={BAR_H} fill="#1e3a5f" rx={2} />
         <rect x={mx(1)} y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
@@ -74,9 +135,18 @@ function CropCycleTimeline() {
         {/* Danger overlays */}
         <rect x={mx(10)} y={BAR_Y} width={100} height={BAR_H} fill="#991b1b" opacity={0.6} rx={2} />
         <rect x={mx(0)}  y={BAR_Y} width={50}  height={BAR_H} fill="#991b1b" opacity={0.45} rx={2} />
-        {/* Irrigation trigger */}
-        <line x1={mx(1)} y1={BAR_Y - 2} x2={mx(1)} y2={BAR_Y + BAR_H + 4} stroke="#93c5fd" strokeWidth={1.5} />
-        <circle cx={mx(1)} cy={BAR_Y - 4} r={3} fill="#93c5fd" />
+        {/* Irrigation cycles */}
+        {IRRIG.map(({ m, r, sw }) => (
+          <g key={m}>
+            <line x1={mx(m)} y1={BAR_Y - 2} x2={mx(m)} y2={BAR_Y + BAR_H + 4}
+              stroke="#93c5fd" strokeWidth={sw} strokeDasharray={m > 1 ? "3 2" : undefined} />
+            <circle cx={mx(m)} cy={BAR_Y - 4} r={r} fill="#93c5fd" />
+          </g>
+        ))}
+        {/* Rainy season start marker */}
+        <line x1={mx(4)} y1={BAR_Y - 2} x2={mx(4)} y2={BAR_Y + BAR_H + 4}
+          stroke="#38bdf8" strokeWidth={1} strokeDasharray="4 2" />
+        <text x={mx(4)} y={BAR_Y - 6} textAnchor="middle" fontSize={6.5} fill="#38bdf8">☔ Rain</text>
         {/* Month labels */}
         {["J","F","M","A","M","J","J","A","S","O","N","D"].map((lbl, i) => (
           <text key={i} x={mx(i) + 25} y={50} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
@@ -90,19 +160,25 @@ function CropCycleTimeline() {
         {/* Below-axis annotations */}
         <text x={25}    y={63} textAnchor="middle" fontSize={8} fill="#fca5a5">⚠ Rain</text>
         <text x={25}    y={73} textAnchor="middle" fontSize={8} fill="#fca5a5">risk</text>
-        <text x={mx(1)} y={63} textAnchor="middle" fontSize={8} fill="#93c5fd">💧 Irrig.</text>
-        <text x={mx(1)} y={73} textAnchor="middle" fontSize={8} fill="#93c5fd">trigger</text>
+        {IRRIG.map(({ m, label, sub }) => (
+          <g key={m}>
+            <text x={mx(m)} y={63} textAnchor="middle" fontSize={7.5} fill="#93c5fd">💧 {label}</text>
+            {sub && <text x={mx(m)} y={73} textAnchor="middle" fontSize={7.5} fill="#93c5fd">{sub}</text>}
+          </g>
+        ))}
+        <text x={mx(4)} y={63} textAnchor="middle" fontSize={7} fill="#38bdf8">Rainy</text>
+        <text x={mx(4)} y={73} textAnchor="middle" fontSize={7} fill="#38bdf8">season</text>
         {/* Legend */}
-        <rect x={10}  y={88} width={8} height={6} fill="#78350f" opacity={0.9} rx={1} />
-        <text x={21}  y={94} fontSize={7.5} fill="#94a3b8">Harvest</text>
-        <rect x={75}  y={88} width={8} height={6} fill="#14532d" opacity={0.9} rx={1} />
-        <text x={86}  y={94} fontSize={7.5} fill="#94a3b8">Fruit dev.</text>
-        <rect x={148} y={88} width={8} height={6} fill="#1e3a5f" opacity={0.9} rx={1} />
-        <text x={159} y={94} fontSize={7.5} fill="#94a3b8">Dry / Dormancy</text>
-        <rect x={270} y={88} width={8} height={6} fill="#991b1b" opacity={0.7} rx={1} />
-        <text x={281} y={94} fontSize={7.5} fill="#fca5a5">Anomalous rain risk</text>
-        <circle cx={390} cy={91} r={3} fill="#93c5fd" />
-        <text x={396} y={94} fontSize={7.5} fill="#93c5fd">Irrigation trigger</text>
+        <rect x={10}  y={96} width={8} height={6} fill="#78350f" opacity={0.9} rx={1} />
+        <text x={21}  y={102} fontSize={7.5} fill="#94a3b8">Harvest</text>
+        <rect x={75}  y={96} width={8} height={6} fill="#14532d" opacity={0.9} rx={1} />
+        <text x={86}  y={102} fontSize={7.5} fill="#94a3b8">Fruit dev.</text>
+        <rect x={148} y={96} width={8} height={6} fill="#1e3a5f" opacity={0.9} rx={1} />
+        <text x={159} y={102} fontSize={7.5} fill="#94a3b8">Dry / Dormancy</text>
+        <rect x={270} y={96} width={8} height={6} fill="#991b1b" opacity={0.7} rx={1} />
+        <text x={281} y={102} fontSize={7.5} fill="#fca5a5">Anomalous rain risk</text>
+        <circle cx={400} cy={99} r={2.5} fill="#93c5fd" />
+        <text x={406} y={102} fontSize={7.5} fill="#93c5fd">Irrig. cycles (25–30d)</text>
       </svg>
     </div>
   );
@@ -203,6 +279,19 @@ function Article1() {
       </div>
 
       <CropCycleTimeline />
+
+      <H>Rainfed farms: a different cycle</H>
+      <P>
+        Farms without irrigation wait for natural rains — the same water stimulus,
+        delivered by the sky in late April/May instead of a pump in January. The
+        physiological cascade is identical, but the calendar shifts ~3 months:
+        blossoming in May, cherries maturing January–March. This is why Vietnamese
+        Robusta export volumes have a secondary tail into Q1 — not just late-ripening
+        clones (TR14/TR15), but also unirrigated smallholders running on a rain-cycle
+        harvest. Traders modelling monthly Vietnamese supply should disaggregate the
+        two populations.
+      </P>
+      <RainfedCycleTimeline />
     </AgronomyCard>
   );
 }
