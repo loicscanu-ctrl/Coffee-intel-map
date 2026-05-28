@@ -1605,7 +1605,7 @@ export default function CertifiedStocksTestPanel() {
                       {/* Density grid — existing portion (T0 state still on hand) */}
                       <div
                         className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
-                        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
+                        style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
                       >
                         {existing.map((sq, i) => {
                           const isPicked = pickedSquare?.market === p.market
@@ -1633,7 +1633,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
+                            style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
                           >
                             {gained.map((sq, i) => {
                               const idx = existing.length + i;
@@ -1664,7 +1664,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
+                            style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
                           >
                             {ghosts.map((sq, i) => {
                               const idx = existing.length + gained.length + i;
