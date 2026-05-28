@@ -500,6 +500,14 @@ def build_arabica_snapshots(certified, pending, gradings_today,
         pg = _build_arabica_section(pending, d)   or {"grand_total": 0, "by_port": {}, "by_group": {}, "by_origin": {}}
         gt = gradings_today.get(d, {})
         passed = gt.get("passed", 0); failed = gt.get("failed", 0)
+        # Per-snapshot issuers/stoppers (TODAY type only — that's the daily flow;
+        # MONTH type is cumulative-to-date and stored in latest_detail).
+        iss_today = [{"port": e["port"], "issuer": e["issuer"], "value": e["value"]}
+                     for e in issuers_per_date.get(d, [])
+                     if e.get("type") == "TODAY" and e.get("value", 0) > 0]
+        stp_today = [{"port": e["port"], "stopper": e["stopper"], "value": e["value"]}
+                     for e in stoppers_per_date.get(d, [])
+                     if e.get("type") == "TODAY" and e.get("value", 0) > 0]
         snaps.append({
             "date":                 d.isoformat(),
             "report_date":          d.isoformat(),
@@ -515,10 +523,19 @@ def build_arabica_snapshots(certified, pending, gradings_today,
                 "total_certified": tc,
                 "pending_grading": pg,
             },
+            # NEW per-snapshot fields — drive arabica Issued period view + drill.
+            "issuers_today":        iss_today,
+            "stoppers_today":       stp_today,
+            "issued_total_today":   sum(e["value"] for e in iss_today),
+            "received_total_today": sum(e["value"] for e in stp_today),
         })
     latest_date = dates[-1] if dates else None
     latest_detail = None
     if latest_date:
+        # age_detail is published at month-ends in sheet 12, not daily —
+        # so latest_detail.age_detail uses the most recent age entry we have,
+        # which may pre-date the snapshot's latest_date.
+        latest_age_date = max(age_per_date) if age_per_date else None
         latest_detail = {
             "report_date":    latest_date.isoformat(),
             "total_certified": _build_arabica_section(certified, latest_date),
@@ -528,16 +545,21 @@ def build_arabica_snapshots(certified, pending, gradings_today,
             "grading_today":  {"passed_today_bags": gradings_today.get(latest_date, {}).get("passed", 0),
                                 "failed_today_bags": gradings_today.get(latest_date, {}).get("failed", 0),
                                 "passed_text":       None, "failed_text": None},
-            # NEW additive fields — frontend can pick up later, doesn't break old readers.
-            "issuers":   issuers_per_date.get(latest_date, []),
-            "stoppers":  stoppers_per_date.get(latest_date, []),
-            "age_detail": age_per_date.get(latest_date, {}),
+            # Additive: NEW arabica-specific fields (don't break old readers).
+            "issuers":         issuers_per_date.get(latest_date, []),
+            "stoppers":        stoppers_per_date.get(latest_date, []),
+            "age_detail":      age_per_date.get(latest_age_date) if latest_age_date else {},
+            "age_detail_date": latest_age_date.isoformat() if latest_age_date else None,
         }
     return snaps, latest_detail, latest_date
 
 
 def build_robusta_snapshots(stock, gradings, iss_recv, tenders, overview):
-    all_dates = sorted(set(stock) | set(gradings) | set(iss_recv) | set(tenders) | set(overview))
+    # Only build snapshots for dates that have stock data. Other event dates
+    # (gradings/iss-recv/tenders on days without a stock report) still appear
+    # in recent_activity; we just don't synthesize a fake 0-stock snapshot
+    # which made the time-series chart drop to 0 ~30 times across the year.
+    all_dates = sorted(stock.keys())
     snaps: list[dict] = []
     for d in all_dates:
         st = stock.get(d) or {}
@@ -652,6 +674,16 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
             print(f"[merge] robusta: {n_old} existing snapshots → {len(robusta_json['snapshots'])} after merge")
         except Exception as e:  # noqa: BLE001
             print(f"[merge] robusta skipped ({e})")
+
+    # Post-merge: drop synthetic zero-stock robusta snapshots that older runs
+    # left behind (a date with no stock_report.csv but with iss-recv/grading
+    # events used to land as total=0 — creating false dips in the chart).
+    before = len(robusta_json.get("snapshots") or [])
+    robusta_json["snapshots"] = [s for s in (robusta_json.get("snapshots") or [])
+                                  if (s.get("total_lots_certified") or 0) > 0]
+    dropped = before - len(robusta_json["snapshots"])
+    if dropped:
+        print(f"[filter] dropped {dropped} robusta snapshots with 0 stock (no source data those days)")
 
     if write:
         OUT_DIR.mkdir(parents=True, exist_ok=True)

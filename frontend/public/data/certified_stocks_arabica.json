@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T11:26:14+00:00",
+  "generated_at": "2026-05-28T11:57:50+00:00",
   "as_of": "2026-05-27",
   "source_url": "imported from synthesis xlsx",
   "snapshots": [
@@ -308,7 +308,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-05-29",
@@ -615,7 +619,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-05-30",
@@ -922,7 +930,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-02",
@@ -1229,7 +1241,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-03",
@@ -1529,7 +1545,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-04",
@@ -1821,7 +1841,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-05",
@@ -2112,7 +2136,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-06",
@@ -2404,7 +2432,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-09",
@@ -2696,7 +2728,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-10",
@@ -2987,7 +3023,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-11",
@@ -3278,7 +3318,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-12",
@@ -3569,7 +3613,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-13",
@@ -3860,7 +3908,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-16",
@@ -4150,7 +4202,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-17",
@@ -4429,7 +4485,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-18",
@@ -4708,7 +4768,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-19",
@@ -4987,7 +5051,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-20",
@@ -5274,7 +5342,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-23",
@@ -5559,7 +5631,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "StoneX Financial Inc.",
+          "value": 4
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 4,
+      "received_total_today": 4
     },
     {
       "date": "2025-06-24",
@@ -5836,7 +5924,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 10
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 4
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 9
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 14,
+      "received_total_today": 14
     },
     {
       "date": "2025-06-25",
@@ -6112,7 +6231,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 33
+        },
+        {
+          "port": "AN",
+          "issuer": "StoneX Financial Inc.",
+          "value": 9
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 36
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "issued_total_today": 42,
+      "received_total_today": 42
     },
     {
       "date": "2025-06-26",
@@ -6385,7 +6530,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "HA",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 14
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 12
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 15,
+      "received_total_today": 15
     },
     {
       "date": "2025-06-27",
@@ -6658,7 +6834,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-06-30",
@@ -6923,7 +7103,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-01",
@@ -7186,7 +7370,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-02",
@@ -7444,7 +7632,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-03",
@@ -7702,7 +7894,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 4,
+      "received_total_today": 4
     },
     {
       "date": "2025-07-07",
@@ -7968,7 +8176,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "HA",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 17
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 15
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "issued_total_today": 24,
+      "received_total_today": 24
     },
     {
       "date": "2025-07-08",
@@ -8234,7 +8478,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-09",
@@ -8500,7 +8748,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Citigroup Global Markets Inc.",
+          "value": 60
+        },
+        {
+          "port": "HA",
+          "issuer": "Citigroup Global Markets Inc.",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 61
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 68,
+      "received_total_today": 68
     },
     {
       "date": "2025-07-10",
@@ -8759,7 +9043,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-11",
@@ -9032,7 +9320,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-14",
@@ -9305,7 +9597,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-15",
@@ -9577,7 +9873,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 46
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 43
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "issued_total_today": 46,
+      "received_total_today": 46
     },
     {
       "date": "2025-07-16",
@@ -9818,7 +10135,58 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "MI",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 28
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 28
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 36,
+      "received_total_today": 36
     },
     {
       "date": "2025-07-17",
@@ -10068,7 +10436,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Citigroup Global Markets Inc.",
+          "value": 89
+        },
+        {
+          "port": "HA",
+          "issuer": "Citigroup Global Markets Inc.",
+          "value": 6
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 82
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 7
+        }
+      ],
+      "issued_total_today": 95,
+      "received_total_today": 95
     },
     {
       "date": "2025-07-18",
@@ -10318,7 +10717,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 5,
+      "received_total_today": 5
     },
     {
       "date": "2025-07-21",
@@ -10568,7 +10983,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-22",
@@ -10818,7 +11237,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-23",
@@ -11060,7 +11483,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-24",
@@ -11302,7 +11729,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-25",
@@ -11535,7 +11966,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-28",
@@ -11783,7 +12218,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-29",
@@ -12038,7 +12477,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-30",
@@ -12300,7 +12743,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-07-31",
@@ -12569,7 +13016,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-01",
@@ -12838,7 +13289,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-04",
@@ -13110,7 +13565,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-05",
@@ -13382,7 +13841,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-06",
@@ -13654,7 +14117,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-07",
@@ -13912,7 +14379,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-08",
@@ -14184,7 +14655,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-11",
@@ -14456,7 +14931,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-12",
@@ -14729,7 +15208,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-13",
@@ -15001,7 +15484,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-14",
@@ -15273,7 +15760,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-15",
@@ -15544,7 +16035,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-18",
@@ -15816,7 +16311,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-19",
@@ -16067,7 +16566,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-20",
@@ -16320,7 +16823,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-21",
@@ -16580,7 +17087,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "StoneX Financial Inc.",
+          "value": 7
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 7,
+      "received_total_today": 7
     },
     {
       "date": "2025-08-22",
@@ -16840,7 +17368,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 273
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 25
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 105
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 21
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 178
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 308,
+      "received_total_today": 308
     },
     {
       "date": "2025-08-25",
@@ -17093,7 +17662,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 126
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 50
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 76
+        }
+      ],
+      "issued_total_today": 126,
+      "received_total_today": 126
     },
     {
       "date": "2025-08-26",
@@ -17345,7 +17935,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 316
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 120
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 10
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 196
+        }
+      ],
+      "issued_total_today": 326,
+      "received_total_today": 326
     },
     {
       "date": "2025-08-27",
@@ -17596,7 +18217,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-08-28",
@@ -17846,7 +18471,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 22
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 17
+        }
+      ],
+      "issued_total_today": 22,
+      "received_total_today": 22
     },
     {
       "date": "2025-08-29",
@@ -18104,7 +18750,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 56
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 49
+        }
+      ],
+      "issued_total_today": 56,
+      "received_total_today": 56
     },
     {
       "date": "2025-09-02",
@@ -18363,7 +19030,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-03",
@@ -18622,7 +19293,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-04",
@@ -18874,7 +19549,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-05",
@@ -19127,7 +19806,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-08",
@@ -19380,7 +20063,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-09",
@@ -19633,7 +20320,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "MI",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 1,
+      "received_total_today": 1
     },
     {
       "date": "2025-09-10",
@@ -19884,7 +20587,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-11",
@@ -20135,7 +20842,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-12",
@@ -20379,7 +21090,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 9
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 9
+        }
+      ],
+      "issued_total_today": 9,
+      "received_total_today": 9
     },
     {
       "date": "2025-09-15",
@@ -20630,7 +21357,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 5,
+      "received_total_today": 5
     },
     {
       "date": "2025-09-16",
@@ -20874,7 +21617,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 2
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 2,
+      "received_total_today": 2
     },
     {
       "date": "2025-09-17",
@@ -21118,7 +21877,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 8
+        }
+      ],
+      "issued_total_today": 10,
+      "received_total_today": 10
     },
     {
       "date": "2025-09-18",
@@ -21367,7 +22147,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 8
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 10
+        }
+      ],
+      "issued_total_today": 10,
+      "received_total_today": 10
     },
     {
       "date": "2025-09-19",
@@ -21615,7 +22416,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "MI",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 6,
+      "received_total_today": 6
     },
     {
       "date": "2025-09-22",
@@ -21863,7 +22695,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-23",
@@ -22102,7 +22938,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-24",
@@ -22340,7 +23180,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-25",
@@ -22578,7 +23422,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-26",
@@ -22816,7 +23664,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-29",
@@ -23047,7 +23899,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-09-30",
@@ -23263,7 +24119,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-01",
@@ -23494,7 +24354,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-02",
@@ -23732,7 +24596,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-03",
@@ -23970,7 +24838,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-06",
@@ -24208,7 +25080,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-07",
@@ -24446,7 +25322,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-08",
@@ -24684,7 +25564,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-09",
@@ -24908,7 +25792,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-10",
@@ -25132,7 +26020,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-13",
@@ -25356,7 +26248,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-14",
@@ -25580,7 +26476,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-15",
@@ -25804,7 +26704,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-16",
@@ -26028,7 +26932,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-17",
@@ -26252,7 +27160,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-20",
@@ -26468,7 +27380,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-21",
@@ -26692,7 +27608,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-22",
@@ -26916,7 +27836,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-23",
@@ -27140,7 +28064,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-24",
@@ -27364,7 +28292,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-27",
@@ -27568,7 +28500,11 @@
           "by_group": {},
           "by_origin": {}
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-28",
@@ -27784,7 +28720,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-29",
@@ -28000,7 +28940,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-30",
@@ -28216,7 +29160,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-10-31",
@@ -28432,7 +29380,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-03",
@@ -28648,7 +29600,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-04",
@@ -28864,7 +29820,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-05",
@@ -29088,7 +30048,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-06",
@@ -29312,7 +30276,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-07",
@@ -29544,7 +30512,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-10",
@@ -29783,7 +30755,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-11",
@@ -30022,7 +30998,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-12",
@@ -30261,7 +31241,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-13",
@@ -30500,7 +31484,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-14",
@@ -30739,7 +31727,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-17",
@@ -30985,7 +31977,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-18",
@@ -31238,7 +32234,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-19",
@@ -31499,7 +32499,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-11-20",
@@ -31760,7 +32764,138 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "ABN Amro\n127",
+          "value": 34
+        },
+        {
+          "port": "",
+          "issuer": "ABN Amro\n127",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 127
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 34
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 10
+        },
+        {
+          "port": "MI",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "NO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 7
+        },
+        {
+          "port": "NY",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 105
+        },
+        {
+          "port": "",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "NY",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 38
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 63
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 35
+        },
+        {
+          "port": "NY",
+          "stopper": "Deutsche Bank Futures",
+          "value": 41
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 29
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 31
+        },
+        {
+          "port": "HO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 8
+        },
+        {
+          "port": "NO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 7
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "stopper": "StoneX Financial Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "StoneX Financial Inc.",
+          "value": 14
+        }
+      ],
+      "issued_total_today": 325,
+      "received_total_today": 290
     },
     {
       "date": "2025-11-21",
@@ -32036,7 +33171,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "MI",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 14
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "MI",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "stopper": "Deutsche Bank Futures",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 15,
+      "received_total_today": 15
     },
     {
       "date": "2025-11-24",
@@ -32312,7 +33488,58 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 93
+        },
+        {
+          "port": "HA",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 10
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 28
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 28
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 27
+        },
+        {
+          "port": "HA",
+          "stopper": "StoneX Financial Inc.",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "stopper": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 98,
+      "received_total_today": 98
     },
     {
       "date": "2025-11-25",
@@ -32596,7 +33823,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "HA",
+          "issuer": "StoneX Financial Inc.",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "HA",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 5,
+      "received_total_today": 5
     },
     {
       "date": "2025-11-26",
@@ -32880,7 +34143,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 3,
+      "received_total_today": 3
     },
     {
       "date": "2025-11-28",
@@ -33157,7 +34451,23 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 1,
+      "received_total_today": 1
     },
     {
       "date": "2025-12-01",
@@ -33441,7 +34751,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-02",
@@ -33718,7 +35032,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 90
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 9
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 27
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 26
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 28
+        }
+      ],
+      "issued_total_today": 90,
+      "received_total_today": 90
     },
     {
       "date": "2025-12-03",
@@ -33993,7 +35338,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-04",
@@ -34269,7 +35618,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 7
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 7,
+      "received_total_today": 7
     },
     {
       "date": "2025-12-05",
@@ -34546,7 +35921,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 7,
+      "received_total_today": 7
     },
     {
       "date": "2025-12-08",
@@ -34823,7 +36234,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-09",
@@ -35093,7 +36508,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-10",
@@ -35371,7 +36790,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 218
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 15
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 74
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 55
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 74
+        }
+      ],
+      "issued_total_today": 218,
+      "received_total_today": 218
     },
     {
       "date": "2025-12-11",
@@ -35656,7 +37106,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-12",
@@ -35925,7 +37379,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 10,
+      "received_total_today": 10
     },
     {
       "date": "2025-12-15",
@@ -36196,7 +37676,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 17
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 8
+        }
+      ],
+      "issued_total_today": 20,
+      "received_total_today": 20
     },
     {
       "date": "2025-12-16",
@@ -36459,7 +37980,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 9
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "ADM Investor Services",
+          "value": 3
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HA",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "issued_total_today": 15,
+      "received_total_today": 15
     },
     {
       "date": "2025-12-17",
@@ -36708,7 +38275,28 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 11
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "issued_total_today": 11,
+      "received_total_today": 11
     },
     {
       "date": "2025-12-18",
@@ -36956,7 +38544,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 12
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 15
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 25,
+      "received_total_today": 25
     },
     {
       "date": "2025-12-19",
@@ -37197,7 +38831,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 17
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 8
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 18,
+      "received_total_today": 18
     },
     {
       "date": "2025-12-22",
@@ -37445,7 +39115,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-23",
@@ -37686,7 +39360,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-24",
@@ -37928,7 +39606,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-26",
@@ -38170,7 +39852,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-29",
@@ -38412,7 +40098,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-30",
@@ -38654,7 +40344,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2025-12-31",
@@ -38896,7 +40590,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-02",
@@ -39138,7 +40836,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-05",
@@ -39380,7 +41082,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-06",
@@ -39628,7 +41334,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-07",
@@ -39868,7 +41578,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-08",
@@ -40115,7 +41829,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-09",
@@ -40362,7 +42080,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-12",
@@ -40609,7 +42331,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-13",
@@ -40856,7 +42582,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-14",
@@ -41101,7 +42831,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-15",
@@ -41346,7 +43080,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-16",
@@ -41605,7 +43343,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-20",
@@ -41864,7 +43606,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-21",
@@ -42116,7 +43862,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-22",
@@ -42361,7 +44111,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-23",
@@ -42591,7 +44345,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-26",
@@ -42828,7 +44586,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-27",
@@ -43065,7 +44827,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-28",
@@ -43311,7 +45077,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-29",
@@ -43557,7 +45327,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-01-30",
@@ -43803,7 +45577,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-02",
@@ -44050,7 +45828,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-03",
@@ -44304,7 +46086,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-04",
@@ -44563,7 +46349,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-05",
@@ -44822,7 +46612,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-06",
@@ -45096,7 +46890,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-09",
@@ -45370,7 +47168,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-10",
@@ -45637,7 +47439,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-11",
@@ -45901,7 +47707,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-12",
@@ -46175,7 +47985,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-13",
@@ -46442,7 +48256,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-16",
@@ -46709,7 +48527,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-17",
@@ -46999,7 +48821,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-18",
@@ -47290,7 +49116,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-19",
@@ -47582,7 +49412,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-20",
@@ -47875,7 +49709,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-23",
@@ -48168,7 +50006,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "issuer": "J.P. Morgan Securities LLC",
+          "value": 3
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 2
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 6,
+      "received_total_today": 6
     },
     {
       "date": "2026-02-24",
@@ -48462,7 +50341,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 4
+        },
+        {
+          "port": "MI",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 15
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 14
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 18
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 7
+        }
+      ],
+      "issued_total_today": 34,
+      "received_total_today": 34
     },
     {
       "date": "2026-02-25",
@@ -48756,7 +50681,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-02-26",
@@ -49050,7 +50979,63 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 16
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 3
+        },
+        {
+          "port": "HA",
+          "issuer": "StoneX Financial Inc.",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 16
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 30,
+      "received_total_today": 30
     },
     {
       "date": "2026-02-27",
@@ -49343,7 +51328,63 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 3
+        },
+        {
+          "port": "MI",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 26
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 11
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 29
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 9
+        }
+      ],
+      "issued_total_today": 43,
+      "received_total_today": 43
     },
     {
       "date": "2026-03-02",
@@ -49633,7 +51674,78 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 37
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 8
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 37
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 32
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 32
+        },
+        {
+          "port": "NY",
+          "stopper": "HSBC Securirties (USA) Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 9
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 9
+        }
+      ],
+      "issued_total_today": 93,
+      "received_total_today": 93
     },
     {
       "date": "2026-03-03",
@@ -49926,7 +52038,103 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "167 Division Marex Capital",
+          "value": 9
+        },
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 9
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 22
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 31
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 22
+        },
+        {
+          "port": "HA",
+          "issuer": "StoneX Financial Inc.",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 4
+        },
+        {
+          "port": "",
+          "issuer": "StoneX Financial Inc.",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 14
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 31
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 14
+        },
+        {
+          "port": "AN",
+          "stopper": "HSBC Securirties (USA) Inc.",
+          "value": 1
+        },
+        {
+          "port": "",
+          "stopper": "HSBC Securirties (USA) Inc.",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 16
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 16
+        }
+      ],
+      "issued_total_today": 111,
+      "received_total_today": 106
     },
     {
       "date": "2026-03-04",
@@ -50228,7 +52436,78 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "167 Division Marex Capital",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 16
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 5
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 16
+        },
+        {
+          "port": "HA",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        },
+        {
+          "port": "",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 14
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 14
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 45,
+      "received_total_today": 44
     },
     {
       "date": "2026-03-05",
@@ -50526,7 +52805,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 8
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 8
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "issued_total_today": 21,
+      "received_total_today": 21
     },
     {
       "date": "2026-03-06",
@@ -50818,7 +53138,88 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "167 Division Marex Capital",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "HSBC Securirties (USA) Inc.",
+          "value": 4
+        },
+        {
+          "port": "HO",
+          "issuer": "HSBC Securirties (USA) Inc.",
+          "value": 4
+        },
+        {
+          "port": "",
+          "issuer": "HSBC Securirties (USA) Inc.",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 7
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 7
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 9
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 9
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        }
+      ],
+      "issued_total_today": 36,
+      "received_total_today": 36
     },
     {
       "date": "2026-03-09",
@@ -51110,7 +53511,63 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "167 Division Marex Capital",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 6
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 21,
+      "received_total_today": 21
     },
     {
       "date": "2026-03-10",
@@ -51396,7 +53853,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 4
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 6
+        },
+        {
+          "port": "NO",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "NO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 11,
+      "received_total_today": 11
     },
     {
       "date": "2026-03-11",
@@ -51697,7 +54195,83 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "167 Division Marex",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 1
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas",
+          "value": 20
+        },
+        {
+          "port": "",
+          "issuer": "SG Americas",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 20
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing",
+          "value": 17
+        },
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 17
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas",
+          "value": 3
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "issued_total_today": 46,
+      "received_total_today": 46
     },
     {
       "date": "2026-03-12",
@@ -51990,7 +54564,68 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "",
+          "issuer": "ABN Amro Clearing",
+          "value": 5
+        },
+        {
+          "port": "MI",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "HSBC Securirties (USA) Inc.",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "",
+          "stopper": "ABN Amro Clearing",
+          "value": 4
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "",
+          "stopper": "SG Americas",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 17,
+      "received_total_today": 17
     },
     {
       "date": "2026-03-16",
@@ -52283,7 +54918,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 20
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 43
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 61
+        },
+        {
+          "port": "HA",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 7
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 74,
+      "received_total_today": 74
     },
     {
       "date": "2026-03-17",
@@ -52576,7 +55257,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 22
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 30
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "issued_total_today": 36,
+      "received_total_today": 36
     },
     {
       "date": "2026-03-18",
@@ -52860,7 +55572,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 7
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 11
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 13,
+      "received_total_today": 13
     },
     {
       "date": "2026-03-19",
@@ -53145,7 +55888,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 10
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 16
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 20
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 6
+        }
+      ],
+      "issued_total_today": 26,
+      "received_total_today": 26
     },
     {
       "date": "2026-03-20",
@@ -53430,7 +56199,48 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 39
+        },
+        {
+          "port": "AN",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 11
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 16
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 44
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 18
+        },
+        {
+          "port": "AN",
+          "stopper": "StoneX Financial Inc.",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 66,
+      "received_total_today": 66
     },
     {
       "date": "2026-03-23",
@@ -53706,7 +56516,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-24",
@@ -53998,7 +56812,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-25",
@@ -54290,7 +57108,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-26",
@@ -54574,7 +57396,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-27",
@@ -54836,7 +57662,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-30",
@@ -55111,7 +57941,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-03-31",
@@ -55386,7 +58220,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-01",
@@ -55669,7 +58507,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-02",
@@ -55946,7 +58788,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-06",
@@ -56223,7 +59069,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-07",
@@ -56491,7 +59341,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-09",
@@ -56763,7 +59617,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-10",
@@ -57035,7 +59893,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-13",
@@ -57307,7 +60169,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-14",
@@ -57563,7 +60429,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-15",
@@ -57826,7 +60696,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-16",
@@ -58089,7 +60963,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-17",
@@ -58342,7 +61220,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-20",
@@ -58610,7 +61492,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-21",
@@ -58878,7 +61764,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-04-22",
@@ -59136,7 +62026,78 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 100
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 27
+        },
+        {
+          "port": "NY",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 20
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 33
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 43
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 18
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 42
+        },
+        {
+          "port": "AN",
+          "stopper": "Goldman Sachs",
+          "value": 17
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 20
+        },
+        {
+          "port": "HO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 37
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 20
+        }
+      ],
+      "issued_total_today": 197,
+      "received_total_today": 197
     },
     {
       "date": "2026-04-23",
@@ -59394,7 +62355,68 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 4
+        },
+        {
+          "port": "HA",
+          "issuer": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "Goldman Sachs",
+          "value": 17
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 9
+        },
+        {
+          "port": "MI",
+          "issuer": "StoneX Financial Inc.",
+          "value": 16
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 11
+        },
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 11
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 4
+        },
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 16
+        }
+      ],
+      "issued_total_today": 47,
+      "received_total_today": 47
     },
     {
       "date": "2026-04-24",
@@ -59645,7 +62667,123 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 141
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 12
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 101
+        },
+        {
+          "port": "MI",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 38
+        },
+        {
+          "port": "NO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 48
+        },
+        {
+          "port": "NY",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 16
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 4
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 87
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 10
+        },
+        {
+          "port": "HO",
+          "stopper": "ADM Investor Services",
+          "value": 13
+        },
+        {
+          "port": "MI",
+          "stopper": "ADM Investor Services",
+          "value": 10
+        },
+        {
+          "port": "NO",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "ADM Investor Services",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 11
+        },
+        {
+          "port": "HO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "MI",
+          "stopper": "Deutsche Bank Futures",
+          "value": 28
+        },
+        {
+          "port": "NO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 47
+        },
+        {
+          "port": "NY",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 124
+        },
+        {
+          "port": "HA",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 12
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 11
+        }
+      ],
+      "issued_total_today": 361,
+      "received_total_today": 361
     },
     {
       "date": "2026-04-27",
@@ -59896,7 +63034,78 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 15
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 36
+        },
+        {
+          "port": "MI",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "NO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 45
+        },
+        {
+          "port": "HO",
+          "issuer": "Macquarie Futures USA, Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 12
+        },
+        {
+          "port": "MI",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "NO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 10
+        },
+        {
+          "port": "HO",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 24
+        },
+        {
+          "port": "NO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 42
+        }
+      ],
+      "issued_total_today": 101,
+      "received_total_today": 101
     },
     {
       "date": "2026-04-28",
@@ -60154,7 +63363,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 2
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 4,
+      "received_total_today": 4
     },
     {
       "date": "2026-04-29",
@@ -60412,7 +63652,68 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 30
+        },
+        {
+          "port": "HA",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "NO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 18
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HA",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "NO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 13
+        },
+        {
+          "port": "HO",
+          "stopper": "ADM Investor Services",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 10
+        },
+        {
+          "port": "HA",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 20
+        },
+        {
+          "port": "NO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 57,
+      "received_total_today": 57
     },
     {
       "date": "2026-04-30",
@@ -60670,7 +63971,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 14
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 15
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 14
+        }
+      ],
+      "issued_total_today": 29,
+      "received_total_today": 29
     },
     {
       "date": "2026-05-01",
@@ -60921,7 +64258,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 15
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 10
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 14
+        }
+      ],
+      "issued_total_today": 29,
+      "received_total_today": 29
     },
     {
       "date": "2026-05-04",
@@ -61172,7 +64555,38 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 7
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 5
+        }
+      ],
+      "issued_total_today": 10,
+      "received_total_today": 10
     },
     {
       "date": "2026-05-05",
@@ -61423,7 +64837,53 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 13
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 8
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 6
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 5
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 8
+        }
+      ],
+      "issued_total_today": 22,
+      "received_total_today": 22
     },
     {
       "date": "2026-05-06",
@@ -61681,7 +65141,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 5
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 5
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "NY",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 3
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 2
+        }
+      ],
+      "issued_total_today": 10,
+      "received_total_today": 10
     },
     {
       "date": "2026-05-07",
@@ -61939,7 +65435,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-08",
@@ -62187,7 +65687,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-11",
@@ -62435,7 +65939,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 3
+        }
+      ],
+      "issued_total_today": 5,
+      "received_total_today": 5
     },
     {
       "date": "2026-05-12",
@@ -62676,7 +66216,58 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "NO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 2
+        },
+        {
+          "port": "HO",
+          "issuer": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "issuer": "StoneX Financial Inc.",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "NO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "HO",
+          "stopper": "Deutsche Bank Futures",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NO",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        },
+        {
+          "port": "NY",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 5,
+      "received_total_today": 5
     },
     {
       "date": "2026-05-13",
@@ -62910,7 +66501,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-14",
@@ -63144,7 +66739,32 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 4
+        },
+        {
+          "port": "HO",
+          "stopper": "ADM Investor Services",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 7
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 19
+        }
+      ],
+      "issued_total_today": 0,
+      "received_total_today": 32
     },
     {
       "date": "2026-05-15",
@@ -63378,7 +66998,43 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "AN",
+          "issuer": "167 Division Marex Capital Markets Inc.",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 12
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "stopper": "Deutsche Bank Futures",
+          "value": 2
+        },
+        {
+          "port": "AN",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 10
+        }
+      ],
+      "issued_total_today": 14,
+      "received_total_today": 14
     },
     {
       "date": "2026-05-18",
@@ -63612,7 +67268,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "HO",
+          "issuer": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "issuer": "ADM Investor Services",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "HO",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 2,
+      "received_total_today": 2
     },
     {
       "date": "2026-05-19",
@@ -63831,7 +67513,33 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [
+        {
+          "port": "MI",
+          "issuer": "ADM Investor Services",
+          "value": 1
+        },
+        {
+          "port": "AN",
+          "issuer": "Deutsche Bank Futures",
+          "value": 1
+        }
+      ],
+      "stoppers_today": [
+        {
+          "port": "AN",
+          "stopper": "ABN Amro Clearing USA LLC",
+          "value": 1
+        },
+        {
+          "port": "MI",
+          "stopper": "SG Americas Securities, LLC",
+          "value": 1
+        }
+      ],
+      "issued_total_today": 2,
+      "received_total_today": 2
     },
     {
       "date": "2026-05-20",
@@ -64050,7 +67758,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-21",
@@ -64269,7 +67981,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-22",
@@ -64488,7 +68204,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-26",
@@ -64707,7 +68427,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     },
     {
       "date": "2026-05-27",
@@ -64926,7 +68650,11 @@
             }
           }
         }
-      }
+      },
+      "issuers_today": [],
+      "stoppers_today": [],
+      "issued_total_today": 0,
+      "received_total_today": 0
     }
   ],
   "latest_detail": {
@@ -65375,7 +69103,467 @@
         "type": "MONTH"
       }
     ],
-    "age_detail": {}
+    "age_detail": {
+      "ANT": [
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 1405
+        },
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 128161
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 42910
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 3604
+        },
+        {
+          "age_bucket": "1261 to 1290",
+          "bags": 253
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 3057
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 2520
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 21756
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 6620
+        },
+        {
+          "age_bucket": "0211 to 0240",
+          "bags": 21007
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 17487
+        },
+        {
+          "age_bucket": "0751 to 0780",
+          "bags": 73
+        },
+        {
+          "age_bucket": "1201 to 1230",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 10798
+        },
+        {
+          "age_bucket": "0601 to 0630",
+          "bags": 2824
+        },
+        {
+          "age_bucket": "5911 to 5940",
+          "bags": 5
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 6647
+        },
+        {
+          "age_bucket": "1381 to 1410",
+          "bags": 250
+        },
+        {
+          "age_bucket": "0691 to 0720",
+          "bags": 2655
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 2178
+        },
+        {
+          "age_bucket": "1681 to 1710",
+          "bags": 200
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 2850
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 5643
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 2959
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 3016
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 12427
+        },
+        {
+          "age_bucket": "1291 to 1320",
+          "bags": 671
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 2572
+        },
+        {
+          "age_bucket": "0241 to 0270",
+          "bags": 1333
+        },
+        {
+          "age_bucket": "1081 to 1110",
+          "bags": 3408
+        },
+        {
+          "age_bucket": "0571 to 0600",
+          "bags": 220
+        },
+        {
+          "age_bucket": "3001 to 3030",
+          "bags": 50
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 4765
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 11626
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 20097
+        }
+      ],
+      "HAM": [
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 960
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 150
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 284
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 284
+        },
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 640
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 1527
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 1673
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 320
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 25
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 375
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 8360
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 1103
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 750
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 855
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2000
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 1565
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 125
+        }
+      ],
+      "HOU": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 36576
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 6327
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 1676
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 24310
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 23
+        }
+      ],
+      "MIA": [
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 250
+        },
+        {
+          "age_bucket": "0511 to 0540",
+          "bags": 1740
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 3750
+        },
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 5025
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 6423
+        }
+      ],
+      "NY": [
+        {
+          "age_bucket": "1051 to 1080",
+          "bags": 225
+        },
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 31213
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 112
+        }
+      ],
+      "VIR": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 1250
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 523
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 35
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 7301
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 826
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2375
+        }
+      ],
+      "TOTAL": [
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 7217
+        },
+        {
+          "age_bucket": "1051 to 1080",
+          "bags": 225
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 20987
+        },
+        {
+          "age_bucket": "0571 to 0600",
+          "bags": 220
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 18057
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 25826
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 4581
+        },
+        {
+          "age_bucket": "0211 to 0240",
+          "bags": 21007
+        },
+        {
+          "age_bucket": "0601 to 0630",
+          "bags": 2824
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 78018
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 1430
+        },
+        {
+          "age_bucket": "1201 to 1230",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0691 to 0720",
+          "bags": 2655
+        },
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 202865
+        },
+        {
+          "age_bucket": "0751 to 0780",
+          "bags": 73
+        },
+        {
+          "age_bucket": "1291 to 1320",
+          "bags": 671
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 11210
+        },
+        {
+          "age_bucket": "3001 to 3030",
+          "bags": 50
+        },
+        {
+          "age_bucket": "1081 to 1110",
+          "bags": 3408
+        },
+        {
+          "age_bucket": "1381 to 1410",
+          "bags": 250
+        },
+        {
+          "age_bucket": "0241 to 0270",
+          "bags": 1333
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 2916
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 14296
+        },
+        {
+          "age_bucket": "0511 to 0540",
+          "bags": 1740
+        },
+        {
+          "age_bucket": "5911 to 5940",
+          "bags": 5
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 3529
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 4707
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 3268
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 12376
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 7170
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 12599
+        },
+        {
+          "age_bucket": "1261 to 1290",
+          "bags": 253
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 13015
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 13253
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 3341
+        },
+        {
+          "age_bucket": "1681 to 1710",
+          "bags": 200
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 3138
+        }
+      ]
+    },
+    "age_detail_date": "2026-04-30"
   },
   "errors": []
 }
