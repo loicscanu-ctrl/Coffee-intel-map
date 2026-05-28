@@ -163,12 +163,15 @@ function TightnessGauge({ title, current, min, max, rangeLabel, tightThreshold =
 // for anything under a year. Bin keys are stable so they survive cross-runs.
 type AgeBin = "fresh" | "y1to2" | "y2to3" | "y3to4" | "y4plus";
 interface AgeDist { fresh: number; y1to2: number; y2to3: number; y3to4: number; y4plus: number }  // shares 0..1
+// Opacity floor lifted from 0.14 → 0.35 so 4y+ squares stay visibly
+// colored. The earlier fade was too aggressive — rows of old stock
+// were reading as "empty lines" in the grid.
 const AGE_OPACITY: Record<AgeBin, number> = {
   fresh:  1.00,
-  y1to2:  0.70,
-  y2to3:  0.48,
-  y3to4:  0.28,
-  y4plus: 0.14,
+  y1to2:  0.80,
+  y2to3:  0.62,
+  y3to4:  0.47,
+  y4plus: 0.35,
 };
 const AGE_LABEL: Record<AgeBin, string> = {
   fresh: "< 1y", y1to2: "1-2y", y2to3: "2-3y", y3to4: "3-4y", y4plus: "4y+",
@@ -324,7 +327,7 @@ function _originColor(origin: string, market: "KC" | "RC"): string {
 // when a port exceeds the cap we scale uniformly across {existing, gained,
 // ghost} groups and surface the effective per-square volume in the click
 // popover so the visual stays honest.
-const DENSITY_COLS = 8;
+// DENSITY_COLS is now per-card: `p.span * 3` (span ∈ 1-4 → cols ∈ 3-12).
 const DENSITY_MAX_SQUARES = 400;
 // Warrant sizing:
 //   • Robusta — 1 lot = 10 MT = 1 warrant. Snapshot data is already in lots,
@@ -454,6 +457,19 @@ function buildDensityGrid(
 }
 
 interface OriginFlow { origin: string; volume: number; color: string }
+// Card-width spans (1–4 of a 12-col container). Sqrt scaling so a port at
+// 5% of max capacity still gets span 1 (visible) rather than collapsing.
+// Top-8 sum ≤ 12 typically; if it overflows the container grid wraps.
+function _assignSpans(ports: PortFlow[]): void {
+  if (ports.length === 0) return;
+  const maxCap = Math.max(...ports.map((p) => p.capacity));
+  for (const p of ports) {
+    const r = maxCap > 0 ? Math.sqrt(p.capacity / maxCap) : 0;
+    const raw = Math.round(4 * r);
+    p.span = Math.max(1, Math.min(4, raw)) as 1 | 2 | 3 | 4;
+  }
+}
+
 interface PortFlow {
   market: "KC" | "RC";
   code: string;
@@ -468,6 +484,11 @@ interface PortFlow {
   deltaByOrigin: Record<string, number>;   // signed change over window per origin
   inflow: OriginFlow[];
   outflow: OriginFlow[];
+  // Display sizing — assigned after all ports are computed. Card spans
+  // 1–4 columns of a 12-col container grid based on capacity-rank (sqrt-
+  // scaled so small ports don't collapse to invisible). Density grid
+  // inside each card uses span × 3 columns.
+  span: 1 | 2 | 3 | 4;
 }
 
 // ── Main test panel ──────────────────────────────────────────────────────────
@@ -791,10 +812,11 @@ export default function CertifiedStocksTestPanel() {
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "bags", squareUnit: BAGS_PER_WARRANT_KC,
           byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
-          deltaByOrigin, inflow, outflow,
+          deltaByOrigin, inflow, outflow, span: 1,
         });
       }
       ports.sort((a, b) => b.current - a.current);
+      _assignSpans(ports);
 
       // Intake summary — SUM over the window (so it aligns with the
       // per-warehouse inflow numbers below). Pending stays point-in-time
@@ -938,10 +960,11 @@ export default function CertifiedStocksTestPanel() {
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
           byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
-          deltaByOrigin, inflow, outflow,
+          deltaByOrigin, inflow, outflow, span: 1,
         });
       }
       ports.sort((a, b) => b.current - a.current);
+      _assignSpans(ports);
 
       // Intake summary — SUM all gradings entries in the window. Aligns
       // with the per-warehouse inflow numbers below (which also sum lots
@@ -1366,22 +1389,37 @@ export default function CertifiedStocksTestPanel() {
               </div>
             )}
 
-            {/* Branch connector — each visible warehouse gets its own arrow,
-                aligned to that column's centre in the 6-col grid below. */}
+            {/* Branch connector — arrows only where the window saw inflow.
+                Trunk anchors to the centroid of the active warehouses so
+                packed-left layouts (Robusta) don't leave the trunk floating
+                disconnected at x=50. */}
             {mkt.ports.length > 0 && (() => {
-              // The grid at xl breakpoint is 8-col. Arrows align to the
-              // centre of each occupied column so a new port joining the row
-              // (up to the 8 cap) gets its own arrow automatically.
-              const n = Math.min(mkt.ports.length, 8);
-              const xs = Array.from({ length: n }, (_, i) => (i + 0.5) * (100 / 8));
+              const visible = mkt.ports.slice(0, 8);
+              // Each card's centre x (% of viewBox width) in a 12-col grid.
+              const totalCols = 12;
+              let cursor = 0;
+              const centres = visible.map((p) => {
+                const c = (cursor + p.span / 2) * (100 / totalCols);
+                cursor += p.span;
+                return c;
+              });
+              const arrowXs = visible
+                .map((p, i) => ({ p, x: centres[i] }))
+                .filter(({ p }) => p.inflow.reduce((s, b) => s + b.volume, 0) > 0)
+                .map(({ x }) => x);
+              if (arrowXs.length === 0) return null;
+              // Manifold extends to include the intake trunk (x=50) so the
+              // vertical drop always reaches the horizontal connector.
+              const leftX  = Math.min(...arrowXs, 50);
+              const rightX = Math.max(...arrowXs, 50);
               return (
                 <svg viewBox="0 0 100 16" preserveAspectRatio="none" className="w-full h-10 my-1" aria-hidden>
                   <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                  {n > 1 && (
-                    <line x1={xs[0]} y1="5" x2={xs[n - 1]} y2="5"
+                  {leftX !== rightX && (
+                    <line x1={leftX} y1="5" x2={rightX} y2="5"
                           stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
                   )}
-                  {xs.map((x, i) => (
+                  {arrowXs.map((x, i) => (
                     <g key={i}>
                       <line x1={x} y1="5" x2={x} y2="14" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
                       <polygon points={`${x - 0.9},14 ${x + 0.9},14 ${x},15.5`} fill="#10b981" fillOpacity="0.85" />
@@ -1395,7 +1433,7 @@ export default function CertifiedStocksTestPanel() {
             {mkt.ports.length === 0 ? (
               <div className="text-xs text-slate-600 italic">No port data loaded.</div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+              <div className="grid grid-cols-4 md:grid-cols-8 xl:grid-cols-12 gap-1.5">
                 {mkt.ports.slice(0, 8).map((p) => {
                   const { existing, gained, ghosts, effectivePerSquare, totalWarrants } =
                     buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit, p.market);
@@ -1417,7 +1455,8 @@ export default function CertifiedStocksTestPanel() {
                   });
                   return (
                     <div key={`${p.market}-${p.code}`}
-                         className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col">
+                         className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col"
+                         style={{ gridColumn: `span ${p.span}` }}>
                       {/* Header */}
                       <div className="flex justify-between items-baseline mb-1">
                         <div>
@@ -1453,7 +1492,7 @@ export default function CertifiedStocksTestPanel() {
                       {/* Density grid — existing portion (T0 state still on hand) */}
                       <div
                         className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded flex-1"
-                        style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                        style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
                       >
                         {existing.map((sq, i) => {
                           const isPicked = pickedSquare?.market === p.market
@@ -1481,7 +1520,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                            style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
                           >
                             {gained.map((sq, i) => {
                               const idx = existing.length + i;
@@ -1512,7 +1551,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                            style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
                           >
                             {ghosts.map((sq, i) => {
                               const idx = existing.length + gained.length + i;
