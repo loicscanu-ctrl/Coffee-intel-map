@@ -41,12 +41,17 @@ from .parse_stock_report import parse_stock_report
 from .parse_tenders import parse_tenders
 
 OUT_DIR = Path(__file__).resolve().parents[4] / "frontend" / "public" / "data"
-# 1.0 s ≈ 1 req/s. The smoke test (10 reqs in ~3 s) passes; the previous 0.3 s
-# backfill (~3 req/s sustained) tripped Akamai's burst protection partway in
-# (arabica's 30 sequential reqs completed, then everything after silently got
-# 200-with-HTML error bodies). 1 req/s sits comfortably under typical limits.
-THROTTLE_S = 1.0
+# Per-path throttle: the 30-day backfill at 1 req/s revealed that ICE's
+# /marketdata/publicdocs/ prefix (robusta) is rate-limited far more strictly
+# than plain /publicdocs/ (arabica) — arabica's 30 sequential reqs all 200,
+# then robusta's 14 requests in 14 s tripped HTTP 429 and every subsequent
+# call returned 429. Slowing /marketdata/ to 5 s/req (=12 req/min) keeps us
+# comfortably under Akamai's threshold for that prefix.
 TIMEOUT = 30
+_THROTTLE = {"public": 1.0, "marketdata": 5.0}
+_THROTTLE_CAP = 15.0   # ceiling when self-bumping on 429 retries
+TOO_MANY_429S = 8       # bail-out after this many consecutive 429s (post-retry)
+_RATE_STATE: dict[str, int] = {"consecutive_429s": 0, "aborted": 0}
 
 # Stock_report.csv's HHMMSS publish time varies daily; 10 guesses per day was
 # 90% wasted 404s and *that* burst was what tripped Akamai. Just try the two
@@ -81,17 +86,54 @@ def _biz_days_back(start: date, n: int) -> list[date]:
     return out
 
 
-def _http_get(url: str, *, source: str | None = None) -> requests.Response | None:
+def _throttle_for(url: str) -> float:
+    return _THROTTLE["marketdata"] if "/marketdata/" in url else _THROTTLE["public"]
+
+
+def _http_get(url: str, *, source: str | None = None, _retry: bool = False) -> requests.Response | None:
+    throttle = _throttle_for(url)
     try:
+        if _RATE_STATE["aborted"]:
+            return None
         r = requests.get(url, headers=F.HEADERS, timeout=TIMEOUT, allow_redirects=True)
-        if r.status_code != 200:
+
+        # 429 → respect Retry-After (default 60s), back off, retry exactly once.
+        if r.status_code == 429:
+            if _retry:
+                # Retry already done; give up on this URL and let the run continue.
+                _RATE_STATE["consecutive_429s"] += 1
+                if _RATE_STATE["consecutive_429s"] >= TOO_MANY_429S:
+                    _RATE_STATE["aborted"] = 1
+                    print(f"  ! {TOO_MANY_429S} consecutive 429s — aborting remaining fetches")
+                ctype = r.headers.get("Content-Type", "")[:40]
+                print(f"  ! HTTP 429 (after retry) ({ctype}) {url}")
+                return r
+            wait_s = 60
+            try:
+                wait_s = max(int(r.headers.get("Retry-After", "60")), 30)
+            except ValueError:
+                pass
+            # Self-tune: bump the path's throttle so subsequent calls slow down
+            # too (capped). Helps when ICE narrows the limit during the run.
+            if "/marketdata/" in url:
+                _THROTTLE["marketdata"] = min(_THROTTLE["marketdata"] * 1.3, _THROTTLE_CAP)
+                print(f"  ! HTTP 429 → sleeping {wait_s}s; bumping marketdata throttle to "
+                      f"{_THROTTLE['marketdata']:.1f}s/req: {url}")
+            else:
+                print(f"  ! HTTP 429 → sleeping {wait_s}s: {url}")
+            time.sleep(wait_s)
+            # Recurse for the single retry; throttle.finally still applies once
+            # below, so we DON'T double-sleep on the way out.
+            return _http_get(url, source=source, _retry=True)
+
+        if r.status_code == 200:
+            _RATE_STATE["consecutive_429s"] = 0
+        else:
             ctype = r.headers.get("Content-Type", "")[:40]
             print(f"  ! HTTP {r.status_code} ({ctype}) {url}")
             return r
-        # 200 OK but wrong shape (Akamai HTML error page on a CSV/PDF endpoint
-        # is the silent failure mode we just hit). Return None so the parser
-        # never sees a misleading body; the WRONG-SHAPE line in _wrong_shape
-        # makes the cause visible.
+
+        # 200 OK but wrong shape (e.g. HTML error page) — treat as miss.
         if source and _wrong_shape(source, r):
             return None
         return r
@@ -99,7 +141,7 @@ def _http_get(url: str, *, source: str | None = None) -> requests.Response | Non
         print(f"  ! {type(e).__name__}: {url} — {e}")
         return None
     finally:
-        time.sleep(THROTTLE_S)
+        time.sleep(throttle)
 
 
 def _safe_parse(parse_fn, source: str, day: date | None, raw):
