@@ -466,6 +466,12 @@ def _merge_robusta(new: dict, old: dict) -> dict:
     if not new.get("latest_detail", {}).get("stock_report") and old.get("latest_detail", {}).get("stock_report"):
         new["latest_detail"] = old["latest_detail"]
 
+    # port_origin_history (workbook full-history lookup) — only the workbook
+    # importer emits it. Preserve the older copy when the daily scraper run
+    # doesn't carry one, so it survives across nightly merges.
+    if not new.get("port_origin_history") and old.get("port_origin_history"):
+        new["port_origin_history"] = old["port_origin_history"]
+
     if new["snapshots"]:
         new["as_of"] = new["snapshots"][-1]["date"]
     return new

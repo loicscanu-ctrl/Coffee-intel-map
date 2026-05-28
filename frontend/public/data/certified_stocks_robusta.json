@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T14:58:53+00:00",
+  "generated_at": "2026-05-28T20:22:51+00:00",
   "as_of": "2026-05-27",
   "snapshots": [
     {
@@ -18941,5 +18941,339 @@
         "transition": null
       }
     ]
+  },
+  "port_origin_history": {
+    "LON": {
+      "Brazilian Conillon": {
+        "tenderable": 13983,
+        "class34": 176
+      },
+      "Indonesia": {
+        "tenderable": 798,
+        "class34": 3
+      },
+      "Vietnam": {
+        "tenderable": 1421,
+        "class34": 29
+      },
+      "Cameroon": {
+        "tenderable": 3,
+        "class34": 0
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 111,
+        "class34": 0
+      }
+    },
+    "ANT": {
+      "Brazilian Conillon": {
+        "tenderable": 24593,
+        "class34": 779
+      },
+      "Angola": {
+        "tenderable": 10,
+        "class34": 0
+      },
+      "Indonesia": {
+        "tenderable": 8889,
+        "class34": 262
+      },
+      "Cameroon": {
+        "tenderable": 216,
+        "class34": 0
+      },
+      "Vietnam": {
+        "tenderable": 26845,
+        "class34": 1389
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 1479,
+        "class34": 610
+      },
+      "Republic of Madagascar": {
+        "tenderable": 70,
+        "class34": 36
+      },
+      "Tanzania": {
+        "tenderable": 61,
+        "class34": 20
+      },
+      "Sierra Leone": {
+        "tenderable": 396,
+        "class34": 40
+      },
+      "Guinea": {
+        "tenderable": 35,
+        "class34": 7
+      },
+      "Togo": {
+        "tenderable": 72,
+        "class34": 0
+      },
+      "Laos": {
+        "tenderable": 301,
+        "class34": 0
+      },
+      "Uganda": {
+        "tenderable": 778,
+        "class34": 373
+      },
+      "India": {
+        "tenderable": 326,
+        "class34": 0
+      },
+      "Congo": {
+        "tenderable": 15,
+        "class34": 0
+      },
+      "Democratic Republic of Congo": {
+        "tenderable": 2,
+        "class34": 0
+      }
+    },
+    "BAR": {
+      "Vietnam": {
+        "tenderable": 1434,
+        "class34": 193
+      },
+      "Brazilian Conillon": {
+        "tenderable": 1845,
+        "class34": 67
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 78,
+        "class34": 12
+      },
+      "India": {
+        "tenderable": 22,
+        "class34": 2
+      },
+      "Uganda": {
+        "tenderable": 44,
+        "class34": 8
+      },
+      "Indonesia": {
+        "tenderable": 85,
+        "class34": 8
+      },
+      "Cameroon": {
+        "tenderable": 7,
+        "class34": 0
+      }
+    },
+    "NOR": {
+      "Angola": {
+        "tenderable": 10,
+        "class34": 0
+      },
+      "Venezuela": {
+        "tenderable": 10,
+        "class34": 0
+      },
+      "Brazilian Conillon": {
+        "tenderable": 324,
+        "class34": 0
+      },
+      "Vietnam": {
+        "tenderable": 22,
+        "class34": 17
+      },
+      "Uganda": {
+        "tenderable": 5,
+        "class34": 5
+      }
+    },
+    "TRI": {
+      "Brazilian Conillon": {
+        "tenderable": 679,
+        "class34": 113
+      },
+      "Tanzania": {
+        "tenderable": 154,
+        "class34": 0
+      },
+      "Uganda": {
+        "tenderable": 59,
+        "class34": 7
+      },
+      "Vietnam": {
+        "tenderable": 598,
+        "class34": 41
+      },
+      "Cameroon": {
+        "tenderable": 21,
+        "class34": 1
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 15,
+        "class34": 0
+      },
+      "India": {
+        "tenderable": 315,
+        "class34": 0
+      },
+      "Laos": {
+        "tenderable": 94,
+        "class34": 0
+      },
+      "Indonesia": {
+        "tenderable": 2,
+        "class34": 0
+      },
+      "Democratic Republic of Congo": {
+        "tenderable": 6,
+        "class34": 0
+      },
+      "Togo": {
+        "tenderable": 15,
+        "class34": 0
+      }
+    },
+    "FEL": {
+      "Vietnam": {
+        "tenderable": 245,
+        "class34": 0
+      },
+      "Brazilian Conillon": {
+        "tenderable": 736,
+        "class34": 7
+      }
+    },
+    "GEN": {
+      "Brazilian Conillon": {
+        "tenderable": 198,
+        "class34": 0
+      },
+      "Tanzania": {
+        "tenderable": 64,
+        "class34": 0
+      },
+      "Uganda": {
+        "tenderable": 19,
+        "class34": 0
+      },
+      "Vietnam": {
+        "tenderable": 30,
+        "class34": 2
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 78,
+        "class34": 29
+      },
+      "Cameroon": {
+        "tenderable": 60,
+        "class34": 13
+      },
+      "India": {
+        "tenderable": 63,
+        "class34": 0
+      },
+      "Democratic Republic of Congo": {
+        "tenderable": 23,
+        "class34": 0
+      }
+    },
+    "HAM": {
+      "Uganda": {
+        "tenderable": 114,
+        "class34": 28
+      },
+      "Brazilian Conillon": {
+        "tenderable": 92,
+        "class34": 0
+      },
+      "Vietnam": {
+        "tenderable": 756,
+        "class34": 197
+      },
+      "India": {
+        "tenderable": 147,
+        "class34": 0
+      },
+      "Cameroon": {
+        "tenderable": 40,
+        "class34": 3
+      },
+      "Laos": {
+        "tenderable": 26,
+        "class34": 0
+      },
+      "Indonesia": {
+        "tenderable": 119,
+        "class34": 2
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 3,
+        "class34": 0
+      },
+      "Tanzania": {
+        "tenderable": 21,
+        "class34": 0
+      }
+    },
+    "LEH": {
+      "Brazilian Conillon": {
+        "tenderable": 20,
+        "class34": 10
+      },
+      "Vietnam": {
+        "tenderable": 18,
+        "class34": 0
+      },
+      "Cameroon": {
+        "tenderable": 90,
+        "class34": 1
+      },
+      "Congo": {
+        "tenderable": 3,
+        "class34": 0
+      },
+      "Guinea": {
+        "tenderable": 18,
+        "class34": 11
+      },
+      "Sierra Leone": {
+        "tenderable": 17,
+        "class34": 3
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 9,
+        "class34": 0
+      }
+    },
+    "BRE": {
+      "Vietnam": {
+        "tenderable": 252,
+        "class34": 10
+      }
+    },
+    "AMS": {
+      "Vietnam": {
+        "tenderable": 1104,
+        "class34": 25
+      },
+      "Brazilian Conillon": {
+        "tenderable": 2696,
+        "class34": 89
+      },
+      "Cote d'Ivoire": {
+        "tenderable": 493,
+        "class34": 349
+      }
+    },
+    "ROT": {
+      "Brazilian Conillon": {
+        "tenderable": 1715,
+        "class34": 24
+      },
+      "Vietnam": {
+        "tenderable": 146,
+        "class34": 1
+      },
+      "Indonesia": {
+        "tenderable": 280,
+        "class34": 0
+      }
+    }
   }
 }
