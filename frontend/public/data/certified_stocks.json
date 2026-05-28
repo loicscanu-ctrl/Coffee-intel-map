@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-05-27T18:00:00Z",
+  "status": "seed",
+  "_note": "Placeholder shape seeded from backend/seed/global.json. The daily ICE scraper overwrites this file once the probe-confirmed sources are wired in.",
+  "arabica": {
+    "as_of": "2026-01-23",
+    "source": "ICE Futures US — coffee_cert_stock_YYYYMMDD.xls (pending live scrape)",
+    "unit": "bags",
+    "total": 442459,
+    "delta_day": null,
+    "pending_grading": null,
+    "graded_today": null,
+    "issued_today": null,
+    "by_port": [],
+    "by_origin": [],
+    "recent_issuance": [],
+    "history": []
+  },
+  "robusta": {
+    "as_of": "2026-01-23",
+    "source": "ICE Futures Europe — Stock_Report_RC_*.csv + supporting reports (pending live scrape)",
+    "unit": "lots",
+    "lot_size_tonnes": 10,
+    "total_lots": 4532,
+    "total_tonnes": 45320,
+    "delta_day_lots": null,
+    "by_origin": [],
+    "by_warehouse": [],
+    "age_allowance": {
+      "month": null,
+      "buckets": []
+    },
+    "recent_gradings": [],
+    "recent_issuance_daily": [],
+    "monthly_issuance": [],
+    "recent_tenders": [],
+    "infested_warrants": [],
+    "grading_appeals": [],
+    "history": []
+  }
+}

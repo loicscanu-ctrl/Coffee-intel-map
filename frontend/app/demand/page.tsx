@@ -5,6 +5,7 @@ import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
+import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 
@@ -21,6 +22,9 @@ export default function DemandPage() {
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <StocksPanel />
+      </div>
+      <div className="border-b border-slate-700 bg-slate-950">
+        <CertifiedStocksPanel />
       </div>
       <div className="border-b border-slate-700 bg-slate-950">
         <GrowthMarketsPanel />
