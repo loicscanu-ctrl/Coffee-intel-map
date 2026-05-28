@@ -63,9 +63,14 @@ def _biz_days_back(start: date, n: int) -> list[date]:
 def _http_get(url: str) -> requests.Response | None:
     try:
         r = requests.get(url, headers=F.HEADERS, timeout=TIMEOUT, allow_redirects=True)
+        # Log non-200 so we can distinguish 404 (file not published that day —
+        # normal for rare sources) from 403 (Akamai block — needs a fix).
+        if r.status_code != 200:
+            ctype = r.headers.get("Content-Type", "")[:40]
+            print(f"  ! HTTP {r.status_code} ({ctype}) {url}")
         return r
     except requests.exceptions.RequestException as e:
-        print(f"  ! {url} → {type(e).__name__}: {e}")
+        print(f"  ! {type(e).__name__}: {url} — {e}")
         return None
     finally:
         time.sleep(THROTTLE_S)
@@ -362,13 +367,53 @@ def run(days_back: int = 30, write: bool = True) -> dict:
     return {"arabica": arabica_json, "robusta": robusta_json}
 
 
+# ── Smoke test ───────────────────────────────────────────────────────────────
+# Hits each of the 10 source URLs ONCE against the dates the user verified in
+# the probe. If any return non-200 here, the problem is URL/access not data
+# volume — not whether ICE happened to publish that day.
+
+_SMOKE_URLS = [
+    ("arabica_xls",            F.ARABICA_DAILY_XLS.format(yyyymmdd="20260527")),
+    ("stock_report",           F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd="20260527", hhmmss="103021")),
+    ("age_allowance",          F.ROBUSTA_AGE_ALLOWANCE_XLSX.format(yyyymmdd="20260430")),
+    ("grading_overview",       F.ROBUSTA_GRADING_OVERVIEW_PDF.format(yymmdd="260521")),
+    ("gradings",               F.ROBUSTA_GRADINGS_TXT.format(yymmdd="260521", n=1)),
+    ("iss_recv_daily",         F.ROBUSTA_ISS_RECV_DAILY.format(yymmdd="260522")),
+    ("iss_recv_monthly",       F.ROBUSTA_ISS_RECV_MONTHLY.format(yymmdd="260331")),
+    ("grading_appeals",        F.ROBUSTA_GRADING_APPEALS.format(yymmdd="250923", n=1)),
+    ("tenders",                F.ROBUSTA_TENDERS.format(yymmdd="260522")),
+    ("infested_warrant",       F.ROBUSTA_INFESTED_WARRANT.format(yymmdd="251215")),
+]
+
+
+def smoke() -> int:
+    """Hit each of the 10 probe-verified URLs once. Returns # of 200s."""
+    print("=== SMOKE: probe-verified URLs (expect 10/10 HTTP 200) ===\n")
+    ok = 0
+    for name, url in _SMOKE_URLS:
+        r = _http_get(url)
+        if r is not None and r.status_code == 200 and r.content:
+            ok += 1
+            ctype = r.headers.get("Content-Type", "")[:40]
+            print(f"  ✓ {name:18}  HTTP 200  {len(r.content):>10,} B  {ctype}")
+    print(f"\n=== SMOKE: {ok}/{len(_SMOKE_URLS)} OK ===")
+    return ok
+
+
 def _cli() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=30,
                     help="business days to look back (default 30)")
     ap.add_argument("--no-write", action="store_true",
                     help="print summary only, don't write JSONs")
+    ap.add_argument("--smoke", action="store_true",
+                    help="hit probe-verified URLs once each; skip the backfill")
     args = ap.parse_args()
+
+    if args.smoke:
+        ok = smoke()
+        sys.exit(0 if ok == len(_SMOKE_URLS) else 1)
+
     out = run(days_back=args.days, write=not args.no_write)
     print(f"\nSUMMARY: arabica snapshots={len(out['arabica']['snapshots'])} · "
           f"robusta snapshots={len(out['robusta']['snapshots'])} · "

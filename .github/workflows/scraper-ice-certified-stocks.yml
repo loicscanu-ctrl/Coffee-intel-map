@@ -11,8 +11,16 @@ name: "1.13 – ICE Certified Stocks (arabica + robusta)"
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: "smoke = hit 10 probe-verified URLs once (no commit); backfill = real window"
+        required: false
+        default: "backfill"
+        type: choice
+        options:
+          - smoke
+          - backfill
       days_back:
-        description: "Business days to look back (30 = test window; 180 = full)"
+        description: "Backfill window in business days (ignored if mode=smoke)"
         required: false
         default: "30"
         type: string
@@ -45,10 +53,15 @@ jobs:
       - name: Pull ICE certified stocks
         working-directory: backend
         run: |
-          python -m scraper.sources.ice_certified_stocks.orchestrate \
-            --days ${{ inputs.days_back || 30 }}
+          if [ "${{ inputs.mode }}" = "smoke" ]; then
+            python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
+          else
+            python -m scraper.sources.ice_certified_stocks.orchestrate \
+              --days ${{ inputs.days_back || 30 }}
+          fi
 
       - name: Commit + push if changed
+        if: ${{ inputs.mode != 'smoke' }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
