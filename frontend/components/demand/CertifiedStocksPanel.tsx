@@ -373,6 +373,137 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
   );
 }
 
+// ── Robusta period table (parallel to arabica's, lots-native) ────────────────
+
+interface GradingEvent {
+  date: string;
+  summary?: {
+    tenderable_today?: number;
+    non_tenderable_today?: number;
+    lots_graded_today?: number;
+  };
+}
+interface OverviewEvent {
+  date: string;
+  total_pending_lots?: number | null;
+  queue_lots?: number | null;
+  forecast_lots?: number | null;
+}
+
+function RobustaPeriodTable({
+  snapshots, gradings, overview, unit,
+}: {
+  snapshots: RobustaSnap[];
+  gradings: GradingEvent[];
+  overview: OverviewEvent[];
+  unit: Unit;
+}) {
+  if (!snapshots.length && !gradings.length && !overview.length) return <Pending label="Period view" />;
+
+  const today = new Date();
+  const cols = _periodColumns(today);
+
+  const data = cols.map((col) => {
+    const snap = _closestSnap(snapshots, col.date);
+    const grading = _closestSnap(gradings, col.date);
+    const ov = _closestSnap(overview, col.date);
+    const idx = snap ? snapshots.findIndex((s) => s.date === snap.date) : -1;
+    const prev = idx > 0 ? snapshots[idx - 1] : null;
+    return { col, snap, prev, grading, overview: ov };
+  });
+
+  const fmtLotsCell = (n: number | null | undefined) =>
+    n == null ? "—" : fmt(fromLots(n, unit), unit);
+
+  const rows: { label: string; values: string[] }[] = [
+    {
+      label: "Pending grading",
+      // grading_overview publishes total = queue + forecast (10-tonne lots).
+      values: data.map((d) => fmtLotsCell(d.overview?.total_pending_lots ?? null)),
+    },
+    {
+      label: "Tenderable today",
+      values: data.map((d) => fmtLotsCell(d.grading?.summary?.tenderable_today)),
+    },
+    {
+      label: "Non-tenderable",
+      values: data.map((d) => fmtLotsCell(d.grading?.summary?.non_tenderable_today)),
+    },
+    {
+      label: "Passing rate",
+      values: data.map((d) => {
+        const t = d.grading?.summary?.tenderable_today ?? 0;
+        const n = d.grading?.summary?.non_tenderable_today ?? 0;
+        const tot = t + n;
+        if (!d.grading || tot === 0) return "—";
+        return `${Math.round((t / tot) * 100)}%`;
+      }),
+    },
+    {
+      label: "Stocks",
+      values: data.map((d) => fmtLotsCell(d.snap?.total_lots_certified)),
+    },
+    {
+      label: "Issuance (sold)",
+      values: data.map((d) => fmtLotsCell(d.snap?.lots_sold_today)),
+    },
+    {
+      label: "Decert / issued",
+      values: data.map((d) => {
+        if (!d.snap || !d.prev) return "—";
+        // Same formula as arabica: prev_stock + passed − stock. For robusta
+        // we use lots_graded_today (the tenderable portion drives the stock
+        // *into* certified). Includes the issuance/tender outflow.
+        const passed = d.grading?.summary?.tenderable_today ?? d.snap.lots_graded_today ?? 0;
+        const v = d.prev.total_lots_certified + passed - d.snap.total_lots_certified;
+        return fmtLotsCell(v);
+      }),
+    },
+  ];
+
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+        Period view ({unitSuffix(unit)})
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[10px] font-mono border-collapse">
+          <thead>
+            <tr className="text-slate-500 border-b border-slate-800">
+              <th className="text-left py-1 pr-2 w-[110px]">Metric</th>
+              {cols.map((c) => (
+                <th key={c.label} className="text-right py-1 px-1.5">{c.label}</th>
+              ))}
+            </tr>
+            <tr className="text-slate-700 text-[9px] border-b border-slate-900">
+              <th className="text-left pb-1 pr-2" />
+              {data.map((d, i) => (
+                <th key={i} className="text-right pb-1 px-1.5">
+                  {d.snap ? d.snap.date.slice(5) : (d.grading ? d.grading.date.slice(5) : "—")}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.label} className="border-b border-slate-900 last:border-0">
+                <td className="text-slate-300 text-left py-1 pr-2">{r.label}</td>
+                {r.values.map((v, i) => (
+                  <td key={i} className="text-slate-100 text-right py-1 px-1.5">{v}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="text-[9px] text-slate-600 italic mt-1">
+        Closest snapshot per period (±7 days). Decert/issued = prev_stock + tenderable − stock.
+        Click-to-drill (port → ageing → origin, the origin layer inferred from gradings flow) coming next.
+      </div>
+    </div>
+  );
+}
+
 // ── Robusta column ────────────────────────────────────────────────────────────
 
 function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
@@ -526,6 +657,13 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
           </div>
         )}
       </div>
+
+      <RobustaPeriodTable
+        snapshots={d?.snapshots || []}
+        gradings={(d?.recent_activity?.gradings || []) as unknown as GradingEvent[]}
+        overview={(d?.recent_activity?.grading_overview || []) as unknown as OverviewEvent[]}
+        unit={unit}
+      />
     </div>
   );
 }
