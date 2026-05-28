@@ -70,13 +70,13 @@ KC   3.24   ▼−0.08  (KCN26)
 VN FAQ  92,400 VND · N−40 (incl. +100 logistics)
 
 COT KC (wk 20 May):
-Price ▲ · OI ▼
-Roasters ▼ · Producers ▲
+Price ▲ xx cents/lb · OI ▼ xx,xxx
+Roasters ▼ xx,xxx · Producers ▲ xx,xxx
 MM net +18,420 ▲+1,240
 
 COT RC (wk 20 May):
-Price ▼ · OI ▼
-Roasters ▲ · Producers ▼
+Price ▼ $xxx · OI ▼ xx,xxx
+Roasters ▲ xx,xxx · Producers ▼ xx,xxx
 MM net −4,130 ▼−890
 
 Brazil daily reg (14 May): 1,025,329 bags
