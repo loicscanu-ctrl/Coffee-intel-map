@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-28T13:58:43.502558Z",
+  "generated_at": "2026-05-28T20:55:05.244891Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "275.75 (+5.90)",
+      "value": "274.25 (+4.40)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,546 (+74)",
+      "value": "3,554 (+82)",
       "category": "futures"
     },
     {
       "label": "B3 4/5 Jul '26",
-      "value": "336.20 USD/sac",
+      "value": "342.00 USD/sac",
       "category": "futures"
     },
     {
