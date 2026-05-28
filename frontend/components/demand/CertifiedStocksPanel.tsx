@@ -372,10 +372,24 @@ function _monthShort(d: Date): string {
   return d.toLocaleString("en-US", { month: "short", year: "2-digit" });
 }
 
+// Snap a date back to the most recent Monday (00:00 local). JS getDay():
+// 0=Sun, 1=Mon, … 6=Sat → walk back (day || 7) - 1 days.
+function _mondayOf(d: Date): Date {
+  const r = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = r.getDay() || 7;   // treat Sunday as 7
+  r.setDate(r.getDate() - (dow - 1));
+  return r;
+}
+
 function _periodColumns(today: Date): PeriodCol[] {
+  // Calendar-week columns (Mon-Sun). "Current" = this week's Mon → today;
+  // "1w ago" = previous full Mon-Sun. Confirmed with user, TODO #9.
+  const thisMon = _mondayOf(today);
+  const prevMon = _addDays(thisMon, -7);
+  const prevSun = _addDays(thisMon, -1);
   const cols: PeriodCol[] = [
-    { label: "Current", start: _addDays(today, -6), end: today },
-    { label: "1w ago",  start: _addDays(today, -13), end: _addDays(today, -7) },
+    { label: "Current", start: thisMon, end: today  },
+    { label: "1w ago",  start: prevMon, end: prevSun },
   ];
   for (let i = 1; i <= 6; i++) {
     const eoM = _endOfMonth(today, i);

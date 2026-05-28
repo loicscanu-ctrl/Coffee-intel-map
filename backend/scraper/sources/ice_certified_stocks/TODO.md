@@ -36,10 +36,6 @@ S3) so future parser changes can re-derive shape without re-fetching ICE.
 requires another 90-min backfill. CI workflow change of moderate scope —
 not started.
 
-### 9. Period-view "Current" column boundary — PENDING USER INPUT
-Today: `Current = today − 6 to today` (rolling 7 days). Confirm with user
-whether this should be Mon-Sun calendar week instead, or stay rolling.
-
 ### 11. Arabica age_detail (per port × day-bucket) — PARTIAL
 - ✅ Issuers (sell-side) wired as Issued row's `port_issuer` drill.
 - ✅ Stoppers (buy-side) wired as a new "Received" row, same drill.
@@ -121,3 +117,6 @@ whether this should be Mon-Sun calendar week instead, or stay rolling.
   `age_detail` deferred (see Open #11).
 - ✅ TODO #12 — Deep-history lazy load: chart range toggle (1y / 5y / 10y /
   all) with `useDeepHistory()` hook that fetches deep chunks on demand.
+- ✅ TODO #9 — Period-view columns now snap to calendar weeks (Mon-Sun):
+  "Current" = this week's Mon → today; "1w ago" = previous full Mon-Sun.
+  `_mondayOf()` helper does the snap; month-end columns unchanged.
