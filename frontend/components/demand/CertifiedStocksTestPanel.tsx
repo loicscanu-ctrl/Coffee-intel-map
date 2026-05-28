@@ -158,113 +158,204 @@ function TightnessGauge({ title, current, min, max, rangeLabel, tightThreshold =
   );
 }
 
-// ── Age bins (shared by system-flow density grid) ─────────────────────────
-type BeanBin = "fresh" | "mid" | "old" | "stale";
-interface AgeDist { fresh: number; mid: number; old: number; stale: number }   // shares 0..1
+// ── Age bins ─────────────────────────────────────────────────────────────────
+// Per user spec — 4 fadeness levels for stock 1y+, plus full-opacity "fresh"
+// for anything under a year. Bin keys are stable so they survive cross-runs.
+type AgeBin = "fresh" | "y1to2" | "y2to3" | "y3to4" | "y4plus";
+interface AgeDist { fresh: number; y1to2: number; y2to3: number; y3to4: number; y4plus: number }  // shares 0..1
+const AGE_OPACITY: Record<AgeBin, number> = {
+  fresh:  1.00,
+  y1to2:  0.70,
+  y2to3:  0.48,
+  y3to4:  0.28,
+  y4plus: 0.14,
+};
+const AGE_LABEL: Record<AgeBin, string> = {
+  fresh: "< 1y", y1to2: "1-2y", y2to3: "2-3y", y3to4: "3-4y", y4plus: "4y+",
+};
+const AGE_BIN_ORDER: AgeBin[] = ["fresh", "y1to2", "y2to3", "y3to4", "y4plus"];
 
-// Port-name lookup for the arabica system-flow row labels (full version
-// lives in CertifiedStocksPanel).
+const _binByMonths = (months: number): AgeBin =>
+  months < 12 ? "fresh"
+  : months < 24 ? "y1to2"
+  : months < 36 ? "y2to3"
+  : months < 48 ? "y3to4"
+  : "y4plus";
+const _binByDays = (days: number): AgeBin => _binByMonths(days / 30);
+
+// Port-name lookup for arabica port labels.
 const ARABICA_PORT_NAMES: Record<string, string> = {
   ANT: "Antwerp", "HA/BR": "Hamburg/Bremen", HA: "Hamburg/Bremen", HAM: "Hamburg",
   HOU: "Houston", HO: "Houston", MIA: "Miami", MI: "Miami",
   NO: "New Orleans", NOR: "Norfolk", NY: "New York", NYK: "New York", VIR: "Virginia",
 };
+const ROBUSTA_PORT_NAMES: Record<string, string> = {
+  AMS: "Amsterdam", ANT: "Antwerp", BAR: "Barcelona", BRE: "Bremen",
+  FEL: "Felixstowe", GEN: "Genoa", HAM: "Hamburg", LEH: "Le Havre",
+  LIV: "Liverpool", LON: "London", NYK: "New York", ROT: "Rotterdam", TRI: "Trieste",
+};
 
-// ── Origin colors (shared by the system-flow density grid) ──────────────────
-// Static palette so a given origin paints the same shade across every port and
-// every animation. Unknown origins fall through to slate.
+// ── Duration window selector ────────────────────────────────────────────────
+type DurationOpt = "7d" | "mtd" | "2m" | "3m" | "6m";
+const DURATION_LABELS: Record<DurationOpt, string> = {
+  "7d":  "Last 7 days",
+  "mtd": "Month to date",
+  "2m":  "Last 2 months",
+  "3m":  "Last 3 months",
+  "6m":  "Last 6 months",
+};
+function _durationCutoff(opt: DurationOpt, today: Date): Date {
+  const d = new Date(today);
+  switch (opt) {
+    case "7d":  d.setDate(d.getDate() - 7); return d;
+    case "mtd": return new Date(today.getFullYear(), today.getMonth(), 1);
+    case "2m":  d.setMonth(d.getMonth() - 2); return d;
+    case "3m":  d.setMonth(d.getMonth() - 3); return d;
+    case "6m":  d.setMonth(d.getMonth() - 6); return d;
+  }
+}
+
+// ── Origin colors ────────────────────────────────────────────────────────────
 const ORIGIN_COLORS: Record<string, string> = {
-  "Brazil":          "#a855f7",   // purple
+  "Brazil":             "#a855f7",   // purple
   "Brazilian Conillon": "#7c3aed",
-  "Honduras":        "#3b82f6",   // blue
-  "Colombia":        "#6366f1",   // indigo
-  "Vietnam":         "#14b8a6",   // teal
-  "Indonesia":       "#10b981",   // emerald
-  "Guatemala":       "#f59e0b",   // amber
-  "El Salvador":     "#eab308",   // yellow
-  "Nicaragua":       "#84cc16",   // lime
-  "Costa Rica":      "#06b6d4",   // cyan
-  "Mexico":          "#f97316",   // orange
-  "Peru":            "#ec4899",   // pink
-  "India":           "#ef4444",   // red
-  "Burundi":         "#22d3ee",   // sky
-  "Uganda":          "#a3e635",   // lime-light
-  "Ethiopia":        "#f472b6",   // pink-light
-  "Tanzania":        "#fb923c",   // orange-light
-  "Venezuela":       "#fb7185",   // rose-light
+  "Honduras":           "#3b82f6",   // blue
+  "Colombia":           "#6366f1",   // indigo
+  "Vietnam":            "#14b8a6",   // teal
+  "Indonesia":          "#10b981",   // emerald
+  "Guatemala":          "#f59e0b",   // amber
+  "El Salvador":        "#eab308",   // yellow
+  "Nicaragua":          "#84cc16",   // lime
+  "Costa Rica":         "#06b6d4",   // cyan
+  "Mexico":             "#f97316",   // orange
+  "Peru":               "#ec4899",   // pink
+  "India":              "#ef4444",   // red
+  "Burundi":            "#22d3ee",   // sky
+  "Uganda":             "#a3e635",   // lime-light
+  "Ethiopia":           "#f472b6",   // pink-light
+  "Tanzania":           "#fb923c",   // orange-light
+  "Venezuela":          "#fb7185",   // rose-light
 };
 const ORIGIN_DEFAULT = "#64748b";  // slate-500
 const _originColor = (origin: string): string => ORIGIN_COLORS[origin] ?? ORIGIN_DEFAULT;
 
-// Squares per 1 unit (so 2,000 bags = 1 square in the density grid). Tunable
-// per market — arabica uses 2,000 bags; robusta would use ~10 lots (skipped
-// here because we lack origin-per-port data for robusta).
-const BAGS_PER_SQUARE = 2000;
-const DENSITY_COLS = 20;
-const DENSITY_MAX_SQUARES = 240;   // safety cap so MAX-volume ports don't blow up the DOM
+// ── Density grid (vertical orientation) ─────────────────────────────────────
+// Per-market unit sizing so an ANT-sized port doesn't blow up the DOM.
+const DENSITY_COLS = 8;
+const DENSITY_MAX_SQUARES = 128;
 
-interface DensitySquare { status: "filled" | "empty"; color: string; opacity: number }
+interface DensitySquare {
+  status: "filled" | "ghost";  // ghost = volume lost over the duration window
+  origin: string;
+  color: string;
+  ageBin: AgeBin;
+  bagsOrLots: number;          // volume one square represents (the per-market unit)
+  isNew: boolean;              // gained over the window — green halo
+}
 
-// Build the density grid for one port given current state + 7-day flows.
-// Filled count = current / 2,000 bags (capped). Each filled square gets:
-//  • color = origin sampled proportionally from the latest by_origin × by_port
-//    matrix (so visual share matches the actual mix)
-//  • opacity = sampled proportionally from the port's age distribution
+// Build the grid for one port. `byOrigin` / `age` snapshots are for the
+// CURRENT state; `deltaByOrigin` is current − T0 per origin (positive =
+// gained, negative = lost). Gained → emerald-bordered "new" squares;
+// lost → ghost squares appended at the end with dotted border.
 function buildDensityGrid(
   current: number,
   byOrigin: Record<string, number>,
   age: AgeDist,
-): { squares: DensitySquare[]; total: number } {
-  const total = Math.min(Math.ceil(current / BAGS_PER_SQUARE), DENSITY_MAX_SQUARES);
-  const filledCount = current > 0 ? Math.max(1, Math.round((current / BAGS_PER_SQUARE) > DENSITY_MAX_SQUARES
-    ? DENSITY_MAX_SQUARES * 0.92
-    : (current / BAGS_PER_SQUARE))) : 0;
-  // Pad to a whole number of rows (DENSITY_COLS = 20).
-  const grandTotal = Math.max(total, filledCount);
-  const totalRowsAligned = Math.ceil(grandTotal / DENSITY_COLS) * DENSITY_COLS;
+  deltaByOrigin: Record<string, number>,
+  unit: number,
+): DensitySquare[] {
+  const target = Math.min(Math.ceil(current / unit), DENSITY_MAX_SQUARES);
+  const filledCount = current > 0 ? Math.max(1, target) : 0;
 
-  // Distribute origins proportionally to byOrigin totals.
+  // 1. Distribute origins proportionally to byOrigin shares.
   const originPool: string[] = [];
   const originSum = Object.values(byOrigin).reduce((a, b) => a + b, 0) || 1;
-  for (const [origin, bags] of Object.entries(byOrigin)) {
-    const n = Math.round(filledCount * (bags / originSum));
-    for (let i = 0; i < n; i++) originPool.push(_originColor(origin));
+  for (const [origin, v] of Object.entries(byOrigin)) {
+    const n = Math.round(filledCount * (v / originSum));
+    for (let i = 0; i < n; i++) originPool.push(origin);
   }
-  while (originPool.length < filledCount) originPool.push(ORIGIN_DEFAULT);
+  while (originPool.length < filledCount) originPool.push(Object.keys(byOrigin)[0] ?? "Unknown");
   while (originPool.length > filledCount) originPool.pop();
 
-  // Distribute opacity (age) proportionally.
-  const opacityPool: number[] = [];
-  const freshN = Math.round(filledCount * age.fresh);
-  const midN   = Math.round(filledCount * age.mid);
-  const oldN   = Math.round(filledCount * age.old);
-  const staleN = Math.max(0, filledCount - freshN - midN - oldN);
-  for (let i = 0; i < freshN; i++) opacityPool.push(1.0);
-  for (let i = 0; i < midN;   i++) opacityPool.push(0.75);
-  for (let i = 0; i < oldN;   i++) opacityPool.push(0.45);
-  for (let i = 0; i < staleN; i++) opacityPool.push(0.18);
+  // 2. Distribute age bins proportionally (independent of origin — we don't
+  // have a per-(origin, age) source).
+  const agePool: AgeBin[] = [];
+  for (const bin of AGE_BIN_ORDER) {
+    const n = Math.round(filledCount * age[bin]);
+    for (let i = 0; i < n; i++) agePool.push(bin);
+  }
+  while (agePool.length < filledCount) agePool.push("fresh");
+  while (agePool.length > filledCount) agePool.pop();
+
+  // 3. Mark "new" squares per origin. For each origin with positive delta
+  // over the window, the last ceil(delta/unit) squares of that origin get
+  // the isNew flag.
+  const gainedSquaresPerOrigin: Record<string, number> = {};
+  for (const [origin, delta] of Object.entries(deltaByOrigin)) {
+    if (delta > 0) gainedSquaresPerOrigin[origin] = Math.ceil(delta / unit);
+  }
+
+  // Walk in reverse so the "last" N squares of an origin get the flag.
+  const isNewArr: boolean[] = new Array(filledCount).fill(false);
+  for (let i = filledCount - 1; i >= 0; i--) {
+    const o = originPool[i];
+    if ((gainedSquaresPerOrigin[o] ?? 0) > 0) {
+      isNewArr[i] = true;
+      gainedSquaresPerOrigin[o]--;
+    }
+  }
 
   const squares: DensitySquare[] = [];
   for (let i = 0; i < filledCount; i++) {
-    squares.push({ status: "filled", color: originPool[i], opacity: opacityPool[i] ?? 0.85 });
+    squares.push({
+      status: "filled",
+      origin: originPool[i],
+      color: _originColor(originPool[i]),
+      ageBin: agePool[i] ?? "fresh",
+      bagsOrLots: unit,
+      isNew: isNewArr[i],
+    });
   }
-  while (squares.length < totalRowsAligned) {
-    squares.push({ status: "empty", color: ORIGIN_DEFAULT, opacity: 0.18 });
+
+  // 4. Append ghost squares for each origin with negative delta (volume
+  // lost). One ghost per `unit` lost. Capped so a huge outflow doesn't
+  // dominate the grid.
+  const ghostCap = Math.min(filledCount, DENSITY_MAX_SQUARES - filledCount);
+  let ghostsLeft = ghostCap;
+  for (const [origin, delta] of Object.entries(deltaByOrigin)) {
+    if (delta < 0 && ghostsLeft > 0) {
+      const n = Math.min(Math.ceil(-delta / unit), ghostsLeft);
+      for (let i = 0; i < n; i++) {
+        squares.push({
+          status: "ghost",
+          origin,
+          color: _originColor(origin),
+          ageBin: "fresh",     // age unknown for lost volume
+          bagsOrLots: unit,
+          isNew: false,
+        });
+        ghostsLeft--;
+      }
+    }
   }
-  return { squares, total: squares.length };
+  return squares;
 }
 
-interface OriginFlow { origin: string; bags: number; color: string }
-interface ArabicaPortFlow {
+interface OriginFlow { origin: string; volume: number; color: string }
+interface PortFlow {
+  market: "KC" | "RC";
   code: string;
   name: string;
   current: number;
   capacity: number;
   pctFull: number;
+  unit: "bags" | "lots";
+  squareUnit: number;            // bags-per-square or lots-per-square
   byOrigin: Record<string, number>;
   age: AgeDist;
-  inflow: OriginFlow[];   // sorted desc by bags
-  outflow: OriginFlow[];  // sorted desc by bags (positive numbers)
+  deltaByOrigin: Record<string, number>;   // signed change over window per origin
+  inflow: OriginFlow[];
+  outflow: OriginFlow[];
 }
 
 // ── Main test panel ──────────────────────────────────────────────────────────
@@ -277,6 +368,13 @@ export default function CertifiedStocksTestPanel() {
   const [deepArabica, setDeepArabica] = useState<DeepRow[] | null>(null);
   const [deepRobusta, setDeepRobusta] = useState<DeepRow[] | null>(null);
   const [showRaw, setShowRaw] = useState(false);
+  // System-flow controls.
+  const [flowDuration, setFlowDuration] = useState<DurationOpt>("7d");
+  const [pickedSquare, setPickedSquare] = useState<{
+    market: "KC" | "RC"; port: string; portName: string; squareIdx: number;
+    origin: string; ageBin: AgeBin; bagsOrLots: number; unit: "bags" | "lots";
+    isNew: boolean; isGhost: boolean;
+  } | null>(null);
 
   // Primary feeds.
   useEffect(() => {
@@ -436,58 +534,6 @@ export default function CertifiedStocksTestPanel() {
     });
   }, [robusta]);
 
-  // ── Today's robusta certification pipeline ────────────────────────────
-  // Counts come from the most recent gradings event + grading_overview.
-  // "Decertified today" is computed as the day-over-day stock delta minus
-  // the day's passed lots (i.e. coffee that left the certified pool).
-  const todaysPipeline = useMemo(() => {
-    const grad = robusta?.recent_activity?.gradings ?? [];
-    const overv = robusta?.recent_activity?.grading_overview ?? [];
-    const snaps = robusta?.snapshots ?? [];
-    if (grad.length === 0 && overv.length === 0 && snaps.length < 2) return null;
-    // Most recent gradings event drives the pass/fail breakdown.
-    const lastGrad = grad.length ? grad[grad.length - 1] : null;
-    let passedPremium = 0, passedBorderline = 0, failed = 0;
-    for (const e of (lastGrad?.entries || [])) {
-      const lots = e.lots || 0;
-      if (e.tenderable === false) { failed += lots; continue; }
-      if (e.class === 3 || e.class === 4) passedBorderline += lots;
-      else passedPremium += lots;
-    }
-    const graded = passedPremium + passedBorderline + failed;
-    // Pending: nearest grading_overview to lastGrad.date (within 14 days).
-    let pendingQueue = 0, pendingForecast = 0;
-    if (lastGrad) {
-      const target = new Date(lastGrad.date).getTime();
-      let best: RobustaOverviewEvent | null = null; let bestDist = Infinity;
-      for (const o of overv) {
-        const dist = Math.abs(new Date(o.date).getTime() - target);
-        if (dist < bestDist) { best = o; bestDist = dist; }
-      }
-      if (best && bestDist < 14 * 86_400_000) {
-        pendingQueue    = best.queue_lots    ?? 0;
-        pendingForecast = best.forecast_lots ?? 0;
-      }
-    }
-    const tendered = graded + pendingQueue;
-    // Decertified ≈ −(stock_delta) + passed_tenderable (those that entered).
-    // Use the latest two snapshots that bracket lastGrad.date.
-    let decertified = 0;
-    if (snaps.length >= 2) {
-      const cur = snaps[snaps.length - 1];
-      const prev = snaps[snaps.length - 2];
-      const delta = (cur.total_lots_certified || 0) - (prev.total_lots_certified || 0);
-      const passed = passedPremium + passedBorderline;
-      decertified = Math.max(0, passed - delta);
-    }
-    return {
-      date: lastGrad?.date ?? null,
-      tendered, pendingQueue, pendingForecast,
-      graded, passedPremium, passedBorderline, failed,
-      decertified,
-    };
-  }, [robusta]);
-
   // ── Lifecycle: 30-day issued vs decertified ───────────────────────────
   // Per snapshot date (last 30): issued = passed tenderable lots from
   // gradings on that date; decertified = previous_total + issued - current_total.
@@ -522,112 +568,291 @@ export default function CertifiedStocksTestPanel() {
     return out;
   }, [robusta]);
 
-  // ── Arabica system flow — per-port current state + 7-day flows ─────────
-  // Uses sections.total_certified.by_origin × by_port for rich origin data.
-  // Inflow / outflow per (port, origin) = positive / negative day-over-day
-  // delta over the last 7 snapshot days.
-  const arabicaPortFlows = useMemo<{ ports: ArabicaPortFlow[]; intake: { passed: number; failed: number; pending: number; passedPremium: number; passedBorderline: number } | null }>(() => {
-    const snaps = arabica?.snapshots ?? [];
-    if (snaps.length === 0) return { ports: [], intake: null };
-    const latest = snaps[snaps.length - 1];
-    const lookbackIdx = Math.max(0, snaps.length - 8);
-    const base = snaps[lookbackIdx];
+  // ── System flow — per-port state, flows, change deltas (both markets) ────
+  // Window: `flowDuration` (last 7d / MTD / 2m / 3m / 6m) drives the "base"
+  // snapshot reference. Per port we compute:
+  //   • current byOrigin and ageDist (KC: exact from sections; RC: inferred)
+  //   • deltaByOrigin (current − T0) per origin, used for new/ghost squares
+  //   • inflow / outflow lists for the side indicators
+  interface SystemFlowMarket {
+    market: "KC" | "RC";
+    label: string;
+    unit: "bags" | "lots";
+    squareUnit: number;
+    ports: PortFlow[];
+    intake: {
+      pending: number;
+      passed: number;
+      failed: number;
+      passedPremium: number;
+      passedBorderline: number;
+      date: string | null;
+    } | null;
+  }
 
-    const latestSec = latest.sections?.total_certified;
-    if (!latestSec) return { ports: [], intake: null };
+  const systemFlows = useMemo<{ kc: SystemFlowMarket; rc: SystemFlowMarket }>(() => {
+    const today = new Date();
+    const cutoff = _durationCutoff(flowDuration, today);
 
-    // Capacity proxy: 365-day per-port max.
-    const maxByPort = new Map<string, number>();
-    for (const s of snaps) {
-      for (const [p, v] of Object.entries(s.by_port || {})) {
-        if (v > (maxByPort.get(p) ?? 0)) maxByPort.set(p, v);
+    // Find the snapshot closest to (but not after) `target` for the T0 baseline.
+    const findSnapAt = <T extends { date: string }>(snaps: T[], target: Date): T | null => {
+      if (!snaps.length) return null;
+      let best: T | null = null;
+      let bestDist = Infinity;
+      for (const s of snaps) {
+        const t = new Date(s.date).getTime();
+        if (t > target.getTime()) continue;
+        const dist = target.getTime() - t;
+        if (dist < bestDist) { best = s; bestDist = dist; }
       }
-    }
-
-    // Pre-bin age distribution per port from latest_detail.age_detail.
-    const ageByPort: Record<string, AgeDist> = {};
-    const ageDetail = arabica?.latest_detail?.age_detail ?? {};
-    for (const [port, rows] of Object.entries(ageDetail)) {
-      const dist: AgeDist = { fresh: 0, mid: 0, old: 0, stale: 0 };
-      for (const r of rows) {
-        const m = r.age_bucket?.match(/^(\d+)/);
-        const days = m ? parseInt(m[1], 10) : 0;
-        const bin: BeanBin = days < 180 ? "fresh" : days < 360 ? "mid" : days < 720 ? "old" : "stale";
-        dist[bin] += r.bags || 0;
-      }
-      const sum = dist.fresh + dist.mid + dist.old + dist.stale;
-      if (sum > 0) {
-        ageByPort[port] = { fresh: dist.fresh / sum, mid: dist.mid / sum, old: dist.old / sum, stale: dist.stale / sum };
-      }
-    }
-
-    // Walk every port in the latest snap.
-    const ports: ArabicaPortFlow[] = [];
-    for (const [code, current] of Object.entries(latestSec.by_port)) {
-      if (current <= 0) continue;
-      const byOrigin: Record<string, number> = {};
-      for (const [origin, od] of Object.entries(latestSec.by_origin)) {
-        const v = od.by_port?.[code] ?? 0;
-        if (v > 0) byOrigin[origin] = v;
-      }
-      // Inflow / outflow per origin from delta.
-      const baseSec = base.sections?.total_certified;
-      const baseByOrigin: Record<string, number> = {};
-      for (const [origin, od] of Object.entries(baseSec?.by_origin ?? {})) {
-        const v = od.by_port?.[code] ?? 0;
-        if (v > 0) baseByOrigin[origin] = v;
-      }
-      const allOrigins = new Set([...Object.keys(byOrigin), ...Object.keys(baseByOrigin)]);
-      const inflow: OriginFlow[] = [];
-      const outflow: OriginFlow[] = [];
-      for (const origin of Array.from(allOrigins)) {
-        const delta = (byOrigin[origin] ?? 0) - (baseByOrigin[origin] ?? 0);
-        if (delta > 0) inflow.push({ origin, bags: delta, color: _originColor(origin) });
-        else if (delta < 0) outflow.push({ origin, bags: -delta, color: _originColor(origin) });
-      }
-      inflow.sort((a, b) => b.bags - a.bags);
-      outflow.sort((a, b) => b.bags - a.bags);
-
-      ports.push({
-        code,
-        name: ARABICA_PORT_NAMES[code] ?? code,
-        current,
-        capacity: Math.max(maxByPort.get(code) ?? current, current),
-        pctFull: ((current / Math.max(maxByPort.get(code) ?? current, current)) * 100),
-        byOrigin,
-        age: ageByPort[code] ?? { fresh: 1, mid: 0, old: 0, stale: 0 },
-        inflow,
-        outflow,
-      });
-    }
-    ports.sort((a, b) => b.current - a.current);
-
-    // Intake summary — latest day's passed/failed + pending.
-    const passed = latest.passed_today_bags ?? 0;
-    const failed = latest.failed_today_bags ?? 0;
-    // Premium/borderline split: arabica has no grading-class breakdown, so
-    // apportion by the Group 0/1/2 vs Group 3/4 share of the latest stock
-    // (a reasonable proxy: today's grading mix tracks the standing inventory
-    // mix).
-    let premiumShare = 0, borderlineShare = 0;
-    for (const od of Object.values(latestSec.by_origin)) {
-      if (od.group === "Group 3" || od.group === "Group 4") borderlineShare += od.total;
-      else premiumShare += od.total;
-    }
-    const grossPassedSum = premiumShare + borderlineShare || 1;
-    const passedPremium    = Math.round(passed * (premiumShare    / grossPassedSum));
-    const passedBorderline = Math.round(passed * (borderlineShare / grossPassedSum));
-    return {
-      ports,
-      intake: {
-        passed,
-        failed,
-        pending: latest.pending_grading_bags ?? 0,
-        passedPremium,
-        passedBorderline,
-      },
+      return best ?? snaps[0];
     };
-  }, [arabica]);
+
+    // ── Arabica market ─────────────────────────────────────────────────
+    const buildArabica = (): SystemFlowMarket => {
+      const empty: SystemFlowMarket = {
+        market: "KC", label: "Arabica · ICE Futures US (KC)",
+        unit: "bags", squareUnit: 2500, ports: [], intake: null,
+      };
+      const snaps = arabica?.snapshots ?? [];
+      if (snaps.length === 0) return empty;
+      const latest = snaps[snaps.length - 1];
+      const base = findSnapAt(snaps, cutoff) ?? snaps[0];
+      const latestSec = latest.sections?.total_certified;
+      const baseSec = base.sections?.total_certified;
+      if (!latestSec) return empty;
+
+      const maxByPort = new Map<string, number>();
+      for (const s of snaps) {
+        for (const [p, v] of Object.entries(s.by_port || {})) {
+          if (v > (maxByPort.get(p) ?? 0)) maxByPort.set(p, v);
+        }
+      }
+
+      // Age distribution per port from latest_detail.age_detail.
+      const ageByPort: Record<string, AgeDist> = {};
+      const ageDetail = arabica?.latest_detail?.age_detail ?? {};
+      for (const [port, rows] of Object.entries(ageDetail)) {
+        const dist: AgeDist = { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+        for (const r of rows) {
+          const m = r.age_bucket?.match(/^(\d+)/);
+          const days = m ? parseInt(m[1], 10) : 0;
+          dist[_binByDays(days)] += r.bags || 0;
+        }
+        const sum = dist.fresh + dist.y1to2 + dist.y2to3 + dist.y3to4 + dist.y4plus;
+        if (sum > 0) {
+          ageByPort[port] = {
+            fresh:  dist.fresh  / sum, y1to2: dist.y1to2 / sum, y2to3: dist.y2to3 / sum,
+            y3to4:  dist.y3to4  / sum, y4plus: dist.y4plus / sum,
+          };
+        }
+      }
+
+      const ports: PortFlow[] = [];
+      for (const [code, current] of Object.entries(latestSec.by_port)) {
+        if (current <= 0) continue;
+        const byOrigin: Record<string, number> = {};
+        for (const [origin, od] of Object.entries(latestSec.by_origin)) {
+          const v = od.by_port?.[code] ?? 0;
+          if (v > 0) byOrigin[origin] = v;
+        }
+        const baseByOrigin: Record<string, number> = {};
+        for (const [origin, od] of Object.entries(baseSec?.by_origin ?? {})) {
+          const v = od.by_port?.[code] ?? 0;
+          if (v > 0) baseByOrigin[origin] = v;
+        }
+        const allOrigins = new Set([...Object.keys(byOrigin), ...Object.keys(baseByOrigin)]);
+        const deltaByOrigin: Record<string, number> = {};
+        const inflow: OriginFlow[] = [];
+        const outflow: OriginFlow[] = [];
+        for (const origin of Array.from(allOrigins)) {
+          const d = (byOrigin[origin] ?? 0) - (baseByOrigin[origin] ?? 0);
+          deltaByOrigin[origin] = d;
+          if (d > 0) inflow.push({ origin, volume: d, color: _originColor(origin) });
+          else if (d < 0) outflow.push({ origin, volume: -d, color: _originColor(origin) });
+        }
+        inflow.sort((a, b) => b.volume - a.volume);
+        outflow.sort((a, b) => b.volume - a.volume);
+        const cap = Math.max(maxByPort.get(code) ?? current, current);
+        ports.push({
+          market: "KC", code, name: ARABICA_PORT_NAMES[code] ?? code,
+          current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
+          unit: "bags", squareUnit: 2500,
+          byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
+          deltaByOrigin, inflow, outflow,
+        });
+      }
+      ports.sort((a, b) => b.current - a.current);
+
+      // Intake summary — latest day's passed/failed + standing pending.
+      const passed = latest.passed_today_bags ?? 0;
+      const failed = latest.failed_today_bags ?? 0;
+      let premiumShare = 0, borderlineShare = 0;
+      for (const od of Object.values(latestSec.by_origin)) {
+        if (od.group === "Group 3" || od.group === "Group 4") borderlineShare += od.total;
+        else premiumShare += od.total;
+      }
+      const sum = premiumShare + borderlineShare || 1;
+      const passedPremium    = Math.round(passed * (premiumShare    / sum));
+      const passedBorderline = Math.round(passed * (borderlineShare / sum));
+      return {
+        market: "KC", label: "Arabica · ICE Futures US (KC)",
+        unit: "bags", squareUnit: 2500, ports,
+        intake: { pending: latest.pending_grading_bags ?? 0, passed, failed, passedPremium, passedBorderline, date: latest.date },
+      };
+    };
+
+    // ── Robusta market ──────────────────────────────────────────────────
+    // No standing by_origin per port in the source — inferred from gradings
+    // flow proportions (per port, full history). Mark every robusta panel
+    // with the inferred caveat.
+    const buildRobusta = (): SystemFlowMarket => {
+      const empty: SystemFlowMarket = {
+        market: "RC", label: "Robusta · ICE Futures Europe (RC)",
+        unit: "lots", squareUnit: 25, ports: [], intake: null,
+      };
+      const snaps = robusta?.snapshots ?? [];
+      const grads = robusta?.recent_activity?.gradings ?? [];
+      const overv = robusta?.recent_activity?.grading_overview ?? [];
+      if (snaps.length === 0) return empty;
+      const latest = snaps[snaps.length - 1];
+      const base = findSnapAt(snaps, cutoff) ?? snaps[0];
+
+      // Origin proportion per port — from ALL gradings, tenderable only.
+      const portOriginLots: Record<string, Record<string, number>> = {};
+      for (const ev of grads) {
+        for (const e of (ev.entries || [])) {
+          if (e.tenderable === false) continue;
+          const port = e.port || "?";
+          const origin = e.origin?.trim() || "?";
+          portOriginLots[port] = portOriginLots[port] ?? {};
+          portOriginLots[port][origin] = (portOriginLots[port][origin] ?? 0) + (e.lots ?? 0);
+        }
+      }
+
+      // Per-port inflow over the window (real gradings events in window).
+      const portInflowOrigin: Record<string, Record<string, number>> = {};
+      const cutTime = cutoff.getTime();
+      for (const ev of grads) {
+        if (new Date(ev.date).getTime() < cutTime) continue;
+        for (const e of (ev.entries || [])) {
+          if (e.tenderable === false) continue;
+          const port = e.port || "?";
+          const origin = e.origin?.trim() || "?";
+          portInflowOrigin[port] = portInflowOrigin[port] ?? {};
+          portInflowOrigin[port][origin] = (portInflowOrigin[port][origin] ?? 0) + (e.lots ?? 0);
+        }
+      }
+
+      // Age distribution per port from the latest age_allowance month.
+      const ageByPort: Record<string, AgeDist> = {};
+      const ageMonths = robusta?.monthly?.age_allowance ?? [];
+      const latestAge = ageMonths.reduce<RobustaAgeMonth | null>((acc, m) =>
+        !acc || new Date(m.month_end) > new Date(acc.month_end) ? m : acc, null);
+      const buckets = latestAge?.valid?.buckets ?? [];
+      for (const b of buckets) {
+        const bin = _binByMonths(b.months_since_graded);
+        for (const [port, mt] of Object.entries(b.by_port || {})) {
+          ageByPort[port] = ageByPort[port] ?? { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+          ageByPort[port][bin] += Number(mt) || 0;
+        }
+      }
+      for (const port of Object.keys(ageByPort)) {
+        const a = ageByPort[port];
+        const sum = a.fresh + a.y1to2 + a.y2to3 + a.y3to4 + a.y4plus;
+        if (sum > 0) {
+          a.fresh /= sum; a.y1to2 /= sum; a.y2to3 /= sum; a.y3to4 /= sum; a.y4plus /= sum;
+        }
+      }
+
+      const maxByPort = new Map<string, number>();
+      for (const s of snaps) {
+        for (const [p, v] of Object.entries(s.by_port_lots || {})) {
+          if (v > (maxByPort.get(p) ?? 0)) maxByPort.set(p, v);
+        }
+      }
+
+      const ports: PortFlow[] = [];
+      for (const [code, current] of Object.entries(latest.by_port_lots || {})) {
+        if (current <= 0) continue;
+        // byOrigin = current × normalised origin share for this port (inferred).
+        const oTotals = portOriginLots[code] ?? {};
+        const oSum = Object.values(oTotals).reduce((a, b) => a + b, 0);
+        const byOrigin: Record<string, number> = {};
+        if (oSum > 0) {
+          for (const [origin, v] of Object.entries(oTotals)) {
+            byOrigin[origin] = (v / oSum) * current;
+          }
+        } else {
+          byOrigin["Unknown"] = current;
+        }
+        // Inflow per origin (real lots from gradings in window).
+        const inflowByOrigin = portInflowOrigin[code] ?? {};
+        // Outflow per origin: apportion the port's net stock-out by current
+        // origin mix. (No per-origin outflow source for robusta.)
+        const basePort = base.by_port_lots?.[code] ?? 0;
+        const netDelta = current - basePort;
+        const inflowSum = Object.values(inflowByOrigin).reduce((a, b) => a + b, 0);
+        const totalOutflow = Math.max(0, inflowSum - netDelta);
+        const outflowByOrigin: Record<string, number> = {};
+        if (totalOutflow > 0 && oSum > 0) {
+          for (const [origin, v] of Object.entries(oTotals)) {
+            outflowByOrigin[origin] = (v / oSum) * totalOutflow;
+          }
+        }
+        const allOrigins = new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]);
+        const deltaByOrigin: Record<string, number> = {};
+        const inflow: OriginFlow[] = [];
+        const outflow: OriginFlow[] = [];
+        for (const origin of Array.from(allOrigins)) {
+          const i = inflowByOrigin[origin] ?? 0;
+          const o = outflowByOrigin[origin] ?? 0;
+          deltaByOrigin[origin] = i - o;
+          if (i > 0)  inflow.push({ origin, volume: i, color: _originColor(origin) });
+          if (o > 0)  outflow.push({ origin, volume: o, color: _originColor(origin) });
+        }
+        inflow.sort((a, b) => b.volume - a.volume);
+        outflow.sort((a, b) => b.volume - a.volume);
+        const cap = Math.max(maxByPort.get(code) ?? current, current);
+        ports.push({
+          market: "RC", code, name: ROBUSTA_PORT_NAMES[code] ?? code,
+          current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
+          unit: "lots", squareUnit: 25,
+          byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
+          deltaByOrigin, inflow, outflow,
+        });
+      }
+      ports.sort((a, b) => b.current - a.current);
+
+      // Intake summary — latest gradings event.
+      const lastGrad = grads.length ? grads[grads.length - 1] : null;
+      let pPrem = 0, pBord = 0, fail = 0;
+      for (const e of (lastGrad?.entries || [])) {
+        const lots = e.lots || 0;
+        if (e.tenderable === false) { fail += lots; continue; }
+        if (e.class === 3 || e.class === 4) pBord += lots;
+        else pPrem += lots;
+      }
+      let pendingTotal = 0;
+      if (lastGrad && overv.length) {
+        let best: RobustaOverviewEvent | null = null; let bestDist = Infinity;
+        const tgt = new Date(lastGrad.date).getTime();
+        for (const o of overv) {
+          const d = Math.abs(new Date(o.date).getTime() - tgt);
+          if (d < bestDist) { best = o; bestDist = d; }
+        }
+        if (best && bestDist < 14 * 86_400_000) pendingTotal = best.total_pending_lots ?? 0;
+      }
+      return {
+        market: "RC", label: "Robusta · ICE Futures Europe (RC)",
+        unit: "lots", squareUnit: 25, ports,
+        intake: { pending: pendingTotal, passed: pPrem + pBord, failed: fail,
+                  passedPremium: pPrem, passedBorderline: pBord, date: lastGrad?.date ?? null },
+      };
+    };
+
+    return { kc: buildArabica(), rc: buildRobusta() };
+  }, [arabica, robusta, flowDuration]);
 
   return (
     <div className="p-6 space-y-6">
@@ -815,84 +1040,14 @@ export default function CertifiedStocksTestPanel() {
         </div>
       </div>
 
-      {/* Pipeline & issuance dynamics */}
+      {/* Net issuance vs decertification — 30-day lifecycle */}
       <div>
         <h3 className="text-base font-bold text-slate-100 pb-2 border-b border-slate-800 mb-4">
-          Pipeline &amp; issuance dynamics
+          Lifecycle · net issuance vs decertification
           <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">robusta</span>
         </h3>
+        <div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Today's pipeline — flow diagram */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-amber-400">→</span>
-              <h4 className="text-xs uppercase tracking-wider font-semibold text-slate-300">
-                Latest day&apos;s certification pipeline
-              </h4>
-            </div>
-            <p className="text-[11px] text-slate-500 mb-4">
-              Lots moving through grading on{" "}
-              <span className="font-mono">{todaysPipeline?.date ?? "—"}</span>. Watch the borderline share.
-            </p>
-
-            {!todaysPipeline ? (
-              <div className="text-xs text-slate-600 italic">No gradings event loaded.</div>
-            ) : (
-              <>
-                <div className="relative">
-                  <div className="absolute top-8 left-8 right-8 h-px bg-slate-800 z-0" />
-                  <div className="flex justify-between items-start relative z-10">
-                    {/* Tendered */}
-                    <div className="flex flex-col items-center w-20">
-                      <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center mb-1.5">
-                        <span className="font-mono font-bold text-sm text-white">{fmtNum(todaysPipeline.tendered)}</span>
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Tendered</span>
-                      <span className="text-[9px] text-amber-400 mt-0.5">{fmtNum(todaysPipeline.pendingQueue)} pending</span>
-                    </div>
-
-                    <span className="text-slate-600 text-xl mt-5">→</span>
-
-                    {/* Graded */}
-                    <div className="flex flex-col items-center w-20">
-                      <div className="w-16 h-16 rounded-full bg-indigo-900/50 border-2 border-indigo-500 flex items-center justify-center mb-1.5"
-                           style={{ boxShadow: "0 0 12px rgba(99,102,241,0.15)" }}>
-                        <span className="font-mono font-bold text-sm text-indigo-200">{fmtNum(todaysPipeline.graded)}</span>
-                      </div>
-                      <span className="text-[10px] font-bold text-indigo-400 uppercase">Graded</span>
-                    </div>
-
-                    <span className="text-slate-600 text-xl mt-5">→</span>
-
-                    {/* Outcomes */}
-                    <div className="flex flex-col space-y-1.5 flex-1 ml-2">
-                      <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2 py-1 rounded">
-                        <span className="text-[10px] text-emerald-300">✓ Premium pass</span>
-                        <span className="font-mono font-bold text-sm text-emerald-300">{fmtNum(todaysPipeline.passedPremium)}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2 py-1 rounded">
-                        <span className="text-[10px] text-amber-300">⚠ Borderline pass</span>
-                        <span className="font-mono font-bold text-sm text-amber-300">{fmtNum(todaysPipeline.passedBorderline)}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2 py-1 rounded">
-                        <span className="text-[10px] text-rose-300">✕ Failed</span>
-                        <span className="font-mono font-bold text-sm text-rose-300">{fmtNum(todaysPipeline.failed)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 bg-slate-950 border border-slate-800 px-3 py-2 rounded flex items-center justify-between">
-                  <div className="flex items-center text-[10px] text-slate-400">
-                    <span className="mr-1.5 text-rose-500">🗑</span>
-                    Decertified that day (aged-out / withdrawn — inferred)
-                  </div>
-                  <span className="font-mono font-bold text-sm text-rose-400">{fmtNum(todaysPipeline.decertified)} lots</span>
-                </div>
-              </>
-            )}
-          </div>
 
           {/* Net issuance vs decertification chart */}
           <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
@@ -941,212 +1096,309 @@ export default function CertifiedStocksTestPanel() {
         </div>
       </div>
 
-      {/* System flow — intake → storage → decertification */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes csFlowConveyor {
-          0%   { left: 8px; opacity: 0; transform: translateY(-50%) scale(0.6); }
-          15%  { opacity: 1; transform: translateY(-50%) scale(1); }
-          75%  { opacity: 1; transform: translateY(-50%) scale(1); }
-          90%  { left: calc(100% - 28px); opacity: 0; transform: translateY(-50%) scale(0.6); }
-          100% { left: calc(100% - 28px); opacity: 0; }
-        }
-        .cs-flow-conveyor { animation: csFlowConveyor 2.4s linear infinite; }
-      ` }} />
-
+      {/* ───────────────────────────────────────────────────────────────────
+          Certified stocks system flow — intake → storage → outflow
+          Vertical workflow per market (arabica + robusta), with origin-coded
+          density grids, click-to-inspect squares, duration selector and
+          gained / lost change markers.
+         ─────────────────────────────────────────────────────────────────── */}
       <div>
-        <h3 className="text-base font-bold text-slate-100 pb-2 border-b border-slate-800 mb-4">
-          Certified stocks system flow
-          <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">arabica · KC</span>
-        </h3>
-
-        {/* Stage 1 — intake pipeline */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4 mb-4">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-            <span>↘</span>Stage 1 · grading intake (latest day)
+        <div className="flex items-baseline justify-between pb-2 border-b border-slate-800 mb-4 gap-2 flex-wrap">
+          <h3 className="text-base font-bold text-slate-100">
+            Certified stocks system flow
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">arabica + robusta</span>
+          </h3>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500">Flow window</span>
+            <select
+              value={flowDuration}
+              onChange={(e) => setFlowDuration(e.target.value as DurationOpt)}
+              className="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-2 py-1 rounded font-mono focus:outline-none focus:border-amber-500"
+            >
+              {(Object.entries(DURATION_LABELS) as [DurationOpt, string][]).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
           </div>
-          {!arabicaPortFlows.intake ? (
-            <div className="text-xs text-slate-600 italic">No intake data loaded.</div>
-          ) : (
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
-              <div className="flex flex-col items-center">
-                <div className="text-[10px] text-slate-400 font-bold uppercase mb-1.5">Pending</div>
-                <div className="w-20 h-20 rounded-full bg-amber-950/40 border-2 border-amber-700/60 flex flex-col items-center justify-center">
-                  <span className="text-base font-mono font-bold text-amber-300">{fmtNum(arabicaPortFlows.intake.pending)}</span>
-                  <span className="text-[9px] text-amber-400/80">bags</span>
-                </div>
-              </div>
-              <span className="hidden md:block w-6 h-px bg-slate-700" />
-              <div className="flex flex-col items-center">
-                <div className="text-[10px] text-slate-400 font-bold uppercase mb-1.5">Graded today</div>
-                <div className="w-24 h-24 rounded-full bg-indigo-900/40 border-2 border-indigo-500 flex flex-col items-center justify-center"
-                     style={{ boxShadow: "0 0 14px rgba(99,102,241,0.18)" }}>
-                  <span className="text-lg font-mono font-bold text-indigo-200">{fmtNum(arabicaPortFlows.intake.passed + arabicaPortFlows.intake.failed)}</span>
-                  <span className="text-[9px] text-indigo-400/80">bags</span>
-                </div>
-              </div>
-              <span className="hidden md:block w-6 h-px bg-slate-700" />
-              <div className="flex flex-col space-y-1.5 w-full md:w-auto md:min-w-[260px]">
-                <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2.5 py-1.5 rounded">
-                  <span className="text-[11px] text-emerald-300 flex items-center gap-1.5">✓ Pass · premium</span>
-                  <span className="font-mono font-bold text-emerald-300">{fmtNum(arabicaPortFlows.intake.passedPremium)}</span>
-                </div>
-                <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2.5 py-1.5 rounded">
-                  <span className="text-[11px] text-amber-300 flex items-center gap-1.5">⚠ Pass · borderline</span>
-                  <span className="font-mono font-bold text-amber-300">{fmtNum(arabicaPortFlows.intake.passedBorderline)}</span>
-                </div>
-                <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2.5 py-1.5 rounded">
-                  <span className="text-[11px] text-rose-300 flex items-center gap-1.5">✕ Failed</span>
-                  <span className="font-mono font-bold text-rose-300">{fmtNum(arabicaPortFlows.intake.failed)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-          <p className="text-[9px] text-slate-600 italic mt-2 text-center">
-            Premium / borderline split apportioned by the Group 0–2 vs Group 3–4 share of standing inventory
-            (no per-grading class data in arabica source).
-          </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 mb-3 text-[10px] bg-slate-950 px-3 py-2 rounded border border-slate-800">
+        {/* Shared legend */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-[10px] bg-slate-950 px-3 py-2 rounded border border-slate-800">
           <span className="text-slate-500 uppercase">Origin (color):</span>
-          {Object.entries(ORIGIN_COLORS).slice(0, 8).map(([origin, color]) => (
+          {Object.entries(ORIGIN_COLORS).slice(0, 10).map(([origin, color]) => (
             <span key={origin} className="flex items-center text-slate-300">
               <span className="w-2 h-2 rounded mr-1" style={{ background: color }} />
-              {origin.length > 12 ? origin.slice(0, 12) + "…" : origin}
+              {origin.length > 14 ? origin.slice(0, 14) + "…" : origin}
             </span>
           ))}
           <span className="text-slate-700 mx-1">|</span>
           <span className="text-slate-500 uppercase">Age (fade):</span>
-          {[
-            { label: "fresh", op: 1 },
-            { label: "mid",   op: 0.7 },
-            { label: "old",   op: 0.4 },
-            { label: "stale", op: 0.18 },
-          ].map(({ label, op }) => (
-            <span key={label} className="flex items-center text-slate-300">
-              <span className="w-2 h-2 rounded mr-1 bg-white" style={{ opacity: op }} />
-              {label}
+          {AGE_BIN_ORDER.map((bin) => (
+            <span key={bin} className="flex items-center text-slate-300">
+              <span className="w-2 h-2 rounded mr-1 bg-white" style={{ opacity: AGE_OPACITY[bin] }} />
+              {AGE_LABEL[bin]}
             </span>
           ))}
+          <span className="text-slate-700 mx-1">|</span>
+          <span className="text-slate-500 uppercase">Change:</span>
+          <span className="flex items-center text-slate-300">
+            <span className="w-2 h-2 rounded mr-1 border border-emerald-400" />
+            new (gained)
+          </span>
+          <span className="flex items-center text-slate-300">
+            <span className="w-2 h-2 rounded mr-1 border border-dashed border-rose-400 opacity-60" />
+            ghost (lost)
+          </span>
         </div>
 
-        {/* Stage 2 — per-port row */}
-        <div className="space-y-3">
-          {arabicaPortFlows.ports.length === 0 ? (
-            <div className="text-xs text-slate-600 italic">No port flows loaded yet.</div>
-          ) : arabicaPortFlows.ports.map((p) => {
-            const grid = buildDensityGrid(p.current, p.byOrigin, p.age);
-            const inflowSum = p.inflow.reduce((a, b) => a + b.bags, 0);
-            const outflowSum = p.outflow.reduce((a, b) => a + b.bags, 0);
-            return (
-              <div key={p.code} className="bg-slate-950/60 border border-slate-800 rounded-lg p-3 lg:p-4">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4">
-                  {/* Inflow */}
-                  <div className="lg:col-span-3">
-                    <div className="text-[10px] text-emerald-400 font-bold uppercase mb-1.5 flex items-center justify-between">
-                      <span>Intake (7d)</span>
-                      <span className="font-mono">+{fmtNum(inflowSum)}</span>
-                    </div>
-                    <div className="relative h-10 bg-emerald-950/20 border border-emerald-900/40 rounded overflow-hidden">
-                      <div className="absolute left-2 top-1/2 -translate-y-1/2 z-10 text-emerald-400 text-xs">🏭</div>
-                      <div className="absolute top-1/2 left-7 right-3 h-px bg-slate-800" />
-                      {p.inflow.slice(0, 4).map((b, i) => (
-                        <div
-                          key={i}
-                          className="absolute top-1/2 w-2.5 h-2.5 rounded-sm cs-flow-conveyor"
-                          style={{ background: b.color, animationDelay: `${i * 0.55}s` }}
-                        />
-                      ))}
-                    </div>
-                    <div className="mt-2 grid grid-cols-1 gap-1 text-[10px]">
-                      {p.inflow.slice(0, 4).map((b) => (
-                        <div key={b.origin} className="flex items-center justify-between bg-slate-900/60 border border-slate-800/60 px-1.5 py-0.5 rounded">
-                          <span className="flex items-center text-slate-300">
-                            <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ background: b.color }} />
-                            {b.origin}
-                          </span>
-                          <span className="text-slate-200 font-mono">{fmtNum(b.bags)}</span>
-                        </div>
-                      ))}
-                      {p.inflow.length === 0 && (
-                        <div className="text-slate-600 italic text-[10px]">no intake last 7d</div>
-                      )}
+        {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
+          <div key={mkt.market} className="mb-8">
+            <div className={`text-xs uppercase tracking-wider font-bold mb-3 ${mkt.market === "KC" ? "text-amber-400" : "text-emerald-400"}`}>
+              {mkt.label}
+              {mkt.market === "RC" && (
+                <span className="ml-2 text-[10px] text-slate-500 normal-case font-normal">
+                  origin per port inferred from gradings flow*
+                </span>
+              )}
+            </div>
+
+            {/* Stage 1 — intake row */}
+            {!mkt.intake ? (
+              <div className="text-xs text-slate-600 italic mb-3">No intake data loaded.</div>
+            ) : (
+              <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-1">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                  <span>⊕</span>Stage 1 · grading intake
+                  {mkt.intake.date && <span className="font-mono normal-case text-slate-600 ml-1">{mkt.intake.date}</span>}
+                </div>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-5">
+                  <div className="flex flex-col items-center">
+                    <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Pending</div>
+                    <div className="w-16 h-16 rounded-full bg-amber-950/40 border-2 border-amber-700/60 flex items-center justify-center">
+                      <span className="text-sm font-mono font-bold text-amber-300">{fmtNum(mkt.intake.pending)}</span>
                     </div>
                   </div>
-
-                  {/* Density grid */}
-                  <div className="lg:col-span-6">
-                    <div className="flex justify-between items-end mb-2">
-                      <div>
-                        <span className="text-base font-bold text-slate-100">{p.name}</span>
-                        <span className="text-[10px] font-mono text-slate-500 ml-2 bg-slate-800/60 px-1 py-0.5 rounded">{p.code}</span>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
-                          <span className="font-mono text-slate-300">{(p.current / 1000).toFixed(0)}k</span> / {(p.capacity / 1000).toFixed(0)}k bags
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-xl font-bold ${p.pctFull > 80 ? "text-rose-400" : p.pctFull > 50 ? "text-amber-400" : "text-slate-400"}`}>
-                          {Math.round(p.pctFull)}%
-                        </div>
-                        <div className="text-[9px] text-slate-600 uppercase">of peak</div>
-                      </div>
-                    </div>
-                    <div
-                      className="w-full grid gap-[1px] bg-slate-900/40 border border-slate-800 p-1 rounded"
-                      style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
-                    >
-                      {grid.squares.map((sq, i) => (
-                        <div
-                          key={i}
-                          className="aspect-square rounded-[1px] transition-transform hover:scale-[1.8] hover:z-10 relative"
-                          style={{ background: sq.color, opacity: sq.opacity }}
-                          title={sq.status === "filled" ? `${BAGS_PER_SQUARE.toLocaleString()} bags` : "empty space"}
-                        />
-                      ))}
-                    </div>
-                    <div className="text-[9px] text-slate-600 italic mt-1">
-                      Each square = {BAGS_PER_SQUARE.toLocaleString()} bags. Color = origin. Fade = age.
+                  <span className="hidden md:block w-6 h-px bg-slate-700" />
+                  <div className="flex flex-col items-center">
+                    <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Graded</div>
+                    <div className="w-20 h-20 rounded-full bg-indigo-900/40 border-2 border-indigo-500 flex items-center justify-center"
+                         style={{ boxShadow: "0 0 12px rgba(99,102,241,0.18)" }}>
+                      <span className="text-base font-mono font-bold text-indigo-200">{fmtNum(mkt.intake.passed + mkt.intake.failed)}</span>
                     </div>
                   </div>
-
-                  {/* Outflow */}
-                  <div className="lg:col-span-3">
-                    <div className="text-[10px] text-rose-400 font-bold uppercase mb-1.5 flex items-center justify-between">
-                      <span>Outflow (7d)</span>
-                      <span className="font-mono">−{fmtNum(outflowSum)}</span>
+                  <span className="hidden md:block w-6 h-px bg-slate-700" />
+                  <div className="flex flex-col gap-1 w-full md:w-auto md:min-w-[220px]">
+                    <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2 py-1 rounded">
+                      <span className="text-[10px] text-emerald-300">✓ Premium</span>
+                      <span className="font-mono font-bold text-sm text-emerald-300">{fmtNum(mkt.intake.passedPremium)}</span>
                     </div>
-                    <div className="relative h-10 bg-rose-950/20 border border-rose-900/40 rounded overflow-hidden">
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-rose-400 text-xs">🚚</div>
-                      <div className="absolute top-1/2 left-3 right-7 h-px bg-slate-800" />
-                      {p.outflow.slice(0, 4).map((b, i) => (
-                        <div
-                          key={i}
-                          className="absolute top-1/2 w-2.5 h-2.5 rounded-sm cs-flow-conveyor"
-                          style={{ background: b.color, animationDelay: `${i * 0.55}s` }}
-                        />
-                      ))}
+                    <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2 py-1 rounded">
+                      <span className="text-[10px] text-amber-300">⚠ Borderline</span>
+                      <span className="font-mono font-bold text-sm text-amber-300">{fmtNum(mkt.intake.passedBorderline)}</span>
                     </div>
-                    <div className="mt-2 grid grid-cols-1 gap-1 text-[10px]">
-                      {p.outflow.slice(0, 4).map((b) => (
-                        <div key={b.origin} className="flex items-center justify-between bg-slate-900/60 border border-slate-800/60 px-1.5 py-0.5 rounded">
-                          <span className="flex items-center text-slate-300">
-                            <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ background: b.color }} />
-                            {b.origin}
-                          </span>
-                          <span className="text-slate-200 font-mono">{fmtNum(b.bags)}</span>
-                        </div>
-                      ))}
-                      {p.outflow.length === 0 && (
-                        <div className="text-slate-600 italic text-[10px]">no outflow last 7d</div>
-                      )}
+                    <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2 py-1 rounded">
+                      <span className="text-[10px] text-rose-300">✕ Failed</span>
+                      <span className="font-mono font-bold text-sm text-rose-300">{fmtNum(mkt.intake.failed)}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            )}
+
+            {/* Branch connector — vertical line down, then horizontal split to each warehouse */}
+            {mkt.ports.length > 0 && (
+              <svg viewBox="0 0 100 14" preserveAspectRatio="none" className="w-full h-8 my-1" aria-hidden>
+                <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                <line x1={50 - 40 * Math.min(1, (mkt.ports.length - 1) / 5)} y1="5"
+                      x2={50 + 40 * Math.min(1, (mkt.ports.length - 1) / 5)} y2="5"
+                      stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                {mkt.ports.slice(0, 6).map((_p, i) => {
+                  const n = Math.min(mkt.ports.length, 6);
+                  const x = n === 1 ? 50 : (50 - 40) + (80 / (n - 1)) * i;
+                  return (
+                    <g key={i}>
+                      <line x1={x} y1="5" x2={x} y2="13" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                      <polygon points={`${x - 0.8},13 ${x + 0.8},13 ${x},14`} fill="#10b981" fillOpacity="0.7" />
+                    </g>
+                  );
+                })}
+              </svg>
+            )}
+
+            {/* Per-port warehouse grid — vertical cards */}
+            {mkt.ports.length === 0 ? (
+              <div className="text-xs text-slate-600 italic">No port data loaded.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {mkt.ports.map((p) => {
+                  const squares = buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
+                  const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
+                  const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
+                  const showGhostNote = squares.some((s) => s.status === "ghost");
+                  const showNewNote   = squares.some((s) => s.isNew);
+                  return (
+                    <div key={`${p.market}-${p.code}`}
+                         className="bg-slate-950/60 border border-slate-800 rounded-lg p-3 flex flex-col">
+                      {/* Header */}
+                      <div className="flex justify-between items-baseline mb-2">
+                        <div>
+                          <div className="text-sm font-bold text-slate-100">{p.name}</div>
+                          <div className="text-[10px] font-mono text-slate-500">{p.code}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-base font-bold ${p.pctFull > 80 ? "text-rose-400" : p.pctFull > 50 ? "text-amber-400" : "text-slate-300"}`}>
+                            {Math.round(p.pctFull)}%
+                          </div>
+                          <div className="text-[9px] text-slate-600 uppercase">of peak</div>
+                        </div>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mb-2 font-mono">
+                        <span className="text-slate-300">{fmtNum(p.current)}</span> / {fmtNum(p.capacity)} {p.unit}
+                      </div>
+
+                      {/* Inflow indicator */}
+                      <div className="flex items-center justify-between mb-1 text-[10px]">
+                        <span className="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">🏭 ↓ in</span>
+                        <span className="font-mono text-emerald-300">+{fmtNum(inflowSum)} {p.unit}</span>
+                      </div>
+                      <div className="bg-emerald-950/15 border border-emerald-900/40 rounded px-2 py-1 mb-2 text-[10px] min-h-[28px]">
+                        {p.inflow.length === 0 ? (
+                          <span className="text-slate-600 italic">no inflow in window</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {p.inflow.slice(0, 4).map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300">
+                                <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ background: b.color }} />
+                                {b.origin}: <span className="font-mono text-slate-200 ml-0.5">{fmtNum(b.volume)}</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Density grid */}
+                      <div
+                        className="grid gap-[2px] bg-slate-900/50 border border-slate-800 p-1.5 rounded flex-1"
+                        style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                      >
+                        {squares.map((sq, i) => {
+                          const isPicked = pickedSquare?.market === p.market
+                                        && pickedSquare?.port === p.code
+                                        && pickedSquare?.squareIdx === i;
+                          const ringCls = sq.status === "ghost"
+                            ? "ring-1 ring-rose-400/60 ring-inset border border-dashed border-rose-400/70"
+                            : sq.isNew
+                              ? "ring-1 ring-emerald-400 ring-inset"
+                              : "";
+                          const opacity = sq.status === "ghost"
+                            ? 0.35
+                            : AGE_OPACITY[sq.ageBin];
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setPickedSquare(isPicked ? null : {
+                                market: p.market, port: p.code, portName: p.name, squareIdx: i,
+                                origin: sq.origin, ageBin: sq.ageBin, bagsOrLots: sq.bagsOrLots,
+                                unit: p.unit, isNew: sq.isNew, isGhost: sq.status === "ghost",
+                              })}
+                              className={`aspect-square rounded-[2px] cursor-pointer transition-transform hover:scale-150 hover:z-10 relative ${ringCls} ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
+                              style={{ background: sq.color, opacity }}
+                              aria-label={`${p.name} square ${i}`}
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="text-[9px] text-slate-600 mt-1 flex justify-between items-center">
+                        <span>1 ◻ = {fmtNum(p.squareUnit)} {p.unit}</span>
+                        <span>
+                          {showNewNote && <span className="text-emerald-400/80 mr-1.5">▣ new</span>}
+                          {showGhostNote && <span className="text-rose-400/80">▤ lost</span>}
+                        </span>
+                      </div>
+
+                      {/* Outflow indicator */}
+                      <div className="flex items-center justify-between mt-2 mb-1 text-[10px]">
+                        <span className="text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">🚚 ↓ out</span>
+                        <span className="font-mono text-rose-300">−{fmtNum(outflowSum)} {p.unit}</span>
+                      </div>
+                      <div className="bg-rose-950/15 border border-rose-900/40 rounded px-2 py-1 text-[10px] min-h-[28px]">
+                        {p.outflow.length === 0 ? (
+                          <span className="text-slate-600 italic">no outflow in window</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {p.outflow.slice(0, 4).map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300">
+                                <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ background: b.color }} />
+                                {b.origin}: <span className="font-mono text-slate-200 ml-0.5">{fmtNum(b.volume)}</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Click-popover for inspected square */}
+        {pickedSquare && (
+          <div
+            role="dialog"
+            aria-label="square details"
+            className="fixed bottom-6 right-6 z-50 max-w-xs bg-slate-900 border border-amber-500/60 rounded-lg shadow-2xl px-4 py-3 text-xs"
+            style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,158,11,0.2)" }}
+          >
+            <div className="flex justify-between items-baseline mb-2">
+              <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Square detail</span>
+              <button
+                type="button"
+                onClick={() => setPickedSquare(null)}
+                className="text-slate-500 hover:text-slate-200 text-lg leading-none"
+                aria-label="close"
+              >×</button>
+            </div>
+            <div className="space-y-1.5 font-mono">
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Port</span>
+                <span className="text-slate-200">{pickedSquare.portName} ({pickedSquare.port})</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Origin</span>
+                <span className="flex items-center text-slate-200">
+                  <span className="w-2 h-2 rounded mr-1.5" style={{ background: _originColor(pickedSquare.origin) }} />
+                  {pickedSquare.origin}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Age band</span>
+                <span className="flex items-center text-slate-200">
+                  <span className="w-2 h-2 rounded mr-1.5 bg-white" style={{ opacity: AGE_OPACITY[pickedSquare.ageBin] }} />
+                  {AGE_LABEL[pickedSquare.ageBin]}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Represents</span>
+                <span className="text-slate-200">{fmtNum(pickedSquare.bagsOrLots)} {pickedSquare.unit}</span>
+              </div>
+              {(pickedSquare.isNew || pickedSquare.isGhost) && (
+                <div className="flex justify-between gap-3 pt-1 border-t border-slate-800 mt-1">
+                  <span className="text-slate-500">Change</span>
+                  <span className={pickedSquare.isGhost ? "text-rose-400" : "text-emerald-400"}>
+                    {pickedSquare.isGhost ? "lost over window" : "gained over window"}
+                  </span>
+                </div>
+              )}
+              <div className="text-[10px] text-slate-600 italic mt-2 pt-1 border-t border-slate-800">
+                Origin × age combined visually from per-port distributions
+                (not per-bag tracked).
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Collapsible raw data table */}
