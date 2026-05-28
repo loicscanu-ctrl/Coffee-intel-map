@@ -156,6 +156,127 @@ function MiniTable({ headers, rows }: { headers: string[]; rows: (string | numbe
   );
 }
 
+// ── Arabica period table (multi-period view requested in spec) ───────────────
+
+interface PeriodCol { label: string; date: Date }
+
+function _addDays(d: Date, n: number): Date {
+  const r = new Date(d); r.setDate(r.getDate() + n); return r;
+}
+function _endOfMonth(today: Date, monthsAgo: number): Date {
+  return new Date(today.getFullYear(), today.getMonth() - monthsAgo + 1, 0);
+}
+function _monthShort(d: Date): string {
+  return d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+}
+function _periodColumns(today: Date): PeriodCol[] {
+  return [
+    { label: "Current",  date: today },
+    { label: "1 wk ago", date: _addDays(today, -7) },
+    ...[1, 2, 3, 4, 5, 6].map((i) => ({
+      label: _monthShort(_endOfMonth(today, i)),
+      date: _endOfMonth(today, i),
+    })),
+  ];
+}
+function _closestSnap<T extends { date: string }>(snaps: T[], target: Date, maxDaysOff = 7): T | null {
+  if (!snaps.length) return null;
+  let best: T | null = null;
+  let bestDist = Infinity;
+  for (const s of snaps) {
+    const dist = Math.abs(new Date(s.date).getTime() - target.getTime());
+    if (dist < bestDist) { best = s; bestDist = dist; }
+  }
+  if (bestDist > maxDaysOff * 86_400_000) return null;
+  return best;
+}
+
+function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; unit: Unit }) {
+  if (!snapshots.length) return <Pending label="Period view" />;
+
+  const today = new Date();
+  const cols = _periodColumns(today);
+
+  const data = cols.map((col) => {
+    const snap = _closestSnap(snapshots, col.date);
+    if (!snap) return { col, snap: null as ArabicaSnap | null, prev: null as ArabicaSnap | null };
+    const idx = snapshots.findIndex((s) => s.date === snap.date);
+    const prev = idx > 0 ? snapshots[idx - 1] : null;
+    return { col, snap, prev };
+  });
+
+  const fmtBagsCell = (n: number | null | undefined) =>
+    n == null ? "—" : fmt(fromBags(n, unit), unit);
+
+  const rows: { label: string; values: string[] }[] = [
+    { label: "Pending grading", values: data.map((d) => fmtBagsCell(d.snap?.pending_grading_bags)) },
+    { label: "Passed today",    values: data.map((d) => fmtBagsCell(d.snap?.passed_today_bags)) },
+    { label: "Failed today",    values: data.map((d) => fmtBagsCell(d.snap?.failed_today_bags)) },
+    {
+      label: "Passing rate",
+      values: data.map((d) => {
+        if (!d.snap) return "—";
+        const tot = (d.snap.passed_today_bags ?? 0) + (d.snap.failed_today_bags ?? 0);
+        return tot === 0 ? "—" : `${Math.round((d.snap.passed_today_bags / tot) * 100)}%`;
+      }),
+    },
+    { label: "Stocks", values: data.map((d) => fmtBagsCell(d.snap?.total_bags)) },
+    {
+      label: "Decert / issued",
+      values: data.map((d) => {
+        if (!d.snap || !d.prev) return "—";
+        // Spec formula: prev_stock + passed_today − today_stock. Lumps any
+        // issuance + decertification together (arabica xls doesn't separate
+        // them; we'd need a deeper data source to split).
+        const v = d.prev.total_bags + d.snap.passed_today_bags - d.snap.total_bags;
+        return fmtBagsCell(v);
+      }),
+    },
+  ];
+
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+        Period view ({unitSuffix(unit)})
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[10px] font-mono border-collapse">
+          <thead>
+            <tr className="text-slate-500 border-b border-slate-800">
+              <th className="text-left py-1 pr-2 w-[110px]">Metric</th>
+              {cols.map((c) => (
+                <th key={c.label} className="text-right py-1 px-1.5">{c.label}</th>
+              ))}
+            </tr>
+            <tr className="text-slate-700 text-[9px] border-b border-slate-900">
+              <th className="text-left pb-1 pr-2" />
+              {data.map((d, i) => (
+                <th key={i} className="text-right pb-1 px-1.5">
+                  {d.snap ? d.snap.date.slice(5) : "—"}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.label} className="border-b border-slate-900 last:border-0">
+                <td className="text-slate-300 text-left py-1 pr-2">{r.label}</td>
+                {r.values.map((v, i) => (
+                  <td key={i} className="text-slate-100 text-right py-1 px-1.5">{v}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="text-[9px] text-slate-600 italic mt-1">
+        Closest snapshot per period (±7 days). Decert/issued = prev_stock + passed − stock.
+        Click-to-drill (port → group → origin) coming next — needs the full 180-day backfill first.
+      </div>
+    </div>
+  );
+}
+
 // ── Arabica column ────────────────────────────────────────────────────────────
 
 function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
@@ -246,6 +367,8 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
       {d?.errors && d.errors.length > 0 && (
         <div className="text-[9px] text-slate-600 italic">Missing: {d.errors.join("; ")}</div>
       )}
+
+      <ArabicaPeriodTable snapshots={d?.snapshots || []} unit={unit} />
     </div>
   );
 }
