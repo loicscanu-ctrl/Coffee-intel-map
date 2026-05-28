@@ -470,6 +470,65 @@ function _assignSpans(ports: PortFlow[]): void {
   }
 }
 
+// ── Poison criteria (v2 per user spec) ─────────────────────────────────────
+// Arabica: aged > 1 year OR Brazil origin.
+// Robusta: Brazilian Conillon OR aged > 1 year OR port ∈ London / US
+//          (LON, NYK, NEW, NOR) OR graded class ∈ {3, 4}.
+const RC_DEAD_PORTS  = new Set(["LON", "NYK", "NEW", "NOR"]);
+const KC_BAD_ORIGINS = new Set(["Brazil"]);
+const RC_BAD_ORIGINS = new Set(["Brazilian Conillon", "Brazil"]);
+
+interface PoisonStats {
+  pct:        number;   // 0..1 — share of standing stock flagged poison
+  total:      number;   // volume (bags or lots) flagged poison
+  aged:       number;   // contribution of the aged>1y criterion
+  badOrigin:  number;   // contribution of bad-origin (Brazil / Conillon)
+  deadPort:   number;   // contribution of dead-port (RC only)
+  lowClass:   number;   // contribution of class 3/4 (RC only, inferred)
+}
+
+function _computePoison(
+  current: number,
+  market: "KC" | "RC",
+  port: string,
+  byOrigin: Record<string, number>,
+  age: AgeDist,
+  class34ShareAtPort: number,
+): PoisonStats {
+  if (current <= 0) {
+    return { pct: 0, total: 0, aged: 0, badOrigin: 0, deadPort: 0, lowClass: 0 };
+  }
+  const agedShare = age.y1to2 + age.y2to3 + age.y3to4 + age.y4plus;
+
+  let badOriginVol = 0;
+  const badSet = market === "KC" ? KC_BAD_ORIGINS : RC_BAD_ORIGINS;
+  for (const [origin, v] of Object.entries(byOrigin)) {
+    if (badSet.has(origin)) badOriginVol += v;
+  }
+  const badShare = badOriginVol / current;
+
+  // Dead-port: robusta only. If the port itself is dead, ALL stock is poison.
+  const deadShare = market === "RC" && RC_DEAD_PORTS.has(port) ? 1 : 0;
+
+  // Class 3/4 share — robusta only, inferred from gradings history at port.
+  const classShare = market === "RC" ? class34ShareAtPort : 0;
+
+  // Combined: if the port is dead, 100% poison. Otherwise assume the three
+  // criteria are roughly independent → P(any) = 1 − ∏(1 − Pᵢ).
+  const pct = deadShare === 1
+    ? 1
+    : 1 - (1 - agedShare) * (1 - badShare) * (1 - classShare);
+
+  return {
+    pct,
+    total:     pct        * current,
+    aged:      agedShare  * current,
+    badOrigin: badShare   * current,
+    deadPort:  deadShare  * current,
+    lowClass:  classShare * current,
+  };
+}
+
 interface PortFlow {
   market: "KC" | "RC";
   code: string;
@@ -489,6 +548,8 @@ interface PortFlow {
   // scaled so small ports don't collapse to invisible). Density grid
   // inside each card uses span × 3 columns.
   span: 1 | 2 | 3 | 4;
+  // Poison stats — share + per-criterion breakdown for the card header.
+  poison: PoisonStats;
 }
 
 // ── Main test panel ──────────────────────────────────────────────────────────
@@ -807,12 +868,14 @@ export default function CertifiedStocksTestPanel() {
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
         const cap = Math.max(maxByPort.get(code) ?? current, current);
+        const ageFinal = ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+        const poison = _computePoison(current, "KC", code, byOrigin, ageFinal, 0);
         ports.push({
           market: "KC", code, name: ARABICA_PORT_NAMES[code] ?? code,
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "bags", squareUnit: BAGS_PER_WARRANT_KC,
-          byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
-          deltaByOrigin, inflow, outflow, span: 1,
+          byOrigin, age: ageFinal,
+          deltaByOrigin, inflow, outflow, span: 1, poison,
         });
       }
       ports.sort((a, b) => b.current - a.current);
@@ -954,13 +1017,28 @@ export default function CertifiedStocksTestPanel() {
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
+        // Class 3/4 share at this port from the FULL gradings history
+        // (standing stock has no class field; this is the best inference).
+        let portTotalLots = 0, portClass34Lots = 0;
+        for (const ev of grads) {
+          for (const e of (ev.entries || [])) {
+            if (e.tenderable === false) continue;
+            if (e.port !== code) continue;
+            const lots = e.lots || 0;
+            portTotalLots += lots;
+            if (e.class === 3 || e.class === 4) portClass34Lots += lots;
+          }
+        }
+        const class34Share = portTotalLots > 0 ? portClass34Lots / portTotalLots : 0;
         const cap = Math.max(maxByPort.get(code) ?? current, current);
+        const ageFinal = ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+        const poison = _computePoison(current, "RC", code, byOrigin, ageFinal, class34Share);
         ports.push({
           market: "RC", code, name: ROBUSTA_PORT_NAMES[code] ?? code,
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
-          byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
-          deltaByOrigin, inflow, outflow, span: 1,
+          byOrigin, age: ageFinal,
+          deltaByOrigin, inflow, outflow, span: 1, poison,
         });
       }
       ports.sort((a, b) => b.current - a.current);
@@ -1433,7 +1511,7 @@ export default function CertifiedStocksTestPanel() {
             {mkt.ports.length === 0 ? (
               <div className="text-xs text-slate-600 italic">No port data loaded.</div>
             ) : (
-              <div className="grid grid-cols-4 md:grid-cols-8 xl:grid-cols-12 gap-1.5">
+              <div className="flex items-start gap-1.5 w-full">
                 {mkt.ports.slice(0, 8).map((p) => {
                   const { existing, gained, ghosts, effectivePerSquare, totalWarrants } =
                     buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit, p.market);
@@ -1456,7 +1534,7 @@ export default function CertifiedStocksTestPanel() {
                   return (
                     <div key={`${p.market}-${p.code}`}
                          className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col"
-                         style={{ gridColumn: `span ${p.span}` }}>
+                         style={{ flex: `${p.span} 1 0`, minWidth: 0 }}>
                       {/* Header */}
                       <div className="flex justify-between items-baseline mb-1">
                         <div>
@@ -1470,6 +1548,41 @@ export default function CertifiedStocksTestPanel() {
                       <div className="text-[9px] text-slate-500 mb-1 font-mono leading-tight">
                         <span className="text-slate-300">{fmtNum(p.current)}</span>/{fmtNum(p.capacity)} {p.unit}
                       </div>
+
+                      {/* Poison breakdown — % + per-criterion contribution. */}
+                      {p.poison.pct > 0 && (
+                        <div className="bg-rose-950/30 border border-rose-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
+                          <div className="flex items-center justify-between text-rose-300 font-bold">
+                            <span>☣ poison</span>
+                            <span className="font-mono">
+                              {Math.round(p.poison.pct * 100)}% · {fmtNum(p.poison.total)}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-rose-300/80 text-[8.5px]">
+                            {p.poison.deadPort > 0 && (
+                              <span title="London / US warehouse">
+                                dead-port {Math.round((p.poison.deadPort / p.current) * 100)}%
+                              </span>
+                            )}
+                            {p.poison.badOrigin > 0 && (
+                              <span title={p.market === "KC" ? "Brazil" : "Brazilian Conillon"}>
+                                {p.market === "KC" ? "Brazil" : "Conillon"}{" "}
+                                {Math.round((p.poison.badOrigin / p.current) * 100)}%
+                              </span>
+                            )}
+                            {p.poison.aged > 0 && (
+                              <span title="stock graded over 1 year ago">
+                                aged {Math.round((p.poison.aged / p.current) * 100)}%
+                              </span>
+                            )}
+                            {p.poison.lowClass > 0 && (
+                              <span title="inferred from gradings history at this port">
+                                class3/4 {Math.round((p.poison.lowClass / p.current) * 100)}%*
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Inflow indicator (compact) */}
                       <div className="bg-emerald-950/20 border border-emerald-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
@@ -1491,8 +1604,8 @@ export default function CertifiedStocksTestPanel() {
 
                       {/* Density grid — existing portion (T0 state still on hand) */}
                       <div
-                        className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded flex-1"
-                        style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
+                        className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
+                        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
                       >
                         {existing.map((sq, i) => {
                           const isPicked = pickedSquare?.market === p.market
@@ -1520,7 +1633,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
+                            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
                           >
                             {gained.map((sq, i) => {
                               const idx = existing.length + i;
@@ -1551,7 +1664,7 @@ export default function CertifiedStocksTestPanel() {
                           </div>
                           <div
                             className="grid gap-[1px]"
-                            style={{ gridTemplateColumns: `repeat(${p.span * 3}, minmax(0, 1fr))` }}
+                            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13px, 1fr))" }}
                           >
                             {ghosts.map((sq, i) => {
                               const idx = existing.length + gained.length + i;
