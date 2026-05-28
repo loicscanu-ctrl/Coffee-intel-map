@@ -185,6 +185,7 @@ def parse_sheet_8a_issuers(sheet, since: date):
         if not rec["issuer"] or rec["value"] == 0:  # drop zero rows
             if rec["value"] == 0: continue
             continue
+        if not rec["port"]: continue                  # workbook per-firm totals (no port) — drop
         if _is_aggregate_port(rec["port"]): continue
         per_date[d].append(rec)
         n += 1
@@ -200,6 +201,7 @@ def parse_sheet_8b_stoppers(sheet, since: date):
         if d < since: continue
         rec = {"port": _str(r[1]), "stopper": _str(r[3]), "value": _int(r[4]), "type": _str(r[5])}
         if not rec["stopper"] or rec["value"] == 0: continue
+        if not rec["port"]: continue                  # workbook per-firm totals (no port) — drop
         if _is_aggregate_port(rec["port"]): continue
         per_date[d].append(rec)
         n += 1

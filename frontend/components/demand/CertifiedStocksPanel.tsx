@@ -517,25 +517,25 @@ function _startOfWindowPrevSnap<T extends { date: string }>(snaps: T[], w: Perio
 
 type ArabicaMetric =
   | "Pending grading" | "Graded" | "Passing rate"
-  | "Stocks" | "Decertified" | "Issued";
+  | "Stocks" | "Decertified" | "Tenders";
 
 const ARABICA_METRICS: ArabicaMetric[] = [
   "Pending grading", "Graded", "Passing rate",
-  "Stocks", "Decertified", "Issued",
+  "Stocks", "Decertified", "Tenders",
 ];
 
 // Per-row drill-down support. Only rows where the source data carries the
 // breakdown (or can be defensibly inferred) get a ▸. Others render flat.
 type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
            | "port_origin_inferred" | "port" | "port_issuer" | "port_member_signed"
-           | "member_origin" | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
+           | "member_signed_origin" | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
   "Pending grading": "port_group_origin",     // port → ICE group → origin
   "Graded":          "graded_with_poison",    // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
   "Passing rate":    "none",                  // failed_today_bags carries no origin → no breakdown
   "Stocks":          "port_group_origin",     // port → ICE group → origin (same shape as Pending)
   "Decertified":     "port_group_origin",     // per-port outflow split by group → origin
-  "Issued":          "port_member_signed",    // port → member, issuer side as −, stopper side as +
+  "Tenders":         "port_member_signed",    // port → member, issuer side as −, stopper side as +
 };
 
 // ICE C-contract group ordering. Drives the Pending grading drill display.
@@ -714,9 +714,9 @@ function _arabicaRowValue(
     const passedSum = _sumWindow(snaps, w, "passed_today_bags");
     return { value: startBase.total_bags + passedSum - endSnap.total_bags };
   }
-  if (metric === "Issued") {
-    // Issued and Received are merged into a single Issued row. Each delivery
-    // event has one issuer (sell side) and one stopper (buy side); the panel
+  if (metric === "Tenders") {
+    // Tenders merges the issuer (sell) side and the stopper (buy) side. Each
+    // delivery event has one issuer and one stopper; the panel
     // reports both sides under the same port, signed so the eye can read
     // direction at a glance:
     //   • member-row + side="issued"   →  negative value (firm delivered out)
@@ -771,7 +771,7 @@ function _portsForMetric(snaps: ArabicaSnap[], cols: PeriodCol[], metric: Arabic
       }
       const startBase = _startOfWindowPrevSnap(snaps, w);
       Object.keys(startBase?.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
-    } else if (metric === "Issued") {
+    } else if (metric === "Tenders") {
       // Union of ports that saw either an issuance or a reception in window.
       for (const s of _snapshotsInWindow(snaps, w)) {
         for (const e of (s.issuers_today  || [])) set.add(e.port);
@@ -1113,8 +1113,8 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
-          + Σpassed − stock. Issued · merges sell-side (issuer) and buy-side (stopper) flow per
-          port; member rows render the firm&apos;s signed flow (<span className="text-rose-300">−N</span>
+          + Σpassed − stock. Tenders · merges sell-side (issuer) and buy-side (stopper) delivery
+          flow per port; member rows render the firm&apos;s signed flow (<span className="text-rose-300">−N</span>
           = delivered out, <span className="text-emerald-300">+N</span> = took delivery). Rows
           reading 0 across every period column are hidden.
         </div>
@@ -1272,19 +1272,19 @@ interface AgeAllowanceMonth {
 
 type RobustaMetric =
   | "Pending grading" | "Graded" | "Passing rate"
-  | "Stocks" | "Decertified" | "Issued";
+  | "Stocks" | "Decertified" | "Tenders";
 
 const ROBUSTA_METRICS: RobustaMetric[] = [
   "Pending grading", "Graded", "Passing rate",
-  "Stocks", "Decertified", "Issued",
+  "Stocks", "Decertified", "Tenders",
 ];
 const ROBUSTA_DRILL: Record<RobustaMetric, Drill> = {
-  "Pending grading": "queue_forecast",       // 2 sub-rows: queue + forecast (source has no port)
-  "Graded":          "graded_with_poison",   // sub-rows: of which Coffee / Poison, each drillable by port → origin
-  "Passing rate":    "passing_breakdown",    // 2 sub-rows: of which Poison / Coffee (% terminal)
-  "Stocks":          "port_age_origin",      // by_port_lots × age_allowance buckets (labels as graded month)
-  "Decertified":     "port_age_origin",      // same drill shape as Stocks
-  "Issued":          "member_origin",        // iss_recv_daily.members → rows[].origin
+  "Pending grading": "queue_forecast",         // 2 sub-rows: queue + forecast (source has no port)
+  "Graded":          "graded_with_poison",     // sub-rows: of which Coffee / Poison, each drillable by port → origin
+  "Passing rate":    "passing_breakdown",      // 2 sub-rows: of which Poison / Coffee (% terminal)
+  "Stocks":          "port_age_origin",        // by_port_lots × age_allowance buckets (labels as graded month)
+  "Decertified":     "port_age_origin",        // same drill shape as Stocks
+  "Tenders":         "member_signed_origin",   // (member, side) signed; sold = −, bought = +; each → origin
 };
 
 // ── Poison criteria (Robusta) ────────────────────────────────────────────────
@@ -1449,12 +1449,12 @@ function _robustaRowValue(
     const passedSum = _aggregateGradings(gradings, w, _GRAD_TENDERABLE).total;
     return { value: startBase.total_lots_certified + passedSum - endSnap.total_lots_certified };
   }
-  // Issued — top-level: sum sold over window. Drill: by member, then origin
-  // (port-of-issuance isn't published, so port drill is not implemented).
-  if (metric === "Issued") {
-    if (!port && !origin) {
-      return { value: _rSum(snaps, w, "lots_sold_today") };
-    }
+  // Tenders — top-level: total delivery flow magnitude. Drill (member, side)
+  // and per-origin signed rows are computed in the renderer via
+  // _aggregateIssuance (it carries sold + bought per (member, origin)).
+  // Port-of-issuance is not in the source, so no port layer for robusta.
+  if (metric === "Tenders") {
+    if (!port && !origin) return { value: _rSum(snaps, w, "lots_sold_today") };
   }
   return { value: null };
 }
@@ -1474,24 +1474,37 @@ function _gradedMonth(snapDate: string | undefined, monthsSince: number): string
 // per day. We aggregate sold across the window.
 type IssRecvDailyEvt = NonNullable<RobustaJson["recent_activity"]>["iss_recv_daily"][number];
 
+interface SideTotals { sold: number; bought: number }
+
 function _aggregateIssuance(
   events: IssRecvDailyEvt[], w: PeriodCol,
-): { byMember: Record<string, number>; byMemberOrigin: Record<string, Record<string, number>>; total: number } {
+): {
+  byMemberSide:       Record<string, SideTotals>;
+  byMemberOriginSide: Record<string, Record<string, SideTotals>>;
+  totalSold:          number;
+  totalBought:        number;
+} {
   const inWin = _snapshotsInWindow(events, w);
-  const byMember: Record<string, number> = {};
-  const byMemberOrigin: Record<string, Record<string, number>> = {};
-  let total = 0;
+  const byMemberSide: Record<string, SideTotals> = {};
+  const byMemberOriginSide: Record<string, Record<string, SideTotals>> = {};
+  let totalSold = 0, totalBought = 0;
   for (const ev of inWin) {
     for (const m of ev.members || []) {
-      byMember[m.code] = (byMember[m.code] ?? 0) + (m.total_sold || 0);
-      byMemberOrigin[m.code] = byMemberOrigin[m.code] ?? {};
+      const ms = byMemberSide[m.code] ?? (byMemberSide[m.code] = { sold: 0, bought: 0 });
+      ms.sold   += m.total_sold   || 0;
+      ms.bought += m.total_bought || 0;
+      byMemberOriginSide[m.code] = byMemberOriginSide[m.code] ?? {};
       for (const r of m.rows || []) {
-        byMemberOrigin[m.code][r.origin] = (byMemberOrigin[m.code][r.origin] ?? 0) + (r.sold || 0);
+        const os = byMemberOriginSide[m.code][r.origin]
+          ?? (byMemberOriginSide[m.code][r.origin] = { sold: 0, bought: 0 });
+        os.sold   += r.sold   || 0;
+        os.bought += r.bought || 0;
       }
-      total += m.total_sold || 0;
+      totalSold   += m.total_sold   || 0;
+      totalBought += m.total_bought || 0;
     }
   }
-  return { byMember, byMemberOrigin, total };
+  return { byMemberSide, byMemberOriginSide, totalSold, totalBought };
 }
 
 // Union across all column windows — same rationale as the arabica helpers.
@@ -1521,14 +1534,25 @@ function _rPortsForMetric(
   return Array.from(set).sort();
 }
 
-// Member codes that ever issued in this column window set.
-function _rMembersForCell(events: IssRecvDailyEvt[], cols: PeriodCol[]): string[] {
-  const set = new Set<string>();
+// (Member, side) pairs ever active across the column set. Mirrors the
+// arabica `_membersForPort` helper — sold side prints as −N (issuer),
+// bought side as +N (receiver). A member with both sides in the window
+// surfaces as two separate rows.
+type RobustaSide = "sold" | "bought";
+function _rMemberSidesForCell(
+  events: IssRecvDailyEvt[], cols: PeriodCol[],
+): Array<{ code: string; side: RobustaSide }> {
+  const seen = new Map<string, { code: string; side: RobustaSide }>();
   for (const w of cols) {
     const a = _aggregateIssuance(events, w);
-    Object.keys(a.byMember).forEach((m) => set.add(m));
+    for (const [code, side] of Object.entries(a.byMemberSide)) {
+      if (side.sold   > 0) seen.set(`${code}|sold`,   { code, side: "sold"   });
+      if (side.bought > 0) seen.set(`${code}|bought`, { code, side: "bought" });
+    }
   }
-  return Array.from(set).sort();
+  return Array.from(seen.values()).sort((a, b) =>
+    a.code === b.code ? (a.side === "sold" ? -1 : 1) : a.code.localeCompare(b.code),
+  );
 }
 
 function _rAgeBucketsForCell(ageMonths: AgeAllowanceMonth[], cols: PeriodCol[], port: string): string[] {
@@ -1700,50 +1724,70 @@ function RobustaPeriodTable({
                     ));
                   })()}
 
-                  {/* Issued: member → origin (union across all column windows) */}
-                  {isOpen && drill === "member_origin" && (() => {
-                    const members = _rMembersForCell(issuance, cols);
-                    return members.map((code) => {
-                      const memKey = `${metric}/${code}`;
+                  {/* Tenders: (member, side) signed → origin signed. Sold side
+                      prints as −N (issuer), bought side as +N (receiver). A
+                      member active on both sides surfaces as two rows. Rows
+                      reading 0 across every column are masked. */}
+                  {isOpen && drill === "member_signed_origin" && (() => {
+                    const pairs = _rMemberSidesForCell(issuance, cols);
+                    const signedLots = (n: number, side: RobustaSide) =>
+                      fromLots(side === "sold" ? -n : n, unit);
+                    const signedCell = (x: number): string => {
+                      if (x === 0) return "0";
+                      const body = fmt(Math.abs(x), unit);
+                      return x > 0 ? "+" + body : "−" + body;
+                    };
+                    return pairs.map(({ code, side }) => {
+                      const memKey = `${metric}/${code}/${side}`;
                       const memOpen = expanded.has(memKey);
+                      const vals = cols.map((c) => {
+                        const a = _aggregateIssuance(issuance, c);
+                        return (a.byMemberSide[code]?.[side]) ?? 0;
+                      });
+                      if (vals.every((v) => v === 0)) return null;
+                      // Origins this member traded on this side across the cols.
                       const originSet = new Set<string>();
                       for (const w2 of cols) {
                         const a2 = _aggregateIssuance(issuance, w2);
-                        Object.keys(a2.byMemberOrigin[code] || {}).forEach((o) => originSet.add(o));
+                        for (const [o, sides] of Object.entries(a2.byMemberOriginSide[code] || {})) {
+                          if ((sides[side] || 0) > 0) originSet.add(o);
+                        }
                       }
                       const origins = memOpen ? Array.from(originSet).sort() : [];
+                      const tone = side === "sold" ? "text-rose-300/90" : "text-emerald-300/90";
                       return (
                         <Fragment key={memKey}>
                           <tr className="border-b border-slate-900 bg-slate-900/40">
                             <td
-                              className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-emerald-300"
+                              className={`${tone} text-left py-0.5 cursor-pointer hover:text-emerald-200`}
                               style={indent(1)}
                               onClick={() => toggle(memKey)}
                             >
                               <span className="text-emerald-500/60 inline-block w-3">{memOpen ? "▾" : "▸"}</span>{" "}{_withName(code, ROBUSTA_MEMBER_NAMES)}
                             </td>
-                            {cols.map((c, i) => {
-                              const a = _aggregateIssuance(issuance, c);
-                              return (
-                                <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
-                                  {fmt(fromLots(a.byMember[code] ?? 0, unit), unit)}
-                                </td>
-                              );
-                            })}
+                            {vals.map((v, i) => (
+                              <td key={i} className={`${tone} text-right py-0.5 px-1.5`}>
+                                {signedCell(signedLots(v, side))}
+                              </td>
+                            ))}
                           </tr>
-                          {memOpen && origins.map((origin) => (
-                            <tr key={`${memKey}/${origin}`} className="border-b border-slate-900">
-                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{origin}</td>
-                              {cols.map((c, i) => {
-                                const a = _aggregateIssuance(issuance, c);
-                                return (
-                                  <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                    {fmt(fromLots(a.byMemberOrigin[code]?.[origin] ?? 0, unit), unit)}
+                          {memOpen && origins.map((origin) => {
+                            const oVals = cols.map((c) => {
+                              const a = _aggregateIssuance(issuance, c);
+                              return (a.byMemberOriginSide[code]?.[origin]?.[side]) ?? 0;
+                            });
+                            if (oVals.every((v) => v === 0)) return null;
+                            return (
+                              <tr key={`${memKey}/${origin}`} className="border-b border-slate-900">
+                                <td className={`${tone} text-left py-0.5 italic`} style={indent(2)}>{origin}</td>
+                                {oVals.map((v, i) => (
+                                  <td key={i} className={`${tone} text-right py-0.5 px-1.5`}>
+                                    {signedCell(signedLots(v, side))}
                                   </td>
-                                );
-                              })}
-                            </tr>
-                          ))}
+                                ))}
+                              </tr>
+                            );
+                          })}
                         </Fragment>
                       );
                     });

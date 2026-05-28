@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T13:31:52+00:00",
+  "generated_at": "2026-05-28T14:58:53+00:00",
   "as_of": "2026-05-27",
   "source_url": "imported from synthesis xlsx",
   "snapshots": [
@@ -32721,16 +32721,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "ABN Amro\n127",
-          "value": 34
-        },
-        {
-          "port": "",
-          "issuer": "ABN Amro\n127",
-          "value": 1
-        },
-        {
           "port": "AN",
           "issuer": "ABN Amro Clearing USA LLC",
           "value": 127
@@ -32759,11 +32749,6 @@
           "port": "NY",
           "issuer": "ABN Amro Clearing USA LLC",
           "value": 105
-        },
-        {
-          "port": "",
-          "issuer": "ABN Amro Clearing USA LLC",
-          "value": 1
         }
       ],
       "stoppers_today": [
@@ -32833,11 +32818,6 @@
           "value": 6
         },
         {
-          "port": "",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 1
-        },
-        {
           "port": "MI",
           "stopper": "StoneX Financial Inc.",
           "value": 1
@@ -32848,8 +32828,8 @@
           "value": 14
         }
       ],
-      "issued_total_today": 325,
-      "received_total_today": 290,
+      "issued_total_today": 289,
+      "received_total_today": 289,
       "graded_today_by_origin": {
         "Peru": {
           "passed": 2750
@@ -51816,11 +51796,6 @@
           "value": 4
         },
         {
-          "port": "",
-          "issuer": "ABN Amro Clearing USA LLC",
-          "value": 4
-        },
-        {
           "port": "NY",
           "issuer": "Macquarie Futures USA, Inc.",
           "value": 3
@@ -51834,11 +51809,6 @@
           "port": "HO",
           "issuer": "SG Americas Securities, LLC",
           "value": 8
-        },
-        {
-          "port": "",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 37
         }
       ],
       "stoppers_today": [
@@ -51851,11 +51821,6 @@
           "port": "HO",
           "stopper": "ABN Amro Clearing USA LLC",
           "value": 8
-        },
-        {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 32
         },
         {
           "port": "NY",
@@ -51871,15 +51836,10 @@
           "port": "NY",
           "stopper": "SG Americas Securities, LLC",
           "value": 2
-        },
-        {
-          "port": "",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 9
         }
       ],
-      "issued_total_today": 93,
-      "received_total_today": 93,
+      "issued_total_today": 52,
+      "received_total_today": 52,
       "graded_today_by_origin": {
         "El Salvador": {
           "passed": 2750
@@ -52239,11 +52199,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "167 Division Marex Capital",
-          "value": 9
-        },
-        {
           "port": "AN",
           "issuer": "167 Division Marex Capital Markets Inc.",
           "value": 9
@@ -52264,11 +52219,6 @@
           "value": 31
         },
         {
-          "port": "",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 22
-        },
-        {
           "port": "HA",
           "issuer": "StoneX Financial Inc.",
           "value": 5
@@ -52277,11 +52227,6 @@
           "port": "NY",
           "issuer": "StoneX Financial Inc.",
           "value": 4
-        },
-        {
-          "port": "",
-          "issuer": "StoneX Financial Inc.",
-          "value": 5
         }
       ],
       "stoppers_today": [
@@ -52306,33 +52251,18 @@
           "value": 8
         },
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 14
-        },
-        {
           "port": "AN",
           "stopper": "HSBC Securirties (USA) Inc.",
           "value": 1
         },
         {
-          "port": "",
-          "stopper": "HSBC Securirties (USA) Inc.",
-          "value": 1
-        },
-        {
           "port": "AN",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 16
-        },
-        {
-          "port": "",
           "stopper": "SG Americas Securities, LLC",
           "value": 16
         }
       ],
-      "issued_total_today": 111,
-      "received_total_today": 106,
+      "issued_total_today": 75,
+      "received_total_today": 75,
       "graded_today_by_origin": {
         "Mexico": {
           "passed": 275
@@ -52681,11 +52611,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "167 Division Marex Capital",
-          "value": 3
-        },
-        {
           "port": "AN",
           "issuer": "167 Division Marex Capital Markets Inc.",
           "value": 3
@@ -52701,17 +52626,7 @@
           "value": 5
         },
         {
-          "port": "",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 16
-        },
-        {
           "port": "HA",
-          "issuer": "StoneX Financial Inc.",
-          "value": 1
-        },
-        {
-          "port": "",
           "issuer": "StoneX Financial Inc.",
           "value": 1
         }
@@ -52733,23 +52648,13 @@
           "value": 5
         },
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 14
-        },
-        {
           "port": "AN",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 5
-        },
-        {
-          "port": "",
           "stopper": "SG Americas Securities, LLC",
           "value": 5
         }
       ],
-      "issued_total_today": 45,
-      "received_total_today": 44,
+      "issued_total_today": 25,
+      "received_total_today": 25,
       "graded_today_by_origin": {
         "Nicaragua": {
           "failed": 1495,
@@ -53082,11 +52987,6 @@
           "port": "AN",
           "issuer": "SG Americas Securities, LLC",
           "value": 8
-        },
-        {
-          "port": "",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 8
         }
       ],
       "stoppers_today": [
@@ -53101,18 +53001,13 @@
           "value": 2
         },
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 8
-        },
-        {
           "port": "NY",
           "stopper": "SG Americas Securities, LLC",
           "value": 3
         }
       ],
-      "issued_total_today": 21,
-      "received_total_today": 21,
+      "issued_total_today": 13,
+      "received_total_today": 13,
       "graded_today_by_origin": {
         "Honduras": {
           "failed": 2442,
@@ -53461,11 +53356,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "167 Division Marex Capital",
-          "value": 2
-        },
-        {
           "port": "AN",
           "issuer": "167 Division Marex Capital Markets Inc.",
           "value": 2
@@ -53477,11 +53367,6 @@
         },
         {
           "port": "HO",
-          "issuer": "HSBC Securirties (USA) Inc.",
-          "value": 4
-        },
-        {
-          "port": "",
           "issuer": "HSBC Securirties (USA) Inc.",
           "value": 4
         },
@@ -53499,11 +53384,6 @@
           "port": "HO",
           "issuer": "SG Americas Securities, LLC",
           "value": 1
-        },
-        {
-          "port": "",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 7
         }
       ],
       "stoppers_today": [
@@ -53523,23 +53403,13 @@
           "value": 5
         },
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 9
-        },
-        {
           "port": "AN",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 4
-        },
-        {
-          "port": "",
           "stopper": "SG Americas Securities, LLC",
           "value": 4
         }
       ],
-      "issued_total_today": 36,
-      "received_total_today": 36,
+      "issued_total_today": 23,
+      "received_total_today": 23,
       "graded_today_by_origin": {
         "Rwanda": {
           "failed": 320,
@@ -53878,11 +53748,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "167 Division Marex Capital",
-          "value": 2
-        },
-        {
           "port": "AN",
           "issuer": "167 Division Marex Capital Markets Inc.",
           "value": 2
@@ -53894,11 +53759,6 @@
         },
         {
           "port": "AN",
-          "issuer": "SG Americas Securities, LLC",
-          "value": 6
-        },
-        {
-          "port": "",
           "issuer": "SG Americas Securities, LLC",
           "value": 6
         }
@@ -53915,23 +53775,13 @@
           "value": 5
         },
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing USA LLC",
-          "value": 6
-        },
-        {
           "port": "AN",
-          "stopper": "SG Americas Securities, LLC",
-          "value": 2
-        },
-        {
-          "port": "",
           "stopper": "SG Americas Securities, LLC",
           "value": 2
         }
       ],
-      "issued_total_today": 21,
-      "received_total_today": 21,
+      "issued_total_today": 13,
+      "received_total_today": 13,
       "graded_today_by_origin": {
         "Rwanda": {
           "passed": 320
@@ -54642,24 +54492,9 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "167 Division Marex",
-          "value": 1
-        },
-        {
           "port": "AN",
           "issuer": "167 Division Marex Capital Markets Inc.",
           "value": 1
-        },
-        {
-          "port": "",
-          "issuer": "SG Americas",
-          "value": 20
-        },
-        {
-          "port": "",
-          "issuer": "SG Americas",
-          "value": 2
         },
         {
           "port": "AN",
@@ -54674,16 +54509,6 @@
       ],
       "stoppers_today": [
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing",
-          "value": 17
-        },
-        {
-          "port": "",
-          "stopper": "ABN Amro Clearing",
-          "value": 1
-        },
-        {
           "port": "AN",
           "stopper": "ABN Amro Clearing USA LLC",
           "value": 1
@@ -54692,16 +54517,6 @@
           "port": "HO",
           "stopper": "ABN Amro Clearing USA LLC",
           "value": 17
-        },
-        {
-          "port": "",
-          "stopper": "SG Americas",
-          "value": 3
-        },
-        {
-          "port": "",
-          "stopper": "SG Americas",
-          "value": 2
         },
         {
           "port": "AN",
@@ -54714,8 +54529,8 @@
           "value": 3
         }
       ],
-      "issued_total_today": 46,
-      "received_total_today": 46,
+      "issued_total_today": 23,
+      "received_total_today": 23,
       "graded_today_by_origin": {
         "Mexico": {
           "passed": 3635,
@@ -55053,11 +54868,6 @@
       },
       "issuers_today": [
         {
-          "port": "",
-          "issuer": "ABN Amro Clearing",
-          "value": 5
-        },
-        {
           "port": "MI",
           "issuer": "ABN Amro Clearing USA LLC",
           "value": 5
@@ -55080,11 +54890,6 @@
       ],
       "stoppers_today": [
         {
-          "port": "",
-          "stopper": "ABN Amro Clearing",
-          "value": 4
-        },
-        {
           "port": "MI",
           "stopper": "ABN Amro Clearing USA LLC",
           "value": 4
@@ -55093,11 +54898,6 @@
           "port": "NY",
           "stopper": "ABN Amro Clearing USA LLC",
           "value": 6
-        },
-        {
-          "port": "",
-          "stopper": "SG Americas",
-          "value": 1
         },
         {
           "port": "MI",
@@ -55110,8 +54910,8 @@
           "value": 1
         }
       ],
-      "issued_total_today": 17,
-      "received_total_today": 17,
+      "issued_total_today": 12,
+      "received_total_today": 12,
       "graded_today_by_origin": {
         "Guatemala": {
           "passed": 275
