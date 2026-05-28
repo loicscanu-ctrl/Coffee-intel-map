@@ -205,7 +205,11 @@ const DURATION_LABELS: Record<DurationOpt, string> = {
   "6m":  "Last 6 months",
 };
 function _durationCutoff(opt: DurationOpt, today: Date): Date {
-  const d = new Date(today);
+  // Normalise to local midnight so date-only event timestamps (which compare
+  // as 00:00:00) aren't accidentally excluded by the time-of-day component
+  // on `today`. Without this, picking "Last 7 days" near the end of the
+  // day cut off the boundary day's gradings event.
+  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   switch (opt) {
     case "7d":  d.setDate(d.getDate() - 7); return d;
     case "mtd": return new Date(today.getFullYear(), today.getMonth(), 1);
@@ -239,10 +243,12 @@ const ORIGIN_COLORS: Record<string, string> = {
 const ORIGIN_DEFAULT = "#64748b";  // slate-500
 const _originColor = (origin: string): string => ORIGIN_COLORS[origin] ?? ORIGIN_DEFAULT;
 
-// ── Density grid (vertical orientation) ─────────────────────────────────────
-// Per-market unit sizing so an ANT-sized port doesn't blow up the DOM.
-const DENSITY_COLS = 8;
-const DENSITY_MAX_SQUARES = 128;
+// ── Density grid (vertical orientation, compact) ────────────────────────────
+// Per-market unit sizing so an ANT-sized port doesn't blow up the DOM. We
+// pack ~6 warehouses per row, so each card is narrow and the grid uses
+// fewer columns / smaller squares than the earlier sandbox version.
+const DENSITY_COLS = 6;
+const DENSITY_MAX_SQUARES = 96;
 
 interface DensitySquare {
   status: "filled" | "ghost";  // ghost = volume lost over the duration window
@@ -253,17 +259,16 @@ interface DensitySquare {
   isNew: boolean;              // gained over the window — green halo
 }
 
-// Build the grid for one port. `byOrigin` / `age` snapshots are for the
-// CURRENT state; `deltaByOrigin` is current − T0 per origin (positive =
-// gained, negative = lost). Gained → emerald-bordered "new" squares;
-// lost → ghost squares appended at the end with dotted border.
+// Build the grid for one port. Returns filled (current state) and ghost
+// (volume lost over the window) lists separately so the render can wrap
+// the ghost group in its own bordered sub-grid.
 function buildDensityGrid(
   current: number,
   byOrigin: Record<string, number>,
   age: AgeDist,
   deltaByOrigin: Record<string, number>,
   unit: number,
-): DensitySquare[] {
+): { filled: DensitySquare[]; ghosts: DensitySquare[] } {
   const target = Math.min(Math.ceil(current / unit), DENSITY_MAX_SQUARES);
   const filledCount = current > 0 ? Math.max(1, target) : 0;
 
@@ -294,8 +299,6 @@ function buildDensityGrid(
   for (const [origin, delta] of Object.entries(deltaByOrigin)) {
     if (delta > 0) gainedSquaresPerOrigin[origin] = Math.ceil(delta / unit);
   }
-
-  // Walk in reverse so the "last" N squares of an origin get the flag.
   const isNewArr: boolean[] = new Array(filledCount).fill(false);
   for (let i = filledCount - 1; i >= 0; i--) {
     const o = originPool[i];
@@ -305,9 +308,9 @@ function buildDensityGrid(
     }
   }
 
-  const squares: DensitySquare[] = [];
+  const filled: DensitySquare[] = [];
   for (let i = 0; i < filledCount; i++) {
-    squares.push({
+    filled.push({
       status: "filled",
       origin: originPool[i],
       color: _originColor(originPool[i]),
@@ -317,20 +320,22 @@ function buildDensityGrid(
     });
   }
 
-  // 4. Append ghost squares for each origin with negative delta (volume
-  // lost). One ghost per `unit` lost. Capped so a huge outflow doesn't
-  // dominate the grid.
-  const ghostCap = Math.min(filledCount, DENSITY_MAX_SQUARES - filledCount);
+  // 4. Ghost squares for each origin with negative delta (volume lost).
+  // Returned as a SEPARATE list so the render can wrap them in a single
+  // red-bordered group (user spec: "border them in red so we can easily
+  // recognize this group of lost coffee").
+  const ghostCap = Math.min(filledCount, DENSITY_MAX_SQUARES);
   let ghostsLeft = ghostCap;
+  const ghosts: DensitySquare[] = [];
   for (const [origin, delta] of Object.entries(deltaByOrigin)) {
     if (delta < 0 && ghostsLeft > 0) {
       const n = Math.min(Math.ceil(-delta / unit), ghostsLeft);
       for (let i = 0; i < n; i++) {
-        squares.push({
+        ghosts.push({
           status: "ghost",
           origin,
           color: _originColor(origin),
-          ageBin: "fresh",     // age unknown for lost volume
+          ageBin: "fresh",
           bagsOrLots: unit,
           isNew: false,
         });
@@ -338,7 +343,7 @@ function buildDensityGrid(
       }
     }
   }
-  return squares;
+  return { filled, ghosts };
 }
 
 interface OriginFlow { origin: string; volume: number; color: string }
@@ -684,9 +689,16 @@ export default function CertifiedStocksTestPanel() {
       }
       ports.sort((a, b) => b.current - a.current);
 
-      // Intake summary — latest day's passed/failed + standing pending.
-      const passed = latest.passed_today_bags ?? 0;
-      const failed = latest.failed_today_bags ?? 0;
+      // Intake summary — SUM over the window (so it aligns with the
+      // per-warehouse inflow numbers below). Pending stays point-in-time
+      // (it's a standing queue, not a flow).
+      const cutTime = cutoff.getTime();
+      let passed = 0, failed = 0;
+      for (const s of snaps) {
+        if (new Date(s.date).getTime() < cutTime) continue;
+        passed += s.passed_today_bags ?? 0;
+        failed += s.failed_today_bags ?? 0;
+      }
       let premiumShare = 0, borderlineShare = 0;
       for (const od of Object.values(latestSec.by_origin)) {
         if (od.group === "Group 3" || od.group === "Group 4") borderlineShare += od.total;
@@ -824,30 +836,33 @@ export default function CertifiedStocksTestPanel() {
       }
       ports.sort((a, b) => b.current - a.current);
 
-      // Intake summary — latest gradings event.
-      const lastGrad = grads.length ? grads[grads.length - 1] : null;
+      // Intake summary — SUM all gradings entries in the window. Aligns
+      // with the per-warehouse inflow numbers below (which also sum lots
+      // from the same gradings events). Pending stays point-in-time from
+      // the most recent grading_overview report.
+      const cutTimeR = cutoff.getTime();
       let pPrem = 0, pBord = 0, fail = 0;
-      for (const e of (lastGrad?.entries || [])) {
-        const lots = e.lots || 0;
-        if (e.tenderable === false) { fail += lots; continue; }
-        if (e.class === 3 || e.class === 4) pBord += lots;
-        else pPrem += lots;
-      }
-      let pendingTotal = 0;
-      if (lastGrad && overv.length) {
-        let best: RobustaOverviewEvent | null = null; let bestDist = Infinity;
-        const tgt = new Date(lastGrad.date).getTime();
-        for (const o of overv) {
-          const d = Math.abs(new Date(o.date).getTime() - tgt);
-          if (d < bestDist) { best = o; bestDist = d; }
+      for (const g of grads) {
+        if (new Date(g.date).getTime() < cutTimeR) continue;
+        for (const e of (g.entries || [])) {
+          const lots = e.lots || 0;
+          if (e.tenderable === false) { fail += lots; continue; }
+          if (e.class === 3 || e.class === 4) pBord += lots;
+          else pPrem += lots;
         }
-        if (best && bestDist < 14 * 86_400_000) pendingTotal = best.total_pending_lots ?? 0;
       }
+      // Pending from the most recent grading_overview report (point-in-time
+      // queue + forecast — not a flow).
+      const lastOverv = overv.length ? overv[overv.length - 1] : null;
+      const pendingTotal = lastOverv?.total_pending_lots ?? 0;
+      // Date label = latest event in window so the user knows the period end.
+      const inWinGrad = grads.filter((g) => new Date(g.date).getTime() >= cutTimeR);
+      const dateLabel = inWinGrad.length ? inWinGrad[inWinGrad.length - 1].date : (grads[grads.length - 1]?.date ?? null);
       return {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
         unit: "lots", squareUnit: 25, ports,
         intake: { pending: pendingTotal, passed: pPrem + pBord, failed: fail,
-                  passedPremium: pPrem, passedBorderline: pBord, date: lastGrad?.date ?? null },
+                  passedPremium: pPrem, passedBorderline: pBord, date: dateLabel },
       };
     };
 
@@ -1205,94 +1220,85 @@ export default function CertifiedStocksTestPanel() {
               </div>
             )}
 
-            {/* Branch connector — vertical line down, then horizontal split to each warehouse */}
-            {mkt.ports.length > 0 && (
-              <svg viewBox="0 0 100 14" preserveAspectRatio="none" className="w-full h-8 my-1" aria-hidden>
-                <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                <line x1={50 - 40 * Math.min(1, (mkt.ports.length - 1) / 5)} y1="5"
-                      x2={50 + 40 * Math.min(1, (mkt.ports.length - 1) / 5)} y2="5"
-                      stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                {mkt.ports.slice(0, 6).map((_p, i) => {
-                  const n = Math.min(mkt.ports.length, 6);
-                  const x = n === 1 ? 50 : (50 - 40) + (80 / (n - 1)) * i;
-                  return (
+            {/* Branch connector — each visible warehouse gets its own arrow,
+                aligned to that column's centre in the 6-col grid below. */}
+            {mkt.ports.length > 0 && (() => {
+              const n = Math.min(mkt.ports.length, 6);
+              // Column centres in a 6-col CSS grid (gap-2 negligible at SVG scale).
+              const xs = Array.from({ length: n }, (_, i) => (i + 0.5) * (100 / 6));
+              return (
+                <svg viewBox="0 0 100 16" preserveAspectRatio="none" className="w-full h-10 my-1" aria-hidden>
+                  <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                  {n > 1 && (
+                    <line x1={xs[0]} y1="5" x2={xs[n - 1]} y2="5"
+                          stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                  )}
+                  {xs.map((x, i) => (
                     <g key={i}>
-                      <line x1={x} y1="5" x2={x} y2="13" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                      <polygon points={`${x - 0.8},13 ${x + 0.8},13 ${x},14`} fill="#10b981" fillOpacity="0.7" />
+                      <line x1={x} y1="5" x2={x} y2="14" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
+                      <polygon points={`${x - 0.9},14 ${x + 0.9},14 ${x},15.5`} fill="#10b981" fillOpacity="0.85" />
                     </g>
-                  );
-                })}
-              </svg>
-            )}
+                  ))}
+                </svg>
+              );
+            })()}
 
-            {/* Per-port warehouse grid — vertical cards */}
+            {/* Per-port warehouse grid — compact vertical cards, up to 6 per row */}
             {mkt.ports.length === 0 ? (
               <div className="text-xs text-slate-600 italic">No port data loaded.</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {mkt.ports.map((p) => {
-                  const squares = buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                {mkt.ports.slice(0, 6).map((p) => {
+                  const { filled, ghosts } = buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
                   const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                   const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
-                  const showGhostNote = squares.some((s) => s.status === "ghost");
-                  const showNewNote   = squares.some((s) => s.isNew);
+                  const topInflow  = p.inflow.slice(0, 2);
+                  const topOutflow = p.outflow.slice(0, 2);
                   return (
                     <div key={`${p.market}-${p.code}`}
-                         className="bg-slate-950/60 border border-slate-800 rounded-lg p-3 flex flex-col">
+                         className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col">
                       {/* Header */}
-                      <div className="flex justify-between items-baseline mb-2">
+                      <div className="flex justify-between items-baseline mb-1">
                         <div>
-                          <div className="text-sm font-bold text-slate-100">{p.name}</div>
-                          <div className="text-[10px] font-mono text-slate-500">{p.code}</div>
+                          <div className="text-[11px] font-bold text-slate-100 leading-tight">{p.name}</div>
+                          <div className="text-[9px] font-mono text-slate-500">{p.code}</div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-base font-bold ${p.pctFull > 80 ? "text-rose-400" : p.pctFull > 50 ? "text-amber-400" : "text-slate-300"}`}>
-                            {Math.round(p.pctFull)}%
-                          </div>
-                          <div className="text-[9px] text-slate-600 uppercase">of peak</div>
+                        <div className={`text-xs font-bold ${p.pctFull > 80 ? "text-rose-400" : p.pctFull > 50 ? "text-amber-400" : "text-slate-400"}`}>
+                          {Math.round(p.pctFull)}%
                         </div>
                       </div>
-                      <div className="text-[11px] text-slate-500 mb-2 font-mono">
-                        <span className="text-slate-300">{fmtNum(p.current)}</span> / {fmtNum(p.capacity)} {p.unit}
+                      <div className="text-[9px] text-slate-500 mb-1 font-mono leading-tight">
+                        <span className="text-slate-300">{fmtNum(p.current)}</span>/{fmtNum(p.capacity)} {p.unit}
                       </div>
 
-                      {/* Inflow indicator */}
-                      <div className="flex items-center justify-between mb-1 text-[10px]">
-                        <span className="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">🏭 ↓ in</span>
-                        <span className="font-mono text-emerald-300">+{fmtNum(inflowSum)} {p.unit}</span>
-                      </div>
-                      <div className="bg-emerald-950/15 border border-emerald-900/40 rounded px-2 py-1 mb-2 text-[10px] min-h-[28px]">
-                        {p.inflow.length === 0 ? (
-                          <span className="text-slate-600 italic">no inflow in window</span>
-                        ) : (
-                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
-                            {p.inflow.slice(0, 4).map((b) => (
-                              <span key={b.origin} className="flex items-center text-slate-300">
-                                <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ background: b.color }} />
-                                {b.origin}: <span className="font-mono text-slate-200 ml-0.5">{fmtNum(b.volume)}</span>
+                      {/* Inflow indicator (compact) */}
+                      <div className="bg-emerald-950/20 border border-emerald-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
+                        <div className="flex items-center justify-between text-emerald-400 font-bold">
+                          <span>↓ in</span>
+                          <span className="font-mono">+{fmtNum(inflowSum)}</span>
+                        </div>
+                        {topInflow.length > 0 && (
+                          <div className="flex flex-wrap gap-x-1.5">
+                            {topInflow.map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
+                                <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
                               </span>
                             ))}
                           </div>
                         )}
                       </div>
 
-                      {/* Density grid */}
+                      {/* Density grid — current state */}
                       <div
-                        className="grid gap-[2px] bg-slate-900/50 border border-slate-800 p-1.5 rounded flex-1"
+                        className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded flex-1"
                         style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
                       >
-                        {squares.map((sq, i) => {
+                        {filled.map((sq, i) => {
                           const isPicked = pickedSquare?.market === p.market
                                         && pickedSquare?.port === p.code
                                         && pickedSquare?.squareIdx === i;
-                          const ringCls = sq.status === "ghost"
-                            ? "ring-1 ring-rose-400/60 ring-inset border border-dashed border-rose-400/70"
-                            : sq.isNew
-                              ? "ring-1 ring-emerald-400 ring-inset"
-                              : "";
-                          const opacity = sq.status === "ghost"
-                            ? 0.35
-                            : AGE_OPACITY[sq.ageBin];
+                          const ringCls = sq.isNew ? "ring-1 ring-emerald-400 ring-inset" : "";
                           return (
                             <button
                               key={i}
@@ -1300,37 +1306,65 @@ export default function CertifiedStocksTestPanel() {
                               onClick={() => setPickedSquare(isPicked ? null : {
                                 market: p.market, port: p.code, portName: p.name, squareIdx: i,
                                 origin: sq.origin, ageBin: sq.ageBin, bagsOrLots: sq.bagsOrLots,
-                                unit: p.unit, isNew: sq.isNew, isGhost: sq.status === "ghost",
+                                unit: p.unit, isNew: sq.isNew, isGhost: false,
                               })}
-                              className={`aspect-square rounded-[2px] cursor-pointer transition-transform hover:scale-150 hover:z-10 relative ${ringCls} ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
-                              style={{ background: sq.color, opacity }}
+                              className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 relative ${ringCls} ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
+                              style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
                               aria-label={`${p.name} square ${i}`}
                             />
                           );
                         })}
                       </div>
-                      <div className="text-[9px] text-slate-600 mt-1 flex justify-between items-center">
-                        <span>1 ◻ = {fmtNum(p.squareUnit)} {p.unit}</span>
-                        <span>
-                          {showNewNote && <span className="text-emerald-400/80 mr-1.5">▣ new</span>}
-                          {showGhostNote && <span className="text-rose-400/80">▤ lost</span>}
-                        </span>
-                      </div>
 
-                      {/* Outflow indicator */}
-                      <div className="flex items-center justify-between mt-2 mb-1 text-[10px]">
-                        <span className="text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">🚚 ↓ out</span>
-                        <span className="font-mono text-rose-300">−{fmtNum(outflowSum)} {p.unit}</span>
-                      </div>
-                      <div className="bg-rose-950/15 border border-rose-900/40 rounded px-2 py-1 text-[10px] min-h-[28px]">
-                        {p.outflow.length === 0 ? (
-                          <span className="text-slate-600 italic">no outflow in window</span>
-                        ) : (
-                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
-                            {p.outflow.slice(0, 4).map((b) => (
-                              <span key={b.origin} className="flex items-center text-slate-300">
-                                <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ background: b.color }} />
-                                {b.origin}: <span className="font-mono text-slate-200 ml-0.5">{fmtNum(b.volume)}</span>
+                      {/* Ghost group — lost over window, ONE red dashed border around the lot */}
+                      {ghosts.length > 0 && (
+                        <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10">
+                          <div className="flex justify-between items-baseline mb-0.5">
+                            <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
+                            <span className="text-[8px] font-mono text-rose-400">−{fmtNum(ghosts.length * p.squareUnit)}</span>
+                          </div>
+                          <div
+                            className="grid gap-[1px]"
+                            style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                          >
+                            {ghosts.map((sq, i) => {
+                              const idx = filled.length + i;
+                              const isPicked = pickedSquare?.market === p.market
+                                            && pickedSquare?.port === p.code
+                                            && pickedSquare?.squareIdx === idx;
+                              return (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => setPickedSquare(isPicked ? null : {
+                                    market: p.market, port: p.code, portName: p.name, squareIdx: idx,
+                                    origin: sq.origin, ageBin: sq.ageBin, bagsOrLots: sq.bagsOrLots,
+                                    unit: p.unit, isNew: false, isGhost: true,
+                                  })}
+                                  className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
+                                  style={{ background: sq.color, opacity: 0.4 }}
+                                  aria-label={`${p.name} lost ${i}`}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="text-[8.5px] text-slate-600 mt-1">1 ◻ = {fmtNum(p.squareUnit)} {p.unit}</div>
+
+                      {/* Outflow indicator (compact) */}
+                      <div className="bg-rose-950/20 border border-rose-900/50 rounded px-1 py-0.5 mt-1 text-[9px]">
+                        <div className="flex items-center justify-between text-rose-400 font-bold">
+                          <span>↓ out</span>
+                          <span className="font-mono">−{fmtNum(outflowSum)}</span>
+                        </div>
+                        {topOutflow.length > 0 && (
+                          <div className="flex flex-wrap gap-x-1.5">
+                            {topOutflow.map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
+                                <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
                               </span>
                             ))}
                           </div>
