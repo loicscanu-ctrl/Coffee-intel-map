@@ -143,6 +143,164 @@ const fmt = (n: number, u: Unit): string => {
 };
 const unitSuffix = (u: Unit) => u === "bags" ? "bags" : u === "tonnes" ? "t" : "lots";
 
+// ── Friendly-name lookups (display-only) ─────────────────────────────────────
+// Static maps for the codes ICE uses in its reports. Best-effort: an unknown
+// code falls through to the raw code itself, never to "Unknown". Update as
+// more authoritative source-lists surface (see TODO #1 + #2).
+
+const ROBUSTA_MEMBER_NAMES: Record<string, string> = {
+  ADU: "ADM Investor Services",
+  DMG: "Deutsche Bank",
+  FCI: "StoneX Financial",
+  FIM: "Marex Financial",
+  ICS: "ICAP Securities",
+  ITL: "StoneX Financial (Intl)",
+  MCQ: "Macquarie",
+  MFL: "Macquarie Futures",
+  PFU: "Phillip Futures",
+  SCD: "Sucden Financial",
+};
+
+// Robusta warehouse port codes (ICE Futures Europe — London market).
+const ROBUSTA_PORT_NAMES: Record<string, string> = {
+  AMS: "Amsterdam",
+  ANT: "Antwerp",
+  BAR: "Barcelona",
+  BRE: "Bremen",
+  FEL: "Felixstowe",
+  GEN: "Genoa",
+  HAM: "Hamburg",
+  LEH: "Le Havre",
+  LIV: "Liverpool",
+  LON: "London",
+  NYK: "New York",
+  ROT: "Rotterdam",
+  TRI: "Trieste",
+};
+
+// Arabica warehouse port codes (ICE Futures US — NY market). HA/BR is the
+// combined Hamburg/Bremen slot the C-contract xls reports as a single line.
+const ARABICA_PORT_NAMES: Record<string, string> = {
+  ANT:     "Antwerp",
+  "HA/BR": "Hamburg/Bremen",
+  HAM:     "Hamburg",
+  HOU:     "Houston",
+  MIA:     "Miami",
+  NO:      "New Orleans",
+  NOR:     "Norfolk",
+  NY:      "New York",
+  NYK:     "New York",
+  VIR:     "Virginia",
+};
+
+const _withName = (code: string, dict: Record<string, string>): string => {
+  const name = dict[code];
+  return name ? `${code} · ${name}` : code;
+};
+
+// ── Deep-history chart (TODO #12) — lazy-loaded older years ─────────────────
+// Primary JSON covers the rolling ~12 months. Older history lives in
+// `certified_stocks_<market>_deep_<startYear>-<endYear>.json` chunks (light
+// shape: just date + total + by_port_totals). Fetched on demand when the
+// user picks a longer range.
+
+type ChartRange = "1y" | "5y" | "10y" | "all";
+
+const ARABICA_DEEP_CHUNKS: Array<[number, number]> = [
+  [2010, 2014], [2015, 2019], [2020, 2024], [2025, 2029],
+];
+const ROBUSTA_DEEP_CHUNKS: Array<[number, number]> = [
+  [1990, 1994], [1995, 1999], [2000, 2004], [2005, 2009],
+  [2010, 2014], [2015, 2019], [2020, 2024], [2025, 2029],
+];
+
+function _chunksFor(market: "arabica" | "robusta", range: ChartRange, today: Date): string[] {
+  if (range === "1y") return [];
+  const chunks = market === "arabica" ? ARABICA_DEEP_CHUNKS : ROBUSTA_DEEP_CHUNKS;
+  let cutoffYear: number;
+  if (range === "5y")  cutoffYear = today.getFullYear() - 5;
+  else if (range === "10y") cutoffYear = today.getFullYear() - 10;
+  else cutoffYear = 1900;   // "all"
+  return chunks
+    .filter(([, end]) => end >= cutoffYear)
+    .map(([s, e]) => `${s}-${e}`);
+}
+
+interface DeepRow { date: string; total: number }
+
+function useDeepHistory(
+  market: "arabica" | "robusta", range: ChartRange,
+): Record<string, DeepRow[]> {
+  const [loaded, setLoaded] = useState<Record<string, DeepRow[]>>({});
+  useEffect(() => {
+    const today = new Date();
+    const needed = _chunksFor(market, range, today);
+    for (const key of needed) {
+      if (loaded[key]) continue;
+      fetch(`/data/certified_stocks_${market}_deep_${key}.json`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => {
+          if (!j?.snapshots) return;
+          const series: DeepRow[] = (j.snapshots as Array<Record<string, unknown>>).map((s) => ({
+            date: String(s.date),
+            total: Number(s.total_bags ?? s.total_lots_certified ?? 0),
+          }));
+          setLoaded((prev) => (prev[key] ? prev : { ...prev, [key]: series }));
+        })
+        .catch(() => { /* chunk missing — leave it out */ });
+    }
+  }, [market, range, loaded]);
+  return loaded;
+}
+
+function RangeToggle({ value, onChange }: { value: ChartRange; onChange: (r: ChartRange) => void }) {
+  const opts: ChartRange[] = ["1y", "5y", "10y", "all"];
+  return (
+    <div className="flex items-center gap-1">
+      {opts.map((r) => (
+        <button
+          key={r}
+          onClick={() => onChange(r)}
+          className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
+            value === r
+              ? "bg-slate-800 text-amber-400 border-slate-700"
+              : "text-slate-500 hover:text-slate-300 border-transparent"
+          }`}
+        >
+          {r}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Persistent expanded-set hook (drill state survives page reloads) ──
+// Mirrors useState<Set<string>> but reads from / writes to localStorage so
+// the user's last drill positions stick. Single key per table.
+function useExpandedSet(storageKey: string): [Set<string>, (k: string) => void] {
+  const [set, setSet] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (!raw) return new Set();
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? new Set(arr.filter((x): x is string => typeof x === "string")) : new Set();
+    } catch { return new Set(); }
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try { window.localStorage.setItem(storageKey, JSON.stringify(Array.from(set))); }
+    catch { /* quota or disabled — silently noop */ }
+  }, [storageKey, set]);
+  const toggle = (k: string) => setSet((prev) => {
+    const next = new Set(prev);
+    if (next.has(k)) next.delete(k);
+    else next.add(k);
+    return next;
+  });
+  return [set, toggle];
+}
+
 // ── Small reusable bits ───────────────────────────────────────────────────────
 
 function StatusPill({ live }: { live: boolean }) {
@@ -264,11 +422,11 @@ function _startOfWindowPrevSnap<T extends { date: string }>(snaps: T[], w: Perio
 
 type ArabicaMetric =
   | "Pending grading" | "Graded" | "Passing rate"
-  | "Stocks" | "Decertified" | "Issued";
+  | "Stocks" | "Decertified" | "Issued" | "Received";
 
 const ARABICA_METRICS: ArabicaMetric[] = [
   "Pending grading", "Graded", "Passing rate",
-  "Stocks", "Decertified", "Issued",
+  "Stocks", "Decertified", "Issued", "Received",
 ];
 
 // Per-row drill-down support. Only rows where the source data carries the
@@ -283,6 +441,7 @@ const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
   "Stocks":          "port_group_origin",   // port → ICE group → origin (same shape as Pending)
   "Decertified":     "port_group_origin",   // per-port outflow split by group → origin
   "Issued":          "port_issuer",         // workbook sheet 8a populates issuers_today
+  "Received":        "port_issuer",         // same shape, reads stoppers_today instead
 };
 
 // ICE C-contract group ordering. Drives the Pending grading drill display.
@@ -460,14 +619,23 @@ function _arabicaRowValue(
     const passedSum = _sumWindow(snaps, w, "passed_today_bags");
     return { value: startBase.total_bags + passedSum - endSnap.total_bags };
   }
-  if (metric === "Issued") {
-    // Sourced from per-snapshot issuers_today (TODAY values from sheet 8a).
+  if (metric === "Issued" || metric === "Received") {
+    // Sourced from per-snapshot issuers_today / stoppers_today (TODAY values
+    // from sheet 8a). Received mirrors Issued shape; the `issuer` arg is
+    // overloaded as "the clearing-member firm name" for both sides.
     const inWin = _snapshotsInWindow(snaps, w);
+    const isIssued = metric === "Issued";
+    const rowsOf = (s: ArabicaSnap) =>
+      isIssued
+        ? (s.issuers_today  || []).map((e) => ({ port: e.port, name: e.issuer,  value: e.value }))
+        : (s.stoppers_today || []).map((e) => ({ port: e.port, name: e.stopper, value: e.value }));
+    const totalOf = (s: ArabicaSnap) =>
+      isIssued ? (s.issued_total_today || 0) : (s.received_total_today || 0);
     if (port && issuer) {
       let total = 0;
       for (const s of inWin) {
-        for (const e of (s.issuers_today || [])) {
-          if (e.port === port && e.issuer === issuer) total += e.value || 0;
+        for (const e of rowsOf(s)) {
+          if (e.port === port && e.name === issuer) total += e.value || 0;
         }
       }
       return { value: total };
@@ -475,14 +643,14 @@ function _arabicaRowValue(
     if (port) {
       let total = 0;
       for (const s of inWin) {
-        for (const e of (s.issuers_today || [])) {
+        for (const e of rowsOf(s)) {
           if (e.port === port) total += e.value || 0;
         }
       }
       return { value: total };
     }
     let total = 0;
-    for (const s of inWin) total += (s.issued_total_today || 0);
+    for (const s of inWin) total += totalOf(s);
     return { value: total };
   }
   return { value: null };
@@ -506,9 +674,10 @@ function _portsForMetric(snaps: ArabicaSnap[], cols: PeriodCol[], metric: Arabic
       }
       const startBase = _startOfWindowPrevSnap(snaps, w);
       Object.keys(startBase?.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
-    } else if (metric === "Issued") {
+    } else if (metric === "Issued" || metric === "Received") {
       for (const s of _snapshotsInWindow(snaps, w)) {
-        for (const e of (s.issuers_today || [])) set.add(e.port);
+        const rows = metric === "Issued" ? (s.issuers_today || []) : (s.stoppers_today || []);
+        for (const e of rows) set.add(e.port);
       }
     }
   }
@@ -553,13 +722,20 @@ function _originsForCell(
   return Array.from(set).sort();
 }
 
-// Issuers ever seen at this port across the column set.
-function _issuersForPort(snaps: ArabicaSnap[], cols: PeriodCol[], port: string): string[] {
+// Issuers / Stoppers ever seen at this port across the column set. `side`
+// picks which TODAY array to scan.
+function _issuersForPort(
+  snaps: ArabicaSnap[], cols: PeriodCol[], port: string,
+  side: "issued" | "received" = "issued",
+): string[] {
   const set = new Set<string>();
   for (const w of cols) {
     for (const s of _snapshotsInWindow(snaps, w)) {
-      for (const e of (s.issuers_today || [])) {
-        if (e.port === port) set.add(e.issuer);
+      const rows = side === "issued"
+        ? (s.issuers_today  || []).map((e) => ({ port: e.port, name: e.issuer  }))
+        : (s.stoppers_today || []).map((e) => ({ port: e.port, name: e.stopper }));
+      for (const e of rows) {
+        if (e.port === port) set.add(e.name);
       }
     }
   }
@@ -567,13 +743,7 @@ function _issuersForPort(snaps: ArabicaSnap[], cols: PeriodCol[], port: string):
 }
 
 function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; unit: Unit }) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const toggle = (key: string) => setExpanded((prev) => {
-    const next = new Set(prev);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    return next;
-  });
+  const [expanded, toggle] = useExpandedSet("certifiedStocks.arabica.expanded");
 
   if (!snapshots.length) return <Pending label="Period view" />;
 
@@ -674,7 +844,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                                     style={indent(2)}
                                     onClick={() => toggle(portKey2)}
                                   >
-                                    <span className="text-amber-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{port}
+                                    <span className="text-amber-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{_withName(port, ARABICA_PORT_NAMES)}
                                   </td>
                                   {cols.map((c, i) => (
                                     <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
@@ -716,7 +886,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                             >
                               <span className="text-amber-500/60 inline-block w-3">
                                 {portOpen ? "▾" : "▸"}
-                              </span>{" "}{port}
+                              </span>{" "}{_withName(port, ARABICA_PORT_NAMES)}
                             </td>
                             {cols.map((c, i) => (
                               <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
@@ -775,7 +945,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                           }
 
                           {/* Issuer level (Issued: port → issuer) */}
-                          {portOpen && drill === "port_issuer" && _issuersForPort(snapshots, cols, port).map((issuer) => (
+                          {portOpen && drill === "port_issuer" && _issuersForPort(snapshots, cols, port, metric === "Received" ? "received" : "issued").map((issuer) => (
                             <tr key={`${portKey}/${issuer}`} className="border-b border-slate-900">
                               <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{issuer}</td>
                               {cols.map((c, i) => (
@@ -802,7 +972,8 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
-          + Σpassed − stock. Issued · per-issuer breakdown from ICE iss/recv sheet (clearing-member firms).
+          + Σpassed − stock. Issued / Received · per-clearing-member breakdown from ICE iss/recv
+          sheet (sell-side firms under Issued, buy-side firms under Received).
         </div>
       </div>
     </div>
@@ -834,12 +1005,31 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
     return Object.entries(src)
       .filter(([_, b]) => b > 0)
       .sort((a, b) => b[1] - a[1])
-      .map(([p, b]) => [p, fmt(fromBags(b, unit), unit)] as [string, string]);
+      .map(([p, b]) => [_withName(p, ARABICA_PORT_NAMES), fmt(fromBags(b, unit), unit)] as [string, string]);
   }, [latestSnap, ld, unit]);
 
-  const chartRows = useMemo(() => (
-    (d?.snapshots || []).map(s => ({ d: s.date.slice(5), v: fromBags(s.total_bags, unit) }))
-  ), [d, unit]);
+  const [range, setRange] = useState<ChartRange>("1y");
+  const deepChunks = useDeepHistory("arabica", range);
+  const chartRows = useMemo(() => {
+    // Merge: deep chunks (by date) overlaid with primary snapshots. Primary
+    // wins on conflict because it carries the richest shape.
+    const byDate = new Map<string, number>();
+    for (const series of Object.values(deepChunks)) {
+      for (const r of series) byDate.set(r.date, r.total);
+    }
+    for (const s of (d?.snapshots || [])) byDate.set(s.date, s.total_bags);
+    const today = new Date();
+    let cutoffYear = today.getFullYear() - 1;
+    if (range === "5y")  cutoffYear = today.getFullYear() - 5;
+    if (range === "10y") cutoffYear = today.getFullYear() - 10;
+    if (range === "all") cutoffYear = 1900;
+    const fullDates = range === "1y"
+      ? Array.from(byDate.keys()).filter((d2) => new Date(d2) >= new Date(today.getTime() - 366 * 86_400_000))
+      : Array.from(byDate.keys()).filter((d2) => new Date(d2).getFullYear() >= cutoffYear);
+    return fullDates
+      .sort()
+      .map((dt) => ({ d: range === "1y" ? dt.slice(5) : dt.slice(0, 7), v: fromBags(byDate.get(dt) ?? 0, unit) }));
+  }, [d, unit, deepChunks, range]);
 
   return (
     <div className="space-y-3">
@@ -876,8 +1066,11 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
       </div>
 
       <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
-          Total certified — last {chartRows.length} business days
+        <div className="flex items-baseline justify-between mb-1">
+          <div className="text-[10px] uppercase tracking-wider text-slate-500">
+            Total certified — {chartRows.length} {range === "1y" ? "business days" : "samples"}
+          </div>
+          <RangeToggle value={range} onChange={setRange} />
         </div>
         {chartRows.length === 0 ? <Pending label="History" /> : (
           <div className="h-32 bg-slate-900 border border-slate-700 rounded-md p-2">
@@ -1216,6 +1409,45 @@ function _rRefDateForAge(ageMonths: AgeAllowanceMonth[], cols: PeriodCol[]): str
   return undefined;
 }
 
+// Origin attribution for the (port, age-bucket) cell — TODO #4. Source has no
+// per-(port, age, origin) breakdown; we infer it by looking at the gradings
+// flow during the source month (= age_allowance_month - monthsSince months)
+// at that port. Returns the bucket's per-origin lot estimate, plus the
+// share each origin contributed so the caller can show "(NN%)" alongside.
+function _rOriginsForAgeBucket(
+  ageMonths: AgeAllowanceMonth[], gradings: GradingEvent[],
+  w: PeriodCol, port: string, monthsSince: number,
+): Array<{ origin: string; lots: number; share: number }> {
+  const m = _ageAllowanceForWindow(ageMonths, w);
+  if (!m?.valid?.buckets) return [];
+  const bucket = m.valid.buckets.find((b) => b.months_since_graded === monthsSince);
+  if (!bucket) return [];
+  const bucketLots = (bucket.by_port?.[port] ?? 0) / TONNES_PER_LOT;
+  if (bucketLots <= 0) return [];
+  // Source month = age_allowance.month_end shifted back by monthsSince.
+  const ref = new Date(m.month_end);
+  ref.setMonth(ref.getMonth() - monthsSince);
+  const srcKey = `${ref.getFullYear()}-${String(ref.getMonth() + 1).padStart(2, "0")}`;
+  // Aggregate tenderable lots per origin from gradings entries in source
+  // month at this port.
+  const perOrigin: Record<string, number> = {};
+  let total = 0;
+  for (const ev of gradings) {
+    if (!ev.date.startsWith(srcKey)) continue;
+    for (const e of (ev.entries || []) as GradingEntry[]) {
+      if (e.tenderable === false) continue;
+      if (e.port !== port) continue;
+      const o = e.origin || "?";
+      perOrigin[o] = (perOrigin[o] ?? 0) + (e.lots ?? 0);
+      total += e.lots ?? 0;
+    }
+  }
+  if (total <= 0) return [];
+  return Object.entries(perOrigin)
+    .map(([origin, lots]) => ({ origin, lots: bucketLots * (lots / total), share: lots / total }))
+    .sort((a, b) => b.lots - a.lots);
+}
+
 function RobustaPeriodTable({
   snapshots, gradings, overview, ageMonths, issuance, unit,
 }: {
@@ -1226,13 +1458,7 @@ function RobustaPeriodTable({
   issuance: IssRecvDailyEvt[];
   unit: Unit;
 }) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const toggle = (key: string) => setExpanded((prev) => {
-    const next = new Set(prev);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    return next;
-  });
+  const [expanded, toggle] = useExpandedSet("certifiedStocks.robusta.expanded");
 
   if (!snapshots.length && !gradings.length && !overview.length) return <Pending label="Period view" />;
 
@@ -1351,7 +1577,7 @@ function RobustaPeriodTable({
                               style={indent(1)}
                               onClick={() => toggle(memKey)}
                             >
-                              <span className="text-emerald-500/60 inline-block w-3">{memOpen ? "▾" : "▸"}</span>{" "}{code}
+                              <span className="text-emerald-500/60 inline-block w-3">{memOpen ? "▾" : "▸"}</span>{" "}{_withName(code, ROBUSTA_MEMBER_NAMES)}
                             </td>
                             {cols.map((c, i) => {
                               const a = _aggregateIssuance(issuance, c);
@@ -1397,7 +1623,7 @@ function RobustaPeriodTable({
                             >
                               <span className="text-emerald-500/60 inline-block w-3">
                                 {portOpen ? "▾" : "▸"}
-                              </span>{" "}{port}
+                              </span>{" "}{_withName(port, ROBUSTA_PORT_NAMES)}
                             </td>
                             {cols.map((c, i) => (
                               <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
@@ -1429,16 +1655,54 @@ function RobustaPeriodTable({
                                     </td>
                                   ))}
                                 </tr>
-                                {ageOpen && (
-                                  <tr key={`${ageKey}/origin-tbd`} className="border-b border-slate-900">
-                                    <td className="text-slate-600 text-left py-0.5 italic" style={indent(3)}>
-                                      origin attribution — inferred next iteration*
-                                    </td>
-                                    {cols.map((_c, i) => (
-                                      <td key={i} className="text-slate-600 text-right py-0.5 px-1.5">—</td>
-                                    ))}
-                                  </tr>
-                                )}
+                                {ageOpen && (() => {
+                                  // Union of origins inferred for this (port, age) across all column windows.
+                                  const originSet = new Set<string>();
+                                  for (const w2 of cols) {
+                                    for (const r of _rOriginsForAgeBucket(ageMonths, gradings, w2, port, monthsSince)) {
+                                      originSet.add(r.origin);
+                                    }
+                                  }
+                                  const origins = Array.from(originSet).sort();
+                                  if (!origins.length) {
+                                    return (
+                                      <tr key={`${ageKey}/origin-tbd`} className="border-b border-slate-900">
+                                        <td className="text-slate-600 text-left py-0.5 italic" style={indent(3)}>
+                                          no gradings flow recorded for this month at this port
+                                        </td>
+                                        {cols.map((_c, i) => (
+                                          <td key={i} className="text-slate-600 text-right py-0.5 px-1.5">—</td>
+                                        ))}
+                                      </tr>
+                                    );
+                                  }
+                                  return origins.map((origin) => (
+                                    <tr key={`${ageKey}/${origin}`} className="border-b border-slate-900">
+                                      <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
+                                      {cols.map((c, i) => {
+                                        const recs = _rOriginsForAgeBucket(ageMonths, gradings, c, port, monthsSince);
+                                        const rec = recs.find((r) => r.origin === origin);
+                                        const lots = rec?.lots ?? 0;
+                                        if (metric === "Decertified") {
+                                          // For decertified the per-origin value is the share of the
+                                          // bucket-level decert applied to that origin's grading share.
+                                          const bucketDecert = _robustaRowValue("Decertified", snapshots, gradings, overview, ageMonths, c, port, age).value ?? 0;
+                                          const apportioned = (rec?.share ?? 0) * bucketDecert;
+                                          return (
+                                            <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                              {fmt(fromLots(apportioned, unit), unit) + "*"}
+                                            </td>
+                                          );
+                                        }
+                                        return (
+                                          <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                            {fmt(fromLots(lots, unit), unit) + "*"}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  ));
+                                })()}
                               </Fragment>
                             );
                           })}
@@ -1495,7 +1759,7 @@ function RobustaPeriodTable({
                                     style={indent(2)}
                                     onClick={() => toggle(portKey2)}
                                   >
-                                    <span className="text-emerald-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{port}
+                                    <span className="text-emerald-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{_withName(port, ROBUSTA_PORT_NAMES)}
                                   </td>
                                   {cols.map((c, i) => (
                                     <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
@@ -1561,13 +1825,30 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
     return stock.ports
       .filter(p => p.with_val_cert > 0)
       .sort((a, b) => b.with_val_cert - a.with_val_cert)
-      .map(p => [p.port_name ? `${p.port_id} · ${p.port_name}` : p.port_id,
+      .map(p => [p.port_name ? `${p.port_id} · ${p.port_name}` : _withName(p.port_id, ROBUSTA_PORT_NAMES),
                  fmt(fromLots(p.with_val_cert, unit), unit)] as [string, string]);
   }, [stock, unit]);
 
-  const chartRows = useMemo(() => (
-    (d?.snapshots || []).map(s => ({ d: s.date.slice(5), v: fromLots(s.total_lots_certified, unit) }))
-  ), [d, unit]);
+  const [range, setRange] = useState<ChartRange>("1y");
+  const deepChunks = useDeepHistory("robusta", range);
+  const chartRows = useMemo(() => {
+    const byDate = new Map<string, number>();
+    for (const series of Object.values(deepChunks)) {
+      for (const r of series) byDate.set(r.date, r.total);
+    }
+    for (const s of (d?.snapshots || [])) byDate.set(s.date, s.total_lots_certified);
+    const today = new Date();
+    let cutoffYear = today.getFullYear() - 1;
+    if (range === "5y")  cutoffYear = today.getFullYear() - 5;
+    if (range === "10y") cutoffYear = today.getFullYear() - 10;
+    if (range === "all") cutoffYear = 1900;
+    const fullDates = range === "1y"
+      ? Array.from(byDate.keys()).filter((d2) => new Date(d2) >= new Date(today.getTime() - 366 * 86_400_000))
+      : Array.from(byDate.keys()).filter((d2) => new Date(d2).getFullYear() >= cutoffYear);
+    return fullDates
+      .sort()
+      .map((dt) => ({ d: range === "1y" ? dt.slice(5) : dt.slice(0, 7), v: fromLots(byDate.get(dt) ?? 0, unit) }));
+  }, [d, unit, deepChunks, range]);
 
   // Combined event feed (chronological).
   const feed = useMemo(() => {
@@ -1671,8 +1952,11 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
       )}
 
       <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
-          Total certified — last {chartRows.length} business days
+        <div className="flex items-baseline justify-between mb-1">
+          <div className="text-[10px] uppercase tracking-wider text-slate-500">
+            Total certified — {chartRows.length} {range === "1y" ? "business days" : "samples"}
+          </div>
+          <RangeToggle value={range} onChange={setRange} />
         </div>
         {chartRows.length === 0 ? <Pending label="History" /> : (
           <div className="h-32 bg-slate-900 border border-slate-700 rounded-md p-2">
