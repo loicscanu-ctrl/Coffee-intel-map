@@ -101,9 +101,14 @@ not started.
   - Stocks/Decertified age buckets now labelled by graded month
     ("Mar-26") instead of "1 mo since graded" (raw bucket shown as a
     smaller suffix).
-- ✅ TODO #1 — Robusta member code → friendly-name map
-  (`ROBUSTA_MEMBER_NAMES` in `CertifiedStocksPanel.tsx`; covers ADU, DMG,
-  FCI, FIM, ICS, ITL, MCQ, MFL, PFU, SCD).
+- ✅ TODO #1 — Clearing-member code → friendly-name map locked in v2
+  with the user's authoritative 35-code list (`CLEARING_MEMBER_NAMES` in
+  `CertifiedStocksPanel.tsx`). Same dict is reused by both markets via the
+  `ROBUSTA_MEMBER_NAMES` alias. Arabica firm names (which arrive as long
+  strings like "167 Division Marex Capital Markets Inc.", "SG Americas
+  Securities, LLC", "ABN Amro\n127") get the matching code prefixed via
+  `_displayFirmName()` / `_codeForFirmName()` regex patterns — covers
+  every distinct firm seen in the workbook today.
 - ✅ TODO #2 — Port code → friendly-name maps for both markets
   (`ARABICA_PORT_NAMES`, `ROBUSTA_PORT_NAMES`). Display format is
   "`CODE · City`"; unknown codes fall through to the raw code.

@@ -148,18 +148,99 @@ const unitSuffix = (u: Unit) => u === "bags" ? "bags" : u === "tonnes" ? "t" : "
 // code falls through to the raw code itself, never to "Unknown". Update as
 // more authoritative source-lists surface (see TODO #1 + #2).
 
-const ROBUSTA_MEMBER_NAMES: Record<string, string> = {
+// Authoritative 3-letter clearing-member codes (provided by user). Shared
+// between the Robusta iss/recv sheet and the Arabica issuer/stopper firms.
+const CLEARING_MEMBER_NAMES: Record<string, string> = {
+  ADM: "ADM Investor Services International",
   ADU: "ADM Investor Services",
-  DMG: "Deutsche Bank",
-  FCI: "StoneX Financial",
-  FIM: "Marex Financial",
-  ICS: "ICAP Securities",
-  ITL: "StoneX Financial (Intl)",
-  MCQ: "Macquarie",
-  MFL: "Macquarie Futures",
-  PFU: "Phillip Futures",
-  SCD: "Sucden Financial",
+  BCF: "Barclays Capital Inc.",
+  BCH: "Bunge Chicago Inc",
+  CAM: "RBC Europe",
+  CSB: "Catholic Syrian Bank",
+  DMG: "Deutsche Bank AG",
+  ECM: "ECM",
+  FCI: "StoneX Financial Inc",
+  FIM: "Societe General",
+  GHF: "GH Financials LLC",
+  GSF: "Goldman Sachs Futures",
+  HSB: "HSBC Securities (USA) Inc",
+  ICS: "ABN Amro Clearing Bank",
+  ITL: "StoneX Financial Ltd",
+  JPM: "JP Morgan Securities LC",
+  LDT: "Louis Dreyfus Trading",
+  MBL: "MBL",
+  MCQ: "Macquarie Futures USA Inc",
+  MFL: "Marex Financial",
+  MLP: "MLP",
+  MST: "Morgan Stanley",
+  NAS: "NAS",
+  PBU: "PBU",
+  PFU: "BNP Paribas",
+  PUS: "PUS",
+  RBS: "Rabobank Securities",
+  RCG: "RCG",
+  RJO: "R J O'Brien and Associates",
+  SCD: "Sucden Financial Limited",
+  SLM: "Citigroup Global Markets Ltd",
+  SND: "SND",
+  TRX: "Truxo (Neumann)",
+  UBA: "UBS AG London",
+  UBS: "UBS Securities",
 };
+// Keep the legacy alias so any old reference still resolves.
+const ROBUSTA_MEMBER_NAMES = CLEARING_MEMBER_NAMES;
+
+// Arabica issuer / stopper rows arrive as long-form firm strings ("ABN Amro
+// Clearing USA LLC", "167 Division Marex Capital Markets Inc.", "ABN Amro\n127",
+// …). Patterns below derive a 3-letter clearing code from those messy
+// variants so the panel can prefix "ICS · ABN Amro Clearing USA LLC".
+// Ordered most-specific → most-general; first regex match wins.
+const ARABICA_FIRM_PATTERNS: Array<[RegExp, string]> = [
+  [/abn\s*amro/i,                                "ICS"],
+  [/r[\s.]*j[\s.]*o['']?brien/i,                 "RJO"],
+  [/marex/i,                                     "MFL"],
+  [/sucden/i,                                    "SCD"],
+  [/macquarie/i,                                 "MCQ"],
+  [/morgan\s+stanley/i,                          "MST"],
+  [/jp\s*morgan|j\.?p\.?\s*morgan/i,             "JPM"],
+  [/deutsche\s+bank/i,                           "DMG"],
+  [/goldman\s+sachs/i,                           "GSF"],
+  [/citi(?:group|bank)/i,                        "SLM"],
+  [/bnp\s+paribas/i,                             "PFU"],
+  [/hsbc/i,                                      "HSB"],
+  [/barclays/i,                                  "BCF"],
+  [/rabobank/i,                                  "RBS"],
+  [/stonex\s+financial\s+ltd/i,                  "ITL"],
+  [/stonex|fcstone/i,                            "FCI"],
+  [/societe\s+general(?:e)?|(?:^|\s)sg\s+(?:americas|securities)/i, "FIM"],
+  [/louis\s+dreyfus/i,                           "LDT"],
+  [/bunge/i,                                     "BCH"],
+  [/gh\s+financials/i,                           "GHF"],
+  [/(?:^|\s)rbc(?:\s|$)|royal\s+bank\s+of\s+canada/i, "CAM"],
+  [/catholic\s+syrian/i,                         "CSB"],
+  [/ubs\s+securities/i,                          "UBS"],
+  [/ubs(?:\s+ag)?/i,                             "UBA"],
+  [/truxo|neumann/i,                             "TRX"],
+  [/adm\s+investor\s+services\s+international/i, "ADM"],
+  [/adm\s+investor\s+services/i,                 "ADU"],
+];
+
+function _codeForFirmName(name: string): string | null {
+  for (const [re, code] of ARABICA_FIRM_PATTERNS) {
+    if (re.test(name)) return code;
+  }
+  return null;
+}
+
+// Display helper for arabica firm names — prefix the matched 3-letter code
+// when we can identify the firm, leave the raw name otherwise. Also tidies
+// the embedded newlines / division prefixes that the workbook sometimes
+// emits ("ABN Amro\n127", "167 Division Marex …").
+function _displayFirmName(raw: string): string {
+  const cleaned = raw.replace(/\s+/g, " ").trim();
+  const code = _codeForFirmName(cleaned);
+  return code ? `${code} · ${cleaned}` : cleaned;
+}
 
 // Robusta warehouse port codes (ICE Futures Europe — London market).
 const ROBUSTA_PORT_NAMES: Record<string, string> = {
@@ -961,7 +1042,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                           {/* Issuer level (Issued: port → issuer) */}
                           {portOpen && drill === "port_issuer" && _issuersForPort(snapshots, cols, port, metric === "Received" ? "received" : "issued").map((issuer) => (
                             <tr key={`${portKey}/${issuer}`} className="border-b border-slate-900">
-                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{issuer}</td>
+                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{_displayFirmName(issuer)}</td>
                               {cols.map((c, i) => (
                                 <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
                                   {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, undefined, issuer))}
