@@ -1,0 +1,4406 @@
+{
+  "generated_at": "2026-05-28T11:26:47+00:00",
+  "market": "robusta",
+  "bucket_years": [
+    2025,
+    2029
+  ],
+  "shape": "light (date + total + by_port_totals; no by_origin/by_group)",
+  "snapshots": [
+    {
+      "date": "2025-01-01",
+      "total_lots_certified": 4348,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1406,
+        "BAR": 70,
+        "FEL": 321,
+        "GEN": 12,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 85
+      }
+    },
+    {
+      "date": "2025-01-02",
+      "total_lots_certified": 4346,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1406,
+        "BAR": 70,
+        "FEL": 321,
+        "GEN": 12,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-05",
+      "total_lots_certified": 4389,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1406,
+        "BAR": 70,
+        "FEL": 321,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-06",
+      "total_lots_certified": 4413,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1430,
+        "BAR": 70,
+        "FEL": 321,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-07",
+      "total_lots_certified": 4415,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1437,
+        "BAR": 70,
+        "FEL": 321,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 76
+      }
+    },
+    {
+      "date": "2025-01-08",
+      "total_lots_certified": 4401,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1431,
+        "BAR": 70,
+        "FEL": 313,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 76
+      }
+    },
+    {
+      "date": "2025-01-09",
+      "total_lots_certified": 4393,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1431,
+        "BAR": 70,
+        "FEL": 305,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 76
+      }
+    },
+    {
+      "date": "2025-01-12",
+      "total_lots_certified": 4392,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1429,
+        "BAR": 70,
+        "FEL": 297,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 85
+      }
+    },
+    {
+      "date": "2025-01-13",
+      "total_lots_certified": 4369,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1414,
+        "BAR": 70,
+        "FEL": 289,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 85
+      }
+    },
+    {
+      "date": "2025-01-14",
+      "total_lots_certified": 4359,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1414,
+        "BAR": 70,
+        "FEL": 281,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-15",
+      "total_lots_certified": 4359,
+      "by_port_lots": {
+        "AMS": 5,
+        "ANT": 1414,
+        "BAR": 70,
+        "FEL": 281,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-16",
+      "total_lots_certified": 4422,
+      "by_port_lots": {
+        "ANT": 1486,
+        "BAR": 66,
+        "FEL": 281,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-19",
+      "total_lots_certified": 4451,
+      "by_port_lots": {
+        "ANT": 1515,
+        "BAR": 66,
+        "FEL": 281,
+        "GEN": 12,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-20",
+      "total_lots_certified": 4506,
+      "by_port_lots": {
+        "ANT": 1536,
+        "BAR": 66,
+        "FEL": 281,
+        "GEN": 46,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2427,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-21",
+      "total_lots_certified": 4507,
+      "by_port_lots": {
+        "ANT": 1538,
+        "BAR": 66,
+        "FEL": 281,
+        "GEN": 46,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2426,
+        "NOR": 3,
+        "TRI": 83
+      }
+    },
+    {
+      "date": "2025-01-22",
+      "total_lots_certified": 4592,
+      "by_port_lots": {
+        "ANT": 1537,
+        "BAR": 66,
+        "FEL": 281,
+        "GEN": 66,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2494,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-23",
+      "total_lots_certified": 4603,
+      "by_port_lots": {
+        "ANT": 1531,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 66,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2494,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-26",
+      "total_lots_certified": 4603,
+      "by_port_lots": {
+        "ANT": 1524,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 66,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-27",
+      "total_lots_certified": 4593,
+      "by_port_lots": {
+        "ANT": 1524,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 56,
+        "HAM": 57,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-28",
+      "total_lots_certified": 4545,
+      "by_port_lots": {
+        "ANT": 1521,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 56,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 81
+      }
+    },
+    {
+      "date": "2025-01-29",
+      "total_lots_certified": 4466,
+      "by_port_lots": {
+        "ANT": 1521,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 54
+      }
+    },
+    {
+      "date": "2025-01-30",
+      "total_lots_certified": 4463,
+      "by_port_lots": {
+        "ANT": 1518,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 54
+      }
+    },
+    {
+      "date": "2025-02-02",
+      "total_lots_certified": 4459,
+      "by_port_lots": {
+        "ANT": 1514,
+        "BAR": 83,
+        "FEL": 281,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 54
+      }
+    },
+    {
+      "date": "2025-02-03",
+      "total_lots_certified": 4422,
+      "by_port_lots": {
+        "ANT": 1490,
+        "BAR": 83,
+        "FEL": 271,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 51
+      }
+    },
+    {
+      "date": "2025-02-04",
+      "total_lots_certified": 4409,
+      "by_port_lots": {
+        "ANT": 1485,
+        "BAR": 83,
+        "FEL": 263,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 51
+      }
+    },
+    {
+      "date": "2025-02-05",
+      "total_lots_certified": 4396,
+      "by_port_lots": {
+        "ANT": 1482,
+        "BAR": 83,
+        "FEL": 253,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 51
+      }
+    },
+    {
+      "date": "2025-02-06",
+      "total_lots_certified": 4363,
+      "by_port_lots": {
+        "ANT": 1457,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 51
+      }
+    },
+    {
+      "date": "2025-02-09",
+      "total_lots_certified": 4351,
+      "by_port_lots": {
+        "ANT": 1455,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-10",
+      "total_lots_certified": 4351,
+      "by_port_lots": {
+        "ANT": 1455,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-11",
+      "total_lots_certified": 4348,
+      "by_port_lots": {
+        "ANT": 1452,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-12",
+      "total_lots_certified": 4332,
+      "by_port_lots": {
+        "ANT": 1436,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-13",
+      "total_lots_certified": 4313,
+      "by_port_lots": {
+        "ANT": 1417,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 4,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-16",
+      "total_lots_certified": 4310,
+      "by_port_lots": {
+        "ANT": 1417,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2501,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-17",
+      "total_lots_certified": 4297,
+      "by_port_lots": {
+        "ANT": 1405,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2500,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-18",
+      "total_lots_certified": 4355,
+      "by_port_lots": {
+        "ANT": 1463,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2500,
+        "NOR": 3,
+        "TRI": 41
+      }
+    },
+    {
+      "date": "2025-02-19",
+      "total_lots_certified": 4347,
+      "by_port_lots": {
+        "ANT": 1457,
+        "BAR": 83,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2500,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-20",
+      "total_lots_certified": 4322,
+      "by_port_lots": {
+        "ANT": 1437,
+        "BAR": 79,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2499,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-23",
+      "total_lots_certified": 4321,
+      "by_port_lots": {
+        "ANT": 1436,
+        "BAR": 79,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2499,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-24",
+      "total_lots_certified": 4312,
+      "by_port_lots": {
+        "ANT": 1436,
+        "BAR": 70,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2499,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-25",
+      "total_lots_certified": 4296,
+      "by_port_lots": {
+        "ANT": 1436,
+        "BAR": 68,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-26",
+      "total_lots_certified": 4273,
+      "by_port_lots": {
+        "ANT": 1413,
+        "BAR": 68,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-02-27",
+      "total_lots_certified": 4247,
+      "by_port_lots": {
+        "ANT": 1392,
+        "BAR": 63,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-03-02",
+      "total_lots_certified": 4284,
+      "by_port_lots": {
+        "ANT": 1429,
+        "BAR": 63,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 39
+      }
+    },
+    {
+      "date": "2025-03-03",
+      "total_lots_certified": 4331,
+      "by_port_lots": {
+        "ANT": 1482,
+        "BAR": 59,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 37
+      }
+    },
+    {
+      "date": "2025-03-04",
+      "total_lots_certified": 4329,
+      "by_port_lots": {
+        "ANT": 1482,
+        "BAR": 57,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 37
+      }
+    },
+    {
+      "date": "2025-03-05",
+      "total_lots_certified": 4320,
+      "by_port_lots": {
+        "ANT": 1473,
+        "BAR": 57,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 37
+      }
+    },
+    {
+      "date": "2025-03-06",
+      "total_lots_certified": 4356,
+      "by_port_lots": {
+        "ANT": 1509,
+        "BAR": 57,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2485,
+        "NOR": 3,
+        "TRI": 37
+      }
+    },
+    {
+      "date": "2025-03-09",
+      "total_lots_certified": 4347,
+      "by_port_lots": {
+        "ANT": 1509,
+        "BAR": 57,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-10",
+      "total_lots_certified": 4321,
+      "by_port_lots": {
+        "ANT": 1500,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-11",
+      "total_lots_certified": 4311,
+      "by_port_lots": {
+        "ANT": 1490,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 12,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-12",
+      "total_lots_certified": 4303,
+      "by_port_lots": {
+        "ANT": 1490,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-13",
+      "total_lots_certified": 4288,
+      "by_port_lots": {
+        "ANT": 1475,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-16",
+      "total_lots_certified": 4320,
+      "by_port_lots": {
+        "ANT": 1507,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 30
+      }
+    },
+    {
+      "date": "2025-03-17",
+      "total_lots_certified": 4316,
+      "by_port_lots": {
+        "ANT": 1507,
+        "BAR": 40,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 26
+      }
+    },
+    {
+      "date": "2025-03-18",
+      "total_lots_certified": 4336,
+      "by_port_lots": {
+        "ANT": 1530,
+        "BAR": 38,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 25
+      }
+    },
+    {
+      "date": "2025-03-19",
+      "total_lots_certified": 4312,
+      "by_port_lots": {
+        "ANT": 1506,
+        "BAR": 38,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 3,
+        "TRI": 25
+      }
+    },
+    {
+      "date": "2025-03-20",
+      "total_lots_certified": 4360,
+      "by_port_lots": {
+        "ANT": 1555,
+        "BAR": 36,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 4,
+        "TRI": 25
+      }
+    },
+    {
+      "date": "2025-03-23",
+      "total_lots_certified": 4327,
+      "by_port_lots": {
+        "ANT": 1529,
+        "BAR": 36,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 4,
+        "TRI": 18
+      }
+    },
+    {
+      "date": "2025-03-24",
+      "total_lots_certified": 4414,
+      "by_port_lots": {
+        "ANT": 1619,
+        "BAR": 36,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2483,
+        "NOR": 5,
+        "TRI": 14
+      }
+    },
+    {
+      "date": "2025-03-25",
+      "total_lots_certified": 4407,
+      "by_port_lots": {
+        "ANT": 1617,
+        "BAR": 36,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2481,
+        "NOR": 5,
+        "TRI": 11
+      }
+    },
+    {
+      "date": "2025-03-26",
+      "total_lots_certified": 4397,
+      "by_port_lots": {
+        "ANT": 1607,
+        "BAR": 36,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2481,
+        "NOR": 5,
+        "TRI": 11
+      }
+    },
+    {
+      "date": "2025-03-27",
+      "total_lots_certified": 4394,
+      "by_port_lots": {
+        "ANT": 1607,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2481,
+        "NOR": 5,
+        "TRI": 11
+      }
+    },
+    {
+      "date": "2025-03-30",
+      "total_lots_certified": 4394,
+      "by_port_lots": {
+        "ANT": 1607,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2481,
+        "NOR": 5,
+        "TRI": 11
+      }
+    },
+    {
+      "date": "2025-03-31",
+      "total_lots_certified": 4345,
+      "by_port_lots": {
+        "ANT": 1592,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-04-01",
+      "total_lots_certified": 4342,
+      "by_port_lots": {
+        "ANT": 1589,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-04-02",
+      "total_lots_certified": 4310,
+      "by_port_lots": {
+        "ANT": 1557,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-04-06",
+      "total_lots_certified": 4304,
+      "by_port_lots": {
+        "ANT": 1552,
+        "BAR": 33,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-07",
+      "total_lots_certified": 4291,
+      "by_port_lots": {
+        "ANT": 1541,
+        "BAR": 31,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-08",
+      "total_lots_certified": 4289,
+      "by_port_lots": {
+        "ANT": 1539,
+        "BAR": 31,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-10",
+      "total_lots_certified": 4253,
+      "by_port_lots": {
+        "ANT": 1503,
+        "BAR": 31,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-13",
+      "total_lots_certified": 4249,
+      "by_port_lots": {
+        "ANT": 1501,
+        "BAR": 29,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-14",
+      "total_lots_certified": 4227,
+      "by_port_lots": {
+        "ANT": 1479,
+        "BAR": 29,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-15",
+      "total_lots_certified": 4276,
+      "by_port_lots": {
+        "ANT": 1528,
+        "BAR": 29,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-16",
+      "total_lots_certified": 4272,
+      "by_port_lots": {
+        "ANT": 1528,
+        "BAR": 25,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-21",
+      "total_lots_certified": 4260,
+      "by_port_lots": {
+        "ANT": 1516,
+        "BAR": 25,
+        "FEL": 245,
+        "GEN": 1,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-22",
+      "total_lots_certified": 4251,
+      "by_port_lots": {
+        "ANT": 1498,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-23",
+      "total_lots_certified": 4251,
+      "by_port_lots": {
+        "ANT": 1498,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-24",
+      "total_lots_certified": 4245,
+      "by_port_lots": {
+        "ANT": 1492,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-27",
+      "total_lots_certified": 4242,
+      "by_port_lots": {
+        "ANT": 1489,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-28",
+      "total_lots_certified": 4230,
+      "by_port_lots": {
+        "ANT": 1477,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 4,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-29",
+      "total_lots_certified": 4225,
+      "by_port_lots": {
+        "ANT": 1475,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-04-30",
+      "total_lots_certified": 4225,
+      "by_port_lots": {
+        "ANT": 1475,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-01",
+      "total_lots_certified": 4292,
+      "by_port_lots": {
+        "ANT": 1542,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-05",
+      "total_lots_certified": 4276,
+      "by_port_lots": {
+        "ANT": 1526,
+        "BAR": 18,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2455,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-06",
+      "total_lots_certified": 4257,
+      "by_port_lots": {
+        "ANT": 1524,
+        "BAR": 16,
+        "FEL": 245,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2440,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-07",
+      "total_lots_certified": 4308,
+      "by_port_lots": {
+        "ANT": 1503,
+        "BAR": 9,
+        "FEL": 324,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2440,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-08",
+      "total_lots_certified": 4418,
+      "by_port_lots": {
+        "ANT": 1538,
+        "BAR": 9,
+        "FEL": 399,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2440,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-11",
+      "total_lots_certified": 4507,
+      "by_port_lots": {
+        "ANT": 1538,
+        "BAR": 9,
+        "FEL": 489,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2439,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-12",
+      "total_lots_certified": 4557,
+      "by_port_lots": {
+        "ANT": 1538,
+        "BAR": 9,
+        "FEL": 489,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2489,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-13",
+      "total_lots_certified": 4626,
+      "by_port_lots": {
+        "ANT": 1536,
+        "BAR": 9,
+        "FEL": 494,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2555,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-14",
+      "total_lots_certified": 4755,
+      "by_port_lots": {
+        "ANT": 1536,
+        "BAR": 9,
+        "FEL": 494,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2684,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-15",
+      "total_lots_certified": 4890,
+      "by_port_lots": {
+        "ANT": 1565,
+        "BAR": 9,
+        "FEL": 494,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2790,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-18",
+      "total_lots_certified": 4955,
+      "by_port_lots": {
+        "ANT": 1623,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 2813,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-19",
+      "total_lots_certified": 5211,
+      "by_port_lots": {
+        "ANT": 1615,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3077,
+        "NOR": 5,
+        "TRI": 2
+      }
+    },
+    {
+      "date": "2025-05-20",
+      "total_lots_certified": 5341,
+      "by_port_lots": {
+        "ANT": 1643,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3171,
+        "NOR": 7,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-21",
+      "total_lots_certified": 5425,
+      "by_port_lots": {
+        "ANT": 1637,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3261,
+        "NOR": 7,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-22",
+      "total_lots_certified": 5438,
+      "by_port_lots": {
+        "ANT": 1600,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3311,
+        "NOR": 7,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-26",
+      "total_lots_certified": 5428,
+      "by_port_lots": {
+        "ANT": 1585,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 7,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-27",
+      "total_lots_certified": 5426,
+      "by_port_lots": {
+        "ANT": 1585,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-28",
+      "total_lots_certified": 5409,
+      "by_port_lots": {
+        "ANT": 1568,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-05-29",
+      "total_lots_certified": 5409,
+      "by_port_lots": {
+        "ANT": 1568,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-06-01",
+      "total_lots_certified": 5409,
+      "by_port_lots": {
+        "ANT": 1568,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-06-02",
+      "total_lots_certified": 5409,
+      "by_port_lots": {
+        "ANT": 1568,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3316,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-06-03",
+      "total_lots_certified": 5312,
+      "by_port_lots": {
+        "ANT": 1563,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3224,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-06-04",
+      "total_lots_certified": 5306,
+      "by_port_lots": {
+        "ANT": 1557,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3224,
+        "NOR": 5,
+        "TRI": 8
+      }
+    },
+    {
+      "date": "2025-06-05",
+      "total_lots_certified": 5287,
+      "by_port_lots": {
+        "ANT": 1542,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3224,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-08",
+      "total_lots_certified": 5275,
+      "by_port_lots": {
+        "ANT": 1530,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3224,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-09",
+      "total_lots_certified": 5275,
+      "by_port_lots": {
+        "ANT": 1530,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3224,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-10",
+      "total_lots_certified": 5256,
+      "by_port_lots": {
+        "ANT": 1522,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-11",
+      "total_lots_certified": 5177,
+      "by_port_lots": {
+        "ANT": 1443,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-15",
+      "total_lots_certified": 5177,
+      "by_port_lots": {
+        "ANT": 1443,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-16",
+      "total_lots_certified": 5157,
+      "by_port_lots": {
+        "ANT": 1423,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 17,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 4
+      }
+    },
+    {
+      "date": "2025-06-17",
+      "total_lots_certified": 5150,
+      "by_port_lots": {
+        "ANT": 1418,
+        "BAR": 16,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-18",
+      "total_lots_certified": 5143,
+      "by_port_lots": {
+        "ANT": 1413,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-19",
+      "total_lots_certified": 5142,
+      "by_port_lots": {
+        "ANT": 1412,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-22",
+      "total_lots_certified": 5137,
+      "by_port_lots": {
+        "ANT": 1407,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-23",
+      "total_lots_certified": 5126,
+      "by_port_lots": {
+        "ANT": 1396,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3213,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-24",
+      "total_lots_certified": 5123,
+      "by_port_lots": {
+        "ANT": 1396,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3210,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-25",
+      "total_lots_certified": 5108,
+      "by_port_lots": {
+        "ANT": 1381,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3210,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-26",
+      "total_lots_certified": 5108,
+      "by_port_lots": {
+        "ANT": 1381,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3210,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-29",
+      "total_lots_certified": 5146,
+      "by_port_lots": {
+        "ANT": 1373,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3256,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-06-30",
+      "total_lots_certified": 5174,
+      "by_port_lots": {
+        "ANT": 1353,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3304,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-01",
+      "total_lots_certified": 5159,
+      "by_port_lots": {
+        "ANT": 1338,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3304,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-02",
+      "total_lots_certified": 5153,
+      "by_port_lots": {
+        "ANT": 1333,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-03",
+      "total_lots_certified": 5134,
+      "by_port_lots": {
+        "ANT": 1314,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-06",
+      "total_lots_certified": 5131,
+      "by_port_lots": {
+        "ANT": 1311,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-07",
+      "total_lots_certified": 5215,
+      "by_port_lots": {
+        "ANT": 1395,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-08",
+      "total_lots_certified": 5270,
+      "by_port_lots": {
+        "ANT": 1450,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-09",
+      "total_lots_certified": 5298,
+      "by_port_lots": {
+        "ANT": 1478,
+        "BAR": 14,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-10",
+      "total_lots_certified": 5349,
+      "by_port_lots": {
+        "ANT": 1521,
+        "BAR": 22,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-13",
+      "total_lots_certified": 5477,
+      "by_port_lots": {
+        "ANT": 1649,
+        "BAR": 22,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-14",
+      "total_lots_certified": 5492,
+      "by_port_lots": {
+        "ANT": 1664,
+        "BAR": 22,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3303,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-15",
+      "total_lots_certified": 5611,
+      "by_port_lots": {
+        "ANT": 1792,
+        "BAR": 22,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3294,
+        "NOR": 5,
+        "TRI": 3
+      }
+    },
+    {
+      "date": "2025-07-16",
+      "total_lots_certified": 5737,
+      "by_port_lots": {
+        "ANT": 1920,
+        "BAR": 22,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3294,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-17",
+      "total_lots_certified": 5995,
+      "by_port_lots": {
+        "ANT": 2176,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3294,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-20",
+      "total_lots_certified": 6243,
+      "by_port_lots": {
+        "ANT": 2422,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3296,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-21",
+      "total_lots_certified": 6401,
+      "by_port_lots": {
+        "ANT": 2614,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "HAM": 1,
+        "LEH": 7,
+        "LON": 3262,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-22",
+      "total_lots_certified": 6410,
+      "by_port_lots": {
+        "ANT": 2624,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "LEH": 7,
+        "LON": 3262,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-23",
+      "total_lots_certified": 6519,
+      "by_port_lots": {
+        "ANT": 2745,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 5,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-24",
+      "total_lots_certified": 6882,
+      "by_port_lots": {
+        "ANT": 3106,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-27",
+      "total_lots_certified": 7029,
+      "by_port_lots": {
+        "ANT": 3253,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-28",
+      "total_lots_certified": 7022,
+      "by_port_lots": {
+        "ANT": 3246,
+        "BAR": 24,
+        "FEL": 471,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-29",
+      "total_lots_certified": 7015,
+      "by_port_lots": {
+        "ANT": 3240,
+        "BAR": 23,
+        "FEL": 471,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-30",
+      "total_lots_certified": 7000,
+      "by_port_lots": {
+        "ANT": 3235,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-07-31",
+      "total_lots_certified": 7012,
+      "by_port_lots": {
+        "ANT": 3247,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-03",
+      "total_lots_certified": 7008,
+      "by_port_lots": {
+        "ANT": 3243,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-04",
+      "total_lots_certified": 7003,
+      "by_port_lots": {
+        "ANT": 3238,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-05",
+      "total_lots_certified": 6992,
+      "by_port_lots": {
+        "ANT": 3227,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-06",
+      "total_lots_certified": 6989,
+      "by_port_lots": {
+        "ANT": 3224,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-07",
+      "total_lots_certified": 6992,
+      "by_port_lots": {
+        "ANT": 3227,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-10",
+      "total_lots_certified": 6981,
+      "by_port_lots": {
+        "ANT": 3216,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-11",
+      "total_lots_certified": 6976,
+      "by_port_lots": {
+        "ANT": 3211,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3257,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-12",
+      "total_lots_certified": 6928,
+      "by_port_lots": {
+        "ANT": 3195,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 16,
+        "LON": 3225,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-14",
+      "total_lots_certified": 6907,
+      "by_port_lots": {
+        "ANT": 3177,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 13,
+        "LON": 3225,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-17",
+      "total_lots_certified": 6916,
+      "by_port_lots": {
+        "ANT": 3186,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 13,
+        "LON": 3225,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-19",
+      "total_lots_certified": 6732,
+      "by_port_lots": {
+        "ANT": 3002,
+        "BAR": 23,
+        "FEL": 461,
+        "GEN": 13,
+        "LON": 3225,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-20",
+      "total_lots_certified": 6647,
+      "by_port_lots": {
+        "ANT": 2968,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3183,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-21",
+      "total_lots_certified": 6642,
+      "by_port_lots": {
+        "ANT": 2963,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3183,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-25",
+      "total_lots_certified": 6614,
+      "by_port_lots": {
+        "ANT": 2935,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3183,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-26",
+      "total_lots_certified": 6611,
+      "by_port_lots": {
+        "ANT": 2932,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3183,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-27",
+      "total_lots_certified": 6552,
+      "by_port_lots": {
+        "ANT": 2873,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3183,
+        "NOR": 7,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-28",
+      "total_lots_certified": 6726,
+      "by_port_lots": {
+        "ANT": 3052,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-08-31",
+      "total_lots_certified": 6724,
+      "by_port_lots": {
+        "ANT": 3050,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-01",
+      "total_lots_certified": 6691,
+      "by_port_lots": {
+        "ANT": 3017,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-02",
+      "total_lots_certified": 6663,
+      "by_port_lots": {
+        "ANT": 2989,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-03",
+      "total_lots_certified": 6649,
+      "by_port_lots": {
+        "ANT": 2975,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-04",
+      "total_lots_certified": 6654,
+      "by_port_lots": {
+        "ANT": 2980,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-07",
+      "total_lots_certified": 6644,
+      "by_port_lots": {
+        "ANT": 2970,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-08",
+      "total_lots_certified": 6638,
+      "by_port_lots": {
+        "ANT": 2964,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-09",
+      "total_lots_certified": 6608,
+      "by_port_lots": {
+        "ANT": 2934,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-10",
+      "total_lots_certified": 6563,
+      "by_port_lots": {
+        "ANT": 2889,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-11",
+      "total_lots_certified": 6557,
+      "by_port_lots": {
+        "ANT": 2883,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-14",
+      "total_lots_certified": 6556,
+      "by_port_lots": {
+        "ANT": 2882,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-15",
+      "total_lots_certified": 6554,
+      "by_port_lots": {
+        "ANT": 2880,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-16",
+      "total_lots_certified": 6551,
+      "by_port_lots": {
+        "ANT": 2877,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3177,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-17",
+      "total_lots_certified": 6517,
+      "by_port_lots": {
+        "ANT": 2855,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-18",
+      "total_lots_certified": 6464,
+      "by_port_lots": {
+        "ANT": 2802,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-21",
+      "total_lots_certified": 6481,
+      "by_port_lots": {
+        "ANT": 2819,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-22",
+      "total_lots_certified": 6478,
+      "by_port_lots": {
+        "ANT": 2816,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-23",
+      "total_lots_certified": 6496,
+      "by_port_lots": {
+        "ANT": 2830,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 13,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-24",
+      "total_lots_certified": 6471,
+      "by_port_lots": {
+        "ANT": 2813,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-25",
+      "total_lots_certified": 6469,
+      "by_port_lots": {
+        "ANT": 2811,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-28",
+      "total_lots_certified": 6469,
+      "by_port_lots": {
+        "ANT": 2811,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-29",
+      "total_lots_certified": 6456,
+      "by_port_lots": {
+        "ANT": 2798,
+        "BAR": 23,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-09-30",
+      "total_lots_certified": 6450,
+      "by_port_lots": {
+        "ANT": 2796,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3169,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-01",
+      "total_lots_certified": 6345,
+      "by_port_lots": {
+        "ANT": 2765,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-02",
+      "total_lots_certified": 6345,
+      "by_port_lots": {
+        "ANT": 2765,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-05",
+      "total_lots_certified": 6333,
+      "by_port_lots": {
+        "ANT": 2753,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-06",
+      "total_lots_certified": 6293,
+      "by_port_lots": {
+        "ANT": 2713,
+        "BAR": 19,
+        "FEL": 452,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-07",
+      "total_lots_certified": 6237,
+      "by_port_lots": {
+        "ANT": 2707,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-08",
+      "total_lots_certified": 6237,
+      "by_port_lots": {
+        "ANT": 2707,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-09",
+      "total_lots_certified": 6237,
+      "by_port_lots": {
+        "ANT": 2707,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 8,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-12",
+      "total_lots_certified": 6230,
+      "by_port_lots": {
+        "ANT": 2706,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-13",
+      "total_lots_certified": 6228,
+      "by_port_lots": {
+        "ANT": 2704,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3095,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-14",
+      "total_lots_certified": 6200,
+      "by_port_lots": {
+        "ANT": 2699,
+        "BAR": 19,
+        "FEL": 402,
+        "GEN": 5,
+        "LON": 3072,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-15",
+      "total_lots_certified": 6177,
+      "by_port_lots": {
+        "ANT": 2698,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-16",
+      "total_lots_certified": 6176,
+      "by_port_lots": {
+        "ANT": 2697,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-19",
+      "total_lots_certified": 6160,
+      "by_port_lots": {
+        "ANT": 2681,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-20",
+      "total_lots_certified": 6152,
+      "by_port_lots": {
+        "ANT": 2673,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-21",
+      "total_lots_certified": 6141,
+      "by_port_lots": {
+        "ANT": 2662,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-22",
+      "total_lots_certified": 6141,
+      "by_port_lots": {
+        "ANT": 2662,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-26",
+      "total_lots_certified": 6122,
+      "by_port_lots": {
+        "ANT": 2643,
+        "BAR": 19,
+        "FEL": 400,
+        "GEN": 5,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-27",
+      "total_lots_certified": 6115,
+      "by_port_lots": {
+        "ANT": 2641,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-28",
+      "total_lots_certified": 6111,
+      "by_port_lots": {
+        "ANT": 2637,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-29",
+      "total_lots_certified": 6111,
+      "by_port_lots": {
+        "ANT": 2637,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-10-30",
+      "total_lots_certified": 6077,
+      "by_port_lots": {
+        "ANT": 2603,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-02",
+      "total_lots_certified": 6053,
+      "by_port_lots": {
+        "ANT": 2579,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-03",
+      "total_lots_certified": 6053,
+      "by_port_lots": {
+        "ANT": 2579,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-04",
+      "total_lots_certified": 6036,
+      "by_port_lots": {
+        "ANT": 2562,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-05",
+      "total_lots_certified": 6030,
+      "by_port_lots": {
+        "ANT": 2556,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 3052,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-06",
+      "total_lots_certified": 5926,
+      "by_port_lots": {
+        "ANT": 2532,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 2972,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-09",
+      "total_lots_certified": 5873,
+      "by_port_lots": {
+        "ANT": 2499,
+        "BAR": 19,
+        "FEL": 400,
+        "LON": 2952,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-10",
+      "total_lots_certified": 5868,
+      "by_port_lots": {
+        "ANT": 2517,
+        "BAR": 19,
+        "FEL": 399,
+        "LON": 2930,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-11",
+      "total_lots_certified": 5879,
+      "by_port_lots": {
+        "ANT": 2572,
+        "BAR": 19,
+        "FEL": 355,
+        "LON": 2930,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-12",
+      "total_lots_certified": 5760,
+      "by_port_lots": {
+        "ANT": 2453,
+        "BAR": 19,
+        "FEL": 355,
+        "LON": 2930,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-13",
+      "total_lots_certified": 5723,
+      "by_port_lots": {
+        "ANT": 2437,
+        "BAR": 19,
+        "FEL": 355,
+        "LON": 2909,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-16",
+      "total_lots_certified": 5648,
+      "by_port_lots": {
+        "ANT": 2436,
+        "BAR": 19,
+        "FEL": 355,
+        "LON": 2835,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-17",
+      "total_lots_certified": 5754,
+      "by_port_lots": {
+        "ANT": 2566,
+        "BAR": 19,
+        "FEL": 355,
+        "LON": 2811,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-18",
+      "total_lots_certified": 5670,
+      "by_port_lots": {
+        "ANT": 2686,
+        "BAR": 19,
+        "FEL": 287,
+        "LON": 2675,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-19",
+      "total_lots_certified": 5640,
+      "by_port_lots": {
+        "ANT": 2855,
+        "BAR": 19,
+        "FEL": 287,
+        "LON": 2476,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-20",
+      "total_lots_certified": 5567,
+      "by_port_lots": {
+        "ANT": 2824,
+        "BAR": 29,
+        "FEL": 287,
+        "LON": 2424,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-23",
+      "total_lots_certified": 5370,
+      "by_port_lots": {
+        "ANT": 2727,
+        "BAR": 29,
+        "FEL": 287,
+        "LON": 2324,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-24",
+      "total_lots_certified": 5134,
+      "by_port_lots": {
+        "ANT": 2694,
+        "BAR": 29,
+        "FEL": 287,
+        "LON": 2121,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-25",
+      "total_lots_certified": 4911,
+      "by_port_lots": {
+        "ANT": 2672,
+        "BAR": 29,
+        "FEL": 224,
+        "LON": 1983,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-26",
+      "total_lots_certified": 4738,
+      "by_port_lots": {
+        "ANT": 2576,
+        "BAR": 29,
+        "FEL": 224,
+        "LON": 1906,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-11-30",
+      "total_lots_certified": 4342,
+      "by_port_lots": {
+        "ANT": 2208,
+        "BAR": 29,
+        "FEL": 209,
+        "LON": 1893,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-01",
+      "total_lots_certified": 4120,
+      "by_port_lots": {
+        "ANT": 1986,
+        "BAR": 29,
+        "FEL": 209,
+        "LON": 1893,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-02",
+      "total_lots_certified": 4115,
+      "by_port_lots": {
+        "ANT": 1983,
+        "BAR": 29,
+        "FEL": 209,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-03",
+      "total_lots_certified": 4056,
+      "by_port_lots": {
+        "ANT": 1976,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-04",
+      "total_lots_certified": 4049,
+      "by_port_lots": {
+        "ANT": 1969,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-07",
+      "total_lots_certified": 4021,
+      "by_port_lots": {
+        "ANT": 1941,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-08",
+      "total_lots_certified": 4018,
+      "by_port_lots": {
+        "ANT": 1938,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-09",
+      "total_lots_certified": 4012,
+      "by_port_lots": {
+        "ANT": 1932,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-10",
+      "total_lots_certified": 4070,
+      "by_port_lots": {
+        "ANT": 1990,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-11",
+      "total_lots_certified": 4110,
+      "by_port_lots": {
+        "ANT": 2030,
+        "BAR": 29,
+        "FEL": 157,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-14",
+      "total_lots_certified": 4055,
+      "by_port_lots": {
+        "ANT": 1991,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-15",
+      "total_lots_certified": 4097,
+      "by_port_lots": {
+        "ANT": 2033,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-16",
+      "total_lots_certified": 4154,
+      "by_port_lots": {
+        "ANT": 2090,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-17",
+      "total_lots_certified": 4154,
+      "by_port_lots": {
+        "ANT": 2090,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-18",
+      "total_lots_certified": 4145,
+      "by_port_lots": {
+        "ANT": 2081,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-21",
+      "total_lots_certified": 4207,
+      "by_port_lots": {
+        "ANT": 2145,
+        "BAR": 29,
+        "FEL": 141,
+        "LON": 1891,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-22",
+      "total_lots_certified": 4278,
+      "by_port_lots": {
+        "ANT": 2218,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1891,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-23",
+      "total_lots_certified": 4278,
+      "by_port_lots": {
+        "ANT": 2218,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1891,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-28",
+      "total_lots_certified": 4259,
+      "by_port_lots": {
+        "ANT": 2218,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1872,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-29",
+      "total_lots_certified": 4221,
+      "by_port_lots": {
+        "ANT": 2180,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1872,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2025-12-30",
+      "total_lots_certified": 4221,
+      "by_port_lots": {
+        "ANT": 2180,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1872,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-01",
+      "total_lots_certified": 4210,
+      "by_port_lots": {
+        "ANT": 2179,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-04",
+      "total_lots_certified": 4164,
+      "by_port_lots": {
+        "ANT": 2133,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-05",
+      "total_lots_certified": 4152,
+      "by_port_lots": {
+        "ANT": 2121,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-06",
+      "total_lots_certified": 4136,
+      "by_port_lots": {
+        "ANT": 2105,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-07",
+      "total_lots_certified": 4136,
+      "by_port_lots": {
+        "ANT": 2105,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-08",
+      "total_lots_certified": 4132,
+      "by_port_lots": {
+        "ANT": 2101,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1862,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-11",
+      "total_lots_certified": 4149,
+      "by_port_lots": {
+        "ANT": 2119,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-12",
+      "total_lots_certified": 4221,
+      "by_port_lots": {
+        "ANT": 2191,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-13",
+      "total_lots_certified": 4187,
+      "by_port_lots": {
+        "ANT": 2157,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-14",
+      "total_lots_certified": 4276,
+      "by_port_lots": {
+        "ANT": 2246,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-15",
+      "total_lots_certified": 4249,
+      "by_port_lots": {
+        "ANT": 2219,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-18",
+      "total_lots_certified": 4309,
+      "by_port_lots": {
+        "ANT": 2279,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-19",
+      "total_lots_certified": 4364,
+      "by_port_lots": {
+        "ANT": 2334,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-20",
+      "total_lots_certified": 4450,
+      "by_port_lots": {
+        "ANT": 2420,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-21",
+      "total_lots_certified": 4532,
+      "by_port_lots": {
+        "ANT": 2500,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1861,
+        "NOR": 2,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-22",
+      "total_lots_certified": 4609,
+      "by_port_lots": {
+        "ANT": 2591,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1849,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-25",
+      "total_lots_certified": 4662,
+      "by_port_lots": {
+        "ANT": 2644,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1849,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-26",
+      "total_lots_certified": 4560,
+      "by_port_lots": {
+        "ANT": 2542,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1849,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-27",
+      "total_lots_certified": 4558,
+      "by_port_lots": {
+        "ANT": 2540,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1849,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-28",
+      "total_lots_certified": 4545,
+      "by_port_lots": {
+        "ANT": 2538,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1838,
+        "TRI": 1
+      }
+    },
+    {
+      "date": "2026-01-29",
+      "total_lots_certified": 4544,
+      "by_port_lots": {
+        "ANT": 2538,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1838
+      }
+    },
+    {
+      "date": "2026-02-01",
+      "total_lots_certified": 4544,
+      "by_port_lots": {
+        "ANT": 2538,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1838
+      }
+    },
+    {
+      "date": "2026-02-02",
+      "total_lots_certified": 4542,
+      "by_port_lots": {
+        "ANT": 2536,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1838
+      }
+    },
+    {
+      "date": "2026-02-03",
+      "total_lots_certified": 4524,
+      "by_port_lots": {
+        "ANT": 2518,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1838
+      }
+    },
+    {
+      "date": "2026-02-04",
+      "total_lots_certified": 4517,
+      "by_port_lots": {
+        "ANT": 2518,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1831
+      }
+    },
+    {
+      "date": "2026-02-05",
+      "total_lots_certified": 4515,
+      "by_port_lots": {
+        "ANT": 2516,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1831
+      }
+    },
+    {
+      "date": "2026-02-08",
+      "total_lots_certified": 4507,
+      "by_port_lots": {
+        "ANT": 2508,
+        "BAR": 27,
+        "FEL": 141,
+        "LON": 1831
+      }
+    },
+    {
+      "date": "2026-02-09",
+      "total_lots_certified": 4488,
+      "by_port_lots": {
+        "ANT": 2504,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1826
+      }
+    },
+    {
+      "date": "2026-02-10",
+      "total_lots_certified": 4472,
+      "by_port_lots": {
+        "ANT": 2488,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1826
+      }
+    },
+    {
+      "date": "2026-02-11",
+      "total_lots_certified": 4470,
+      "by_port_lots": {
+        "ANT": 2486,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1826
+      }
+    },
+    {
+      "date": "2026-02-19",
+      "total_lots_certified": 4427,
+      "by_port_lots": {
+        "ANT": 2446,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1823
+      }
+    },
+    {
+      "date": "2026-02-22",
+      "total_lots_certified": 4066,
+      "by_port_lots": {
+        "ANT": 2445,
+        "BAR": 27,
+        "FEL": 113,
+        "LON": 1481
+      }
+    },
+    {
+      "date": "2026-02-23",
+      "total_lots_certified": 4399,
+      "by_port_lots": {
+        "ANT": 2437,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1804
+      }
+    },
+    {
+      "date": "2026-02-24",
+      "total_lots_certified": 4456,
+      "by_port_lots": {
+        "ANT": 2489,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-02-25",
+      "total_lots_certified": 4516,
+      "by_port_lots": {
+        "ANT": 2549,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-02-26",
+      "total_lots_certified": 4569,
+      "by_port_lots": {
+        "ANT": 2602,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-03-01",
+      "total_lots_certified": 4638,
+      "by_port_lots": {
+        "ANT": 2657,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1823
+      }
+    },
+    {
+      "date": "2026-03-02",
+      "total_lots_certified": 4721,
+      "by_port_lots": {
+        "ANT": 2754,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-03-03",
+      "total_lots_certified": 4712,
+      "by_port_lots": {
+        "ANT": 2745,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-03-04",
+      "total_lots_certified": 4675,
+      "by_port_lots": {
+        "ANT": 2708,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1809
+      }
+    },
+    {
+      "date": "2026-03-05",
+      "total_lots_certified": 4602,
+      "by_port_lots": {
+        "ANT": 2645,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1799
+      }
+    },
+    {
+      "date": "2026-03-08",
+      "total_lots_certified": 4583,
+      "by_port_lots": {
+        "ANT": 2636,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1789
+      }
+    },
+    {
+      "date": "2026-03-09",
+      "total_lots_certified": 4573,
+      "by_port_lots": {
+        "ANT": 2636,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1779
+      }
+    },
+    {
+      "date": "2026-03-10",
+      "total_lots_certified": 4563,
+      "by_port_lots": {
+        "ANT": 2636,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1769
+      }
+    },
+    {
+      "date": "2026-03-11",
+      "total_lots_certified": 4550,
+      "by_port_lots": {
+        "ANT": 2633,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1759
+      }
+    },
+    {
+      "date": "2026-03-12",
+      "total_lots_certified": 4517,
+      "by_port_lots": {
+        "ANT": 2626,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1733
+      }
+    },
+    {
+      "date": "2026-03-15",
+      "total_lots_certified": 4497,
+      "by_port_lots": {
+        "ANT": 2626,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1713
+      }
+    },
+    {
+      "date": "2026-03-16",
+      "total_lots_certified": 4363,
+      "by_port_lots": {
+        "ANT": 2520,
+        "BAR": 27,
+        "FEL": 131,
+        "LON": 1685
+      }
+    },
+    {
+      "date": "2026-03-17",
+      "total_lots_certified": 4348,
+      "by_port_lots": {
+        "ANT": 2516,
+        "BAR": 24,
+        "FEL": 131,
+        "LON": 1677
+      }
+    },
+    {
+      "date": "2026-03-18",
+      "total_lots_certified": 4285,
+      "by_port_lots": {
+        "ANT": 2516,
+        "BAR": 24,
+        "FEL": 123,
+        "LON": 1622
+      }
+    },
+    {
+      "date": "2026-03-19",
+      "total_lots_certified": 4257,
+      "by_port_lots": {
+        "ANT": 2512,
+        "BAR": 24,
+        "FEL": 110,
+        "LON": 1611
+      }
+    },
+    {
+      "date": "2026-03-22",
+      "total_lots_certified": 4211,
+      "by_port_lots": {
+        "ANT": 2478,
+        "BAR": 24,
+        "FEL": 98,
+        "LON": 1611
+      }
+    },
+    {
+      "date": "2026-03-23",
+      "total_lots_certified": 4253,
+      "by_port_lots": {
+        "ANT": 2530,
+        "BAR": 24,
+        "FEL": 88,
+        "LON": 1611
+      }
+    },
+    {
+      "date": "2026-03-24",
+      "total_lots_certified": 4229,
+      "by_port_lots": {
+        "ANT": 2516,
+        "BAR": 24,
+        "FEL": 78,
+        "LON": 1611
+      }
+    },
+    {
+      "date": "2026-03-25",
+      "total_lots_certified": 4173,
+      "by_port_lots": {
+        "ANT": 2516,
+        "BAR": 24,
+        "FEL": 72,
+        "LON": 1561
+      }
+    },
+    {
+      "date": "2026-03-26",
+      "total_lots_certified": 4127,
+      "by_port_lots": {
+        "ANT": 2495,
+        "BAR": 13,
+        "FEL": 60,
+        "LON": 1559
+      }
+    },
+    {
+      "date": "2026-03-29",
+      "total_lots_certified": 4109,
+      "by_port_lots": {
+        "ANT": 2489,
+        "BAR": 13,
+        "FEL": 48,
+        "LON": 1559
+      }
+    },
+    {
+      "date": "2026-03-30",
+      "total_lots_certified": 4095,
+      "by_port_lots": {
+        "ANT": 2487,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1559
+      }
+    },
+    {
+      "date": "2026-03-31",
+      "total_lots_certified": 4093,
+      "by_port_lots": {
+        "ANT": 2485,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1559
+      }
+    },
+    {
+      "date": "2026-04-01",
+      "total_lots_certified": 4109,
+      "by_port_lots": {
+        "ANT": 2501,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1559
+      }
+    },
+    {
+      "date": "2026-04-06",
+      "total_lots_certified": 4051,
+      "by_port_lots": {
+        "ANT": 2477,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1525
+      }
+    },
+    {
+      "date": "2026-04-07",
+      "total_lots_certified": 4045,
+      "by_port_lots": {
+        "ANT": 2471,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1525
+      }
+    },
+    {
+      "date": "2026-04-08",
+      "total_lots_certified": 3982,
+      "by_port_lots": {
+        "ANT": 2428,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1505
+      }
+    },
+    {
+      "date": "2026-04-09",
+      "total_lots_certified": 3977,
+      "by_port_lots": {
+        "ANT": 2423,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1505
+      }
+    },
+    {
+      "date": "2026-04-12",
+      "total_lots_certified": 3955,
+      "by_port_lots": {
+        "ANT": 2405,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1501
+      }
+    },
+    {
+      "date": "2026-04-13",
+      "total_lots_certified": 3911,
+      "by_port_lots": {
+        "ANT": 2395,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1467
+      }
+    },
+    {
+      "date": "2026-04-14",
+      "total_lots_certified": 3891,
+      "by_port_lots": {
+        "ANT": 2395,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1447
+      }
+    },
+    {
+      "date": "2026-04-15",
+      "total_lots_certified": 3867,
+      "by_port_lots": {
+        "ANT": 2391,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1427
+      }
+    },
+    {
+      "date": "2026-04-16",
+      "total_lots_certified": 3838,
+      "by_port_lots": {
+        "ANT": 2382,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1407
+      }
+    },
+    {
+      "date": "2026-04-19",
+      "total_lots_certified": 3788,
+      "by_port_lots": {
+        "ANT": 2352,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1387
+      }
+    },
+    {
+      "date": "2026-04-20",
+      "total_lots_certified": 3755,
+      "by_port_lots": {
+        "ANT": 2343,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1363
+      }
+    },
+    {
+      "date": "2026-04-21",
+      "total_lots_certified": 3777,
+      "by_port_lots": {
+        "ANT": 2343,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1385
+      }
+    },
+    {
+      "date": "2026-04-22",
+      "total_lots_certified": 3803,
+      "by_port_lots": {
+        "ANT": 2319,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1435
+      }
+    },
+    {
+      "date": "2026-04-23",
+      "total_lots_certified": 3836,
+      "by_port_lots": {
+        "ANT": 2295,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1492
+      }
+    },
+    {
+      "date": "2026-04-26",
+      "total_lots_certified": 3805,
+      "by_port_lots": {
+        "ANT": 2284,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1472
+      }
+    },
+    {
+      "date": "2026-04-27",
+      "total_lots_certified": 3873,
+      "by_port_lots": {
+        "ANT": 2274,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1550
+      }
+    },
+    {
+      "date": "2026-04-28",
+      "total_lots_certified": 3851,
+      "by_port_lots": {
+        "ANT": 2272,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1530
+      }
+    },
+    {
+      "date": "2026-04-29",
+      "total_lots_certified": 3869,
+      "by_port_lots": {
+        "ANT": 2250,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1570
+      }
+    },
+    {
+      "date": "2026-04-30",
+      "total_lots_certified": 3845,
+      "by_port_lots": {
+        "ANT": 2246,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1550
+      }
+    },
+    {
+      "date": "2026-05-04",
+      "total_lots_certified": 3824,
+      "by_port_lots": {
+        "ANT": 2233,
+        "BAR": 13,
+        "FEL": 36,
+        "LON": 1542
+      }
+    },
+    {
+      "date": "2026-05-05",
+      "total_lots_certified": 3799,
+      "by_port_lots": {
+        "ANT": 2210,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1542
+      }
+    },
+    {
+      "date": "2026-05-06",
+      "total_lots_certified": 3755,
+      "by_port_lots": {
+        "ANT": 2206,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1502
+      }
+    },
+    {
+      "date": "2026-05-07",
+      "total_lots_certified": 3724,
+      "by_port_lots": {
+        "ANT": 2183,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1494
+      }
+    },
+    {
+      "date": "2026-05-10",
+      "total_lots_certified": 3687,
+      "by_port_lots": {
+        "ANT": 2166,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1474
+      }
+    },
+    {
+      "date": "2026-05-11",
+      "total_lots_certified": 3664,
+      "by_port_lots": {
+        "ANT": 2159,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1458
+      }
+    },
+    {
+      "date": "2026-05-12",
+      "total_lots_certified": 3642,
+      "by_port_lots": {
+        "ANT": 2153,
+        "BAR": 11,
+        "FEL": 36,
+        "LON": 1442
+      }
+    },
+    {
+      "date": "2026-05-14",
+      "total_lots_certified": 3631,
+      "by_port_lots": {
+        "ANT": 2184,
+        "BAR": 9,
+        "FEL": 36,
+        "LON": 1402
+      }
+    },
+    {
+      "date": "2026-05-17",
+      "total_lots_certified": 3660,
+      "by_port_lots": {
+        "ANT": 2231,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1386
+      }
+    },
+    {
+      "date": "2026-05-18",
+      "total_lots_certified": 3702,
+      "by_port_lots": {
+        "ANT": 2229,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1430
+      }
+    },
+    {
+      "date": "2026-05-19",
+      "total_lots_certified": 3845,
+      "by_port_lots": {
+        "ANT": 2222,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1580
+      }
+    },
+    {
+      "date": "2026-05-20",
+      "total_lots_certified": 3924,
+      "by_port_lots": {
+        "ANT": 2214,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1667
+      }
+    },
+    {
+      "date": "2026-05-21",
+      "total_lots_certified": 3968,
+      "by_port_lots": {
+        "ANT": 2121,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1804
+      }
+    },
+    {
+      "date": "2026-05-25",
+      "total_lots_certified": 3941,
+      "by_port_lots": {
+        "ANT": 2114,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1784
+      }
+    },
+    {
+      "date": "2026-05-26",
+      "total_lots_certified": 3921,
+      "by_port_lots": {
+        "ANT": 2114,
+        "BAR": 9,
+        "FEL": 34,
+        "LON": 1764
+      }
+    }
+  ]
+}

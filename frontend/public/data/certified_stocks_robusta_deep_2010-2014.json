@@ -1,0 +1,2107 @@
+{
+  "generated_at": "2026-05-28T11:26:47+00:00",
+  "market": "robusta",
+  "bucket_years": [
+    2010,
+    2014
+  ],
+  "shape": "light (date + total + by_port_totals; no by_origin/by_group)",
+  "snapshots": [
+    {
+      "date": "2010-01-11",
+      "total_lots_certified": 30363,
+      "by_port_lots": {
+        "AMS": 812,
+        "ANT": 18410,
+        "BAR": 313,
+        "BRE": 78,
+        "GEN": 1338,
+        "HAM": 181,
+        "LEH": 155,
+        "LON": 178,
+        "MAR": 39,
+        "NOR": 21,
+        "ROT": 2669,
+        "TRI": 6169
+      }
+    },
+    {
+      "date": "2010-01-25",
+      "total_lots_certified": 29993,
+      "by_port_lots": {
+        "AMS": 812,
+        "ANT": 18150,
+        "BAR": 308,
+        "BRE": 78,
+        "GEN": 1321,
+        "HAM": 181,
+        "LEH": 114,
+        "LON": 178,
+        "MAR": 39,
+        "NOR": 21,
+        "ROT": 2669,
+        "TRI": 6122
+      }
+    },
+    {
+      "date": "2010-02-08",
+      "total_lots_certified": 28267,
+      "by_port_lots": {
+        "AMS": 811,
+        "ANT": 17186,
+        "BAR": 293,
+        "BRE": 57,
+        "GEN": 1316,
+        "HAM": 159,
+        "LEH": 82,
+        "LON": 178,
+        "MAR": 39,
+        "NOR": 21,
+        "ROT": 2443,
+        "TRI": 5682
+      }
+    },
+    {
+      "date": "2010-02-22",
+      "total_lots_certified": 27346,
+      "by_port_lots": {
+        "AMS": 811,
+        "ANT": 16730,
+        "BAR": 251,
+        "BRE": 56,
+        "GEN": 1186,
+        "HAM": 113,
+        "LEH": 82,
+        "LON": 178,
+        "MAR": 39,
+        "NOR": 19,
+        "ROT": 2397,
+        "TRI": 5484
+      }
+    },
+    {
+      "date": "2010-03-08",
+      "total_lots_certified": 28479,
+      "by_port_lots": {
+        "AMS": 811,
+        "ANT": 17953,
+        "BAR": 238,
+        "BRE": 54,
+        "GEN": 1215,
+        "HAM": 171,
+        "LEH": 45,
+        "LON": 144,
+        "MAR": 39,
+        "NOR": 19,
+        "ROT": 2379,
+        "TRI": 5411
+      }
+    },
+    {
+      "date": "2010-03-22",
+      "total_lots_certified": 27700,
+      "by_port_lots": {
+        "AMS": 811,
+        "ANT": 17479,
+        "BAR": 175,
+        "BRE": 54,
+        "GEN": 1070,
+        "HAM": 171,
+        "LEH": 38,
+        "LON": 128,
+        "MAR": 39,
+        "NOR": 15,
+        "ROT": 2352,
+        "TRI": 5368
+      }
+    },
+    {
+      "date": "2010-04-05",
+      "total_lots_certified": 26880,
+      "by_port_lots": {
+        "AMS": 811,
+        "ANT": 17021,
+        "BAR": 161,
+        "BRE": 54,
+        "GEN": 1063,
+        "HAM": 163,
+        "LEH": 32,
+        "LON": 121,
+        "MAR": 39,
+        "NOR": 10,
+        "ROT": 2294,
+        "TRI": 5111
+      }
+    },
+    {
+      "date": "2010-04-19",
+      "total_lots_certified": 25943,
+      "by_port_lots": {
+        "AMS": 723,
+        "ANT": 16362,
+        "BAR": 139,
+        "BRE": 53,
+        "GEN": 1063,
+        "HAM": 161,
+        "LEH": 32,
+        "LON": 112,
+        "MAR": 39,
+        "NOR": 10,
+        "ROT": 2284,
+        "TRI": 4965
+      }
+    },
+    {
+      "date": "2010-05-03",
+      "total_lots_certified": 24062,
+      "by_port_lots": {
+        "AMS": 644,
+        "ANT": 14862,
+        "BAR": 121,
+        "BRE": 53,
+        "GEN": 880,
+        "HAM": 160,
+        "LEH": 32,
+        "LON": 111,
+        "MAR": 39,
+        "NOR": 10,
+        "ROT": 2236,
+        "TRI": 4914
+      }
+    },
+    {
+      "date": "2010-05-17",
+      "total_lots_certified": 22737,
+      "by_port_lots": {
+        "AMS": 644,
+        "ANT": 14348,
+        "BAR": 57,
+        "BRE": 53,
+        "GEN": 712,
+        "HAM": 159,
+        "LEH": 30,
+        "LON": 111,
+        "MAR": 39,
+        "NOR": 10,
+        "ROT": 2189,
+        "TRI": 4385
+      }
+    },
+    {
+      "date": "2010-05-31",
+      "total_lots_certified": 22067,
+      "by_port_lots": {
+        "AMS": 644,
+        "ANT": 14042,
+        "BAR": 41,
+        "BRE": 86,
+        "GEN": 678,
+        "HAM": 148,
+        "LEH": 30,
+        "LON": 111,
+        "MAR": 39,
+        "NOR": 4,
+        "ROT": 2134,
+        "TRI": 4110
+      }
+    },
+    {
+      "date": "2010-06-14",
+      "total_lots_certified": 20623,
+      "by_port_lots": {
+        "AMS": 541,
+        "ANT": 13042,
+        "BAR": 35,
+        "BRE": 65,
+        "GEN": 633,
+        "HAM": 140,
+        "LEH": 30,
+        "LON": 136,
+        "MAR": 39,
+        "NOR": 4,
+        "ROT": 1968,
+        "TRI": 3990
+      }
+    },
+    {
+      "date": "2010-06-28",
+      "total_lots_certified": 20604,
+      "by_port_lots": {
+        "AMS": 541,
+        "ANT": 13035,
+        "BAR": 27,
+        "BRE": 65,
+        "GEN": 653,
+        "HAM": 137,
+        "LEH": 32,
+        "LON": 136,
+        "MAR": 115,
+        "NOR": 4,
+        "ROT": 1931,
+        "TRI": 3928
+      }
+    },
+    {
+      "date": "2010-07-12",
+      "total_lots_certified": 20716,
+      "by_port_lots": {
+        "AMS": 541,
+        "ANT": 13071,
+        "BAR": 18,
+        "BRE": 64,
+        "GEN": 655,
+        "HAM": 137,
+        "LEH": 30,
+        "LON": 136,
+        "MAR": 272,
+        "NOR": 4,
+        "ROT": 1900,
+        "TRI": 3888
+      }
+    },
+    {
+      "date": "2010-07-26",
+      "total_lots_certified": 20997,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 13202,
+        "BAR": 59,
+        "BRE": 64,
+        "GEN": 678,
+        "HAM": 153,
+        "LEH": 30,
+        "LON": 136,
+        "MAR": 357,
+        "NOR": 4,
+        "ROT": 1896,
+        "TRI": 3887
+      }
+    },
+    {
+      "date": "2010-08-09",
+      "total_lots_certified": 21070,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 13272,
+        "BAR": 69,
+        "BRE": 64,
+        "GEN": 678,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 136,
+        "MAR": 381,
+        "NOR": 4,
+        "ROT": 1887,
+        "TRI": 3858
+      }
+    },
+    {
+      "date": "2010-08-23",
+      "total_lots_certified": 21137,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 13359,
+        "BAR": 67,
+        "BRE": 64,
+        "GEN": 736,
+        "HAM": 153,
+        "LEH": 39,
+        "LON": 135,
+        "MAR": 381,
+        "NOR": 4,
+        "ROT": 1883,
+        "TRI": 3785
+      }
+    },
+    {
+      "date": "2010-09-06",
+      "total_lots_certified": 21167,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 13539,
+        "BAR": 63,
+        "BRE": 64,
+        "GEN": 725,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 139,
+        "MAR": 381,
+        "NOR": 4,
+        "ROT": 1865,
+        "TRI": 3666
+      }
+    },
+    {
+      "date": "2010-09-20",
+      "total_lots_certified": 21554,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 14073,
+        "BAR": 63,
+        "BRE": 64,
+        "GEN": 716,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 131,
+        "MAR": 381,
+        "NOR": 4,
+        "ROT": 1862,
+        "TRI": 3539
+      }
+    },
+    {
+      "date": "2010-10-04",
+      "total_lots_certified": 21625,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 14257,
+        "BAR": 63,
+        "BRE": 64,
+        "GEN": 675,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 131,
+        "MAR": 381,
+        "NOR": 4,
+        "ROT": 1853,
+        "TRI": 3476
+      }
+    },
+    {
+      "date": "2010-10-18",
+      "total_lots_certified": 21459,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 14192,
+        "BAR": 61,
+        "BRE": 64,
+        "GEN": 675,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 131,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1845,
+        "TRI": 3404
+      }
+    },
+    {
+      "date": "2010-11-01",
+      "total_lots_certified": 21471,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 14285,
+        "BAR": 50,
+        "BRE": 64,
+        "GEN": 663,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 131,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3356
+      }
+    },
+    {
+      "date": "2010-11-15",
+      "total_lots_certified": 21680,
+      "by_port_lots": {
+        "AMS": 531,
+        "ANT": 14538,
+        "BAR": 58,
+        "BRE": 64,
+        "GEN": 648,
+        "HAM": 153,
+        "LEH": 37,
+        "LON": 109,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3341
+      }
+    },
+    {
+      "date": "2010-11-29",
+      "total_lots_certified": 21695,
+      "by_port_lots": {
+        "AMS": 528,
+        "ANT": 14536,
+        "BAR": 79,
+        "BRE": 64,
+        "GEN": 732,
+        "HAM": 153,
+        "LEH": 29,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3265
+      }
+    },
+    {
+      "date": "2010-12-13",
+      "total_lots_certified": 21632,
+      "by_port_lots": {
+        "AMS": 524,
+        "ANT": 14611,
+        "BAR": 79,
+        "BRE": 64,
+        "GEN": 734,
+        "HAM": 153,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3128
+      }
+    },
+    {
+      "date": "2010-12-27",
+      "total_lots_certified": 21711,
+      "by_port_lots": {
+        "AMS": 524,
+        "ANT": 14752,
+        "BAR": 79,
+        "BRE": 64,
+        "GEN": 750,
+        "HAM": 153,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3050
+      }
+    },
+    {
+      "date": "2011-01-10",
+      "total_lots_certified": 22225,
+      "by_port_lots": {
+        "AMS": 600,
+        "ANT": 15179,
+        "BAR": 87,
+        "BRE": 57,
+        "GEN": 772,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1835,
+        "TRI": 3041
+      }
+    },
+    {
+      "date": "2011-01-24",
+      "total_lots_certified": 22841,
+      "by_port_lots": {
+        "AMS": 701,
+        "ANT": 15575,
+        "BAR": 87,
+        "BRE": 68,
+        "GEN": 823,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1927,
+        "TRI": 3006
+      }
+    },
+    {
+      "date": "2011-02-07",
+      "total_lots_certified": 23234,
+      "by_port_lots": {
+        "AMS": 878,
+        "ANT": 15711,
+        "BAR": 95,
+        "BRE": 56,
+        "GEN": 772,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1963,
+        "TRI": 3105
+      }
+    },
+    {
+      "date": "2011-02-21",
+      "total_lots_certified": 24131,
+      "by_port_lots": {
+        "AMS": 960,
+        "ANT": 16315,
+        "BAR": 67,
+        "BRE": 56,
+        "GEN": 775,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 108,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 1993,
+        "TRI": 3311
+      }
+    },
+    {
+      "date": "2011-03-07",
+      "total_lots_certified": 25165,
+      "by_port_lots": {
+        "AMS": 1099,
+        "ANT": 16857,
+        "BAR": 66,
+        "BRE": 56,
+        "GEN": 906,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 109,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 2012,
+        "TRI": 3514
+      }
+    },
+    {
+      "date": "2011-03-21",
+      "total_lots_certified": 26086,
+      "by_port_lots": {
+        "AMS": 1335,
+        "ANT": 17258,
+        "BAR": 66,
+        "BRE": 56,
+        "GEN": 968,
+        "HAM": 150,
+        "LEH": 30,
+        "LON": 109,
+        "MAR": 362,
+        "NOR": 4,
+        "ROT": 2003,
+        "TRI": 3745
+      }
+    },
+    {
+      "date": "2011-04-04",
+      "total_lots_certified": 27907,
+      "by_port_lots": {
+        "AMS": 1553,
+        "ANT": 18218,
+        "BAR": 75,
+        "BRE": 57,
+        "GEN": 1078,
+        "HAM": 161,
+        "LEH": 34,
+        "LON": 133,
+        "MAR": 362,
+        "NOR": 7,
+        "ROT": 2125,
+        "TRI": 4104
+      }
+    },
+    {
+      "date": "2011-04-18",
+      "total_lots_certified": 29095,
+      "by_port_lots": {
+        "AMS": 1709,
+        "ANT": 18811,
+        "BAR": 153,
+        "BRE": 57,
+        "GEN": 1214,
+        "HAM": 201,
+        "LEH": 37,
+        "LON": 149,
+        "MAR": 362,
+        "NOR": 45,
+        "ROT": 2210,
+        "TRI": 4147
+      }
+    },
+    {
+      "date": "2011-05-02",
+      "total_lots_certified": 30193,
+      "by_port_lots": {
+        "AMS": 1821,
+        "ANT": 19515,
+        "BAR": 186,
+        "BRE": 77,
+        "GEN": 1261,
+        "HAM": 206,
+        "LEH": 37,
+        "LON": 181,
+        "MAR": 362,
+        "NOR": 79,
+        "ROT": 2281,
+        "TRI": 4187
+      }
+    },
+    {
+      "date": "2011-05-16",
+      "total_lots_certified": 33944,
+      "by_port_lots": {
+        "AMS": 2017,
+        "ANT": 21891,
+        "BAR": 329,
+        "BRE": 66,
+        "GEN": 1398,
+        "HAM": 211,
+        "LEH": 46,
+        "LON": 301,
+        "MAR": 362,
+        "NOR": 120,
+        "ROT": 2397,
+        "TRI": 4806
+      }
+    },
+    {
+      "date": "2011-05-30",
+      "total_lots_certified": 40034,
+      "by_port_lots": {
+        "AMS": 2399,
+        "ANT": 25762,
+        "BAR": 716,
+        "BRE": 66,
+        "GEN": 1731,
+        "HAM": 330,
+        "LEH": 66,
+        "LON": 448,
+        "MAR": 362,
+        "NOR": 120,
+        "ROT": 2592,
+        "TRI": 5442
+      }
+    },
+    {
+      "date": "2011-06-13",
+      "total_lots_certified": 40451,
+      "by_port_lots": {
+        "AMS": 2518,
+        "ANT": 25741,
+        "BAR": 736,
+        "BRE": 66,
+        "GEN": 1898,
+        "HAM": 324,
+        "LEH": 66,
+        "LON": 459,
+        "MAR": 362,
+        "NOR": 114,
+        "ROT": 2680,
+        "TRI": 5487
+      }
+    },
+    {
+      "date": "2011-06-27",
+      "total_lots_certified": 41238,
+      "by_port_lots": {
+        "AMS": 2558,
+        "ANT": 26547,
+        "BAR": 746,
+        "BRE": 66,
+        "GEN": 1892,
+        "HAM": 309,
+        "LEH": 66,
+        "LON": 485,
+        "MAR": 362,
+        "NOR": 106,
+        "ROT": 2599,
+        "TRI": 5502
+      }
+    },
+    {
+      "date": "2011-07-11",
+      "total_lots_certified": 41686,
+      "by_port_lots": {
+        "AMS": 2590,
+        "ANT": 27067,
+        "BAR": 746,
+        "BRE": 66,
+        "GEN": 1905,
+        "HAM": 290,
+        "LEH": 75,
+        "LON": 488,
+        "MAR": 362,
+        "NOR": 57,
+        "ROT": 2576,
+        "TRI": 5464
+      }
+    },
+    {
+      "date": "2011-07-25",
+      "total_lots_certified": 40958,
+      "by_port_lots": {
+        "AMS": 2568,
+        "ANT": 26765,
+        "BAR": 699,
+        "BRE": 66,
+        "GEN": 1915,
+        "HAM": 217,
+        "LEH": 75,
+        "LON": 506,
+        "MAR": 39,
+        "NOR": 56,
+        "ROT": 2806,
+        "TRI": 5246
+      }
+    },
+    {
+      "date": "2011-08-08",
+      "total_lots_certified": 40391,
+      "by_port_lots": {
+        "AMS": 2505,
+        "ANT": 26298,
+        "BAR": 678,
+        "BRE": 66,
+        "GEN": 1911,
+        "HAM": 200,
+        "LEH": 75,
+        "LON": 519,
+        "MAR": 39,
+        "NOR": 55,
+        "ROT": 2870,
+        "TRI": 5175
+      }
+    },
+    {
+      "date": "2011-08-22",
+      "total_lots_certified": 39753,
+      "by_port_lots": {
+        "AMS": 2503,
+        "ANT": 25967,
+        "BAR": 672,
+        "BRE": 66,
+        "GEN": 1915,
+        "HAM": 184,
+        "LEH": 75,
+        "LON": 498,
+        "MAR": 39,
+        "NOR": 23,
+        "ROT": 2801,
+        "TRI": 5010
+      }
+    },
+    {
+      "date": "2011-09-05",
+      "total_lots_certified": 38839,
+      "by_port_lots": {
+        "AMS": 2483,
+        "ANT": 25824,
+        "BAR": 641,
+        "BRE": 66,
+        "GEN": 1662,
+        "HAM": 103,
+        "LEH": 75,
+        "LON": 498,
+        "MAR": 39,
+        "NOR": 23,
+        "ROT": 2661,
+        "TRI": 4764
+      }
+    },
+    {
+      "date": "2011-09-19",
+      "total_lots_certified": 37766,
+      "by_port_lots": {
+        "AMS": 2246,
+        "ANT": 25378,
+        "BAR": 641,
+        "BRE": 66,
+        "GEN": 1656,
+        "HAM": 103,
+        "LEH": 78,
+        "LON": 498,
+        "MAR": 39,
+        "NOR": 22,
+        "ROT": 2519,
+        "TRI": 4520
+      }
+    },
+    {
+      "date": "2011-10-03",
+      "total_lots_certified": 36756,
+      "by_port_lots": {
+        "AMS": 2127,
+        "ANT": 24762,
+        "BAR": 620,
+        "BRE": 66,
+        "GEN": 1652,
+        "HAM": 103,
+        "LEH": 68,
+        "LON": 497,
+        "MAR": 39,
+        "NOR": 6,
+        "ROT": 2382,
+        "TRI": 4434
+      }
+    },
+    {
+      "date": "2011-10-17",
+      "total_lots_certified": 35000,
+      "by_port_lots": {
+        "AMS": 2051,
+        "ANT": 23737,
+        "BAR": 613,
+        "BRE": 66,
+        "GEN": 1308,
+        "HAM": 103,
+        "LEH": 59,
+        "LON": 497,
+        "MAR": 7,
+        "NOR": 4,
+        "ROT": 2294,
+        "TRI": 4261
+      }
+    },
+    {
+      "date": "2011-10-31",
+      "total_lots_certified": 33176,
+      "by_port_lots": {
+        "AMS": 1858,
+        "ANT": 22479,
+        "BAR": 581,
+        "BRE": 66,
+        "GEN": 1301,
+        "HAM": 101,
+        "LEH": 59,
+        "LON": 518,
+        "MAR": 7,
+        "NOR": 4,
+        "ROT": 2186,
+        "TRI": 4016
+      }
+    },
+    {
+      "date": "2011-11-14",
+      "total_lots_certified": 31115,
+      "by_port_lots": {
+        "AMS": 1621,
+        "ANT": 21449,
+        "BAR": 322,
+        "BRE": 56,
+        "GEN": 1100,
+        "HAM": 84,
+        "LEH": 55,
+        "LON": 517,
+        "MAR": 7,
+        "NOR": 4,
+        "ROT": 2134,
+        "TRI": 3766
+      }
+    },
+    {
+      "date": "2011-11-28",
+      "total_lots_certified": 29905,
+      "by_port_lots": {
+        "AMS": 1554,
+        "ANT": 20718,
+        "BAR": 311,
+        "BRE": 47,
+        "GEN": 1000,
+        "HAM": 80,
+        "LEH": 52,
+        "LON": 473,
+        "MAR": 7,
+        "ROT": 2083,
+        "TRI": 3580
+      }
+    },
+    {
+      "date": "2011-12-12",
+      "total_lots_certified": 27485,
+      "by_port_lots": {
+        "AMS": 1554,
+        "ANT": 18761,
+        "BAR": 285,
+        "BRE": 46,
+        "GEN": 948,
+        "HAM": 70,
+        "LEH": 52,
+        "LON": 456,
+        "MAR": 7,
+        "ROT": 2014,
+        "TRI": 3292
+      }
+    },
+    {
+      "date": "2011-12-26",
+      "total_lots_certified": 25507,
+      "by_port_lots": {
+        "AMS": 1486,
+        "ANT": 17375,
+        "BAR": 279,
+        "BRE": 46,
+        "GEN": 939,
+        "HAM": 51,
+        "LEH": 37,
+        "LON": 375,
+        "MAR": 7,
+        "ROT": 1892,
+        "TRI": 3020
+      }
+    },
+    {
+      "date": "2012-01-09",
+      "total_lots_certified": 24658,
+      "by_port_lots": {
+        "AMS": 1327,
+        "ANT": 16972,
+        "BAR": 269,
+        "BRE": 46,
+        "GEN": 912,
+        "HAM": 47,
+        "LEH": 37,
+        "LON": 368,
+        "MAR": 7,
+        "ROT": 1763,
+        "TRI": 2910
+      }
+    },
+    {
+      "date": "2012-01-23",
+      "total_lots_certified": 23584,
+      "by_port_lots": {
+        "AMS": 1262,
+        "ANT": 16185,
+        "BAR": 268,
+        "BRE": 46,
+        "GEN": 895,
+        "HAM": 42,
+        "LEH": 36,
+        "LON": 365,
+        "MAR": 7,
+        "ROT": 1713,
+        "TRI": 2765
+      }
+    },
+    {
+      "date": "2012-02-06",
+      "total_lots_certified": 22669,
+      "by_port_lots": {
+        "AMS": 1228,
+        "ANT": 15569,
+        "BAR": 259,
+        "BRE": 46,
+        "GEN": 881,
+        "HAM": 38,
+        "LEH": 36,
+        "LON": 329,
+        "MAR": 7,
+        "ROT": 1654,
+        "TRI": 2622
+      }
+    },
+    {
+      "date": "2012-02-20",
+      "total_lots_certified": 21049,
+      "by_port_lots": {
+        "AMS": 1156,
+        "ANT": 14434,
+        "BAR": 197,
+        "BRE": 46,
+        "GEN": 863,
+        "HAM": 38,
+        "LEH": 35,
+        "LON": 316,
+        "MAR": 7,
+        "ROT": 1545,
+        "TRI": 2412
+      }
+    },
+    {
+      "date": "2012-03-05",
+      "total_lots_certified": 20195,
+      "by_port_lots": {
+        "AMS": 1099,
+        "ANT": 14120,
+        "BAR": 148,
+        "BRE": 46,
+        "GEN": 585,
+        "HAM": 32,
+        "LEH": 35,
+        "LON": 316,
+        "MAR": 7,
+        "ROT": 1496,
+        "TRI": 2311
+      }
+    },
+    {
+      "date": "2012-03-19",
+      "total_lots_certified": 19232,
+      "by_port_lots": {
+        "AMS": 1077,
+        "ANT": 13467,
+        "BAR": 123,
+        "BRE": 46,
+        "GEN": 483,
+        "HAM": 32,
+        "LEH": 29,
+        "LON": 350,
+        "MAR": 7,
+        "ROT": 1448,
+        "TRI": 2170
+      }
+    },
+    {
+      "date": "2012-04-02",
+      "total_lots_certified": 18857,
+      "by_port_lots": {
+        "AMS": 1094,
+        "ANT": 13093,
+        "BAR": 109,
+        "BRE": 45,
+        "GEN": 466,
+        "HAM": 32,
+        "LEH": 23,
+        "LON": 350,
+        "MAR": 7,
+        "ROT": 1421,
+        "TRI": 2217
+      }
+    },
+    {
+      "date": "2012-04-16",
+      "total_lots_certified": 18173,
+      "by_port_lots": {
+        "AMS": 1016,
+        "ANT": 12682,
+        "BAR": 66,
+        "BRE": 40,
+        "GEN": 462,
+        "HAM": 31,
+        "LEH": 22,
+        "LON": 328,
+        "MAR": 2,
+        "ROT": 1406,
+        "TRI": 2118
+      }
+    },
+    {
+      "date": "2012-04-30",
+      "total_lots_certified": 17253,
+      "by_port_lots": {
+        "AMS": 1016,
+        "ANT": 11910,
+        "BAR": 59,
+        "BRE": 39,
+        "GEN": 456,
+        "HAM": 1,
+        "LEH": 13,
+        "LON": 334,
+        "MAR": 2,
+        "ROT": 1384,
+        "TRI": 2039
+      }
+    },
+    {
+      "date": "2012-05-14",
+      "total_lots_certified": 17138,
+      "by_port_lots": {
+        "AMS": 1016,
+        "ANT": 11892,
+        "BAR": 41,
+        "BRE": 39,
+        "GEN": 459,
+        "HAM": 1,
+        "LEH": 13,
+        "LON": 292,
+        "MAR": 2,
+        "ROT": 1367,
+        "TRI": 2016
+      }
+    },
+    {
+      "date": "2012-05-28",
+      "total_lots_certified": 17619,
+      "by_port_lots": {
+        "AMS": 1016,
+        "ANT": 12501,
+        "BAR": 33,
+        "BRE": 39,
+        "GEN": 458,
+        "HAM": 1,
+        "LEH": 13,
+        "LON": 266,
+        "MAR": 2,
+        "ROT": 1334,
+        "TRI": 1956
+      }
+    },
+    {
+      "date": "2012-06-11",
+      "total_lots_certified": 16884,
+      "by_port_lots": {
+        "AMS": 1013,
+        "ANT": 12000,
+        "BAR": 30,
+        "BRE": 39,
+        "GEN": 456,
+        "HAM": 1,
+        "LEH": 13,
+        "LON": 266,
+        "MAR": 2,
+        "ROT": 1219,
+        "TRI": 1845
+      }
+    },
+    {
+      "date": "2012-06-25",
+      "total_lots_certified": 16281,
+      "by_port_lots": {
+        "AMS": 985,
+        "ANT": 11780,
+        "BAR": 30,
+        "BRE": 33,
+        "GEN": 365,
+        "HAM": 1,
+        "LEH": 13,
+        "LON": 232,
+        "MAR": 1,
+        "ROT": 1007,
+        "TRI": 1834
+      }
+    },
+    {
+      "date": "2012-07-09",
+      "total_lots_certified": 15774,
+      "by_port_lots": {
+        "AMS": 985,
+        "ANT": 11471,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "HAM": 1,
+        "LEH": 4,
+        "LON": 232,
+        "MAR": 1,
+        "ROT": 861,
+        "TRI": 1805
+      }
+    },
+    {
+      "date": "2012-07-23",
+      "total_lots_certified": 14998,
+      "by_port_lots": {
+        "AMS": 931,
+        "ANT": 11047,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "HAM": 1,
+        "LEH": 4,
+        "LON": 209,
+        "MAR": 1,
+        "ROT": 648,
+        "TRI": 1743
+      }
+    },
+    {
+      "date": "2012-08-06",
+      "total_lots_certified": 14621,
+      "by_port_lots": {
+        "AMS": 931,
+        "ANT": 10744,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "HAM": 1,
+        "LEH": 4,
+        "LON": 209,
+        "MAR": 1,
+        "ROT": 593,
+        "TRI": 1724
+      }
+    },
+    {
+      "date": "2012-08-20",
+      "total_lots_certified": 14247,
+      "by_port_lots": {
+        "AMS": 931,
+        "ANT": 10462,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "HAM": 1,
+        "LEH": 4,
+        "LON": 195,
+        "MAR": 1,
+        "ROT": 589,
+        "TRI": 1650
+      }
+    },
+    {
+      "date": "2012-09-03",
+      "total_lots_certified": 13765,
+      "by_port_lots": {
+        "AMS": 925,
+        "ANT": 10257,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "LEH": 4,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 589,
+        "TRI": 1381
+      }
+    },
+    {
+      "date": "2012-09-17",
+      "total_lots_certified": 12949,
+      "by_port_lots": {
+        "AMS": 925,
+        "ANT": 9454,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 582,
+        "TRI": 1379
+      }
+    },
+    {
+      "date": "2012-10-01",
+      "total_lots_certified": 13028,
+      "by_port_lots": {
+        "AMS": 917,
+        "ANT": 9585,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 352,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 569,
+        "TRI": 1348
+      }
+    },
+    {
+      "date": "2012-10-15",
+      "total_lots_certified": 11945,
+      "by_port_lots": {
+        "AMS": 907,
+        "ANT": 8652,
+        "BAR": 29,
+        "BRE": 33,
+        "GEN": 349,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 557,
+        "TRI": 1223
+      }
+    },
+    {
+      "date": "2012-10-29",
+      "total_lots_certified": 11586,
+      "by_port_lots": {
+        "AMS": 907,
+        "ANT": 8709,
+        "BAR": 24,
+        "BRE": 32,
+        "GEN": 290,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 557,
+        "TRI": 872
+      }
+    },
+    {
+      "date": "2012-11-12",
+      "total_lots_certified": 10858,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 8138,
+        "BAR": 21,
+        "BRE": 32,
+        "GEN": 283,
+        "LON": 194,
+        "MAR": 1,
+        "ROT": 557,
+        "TRI": 743
+      }
+    },
+    {
+      "date": "2012-11-26",
+      "total_lots_certified": 10849,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 8187,
+        "BAR": 21,
+        "BRE": 32,
+        "GEN": 283,
+        "LON": 193,
+        "MAR": 1,
+        "ROT": 547,
+        "TRI": 696
+      }
+    },
+    {
+      "date": "2012-12-10",
+      "total_lots_certified": 10514,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 7899,
+        "BAR": 21,
+        "BRE": 32,
+        "GEN": 283,
+        "LON": 192,
+        "MAR": 1,
+        "ROT": 529,
+        "TRI": 668
+      }
+    },
+    {
+      "date": "2012-12-24",
+      "total_lots_certified": 10654,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 8147,
+        "BAR": 21,
+        "BRE": 32,
+        "GEN": 261,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 529,
+        "TRI": 583
+      }
+    },
+    {
+      "date": "2013-01-07",
+      "total_lots_certified": 10486,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 7995,
+        "BAR": 21,
+        "BRE": 32,
+        "GEN": 260,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 525,
+        "TRI": 572
+      }
+    },
+    {
+      "date": "2013-01-21",
+      "total_lots_certified": 10553,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 7885,
+        "BAR": 209,
+        "BRE": 32,
+        "GEN": 260,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 515,
+        "TRI": 571
+      }
+    },
+    {
+      "date": "2013-02-04",
+      "total_lots_certified": 10241,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 7708,
+        "BAR": 218,
+        "BRE": 32,
+        "GEN": 260,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 412,
+        "TRI": 530
+      }
+    },
+    {
+      "date": "2013-02-18",
+      "total_lots_certified": 11309,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 8856,
+        "BAR": 214,
+        "BRE": 32,
+        "GEN": 230,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 390,
+        "TRI": 506
+      }
+    },
+    {
+      "date": "2013-03-04",
+      "total_lots_certified": 12582,
+      "by_port_lots": {
+        "AMS": 889,
+        "ANT": 10257,
+        "BAR": 203,
+        "BRE": 32,
+        "GEN": 230,
+        "LON": 191,
+        "MAR": 1,
+        "ROT": 328,
+        "TRI": 451
+      }
+    },
+    {
+      "date": "2013-03-18",
+      "total_lots_certified": 12240,
+      "by_port_lots": {
+        "AMS": 803,
+        "ANT": 10113,
+        "BAR": 193,
+        "BRE": 32,
+        "GEN": 198,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 327,
+        "TRI": 390
+      }
+    },
+    {
+      "date": "2013-04-01",
+      "total_lots_certified": 12162,
+      "by_port_lots": {
+        "AMS": 760,
+        "ANT": 10082,
+        "BAR": 192,
+        "BRE": 32,
+        "GEN": 198,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 327,
+        "TRI": 387
+      }
+    },
+    {
+      "date": "2013-04-15",
+      "total_lots_certified": 12625,
+      "by_port_lots": {
+        "AMS": 751,
+        "ANT": 10626,
+        "BAR": 192,
+        "BRE": 32,
+        "GEN": 192,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 281,
+        "TRI": 367
+      }
+    },
+    {
+      "date": "2013-04-29",
+      "total_lots_certified": 12610,
+      "by_port_lots": {
+        "AMS": 751,
+        "ANT": 10629,
+        "BAR": 191,
+        "BRE": 32,
+        "GEN": 188,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 274,
+        "TRI": 361
+      }
+    },
+    {
+      "date": "2013-05-13",
+      "total_lots_certified": 12727,
+      "by_port_lots": {
+        "AMS": 751,
+        "ANT": 10775,
+        "BAR": 190,
+        "BRE": 32,
+        "GEN": 184,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 271,
+        "TRI": 340
+      }
+    },
+    {
+      "date": "2013-05-27",
+      "total_lots_certified": 12448,
+      "by_port_lots": {
+        "AMS": 751,
+        "ANT": 10583,
+        "BAR": 190,
+        "BRE": 32,
+        "GEN": 159,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 248,
+        "TRI": 301
+      }
+    },
+    {
+      "date": "2013-06-10",
+      "total_lots_certified": 12114,
+      "by_port_lots": {
+        "AMS": 751,
+        "ANT": 10334,
+        "BAR": 174,
+        "BRE": 32,
+        "GEN": 108,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 242,
+        "TRI": 289
+      }
+    },
+    {
+      "date": "2013-06-24",
+      "total_lots_certified": 11958,
+      "by_port_lots": {
+        "AMS": 729,
+        "ANT": 10242,
+        "BAR": 145,
+        "BRE": 32,
+        "GEN": 108,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 242,
+        "TRI": 276
+      }
+    },
+    {
+      "date": "2013-07-08",
+      "total_lots_certified": 11575,
+      "by_port_lots": {
+        "AMS": 715,
+        "ANT": 9955,
+        "BAR": 143,
+        "BRE": 21,
+        "GEN": 74,
+        "LON": 183,
+        "MAR": 1,
+        "ROT": 242,
+        "TRI": 241
+      }
+    },
+    {
+      "date": "2013-07-22",
+      "total_lots_certified": 9825,
+      "by_port_lots": {
+        "AMS": 604,
+        "ANT": 8465,
+        "BAR": 143,
+        "BRE": 21,
+        "GEN": 40,
+        "LON": 119,
+        "MAR": 1,
+        "ROT": 242,
+        "TRI": 190
+      }
+    },
+    {
+      "date": "2013-08-05",
+      "total_lots_certified": 8377,
+      "by_port_lots": {
+        "AMS": 526,
+        "ANT": 7131,
+        "BAR": 139,
+        "BRE": 21,
+        "GEN": 31,
+        "LON": 119,
+        "MAR": 1,
+        "ROT": 239,
+        "TRI": 170
+      }
+    },
+    {
+      "date": "2013-08-19",
+      "total_lots_certified": 7875,
+      "by_port_lots": {
+        "AMS": 491,
+        "ANT": 6699,
+        "BAR": 139,
+        "BRE": 9,
+        "GEN": 31,
+        "LON": 112,
+        "MAR": 1,
+        "ROT": 228,
+        "TRI": 165
+      }
+    },
+    {
+      "date": "2013-09-02",
+      "total_lots_certified": 7703,
+      "by_port_lots": {
+        "AMS": 475,
+        "ANT": 6577,
+        "BAR": 133,
+        "GEN": 31,
+        "LON": 95,
+        "MAR": 1,
+        "ROT": 226,
+        "TRI": 165
+      }
+    },
+    {
+      "date": "2013-09-16",
+      "total_lots_certified": 7489,
+      "by_port_lots": {
+        "AMS": 382,
+        "ANT": 6478,
+        "BAR": 133,
+        "GEN": 31,
+        "LON": 95,
+        "MAR": 1,
+        "ROT": 206,
+        "TRI": 163
+      }
+    },
+    {
+      "date": "2013-09-30",
+      "total_lots_certified": 6038,
+      "by_port_lots": {
+        "AMS": 254,
+        "ANT": 5184,
+        "BAR": 133,
+        "GEN": 31,
+        "LON": 67,
+        "MAR": 1,
+        "ROT": 205,
+        "TRI": 163
+      }
+    },
+    {
+      "date": "2013-10-14",
+      "total_lots_certified": 5615,
+      "by_port_lots": {
+        "AMS": 210,
+        "ANT": 4824,
+        "BAR": 133,
+        "GEN": 31,
+        "LON": 48,
+        "MAR": 1,
+        "ROT": 205,
+        "TRI": 163
+      }
+    },
+    {
+      "date": "2013-10-28",
+      "total_lots_certified": 5302,
+      "by_port_lots": {
+        "AMS": 198,
+        "ANT": 4600,
+        "BAR": 133,
+        "GEN": 30,
+        "LON": 48,
+        "MAR": 1,
+        "ROT": 205,
+        "TRI": 87
+      }
+    },
+    {
+      "date": "2013-11-11",
+      "total_lots_certified": 4877,
+      "by_port_lots": {
+        "AMS": 187,
+        "ANT": 4316,
+        "BAR": 109,
+        "GEN": 5,
+        "LON": 48,
+        "MAR": 1,
+        "ROT": 205,
+        "TRI": 6
+      }
+    },
+    {
+      "date": "2013-11-25",
+      "total_lots_certified": 4590,
+      "by_port_lots": {
+        "AMS": 179,
+        "ANT": 4038,
+        "BAR": 109,
+        "GEN": 5,
+        "LON": 48,
+        "MAR": 1,
+        "ROT": 205,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2013-12-09",
+      "total_lots_certified": 3142,
+      "by_port_lots": {
+        "AMS": 172,
+        "ANT": 2629,
+        "BAR": 101,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 182,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2013-12-23",
+      "total_lots_certified": 3002,
+      "by_port_lots": {
+        "AMS": 169,
+        "ANT": 2507,
+        "BAR": 101,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 167,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2014-01-06",
+      "total_lots_certified": 2820,
+      "by_port_lots": {
+        "AMS": 167,
+        "ANT": 2327,
+        "BAR": 101,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 167,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2014-01-20",
+      "total_lots_certified": 2777,
+      "by_port_lots": {
+        "AMS": 154,
+        "ANT": 2327,
+        "BAR": 79,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 159,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2014-02-03",
+      "total_lots_certified": 2496,
+      "by_port_lots": {
+        "AMS": 143,
+        "ANT": 2104,
+        "BAR": 69,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 122,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2014-02-17",
+      "total_lots_certified": 2418,
+      "by_port_lots": {
+        "AMS": 138,
+        "ANT": 2064,
+        "BAR": 69,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 89,
+        "TRI": 5
+      }
+    },
+    {
+      "date": "2014-03-03",
+      "total_lots_certified": 2396,
+      "by_port_lots": {
+        "AMS": 138,
+        "ANT": 2065,
+        "BAR": 61,
+        "GEN": 5,
+        "LON": 48,
+        "ROT": 69,
+        "TRI": 10
+      }
+    },
+    {
+      "date": "2014-03-17",
+      "total_lots_certified": 2384,
+      "by_port_lots": {
+        "AMS": 138,
+        "ANT": 2058,
+        "BAR": 44,
+        "GEN": 5,
+        "HAM": 23,
+        "LON": 48,
+        "ROT": 61,
+        "TRI": 7
+      }
+    },
+    {
+      "date": "2014-03-31",
+      "total_lots_certified": 1833,
+      "by_port_lots": {
+        "AMS": 136,
+        "ANT": 1477,
+        "BAR": 96,
+        "GEN": 5,
+        "HAM": 36,
+        "LON": 48,
+        "ROT": 28,
+        "TRI": 7
+      }
+    },
+    {
+      "date": "2014-04-14",
+      "total_lots_certified": 1386,
+      "by_port_lots": {
+        "AMS": 2,
+        "ANT": 1195,
+        "BAR": 91,
+        "GEN": 5,
+        "HAM": 61,
+        "LON": 8,
+        "ROT": 17,
+        "TRI": 7
+      }
+    },
+    {
+      "date": "2014-04-28",
+      "total_lots_certified": 1617,
+      "by_port_lots": {
+        "AMS": 2,
+        "ANT": 1513,
+        "BAR": 16,
+        "GEN": 5,
+        "HAM": 46,
+        "LON": 8,
+        "ROT": 17,
+        "TRI": 10
+      }
+    },
+    {
+      "date": "2014-05-12",
+      "total_lots_certified": 3354,
+      "by_port_lots": {
+        "AMS": 2,
+        "ANT": 3182,
+        "BAR": 12,
+        "GEN": 5,
+        "HAM": 70,
+        "LON": 8,
+        "ROT": 17,
+        "TRI": 58
+      }
+    },
+    {
+      "date": "2014-05-26",
+      "total_lots_certified": 5076,
+      "by_port_lots": {
+        "AMS": 2,
+        "ANT": 4857,
+        "BAR": 12,
+        "GEN": 15,
+        "HAM": 106,
+        "LON": 8,
+        "ROT": 17,
+        "TRI": 59
+      }
+    },
+    {
+      "date": "2014-06-09",
+      "total_lots_certified": 5973,
+      "by_port_lots": {
+        "AMS": 2,
+        "ANT": 5732,
+        "BAR": 12,
+        "GEN": 15,
+        "HAM": 127,
+        "LON": 8,
+        "ROT": 17,
+        "TRI": 60
+      }
+    },
+    {
+      "date": "2014-06-23",
+      "total_lots_certified": 6641,
+      "by_port_lots": {
+        "AMS": 1,
+        "ANT": 6383,
+        "BAR": 12,
+        "GEN": 15,
+        "HAM": 127,
+        "LON": 28,
+        "ROT": 15,
+        "TRI": 60
+      }
+    },
+    {
+      "date": "2014-07-07",
+      "total_lots_certified": 6884,
+      "by_port_lots": {
+        "AMS": 1,
+        "ANT": 6612,
+        "BAR": 12,
+        "GEN": 15,
+        "HAM": 123,
+        "LON": 46,
+        "ROT": 15,
+        "TRI": 60
+      }
+    },
+    {
+      "date": "2014-07-21",
+      "total_lots_certified": 7590,
+      "by_port_lots": {
+        "AMS": 1,
+        "ANT": 7223,
+        "BAR": 26,
+        "GEN": 24,
+        "HAM": 123,
+        "LON": 88,
+        "ROT": 15,
+        "TRI": 90
+      }
+    },
+    {
+      "date": "2014-08-04",
+      "total_lots_certified": 8210,
+      "by_port_lots": {
+        "AMS": 61,
+        "ANT": 7699,
+        "BAR": 40,
+        "GEN": 24,
+        "HAM": 123,
+        "LON": 144,
+        "ROT": 10,
+        "TRI": 109
+      }
+    },
+    {
+      "date": "2014-08-18",
+      "total_lots_certified": 8410,
+      "by_port_lots": {
+        "AMS": 105,
+        "ANT": 7832,
+        "BAR": 40,
+        "GEN": 18,
+        "HAM": 122,
+        "LON": 171,
+        "ROT": 10,
+        "TRI": 112
+      }
+    },
+    {
+      "date": "2014-09-01",
+      "total_lots_certified": 8710,
+      "by_port_lots": {
+        "AMS": 124,
+        "ANT": 8090,
+        "BAR": 40,
+        "GEN": 18,
+        "HAM": 122,
+        "LON": 198,
+        "ROT": 10,
+        "TRI": 108
+      }
+    },
+    {
+      "date": "2014-09-15",
+      "total_lots_certified": 9693,
+      "by_port_lots": {
+        "AMS": 204,
+        "ANT": 8935,
+        "BAR": 40,
+        "GEN": 18,
+        "HAM": 122,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 108
+      }
+    },
+    {
+      "date": "2014-09-29",
+      "total_lots_certified": 11167,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 10322,
+        "BAR": 40,
+        "GEN": 18,
+        "HAM": 122,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 105
+      }
+    },
+    {
+      "date": "2014-10-13",
+      "total_lots_certified": 11995,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11182,
+        "BAR": 40,
+        "GEN": 38,
+        "HAM": 71,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 104
+      }
+    },
+    {
+      "date": "2014-10-27",
+      "total_lots_certified": 12042,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11229,
+        "BAR": 40,
+        "GEN": 38,
+        "HAM": 71,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 104
+      }
+    },
+    {
+      "date": "2014-11-10",
+      "total_lots_certified": 12291,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11478,
+        "BAR": 40,
+        "GEN": 38,
+        "HAM": 71,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 104
+      }
+    },
+    {
+      "date": "2014-11-24",
+      "total_lots_certified": 12396,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11565,
+        "BAR": 40,
+        "GEN": 38,
+        "HAM": 89,
+        "LON": 256,
+        "ROT": 10,
+        "TRI": 104
+      }
+    },
+    {
+      "date": "2014-12-08",
+      "total_lots_certified": 12464,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11619,
+        "BAR": 40,
+        "GEN": 58,
+        "HAM": 89,
+        "LON": 251,
+        "ROT": 9,
+        "TRI": 104
+      }
+    },
+    {
+      "date": "2014-12-22",
+      "total_lots_certified": 12658,
+      "by_port_lots": {
+        "AMS": 294,
+        "ANT": 11832,
+        "BAR": 30,
+        "GEN": 50,
+        "HAM": 89,
+        "LON": 251,
+        "ROT": 9,
+        "TRI": 103
+      }
+    }
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "generated_at": "2026-05-28T11:26:47+00:00",
+  "market": "robusta",
+  "bucket_years": [
+    1995,
+    1999
+  ],
+  "shape": "light (date + total + by_port_totals; no by_origin/by_group)",
+  "snapshots": [
+    {
+      "date": "1995-01-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-02-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-03-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-04-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-05-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-06-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-07-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-08-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-09-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-10-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-11-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1995-12-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-01-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-02-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-03-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-04-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-05-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-06-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-07-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-08-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-09-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-10-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-11-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1996-12-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-01-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-02-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-03-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-04-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-05-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-06-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-07-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-08-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-09-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-10-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-11-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1997-12-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-01-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-02-28",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-03-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-04-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-05-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-06-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-07-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-08-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-09-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-10-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-11-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1998-12-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-01-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-02-26",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-03-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-04-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-05-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-06-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-07-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-08-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-09-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-10-29",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-11-30",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    },
+    {
+      "date": "1999-12-31",
+      "total_lots_certified": 0,
+      "by_port_lots": {}
+    }
+  ]
+}
