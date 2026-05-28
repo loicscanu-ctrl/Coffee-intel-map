@@ -289,6 +289,45 @@ def parse_sheet_2_gradings(sheet, since: date):
     return per_date
 
 
+def parse_sheet_2_port_origin_history(sheet) -> dict:
+    """Walk the FULL robusta gradings history (ignoring `since`) and roll up
+    per-port × per-origin × {tenderable, all_classes} tenderable lots.
+
+    Used by the panel to infer the origin mix of CURRENT standing stock when
+    the recent_activity.gradings window doesn't reach back far enough (e.g.
+    Felixstowe holds 34 lots graded ~2 years ago — outside the daily window
+    but visible here because we have workbook gradings to Nov 2023).
+
+    Output shape:
+        {
+          "FEL": {"Brazilian Conillon": {"tenderable": 736, "class34": 0},
+                  "Vietnam":             {"tenderable": 250, "class34": 0}},
+          ...
+        }
+    Only tenderable lots are counted (Non-tender stock isn't certifiable).
+    """
+    out: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: {"tenderable": 0, "class34": 0})
+    )
+    n = 0
+    for d, r in _bucket_by_date(sheet):
+        port = _str(r[1])
+        if not port or _is_aggregate_port(port): continue
+        origin = _str(r[4]).strip()
+        if not origin: continue
+        cls = _int(r[5]) or None
+        tenderable = _str(r[6]).upper() == "Y"
+        lots = _int(r[7])
+        if lots <= 0 or not tenderable: continue
+        out[port][origin]["tenderable"] += lots
+        if cls in (3, 4): out[port][origin]["class34"] += lots
+        n += 1
+    plain = {p: {o: dict(d) for o, d in by_o.items()} for p, by_o in out.items()}
+    print(f"    sheet 2_ld_gradings (full history): {n} tenderable rows → "
+          f"{len(plain)} ports × {sum(len(v) for v in plain.values())} origin pairs.")
+    return plain
+
+
 def parse_sheet_3_age(sheet, since_month_end: date):
     """Robusta age allowance — flat: date_actual | port_code | port_name | months_since_graded | value_mt | month_actual.
     Skips 0-MT cells so buckets[].by_port dicts stay sparse."""
@@ -655,6 +694,10 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
     r_tenders    = parse_sheet_1_tenders(wb["1_ld_tender"], since_daily)
     r_overview   = parse_sheet_13_overview(wb["13_ld_gradings_queue"], since_daily)
     r_age_allow  = parse_sheet_3_age(wb["3_age_allowance"], since_month_end)
+    # Full-history origin × class lookup per port — backs the panel's
+    # standing-stock inference for ports with old stock outside the daily
+    # gradings window (e.g. Felixstowe).
+    r_port_origin_history = parse_sheet_2_port_origin_history(wb["2_ld_gradings"])
 
     print("\n=== composing arabica JSON ===")
     a_snaps, a_latest_detail, a_latest_date = build_arabica_snapshots(
@@ -700,6 +743,10 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
             "iss_recv_monthly": [],            # not split in this workbook (daily has it)
             "age_allowance":    r_age_allow_list,
         },
+        # Full-history (workbook back to ~Nov 2023) port × origin × class
+        # rollup — lets the panel attribute origins for old standing stock
+        # whose grading event is outside the rolling daily window.
+        "port_origin_history": r_port_origin_history,
     }
 
     a_path = OUT_DIR / "certified_stocks_arabica.json"

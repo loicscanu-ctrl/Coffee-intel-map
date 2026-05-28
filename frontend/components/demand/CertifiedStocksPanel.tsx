@@ -3,6 +3,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
+import CertifiedStocksSystemFlow from "./CertifiedStocksSystemFlow";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
 
@@ -2225,6 +2226,20 @@ export default function CertifiedStocksPanel() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ArabicaColumn d={arabica} unit={unit} />
         <RobustaColumn d={robusta} unit={unit} />
+      </div>
+
+      {/* End-to-end visual flow per market — promoted from the Test sandbox
+          once layout + poison rules + origin-history inference were verified.
+          The cast is necessary because the panel's ArabicaJson.latest_detail
+          carries the matrix-section shape (report_date, total_certified, …)
+          while the system flow only needs latest_detail.age_detail (which
+          the workbook importer attaches but the live scraper doesn't). The
+          component handles a missing latest_detail gracefully. */}
+      <div className="mt-6">
+        <CertifiedStocksSystemFlow
+          arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
+          robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
+        />
       </div>
     </div>
   );
