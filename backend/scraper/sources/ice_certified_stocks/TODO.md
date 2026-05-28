@@ -21,11 +21,15 @@ Build a display-only friendly name lookup per market (don't merge across
 markets — different ICE warehouse designations).
 
 ### 3. Arabica Poison criteria
-Currently flat (no breakdown, no drill) because the criteria are TBD. Once
-defined, mirror the Robusta logic:
-- Edit `_isArabicaPoison(e)` in `CertifiedStocksPanel.tsx`.
-- Flip `ARABICA_DRILL["Poison"]` to `"port_origin"` (or whichever).
-- Flip `ARABICA_DRILL["Passing rate"]` to `"passing_breakdown"`.
+**Pending user decision.** The Arabica column no longer renders a standalone
+"Poison" row — once criteria are defined, mirror the Robusta logic:
+- Add `_isArabicaPoison(e)` analogous to `_isRobustaPoison()` in
+  `CertifiedStocksPanel.tsx`.
+- Flip `ARABICA_DRILL["Graded"]` from `"port_origin_inferred"` to
+  `"graded_with_poison"` so Graded gets the Coffee/Poison sub-row split.
+- Flip `ARABICA_DRILL["Passing rate"]` from `"none"` to `"passing_breakdown"`.
+- Re-add "Poison" to `ARABICA_METRICS` only if you want it as a standalone
+  row (not strictly needed once Graded carries the breakdown).
 
 ### 4. Robusta origin under (port, age)
 Today renders `"origin attribution — inferred next iteration*"` placeholder.
@@ -71,18 +75,17 @@ Nice-to-have: persist `expanded` Set to localStorage so the user's last
 drill state survives page reloads.
 
 ### 11. Wire the workbook's new fields into the panel
-The synthesis import surfaces fields not yet rendered by the panel:
-- `arabica.latest_detail.issuers` — port × member × value (MONTH/TODAY). Plug
-  into the Arabica Issued row as `member_origin`-style drill (label as
-  member name like "Marex Capital", "ABN Amro Clearing USA"…) and flip
-  `ARABICA_DRILL["Issued"]` from `"none"` to `"member_origin"`.
-- `arabica.latest_detail.stoppers` — same, for receivers / buyers side.
-- `arabica.latest_detail.age_detail` — per port × age-bucket-in-days (e.g.
-  "0721 to 0750"). Drop the Regular/Transition split for arabica Stocks and
-  replace `ARABICA_AGE_BUCKETS` with the real ICE day buckets from this field.
-- `arabica.snapshots[].passed_today_bags / failed_today_bags` — now actually
-  populated daily by source (was idle-day text only). The panel already reads
-  these; just verify rendering.
+- ✅ `arabica.snapshots[].issuers_today` — wired as `port_issuer` drill on
+  Arabica Issued (clearing-member firm names appear under each port).
+- 🟡 `arabica.snapshots[].stoppers_today` — populated and exported, but
+  panel does not yet have a "Received" row to render it. Consider adding
+  if buy-side flow ever matters.
+- 🟡 `arabica.latest_detail.age_detail` — per port × age-bucket-in-days
+  (e.g. "0721 to 0750"). Current Arabica Stocks drill is
+  `port_group_origin`; if we want age slicing, add a new drill
+  `port_age_group_origin` rather than replacing the group view.
+- ✅ `arabica.snapshots[].passed_today_bags / failed_today_bags` rendered
+  in Graded + Passing rate.
 
 ### 12. Deep-history chart background
 12 deep-chunk JSONs are on disk (`certified_stocks_<market>_deep_<years>.json`,
@@ -121,3 +124,22 @@ loading all 12 is < 2 MB total.
 - ✅ Synthesis-workbook importer with zero-skip + 5-year deep history chunks
   (`backend/scripts/import_synthesis_xlsx.py`).
 - ✅ 12 deep-history JSONs on disk: Arabica 2010–2029, Robusta 1990–2029.
+- ✅ Robusta 0-stock dates dropped from snapshots (importer-side filter +
+  post-merge cleanup of legacy entries).
+- ✅ Panel v4 — 11-point feedback addressed:
+  - Master ports/groups/origins/members/issuers/age-buckets now derived from
+    the UNION of every column window, not just "Current" (fixes Arabica
+    Group 2/4 being hidden when the latest week is Group-0-only).
+  - Arabica `port_issuer` drill on Issued (clearing-member breakdown).
+  - Arabica `port_group_origin` drill on Stocks + Decertified (replaces
+    the obscure "Regular / Transition" age split).
+  - Removed standalone Arabica "Poison" row (criteria TBD — see #3).
+  - Robusta Graded gets `graded_with_poison` drill: 2 sub-rows
+    (Coffee / Poison), each opens port → origin.
+  - Robusta Pending grading gets `queue_forecast` drill (queue + forecast
+    sub-rows from grading_overview).
+  - Robusta Decertified gets same drill shape as Stocks (port → age → origin),
+    with per (port, age) values inferred from month-over-month bucket change.
+  - Stocks/Decertified age buckets now labelled by graded month
+    ("Mar-26") instead of "1 mo since graded" (raw bucket shown as a
+    smaller suffix).

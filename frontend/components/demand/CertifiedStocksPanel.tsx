@@ -32,6 +32,11 @@ interface ArabicaSnap {
     pending_grading?: SectionHierarchy;
     rebagging?:       SectionHierarchy;
   };
+  // Issuance / receipt — populated by the workbook importer (sheet 8a).
+  issuers_today?:        Array<{ port: string; issuer: string;  value: number }>;
+  stoppers_today?:       Array<{ port: string; stopper: string; value: number }>;
+  issued_total_today?:   number;
+  received_total_today?: number;
 }
 interface MatrixSection {
   ports: string[];
@@ -258,32 +263,27 @@ function _startOfWindowPrevSnap<T extends { date: string }>(snaps: T[], w: Perio
 // ── Arabica period table — rewritten with window semantics + flow/inv split ──
 
 type ArabicaMetric =
-  | "Pending grading" | "Graded" | "Poison" | "Passing rate"
+  | "Pending grading" | "Graded" | "Passing rate"
   | "Stocks" | "Decertified" | "Issued";
 
 const ARABICA_METRICS: ArabicaMetric[] = [
-  "Pending grading", "Graded", "Poison", "Passing rate",
+  "Pending grading", "Graded", "Passing rate",
   "Stocks", "Decertified", "Issued",
 ];
 
 // Per-row drill-down support. Only rows where the source data carries the
 // breakdown (or can be defensibly inferred) get a ▸. Others render flat.
 type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
-           | "port_origin_inferred" | "port" | "member_origin" | "passing_breakdown";
+           | "port_origin_inferred" | "port" | "port_issuer" | "member_origin"
+           | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
-  "Pending grading": "port_group_origin",   // restored: port → ICE group → origin
+  "Pending grading": "port_group_origin",   // port → ICE group → origin
   "Graded":          "port_origin_inferred", // delta of certified by_port × by_origin
-  "Poison":          "none",                 // arabica poison criteria TBD
   "Passing rate":    "none",                 // arabica poison TBD → no breakdown yet
-  "Stocks":          "port_age_origin",      // age = Regular / Transition for arabica
-  "Decertified":     "port",                 // per-port outflow = prev + Σpassed − cur
-  "Issued":          "none",                 // arabica has no published issuance source
+  "Stocks":          "port_group_origin",   // port → ICE group → origin (same shape as Pending)
+  "Decertified":     "port_group_origin",   // per-port outflow split by group → origin
+  "Issued":          "port_issuer",         // workbook sheet 8a populates issuers_today
 };
-
-const ARABICA_AGE_BUCKETS: { label: string; sectKey: keyof NonNullable<ArabicaSnap["sections"]> }[] = [
-  { label: "Regular",    sectKey: "total_certified" },
-  { label: "Transition", sectKey: "transition" },
-];
 
 // ICE C-contract group ordering. Drives the Pending grading drill display.
 const ARABICA_GROUP_ORDER = ["Group 0", "Group 1", "Group 2", "Group 3", "Group 4", "Unknown"];
@@ -361,7 +361,7 @@ interface RowVal { value: number | null; isInferred?: boolean }
 
 function _arabicaRowValue(
   metric: ArabicaMetric, snaps: ArabicaSnap[], w: PeriodCol,
-  port?: string, group?: string, age?: string, origin?: string,
+  port?: string, group?: string, origin?: string, issuer?: string,
 ): RowVal {
   const endSnap = _endOfWindowSnap(snaps, w);
   const startBase = _startOfWindowPrevSnap(snaps, w);
@@ -370,17 +370,10 @@ function _arabicaRowValue(
     return { value: _sectValue(endSnap, "pending_grading", port, group, origin) };
   }
   if (metric === "Stocks") {
-    if (age) {
-      const bucket = ARABICA_AGE_BUCKETS.find((b) => b.label === age);
-      return { value: bucket ? _sectValue(endSnap, bucket.sectKey, port, group, origin) : null };
-    }
     return { value: _sectValue(endSnap, "total_certified", port, group, origin) };
   }
   if (metric === "Graded") {
     return { value: _gradedByDelta(snaps, w, port, origin), isInferred: !!(port || origin) };
-  }
-  if (metric === "Poison") {
-    return { value: _sumWindow(snaps, w, "failed_today_bags") };   // top-level only
   }
   if (metric === "Passing rate") {
     const g = _sumWindow(snaps, w, "passed_today_bags");
@@ -390,8 +383,18 @@ function _arabicaRowValue(
   }
   if (metric === "Decertified") {
     if (!endSnap || !startBase) return { value: null };
+    if (port && group && origin) {
+      // Per-origin: outflow = prev − current (no per-origin passed in source).
+      const prev = _sectValue(startBase, "total_certified", port, group, origin) ?? 0;
+      const cur  = _sectValue(endSnap,   "total_certified", port, group, origin) ?? 0;
+      return { value: prev - cur, isInferred: true };
+    }
+    if (port && group) {
+      const prev = _sectValue(startBase, "total_certified", port, group) ?? 0;
+      const cur  = _sectValue(endSnap,   "total_certified", port, group) ?? 0;
+      return { value: prev - cur, isInferred: true };
+    }
     if (port) {
-      // Per-port: outflow = prev_stock_port + Σpassed_port (inferred) − stock_port
       const prevP = _sectValue(startBase, "total_certified", port) ?? 0;
       const curP  = _sectValue(endSnap,   "total_certified", port) ?? 0;
       const passedP = _gradedByDelta(snaps, w, port) ?? 0;
@@ -400,47 +403,109 @@ function _arabicaRowValue(
     const passedSum = _sumWindow(snaps, w, "passed_today_bags");
     return { value: startBase.total_bags + passedSum - endSnap.total_bags };
   }
-  // Issued — no source for arabica.
+  if (metric === "Issued") {
+    // Sourced from per-snapshot issuers_today (TODAY values from sheet 8a).
+    const inWin = _snapshotsInWindow(snaps, w);
+    if (port && issuer) {
+      let total = 0;
+      for (const s of inWin) {
+        for (const e of (s.issuers_today || [])) {
+          if (e.port === port && e.issuer === issuer) total += e.value || 0;
+        }
+      }
+      return { value: total };
+    }
+    if (port) {
+      let total = 0;
+      for (const s of inWin) {
+        for (const e of (s.issuers_today || [])) {
+          if (e.port === port) total += e.value || 0;
+        }
+      }
+      return { value: total };
+    }
+    let total = 0;
+    for (const s of inWin) total += (s.issued_total_today || 0);
+    return { value: total };
+  }
   return { value: null };
 }
 
-function _portsForMetric(snaps: ArabicaSnap[], w: PeriodCol, metric: ArabicaMetric): string[] {
+// Master entity lists for drill rendering. We UNION across every column
+// window (Current + 1w ago + last 6 month-ends), not just Current, because
+// e.g. Group 4 may be absent from this week but present in last month — the
+// user still needs the drill to surface it so the historical columns show.
+function _portsForMetric(snaps: ArabicaSnap[], cols: PeriodCol[], metric: ArabicaMetric): string[] {
   const set = new Set<string>();
-  const endSnap = _endOfWindowSnap(snaps, w);
-  if (metric === "Pending grading") {
-    Object.entries(endSnap?.sections?.pending_grading?.by_port || {}).forEach(([p, v]) => v > 0 && set.add(p));
-  } else if (metric === "Stocks") {
-    Object.entries(endSnap?.sections?.total_certified?.by_port || {}).forEach(([p, v]) => v > 0 && set.add(p));
-    Object.entries(endSnap?.sections?.transition?.by_port      || {}).forEach(([p, v]) => v > 0 && set.add(p));
-  } else if (metric === "Graded" || metric === "Decertified") {
-    // Union of ports that show ANY activity in window (positive or negative
-    // delta of certified_by_port). For Decertified the per-port outflow uses
-    // this same set.
-    for (const s of _snapshotsInWindow(snaps, w)) {
-      Object.keys(s.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
+  for (const w of cols) {
+    const endSnap = _endOfWindowSnap(snaps, w);
+    if (metric === "Pending grading") {
+      Object.entries(endSnap?.sections?.pending_grading?.by_port || {}).forEach(([p, v]) => v > 0 && set.add(p));
+    } else if (metric === "Stocks") {
+      Object.entries(endSnap?.sections?.total_certified?.by_port || {}).forEach(([p, v]) => v > 0 && set.add(p));
+    } else if (metric === "Graded" || metric === "Decertified") {
+      for (const s of _snapshotsInWindow(snaps, w)) {
+        Object.keys(s.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
+      }
+      const startBase = _startOfWindowPrevSnap(snaps, w);
+      Object.keys(startBase?.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
+    } else if (metric === "Issued") {
+      for (const s of _snapshotsInWindow(snaps, w)) {
+        for (const e of (s.issuers_today || [])) set.add(e.port);
+      }
     }
-    const startBase = _startOfWindowPrevSnap(snaps, w);
-    Object.keys(startBase?.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
   }
   return Array.from(set).sort();
 }
 
-function _originsForCell(snaps: ArabicaSnap[], w: PeriodCol, metric: ArabicaMetric, port: string, age?: string): string[] {
-  const set = new Set<string>();
-  const endSnap = _endOfWindowSnap(snaps, w);
+// Groups (Pending grading · Stocks · Decertified) that ever appear for this
+// (port) across the column set. Avoids hiding Group 2/4 when Current happens
+// to be Group-0-only.
+function _groupsForCell(snaps: ArabicaSnap[], cols: PeriodCol[], metric: ArabicaMetric, port: string): string[] {
   const sectKey: keyof NonNullable<ArabicaSnap["sections"]> | null =
     metric === "Pending grading" ? "pending_grading"
-    : metric === "Stocks" && age
-        ? (ARABICA_AGE_BUCKETS.find((b) => b.label === age)?.sectKey ?? null)
-    : metric === "Stocks"
-        ? "total_certified"
-    : metric === "Graded"
-        ? "total_certified"
+    : metric === "Stocks" || metric === "Decertified" ? "total_certified"
     : null;
   if (!sectKey) return [];
-  Object.entries(endSnap?.sections?.[sectKey]?.by_origin || {}).forEach(([o, d]) => {
-    if ((d.by_port?.[port] ?? 0) > 0) set.add(o);
-  });
+  const set = new Set<string>();
+  for (const w of cols) {
+    const endSnap = _endOfWindowSnap(snaps, w);
+    for (const d of Object.values(endSnap?.sections?.[sectKey]?.by_origin || {})) {
+      if ((d.by_port?.[port] ?? 0) > 0) set.add(d.group);
+    }
+  }
+  return ARABICA_GROUP_ORDER.filter((g) => set.has(g));
+}
+
+// Origins under (port [, group]) across the column set.
+function _originsForCell(
+  snaps: ArabicaSnap[], cols: PeriodCol[], metric: ArabicaMetric, port: string, group?: string,
+): string[] {
+  const sectKey: keyof NonNullable<ArabicaSnap["sections"]> | null =
+    metric === "Pending grading" ? "pending_grading"
+    : metric === "Stocks" || metric === "Decertified" || metric === "Graded" ? "total_certified"
+    : null;
+  if (!sectKey) return [];
+  const set = new Set<string>();
+  for (const w of cols) {
+    const endSnap = _endOfWindowSnap(snaps, w);
+    for (const [o, d] of Object.entries(endSnap?.sections?.[sectKey]?.by_origin || {})) {
+      if ((d.by_port?.[port] ?? 0) > 0 && (!group || d.group === group)) set.add(o);
+    }
+  }
+  return Array.from(set).sort();
+}
+
+// Issuers ever seen at this port across the column set.
+function _issuersForPort(snaps: ArabicaSnap[], cols: PeriodCol[], port: string): string[] {
+  const set = new Set<string>();
+  for (const w of cols) {
+    for (const s of _snapshotsInWindow(snaps, w)) {
+      for (const e of (s.issuers_today || [])) {
+        if (e.port === port) set.add(e.issuer);
+      }
+    }
+  }
   return Array.from(set).sort();
 }
 
@@ -507,24 +572,20 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
 
                   {/* Port sub-rows */}
                   {isOpen && cols.length > 0 && (() => {
-                    // Use Current-window's ports as the master list (drill follows
-                    // the latest week's composition; cells still use each column's window).
-                    const ports = _portsForMetric(snapshots, cols[0], metric);
+                    const ports = _portsForMetric(snapshots, cols, metric);
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
                       const portOpen = expanded.has(portKey);
-                      // "port" drill has no nested level → leaf row, no chevron.
-                      const portIsLeaf = drill === "port";
                       return (
                         <Fragment key={portKey}>
                           <tr className="border-b border-slate-900 bg-slate-900/40">
                             <td
-                              className={`text-slate-400 text-left py-0.5 ${portIsLeaf ? "" : "cursor-pointer hover:text-amber-300"}`}
+                              className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-amber-300"
                               style={indent(1)}
-                              onClick={portIsLeaf ? undefined : () => toggle(portKey)}
+                              onClick={() => toggle(portKey)}
                             >
                               <span className="text-amber-500/60 inline-block w-3">
-                                {portIsLeaf ? " " : (portOpen ? "▾" : "▸")}
+                                {portOpen ? "▾" : "▸"}
                               </span>{" "}{port}
                             </td>
                             {cols.map((c, i) => (
@@ -534,57 +595,11 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                             ))}
                           </tr>
 
-                          {/* Age level (Stocks only) */}
-                          {portOpen && drill === "port_age_origin" && ARABICA_AGE_BUCKETS.map((bucket) => {
-                            const ageKey = `${portKey}/${bucket.label}`;
-                            const ageOpen = expanded.has(ageKey);
-                            const anyVal = cols.some((c) => (_arabicaRowValue(metric, snapshots, c, port, undefined, bucket.label).value ?? 0) > 0);
-                            if (!anyVal) return null;
-                            const origins = ageOpen ? _originsForCell(snapshots, cols[0], metric, port, bucket.label) : [];
-                            return (
-                              <Fragment key={ageKey}>
-                                <tr className="border-b border-slate-900 bg-slate-900/20">
-                                  <td
-                                    className="text-slate-500 text-left py-0.5 cursor-pointer hover:text-amber-300"
-                                    style={indent(2)}
-                                    onClick={() => toggle(ageKey)}
-                                  >
-                                    <span className="text-amber-500/40 inline-block w-3">{ageOpen ? "▾" : "▸"}</span>{" "}{bucket.label}
-                                  </td>
-                                  {cols.map((c, i) => (
-                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
-                                      {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, bucket.label))}
-                                    </td>
-                                  ))}
-                                </tr>
-                                {ageOpen && origins.map((origin) => (
-                                  <tr key={`${ageKey}/${origin}`} className="border-b border-slate-900">
-                                    <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
-                                    {cols.map((c, i) => (
-                                      <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                        {fmtCell(_arabicaRowValue(metric, snapshots, c, port, bucket.label, origin))}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </Fragment>
-                            );
-                          })}
-
-                          {/* Group level → origins (Pending grading: port → group → origin) */}
-                          {portOpen && drill === "port_group_origin" && ARABICA_GROUP_ORDER.map((group) => {
+                          {/* Group level → origins (port → group → origin) */}
+                          {portOpen && drill === "port_group_origin" && _groupsForCell(snapshots, cols, metric, port).map((group) => {
                             const grpKey = `${portKey}/${group}`;
                             const grpOpen = expanded.has(grpKey);
-                            const anyVal = cols.some((c) => (_arabicaRowValue(metric, snapshots, c, port, group).value ?? 0) > 0);
-                            if (!anyVal) return null;
-                            // Origins assigned to this group with bags at this port (from latest snapshot).
-                            const endSnap = _endOfWindowSnap(snapshots, cols[0]);
-                            const sectKey = metric === "Pending grading" ? "pending_grading" : "total_certified";
-                            const origins = grpOpen
-                              ? Object.entries(endSnap?.sections?.[sectKey]?.by_origin || {})
-                                  .filter(([, d]) => d.group === group && (d.by_port?.[port] ?? 0) > 0)
-                                  .map(([o]) => o).sort()
-                              : [];
+                            const origins = grpOpen ? _originsForCell(snapshots, cols, metric, port, group) : [];
                             return (
                               <Fragment key={grpKey}>
                                 <tr className="border-b border-slate-900 bg-slate-900/20">
@@ -606,7 +621,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                                     <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
                                     {cols.map((c, i) => (
                                       <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                        {fmtCell(_arabicaRowValue(metric, snapshots, c, port, group, undefined, origin))}
+                                        {fmtCell(_arabicaRowValue(metric, snapshots, c, port, group, origin))}
                                       </td>
                                     ))}
                                   </tr>
@@ -615,19 +630,31 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                             );
                           })}
 
-                          {/* Origin level for non-age non-group drills (Graded) */}
+                          {/* Origin level for Graded (port → origin inferred from delta) */}
                           {portOpen && (drill === "port_origin" || drill === "port_origin_inferred") &&
-                            _originsForCell(snapshots, cols[0], metric, port).map((origin) => (
+                            _originsForCell(snapshots, cols, metric, port).map((origin) => (
                               <tr key={`${portKey}/${origin}`} className="border-b border-slate-900">
                                 <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{origin}</td>
                                 {cols.map((c, i) => (
                                   <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                    {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, undefined, origin))}
+                                    {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, origin))}
                                   </td>
                                 ))}
                               </tr>
                             ))
                           }
+
+                          {/* Issuer level (Issued: port → issuer) */}
+                          {portOpen && drill === "port_issuer" && _issuersForPort(snapshots, cols, port).map((issuer) => (
+                            <tr key={`${portKey}/${issuer}`} className="border-b border-slate-900">
+                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{issuer}</td>
+                              {cols.map((c, i) => (
+                                <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                  {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, undefined, issuer))}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
                         </Fragment>
                       );
                     });
@@ -640,11 +667,11 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
       </div>
       <div className="text-[9px] text-slate-600 italic mt-1 space-y-0.5">
         <div>
-          Flow metrics (Graded · Poison · Decertified) sum across each window. Inventory metrics
+          Flow metrics (Graded · Decertified · Issued) sum across each window. Inventory metrics
           (Stocks · Pending) show the end-of-window snapshot. <strong>* = inferred</strong> from
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Decertified = prev_stock + Σpassed − stock.
-          Issued — no source published by ICE for arabica.
+          Issued · per-issuer breakdown from ICE iss/recv sheet (clearing-member firms).
         </div>
       </div>
     </div>
@@ -777,20 +804,19 @@ interface AgeAllowanceMonth {
 }
 
 type RobustaMetric =
-  | "Pending grading" | "Graded" | "Poison" | "Passing rate"
+  | "Pending grading" | "Graded" | "Passing rate"
   | "Stocks" | "Decertified" | "Issued";
 
 const ROBUSTA_METRICS: RobustaMetric[] = [
-  "Pending grading", "Graded", "Poison", "Passing rate",
+  "Pending grading", "Graded", "Passing rate",
   "Stocks", "Decertified", "Issued",
 ];
 const ROBUSTA_DRILL: Record<RobustaMetric, Drill> = {
-  "Pending grading": "none",                 // grading_overview is queue+forecast total only
-  "Graded":          "port_origin",          // gradings.entries have port + origin per lot
-  "Poison":          "port_origin",          // poison subset of tenderable, same source
-  "Passing rate":    "passing_breakdown",    // 2 sub-rows: of which Poison / Coffee
-  "Stocks":          "port_age_origin",      // by_port_lots × age_allowance buckets; origin inferred
-  "Decertified":     "port",                 // per-port outflow = prev + Σpassed − cur
+  "Pending grading": "queue_forecast",       // 2 sub-rows: queue + forecast (source has no port)
+  "Graded":          "graded_with_poison",   // sub-rows: of which Coffee / Poison, each drillable by port → origin
+  "Passing rate":    "passing_breakdown",    // 2 sub-rows: of which Poison / Coffee (% terminal)
+  "Stocks":          "port_age_origin",      // by_port_lots × age_allowance buckets (labels as graded month)
+  "Decertified":     "port_age_origin",      // same drill shape as Stocks
   "Issued":          "member_origin",        // iss_recv_daily.members → rows[].origin
 };
 
@@ -884,17 +910,11 @@ function _robustaRowValue(
     return { value: ov?.total_pending_lots ?? null };
   }
   if (metric === "Graded") {
+    // Top-level total (= passed grading, tenderable). Drill-down is rendered
+    // as Coffee / Poison sub-rows in the table; the per-(port[, origin])
+    // values for those sub-rows are computed there via _aggregateGradings,
+    // not through this row-value function.
     const agg = _aggregateGradings(gradings, w, _GRAD_TENDERABLE);
-    if (!port && !origin) return { value: agg.total };
-    if (port && !origin)  return { value: agg.byPort[port] ?? 0 };
-    if (port && origin)   return { value: agg.byPortOrigin[port]?.[origin] ?? 0 };
-    return { value: null };
-  }
-  if (metric === "Poison") {
-    // Poison = subset of tenderable matching low-quality criteria (NOT the
-    // failed-grading lots). Spec: port ∈ {LON, NYK} OR class ∈ {3, 4} OR
-    // origin = "Brazilian Conillon".
-    const agg = _aggregateGradings(gradings, w, _GRAD_POISON);
     if (!port && !origin) return { value: agg.total };
     if (port && !origin)  return { value: agg.byPort[port] ?? 0 };
     if (port && origin)   return { value: agg.byPortOrigin[port]?.[origin] ?? 0 };
@@ -928,6 +948,30 @@ function _robustaRowValue(
   }
   if (metric === "Decertified") {
     if (!endSnap || !startBase) return { value: null };
+    if (port && age) {
+      // Per (port, age): month-over-month change in that bucket. The
+      // age-allowance .xlsx publishes the snapshot of the bucket at each
+      // month-end; the decrease is "lots that aged out" — typically because
+      // they were decertified. Inferred (not directly published).
+      const cur  = _ageAllowanceForWindow(ageMonths, w);
+      // Prev month-end relative to this window.
+      const prevTarget = new Date(w.end);
+      prevTarget.setMonth(prevTarget.getMonth() - 1);
+      const prev = _ageAllowanceForWindow(
+        ageMonths, { ...w, end: prevTarget } as PeriodCol,
+      );
+      const cb = cur?.valid?.buckets?.find((b) => `${b.months_since_graded} mo` === age);
+      const pb = prev?.valid?.buckets?.find((b) => `${b.months_since_graded} mo` === age);
+      if (!cb && !pb) return { value: null, isInferred: true };
+      const prevV = (pb?.by_port?.[port] ?? 0) / TONNES_PER_LOT;
+      const curV  = (cb?.by_port?.[port] ?? 0) / TONNES_PER_LOT;
+      if (origin) {
+        // Origin layer not directly available — inferred placeholder.
+        return { value: null, isInferred: true };
+      }
+      const decert = prevV - curV;
+      return { value: decert > 0 ? decert : 0, isInferred: true };
+    }
     if (port) {
       // Per-port: prev_stock_port + Σpassed_port (from gradings) − cur_stock_port
       const prevP = startBase.by_port_lots?.[port] ?? 0;
@@ -942,11 +986,20 @@ function _robustaRowValue(
   // (port-of-issuance isn't published, so port drill is not implemented).
   if (metric === "Issued") {
     if (!port && !origin) {
-      // Account for member-level drill via the special args below.
       return { value: _rSum(snaps, w, "lots_sold_today") };
     }
   }
   return { value: null };
+}
+
+// Convert an age-bucket number ("3 mo since graded") + a reference snapshot
+// date into a friendly graded month label ("Feb-26"). Bucket 1 = the month
+// that ended ~30d before the snapshot.
+function _gradedMonth(snapDate: string | undefined, monthsSince: number): string {
+  if (!snapDate) return `${monthsSince} mo`;
+  const d = new Date(snapDate);
+  d.setMonth(d.getMonth() - monthsSince);
+  return d.toLocaleString("en-US", { month: "short", year: "2-digit" });
 }
 
 // ── Issued aggregation by clearing member (Robusta) ──────────────────────────
@@ -974,45 +1027,62 @@ function _aggregateIssuance(
   return { byMember, byMemberOrigin, total };
 }
 
+// Union across all column windows — same rationale as the arabica helpers.
 function _rPortsForMetric(
   metric: RobustaMetric,
-  snaps: RobustaSnap[], gradings: GradingEvent[], ageMonths: AgeAllowanceMonth[], w: PeriodCol,
+  snaps: RobustaSnap[], gradings: GradingEvent[], ageMonths: AgeAllowanceMonth[], cols: PeriodCol[],
 ): string[] {
   const set = new Set<string>();
-  if (metric === "Graded" || metric === "Poison") {
-    const pred = metric === "Graded" ? _GRAD_TENDERABLE : _GRAD_POISON;
-    const agg = _aggregateGradings(gradings, w, pred);
-    Object.keys(agg.byPort).forEach((p) => set.add(p));
-  } else if (metric === "Stocks") {
-    const endSnap = _endOfWindowSnap(snaps, w);
-    Object.entries(endSnap?.by_port_lots || {}).forEach(([p, v]) => v > 0 && set.add(p));
-    const m = _ageAllowanceForWindow(ageMonths, w);
-    (m?.valid?.ports || []).forEach((p) => set.add(p));
-  } else if (metric === "Decertified") {
-    // Ports that had stock at start OR end of window.
-    const endSnap = _endOfWindowSnap(snaps, w);
-    const startBase = _startOfWindowPrevSnap(snaps, w);
-    Object.keys(endSnap?.by_port_lots   || {}).forEach((p) => set.add(p));
-    Object.keys(startBase?.by_port_lots || {}).forEach((p) => set.add(p));
+  for (const w of cols) {
+    if (metric === "Graded") {
+      const agg = _aggregateGradings(gradings, w, _GRAD_TENDERABLE);
+      Object.keys(agg.byPort).forEach((p) => set.add(p));
+    } else if (metric === "Stocks") {
+      const endSnap = _endOfWindowSnap(snaps, w);
+      Object.entries(endSnap?.by_port_lots || {}).forEach(([p, v]) => v > 0 && set.add(p));
+      const m = _ageAllowanceForWindow(ageMonths, w);
+      (m?.valid?.ports || []).forEach((p) => set.add(p));
+    } else if (metric === "Decertified") {
+      const endSnap = _endOfWindowSnap(snaps, w);
+      const startBase = _startOfWindowPrevSnap(snaps, w);
+      Object.keys(endSnap?.by_port_lots   || {}).forEach((p) => set.add(p));
+      Object.keys(startBase?.by_port_lots || {}).forEach((p) => set.add(p));
+      const m = _ageAllowanceForWindow(ageMonths, w);
+      (m?.valid?.ports || []).forEach((p) => set.add(p));
+    }
   }
   return Array.from(set).sort();
 }
 
-function _rOriginsForCell(
-  metric: RobustaMetric, gradings: GradingEvent[], w: PeriodCol, port: string,
-): string[] {
-  if (metric !== "Graded" && metric !== "Poison") return [];
-  const pred = metric === "Graded" ? _GRAD_TENDERABLE : _GRAD_POISON;
-  const agg = _aggregateGradings(gradings, w, pred);
-  return Object.keys(agg.byPortOrigin[port] || {}).sort();
+// Member codes that ever issued in this column window set.
+function _rMembersForCell(events: IssRecvDailyEvt[], cols: PeriodCol[]): string[] {
+  const set = new Set<string>();
+  for (const w of cols) {
+    const a = _aggregateIssuance(events, w);
+    Object.keys(a.byMember).forEach((m) => set.add(m));
+  }
+  return Array.from(set).sort();
 }
 
-function _rAgeBucketsForCell(ageMonths: AgeAllowanceMonth[], w: PeriodCol, port: string): string[] {
-  const m = _ageAllowanceForWindow(ageMonths, w);
-  if (!m?.valid?.buckets) return [];
-  return m.valid.buckets
-    .filter((b) => (b.by_port?.[port] ?? 0) > 0)
-    .map((b) => `${b.months_since_graded} mo`);
+function _rAgeBucketsForCell(ageMonths: AgeAllowanceMonth[], cols: PeriodCol[], port: string): string[] {
+  const set = new Set<number>();
+  for (const w of cols) {
+    const m = _ageAllowanceForWindow(ageMonths, w);
+    for (const b of (m?.valid?.buckets || [])) {
+      if ((b.by_port?.[port] ?? 0) > 0) set.add(b.months_since_graded);
+    }
+  }
+  return Array.from(set).sort((a, b) => a - b).map((n) => `${n} mo`);
+}
+
+// Reference date to label the "age N months" bucket as a graded calendar
+// month — uses the closest age-allowance month_end across the column set.
+function _rRefDateForAge(ageMonths: AgeAllowanceMonth[], cols: PeriodCol[]): string | undefined {
+  for (const w of cols) {
+    const m = _ageAllowanceForWindow(ageMonths, w);
+    if (m?.month_end) return m.month_end;
+  }
+  return undefined;
 }
 
 function RobustaPeriodTable({
@@ -1108,16 +1178,40 @@ function RobustaPeriodTable({
                     ));
                   })()}
 
-                  {/* Issued: member → origin */}
+                  {/* Pending grading: 2 sub-rows (queue + forecast). No port in source. */}
+                  {isOpen && drill === "queue_forecast" && (() => {
+                    const rows = [
+                      { label: "of which Queue",    field: "queue_lots"    as const, tone: "text-amber-300"   },
+                      { label: "of which Forecast", field: "forecast_lots" as const, tone: "text-sky-300"     },
+                    ];
+                    return rows.map((r) => (
+                      <tr key={r.label} className="border-b border-slate-900 bg-slate-900/30">
+                        <td className={`${r.tone} text-left py-0.5 italic`} style={indent(1)}>{r.label}</td>
+                        {cols.map((c, i) => {
+                          const ov = _closestSnap(overview, c.end, 14);
+                          const v = ov?.[r.field];
+                          return (
+                            <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
+                              {v == null ? "—" : fmt(fromLots(v, unit), unit)}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ));
+                  })()}
+
+                  {/* Issued: member → origin (union across all column windows) */}
                   {isOpen && drill === "member_origin" && (() => {
-                    const aggCurrent = _aggregateIssuance(issuance, cols[0]);
-                    const members = Object.keys(aggCurrent.byMember).sort();
+                    const members = _rMembersForCell(issuance, cols);
                     return members.map((code) => {
                       const memKey = `${metric}/${code}`;
                       const memOpen = expanded.has(memKey);
-                      const origins = memOpen
-                        ? Object.keys(aggCurrent.byMemberOrigin[code] || {}).sort()
-                        : [];
+                      const originSet = new Set<string>();
+                      for (const w2 of cols) {
+                        const a2 = _aggregateIssuance(issuance, w2);
+                        Object.keys(a2.byMemberOrigin[code] || {}).forEach((o) => originSet.add(o));
+                      }
+                      const origins = memOpen ? Array.from(originSet).sort() : [];
                       return (
                         <Fragment key={memKey}>
                           <tr className="border-b border-slate-900 bg-slate-900/40">
@@ -1155,23 +1249,23 @@ function RobustaPeriodTable({
                     });
                   })()}
 
-                  {/* Port sub-rows (Graded · Poison · Stocks · Decertified) */}
-                  {isOpen && drill !== "passing_breakdown" && drill !== "member_origin" && (() => {
-                    const ports = _rPortsForMetric(metric, snapshots, gradings, ageMonths, cols[0]);
+                  {/* Stocks · Decertified: port → age (graded month) → origin */}
+                  {isOpen && drill === "port_age_origin" && (() => {
+                    const ports = _rPortsForMetric(metric, snapshots, gradings, ageMonths, cols);
+                    const refDate = _rRefDateForAge(ageMonths, cols);
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
                       const portOpen = expanded.has(portKey);
-                      const portIsLeaf = drill === "port";   // Decertified — leaf
                       return (
                         <Fragment key={portKey}>
                           <tr className="border-b border-slate-900 bg-slate-900/40">
                             <td
-                              className={`text-slate-400 text-left py-0.5 ${portIsLeaf ? "" : "cursor-pointer hover:text-emerald-300"}`}
+                              className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-emerald-300"
                               style={indent(1)}
-                              onClick={portIsLeaf ? undefined : () => toggle(portKey)}
+                              onClick={() => toggle(portKey)}
                             >
                               <span className="text-emerald-500/60 inline-block w-3">
-                                {portIsLeaf ? " " : (portOpen ? "▾" : "▸")}
+                                {portOpen ? "▾" : "▸"}
                               </span>{" "}{port}
                             </td>
                             {cols.map((c, i) => (
@@ -1181,10 +1275,11 @@ function RobustaPeriodTable({
                             ))}
                           </tr>
 
-                          {/* Stocks: age bucket level → origin (inferred) */}
-                          {portOpen && drill === "port_age_origin" && _rAgeBucketsForCell(ageMonths, cols[0], port).map((age) => {
+                          {portOpen && _rAgeBucketsForCell(ageMonths, cols, port).map((age) => {
                             const ageKey = `${portKey}/${age}`;
                             const ageOpen = expanded.has(ageKey);
+                            const monthsSince = parseInt(age, 10);
+                            const ageLabel = _gradedMonth(refDate, monthsSince);
                             const anyVal = cols.some((c) => (_robustaRowValue(metric, snapshots, gradings, overview, ageMonths, c, port, age).value ?? 0) > 0);
                             if (!anyVal) return null;
                             return (
@@ -1195,7 +1290,7 @@ function RobustaPeriodTable({
                                     style={indent(2)}
                                     onClick={() => toggle(ageKey)}
                                   >
-                                    <span className="text-emerald-500/40 inline-block w-3">{ageOpen ? "▾" : "▸"}</span>{" "}{age} since graded
+                                    <span className="text-emerald-500/40 inline-block w-3">{ageOpen ? "▾" : "▸"}</span>{" "}{ageLabel}{" "}<span className="text-slate-700 text-[9px]">({age})</span>
                                   </td>
                                   {cols.map((c, i) => (
                                     <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
@@ -1217,17 +1312,79 @@ function RobustaPeriodTable({
                             );
                           })}
 
-                          {/* Graded / Poison: origin level (from gradings entries directly) */}
-                          {portOpen && (drill === "port_origin") && _rOriginsForCell(metric, gradings, cols[0], port).map((origin) => (
-                            <tr key={`${portKey}/${origin}`} className="border-b border-slate-900">
-                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{origin}</td>
-                              {cols.map((c, i) => (
-                                <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                  {fmtCell(_robustaRowValue(metric, snapshots, gradings, overview, ageMonths, c, port, undefined, origin))}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
+                        </Fragment>
+                      );
+                    });
+                  })()}
+
+                  {/* Graded: 2 sub-rows (Coffee / Poison), each drillable port → origin */}
+                  {isOpen && drill === "graded_with_poison" && (() => {
+                    const subs = [
+                      { label: "of which Coffee", pred: _GRAD_COFFEE, tone: "text-emerald-300" },
+                      { label: "of which Poison", pred: _GRAD_POISON, tone: "text-rose-300"   },
+                    ];
+                    return subs.map((sub) => {
+                      const subKey = `${metric}/${sub.label}`;
+                      const subOpen = expanded.has(subKey);
+                      const portSet = new Set<string>();
+                      for (const w2 of cols) {
+                        Object.keys(_aggregateGradings(gradings, w2, sub.pred).byPort).forEach((p) => portSet.add(p));
+                      }
+                      const ports = subOpen ? Array.from(portSet).sort() : [];
+                      return (
+                        <Fragment key={subKey}>
+                          <tr className="border-b border-slate-900 bg-slate-900/40">
+                            <td
+                              className={`${sub.tone} text-left py-0.5 italic cursor-pointer hover:text-emerald-200`}
+                              style={indent(1)}
+                              onClick={() => toggle(subKey)}
+                            >
+                              <span className="text-emerald-500/60 inline-block w-3">{subOpen ? "▾" : "▸"}</span>{" "}{sub.label}
+                            </td>
+                            {cols.map((c, i) => (
+                              <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
+                                {fmt(fromLots(_aggregateGradings(gradings, c, sub.pred).total, unit), unit)}
+                              </td>
+                            ))}
+                          </tr>
+                          {subOpen && ports.map((port) => {
+                            const portKey2 = `${subKey}/${port}`;
+                            const portOpen2 = expanded.has(portKey2);
+                            const originSet = new Set<string>();
+                            for (const w2 of cols) {
+                              Object.keys(_aggregateGradings(gradings, w2, sub.pred).byPortOrigin[port] || {})
+                                .forEach((o) => originSet.add(o));
+                            }
+                            const origins = portOpen2 ? Array.from(originSet).sort() : [];
+                            return (
+                              <Fragment key={portKey2}>
+                                <tr className="border-b border-slate-900 bg-slate-900/20">
+                                  <td
+                                    className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-emerald-300"
+                                    style={indent(2)}
+                                    onClick={() => toggle(portKey2)}
+                                  >
+                                    <span className="text-emerald-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{port}
+                                  </td>
+                                  {cols.map((c, i) => (
+                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
+                                      {fmt(fromLots(_aggregateGradings(gradings, c, sub.pred).byPort[port] ?? 0, unit), unit)}
+                                    </td>
+                                  ))}
+                                </tr>
+                                {portOpen2 && origins.map((origin) => (
+                                  <tr key={`${portKey2}/${origin}`} className="border-b border-slate-900">
+                                    <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
+                                    {cols.map((c, i) => (
+                                      <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                        {fmt(fromLots(_aggregateGradings(gradings, c, sub.pred).byPortOrigin[port]?.[origin] ?? 0, unit), unit)}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </Fragment>
+                            );
+                          })}
                         </Fragment>
                       );
                     });
@@ -1239,10 +1396,12 @@ function RobustaPeriodTable({
         </table>
       </div>
       <div className="text-[9px] text-slate-600 italic mt-1">
-        Flow metrics (Graded · Poison · Decertified · Issued) sum across each window. Stocks &amp;
-        Pending use end-of-window snapshots. <strong>* = inferred</strong>. Stocks → port → age comes
-        from the monthly age-allowance .xlsx; origin under (port, age) is inferred from gradings
-        flow in that month and lands next iteration. Decertified = prev_stock + Σtenderable − stock.
+        Flow metrics (Graded · Decertified · Issued) sum across each window; Graded drills into
+        Coffee / Poison sub-rows. Inventory metrics (Stocks · Pending) use the end-of-window
+        snapshot. <strong>* = inferred</strong>. Stocks → port → age comes from the monthly
+        age-allowance .xlsx; age buckets are labelled by graded calendar month. Decertified at
+        the (port, age) level = month-over-month change in that bucket (inferred). Origin under
+        (port, age) is inferred from gradings flow in that month and lands next iteration.
       </div>
     </div>
   );
