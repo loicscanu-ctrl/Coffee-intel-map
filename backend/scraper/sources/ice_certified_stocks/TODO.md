@@ -20,16 +20,20 @@ Same physical warehouse appears under different codes across sources:
 Build a display-only friendly name lookup per market (don't merge across
 markets — different ICE warehouse designations).
 
-### 3. Arabica Poison criteria
-**Pending user decision.** The Arabica column no longer renders a standalone
-"Poison" row — once criteria are defined, mirror the Robusta logic:
-- Add `_isArabicaPoison(e)` analogous to `_isRobustaPoison()` in
-  `CertifiedStocksPanel.tsx`.
-- Flip `ARABICA_DRILL["Graded"]` from `"port_origin_inferred"` to
-  `"graded_with_poison"` so Graded gets the Coffee/Poison sub-row split.
-- Flip `ARABICA_DRILL["Passing rate"]` from `"none"` to `"passing_breakdown"`.
-- Re-add "Poison" to `ARABICA_METRICS` only if you want it as a standalone
-  row (not strictly needed once Graded carries the breakdown).
+### 3. Arabica Poison criteria — DONE (locked in v1)
+Spec: any origin assigned to **Group 3 or Group 4** of the C-contract counts
+as Poison (the discount-tier naturals). Source: `ARABICA_POISON_GROUPS` set
++ `_isArabicaPoisonOrigin()` in `CertifiedStocksPanel.tsx`.
+
+The Graded row drills into "of which Coffee" (Groups 0/1/2) + "of which
+Poison" (Groups 3/4) sub-rows, each opens port → origin (all inferred from
+positive day-over-day delta of certified_by_port × by_origin, since the xls
+publishes only daily passed/failed totals without origin attribution).
+
+Passing rate breakdown stays disabled: `failed_today_bags` carries no
+origin/group attribution in the source, so we can't split failed bags
+between Coffee / Poison the way Robusta does (which has explicit gradings
+entries with origin + class + tenderable flags).
 
 ### 4. Robusta origin under (port, age)
 Today renders `"origin attribution — inferred next iteration*"` placeholder.

@@ -278,8 +278,8 @@ type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
            | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
   "Pending grading": "port_group_origin",   // port → ICE group → origin
-  "Graded":          "port_origin_inferred", // delta of certified by_port × by_origin
-  "Passing rate":    "none",                 // arabica poison TBD → no breakdown yet
+  "Graded":          "graded_with_poison",  // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
+  "Passing rate":    "none",                 // failed_today_bags carries no origin → no breakdown
   "Stocks":          "port_group_origin",   // port → ICE group → origin (same shape as Pending)
   "Decertified":     "port_group_origin",   // per-port outflow split by group → origin
   "Issued":          "port_issuer",         // workbook sheet 8a populates issuers_today
@@ -329,6 +329,63 @@ function _sectValue(
 // Sum a field of `snap` across the snapshots inside the window.
 function _sumWindow(snaps: ArabicaSnap[], w: PeriodCol, field: keyof ArabicaSnap): number {
   return _snapshotsInWindow(snaps, w).reduce((t, s) => t + (Number(s[field] ?? 0) || 0), 0);
+}
+
+// Arabica Poison spec: origin assigned to Group 3 or Group 4 in the C-contract
+// (the discount-tier naturals). Group lookup uses each snapshot's by_origin
+// metadata; an origin's group can shift between snapshots but in practice
+// remains stable. Editable as the spec evolves.
+const ARABICA_POISON_GROUPS = new Set(["Group 3", "Group 4"]);
+const _isArabicaPoisonOrigin = (group: string | undefined): boolean =>
+  !!group && ARABICA_POISON_GROUPS.has(group);
+
+// Aggregate inferred grading flow (positive day-over-day deltas of certified
+// by port × origin) and bucket each origin's contribution by whether its
+// group counts as Poison. Mirrors `_aggregateGradings` for Robusta but reads
+// from the snapshot hierarchy instead of explicit gradings events.
+function _arabicaGradedAgg(
+  snaps: ArabicaSnap[], w: PeriodCol, wantPoison: boolean,
+): { byPort: Record<string, number>; byPortOrigin: Record<string, Record<string, number>>; total: number } {
+  const inWin = _snapshotsInWindow(snaps, w);
+  const empty = { byPort: {} as Record<string, number>, byPortOrigin: {} as Record<string, Record<string, number>>, total: 0 };
+  if (!inWin.length) return empty;
+  const startBase = _startOfWindowPrevSnap(snaps, w) ?? inWin[0];
+
+  const byPort: Record<string, number> = {};
+  const byPortOrigin: Record<string, Record<string, number>> = {};
+  let total = 0;
+
+  let prev: ArabicaSnap = startBase;
+  for (const s of inWin) {
+    // Iterate every (origin, port) pair present in either snapshot.
+    const originSet = new Set<string>([
+      ...Object.keys(prev.sections?.total_certified?.by_origin || {}),
+      ...Object.keys(s.sections?.total_certified?.by_origin    || {}),
+    ]);
+    for (const origin of Array.from(originSet)) {
+      const prevOd = prev.sections?.total_certified?.by_origin?.[origin];
+      const sOd    = s.sections?.total_certified?.by_origin?.[origin];
+      const group  = sOd?.group ?? prevOd?.group;
+      if (_isArabicaPoisonOrigin(group) !== wantPoison) continue;
+      const portSet = new Set<string>([
+        ...Object.keys(prevOd?.by_port || {}),
+        ...Object.keys(sOd?.by_port    || {}),
+      ]);
+      for (const port of Array.from(portSet)) {
+        const a = prevOd?.by_port?.[port] ?? 0;
+        const b = sOd?.by_port?.[port]    ?? 0;
+        const delta = b - a;
+        if (delta > 0) {
+          byPort[port] = (byPort[port] ?? 0) + delta;
+          byPortOrigin[port] = byPortOrigin[port] ?? {};
+          byPortOrigin[port][origin] = (byPortOrigin[port][origin] ?? 0) + delta;
+          total += delta;
+        }
+      }
+    }
+    prev = s;
+  }
+  return { byPort, byPortOrigin, total };
 }
 
 // Inferred Graded by port × origin = positive day-over-day delta of certified
@@ -570,8 +627,81 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                     ))}
                   </tr>
 
-                  {/* Port sub-rows */}
-                  {isOpen && cols.length > 0 && (() => {
+                  {/* Graded: 2 sub-rows (Coffee Groups 0/1/2 / Poison Groups 3/4), each drillable port → origin */}
+                  {isOpen && drill === "graded_with_poison" && (() => {
+                    const subs = [
+                      { label: "of which Coffee", wantPoison: false, tone: "text-emerald-300" },
+                      { label: "of which Poison", wantPoison: true,  tone: "text-rose-300"   },
+                    ];
+                    return subs.map((sub) => {
+                      const subKey = `${metric}/${sub.label}`;
+                      const subOpen = expanded.has(subKey);
+                      const portSet = new Set<string>();
+                      for (const w2 of cols) {
+                        Object.keys(_arabicaGradedAgg(snapshots, w2, sub.wantPoison).byPort).forEach((p) => portSet.add(p));
+                      }
+                      const ports = subOpen ? Array.from(portSet).sort() : [];
+                      return (
+                        <Fragment key={subKey}>
+                          <tr className="border-b border-slate-900 bg-slate-900/40">
+                            <td
+                              className={`${sub.tone} text-left py-0.5 italic cursor-pointer hover:text-amber-200`}
+                              style={indent(1)}
+                              onClick={() => toggle(subKey)}
+                            >
+                              <span className="text-amber-500/60 inline-block w-3">{subOpen ? "▾" : "▸"}</span>{" "}{sub.label}
+                            </td>
+                            {cols.map((c, i) => (
+                              <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
+                                {fmt(fromBags(_arabicaGradedAgg(snapshots, c, sub.wantPoison).total, unit), unit) + "*"}
+                              </td>
+                            ))}
+                          </tr>
+                          {subOpen && ports.map((port) => {
+                            const portKey2 = `${subKey}/${port}`;
+                            const portOpen2 = expanded.has(portKey2);
+                            const originSet = new Set<string>();
+                            for (const w2 of cols) {
+                              Object.keys(_arabicaGradedAgg(snapshots, w2, sub.wantPoison).byPortOrigin[port] || {})
+                                .forEach((o) => originSet.add(o));
+                            }
+                            const origins = portOpen2 ? Array.from(originSet).sort() : [];
+                            return (
+                              <Fragment key={portKey2}>
+                                <tr className="border-b border-slate-900 bg-slate-900/20">
+                                  <td
+                                    className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-amber-300"
+                                    style={indent(2)}
+                                    onClick={() => toggle(portKey2)}
+                                  >
+                                    <span className="text-amber-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{port}
+                                  </td>
+                                  {cols.map((c, i) => (
+                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
+                                      {fmt(fromBags(_arabicaGradedAgg(snapshots, c, sub.wantPoison).byPort[port] ?? 0, unit), unit) + "*"}
+                                    </td>
+                                  ))}
+                                </tr>
+                                {portOpen2 && origins.map((origin) => (
+                                  <tr key={`${portKey2}/${origin}`} className="border-b border-slate-900">
+                                    <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
+                                    {cols.map((c, i) => (
+                                      <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                        {fmt(fromBags(_arabicaGradedAgg(snapshots, c, sub.wantPoison).byPortOrigin[port]?.[origin] ?? 0, unit), unit) + "*"}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </Fragment>
+                            );
+                          })}
+                        </Fragment>
+                      );
+                    });
+                  })()}
+
+                  {/* Port sub-rows (Pending grading · Stocks · Decertified · Issued) */}
+                  {isOpen && drill !== "graded_with_poison" && cols.length > 0 && (() => {
                     const ports = _portsForMetric(snapshots, cols, metric);
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
@@ -670,8 +800,9 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
           Flow metrics (Graded · Decertified · Issued) sum across each window. Inventory metrics
           (Stocks · Pending) show the end-of-window snapshot. <strong>* = inferred</strong> from
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
-          for grading, not per-port breakdown). Decertified = prev_stock + Σpassed − stock.
-          Issued · per-issuer breakdown from ICE iss/recv sheet (clearing-member firms).
+          for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
+          (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
+          + Σpassed − stock. Issued · per-issuer breakdown from ICE iss/recv sheet (clearing-member firms).
         </div>
       </div>
     </div>
