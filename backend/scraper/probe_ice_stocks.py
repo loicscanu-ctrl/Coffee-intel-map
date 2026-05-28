@@ -30,9 +30,19 @@ import requests
 ROOT = Path(__file__).resolve().parents[2]
 DEBUG_DIR = ROOT / "debug" / "ice_probe"
 
+# Direct file URLs (publicdocs paths). The user confirmed these bypass the
+# Report Center captcha when hit directly; the captcha only gates the catalog
+# /report/{id} pages. Dates are hardcoded to known-good samples for this probe
+# — the real scraper will compute them dynamically.
 CANDIDATES: list[tuple[str, str]] = [
-    ("arabica_shtml", "https://www.theice.com/marketdata/reports/coffee/CertifiedStocks.shtml"),
-    ("reports_142",   "https://www.theice.com/marketdata/reports/142"),
+    ("arabica_daily_xls",
+     "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260527.xls"),
+    ("robusta_age_allowance_xlsx",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/aged_allowance_stock_report/Robusta_Coffee_Age_Allowance_20260430.xlsx"),
+    ("robusta_grading_pdf",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/grading_overview/GradingOverviewCoffee_260521.pdf"),
+    ("robusta_issuers_receivers_txt",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/daily_issuers_receivers/irrrc_260522.txt"),
 ]
 
 BROWSER_HEADERS = {
@@ -61,15 +71,35 @@ def _classify(status: int, ctype: str, head: str, raw: bytes) -> str:
         return "BLOCKED (403)"
     if status != 200:
         return f"HTTP {status}"
+    # Binary magic-byte sniffing — content-type from theice.com is often generic.
     if raw[:4] == b"%PDF" or "application/pdf" in ctype:
-        return "PDF (likely data)"
-    if "csv" in ctype or "text/plain" in ctype:
-        return "CSV/plain (likely data)"
+        return "PDF"
+    if raw[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return "Excel .xls (OLE2 binary)"
+    if raw[:4] == b"PK\x03\x04":
+        # .xlsx is a zip; could also be other zip — refine by content-type or
+        # filename hint, but for our ICE candidates xlsx is the expected case.
+        return "Excel .xlsx (zipped XML)"
     if "json" in ctype:
-        return "JSON (likely data)"
+        return "JSON"
+    if "csv" in ctype:
+        return "CSV"
     if "<html" in low:
         return "HTML page"
-    return "unknown"
+    if "text" in ctype or all(32 <= b < 127 or b in (9, 10, 13) for b in raw[:256]):
+        return "plain text"
+    return "unknown (binary)"
+
+
+_EXT_BY_VERDICT = {
+    "PDF": "pdf",
+    "Excel .xls (OLE2 binary)": "xls",
+    "Excel .xlsx (zipped XML)": "xlsx",
+    "JSON": "json",
+    "CSV": "csv",
+    "plain text": "txt",
+    "HTML page": "html",
+}
 
 
 def _preview_html(name: str, html: str) -> None:
@@ -186,8 +216,15 @@ def _attempt(name: str, url: str, headers: dict, tag: str) -> tuple[int | None, 
         print(f"    {label:24} HTTP {r.status_code:>3} | {len(raw):>10,} B | {ctype[:34]:34} | {verdict}")
         if r.status_code == 200 and raw:
             DEBUG_DIR.mkdir(parents=True, exist_ok=True)
-            ext = "pdf" if raw[:4] == b"%PDF" else "html"
+            ext = _EXT_BY_VERDICT.get(verdict, "bin")
             (DEBUG_DIR / f"{name}__{tag}.{ext}").write_bytes(raw)
+            # Inline preview for plain text (we won't get the issuers/receivers
+            # file off the artifact otherwise; binary formats stay artifact-only).
+            if verdict == "plain text" and tag == "browser":
+                lines = [ln for ln in raw.decode("utf-8", "ignore").splitlines() if ln.strip()][:25]
+                print("      first non-empty lines:")
+                for ln in lines:
+                    print(f"        {ln[:200]}")
         return r.status_code, verdict, (r.text if r.status_code == 200 else "")
     except requests.exceptions.RequestException as e:
         print(f"    {label:24} ERROR: {type(e).__name__}: {str(e)[:90]}")
