@@ -517,26 +517,25 @@ function _startOfWindowPrevSnap<T extends { date: string }>(snaps: T[], w: Perio
 
 type ArabicaMetric =
   | "Pending grading" | "Graded" | "Passing rate"
-  | "Stocks" | "Decertified" | "Issued" | "Received";
+  | "Stocks" | "Decertified" | "Issued";
 
 const ARABICA_METRICS: ArabicaMetric[] = [
   "Pending grading", "Graded", "Passing rate",
-  "Stocks", "Decertified", "Issued", "Received",
+  "Stocks", "Decertified", "Issued",
 ];
 
 // Per-row drill-down support. Only rows where the source data carries the
 // breakdown (or can be defensibly inferred) get a ▸. Others render flat.
 type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
-           | "port_origin_inferred" | "port" | "port_issuer" | "member_origin"
-           | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
+           | "port_origin_inferred" | "port" | "port_issuer" | "port_member_signed"
+           | "member_origin" | "passing_breakdown" | "graded_with_poison" | "queue_forecast";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
-  "Pending grading": "port_group_origin",   // port → ICE group → origin
-  "Graded":          "graded_with_poison",  // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
-  "Passing rate":    "none",                 // failed_today_bags carries no origin → no breakdown
-  "Stocks":          "port_group_origin",   // port → ICE group → origin (same shape as Pending)
-  "Decertified":     "port_group_origin",   // per-port outflow split by group → origin
-  "Issued":          "port_issuer",         // workbook sheet 8a populates issuers_today
-  "Received":        "port_issuer",         // same shape, reads stoppers_today instead
+  "Pending grading": "port_group_origin",     // port → ICE group → origin
+  "Graded":          "graded_with_poison",    // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
+  "Passing rate":    "none",                  // failed_today_bags carries no origin → no breakdown
+  "Stocks":          "port_group_origin",     // port → ICE group → origin (same shape as Pending)
+  "Decertified":     "port_group_origin",     // per-port outflow split by group → origin
+  "Issued":          "port_member_signed",    // port → member, issuer side as −, stopper side as +
 };
 
 // ICE C-contract group ordering. Drives the Pending grading drill display.
@@ -673,6 +672,7 @@ interface RowVal { value: number | null; isInferred?: boolean }
 function _arabicaRowValue(
   metric: ArabicaMetric, snaps: ArabicaSnap[], w: PeriodCol,
   port?: string, group?: string, origin?: string, issuer?: string,
+  side?: "issued" | "received",
 ): RowVal {
   const endSnap = _endOfWindowSnap(snaps, w);
   const startBase = _startOfWindowPrevSnap(snaps, w);
@@ -714,38 +714,40 @@ function _arabicaRowValue(
     const passedSum = _sumWindow(snaps, w, "passed_today_bags");
     return { value: startBase.total_bags + passedSum - endSnap.total_bags };
   }
-  if (metric === "Issued" || metric === "Received") {
-    // Sourced from per-snapshot issuers_today / stoppers_today (TODAY values
-    // from sheet 8a). Received mirrors Issued shape; the `issuer` arg is
-    // overloaded as "the clearing-member firm name" for both sides.
+  if (metric === "Issued") {
+    // Issued and Received are merged into a single Issued row. Each delivery
+    // event has one issuer (sell side) and one stopper (buy side); the panel
+    // reports both sides under the same port, signed so the eye can read
+    // direction at a glance:
+    //   • member-row + side="issued"   →  negative value (firm delivered out)
+    //   • member-row + side="received" →  positive value (firm took delivery)
+    //   • port-row (no side)           →  unsigned flow magnitude at that port
+    //   • top-row                      →  unsigned total flow over the window
     const inWin = _snapshotsInWindow(snaps, w);
-    const isIssued = metric === "Issued";
-    const rowsOf = (s: ArabicaSnap) =>
-      isIssued
-        ? (s.issuers_today  || []).map((e) => ({ port: e.port, name: e.issuer,  value: e.value }))
-        : (s.stoppers_today || []).map((e) => ({ port: e.port, name: e.stopper, value: e.value }));
-    const totalOf = (s: ArabicaSnap) =>
-      isIssued ? (s.issued_total_today || 0) : (s.received_total_today || 0);
-    if (port && issuer) {
-      let total = 0;
+    if (port && issuer && side) {
+      let raw = 0;
       for (const s of inWin) {
-        for (const e of rowsOf(s)) {
-          if (e.port === port && e.name === issuer) total += e.value || 0;
+        const rows = side === "issued" ? (s.issuers_today || []) : (s.stoppers_today || []);
+        for (const e of rows) {
+          const name = side === "issued"
+            ? (e as { issuer: string }).issuer
+            : (e as { stopper: string }).stopper;
+          if (e.port === port && name === issuer) raw += e.value || 0;
         }
       }
-      return { value: total };
+      return { value: side === "issued" ? -raw : raw };
     }
     if (port) {
       let total = 0;
       for (const s of inWin) {
-        for (const e of rowsOf(s)) {
+        for (const e of (s.issuers_today || [])) {
           if (e.port === port) total += e.value || 0;
         }
       }
       return { value: total };
     }
     let total = 0;
-    for (const s of inWin) total += totalOf(s);
+    for (const s of inWin) total += (s.issued_total_today || 0);
     return { value: total };
   }
   return { value: null };
@@ -769,10 +771,11 @@ function _portsForMetric(snaps: ArabicaSnap[], cols: PeriodCol[], metric: Arabic
       }
       const startBase = _startOfWindowPrevSnap(snaps, w);
       Object.keys(startBase?.sections?.total_certified?.by_port || {}).forEach((p) => set.add(p));
-    } else if (metric === "Issued" || metric === "Received") {
+    } else if (metric === "Issued") {
+      // Union of ports that saw either an issuance or a reception in window.
       for (const s of _snapshotsInWindow(snaps, w)) {
-        const rows = metric === "Issued" ? (s.issuers_today || []) : (s.stoppers_today || []);
-        for (const e of rows) set.add(e.port);
+        for (const e of (s.issuers_today  || [])) set.add(e.port);
+        for (const e of (s.stoppers_today || [])) set.add(e.port);
       }
     }
   }
@@ -817,24 +820,28 @@ function _originsForCell(
   return Array.from(set).sort();
 }
 
-// Issuers / Stoppers ever seen at this port across the column set. `side`
-// picks which TODAY array to scan.
-function _issuersForPort(
+// (Member, side) pairs ever seen at this port across the column set. Issuer
+// and stopper appearances surface as separate rows because a single firm can
+// take both roles on the same day (e.g. ICS issued 1 lot, ICS received 1 lot
+// at HO on 2026-05-18). Sorted by name then issuer-before-receiver.
+interface MemberSide { name: string; side: "issued" | "received" }
+function _membersForPort(
   snaps: ArabicaSnap[], cols: PeriodCol[], port: string,
-  side: "issued" | "received" = "issued",
-): string[] {
-  const set = new Set<string>();
+): MemberSide[] {
+  const seen = new Map<string, MemberSide>();
+  const add = (name: string, side: "issued" | "received") => {
+    const key = `${name}|${side}`;
+    if (!seen.has(key)) seen.set(key, { name, side });
+  };
   for (const w of cols) {
     for (const s of _snapshotsInWindow(snaps, w)) {
-      const rows = side === "issued"
-        ? (s.issuers_today  || []).map((e) => ({ port: e.port, name: e.issuer  }))
-        : (s.stoppers_today || []).map((e) => ({ port: e.port, name: e.stopper }));
-      for (const e of rows) {
-        if (e.port === port) set.add(e.name);
-      }
+      for (const e of (s.issuers_today  || [])) if (e.port === port) add(e.issuer,  "issued");
+      for (const e of (s.stoppers_today || [])) if (e.port === port) add(e.stopper, "received");
     }
   }
-  return Array.from(set).sort();
+  return Array.from(seen.values()).sort((a, b) =>
+    a.name === b.name ? (a.side === "issued" ? -1 : 1) : a.name.localeCompare(b.name),
+  );
 }
 
 function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; unit: Unit }) {
@@ -851,6 +858,22 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
     return v.isInferred ? shown + "*" : shown;
   };
   const fmtPct = (v: RowVal): string => v.value == null ? "—" : `${Math.round(v.value * 100)}%`;
+  // Signed renderer for the Issued member rows. Issuer side prints as
+  // "−N", receiver side as "+N"; 0 stays bare so eyes skip past empties.
+  const fmtSigned = (v: RowVal): string => {
+    if (v.value == null) return "—";
+    const x = fromBags(v.value, unit);
+    if (x === 0) return "0";
+    const body = fmt(Math.abs(x), unit);
+    return x > 0 ? "+" + body : "−" + body;
+  };
+  // Hide rows where every column reads zero (or null) — the user calls this
+  // "mask 0 everywhere". Reads each col's value for the given accessor.
+  const allZero = (vals: Array<RowVal | number | null>): boolean =>
+    vals.every((v) => {
+      const n = typeof v === "number" ? v : (v?.value ?? null);
+      return n == null || n === 0;
+    });
 
   const indent = (lvl: number) => ({ paddingLeft: 8 + lvl * 14 });
 
@@ -931,6 +954,8 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                                 .forEach((o) => originSet.add(o));
                             }
                             const origins = portOpen2 ? Array.from(originSet).sort() : [];
+                            const portVals = cols.map((c) => _arabicaGradedAgg(snapshots, c, sub.wantPoison).byPort[port] ?? 0);
+                            if (allZero(portVals)) return null;
                             return (
                               <Fragment key={portKey2}>
                                 <tr className="border-b border-slate-900 bg-slate-900/20">
@@ -941,22 +966,26 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                                   >
                                     <span className="text-amber-500/40 inline-block w-3">{portOpen2 ? "▾" : "▸"}</span>{" "}{_withName(port, ARABICA_PORT_NAMES)}
                                   </td>
-                                  {cols.map((c, i) => (
+                                  {portVals.map((v, i) => (
                                     <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
-                                      {fmt(fromBags(_arabicaGradedAgg(snapshots, c, sub.wantPoison).byPort[port] ?? 0, unit), unit) + "*"}
+                                      {fmt(fromBags(v, unit), unit) + "*"}
                                     </td>
                                   ))}
                                 </tr>
-                                {portOpen2 && origins.map((origin) => (
-                                  <tr key={`${portKey2}/${origin}`} className="border-b border-slate-900">
-                                    <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
-                                    {cols.map((c, i) => (
-                                      <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                        {fmt(fromBags(_arabicaGradedAgg(snapshots, c, sub.wantPoison).byPortOrigin[port]?.[origin] ?? 0, unit), unit) + "*"}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ))}
+                                {portOpen2 && origins.map((origin) => {
+                                  const oVals = cols.map((c) => _arabicaGradedAgg(snapshots, c, sub.wantPoison).byPortOrigin[port]?.[origin] ?? 0);
+                                  if (allZero(oVals)) return null;
+                                  return (
+                                    <tr key={`${portKey2}/${origin}`} className="border-b border-slate-900">
+                                      <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
+                                      {oVals.map((v, i) => (
+                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                          {fmt(fromBags(v, unit), unit) + "*"}
+                                        </td>
+                                      ))}
+                                    </tr>
+                                  );
+                                })}
                               </Fragment>
                             );
                           })}
@@ -971,6 +1000,9 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
                       const portOpen = expanded.has(portKey);
+                      // Mask the whole port row + drill if every column reads 0.
+                      const portVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port));
+                      if (allZero(portVals)) return null;
                       return (
                         <Fragment key={portKey}>
                           <tr className="border-b border-slate-900 bg-slate-900/40">
@@ -994,6 +1026,8 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                           {portOpen && drill === "port_group_origin" && _groupsForCell(snapshots, cols, metric, port).map((group) => {
                             const grpKey = `${portKey}/${group}`;
                             const grpOpen = expanded.has(grpKey);
+                            const grpVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port, group));
+                            if (allZero(grpVals)) return null;
                             const origins = grpOpen ? _originsForCell(snapshots, cols, metric, port, group) : [];
                             return (
                               <Fragment key={grpKey}>
@@ -1005,51 +1039,63 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
                                   >
                                     <span className="text-amber-500/40 inline-block w-3">{grpOpen ? "▾" : "▸"}</span>{" "}{group}
                                   </td>
-                                  {cols.map((c, i) => (
-                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
-                                      {fmtCell(_arabicaRowValue(metric, snapshots, c, port, group))}
-                                    </td>
+                                  {grpVals.map((v, i) => (
+                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
                                   ))}
                                 </tr>
-                                {grpOpen && origins.map((origin) => (
-                                  <tr key={`${grpKey}/${origin}`} className="border-b border-slate-900">
-                                    <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
-                                    {cols.map((c, i) => (
-                                      <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                        {fmtCell(_arabicaRowValue(metric, snapshots, c, port, group, origin))}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ))}
+                                {grpOpen && origins.map((origin) => {
+                                  const oVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port, group, origin));
+                                  if (allZero(oVals)) return null;
+                                  return (
+                                    <tr key={`${grpKey}/${origin}`} className="border-b border-slate-900">
+                                      <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
+                                      {oVals.map((v, i) => (
+                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                      ))}
+                                    </tr>
+                                  );
+                                })}
                               </Fragment>
                             );
                           })}
 
                           {/* Origin level for Graded (port → origin inferred from delta) */}
                           {portOpen && (drill === "port_origin" || drill === "port_origin_inferred") &&
-                            _originsForCell(snapshots, cols, metric, port).map((origin) => (
-                              <tr key={`${portKey}/${origin}`} className="border-b border-slate-900">
-                                <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{origin}</td>
-                                {cols.map((c, i) => (
-                                  <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                    {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, origin))}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))
+                            _originsForCell(snapshots, cols, metric, port).map((origin) => {
+                              const oVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port, undefined, origin));
+                              if (allZero(oVals)) return null;
+                              return (
+                                <tr key={`${portKey}/${origin}`} className="border-b border-slate-900">
+                                  <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{origin}</td>
+                                  {oVals.map((v, i) => (
+                                    <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                  ))}
+                                </tr>
+                              );
+                            })
                           }
 
-                          {/* Issuer level (Issued: port → issuer) */}
-                          {portOpen && drill === "port_issuer" && _issuersForPort(snapshots, cols, port, metric === "Received" ? "received" : "issued").map((issuer) => (
-                            <tr key={`${portKey}/${issuer}`} className="border-b border-slate-900">
-                              <td className="text-slate-500 text-left py-0.5 italic" style={indent(2)}>{_displayFirmName(issuer)}</td>
-                              {cols.map((c, i) => (
-                                <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
-                                  {fmtCell(_arabicaRowValue(metric, snapshots, c, port, undefined, undefined, issuer))}
+                          {/* Issued: port → (member, side) — issuer side as
+                              negative (firm delivered out), stopper side as
+                              positive (firm took delivery). Rows reading 0
+                              across every column are dropped. */}
+                          {portOpen && drill === "port_member_signed" && _membersForPort(snapshots, cols, port).map(({ name, side }) => {
+                            const vals = cols.map((c) =>
+                              _arabicaRowValue(metric, snapshots, c, port, undefined, undefined, name, side),
+                            );
+                            if (allZero(vals)) return null;
+                            const tone = side === "issued" ? "text-rose-300/90" : "text-emerald-300/90";
+                            return (
+                              <tr key={`${portKey}/${name}/${side}`} className="border-b border-slate-900">
+                                <td className={`${tone} text-left py-0.5 italic`} style={indent(2)}>
+                                  {_displayFirmName(name)}
                                 </td>
-                              ))}
-                            </tr>
-                          ))}
+                                {vals.map((v, i) => (
+                                  <td key={i} className={`${tone} text-right py-0.5 px-1.5`}>{fmtSigned(v)}</td>
+                                ))}
+                              </tr>
+                            );
+                          })}
                         </Fragment>
                       );
                     });
@@ -1067,8 +1113,10 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
-          + Σpassed − stock. Issued / Received · per-clearing-member breakdown from ICE iss/recv
-          sheet (sell-side firms under Issued, buy-side firms under Received).
+          + Σpassed − stock. Issued · merges sell-side (issuer) and buy-side (stopper) flow per
+          port; member rows render the firm's signed flow (<span className="text-rose-300">−N</span>
+          = delivered out, <span className="text-emerald-300">+N</span> = took delivery). Rows
+          reading 0 across every period column are hidden.
         </div>
       </div>
     </div>
