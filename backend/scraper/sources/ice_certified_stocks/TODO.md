@@ -70,6 +70,27 @@ whether this should be Mon-Sun calendar week instead, or stay rolling.
 Nice-to-have: persist `expanded` Set to localStorage so the user's last
 drill state survives page reloads.
 
+### 11. Wire the workbook's new fields into the panel
+The synthesis import surfaces fields not yet rendered by the panel:
+- `arabica.latest_detail.issuers` — port × member × value (MONTH/TODAY). Plug
+  into the Arabica Issued row as `member_origin`-style drill (label as
+  member name like "Marex Capital", "ABN Amro Clearing USA"…) and flip
+  `ARABICA_DRILL["Issued"]` from `"none"` to `"member_origin"`.
+- `arabica.latest_detail.stoppers` — same, for receivers / buyers side.
+- `arabica.latest_detail.age_detail` — per port × age-bucket-in-days (e.g.
+  "0721 to 0750"). Drop the Regular/Transition split for arabica Stocks and
+  replace `ARABICA_AGE_BUCKETS` with the real ICE day buckets from this field.
+- `arabica.snapshots[].passed_today_bags / failed_today_bags` — now actually
+  populated daily by source (was idle-day text only). The panel already reads
+  these; just verify rendering.
+
+### 12. Deep-history chart background
+12 deep-chunk JSONs are on disk (`certified_stocks_<market>_deep_<years>.json`,
+1990–2029). Add a frontend toggle / lazy-loader that fetches the relevant
+chunks when the user expands the time-series chart's range beyond 365 days.
+Each chunk is light (date + total + by_port_totals, no by_origin) so even
+loading all 12 is < 2 MB total.
+
 ## Done (kept for reference)
 
 - ✅ Probe verified all 10 source URLs reachable from CI (no Akamai walls on
@@ -93,3 +114,10 @@ drill state survives page reloads.
 - ✅ Decertified per-port drill (both markets).
 - ✅ Robusta Issued drill: member → origin (from iss/recv.members).
 - ✅ Workflow `PYTHONUNBUFFERED=1` so long backfills show real-time progress.
+- ✅ Per-path rate limiting fix (2 s `/publicdocs/`, 5 s `/marketdata/`,
+  Retry-After cap at 90 s, abort on > 600 s penalty).
+- ✅ Manual-ingest importer for raw ICE source files
+  (`backend/scripts/import_ice_historical.py`).
+- ✅ Synthesis-workbook importer with zero-skip + 5-year deep history chunks
+  (`backend/scripts/import_synthesis_xlsx.py`).
+- ✅ 12 deep-history JSONs on disk: Arabica 2010–2029, Robusta 1990–2029.
