@@ -275,22 +275,35 @@ def pull_age_allowance(month_end: date) -> tuple[str, dict | None]:
 # ── Snapshot reductions (rich parsed dict → flat per-day row) ────────────────
 
 def _arabica_snapshot(d: date, parsed: dict) -> dict:
-    tc = parsed.get("total_certified") or {}
-    tr = parsed.get("transition") or {}
-    pg = parsed.get("pending_grading") or {}
-    rb = parsed.get("rebagging") or {}
+    # Keep full per-section hierarchy on each snapshot so the period-view drill-
+    # down (port → group → origin) can read history, not just latest_detail.
+    sections: dict[str, dict] = {}
+    for key in ("total_certified", "transition", "pending_grading", "rebagging"):
+        s = parsed.get(key) or {}
+        if s.get("grand_total") or s.get("by_origin"):
+            sections[key] = {
+                "grand_total": s.get("grand_total", 0),
+                "by_port":     s.get("by_port", {}),
+                "by_group":    s.get("by_group", {}),
+                "by_origin":   s.get("by_origin", {}),
+            }
+    tc = sections.get("total_certified", {})
     gt = parsed.get("grading_today") or {}
     return {
         "date":                 d.isoformat(),
         "report_date":          parsed.get("report_date"),
+        # Headline scalars (kept flat for cheap reads):
         "total_bags":           tc.get("grand_total", 0),
-        "transition_bags":      tr.get("grand_total", 0),
-        "pending_grading_bags": pg.get("grand_total", 0),
-        "rebagging_bags":       rb.get("grand_total", 0),
+        "transition_bags":      sections.get("transition", {}).get("grand_total", 0),
+        "pending_grading_bags": sections.get("pending_grading", {}).get("grand_total", 0),
+        "rebagging_bags":       sections.get("rebagging", {}).get("grand_total", 0),
         "passed_today_bags":    gt.get("passed_today_bags", 0),
         "failed_today_bags":    gt.get("failed_today_bags", 0),
+        # Convenience rollups (still flat for the headline charts):
         "by_port":              tc.get("by_port", {}),
         "by_group":             tc.get("by_group", {}),
+        # Full hierarchy — port × group × origin per section, drives drill-down.
+        "sections":             sections,
     }
 
 

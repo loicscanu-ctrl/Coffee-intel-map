@@ -1,11 +1,17 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
 
+interface SectionHierarchy {
+  grand_total: number;
+  by_port:   Record<string, number>;
+  by_group:  Record<string, number>;
+  by_origin: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
+}
 interface ArabicaSnap {
   date: string;
   report_date: string | null;
@@ -17,6 +23,15 @@ interface ArabicaSnap {
   failed_today_bags: number;
   by_port: Record<string, number>;
   by_group: Record<string, number>;
+  // Full hierarchy per section, populated by orchestrator. May be absent on
+  // snapshots written by an older run — the table falls back to the flat
+  // fields above when `sections` is undefined.
+  sections?: {
+    total_certified?: SectionHierarchy;
+    transition?:      SectionHierarchy;
+    pending_grading?: SectionHierarchy;
+    rebagging?:       SectionHierarchy;
+  };
 }
 interface MatrixSection {
   ports: string[];
@@ -191,87 +206,253 @@ function _closestSnap<T extends { date: string }>(snaps: T[], target: Date, maxD
   return best;
 }
 
+// Metric identities for the arabica period view.
+type ArabicaMetric =
+  | "Pending grading" | "Passed today" | "Failed today"
+  | "Passing rate"    | "Stocks"       | "Decert / issued";
+
+const ARABICA_METRICS: ArabicaMetric[] = [
+  "Pending grading", "Passed today", "Failed today",
+  "Passing rate",    "Stocks",       "Decert / issued",
+];
+
+// Which snapshot section a metric reads from, for drill-down. Metrics not in
+// this map are scalars (no per-port/group/origin data in the source).
+const _METRIC_TO_SECTION: Partial<Record<ArabicaMetric, keyof NonNullable<ArabicaSnap["sections"]>>> = {
+  "Pending grading": "pending_grading",
+  "Stocks":          "total_certified",
+};
+
+const ARABICA_GROUP_ORDER = ["Group 0", "Group 1", "Group 2", "Group 3", "Group 4", "Unknown"];
+
+interface Path { metric: ArabicaMetric; port?: string; group?: string; origin?: string }
+
+// Single value accessor — handles every drill level + the scalar metrics.
+function _arabicaValue(snap: ArabicaSnap | null, p: Path): number | null {
+  if (!snap) return null;
+
+  // Scalar metrics (no drill-down).
+  if (p.metric === "Passed today")     return snap.passed_today_bags ?? null;
+  if (p.metric === "Failed today")     return snap.failed_today_bags ?? null;
+  if (p.metric === "Passing rate") {
+    const t = (snap.passed_today_bags ?? 0) + (snap.failed_today_bags ?? 0);
+    return t === 0 ? null : (snap.passed_today_bags ?? 0) / t;       // ratio 0..1
+  }
+  if (p.metric === "Decert / issued")  return null;   // computed in renderer (needs prev)
+
+  // Hierarchical metrics (Stocks · Pending grading).
+  const sectKey = _METRIC_TO_SECTION[p.metric];
+  if (!sectKey) return null;
+  const sec = snap.sections?.[sectKey];
+  // Fallback to flat fields when older snapshots are missing `sections`.
+  if (!sec) {
+    if (p.port || p.group || p.origin) return null;
+    if (sectKey === "total_certified") return snap.total_bags;
+    if (sectKey === "pending_grading") return snap.pending_grading_bags;
+    return null;
+  }
+
+  if (!p.port && !p.group && !p.origin)   return sec.grand_total;
+  if (p.port && !p.group && !p.origin)    return sec.by_port?.[p.port] ?? null;
+  if (p.port && p.group && !p.origin) {
+    // Sum bags from origins assigned to this group that have a value at this port.
+    let total = 0;
+    for (const data of Object.values(sec.by_origin || {})) {
+      if (data.group === p.group) total += data.by_port?.[p.port] ?? 0;
+    }
+    return total;
+  }
+  if (p.port && p.group && p.origin) {
+    return sec.by_origin?.[p.origin]?.by_port?.[p.port] ?? null;
+  }
+  return null;
+}
+
+function _decertCell(snap: ArabicaSnap | null, prev: ArabicaSnap | null): number | null {
+  if (!snap || !prev) return null;
+  return prev.total_bags + snap.passed_today_bags - snap.total_bags;
+}
+
+// Union of ports / origins-in-group seen across the visible column snapshots.
+function _portsFromSnaps(snaps: (ArabicaSnap | null)[], sectKey: keyof NonNullable<ArabicaSnap["sections"]>): string[] {
+  const set = new Set<string>();
+  for (const s of snaps) {
+    const sec = s?.sections?.[sectKey];
+    if (!sec) continue;
+    Object.entries(sec.by_port || {}).forEach(([port, bags]) => { if (bags > 0) set.add(port); });
+  }
+  return Array.from(set).sort();
+}
+function _originsInGroup(snaps: (ArabicaSnap | null)[], sectKey: keyof NonNullable<ArabicaSnap["sections"]>, port: string, group: string): string[] {
+  const set = new Set<string>();
+  for (const s of snaps) {
+    const sec = s?.sections?.[sectKey];
+    if (!sec) continue;
+    for (const [origin, data] of Object.entries(sec.by_origin || {})) {
+      if (data.group !== group) continue;
+      const v = data.by_port?.[port] ?? 0;
+      if (v > 0) set.add(origin);
+    }
+  }
+  return Array.from(set).sort();
+}
+
 function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; unit: Unit }) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggle = (key: string) => setExpanded((prev) => {
+    const next = new Set(prev);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    return next;
+  });
+
   if (!snapshots.length) return <Pending label="Period view" />;
 
   const today = new Date();
   const cols = _periodColumns(today);
-
-  const data = cols.map((col) => {
+  const colData = cols.map((col) => {
     const snap = _closestSnap(snapshots, col.date);
-    if (!snap) return { col, snap: null as ArabicaSnap | null, prev: null as ArabicaSnap | null };
-    const idx = snapshots.findIndex((s) => s.date === snap.date);
+    const idx  = snap ? snapshots.findIndex((s) => s.date === snap.date) : -1;
     const prev = idx > 0 ? snapshots[idx - 1] : null;
     return { col, snap, prev };
   });
 
-  const fmtBagsCell = (n: number | null | undefined) =>
+  const fmtCell = (n: number | null | undefined): string =>
     n == null ? "—" : fmt(fromBags(n, unit), unit);
+  const fmtPct = (n: number | null | undefined): string =>
+    n == null ? "—" : `${Math.round(n * 100)}%`;
 
-  const rows: { label: string; values: string[] }[] = [
-    { label: "Pending grading", values: data.map((d) => fmtBagsCell(d.snap?.pending_grading_bags)) },
-    { label: "Passed today",    values: data.map((d) => fmtBagsCell(d.snap?.passed_today_bags)) },
-    { label: "Failed today",    values: data.map((d) => fmtBagsCell(d.snap?.failed_today_bags)) },
-    {
-      label: "Passing rate",
-      values: data.map((d) => {
-        if (!d.snap) return "—";
-        const tot = (d.snap.passed_today_bags ?? 0) + (d.snap.failed_today_bags ?? 0);
-        return tot === 0 ? "—" : `${Math.round((d.snap.passed_today_bags / tot) * 100)}%`;
-      }),
-    },
-    { label: "Stocks", values: data.map((d) => fmtBagsCell(d.snap?.total_bags)) },
-    {
-      label: "Decert / issued",
-      values: data.map((d) => {
-        if (!d.snap || !d.prev) return "—";
-        // Spec formula: prev_stock + passed_today − today_stock. Lumps any
-        // issuance + decertification together (arabica xls doesn't separate
-        // them; we'd need a deeper data source to split).
-        const v = d.prev.total_bags + d.snap.passed_today_bags - d.snap.total_bags;
-        return fmtBagsCell(v);
-      }),
-    },
-  ];
+  function valueForMetric(metric: ArabicaMetric, snap: ArabicaSnap | null, prev: ArabicaSnap | null): string {
+    if (metric === "Passing rate")    return fmtPct(_arabicaValue(snap, { metric }));
+    if (metric === "Decert / issued") return fmtCell(_decertCell(snap, prev));
+    return fmtCell(_arabicaValue(snap, { metric }));
+  }
+
+  const indent = (lvl: number) => ({ paddingLeft: 8 + lvl * 14 });
 
   return (
     <div>
       <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
-        Period view ({unitSuffix(unit)})
+        Period view ({unitSuffix(unit)}) — click <span className="text-amber-400">▸</span> on Stocks / Pending grading to drill: port → group → origin
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-[10px] font-mono border-collapse">
           <thead>
             <tr className="text-slate-500 border-b border-slate-800">
-              <th className="text-left py-1 pr-2 w-[110px]">Metric</th>
-              {cols.map((c) => (
-                <th key={c.label} className="text-right py-1 px-1.5">{c.label}</th>
-              ))}
+              <th className="text-left py-1 pr-2 w-[170px]">Metric</th>
+              {cols.map((c) => <th key={c.label} className="text-right py-1 px-1.5">{c.label}</th>)}
             </tr>
             <tr className="text-slate-700 text-[9px] border-b border-slate-900">
               <th className="text-left pb-1 pr-2" />
-              {data.map((d, i) => (
-                <th key={i} className="text-right pb-1 px-1.5">
-                  {d.snap ? d.snap.date.slice(5) : "—"}
-                </th>
+              {colData.map((d, i) => (
+                <th key={i} className="text-right pb-1 px-1.5">{d.snap ? d.snap.date.slice(5) : "—"}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.label} className="border-b border-slate-900 last:border-0">
-                <td className="text-slate-300 text-left py-1 pr-2">{r.label}</td>
-                {r.values.map((v, i) => (
-                  <td key={i} className="text-slate-100 text-right py-1 px-1.5">{v}</td>
-                ))}
-              </tr>
-            ))}
+            {ARABICA_METRICS.map((metric) => {
+              const sectKey = _METRIC_TO_SECTION[metric];
+              const canDrill = !!sectKey;
+              const isOpen = expanded.has(metric);
+              const arrow = canDrill ? (isOpen ? "▾" : "▸") : "  ";
+              const ports = canDrill && isOpen ? _portsFromSnaps(colData.map((d) => d.snap), sectKey!) : [];
+
+              return (
+                <Fragment key={metric}>
+                  <tr className="border-b border-slate-900">
+                    <td
+                      className={`text-slate-300 text-left py-1 ${canDrill ? "cursor-pointer hover:text-amber-300" : ""}`}
+                      style={indent(0)}
+                      onClick={() => canDrill && toggle(metric)}
+                    >
+                      <span className="text-amber-500/80 inline-block w-3">{arrow}</span>{" "}{metric}
+                    </td>
+                    {colData.map((d, i) => (
+                      <td key={i} className="text-slate-100 text-right py-1 px-1.5">
+                        {valueForMetric(metric, d.snap, d.prev)}
+                      </td>
+                    ))}
+                  </tr>
+
+                  {/* Port sub-rows */}
+                  {canDrill && isOpen && ports.map((port) => {
+                    const portKey = `${metric}/${port}`;
+                    const portOpen = expanded.has(portKey);
+                    return (
+                      <Fragment key={portKey}>
+                        <tr className="border-b border-slate-900 bg-slate-900/40">
+                          <td
+                            className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-amber-300"
+                            style={indent(1)}
+                            onClick={() => toggle(portKey)}
+                          >
+                            <span className="text-amber-500/60 inline-block w-3">{portOpen ? "▾" : "▸"}</span>{" "}{port}
+                          </td>
+                          {colData.map((d, i) => (
+                            <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">
+                              {fmtCell(_arabicaValue(d.snap, { metric, port }))}
+                            </td>
+                          ))}
+                        </tr>
+
+                        {/* Group sub-sub-rows */}
+                        {portOpen && ARABICA_GROUP_ORDER.map((group) => {
+                          const groupKey = `${portKey}/${group}`;
+                          const groupOpen = expanded.has(groupKey);
+                          // Only render group rows that have a value somewhere in the period.
+                          const anyVal = colData.some(
+                            (d) => (_arabicaValue(d.snap, { metric, port, group }) ?? 0) > 0,
+                          );
+                          if (!anyVal) return null;
+                          const origins = groupOpen
+                            ? _originsInGroup(colData.map((d) => d.snap), sectKey!, port, group)
+                            : [];
+                          return (
+                            <Fragment key={groupKey}>
+                              <tr className="border-b border-slate-900 bg-slate-900/20">
+                                <td
+                                  className="text-slate-500 text-left py-0.5 cursor-pointer hover:text-amber-300"
+                                  style={indent(2)}
+                                  onClick={() => toggle(groupKey)}
+                                >
+                                  <span className="text-amber-500/40 inline-block w-3">{groupOpen ? "▾" : "▸"}</span>{" "}{group}
+                                </td>
+                                {colData.map((d, i) => (
+                                  <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">
+                                    {fmtCell(_arabicaValue(d.snap, { metric, port, group }))}
+                                  </td>
+                                ))}
+                              </tr>
+
+                              {/* Origin leaves */}
+                              {groupOpen && origins.map((origin) => (
+                                <tr key={`${groupKey}/${origin}`} className="border-b border-slate-900">
+                                  <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>
+                                    {origin}
+                                  </td>
+                                  {colData.map((d, i) => (
+                                    <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">
+                                      {fmtCell(_arabicaValue(d.snap, { metric, port, group, origin }))}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </Fragment>
+                          );
+                        })}
+                      </Fragment>
+                    );
+                  })}
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>
       <div className="text-[9px] text-slate-600 italic mt-1">
         Closest snapshot per period (±7 days). Decert/issued = prev_stock + passed − stock.
-        Click-to-drill (port → group → origin) coming next — needs the full 180-day backfill first.
+        Drill-down only on Stocks &amp; Pending grading — Passed/Failed/Passing rate are scalars
+        in the source xls (no per-port breakdown published).
       </div>
     </div>
   );
