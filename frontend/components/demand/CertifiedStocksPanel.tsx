@@ -1114,7 +1114,7 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
           + Σpassed − stock. Issued · merges sell-side (issuer) and buy-side (stopper) flow per
-          port; member rows render the firm's signed flow (<span className="text-rose-300">−N</span>
+          port; member rows render the firm&apos;s signed flow (<span className="text-rose-300">−N</span>
           = delivered out, <span className="text-emerald-300">+N</span> = took delivery). Rows
           reading 0 across every period column are hidden.
         </div>
