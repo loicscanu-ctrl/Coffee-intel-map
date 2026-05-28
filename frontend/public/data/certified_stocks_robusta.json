@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-05-28T07:37:36+00:00",
+  "as_of": null,
+  "snapshots": [],
+  "latest_detail": {
+    "stock_report": null,
+    "stock_report_url": null
+  },
+  "recent_activity": {
+    "gradings": [],
+    "grading_appeals": [],
+    "iss_recv_daily": [],
+    "tenders": [],
+    "grading_overview": [],
+    "infested_warrants": []
+  },
+  "monthly": {
+    "iss_recv_monthly": [],
+    "age_allowance": []
+  }
+}
