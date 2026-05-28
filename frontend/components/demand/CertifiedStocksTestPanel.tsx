@@ -13,14 +13,19 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   AreaChart, Area, BarChart, Bar, ComposedChart, Line,
-  XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
+  XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
 
 // ── Data shapes (subset of the rich JSON — only what this view consumes) ─────
 
-interface ArabicaSnap { date: string; total_bags: number }
-interface RobustaSnap { date: string; total_lots_certified: number }
-interface ArabicaJson { snapshots: ArabicaSnap[]; as_of?: string | null }
+interface ArabicaSnap { date: string; total_bags: number; by_port?: Record<string, number> }
+interface RobustaSnap { date: string; total_lots_certified: number; by_port_lots?: Record<string, number> }
+interface ArabicaAgeBucketRow { age_bucket: string; bags: number }
+interface ArabicaJson {
+  snapshots: ArabicaSnap[];
+  as_of?: string | null;
+  latest_detail?: { age_detail?: Record<string, ArabicaAgeBucketRow[]>; age_detail_date?: string | null };
+}
 
 interface RobustaAgeBucket { months_since_graded: number; by_port: Record<string, number>; grand_total_mt: number }
 interface RobustaAgeMonth  { month_end: string; valid?: { ports?: string[]; buckets?: RobustaAgeBucket[] } | null }
@@ -138,6 +143,66 @@ function TightnessGauge({ title, current, min, max, rangeLabel, tightThreshold =
       </div>
     </div>
   );
+}
+
+// ── Coffee-bean fill widget (Warehouse Map) ──────────────────────────────────
+// 10 beans per port. Filled count = current / capacity (capacity = 365-day
+// historical max at that port, our best capacity proxy from the data we have).
+// Color encodes age bucket; empty beans are dimmed slate.
+
+type BeanBin = "fresh" | "mid" | "old" | "stale";
+const BEAN_COLOR: Record<BeanBin | "empty", string> = {
+  fresh: "#10b981",   // emerald — <6m
+  mid:   "#fbbf24",   // amber   — 6-12m
+  old:   "#f97316",   // orange  — 12-24m
+  stale: "#e11d48",   // rose    — 24m+
+  empty: "#1e293b",   // slate-800
+};
+
+function BeanIcon({ color }: { color: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+      <path fill={color} d="M16.5,5.5C14.7,3.8,11.8,3.5,9.3,4.6C6.8,5.6,5,7.8,4.5,10.4C4,13.1,4.7,15.9,6.5,17.7C8.3,19.4,11.2,19.7,13.7,18.6C16.2,17.6,18,15.4,18.5,12.8C19,10.1,18.3,7.3,16.5,5.5z" />
+      <path fill={color} fillOpacity="0.55" d="M12.2,11.5c-1.4,0.4-2.7,1.3-3.3,2.2c-0.3,0.5-0.5,1.2-0.3,1.8c0.2,0.6,0.6,1.1,1.2,1.3c0.5,0.2,1.2,0.3,1.8,0C14.1,16,15.5,14.6,16.8,11.8c0-0.2-0.1-0.4-0.3-0.5C15.1,11,13.6,11.1,12.2,11.5z" />
+    </svg>
+  );
+}
+
+interface AgeDist { fresh: number; mid: number; old: number; stale: number }   // values in 0..1 (shares)
+
+// Build the 10-bean array from current, capacity, age distribution.
+function generateBeans(current: number, capacity: number, age: AgeDist): BeanBin[] {
+  const MAX = 10;
+  const fillRatio = capacity > 0 ? Math.min(1, current / capacity) : 0;
+  const filled = current > 0 ? Math.max(1, Math.round(fillRatio * MAX)) : 0;
+  const fresh = Math.round(filled * age.fresh);
+  const mid   = Math.round(filled * age.mid);
+  const old   = Math.round(filled * age.old);
+  const stale = filled - fresh - mid - old;
+  const beans: BeanBin[] = [];
+  for (let i = 0; i < fresh; i++) beans.push("fresh");
+  for (let i = 0; i < mid;   i++) beans.push("mid");
+  for (let i = 0; i < old;   i++) beans.push("old");
+  for (let i = 0; i < stale; i++) beans.push("stale");
+  return beans;
+}
+
+// Port-name lookups (small subset — full versions live in CertifiedStocksPanel).
+const ARABICA_PORT_NAMES: Record<string, string> = {
+  ANT: "Antwerp", "HA/BR": "Hamburg/Bremen", HA: "Hamburg/Bremen", HAM: "Hamburg",
+  HOU: "Houston", HO: "Houston", MIA: "Miami", MI: "Miami",
+  NO: "New Orleans", NOR: "Norfolk", NY: "New York", NYK: "New York", VIR: "Virginia",
+};
+const ROBUSTA_PORT_NAMES: Record<string, string> = {
+  AMS: "Amsterdam", ANT: "Antwerp", BAR: "Barcelona", BRE: "Bremen",
+  FEL: "Felixstowe", GEN: "Genoa", HAM: "Hamburg", LEH: "Le Havre",
+  LIV: "Liverpool", LON: "London", NYK: "New York", ROT: "Rotterdam", TRI: "Trieste",
+};
+
+interface PortFill {
+  code: string; name: string; region: "RC" | "KC";
+  current: number; capacity: number; unit: "lots" | "bags"; pctFull: number;
+  age: AgeDist; staleShare: number;
 }
 
 // ── Main test panel ──────────────────────────────────────────────────────────
@@ -344,6 +409,192 @@ export default function CertifiedStocksTestPanel() {
         pending,
       };
     });
+  }, [robusta]);
+
+  // ── Warehouse fill grid — both markets, port × age × capacity ─────────────
+  // Capacity is proxied by the past-365d max at that port (we don't scrape
+  // ICE's published warehouse limits). Age distribution: robusta from the
+  // latest age_allowance month, arabica from latest_detail.age_detail
+  // (day buckets converted to month bins).
+  const warehouseFill = useMemo<{ kc: PortFill[]; rc: PortFill[]; ageDate: string | null }>(() => {
+    // ── Robusta ─────────────────────────────────────────────────────────
+    const rSnaps = robusta?.snapshots ?? [];
+    const rLatest = rSnaps.length ? rSnaps[rSnaps.length - 1] : null;
+    const rMaxByPort = new Map<string, number>();
+    for (const s of rSnaps) {
+      for (const [p, v] of Object.entries(s.by_port_lots || {})) {
+        if (v > (rMaxByPort.get(p) ?? 0)) rMaxByPort.set(p, v);
+      }
+    }
+    const rAgeMonth = (robusta?.monthly?.age_allowance ?? [])
+      .reduce<RobustaAgeMonth | null>((acc, m) =>
+        !acc || new Date(m.month_end) > new Date(acc.month_end) ? m : acc, null);
+    const rAgeByPort: Record<string, AgeDist> = {};
+    for (const b of (rAgeMonth?.valid?.buckets ?? [])) {
+      const bin: BeanBin = b.months_since_graded < 6 ? "fresh"
+                        : b.months_since_graded < 12 ? "mid"
+                        : b.months_since_graded < 24 ? "old"
+                        : "stale";
+      for (const [p, mt] of Object.entries(b.by_port || {})) {
+        rAgeByPort[p] = rAgeByPort[p] ?? { fresh: 0, mid: 0, old: 0, stale: 0 };
+        rAgeByPort[p][bin] += Number(mt) || 0;
+      }
+    }
+    const rc: PortFill[] = Object.entries(rLatest?.by_port_lots || {})
+      .filter(([, v]) => v > 0)
+      .map(([code, current]) => {
+        const ageRaw = rAgeByPort[code] ?? { fresh: 0, mid: 0, old: 0, stale: 0 };
+        const total = ageRaw.fresh + ageRaw.mid + ageRaw.old + ageRaw.stale;
+        const age: AgeDist = total > 0
+          ? { fresh: ageRaw.fresh / total, mid: ageRaw.mid / total, old: ageRaw.old / total, stale: ageRaw.stale / total }
+          : { fresh: 1, mid: 0, old: 0, stale: 0 };
+        const capacity = Math.max(rMaxByPort.get(code) ?? current, current);
+        return {
+          code,
+          name: ROBUSTA_PORT_NAMES[code] ?? code,
+          region: "RC" as const,
+          current,
+          capacity,
+          unit: "lots" as const,
+          pctFull: capacity > 0 ? (current / capacity) * 100 : 0,
+          age,
+          staleShare: age.stale,
+        };
+      })
+      .sort((a, b) => b.current - a.current);
+
+    // ── Arabica ─────────────────────────────────────────────────────────
+    const aSnaps = arabica?.snapshots ?? [];
+    const aLatest = aSnaps.length ? aSnaps[aSnaps.length - 1] : null;
+    const aMaxByPort = new Map<string, number>();
+    for (const s of aSnaps) {
+      for (const [p, v] of Object.entries(s.by_port || {})) {
+        if (v > (aMaxByPort.get(p) ?? 0)) aMaxByPort.set(p, v);
+      }
+    }
+    const aAgeByPort: Record<string, AgeDist> = {};
+    const ageDetail = arabica?.latest_detail?.age_detail ?? {};
+    for (const [port, rows] of Object.entries(ageDetail)) {
+      const dist: AgeDist = { fresh: 0, mid: 0, old: 0, stale: 0 };
+      for (const r of rows) {
+        // age_bucket looks like "0721 to 0750" — days since grading.
+        const m = r.age_bucket?.match(/^(\d+)/);
+        const days = m ? parseInt(m[1], 10) : 0;
+        const bin: BeanBin = days < 180 ? "fresh" : days < 360 ? "mid" : days < 720 ? "old" : "stale";
+        dist[bin] += r.bags || 0;
+      }
+      aAgeByPort[port] = dist;
+    }
+    const kc: PortFill[] = Object.entries(aLatest?.by_port || {})
+      .filter(([, v]) => v > 0)
+      .map(([code, current]) => {
+        const ageRaw = aAgeByPort[code] ?? { fresh: 0, mid: 0, old: 0, stale: 0 };
+        const total = ageRaw.fresh + ageRaw.mid + ageRaw.old + ageRaw.stale;
+        const age: AgeDist = total > 0
+          ? { fresh: ageRaw.fresh / total, mid: ageRaw.mid / total, old: ageRaw.old / total, stale: ageRaw.stale / total }
+          : { fresh: 1, mid: 0, old: 0, stale: 0 };
+        const capacity = Math.max(aMaxByPort.get(code) ?? current, current);
+        return {
+          code,
+          name: ARABICA_PORT_NAMES[code] ?? code,
+          region: "KC" as const,
+          current,
+          capacity,
+          unit: "bags" as const,
+          pctFull: capacity > 0 ? (current / capacity) * 100 : 0,
+          age,
+          staleShare: age.stale,
+        };
+      })
+      .sort((a, b) => b.current - a.current);
+
+    return { kc, rc, ageDate: rAgeMonth?.month_end ?? arabica?.latest_detail?.age_detail_date ?? null };
+  }, [robusta, arabica]);
+
+  // ── Today's robusta certification pipeline ────────────────────────────
+  // Counts come from the most recent gradings event + grading_overview.
+  // "Decertified today" is computed as the day-over-day stock delta minus
+  // the day's passed lots (i.e. coffee that left the certified pool).
+  const todaysPipeline = useMemo(() => {
+    const grad = robusta?.recent_activity?.gradings ?? [];
+    const overv = robusta?.recent_activity?.grading_overview ?? [];
+    const snaps = robusta?.snapshots ?? [];
+    if (grad.length === 0 && overv.length === 0 && snaps.length < 2) return null;
+    // Most recent gradings event drives the pass/fail breakdown.
+    const lastGrad = grad.length ? grad[grad.length - 1] : null;
+    let passedPremium = 0, passedBorderline = 0, failed = 0;
+    for (const e of (lastGrad?.entries || [])) {
+      const lots = e.lots || 0;
+      if (e.tenderable === false) { failed += lots; continue; }
+      if (e.class === 3 || e.class === 4) passedBorderline += lots;
+      else passedPremium += lots;
+    }
+    const graded = passedPremium + passedBorderline + failed;
+    // Pending: nearest grading_overview to lastGrad.date (within 14 days).
+    let pendingQueue = 0, pendingForecast = 0;
+    if (lastGrad) {
+      const target = new Date(lastGrad.date).getTime();
+      let best: RobustaOverviewEvent | null = null; let bestDist = Infinity;
+      for (const o of overv) {
+        const dist = Math.abs(new Date(o.date).getTime() - target);
+        if (dist < bestDist) { best = o; bestDist = dist; }
+      }
+      if (best && bestDist < 14 * 86_400_000) {
+        pendingQueue    = best.queue_lots    ?? 0;
+        pendingForecast = best.forecast_lots ?? 0;
+      }
+    }
+    const tendered = graded + pendingQueue;
+    // Decertified ≈ −(stock_delta) + passed_tenderable (those that entered).
+    // Use the latest two snapshots that bracket lastGrad.date.
+    let decertified = 0;
+    if (snaps.length >= 2) {
+      const cur = snaps[snaps.length - 1];
+      const prev = snaps[snaps.length - 2];
+      const delta = (cur.total_lots_certified || 0) - (prev.total_lots_certified || 0);
+      const passed = passedPremium + passedBorderline;
+      decertified = Math.max(0, passed - delta);
+    }
+    return {
+      date: lastGrad?.date ?? null,
+      tendered, pendingQueue, pendingForecast,
+      graded, passedPremium, passedBorderline, failed,
+      decertified,
+    };
+  }, [robusta]);
+
+  // ── Lifecycle: 30-day issued vs decertified ───────────────────────────
+  // Per snapshot date (last 30): issued = passed tenderable lots from
+  // gradings on that date; decertified = previous_total + issued - current_total.
+  // Issued plotted positive, decertified plotted negative for the drawdown
+  // visual. `net` line = issued − decertified.
+  const lifecycle = useMemo(() => {
+    const snaps = robusta?.snapshots ?? [];
+    const grad = robusta?.recent_activity?.gradings ?? [];
+    if (snaps.length < 2) return [];
+    const gradByDate = new Map<string, RobustaGradingEvent>();
+    for (const g of grad) gradByDate.set(g.date, g);
+    const last30 = snaps.slice(-30);
+    const out: Array<{ date: string; displayDate: string; issued: number; decertified: number; net: number }> = [];
+    for (let i = 1; i < last30.length; i++) {
+      const cur = last30[i];
+      const prev = last30[i - 1];
+      const g = gradByDate.get(cur.date);
+      let issuedToday = 0;
+      for (const e of (g?.entries || [])) {
+        if (e.tenderable !== false) issuedToday += e.lots || 0;
+      }
+      const stockDelta = (cur.total_lots_certified || 0) - (prev.total_lots_certified || 0);
+      const decertifiedToday = Math.max(0, issuedToday - stockDelta);
+      out.push({
+        date: cur.date,
+        displayDate: fmtShortDate(cur.date),
+        issued: issuedToday,
+        decertified: -decertifiedToday,
+        net: issuedToday - decertifiedToday,
+      });
+    }
+    return out;
   }, [robusta]);
 
   return (
@@ -576,6 +827,207 @@ export default function CertifiedStocksTestPanel() {
               <strong>Read:</strong> growing yellow band = origins tendering lower-quality
               (class 3/4) crop even as the headline pass rate looks stable.
               Rising purple line = pipeline backing up, future supply pressure.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Warehouse fill & age — bean visualization */}
+      <div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-3 pb-2 border-b border-slate-800 gap-2">
+          <div>
+            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <span className="text-indigo-400">⬢</span>
+              Global warehouse fill &amp; age profile
+            </h3>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              1 bean = 10% of the port&apos;s 365-day peak capacity. Bean color = age bucket.
+              {warehouseFill.ageDate && (
+                <span> Age snapshot: <span className="font-mono">{warehouseFill.ageDate.slice(0, 10)}</span>.</span>
+              )}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] bg-slate-950 px-3 py-1.5 rounded border border-slate-800">
+            <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5" />&lt;6m</span>
+            <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5" />6-12m</span>
+            <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-orange-500 mr-1.5" />12-24m</span>
+            <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-600 mr-1.5" />24m+</span>
+          </div>
+        </div>
+
+        {(["KC", "RC"] as const).map((market) => {
+          const ports = market === "KC" ? warehouseFill.kc : warehouseFill.rc;
+          if (ports.length === 0) return null;
+          const label = market === "KC" ? "Arabica (KC) — US ports" : "Robusta (RC) — European ports";
+          return (
+            <div key={market} className="mb-4">
+              <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">{label}</div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {ports.map((p) => {
+                  const beans = generateBeans(p.current, p.capacity, p.age);
+                  return (
+                    <div key={`${market}-${p.code}`} className="bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+                      <div className="flex justify-between items-baseline mb-1.5">
+                        <div>
+                          <span className="text-sm font-semibold text-slate-200">{p.name}</span>
+                          <span className="text-[10px] font-mono text-slate-500 ml-2 uppercase">{p.code} · {p.region}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-sm font-mono font-bold text-white">
+                            {p.unit === "lots" ? fmtNum(p.current) : `${(p.current / 1000).toFixed(0)}k`}
+                          </span>
+                          <span className="text-[10px] text-slate-500 ml-1">/ {p.unit === "lots" ? fmtNum(p.capacity) : `${(p.capacity / 1000).toFixed(0)}k`} {p.unit}</span>
+                          <div className={`text-[10px] font-bold ${p.pctFull > 80 ? "text-rose-400" : p.pctFull > 50 ? "text-amber-400" : "text-slate-500"}`}>
+                            {Math.round(p.pctFull)}% of peak
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-slate-950/80 px-2 py-1.5 rounded border border-slate-800/60 flex justify-between items-center">
+                        {Array.from({ length: 10 }).map((_, i) => {
+                          const bin = beans[i];
+                          return <BeanIcon key={i} color={bin ? BEAN_COLOR[bin] : BEAN_COLOR.empty} />;
+                        })}
+                      </div>
+                      {p.staleShare > 0.25 && (
+                        <div className="mt-1.5 flex items-center text-[10px] text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/20">
+                          <span className="mr-1">⚠</span>
+                          {Math.round(p.staleShare * 100)}% of stock is 24m+ — heavy age-allowance penalty.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+        {warehouseFill.kc.length === 0 && warehouseFill.rc.length === 0 && (
+          <div className="text-xs text-slate-600 italic">No warehouse data loaded yet.</div>
+        )}
+      </div>
+
+      {/* Pipeline & issuance dynamics */}
+      <div>
+        <h3 className="text-base font-bold text-slate-100 pb-2 border-b border-slate-800 mb-4">
+          Pipeline &amp; issuance dynamics
+          <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">robusta</span>
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Today's pipeline — flow diagram */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-amber-400">→</span>
+              <h4 className="text-xs uppercase tracking-wider font-semibold text-slate-300">
+                Latest day&apos;s certification pipeline
+              </h4>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-4">
+              Lots moving through grading on{" "}
+              <span className="font-mono">{todaysPipeline?.date ?? "—"}</span>. Watch the borderline share.
+            </p>
+
+            {!todaysPipeline ? (
+              <div className="text-xs text-slate-600 italic">No gradings event loaded.</div>
+            ) : (
+              <>
+                <div className="relative">
+                  <div className="absolute top-8 left-8 right-8 h-px bg-slate-800 z-0" />
+                  <div className="flex justify-between items-start relative z-10">
+                    {/* Tendered */}
+                    <div className="flex flex-col items-center w-20">
+                      <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center mb-1.5">
+                        <span className="font-mono font-bold text-sm text-white">{fmtNum(todaysPipeline.tendered)}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Tendered</span>
+                      <span className="text-[9px] text-amber-400 mt-0.5">{fmtNum(todaysPipeline.pendingQueue)} pending</span>
+                    </div>
+
+                    <span className="text-slate-600 text-xl mt-5">→</span>
+
+                    {/* Graded */}
+                    <div className="flex flex-col items-center w-20">
+                      <div className="w-16 h-16 rounded-full bg-indigo-900/50 border-2 border-indigo-500 flex items-center justify-center mb-1.5"
+                           style={{ boxShadow: "0 0 12px rgba(99,102,241,0.15)" }}>
+                        <span className="font-mono font-bold text-sm text-indigo-200">{fmtNum(todaysPipeline.graded)}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase">Graded</span>
+                    </div>
+
+                    <span className="text-slate-600 text-xl mt-5">→</span>
+
+                    {/* Outcomes */}
+                    <div className="flex flex-col space-y-1.5 flex-1 ml-2">
+                      <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2 py-1 rounded">
+                        <span className="text-[10px] text-emerald-300">✓ Premium pass</span>
+                        <span className="font-mono font-bold text-sm text-emerald-300">{fmtNum(todaysPipeline.passedPremium)}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2 py-1 rounded">
+                        <span className="text-[10px] text-amber-300">⚠ Borderline pass</span>
+                        <span className="font-mono font-bold text-sm text-amber-300">{fmtNum(todaysPipeline.passedBorderline)}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2 py-1 rounded">
+                        <span className="text-[10px] text-rose-300">✕ Failed</span>
+                        <span className="font-mono font-bold text-sm text-rose-300">{fmtNum(todaysPipeline.failed)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 bg-slate-950 border border-slate-800 px-3 py-2 rounded flex items-center justify-between">
+                  <div className="flex items-center text-[10px] text-slate-400">
+                    <span className="mr-1.5 text-rose-500">🗑</span>
+                    Decertified that day (aged-out / withdrawn — inferred)
+                  </div>
+                  <span className="font-mono font-bold text-sm text-rose-400">{fmtNum(todaysPipeline.decertified)} lots</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Net issuance vs decertification chart */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-amber-400">⇣</span>
+              <h4 className="text-xs uppercase tracking-wider font-semibold text-slate-300">
+                Net issuance vs decertification
+              </h4>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3">
+              Building or bleeding the certified pool? Last {lifecycle.length || 30} days, lots-native.
+            </p>
+            <div className="h-56 w-full">
+              {lifecycle.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-xs text-slate-600">
+                  not enough snapshots to compute lifecycle
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <ComposedChart data={lifecycle} margin={{ top: 4, right: 0, left: -10, bottom: 0 }} stackOffset="sign">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                    <ReferenceLine y={0} stroke="#64748b" />
+                    <XAxis dataKey="displayDate" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} minTickGap={20} />
+                    <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false}
+                           tickFormatter={(v: number) => fmtNum(v)} />
+                    <Tooltip
+                      cursor={{ fill: "#1e293b" }}
+                      contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", fontSize: 11 }}
+                      formatter={(v) => `${fmtNum(Math.abs(Number(v ?? 0)))} lots`}
+                    />
+                    <Legend verticalAlign="top" height={28} iconType="circle"
+                            wrapperStyle={{ fontSize: 10, color: "#cbd5e1" }} />
+                    <Bar dataKey="issued"      name="issued (passed)"   fill="#10b981" stackId="x" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="decertified" name="decertified"       fill="#f43f5e" stackId="x" radius={[0, 0, 3, 3]} />
+                    <Line type="monotone" dataKey="net" name="net flow" stroke="#eab308" strokeWidth={2.4} dot={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+            <div className="mt-3 bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 rounded text-[10px] text-indigo-300">
+              <strong>Read:</strong> green bars above zero = today&apos;s passed lots entering
+              the certified pool; rose below zero = lots leaving (aged-out or withdrawn).
+              Yellow line = net change. Persistent net-negative weeks = bleeding inventory.
             </div>
           </div>
         </div>
