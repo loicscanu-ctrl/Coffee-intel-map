@@ -32,17 +32,35 @@ DEBUG_DIR = ROOT / "debug" / "ice_probe"
 
 # Direct file URLs (publicdocs paths). The user confirmed these bypass the
 # Report Center captcha when hit directly; the captcha only gates the catalog
-# /report/{id} pages. Dates are hardcoded to known-good samples for this probe
-# — the real scraper will compute them dynamically.
+# /report/{id} pages. Dates / suffixes are hardcoded to known-good samples for
+# this probe — the real scraper will compute or enumerate them dynamically.
+#
+# Suffix patterns to figure out at scraper time:
+#   - Stock_Report_RC_YYYYMMDD_HHMMSS.csv   ← HHMMSS = publish time
+#   - gradrc_YYMMDD-N.txt / apprc_YYMMDD-N.txt  ← -N = sequence #
 CANDIDATES: list[tuple[str, str]] = [
+    # Arabica — ICE Futures US (single combined daily file)
     ("arabica_daily_xls",
      "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260527.xls"),
+    # Robusta — ICE Futures Europe (split across 9 sources)
+    ("robusta_stock_report_csv",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260527_103021.csv"),
     ("robusta_age_allowance_xlsx",
      "https://www.ice.com/marketdata/publicdocs/liffe/coffee/aged_allowance_stock_report/Robusta_Coffee_Age_Allowance_20260430.xlsx"),
-    ("robusta_grading_pdf",
+    ("robusta_grading_overview_pdf",
      "https://www.ice.com/marketdata/publicdocs/liffe/coffee/grading_overview/GradingOverviewCoffee_260521.pdf"),
-    ("robusta_issuers_receivers_txt",
+    ("robusta_gradings_txt",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/gradings/gradrc_260521-1.txt"),
+    ("robusta_iss_recv_daily_txt",
      "https://www.ice.com/marketdata/publicdocs/liffe/coffee/daily_issuers_receivers/irrrc_260522.txt"),
+    ("robusta_iss_recv_monthly_txt",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/monthly_issuers_receivers/irrrc_m260331.txt"),
+    ("robusta_grading_appeals_txt",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/grading_appeals/apprc_250923-1.txt"),
+    ("robusta_tenders_txt",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/tenders/tendrc_260522.txt"),
+    ("robusta_infested_warrant_pdf",
+     "https://www.ice.com/marketdata/publicdocs/liffe/coffee/infested_warrant_report/INFESTEDCOFFEEWARRANT_251215.pdf"),
 ]
 
 BROWSER_HEADERS = {
@@ -218,11 +236,12 @@ def _attempt(name: str, url: str, headers: dict, tag: str) -> tuple[int | None, 
             DEBUG_DIR.mkdir(parents=True, exist_ok=True)
             ext = _EXT_BY_VERDICT.get(verdict, "bin")
             (DEBUG_DIR / f"{name}__{tag}.{ext}").write_bytes(raw)
-            # Inline preview for plain text (we won't get the issuers/receivers
-            # file off the artifact otherwise; binary formats stay artifact-only).
-            if verdict == "plain text" and tag == "browser":
-                lines = [ln for ln in raw.decode("utf-8", "ignore").splitlines() if ln.strip()][:25]
-                print("      first non-empty lines:")
+            # Inline preview for text-like bodies (CSV + plain .txt) so we can
+            # read the structure straight from the CI logs without downloading
+            # the artifact. Binary formats (.xls/.xlsx/.pdf) stay artifact-only.
+            if verdict in ("plain text", "CSV") and tag == "browser":
+                lines = [ln for ln in raw.decode("utf-8", "ignore").splitlines() if ln.strip()][:30]
+                print(f"      first non-empty lines ({verdict}):")
                 for ln in lines:
                     print(f"        {ln[:200]}")
         return r.status_code, verdict, (r.text if r.status_code == 200 else "")
