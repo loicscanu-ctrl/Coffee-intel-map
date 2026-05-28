@@ -2,13 +2,15 @@
 import { useState } from "react";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
+import AgronomyArticles from "./AgronomyArticles";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",        label: "COT & positioning" },
   { id: "weather",    label: "Weather" },
   { id: "fertilizer", label: "Fertilizer" },
   { id: "contracts",  label: "Contract rules" },
+  { id: "agronomy",   label: "Agronomy" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -431,6 +433,7 @@ export default function ResearchView() {
       {cat === "weather" && <FrostRiskMethodology />}
       {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
+      {cat === "agronomy"  && <AgronomyArticles />}
     </>
   );
 }
