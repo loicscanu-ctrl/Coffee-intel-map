@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Suspense } from "react";
 
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
@@ -11,6 +11,7 @@ import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
+import { useUrlState } from "@/lib/useUrlState";
 
 type SubTab = "destination" | "certified" | "demand" | "listed";
 
@@ -20,13 +21,28 @@ const TABS: { id: SubTab; label: string }[] = [
   { id: "demand",      label: "Demand" },
   { id: "listed",      label: "Listed stocks" },
 ];
+const SUB_TABS = TABS.map((t) => t.id) as SubTab[];
 
 function Section({ children }: { children: React.ReactNode }) {
   return <div className="border-b border-slate-700 bg-slate-950">{children}</div>;
 }
 
 export default function DemandPage() {
-  const [tab, setTab] = useState<SubTab>("destination");
+  // useUrlState reads `useSearchParams`, which Next 14 requires to live
+  // under a Suspense boundary during static prerender (see /futures).
+  return (
+    <Suspense fallback={<div className="h-full bg-slate-950" />}>
+      <DemandPageInner />
+    </Suspense>
+  );
+}
+
+function DemandPageInner() {
+  // Deep-linkable sub-tab via `?tab=certified` — bookmarks, share-links,
+  // and the browser back button all behave correctly.
+  const [tab, setTab] = useUrlState<SubTab>("tab", "destination", (raw) =>
+    (SUB_TABS as string[]).includes(raw) ? (raw as SubTab) : "destination",
+  );
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
