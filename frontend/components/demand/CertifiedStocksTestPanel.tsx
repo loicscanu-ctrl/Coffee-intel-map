@@ -12,7 +12,8 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  AreaChart, Area, BarChart, Bar, ComposedChart, Line,
+  XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
 // ── Data shapes (subset of the rich JSON — only what this view consumes) ─────
@@ -20,7 +21,18 @@ import {
 interface ArabicaSnap { date: string; total_bags: number }
 interface RobustaSnap { date: string; total_lots_certified: number }
 interface ArabicaJson { snapshots: ArabicaSnap[]; as_of?: string | null }
-interface RobustaJson { snapshots: RobustaSnap[]; as_of?: string | null }
+
+interface RobustaAgeBucket { months_since_graded: number; by_port: Record<string, number>; grand_total_mt: number }
+interface RobustaAgeMonth  { month_end: string; valid?: { ports?: string[]; buckets?: RobustaAgeBucket[] } | null }
+interface RobustaGradingEntry { port?: string; origin?: string; class?: number | null; tenderable?: boolean; lots: number }
+interface RobustaGradingEvent { date: string; entries?: RobustaGradingEntry[] }
+interface RobustaOverviewEvent { date: string; total_pending_lots?: number | null; queue_lots?: number | null; forecast_lots?: number | null }
+interface RobustaJson {
+  snapshots: RobustaSnap[];
+  as_of?: string | null;
+  monthly?: { age_allowance?: RobustaAgeMonth[] };
+  recent_activity?: { gradings?: RobustaGradingEvent[]; grading_overview?: RobustaOverviewEvent[] };
+}
 
 // Deep-chunk shape is lighter still — only need date + total here.
 interface DeepRow { date: string; total: number }
@@ -256,6 +268,84 @@ export default function CertifiedStocksTestPanel() {
     };
   }, [deepArabica, deepRobusta]);
 
+  // ── Port × age matrix (Robusta only — only robusta publishes age allowance) ──
+  // Source: monthly.age_allowance — the most recent month_end.
+  // Bucket-month groupings:
+  //   fresh = months 1–5   (< 6 months since graded)
+  //   mid   = months 6–11  (6–12 months — still inside free allowance period)
+  //   old   = months 12–23 (12–24 months — discount kicks in at month 13)
+  //   stale = months 24+   (heavy age allowance — physical buyers shun these)
+  // Values converted MT → lots so the chart axis matches the rest of the panel.
+  const portQuality = useMemo(() => {
+    const months = robusta?.monthly?.age_allowance ?? [];
+    if (months.length === 0) return { rows: [] as Array<{ port: string; fresh: number; mid: number; old: number; stale: number; total: number }>, monthLabel: null as string | null };
+    // Pick the most recent month_end.
+    const latestMonth = months.reduce((acc, m) =>
+      new Date(m.month_end) > new Date(acc.month_end) ? m : acc, months[0]);
+    const buckets = latestMonth.valid?.buckets ?? [];
+    const perPort = new Map<string, { fresh: number; mid: number; old: number; stale: number }>();
+    for (const b of buckets) {
+      const ms = b.months_since_graded;
+      const bin =
+        ms < 6  ? "fresh"
+        : ms < 12 ? "mid"
+        : ms < 24 ? "old"
+        : "stale";
+      for (const [port, mt] of Object.entries(b.by_port || {})) {
+        const lots = (Number(mt) || 0) / TONNES_PER_LOT;
+        if (lots <= 0) continue;
+        const cur = perPort.get(port) ?? { fresh: 0, mid: 0, old: 0, stale: 0 };
+        cur[bin] += lots;
+        perPort.set(port, cur);
+      }
+    }
+    const rows = Array.from(perPort.entries())
+      .map(([port, v]) => ({ port, ...v, total: v.fresh + v.mid + v.old + v.stale }))
+      .sort((a, b) => b.total - a.total);
+    return { rows, monthLabel: latestMonth.month_end?.slice(0, 7) ?? null };
+  }, [robusta]);
+
+  // ── Grading velocity & yield (Robusta — last 14 days) ─────────────────────
+  // Daily passed (premium / borderline) + failed bars, line = pending queue.
+  // Premium  = tenderable & class ∈ {null, 1, 2}
+  // Borderline = tenderable & class ∈ {3, 4}  — same poison criteria the
+  //               main panel uses; reuse for visual continuity.
+  // Failed   = not tenderable.
+  // Pending  = grading_overview.total_pending_lots for the same day (nearest).
+  const pipelineFlow = useMemo(() => {
+    const grad  = robusta?.recent_activity?.gradings        ?? [];
+    const overv = robusta?.recent_activity?.grading_overview ?? [];
+    if (grad.length === 0 && overv.length === 0) return [];
+    const overviewByDate = new Map(overv.map((o) => [o.date, o]));
+    // Pull the last 14 unique dates seen across the two streams.
+    const allDates = new Set<string>();
+    grad.forEach((g) => allDates.add(g.date));
+    overv.forEach((o) => allDates.add(o.date));
+    const sorted = Array.from(allDates).sort();
+    const last14 = sorted.slice(-14);
+
+    return last14.map((d) => {
+      let passedPremium = 0, passedBorderline = 0, failed = 0;
+      const ev = grad.find((g) => g.date === d);
+      for (const e of (ev?.entries || [])) {
+        const lots = e.lots || 0;
+        if (e.tenderable === false) { failed += lots; continue; }
+        const cls = e.class;
+        if (cls === 3 || cls === 4) passedBorderline += lots;
+        else passedPremium += lots;
+      }
+      const pending = overviewByDate.get(d)?.total_pending_lots ?? null;
+      return {
+        date: d,
+        displayDate: fmtShortDate(d),
+        passedPremium,
+        passedBorderline,
+        failed,
+        pending,
+      };
+    });
+  }, [robusta]);
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -380,6 +470,114 @@ export default function CertifiedStocksTestPanel() {
             (tight market). Emerald = top 30% (loose). 5Y window pulled from
             the deep-history chunks.
           </p>
+        </div>
+      </div>
+
+      {/* Multi-dimensional intelligence */}
+      <div>
+        <h3 className="text-base font-bold text-slate-100 pb-2 border-b border-slate-800 mb-4">
+          Multi-dimensional intelligence
+          <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">robusta</span>
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Card 1 — Port × age matrix */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-amber-400">◈</span>
+              <h4 className="text-xs uppercase tracking-wider font-semibold text-slate-300">
+                Port quality matrix (location × staleness)
+              </h4>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3">
+              Stacked lots per warehouse, broken down by age allowance bucket.
+              Robusta age-allowance month-end {portQuality.monthLabel ?? "—"}.
+            </p>
+            <div className="h-56 w-full">
+              {portQuality.rows.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-xs text-slate-600">
+                  no age-allowance data
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <BarChart data={portQuality.rows} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                    <XAxis dataKey="port" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false}
+                           tickFormatter={(v: number) => `${(v / 1000).toFixed(1)}k`} />
+                    <Tooltip
+                      cursor={{ fill: "#1e293b" }}
+                      contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", fontSize: 11 }}
+                      itemStyle={{ fontSize: 11 }}
+                      formatter={(v) => `${fmtNum(Number(v ?? 0))} lots`}
+                    />
+                    <Legend verticalAlign="top" height={28} iconType="circle"
+                            wrapperStyle={{ fontSize: 10, color: "#cbd5e1" }} />
+                    <Bar dataKey="fresh"  name="< 6m (premium)"    stackId="a" fill="#10b981" />
+                    <Bar dataKey="mid"    name="6–12m (standard)"  stackId="a" fill="#fbbf24" />
+                    <Bar dataKey="old"    name="12–24m (discount)" stackId="a" fill="#f97316" />
+                    <Bar dataKey="stale"  name="24m+ (penalty)"    stackId="a" fill="#e11d48" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+            <div className="mt-3 bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 rounded text-[10px] text-indigo-300">
+              <strong>Read:</strong> tall bars = high inventory at that port; the
+              colour mix tells you whether physical buyers will fight for it
+              (lots of green at top = fresh = premium) or shun it (red bottom
+              = stale, deep age-allowance discount).
+            </div>
+          </div>
+
+          {/* Card 2 — Grading velocity */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-amber-400">◈</span>
+              <h4 className="text-xs uppercase tracking-wider font-semibold text-slate-300">
+                Grading velocity &amp; yield (pipeline × quality)
+              </h4>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3">
+              Last {pipelineFlow.length || 14} days. Bars = daily graded lots
+              split by quality outcome. Line = total pending queue (right axis).
+            </p>
+            <div className="h-56 w-full">
+              {pipelineFlow.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-xs text-slate-600">
+                  no gradings data
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <ComposedChart data={pipelineFlow} margin={{ top: 4, right: 0, left: -10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                    <XAxis dataKey="displayDate" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis yAxisId="left" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false}
+                           tickFormatter={(v: number) => fmtNum(v)} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#a78bfa" fontSize={10} tickLine={false} axisLine={false}
+                           tickFormatter={(v: number) => `${(v / 1000).toFixed(1)}k`} />
+                    <Tooltip
+                      cursor={{ fill: "#1e293b" }}
+                      contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", fontSize: 11 }}
+                      itemStyle={{ fontSize: 11 }}
+                      formatter={(v) => `${fmtNum(Number(v ?? 0))} lots`}
+                    />
+                    <Legend verticalAlign="top" height={28} iconType="circle"
+                            wrapperStyle={{ fontSize: 10, color: "#cbd5e1" }} />
+                    <Bar yAxisId="left" dataKey="passedPremium"    name="pass · premium"    stackId="a" fill="#10b981" />
+                    <Bar yAxisId="left" dataKey="passedBorderline" name="pass · borderline" stackId="a" fill="#eab308" />
+                    <Bar yAxisId="left" dataKey="failed"           name="failed"           stackId="a" fill="#f43f5e" radius={[3, 3, 0, 0]} />
+                    <Line yAxisId="right" type="monotone" dataKey="pending" name="pending (right axis)"
+                          stroke="#a78bfa" strokeWidth={2.4} dot={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+            <div className="mt-3 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded text-[10px] text-amber-300">
+              <strong>Read:</strong> growing yellow band = origins tendering lower-quality
+              (class 3/4) crop even as the headline pass rate looks stable.
+              Rising purple line = pipeline backing up, future supply pressure.
+            </div>
+          </div>
         </div>
       </div>
 
