@@ -1,10 +1,154 @@
 {
-  "generated_at": "2026-05-28T07:37:36+00:00",
-  "as_of": null,
-  "snapshots": [],
+  "generated_at": "2026-05-28T08:07:02+00:00",
+  "as_of": "2026-05-27",
+  "snapshots": [
+    {
+      "date": "2026-05-26",
+      "cut_off_date": "2026-05-25",
+      "total_lots_certified": 3941,
+      "non_tend_lots": 1,
+      "suspended_lots": 0,
+      "lots_graded_today": 0,
+      "lots_sold_today": 0,
+      "lots_bought_today": 0,
+      "tenders_today": 0,
+      "by_port_lots": {
+        "ANT": 2114,
+        "LON": 1784,
+        "FEL": 34,
+        "BAR": 9,
+        "AMS": 0,
+        "BRE": 0,
+        "HAM": 0,
+        "LEH": 0,
+        "LIV": 0,
+        "NOR": 0,
+        "ROT": 0,
+        "TRI": 0
+      }
+    },
+    {
+      "date": "2026-05-27",
+      "cut_off_date": "2026-05-26",
+      "total_lots_certified": 3921,
+      "non_tend_lots": 1,
+      "suspended_lots": 0,
+      "lots_graded_today": 0,
+      "lots_sold_today": 0,
+      "lots_bought_today": 0,
+      "tenders_today": 0,
+      "by_port_lots": {
+        "ANT": 2114,
+        "LON": 1764,
+        "FEL": 34,
+        "BAR": 9,
+        "AMS": 0,
+        "BRE": 0,
+        "HAM": 0,
+        "LEH": 0,
+        "LIV": 0,
+        "NOR": 0,
+        "ROT": 0,
+        "TRI": 0
+      }
+    }
+  ],
   "latest_detail": {
-    "stock_report": null,
-    "stock_report_url": null
+    "stock_report": {
+      "cut_off_date": "2026-05-26",
+      "ports": [
+        {
+          "port_id": "ANT",
+          "port_name": "Antwerp",
+          "with_val_cert": 2114,
+          "non_tend": 1,
+          "suspended": 0
+        },
+        {
+          "port_id": "LON",
+          "port_name": "London",
+          "with_val_cert": 1764,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "FEL",
+          "port_name": "Felixstowe",
+          "with_val_cert": 34,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "BAR",
+          "port_name": "Barcelona",
+          "with_val_cert": 9,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "AMS",
+          "port_name": "Amsterdam",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "BRE",
+          "port_name": "Bremen",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "HAM",
+          "port_name": "Hamburg",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "LEH",
+          "port_name": "Le Havre",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "LIV",
+          "port_name": "Liverpool",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "NOR",
+          "port_name": null,
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "ROT",
+          "port_name": "Rotterdam",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        },
+        {
+          "port_id": "TRI",
+          "port_name": "Trieste",
+          "with_val_cert": 0,
+          "non_tend": 0,
+          "suspended": 0
+        }
+      ],
+      "grand_total": {
+        "with_val_cert": 3921,
+        "non_tend": 1,
+        "suspended": 0
+      }
+    },
+    "stock_report_url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260527_103021.csv"
   },
   "recent_activity": {
     "gradings": [],
