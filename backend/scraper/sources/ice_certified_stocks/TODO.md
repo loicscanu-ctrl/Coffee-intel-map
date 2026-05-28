@@ -5,36 +5,11 @@ new ones here so they don't get lost in chat scroll-back.
 
 ## Open
 
-### 5. Issued port-of-issuance (Robusta) — DEFERRED
-Iss/recv carries `member × origin × sold`, but not port. To get port, the
-3-way join is:
-- Daily stock-delta per port (from stock_report.csv day-over-day) → per-port
-  outflow.
-- Daily tenders per origin → total tendered origin volume.
-- Member-of-issuance from iss/recv.
-Join (member, origin, day) ↔ (port, origin, day) ↔ (member, day) to estimate
-which port each member's sales came from. All inferred, flag with `*`.
-
-Not yet attempted: the inference is fragile (some days have no tender event;
-stock-delta can be confounded by re-grading; member attribution is noisy).
-Will revisit when there's a clear use-case demanding port-of-issuance for
-Robusta member rows.
-
-### 6. Robusta stock_report HHMMSS guess set — DEFERRED (Akamai risk)
-Currently tries 3 fixed publish times (`103021`, `103126`, `103045`). Real
-publish times vary daily; we capture ~2/5 days. Expanding the guess set
-risks Akamai 429-burst penalties (we hit 3600 s Retry-After in the past
-during 180-day backfills). Options:
-- Scrape the `/stock_reports/` directory listing if exposed (preferred).
-- Subscribe to ICE's email/RSS notification if any exists.
-- Workbook ingest already fills the gap for historical backfill.
-
-### 8. Raw-bytes artifact cache (architectural) — DEFERRED
-Persist the raw .xls / .csv / .pdf / .txt bytes per day (GitHub artifact or
-S3) so future parser changes can re-derive shape without re-fetching ICE.
-~30–50 MB for 180 days. Means a UI change that needs a new field never
-requires another 90-min backfill. CI workflow change of moderate scope —
-not started.
+### 5. Issued port-of-issuance (Robusta) — PARKED (user choice)
+Iss/recv carries `member × origin × sold`, but not port. Inference would
+need a fragile 3-way join across stock-deltas + tenders + iss-recv. Will
+revisit only if a clear use-case demands port-of-issuance on Robusta
+member rows.
 
 ### 11. Arabica age_detail (per port × day-bucket) — PARTIAL
 - ✅ Issuers (sell-side) wired as Issued row's `port_issuer` drill.
@@ -125,3 +100,25 @@ not started.
 - ✅ TODO #9 — Period-view columns now snap to calendar weeks (Mon-Sun):
   "Current" = this week's Mon → today; "1w ago" = previous full Mon-Sun.
   `_mondayOf()` helper does the snap; month-end columns unchanged.
+- ✅ TODO #6 — Tiered HHMMSS guesser for the Robusta stock_report.csv.
+  Tier 1 = top-5 most-frequent HHMMSS from `stock_report_hits.json`
+  (≤5 GETs, self-tunes after every success). Tier 2 = 120-second sweep
+  of the published 10:30:00–10:31:59 window (only on miss, only for the
+  latest day so daily cron stays bounded). Hits log starts seeded with
+  the 3 bootstrap values and grows with every confirmed capture.
+- ✅ TODO #8 — Audit closed without building a raw-bytes cache. Live
+  parsers (arabica_xls / stock_report / age_allowance / gradings /
+  iss_recv / pdfs / tenders) verified exhaustive for the URLs they
+  fetch. One workbook-importer omission fixed: sheet 6_ny_gradings was
+  dropping the `origin` column — now surfaced as
+  `snapshots[].graded_today_by_origin` + `graded_today_by_port_origin`.
+  Remaining gaps are derivable (wow/mom/yoy %s) or already covered by
+  workbook ingest (arabica iss/recv has no live ICE source URL — workbook
+  fills it on demand).
+- ✅ Bug fix — workbook pivot rows labelled "TOTAL" were being treated as
+  a real warehouse port, double-counting the arabica grand total
+  (rendered 887,216 bags instead of the actual 443,608). Added
+  `_is_aggregate_port()` filter at every parser entry that consumes a
+  port_code (plus regression tests in
+  `backend/tests/test_import_synthesis_xlsx.py`). Re-imported all
+  arabica + robusta JSONs.

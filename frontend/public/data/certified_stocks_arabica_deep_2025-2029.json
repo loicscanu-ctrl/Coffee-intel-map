@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T11:26:47+00:00",
+  "generated_at": "2026-05-28T13:32:20+00:00",
   "market": "arabica",
   "bucket_years": [
     2025,
@@ -9,24 +9,22 @@
   "snapshots": [
     {
       "date": "2025-01-02",
-      "total_bags": 1971594,
+      "total_bags": 985797,
       "by_port_totals": {
         "ANT": 938552,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 985797,
         "NOR": 4611,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-03",
-      "total_bags": 1971344,
+      "total_bags": 985672,
       "by_port_totals": {
         "NYK": 3916,
         "NOR": 4611,
-        "TOTAL": 985672,
         "VIR": 230,
         "HOU": 8337,
         "HAM": 30151,
@@ -35,185 +33,171 @@
     },
     {
       "date": "2025-01-06",
-      "total_bags": 1987124,
+      "total_bags": 993562,
       "by_port_totals": {
         "NOR": 4611,
         "ANT": 946317,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 993562,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-07",
-      "total_bags": 1983208,
+      "total_bags": 991604,
       "by_port_totals": {
         "NOR": 4611,
         "ANT": 944359,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 991604,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-08",
-      "total_bags": 1961916,
+      "total_bags": 980958,
       "by_port_totals": {
         "NYK": 3916,
         "ANT": 933979,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 980958,
         "NOR": 4345
       }
     },
     {
       "date": "2025-01-09",
-      "total_bags": 1961086,
+      "total_bags": 980543,
       "by_port_totals": {
         "ANT": 933564,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 980543,
         "NOR": 4345,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-10",
-      "total_bags": 1954220,
+      "total_bags": 977110,
       "by_port_totals": {
         "ANT": 930131,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 977110,
         "NOR": 4345,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-13",
-      "total_bags": 1958260,
+      "total_bags": 979130,
       "by_port_totals": {
         "NYK": 3916,
         "HAM": 30151,
         "HOU": 8337,
         "ANT": 932151,
         "VIR": 230,
-        "TOTAL": 979130,
         "NOR": 4345
       }
     },
     {
       "date": "2025-01-14",
-      "total_bags": 1958260,
+      "total_bags": 979130,
       "by_port_totals": {
         "NYK": 3916,
         "ANT": 932151,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 979130,
         "NOR": 4345
       }
     },
     {
       "date": "2025-01-15",
-      "total_bags": 1958260,
+      "total_bags": 979130,
       "by_port_totals": {
         "ANT": 932151,
         "HAM": 30151,
         "HOU": 8337,
         "VIR": 230,
-        "TOTAL": 979130,
         "NOR": 4345,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-16",
-      "total_bags": 1958284,
+      "total_bags": 979142,
       "by_port_totals": {
         "HOU": 9885,
         "ANT": 929975,
         "HAM": 30791,
         "VIR": 230,
-        "TOTAL": 979142,
         "NOR": 4345,
         "NYK": 3916
       }
     },
     {
       "date": "2025-01-17",
-      "total_bags": 1964754,
+      "total_bags": 982377,
       "by_port_totals": {
         "NYK": 3916,
         "ANT": 933495,
         "HAM": 30506,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 982377,
         "NOR": 4345
       }
     },
     {
       "date": "2025-01-21",
-      "total_bags": 1912428,
+      "total_bags": 956214,
       "by_port_totals": {
         "NYK": 3916,
         "ANT": 907012,
         "HAM": 30506,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 956214,
         "NOR": 4345,
         "MIA": 320
       }
     },
     {
       "date": "2025-01-22",
-      "total_bags": 1912418,
+      "total_bags": 956209,
       "by_port_totals": {
         "NOR": 4345,
         "ANT": 907757,
         "HAM": 29756,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 956209,
         "NYK": 3916,
         "MIA": 320
       }
     },
     {
       "date": "2025-01-31",
-      "total_bags": 1735164,
+      "total_bags": 867582,
       "by_port_totals": {
         "NOR": 4345,
         "ANT": 820107,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 867582,
         "NYK": 3366,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-03",
-      "total_bags": 1712354,
+      "total_bags": 856177,
       "by_port_totals": {
         "ANT": 808702,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 856177,
         "NOR": 4345,
         "NYK": 3366,
         "MIA": 3200
@@ -221,13 +205,12 @@
     },
     {
       "date": "2025-02-04",
-      "total_bags": 1709906,
+      "total_bags": 854953,
       "by_port_totals": {
         "ANT": 807478,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 854953,
         "NOR": 4345,
         "NYK": 3366,
         "MIA": 3200
@@ -235,13 +218,12 @@
     },
     {
       "date": "2025-02-05",
-      "total_bags": 1695610,
+      "total_bags": 847805,
       "by_port_totals": {
         "ANT": 800605,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 847805,
         "NOR": 4070,
         "NYK": 3366,
         "MIA": 3200
@@ -249,13 +231,12 @@
     },
     {
       "date": "2025-02-06",
-      "total_bags": 1709106,
+      "total_bags": 854553,
       "by_port_totals": {
         "HAM": 26449,
         "HOU": 9885,
         "ANT": 807353,
         "VIR": 230,
-        "TOTAL": 854553,
         "NOR": 4070,
         "NYK": 3366,
         "MIA": 3200
@@ -263,27 +244,25 @@
     },
     {
       "date": "2025-02-07",
-      "total_bags": 1725476,
+      "total_bags": 862738,
       "by_port_totals": {
         "NYK": 3091,
         "ANT": 815813,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 862738,
         "NOR": 4070,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-10",
-      "total_bags": 1745982,
+      "total_bags": 872991,
       "by_port_totals": {
         "NYK": 3091,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 872991,
         "NOR": 4070,
         "ANT": 826066,
         "MIA": 3200
@@ -291,69 +270,64 @@
     },
     {
       "date": "2025-02-11",
-      "total_bags": 1714258,
+      "total_bags": 857129,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 810204,
         "HAM": 26449,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 857129,
         "NYK": 3091,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-12",
-      "total_bags": 1683590,
+      "total_bags": 841795,
       "by_port_totals": {
         "NYK": 3091,
         "ANT": 795510,
         "HAM": 25809,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 841795,
         "NOR": 4070,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-13",
-      "total_bags": 1699870,
+      "total_bags": 849935,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 804000,
         "HAM": 25459,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 849935,
         "NYK": 3091,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-14",
-      "total_bags": 1678798,
+      "total_bags": 839399,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 793651,
         "HAM": 25272,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 839399,
         "NYK": 3091,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-17",
-      "total_bags": 1649566,
+      "total_bags": 824783,
       "by_port_totals": {
         "ANT": 779035,
         "HAM": 25272,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 824783,
         "NOR": 4070,
         "NYK": 3091,
         "MIA": 3200
@@ -361,13 +335,12 @@
     },
     {
       "date": "2025-02-18",
-      "total_bags": 1517028,
+      "total_bags": 758514,
       "by_port_totals": {
         "ANT": 713051,
         "HAM": 24987,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 758514,
         "NOR": 4070,
         "NYK": 3091,
         "MIA": 3200
@@ -375,13 +348,12 @@
     },
     {
       "date": "2025-02-19",
-      "total_bags": 1549106,
+      "total_bags": 774553,
       "by_port_totals": {
         "ANT": 729090,
         "HAM": 24987,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 774553,
         "NOR": 4070,
         "NYK": 3091,
         "MIA": 3200
@@ -389,13 +361,12 @@
     },
     {
       "date": "2025-02-20",
-      "total_bags": 1558126,
+      "total_bags": 779063,
       "by_port_totals": {
         "HAM": 24737,
         "HOU": 9885,
         "ANT": 733850,
         "VIR": 230,
-        "TOTAL": 779063,
         "NOR": 4070,
         "NYK": 3091,
         "MIA": 3200
@@ -403,27 +374,25 @@
     },
     {
       "date": "2025-02-21",
-      "total_bags": 1575998,
+      "total_bags": 787999,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 742836,
         "HAM": 24687,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 787999,
         "NYK": 3091,
         "MIA": 3200
       }
     },
     {
       "date": "2025-02-24",
-      "total_bags": 1585390,
+      "total_bags": 792695,
       "by_port_totals": {
         "ANT": 749181,
         "HAM": 21538,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 792695,
         "NOR": 4070,
         "NYK": 4591,
         "MIA": 3200
@@ -431,13 +400,12 @@
     },
     {
       "date": "2025-02-25",
-      "total_bags": 1606132,
+      "total_bags": 803066,
       "by_port_totals": {
         "ANT": 757056,
         "HAM": 21538,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 803066,
         "NOR": 4070,
         "NYK": 7087,
         "MIA": 3200
@@ -445,12 +413,11 @@
     },
     {
       "date": "2025-02-26",
-      "total_bags": 1598754,
+      "total_bags": 799377,
       "by_port_totals": {
         "HAM": 21538,
         "HOU": 9885,
         "VIR": 230,
-        "TOTAL": 799377,
         "NOR": 4070,
         "NYK": 7087,
         "ANT": 753367,
@@ -459,12 +426,11 @@
     },
     {
       "date": "2025-02-27",
-      "total_bags": 1618256,
+      "total_bags": 809128,
       "by_port_totals": {
         "VIR": 230,
         "NYK": 7087,
         "NOR": 4070,
-        "TOTAL": 809128,
         "HOU": 9885,
         "HAM": 21538,
         "ANT": 763118,
@@ -473,9 +439,8 @@
     },
     {
       "date": "2025-02-28",
-      "total_bags": 1611176,
+      "total_bags": 805588,
       "by_port_totals": {
-        "TOTAL": 805588,
         "HOU": 10160,
         "NYK": 7087,
         "HAM": 21218,
@@ -487,55 +452,51 @@
     },
     {
       "date": "2025-03-03",
-      "total_bags": 1583652,
+      "total_bags": 791826,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 745861,
         "HAM": 21218,
         "HOU": 10160,
         "VIR": 230,
-        "TOTAL": 791826,
         "NYK": 7087,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-04",
-      "total_bags": 1582942,
+      "total_bags": 791471,
       "by_port_totals": {
         "NOR": 4070,
         "ANT": 745386,
         "HAM": 21338,
         "HOU": 10160,
         "VIR": 230,
-        "TOTAL": 791471,
         "NYK": 7087,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-05",
-      "total_bags": 1565464,
+      "total_bags": 782732,
       "by_port_totals": {
         "NOR": 4345,
         "ANT": 736620,
         "HAM": 20840,
         "HOU": 10160,
         "VIR": 230,
-        "TOTAL": 782732,
         "NYK": 7337,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-06",
-      "total_bags": 1589362,
+      "total_bags": 794681,
       "by_port_totals": {
         "ANT": 748294,
         "HAM": 20840,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 794681,
         "NOR": 4345,
         "NYK": 7337,
         "MIA": 3200
@@ -543,9 +504,8 @@
     },
     {
       "date": "2025-03-07",
-      "total_bags": 1595652,
+      "total_bags": 797826,
       "by_port_totals": {
-        "TOTAL": 797826,
         "NOR": 4345,
         "ANT": 749269,
         "HAM": 22760,
@@ -557,49 +517,46 @@
     },
     {
       "date": "2025-03-10",
-      "total_bags": 1598812,
+      "total_bags": 799406,
       "by_port_totals": {
         "NOR": 4345,
         "HAM": 22605,
         "ANT": 750754,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 799406,
         "NYK": 7837,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-11",
-      "total_bags": 1606064,
+      "total_bags": 803032,
       "by_port_totals": {
         "NYK": 7837,
         "ANT": 754578,
         "HAM": 22407,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 803032,
         "NOR": 4345,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-12",
-      "total_bags": 1587250,
+      "total_bags": 793625,
       "by_port_totals": {
         "NOR": 3845,
         "ANT": 745671,
         "HAM": 22407,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 793625,
         "NYK": 7837,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-13",
-      "total_bags": 1604554,
+      "total_bags": 802277,
       "by_port_totals": {
         "NOR": 4118,
         "NYK": 9337,
@@ -607,32 +564,29 @@
         "HAM": 22407,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 802277,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-14",
-      "total_bags": 1593472,
+      "total_bags": 796736,
       "by_port_totals": {
         "NOR": 4118,
         "ANT": 747009,
         "HAM": 22407,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 796736,
         "NYK": 9337,
         "MIA": 3200
       }
     },
     {
       "date": "2025-03-17",
-      "total_bags": 1581282,
+      "total_bags": 790641,
       "by_port_totals": {
         "HAM": 22407,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 790641,
         "ANT": 740939,
         "NOR": 4093,
         "NYK": 9337,
@@ -641,41 +595,38 @@
     },
     {
       "date": "2025-03-18",
-      "total_bags": 1575218,
+      "total_bags": 787609,
       "by_port_totals": {
         "NOR": 4093,
         "ANT": 736087,
         "HAM": 21907,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 787609,
         "NYK": 9337,
         "MIA": 5520
       }
     },
     {
       "date": "2025-03-19",
-      "total_bags": 1565296,
+      "total_bags": 782648,
       "by_port_totals": {
         "NYK": 9337,
         "ANT": 727956,
         "HAM": 21657,
         "HOU": 10435,
         "VIR": 230,
-        "TOTAL": 782648,
         "NOR": 4093,
         "MIA": 8940
       }
     },
     {
       "date": "2025-03-20",
-      "total_bags": 1564978,
+      "total_bags": 782489,
       "by_port_totals": {
         "ANT": 730037,
         "HAM": 21657,
         "HOU": 9795,
         "VIR": 230,
-        "TOTAL": 782489,
         "NOR": 2493,
         "NYK": 9337,
         "MIA": 8940
@@ -683,27 +634,25 @@
     },
     {
       "date": "2025-03-21",
-      "total_bags": 1555416,
+      "total_bags": 777708,
       "by_port_totals": {
         "NYK": 9337,
         "ANT": 725576,
         "HAM": 21657,
         "HOU": 9795,
         "VIR": 230,
-        "TOTAL": 777708,
         "NOR": 2173,
         "MIA": 8940
       }
     },
     {
       "date": "2025-03-24",
-      "total_bags": 1559266,
+      "total_bags": 779633,
       "by_port_totals": {
         "ANT": 724946,
         "HAM": 21657,
         "HOU": 12075,
         "VIR": 230,
-        "TOTAL": 779633,
         "NYK": 9337,
         "NOR": 2448,
         "MIA": 8940
@@ -711,13 +660,12 @@
     },
     {
       "date": "2025-03-25",
-      "total_bags": 1563916,
+      "total_bags": 781958,
       "by_port_totals": {
         "ANT": 726081,
         "HAM": 21977,
         "HOU": 12075,
         "VIR": 230,
-        "TOTAL": 781958,
         "NYK": 10207,
         "NOR": 2448,
         "MIA": 8940
@@ -725,13 +673,12 @@
     },
     {
       "date": "2025-03-26",
-      "total_bags": 1567626,
+      "total_bags": 783813,
       "by_port_totals": {
         "ANT": 726081,
         "HAM": 21977,
         "HOU": 13395,
         "VIR": 230,
-        "TOTAL": 783813,
         "NYK": 10207,
         "NOR": 2448,
         "MIA": 9475
@@ -739,13 +686,12 @@
     },
     {
       "date": "2025-03-27",
-      "total_bags": 1555634,
+      "total_bags": 777817,
       "by_port_totals": {
         "ANT": 720085,
         "HAM": 21977,
         "HOU": 13395,
         "VIR": 230,
-        "TOTAL": 777817,
         "NYK": 10207,
         "NOR": 2448,
         "MIA": 9475
@@ -753,11 +699,10 @@
     },
     {
       "date": "2025-03-28",
-      "total_bags": 1543152,
+      "total_bags": 771576,
       "by_port_totals": {
         "VIR": 230,
         "NYK": 10207,
-        "TOTAL": 771576,
         "HOU": 13337,
         "HAM": 21977,
         "ANT": 713902,
@@ -767,11 +712,10 @@
     },
     {
       "date": "2025-03-31",
-      "total_bags": 1540952,
+      "total_bags": 770476,
       "by_port_totals": {
         "ANT": 712802,
         "NYK": 10207,
-        "TOTAL": 770476,
         "VIR": 230,
         "HOU": 13337,
         "HAM": 21977,
@@ -781,13 +725,12 @@
     },
     {
       "date": "2025-04-02",
-      "total_bags": 1554526,
+      "total_bags": 777263,
       "by_port_totals": {
         "ANT": 709244,
         "HAM": 28727,
         "HOU": 16432,
         "VIR": 230,
-        "TOTAL": 777263,
         "NYK": 10207,
         "NOR": 2448,
         "MIA": 9975
@@ -795,41 +738,38 @@
     },
     {
       "date": "2025-04-03",
-      "total_bags": 1564226,
+      "total_bags": 782113,
       "by_port_totals": {
         "NYK": 10207,
         "ANT": 708502,
         "HAM": 29102,
         "HOU": 21649,
         "VIR": 230,
-        "TOTAL": 782113,
         "NOR": 2448,
         "MIA": 9975
       }
     },
     {
       "date": "2025-04-04",
-      "total_bags": 1542028,
+      "total_bags": 771014,
       "by_port_totals": {
         "NYK": 10207,
         "ANT": 694653,
         "HAM": 29102,
         "HOU": 24399,
         "VIR": 230,
-        "TOTAL": 771014,
         "NOR": 2448,
         "MIA": 9975
       }
     },
     {
       "date": "2025-04-07",
-      "total_bags": 1547572,
+      "total_bags": 773786,
       "by_port_totals": {
         "ANT": 695780,
         "HAM": 29102,
         "HOU": 26044,
         "VIR": 230,
-        "TOTAL": 773786,
         "NYK": 10207,
         "NOR": 2448,
         "MIA": 9975
@@ -837,13 +777,12 @@
     },
     {
       "date": "2025-04-08",
-      "total_bags": 1561612,
+      "total_bags": 780806,
       "by_port_totals": {
         "NYK": 13957,
         "HAM": 29102,
         "HOU": 29314,
         "VIR": 230,
-        "TOTAL": 780806,
         "ANT": 695780,
         "NOR": 2448,
         "MIA": 9975
@@ -851,13 +790,12 @@
     },
     {
       "date": "2025-04-09",
-      "total_bags": 1556376,
+      "total_bags": 778188,
       "by_port_totals": {
         "ANT": 689887,
         "HAM": 29102,
         "HOU": 30339,
         "VIR": 230,
-        "TOTAL": 778188,
         "NYK": 16207,
         "NOR": 2448,
         "MIA": 9975
@@ -865,13 +803,12 @@
     },
     {
       "date": "2025-04-10",
-      "total_bags": 1571118,
+      "total_bags": 785559,
       "by_port_totals": {
         "HOU": 32030,
         "ANT": 693793,
         "HAM": 30602,
         "VIR": 230,
-        "TOTAL": 785559,
         "NYK": 16207,
         "NOR": 2722,
         "MIA": 9975
@@ -879,13 +816,12 @@
     },
     {
       "date": "2025-04-11",
-      "total_bags": 1569118,
+      "total_bags": 784559,
       "by_port_totals": {
         "ANT": 692793,
         "HAM": 30602,
         "HOU": 32030,
         "VIR": 230,
-        "TOTAL": 784559,
         "NYK": 16207,
         "NOR": 2722,
         "MIA": 9975
@@ -893,9 +829,8 @@
     },
     {
       "date": "2025-04-14",
-      "total_bags": 1573840,
+      "total_bags": 786920,
       "by_port_totals": {
-        "TOTAL": 786920,
         "VIR": 230,
         "HOU": 32305,
         "NYK": 16707,
@@ -907,13 +842,12 @@
     },
     {
       "date": "2025-04-15",
-      "total_bags": 1580674,
+      "total_bags": 790337,
       "by_port_totals": {
         "ANT": 696032,
         "HAM": 30942,
         "HOU": 34230,
         "VIR": 230,
-        "TOTAL": 790337,
         "NYK": 16206,
         "NOR": 2722,
         "MIA": 9975
@@ -921,13 +855,12 @@
     },
     {
       "date": "2025-04-16",
-      "total_bags": 1574626,
+      "total_bags": 787313,
       "by_port_totals": {
         "ANT": 692263,
         "HAM": 30942,
         "HOU": 34475,
         "VIR": 230,
-        "TOTAL": 787313,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 9975
@@ -935,13 +868,12 @@
     },
     {
       "date": "2025-04-17",
-      "total_bags": 1591176,
+      "total_bags": 795588,
       "by_port_totals": {
         "ANT": 692263,
         "HAM": 37317,
         "HOU": 36125,
         "VIR": 230,
-        "TOTAL": 795588,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 10225
@@ -949,13 +881,12 @@
     },
     {
       "date": "2025-04-21",
-      "total_bags": 1603098,
+      "total_bags": 801549,
       "by_port_totals": {
         "ANT": 695095,
         "HAM": 40692,
         "HOU": 35879,
         "VIR": 230,
-        "TOTAL": 801549,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 10225
@@ -963,11 +894,10 @@
     },
     {
       "date": "2025-04-22",
-      "total_bags": 1612362,
+      "total_bags": 806181,
       "by_port_totals": {
         "VIR": 230,
         "NYK": 16706,
-        "TOTAL": 806181,
         "HOU": 35879,
         "HAM": 40692,
         "ANT": 699727,
@@ -977,13 +907,12 @@
     },
     {
       "date": "2025-04-23",
-      "total_bags": 1623632,
+      "total_bags": 811816,
       "by_port_totals": {
         "HAM": 43942,
         "HOU": 34629,
         "ANT": 703362,
         "VIR": 230,
-        "TOTAL": 811816,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 10225
@@ -991,13 +920,12 @@
     },
     {
       "date": "2025-04-24",
-      "total_bags": 1631852,
+      "total_bags": 815926,
       "by_port_totals": {
         "ANT": 707097,
         "HAM": 44317,
         "HOU": 34629,
         "VIR": 230,
-        "TOTAL": 815926,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 10225
@@ -1005,13 +933,12 @@
     },
     {
       "date": "2025-04-25",
-      "total_bags": 1644042,
+      "total_bags": 822021,
       "by_port_totals": {
         "ANT": 713192,
         "HAM": 44317,
         "HOU": 34629,
         "VIR": 230,
-        "TOTAL": 822021,
         "NYK": 16706,
         "NOR": 2722,
         "MIA": 10225
@@ -1019,23 +946,21 @@
     },
     {
       "date": "2025-04-28",
-      "total_bags": 1652608,
+      "total_bags": 826304,
       "by_port_totals": {
         "NYK": 16706,
         "ANT": 717475,
         "HAM": 44317,
         "HOU": 34629,
         "VIR": 230,
-        "TOTAL": 826304,
         "NOR": 2722,
         "MIA": 10225
       }
     },
     {
       "date": "2025-04-29",
-      "total_bags": 1625222,
+      "total_bags": 812611,
       "by_port_totals": {
-        "TOTAL": 812611,
         "ANT": 706502,
         "HAM": 44317,
         "NYK": 16266,
@@ -1047,25 +972,23 @@
     },
     {
       "date": "2025-04-30",
-      "total_bags": 1627336,
+      "total_bags": 813668,
       "by_port_totals": {
         "NYK": 16266,
         "ANT": 708274,
         "HAM": 44317,
         "HOU": 32774,
         "VIR": 230,
-        "TOTAL": 813668,
         "NOR": 2722,
         "MIA": 9085
       }
     },
     {
       "date": "2025-05-01",
-      "total_bags": 1642150,
+      "total_bags": 821075,
       "by_port_totals": {
         "HOU": 34699,
         "NYK": 16266,
-        "TOTAL": 821075,
         "VIR": 230,
         "HAM": 44317,
         "ANT": 713756,
@@ -1075,13 +998,12 @@
     },
     {
       "date": "2025-05-02",
-      "total_bags": 1656238,
+      "total_bags": 828119,
       "by_port_totals": {
         "ANT": 720810,
         "HAM": 44317,
         "HOU": 34699,
         "VIR": 230,
-        "TOTAL": 828119,
         "NYK": 16256,
         "NOR": 2722,
         "MIA": 9085
@@ -1089,13 +1011,12 @@
     },
     {
       "date": "2025-05-05",
-      "total_bags": 1664266,
+      "total_bags": 832133,
       "by_port_totals": {
         "ANT": 726465,
         "HAM": 44317,
         "HOU": 33058,
         "VIR": 230,
-        "TOTAL": 832133,
         "NYK": 16256,
         "NOR": 2722,
         "MIA": 9085
@@ -1103,13 +1024,12 @@
     },
     {
       "date": "2025-05-06",
-      "total_bags": 1676770,
+      "total_bags": 838385,
       "by_port_totals": {
         "ANT": 732092,
         "HAM": 44657,
         "HOU": 33343,
         "VIR": 230,
-        "TOTAL": 838385,
         "NYK": 16256,
         "NOR": 2722,
         "MIA": 9085
@@ -1117,12 +1037,11 @@
     },
     {
       "date": "2025-05-07",
-      "total_bags": 1688946,
+      "total_bags": 844473,
       "by_port_totals": {
         "ANT": 738750,
         "HOU": 33058,
         "VIR": 230,
-        "TOTAL": 844473,
         "NYK": 16256,
         "HAM": 44372,
         "NOR": 2722,
@@ -1131,12 +1050,11 @@
     },
     {
       "date": "2025-05-08",
-      "total_bags": 1674716,
+      "total_bags": 837358,
       "by_port_totals": {
         "ANT": 729985,
         "HOU": 34708,
         "VIR": 230,
-        "TOTAL": 837358,
         "NYK": 16256,
         "HAM": 44372,
         "NOR": 2722,
@@ -1145,13 +1063,12 @@
     },
     {
       "date": "2025-05-09",
-      "total_bags": 1676336,
+      "total_bags": 838168,
       "by_port_totals": {
         "NYK": 16256,
         "ANT": 731650,
         "HOU": 33853,
         "VIR": 230,
-        "TOTAL": 838168,
         "HAM": 44372,
         "NOR": 2722,
         "MIA": 9085
@@ -1159,12 +1076,11 @@
     },
     {
       "date": "2025-05-12",
-      "total_bags": 1687806,
+      "total_bags": 843903,
       "by_port_totals": {
         "ANT": 737385,
         "HOU": 33853,
         "VIR": 230,
-        "TOTAL": 843903,
         "NYK": 16256,
         "HAM": 44372,
         "NOR": 2722,
@@ -1173,12 +1089,11 @@
     },
     {
       "date": "2025-05-13",
-      "total_bags": 1688094,
+      "total_bags": 844047,
       "by_port_totals": {
         "ANT": 737529,
         "HOU": 33853,
         "VIR": 230,
-        "TOTAL": 844047,
         "NYK": 16256,
         "HAM": 44372,
         "NOR": 2722,
@@ -1187,13 +1102,12 @@
     },
     {
       "date": "2025-05-14",
-      "total_bags": 1671534,
+      "total_bags": 835767,
       "by_port_totals": {
         "NYK": 19391,
         "HOU": 33303,
         "ANT": 727164,
         "VIR": 230,
-        "TOTAL": 835767,
         "HAM": 44372,
         "NOR": 2722,
         "MIA": 8585
@@ -1201,13 +1115,12 @@
     },
     {
       "date": "2025-05-15",
-      "total_bags": 1683644,
+      "total_bags": 841822,
       "by_port_totals": {
         "NYK": 21671,
         "ANT": 730939,
         "HOU": 33303,
         "VIR": 230,
-        "TOTAL": 841822,
         "HAM": 44372,
         "NOR": 2722,
         "MIA": 8585
@@ -1215,13 +1128,12 @@
     },
     {
       "date": "2025-05-16",
-      "total_bags": 1702338,
+      "total_bags": 851169,
       "by_port_totals": {
         "NYK": 21671,
         "ANT": 737151,
         "HOU": 36438,
         "VIR": 230,
-        "TOTAL": 851169,
         "HAM": 44372,
         "NOR": 2722,
         "MIA": 8585
@@ -1229,10 +1141,9 @@
     },
     {
       "date": "2025-05-19",
-      "total_bags": 1717068,
+      "total_bags": 858534,
       "by_port_totals": {
         "NYK": 21671,
-        "TOTAL": 858534,
         "VIR": 230,
         "HOU": 40713,
         "ANT": 740241,
@@ -1243,13 +1154,12 @@
     },
     {
       "date": "2025-05-20",
-      "total_bags": 1733902,
+      "total_bags": 866951,
       "by_port_totals": {
         "NYK": 21671,
         "ANT": 746738,
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 866951,
         "HAM": 46292,
         "NOR": 2722,
         "MIA": 8585
@@ -1257,13 +1167,12 @@
     },
     {
       "date": "2025-05-21",
-      "total_bags": 1752038,
+      "total_bags": 876019,
       "by_port_totals": {
         "NYK": 21671,
         "ANT": 755806,
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 876019,
         "HAM": 46292,
         "NOR": 2722,
         "MIA": 8585
@@ -1271,13 +1180,12 @@
     },
     {
       "date": "2025-05-22",
-      "total_bags": 1766394,
+      "total_bags": 883197,
       "by_port_totals": {
         "NYK": 22526,
         "ANT": 762129,
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 883197,
         "HAM": 46292,
         "NOR": 2722,
         "MIA": 8585
@@ -1285,11 +1193,10 @@
     },
     {
       "date": "2025-05-23",
-      "total_bags": 1773180,
+      "total_bags": 886590,
       "by_port_totals": {
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 886590,
         "ANT": 760118,
         "NYK": 22526,
         "HAM": 46292,
@@ -1299,12 +1206,11 @@
     },
     {
       "date": "2025-05-27",
-      "total_bags": 1784936,
+      "total_bags": 892468,
       "by_port_totals": {
         "ANT": 766086,
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 892468,
         "NYK": 22811,
         "HAM": 45917,
         "NOR": 8126,
@@ -1313,12 +1219,11 @@
     },
     {
       "date": "2025-05-28",
-      "total_bags": 1772230,
+      "total_bags": 886115,
       "by_port_totals": {
         "ANT": 759733,
         "HOU": 40713,
         "VIR": 230,
-        "TOTAL": 886115,
         "NYK": 22811,
         "HAM": 45917,
         "NOR": 8126,
@@ -1327,12 +1232,11 @@
     },
     {
       "date": "2025-05-29",
-      "total_bags": 1783432,
+      "total_bags": 891716,
       "by_port_totals": {
         "ANT": 762487,
         "HOU": 43560,
         "VIR": 230,
-        "TOTAL": 891716,
         "NYK": 22811,
         "HAM": 45917,
         "NOR": 8126,
@@ -1341,12 +1245,11 @@
     },
     {
       "date": "2025-05-30",
-      "total_bags": 1776780,
+      "total_bags": 888390,
       "by_port_totals": {
         "ANT": 761091,
         "HOU": 39710,
         "VIR": 230,
-        "TOTAL": 888390,
         "NYK": 22811,
         "HAM": 47837,
         "NOR": 8126,
@@ -1355,12 +1258,11 @@
     },
     {
       "date": "2025-06-02",
-      "total_bags": 1764424,
+      "total_bags": 882212,
       "by_port_totals": {
         "ANT": 757429,
         "HOU": 39710,
         "VIR": 230,
-        "TOTAL": 882212,
         "NYK": 22491,
         "HAM": 44212,
         "NOR": 9555,
@@ -1369,12 +1271,11 @@
     },
     {
       "date": "2025-06-03",
-      "total_bags": 1756174,
+      "total_bags": 878087,
       "by_port_totals": {
         "ANT": 753874,
         "HOU": 39140,
         "VIR": 230,
-        "TOTAL": 878087,
         "NYK": 22491,
         "HAM": 44212,
         "NOR": 9555,
@@ -1383,12 +1284,11 @@
     },
     {
       "date": "2025-06-04",
-      "total_bags": 1721446,
+      "total_bags": 860723,
       "by_port_totals": {
         "ANT": 736745,
         "HOU": 40850,
         "VIR": 230,
-        "TOTAL": 860723,
         "NYK": 22491,
         "HAM": 40837,
         "NOR": 10985,
@@ -1397,12 +1297,11 @@
     },
     {
       "date": "2025-06-05",
-      "total_bags": 1652968,
+      "total_bags": 826484,
       "by_port_totals": {
         "NYK": 23526,
         "HOU": 41990,
         "VIR": 230,
-        "TOTAL": 826484,
         "ANT": 699197,
         "HAM": 40837,
         "NOR": 12119,
@@ -1411,12 +1310,11 @@
     },
     {
       "date": "2025-06-06",
-      "total_bags": 1641338,
+      "total_bags": 820669,
       "by_port_totals": {
         "ANT": 692122,
         "HOU": 44840,
         "VIR": 230,
-        "TOTAL": 820669,
         "NYK": 23811,
         "HAM": 38962,
         "NOR": 12119,
@@ -1425,12 +1323,11 @@
     },
     {
       "date": "2025-06-09",
-      "total_bags": 1632538,
+      "total_bags": 816269,
       "by_port_totals": {
         "HOU": 44840,
         "ANT": 687722,
         "VIR": 230,
-        "TOTAL": 816269,
         "NYK": 23811,
         "HAM": 38962,
         "NOR": 12119,
@@ -1439,13 +1336,12 @@
     },
     {
       "date": "2025-06-10",
-      "total_bags": 1636884,
+      "total_bags": 818442,
       "by_port_totals": {
         "NYK": 23811,
         "ANT": 685337,
         "HOU": 48260,
         "VIR": 230,
-        "TOTAL": 818442,
         "HAM": 39602,
         "NOR": 12617,
         "MIA": 8585
@@ -1453,12 +1349,11 @@
     },
     {
       "date": "2025-06-11",
-      "total_bags": 1655174,
+      "total_bags": 827587,
       "by_port_totals": {
         "HOU": 49970,
         "ANT": 691342,
         "VIR": 230,
-        "TOTAL": 827587,
         "NYK": 23811,
         "HAM": 39602,
         "NOR": 14047,
@@ -1467,13 +1362,12 @@
     },
     {
       "date": "2025-06-12",
-      "total_bags": 1675048,
+      "total_bags": 837524,
       "by_port_totals": {
         "NYK": 23811,
         "ANT": 701529,
         "HOU": 49400,
         "VIR": 230,
-        "TOTAL": 837524,
         "HAM": 39922,
         "NOR": 14047,
         "MIA": 8585
@@ -1481,9 +1375,8 @@
     },
     {
       "date": "2025-06-13",
-      "total_bags": 1692582,
+      "total_bags": 846291,
       "by_port_totals": {
-        "TOTAL": 846291,
         "ANT": 710296,
         "NYK": 23811,
         "HOU": 49400,
@@ -1495,13 +1388,12 @@
     },
     {
       "date": "2025-06-16",
-      "total_bags": 1705698,
+      "total_bags": 852849,
       "by_port_totals": {
         "NYK": 23811,
         "ANT": 716283,
         "HOU": 49331,
         "VIR": 230,
-        "TOTAL": 852849,
         "HAM": 40562,
         "NOR": 14047,
         "MIA": 8585
@@ -1509,12 +1401,11 @@
     },
     {
       "date": "2025-06-17",
-      "total_bags": 1718778,
+      "total_bags": 859389,
       "by_port_totals": {
         "ANT": 721430,
         "HOU": 50474,
         "VIR": 230,
-        "TOTAL": 859389,
         "NYK": 24061,
         "HAM": 40562,
         "NOR": 14047,
@@ -1523,12 +1414,11 @@
     },
     {
       "date": "2025-06-18",
-      "total_bags": 1722286,
+      "total_bags": 861143,
       "by_port_totals": {
         "HOU": 50759,
         "ANT": 722899,
         "VIR": 230,
-        "TOTAL": 861143,
         "NYK": 24061,
         "HAM": 40562,
         "NOR": 14047,
@@ -1537,9 +1427,8 @@
     },
     {
       "date": "2025-06-19",
-      "total_bags": 1727616,
+      "total_bags": 863808,
       "by_port_totals": {
-        "TOTAL": 863808,
         "ANT": 725564,
         "NYK": 24061,
         "HOU": 50759,
@@ -1551,12 +1440,11 @@
     },
     {
       "date": "2025-06-20",
-      "total_bags": 1737134,
+      "total_bags": 868567,
       "by_port_totals": {
         "ANT": 730323,
         "HOU": 50759,
         "VIR": 230,
-        "TOTAL": 868567,
         "NYK": 24061,
         "HAM": 40562,
         "NOR": 14047,
@@ -1565,10 +1453,9 @@
     },
     {
       "date": "2025-06-23",
-      "total_bags": 1731796,
+      "total_bags": 865898,
       "by_port_totals": {
         "VIR": 230,
-        "TOTAL": 865898,
         "NYK": 24061,
         "ANT": 727368,
         "HOU": 50759,
@@ -1579,13 +1466,12 @@
     },
     {
       "date": "2025-06-24",
-      "total_bags": 1710760,
+      "total_bags": 855380,
       "by_port_totals": {
         "NYK": 24061,
         "ANT": 717100,
         "HOU": 50759,
         "VIR": 230,
-        "TOTAL": 855380,
         "HAM": 40312,
         "NOR": 14333,
         "MIA": 8585
@@ -1593,12 +1479,11 @@
     },
     {
       "date": "2025-06-25",
-      "total_bags": 1708412,
+      "total_bags": 854206,
       "by_port_totals": {
         "ANT": 715606,
         "HOU": 50759,
         "VIR": 230,
-        "TOTAL": 854206,
         "NYK": 24061,
         "HAM": 40632,
         "NOR": 14333,
@@ -1607,11 +1492,10 @@
     },
     {
       "date": "2025-06-26",
-      "total_bags": 1700762,
+      "total_bags": 850381,
       "by_port_totals": {
         "ANT": 712581,
         "HOU": 50189,
-        "TOTAL": 850381,
         "NYK": 24061,
         "HAM": 40632,
         "NOR": 14333,
@@ -1620,11 +1504,10 @@
     },
     {
       "date": "2025-06-27",
-      "total_bags": 1688638,
+      "total_bags": 844319,
       "by_port_totals": {
         "HOU": 49619,
         "ANT": 707189,
-        "TOTAL": 844319,
         "NYK": 23961,
         "HAM": 40632,
         "NOR": 14333,
@@ -1633,9 +1516,8 @@
     },
     {
       "date": "2025-06-30",
-      "total_bags": 1682346,
+      "total_bags": 841173,
       "by_port_totals": {
-        "TOTAL": 841173,
         "ANT": 703923,
         "NYK": 23961,
         "HOU": 49619,
@@ -1646,11 +1528,10 @@
     },
     {
       "date": "2025-07-01",
-      "total_bags": 1683540,
+      "total_bags": 841770,
       "by_port_totals": {
         "HOU": 49619,
         "ANT": 705895,
-        "TOTAL": 841770,
         "NYK": 23961,
         "HAM": 39377,
         "NOR": 14333,
@@ -1659,11 +1540,10 @@
     },
     {
       "date": "2025-07-02",
-      "total_bags": 1687518,
+      "total_bags": 843759,
       "by_port_totals": {
         "ANT": 709024,
         "HOU": 48479,
-        "TOTAL": 843759,
         "NYK": 23961,
         "HAM": 39377,
         "NOR": 14333,
@@ -1672,11 +1552,10 @@
     },
     {
       "date": "2025-07-03",
-      "total_bags": 1684446,
+      "total_bags": 842223,
       "by_port_totals": {
         "ANT": 707488,
         "HOU": 48479,
-        "TOTAL": 842223,
         "NYK": 23961,
         "HAM": 39377,
         "NOR": 14333,
@@ -1685,12 +1564,11 @@
     },
     {
       "date": "2025-07-07",
-      "total_bags": 1667390,
+      "total_bags": 833695,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 698960,
         "HOU": 48479,
-        "TOTAL": 833695,
         "HAM": 39377,
         "NOR": 14333,
         "MIA": 8585
@@ -1698,11 +1576,10 @@
     },
     {
       "date": "2025-07-08",
-      "total_bags": 1664860,
+      "total_bags": 832430,
       "by_port_totals": {
         "ANT": 701097,
         "HOU": 48479,
-        "TOTAL": 832430,
         "NYK": 23961,
         "HAM": 39377,
         "NOR": 10931,
@@ -1711,11 +1588,10 @@
     },
     {
       "date": "2025-07-09",
-      "total_bags": 1672660,
+      "total_bags": 836330,
       "by_port_totals": {
         "ANT": 704997,
         "HOU": 48479,
-        "TOTAL": 836330,
         "NYK": 23961,
         "HAM": 39377,
         "NOR": 10931,
@@ -1724,11 +1600,10 @@
     },
     {
       "date": "2025-07-10",
-      "total_bags": 1663438,
+      "total_bags": 831719,
       "by_port_totals": {
         "ANT": 702286,
         "HOU": 46829,
-        "TOTAL": 831719,
         "NYK": 23961,
         "HAM": 39127,
         "NOR": 10931,
@@ -1737,11 +1612,10 @@
     },
     {
       "date": "2025-07-11",
-      "total_bags": 1653828,
+      "total_bags": 826914,
       "by_port_totals": {
         "ANT": 699191,
         "HOU": 45119,
-        "TOTAL": 826914,
         "NYK": 23961,
         "HAM": 39127,
         "NOR": 10931,
@@ -1750,9 +1624,8 @@
     },
     {
       "date": "2025-07-14",
-      "total_bags": 1657356,
+      "total_bags": 828678,
       "by_port_totals": {
-        "TOTAL": 828678,
         "ANT": 701810,
         "NYK": 23961,
         "HOU": 44264,
@@ -1763,12 +1636,11 @@
     },
     {
       "date": "2025-07-15",
-      "total_bags": 1663224,
+      "total_bags": 831612,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 704344,
         "HOU": 43704,
-        "TOTAL": 831612,
         "HAM": 40087,
         "NOR": 10931,
         "MIA": 8585
@@ -1776,11 +1648,10 @@
     },
     {
       "date": "2025-07-16",
-      "total_bags": 1642926,
+      "total_bags": 821463,
       "by_port_totals": {
         "ANT": 692595,
         "HOU": 43704,
-        "TOTAL": 821463,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 10931,
@@ -1789,11 +1660,10 @@
     },
     {
       "date": "2025-07-17",
-      "total_bags": 1638122,
+      "total_bags": 819061,
       "by_port_totals": {
         "ANT": 690193,
         "HOU": 43704,
-        "TOTAL": 819061,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 10931,
@@ -1802,11 +1672,10 @@
     },
     {
       "date": "2025-07-18",
-      "total_bags": 1628110,
+      "total_bags": 814055,
       "by_port_totals": {
         "ANT": 689693,
         "HOU": 40914,
-        "TOTAL": 814055,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 9215,
@@ -1815,11 +1684,10 @@
     },
     {
       "date": "2025-07-21",
-      "total_bags": 1622048,
+      "total_bags": 811024,
       "by_port_totals": {
         "ANT": 687193,
         "HOU": 40629,
-        "TOTAL": 811024,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 8969,
@@ -1828,11 +1696,10 @@
     },
     {
       "date": "2025-07-22",
-      "total_bags": 1615712,
+      "total_bags": 807856,
       "by_port_totals": {
         "ANT": 684025,
         "HOU": 40629,
-        "TOTAL": 807856,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 8969,
@@ -1841,11 +1708,10 @@
     },
     {
       "date": "2025-07-23",
-      "total_bags": 1612124,
+      "total_bags": 806062,
       "by_port_totals": {
         "ANT": 682506,
         "HOU": 40354,
-        "TOTAL": 806062,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 8969,
@@ -1854,11 +1720,10 @@
     },
     {
       "date": "2025-07-24",
-      "total_bags": 1612464,
+      "total_bags": 806232,
       "by_port_totals": {
         "ANT": 684386,
         "HOU": 38644,
-        "TOTAL": 806232,
         "NYK": 23961,
         "HAM": 41687,
         "NOR": 8969,
@@ -1867,11 +1732,10 @@
     },
     {
       "date": "2025-07-25",
-      "total_bags": 1605356,
+      "total_bags": 802678,
       "by_port_totals": {
         "NYK": 23961,
         "HOU": 38074,
-        "TOTAL": 802678,
         "ANT": 681367,
         "HAM": 42007,
         "NOR": 8969,
@@ -1880,11 +1744,10 @@
     },
     {
       "date": "2025-07-28",
-      "total_bags": 1600652,
+      "total_bags": 800326,
       "by_port_totals": {
         "ANT": 679300,
         "HOU": 37789,
-        "TOTAL": 800326,
         "NYK": 23961,
         "HAM": 42007,
         "NOR": 8969,
@@ -1893,11 +1756,10 @@
     },
     {
       "date": "2025-07-29",
-      "total_bags": 1583684,
+      "total_bags": 791842,
       "by_port_totals": {
         "ANT": 672524,
         "HOU": 36081,
-        "TOTAL": 791842,
         "NYK": 23961,
         "HAM": 42007,
         "NOR": 8969,
@@ -1906,12 +1768,11 @@
     },
     {
       "date": "2025-07-30",
-      "total_bags": 1550952,
+      "total_bags": 775476,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 656158,
         "HOU": 36081,
-        "TOTAL": 775476,
         "HAM": 42007,
         "NOR": 8969,
         "MIA": 8300
@@ -1919,12 +1780,11 @@
     },
     {
       "date": "2025-07-31",
-      "total_bags": 1541242,
+      "total_bags": 770621,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 651553,
         "HOU": 36081,
-        "TOTAL": 770621,
         "HAM": 41757,
         "NOR": 8969,
         "MIA": 8300
@@ -1932,12 +1792,11 @@
     },
     {
       "date": "2025-08-01",
-      "total_bags": 1522906,
+      "total_bags": 761453,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 648666,
         "HOU": 36081,
-        "TOTAL": 761453,
         "HAM": 41757,
         "NOR": 2688,
         "MIA": 8300
@@ -1945,12 +1804,11 @@
     },
     {
       "date": "2025-08-04",
-      "total_bags": 1521058,
+      "total_bags": 760529,
       "by_port_totals": {
         "NYK": 23961,
         "ANT": 652299,
         "HOU": 31524,
-        "TOTAL": 760529,
         "HAM": 41757,
         "NOR": 2688,
         "MIA": 8300
@@ -1958,9 +1816,8 @@
     },
     {
       "date": "2025-08-05",
-      "total_bags": 1509032,
+      "total_bags": 754516,
       "by_port_totals": {
-        "TOTAL": 754516,
         "ANT": 649139,
         "HOU": 28671,
         "NYK": 23961,
@@ -1971,11 +1828,10 @@
     },
     {
       "date": "2025-08-06",
-      "total_bags": 1502088,
+      "total_bags": 751044,
       "by_port_totals": {
         "ANT": 646663,
         "HOU": 28671,
-        "TOTAL": 751044,
         "NYK": 22965,
         "HAM": 41757,
         "NOR": 2688,
@@ -1984,11 +1840,10 @@
     },
     {
       "date": "2025-08-07",
-      "total_bags": 1486480,
+      "total_bags": 743240,
       "by_port_totals": {
         "ANT": 639049,
         "HOU": 28671,
-        "TOTAL": 743240,
         "NYK": 22965,
         "HAM": 41567,
         "NOR": 2688,
@@ -1997,11 +1852,10 @@
     },
     {
       "date": "2025-08-08",
-      "total_bags": 1476188,
+      "total_bags": 738094,
       "by_port_totals": {
         "ANT": 638992,
         "HOU": 28142,
-        "TOTAL": 738094,
         "NYK": 18405,
         "HAM": 41567,
         "NOR": 2688,
@@ -2010,12 +1864,11 @@
     },
     {
       "date": "2025-08-11",
-      "total_bags": 1475218,
+      "total_bags": 737609,
       "by_port_totals": {
         "NYK": 18405,
         "ANT": 638507,
         "HOU": 28142,
-        "TOTAL": 737609,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 8300
@@ -2023,11 +1876,10 @@
     },
     {
       "date": "2025-08-12",
-      "total_bags": 1475052,
+      "total_bags": 737526,
       "by_port_totals": {
         "ANT": 636827,
         "HOU": 23467,
-        "TOTAL": 737526,
         "NYK": 24677,
         "HAM": 41567,
         "NOR": 2688,
@@ -2036,12 +1888,11 @@
     },
     {
       "date": "2025-08-13",
-      "total_bags": 1472822,
+      "total_bags": 736411,
       "by_port_totals": {
         "NYK": 29505,
         "ANT": 631169,
         "HOU": 23182,
-        "TOTAL": 736411,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 8300
@@ -2049,11 +1900,10 @@
     },
     {
       "date": "2025-08-14",
-      "total_bags": 1453322,
+      "total_bags": 726661,
       "by_port_totals": {
         "HOU": 23182,
         "ANT": 621919,
-        "TOTAL": 726661,
         "NYK": 29505,
         "HAM": 41567,
         "NOR": 2688,
@@ -2062,11 +1912,10 @@
     },
     {
       "date": "2025-08-15",
-      "total_bags": 1463478,
+      "total_bags": 731739,
       "by_port_totals": {
         "ANT": 626997,
         "HOU": 23182,
-        "TOTAL": 731739,
         "NYK": 29505,
         "HAM": 41567,
         "NOR": 2688,
@@ -2075,12 +1924,11 @@
     },
     {
       "date": "2025-08-18",
-      "total_bags": 1466210,
+      "total_bags": 733105,
       "by_port_totals": {
         "NYK": 30721,
         "ANT": 627363,
         "HOU": 22966,
-        "TOTAL": 733105,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 7800
@@ -2088,12 +1936,11 @@
     },
     {
       "date": "2025-08-19",
-      "total_bags": 1473146,
+      "total_bags": 736573,
       "by_port_totals": {
         "NYK": 32437,
         "ANT": 629685,
         "HOU": 22396,
-        "TOTAL": 736573,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 7800
@@ -2101,11 +1948,10 @@
     },
     {
       "date": "2025-08-20",
-      "total_bags": 1472198,
+      "total_bags": 736099,
       "by_port_totals": {
         "ANT": 631485,
         "HOU": 22121,
-        "TOTAL": 736099,
         "NYK": 30438,
         "HAM": 41567,
         "NOR": 2688,
@@ -2114,11 +1960,10 @@
     },
     {
       "date": "2025-08-21",
-      "total_bags": 1459658,
+      "total_bags": 729829,
       "by_port_totals": {
         "ANT": 625215,
         "HOU": 22121,
-        "TOTAL": 729829,
         "NYK": 30438,
         "HAM": 41567,
         "NOR": 2688,
@@ -2127,12 +1972,11 @@
     },
     {
       "date": "2025-08-22",
-      "total_bags": 1459212,
+      "total_bags": 729606,
       "by_port_totals": {
         "NYK": 31299,
         "HOU": 21836,
         "ANT": 624416,
-        "TOTAL": 729606,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 7800
@@ -2140,11 +1984,10 @@
     },
     {
       "date": "2025-08-25",
-      "total_bags": 1459868,
+      "total_bags": 729934,
       "by_port_totals": {
         "ANT": 625599,
         "HOU": 20981,
-        "TOTAL": 729934,
         "NYK": 31299,
         "HAM": 41567,
         "NOR": 2688,
@@ -2153,12 +1996,11 @@
     },
     {
       "date": "2025-08-26",
-      "total_bags": 1434226,
+      "total_bags": 717113,
       "by_port_totals": {
         "NYK": 31299,
         "ANT": 620263,
         "HOU": 18986,
-        "TOTAL": 717113,
         "HAM": 41567,
         "NOR": 2688,
         "MIA": 2310
@@ -2166,11 +2008,10 @@
     },
     {
       "date": "2025-08-27",
-      "total_bags": 1433156,
+      "total_bags": 716578,
       "by_port_totals": {
         "ANT": 620263,
         "NYK": 31299,
-        "TOTAL": 716578,
         "HOU": 18701,
         "HAM": 41567,
         "NOR": 2688,
@@ -2179,11 +2020,10 @@
     },
     {
       "date": "2025-08-28",
-      "total_bags": 1429872,
+      "total_bags": 714936,
       "by_port_totals": {
         "ANT": 617782,
         "HOU": 18701,
-        "TOTAL": 714936,
         "NYK": 31013,
         "HAM": 42692,
         "NOR": 2688,
@@ -2192,11 +2032,10 @@
     },
     {
       "date": "2025-08-29",
-      "total_bags": 1420392,
+      "total_bags": 710196,
       "by_port_totals": {
         "ANT": 613042,
         "HOU": 18701,
-        "TOTAL": 710196,
         "NYK": 31013,
         "HAM": 42692,
         "NOR": 2688,
@@ -2205,11 +2044,10 @@
     },
     {
       "date": "2025-09-02",
-      "total_bags": 1398808,
+      "total_bags": 699404,
       "by_port_totals": {
         "ANT": 602250,
         "HOU": 18701,
-        "TOTAL": 699404,
         "NYK": 31013,
         "HAM": 42692,
         "NOR": 2688,
@@ -2218,11 +2056,10 @@
     },
     {
       "date": "2025-09-03",
-      "total_bags": 1373726,
+      "total_bags": 686863,
       "by_port_totals": {
         "ANT": 590564,
         "HOU": 18701,
-        "TOTAL": 686863,
         "NYK": 30158,
         "HAM": 42692,
         "NOR": 2688,
@@ -2231,11 +2068,10 @@
     },
     {
       "date": "2025-09-04",
-      "total_bags": 1380864,
+      "total_bags": 690432,
       "by_port_totals": {
         "ANT": 588949,
         "NYK": 35592,
-        "TOTAL": 690432,
         "HOU": 18701,
         "HAM": 42442,
         "NOR": 2688,
@@ -2244,11 +2080,10 @@
     },
     {
       "date": "2025-09-05",
-      "total_bags": 1385532,
+      "total_bags": 692766,
       "by_port_totals": {
         "ANT": 584455,
         "HOU": 18701,
-        "TOTAL": 692766,
         "NYK": 42170,
         "HAM": 42442,
         "NOR": 2688,
@@ -2257,11 +2092,10 @@
     },
     {
       "date": "2025-09-08",
-      "total_bags": 1391768,
+      "total_bags": 695884,
       "by_port_totals": {
         "ANT": 583030,
         "HOU": 18701,
-        "TOTAL": 695884,
         "NYK": 47318,
         "HAM": 42442,
         "NOR": 2083,
@@ -2270,11 +2104,10 @@
     },
     {
       "date": "2025-09-09",
-      "total_bags": 1371890,
+      "total_bags": 685945,
       "by_port_totals": {
         "ANT": 568227,
         "HOU": 18701,
-        "TOTAL": 685945,
         "NYK": 52182,
         "HAM": 42442,
         "NOR": 2083,
@@ -2283,11 +2116,10 @@
     },
     {
       "date": "2025-09-10",
-      "total_bags": 1359096,
+      "total_bags": 679548,
       "by_port_totals": {
         "ANT": 556906,
         "HOU": 20417,
-        "TOTAL": 679548,
         "NYK": 53890,
         "HAM": 43942,
         "NOR": 2083,
@@ -2296,11 +2128,10 @@
     },
     {
       "date": "2025-09-11",
-      "total_bags": 1339982,
+      "total_bags": 669991,
       "by_port_totals": {
         "ANT": 548206,
         "HOU": 20417,
-        "TOTAL": 669991,
         "NYK": 53033,
         "HAM": 43942,
         "NOR": 2083,
@@ -2309,11 +2140,10 @@
     },
     {
       "date": "2025-09-12",
-      "total_bags": 1338450,
+      "total_bags": 669225,
       "by_port_totals": {
         "ANT": 544581,
         "HOU": 20417,
-        "TOTAL": 669225,
         "NYK": 55892,
         "HAM": 43942,
         "NOR": 2083,
@@ -2322,11 +2152,10 @@
     },
     {
       "date": "2025-09-15",
-      "total_bags": 1332674,
+      "total_bags": 666337,
       "by_port_totals": {
         "ANT": 540550,
         "HOU": 20417,
-        "TOTAL": 666337,
         "NYK": 57035,
         "HAM": 43942,
         "NOR": 2083,
@@ -2335,12 +2164,11 @@
     },
     {
       "date": "2025-09-16",
-      "total_bags": 1337748,
+      "total_bags": 668874,
       "by_port_totals": {
         "NYK": 57035,
         "HOU": 20417,
         "ANT": 543557,
-        "TOTAL": 668874,
         "HAM": 43472,
         "NOR": 2083,
         "MIA": 2310
@@ -2348,11 +2176,10 @@
     },
     {
       "date": "2025-09-17",
-      "total_bags": 1319898,
+      "total_bags": 659949,
       "by_port_totals": {
         "ANT": 536513,
         "HOU": 20417,
-        "TOTAL": 659949,
         "NYK": 55154,
         "HAM": 43472,
         "NOR": 2083,
@@ -2361,11 +2188,10 @@
     },
     {
       "date": "2025-09-18",
-      "total_bags": 1316604,
+      "total_bags": 658302,
       "by_port_totals": {
         "ANT": 534008,
         "HOU": 20703,
-        "TOTAL": 658302,
         "NYK": 55726,
         "HAM": 43472,
         "NOR": 2083,
@@ -2374,11 +2200,10 @@
     },
     {
       "date": "2025-09-19",
-      "total_bags": 1308450,
+      "total_bags": 654225,
       "by_port_totals": {
         "ANT": 530181,
         "HOU": 20703,
-        "TOTAL": 654225,
         "NYK": 55726,
         "HAM": 43222,
         "NOR": 2083,
@@ -2387,11 +2212,10 @@
     },
     {
       "date": "2025-09-22",
-      "total_bags": 1286682,
+      "total_bags": 643341,
       "by_port_totals": {
         "ANT": 519297,
         "HOU": 20703,
-        "TOTAL": 643341,
         "NYK": 55726,
         "HAM": 43222,
         "NOR": 2083,
@@ -2400,11 +2224,10 @@
     },
     {
       "date": "2025-09-23",
-      "total_bags": 1231806,
+      "total_bags": 615903,
       "by_port_totals": {
         "HOU": 20703,
         "ANT": 495068,
-        "TOTAL": 615903,
         "NYK": 52866,
         "HAM": 42873,
         "NOR": 2083,
@@ -2413,11 +2236,10 @@
     },
     {
       "date": "2025-09-24",
-      "total_bags": 1203434,
+      "total_bags": 601717,
       "by_port_totals": {
         "NYK": 52366,
         "HOU": 19607,
-        "TOTAL": 601717,
         "ANT": 482478,
         "HAM": 42873,
         "NOR": 2083,
@@ -2426,9 +2248,8 @@
     },
     {
       "date": "2025-09-25",
-      "total_bags": 1159922,
+      "total_bags": 579961,
       "by_port_totals": {
-        "TOTAL": 579961,
         "ANT": 460722,
         "HOU": 19607,
         "NYK": 52366,
@@ -2439,11 +2260,10 @@
     },
     {
       "date": "2025-09-26",
-      "total_bags": 1153506,
+      "total_bags": 576753,
       "by_port_totals": {
         "ANT": 460722,
         "HOU": 19607,
-        "TOTAL": 576753,
         "NYK": 49506,
         "HAM": 42845,
         "NOR": 2083,
@@ -2452,12 +2272,11 @@
     },
     {
       "date": "2025-09-29",
-      "total_bags": 1143508,
+      "total_bags": 571754,
       "by_port_totals": {
         "NYK": 49506,
         "ANT": 458473,
         "HOU": 16857,
-        "TOTAL": 571754,
         "HAM": 42845,
         "NOR": 2083,
         "MIA": 1990
@@ -2465,11 +2284,10 @@
     },
     {
       "date": "2025-09-30",
-      "total_bags": 1139874,
+      "total_bags": 569937,
       "by_port_totals": {
         "ANT": 460158,
         "HOU": 16857,
-        "TOTAL": 569937,
         "NYK": 47504,
         "HAM": 41345,
         "NOR": 2083,
@@ -2478,12 +2296,11 @@
     },
     {
       "date": "2025-10-01",
-      "total_bags": 1126702,
+      "total_bags": 563351,
       "by_port_totals": {
         "NYK": 47504,
         "ANT": 456137,
         "HOU": 14292,
-        "TOTAL": 563351,
         "HAM": 41345,
         "NOR": 2083,
         "MIA": 1990
@@ -2491,11 +2308,10 @@
     },
     {
       "date": "2025-10-02",
-      "total_bags": 1094072,
+      "total_bags": 547036,
       "by_port_totals": {
         "ANT": 440107,
         "HOU": 14007,
-        "TOTAL": 547036,
         "NYK": 47504,
         "HAM": 41345,
         "NOR": 2083,
@@ -2504,11 +2320,10 @@
     },
     {
       "date": "2025-10-03",
-      "total_bags": 1077212,
+      "total_bags": 538606,
       "by_port_totals": {
         "NYK": 47504,
         "HOU": 13722,
-        "TOTAL": 538606,
         "ANT": 431962,
         "HAM": 41345,
         "NOR": 2083,
@@ -2517,11 +2332,10 @@
     },
     {
       "date": "2025-10-06",
-      "total_bags": 1070272,
+      "total_bags": 535136,
       "by_port_totals": {
         "ANT": 429064,
         "HOU": 13722,
-        "TOTAL": 535136,
         "NYK": 46932,
         "HAM": 41345,
         "NOR": 2083,
@@ -2530,11 +2344,10 @@
     },
     {
       "date": "2025-10-07",
-      "total_bags": 1069330,
+      "total_bags": 534665,
       "by_port_totals": {
         "ANT": 428879,
         "HOU": 13722,
-        "TOTAL": 534665,
         "NYK": 46646,
         "HAM": 41345,
         "NOR": 2083,
@@ -2543,11 +2356,10 @@
     },
     {
       "date": "2025-10-08",
-      "total_bags": 1051978,
+      "total_bags": 525989,
       "by_port_totals": {
         "ANT": 423921,
         "HOU": 13722,
-        "TOTAL": 525989,
         "NYK": 42928,
         "HAM": 41345,
         "NOR": 2083,
@@ -2556,12 +2368,11 @@
     },
     {
       "date": "2025-10-09",
-      "total_bags": 1039068,
+      "total_bags": 519534,
       "by_port_totals": {
         "NYK": 41498,
         "ANT": 418896,
         "HOU": 13722,
-        "TOTAL": 519534,
         "HAM": 41345,
         "NOR": 2083,
         "MIA": 1990
@@ -2569,11 +2380,10 @@
     },
     {
       "date": "2025-10-10",
-      "total_bags": 1018766,
+      "total_bags": 509383,
       "by_port_totals": {
         "ANT": 408745,
         "HOU": 13722,
-        "TOTAL": 509383,
         "NYK": 41498,
         "HAM": 41345,
         "NOR": 2083,
@@ -2582,12 +2392,11 @@
     },
     {
       "date": "2025-10-13",
-      "total_bags": 996176,
+      "total_bags": 498088,
       "by_port_totals": {
         "NYK": 38998,
         "ANT": 399950,
         "HOU": 13722,
-        "TOTAL": 498088,
         "HAM": 41345,
         "NOR": 2083,
         "MIA": 1990
@@ -2595,11 +2404,10 @@
     },
     {
       "date": "2025-10-14",
-      "total_bags": 993616,
+      "total_bags": 496808,
       "by_port_totals": {
         "NYK": 38998,
         "HOU": 13722,
-        "TOTAL": 496808,
         "ANT": 398670,
         "HAM": 41345,
         "NOR": 2083,
@@ -2608,11 +2416,10 @@
     },
     {
       "date": "2025-10-15",
-      "total_bags": 989116,
+      "total_bags": 494558,
       "by_port_totals": {
         "ANT": 396420,
         "HOU": 13722,
-        "TOTAL": 494558,
         "NYK": 38998,
         "HAM": 41345,
         "NOR": 2083,
@@ -2621,10 +2428,9 @@
     },
     {
       "date": "2025-10-16",
-      "total_bags": 987566,
+      "total_bags": 493783,
       "by_port_totals": {
         "NYK": 38498,
-        "TOTAL": 493783,
         "HOU": 13722,
         "ANT": 396145,
         "HAM": 41345,
@@ -2634,9 +2440,8 @@
     },
     {
       "date": "2025-10-17",
-      "total_bags": 934220,
+      "total_bags": 467110,
       "by_port_totals": {
-        "TOTAL": 467110,
         "ANT": 369757,
         "HOU": 13437,
         "NYK": 38498,
@@ -2647,11 +2452,10 @@
     },
     {
       "date": "2025-10-20",
-      "total_bags": 936820,
+      "total_bags": 468410,
       "by_port_totals": {
         "ANT": 371057,
         "NYK": 38498,
-        "TOTAL": 468410,
         "HOU": 13437,
         "HAM": 41345,
         "NOR": 2083,
@@ -2660,11 +2464,10 @@
     },
     {
       "date": "2025-10-21",
-      "total_bags": 936820,
+      "total_bags": 468410,
       "by_port_totals": {
         "ANT": 371057,
         "HOU": 13437,
-        "TOTAL": 468410,
         "NYK": 38498,
         "HAM": 41345,
         "NOR": 2083,
@@ -2673,11 +2476,10 @@
     },
     {
       "date": "2025-10-22",
-      "total_bags": 931820,
+      "total_bags": 465910,
       "by_port_totals": {
         "ANT": 371057,
         "HOU": 13437,
-        "TOTAL": 465910,
         "NYK": 35998,
         "HAM": 41345,
         "NOR": 2083,
@@ -2686,10 +2488,9 @@
     },
     {
       "date": "2025-10-23",
-      "total_bags": 925612,
+      "total_bags": 462806,
       "by_port_totals": {
         "HOU": 12579,
-        "TOTAL": 462806,
         "ANT": 368811,
         "NYK": 35998,
         "HAM": 41345,
@@ -2699,11 +2500,10 @@
     },
     {
       "date": "2025-10-24",
-      "total_bags": 895546,
+      "total_bags": 447773,
       "by_port_totals": {
         "ANT": 354633,
         "NYK": 35998,
-        "TOTAL": 447773,
         "HOU": 12579,
         "HAM": 40490,
         "NOR": 2083,
@@ -2712,11 +2512,10 @@
     },
     {
       "date": "2025-10-27",
-      "total_bags": 901486,
+      "total_bags": 450743,
       "by_port_totals": {
         "ANT": 357603,
         "HOU": 12579,
-        "TOTAL": 450743,
         "NYK": 35998,
         "HAM": 40490,
         "NOR": 2083,
@@ -2725,11 +2524,10 @@
     },
     {
       "date": "2025-10-28",
-      "total_bags": 899230,
+      "total_bags": 449615,
       "by_port_totals": {
         "ANT": 356475,
         "HOU": 12579,
-        "TOTAL": 449615,
         "NYK": 35998,
         "HAM": 40490,
         "NOR": 2083,
@@ -2738,11 +2536,10 @@
     },
     {
       "date": "2025-10-29",
-      "total_bags": 892950,
+      "total_bags": 446475,
       "by_port_totals": {
         "ANT": 353370,
         "HOU": 12579,
-        "TOTAL": 446475,
         "NYK": 35998,
         "HAM": 40455,
         "NOR": 2083,
@@ -2751,11 +2548,10 @@
     },
     {
       "date": "2025-10-30",
-      "total_bags": 892950,
+      "total_bags": 446475,
       "by_port_totals": {
         "ANT": 353370,
         "HOU": 12579,
-        "TOTAL": 446475,
         "NYK": 35998,
         "HAM": 40455,
         "NOR": 2083,
@@ -2764,11 +2560,10 @@
     },
     {
       "date": "2025-10-31",
-      "total_bags": 863456,
+      "total_bags": 431728,
       "by_port_totals": {
         "ANT": 338623,
         "HOU": 12579,
-        "TOTAL": 431728,
         "NYK": 35998,
         "HAM": 40455,
         "NOR": 2083,
@@ -2777,11 +2572,10 @@
     },
     {
       "date": "2025-11-03",
-      "total_bags": 862962,
+      "total_bags": 431481,
       "by_port_totals": {
         "ANT": 338376,
         "HOU": 12579,
-        "TOTAL": 431481,
         "NYK": 35998,
         "HAM": 40455,
         "NOR": 2083,
@@ -2790,11 +2584,10 @@
     },
     {
       "date": "2025-11-04",
-      "total_bags": 860540,
+      "total_bags": 430270,
       "by_port_totals": {
         "HOU": 12579,
         "NYK": 35712,
-        "TOTAL": 430270,
         "ANT": 337781,
         "HAM": 40125,
         "NOR": 2083,
@@ -2803,11 +2596,10 @@
     },
     {
       "date": "2025-11-05",
-      "total_bags": 859540,
+      "total_bags": 429770,
       "by_port_totals": {
         "ANT": 337281,
         "HOU": 12579,
-        "TOTAL": 429770,
         "NYK": 35712,
         "HAM": 40125,
         "NOR": 2083,
@@ -2816,11 +2608,10 @@
     },
     {
       "date": "2025-11-06",
-      "total_bags": 836406,
+      "total_bags": 418203,
       "by_port_totals": {
         "ANT": 327430,
         "HOU": 12579,
-        "TOTAL": 418203,
         "NYK": 33996,
         "HAM": 40125,
         "NOR": 2083,
@@ -2829,12 +2620,11 @@
     },
     {
       "date": "2025-11-07",
-      "total_bags": 834956,
+      "total_bags": 417478,
       "by_port_totals": {
         "NYK": 33996,
         "ANT": 326705,
         "HOU": 12579,
-        "TOTAL": 417478,
         "HAM": 40125,
         "NOR": 2083,
         "MIA": 1990
@@ -2842,10 +2632,9 @@
     },
     {
       "date": "2025-11-10",
-      "total_bags": 833406,
+      "total_bags": 416703,
       "by_port_totals": {
         "NYK": 33996,
-        "TOTAL": 416703,
         "HOU": 12579,
         "ANT": 326000,
         "HAM": 40055,
@@ -2855,11 +2644,10 @@
     },
     {
       "date": "2025-11-11",
-      "total_bags": 812258,
+      "total_bags": 406129,
       "by_port_totals": {
         "HOU": 12579,
         "ANT": 315426,
-        "TOTAL": 406129,
         "NYK": 33996,
         "HAM": 40055,
         "NOR": 2083,
@@ -2868,12 +2656,11 @@
     },
     {
       "date": "2025-11-12",
-      "total_bags": 809860,
+      "total_bags": 404930,
       "by_port_totals": {
         "NYK": 32852,
         "ANT": 315426,
         "HOU": 12579,
-        "TOTAL": 404930,
         "HAM": 40000,
         "NOR": 2083,
         "MIA": 1990
@@ -2881,10 +2668,9 @@
     },
     {
       "date": "2025-11-13",
-      "total_bags": 806860,
+      "total_bags": 403430,
       "by_port_totals": {
         "NYK": 31352,
-        "TOTAL": 403430,
         "HOU": 12579,
         "ANT": 315426,
         "HAM": 40000,
@@ -2894,12 +2680,11 @@
     },
     {
       "date": "2025-11-14",
-      "total_bags": 806380,
+      "total_bags": 403190,
       "by_port_totals": {
         "NYK": 29370,
         "ANT": 317168,
         "HOU": 12579,
-        "TOTAL": 403190,
         "HAM": 40000,
         "NOR": 2083,
         "MIA": 1990
@@ -2907,11 +2692,10 @@
     },
     {
       "date": "2025-11-17",
-      "total_bags": 801580,
+      "total_bags": 400790,
       "by_port_totals": {
         "ANT": 315338,
         "HOU": 12579,
-        "TOTAL": 400790,
         "NYK": 29370,
         "HAM": 39430,
         "NOR": 2083,
@@ -2920,11 +2704,10 @@
     },
     {
       "date": "2025-11-18",
-      "total_bags": 793026,
+      "total_bags": 396513,
       "by_port_totals": {
         "HOU": 12579,
         "ANT": 311633,
-        "TOTAL": 396513,
         "NYK": 28798,
         "HAM": 39430,
         "NOR": 2083,
@@ -2933,12 +2716,11 @@
     },
     {
       "date": "2025-11-19",
-      "total_bags": 800646,
+      "total_bags": 400323,
       "by_port_totals": {
         "NYK": 28798,
         "ANT": 315443,
         "HOU": 12579,
-        "TOTAL": 400323,
         "HAM": 39430,
         "NOR": 2083,
         "MIA": 1990
@@ -2946,11 +2728,10 @@
     },
     {
       "date": "2025-11-20",
-      "total_bags": 797290,
+      "total_bags": 398645,
       "by_port_totals": {
         "NYK": 28798,
         "HOU": 12579,
-        "TOTAL": 398645,
         "ANT": 313765,
         "HAM": 39430,
         "NOR": 2083,
@@ -2959,11 +2740,10 @@
     },
     {
       "date": "2025-11-21",
-      "total_bags": 804138,
+      "total_bags": 402069,
       "by_port_totals": {
         "ANT": 317189,
         "HOU": 12579,
-        "TOTAL": 402069,
         "NYK": 28798,
         "HAM": 39430,
         "NOR": 2083,
@@ -2972,12 +2752,11 @@
     },
     {
       "date": "2025-11-24",
-      "total_bags": 810430,
+      "total_bags": 405215,
       "by_port_totals": {
         "NYK": 28798,
         "ANT": 320620,
         "HOU": 12579,
-        "TOTAL": 405215,
         "HAM": 39145,
         "NOR": 2083,
         "MIA": 1990
@@ -2985,10 +2764,9 @@
     },
     {
       "date": "2025-11-25",
-      "total_bags": 807108,
+      "total_bags": 403554,
       "by_port_totals": {
         "HOU": 12579,
-        "TOTAL": 403554,
         "NYK": 27548,
         "ANT": 320209,
         "HAM": 39145,
@@ -2998,11 +2776,10 @@
     },
     {
       "date": "2025-11-26",
-      "total_bags": 817878,
+      "total_bags": 408939,
       "by_port_totals": {
         "ANT": 325594,
         "HOU": 12579,
-        "TOTAL": 408939,
         "NYK": 27548,
         "HAM": 39145,
         "NOR": 2083,
@@ -3011,12 +2788,11 @@
     },
     {
       "date": "2025-11-28",
-      "total_bags": 813918,
+      "total_bags": 406959,
       "by_port_totals": {
         "NYK": 27548,
         "ANT": 323614,
         "HOU": 12579,
-        "TOTAL": 406959,
         "HAM": 39145,
         "NOR": 2083,
         "MIA": 1990
@@ -3024,12 +2800,11 @@
     },
     {
       "date": "2025-12-01",
-      "total_bags": 813218,
+      "total_bags": 406609,
       "by_port_totals": {
         "NYK": 27548,
         "ANT": 323264,
         "HOU": 12579,
-        "TOTAL": 406609,
         "HAM": 39145,
         "NOR": 2083,
         "MIA": 1990
@@ -3037,12 +2812,11 @@
     },
     {
       "date": "2025-12-02",
-      "total_bags": 817808,
+      "total_bags": 408904,
       "by_port_totals": {
         "NYK": 27548,
         "ANT": 325284,
         "HOU": 12579,
-        "TOTAL": 408904,
         "HAM": 39420,
         "NOR": 2083,
         "MIA": 1990
@@ -3050,11 +2824,10 @@
     },
     {
       "date": "2025-12-03",
-      "total_bags": 826948,
+      "total_bags": 413474,
       "by_port_totals": {
         "ANT": 329854,
         "HOU": 12579,
-        "TOTAL": 413474,
         "NYK": 27548,
         "HAM": 39420,
         "NOR": 2083,
@@ -3063,11 +2836,10 @@
     },
     {
       "date": "2025-12-04",
-      "total_bags": 836988,
+      "total_bags": 418494,
       "by_port_totals": {
         "ANT": 334874,
         "HOU": 12579,
-        "TOTAL": 418494,
         "NYK": 27548,
         "HAM": 39420,
         "NOR": 2083,
@@ -3076,11 +2848,10 @@
     },
     {
       "date": "2025-12-05",
-      "total_bags": 853046,
+      "total_bags": 426523,
       "by_port_totals": {
         "ANT": 342903,
         "HOU": 12579,
-        "TOTAL": 426523,
         "NYK": 27548,
         "HAM": 39420,
         "NOR": 2083,
@@ -3089,11 +2860,10 @@
     },
     {
       "date": "2025-12-08",
-      "total_bags": 842758,
+      "total_bags": 421379,
       "by_port_totals": {
         "HOU": 12579,
         "ANT": 337759,
-        "TOTAL": 421379,
         "NYK": 27548,
         "HAM": 39420,
         "NOR": 2083,
@@ -3102,11 +2872,10 @@
     },
     {
       "date": "2025-12-09",
-      "total_bags": 824892,
+      "total_bags": 412446,
       "by_port_totals": {
         "HOU": 12579,
         "NYK": 27548,
-        "TOTAL": 412446,
         "ANT": 328826,
         "HAM": 39420,
         "NOR": 2083,
@@ -3115,11 +2884,10 @@
     },
     {
       "date": "2025-12-10",
-      "total_bags": 830560,
+      "total_bags": 415280,
       "by_port_totals": {
         "ANT": 332240,
         "HOU": 12579,
-        "TOTAL": 415280,
         "NYK": 27548,
         "HAM": 38840,
         "NOR": 2083,
@@ -3128,11 +2896,10 @@
     },
     {
       "date": "2025-12-11",
-      "total_bags": 832748,
+      "total_bags": 416374,
       "by_port_totals": {
         "ANT": 333334,
         "HOU": 12579,
-        "TOTAL": 416374,
         "NYK": 27548,
         "HAM": 38840,
         "NOR": 2083,
@@ -3141,11 +2908,10 @@
     },
     {
       "date": "2025-12-12",
-      "total_bags": 841194,
+      "total_bags": 420597,
       "by_port_totals": {
         "ANT": 336597,
         "HOU": 12579,
-        "TOTAL": 420597,
         "NYK": 27548,
         "HAM": 39800,
         "NOR": 2083,
@@ -3154,12 +2920,11 @@
     },
     {
       "date": "2025-12-15",
-      "total_bags": 834906,
+      "total_bags": 417453,
       "by_port_totals": {
         "NYK": 27548,
         "ANT": 333453,
         "HOU": 12579,
-        "TOTAL": 417453,
         "HAM": 39800,
         "NOR": 2083,
         "MIA": 1990
@@ -3167,11 +2932,10 @@
     },
     {
       "date": "2025-12-16",
-      "total_bags": 840346,
+      "total_bags": 420173,
       "by_port_totals": {
         "HOU": 12579,
         "ANT": 336173,
-        "TOTAL": 420173,
         "NYK": 27548,
         "HAM": 39800,
         "NOR": 2083,
@@ -3180,11 +2944,10 @@
     },
     {
       "date": "2025-12-17",
-      "total_bags": 853876,
+      "total_bags": 426938,
       "by_port_totals": {
         "ANT": 342938,
         "HOU": 12579,
-        "TOTAL": 426938,
         "NYK": 27548,
         "HAM": 39800,
         "NOR": 2083,
@@ -3193,11 +2956,10 @@
     },
     {
       "date": "2025-12-18",
-      "total_bags": 865344,
+      "total_bags": 432672,
       "by_port_totals": {
         "ANT": 349172,
         "HOU": 12579,
-        "TOTAL": 432672,
         "NYK": 27048,
         "HAM": 39800,
         "NOR": 2083,
@@ -3206,11 +2968,10 @@
     },
     {
       "date": "2025-12-19",
-      "total_bags": 878514,
+      "total_bags": 439257,
       "by_port_totals": {
         "ANT": 355757,
         "HOU": 12579,
-        "TOTAL": 439257,
         "NYK": 27048,
         "HAM": 39800,
         "NOR": 2083,
@@ -3219,11 +2980,10 @@
     },
     {
       "date": "2025-12-22",
-      "total_bags": 887966,
+      "total_bags": 443983,
       "by_port_totals": {
         "NYK": 26799,
         "HOU": 12304,
-        "TOTAL": 443983,
         "ANT": 361037,
         "HAM": 39770,
         "NOR": 2083,
@@ -3232,11 +2992,10 @@
     },
     {
       "date": "2025-12-23",
-      "total_bags": 907528,
+      "total_bags": 453764,
       "by_port_totals": {
         "ANT": 366943,
         "HOU": 12304,
-        "TOTAL": 453764,
         "NYK": 26799,
         "HAM": 38645,
         "NOR": 2083,
@@ -3245,11 +3004,10 @@
     },
     {
       "date": "2025-12-24",
-      "total_bags": 912954,
+      "total_bags": 456477,
       "by_port_totals": {
         "ANT": 374281,
         "HOU": 12304,
-        "TOTAL": 456477,
         "NYK": 26299,
         "HAM": 34520,
         "NOR": 2083,
@@ -3258,11 +3016,10 @@
     },
     {
       "date": "2025-12-26",
-      "total_bags": 912954,
+      "total_bags": 456477,
       "by_port_totals": {
         "HOU": 12304,
         "ANT": 374281,
-        "TOTAL": 456477,
         "NYK": 26299,
         "HAM": 34520,
         "NOR": 2083,
@@ -3271,11 +3028,10 @@
     },
     {
       "date": "2025-12-29",
-      "total_bags": 912954,
+      "total_bags": 456477,
       "by_port_totals": {
         "ANT": 374281,
         "HOU": 12304,
-        "TOTAL": 456477,
         "NYK": 26299,
         "HAM": 34520,
         "NOR": 2083,
@@ -3284,12 +3040,11 @@
     },
     {
       "date": "2025-12-30",
-      "total_bags": 911454,
+      "total_bags": 455727,
       "by_port_totals": {
         "NYK": 25549,
         "ANT": 374281,
         "HOU": 12304,
-        "TOTAL": 455727,
         "HAM": 34520,
         "NOR": 2083,
         "MIA": 6990
@@ -3297,12 +3052,11 @@
     },
     {
       "date": "2025-12-31",
-      "total_bags": 906310,
+      "total_bags": 453155,
       "by_port_totals": {
         "NYK": 24297,
         "ANT": 372961,
         "HOU": 12304,
-        "TOTAL": 453155,
         "HAM": 34520,
         "NOR": 2083,
         "MIA": 6990
@@ -3310,12 +3064,11 @@
     },
     {
       "date": "2026-01-02",
-      "total_bags": 905812,
+      "total_bags": 452906,
       "by_port_totals": {
         "NYK": 24297,
         "ANT": 372961,
         "HOU": 12055,
-        "TOTAL": 452906,
         "HAM": 34520,
         "NOR": 2083,
         "MIA": 6990
@@ -3323,10 +3076,9 @@
     },
     {
       "date": "2026-01-05",
-      "total_bags": 905812,
+      "total_bags": 452906,
       "by_port_totals": {
         "NYK": 24297,
-        "TOTAL": 452906,
         "HOU": 12055,
         "ANT": 372961,
         "HAM": 34520,
@@ -3336,11 +3088,10 @@
     },
     {
       "date": "2026-01-06",
-      "total_bags": 914062,
+      "total_bags": 457031,
       "by_port_totals": {
         "ANT": 376836,
         "NYK": 24047,
-        "TOTAL": 457031,
         "HOU": 12055,
         "HAM": 35020,
         "NOR": 2083,
@@ -3349,10 +3100,9 @@
     },
     {
       "date": "2026-01-07",
-      "total_bags": 923658,
+      "total_bags": 461829,
       "by_port_totals": {
         "NYK": 24047,
-        "TOTAL": 461829,
         "HOU": 12055,
         "ANT": 381134,
         "HAM": 35270,
@@ -3362,11 +3112,10 @@
     },
     {
       "date": "2026-01-08",
-      "total_bags": 922938,
+      "total_bags": 461469,
       "by_port_totals": {
         "ANT": 380774,
         "HOU": 12055,
-        "TOTAL": 461469,
         "NYK": 24047,
         "HAM": 35270,
         "NOR": 2083,
@@ -3375,12 +3124,11 @@
     },
     {
       "date": "2026-01-09",
-      "total_bags": 922668,
+      "total_bags": 461334,
       "by_port_totals": {
         "NYK": 24047,
         "ANT": 380639,
         "HOU": 12055,
-        "TOTAL": 461334,
         "HAM": 35270,
         "NOR": 2083,
         "MIA": 7240
@@ -3388,12 +3136,11 @@
     },
     {
       "date": "2026-01-12",
-      "total_bags": 900638,
+      "total_bags": 450319,
       "by_port_totals": {
         "NYK": 24047,
         "ANT": 369624,
         "HOU": 12055,
-        "TOTAL": 450319,
         "HAM": 35270,
         "NOR": 2083,
         "MIA": 7240
@@ -3401,12 +3148,11 @@
     },
     {
       "date": "2026-01-13",
-      "total_bags": 906058,
+      "total_bags": 453029,
       "by_port_totals": {
         "NYK": 24047,
         "HOU": 12055,
         "ANT": 373404,
-        "TOTAL": 453029,
         "HAM": 34200,
         "NOR": 2083,
         "MIA": 7240
@@ -3414,11 +3160,10 @@
     },
     {
       "date": "2026-01-14",
-      "total_bags": 898644,
+      "total_bags": 449322,
       "by_port_totals": {
         "ANT": 374452,
         "HOU": 9880,
-        "TOTAL": 449322,
         "HAM": 34200,
         "NOR": 2083,
         "NYK": 21467,
@@ -3427,11 +3172,10 @@
     },
     {
       "date": "2026-01-15",
-      "total_bags": 898644,
+      "total_bags": 449322,
       "by_port_totals": {
         "ANT": 374452,
         "HOU": 9880,
-        "TOTAL": 449322,
         "HAM": 34200,
         "NOR": 2083,
         "NYK": 21467,
@@ -3440,11 +3184,10 @@
     },
     {
       "date": "2026-01-16",
-      "total_bags": 893356,
+      "total_bags": 446678,
       "by_port_totals": {
         "ANT": 373202,
         "HOU": 9880,
-        "TOTAL": 446678,
         "HAM": 33056,
         "NOR": 2083,
         "NYK": 21467,
@@ -3453,11 +3196,10 @@
     },
     {
       "date": "2026-01-20",
-      "total_bags": 881692,
+      "total_bags": 440846,
       "by_port_totals": {
         "ANT": 367655,
         "HOU": 9880,
-        "TOTAL": 440846,
         "HAM": 33056,
         "NOR": 2083,
         "NYK": 21182,
@@ -3466,11 +3208,10 @@
     },
     {
       "date": "2026-01-21",
-      "total_bags": 881106,
+      "total_bags": 440553,
       "by_port_totals": {
         "ANT": 367362,
         "HOU": 9880,
-        "TOTAL": 440553,
         "HAM": 33056,
         "NOR": 2083,
         "NYK": 21182,
@@ -3479,11 +3220,10 @@
     },
     {
       "date": "2026-01-22",
-      "total_bags": 884918,
+      "total_bags": 442459,
       "by_port_totals": {
         "ANT": 369268,
         "HOU": 9880,
-        "TOTAL": 442459,
         "HAM": 33056,
         "NOR": 2083,
         "NYK": 21182,
@@ -3492,11 +3232,10 @@
     },
     {
       "date": "2026-01-23",
-      "total_bags": 895710,
+      "total_bags": 447855,
       "by_port_totals": {
         "HOU": 9880,
         "ANT": 374664,
-        "TOTAL": 447855,
         "HAM": 33056,
         "NOR": 2083,
         "NYK": 21182,
@@ -3505,11 +3244,10 @@
     },
     {
       "date": "2026-01-26",
-      "total_bags": 880624,
+      "total_bags": 440312,
       "by_port_totals": {
         "ANT": 367976,
         "HOU": 9880,
-        "TOTAL": 440312,
         "HAM": 32201,
         "NOR": 2083,
         "NYK": 21182,
@@ -3518,11 +3256,10 @@
     },
     {
       "date": "2026-01-27",
-      "total_bags": 862236,
+      "total_bags": 431118,
       "by_port_totals": {
         "ANT": 360282,
         "HOU": 9880,
-        "TOTAL": 431118,
         "HAM": 30951,
         "NOR": 2083,
         "NYK": 20932,
@@ -3531,9 +3268,8 @@
     },
     {
       "date": "2026-01-28",
-      "total_bags": 862236,
+      "total_bags": 431118,
       "by_port_totals": {
-        "TOTAL": 431118,
         "HOU": 9880,
         "ANT": 360282,
         "HAM": 30951,
@@ -3544,11 +3280,10 @@
     },
     {
       "date": "2026-01-29",
-      "total_bags": 866744,
+      "total_bags": 433372,
       "by_port_totals": {
         "ANT": 362786,
         "HOU": 9880,
-        "TOTAL": 433372,
         "HAM": 30701,
         "NOR": 2083,
         "NYK": 20932,
@@ -3557,11 +3292,10 @@
     },
     {
       "date": "2026-01-30",
-      "total_bags": 871442,
+      "total_bags": 435721,
       "by_port_totals": {
         "ANT": 365135,
         "HOU": 9880,
-        "TOTAL": 435721,
         "HAM": 30701,
         "NOR": 2083,
         "NYK": 20932,
@@ -3570,9 +3304,8 @@
     },
     {
       "date": "2026-02-02",
-      "total_bags": 871362,
+      "total_bags": 435681,
       "by_port_totals": {
-        "TOTAL": 435681,
         "HOU": 9880,
         "ANT": 365095,
         "HAM": 30701,
@@ -3583,10 +3316,9 @@
     },
     {
       "date": "2026-02-03",
-      "total_bags": 873156,
+      "total_bags": 436578,
       "by_port_totals": {
         "HOU": 10980,
-        "TOTAL": 436578,
         "ANT": 364892,
         "HAM": 30701,
         "NOR": 2083,
@@ -3596,9 +3328,8 @@
     },
     {
       "date": "2026-02-04",
-      "total_bags": 874816,
+      "total_bags": 437408,
       "by_port_totals": {
-        "TOTAL": 437408,
         "ANT": 366222,
         "HOU": 10730,
         "HAM": 30701,
@@ -3609,11 +3340,10 @@
     },
     {
       "date": "2026-02-05",
-      "total_bags": 850662,
+      "total_bags": 425331,
       "by_port_totals": {
         "ANT": 357020,
         "HOU": 10730,
-        "TOTAL": 425331,
         "HAM": 28826,
         "NOR": 1083,
         "NYK": 20682,
@@ -3622,11 +3352,10 @@
     },
     {
       "date": "2026-02-06",
-      "total_bags": 842346,
+      "total_bags": 421173,
       "by_port_totals": {
         "ANT": 350789,
         "HOU": 14305,
-        "TOTAL": 421173,
         "HAM": 28826,
         "NOR": 337,
         "NYK": 20426,
@@ -3635,10 +3364,9 @@
     },
     {
       "date": "2026-02-09",
-      "total_bags": 856128,
+      "total_bags": 428064,
       "by_port_totals": {
         "HOU": 15955,
-        "TOTAL": 428064,
         "ANT": 356280,
         "HAM": 28826,
         "NOR": 337,
@@ -3648,11 +3376,10 @@
     },
     {
       "date": "2026-02-10",
-      "total_bags": 852642,
+      "total_bags": 426321,
       "by_port_totals": {
         "ANT": 353162,
         "HOU": 17330,
-        "TOTAL": 426321,
         "HAM": 28826,
         "NOR": 337,
         "NYK": 20426,
@@ -3661,10 +3388,9 @@
     },
     {
       "date": "2026-02-11",
-      "total_bags": 861330,
+      "total_bags": 430665,
       "by_port_totals": {
         "ANT": 354405,
-        "TOTAL": 430665,
         "HOU": 20931,
         "HAM": 28826,
         "NOR": 337,
@@ -3674,11 +3400,10 @@
     },
     {
       "date": "2026-02-12",
-      "total_bags": 872162,
+      "total_bags": 436081,
       "by_port_totals": {
         "ANT": 353755,
         "HOU": 27494,
-        "TOTAL": 436081,
         "HAM": 28826,
         "NOR": 337,
         "NYK": 19429,
@@ -3687,11 +3412,10 @@
     },
     {
       "date": "2026-02-13",
-      "total_bags": 857262,
+      "total_bags": 428631,
       "by_port_totals": {
         "ANT": 347160,
         "HOU": 27494,
-        "TOTAL": 428631,
         "HAM": 27971,
         "NOR": 337,
         "NYK": 19429,
@@ -3700,11 +3424,10 @@
     },
     {
       "date": "2026-02-16",
-      "total_bags": 869692,
+      "total_bags": 434846,
       "by_port_totals": {
         "ANT": 348110,
         "HOU": 32759,
-        "TOTAL": 434846,
         "HAM": 27971,
         "NOR": 337,
         "NYK": 19429,
@@ -3713,11 +3436,10 @@
     },
     {
       "date": "2026-02-17",
-      "total_bags": 870988,
+      "total_bags": 435494,
       "by_port_totals": {
         "ANT": 343909,
         "HOU": 40101,
-        "TOTAL": 435494,
         "HAM": 24221,
         "NOR": 337,
         "NYK": 19429,
@@ -3726,9 +3448,8 @@
     },
     {
       "date": "2026-02-18",
-      "total_bags": 900858,
+      "total_bags": 450429,
       "by_port_totals": {
-        "TOTAL": 450429,
         "ANT": 343734,
         "HOU": 53620,
         "HAM": 24221,
@@ -3739,11 +3460,10 @@
     },
     {
       "date": "2026-02-19",
-      "total_bags": 899132,
+      "total_bags": 449566,
       "by_port_totals": {
         "ANT": 335870,
         "HOU": 61761,
-        "TOTAL": 449566,
         "HAM": 23081,
         "NOR": 337,
         "MIA": 9088,
@@ -3752,11 +3472,10 @@
     },
     {
       "date": "2026-02-20",
-      "total_bags": 918408,
+      "total_bags": 459204,
       "by_port_totals": {
         "ANT": 339908,
         "HOU": 62036,
-        "TOTAL": 459204,
         "HAM": 23581,
         "NOR": 337,
         "NYK": 20679,
@@ -3765,11 +3484,10 @@
     },
     {
       "date": "2026-02-23",
-      "total_bags": 916274,
+      "total_bags": 458137,
       "by_port_totals": {
         "ANT": 338841,
         "HOU": 62036,
-        "TOTAL": 458137,
         "HAM": 23581,
         "NOR": 337,
         "NYK": 20679,
@@ -3778,9 +3496,8 @@
     },
     {
       "date": "2026-02-24",
-      "total_bags": 907224,
+      "total_bags": 453612,
       "by_port_totals": {
-        "TOTAL": 453612,
         "ANT": 338666,
         "HOU": 58186,
         "HAM": 23581,
@@ -3791,11 +3508,10 @@
     },
     {
       "date": "2026-02-25",
-      "total_bags": 910840,
+      "total_bags": 455420,
       "by_port_totals": {
         "ANT": 339119,
         "HOU": 58451,
-        "TOTAL": 455420,
         "HAM": 23296,
         "NOR": 337,
         "MIA": 12163,
@@ -3804,11 +3520,10 @@
     },
     {
       "date": "2026-02-26",
-      "total_bags": 932110,
+      "total_bags": 466055,
       "by_port_totals": {
         "ANT": 347279,
         "HOU": 60926,
-        "TOTAL": 466055,
         "HAM": 23296,
         "NOR": 337,
         "MIA": 12163,
@@ -3817,10 +3532,9 @@
     },
     {
       "date": "2026-02-27",
-      "total_bags": 954458,
+      "total_bags": 477229,
       "by_port_totals": {
         "HOU": 62851,
-        "TOTAL": 477229,
         "ANT": 355278,
         "HAM": 24546,
         "NOR": 337,
@@ -3830,11 +3544,10 @@
     },
     {
       "date": "2026-03-02",
-      "total_bags": 1020302,
+      "total_bags": 510151,
       "by_port_totals": {
         "ANT": 375074,
         "HOU": 74727,
-        "TOTAL": 510151,
         "HAM": 24796,
         "NOR": 337,
         "NYK": 23054,
@@ -3843,11 +3556,10 @@
     },
     {
       "date": "2026-03-03",
-      "total_bags": 1048278,
+      "total_bags": 524139,
       "by_port_totals": {
         "ANT": 390437,
         "HOU": 73352,
-        "TOTAL": 524139,
         "HAM": 24796,
         "NOR": 337,
         "NYK": 23054,
@@ -3856,11 +3568,10 @@
     },
     {
       "date": "2026-03-04",
-      "total_bags": 1056056,
+      "total_bags": 528028,
       "by_port_totals": {
         "ANT": 392075,
         "HOU": 75851,
-        "TOTAL": 528028,
         "HAM": 24548,
         "NOR": 337,
         "NYK": 23054,
@@ -3869,11 +3580,10 @@
     },
     {
       "date": "2026-03-05",
-      "total_bags": 1064498,
+      "total_bags": 532249,
       "by_port_totals": {
         "ANT": 389868,
         "HOU": 81607,
-        "TOTAL": 532249,
         "HAM": 24480,
         "NOR": 337,
         "MIA": 13188,
@@ -3882,11 +3592,10 @@
     },
     {
       "date": "2026-03-06",
-      "total_bags": 1081734,
+      "total_bags": 540867,
       "by_port_totals": {
         "ANT": 394386,
         "HOU": 85457,
-        "TOTAL": 540867,
         "HAM": 24480,
         "NOR": 587,
         "NYK": 22769,
@@ -3895,10 +3604,9 @@
     },
     {
       "date": "2026-03-09",
-      "total_bags": 1106758,
+      "total_bags": 553379,
       "by_port_totals": {
         "ANT": 393781,
-        "TOTAL": 553379,
         "HOU": 92986,
         "HAM": 24480,
         "NOR": 6175,
@@ -3908,11 +3616,10 @@
     },
     {
       "date": "2026-03-10",
-      "total_bags": 1129252,
+      "total_bags": 564626,
       "by_port_totals": {
         "HOU": 102612,
         "ANT": 395402,
-        "TOTAL": 564626,
         "HAM": 24480,
         "NOR": 6175,
         "NYK": 22769,
@@ -3921,11 +3628,10 @@
     },
     {
       "date": "2026-03-11",
-      "total_bags": 1104384,
+      "total_bags": 552192,
       "by_port_totals": {
         "ANT": 394173,
         "HOU": 96332,
-        "TOTAL": 552192,
         "HAM": 24233,
         "NOR": 8100,
         "MIA": 13188,
@@ -3934,11 +3640,10 @@
     },
     {
       "date": "2026-03-12",
-      "total_bags": 1126208,
+      "total_bags": 563104,
       "by_port_totals": {
         "ANT": 402555,
         "HOU": 96882,
-        "TOTAL": 563104,
         "HAM": 24233,
         "NOR": 10080,
         "MIA": 13188,
@@ -3947,11 +3652,10 @@
     },
     {
       "date": "2026-03-16",
-      "total_bags": 1163660,
+      "total_bags": 581830,
       "by_port_totals": {
         "ANT": 419905,
         "HOU": 96608,
-        "TOTAL": 581830,
         "HAM": 24233,
         "NOR": 11730,
         "NYK": 16166,
@@ -3960,11 +3664,10 @@
     },
     {
       "date": "2026-03-17",
-      "total_bags": 1158530,
+      "total_bags": 579265,
       "by_port_totals": {
         "ANT": 418754,
         "HOU": 95194,
-        "TOTAL": 579265,
         "HAM": 24233,
         "NOR": 11730,
         "MIA": 13188,
@@ -3973,11 +3676,10 @@
     },
     {
       "date": "2026-03-18",
-      "total_bags": 1171242,
+      "total_bags": 585621,
       "by_port_totals": {
         "ANT": 421184,
         "HOU": 93761,
-        "TOTAL": 585621,
         "HAM": 24233,
         "NOR": 17089,
         "NYK": 16166,
@@ -3986,10 +3688,9 @@
     },
     {
       "date": "2026-03-19",
-      "total_bags": 1104298,
+      "total_bags": 552149,
       "by_port_totals": {
         "ANT": 387835,
-        "TOTAL": 552149,
         "HAM": 24233,
         "NOR": 17089,
         "HOU": 93638,
@@ -3999,10 +3700,9 @@
     },
     {
       "date": "2026-03-20",
-      "total_bags": 1082878,
+      "total_bags": 541439,
       "by_port_totals": {
         "ANT": 379087,
-        "TOTAL": 541439,
         "HAM": 24233,
         "NOR": 17089,
         "HOU": 91676,
@@ -4012,10 +3712,9 @@
     },
     {
       "date": "2026-03-23",
-      "total_bags": 1065122,
+      "total_bags": 532561,
       "by_port_totals": {
         "ANT": 375659,
-        "TOTAL": 532561,
         "HAM": 24233,
         "NOR": 19089,
         "HOU": 84226,
@@ -4025,9 +3724,8 @@
     },
     {
       "date": "2026-03-24",
-      "total_bags": 1067474,
+      "total_bags": 533737,
       "by_port_totals": {
-        "TOTAL": 533737,
         "ANT": 381785,
         "HAM": 24233,
         "NOR": 19089,
@@ -4038,10 +3736,9 @@
     },
     {
       "date": "2026-03-25",
-      "total_bags": 1089318,
+      "total_bags": 544659,
       "by_port_totals": {
         "ANT": 386385,
-        "TOTAL": 544659,
         "HAM": 24233,
         "NOR": 23212,
         "HOU": 81475,
@@ -4051,10 +3748,9 @@
     },
     {
       "date": "2026-03-26",
-      "total_bags": 1099422,
+      "total_bags": 549711,
       "by_port_totals": {
         "ANT": 391437,
-        "TOTAL": 549711,
         "HAM": 24233,
         "NOR": 23212,
         "HOU": 81475,
@@ -4064,10 +3760,9 @@
     },
     {
       "date": "2026-03-27",
-      "total_bags": 1103448,
+      "total_bags": 551724,
       "by_port_totals": {
         "ANT": 389884,
-        "TOTAL": 551724,
         "HAM": 23386,
         "NOR": 24323,
         "HOU": 84777,
@@ -4077,10 +3772,9 @@
     },
     {
       "date": "2026-03-30",
-      "total_bags": 1118048,
+      "total_bags": 559024,
       "by_port_totals": {
         "ANT": 394834,
-        "TOTAL": 559024,
         "HAM": 23386,
         "NOR": 26248,
         "HOU": 83952,
@@ -4090,10 +3784,9 @@
     },
     {
       "date": "2026-03-31",
-      "total_bags": 1114948,
+      "total_bags": 557474,
       "by_port_totals": {
         "ANT": 394084,
-        "TOTAL": 557474,
         "HAM": 23386,
         "NOR": 26248,
         "HOU": 83402,
@@ -4103,10 +3796,9 @@
     },
     {
       "date": "2026-04-01",
-      "total_bags": 1091740,
+      "total_bags": 545870,
       "by_port_totals": {
         "ANT": 388280,
-        "TOTAL": 545870,
         "HAM": 23386,
         "NOR": 26248,
         "HOU": 77602,
@@ -4116,9 +3808,8 @@
     },
     {
       "date": "2026-04-02",
-      "total_bags": 1095334,
+      "total_bags": 547667,
       "by_port_totals": {
-        "TOTAL": 547667,
         "ANT": 386773,
         "HAM": 23386,
         "NOR": 27623,
@@ -4129,10 +3820,9 @@
     },
     {
       "date": "2026-04-06",
-      "total_bags": 1092236,
+      "total_bags": 546118,
       "by_port_totals": {
         "ANT": 386333,
-        "TOTAL": 546118,
         "HAM": 23386,
         "NOR": 26798,
         "HOU": 79531,
@@ -4142,9 +3832,8 @@
     },
     {
       "date": "2026-04-07",
-      "total_bags": 1093440,
+      "total_bags": 546720,
       "by_port_totals": {
-        "TOTAL": 546720,
         "ANT": 389522,
         "HAM": 23386,
         "NOR": 26512,
@@ -4155,10 +3844,9 @@
     },
     {
       "date": "2026-04-09",
-      "total_bags": 1098494,
+      "total_bags": 549247,
       "by_port_totals": {
         "ANT": 389373,
-        "TOTAL": 549247,
         "HAM": 23386,
         "NOR": 28987,
         "HOU": 76431,
@@ -4168,10 +3856,9 @@
     },
     {
       "date": "2026-04-10",
-      "total_bags": 1092362,
+      "total_bags": 546181,
       "by_port_totals": {
         "ANT": 387557,
-        "TOTAL": 546181,
         "HAM": 23386,
         "NOR": 28987,
         "HOU": 76431,
@@ -4181,10 +3868,9 @@
     },
     {
       "date": "2026-04-13",
-      "total_bags": 1079404,
+      "total_bags": 539702,
       "by_port_totals": {
         "ANT": 382379,
-        "TOTAL": 539702,
         "HAM": 22636,
         "NOR": 28987,
         "HOU": 75880,
@@ -4194,10 +3880,9 @@
     },
     {
       "date": "2026-04-14",
-      "total_bags": 1092186,
+      "total_bags": 546093,
       "by_port_totals": {
         "ANT": 384468,
-        "TOTAL": 546093,
         "HAM": 22636,
         "NOR": 30989,
         "HOU": 76155,
@@ -4207,10 +3892,9 @@
     },
     {
       "date": "2026-04-15",
-      "total_bags": 1083972,
+      "total_bags": 541986,
       "by_port_totals": {
         "ANT": 380361,
-        "TOTAL": 541986,
         "HAM": 22636,
         "NOR": 30989,
         "HOU": 76155,
@@ -4220,10 +3904,9 @@
     },
     {
       "date": "2026-04-16",
-      "total_bags": 1080188,
+      "total_bags": 540094,
       "by_port_totals": {
         "ANT": 379470,
-        "TOTAL": 540094,
         "HAM": 22636,
         "NOR": 30989,
         "HOU": 75154,
@@ -4233,10 +3916,9 @@
     },
     {
       "date": "2026-04-17",
-      "total_bags": 1055732,
+      "total_bags": 527866,
       "by_port_totals": {
         "ANT": 368892,
-        "TOTAL": 527866,
         "HAM": 22636,
         "NOR": 31264,
         "HOU": 73229,
@@ -4246,9 +3928,8 @@
     },
     {
       "date": "2026-04-20",
-      "total_bags": 1044366,
+      "total_bags": 522183,
       "by_port_totals": {
-        "TOTAL": 522183,
         "ANT": 366256,
         "HAM": 22636,
         "NOR": 31264,
@@ -4259,9 +3940,8 @@
     },
     {
       "date": "2026-04-21",
-      "total_bags": 1036994,
+      "total_bags": 518497,
       "by_port_totals": {
-        "TOTAL": 518497,
         "ANT": 362570,
         "HAM": 22636,
         "NOR": 31264,
@@ -4272,10 +3952,9 @@
     },
     {
       "date": "2026-04-22",
-      "total_bags": 1031074,
+      "total_bags": 515537,
       "by_port_totals": {
         "ANT": 359684,
-        "TOTAL": 515537,
         "HAM": 23276,
         "NOR": 31550,
         "HOU": 69754,
@@ -4285,10 +3964,9 @@
     },
     {
       "date": "2026-04-23",
-      "total_bags": 1036086,
+      "total_bags": 518043,
       "by_port_totals": {
         "ANT": 360576,
-        "TOTAL": 518043,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 72213,
@@ -4298,10 +3976,9 @@
     },
     {
       "date": "2026-04-24",
-      "total_bags": 1025672,
+      "total_bags": 512836,
       "by_port_totals": {
         "ANT": 358119,
-        "TOTAL": 512836,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 69463,
@@ -4311,10 +3988,9 @@
     },
     {
       "date": "2026-04-27",
-      "total_bags": 994924,
+      "total_bags": 497462,
       "by_port_totals": {
         "ANT": 343846,
-        "TOTAL": 497462,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68362,
@@ -4324,10 +4000,9 @@
     },
     {
       "date": "2026-04-28",
-      "total_bags": 989016,
+      "total_bags": 494508,
       "by_port_totals": {
         "ANT": 343942,
-        "TOTAL": 494508,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 67812,
@@ -4337,10 +4012,9 @@
     },
     {
       "date": "2026-04-29",
-      "total_bags": 989516,
+      "total_bags": 494758,
       "by_port_totals": {
         "ANT": 343942,
-        "TOTAL": 494758,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 67812,
@@ -4350,10 +4024,9 @@
     },
     {
       "date": "2026-04-30",
-      "total_bags": 998566,
+      "total_bags": 499283,
       "by_port_totals": {
         "ANT": 346617,
-        "TOTAL": 499283,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4363,10 +4036,9 @@
     },
     {
       "date": "2026-05-01",
-      "total_bags": 1004468,
+      "total_bags": 502234,
       "by_port_totals": {
         "ANT": 349568,
-        "TOTAL": 502234,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4376,10 +4048,9 @@
     },
     {
       "date": "2026-05-04",
-      "total_bags": 998072,
+      "total_bags": 499036,
       "by_port_totals": {
         "ANT": 346370,
-        "TOTAL": 499036,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4389,10 +4060,9 @@
     },
     {
       "date": "2026-05-05",
-      "total_bags": 995852,
+      "total_bags": 497926,
       "by_port_totals": {
         "ANT": 345510,
-        "TOTAL": 497926,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4402,10 +4072,9 @@
     },
     {
       "date": "2026-05-06",
-      "total_bags": 984816,
+      "total_bags": 492408,
       "by_port_totals": {
         "ANT": 339992,
-        "TOTAL": 492408,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4415,10 +4084,9 @@
     },
     {
       "date": "2026-05-07",
-      "total_bags": 966584,
+      "total_bags": 483292,
       "by_port_totals": {
         "ANT": 330876,
-        "TOTAL": 483292,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 68912,
@@ -4428,10 +4096,9 @@
     },
     {
       "date": "2026-05-08",
-      "total_bags": 954090,
+      "total_bags": 477045,
       "by_port_totals": {
         "ANT": 325412,
-        "TOTAL": 477045,
         "HAM": 22706,
         "NOR": 31550,
         "HOU": 67879,
@@ -4441,9 +4108,8 @@
     },
     {
       "date": "2026-05-11",
-      "total_bags": 954090,
+      "total_bags": 477045,
       "by_port_totals": {
-        "TOTAL": 477045,
         "ANT": 325412,
         "HAM": 22706,
         "NOR": 31550,
@@ -4454,9 +4120,8 @@
     },
     {
       "date": "2026-05-12",
-      "total_bags": 943662,
+      "total_bags": 471831,
       "by_port_totals": {
-        "TOTAL": 471831,
         "ANT": 323074,
         "HAM": 21562,
         "NOR": 30178,
@@ -4467,10 +4132,9 @@
     },
     {
       "date": "2026-05-13",
-      "total_bags": 943970,
+      "total_bags": 471985,
       "by_port_totals": {
         "ANT": 323514,
-        "TOTAL": 471985,
         "HAM": 21562,
         "NOR": 29892,
         "HOU": 67519,
@@ -4480,10 +4144,9 @@
     },
     {
       "date": "2026-05-14",
-      "total_bags": 943970,
+      "total_bags": 471985,
       "by_port_totals": {
         "ANT": 323514,
-        "TOTAL": 471985,
         "HAM": 21562,
         "NOR": 29892,
         "HOU": 67519,
@@ -4493,10 +4156,9 @@
     },
     {
       "date": "2026-05-15",
-      "total_bags": 932810,
+      "total_bags": 466405,
       "by_port_totals": {
         "ANT": 318468,
-        "TOTAL": 466405,
         "HAM": 21028,
         "NOR": 29892,
         "HOU": 67519,
@@ -4506,10 +4168,9 @@
     },
     {
       "date": "2026-05-18",
-      "total_bags": 925554,
+      "total_bags": 462777,
       "by_port_totals": {
         "ANT": 316490,
-        "TOTAL": 462777,
         "HAM": 21028,
         "NOR": 29892,
         "HOU": 65869,
@@ -4519,9 +4180,8 @@
     },
     {
       "date": "2026-05-19",
-      "total_bags": 917470,
+      "total_bags": 458735,
       "by_port_totals": {
-        "TOTAL": 458735,
         "ANT": 312448,
         "HAM": 21028,
         "NOR": 29892,
@@ -4532,10 +4192,9 @@
     },
     {
       "date": "2026-05-20",
-      "total_bags": 912924,
+      "total_bags": 456462,
       "by_port_totals": {
         "ANT": 310203,
-        "TOTAL": 456462,
         "HAM": 21028,
         "NOR": 29892,
         "HOU": 65841,
@@ -4545,9 +4204,8 @@
     },
     {
       "date": "2026-05-21",
-      "total_bags": 902450,
+      "total_bags": 451225,
       "by_port_totals": {
-        "TOTAL": 451225,
         "ANT": 308679,
         "HAM": 21028,
         "NOR": 28517,
@@ -4558,9 +4216,8 @@
     },
     {
       "date": "2026-05-22",
-      "total_bags": 899134,
+      "total_bags": 449567,
       "by_port_totals": {
-        "TOTAL": 449567,
         "ANT": 307306,
         "HAM": 21028,
         "NOR": 28517,
@@ -4571,10 +4228,9 @@
     },
     {
       "date": "2026-05-26",
-      "total_bags": 893632,
+      "total_bags": 446816,
       "by_port_totals": {
         "ANT": 304555,
-        "TOTAL": 446816,
         "HAM": 21028,
         "NOR": 28517,
         "HOU": 63506,
@@ -4584,10 +4240,9 @@
     },
     {
       "date": "2026-05-27",
-      "total_bags": 887216,
+      "total_bags": 443608,
       "by_port_totals": {
         "ANT": 301847,
-        "TOTAL": 443608,
         "HAM": 21028,
         "NOR": 28017,
         "HOU": 63506,

@@ -79,6 +79,15 @@ def _str(v):
     return ("" if v is None else str(v)).strip()
 
 
+# Workbook pivots include per-origin / per-date "TOTAL" rows that aggregate
+# across the real warehouse ports. Treating these as a port double-counts the
+# grand total. Filter them at every parser entry that consumes a port_code.
+_AGGREGATE_PORT_NAMES = {"TOTAL", "GRAND TOTAL", "GRANDTOTAL", "ALL", "SUM", "TOT"}
+
+def _is_aggregate_port(port_code: str) -> bool:
+    return (port_code or "").strip().upper() in _AGGREGATE_PORT_NAMES
+
+
 # ── Per-sheet parsers ─────────────────────────────────────────────────────────
 
 def _bucket_by_date(sheet, *, date_col=0, skip_header_rows=1):
@@ -105,6 +114,7 @@ def parse_sheet_7_ny(sheet, since: date):
         port_code = _str(r[2])
         bags      = _int(r[4])
         if not origin or not port_code or bags <= 0: continue
+        if _is_aggregate_port(port_code): continue
         per_date[d].setdefault(origin, {})[port_code] = bags
         n += 1
     print(f"    sheet 7_ny: {n} non-zero rows kept ({len(per_date)} dates).")
@@ -122,6 +132,7 @@ def parse_sheet_5_pend(sheet, since: date):
         bags      = _int(r[3])
         origin    = _str(r[4])
         if not origin or not port_code or bags <= 0: continue
+        if _is_aggregate_port(port_code): continue
         per_date[d].setdefault(origin, {})[port_code] = bags
         n += 1
     print(f"    sheet 5_ny_pend_gradings: {n} non-zero rows kept ({len(per_date)} dates).")
@@ -130,23 +141,35 @@ def parse_sheet_5_pend(sheet, since: date):
 
 def parse_sheet_6_gradings(sheet, since: date):
     """Arabica gradings — flat: date | port_code | port_name | status | bags | origin.
-    Returns {date: {"passed": int, "failed": int, "by_port_status": {port: {status: bags}}}}."""
-    per_date: dict[date, dict] = defaultdict(lambda: {"passed": 0, "failed": 0,
-                                                       "by_port_status": defaultdict(lambda: defaultdict(int))})
+    Returns {date: {"passed": int, "failed": int,
+                    "by_port_status": {port: {status: bags}},
+                    "by_origin_status": {origin: {status: bags}},
+                    "by_port_origin_status": {port: {origin: {status: bags}}}}}.
+    The latter two are extracted from the workbook's `origin` column (was
+    dropped pre-audit) so a future Arabica Graded drill can render
+    port × origin × pass/fail rather than just port × pass/fail."""
+    def _new_day():
+        return {"passed": 0, "failed": 0,
+                "by_port_status":        defaultdict(lambda: defaultdict(int)),
+                "by_origin_status":      defaultdict(lambda: defaultdict(int)),
+                "by_port_origin_status": defaultdict(lambda: defaultdict(lambda: defaultdict(int)))}
+    per_date: dict[date, dict] = defaultdict(_new_day)
     n = 0
     for d, r in _bucket_by_date(sheet):
         if d < since: continue
         port_code = _str(r[1])
         status    = _str(r[3]).lower()
         bags      = _int(r[4])
-        # origin = _str(r[5])  # kept implicit; can add later if drill needs it
+        origin    = _str(r[5])
         if bags <= 0: continue
-        if status.startswith("pass"):
-            per_date[d]["passed"] += bags
-            per_date[d]["by_port_status"][port_code]["passed"] += bags
-        elif status.startswith("fail"):
-            per_date[d]["failed"] += bags
-            per_date[d]["by_port_status"][port_code]["failed"] += bags
+        if _is_aggregate_port(port_code): continue
+        kind = "passed" if status.startswith("pass") else "failed" if status.startswith("fail") else None
+        if kind is None: continue
+        per_date[d][kind] += bags
+        per_date[d]["by_port_status"][port_code][kind] += bags
+        if origin:
+            per_date[d]["by_origin_status"][origin][kind] += bags
+            per_date[d]["by_port_origin_status"][port_code][origin][kind] += bags
         n += 1
     print(f"    sheet 6_ny_gradings: {n} rows kept ({len(per_date)} dates).")
     return per_date
@@ -162,6 +185,7 @@ def parse_sheet_8a_issuers(sheet, since: date):
         if not rec["issuer"] or rec["value"] == 0:  # drop zero rows
             if rec["value"] == 0: continue
             continue
+        if _is_aggregate_port(rec["port"]): continue
         per_date[d].append(rec)
         n += 1
     print(f"    sheet 8a_ny_issuers: {n} non-zero rows kept ({len(per_date)} dates).")
@@ -176,6 +200,7 @@ def parse_sheet_8b_stoppers(sheet, since: date):
         if d < since: continue
         rec = {"port": _str(r[1]), "stopper": _str(r[3]), "value": _int(r[4]), "type": _str(r[5])}
         if not rec["stopper"] or rec["value"] == 0: continue
+        if _is_aggregate_port(rec["port"]): continue
         per_date[d].append(rec)
         n += 1
     print(f"    sheet 8b_ny_stoppers: {n} non-zero rows kept ({len(per_date)} dates).")
@@ -195,6 +220,7 @@ def parse_sheet_12_age(sheet, since: date):
         bucket  = _str(r[4])
         bags    = _int(r[6])
         if not port or not bucket or bags <= 0: continue
+        if _is_aggregate_port(port): continue
         per_date[d][port].append({"age_bucket": bucket, "bags": bags})
         n += 1
     print(f"    sheet 12_ny_age: {n} non-zero rows kept ({len(per_date)} dates).")
@@ -214,6 +240,7 @@ def parse_sheet_9_ld(sheet, since: date):
         non_tend   = _int(r[4])
         suspended  = _int(r[5])
         if not port_code: continue
+        if _is_aggregate_port(port_code): continue
         if val_cert == 0 and non_tend == 0 and suspended == 0: continue
         ent = per_date.setdefault(d, {"cut_off_date": d.isoformat(), "ports": [],
                                        "grand_total": {"with_val_cert": 0, "non_tend": 0, "suspended": 0}})
@@ -248,6 +275,7 @@ def parse_sheet_2_gradings(sheet, since: date):
             "lots":             _int(r[7]),
         }
         if entry["lots"] <= 0: continue
+        if _is_aggregate_port(entry["port"]): continue
         per_date[d]["entries"].append(entry)
         if entry["tenderable"]:
             per_date[d]["summary"]["tenderable_today"] += entry["lots"]
@@ -272,6 +300,7 @@ def parse_sheet_3_age(sheet, since_month_end: date):
         months  = _int(r[3])
         mt      = _int(r[4])
         if not port or months <= 0 or mt <= 0: continue
+        if _is_aggregate_port(port): continue
         per_me[me]["valid"]["ports"].add(port)
         per_me[me]["valid"]["buckets_raw"][months][port] += mt
         n += 1
@@ -389,6 +418,7 @@ def build_deep_arabica_chunks(sheet_7) -> dict[tuple[int, int], list[dict]]:
         port_code = _str(r[2])
         bags      = _int(r[4])
         if not port_code or bags <= 0: continue
+        if _is_aggregate_port(port_code): continue
         per_date_pp[d][port_code] += bags
         n += 1
     chunks: dict[tuple[int, int], list[dict]] = defaultdict(list)
@@ -413,6 +443,7 @@ def build_deep_robusta_chunks(sheet_9) -> dict[tuple[int, int], list[dict]]:
         port_code = _str(r[1])
         val_cert  = _int(r[3])
         if not port_code: continue
+        if _is_aggregate_port(port_code): continue
         ent = per_date.setdefault(d, {"by_port_lots": {}, "total_lots_certified": 0})
         if val_cert > 0:
             ent["by_port_lots"][port_code] = val_cert
@@ -508,6 +539,16 @@ def build_arabica_snapshots(certified, pending, gradings_today,
         stp_today = [{"port": e["port"], "stopper": e["stopper"], "value": e["value"]}
                      for e in stoppers_per_date.get(d, [])
                      if e.get("type") == "TODAY" and e.get("value", 0) > 0]
+        # Per-snapshot gradings detail — by port/origin/pass-fail. Captured
+        # exhaustively from sheet 6 so future drills (Arabica Graded → origin)
+        # work without re-importing.
+        def _materialise(dd):
+            """Convert nested defaultdicts into plain dicts (JSON-safe)."""
+            if isinstance(dd, dict):
+                return {k: _materialise(v) for k, v in dd.items()}
+            return dd
+        grad_origin   = _materialise(gt.get("by_origin_status", {}))
+        grad_port_org = _materialise(gt.get("by_port_origin_status", {}))
         snaps.append({
             "date":                 d.isoformat(),
             "report_date":          d.isoformat(),
@@ -528,6 +569,9 @@ def build_arabica_snapshots(certified, pending, gradings_today,
             "stoppers_today":       stp_today,
             "issued_total_today":   sum(e["value"] for e in iss_today),
             "received_total_today": sum(e["value"] for e in stp_today),
+            # Gradings-today detail (origin-resolved).
+            "graded_today_by_origin":      grad_origin,
+            "graded_today_by_port_origin": grad_port_org,
         })
     latest_date = dates[-1] if dates else None
     latest_detail = None

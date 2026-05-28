@@ -53,11 +53,53 @@ RETRY_AFTER_MAX_S = 90         # cap any Retry-After we'll wait for
 RETRY_AFTER_GIVE_UP_S = 600    # if Akamai asks > this, abort the rest of the run
 _RATE_STATE: dict[str, int] = {"consecutive_429s": 0, "aborted": 0}
 
-# Stock_report.csv's HHMMSS publish time varies daily; 10 guesses per day was
-# 90% wasted 404s and *that* burst was what tripped Akamai. Just try the two
-# real sample times — if neither hits, we live with the gap (the other 8
-# robusta sources still capture per-day activity).
-STOCK_REPORT_TIMES = ("103021", "103126", "103045")
+# Stock_report.csv's HHMMSS publish time varies daily. Strategy is tiered:
+#   Tier 1 — try the 5 most-frequent HHMMSS values from past successful
+#            captures (loaded from STOCK_REPORT_HITS_PATH). Cheap: ≤5 GETs.
+#   Tier 2 — if Tier 1 misses, sweep every second of the published
+#            10:30:00 → 10:31:59 window (120 GETs at 5 s throttle = 10 min
+#            worst case). Skipped during multi-day backfills (`sweep=False`).
+# Every successful capture is appended to the hits file so the Tier 1
+# ordering self-tunes over time.
+STOCK_REPORT_HITS_PATH = Path(__file__).with_name("stock_report_hits.json")
+STOCK_REPORT_SWEEP_HHMM = ((10, 30), (10, 31))
+STOCK_REPORT_TIER1_K = 5
+
+def _load_stock_report_hits() -> list[dict]:
+    if not STOCK_REPORT_HITS_PATH.exists():
+        return []
+    try:
+        return json.loads(STOCK_REPORT_HITS_PATH.read_text(encoding="utf-8")).get("hits", [])
+    except Exception:
+        return []
+
+def _record_stock_report_hit(d: date, hhmmss: str) -> None:
+    hits = _load_stock_report_hits()
+    hits.append({"date": d.isoformat(), "hhmmss": hhmmss})
+    STOCK_REPORT_HITS_PATH.write_text(
+        json.dumps({"hits": hits}, indent=2), encoding="utf-8",
+    )
+
+def _stock_report_tier1_times() -> tuple[str, ...]:
+    """Top-K most-frequent HHMMSS from the hits log."""
+    counts: dict[str, int] = defaultdict(int)
+    for h in _load_stock_report_hits():
+        if h.get("hhmmss"):
+            counts[h["hhmmss"]] += 1
+    most_common = sorted(counts.items(), key=lambda kv: -kv[1])[:STOCK_REPORT_TIER1_K]
+    if most_common:
+        return tuple(t for t, _ in most_common)
+    # Bootstrap: best guesses from initial exploration. Replaced once the
+    # hits log accumulates ≥5 confirmed captures.
+    return ("103021", "103126", "103045")
+
+def _stock_report_sweep_times() -> list[str]:
+    """Every HH:MM:SS in the 10:30:00 → 10:31:59 publish window."""
+    out: list[str] = []
+    for hh, mm in STOCK_REPORT_SWEEP_HHMM:
+        for ss in range(60):
+            out.append(f"{hh:02d}{mm:02d}{ss:02d}")
+    return out
 
 # Magic-byte / content-type expectations per source — used to flag "200 OK but
 # it's an HTML error page" responses that would otherwise be swallowed silently
@@ -193,13 +235,37 @@ def pull_arabica_xls(d: date) -> tuple[str, dict | None]:
     return url, _safe_parse(parse_arabica_xls, "arabica_xls", d, r.content)
 
 
-def pull_stock_report(d: date, *, times: tuple[str, ...] = STOCK_REPORT_TIMES) -> tuple[str | None, dict | None]:
-    """The HHMMSS varies daily — try a small list of likely publish times."""
-    for hhmmss in times:
+def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict | None]:
+    """Tiered HHMMSS guesser. Returns (url, parsed_dict) on hit, (None, None)
+    on miss. `sweep=False` skips the Tier-2 minute-by-minute window — useful
+    for multi-day backfills that would otherwise spend 10 min per missed day.
+    """
+    def _try(hhmmss: str) -> tuple[str | None, dict | None]:
         url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
         r = _http_get(url, source="stock_report")
         if r and r.status_code == 200 and r.text:
+            _record_stock_report_hit(d, hhmmss)
             return url, _safe_parse(parse_stock_report, "stock_report", d, r.text)
+        return None, None
+
+    tier1 = _stock_report_tier1_times()
+    for hhmmss in tier1:
+        url, parsed = _try(hhmmss)
+        if url:
+            return url, parsed
+
+    if not sweep:
+        return None, None
+
+    # Tier 2 — 120-second sweep around the observed publish window.
+    # Already-tried tier-1 times are skipped to avoid wasted GETs.
+    tried = set(tier1)
+    for hhmmss in _stock_report_sweep_times():
+        if hhmmss in tried:
+            continue
+        url, parsed = _try(hhmmss)
+        if url:
+            return url, parsed
     return None, None
 
 
@@ -435,9 +501,13 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     robusta_stocks: dict[date, dict] = {}
     robusta_stock_url: str | None = None
     # Try most-recent business days for stock_report; ICE only keeps one per day
-    # under a HHMMSS-stamped URL.
-    for d in days_sorted_asc[-5:]:                   # try last 5 days only
-        url, parsed = pull_stock_report(d)
+    # under a HHMMSS-stamped URL. Tier-2 sweep (~10 min) runs only for the
+    # latest day so the daily cron stays bounded — older days that already
+    # missed are filled by the workbook ingest instead.
+    recent_days = days_sorted_asc[-5:]
+    last_day = recent_days[-1] if recent_days else None
+    for d in recent_days:
+        url, parsed = pull_stock_report(d, sweep=(d == last_day))
         if parsed is not None:
             robusta_stocks[d] = parsed
             robusta_stock_url = url
