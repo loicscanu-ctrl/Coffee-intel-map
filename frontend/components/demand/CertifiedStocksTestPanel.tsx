@@ -257,107 +257,137 @@ const ORIGIN_COLORS: Record<string, string> = {
 const ORIGIN_DEFAULT = "#64748b";  // slate-500
 const _originColor = (origin: string): string => ORIGIN_COLORS[origin] ?? ORIGIN_DEFAULT;
 
-// ── Density grid (vertical orientation, compact) ────────────────────────────
-// Per-market unit sizing so an ANT-sized port doesn't blow up the DOM. We
-// pack up to 8 warehouses per row at xl, so each card is narrow and the
-// grid uses fewer columns / smaller squares than the earlier sandbox version.
-const DENSITY_COLS = 5;
-const DENSITY_MAX_SQUARES = 80;
+// ── Density grid (vertical orientation, one square ≈ one warrant) ──────────
+// Each square targets one ICE warrant. Tunable cap so giant ports (ANT at
+// 1k+ arabica warrants, LON at 1.7k robusta lots) don't blow up the DOM —
+// when a port exceeds the cap we scale uniformly across {existing, gained,
+// ghost} groups and surface the effective per-square volume in the click
+// popover so the visual stays honest.
+const DENSITY_COLS = 8;
+const DENSITY_MAX_SQUARES = 400;
+// Warrant sizing:
+//   • Robusta — 1 lot = 10 MT = 1 warrant. Snapshot data is already in lots,
+//     so squareUnit = 1.
+//   • Arabica — 1 warrant = 37,500 lb = 17,009 kg ≈ 283.49 bags (at 60 kg/bag).
+//     Snapshot data is in bags, so squareUnit = 283.49.
+const BAGS_PER_WARRANT_KC = (37_500 * 0.45359237) / 60;   // ≈ 283.49
+const LOTS_PER_WARRANT_RC = 1;
 
 interface DensitySquare {
-  status: "filled" | "ghost";  // ghost = volume lost over the duration window
+  status: "filled" | "gained" | "ghost";
   origin: string;
   color: string;
   ageBin: AgeBin;
-  bagsOrLots: number;          // volume one square represents (the per-market unit)
-  isNew: boolean;              // gained over the window — green halo
+  warrants: number;            // effective warrants this square represents
 }
 
-// Build the grid for one port. Returns filled (current state) and ghost
-// (volume lost over the window) lists separately so the render can wrap
-// the ghost group in its own bordered sub-grid.
+// Helper — distribute `count` squares across origins proportionally and
+// stamp each with an age bin sampled from the age distribution.
+function _allocSquares(
+  count: number,
+  byOrigin: Record<string, number>,
+  age: AgeDist,
+  status: DensitySquare["status"],
+  perSquareWarrants: number,
+): DensitySquare[] {
+  if (count <= 0) return [];
+  const origins = Object.entries(byOrigin).filter(([, v]) => v > 0);
+  const total = origins.reduce((a, [, v]) => a + v, 0);
+  if (total <= 0) return [];
+
+  const originPool: string[] = [];
+  for (const [origin, v] of origins) {
+    const n = Math.round(count * (v / total));
+    for (let i = 0; i < n; i++) originPool.push(origin);
+  }
+  while (originPool.length < count) originPool.push(origins[0][0]);
+  while (originPool.length > count) originPool.pop();
+
+  const agePool: AgeBin[] = [];
+  for (const bin of AGE_BIN_ORDER) {
+    const n = Math.round(count * age[bin]);
+    for (let i = 0; i < n; i++) agePool.push(bin);
+  }
+  while (agePool.length < count) agePool.push("fresh");
+  while (agePool.length > count) agePool.pop();
+
+  return originPool.map((origin, i) => ({
+    status,
+    origin,
+    color: _originColor(origin),
+    ageBin: agePool[i] ?? "fresh",
+    warrants: perSquareWarrants,
+  }));
+}
+
+// Build the three sub-grids for one port:
+//   • `existing`  — what was already at the port at the window's T0
+//                   (current minus the net-gained portion this window)
+//   • `gained`    — newly arrived warrants over the window (any origin with
+//                   positive net delta). Rendered in a green dashed box.
+//   • `ghosts`    — warrants that left the port over the window (any
+//                   origin with negative net delta). Red dashed box.
+//
+// `unit` is the per-market warrant size (bags or lots) — see
+// BAGS_PER_WARRANT_KC / LOTS_PER_WARRANT_RC. We aim for one square ≈ one
+// warrant. If the port's total warrants exceeds DENSITY_MAX_SQUARES we
+// scale uniformly across the three groups and surface the effective
+// per-square count via `effectivePerSquare` so the click popover stays
+// honest.
 function buildDensityGrid(
   current: number,
   byOrigin: Record<string, number>,
   age: AgeDist,
   deltaByOrigin: Record<string, number>,
   unit: number,
-): { filled: DensitySquare[]; ghosts: DensitySquare[] } {
-  const target = Math.min(Math.ceil(current / unit), DENSITY_MAX_SQUARES);
-  const filledCount = current > 0 ? Math.max(1, target) : 0;
+): {
+  existing: DensitySquare[];
+  gained:   DensitySquare[];
+  ghosts:   DensitySquare[];
+  effectivePerSquare: number;
+  totalWarrants: number;
+} {
+  // 1. Raw warrant counts (current state, gained, lost).
+  const totalWarrants = Math.max(0, Math.ceil(current / unit));
 
-  // 1. Distribute origins proportionally to byOrigin shares.
-  const originPool: string[] = [];
-  const originSum = Object.values(byOrigin).reduce((a, b) => a + b, 0) || 1;
+  let gainedTotalVol = 0, lostTotalVol = 0;
+  for (const d of Object.values(deltaByOrigin)) {
+    if (d > 0) gainedTotalVol += d;
+    if (d < 0) lostTotalVol += -d;
+  }
+  const gainedWarrants = Math.max(0, Math.ceil(gainedTotalVol / unit));
+  const lostWarrants   = Math.max(0, Math.ceil(lostTotalVol   / unit));
+  const existingWarrants = Math.max(0, totalWarrants - gainedWarrants);
+
+  // 2. Uniform scale-down if the grand total of squares would overflow.
+  const grand = existingWarrants + gainedWarrants + lostWarrants;
+  const scale = grand > DENSITY_MAX_SQUARES ? DENSITY_MAX_SQUARES / grand : 1;
+  const existingShown = Math.round(existingWarrants * scale);
+  const gainedShown   = Math.round(gainedWarrants   * scale);
+  const lostShown     = Math.round(lostWarrants     * scale);
+  const effectivePerSquare = scale === 1 ? 1 : 1 / scale;
+
+  // 3. Origin distributions for each group.
+  const existingByOrigin: Record<string, number> = {};
   for (const [origin, v] of Object.entries(byOrigin)) {
-    const n = Math.round(filledCount * (v / originSum));
-    for (let i = 0; i < n; i++) originPool.push(origin);
+    const delta = deltaByOrigin[origin] ?? 0;
+    existingByOrigin[origin] = Math.max(0, v - Math.max(0, delta));
   }
-  while (originPool.length < filledCount) originPool.push(Object.keys(byOrigin)[0] ?? "Unknown");
-  while (originPool.length > filledCount) originPool.pop();
-
-  // 2. Distribute age bins proportionally (independent of origin — we don't
-  // have a per-(origin, age) source).
-  const agePool: AgeBin[] = [];
-  for (const bin of AGE_BIN_ORDER) {
-    const n = Math.round(filledCount * age[bin]);
-    for (let i = 0; i < n; i++) agePool.push(bin);
-  }
-  while (agePool.length < filledCount) agePool.push("fresh");
-  while (agePool.length > filledCount) agePool.pop();
-
-  // 3. Mark "new" squares per origin. For each origin with positive delta
-  // over the window, the last ceil(delta/unit) squares of that origin get
-  // the isNew flag.
-  const gainedSquaresPerOrigin: Record<string, number> = {};
-  for (const [origin, delta] of Object.entries(deltaByOrigin)) {
-    if (delta > 0) gainedSquaresPerOrigin[origin] = Math.ceil(delta / unit);
-  }
-  const isNewArr: boolean[] = new Array(filledCount).fill(false);
-  for (let i = filledCount - 1; i >= 0; i--) {
-    const o = originPool[i];
-    if ((gainedSquaresPerOrigin[o] ?? 0) > 0) {
-      isNewArr[i] = true;
-      gainedSquaresPerOrigin[o]--;
-    }
+  const gainedByOrigin: Record<string, number> = {};
+  const ghostByOrigin: Record<string, number>  = {};
+  for (const [origin, d] of Object.entries(deltaByOrigin)) {
+    if (d > 0) gainedByOrigin[origin] = d;
+    if (d < 0) ghostByOrigin[origin]  = -d;
   }
 
-  const filled: DensitySquare[] = [];
-  for (let i = 0; i < filledCount; i++) {
-    filled.push({
-      status: "filled",
-      origin: originPool[i],
-      color: _originColor(originPool[i]),
-      ageBin: agePool[i] ?? "fresh",
-      bagsOrLots: unit,
-      isNew: isNewArr[i],
-    });
-  }
+  // 4. Stamp squares. Existing inherits the port's actual age mix; gained
+  // are by definition fresh (<1y); ghosts have no surviving age info.
+  const FRESH_ONLY: AgeDist = { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+  const existing = _allocSquares(existingShown, existingByOrigin, age,        "filled", effectivePerSquare);
+  const gained   = _allocSquares(gainedShown,   gainedByOrigin,   FRESH_ONLY, "gained", effectivePerSquare);
+  const ghosts   = _allocSquares(lostShown,     ghostByOrigin,    FRESH_ONLY, "ghost",  effectivePerSquare);
 
-  // 4. Ghost squares for each origin with negative delta (volume lost).
-  // Returned as a SEPARATE list so the render can wrap them in a single
-  // red-bordered group (user spec: "border them in red so we can easily
-  // recognize this group of lost coffee").
-  const ghostCap = Math.min(filledCount, DENSITY_MAX_SQUARES);
-  let ghostsLeft = ghostCap;
-  const ghosts: DensitySquare[] = [];
-  for (const [origin, delta] of Object.entries(deltaByOrigin)) {
-    if (delta < 0 && ghostsLeft > 0) {
-      const n = Math.min(Math.ceil(-delta / unit), ghostsLeft);
-      for (let i = 0; i < n; i++) {
-        ghosts.push({
-          status: "ghost",
-          origin,
-          color: _originColor(origin),
-          ageBin: "fresh",
-          bagsOrLots: unit,
-          isNew: false,
-        });
-        ghostsLeft--;
-      }
-    }
-  }
-  return { filled, ghosts };
+  return { existing, gained, ghosts, effectivePerSquare, totalWarrants };
 }
 
 interface OriginFlow { origin: string; volume: number; color: string }
@@ -631,7 +661,7 @@ export default function CertifiedStocksTestPanel() {
     const buildArabica = (): SystemFlowMarket => {
       const empty: SystemFlowMarket = {
         market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: 2500, ports: [], intake: null,
+        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports: [], intake: null,
       };
       const snaps = arabica?.snapshots ?? [];
       if (snaps.length === 0) return empty;
@@ -696,7 +726,7 @@ export default function CertifiedStocksTestPanel() {
         ports.push({
           market: "KC", code, name: ARABICA_PORT_NAMES[code] ?? code,
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
-          unit: "bags", squareUnit: 2500,
+          unit: "bags", squareUnit: BAGS_PER_WARRANT_KC,
           byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
           deltaByOrigin, inflow, outflow,
         });
@@ -723,7 +753,7 @@ export default function CertifiedStocksTestPanel() {
       const passedBorderline = Math.round(passed * (borderlineShare / sum));
       return {
         market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: 2500, ports,
+        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports,
         intake: { pending: latest.pending_grading_bags ?? 0, passed, failed, passedPremium, passedBorderline, date: latest.date },
       };
     };
@@ -735,7 +765,7 @@ export default function CertifiedStocksTestPanel() {
     const buildRobusta = (): SystemFlowMarket => {
       const empty: SystemFlowMarket = {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
-        unit: "lots", squareUnit: 25, ports: [], intake: null,
+        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports: [], intake: null,
       };
       const snaps = robusta?.snapshots ?? [];
       const grads = robusta?.recent_activity?.gradings ?? [];
@@ -843,7 +873,7 @@ export default function CertifiedStocksTestPanel() {
         ports.push({
           market: "RC", code, name: ROBUSTA_PORT_NAMES[code] ?? code,
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
-          unit: "lots", squareUnit: 25,
+          unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
           byOrigin, age: ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 },
           deltaByOrigin, inflow, outflow,
         });
@@ -874,7 +904,7 @@ export default function CertifiedStocksTestPanel() {
       const dateLabel = inWinGrad.length ? inWinGrad[inWinGrad.length - 1].date : (grads[grads.length - 1]?.date ?? null);
       return {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
-        unit: "lots", squareUnit: 25, ports,
+        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports,
         intake: { pending: pendingTotal, passed: pPrem + pBord, failed: fail,
                   passedPremium: pPrem, passedBorderline: pBord, date: dateLabel },
       };
@@ -1171,13 +1201,16 @@ export default function CertifiedStocksTestPanel() {
           <span className="text-slate-700 mx-1">|</span>
           <span className="text-slate-500 uppercase">Change:</span>
           <span className="flex items-center text-slate-300">
-            <span className="w-2 h-2 rounded mr-1 border border-emerald-400" />
-            new (gained)
+            <span className="w-3 h-3 rounded mr-1 border border-dashed border-emerald-400 bg-emerald-950/50" />
+            gained box
           </span>
           <span className="flex items-center text-slate-300">
-            <span className="w-2 h-2 rounded mr-1 border border-dashed border-rose-400 opacity-60" />
-            ghost (lost)
+            <span className="w-3 h-3 rounded mr-1 border border-dashed border-rose-400 bg-rose-950/50" />
+            lost box
           </span>
+          <span className="text-slate-700 mx-1">|</span>
+          <span className="text-slate-500 uppercase">1 ◻ =</span>
+          <span className="flex items-center text-slate-300">1 warrant (KC: 37,500 lb · RC: 10 MT)</span>
         </div>
 
         {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
@@ -1265,11 +1298,24 @@ export default function CertifiedStocksTestPanel() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
                 {mkt.ports.slice(0, 8).map((p) => {
-                  const { filled, ghosts } = buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
+                  const { existing, gained, ghosts, effectivePerSquare, totalWarrants } =
+                    buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
                   const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                   const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                   const topInflow  = p.inflow.slice(0, 2);
                   const topOutflow = p.outflow.slice(0, 2);
+                  // Label that explains the per-square scale. If
+                  // effectivePerSquare > 1 the port exceeded the cap and
+                  // each square is now ≈N warrants instead of 1 exactly.
+                  const sqLabel = effectivePerSquare === 1
+                    ? "1 ◻ = 1 warrant"
+                    : `1 ◻ ≈ ${effectivePerSquare.toFixed(1)} warrants`;
+                  const buildPick = (sq: DensitySquare, idx: number, isNew: boolean, isGhost: boolean) => ({
+                    market: p.market, port: p.code, portName: p.name, squareIdx: idx,
+                    origin: sq.origin, ageBin: sq.ageBin,
+                    bagsOrLots: sq.warrants * p.squareUnit,
+                    unit: p.unit, isNew, isGhost,
+                  });
                   return (
                     <div key={`${p.market}-${p.code}`}
                          className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col">
@@ -1305,26 +1351,21 @@ export default function CertifiedStocksTestPanel() {
                         )}
                       </div>
 
-                      {/* Density grid — current state */}
+                      {/* Density grid — existing portion (T0 state still on hand) */}
                       <div
                         className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded flex-1"
                         style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
                       >
-                        {filled.map((sq, i) => {
+                        {existing.map((sq, i) => {
                           const isPicked = pickedSquare?.market === p.market
                                         && pickedSquare?.port === p.code
                                         && pickedSquare?.squareIdx === i;
-                          const ringCls = sq.isNew ? "ring-1 ring-emerald-400 ring-inset" : "";
                           return (
                             <button
                               key={i}
                               type="button"
-                              onClick={() => setPickedSquare(isPicked ? null : {
-                                market: p.market, port: p.code, portName: p.name, squareIdx: i,
-                                origin: sq.origin, ageBin: sq.ageBin, bagsOrLots: sq.bagsOrLots,
-                                unit: p.unit, isNew: sq.isNew, isGhost: false,
-                              })}
-                              className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 relative ${ringCls} ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
+                              onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, i, false, false))}
+                              className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
                               style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
                               aria-label={`${p.name} square ${i}`}
                             />
@@ -1332,19 +1373,19 @@ export default function CertifiedStocksTestPanel() {
                         })}
                       </div>
 
-                      {/* Ghost group — lost over window, ONE red dashed border around the lot */}
-                      {ghosts.length > 0 && (
-                        <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10">
+                      {/* Gained group — new warrants this window, ONE green dashed border around the lot */}
+                      {gained.length > 0 && (
+                        <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10">
                           <div className="flex justify-between items-baseline mb-0.5">
-                            <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
-                            <span className="text-[8px] font-mono text-rose-400">−{fmtNum(ghosts.length * p.squareUnit)}</span>
+                            <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Gained</span>
+                            <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(gained.length * effectivePerSquare * p.squareUnit))}</span>
                           </div>
                           <div
                             className="grid gap-[1px]"
                             style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
                           >
-                            {ghosts.map((sq, i) => {
-                              const idx = filled.length + i;
+                            {gained.map((sq, i) => {
+                              const idx = existing.length + i;
                               const isPicked = pickedSquare?.market === p.market
                                             && pickedSquare?.port === p.code
                                             && pickedSquare?.squareIdx === idx;
@@ -1352,11 +1393,38 @@ export default function CertifiedStocksTestPanel() {
                                 <button
                                   key={i}
                                   type="button"
-                                  onClick={() => setPickedSquare(isPicked ? null : {
-                                    market: p.market, port: p.code, portName: p.name, squareIdx: idx,
-                                    origin: sq.origin, ageBin: sq.ageBin, bagsOrLots: sq.bagsOrLots,
-                                    unit: p.unit, isNew: false, isGhost: true,
-                                  })}
+                                  onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, true, false))}
+                                  className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
+                                  style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
+                                  aria-label={`${p.name} gained ${i}`}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Ghost group — lost over window, ONE red dashed border around the lot */}
+                      {ghosts.length > 0 && (
+                        <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10">
+                          <div className="flex justify-between items-baseline mb-0.5">
+                            <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
+                            <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(ghosts.length * effectivePerSquare * p.squareUnit))}</span>
+                          </div>
+                          <div
+                            className="grid gap-[1px]"
+                            style={{ gridTemplateColumns: `repeat(${DENSITY_COLS}, minmax(0, 1fr))` }}
+                          >
+                            {ghosts.map((sq, i) => {
+                              const idx = existing.length + gained.length + i;
+                              const isPicked = pickedSquare?.market === p.market
+                                            && pickedSquare?.port === p.code
+                                            && pickedSquare?.squareIdx === idx;
+                              return (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, false, true))}
                                   className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
                                   style={{ background: sq.color, opacity: 0.4 }}
                                   aria-label={`${p.name} lost ${i}`}
@@ -1367,7 +1435,10 @@ export default function CertifiedStocksTestPanel() {
                         </div>
                       )}
 
-                      <div className="text-[8.5px] text-slate-600 mt-1">1 ◻ = {fmtNum(p.squareUnit)} {p.unit}</div>
+                      <div className="text-[8.5px] text-slate-600 mt-1 flex justify-between">
+                        <span>{sqLabel}</span>
+                        <span>{fmtNum(totalWarrants)} warrants</span>
+                      </div>
 
                       {/* Outflow indicator (compact) */}
                       <div className="bg-rose-950/20 border border-rose-900/50 rounded px-1 py-0.5 mt-1 text-[9px]">
@@ -1432,7 +1503,11 @@ export default function CertifiedStocksTestPanel() {
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-slate-500">Represents</span>
-                <span className="text-slate-200">{fmtNum(pickedSquare.bagsOrLots)} {pickedSquare.unit}</span>
+                <span className="text-slate-200">
+                  {pickedSquare.market === "RC"
+                    ? `${fmtNum(pickedSquare.bagsOrLots)} lot${pickedSquare.bagsOrLots !== 1 ? "s" : ""} (${fmtNum(pickedSquare.bagsOrLots * 10)} MT)`
+                    : `${fmtNum(pickedSquare.bagsOrLots)} bags (${(pickedSquare.bagsOrLots / BAGS_PER_WARRANT_KC).toFixed(2)} warrants)`}
+                </span>
               </div>
               {(pickedSquare.isNew || pickedSquare.isGhost) && (
                 <div className="flex justify-between gap-3 pt-1 border-t border-slate-800 mt-1">
