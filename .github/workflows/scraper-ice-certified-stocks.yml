@@ -57,6 +57,11 @@ jobs:
 
       - name: Pull ICE certified stocks
         working-directory: backend
+        env:
+          # Force unbuffered stdout so every print() shows up immediately in
+          # the Actions log instead of waiting for the (block-buffered) pipe
+          # to fill — otherwise a long run looks "stalled" until completion.
+          PYTHONUNBUFFERED: "1"
         run: |
           # Scheduled cron passes no inputs → default to a 3-day catch-up
           # (merge preserves the history). Manual dispatch can override with
