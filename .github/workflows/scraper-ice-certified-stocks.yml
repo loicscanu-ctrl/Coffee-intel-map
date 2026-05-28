@@ -20,13 +20,16 @@ on:
           - smoke
           - backfill
       days_back:
-        description: "Backfill window in business days (ignored if mode=smoke)"
+        description: "Backfill window in business days (e.g. 3 for daily catch-up, 180 for full history)"
         required: false
-        default: "30"
+        default: "3"
         type: string
-  # Schedule once the test pass looks healthy. Holding off until then.
-  # schedule:
-  #   - cron: '0 11 * * *'   # 11:00 UTC — after ICE's morning publishes
+  schedule:
+    # 17:00 UTC daily — past ICE's morning robusta publish (~10:30 UTC) and
+    # afternoon arabica publish (~13:30 UTC). Small window (days_back=3) is
+    # enough to catch any missed day; the merge step preserves the full history
+    # on disk from prior backfill runs.
+    - cron: '0 17 * * *'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
@@ -35,7 +38,9 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Big enough for a one-off 180-day backfill at 5s/req on /marketdata/ (~90
+    # min worst case). Daily cron runs in ~5-10 min on a 3-day window.
+    timeout-minutes: 120
     permissions:
       contents: write
 
@@ -53,11 +58,14 @@ jobs:
       - name: Pull ICE certified stocks
         working-directory: backend
         run: |
+          # Scheduled cron passes no inputs → default to a 3-day catch-up
+          # (merge preserves the history). Manual dispatch can override with
+          # days_back=180 for the one-off historical backfill.
           if [ "${{ inputs.mode }}" = "smoke" ]; then
             python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
           else
             python -m scraper.sources.ice_certified_stocks.orchestrate \
-              --days ${{ inputs.days_back || 30 }}
+              --days "${{ inputs.days_back || 3 }}"
           fi
 
       - name: Commit + push if changed

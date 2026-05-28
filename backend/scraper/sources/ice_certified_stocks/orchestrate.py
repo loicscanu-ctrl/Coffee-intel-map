@@ -314,9 +314,76 @@ def _robusta_snapshot(d: date, stock: dict | None, gradings_today: list[dict],
     }
 
 
-# ── Main run ─────────────────────────────────────────────────────────────────
+# ── Merge-into-existing ──────────────────────────────────────────────────────
+# Each run produces a window of the recent N days. To support both a one-off
+# big backfill (e.g. 180 days) and a cheap daily cron (e.g. 3 days) without
+# clobbering history, merge the new window into whatever's already on disk.
 
-def run(days_back: int = 30, write: bool = True) -> dict:
+def _load_existing_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _merge_arabica(new: dict, old: dict) -> dict:
+    by_date = {s["date"]: s for s in (old.get("snapshots") or [])}
+    for s in new.get("snapshots") or []:
+        by_date[s["date"]] = s                          # new overrides
+    new["snapshots"] = sorted(by_date.values(), key=lambda s: s["date"])
+    if not new.get("latest_detail") and old.get("latest_detail"):
+        new["latest_detail"] = old["latest_detail"]
+    if new["snapshots"]:
+        new["as_of"] = new["snapshots"][-1]["date"]
+    return new
+
+
+def _merge_robusta(new: dict, old: dict) -> dict:
+    # snapshots: union by date.
+    by_date = {s["date"]: s for s in (old.get("snapshots") or [])}
+    for s in new.get("snapshots") or []:
+        by_date[s["date"]] = s
+    new["snapshots"] = sorted(by_date.values(), key=lambda s: s["date"])
+
+    # recent_activity: union by `date` field (the event keying).
+    for key in ("gradings", "grading_appeals", "iss_recv_daily",
+                "tenders", "grading_overview", "infested_warrants"):
+        merged: dict[str, dict] = {}
+        for e in (old.get("recent_activity") or {}).get(key, []):
+            merged[e.get("date") or ""] = e
+        for e in (new.get("recent_activity") or {}).get(key, []):
+            merged[e.get("date") or ""] = e
+        merged.pop("", None)
+        new.setdefault("recent_activity", {})[key] = sorted(
+            merged.values(), key=lambda e: e.get("date") or ""
+        )
+
+    # monthly: union by month key.
+    def _merge_monthly(key: str, k_field: str) -> list:
+        merged: dict[str, dict] = {}
+        for e in (old.get("monthly") or {}).get(key, []):
+            merged[e.get(k_field) or ""] = e
+        for e in (new.get("monthly") or {}).get(key, []):
+            merged[e.get(k_field) or ""] = e
+        merged.pop("", None)
+        return sorted(merged.values(), key=lambda e: e.get(k_field) or "")
+
+    new.setdefault("monthly", {})["iss_recv_monthly"] = _merge_monthly("iss_recv_monthly", "month")
+    new["monthly"]["age_allowance"] = _merge_monthly("age_allowance", "month_end")
+
+    # latest_detail: only overwrite if the new run actually captured a
+    # stock_report — otherwise keep the older one so the panel keeps showing
+    # the most recent good snapshot even when today's run missed.
+    if not new.get("latest_detail", {}).get("stock_report") and old.get("latest_detail", {}).get("stock_report"):
+        new["latest_detail"] = old["latest_detail"]
+
+    if new["snapshots"]:
+        new["as_of"] = new["snapshots"][-1]["date"]
+    return new
+
+def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     today = date.today()
     days = _biz_days_back(today, days_back)
     days_sorted_asc = sorted(days)
@@ -441,6 +508,22 @@ def run(days_back: int = 30, write: bool = True) -> dict:
         },
     }
 
+    if merge:
+        existing_a = _load_existing_json(OUT_DIR / "certified_stocks_arabica.json")
+        existing_r = _load_existing_json(OUT_DIR / "certified_stocks_robusta.json")
+        if existing_a:
+            n_old = len(existing_a.get("snapshots") or [])
+            arabica_json = _merge_arabica(arabica_json, existing_a)
+            print(f"[merge] arabica: {n_old} existing snapshots → {len(arabica_json['snapshots'])} after merge")
+        if existing_r:
+            n_old = len(existing_r.get("snapshots") or [])
+            robusta_json = _merge_robusta(robusta_json, existing_r)
+            ra = robusta_json["recent_activity"]
+            print(f"[merge] robusta: {n_old} existing snapshots → {len(robusta_json['snapshots'])} after merge "
+                  f"(events: gradings={len(ra['gradings'])} iss={len(ra['iss_recv_daily'])} "
+                  f"tend={len(ra['tenders'])} overview={len(ra['grading_overview'])} "
+                  f"infested={len(ra['infested_warrants'])} appeals={len(ra['grading_appeals'])})")
+
     if write:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
         (OUT_DIR / "certified_stocks_arabica.json").write_text(
@@ -498,13 +581,15 @@ def _cli() -> None:
                     help="print summary only, don't write JSONs")
     ap.add_argument("--smoke", action="store_true",
                     help="hit probe-verified URLs once each; skip the backfill")
+    ap.add_argument("--no-merge", action="store_true",
+                    help="overwrite the JSONs instead of merging with existing")
     args = ap.parse_args()
 
     if args.smoke:
         ok = smoke()
         sys.exit(0 if ok == len(_SMOKE_URLS) else 1)
 
-    out = run(days_back=args.days, write=not args.no_write)
+    out = run(days_back=args.days, write=not args.no_write, merge=not args.no_merge)
     print(f"\nSUMMARY: arabica snapshots={len(out['arabica']['snapshots'])} · "
           f"robusta snapshots={len(out['robusta']['snapshots'])} · "
           f"gradings={len(out['robusta']['recent_activity']['gradings'])}")
