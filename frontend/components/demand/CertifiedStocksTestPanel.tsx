@@ -233,29 +233,90 @@ function _durationCutoff(opt: DurationOpt, today: Date): Date {
   }
 }
 
-// ── Origin colors ────────────────────────────────────────────────────────────
-const ORIGIN_COLORS: Record<string, string> = {
-  "Brazil":             "#a855f7",   // purple
-  "Brazilian Conillon": "#7c3aed",
-  "Honduras":           "#3b82f6",   // blue
-  "Colombia":           "#6366f1",   // indigo
-  "Vietnam":            "#14b8a6",   // teal
-  "Indonesia":          "#10b981",   // emerald
-  "Guatemala":          "#f59e0b",   // amber
-  "El Salvador":        "#eab308",   // yellow
-  "Nicaragua":          "#84cc16",   // lime
-  "Costa Rica":         "#06b6d4",   // cyan
-  "Mexico":             "#f97316",   // orange
-  "Peru":               "#ec4899",   // pink
-  "India":              "#ef4444",   // red
-  "Burundi":            "#22d3ee",   // sky
-  "Uganda":             "#a3e635",   // lime-light
-  "Ethiopia":           "#f472b6",   // pink-light
-  "Tanzania":           "#fb923c",   // orange-light
-  "Venezuela":          "#fb7185",   // rose-light
+// ── Origin colors (market-aware) ────────────────────────────────────────────
+// Arabica (KC) palette is structured by ICE C-contract group, then by
+// continent within Group 0:
+//   • Group 0 — cold colors. Latin American → greens, Asian → blues,
+//                            African → purples.
+//   • Group 1 — dark green (Colombian milds).
+//   • Group 2 — yellow to light orange (warm light).
+//   • Group 3 — red / pink (warmer).
+//   • Group 4 — dark red-brown (Brazil naturals + Vietnam KC).
+//
+// Robusta (RC) palette follows the user's origin spec:
+//   • Vietnam     → dark blue   (primary RC origin)
+//   • Indonesia   → blue
+//   • Brazil      → dark red-brown
+//   • African     → purple nuances (Uganda, Tanzania, Cameroon, etc.)
+//   • Other Asian → cold colour nuances
+//   • Other LA    → warm colour nuances
+//
+// Vietnam carries different roles in each market so the dicts must be
+// kept separate (RC blue ≠ KC dark brown). _originColor() routes by market.
+
+const KC_ORIGIN_COLORS: Record<string, string> = {
+  // ── Group 0 — cold colours (LA green, AS blue, AF purple) ──
+  "Costa Rica":        "#16a34a",   // green-600
+  "El Salvador":       "#22c55e",   // green-500
+  "Guatemala":         "#10b981",   // emerald-500
+  "Honduras":          "#14b8a6",   // teal-500
+  "Mexico":            "#84cc16",   // lime-500
+  "Nicaragua":         "#15803d",   // green-700
+  "Panama":            "#34d399",   // emerald-400
+  "Peru":              "#4ade80",   // green-400
+  "Papua New Guinea":  "#0ea5e9",   // sky-500
+  "Kenya":             "#a855f7",   // purple-500
+  "Tanzania":          "#9333ea",   // purple-600
+  "Uganda":            "#c084fc",   // purple-400
+  // ── Group 1 — dark green ──
+  "Colombia":          "#14532d",   // green-900
+  // ── Group 2 — yellow to light orange ──
+  "Burundi":           "#facc15",   // yellow-400
+  "India":             "#fb923c",   // orange-400
+  "Rwanda":            "#fbbf24",   // amber-400
+  "Venezuela":         "#fdba74",   // orange-300
+  // ── Group 3 — red / pink ──
+  "Dominican Republic": "#f43f5e",  // rose-500
+  "Ecuador":           "#ec4899",   // pink-500
+  // ── Group 4 — dark red-brown ──
+  "Brazil":            "#7c2d12",   // red-brown-900
+  "Vietnam":           "#92400e",   // amber-900-brown
 };
-const ORIGIN_DEFAULT = "#64748b";  // slate-500
-const _originColor = (origin: string): string => ORIGIN_COLORS[origin] ?? ORIGIN_DEFAULT;
+
+const RC_ORIGIN_COLORS: Record<string, string> = {
+  "Vietnam":                       "#1e3a8a",  // dark blue (blue-900)
+  "Indonesia":                     "#3b82f6",  // blue-500
+  // Brazil — dark red-brown
+  "Brazil":                        "#7c2d12",
+  "Brazilian Conillon":            "#7c2d12",
+  // African origins — purple nuances
+  "Uganda":                        "#a855f7",  // purple-500
+  "Tanzania":                      "#9333ea",  // purple-600
+  "Ethiopia":                      "#c084fc",  // purple-400
+  "Cameroon":                      "#7e22ce",  // purple-700
+  "Angola":                        "#6b21a8",  // purple-800
+  "Cote dIvoire":                  "#9d4edd",
+  "Cote d'Ivoire":                 "#9d4edd",
+  "Ghana":                         "#a78bfa",  // violet-400
+  "Guinea":                        "#8b5cf6",  // violet-500
+  "Madagascar":                    "#7c3aed",  // violet-600
+  "Republic of Madagascar":        "#7c3aed",
+  "Sierra Leone":                  "#d8b4fe",  // purple-300
+  "Togo":                          "#a855f7",
+  "Nigeria":                       "#9d4edd",
+  "DRC":                           "#7e22ce",
+  "Congo":                         "#7e22ce",
+  "Democratic Republic of Congo":  "#7e22ce",
+  // Other Asian — cold (blue / cyan)
+  "India":                         "#0ea5e9",  // sky-500
+  "Laos":                          "#06b6d4",  // cyan-500
+};
+const ORIGIN_DEFAULT = "#64748b";  // slate-500 (unknown / catch-all)
+
+function _originColor(origin: string, market: "KC" | "RC"): string {
+  const dict = market === "KC" ? KC_ORIGIN_COLORS : RC_ORIGIN_COLORS;
+  return dict[origin] ?? ORIGIN_DEFAULT;
+}
 
 // ── Density grid (vertical orientation, one square ≈ one warrant) ──────────
 // Each square targets one ICE warrant. Tunable cap so giant ports (ANT at
@@ -289,6 +350,7 @@ function _allocSquares(
   age: AgeDist,
   status: DensitySquare["status"],
   perSquareWarrants: number,
+  market: "KC" | "RC",
 ): DensitySquare[] {
   if (count <= 0) return [];
   const origins = Object.entries(byOrigin).filter(([, v]) => v > 0);
@@ -314,7 +376,7 @@ function _allocSquares(
   return originPool.map((origin, i) => ({
     status,
     origin,
-    color: _originColor(origin),
+    color: _originColor(origin, market),
     ageBin: agePool[i] ?? "fresh",
     warrants: perSquareWarrants,
   }));
@@ -340,6 +402,7 @@ function buildDensityGrid(
   age: AgeDist,
   deltaByOrigin: Record<string, number>,
   unit: number,
+  market: "KC" | "RC",
 ): {
   existing: DensitySquare[];
   gained:   DensitySquare[];
@@ -383,9 +446,9 @@ function buildDensityGrid(
   // 4. Stamp squares. Existing inherits the port's actual age mix; gained
   // are by definition fresh (<1y); ghosts have no surviving age info.
   const FRESH_ONLY: AgeDist = { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-  const existing = _allocSquares(existingShown, existingByOrigin, age,        "filled", effectivePerSquare);
-  const gained   = _allocSquares(gainedShown,   gainedByOrigin,   FRESH_ONLY, "gained", effectivePerSquare);
-  const ghosts   = _allocSquares(lostShown,     ghostByOrigin,    FRESH_ONLY, "ghost",  effectivePerSquare);
+  const existing = _allocSquares(existingShown, existingByOrigin, age,        "filled", effectivePerSquare, market);
+  const gained   = _allocSquares(gainedShown,   gainedByOrigin,   FRESH_ONLY, "gained", effectivePerSquare, market);
+  const ghosts   = _allocSquares(lostShown,     ghostByOrigin,    FRESH_ONLY, "ghost",  effectivePerSquare, market);
 
   return { existing, gained, ghosts, effectivePerSquare, totalWarrants };
 }
@@ -717,8 +780,8 @@ export default function CertifiedStocksTestPanel() {
         for (const origin of Array.from(allOrigins)) {
           const d = (byOrigin[origin] ?? 0) - (baseByOrigin[origin] ?? 0);
           deltaByOrigin[origin] = d;
-          if (d > 0) inflow.push({ origin, volume: d, color: _originColor(origin) });
-          else if (d < 0) outflow.push({ origin, volume: -d, color: _originColor(origin) });
+          if (d > 0) inflow.push({ origin, volume: d, color: _originColor(origin, "KC") });
+          else if (d < 0) outflow.push({ origin, volume: -d, color: _originColor(origin, "KC") });
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
@@ -864,8 +927,8 @@ export default function CertifiedStocksTestPanel() {
           const i = inflowByOrigin[origin] ?? 0;
           const o = outflowByOrigin[origin] ?? 0;
           deltaByOrigin[origin] = i - o;
-          if (i > 0)  inflow.push({ origin, volume: i, color: _originColor(origin) });
-          if (o > 0)  outflow.push({ origin, volume: o, color: _originColor(origin) });
+          if (i > 0)  inflow.push({ origin, volume: i, color: _originColor(origin, "RC") });
+          if (o > 0)  outflow.push({ origin, volume: o, color: _originColor(origin, "RC") });
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
@@ -1181,15 +1244,51 @@ export default function CertifiedStocksTestPanel() {
           </div>
         </div>
 
-        {/* Shared legend */}
+        {/* Shared legend — colour scheme summary + age + change groups */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-[10px] bg-slate-950 px-3 py-2 rounded border border-slate-800">
-          <span className="text-slate-500 uppercase">Origin (color):</span>
-          {Object.entries(ORIGIN_COLORS).slice(0, 10).map(([origin, color]) => (
-            <span key={origin} className="flex items-center text-slate-300">
-              <span className="w-2 h-2 rounded mr-1" style={{ background: color }} />
-              {origin.length > 14 ? origin.slice(0, 14) + "…" : origin}
-            </span>
-          ))}
+          <details className="cursor-pointer">
+            <summary className="text-slate-500 uppercase tracking-wider hover:text-slate-300">
+              Origin scheme · click to expand
+            </summary>
+            <div className="mt-2 space-y-2 max-w-3xl">
+              <div>
+                <div className="text-[9px] uppercase tracking-wider text-amber-400 font-bold mb-1">Arabica (KC) — by C-contract group</div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {[
+                    { label: "G0 · LA",  example: "Honduras",        color: KC_ORIGIN_COLORS["Honduras"] },
+                    { label: "G0 · AS",  example: "Papua New Guinea",color: KC_ORIGIN_COLORS["Papua New Guinea"] },
+                    { label: "G0 · AF",  example: "Kenya",           color: KC_ORIGIN_COLORS["Kenya"] },
+                    { label: "G1",       example: "Colombia",        color: KC_ORIGIN_COLORS["Colombia"] },
+                    { label: "G2",       example: "Burundi",         color: KC_ORIGIN_COLORS["Burundi"] },
+                    { label: "G3",       example: "Ecuador",         color: KC_ORIGIN_COLORS["Ecuador"] },
+                    { label: "G4",       example: "Brazil",          color: KC_ORIGIN_COLORS["Brazil"] },
+                  ].map((g) => (
+                    <span key={g.label} className="flex items-center text-slate-300">
+                      <span className="w-2.5 h-2.5 rounded mr-1" style={{ background: g.color }} />
+                      <span className="font-mono text-slate-400 mr-1">{g.label}</span>{g.example}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[9px] uppercase tracking-wider text-emerald-400 font-bold mb-1">Robusta (RC) — by region</div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {[
+                    { label: "Vietnam",   color: RC_ORIGIN_COLORS["Vietnam"] },
+                    { label: "Indonesia", color: RC_ORIGIN_COLORS["Indonesia"] },
+                    { label: "Brazil",    color: RC_ORIGIN_COLORS["Brazil"] },
+                    { label: "African",   color: RC_ORIGIN_COLORS["Uganda"] },
+                    { label: "Other AS",  color: RC_ORIGIN_COLORS["India"] },
+                  ].map((g) => (
+                    <span key={g.label} className="flex items-center text-slate-300">
+                      <span className="w-2.5 h-2.5 rounded mr-1" style={{ background: g.color }} />
+                      {g.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </details>
           <span className="text-slate-700 mx-1">|</span>
           <span className="text-slate-500 uppercase">Age (fade):</span>
           {AGE_BIN_ORDER.map((bin) => (
@@ -1299,7 +1398,7 @@ export default function CertifiedStocksTestPanel() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
                 {mkt.ports.slice(0, 8).map((p) => {
                   const { existing, gained, ghosts, effectivePerSquare, totalWarrants } =
-                    buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
+                    buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit, p.market);
                   const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                   const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                   const topInflow  = p.inflow.slice(0, 2);
@@ -1490,7 +1589,7 @@ export default function CertifiedStocksTestPanel() {
               <div className="flex justify-between gap-3">
                 <span className="text-slate-500">Origin</span>
                 <span className="flex items-center text-slate-200">
-                  <span className="w-2 h-2 rounded mr-1.5" style={{ background: _originColor(pickedSquare.origin) }} />
+                  <span className="w-2 h-2 rounded mr-1.5" style={{ background: _originColor(pickedSquare.origin, pickedSquare.market) }} />
                   {pickedSquare.origin}
                 </span>
               </div>
