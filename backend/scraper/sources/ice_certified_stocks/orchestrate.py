@@ -41,13 +41,34 @@ from .parse_stock_report import parse_stock_report
 from .parse_tenders import parse_tenders
 
 OUT_DIR = Path(__file__).resolve().parents[4] / "frontend" / "public" / "data"
-THROTTLE_S = 0.30
+# 1.0 s ≈ 1 req/s. The smoke test (10 reqs in ~3 s) passes; the previous 0.3 s
+# backfill (~3 req/s sustained) tripped Akamai's burst protection partway in
+# (arabica's 30 sequential reqs completed, then everything after silently got
+# 200-with-HTML error bodies). 1 req/s sits comfortably under typical limits.
+THROTTLE_S = 1.0
 TIMEOUT = 30
 
-# Common publish times we'll attempt for today's stock_report.csv. From samples
-# ICE publishes around 10:30 UTC; widen on either side for resilience.
-STOCK_REPORT_TIMES = ("103021", "103126", "103000", "103100", "103200",
-                      "102900", "102800", "103300", "103400", "103500")
+# Stock_report.csv's HHMMSS publish time varies daily; 10 guesses per day was
+# 90% wasted 404s and *that* burst was what tripped Akamai. Just try the two
+# real sample times — if neither hits, we live with the gap (the other 8
+# robusta sources still capture per-day activity).
+STOCK_REPORT_TIMES = ("103021", "103126", "103045")
+
+# Magic-byte / content-type expectations per source — used to flag "200 OK but
+# it's an HTML error page" responses that would otherwise be swallowed silently
+# by the parsers.
+_EXPECT_BY_NAME: dict[str, tuple] = {
+    "arabica_xls":      ("application/vnd.ms-excel",                                       b"\xd0\xcf\x11\xe0"),
+    "stock_report":     ("text/csv",                                                       b'"'),
+    "age_allowance":    ("application/vnd.openxmlformats-officedocument.spreadsheetml",    b"PK\x03\x04"),
+    "grading_overview": ("application/pdf",                                                b"%PDF"),
+    "infested_warrant": ("application/pdf",                                                b"%PDF"),
+    "gradings":         ("text/plain",                                                     b""),
+    "grading_appeals":  ("text/plain",                                                     b""),
+    "iss_recv_daily":   ("text/plain",                                                     b""),
+    "iss_recv_monthly": ("text/plain",                                                     b""),
+    "tenders":          ("text/plain",                                                     b""),
+}
 
 
 def _biz_days_back(start: date, n: int) -> list[date]:
@@ -60,14 +81,19 @@ def _biz_days_back(start: date, n: int) -> list[date]:
     return out
 
 
-def _http_get(url: str) -> requests.Response | None:
+def _http_get(url: str, *, source: str | None = None) -> requests.Response | None:
     try:
         r = requests.get(url, headers=F.HEADERS, timeout=TIMEOUT, allow_redirects=True)
-        # Log non-200 so we can distinguish 404 (file not published that day —
-        # normal for rare sources) from 403 (Akamai block — needs a fix).
         if r.status_code != 200:
             ctype = r.headers.get("Content-Type", "")[:40]
             print(f"  ! HTTP {r.status_code} ({ctype}) {url}")
+            return r
+        # 200 OK but wrong shape (Akamai HTML error page on a CSV/PDF endpoint
+        # is the silent failure mode we just hit). Return None so the parser
+        # never sees a misleading body; the WRONG-SHAPE line in _wrong_shape
+        # makes the cause visible.
+        if source and _wrong_shape(source, r):
+            return None
         return r
     except requests.exceptions.RequestException as e:
         print(f"  ! {type(e).__name__}: {url} — {e}")
@@ -85,11 +111,33 @@ def _safe_parse(parse_fn, source: str, day: date | None, raw):
         return None
 
 
+def _wrong_shape(source: str, r: requests.Response) -> bool:
+    """Return True (and log) when a 200 response doesn't match the source's
+    expected content-type / magic bytes — the classic 'Akamai serves 200 with
+    HTML error body' case that otherwise passes silently into the parsers."""
+    expected = _EXPECT_BY_NAME.get(source)
+    if not expected:
+        return False
+    ct_prefix, magic = expected
+    ctype = (r.headers.get("Content-Type", "") or "").lower()
+    raw = r.content or b""
+    bad = False
+    if ct_prefix and not ctype.startswith(ct_prefix.lower()):
+        if "text/html" in ctype:
+            bad = True
+    if magic and raw[:len(magic)] != magic:
+        if raw[:5] in (b"<!DOC", b"<html", b"<HTML", b"<HtmL"):
+            bad = True
+    if bad:
+        print(f"  ! WRONG-SHAPE {source}: ct={ctype[:40]!r} head={raw[:80]!r}")
+    return bad
+
+
 # ── Per-source pull functions ────────────────────────────────────────────────
 
 def pull_arabica_xls(d: date) -> tuple[str, dict | None]:
     url = F.ARABICA_DAILY_XLS.format(yyyymmdd=F.yyyymmdd(d))
-    r = _http_get(url)
+    r = _http_get(url, source="arabica_xls")
     if not r or r.status_code != 200 or not r.content:
         return url, None
     return url, _safe_parse(parse_arabica_xls, "arabica_xls", d, r.content)
@@ -99,7 +147,7 @@ def pull_stock_report(d: date, *, times: tuple[str, ...] = STOCK_REPORT_TIMES) -
     """The HHMMSS varies daily — try a small list of likely publish times."""
     for hhmmss in times:
         url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
-        r = _http_get(url)
+        r = _http_get(url, source="stock_report")
         if r and r.status_code == 200 and r.text:
             return url, _safe_parse(parse_stock_report, "stock_report", d, r.text)
     return None, None
@@ -110,7 +158,7 @@ def pull_gradings(d: date, *, max_seq: int = 3) -> list[tuple[str, dict]]:
     results: list[tuple[str, dict]] = []
     for n in range(1, max_seq + 1):
         url = F.ROBUSTA_GRADINGS_TXT.format(yymmdd=F.yymmdd(d), n=n)
-        r = _http_get(url)
+        r = _http_get(url, source="gradings")
         if not r or r.status_code != 200 or not r.text:
             break  # no -2 if -1 missing
         parsed = _safe_parse(parse_gradings, "gradings", d, r.text)
@@ -124,7 +172,7 @@ def pull_grading_appeals(d: date, *, max_seq: int = 3) -> list[tuple[str, dict]]
     results: list[tuple[str, dict]] = []
     for n in range(1, max_seq + 1):
         url = F.ROBUSTA_GRADING_APPEALS.format(yymmdd=F.yymmdd(d), n=n)
-        r = _http_get(url)
+        r = _http_get(url, source="grading_appeals")
         if not r or r.status_code != 200 or not r.text:
             break
         parsed = _safe_parse(parse_gradings, "grading_appeals", d, r.text)
@@ -135,7 +183,7 @@ def pull_grading_appeals(d: date, *, max_seq: int = 3) -> list[tuple[str, dict]]
 
 def pull_iss_recv_daily(d: date) -> tuple[str, dict | None]:
     url = F.ROBUSTA_ISS_RECV_DAILY.format(yymmdd=F.yymmdd(d))
-    r = _http_get(url)
+    r = _http_get(url, source="iss_recv_daily")
     if not r or r.status_code != 200 or not r.text:
         return url, None
     return url, _safe_parse(parse_iss_recv_daily, "iss_recv_daily", d, r.text)
@@ -143,7 +191,7 @@ def pull_iss_recv_daily(d: date) -> tuple[str, dict | None]:
 
 def pull_tenders(d: date) -> tuple[str, dict | None]:
     url = F.ROBUSTA_TENDERS.format(yymmdd=F.yymmdd(d))
-    r = _http_get(url)
+    r = _http_get(url, source="tenders")
     if not r or r.status_code != 200 or not r.text:
         return url, None
     return url, _safe_parse(parse_tenders, "tenders", d, r.text)
@@ -151,7 +199,7 @@ def pull_tenders(d: date) -> tuple[str, dict | None]:
 
 def pull_grading_overview(d: date) -> tuple[str, dict | None]:
     url = F.ROBUSTA_GRADING_OVERVIEW_PDF.format(yymmdd=F.yymmdd(d))
-    r = _http_get(url)
+    r = _http_get(url, source="grading_overview")
     if not r or r.status_code != 200 or not r.content:
         return url, None
     return url, _safe_parse(parse_grading_overview_pdf, "grading_overview", d, r.content)
@@ -160,7 +208,7 @@ def pull_grading_overview(d: date) -> tuple[str, dict | None]:
 def pull_infested_warrant(d: date) -> tuple[str, dict | None]:
     """Rare — only ~13 publications per year; most days 404."""
     url = F.ROBUSTA_INFESTED_WARRANT.format(yymmdd=F.yymmdd(d))
-    r = _http_get(url)
+    r = _http_get(url, source="infested_warrant")
     if not r or r.status_code != 200 or not r.content:
         return url, None
     return url, _safe_parse(parse_infested_warrant_pdf, "infested_warrant", d, r.content)
@@ -168,7 +216,7 @@ def pull_infested_warrant(d: date) -> tuple[str, dict | None]:
 
 def pull_iss_recv_monthly(month_end: date) -> tuple[str, dict | None]:
     url = F.ROBUSTA_ISS_RECV_MONTHLY.format(yymmdd=F.yymmdd(month_end))
-    r = _http_get(url)
+    r = _http_get(url, source="iss_recv_monthly")
     if not r or r.status_code != 200 or not r.text:
         return url, None
     return url, _safe_parse(parse_iss_recv_monthly, "iss_recv_monthly", month_end, r.text)
@@ -176,7 +224,7 @@ def pull_iss_recv_monthly(month_end: date) -> tuple[str, dict | None]:
 
 def pull_age_allowance(month_end: date) -> tuple[str, dict | None]:
     url = F.ROBUSTA_AGE_ALLOWANCE_XLSX.format(yyyymmdd=F.yyyymmdd(month_end))
-    r = _http_get(url)
+    r = _http_get(url, source="age_allowance")
     if not r or r.status_code != 200 or not r.content:
         return url, None
     return url, _safe_parse(parse_age_allowance_xlsx, "age_allowance", month_end, r.content)
