@@ -190,9 +190,23 @@ const ARABICA_PORT_NAMES: Record<string, string> = {
   NO: "New Orleans", NOR: "Norfolk", NY: "New York", NYK: "New York", VIR: "Virginia",
 };
 const ROBUSTA_PORT_NAMES: Record<string, string> = {
-  AMS: "Amsterdam", ANT: "Antwerp", BAR: "Barcelona", BRE: "Bremen",
-  FEL: "Felixstowe", GEN: "Genoa", HAM: "Hamburg", LEH: "Le Havre",
-  LIV: "Liverpool", LON: "London", NYK: "New York", ROT: "Rotterdam", TRI: "Trieste",
+  AMS: "Amsterdam",
+  ANT: "Antwerp",
+  BAR: "Barcelona",
+  BRE: "Bremen",
+  FEL: "Felixstowe",
+  GEN: "Genoa",
+  HAM: "Hamburg",
+  HUL: "Hull",
+  HUM: "Humberside",
+  LEH: "Le Havre",
+  LIV: "Liverpool",
+  LON: "London",
+  NOR: "Norfolk",
+  NYK: "New York",
+  ROT: "Rotterdam",
+  TEE: "Teesside",
+  TRI: "Trieste",
 };
 
 // ── Duration window selector ────────────────────────────────────────────────
@@ -245,10 +259,10 @@ const _originColor = (origin: string): string => ORIGIN_COLORS[origin] ?? ORIGIN
 
 // ── Density grid (vertical orientation, compact) ────────────────────────────
 // Per-market unit sizing so an ANT-sized port doesn't blow up the DOM. We
-// pack ~6 warehouses per row, so each card is narrow and the grid uses
-// fewer columns / smaller squares than the earlier sandbox version.
-const DENSITY_COLS = 6;
-const DENSITY_MAX_SQUARES = 96;
+// pack up to 8 warehouses per row at xl, so each card is narrow and the
+// grid uses fewer columns / smaller squares than the earlier sandbox version.
+const DENSITY_COLS = 5;
+const DENSITY_MAX_SQUARES = 80;
 
 interface DensitySquare {
   status: "filled" | "ghost";  // ghost = volume lost over the duration window
@@ -1223,9 +1237,11 @@ export default function CertifiedStocksTestPanel() {
             {/* Branch connector — each visible warehouse gets its own arrow,
                 aligned to that column's centre in the 6-col grid below. */}
             {mkt.ports.length > 0 && (() => {
-              const n = Math.min(mkt.ports.length, 6);
-              // Column centres in a 6-col CSS grid (gap-2 negligible at SVG scale).
-              const xs = Array.from({ length: n }, (_, i) => (i + 0.5) * (100 / 6));
+              // The grid at xl breakpoint is 8-col. Arrows align to the
+              // centre of each occupied column so a new port joining the row
+              // (up to the 8 cap) gets its own arrow automatically.
+              const n = Math.min(mkt.ports.length, 8);
+              const xs = Array.from({ length: n }, (_, i) => (i + 0.5) * (100 / 8));
               return (
                 <svg viewBox="0 0 100 16" preserveAspectRatio="none" className="w-full h-10 my-1" aria-hidden>
                   <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
@@ -1247,8 +1263,8 @@ export default function CertifiedStocksTestPanel() {
             {mkt.ports.length === 0 ? (
               <div className="text-xs text-slate-600 italic">No port data loaded.</div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                {mkt.ports.slice(0, 6).map((p) => {
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+                {mkt.ports.slice(0, 8).map((p) => {
                   const { filled, ghosts } = buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit);
                   const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                   const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
