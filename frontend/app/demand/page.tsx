@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
+import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
@@ -13,13 +14,14 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "destination" | "certified" | "demand" | "listed";
+type SubTab = "destination" | "certified" | "demand" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "destination", label: "Destination stocks" },
   { id: "certified",   label: "Certified stocks" },
   { id: "demand",      label: "Demand" },
   { id: "listed",      label: "Listed stocks" },
+  { id: "test",        label: "Test ✦" },
 ];
 const SUB_TABS = TABS.map((t) => t.id) as SubTab[];
 
@@ -97,6 +99,12 @@ function DemandPageInner() {
       {tab === "listed" && (
         <Section>
           <EarningsTable />
+        </Section>
+      )}
+
+      {tab === "test" && (
+        <Section>
+          <CertifiedStocksTestPanel />
         </Section>
       )}
 
