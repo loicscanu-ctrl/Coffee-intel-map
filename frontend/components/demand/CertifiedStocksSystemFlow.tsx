@@ -282,7 +282,24 @@ interface DensitySquare {
   color: string;
   ageBin: AgeBin;
   warrants: number;            // effective warrants this square represents
+  klass: number | null;        // Robusta C-contract class (1..4) — null for KC.
 }
+
+// Robusta-class contour colours (1px inset border). Class 1 = par (no
+// border, the cleanest visual), faded yellow / orange / red walk down
+// the differential ladder (-30 / -60 / -90). Class P (premium, +30)
+// would be green when the source feed starts emitting it.
+const CLASS_BORDER_RC: Record<number, string> = {
+  2: "rgba(250, 204, 21, 0.65)",  // faded yellow (-30)
+  3: "rgba(249, 115, 22, 0.95)",  // orange       (-60)
+  4: "rgba(239, 68, 68, 0.98)",   // red          (-90)
+};
+const CLASS_LABEL_RC: Record<number, string> = {
+  1: "Class 1 (par)",
+  2: "Class 2 (−30)",
+  3: "Class 3 (−60)",
+  4: "Class 4 (−90)",
+};
 
 // Per-origin gross flow over the window. gross_in = sum of all positive daily
 // deltas (or grading events for Robusta). gross_out = sum of all negative
@@ -417,7 +434,10 @@ function _simulateRobustaPortStock(
 }
 
 // Helper — distribute `count` squares across origins proportionally and
-// stamp each with an age bin sampled from the age distribution.
+// stamp each with an age bin sampled from the age distribution. For
+// Robusta squares an optional `originClassShares` lets us also stamp
+// each square's C-contract class (1..4) proportionally to that
+// origin's class mix recorded in gradings at the port.
 function _allocSquares(
   count: number,
   byOrigin: Record<string, number>,
@@ -425,6 +445,7 @@ function _allocSquares(
   status: DensitySquare["status"],
   perSquareWarrants: number,
   market: "KC" | "RC",
+  originClassShares?: Record<string, Record<number, number>>,
 ): DensitySquare[] {
   if (count <= 0) return [];
   const origins = Object.entries(byOrigin).filter(([, v]) => v > 0);
@@ -447,12 +468,43 @@ function _allocSquares(
   while (agePool.length < count) agePool.push("fresh");
   while (agePool.length > count) agePool.pop();
 
+  // Per-square class assignment (Robusta only). Group indices by origin,
+  // then partition each origin's slot of the pool proportionally to its
+  // gradings-derived class mix; the leftover fills with class 1 (par).
+  const klassByIdx: (number | null)[] = new Array(count).fill(null);
+  if (market === "RC" && originClassShares) {
+    const indicesByOrigin: Record<string, number[]> = {};
+    originPool.forEach((o, i) => {
+      indicesByOrigin[o] = indicesByOrigin[o] || [];
+      indicesByOrigin[o].push(i);
+    });
+    for (const [origin, indices] of Object.entries(indicesByOrigin)) {
+      const shares = originClassShares[origin] ?? {};
+      const classes = Object.entries(shares)
+        .map(([k, v]) => [Number(k), v] as [number, number])
+        .sort((a, b) => a[0] - b[0]);
+      let assigned = 0;
+      for (const [cls, share] of classes) {
+        const n = Math.round(indices.length * share);
+        for (let j = 0; j < n && assigned < indices.length; j++) {
+          klassByIdx[indices[assigned]] = cls;
+          assigned++;
+        }
+      }
+      while (assigned < indices.length) {
+        klassByIdx[indices[assigned]] = 1;
+        assigned++;
+      }
+    }
+  }
+
   return originPool.map((origin, i) => ({
     status,
     origin,
     color: _originColor(origin, market),
     ageBin: agePool[i] ?? "fresh",
     warrants: perSquareWarrants,
+    klass: klassByIdx[i],
   }));
 }
 
@@ -477,6 +529,7 @@ function buildDensityGrid(
   flowByOrigin: Record<string, OriginFlowPair>,
   unit: number,
   market: "KC" | "RC",
+  originClassShares?: Record<string, Record<number, number>>,
 ): {
   existing:  DensitySquare[];
   netGained: DensitySquare[];
@@ -532,10 +585,10 @@ function buildDensityGrid(
   // 4. Stamp squares. Existing inherits the port's age mix; net-gained and
   // transit are fresh by definition; ghosts have no surviving age info.
   const FRESH_ONLY: AgeDist = { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-  const existing  = _allocSquares(existingShown,  existingByOrigin,  age,        "filled",  effectivePerSquare, market);
-  const netGained = _allocSquares(netGainedShown, netGainedByOrigin, FRESH_ONLY, "gained",  effectivePerSquare, market);
-  const ghosts    = _allocSquares(lostShown,      ghostByOrigin,     FRESH_ONLY, "ghost",   effectivePerSquare, market);
-  const transited = _allocSquares(transitShown,   transitByOrigin,   FRESH_ONLY, "transit", effectivePerSquare, market);
+  const existing  = _allocSquares(existingShown,  existingByOrigin,  age,        "filled",  effectivePerSquare, market, originClassShares);
+  const netGained = _allocSquares(netGainedShown, netGainedByOrigin, FRESH_ONLY, "gained",  effectivePerSquare, market, originClassShares);
+  const ghosts    = _allocSquares(lostShown,      ghostByOrigin,     FRESH_ONLY, "ghost",   effectivePerSquare, market, originClassShares);
+  const transited = _allocSquares(transitShown,   transitByOrigin,   FRESH_ONLY, "transit", effectivePerSquare, market, originClassShares);
 
   return {
     existing, netGained, ghosts, transited,
@@ -635,6 +688,10 @@ interface PortFlow {
   // grid (existing / net-gained / lost / transited). Replaces the older
   // signed-delta-only model so we can surface intra-window churn.
   flowByOrigin: Record<string, OriginFlowPair>;
+  // Per-origin C-contract class mix (Robusta only). Tagged on each square
+  // so a hover reveals "Class 2 (−30)" etc. and the border colour reflects
+  // the class differential.
+  classShares?: Record<string, Record<number, number>>;
   inflow: OriginFlow[];
   outflow: OriginFlow[];
   // Display sizing — assigned after all ports are computed. Card spans
@@ -661,10 +718,13 @@ interface Props {
 
 export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
   const [flowDuration, setFlowDuration] = useState<DurationOpt>("7d");
-  const [pickedSquare, setPickedSquare] = useState<{
-    market: "KC" | "RC"; port: string; portName: string; squareIdx: number;
-    origin: string; ageBin: AgeBin; bagsOrLots: number; unit: "bags" | "lots";
-    isNew: boolean; isGhost: boolean;
+  // Hover-only inspector — no click state. The tooltip pops out of the
+  // square the mouse is over and renders origin / age / (Robusta) class.
+  const [hoveredSquare, setHoveredSquare] = useState<{
+    market: "KC" | "RC"; portName: string;
+    origin: string; ageBin: AgeBin; klass: number | null;
+    status: DensitySquare["status"];
+    anchorLeft: number; anchorTop: number;     // viewport pixels
   } | null>(null);
 
   // Inject the flowing-dash keyframes once, the same way the map's
@@ -929,6 +989,36 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         }
       }
 
+      // Per-(port, origin, class) tenderable lots from gradings events —
+      // drives the per-square Robusta class assignment + border colour.
+      // Normalised to shares per (port, origin) so each square is stamped
+      // with a class sampled from that origin's quality mix at the port.
+      const portOriginClassMix: Record<string, Record<string, Record<number, number>>> = {};
+      for (const ev of grads) {
+        for (const e of (ev.entries || [])) {
+          if (e.tenderable === false) continue;
+          const klass = e.class;
+          if (klass == null) continue;
+          const port = e.port || "?";
+          const origin = e.origin?.trim() || "?";
+          portOriginClassMix[port] = portOriginClassMix[port] || {};
+          portOriginClassMix[port][origin] = portOriginClassMix[port][origin] || {};
+          portOriginClassMix[port][origin][klass] = (portOriginClassMix[port][origin][klass] ?? 0) + (e.lots ?? 0);
+        }
+      }
+      const portOriginClassShares: Record<string, Record<string, Record<number, number>>> = {};
+      for (const [port, byOrigin] of Object.entries(portOriginClassMix)) {
+        const out: Record<string, Record<number, number>> = {};
+        for (const [origin, byClass] of Object.entries(byOrigin)) {
+          const total = Object.values(byClass).reduce((a, b) => a + b, 0);
+          if (total <= 0) continue;
+          const shares: Record<number, number> = {};
+          for (const [k, v] of Object.entries(byClass)) shares[Number(k)] = v / total;
+          out[origin] = shares;
+        }
+        if (Object.keys(out).length > 0) portOriginClassShares[port] = out;
+      }
+
       // Age distribution per port from the latest age_allowance month.
       const ageByPort: Record<string, AgeDist> = {};
       const ageMonths = robusta?.monthly?.age_allowance ?? [];
@@ -1076,7 +1166,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
           byOrigin, age: ageFinal,
-          flowByOrigin, inflow, outflow, span: 1, poison,
+          flowByOrigin, classShares: portOriginClassShares[code],
+          inflow, outflow, span: 1, poison,
         });
       }
       ports.sort((a, b) => b.current - a.current);
@@ -1195,6 +1286,20 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         <span className="text-slate-700 mx-1">|</span>
         <span className="text-slate-500 uppercase">1 ◻ =</span>
         <span className="flex items-center text-slate-300">KC: 1 warrant = 37,500 lb (17.009 MT ≈ 283 bags) · RC: 1 lot (10 MT)</span>
+        <span className="text-slate-700 mx-1">|</span>
+        <span className="text-slate-500 uppercase" title="Robusta C-contract class — apportioned to each square from each origin's class mix at the port">RC class:</span>
+        <span className="flex items-center text-slate-300" title="par (0 differential)">
+          <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" /> 1 (par)
+        </span>
+        <span className="flex items-center text-slate-300" title="−30 differential">
+          <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" style={{ boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[2]}` }} /> 2 (−30)
+        </span>
+        <span className="flex items-center text-slate-300" title="−60 differential">
+          <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" style={{ boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[3]}` }} /> 3 (−60)
+        </span>
+        <span className="flex items-center text-slate-300" title="−90 differential">
+          <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" style={{ boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[4]}` }} /> 4 (−90)
+        </span>
 
         {/* Flow window selector — pill-button group, right-aligned, same
             style as the chart range toggle on the panel above. */}
@@ -1356,7 +1461,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   existing, netGained, ghosts, transited,
                   byOriginExisting, byOriginNetGained, byOriginGhost, byOriginTransit,
                   effectivePerSquare, totalWarrants,
-                } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market);
+                } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market, p.classShares);
                 const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                 const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                 const topInflow  = p.inflow.slice(0, 2);
@@ -1393,12 +1498,27 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   const r = _rowsForCount(n, cols);
                   return r === 0 ? "" : `${cols}×${r}`;
                 };
-                const buildPick = (sq: DensitySquare, idx: number, isNew: boolean, isGhost: boolean) => ({
-                  market: p.market, port: p.code, portName: p.name, squareIdx: idx,
-                  origin: sq.origin, ageBin: sq.ageBin,
-                  bagsOrLots: sq.warrants * p.squareUnit,
-                  unit: p.unit, isNew, isGhost,
-                });
+                // Hover-tooltip helpers — read the square's viewport rect
+                // from the event target and set state. Same handler shape
+                // for every sub-grid; the status field distinguishes
+                // existing / gained / lost / transit.
+                const onSquareEnter = (e: React.MouseEvent<HTMLButtonElement>, sq: DensitySquare) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  setHoveredSquare({
+                    market: p.market, portName: p.name,
+                    origin: sq.origin, ageBin: sq.ageBin, klass: sq.klass,
+                    status: sq.status,
+                    anchorLeft: r.left + r.width / 2,
+                    anchorTop: r.top,
+                  });
+                };
+                const onSquareLeave = () => setHoveredSquare(null);
+                // Per-class border for Robusta squares — inset 1px so the
+                // contour doesn't disturb the grid alignment.
+                const classBorder = (sq: DensitySquare) =>
+                  p.market === "RC" && sq.klass != null && CLASS_BORDER_RC[sq.klass]
+                    ? { boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[sq.klass]}` }
+                    : {};
                 return (
                   <div key={`${p.market}-${p.code}`}
                        className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col"
@@ -1487,21 +1607,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
                         style={{ gridTemplateColumns: colsTemplate }}
                       >
-                        {existing.map((sq, i) => {
-                          const isPicked = pickedSquare?.market === p.market
-                                        && pickedSquare?.port === p.code
-                                        && pickedSquare?.squareIdx === i;
-                          return (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, i, false, false))}
-                              className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
-                              style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
-                              aria-label={`${p.name} square ${i}`}
-                            />
-                          );
-                        })}
+                        {existing.map((sq, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onMouseEnter={(e) => onSquareEnter(e, sq)}
+                            onMouseLeave={onSquareLeave}
+                            className="aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10"
+                            style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin], ...classBorder(sq) }}
+                            aria-label={`${p.name} square ${i}`}
+                          />
+                        ))}
                       </div>
                       {existing.length > 0 && (
                         <span className="absolute -top-2 right-1 text-[8px] font-mono text-slate-500 bg-slate-950 px-1 rounded"
@@ -1529,22 +1645,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           </div>
                         )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
-                          {netGained.map((sq, i) => {
-                            const idx = existing.length + i;
-                            const isPicked = pickedSquare?.market === p.market
-                                          && pickedSquare?.port === p.code
-                                          && pickedSquare?.squareIdx === idx;
-                            return (
-                              <button
-                                key={i}
-                                type="button"
-                                onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, true, false))}
-                                className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
-                                style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
-                                aria-label={`${p.name} net-gained ${i}`}
-                              />
-                            );
-                          })}
+                          {netGained.map((sq, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onMouseEnter={(e) => onSquareEnter(e, sq)}
+                              onMouseLeave={onSquareLeave}
+                              className="aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10"
+                              style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin], ...classBorder(sq) }}
+                              aria-label={`${p.name} net-gained ${i}`}
+                            />
+                          ))}
                         </div>
                         <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-emerald-400 bg-slate-950 px-1 rounded"
                               title={`${dimLabel(netGained.length)} = ${netGained.length} warrants`}>
@@ -1571,22 +1682,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           </div>
                         )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
-                          {ghosts.map((sq, i) => {
-                            const idx = existing.length + netGained.length + i;
-                            const isPicked = pickedSquare?.market === p.market
-                                          && pickedSquare?.port === p.code
-                                          && pickedSquare?.squareIdx === idx;
-                            return (
-                              <button
-                                key={i}
-                                type="button"
-                                onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, false, true))}
-                                className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
-                                style={{ background: sq.color, opacity: 0.4 }}
-                                aria-label={`${p.name} lost ${i}`}
-                              />
-                            );
-                          })}
+                          {ghosts.map((sq, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onMouseEnter={(e) => onSquareEnter(e, sq)}
+                              onMouseLeave={onSquareLeave}
+                              className="aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10"
+                              style={{ background: sq.color, opacity: 0.4, ...classBorder(sq) }}
+                              aria-label={`${p.name} lost ${i}`}
+                            />
+                          ))}
                         </div>
                         <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-rose-400 bg-slate-950 px-1 rounded"
                               title={`${dimLabel(ghosts.length)} = ${ghosts.length} warrants`}>
@@ -1614,22 +1720,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           </div>
                         )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
-                          {transited.map((sq, i) => {
-                            const idx = existing.length + netGained.length + ghosts.length + i;
-                            const isPicked = pickedSquare?.market === p.market
-                                          && pickedSquare?.port === p.code
-                                          && pickedSquare?.squareIdx === idx;
-                            return (
-                              <button
-                                key={i}
-                                type="button"
-                                onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, false, false))}
-                                className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
-                                style={{ background: sq.color, opacity: 0.55 }}
-                                aria-label={`${p.name} transited ${i}`}
-                              />
-                            );
-                          })}
+                          {transited.map((sq, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onMouseEnter={(e) => onSquareEnter(e, sq)}
+                              onMouseLeave={onSquareLeave}
+                              className="aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10"
+                              style={{ background: sq.color, opacity: 0.55, ...classBorder(sq) }}
+                              aria-label={`${p.name} transited ${i}`}
+                            />
+                          ))}
                         </div>
                         <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-amber-400 bg-slate-950 px-1 rounded"
                               title={`${dimLabel(transited.length)} = ${transited.length} warrants`}>
@@ -1668,63 +1769,46 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         </div>
       ))}
 
-      {/* Click-popover for inspected square */}
-      {pickedSquare && (
+      {/* Hover tooltip — anchored to the square the cursor is over.
+          Renders origin, age band, and (Robusta only) C-contract class.
+          pointer-events:none so it never eats hover from neighbouring
+          squares. Transform pulls the tooltip above and centred on the
+          anchor point. */}
+      {hoveredSquare && (
         <div
-          role="dialog"
-          aria-label="square details"
-          className="fixed bottom-6 right-6 z-50 max-w-xs bg-slate-900 border border-amber-500/60 rounded-lg shadow-2xl px-4 py-3 text-xs"
-          style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,158,11,0.2)" }}
+          role="tooltip"
+          className="fixed z-50 pointer-events-none bg-slate-900 border border-slate-700 rounded shadow-2xl px-2 py-1.5 text-[10px] font-mono whitespace-nowrap"
+          style={{
+            left: hoveredSquare.anchorLeft,
+            top:  hoveredSquare.anchorTop - 6,
+            transform: "translate(-50%, -100%)",
+            boxShadow: "0 8px 20px rgba(0,0,0,0.6)",
+          }}
         >
-          <div className="flex justify-between items-baseline mb-2">
-            <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Square detail</span>
-            <button
-              type="button"
-              onClick={() => setPickedSquare(null)}
-              className="text-slate-500 hover:text-slate-200 text-lg leading-none"
-              aria-label="close"
-            >×</button>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="w-2 h-2 rounded" style={{ background: _originColor(hoveredSquare.origin, hoveredSquare.market) }} />
+            <span className="text-slate-100">{hoveredSquare.origin}</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-500">{hoveredSquare.portName}</span>
           </div>
-          <div className="space-y-1.5 font-mono">
-            <div className="flex justify-between gap-3">
-              <span className="text-slate-500">Port</span>
-              <span className="text-slate-200">{pickedSquare.portName} ({pickedSquare.port})</span>
-            </div>
-            <div className="flex justify-between gap-3">
-              <span className="text-slate-500">Origin</span>
-              <span className="flex items-center text-slate-200">
-                <span className="w-2 h-2 rounded mr-1.5" style={{ background: _originColor(pickedSquare.origin, pickedSquare.market) }} />
-                {pickedSquare.origin}
-              </span>
-            </div>
-            <div className="flex justify-between gap-3">
-              <span className="text-slate-500">Age band</span>
-              <span className="flex items-center text-slate-200">
-                <span className="w-2 h-2 rounded mr-1.5 bg-white" style={{ opacity: AGE_OPACITY[pickedSquare.ageBin] }} />
-                {AGE_LABEL[pickedSquare.ageBin]}
-              </span>
-            </div>
-            <div className="flex justify-between gap-3">
-              <span className="text-slate-500">Represents</span>
-              <span className="text-slate-200">
-                {pickedSquare.market === "RC"
-                  ? `${fmtNum(pickedSquare.bagsOrLots)} lot${pickedSquare.bagsOrLots !== 1 ? "s" : ""} (${fmtNum(pickedSquare.bagsOrLots * 10)} MT)`
-                  : `${fmtNum(pickedSquare.bagsOrLots)} bags (${(pickedSquare.bagsOrLots / BAGS_PER_WARRANT_KC).toFixed(2)} warrants)`}
-              </span>
-            </div>
-            {(pickedSquare.isNew || pickedSquare.isGhost) && (
-              <div className="flex justify-between gap-3 pt-1 border-t border-slate-800 mt-1">
-                <span className="text-slate-500">Change</span>
-                <span className={pickedSquare.isGhost ? "text-rose-400" : "text-emerald-400"}>
-                  {pickedSquare.isGhost ? "lost over window" : "gained over window"}
-                </span>
-              </div>
-            )}
-            <div className="text-[10px] text-slate-600 italic mt-2 pt-1 border-t border-slate-800">
-              Origin × age combined visually from per-port distributions
-              (not per-bag tracked).
-            </div>
+          <div className="text-slate-400">
+            <span className="text-slate-500">age</span> {AGE_LABEL[hoveredSquare.ageBin]}
           </div>
+          {hoveredSquare.market === "RC" && hoveredSquare.klass != null && (
+            <div className="text-slate-400">
+              <span className="text-slate-500">quality</span>{" "}
+              <span style={{ color: CLASS_BORDER_RC[hoveredSquare.klass] ?? "#94a3b8" }}>
+                {CLASS_LABEL_RC[hoveredSquare.klass] ?? `Class ${hoveredSquare.klass}`}
+              </span>
+            </div>
+          )}
+          {hoveredSquare.status !== "filled" && (
+            <div className="text-[9px] text-slate-600 italic mt-0.5">
+              {hoveredSquare.status === "gained" ? "net gained over window"
+                : hoveredSquare.status === "ghost" ? "lost over window"
+                : "in & out over window"}
+            </div>
+          )}
         </div>
       )}
     </div>
