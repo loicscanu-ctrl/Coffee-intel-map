@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-29T06:39:12.189144Z",
+  "generated_at": "2026-05-29T09:12:14.773223Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "274.25 (+4.40)",
+      "value": "273.25 (-1.00)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,554 (+82)",
+      "value": "3,536 (-18)",
       "category": "futures"
     },
     {
@@ -28,7 +28,7 @@
     },
     {
       "label": "UGA S15",
-      "value": "168.10 ($3,706)",
+      "value": "172.50 ($3,803)",
       "category": "physical"
     },
     {
