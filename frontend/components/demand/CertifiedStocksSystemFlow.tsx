@@ -738,6 +738,16 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
       @keyframes csFlowDash { to { stroke-dashoffset: -10; } }
       .cs-flow      { stroke-dasharray: 2.4 1.4; animation: csFlowDash 1.6s linear infinite; }
       .cs-flow-slow { stroke-dasharray: 3.2 1.8; animation: csFlowDash 2.2s linear infinite; }
+      /* Mini conveyor — animates per-card "out" boxes from left edge to
+         right edge of the outflow indicator strip. Same look-and-feel as
+         the cohort-explainer conveyor on the test tab, scaled down. */
+      @keyframes csConveyorMini {
+        0%   { left: 0%;                opacity: 0; }
+        15%  {                           opacity: 1; }
+        85%  {                           opacity: 1; }
+        100% { left: calc(100% - 5px);  opacity: 0; }
+      }
+      .cs-conveyor-mini { animation: csConveyorMini 1.8s linear infinite; }
     `;
     document.head.appendChild(s);
   }, []);
@@ -1744,12 +1754,32 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <span>{fmtNum(totalWarrants)} warrants</span>
                     </div>
 
-                    {/* Outflow indicator (compact) */}
+                    {/* Outflow indicator (compact) — header / animated
+                        conveyor strip / top-origin chip line. */}
                     <div className="bg-rose-950/20 border border-rose-900/50 rounded px-1 py-0.5 mt-1 text-[9px]">
                       <div className="flex items-center justify-between text-rose-400 font-bold">
                         <span>↓ out</span>
                         <span className="font-mono">−{fmtNum(outflowSum)}</span>
                       </div>
+                      {outflowSum > 0 && topOutflow.length > 0 && (
+                        <div className="relative h-2.5 mt-0.5 overflow-hidden">
+                          {/* Track */}
+                          <div className="absolute inset-x-0 top-1/2 h-px bg-rose-900/40 -translate-y-1/2" />
+                          {/* 4 boxes flowing right, cycling the top outflow
+                              origin colours. Staggered delays so they
+                              feel like a steady stream rather than a wave. */}
+                          {Array.from({ length: 4 }).map((_, i) => (
+                            <span key={i}
+                              className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-sm cs-conveyor-mini"
+                              style={{
+                                background: topOutflow[i % topOutflow.length].color,
+                                animationDelay: `${i * 0.45}s`,
+                                boxShadow: "0 0 4px rgba(239,68,68,0.45)",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
                       {topOutflow.length > 0 && (
                         <div className="flex flex-wrap gap-x-1.5">
                           {topOutflow.map((b) => (
