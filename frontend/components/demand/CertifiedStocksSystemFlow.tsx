@@ -541,6 +541,13 @@ function buildDensityGrid(
   byOriginNetGained: Record<string, number>;
   byOriginGhost:     Record<string, number>;
   byOriginTransit:   Record<string, number>;
+  // Raw volume per bucket (bags for KC, lots for RC). Square counts are
+  // ceil'd to whole warrants for visual integrity, so the headline label
+  // must use these to avoid a rounding inflation (e.g. 500 lost bags
+  // → 2 warrants → 567 bags via the warrant count).
+  netGainedVol: number;
+  lostVol:      number;
+  transitVol:   number;
   effectivePerSquare: number;
   totalWarrants: number;
 } {
@@ -596,6 +603,7 @@ function buildDensityGrid(
     byOriginNetGained: netGainedByOrigin,
     byOriginGhost:     ghostByOrigin,
     byOriginTransit:   transitByOrigin,
+    netGainedVol, lostVol, transitVol,
     effectivePerSquare, totalWarrants,
   };
 }
@@ -1470,6 +1478,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 const {
                   existing, netGained, ghosts, transited,
                   byOriginExisting, byOriginNetGained, byOriginGhost, byOriginTransit,
+                  netGainedVol, lostVol, transitVol,
                   effectivePerSquare, totalWarrants,
                 } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market, p.classShares);
                 const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
@@ -1642,7 +1651,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Net gained</span>
-                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGained.length * effectivePerSquare * p.squareUnit))}</span>
+                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGainedVol))}</span>
                         </div>
                         {topNetGained.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
@@ -1679,7 +1688,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
-                          <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(ghosts.length * effectivePerSquare * p.squareUnit))}</span>
+                          <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(lostVol))}</span>
                         </div>
                         {topGhost.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
@@ -1717,7 +1726,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-amber-400/70 rounded p-1 bg-amber-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-amber-400 font-bold">In & out</span>
-                          <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transited.length * effectivePerSquare * p.squareUnit))}</span>
+                          <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transitVol))}</span>
                         </div>
                         {topTransit.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
