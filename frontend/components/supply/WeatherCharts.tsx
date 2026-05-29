@@ -476,6 +476,7 @@ export default function WeatherCharts({
   dataUrl,
   title,
   farmerEconomicsUrl,
+  startMonthIdx = 0,
 }: {
   /** Path under /public, e.g. "/data/brazil_weather.json". */
   dataUrl: string;
@@ -485,6 +486,13 @@ export default function WeatherCharts({
    *  context + 14-day frost risk grid. When provided, the weather tab
    *  renders the EnsoPanel and WeatherRiskPanel at the bottom. */
   farmerEconomicsUrl?: string;
+  /** Calendar month (0=Jan … 11=Dec) the yearly charts should *start* at.
+   *  Northern-hemisphere origins (Honduras, Vietnam, Ethiopia, Uganda) and
+   *  Equatorial origins (Colombia, Indonesia) keep the default 0 = January.
+   *  Southern-hemisphere origins (Brazil) pass 5 = June so the calendar
+   *  matches the local coffee year. The underlying JSON arrays stay
+   *  Jan-Dec; we just rotate the display order. */
+  startMonthIdx?: number;
 }) {
   const [data, setData] = useState<WeatherData | null>(null);
   const [selected, setSelected] = useState<Set<string> | null>(null);
@@ -555,11 +563,15 @@ export default function WeatherCharts({
   const monthlyRainData = useMemo<MonthlyRainRow[]>(() => {
     if (!data || !totalProd) return [];
     const hasDryWarn = activeProv.every((p) => Array.isArray(p.monthly_dry_warn) && p.monthly_dry_warn.length === 12);
-    const rows: MonthlyRainRow[] = MONTHS.map((month, i) => {
+    // `dispIdx` walks 0..11 in display order; `i` is the calendar-month
+    // index used to look up the (Jan-Dec) data arrays. Rotating by
+    // startMonthIdx is the only change for Southern-hemisphere countries.
+    const rows: MonthlyRainRow[] = Array.from({ length: 12 }, (_, dispIdx) => {
+      const i = (dispIdx + startMonthIdx) % 12;
       const minRain = r1(wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd);
       const dryWarn = hasDryWarn ? r1(wsum(activeProv, (p) => p.monthly_dry_warn![i]) / totalProd) : 0;
       return {
-        month,
+        month: MONTHS[i],
         avgRain:      r1(wsum(activeProv, (p) => p.monthly_avg_rain[i])      / totalProd),
         minRain,
         maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
@@ -575,20 +587,24 @@ export default function WeatherCharts({
     // Current (partial) month → project to month-end so the bar is comparable to
     // the full-month climatology (same basis as the cumulative chart & the daily
     // forecast): avg daily rate over (MTD + 7-day forecast) × days-in-month.
-    const curIdx = rows.reduce((acc, r, i) => (r.actualCur !== null ? i : acc), -1);
-    if (curIdx >= 0) {
+    // Find the partial month by display index, then convert to calendar
+    // month for the actual date arithmetic.
+    const curDispIdx = rows.reduce((acc, r, i) => (r.actualCur !== null ? i : acc), -1);
+    if (curDispIdx >= 0) {
+      const curCalIdx = (curDispIdx + startMonthIdx) % 12;
       const parts = data.updated.split("-");
       const curYearNum  = parseInt(parts[0]);
       const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
-      const daysInMonth = new Date(curYearNum, curIdx + 1, 0).getDate();
+      const daysInMonth = new Date(curYearNum, curCalIdx + 1, 0).getDate();
       let fcRain = 0, fcDays = 0;
       data.forecast_7d.forEach((f, i) => {
         const [y, m] = f.date.split("-").map(Number);
-        if (y === curYearNum && m - 1 === curIdx) {
+        if (y === curYearNum && m - 1 === curCalIdx) {
           fcRain += wsum(activeProv, (p) => p.forecast_7d_rain[i] ?? 0) / totalProd;
           fcDays += 1;
         }
       });
+      const curIdx = curDispIdx;  // alias: subsequent block uses this label
       const mtd = rows[curIdx].actualCur as number;
       const knownDays = daysElapsed + fcDays;
       if (knownDays > 0) {
@@ -597,12 +613,14 @@ export default function WeatherCharts({
       }
     }
     return rows;
-  }, [data, activeProv, totalProd]);
+  }, [data, activeProv, totalProd, startMonthIdx]);
 
   const cumulativeData = useMemo<CumRainRow[]>(() => {
     if (!data || !totalProd) return [];
     let cumAvg = 0, cumMin = 0, cumMax = 0, cumLY = 0, cumC = 0;
-    const rows: CumRainRow[] = MONTHS.map((month, i) => {
+    const rows: CumRainRow[] = Array.from({ length: 12 }, (_, dispIdx) => {
+      const i = (dispIdx + startMonthIdx) % 12;
+      const month = MONTHS[i];
       cumAvg += wsum(activeProv, (p) => p.monthly_avg_rain[i])       / totalProd;
       cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i])       / totalProd;
       cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i])       / totalProd;
@@ -623,23 +641,25 @@ export default function WeatherCharts({
     // Project the current (partial) month to month-end: average daily rate over
     // the known window (month-to-date actuals + 7-day forecast) extrapolated
     // across the whole month. Drawn dissociated from the actual line.
-    const curIdx = rows.reduce((acc, r, i) => (r.cumCur !== null ? i : acc), -1);
-    if (curIdx >= 0) {
+    const curDispIdx = rows.reduce((acc, r, i) => (r.cumCur !== null ? i : acc), -1);
+    if (curDispIdx >= 0) {
+      const curCalIdx = (curDispIdx + startMonthIdx) % 12;
       const parts = data.updated.split("-");
       const curYearNum  = parseInt(parts[0]);
       const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
-      const daysInMonth = new Date(curYearNum, curIdx + 1, 0).getDate();
+      const daysInMonth = new Date(curYearNum, curCalIdx + 1, 0).getDate();
 
       let fcRain = 0, fcDays = 0;
       data.forecast_7d.forEach((f, i) => {
         const [y, m] = f.date.split("-").map(Number);
-        if (y === curYearNum && m - 1 === curIdx) {
+        if (y === curYearNum && m - 1 === curCalIdx) {
           fcRain += wsum(activeProv, (p) => p.forecast_7d_rain[i] ?? 0) / totalProd;
           fcDays += 1;
         }
       });
 
-      const mtd       = wsum(activeProv, (p) => p.monthly_actual_cur[curIdx]) / totalProd;
+      const curIdx    = curDispIdx;
+      const mtd       = wsum(activeProv, (p) => p.monthly_actual_cur[curCalIdx]) / totalProd;
       const prevCum   = (rows[curIdx].cumCur as number) - mtd;
       const knownDays = daysElapsed + fcDays;
       if (knownDays > 0) {
@@ -650,21 +670,24 @@ export default function WeatherCharts({
       }
     }
     return rows;
-  }, [data, activeProv, totalProd]);
+  }, [data, activeProv, totalProd, startMonthIdx]);
 
   const tempData = useMemo<TempRow[]>(() => {
     if (!totalProd) return [];
-    return MONTHS.map((month, i) => ({
-      month,
-      avgTemp:      r1(wsum(activeProv, (p) => p.monthly_avg_temp[i])        / totalProd),
-      minTemp:      r1(wsum(activeProv, (p) => p.monthly_min_temp[i])        / totalProd),
-      maxTemp:      r1(wsum(activeProv, (p) => p.monthly_max_temp[i])        / totalProd),
-      lastYearTemp: r1(wsum(activeProv, (p) => p.monthly_last_year_temp[i])  / totalProd),
-      actualCur:    activeProv.every((p) => p.monthly_actual_temp_cur[i] != null)
-        ? r1(wsum(activeProv, (p) => p.monthly_actual_temp_cur[i]) / totalProd)
-        : null,
-    }));
-  }, [activeProv, totalProd]);
+    return Array.from({ length: 12 }, (_, dispIdx) => {
+      const i = (dispIdx + startMonthIdx) % 12;
+      return {
+        month: MONTHS[i],
+        avgTemp:      r1(wsum(activeProv, (p) => p.monthly_avg_temp[i])        / totalProd),
+        minTemp:      r1(wsum(activeProv, (p) => p.monthly_min_temp[i])        / totalProd),
+        maxTemp:      r1(wsum(activeProv, (p) => p.monthly_max_temp[i])        / totalProd),
+        lastYearTemp: r1(wsum(activeProv, (p) => p.monthly_last_year_temp[i])  / totalProd),
+        actualCur:    activeProv.every((p) => p.monthly_actual_temp_cur[i] != null)
+          ? r1(wsum(activeProv, (p) => p.monthly_actual_temp_cur[i]) / totalProd)
+          : null,
+      };
+    });
+  }, [activeProv, totalProd, startMonthIdx]);
 
   const tempDomain = useMemo<[number, number]>(() => {
     const vals = tempData.flatMap((d) => [d.minTemp, d.maxTemp]).filter((v) => v > 0);

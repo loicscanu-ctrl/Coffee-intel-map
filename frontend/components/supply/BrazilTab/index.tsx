@@ -127,6 +127,7 @@ export default function BrazilTab() {
           dataUrl="/data/brazil_weather.json"
           title="Weather · Brazil"
           farmerEconomicsUrl="/data/farmer_economics.json"
+          startMonthIdx={5}  // Brazil = southern hemisphere → calendar starts in June
         />
       )}
 
