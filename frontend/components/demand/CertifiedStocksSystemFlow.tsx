@@ -225,14 +225,23 @@ function _originColor(origin: string, market: "KC" | "RC"): string {
 // ghost} groups and surface the effective per-square volume in the click
 // popover so the visual stays honest.
 // DENSITY_COLS is now per-card: `p.span * 3` (span ∈ 1-4 → cols ∈ 3-12).
-const DENSITY_MAX_SQUARES = 400;
+// Per-market caps — RC half of KC so the "divide by two" directive applies
+// uniformly to robusta ports (the small ones drop their square count via
+// the LOTS_PER_WARRANT_RC change below, the big ones drop here via the cap).
+const DENSITY_MAX_SQUARES_KC = 400;
+const DENSITY_MAX_SQUARES_RC = 200;
+const _densityMaxSquares = (market: "KC" | "RC") =>
+  market === "KC" ? DENSITY_MAX_SQUARES_KC : DENSITY_MAX_SQUARES_RC;
 // Warrant sizing:
-//   • Robusta — 1 lot = 10 MT = 1 warrant. Snapshot data is already in lots,
-//     so squareUnit = 1.
-//   • Arabica — 1 warrant = 37,500 lb = 17,009 kg ≈ 283.49 bags (at 60 kg/bag).
-//     Snapshot data is in bags, so squareUnit = 283.49.
+//   • Robusta — 1 lot = 10 MT. User asked for each square to represent
+//     ≈ 10 MT and to "divide the number by two" (their observation: the
+//     prior visual rendered squares at ~5 MT each). Setting per-square
+//     unit = 2 lots = 20 MT halves the square count uniformly across
+//     robusta ports while keeping size + colour treatment identical.
+//   • Arabica — 1 warrant = 37,500 lb = 17,009 kg ≈ 283.49 bags (60 kg/bag).
+//     Snapshot data is in bags, so squareUnit = 283.49 — unchanged.
 const BAGS_PER_WARRANT_KC = (37_500 * 0.45359237) / 60;   // ≈ 283.49
-const LOTS_PER_WARRANT_RC = 1;
+const LOTS_PER_WARRANT_RC = 2;
 
 interface DensitySquare {
   status: "filled" | "gained" | "ghost";
@@ -324,7 +333,8 @@ function buildDensityGrid(
 
   // 2. Uniform scale-down if the grand total of squares would overflow.
   const grand = existingWarrants + gainedWarrants + lostWarrants;
-  const scale = grand > DENSITY_MAX_SQUARES ? DENSITY_MAX_SQUARES / grand : 1;
+  const cap = _densityMaxSquares(market);
+  const scale = grand > cap ? cap / grand : 1;
   const existingShown = Math.round(existingWarrants * scale);
   const gainedShown   = Math.round(gainedWarrants   * scale);
   const lostShown     = Math.round(lostWarrants     * scale);
@@ -884,7 +894,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         </span>
         <span className="text-slate-700 mx-1">|</span>
         <span className="text-slate-500 uppercase">1 ◻ =</span>
-        <span className="flex items-center text-slate-300">1 warrant (KC: 37,500 lb · RC: 10 MT)</span>
+        <span className="flex items-center text-slate-300">KC: 1 warrant (≈ 17 MT) · RC: 2 lots (20 MT)</span>
       </div>
 
       {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
