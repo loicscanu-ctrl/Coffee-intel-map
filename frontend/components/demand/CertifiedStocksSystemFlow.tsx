@@ -719,6 +719,18 @@ interface PortFlow {
 
 // ── Component body ─────────────────────────────────────────────────────────
 
+// Tiny lucide-style truck SVG, parked at the right end of each ↓out
+// conveyor strip so the visual reads as "stock flowing out to a buyer".
+const IconTruck = (p: { className?: string }) => (
+  <svg className={p.className} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="1" y="3" width="15" height="13" />
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+    <circle cx="5.5" cy="18.5" r="2.5" />
+    <circle cx="18.5" cy="18.5" r="2.5" />
+  </svg>
+);
+
 interface Props {
   arabica: ArabicaJsonShape | null;
   robusta: RobustaJsonShape | null;
@@ -1396,76 +1408,66 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
             </div>
           )}
 
-          {/* Branch connector — animated flow lines, mirroring the map's
-              logistics route style. Per-port verticals only render where
-              the window saw inflow; the manifold extends to include the
-              intake trunk so vertical drops always meet the horizontal
-              rail. Stroke renders at constant pixel width via
-              vector-effect, so the SVG can stretch with the row. */}
+          {/* Grading-intake → warehouses conveyor. Replaces the previous
+              SVG manifold tree with a single horizontal conveyor that mirrors
+              the per-port ↓out strip — boxes flow left-to-right from the
+              intake stage to the warehouse row, coloured by the dominant
+              origins arriving in the window. The keyframes (cs-conveyor-mini)
+              live in the same one-shot style injection used elsewhere. */}
           {mkt.ports.length > 0 && (() => {
             const visible = mkt.ports.slice(0, 8);
             if (visible.length === 0) return null;
-            // Cards now size to their content (fixed-px squares + flex-wrap),
-            // so span-weighted x positions no longer line up. Equal spacing
-            // across the visible cards is the simplest honest approximation —
-            // the manifold drops onto the centre of each slot.
-            const centres = visible.map((_, i) => ((i + 0.5) / visible.length) * 100);
-            const arrowXs = visible
-              .map((p, i) => ({ p, x: centres[i] }))
-              .filter(({ p }) => p.inflow.reduce((s, b) => s + b.volume, 0) > 0)
-              .map(({ x }) => x);
-            if (arrowXs.length === 0) return null;
-            const leftX  = Math.min(...arrowXs, 50);
-            const rightX = Math.max(...arrowXs, 50);
-            const markerId = `cs-arr-${mkt.market.toLowerCase()}`;
-            const stroke   = "#10b981";
-            const trunkY   = 4.4;          // bottom of the top trunk
-            const railY    = 5;            // horizontal rail height
-            const dropEndY = 13.2;         // bottom of the drop, before arrowhead
-            const r        = 0.6;          // corner radius at trunk → rail
-            // Combine trunk + horizontal rail into a single path so the
-            // animated dash flows continuously across the bend.
-            let railPath = `M50,0 V${trunkY - r}`;
-            railPath += ` Q50,${railY} ${leftX < 50 ? "50" : "50"},${railY}`;
-            if (leftX !== rightX) railPath += ` M${leftX},${railY} H${rightX}`;
+            // Aggregate inflow across visible ports and pick the dominant
+            // origins for the box-colour cycle. Falls back to a neutral
+            // emerald box stream when no origin-resolved inflow exists.
+            const totals: Record<string, { volume: number; color: string }> = {};
+            for (const p of visible) {
+              for (const o of p.inflow) {
+                totals[o.origin] = totals[o.origin] || { volume: 0, color: o.color };
+                totals[o.origin].volume += o.volume;
+              }
+            }
+            const topOrigins = Object.entries(totals)
+              .sort(([, a], [, b]) => b.volume - a.volume)
+              .slice(0, 4)
+              .map(([, v]) => v);
+            const colors = topOrigins.length > 0 ? topOrigins : [{ volume: 0, color: "#10b981" }];
+            const totalInflow = Object.values(totals).reduce((a, b) => a + b.volume, 0);
             return (
-              <svg viewBox="0 0 100 16" preserveAspectRatio="none"
-                   className="w-full h-12 my-1 overflow-visible" aria-hidden>
-                <defs>
-                  {/* Chevron arrowhead — open-V shape, less PowerPoint than
-                      the old filled triangle. */}
-                  <marker id={markerId} viewBox="0 0 10 10"
-                          refX="6" refY="5" markerWidth="3.8" markerHeight="3.8"
-                          orient="auto">
-                    <path d="M1,1 L7,5 L1,9" fill="none" stroke={stroke}
-                          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </marker>
-                  {/* Soft glow so the flowing line has a hint of depth. */}
-                  <filter id={`${markerId}-glow`} x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="0.45" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-                <g filter={`url(#${markerId}-glow)`}>
-                  {/* Trunk + horizontal rail */}
-                  <path d={railPath} fill="none" stroke={stroke} strokeOpacity="0.9"
-                        strokeWidth="2" strokeLinecap="round"
-                        vectorEffect="non-scaling-stroke"
-                        className="cs-flow-slow" />
-                  {/* Per-port drops with chevron arrowheads */}
-                  {arrowXs.map((x, i) => (
-                    <line key={i} x1={x} y1={railY} x2={x} y2={dropEndY}
-                          stroke={stroke} strokeOpacity="0.9"
-                          strokeWidth="2" strokeLinecap="round"
-                          vectorEffect="non-scaling-stroke"
-                          markerEnd={`url(#${markerId})`}
-                          className="cs-flow" />
-                  ))}
-                </g>
-              </svg>
+              <div className="my-2 flex items-stretch gap-2">
+                {/* Source badge */}
+                <div className="flex flex-col items-center justify-center px-2 py-1 bg-slate-900 border border-slate-700 rounded text-[9px] text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                  Grading intake
+                </div>
+                {/* Conveyor — flex-grow so it stretches with the row */}
+                <div className="relative flex-1 h-10 bg-slate-900/40 border border-slate-800 rounded overflow-hidden">
+                  {/* Belt rails */}
+                  <div className="absolute inset-x-2 top-1/2 h-px bg-emerald-900/50 -translate-y-1/2" />
+                  <div className="absolute inset-x-2 top-1/2 mt-[2px] h-px bg-emerald-900/30" />
+                  {/* 8 boxes flowing right, staggered so the belt looks alive */}
+                  <div className="absolute inset-x-2 inset-y-0">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <span key={i}
+                        className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-sm cs-conveyor-mini"
+                        style={{
+                          background: colors[i % colors.length].color,
+                          animationDelay: `${i * 0.28}s`,
+                          animationDuration: "2.3s",
+                          boxShadow: "0 0 5px rgba(16,185,129,0.4)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Direction label + magnitude, centred above the belt */}
+                  <div className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8.5px] font-mono text-emerald-400/80 px-1.5 bg-slate-950/60 rounded">
+                    → graded {totalInflow > 0 ? `+${fmtNum(totalInflow)}` : ""}
+                  </div>
+                </div>
+                {/* Destination badge */}
+                <div className="flex flex-col items-center justify-center px-2 py-1 bg-emerald-950/40 border border-emerald-900/60 rounded text-[9px] text-emerald-300 uppercase tracking-wider whitespace-nowrap">
+                  Warehouses
+                </div>
+              </div>
             );
           })()}
 
@@ -1771,22 +1773,28 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         <span className="font-mono">−{fmtNum(outflowSum)}</span>
                       </div>
                       {outflowSum > 0 && topOutflow.length > 0 && (
-                        <div className="relative h-2.5 mt-0.5 overflow-hidden">
-                          {/* Track */}
-                          <div className="absolute inset-x-0 top-1/2 h-px bg-rose-900/40 -translate-y-1/2" />
-                          {/* 4 boxes flowing right, cycling the top outflow
-                              origin colours. Staggered delays so they
-                              feel like a steady stream rather than a wave. */}
-                          {Array.from({ length: 4 }).map((_, i) => (
-                            <span key={i}
-                              className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-sm cs-conveyor-mini"
-                              style={{
-                                background: topOutflow[i % topOutflow.length].color,
-                                animationDelay: `${i * 0.45}s`,
-                                boxShadow: "0 0 4px rgba(239,68,68,0.45)",
-                              }}
-                            />
-                          ))}
+                        <div className="relative h-3 mt-0.5 overflow-hidden">
+                          {/* Conveyor track — narrower than the container so
+                              the boxes fade out just before reaching the
+                              truck parked at the right edge. */}
+                          <div className="absolute left-0 right-3.5 top-1/2 h-px bg-rose-900/40 -translate-y-1/2" />
+                          <div className="absolute left-0 right-3.5 top-0 bottom-0">
+                            {/* 4 boxes flowing right, cycling the top outflow
+                                origin colours. Staggered delays give a steady
+                                stream rather than a wave. */}
+                            {Array.from({ length: 4 }).map((_, i) => (
+                              <span key={i}
+                                className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-sm cs-conveyor-mini"
+                                style={{
+                                  background: topOutflow[i % topOutflow.length].color,
+                                  animationDelay: `${i * 0.45}s`,
+                                  boxShadow: "0 0 4px rgba(239,68,68,0.45)",
+                                }}
+                              />
+                            ))}
+                          </div>
+                          {/* Truck destination — the stock leaves the system here. */}
+                          <IconTruck className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-rose-400" />
                         </div>
                       )}
                       {topOutflow.length > 0 && (
