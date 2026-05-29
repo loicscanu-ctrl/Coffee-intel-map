@@ -1630,7 +1630,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topInflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                              {b.origin}: {fmtNum(b.volume)}
                             </span>
                           ))}
                         </div>
@@ -1644,7 +1644,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         {topExisting.map((b) => (
                           <span key={b.origin} className="flex items-center text-slate-300">
                             <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                            {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                            {b.origin}: {fmtNum(b.volume)}
                           </span>
                         ))}
                       </div>
@@ -1686,7 +1686,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                             {topNetGained.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                                {b.origin}: {fmtNum(b.volume)}
                               </span>
                             ))}
                           </div>
@@ -1723,7 +1723,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                             {topGhost.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                                {b.origin}: {fmtNum(b.volume)}
                               </span>
                             ))}
                           </div>
@@ -1761,7 +1761,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                             {topTransit.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                                {b.origin}: {fmtNum(b.volume)}
                               </span>
                             ))}
                           </div>
@@ -1828,7 +1828,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topOutflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                              {b.origin}: {fmtNum(b.volume)}
                             </span>
                           ))}
                         </div>
