@@ -18940,7 +18940,1230 @@
         },
         "transition": null
       }
-    ]
+    ],
+    "implied_outflow": [
+      {
+        "month_end": "2024-05-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 35.99,
+            "Indonesia": 2.05,
+            "Vietnam": 3.66,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.29
+          },
+          "FEL": {
+            "Vietnam": 3.0,
+            "Brazilian Conillon": 9.0
+          },
+          "ANT": {
+            "Brazilian Conillon": 85.57,
+            "Angola": 0.03,
+            "Indonesia": 30.93,
+            "Cameroon": 0.75,
+            "Vietnam": 93.41,
+            "Cote d'Ivoire": 5.15,
+            "Republic of Madagascar": 0.24,
+            "Tanzania": 0.21,
+            "Sierra Leone": 1.38,
+            "Guinea": 0.12,
+            "Togo": 0.25,
+            "Laos": 1.05,
+            "Uganda": 2.71,
+            "India": 1.13,
+            "Congo": 0.05,
+            "Democratic Republic of Congo": 0.01
+          }
+        }
+      },
+      {
+        "month_end": "2024-06-28",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 39.42,
+            "Indonesia": 2.25,
+            "Vietnam": 4.01,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.31
+          },
+          "FEL": {
+            "Vietnam": 0.75,
+            "Brazilian Conillon": 2.25
+          },
+          "ANT": {
+            "Brazilian Conillon": 105.14,
+            "Angola": 0.04,
+            "Indonesia": 38.0,
+            "Cameroon": 0.92,
+            "Vietnam": 114.77,
+            "Cote d'Ivoire": 6.32,
+            "Republic of Madagascar": 0.3,
+            "Tanzania": 0.26,
+            "Sierra Leone": 1.69,
+            "Guinea": 0.15,
+            "Togo": 0.31,
+            "Laos": 1.29,
+            "Uganda": 3.33,
+            "India": 1.39,
+            "Congo": 0.06,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 4.9,
+            "Brazilian Conillon": 6.3,
+            "Cote d'Ivoire": 0.27,
+            "India": 0.08,
+            "Uganda": 0.15,
+            "Indonesia": 0.29,
+            "Cameroon": 0.02
+          }
+        }
+      },
+      {
+        "month_end": "2024-07-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 179.97,
+            "Indonesia": 10.27,
+            "Vietnam": 18.29,
+            "Cameroon": 0.04,
+            "Cote d'Ivoire": 1.43
+          },
+          "FEL": {
+            "Vietnam": 15.73,
+            "Brazilian Conillon": 47.27
+          },
+          "LEH": {
+            "Brazilian Conillon": 0.34,
+            "Vietnam": 0.31,
+            "Cameroon": 1.54,
+            "Congo": 0.05,
+            "Guinea": 0.31,
+            "Sierra Leone": 0.29,
+            "Cote d'Ivoire": 0.15
+          },
+          "ANT": {
+            "Brazilian Conillon": 131.24,
+            "Angola": 0.05,
+            "Indonesia": 47.44,
+            "Cameroon": 1.15,
+            "Vietnam": 143.26,
+            "Cote d'Ivoire": 7.89,
+            "Republic of Madagascar": 0.37,
+            "Tanzania": 0.33,
+            "Sierra Leone": 2.11,
+            "Guinea": 0.19,
+            "Togo": 0.38,
+            "Laos": 1.61,
+            "Uganda": 4.15,
+            "India": 1.74,
+            "Congo": 0.08,
+            "Democratic Republic of Congo": 0.01
+          }
+        }
+      },
+      {
+        "month_end": "2024-08-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 152.55,
+            "Indonesia": 8.71,
+            "Vietnam": 15.5,
+            "Cameroon": 0.03,
+            "Cote d'Ivoire": 1.21
+          },
+          "FEL": {
+            "Vietnam": 4.75,
+            "Brazilian Conillon": 14.25
+          },
+          "ANT": {
+            "Brazilian Conillon": 208.75,
+            "Angola": 0.08,
+            "Indonesia": 75.45,
+            "Cameroon": 1.83,
+            "Vietnam": 227.87,
+            "Cote d'Ivoire": 12.55,
+            "Republic of Madagascar": 0.59,
+            "Tanzania": 0.52,
+            "Sierra Leone": 3.36,
+            "Guinea": 0.3,
+            "Togo": 0.61,
+            "Laos": 2.55,
+            "Uganda": 6.6,
+            "India": 2.77,
+            "Congo": 0.13,
+            "Democratic Republic of Congo": 0.02
+          }
+        }
+      },
+      {
+        "month_end": "2024-09-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 408.79,
+            "Indonesia": 23.33,
+            "Vietnam": 41.54,
+            "Cameroon": 0.09,
+            "Cote d'Ivoire": 3.25
+          },
+          "FEL": {
+            "Vietnam": 16.48,
+            "Brazilian Conillon": 49.52
+          },
+          "ANT": {
+            "Brazilian Conillon": 511.91,
+            "Angola": 0.21,
+            "Indonesia": 185.03,
+            "Cameroon": 4.5,
+            "Vietnam": 558.78,
+            "Cote d'Ivoire": 30.79,
+            "Republic of Madagascar": 1.46,
+            "Tanzania": 1.27,
+            "Sierra Leone": 8.24,
+            "Guinea": 0.73,
+            "Togo": 1.5,
+            "Laos": 6.27,
+            "Uganda": 16.19,
+            "India": 6.79,
+            "Congo": 0.31,
+            "Democratic Republic of Congo": 0.04
+          }
+        }
+      },
+      {
+        "month_end": "2024-10-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 167.97,
+            "Indonesia": 9.59,
+            "Vietnam": 17.07,
+            "Cameroon": 0.04,
+            "Cote d'Ivoire": 1.33
+          },
+          "FEL": {
+            "Vietnam": 5.49,
+            "Brazilian Conillon": 16.51
+          },
+          "ANT": {
+            "Brazilian Conillon": 181.89,
+            "Angola": 0.07,
+            "Indonesia": 65.74,
+            "Cameroon": 1.6,
+            "Vietnam": 198.55,
+            "Cote d'Ivoire": 10.94,
+            "Republic of Madagascar": 0.52,
+            "Tanzania": 0.45,
+            "Sierra Leone": 2.93,
+            "Guinea": 0.26,
+            "Togo": 0.53,
+            "Laos": 2.23,
+            "Uganda": 5.75,
+            "India": 2.41,
+            "Congo": 0.11,
+            "Democratic Republic of Congo": 0.01
+          },
+          "NOR": {
+            "Angola": 0.81,
+            "Venezuela": 0.81,
+            "Brazilian Conillon": 26.2,
+            "Vietnam": 1.78,
+            "Uganda": 0.4
+          }
+        }
+      },
+      {
+        "month_end": "2024-11-29",
+        "by_port": {
+          "HAM": {
+            "Uganda": 0.09,
+            "Brazilian Conillon": 0.07,
+            "Vietnam": 0.57,
+            "India": 0.11,
+            "Cameroon": 0.03,
+            "Laos": 0.02,
+            "Indonesia": 0.09,
+            "Cote d'Ivoire": 0.0,
+            "Tanzania": 0.02
+          },
+          "LEH": {
+            "Brazilian Conillon": 1.49,
+            "Vietnam": 1.34,
+            "Cameroon": 6.69,
+            "Congo": 0.22,
+            "Guinea": 1.34,
+            "Sierra Leone": 1.26,
+            "Cote d'Ivoire": 0.67
+          },
+          "BAR": {
+            "Vietnam": 10.2,
+            "Brazilian Conillon": 13.12,
+            "Cote d'Ivoire": 0.55,
+            "India": 0.16,
+            "Uganda": 0.31,
+            "Indonesia": 0.6,
+            "Cameroon": 0.05
+          },
+          "TRI": {
+            "Brazilian Conillon": 5.55,
+            "Tanzania": 1.26,
+            "Uganda": 0.48,
+            "Vietnam": 4.89,
+            "Cameroon": 0.17,
+            "Cote d'Ivoire": 0.12,
+            "India": 2.57,
+            "Laos": 0.77,
+            "Indonesia": 0.02,
+            "Democratic Republic of Congo": 0.05,
+            "Togo": 0.12
+          },
+          "LON": {
+            "Brazilian Conillon": 67.7,
+            "Indonesia": 3.86,
+            "Vietnam": 6.88,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.54
+          },
+          "ANT": {
+            "Brazilian Conillon": 17.65,
+            "Angola": 0.01,
+            "Indonesia": 6.38,
+            "Cameroon": 0.16,
+            "Vietnam": 19.27,
+            "Cote d'Ivoire": 1.06,
+            "Republic of Madagascar": 0.05,
+            "Tanzania": 0.04,
+            "Sierra Leone": 0.28,
+            "Guinea": 0.03,
+            "Togo": 0.05,
+            "Laos": 0.22,
+            "Uganda": 0.56,
+            "India": 0.23,
+            "Congo": 0.01,
+            "Democratic Republic of Congo": 0.0
+          },
+          "GEN": {
+            "Brazilian Conillon": 0.74,
+            "Tanzania": 0.24,
+            "Uganda": 0.07,
+            "Vietnam": 0.11,
+            "Cote d'Ivoire": 0.29,
+            "Cameroon": 0.22,
+            "India": 0.24,
+            "Democratic Republic of Congo": 0.09
+          }
+        }
+      },
+      {
+        "month_end": "2024-12-31",
+        "by_port": {
+          "BAR": {
+            "Vietnam": 2.04,
+            "Brazilian Conillon": 2.62,
+            "Cote d'Ivoire": 0.11,
+            "India": 0.03,
+            "Uganda": 0.06,
+            "Indonesia": 0.12,
+            "Cameroon": 0.01
+          },
+          "TRI": {
+            "Brazilian Conillon": 18.73,
+            "Tanzania": 4.25,
+            "Uganda": 1.63,
+            "Vietnam": 16.49,
+            "Cameroon": 0.58,
+            "Cote d'Ivoire": 0.41,
+            "India": 8.69,
+            "Laos": 2.59,
+            "Indonesia": 0.06,
+            "Democratic Republic of Congo": 0.17,
+            "Togo": 0.41
+          },
+          "LON": {
+            "Brazilian Conillon": 119.12,
+            "Indonesia": 6.8,
+            "Vietnam": 12.11,
+            "Cameroon": 0.03,
+            "Cote d'Ivoire": 0.95
+          },
+          "ANT": {
+            "Brazilian Conillon": 24.56,
+            "Angola": 0.01,
+            "Indonesia": 8.88,
+            "Cameroon": 0.22,
+            "Vietnam": 26.81,
+            "Cote d'Ivoire": 1.48,
+            "Republic of Madagascar": 0.07,
+            "Tanzania": 0.06,
+            "Sierra Leone": 0.4,
+            "Guinea": 0.03,
+            "Togo": 0.07,
+            "Laos": 0.3,
+            "Uganda": 0.78,
+            "India": 0.33,
+            "Congo": 0.01,
+            "Democratic Republic of Congo": 0.0
+          },
+          "NOR": {
+            "Angola": 0.08,
+            "Venezuela": 0.08,
+            "Brazilian Conillon": 2.62,
+            "Vietnam": 0.18,
+            "Uganda": 0.04
+          }
+        }
+      },
+      {
+        "month_end": "2025-01-31",
+        "by_port": {
+          "BAR": {
+            "Vietnam": 1.63,
+            "Brazilian Conillon": 2.1,
+            "Cote d'Ivoire": 0.09,
+            "India": 0.03,
+            "Uganda": 0.05,
+            "Indonesia": 0.1,
+            "Cameroon": 0.01
+          },
+          "TRI": {
+            "Brazilian Conillon": 10.75,
+            "Tanzania": 2.44,
+            "Uganda": 0.93,
+            "Vietnam": 9.47,
+            "Cameroon": 0.33,
+            "Cote d'Ivoire": 0.24,
+            "India": 4.99,
+            "Laos": 1.49,
+            "Indonesia": 0.03,
+            "Democratic Republic of Congo": 0.09,
+            "Togo": 0.24
+          },
+          "LON": {
+            "Brazilian Conillon": 0.86,
+            "Indonesia": 0.05,
+            "Vietnam": 0.09,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.01
+          },
+          "FEL": {
+            "Vietnam": 9.99,
+            "Brazilian Conillon": 30.01
+          },
+          "AMS": {
+            "Vietnam": 1.29,
+            "Brazilian Conillon": 3.14,
+            "Cote d'Ivoire": 0.57
+          },
+          "ANT": {
+            "Brazilian Conillon": 37.99,
+            "Angola": 0.02,
+            "Indonesia": 13.73,
+            "Cameroon": 0.33,
+            "Vietnam": 41.47,
+            "Cote d'Ivoire": 2.28,
+            "Republic of Madagascar": 0.11,
+            "Tanzania": 0.09,
+            "Sierra Leone": 0.61,
+            "Guinea": 0.05,
+            "Togo": 0.11,
+            "Laos": 0.46,
+            "Uganda": 1.2,
+            "India": 0.5,
+            "Congo": 0.02,
+            "Democratic Republic of Congo": 0.0
+          },
+          "GEN": {
+            "Brazilian Conillon": 3.33,
+            "Tanzania": 1.08,
+            "Uganda": 0.32,
+            "Vietnam": 0.5,
+            "Cote d'Ivoire": 1.31,
+            "Cameroon": 1.01,
+            "India": 1.06,
+            "Democratic Republic of Congo": 0.39
+          }
+        }
+      },
+      {
+        "month_end": "2025-02-28",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 13.71,
+            "Indonesia": 0.78,
+            "Vietnam": 1.39,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.11
+          },
+          "FEL": {
+            "Vietnam": 8.99,
+            "Brazilian Conillon": 27.01
+          },
+          "ANT": {
+            "Brazilian Conillon": 73.29,
+            "Angola": 0.03,
+            "Indonesia": 26.49,
+            "Cameroon": 0.64,
+            "Vietnam": 80.01,
+            "Cote d'Ivoire": 4.41,
+            "Republic of Madagascar": 0.21,
+            "Tanzania": 0.18,
+            "Sierra Leone": 1.18,
+            "Guinea": 0.1,
+            "Togo": 0.21,
+            "Laos": 0.9,
+            "Uganda": 2.32,
+            "India": 0.97,
+            "Congo": 0.04,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 8.16,
+            "Brazilian Conillon": 10.5,
+            "Cote d'Ivoire": 0.44,
+            "India": 0.13,
+            "Uganda": 0.25,
+            "Indonesia": 0.48,
+            "Cameroon": 0.04
+          },
+          "GEN": {
+            "Brazilian Conillon": 1.11,
+            "Tanzania": 0.36,
+            "Uganda": 0.11,
+            "Vietnam": 0.17,
+            "Cote d'Ivoire": 0.44,
+            "Cameroon": 0.34,
+            "India": 0.35,
+            "Democratic Republic of Congo": 0.13
+          },
+          "TRI": {
+            "Brazilian Conillon": 5.2,
+            "Tanzania": 1.18,
+            "Uganda": 0.45,
+            "Vietnam": 4.58,
+            "Cameroon": 0.16,
+            "Cote d'Ivoire": 0.11,
+            "India": 2.41,
+            "Laos": 0.72,
+            "Indonesia": 0.02,
+            "Democratic Republic of Congo": 0.05,
+            "Togo": 0.11
+          }
+        }
+      },
+      {
+        "month_end": "2025-03-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 25.71,
+            "Indonesia": 1.47,
+            "Vietnam": 2.61,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.2
+          },
+          "HAM": {
+            "Uganda": 0.69,
+            "Brazilian Conillon": 0.56,
+            "Vietnam": 4.59,
+            "India": 0.89,
+            "Cameroon": 0.24,
+            "Laos": 0.16,
+            "Indonesia": 0.72,
+            "Cote d'Ivoire": 0.02,
+            "Tanzania": 0.13
+          },
+          "ANT": {
+            "Brazilian Conillon": 75.98,
+            "Angola": 0.03,
+            "Indonesia": 27.46,
+            "Cameroon": 0.67,
+            "Vietnam": 82.94,
+            "Cote d'Ivoire": 4.57,
+            "Republic of Madagascar": 0.22,
+            "Tanzania": 0.19,
+            "Sierra Leone": 1.22,
+            "Guinea": 0.11,
+            "Togo": 0.22,
+            "Laos": 0.93,
+            "Uganda": 2.4,
+            "India": 1.01,
+            "Congo": 0.05,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 12.24,
+            "Brazilian Conillon": 15.75,
+            "Cote d'Ivoire": 0.67,
+            "India": 0.19,
+            "Uganda": 0.38,
+            "Indonesia": 0.73,
+            "Cameroon": 0.06
+          },
+          "TRI": {
+            "Brazilian Conillon": 12.48,
+            "Tanzania": 2.83,
+            "Uganda": 1.08,
+            "Vietnam": 10.99,
+            "Cameroon": 0.39,
+            "Cote d'Ivoire": 0.28,
+            "India": 5.79,
+            "Laos": 1.73,
+            "Indonesia": 0.04,
+            "Democratic Republic of Congo": 0.11,
+            "Togo": 0.28
+          }
+        }
+      },
+      {
+        "month_end": "2025-04-30",
+        "by_port": {
+          "HAM": {
+            "Uganda": 0.26,
+            "Brazilian Conillon": 0.21,
+            "Vietnam": 1.72,
+            "India": 0.33,
+            "Cameroon": 0.09,
+            "Laos": 0.06,
+            "Indonesia": 0.27,
+            "Cote d'Ivoire": 0.01,
+            "Tanzania": 0.05
+          },
+          "ANT": {
+            "Brazilian Conillon": 64.47,
+            "Angola": 0.03,
+            "Indonesia": 23.3,
+            "Cameroon": 0.57,
+            "Vietnam": 70.37,
+            "Cote d'Ivoire": 3.88,
+            "Republic of Madagascar": 0.18,
+            "Tanzania": 0.16,
+            "Sierra Leone": 1.04,
+            "Guinea": 0.09,
+            "Togo": 0.19,
+            "Laos": 0.79,
+            "Uganda": 2.04,
+            "India": 0.85,
+            "Congo": 0.04,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 6.12,
+            "Brazilian Conillon": 7.87,
+            "Cote d'Ivoire": 0.33,
+            "India": 0.09,
+            "Uganda": 0.19,
+            "Indonesia": 0.36,
+            "Cameroon": 0.03
+          },
+          "TRI": {
+            "Brazilian Conillon": 0.35,
+            "Tanzania": 0.08,
+            "Uganda": 0.03,
+            "Vietnam": 0.31,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.01,
+            "India": 0.16,
+            "Laos": 0.05,
+            "Indonesia": 0.0,
+            "Democratic Republic of Congo": 0.0,
+            "Togo": 0.01
+          }
+        }
+      },
+      {
+        "month_end": "2025-05-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 21.43,
+            "Indonesia": 1.22,
+            "Vietnam": 2.18,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.17
+          },
+          "FEL": {
+            "Vietnam": 3.25,
+            "Brazilian Conillon": 9.75
+          },
+          "ANT": {
+            "Brazilian Conillon": 79.43,
+            "Angola": 0.03,
+            "Indonesia": 28.71,
+            "Cameroon": 0.7,
+            "Vietnam": 86.71,
+            "Cote d'Ivoire": 4.78,
+            "Republic of Madagascar": 0.23,
+            "Tanzania": 0.2,
+            "Sierra Leone": 1.28,
+            "Guinea": 0.11,
+            "Togo": 0.23,
+            "Laos": 0.97,
+            "Uganda": 2.51,
+            "India": 1.05,
+            "Congo": 0.05,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 0.82,
+            "Brazilian Conillon": 1.05,
+            "Cote d'Ivoire": 0.04,
+            "India": 0.01,
+            "Uganda": 0.03,
+            "Indonesia": 0.05,
+            "Cameroon": 0.0
+          }
+        }
+      },
+      {
+        "month_end": "2025-06-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 95.99,
+            "Indonesia": 105.48,
+            "Vietnam": 9.75,
+            "Cameroon": 0.02,
+            "Cote d'Ivoire": 0.76
+          },
+          "ANT": {
+            "Brazilian Conillon": 86.34,
+            "Angola": 0.04,
+            "Indonesia": 31.21,
+            "Cameroon": 0.76,
+            "Vietnam": 94.25,
+            "Cote d'Ivoire": 5.19,
+            "Republic of Madagascar": 0.25,
+            "Tanzania": 0.21,
+            "Sierra Leone": 1.39,
+            "Guinea": 0.12,
+            "Togo": 0.25,
+            "Laos": 1.06,
+            "Uganda": 2.73,
+            "India": 1.14,
+            "Congo": 0.05,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 0.82,
+            "Brazilian Conillon": 1.05,
+            "Cote d'Ivoire": 0.04,
+            "India": 0.01,
+            "Uganda": 0.03,
+            "Indonesia": 0.05,
+            "Cameroon": 0.0
+          },
+          "GEN": {
+            "Brazilian Conillon": 0.37,
+            "Tanzania": 0.12,
+            "Uganda": 0.04,
+            "Vietnam": 0.06,
+            "Cote d'Ivoire": 0.15,
+            "Cameroon": 0.11,
+            "India": 0.12,
+            "Democratic Republic of Congo": 0.04
+          },
+          "TRI": {
+            "Brazilian Conillon": 1.73,
+            "Tanzania": 0.39,
+            "Uganda": 0.15,
+            "Vietnam": 1.53,
+            "Cameroon": 0.05,
+            "Cote d'Ivoire": 0.04,
+            "India": 0.8,
+            "Laos": 0.24,
+            "Indonesia": 0.01,
+            "Democratic Republic of Congo": 0.02,
+            "Togo": 0.04
+          }
+        }
+      },
+      {
+        "month_end": "2025-07-31",
+        "by_port": {
+          "LON": {
+            "Indonesia": 102.4,
+            "Brazilian Conillon": 41.99,
+            "Vietnam": 4.27,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.33
+          },
+          "HAM": {
+            "Uganda": 0.09,
+            "Brazilian Conillon": 0.07,
+            "Vietnam": 0.57,
+            "India": 0.11,
+            "Cameroon": 0.03,
+            "Laos": 0.02,
+            "Indonesia": 0.09,
+            "Cote d'Ivoire": 0.0,
+            "Tanzania": 0.02
+          },
+          "FEL": {
+            "Vietnam": 2.5,
+            "Brazilian Conillon": 7.5
+          },
+          "LEH": {
+            "Brazilian Conillon": 0.8,
+            "Vietnam": 0.72,
+            "Cameroon": 3.6,
+            "Congo": 0.12,
+            "Guinea": 0.72,
+            "Sierra Leone": 0.68,
+            "Cote d'Ivoire": 0.36
+          },
+          "ANT": {
+            "Brazilian Conillon": 1086.23,
+            "Angola": 0.04,
+            "Indonesia": 946.31,
+            "Cameroon": 0.91,
+            "Vietnam": 389.68,
+            "Cote d'Ivoire": 7.21,
+            "Republic of Madagascar": 0.29,
+            "Tanzania": 0.26,
+            "Sierra Leone": 1.66,
+            "Guinea": 0.15,
+            "Togo": 0.3,
+            "Laos": 1.26,
+            "Uganda": 3.27,
+            "India": 1.37,
+            "Congo": 0.06,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 8.41,
+            "Brazilian Conillon": 2.52,
+            "Cote d'Ivoire": 0.02,
+            "India": 0.01,
+            "Uganda": 0.01,
+            "Indonesia": 0.02,
+            "Cameroon": 0.0
+          },
+          "TRI": {
+            "Brazilian Conillon": 0.69,
+            "Tanzania": 0.16,
+            "Uganda": 0.06,
+            "Vietnam": 0.61,
+            "Cameroon": 0.02,
+            "Cote d'Ivoire": 0.02,
+            "India": 0.32,
+            "Laos": 0.1,
+            "Indonesia": 0.0,
+            "Democratic Republic of Congo": 0.01,
+            "Togo": 0.02
+          }
+        }
+      },
+      {
+        "month_end": "2025-08-29",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 68.56,
+            "Indonesia": 5.91,
+            "Vietnam": 6.97,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.54
+          },
+          "FEL": {
+            "Vietnam": 2.25,
+            "Brazilian Conillon": 6.75
+          },
+          "ANT": {
+            "Brazilian Conillon": 1046.06,
+            "Angola": 0.06,
+            "Indonesia": 1052.61,
+            "Cameroon": 1.27,
+            "Vietnam": 424.23,
+            "Cote d'Ivoire": 9.64,
+            "Republic of Madagascar": 0.41,
+            "Tanzania": 0.36,
+            "Sierra Leone": 2.34,
+            "Guinea": 0.21,
+            "Togo": 0.42,
+            "Laos": 1.78,
+            "Uganda": 4.59,
+            "India": 1.92,
+            "Congo": 0.09,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 8.0,
+            "Brazilian Conillon": 2.0
+          },
+          "GEN": {
+            "Brazilian Conillon": 1.11,
+            "Tanzania": 0.36,
+            "Uganda": 0.11,
+            "Vietnam": 0.17,
+            "Cote d'Ivoire": 0.44,
+            "Cameroon": 0.34,
+            "India": 0.35,
+            "Democratic Republic of Congo": 0.13
+          }
+        }
+      },
+      {
+        "month_end": "2025-09-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 6.86,
+            "Indonesia": 0.39,
+            "Vietnam": 0.7,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.05
+          },
+          "ANT": {
+            "Brazilian Conillon": 152.81,
+            "Angola": 0.05,
+            "Indonesia": 160.13,
+            "Cameroon": 15.03,
+            "Vietnam": 141.04,
+            "Cote d'Ivoire": 7.08,
+            "Republic of Madagascar": 0.34,
+            "Tanzania": 0.29,
+            "Sierra Leone": 1.9,
+            "Guinea": 0.17,
+            "Togo": 0.34,
+            "Laos": 1.44,
+            "Uganda": 3.73,
+            "India": 1.56,
+            "Congo": 0.07,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 7.26,
+            "Brazilian Conillon": 4.2,
+            "Cote d'Ivoire": 0.18,
+            "India": 0.05,
+            "Uganda": 0.1,
+            "Indonesia": 0.19,
+            "Cameroon": 0.02
+          },
+          "GEN": {
+            "Brazilian Conillon": 2.96,
+            "Tanzania": 0.96,
+            "Uganda": 0.28,
+            "Vietnam": 0.45,
+            "Cote d'Ivoire": 1.17,
+            "Cameroon": 0.9,
+            "India": 0.94,
+            "Democratic Republic of Congo": 0.34
+          }
+        }
+      },
+      {
+        "month_end": "2025-10-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 100.27,
+            "Indonesia": 5.72,
+            "Vietnam": 10.19,
+            "Cameroon": 0.02,
+            "Cote d'Ivoire": 0.8
+          },
+          "FEL": {
+            "Vietnam": 12.99,
+            "Brazilian Conillon": 39.01
+          },
+          "ANT": {
+            "Brazilian Conillon": 120.31,
+            "Angola": 0.03,
+            "Indonesia": 42.89,
+            "Cameroon": 14.34,
+            "Vietnam": 83.6,
+            "Cote d'Ivoire": 4.13,
+            "Republic of Madagascar": 0.19,
+            "Tanzania": 0.17,
+            "Sierra Leone": 1.1,
+            "Guinea": 0.1,
+            "Togo": 0.2,
+            "Laos": 0.84,
+            "Uganda": 2.16,
+            "India": 0.91,
+            "Congo": 0.04,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 4.0
+          },
+          "GEN": {
+            "Brazilian Conillon": 1.85,
+            "Tanzania": 0.6,
+            "Uganda": 0.18,
+            "Vietnam": 0.28,
+            "Cote d'Ivoire": 0.73,
+            "Cameroon": 0.56,
+            "India": 0.59,
+            "Democratic Republic of Congo": 0.21
+          }
+        }
+      },
+      {
+        "month_end": "2025-11-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 991.56,
+            "Indonesia": 58.59,
+            "Vietnam": 100.77,
+            "Cameroon": 0.21,
+            "Cote d'Ivoire": 7.87
+          },
+          "FEL": {
+            "Vietnam": 47.7,
+            "Brazilian Conillon": 143.3
+          },
+          "ANT": {
+            "Brazilian Conillon": 403.13,
+            "Angola": 0.15,
+            "Indonesia": 878.77,
+            "Cameroon": 3.24,
+            "Vietnam": 413.61,
+            "Cote d'Ivoire": 22.24,
+            "Republic of Madagascar": 1.05,
+            "Tanzania": 0.92,
+            "Sierra Leone": 5.94,
+            "Guinea": 0.53,
+            "Togo": 1.08,
+            "Laos": 4.52,
+            "Uganda": 11.68,
+            "India": 4.89,
+            "Congo": 0.23,
+            "Democratic Republic of Congo": 0.03
+          },
+          "BAR": {
+            "Vietnam": 10.0
+          }
+        }
+      },
+      {
+        "month_end": "2025-12-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 26.57,
+            "Indonesia": 1.52,
+            "Vietnam": 2.7,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.21
+          },
+          "FEL": {
+            "Vietnam": 16.98,
+            "Brazilian Conillon": 51.02
+          },
+          "ANT": {
+            "Brazilian Conillon": 298.9,
+            "Angola": 0.11,
+            "Indonesia": 454.0,
+            "Cameroon": 2.41,
+            "Vietnam": 306.17,
+            "Cote d'Ivoire": 16.5,
+            "Republic of Madagascar": 0.78,
+            "Tanzania": 0.68,
+            "Sierra Leone": 4.41,
+            "Guinea": 0.39,
+            "Togo": 0.8,
+            "Laos": 3.35,
+            "Uganda": 8.67,
+            "India": 3.63,
+            "Congo": 0.17,
+            "Democratic Republic of Congo": 0.02
+          },
+          "BAR": {
+            "Vietnam": 10.82,
+            "Brazilian Conillon": 1.05,
+            "Cote d'Ivoire": 0.04,
+            "India": 0.01,
+            "Uganda": 0.03,
+            "Indonesia": 0.05,
+            "Cameroon": 0.0
+          }
+        }
+      },
+      {
+        "month_end": "2026-01-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 20.57,
+            "Indonesia": 1.17,
+            "Vietnam": 2.09,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.16
+          },
+          "ANT": {
+            "Indonesia": 884.43,
+            "Brazilian Conillon": 141.14,
+            "Angola": 2.06,
+            "Cameroon": 1.2,
+            "Vietnam": 150.53,
+            "Cote d'Ivoire": 8.22,
+            "Republic of Madagascar": 0.39,
+            "Tanzania": 0.34,
+            "Sierra Leone": 2.2,
+            "Guinea": 0.19,
+            "Togo": 0.4,
+            "Laos": 1.67,
+            "Uganda": 4.32,
+            "India": 1.81,
+            "Congo": 0.08,
+            "Democratic Republic of Congo": 0.01
+          },
+          "TRI": {
+            "Brazilian Conillon": 0.35,
+            "Tanzania": 0.08,
+            "Uganda": 0.03,
+            "Vietnam": 0.31,
+            "Cameroon": 0.01,
+            "Cote d'Ivoire": 0.01,
+            "India": 0.16,
+            "Laos": 0.05,
+            "Indonesia": 0.0,
+            "Democratic Republic of Congo": 0.0,
+            "Togo": 0.01
+          }
+        }
+      },
+      {
+        "month_end": "2026-02-27",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 12.86,
+            "Indonesia": 0.73,
+            "Vietnam": 1.31,
+            "Cameroon": 0.0,
+            "Cote d'Ivoire": 0.1
+          },
+          "FEL": {
+            "Vietnam": 2.5,
+            "Brazilian Conillon": 7.5
+          },
+          "ANT": {
+            "Indonesia": 807.32,
+            "Brazilian Conillon": 40.68,
+            "Angola": 1.4,
+            "Cameroon": 0.36,
+            "Vietnam": 44.4,
+            "Cote d'Ivoire": 2.45,
+            "Republic of Madagascar": 0.12,
+            "Tanzania": 0.1,
+            "Sierra Leone": 0.65,
+            "Guinea": 0.06,
+            "Togo": 0.12,
+            "Laos": 0.5,
+            "Uganda": 1.29,
+            "India": 0.54,
+            "Congo": 0.02,
+            "Democratic Republic of Congo": 0.0
+          }
+        }
+      },
+      {
+        "month_end": "2026-03-31",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 226.25,
+            "Indonesia": 12.91,
+            "Vietnam": 22.99,
+            "Cameroon": 0.05,
+            "Cote d'Ivoire": 1.8
+          },
+          "FEL": {
+            "Vietnam": 23.73,
+            "Brazilian Conillon": 71.27
+          },
+          "ANT": {
+            "Brazilian Conillon": 118.58,
+            "Angola": 0.08,
+            "Indonesia": 297.83,
+            "Cameroon": 1.04,
+            "Vietnam": 129.43,
+            "Cote d'Ivoire": 7.13,
+            "Republic of Madagascar": 0.34,
+            "Tanzania": 0.29,
+            "Sierra Leone": 1.91,
+            "Guinea": 0.17,
+            "Togo": 0.35,
+            "Laos": 1.45,
+            "Uganda": 3.75,
+            "India": 1.57,
+            "Congo": 0.07,
+            "Democratic Republic of Congo": 0.01
+          },
+          "BAR": {
+            "Vietnam": 5.71,
+            "Brazilian Conillon": 7.35,
+            "Cote d'Ivoire": 0.31,
+            "India": 0.09,
+            "Uganda": 0.18,
+            "Indonesia": 0.34,
+            "Cameroon": 0.03
+          }
+        }
+      },
+      {
+        "month_end": "2026-04-30",
+        "by_port": {
+          "LON": {
+            "Brazilian Conillon": 663.24,
+            "Indonesia": 17.71,
+            "Vietnam": 31.53,
+            "Cameroon": 0.07,
+            "Cote d'Ivoire": 2.46
+          },
+          "ANT": {
+            "Indonesia": 261.81,
+            "Brazilian Conillon": 69.84,
+            "Angola": 0.2,
+            "Cameroon": 0.61,
+            "Vietnam": 76.5,
+            "Cote d'Ivoire": 4.2,
+            "Republic of Madagascar": 0.2,
+            "Tanzania": 0.17,
+            "Sierra Leone": 1.12,
+            "Guinea": 0.1,
+            "Togo": 0.2,
+            "Laos": 0.85,
+            "Uganda": 2.21,
+            "India": 0.93,
+            "Congo": 0.04,
+            "Democratic Republic of Congo": 0.01
+          }
+        }
+      }
+    ],
+    "current_by_origin": {
+      "ANT": {
+        "Indonesia": 1418.14,
+        "Angola": 0.57,
+        "Brazilian Conillon": 368.42,
+        "Cameroon": 3.49,
+        "Vietnam": 402.65,
+        "Cote d'Ivoire": 22.06,
+        "Republic of Madagascar": 1.04,
+        "Tanzania": 0.91,
+        "Sierra Leone": 5.91,
+        "Guinea": 0.52,
+        "Togo": 1.07,
+        "Laos": 4.49,
+        "Uganda": 11.61,
+        "India": 4.86,
+        "Congo": 0.22,
+        "Democratic Republic of Congo": 0.03
+      },
+      "LON": {
+        "Brazilian Conillon": 1328.37,
+        "Indonesia": 75.81,
+        "Vietnam": 134.99,
+        "Cameroon": 0.28,
+        "Cote d'Ivoire": 10.54
+      },
+      "BAR": {
+        "Vietnam": 5.3,
+        "Brazilian Conillon": 6.82,
+        "Cote d'Ivoire": 0.29,
+        "India": 0.08,
+        "Uganda": 0.16,
+        "Indonesia": 0.31,
+        "Cameroon": 0.03
+      },
+      "FEL": {
+        "Vietnam": 8.99,
+        "Brazilian Conillon": 27.01
+      }
+    }
   },
   "port_origin_history": {
     "LON": {

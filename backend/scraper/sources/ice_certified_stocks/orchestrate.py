@@ -459,6 +459,12 @@ def _merge_robusta(new: dict, old: dict) -> dict:
 
     new.setdefault("monthly", {})["iss_recv_monthly"] = _merge_monthly("iss_recv_monthly", "month")
     new["monthly"]["age_allowance"] = _merge_monthly("age_allowance", "month_end")
+    # Cohort-DNA outputs — only the workbook importer emits these. Preserve
+    # the older copy when the daily scraper run doesn't carry one.
+    if not new["monthly"].get("implied_outflow") and (old.get("monthly") or {}).get("implied_outflow"):
+        new["monthly"]["implied_outflow"] = old["monthly"]["implied_outflow"]
+    if not new["monthly"].get("current_by_origin") and (old.get("monthly") or {}).get("current_by_origin"):
+        new["monthly"]["current_by_origin"] = old["monthly"]["current_by_origin"]
 
     # latest_detail: only overwrite if the new run actually captured a
     # stock_report — otherwise keep the older one so the panel keeps showing

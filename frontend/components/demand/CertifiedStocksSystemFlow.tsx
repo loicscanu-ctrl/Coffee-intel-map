@@ -42,10 +42,21 @@ interface RobustaAgeMonth  { month_end: string; valid?: { ports?: string[]; buck
 interface RobustaGradingEntry { port?: string; origin?: string; class?: number | null; tenderable?: boolean; lots: number }
 interface RobustaGradingEvent { date: string; entries?: RobustaGradingEntry[] }
 interface RobustaOverviewEvent { date: string; total_pending_lots?: number | null; queue_lots?: number | null; forecast_lots?: number | null }
+// Output of the cohort-DNA pipeline (backend cohort_outflow.py). When
+// present these drive the system flow's per-origin buckets; missing →
+// we fall back to the in-browser stock simulation.
+interface ImpliedOutflowMonth {
+  month_end: string;
+  by_port: Record<string, Record<string, number>>;
+}
 export interface RobustaJsonShape {
   snapshots: RobustaSnap[];
   as_of?: string | null;
-  monthly?: { age_allowance?: RobustaAgeMonth[] };
+  monthly?: {
+    age_allowance?: RobustaAgeMonth[];
+    implied_outflow?: ImpliedOutflowMonth[];
+    current_by_origin?: Record<string, Record<string, number>>;
+  };
   recent_activity?: { gradings?: RobustaGradingEvent[]; grading_overview?: RobustaOverviewEvent[] };
   port_origin_history?: Record<string, Record<string, { tenderable: number; class34: number }>>;
 }
@@ -941,50 +952,102 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         }
       }
 
-      // Run the per-port stock simulation once for every port present in
-      // the snapshot history. Init state from port_origin_history shares,
-      // then walk every snapshot: inflows from gradings events, outflows
-      // apportioned by current state. The end state is our `cur[o]` and
-      // the per-date in/out logs feed `flowByOrigin` for any window.
+      // Preferred path: read backend's cohort-DNA outputs (cohort_outflow.py).
+      // `current_by_origin` gives the per-origin breakdown of the latest
+      // ageing report; `implied_outflow` gives per-origin outflow per
+      // calendar month, apportioned by each cohort's own DNA. Falls back
+      // to the in-browser per-port stock simulation when either field is
+      // missing (older JSON or fresh builds before the importer re-runs).
+      const cohortCurrent = robusta?.monthly?.current_by_origin;
+      const cohortOutflow = robusta?.monthly?.implied_outflow;
+      const useCohort = !!cohortCurrent && !!cohortOutflow;
+
       const sims: Record<string, RobustaPortSim> = {};
-      const allPortCodes = new Set<string>();
-      for (const s of snaps) for (const p of Object.keys(s.by_port_lots || {})) allPortCodes.add(p);
-      for (const p of Array.from(allPortCodes)) {
-        sims[p] = _simulateRobustaPortStock(p, snaps, grads, portOriginLots[p] ?? {});
+      if (!useCohort) {
+        const allPortCodes = new Set<string>();
+        for (const s of snaps) for (const p of Object.keys(s.by_port_lots || {})) allPortCodes.add(p);
+        for (const p of Array.from(allPortCodes)) {
+          sims[p] = _simulateRobustaPortStock(p, snaps, grads, portOriginLots[p] ?? {});
+        }
+      }
+
+      // Real per-(port, origin) gradings inflow per calendar month —
+      // needed when cohort-DNA outflow is the trusted source for gross_out;
+      // gross_in still comes straight from gradings events (the source
+      // of truth for inflows).
+      const cutT = cutoff.getTime();
+      const cohortInflowByPortOrigin: Record<string, Record<string, number>> = {};
+      if (useCohort) {
+        for (const ev of grads) {
+          if (new Date(ev.date).getTime() < cutT) continue;
+          for (const e of (ev.entries || [])) {
+            if (e.tenderable === false) continue;
+            const port = e.port || "?";
+            const origin = (e.origin || "?").trim();
+            cohortInflowByPortOrigin[port] = cohortInflowByPortOrigin[port] || {};
+            cohortInflowByPortOrigin[port][origin] = (cohortInflowByPortOrigin[port][origin] ?? 0) + (e.lots ?? 0);
+          }
+        }
       }
 
       const ports: PortFlow[] = [];
       for (const [code, current] of Object.entries(latest.by_port_lots || {})) {
         if (current <= 0) continue;
-        const sim = sims[code];
-        // byOrigin = simulated per-origin stock at the latest snapshot.
-        // Normalises to `current` so rounding drift over the long walk
-        // can't desync the per-origin total from the headline lots.
         const byOrigin: Record<string, number> = {};
-        const stateSum = sim ? Object.values(sim.state).reduce((a, b) => a + b, 0) : 0;
-        if (sim && stateSum > 0) {
-          for (const [o, v] of Object.entries(sim.state)) {
-            if (v > 0) byOrigin[o] = (v / stateSum) * current;
-          }
-        } else {
-          byOrigin["Unknown"] = current;
-        }
-        // Window-scoped gross flows per origin from the simulation logs.
         const flowByOrigin: Record<string, OriginFlowPair> = {};
-        if (sim) {
-          const cutT = cutoff.getTime();
-          for (const [date, byO] of Object.entries(sim.inflowByOriginByDate)) {
-            if (new Date(date).getTime() < cutT) continue;
+
+        if (useCohort) {
+          // PREFERRED: cohort-DNA pipeline outputs.
+          // byOrigin from current_by_origin, normalised to the live port
+          // total so it always sums to `current` (which comes from the
+          // most recent daily snapshot, not the month-end ageing report).
+          const cur = cohortCurrent?.[code] ?? {};
+          const curSum = Object.values(cur).reduce((a, b) => a + b, 0);
+          if (curSum > 0) {
+            for (const [o, v] of Object.entries(cur)) if (v > 0) byOrigin[o] = (v / curSum) * current;
+          } else {
+            byOrigin["Unknown"] = current;
+          }
+          // gross_out from implied_outflow summed over months in window;
+          // gross_in from real gradings events.
+          const inflowByOrigin = cohortInflowByPortOrigin[code] ?? {};
+          const outflowByOrigin: Record<string, number> = {};
+          for (const entry of cohortOutflow ?? []) {
+            if (new Date(entry.month_end).getTime() < cutT) continue;
+            const byO = entry.by_port?.[code];
+            if (!byO) continue;
             for (const [o, v] of Object.entries(byO)) {
-              flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
-              flowByOrigin[o].gross_in += v;
+              outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
             }
           }
-          for (const [date, byO] of Object.entries(sim.outflowByOriginByDate)) {
-            if (new Date(date).getTime() < cutT) continue;
-            for (const [o, v] of Object.entries(byO)) {
-              flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
-              flowByOrigin[o].gross_out += v;
+          for (const o of Array.from(new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]))) {
+            const gi = inflowByOrigin[o] ?? 0;
+            const go = outflowByOrigin[o] ?? 0;
+            if (gi > 0 || go > 0) flowByOrigin[o] = { gross_in: gi, gross_out: go };
+          }
+        } else {
+          // FALLBACK: in-browser per-port stock simulation.
+          const sim = sims[code];
+          const stateSum = sim ? Object.values(sim.state).reduce((a, b) => a + b, 0) : 0;
+          if (sim && stateSum > 0) {
+            for (const [o, v] of Object.entries(sim.state)) if (v > 0) byOrigin[o] = (v / stateSum) * current;
+          } else {
+            byOrigin["Unknown"] = current;
+          }
+          if (sim) {
+            for (const [date, byO] of Object.entries(sim.inflowByOriginByDate)) {
+              if (new Date(date).getTime() < cutT) continue;
+              for (const [o, v] of Object.entries(byO)) {
+                flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
+                flowByOrigin[o].gross_in += v;
+              }
+            }
+            for (const [date, byO] of Object.entries(sim.outflowByOriginByDate)) {
+              if (new Date(date).getTime() < cutT) continue;
+              for (const [o, v] of Object.entries(byO)) {
+                flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
+                flowByOrigin[o].gross_out += v;
+              }
             }
           }
         }
