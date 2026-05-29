@@ -557,9 +557,9 @@ function NutrientExtractionChart() {
 
 function PhenologicalTimeline() {
   const events = [
-    { label: "Dry S2", dose: "500 kg/ha", x: 60,  color: "#f59e0b", note: "Floral induction" },
-    { label: "May",    dose: "400 kg/ha", x: 200, color: "#60a5fa", note: "Fruit set"        },
-    { label: "July",   dose: "200 kg/ha", x: 340, color: "#34d399", note: "Bean expansion"   },
+    { label: "Dry S2", dose: "200 kg/ha", x: 60,  color: "#f59e0b", note: "Floral induction" },
+    { label: "May",    dose: "500 kg/ha", x: 200, color: "#60a5fa", note: "Fruit set"        },
+    { label: "July",   dose: "400 kg/ha", x: 340, color: "#34d399", note: "Bean expansion"   },
     { label: "Sep",    dose: "500 kg/ha", x: 480, color: "#f59e0b", note: "Maturation"       },
   ];
   return (
@@ -582,7 +582,7 @@ function PhenologicalTimeline() {
           </g>
         ))}
         <text x={280} y={82} textAnchor="middle" fontSize={7.5} fill="#64748b">
-          +150 kg urea · +100 kg phosphate · +120–130 kg KCl per extra tonne above baseline
+          +150 kg urea · +83 kg MAP · +122 kg KCl per extra tonne above 3 t/ha baseline
         </text>
       </svg>
     </div>
@@ -590,12 +590,15 @@ function PhenologicalTimeline() {
 }
 
 // ── Live fertilizer cost calculator ─────────────────────────────────────────
-// kg/ha for standard VN Robusta at 3 t/ha (IPHM schedule, WASI cross-check):
-//   Total inorganic ~900 kg + ~700 kg compost/SA = 1,600 kg/ha
+// Pure-fertilizer equivalents for IPHM target nutrients (3 t/ha baseline):
+//   Target: N 235 kg, P₂O₅ 130 kg, K₂O 220 kg/ha
+//   MAP (11-52-0): 130/0.52 = 250 kg → also supplies 250×0.11 = 27.5 kg N
+//   Urea (46-0-0): (235-27.5)/0.46 = 451 kg (remaining N after MAP)
+//   KCl  (0-0-60): 220/0.60 = 367 kg
 const NPK_KG_HA = [
-  { name: "Urea (N)", kg: 350, color: "#22c55e" },
-  { name: "MAP (P)",  kg: 200, color: "#3b82f6" },
-  { name: "KCl (K)",  kg: 350, color: "#f97316" },
+  { name: "Urea (N)", kg: 451, color: "#22c55e" },
+  { name: "MAP (P)",  kg: 250, color: "#3b82f6" },
+  { name: "KCl (K)",  kg: 367, color: "#f97316" },
 ] as const;
 const YIELD_THA        = 2.7;   // WASI 2024-25 observed
 const SA_COST_HA       = 41;    // ammonium sulphate, WASI 2024-25, no live price
