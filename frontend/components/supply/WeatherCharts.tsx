@@ -36,6 +36,12 @@ interface Province {
   daily_accum_ly?: (number | null)[];    // per-day cumulative rain, last year same month
   essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
   essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
+  spi_1?: number;                         // Standardised Precipitation Index, 1-mo
+  spi_3?: number;                         //   …trailing 3-mo
+  spi_month?: string;                     // 'YYYY-MM' target month of the SPI(s) above
+  spei_1?: number;                        // Standardised Precip-ET₀ Index, 1-mo (D = P − ET₀)
+  spei_3?: number;                        //   …trailing 3-mo
+  spei_month?: string;                    // 'YYYY-MM' target month of the SPEI(s) above
 }
 
 interface DailyRow {
@@ -472,6 +478,93 @@ function SoilMoistureChart({ data }: { data: SoilRow[] }) {
   );
 }
 
+// ── Drought-index panel (SPI + SPEI per province) ───────────────────────────
+// Renders a small chip strip per region: SPI-1 / SPI-3 / SPEI-1 / SPEI-3
+// with the same red→amber→green ramp drought scientists use. Hidden when no
+// province carries the indices yet (graceful — the panel only appears once
+// the fetcher starts emitting them).
+
+const _droughtTone = (z: number | null | undefined): string => {
+  if (z == null) return "bg-slate-800 text-slate-500 border border-slate-700";
+  if (z <= -1.5) return "bg-rose-950/40 text-rose-300 border border-rose-800/60";
+  if (z <= -1.0) return "bg-orange-950/40 text-orange-300 border border-orange-800/60";
+  if (z <= -0.5) return "bg-amber-950/40 text-amber-300 border border-amber-800/60";
+  if (z <   0.5) return "bg-slate-900 text-slate-300 border border-slate-700";
+  if (z <   1.0) return "bg-emerald-950/30 text-emerald-300 border border-emerald-800/60";
+  return              "bg-emerald-900/40 text-emerald-200 border border-emerald-700/60";
+};
+
+function DroughtChip({ label, z }: { label: string; z?: number }) {
+  return (
+    <span
+      title={z != null
+        ? `${label} = ${z.toFixed(2)} (vs 30-yr climatology). <-1 → drought, >1 → wet.`
+        : `${label} not available yet — waiting on baseline seed or complete month.`}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono ${_droughtTone(z)}`}
+    >
+      <span className="opacity-70 uppercase tracking-wider">{label}</span>
+      <span>{z != null ? z.toFixed(2) : "—"}</span>
+    </span>
+  );
+}
+
+function DroughtIndexPanel({ provinces }: { provinces: Province[] }) {
+  const visible = provinces.filter(
+    (p) => p.spi_1 != null || p.spi_3 != null || p.spei_1 != null || p.spei_3 != null,
+  );
+  if (visible.length === 0) return null;
+  // All provinces share the same target month in practice (current month).
+  // We surface the latest seen across rows for the section header.
+  const monthLabels = Array.from(new Set(
+    visible.flatMap((p) => [p.spi_month, p.spei_month]).filter((m): m is string => !!m),
+  )).sort();
+  const headerMonth = monthLabels.length ? monthLabels[monthLabels.length - 1] : null;
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
+      <div className="flex items-baseline justify-between mb-2 flex-wrap gap-2">
+        <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
+          Drought indices
+          {headerMonth && (
+            <span className="text-slate-500 font-normal normal-case ml-2">· month {headerMonth}</span>
+          )}
+        </h3>
+        <div className="text-[9px] text-slate-500">
+          <span className="text-rose-400">deficit</span> ← &nbsp;
+          <span className="text-slate-400">normal</span>
+          &nbsp; → <span className="text-emerald-400">surplus</span>
+        </div>
+      </div>
+      <table className="w-full text-[10px] font-mono">
+        <thead>
+          <tr className="text-slate-500">
+            <th className="text-left py-1 pr-2">Region</th>
+            <th className="text-right py-1 px-1">SPI-1</th>
+            <th className="text-right py-1 px-1">SPI-3</th>
+            <th className="text-right py-1 px-1">SPEI-1</th>
+            <th className="text-right py-1 px-1">SPEI-3</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visible.map((p) => (
+            <tr key={p.name} className="border-t border-slate-800">
+              <td className="text-slate-300 py-1 pr-2">{p.name}</td>
+              <td className="text-right py-1 px-1"><DroughtChip label="SPI-1"  z={p.spi_1}  /></td>
+              <td className="text-right py-1 px-1"><DroughtChip label="SPI-3"  z={p.spi_3}  /></td>
+              <td className="text-right py-1 px-1"><DroughtChip label="SPEI-1" z={p.spei_1} /></td>
+              <td className="text-right py-1 px-1"><DroughtChip label="SPEI-3" z={p.spei_3} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="text-[8.5px] text-slate-600 italic mt-2">
+        SPI is precipitation-only; SPEI uses the climatic water balance
+        D = P − ET₀ (Penman-Monteith). Same target month, different sensitivity:
+        heat-driven deficits show up on SPEI before SPI.
+      </div>
+    </div>
+  );
+}
+
 export default function WeatherCharts({
   dataUrl,
   title,
@@ -877,6 +970,10 @@ export default function WeatherCharts({
 
       {/* Full-width forecast */}
       <ForecastRainChart data={forecastData} />
+
+      {/* Drought-index strip — only renders when the fetcher has emitted
+          SPI / SPEI for at least one of the visible regions. */}
+      <DroughtIndexPanel provinces={activeProv} />
 
       {/* ENSO context + 14-day frost risk grid — moved here from
           farmer-economics so weather lives in one place. Both render

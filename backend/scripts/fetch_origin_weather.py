@@ -46,7 +46,8 @@ urllib3_conn.allowed_gai_family = lambda: socket.AF_INET
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
 HISTORY_DIR = REPO_ROOT / "backend" / "seed" / "weather_history"
-SPI_SEED_PATH = REPO_ROOT / "backend" / "seed" / "spi_30yr_baselines.json"
+SPI_SEED_PATH  = REPO_ROOT / "backend" / "seed" / "spi_30yr_baselines.json"
+SPEI_SEED_PATH = REPO_ROOT / "backend" / "seed" / "spei_30yr_baselines.json"
 
 # SPI is computed in CI from the committed 30-yr baseline (built one-shot by the
 # build-spi-baselines workflow) + the current month's rain — no archive call at
@@ -57,6 +58,15 @@ try:
     HAS_SPI = True
 except Exception:  # noqa: BLE001  (scipy missing, etc.)
     HAS_SPI = False
+
+# SPEI follows the exact same pattern as SPI but on D = P − ET₀. Same scipy
+# guard, same graceful omission until the SPEI seed + ET₀-aware forecast
+# fetch are both in place.
+try:
+    import spei_calc
+    HAS_SPEI = True
+except Exception:  # noqa: BLE001
+    HAS_SPEI = False
 
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelWeather/1.0)"}
@@ -172,6 +182,18 @@ def _load_spi_baselines() -> dict:
 _SPI_BASE = _load_spi_baselines()
 
 
+def _load_spei_baselines() -> dict:
+    if HAS_SPEI and SPEI_SEED_PATH.exists():
+        try:
+            return json.loads(SPEI_SEED_PATH.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            pass
+    return {}
+
+
+_SPEI_BASE = _load_spei_baselines()
+
+
 def _monthly_rain(reg_hist: dict) -> tuple[dict[str, float], dict[str, int]]:
     """Region history rows → ({'YYYY-MM': total rain mm}, {'YYYY-MM': day count}).
     The day count lets SPI skip partially-covered months (a half-empty month
@@ -182,6 +204,20 @@ def _monthly_rain(reg_hist: dict) -> tuple[dict[str, float], dict[str, int]]:
         if isinstance(v, dict) and v.get("rain") is not None:
             ym = date[:7]
             totals[ym] = round(totals.get(ym, 0.0) + v["rain"], 1)
+            counts[ym] = counts.get(ym, 0) + 1
+    return totals, counts
+
+
+def _monthly_et0(reg_hist: dict) -> tuple[dict[str, float], dict[str, int]]:
+    """Region history rows → ({'YYYY-MM': total ET₀ mm}, {'YYYY-MM': day count}).
+    Same gating model as `_monthly_rain` — a half-covered month shouldn't bias
+    the SPEI water balance."""
+    totals: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    for date, v in reg_hist.items():
+        if isinstance(v, dict) and v.get("et0") is not None:
+            ym = date[:7]
+            totals[ym] = round(totals.get(ym, 0.0) + v["et0"], 1)
             counts[ym] = counts.get(ym, 0) + 1
     return totals, counts
 
@@ -235,7 +271,7 @@ def preflight() -> None:
 def fetch_region(lat: float, lon: float) -> dict:
     return _get({
         "latitude": lat, "longitude": lon,
-        "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min,temperature_2m_mean",
+        "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min,temperature_2m_mean,et0_fao_evapotranspiration",
         "hourly": ",".join(SOIL_LAYERS),   # soil moisture → daily ESSM
         "past_days": PAST_DAYS, "forecast_days": FORECAST_DAYS, "timezone": "auto",
     })
@@ -267,6 +303,10 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
     tx = d["temperature_2m_max"]
     tn = d["temperature_2m_min"]
     tm = d["temperature_2m_mean"]
+    # et0 is a recent addition to the request (powers SPEI). Older history
+    # rows may not carry it; we tolerate the key missing on the API side
+    # too (older deployed versions of the fetcher didn't request it).
+    et0 = d.get("et0_fao_evapotranspiration") or [None] * len(times)
     essm_by_date = _daily_essm(daily.get("hourly"))
     reg = hist["regions"].setdefault(region, {})
     today_iso = TODAY.isoformat()
@@ -298,10 +338,14 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
             if (raw_rain == 0.0 and prev_rain not in (None, 0.0)
                     and date < (TODAY - dt.timedelta(days=7)).isoformat()):
                 new_rain = prev_rain
+            new_et0 = et0[i]
             reg[date] = {
                 "rain":  new_rain,
                 "tmean": new_tmean if new_tmean is not None else prev.get("tmean"),
                 "essm":  new_essm if new_essm is not None else prev.get("essm"),
+                # Penman-Monteith ET₀ in mm/day. Same merge-don't-clobber rule
+                # as rain/tmean so an API hiccup never wipes a stored value.
+                "et0":   r1(new_et0) if new_et0 is not None else prev.get("et0"),
             }
         else:
             # Future forecast rows are display-only; 0.0 for a null is fine here.
@@ -433,6 +477,30 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
                     prov["spi_3"] = s3
                 if s1 is not None or s3 is not None:
                     prov["spi_month"] = tgt
+        # SPEI-1 / SPEI-3 from the same 30-yr baseline pattern but on
+        # D = P − ET₀. Reuses the SPI gating (`_spi_target_month`) and the
+        # same monthly-rain helpers to identify the latest complete past
+        # month; just needs the parallel monthly_et0 series.
+        calib_spei = _SPEI_BASE.get("origins", {}).get(origin, {}).get(prov["name"])
+        if HAS_SPEI and calib_spei:
+            cur_p, day_counts = _monthly_rain(rh)
+            cur_et0, _ = _monthly_et0(rh)
+            tgt = _spi_target_month(cur_p, day_counts, f"{CUR_YEAR}-{cur_month:02d}")
+            if tgt:
+                # Calibration: {YYYY-MM: {'p': mm, 'et0': mm}} → D = P − ET₀.
+                cal_p   = {k: v["p"]   for k, v in calib_spei.items() if v.get("p")   is not None}
+                cal_et0 = {k: v["et0"] for k, v in calib_spei.items() if v.get("et0") is not None}
+                cal_d = spei_calc.monthly_d(cal_p, cal_et0)
+                cur_d = spei_calc.monthly_d(cur_p, cur_et0)
+                if cal_d and cur_d.get(tgt) is not None:
+                    z1 = spei_calc.spei_for_month(cal_d, cur_d, tgt, 1)
+                    z3 = spei_calc.spei_for_month(cal_d, cur_d, tgt, 3)
+                    if z1 is not None:
+                        prov["spei_1"] = z1
+                    if z3 is not None:
+                        prov["spei_3"] = z3
+                    if z1 is not None or z3 is not None:
+                        prov["spei_month"] = tgt
 
     # Daily month-to-date accumulation for the reference (first) province.
     ref = doc["provinces"][0]
