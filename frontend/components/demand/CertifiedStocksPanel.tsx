@@ -1,8 +1,5 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-} from "recharts";
 import CertifiedStocksSystemFlow from "./CertifiedStocksSystemFlow";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
@@ -280,85 +277,8 @@ const _withName = (code: string, dict: Record<string, string>): string => {
   return name ? `${code} · ${name}` : code;
 };
 
-// ── Deep-history chart (TODO #12) — lazy-loaded older years ─────────────────
-// Primary JSON covers the rolling ~12 months. Older history lives in
-// `certified_stocks_<market>_deep_<startYear>-<endYear>.json` chunks (light
-// shape: just date + total + by_port_totals). Fetched on demand when the
-// user picks a longer range.
+// ── Expand/collapse state, persisted per-table to localStorage ──────────────
 
-type ChartRange = "1y" | "5y" | "10y" | "all";
-
-const ARABICA_DEEP_CHUNKS: Array<[number, number]> = [
-  [2010, 2014], [2015, 2019], [2020, 2024], [2025, 2029],
-];
-const ROBUSTA_DEEP_CHUNKS: Array<[number, number]> = [
-  [1990, 1994], [1995, 1999], [2000, 2004], [2005, 2009],
-  [2010, 2014], [2015, 2019], [2020, 2024], [2025, 2029],
-];
-
-function _chunksFor(market: "arabica" | "robusta", range: ChartRange, today: Date): string[] {
-  if (range === "1y") return [];
-  const chunks = market === "arabica" ? ARABICA_DEEP_CHUNKS : ROBUSTA_DEEP_CHUNKS;
-  let cutoffYear: number;
-  if (range === "5y")  cutoffYear = today.getFullYear() - 5;
-  else if (range === "10y") cutoffYear = today.getFullYear() - 10;
-  else cutoffYear = 1900;   // "all"
-  return chunks
-    .filter(([, end]) => end >= cutoffYear)
-    .map(([s, e]) => `${s}-${e}`);
-}
-
-interface DeepRow { date: string; total: number }
-
-function useDeepHistory(
-  market: "arabica" | "robusta", range: ChartRange,
-): Record<string, DeepRow[]> {
-  const [loaded, setLoaded] = useState<Record<string, DeepRow[]>>({});
-  useEffect(() => {
-    const today = new Date();
-    const needed = _chunksFor(market, range, today);
-    for (const key of needed) {
-      if (loaded[key]) continue;
-      fetch(`/data/certified_stocks_${market}_deep_${key}.json`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((j) => {
-          if (!j?.snapshots) return;
-          const series: DeepRow[] = (j.snapshots as Array<Record<string, unknown>>).map((s) => ({
-            date: String(s.date),
-            total: Number(s.total_bags ?? s.total_lots_certified ?? 0),
-          }));
-          setLoaded((prev) => (prev[key] ? prev : { ...prev, [key]: series }));
-        })
-        .catch(() => { /* chunk missing — leave it out */ });
-    }
-  }, [market, range, loaded]);
-  return loaded;
-}
-
-function RangeToggle({ value, onChange }: { value: ChartRange; onChange: (r: ChartRange) => void }) {
-  const opts: ChartRange[] = ["1y", "5y", "10y", "all"];
-  return (
-    <div className="flex items-center gap-1">
-      {opts.map((r) => (
-        <button
-          key={r}
-          onClick={() => onChange(r)}
-          className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
-            value === r
-              ? "bg-slate-800 text-amber-400 border-slate-700"
-              : "text-slate-500 hover:text-slate-300 border-transparent"
-          }`}
-        >
-          {r}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ── Persistent expanded-set hook (drill state survives page reloads) ──
-// Mirrors useState<Set<string>> but reads from / writes to localStorage so
-// the user's last drill positions stick. Single key per table.
 function useExpandedSet(storageKey: string): [Set<string>, (k: string) => void] {
   const [set, setSet] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set();
@@ -366,7 +286,9 @@ function useExpandedSet(storageKey: string): [Set<string>, (k: string) => void] 
       const raw = window.localStorage.getItem(storageKey);
       if (!raw) return new Set();
       const arr = JSON.parse(raw);
-      return Array.isArray(arr) ? new Set(arr.filter((x): x is string => typeof x === "string")) : new Set();
+      return Array.isArray(arr)
+        ? new Set(arr.filter((x): x is string => typeof x === "string"))
+        : new Set();
     } catch { return new Set(); }
   });
   useEffect(() => {
@@ -376,20 +298,22 @@ function useExpandedSet(storageKey: string): [Set<string>, (k: string) => void] 
   }, [storageKey, set]);
   const toggle = (k: string) => setSet((prev) => {
     const next = new Set(prev);
-    if (next.has(k)) next.delete(k);
-    else next.add(k);
+    if (next.has(k)) next.delete(k); else next.add(k);
     return next;
   });
   return [set, toggle];
 }
 
-// ── Small reusable bits ───────────────────────────────────────────────────────
+// ── Small UI primitives (header pill, stat tile, pending placeholder) ────────
 
 function StatusPill({ live }: { live: boolean }) {
   return (
-    <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border
-      ${live ? "border-emerald-700 text-emerald-400 bg-emerald-900/30"
-             : "border-amber-700  text-amber-400  bg-amber-900/20"}`}>
+    <span
+      className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border
+        ${live
+          ? "border-emerald-700 text-emerald-400 bg-emerald-900/30"
+          : "border-amber-700 text-amber-400 bg-amber-900/20"}`}
+    >
       {live ? "live" : "pending"}
     </span>
   );
@@ -399,8 +323,8 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-md px-3 py-2">
       <div className="text-[9px] uppercase tracking-wider text-slate-500">{label}</div>
-      <div className="text-base font-semibold text-slate-100 font-mono">{value}</div>
-      {sub && <div className="text-[10px] text-slate-400 font-mono">{sub}</div>}
+      <div className="text-sm font-mono text-slate-100 mt-0.5">{value}</div>
+      {sub && <div className="text-[9px] text-slate-500 mt-0.5">{sub}</div>}
     </div>
   );
 }
@@ -408,35 +332,11 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 function Pending({ label }: { label: string }) {
   return (
     <div className="text-[10px] text-slate-500 italic border border-dashed border-slate-700 rounded px-2 py-3">
-      {label} — pending (scraper hasn’t populated yet).
+      {label} — pending (scraper hasn&apos;t populated yet).
     </div>
   );
 }
 
-function MiniTable({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) {
-  return (
-    <table className="w-full text-[11px] font-mono">
-      <thead>
-        <tr className="text-slate-500 border-b border-slate-800">
-          {headers.map((h, i) => (
-            <th key={h} className={`py-1 ${i === 0 ? "text-left" : "text-right"}`}>{h}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, ri) => (
-          <tr key={ri} className="border-b border-slate-900 last:border-0">
-            {r.map((c, ci) => (
-              <td key={ci} className={`py-0.5 ${ci === 0 ? "text-slate-300 text-left" : "text-slate-100 text-right"}`}>
-                {typeof c === "number" ? c.toLocaleString("en-US") : c}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
 
 // ── Period windows (each column = a date window, not a single date) ──────────
 // Flow metrics (Graded · Poison · Decertified · Issued) sum across the window;
@@ -1129,51 +1029,11 @@ function ArabicaPeriodTable({ snapshots, unit }: { snapshots: ArabicaSnap[]; uni
 function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
   const live = !!d && d.snapshots.length > 0;
   const latestSnap = d?.snapshots.at(-1) || null;
-  const ld = d?.latest_detail || null;
 
   const totalDisplay   = latestSnap ? fmt(fromBags(latestSnap.total_bags,           unit), unit) + " " + unitSuffix(unit) : "—";
   const pendingDisplay = latestSnap ? fmt(fromBags(latestSnap.pending_grading_bags, unit), unit) + " " + unitSuffix(unit) : "—";
   const gradedDisplay  = latestSnap ? fmt(fromBags(latestSnap.passed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
   const failedDisplay  = latestSnap ? fmt(fromBags(latestSnap.failed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
-
-  const groupRows = useMemo(() => {
-    const src = latestSnap?.by_group || ld?.total_certified?.by_group || {};
-    return Object.entries(src)
-      .filter(([_, b]) => b > 0)
-      .sort((a, b) => b[1] - a[1])
-      .map(([g, b]) => [g, fmt(fromBags(b, unit), unit)] as [string, string]);
-  }, [latestSnap, ld, unit]);
-
-  const portRows = useMemo(() => {
-    const src = latestSnap?.by_port || ld?.total_certified?.by_port || {};
-    return Object.entries(src)
-      .filter(([_, b]) => b > 0)
-      .sort((a, b) => b[1] - a[1])
-      .map(([p, b]) => [_withName(p, ARABICA_PORT_NAMES), fmt(fromBags(b, unit), unit)] as [string, string]);
-  }, [latestSnap, ld, unit]);
-
-  const [range, setRange] = useState<ChartRange>("1y");
-  const deepChunks = useDeepHistory("arabica", range);
-  const chartRows = useMemo(() => {
-    // Merge: deep chunks (by date) overlaid with primary snapshots. Primary
-    // wins on conflict because it carries the richest shape.
-    const byDate = new Map<string, number>();
-    for (const series of Object.values(deepChunks)) {
-      for (const r of series) byDate.set(r.date, r.total);
-    }
-    for (const s of (d?.snapshots || [])) byDate.set(s.date, s.total_bags);
-    const today = new Date();
-    let cutoffYear = today.getFullYear() - 1;
-    if (range === "5y")  cutoffYear = today.getFullYear() - 5;
-    if (range === "10y") cutoffYear = today.getFullYear() - 10;
-    if (range === "all") cutoffYear = 1900;
-    const fullDates = range === "1y"
-      ? Array.from(byDate.keys()).filter((d2) => new Date(d2) >= new Date(today.getTime() - 366 * 86_400_000))
-      : Array.from(byDate.keys()).filter((d2) => new Date(d2).getFullYear() >= cutoffYear);
-    return fullDates
-      .sort()
-      .map((dt) => ({ d: range === "1y" ? dt.slice(5) : dt.slice(0, 7), v: fromBags(byDate.get(dt) ?? 0, unit) }));
-  }, [d, unit, deepChunks, range]);
 
   return (
     <div className="space-y-3">
@@ -1195,49 +1055,52 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
         <Stat label="Failed today"    value={failedDisplay} />
       </div>
 
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">By ICE group (latest)</div>
-        {groupRows.length === 0
-          ? <Pending label="Group rollup" />
-          : <MiniTable headers={["Group", unitSuffix(unit)]} rows={groupRows} />}
-      </div>
-
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">By delivery port (latest)</div>
-        {portRows.length === 0
-          ? <Pending label="Port breakdown" />
-          : <MiniTable headers={["Port", unitSuffix(unit)]} rows={portRows} />}
-      </div>
-
-      <div>
-        <div className="flex items-baseline justify-between mb-1">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">
-            Total certified — {chartRows.length} {range === "1y" ? "business days" : "samples"}
-          </div>
-          <RangeToggle value={range} onChange={setRange} />
-        </div>
-        {chartRows.length === 0 ? <Pending label="History" /> : (
-          <div className="h-32 bg-slate-900 border border-slate-700 rounded-md p-2">
-            <ResponsiveContainer>
-              <AreaChart data={chartRows} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="d" tick={{ fontSize: 9, fill: "#64748b" }} />
-                <YAxis tick={{ fontSize: 9, fill: "#64748b" }} width={42}
-                       tickFormatter={(v) => fmt(v, unit)} />
-                <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", fontSize: 10 }}
-                         formatter={(v) => [fmt(Number(v ?? 0), unit) + " " + unitSuffix(unit), "total"]} />
-                <Area type="monotone" dataKey="v" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={1.6} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
       {d?.errors && d.errors.length > 0 && (
         <div className="text-[9px] text-slate-600 italic">Missing: {d.errors.join("; ")}</div>
       )}
+    </div>
+  );
+}
 
-      <ArabicaPeriodTable snapshots={d?.snapshots || []} unit={unit} />
+// Arabica recent activity — last N days of passed/failed grading events
+// from the snapshot stream. Mirrors robusta's gradings feed in shape so
+// the two markets sit side-by-side under "Recent activity".
+function ArabicaActivityFeed({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
+  const feed = useMemo(() => {
+    if (!d?.snapshots) return [];
+    type Evt = { date: string; kind: string; detail: string };
+    const out: Evt[] = [];
+    for (const s of d.snapshots) {
+      if ((s.passed_today_bags || 0) > 0) {
+        out.push({ date: s.date, kind: "passed",
+                   detail: `${fmt(fromBags(s.passed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} graded` });
+      }
+      if ((s.failed_today_bags || 0) > 0) {
+        out.push({ date: s.date, kind: "failed",
+                   detail: `${fmt(fromBags(s.failed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} rejected` });
+      }
+    }
+    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
+  }, [d, unit]);
+
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-wider text-amber-400/80 mb-1">
+        Arabica · recent activity
+      </div>
+      {feed.length === 0 ? <Pending label="Activity feed" /> : (
+        <ul className="space-y-0.5 text-[11px] font-mono">
+          {feed.map((e, i) => (
+            <li key={i} className="flex items-baseline gap-2 text-slate-300">
+              <span className="text-slate-500 w-16">{e.date}</span>
+              <span className={`w-16 text-[9px] uppercase tracking-wider ${e.kind === "passed" ? "text-emerald-400/80" : "text-rose-400/80"}`}>
+                {e.kind}
+              </span>
+              <span className="flex-1">{e.detail}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -2008,68 +1871,6 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
     (ra.grading_overview?.length || 0)
   ) : 0;
 
-  const portRows = useMemo(() => {
-    if (!stock) return [];
-    return stock.ports
-      .filter(p => p.with_val_cert > 0)
-      .sort((a, b) => b.with_val_cert - a.with_val_cert)
-      .map(p => [p.port_name ? `${p.port_id} · ${p.port_name}` : _withName(p.port_id, ROBUSTA_PORT_NAMES),
-                 fmt(fromLots(p.with_val_cert, unit), unit)] as [string, string]);
-  }, [stock, unit]);
-
-  const [range, setRange] = useState<ChartRange>("1y");
-  const deepChunks = useDeepHistory("robusta", range);
-  const chartRows = useMemo(() => {
-    const byDate = new Map<string, number>();
-    for (const series of Object.values(deepChunks)) {
-      for (const r of series) byDate.set(r.date, r.total);
-    }
-    for (const s of (d?.snapshots || [])) byDate.set(s.date, s.total_lots_certified);
-    const today = new Date();
-    let cutoffYear = today.getFullYear() - 1;
-    if (range === "5y")  cutoffYear = today.getFullYear() - 5;
-    if (range === "10y") cutoffYear = today.getFullYear() - 10;
-    if (range === "all") cutoffYear = 1900;
-    const fullDates = range === "1y"
-      ? Array.from(byDate.keys()).filter((d2) => new Date(d2) >= new Date(today.getTime() - 366 * 86_400_000))
-      : Array.from(byDate.keys()).filter((d2) => new Date(d2).getFullYear() >= cutoffYear);
-    return fullDates
-      .sort()
-      .map((dt) => ({ d: range === "1y" ? dt.slice(5) : dt.slice(0, 7), v: fromLots(byDate.get(dt) ?? 0, unit) }));
-  }, [d, unit, deepChunks, range]);
-
-  // Combined event feed (chronological).
-  const feed = useMemo(() => {
-    if (!ra) return [];
-    type Evt = { date: string; kind: string; detail: string };
-    const out: Evt[] = [];
-    for (const g of ra.gradings || []) {
-      out.push({ date: g.date, kind: "grading", detail: `${g.summary?.lots_graded_today ?? "?"} lots graded` });
-    }
-    for (const i of ra.iss_recv_daily || []) {
-      out.push({ date: i.date, kind: "issuance", detail: `${i.grand_total?.sold ?? 0} sold · ${i.grand_total?.bought ?? 0} bought` });
-    }
-    for (const t of ra.tenders || []) {
-      out.push({ date: t.date, kind: "tender", detail: `${t.totals_today?.originals ?? 0} originals` });
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  }, [ra]);
-
-  // Anomalies = infested warrants + grading appeals
-  const anomalies = useMemo(() => {
-    const out: { date: string; kind: string; detail: string }[] = [];
-    for (const i of d?.recent_activity?.infested_warrants || []) {
-      out.push({ date: i.date, kind: "infested", detail: `${i.suspended?.total_lots ?? 0} lots suspended` });
-    }
-    for (const a of d?.recent_activity?.grading_appeals || []) {
-      out.push({ date: a.date, kind: "appeal", detail: "grading appeal filed" });
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date));
-  }, [d]);
-
-  const ageAllow = d?.monthly?.age_allowance || [];
-  const latestAge = ageAllow[0];
-
   return (
     <div className="space-y-3">
       <div className="flex items-baseline justify-between gap-2 flex-wrap">
@@ -2091,26 +1892,50 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
               value={`${activityCount}`}
               sub={`gradings/iss/tenders, ${d?.snapshots.length ?? 0}d window`} />
       </div>
+    </div>
+  );
+}
 
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">By warehouse port (latest)</div>
-        {portRows.length === 0
-          ? <Pending label="Port breakdown" />
-          : <MiniTable headers={["Port", unitSuffix(unit)]} rows={portRows} />}
-      </div>
+// Robusta recent activity — gradings + iss/recv + tenders feed, plus the
+// infested/appeal anomaly block underneath when present. Extracted out of
+// RobustaColumn so it can sit below the period view tables in the new
+// vertical layout.
+function RobustaActivityFeed({ d }: { d: RobustaJson | null }) {
+  const ra = d?.recent_activity;
 
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Age allowance (most recent month)</div>
-        {!latestAge ? <Pending label="Age allowance" /> : (
-          <div className="text-[11px] font-mono text-slate-300">
-            {latestAge.month_end?.slice(0, 7)} ·{" "}
-            valid: {fmt(fromLots((latestAge.valid?.grand_total_mt ?? 0) / TONNES_PER_LOT, unit), unit)} {unitSuffix(unit)}
-          </div>
-        )}
-      </div>
+  const feed = useMemo(() => {
+    if (!ra) return [];
+    type Evt = { date: string; kind: string; detail: string };
+    const out: Evt[] = [];
+    for (const g of ra.gradings || []) {
+      out.push({ date: g.date, kind: "grading", detail: `${g.summary?.lots_graded_today ?? "?"} lots graded` });
+    }
+    for (const i of ra.iss_recv_daily || []) {
+      out.push({ date: i.date, kind: "issuance", detail: `${i.grand_total?.sold ?? 0} sold · ${i.grand_total?.bought ?? 0} bought` });
+    }
+    for (const t of ra.tenders || []) {
+      out.push({ date: t.date, kind: "tender", detail: `${t.totals_today?.originals ?? 0} originals` });
+    }
+    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
+  }, [ra]);
 
+  const anomalies = useMemo(() => {
+    const out: { date: string; kind: string; detail: string }[] = [];
+    for (const i of ra?.infested_warrants || []) {
+      out.push({ date: i.date, kind: "infested", detail: `${i.suspended?.total_lots ?? 0} lots suspended` });
+    }
+    for (const a of ra?.grading_appeals || []) {
+      out.push({ date: a.date, kind: "appeal", detail: "grading appeal filed" });
+    }
+    return out.sort((a, b) => b.date.localeCompare(a.date));
+  }, [ra]);
+
+  return (
+    <div className="space-y-3">
       <div>
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Recent activity</div>
+        <div className="text-[10px] uppercase tracking-wider text-emerald-400/80 mb-1">
+          Robusta · recent activity
+        </div>
         {feed.length === 0 ? <Pending label="Activity feed" /> : (
           <ul className="space-y-0.5 text-[11px] font-mono">
             {feed.map((e, i) => (
@@ -2138,39 +1963,6 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
           </ul>
         </div>
       )}
-
-      <div>
-        <div className="flex items-baseline justify-between mb-1">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">
-            Total certified — {chartRows.length} {range === "1y" ? "business days" : "samples"}
-          </div>
-          <RangeToggle value={range} onChange={setRange} />
-        </div>
-        {chartRows.length === 0 ? <Pending label="History" /> : (
-          <div className="h-32 bg-slate-900 border border-slate-700 rounded-md p-2">
-            <ResponsiveContainer>
-              <AreaChart data={chartRows} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="d" tick={{ fontSize: 9, fill: "#64748b" }} />
-                <YAxis tick={{ fontSize: 9, fill: "#64748b" }} width={42}
-                       tickFormatter={(v) => fmt(v, unit)} />
-                <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", fontSize: 10 }}
-                         formatter={(v) => [fmt(Number(v ?? 0), unit) + " " + unitSuffix(unit), "total"]} />
-                <Area type="monotone" dataKey="v" stroke="#10b981" fill="#10b981" fillOpacity={0.2} strokeWidth={1.6} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
-      <RobustaPeriodTable
-        snapshots={d?.snapshots || []}
-        gradings={(d?.recent_activity?.gradings || []) as unknown as GradingEvent[]}
-        overview={(d?.recent_activity?.grading_overview || []) as unknown as OverviewEvent[]}
-        ageMonths={(d?.monthly?.age_allowance || []) as unknown as AgeAllowanceMonth[]}
-        issuance={(d?.recent_activity?.iss_recv_daily || []) as unknown as IssRecvDailyEvt[]}
-        unit={unit}
-      />
     </div>
   );
 }
@@ -2223,23 +2015,40 @@ export default function CertifiedStocksPanel() {
         </div>
       </div>
 
+      {/* 1 · the 4 tiles per contract */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ArabicaColumn d={arabica} unit={unit} />
         <RobustaColumn d={robusta} unit={unit} />
       </div>
 
-      {/* End-to-end visual flow per market — promoted from the Test sandbox
-          once layout + poison rules + origin-history inference were verified.
-          The cast is necessary because the panel's ArabicaJson.latest_detail
-          carries the matrix-section shape (report_date, total_certified, …)
-          while the system flow only needs latest_detail.age_detail (which
-          the workbook importer attaches but the live scraper doesn't). The
-          component handles a missing latest_detail gracefully. */}
+      {/* 2 · full-width system flow. The cast is needed because the panel's
+          ArabicaJson.latest_detail carries the matrix-section shape while the
+          system flow only consumes latest_detail.age_detail (workbook-side).
+          The component handles missing latest_detail gracefully. */}
       <div className="mt-6">
         <CertifiedStocksSystemFlow
           arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
           robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
         />
+      </div>
+
+      {/* 3 · period view tables — side-by-side per contract */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ArabicaPeriodTable snapshots={arabica?.snapshots || []} unit={unit} />
+        <RobustaPeriodTable
+          snapshots={robusta?.snapshots || []}
+          gradings={(robusta?.recent_activity?.gradings || []) as unknown as GradingEvent[]}
+          overview={(robusta?.recent_activity?.grading_overview || []) as unknown as OverviewEvent[]}
+          ageMonths={(robusta?.monthly?.age_allowance || []) as unknown as AgeAllowanceMonth[]}
+          issuance={(robusta?.recent_activity?.iss_recv_daily || []) as unknown as IssRecvDailyEvt[]}
+          unit={unit}
+        />
+      </div>
+
+      {/* 4 · recent activity feed per contract */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ArabicaActivityFeed d={arabica} unit={unit} />
+        <RobustaActivityFeed d={robusta} />
       </div>
     </div>
   );
