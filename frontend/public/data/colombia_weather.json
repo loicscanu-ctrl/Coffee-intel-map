@@ -1,13 +1,13 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-28",
+  "updated": "2026-05-29",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Colombia",
   "share_label": "Colombia arabica",
   "station": "Pitalito",
   "source_production": "FNC 2024 departmental output (approx. weights)",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Huila",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         235.6,
         95.5,
-        null,
-        null,
+        0.0,
+        0.0,
         116.7
       ],
       "monthly_avg_temp": [
@@ -222,7 +222,7 @@
     },
     {
       "name": "Antioquia",
-      "station": "Medell\u00c3\u00adn",
+      "station": "MedellÃ­n",
       "prod_mt_k": 180,
       "weight": 0.269,
       "monthly_avg_rain": [
@@ -298,9 +298,9 @@
       "monthly_actual_cur": [
         228.7,
         144.8,
-        null,
-        null,
-        54.7
+        0.0,
+        0.0,
+        74.8
       ],
       "monthly_avg_temp": [
         22.4,
@@ -366,13 +366,13 @@
         22.3
       ],
       "forecast_7d_rain": [
-        11.2,
-        8.9,
-        12.6,
-        13.5,
-        19.8,
-        5.2,
-        7.4
+        10.8,
+        4.7,
+        10.9,
+        14.0,
+        14.0,
+        9.2,
+        14.6
       ],
       "daily_accum_cur": [
         0.0,
@@ -402,8 +402,8 @@
         46.3,
         47.7,
         49.9,
-        54.7,
-        null,
+        54.3,
+        74.8,
         null,
         null
       ],
@@ -411,7 +411,7 @@
       "spi_1": -0.08,
       "spi_3": -4.75,
       "spi_month": "2026-02",
-      "essm_fraction": 0.202,
+      "essm_fraction": 0.241,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -427,13 +427,17 @@
         },
         {
           "date": "2026-05-28",
-          "essm": 0.202
+          "essm": 0.231
+        },
+        {
+          "date": "2026-05-29",
+          "essm": 0.241
         }
       ]
     },
     {
       "name": "Cauca",
-      "station": "Popay\u00c3\u00a1n",
+      "station": "PopayÃ¡n",
       "prod_mt_k": 120,
       "weight": 0.179,
       "monthly_avg_rain": [
@@ -509,9 +513,9 @@
       "monthly_actual_cur": [
         245.7,
         99.3,
-        null,
-        null,
-        57.6
+        0.0,
+        0.0,
+        66.5
       ],
       "monthly_avg_temp": [
         19.4,
@@ -577,13 +581,13 @@
         18.9
       ],
       "forecast_7d_rain": [
-        17.4,
-        6.3,
-        7.8,
-        19.0,
-        10.5,
-        8.6,
-        5.8
+        6.8,
+        2.0,
+        8.4,
+        12.9,
+        14.6,
+        5.6,
+        4.6
       ],
       "daily_accum_cur": [
         0.0,
@@ -613,13 +617,13 @@
         43.9,
         45.2,
         47.2,
-        57.6,
-        null,
+        54.7,
+        66.5,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.243,
+      "essm_fraction": 0.245,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -635,7 +639,11 @@
         },
         {
           "date": "2026-05-28",
-          "essm": 0.243
+          "essm": 0.242
+        },
+        {
+          "date": "2026-05-29",
+          "essm": 0.245
         }
       ],
       "spi_1": -2.15,
@@ -720,9 +728,9 @@
       "monthly_actual_cur": [
         348.2,
         286.2,
-        null,
-        null,
-        340.9
+        0.0,
+        0.0,
+        365.1
       ],
       "monthly_avg_temp": [
         18.4,
@@ -788,13 +796,13 @@
         16.0
       ],
       "forecast_7d_rain": [
-        40.6,
-        51.3,
-        15.3,
-        4.0,
-        1.6,
-        11.0,
-        19.6
+        24.5,
+        29.4,
+        3.1,
+        5.2,
+        3.1,
+        9.4,
+        9.2
       ],
       "daily_accum_cur": [
         0.0,
@@ -824,13 +832,13 @@
         284.1,
         306.6,
         320.8,
-        340.9,
-        null,
+        330.8,
+        365.1,
         null,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.321,
+      "essm_fraction": 0.345,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -846,7 +854,11 @@
         },
         {
           "date": "2026-05-28",
-          "essm": 0.321
+          "essm": 0.332
+        },
+        {
+          "date": "2026-05-29",
+          "essm": 0.345
         }
       ],
       "spi_1": -1.25,
@@ -854,7 +866,7 @@
       "spi_month": "2026-02"
     },
     {
-      "name": "Nari\u00c3\u00b1o",
+      "name": "NariÃ±o",
       "station": "Pasto",
       "prod_mt_k": 60,
       "weight": 0.09,
@@ -1007,39 +1019,7 @@
         1.2,
         0.0
       ],
-      "daily_accum_cur": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.3,
-        32.1,
-        32.1,
-        39.8,
-        49.9,
-        56.5,
-        59.5,
-        59.9,
-        60.6,
-        62.9,
-        72.6,
-        73.4,
-        73.4,
-        73.5,
-        79.1,
-        80.6,
-        82.8,
-        82.8,
-        85.1,
-        85.4,
-        86.5,
-        92.8,
-        null,
-        null,
-        null
-      ],
+      "daily_accum_cur": [],
       "daily_accum_ly": [],
       "essm_fraction": 0.213,
       "essm_recent": [
