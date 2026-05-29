@@ -1410,16 +1410,15 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
 
           {/* Grading-intake → warehouses conveyor. Replaces the previous
               SVG manifold tree with a single horizontal conveyor that mirrors
-              the per-port ↓out strip — boxes flow left-to-right from the
-              intake stage to the warehouse row, coloured by the dominant
-              origins arriving in the window. The keyframes (cs-conveyor-mini)
-              live in the same one-shot style injection used elsewhere. */}
+              the per-port ↓in / ↓out strips — boxes flow left-to-right from
+              the intake stage to the warehouse row, coloured by the dominant
+              origins arriving in the window. Hidden when no passed graded
+              coffee landed in this window. */}
           {mkt.ports.length > 0 && (() => {
             const visible = mkt.ports.slice(0, 8);
             if (visible.length === 0) return null;
             // Aggregate inflow across visible ports and pick the dominant
-            // origins for the box-colour cycle. Falls back to a neutral
-            // emerald box stream when no origin-resolved inflow exists.
+            // origins for the box-colour cycle.
             const totals: Record<string, { volume: number; color: string }> = {};
             for (const p of visible) {
               for (const o of p.inflow) {
@@ -1427,12 +1426,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 totals[o.origin].volume += o.volume;
               }
             }
+            const totalInflow = Object.values(totals).reduce((a, b) => a + b.volume, 0);
+            // Nothing passed grading in this window → no conveyor.
+            if (totalInflow <= 0) return null;
             const topOrigins = Object.entries(totals)
               .sort(([, a], [, b]) => b.volume - a.volume)
               .slice(0, 4)
               .map(([, v]) => v);
             const colors = topOrigins.length > 0 ? topOrigins : [{ volume: 0, color: "#10b981" }];
-            const totalInflow = Object.values(totals).reduce((a, b) => a + b.volume, 0);
             return (
               <div className="my-2 flex items-stretch gap-2">
                 {/* Source badge */}
@@ -1444,15 +1445,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   {/* Belt rails */}
                   <div className="absolute inset-x-2 top-1/2 h-px bg-emerald-900/50 -translate-y-1/2" />
                   <div className="absolute inset-x-2 top-1/2 mt-[2px] h-px bg-emerald-900/30" />
-                  {/* 8 boxes flowing right, staggered so the belt looks alive */}
+                  {/* 8 boxes flowing right, slower cadence — duration bumped
+                      to 3.5s and delays restaggered so the belt feels calm
+                      rather than racing. */}
                   <div className="absolute inset-x-2 inset-y-0">
                     {Array.from({ length: 8 }).map((_, i) => (
                       <span key={i}
                         className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-sm cs-conveyor-mini"
                         style={{
                           background: colors[i % colors.length].color,
-                          animationDelay: `${i * 0.28}s`,
-                          animationDuration: "2.3s",
+                          animationDelay: `${i * 0.44}s`,
+                          animationDuration: "3.5s",
                           boxShadow: "0 0 5px rgba(16,185,129,0.4)",
                         }}
                       />
@@ -1460,7 +1463,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   </div>
                   {/* Direction label + magnitude, centred above the belt */}
                   <div className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8.5px] font-mono text-emerald-400/80 px-1.5 bg-slate-950/60 rounded">
-                    → graded {totalInflow > 0 ? `+${fmtNum(totalInflow)}` : ""}
+                    → graded +{fmtNum(totalInflow)}
                   </div>
                 </div>
                 {/* Destination badge */}
@@ -1593,12 +1596,35 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       </div>
                     )}
 
-                    {/* Inflow indicator (compact) */}
+                    {/* Inflow indicator (compact) — header / animated
+                        conveyor strip / top-origin chip line. Mirrors the
+                        ↓out belt but emerald, and only renders when this
+                        port saw positive inflow over the window. */}
                     <div className="bg-emerald-950/20 border border-emerald-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
                       <div className="flex items-center justify-between text-emerald-400 font-bold">
                         <span>↓ in</span>
                         <span className="font-mono">+{fmtNum(inflowSum)}</span>
                       </div>
+                      {inflowSum > 0 && topInflow.length > 0 && (
+                        <div className="relative h-2.5 mt-0.5 overflow-hidden">
+                          {/* Track */}
+                          <div className="absolute inset-x-0 top-1/2 h-px bg-emerald-900/40 -translate-y-1/2" />
+                          {/* 4 boxes flowing right, cycling the top inflow
+                              origin colours. Staggered delays give a steady
+                              stream rather than a wave. */}
+                          {Array.from({ length: 4 }).map((_, i) => (
+                            <span key={i}
+                              className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-sm cs-conveyor-mini"
+                              style={{
+                                background: topInflow[i % topInflow.length].color,
+                                animationDelay: `${i * 0.45}s`,
+                                animationDuration: "2.4s",
+                                boxShadow: "0 0 4px rgba(16,185,129,0.45)",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
                       {topInflow.length > 0 && (
                         <div className="flex flex-wrap gap-x-1.5">
                           {topInflow.map((b) => (
