@@ -1057,14 +1057,14 @@ function Article5() {
         these nutrients into stable, storable, transportable <em>carrier molecules</em>.
       </P>
 
-      <H>Why "K" — not "Po" for potassium, and why P₂O₅ not P?</H>
+      <H>Why &ldquo;K&rdquo; — not &ldquo;Po&rdquo; for potassium, and why P₂O₅ not P?</H>
       <P>
         Element symbols follow Latin and Germanic roots, not English names. Potassium
         derives from <em>Kalium</em> (medieval Latin, from Arabic <em>al-qaly</em> — ash of
         burnt plants), hence the symbol K. Phosphorus measurements use P₂O₅ (phosphorus
         pentoxide) rather than elemental P — a 19th-century analytical convention that
         overstates actual P content by ~2.3×, yet remains the global industry standard.
-        Potassium is likewise expressed as K₂O. This is why an NPK label reads "14-8-16"
+        Potassium is likewise expressed as K₂O. This is why an NPK label reads &ldquo;14-8-16&rdquo;
         even though the product contains no literal oxides.
       </P>
 
@@ -1093,26 +1093,26 @@ function Article5() {
         </LI>
       </ul>
 
-      <H>Why you cannot buy "nitrogen" at a commodity desk</H>
+      <H>Why you cannot buy &ldquo;nitrogen&rdquo; at a commodity desk</H>
       <P>
         Atmospheric N₂ is abundant but agronomically useless. The economically relevant
         product is <em>fixed nitrogen</em> — converted into reactive NH₃, NH₄⁺ or NO₃⁻ that
         roots can absorb. The Haber-Bosch process, which reacts N₂ with hydrogen from natural
         gas at 150–300 bar and 400–500°C, is the only scalable industrial path. It consumes
         roughly 1–2% of global energy. Urea is the most efficient solid form to ship and store
-        this fixed nitrogen. When commodity markets quote "Urea FOB Black Sea," they are
+        this fixed nitrogen. When commodity markets quote &ldquo;Urea FOB Black Sea,&rdquo; they are
         effectively pricing the cost of extracting atmospheric nitrogen, concentrating it, and
         shipping it in pelletised form.
       </P>
 
-      <H>Why "NPK" — not "UMK"?</H>
+      <H>Why &ldquo;NPK&rdquo; — not &ldquo;UMK&rdquo;?</H>
       <P>
-        NPK describes <em>what the plant needs</em>. "UMK" would describe one particular set
+        NPK describes <em>what the plant needs</em>. &ldquo;UMK&rdquo; would describe one particular set
         of carrier products — but the same N, P, K targets can be met with dozens of
         substitutes: DAP (18-46-0) instead of MAP, Ammonium Nitrate (34-0-0) instead of Urea,
         SOP (0-0-50) instead of KCl. The NPK framework is carrier-agnostic by design, allowing
         agronomists to write a single nutrient prescription that farmers fill with locally
-        available or economically optimal products. A bag labelled "15-8-14" could contain
+        available or economically optimal products. A bag labelled &ldquo;15-8-14&rdquo; could contain
         Urea+MAP+KCl, or DAP+AN+SOP, or a factory-blended compound. The nutrient targets are
         universal; the carrier choice is regional and economic.
       </P>
@@ -1283,7 +1283,7 @@ function Article5() {
           <strong className="text-orange-400">Belarusian potash export volumes</strong> — Post-2022
           sanctions, Belarus routes potash via Russian ports and China, partially restoring volumes.
           Monitoring Kaliningrad/Ust-Luga rail + ship data reveals actual Belarus supply reaching
-          the market vs. the official "sanctioned" picture.
+          the market vs. the official &ldquo;sanctioned&rdquo; picture.
         </LI>
         <LI>
           <strong className="text-slate-300">Fertilizer-to-coffee price ratio</strong> — When the
