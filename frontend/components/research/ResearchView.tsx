@@ -1,16 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",        label: "COT & positioning" },
   { id: "weather",    label: "Weather" },
   { id: "fertilizer", label: "Fertilizer" },
   { id: "contracts",  label: "Contract rules" },
   { id: "agronomy",   label: "Agronomy" },
+  { id: "logistics",  label: "Origin Logistics" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -409,13 +411,233 @@ function FertilizerMethodology() {
   );
 }
 
-export default function ResearchView() {
-  const [cat, setCat] = useState<Cat>("cot");
+function CostRow({ label, cost, note }: { label: string; cost: string; note?: string }) {
+  return (
+    <tr className="border-b border-slate-800">
+      <td className="py-1.5 pr-4 text-slate-300">{label}</td>
+      <td className="py-1.5 pr-4 text-right font-mono text-amber-300 whitespace-nowrap">{cost}</td>
+      <td className="py-1.5 text-slate-500 text-[11px]">{note}</td>
+    </tr>
+  );
+}
+
+function CostTable({ children }: { children: React.ReactNode }) {
+  return (
+    <table className="w-full text-xs mt-3 mb-4">
+      <thead>
+        <tr className="border-b border-slate-700 text-left text-[10px] uppercase tracking-wider text-slate-500">
+          <th className="pb-1.5 pr-4">Component</th>
+          <th className="pb-1.5 pr-4 text-right">USD/t</th>
+          <th className="pb-1.5">Notes</th>
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </table>
+  );
+}
+
+function OriginLogistics() {
+  return (
+    <div className="space-y-5 max-w-4xl">
+
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <H>What is a FOBbing cost?</H>
+        <P>
+          The physical prices on the ticker — VN FAQ, CON T7, UGA S15 — are quoted at the <strong>origin
+          warehouse</strong> or farmgate level, not at a ship&#39;s rail. The ICE Robusta contract (RC) settles at
+          European port warehouses. To make origin prices comparable with RC futures, you add the <strong>FOBbing
+          cost</strong>: the full chain of expenses that moves coffee from farm to vessel, ready for loading.
+        </P>
+        <P>
+          The ticker differential already incorporates this:
+        </P>
+        <div className="font-mono text-xs bg-slate-800 rounded px-3 py-2 text-amber-300 mb-2">
+          N±diff = physical_USD + FOBbing_cost − RC_nearby
+        </div>
+        <P>
+          A negative N-diff means origin-adjusted coffee is <em>cheaper</em> than futures parity — origin is offering
+          a discount. A positive N-diff means origin is commanding a premium.
+        </P>
+      </div>
+
+      {/* Vietnam */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Vietnam · Dak Lak / Central Highlands</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+          VN FAQ Robusta — FOBbing cost ~$65–70/t
+        </h3>
+        <P>
+          Vietnam runs the tightest logistics chain of the three origins. The port of Cat Lai (Ho Chi Minh City) is
+          efficient, and the domestic trucking corridor from Dak Lak is well-established. The single largest line is
+          the L1 inland collection, which aggregates smallholder coffee from cooperative warehouses spread across the
+          plateau.
+        </P>
+        <CostTable>
+          <CostRow label="L1 — Inland collection" cost="25.00" note="Farm → Dak Lak co-op warehouse; covers aggregation + local haulage" />
+          <CostRow label="L2 — Trucking to port" cost="6.54" note="Dak Lak → Ho Chi Minh City / Cat Lai (~290 km)" />
+          <CostRow label="Cargo insurance" cost="0.61" note="In-transit policy" />
+          <CostRow label="LoLo (port handling)" cost="2.43" note="Load on / Load off at berth" />
+          <CostRow label="Dunnage & securing" cost="0.71" note="Container stuffing materials" />
+          <CostRow label="Fumigation" cost="1.25" note="MARD-mandated phytosanitary fumigation" />
+          <CostRow label="Quality inspection" cost="1.23" note="Weight + quality certificate" />
+          <CostRow label="Forwarder service fee" cost="0.50" note="Freight-forwarding agent" />
+          <CostRow label="Customs declaration" cost="0.38" note="Customs brokerage" />
+          <CostRow label="Bill of Lading" cost="0.18" note="Shipping document issuance" />
+          <CostRow label="Phytosanitary certificate" cost="0.07" note="MARD phytosanitary cert" />
+          <CostRow label="THC (terminal handling)" cost="5.87" note="Cat Lai terminal handling charge" />
+          <CostRow label="Port infrastructure fee" cost="0.48" note="Vietnam port authority" />
+          <CostRow label="Container seal" cost="0.38" note="Security seal" />
+          <CostRow label="Financing" cost="10.00" note="~0.37% on $2,700 price × 3-week float" />
+          <tr className="border-t border-slate-600 font-semibold">
+            <td className="pt-2 text-slate-200">Total</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~65–70</td>
+            <td className="pt-2 text-slate-500 text-[11px]">~2.5% of $2,700 reference price</td>
+          </tr>
+        </CostTable>
+        <P>
+          <strong>Trader note:</strong> Vietnam&#39;s FOBbing cost is the most stable of the three — no quality
+          transformation required, and the trucking corridor is well-supplied. The financing line is the most
+          price-sensitive: when VN FAQ trades at $3,500+, the 3-week float cost rises proportionally.
+        </P>
+      </div>
+
+      {/* Brazil */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Brazil · Espírito Santo / Rondônia</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+          CON T7 Conilon — FOBbing cost ~$200–300/t
+        </h3>
+        <P>
+          Brazil&#39;s larger figure reflects a structural cost that Vietnam doesn&#39;t face: <strong>quality
+          preparation</strong>. Raw Conilon from the farm often arrives at the dry mill at Screen 13–14 with a
+          natural cup. To tender into the ICE RC contract at Class 1 or better — or to sell into European roaster
+          specifications — the coffee needs mechanical sorting, hulling, and polishing. That processing step is
+          semi-fixed and accounts for the largest single block of the FOBbing cost.
+        </P>
+        <CostTable>
+          <CostRow label="Quality preparation" cost="55–65" note="Mechanical sorting, hulling, polishing to Class 1+ spec" />
+          <CostRow label="L1 — Farm to dry mill" cost="10–15" note="Smallholder aggregation; distance varies across ES/RO" />
+          <CostRow label="L2 — Mill to port (Santos/Vitória)" cost="20–25" note="Road haulage; Santos ~900 km from Rondônia" />
+          <CostRow label="MAPA inspection & fumigation" cost="8–12" note="Brazilian agriculture ministry mandatory checks" />
+          <CostRow label="THC + port docs + B/L" cost="17–18" note="Terminal handling, export documentation, bill of lading" />
+          <CostRow label="Financing" cost="15" note="~0.5% on $3,000 price × 3-week float" />
+          <CostRow label="Exporter margin" cost="~30" note="~1% of FOB price; the competitive floor for origin traders" />
+          <tr className="border-t border-slate-600 font-semibold">
+            <td className="pt-2 text-slate-200">Total</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~200–300</td>
+            <td className="pt-2 text-slate-500 text-[11px]">Lower end = logistics only; upper end = incl. quality prep + margin</td>
+          </tr>
+        </CostTable>
+        <P>
+          <strong>Trader note:</strong> The quality-preparation cost is the decisive variable. When Brazilian Conilon
+          is already clean (cooperative members with processing equipment), the FOBbing cost drops toward $150–170.
+          When it comes in as naturals from smallholders, the full $300 range applies. The ticker uses a blended
+          $300 — the relevant figure when comparing against RC futures parity.
+        </P>
+      </div>
+
+      {/* Uganda */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Uganda · Western / Central Region</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+          UGA S15 Robusta — FOBbing cost ~$200/t
+        </h3>
+        <P>
+          Uganda&#39;s logistics cost is dominated by one line: the <strong>Northern Corridor</strong>. As a
+          landlocked country, all export coffee must travel 1,150 km by road to the port of Mombasa, Kenya. That
+          transit adds a cost and a time premium that no policy change can eliminate short of a rail upgrade. On top
+          of the transit, UCDA imposes a 1% export cess (the Uganda Coffee Development Authority levy), and
+          sun-drying shrinkage is a material physical cost that doesn&#39;t appear in freight quotes.
+        </P>
+        <CostTable>
+          <CostRow label="Shrinkage (drying weight loss)" cost="30–45" note="Moisture loss in sun-drying from 12.5% to ~10% export moisture" />
+          <CostRow label="L1 — Farm to Kampala mill" cost="15–20" note="Collection from Western / Mt. Elgon growing areas" />
+          <CostRow label="L2 — Northern Corridor (Kampala → Mombasa)" cost="75–80" note="1,150 km road transit; rate set by EA road-freight market" />
+          <CostRow label="UCDA export cess" cost="~30" note="1% of FOB value on ~$3,000/t reference price" />
+          <CostRow label="Mombasa port (THC + handling + B/L)" cost="35" note="Kenya Ports Authority terminal + shipping docs" />
+          <CostRow label="Inspection + fumigation" cost="10–12" note="UCDA quality grading + container fumigation" />
+          <CostRow label="Financing (longer transit)" cost="16–20" note="~0.5% on $3,000 × 4-week float (longer than VN/Brazil)" />
+          <tr className="border-t border-slate-600 font-semibold">
+            <td className="pt-2 text-slate-200">Total</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~200</td>
+            <td className="pt-2 text-slate-500 text-[11px]">~7% of $3,000 reference price</td>
+          </tr>
+        </CostTable>
+        <P>
+          <strong>Trader note:</strong> The Northern Corridor rate is the most volatile element across the three
+          origins. East African road-freight tightens during harvest season (Oct–Jan), when trucks are competing with
+          tea, grain and maize exports from Kenya and Tanzania. A $10–15/t swing in the corridor rate shows up
+          directly in Uganda&#39;s effective FOB cost within weeks. UCDA cess is the other watch item: it scales
+          with price, so every $300/t rally in RC adds ~$3/t to the cess line.
+        </P>
+      </div>
+
+      {/* Summary comparison */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <H>Cross-origin comparison</H>
+        <table className="w-full text-xs mt-2">
+          <thead>
+            <tr className="border-b border-slate-700 text-left text-[10px] uppercase tracking-wider text-slate-500">
+              <th className="pb-1.5 pr-4">Origin</th>
+              <th className="pb-1.5 pr-4 text-right">FOBbing cost</th>
+              <th className="pb-1.5 pr-4 text-right">As % of price</th>
+              <th className="pb-1.5">Key swing factor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">VN FAQ</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">$70/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">~2.5%</td>
+              <td className="py-1.5 text-slate-400">Financing cost (price-sensitive)</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">CON T7</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">$300/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">~10%</td>
+              <td className="py-1.5 text-slate-400">Quality-prep cost + exporter margin</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">UGA S15</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">$200/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">~7%</td>
+              <td className="py-1.5 text-slate-400">Northern Corridor freight rate</td>
+            </tr>
+          </tbody>
+        </table>
+        <P>
+          These figures are structural: they set the <em>floor</em> of what origin must offer relative to RC futures
+          for an export trade to work. When the ticker N-diff is <strong>close to zero</strong>, origin is priced at
+          futures parity and export is marginally viable. When it is <strong>deeply negative</strong> (e.g. N-200),
+          origin is offering a substantial discount — either oversupply at origin, logistics disruption, or currency
+          effects. When it is <strong>positive</strong>, origin is at a premium to futures, which typically signals
+          tight prompt supply or a quality bid.
+        </P>
+      </div>
+
+    </div>
+  );
+}
+
+export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
+  const router = useRouter();
+  const [cat, setCat] = useState<Cat>(initialTab ?? "cot");
+
+  useEffect(() => {
+    if (initialTab && initialTab !== cat) setCat(initialTab);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTab]);
+
+  function handleCat(id: Cat) {
+    setCat(id);
+    router.push(`/research/${id}`, { scroll: false });
+  }
+
   return (
     <>
       <div className="flex items-center gap-1 flex-wrap mb-4">
         {CATS.map(c => (
-          <button key={c.id} onClick={() => setCat(c.id)}
+          <button key={c.id} onClick={() => handleCat(c.id)}
             className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
               cat === c.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300 border border-transparent"
             }`}>
@@ -434,6 +656,7 @@ export default function ResearchView() {
       {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
       {cat === "agronomy"  && <AgronomyArticles />}
+      {cat === "logistics" && <OriginLogistics />}
     </>
   );
 }

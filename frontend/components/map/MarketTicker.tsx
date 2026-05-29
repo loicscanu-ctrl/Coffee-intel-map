@@ -70,6 +70,14 @@ async function fetchAcaphe(): Promise<AcapheData | null> {
   return null;
 }
 
+// Farmgate-to-FOB cost per origin (USD/tonne). Added to physical price before
+// computing the N±diff so all tickers are comparable at port/exchange parity.
+const FOB_COST_USD: Record<string, number> = {
+  "VN FAQ":  70,   // Vietnam: logistics only (trucking, port, admin, financing)
+  "CON T7": 300,   // Brazil Conilon: logistics + quality-upgrade to Class 1
+  "UGA S15": 200,  // Uganda: Northern Corridor road transit + UCDA cess
+};
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function MarketTicker() {
@@ -150,13 +158,15 @@ export default function MarketTicker() {
     return null;
   })();
 
-  // Inject "N±diff" into physical value strings that contain a USD price
-  const formatPhysical = (value: string): string => {
+  // Inject "N±diff" into physical value strings. diff = physical + FOBbing − RC
+  // so the result is an at-port parity comparison vs. the nearby futures contract.
+  const formatPhysical = (value: string, label: string): string => {
     if (rcPrice == null) return value;
     const usdMatch = value.match(/\$([0-9,]+)/);
     if (!usdMatch) return value;
     const usd = parseInt(usdMatch[1].replace(/,/g, ""), 10);
-    const diff = usd - rcPrice;
+    const fobCost = FOB_COST_USD[label] ?? 0;
+    const diff = usd + fobCost - rcPrice;
     const sign = diff >= 0 ? "+" : "";
     return value.replace(/(\$[0-9,]+)(\))/, `$1, N${sign}${diff}$2`);
   };
@@ -187,7 +197,7 @@ export default function MarketTicker() {
   const tickerContent = groups.flatMap((group, gi) => {
     const items = group.map((t, i) => (
       <span key={`${t.label}-${i}`} className={`${COLOR[t.category]} font-mono`}>
-        {t.label}: {t.category === "physical" ? formatPhysical(t.value) : t.value}
+        {t.label}: {t.category === "physical" ? formatPhysical(t.value, t.label) : t.value}
         {i < group.length - 1 && <span className="text-slate-500">{"   ·   "}</span>}
       </span>
     ));
