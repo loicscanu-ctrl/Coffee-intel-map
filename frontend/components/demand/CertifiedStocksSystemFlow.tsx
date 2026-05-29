@@ -293,6 +293,113 @@ const _gridCols = (squares: number) => {
 };
 const _rowsForCount = (n: number, cols: number) => (n <= 0 ? 0 : Math.ceil(n / cols));
 
+// ── Density-grid formulas ────────────────────────────────────────────────────
+//
+// Per port, over a chosen window:
+//
+//   • Per origin we know two gross flows:
+//       gross_in[o]  = lots arriving in the window
+//       gross_out[o] = lots leaving in the window
+//
+//   • Per-origin invariant (mass balance):
+//       base[o] + gross_in[o] − gross_out[o]  =  cur[o]
+//     so:
+//       net_delta[o] = gross_in[o] − gross_out[o]
+//
+//   • Buckets rendered on the card:
+//       net_gained[o] = max(0,  net_delta[o])      arrived and still here
+//       lost[o]       = max(0, −net_delta[o])      were here, gone now
+//       transited[o]  = min(gross_in[o], gross_out[o])   arrived AND left
+//
+//   • Existing portion (the colored grid above the dashed boxes):
+//       existing[o]   = max(0, cur[o] − net_gained[o])
+//     i.e. what's still on hand from before the window started.
+//
+//   • Port-level invariant:
+//       current = existing_total + net_gained_total
+//       gross_in_total  = net_gained_total + transited_total
+//       gross_out_total = lost_total        + transited_total
+//
+// How gross_in / gross_out are sourced:
+//
+//   Arabica (KC) — we walk every snapshot in the window and read
+//   `total_certified.by_origin[o].by_port[p]` directly. Positive daily
+//   deltas at (p, o) accumulate into gross_in[o], negative into gross_out[o].
+//
+//   Robusta (RC) — the source only carries port-level totals, never
+//   per-origin stock. So we run a simulation per port:
+//       1. Initialise per-origin state from port_origin_history shares ×
+//          first snapshot's port total.
+//       2. Walk daily. Each gradings event (date, port, origin, lots) adds
+//          to state[o] and to gross_in[o]. Each day's port-level outflow
+//          (mass balance: prev_total + total_in − new_total) is apportioned
+//          across the current state proportionally, decrementing state[o]
+//          and accumulating into gross_out[o].
+//       3. End state = inferred current per-origin stock (cur[o]).
+//   This is what lets transited and net_gained stay self-consistent:
+//   Indonesia arriving at Antwerp 6mo ago and leaving 4mo ago shows up
+//   as transited (in & out), not as net_gained that never materialises.
+//   ─────────────────────────────────────────────────────────────────────────
+
+interface RobustaPortSim {
+  state: Record<string, number>;
+  inflowByOriginByDate:  Record<string, Record<string, number>>;
+  outflowByOriginByDate: Record<string, Record<string, number>>;
+}
+
+function _simulateRobustaPortStock(
+  port: string,
+  snaps: RobustaSnap[],
+  grads: RobustaGradingEvent[],
+  histShare: Record<string, number>,
+): RobustaPortSim {
+  const sortedSnaps = [...snaps].sort((a, b) => a.date.localeCompare(b.date));
+  // Bucket gradings into daily per-origin inflow for this port only.
+  const gradsByDate: Record<string, Record<string, number>> = {};
+  for (const ev of grads) {
+    for (const e of (ev.entries || [])) {
+      if (e.tenderable === false) continue;
+      if ((e.port || "") !== port) continue;
+      const origin = (e.origin || "?").trim();
+      gradsByDate[ev.date] = gradsByDate[ev.date] || {};
+      gradsByDate[ev.date][origin] = (gradsByDate[ev.date][origin] ?? 0) + (e.lots ?? 0);
+    }
+  }
+  const state: Record<string, number> = {};
+  const firstTotal = sortedSnaps[0]?.by_port_lots?.[port] ?? 0;
+  const shareSum = Object.values(histShare).reduce((a, b) => a + b, 0);
+  if (firstTotal > 0 && shareSum > 0) {
+    for (const [o, v] of Object.entries(histShare)) state[o] = (v / shareSum) * firstTotal;
+  }
+  const inflowByOriginByDate:  Record<string, Record<string, number>> = {};
+  const outflowByOriginByDate: Record<string, Record<string, number>> = {};
+  let prevTotal = firstTotal;
+  for (let i = 1; i < sortedSnaps.length; i++) {
+    const date = sortedSnaps[i].date;
+    const newTotal = sortedSnaps[i].by_port_lots?.[port] ?? 0;
+    const dayIn = gradsByDate[date] ?? {};
+    let totalIn = 0;
+    for (const [o, v] of Object.entries(dayIn)) {
+      state[o] = (state[o] ?? 0) + v;
+      totalIn += v;
+    }
+    if (Object.keys(dayIn).length > 0) inflowByOriginByDate[date] = { ...dayIn };
+    const totalOut = Math.max(0, prevTotal + totalIn - newTotal);
+    const stateSum = Object.values(state).reduce((a, b) => a + b, 0);
+    if (totalOut > 0 && stateSum > 0) {
+      const dayOut: Record<string, number> = {};
+      for (const [o, v] of Object.entries(state)) {
+        const out = (v / stateSum) * totalOut;
+        state[o] = Math.max(0, v - out);
+        if (out > 0) dayOut[o] = out;
+      }
+      if (Object.keys(dayOut).length > 0) outflowByOriginByDate[date] = dayOut;
+    }
+    prevTotal = newTotal;
+  }
+  return { state, inflowByOriginByDate, outflowByOriginByDate };
+}
+
 // Helper — distribute `count` squares across origins proportionally and
 // stamp each with an age bin sampled from the age distribution.
 function _allocSquares(
@@ -359,6 +466,12 @@ function buildDensityGrid(
   netGained: DensitySquare[];
   ghosts:    DensitySquare[];
   transited: DensitySquare[];
+  // Volume breakdown per origin for each bucket. Drives the small
+  // top-origin chip strip beneath each sub-grid header.
+  byOriginExisting:  Record<string, number>;
+  byOriginNetGained: Record<string, number>;
+  byOriginGhost:     Record<string, number>;
+  byOriginTransit:   Record<string, number>;
   effectivePerSquare: number;
   totalWarrants: number;
 } {
@@ -408,7 +521,14 @@ function buildDensityGrid(
   const ghosts    = _allocSquares(lostShown,      ghostByOrigin,     FRESH_ONLY, "ghost",   effectivePerSquare, market);
   const transited = _allocSquares(transitShown,   transitByOrigin,   FRESH_ONLY, "transit", effectivePerSquare, market);
 
-  return { existing, netGained, ghosts, transited, effectivePerSquare, totalWarrants };
+  return {
+    existing, netGained, ghosts, transited,
+    byOriginExisting:  existingByOrigin,
+    byOriginNetGained: netGainedByOrigin,
+    byOriginGhost:     ghostByOrigin,
+    byOriginTransit:   transitByOrigin,
+    effectivePerSquare, totalWarrants,
+  };
 }
 
 interface OriginFlow { origin: string; volume: number; color: string }
@@ -755,7 +875,6 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
       const overv = robusta?.recent_activity?.grading_overview ?? [];
       if (snaps.length === 0) return empty;
       const latest = snaps[snaps.length - 1];
-      const base = findSnapAt(snaps, cutoff) ?? snaps[0];
 
       // Origin proportion per port — prefer the full-history rollup the
       // importer attached (covers stock graded outside the daily window,
@@ -794,20 +913,6 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         }
       }
 
-      // Per-port inflow over the window (real gradings events in window).
-      const portInflowOrigin: Record<string, Record<string, number>> = {};
-      const cutTime = cutoff.getTime();
-      for (const ev of grads) {
-        if (new Date(ev.date).getTime() < cutTime) continue;
-        for (const e of (ev.entries || [])) {
-          if (e.tenderable === false) continue;
-          const port = e.port || "?";
-          const origin = e.origin?.trim() || "?";
-          portInflowOrigin[port] = portInflowOrigin[port] ?? {};
-          portInflowOrigin[port][origin] = (portInflowOrigin[port][origin] ?? 0) + (e.lots ?? 0);
-        }
-      }
-
       // Age distribution per port from the latest age_allowance month.
       const ageByPort: Record<string, AgeDist> = {};
       const ageMonths = robusta?.monthly?.age_allowance ?? [];
@@ -836,44 +941,58 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         }
       }
 
+      // Run the per-port stock simulation once for every port present in
+      // the snapshot history. Init state from port_origin_history shares,
+      // then walk every snapshot: inflows from gradings events, outflows
+      // apportioned by current state. The end state is our `cur[o]` and
+      // the per-date in/out logs feed `flowByOrigin` for any window.
+      const sims: Record<string, RobustaPortSim> = {};
+      const allPortCodes = new Set<string>();
+      for (const s of snaps) for (const p of Object.keys(s.by_port_lots || {})) allPortCodes.add(p);
+      for (const p of Array.from(allPortCodes)) {
+        sims[p] = _simulateRobustaPortStock(p, snaps, grads, portOriginLots[p] ?? {});
+      }
+
       const ports: PortFlow[] = [];
       for (const [code, current] of Object.entries(latest.by_port_lots || {})) {
         if (current <= 0) continue;
-        // byOrigin = current × normalised origin share for this port (inferred).
-        const oTotals = portOriginLots[code] ?? {};
-        const oSum = Object.values(oTotals).reduce((a, b) => a + b, 0);
+        const sim = sims[code];
+        // byOrigin = simulated per-origin stock at the latest snapshot.
+        // Normalises to `current` so rounding drift over the long walk
+        // can't desync the per-origin total from the headline lots.
         const byOrigin: Record<string, number> = {};
-        if (oSum > 0) {
-          for (const [origin, v] of Object.entries(oTotals)) {
-            byOrigin[origin] = (v / oSum) * current;
+        const stateSum = sim ? Object.values(sim.state).reduce((a, b) => a + b, 0) : 0;
+        if (sim && stateSum > 0) {
+          for (const [o, v] of Object.entries(sim.state)) {
+            if (v > 0) byOrigin[o] = (v / stateSum) * current;
           }
         } else {
           byOrigin["Unknown"] = current;
         }
-        // Inflow per origin (real lots from gradings in window).
-        const inflowByOrigin = portInflowOrigin[code] ?? {};
-        // Outflow per origin: apportion the port's net stock-out by current
-        // origin mix. (No per-origin outflow source for robusta.)
-        const basePort = base.by_port_lots?.[code] ?? 0;
-        const netDelta = current - basePort;
-        const inflowSum = Object.values(inflowByOrigin).reduce((a, b) => a + b, 0);
-        const totalOutflow = Math.max(0, inflowSum - netDelta);
-        const outflowByOrigin: Record<string, number> = {};
-        if (totalOutflow > 0 && oSum > 0) {
-          for (const [origin, v] of Object.entries(oTotals)) {
-            outflowByOrigin[origin] = (v / oSum) * totalOutflow;
+        // Window-scoped gross flows per origin from the simulation logs.
+        const flowByOrigin: Record<string, OriginFlowPair> = {};
+        if (sim) {
+          const cutT = cutoff.getTime();
+          for (const [date, byO] of Object.entries(sim.inflowByOriginByDate)) {
+            if (new Date(date).getTime() < cutT) continue;
+            for (const [o, v] of Object.entries(byO)) {
+              flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
+              flowByOrigin[o].gross_in += v;
+            }
+          }
+          for (const [date, byO] of Object.entries(sim.outflowByOriginByDate)) {
+            if (new Date(date).getTime() < cutT) continue;
+            for (const [o, v] of Object.entries(byO)) {
+              flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
+              flowByOrigin[o].gross_out += v;
+            }
           }
         }
-        const allOrigins = new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]);
-        const flowByOrigin: Record<string, OriginFlowPair> = {};
-        const inflow: OriginFlow[] = [];
+        const inflow:  OriginFlow[] = [];
         const outflow: OriginFlow[] = [];
-        for (const origin of Array.from(allOrigins)) {
-          const i = inflowByOrigin[origin] ?? 0;
-          const o = outflowByOrigin[origin] ?? 0;
-          if (i > 0 || o > 0) flowByOrigin[origin] = { gross_in: i, gross_out: o };
-          if (i > 0) inflow.push({ origin, volume: i, color: _originColor(origin, "RC") });
-          if (o > 0) outflow.push({ origin, volume: o, color: _originColor(origin, "RC") });
+        for (const [origin, f] of Object.entries(flowByOrigin)) {
+          if (f.gross_in  > 0) inflow.push({  origin, volume: f.gross_in,  color: _originColor(origin, "RC") });
+          if (f.gross_out > 0) outflow.push({ origin, volume: f.gross_out, color: _originColor(origin, "RC") });
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
@@ -1167,12 +1286,28 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           ) : (
             <div className="flex items-start gap-1.5 w-full">
               {mkt.ports.slice(0, 8).map((p) => {
-                const { existing, netGained, ghosts, transited, effectivePerSquare, totalWarrants } =
-                  buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market);
+                const {
+                  existing, netGained, ghosts, transited,
+                  byOriginExisting, byOriginNetGained, byOriginGhost, byOriginTransit,
+                  effectivePerSquare, totalWarrants,
+                } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market);
                 const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                 const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                 const topInflow  = p.inflow.slice(0, 2);
                 const topOutflow = p.outflow.slice(0, 2);
+                // Top-2 origins per bucket — drives the small chip strip
+                // beneath each sub-grid header so the user sees the
+                // origin mix at a glance.
+                const top2 = (m: Record<string, number>) =>
+                  Object.entries(m)
+                    .filter(([, v]) => v > 0)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 2)
+                    .map(([origin, volume]) => ({ origin, volume, color: _originColor(origin, p.market) }));
+                const topExisting  = top2(byOriginExisting);
+                const topNetGained = top2(byOriginNetGained);
+                const topGhost     = top2(byOriginGhost);
+                const topTransit   = top2(byOriginTransit);
                 // Label that explains the per-square scale. If
                 // effectivePerSquare > 1 the port exceeded the cap and
                 // each square is now ≈N warrants instead of 1 exactly.
@@ -1269,6 +1404,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                     </div>
 
                     {/* Density grid — existing portion (= current − net-gained). */}
+                    {topExisting.length > 0 && (
+                      <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
+                        <span className="text-slate-500 uppercase tracking-wider">Existing top:</span>
+                        {topExisting.map((b) => (
+                          <span key={b.origin} className="flex items-center text-slate-300">
+                            <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                            {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     <div className="relative">
                       <div
                         className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
@@ -1305,6 +1451,16 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Net gained</span>
                           <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGained.length * effectivePerSquare * p.squareUnit))}</span>
                         </div>
+                        {topNetGained.length > 0 && (
+                          <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
+                            {topNetGained.map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300">
+                                <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
                           {netGained.map((sq, i) => {
                             const idx = existing.length + i;
@@ -1337,6 +1493,16 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
                           <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(ghosts.length * effectivePerSquare * p.squareUnit))}</span>
                         </div>
+                        {topGhost.length > 0 && (
+                          <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
+                            {topGhost.map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300">
+                                <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
                           {ghosts.map((sq, i) => {
                             const idx = existing.length + netGained.length + i;
@@ -1370,6 +1536,16 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           <span className="text-[8px] uppercase tracking-wider text-amber-400 font-bold">In & out</span>
                           <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transited.length * effectivePerSquare * p.squareUnit))}</span>
                         </div>
+                        {topTransit.length > 0 && (
+                          <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
+                            {topTransit.map((b) => (
+                              <span key={b.origin} className="flex items-center text-slate-300">
+                                <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
+                                {b.origin.slice(0, 6)}:{fmtNum(b.volume)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
                           {transited.map((sq, i) => {
                             const idx = existing.length + netGained.length + ghosts.length + i;
