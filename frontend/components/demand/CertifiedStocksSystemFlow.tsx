@@ -11,7 +11,7 @@
  * verified. Consumes the same JSON shape the panel already loads — pass
  * arabica + robusta JSON in as props.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // ── Local data shapes (a subset of the rich panel types) ─────────────────────
 
@@ -530,6 +530,21 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
     origin: string; ageBin: AgeBin; bagsOrLots: number; unit: "bags" | "lots";
     isNew: boolean; isGhost: boolean;
   } | null>(null);
+
+  // Inject the flowing-dash keyframes once, the same way the map's
+  // logistics routes get their animation. Lives in document.head so it
+  // survives re-renders and doesn't compound when this component re-mounts.
+  useEffect(() => {
+    if (document.getElementById("cs-flow-anim")) return;
+    const s = document.createElement("style");
+    s.id = "cs-flow-anim";
+    s.textContent = `
+      @keyframes csFlowDash { to { stroke-dashoffset: -10; } }
+      .cs-flow      { stroke-dasharray: 2.4 1.4; animation: csFlowDash 1.6s linear infinite; }
+      .cs-flow-slow { stroke-dasharray: 3.2 1.8; animation: csFlowDash 2.2s linear infinite; }
+    `;
+    document.head.appendChild(s);
+  }, []);
 
   //   • flowByOrigin (gross_in / gross_out) per origin over the window,
   //     used to derive the existing / net-gained / lost / transited squares
@@ -1071,9 +1086,12 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
             </div>
           )}
 
-          {/* Branch connector — arrows only where the window saw inflow.
-              Card positions are computed from the actual flex layout
-              (each card's flex grow = its span, total = sum of spans). */}
+          {/* Branch connector — animated flow lines, mirroring the map's
+              logistics route style. Per-port verticals only render where
+              the window saw inflow; the manifold extends to include the
+              intake trunk so vertical drops always meet the horizontal
+              rail. Stroke renders at constant pixel width via
+              vector-effect, so the SVG can stretch with the row. */}
           {mkt.ports.length > 0 && (() => {
             const visible = mkt.ports.slice(0, 8);
             const totalSpan = visible.reduce((sum, p) => sum + p.span, 0);
@@ -1089,23 +1107,56 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
               .filter(({ p }) => p.inflow.reduce((s, b) => s + b.volume, 0) > 0)
               .map(({ x }) => x);
             if (arrowXs.length === 0) return null;
-            // Manifold extends to include the intake trunk (x=50) so the
-            // vertical drop always reaches the horizontal connector.
             const leftX  = Math.min(...arrowXs, 50);
             const rightX = Math.max(...arrowXs, 50);
+            const markerId = `cs-arr-${mkt.market.toLowerCase()}`;
+            const stroke   = "#10b981";
+            const trunkY   = 4.4;          // bottom of the top trunk
+            const railY    = 5;            // horizontal rail height
+            const dropEndY = 13.2;         // bottom of the drop, before arrowhead
+            const r        = 0.6;          // corner radius at trunk → rail
+            // Combine trunk + horizontal rail into a single path so the
+            // animated dash flows continuously across the bend.
+            let railPath = `M50,0 V${trunkY - r}`;
+            railPath += ` Q50,${railY} ${leftX < 50 ? "50" : "50"},${railY}`;
+            if (leftX !== rightX) railPath += ` M${leftX},${railY} H${rightX}`;
             return (
-              <svg viewBox="0 0 100 16" preserveAspectRatio="none" className="w-full h-10 my-1" aria-hidden>
-                <line x1="50" y1="0" x2="50" y2="5" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                {leftX !== rightX && (
-                  <line x1={leftX} y1="5" x2={rightX} y2="5"
-                        stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                )}
-                {arrowXs.map((x, i) => (
-                  <g key={i}>
-                    <line x1={x} y1="5" x2={x} y2="14" stroke="#10b981" strokeWidth="0.4" strokeOpacity="0.7" />
-                    <polygon points={`${x - 0.9},14 ${x + 0.9},14 ${x},15.5`} fill="#10b981" fillOpacity="0.85" />
-                  </g>
-                ))}
+              <svg viewBox="0 0 100 16" preserveAspectRatio="none"
+                   className="w-full h-12 my-1 overflow-visible" aria-hidden>
+                <defs>
+                  {/* Chevron arrowhead — open-V shape, less PowerPoint than
+                      the old filled triangle. */}
+                  <marker id={markerId} viewBox="0 0 10 10"
+                          refX="6" refY="5" markerWidth="3.8" markerHeight="3.8"
+                          orient="auto">
+                    <path d="M1,1 L7,5 L1,9" fill="none" stroke={stroke}
+                          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </marker>
+                  {/* Soft glow so the flowing line has a hint of depth. */}
+                  <filter id={`${markerId}-glow`} x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="0.45" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <g filter={`url(#${markerId}-glow)`}>
+                  {/* Trunk + horizontal rail */}
+                  <path d={railPath} fill="none" stroke={stroke} strokeOpacity="0.9"
+                        strokeWidth="2" strokeLinecap="round"
+                        vectorEffect="non-scaling-stroke"
+                        className="cs-flow-slow" />
+                  {/* Per-port drops with chevron arrowheads */}
+                  {arrowXs.map((x, i) => (
+                    <line key={i} x1={x} y1={railY} x2={x} y2={dropEndY}
+                          stroke={stroke} strokeOpacity="0.9"
+                          strokeWidth="2" strokeLinecap="round"
+                          vectorEffect="non-scaling-stroke"
+                          markerEnd={`url(#${markerId})`}
+                          className="cs-flow" />
+                  ))}
+                </g>
               </svg>
             );
           })()}
