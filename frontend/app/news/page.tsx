@@ -13,6 +13,7 @@
 import PageHeader from "@/components/PageHeader";
 import FreshnessGrid from "@/components/news/FreshnessGrid";
 import UpcomingCalendar from "@/components/news/UpcomingCalendar";
+import RiskRadar from "@/components/news/RiskRadar";
 import HeadlinesDigest from "@/components/news/HeadlinesDigest";
 
 export default function NewsPage() {
@@ -25,6 +26,7 @@ export default function NewsPage() {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <FreshnessGrid />
         <UpcomingCalendar />
+        <RiskRadar />
         <HeadlinesDigest />
       </div>
     </div>
