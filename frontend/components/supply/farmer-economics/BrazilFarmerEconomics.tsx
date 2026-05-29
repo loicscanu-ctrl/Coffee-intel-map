@@ -3,12 +3,10 @@ import { useState, useEffect } from "react";
 import type { FarmerEconomicsData } from "./farmerEconomicsData";
 import ProductionCostPanel from "./ProductionCostPanel";
 import AcreageYieldPanel   from "./AcreageYieldPanel";
-import EnsoPanel           from "./EnsoPanel";
 import FertilizerPanel     from "./FertilizerPanel";
 import ManualIntelPanel    from "../ManualIntelPanel";
 import BalanceSheetPanel   from "./BalanceSheetPanel";
 import FarmerSellingPanel  from "./FarmerSellingPanel";
-import WeatherRiskPanel    from "./WeatherRiskPanel";
 
 export default function BrazilFarmerEconomics() {
   const [data, setData] = useState<FarmerEconomicsData | null>(null);
@@ -68,13 +66,15 @@ export default function BrazilFarmerEconomics() {
 
         {/* Right */}
         <div className="space-y-4">
-          {data.enso       && <EnsoPanel enso={data.enso} />}
           <ManualIntelPanel />
         </div>
       </div>
 
-      {/* ── Weather Risk: frost + drought monitor (full width) ──── */}
-      {data.weather && <WeatherRiskPanel weather={data.weather} />}
+      {/* ENSO and Frost-risk panels moved to /supply/Brazil → Weather tab.
+          The data still flows through farmer_economics.json; the weather
+          tab fetches it directly and embeds EnsoPanel + WeatherRiskPanel
+          there. Centralises "what's happening with the weather" in one
+          place. */}
     </div>
   );
 }

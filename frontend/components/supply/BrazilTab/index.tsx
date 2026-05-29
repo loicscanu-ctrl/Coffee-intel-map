@@ -122,7 +122,13 @@ export default function BrazilTab() {
 
       {subTab === "supply-demand" && <SupplyDemandBalance origin="brazil" label="Brazil" />}
 
-      {subTab === "weather" && <WeatherCharts dataUrl="/data/brazil_weather.json" title="Weather · Brazil" />}
+      {subTab === "weather" && (
+        <WeatherCharts
+          dataUrl="/data/brazil_weather.json"
+          title="Weather · Brazil"
+          farmerEconomicsUrl="/data/farmer_economics.json"
+        />
+      )}
 
       {subTab === "exports" && (
         <>

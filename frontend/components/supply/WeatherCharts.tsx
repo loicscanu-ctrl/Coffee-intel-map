@@ -5,6 +5,13 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import EnsoPanel from "./farmer-economics/EnsoPanel";
+import WeatherRiskPanel from "./farmer-economics/WeatherRiskPanel";
+import type { FarmerEconomicsData } from "./farmer-economics/farmerEconomicsData";
+
+// Subset of FarmerEconomicsData this view actually consumes — keeps the
+// fetch loosely typed so future fields on that JSON don't trip us up.
+type FarmerEconomicsLite = Pick<FarmerEconomicsData, "enso" | "weather">;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -468,16 +475,22 @@ function SoilMoistureChart({ data }: { data: SoilRow[] }) {
 export default function WeatherCharts({
   dataUrl,
   title,
+  farmerEconomicsUrl,
 }: {
   /** Path under /public, e.g. "/data/brazil_weather.json". */
   dataUrl: string;
   /** Header label, e.g. "Weather · Brazil". */
   title: string;
+  /** Optional farmer-economics JSON that also carries the country's ENSO
+   *  context + 14-day frost risk grid. When provided, the weather tab
+   *  renders the EnsoPanel and WeatherRiskPanel at the bottom. */
+  farmerEconomicsUrl?: string;
 }) {
   const [data, setData] = useState<WeatherData | null>(null);
   const [selected, setSelected] = useState<Set<string> | null>(null);
   const [selectedYear, setSelectedYear]   = useState<number>(new Date().getFullYear());
   const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(new Date().getMonth());
+  const [econ, setEcon] = useState<FarmerEconomicsLite | null>(null);
 
   useEffect(() => {
     fetch(dataUrl)
@@ -493,6 +506,14 @@ export default function WeatherCharts({
       })
       .catch((err) => console.error(`[WeatherCharts] ${dataUrl} fetch failed:`, err));
   }, [dataUrl]);
+
+  useEffect(() => {
+    if (!farmerEconomicsUrl) return;
+    fetch(farmerEconomicsUrl)
+      .then((r) => r.json())
+      .then(setEcon)
+      .catch((err) => console.error(`[WeatherCharts] ${farmerEconomicsUrl} fetch failed:`, err));
+  }, [farmerEconomicsUrl]);
 
   function toggleProvince(name: string) {
     setSelected((prev) => {
@@ -833,6 +854,17 @@ export default function WeatherCharts({
 
       {/* Full-width forecast */}
       <ForecastRainChart data={forecastData} />
+
+      {/* ENSO context + 14-day frost risk grid — moved here from
+          farmer-economics so weather lives in one place. Both render
+          only when the farmer-economics JSON is loaded and carries
+          the relevant fields. */}
+      {econ?.enso && (
+        <EnsoPanel enso={econ.enso} />
+      )}
+      {econ?.weather && (
+        <WeatherRiskPanel weather={econ.weather} />
+      )}
 
       <div className="text-[8px] text-slate-700 italic border-t border-slate-700 pt-2">
         Production weights: {data.source_production} ·
