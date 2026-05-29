@@ -54,16 +54,23 @@ RETRY_AFTER_GIVE_UP_S = 600    # if Akamai asks > this, abort the rest of the ru
 _RATE_STATE: dict[str, int] = {"consecutive_429s": 0, "aborted": 0}
 
 # Stock_report.csv's HHMMSS publish time varies daily. Strategy is tiered:
-#   Tier 1 — try the 5 most-frequent HHMMSS values from past successful
-#            captures (loaded from STOCK_REPORT_HITS_PATH). Cheap: ≤5 GETs.
+#   Tier 1 — try the K most-frequent HHMMSS values from past successful
+#            captures (loaded from STOCK_REPORT_HITS_PATH). Cheap: ≤K GETs.
 #   Tier 2 — if Tier 1 misses, sweep every second of the published
-#            10:30:00 → 10:31:59 window (120 GETs at 5 s throttle = 10 min
-#            worst case). Skipped during multi-day backfills (`sweep=False`).
+#            10:30:00 → 11:15:59 window. ICE has been observed publishing as
+#            late as 11:12:30, so the 10:30–10:31 window we used before
+#            now silently misses ~once a month. 46 min × 60 s = 2760 GETs;
+#            at 5 s/req that's ~3.8 h WCB on a full miss, but in practice
+#            Tier 1 catches almost every day, so the sweep rarely runs.
+#            Skipped during multi-day backfills (`sweep=False`).
 # Every successful capture is appended to the hits file so the Tier 1
 # ordering self-tunes over time.
 STOCK_REPORT_HITS_PATH = Path(__file__).with_name("stock_report_hits.json")
-STOCK_REPORT_SWEEP_HHMM = ((10, 30), (10, 31))
-STOCK_REPORT_TIER1_K = 5
+# Inclusive minute range to sweep: [10:30 … 11:15] = 46 minutes.
+STOCK_REPORT_SWEEP_RANGE = ((10, 30), (11, 15))
+# K = 10 (was 5) — wider Tier 1 keeps the cheap path covering more days as
+# the publish window expands; only matters once the hits log fills out.
+STOCK_REPORT_TIER1_K = 10
 
 def _load_stock_report_hits() -> list[dict]:
     if not STOCK_REPORT_HITS_PATH.exists():
@@ -94,9 +101,13 @@ def _stock_report_tier1_times() -> tuple[str, ...]:
     return ("103021", "103126", "103045")
 
 def _stock_report_sweep_times() -> list[str]:
-    """Every HH:MM:SS in the 10:30:00 → 10:31:59 publish window."""
+    """Every HH:MM:SS in the configured publish window (inclusive)."""
+    (start_hh, start_mm), (end_hh, end_mm) = STOCK_REPORT_SWEEP_RANGE
     out: list[str] = []
-    for hh, mm in STOCK_REPORT_SWEEP_HHMM:
+    start = start_hh * 60 + start_mm
+    end   = end_hh   * 60 + end_mm
+    for total in range(start, end + 1):
+        hh, mm = divmod(total, 60)
         for ss in range(60):
             out.append(f"{hh:02d}{mm:02d}{ss:02d}")
     return out
