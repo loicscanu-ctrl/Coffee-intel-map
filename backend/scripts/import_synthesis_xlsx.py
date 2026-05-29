@@ -33,6 +33,12 @@ import openpyxl
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scraper.sources.ice_arabica_groups import group_of
+from scraper.sources.ice_certified_stocks.cohort_outflow import (
+    build_cohort_dna,
+    build_current_by_origin,
+    build_implied_outflow,
+    build_port_alltime_dna,
+)
 from scraper.sources.ice_certified_stocks.orchestrate import (
     _merge_arabica, _merge_robusta, OUT_DIR,
 )
@@ -325,6 +331,35 @@ def parse_sheet_2_port_origin_history(sheet) -> dict:
     plain = {p: {o: dict(d) for o, d in by_o.items()} for p, by_o in out.items()}
     print(f"    sheet 2_ld_gradings (full history): {n} tenderable rows → "
           f"{len(plain)} ports × {sum(len(v) for v in plain.values())} origin pairs.")
+    return plain
+
+
+def parse_sheet_2_per_month_origin(sheet) -> dict:
+    """Walk the FULL sheet 2 history and bucket tenderable lots by cohort.
+
+    Output shape: {port: {"YYYY-MM": {origin: lots}}}
+    Drives the cohort-DNA implied-outflow pipeline (see
+    backend.scraper.sources.ice_certified_stocks.cohort_outflow).
+    Only tenderable lots count — non-tender never enters the certified pool.
+    """
+    out: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(int))
+    )
+    n = 0
+    for d, r in _bucket_by_date(sheet):
+        port = _str(r[1])
+        if not port or _is_aggregate_port(port): continue
+        origin = _str(r[4]).strip()
+        if not origin: continue
+        tenderable = _str(r[6]).upper() == "Y"
+        lots = _int(r[7])
+        if lots <= 0 or not tenderable: continue
+        cohort = f"{d.year:04d}-{d.month:02d}"
+        out[port][cohort][origin] += lots
+        n += 1
+    plain = {p: {c: dict(o) for c, o in by_c.items()} for p, by_c in out.items()}
+    print(f"    sheet 2_ld_gradings per-month: {n} rows → {len(plain)} ports × "
+          f"{sum(len(v) for v in plain.values())} (port, cohort) cells.")
     return plain
 
 
@@ -698,6 +733,9 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
     # standing-stock inference for ports with old stock outside the daily
     # gradings window (e.g. Felixstowe).
     r_port_origin_history = parse_sheet_2_port_origin_history(wb["2_ld_gradings"])
+    # Full-history per-(port, cohort_month, origin) tenderable lots — drives
+    # the cohort-DNA implied-outflow pipeline below.
+    r_gradings_per_month = parse_sheet_2_per_month_origin(wb["2_ld_gradings"])
 
     print("\n=== composing arabica JSON ===")
     a_snaps, a_latest_detail, a_latest_date = build_arabica_snapshots(
@@ -715,6 +753,33 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
     r_tenders_list    = [{"date": d.isoformat(), **v} for d, v in sorted(r_tenders.items())]
     r_overview_list   = [{"date": d.isoformat(), **v} for d, v in sorted(r_overview.items())]
     r_age_allow_list  = [{"month_end": me.isoformat(), **v} for me, v in sorted(r_age_allow.items(), reverse=True)]
+
+    # ── Cohort-DNA implied-outflow pipeline ─────────────────────────────────
+    # Per-port per-cohort origin split from the full gradings history, then
+    # walk consecutive ageing reports to deduce per-(port, origin) outflow.
+    # The frontend uses these for the Robusta system flow's per-origin
+    # buckets (existing / net gained / lost / in & out).
+    r_cohort_dna = build_cohort_dna(r_gradings_per_month)
+    r_port_alltime_dna = build_port_alltime_dna(r_port_origin_history)
+    # Implied outflow needs ageing reports in chronological order (oldest
+    # first); r_age_allow_list is currently sorted newest-first for the
+    # frontend table, so flip it for the algorithm.
+    r_implied_outflow = build_implied_outflow(
+        list(reversed(r_age_allow_list)),
+        r_cohort_dna,
+        r_port_alltime_dna,
+        r_gradings_per_month,
+    )
+    # Current per-origin breakdown from the *latest* ageing report — drives
+    # the "existing" bucket in the system flow.
+    r_latest_age_report = list(reversed(r_age_allow_list))[-1] if r_age_allow_list else None
+    r_current_by_origin = build_current_by_origin(
+        r_latest_age_report, r_cohort_dna, r_port_alltime_dna, r_gradings_per_month,
+    ) if r_latest_age_report else {}
+    print(f"    cohort DNA: {len(r_cohort_dna)} ports × "
+          f"{sum(len(v) for v in r_cohort_dna.values())} (port, cohort) cells.")
+    print(f"    implied outflow: {len(r_implied_outflow)} month transitions.")
+    print(f"    current_by_origin: {len(r_current_by_origin)} ports.")
 
     now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
     arabica_json = {
@@ -742,6 +807,14 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
         "monthly": {
             "iss_recv_monthly": [],            # not split in this workbook (daily has it)
             "age_allowance":    r_age_allow_list,
+            # Cohort-DNA outputs — see backend/scraper/sources/ice_certified_stocks/cohort_outflow.py.
+            # implied_outflow[month_end][port][origin] = lots inferred to have left
+            # during that calendar month, apportioned by each cohort's own DNA.
+            "implied_outflow":  r_implied_outflow,
+            # current_by_origin[port][origin] = lots from the *latest* ageing
+            # report, apportioned by per-cohort DNA. This is the rigorous
+            # per-origin stock breakdown for the current ageing snapshot.
+            "current_by_origin": r_current_by_origin,
         },
         # Full-history (workbook back to ~Nov 2023) port × origin × class
         # rollup — lets the panel attribute origins for old standing stock
