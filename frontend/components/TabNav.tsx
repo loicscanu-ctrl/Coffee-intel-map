@@ -3,15 +3,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
+  { href: "/news",    label: "News" },
   { href: "/futures", label: "Futures Exchange" },
   { href: "/cot",     label: "COT" },
   { href: "/freight", label: "Freight" },
-  { href: "/supply", label: "Supply" },
-  { href: "/demand", label: "Demand" },
-  { href: "/macro", label: "Macro" },
-  { href: "/map", label: "News & Intel" },
-  { href: "/data-map", label: "Data Map" },
-  { href: "/research", label: "Research" },
+  { href: "/supply",  label: "Supply" },
+  { href: "/demand",  label: "Demand" },
+  { href: "/macro",   label: "Macro" },
+  { href: "/map",     label: "Map" },
+  { href: "/data-map",label: "Data Map" },
+  { href: "/research",label: "Research" },
 ];
 
 export default function TabNav() {
