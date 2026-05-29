@@ -37,7 +37,7 @@ function AgronomyCard({ kicker, title, briefing, children }: {
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl">
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
       <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">
         {kicker}
       </div>
@@ -1335,7 +1335,7 @@ function Article5() {
 
 export default function AgronomyArticles() {
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
       <Article1 />
       <Article2 />
       <Article3 />

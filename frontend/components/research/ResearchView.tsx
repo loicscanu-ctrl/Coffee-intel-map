@@ -438,9 +438,9 @@ function CostTable({ children }: { children: React.ReactNode }) {
 
 function OriginLogistics() {
   return (
-    <div className="space-y-5 max-w-4xl">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
         <H>What is a FOBbing cost?</H>
         <P>
           The physical prices on the ticker — VN FAQ, CON T7, UGA S15 — are quoted at the <strong>origin
@@ -575,7 +575,7 @@ function OriginLogistics() {
       </div>
 
       {/* Summary comparison */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
         <H>Cross-origin comparison</H>
         <table className="w-full text-xs mt-2">
           <thead>
