@@ -73,9 +73,9 @@ async function fetchAcaphe(): Promise<AcapheData | null> {
 // Farmgate-to-FOB cost per origin (USD/tonne). Added to physical price before
 // computing the N±diff so all tickers are comparable at port/exchange parity.
 const FOB_COST_USD: Record<string, number> = {
-  "VN FAQ":  70,   // Vietnam: logistics only (trucking, port, admin, financing)
-  "CON T7": 300,   // Brazil Conilon: logistics + quality-upgrade to Class 1
-  "UGA S15": 200,  // Uganda: Northern Corridor road transit + UCDA cess
+  "VN FAQ":  100,  // Vietnam: ~$65 logistics + ~$35 exporter margin (1% of ~$3,500)
+  "CON T7":  200,  // Brazil Conilon: logistics + quality-upgrade to Class 1
+  "UGA S15": 265,  // Uganda: ~$228 logistics (incl. Northern Corridor) + ~$37 exporter margin (1% of ~$3,700)
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
