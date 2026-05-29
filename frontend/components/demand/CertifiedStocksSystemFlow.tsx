@@ -282,9 +282,15 @@ interface DensitySquare {
 //   • transit   = min(gross_in, gross_out)      (arrived AND left within window)
 interface OriginFlowPair { gross_in: number; gross_out: number }
 
-// Number of grid columns per warehouse card, derived from `p.span` (1..4).
-// Deterministic so the cols × rows label is always honest.
-const COLS_PER_SPAN: Record<1 | 2 | 3 | 4, number> = { 1: 4, 2: 8, 3: 11, 4: 14 };
+// Per-card grid sizing. We target a square-ish layout (cols ≈ √squares)
+// so a port like Antwerp at ~1060 warrants reads as ~32 × 33 instead of
+// stretching to a narrow tall ribbon. cols is clamped to [4, 36] so tiny
+// ports still get a chunky grid and giants don't blow past a sensible
+// width. All four sub-grids in a card share the same cols count.
+const _gridCols = (squares: number) => {
+  if (squares <= 0) return 4;
+  return Math.max(4, Math.min(36, Math.round(Math.sqrt(squares))));
+};
 const _rowsForCount = (n: number, cols: number) => (n <= 0 ? 0 : Math.ceil(n / cols));
 
 // Helper — distribute `count` squares across origins proportionally and
@@ -1122,11 +1128,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 const sqLabel = effectivePerSquare === 1
                   ? "1 ◻ = 1 warrant"
                   : `1 ◻ ≈ ${effectivePerSquare.toFixed(1)} warrants`;
-                // Deterministic grid width — same cols count for every
-                // sub-grid in the card so the user can read "cols × rows"
-                // off the border and multiply for the warrant count.
-                const cols = COLS_PER_SPAN[p.span];
-                const colsTemplate = `repeat(${cols}, 13px)`;
+                // Per-card grid: cols ≈ √(existing + net-gained) so the
+                // grid is square-ish and fills the card width. All four
+                // sub-grids share the same cols so the user can read
+                // "cols × rows" off the border and multiply for the warrant
+                // count. minmax(0, 1fr) lets squares expand to fill the
+                // card — no empty space on the right.
+                const cols = _gridCols(existing.length + netGained.length);
+                const colsTemplate = `repeat(${cols}, minmax(0, 1fr))`;
                 const dimLabel = (n: number) => {
                   const r = _rowsForCount(n, cols);
                   return r === 0 ? "" : `${cols}×${r}`;
