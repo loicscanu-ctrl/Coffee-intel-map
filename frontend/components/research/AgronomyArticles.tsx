@@ -1133,15 +1133,199 @@ function Article5() {
         and apply the same MAP-first conversion to get the carrier quantities for any yield target.
       </P>
 
+      <H>Fertilizer SnD: who controls supply by carrier</H>
+      <div className="overflow-x-auto mt-2 mb-3">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4 w-16">Carrier</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Key exporters</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Benchmark price</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5">Primary swing factor</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-2 pr-4 text-green-300 font-medium">Urea</td>
+              <td className="py-2 pr-4 text-slate-300">China (≈30% world), Russia, Saudi Arabia, Qatar, Egypt</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">FOB Yuzhny (Black Sea)<br/>FOB Arab Gulf</td>
+              <td className="py-2 text-slate-300">
+                Chinese export quotas (announced quarterly); European gas prices drive Middle East cost floor.
+                India tenders signal global price floor 3–4×/year.
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4 text-sky-300 font-medium">MAP</td>
+              <td className="py-2 pr-4 text-slate-300">Morocco OCP (~35% exports), Saudi MFIL, Russia, China</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">FOB Jorf Lasfar<br/>FOB Tampa (US)</td>
+              <td className="py-2 text-slate-300">
+                OCP holds ~70% of world economically viable phosphate rock reserves.
+                Annual OCP–India contract sets reference price for Asian MAP.
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4 text-orange-300 font-medium">KCl</td>
+              <td className="py-2 pr-4 text-slate-300">Canada (Nutrien, Mosaic ≈35%), Russia (Uralkali), Belarus (Belaruskali)</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">CFR Brazil<br/>CFR SE Asia</td>
+              <td className="py-2 text-slate-300">
+                Belarus + Russia = ~40% pre-2022 global exports. Sanctions removed
+                them abruptly; Canadian capacity absorbed partially over 18 months.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <H>Origin-to-farm pipeline: how fast does a price shock reach Vietnam?</H>
+      <P>
+        A price move at origin must traverse multiple stages before changing what a
+        farmer pays at the field gate. The total lag from FOB price spike to application
+        rate change is <strong>6–14 weeks</strong>. The lag from application rate change
+        to crop supply effect is a further <strong>6–9 months</strong>.
+      </P>
+
+      {/* Pipeline SVG */}
+      <div className="mt-3 mb-3">
+        <svg viewBox="0 0 600 130" className="w-full rounded overflow-hidden">
+          <rect width="600" height="130" fill="#0f172a" />
+          {/* Stage boxes */}
+          {[
+            { x: 10,  w: 70,  label: "Price spike",    sub: "FOB benchmark",   color: "#f59e0b" },
+            { x: 100, w: 70,  label: "Production",     sub: "0–2 wks",         color: "#64748b" },
+            { x: 190, w: 70,  label: "Ocean sailing",  sub: "15–35 days",      color: "#3b82f6" },
+            { x: 280, w: 70,  label: "VN port",        sub: "1–2 wks customs", color: "#64748b" },
+            { x: 370, w: 70,  label: "Distributor",    sub: "2–3 wks",         color: "#64748b" },
+            { x: 460, w: 70,  label: "Farm stock",     sub: "0–4 wks buffer",  color: "#64748b" },
+            { x: 540, w: 52,  label: "Applied",        sub: "seasonal lock-in",color: "#22c55e" },
+          ].map(({ x, w, label, sub, color }) => (
+            <g key={x}>
+              <rect x={x} y={28} width={w} height={34} rx={3} fill="#1e293b" stroke={color} strokeWidth={1} />
+              <text x={x + w/2} y={42} textAnchor="middle" fontSize={8}   fill={color} fontWeight="600">{label}</text>
+              <text x={x + w/2} y={54} textAnchor="middle" fontSize={6.5} fill="#64748b">{sub}</text>
+            </g>
+          ))}
+          {/* Arrows between boxes */}
+          {[90, 180, 270, 360, 450, 540].map((ax) => (
+            <text key={ax} x={ax + 5} y={49} fontSize={10} fill="#475569">›</text>
+          ))}
+          {/* Total lag label */}
+          <line x1={10} y1={76} x2={592} y2={76} stroke="#334155" strokeWidth={1} strokeDasharray="3 2" />
+          <text x={300} y={89} textAnchor="middle" fontSize={8} fill="#94a3b8">≈ 6–14 weeks: price shock → farm application</text>
+          {/* Crop effect arrow */}
+          <line x1={565} y1={62} x2={565} y2={100} stroke="#22c55e" strokeWidth={1} strokeDasharray="3 2" />
+          <text x={565} y={110} textAnchor="middle" fontSize={7} fill="#22c55e">+6–9 months</text>
+          <text x={565} y={120} textAnchor="middle" fontSize={7} fill="#22c55e">→ harvest effect</text>
+          {/* Route duration notes */}
+          <text x={225} y={18} textAnchor="middle" fontSize={6.5} fill="#3b82f6">Arab Gulf→VN: 15–18d · Morocco→VN: 25–28d · Canada→VN: 18–22d</text>
+        </svg>
+      </div>
+
+      <H>Vietnam procurement calendar — when price signals matter</H>
+      <div className="overflow-x-auto mt-2 mb-3">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Window</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Months</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Application</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5">Procurement locked by</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-1.5 pr-4 text-amber-300">Dry S2</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">Feb–Mar</td>
+              <td className="py-1.5 pr-4">200 kg/ha — floral trigger</td>
+              <td className="py-1.5">Nov–Dec orders; Oct price signal is last open window</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S1</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">May</td>
+              <td className="py-1.5 pr-4">500 kg/ha — largest dose, fruit set</td>
+              <td className="py-1.5">Feb–Mar imports arrive; Jan price signal is last open window</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S2</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">July</td>
+              <td className="py-1.5 pr-4">400 kg/ha — bean expansion</td>
+              <td className="py-1.5">Apr–May procurement; Mar–Apr price signal relevant</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S3</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">September</td>
+              <td className="py-1.5 pr-4">500 kg/ha — maturation flush</td>
+              <td className="py-1.5">Jun–Jul procurement; Jun price signal is last open window</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <H>Key metrics traders monitor</H>
+      <ul className="space-y-1.5 mb-3">
+        <LI>
+          <strong className="text-green-400">India Urea tender price (FIST/RCF)</strong> — India is the world&rsquo;s
+          largest Urea importer. Government tenders run 3–4×/year and set the effective price
+          floor for Asian Urea. A successful tender below $280/t usually signals global oversupply;
+          above $350/t signals tightness.
+        </LI>
+        <LI>
+          <strong className="text-green-400">China Urea export policy</strong> — China announces export
+          quotas (or restrictions) seasonally. Restrictions in Q4 2021 and Q3 2023 each drove
+          a 40–60% global price spike within 6 weeks. Spring lifting of quotas is a predictable
+          relief valve.
+        </LI>
+        <LI>
+          <strong className="text-sky-400">OCP–India annual MAP contract</strong> — Morocco&rsquo;s
+          OCP and India&rsquo;s importers negotiate a reference price each spring. This price anchors
+          MAP spot markets across Asia for the following 12 months.
+        </LI>
+        <LI>
+          <strong className="text-orange-400">Belarusian potash export volumes</strong> — Post-2022
+          sanctions, Belarus routes potash via Russian ports and China, partially restoring volumes.
+          Monitoring Kaliningrad/Ust-Luga rail + ship data reveals actual Belarus supply reaching
+          the market vs. the official "sanctioned" picture.
+        </LI>
+        <LI>
+          <strong className="text-slate-300">Fertilizer-to-coffee price ratio</strong> — When the
+          total fertilizer bill exceeds ~15% of expected green bean revenue, smallholders begin
+          skipping applications. At current prices (~$305/t fertilizer cost vs ~$2,500/t FOB
+          Robusta), the ratio is ~12% — below the stress threshold but rising since 2023.
+        </LI>
+      </ul>
+
       <div className="bg-slate-800/50 border border-amber-500/20 rounded-lg p-3 mt-2">
-        <p className="text-[11px] text-amber-400/80 font-semibold mb-1">Trader take-away</p>
-        <p className="text-[11px] text-slate-300 leading-relaxed">
-          Urea price shocks (gas-driven, Black Sea / Arab Gulf benchmark) flow directly into
-          Vietnam fertilizer costs — Urea is the largest-volume carrier. Phosphate rock
-          tightening (Morocco OCP-driven) propagates into MAP within one planting season.
-          Potash shocks — like the 2022 Belarus/Russia sanctions — take 12–18 months to reach
-          application rates, as farmers first exhaust existing field stocks before cutting doses.
-        </p>
+        <p className="text-[11px] text-amber-400/80 font-semibold mb-2">Trader take-away — lag structure</p>
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-green-400 font-semibold">Urea shocks</span> hit fastest:
+            Arab Gulf → Vietnam sailing is only 15–18 days, so a Black Sea/Arab Gulf price
+            spike is reflected in Vietnamese import costs within 6–8 weeks. Because Urea
+            is the largest-volume carrier (451 kg/ha vs 250 MAP + 367 KCl), it drives the
+            largest absolute cost change. Monitor Henry Hub, TTF gas benchmarks as 4–8 week
+            leading indicators.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-sky-400 font-semibold">MAP shocks</span> propagate within
+            one season: Morocco sailing is 25–28 days, but the OCP contract structure means
+            price resets happen annually rather than spot. A sharp post-harvest OCP contract
+            repricing (spring) hits the May rainy-season application directly.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-orange-400 font-semibold">KCl shocks</span> take 12–18 months
+            to reduce application rates: farmers hold field-level buffer stocks (2–4 weeks),
+            distributors carry 1–2 months inventory, and potash is the nutrient farmers cut
+            last (nitrogen loss is visible immediately; potassium deficiency is slower and less
+            obvious). The 2022 Belarus shock was not fully priced into Vietnamese farm budgets
+            until the 2023 rainy season.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-slate-200 font-semibold">From application cut to harvest impact:</span>{" "}
+            reduced fertilizer doses applied in May–September show up as lower cherry weight and
+            yield the following October–January harvest — a 6–9 month transmission. For supply
+            forecasting, a fertilizer affordability squeeze in Q2 is a leading indicator of
+            a tight Vietnamese crop by Q4 of the same year.
+          </p>
+        </div>
       </div>
     </AgronomyCard>
   );
