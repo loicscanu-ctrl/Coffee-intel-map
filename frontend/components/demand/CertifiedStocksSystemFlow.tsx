@@ -83,11 +83,40 @@ const _binByMonths = (months: number): AgeBin =>
   : "y4plus";
 const _binByDays = (days: number): AgeBin => _binByMonths(days / 30);
 
-// Port-name lookup for arabica port labels.
+// Port-name lookup for arabica port labels. Workbook + live scraper both
+// settle on the long forms (NOLA, MIAMI, NY, HA/BR, VA, BAR) but older
+// snapshots can carry short forms (NOR, MIA, NYK, HAM, VIR). Canonical
+// forms below are the long names; aliases get mapped via _canonicalKC.
 const ARABICA_PORT_NAMES: Record<string, string> = {
-  ANT: "Antwerp", "HA/BR": "Hamburg/Bremen", HA: "Hamburg/Bremen", HAM: "Hamburg",
-  HOU: "Houston", HO: "Houston", MIA: "Miami", MI: "Miami",
-  NO: "New Orleans", NOR: "Norfolk", NY: "New York", NYK: "New York", VIR: "Virginia",
+  ANT:    "Antwerp",
+  BAR:    "Barcelona",
+  "HA/BR": "Hamburg/Bremen",
+  HOU:    "Houston",
+  MIAMI:  "Miami",
+  NOLA:   "New Orleans",
+  NY:     "New York",
+  VA:     "Virginia",
+};
+
+// Short → canonical KC port codes. The workbook & live xls flip-flopped
+// between the short and long forms; the system flow comparing periods
+// across both forms would otherwise count an entire port's stock as
+// "gained" (current code missing from the base, so delta = current − 0).
+const KC_PORT_ALIASES: Record<string, string> = {
+  // short → canonical (the workbook + live scraper now use the long forms)
+  NOR:  "NOLA",   // observed Apr-May 2026: NOR (with 28k bags) ↔ NOLA same volume
+  NO:   "NOLA",
+  MIA:  "MIAMI",
+  MI:   "MIAMI",
+  NYK:  "NY",
+  HAM:  "HA/BR",
+  HA:   "HA/BR",
+  HO:   "HOU",
+  VIR:  "VA",
+};
+const _canonicalKC = (code: string): string => {
+  const c = (code || "").toUpperCase();
+  return KC_PORT_ALIASES[c] ?? c;
 };
 const ROBUSTA_PORT_NAMES: Record<string, string> = {
   AMS: "Amsterdam",
@@ -526,43 +555,73 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
       const baseSec = base.sections?.total_certified;
       if (!latestSec) return empty;
 
+      // 365-day per-port max, keyed by canonical port code so the snapshot
+      // history's short codes (NOR/MIA/NYK/HAM) merge into the long forms.
       const maxByPort = new Map<string, number>();
       for (const s of snaps) {
         for (const [p, v] of Object.entries(s.by_port || {})) {
-          if (v > (maxByPort.get(p) ?? 0)) maxByPort.set(p, v);
+          const k = _canonicalKC(p);
+          if (v > (maxByPort.get(k) ?? 0)) maxByPort.set(k, v);
         }
       }
 
-      // Age distribution per port from latest_detail.age_detail.
+      // Age distribution per port from latest_detail.age_detail. Canonicalise
+      // here too so the latest's "NOLA" key picks up workbook rows still
+      // written as "NOR" (older imports of sheet 12).
       const ageByPort: Record<string, AgeDist> = {};
       const ageDetail = arabica?.latest_detail?.age_detail ?? {};
       for (const [port, rows] of Object.entries(ageDetail)) {
-        const dist: AgeDist = { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
+        const canon = _canonicalKC(port);
+        const dist: AgeDist = ageByPort[canon] ?? { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
         for (const r of rows) {
           const m = r.age_bucket?.match(/^(\d+)/);
           const days = m ? parseInt(m[1], 10) : 0;
           dist[_binByDays(days)] += r.bags || 0;
         }
-        const sum = dist.fresh + dist.y1to2 + dist.y2to3 + dist.y3to4 + dist.y4plus;
+        ageByPort[canon] = dist;
+      }
+      // Renormalise to shares per canonical port.
+      for (const port of Object.keys(ageByPort)) {
+        const a = ageByPort[port];
+        const sum = a.fresh + a.y1to2 + a.y2to3 + a.y3to4 + a.y4plus;
         if (sum > 0) {
-          ageByPort[port] = {
-            fresh:  dist.fresh  / sum, y1to2: dist.y1to2 / sum, y2to3: dist.y2to3 / sum,
-            y3to4:  dist.y3to4  / sum, y4plus: dist.y4plus / sum,
-          };
+          a.fresh /= sum; a.y1to2 /= sum; a.y2to3 /= sum; a.y3to4 /= sum; a.y4plus /= sum;
         }
       }
 
+      // Roll up latest + base port volumes per canonical code so periods
+      // with mismatched short/long codes compare cleanly.
+      const collapseSec = (sec: typeof latestSec | undefined) => {
+        const byPort: Record<string, number> = {};
+        const byOriginPort: Record<string, Record<string, number>> = {};
+        const originMeta: Record<string, { group: string }> = {};
+        for (const [p, v] of Object.entries(sec?.by_port ?? {})) {
+          byPort[_canonicalKC(p)] = (byPort[_canonicalKC(p)] ?? 0) + v;
+        }
+        for (const [origin, od] of Object.entries(sec?.by_origin ?? {})) {
+          byOriginPort[origin] = byOriginPort[origin] ?? {};
+          originMeta[origin] = { group: od.group };
+          for (const [p, v] of Object.entries(od.by_port ?? {})) {
+            const k = _canonicalKC(p);
+            byOriginPort[origin][k] = (byOriginPort[origin][k] ?? 0) + v;
+          }
+        }
+        return { byPort, byOriginPort, originMeta };
+      };
+      const latestC = collapseSec(latestSec);
+      const baseC   = collapseSec(baseSec);
+
       const ports: PortFlow[] = [];
-      for (const [code, current] of Object.entries(latestSec.by_port)) {
+      for (const [code, current] of Object.entries(latestC.byPort)) {
         if (current <= 0) continue;
         const byOrigin: Record<string, number> = {};
-        for (const [origin, od] of Object.entries(latestSec.by_origin)) {
-          const v = od.by_port?.[code] ?? 0;
+        for (const [origin, perPort] of Object.entries(latestC.byOriginPort)) {
+          const v = perPort[code] ?? 0;
           if (v > 0) byOrigin[origin] = v;
         }
         const baseByOrigin: Record<string, number> = {};
-        for (const [origin, od] of Object.entries(baseSec?.by_origin ?? {})) {
-          const v = od.by_port?.[code] ?? 0;
+        for (const [origin, perPort] of Object.entries(baseC.byOriginPort)) {
+          const v = perPort[code] ?? 0;
           if (v > 0) baseByOrigin[origin] = v;
         }
         const allOrigins = new Set([...Object.keys(byOrigin), ...Object.keys(baseByOrigin)]);
@@ -602,9 +661,11 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         failed += s.failed_today_bags ?? 0;
       }
       let premiumShare = 0, borderlineShare = 0;
-      for (const od of Object.values(latestSec.by_origin)) {
-        if (od.group === "Group 3" || od.group === "Group 4") borderlineShare += od.total;
-        else premiumShare += od.total;
+      for (const [origin, perPort] of Object.entries(latestC.byOriginPort)) {
+        const tot = Object.values(perPort).reduce((a, b) => a + b, 0);
+        const group = latestC.originMeta[origin]?.group ?? "";
+        if (group === "Group 3" || group === "Group 4") borderlineShare += tot;
+        else premiumShare += tot;
       }
       const sum = premiumShare + borderlineShare || 1;
       const passedPremium    = Math.round(passed * (premiumShare    / sum));
@@ -806,23 +867,11 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
 
   return (
     <div>
-      <div className="flex items-baseline justify-between pb-2 border-b border-slate-800 mb-4 gap-2 flex-wrap">
+      <div className="pb-2 border-b border-slate-800 mb-4">
         <h3 className="text-base font-bold text-slate-100">
           Certified stocks system flow
           <span className="text-[10px] uppercase tracking-wider text-slate-500 ml-2">arabica + robusta</span>
         </h3>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-slate-500">Flow window</span>
-          <select
-            value={flowDuration}
-            onChange={(e) => setFlowDuration(e.target.value as DurationOpt)}
-            className="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-2 py-1 rounded font-mono focus:outline-none focus:border-amber-500"
-          >
-            {(Object.entries(DURATION_LABELS) as [DurationOpt, string][]).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Shared legend — colour scheme summary + age + change groups */}
@@ -891,6 +940,28 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         <span className="text-slate-700 mx-1">|</span>
         <span className="text-slate-500 uppercase">1 ◻ =</span>
         <span className="flex items-center text-slate-300">KC: 1 warrant = 37,500 lb (17.009 MT ≈ 283 bags) · RC: 1 lot (10 MT)</span>
+
+        {/* Flow window selector — pill-button group, right-aligned, same
+            style as the chart range toggle on the panel above. */}
+        <div className="ml-auto flex items-center gap-1.5">
+          <span className="text-slate-500 uppercase text-[10px] tracking-wider">Flow window</span>
+          <div className="flex items-center gap-1">
+            {(Object.entries(DURATION_LABELS) as [DurationOpt, string][]).map(([k, v]) => (
+              <button
+                key={k}
+                onClick={() => setFlowDuration(k)}
+                className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
+                  flowDuration === k
+                    ? "bg-slate-800 text-amber-400 border-slate-700"
+                    : "text-slate-500 hover:text-slate-300 border-transparent"
+                }`}
+                title={v}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
