@@ -12,6 +12,7 @@ const HondurasTab    = dynamic(() => import("@/components/supply/HondurasTab"), 
 const IndonesiaTab   = dynamic(() => import("@/components/supply/IndonesiaTab"),   { ssr: false });
 const UgandaTab      = dynamic(() => import("@/components/supply/UgandaTab"),      { ssr: false });
 const EthiopiaTab    = dynamic(() => import("@/components/supply/EthiopiaTab"),    { ssr: false });
+const SupplyEnsoTab  = dynamic(() => import("@/components/supply/SupplyEnsoTab"),  { ssr: false });
 
 const TABS = [
   { id: "brazil",       label: "Brazil",       available: true  },
@@ -22,6 +23,7 @@ const TABS = [
   { id: "indonesia",    label: "Indonesia",    available: true  },
   { id: "uganda",       label: "Uganda",       available: true  },
   { id: "fertilizers",  label: "Fertilizers",  available: true  },
+  { id: "enso",         label: "ENSO",         available: true  },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -84,6 +86,7 @@ function SupplyPageInner() {
         {tab === "indonesia"   && <IndonesiaTab />}
         {tab === "uganda"      && <UgandaTab />}
         {tab === "ethiopia"    && <EthiopiaTab />}
+        {tab === "enso"        && <SupplyEnsoTab />}
       </div>
     </div>
   );
