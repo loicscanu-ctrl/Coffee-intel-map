@@ -101,9 +101,9 @@ member rows.
   "Current" = this week's Mon → today; "1w ago" = previous full Mon-Sun.
   `_mondayOf()` helper does the snap; month-end columns unchanged.
 - ✅ TODO #6 — Tiered HHMMSS guesser for the Robusta stock_report.csv.
-  Tier 1 = top-5 most-frequent HHMMSS from `stock_report_hits.json`
-  (≤5 GETs, self-tunes after every success). Tier 2 = 120-second sweep
-  of the published 10:30:00–10:31:59 window (only on miss, only for the
+  Tier 1 = top-10 most-frequent HHMMSS from `stock_report_hits.json`
+  (≤10 GETs, self-tunes after every success). Tier 2 = sweep of the
+  published 10:30:00–11:15:59 window (only on miss, only for the
   latest day so daily cron stays bounded). Hits log starts seeded with
   the 3 bootstrap values and grows with every confirmed capture.
 - ✅ TODO #8 — Audit closed without building a raw-bytes cache. Live
