@@ -929,6 +929,224 @@ function Article4() {
   );
 }
 
+// ── Article 5: NPK → carrier conversion ──────────────────────────────────────
+
+function CarrierConversionTable() {
+  const TARGET_N = 235, TARGET_P = 130, TARGET_K = 220;
+  const mapKg    = Math.round(TARGET_P / 0.52 * 10) / 10;        // 250
+  const mapN     = Math.round(mapKg * 0.11 * 10) / 10;           // 27.5
+  const remainN  = Math.round((TARGET_N - mapN) * 10) / 10;      // 207.5
+  const ureaKg   = Math.round(remainN / 0.46 * 10) / 10;         // 451.1
+  const kclKg    = Math.round(TARGET_K / 0.60 * 10) / 10;        // 366.7
+  const totalKg  = Math.round((ureaKg + mapKg + kclKg) * 10) / 10;
+  const urea_N   = Math.round(ureaKg * 0.46 * 10) / 10;
+
+  return (
+    <div className="mt-3 space-y-3">
+      <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700 text-xs">
+        <p className="text-amber-400 font-bold text-[10px] uppercase tracking-wider mb-3">
+          Step-by-step · IPHM 3 t/ha baseline · N:{TARGET_N} P₂O₅:{TARGET_P} K₂O:{TARGET_K} kg/ha
+        </p>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">①</span>
+            <div>
+              <span className="text-sky-400 font-semibold">MAP first</span>
+              <span className="text-slate-400"> — fixes P₂O₅ requirement and its bonus N</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                {TARGET_P} kg P₂O₅ ÷ 0.52 = <span className="text-sky-300 font-bold">{mapKg} kg MAP</span>
+                <span className="text-slate-500 ml-3">bonus N: {mapKg} × 0.11 = {mapN} kg N</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">②</span>
+            <div>
+              <span className="text-green-400 font-semibold">Urea</span>
+              <span className="text-slate-400"> — covers remaining N after MAP contribution</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                ({TARGET_N} − {mapN}) ÷ 0.46 = <span className="text-green-300 font-bold">{ureaKg} kg Urea</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">③</span>
+            <div>
+              <span className="text-orange-400 font-semibold">KCl</span>
+              <span className="text-slate-400"> — covers K₂O independently</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                {TARGET_K} kg K₂O ÷ 0.60 = <span className="text-orange-300 font-bold">{kclKg} kg KCl</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Product</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Grade (N-P₂O₅-K₂O)</th>
+              <th className="text-right text-slate-400 font-medium pb-1.5 pr-4">kg/ha</th>
+              <th className="text-right text-green-400 font-medium pb-1.5 pr-4">N kg</th>
+              <th className="text-right text-sky-400 font-medium pb-1.5 pr-4">P₂O₅ kg</th>
+              <th className="text-right text-orange-400 font-medium pb-1.5">K₂O kg</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-1.5 pr-4 text-green-300 font-medium">Urea</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">46-0-0</td>
+              <td className="py-1.5 pr-4 text-right">{ureaKg}</td>
+              <td className="py-1.5 pr-4 text-right text-green-400">{urea_N}</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 text-right text-slate-600">—</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300 font-medium">MAP</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">11-52-0</td>
+              <td className="py-1.5 pr-4 text-right">{mapKg}</td>
+              <td className="py-1.5 pr-4 text-right text-green-400">{mapN}</td>
+              <td className="py-1.5 pr-4 text-right text-sky-400">{TARGET_P}</td>
+              <td className="py-1.5 text-right text-slate-600">—</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-orange-300 font-medium">KCl</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">0-0-60</td>
+              <td className="py-1.5 pr-4 text-right">{kclKg}</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 text-right text-orange-400">{TARGET_K}</td>
+            </tr>
+            <tr className="border-t border-slate-600">
+              <td className="pt-2 pr-4 text-slate-200 font-semibold">Total</td>
+              <td className="pt-2 pr-4 text-slate-500 text-[10px]">pure fertilizer applied</td>
+              <td className="pt-2 pr-4 text-right text-slate-200 font-semibold">{totalKg}</td>
+              <td className="pt-2 pr-4 text-right text-green-300 font-semibold">{TARGET_N} ✓</td>
+              <td className="pt-2 pr-4 text-right text-sky-300 font-semibold">{TARGET_P} ✓</td>
+              <td className="pt-2 text-right text-orange-300 font-semibold">{TARGET_K} ✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Article5() {
+  return (
+    <AgronomyCard
+      kicker="Agronomy · Fertilizer Fundamentals"
+      title="NPK, Urea and MAP: why agronomists and traders speak different languages"
+      briefing={
+        <span>
+          Agronomists prescribe fertilizer in NPK — the three plant-available nutrients.
+          Commodity desks price Urea, MAP and KCl — the carrier products that deliver
+          those nutrients. The gap between these two vocabularies is where cost analysis
+          breaks down if you conflate them.
+        </span>
+      }
+    >
+      <H>N, P, K — nutrients, not products</H>
+      <P>
+        Plants need three macro-nutrients: Nitrogen (N), Phosphorus (P) and Potassium (K).
+        But none can simply be poured on a field. Nitrogen gas (N₂) makes up 78% of the
+        atmosphere yet plants cannot absorb it — it is chemically inert. Phosphorus and
+        potassium must arrive in water-soluble ionic form. The fertilizer industry packages
+        these nutrients into stable, storable, transportable <em>carrier molecules</em>.
+      </P>
+
+      <H>Why "K" — not "Po" for potassium, and why P₂O₅ not P?</H>
+      <P>
+        Element symbols follow Latin and Germanic roots, not English names. Potassium
+        derives from <em>Kalium</em> (medieval Latin, from Arabic <em>al-qaly</em> — ash of
+        burnt plants), hence the symbol K. Phosphorus measurements use P₂O₅ (phosphorus
+        pentoxide) rather than elemental P — a 19th-century analytical convention that
+        overstates actual P content by ~2.3×, yet remains the global industry standard.
+        Potassium is likewise expressed as K₂O. This is why an NPK label reads "14-8-16"
+        even though the product contains no literal oxides.
+      </P>
+
+      <H>The three dominant carrier products</H>
+      <ul className="space-y-2 mb-3">
+        <LI>
+          <strong className="text-green-400">Urea CO(NH₂)₂ — grade 46-0-0.</strong>{" "}
+          The most concentrated solid nitrogen fertilizer: 46% N by weight. Produced via
+          the Haber-Bosch process (N₂ + H₂ → NH₃, then reacted with CO₂ → urea). Natural
+          gas is both feedstock and energy, so Urea prices track European and Asian gas
+          benchmarks closely. Contains no phosphorus or potassium.
+        </LI>
+        <LI>
+          <strong className="text-sky-400">MAP — Monoammonium Phosphate, grade 11-52-0.</strong>{" "}
+          A dual-nutrient carrier: 52% P₂O₅ and 11% N, produced by reacting phosphoric acid
+          with ammonia. Because MAP delivers both P and N simultaneously, conversion from an
+          NPK prescription always resolves MAP first — it fixes the phosphorus requirement and
+          reduces the Urea needed for nitrogen in the same step.
+        </LI>
+        <LI>
+          <strong className="text-orange-400">KCl — Muriate of Potash (MOP), grade 0-0-60.</strong>{" "}
+          60% K₂O, mined directly from underground potash deposits (sylvinite, carnallite) in
+          Canada, Russia and Belarus. Unlike Urea and MAP — manufactured via chemical synthesis —
+          KCl is a mined and refined mineral. Its price is driven by mining economics and
+          geopolitics rather than energy costs.
+        </LI>
+      </ul>
+
+      <H>Why you cannot buy "nitrogen" at a commodity desk</H>
+      <P>
+        Atmospheric N₂ is abundant but agronomically useless. The economically relevant
+        product is <em>fixed nitrogen</em> — converted into reactive NH₃, NH₄⁺ or NO₃⁻ that
+        roots can absorb. The Haber-Bosch process, which reacts N₂ with hydrogen from natural
+        gas at 150–300 bar and 400–500°C, is the only scalable industrial path. It consumes
+        roughly 1–2% of global energy. Urea is the most efficient solid form to ship and store
+        this fixed nitrogen. When commodity markets quote "Urea FOB Black Sea," they are
+        effectively pricing the cost of extracting atmospheric nitrogen, concentrating it, and
+        shipping it in pelletised form.
+      </P>
+
+      <H>Why "NPK" — not "UMK"?</H>
+      <P>
+        NPK describes <em>what the plant needs</em>. "UMK" would describe one particular set
+        of carrier products — but the same N, P, K targets can be met with dozens of
+        substitutes: DAP (18-46-0) instead of MAP, Ammonium Nitrate (34-0-0) instead of Urea,
+        SOP (0-0-50) instead of KCl. The NPK framework is carrier-agnostic by design, allowing
+        agronomists to write a single nutrient prescription that farmers fill with locally
+        available or economically optimal products. A bag labelled "15-8-14" could contain
+        Urea+MAP+KCl, or DAP+AN+SOP, or a factory-blended compound. The nutrient targets are
+        universal; the carrier choice is regional and economic.
+      </P>
+
+      <H>Converting a nutrient prescription to carrier quantities</H>
+      <P>
+        Resolve MAP first (dual-nutrient carrier), subtract its N contribution from the total
+        N target, then cover residual N with Urea, and K₂O with KCl independently.
+        IPHM prescription for mature Robusta at 3 t/ha (N: 235, P₂O₅: 130, K₂O: 220 kg/ha):
+      </P>
+      <CarrierConversionTable />
+
+      <H>Scaling to other yield targets</H>
+      <P>
+        The IPHM baseline is calibrated at 3 t/ha. Each tonne of green beans extracts
+        approximately <strong>78 kg N</strong>, <strong>43 kg P₂O₅</strong> and{" "}
+        <strong>73 kg K₂O</strong> from the soil. Scale the nutrient targets proportionally
+        and apply the same MAP-first conversion to get the carrier quantities for any yield target.
+      </P>
+
+      <div className="bg-slate-800/50 border border-amber-500/20 rounded-lg p-3 mt-2">
+        <p className="text-[11px] text-amber-400/80 font-semibold mb-1">Trader take-away</p>
+        <p className="text-[11px] text-slate-300 leading-relaxed">
+          Urea price shocks (gas-driven, Black Sea / Arab Gulf benchmark) flow directly into
+          Vietnam fertilizer costs — Urea is the largest-volume carrier. Phosphate rock
+          tightening (Morocco OCP-driven) propagates into MAP within one planting season.
+          Potash shocks — like the 2022 Belarus/Russia sanctions — take 12–18 months to reach
+          application rates, as farmers first exhaust existing field stocks before cutting doses.
+        </p>
+      </div>
+    </AgronomyCard>
+  );
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export default function AgronomyArticles() {
@@ -938,6 +1156,7 @@ export default function AgronomyArticles() {
       <Article2 />
       <Article3 />
       <Article4 />
+      <Article5 />
     </div>
   );
 }
