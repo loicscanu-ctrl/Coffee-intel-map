@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 interface FreshnessSource {
   arabicaAsOf?:        string | null;
   arabicaGeneratedAt?: string | null;
+  arabicaAgeingLast?:  string | null;
   robustaAsOf?:        string | null;
   robustaGeneratedAt?: string | null;
   robustaGradingsLast?:        string | null;
@@ -76,6 +77,7 @@ export default function CertifiedStocksFreshness(props: FreshnessSource) {
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Data freshness</span>
         <Chip label="KC stock"     last={props.arabicaAsOf}            today={today} />
+        <Chip label="KC ageing"    last={props.arabicaAgeingLast}      today={today} />
         <Chip label="RC stock"     last={props.robustaAsOf}            today={today} />
         <Chip label="RC gradings"  last={props.robustaGradingsLast}    today={today} />
         <Chip label="RC age allow" last={props.robustaAgeAllowanceLast} today={today} />
