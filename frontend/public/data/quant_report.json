@@ -228,272 +228,271 @@
       }
     ]
   },
-  "scraped_at": "2026-05-29T22:51:40.173279+00:00",
+  "scraped_at": "2026-05-29T22:52:13.299926Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-05-28T22:53:55.815776Z",
+    "scraped_at": "2026-05-29T22:52:12.105067Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 78.4,
+    "overall_confidence": 71.4,
     "bull_count": 0,
     "bear_count": 0,
     "neutral_count": 25,
     "total": 25,
     "items": [
       {
-        "headline": "World Bank Population \u2013 2026-05-28",
+        "headline": "World Bank Population – 2026-05-29",
         "source": "World Bank",
         "sentiment": "Neutral",
-        "confidence": 60.0,
+        "confidence": 70.0,
         "tags": [
-          "population",
           "world-bank",
+          "population",
           "demand"
         ]
       },
       {
-        "headline": "Fertilizer Prices \u2013 2026-05",
+        "headline": "Fertilizer Prices – 2026-05",
         "source": "World Bank",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 65.0,
         "tags": [
+          "fertilizer",
           "brazil",
-          "supply",
-          "fertilizer"
-        ]
-      },
-      {
-        "headline": "ENSO ONI \u2013 2026-05",
-        "source": "NOAA CPC",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "brazil",
-          "enso",
           "supply"
         ]
       },
       {
-        "headline": "Colombia FNC Precio Interno \u2013 2026-05-28",
+        "headline": "ENSO ONI – 2026-05",
+        "source": "NOAA CPC",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "enso",
+          "brazil",
+          "supply"
+        ]
+      },
+      {
+        "headline": "Colombia FNC Precio Interno – 2026-05-29",
         "source": "FNC",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 60.0,
         "tags": [
+          "precio-interno",
           "colombia",
-          "fnc",
-          "precio-interno"
+          "fnc"
         ]
       },
       {
-        "headline": "B3 ICF Arabica (Jul '26) \u2013 2026-05-28",
+        "headline": "B3 ICF Arabica (Jul '26) – 2026-05-29",
         "source": "B3",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
-          "brazil",
           "b3",
+          "brazil",
           "arabica"
         ]
       },
       {
-        "headline": "Uganda Screen 15 \u2013 2026-05-28",
+        "headline": "Uganda Screen 15 – 2026-05-29",
         "source": "UCDA",
+        "sentiment": "Neutral",
+        "confidence": 60.0,
+        "tags": [
+          "uganda",
+          "robusta"
+        ]
+      },
+      {
+        "headline": "Brazil Arabica Price (Noticiasagricolas) – 2026-05-29",
+        "source": "Noticiasagricolas",
+        "sentiment": "Neutral",
+        "confidence": 60.0,
+        "tags": [
+          "brazil",
+          "arabica"
+        ]
+      },
+      {
+        "headline": "Conilon Tipo 7 (Cooabriel) – 2026-05-29",
+        "source": "Cooabriel",
+        "sentiment": "Neutral",
+        "confidence": 60.0,
+        "tags": [
+          "conilon",
+          "brazil"
+        ]
+      },
+      {
+        "headline": "ICE COT Robusta Coffee (London) – 2026-05-26",
+        "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 70.0,
         "tags": [
-          "robusta",
-          "uganda"
+          "cot",
+          "robusta"
         ]
       },
       {
-        "headline": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-05-28",
-        "source": "Noticiasagricolas",
-        "sentiment": "Neutral",
-        "confidence": 75.0,
-        "tags": [
-          "brazil",
-          "arabica"
-        ]
-      },
-      {
-        "headline": "Conilon Tipo 7 (Cooabriel) \u2013 2026-05-28",
-        "source": "Cooabriel",
-        "sentiment": "Neutral",
-        "confidence": 75.0,
-        "tags": [
-          "brazil",
-          "conilon"
-        ]
-      },
-      {
-        "headline": "ICE COT Robusta Coffee (London) \u2013 2026-05-19",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "robusta",
-          "cot"
-        ]
-      },
-      {
-        "headline": "CFTC COT Coffee C (NY Arabica) \u2013 2026-05-19",
+        "headline": "CFTC COT Coffee C (NY Arabica) – 2026-05-19",
         "source": "CFTC",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 70.0,
         "tags": [
           "cot",
           "arabica"
         ]
       },
       {
-        "headline": "ICE London Robusta (RM) Futures \u2013 2026-05-26",
+        "headline": "ICE London Robusta (RM) Futures – 2026-05-27",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
           "robusta"
         ]
       },
       {
-        "headline": "ICE NY Arabica (KC) Futures \u2013 2026-05-26",
+        "headline": "ICE NY Arabica (KC) Futures – 2026-05-27",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
           "arabica"
         ]
       },
       {
-        "headline": "Vietnam Robusta \u2013 2026-05-28",
+        "headline": "Vietnam Robusta – 2026-05-29",
         "source": "Giacaphe",
         "sentiment": "Neutral",
-        "confidence": 75.0,
+        "confidence": 60.0,
         "tags": [
-          "robusta",
-          "vietnam"
+          "vietnam",
+          "robusta"
         ]
       },
       {
-        "headline": "Brazil Coffee Exports (Cecafe) \u2013 2026-05-28",
-        "source": "Cecafe",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "brazil",
-          "exports"
-        ]
-      },
-      {
-        "headline": "Ethiopia ECX Coffee Price \u2013 2026-05-28",
+        "headline": "Ethiopia ECX Coffee Price – 2026-05-29",
         "source": "ECX",
+        "sentiment": "Neutral",
+        "confidence": 60.0,
+        "tags": [
+          "ecx",
+          "ethiopia",
+          "arabica"
+        ]
+      },
+      {
+        "headline": "Retail Coffee CPI – 2026-05-29",
+        "source": "Retail CPI",
+        "sentiment": "Neutral",
+        "confidence": 55.0,
+        "tags": [
+          "cpi",
+          "demand",
+          "retail"
+        ]
+      },
+      {
+        "headline": "AJCA Japan Coffee Data – 2026-05-29",
+        "source": "AJCA",
         "sentiment": "Neutral",
         "confidence": 70.0,
         "tags": [
-          "ecx",
-          "arabica",
-          "ethiopia"
+          "imports",
+          "demand",
+          "japan"
         ]
       },
       {
-        "headline": "USDA PSD Coffee Data \u2013 2026-05-28",
+        "headline": "USDA PSD Coffee Data – 2026-05-29",
         "source": "PSD Coffee",
         "sentiment": "Neutral",
         "confidence": 90.0,
         "tags": [
-          "usda",
           "psd",
+          "usda",
           "demand"
         ]
       },
       {
-        "headline": "Retail Coffee CPI \u2013 2026-05-28",
-        "source": "Retail CPI",
+        "headline": "Brazil Coffee Exports (Cecafe) – 2026-05-29",
+        "source": "Cecafe",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 75.0,
         "tags": [
-          "retail",
-          "cpi",
-          "demand"
+          "exports",
+          "brazil"
         ]
       },
       {
-        "headline": "AJCA Japan Coffee Data \u2013 2026-05-28",
-        "source": "AJCA",
-        "sentiment": "Neutral",
-        "confidence": 65.0,
-        "tags": [
-          "imports",
-          "japan",
-          "demand"
-        ]
-      },
-      {
-        "headline": "USD/VND FX Rate \u2013 2026-05-28",
+        "headline": "USD/VND FX Rate – 2026-05-29",
         "source": "ExchangeRate-API",
         "sentiment": "Neutral",
-        "confidence": 80.0,
+        "confidence": 70.0,
         "tags": [
           "fx",
           "vietnam"
         ]
       },
       {
-        "headline": "USD/BRL FX Rate \u2013 2026-05-28",
+        "headline": "USD/BRL FX Rate – 2026-05-29",
         "source": "ExchangeRate-API",
         "sentiment": "Neutral",
-        "confidence": 80.0,
+        "confidence": 70.0,
         "tags": [
-          "fx",
-          "brazil"
+          "brazil",
+          "fx"
         ]
       },
       {
-        "headline": "B3 ICF Arabica (Jul '26) \u2013 2026-05-27",
+        "headline": "B3 ICF Arabica (Jul '26) – 2026-05-28",
         "source": "B3",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
-          "brazil",
           "b3",
+          "brazil",
           "arabica"
         ]
       },
       {
-        "headline": "ICE London Robusta (RM) Futures \u2013 2026-05-25",
+        "headline": "ICE London Robusta (RM) Futures – 2026-05-26",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
           "robusta"
         ]
       },
       {
-        "headline": "ICE NY Arabica (KC) Futures \u2013 2026-05-25",
+        "headline": "ICE NY Arabica (KC) Futures – 2026-05-26",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 80.0,
         "tags": [
           "arabica"
         ]
       },
       {
-        "headline": "Retail Coffee CPI \u2013 2026-05-27",
-        "source": "Retail CPI",
+        "headline": "Brazil Coffee Exports (Cecafe) – 2026-05-28",
+        "source": "Cecafe",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 75.0,
         "tags": [
-          "retail",
-          "cpi",
-          "demand"
+          "exports",
+          "brazil"
         ]
       },
       {
-        "headline": "AJCA Japan Coffee Data \u2013 2026-05-27",
-        "source": "AJCA",
+        "headline": "USDA PSD Coffee Data – 2026-05-28",
+        "source": "PSD Coffee",
         "sentiment": "Neutral",
-        "confidence": 65.0,
+        "confidence": 90.0,
         "tags": [
-          "imports",
-          "japan",
+          "psd",
+          "usda",
           "demand"
         ]
       }
