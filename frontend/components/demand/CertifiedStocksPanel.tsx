@@ -1,6 +1,7 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import CertifiedStocksSystemFlow from "./CertifiedStocksSystemFlow";
+import CertifiedStocksFreshness from "./CertifiedStocksFreshness";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
 
@@ -122,6 +123,10 @@ interface RobustaJson {
         grand_total_mt?: number;
       } | null;
     }>;
+    // Cohort-DNA outputs (see backend cohort_outflow.py). Optional —
+    // present only after the workbook importer has run with the
+    // cohort-DNA pipeline wired in.
+    implied_outflow?: Array<{ month_end: string }>;
   };
 }
 
@@ -2218,6 +2223,22 @@ export default function CertifiedStocksPanel() {
           ))}
         </div>
       </div>
+
+      {/* Per-feed data-freshness strip — colour-coded by calendar-day age
+          so a reader can tell at a glance which feeds are today's and
+          which are stale (e.g. weekend gaps, importer behind schedule). */}
+      <CertifiedStocksFreshness
+        arabicaAsOf={arabica?.as_of ?? null}
+        arabicaGeneratedAt={arabica?.generated_at ?? null}
+        robustaAsOf={robusta?.as_of ?? null}
+        robustaGeneratedAt={robusta?.generated_at ?? null}
+        robustaGradingsLast={robusta?.recent_activity?.gradings?.at(-1)?.date ?? null}
+        robustaAgeAllowanceLast={robusta?.monthly?.age_allowance?.at(-1)?.month_end ?? null}
+        robustaIssRecvLast={robusta?.recent_activity?.iss_recv_daily?.at(-1)?.date ?? null}
+        robustaTendersLast={robusta?.recent_activity?.tenders?.at(-1)?.date ?? null}
+        robustaOverviewLast={robusta?.recent_activity?.grading_overview?.at(-1)?.date ?? null}
+        robustaImpliedOutflowLast={robusta?.monthly?.implied_outflow?.at(-1)?.month_end ?? null}
+      />
 
       {/* 1 · the 4 tiles per contract */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
