@@ -7,7 +7,7 @@
   "share_label": "Colombia arabica",
   "station": "Pitalito",
   "source_production": "FNC 2024 departmental output (approx. weights)",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Huila",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         235.6,
         95.5,
-        0.0,
-        0.0,
+        null,
+        null,
         116.7
       ],
       "monthly_avg_temp": [
@@ -222,7 +222,7 @@
     },
     {
       "name": "Antioquia",
-      "station": "Medellín",
+      "station": "Medell\u00c3\u00adn",
       "prod_mt_k": 180,
       "weight": 0.269,
       "monthly_avg_rain": [
@@ -298,8 +298,8 @@
       "monthly_actual_cur": [
         228.7,
         144.8,
-        0.0,
-        0.0,
+        null,
+        null,
         54.7
       ],
       "monthly_avg_temp": [
@@ -433,7 +433,7 @@
     },
     {
       "name": "Cauca",
-      "station": "Popayán",
+      "station": "Popay\u00c3\u00a1n",
       "prod_mt_k": 120,
       "weight": 0.179,
       "monthly_avg_rain": [
@@ -509,8 +509,8 @@
       "monthly_actual_cur": [
         245.7,
         99.3,
-        0.0,
-        0.0,
+        null,
+        null,
         57.6
       ],
       "monthly_avg_temp": [
@@ -720,8 +720,8 @@
       "monthly_actual_cur": [
         348.2,
         286.2,
-        0.0,
-        0.0,
+        null,
+        null,
         340.9
       ],
       "monthly_avg_temp": [
@@ -854,7 +854,7 @@
       "spi_month": "2026-02"
     },
     {
-      "name": "Nariño",
+      "name": "Nari\u00c3\u00b1o",
       "station": "Pasto",
       "prod_mt_k": 60,
       "weight": 0.09,
@@ -931,8 +931,8 @@
       "monthly_actual_cur": [
         607.1,
         335.8,
-        0.0,
-        0.0,
+        null,
+        null,
         92.8
       ],
       "monthly_avg_temp": [

@@ -7,7 +7,7 @@
   "share_label": "Ethiopia arabica",
   "station": "Yirgacheffe",
   "source_production": "ECX/USDA 2024 regional output (approx. weights)",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Sidama/Yirgacheffe",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         11.7,
         5.4,
-        0.0,
-        0.0,
+        null,
+        null,
         117.7
       ],
       "monthly_avg_temp": [
@@ -298,8 +298,8 @@
       "monthly_actual_cur": [
         13.2,
         12.9,
-        0.0,
-        0.0,
+        null,
+        null,
         114.6
       ],
       "monthly_avg_temp": [
@@ -509,8 +509,8 @@
       "monthly_actual_cur": [
         5.3,
         25.5,
-        0.0,
-        0.0,
+        null,
+        null,
         105.1
       ],
       "monthly_avg_temp": [
@@ -720,8 +720,8 @@
       "monthly_actual_cur": [
         23.1,
         29.9,
-        0.0,
-        0.0,
+        null,
+        null,
         111.5
       ],
       "monthly_avg_temp": [
@@ -931,8 +931,8 @@
       "monthly_actual_cur": [
         1.6,
         1.8,
-        0.0,
-        0.0,
+        null,
+        null,
         30.0
       ],
       "monthly_avg_temp": [

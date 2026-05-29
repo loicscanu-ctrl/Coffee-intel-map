@@ -7,7 +7,7 @@
   "share_label": "Indonesia robusta+arabica",
   "station": "Bandar Lampung",
   "source_production": "USDA/AEKI 2024 regional output (approx. weights)",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Lampung",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         368.4,
         258.8,
-        0.0,
-        0.0,
+        null,
+        null,
         125.1
       ],
       "monthly_avg_temp": [
@@ -298,8 +298,8 @@
       "monthly_actual_cur": [
         155.9,
         164.1,
-        0.0,
-        0.0,
+        null,
+        null,
         94.8
       ],
       "monthly_avg_temp": [
@@ -509,8 +509,8 @@
       "monthly_actual_cur": [
         227.8,
         281.4,
-        0.0,
-        0.0,
+        null,
+        null,
         21.0
       ],
       "monthly_avg_temp": [
@@ -712,8 +712,8 @@
       "monthly_actual_cur": [
         97.0,
         118.2,
-        0.0,
-        0.0,
+        null,
+        null,
         178.4
       ],
       "monthly_avg_temp": [
@@ -923,8 +923,8 @@
       "monthly_actual_cur": [
         225.3,
         155.8,
-        0.0,
-        0.0,
+        null,
+        null,
         121.1
       ],
       "monthly_avg_temp": [

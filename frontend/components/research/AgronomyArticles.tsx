@@ -62,25 +62,25 @@ function RainfedCycleTimeline() {
   return (
     <div>
       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
-        Rainfed farms · No irrigation (blossoming delayed to May)
+        Rainfed farms · No irrigation (blossoming delayed to April)
       </p>
       <svg viewBox="0 0 600 100" className="w-full rounded overflow-hidden">
         <rect width="600" height="100" fill="#0f172a" />
-        {/* Dry / Dormancy: Jan–Apr (4 months) */}
-        <rect x={mx(0)} y={BAR_Y} width={200} height={BAR_H} fill="#1e3a5f" rx={2} />
-        {/* Blossoming: May–Jun */}
-        <rect x={mx(4)} y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
-        {/* Fruit Development: Jul–Dec */}
-        <rect x={mx(6)} y={BAR_Y} width={300} height={BAR_H} fill="#14532d" rx={2} />
+        {/* Dry / Dormancy: Jan–Mar (3 months) */}
+        <rect x={mx(0)} y={BAR_Y} width={150} height={BAR_H} fill="#1e3a5f" rx={2} />
+        {/* Blossoming: Apr–May */}
+        <rect x={mx(3)} y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
+        {/* Fruit Development: Jun–Dec (fills to edge; harvest wraps to Jan) */}
+        <rect x={mx(5)} y={BAR_Y} width={350} height={BAR_H} fill="#14532d" rx={2} />
         {/* Rain trigger marker */}
-        <line x1={mx(4)} y1={BAR_Y - 2} x2={mx(4)} y2={BAR_Y + BAR_H + 4}
+        <line x1={mx(3)} y1={BAR_Y - 2} x2={mx(3)} y2={BAR_Y + BAR_H + 4}
           stroke="#38bdf8" strokeWidth={1.5} />
-        <circle cx={mx(4)} cy={BAR_Y - 4} r={3} fill="#38bdf8" />
+        <circle cx={mx(3)} cy={BAR_Y - 4} r={3} fill="#38bdf8" />
         {/* Harvest wraps to next year — arrow + label at right edge */}
         <line x1={570} y1={BAR_Y + BAR_H / 2} x2={595} y2={BAR_Y + BAR_H / 2}
-          stroke="#fde68a" strokeWidth={1.5} markerEnd="url(#arr)" />
+          stroke="#fde68a" strokeWidth={1.5} markerEnd="url(#arr-rainfed)" />
         <defs>
-          <marker id="arr" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+          <marker id="arr-rainfed" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
             <path d="M0,0 L5,2.5 L0,5 Z" fill="#fde68a" />
           </marker>
         </defs>
@@ -89,21 +89,21 @@ function RainfedCycleTimeline() {
           <text key={i} x={mx(i) + 25} y={50} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
         ))}
         {/* Band labels */}
-        <text x={100}      y={24} textAnchor="middle" fontSize={7}   fill="#bfdbfe" fontWeight="600">Dry / Dormancy</text>
-        <text x={mx(4)+50} y={18} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Blossoming</text>
-        <text x={mx(9)}    y={24} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Fruit Development</text>
+        <text x={75}       y={24} textAnchor="middle" fontSize={7}   fill="#bfdbfe" fontWeight="600">Dry / Dormancy</text>
+        <text x={mx(3)+50} y={18} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Blossoming</text>
+        <text x={425}      y={24} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Fruit Development</text>
         {/* Below-axis */}
-        <text x={mx(4)} y={63} textAnchor="middle" fontSize={7.5} fill="#38bdf8">☔ Rain</text>
-        <text x={mx(4)} y={73} textAnchor="middle" fontSize={7.5} fill="#38bdf8">triggers bloom</text>
+        <text x={mx(3)} y={63} textAnchor="middle" fontSize={7.5} fill="#38bdf8">☔ Rain</text>
+        <text x={mx(3)} y={73} textAnchor="middle" fontSize={7.5} fill="#38bdf8">triggers bloom</text>
         <text x={585}   y={63} textAnchor="middle" fontSize={7}   fill="#fde68a">Harvest</text>
-        <text x={585}   y={73} textAnchor="middle" fontSize={7}   fill="#fde68a">Feb–Apr</text>
+        <text x={585}   y={73} textAnchor="middle" fontSize={7}   fill="#fde68a">Jan–Mar</text>
         {/* Legend */}
         <rect x={10}  y={84} width={8} height={6} fill="#1e3a5f" opacity={0.9} rx={1} />
-        <text x={21}  y={90} fontSize={7.5} fill="#94a3b8">Dry / Dormancy (4 mo)</text>
+        <text x={21}  y={90} fontSize={7.5} fill="#94a3b8">Dry / Dormancy (3 mo)</text>
         <rect x={155} y={84} width={8} height={6} fill="#14532d" opacity={0.9} rx={1} />
         <text x={166} y={90} fontSize={7.5} fill="#94a3b8">Fruit dev.</text>
         <circle cx={240} cy={87} r={3} fill="#38bdf8" />
-        <text x={246} y={90} fontSize={7.5} fill="#38bdf8">Rain trigger (May)</text>
+        <text x={246} y={90} fontSize={7.5} fill="#38bdf8">Rain trigger (Apr)</text>
         <rect x={380} y={84} width={14} height={6} fill="#fde68a" opacity={0.4} rx={1} />
         <text x={397} y={90} fontSize={7.5} fill="#fde68a">Harvest wraps → next year</text>
       </svg>
@@ -114,11 +114,10 @@ function RainfedCycleTimeline() {
 function CropCycleTimeline() {
   const mx = (m: number) => m * 50;
   const BAR_Y = 8, BAR_H = 26;
-  // Irrigation cycles: Feb (#1 bloom trigger), Mar (#2), Apr (#3) — every 25–30 days
+  // Irrigation cycles: Mar (#1 bloom trigger), Apr (#2) — rains arrive May
   const IRRIG = [
-    { m: 1, label: "#1 bloom", sub: "trigger", r: 3, sw: 1.5 },
-    { m: 2, label: "#2",       sub: "",        r: 2, sw: 1   },
-    { m: 3, label: "#3",       sub: "",        r: 2, sw: 1   },
+    { m: 2, label: "#1 bloom", sub: "trigger", r: 3, sw: 1.5 },
+    { m: 3, label: "#2",       sub: "",        r: 2, sw: 1   },
   ];
   return (
     <div>
@@ -128,38 +127,46 @@ function CropCycleTimeline() {
       <svg viewBox="0 0 600 112" className="w-full rounded overflow-hidden">
         <rect width="600" height="112" fill="#0f172a" />
         {/* Phase bands */}
-        <rect x={mx(0)} y={BAR_Y} width={100} height={BAR_H} fill="#1e3a5f" rx={2} />
-        <rect x={mx(1)} y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
-        <rect x={mx(3)} y={BAR_Y} width={300} height={BAR_H} fill="#14532d" rx={2} />
-        <rect x={mx(9)} y={BAR_Y} width={150} height={BAR_H} fill="#78350f" rx={2} />
+        <rect x={mx(1)}  y={BAR_Y} width={100} height={BAR_H} fill="#1e3a5f" rx={2} />
+        <rect x={mx(2)}  y={BAR_Y} width={100} height={BAR_H} fill="#166534" rx={2} />
+        <rect x={mx(4)}  y={BAR_Y} width={300} height={BAR_H} fill="#14532d" rx={2} />
+        <rect x={mx(10)} y={BAR_Y} width={100} height={BAR_H} fill="#78350f" rx={2} />
         {/* Danger overlays */}
-        <rect x={mx(10)} y={BAR_Y} width={100} height={BAR_H} fill="#991b1b" opacity={0.6} rx={2} />
-        <rect x={mx(0)}  y={BAR_Y} width={50}  height={BAR_H} fill="#991b1b" opacity={0.45} rx={2} />
+        <rect x={mx(11)} y={BAR_Y} width={50} height={BAR_H} fill="#991b1b" opacity={0.6} rx={2} />
+        <rect x={mx(1)}  y={BAR_Y} width={50} height={BAR_H} fill="#991b1b" opacity={0.45} rx={2} />
         {/* Irrigation cycles */}
         {IRRIG.map(({ m, r, sw }) => (
           <g key={m}>
             <line x1={mx(m)} y1={BAR_Y - 2} x2={mx(m)} y2={BAR_Y + BAR_H + 4}
-              stroke="#93c5fd" strokeWidth={sw} strokeDasharray={m > 1 ? "3 2" : undefined} />
+              stroke="#93c5fd" strokeWidth={sw} strokeDasharray={m > 2 ? "3 2" : undefined} />
             <circle cx={mx(m)} cy={BAR_Y - 4} r={r} fill="#93c5fd" />
           </g>
         ))}
-        {/* Rainy season start marker */}
+        {/* Rainy season start marker (May) */}
         <line x1={mx(4)} y1={BAR_Y - 2} x2={mx(4)} y2={BAR_Y + BAR_H + 4}
           stroke="#38bdf8" strokeWidth={1} strokeDasharray="4 2" />
         <text x={mx(4)} y={BAR_Y - 6} textAnchor="middle" fontSize={6.5} fill="#38bdf8">☔ Rain</text>
+        {/* Harvest wrap arrow */}
+        <defs>
+          <marker id="arr-irr" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+            <path d="M0,0 L5,2.5 L0,5 Z" fill="#fde68a" />
+          </marker>
+        </defs>
+        <line x1={570} y1={BAR_Y + BAR_H / 2} x2={595} y2={BAR_Y + BAR_H / 2}
+          stroke="#fde68a" strokeWidth={1.5} markerEnd="url(#arr-irr)" />
         {/* Month labels */}
         {["J","F","M","A","M","J","J","A","S","O","N","D"].map((lbl, i) => (
           <text key={i} x={mx(i) + 25} y={50} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
         ))}
         {/* Band labels */}
-        <text x={25}        y={24} textAnchor="middle" fontSize={7}   fill="#bfdbfe" fontWeight="600">Dry</text>
-        <text x={mx(1)+50}  y={18} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Blossoming</text>
-        <text x={mx(6)}     y={24} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Fruit Development</text>
-        <text x={mx(9)+50}  y={18} textAnchor="middle" fontSize={7}   fill="#fde68a" fontWeight="600">Harvest</text>
-        <text x={mx(10)+50} y={27} textAnchor="middle" fontSize={6.5} fill="#fca5a5">⚠ Rain risk</text>
+        <text x={mx(1)+50}  y={24} textAnchor="middle" fontSize={7}   fill="#bfdbfe" fontWeight="600">Dry</text>
+        <text x={mx(2)+50}  y={18} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Blossoming</text>
+        <text x={mx(7)}     y={24} textAnchor="middle" fontSize={7}   fill="#bbf7d0" fontWeight="600">Fruit Development</text>
+        <text x={mx(10)+50} y={18} textAnchor="middle" fontSize={7}   fill="#fde68a" fontWeight="600">Harvest</text>
+        <text x={mx(11)+25} y={27} textAnchor="middle" fontSize={6.5} fill="#fca5a5">⚠ Rain risk</text>
         {/* Below-axis annotations */}
-        <text x={25}    y={63} textAnchor="middle" fontSize={8} fill="#fca5a5">⚠ Rain</text>
-        <text x={25}    y={73} textAnchor="middle" fontSize={8} fill="#fca5a5">risk</text>
+        <text x={75}    y={63} textAnchor="middle" fontSize={8} fill="#fca5a5">⚠ Rain</text>
+        <text x={75}    y={73} textAnchor="middle" fontSize={8} fill="#fca5a5">risk</text>
         {IRRIG.map(({ m, label, sub }) => (
           <g key={m}>
             <text x={mx(m)} y={63} textAnchor="middle" fontSize={7.5} fill="#93c5fd">💧 {label}</text>
@@ -168,6 +175,7 @@ function CropCycleTimeline() {
         ))}
         <text x={mx(4)} y={63} textAnchor="middle" fontSize={7} fill="#38bdf8">Rainy</text>
         <text x={mx(4)} y={73} textAnchor="middle" fontSize={7} fill="#38bdf8">season</text>
+        <text x={585}   y={63} textAnchor="middle" fontSize={7} fill="#fde68a">→Jan</text>
         {/* Legend */}
         <rect x={10}  y={96} width={8} height={6} fill="#78350f" opacity={0.9} rx={1} />
         <text x={21}  y={102} fontSize={7.5} fill="#94a3b8">Harvest</text>
@@ -549,9 +557,9 @@ function NutrientExtractionChart() {
 
 function PhenologicalTimeline() {
   const events = [
-    { label: "Dry S2", dose: "500 kg/ha", x: 60,  color: "#f59e0b", note: "Floral induction" },
-    { label: "May",    dose: "400 kg/ha", x: 200, color: "#60a5fa", note: "Fruit set"        },
-    { label: "July",   dose: "200 kg/ha", x: 340, color: "#34d399", note: "Bean expansion"   },
+    { label: "Dry S2", dose: "200 kg/ha", x: 60,  color: "#f59e0b", note: "Floral induction" },
+    { label: "May",    dose: "500 kg/ha", x: 200, color: "#60a5fa", note: "Fruit set"        },
+    { label: "July",   dose: "400 kg/ha", x: 340, color: "#34d399", note: "Bean expansion"   },
     { label: "Sep",    dose: "500 kg/ha", x: 480, color: "#f59e0b", note: "Maturation"       },
   ];
   return (
@@ -574,7 +582,7 @@ function PhenologicalTimeline() {
           </g>
         ))}
         <text x={280} y={82} textAnchor="middle" fontSize={7.5} fill="#64748b">
-          +150 kg urea · +100 kg phosphate · +120–130 kg KCl per extra tonne above baseline
+          +150 kg urea · +83 kg MAP · +122 kg KCl per extra tonne above 3 t/ha baseline
         </text>
       </svg>
     </div>
@@ -582,12 +590,15 @@ function PhenologicalTimeline() {
 }
 
 // ── Live fertilizer cost calculator ─────────────────────────────────────────
-// kg/ha for standard VN Robusta at 3 t/ha (IPHM schedule, WASI cross-check):
-//   Total inorganic ~900 kg + ~700 kg compost/SA = 1,600 kg/ha
+// Pure-fertilizer equivalents for IPHM target nutrients (3 t/ha baseline):
+//   Target: N 235 kg, P₂O₅ 130 kg, K₂O 220 kg/ha
+//   MAP (11-52-0): 130/0.52 = 250 kg → also supplies 250×0.11 = 27.5 kg N
+//   Urea (46-0-0): (235-27.5)/0.46 = 451 kg (remaining N after MAP)
+//   KCl  (0-0-60): 220/0.60 = 367 kg
 const NPK_KG_HA = [
-  { name: "Urea (N)", kg: 350, color: "#22c55e" },
-  { name: "MAP (P)",  kg: 200, color: "#3b82f6" },
-  { name: "KCl (K)",  kg: 350, color: "#f97316" },
+  { name: "Urea (N)", kg: 451, color: "#22c55e" },
+  { name: "MAP (P)",  kg: 250, color: "#3b82f6" },
+  { name: "KCl (K)",  kg: 367, color: "#f97316" },
 ] as const;
 const YIELD_THA        = 2.7;   // WASI 2024-25 observed
 const SA_COST_HA       = 41;    // ammonium sulphate, WASI 2024-25, no live price
@@ -918,6 +929,408 @@ function Article4() {
   );
 }
 
+// ── Article 5: NPK → carrier conversion ──────────────────────────────────────
+
+function CarrierConversionTable() {
+  const TARGET_N = 235, TARGET_P = 130, TARGET_K = 220;
+  const mapKg    = Math.round(TARGET_P / 0.52 * 10) / 10;        // 250
+  const mapN     = Math.round(mapKg * 0.11 * 10) / 10;           // 27.5
+  const remainN  = Math.round((TARGET_N - mapN) * 10) / 10;      // 207.5
+  const ureaKg   = Math.round(remainN / 0.46 * 10) / 10;         // 451.1
+  const kclKg    = Math.round(TARGET_K / 0.60 * 10) / 10;        // 366.7
+  const totalKg  = Math.round((ureaKg + mapKg + kclKg) * 10) / 10;
+  const urea_N   = Math.round(ureaKg * 0.46 * 10) / 10;
+
+  return (
+    <div className="mt-3 space-y-3">
+      <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700 text-xs">
+        <p className="text-amber-400 font-bold text-[10px] uppercase tracking-wider mb-3">
+          Step-by-step · IPHM 3 t/ha baseline · N:{TARGET_N} P₂O₅:{TARGET_P} K₂O:{TARGET_K} kg/ha
+        </p>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">①</span>
+            <div>
+              <span className="text-sky-400 font-semibold">MAP first</span>
+              <span className="text-slate-400"> — fixes P₂O₅ requirement and its bonus N</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                {TARGET_P} kg P₂O₅ ÷ 0.52 = <span className="text-sky-300 font-bold">{mapKg} kg MAP</span>
+                <span className="text-slate-500 ml-3">bonus N: {mapKg} × 0.11 = {mapN} kg N</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">②</span>
+            <div>
+              <span className="text-green-400 font-semibold">Urea</span>
+              <span className="text-slate-400"> — covers remaining N after MAP contribution</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                ({TARGET_N} − {mapN}) ÷ 0.46 = <span className="text-green-300 font-bold">{ureaKg} kg Urea</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-slate-500 shrink-0 font-mono">③</span>
+            <div>
+              <span className="text-orange-400 font-semibold">KCl</span>
+              <span className="text-slate-400"> — covers K₂O independently</span>
+              <div className="mt-1 font-mono text-[11px] text-slate-300">
+                {TARGET_K} kg K₂O ÷ 0.60 = <span className="text-orange-300 font-bold">{kclKg} kg KCl</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Product</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Grade (N-P₂O₅-K₂O)</th>
+              <th className="text-right text-slate-400 font-medium pb-1.5 pr-4">kg/ha</th>
+              <th className="text-right text-green-400 font-medium pb-1.5 pr-4">N kg</th>
+              <th className="text-right text-sky-400 font-medium pb-1.5 pr-4">P₂O₅ kg</th>
+              <th className="text-right text-orange-400 font-medium pb-1.5">K₂O kg</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-1.5 pr-4 text-green-300 font-medium">Urea</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">46-0-0</td>
+              <td className="py-1.5 pr-4 text-right">{ureaKg}</td>
+              <td className="py-1.5 pr-4 text-right text-green-400">{urea_N}</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 text-right text-slate-600">—</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300 font-medium">MAP</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">11-52-0</td>
+              <td className="py-1.5 pr-4 text-right">{mapKg}</td>
+              <td className="py-1.5 pr-4 text-right text-green-400">{mapN}</td>
+              <td className="py-1.5 pr-4 text-right text-sky-400">{TARGET_P}</td>
+              <td className="py-1.5 text-right text-slate-600">—</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-orange-300 font-medium">KCl</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-500">0-0-60</td>
+              <td className="py-1.5 pr-4 text-right">{kclKg}</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 pr-4 text-right text-slate-600">—</td>
+              <td className="py-1.5 text-right text-orange-400">{TARGET_K}</td>
+            </tr>
+            <tr className="border-t border-slate-600">
+              <td className="pt-2 pr-4 text-slate-200 font-semibold">Total</td>
+              <td className="pt-2 pr-4 text-slate-500 text-[10px]">pure fertilizer applied</td>
+              <td className="pt-2 pr-4 text-right text-slate-200 font-semibold">{totalKg}</td>
+              <td className="pt-2 pr-4 text-right text-green-300 font-semibold">{TARGET_N} ✓</td>
+              <td className="pt-2 pr-4 text-right text-sky-300 font-semibold">{TARGET_P} ✓</td>
+              <td className="pt-2 text-right text-orange-300 font-semibold">{TARGET_K} ✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Article5() {
+  return (
+    <AgronomyCard
+      kicker="Agronomy · Fertilizer Fundamentals"
+      title="NPK, Urea and MAP: why agronomists and traders speak different languages"
+      briefing={
+        <span>
+          Agronomists prescribe fertilizer in NPK — the three plant-available nutrients.
+          Commodity desks price Urea, MAP and KCl — the carrier products that deliver
+          those nutrients. The gap between these two vocabularies is where cost analysis
+          breaks down if you conflate them.
+        </span>
+      }
+    >
+      <H>N, P, K — nutrients, not products</H>
+      <P>
+        Plants need three macro-nutrients: Nitrogen (N), Phosphorus (P) and Potassium (K).
+        But none can simply be poured on a field. Nitrogen gas (N₂) makes up 78% of the
+        atmosphere yet plants cannot absorb it — it is chemically inert. Phosphorus and
+        potassium must arrive in water-soluble ionic form. The fertilizer industry packages
+        these nutrients into stable, storable, transportable <em>carrier molecules</em>.
+      </P>
+
+      <H>Why "K" — not "Po" for potassium, and why P₂O₅ not P?</H>
+      <P>
+        Element symbols follow Latin and Germanic roots, not English names. Potassium
+        derives from <em>Kalium</em> (medieval Latin, from Arabic <em>al-qaly</em> — ash of
+        burnt plants), hence the symbol K. Phosphorus measurements use P₂O₅ (phosphorus
+        pentoxide) rather than elemental P — a 19th-century analytical convention that
+        overstates actual P content by ~2.3×, yet remains the global industry standard.
+        Potassium is likewise expressed as K₂O. This is why an NPK label reads "14-8-16"
+        even though the product contains no literal oxides.
+      </P>
+
+      <H>The three dominant carrier products</H>
+      <ul className="space-y-2 mb-3">
+        <LI>
+          <strong className="text-green-400">Urea CO(NH₂)₂ — grade 46-0-0.</strong>{" "}
+          The most concentrated solid nitrogen fertilizer: 46% N by weight. Produced via
+          the Haber-Bosch process (N₂ + H₂ → NH₃, then reacted with CO₂ → urea). Natural
+          gas is both feedstock and energy, so Urea prices track European and Asian gas
+          benchmarks closely. Contains no phosphorus or potassium.
+        </LI>
+        <LI>
+          <strong className="text-sky-400">MAP — Monoammonium Phosphate, grade 11-52-0.</strong>{" "}
+          A dual-nutrient carrier: 52% P₂O₅ and 11% N, produced by reacting phosphoric acid
+          with ammonia. Because MAP delivers both P and N simultaneously, conversion from an
+          NPK prescription always resolves MAP first — it fixes the phosphorus requirement and
+          reduces the Urea needed for nitrogen in the same step.
+        </LI>
+        <LI>
+          <strong className="text-orange-400">KCl — Muriate of Potash (MOP), grade 0-0-60.</strong>{" "}
+          60% K₂O, mined directly from underground potash deposits (sylvinite, carnallite) in
+          Canada, Russia and Belarus. Unlike Urea and MAP — manufactured via chemical synthesis —
+          KCl is a mined and refined mineral. Its price is driven by mining economics and
+          geopolitics rather than energy costs.
+        </LI>
+      </ul>
+
+      <H>Why you cannot buy "nitrogen" at a commodity desk</H>
+      <P>
+        Atmospheric N₂ is abundant but agronomically useless. The economically relevant
+        product is <em>fixed nitrogen</em> — converted into reactive NH₃, NH₄⁺ or NO₃⁻ that
+        roots can absorb. The Haber-Bosch process, which reacts N₂ with hydrogen from natural
+        gas at 150–300 bar and 400–500°C, is the only scalable industrial path. It consumes
+        roughly 1–2% of global energy. Urea is the most efficient solid form to ship and store
+        this fixed nitrogen. When commodity markets quote "Urea FOB Black Sea," they are
+        effectively pricing the cost of extracting atmospheric nitrogen, concentrating it, and
+        shipping it in pelletised form.
+      </P>
+
+      <H>Why "NPK" — not "UMK"?</H>
+      <P>
+        NPK describes <em>what the plant needs</em>. "UMK" would describe one particular set
+        of carrier products — but the same N, P, K targets can be met with dozens of
+        substitutes: DAP (18-46-0) instead of MAP, Ammonium Nitrate (34-0-0) instead of Urea,
+        SOP (0-0-50) instead of KCl. The NPK framework is carrier-agnostic by design, allowing
+        agronomists to write a single nutrient prescription that farmers fill with locally
+        available or economically optimal products. A bag labelled "15-8-14" could contain
+        Urea+MAP+KCl, or DAP+AN+SOP, or a factory-blended compound. The nutrient targets are
+        universal; the carrier choice is regional and economic.
+      </P>
+
+      <H>Converting a nutrient prescription to carrier quantities</H>
+      <P>
+        Resolve MAP first (dual-nutrient carrier), subtract its N contribution from the total
+        N target, then cover residual N with Urea, and K₂O with KCl independently.
+        IPHM prescription for mature Robusta at 3 t/ha (N: 235, P₂O₅: 130, K₂O: 220 kg/ha):
+      </P>
+      <CarrierConversionTable />
+
+      <H>Scaling to other yield targets</H>
+      <P>
+        The IPHM baseline is calibrated at 3 t/ha. Each tonne of green beans extracts
+        approximately <strong>78 kg N</strong>, <strong>43 kg P₂O₅</strong> and{" "}
+        <strong>73 kg K₂O</strong> from the soil. Scale the nutrient targets proportionally
+        and apply the same MAP-first conversion to get the carrier quantities for any yield target.
+      </P>
+
+      <H>Fertilizer SnD: who controls supply by carrier</H>
+      <div className="overflow-x-auto mt-2 mb-3">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4 w-16">Carrier</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Key exporters</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Benchmark price</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5">Primary swing factor</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-2 pr-4 text-green-300 font-medium">Urea</td>
+              <td className="py-2 pr-4 text-slate-300">China (≈30% world), Russia, Saudi Arabia, Qatar, Egypt</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">FOB Yuzhny (Black Sea)<br/>FOB Arab Gulf</td>
+              <td className="py-2 text-slate-300">
+                Chinese export quotas (announced quarterly); European gas prices drive Middle East cost floor.
+                India tenders signal global price floor 3–4×/year.
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4 text-sky-300 font-medium">MAP</td>
+              <td className="py-2 pr-4 text-slate-300">Morocco OCP (~35% exports), Saudi MFIL, Russia, China</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">FOB Jorf Lasfar<br/>FOB Tampa (US)</td>
+              <td className="py-2 text-slate-300">
+                OCP holds ~70% of world economically viable phosphate rock reserves.
+                Annual OCP–India contract sets reference price for Asian MAP.
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4 text-orange-300 font-medium">KCl</td>
+              <td className="py-2 pr-4 text-slate-300">Canada (Nutrien, Mosaic ≈35%), Russia (Uralkali), Belarus (Belaruskali)</td>
+              <td className="py-2 pr-4 font-mono text-slate-400">CFR Brazil<br/>CFR SE Asia</td>
+              <td className="py-2 text-slate-300">
+                Belarus + Russia = ~40% pre-2022 global exports. Sanctions removed
+                them abruptly; Canadian capacity absorbed partially over 18 months.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <H>Origin-to-farm pipeline: how fast does a price shock reach Vietnam?</H>
+      <P>
+        A price move at origin must traverse multiple stages before changing what a
+        farmer pays at the field gate. The total lag from FOB price spike to application
+        rate change is <strong>6–14 weeks</strong>. The lag from application rate change
+        to crop supply effect is a further <strong>6–9 months</strong>.
+      </P>
+
+      {/* Pipeline SVG */}
+      <div className="mt-3 mb-3">
+        <svg viewBox="0 0 600 130" className="w-full rounded overflow-hidden">
+          <rect width="600" height="130" fill="#0f172a" />
+          {/* Stage boxes */}
+          {[
+            { x: 10,  w: 70,  label: "Price spike",    sub: "FOB benchmark",   color: "#f59e0b" },
+            { x: 100, w: 70,  label: "Production",     sub: "0–2 wks",         color: "#64748b" },
+            { x: 190, w: 70,  label: "Ocean sailing",  sub: "15–35 days",      color: "#3b82f6" },
+            { x: 280, w: 70,  label: "VN port",        sub: "1–2 wks customs", color: "#64748b" },
+            { x: 370, w: 70,  label: "Distributor",    sub: "2–3 wks",         color: "#64748b" },
+            { x: 460, w: 70,  label: "Farm stock",     sub: "0–4 wks buffer",  color: "#64748b" },
+            { x: 540, w: 52,  label: "Applied",        sub: "seasonal lock-in",color: "#22c55e" },
+          ].map(({ x, w, label, sub, color }) => (
+            <g key={x}>
+              <rect x={x} y={28} width={w} height={34} rx={3} fill="#1e293b" stroke={color} strokeWidth={1} />
+              <text x={x + w/2} y={42} textAnchor="middle" fontSize={8}   fill={color} fontWeight="600">{label}</text>
+              <text x={x + w/2} y={54} textAnchor="middle" fontSize={6.5} fill="#64748b">{sub}</text>
+            </g>
+          ))}
+          {/* Arrows between boxes */}
+          {[90, 180, 270, 360, 450, 540].map((ax) => (
+            <text key={ax} x={ax + 5} y={49} fontSize={10} fill="#475569">›</text>
+          ))}
+          {/* Total lag label */}
+          <line x1={10} y1={76} x2={592} y2={76} stroke="#334155" strokeWidth={1} strokeDasharray="3 2" />
+          <text x={300} y={89} textAnchor="middle" fontSize={8} fill="#94a3b8">≈ 6–14 weeks: price shock → farm application</text>
+          {/* Crop effect arrow */}
+          <line x1={565} y1={62} x2={565} y2={100} stroke="#22c55e" strokeWidth={1} strokeDasharray="3 2" />
+          <text x={565} y={110} textAnchor="middle" fontSize={7} fill="#22c55e">+6–9 months</text>
+          <text x={565} y={120} textAnchor="middle" fontSize={7} fill="#22c55e">→ harvest effect</text>
+          {/* Route duration notes */}
+          <text x={225} y={18} textAnchor="middle" fontSize={6.5} fill="#3b82f6">Arab Gulf→VN: 15–18d · Morocco→VN: 25–28d · Canada→VN: 18–22d</text>
+        </svg>
+      </div>
+
+      <H>Vietnam procurement calendar — when price signals matter</H>
+      <div className="overflow-x-auto mt-2 mb-3">
+        <table className="text-[11px] text-slate-300 w-full border-collapse">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Window</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Months</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5 pr-4">Application</th>
+              <th className="text-left text-slate-400 font-medium pb-1.5">Procurement locked by</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            <tr>
+              <td className="py-1.5 pr-4 text-amber-300">Dry S2</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">Feb–Mar</td>
+              <td className="py-1.5 pr-4">200 kg/ha — floral trigger</td>
+              <td className="py-1.5">Nov–Dec orders; Oct price signal is last open window</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S1</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">May</td>
+              <td className="py-1.5 pr-4">500 kg/ha — largest dose, fruit set</td>
+              <td className="py-1.5">Feb–Mar imports arrive; Jan price signal is last open window</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S2</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">July</td>
+              <td className="py-1.5 pr-4">400 kg/ha — bean expansion</td>
+              <td className="py-1.5">Apr–May procurement; Mar–Apr price signal relevant</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-sky-300">Rainy S3</td>
+              <td className="py-1.5 pr-4 font-mono text-slate-400">September</td>
+              <td className="py-1.5 pr-4">500 kg/ha — maturation flush</td>
+              <td className="py-1.5">Jun–Jul procurement; Jun price signal is last open window</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <H>Key metrics traders monitor</H>
+      <ul className="space-y-1.5 mb-3">
+        <LI>
+          <strong className="text-green-400">India Urea tender price (FIST/RCF)</strong> — India is the world&rsquo;s
+          largest Urea importer. Government tenders run 3–4×/year and set the effective price
+          floor for Asian Urea. A successful tender below $280/t usually signals global oversupply;
+          above $350/t signals tightness.
+        </LI>
+        <LI>
+          <strong className="text-green-400">China Urea export policy</strong> — China announces export
+          quotas (or restrictions) seasonally. Restrictions in Q4 2021 and Q3 2023 each drove
+          a 40–60% global price spike within 6 weeks. Spring lifting of quotas is a predictable
+          relief valve.
+        </LI>
+        <LI>
+          <strong className="text-sky-400">OCP–India annual MAP contract</strong> — Morocco&rsquo;s
+          OCP and India&rsquo;s importers negotiate a reference price each spring. This price anchors
+          MAP spot markets across Asia for the following 12 months.
+        </LI>
+        <LI>
+          <strong className="text-orange-400">Belarusian potash export volumes</strong> — Post-2022
+          sanctions, Belarus routes potash via Russian ports and China, partially restoring volumes.
+          Monitoring Kaliningrad/Ust-Luga rail + ship data reveals actual Belarus supply reaching
+          the market vs. the official "sanctioned" picture.
+        </LI>
+        <LI>
+          <strong className="text-slate-300">Fertilizer-to-coffee price ratio</strong> — When the
+          total fertilizer bill exceeds ~15% of expected green bean revenue, smallholders begin
+          skipping applications. At current prices (~$305/t fertilizer cost vs ~$2,500/t FOB
+          Robusta), the ratio is ~12% — below the stress threshold but rising since 2023.
+        </LI>
+      </ul>
+
+      <div className="bg-slate-800/50 border border-amber-500/20 rounded-lg p-3 mt-2">
+        <p className="text-[11px] text-amber-400/80 font-semibold mb-2">Trader take-away — lag structure</p>
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-green-400 font-semibold">Urea shocks</span> hit fastest:
+            Arab Gulf → Vietnam sailing is only 15–18 days, so a Black Sea/Arab Gulf price
+            spike is reflected in Vietnamese import costs within 6–8 weeks. Because Urea
+            is the largest-volume carrier (451 kg/ha vs 250 MAP + 367 KCl), it drives the
+            largest absolute cost change. Monitor Henry Hub, TTF gas benchmarks as 4–8 week
+            leading indicators.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-sky-400 font-semibold">MAP shocks</span> propagate within
+            one season: Morocco sailing is 25–28 days, but the OCP contract structure means
+            price resets happen annually rather than spot. A sharp post-harvest OCP contract
+            repricing (spring) hits the May rainy-season application directly.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-orange-400 font-semibold">KCl shocks</span> take 12–18 months
+            to reduce application rates: farmers hold field-level buffer stocks (2–4 weeks),
+            distributors carry 1–2 months inventory, and potash is the nutrient farmers cut
+            last (nitrogen loss is visible immediately; potassium deficiency is slower and less
+            obvious). The 2022 Belarus shock was not fully priced into Vietnamese farm budgets
+            until the 2023 rainy season.
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <span className="text-slate-200 font-semibold">From application cut to harvest impact:</span>{" "}
+            reduced fertilizer doses applied in May–September show up as lower cherry weight and
+            yield the following October–January harvest — a 6–9 month transmission. For supply
+            forecasting, a fertilizer affordability squeeze in Q2 is a leading indicator of
+            a tight Vietnamese crop by Q4 of the same year.
+          </p>
+        </div>
+      </div>
+    </AgronomyCard>
+  );
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export default function AgronomyArticles() {
@@ -927,6 +1340,7 @@ export default function AgronomyArticles() {
       <Article2 />
       <Article3 />
       <Article4 />
+      <Article5 />
     </div>
   );
 }

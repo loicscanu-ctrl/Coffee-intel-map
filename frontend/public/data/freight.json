@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28",
+  "updated": "2026-05-29",
   "routes": [
     {
       "id": "vn-eu",
@@ -23,7 +23,7 @@
       "id": "vn-us",
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
-      "rate": 3181,
+      "rate": 3188,
       "prev": 2814,
       "unit": "USD/FEU",
       "proxy": false
@@ -59,7 +59,7 @@
       "id": "br-us",
       "from": "Santos",
       "to": "New York",
-      "rate": 2189,
+      "rate": 2282,
       "prev": 1924,
       "unit": "USD/FEU",
       "proxy": true
@@ -576,6 +576,13 @@
       "br-eu": 1679,
       "et-eu": 2027,
       "vn-us": 3181
+    },
+    {
+      "date": "2026-05-29",
+      "vn-eu": 2895,
+      "br-eu": 1679,
+      "et-eu": 2027,
+      "vn-us": 3188
     }
   ]
 }
