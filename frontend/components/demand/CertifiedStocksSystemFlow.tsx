@@ -266,12 +266,26 @@ const BAGS_PER_WARRANT_KC = (37_500 * 0.45359237) / 60;   // ≈ 283.49
 const LOTS_PER_WARRANT_RC = 1;
 
 interface DensitySquare {
-  status: "filled" | "gained" | "ghost";
+  status: "filled" | "gained" | "ghost" | "transit";
   origin: string;
   color: string;
   ageBin: AgeBin;
   warrants: number;            // effective warrants this square represents
 }
+
+// Per-origin gross flow over the window. gross_in = sum of all positive daily
+// deltas (or grading events for Robusta). gross_out = sum of all negative
+// daily deltas. We derive net / lost / transit from these:
+//   • net_delta = gross_in − gross_out
+//   • net_gained = max(0, net_delta)            (showed up in current stock)
+//   • lost      = max(0, −net_delta)            (disappeared, shown as ghost)
+//   • transit   = min(gross_in, gross_out)      (arrived AND left within window)
+interface OriginFlowPair { gross_in: number; gross_out: number }
+
+// Number of grid columns per warehouse card, derived from `p.span` (1..4).
+// Deterministic so the cols × rows label is always honest.
+const COLS_PER_SPAN: Record<1 | 2 | 3 | 4, number> = { 1: 4, 2: 8, 3: 11, 4: 14 };
+const _rowsForCount = (n: number, cols: number) => (n <= 0 ? 0 : Math.ceil(n / cols));
 
 // Helper — distribute `count` squares across origins proportionally and
 // stamp each with an age bin sampled from the age distribution.
@@ -313,79 +327,82 @@ function _allocSquares(
   }));
 }
 
-// Build the three sub-grids for one port:
-//   • `existing`  — what was already at the port at the window's T0
-//                   (current minus the net-gained portion this window)
-//   • `gained`    — newly arrived warrants over the window (any origin with
-//                   positive net delta). Rendered in a green dashed box.
-//   • `ghosts`    — warrants that left the port over the window (any
-//                   origin with negative net delta). Red dashed box.
+// Build the four sub-grids for one port from per-origin gross flows:
+//   • `existing`   — what's still here from before the window started
+//                    (current − net-gained). Inherits the port's age mix.
+//   • `netGained`  — net new warrants added over the window (sum of per-
+//                    origin max(0, in−out)). Green dashed border, fresh.
+//   • `ghosts`     — net warrants that disappeared (sum of per-origin
+//                    max(0, out−in)). Red dashed border.
+//   • `transited`  — coffee that arrived AND left within the window
+//                    (sum of per-origin min(in, out)). Amber dashed,
+//                    fresh — these never show up in current stock.
 //
-// `unit` is the per-market warrant size (bags or lots) — see
-// BAGS_PER_WARRANT_KC / LOTS_PER_WARRANT_RC. We aim for one square ≈ one
-// warrant. If the port's total warrants exceeds DENSITY_MAX_SQUARES we
-// scale uniformly across the three groups and surface the effective
-// per-square count via `effectivePerSquare` so the click popover stays
-// honest.
+// Invariant: current = existing + netGained, so the visible current stock
+// is exactly `existing` + `netGained`. `ghosts` and `transited` sit
+// alongside as window-only ghost groups.
 function buildDensityGrid(
   current: number,
   byOrigin: Record<string, number>,
   age: AgeDist,
-  deltaByOrigin: Record<string, number>,
+  flowByOrigin: Record<string, OriginFlowPair>,
   unit: number,
   market: "KC" | "RC",
 ): {
-  existing: DensitySquare[];
-  gained:   DensitySquare[];
-  ghosts:   DensitySquare[];
+  existing:  DensitySquare[];
+  netGained: DensitySquare[];
+  ghosts:    DensitySquare[];
+  transited: DensitySquare[];
   effectivePerSquare: number;
   totalWarrants: number;
 } {
-  // 1. Raw warrant counts (current state, gained, lost).
-  const totalWarrants = Math.max(0, Math.ceil(current / unit));
-
-  let gainedTotalVol = 0, lostTotalVol = 0;
-  for (const d of Object.values(deltaByOrigin)) {
-    if (d > 0) gainedTotalVol += d;
-    if (d < 0) lostTotalVol += -d;
+  // 1. Decompose per-origin gross flows into net / lost / transit volumes.
+  let netGainedVol = 0, lostVol = 0, transitVol = 0;
+  const netGainedByOrigin: Record<string, number> = {};
+  const ghostByOrigin:     Record<string, number> = {};
+  const transitByOrigin:   Record<string, number> = {};
+  for (const [origin, f] of Object.entries(flowByOrigin)) {
+    const tIn  = Math.max(0, f.gross_in);
+    const tOut = Math.max(0, f.gross_out);
+    const net  = tIn - tOut;
+    const tr   = Math.min(tIn, tOut);
+    if (net > 0)  { netGainedByOrigin[origin] = net;  netGainedVol += net;  }
+    if (net < 0)  { ghostByOrigin[origin]     = -net; lostVol      += -net; }
+    if (tr  > 0)  { transitByOrigin[origin]   = tr;   transitVol   += tr;   }
   }
-  const gainedWarrants = Math.max(0, Math.ceil(gainedTotalVol / unit));
-  const lostWarrants   = Math.max(0, Math.ceil(lostTotalVol   / unit));
-  const existingWarrants = Math.max(0, totalWarrants - gainedWarrants);
+
+  const totalWarrants    = Math.max(0, Math.ceil(current / unit));
+  const netGainedWarrants = Math.max(0, Math.ceil(netGainedVol / unit));
+  const lostWarrants      = Math.max(0, Math.ceil(lostVol      / unit));
+  const transitWarrants   = Math.max(0, Math.ceil(transitVol   / unit));
+  const existingWarrants  = Math.max(0, totalWarrants - netGainedWarrants);
 
   // 2. Uniform scale-down if the grand total of squares would overflow.
-  const grand = existingWarrants + gainedWarrants + lostWarrants;
-  // Safety scale only triggers if a port somehow exceeds the (deliberately
-  // huge) cap — in practice scale stays at 1 so each square is exactly
-  // 1 warrant. Avoids referencing the now-unused `market` arg directly.
+  const grand = existingWarrants + netGainedWarrants + lostWarrants + transitWarrants;
   void market;
   const scale = grand > DENSITY_MAX_SQUARES ? DENSITY_MAX_SQUARES / grand : 1;
-  const existingShown = Math.round(existingWarrants * scale);
-  const gainedShown   = Math.round(gainedWarrants   * scale);
-  const lostShown     = Math.round(lostWarrants     * scale);
+  const existingShown  = Math.round(existingWarrants  * scale);
+  const netGainedShown = Math.round(netGainedWarrants * scale);
+  const lostShown      = Math.round(lostWarrants      * scale);
+  const transitShown   = Math.round(transitWarrants   * scale);
   const effectivePerSquare = scale === 1 ? 1 : 1 / scale;
 
-  // 3. Origin distributions for each group.
+  // 3. Existing origin shares = byOrigin minus per-origin net-gained.
   const existingByOrigin: Record<string, number> = {};
   for (const [origin, v] of Object.entries(byOrigin)) {
-    const delta = deltaByOrigin[origin] ?? 0;
-    existingByOrigin[origin] = Math.max(0, v - Math.max(0, delta));
-  }
-  const gainedByOrigin: Record<string, number> = {};
-  const ghostByOrigin: Record<string, number>  = {};
-  for (const [origin, d] of Object.entries(deltaByOrigin)) {
-    if (d > 0) gainedByOrigin[origin] = d;
-    if (d < 0) ghostByOrigin[origin]  = -d;
+    const ng = netGainedByOrigin[origin] ?? 0;
+    existingByOrigin[origin] = Math.max(0, v - ng);
   }
 
-  // 4. Stamp squares. Existing inherits the port's actual age mix; gained
-  // are by definition fresh (<1y); ghosts have no surviving age info.
+  // 4. Stamp squares. Existing inherits the port's age mix; net-gained and
+  // transit are fresh by definition; ghosts have no surviving age info.
   const FRESH_ONLY: AgeDist = { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-  const existing = _allocSquares(existingShown, existingByOrigin, age,        "filled", effectivePerSquare, market);
-  const gained   = _allocSquares(gainedShown,   gainedByOrigin,   FRESH_ONLY, "gained", effectivePerSquare, market);
-  const ghosts   = _allocSquares(lostShown,     ghostByOrigin,    FRESH_ONLY, "ghost",  effectivePerSquare, market);
+  const existing  = _allocSquares(existingShown,  existingByOrigin,  age,        "filled",  effectivePerSquare, market);
+  const netGained = _allocSquares(netGainedShown, netGainedByOrigin, FRESH_ONLY, "gained",  effectivePerSquare, market);
+  const ghosts    = _allocSquares(lostShown,      ghostByOrigin,     FRESH_ONLY, "ghost",   effectivePerSquare, market);
+  const transited = _allocSquares(transitShown,   transitByOrigin,   FRESH_ONLY, "transit", effectivePerSquare, market);
 
-  return { existing, gained, ghosts, effectivePerSquare, totalWarrants };
+  return { existing, netGained, ghosts, transited, effectivePerSquare, totalWarrants };
 }
 
 interface OriginFlow { origin: string; volume: number; color: string }
@@ -472,7 +489,10 @@ interface PortFlow {
   squareUnit: number;            // bags-per-square or lots-per-square
   byOrigin: Record<string, number>;
   age: AgeDist;
-  deltaByOrigin: Record<string, number>;   // signed change over window per origin
+  // Per-origin gross flows over the window — drives the four-bucket density
+  // grid (existing / net-gained / lost / transited). Replaces the older
+  // signed-delta-only model so we can surface intra-window churn.
+  flowByOrigin: Record<string, OriginFlowPair>;
   inflow: OriginFlow[];
   outflow: OriginFlow[];
   // Display sizing — assigned after all ports are computed. Card spans
@@ -505,7 +525,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
     isNew: boolean; isGhost: boolean;
   } | null>(null);
 
-  //   • deltaByOrigin (current − T0) per origin, used for new/ghost squares
+  //   • flowByOrigin (gross_in / gross_out) per origin over the window,
+  //     used to derive the existing / net-gained / lost / transited squares
   //   • inflow / outflow lists for the side indicators
   interface SystemFlowMarket {
     market: "KC" | "RC";
@@ -552,7 +573,6 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
       const latest = snaps[snaps.length - 1];
       const base = findSnapAt(snaps, cutoff) ?? snaps[0];
       const latestSec = latest.sections?.total_certified;
-      const baseSec = base.sections?.total_certified;
       if (!latestSec) return empty;
 
       // 365-day per-port max, keyed by canonical port code so the snapshot
@@ -609,7 +629,38 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         return { byPort, byOriginPort, originMeta };
       };
       const latestC = collapseSec(latestSec);
-      const baseC   = collapseSec(baseSec);
+
+      // Walk every snapshot in the window in chronological order and
+      // accumulate per-(port, origin) gross inflows / outflows from daily
+      // deltas. Including `base` at the start captures the first transition
+      // into the window. This is what lets us surface stock that arrived
+      // AND departed inside the period (the "transited" bucket).
+      const cutT = cutoff.getTime();
+      const winSnaps = snaps
+        .filter((s) => new Date(s.date).getTime() >= cutT)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const walk = winSnaps[0] === base ? winSnaps : [base, ...winSnaps];
+      const flowByPort: Record<string, Record<string, OriginFlowPair>> = {};
+      for (let i = 0; i < walk.length - 1; i++) {
+        const a = collapseSec(walk[i].sections?.total_certified);
+        const b = collapseSec(walk[i + 1].sections?.total_certified);
+        const keys = new Set<string>();
+        for (const [origin, perPort] of Object.entries(a.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${origin}`);
+        for (const [origin, perPort] of Object.entries(b.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${origin}`);
+        for (const key of Array.from(keys)) {
+          const sep = key.indexOf("|");
+          const port = key.slice(0, sep);
+          const origin = key.slice(sep + 1);
+          const av = (a.byOriginPort[origin] || {})[port] ?? 0;
+          const bv = (b.byOriginPort[origin] || {})[port] ?? 0;
+          const d = bv - av;
+          if (d === 0) continue;
+          flowByPort[port] = flowByPort[port] || {};
+          flowByPort[port][origin] = flowByPort[port][origin] || { gross_in: 0, gross_out: 0 };
+          if (d > 0) flowByPort[port][origin].gross_in  += d;
+          else       flowByPort[port][origin].gross_out += -d;
+        }
+      }
 
       const ports: PortFlow[] = [];
       for (const [code, current] of Object.entries(latestC.byPort)) {
@@ -619,20 +670,12 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           const v = perPort[code] ?? 0;
           if (v > 0) byOrigin[origin] = v;
         }
-        const baseByOrigin: Record<string, number> = {};
-        for (const [origin, perPort] of Object.entries(baseC.byOriginPort)) {
-          const v = perPort[code] ?? 0;
-          if (v > 0) baseByOrigin[origin] = v;
-        }
-        const allOrigins = new Set([...Object.keys(byOrigin), ...Object.keys(baseByOrigin)]);
-        const deltaByOrigin: Record<string, number> = {};
+        const flowByOrigin = flowByPort[code] ?? {};
         const inflow: OriginFlow[] = [];
         const outflow: OriginFlow[] = [];
-        for (const origin of Array.from(allOrigins)) {
-          const d = (byOrigin[origin] ?? 0) - (baseByOrigin[origin] ?? 0);
-          deltaByOrigin[origin] = d;
-          if (d > 0) inflow.push({ origin, volume: d, color: _originColor(origin, "KC") });
-          else if (d < 0) outflow.push({ origin, volume: -d, color: _originColor(origin, "KC") });
+        for (const [origin, f] of Object.entries(flowByOrigin)) {
+          if (f.gross_in  > 0) inflow.push({  origin, volume: f.gross_in,  color: _originColor(origin, "KC") });
+          if (f.gross_out > 0) outflow.push({ origin, volume: f.gross_out, color: _originColor(origin, "KC") });
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
@@ -644,7 +687,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "bags", squareUnit: BAGS_PER_WARRANT_KC,
           byOrigin, age: ageFinal,
-          deltaByOrigin, inflow, outflow, span: 1, poison,
+          flowByOrigin, inflow, outflow, span: 1, poison,
         });
       }
       ports.sort((a, b) => b.current - a.current);
@@ -801,15 +844,15 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           }
         }
         const allOrigins = new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]);
-        const deltaByOrigin: Record<string, number> = {};
+        const flowByOrigin: Record<string, OriginFlowPair> = {};
         const inflow: OriginFlow[] = [];
         const outflow: OriginFlow[] = [];
         for (const origin of Array.from(allOrigins)) {
           const i = inflowByOrigin[origin] ?? 0;
           const o = outflowByOrigin[origin] ?? 0;
-          deltaByOrigin[origin] = i - o;
-          if (i > 0)  inflow.push({ origin, volume: i, color: _originColor(origin, "RC") });
-          if (o > 0)  outflow.push({ origin, volume: o, color: _originColor(origin, "RC") });
+          if (i > 0 || o > 0) flowByOrigin[origin] = { gross_in: i, gross_out: o };
+          if (i > 0) inflow.push({ origin, volume: i, color: _originColor(origin, "RC") });
+          if (o > 0) outflow.push({ origin, volume: o, color: _originColor(origin, "RC") });
         }
         inflow.sort((a, b) => b.volume - a.volume);
         outflow.sort((a, b) => b.volume - a.volume);
@@ -825,7 +868,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
           unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
           byOrigin, age: ageFinal,
-          deltaByOrigin, inflow, outflow, span: 1, poison,
+          flowByOrigin, inflow, outflow, span: 1, poison,
         });
       }
       ports.sort((a, b) => b.current - a.current);
@@ -931,11 +974,15 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         <span className="text-slate-500 uppercase">Change:</span>
         <span className="flex items-center text-slate-300">
           <span className="w-3 h-3 rounded mr-1 border border-dashed border-emerald-400 bg-emerald-950/50" />
-          gained box
+          net gained
         </span>
         <span className="flex items-center text-slate-300">
           <span className="w-3 h-3 rounded mr-1 border border-dashed border-rose-400 bg-rose-950/50" />
-          lost box
+          lost
+        </span>
+        <span className="flex items-center text-slate-300" title="stock that arrived AND left within the window — never showed up in current stock">
+          <span className="w-3 h-3 rounded mr-1 border border-dashed border-amber-400 bg-amber-950/50" />
+          in & out (transited)
         </span>
         <span className="text-slate-700 mx-1">|</span>
         <span className="text-slate-500 uppercase">1 ◻ =</span>
@@ -1063,8 +1110,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           ) : (
             <div className="flex items-start gap-1.5 w-full">
               {mkt.ports.slice(0, 8).map((p) => {
-                const { existing, gained, ghosts, effectivePerSquare, totalWarrants } =
-                  buildDensityGrid(p.current, p.byOrigin, p.age, p.deltaByOrigin, p.squareUnit, p.market);
+                const { existing, netGained, ghosts, transited, effectivePerSquare, totalWarrants } =
+                  buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market);
                 const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                 const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                 const topInflow  = p.inflow.slice(0, 2);
@@ -1075,6 +1122,15 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 const sqLabel = effectivePerSquare === 1
                   ? "1 ◻ = 1 warrant"
                   : `1 ◻ ≈ ${effectivePerSquare.toFixed(1)} warrants`;
+                // Deterministic grid width — same cols count for every
+                // sub-grid in the card so the user can read "cols × rows"
+                // off the border and multiply for the warrant count.
+                const cols = COLS_PER_SPAN[p.span];
+                const colsTemplate = `repeat(${cols}, 13px)`;
+                const dimLabel = (n: number) => {
+                  const r = _rowsForCount(n, cols);
+                  return r === 0 ? "" : `${cols}×${r}`;
+                };
                 const buildPick = (sq: DensitySquare, idx: number, isNew: boolean, isGhost: boolean) => ({
                   market: p.market, port: p.code, portName: p.name, squareIdx: idx,
                   origin: sq.origin, ageBin: sq.ageBin,
@@ -1152,40 +1208,45 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       )}
                     </div>
 
-                    {/* Density grid — existing portion (T0 state still on hand) */}
-                    <div
-                      className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
-                      style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
-                    >
-                      {existing.map((sq, i) => {
-                        const isPicked = pickedSquare?.market === p.market
-                                      && pickedSquare?.port === p.code
-                                      && pickedSquare?.squareIdx === i;
-                        return (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, i, false, false))}
-                            className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
-                            style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
-                            aria-label={`${p.name} square ${i}`}
-                          />
-                        );
-                      })}
+                    {/* Density grid — existing portion (= current − net-gained). */}
+                    <div className="relative">
+                      <div
+                        className="grid gap-[1px] bg-slate-900/50 border border-slate-800 p-1 rounded"
+                        style={{ gridTemplateColumns: colsTemplate }}
+                      >
+                        {existing.map((sq, i) => {
+                          const isPicked = pickedSquare?.market === p.market
+                                        && pickedSquare?.port === p.code
+                                        && pickedSquare?.squareIdx === i;
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, i, false, false))}
+                              className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950" : ""}`}
+                              style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
+                              aria-label={`${p.name} square ${i}`}
+                            />
+                          );
+                        })}
+                      </div>
+                      {existing.length > 0 && (
+                        <span className="absolute -top-2 right-1 text-[8px] font-mono text-slate-500 bg-slate-950 px-1 rounded"
+                              title={`${dimLabel(existing.length)} = ${existing.length} warrants`}>
+                          {dimLabel(existing.length)}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Gained group — new warrants this window, ONE green dashed border around the lot */}
-                    {gained.length > 0 && (
-                      <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10">
+                    {/* Net gained — origins whose net delta is positive over the window. */}
+                    {netGained.length > 0 && (
+                      <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
-                          <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Gained</span>
-                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(gained.length * effectivePerSquare * p.squareUnit))}</span>
+                          <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Net gained</span>
+                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGained.length * effectivePerSquare * p.squareUnit))}</span>
                         </div>
-                        <div
-                          className="grid gap-[1px]"
-                          style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
-                        >
-                          {gained.map((sq, i) => {
+                        <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
+                          {netGained.map((sq, i) => {
                             const idx = existing.length + i;
                             const isPicked = pickedSquare?.market === p.market
                                           && pickedSquare?.port === p.code
@@ -1197,27 +1258,28 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                                 onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, true, false))}
                                 className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
                                 style={{ background: sq.color, opacity: AGE_OPACITY[sq.ageBin] }}
-                                aria-label={`${p.name} gained ${i}`}
+                                aria-label={`${p.name} net-gained ${i}`}
                               />
                             );
                           })}
                         </div>
+                        <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-emerald-400 bg-slate-950 px-1 rounded"
+                              title={`${dimLabel(netGained.length)} = ${netGained.length} warrants`}>
+                          {dimLabel(netGained.length)}
+                        </span>
                       </div>
                     )}
 
-                    {/* Ghost group — lost over window, ONE red dashed border around the lot */}
+                    {/* Lost group — net warrants that disappeared over the window. */}
                     {ghosts.length > 0 && (
-                      <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10">
+                      <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
                           <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(ghosts.length * effectivePerSquare * p.squareUnit))}</span>
                         </div>
-                        <div
-                          className="grid gap-[1px]"
-                          style={{ gridTemplateColumns: "repeat(auto-fill, 13px)" }}
-                        >
+                        <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
                           {ghosts.map((sq, i) => {
-                            const idx = existing.length + gained.length + i;
+                            const idx = existing.length + netGained.length + i;
                             const isPicked = pickedSquare?.market === p.market
                                           && pickedSquare?.port === p.code
                                           && pickedSquare?.squareIdx === idx;
@@ -1233,6 +1295,43 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                             );
                           })}
                         </div>
+                        <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-rose-400 bg-slate-950 px-1 rounded"
+                              title={`${dimLabel(ghosts.length)} = ${ghosts.length} warrants`}>
+                          {dimLabel(ghosts.length)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Transited — stock that arrived AND departed inside the
+                        window. Per-origin min(gross_in, gross_out), summed. */}
+                    {transited.length > 0 && (
+                      <div className="mt-1 border border-dashed border-amber-400/70 rounded p-1 bg-amber-950/10 relative">
+                        <div className="flex justify-between items-baseline mb-0.5">
+                          <span className="text-[8px] uppercase tracking-wider text-amber-400 font-bold">In & out</span>
+                          <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transited.length * effectivePerSquare * p.squareUnit))}</span>
+                        </div>
+                        <div className="grid gap-[1px]" style={{ gridTemplateColumns: colsTemplate }}>
+                          {transited.map((sq, i) => {
+                            const idx = existing.length + netGained.length + ghosts.length + i;
+                            const isPicked = pickedSquare?.market === p.market
+                                          && pickedSquare?.port === p.code
+                                          && pickedSquare?.squareIdx === idx;
+                            return (
+                              <button
+                                key={i}
+                                type="button"
+                                onClick={() => setPickedSquare(isPicked ? null : buildPick(sq, idx, false, false))}
+                                className={`aspect-square rounded-[1px] cursor-pointer transition-transform hover:scale-150 hover:z-10 ${isPicked ? "scale-150 z-20 ring-2 ring-amber-400" : ""}`}
+                                style={{ background: sq.color, opacity: 0.55 }}
+                                aria-label={`${p.name} transited ${i}`}
+                              />
+                            );
+                          })}
+                        </div>
+                        <span className="absolute -bottom-2 right-1 text-[8px] font-mono text-amber-400 bg-slate-950 px-1 rounded"
+                              title={`${dimLabel(transited.length)} = ${transited.length} warrants`}>
+                          {dimLabel(transited.length)}
+                        </span>
                       </div>
                     )}
 
