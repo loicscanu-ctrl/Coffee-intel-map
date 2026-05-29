@@ -38,7 +38,8 @@ from datetime import date, timedelta
 from pathlib import Path
 
 REPO_ROOT  = Path(__file__).resolve().parents[2]
-EVENTS_PATH = REPO_ROOT / "backend" / "seed" / "events.json"
+EVENTS_PATH        = REPO_ROOT / "backend" / "seed" / "events.json"
+EVENTS_PUBLIC_PATH = REPO_ROOT / "frontend" / "public" / "data" / "events.json"
 
 # ── Recurring patterns ────────────────────────────────────────────────────────
 
@@ -224,6 +225,11 @@ def main():
     if args.write:
         EVENTS_PATH.write_text(payload, encoding="utf-8")
         print(f"[build_events_calendar] wrote {EVENTS_PATH}")
+        # Mirror into /public/data so the News tab can fetch it without a
+        # separate copier step. Two files, one source of truth.
+        EVENTS_PUBLIC_PATH.parent.mkdir(parents=True, exist_ok=True)
+        EVENTS_PUBLIC_PATH.write_text(payload, encoding="utf-8")
+        print(f"[build_events_calendar] mirrored to {EVENTS_PUBLIC_PATH}")
     else:
         print(payload[:2000] + ("...(truncated)" if len(payload) > 2000 else ""))
 
