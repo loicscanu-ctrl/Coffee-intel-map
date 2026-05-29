@@ -6,8 +6,8 @@
   "label": "Vietnam",
   "share_label": "VN Robusta",
   "station": "Buon Ma Thuot",
-  "source_production": "USDA GAIN VM2024-0012 · MARD Crop Stats 2021-24 avg · ICO trade data",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
+  "source_production": "USDA GAIN VM2024-0012 \u00c2\u00b7 MARD Crop Stats 2021-24 avg \u00c2\u00b7 ICO trade data",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Dak Lak",
@@ -152,8 +152,8 @@
       "monthly_actual_cur": [
         0.0,
         3.1,
-        0.0,
-        0.0,
+        null,
+        null,
         93.8
       ],
       "monthly_actual_temp_cur": [
@@ -363,8 +363,8 @@
       "monthly_actual_cur": [
         13.2,
         5.9,
-        0.0,
-        0.0,
+        null,
+        null,
         127.8
       ],
       "monthly_actual_temp_cur": [
@@ -574,8 +574,8 @@
       "monthly_actual_cur": [
         0.0,
         7.4,
-        0.0,
-        0.0,
+        null,
+        null,
         106.1
       ],
       "monthly_actual_temp_cur": [
@@ -781,8 +781,8 @@
       "monthly_actual_cur": [
         0.0,
         1.1,
-        0.0,
-        0.0,
+        null,
+        null,
         85.6
       ],
       "monthly_actual_temp_cur": [
@@ -989,8 +989,8 @@
       "monthly_actual_cur": [
         0.0,
         0.8,
-        0.0,
-        0.0,
+        null,
+        null,
         89.1
       ],
       "monthly_actual_temp_cur": [

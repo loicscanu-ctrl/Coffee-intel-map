@@ -249,8 +249,14 @@ def _pctl(by_year: dict[tuple[int, int], float], month: int, y0: int, y1: int, q
 
 
 def _year_series(by_year: dict[tuple[int, int], float], year: int, full: bool):
-    """12-length list for `year`; if not full, truncated at the last month present."""
-    out = []
+    """12-length list for `year`; if not full, truncated at the last month present.
+
+    ERA5 sometimes returns 0.0 (not null) for months whose quality-controlled data
+    is not yet available. Runs of ≥2 consecutive zeros followed by a non-zero month
+    are replaced with None so the frontend can distinguish 'genuinely dry' from
+    'data not yet published'.
+    """
+    out: list = []
     for m in range(1, 13):
         if (year, m) in by_year:
             out.append(r1(by_year[(year, m)]))
@@ -258,6 +264,21 @@ def _year_series(by_year: dict[tuple[int, int], float], year: int, full: bool):
             out.append(0.0)
         else:
             break
+
+    if not full:
+        i = 0
+        while i < len(out):
+            if out[i] == 0.0:
+                j = i
+                while j < len(out) and out[j] == 0.0:
+                    j += 1
+                if j - i >= 2 and j < len(out):
+                    for k in range(i, j):
+                        out[k] = None
+                i = j
+            else:
+                i += 1
+
     return out
 
 

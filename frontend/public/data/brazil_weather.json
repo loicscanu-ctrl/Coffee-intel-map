@@ -7,7 +7,7 @@
   "share_label": "Brazil arabica+conilon",
   "station": "Varginha",
   "source_production": "CONAB 2024/25 regional output (approx. weights)",
-  "source_weather": "Open-Meteo forecast API (live, accumulated daily) · climatology bands seeded, refined as history builds",
+  "source_weather": "Open-Meteo forecast API (live, accumulated daily) \u00c2\u00b7 climatology bands seeded, refined as history builds",
   "provinces": [
     {
       "name": "Sul de Minas",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         282.7,
         110.6,
-        0.0,
-        0.0,
+        null,
+        null,
         23.7
       ],
       "monthly_avg_temp": [
@@ -222,7 +222,7 @@
     },
     {
       "name": "Cerrado",
-      "station": "Patrocínio",
+      "station": "Patroc\u00c3\u00adnio",
       "prod_mt_k": 600,
       "weight": 0.261,
       "monthly_avg_rain": [
@@ -298,8 +298,8 @@
       "monthly_actual_cur": [
         337.8,
         153.9,
-        0.0,
-        0.0,
+        null,
+        null,
         22.8
       ],
       "monthly_avg_temp": [
@@ -432,8 +432,8 @@
       "spi_month": "2026-02"
     },
     {
-      "name": "Espírito Santo",
-      "station": "Vitória",
+      "name": "Esp\u00c3\u00adrito Santo",
+      "station": "Vit\u00c3\u00b3ria",
       "prod_mt_k": 700,
       "weight": 0.304,
       "monthly_avg_rain": [
@@ -509,8 +509,8 @@
       "monthly_actual_cur": [
         304.9,
         61.9,
-        0.0,
-        0.0,
+        null,
+        null,
         17.8
       ],
       "monthly_avg_temp": [
@@ -643,7 +643,7 @@
       "spi_month": "2026-02"
     },
     {
-      "name": "Paraná",
+      "name": "Paran\u00c3\u00a1",
       "station": "Londrina",
       "prod_mt_k": 100,
       "weight": 0.043,
@@ -720,8 +720,8 @@
       "monthly_actual_cur": [
         164.1,
         105.9,
-        0.0,
-        0.0,
+        null,
+        null,
         182.1
       ],
       "monthly_avg_temp": [

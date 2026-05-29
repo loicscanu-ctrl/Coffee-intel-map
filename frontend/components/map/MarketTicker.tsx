@@ -136,6 +136,31 @@ export default function MarketTicker() {
   const otherTickers = tickers.filter(t => t.category !== "futures");
   const allTickers = [...futureTickers, ...otherTickers];
 
+  // RC nearby price in USD/tonne — live first, then parse from static string
+  const rcPrice: number | null = (() => {
+    if (acaphe) {
+      const rc = frontByOI(acaphe.robusta);
+      if (rc?.last != null) return Math.round(rc.last);
+    }
+    const rm = futureTickers.find(t => /^R[MC]/.test(t.label));
+    if (rm) {
+      const m = rm.value.match(/^([0-9,]+)/);
+      if (m) return parseInt(m[1].replace(/,/g, ""), 10);
+    }
+    return null;
+  })();
+
+  // Inject "N±diff" into physical value strings that contain a USD price
+  const formatPhysical = (value: string): string => {
+    if (rcPrice == null) return value;
+    const usdMatch = value.match(/\$([0-9,]+)/);
+    if (!usdMatch) return value;
+    const usd = parseInt(usdMatch[1].replace(/,/g, ""), 10);
+    const diff = usd - rcPrice;
+    const sign = diff >= 0 ? "+" : "";
+    return value.replace(/(\$[0-9,]+)(\))/, `$1, N${sign}${diff}$2`);
+  };
+
   const futuresTs  = acaphe?.fetched_at ?? null;
   const staticTs   = generatedAt;
   // Use acaphe ts for KC/RC, static ts for FX/physical
@@ -162,7 +187,7 @@ export default function MarketTicker() {
   const tickerContent = groups.flatMap((group, gi) => {
     const items = group.map((t, i) => (
       <span key={`${t.label}-${i}`} className={`${COLOR[t.category]} font-mono`}>
-        {t.label}: {t.value}
+        {t.label}: {t.category === "physical" ? formatPhysical(t.value) : t.value}
         {i < group.length - 1 && <span className="text-slate-500">{"   ·   "}</span>}
       </span>
     ));
