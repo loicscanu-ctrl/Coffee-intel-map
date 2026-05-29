@@ -5,7 +5,7 @@ reports, cohort DNA from gradings events, per-cohort shrinkage, and
 the implied per-origin outflow that falls out.
 """
 
-from backend.scraper.sources.ice_certified_stocks.cohort_outflow import (
+from scraper.sources.ice_certified_stocks.cohort_outflow import (
     build_cohort_dna,
     build_current_by_origin,
     build_implied_outflow,
