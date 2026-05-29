@@ -15,6 +15,7 @@ import {
   AreaChart, Area, Bar, ComposedChart, Line,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
+import CohortExplainer from "./CohortExplainer";
 
 // ── Data shapes (subset of the rich JSON — only what this view consumes) ─────
 
@@ -367,6 +368,10 @@ export default function CertifiedStocksTestPanel() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Cohort-DNA implied-outflow explainer — static walkthrough of the
+          algorithm with the worked example from the design doc. */}
+      <CohortExplainer />
+
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
