@@ -293,15 +293,20 @@ interface DensitySquare {
 //   • transit   = min(gross_in, gross_out)      (arrived AND left within window)
 interface OriginFlowPair { gross_in: number; gross_out: number }
 
-// Per-card grid sizing. We target a square-ish layout (cols ≈ √squares)
-// so a port like Antwerp at ~1060 warrants reads as ~32 × 33 instead of
-// stretching to a narrow tall ribbon. cols is clamped to [4, 36] so tiny
-// ports still get a chunky grid and giants don't blow past a sensible
-// width. All four sub-grids in a card share the same cols count.
-const _gridCols = (squares: number) => {
-  if (squares <= 0) return 4;
-  return Math.max(4, Math.min(36, Math.round(Math.sqrt(squares))));
-};
+// Per-card grid sizing. Hard rule (locked at user's request):
+//   • Every Robusta square is exactly 13 px — matches the baseline size
+//     a Houston-Arabica square previously rendered at (small warehouse,
+//     used as the reference point).
+//   • Every Arabica square is 17 px (= 13 × √(17 MT / 10 MT) ≈ 13 × 1.30
+//     so the square area scales with the contract's warrant volume —
+//     Arabica 17 MT lot vs Robusta 10 MT lot).
+// cols = ceil(√squares) keeps the grid square-ish; cards grow to fit and
+// the parent row wraps. This means visual area is comparable across
+// warehouses and contracts — one Antwerp lot covers the same number of
+// pixels regardless of how many lots Antwerp holds.
+const CELL_PX_KC = 17;
+const CELL_PX_RC = 13;
+const _gridCols = (squares: number) => (squares <= 0 ? 4 : Math.max(4, Math.ceil(Math.sqrt(squares))));
 const _rowsForCount = (n: number, cols: number) => (n <= 0 ? 0 : Math.ceil(n / cols));
 
 // ── Density-grid formulas ────────────────────────────────────────────────────
@@ -1276,14 +1281,12 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
               vector-effect, so the SVG can stretch with the row. */}
           {mkt.ports.length > 0 && (() => {
             const visible = mkt.ports.slice(0, 8);
-            const totalSpan = visible.reduce((sum, p) => sum + p.span, 0);
-            if (totalSpan === 0) return null;
-            let cursor = 0;
-            const centres = visible.map((p) => {
-              const c = (cursor + p.span / 2) * (100 / totalSpan);
-              cursor += p.span;
-              return c;
-            });
+            if (visible.length === 0) return null;
+            // Cards now size to their content (fixed-px squares + flex-wrap),
+            // so span-weighted x positions no longer line up. Equal spacing
+            // across the visible cards is the simplest honest approximation —
+            // the manifold drops onto the centre of each slot.
+            const centres = visible.map((_, i) => ((i + 0.5) / visible.length) * 100);
             const arrowXs = visible
               .map((p, i) => ({ p, x: centres[i] }))
               .filter(({ p }) => p.inflow.reduce((s, b) => s + b.volume, 0) > 0)
@@ -1347,7 +1350,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
           {mkt.ports.length === 0 ? (
             <div className="text-xs text-slate-600 italic">No port data loaded.</div>
           ) : (
-            <div className="flex items-start gap-1.5 w-full">
+            <div className="flex flex-wrap items-start gap-1.5 w-full">
               {mkt.ports.slice(0, 8).map((p) => {
                 const {
                   existing, netGained, ghosts, transited,
@@ -1378,13 +1381,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   ? "1 ◻ = 1 warrant"
                   : `1 ◻ ≈ ${effectivePerSquare.toFixed(1)} warrants`;
                 // Per-card grid: cols ≈ √(existing + net-gained) so the
-                // grid is square-ish and fills the card width. All four
-                // sub-grids share the same cols so the user can read
-                // "cols × rows" off the border and multiply for the warrant
-                // count. minmax(0, 1fr) lets squares expand to fill the
-                // card — no empty space on the right.
+                // grid is square-ish and the card sizes to its content.
+                // Cells are fixed-pixel (17 px Arabica, 13 px Robusta) so
+                // one warrant always covers the same area across cards
+                // and contracts — the user can eyeball "this is twice as
+                // much coffee" because the squares ARE the same size.
+                const cellPx = p.market === "KC" ? CELL_PX_KC : CELL_PX_RC;
                 const cols = _gridCols(existing.length + netGained.length);
-                const colsTemplate = `repeat(${cols}, minmax(0, 1fr))`;
+                const colsTemplate = `repeat(${cols}, ${cellPx}px)`;
                 const dimLabel = (n: number) => {
                   const r = _rowsForCount(n, cols);
                   return r === 0 ? "" : `${cols}×${r}`;
@@ -1398,7 +1402,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 return (
                   <div key={`${p.market}-${p.code}`}
                        className="bg-slate-950/60 border border-slate-800 rounded-md p-1.5 flex flex-col"
-                       style={{ flex: `${p.span} 1 0`, minWidth: 0 }}>
+                       style={{ minWidth: 0 }}>
                     {/* Header */}
                     <div className="flex justify-between items-baseline mb-1">
                       <div>
