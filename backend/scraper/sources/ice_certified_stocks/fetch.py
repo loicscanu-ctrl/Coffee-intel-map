@@ -25,6 +25,9 @@ HEADERS = {
 # URL templates (date placeholders are bare format strings, filled by callers).
 # YYYYMMDD = 8-digit; YYMMDD = 6-digit (the legacy LIFFE format).
 ARABICA_DAILY_XLS         = "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_{yyyymmdd}.xls"
+# Monthly Arabica ageing report — published on the last business day of
+# each calendar month. Caller fills in YYYYMMDD = previous month-end.
+ARABICA_AGEING_XLS        = "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_aging_{yyyymmdd}.xls"
 ROBUSTA_STOCK_REPORT_CSV  = "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_{yyyymmdd}_{hhmmss}.csv"
 ROBUSTA_AGE_ALLOWANCE_XLSX = "https://www.ice.com/marketdata/publicdocs/liffe/coffee/aged_allowance_stock_report/Robusta_Coffee_Age_Allowance_{yyyymmdd}.xlsx"
 ROBUSTA_GRADING_OVERVIEW_PDF = "https://www.ice.com/marketdata/publicdocs/liffe/coffee/grading_overview/GradingOverviewCoffee_{yymmdd}.pdf"

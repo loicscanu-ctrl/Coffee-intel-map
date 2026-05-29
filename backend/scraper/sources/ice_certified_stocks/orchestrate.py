@@ -34,6 +34,7 @@ import requests
 from . import fetch as F
 from .parse_age_allowance import parse_age_allowance_xlsx
 from .parse_arabica_xls import parse_arabica_xls
+from .parse_arabica_ageing import parse_arabica_ageing
 from .parse_gradings import parse_gradings
 from .parse_iss_recv import parse_iss_recv_daily, parse_iss_recv_monthly
 from .parse_pdfs import parse_grading_overview_pdf, parse_infested_warrant_pdf
@@ -117,6 +118,7 @@ def _stock_report_sweep_times() -> list[str]:
 # by the parsers.
 _EXPECT_BY_NAME: dict[str, tuple] = {
     "arabica_xls":      ("application/vnd.ms-excel",                                       b"\xd0\xcf\x11\xe0"),
+    "arabica_ageing":   ("application/vnd.ms-excel",                                       b"\xd0\xcf\x11\xe0"),
     "stock_report":     ("text/csv",                                                       b'"'),
     "age_allowance":    ("application/vnd.openxmlformats-officedocument.spreadsheetml",    b"PK\x03\x04"),
     "grading_overview": ("application/pdf",                                                b"%PDF"),
@@ -205,9 +207,13 @@ def _http_get(url: str, *, source: str | None = None, _retry: bool = False) -> r
         time.sleep(throttle)
 
 
-def _safe_parse(parse_fn, source: str, day: date | None, raw):
-    """Wrap a parser; log & swallow on failure so the run continues."""
+def _safe_parse(parse_fn, source: str, day: date | None, raw, **kwargs):
+    """Wrap a parser; log & swallow on failure so the run continues.
+    `kwargs` are forwarded to the parser (e.g. source_url / month_end for
+    parsers that need extra context beyond the raw bytes)."""
     try:
+        if kwargs:
+            return parse_fn(raw, **{**kwargs, "month_end": day} if day else kwargs)
         return parse_fn(raw)
     except Exception as e:  # noqa: BLE001
         print(f"  ! parse {source} {day}: {type(e).__name__}: {e}")
@@ -244,6 +250,19 @@ def pull_arabica_xls(d: date) -> tuple[str, dict | None]:
     if not r or r.status_code != 200 or not r.content:
         return url, None
     return url, _safe_parse(parse_arabica_xls, "arabica_xls", d, r.content)
+
+
+def pull_arabica_ageing(month_end: date) -> tuple[str, dict | None]:
+    """Monthly Arabica ageing report — last-business-day URL. Caller is the
+    monthly cron, which seeds `month_end` to the previous month's last day.
+    The parser returns the per-(origin, year-band) bag matrix the panel needs;
+    failure modes (404, blocked, schema drift) all surface as `parsed=None`.
+    """
+    url = F.ARABICA_AGEING_XLS.format(yyyymmdd=F.yyyymmdd(month_end))
+    r = _http_get(url, source="arabica_ageing")
+    if not r or r.status_code != 200 or not r.content:
+        return url, None
+    return url, _safe_parse(parse_arabica_ageing, "arabica_ageing", month_end, r.content, source_url=url)
 
 
 def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict | None]:
@@ -433,6 +452,12 @@ def _merge_arabica(new: dict, old: dict) -> dict:
     new["snapshots"] = sorted(by_date.values(), key=lambda s: s["date"])
     if not new.get("latest_detail") and old.get("latest_detail"):
         new["latest_detail"] = old["latest_detail"]
+    # Ageing report — keep the older snapshot when the current run didn't
+    # land one (e.g. mid-month, no new file published yet). When a fresher
+    # month_end comes in it naturally wins because we overwrite.
+    if not new.get("ageing_report") and old.get("ageing_report"):
+        new["ageing_report"]     = old["ageing_report"]
+        new["ageing_report_url"] = old.get("ageing_report_url")
     if new["snapshots"]:
         new["as_of"] = new["snapshots"][-1]["date"]
     return new
@@ -519,7 +544,30 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
         arabica_source_url = url
     print(f"  → {len(arabica_snapshots)} snapshots; {len(arabica_errors)} misses\n")
 
-    # ── Robusta: 9 sources ──
+    # ── Arabica monthly ageing report ──
+    # Last business day of the previous calendar month; fall back one
+    # more month if ICE hasn't published yet (typically published within
+    # a few business days of month-end).
+    today = days_sorted_asc[-1] if days_sorted_asc else date.today()
+    arabica_ageing: dict | None = None
+    arabica_ageing_url: str | None = None
+    for back in (0, 1):
+        first_of_this_month = today.replace(day=1)
+        target_month_end = first_of_this_month - timedelta(days=1)
+        if back == 1:
+            target_month_end = target_month_end.replace(day=1) - timedelta(days=1)
+        # ICE files use the actual last calendar day, not the last business day.
+        print(f"[arabica] ageing report for {target_month_end.isoformat()}...")
+        url, parsed = pull_arabica_ageing(target_month_end)
+        if parsed:
+            arabica_ageing = parsed
+            arabica_ageing_url = url
+            print(f"  → captured ({parsed.get('grand_total', 0):,} bags across "
+                  f"{len(parsed.get('origins', []))} origins)")
+            break
+        print(f"  → miss, will try {back+1} month(s) back")
+
+
     print("[robusta] stock report (.csv, today + recent)...")
     robusta_stocks: dict[date, dict] = {}
     robusta_stock_url: str | None = None
@@ -597,6 +645,11 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
         "source_url":   arabica_source_url,
         "snapshots":    arabica_snapshots,
         "latest_detail": arabica_latest,
+        # ICE C-contract monthly ageing report: per-(origin, year-band) bags.
+        # Driven by the new pull_arabica_ageing() above; absent on days where
+        # the file hasn't published yet — _merge_arabica keeps the older copy.
+        "ageing_report": arabica_ageing,
+        "ageing_report_url": arabica_ageing_url,
         "errors":       arabica_errors,
     }
 
