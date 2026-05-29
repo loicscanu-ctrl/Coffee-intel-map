@@ -286,8 +286,20 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
             new_tmean = round(mean, 1) if mean is not None else None
             prev = reg.get(date, {})
             new_essm = essm_by_date.get(date)
+            # Guard against the "API returns 0.0 for a past date" regression
+            # that wiped Mar/Apr 2026 across every origin (the all-zero months
+            # that broke the rainfall chart). If a date older than 7 days
+            # already has a non-zero stored rain reading, refuse to overwrite
+            # it with 0.0 — treat the new 0.0 as a transient API hiccup.
+            # Real zero-rain days are still accepted on first capture (when
+            # prev is None or already 0.0) and within the 7-day window.
+            new_rain = r1(raw_rain) if raw_rain is not None else prev.get("rain")
+            prev_rain = prev.get("rain")
+            if (raw_rain == 0.0 and prev_rain not in (None, 0.0)
+                    and date < (TODAY - dt.timedelta(days=7)).isoformat()):
+                new_rain = prev_rain
             reg[date] = {
-                "rain":  r1(raw_rain) if raw_rain is not None else prev.get("rain"),
+                "rain":  new_rain,
                 "tmean": new_tmean if new_tmean is not None else prev.get("tmean"),
                 "essm":  new_essm if new_essm is not None else prev.get("essm"),
             }
