@@ -243,17 +243,17 @@ SIGNALS_MARKET         = "PHYS"   # physical/agronomic, not NY/LDN futures
 def flatten_for_signals(payload: dict[str, Any]) -> list[dict[str, Any]]:
     """Project the agronomic_alerts payload into signals.json-shaped entries.
 
-    Severity is lowercased so it matches the quant signals' info/watch/alert
-    convention. Each entry's id is deterministic so a daily run replaces the
-    prior day's entries cleanly (the merge below drops any prior AGRO rows).
+    Severity passes through unchanged (the IPHM ruleset is already lowercase
+    to match the quant-signal convention). `timeframe` is promoted to a
+    top-level field so UIs can filter `s.timeframe === "forecast"` without
+    regex-sniffing the human-readable text. Each entry's id is deterministic
+    so a daily run replaces the prior day's entries cleanly (the merge below
+    drops any prior AGRO rows).
     """
     out: list[dict[str, Any]] = []
     for origin, regions in (payload.get("origins") or {}).items():
         for region, alerts in regions.items():
             for a in alerts:
-                severity = a["severity"].lower()
-                tf = a["timeframe"]
-                tf_text = " (forecast)" if tf == "forecast" else ""
                 trigger_bits = ", ".join(f"{k}={v}" for k, v in a["triggers"].items())
                 out.append({
                     "id": f"AGRO_{origin}_{region}_{a['threat_id']}".replace(" ", "_"),
@@ -261,10 +261,11 @@ def flatten_for_signals(payload: dict[str, Any]) -> list[dict[str, Any]]:
                     "category":      SIGNALS_CATEGORY,
                     "categoryLabel": SIGNALS_CATEGORY_LABEL,
                     "market":        SIGNALS_MARKET,
-                    "severity":      severity,
+                    "severity":      a["severity"],
+                    "timeframe":     a["timeframe"],
                     "score":         0,            # not a price-direction score
                     "magnitude":     "medium",
-                    "text":          f"{origin}/{region}: {a['market_impact']}{tf_text}  [{trigger_bits}]",
+                    "text":          f"{origin}/{region}: {a['market_impact']}  [{trigger_bits}]",
                 })
     return out
 

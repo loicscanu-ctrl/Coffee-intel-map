@@ -25,7 +25,7 @@ class TestFungalRust:
         out = ae.evaluate_rule(self.RULE, {"spi_1": 2.0, "temp_mean": 23.0}, "COL", 5)
         assert out is not None
         assert out["threat_id"] == "fungal_rust_outbreak"
-        assert out["severity"] == "Alert"
+        assert out["severity"] == "alert"
         assert out["timeframe"] == "current"
         assert out["triggers"] == {"spi_1": 2.0, "temp_mean": 23.0}
 
@@ -52,7 +52,7 @@ class TestSevereDefoliation:
     def test_fires_on_double_stress(self):
         out = ae.evaluate_rule(self.RULE, {"vhi": 30.0, "spei_3": -2.0}, "VNM", 5)
         assert out is not None
-        assert out["severity"] == "Critical"
+        assert out["severity"] == "critical"
         assert out["timeframe"] == "current"
         assert out["triggers"] == {"vhi": 30.0, "spei_3": -2.0}
 
@@ -75,7 +75,7 @@ class TestBrazilFrost:
             out = ae.evaluate_rule(self.RULE, {"temp_min": 1.5}, "BRA", m)
             assert out is not None
             assert out["timeframe"] == "forecast"   # temp_min is forecast-only
-            assert out["severity"] == "Critical"
+            assert out["severity"] == "critical"
 
     def test_skips_other_origins_even_when_cold(self):
         for iso in ("COL", "HND", "VNM", "ETH"):
@@ -100,7 +100,7 @@ class TestBlossomDrop:
             self.RULE, {"spei_3": -1.2, "forecast_7d_rain": 78.0}, "BRA", 9,
         )
         assert out is not None
-        assert out["severity"] == "Watch"
+        assert out["severity"] == "watch"
         assert out["timeframe"] == "forecast"   # forecast_7d_rain is a forecast field
 
     def test_does_not_fire_without_drought(self):
@@ -150,16 +150,16 @@ def test_extract_skips_absent_fields():
 
 # ── Flatten into signals.json shape ──────────────────────────────────────────
 
-def test_flatten_lowercases_severity_and_tags_timeframe():
+def test_flatten_promotes_timeframe_and_passes_severity_through():
     payload = {
         "origins": {
             "brazil": {
                 "Sul de Minas": [{
                     "threat_id": "brazil_frost_risk",
                     "name": "Critical Frost Threat",
-                    "severity": "Critical",
+                    "severity": "critical",
                     "timeframe": "forecast",
-                    "market_impact": "…",
+                    "market_impact": "Immediate systemic threat.",
                     "triggers": {"temp_min": 1.5},
                 }],
             },
@@ -168,22 +168,26 @@ def test_flatten_lowercases_severity_and_tags_timeframe():
     rows = ae.flatten_for_signals(payload)
     assert len(rows) == 1
     r = rows[0]
-    assert r["severity"] == "critical"             # lowercase
-    assert r["category"] == "AGRO"
-    assert r["market"] == "PHYS"
-    assert "(forecast)" in r["text"]               # timeframe surfaced
+    # Structured fields — what the UI actually filters on
+    assert r["severity"]  == "critical"            # passthrough (was already lowercase)
+    assert r["timeframe"] == "forecast"            # promoted from text → top-level
+    assert r["category"]  == "AGRO"
+    assert r["market"]    == "PHYS"
+    assert r["id"]        == "AGRO_brazil_Sul_de_Minas_brazil_frost_risk"
+    # text is now informational only — no parseable state. Triggers remain
+    # in brackets for Telegram readability.
+    assert "(forecast)" not in r["text"]
     assert "temp_min=1.5" in r["text"]
-    assert r["id"] == "AGRO_brazil_Sul_de_Minas_brazil_frost_risk"
 
 
-def test_flatten_marks_current_timeframe_without_forecast_suffix():
+def test_flatten_current_timeframe_pass_through():
     payload = {
         "origins": {
             "colombia": {
                 "Huila": [{
                     "threat_id": "fungal_rust_outbreak",
                     "name": "Elevated Fungal / Leaf Rust Risk",
-                    "severity": "Alert",
+                    "severity": "alert",
                     "timeframe": "current",
                     "market_impact": "…",
                     "triggers": {"spi_1": 1.8, "temp_mean": 22.5},
@@ -192,8 +196,20 @@ def test_flatten_marks_current_timeframe_without_forecast_suffix():
         },
     }
     rows = ae.flatten_for_signals(payload)
+    assert rows[0]["timeframe"] == "current"
+    assert rows[0]["severity"]  == "alert"
     assert "(forecast)" not in rows[0]["text"]
-    assert rows[0]["severity"] == "alert"
+
+
+def test_iphm_rules_all_use_lowercase_severities():
+    """Guard: no Pascal-case sneaks back into the canonical ruleset."""
+    from scraper.rules.iphm_thresholds import IPHM_RULES
+    allowed = {"watch", "alert", "critical"}
+    for rule in IPHM_RULES:
+        assert rule["severity"] in allowed, (
+            f"{rule['threat_id']} has severity {rule['severity']!r} — "
+            "must be lowercase (watch | alert | critical)."
+        )
 
 
 # ── evaluate_region: stacks alerts ───────────────────────────────────────────
