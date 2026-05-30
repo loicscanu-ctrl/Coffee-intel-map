@@ -417,10 +417,17 @@ def _robusta_snapshot(d: date, stock: dict | None, gradings_today: list[dict],
     lots_graded_today = sum(g["summary"]["lots_graded_today"] for g in gradings_today) if gradings_today else 0
     iss_total = (iss_recv_today or {}).get("grand_total") or {}
     tenders_total = (tenders_today or {}).get("totals_today") or {}
+    total_lots = sr_total.get("with_val_cert", 0)
     return {
         "date":                 d.isoformat(),
         "cut_off_date":         (stock or {}).get("cut_off_date"),
-        "total_lots_certified": sr_total.get("with_val_cert", 0),
+        "total_lots_certified": total_lots,
+        # Headline cross-market unit so anything ranking Arabica vs Robusta side
+        # by side (data-map, alerting) can read one canonical number. 1 ICE
+        # Robusta lot = 10 tonnes = 10,000 kg ÷ 60 kg/bag = 166.6667 bags.
+        # Lot-denominated detail (by_port_lots, lots_sold_today, …) stays raw
+        # because that's the ICE-native semantic traders work in.
+        "total_bags_60kg_equivalent": round(total_lots * 10_000 / 60),
         "non_tend_lots":        sr_total.get("non_tend", 0),
         "suspended_lots":       sr_total.get("suspended", 0),
         "lots_graded_today":    lots_graded_today,
