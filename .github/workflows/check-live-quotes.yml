@@ -1,13 +1,21 @@
 name: "1.8 – Check Live Quotes Freshness"
 
 # Reads `live_quotes` from Upstash Redis and pings Telegram if `fetched_at` is
-# older than STALE_HOURS. The acaphe_poller process runs outside GitHub Actions
-# (external host), so the existing `if: failure()` notifications never fire when
-# it dies silently. This workflow closes that gap.
+# older than STALE_HOURS. Schedule mirrors the 0.1 poller's window:
+#   poller cron     `*/15 8-19 * * 1-5`   → polls every 15 min, 08:00-19:45 UTC, Mon-Fri
+#   checker cron    `15 9-20 * * 1-5`     → checks Mon-Fri 09:15-20:15 UTC
+# The 1-hour lead-in lets the first poll of the day land + write to Upstash
+# before the first check fires, and the trailing tick at 20:15 catches a
+# missed-last-poll scenario.
+#
+# Outside this window (overnight / weekends) the poller is intentionally
+# silent, so the freshness check is intentionally silent too — otherwise it
+# would fire ~80 false-positive Telegram alerts per week (every weeknight
+# 02:15-09:15 UTC + every weekend Sat 02:15 through Mon 09:15).
 
 on:
   schedule:
-    - cron: '15 * * * *'   # hourly at :15
+    - cron: '15 9-20 * * 1-5'   # Mon-Fri, 09:15-20:15 UTC, hourly at :15
   workflow_dispatch:
 
 jobs:
@@ -21,7 +29,11 @@ jobs:
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
           TELEGRAM_BOT_TOKEN:       ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:         ${{ secrets.TELEGRAM_CHAT_ID }}
-          STALE_HOURS:              "6"
+          # The poller writes every 15 minutes during the trading window.
+          # 2h = 8 consecutive missed polls — well beyond transient delays
+          # (GH Actions cron drift is typically <10 min) but short enough
+          # to surface a real outage inside one trading day.
+          STALE_HOURS:              "2"
         run: |
           set -u
           if [ -z "${UPSTASH_REDIS_REST_URL:-}" ] || [ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]; then
