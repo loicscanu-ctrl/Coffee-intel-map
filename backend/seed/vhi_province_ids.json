@@ -25,51 +25,59 @@
   "honduras": {
     "country_iso3": "HND",
     "provinces": {
-      "El Paraíso":    { "province_id": null, "noaa_name": null },
-      "Copán":         { "province_id": null, "noaa_name": null },
-      "Santa Bárbara": { "province_id": null, "noaa_name": null },
-      "Montecillos":   { "province_id": null, "noaa_name": null },
-      "Agalta":        { "province_id": null, "noaa_name": null }
+      "El Paraíso":    { "province_id": 16, "noaa_name": "El Paraiso" },
+      "Copán":         { "province_id": 8,  "noaa_name": "Copan" },
+      "Santa Bárbara": { "province_id": 7,  "noaa_name": "Santa Barbara" },
+      "Montecillos":   { "province_id": 10, "noaa_name": "Comayagua",
+                          "_note": "Montecillos coffee region spans Comayagua/La Paz/Intibucá/Santa Bárbara — Comayagua is the dominant production share." },
+      "Agalta":        { "province_id": 9,  "noaa_name": "Olancho" }
     }
   },
   "indonesia": {
     "country_iso3": "IDN",
     "provinces": {
-      "Lampung": { "province_id": null, "noaa_name": null },
-      "Gayo":    { "province_id": null, "noaa_name": null },
-      "Java":    { "province_id": null, "noaa_name": null },
-      "Toraja":  { "province_id": null, "noaa_name": null },
-      "Flores":  { "province_id": null, "noaa_name": null }
+      "Lampung": { "province_id": 25, "noaa_name": "Lampung" },
+      "Gayo":    { "province_id": 1,  "noaa_name": "Aceh",
+                    "_note": "Gayo highlands sit within Aceh province." },
+      "Java":    { "province_id": 30, "noaa_name": "East Java",
+                    "_note": "Java coffee is concentrated on the Ijen plateau in East Java; West/Central Java contribute little." },
+      "Toraja":  { "province_id": 22, "noaa_name": "South Sulawesi" },
+      "Flores":  { "province_id": null, "noaa_name": null,
+                    "_note": "Flores is in East Nusa Tenggara (NTT). NOAA ID not yet captured." }
     }
   },
   "uganda": {
     "country_iso3": "UGA",
     "provinces": {
-      "Masaka":   { "province_id": null, "noaa_name": null },
-      "Kasese":   { "province_id": null, "noaa_name": null },
-      "Rwenzori": { "province_id": null, "noaa_name": null },
-      "Mbale":    { "province_id": null, "noaa_name": null },
-      "Mt Elgon": { "province_id": null, "noaa_name": null }
+      "Masaka":   { "province_id": 47, "noaa_name": "Masaka" },
+      "Kasese":   { "province_id": 45, "noaa_name": "Kasese" },
+      "Rwenzori": { "province_id": 45, "noaa_name": "Kasese",
+                     "_note": "Rwenzori mountains sit within Kasese district (GADM admin-2)." },
+      "Mbale":    { "province_id": 27, "noaa_name": "Mbale" },
+      "Mt Elgon": { "province_id": 27, "noaa_name": "Mbale",
+                     "_note": "Mt Elgon coffee zone (eastern slope) maps to Mbale district at GADM admin-2." }
     }
   },
   "ethiopia": {
     "country_iso3": "ETH",
     "provinces": {
-      "Sidama/Yirgacheffe": { "province_id": null, "noaa_name": null },
-      "Jimma":              { "province_id": null, "noaa_name": null },
-      "Limu":               { "province_id": null, "noaa_name": null },
-      "Kaffa":              { "province_id": null, "noaa_name": null },
-      "Harrar":             { "province_id": null, "noaa_name": null }
+      "Sidama/Yirgacheffe": { "province_id": 11, "noaa_name": "SNNPR",
+                               "_note": "Sidama + Yirgacheffe historically inside SNNPR; GADM may still use the legacy boundary after the 2023 partition." },
+      "Jimma":              { "province_id": 9,  "noaa_name": "Oromia" },
+      "Limu":               { "province_id": 9,  "noaa_name": "Oromia" },
+      "Kaffa":               { "province_id": 11, "noaa_name": "SNNPR" },
+      "Harrar":             { "province_id": 9,  "noaa_name": "Oromia",
+                               "_note": "Harrar coffee comes from East Hararghe in Oromia." }
     }
   },
   "vn": {
     "country_iso3": "VNM",
     "provinces": {
-      "Dak Lak":  { "province_id": null, "noaa_name": null },
-      "Lam Dong": { "province_id": null, "noaa_name": null },
-      "Dak Nong": { "province_id": null, "noaa_name": null },
-      "Gia Lai":  { "province_id": null, "noaa_name": null },
-      "Kon Tum":  { "province_id": null, "noaa_name": null }
+      "Dak Lak":  { "province_id": 40, "noaa_name": "Dak Lak" },
+      "Lam Dong": { "province_id": 44, "noaa_name": "Lam Dong" },
+      "Dak Nong": { "province_id": 42, "noaa_name": "Dak Nong" },
+      "Gia Lai":  { "province_id": 38, "noaa_name": "Gia Lai" },
+      "Kon Tum":  { "province_id": 36, "noaa_name": "Kon Tum" }
     }
   }
 }
