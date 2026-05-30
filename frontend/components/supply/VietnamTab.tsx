@@ -4,6 +4,7 @@ import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
 import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEstimate";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
+import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 
 interface VietnamSupply {
@@ -27,6 +28,39 @@ interface VietnamSupply {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SharesData = any;
+
+function VnEnsoNote() {
+  return (
+    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3">
+      <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+        ENSO Impact · Vietnam
+      </div>
+      <div className="space-y-2 text-[9px]">
+        <div className="flex items-start gap-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+          <span className="font-bold text-blue-400 flex-shrink-0">La Niña</span>
+          <span className="text-slate-400">
+            Wetter dry season in Central Highlands. Reduced irrigation cost.
+            Historically <span className="text-green-400 font-semibold">+5–10%</span> yield uplift.
+          </span>
+        </div>
+        <div className="flex items-start gap-2 p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
+          <span className="font-bold text-orange-400 flex-shrink-0">El Niño</span>
+          <span className="text-slate-400">
+            Prolonged dry season (Jan–Apr critical). Srepok / Dak Bla basins most exposed.
+            2023/24 drought cut production ~<span className="text-red-400 font-semibold">−10%</span>.
+          </span>
+        </div>
+        <div className="flex items-start gap-2 p-2 rounded-lg bg-slate-700/50 border border-slate-600/30">
+          <span className="font-bold text-slate-400 flex-shrink-0">Neutral</span>
+          <span className="text-slate-500">Normal seasonal rainfall. Trend yield around 27–29 bags/ha.</span>
+        </div>
+      </div>
+      <div className="text-[7px] text-slate-700 italic border-t border-slate-700 pt-2">
+        Source: WASI / WMO historical analysis. ~90% of Vietnam coffee is Robusta (Dak Lak, Gia Lai, Dak Nong, Lam Dong).
+      </div>
+    </div>
+  );
+}
 
 export default function VietnamTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
@@ -72,7 +106,13 @@ export default function VietnamTab() {
       {subTab === "supply-demand" && <SupplyDemandBalance origin="vietnam" label="Vietnam" />}
 
       {/* ── Weather ────────────────────────────────────────────────── */}
-      {subTab === "weather" && <VnWeatherCharts />}
+      {subTab === "weather" && (
+        <div className="space-y-5">
+          <VnWeatherCharts />
+          <VnWaterLevels />
+          <VnEnsoNote />
+        </div>
+      )}
 
       {/* ── Exports ────────────────────────────────────────────────── */}
       {subTab === "exports" && (

@@ -265,6 +265,10 @@ function Spec({ k, children }: { k: string; children: React.ReactNode }) {
   );
 }
 
+function Tbc() {
+  return <span className="text-amber-400/90 text-[7px] font-bold ml-1 border border-amber-400/40 rounded px-0.5 align-middle">TBC</span>;
+}
+
 function PdfLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
@@ -278,60 +282,137 @@ function ContractRules() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
-      <Article kicker="ICE Futures U.S." title={"Coffee “C” Futures (Arabica · KC)"} dateline="Chapter 8 · Coffee “C” Rules">
-        <p className="mb-3">
+      <Article kicker=”ICE Futures U.S.” title={“Coffee “C” Futures (Arabica · KC)”} dateline=”Chapter 8 · Coffee “C” Rules”>
+        <p className=”mb-3”>
           The Coffee &ldquo;C&rdquo; contract is the world benchmark for <strong>washed Arabica</strong>. The rulebook
           opens with a notice that ICE is <em>phasing it out</em>: a new Arabica contract was slated to list in fall 2025,
           no Coffee &ldquo;C&rdquo; futures are listed beyond the <strong>March 2028</strong> month, and only options on
           March-2028-and-earlier futures will continue.
         </p>
-        <Spec k="Lot size">37,500 lb of washed Arabica (one growth).</Spec>
-        <Spec k="Deliverable growths">Brazil, Colombia, Costa Rica, Guatemala, Honduras, Mexico, Peru, Uganda and ~12
+        <Spec k=”Lot size”>37,500 lb of washed Arabica (one growth).</Spec>
+        <Spec k=”Deliverable growths”>Brazil, Colombia, Costa Rica, Guatemala, Honduras, Mexico, Peru, Uganda and ~12
           others; <strong>Vietnam added from the May 2027 month</strong>.</Spec>
-        <Spec k="Grade standard">Sound, free of unwashed/aged cup flavours, good roasting quality; no more than
+        <Spec k=”Grade standard”>Sound, free of unwashed/aged cup flavours, good roasting quality; no more than
           <strong> 15 full imperfections</strong> below the growth basis (Colombian: max 10).</Spec>
-        <Spec k="Delivery months">March, May, July, September, December; listed up to 60 months out.</Spec>
-        <Spec k="Price / tick">Quoted in cents per pound; minimum fluctuation <strong>0.05¢/lb</strong> — i.e.
+        <Spec k=”Delivery months”>March, May, July, September, December; listed up to 60 months out.</Spec>
+        <Spec k=”Price / tick”>Quoted in cents per pound; minimum fluctuation <strong>0.05¢/lb</strong> (= 5 points) — i.e.
           <strong> $18.75 per contract</strong>.</Spec>
-        <Spec k="Price basis">A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
-          Honduras, Uganda from the Mar 2026 month) with Board-set differentials for other growths and grades.</Spec>
-        <Spec k="Delivery mechanism">Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
+        <Spec k=”Price basis”>A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
+          Honduras, Uganda from the Mar 2026 month) with Board-set differentials for all other growths.</Spec>
+        <Spec k=”Origin differentials”>Basis growths at <strong>par</strong> (current list from Mar 2026 month: Mexico,
+          El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru; list revised Jan 2024). Board-set
+          premia and discounts — amounts below from prior rulebook, <em>verify in latest ICE Circular for current
+          values</em>:
+          <br />· <strong>Colombia</strong> <code>+0.04¢/lb</code><Tbc /> (historic; may have changed in Jan 2024 update)
+          <br />· <strong>Venezuela, Burundi, Rwanda, India</strong> <code>−0.01¢/lb</code><Tbc />
+          <br />· <strong>Dominican Republic, Ecuador</strong> <code>−0.04¢/lb</code><Tbc />
+          <br />· <strong>Brazil</strong> <code>−0.06¢/lb</code><Tbc /> (natural-process cup profile)
+          <br />· <strong>Vietnam</strong> (from May 2027) — differential TBD by ICE Board</Spec>
+        <Spec k=”Delivery point allowances”>New York District and Virginia: <strong>at par</strong>.
+          New Orleans, Miami, Houston: <strong>−0.50¢/lb</strong>.
+          Antwerp, Hamburg/Bremen, Barcelona: <strong>−1.25¢/lb</strong>. Deducted from invoice at delivery.</Spec>
+        <Spec k=”Weight allowance (outturn)”>Tolerance <strong>±2% of 37,500 lb</strong>. Deficiency ≤2%: delivery
+          permitted; buyer pays only for actual weight. Deficiency &gt;2%: not permitted without mutual consent.
+          Excess &gt;2%: buyer not obligated to accept or pay for the excess weight.</Spec>
+        <Spec k=”Age allowance”><Tbc /> Monthly deduction in ¢/lb accruing from certification date — <em>rates below from prior rulebook, verify in current ICE Chapter 8 circular</em>:
+          <br />· <strong>M1–M3</strong>: no deduction &nbsp;·&nbsp; <strong>M4</strong>: −0.50¢/lb (threshold step)
+          <br />· <strong>M5–Y1</strong>: −0.25¢/lb / month &nbsp;·&nbsp; <strong>Y1–Y2</strong>: −0.50¢/lb / month
+          <br />· <strong>Y2–Y3</strong>: −1.00¢/lb / month &nbsp;·&nbsp; <strong>Y3–Y4</strong>: −1.25¢/lb / month
+          <br />· <strong>Y4–Y5</strong>: −1.50¢/lb / month &nbsp;·&nbsp; <strong>Y5–Y6</strong>: −1.75¢/lb / month
+          <br />· <strong>Y6–Y7</strong>: −2.00¢/lb / month &nbsp;·&nbsp; <strong>Y7–Y8</strong>: −2.25¢/lb / month
+          <br />· <strong>Y8–Y9</strong>: −2.50¢/lb / month &nbsp;·&nbsp; <strong>Y9–Y10</strong>: −2.75¢/lb / month
+          <br />· <strong>Y10+</strong>: −3.00¢/lb / month
+          <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) allowing
+          traders to estimate aggregate deduction exposure across exchange stocks.</Spec>
+        <Spec k=”Delivery mechanism”>Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
           7 business days after the Delivery Notice.</Spec>
-        <Spec k="Key dates">Last Notice Day = 7th business day before the last business day of the delivery month;
+        <Spec k=”Key dates”>Last Notice Day = 7th business day before the last business day of the delivery month;
           Last Trading Day = the business day before Last Notice Day.</Spec>
-        <Spec k="Delivery points">Licensed warehouses at the Port of New York District, New Orleans, Miami, Houston,
+        <Spec k=”Delivery points”>Licensed warehouses in Port of New York District, New Orleans, Miami, Houston,
           Virginia, Antwerp, Hamburg/Bremen and Barcelona.</Spec>
-        <Spec k="Packaging">Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
+        <Spec k=”Packaging”>Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
           deforestation (EUDR) appendices apply.</Spec>
-        <PdfLink href="https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf">Full rulebook on ICE (PDF)</PdfLink>
+        <Spec k=”Storage / Rent”>Accrues from certification date; deducted on invoice. Indicative licensed-warehouse
+          rates: <strong>≈ $0.85–1.25/bag/month</strong><Tbc /> (≈ $240–355/lot/month for a ~284-bag lot; EU locations may
+          differ). Exact rates per warehouse, approved by ICE — verify in current warehouse schedule.</Spec>
+        <Spec k=”Loading Out Charge (OCA)”>One-time charge paid by buyer when collecting from licensed warehouse.<Tbc />{“ “}
+          <em>Exact amounts set per warehouse in ICE schedule — verify in current circular before tendering.</em></Spec>
+        <Spec k=”Grading / Sampling fee”>ICE charges <strong>$1.50 per bag</strong> (minimum $40 per EWR) for
+          sampling and grading at certification — raised from $1.25/bag in Nov 2024. Appeal of a grade costs the same
+          fee. Redelivery grading incurs a similar fee borne by the certifying party.</Spec>
+        <Spec k=”Weighing”>Required at certification and redelivery. Fees set per licensed warehouse —
+          <em> verify exact amounts in current ICE warehouse rate schedule.</em></Spec>
+        <PdfLink href=”https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf”>Full rulebook on ICE (PDF)</PdfLink>
       </Article>
 
       <Article kicker="ICE Futures Europe" title={"Robusta Coffee Futures (RC · Section GGGG)"} dateline="Section GGGG · Contract Rules">
-        <p className="mb-3">
+        <p className="mb-2">
           The London Robusta contract — rulebook <strong>Section GGGG</strong> — is the global benchmark for
           <strong> Robusta</strong> (<em>Coffea canephora</em>). It is sized and priced per <strong>tonne</strong> and
           settles into European/UK/US warehouse delivery, with a tiered quality-class allowance schedule rather than a
           single deliverable grade.
         </p>
+        <p className="mb-3 text-[10px] text-slate-400 bg-slate-800/60 rounded p-2 border border-slate-700/50">
+          <strong className="text-slate-300">Tenderable parity</strong> — the break-even differential at which a trader
+          is indifferent between selling FOB physical and tendering into the exchange — is:
+          {" "}<code className="text-amber-300">FOB + Freight + Port transport (~$7/t<Tbc />) + Rent (~$15/t<Tbc />) + Rent allowance + Loading Out (~$40/t<Tbc />) + Contract allowances</code>.
+          If the physical FOB differential is <em>above</em> tenderable parity, traders sell commercial; below it, it pays
+          to tender into the exchange. Certified stocks accumulate when FOB differentials compress toward or below parity.
+        </p>
         <Spec k="Lot size">Nominal <strong>10 tonnes</strong> net, one Origin and shipment period, from no more than two
           parcels.</Spec>
         <Spec k="Origin">Any country freely available for export.</Spec>
-        <Spec k="Quality classes (per 300 g)">Premium (≤0.5% defects, 90% over Screen 15) <strong>+$30/t</strong>;
-          Class 1 (≤3% defects, Screen 14) <strong>at par</strong>; Class 2 <strong>−$30/t</strong>; Class 3
-          <strong> −$60/t</strong>; Class 4 (≤8% defects, Screen 12) <strong>−$90/t</strong>.</Spec>
+        <Spec k="Quality class allowances (per 300 g sample)">
+          <br />· <strong>Premium (Class 0)</strong> <code>+$30/t</code>: ≤0.2% FM, ≤0.5% defects, ≥90% over Screen 15, ≥96% over Screen 13
+          <br />· <strong>Class 1</strong> <code>par</code>: ≤0.5% FM, ≤3.0% defects, ≥90% over Screen 14, ≥96% over Screen 12
+          <br />· <strong>Class 2</strong> <code>−$30/t</code>: ≤1.0% FM, ≤5.0% defects, ≥90% over Screen 13, ≥96% over Screen 12
+          <br />· <strong>Class 3</strong> <code>−$60/t</code>: ≤1.0% FM, ≤7.5% defects, ≥90% over Screen 13, ≥96% over Screen 12
+          <br />· <strong>Class 4</strong> <code>−$90/t</code>: ≤1.0% FM, ≤8.0% defects, ≥90% over Screen 12
+          <br /><em>Note: the $30/t step was chosen for simplification; Class 4 is arguably over-discounted vs. its
+          net-sound-bean ratio (~91%) relative to Class 1 (~96.5%).</em></Spec>
         <Spec k="Not tenderable">&gt;8% defects, &lt;90% over Screen 12 round, &gt;1% foreign matter, foreign odour, or
           not sound Robusta.</Spec>
         <Spec k="Price / tick">Quoted in US$ per tonne; minimum fluctuation <strong>$1/tonne = $10 per lot</strong>.</Spec>
-        <Spec k="Age allowance">−$5/tonne per month for grading age 13–48 months; −$10/tonne per month from 49 months.</Spec>
+        <Spec k="Age allowance">Deducted monthly from invoice: <strong>−$5/tonne per calendar month</strong> for grading
+          age 13–48 months; <strong>−$10/tonne per calendar month</strong> from 49 months onward. Coffee &gt;12 months
+          old at grading date accumulates allowances immediately on warrant issue.</Spec>
+        <Spec k="Weight allowance">Two components:
+          <br /><strong>1. Outturn tolerance</strong> — ±3% of 10 tonnes. Deviation within band settles at EDSP on
+          the invoice; deficiency &gt;3% is non-conforming.
+          <br /><strong>2. Age-related moisture loss</strong><Tbc /> — from year 2 of storage: fixed deduction of
+          <strong>+0.75%</strong> of nominal weight, then an additional <strong>−0.065% per month</strong>, capping
+          at <strong>−1.5% of net weight</strong> (reached approximately at year 3). This allowance compensates the
+          holder for natural moisture loss during extended bonded storage; it is deducted from the invoice separately
+          from the outturn measurement.</Spec>
         <Spec k="Packaging">Bags ≤80 kg gross; bulk in FIBCs of 900–1,100 kg.</Spec>
         <Spec k="Delivery areas">Amsterdam, Antwerp, Barcelona, Bremen, Felixstowe, Genoa-Savona, Hamburg, Le Havre,
           London (Tilbury), New Orleans, New York, Rotterdam, Trieste.</Spec>
-        <Spec k="Customs">EU delivery is into a Customs Warehouse retaining <strong>non-Union status</strong>;
-          UK / New Orleans / New York lots must be cleared into free circulation.</Spec>
+        <Spec k="Customs status">EU delivery: Customs Warehouse retaining <strong>non-Union status</strong> (import duty
+          deducted from invoice — see Import-Duty allowance). UK, New Orleans and New York lots must be cleared into free
+          circulation at buyer&rsquo;s expense; no duty deduction applies.</Spec>
         <Spec k="Key dates">Last Trading Day = 4th business day before the last business day of the delivery month;
           First Notice Day = 4th business day before its first business day.</Spec>
-        <Spec k="Invoicing">EDSP × Net Weight, less Age, Class, Weight, Rent, Import-Duty and Transition-Stock
-          allowances. EU/UK lots require validated deforestation (DDI) data.</Spec>
+        <Spec k="Storage / Rent allowance">Rent accrues from warrant issue date. The invoice includes a <strong>rent
+          allowance adjustment</strong>: if the delivery warehouse charges above the global average ICE-nominated rate, a
+          deduction is applied; if below, an addition is made. Net effect: all lots settle at the same effective rent
+          regardless of warehouse location. Indicative warehouse rates: <strong>≈ €0.30–0.60/bag/month</strong><Tbc />
+          (≈ €5–10/tonne/month for ≤80 kg bags). Exact rates per ICE nominated warehouse schedule — verify before
+          tendering.</Spec>
+        <Spec k="Loading Out Charge">One-time charge paid by buyer when collecting from a licensed terminal.
+          EU ports indicatively <strong>≈ €4–8/tonne</strong><Tbc />; warehouse-specific.{" "}
+          <em>Exact current rate in ICE Section GGGG warehouse schedule — verify before tendering.</em></Spec>
+        <Spec k="Import-Duty allowance">For EU Customs Warehouse lots: the import duty on green Robusta coffee
+          (currently <strong>7.5% CIF</strong><Tbc /> in the EU) is deducted from the invoice, compensating the buyer
+          for the customs liability they assume on clearing. Amount calculated at EDSP × applicable tariff rate × net
+          weight.</Spec>
+        <Spec k="Transition Stock allowance (EUDR)">For lots delivered without Validated DDI documentation — EU/UK
+          delivery areas only: <strong>−$5/t/month</strong> for 2026 delivery months; <strong>−$10/t/month</strong> from
+          January 2027 onwards. US delivery areas: no allowance — transition stock without DDI not accepted.</Spec>
+        <Spec k="Grading / Sampling"><Tbc /> Sampling and grading required at certification. Fees set by ICE-nominated
+          graders — exact amounts in current ICE grading fee circular (not published openly online; contact ICE Commodity
+          Operations).</Spec>
+        <Spec k="Invoicing">EDSP × Net Outturn Weight, adjusted by: Quality Class allowance ± Age allowance ± Weight
+          deviation ± Rent allowance − Import-Duty allowance (EU/UK) − Transition-Stock allowance (if applicable).</Spec>
         <PdfLink href="https://www.ice.com/publicdocs/contractregs/105_SECTION_GGGG.pdf">Full rulebook on ICE (PDF)</PdfLink>
       </Article>
 
