@@ -1,0 +1,75 @@
+{
+  "_schema": "Map each origin's weather-fetcher region name (must match ORIGINS in backend/scripts/fetch_origin_weather.py) to NOAA STAR's internal integer provinceID for the get_TS_admin.php endpoint. Use the country's ISO-3 code at the origin level. Set province_id to null where the ID has not been confirmed yet — the fetcher logs a warning and skips that region rather than guessing.",
+  "_endpoint": "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_TS_admin.php?country={iso3}&provinceID={id}&year1=...&year2=...&type=Mean",
+  "_note": "NOAA STAR operates VHI at the admin-1 level (Brazilian state, Colombian departamento, etc.). Sub-state regions our weather fetcher tracks (e.g. Sul de Minas + Cerrado both in Minas Gerais) legitimately share the same provinceID.",
+
+  "brazil": {
+    "country_iso3": "BRA",
+    "provinces": {
+      "Sul de Minas":    { "province_id": 13, "noaa_name": "Minas Gerais" },
+      "Cerrado":         { "province_id": 13, "noaa_name": "Minas Gerais" },
+      "Espírito Santo":  { "province_id": 11, "noaa_name": "Espirito Santo" },
+      "Paraná":          { "province_id": null, "noaa_name": null }
+    }
+  },
+  "colombia": {
+    "country_iso3": "COL",
+    "provinces": {
+      "Huila":      { "province_id": null, "noaa_name": null },
+      "Antioquia":  { "province_id": null, "noaa_name": null },
+      "Cauca":      { "province_id": null, "noaa_name": null },
+      "Caldas":     { "province_id": null, "noaa_name": null },
+      "Nariño":     { "province_id": null, "noaa_name": null }
+    }
+  },
+  "honduras": {
+    "country_iso3": "HND",
+    "provinces": {
+      "El Paraíso":    { "province_id": null, "noaa_name": null },
+      "Copán":         { "province_id": null, "noaa_name": null },
+      "Santa Bárbara": { "province_id": null, "noaa_name": null },
+      "Montecillos":   { "province_id": null, "noaa_name": null },
+      "Agalta":        { "province_id": null, "noaa_name": null }
+    }
+  },
+  "indonesia": {
+    "country_iso3": "IDN",
+    "provinces": {
+      "Lampung": { "province_id": null, "noaa_name": null },
+      "Gayo":    { "province_id": null, "noaa_name": null },
+      "Java":    { "province_id": null, "noaa_name": null },
+      "Toraja":  { "province_id": null, "noaa_name": null },
+      "Flores":  { "province_id": null, "noaa_name": null }
+    }
+  },
+  "uganda": {
+    "country_iso3": "UGA",
+    "provinces": {
+      "Masaka":   { "province_id": null, "noaa_name": null },
+      "Kasese":   { "province_id": null, "noaa_name": null },
+      "Rwenzori": { "province_id": null, "noaa_name": null },
+      "Mbale":    { "province_id": null, "noaa_name": null },
+      "Mt Elgon": { "province_id": null, "noaa_name": null }
+    }
+  },
+  "ethiopia": {
+    "country_iso3": "ETH",
+    "provinces": {
+      "Sidama/Yirgacheffe": { "province_id": null, "noaa_name": null },
+      "Jimma":              { "province_id": null, "noaa_name": null },
+      "Limu":               { "province_id": null, "noaa_name": null },
+      "Kaffa":              { "province_id": null, "noaa_name": null },
+      "Harrar":             { "province_id": null, "noaa_name": null }
+    }
+  },
+  "vn": {
+    "country_iso3": "VNM",
+    "provinces": {
+      "Dak Lak":  { "province_id": null, "noaa_name": null },
+      "Lam Dong": { "province_id": null, "noaa_name": null },
+      "Dak Nong": { "province_id": null, "noaa_name": null },
+      "Gia Lai":  { "province_id": null, "noaa_name": null },
+      "Kon Tum":  { "province_id": null, "noaa_name": null }
+    }
+  }
+}
