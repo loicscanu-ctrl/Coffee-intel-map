@@ -1,6 +1,6 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-29",
+  "updated": "2026-05-30",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Indonesia",
@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         368.4,
         258.8,
-        0.0,
-        0.0,
+        null,
+        null,
         124.9
       ],
       "monthly_avg_temp": [
@@ -302,8 +302,8 @@
       "monthly_actual_cur": [
         155.9,
         164.1,
-        0.0,
-        0.0,
+        null,
+        null,
         94.9
       ],
       "monthly_avg_temp": [
@@ -370,13 +370,13 @@
         20.3
       ],
       "forecast_7d_rain": [
-        0.0,
-        0.8,
+        0.9,
+        1.7,
+        1.4,
         1.8,
-        0.6,
-        2.1,
         1.2,
-        0.6
+        0.0,
+        0.0
       ],
       "daily_accum_cur": [
         0.0,
@@ -408,11 +408,11 @@
         93.8,
         94.9,
         94.9,
-        null,
+        94.9,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.309,
+      "essm_fraction": 0.298,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -433,6 +433,10 @@
         {
           "date": "2026-05-29",
           "essm": 0.309
+        },
+        {
+          "date": "2026-05-30",
+          "essm": 0.298
         }
       ],
       "spi_1": -0.25,
@@ -517,8 +521,8 @@
       "monthly_actual_cur": [
         227.8,
         281.4,
-        0.0,
-        0.0,
+        null,
+        null,
         23.0
       ],
       "monthly_avg_temp": [
@@ -623,11 +627,11 @@
         23.0,
         23.0,
         23.0,
-        null,
+        23.0,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.207,
+      "essm_fraction": 0.196,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -648,6 +652,10 @@
         {
           "date": "2026-05-29",
           "essm": 0.207
+        },
+        {
+          "date": "2026-05-30",
+          "essm": 0.196
         }
       ],
       "spi_1": -1.66,
@@ -732,9 +740,9 @@
       "monthly_actual_cur": [
         97.0,
         118.2,
-        0.0,
-        0.0,
-        177.1
+        null,
+        null,
+        180.8
       ],
       "monthly_avg_temp": [
         21.0,
@@ -800,12 +808,12 @@
         21.9
       ],
       "forecast_7d_rain": [
-        3.8,
-        1.3,
-        0.7,
-        2.5,
-        2.1,
-        5.4,
+        3.2,
+        7.2,
+        1.5,
+        4.6,
+        5.7,
+        4.8,
         1.5
       ],
       "daily_accum_cur": [
@@ -837,12 +845,12 @@
         161.9,
         166.1,
         174.0,
-        177.1,
-        null,
+        177.6,
+        180.8,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.38,
+      "essm_fraction": 0.378,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -863,6 +871,10 @@
         {
           "date": "2026-05-29",
           "essm": 0.38
+        },
+        {
+          "date": "2026-05-30",
+          "essm": 0.378
         }
       ],
       "spi_1": -2.29,
@@ -947,9 +959,9 @@
       "monthly_actual_cur": [
         225.3,
         155.8,
-        0.0,
-        0.0,
-        120.8
+        null,
+        null,
+        120.9
       ],
       "monthly_avg_temp": [
         22.5,
@@ -1012,14 +1024,14 @@
         19.2,
         19.1,
         18.8,
-        18.6
+        18.5
       ],
       "forecast_7d_rain": [
-        1.2,
-        0.3,
+        0.6,
         0.0,
+        0.7,
+        4.5,
         0.0,
-        4.8,
         0.0,
         0.0
       ],
@@ -1052,12 +1064,12 @@
         117.1,
         118.7,
         120.8,
-        120.8,
-        null,
+        120.9,
+        120.9,
         null
       ],
       "daily_accum_ly": [],
-      "essm_fraction": 0.217,
+      "essm_fraction": 0.212,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -1078,6 +1090,10 @@
         {
           "date": "2026-05-29",
           "essm": 0.217
+        },
+        {
+          "date": "2026-05-30",
+          "essm": 0.212
         }
       ]
     }
