@@ -4,455 +4,462 @@
     "Lampung": {
       "2026-02-20": {
         "rain": 0.0,
-        "tmean": 26.5
+        "tmean": 26.5,
+        "et0": 3.3
       },
       "2026-02-21": {
         "rain": 0.0,
-        "tmean": 27.1
+        "tmean": 27.1,
+        "et0": 4.7
       },
       "2026-02-22": {
         "rain": 0.0,
-        "tmean": 26.6
+        "tmean": 26.6,
+        "et0": 4.0
       },
       "2026-02-23": {
         "rain": 0.0,
         "tmean": 25.3,
-        "essm": null
+        "essm": null,
+        "et0": 2.2
       },
       "2026-02-24": {
         "rain": 0.0,
         "tmean": 25.8,
-        "essm": null
+        "essm": null,
+        "et0": 1.6
       },
       "2026-02-25": {
         "rain": 0.0,
         "tmean": 27.4,
-        "essm": null
+        "essm": null,
+        "et0": 4.9
       },
       "2026-02-26": {
         "rain": 0.0,
         "tmean": 26.8,
-        "essm": null
+        "essm": null,
+        "et0": 4.7
       },
       "2026-02-27": {
         "rain": 0.0,
         "tmean": 26.6,
         "essm": null,
-        "et0": null
+        "et0": 2.2
       },
       "2026-02-28": {
         "rain": 0.0,
         "tmean": 27.3,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-01": {
         "rain": null,
         "tmean": 27.2,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-03-02": {
         "rain": null,
         "tmean": 27.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-03": {
         "rain": null,
         "tmean": 27.4,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-04": {
         "rain": null,
         "tmean": 26.8,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-03-05": {
         "rain": null,
         "tmean": 27.2,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-06": {
         "rain": null,
         "tmean": 25.7,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-03-07": {
         "rain": null,
         "tmean": 25.9,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-03-08": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-09": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-10": {
         "rain": null,
         "tmean": 24.1,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-11": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-12": {
         "rain": null,
         "tmean": 25.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-13": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-14": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 5.0
       },
       "2026-03-15": {
         "rain": null,
         "tmean": 26.2,
         "essm": null,
-        "et0": null
+        "et0": 5.1
       },
       "2026-03-16": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-03-17": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-03-18": {
         "rain": null,
         "tmean": 26.2,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-19": {
         "rain": null,
         "tmean": 26.6,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-20": {
         "rain": null,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 5.0
       },
       "2026-03-21": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-22": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-23": {
         "rain": null,
         "tmean": 25.3,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-03-24": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-25": {
         "rain": null,
         "tmean": 24.2,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-03-26": {
         "rain": null,
         "tmean": 26.1,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-27": {
         "rain": null,
         "tmean": 27.0,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-28": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-03-29": {
         "rain": null,
         "tmean": 26.7,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-30": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 2.7
       },
       "2026-03-31": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-01": {
         "rain": null,
         "tmean": 26.7,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-02": {
         "rain": null,
         "tmean": 27.4,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-04-03": {
         "rain": null,
         "tmean": 27.3,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-04": {
         "rain": null,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-05": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-06": {
         "rain": null,
         "tmean": 27.0,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-07": {
         "rain": null,
         "tmean": 27.5,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-08": {
         "rain": null,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-04-09": {
         "rain": null,
         "tmean": 27.8,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-10": {
         "rain": null,
         "tmean": 27.4,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-11": {
         "rain": null,
         "tmean": 27.0,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-12": {
         "rain": null,
         "tmean": 27.1,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-13": {
         "rain": null,
         "tmean": 27.7,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-14": {
         "rain": null,
         "tmean": 27.5,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-15": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-16": {
         "rain": null,
         "tmean": 27.2,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-17": {
         "rain": null,
         "tmean": 26.6,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-04-18": {
         "rain": null,
         "tmean": 26.5,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-19": {
         "rain": null,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-20": {
         "rain": null,
         "tmean": 26.5,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-21": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-22": {
         "rain": null,
         "tmean": 27.4,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-23": {
         "rain": null,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-24": {
         "rain": null,
         "tmean": 26.8,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-04-25": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-04-26": {
         "rain": null,
         "tmean": 28.2,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-04-27": {
         "rain": null,
         "tmean": 28.6,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-28": {
         "rain": null,
         "tmean": 27.5,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-29": {
         "rain": null,
         "tmean": 27.1,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-04-30": {
         "rain": null,
         "tmean": 27.1,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-05-01": {
         "rain": 0.0,
         "tmean": 27.0,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-05-02": {
         "rain": 0.0,
         "tmean": 27.1,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-05-03": {
         "rain": 0.0,
         "tmean": 26.7,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-05-04": {
         "rain": 0.0,
         "tmean": 26.9,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-05-05": {
         "rain": 0.0,
         "tmean": 26.6,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-05-06": {
         "rain": 0.0,
         "tmean": 26.6,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-05-07": {
         "rain": 0.0,
         "tmean": 28.2,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-05-08": {
         "rain": 0.0,
@@ -564,203 +571,253 @@
       },
       "2026-01-01": {
         "rain": 11.0,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 4.0
       },
       "2026-01-02": {
         "rain": 28.2,
-        "tmean": 25.0
+        "tmean": 25.0,
+        "et0": 1.7
       },
       "2026-01-03": {
         "rain": 5.3,
-        "tmean": 25.1
+        "tmean": 25.1,
+        "et0": 1.9
       },
       "2026-01-04": {
         "rain": 5.0,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 4.4
       },
       "2026-01-05": {
         "rain": 7.8,
-        "tmean": 26.7
+        "tmean": 26.7,
+        "et0": 4.4
       },
       "2026-01-06": {
         "rain": 1.5,
-        "tmean": 26.5
+        "tmean": 26.5,
+        "et0": 3.7
       },
       "2026-01-07": {
         "rain": 27.4,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 3.6
       },
       "2026-01-08": {
         "rain": 12.1,
-        "tmean": 25.6
+        "tmean": 25.6,
+        "et0": 2.6
       },
       "2026-01-09": {
         "rain": 22.1,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 2.6
       },
       "2026-01-10": {
         "rain": 7.2,
-        "tmean": 25.6
+        "tmean": 25.6,
+        "et0": 3.1
       },
       "2026-01-11": {
         "rain": 1.5,
-        "tmean": 25.5
+        "tmean": 25.5,
+        "et0": 3.7
       },
       "2026-01-12": {
         "rain": 3.4,
-        "tmean": 25.7
+        "tmean": 25.7,
+        "et0": 4.0
       },
       "2026-01-13": {
         "rain": 11.8,
-        "tmean": 26.0
+        "tmean": 26.0,
+        "et0": 3.7
       },
       "2026-01-14": {
         "rain": 20.1,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 2.9
       },
       "2026-01-15": {
         "rain": 9.8,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 2.7
       },
       "2026-01-16": {
         "rain": 32.6,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 3.4
       },
       "2026-01-17": {
         "rain": 22.2,
-        "tmean": 25.5
+        "tmean": 25.5,
+        "et0": 3.0
       },
       "2026-01-18": {
         "rain": 22.1,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 3.2
       },
       "2026-01-19": {
         "rain": 8.0,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 3.6
       },
       "2026-01-20": {
         "rain": 13.0,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 2.8
       },
       "2026-01-21": {
         "rain": 1.4,
-        "tmean": 25.7
+        "tmean": 25.7,
+        "et0": 2.9
       },
       "2026-01-22": {
         "rain": 5.2,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 3.1
       },
       "2026-01-23": {
         "rain": 6.2,
-        "tmean": 25.5
+        "tmean": 25.5,
+        "et0": 3.4
       },
       "2026-01-24": {
         "rain": 1.9,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 4.5
       },
       "2026-01-25": {
         "rain": 0.4,
-        "tmean": 27.1
+        "tmean": 27.1,
+        "et0": 5.0
       },
       "2026-01-26": {
         "rain": 4.9,
-        "tmean": 26.6
+        "tmean": 26.6,
+        "et0": 4.5
       },
       "2026-01-27": {
         "rain": 6.0,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 4.5
       },
       "2026-01-28": {
         "rain": 14.6,
-        "tmean": 25.7
+        "tmean": 25.7,
+        "et0": 3.5
       },
       "2026-01-29": {
         "rain": 7.9,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 2.9
       },
       "2026-01-30": {
         "rain": 23.8,
-        "tmean": 25.7
+        "tmean": 25.7,
+        "et0": 3.2
       },
       "2026-01-31": {
         "rain": 24.0,
-        "tmean": 25.6
+        "tmean": 25.6,
+        "et0": 3.1
       },
       "2026-02-01": {
         "rain": 22.8,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 3.3
       },
       "2026-02-02": {
         "rain": 6.0,
-        "tmean": 25.3
+        "tmean": 25.3,
+        "et0": 3.3
       },
       "2026-02-03": {
         "rain": 36.8,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 4.0
       },
       "2026-02-04": {
         "rain": 19.0,
-        "tmean": 25.7
+        "tmean": 25.7,
+        "et0": 2.6
       },
       "2026-02-05": {
         "rain": 29.2,
-        "tmean": 26.0
+        "tmean": 26.0,
+        "et0": 4.1
       },
       "2026-02-06": {
         "rain": 10.0,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 3.6
       },
       "2026-02-07": {
         "rain": 21.7,
-        "tmean": 26.0
+        "tmean": 26.0,
+        "et0": 3.2
       },
       "2026-02-08": {
         "rain": 5.4,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 3.0
       },
       "2026-02-09": {
         "rain": 0.6,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 3.5
       },
       "2026-02-10": {
         "rain": 10.6,
-        "tmean": 26.3
+        "tmean": 26.3,
+        "et0": 4.2
       },
       "2026-02-11": {
         "rain": 9.6,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 3.9
       },
       "2026-02-12": {
         "rain": 22.8,
-        "tmean": 25.6
+        "tmean": 25.6,
+        "et0": 2.8
       },
       "2026-02-13": {
         "rain": 2.1,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 3.6
       },
       "2026-02-14": {
         "rain": 21.9,
-        "tmean": 26.1
+        "tmean": 26.1,
+        "et0": 3.7
       },
       "2026-02-15": {
         "rain": 9.1,
-        "tmean": 25.9
+        "tmean": 25.9,
+        "et0": 2.9
       },
       "2026-02-16": {
         "rain": 14.0,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 4.1
       },
       "2026-02-17": {
         "rain": 5.5,
-        "tmean": 26.6
+        "tmean": 26.6,
+        "et0": 3.7
       },
       "2026-02-18": {
         "rain": 8.5,
-        "tmean": 26.3
+        "tmean": 26.3,
+        "et0": 3.6
       },
       "2026-02-19": {
         "rain": 3.2,
-        "tmean": 26.1
+        "tmean": 26.1,
+        "et0": 3.4
       },
       "2026-05-26": {
         "rain": 3.2,
@@ -796,455 +853,462 @@
     "Gayo": {
       "2026-02-20": {
         "rain": 0.0,
-        "tmean": 20.1
+        "tmean": 20.1,
+        "et0": 4.5
       },
       "2026-02-21": {
         "rain": 0.0,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 4.2
       },
       "2026-02-22": {
         "rain": 0.0,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 4.8
       },
       "2026-02-23": {
         "rain": 0.0,
         "tmean": 19.9,
-        "essm": null
+        "essm": null,
+        "et0": 4.4
       },
       "2026-02-24": {
         "rain": 0.0,
         "tmean": 19.6,
-        "essm": null
+        "essm": null,
+        "et0": 3.9
       },
       "2026-02-25": {
         "rain": 0.0,
         "tmean": 19.3,
-        "essm": null
+        "essm": null,
+        "et0": 3.6
       },
       "2026-02-26": {
         "rain": 0.0,
         "tmean": 18.5,
-        "essm": null
+        "essm": null,
+        "et0": 2.6
       },
       "2026-02-27": {
         "rain": 0.0,
         "tmean": 19.2,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-02-28": {
         "rain": 0.0,
         "tmean": 20.0,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-01": {
         "rain": null,
         "tmean": 20.3,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-03-02": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-03-03": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-04": {
         "rain": null,
         "tmean": 19.3,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-03-05": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-06": {
         "rain": null,
         "tmean": 19.2,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-03-07": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-03-08": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-09": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-10": {
         "rain": null,
         "tmean": 17.6,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-11": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-12": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-13": {
         "rain": null,
         "tmean": 19.6,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-14": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-03-15": {
         "rain": null,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-16": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-17": {
         "rain": null,
         "tmean": 19.6,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-18": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-19": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-20": {
         "rain": null,
         "tmean": 19.4,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-03-21": {
         "rain": null,
         "tmean": 20.5,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-22": {
         "rain": null,
         "tmean": 20.6,
         "essm": null,
-        "et0": null
+        "et0": 5.0
       },
       "2026-03-23": {
         "rain": null,
         "tmean": 25.1,
         "essm": null,
-        "et0": null
+        "et0": 5.3
       },
       "2026-03-24": {
         "rain": null,
         "tmean": 23.0,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-03-25": {
         "rain": null,
         "tmean": 22.8,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-03-26": {
         "rain": null,
         "tmean": 21.2,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-27": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-28": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 2.7
       },
       "2026-03-29": {
         "rain": null,
         "tmean": 19.3,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-03-30": {
         "rain": null,
         "tmean": 19.6,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-31": {
         "rain": null,
         "tmean": 19.9,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-01": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-02": {
         "rain": null,
         "tmean": 20.8,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-03": {
         "rain": null,
         "tmean": 20.2,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-04": {
         "rain": null,
         "tmean": 20.1,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-05": {
         "rain": null,
         "tmean": 20.0,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-06": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-07": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-08": {
         "rain": null,
         "tmean": 19.6,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-09": {
         "rain": null,
         "tmean": 19.3,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-10": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-11": {
         "rain": null,
         "tmean": 20.2,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-12": {
         "rain": null,
         "tmean": 20.7,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-13": {
         "rain": null,
         "tmean": 20.4,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-14": {
         "rain": null,
         "tmean": 20.0,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-04-15": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-04-16": {
         "rain": null,
         "tmean": 20.3,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-17": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-04-18": {
         "rain": null,
         "tmean": 20.2,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-04-19": {
         "rain": null,
         "tmean": 20.1,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-20": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-21": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-22": {
         "rain": null,
         "tmean": 20.6,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-23": {
         "rain": null,
         "tmean": 20.8,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-24": {
         "rain": null,
         "tmean": 20.7,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-25": {
         "rain": null,
         "tmean": 20.7,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-26": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-27": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-28": {
         "rain": null,
         "tmean": 20.5,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-29": {
         "rain": null,
         "tmean": 20.6,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-30": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-05-01": {
         "rain": 0.0,
         "tmean": 20.3,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-05-02": {
         "rain": 0.0,
         "tmean": 19.9,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-05-03": {
         "rain": 0.0,
         "tmean": 19.9,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-05-04": {
         "rain": 0.0,
         "tmean": 19.9,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-05-05": {
         "rain": 0.0,
         "tmean": 20.4,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-05-06": {
         "rain": 0.0,
         "tmean": 20.8,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-05-07": {
         "rain": 0.0,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-05-08": {
         "rain": 5.2,
@@ -1356,203 +1420,253 @@
       },
       "2026-01-01": {
         "rain": 2.9,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 2.9
       },
       "2026-01-02": {
         "rain": 16.7,
-        "tmean": 18.3
+        "tmean": 18.3,
+        "et0": 1.5
       },
       "2026-01-03": {
         "rain": 2.6,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 3.7
       },
       "2026-01-04": {
         "rain": 25.8,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 2.9
       },
       "2026-01-05": {
         "rain": 16.8,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 3.5
       },
       "2026-01-06": {
         "rain": 14.1,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 3.0
       },
       "2026-01-07": {
         "rain": 25.7,
-        "tmean": 19.4
+        "tmean": 19.4,
+        "et0": 2.9
       },
       "2026-01-08": {
         "rain": 17.2,
-        "tmean": 18.3
+        "tmean": 18.3,
+        "et0": 1.7
       },
       "2026-01-09": {
         "rain": 9.6,
-        "tmean": 18.4
+        "tmean": 18.4,
+        "et0": 2.7
       },
       "2026-01-10": {
         "rain": 3.6,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 3.7
       },
       "2026-01-11": {
         "rain": 1.1,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 3.9
       },
       "2026-01-12": {
         "rain": 0.3,
-        "tmean": 18.7
+        "tmean": 18.7,
+        "et0": 3.9
       },
       "2026-01-13": {
         "rain": 0.2,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 4.2
       },
       "2026-01-14": {
         "rain": 0.0,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 4.5
       },
       "2026-01-15": {
         "rain": 0.0,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 4.5
       },
       "2026-01-16": {
         "rain": 0.0,
-        "tmean": 18.8
+        "tmean": 18.8,
+        "et0": 4.2
       },
       "2026-01-17": {
         "rain": 0.0,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 4.5
       },
       "2026-01-18": {
         "rain": 0.0,
-        "tmean": 19.4
+        "tmean": 19.4,
+        "et0": 4.2
       },
       "2026-01-19": {
         "rain": 0.0,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 4.1
       },
       "2026-01-20": {
         "rain": 0.6,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 3.8
       },
       "2026-01-21": {
         "rain": 3.4,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 3.6
       },
       "2026-01-22": {
         "rain": 0.2,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 4.2
       },
       "2026-01-23": {
         "rain": 0.1,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 4.5
       },
       "2026-01-24": {
         "rain": 0.9,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 4.4
       },
       "2026-01-25": {
         "rain": 0.3,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 4.5
       },
       "2026-01-26": {
         "rain": 0.2,
-        "tmean": 20.3
+        "tmean": 20.3,
+        "et0": 4.5
       },
       "2026-01-27": {
         "rain": 1.3,
-        "tmean": 20.7
+        "tmean": 20.7,
+        "et0": 4.5
       },
       "2026-01-28": {
         "rain": 0.9,
-        "tmean": 20.2
+        "tmean": 20.2,
+        "et0": 4.2
       },
       "2026-01-29": {
         "rain": 1.6,
-        "tmean": 20.4
+        "tmean": 20.4,
+        "et0": 4.0
       },
       "2026-01-30": {
         "rain": 6.0,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 2.9
       },
       "2026-01-31": {
         "rain": 3.8,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 3.9
       },
       "2026-02-01": {
         "rain": 2.4,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 4.0
       },
       "2026-02-02": {
         "rain": 1.9,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 3.6
       },
       "2026-02-03": {
         "rain": 11.9,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 3.7
       },
       "2026-02-04": {
         "rain": 15.2,
-        "tmean": 18.4
+        "tmean": 18.4,
+        "et0": 3.0
       },
       "2026-02-05": {
         "rain": 9.8,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 3.7
       },
       "2026-02-06": {
         "rain": 3.4,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 3.5
       },
       "2026-02-07": {
         "rain": 3.5,
-        "tmean": 20.2
+        "tmean": 20.2,
+        "et0": 3.9
       },
       "2026-02-08": {
         "rain": 4.0,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 4.1
       },
       "2026-02-09": {
         "rain": 3.2,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 4.2
       },
       "2026-02-10": {
         "rain": 1.5,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 4.5
       },
       "2026-02-11": {
         "rain": 3.7,
-        "tmean": 20.4
+        "tmean": 20.4,
+        "et0": 4.6
       },
       "2026-02-12": {
         "rain": 3.6,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 3.7
       },
       "2026-02-13": {
         "rain": 9.9,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 3.2
       },
       "2026-02-14": {
         "rain": 17.5,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 3.1
       },
       "2026-02-15": {
         "rain": 17.8,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 3.0
       },
       "2026-02-16": {
         "rain": 7.2,
-        "tmean": 18.8
+        "tmean": 18.8,
+        "et0": 2.1
       },
       "2026-02-17": {
         "rain": 24.4,
-        "tmean": 18.1
+        "tmean": 18.1,
+        "et0": 1.1
       },
       "2026-02-18": {
         "rain": 19.1,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 3.1
       },
       "2026-02-19": {
         "rain": 4.1,
-        "tmean": 19.4
+        "tmean": 19.4,
+        "et0": 3.0
       },
       "2026-05-26": {
         "rain": 5.5,
@@ -1588,455 +1702,462 @@
     "Java": {
       "2026-02-20": {
         "rain": 0.0,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 4.0
       },
       "2026-02-21": {
         "rain": 0.0,
-        "tmean": 25.0
+        "tmean": 25.0,
+        "et0": 3.8
       },
       "2026-02-22": {
         "rain": 0.0,
-        "tmean": 23.8
+        "tmean": 23.8,
+        "et0": 2.8
       },
       "2026-02-23": {
         "rain": 0.0,
         "tmean": 23.7,
-        "essm": null
+        "essm": null,
+        "et0": 2.9
       },
       "2026-02-24": {
         "rain": 0.0,
         "tmean": 22.9,
-        "essm": null
+        "essm": null,
+        "et0": 2.1
       },
       "2026-02-25": {
         "rain": 0.0,
         "tmean": 23.4,
-        "essm": null
+        "essm": null,
+        "et0": 2.4
       },
       "2026-02-26": {
         "rain": 0.0,
         "tmean": 23.4,
-        "essm": null
+        "essm": null,
+        "et0": 2.5
       },
       "2026-02-27": {
         "rain": 0.0,
         "tmean": 23.4,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-02-28": {
         "rain": 0.0,
         "tmean": 24.4,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-03-01": {
         "rain": null,
         "tmean": 24.8,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-02": {
         "rain": null,
         "tmean": 23.8,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-03-03": {
         "rain": null,
         "tmean": 24.8,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-03-04": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-05": {
         "rain": null,
         "tmean": 24.3,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-03-06": {
         "rain": null,
         "tmean": 25.0,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-07": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-08": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-03-09": {
         "rain": null,
         "tmean": 24.6,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-10": {
         "rain": null,
         "tmean": 22.5,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-03-11": {
         "rain": null,
         "tmean": 25.4,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-03-12": {
         "rain": null,
         "tmean": 25.4,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-03-13": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-03-14": {
         "rain": null,
         "tmean": 24.8,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-15": {
         "rain": null,
         "tmean": 24.8,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-16": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-17": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-18": {
         "rain": null,
         "tmean": 25.2,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-03-19": {
         "rain": null,
         "tmean": 25.1,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-03-20": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-21": {
         "rain": null,
         "tmean": 24.6,
         "essm": null,
-        "et0": null
+        "et0": 5.0
       },
       "2026-03-22": {
         "rain": null,
         "tmean": 24.4,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-03-23": {
         "rain": null,
         "tmean": 21.6,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-24": {
         "rain": null,
         "tmean": 20.7,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-25": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-26": {
         "rain": null,
         "tmean": 24.4,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-27": {
         "rain": null,
         "tmean": 25.6,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-28": {
         "rain": null,
         "tmean": 25.4,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-29": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-30": {
         "rain": null,
         "tmean": 24.5,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-03-31": {
         "rain": null,
         "tmean": 25.4,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-01": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 5.0
       },
       "2026-04-02": {
         "rain": null,
         "tmean": 25.6,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-03": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-04": {
         "rain": null,
         "tmean": 25.5,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-05": {
         "rain": null,
         "tmean": 25.2,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-06": {
         "rain": null,
         "tmean": 25.2,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-07": {
         "rain": null,
         "tmean": 25.4,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-08": {
         "rain": null,
         "tmean": 25.5,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-09": {
         "rain": null,
         "tmean": 25.0,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-10": {
         "rain": null,
         "tmean": 25.3,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-11": {
         "rain": null,
         "tmean": 25.0,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-12": {
         "rain": null,
         "tmean": 25.1,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-13": {
         "rain": null,
         "tmean": 25.7,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-14": {
         "rain": null,
         "tmean": 26.2,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-15": {
         "rain": null,
         "tmean": 26.3,
         "essm": null,
-        "et0": null
+        "et0": 4.9
       },
       "2026-04-16": {
         "rain": null,
         "tmean": 26.1,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-17": {
         "rain": null,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-04-18": {
         "rain": null,
         "tmean": 25.9,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-04-19": {
         "rain": null,
         "tmean": 25.7,
         "essm": null,
-        "et0": null
+        "et0": 5.3
       },
       "2026-04-20": {
         "rain": null,
         "tmean": 25.8,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-21": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-04-22": {
         "rain": null,
         "tmean": 25.9,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-23": {
         "rain": null,
         "tmean": 25.5,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-24": {
         "rain": null,
         "tmean": 26.4,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-04-25": {
         "rain": null,
         "tmean": 26.8,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-04-26": {
         "rain": null,
         "tmean": 26.2,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-27": {
         "rain": null,
         "tmean": 24.7,
         "essm": null,
-        "et0": null
+        "et0": 2.4
       },
       "2026-04-28": {
         "rain": null,
         "tmean": 25.3,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-29": {
         "rain": null,
         "tmean": 25.0,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-30": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 2.6
       },
       "2026-05-01": {
         "rain": 0.0,
         "tmean": 24.1,
         "essm": null,
-        "et0": null
+        "et0": 2.6
       },
       "2026-05-02": {
         "rain": 0.0,
         "tmean": 25.2,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-05-03": {
         "rain": 0.0,
         "tmean": 26.0,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-05-04": {
         "rain": 0.0,
         "tmean": 25.9,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-05-05": {
         "rain": 0.0,
         "tmean": 26.1,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-05-06": {
         "rain": 0.0,
         "tmean": 26.1,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-05-07": {
         "rain": 0.0,
         "tmean": 27.7,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-05-08": {
         "rain": 0.0,
@@ -2148,203 +2269,253 @@
       },
       "2026-01-01": {
         "rain": 2.4,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 3.5
       },
       "2026-01-02": {
         "rain": 1.9,
-        "tmean": 24.9
+        "tmean": 24.9,
+        "et0": 3.8
       },
       "2026-01-03": {
         "rain": 0.0,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 4.7
       },
       "2026-01-04": {
         "rain": 1.6,
-        "tmean": 26.3
+        "tmean": 26.3,
+        "et0": 5.1
       },
       "2026-01-05": {
         "rain": 0.7,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 3.1
       },
       "2026-01-06": {
         "rain": 0.0,
-        "tmean": 26.1
+        "tmean": 26.1,
+        "et0": 4.7
       },
       "2026-01-07": {
         "rain": 0.4,
-        "tmean": 26.2
+        "tmean": 26.2,
+        "et0": 5.2
       },
       "2026-01-08": {
         "rain": 1.9,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 4.4
       },
       "2026-01-09": {
         "rain": 24.0,
-        "tmean": 25.1
+        "tmean": 25.1,
+        "et0": 4.2
       },
       "2026-01-10": {
         "rain": 25.4,
-        "tmean": 24.4
+        "tmean": 24.4,
+        "et0": 3.3
       },
       "2026-01-11": {
         "rain": 11.4,
-        "tmean": 24.2
+        "tmean": 24.2,
+        "et0": 3.0
       },
       "2026-01-12": {
         "rain": 1.4,
-        "tmean": 23.8
+        "tmean": 23.8,
+        "et0": 2.4
       },
       "2026-01-13": {
         "rain": 0.6,
-        "tmean": 25.3
+        "tmean": 25.3,
+        "et0": 4.2
       },
       "2026-01-14": {
         "rain": 4.4,
-        "tmean": 24.5
+        "tmean": 24.5,
+        "et0": 3.2
       },
       "2026-01-15": {
         "rain": 2.6,
-        "tmean": 23.9
+        "tmean": 23.9,
+        "et0": 2.4
       },
       "2026-01-16": {
         "rain": 0.9,
-        "tmean": 25.0
+        "tmean": 25.0,
+        "et0": 3.7
       },
       "2026-01-17": {
         "rain": 9.8,
-        "tmean": 25.2
+        "tmean": 25.2,
+        "et0": 3.5
       },
       "2026-01-18": {
         "rain": 13.6,
-        "tmean": 24.4
+        "tmean": 24.4,
+        "et0": 2.7
       },
       "2026-01-19": {
         "rain": 21.4,
-        "tmean": 24.5
+        "tmean": 24.5,
+        "et0": 3.3
       },
       "2026-01-20": {
         "rain": 11.2,
-        "tmean": 24.2
+        "tmean": 24.2,
+        "et0": 4.1
       },
       "2026-01-21": {
         "rain": 32.8,
-        "tmean": 24.1
+        "tmean": 24.1,
+        "et0": 3.0
       },
       "2026-01-22": {
         "rain": 3.8,
-        "tmean": 24.1
+        "tmean": 24.1,
+        "et0": 1.9
       },
       "2026-01-23": {
         "rain": 3.1,
-        "tmean": 25.0
+        "tmean": 25.0,
+        "et0": 3.5
       },
       "2026-01-24": {
         "rain": 0.0,
-        "tmean": 26.4
+        "tmean": 26.4,
+        "et0": 5.2
       },
       "2026-01-25": {
         "rain": 0.2,
-        "tmean": 26.3
+        "tmean": 26.3,
+        "et0": 5.1
       },
       "2026-01-26": {
         "rain": 24.3,
-        "tmean": 24.8
+        "tmean": 24.8,
+        "et0": 3.3
       },
       "2026-01-27": {
         "rain": 7.8,
-        "tmean": 24.0
+        "tmean": 24.0,
+        "et0": 2.7
       },
       "2026-01-28": {
         "rain": 3.8,
-        "tmean": 24.7
+        "tmean": 24.7,
+        "et0": 2.7
       },
       "2026-01-29": {
         "rain": 0.3,
-        "tmean": 25.4
+        "tmean": 25.4,
+        "et0": 3.7
       },
       "2026-01-30": {
         "rain": 4.5,
-        "tmean": 25.3
+        "tmean": 25.3,
+        "et0": 4.6
       },
       "2026-01-31": {
         "rain": 11.6,
-        "tmean": 24.7
+        "tmean": 24.7,
+        "et0": 4.2
       },
       "2026-02-01": {
         "rain": 28.0,
-        "tmean": 24.2
+        "tmean": 24.2,
+        "et0": 3.8
       },
       "2026-02-02": {
         "rain": 15.6,
-        "tmean": 24.4
+        "tmean": 24.4,
+        "et0": 4.2
       },
       "2026-02-03": {
         "rain": 0.5,
-        "tmean": 24.9
+        "tmean": 24.9,
+        "et0": 4.9
       },
       "2026-02-04": {
         "rain": 6.0,
-        "tmean": 24.9
+        "tmean": 24.9,
+        "et0": 4.8
       },
       "2026-02-05": {
         "rain": 10.1,
-        "tmean": 24.9
+        "tmean": 24.9,
+        "et0": 4.3
       },
       "2026-02-06": {
         "rain": 26.3,
-        "tmean": 24.9
+        "tmean": 24.9,
+        "et0": 3.7
       },
       "2026-02-07": {
         "rain": 32.6,
-        "tmean": 24.4
+        "tmean": 24.4,
+        "et0": 3.1
       },
       "2026-02-08": {
         "rain": 22.3,
-        "tmean": 24.6
+        "tmean": 24.6,
+        "et0": 3.1
       },
       "2026-02-09": {
         "rain": 20.5,
-        "tmean": 24.1
+        "tmean": 24.1,
+        "et0": 3.3
       },
       "2026-02-10": {
         "rain": 1.5,
-        "tmean": 24.0
+        "tmean": 24.0,
+        "et0": 2.9
       },
       "2026-02-11": {
         "rain": 27.9,
-        "tmean": 24.4
+        "tmean": 24.4,
+        "et0": 3.7
       },
       "2026-02-12": {
         "rain": 23.3,
-        "tmean": 23.9
+        "tmean": 23.9,
+        "et0": 3.0
       },
       "2026-02-13": {
         "rain": 36.0,
-        "tmean": 23.7
+        "tmean": 23.7,
+        "et0": 2.9
       },
       "2026-02-14": {
         "rain": 6.1,
-        "tmean": 24.3
+        "tmean": 24.3,
+        "et0": 3.5
       },
       "2026-02-15": {
         "rain": 20.5,
-        "tmean": 24.8
+        "tmean": 24.8,
+        "et0": 4.3
       },
       "2026-02-16": {
         "rain": 1.7,
-        "tmean": 25.0
+        "tmean": 25.0,
+        "et0": 3.6
       },
       "2026-02-17": {
         "rain": 0.2,
-        "tmean": 25.6
+        "tmean": 25.6,
+        "et0": 4.3
       },
       "2026-02-18": {
         "rain": 1.3,
-        "tmean": 25.5
+        "tmean": 25.5,
+        "et0": 4.8
       },
       "2026-02-19": {
         "rain": 1.0,
-        "tmean": 25.5
+        "tmean": 25.5,
+        "et0": 4.3
       },
       "2026-05-26": {
         "rain": 2.5,
@@ -2380,455 +2551,462 @@
     "Toraja": {
       "2026-02-20": {
         "rain": 0.0,
-        "tmean": 22.8
+        "tmean": 22.8,
+        "et0": 4.8
       },
       "2026-02-21": {
         "rain": 0.0,
-        "tmean": 21.2
+        "tmean": 21.2,
+        "et0": 2.5
       },
       "2026-02-22": {
         "rain": 0.0,
-        "tmean": 21.3
+        "tmean": 21.3,
+        "et0": 2.9
       },
       "2026-02-23": {
         "rain": 0.0,
         "tmean": 22.2,
-        "essm": null
+        "essm": null,
+        "et0": 4.2
       },
       "2026-02-24": {
         "rain": 0.0,
         "tmean": 20.8,
-        "essm": null
+        "essm": null,
+        "et0": 2.9
       },
       "2026-02-25": {
         "rain": 0.0,
         "tmean": 20.3,
-        "essm": null
+        "essm": null,
+        "et0": 1.9
       },
       "2026-02-26": {
         "rain": 0.0,
         "tmean": 22.0,
-        "essm": null
+        "essm": null,
+        "et0": 3.8
       },
       "2026-02-27": {
         "rain": 0.0,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-02-28": {
         "rain": 0.0,
         "tmean": 22.4,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-03-01": {
         "rain": null,
         "tmean": 21.9,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-02": {
         "rain": null,
         "tmean": 22.5,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-03": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-04": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-05": {
         "rain": null,
         "tmean": 21.8,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-06": {
         "rain": null,
         "tmean": 22.7,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-07": {
         "rain": null,
         "tmean": 20.6,
         "essm": null,
-        "et0": null
+        "et0": 2.0
       },
       "2026-03-08": {
         "rain": null,
         "tmean": 21.6,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-09": {
         "rain": null,
         "tmean": 21.1,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-10": {
         "rain": null,
         "tmean": 22.3,
         "essm": null,
-        "et0": null
+        "et0": 4.7
       },
       "2026-03-11": {
         "rain": null,
         "tmean": 21.8,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-03-12": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-13": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.6
       },
       "2026-03-14": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-15": {
         "rain": null,
         "tmean": 22.2,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-16": {
         "rain": null,
         "tmean": 22.0,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-03-17": {
         "rain": null,
         "tmean": 22.4,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-18": {
         "rain": null,
         "tmean": 22.3,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-03-19": {
         "rain": null,
         "tmean": 22.6,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-20": {
         "rain": null,
         "tmean": 21.1,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-21": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-03-22": {
         "rain": null,
         "tmean": 21.3,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-03-23": {
         "rain": null,
         "tmean": 25.9,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-24": {
         "rain": null,
         "tmean": 25.0,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-25": {
         "rain": null,
         "tmean": 24.9,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-26": {
         "rain": null,
         "tmean": 23.2,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-03-27": {
         "rain": null,
         "tmean": 21.9,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-28": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-03-29": {
         "rain": null,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-30": {
         "rain": null,
         "tmean": 21.1,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-31": {
         "rain": null,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-01": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-04-02": {
         "rain": null,
         "tmean": 21.9,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-03": {
         "rain": null,
         "tmean": 21.3,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-04": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-05": {
         "rain": null,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-04-06": {
         "rain": null,
         "tmean": 21.8,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-07": {
         "rain": null,
         "tmean": 21.9,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-04-08": {
         "rain": null,
         "tmean": 21.9,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-09": {
         "rain": null,
         "tmean": 21.6,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-04-10": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-11": {
         "rain": null,
         "tmean": 21.3,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-12": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-04-13": {
         "rain": null,
         "tmean": 20.9,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-04-14": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-15": {
         "rain": null,
         "tmean": 21.2,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-16": {
         "rain": null,
         "tmean": 21.2,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-04-17": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-18": {
         "rain": null,
         "tmean": 21.5,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-19": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-04-20": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-21": {
         "rain": null,
         "tmean": 22.3,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-22": {
         "rain": null,
         "tmean": 22.4,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-04-23": {
         "rain": null,
         "tmean": 22.2,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-24": {
         "rain": null,
         "tmean": 22.8,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-04-25": {
         "rain": null,
         "tmean": 23.0,
         "essm": null,
-        "et0": null
+        "et0": 4.8
       },
       "2026-04-26": {
         "rain": null,
         "tmean": 22.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-27": {
         "rain": null,
         "tmean": 21.8,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-28": {
         "rain": null,
         "tmean": 21.7,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-29": {
         "rain": null,
         "tmean": 21.8,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-30": {
         "rain": null,
         "tmean": 22.1,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-05-01": {
         "rain": 0.0,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-05-02": {
         "rain": 0.0,
         "tmean": 21.6,
         "essm": null,
-        "et0": null
+        "et0": 2.7
       },
       "2026-05-03": {
         "rain": 0.0,
         "tmean": 21.2,
         "essm": null,
-        "et0": null
+        "et0": 2.6
       },
       "2026-05-04": {
         "rain": 0.0,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-05-05": {
         "rain": 0.0,
         "tmean": 21.0,
         "essm": null,
-        "et0": null
+        "et0": 2.3
       },
       "2026-05-06": {
         "rain": 0.0,
         "tmean": 21.0,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-05-07": {
         "rain": 0.0,
         "tmean": 23.7,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-05-08": {
         "rain": 6.7,
@@ -2940,203 +3118,253 @@
       },
       "2026-01-01": {
         "rain": 6.9,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 2.7
       },
       "2026-01-02": {
         "rain": 9.4,
-        "tmean": 21.9
+        "tmean": 21.9,
+        "et0": 3.7
       },
       "2026-01-03": {
         "rain": 1.2,
-        "tmean": 21.4
+        "tmean": 21.4,
+        "et0": 2.8
       },
       "2026-01-04": {
         "rain": 7.9,
-        "tmean": 21.9
+        "tmean": 21.9,
+        "et0": 3.9
       },
       "2026-01-05": {
         "rain": 5.9,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 3.4
       },
       "2026-01-06": {
         "rain": 15.1,
-        "tmean": 21.6
+        "tmean": 21.6,
+        "et0": 2.8
       },
       "2026-01-07": {
         "rain": 6.1,
-        "tmean": 21.2
+        "tmean": 21.2,
+        "et0": 2.7
       },
       "2026-01-08": {
         "rain": 0.0,
-        "tmean": 21.0
+        "tmean": 21.0,
+        "et0": 2.3
       },
       "2026-01-09": {
         "rain": 1.9,
-        "tmean": 21.2
+        "tmean": 21.2,
+        "et0": 3.4
       },
       "2026-01-10": {
         "rain": 4.2,
-        "tmean": 21.4
+        "tmean": 21.4,
+        "et0": 4.0
       },
       "2026-01-11": {
         "rain": 7.7,
-        "tmean": 20.7
+        "tmean": 20.7,
+        "et0": 3.0
       },
       "2026-01-12": {
         "rain": 0.0,
-        "tmean": 21.0
+        "tmean": 21.0,
+        "et0": 3.9
       },
       "2026-01-13": {
         "rain": 0.1,
-        "tmean": 21.4
+        "tmean": 21.4,
+        "et0": 4.5
       },
       "2026-01-14": {
         "rain": 0.2,
-        "tmean": 21.6
+        "tmean": 21.6,
+        "et0": 4.5
       },
       "2026-01-15": {
         "rain": 0.8,
-        "tmean": 21.1
+        "tmean": 21.1,
+        "et0": 4.3
       },
       "2026-01-16": {
         "rain": 0.6,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 4.6
       },
       "2026-01-17": {
         "rain": 0.4,
-        "tmean": 21.2
+        "tmean": 21.2,
+        "et0": 3.7
       },
       "2026-01-18": {
         "rain": 2.5,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 4.2
       },
       "2026-01-19": {
         "rain": 3.3,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 3.4
       },
       "2026-01-20": {
         "rain": 1.3,
-        "tmean": 22.1
+        "tmean": 22.1,
+        "et0": 4.0
       },
       "2026-01-21": {
         "rain": 0.8,
-        "tmean": 21.8
+        "tmean": 21.8,
+        "et0": 4.5
       },
       "2026-01-22": {
         "rain": 1.0,
-        "tmean": 22.3
+        "tmean": 22.3,
+        "et0": 4.8
       },
       "2026-01-23": {
         "rain": 0.4,
-        "tmean": 21.3
+        "tmean": 21.3,
+        "et0": 3.6
       },
       "2026-01-24": {
         "rain": 0.0,
-        "tmean": 22.1
+        "tmean": 22.1,
+        "et0": 5.0
       },
       "2026-01-25": {
         "rain": 0.4,
-        "tmean": 22.5
+        "tmean": 22.5,
+        "et0": 5.1
       },
       "2026-01-26": {
         "rain": 1.0,
-        "tmean": 22.3
+        "tmean": 22.3,
+        "et0": 4.5
       },
       "2026-01-27": {
         "rain": 2.8,
-        "tmean": 22.3
+        "tmean": 22.3,
+        "et0": 4.5
       },
       "2026-01-28": {
         "rain": 6.3,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 3.8
       },
       "2026-01-29": {
         "rain": 7.2,
-        "tmean": 21.4
+        "tmean": 21.4,
+        "et0": 3.2
       },
       "2026-01-30": {
         "rain": 1.6,
-        "tmean": 22.0
+        "tmean": 22.0,
+        "et0": 4.2
       },
       "2026-01-31": {
         "rain": 0.0,
-        "tmean": 22.2
+        "tmean": 22.2,
+        "et0": 3.4
       },
       "2026-02-01": {
         "rain": 3.9,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 4.0
       },
       "2026-02-02": {
         "rain": 2.0,
-        "tmean": 21.3
+        "tmean": 21.3,
+        "et0": 3.6
       },
       "2026-02-03": {
         "rain": 3.4,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 4.2
       },
       "2026-02-04": {
         "rain": 7.1,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 3.9
       },
       "2026-02-05": {
         "rain": 0.9,
-        "tmean": 22.3
+        "tmean": 22.3,
+        "et0": 4.5
       },
       "2026-02-06": {
         "rain": 3.8,
-        "tmean": 22.1
+        "tmean": 22.1,
+        "et0": 4.1
       },
       "2026-02-07": {
         "rain": 5.2,
-        "tmean": 22.2
+        "tmean": 22.2,
+        "et0": 3.6
       },
       "2026-02-08": {
         "rain": 4.6,
-        "tmean": 21.4
+        "tmean": 21.4,
+        "et0": 3.1
       },
       "2026-02-09": {
         "rain": 0.8,
-        "tmean": 22.2
+        "tmean": 22.2,
+        "et0": 3.3
       },
       "2026-02-10": {
         "rain": 25.9,
-        "tmean": 21.9
+        "tmean": 21.9,
+        "et0": 3.1
       },
       "2026-02-11": {
         "rain": 3.2,
-        "tmean": 21.3
+        "tmean": 21.3,
+        "et0": 2.2
       },
       "2026-02-12": {
         "rain": 6.1,
-        "tmean": 21.6
+        "tmean": 21.6,
+        "et0": 3.5
       },
       "2026-02-13": {
         "rain": 4.3,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 3.1
       },
       "2026-02-14": {
         "rain": 2.0,
-        "tmean": 21.5
+        "tmean": 21.5,
+        "et0": 2.3
       },
       "2026-02-15": {
         "rain": 1.4,
-        "tmean": 22.8
+        "tmean": 22.8,
+        "et0": 4.5
       },
       "2026-02-16": {
         "rain": 13.6,
-        "tmean": 22.2
+        "tmean": 22.2,
+        "et0": 4.2
       },
       "2026-02-17": {
         "rain": 1.2,
-        "tmean": 21.6
+        "tmean": 21.6,
+        "et0": 3.7
       },
       "2026-02-18": {
         "rain": 27.7,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 4.1
       },
       "2026-02-19": {
         "rain": 1.1,
-        "tmean": 21.7
+        "tmean": 21.7,
+        "et0": 4.0
       },
       "2026-05-26": {
         "rain": 3.9,
@@ -3172,451 +3400,457 @@
     "Flores": {
       "2026-02-21": {
         "rain": 0.0,
-        "tmean": 19.4
+        "tmean": 19.4,
+        "et0": 3.3
       },
       "2026-02-22": {
         "rain": 0.0,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 2.9
       },
       "2026-02-23": {
         "rain": 0.0,
         "tmean": 19.0,
-        "essm": null
+        "essm": null,
+        "et0": 3.3
       },
       "2026-02-24": {
         "rain": 0.0,
         "tmean": 18.6,
-        "essm": null
+        "essm": null,
+        "et0": 2.6
       },
       "2026-02-25": {
         "rain": 0.0,
         "tmean": 18.2,
-        "essm": null
+        "essm": null,
+        "et0": 2.2
       },
       "2026-02-26": {
         "rain": 0.0,
         "tmean": 18.8,
-        "essm": null
+        "essm": null,
+        "et0": 2.9
       },
       "2026-02-27": {
         "rain": 0.0,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 2.6
       },
       "2026-02-28": {
         "rain": 0.0,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 3.3
       },
       "2026-03-01": {
         "rain": null,
         "tmean": 19.3,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-03-02": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-03": {
         "rain": null,
         "tmean": 18.9,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-04": {
         "rain": null,
         "tmean": 19.9,
         "essm": null,
-        "et0": null
+        "et0": 4.5
       },
       "2026-03-05": {
         "rain": null,
         "tmean": 20.4,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-03-06": {
         "rain": null,
         "tmean": 19.4,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-07": {
         "rain": null,
         "tmean": 19.6,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-03-08": {
         "rain": null,
         "tmean": 18.7,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-03-09": {
         "rain": null,
         "tmean": 18.1,
         "essm": null,
-        "et0": null
+        "et0": 2.4
       },
       "2026-03-10": {
         "rain": null,
         "tmean": 17.8,
         "essm": null,
-        "et0": null
+        "et0": 2.2
       },
       "2026-03-11": {
         "rain": null,
         "tmean": 18.3,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-03-12": {
         "rain": null,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-03-13": {
         "rain": null,
         "tmean": 18.7,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-03-14": {
         "rain": null,
         "tmean": 18.6,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-03-15": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-03-16": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-17": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-03-18": {
         "rain": null,
         "tmean": 19.5,
         "essm": null,
-        "et0": null
+        "et0": 3.0
       },
       "2026-03-19": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-03-20": {
         "rain": null,
         "tmean": 17.6,
         "essm": null,
-        "et0": null
+        "et0": 2.5
       },
       "2026-03-21": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-22": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-23": {
         "rain": null,
         "tmean": 21.4,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-03-24": {
         "rain": null,
         "tmean": 20.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-03-25": {
         "rain": null,
         "tmean": 20.6,
         "essm": null,
-        "et0": null
+        "et0": 2.8
       },
       "2026-03-26": {
         "rain": null,
         "tmean": 19.7,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-03-27": {
         "rain": null,
         "tmean": 19.4,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-28": {
         "rain": null,
         "tmean": 19.2,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-29": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-30": {
         "rain": null,
         "tmean": 18.6,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-03-31": {
         "rain": null,
         "tmean": 18.3,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-01": {
         "rain": null,
         "tmean": 18.6,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-02": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-04-03": {
         "rain": null,
         "tmean": 18.9,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-04-04": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-05": {
         "rain": null,
         "tmean": 19.2,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-06": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-07": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-08": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-09": {
         "rain": null,
         "tmean": 18.9,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-10": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-04-11": {
         "rain": null,
         "tmean": 18.7,
         "essm": null,
-        "et0": null
+        "et0": 3.6
       },
       "2026-04-12": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-13": {
         "rain": null,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 4.4
       },
       "2026-04-14": {
         "rain": null,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-15": {
         "rain": null,
         "tmean": 17.7,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-16": {
         "rain": null,
         "tmean": 17.9,
         "essm": null,
-        "et0": null
+        "et0": 4.1
       },
       "2026-04-17": {
         "rain": null,
         "tmean": 17.9,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-18": {
         "rain": null,
         "tmean": 18.1,
         "essm": null,
-        "et0": null
+        "et0": 4.2
       },
       "2026-04-19": {
         "rain": null,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 2.4
       },
       "2026-04-20": {
         "rain": null,
         "tmean": 18.7,
         "essm": null,
-        "et0": null
+        "et0": 2.2
       },
       "2026-04-21": {
         "rain": null,
         "tmean": 19.4,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-04-22": {
         "rain": null,
         "tmean": 19.8,
         "essm": null,
-        "et0": null
+        "et0": 4.3
       },
       "2026-04-23": {
         "rain": null,
         "tmean": 19.3,
         "essm": null,
-        "et0": null
+        "et0": 3.5
       },
       "2026-04-24": {
         "rain": null,
         "tmean": 20.1,
         "essm": null,
-        "et0": null
+        "et0": 4.0
       },
       "2026-04-25": {
         "rain": null,
         "tmean": 19.2,
         "essm": null,
-        "et0": null
+        "et0": 2.9
       },
       "2026-04-26": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 2.4
       },
       "2026-04-27": {
         "rain": null,
         "tmean": 19.1,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-04-28": {
         "rain": null,
         "tmean": 18.8,
         "essm": null,
-        "et0": null
+        "et0": 2.6
       },
       "2026-04-29": {
         "rain": null,
         "tmean": 19.0,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-04-30": {
         "rain": null,
         "tmean": 18.9,
         "essm": null,
-        "et0": null
+        "et0": 3.1
       },
       "2026-05-01": {
         "rain": 0.0,
         "tmean": 18.5,
         "essm": null,
-        "et0": null
+        "et0": 3.2
       },
       "2026-05-02": {
         "rain": 0.0,
         "tmean": 18.4,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-05-03": {
         "rain": 0.0,
         "tmean": 18.3,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-05-04": {
         "rain": 0.0,
         "tmean": 18.4,
         "essm": null,
-        "et0": null
+        "et0": 3.7
       },
       "2026-05-05": {
         "rain": 0.0,
         "tmean": 18.9,
         "essm": null,
-        "et0": null
+        "et0": 3.9
       },
       "2026-05-06": {
         "rain": 0.0,
         "tmean": 18.7,
         "essm": null,
-        "et0": null
+        "et0": 3.4
       },
       "2026-05-07": {
         "rain": 0.0,
         "tmean": 20.2,
         "essm": null,
-        "et0": null
+        "et0": 3.8
       },
       "2026-05-08": {
         "rain": 3.8,
@@ -3728,207 +3962,258 @@
       },
       "2026-01-01": {
         "rain": 0.0,
-        "tmean": 20.0
+        "tmean": 20.0,
+        "et0": 5.0
       },
       "2026-01-02": {
         "rain": 0.0,
-        "tmean": 20.4
+        "tmean": 20.4,
+        "et0": 5.2
       },
       "2026-01-03": {
         "rain": 1.5,
-        "tmean": 20.3
+        "tmean": 20.3,
+        "et0": 4.8
       },
       "2026-01-04": {
         "rain": 1.1,
-        "tmean": 19.8
+        "tmean": 19.8,
+        "et0": 4.5
       },
       "2026-01-05": {
         "rain": 1.6,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 4.5
       },
       "2026-01-06": {
         "rain": 6.4,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 3.5
       },
       "2026-01-07": {
         "rain": 11.9,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 2.7
       },
       "2026-01-08": {
         "rain": 14.2,
-        "tmean": 18.5
+        "tmean": 18.5,
+        "et0": 1.9
       },
       "2026-01-09": {
         "rain": 19.7,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 2.7
       },
       "2026-01-10": {
         "rain": 15.6,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 2.9
       },
       "2026-01-11": {
         "rain": 9.1,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 2.6
       },
       "2026-01-12": {
         "rain": 4.6,
-        "tmean": 18.8
+        "tmean": 18.8,
+        "et0": 1.6
       },
       "2026-01-13": {
         "rain": 14.5,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 2.7
       },
       "2026-01-14": {
         "rain": 11.8,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 2.6
       },
       "2026-01-15": {
         "rain": 5.3,
-        "tmean": 20.1
+        "tmean": 20.1,
+        "et0": 2.8
       },
       "2026-01-16": {
         "rain": 1.3,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 3.3
       },
       "2026-01-17": {
         "rain": 6.1,
-        "tmean": 19.5
+        "tmean": 19.5,
+        "et0": 3.4
       },
       "2026-01-18": {
         "rain": 9.7,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 3.8
       },
       "2026-01-19": {
         "rain": 17.2,
-        "tmean": 18.7
+        "tmean": 18.7,
+        "et0": 3.2
       },
       "2026-01-20": {
         "rain": 14.2,
-        "tmean": 18.6
+        "tmean": 18.6,
+        "et0": 3.1
       },
       "2026-01-21": {
         "rain": 6.1,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 3.3
       },
       "2026-01-22": {
         "rain": 16.4,
-        "tmean": 18.9
+        "tmean": 18.9,
+        "et0": 1.5
       },
       "2026-01-23": {
         "rain": 2.9,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 3.0
       },
       "2026-01-24": {
         "rain": 3.6,
-        "tmean": 20.9
+        "tmean": 20.9,
+        "et0": 4.5
       },
       "2026-01-25": {
         "rain": 0.8,
-        "tmean": 20.5
+        "tmean": 20.5,
+        "et0": 4.2
       },
       "2026-01-26": {
         "rain": 5.2,
-        "tmean": 20.5
+        "tmean": 20.5,
+        "et0": 4.5
       },
       "2026-01-27": {
         "rain": 7.4,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 2.9
       },
       "2026-01-28": {
         "rain": 11.5,
-        "tmean": 18.6
+        "tmean": 18.6,
+        "et0": 2.8
       },
       "2026-01-29": {
         "rain": 3.3,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 3.8
       },
       "2026-01-30": {
         "rain": 0.8,
-        "tmean": 19.7
+        "tmean": 19.7,
+        "et0": 4.8
       },
       "2026-01-31": {
         "rain": 1.5,
-        "tmean": 19.4
+        "tmean": 19.4,
+        "et0": 4.1
       },
       "2026-02-01": {
         "rain": 4.4,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 2.8
       },
       "2026-02-02": {
         "rain": 3.5,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 3.5
       },
       "2026-02-03": {
         "rain": 4.0,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 4.3
       },
       "2026-02-04": {
         "rain": 2.3,
-        "tmean": 18.8
+        "tmean": 18.8,
+        "et0": 4.2
       },
       "2026-02-05": {
         "rain": 2.2,
-        "tmean": 19.3
+        "tmean": 19.3,
+        "et0": 4.4
       },
       "2026-02-06": {
         "rain": 11.7,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 4.0
       },
       "2026-02-07": {
         "rain": 16.1,
-        "tmean": 19.2
+        "tmean": 19.2,
+        "et0": 3.4
       },
       "2026-02-08": {
         "rain": 23.8,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 2.9
       },
       "2026-02-09": {
         "rain": 7.8,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 2.7
       },
       "2026-02-10": {
         "rain": 5.3,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 3.0
       },
       "2026-02-11": {
         "rain": 9.1,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 3.6
       },
       "2026-02-12": {
         "rain": 10.8,
-        "tmean": 19.1
+        "tmean": 19.1,
+        "et0": 3.2
       },
       "2026-02-13": {
         "rain": 5.0,
-        "tmean": 19.0
+        "tmean": 19.0,
+        "et0": 2.9
       },
       "2026-02-14": {
         "rain": 6.7,
-        "tmean": 18.6
+        "tmean": 18.6,
+        "et0": 2.5
       },
       "2026-02-15": {
         "rain": 0.2,
-        "tmean": 19.8
+        "tmean": 19.8,
+        "et0": 4.8
       },
       "2026-02-16": {
         "rain": 5.7,
-        "tmean": 20.1
+        "tmean": 20.1,
+        "et0": 4.0
       },
       "2026-02-17": {
         "rain": 7.8,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 3.9
       },
       "2026-02-18": {
         "rain": 7.6,
-        "tmean": 19.9
+        "tmean": 19.9,
+        "et0": 3.8
       },
       "2026-02-19": {
         "rain": 5.9,
-        "tmean": 20.1
+        "tmean": 20.1,
+        "et0": 3.5
       },
       "2026-02-20": {
         "rain": 15.9,
-        "tmean": 19.6
+        "tmean": 19.6,
+        "et0": 3.9
       },
       "2026-05-26": {
         "rain": 3.7,
