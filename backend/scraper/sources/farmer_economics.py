@@ -474,130 +474,37 @@ def _scrape_enso(db) -> None:
         print(f"[farmer_economics] ENSO FAILED: {e}")
 
 
-IRI_FORECAST_URL = "https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/"
-
-_SEASON_ORDER = ["DJF","JFM","FMA","MAM","AMJ","MJJ","JJA","JAS","ASO","SON","OND","NDJ"]
-
-
-def parse_iri_probability_table(html: str) -> list[dict]:
-    """Parse the IRI/CPC ENSO probability table out of the forecast page HTML.
-
-    Pure (no network) so it's unit-testable against a saved fixture. Table
-    layout (column-oriented):
-        Season | La Nina | Neutral | El Nino
-        MAM    |   0     |   91    |    9
-        ...
-    Returns [{"season": "MAM", "la_nina": 0, "neutral": 91, "el_nino": 9}, ...].
-    """
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(html, "html.parser")
-    forecast: list[dict] = []
-
-    def _int(cell):
-        try:
-            return int(cell.get_text(strip=True).replace("%", "").strip())
-        except (ValueError, AttributeError):
-            return None
-
-    for table in soup.find_all("table"):
-        all_text = table.get_text()
-        if "La Nina" not in all_text and "La Ni\xf1a" not in all_text:
-            continue
-
-        rows = table.find_all("tr")
-        if not rows:
-            continue
-
-        # Try header-based column mapping first.
-        headers = [th.get_text(strip=True).lower() for th in rows[0].find_all(["th", "td"])]
-        col_season: int | None = None
-        col_lanina: int | None = None
-        col_neutral: int | None = None
-        col_elnino: int | None = None
-        for i, h in enumerate(headers):
-            if col_season is None and (
-                h == "season" or "month" in h or "period" in h or "3-mo" in h
-            ):
-                col_season = i
-            if col_lanina is None and "la" in h and ("nina" in h or "niña" in h):
-                col_lanina = i
-            if col_neutral is None and "neutral" in h:
-                col_neutral = i
-            if col_elnino is None and "el" in h and ("nino" in h or "niño" in h):
-                col_elnino = i
-
-        # Data rows: pick by header positions if we know them, otherwise
-        # by content shape — a row whose first cell is a 3-letter season
-        # code (e.g. "MAM", "AMJ") followed by three integer cells.
-        for row in rows[1:]:
-            cells = row.find_all(["td", "th"])
-            if len(cells) < 4:
-                continue
-            if col_season is not None:
-                season = cells[col_season].get_text(strip=True)
-            else:
-                season = cells[0].get_text(strip=True)
-            if len(season) != 3 or not season.isalpha() or not season.isupper():
-                continue
-
-            if (
-                col_lanina is not None
-                and col_neutral is not None
-                and col_elnino is not None
-            ):
-                if len(cells) <= max(col_lanina, col_neutral, col_elnino):
-                    continue
-                la, nu, el = _int(cells[col_lanina]), _int(cells[col_neutral]), _int(cells[col_elnino])
-            else:
-                # Content-shape fallback: take the first three numbers
-                # following the season cell, in the standard layout order.
-                nums = [_int(c) for c in cells[1:5]]
-                nums = [n for n in nums if n is not None]
-                if len(nums) < 3:
-                    continue
-                la, nu, el = nums[0], nums[1], nums[2]
-
-            forecast.append({
-                "season":  season,
-                "la_nina": la,
-                "neutral": nu,
-                "el_nino": el,
-            })
-
-        if forecast:
-            break
-
-    return forecast
+# IRI forecast parsing moved to scraper.enso_forecast as part of the multi-
+# source fallback chain (IRI HTML → NOAA CPC discussion text). Re-exported
+# here so existing imports (and tests) keep working unchanged.
+from scraper.enso_forecast import (
+    IRI_FORECAST_URL,
+    SEASON_ORDER as _SEASON_ORDER,
+    parse_iri_probability_table,
+)
 
 
 def _scrape_enso_forecast(db) -> None:
-    """Fetch IRI/CPC ENSO probability table and append to the NOAA ONI item."""
+    """Fetch the ENSO probability table via the multi-source fallback chain
+    (IRI HTML → NOAA CPC discussion text) and attach to the NOAA ONI item.
+
+    The orchestration lives in scraper.enso_forecast so the IRI + CPC parsers
+    stay pure / fixture-testable; this function only handles the DB plumbing.
+    """
     import os
     import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
     from models import NewsItem
+    from scraper.enso_forecast import fetch_enso_forecast
 
     try:
-        resp = requests.get(IRI_FORECAST_URL, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
-        resp.raise_for_status()
-        forecast = parse_iri_probability_table(resp.text)
-
+        forecast, source = fetch_enso_forecast(timeout=30)
         if not forecast:
-            # Distinguish "page has no parseable table" (image/JS-rendered, or
-            # layout changed) from a fetch problem. raise_for_status already
-            # turns a 403/blocked response into the except branch below, so
-            # reaching here means we got HTML but found no probability table.
-            html = resp.text or ""
-            n_tables = html.lower().count("<table")
-            has_lanina = ("la nina" in html.lower()) or ("la ni\xf1a" in html.lower())
-            print(f"[farmer_economics] ENSO forecast: probability table not found "
-                  f"(HTTP {resp.status_code}, {len(html):,} chars, {n_tables} <table> "
-                  f"tags, La-Nina-text={has_lanina}) — IRI likely image/JS-rendered.")
+            print("[farmer_economics] ENSO forecast: both sources empty "
+                  "(IRI image/JS-rendered, CPC table absent or layout drift).")
             return
 
-        # Append to existing ONI NewsItem meta
         enso_item = (
             db.query(NewsItem)
             .filter(NewsItem.source == "NOAA CPC")
@@ -607,10 +514,11 @@ def _scrape_enso_forecast(db) -> None:
         if enso_item:
             meta = json.loads(enso_item.meta or "{}")
             meta["oni_forecast"] = forecast
+            meta["oni_forecast_source"] = source
             enso_item.meta = json.dumps(meta)
             db.commit()
-            print(f"[farmer_economics] ENSO forecast OK ({len(forecast)} seasons): "
-                  f"{[f['season'] for f in forecast]}")
+            print(f"[farmer_economics] ENSO forecast OK ({len(forecast)} seasons "
+                  f"via {source}): {[f['season'] for f in forecast]}")
         else:
             print("[farmer_economics] ENSO forecast: no ONI item to attach to")
     except Exception as e:
