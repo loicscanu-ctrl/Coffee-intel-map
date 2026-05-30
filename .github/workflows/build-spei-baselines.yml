@@ -32,7 +32,11 @@ on:
 jobs:
   build-spei-baselines:
     runs-on: ubuntu-22.04
-    timeout-minutes: 35
+    # 35 was too tight: the first dispatch (2026-05-30) saw ~30% of archive
+    # calls timeout at 180s each, and the runner was killed at 35 min with
+    # 19/27 regions fetched but nothing committed. 90 absorbs retries
+    # comfortably and leaves headroom for the checkpoint-per-origin writes.
+    timeout-minutes: 90
     permissions:
       contents: write
 
