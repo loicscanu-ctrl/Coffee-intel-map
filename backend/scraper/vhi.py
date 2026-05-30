@@ -32,8 +32,8 @@ import requests
 
 VHI_URL = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_TS_admin.php"
 DEFAULT_HEADERS = {
-    "User-Agent": ("Mozilla/5.0 (compatible; CoffeeIntelVHI/1.0; "
-                   "+https://www.theice.com — fair-use educational)"),
+    # HTTP header values must be latin-1; no em-dashes, smart quotes, etc.
+    "User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelVHI/1.0; fair-use educational)",
     "Accept":     "text/plain, */*",
 }
 
