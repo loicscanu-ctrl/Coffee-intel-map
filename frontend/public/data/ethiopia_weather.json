@@ -71,18 +71,18 @@
         20
       ],
       "monthly_last_year_rain": [
-        31,
-        47,
-        109,
-        141,
-        141,
-        187,
-        250,
-        234,
-        156,
-        94,
-        62,
-        31
+        8.7,
+        1.1,
+        249.1,
+        205.1,
+        201.7,
+        115.9,
+        114.3,
+        137.7,
+        186.4,
+        393.4,
+        64.3,
+        33.7
       ],
       "monthly_actual_cur": [
         11.7,
@@ -134,18 +134,18 @@
         21.0
       ],
       "monthly_last_year_temp": [
-        19.5,
-        20.3,
-        20.9,
-        21.1,
-        20.9,
-        20.3,
-        19.5,
-        18.7,
-        18.1,
-        17.9,
-        18.1,
-        18.7
+        18.0,
+        20.6,
+        19.2,
+        17.8,
+        17.2,
+        17.0,
+        16.8,
+        16.4,
+        17.0,
+        16.4,
+        16.7,
+        17.6
       ],
       "monthly_actual_temp_cur": [
         18.4,
@@ -196,7 +196,39 @@
         123.5,
         null
       ],
-      "daily_accum_ly": [],
+      "daily_accum_ly": [
+        6.6,
+        8.8,
+        17.1,
+        34.9,
+        41.4,
+        44.2,
+        53.5,
+        95.3,
+        101.9,
+        118.1,
+        118.2,
+        122.8,
+        126.0,
+        136.2,
+        140.4,
+        144.3,
+        152.7,
+        155.2,
+        163.9,
+        165.1,
+        168.0,
+        175.0,
+        176.6,
+        177.6,
+        178.3,
+        179.6,
+        185.8,
+        194.5,
+        197.6,
+        200.0,
+        201.7
+      ],
       "essm_fraction": 0.248,
       "essm_recent": [
         {
@@ -225,10 +257,11 @@
         }
       ],
       "spi_1": -0.88,
-      "spi_3": -4.75,
+      "spi_3": -0.94,
       "spi_month": "2026-02",
       "spei_1": -0.54,
-      "spei_month": "2026-02"
+      "spei_month": "2026-02",
+      "spei_3": -0.65
     },
     {
       "name": "Jimma",
@@ -292,18 +325,18 @@
         22
       ],
       "monthly_last_year_rain": [
-        33,
-        50,
-        117,
-        151,
-        151,
-        201,
-        268,
-        251,
-        167,
-        100,
-        67,
-        33
+        12.9,
+        0.9,
+        116.6,
+        171.1,
+        201.7,
+        228.2,
+        205.4,
+        202.0,
+        201.8,
+        137.8,
+        7.2,
+        72.2
       ],
       "monthly_actual_cur": [
         13.2,
@@ -355,18 +388,18 @@
         22.0
       ],
       "monthly_last_year_temp": [
-        20.5,
-        21.3,
-        21.9,
-        22.1,
-        21.9,
-        21.3,
-        20.5,
-        19.7,
-        19.1,
-        18.9,
-        19.1,
-        19.7
+        18.6,
+        20.4,
+        19.8,
+        19.2,
+        18.3,
+        17.4,
+        16.7,
+        16.5,
+        16.9,
+        17.1,
+        17.9,
+        18.4
       ],
       "monthly_actual_temp_cur": [
         19.1,
@@ -417,9 +450,41 @@
         146.6,
         null
       ],
-      "daily_accum_ly": [],
+      "daily_accum_ly": [
+        7.2,
+        14.2,
+        15.4,
+        26.5,
+        48.4,
+        52.8,
+        52.8,
+        60.7,
+        64.6,
+        64.8,
+        65.5,
+        73.9,
+        80.9,
+        95.9,
+        100.1,
+        102.8,
+        102.8,
+        114.0,
+        134.6,
+        136.5,
+        137.5,
+        148.7,
+        151.8,
+        159.7,
+        160.8,
+        162.5,
+        184.2,
+        185.8,
+        186.6,
+        191.7,
+        201.7
+      ],
       "spi_1": -0.19,
-      "spi_3": -4.75,
+      "spi_3": 0.74,
       "spi_month": "2026-02",
       "essm_fraction": 0.373,
       "essm_recent": [
@@ -449,7 +514,8 @@
         }
       ],
       "spei_1": -0.11,
-      "spei_month": "2026-02"
+      "spei_month": "2026-02",
+      "spei_3": 0.42
     },
     {
       "name": "Limu",
@@ -513,18 +579,18 @@
         22
       ],
       "monthly_last_year_rain": [
-        33,
-        50,
-        117,
-        151,
-        151,
-        201,
-        268,
-        251,
-        167,
-        100,
-        67,
-        33
+        6.5,
+        0.5,
+        87.1,
+        108.5,
+        119.8,
+        193.1,
+        219.7,
+        307.5,
+        286.6,
+        200.7,
+        8.4,
+        44.7
       ],
       "monthly_actual_cur": [
         5.3,
@@ -576,18 +642,18 @@
         22.0
       ],
       "monthly_last_year_temp": [
-        20.5,
-        21.3,
-        21.9,
-        22.1,
-        21.9,
-        21.3,
-        20.5,
-        19.7,
-        19.1,
+        20.7,
+        22.7,
+        22.5,
+        22.0,
+        20.8,
+        19.6,
         18.9,
+        18.6,
+        19.0,
         19.1,
-        19.7
+        19.8,
+        20.4
       ],
       "monthly_actual_temp_cur": [
         21.1,
@@ -638,7 +704,39 @@
         110.3,
         null
       ],
-      "daily_accum_ly": [],
+      "daily_accum_ly": [
+        10.6,
+        13.6,
+        19.7,
+        28.5,
+        36.7,
+        38.2,
+        38.2,
+        38.2,
+        39.8,
+        39.8,
+        39.8,
+        44.6,
+        52.5,
+        54.2,
+        56.5,
+        56.7,
+        56.7,
+        59.5,
+        64.4,
+        65.6,
+        66.4,
+        69.0,
+        71.2,
+        71.4,
+        71.5,
+        74.5,
+        85.3,
+        90.5,
+        90.7,
+        101.0,
+        119.8
+      ],
       "essm_fraction": 0.459,
       "essm_recent": [
         {
@@ -667,10 +765,11 @@
         }
       ],
       "spi_1": 0.99,
-      "spi_3": -3.15,
+      "spi_3": 1.61,
       "spi_month": "2026-02",
       "spei_1": 0.87,
-      "spei_month": "2026-02"
+      "spei_month": "2026-02",
+      "spei_3": 1.24
     },
     {
       "name": "Kaffa",
@@ -734,18 +833,18 @@
         27
       ],
       "monthly_last_year_rain": [
-        40,
-        60,
-        141,
-        181,
-        181,
-        241,
-        321,
-        301,
-        201,
-        121,
-        80,
-        40
+        19.8,
+        9.0,
+        106.9,
+        126.5,
+        115.0,
+        109.1,
+        186.7,
+        214.3,
+        150.9,
+        190.9,
+        42.7,
+        33.9
       ],
       "monthly_actual_cur": [
         23.1,
@@ -797,17 +896,17 @@
         21.1
       ],
       "monthly_last_year_temp": [
-        19.5,
+        19.8,
+        21.2,
         20.2,
-        20.8,
-        21.0,
-        20.8,
-        20.2,
-        19.5,
+        19.7,
+        19.0,
+        18.3,
+        17.7,
+        17.4,
+        17.9,
+        17.9,
         18.8,
-        18.2,
-        18.0,
-        18.2,
         18.8
       ],
       "monthly_actual_temp_cur": [
@@ -859,7 +958,39 @@
         120.0,
         null
       ],
-      "daily_accum_ly": [],
+      "daily_accum_ly": [
+        3.7,
+        8.0,
+        23.0,
+        30.2,
+        43.8,
+        44.4,
+        44.5,
+        44.7,
+        48.0,
+        48.0,
+        48.2,
+        55.9,
+        62.0,
+        64.6,
+        65.3,
+        66.4,
+        67.6,
+        73.2,
+        79.6,
+        83.2,
+        84.0,
+        90.5,
+        91.5,
+        92.1,
+        92.9,
+        95.0,
+        103.0,
+        106.4,
+        107.1,
+        109.6,
+        115.0
+      ],
       "essm_fraction": 0.318,
       "essm_recent": [
         {
@@ -888,10 +1019,11 @@
         }
       ],
       "spi_1": -1.04,
-      "spi_3": -4.16,
+      "spi_3": -1.17,
       "spi_month": "2026-02",
       "spei_1": -0.69,
-      "spei_month": "2026-02"
+      "spei_month": "2026-02",
+      "spei_3": -0.95
     },
     {
       "name": "Harrar",
@@ -955,18 +1087,18 @@
         13
       ],
       "monthly_last_year_rain": [
-        20,
-        30,
-        70,
-        90,
-        90,
-        121,
-        161,
-        151,
-        100,
-        60,
-        40,
-        20
+        0.5,
+        0.3,
+        51.3,
+        55.4,
+        97.6,
+        24.4,
+        52.0,
+        129.8,
+        130.1,
+        33.6,
+        0.3,
+        8.9
       ],
       "monthly_actual_cur": [
         1.6,
@@ -1018,18 +1150,18 @@
         19.9
       ],
       "monthly_last_year_temp": [
-        18.5,
+        18.2,
+        20.0,
+        20.5,
+        20.6,
+        19.7,
         19.4,
-        20.1,
-        20.3,
-        20.1,
-        19.4,
+        18.8,
+        18.0,
         18.5,
-        17.6,
-        16.9,
-        16.7,
-        16.9,
-        17.6
+        18.5,
+        18.9,
+        18.8
       ],
       "monthly_actual_temp_cur": [
         18.3,
@@ -1080,7 +1212,39 @@
         43.5,
         null
       ],
-      "daily_accum_ly": [],
+      "daily_accum_ly": [
+        2.3,
+        3.1,
+        5.6,
+        16.9,
+        30.0,
+        41.1,
+        53.5,
+        53.8,
+        53.8,
+        53.9,
+        54.0,
+        55.1,
+        70.3,
+        83.2,
+        84.0,
+        84.5,
+        88.4,
+        88.9,
+        88.9,
+        89.4,
+        91.1,
+        91.1,
+        94.6,
+        94.9,
+        94.9,
+        95.2,
+        95.3,
+        96.6,
+        96.6,
+        97.6,
+        97.6
+      ],
       "essm_fraction": 0.268,
       "essm_recent": [
         {
@@ -1109,7 +1273,8 @@
         }
       ],
       "spei_1": -1.07,
-      "spei_month": "2026-02"
+      "spei_month": "2026-02",
+      "spei_3": -1.11
     }
   ],
   "daily_station": [
@@ -1120,7 +1285,7 @@
       "avg_accum_mm": 4.3,
       "min_accum_mm": 2.6,
       "max_accum_mm": 6.4,
-      "last_year_accum_mm": 4.6,
+      "last_year_accum_mm": 6.6,
       "temp_c": 17.1
     },
     {
@@ -1130,7 +1295,7 @@
       "avg_accum_mm": 8.6,
       "min_accum_mm": 5.1,
       "max_accum_mm": 12.9,
-      "last_year_accum_mm": 9.3,
+      "last_year_accum_mm": 8.8,
       "temp_c": 16.8
     },
     {
@@ -1140,7 +1305,7 @@
       "avg_accum_mm": 12.9,
       "min_accum_mm": 7.7,
       "max_accum_mm": 19.3,
-      "last_year_accum_mm": 13.9,
+      "last_year_accum_mm": 17.1,
       "temp_c": 17.0
     },
     {
@@ -1150,7 +1315,7 @@
       "avg_accum_mm": 17.2,
       "min_accum_mm": 10.3,
       "max_accum_mm": 25.7,
-      "last_year_accum_mm": 18.5,
+      "last_year_accum_mm": 34.9,
       "temp_c": 18.6
     },
     {
@@ -1160,7 +1325,7 @@
       "avg_accum_mm": 21.5,
       "min_accum_mm": 12.9,
       "max_accum_mm": 32.2,
-      "last_year_accum_mm": 23.2,
+      "last_year_accum_mm": 41.4,
       "temp_c": 17.3
     },
     {
@@ -1170,7 +1335,7 @@
       "avg_accum_mm": 25.7,
       "min_accum_mm": 15.4,
       "max_accum_mm": 38.6,
-      "last_year_accum_mm": 27.8,
+      "last_year_accum_mm": 44.2,
       "temp_c": 17.8
     },
     {
@@ -1180,7 +1345,7 @@
       "avg_accum_mm": 30.0,
       "min_accum_mm": 18.0,
       "max_accum_mm": 45.0,
-      "last_year_accum_mm": 32.4,
+      "last_year_accum_mm": 53.5,
       "temp_c": 17.1
     },
     {
@@ -1190,7 +1355,7 @@
       "avg_accum_mm": 34.3,
       "min_accum_mm": 20.6,
       "max_accum_mm": 51.5,
-      "last_year_accum_mm": 37.1,
+      "last_year_accum_mm": 95.3,
       "temp_c": 17.8
     },
     {
@@ -1200,7 +1365,7 @@
       "avg_accum_mm": 38.6,
       "min_accum_mm": 23.2,
       "max_accum_mm": 57.9,
-      "last_year_accum_mm": 41.7,
+      "last_year_accum_mm": 101.9,
       "temp_c": 17.0
     },
     {
@@ -1210,7 +1375,7 @@
       "avg_accum_mm": 42.9,
       "min_accum_mm": 25.7,
       "max_accum_mm": 64.4,
-      "last_year_accum_mm": 46.3,
+      "last_year_accum_mm": 118.1,
       "temp_c": 17.7
     },
     {
@@ -1220,7 +1385,7 @@
       "avg_accum_mm": 47.2,
       "min_accum_mm": 28.3,
       "max_accum_mm": 70.8,
-      "last_year_accum_mm": 51.0,
+      "last_year_accum_mm": 118.2,
       "temp_c": 16.5
     },
     {
@@ -1230,7 +1395,7 @@
       "avg_accum_mm": 51.5,
       "min_accum_mm": 30.9,
       "max_accum_mm": 77.2,
-      "last_year_accum_mm": 55.6,
+      "last_year_accum_mm": 122.8,
       "temp_c": 17.8
     },
     {
@@ -1240,7 +1405,7 @@
       "avg_accum_mm": 55.8,
       "min_accum_mm": 33.5,
       "max_accum_mm": 83.7,
-      "last_year_accum_mm": 60.2,
+      "last_year_accum_mm": 126.0,
       "temp_c": 17.8
     },
     {
@@ -1250,7 +1415,7 @@
       "avg_accum_mm": 60.1,
       "min_accum_mm": 36.0,
       "max_accum_mm": 90.1,
-      "last_year_accum_mm": 64.9,
+      "last_year_accum_mm": 136.2,
       "temp_c": 17.5
     },
     {
@@ -1260,7 +1425,7 @@
       "avg_accum_mm": 64.4,
       "min_accum_mm": 38.6,
       "max_accum_mm": 96.5,
-      "last_year_accum_mm": 69.5,
+      "last_year_accum_mm": 140.4,
       "temp_c": 18.0
     },
     {
@@ -1270,7 +1435,7 @@
       "avg_accum_mm": 68.6,
       "min_accum_mm": 41.2,
       "max_accum_mm": 103.0,
-      "last_year_accum_mm": 74.1,
+      "last_year_accum_mm": 144.3,
       "temp_c": 17.2
     },
     {
@@ -1280,7 +1445,7 @@
       "avg_accum_mm": 72.9,
       "min_accum_mm": 43.8,
       "max_accum_mm": 109.4,
-      "last_year_accum_mm": 78.8,
+      "last_year_accum_mm": 152.7,
       "temp_c": 17.2
     },
     {
@@ -1290,7 +1455,7 @@
       "avg_accum_mm": 77.2,
       "min_accum_mm": 46.3,
       "max_accum_mm": 115.8,
-      "last_year_accum_mm": 83.4,
+      "last_year_accum_mm": 155.2,
       "temp_c": 17.3
     },
     {
@@ -1300,7 +1465,7 @@
       "avg_accum_mm": 81.5,
       "min_accum_mm": 48.9,
       "max_accum_mm": 122.3,
-      "last_year_accum_mm": 88.0,
+      "last_year_accum_mm": 163.9,
       "temp_c": 17.1
     },
     {
@@ -1310,7 +1475,7 @@
       "avg_accum_mm": 85.8,
       "min_accum_mm": 51.5,
       "max_accum_mm": 128.7,
-      "last_year_accum_mm": 92.7,
+      "last_year_accum_mm": 165.1,
       "temp_c": 17.4
     },
     {
@@ -1320,7 +1485,7 @@
       "avg_accum_mm": 90.1,
       "min_accum_mm": 54.1,
       "max_accum_mm": 135.1,
-      "last_year_accum_mm": 97.3,
+      "last_year_accum_mm": 168.0,
       "temp_c": 17.1
     },
     {
@@ -1330,7 +1495,7 @@
       "avg_accum_mm": 94.4,
       "min_accum_mm": 56.6,
       "max_accum_mm": 141.6,
-      "last_year_accum_mm": 101.9,
+      "last_year_accum_mm": 175.0,
       "temp_c": 17.4
     },
     {
@@ -1340,7 +1505,7 @@
       "avg_accum_mm": 98.7,
       "min_accum_mm": 59.2,
       "max_accum_mm": 148.0,
-      "last_year_accum_mm": 106.6,
+      "last_year_accum_mm": 176.6,
       "temp_c": 17.5
     },
     {
@@ -1350,7 +1515,7 @@
       "avg_accum_mm": 103.0,
       "min_accum_mm": 61.8,
       "max_accum_mm": 154.5,
-      "last_year_accum_mm": 111.2,
+      "last_year_accum_mm": 177.6,
       "temp_c": 17.1
     },
     {
@@ -1360,7 +1525,7 @@
       "avg_accum_mm": 107.3,
       "min_accum_mm": 64.4,
       "max_accum_mm": 160.9,
-      "last_year_accum_mm": 115.8,
+      "last_year_accum_mm": 178.3,
       "temp_c": 17.2
     },
     {
@@ -1370,7 +1535,7 @@
       "avg_accum_mm": 111.5,
       "min_accum_mm": 66.9,
       "max_accum_mm": 167.3,
-      "last_year_accum_mm": 120.5,
+      "last_year_accum_mm": 179.6,
       "temp_c": 17.1
     },
     {
@@ -1380,7 +1545,7 @@
       "avg_accum_mm": 115.8,
       "min_accum_mm": 69.5,
       "max_accum_mm": 173.8,
-      "last_year_accum_mm": 125.1,
+      "last_year_accum_mm": 185.8,
       "temp_c": 17.2
     },
     {
@@ -1390,7 +1555,7 @@
       "avg_accum_mm": 120.1,
       "min_accum_mm": 72.1,
       "max_accum_mm": 180.2,
-      "last_year_accum_mm": 129.7,
+      "last_year_accum_mm": 194.5,
       "temp_c": 17.4
     },
     {
@@ -1400,7 +1565,7 @@
       "avg_accum_mm": 124.4,
       "min_accum_mm": 74.7,
       "max_accum_mm": 186.6,
-      "last_year_accum_mm": 134.4,
+      "last_year_accum_mm": 197.6,
       "temp_c": 17.5
     },
     {
@@ -1410,7 +1575,7 @@
       "avg_accum_mm": 128.7,
       "min_accum_mm": 77.2,
       "max_accum_mm": 193.1,
-      "last_year_accum_mm": 139.0,
+      "last_year_accum_mm": 200.0,
       "temp_c": 17.5
     },
     {
@@ -1420,7 +1585,7 @@
       "avg_accum_mm": 133.0,
       "min_accum_mm": 79.8,
       "max_accum_mm": 199.5,
-      "last_year_accum_mm": 143.6,
+      "last_year_accum_mm": 201.7,
       "temp_c": 0.0
     }
   ],
