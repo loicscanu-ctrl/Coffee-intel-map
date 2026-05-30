@@ -46,6 +46,38 @@ def test_parse_dual_crop_rejects_out_of_range_pct():
     assert out is None or out.get("2025/26", {}).get("overall_sold_pct") != 120
 
 
+def test_parse_dual_crop_rejects_date_noise():
+    # "2022/12", "2023/01" look like crop years to a loose regex but are dates.
+    # Real crop years are always Y/Y+1.
+    text = (
+        "Em 2022/12 a Safras publicou seu primeiro boletim; até 2023/01, 5% "
+        "vendidos. A comercialização da safra 2025/26 atingiu 86%."
+    )
+    out = fs._parse_dual_crop(text)
+    assert out is not None
+    assert "2022/12" not in out
+    assert "2023/01" not in out
+    assert out["2025/26"]["overall_sold_pct"] == 86
+
+
+def test_parse_dual_crop_accepts_short_year_form():
+    # Safras headlines sometimes write '25/26' (short) — accepted iff Y+1.
+    out = fs._parse_dual_crop("Safra 25/26 fechou em 92% no Brasil.")
+    assert out is not None
+    assert "2025/26" in out
+    assert out["2025/26"]["overall_sold_pct"] == 92
+
+
+def test_is_crop_year_pair_helpers():
+    assert fs._is_crop_year_pair("2025", "26")
+    assert fs._is_crop_year_pair("25", "26")
+    assert fs._is_crop_year_pair("2099", "00")     # century wrap
+    assert not fs._is_crop_year_pair("2022", "12")
+    assert not fs._is_crop_year_pair("2023", "01")
+    assert fs._canonical_crop_year("25", "26") == "2025/26"
+    assert fs._canonical_crop_year("2025", "26") == "2025/26"
+
+
 # ── echo candidate filtering ──────────────────────────────────────────────────
 
 def test_is_echo_candidate_accepts_coffee_sales():

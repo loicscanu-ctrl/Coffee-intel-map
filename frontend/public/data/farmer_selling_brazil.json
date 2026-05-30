@@ -557,48 +557,6 @@
       "overall_sold_pct": 31,
       "arabica_sold_pct": 29,
       "conilon_sold_pct": 35
-    },
-    "2022/12": {
-      "status": "current_crop",
-      "overall_sold_pct": 100,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2022/10": {
-      "status": "current_crop",
-      "overall_sold_pct": 31,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2023/01": {
-      "status": "current_crop",
-      "overall_sold_pct": 31,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2022/11": {
-      "status": "current_crop",
-      "overall_sold_pct": 100,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2023/12": {
-      "status": "current_crop",
-      "overall_sold_pct": 31,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2024/25": {
-      "status": "current_crop",
-      "overall_sold_pct": 98,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
-    },
-    "2021/03": {
-      "status": "current_crop",
-      "overall_sold_pct": 77,
-      "arabica_sold_pct": null,
-      "conilon_sold_pct": null
     }
   },
   "crops_meta": {

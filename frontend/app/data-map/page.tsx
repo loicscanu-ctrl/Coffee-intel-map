@@ -272,6 +272,7 @@ const DEMAND = `flowchart LR
   WICE_KCD["1.13 ICE Cert Stocks · daily 17:00<br/>Arabica xls (sheet 7)<br/>publicdocs/coffee_cert_stock_*.xls"]
   WICE_KCA["1.14 ICE Arabica Ageing · day-1/mo<br/>coffee_aging_YYYYMMDD.xls"]
   WICE_RC["ICE Robusta · daily 17:00<br/>stock_report_RC_*.csv (10:30-11:15 sweep)<br/>+ age_allowance + gradings + iss_recv"]
+  WICE_SPA["ICE SPA API (fallback)<br/>POST marketdata/api/reports/142/data<br/>{KC | RC} → warehouse + total"]
   COH[["cohort_outflow.py<br/>per-cohort DNA from gradings<br/>+ DNA-coverage guard"]]
   EXP{{"1.4 Export · 02:30"}}
   J_stk[/demand_stocks.json/]
@@ -312,6 +313,8 @@ const DEMAND = `flowchart LR
   WICE_KCA --> J_csa
   WICE_RC --> J_csr
   WICE_RC --> COH --> J_csr
+  WICE_SPA -.fallback / freshness probe.-> J_csa
+  WICE_SPA -.fallback / freshness probe.-> J_csr
   J_csa --> tiles
   J_csr --> tiles
   J_csa --> period
@@ -323,7 +326,7 @@ const DEMAND = `flowchart LR
   J_csr --> fresh
 ${DEFS}
   classDef vis fill:#451a03,stroke:#f59e0b,color:#fde68a;
-  class W3B,WPOP,W41,W31,WMIX,WICE_KCD,WICE_KCA,WICE_RC scr;
+  class W3B,WPOP,W41,W31,WMIX,WICE_KCD,WICE_KCA,WICE_RC,WICE_SPA scr;
   class COH proc;
   class EXP proc;
   class J_stk,J_earn,J_tax,J_mix,J_csa,J_csr,J_h json;

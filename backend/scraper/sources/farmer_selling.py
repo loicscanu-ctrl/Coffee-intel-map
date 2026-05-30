@@ -250,7 +250,29 @@ def _extract_pct(text: str, *patterns: str) -> int | None:
 # We locate each crop-year token (e.g. "2026/27") and read the percentages in
 # the text window that follows it — the breakdown sits next to its crop-year.
 
-_CROP_YEAR_RE = re.compile(r"\b(20\d{2})/(\d{2})\b")
+# Matches both "YYYY/YY" (2025/26) and the colloquial short "YY/YY" (25/26)
+# Safras uses in headlines. _is_crop_year_pair below enforces the Y2 = Y1+1
+# constraint so date noise like "2022/12" or "2023/01" doesn't pollute crops{}.
+_CROP_YEAR_RE = re.compile(r"\b(20\d{2}|\d{2})/(\d{2})\b")
+
+
+def _is_crop_year_pair(yyyy_or_yy: str, yy: str) -> bool:
+    """True iff the (Y1, Y2) pair denotes consecutive years modulo 100.
+    A real crop year is always Y/Y+1: 25/26, 2025/26, 99/00 are valid; the
+    date '2022/12' or '2023/01' is not."""
+    try:
+        y2 = int(yy)
+        y1 = int(yyyy_or_yy) % 100
+        return (y1 + 1) % 100 == y2
+    except ValueError:
+        return False
+
+
+def _canonical_crop_year(yyyy_or_yy: str, yy: str) -> str:
+    """Normalise to YYYY/YY ('2025/26'). Two-digit Y1 inputs assume 20YY."""
+    y1 = int(yyyy_or_yy)
+    full_y1 = y1 if y1 >= 100 else 2000 + y1
+    return f"{full_y1}/{yy}"
 
 
 def _pct_in_range(val: int | None) -> int | None:
@@ -284,12 +306,15 @@ def _parse_dual_crop(text: str) -> dict[str, dict[str, int]] | None:
     refined against live CI articles over time.
     """
     t = re.sub(r"\s+", " ", text or "")
-    years = list(_CROP_YEAR_RE.finditer(t))
+    # Filter to true crop-year tokens (Y2 = Y1+1 mod 100). Drops date noise
+    # like "2022/12" and "2023/01" that the bare regex used to admit.
+    years = [m for m in _CROP_YEAR_RE.finditer(t)
+             if _is_crop_year_pair(m.group(1), m.group(2))]
     if not years:
         return None
     crops: dict[str, dict[str, int]] = {}
     for i, m in enumerate(years):
-        cy = f"{m.group(1)}/{m.group(2)}"
+        cy = _canonical_crop_year(m.group(1), m.group(2))
         start = m.end()
         end = years[i + 1].start() if i + 1 < len(years) else min(len(t), start + 400)
         win = t[start:end]
@@ -630,8 +655,12 @@ def build_farmer_selling(db=None) -> dict:
     # so the live panel is unaffected; the UI sprint will read data["crops"].
     if best_dual is not None:
         current_cy = ((data.get("arabica") or {}).get("brazil") or {}).get("crop_year") or ""
+        # Keep only current + forward crops; drop historical ones that wouldn't
+        # carry today's commercialization signal even if the article cited them.
         crops_out: dict[str, dict[str, Any]] = {}
         for cy, pcts in best_dual[1].items():
+            if current_cy and cy < current_cy:
+                continue
             crops_out[cy] = {
                 "status": "new_crop_advance" if (current_cy and cy > current_cy) else "current_crop",
                 "overall_sold_pct": pcts.get("overall_sold_pct"),
