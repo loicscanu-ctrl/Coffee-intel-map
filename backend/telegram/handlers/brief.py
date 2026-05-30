@@ -194,6 +194,26 @@ def _brazil_brief_block(daily: dict | None) -> str:
     return "\n".join(lines)
 
 
+def _drought_below_seasonal_floor(reg: dict) -> bool:
+    """True iff this region's current MTD rain is below the historical
+    minimum MTD rain for THIS calendar month — i.e. the dryness is
+    record-breaking for the season, not just an absolute-rainfall reading
+    the upstream scraper flagged as HIGH.
+
+    Without this gate, the brief alerts every "drought=HIGH" reading
+    including normal seasonal dryness (Sul de Minas in winter, Central
+    Highlands in December, Honduras in March). Issue #132 Body-3.
+
+    Returns False when either field is missing — fail-closed; absence of
+    baseline data shouldn't generate noise.
+    """
+    cur = reg.get("rain_mtd_mm")
+    floor = reg.get("rain_hist_min")
+    if not isinstance(cur, (int, float)) or not isinstance(floor, (int, float)):
+        return False
+    return cur < floor
+
+
 def _weather_line() -> str:
     alerts = []
     supply_files = [
@@ -210,8 +230,15 @@ def _weather_line() -> str:
             continue
         weather = data.get("weather", {})
         for reg in weather.get("regions", []):
-            if reg.get("drought") == "HIGH":
+            # Drought alerts: gated by the seasonal baseline check so we
+            # only flag dryness that is anomalous for THIS month. Normal
+            # seasonal dry-season readings stay silent on the brief.
+            if reg.get("drought") == "HIGH" and _drought_below_seasonal_floor(reg):
                 alerts.append(f"{country}/{reg.get('name', '?')} drought")
+            # CSI alerts kept as-is — no per-month historical baseline
+            # ships in the supply JSON for CSI, and the categorical level
+            # H already incorporates an upstream severity assessment that
+            # blends multiple stress dimensions (rain + VHI + temp).
             if reg.get("csi_30d_level") == "HIGH":
                 alerts.append(f"{country}/{reg.get('name', '?')} CSI")
     return " · ".join(alerts[:3]) if alerts else ""
