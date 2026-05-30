@@ -4,6 +4,7 @@ import type { ProcessedCotRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
 import { buildPostCot, confidenceTier, LDN_PARAMS, NY_PARAMS, type IntraweekParams, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
+import { nearbyOiDelta } from "@/lib/cot/oiNearby";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
@@ -56,8 +57,13 @@ function Bullet({ children, sub }: { children: React.ReactNode; sub?: boolean })
   );
 }
 
-function MarketColumn({ m, prevPrice, letters, label, post, params }: {
+function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNearbyOverride }: {
   m: MarketMetrics; prevPrice: number; letters: string | null; label: string; post: PostCot | null; params: IntraweekParams;
+  /** Re-derived nearby delta from per-contract OI history (issue #132 Body-7
+   *  fix). When provided, takes precedence over m.oiChangeNearby which
+   *  pulled from the buggy single `exch_oi_*` DB field. Forward bullet is
+   *  re-derived as Total − Nearby so the math stays internally consistent. */
+  oiChangeNearbyOverride: number | null;
 }) {
   const isNY = m.market === "NY Arabica";
   const priceAbs = isNY ? priceAbsNY(m.priceChangeAbs) : priceAbsLDN(m.priceChangeAbs);
@@ -82,28 +88,39 @@ function MarketColumn({ m, prevPrice, letters, label, post, params }: {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
       <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">{label} Overview</div>
-      <ul className="space-y-1.5 text-xs leading-relaxed">
-        <Bullet>Total OI change of {lotsSigned(m.oiChangeLots)} since last COT</Bullet>
-        {m.oiChangeNearby !== null && (
-          <Bullet sub>{lotsSigned(m.oiChangeNearby)} in nearby contracts{letters ? ` (${letters})` : ""}</Bullet>
-        )}
-        {m.oiChangeForward !== null && (
-          <Bullet sub>{lotsSigned(m.oiChangeForward)} in forward contracts</Bullet>
-        )}
-        <Bullet>Price change of {pct1(m.priceChangePct)} ({priceAbs}){structureClause}.</Bullet>
-        <Bullet>
-          Roasters&rsquo; coverage variation of {pct1(covVar(m.roasterMTWoW, m.roasterMT))}, reaching{" "}
-          {pct1(m.roasterCovPct)} of range, now at {kTons(m.roasterMT)} equivalent.
-        </Bullet>
-        <Bullet>
-          Producers&rsquo; coverage variation of {pct1(covVar(m.producerMTWoW, m.producerMT))}, reaching{" "}
-          {pct1(m.producerCovPct)} of range, now at {kTons(m.producerMT)} equivalent.
-        </Bullet>
-        <Bullet>
-          MM {longVerb} longs ({lotsSigned(m.mmLongChangeLots)} / {pctSigned(m.mmLongChangePct)} of their position)
-          {" "}and {shortVerb} shorts ({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)}).
-        </Bullet>
-      </ul>
+      {(() => {
+        // Prefer the override re-derived from per-contract OI history (issue
+        // #132 Body-7). Forward = Total − Nearby to keep the three numbers
+        // self-consistent. Falls back to the metrics-object values when the
+        // override is unavailable (e.g. fresh page load before oi_history.json
+        // resolves, or a date missing from the 14-day window).
+        const nearbyShown = oiChangeNearbyOverride !== null ? oiChangeNearbyOverride : m.oiChangeNearby;
+        const forwardShown = oiChangeNearbyOverride !== null ? m.oiChangeLots - oiChangeNearbyOverride : m.oiChangeForward;
+        return (
+          <ul className="space-y-1.5 text-xs leading-relaxed">
+            <Bullet>Total OI change of {lotsSigned(m.oiChangeLots)} since last COT</Bullet>
+            {nearbyShown !== null && (
+              <Bullet sub>{lotsSigned(nearbyShown)} in nearby contracts{letters ? ` (${letters})` : ""}</Bullet>
+            )}
+            {forwardShown !== null && (
+              <Bullet sub>{lotsSigned(forwardShown)} in forward contracts</Bullet>
+            )}
+            <Bullet>Price change of {pct1(m.priceChangePct)} ({priceAbs}){structureClause}.</Bullet>
+            <Bullet>
+              Roasters&rsquo; coverage variation of {pct1(covVar(m.roasterMTWoW, m.roasterMT))}, reaching{" "}
+              {pct1(m.roasterCovPct)} of range, now at {kTons(m.roasterMT)} equivalent.
+            </Bullet>
+            <Bullet>
+              Producers&rsquo; coverage variation of {pct1(covVar(m.producerMTWoW, m.producerMT))}, reaching{" "}
+              {pct1(m.producerCovPct)} of range, now at {kTons(m.producerMT)} equivalent.
+            </Bullet>
+            <Bullet>
+              MM {longVerb} longs ({lotsSigned(m.mmLongChangeLots)} / {pctSigned(m.mmLongChangePct)} of their position)
+              {" "}and {shortVerb} shorts ({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)}).
+            </Bullet>
+          </ul>
+        );
+      })()}
 
       {post && (
         <div className="mt-4 pt-3 border-t border-slate-800">
@@ -164,14 +181,23 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
   const ny  = buildMarketMetrics(recent52, data, "ny");
   const ldn = buildMarketMetrics(recent52, data, "ldn");
 
-  const { lettersNy, lettersLdn, postNy, postLdn } = useMemo(() => {
+  const { lettersNy, lettersLdn, postNy, postLdn, nearbyNyOverride, nearbyLdnOverride } = useMemo(() => {
     const last = data[data.length - 1];
+    const prev = data[data.length - 2];
     const cotDate = last?.date ?? "";
+    const priorCotDate = prev?.date ?? "";
     return {
       lettersNy:  nearestLetters(oi?.arabica),
       lettersLdn: nearestLetters(oi?.robusta),
       postNy:  last ? buildPostCot(oi?.arabica, cotDate, last.ny,  NY_PARAMS)  : null,
       postLdn: last ? buildPostCot(oi?.robusta, cotDate, last.ldn, LDN_PARAMS) : null,
+      // Issue #132 Body-7: re-derive nearby OI delta from per-contract history
+      // (oi_history.json) instead of the buggy `exch_oi_*` DB field that
+      // dataHelpers.ts still reads. Falls back to null when either date is
+      // outside the 14-day window or fetch hasn't resolved yet — MarketColumn
+      // then uses the metrics-object value.
+      nearbyNyOverride:  nearbyOiDelta(oi?.arabica, cotDate, priorCotDate),
+      nearbyLdnOverride: nearbyOiDelta(oi?.robusta, cotDate, priorCotDate),
     };
   }, [oi, data]);
 
@@ -184,8 +210,8 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
         subtitle="Weekly positioning summary per market — OI, price/structure, industry coverage and managed-money flow vs. the prior COT week, plus an intraweek update from the COT day to the latest data." />
       {ny && ldn ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <MarketColumn m={ny}  prevPrice={prevPriceNY}  letters={lettersNy}  label="Arabica · NY"  post={postNy}  params={NY_PARAMS} />
-          <MarketColumn m={ldn} prevPrice={prevPriceLDN} letters={lettersLdn} label="Robusta · LDN" post={postLdn} params={LDN_PARAMS} />
+          <MarketColumn m={ny}  prevPrice={prevPriceNY}  letters={lettersNy}  label="Arabica · NY"  post={postNy}  params={NY_PARAMS}  oiChangeNearbyOverride={nearbyNyOverride} />
+          <MarketColumn m={ldn} prevPrice={prevPriceLDN} letters={lettersLdn} label="Robusta · LDN" post={postLdn} params={LDN_PARAMS} oiChangeNearbyOverride={nearbyLdnOverride} />
         </div>
       ) : (
         <div className="text-xs text-slate-500 px-1">Insufficient history to build the overview.</div>
