@@ -170,6 +170,29 @@ def _daily_essm(hourly: dict | None) -> dict[str, float]:
     return {d: round(sum(v) / len(v), 3) for d, v in by_date.items() if v}
 
 
+# Baseline lifecycle note: the seed JSONs are loaded fresh each invocation and
+# never mutated. Per-month calibration is a {YYYY-MM: value} dict, so appending
+# the current month is idempotent (no FIFO/pop needed; you can't accumulate
+# duplicates). The real lifecycle concern is climatology aging — after a few
+# years the 30y seed no longer reflects the latest climate. _warn_baseline_age()
+# surfaces that in CI logs so we remember to re-run the build-* workflow.
+_BASELINE_AGE_WARN_DAYS = 365 * 2   # 2 years; baselines should refresh annually
+
+
+def _warn_baseline_age(label: str, base: dict) -> None:
+    ts = base.get("generated_at") if isinstance(base, dict) else None
+    if not ts:
+        return
+    try:
+        gen = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    except Exception:  # noqa: BLE001
+        return
+    age_days = (dt.datetime.now(dt.timezone.utc) - gen).days
+    if age_days > _BASELINE_AGE_WARN_DAYS:
+        print(f"  [{label}] baseline is {age_days}d old — consider re-running "
+              f"the build-{label.lower()}-baselines workflow.")
+
+
 def _load_spi_baselines() -> dict:
     if HAS_SPI and SPI_SEED_PATH.exists():
         try:
@@ -180,6 +203,7 @@ def _load_spi_baselines() -> dict:
 
 
 _SPI_BASE = _load_spi_baselines()
+_warn_baseline_age("SPI", _SPI_BASE)
 
 
 def _load_spei_baselines() -> dict:
@@ -192,6 +216,7 @@ def _load_spei_baselines() -> dict:
 
 
 _SPEI_BASE = _load_spei_baselines()
+_warn_baseline_age("SPEI", _SPEI_BASE)
 
 
 def _monthly_rain(reg_hist: dict) -> tuple[dict[str, float], dict[str, int]]:

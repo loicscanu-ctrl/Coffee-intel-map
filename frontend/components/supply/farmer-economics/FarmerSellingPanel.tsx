@@ -45,12 +45,30 @@ interface HarvestPace {
   source_article?: string;
 }
 
+// Dual-crop block: Safras-echo articles often report the current crop's
+// overall commercialization AND the next crop's advance sales side by side.
+// Backend emits one entry per crop year; status flags whether the figure is
+// inventory tightness (current_crop) or future advance sales (new_crop_advance).
+interface CropProgress {
+  status: "current_crop" | "new_crop_advance";
+  overall_sold_pct: number | null;
+  arabica_sold_pct: number | null;
+  conilon_sold_pct: number | null;
+}
+
+interface CropsMeta {
+  updated?: string;
+  source?: string;
+}
+
 interface FarmerSellingFile {
   source: string;
   report_date: string;
   arabica: SellingData;
   robusta: SellingData;
   harvest?: HarvestPace | null;
+  crops?: Record<string, CropProgress>;
+  crops_meta?: CropsMeta;
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -71,6 +89,79 @@ function gapColor(gap: number): string {
   if (gap >= -5) return "#fde68a";
   if (gap >= -15)return "#fb923c";
   return "#ef4444";
+}
+
+// ── Dual-crop strip (current vs new-crop advance) ─────────────────────────────
+// Renders one row per crop year present in data.crops. Each row shows the
+// overall %, plus arabica/conilon if the echo article broke them out. The
+// "Advance" badge separates new-crop forward sales from real inventory.
+
+function CropRow({ year, p }: { year: string; p: CropProgress }) {
+  const isAdvance = p.status === "new_crop_advance";
+  const overall = p.overall_sold_pct;
+  const cellTone = (v: number | null) =>
+    v == null ? "text-slate-600" : isAdvance ? "text-sky-300" : "text-amber-300";
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-2.5 flex items-center gap-3">
+      <div className="w-20 shrink-0">
+        <div className="text-[10px] font-mono font-bold text-slate-200">{year}</div>
+        <div className={`text-[8px] uppercase tracking-wider ${isAdvance ? "text-sky-400/80" : "text-amber-400/80"}`}>
+          {isAdvance ? "advance" : "current"}
+        </div>
+      </div>
+      <div className="flex-1">
+        <div className="flex items-baseline gap-1">
+          <span className={`text-xl font-extrabold ${cellTone(overall)}`}>
+            {overall ?? "—"}
+          </span>
+          <span className="text-[8px] text-slate-500">% overall</span>
+        </div>
+        <div className="w-full max-w-md bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1">
+          <div
+            className={`h-full rounded-full ${isAdvance ? "bg-sky-500/70" : "bg-amber-500"}`}
+            style={{ width: `${Math.min(100, overall ?? 0)}%` }}
+          />
+        </div>
+      </div>
+      <div className="flex gap-3 text-[8px]">
+        <span className="text-slate-500">
+          Arabica <span className={`font-bold ${cellTone(p.arabica_sold_pct)}`}>
+            {p.arabica_sold_pct ?? "—"}{p.arabica_sold_pct == null ? "" : "%"}
+          </span>
+        </span>
+        <span className="text-slate-700">·</span>
+        <span className="text-slate-500">
+          Conilon <span className={`font-bold ${cellTone(p.conilon_sold_pct)}`}>
+            {p.conilon_sold_pct ?? "—"}{p.conilon_sold_pct == null ? "" : "%"}
+          </span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DualCropStrip({ crops, meta }: { crops: Record<string, CropProgress>; meta?: CropsMeta }) {
+  // Current crop first, then new-crop advance; within each group, ascending year.
+  const ordered = Object.entries(crops).sort(([a, pa], [b, pb]) => {
+    if (pa.status !== pb.status) return pa.status === "current_crop" ? -1 : 1;
+    return a.localeCompare(b);
+  });
+  if (ordered.length === 0) return null;
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <div className="text-[8px] text-slate-500 uppercase tracking-wide">
+          Dual-crop commitment · Safras echo
+        </div>
+        {meta?.updated && (
+          <div className="text-[7px] text-slate-600">upd {meta.updated}</div>
+        )}
+      </div>
+      <div className="space-y-1.5">
+        {ordered.map(([year, p]) => <CropRow key={year} year={year} p={p} />)}
+      </div>
+    </div>
+  );
 }
 
 // ── Regional cards ────────────────────────────────────────────────────────────
@@ -231,6 +322,11 @@ export default function FarmerSellingPanel() {
           ))}
         </div>
       </div>
+
+      {/* Dual-crop commitment (current crop + new-crop advance sales) */}
+      {data.crops && Object.keys(data.crops).length > 0 && (
+        <DualCropStrip crops={data.crops} meta={data.crops_meta} />
+      )}
 
       {/* Harvest pace (crop-wide; Safras) */}
       {data.harvest && typeof data.harvest.current === "number" && (
