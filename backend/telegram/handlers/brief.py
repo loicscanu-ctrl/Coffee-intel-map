@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from telegram.data import load
 
@@ -217,6 +217,59 @@ def _weather_line() -> str:
     return " · ".join(alerts[:3]) if alerts else ""
 
 
+# Display label per events.json category code. Kept compact ([XXX] prefix
+# style) to match the brief's text-dense tone — no emoji decoration.
+_EVENT_CATEGORY_LABEL = {
+    "wasde":           "WASDE",
+    "ico":             "ICO",
+    "vietnam_customs": "VN",
+    "cecafe":          "CECAFÉ",
+    "fnd":             "FND",
+    "central_bank":    "CB",
+    "other":           "EVT",
+}
+
+
+def _upcoming_events_section(now: datetime | None = None) -> str | None:
+    """Format the "Coming up · next 24h" block for the morning brief.
+
+    Reads frontend/public/data/events.json (the hand-curated +
+    build_events_calendar.py output) and returns a Telegram block for
+    events dated today or tomorrow (UTC day boundary, matching how event
+    dates are stored as YYYY-MM-DD without a timezone). Returns None when
+    nothing's scheduled so the brief silently omits the section.
+    """
+    doc = load("events.json")
+    if not isinstance(doc, dict):
+        return None
+    events = doc.get("events") or []
+    if not events:
+        return None
+
+    today = (now or datetime.now(UTC)).date()
+    tomorrow = today + timedelta(days=1)
+    today_iso, tomorrow_iso = today.isoformat(), tomorrow.isoformat()
+
+    upcoming = [
+        e for e in events
+        if isinstance(e, dict) and e.get("date") in (today_iso, tomorrow_iso)
+    ]
+    if not upcoming:
+        return None
+
+    # Chronological — today before tomorrow, then by category for stable
+    # ordering across runs.
+    upcoming.sort(key=lambda e: (e.get("date") or "", e.get("category") or ""))
+
+    lines = ["🗓 <b>Coming up · next 24h</b>"]
+    for e in upcoming:
+        when = "Today   " if e["date"] == today_iso else "Tomorrow"
+        cat = _EVENT_CATEGORY_LABEL.get(e.get("category") or "other", "EVT")
+        title = (e.get("title") or "").strip()
+        lines.append(f"  {when} · [{cat}] {title}")
+    return "\n".join(lines)
+
+
 def build_brief_message(db=None) -> str:
     now = datetime.now(UTC)
     # "%-d" strips leading zero on Linux/Mac; falls back to "%d" on Windows
@@ -237,6 +290,7 @@ def build_brief_message(db=None) -> str:
     cot_block = _cot_brief_block(cot if isinstance(cot, list) else None)
     bra_block = _brazil_brief_block(daily if isinstance(daily, dict) else None)
     weather   = _weather_line()
+    upcoming  = _upcoming_events_section(now)
 
     parts: list[str] = [f"☕ <b>Coffee Intel · {day_str}</b>", ""]
     parts.append(rc_line)
@@ -255,6 +309,10 @@ def build_brief_message(db=None) -> str:
     if weather:
         parts.append("")
         parts.append(weather)
+
+    if upcoming:
+        parts.append("")
+        parts.append(upcoming)
 
     parts.append("")
     parts.append("/quote · /cot · /brazil · /ecf")
