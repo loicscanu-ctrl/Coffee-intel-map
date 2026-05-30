@@ -42,8 +42,8 @@
       "Java":    { "province_id": 30, "noaa_name": "East Java",
                     "_note": "Java coffee is concentrated on the Ijen plateau in East Java; West/Central Java contribute little." },
       "Toraja":  { "province_id": 22, "noaa_name": "South Sulawesi" },
-      "Flores":  { "province_id": null, "noaa_name": null,
-                    "_note": "Flores is in East Nusa Tenggara (NTT). NOAA ID not yet captured." }
+      "Flores":  { "province_id": 19, "noaa_name": "East Nusa Tenggara",
+                    "_note": "Flores sits within East Nusa Tenggara (Nusa Tenggara Timur); GADM admin-1 ID 19." }
     }
   },
   "uganda": {
