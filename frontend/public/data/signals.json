@@ -234,6 +234,17 @@
       "name": "Backwardation Incentive",
       "category": "CS",
       "categoryLabel": "Curve Structure",
+      "market": "NY",
+      "severity": "info",
+      "score": 1,
+      "magnitude": "small",
+      "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS1",
+      "name": "Backwardation Incentive",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
       "market": "LDN",
       "severity": "info",
       "score": 1,
@@ -2489,6 +2500,17 @@
           "name": "Backwardation Incentive",
           "category": "CS",
           "categoryLabel": "Curve Structure",
+          "market": "NY",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "small",
+          "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS1",
+          "name": "Backwardation Incentive",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
           "market": "LDN",
           "severity": "info",
           "score": 1,
@@ -2535,5 +2557,5 @@
       "priceLDN": 3519
     }
   ],
-  "generatedAt": "2026-05-29T21:55:11.648Z"
+  "generatedAt": "2026-05-30T06:02:01.640Z"
 }

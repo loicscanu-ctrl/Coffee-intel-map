@@ -1,12 +1,12 @@
 {
-  "updated": "2026-05-29",
+  "updated": "2026-05-30",
   "routes": [
     {
       "id": "vn-eu",
       "from": "Ho Chi Minh",
       "to": "Rotterdam",
-      "rate": 2895,
-      "prev": 2801,
+      "rate": 2970,
+      "prev": 2891,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -14,8 +14,8 @@
       "id": "vn-ham",
       "from": "Ho Chi Minh",
       "to": "Hamburg",
-      "rate": 2953,
-      "prev": 2857,
+      "rate": 3029,
+      "prev": 2949,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -24,7 +24,7 @@
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
       "rate": 3188,
-      "prev": 2814,
+      "prev": 3188,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -32,8 +32,8 @@
       "id": "br-eu",
       "from": "Santos",
       "to": "Rotterdam",
-      "rate": 1679,
-      "prev": 1625,
+      "rate": 1723,
+      "prev": 1677,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -41,8 +41,8 @@
       "id": "co-eu",
       "from": "Cartagena",
       "to": "Rotterdam",
-      "rate": 1592,
-      "prev": 1541,
+      "rate": 1634,
+      "prev": 1590,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -50,8 +50,8 @@
       "id": "et-eu",
       "from": "Djibouti",
       "to": "Rotterdam",
-      "rate": 2027,
-      "prev": 1961,
+      "rate": 2079,
+      "prev": 2024,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -60,7 +60,7 @@
       "from": "Santos",
       "to": "New York",
       "rate": 2282,
-      "prev": 1924,
+      "prev": 2170,
       "unit": "USD/FEU",
       "proxy": true
     }
@@ -579,9 +579,16 @@
     },
     {
       "date": "2026-05-29",
-      "vn-eu": 2895,
-      "br-eu": 1679,
-      "et-eu": 2027,
+      "vn-eu": 2970,
+      "br-eu": 1723,
+      "et-eu": 2079,
+      "vn-us": 3188
+    },
+    {
+      "date": "2026-05-30",
+      "vn-eu": 2970,
+      "br-eu": 1723,
+      "et-eu": 2079,
       "vn-us": 3188
     }
   ]
