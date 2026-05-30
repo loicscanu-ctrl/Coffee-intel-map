@@ -226,7 +226,9 @@
       ],
       "spi_1": -0.61,
       "spi_3": -3.76,
-      "spi_month": "2026-02"
+      "spi_month": "2026-02",
+      "spei_1": -0.46,
+      "spei_month": "2026-02"
     },
     {
       "name": "Cerrado",
@@ -445,7 +447,9 @@
       ],
       "spi_1": -0.24,
       "spi_3": -3.4,
-      "spi_month": "2026-02"
+      "spi_month": "2026-02",
+      "spei_1": -0.1,
+      "spei_month": "2026-02"
     },
     {
       "name": "EspÃ­rito Santo",
