@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T18:54:53+00:00",
+  "generated_at": "2026-05-30T23:52:08+00:00",
   "country_iso3": "IDN",
   "year_window": [
     2023,
@@ -253,10 +253,70 @@
           "vhi": 60.91
         }
       ]
+    },
+    "Flores": {
+      "province_id": 19,
+      "noaa_name": "East Nusa Tenggara",
+      "weeks_in_window": 176,
+      "vhi_latest": {
+        "year": 2026,
+        "week": 21,
+        "iso_week": "2026-W21",
+        "vhi": 47.91,
+        "severity": "fair"
+      },
+      "vhi_recent": [
+        {
+          "iso_week": "2026-W10",
+          "vhi": 46.82
+        },
+        {
+          "iso_week": "2026-W11",
+          "vhi": 46.74
+        },
+        {
+          "iso_week": "2026-W12",
+          "vhi": 46.04
+        },
+        {
+          "iso_week": "2026-W13",
+          "vhi": 46.13
+        },
+        {
+          "iso_week": "2026-W14",
+          "vhi": 46.11
+        },
+        {
+          "iso_week": "2026-W15",
+          "vhi": 45.83
+        },
+        {
+          "iso_week": "2026-W16",
+          "vhi": 45.91
+        },
+        {
+          "iso_week": "2026-W17",
+          "vhi": 45.91
+        },
+        {
+          "iso_week": "2026-W18",
+          "vhi": 46.1
+        },
+        {
+          "iso_week": "2026-W19",
+          "vhi": 46.71
+        },
+        {
+          "iso_week": "2026-W20",
+          "vhi": 47.09
+        },
+        {
+          "iso_week": "2026-W21",
+          "vhi": 47.91
+        }
+      ]
     }
   },
-  "missing_province_ids": [
-    "Flores"
-  ],
+  "missing_province_ids": [],
   "errors": []
 }
