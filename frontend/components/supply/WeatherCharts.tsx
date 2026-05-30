@@ -42,6 +42,18 @@ interface Province {
   spei_1?: number;                        // Standardised Precip-ET₀ Index, 1-mo (D = P − ET₀)
   spei_3?: number;                        //   …trailing 3-mo
   spei_month?: string;                    // 'YYYY-MM' target month of the SPEI(s) above
+  // VHI fields are merged in client-side from vhi_{origin}.json (separate file
+  // so the daily weather rebuild can't wipe these weekly NOAA STAR values).
+  vhi?: number;                           // 0–100 vegetation health; <40 stress, >60 healthy
+  vhi_iso_week?: string;                  // 'YYYY-Www' source week
+  vhi_severity?: "stress" | "fair" | "healthy";
+}
+
+// Shape of frontend/public/data/vhi_{origin}.json — minimum we need to merge.
+interface VhiFile {
+  provinces?: Record<string, {
+    vhi_latest?: { vhi: number; iso_week: string; severity: "stress" | "fair" | "healthy" };
+  }>;
 }
 
 interface DailyRow {
@@ -508,30 +520,63 @@ function DroughtChip({ label, z }: { label: string; z?: number }) {
   );
 }
 
+// VHI: 0–100 vegetation health blend from NOAA STAR (weekly admin-1). Same
+// red→amber→green ramp as SPI/SPEI so the eye reads them as one severity
+// language. Bin thresholds match scraper/vhi.py:vhi_severity.
+const _vhiTone = (v: number | null | undefined): string => {
+  if (v == null) return "bg-slate-800 text-slate-500 border border-slate-700";
+  if (v < 40)    return "bg-rose-950/40 text-rose-300 border border-rose-800/60";
+  if (v <= 60)   return "bg-amber-950/40 text-amber-300 border border-amber-800/60";
+  return              "bg-emerald-900/40 text-emerald-200 border border-emerald-700/60";
+};
+
+function VhiChip({ v, week }: { v?: number; week?: string }) {
+  return (
+    <span
+      title={v != null
+        ? `VHI = ${v.toFixed(1)} (${week ?? "n/a"}). <40 stressed canopy, 40–60 fair, >60 healthy. Source: NOAA STAR.`
+        : "VHI not available — waiting on NOAA STAR provinceID mapping or weekly fetch."}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono ${_vhiTone(v)}`}
+    >
+      <span className="opacity-70 uppercase tracking-wider">VHI</span>
+      <span>{v != null ? v.toFixed(0) : "—"}</span>
+    </span>
+  );
+}
+
 function DroughtIndexPanel({ provinces }: { provinces: Province[] }) {
   const visible = provinces.filter(
-    (p) => p.spi_1 != null || p.spi_3 != null || p.spei_1 != null || p.spei_3 != null,
+    (p) => p.spi_1 != null || p.spi_3 != null
+      || p.spei_1 != null || p.spei_3 != null
+      || p.vhi != null,
   );
   if (visible.length === 0) return null;
-  // All provinces share the same target month in practice (current month).
-  // We surface the latest seen across rows for the section header.
+  // SPI/SPEI share the same target month; VHI carries its own ISO week.
+  // Surface both in the header so the user knows the indices aren't co-dated.
   const monthLabels = Array.from(new Set(
     visible.flatMap((p) => [p.spi_month, p.spei_month]).filter((m): m is string => !!m),
   )).sort();
   const headerMonth = monthLabels.length ? monthLabels[monthLabels.length - 1] : null;
+  const vhiWeeks = Array.from(new Set(
+    visible.map((p) => p.vhi_iso_week).filter((w): w is string => !!w),
+  )).sort();
+  const headerVhiWeek = vhiWeeks.length ? vhiWeeks[vhiWeeks.length - 1] : null;
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
       <div className="flex items-baseline justify-between mb-2 flex-wrap gap-2">
         <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
-          Drought indices
+          Drought + vegetation indices
           {headerMonth && (
             <span className="text-slate-500 font-normal normal-case ml-2">· month {headerMonth}</span>
           )}
+          {headerVhiWeek && (
+            <span className="text-slate-500 font-normal normal-case ml-2">· VHI {headerVhiWeek}</span>
+          )}
         </h3>
         <div className="text-[9px] text-slate-500">
-          <span className="text-rose-400">deficit</span> ← &nbsp;
+          <span className="text-rose-400">stress</span> ← &nbsp;
           <span className="text-slate-400">normal</span>
-          &nbsp; → <span className="text-emerald-400">surplus</span>
+          &nbsp; → <span className="text-emerald-400">healthy</span>
         </div>
       </div>
       <table className="w-full text-[10px] font-mono">
@@ -542,6 +587,7 @@ function DroughtIndexPanel({ provinces }: { provinces: Province[] }) {
             <th className="text-right py-1 px-1">SPI-3</th>
             <th className="text-right py-1 px-1">SPEI-1</th>
             <th className="text-right py-1 px-1">SPEI-3</th>
+            <th className="text-right py-1 px-1">VHI</th>
           </tr>
         </thead>
         <tbody>
@@ -552,14 +598,17 @@ function DroughtIndexPanel({ provinces }: { provinces: Province[] }) {
               <td className="text-right py-1 px-1"><DroughtChip label="SPI-3"  z={p.spi_3}  /></td>
               <td className="text-right py-1 px-1"><DroughtChip label="SPEI-1" z={p.spei_1} /></td>
               <td className="text-right py-1 px-1"><DroughtChip label="SPEI-3" z={p.spei_3} /></td>
+              <td className="text-right py-1 px-1"><VhiChip v={p.vhi} week={p.vhi_iso_week} /></td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className="text-[8.5px] text-slate-600 italic mt-2">
-        SPI is precipitation-only; SPEI uses the climatic water balance
-        D = P − ET₀ (Penman-Monteith). Same target month, different sensitivity:
-        heat-driven deficits show up on SPEI before SPI.
+        SPI is precipitation-only; SPEI adds the climatic water balance
+        D = P − ET₀ so heat-driven deficits show up before SPI. VHI blends
+        vegetation condition (VCI) and temperature condition (TCI) into a
+        0–100 canopy-health score from NOAA STAR satellite — the
+        downstream symptom of what SPI/SPEI are predicting upstream.
       </div>
     </div>
   );
@@ -592,6 +641,7 @@ export default function WeatherCharts({
   const [selectedYear, setSelectedYear]   = useState<number>(new Date().getFullYear());
   const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(new Date().getMonth());
   const [econ, setEcon] = useState<FarmerEconomicsLite | null>(null);
+  const [vhi, setVhi] = useState<VhiFile | null>(null);
 
   useEffect(() => {
     fetch(dataUrl)
@@ -606,6 +656,20 @@ export default function WeatherCharts({
         }
       })
       .catch((err) => console.error(`[WeatherCharts] ${dataUrl} fetch failed:`, err));
+  }, [dataUrl]);
+
+  // VHI lives in a sibling file (vhi_{origin}.json) so the daily weather
+  // rebuild can't wipe the weekly NOAA STAR values. We derive the URL from
+  // dataUrl by convention. Silent 404 — file is absent until the Saturday
+  // fetcher has run for the origin at least once.
+  useEffect(() => {
+    const m = dataUrl.match(/^(\/data\/)([^_/]+)_weather\.json$/);
+    if (!m) return;
+    const vhiUrl = `${m[1]}vhi_${m[2]}.json`;
+    fetch(vhiUrl)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: VhiFile | null) => d && setVhi(d))
+      .catch(() => { /* absent file is the expected state pre-CI-run */ });
   }, [dataUrl]);
 
   useEffect(() => {
@@ -629,8 +693,14 @@ export default function WeatherCharts({
 
   const activeProv = useMemo(() => {
     if (!data || !selected) return [];
-    return data.provinces.filter((p) => selected.has(p.name));
-  }, [data, selected]);
+    const vhiByName = vhi?.provinces ?? {};
+    return data.provinces
+      .filter((p) => selected.has(p.name))
+      .map((p) => {
+        const v = vhiByName[p.name]?.vhi_latest;
+        return v ? { ...p, vhi: v.vhi, vhi_iso_week: v.iso_week, vhi_severity: v.severity } : p;
+      });
+  }, [data, selected, vhi]);
 
   // Prod-weighted daily surface soil moisture (ESSM) across selected regions.
   const soilData = useMemo<SoilRow[]>(() => {

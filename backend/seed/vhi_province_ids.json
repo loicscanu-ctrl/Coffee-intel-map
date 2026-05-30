@@ -8,18 +8,18 @@
     "provinces": {
       "Sul de Minas":    { "province_id": 13, "noaa_name": "Minas Gerais" },
       "Cerrado":         { "province_id": 13, "noaa_name": "Minas Gerais" },
-      "Espírito Santo":  { "province_id": 11, "noaa_name": "Espirito Santo" },
-      "Paraná":          { "province_id": null, "noaa_name": null }
+      "Espírito Santo":  { "province_id": 8,  "noaa_name": "Espirito Santo" },
+      "Paraná":          { "province_id": 16, "noaa_name": "Parana" }
     }
   },
   "colombia": {
     "country_iso3": "COL",
     "provinces": {
-      "Huila":      { "province_id": null, "noaa_name": null },
-      "Antioquia":  { "province_id": null, "noaa_name": null },
-      "Cauca":      { "province_id": null, "noaa_name": null },
-      "Caldas":     { "province_id": null, "noaa_name": null },
-      "Nariño":     { "province_id": null, "noaa_name": null }
+      "Huila":      { "province_id": 17, "noaa_name": "Huila" },
+      "Antioquia":  { "province_id": 2,  "noaa_name": "Antioquia" },
+      "Cauca":      { "province_id": 10, "noaa_name": "Cauca" },
+      "Caldas":     { "province_id": 7,  "noaa_name": "Caldas" },
+      "Nariño":     { "province_id": 21, "noaa_name": "Narino" }
     }
   },
   "honduras": {
