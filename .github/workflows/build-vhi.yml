@@ -1,18 +1,19 @@
 name: "0.5 – Weekly — Vegetation Health Index (NOAA STAR VHI)"
 
-# Weekly NOAA STAR VHI per coffee region, bbox-averaged into the origin weather
-# JSONs (additive `vhi` per province). The NOAA host is blocked from the Claude
-# sandbox but reachable from GitHub runners. VHI is a weekly product, so this
-# runs weekly + on demand. Graceful: if the file/format isn't found it commits
-# nothing. VERIFY the VHI_URL/format on the first dispatch (see fetch_vhi.py).
+# Weekly NOAA STAR VHI per coffee region, via the admin-1 text export endpoint
+# (get_TS_admin.php). Writes frontend/public/data/vhi_{origin}.json — a SEPARATE
+# file from {origin}_weather.json so the daily weather rebuild can't wipe these
+# weekly fields. NOAA's host is blocked from the Claude sandbox but reachable
+# from GitHub runners.
 
 on:
   schedule:
-    - cron: '30 7 * * 2'   # Tuesdays 07:30 UTC (after NOAA's weekly publish)
+    # Saturday 23:00 UTC — comfortably after NOAA's weekly Saturday batch.
+    - cron: '0 23 * * 6'
   workflow_dispatch:
     inputs:
       origins:
-        description: "Space-separated origin keys, or blank for all"
+        description: "Space-separated origin keys (brazil colombia …), or blank for all"
         required: false
         default: ""
         type: string
@@ -32,9 +33,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests netCDF4 numpy   # netCDF4 reads NOAA STAR's gridded VHI
+        # Switched to NOAA STAR's text endpoint — only `requests` needed.
+        # No more netCDF4 / numpy: the gridded approach never produced data.
+        run: pip install requests
 
-      - name: Fetch + apply VHI
+      - name: Fetch VHI
         env:
           ORIGINS: ${{ inputs.origins }}
         run: |
@@ -42,12 +45,12 @@ jobs:
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
           python backend/scripts/fetch_vhi.py $ARGS
 
-      - name: Commit updated weather data
+      - name: Commit updated VHI data
         run: |
           set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/*_weather.json
+          git add frontend/public/data/vhi_*.json
           if git diff --cached --quiet; then
             echo "No VHI change to commit."
             exit 0
