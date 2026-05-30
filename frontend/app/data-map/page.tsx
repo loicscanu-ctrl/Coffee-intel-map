@@ -163,6 +163,7 @@ const SUPPLY = `flowchart LR
   WSPI["0.3 SPI baseline · one-shot<br/>archive.open-meteo.com 1995-24"]
   WSPEI["0.4 SPEI baseline · one-shot<br/>archive 1995-24 (P + ET₀)"]
   WENSO["NOAA ENSO ONI · monthly<br/>cpc.ncep.noaa.gov"]
+  WENFC["ENSO forecast fallback chain<br/>IRI HTML → CPC discussion text<br/>9 rolling quarters · enso_forecast.py"]
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   SEED_SPI[("spi_30yr_baselines.json")]
@@ -238,6 +239,7 @@ const SUPPLY = `flowchart LR
   J_wx --> drought
   J_fe --> frost
   WENSO --> J_enso --> ensoSub
+  WENFC --> J_enso
   J_fe --> bfe
   J_fsell --> sell
   J_vn --> vnexp
@@ -257,7 +259,7 @@ const SUPPLY = `flowchart LR
   J_intel --> intel
 ${DEFS}
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WENSO scr;
+  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WENSO,WENFC scr;
   class DB,SEED_SPI,SEED_SPEI store;
   class EXP proc;
   class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
