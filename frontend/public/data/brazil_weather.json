@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         282.7,
         110.6,
-        null,
-        null,
+        131.7,
+        80.0,
         29.2
       ],
       "monthly_avg_temp": [
@@ -256,12 +256,12 @@
           "essm": 0.294
         }
       ],
-      "spi_1": -0.61,
-      "spi_3": -0.21,
-      "spi_month": "2026-02",
-      "spei_1": -0.46,
-      "spei_month": "2026-02",
-      "spei_3": -0.36
+      "spi_1": 0.99,
+      "spi_3": -0.24,
+      "spi_month": "2026-04",
+      "spei_1": 0.4,
+      "spei_month": "2026-04",
+      "spei_3": -0.45
     },
     {
       "name": "Cerrado",
@@ -341,8 +341,8 @@
       "monthly_actual_cur": [
         337.8,
         153.9,
-        null,
-        null,
+        151.7,
+        48.6,
         22.8
       ],
       "monthly_avg_temp": [
@@ -510,12 +510,12 @@
           "essm": 0.208
         }
       ],
-      "spi_1": -0.24,
-      "spi_3": 0.56,
-      "spi_month": "2026-02",
-      "spei_1": -0.1,
-      "spei_month": "2026-02",
-      "spei_3": 0.46
+      "spi_1": -0.33,
+      "spi_3": -0.56,
+      "spi_month": "2026-04",
+      "spei_1": -0.74,
+      "spei_month": "2026-04",
+      "spei_3": -0.56
     },
     {
       "name": "EspÃ­rito Santo",

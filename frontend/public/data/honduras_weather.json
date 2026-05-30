@@ -620,8 +620,8 @@
       "monthly_actual_cur": [
         75.9,
         29.1,
-        null,
-        null,
+        34.5,
+        32.7,
         69.6
       ],
       "monthly_avg_temp": [
@@ -762,9 +762,9 @@
         29.2,
         29.7
       ],
-      "spi_1": 0.91,
-      "spi_3": 1.11,
-      "spi_month": "2026-02",
+      "spi_1": -0.32,
+      "spi_3": 0.14,
+      "spi_month": "2026-04",
       "essm_fraction": 0.22,
       "essm_recent": [
         {
@@ -792,9 +792,9 @@
           "essm": 0.22
         }
       ],
-      "spei_1": 0.78,
-      "spei_month": "2026-02",
-      "spei_3": 0.74
+      "spei_1": -0.33,
+      "spei_month": "2026-04",
+      "spei_3": 0.19
     },
     {
       "name": "Agalta",
@@ -874,8 +874,8 @@
       "monthly_actual_cur": [
         63.6,
         6.6,
-        null,
-        null,
+        76.2,
+        64.8,
         60.1
       ],
       "monthly_avg_temp": [
@@ -1043,9 +1043,9 @@
           "essm": 0.229
         }
       ],
-      "spei_1": -1.2,
-      "spei_month": "2026-02",
-      "spei_3": 2.7
+      "spei_1": 0.96,
+      "spei_month": "2026-04",
+      "spei_3": 1.37
     }
   ],
   "daily_station": [],

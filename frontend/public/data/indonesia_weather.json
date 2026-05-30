@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         368.4,
         258.8,
-        null,
-        null,
+        306.4,
+        261.8,
         127.5
       ],
       "monthly_avg_temp": [
@@ -257,12 +257,12 @@
           "essm": 0.271
         }
       ],
-      "spi_1": -0.79,
-      "spi_3": 0.73,
-      "spi_month": "2026-02",
-      "spei_1": -0.8,
-      "spei_month": "2026-02",
-      "spei_3": 0.66
+      "spi_1": -0.17,
+      "spi_3": -1.0,
+      "spi_month": "2026-04",
+      "spei_1": -0.45,
+      "spei_month": "2026-04",
+      "spei_3": -1.17
     },
     {
       "name": "Gayo",
@@ -342,8 +342,8 @@
       "monthly_actual_cur": [
         155.9,
         164.1,
-        null,
-        null,
+        173.9,
+        305.6,
         94.9
       ],
       "monthly_avg_temp": [
@@ -512,12 +512,12 @@
           "essm": 0.298
         }
       ],
-      "spi_1": -0.25,
-      "spi_3": -1.13,
-      "spi_month": "2026-02",
-      "spei_1": -0.34,
-      "spei_month": "2026-02",
-      "spei_3": -1.28
+      "spi_1": 0.33,
+      "spi_3": -0.29,
+      "spi_month": "2026-04",
+      "spei_1": 0.06,
+      "spei_month": "2026-04",
+      "spei_3": -0.5
     },
     {
       "name": "Java",
@@ -597,8 +597,8 @@
       "monthly_actual_cur": [
         227.8,
         281.4,
-        null,
-        null,
+        148.9,
+        102.2,
         23.0
       ],
       "monthly_avg_temp": [
@@ -767,12 +767,12 @@
           "essm": 0.197
         }
       ],
-      "spi_1": -1.66,
-      "spi_3": -2.91,
-      "spi_month": "2026-02",
-      "spei_1": -1.56,
-      "spei_month": "2026-02",
-      "spei_3": -2.57
+      "spi_1": -1.1,
+      "spi_3": -2.48,
+      "spi_month": "2026-04",
+      "spei_1": -1.22,
+      "spei_month": "2026-04",
+      "spei_3": -2.25
     },
     {
       "name": "Toraja",
@@ -852,8 +852,8 @@
       "monthly_actual_cur": [
         97.0,
         118.2,
-        null,
-        null,
+        115.0,
+        194.3,
         181.9
       ],
       "monthly_avg_temp": [
@@ -1022,12 +1022,12 @@
           "essm": 0.376
         }
       ],
-      "spi_1": -2.29,
-      "spi_3": -2.4,
-      "spi_month": "2026-02",
-      "spei_1": -1.9,
-      "spei_month": "2026-02",
-      "spei_3": -1.9
+      "spi_1": -1.61,
+      "spi_3": -2.77,
+      "spi_month": "2026-04",
+      "spei_1": -1.44,
+      "spei_month": "2026-04",
+      "spei_3": -2.29
     },
     {
       "name": "Flores",
@@ -1107,8 +1107,8 @@
       "monthly_actual_cur": [
         225.3,
         155.8,
-        null,
-        null,
+        255.5,
+        155.8,
         120.9
       ],
       "monthly_avg_temp": [
@@ -1277,9 +1277,9 @@
           "essm": 0.212
         }
       ],
-      "spei_1": -1.48,
-      "spei_month": "2026-02",
-      "spei_3": -0.86
+      "spei_1": -0.42,
+      "spei_month": "2026-04",
+      "spei_3": -1.08
     }
   ],
   "daily_station": [

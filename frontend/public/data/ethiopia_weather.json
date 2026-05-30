@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         11.7,
         5.4,
-        null,
-        null,
+        338.1,
+        365.8,
         123.5
       ],
       "monthly_avg_temp": [
@@ -256,12 +256,12 @@
           "essm": 0.248
         }
       ],
-      "spi_1": -0.88,
-      "spi_3": -0.94,
-      "spi_month": "2026-02",
-      "spei_1": -0.54,
-      "spei_month": "2026-02",
-      "spei_3": -0.65
+      "spi_1": -0.02,
+      "spi_3": 0.42,
+      "spi_month": "2026-04",
+      "spei_1": -0.14,
+      "spei_month": "2026-04",
+      "spei_3": 0.43
     },
     {
       "name": "Jimma",
@@ -341,8 +341,8 @@
       "monthly_actual_cur": [
         13.2,
         12.9,
-        null,
-        null,
+        239.7,
+        276.5,
         146.6
       ],
       "monthly_avg_temp": [
@@ -483,9 +483,9 @@
         191.7,
         201.7
       ],
-      "spi_1": -0.19,
-      "spi_3": 0.74,
-      "spi_month": "2026-02",
+      "spi_1": 2.03,
+      "spi_3": 3.0,
+      "spi_month": "2026-04",
       "essm_fraction": 0.373,
       "essm_recent": [
         {
@@ -513,9 +513,9 @@
           "essm": 0.373
         }
       ],
-      "spei_1": -0.11,
-      "spei_month": "2026-02",
-      "spei_3": 0.42
+      "spei_1": 2.26,
+      "spei_month": "2026-04",
+      "spei_3": 3.46
     },
     {
       "name": "Limu",
@@ -595,8 +595,8 @@
       "monthly_actual_cur": [
         5.3,
         25.5,
-        null,
-        null,
+        203.1,
+        109.8,
         110.3
       ],
       "monthly_avg_temp": [
@@ -764,12 +764,12 @@
           "essm": 0.459
         }
       ],
-      "spi_1": 0.99,
-      "spi_3": 1.61,
-      "spi_month": "2026-02",
-      "spei_1": 0.87,
-      "spei_month": "2026-02",
-      "spei_3": 1.24
+      "spi_1": 0.87,
+      "spi_3": 2.88,
+      "spi_month": "2026-04",
+      "spei_1": 0.7,
+      "spei_month": "2026-04",
+      "spei_3": 3.29
     },
     {
       "name": "Kaffa",
@@ -849,8 +849,8 @@
       "monthly_actual_cur": [
         23.1,
         29.9,
-        null,
-        null,
+        176.1,
+        177.7,
         120.0
       ],
       "monthly_avg_temp": [
@@ -1018,12 +1018,12 @@
           "essm": 0.318
         }
       ],
-      "spi_1": -1.04,
-      "spi_3": -1.17,
-      "spi_month": "2026-02",
-      "spei_1": -0.69,
-      "spei_month": "2026-02",
-      "spei_3": -0.95
+      "spi_1": -1.12,
+      "spi_3": -0.77,
+      "spi_month": "2026-04",
+      "spei_1": -1.22,
+      "spei_month": "2026-04",
+      "spei_3": -0.87
     },
     {
       "name": "Harrar",
@@ -1103,8 +1103,8 @@
       "monthly_actual_cur": [
         1.6,
         1.8,
-        null,
-        null,
+        101.3,
+        56.0,
         43.5
       ],
       "monthly_avg_temp": [
@@ -1272,9 +1272,9 @@
           "essm": 0.268
         }
       ],
-      "spei_1": -1.07,
-      "spei_month": "2026-02",
-      "spei_3": -1.11
+      "spei_1": -1.13,
+      "spei_month": "2026-04",
+      "spei_3": -0.31
     }
   ],
   "daily_station": [

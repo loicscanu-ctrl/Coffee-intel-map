@@ -87,8 +87,8 @@
       "monthly_actual_cur": [
         235.6,
         95.5,
-        null,
-        null,
+        186.0,
+        121.9,
         132.4
       ],
       "monthly_avg_temp": [
@@ -256,12 +256,12 @@
           "essm": 0.303
         }
       ],
-      "spi_1": -1.4,
-      "spi_3": -0.94,
-      "spi_month": "2026-02",
-      "spei_1": -1.32,
-      "spei_month": "2026-02",
-      "spei_3": -1.11
+      "spi_1": -2.41,
+      "spi_3": -2.33,
+      "spi_month": "2026-04",
+      "spei_1": -2.2,
+      "spei_month": "2026-04",
+      "spei_3": -2.28
     },
     {
       "name": "Antioquia",
@@ -341,8 +341,8 @@
       "monthly_actual_cur": [
         228.7,
         144.8,
-        null,
-        null,
+        186.4,
+        125.3,
         74.8
       ],
       "monthly_avg_temp": [
@@ -483,9 +483,9 @@
         221.7,
         222.7
       ],
-      "spi_1": -0.08,
-      "spi_3": 0.15,
-      "spi_month": "2026-02",
+      "spi_1": -3.05,
+      "spi_3": -1.85,
+      "spi_month": "2026-04",
       "essm_fraction": 0.281,
       "essm_recent": [
         {
@@ -513,9 +513,9 @@
           "essm": 0.281
         }
       ],
-      "spei_1": -0.07,
-      "spei_month": "2026-02",
-      "spei_3": 0.09
+      "spei_1": -2.41,
+      "spei_month": "2026-04",
+      "spei_3": -1.64
     },
     {
       "name": "Cauca",
@@ -595,8 +595,8 @@
       "monthly_actual_cur": [
         245.7,
         99.3,
-        null,
-        null,
+        247.5,
+        232.4,
         66.1
       ],
       "monthly_avg_temp": [
@@ -764,12 +764,12 @@
           "essm": 0.262
         }
       ],
-      "spi_1": -2.15,
-      "spi_3": -1.65,
-      "spi_month": "2026-02",
-      "spei_1": -1.63,
-      "spei_month": "2026-02",
-      "spei_3": -1.65
+      "spi_1": -1.22,
+      "spi_3": -1.66,
+      "spi_month": "2026-04",
+      "spei_1": -1.34,
+      "spei_month": "2026-04",
+      "spei_3": -1.63
     },
     {
       "name": "Caldas",
@@ -849,8 +849,8 @@
       "monthly_actual_cur": [
         348.2,
         286.2,
-        null,
-        null,
+        222.5,
+        189.8,
         387.5
       ],
       "monthly_avg_temp": [
@@ -1018,12 +1018,12 @@
           "essm": 0.329
         }
       ],
-      "spi_1": -1.25,
-      "spi_3": -1.77,
-      "spi_month": "2026-02",
-      "spei_1": -1.18,
-      "spei_month": "2026-02",
-      "spei_3": -1.67
+      "spi_1": -2.96,
+      "spi_3": -2.31,
+      "spi_month": "2026-04",
+      "spei_1": -2.15,
+      "spei_month": "2026-04",
+      "spei_3": -1.91
     },
     {
       "name": "NariÃ±o",
