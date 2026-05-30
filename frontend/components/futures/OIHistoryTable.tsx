@@ -673,7 +673,7 @@ export default function OIHistoryTable({ market }: { market: "robusta" | "arabic
         .then(r => r.json())
         .then((j: Record<string, DayData[]>) => j[market] ?? [])
         .catch(() => [] as DayData[]),
-      fetch(`${API_URL}/api/futures/oi-history?market=${market}&days=30`)
+      fetch(`${API_URL}/api/futures/oi-history?market=${market}&days=14`)
         .then(r => r.json()).catch(() => [] as DayData[]),
       fetch(GITHUB_OI_URL)
         .then(r => r.json())
@@ -682,7 +682,10 @@ export default function OIHistoryTable({ market }: { market: "robusta" | "arabic
     ]).then(([staticDays, localDays, githubDays]: [DayData[], DayData[], DayData[]]) => {
       // Freshest committed file first so it wins on overlapping dates; the API,
       // GitHub raw, and embedded snapshot only backfill dates/symbols it lacks.
-      const merged = mergeSources([staticDays, localDays, githubDays, STATIC_HISTORY[market]]);
+      // Defensive 14-day cap so a future fetch_oi_json.py drift can't balloon
+      // the table; mergeSources sorts newest-first, so .slice(0, 14) keeps the
+      // most recent fortnight.
+      const merged = mergeSources([staticDays, localDays, githubDays, STATIC_HISTORY[market]]).slice(0, 14);
       if (merged.length) setDays(merged);
     });
   }, [market]);

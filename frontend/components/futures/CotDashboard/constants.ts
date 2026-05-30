@@ -9,7 +9,7 @@ import type { Step } from "./types";
 // stable URL slugs, decoupled from display order.
 export const NAV_STEPS = [
   { id: 10 as Step, icon: "Eye",       label: "Overview" },    //  1. Overview (per-market summary)
-  { id: 9 as Step,  icon: "Bars",      label: "OI 7d" },       //  2. OI 7-day tracking (moved from /futures Exchange)
+  { id: 9 as Step,  icon: "Bars",      label: "OI 14d" },      //  2. OI 14-day tracking (moved from /futures Exchange)
   { id: 2 as Step,  icon: "Grid",      label: "Heatmap" },     //  3.
   { id: 3 as Step,  icon: "Sliders",   label: "Gauges" },      //  4.
   { id: 1 as Step,  icon: "Globe",     label: "Flow" },        //  5.

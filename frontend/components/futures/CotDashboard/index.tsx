@@ -179,11 +179,11 @@ export default function CotDashboard() {
 
       <div id="cot-section-10"><Overview data={data} /></div>
 
-      {/* 2. NY & London OI — 7-Day Tracking. Moved from /futures Exchange
+      {/* 2. NY & London OI — 14-Day Tracking. Moved from /futures Exchange
           tab so positioning context sits next to the COT signal output. */}
       <div id="cot-section-9" className="space-y-3">
         <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-1">
-          2. NY & London OI — 7-Day Tracking
+          2. NY & London OI — 14-Day Tracking
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
