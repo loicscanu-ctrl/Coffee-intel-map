@@ -1,25 +1,28 @@
-name: "0.6 – One-shot — Backfill ET₀ in weather history (Open-Meteo archive)"
+name: "0.6 – One-shot — Backfill missing weather-history fields (Open-Meteo archive)"
 
-# Why: the daily fetcher (1.10) requests ET₀ from Open-Meteo's *forecast*
-# endpoint with past_days=92, but that endpoint silently truncates ET₀ to
-# ~24 days back. The result: history files have months of rain/tmean/essm
-# but only ~3 weeks of ET₀, which keeps SPEI gated out (target month needs
-# near-complete ET₀, not just rain).
+# Generalization of the original "backfill ET₀" workflow. The daily fetcher
+# (1.10) sometimes stores `None` for a field because Open-Meteo's *forecast*
+# endpoint silently returned null. Known cases:
+#   - ET₀: forecast truncates to ~24 days back even with past_days=92.
+#   - Rain: forecast returned null for 2026-03..2026-04 across every region
+#     (61 days), plus 2026-01 for 4 of 5 Vietnam regions (extra 31).
 #
-# This one-shot fills ET₀ into existing history records using the archive
-# endpoint (the same source build_spei_baselines.py uses). Idempotent and
-# safe to re-run: only writes ET₀ where it's missing.
+# The archive endpoint usually has the values. This one-shot heals any
+# requested field where it's None in existing history rows. Field-generic
+# so future API-null recurrences are a single re-dispatch.
 #
-# After this lands, the next 1.10 run will be able to gate SPEI on a fully
-# populated prior month and the chips light up.
-#
-# NOT scheduled — workflow_dispatch only.
+# NOT scheduled — workflow_dispatch only. Idempotent.
 
 on:
   workflow_dispatch:
     inputs:
       origins:
-        description: "Space-separated origin keys, or blank for all (brazil colombia honduras indonesia uganda ethiopia vn)"
+        description: "Space-separated origin keys, or blank for all"
+        required: false
+        default: ""
+        type: string
+      fields:
+        description: "Space-separated fields to heal (rain et0 tmean); blank = all three"
         required: false
         default: ""
         type: string
@@ -30,7 +33,7 @@ on:
         type: boolean
 
 jobs:
-  backfill-et0:
+  backfill-missing-fields:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     permissions:
@@ -46,15 +49,17 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Backfill ET₀ — DRY RUN (preview only)
+      - name: Backfill missing fields — DRY RUN (preview only)
         if: ${{ inputs.dry_run }}
         env:
           ORIGINS: ${{ inputs.origins }}
+          FIELDS:  ${{ inputs.fields }}
         run: |
           echo "=== DRY RUN — no --write, no commit ==="
           ARGS=""
-          [ -n "$ORIGINS" ] && ARGS="--origins $ORIGINS"
-          python backend/scripts/backfill_et0_history.py $ARGS
+          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
+          [ -n "$FIELDS" ]  && ARGS="$ARGS --fields  $FIELDS"
+          python backend/scripts/backfill_missing_fields.py $ARGS
 
       - name: Overlay main's current history (so concurrent commits don't conflict)
         if: ${{ !inputs.dry_run }}
@@ -65,15 +70,17 @@ jobs:
             git show "origin/main:$f" > "$f" 2>/dev/null || true
           done
 
-      - name: Backfill ET₀ — APPLY
+      - name: Backfill missing fields — APPLY
         if: ${{ !inputs.dry_run }}
         env:
           ORIGINS: ${{ inputs.origins }}
+          FIELDS:  ${{ inputs.fields }}
         run: |
           echo "=== APPLY — writing backend/seed/weather_history/*.json ==="
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/backfill_et0_history.py $ARGS
+          [ -n "$FIELDS" ]  && ARGS="$ARGS --fields  $FIELDS"
+          python backend/scripts/backfill_missing_fields.py $ARGS
 
       - name: Commit refreshed history to main
         if: ${{ !inputs.dry_run }}
@@ -81,7 +88,6 @@ jobs:
           set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Save the filled files outside the git tree so checkout doesn't blow them away.
           mkdir -p "$RUNNER_TEMP/wh"
           cp backend/seed/weather_history/*.json "$RUNNER_TEMP/wh/"
           git checkout -- backend/seed/weather_history/ 2>/dev/null || true
@@ -90,10 +96,10 @@ jobs:
           cp "$RUNNER_TEMP/wh"/*.json backend/seed/weather_history/
           git add backend/seed/weather_history/*.json
           if git diff --cached --quiet; then
-            echo "No change to weather history — ET₀ already populated."
+            echo "No change to weather history — all requested fields already populated."
             exit 0
           fi
-          git commit -m "data: backfill ET₀ in weather history (Open-Meteo archive) [skip ci]"
+          git commit -m "data: backfill missing weather-history fields (Open-Meteo archive) [skip ci]"
           git pull --rebase --autostash origin main
           git push origin main
 
@@ -103,7 +109,7 @@ jobs:
           if [ "${{ inputs.dry_run }}" == "true" ]; then
             echo "Dry-run complete. Re-run with dry_run=false to commit."
           else
-            echo "ET₀ backfill committed. The next 1.10 (daily weather) run will start emitting SPEI per region."
+            echo "Missing-field backfill committed. Next 1.10 run will start emitting any newly-unblocked SPEI/SPI windows."
           fi
 
       - name: Notify on failure
