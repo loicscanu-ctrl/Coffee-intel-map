@@ -103,6 +103,33 @@ ${DEFS}
   class J_cot,J_mac,J_fnd json;
   class ip,sig,gau,hm,flow,dp,cyc,rep,oi,oifnd vis;`;
 
+const NEWS = `flowchart LR
+  W11["1.1 News · 01:00<br/>RSS · B3 · CEPEA · Cooabriel · AJCA · World Bank"]
+  WEVT["build_events_calendar.py · manual<br/>WASDE · ICE FND · Cecafé · ICO · VN Customs"]
+  WHLTH["1.4 Export · 02:30<br/>per-scraper run timestamps"]
+  DB[(Postgres · news_feed)]
+  EXP{{"1.4 Export · 02:30"}}
+  SEED_EV[("backend/seed/events.json<br/>(mirrored to /public/data)")]
+  J_n[/news.json/]
+  J_e[/events.json/]
+  J_h[/health.json/]
+  fresh{{"Freshness Grid — 26 scraper chips,<br/>today-pulse, grouped by category"}}
+  cal{{"Upcoming Calendar — next 30d,<br/>ISO-week timeline, category icons"}}
+  risk{{"Risk Radar — 15 watched terms<br/>last-7d vs prior-23d velocity ↑↑/↑/→/↓"}}
+  hd{{"Headlines Digest — last 7d,<br/>OR-multi-select Focus chips (KC·RC·origins·Macro)"}}
+  WHLTH --> J_h --> fresh
+  WEVT --> SEED_EV --> J_e --> cal
+  W11 --> DB --> EXP --> J_n
+  J_n --> hd
+  J_n --> risk
+${DEFS}
+  classDef vis fill:#1a1a2e,stroke:#a78bfa,color:#ddd6fe;
+  class W11,WEVT,WHLTH scr;
+  class DB,SEED_EV store;
+  class EXP proc;
+  class J_n,J_e,J_h json;
+  class fresh,cal,risk,hd vis;`;
+
 const FREIGHT = `flowchart LR
   W12["1.2 Freight · 02:00 daily<br/>Freightos containers"]
   WDRY["Yahoo dry-bulk<br/>(BDRY proxy)"]
@@ -132,8 +159,14 @@ const SUPPLY = `flowchart LR
   WCNTRY["Origin supply<br/>ICO · USDA · customs<br/>(CO·VN·ET·HN·ID)"]
   WFERT["Fertilizers · UN Comtrade · World Bank"]
   WINTEL["manual intel"]
+  WWX["weather-fetch · daily<br/>forecast.open-meteo.com<br/>P · Tmax/Tmin · ET₀ · ESSM"]
+  WSPI["0.3 SPI baseline · one-shot<br/>archive.open-meteo.com 1995-24"]
+  WSPEI["0.4 SPEI baseline · one-shot<br/>archive 1995-24 (P + ET₀)"]
+  WENSO["NOAA ENSO ONI · monthly<br/>cpc.ncep.noaa.gov"]
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
+  SEED_SPI[("spi_30yr_baselines.json")]
+  SEED_SPEI[("spei_30yr_baselines.json")]
   J_cecd[/cecafe_daily.json/]
   J_cec[/cecafe.json/]
   J_fe[/farmer_economics.json/]
@@ -143,6 +176,7 @@ const SUPPLY = `flowchart LR
   J_vnfe[/vn_farmer_economics/]
   J_vnwl[/vn_water_levels.json/]
   J_vnw[/vn_weather.json/]
+  J_wx[/×7 origin weather.json<br/>+ spi_1/3 + spei_1/3/]
   J_co[/colombia_supply.json/]
   J_et[/ethiopia_supply.json/]
   J_hn[/honduras_supply.json/]
@@ -150,6 +184,7 @@ const SUPPLY = `flowchart LR
   J_ug[/uganda_supply.json/]
   J_ferts[/global_fertilizers.json/]
   J_intel[/manual_intel.json/]
+  J_enso[/enso.json/]
   br{{BR Daily Registration}}
   mv{{BR Monthly Volume}}
   brexp{{BR Export Charts}}
@@ -162,6 +197,11 @@ const SUPPLY = `flowchart LR
   vnfe{{VN Farmer Economics}}
   vnwl{{VN Water Levels}}
   vnw{{VN Weather}}
+  wx{{Weather charts · rain · temp · cum · forecast}}
+  soil{{Soil Moisture · ESSM}}
+  drought{{Drought Indices · SPI + SPEI panel}}
+  frost{{14-day Frost Risk grid · moved here from farmer-econ}}
+  ensoSub{{ENSO subtab · forecast plume · analogs · risk map}}
   coexp{{Colombia}}
   et{{Ethiopia}}
   hn{{Honduras}}
@@ -190,11 +230,14 @@ const SUPPLY = `flowchart LR
   EXP --> J_vnfe
   EXP --> J_vnwl
   EXP --> J_vnw
-  EXP --> J_co
-  EXP --> J_et
-  EXP --> J_hn
-  EXP --> J_id
-  EXP --> J_ug
+  EXP --> J_enso
+  WSPI -.->|one-shot CI| SEED_SPI --> WWX
+  WSPEI -.->|one-shot CI| SEED_SPEI --> WWX
+  WWX --> J_wx --> wx
+  J_wx --> soil
+  J_wx --> drought
+  J_fe --> frost
+  WENSO --> J_enso --> ensoSub
   J_fe --> bfe
   J_fsell --> sell
   J_vn --> vnexp
@@ -214,11 +257,11 @@ const SUPPLY = `flowchart LR
   J_intel --> intel
 ${DEFS}
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL scr;
-  class DB store;
+  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WENSO scr;
+  class DB,SEED_SPI,SEED_SPEI store;
   class EXP proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel vis;`;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
 
 const DEMAND = `flowchart LR
   W3B["1.3b Slow-data · 1st/mo<br/>ECF stocks · USDA PSD · AJCA · UCDA"]
@@ -226,11 +269,18 @@ const DEMAND = `flowchart LR
   W41["4.1 Earnings · quarterly · filings"]
   W31["3.1 Kaffeesteuer · 1st/mo · DESTATIS"]
   WMIX["manual / various"]
+  WICE_KCD["1.13 ICE Cert Stocks · daily 17:00<br/>Arabica xls (sheet 7)<br/>publicdocs/coffee_cert_stock_*.xls"]
+  WICE_KCA["1.14 ICE Arabica Ageing · day-1/mo<br/>coffee_aging_YYYYMMDD.xls"]
+  WICE_RC["ICE Robusta · daily 17:00<br/>stock_report_RC_*.csv (10:30-11:15 sweep)<br/>+ age_allowance + gradings + iss_recv"]
+  COH[["cohort_outflow.py<br/>per-cohort DNA from gradings<br/>+ DNA-coverage guard"]]
   EXP{{"1.4 Export · 02:30"}}
   J_stk[/demand_stocks.json/]
   J_earn[/earnings.json/]
   J_tax[/kaffeesteuer.json/]
   J_mix[/factory_mix.json/]
+  J_csa[/certified_stocks_arabica.json<br/>+ ageing_report (year-bands)/]
+  J_csr[/certified_stocks_robusta.json<br/>+ monthly.implied_outflow<br/>+ monthly.current_by_origin/]
+  J_h[/health.json/]
   stk{{"ICE/ECF Stocks"}}
   ecf{{ECF Panel}}
   psd{{PSD Analytical}}
@@ -241,6 +291,10 @@ const DEMAND = `flowchart LR
   earn{{Roaster Earnings}}
   tax{{"Kaffeesteuer (DE tax)"}}
   mix{{Roasting Mix}}
+  tiles{{4-tile header per contract}}
+  period{{Period view drills · age-banded}}
+  sysflow{{System Flow · warehouses · in/out/transit · cohort outflow}}
+  fresh{{Freshness chip strip (per-feed)}}
   W3B --> EXP
   WPOP --> EXP
   EXP --> J_stk
@@ -254,12 +308,26 @@ const DEMAND = `flowchart LR
   W41 --> J_earn --> earn
   W31 --> J_tax --> tax
   WMIX --> J_mix --> mix
+  WICE_KCD --> J_csa
+  WICE_KCA --> J_csa
+  WICE_RC --> J_csr
+  WICE_RC --> COH --> J_csr
+  J_csa --> tiles
+  J_csr --> tiles
+  J_csa --> period
+  J_csr --> period
+  J_csa --> sysflow
+  J_csr --> sysflow
+  J_h --> fresh
+  J_csa --> fresh
+  J_csr --> fresh
 ${DEFS}
   classDef vis fill:#451a03,stroke:#f59e0b,color:#fde68a;
-  class W3B,WPOP,W41,W31,WMIX scr;
+  class W3B,WPOP,W41,W31,WMIX,WICE_KCD,WICE_KCA,WICE_RC scr;
+  class COH proc;
   class EXP proc;
-  class J_stk,J_earn,J_tax,J_mix json;
-  class stk,ecf,psd,jp,age,grow,world,earn,tax,mix vis;`;
+  class J_stk,J_earn,J_tax,J_mix,J_csa,J_csr,J_h json;
+  class stk,ecf,psd,jp,age,grow,world,earn,tax,mix,tiles,period,sysflow,fresh vis;`;
 
 const MACRO = `flowchart LR
   W19["1.9 Quant CCI · 21:30 M-F<br/>jsDelivr FX · yfinance"]
@@ -380,13 +448,14 @@ ${DEFS}
   class TICKER,TG vis;`;
 
 const TAB_DIAGRAMS: Array<{ title: string; chart: string }> = [
+  { title: "News (Daily Brief)", chart: NEWS },
   { title: "Futures Exchange", chart: FUTURES },
   { title: "COT", chart: COT },
   { title: "Freight", chart: FREIGHT },
-  { title: "Supply", chart: SUPPLY },
-  { title: "Demand", chart: DEMAND },
+  { title: "Supply (incl. Weather + ENSO subtab)", chart: SUPPLY },
+  { title: "Demand (incl. Certified Stocks)", chart: DEMAND },
   { title: "Macro", chart: MACRO },
-  { title: "News & Intel (Map)", chart: NEWSMAP },
+  { title: "Map", chart: NEWSMAP },
   { title: "Global — Ticker & Telegram brief", chart: GLOBAL },
 ];
 
@@ -424,6 +493,17 @@ const ROWS: Row[] = [
   { wf: "various / manual", output: "retail_cpi.json", component: "RetailCpiPanel", visual: "Macro · Retail CPI" },
   { wf: "various / manual", output: "origin_prices_history.json", component: "OriginPricesPanel", visual: "Macro · Origin Prices" },
   { wf: "various / manual", output: "*_supply.json (CO·ET·HN·ID)", component: "country tabs", visual: "Supply · country pages + Map (UG now via 3.3.5)" },
+  // ── Added in the last 10 days ────────────────────────────────────────────
+  { wf: "1.13 ICE Certified Stocks", output: "certified_stocks_arabica.json + …robusta.json", component: "CertifiedStocksPanel · CertifiedStocksSystemFlow", visual: "Demand · Tiles + Period view + System flow + Freshness chips" },
+  { wf: "1.14 ICE Arabica Ageing (monthly)", output: "certified_stocks_arabica.json.ageing_report", component: "ArabicaPeriodTable", visual: "Demand · Stocks drill Age (0Y/1Y/2Y/3Y/>4Y) → Group → Origin" },
+  { wf: "cohort_outflow (inline 1.13)", output: "certified_stocks_robusta.json.monthly.{implied_outflow, current_by_origin}", component: "CertifiedStocksSystemFlow", visual: "Demand · Robusta per-origin in/out/lost/transit (cohort DNA + coverage guard)" },
+  { wf: "0.3 SPI baseline (one-shot)", output: "spi_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts", visual: "Supply · Weather · Drought Indices (SPI-1 / SPI-3)" },
+  { wf: "0.4 SPEI baseline (one-shot)", output: "spei_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts", visual: "Supply · Weather · Drought Indices (SPEI = D vs 30y, D = P − ET₀)" },
+  { wf: "/enso → /supply subtab", output: "enso.json", component: "SupplyEnsoTab", visual: "Supply · ENSO subtab (PhaseSummary + ForecastPlume + AnalogChart + RiskMap)" },
+  { wf: "EnsoPanel + WeatherRiskPanel relocation", output: "farmer_economics.json {.enso, .weather}", component: "WeatherCharts (farmerEconomicsUrl)", visual: "Supply · Brazil · Weather subtab (was: Farmer Economics)" },
+  { wf: "build_events_calendar.py", output: "events.json (seed + /public mirror)", component: "UpcomingCalendar", visual: "News · Coming up next 30 days (ISO-week timeline)" },
+  { wf: "1.1 News (existing)", output: "news.json", component: "HeadlinesDigest + RiskRadar", visual: "News · Filtered headlines digest · keyword-velocity radar" },
+  { wf: "1.4 Export (existing)", output: "health.json", component: "FreshnessGrid", visual: "News · 'What changed since yesterday' chip grid (26 feeds, today pulse)" },
 ];
 
 function WorkflowTable() {
