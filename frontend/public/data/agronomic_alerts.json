@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-05-30T19:17:25+00:00",
+  "ruleset_version": "iphm-v1",
+  "origins": {
+    "colombia": {
+      "Antioquia": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.64,
+            "forecast_7d_rain": 72.5
+          }
+        }
+      ],
+      "Cauca": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.63,
+            "forecast_7d_rain": 59.1
+          }
+        }
+      ],
+      "Caldas": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.91,
+            "forecast_7d_rain": 61.6
+          }
+        }
+      ]
+    },
+    "uganda": {
+      "Mbale": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.28,
+            "forecast_7d_rain": 104.3
+          }
+        }
+      ]
+    },
+    "vn": {
+      "Dak Nong": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.31,
+            "forecast_7d_rain": 68.1
+          }
+        }
+      ],
+      "Gia Lai": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "Watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.02,
+            "forecast_7d_rain": 92.0
+          }
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_alerts": 6,
+    "by_severity": {
+      "Watch": 6
+    },
+    "by_threat": {
+      "blossom_drop": 6
+    }
+  }
+}
