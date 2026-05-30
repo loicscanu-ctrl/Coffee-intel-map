@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import NewsSidebar from "@/components/map/NewsSidebar";
 import NewsFeed from "@/components/map/NewsFeed";
 import MapLegend from "@/components/map/MapLegend";
+import AgronomicTicker from "@/components/map/AgronomicTicker";
 import {
   fetchMapCountries, fetchMapFactories, fetchNews,
   type CountryPin, type FactoryPin, type FactoryType, type NewsItem,
@@ -87,6 +88,7 @@ export default function MapPageClient() {
               news={news}
               hiddenFactoryTypes={hiddenFactoryTypes}
             />
+            <AgronomicTicker />
             <NewsSidebar item={selectedPin} onClose={() => setSelectedPin(null)} />
             <MapLegend
               hiddenFactoryTypes={hiddenFactoryTypes}
