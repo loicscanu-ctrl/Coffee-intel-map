@@ -291,9 +291,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Antioquia: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.64, forecast_7d_rain=72.5]"
+      "text": "colombia/Antioquia: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.64, forecast_7d_rain=72.5]"
     },
     {
       "id": "AGRO_colombia_Cauca_blossom_drop",
@@ -302,9 +303,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Cauca: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.63, forecast_7d_rain=59.1]"
+      "text": "colombia/Cauca: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.63, forecast_7d_rain=59.1]"
     },
     {
       "id": "AGRO_colombia_Caldas_blossom_drop",
@@ -313,9 +315,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.91, forecast_7d_rain=61.6]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.91, forecast_7d_rain=61.6]"
     },
     {
       "id": "AGRO_uganda_Mbale_blossom_drop",
@@ -324,9 +327,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Mbale: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.28, forecast_7d_rain=104.3]"
+      "text": "uganda/Mbale: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.28, forecast_7d_rain=104.3]"
     },
     {
       "id": "AGRO_vn_Dak_Nong_blossom_drop",
@@ -335,9 +339,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.31, forecast_7d_rain=68.1]"
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.31, forecast_7d_rain=68.1]"
     },
     {
       "id": "AGRO_vn_Gia_Lai_blossom_drop",
@@ -346,9 +351,10 @@
       "categoryLabel": "Agronomic",
       "market": "PHYS",
       "severity": "watch",
+      "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay. (forecast)  [spei_3=-1.02, forecast_7d_rain=92.0]"
+      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.02, forecast_7d_rain=92.0]"
     }
   ],
   "history": [
@@ -2623,5 +2629,5 @@
       "priceLDN": 3519
     }
   ],
-  "generatedAt": "2026-05-30T19:17:25.434Z"
+  "generatedAt": "2026-05-30T19:28:33.466Z"
 }

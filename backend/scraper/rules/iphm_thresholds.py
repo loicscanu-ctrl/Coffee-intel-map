@@ -21,9 +21,11 @@ Optional rule keys:
   origins  list[str]  ISO-3 country codes the rule applies to (default: all)
   months   list[int]  Calendar months 1-12 the rule applies to (default: all)
 
-Severity tiers: "Watch" (informational), "Alert" (act-soon), "Critical"
-(act-now). The flattening into signals.json lowercases these to match the
-quant signal convention.
+Severity tiers (strict lowercase to match the existing quant-signal
+convention; presentation layer applies any title-casing for display):
+  "watch"     — informational; visually contained
+  "alert"     — act-soon
+  "critical"  — act-now
 """
 
 IPHM_RULES: list[dict] = [
@@ -35,7 +37,7 @@ IPHM_RULES: list[dict] = [
             "temp_mean_min":  21.0,   # Ideal fungal incubation temp
             "temp_mean_max":  25.0,
         },
-        "severity": "Alert",
+        "severity": "alert",
         "market_impact": "High probability of bean defects and yield reduction.",
     },
     {
@@ -45,7 +47,7 @@ IPHM_RULES: list[dict] = [
             "vhi_max":     35.0,      # High vegetative stress
             "spei_3_max": -1.5,       # Prolonged 3-month drought
         },
-        "severity": "Critical",
+        "severity": "critical",
         "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
     },
     {
@@ -56,7 +58,7 @@ IPHM_RULES: list[dict] = [
         "conditions": {
             "temp_min_max": 3.0,       # Minimum temp dropping below 3 °C
         },
-        "severity": "Critical",
+        "severity": "critical",
         "market_impact": "Immediate systemic threat to next year's vegetative growth.",
     },
     {
@@ -66,7 +68,7 @@ IPHM_RULES: list[dict] = [
             "spei_3_max":            -1.0,   # Was in drought…
             "forecast_7d_rain_min":  50.0,   # …followed by sudden heavy rain forecast
         },
-        "severity": "Watch",
+        "severity": "watch",
         "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
     },
 ]

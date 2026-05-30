@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T19:17:25+00:00",
+  "generated_at": "2026-05-30T19:28:33+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -7,7 +7,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -20,7 +20,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -33,7 +33,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -48,7 +48,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -63,7 +63,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -76,7 +76,7 @@
         {
           "threat_id": "blossom_drop",
           "name": "Flowering Disruption / Blossom Drop",
-          "severity": "Watch",
+          "severity": "watch",
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
@@ -90,7 +90,7 @@
   "summary": {
     "total_alerts": 6,
     "by_severity": {
-      "Watch": 6
+      "watch": 6
     },
     "by_threat": {
       "blossom_drop": 6
