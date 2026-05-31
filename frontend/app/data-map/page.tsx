@@ -212,9 +212,9 @@ const SUPPLY = `flowchart LR
   vnw{{VN Weather}}
   wx{{Weather charts · rain · temp · cum · forecast}}
   soil{{Soil Moisture · ESSM}}
-  drought{{Drought + vegetation indices panel · SPI / SPEI / VHI columns}}
+  drought{{"Drought + vegetation indices panel · SPI / SPEI / VHI columns"}}
   frost{{14-day Frost Risk grid · moved here from farmer-econ}}
-  agroAlert{{Agronomic alerts canonical · used by /map ticker + /signals merge}}
+  agroAlert{{"Agronomic alerts canonical · used by /map ticker + /signals merge"}}
   ensoSub{{ENSO subtab · forecast plume · analogs · risk map}}
   coexp{{Colombia}}
   et{{Ethiopia}}
@@ -315,7 +315,7 @@ const DEMAND = `flowchart LR
   mix{{Roasting Mix}}
   tiles{{4-tile header per contract}}
   period{{Period view drills · age-banded}}
-  sysflow{{System Flow · warehouses · in/out/transit · cohort outflow}}
+  sysflow{{"System Flow · warehouses · in/out/transit · cohort outflow"}}
   fresh{{Freshness chip strip (per-feed)}}
   W3B --> EXP
   WPOP --> EXP
@@ -420,7 +420,7 @@ const NEWSMAP = `flowchart LR
   exports{{Exports overlay}}
   freight{{Freight overlay}}
   vnport{{VN port-flow arrows}}
-  news{{News Feed / Sidebar}}
+  news{{"News Feed / Sidebar"}}
   ticker{{"Agronomic Threats Ticker — top overlay<br/>country chips, severity sort, click→region detail"}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
