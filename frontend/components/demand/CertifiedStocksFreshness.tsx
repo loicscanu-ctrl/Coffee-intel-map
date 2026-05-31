@@ -37,20 +37,18 @@ function _ageDays(iso: string | null | undefined, today: Date): number | null {
   return Math.max(0, Math.floor((today.getTime() - t) / 86_400_000));
 }
 
-// Threshold-relative colour cascade. A feed is "within lifecycle" up to
-// its expected publication cadence (e.g. 4 days for daily-M-F-with-
-// weekend-skip, 11 days for the weekly COT including the worst-case
-// pre-next-release window, 35 days for monthly publications). Past the
-// threshold the colour ramps amber → orange → rose so a chip that's
-// overdue is unmissable, but a 25-day-old MONTHLY source no longer
-// false-alarms in rose.
+// Binary cascade. A feed is "within lifecycle" up to its expected
+// publication cadence (e.g. 4 days for daily-M-F-with-weekend-skip,
+// 11 days for the weekly COT including the worst-case pre-next-release
+// window, 35 days for monthly publications). The moment it falls even
+// one day past that window — i.e. the source missed its expected
+// publish — the chip pings rose. No buffer / no gradient: overdue
+// reads as overdue.
 function _tone(days: number | null, threshold: number): string {
   if (days == null) return "text-slate-700 border-slate-800";
-  if (days === 0)                  return "text-emerald-400 border-emerald-800/60 bg-emerald-950/30";  // fresh
-  if (days <= threshold)           return "text-slate-300   border-slate-700                       ";  // within lifecycle
-  if (days <= threshold * 1.25)    return "text-amber-400   border-amber-800/60   bg-amber-950/30";    // slightly overdue
-  if (days <= threshold * 1.5)     return "text-orange-400  border-orange-800/60  bg-orange-950/30";   // overdue
-  return                                  "text-rose-400    border-rose-800/60    bg-rose-950/30";     // significantly stale
+  if (days === 0)              return "text-emerald-400 border-emerald-800/60 bg-emerald-950/30"; // fresh
+  if (days <= threshold)       return "text-slate-300   border-slate-700                       "; // within lifecycle
+  return                              "text-rose-400    border-rose-800/60    bg-rose-950/30";    // OVERDUE — alert
 }
 
 function _ageStr(days: number | null): string {
@@ -113,8 +111,7 @@ export default function CertifiedStocksFreshness(props: FreshnessSource) {
       </div>
       <div className="text-[8.5px] text-slate-600 mt-1">
         Colour: <span className="text-emerald-400">today</span> · <span className="text-slate-300">within publishing cycle</span> ·
-        <span className="text-amber-400"> slightly overdue</span> · <span className="text-orange-400"> overdue</span> ·
-        <span className="text-rose-400"> significantly stale</span>.
+        <span className="text-rose-400"> OVERDUE</span> (alert pings immediately when the source misses its expected publish window).
         Cadence varies per feed — monthly publications (KC ageing, RC age allowance, cohort out) read normal up to ~35 days.
       </div>
     </div>

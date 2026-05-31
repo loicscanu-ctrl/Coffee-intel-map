@@ -87,19 +87,15 @@ function _ageDays(iso: string | null | undefined, now: Date): number | null {
   return Math.max(0, Math.floor((now.getTime() - t) / 86_400_000));
 }
 
-// Threshold-relative cascade — a feed's colour is determined by its age
-// against ITS OWN publication cadence, not a hardcoded 1d/3d/7d ramp.
-// Issue caught by the user: monthly feeds (KC ageing, fertilizer, etc.)
-// were showing amber/orange/rose at 2/4/8 days even though those ages
-// are mid-cycle normal for a monthly publication. Now within-threshold
-// = neutral slate; ramp starts only past the threshold.
+// Binary cascade against each feed's publication cadence. Within the
+// threshold = neutral slate (mid-cycle normal); the moment we fall even
+// one day past the expected publish window the chip pings rose. No
+// gradient — overdue is overdue, and the trader needs to see it.
 function _tone(days: number | null, threshold: number): string {
   if (days == null) return "text-slate-700 border-slate-800 bg-slate-900";
-  if (days === 0)                  return "text-emerald-300 border-emerald-800/60 bg-emerald-950/40"; // fresh today
-  if (days <= threshold)           return "text-slate-300   border-slate-700      bg-slate-900";      // within lifecycle
-  if (days <= threshold * 1.25)    return "text-amber-300   border-amber-800/60   bg-amber-950/40";   // slightly overdue
-  if (days <= threshold * 1.5)     return "text-orange-300  border-orange-800/60  bg-orange-950/40";  // overdue
-  return                                  "text-rose-300    border-rose-800/60    bg-rose-950/40";    // significantly stale
+  if (days === 0)              return "text-emerald-300 border-emerald-800/60 bg-emerald-950/40"; // fresh today
+  if (days <= threshold)       return "text-slate-300   border-slate-700      bg-slate-900";      // within lifecycle
+  return                              "text-rose-300    border-rose-800/60    bg-rose-950/40";    // OVERDUE — alert
 }
 
 function _ageStr(days: number | null): string {
