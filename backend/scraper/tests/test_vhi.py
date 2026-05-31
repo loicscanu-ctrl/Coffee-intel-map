@@ -187,3 +187,56 @@ def test_fetch_propagates_http_errors():
     session.get.return_value = err
     with pytest.raises(requests.HTTPError):
         vhi.fetch_vhi("BRA", 13, 2023, 2026, session=session)
+
+
+# ── Defensive header sanitization (regression for the 2026-05-30 CI crash) ──
+
+def test_sanitize_header_value_passes_ascii_through():
+    s = vhi._sanitize_header_value("Mozilla/5.0 (compatible; CoffeeIntelVHI/1.0)")
+    assert s == "Mozilla/5.0 (compatible; CoffeeIntelVHI/1.0)"
+
+
+def test_sanitize_header_value_strips_em_dash():
+    """Em-dash (U+2014) is the character that crashed CI on 2026-05-30."""
+    s = vhi._sanitize_header_value("foo — bar")
+    # Replaces with ? per ASCII errors='replace', leaving a latin-1-clean value.
+    assert "—" not in s
+    s.encode("latin-1")  # must not raise
+
+
+def test_sanitize_header_value_strips_en_dash_and_smart_quotes():
+    """All the typographic Unicode that sneaks into copy-pasted strings."""
+    s = vhi._sanitize_header_value("a–b 'c' \"d\" • e")
+    s.encode("latin-1")   # must not raise
+
+
+def test_safe_session_wipes_default_headers_and_sets_baseline():
+    """Even if a runner-injected default header had non-latin-1 chars,
+    _safe_session resets them before our request goes out."""
+    import requests
+    s = requests.Session()
+    # Inject something non-latin-1 to simulate the CI condition.
+    s.headers["User-Agent"] = "python-requests/2.32.3 — corrupted by some hook"
+    cleaned = vhi._safe_session(s)
+    ua = cleaned.headers.get("User-Agent")
+    assert ua is not None
+    ua.encode("latin-1")   # must not raise
+    assert "—" not in ua   # the bad default was replaced, not inherited
+    # And our intended User-Agent is what's set.
+    assert "CoffeeIntelVHI" in ua
+
+
+def test_safe_session_creates_new_session_when_none_passed():
+    s = vhi._safe_session(None)
+    assert s is not None
+    assert "CoffeeIntelVHI" in s.headers["User-Agent"]
+    assert s.headers["Accept"] == "text/plain, */*"
+    assert s.headers["Connection"] == "keep-alive"
+
+
+def test_safe_session_preserves_all_baseline_headers():
+    """All four baseline headers we explicitly set must end up on the session."""
+    s = vhi._safe_session(None)
+    for k in ("User-Agent", "Accept", "Accept-Encoding", "Connection"):
+        assert k in s.headers
+        s.headers[k].encode("latin-1")   # all latin-1-encodable
