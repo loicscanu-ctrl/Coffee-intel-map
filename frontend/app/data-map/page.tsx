@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import Mermaid from "@/components/Mermaid";
 
@@ -596,29 +597,157 @@ const ROWS: FlowMetadata[] = [
   { wf: "COT Robusta nearby-OI fix (Body-7)", output: "—", component: "lib/cot/oiNearby.ts · Overview.tsx", visual: "COT · 'X k lots in nearby (N and U)' re-derived from per-contract oi_history.json (was 0.0 bug)" },
 ];
 
-function WorkflowTable() {
+// ── Operational metadata card view ──────────────────────────────────────────
+// Replaces the flat 4-column table with an expandable per-flow card.
+// Always-visible header line carries wf · output · component · visual.
+// Click toggles a detail panel that surfaces the five ops blocks:
+// cadence · transport · storage · resiliency · runtime. Empty sub-fields
+// render "TBD" rather than disappearing — the audit gap stays visible.
+
+// Three-letter chip per trigger type — uniform width, instantly scannable.
+const TRIGGER_BADGE: Record<TriggerType, { tag: string; cls: string }> = {
+  cron:      { tag: "CRON", cls: "text-sky-300 border-sky-700/60 bg-sky-950/40" },
+  manual:    { tag: "MAN",  cls: "text-amber-300 border-amber-700/60 bg-amber-950/40" },
+  edge:      { tag: "EDGE", cls: "text-emerald-300 border-emerald-700/60 bg-emerald-950/40" },
+  composite: { tag: "COMP", cls: "text-violet-300 border-violet-700/60 bg-violet-950/40" },
+  tbd:       { tag: "TBD",  cls: "text-slate-500 border-slate-700 bg-slate-900" },
+};
+
+function _fieldsFilledRatio(meta: FlowMetadata): { filled: number; total: number } {
+  // Walks the five ops blocks and counts populated sub-fields. Helper
+  // for the header progress dot — "5/14 ops fields filled".
+  const groups: Array<Record<string, string | TriggerType | undefined> | undefined> = [
+    meta.cadence, meta.transport, meta.storage, meta.resiliency, meta.runtime,
+  ];
+  // 14 = 3+3+3+3+2 sub-fields across the five blocks.
+  let filled = 0;
+  for (const g of groups) {
+    if (!g) continue;
+    for (const v of Object.values(g)) {
+      if (typeof v === "string" && v.trim().length > 0) filled++;
+      else if (v && v !== "tbd") filled++;   // TriggerType passthrough
+    }
+  }
+  return { filled, total: 14 };
+}
+
+function DimensionRow({ label, value }: { label: string; value: string | undefined }) {
+  const populated = value && value.trim().length > 0;
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-[11px] border-collapse">
-        <thead>
-          <tr className="text-left text-slate-500 border-b border-slate-700">
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Workflow</th>
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Output</th>
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Component</th>
-            <th className="py-1.5 font-medium">Tab · Visual</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ROWS.map((r, i) => (
-            <tr key={i} className="border-b border-slate-800/60 align-top">
-              <td className="py-1.5 pr-3 text-amber-400 whitespace-nowrap">{r.wf}</td>
-              <td className="py-1.5 pr-3 font-mono text-slate-400 whitespace-nowrap">{r.output}</td>
-              <td className="py-1.5 pr-3 font-mono text-slate-500 whitespace-nowrap">{r.component}</td>
-              <td className="py-1.5 text-slate-300">{r.visual}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex gap-2 text-[10.5px] leading-snug">
+      <span className="text-slate-500 w-28 shrink-0">{label}</span>
+      <span className={populated ? "text-slate-300" : "text-slate-700 italic"}>
+        {populated ? value : "TBD"}
+      </span>
+    </div>
+  );
+}
+
+function DimensionBlock({ title, accent, children }: {
+  title: string; accent: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className={`text-[9px] uppercase tracking-widest font-bold ${accent}`}>{title}</div>
+      <div className="space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function FlowCard({ meta }: { meta: FlowMetadata }) {
+  const [open, setOpen] = useState(false);
+  const trig = meta.cadence?.trigger ?? "tbd";
+  const badge = TRIGGER_BADGE[trig];
+  const ratio = _fieldsFilledRatio(meta);
+  const ratioPct = (ratio.filled / ratio.total) * 100;
+  return (
+    <div className="border border-slate-800 rounded-lg bg-slate-950/60 hover:border-slate-700 transition-colors">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="w-full flex items-start gap-3 px-3 py-2 text-left"
+      >
+        <span className={`shrink-0 text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border ${badge.cls}`}>
+          {badge.tag}
+        </span>
+        <div className="flex-1 min-w-0">
+          <div className="text-[12px] text-amber-300 font-semibold truncate">{meta.wf}</div>
+          <div className="text-[10.5px] text-slate-300 leading-snug mt-0.5">{meta.visual}</div>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px]">
+            <span className="font-mono text-slate-400">→ {meta.output}</span>
+            <span className="font-mono text-slate-500">{meta.component}</span>
+          </div>
+        </div>
+        <div className="shrink-0 flex items-center gap-2">
+          <span
+            title={`Ops detail: ${ratio.filled}/${ratio.total} fields filled`}
+            className="text-[9px] font-mono text-slate-500 whitespace-nowrap"
+          >
+            {ratio.filled}/{ratio.total} ops
+          </span>
+          <div className="w-10 h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div
+              className={`h-full ${ratioPct >= 75 ? "bg-emerald-500" : ratioPct >= 40 ? "bg-amber-500" : "bg-slate-600"}`}
+              style={{ width: `${Math.max(4, ratioPct)}%` }}
+            />
+          </div>
+          <span className="text-slate-500">{open ? "▾" : "▸"}</span>
+        </div>
+      </button>
+
+      {open && (
+        <div className="px-3 pb-3 pt-1 border-t border-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <DimensionBlock title="Cadence · when" accent="text-sky-300">
+            <DimensionRow label="recurrence" value={meta.cadence?.recurrence} />
+            <DimensionRow label="window"     value={meta.cadence?.window} />
+            <DimensionRow label="trigger"    value={meta.cadence?.trigger} />
+          </DimensionBlock>
+          <DimensionBlock title="Transport · where & how" accent="text-violet-300">
+            <DimensionRow label="provider" value={meta.transport?.provider} />
+            <DimensionRow label="method"   value={meta.transport?.method} />
+            <DimensionRow label="bypass"   value={meta.transport?.bypass} />
+          </DimensionBlock>
+          <DimensionBlock title="Storage · destination" accent="text-emerald-300">
+            <DimensionRow label="target"    value={meta.storage?.target} />
+            <DimensionRow label="footprint" value={meta.storage?.footprint} />
+            <DimensionRow label="units"     value={meta.storage?.units} />
+          </DimensionBlock>
+          <DimensionBlock title="Resiliency · safety net" accent="text-amber-300">
+            <DimensionRow label="onMissing"     value={meta.resiliency?.onMissing} />
+            <DimensionRow label="debounce"      value={meta.resiliency?.debounce} />
+            <DimensionRow label="parserFallback" value={meta.resiliency?.parserFallback} />
+          </DimensionBlock>
+          <DimensionBlock title="Runtime · budget" accent="text-rose-300">
+            <DimensionRow label="duration" value={meta.runtime?.duration} />
+            <DimensionRow label="cost"     value={meta.runtime?.cost} />
+          </DimensionBlock>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WorkflowTable() {
+  const totalFilled = ROWS.reduce((acc, r) => acc + _fieldsFilledRatio(r).filled, 0);
+  const totalSlots  = ROWS.length * 14;
+  const auditPct    = Math.round((totalFilled / totalSlots) * 100);
+  return (
+    <div className="space-y-3">
+      <div className="flex items-baseline justify-between flex-wrap gap-2 text-[11px]">
+        <div className="text-slate-400">
+          <span className="font-semibold text-slate-200">{ROWS.length}</span> flows ·
+          click any to expand the operational metadata (cadence · transport · storage · resiliency · runtime).
+        </div>
+        <div className="font-mono text-slate-500">
+          Audit fill: <span className="text-slate-300">{totalFilled}/{totalSlots}</span> · {auditPct}%
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        {ROWS.map((meta, i) => (
+          <FlowCard key={i} meta={meta} />
+        ))}
+      </div>
     </div>
   );
 }
