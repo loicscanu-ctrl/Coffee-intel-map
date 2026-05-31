@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T20:37:49.713617Z",
+  "generated_at": "2026-05-31T05:07:53.431877Z",
   "tickers": [
     {
       "label": "KCN26",
@@ -18,7 +18,7 @@
     },
     {
       "label": "VN FAQ",
-      "value": "87.300 VND ($3,319)",
+      "value": "87.300 VND ($3,320)",
       "category": "physical"
     },
     {
@@ -33,27 +33,27 @@
     },
     {
       "label": "USD/BRL",
-      "value": "5.0470",
+      "value": "5.0466",
       "category": "fx"
     },
     {
       "label": "USD/VND",
-      "value": "26305",
+      "value": "26293",
       "category": "fx"
     },
     {
       "label": "USD/IDR",
-      "value": "17868",
+      "value": "17861",
       "category": "fx"
     },
     {
       "label": "USD/HNL",
-      "value": "26.5798",
+      "value": "26.5806",
       "category": "fx"
     },
     {
       "label": "USD/UGX",
-      "value": "3745",
+      "value": "3743",
       "category": "fx"
     }
   ]
