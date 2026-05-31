@@ -69,7 +69,7 @@ const COT = `flowchart LR
   J_cot[/cot.json · 312wk/]
   J_mac[/macro_cot.json/]
   J_fnd[/oi_fnd_chart.json/]
-  J_oi[/oi_history.json<br/>14-day rolling slice of ARC (was 30)/]
+  J_oi[/"oi_history.json<br/>14-day rolling slice of ARC (was 30)"/]
   J_sig[/signals.json<br/>· quant + AGRO rows merged/]
   ip{{Industry Pulse}}
   sig{{"Signals · computed in-browser from cot.json<br/>+ /cot Telegram appends per-rule listing from signals.json"}}
@@ -300,7 +300,7 @@ const DEMAND = `flowchart LR
   J_earn[/earnings.json/]
   J_tax[/kaffeesteuer.json/]
   J_mix[/factory_mix.json/]
-  J_csa[/certified_stocks_arabica.json<br/>+ ageing_report (year-bands)/]
+  J_csa[/"certified_stocks_arabica.json<br/>+ ageing_report (year-bands)"/]
   J_csr[/certified_stocks_robusta.json<br/>+ monthly.implied_outflow<br/>+ monthly.current_by_origin/]
   J_h[/health.json/]
   stk{{"ICE/ECF Stocks"}}
@@ -316,7 +316,7 @@ const DEMAND = `flowchart LR
   tiles{{4-tile header per contract}}
   period{{Period view drills · age-banded}}
   sysflow{{"System Flow · warehouses · in/out/transit · cohort outflow"}}
-  fresh{{Freshness chip strip (per-feed)}}
+  fresh{{"Freshness chip strip (per-feed)"}}
   W3B --> EXP
   WPOP --> EXP
   EXP --> J_stk
@@ -412,7 +412,7 @@ const NEWSMAP = `flowchart LR
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
   J_vnx[/vn_export_destination_port/]
-  J_agro[/agronomic_alerts.json<br/>(produced end of 1.10 weather run)/]
+  J_agro[/"agronomic_alerts.json<br/>(produced end of 1.10 weather run)"/]
   base{{Coffee Map base}}
   price{{Price labels}}
   country{{Country pins + intel}}
