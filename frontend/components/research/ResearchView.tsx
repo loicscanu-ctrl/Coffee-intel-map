@@ -282,24 +282,24 @@ function ContractRules() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
-      <Article kicker=”ICE Futures U.S.” title={“Coffee “C” Futures (Arabica · KC)”} dateline=”Chapter 8 · Coffee “C” Rules”>
-        <p className=”mb-3”>
+      <Article kicker="ICE Futures U.S." title={'Coffee "C" Futures (Arabica · KC)'} dateline={'Chapter 8 · Coffee "C" Rules'}>
+        <p className="mb-3">
           The Coffee &ldquo;C&rdquo; contract is the world benchmark for <strong>washed Arabica</strong>. The rulebook
           opens with a notice that ICE is <em>phasing it out</em>: a new Arabica contract was slated to list in fall 2025,
           no Coffee &ldquo;C&rdquo; futures are listed beyond the <strong>March 2028</strong> month, and only options on
           March-2028-and-earlier futures will continue.
         </p>
-        <Spec k=”Lot size”>37,500 lb of washed Arabica (one growth).</Spec>
-        <Spec k=”Deliverable growths”>Brazil, Colombia, Costa Rica, Guatemala, Honduras, Mexico, Peru, Uganda and ~12
+        <Spec k="Lot size">37,500 lb of washed Arabica (one growth).</Spec>
+        <Spec k="Deliverable growths">Brazil, Colombia, Costa Rica, Guatemala, Honduras, Mexico, Peru, Uganda and ~12
           others; <strong>Vietnam added from the May 2027 month</strong>.</Spec>
-        <Spec k=”Grade standard”>Sound, free of unwashed/aged cup flavours, good roasting quality; no more than
+        <Spec k="Grade standard">Sound, free of unwashed/aged cup flavours, good roasting quality; no more than
           <strong> 15 full imperfections</strong> below the growth basis (Colombian: max 10).</Spec>
-        <Spec k=”Delivery months”>March, May, July, September, December; listed up to 60 months out.</Spec>
-        <Spec k=”Price / tick”>Quoted in cents per pound; minimum fluctuation <strong>0.05¢/lb</strong> (= 5 points) — i.e.
+        <Spec k="Delivery months">March, May, July, September, December; listed up to 60 months out.</Spec>
+        <Spec k="Price / tick">Quoted in cents per pound; minimum fluctuation <strong>0.05¢/lb</strong> (= 5 points) — i.e.
           <strong> $18.75 per contract</strong>.</Spec>
-        <Spec k=”Price basis”>A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
+        <Spec k="Price basis">A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
           Honduras, Uganda from the Mar 2026 month) with Board-set differentials for all other growths.</Spec>
-        <Spec k=”Origin differentials”>Basis growths at <strong>par</strong> (current list from Mar 2026 month: Mexico,
+        <Spec k="Origin differentials">Basis growths at <strong>par</strong> (current list from Mar 2026 month: Mexico,
           El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru; list revised Jan 2024). Board-set
           premia and discounts — amounts below from prior rulebook, <em>verify in latest ICE Circular for current
           values</em>:
@@ -308,13 +308,13 @@ function ContractRules() {
           <br />· <strong>Dominican Republic, Ecuador</strong> <code>−0.04¢/lb</code><Tbc />
           <br />· <strong>Brazil</strong> <code>−0.06¢/lb</code><Tbc /> (natural-process cup profile)
           <br />· <strong>Vietnam</strong> (from May 2027) — differential TBD by ICE Board</Spec>
-        <Spec k=”Delivery point allowances”>New York District and Virginia: <strong>at par</strong>.
+        <Spec k="Delivery point allowances">New York District and Virginia: <strong>at par</strong>.
           New Orleans, Miami, Houston: <strong>−0.50¢/lb</strong>.
           Antwerp, Hamburg/Bremen, Barcelona: <strong>−1.25¢/lb</strong>. Deducted from invoice at delivery.</Spec>
-        <Spec k=”Weight allowance (outturn)”>Tolerance <strong>±2% of 37,500 lb</strong>. Deficiency ≤2%: delivery
+        <Spec k="Weight allowance (outturn)">Tolerance <strong>±2% of 37,500 lb</strong>. Deficiency ≤2%: delivery
           permitted; buyer pays only for actual weight. Deficiency &gt;2%: not permitted without mutual consent.
           Excess &gt;2%: buyer not obligated to accept or pay for the excess weight.</Spec>
-        <Spec k=”Age allowance”><Tbc /> Monthly deduction in ¢/lb accruing from certification date — <em>rates below from prior rulebook, verify in current ICE Chapter 8 circular</em>:
+        <Spec k="Age allowance"><Tbc /> Monthly deduction in ¢/lb accruing from certification date — <em>rates below from prior rulebook, verify in current ICE Chapter 8 circular</em>:
           <br />· <strong>M1–M3</strong>: no deduction &nbsp;·&nbsp; <strong>M4</strong>: −0.50¢/lb (threshold step)
           <br />· <strong>M5–Y1</strong>: −0.25¢/lb / month &nbsp;·&nbsp; <strong>Y1–Y2</strong>: −0.50¢/lb / month
           <br />· <strong>Y2–Y3</strong>: −1.00¢/lb / month &nbsp;·&nbsp; <strong>Y3–Y4</strong>: −1.25¢/lb / month
@@ -324,25 +324,25 @@ function ContractRules() {
           <br />· <strong>Y10+</strong>: −3.00¢/lb / month
           <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) allowing
           traders to estimate aggregate deduction exposure across exchange stocks.</Spec>
-        <Spec k=”Delivery mechanism”>Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
+        <Spec k="Delivery mechanism">Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
           7 business days after the Delivery Notice.</Spec>
-        <Spec k=”Key dates”>Last Notice Day = 7th business day before the last business day of the delivery month;
+        <Spec k="Key dates">Last Notice Day = 7th business day before the last business day of the delivery month;
           Last Trading Day = the business day before Last Notice Day.</Spec>
-        <Spec k=”Delivery points”>Licensed warehouses in Port of New York District, New Orleans, Miami, Houston,
+        <Spec k="Delivery points">Licensed warehouses in Port of New York District, New Orleans, Miami, Houston,
           Virginia, Antwerp, Hamburg/Bremen and Barcelona.</Spec>
-        <Spec k=”Packaging”>Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
+        <Spec k="Packaging">Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
           deforestation (EUDR) appendices apply.</Spec>
-        <Spec k=”Storage / Rent”>Accrues from certification date; deducted on invoice. Indicative licensed-warehouse
+        <Spec k="Storage / Rent">Accrues from certification date; deducted on invoice. Indicative licensed-warehouse
           rates: <strong>≈ $0.85–1.25/bag/month</strong><Tbc /> (≈ $240–355/lot/month for a ~284-bag lot; EU locations may
           differ). Exact rates per warehouse, approved by ICE — verify in current warehouse schedule.</Spec>
-        <Spec k=”Loading Out Charge (OCA)”>One-time charge paid by buyer when collecting from licensed warehouse.<Tbc />{“ “}
+        <Spec k="Loading Out Charge (OCA)">One-time charge paid by buyer when collecting from licensed warehouse.<Tbc />{" "}
           <em>Exact amounts set per warehouse in ICE schedule — verify in current circular before tendering.</em></Spec>
-        <Spec k=”Grading / Sampling fee”>ICE charges <strong>$1.50 per bag</strong> (minimum $40 per EWR) for
+        <Spec k="Grading / Sampling fee">ICE charges <strong>$1.50 per bag</strong> (minimum $40 per EWR) for
           sampling and grading at certification — raised from $1.25/bag in Nov 2024. Appeal of a grade costs the same
           fee. Redelivery grading incurs a similar fee borne by the certifying party.</Spec>
-        <Spec k=”Weighing”>Required at certification and redelivery. Fees set per licensed warehouse —
+        <Spec k="Weighing">Required at certification and redelivery. Fees set per licensed warehouse —
           <em> verify exact amounts in current ICE warehouse rate schedule.</em></Spec>
-        <PdfLink href=”https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf”>Full rulebook on ICE (PDF)</PdfLink>
+        <PdfLink href="https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf">Full rulebook on ICE (PDF)</PdfLink>
       </Article>
 
       <Article kicker="ICE Futures Europe" title={"Robusta Coffee Futures (RC · Section GGGG)"} dateline="Section GGGG · Contract Rules">
