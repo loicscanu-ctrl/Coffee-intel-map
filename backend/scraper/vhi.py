@@ -147,6 +147,51 @@ def vhi_severity(value: float | None) -> str:
 
 # ── Live fetch ───────────────────────────────────────────────────────────────
 
+def _sanitize_header_value(v: str) -> str:
+    """Ensure a header value is latin-1-encodable (HTTP requirement).
+
+    Defensive: PR #137 cleaned the em-dash from User-Agent, but the
+    Saturday 2026-05-30 CI run still failed with
+        UnicodeEncodeError: 'latin-1' codec can't encode character '\\u2014'
+        in position 69
+    despite the local probe showing only ASCII headers on the wire.
+    Something on the GH runner's session — likely a default header
+    injected by an environment variable or a charset_normalizer hook —
+    contained an em-dash beyond what our DEFAULT_HEADERS controls.
+    This helper strips/replaces any non-latin-1 char so even an injected
+    value can't crash the request. ASCII-only inputs pass through.
+    """
+    try:
+        v.encode("latin-1")
+        return v
+    except UnicodeEncodeError:
+        return v.encode("ascii", errors="replace").decode("ascii")
+
+
+def _safe_session(session: requests.Session | None) -> requests.Session:
+    """Return a session whose default headers are KNOWN-SAFE (latin-1).
+
+    Resets session.headers to a minimal ASCII baseline before any of our
+    headers go on, so a runner-injected default (the suspected cause of
+    the 2026-05-30 em-dash crash that didn't reproduce locally) can't
+    sneak through. Pulls existing session keys via .get so other config
+    (proxies, adapters, cert paths) is preserved.
+    """
+    s = session or requests.Session()
+    # Wipe the inherited defaults — requests injects User-Agent,
+    # Accept-Encoding, Accept, Connection on Session() init from
+    # requests.utils.default_headers(), which CAN include charset_normalizer
+    # info on some installs. Replace with our sanitized baseline.
+    s.headers.clear()
+    for k, v in DEFAULT_HEADERS.items():
+        s.headers[k] = _sanitize_header_value(v)
+    # Keep-alive is the requests default; restore it explicitly so the
+    # pool reuses connections across our 34 per-region calls.
+    s.headers["Connection"] = "keep-alive"
+    s.headers["Accept-Encoding"] = "gzip, deflate"
+    return s
+
+
 def fetch_vhi(country: str, province_id: int,
               year1: int, year2: int,
               type_: str = "Mean", timeout: float = 30.0,
@@ -158,7 +203,7 @@ def fetch_vhi(country: str, province_id: int,
     works in CI. Returns parse_vhi_text() output with the request params
     threaded through so callers can match the response to the origin map.
     """
-    s = session or requests.Session()
+    s = _safe_session(session)
     params = {
         "country":    country,
         "provinceID": province_id,
@@ -166,7 +211,7 @@ def fetch_vhi(country: str, province_id: int,
         "year2":      year2,
         "type":       type_,
     }
-    r = s.get(VHI_URL, params=params, headers=DEFAULT_HEADERS, timeout=timeout)
+    r = s.get(VHI_URL, params=params, timeout=timeout)
     r.raise_for_status()
     parsed = parse_vhi_text(r.text)
     parsed["country"] = country
