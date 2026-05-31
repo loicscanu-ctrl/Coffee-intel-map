@@ -488,9 +488,60 @@ const TAB_DIAGRAMS: Array<{ title: string; chart: string }> = [
   { title: "Global — Ticker & Telegram brief", chart: GLOBAL },
 ];
 
-// Per-workflow → exact visual (mirrors docs/DATA_PLATFORM_MAP.md §4a).
-type Row = { wf: string; output: string; component: string; visual: string };
-const ROWS: Row[] = [
+// Per-workflow operational metadata. The first four fields (wf, output,
+// component, visual) describe what trader-facing value the flow produces;
+// the optional five-group blocks below describe the OPS reality — when,
+// where, how, what-if-it-breaks, and what-it-costs. Designed for the
+// "if Cecafé's Akamai posture changes overnight, what do I check first"
+// question.
+//
+// All ops blocks are optional; "TBD" surfaces unfilled slots in the UI
+// rather than hiding them, so the audit gap is visible.
+type TriggerType = "cron" | "manual" | "edge" | "composite" | "tbd";
+
+interface FlowMetadata {
+  // ── Trader-facing summary (always populated) ───────────────────────────
+  wf: string;          // Workflow name / id, e.g. "1.13 ICE Certified Stocks"
+  output: string;      // What it writes (JSON path or "—" for compute-only)
+  component: string;   // Frontend / handler consumer
+  visual: string;      // User-facing surface description
+
+  // ── 1. Timing & Cadence — the "when" ───────────────────────────────────
+  cadence?: {
+    recurrence?: string;     // e.g. "Daily 17:00 UTC Mon-Fri"
+    window?: string;         // Active execution window if any, e.g. "Market hrs 09:00-20:00 UTC"
+    trigger?: TriggerType;   // cron | manual | edge | composite
+  };
+
+  // ── 2. Sourcing & Transport — the "where & how" ───────────────────────
+  transport?: {
+    provider?: string;       // e.g. "ICE Portal", "Open-Meteo", "CECAFÉ"
+    method?: string;         // e.g. "Direct API GET", "BeautifulSoup HTML parse", "PDF extract"
+    bypass?: string;         // Armor: e.g. "browser headers", "Akamai-friendly UA", "none"
+  };
+
+  // ── 3. Output & State — the "destination" ─────────────────────────────
+  storage?: {
+    target?: string;         // Same as `output` but normalized for filtering
+    footprint?: string;      // e.g. "~2KB capped at 14d", "~150KB monthly"
+    units?: string;          // Critical for ambiguous data: e.g. "60kg bags (KC) / 10MT lots (RC)"
+  };
+
+  // ── 4. Resiliency & Fallbacks — the "safety net" ──────────────────────
+  resiliency?: {
+    onMissing?: string;      // e.g. "keep last good JSON", "fail-closed", "use SPI baseline"
+    debounce?: string;       // Alert flap rule: e.g. "2 consecutive days before Telegram ping"
+    parserFallback?: string; // e.g. "regex extraction if structured JSON fails"
+  };
+
+  // ── 5. Compute & Cost — the "budget" ──────────────────────────────────
+  runtime?: {
+    duration?: string;       // Average run time, e.g. "~5s API", "~45s Playwright"
+    cost?: string;           // CI minutes / month, e.g. "~10 min/mo"
+  };
+}
+
+const ROWS: FlowMetadata[] = [
   { wf: "1.3 Daily OI", output: "oi_history.json", component: "OIHistoryTable", visual: "Futures · OI 7-day table (+ COT §2)" },
   { wf: "1.3 Daily OI", output: "oi_fnd_chart.json", component: "OIFndChart", visual: "Futures + COT · OI Evolution to FND" },
   { wf: "1.3 → 2.3 rebuild", output: "cot.json price", component: "Step4IndustryPulse", visual: "COT · Industry Pulse — price + switch dots" },
