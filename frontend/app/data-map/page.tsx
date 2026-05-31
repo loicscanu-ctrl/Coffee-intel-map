@@ -63,29 +63,34 @@ ${DEFS}
 const COT = `flowchart LR
   W13["1.3 Daily OI · 02:00 M-F<br/>Barchart core-api"]
   W23["2.3 COT + max-OI rebuild · Fri 20:00<br/>CFTC disagg report"]
-  ARC[("contract_prices_archive.json<br/>5y per-contract OI+price")]
+  ARC[("contract_prices_archive.json<br/>5y per-contract OI+price · untouched")]
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   J_cot[/cot.json · 312wk/]
   J_mac[/macro_cot.json/]
   J_fnd[/oi_fnd_chart.json/]
+  J_oi[/oi_history.json<br/>14-day rolling slice of ARC (was 30)/]
+  J_sig[/signals.json<br/>· quant + AGRO rows merged/]
   ip{{Industry Pulse}}
-  sig{{"Signals · computed in-browser from cot.json"}}
+  sig{{"Signals · computed in-browser from cot.json<br/>+ /cot Telegram appends per-rule listing from signals.json"}}
   gau{{Gauges}}
   hm{{Heatmap}}
   flow{{Global Flow}}
   dp{{Dry Powder}}
   cyc{{Cycle Location}}
   rep{{"Report · backtest"}}
-  oi{{OI 7-day}}
+  oi{{"OI 14-day table · nearby-OI delta re-derived<br/>from per-contract oi_history.json (was buggy exch_oi_*)"}}
   oifnd{{OI Evolution to FND}}
   W13 --> ARC --> DB
   W23 --> DB --> EXP
   EXP --> J_cot
   EXP --> J_mac
+  EXP --> J_sig
   ARC --> J_fnd
+  ARC --> J_oi
   J_cot --> ip
   J_cot --> sig
+  J_sig --> sig
   J_cot --> gau
   J_cot --> hm
   J_cot --> flow
@@ -93,6 +98,7 @@ const COT = `flowchart LR
   J_cot --> dp
   J_cot --> cyc
   J_cot --> rep
+  J_oi --> oi
   J_cot --> oi
   J_fnd --> oifnd
 ${DEFS}
@@ -100,7 +106,7 @@ ${DEFS}
   class W13,W23 scr;
   class ARC,DB store;
   class EXP proc;
-  class J_cot,J_mac,J_fnd json;
+  class J_cot,J_mac,J_fnd,J_oi,J_sig json;
   class ip,sig,gau,hm,flow,dp,cyc,rep,oi,oifnd vis;`;
 
 const NEWS = `flowchart LR
@@ -165,10 +171,13 @@ const SUPPLY = `flowchart LR
   WVHI["0.5 NOAA STAR VHI · weekly<br/>get_TS_admin.php per province<br/>admin-1 text endpoint (no NetCDF)"]
   WENSO["NOAA ENSO ONI · monthly<br/>cpc.ncep.noaa.gov"]
   WENFC["ENSO forecast fallback chain<br/>IRI HTML → CPC discussion text<br/>9 rolling quarters · enso_forecast.py"]
+  WBFL["0.6/0.7 One-shot backfills<br/>backfill_missing_fields.py · backfill_history_gap.py<br/>heals rain/ET₀/2025-gap from archive"]
+  AGRO[["agronomic_alerts.py · end of 1.10<br/>IPHM rules: fungal rust · severe defoliation<br/>· brazil frost · blossom drop"]]
   DB[(Postgres)]
   EXP{{"1.4 Export · 02:30"}}
   SEED_SPI[("spi_30yr_baselines.json")]
   SEED_SPEI[("spei_30yr_baselines.json")]
+  SEED_VHI[("vhi_province_ids.json<br/>34/34 NOAA GADM admin-1 IDs")]
   J_cecd[/cecafe_daily.json/]
   J_cec[/cecafe.json/]
   J_fe[/farmer_economics.json/]
@@ -180,6 +189,7 @@ const SUPPLY = `flowchart LR
   J_vnw[/vn_weather.json/]
   J_wx[/×7 origin weather.json<br/>+ spi_1/3 + spei_1/3/]
   J_vhi[/×7 vhi_{origin}.json<br/>weekly NOAA STAR VHI by province/]
+  J_agro[/agronomic_alerts.json<br/>+ AGRO rows merged into signals.json/]
   J_co[/colombia_supply.json/]
   J_et[/ethiopia_supply.json/]
   J_hn[/honduras_supply.json/]
@@ -202,8 +212,9 @@ const SUPPLY = `flowchart LR
   vnw{{VN Weather}}
   wx{{Weather charts · rain · temp · cum · forecast}}
   soil{{Soil Moisture · ESSM}}
-  drought{{Drought Indices · SPI + SPEI panel}}
+  drought{{Drought + vegetation indices panel · SPI / SPEI / VHI columns}}
   frost{{14-day Frost Risk grid · moved here from farmer-econ}}
+  agroAlert{{Agronomic alerts canonical · used by /map ticker + /signals merge}}
   ensoSub{{ENSO subtab · forecast plume · analogs · risk map}}
   coexp{{Colombia}}
   et{{Ethiopia}}
@@ -236,10 +247,15 @@ const SUPPLY = `flowchart LR
   EXP --> J_enso
   WSPI -.->|one-shot CI| SEED_SPI --> WWX
   WSPEI -.->|one-shot CI| SEED_SPEI --> WWX
+  WBFL -.->|one-shot CI| WWX
   WWX --> J_wx --> wx
   J_wx --> soil
   J_wx --> drought
-  WVHI --> J_vhi --> drought
+  WVHI --> SEED_VHI --> J_vhi
+  J_vhi --> drought
+  J_wx --> AGRO
+  J_vhi --> AGRO
+  AGRO --> J_agro --> agroAlert
   J_fe --> frost
   WENSO --> J_enso --> ensoSub
   WENFC --> J_enso
@@ -262,11 +278,11 @@ const SUPPLY = `flowchart LR
   J_intel --> intel
 ${DEFS}
   classDef vis fill:#1a2e05,stroke:#84cc16,color:#d9f99d;
-  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WVHI,WENSO,WENFC scr;
-  class DB,SEED_SPI,SEED_SPEI store;
-  class EXP proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
+  class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WVHI,WENSO,WENFC,WBFL scr;
+  class DB,SEED_SPI,SEED_SPEI,SEED_VHI store;
+  class EXP,AGRO proc;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_agro,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,agroAlert,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
 
 const DEMAND = `flowchart LR
   W3B["1.3b Slow-data · 1st/mo<br/>ECF stocks · USDA PSD · AJCA · UCDA"]
@@ -396,6 +412,7 @@ const NEWSMAP = `flowchart LR
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
   J_vnx[/vn_export_destination_port/]
+  J_agro[/agronomic_alerts.json<br/>(produced end of 1.10 weather run)/]
   base{{Coffee Map base}}
   price{{Price labels}}
   country{{Country pins + intel}}
@@ -404,6 +421,7 @@ const NEWSMAP = `flowchart LR
   freight{{Freight overlay}}
   vnport{{VN port-flow arrows}}
   news{{News Feed / Sidebar}}
+  ticker{{"Agronomic Threats Ticker — top overlay<br/>country chips, severity sort, click→region detail"}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
   W11 --> DB --> EXP
@@ -415,28 +433,30 @@ const NEWSMAP = `flowchart LR
   W32 --> J_cec --> exports
   W12 --> J_fr --> freight
   WCNTRY --> J_vnx --> vnport
+  J_agro --> ticker
 ${DEFS}
   classDef vis fill:#500724,stroke:#ec4899,color:#fbcfe8;
   class W22,WPOLL,W11,W32,W12,WCNTRY,SEED,SUP scr;
   class DB store;
   class EXP proc;
-  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx json;
-  class base,price,country,factory,exports,freight,vnport,news vis;`;
+  class J_lp,J_aca,J_news,J_ctry,J_fact,J_cec,J_fr,J_vnx,J_agro json;
+  class base,price,country,factory,exports,freight,vnport,news,ticker vis;`;
 
 const GLOBAL = `flowchart LR
   J_aca[/acaphe_live.json/]
   J_lp[/latest_prices.json/]
   J_orig[/origin_prices_history.json/]
   J_cot[/cot.json/]
-  J_sig[/signals.json/]
+  J_sig[/signals.json · quant + AGRO rows/]
   J_ev[/events.json · seed/]
-  J_met[/origin weather JSON ×7/]
+  J_met[/origin weather JSON ×7 · drought gated by rain_hist_min/]
+  J_sup[/×N _supply.json · per-region rain_mtd/hist/]
   J_fr[/freight.json/]
   J_q[/quant_report.json/]
   J_mac[/macro_cot.json/]
   J_news[(news_feed)]
   TICKER{{"Market Ticker — global band, every tab<br/>KC + RC live · FX"}}
-  TG{{"Telegram morning brief · 03:00<br/>last step · 9 sections"}}
+  TG{{"Telegram morning brief · 03:00<br/>9 sections + 'Coming up · next 24h'<br/>weather alerts gated by seasonal baseline<br/>/cot appends per-rule signals listing"}}
   J_aca --> TICKER
   J_lp --> TICKER
   J_aca --> TG
@@ -444,7 +464,8 @@ const GLOBAL = `flowchart LR
   J_orig --> TG
   J_cot --> TG
   J_sig --> TG
-  J_ev --> TG
+  J_ev -->|next 24h| TG
+  J_sup --> TG
   J_met --> TG
   J_fr --> TG
   J_q --> TG
@@ -452,7 +473,7 @@ const GLOBAL = `flowchart LR
   J_news --> TG
 ${DEFS}
   classDef vis fill:#083344,stroke:#22d3ee,color:#a5f3fc;
-  class J_aca,J_lp,J_orig,J_cot,J_sig,J_ev,J_met,J_fr,J_q,J_mac,J_news json;
+  class J_aca,J_lp,J_orig,J_cot,J_sig,J_ev,J_met,J_sup,J_fr,J_q,J_mac,J_news json;
   class TICKER,TG vis;`;
 
 const TAB_DIAGRAMS: Array<{ title: string; chart: string }> = [
@@ -512,6 +533,16 @@ const ROWS: Row[] = [
   { wf: "build_events_calendar.py", output: "events.json (seed + /public mirror)", component: "UpcomingCalendar", visual: "News · Coming up next 30 days (ISO-week timeline)" },
   { wf: "1.1 News (existing)", output: "news.json", component: "HeadlinesDigest + RiskRadar", visual: "News · Filtered headlines digest · keyword-velocity radar" },
   { wf: "1.4 Export (existing)", output: "health.json", component: "FreshnessGrid", visual: "News · 'What changed since yesterday' chip grid (26 feeds, today pulse)" },
+  // ── Added this sprint (Phase 5 Path A + Sprint 2) ────────────────────────
+  { wf: "0.5 NOAA STAR VHI (weekly, Sat 23:00)", output: "vhi_{origin}.json ×7", component: "WeatherCharts (VHI column in Drought + vegetation panel)", visual: "Supply · Weather · VHI chip per province · stress<40 / fair 40-60 / healthy>60" },
+  { wf: "0.6 backfill_missing_fields (one-shot)", output: "weather_history/*.json (rain + et0 + tmean heal)", component: "(internal: unblocks SPEI emit when forecast endpoint truncates et0/rain)", visual: "—" },
+  { wf: "0.7 backfill_history_gap (one-shot)", output: "weather_history/*.json (2025 gap fill)", component: "(internal: unblocks SPEI-3 by making seed↔history contiguous)", visual: "—" },
+  { wf: "Agronomic Alert Engine (Phase 5 Path A · end of 1.10)", output: "agronomic_alerts.json + AGRO rows in signals.json", component: "AgronomicTicker", visual: "Map · Live Agronomic Threats top overlay · country chips · click→region detail" },
+  { wf: "1.6 Morning Brief (Body-4)", output: "reads events.json", component: "telegram/handlers/brief.py::_upcoming_events_section", visual: "Telegram · 'Coming up · next 24h' block under weather" },
+  { wf: "1.6 Morning Brief (Body-3)", output: "—", component: "telegram/handlers/brief.py::_weather_line", visual: "Telegram · drought alerts gated by rain_mtd_mm < rain_hist_min (seasonal baseline)" },
+  { wf: "/cot Telegram command (Body-1)", output: "reads signals.json", component: "telegram/handlers/cot.py", visual: "Telegram · 'Signals (NY)/(LDN)' per-rule listing under position block · CRIT/ALERT/WARN/INFO" },
+  { wf: "OI 14-day cap (Body-8)", output: "oi_history.json sliced to 14 days (was 30)", component: "OIHistoryTable", visual: "COT · OI 14-day table · contract_prices_archive.json (5y) untouched" },
+  { wf: "COT Robusta nearby-OI fix (Body-7)", output: "—", component: "lib/cot/oiNearby.ts · Overview.tsx", visual: "COT · 'X k lots in nearby (N and U)' re-derived from per-contract oi_history.json (was 0.0 bug)" },
 ];
 
 function WorkflowTable() {
