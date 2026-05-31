@@ -2355,7 +2355,7 @@ export default function CertifiedStocksPanel() {
           <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
           <p className="text-[11px] text-slate-500">
             ICE-certified arabica (US warehouses) &amp; robusta (European warehouses) — the deliverable inventory the
-            futures market clears against. Daily scrape of ICE’s publicdocs reports.
+            futures market clears against. Daily scrape of ICE&rsquo;s publicdocs reports.
           </p>
         </div>
         <div className="flex items-center gap-1.5">
