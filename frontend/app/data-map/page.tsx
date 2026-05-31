@@ -188,7 +188,7 @@ const SUPPLY = `flowchart LR
   J_vnwl[/vn_water_levels.json/]
   J_vnw[/vn_weather.json/]
   J_wx[/×7 origin weather.json<br/>+ spi_1/3 + spei_1/3/]
-  J_vhi[/×7 vhi_{origin}.json<br/>weekly NOAA STAR VHI by province/]
+  J_vhi[/×7 vhi_*.json<br/>weekly NOAA STAR VHI by province/]
   J_agro[/agronomic_alerts.json<br/>+ AGRO rows merged into signals.json/]
   J_co[/colombia_supply.json/]
   J_et[/ethiopia_supply.json/]
