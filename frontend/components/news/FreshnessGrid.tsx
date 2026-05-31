@@ -34,36 +34,49 @@ const CATEGORY_ORDER = [
 type Category = (typeof CATEGORY_ORDER)[number];
 
 // scraper key → {label, category, thresholdDays}. Labels mirror DataHealthBar;
-// thresholds are normalised to days for the chip tooltip. Unknown keys fall
-// through to "Other" with a 30-day threshold (lets a new scraper never
-// silently disappear from the daily-newspaper view).
+// thresholdDays is the actual publication-cycle window, NOT a generic "old"
+// timer. Past the threshold the chip ramps amber → orange → rose so a
+// truly-overdue feed is unmissable; within the threshold it sits neutral.
+// Unknown keys fall through to "Other" with a 30-day threshold (lets a new
+// scraper never silently disappear from the daily-newspaper view).
+//
+// Threshold conventions (see _tone() below for how they cascade):
+//   - Daily M-F sources: 4d to tolerate the weekend skip (cecafe_daily,
+//     freight, weather, FX, ICE certified stocks, etc.). On a Sunday morning,
+//     Friday-dated data is 2 calendar days old AND that's normal — the
+//     source doesn't publish on weekends.
+//   - Weekly sources (COT): 11d. COT releases Friday with Tuesday data
+//     (3-day baseline lag), and "worst case is Friday evening just before
+//     the next release", i.e. 3 + 7 = 10d. 11 gives one day safety.
+//   - Monthly sources (CONAB, fertilizer, ENSO, ageing, AJCA): 35d.
+//   - Bi-monthly / quarterly (USDA PSD, ECF): 70-100d.
 const SCRAPER_META: Record<string, { label: string; category: Category; thresholdDays: number }> = {
-  futures:              { label: "Barchart futures",      category: "Futures",          thresholdDays:  2  },
-  cot:                  { label: "CFTC COT",              category: "COT",              thresholdDays:  8  },
-  macro_cot:            { label: "Macro COT",             category: "COT",              thresholdDays:  8  },
-  freight:              { label: "Freight rates",         category: "Freight",          thresholdDays:  2  },
-  weather:              { label: "Origin weather",        category: "Weather",          thresholdDays:  2  },
-  enso:                 { label: "NOAA ENSO ONI",         category: "ENSO",             thresholdDays: 35  },
-  fertilizer_wb:        { label: "World Bank fert.",      category: "Fertilizer",       thresholdDays: 35  },
-  fertilizer_comex:     { label: "Comex fert.",           category: "Fertilizer",       thresholdDays: 35  },
-  ecf:                  { label: "ECF stocks",            category: "Demand & stocks",  thresholdDays: 70  },
-  psd_coffee:           { label: "USDA PSD",              category: "Demand & stocks",  thresholdDays: 70  },
-  ajca:                 { label: "AJCA Japan stocks",     category: "Demand & stocks",  thresholdDays: 35  },
-  conab_costs:          { label: "CONAB costs",           category: "Supply (origins)", thresholdDays: 35  },
-  conab_safra:          { label: "CONAB safra",           category: "Supply (origins)", thresholdDays: 35  },
-  cecafe_daily:         { label: "Cecafé daily",          category: "Supply (origins)", thresholdDays:  2  },
-  brazil_exports:       { label: "BR exports",            category: "Supply (origins)", thresholdDays: 35  },
-  colombia_exports:     { label: "CO exports",            category: "Supply (origins)", thresholdDays:  3  },
-  honduras_exports:     { label: "HN exports",            category: "Supply (origins)", thresholdDays:  3  },
-  ethiopia_exports:     { label: "ET exports",            category: "Supply (origins)", thresholdDays:  3  },
-  vietnam_exports:      { label: "VN exports",            category: "Supply (origins)", thresholdDays:  3  },
-  indonesia_exports:    { label: "ID exports",            category: "Supply (origins)", thresholdDays:  3  },
-  uganda_exports:       { label: "UG exports",            category: "Supply (origins)", thresholdDays:  3  },
-  vietnam_price:        { label: "VN domestic price",     category: "Supply (origins)", thresholdDays:  3  },
-  origin_prices:        { label: "Origin price hub",      category: "Supply (origins)", thresholdDays:  3  },
-  quant_currency_index: { label: "Currency index",        category: "Macro",            thresholdDays:  3  },
-  retail_cpi:           { label: "Retail CPI",            category: "Macro",            thresholdDays: 35  },
-  fx_history:           { label: "FX history",            category: "Macro",            thresholdDays:  3  },
+  futures:              { label: "Barchart futures",      category: "Futures",          thresholdDays:  4  }, // daily M-F
+  cot:                  { label: "CFTC COT",              category: "COT",              thresholdDays: 11  }, // Fri release of Tue data, worst-case = 3+7
+  macro_cot:            { label: "Macro COT",             category: "COT",              thresholdDays: 11  },
+  freight:              { label: "Freight rates",         category: "Freight",          thresholdDays:  4  }, // daily M-F
+  weather:              { label: "Origin weather",        category: "Weather",          thresholdDays:  3  }, // daily 7-day cron
+  enso:                 { label: "NOAA ENSO ONI",         category: "ENSO",             thresholdDays: 35  }, // monthly
+  fertilizer_wb:        { label: "World Bank fert.",      category: "Fertilizer",       thresholdDays: 35  }, // monthly Pink Sheet
+  fertilizer_comex:     { label: "Comex fert.",           category: "Fertilizer",       thresholdDays: 35  }, // monthly
+  ecf:                  { label: "ECF stocks",            category: "Demand & stocks",  thresholdDays: 70  }, // bi-monthly
+  psd_coffee:           { label: "USDA PSD",              category: "Demand & stocks",  thresholdDays: 70  }, // ~quarterly refresh
+  ajca:                 { label: "AJCA Japan stocks",     category: "Demand & stocks",  thresholdDays: 35  }, // monthly
+  conab_costs:          { label: "CONAB costs",           category: "Supply (origins)", thresholdDays: 35  }, // monthly
+  conab_safra:          { label: "CONAB safra",           category: "Supply (origins)", thresholdDays: 35  }, // monthly safra release
+  cecafe_daily:         { label: "Cecafé daily",          category: "Supply (origins)", thresholdDays:  4  }, // daily M-F + Brazilian holidays
+  brazil_exports:       { label: "BR exports",            category: "Supply (origins)", thresholdDays: 35  }, // monthly (Cecafé export report, ~15th)
+  colombia_exports:     { label: "CO exports",            category: "Supply (origins)", thresholdDays:  4  }, // daily fetch (cumulative monthly)
+  honduras_exports:     { label: "HN exports",            category: "Supply (origins)", thresholdDays:  4  },
+  ethiopia_exports:     { label: "ET exports",            category: "Supply (origins)", thresholdDays:  4  },
+  vietnam_exports:      { label: "VN exports",            category: "Supply (origins)", thresholdDays:  4  },
+  indonesia_exports:    { label: "ID exports",            category: "Supply (origins)", thresholdDays:  4  },
+  uganda_exports:       { label: "UG exports",            category: "Supply (origins)", thresholdDays:  4  },
+  vietnam_price:        { label: "VN domestic price",     category: "Supply (origins)", thresholdDays:  4  }, // daily survey
+  origin_prices:        { label: "Origin price hub",      category: "Supply (origins)", thresholdDays:  4  },
+  quant_currency_index: { label: "Currency index",        category: "Macro",            thresholdDays:  4  }, // daily M-F FX
+  retail_cpi:           { label: "Retail CPI",            category: "Macro",            thresholdDays: 35  }, // monthly BLS/Eurostat/BCB
+  fx_history:           { label: "FX history",            category: "Macro",            thresholdDays:  4  }, // daily M-F
 };
 
 function _ageDays(iso: string | null | undefined, now: Date): number | null {
@@ -74,13 +87,19 @@ function _ageDays(iso: string | null | undefined, now: Date): number | null {
   return Math.max(0, Math.floor((now.getTime() - t) / 86_400_000));
 }
 
+// Threshold-relative cascade — a feed's colour is determined by its age
+// against ITS OWN publication cadence, not a hardcoded 1d/3d/7d ramp.
+// Issue caught by the user: monthly feeds (KC ageing, fertilizer, etc.)
+// were showing amber/orange/rose at 2/4/8 days even though those ages
+// are mid-cycle normal for a monthly publication. Now within-threshold
+// = neutral slate; ramp starts only past the threshold.
 function _tone(days: number | null, threshold: number): string {
   if (days == null) return "text-slate-700 border-slate-800 bg-slate-900";
-  if (days <= 1)              return "text-emerald-300 border-emerald-800/60 bg-emerald-950/40";
-  if (days <= 3)              return "text-amber-300   border-amber-800/60   bg-amber-950/40";
-  if (days <= 7)              return "text-orange-300  border-orange-800/60  bg-orange-950/40";
-  if (days <= threshold)      return "text-slate-300   border-slate-700      bg-slate-900";
-  return                             "text-rose-300    border-rose-800/60    bg-rose-950/40";
+  if (days === 0)                  return "text-emerald-300 border-emerald-800/60 bg-emerald-950/40"; // fresh today
+  if (days <= threshold)           return "text-slate-300   border-slate-700      bg-slate-900";      // within lifecycle
+  if (days <= threshold * 1.25)    return "text-amber-300   border-amber-800/60   bg-amber-950/40";   // slightly overdue
+  if (days <= threshold * 1.5)     return "text-orange-300  border-orange-800/60  bg-orange-950/40";  // overdue
+  return                                  "text-rose-300    border-rose-800/60    bg-rose-950/40";    // significantly stale
 }
 
 function _ageStr(days: number | null): string {
