@@ -23,14 +23,13 @@ Output: frontend/public/data/cecafe_daily.json
     "conillon": { "YYYY-MM": { "1": bags, "2": bags, ... } }
   }
 """
-import gzip
-import http.cookiejar
 import json
 import re
 import sys
-import urllib.request
 from datetime import date
 from pathlib import Path
+
+import requests
 
 ROOT     = Path(__file__).resolve().parents[2]
 OUT_DIR  = ROOT / "frontend" / "public" / "data"
@@ -58,22 +57,54 @@ DAILY_URL = "https://www.cecafe.com.br/dados-estatisticos/exportacoes-brasileira
 
 # ── Fetch ─────────────────────────────────────────────────────────────────────
 
+# Headers chosen to look like a stock desktop Chrome request — the page
+# sometimes returns a 403 / shorter "block page" when called with a generic
+# Python User-Agent. The Accept-Language: pt-BR hint matters for some
+# Brazilian-hosted sites that geo-tune their response.
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "pt-BR,pt;q=0.9",
+    "Accept-Encoding": "gzip, deflate",
+    "Connection":      "keep-alive",
+}
+
+
+class CecafeUnreachable(RuntimeError):
+    """TCP connect or read timed out — Cecafe's server refused or dropped
+    the connection. Distinguished from a parser error (real bug in our code)
+    so the workflow can choose to treat it as a transient external issue."""
+
+
 def _fetch_page() -> str:
-    jar = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    opener.addheaders = [
-        ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
-        ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-        ("Accept-Language", "pt-BR,pt;q=0.9"),
-        ("Accept-Encoding", "gzip, deflate"),
-        ("Connection", "keep-alive"),
-    ]
-    resp = opener.open(DAILY_URL, timeout=45)
-    raw = resp.read()
+    """Fetch the Cecafe daily-resumo HTML.
+
+    Raises:
+        CecafeUnreachable — TCP-level failure (connect/read timeout, DNS,
+            ConnectionError). The 2026-05-30 outage was all four attempts
+            seeing the same TimeoutError at sock.connect — the runner's
+            IP range was being refused by Cecafe's edge for the whole
+            ~25min window. Spread retries across the day (multiple cron
+            entries in the workflow) to give the block time to clear.
+        requests.RequestException — non-timeout HTTP error (4xx/5xx).
+            Re-raised so the caller can decide.
+    """
     try:
-        return gzip.decompress(raw).decode("utf-8", errors="ignore")
-    except Exception:
-        return raw.decode("utf-8", errors="ignore")
+        # (connect, read) — fail fast on connect so the bash retry loop
+        # cycles quicker; allow 45s of read time for the slow page itself.
+        r = requests.get(DAILY_URL, headers=_BROWSER_HEADERS, timeout=(15, 45))
+        r.raise_for_status()
+        # requests auto-handles gzip/deflate via Content-Encoding header.
+        # .text uses apparent_encoding which works for utf-8 / latin-1
+        # pages without us second-guessing.
+        return r.text
+    except (requests.Timeout, requests.ConnectionError) as e:
+        raise CecafeUnreachable(
+            f"TCP-level failure reaching {DAILY_URL}: {type(e).__name__}: {e}"
+        ) from e
 
 
 # ── Parse ─────────────────────────────────────────────────────────────────────
@@ -222,9 +253,19 @@ def main():
         except Exception:
             pass
 
-    # 2. Fetch page
+    # 2. Fetch page — surface unreachability cleanly so the workflow log
+    # explains a sustained outage (recurring May 2026 issue: GH Actions
+    # runner IPs periodically refused by Cecafe's edge for ~30+ min windows).
     print(f"\n[1] Fetching {DAILY_URL}...")
-    html = _fetch_page()
+    try:
+        html = _fetch_page()
+    except CecafeUnreachable as e:
+        print(f"  ERROR (transient): {e}")
+        print("  Source is unreachable — keeping last good JSON.")
+        print("  This is the recurring connect-timeout pattern; the next")
+        print("  scheduled cron (midday / evening) will retry with a fresh")
+        print("  network window.")
+        sys.exit(1)
     print(f"  Page size: {len(html):,} chars")
     # Always capture the fetched page so a green-but-stale run is diagnosable
     # (the parser only dumped on exceptions; the "data unchanged" case never hit
