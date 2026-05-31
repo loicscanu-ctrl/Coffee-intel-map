@@ -25,11 +25,14 @@ on:
         default: "3"
         type: string
   schedule:
-    # 17:00 UTC daily — past ICE's morning robusta publish (~10:30 UTC) and
-    # afternoon arabica publish (~13:30 UTC). Small window (days_back=3) is
-    # enough to catch any missed day; the merge step preserves the full history
-    # on disk from prior backfill runs.
-    - cron: '0 17 * * *'
+    # 17:00 UTC Mon-Fri — past ICE's morning robusta publish (~10:30 UTC) and
+    # afternoon arabica publish (~13:30 UTC). Weekend skip: ICE doesn't
+    # publish Sat/Sun, so weekend runs spent 5-10 min apiece fetching the
+    # same Friday-EOD data already on disk. Monday's run still picks up
+    # whatever moved during the weekend (none — ICE is closed) AND that
+    # day's fresh publication, so no gap. Manual dispatch still allowed
+    # any day for backfills / one-offs.
+    - cron: '0 17 * * 1-5'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
