@@ -1,6 +1,6 @@
 {
   "_note": "Climatology (avg/min/max) from committed per-region seed; actual-cur, daily MTD, last-year (once accumulated) and 7-day forecast are live from Open-Meteo's forecast API, accumulated daily in backend/seed/weather_history/.",
-  "updated": "2026-05-30",
+  "updated": "2026-05-31",
   "cur_year": 2026,
   "last_year": 2025,
   "label": "Honduras",
@@ -622,7 +622,7 @@
         29.1,
         34.5,
         32.7,
-        69.6
+        67.3
       ],
       "monthly_avg_temp": [
         20.1,
@@ -688,13 +688,13 @@
         23.0
       ],
       "forecast_7d_rain": [
-        4.6,
-        3.2,
-        1.5,
-        1.4,
-        3.2,
         2.5,
-        1.7
+        3.2,
+        1.1,
+        3.0,
+        3.4,
+        2.7,
+        6.0
       ],
       "daily_accum_cur": [
         0.0,
@@ -726,8 +726,8 @@
         14.5,
         29.1,
         45.9,
-        69.6,
-        null
+        54.7,
+        67.3
       ],
       "daily_accum_ly": [
         2.2,
@@ -765,7 +765,7 @@
       "spi_1": -0.32,
       "spi_3": 0.14,
       "spi_month": "2026-04",
-      "essm_fraction": 0.22,
+      "essm_fraction": 0.217,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -790,6 +790,10 @@
         {
           "date": "2026-05-30",
           "essm": 0.22
+        },
+        {
+          "date": "2026-05-31",
+          "essm": 0.217
         }
       ],
       "spei_1": -0.33,
@@ -876,7 +880,7 @@
         6.6,
         76.2,
         64.8,
-        60.1
+        56.2
       ],
       "monthly_avg_temp": [
         23.0,
@@ -939,16 +943,16 @@
         22.9,
         24.3,
         26.3,
-        27.4
+        27.3
       ],
       "forecast_7d_rain": [
-        13.5,
-        6.5,
-        4.5,
         4.3,
-        8.1,
+        5.7,
+        5.2,
+        2.8,
+        1.5,
         1.2,
-        6.4
+        14.6
       ],
       "daily_accum_cur": [
         0.0,
@@ -980,8 +984,8 @@
         29.7,
         39.0,
         44.7,
-        60.1,
-        null
+        51.3,
+        56.2
       ],
       "daily_accum_ly": [
         1.9,
@@ -1016,7 +1020,7 @@
         64.3,
         67.3
       ],
-      "essm_fraction": 0.229,
+      "essm_fraction": 0.243,
       "essm_recent": [
         {
           "date": "2026-05-25",
@@ -1041,6 +1045,10 @@
         {
           "date": "2026-05-30",
           "essm": 0.229
+        },
+        {
+          "date": "2026-05-31",
+          "essm": 0.243
         }
       ],
       "spei_1": 0.96,
