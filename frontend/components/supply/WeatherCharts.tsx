@@ -25,11 +25,18 @@ interface Province {
   monthly_max_rain: number[];
   monthly_dry_warn?: number[];
   monthly_last_year_rain: number[];
+  // Populated by fetch_origin_weather.py only after the 30Y backfill (workflow 0.9)
+  // has imported 1995-2024 into weather_history. Optional: charts fall back to
+  // null cleanly when absent. Needed by the prior-crop-year line for origins
+  // with a non-Jan start month (Brazil = Jun-May): its first 7 months land in
+  // calendar year (cur_year-2), which monthly_last_year_rain doesn't reach.
+  monthly_two_years_ago_rain?: number[];
   monthly_actual_cur: number[];
   monthly_avg_temp: number[];
   monthly_min_temp: number[];
   monthly_max_temp: number[];
   monthly_last_year_temp: number[];
+  monthly_two_years_ago_temp?: number[];
   monthly_actual_temp_cur: number[];
   forecast_7d_rain: number[];
   daily_accum_cur?: (number | null)[];   // per-day cumulative rain, current month
@@ -760,18 +767,22 @@ export default function WeatherCharts({
   const _slotYear = (dispIdx: number) =>
     cropFrame.cropStartYear + Math.floor((startMonthIdx + dispIdx) / 12);
 
-  // Rain lookup keyed by year: pulls monthly_actual_cur for cur_year, monthly_last_year_rain
-  // for cur_year-1, null otherwise (two-years-ago data is not currently stored).
+  // Rain lookup keyed by year: pulls monthly_actual_cur for cur_year,
+  // monthly_last_year_rain for cur_year-1, monthly_two_years_ago_rain for
+  // cur_year-2 (populated after the 30Y backfill workflow 0.9 ran). Null
+  // otherwise — chart's connectNulls={false} hides the gap cleanly.
   const _rainForYear = (p: WeatherData["provinces"][number], calIdx: number, yr: number): number | null => {
-    if (yr === cropFrame.curYear)  return p.monthly_actual_cur?.[calIdx] ?? null;
-    if (yr === cropFrame.lastYear) return p.monthly_last_year_rain?.[calIdx] ?? null;
+    if (yr === cropFrame.curYear)      return p.monthly_actual_cur?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear)     return p.monthly_last_year_rain?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear - 1) return p.monthly_two_years_ago_rain?.[calIdx] ?? null;
     return null;
   };
 
   // Temperature mirror of _rainForYear for the temperature chart.
   const _tempForYear = (p: WeatherData["provinces"][number], calIdx: number, yr: number): number | null => {
-    if (yr === cropFrame.curYear)  return p.monthly_actual_temp_cur?.[calIdx] ?? null;
-    if (yr === cropFrame.lastYear) return p.monthly_last_year_temp?.[calIdx] ?? null;
+    if (yr === cropFrame.curYear)      return p.monthly_actual_temp_cur?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear)     return p.monthly_last_year_temp?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear - 1) return p.monthly_two_years_ago_temp?.[calIdx] ?? null;
     return null;
   };
 
