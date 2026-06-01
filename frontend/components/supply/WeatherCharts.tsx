@@ -155,22 +155,24 @@ function DailyAccumChart({
 
   // Extend the current-year accumulation into the future with the 7-day
   // forecast (same reference station), drawn dotted to flag it as projected.
-  // Forecast rain is cumulated onto the last actual accum value; only forecast
-  // days that fall within the displayed month are included.
+  // Forecast rain is cumulated onto the last actual accum value when available;
+  // otherwise the line draws from day 0 (handy on day 1 of a new month before
+  // the live fetch has landed any actuals).
   const chartData = useMemo(() => {
     type Row = Partial<DailyRow> & { day: number; forecast_accum_mm?: number | null };
     const rows: Row[] = daily.map((d) => ({ ...d }));
-    const lastActual = [...daily].reverse().find((d) => d.accum_mm != null);
-    if (!lastActual) return rows;
-
     const byDay = new Map<number, Row>(rows.map((r) => [r.day, r]));
+    const lastActual = [...daily].reverse().find((d) => d.accum_mm != null);
+    const anchorDay = lastActual?.day ?? 0;
+    const anchorAccum = lastActual?.accum_mm ?? 0;
     // Anchor the dotted line on the last actual point so the two lines join.
-    byDay.get(lastActual.day)!.forecast_accum_mm = lastActual.accum_mm;
-
-    let acc = lastActual.accum_mm ?? 0;
+    // With no actuals, leave day 0 implicit and let the forecast line start
+    // at the first matching day.
+    if (lastActual) byDay.get(anchorDay)!.forecast_accum_mm = anchorAccum;
+    let acc = anchorAccum;
     for (const f of forecast) {
       const [y, m, d] = f.date.split("-").map(Number);
-      if (y !== dataYear || m - 1 !== dataMonth || d <= lastActual.day) continue;
+      if (y !== dataYear || m - 1 !== dataMonth || d <= anchorDay) continue;
       acc += f.rain_mm;
       const existing = byDay.get(d);
       if (existing) existing.forecast_accum_mm = r1(acc);
@@ -971,29 +973,38 @@ export default function WeatherCharts({
     }));
   }, [data, activeProv, totalProd]);
 
-  // Prod-weighted daily accumulation across selected regions (falls back to the
-  // single reference station when per-province daily series aren't in the data yet).
+  // Prod-weighted daily accumulation across selected regions. Always emits a
+  // full month's worth of rows even when no current-year data has landed yet
+  // (e.g. day 1 of a new month, before the live fetch has caught up). The
+  // climatology bands + last-year curve + 7-day forecast all stay visible —
+  // only the actual blue line goes null until daily_accum_cur fills in.
   const weightedDaily = useMemo<DailyRow[] | null>(() => {
     if (!data || !totalProd) return null;
-    if (!activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur.length)) return null;
     const [yr, mo] = data.updated.split("-").map(Number);
     const mIdx = mo - 1;
     const dim = new Date(yr, mIdx + 1, 0).getDate();
     const wAvgMonth = wsum(activeProv, (p) => p.monthly_avg_rain[mIdx]) / totalProd;
-    const haveLY = activeProv.every((p) => Array.isArray(p.daily_accum_ly) && p.daily_accum_ly!.length);
+    const wMinMonth = wsum(activeProv, (p) => p.monthly_min_rain[mIdx]) / totalProd;
+    const wMaxMonth = wsum(activeProv, (p) => p.monthly_max_rain[mIdx]) / totalProd;
+    const haveCur = activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
+    const haveLY  = activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
     const rows: DailyRow[] = [];
     for (let d = 1; d <= dim; d++) {
       const i = d - 1;
-      const allCur = activeProv.every((p) => p.daily_accum_cur![i] != null);
+      const allCur = haveCur && activeProv.every((p) => p.daily_accum_cur![i] != null);
       const avg_accum = r1(wAvgMonth * (d / dim));
+      // Use the real monthly min/max envelope spread proportionally to the day,
+      // rather than the heuristic ±40% of avg the backend script falls back to.
+      const min_accum = r1(wMinMonth * (d / dim));
+      const max_accum = r1(wMaxMonth * (d / dim));
       const lyOk = haveLY && activeProv.every((p) => p.daily_accum_ly![i] != null);
       rows.push({
         day: d,
         rain_mm: 0,
         accum_mm: allCur ? r1(wsum(activeProv, (p) => p.daily_accum_cur![i] as number) / totalProd) : null,
         avg_accum_mm: avg_accum,
-        min_accum_mm: r1(avg_accum * 0.6),
-        max_accum_mm: r1(avg_accum * 1.5),
+        min_accum_mm: min_accum,
+        max_accum_mm: max_accum,
         last_year_accum_mm: lyOk ? r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd) : r1(avg_accum * 1.08),
         temp_c: 0,
       });
