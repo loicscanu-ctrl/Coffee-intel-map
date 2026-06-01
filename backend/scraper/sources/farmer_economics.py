@@ -477,6 +477,15 @@ def _scrape_enso(db) -> None:
 # IRI forecast parsing moved to scraper.enso_forecast as part of the multi-
 # source fallback chain (IRI HTML → NOAA CPC discussion text). Re-exported
 # here so existing imports (and tests) keep working unchanged.
+# noqa: F401 — `parse_iri_probability_table` is intentionally unused locally
+# (the test suite + downstream callers import it via this module path).
+from scraper.enso_forecast import (
+    IRI_FORECAST_URL,  # noqa: F401
+    parse_iri_probability_table,  # noqa: F401
+)
+from scraper.enso_forecast import (
+    SEASON_ORDER as _SEASON_ORDER,  # noqa: F401
+)
 
 
 def _scrape_enso_forecast(db) -> None:

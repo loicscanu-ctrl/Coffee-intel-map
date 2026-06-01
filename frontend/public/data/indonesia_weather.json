@@ -2915,7 +2915,10 @@
           248.0,
           523.3
         ]
-      }
+      },
+      "crop_type": "robusta",
+      "prod_mt_k_arabica": 0,
+      "prod_mt_k_robusta": 350
     },
     {
       "name": "Gayo",
@@ -5823,7 +5826,10 @@
           586.4,
           273.4
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 120,
+      "prod_mt_k_robusta": 0
     },
     {
       "name": "Java",
@@ -8731,7 +8737,10 @@
           136.6,
           136.6
         ]
-      }
+      },
+      "crop_type": "mixed",
+      "prod_mt_k_arabica": 30,
+      "prod_mt_k_robusta": 80
     },
     {
       "name": "Toraja",
@@ -11639,7 +11648,10 @@
           198.9,
           147.4
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 70,
+      "prod_mt_k_robusta": 0
     },
     {
       "name": "Flores",
@@ -14544,7 +14556,10 @@
           189.0,
           332.3
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 50,
+      "prod_mt_k_robusta": 0
     }
   ],
   "daily_station": [
