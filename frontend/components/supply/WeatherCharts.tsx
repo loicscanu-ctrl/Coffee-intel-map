@@ -42,10 +42,11 @@ interface Province {
   daily_accum_cur?: (number | null)[];   // per-day cumulative rain, current month
   daily_accum_ly?: (number | null)[];    // per-day cumulative rain, last year same month
   // Per-day 10Y envelope built from real history in fetch_origin_weather.py.
-  // Replaces the chart's linear interpolation of monthly_min/max_rain (which
-  // mis-flagged bursty-rain years as exceeding the band — see ES Jun 2025
-  // where day-3 actual = 9.4mm vs linear envelope of 2.7mm).
+  // Replaces the chart's linear interpolation of monthly_min/avg/max_rain
+  // (which mis-flagged bursty-rain years as exceeding the band — see ES
+  // Jun 2025 day-3 actual = 9.4mm vs linear envelope of 2.7mm).
   daily_accum_min_10y?: (number | null)[];
+  daily_accum_avg_10y?: (number | null)[];
   daily_accum_max_10y?: (number | null)[];
   essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
   essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
@@ -204,7 +205,7 @@ function DailyAccumChart({
             stroke="none" opacity={0.5} legendType="none" />
           <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
             stroke="none" opacity={1} legendType="none" />
-          <Line type="monotone" dataKey="avg_accum_mm" name="30yr avg"
+          <Line type="monotone" dataKey="avg_accum_mm" name="10yr avg"
             stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
           <Line type="monotone" dataKey="last_year_accum_mm" name={`${lastYear}`}
             stroke="#93c5fd" strokeWidth={1.5} dot={false} />
@@ -270,7 +271,7 @@ function MonthlyRainChart({ data, curLabel, lyLabel }: { data: MonthlyRainRow[];
           <Bar dataKey="actualCur" name={curLabel} stackId="cur" fill="#38bdf8" opacity={0.9} />
           <Bar dataKey="proj" name={`${curLabel} proj.`} stackId="cur" fill="#38bdf8" opacity={0.3} radius={[2, 2, 0, 0]} />
           {/* 30yr avg line */}
-          <Line type="monotone" dataKey="avgRain" name="30yr avg"
+          <Line type="monotone" dataKey="avgRain" name="10yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -318,7 +319,7 @@ function CumulativeRainChart({ data, curLabel, lyLabel }: { data: CumRainRow[]; 
           <Area type="monotone" dataKey="cumMin" name="10yr min" fill="#0f172a"
             stroke="none" opacity={1} legendType="none" />
           {/* 30yr avg */}
-          <Line type="monotone" dataKey="cumAvg" name="30yr avg"
+          <Line type="monotone" dataKey="cumAvg" name="10yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
           {/* last year (or previous crop year for crop-aligned charts) */}
           <Line type="monotone" dataKey="cumLastYear" name={lyLabel}
@@ -380,7 +381,7 @@ function MeanTempChart({
           <Area type="monotone" dataKey="minTemp" name="10yr min" fill="#0f172a"
             stroke="none" opacity={1} legendType="none" />
           {/* 30yr avg */}
-          <Line type="monotone" dataKey="avgTemp" name="30yr avg"
+          <Line type="monotone" dataKey="avgTemp" name="10yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
           {/* last year (or previous crop year for crop-aligned charts) */}
           <Line type="monotone" dataKey="lastYearTemp" name={lyLabel}
@@ -1006,16 +1007,21 @@ export default function WeatherCharts({
     const haveLY  = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
     // 10Y envelope: prefer the real per-day percentile arrays when the file
     // ships them (and we're in the stored window). Linear interpolation of
-    // monthly_min/max stays as a fallback so charts don't go blank pre-refresh.
+    // monthly_min/avg/max stays as a fallback so charts don't go blank pre-refresh.
     const haveEnvelope = isStored
       && activeProv.every((p) => Array.isArray(p.daily_accum_min_10y) && p.daily_accum_min_10y!.length === dim)
       && activeProv.every((p) => Array.isArray(p.daily_accum_max_10y) && p.daily_accum_max_10y!.length === dim);
+    const haveAvg = isStored
+      && activeProv.every((p) => Array.isArray(p.daily_accum_avg_10y) && p.daily_accum_avg_10y!.length === dim);
     const rows: DailyRow[] = [];
     for (let d = 1; d <= dim; d++) {
       const i = d - 1;
-      const avg_accum = r1(wAvgMonth * (d / dim));
       const minEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_min_10y![i] != null);
       const maxEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_max_10y![i] != null);
+      const avgEnvOk = haveAvg && activeProv.every((p) => p.daily_accum_avg_10y![i] != null);
+      const avg_accum = avgEnvOk
+        ? r1(wsum(activeProv, (p) => p.daily_accum_avg_10y![i] as number) / totalProd)
+        : r1(wAvgMonth * (d / dim));
       const min_accum = minEnvOk
         ? r1(wsum(activeProv, (p) => p.daily_accum_min_10y![i] as number) / totalProd)
         : r1(wMinMonth * (d / dim));
