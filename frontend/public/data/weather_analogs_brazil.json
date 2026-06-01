@@ -1,0 +1,1057 @@
+{
+  "_schema": "v1",
+  "_note": "Brazilian arabica weather-analog forecast. Top-N past years ranked by Euclidean distance on z-scored (rain, temp) signatures per phenology stage. next_crop_yoy_pct = the actual y/y production change that followed each analog's weather pattern.",
+  "generated_at": "2026-06-01T18:22:12+00:00",
+  "origin": "brazil_arabica",
+  "current_crop_year": 2026,
+  "phenology": [
+    {
+      "name": "pre_flowering",
+      "months": [
+        8,
+        9
+      ]
+    },
+    {
+      "name": "flowering",
+      "months": [
+        10,
+        11
+      ]
+    },
+    {
+      "name": "fruit_fill",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "maturation",
+      "months": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "feature_means": {
+    "pre_flowering_rain": 72.37,
+    "pre_flowering_temp": 20.58,
+    "flowering_rain": 294.0,
+    "flowering_temp": 22.23,
+    "fruit_fill_rain": 622.67,
+    "fruit_fill_temp": 22.8,
+    "maturation_rain": 237.91,
+    "maturation_temp": 20.96
+  },
+  "feature_stds": {
+    "pre_flowering_rain": 44.13,
+    "pre_flowering_temp": 0.69,
+    "flowering_rain": 54.0,
+    "flowering_temp": 0.88,
+    "fruit_fill_rain": 124.14,
+    "fruit_fill_temp": 0.51,
+    "maturation_rain": 64.29,
+    "maturation_temp": 0.52
+  },
+  "current_year_signature": [
+    {
+      "name": "pre_flowering",
+      "rain_mm": 32.2,
+      "temp_c": 20.71
+    },
+    {
+      "name": "flowering",
+      "rain_mm": 207.6,
+      "temp_c": 22.43
+    },
+    {
+      "name": "fruit_fill",
+      "rain_mm": 623.2,
+      "temp_c": 22.72
+    },
+    {
+      "name": "maturation",
+      "rain_mm": 240.5,
+      "temp_c": 21.63
+    }
+  ],
+  "current_year_z": {
+    "pre_flowering_rain": -0.91,
+    "pre_flowering_temp": 0.188,
+    "flowering_rain": -1.6,
+    "flowering_temp": 0.227,
+    "fruit_fill_rain": 0.004,
+    "fruit_fill_temp": -0.157,
+    "maturation_rain": 0.04,
+    "maturation_temp": 1.288
+  },
+  "top_analogs": [
+    {
+      "year": 2005,
+      "distance": 0.624,
+      "features_compared": 8,
+      "same_cycle_crop_year": 2005,
+      "same_cycle_production_kbags": 33500,
+      "same_cycle_yoy_pct": 35.6,
+      "next_crop_year": 2006,
+      "next_crop_production_kbags": 26000,
+      "next_crop_yoy_pct": -22.4,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 27.9,
+          "temp_c": 20.74
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 266.4,
+          "temp_c": 21.85
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 665.3,
+          "temp_c": 22.3
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 272.8,
+          "temp_c": 21.29
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "distance": 0.809,
+      "features_compared": 8,
+      "same_cycle_crop_year": 2018,
+      "same_cycle_production_kbags": 32500,
+      "same_cycle_yoy_pct": -25.6,
+      "next_crop_year": 2019,
+      "next_crop_production_kbags": 47500,
+      "next_crop_yoy_pct": 46.2,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 40.6,
+          "temp_c": 20.55
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 272.3,
+          "temp_c": 22.49
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 478.7,
+          "temp_c": 22.59
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 154.9,
+          "temp_c": 21.26
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "distance": 0.873,
+      "features_compared": 8,
+      "same_cycle_crop_year": 2021,
+      "same_cycle_production_kbags": 48700,
+      "same_cycle_yoy_pct": 28.5,
+      "next_crop_year": 2022,
+      "next_crop_production_kbags": 31300,
+      "next_crop_yoy_pct": -35.7,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 38.4,
+          "temp_c": 21.21
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 234.0,
+          "temp_c": 22.95
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 587.3,
+          "temp_c": 22.81
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 128.3,
+          "temp_c": 20.93
+        }
+      ]
+    },
+    {
+      "year": 2009,
+      "distance": 0.974,
+      "features_compared": 8,
+      "same_cycle_crop_year": 2009,
+      "same_cycle_production_kbags": 41800,
+      "same_cycle_yoy_pct": 30.6,
+      "next_crop_year": 2010,
+      "next_crop_production_kbags": 32700,
+      "next_crop_yoy_pct": -21.8,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 91.2,
+          "temp_c": 20.19
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 259.0,
+          "temp_c": 22.21
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 791.0,
+          "temp_c": 22.33
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 277.8,
+          "temp_c": 20.99
+        }
+      ]
+    },
+    {
+      "year": 2006,
+      "distance": 1.0,
+      "features_compared": 8,
+      "same_cycle_crop_year": 2006,
+      "same_cycle_production_kbags": 26000,
+      "same_cycle_yoy_pct": -22.4,
+      "next_crop_year": 2007,
+      "next_crop_production_kbags": 37500,
+      "next_crop_yoy_pct": 44.2,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 83.7,
+          "temp_c": 20.34
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 258.5,
+          "temp_c": 22.39
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 566.0,
+          "temp_c": 22.58
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 253.0,
+          "temp_c": 20.45
+        }
+      ]
+    }
+  ],
+  "ensemble_same_cycle": {
+    "mean_pct": 9.3,
+    "median_pct": 28.5,
+    "stdev_pct": 27.3,
+    "n": 5,
+    "min_pct": -25.6,
+    "max_pct": 35.6
+  },
+  "ensemble_lag_one": {
+    "mean_pct": 2.1,
+    "median_pct": -21.8,
+    "stdev_pct": 35.5,
+    "n": 5,
+    "min_pct": -35.7,
+    "max_pct": 46.2
+  },
+  "historical_signatures": [
+    {
+      "year": 1996,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 53.2,
+          "temp_c": 20.94
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 390.4,
+          "temp_c": 21.21
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 626.2,
+          "temp_c": 22.92
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 302.8,
+          "temp_c": 20.81
+        }
+      ],
+      "production_kbags": 16500
+    },
+    {
+      "year": 1997,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 183.6,
+          "temp_c": 19.25
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 386.4,
+          "temp_c": 21.26
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 727.9,
+          "temp_c": 22.33
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 292.1,
+          "temp_c": 19.94
+        }
+      ],
+      "production_kbags": 28500
+    },
+    {
+      "year": 1998,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 82.5,
+          "temp_c": 20.64
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 345.9,
+          "temp_c": 23.07
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 634.8,
+          "temp_c": 23.54
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 274.4,
+          "temp_c": 21.49
+        }
+      ],
+      "production_kbags": 23000
+    },
+    {
+      "year": 1999,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 144.0,
+          "temp_c": 20.94
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 276.8,
+          "temp_c": 21.27
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 651.2,
+          "temp_c": 22.94
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 234.6,
+          "temp_c": 20.5
+        }
+      ],
+      "production_kbags": 34200
+    },
+    {
+      "year": 2000,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 47.6,
+          "temp_c": 19.65
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 242.5,
+          "temp_c": 20.72
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 729.3,
+          "temp_c": 22.27
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 190.0,
+          "temp_c": 20.4
+        }
+      ],
+      "production_kbags": 22000
+    },
+    {
+      "year": 2001,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 154.9,
+          "temp_c": 19.31
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 273.4,
+          "temp_c": 22.24
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 420.1,
+          "temp_c": 22.95
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 242.2,
+          "temp_c": 21.1
+        }
+      ],
+      "production_kbags": 31300
+    },
+    {
+      "year": 2002,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 105.0,
+          "temp_c": 19.52
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 351.5,
+          "temp_c": 21.52
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 726.8,
+          "temp_c": 22.13
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 158.3,
+          "temp_c": 21.86
+        }
+      ],
+      "production_kbags": 23300
+    },
+    {
+      "year": 2003,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 110.1,
+          "temp_c": 20.61
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 251.1,
+          "temp_c": 23.33
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 706.2,
+          "temp_c": 23.19
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 239.4,
+          "temp_c": 20.78
+        }
+      ],
+      "production_kbags": 41000
+    },
+    {
+      "year": 2004,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 64.6,
+          "temp_c": 19.95
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 225.0,
+          "temp_c": 21.89
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 670.4,
+          "temp_c": 22.22
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 280.5,
+          "temp_c": 20.25
+        }
+      ],
+      "production_kbags": 24700
+    },
+    {
+      "year": 2005,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 27.9,
+          "temp_c": 20.74
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 266.4,
+          "temp_c": 21.85
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 665.3,
+          "temp_c": 22.3
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 272.8,
+          "temp_c": 21.29
+        }
+      ],
+      "production_kbags": 33500
+    },
+    {
+      "year": 2006,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 83.7,
+          "temp_c": 20.34
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 258.5,
+          "temp_c": 22.39
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 566.0,
+          "temp_c": 22.58
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 253.0,
+          "temp_c": 20.45
+        }
+      ],
+      "production_kbags": 26000
+    },
+    {
+      "year": 2007,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 68.6,
+          "temp_c": 20.03
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 344.2,
+          "temp_c": 21.28
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 805.3,
+          "temp_c": 22.31
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 160.3,
+          "temp_c": 21.37
+        }
+      ],
+      "production_kbags": 37500
+    },
+    {
+      "year": 2008,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 11.7,
+          "temp_c": 20.87
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 231.0,
+          "temp_c": 22.96
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 617.3,
+          "temp_c": 22.29
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 365.9,
+          "temp_c": 20.48
+        }
+      ],
+      "production_kbags": 32000
+    },
+    {
+      "year": 2009,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 91.2,
+          "temp_c": 20.19
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 259.0,
+          "temp_c": 22.21
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 791.0,
+          "temp_c": 22.33
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 277.8,
+          "temp_c": 20.99
+        }
+      ],
+      "production_kbags": 41800
+    },
+    {
+      "year": 2010,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 137.7,
+          "temp_c": 20.62
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 334.0,
+          "temp_c": 22.64
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 647.6,
+          "temp_c": 23.23
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 260.0,
+          "temp_c": 20.86
+        }
+      ],
+      "production_kbags": 32700
+    },
+    {
+      "year": 2011,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 45.9,
+          "temp_c": 20.54
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 362.3,
+          "temp_c": 21.72
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 580.1,
+          "temp_c": 23.24
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 350.1,
+          "temp_c": 20.5
+        }
+      ],
+      "production_kbags": 39400
+    },
+    {
+      "year": 2012,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 12.4,
+          "temp_c": 20.99
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 311.7,
+          "temp_c": 20.93
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 654.9,
+          "temp_c": 22.03
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 219.1,
+          "temp_c": 20.72
+        }
+      ],
+      "production_kbags": 32800
+    },
+    {
+      "year": 2013,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 41.8,
+          "temp_c": 20.23
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 243.4,
+          "temp_c": 22.75
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 717.4,
+          "temp_c": 23.11
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 324.7,
+          "temp_c": 20.52
+        }
+      ],
+      "production_kbags": 43400
+    },
+    {
+      "year": 2014,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 62.8,
+          "temp_c": 20.01
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 276.8,
+          "temp_c": 21.45
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 407.0,
+          "temp_c": 23.36
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 206.9,
+          "temp_c": 20.97
+        }
+      ],
+      "production_kbags": 38000
+    },
+    {
+      "year": 2015,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 28.1,
+          "temp_c": 20.89
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 250.4,
+          "temp_c": 22.81
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 432.0,
+          "temp_c": 23.4
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 348.3,
+          "temp_c": 20.8
+        }
+      ],
+      "production_kbags": 35200
+    },
+    {
+      "year": 2016,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 111.3,
+          "temp_c": 21.19
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 239.2,
+          "temp_c": 24.34
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 726.9,
+          "temp_c": 23.39
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 204.4,
+          "temp_c": 21.89
+        }
+      ],
+      "production_kbags": 36400
+    },
+    {
+      "year": 2017,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 51.9,
+          "temp_c": 21.09
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 364.5,
+          "temp_c": 22.08
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 396.5,
+          "temp_c": 23.22
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 176.3,
+          "temp_c": 21.4
+        }
+      ],
+      "production_kbags": 43700
+    },
+    {
+      "year": 2018,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 40.6,
+          "temp_c": 20.55
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 272.3,
+          "temp_c": 22.49
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 478.7,
+          "temp_c": 22.59
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 154.9,
+          "temp_c": 21.26
+        }
+      ],
+      "production_kbags": 32500
+    },
+    {
+      "year": 2019,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 94.2,
+          "temp_c": 20.24
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 369.4,
+          "temp_c": 22.0
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 389.2,
+          "temp_c": 23.42
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 293.9,
+          "temp_c": 21.65
+        }
+      ],
+      "production_kbags": 47500
+    },
+    {
+      "year": 2020,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 61.2,
+          "temp_c": 21.17
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 244.4,
+          "temp_c": 23.21
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 719.8,
+          "temp_c": 22.86
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 171.9,
+          "temp_c": 20.34
+        }
+      ],
+      "production_kbags": 37900
+    },
+    {
+      "year": 2021,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 38.4,
+          "temp_c": 21.21
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 234.0,
+          "temp_c": 22.95
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 587.3,
+          "temp_c": 22.81
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 128.3,
+          "temp_c": 20.93
+        }
+      ],
+      "production_kbags": 48700
+    },
+    {
+      "year": 2022,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 14.8,
+          "temp_c": 21.91
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 383.1,
+          "temp_c": 21.74
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 786.4,
+          "temp_c": 22.13
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 131.1,
+          "temp_c": 21.03
+        }
+      ],
+      "production_kbags": 31300
+    },
+    {
+      "year": 2023,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 118.0,
+          "temp_c": 20.02
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 264.4,
+          "temp_c": 21.63
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 766.2,
+          "temp_c": 21.99
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 211.7,
+          "temp_c": 20.66
+        }
+      ],
+      "production_kbags": 38400
+    },
+    {
+      "year": 2024,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 61.9,
+          "temp_c": 22.03
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 242.8,
+          "temp_c": 24.17
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 496.7,
+          "temp_c": 23.62
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 202.7,
+          "temp_c": 22.11
+        }
+      ],
+      "production_kbags": 44800
+    },
+    {
+      "year": 2025,
+      "stages": [
+        {
+          "name": "pre_flowering",
+          "rain_mm": 21.6,
+          "temp_c": 21.77
+        },
+        {
+          "name": "flowering",
+          "rain_mm": 325.3,
+          "temp_c": 22.78
+        },
+        {
+          "name": "fruit_fill",
+          "rain_mm": 555.7,
+          "temp_c": 23.21
+        },
+        {
+          "name": "maturation",
+          "rain_mm": 208.9,
+          "temp_c": 21.51
+        }
+      ],
+      "production_kbags": 39800
+    }
+  ],
+  "production_seed_note": "BRAZIL_ARABICA_PRODUCTION is an APPROXIMATE seed from USDA PSD historical figures (rounded). Replace with real CONAB safra data for production accuracy."
+}
