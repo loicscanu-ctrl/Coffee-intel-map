@@ -48,6 +48,11 @@ interface Province {
   daily_accum_min_10y?: (number | null)[];
   daily_accum_avg_10y?: (number | null)[];
   daily_accum_max_10y?: (number | null)[];
+  // 11Y window of per-year monthly rain totals — {"2015": [Jan..Dec], ...}.
+  // Lets the Cumulative YTD chart build per-year cumulative curves and
+  // take min/max across years for a real envelope (sum of per-month minima
+  // didn't correspond to any actually-observed year).
+  monthly_totals_history?: Record<string, (number | null)[]>;
   essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
   essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
   spi_1?: number;                         // Standardised Precipitation Index, 1-mo
@@ -858,7 +863,61 @@ export default function WeatherCharts({
 
   const cumulativeData = useMemo<CumRainRow[]>(() => {
     if (!data || !totalProd) return [];
-    let cumAvg = 0, cumMin = 0, cumMax = 0, cumLY = 0, cumC = 0;
+    // 10Y window for the band — same anchor as the rest of the climatology.
+    // cropStartYear is the START year of the displayed window; the band
+    // years are the 10 windows ending at cropStartYear-1.
+    const bandWindows = Array.from({ length: 10 }, (_, k) => cropFrame.cropStartYear - 10 + k);
+
+    // Per-band-year per-province cumulative through each dispIdx, summed
+    // across active provinces with production weighting. yearCum[k][dispIdx]
+    // = prod-weighted cumulative-through-slot for window starting in
+    // bandWindows[k]. Null when any province lacks data for any slot in the
+    // window (so a partial year doesn't poison the envelope).
+    const haveHistory = activeProv.every((p) => p.monthly_totals_history && Object.keys(p.monthly_totals_history).length > 0);
+    const yearCum: (number | null)[][] = bandWindows.map((startYr) => {
+      const slots: (number | null)[] = [];
+      let runningSum = 0;
+      let broken = false;
+      for (let dispIdx = 0; dispIdx < 12; dispIdx++) {
+        if (broken) { slots.push(null); continue; }
+        const i = (dispIdx + startMonthIdx) % 12;
+        // The slot's calendar year inside this band window: startYr for
+        // months at-or-after startMonthIdx, startYr+1 for the wrapped Jan-…
+        // part of a crop-year display.
+        const calYear = startMonthIdx === 0
+          ? startYr
+          : (dispIdx < 12 - startMonthIdx ? startYr : startYr + 1);
+        const yearKey = String(calYear);
+        let weighted = 0;
+        let valid = true;
+        for (const p of activeProv) {
+          const v = p.monthly_totals_history?.[yearKey]?.[i];
+          if (v == null) { valid = false; break; }
+          weighted += v * p.prod_mt_k;
+        }
+        if (!valid) { broken = true; slots.push(null); continue; }
+        runningSum += weighted / totalProd;
+        slots.push(runningSum);
+      }
+      return slots;
+    });
+
+    // Fallback envelope: cumulate the per-month min/max naively (the OLD
+    // behaviour). Used only when monthly_totals_history isn't shipped yet
+    // (pre-refresh state); the chart degrades to the previous wrong-but-
+    // visible band rather than going blank.
+    const fallbackCumMin: number[] = [];
+    const fallbackCumMax: number[] = [];
+    let fbMin = 0, fbMax = 0;
+    for (let dispIdx = 0; dispIdx < 12; dispIdx++) {
+      const i = (dispIdx + startMonthIdx) % 12;
+      fbMin += wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd;
+      fbMax += wsum(activeProv, (p) => p.monthly_max_rain[i]) / totalProd;
+      fallbackCumMin.push(fbMin);
+      fallbackCumMax.push(fbMax);
+    }
+
+    let cumAvg = 0, cumLY = 0, cumC = 0;
     let lyHasNull = false;   // Once the LY line hits a null slot (no data for that
                              // year), drop it for the rest of the span — a flat
                              // 0-stretch followed by a jump would mis-suggest a dry spell.
@@ -867,9 +926,25 @@ export default function WeatherCharts({
       const slotYear = _slotYear(dispIdx);
       const prevYear = slotYear - 1;
       const month = MONTHS[i];
+      // cumAvg cumulates the monthly averages. By linearity of expectation,
+      //   avg(sum_k year_k_through_slot) = sum_k avg(year_k_monthly)
+      // so this matches the "average of yearly cumulative curves" without
+      // needing per-year data. Min and max don't have that property.
       cumAvg += wsum(activeProv, (p) => p.monthly_avg_rain[i]) / totalProd;
-      cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd;
-      cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i]) / totalProd;
+      // Min/max envelope: across all 10 band windows, pick the smallest /
+      // largest cumulative through this dispIdx.
+      let envMin: number | null = null;
+      let envMax: number | null = null;
+      if (haveHistory) {
+        for (const slots of yearCum) {
+          const v = slots[dispIdx];
+          if (v == null) continue;
+          envMin = envMin == null ? v : Math.min(envMin, v);
+          envMax = envMax == null ? v : Math.max(envMax, v);
+        }
+      }
+      if (envMin == null) envMin = fallbackCumMin[dispIdx];
+      if (envMax == null) envMax = fallbackCumMax[dispIdx];
       // Crop-year-aware: each slot pulls from the calendar-year array that
       // actually contains its date. Without this, Brazil's Dec → Jan slot
       // accumulated Jan 2025 onto Dec 2025 instead of Jan 2026 (the user's
@@ -889,8 +964,8 @@ export default function WeatherCharts({
       return {
         month,
         cumAvg:      Math.round(cumAvg),
-        cumMin:      Math.round(cumMin),
-        cumMax:      Math.round(cumMax),
+        cumMin:      Math.round(envMin),
+        cumMax:      Math.round(envMax),
         cumLastYear: hasLY ? Math.round(cumLY) : null,
         cumCur:      hasActual ? Math.round(cumC) : null,
         cumProj:     null,

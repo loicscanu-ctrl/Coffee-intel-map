@@ -12,7 +12,6 @@ ice_arabica_groups for the by_group rollups the certified-stocks panel needs.
 """
 from __future__ import annotations
 
-import io
 import re
 from datetime import datetime
 

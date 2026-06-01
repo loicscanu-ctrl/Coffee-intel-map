@@ -153,8 +153,12 @@ def _parse_warrant_table(tbl) -> dict:
             continue
         if not first:
             continue
-        # Tolerate short rows.
-        get = lambda i: (r[i] if i < len(r) else None) or ""
+        # Tolerate short rows. Bind `r` explicitly so ruff's B023 is happy
+        # (loop variable would otherwise be captured by reference and reflect
+        # whatever the last iteration's `r` is).
+        def _get(i: int, _r=r):
+            return (_r[i] if i < len(_r) else None) or ""
+        get = _get
         try:
             lots = int(get(6).strip() or 0)
         except (ValueError, AttributeError):

@@ -6,7 +6,6 @@ import pytest
 # Path setup matches the other backend tests (conftest.py adds backend/ to sys.path).
 from telegram.handlers import cot
 
-
 # Minimal cot_recent.json shape — two adjacent weeks so the handler picks
 # `latest` + `prev` and renders the per-market header block. Numbers are
 # arbitrary; the test asserts on the signals block, not these numbers.

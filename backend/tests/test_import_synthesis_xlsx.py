@@ -6,9 +6,9 @@ the arabica grand total by ~2x in v3 of the certified-stocks panel).
 """
 from __future__ import annotations
 
+import sys
 from importlib import import_module
 from pathlib import Path
-import sys
 
 # The importer lives in backend/scripts/ which isn't on the package path.
 _THIS = Path(__file__).resolve()

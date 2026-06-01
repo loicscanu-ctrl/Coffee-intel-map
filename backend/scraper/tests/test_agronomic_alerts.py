@@ -1,11 +1,8 @@
 """Pure-rule tests for the IPHM agronomic alert engine."""
 from __future__ import annotations
 
-import pytest
-
 from scraper import agronomic_alerts as ae
 from scraper.rules.iphm_thresholds import IPHM_RULES
-
 
 # ── Rule lookup helpers (so tests don't drift when the rule order changes) ───
 

@@ -220,7 +220,7 @@ def build() -> dict[str, Any]:
             origins_out[origin] = per_region
 
     return {
-        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
         "ruleset_version": "iphm-v1",
         "origins": origins_out,
         "summary": {
@@ -284,7 +284,7 @@ def merge_into_signals_json(payload: dict[str, Any], write: bool) -> int:
               if s.get("category") != SIGNALS_CATEGORY]
     fresh = flatten_for_signals(payload)
     existing["signals"] = others + fresh
-    existing["generatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat(
+    existing["generatedAt"] = dt.datetime.now(dt.UTC).isoformat(
         timespec="milliseconds").replace("+00:00", "Z")
     if write:
         SIGNALS_PATH.write_text(
@@ -320,7 +320,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  → wrote {ALERTS_PATH.name}")
         print(f"  → merged {n_merged} rows into {SIGNALS_PATH.name}")
     else:
-        print(f"(preview only — re-run with --write to persist)")
+        print("(preview only — re-run with --write to persist)")
     return 0
 
 
