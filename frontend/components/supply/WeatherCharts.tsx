@@ -146,18 +146,12 @@ function DailyAccumChart({
   selectedYear: number;
   selectedMonthIdx: number;
 }) {
-  const parts = updated.split("-");
-  const dataYear  = parts.length >= 1 ? parseInt(parts[0]) : new Date().getFullYear();
-  const dataMonth = parts.length >= 2 ? parseInt(parts[1]) - 1 : 0; // 0-indexed
-
   const monthLabel = MONTHS[selectedMonthIdx] + " " + selectedYear;
-  const isCurrentPeriod = selectedYear === dataYear && selectedMonthIdx === dataMonth;
+  void updated;  // kept in the props for future use (e.g. stamping data-source recency).
 
-  // Extend the current-year accumulation into the future with the 7-day
-  // forecast (same reference station), drawn dotted to flag it as projected.
-  // Forecast rain is cumulated onto the last actual accum value when available;
-  // otherwise the line draws from day 0 (handy on day 1 of a new month before
-  // the live fetch has landed any actuals).
+  // Build the chart series for the *selected* month. Forecast accumulates from
+  // the last actual point when one exists in this month, else from day 0 so
+  // the line still renders during the day-1-of-new-month window.
   const chartData = useMemo(() => {
     type Row = Partial<DailyRow> & { day: number; forecast_accum_mm?: number | null };
     const rows: Row[] = daily.map((d) => ({ ...d }));
@@ -165,21 +159,18 @@ function DailyAccumChart({
     const lastActual = [...daily].reverse().find((d) => d.accum_mm != null);
     const anchorDay = lastActual?.day ?? 0;
     const anchorAccum = lastActual?.accum_mm ?? 0;
-    // Anchor the dotted line on the last actual point so the two lines join.
-    // With no actuals, leave day 0 implicit and let the forecast line start
-    // at the first matching day.
     if (lastActual) byDay.get(anchorDay)!.forecast_accum_mm = anchorAccum;
     let acc = anchorAccum;
     for (const f of forecast) {
       const [y, m, d] = f.date.split("-").map(Number);
-      if (y !== dataYear || m - 1 !== dataMonth || d <= anchorDay) continue;
+      if (y !== selectedYear || m - 1 !== selectedMonthIdx || d <= anchorDay) continue;
       acc += f.rain_mm;
       const existing = byDay.get(d);
       if (existing) existing.forecast_accum_mm = r1(acc);
       else byDay.set(d, { day: d, forecast_accum_mm: r1(acc) });
     }
     return Array.from(byDay.values()).sort((a, b) => a.day - b.day);
-  }, [daily, forecast, dataYear, dataMonth]);
+  }, [daily, forecast, selectedYear, selectedMonthIdx]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
@@ -187,36 +178,30 @@ function DailyAccumChart({
         Daily Accumulated Rainfall — {monthLabel} (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">{sourceLabel} · Band = 10yr min/max · Dotted = 7-day forecast</div>
-      {isCurrentPeriod ? (
-        <ResponsiveContainer width="100%" height={155}>
-          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
-              tickFormatter={(v) => `${v}`} interval={4} />
-            <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={TT} labelFormatter={(v) => `Day ${v}`}
-              formatter={(v: unknown) => [`${Number(v).toFixed(1)} mm`]} />
-            <Legend wrapperStyle={{ fontSize: 9 }} />
-            <Area type="monotone" dataKey="max_accum_mm" name="10yr max" fill="#1e3a5f"
-              stroke="none" opacity={0.5} legendType="none" />
-            <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
-              stroke="none" opacity={1} legendType="none" />
-            <Line type="monotone" dataKey="avg_accum_mm" name="30yr avg"
-              stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
-            <Line type="monotone" dataKey="last_year_accum_mm" name={`${lastYear}`}
-              stroke="#93c5fd" strokeWidth={1.5} dot={false} />
-            <Line type="monotone" dataKey="accum_mm" name={`${curYear}`}
-              stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
-            <Line type="monotone" dataKey="forecast_accum_mm" name={`${curYear} forecast`}
-              stroke="#38bdf8" strokeWidth={2} strokeDasharray="2 3" dot={false}
-              activeDot={{ r: 3 }} connectNulls opacity={0.85} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      ) : (
-        <div className="h-[155px] flex items-center justify-center text-[9px] text-slate-600 italic">
-          Daily station data only stored for current month ({MONTHS[dataMonth]} {dataYear})
-        </div>
-      )}
+      <ResponsiveContainer width="100%" height={155}>
+        <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+          <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
+            tickFormatter={(v) => `${v}`} interval={4} />
+          <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} />
+          <Tooltip contentStyle={TT} labelFormatter={(v) => `Day ${v}`}
+            formatter={(v: unknown) => [`${Number(v).toFixed(1)} mm`]} />
+          <Legend wrapperStyle={{ fontSize: 9 }} />
+          <Area type="monotone" dataKey="max_accum_mm" name="10yr max" fill="#1e3a5f"
+            stroke="none" opacity={0.5} legendType="none" />
+          <Area type="monotone" dataKey="min_accum_mm" name="10yr min" fill="#0f172a"
+            stroke="none" opacity={1} legendType="none" />
+          <Line type="monotone" dataKey="avg_accum_mm" name="30yr avg"
+            stroke="#475569" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+          <Line type="monotone" dataKey="last_year_accum_mm" name={`${lastYear}`}
+            stroke="#93c5fd" strokeWidth={1.5} dot={false} />
+          <Line type="monotone" dataKey="accum_mm" name={`${curYear}`}
+            stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
+          <Line type="monotone" dataKey="forecast_accum_mm" name={`${curYear} forecast`}
+            stroke="#38bdf8" strokeWidth={2} strokeDasharray="2 3" dot={false}
+            activeDot={{ r: 3 }} connectNulls opacity={0.85} />
+        </ComposedChart>
+      </ResponsiveContainer>
     </div>
   );
 }
@@ -228,7 +213,7 @@ interface MonthlyRainRow {
   avgRain: number;
   minRain: number;
   maxRain: number;
-  lastYearRain: number;
+  lastYearRain: number | null;
   actualCur: number | null;
   proj: number;      // current (partial) month: projected remainder to month-end; 0 otherwise
   dryWarn: number;   // drought-risk threshold (≤P20 of last 30yr); 0 = no data
@@ -346,7 +331,7 @@ interface TempRow {
   avgTemp: number;
   minTemp: number;
   maxTemp: number;
-  lastYearTemp: number;
+  lastYearTemp: number | null;
   actualCur: number | null;
 }
 
@@ -386,7 +371,7 @@ function MeanTempChart({
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
           {/* last year (or previous crop year for crop-aligned charts) */}
           <Line type="monotone" dataKey="lastYearTemp" name={lyLabel}
-            stroke="#93c5fd" strokeWidth={1.5} dot={false} />
+            stroke="#93c5fd" strokeWidth={1.5} dot={false} connectNulls={false} />
           {/* current year (or current crop year for crop-aligned charts) */}
           {lastActualMonth && <ReferenceLine x={lastActualMonth} stroke="#334155" strokeDasharray="2 2" />}
           <Line type="monotone" dataKey="actualCur" name={curLabel}
@@ -811,7 +796,7 @@ export default function WeatherCharts({
         maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
         lastYearRain: lyVals.every((v) => v != null)
           ? r1(activeProv.reduce((acc, p, k) => acc + (lyVals[k] as number) * p.prod_mt_k, 0) / totalProd)
-          : 0,
+          : null,
         actualCur: curVals.every((v) => v != null)
           ? r1(activeProv.reduce((acc, p, k) => acc + (curVals[k] as number) * p.prod_mt_k, 0) / totalProd)
           : null,
@@ -949,7 +934,7 @@ export default function WeatherCharts({
         maxTemp: r1(wsum(activeProv, (p) => p.monthly_max_temp[i]) / totalProd),
         lastYearTemp: lyVals.every((v) => v != null)
           ? r1(activeProv.reduce((acc, p, k) => acc + (lyVals[k] as number) * p.prod_mt_k, 0) / totalProd)
-          : 0,
+          : null,
         actualCur: curVals.every((v) => v != null)
           ? r1(activeProv.reduce((acc, p, k) => acc + (curVals[k] as number) * p.prod_mt_k, 0) / totalProd)
           : null,
@@ -973,31 +958,46 @@ export default function WeatherCharts({
     }));
   }, [data, activeProv, totalProd]);
 
-  // Prod-weighted daily accumulation across selected regions. Always emits a
-  // full month's worth of rows even when no current-year data has landed yet
-  // (e.g. day 1 of a new month, before the live fetch has caught up). The
-  // climatology bands + last-year curve + 7-day forecast all stay visible —
-  // only the actual blue line goes null until daily_accum_cur fills in.
+  // Prod-weighted daily accumulation across selected regions for the *selected*
+  // month (not the data's stored month). Always emits a full month's rows so
+  // the climatology band + 30yr avg + last-year curve + 7-day forecast stay
+  // visible even when no current-year actuals exist yet for that month.
+  //
+  // Per-day daily_accum_cur / daily_accum_ly arrays in the JSON are only
+  // populated for the data's stored month. When the user is looking at a
+  // different month (e.g. today is May 31 with updated="2026-05-31" but the
+  // user picks Jun 2026), accum_mm goes null and last_year_accum_mm falls
+  // back to a linear interpolation from monthly_last_year_rain[selectedMonthIdx]
+  // — rougher than the day-by-day real series, but at least shows the right
+  // monthly shape.
   const weightedDaily = useMemo<DailyRow[] | null>(() => {
     if (!data || !totalProd) return null;
-    const [yr, mo] = data.updated.split("-").map(Number);
-    const mIdx = mo - 1;
-    const dim = new Date(yr, mIdx + 1, 0).getDate();
-    const wAvgMonth = wsum(activeProv, (p) => p.monthly_avg_rain[mIdx]) / totalProd;
-    const wMinMonth = wsum(activeProv, (p) => p.monthly_min_rain[mIdx]) / totalProd;
-    const wMaxMonth = wsum(activeProv, (p) => p.monthly_max_rain[mIdx]) / totalProd;
-    const haveCur = activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
-    const haveLY  = activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
+    const tgtYear = selectedYear;
+    const tgtMIdx = selectedMonthIdx;
+    const dim = new Date(tgtYear, tgtMIdx + 1, 0).getDate();
+    const [storedYr, storedMo] = data.updated.split("-").map(Number);
+    const isStored = tgtYear === storedYr && tgtMIdx === storedMo - 1;
+
+    const wAvgMonth      = wsum(activeProv, (p) => p.monthly_avg_rain[tgtMIdx])             / totalProd;
+    const wMinMonth      = wsum(activeProv, (p) => p.monthly_min_rain[tgtMIdx])             / totalProd;
+    const wMaxMonth      = wsum(activeProv, (p) => p.monthly_max_rain[tgtMIdx])             / totalProd;
+    const wLastYearMonth = wsum(activeProv, (p) => p.monthly_last_year_rain?.[tgtMIdx] ?? 0) / totalProd;
+    // Per-day historical/current series only line up when the selected month
+    // matches the data's stored month — otherwise we fall back to monthly
+    // interpolations.
+    const haveCur = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
+    const haveLY  = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
     const rows: DailyRow[] = [];
     for (let d = 1; d <= dim; d++) {
       const i = d - 1;
-      const allCur = haveCur && activeProv.every((p) => p.daily_accum_cur![i] != null);
       const avg_accum = r1(wAvgMonth * (d / dim));
-      // Use the real monthly min/max envelope spread proportionally to the day,
-      // rather than the heuristic ±40% of avg the backend script falls back to.
       const min_accum = r1(wMinMonth * (d / dim));
       const max_accum = r1(wMaxMonth * (d / dim));
+      const allCur = haveCur && activeProv.every((p) => p.daily_accum_cur![i] != null);
       const lyOk = haveLY && activeProv.every((p) => p.daily_accum_ly![i] != null);
+      const last_year_accum_mm = lyOk
+        ? r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd)
+        : r1(wLastYearMonth * (d / dim));
       rows.push({
         day: d,
         rain_mm: 0,
@@ -1005,12 +1005,12 @@ export default function WeatherCharts({
         avg_accum_mm: avg_accum,
         min_accum_mm: min_accum,
         max_accum_mm: max_accum,
-        last_year_accum_mm: lyOk ? r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd) : r1(avg_accum * 1.08),
+        last_year_accum_mm,
         temp_c: 0,
       });
     }
     return rows;
-  }, [data, activeProv, totalProd]);
+  }, [data, activeProv, totalProd, selectedYear, selectedMonthIdx]);
 
   const weightedForecast = useMemo<ForecastRow[]>(() => {
     if (!data || !totalProd) return [];
