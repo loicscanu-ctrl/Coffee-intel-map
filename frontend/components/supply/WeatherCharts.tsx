@@ -48,6 +48,14 @@ interface Province {
   daily_accum_min_10y?: (number | null)[];
   daily_accum_avg_10y?: (number | null)[];
   daily_accum_max_10y?: (number | null)[];
+  // Last 36 months of per-day rain — {'YYYY-MM': [day1, day2, ..., dim]}.
+  // Lets the chart compute cur + LY cumulative curves for ANY selected
+  // month within the last 24-25 months, not just the current one.
+  daily_rain_history?: Record<string, (number | null)[]>;
+  // Per-month 10Y daily-accum envelope — {'1': {min, avg, max}, '2': {...}, ...}.
+  // Same shape as daily_accum_{min,avg,max}_10y but precomputed for every
+  // calendar month so non-current selections keep a real-history band.
+  daily_envelope_by_month?: Record<string, { min: (number | null)[]; avg: (number | null)[]; max: (number | null)[] }>;
   // 11Y window of per-year monthly rain totals — {"2015": [Jan..Dec], ...}.
   // Lets the Cumulative YTD chart build per-year cumulative curves and
   // take min/max across years for a real envelope (sum of per-month minima
@@ -1068,6 +1076,9 @@ export default function WeatherCharts({
     const tgtYear = selectedYear;
     const tgtMIdx = selectedMonthIdx;
     const dim = new Date(tgtYear, tgtMIdx + 1, 0).getDate();
+    const tgtKey   = `${tgtYear}-${String(tgtMIdx + 1).padStart(2, "0")}`;
+    const lyKey    = `${tgtYear - 1}-${String(tgtMIdx + 1).padStart(2, "0")}`;
+    const monthKey = String(tgtMIdx + 1);
     const [storedYr, storedMo] = data.updated.split("-").map(Number);
     const isStored = tgtYear === storedYr && tgtMIdx === storedMo - 1;
 
@@ -1075,43 +1086,118 @@ export default function WeatherCharts({
     const wMinMonth      = wsum(activeProv, (p) => p.monthly_min_rain[tgtMIdx])             / totalProd;
     const wMaxMonth      = wsum(activeProv, (p) => p.monthly_max_rain[tgtMIdx])             / totalProd;
     const wLastYearMonth = wsum(activeProv, (p) => p.monthly_last_year_rain?.[tgtMIdx] ?? 0) / totalProd;
-    // Per-day historical/current series only line up when the selected month
-    // matches the data's stored month — otherwise we fall back to monthly
-    // interpolations.
-    const haveCur = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
-    const haveLY  = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
-    // 10Y envelope: prefer the real per-day percentile arrays when the file
-    // ships them (and we're in the stored window). Linear interpolation of
-    // monthly_min/avg/max stays as a fallback so charts don't go blank pre-refresh.
-    const haveEnvelope = isStored
+
+    // Cur / LY routing — prefer the 36-month daily_rain_history (works for
+    // ANY selected month), then fall back to daily_accum_cur/ly (current
+    // month only — kept for backward compat), then linear interpolation
+    // from monthly totals (pre-refresh state).
+    const haveCurHist = activeProv.every((p) => p.daily_rain_history?.[tgtKey]?.length === dim);
+    const haveLyHist  = activeProv.every((p) => p.daily_rain_history?.[lyKey]?.length === dim);
+    const haveCurOld  = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
+    const haveLyOld   = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
+
+    // Per-province cumulative curves for the selected month built from the
+    // 36-month daily rain history. Null when any province's day is null,
+    // so a single missing reading doesn't pin the line at zero.
+    const curHistAccum: (number | null)[][] = haveCurHist
+      ? activeProv.map((p) => {
+          const days = p.daily_rain_history![tgtKey];
+          const out: (number | null)[] = [];
+          let acc = 0;
+          for (const r of days) {
+            if (r == null) { out.push(null); continue; }
+            acc += r;
+            out.push(acc);
+          }
+          return out;
+        })
+      : [];
+    const lyHistAccum: (number | null)[][] = haveLyHist
+      ? activeProv.map((p) => {
+          const days = p.daily_rain_history![lyKey];
+          const out: (number | null)[] = [];
+          let acc = 0;
+          for (const r of days) {
+            if (r == null) { out.push(null); continue; }
+            acc += r;
+            out.push(acc);
+          }
+          return out;
+        })
+      : [];
+
+    // 10Y envelope — prefer the per-month precomputed envelopes (work for
+    // any selected month), then the legacy daily_accum_*_10y (current
+    // month only), then linear interpolation from monthly totals.
+    const haveEnvByMonth = activeProv.every((p) => {
+      const e = p.daily_envelope_by_month?.[monthKey];
+      return e && Array.isArray(e.min) && Array.isArray(e.avg) && Array.isArray(e.max)
+          && e.min.length >= dim && e.avg.length >= dim && e.max.length >= dim;
+    });
+    const haveEnvOld = isStored
       && activeProv.every((p) => Array.isArray(p.daily_accum_min_10y) && p.daily_accum_min_10y!.length === dim)
-      && activeProv.every((p) => Array.isArray(p.daily_accum_max_10y) && p.daily_accum_max_10y!.length === dim);
-    const haveAvg = isStored
+      && activeProv.every((p) => Array.isArray(p.daily_accum_max_10y) && p.daily_accum_max_10y!.length === dim)
       && activeProv.every((p) => Array.isArray(p.daily_accum_avg_10y) && p.daily_accum_avg_10y!.length === dim);
+
     const rows: DailyRow[] = [];
     for (let d = 1; d <= dim; d++) {
       const i = d - 1;
-      const minEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_min_10y![i] != null);
-      const maxEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_max_10y![i] != null);
-      const avgEnvOk = haveAvg && activeProv.every((p) => p.daily_accum_avg_10y![i] != null);
-      const avg_accum = avgEnvOk
-        ? r1(wsum(activeProv, (p) => p.daily_accum_avg_10y![i] as number) / totalProd)
-        : r1(wAvgMonth * (d / dim));
-      const min_accum = minEnvOk
-        ? r1(wsum(activeProv, (p) => p.daily_accum_min_10y![i] as number) / totalProd)
-        : r1(wMinMonth * (d / dim));
-      const max_accum = maxEnvOk
-        ? r1(wsum(activeProv, (p) => p.daily_accum_max_10y![i] as number) / totalProd)
-        : r1(wMaxMonth * (d / dim));
-      const allCur = haveCur && activeProv.every((p) => p.daily_accum_cur![i] != null);
-      const lyOk = haveLY && activeProv.every((p) => p.daily_accum_ly![i] != null);
-      const last_year_accum_mm = lyOk
-        ? r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd)
-        : r1(wLastYearMonth * (d / dim));
+
+      // Envelope — band + 10yr avg line.
+      let min_accum: number;
+      let max_accum: number;
+      let avg_accum: number;
+      if (haveEnvByMonth) {
+        const minOk = activeProv.every((p) => p.daily_envelope_by_month![monthKey].min[i] != null);
+        const avgOk = activeProv.every((p) => p.daily_envelope_by_month![monthKey].avg[i] != null);
+        const maxOk = activeProv.every((p) => p.daily_envelope_by_month![monthKey].max[i] != null);
+        min_accum = minOk
+          ? r1(wsum(activeProv, (p) => p.daily_envelope_by_month![monthKey].min[i] as number) / totalProd)
+          : r1(wMinMonth * (d / dim));
+        avg_accum = avgOk
+          ? r1(wsum(activeProv, (p) => p.daily_envelope_by_month![monthKey].avg[i] as number) / totalProd)
+          : r1(wAvgMonth * (d / dim));
+        max_accum = maxOk
+          ? r1(wsum(activeProv, (p) => p.daily_envelope_by_month![monthKey].max[i] as number) / totalProd)
+          : r1(wMaxMonth * (d / dim));
+      } else if (haveEnvOld) {
+        const minOk = activeProv.every((p) => p.daily_accum_min_10y![i] != null);
+        const avgOk = activeProv.every((p) => p.daily_accum_avg_10y![i] != null);
+        const maxOk = activeProv.every((p) => p.daily_accum_max_10y![i] != null);
+        min_accum = minOk ? r1(wsum(activeProv, (p) => p.daily_accum_min_10y![i] as number) / totalProd) : r1(wMinMonth * (d / dim));
+        avg_accum = avgOk ? r1(wsum(activeProv, (p) => p.daily_accum_avg_10y![i] as number) / totalProd) : r1(wAvgMonth * (d / dim));
+        max_accum = maxOk ? r1(wsum(activeProv, (p) => p.daily_accum_max_10y![i] as number) / totalProd) : r1(wMaxMonth * (d / dim));
+      } else {
+        min_accum = r1(wMinMonth * (d / dim));
+        avg_accum = r1(wAvgMonth * (d / dim));
+        max_accum = r1(wMaxMonth * (d / dim));
+      }
+
+      // Cur line — real selected-month actuals from daily_rain_history when
+      // available, then legacy daily_accum_cur, else null (forecast still
+      // renders independently).
+      let accum_mm: number | null = null;
+      if (haveCurHist && curHistAccum.every((c) => c[i] != null)) {
+        accum_mm = r1(curHistAccum.reduce((s, c, k) => s + (c[i] as number) * activeProv[k].prod_mt_k, 0) / totalProd);
+      } else if (haveCurOld && activeProv.every((p) => p.daily_accum_cur![i] != null)) {
+        accum_mm = r1(wsum(activeProv, (p) => p.daily_accum_cur![i] as number) / totalProd);
+      }
+
+      // LY line — real (selected_month, year - 1) actuals when available,
+      // then legacy daily_accum_ly, else linear interpolation.
+      let last_year_accum_mm: number;
+      if (haveLyHist && lyHistAccum.every((c) => c[i] != null)) {
+        last_year_accum_mm = r1(lyHistAccum.reduce((s, c, k) => s + (c[i] as number) * activeProv[k].prod_mt_k, 0) / totalProd);
+      } else if (haveLyOld && activeProv.every((p) => p.daily_accum_ly![i] != null)) {
+        last_year_accum_mm = r1(wsum(activeProv, (p) => p.daily_accum_ly![i] as number) / totalProd);
+      } else {
+        last_year_accum_mm = r1(wLastYearMonth * (d / dim));
+      }
+
       rows.push({
         day: d,
         rain_mm: 0,
-        accum_mm: allCur ? r1(wsum(activeProv, (p) => p.daily_accum_cur![i] as number) / totalProd) : null,
+        accum_mm,
         avg_accum_mm: avg_accum,
         min_accum_mm: min_accum,
         max_accum_mm: max_accum,

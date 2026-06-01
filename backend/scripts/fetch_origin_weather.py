@@ -601,6 +601,55 @@ def _daily_accum_envelope(reg_hist: dict, month: int, dim: int,
     return mins, avgs, maxs
 
 
+def _daily_rain_history(reg_hist: dict, anchor: dt.date, n_months: int = 36,
+                         ) -> dict[str, list[float | None]]:
+    """{'YYYY-MM': [day1_rain, day2_rain, ..., dim_rain]} for the n_months
+    months ending at `anchor.month`. Used by the chart to render the Daily
+    Accumulated Rainfall panel for ANY selected month (not just the current
+    one), and to derive the LY line for any selected month by looking up
+    its (year-1, month) entry. 36 months ≈ 3 years means the user can pick
+    any of the last 24 months and still see both cur + LY lines."""
+    out: dict[str, list[float | None]] = {}
+    y, m = anchor.year, anchor.month
+    for _ in range(n_months):
+        dim = calendar.monthrange(y, m)[1]
+        row: list[float | None] = []
+        any_data = False
+        for d in range(1, dim + 1):
+            v = reg_hist.get(f"{y}-{m:02d}-{d:02d}")
+            rain = v.get("rain") if v else None
+            if rain is not None:
+                any_data = True
+            row.append(r1(rain) if rain is not None else None)
+        if any_data:
+            out[f"{y}-{m:02d}"] = row
+        # Step backwards one calendar month.
+        m -= 1
+        if m == 0:
+            m = 12
+            y -= 1
+    return out
+
+
+def _envelope_by_month(reg_hist: dict, year_start: int, year_end: int,
+                       ) -> dict[str, dict[str, list[float | None]]]:
+    """Pre-computes the 10Y daily-accum envelope for every month so the chart
+    can show a realistic band on ANY selected month (not just the current
+    one). {'1': {min, avg, max}, '2': {...}, ...} — each list has the day
+    count for that month. Inner arrays mirror the shape of
+    daily_accum_min_10y / _avg_10y / _max_10y."""
+    out: dict[str, dict[str, list[float | None]]] = {}
+    # Use a leap year for Feb so the 29-day envelope is always available;
+    # the chart selects dim from new Date(year, month+1, 0).getDate() and
+    # truncates Feb to 28 in non-leap years.
+    leap = 2024
+    for m in range(1, 13):
+        dim = calendar.monthrange(leap, m)[1]
+        mins, avgs, maxs = _daily_accum_envelope(reg_hist, m, dim, year_start, year_end)
+        out[str(m)] = {"min": mins, "avg": avgs, "max": maxs}
+    return out
+
+
 def _unmojibake(s: str) -> str:
     """Reverse a past double-encoding round-trip: when accented UTF-8
     was decoded as Latin-1 and re-encoded as UTF-8, the bytes look like
@@ -662,8 +711,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         # Per-province daily accumulation for the current month (+ last year) so
         # the frontend can prod-weight the Daily Accumulated chart across the
         # selected regions, not just the single reference station.
+        # Kept for backward compatibility — the chart prefers daily_rain_history
+        # (lets it render any selected month, not just the current one).
         prov["daily_accum_cur"] = _daily_accum(rh, CUR_YEAR, cur_month, dim_cur)
         prov["daily_accum_ly"]  = _daily_accum(rh, LAST_YEAR, cur_month, dim_cur)
+        # Last 36 months of per-day rain → the chart can build cur + LY
+        # cumulative curves for ANY selected month within the last 24-25
+        # months (selected_month + selected_month - 12). Before this field
+        # existed, picking a past month blanked the cur line because
+        # daily_accum_cur only covered the current month.
+        prov["daily_rain_history"] = _daily_rain_history(rh, TODAY, n_months=36)
         # Per-day 10Y min/avg/max envelope built from the real backfilled history.
         # The chart used to interpolate a linear envelope from monthly_min/max
         # totals (max_day_d = monthly_max * d/dim), which is physically wrong:
@@ -675,6 +732,10 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         prov["daily_accum_min_10y"] = env_min
         prov["daily_accum_avg_10y"] = env_avg
         prov["daily_accum_max_10y"] = env_max
+        # Same 10Y envelope but precomputed for every calendar month, so the
+        # band keeps its real shape when the user selects a non-current month.
+        prov["daily_envelope_by_month"] = _envelope_by_month(  # type: ignore[assignment]
+            rh, ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
         # Refresh the monthly aggregates from the freshly backfilled history.
         # The original seed values came from a one-shot Open-Meteo fetch in
         # build_origin_weather.py; they're stale (ES Jun max was 27mm vs the
