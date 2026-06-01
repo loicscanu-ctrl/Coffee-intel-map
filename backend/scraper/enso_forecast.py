@@ -20,10 +20,8 @@ Public API:
 from __future__ import annotations
 
 import re
-from typing import Any
 
 import requests
-
 
 # Source URLs — pinned constants so the fallback chain is greppable.
 IRI_FORECAST_URL = "https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/"

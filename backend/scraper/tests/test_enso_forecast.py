@@ -7,7 +7,7 @@ mocked HTTP responses. CI proves the live fetches.
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from scraper import enso_forecast
 

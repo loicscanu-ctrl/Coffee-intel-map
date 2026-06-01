@@ -25,7 +25,7 @@ import argparse
 import json
 import sys
 from collections import defaultdict
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import openpyxl
@@ -40,7 +40,9 @@ from scraper.sources.ice_certified_stocks.cohort_outflow import (
     build_port_alltime_dna,
 )
 from scraper.sources.ice_certified_stocks.orchestrate import (
-    _merge_arabica, _merge_robusta, OUT_DIR,
+    OUT_DIR,
+    _merge_arabica,
+    _merge_robusta,
 )
 
 # ── Tunables ──────────────────────────────────────────────────────────────────
@@ -316,7 +318,7 @@ def parse_sheet_2_port_origin_history(sheet) -> dict:
         lambda: defaultdict(lambda: {"tenderable": 0, "class34": 0})
     )
     n = 0
-    for d, r in _bucket_by_date(sheet):
+    for _d, r in _bucket_by_date(sheet):
         port = _str(r[1])
         if not port or _is_aggregate_port(port): continue
         origin = _str(r[4]).strip()
@@ -544,7 +546,7 @@ def write_deep_chunks(market: str, chunks: dict[tuple[int, int], list[dict]]) ->
         certified_stocks_<market>_deep_<startYr>-<endYr>.json
     Existing files are overwritten (deep is regenerated from the workbook
     each import; the live scraper never touches these)."""
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now_iso = datetime.now(UTC).isoformat(timespec="seconds")
     for (s_yr, e_yr), snaps in sorted(chunks.items()):
         path = OUT_DIR / f"certified_stocks_{market}_deep_{s_yr}-{e_yr}.json"
         payload = {
@@ -781,7 +783,7 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
     print(f"    implied outflow: {len(r_implied_outflow)} month transitions.")
     print(f"    current_by_origin: {len(r_current_by_origin)} ports.")
 
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now_iso = datetime.now(UTC).isoformat(timespec="seconds")
     arabica_json = {
         "generated_at":  now_iso,
         "as_of":         a_latest_date.isoformat() if a_latest_date else None,
@@ -863,12 +865,12 @@ def run(xlsx_path: Path, daily_keep_days: int, monthly_keep_months: int, write: 
         print("\n=== building deep history chunks (5-year buckets, light shape) ===")
         a_chunks = build_deep_arabica_chunks(wb["7_ny"])
         r_chunks = build_deep_robusta_chunks(wb["9_ld"])
-        print(f"\n=== writing deep arabica chunks ===")
+        print("\n=== writing deep arabica chunks ===")
         write_deep_chunks("arabica", a_chunks)
-        print(f"=== writing deep robusta chunks ===")
+        print("=== writing deep robusta chunks ===")
         write_deep_chunks("robusta", r_chunks)
 
-    print(f"\nSUMMARY:")
+    print("\nSUMMARY:")
     print(f"  arabica: {len(arabica_json['snapshots'])} snapshots · as_of={arabica_json['as_of']}")
     print(f"  robusta: {len(robusta_json['snapshots'])} snapshots · as_of={robusta_json['as_of']}")
     ra = robusta_json["recent_activity"]

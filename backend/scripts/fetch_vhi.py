@@ -100,7 +100,7 @@ def fetch_origin(origin: str, origin_cfg: dict,
             print(f"  [vhi] {origin}/{region} ERROR: {e}", file=sys.stderr)
 
     return {
-        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
         "country_iso3": iso3,
         "year_window":  [year1, year2],
         "provinces":    provinces_out,

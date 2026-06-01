@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import numpy as np
 from scipy import stats
-
 from spi_calc import _month_index
 
 _CLAMP = 1e-6

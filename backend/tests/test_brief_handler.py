@@ -7,7 +7,6 @@ import pytest
 
 from telegram.handlers import brief
 
-
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
 # "Now" — picking a fixed date so the test isn't time-dependent. May 30 is
