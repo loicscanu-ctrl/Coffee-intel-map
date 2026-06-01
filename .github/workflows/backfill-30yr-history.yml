@@ -44,6 +44,16 @@ on:
         required: false
         default: "2024-12-31"
         type: string
+      regions:
+        description: "Region names to retry, COMMA-separated (blank = all in the selected origins). Use after a partial-failure run, e.g. 'Java,Mt Elgon,Sidama/Yirgacheffe,Jimma,Limu,Kaffa,Harrar,Dak Lak,Lam Dong,Dak Nong'."
+        required: false
+        default: ""
+        type: string
+      throttle_s:
+        description: "Seconds to sleep between region requests (default 3.0 — bump higher after a 429 to clear Open-Meteo's hourly archive rate limit)"
+        required: false
+        default: "3"
+        type: string
       dry_run:
         description: "Preview only (no commit). Default false = apply."
         required: false
@@ -74,15 +84,27 @@ jobs:
       - name: Backfill 30Y history — DRY RUN (preview only)
         if: ${{ inputs.dry_run }}
         env:
-          ORIGINS: ${{ inputs.origins }}
-          START:   ${{ inputs.start }}
-          END:     ${{ inputs.end }}
+          ORIGINS:  ${{ inputs.origins }}
+          REGIONS:  ${{ inputs.regions }}
+          START:    ${{ inputs.start }}
+          END:      ${{ inputs.end }}
+          THROTTLE: ${{ inputs.throttle_s }}
           PYTHONUNBUFFERED: "1"
+        # Region names can contain spaces ("Sul de Minas"), so the input is
+        # comma-separated and IFS-split here into properly quoted argv tokens.
         run: |
           echo "=== DRY RUN — no --write, no commit ==="
-          ARGS="--start $START --end $END"
-          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/backfill_history_gap.py $ARGS
+          set -- --start "$START" --end "$END" --throttle-s "$THROTTLE"
+          if [ -n "$ORIGINS" ]; then
+            # Origins keys never contain spaces, so plain word-split is fine.
+            set -- "$@" --origins $ORIGINS
+          fi
+          if [ -n "$REGIONS" ]; then
+            old_ifs="$IFS"; IFS=','
+            set -- "$@" --regions $REGIONS
+            IFS="$old_ifs"
+          fi
+          python backend/scripts/backfill_history_gap.py "$@"
 
       - name: Overlay main's current history (concurrent commits won't conflict)
         if: ${{ !inputs.dry_run }}
@@ -96,15 +118,24 @@ jobs:
       - name: Backfill 30Y history — APPLY
         if: ${{ !inputs.dry_run }}
         env:
-          ORIGINS: ${{ inputs.origins }}
-          START:   ${{ inputs.start }}
-          END:     ${{ inputs.end }}
+          ORIGINS:  ${{ inputs.origins }}
+          REGIONS:  ${{ inputs.regions }}
+          START:    ${{ inputs.start }}
+          END:      ${{ inputs.end }}
+          THROTTLE: ${{ inputs.throttle_s }}
           PYTHONUNBUFFERED: "1"
         run: |
           echo "=== APPLY — writing backend/seed/weather_history/*.json ==="
-          ARGS="--write --start $START --end $END"
-          [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/backfill_history_gap.py $ARGS
+          set -- --write --start "$START" --end "$END" --throttle-s "$THROTTLE"
+          if [ -n "$ORIGINS" ]; then
+            set -- "$@" --origins $ORIGINS
+          fi
+          if [ -n "$REGIONS" ]; then
+            old_ifs="$IFS"; IFS=','
+            set -- "$@" --regions $REGIONS
+            IFS="$old_ifs"
+          fi
+          python backend/scripts/backfill_history_gap.py "$@"
 
       - name: Commit refreshed history to main
         if: ${{ !inputs.dry_run }}
