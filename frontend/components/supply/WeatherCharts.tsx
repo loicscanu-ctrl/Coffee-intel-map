@@ -232,7 +232,7 @@ interface MonthlyRainRow {
   dryWarn: number;   // drought-risk threshold (≤P20 of last 30yr); 0 = no data
 }
 
-function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[]; curYear: number; lastYear: number }) {
+function MonthlyRainChart({ data, curLabel, lyLabel }: { data: MonthlyRainRow[]; curLabel: string; lyLabel: string }) {
   const hasZone = data.some((d) => d.dryWarn > d.minRain);
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
@@ -240,7 +240,7 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
         Monthly Rainfall (mm)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">
-        Pro-rata prod-weighted · Blue = {curYear} (MTD) · Faded = projected month-end · Light blue = {lastYear} · Band = 10yr min/max
+        Pro-rata prod-weighted · Blue = {curLabel} (MTD) · Faded = projected month-end · Light blue = {lyLabel} · Band = 10yr min/max
         {hasZone && " · Orange = drought-risk zone (below 30yr P20)"}
       </div>
       <ResponsiveContainer width="100%" height={155}>
@@ -266,9 +266,9 @@ function MonthlyRainChart({ data, curYear, lastYear }: { data: MonthlyRainRow[];
             stroke="none" opacity={1} legendType="none" />
           {/* last-year and current-year bars — current month stacks MTD (solid) +
               projected remainder (faded) so it's comparable to the full-month band */}
-          <Bar dataKey="lastYearRain" name={`${lastYear}`} fill="#93c5fd" opacity={0.7} radius={[2, 2, 0, 0]} />
-          <Bar dataKey="actualCur" name={`${curYear}`} stackId="cur" fill="#38bdf8" opacity={0.9} />
-          <Bar dataKey="proj" name={`${curYear} proj.`} stackId="cur" fill="#38bdf8" opacity={0.3} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="lastYearRain" name={lyLabel} fill="#93c5fd" opacity={0.7} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="actualCur" name={curLabel} stackId="cur" fill="#38bdf8" opacity={0.9} />
+          <Bar dataKey="proj" name={`${curLabel} proj.`} stackId="cur" fill="#38bdf8" opacity={0.3} radius={[2, 2, 0, 0]} />
           {/* 30yr avg line */}
           <Line type="monotone" dataKey="avgRain" name="30yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
@@ -285,13 +285,14 @@ interface CumRainRow {
   cumAvg: number;
   cumMin: number;
   cumMax: number;
-  cumLastYear: number;
+  cumLastYear: number | null;
   cumCur: number | null;
   cumProj: number | null;
 }
 
-function CumulativeRainChart({ data, curYear, lastYear }: { data: CumRainRow[]; curYear: number; lastYear: number }) {
+function CumulativeRainChart({ data, curLabel, lyLabel }: { data: CumRainRow[]; curLabel: string; lyLabel: string }) {
   const lastActualMonth = [...data].reverse().find((d) => d.cumCur !== null)?.month;
+  const curYear = curLabel;
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-1">
@@ -319,15 +320,15 @@ function CumulativeRainChart({ data, curYear, lastYear }: { data: CumRainRow[]; 
           {/* 30yr avg */}
           <Line type="monotone" dataKey="cumAvg" name="30yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
-          {/* last year */}
-          <Line type="monotone" dataKey="cumLastYear" name={`${lastYear}`}
-            stroke="#93c5fd" strokeWidth={1.5} dot={false} />
-          {/* current year */}
+          {/* last year (or previous crop year for crop-aligned charts) */}
+          <Line type="monotone" dataKey="cumLastYear" name={lyLabel}
+            stroke="#93c5fd" strokeWidth={1.5} dot={false} connectNulls={false} />
+          {/* current year (or current crop year for crop-aligned charts) */}
           {lastActualMonth && <ReferenceLine x={lastActualMonth} stroke="#334155" strokeDasharray="2 2" />}
-          <Line type="monotone" dataKey="cumCur" name={`${curYear}`}
+          <Line type="monotone" dataKey="cumCur" name={curLabel}
             stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
           {/* projected current-month-end (month-to-date + forecast trend, extrapolated) */}
-          <Line type="monotone" dataKey="cumProj" name={`${curYear} proj.`}
+          <Line type="monotone" dataKey="cumProj" name={`${curLabel} proj.`}
             stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="2 3"
             dot={{ r: 2, fill: "#fbbf24", strokeWidth: 0 }} activeDot={{ r: 3 }} connectNulls={false} />
         </ComposedChart>
@@ -348,9 +349,9 @@ interface TempRow {
 }
 
 function MeanTempChart({
-  data, curYear, lastYear, domain,
+  data, curLabel, lyLabel, domain,
 }: {
-  data: TempRow[]; curYear: number; lastYear: number; domain: [number, number];
+  data: TempRow[]; curLabel: string; lyLabel: string; domain: [number, number];
 }) {
   const lastActualMonth = [...data].reverse().find((d) => d.actualCur !== null)?.month;
 
@@ -360,7 +361,7 @@ function MeanTempChart({
         Mean Temperature (°C)
       </div>
       <div className="text-[8px] text-slate-600 mb-1">
-        Pro-rata prod-weighted · Blue = {curYear} · Light blue = {lastYear} · Band = 10yr min/max
+        Pro-rata prod-weighted · Blue = {curLabel} · Light blue = {lyLabel} · Band = 10yr min/max
       </div>
       <ResponsiveContainer width="100%" height={155}>
         <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
@@ -381,12 +382,12 @@ function MeanTempChart({
           {/* 30yr avg */}
           <Line type="monotone" dataKey="avgTemp" name="30yr avg"
             stroke="#475569" strokeDasharray="4 3" strokeWidth={1.5} dot={false} />
-          {/* last year */}
-          <Line type="monotone" dataKey="lastYearTemp" name={`${lastYear}`}
+          {/* last year (or previous crop year for crop-aligned charts) */}
+          <Line type="monotone" dataKey="lastYearTemp" name={lyLabel}
             stroke="#93c5fd" strokeWidth={1.5} dot={false} />
-          {/* current year */}
+          {/* current year (or current crop year for crop-aligned charts) */}
           {lastActualMonth && <ReferenceLine x={lastActualMonth} stroke="#334155" strokeDasharray="2 2" />}
-          <Line type="monotone" dataKey="actualCur" name={`${curYear}`}
+          <Line type="monotone" dataKey="actualCur" name={curLabel}
             stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 3 }} connectNulls={false} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -723,6 +724,70 @@ export default function WeatherCharts({
     [activeProv]
   );
 
+  // Crop-year-aware lookup helpers. For startMonthIdx > 0 (e.g. Brazil = 5 = Jun),
+  // the X-axis spans a 12-month crop year that crosses a calendar boundary, so a
+  // single calendar-year array can't supply the right values on both sides of
+  // Dec → Jan. These helpers determine the actual calendar year for each display
+  // slot, then route to monthly_actual_cur (cur_year data) or monthly_last_year_*
+  // (last_year data) accordingly. Without this, the line crossing the year
+  // boundary jumps backwards in time (Dec 2025 followed by Jan 2025 instead of
+  // Jan 2026), which is what the user observed.
+  const cropFrame = useMemo(() => {
+    // Calendar-year chart (startMonthIdx=0): every slot stays in curYear and
+    // the helpers route to monthly_actual_cur — existing behaviour preserved.
+    //
+    // Crop-year chart (startMonthIdx>0, e.g. Brazil=5=Jun): the X-axis crosses
+    // a calendar boundary, so a single calendar-year array can't supply the
+    // right values on both sides of Dec → Jan. We anchor the displayed crop
+    // year on the latest filled month of monthly_actual_cur:
+    //   • Latest filled month ≥ startMonthIdx → display the in-progress crop
+    //     year (cropStartYear = curYear). Pivot only happens once new-crop-
+    //     year data has actually started landing.
+    //   • Latest filled month < startMonthIdx (or no data yet) → display the
+    //     just-completed crop year (cropStartYear = curYear − 1). E.g. Brazil
+    //     on Jun 1 2026 still shows the 2025-26 crop year that just ended.
+    const curYear = data?.cur_year ?? new Date().getFullYear();
+    const lastYear = data?.last_year ?? curYear - 1;
+    let cropStartYear = curYear;
+    if (startMonthIdx > 0) {
+      const refLen = data?.provinces?.[0]?.monthly_actual_cur?.length ?? 0;
+      const latestFilledIdx = refLen - 1;
+      cropStartYear = latestFilledIdx >= startMonthIdx ? curYear : curYear - 1;
+    }
+    return { curYear, lastYear, cropStartYear };
+  }, [data, startMonthIdx]);
+
+  // Legend labels. Calendar charts read as plain "2026" / "2025"; crop-year
+  // charts (Brazil = Jun-May) read as "2025/26" / "2024/25" so the year span
+  // matches what the line is actually drawing.
+  const { curLabel, lyLabel } = useMemo(() => {
+    if (startMonthIdx === 0) {
+      return { curLabel: String(cropFrame.curYear), lyLabel: String(cropFrame.lastYear) };
+    }
+    const csy = cropFrame.cropStartYear;
+    const fmt = (start: number) => `${start}/${String(start + 1).slice(-2)}`;
+    return { curLabel: fmt(csy), lyLabel: fmt(csy - 1) };
+  }, [cropFrame, startMonthIdx]);
+
+  // Per-slot calendar year on the displayed crop-year span.
+  const _slotYear = (dispIdx: number) =>
+    cropFrame.cropStartYear + Math.floor((startMonthIdx + dispIdx) / 12);
+
+  // Rain lookup keyed by year: pulls monthly_actual_cur for cur_year, monthly_last_year_rain
+  // for cur_year-1, null otherwise (two-years-ago data is not currently stored).
+  const _rainForYear = (p: WeatherData["provinces"][number], calIdx: number, yr: number): number | null => {
+    if (yr === cropFrame.curYear)  return p.monthly_actual_cur?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear) return p.monthly_last_year_rain?.[calIdx] ?? null;
+    return null;
+  };
+
+  // Temperature mirror of _rainForYear for the temperature chart.
+  const _tempForYear = (p: WeatherData["provinces"][number], calIdx: number, yr: number): number | null => {
+    if (yr === cropFrame.curYear)  return p.monthly_actual_temp_cur?.[calIdx] ?? null;
+    if (yr === cropFrame.lastYear) return p.monthly_last_year_temp?.[calIdx] ?? null;
+    return null;
+  };
+
   const monthlyRainData = useMemo<MonthlyRainRow[]>(() => {
     if (!data || !totalProd) return [];
     const hasDryWarn = activeProv.every((p) => Array.isArray(p.monthly_dry_warn) && p.monthly_dry_warn.length === 12);
@@ -731,16 +796,22 @@ export default function WeatherCharts({
     // startMonthIdx is the only change for Southern-hemisphere countries.
     const rows: MonthlyRainRow[] = Array.from({ length: 12 }, (_, dispIdx) => {
       const i = (dispIdx + startMonthIdx) % 12;
+      const slotYear = _slotYear(dispIdx);     // Actual calendar year for this slot.
+      const prevYear = slotYear - 1;           // Same month, one crop year earlier.
       const minRain = r1(wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd);
       const dryWarn = hasDryWarn ? r1(wsum(activeProv, (p) => p.monthly_dry_warn![i]) / totalProd) : 0;
+      const lyVals  = activeProv.map((p) => _rainForYear(p, i, prevYear));
+      const curVals = activeProv.map((p) => _rainForYear(p, i, slotYear));
       return {
         month: MONTHS[i],
         avgRain:      r1(wsum(activeProv, (p) => p.monthly_avg_rain[i])      / totalProd),
         minRain,
         maxRain:      r1(wsum(activeProv, (p) => p.monthly_max_rain[i])      / totalProd),
-        lastYearRain: r1(wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd),
-        actualCur:    activeProv.every((p) => p.monthly_actual_cur[i] != null)
-          ? r1(wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd)
+        lastYearRain: lyVals.every((v) => v != null)
+          ? r1(activeProv.reduce((acc, p, k) => acc + (lyVals[k] as number) * p.prod_mt_k, 0) / totalProd)
+          : 0,
+        actualCur: curVals.every((v) => v != null)
+          ? r1(activeProv.reduce((acc, p, k) => acc + (curVals[k] as number) * p.prod_mt_k, 0) / totalProd)
           : null,
         proj: 0,
         dryWarn,
@@ -750,12 +821,14 @@ export default function WeatherCharts({
     // Current (partial) month → project to month-end so the bar is comparable to
     // the full-month climatology (same basis as the cumulative chart & the daily
     // forecast): avg daily rate over (MTD + 7-day forecast) × days-in-month.
-    // Find the partial month by display index, then convert to calendar
-    // month for the actual date arithmetic.
+    // Only project when the last filled slot maps to today's calendar month
+    // (otherwise on Brazil June 1 we'd project May's full-month total as a
+    // phantom partial-month MTD).
     const curDispIdx = rows.reduce((acc, r, i) => (r.actualCur !== null ? i : acc), -1);
-    if (curDispIdx >= 0) {
+    const parts = data.updated.split("-");
+    const todayCalIdx = parts.length >= 2 ? parseInt(parts[1]) - 1 : -1;
+    if (curDispIdx >= 0 && ((curDispIdx + startMonthIdx) % 12) === todayCalIdx) {
       const curCalIdx = (curDispIdx + startMonthIdx) % 12;
-      const parts = data.updated.split("-");
       const curYearNum  = parseInt(parts[0]);
       const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
       const daysInMonth = new Date(curYearNum, curCalIdx + 1, 0).getDate();
@@ -781,21 +854,39 @@ export default function WeatherCharts({
   const cumulativeData = useMemo<CumRainRow[]>(() => {
     if (!data || !totalProd) return [];
     let cumAvg = 0, cumMin = 0, cumMax = 0, cumLY = 0, cumC = 0;
+    let lyHasNull = false;   // Once the LY line hits a null slot (no data for that
+                             // year), drop it for the rest of the span — a flat
+                             // 0-stretch followed by a jump would mis-suggest a dry spell.
     const rows: CumRainRow[] = Array.from({ length: 12 }, (_, dispIdx) => {
       const i = (dispIdx + startMonthIdx) % 12;
+      const slotYear = _slotYear(dispIdx);
+      const prevYear = slotYear - 1;
       const month = MONTHS[i];
-      cumAvg += wsum(activeProv, (p) => p.monthly_avg_rain[i])       / totalProd;
-      cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i])       / totalProd;
-      cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i])       / totalProd;
-      cumLY  += wsum(activeProv, (p) => p.monthly_last_year_rain[i]) / totalProd;
-      const hasActual = activeProv.every((p) => p.monthly_actual_cur[i] != null);
-      if (hasActual) cumC += wsum(activeProv, (p) => p.monthly_actual_cur[i]) / totalProd;
+      cumAvg += wsum(activeProv, (p) => p.monthly_avg_rain[i]) / totalProd;
+      cumMin += wsum(activeProv, (p) => p.monthly_min_rain[i]) / totalProd;
+      cumMax += wsum(activeProv, (p) => p.monthly_max_rain[i]) / totalProd;
+      // Crop-year-aware: each slot pulls from the calendar-year array that
+      // actually contains its date. Without this, Brazil's Dec → Jan slot
+      // accumulated Jan 2025 onto Dec 2025 instead of Jan 2026 (the user's
+      // reported bug).
+      const lyVals  = activeProv.map((p) => _rainForYear(p, i, prevYear));
+      const curVals = activeProv.map((p) => _rainForYear(p, i, slotYear));
+      const hasLY     = !lyHasNull && lyVals.every((v) => v != null);
+      const hasActual = curVals.every((v) => v != null);
+      if (hasLY) {
+        cumLY += activeProv.reduce((acc, p, k) => acc + (lyVals[k] as number) * p.prod_mt_k, 0) / totalProd;
+      } else {
+        lyHasNull = true;
+      }
+      if (hasActual) {
+        cumC += activeProv.reduce((acc, p, k) => acc + (curVals[k] as number) * p.prod_mt_k, 0) / totalProd;
+      }
       return {
         month,
         cumAvg:      Math.round(cumAvg),
         cumMin:      Math.round(cumMin),
         cumMax:      Math.round(cumMax),
-        cumLastYear: Math.round(cumLY),
+        cumLastYear: hasLY ? Math.round(cumLY) : null,
         cumCur:      hasActual ? Math.round(cumC) : null,
         cumProj:     null,
       };
@@ -804,10 +895,16 @@ export default function WeatherCharts({
     // Project the current (partial) month to month-end: average daily rate over
     // the known window (month-to-date actuals + 7-day forecast) extrapolated
     // across the whole month. Drawn dissociated from the actual line.
+    //
+    // Only project when the last filled slot is actually the current calendar
+    // month — otherwise on Brazil June 1 we'd extrapolate May's 26.6mm MTD into
+    // a phantom May projection (the chart's last slot is the crop year's end,
+    // not a partial month under observation).
     const curDispIdx = rows.reduce((acc, r, i) => (r.cumCur !== null ? i : acc), -1);
-    if (curDispIdx >= 0) {
+    const parts = data.updated.split("-");
+    const todayCalIdx = parts.length >= 2 ? parseInt(parts[1]) - 1 : -1;
+    if (curDispIdx >= 0 && ((curDispIdx + startMonthIdx) % 12) === todayCalIdx) {
       const curCalIdx = (curDispIdx + startMonthIdx) % 12;
-      const parts = data.updated.split("-");
       const curYearNum  = parseInt(parts[0]);
       const daysElapsed = parts.length >= 3 ? parseInt(parts[2]) : 0;
       const daysInMonth = new Date(curYearNum, curCalIdx + 1, 0).getDate();
@@ -839,14 +936,20 @@ export default function WeatherCharts({
     if (!totalProd) return [];
     return Array.from({ length: 12 }, (_, dispIdx) => {
       const i = (dispIdx + startMonthIdx) % 12;
+      const slotYear = _slotYear(dispIdx);
+      const prevYear = slotYear - 1;
+      const lyVals  = activeProv.map((p) => _tempForYear(p, i, prevYear));
+      const curVals = activeProv.map((p) => _tempForYear(p, i, slotYear));
       return {
         month: MONTHS[i],
-        avgTemp:      r1(wsum(activeProv, (p) => p.monthly_avg_temp[i])        / totalProd),
-        minTemp:      r1(wsum(activeProv, (p) => p.monthly_min_temp[i])        / totalProd),
-        maxTemp:      r1(wsum(activeProv, (p) => p.monthly_max_temp[i])        / totalProd),
-        lastYearTemp: r1(wsum(activeProv, (p) => p.monthly_last_year_temp[i])  / totalProd),
-        actualCur:    activeProv.every((p) => p.monthly_actual_temp_cur[i] != null)
-          ? r1(wsum(activeProv, (p) => p.monthly_actual_temp_cur[i]) / totalProd)
+        avgTemp: r1(wsum(activeProv, (p) => p.monthly_avg_temp[i]) / totalProd),
+        minTemp: r1(wsum(activeProv, (p) => p.monthly_min_temp[i]) / totalProd),
+        maxTemp: r1(wsum(activeProv, (p) => p.monthly_max_temp[i]) / totalProd),
+        lastYearTemp: lyVals.every((v) => v != null)
+          ? r1(activeProv.reduce((acc, p, k) => acc + (lyVals[k] as number) * p.prod_mt_k, 0) / totalProd)
+          : 0,
+        actualCur: curVals.every((v) => v != null)
+          ? r1(activeProv.reduce((acc, p, k) => acc + (curVals[k] as number) * p.prod_mt_k, 0) / totalProd)
           : null,
       };
     });
@@ -1032,9 +1135,9 @@ export default function WeatherCharts({
           selectedYear={selectedYear}
           selectedMonthIdx={selectedMonthIdx}
         />
-        <MeanTempChart data={tempData} curYear={data.cur_year} lastYear={data.last_year} domain={tempDomain} />
-        <MonthlyRainChart data={monthlyRainData} curYear={data.cur_year} lastYear={data.last_year} />
-        <CumulativeRainChart data={cumulativeData} curYear={data.cur_year} lastYear={data.last_year} />
+        <MeanTempChart data={tempData} curLabel={curLabel} lyLabel={lyLabel} domain={tempDomain} />
+        <MonthlyRainChart data={monthlyRainData} curLabel={curLabel} lyLabel={lyLabel} />
+        <CumulativeRainChart data={cumulativeData} curLabel={curLabel} lyLabel={lyLabel} />
         <SoilMoistureChart data={soilData} />
       </div>
 
