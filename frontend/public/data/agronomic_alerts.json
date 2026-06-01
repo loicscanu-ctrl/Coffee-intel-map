@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T08:59:15+00:00",
+  "generated_at": "2026-06-01T09:47:48+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -52,8 +52,8 @@
           "timeframe": "forecast",
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
-            "spei_3": -1.63,
-            "forecast_7d_rain": 104.3
+            "spei_3": -1.62,
+            "forecast_7d_rain": 68.8
           }
         }
       ]

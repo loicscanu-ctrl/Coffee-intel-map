@@ -330,7 +330,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Mbale: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.63, forecast_7d_rain=104.3]"
+      "text": "uganda/Mbale: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.62, forecast_7d_rain=68.8]"
     },
     {
       "id": "AGRO_vn_Lam_Dong_blossom_drop",
@@ -2641,5 +2641,5 @@
       "priceLDN": 3519
     }
   ],
-  "generatedAt": "2026-06-01T08:59:15.443Z"
+  "generatedAt": "2026-06-01T09:47:48.574Z"
 }
