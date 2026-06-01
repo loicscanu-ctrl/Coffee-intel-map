@@ -15,11 +15,21 @@ type FarmerEconomicsLite = Pick<FarmerEconomicsData, "enso" | "weather">;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+type CropType = "arabica" | "robusta" | "mixed";
+type CropFilter = "all" | "arabica" | "robusta";
+
 interface Province {
   name: string;
   station: string;
   prod_mt_k: number;
   weight: number;
+  // Crop-type metadata (currently shipped for Brazil + Indonesia; other
+  // origins default to arabica). The chart's crop filter routes through
+  // these — pure provinces use prod_mt_k as the matching breakdown, mixed
+  // provinces split between arabica + robusta totals.
+  crop_type?: CropType;
+  prod_mt_k_arabica?: number;
+  prod_mt_k_robusta?: number;
   monthly_avg_rain: number[];
   monthly_min_rain: number[];
   monthly_max_rain: number[];
@@ -120,38 +130,94 @@ const TT = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
-const wsum = (provs: Province[], fn: (p: Province) => number) =>
-  provs.reduce((s, p) => s + fn(p) * p.prod_mt_k, 0);
+
+// Per-province production weight under the active crop filter:
+//   "all"     → total prod_mt_k (any provincial coffee, unfiltered)
+//   "arabica" → prod_mt_k_arabica when present, else prod_mt_k if pure-arabica, else 0
+//   "robusta" → prod_mt_k_robusta when present, else prod_mt_k if pure-robusta, else 0
+// Pure provinces with the matching crop_type fall back to prod_mt_k so the
+// behaviour is identical when an origin doesn't yet ship per-crop breakdowns
+// (only Brazil + Indonesia do today).
+function _prodFor(p: Province, filter: CropFilter): number {
+  if (filter === "all") return p.prod_mt_k;
+  if (filter === "arabica") {
+    if (typeof p.prod_mt_k_arabica === "number") return p.prod_mt_k_arabica;
+    return p.crop_type === "robusta" ? 0 : p.prod_mt_k;
+  }
+  if (typeof p.prod_mt_k_robusta === "number") return p.prod_mt_k_robusta;
+  return p.crop_type === "robusta" ? p.prod_mt_k : 0;
+}
+
+const wsum = (provs: Province[], fn: (p: Province) => number, filter: CropFilter = "all") =>
+  provs.reduce((s, p) => s + fn(p) * _prodFor(p, filter), 0);
+
+// ── Crop filter (Arabica / Robusta toggle for Brazil + Indonesia) ─────────────
+
+function CropFilterPicker({ value, onChange }: { value: CropFilter; onChange: (v: CropFilter) => void }) {
+  const opts: { v: CropFilter; label: string; cls: string }[] = [
+    { v: "all",     label: "All",     cls: "border-slate-500 text-slate-200" },
+    { v: "arabica", label: "Arabica", cls: "border-amber-600 text-amber-300" },
+    { v: "robusta", label: "Robusta", cls: "border-emerald-600 text-emerald-300" },
+  ];
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="text-[8px] text-slate-600 uppercase tracking-wider">Crop:</span>
+      {opts.map((o) => (
+        <button
+          key={o.v}
+          onClick={() => onChange(o.v)}
+          className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors border ${
+            value === o.v ? `bg-slate-800 ${o.cls}` : "bg-transparent text-slate-600 border-slate-700"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 // ── Province selector ─────────────────────────────────────────────────────────
 
 function ProvinceSelector({
-  provinces, selected, onToggle,
+  provinces, selected, onToggle, cropFilter,
 }: {
   provinces: Province[];
   selected: Set<string>;
   onToggle: (name: string) => void;
+  cropFilter: CropFilter;
 }) {
-  const totalProd = provinces.reduce((s, p) => s + p.prod_mt_k, 0) || 1;
+  // Display prod weights through the active crop filter so the per-province
+  // "% of crop" badge stays consistent with the chart's actual aggregation.
+  const totalProd = provinces.reduce((s, p) => s + _prodFor(p, cropFilter), 0) || 1;
   return (
     <div className="flex flex-wrap gap-1.5 items-center">
       <span className="text-[8px] text-slate-600 uppercase tracking-wider mr-0.5">Filter:</span>
       {provinces.map((p) => {
-        const active = selected.has(p.name);
-        const share = Math.round((p.prod_mt_k / totalProd) * 100);
+        const prod = _prodFor(p, cropFilter);
+        const inactive = prod === 0;       // Excluded by current crop filter.
+        const active = selected.has(p.name) && !inactive;
+        const share = Math.round((prod / totalProd) * 100);
         return (
           <button
             key={p.name}
-            onClick={() => onToggle(p.name)}
-            title={`${p.name} · ${p.prod_mt_k.toLocaleString()}k MT · ${share}% of crop`}
+            onClick={() => !inactive && onToggle(p.name)}
+            disabled={inactive}
+            title={inactive
+              ? `${p.name} · no ${cropFilter} production`
+              : `${p.name} · ${prod.toLocaleString()}k MT · ${share}% of crop`}
             className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors border leading-tight ${
-              active
+              inactive
+                ? "bg-transparent text-slate-800 border-slate-800 cursor-not-allowed"
+                : active
                 ? "bg-slate-700 text-slate-200 border-slate-500"
                 : "bg-transparent text-slate-600 border-slate-700"
             }`}
           >
             <span className="block">{p.name}</span>
-            <span className={`block text-[7px] ${active ? "text-amber-400/90" : "text-slate-600"}`}>{share}% of crop</span>
+            <span className={`block text-[7px] ${active ? "text-amber-400/90" : "text-slate-600"}`}>
+              {inactive ? "—" : `${share}% of crop`}
+            </span>
           </button>
         );
       })}
@@ -655,6 +721,24 @@ export default function WeatherCharts({
   const [selected, setSelected] = useState<Set<string> | null>(null);
   const [selectedYear, setSelectedYear]   = useState<number>(new Date().getFullYear());
   const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(new Date().getMonth());
+  // Crop-type filter for origins that produce both arabica and robusta
+  // (Brazil, Indonesia). Routes the chart's prod weighting through
+  // _prodFor() and hides provinces with zero matching production.
+  const [cropFilter, setCropFilter] = useState<CropFilter>("all");
+  // True when the origin has BOTH arabica and robusta production at the
+  // origin level (across provinces or within a mixed province). Drives
+  // whether the crop-filter toggle is rendered — pure-arabica origins
+  // like Colombia / Ethiopia don't need it.
+  const hasCropMix = useMemo(() => {
+    if (!data) return false;
+    let hasA = false, hasR = false;
+    for (const p of data.provinces) {
+      if ((p.prod_mt_k_arabica ?? 0) > 0) hasA = true;
+      if ((p.prod_mt_k_robusta ?? 0) > 0) hasR = true;
+      if (hasA && hasR) return true;
+    }
+    return false;
+  }, [data]);
   const [econ, setEcon] = useState<FarmerEconomicsLite | null>(null);
   const [vhi, setVhi] = useState<VhiFile | null>(null);
 
@@ -711,11 +795,21 @@ export default function WeatherCharts({
     const vhiByName = vhi?.provinces ?? {};
     return data.provinces
       .filter((p) => selected.has(p.name))
+      // Drop provinces with zero matching production under the active crop
+      // filter — Lampung disappears when viewing "arabica", Sul de Minas when
+      // viewing "robusta", etc. Mixed provinces (ES, Java) stay visible but
+      // with their per-crop share as the weight.
+      .filter((p) => _prodFor(p, cropFilter) > 0)
       .map((p) => {
         const v = vhiByName[p.name]?.vhi_latest;
-        return v ? { ...p, vhi: v.vhi, vhi_iso_week: v.iso_week, vhi_severity: v.severity } : p;
+        // Overwrite prod_mt_k on the local copy with the filter-aware value
+        // so every downstream wsum / reduce picks up the right weighting
+        // without threading cropFilter through. Original data.provinces
+        // references are untouched.
+        const base: Province = { ...p, prod_mt_k: _prodFor(p, cropFilter) };
+        return v ? { ...base, vhi: v.vhi, vhi_iso_week: v.iso_week, vhi_severity: v.severity } : base;
       });
-  }, [data, selected, vhi]);
+  }, [data, selected, vhi, cropFilter]);
 
   // Prod-weighted daily surface soil moisture (ESSM) across selected regions.
   const soilData = useMemo<SoilRow[]>(() => {
@@ -1312,11 +1406,19 @@ export default function WeatherCharts({
         </div>
       </div>
 
+      {/* Crop filter — only rendered when the origin ships per-crop production
+          data (Brazil, Indonesia today). For pure-arabica origins the filter
+          would be a no-op so we hide it. */}
+      {hasCropMix && (
+        <CropFilterPicker value={cropFilter} onChange={setCropFilter} />
+      )}
+
       {/* Province selector */}
       <ProvinceSelector
         provinces={data.provinces}
         selected={selected}
         onToggle={toggleProvince}
+        cropFilter={cropFilter}
       />
 
       {/* Active region note */}
