@@ -76,6 +76,10 @@ FORECAST_DAYS = 8  # today + 7 future days (the 7 future days populate the chart
 TODAY = dt.date.today()
 CUR_YEAR = TODAY.year
 LAST_YEAR = CUR_YEAR - 1
+TWO_YEARS_AGO = CUR_YEAR - 2  # Needed by the crop-year LY line (e.g. Brazil
+                              # Jun-May): the prior crop year's first 7 months
+                              # fall in TWO_YEARS_AGO. See WeatherCharts.tsx
+                              # _rainForYear / _tempForYear lookups.
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 DAYS_IN_MONTH = [31, 29 if CUR_YEAR % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
@@ -518,6 +522,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         ly_t = _year_actuals_temp(rh, LAST_YEAR, 12)
         if all(v is not None for v in ly_t) and len(ly_t) == 12:
             prov["monthly_last_year_temp"] = ly_t
+        # Two-years-ago actuals. Populates only after the 0.9 backfill workflow
+        # has imported 1995-2024 into weather_history. Without these, crop-year
+        # charts (Brazil = Jun-May) have a null first half on the previous-crop-
+        # year line because the prior crop year's Jun-Dec falls in TWO_YEARS_AGO.
+        t2_r = _year_actuals_rain(rh, TWO_YEARS_AGO, 12)
+        if all(v is not None for v in t2_r) and len(t2_r) == 12:
+            prov["monthly_two_years_ago_rain"] = t2_r
+        t2_t = _year_actuals_temp(rh, TWO_YEARS_AGO, 12)
+        if all(v is not None for v in t2_t) and len(t2_t) == 12:
+            prov["monthly_two_years_ago_temp"] = t2_t
         # 7-day forecast rain.
         fc = forecasts.get(prov["name"], [])
         if fc:
