@@ -2915,7 +2915,10 @@
           144.1,
           184.9
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 900,
+      "prod_mt_k_robusta": 0
     },
     {
       "name": "Cerrado",
@@ -5823,7 +5826,10 @@
           160.8,
           269.6
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 600,
+      "prod_mt_k_robusta": 0
     },
     {
       "name": "Espírito Santo",
@@ -8731,7 +8737,10 @@
           77.9,
           107.9
         ]
-      }
+      },
+      "crop_type": "mixed",
+      "prod_mt_k_arabica": 210,
+      "prod_mt_k_robusta": 490
     },
     {
       "name": "Paraná",
@@ -11636,7 +11645,10 @@
           152.7,
           241.6
         ]
-      }
+      },
+      "crop_type": "arabica",
+      "prod_mt_k_arabica": 100,
+      "prod_mt_k_robusta": 0
     }
   ],
   "daily_station": [

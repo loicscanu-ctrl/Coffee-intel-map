@@ -68,10 +68,12 @@ ORIGINS: dict[str, dict] = {
         "share_label": "Brazil arabica+conilon",
         "source_production": "CONAB 2024/25 regional output (approx. weights)",
         "regions": [
-            {"name": "Sul de Minas",   "station": "Varginha",     "lat": -21.55, "lon": -45.43, "prod_mt_k": 900},
-            {"name": "Cerrado",        "station": "Patrocínio",   "lat": -18.95, "lon": -46.99, "prod_mt_k": 600},
-            {"name": "Espírito Santo", "station": "Vitória",      "lat": -20.00, "lon": -40.80, "prod_mt_k": 700},
-            {"name": "Paraná",         "station": "Londrina",     "lat": -23.31, "lon": -50.62, "prod_mt_k": 100},
+            # crop_type + per-crop split — used by the chart's Arabica / Robusta filter.
+            # ES is ~70% conilon (capital of Brazilian robusta), ~30% arabica (Caparaó).
+            {"name": "Sul de Minas",   "station": "Varginha",     "lat": -21.55, "lon": -45.43, "prod_mt_k": 900, "crop_type": "arabica", "prod_mt_k_arabica": 900, "prod_mt_k_robusta":   0},
+            {"name": "Cerrado",        "station": "Patrocínio",   "lat": -18.95, "lon": -46.99, "prod_mt_k": 600, "crop_type": "arabica", "prod_mt_k_arabica": 600, "prod_mt_k_robusta":   0},
+            {"name": "Espírito Santo", "station": "Vitória",      "lat": -20.00, "lon": -40.80, "prod_mt_k": 700, "crop_type": "mixed",   "prod_mt_k_arabica": 210, "prod_mt_k_robusta": 490},
+            {"name": "Paraná",         "station": "Londrina",     "lat": -23.31, "lon": -50.62, "prod_mt_k": 100, "crop_type": "arabica", "prod_mt_k_arabica": 100, "prod_mt_k_robusta":   0},
         ],
     },
     "colombia": {
@@ -103,11 +105,14 @@ ORIGINS: dict[str, dict] = {
         "share_label": "Indonesia robusta+arabica",
         "source_production": "USDA/AEKI 2024 regional output (approx. weights)",
         "regions": [
-            {"name": "Lampung", "station": "Bandar Lampung", "lat": -5.00, "lon": 104.80, "prod_mt_k": 350},
-            {"name": "Gayo",    "station": "Takengon",       "lat": 4.62,  "lon": 96.85,  "prod_mt_k": 120},
-            {"name": "Java",    "station": "Bondowoso",      "lat": -7.91, "lon": 113.82, "prod_mt_k": 110},
-            {"name": "Toraja",  "station": "Rantepao",       "lat": -2.97, "lon": 119.90, "prod_mt_k": 70},
-            {"name": "Flores",  "station": "Bajawa",         "lat": -8.79, "lon": 120.98, "prod_mt_k": 50},
+            # Lampung is the heart of Indonesian robusta (~97% robusta); the small
+            # arabica share is statistically irrelevant. Java has both — Ijen
+            # arabica (~30%) + robusta everywhere else.
+            {"name": "Lampung", "station": "Bandar Lampung", "lat": -5.00, "lon": 104.80, "prod_mt_k": 350, "crop_type": "robusta", "prod_mt_k_arabica":   0, "prod_mt_k_robusta": 350},
+            {"name": "Gayo",    "station": "Takengon",       "lat": 4.62,  "lon": 96.85,  "prod_mt_k": 120, "crop_type": "arabica", "prod_mt_k_arabica": 120, "prod_mt_k_robusta":   0},
+            {"name": "Java",    "station": "Bondowoso",      "lat": -7.91, "lon": 113.82, "prod_mt_k": 110, "crop_type": "mixed",   "prod_mt_k_arabica":  30, "prod_mt_k_robusta":  80},
+            {"name": "Toraja",  "station": "Rantepao",       "lat": -2.97, "lon": 119.90, "prod_mt_k": 70,  "crop_type": "arabica", "prod_mt_k_arabica":  70, "prod_mt_k_robusta":   0},
+            {"name": "Flores",  "station": "Bajawa",         "lat": -8.79, "lon": 120.98, "prod_mt_k": 50,  "crop_type": "arabica", "prod_mt_k_arabica":  50, "prod_mt_k_robusta":   0},
         ],
     },
     "uganda": {
@@ -294,6 +299,12 @@ def build_region(cfg: dict) -> dict:
     region = {
         "name": cfg["name"], "station": cfg["station"],
         "prod_mt_k": cfg["prod_mt_k"], "weight": 0.0,  # filled in by caller
+        # Crop-type metadata for the Arabica / Robusta filter (Brazil + Indonesia).
+        # Defaults preserve single-crop semantics for the other origins that
+        # don't currently ship a crop_type — chart treats them as 100% arabica.
+        "crop_type":          cfg.get("crop_type", "arabica"),
+        "prod_mt_k_arabica":  cfg.get("prod_mt_k_arabica", cfg["prod_mt_k"] if cfg.get("crop_type", "arabica") != "robusta" else 0),
+        "prod_mt_k_robusta":  cfg.get("prod_mt_k_robusta", cfg["prod_mt_k"] if cfg.get("crop_type") == "robusta" else 0),
         "monthly_avg_rain":       [r1(_normal(rain_by, m, NORMAL_START, NORMAL_END)) for m in range(1, 13)],
         "monthly_min_rain":       [r1(_range(rain_by, m, RANGE_START, RANGE_END)[0]) for m in range(1, 13)],
         "monthly_max_rain":       [r1(_range(rain_by, m, RANGE_START, RANGE_END)[1]) for m in range(1, 13)],
