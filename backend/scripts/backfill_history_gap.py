@@ -49,10 +49,24 @@ HISTORY_DIR = Path(__file__).resolve().parents[1] / "seed" / "weather_history"
 DEFAULT_START = "2025-01-01"
 DEFAULT_END   = "2025-12-31"
 
-# Same retry posture as build_spei_baselines / backfill_et0.
+# Retry posture. Long ranges (30Y) trip Open-Meteo's archive rate limiter
+# after ~30 min of sustained calls — the server then returns 429 until the
+# hourly window resets. The default short backoffs (5/15/30s) can't escape
+# that window, so 429 specifically gets a much longer sleep that's likely
+# to outlast the rate-limit interval. Plain ReadTimeouts use the original
+# short ladder since they usually clear on the very next attempt.
 CALL_TIMEOUT = 60
-MAX_ATTEMPTS = 3
-RETRY_SLEEP_S = (5, 15, 30)
+MAX_ATTEMPTS = 4
+RETRY_SLEEP_S       = (5, 15, 30, 60)        # generic errors / timeouts
+RETRY_SLEEP_S_429   = (60, 180, 300, 600)    # rate-limit (HTTP 429)
+
+
+def _is_rate_limit(exc: Exception) -> bool:
+    """True when the exception is an HTTPError carrying 429."""
+    if isinstance(exc, requests.HTTPError):
+        resp = getattr(exc, "response", None)
+        return resp is not None and resp.status_code == 429
+    return False
 
 
 def fetch_daily_range(lat: float, lon: float,
@@ -96,9 +110,11 @@ def fetch_daily_range(lat: float, lon: float,
         except requests.RequestException as e:
             last_err = e
             if attempt < MAX_ATTEMPTS - 1:
-                sleep = RETRY_SLEEP_S[attempt]
+                ladder = RETRY_SLEEP_S_429 if _is_rate_limit(e) else RETRY_SLEEP_S
+                sleep = ladder[attempt]
+                tag = "RATE_LIMIT" if _is_rate_limit(e) else type(e).__name__
                 print(f"    retry {attempt + 1}/{MAX_ATTEMPTS - 1} in {sleep}s "
-                      f"({type(e).__name__})", file=sys.stderr, flush=True)
+                      f"({tag})", file=sys.stderr, flush=True)
                 time.sleep(sleep)
     raise last_err if last_err else RuntimeError("fetch_daily_range: no error captured")
 
@@ -143,6 +159,15 @@ def main() -> int:
     ap.add_argument("--write", action="store_true",
                     help="Persist filled rows back to seed/weather_history/")
     ap.add_argument("--origins", nargs="*", default=list(ORIGINS))
+    ap.add_argument("--regions", nargs="*", default=None,
+                    help="Region names to process (e.g. 'Sul de Minas' Sidama). "
+                         "When set, only these regions are fetched — used for "
+                         "surgical recovery after a partial-failure run so we "
+                         "don't burn API calls on already-completed regions.")
+    ap.add_argument("--throttle-s", type=float, default=1.0,
+                    help="Sleep between region requests (default 1.0s). Bump "
+                         "to 3-5s when re-running after a 429 to stay clear "
+                         "of Open-Meteo's hourly archive-endpoint rate limit.")
     ap.add_argument("--start", default=DEFAULT_START,
                     help=f"YYYY-MM-DD inclusive (default {DEFAULT_START})")
     ap.add_argument("--end",   default=DEFAULT_END,
@@ -173,6 +198,8 @@ def main() -> int:
         per_origin_added = 0
         for reg_meta in ORIGINS[origin]:
             name = reg_meta["name"]
+            if args.regions and name not in args.regions:
+                continue  # Surgical-recovery mode: skip un-listed regions.
             reg_hist = regions.setdefault(name, {})
             try:
                 added, skipped = process_region(reg_hist, reg_meta["lat"],
@@ -185,7 +212,7 @@ def main() -> int:
             except Exception as e:  # noqa: BLE001
                 print(f"  {origin}/{name}: FAILED {e}", file=sys.stderr, flush=True)
                 grand_failed.append(f"{origin}/{name}")
-            time.sleep(1)
+            time.sleep(args.throttle_s)
         if args.write and per_origin_added:
             _write_history(origin, hist)
             print(f"  → checkpoint: wrote {origin}.json "
