@@ -27,7 +27,7 @@ export default function EnsoAnalogChart({
   current: AlignedPoint[];
   analogs: EnsoAnalog[];
 }) {
-  const { rows, hasAnalogs } = useMemo(() => {
+  const { rows, hasAnalogs, hasProjection } = useMemo(() => {
     const offsets = new Set<number>();
     for (const p of current) offsets.add(p.offset);
     for (const a of analogs) for (const p of a.series) offsets.add(p.offset);
@@ -36,15 +36,41 @@ export default function EnsoAnalogChart({
     const curByOffset = new Map(current.map((p) => [p.offset, p.value]));
     const analogMaps = analogs.map((a) => new Map(a.series.map((p) => [p.offset, p.value])));
 
+    // Project the "current" line into the future by averaging the analog years
+    // at each positive offset — same technique meteorologists use for analog
+    // forecasting (the closest historical years vote on what comes next).
+    // Anchored at offset 0 with the latest observed value so the dotted line
+    // joins the solid one cleanly.
+    const lastObs = current.length ? current[current.length - 1] : null;
+    const projByOffset = new Map<number, number>();
+    if (lastObs) {
+      projByOffset.set(lastObs.offset, lastObs.value);
+      for (const o of sorted) {
+        if (o <= lastObs.offset) continue;
+        const vals: number[] = [];
+        for (const m of analogMaps) {
+          const v = m.get(o);
+          if (typeof v === "number") vals.push(v);
+        }
+        if (vals.length === 0) continue;
+        projByOffset.set(o, vals.reduce((s, v) => s + v, 0) / vals.length);
+      }
+    }
+
     const rows = sorted.map((o) => {
       const row: Record<string, number | string | null> = { offset: o, label: offsetLabel(o) };
       row.current = curByOffset.has(o) ? (curByOffset.get(o) as number) : null;
+      row.currentProj = projByOffset.has(o) ? Number(projByOffset.get(o)!.toFixed(2)) : null;
       analogs.forEach((a, i) => {
         row[`y${a.year}`] = analogMaps[i].has(o) ? (analogMaps[i].get(o) as number) : null;
       });
       return row;
     });
-    return { rows, hasAnalogs: analogs.length > 0 };
+    return {
+      rows,
+      hasAnalogs: analogs.length > 0,
+      hasProjection: projByOffset.size > 1,  // anchor + ≥1 projected point
+    };
   }, [current, analogs]);
 
   if (!current || current.length === 0) {
@@ -111,6 +137,19 @@ export default function EnsoAnalogChart({
               dot={{ r: 2 }}
               connectNulls
             />
+            {hasProjection && (
+              <Line
+                type="monotone"
+                dataKey="currentProj"
+                name="Current proj. (analog mean)"
+                stroke="#e2e8f0"
+                strokeWidth={1.5}
+                strokeDasharray="3 3"
+                strokeOpacity={0.7}
+                dot={false}
+                connectNulls
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
