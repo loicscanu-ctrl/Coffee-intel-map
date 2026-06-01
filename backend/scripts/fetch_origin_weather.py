@@ -441,6 +441,36 @@ def _daily_accum(reg_hist: dict, year: int, month: int, dim: int) -> list[float 
     return out if seen else []
 
 
+def _unmojibake(s: str) -> str:
+    """Reverse a past double-encoding round-trip: when accented UTF-8
+    was decoded as Latin-1 and re-encoded as UTF-8, the bytes look like
+    'EspÃ\\xadrito Santo'. Re-encoding as Latin-1 and decoding as UTF-8
+    inverts that transform. Returns s unchanged if the transform fails
+    or the result is unchanged."""
+    try:
+        fixed = s.encode("latin-1").decode("utf-8")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return s
+    return fixed if fixed != s else s
+
+
+def _resolve_region(prov_name: str, regions_hist: dict) -> tuple[str, dict]:
+    """Find the seed-history entry for a province, tolerating mojibake
+    introduced by a past round-trip. Once the published *_weather.json
+    has mojibake, the direct lookup misses, and monthly_actual_cur stops
+    refreshing for that province — the chart bars for the current year
+    appear empty (this was the March/April gap on Brazil/Colombia/Honduras).
+    Returns (canonical_name, history_dict). canonical_name differs from
+    prov_name when a heal happened; caller writes it back so the file
+    becomes UTF-8-clean on the next commit."""
+    if prov_name in regions_hist:
+        return prov_name, regions_hist[prov_name]
+    fixed = _unmojibake(prov_name)
+    if fixed != prov_name and fixed in regions_hist:
+        return fixed, regions_hist[fixed]
+    return prov_name, {}
+
+
 def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> dict | None:
     path = DATA_DIR / f"{origin}_weather.json"
     if not path.exists():
@@ -451,8 +481,24 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
     dim_cur = DAYS_IN_MONTH[cur_month - 1]
     regions_hist = hist["regions"]
 
+    # Heal mojibake in top-level station label too (display-only field).
+    if "station" in doc:
+        fixed_station = _unmojibake(doc["station"])
+        if fixed_station != doc["station"]:
+            print(f"  [heal] {origin}: top.station {doc['station']!r} → {fixed_station!r}")
+            doc["station"] = fixed_station
+
     for prov in doc["provinces"]:
-        rh = regions_hist.get(prov["name"], {})
+        canonical, rh = _resolve_region(prov["name"], regions_hist)
+        if canonical != prov["name"]:
+            print(f"  [heal] {origin}: mojibake {prov['name']!r} → {canonical!r}")
+            prov["name"] = canonical
+        # Per-province station label is display-only — heal without lookup.
+        if "station" in prov:
+            fixed = _unmojibake(prov["station"])
+            if fixed != prov["station"]:
+                print(f"  [heal] {origin}: {prov['name']} station {prov['station']!r} → {fixed!r}")
+                prov["station"] = fixed
         # Per-province daily accumulation for the current month (+ last year) so
         # the frontend can prod-weight the Daily Accumulated chart across the
         # selected regions, not just the single reference station.
@@ -535,7 +581,15 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
     month_norm = ref["monthly_avg_rain"][m_idx] if ref.get("monthly_avg_rain") else 0
     cur_days = sorted(int(date[8:10]) for date in ref_hist
                       if int(date[:4]) == CUR_YEAR and int(date[5:7]) == cur_month)
-    daily_rows = []
+    daily_rows: list[dict] = []
+    keep_prior_daily = False
+    if not cur_days and doc.get("daily_station"):
+        # Month rollover before the live fetch has captured the 1st: keep
+        # the previously-published daily_station rather than wipe it. The
+        # next cron run with fresh history will replace it with the new
+        # month. Without this guard, a one-shot heal or a day-1 fetch
+        # failure would leave the chart blank.
+        keep_prior_daily = True
     if cur_days:
         last_actual = max(cur_days)
         accum = 0.0
@@ -572,7 +626,8 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
                 "last_year_accum_mm": ly_val,
                 "temp_c": r1(v["tmean"]) if v.get("tmean") is not None else 0.0,
             })
-    doc["daily_station"] = daily_rows
+    if not keep_prior_daily:
+        doc["daily_station"] = daily_rows
 
     # 7-day forecast list from the reference province.
     ref_fc = forecasts.get(ref["name"], [])
