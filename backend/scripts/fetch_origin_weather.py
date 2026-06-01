@@ -80,6 +80,12 @@ TWO_YEARS_AGO = CUR_YEAR - 2  # Needed by the crop-year LY line (e.g. Brazil
                               # Jun-May): the prior crop year's first 7 months
                               # fall in TWO_YEARS_AGO. See WeatherCharts.tsx
                               # _rainForYear / _tempForYear lookups.
+# 10-year window for the daily-accum envelope. Built from the freshly
+# backfilled history (1995-2024) + the live 2025+ data, so it reflects
+# the actual recent decade rather than the stale fetched aggregates from
+# the original seed run.
+ENVELOPE_RANGE_START = CUR_YEAR - 10
+ENVELOPE_RANGE_END   = CUR_YEAR - 1
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 DAYS_IN_MONTH = [31, 29 if CUR_YEAR % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
@@ -445,6 +451,51 @@ def _daily_accum(reg_hist: dict, year: int, month: int, dim: int) -> list[float 
     return out if seen else []
 
 
+def _daily_accum_envelope(reg_hist: dict, month: int, dim: int,
+                          year_start: int, year_end: int) -> tuple[list[float | None], list[float | None]]:
+    """Per-day (1..dim) min/max of cumulative rain across years in
+    [year_start, year_end]. Replaces the chart's linear interpolation of
+    monthly_min/max_rain — that approach mis-flags bursty rainfall (a
+    single early-month storm pushes the cumulative line above a max
+    envelope that grows linearly from 0). With per-day percentiles built
+    from real history, the envelope contains every observed yearly
+    curve by construction. Returns ([min_per_day], [max_per_day]); each
+    list has `dim` entries. Years with no data for a given day-in-month
+    are skipped (so a partial-year doesn't pin the min at zero)."""
+    per_year_curves: list[list[float | None]] = []
+    for y in range(year_start, year_end + 1):
+        acc = 0.0
+        any_data = False
+        curve: list[float | None] = []
+        for d in range(1, dim + 1):
+            v = reg_hist.get(f"{y}-{month:02d}-{d:02d}")
+            rain = v.get("rain") if v else None
+            if rain is not None:
+                acc += rain
+                any_data = True
+                curve.append(acc)
+            else:
+                # Carry the accumulator forward (gap day = zero rain). Curve
+                # still emits the running total so a single missing day
+                # doesn't reset the year's progression.
+                curve.append(acc if any_data else None)
+        if any_data:
+            per_year_curves.append(curve)
+    if not per_year_curves:
+        return [None] * dim, [None] * dim
+    mins: list[float | None] = []
+    maxs: list[float | None] = []
+    for d in range(dim):
+        day_vals = [c[d] for c in per_year_curves if c[d] is not None]
+        if not day_vals:
+            mins.append(None)
+            maxs.append(None)
+        else:
+            mins.append(r1(min(day_vals)))
+            maxs.append(r1(max(day_vals)))
+    return mins, maxs
+
+
 def _unmojibake(s: str) -> str:
     """Reverse a past double-encoding round-trip: when accented UTF-8
     was decoded as Latin-1 and re-encoded as UTF-8, the bytes look like
@@ -508,6 +559,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         # selected regions, not just the single reference station.
         prov["daily_accum_cur"] = _daily_accum(rh, CUR_YEAR, cur_month, dim_cur)
         prov["daily_accum_ly"]  = _daily_accum(rh, LAST_YEAR, cur_month, dim_cur)
+        # Per-day 10Y min/max envelope built from the real backfilled history.
+        # The chart used to interpolate a linear envelope from monthly_min/max
+        # totals (max_day_d = monthly_max * d/dim), which is physically wrong:
+        # a single early-month storm pushes the cumulative line above an
+        # envelope that grows linearly from 0. Now the band reflects real
+        # day-by-day percentiles across the 10 prior years.
+        env_min, env_max = _daily_accum_envelope(rh, cur_month, dim_cur,
+                                                  ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
+        prov["daily_accum_min_10y"] = env_min
+        prov["daily_accum_max_10y"] = env_max
         # Current-year actuals (live, accumulating). Keep seed where history is absent.
         act_r = _trim_trailing_none(_year_actuals_rain(rh, CUR_YEAR, cur_month))
         act_t = _trim_trailing_none(_year_actuals_temp(rh, CUR_YEAR, cur_month))
