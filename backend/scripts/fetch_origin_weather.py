@@ -197,7 +197,7 @@ def _warn_baseline_age(label: str, base: dict) -> None:
         gen = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
     except Exception:  # noqa: BLE001
         return
-    age_days = (dt.datetime.now(dt.timezone.utc) - gen).days
+    age_days = (dt.datetime.now(dt.UTC) - gen).days
     if age_days > _BASELINE_AGE_WARN_DAYS:
         print(f"  [{label}] baseline is {age_days}d old — consider re-running "
               f"the build-{label.lower()}-baselines workflow.")
@@ -390,21 +390,69 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
 
 
 # ── Chart-JSON rebuild ───────────────────────────────────────────────────────
+def _pctl(vs: list[float], q: float) -> float:
+    """Linear-interpolated q-quantile (0..1) of a sorted-or-unsorted list.
+    Same shape as numpy.quantile(method='linear'). Caller is responsible
+    for filtering out None entries before passing."""
+    if not vs:
+        return 0.0
+    s = sorted(vs)
+    if len(s) == 1:
+        return s[0]
+    pos = q * (len(s) - 1)
+    lo = int(pos)
+    hi = min(lo + 1, len(s) - 1)
+    return s[lo] + (s[hi] - s[lo]) * (pos - lo)
+
+
+def _monthly_totals_per_year(reg_hist: dict, year_start: int, year_end: int,
+                              ) -> dict[str, list[float | None]]:
+    """{year_str: [12 monthly rain totals or None]} for each calendar year in
+    [year_start, year_end]. A month with fewer than (dim - 2) days of data is
+    emitted as None so partial months don't skew the cumulative-envelope
+    computation downstream. Stored in the published *_weather.json so the
+    chart can derive per-year cumulative curves client-side, then take min/
+    max across years for an honest cumulative envelope (sum of per-month
+    minima never lands on any single observed year — that was the old bug).
+    11-year window — caller passes (CUR_YEAR-11, CUR_YEAR-1) so the chart
+    can build 10 crop-year cumulative windows even when the displayed year
+    straddles a calendar boundary (e.g. Brazil's Jun-May)."""
+    out: dict[str, list[float | None]] = {}
+    for y in range(year_start, year_end + 1):
+        row: list[float | None] = []
+        for m in range(1, 13):
+            dim = DAYS_IN_MONTH[m - 1]
+            total = 0.0
+            n = 0
+            for d in range(1, dim + 1):
+                v = reg_hist.get(f"{y}-{m:02d}-{d:02d}")
+                if v and v.get("rain") is not None:
+                    total += v["rain"]
+                    n += 1
+            row.append(r1(total) if n >= dim - 2 else None)
+        out[str(y)] = row
+    return out
+
+
 def _monthly_aggregates_10y(reg_hist: dict, year_start: int, year_end: int,
                              ) -> tuple[list[float | None], list[float | None],
                                         list[float | None], list[float | None],
-                                        list[float | None], list[float | None]]:
+                                        list[float | None], list[float | None],
+                                        list[float | None]]:
     """For each calendar month 1..12, walk years [year_start, year_end] and
-    return (avg_rain, min_rain, max_rain, avg_temp, min_temp, max_temp) as
-    12-element lists. Months without ≥1 complete year (≥dim-2 days) get None.
+    return (avg_rain, min_rain, max_rain, dry_warn_p20, avg_temp, min_temp,
+    max_temp) as 12-element lists. Months without ≥1 near-complete year
+    (≥dim-2 days) get None.
 
-    Replaces the stale 30Y normals from the original build_origin_weather.py
-    seed run. The recent ES Jun=27mm bug surfaced because those normals were
-    fetched once from Open-Meteo and never refreshed; rolling them off the
-    just-backfilled history fixes them and keeps them auto-rolling forward."""
+    dry_warn_p20 = 20th percentile of monthly rain totals across the 10Y
+    window — the drought-risk floor used by the Monthly Rainfall bar chart's
+    orange "drought-risk zone" overlay. Previously sourced from
+    build_origin_weather.py's 30Y P20 (one-shot seed, never refreshed); now
+    auto-rolls with the rest of the climatology."""
     avg_rain: list[float | None] = []
     min_rain: list[float | None] = []
     max_rain: list[float | None] = []
+    dry_warn: list[float | None] = []
     avg_temp: list[float | None] = []
     min_temp: list[float | None] = []
     max_temp: list[float | None] = []
@@ -438,10 +486,11 @@ def _monthly_aggregates_10y(reg_hist: dict, year_start: int, year_end: int,
         avg_rain.append(_agg(rain_totals, lambda xs: sum(xs) / len(xs)))
         min_rain.append(_agg(rain_totals, min))
         max_rain.append(_agg(rain_totals, max))
+        dry_warn.append(_agg(rain_totals, lambda xs: _pctl(xs, 0.20)))
         avg_temp.append(_agg(temp_means, lambda xs: sum(xs) / len(xs)))
         min_temp.append(_agg(temp_means, min))
         max_temp.append(_agg(temp_means, max))
-    return avg_rain, min_rain, max_rain, avg_temp, min_temp, max_temp
+    return avg_rain, min_rain, max_rain, dry_warn, avg_temp, min_temp, max_temp
 
 
 def _month_rain(reg_hist: dict, year: int, month: int) -> tuple[float, int]:
@@ -632,7 +681,7 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         # real 38.8mm from 2018). Recomputing here per-cron means they
         # auto-roll forward each year — by Jan 1 2027 the 10Y window slides
         # to 2017-2026 with no manual intervention.
-        ar, ir, xr, at, it, xt = _monthly_aggregates_10y(
+        ar, ir, xr, dw, at, it, xt = _monthly_aggregates_10y(
             rh, ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
         # Only overwrite when every month is populated; partial coverage
         # would mean keeping the seed values for the missing months.
@@ -642,12 +691,22 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
             prov["monthly_min_rain"] = ir  # type: ignore[assignment]
         if all(v is not None for v in xr):
             prov["monthly_max_rain"] = xr  # type: ignore[assignment]
+        if all(v is not None for v in dw):
+            prov["monthly_dry_warn"] = dw  # type: ignore[assignment]
         if all(v is not None for v in at):
             prov["monthly_avg_temp"] = at  # type: ignore[assignment]
         if all(v is not None for v in it):
             prov["monthly_min_temp"] = it  # type: ignore[assignment]
         if all(v is not None for v in xt):
             prov["monthly_max_temp"] = xt  # type: ignore[assignment]
+        # Per-year monthly rain totals (11Y window so the chart can build
+        # 10 crop-year cumulatives that may straddle a calendar boundary,
+        # e.g. Brazil's Jun-May display needs Jun-Dec of year y plus
+        # Jan-May of year y+1). Feeds the Cumulative YTD chart's proper
+        # min/max envelope — replaces the old naive sum-of-per-month-mins
+        # which couldn't correspond to any actually-observed year.
+        prov["monthly_totals_history"] = _monthly_totals_per_year(  # type: ignore[assignment]
+            rh, ENVELOPE_RANGE_START - 1, ENVELOPE_RANGE_END)
         # Current-year actuals (live, accumulating). Keep seed where history is absent.
         act_r = _trim_trailing_none(_year_actuals_rain(rh, CUR_YEAR, cur_month))
         act_t = _trim_trailing_none(_year_actuals_temp(rh, CUR_YEAR, cur_month))

@@ -15,7 +15,6 @@ import requests
 
 from scraper import fetch_cecafe_daily as fcd
 
-
 # ── _fetch_page: success path ────────────────────────────────────────────────
 
 def test_fetch_page_returns_text_on_200():

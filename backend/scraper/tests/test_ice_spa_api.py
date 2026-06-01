@@ -10,7 +10,6 @@ import pytest
 
 from scraper.sources.ice_certified_stocks import spa_api
 
-
 # ── as_of parsing ─────────────────────────────────────────────────────────────
 
 def test_parse_as_of_iso_date():
