@@ -41,6 +41,12 @@ interface Province {
   forecast_7d_rain: number[];
   daily_accum_cur?: (number | null)[];   // per-day cumulative rain, current month
   daily_accum_ly?: (number | null)[];    // per-day cumulative rain, last year same month
+  // Per-day 10Y envelope built from real history in fetch_origin_weather.py.
+  // Replaces the chart's linear interpolation of monthly_min/max_rain (which
+  // mis-flagged bursty-rain years as exceeding the band — see ES Jun 2025
+  // where day-3 actual = 9.4mm vs linear envelope of 2.7mm).
+  daily_accum_min_10y?: (number | null)[];
+  daily_accum_max_10y?: (number | null)[];
   essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
   essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
   spi_1?: number;                         // Standardised Precipitation Index, 1-mo
@@ -998,12 +1004,24 @@ export default function WeatherCharts({
     // interpolations.
     const haveCur = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_cur) && p.daily_accum_cur!.length);
     const haveLY  = isStored && activeProv.every((p) => Array.isArray(p.daily_accum_ly)  && p.daily_accum_ly!.length);
+    // 10Y envelope: prefer the real per-day percentile arrays when the file
+    // ships them (and we're in the stored window). Linear interpolation of
+    // monthly_min/max stays as a fallback so charts don't go blank pre-refresh.
+    const haveEnvelope = isStored
+      && activeProv.every((p) => Array.isArray(p.daily_accum_min_10y) && p.daily_accum_min_10y!.length === dim)
+      && activeProv.every((p) => Array.isArray(p.daily_accum_max_10y) && p.daily_accum_max_10y!.length === dim);
     const rows: DailyRow[] = [];
     for (let d = 1; d <= dim; d++) {
       const i = d - 1;
       const avg_accum = r1(wAvgMonth * (d / dim));
-      const min_accum = r1(wMinMonth * (d / dim));
-      const max_accum = r1(wMaxMonth * (d / dim));
+      const minEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_min_10y![i] != null);
+      const maxEnvOk = haveEnvelope && activeProv.every((p) => p.daily_accum_max_10y![i] != null);
+      const min_accum = minEnvOk
+        ? r1(wsum(activeProv, (p) => p.daily_accum_min_10y![i] as number) / totalProd)
+        : r1(wMinMonth * (d / dim));
+      const max_accum = maxEnvOk
+        ? r1(wsum(activeProv, (p) => p.daily_accum_max_10y![i] as number) / totalProd)
+        : r1(wMaxMonth * (d / dim));
       const allCur = haveCur && activeProv.every((p) => p.daily_accum_cur![i] != null);
       const lyOk = haveLY && activeProv.every((p) => p.daily_accum_ly![i] != null);
       const last_year_accum_mm = lyOk
