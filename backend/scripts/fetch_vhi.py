@@ -99,16 +99,18 @@ def fetch_origin(origin: str, origin_cfg: dict,
             }
             if emit_history:
                 # Minimal per-week record — drop spare NOAA columns the chart
-                # doesn't read. Keeps the long-form payload manageable.
+                # doesn't read. Keeps the long-form payload manageable. rows
+                # are VhiRow dataclass instances (frozen=True), so use attr
+                # access, not .get().
                 entry["weekly_history"] = [
                     {
-                        "year": r.get("year"),
-                        "week": r.get("week"),
-                        "iso_week": r.get("iso_week"),
-                        "vhi": r.get("vhi"),
+                        "year": r.year,
+                        "week": r.week,
+                        "iso_week": r.iso_week_key(),
+                        "vhi": r.vhi,
                     }
                     for r in parsed["rows"]
-                    if r.get("vhi") is not None
+                    if r.vhi is not None
                 ]
             provinces_out[region] = entry
             latest = head["vhi_latest"]
