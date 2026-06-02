@@ -49,10 +49,16 @@ from scraper import vhi  # noqa: E402
 DATA_DIR = REPO_ROOT / "frontend" / "public" / "data"
 SEED_PATH = REPO_ROOT / "backend" / "seed" / "vhi_province_ids.json"
 
-# 3 years of trailing history keeps each response under ~6 KB and gives the
-# frontend enough series to draw a seasonal context chart later.
+# Default rolling window for the weekly cron — 3yr is enough for the chart's
+# trailing context. The one-shot backfill workflow overrides via --years
+# so the file ships a long-form `weekly_history` array fed into the
+# analog-forecast signature engine.
 YEAR_WINDOW = 3
-N_RECENT = 12   # weeks shipped to the frontend chart
+N_RECENT = 12   # weeks shipped to the frontend chart as `vhi_recent`
+# Threshold above which we also emit the full per-week history alongside
+# vhi_recent. Keeps the daily cron payload small while letting the backfill
+# include a full 30Y series. ~30yr × 52wk × ~30 bytes ≈ 50KB per province.
+LONG_FORM_THRESHOLD_YEARS = 10
 
 
 def _load_seed() -> dict:
@@ -65,8 +71,11 @@ def _load_seed() -> dict:
 
 def fetch_origin(origin: str, origin_cfg: dict,
                  session: requests.Session,
-                 year1: int, year2: int) -> dict:
-    """Fetch every region in one origin. Returns the JSON-ready payload."""
+                 year1: int, year2: int,
+                 emit_history: bool = False) -> dict:
+    """Fetch every region in one origin. Returns the JSON-ready payload.
+    emit_history=True attaches the full weekly series per province under
+    `weekly_history` — used by the analog-forecast pipeline."""
     iso3 = origin_cfg["country_iso3"]
     provinces_in = origin_cfg.get("provinces") or {}
     provinces_out: dict[str, dict] = {}
@@ -82,18 +91,31 @@ def fetch_origin(origin: str, origin_cfg: dict,
         try:
             parsed = vhi.fetch_vhi(iso3, pid, year1, year2, session=session)
             head = vhi.latest_and_recent(parsed["rows"], n_recent=N_RECENT)
-            provinces_out[region] = {
+            entry: dict = {
                 "province_id":     pid,
                 "noaa_name":       (meta or {}).get("noaa_name") or parsed.get("province_name"),
                 "weeks_in_window": len(parsed["rows"]),
                 **head,
             }
+            if emit_history:
+                # Minimal per-week record — drop spare NOAA columns the chart
+                # doesn't read. Keeps the long-form payload manageable.
+                entry["weekly_history"] = [
+                    {
+                        "year": r.get("year"),
+                        "week": r.get("week"),
+                        "iso_week": r.get("iso_week"),
+                        "vhi": r.get("vhi"),
+                    }
+                    for r in parsed["rows"]
+                    if r.get("vhi") is not None
+                ]
+            provinces_out[region] = entry
             latest = head["vhi_latest"]
             print(f"  [vhi] {origin}/{region} pid={pid} weeks={len(parsed['rows'])} "
                   f"latest={latest['iso_week'] if latest else 'n/a'} "
                   f"vhi={latest['vhi'] if latest else 'n/a'} "
                   f"({latest['severity'] if latest else 'n/a'})")
-            # Light rate-limit; NOAA's PHP backend is single-threaded per IP.
             time.sleep(0.4)
         except requests.RequestException as e:
             errors.append(f"{region}: {e}")
@@ -115,6 +137,11 @@ def main() -> int:
                     help="Persist results to frontend/public/data/vhi_*.json")
     ap.add_argument("--origins", nargs="*", default=None,
                     help="Subset of origins to fetch (default: all in the seed)")
+    ap.add_argument("--years", type=int, default=YEAR_WINDOW,
+                    help=f"Years of history to pull (default: {YEAR_WINDOW}). "
+                         "Set higher to backfill the analog-forecast signature; "
+                         f"≥{LONG_FORM_THRESHOLD_YEARS} also emits a `weekly_history` "
+                         "array per province.")
     args = ap.parse_args()
 
     seed = _load_seed()
@@ -127,9 +154,11 @@ def main() -> int:
 
     today = dt.date.today()
     year2 = today.year
-    year1 = year2 - YEAR_WINDOW
+    year1 = year2 - args.years
+    emit_history = args.years >= LONG_FORM_THRESHOLD_YEARS
 
-    print(f"[vhi] fetching {len(origins)} origins, years {year1}–{year2}")
+    print(f"[vhi] fetching {len(origins)} origins, years {year1}–{year2}"
+          + (" (long-form, weekly_history emitted)" if emit_history else ""))
     session = requests.Session()
     summary = []
 
@@ -137,7 +166,7 @@ def main() -> int:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     for origin, cfg in origins.items():
-        payload = fetch_origin(origin, cfg, session, year1, year2)
+        payload = fetch_origin(origin, cfg, session, year1, year2, emit_history=emit_history)
         summary.append((origin, len(payload["provinces"]),
                         len(payload["missing_province_ids"]),
                         len(payload["errors"])))
