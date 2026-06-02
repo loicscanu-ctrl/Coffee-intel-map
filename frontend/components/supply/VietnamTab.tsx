@@ -5,6 +5,7 @@ import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEs
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
+import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 
 interface VietnamSupply {
@@ -63,7 +64,7 @@ function VnEnsoNote() {
 }
 
 export default function VietnamTab() {
-  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
+  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
   const [sharesData, setSharesData] = useState<SharesData | null>(null);
 
@@ -82,7 +83,7 @@ export default function VietnamTab() {
     <div className="space-y-4">
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map((t) => (
+        {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -92,7 +93,11 @@ export default function VietnamTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "exports" ? "Exports" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Farmer Economics"}
+            {t === "exports" ? "Exports"
+              : t === "weather" ? "Weather"
+              : t === "analogs" ? "Analogs"
+              : t === "supply-demand" ? "Supply & Demand"
+              : "Farmer Economics"}
           </button>
         ))}
       </div>
@@ -112,6 +117,11 @@ export default function VietnamTab() {
           <VnWaterLevels />
           <VnEnsoNote />
         </div>
+      )}
+
+      {/* ── Analogs ────────────────────────────────────────────────── */}
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_vietnam.json" label="Vietnam robusta" />
       )}
 
       {/* ── Exports ────────────────────────────────────────────────── */}
