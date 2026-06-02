@@ -126,12 +126,17 @@ const kMT = (x?: number | null) => (x != null ? Math.round(x / 1000) : null);
 // Years present in the series (newest first), restricted to entries that carry
 // the field selected by `has`.
 function yearsWith(monthly: MonthlyEntry[], has: (m: MonthlyEntry) => boolean): number[] {
-  const ys = new Set<number>();
+  // Plain array + includes (no Set spread — repo's TS target predates es2015
+  // iteration, so [...set] fails to compile).
+  const ys: number[] = [];
   for (const m of monthly) {
     const mt = (m.period ?? m.month ?? "").match(/^(\d{4})-\d{2}$/);
-    if (mt && has(m)) ys.add(parseInt(mt[1]));
+    if (mt && has(m)) {
+      const y = parseInt(mt[1]);
+      if (!ys.includes(y)) ys.push(y);
+    }
   }
-  return [...ys].sort((a, b) => b - a);
+  return ys.sort((a, b) => b - a);
 }
 
 type SeasonRow = Record<string, number | string | null>;
