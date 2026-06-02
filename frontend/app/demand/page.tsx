@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
+import AjcaPanel from "@/components/demand/AjcaPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
@@ -14,11 +15,12 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "destination" | "certified" | "demand" | "listed" | "test";
+type SubTab = "destination" | "certified" | "ajca" | "demand" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "destination", label: "Destination stocks" },
   { id: "certified",   label: "Certified stocks" },
+  { id: "ajca",        label: "Japan (AJCA)" },
   { id: "demand",      label: "Demand" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
@@ -83,6 +85,12 @@ function DemandPageInner() {
       {tab === "certified" && (
         <Section>
           <CertifiedStocksPanel />
+        </Section>
+      )}
+
+      {tab === "ajca" && (
+        <Section>
+          <AjcaPanel />
         </Section>
       )}
 
