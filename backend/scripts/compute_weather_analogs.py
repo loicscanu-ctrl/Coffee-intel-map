@@ -84,62 +84,53 @@ ONI_BY_YM: dict[tuple[int, int], float] = {
 }
 
 # ── Phenology zone templates ─────────────────────────────────────────────────
-# Coffee phenology is climate-zone-dependent. Three structurally different
-# templates cover the producing belt:
+# Coffee phenology is climate-hemisphere-dependent. Two symmetric templates
+# with a clean 6-month offset between them, matching how harvest peaks split
+# between the hemispheres:
 #
-#   southern_temperate (Brazil): distinct dry winter (Jun-Aug) + wet summer
-#     (Dec-Feb). Flowering triggered by spring rain Oct-Nov. Single
-#     concentrated harvest May-Sep. Stages cross Dec → Jan year boundary, so
-#     anchor "southern_hemisphere" maps months ≥ 8 to crop_year - 1.
+#   southern_hemisphere (Brazil + Indonesia robusta): pre-flowering starts
+#     Aug-Sep, harvest peaks May-Sep of the crop year. Used by producers
+#     south of ~3°N — including Indonesia's Lampung+Java robusta belt
+#     (5-7°S) where Brazil's pattern fits cleanly.
 #
-#   northern_monsoon_asia (Vietnam): Asian SE monsoon — dry Nov-Apr, wet
-#     May-Oct. Robusta growers time bloom to Feb-Mar via dry-season
-#     irrigation withholding, so harvest falls in the dry season Nov-Jan
-#     for easier drying. Stages span calendar year with only Dec wrapping
-#     to crop_year - 1 (anchor "calendar_year").
+#   northern_hemisphere (Vietnam + future Honduras / Ethiopia / Colombia):
+#     6 months offset from southern — pre-flowering starts Feb-Mar,
+#     harvest peaks Nov-Feb. Used by producers north of ~3°N. Vietnam
+#     robusta's bloom is timed Feb-Mar via dry-season irrigation
+#     withholding; the rest of the cycle follows Asian/Caribbean monsoon
+#     rhythm.
 #
-#   equatorial (Indonesia, future Colombia / Uganda): weakly seasonal,
-#     near-equator climate. Real phenology is bimodal with multiple
-#     flushes; we collapse to a single annual cycle for analog ranking
-#     using the dominant Lampung-style pattern. Stages run Jul-Jun.
-#     Anchor matches southern_hemisphere (months ≥ 7 → Y-1) since most
-#     equatorial producers sit just south of the line.
-#
-# Future-zone hooks (add when porting Honduras / Ethiopia / etc.):
-#   northern_subtropical: Honduras-style. Flowering Apr-May, harvest
-#     Dec-Mar. Anchor "calendar_year_simple" (no wrap; all stages in Y).
+# Equatorial origins (Indonesia, Colombia, Uganda) PICK ONE of the two
+# templates based on which hemisphere their dominant producing region sits
+# in. Each origin's config says "zone": "southern_hemisphere" or
+# "northern_hemisphere" — no separate equatorial template, just pick the
+# right anchor for the producer geography.
 PHENOLOGY_ZONES: dict[str, dict] = {
-    "southern_temperate": {
+    "southern_hemisphere": {
         "stages": [
             ("pre_flowering", [8, 9]),       # Aug-Sep of (Y-1): end of dry season
             ("flowering",     [10, 11]),     # Oct-Nov of (Y-1): spring rain triggers bloom
             ("fruit_fill",    [12, 1, 2]),   # Dec (Y-1) - Feb (Y): summer wet, grand expansion
             ("maturation",    [3, 4, 5]),    # Mar-May of (Y): autumn dry-down toward harvest
         ],
-        "anchor":          "southern_hemisphere",  # months ≥ 8 → Y-1
-        "harvest_period":  "May-Sep of crop_year",
+        "anchor":            "wrap_august",  # months ≥ 8 → crop_year-1
+        "harvest_period":    "May-Sep of crop_year",
+        "flip_month":        8,              # cur_crop_year advances when today.month ≥ 8
+        "post_flip_offset":  1,              # year+1 when past flip (harvest is NEXT year)
     },
-    "northern_monsoon_asia": {
+    "northern_hemisphere": {
+        # Symmetric 6-month offset from southern_hemisphere. All stages live
+        # in calendar year Y; harvest straddles into Y+1 but stages don't.
         "stages": [
-            ("pre_flowering", [12, 1]),         # Dec (Y-1) - Jan (Y): dry rest
-            ("flowering",     [2, 3]),          # Feb-Mar (Y): irrigation-triggered bloom
-            ("fruit_fill",    [4, 5, 6, 7]),    # Apr-Jul (Y): main wet season
-            ("maturation",    [8, 9, 10]),      # Aug-Oct (Y): wet tapers, prep for dry harvest
+            ("pre_flowering", [2, 3]),       # Feb-Mar of Y: end of dry rest
+            ("flowering",     [4, 5]),       # Apr-May of Y: rain triggers bloom (or irrigation in VN)
+            ("fruit_fill",    [6, 7, 8]),    # Jun-Aug of Y: monsoon wet season
+            ("maturation",    [9, 10, 11]),  # Sep-Nov of Y: dry-down toward harvest
         ],
-        "anchor":          "calendar_year",     # only month 12 wraps to Y-1
-        "harvest_period":  "Nov Y - Jan Y+1",
-    },
-    "equatorial": {
-        # Less concentrated cycle — wider pre-flowering and fruit-fill windows
-        # reflect that equatorial origins rarely have a single sharp bloom.
-        "stages": [
-            ("pre_flowering", [7, 8, 9]),       # Jul-Sep (Y-1): mid-year dry, build-up
-            ("flowering",     [10, 11]),        # Oct-Nov (Y-1): wet-season trigger
-            ("fruit_fill",    [12, 1, 2, 3]),   # Dec (Y-1) - Mar (Y): wet season fill
-            ("maturation",    [4, 5]),          # Apr-May (Y): drier window before harvest
-        ],
-        "anchor":          "southern_hemisphere",  # most equatorial producers sit at 5-10°S
-        "harvest_period":  "May-Aug of crop_year (dominant cycle; smaller flush usually Nov-Jan)",
+        "anchor":            "no_wrap",      # all stage months belong to crop_year directly
+        "harvest_period":    "Nov Y - Feb Y+1",
+        "flip_month":        2,              # cur_crop_year advances when today.month ≥ 2
+        "post_flip_offset":  0,              # year+0 (harvest is THIS year's late + Y+1 early)
     },
 }
 
@@ -152,7 +143,7 @@ ORIGIN_CONFIGS = {
         "prod_seed_file": "brazil_arabica_production.json",
         "vhi_file":       "vhi_brazil.json",
         "out_file":       "weather_analogs_brazil.json",
-        "zone":           "southern_temperate",
+        "zone":           "southern_hemisphere",
         # Production weights (arabica share only; Espírito Santo's conilon excluded).
         "prod_weights": {
             "Sul de Minas":   900,
@@ -167,7 +158,7 @@ ORIGIN_CONFIGS = {
         "prod_seed_file": "vietnam_robusta_production.json",
         "vhi_file":       "vhi_vn.json",
         "out_file":       "weather_analogs_vietnam.json",
-        "zone":           "northern_monsoon_asia",
+        "zone":           "northern_hemisphere",
         # USDA AEKI 2024 regional weights (Vietnam is ~95% robusta so use
         # total prod for all 5 regions in the Central Highlands).
         "prod_weights": {
@@ -184,7 +175,10 @@ ORIGIN_CONFIGS = {
         "prod_seed_file": "indonesia_robusta_production.json",
         "vhi_file":       "vhi_indonesia.json",
         "out_file":       "weather_analogs_indonesia.json",
-        "zone":           "equatorial",
+        # Equatorial origin: Lampung+Java sit 5-7°S, so we use the southern
+        # hemisphere template. If we later add an arabica-side engine for
+        # Gayo (4°N), it'd reference "northern_hemisphere" instead.
+        "zone":           "southern_hemisphere",
         # Robusta share only — Lampung dominant; Java carries a smaller
         # robusta load. Gayo/Toraja/Flores are arabica → excluded here so
         # the signature tracks robusta-producing weather only.
@@ -209,17 +203,19 @@ def _dim(year: int, month: int) -> int:
 
 
 def _stage_window(stage_months: list[int], crop_year: int, anchor: str) -> list[tuple[int, int]]:
-    """For a crop-year (harvest year), return [(calendar_year, month), ...]
-    covering the stage's calendar months.
-    anchor == "southern_hemisphere": months ≥ 8 belong to crop_year-1.
-    anchor == "calendar_year":       month 12 belongs to crop_year-1, rest to crop_year."""
+    """For a crop-year, return [(calendar_year, month), ...] for the stage's
+    calendar months.
+      anchor "wrap_august": months ≥ 8 belong to crop_year-1 (southern_hemisphere).
+      anchor "no_wrap":     all months belong to crop_year (northern_hemisphere).
+    The older "southern_hemisphere" / "calendar_year" aliases are kept for
+    backward-compat with any callers that hand-built the anchor string."""
     out = []
     for m in stage_months:
-        if anchor == "southern_hemisphere":
+        if anchor in ("wrap_august", "southern_hemisphere"):
             cy = crop_year - 1 if m >= 8 else crop_year
-        elif anchor == "calendar_year":
+        elif anchor == "calendar_year":   # legacy: Dec → Y-1, rest → Y
             cy = crop_year - 1 if m == 12 else crop_year
-        else:
+        else:                              # "no_wrap" or anything else
             cy = crop_year
         out.append((cy, m))
     return out
@@ -595,11 +591,20 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
     stage_anchor = zone["anchor"]
 
     today = dt.date.today()
-    # Crop-year rollover: when "today" sits past the zone's harvest window,
-    # the current cycle becomes the NEXT crop year. southern_temperate flips
-    # at Aug; northern_monsoon_asia at Nov; equatorial at Jul.
-    flip_month = {"southern_temperate": 8, "northern_monsoon_asia": 11, "equatorial": 7}.get(zone_key, 8)
-    cur_crop_year = today.year + 1 if today.month >= flip_month else today.year
+    # Crop-year semantics per hemisphere:
+    #   southern (Brazil): growing cycle Aug Y-1 → May Y, harvest in Y.
+    #     When today.month ≥ flip_month (Aug), we've already started growing
+    #     for NEXT year's harvest → cur = today.year + 1.
+    #   northern (Vietnam): growing cycle Feb Y → Nov Y, harvest spans Nov Y
+    #     → Feb Y+1. When today.month ≥ flip_month (Feb), we're growing
+    #     for THIS year's harvest → cur = today.year. Before Feb (Jan only)
+    #     we're still in the previous cycle's harvest tail → cur = today.year - 1.
+    flip_month       = zone["flip_month"]
+    post_flip_offset = zone["post_flip_offset"]
+    if today.month >= flip_month:
+        cur_crop_year = today.year + post_flip_offset
+    else:
+        cur_crop_year = today.year + post_flip_offset - 1
 
     all_years = sorted({y for prov in history["regions"].values()
                           for y in {int(k[:4]) for k in prov}})

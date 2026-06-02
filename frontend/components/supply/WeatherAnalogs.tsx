@@ -111,12 +111,29 @@ const ZONE_LABEL: Record<string, string> = {
   northern_subtropical:  "Northern hemisphere · subtropical",
 };
 
-const STAGE_LABEL: Record<string, string> = {
-  pre_flowering: "Pre-flowering (Aug-Sep)",
-  flowering:     "Flowering (Oct-Nov)",
-  fruit_fill:    "Fruit fill (Dec-Feb)",
-  maturation:    "Maturation (Mar-May)",
+// Stage label uses the origin's own phenology months from the analog JSON
+// — pre-flowering looks different in southern vs northern hemisphere, so a
+// hard-coded "Aug-Sep" tag is wrong for Vietnam (Feb-Mar) and any future
+// northern_hemisphere origin.
+const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const STAGE_PRETTY: Record<string, string> = {
+  pre_flowering: "Pre-flowering",
+  flowering:     "Flowering",
+  fruit_fill:    "Fruit fill",
+  maturation:    "Maturation",
 };
+
+function _stageLabel(stageName: string, phenology: { name: string; months: number[] }[] | undefined): string {
+  const pretty = STAGE_PRETTY[stageName] ?? stageName;
+  const entry = phenology?.find((p) => p.name === stageName);
+  if (!entry || !entry.months.length) return pretty;
+  // Compact label: first + last month abbreviation (e.g. "Aug-Sep", "Dec-Feb",
+  // "Apr-Jul"). For a single month stage just show the one.
+  const first = MONTH_ABBR[entry.months[0] - 1];
+  const last  = MONTH_ABBR[entry.months[entry.months.length - 1] - 1];
+  return entry.months.length === 1 ? `${pretty} (${first})` : `${pretty} (${first}-${last})`;
+}
 
 const ANALOG_COLOR = ["#f59e0b", "#a855f7", "#14b8a6", "#ec4899", "#22d3ee"];
 const TT = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
@@ -297,7 +314,7 @@ function CurrentSignature({ doc }: { doc: AnalogDoc }) {
           return (
             <div key={s.name} className="bg-slate-950/50 rounded border border-slate-800 p-2 space-y-1">
               <div className="text-[9px] text-slate-500 uppercase tracking-wider">
-                {STAGE_LABEL[s.name] ?? s.name}
+                {_stageLabel(s.name, doc.phenology)}
               </div>
               <div className="flex items-baseline justify-between">
                 <span className="text-[9px] text-slate-600">rain</span>
@@ -364,7 +381,7 @@ function StageRainChart({ doc }: { doc: AnalogDoc }) {
     const cur = doc.current_year_signature.find((s) => s.name === stageName);
     const norm = doc.stage_normals_10y[stageName];
     const row: Record<string, string | number | null> = {
-      stage: STAGE_LABEL[stageName] ?? stageName,
+      stage: _stageLabel(stageName, doc.phenology),
       current: cur?.rain_mm ?? null,
       avg: norm?.rain_mean ?? 0,
     };
@@ -424,7 +441,7 @@ function StageOniChart({ doc }: { doc: AnalogDoc }) {
   const data = stages.map((stageName) => {
     const cur = doc.current_year_signature.find((s) => s.name === stageName);
     const row: Record<string, string | number | null> = {
-      stage: STAGE_LABEL[stageName] ?? stageName,
+      stage: _stageLabel(stageName, doc.phenology),
       current: cur?.oni_avg ?? null,
     };
     doc.top_analogs.forEach((a, i) => {

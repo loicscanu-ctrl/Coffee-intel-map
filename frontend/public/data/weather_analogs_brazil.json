@@ -1,11 +1,11 @@
 {
   "_schema": "v3",
   "_note": "Brazil arabica weather-analog forecast. Mahalanobis on 24-dim (rain, temp, rain_anom, SPI z, SPEI z, ONI) × 4 phenology stages. Detrended production residuals. Walk-forward backtest. Bootstrap 95% CI on ensemble.",
-  "generated_at": "2026-06-02T03:45:21+00:00",
+  "generated_at": "2026-06-02T03:55:41+00:00",
   "origin": "brazil_arabica",
   "origin_label": "Brazil arabica",
   "current_crop_year": 2026,
-  "zone": "southern_temperate",
+  "zone": "southern_hemisphere",
   "harvest_period": "May-Sep of crop_year",
   "phenology": [
     {
