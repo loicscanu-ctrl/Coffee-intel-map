@@ -62,6 +62,95 @@ def test_fetch_page_http_error_propagates_naturally():
             fcd._fetch_page()
 
 
+# ── _parse_page: anchor priority (Embarques > Certificados) ──────────────────
+
+def _build_two_table_html(emb_totais: str, cert_totais: str, ref_date: str = "01/06/2026") -> str:
+    """Synthetic Cecafé page with BOTH tables present. Order matches the live
+    page (Certificados first, then Embarques later in the document)."""
+    return f"""
+    <html><body>
+        <p>Informações recebidas até: {ref_date}</p>
+        <h2>Emissão de Certificados de Origem</h2>
+        <table><tr><td>TOTAIS</td>{cert_totais}</tr></table>
+        <h2>Unidades de Embarques Marítimos e Rodoviários</h2>
+        <table><tr><td>TOTAIS</td>{emb_totais}</tr></table>
+    </body></html>
+    """
+
+
+def _td_row(*values) -> str:
+    return "".join(f"<td>{v}</td>" for v in values)
+
+
+def test_parse_extracts_both_sources():
+    """User spec: fetch BOTH Embarques (physical loadings) and Certificados
+    (paperwork). Distinct numbers per table so misrouting would show up."""
+    cert = _td_row(0, 28024, 0, 28024, 0, 28024, 0, 28024, 99999, 99999, 99999, 99999)
+    emb  = _td_row(0, 2520,  0, 2520,  0, 2520,  0, 2520,  34254, 26973, 0,     61227)
+    html = _build_two_table_html(emb_totais=emb, cert_totais=cert)
+
+    parsed = fcd._parse_page(html)
+
+    assert parsed["sources"]["embarques"]["conillon"]      == 2520
+    assert parsed["sources"]["embarques"]["prev_arabica"]  == 34254
+    assert parsed["sources"]["certificados"]["conillon"]   == 28024
+    assert parsed["sources"]["certificados"]["prev_arabica"] == 99999
+
+
+def test_parse_handles_missing_embarques_source():
+    """If Embarques header is absent (Cecafé page-tree drift), Certificados
+    still parses and the run keeps going. sources['embarques'] becomes None."""
+    cert = _td_row(0, 28024, 0, 28024, 0, 28024, 0, 28024, 99999, 99999, 99999, 99999)
+    html = f"""
+    <html><body>
+        <p>Informações recebidas até: 01/06/2026</p>
+        <h2>Emissão de Certificados de Origem</h2>
+        <table><tr><td>TOTAIS</td>{cert}</tr></table>
+    </body></html>
+    """
+    parsed = fcd._parse_page(html)
+    assert parsed["sources"]["embarques"] is None
+    assert parsed["sources"]["certificados"]["conillon"] == 28024
+
+
+def test_parse_reference_date_correct():
+    """Date after 'Informações recebidas até:' becomes ref_date."""
+    emb = _td_row(*([0] * 12))
+    html = _build_two_table_html(emb_totais=emb, cert_totais=emb, ref_date="15/05/2026")
+    parsed = fcd._parse_page(html)
+    assert parsed["ref_date"].isoformat() == "2026-05-15"
+
+
+def test_parse_column_order_matches_user_spec():
+    """Column order per source:
+        1-4   Movimento do dia: arabica, conillon, soluvel, total
+        5-8   Acumulado:        arabica, conillon, soluvel, total
+        9-12  Mês Anterior:     arabica, conillon, soluvel, total"""
+    emb = _td_row(
+        100, 200, 300, 600,
+        1000, 2000, 3000, 6000,
+        10000, 20000, 30000, 60000,
+    )
+    cert = _td_row(*([99999] * 12))
+    html = _build_two_table_html(emb_totais=emb, cert_totais=cert)
+    parsed = fcd._parse_page(html)
+    s = parsed["sources"]["embarques"]
+    assert s["arabica"]       == 1000
+    assert s["conillon"]      == 2000
+    assert s["soluvel"]       == 3000
+    assert s["prev_arabica"]  == 10000
+    assert s["prev_conillon"] == 20000
+    assert s["prev_soluvel"]  == 30000
+
+
+def test_parse_raises_when_both_sources_missing():
+    """Neither table present → page is unrecognizable, raise so the workflow's
+    retry / alert path fires."""
+    html = "<html><body><p>Informações recebidas até: 01/06/2026</p></body></html>"
+    with pytest.raises(ValueError, match="Could not find TOTAIS row for ANY"):
+        fcd._parse_page(html)
+
+
 # ── Error class hierarchy ────────────────────────────────────────────────────
 
 def test_cecafe_unreachable_is_runtime_error_subclass():
