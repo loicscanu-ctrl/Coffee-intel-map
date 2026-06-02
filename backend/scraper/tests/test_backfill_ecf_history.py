@@ -67,6 +67,20 @@ def test_parse_real_by_type_table():
     assert out["2020-01"]["value_mt"] == 312_468 + 202_536
 
 
+def test_implausible_total_dropped_but_breakdown_kept():
+    """A mis-parsed total outside the European band is dropped; ports kept."""
+    table = [
+        ["", "Port", "", "", "31-Feb-14"],   # single bad value → tiny total
+        ["Antwerp", None, None, "874", None],
+    ]
+    pm: dict = {}
+    _parse_table(table, 2014, "u", pm)
+    out = {e["period"]: e for e in _finalise(pm)}
+    e = out["2014-02"]
+    assert "value_mt" not in e          # 874 t dropped
+    assert e["ports"] == {"Antwerp": 874}  # breakdown still retained
+
+
 def test_parse_ignores_non_date_tables():
     table = [["Disclaimer:", "text"], ["more", "text"]]
     pm: dict = {}
