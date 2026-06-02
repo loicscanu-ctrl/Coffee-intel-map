@@ -142,6 +142,11 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
       unwashed: m.arabica_unwashed_mt != null ? Math.round(m.arabica_unwashed_mt / 1000) : null,
       robusta:  m.robusta_mt          != null ? Math.round(m.robusta_mt          / 1000) : null,
       other:    m.other_mt            != null ? Math.round(m.other_mt            / 1000) : null,
+      // Months without a type split (pre-2020 PDFs) still have a total — show it
+      // as a single neutral column so the early history isn't blank.
+      totalOnly: (m.arabica_washed_mt == null && m.arabica_unwashed_mt == null &&
+                  m.robusta_mt == null && m.other_mt == null && mt != null)
+                 ? Math.round(mt / 1000) : null,
       yoy,
     };
   }).filter(d => d.mt != null);
@@ -209,6 +214,7 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
                     const labels: Record<string, string> = {
                       washed: "Arabica Washed", unwashed: "Arabica Unwashed",
                       robusta: "Robusta", other: "Other",
+                      totalOnly: "Total (type split N/A)",
                     };
                     const key = String(name ?? "");
                     return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
@@ -218,8 +224,11 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
                   formatter={(v: string) => ({
                     washed: "Arabica Washed", unwashed: "Arabica Unwashed",
                     robusta: "Robusta", other: "Other",
+                    totalOnly: "Total (pre-2020)",
                   }[v] ?? v)}
                 />
+                {/* Pre-2020 months: single neutral total column (no type split). */}
+                <Bar dataKey="totalOnly" stackId="s" fill="#475569" opacity={0.9} radius={[2,2,0,0]} name="totalOnly" />
                 <Bar dataKey="washed"   stackId="s" fill="#6366f1" opacity={0.9} name="washed" />
                 <Bar dataKey="unwashed" stackId="s" fill="#8b5cf6" opacity={0.9} name="unwashed" />
                 <Bar dataKey="robusta"  stackId="s" fill="#a78bfa" opacity={0.9} radius={[2,2,0,0]} name="robusta" />
