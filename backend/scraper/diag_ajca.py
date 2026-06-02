@@ -94,6 +94,41 @@ def main() -> None:
         print(f"\n===== STOCK PDF: {u} =====")
         dump_pdf(u, max_pages=6)
 
+    # ── Probe A: historical j-zaiko (only current year is linked on the hub) ───
+    print("\n===== HISTORICAL j-zaiko PROBE =====")
+    base = "https://coffee.ajca.or.jp/wordpress/wp-content/uploads"
+    hits = []
+    for yr in range(2018, 2027):
+        for mo in range(1, 13):
+            for uy, um in [(yr, mo), (yr, mo + 1), (yr + (mo // 12), (mo % 12) + 1)]:
+                url = f"{base}/{uy}/{um:02d}/j-zaiko{yr}{mo:02d}.pdf"
+                try:
+                    rr = requests.head(url, headers=_HEADERS, timeout=15)
+                    if rr.status_code == 200:
+                        hits.append(url); break
+                except Exception:
+                    pass
+    print(f"  resolved {len(hits)} j-zaiko URLs:")
+    for u in hits:
+        print("   ", u)
+
+    # ── Probe B: data7 per-type import totals (find the grand-total / 合計 row) ─
+    print("\n===== data7 TYPE-TOTAL PROBE =====")
+    for kind in ["data7-import-nama", "data7-import-rc", "data7-import-ic"]:
+        u = _latest_pdf_by_kind(idx, kind)
+        print(f"\n  --- {kind}: {u}")
+        if not u:
+            continue
+        try:
+            r = requests.get(u, headers=_HEADERS, timeout=60)
+            with pdfplumber.open(io.BytesIO(r.content)) as pdf:
+                for pno, page in enumerate(pdf.pages, 1):
+                    for line in (page.extract_text() or "").split("\n"):
+                        if re.search(r"合計|総合計|総計", line) or re.search(r"20\d\d\s+20\d\d", line):
+                            print(f"     p{pno}: {line[:200]}")
+        except Exception as e:
+            print(f"     ERROR: {e}")
+
 
 if __name__ == "__main__":
     main()
