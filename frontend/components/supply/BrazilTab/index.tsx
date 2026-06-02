@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
 import WeatherCharts from "../WeatherCharts";
-import BrazilWeatherAnalogs from "../BrazilWeatherAnalogs";
+import WeatherAnalogs from "../WeatherAnalogs";
 import SupplyDemandBalance from "../SupplyDemandBalance";
 import { COUNTRY_HUB, EMPTY_CY, ICE_KC_COUNTRIES, ICE_RC_COUNTRIES } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
@@ -140,7 +140,9 @@ export default function BrazilTab() {
         />
       )}
 
-      {subTab === "analogs" && <BrazilWeatherAnalogs />}
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_brazil.json" label="Brazil arabica" />
+      )}
 
       {subTab === "exports" && (
         <>

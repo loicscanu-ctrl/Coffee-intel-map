@@ -29,7 +29,12 @@ interface Stage {
   name: string;
   rain_mm?: number | null;
   temp_c?: number | null;
+  et0_mm?: number | null;
   oni_avg?: number | null;
+  rain_anom_pct?: number | null;
+  temp_anom_c?: number | null;
+  spi_z?: number | null;
+  spei_z?: number | null;
 }
 
 interface Ensemble {
@@ -81,6 +86,8 @@ interface HistoricalSig {
 }
 
 interface AnalogDoc {
+  origin?: string;
+  origin_label?: string;
   current_crop_year: number;
   phenology: { name: string; months: number[] }[];
   stage_normals_10y: Record<string, { rain_mean: number | null; temp_mean: number | null }>;
@@ -231,6 +238,25 @@ function EnsembleCard({ title, ensemble, sub }: { title: string; ensemble: Ensem
   );
 }
 
+// SPI / SPEI band-label conventions (NOAA Climate Prediction Center categories):
+//   z ≤ -2.0 : extremely dry / drought
+//   -1.5..-2.0: severely dry
+//   -1.0..-1.5: moderately dry
+//   -1.0..+1.0: near normal
+//   +1.0..+1.5: moderately wet
+//   +1.5..+2.0: severely wet
+//   z ≥ +2.0 : extremely wet
+function _spiBadge(v: number | null | undefined): { tag: string; cls: string } {
+  if (v == null) return { tag: "—", cls: "text-slate-600" };
+  if (v <= -2.0) return { tag: "extreme dry",  cls: "text-rose-500" };
+  if (v <= -1.5) return { tag: "severe dry",   cls: "text-rose-400" };
+  if (v <= -1.0) return { tag: "moderate dry", cls: "text-amber-400" };
+  if (v <  +1.0) return { tag: "near normal",  cls: "text-slate-400" };
+  if (v <  +1.5) return { tag: "moderate wet", cls: "text-sky-400" };
+  if (v <  +2.0) return { tag: "severe wet",   cls: "text-sky-300" };
+  return { tag: "extreme wet", cls: "text-sky-200" };
+}
+
 function CurrentSignature({ doc }: { doc: AnalogDoc }) {
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
@@ -240,9 +266,11 @@ function CurrentSignature({ doc }: { doc: AnalogDoc }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {doc.current_year_signature.map((s) => {
           const norm = doc.stage_normals_10y[s.name];
-          const rainAnomPct = s.rain_mm != null && norm?.rain_mean
-            ? ((s.rain_mm - norm.rain_mean) / norm.rain_mean * 100) : null;
+          const rainAnomPct = s.rain_anom_pct ?? (s.rain_mm != null && norm?.rain_mean
+            ? ((s.rain_mm - norm.rain_mean) / norm.rain_mean * 100) : null);
           const oniBadge = _oniBadge(s.oni_avg);
+          const spiBadge  = _spiBadge(s.spi_z);
+          const speiBadge = _spiBadge(s.spei_z);
           return (
             <div key={s.name} className="bg-slate-950/50 rounded border border-slate-800 p-2 space-y-1">
               <div className="text-[9px] text-slate-500 uppercase tracking-wider">
@@ -265,12 +293,29 @@ function CurrentSignature({ doc }: { doc: AnalogDoc }) {
                   {s.temp_c != null ? `${s.temp_c.toFixed(1)}°C` : "—"}
                 </span>
               </div>
-              <div className="flex items-baseline justify-between border-t border-slate-800 pt-1 mt-1">
-                <span className="text-[9px] text-slate-600">ONI</span>
-                <span className={`text-[11px] font-mono ${oniBadge.cls}`}>
-                  {s.oni_avg != null ? s.oni_avg.toFixed(2) : "—"}
-                  <span className="text-[8px] ml-1">{oniBadge.tag}</span>
-                </span>
+              {/* Drought indices: SPI (precipitation only), SPEI (precip - ET₀) */}
+              <div className="border-t border-slate-800 pt-1 mt-1 space-y-0.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[9px] text-slate-600" title="Standardized Precipitation Index — rain only, z-score across 10Y window">SPI</span>
+                  <span className={`text-[11px] font-mono ${spiBadge.cls}`}>
+                    {s.spi_z != null ? s.spi_z.toFixed(2) : "—"}
+                    <span className="text-[8px] ml-1">{spiBadge.tag}</span>
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[9px] text-slate-600" title="Standardized Precipitation-Evapotranspiration Index — water balance (rain - ET₀), z-score">SPEI</span>
+                  <span className={`text-[11px] font-mono ${speiBadge.cls}`}>
+                    {s.spei_z != null ? s.spei_z.toFixed(2) : "—"}
+                    <span className="text-[8px] ml-1">{speiBadge.tag}</span>
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[9px] text-slate-600">ONI</span>
+                  <span className={`text-[11px] font-mono ${oniBadge.cls}`}>
+                    {s.oni_avg != null ? s.oni_avg.toFixed(2) : "—"}
+                    <span className="text-[8px] ml-1">{oniBadge.tag}</span>
+                  </span>
+                </div>
               </div>
             </div>
           );
@@ -449,26 +494,36 @@ function AnalogTable({ analogs }: { analogs: Analog[] }) {
   );
 }
 
-export default function BrazilWeatherAnalogs() {
+interface WeatherAnalogsProps {
+  /** URL of the analog JSON in /public/data — e.g. /data/weather_analogs_brazil.json */
+  dataUrl: string;
+  /** Display label, e.g. "Brazil arabica". Falls back to doc.origin_label, then "the origin". */
+  label?: string;
+}
+
+export default function WeatherAnalogs({ dataUrl, label }: WeatherAnalogsProps) {
   const [doc, setDoc] = useState<AnalogDoc | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("/data/weather_analogs_brazil.json")
+    setDoc(null);
+    setError(false);
+    fetch(dataUrl)
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setDoc)
       .catch(() => setError(true));
-  }, []);
+  }, [dataUrl]);
 
   if (error) return (
     <div className="text-xs text-slate-500 italic py-6">
       Weather analog forecast unavailable — backend script (compute_weather_analogs.py)
-      hasn&apos;t run yet.
+      hasn&apos;t produced this origin yet.
     </div>
   );
   if (!doc) return (
     <div className="text-xs text-slate-500 animate-pulse py-6">Computing weather analogs…</div>
   );
+  const originLabel = label ?? doc.origin_label ?? "this origin";
 
   return (
     <div className="space-y-3">
@@ -476,12 +531,12 @@ export default function BrazilWeatherAnalogs() {
       <div className="flex items-baseline justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-sm font-semibold text-slate-200">
-            Weather analogs — Brazil arabica · 20-dim Mahalanobis
+            Weather analogs — {originLabel} · 24-dim Mahalanobis
           </h3>
           <p className="text-[10px] text-slate-500 mt-0.5 max-w-2xl">
-            5 features per phenology stage (rain, temp, anomalies, ENSO ONI) × 4 stages.
+            6 features per phenology stage (rain, temp, anomalies, SPI, SPEI, ENSO ONI) × 4 stages.
             Distance: Mahalanobis on z-scored historical population. y/y figures are
-            DETRENDED (log-linear trend removed) so 1999 and 2024 yields are
+            DETRENDED (log-linear trend removed) so older and newer yields are
             apples-to-apples. 95% CIs are 1000-resample bootstrap on the analog set.
           </p>
         </div>

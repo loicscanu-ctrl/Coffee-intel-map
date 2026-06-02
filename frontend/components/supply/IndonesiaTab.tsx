@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import IndonesiaExportPanel from "@/components/supply/indonesia/IndonesiaExportPanel";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
+import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
@@ -69,7 +70,7 @@ const DEFAULT_HARVEST: IndonesiaSupply["harvest_windows"] = [
 ];
 
 export default function IndonesiaTab() {
-  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
+  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [data, setData] = useState<IndonesiaSupply | null>(null);
   const [error, setError] = useState(false);
 
@@ -83,7 +84,7 @@ export default function IndonesiaTab() {
   return (
     <div className="space-y-4">
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map(t => (
+        {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map(t => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -93,7 +94,11 @@ export default function IndonesiaTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "farmer-economics" ? "Farmer Economics" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Exports"}
+            {t === "farmer-economics" ? "Farmer Economics"
+              : t === "weather" ? "Weather"
+              : t === "analogs" ? "Analogs"
+              : t === "supply-demand" ? "Supply & Demand"
+              : "Exports"}
           </button>
         ))}
       </div>
@@ -116,6 +121,9 @@ export default function IndonesiaTab() {
 
       {subTab === "supply-demand" && <SupplyDemandBalance origin="indonesia" label="Indonesia" />}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/indonesia_weather.json" title="Weather · Indonesia" />}
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_indonesia.json" label="Indonesia robusta" />
+      )}
 
       {data && subTab === "exports" && (
         data.exports?.annual?.length ? (
