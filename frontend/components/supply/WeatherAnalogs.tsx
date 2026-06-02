@@ -35,6 +35,8 @@ interface Stage {
   temp_anom_c?: number | null;
   spi_z?: number | null;
   spei_z?: number | null;
+  vhi?: number | null;     // Mean NOAA STAR VHI across stage weeks (0-100)
+  vhi_z?: number | null;   // Z-score vs 10Y historical population
 }
 
 interface Ensemble {
@@ -246,6 +248,18 @@ function EnsembleCard({ title, ensemble, sub }: { title: string; ensemble: Ensem
 //   +1.0..+1.5: moderately wet
 //   +1.5..+2.0: severely wet
 //   z ≥ +2.0 : extremely wet
+// NOAA STAR VHI categories (0-100): combines NDVI greenness + brightness temp.
+// < 10 extreme stress · 10-30 severe · 30-40 moderate · 40-60 fair · > 60 healthy.
+function _vhiBadge(v: number | null | undefined): { tag: string; cls: string } {
+  if (v == null) return { tag: "—", cls: "text-slate-600" };
+  if (v < 10) return { tag: "extreme stress",  cls: "text-rose-500" };
+  if (v < 30) return { tag: "severe stress",   cls: "text-rose-400" };
+  if (v < 40) return { tag: "moderate stress", cls: "text-amber-400" };
+  if (v < 60) return { tag: "fair",            cls: "text-slate-400" };
+  if (v < 80) return { tag: "healthy",         cls: "text-emerald-400" };
+  return { tag: "excellent", cls: "text-emerald-300" };
+}
+
 function _spiBadge(v: number | null | undefined): { tag: string; cls: string } {
   if (v == null) return { tag: "—", cls: "text-slate-600" };
   if (v <= -2.0) return { tag: "extreme dry",  cls: "text-rose-500" };
@@ -293,7 +307,7 @@ function CurrentSignature({ doc }: { doc: AnalogDoc }) {
                   {s.temp_c != null ? `${s.temp_c.toFixed(1)}°C` : "—"}
                 </span>
               </div>
-              {/* Drought indices: SPI (precipitation only), SPEI (precip - ET₀) */}
+              {/* Drought indices + ENSO + vegetation health */}
               <div className="border-t border-slate-800 pt-1 mt-1 space-y-0.5">
                 <div className="flex items-baseline justify-between">
                   <span className="text-[9px] text-slate-600" title="Standardized Precipitation Index — rain only, z-score across 10Y window">SPI</span>
@@ -314,6 +328,16 @@ function CurrentSignature({ doc }: { doc: AnalogDoc }) {
                   <span className={`text-[11px] font-mono ${oniBadge.cls}`}>
                     {s.oni_avg != null ? s.oni_avg.toFixed(2) : "—"}
                     <span className="text-[8px] ml-1">{oniBadge.tag}</span>
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between" title="NOAA STAR Vegetation Health Index — direct satellite measure of plant stress (0-100). Long-form history requires the 0.10 backfill workflow.">
+                  <span className="text-[9px] text-slate-600">VHI</span>
+                  <span className={`text-[11px] font-mono ${_vhiBadge(s.vhi).cls}`}>
+                    {s.vhi != null ? s.vhi.toFixed(1) : "—"}
+                    <span className="text-[8px] ml-1">{_vhiBadge(s.vhi).tag}</span>
+                    {s.vhi_z != null && (
+                      <span className="text-[8px] ml-1 text-slate-500">(z={s.vhi_z.toFixed(2)})</span>
+                    )}
                   </span>
                 </div>
               </div>
