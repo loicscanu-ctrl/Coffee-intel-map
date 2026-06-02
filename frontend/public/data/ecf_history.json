@@ -1,0 +1,1858 @@
+{
+  "source": "ECF",
+  "unit": "metric_tonnes",
+  "generated_at": "2026-06-02",
+  "count": 149,
+  "monthly": [
+    {
+      "period": "2013-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 29261,
+      "value_raw": 487683,
+      "ports": {
+        "Bremen": 983833,
+        "Hamburg": 1651783,
+        "Genoa": 936653,
+        "Le Havre": 437717,
+        "Trieste": 678642,
+        "Antwerp": 92550
+      }
+    },
+    {
+      "period": "2014-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 203777,
+      "value_raw": 3396283,
+      "ports": {
+        "Bremen": 1041700,
+        "Hamburg": 1626017,
+        "Genoa": 937926,
+        "Le Havre": 491567,
+        "Trieste": 655981,
+        "Antwerp": 75600
+      }
+    },
+    {
+      "period": "2014-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 874,
+      "value_raw": 14567,
+      "ports": {
+        "Bremen": 975100,
+        "Hamburg": 1609433,
+        "Genoa": 977152,
+        "Le Havre": 418950,
+        "Trieste": 683604,
+        "Antwerp": 5117
+      }
+    },
+    {
+      "period": "2014-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 805347,
+      "value_raw": 13422450,
+      "ports": {
+        "Bremen": 998117,
+        "Hamburg": 1506900,
+        "Genoa": 1037386,
+        "Le Havre": 435817,
+        "Trieste": 690263,
+        "Antwerp": 291783
+      }
+    },
+    {
+      "period": "2014-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 1090442,
+      "value_raw": 18174033,
+      "ports": {
+        "Bremen": 1166717,
+        "Hamburg": 1622967,
+        "Genoa": 1225721,
+        "Le Havre": 459417,
+        "Trieste": 707225,
+        "Antwerp": 612183
+      }
+    },
+    {
+      "period": "2014-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 620012,
+      "value_raw": 10333533,
+      "ports": {
+        "Bremen": 1280283,
+        "Hamburg": 1801300,
+        "Genoa": 1361827,
+        "Le Havre": 482817,
+        "Trieste": 734078,
+        "Antwerp": 242733
+      }
+    },
+    {
+      "period": "2014-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 502659,
+      "value_raw": 8377650,
+      "ports": {
+        "Bremen": 1517083,
+        "Hamburg": 1934317,
+        "Genoa": 1422710,
+        "Le Havre": 493467,
+        "Trieste": 670007,
+        "Antwerp": 371917
+      }
+    },
+    {
+      "period": "2014-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 294418,
+      "value_raw": 4906967,
+      "ports": {
+        "Bremen": 1589217,
+        "Hamburg": 1976217,
+        "Genoa": 1356906,
+        "Le Havre": 500667,
+        "Trieste": 717020,
+        "Antwerp": 3850
+      }
+    },
+    {
+      "period": "2014-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 214008,
+      "value_raw": 3566800,
+      "ports": {
+        "Bremen": 1637883,
+        "Hamburg": 1976217,
+        "Genoa": 1524125,
+        "Le Havre": 557167,
+        "Trieste": 771202,
+        "Antwerp": 418033
+      }
+    },
+    {
+      "period": "2014-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 329593,
+      "value_raw": 5493217,
+      "ports": {
+        "Bremen": 1600433,
+        "Hamburg": 1964467,
+        "Genoa": 1398032,
+        "Le Havre": 545467,
+        "Trieste": 754170,
+        "Antwerp": 47383
+      }
+    },
+    {
+      "period": "2014-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 17589,
+      "value_raw": 293150,
+      "ports": {
+        "Bremen": 1420067,
+        "Hamburg": 1829417,
+        "Genoa": 1111355,
+        "Le Havre": 495483,
+        "Trieste": 718526,
+        "Antwerp": 152325
+      }
+    },
+    {
+      "period": "2014-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 17589,
+      "value_raw": 293150,
+      "ports": {
+        "Bremen": 1420067,
+        "Hamburg": 1829417,
+        "Genoa": 1111355,
+        "Le Havre": 495483,
+        "Trieste": 718526,
+        "Antwerp": 152325
+      }
+    },
+    {
+      "period": "2014-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+      "value_mt": 689446,
+      "value_raw": 11490767,
+      "ports": {
+        "Bremen": 77410,
+        "Genoa": 62525,
+        "Le Havre": 29931,
+        "Trieste": 46749,
+        "Hamburg": 109791,
+        "Antwerp": 363040
+      }
+    },
+    {
+      "period": "2015-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 695233,
+      "value_raw": 11587217,
+      "ports": {
+        "Antwerp": 365732,
+        "Bremen": 79404,
+        "Hamburg": 110233,
+        "Genoa": 63572,
+        "Le Havre": 32405,
+        "Trieste": 43886
+      }
+    },
+    {
+      "period": "2015-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 698263,
+      "value_raw": 11637717,
+      "ports": {
+        "Antwerp": 374113,
+        "Bremen": 78574,
+        "Hamburg": 109954,
+        "Genoa": 63572,
+        "Le Havre": 29700,
+        "Trieste": 42350
+      }
+    },
+    {
+      "period": "2015-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 695441,
+      "value_raw": 11590683,
+      "ports": {
+        "Antwerp": 373092,
+        "Bremen": 77867,
+        "Hamburg": 107932,
+        "Genoa": 63572,
+        "Le Havre": 29220,
+        "Trieste": 43758
+      }
+    },
+    {
+      "period": "2015-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 697324,
+      "value_raw": 11622067,
+      "ports": {
+        "Antwerp": 368520,
+        "Bremen": 79946,
+        "Hamburg": 115140,
+        "Genoa": 63572,
+        "Le Havre": 28668,
+        "Trieste": 41478
+      }
+    },
+    {
+      "period": "2015-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 726315,
+      "value_raw": 12105250,
+      "ports": {
+        "Antwerp": 393851,
+        "Bremen": 83554,
+        "Hamburg": 114963,
+        "Genoa": 63572,
+        "Le Havre": 28965,
+        "Trieste": 41410
+      }
+    },
+    {
+      "period": "2015-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 703666,
+      "value_raw": 11727767,
+      "ports": {
+        "Antwerp": 366034,
+        "Bremen": 86761,
+        "Hamburg": 112023,
+        "Genoa": 63572,
+        "Le Havre": 32062,
+        "Trieste": 43214
+      }
+    },
+    {
+      "period": "2015-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 714566,
+      "value_raw": 11909433,
+      "ports": {
+        "Antwerp": 367254,
+        "Bremen": 89850,
+        "Hamburg": 118805,
+        "Genoa": 63572,
+        "Le Havre": 33231,
+        "Trieste": 41854
+      }
+    },
+    {
+      "period": "2015-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 720339,
+      "value_raw": 12005650,
+      "ports": {
+        "Antwerp": 361557,
+        "Bremen": 98692,
+        "Hamburg": 120384,
+        "Genoa": 63572,
+        "Le Havre": 33073,
+        "Trieste": 43060
+      }
+    },
+    {
+      "period": "2015-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 715505,
+      "value_raw": 11925083,
+      "ports": {
+        "Antwerp": 357510,
+        "Bremen": 103706,
+        "Hamburg": 115993,
+        "Genoa": 63572,
+        "Le Havre": 31664,
+        "Trieste": 43060
+      }
+    },
+    {
+      "period": "2015-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 711144,
+      "value_raw": 11852400,
+      "ports": {
+        "Antwerp": 346262,
+        "Bremen": 103706,
+        "Hamburg": 113037,
+        "Genoa": 81807,
+        "Le Havre": 31294,
+        "Trieste": 35038
+      }
+    },
+    {
+      "period": "2015-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 708426,
+      "value_raw": 11807100,
+      "ports": {
+        "Antwerp": 350107,
+        "Bremen": 103706,
+        "Hamburg": 105987,
+        "Genoa": 77262,
+        "Le Havre": 28842,
+        "Trieste": 42522
+      }
+    },
+    {
+      "period": "2015-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+      "value_mt": 711613,
+      "value_raw": 11860217,
+      "ports": {
+        "Antwerp": 337042,
+        "Bremen": 103706,
+        "Hamburg": 107451,
+        "Genoa": 88755,
+        "Le Havre": 30399,
+        "Trieste": 44260
+      }
+    },
+    {
+      "period": "2016-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 702088,
+      "value_raw": 11701467,
+      "ports": {
+        "Antwerp": 333922,
+        "Bremen": 103706,
+        "Hamburg": 105717,
+        "Genoa": 82256,
+        "Le Havre": 32405,
+        "Trieste": 44081
+      }
+    },
+    {
+      "period": "2016-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 689078,
+      "value_raw": 11484633,
+      "ports": {
+        "Antwerp": 317689,
+        "Bremen": 103706,
+        "Hamburg": 107560,
+        "Genoa": 85479,
+        "Le Havre": 31189,
+        "Trieste": 43454
+      }
+    },
+    {
+      "period": "2016-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 687703,
+      "value_raw": 11461717,
+      "ports": {
+        "Antwerp": 311852,
+        "Bremen": 103706,
+        "Hamburg": 113629,
+        "Genoa": 87174,
+        "Le Havre": 29201,
+        "Trieste": 42141
+      }
+    },
+    {
+      "period": "2016-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 706789,
+      "value_raw": 11779817,
+      "ports": {
+        "Antwerp": 307086,
+        "Bremen": 103706,
+        "Hamburg": 122014,
+        "Genoa": 99314,
+        "Le Havre": 27565,
+        "Trieste": 47105
+      }
+    },
+    {
+      "period": "2016-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 724681,
+      "value_raw": 12078017,
+      "ports": {
+        "Antwerp": 306124,
+        "Bremen": 103706,
+        "Hamburg": 126750,
+        "Genoa": 108093,
+        "Le Havre": 30772,
+        "Trieste": 49236
+      }
+    },
+    {
+      "period": "2016-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 742142,
+      "value_raw": 12369033,
+      "ports": {
+        "Antwerp": 303504,
+        "Bremen": 103706,
+        "Hamburg": 136089,
+        "Genoa": 116483,
+        "Le Havre": 33802,
+        "Trieste": 48559
+      }
+    },
+    {
+      "period": "2016-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 729073,
+      "value_raw": 12151217,
+      "ports": {
+        "Antwerp": 299442,
+        "Bremen": 103706,
+        "Hamburg": 135897,
+        "Genoa": 105546,
+        "Le Havre": 35205,
+        "Trieste": 49277
+      }
+    },
+    {
+      "period": "2016-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 716770,
+      "value_raw": 11946167,
+      "ports": {
+        "Antwerp": 297130,
+        "Bremen": 103706,
+        "Hamburg": 126112,
+        "Genoa": 103603,
+        "Le Havre": 36146,
+        "Trieste": 50072
+      }
+    },
+    {
+      "period": "2016-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 707779,
+      "value_raw": 11796317,
+      "ports": {
+        "Antwerp": 291592,
+        "Bremen": 103706,
+        "Hamburg": 121225,
+        "Genoa": 106655,
+        "Le Havre": 35695,
+        "Trieste": 48906
+      }
+    },
+    {
+      "period": "2016-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 705492,
+      "value_raw": 11758200,
+      "ports": {
+        "Antwerp": 288483,
+        "Bremen": 103706,
+        "Hamburg": 122325,
+        "Genoa": 108207,
+        "Le Havre": 35480,
+        "Trieste": 47291
+      }
+    },
+    {
+      "period": "2016-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 710270,
+      "value_raw": 11837833,
+      "ports": {
+        "Antwerp": 293253,
+        "Bremen": 103706,
+        "Hamburg": 130400,
+        "Genoa": 99933,
+        "Le Havre": 34072,
+        "Trieste": 48905
+      }
+    },
+    {
+      "period": "2016-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+      "value_mt": 611560,
+      "value_raw": 10192667,
+      "ports": {
+        "Antwerp": 291296,
+        "Bremen": 103706,
+        "Hamburg": 135772,
+        "Genoa": 98619,
+        "Le Havre": 34334,
+        "Trieste": 51539
+      }
+    },
+    {
+      "period": "2017-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 635359,
+      "value_raw": 10589317,
+      "ports": {
+        "Antwerp": 316081,
+        "Hamburg": 136910,
+        "Genoa": 95587,
+        "Le Havre": 34453,
+        "Trieste": 52328
+      }
+    },
+    {
+      "period": "2017-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 646535,
+      "value_raw": 10775583,
+      "ports": {
+        "Antwerp": 334067,
+        "Hamburg": 134643,
+        "Genoa": 92688,
+        "Le Havre": 31943,
+        "Trieste": 53194
+      }
+    },
+    {
+      "period": "2017-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 663619,
+      "value_raw": 11060317,
+      "ports": {
+        "Antwerp": 343101,
+        "Hamburg": 138604,
+        "Genoa": 93070,
+        "Le Havre": 33187,
+        "Trieste": 55657
+      }
+    },
+    {
+      "period": "2017-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 688716,
+      "value_raw": 11478600,
+      "ports": {
+        "Antwerp": 354702,
+        "Hamburg": 141756,
+        "Genoa": 106488,
+        "Le Havre": 31669,
+        "Trieste": 54101
+      }
+    },
+    {
+      "period": "2017-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 706047,
+      "value_raw": 11767450,
+      "ports": {
+        "Antwerp": 361564,
+        "Hamburg": 146961,
+        "Genoa": 109531,
+        "Le Havre": 31216,
+        "Trieste": 56775
+      }
+    },
+    {
+      "period": "2017-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 708842,
+      "value_raw": 11814033,
+      "ports": {
+        "Antwerp": 361620,
+        "Hamburg": 146336,
+        "Genoa": 111386,
+        "Le Havre": 33073,
+        "Trieste": 56427
+      }
+    },
+    {
+      "period": "2017-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 697735,
+      "value_raw": 11628917,
+      "ports": {
+        "Antwerp": 362425,
+        "Hamburg": 135810,
+        "Genoa": 111106,
+        "Le Havre": 32775,
+        "Trieste": 55619
+      }
+    },
+    {
+      "period": "2017-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 693965,
+      "value_raw": 11566083,
+      "ports": {
+        "Antwerp": 364734,
+        "Hamburg": 129016,
+        "Genoa": 109522,
+        "Le Havre": 33711,
+        "Trieste": 56982
+      }
+    },
+    {
+      "period": "2017-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 681458,
+      "value_raw": 11357633,
+      "ports": {
+        "Antwerp": 354785,
+        "Hamburg": 120244,
+        "Genoa": 112166,
+        "Le Havre": 38995,
+        "Trieste": 55268
+      }
+    },
+    {
+      "period": "2017-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 654433,
+      "value_raw": 10907217,
+      "ports": {
+        "Antwerp": 337688,
+        "Hamburg": 122966,
+        "Genoa": 108882,
+        "Le Havre": 31239,
+        "Trieste": 53658
+      }
+    },
+    {
+      "period": "2017-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 619601,
+      "value_raw": 10326683,
+      "ports": {
+        "Antwerp": 325046,
+        "Hamburg": 113237,
+        "Genoa": 100826,
+        "Le Havre": 28819,
+        "Trieste": 51673
+      }
+    },
+    {
+      "period": "2017-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+      "value_mt": 630087,
+      "value_raw": 10501450,
+      "ports": {
+        "Antwerp": 321519,
+        "Hamburg": 112379,
+        "Genoa": 76015,
+        "Le Havre": 28482,
+        "Trieste": 48326,
+        "Barcelona": 43365
+      }
+    },
+    {
+      "period": "2018-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 638727,
+      "value_raw": 10645450,
+      "ports": {
+        "Antwerp": 313109,
+        "Hamburg": 115997,
+        "Genoa": 93268,
+        "Le Havre": 28396,
+        "Trieste": 44784,
+        "Barcelona": 43173
+      }
+    },
+    {
+      "period": "2018-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 641505,
+      "value_raw": 10691750,
+      "ports": {
+        "Antwerp": 315088,
+        "Hamburg": 119366,
+        "Genoa": 90001,
+        "Le Havre": 26409,
+        "Trieste": 43245,
+        "Barcelona": 43535
+      }
+    },
+    {
+      "period": "2018-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 646406,
+      "value_raw": 10773433,
+      "ports": {
+        "Antwerp": 324610,
+        "Hamburg": 118953,
+        "Genoa": 91875,
+        "Le Havre": 24248,
+        "Trieste": 42758,
+        "Barcelona": 43962
+      }
+    },
+    {
+      "period": "2018-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 667667,
+      "value_raw": 11127783,
+      "ports": {
+        "Antwerp": 327607,
+        "Hamburg": 126014,
+        "Genoa": 98090,
+        "Le Havre": 26741,
+        "Trieste": 46518,
+        "Barcelona": 42697
+      }
+    },
+    {
+      "period": "2018-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 686072,
+      "value_raw": 11434533,
+      "ports": {
+        "Antwerp": 334163,
+        "Hamburg": 125781,
+        "Genoa": 102857,
+        "Le Havre": 26669,
+        "Trieste": 48215,
+        "Barcelona": 44830
+      }
+    },
+    {
+      "period": "2018-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 691037,
+      "value_raw": 11517283,
+      "ports": {
+        "Antwerp": 337021,
+        "Hamburg": 124439,
+        "Genoa": 98935,
+        "Le Havre": 28854,
+        "Trieste": 48328,
+        "Barcelona": 49411
+      }
+    },
+    {
+      "period": "2018-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 684856,
+      "value_raw": 11414267,
+      "ports": {
+        "Antwerp": 336510,
+        "Hamburg": 121745,
+        "Genoa": 94303,
+        "Le Havre": 31231,
+        "Trieste": 45870,
+        "Barcelona": 55197
+      }
+    },
+    {
+      "period": "2018-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 701296,
+      "value_raw": 11688267,
+      "ports": {
+        "Antwerp": 346648,
+        "Hamburg": 122343,
+        "Genoa": 99178,
+        "Le Havre": 32584,
+        "Trieste": 47843,
+        "Barcelona": 52700
+      }
+    },
+    {
+      "period": "2018-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 703368,
+      "value_raw": 11722800,
+      "ports": {
+        "Antwerp": 361538,
+        "Hamburg": 122131,
+        "Genoa": 95907,
+        "Le Havre": 29903,
+        "Trieste": 47096,
+        "Barcelona": 46793
+      }
+    },
+    {
+      "period": "2018-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 698434,
+      "value_raw": 11640567,
+      "ports": {
+        "Antwerp": 370277,
+        "Hamburg": 115403,
+        "Genoa": 96138,
+        "Le Havre": 28489,
+        "Trieste": 44252,
+        "Barcelona": 43875
+      }
+    },
+    {
+      "period": "2018-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 685358,
+      "value_raw": 11422633,
+      "ports": {
+        "Antwerp": 377973,
+        "Hamburg": 105710,
+        "Genoa": 90037,
+        "Le Havre": 27814,
+        "Trieste": 41971,
+        "Barcelona": 41853
+      }
+    },
+    {
+      "period": "2018-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+      "value_mt": 688739,
+      "value_raw": 11478983,
+      "ports": {
+        "Antwerp": 379850,
+        "Hamburg": 107374,
+        "Genoa": 89790,
+        "Le Havre": 27684,
+        "Trieste": 41122,
+        "Barcelona": 42919
+      }
+    },
+    {
+      "period": "2019-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 683935,
+      "value_raw": 11398917,
+      "ports": {
+        "Antwerp": 377152,
+        "Hamburg": 109177,
+        "Genoa": 81243,
+        "Le Havre": 27452,
+        "Trieste": 45261,
+        "Barcelona": 43650
+      }
+    },
+    {
+      "period": "2019-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 675723,
+      "value_raw": 11262050,
+      "ports": {
+        "Antwerp": 369301,
+        "Hamburg": 106458,
+        "Genoa": 83716,
+        "Le Havre": 26657,
+        "Trieste": 43504,
+        "Barcelona": 46087
+      }
+    },
+    {
+      "period": "2019-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 681937,
+      "value_raw": 11365617,
+      "ports": {
+        "Antwerp": 373753,
+        "Hamburg": 109181,
+        "Genoa": 90636,
+        "Le Havre": 27344,
+        "Trieste": 44246,
+        "Barcelona": 40988
+      }
+    },
+    {
+      "period": "2019-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 700797,
+      "value_raw": 11679950,
+      "ports": {
+        "Antwerp": 377321,
+        "Hamburg": 104622,
+        "Genoa": 102752,
+        "Le Havre": 28333,
+        "Trieste": 47769,
+        "Barcelona": 40000
+      }
+    },
+    {
+      "period": "2019-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 706223,
+      "value_raw": 11770383,
+      "ports": {
+        "Antwerp": 377215,
+        "Hamburg": 107522,
+        "Genoa": 105380,
+        "Le Havre": 28548,
+        "Trieste": 49926,
+        "Barcelona": 37632
+      }
+    },
+    {
+      "period": "2019-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 721590,
+      "value_raw": 12026500,
+      "ports": {
+        "Antwerp": 383279,
+        "Hamburg": 112229,
+        "Genoa": 104896,
+        "Le Havre": 31598,
+        "Trieste": 53678,
+        "Barcelona": 35910
+      }
+    },
+    {
+      "period": "2019-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 745601,
+      "value_raw": 12426683,
+      "ports": {
+        "Antwerp": 392992,
+        "Hamburg": 121278,
+        "Genoa": 104821,
+        "Le Havre": 32634,
+        "Trieste": 55205,
+        "Barcelona": 38671
+      }
+    },
+    {
+      "period": "2019-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 377821,
+      "value_raw": 6297017,
+      "ports": {
+        "Hamburg": 133215,
+        "Genoa": 111163,
+        "Le Havre": 32870,
+        "Trieste": 58736,
+        "Barcelona": 41837
+      }
+    },
+    {
+      "period": "2019-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 373314,
+      "value_raw": 6221900,
+      "ports": {
+        "Hamburg": 129901,
+        "Genoa": 108841,
+        "Le Havre": 32568,
+        "Trieste": 56555,
+        "Barcelona": 45449
+      }
+    },
+    {
+      "period": "2019-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 365044,
+      "value_raw": 6084067,
+      "ports": {
+        "Hamburg": 125151,
+        "Genoa": 110752,
+        "Le Havre": 29777,
+        "Trieste": 54704,
+        "Barcelona": 44660
+      }
+    },
+    {
+      "period": "2019-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 350028,
+      "value_raw": 5833800,
+      "ports": {
+        "Hamburg": 117299,
+        "Genoa": 110805,
+        "Le Havre": 27778,
+        "Trieste": 53516,
+        "Barcelona": 40574
+      }
+    },
+    {
+      "period": "2019-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+      "value_mt": 807387,
+      "value_raw": 13456450,
+      "ports": {
+        "Hamburg": 105019,
+        "Genoa": 97547,
+        "Le Havre": 27126,
+        "Trieste": 54256,
+        "Barcelona": 40205
+      },
+      "types": {
+        "robusta_mt": 312468,
+        "arabica_unwashed_mt": 202536,
+        "arabica_washed_mt": 292383
+      }
+    },
+    {
+      "period": "2020-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 807387,
+      "value_raw": 13456450,
+      "types": {
+        "robusta_mt": 312468,
+        "arabica_unwashed_mt": 202536,
+        "arabica_washed_mt": 292383
+      }
+    },
+    {
+      "period": "2020-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 797581,
+      "value_raw": 13293017,
+      "types": {
+        "robusta_mt": 308197,
+        "arabica_unwashed_mt": 202652,
+        "arabica_washed_mt": 286733
+      }
+    },
+    {
+      "period": "2020-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 776219,
+      "value_raw": 12936983,
+      "types": {
+        "robusta_mt": 303213,
+        "arabica_unwashed_mt": 190341,
+        "arabica_washed_mt": 282664
+      }
+    },
+    {
+      "period": "2020-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 804172,
+      "value_raw": 13402867,
+      "types": {
+        "robusta_mt": 316309,
+        "arabica_unwashed_mt": 200478,
+        "arabica_washed_mt": 287385
+      }
+    },
+    {
+      "period": "2020-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 820665,
+      "value_raw": 13677750,
+      "types": {
+        "robusta_mt": 339257,
+        "arabica_unwashed_mt": 185677,
+        "arabica_washed_mt": 295731
+      }
+    },
+    {
+      "period": "2020-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 877469,
+      "value_raw": 14624483,
+      "types": {
+        "robusta_mt": 347673,
+        "arabica_unwashed_mt": 221546,
+        "arabica_washed_mt": 308250
+      }
+    },
+    {
+      "period": "2020-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 906337,
+      "value_raw": 15105617,
+      "types": {
+        "robusta_mt": 363538,
+        "arabica_unwashed_mt": 225359,
+        "arabica_washed_mt": 317441
+      }
+    },
+    {
+      "period": "2020-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 926651,
+      "value_raw": 15444183,
+      "types": {
+        "robusta_mt": 368116,
+        "arabica_unwashed_mt": 237760,
+        "arabica_washed_mt": 320775
+      }
+    },
+    {
+      "period": "2020-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 902298,
+      "value_raw": 15038300,
+      "types": {
+        "robusta_mt": 357174,
+        "arabica_unwashed_mt": 229598,
+        "arabica_washed_mt": 315525
+      }
+    },
+    {
+      "period": "2020-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 904583,
+      "value_raw": 15076383,
+      "types": {
+        "robusta_mt": 358507,
+        "arabica_unwashed_mt": 241409,
+        "arabica_washed_mt": 304667
+      }
+    },
+    {
+      "period": "2020-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 900413,
+      "value_raw": 15006883,
+      "types": {
+        "robusta_mt": 359790,
+        "arabica_unwashed_mt": 245745,
+        "arabica_washed_mt": 294879
+      }
+    },
+    {
+      "period": "2020-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+      "value_mt": 909723,
+      "value_raw": 15162050,
+      "types": {
+        "robusta_mt": 350548,
+        "arabica_unwashed_mt": 260081,
+        "arabica_washed_mt": 299095
+      }
+    },
+    {
+      "period": "2021-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 890563,
+      "value_raw": 14842717,
+      "types": {
+        "robusta_mt": 346220,
+        "arabica_unwashed_mt": 248114,
+        "arabica_washed_mt": 296229
+      }
+    },
+    {
+      "period": "2021-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 876590,
+      "value_raw": 14609833,
+      "types": {
+        "robusta_mt": 334659,
+        "arabica_unwashed_mt": 252085,
+        "arabica_washed_mt": 289847
+      }
+    },
+    {
+      "period": "2021-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 864740,
+      "value_raw": 14412333,
+      "types": {
+        "robusta_mt": 322843,
+        "arabica_unwashed_mt": 255007,
+        "arabica_washed_mt": 286891
+      }
+    },
+    {
+      "period": "2021-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 868323,
+      "value_raw": 14472050,
+      "types": {
+        "robusta_mt": 320617,
+        "arabica_unwashed_mt": 262306,
+        "arabica_washed_mt": 285400
+      }
+    },
+    {
+      "period": "2021-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 873177,
+      "value_raw": 14552950,
+      "types": {
+        "robusta_mt": 322903,
+        "arabica_unwashed_mt": 261971,
+        "arabica_washed_mt": 288303
+      }
+    },
+    {
+      "period": "2021-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 866538,
+      "value_raw": 14442300,
+      "types": {
+        "robusta_mt": 314747,
+        "arabica_unwashed_mt": 261571,
+        "arabica_washed_mt": 290220
+      }
+    },
+    {
+      "period": "2021-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 858571,
+      "value_raw": 14309517,
+      "types": {
+        "robusta_mt": 305627,
+        "arabica_unwashed_mt": 256111,
+        "arabica_washed_mt": 296833
+      }
+    },
+    {
+      "period": "2021-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 847494,
+      "value_raw": 14124900,
+      "types": {
+        "robusta_mt": 297656,
+        "arabica_unwashed_mt": 247685,
+        "arabica_washed_mt": 302152
+      }
+    },
+    {
+      "period": "2021-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 826075,
+      "value_raw": 13767917,
+      "types": {
+        "robusta_mt": 290077,
+        "arabica_unwashed_mt": 233547,
+        "arabica_washed_mt": 302452
+      }
+    },
+    {
+      "period": "2021-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 799308,
+      "value_raw": 13321800,
+      "types": {
+        "robusta_mt": 285785,
+        "arabica_unwashed_mt": 222090,
+        "arabica_washed_mt": 291433
+      }
+    },
+    {
+      "period": "2021-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 740429,
+      "value_raw": 12340483,
+      "types": {
+        "robusta_mt": 264697,
+        "arabica_unwashed_mt": 212488,
+        "arabica_washed_mt": 263244
+      }
+    },
+    {
+      "period": "2021-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+      "value_mt": 722440,
+      "value_raw": 12040667,
+      "types": {
+        "robusta_mt": 259942,
+        "arabica_unwashed_mt": 215013,
+        "arabica_washed_mt": 247486
+      }
+    },
+    {
+      "period": "2022-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 708988,
+      "value_raw": 11816467,
+      "types": {
+        "robusta_mt": 251299,
+        "arabica_unwashed_mt": 215603,
+        "arabica_washed_mt": 242087
+      }
+    },
+    {
+      "period": "2022-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 711464,
+      "value_raw": 11857733,
+      "types": {
+        "robusta_mt": 248039,
+        "arabica_unwashed_mt": 221337,
+        "arabica_washed_mt": 242087
+      }
+    },
+    {
+      "period": "2022-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 715112,
+      "value_raw": 11918533,
+      "types": {
+        "robusta_mt": 245923,
+        "arabica_unwashed_mt": 221834,
+        "arabica_washed_mt": 247355
+      }
+    },
+    {
+      "period": "2022-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 746860,
+      "value_raw": 12447667,
+      "types": {
+        "robusta_mt": 260969,
+        "arabica_unwashed_mt": 230687,
+        "arabica_washed_mt": 255204
+      }
+    },
+    {
+      "period": "2022-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 800753,
+      "value_raw": 13345883,
+      "types": {
+        "robusta_mt": 300733,
+        "arabica_unwashed_mt": 238695,
+        "arabica_washed_mt": 261325
+      }
+    },
+    {
+      "period": "2022-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 817837,
+      "value_raw": 13630617,
+      "types": {
+        "robusta_mt": 315637,
+        "arabica_unwashed_mt": 237954,
+        "arabica_washed_mt": 264246
+      }
+    },
+    {
+      "period": "2022-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 832727,
+      "value_raw": 13878783,
+      "types": {
+        "robusta_mt": 334174,
+        "arabica_unwashed_mt": 226582,
+        "arabica_washed_mt": 271972
+      }
+    },
+    {
+      "period": "2022-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 838796,
+      "value_raw": 13979933,
+      "types": {
+        "robusta_mt": 334319,
+        "arabica_unwashed_mt": 249301,
+        "arabica_washed_mt": 255176
+      }
+    },
+    {
+      "period": "2022-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 840577,
+      "value_raw": 14009617,
+      "types": {
+        "robusta_mt": 325217,
+        "arabica_unwashed_mt": 234679,
+        "arabica_washed_mt": 280681
+      }
+    },
+    {
+      "period": "2022-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 831428,
+      "value_raw": 13857133,
+      "types": {
+        "robusta_mt": 317554,
+        "arabica_unwashed_mt": 234543,
+        "arabica_washed_mt": 279330
+      }
+    },
+    {
+      "period": "2022-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 788459,
+      "value_raw": 13140983,
+      "types": {
+        "robusta_mt": 287700,
+        "arabica_unwashed_mt": 235690,
+        "arabica_washed_mt": 265068
+      }
+    },
+    {
+      "period": "2022-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+      "value_mt": 771330,
+      "value_raw": 12855500,
+      "types": {
+        "robusta_mt": 273753,
+        "arabica_unwashed_mt": 245811,
+        "arabica_washed_mt": 251766
+      }
+    },
+    {
+      "period": "2023-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 703478,
+      "value_raw": 11724633,
+      "types": {
+        "robusta_mt": 256216,
+        "arabica_unwashed_mt": 237957,
+        "arabica_washed_mt": 209305
+      }
+    },
+    {
+      "period": "2023-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 681437,
+      "value_raw": 11357283,
+      "types": {
+        "robusta_mt": 249354,
+        "arabica_unwashed_mt": 230263,
+        "arabica_washed_mt": 201820
+      }
+    },
+    {
+      "period": "2023-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 663982,
+      "value_raw": 11066367,
+      "types": {
+        "robusta_mt": 242327,
+        "arabica_unwashed_mt": 213143,
+        "arabica_washed_mt": 208512
+      }
+    },
+    {
+      "period": "2023-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 671390,
+      "value_raw": 11189833,
+      "types": {
+        "robusta_mt": 268182,
+        "arabica_unwashed_mt": 204447,
+        "arabica_washed_mt": 198761
+      }
+    },
+    {
+      "period": "2023-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 668834,
+      "value_raw": 11147233,
+      "types": {
+        "robusta_mt": 278022,
+        "arabica_unwashed_mt": 193703,
+        "arabica_washed_mt": 197109
+      }
+    },
+    {
+      "period": "2023-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 693851,
+      "value_raw": 11564183,
+      "types": {
+        "robusta_mt": 277261,
+        "arabica_unwashed_mt": 181182,
+        "arabica_washed_mt": 235408
+      }
+    },
+    {
+      "period": "2023-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 650945,
+      "value_raw": 10849083,
+      "types": {
+        "robusta_mt": 259807,
+        "arabica_unwashed_mt": 160065,
+        "arabica_washed_mt": 231073
+      }
+    },
+    {
+      "period": "2023-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 613659,
+      "value_raw": 10227650,
+      "types": {
+        "robusta_mt": 237112,
+        "arabica_unwashed_mt": 150207,
+        "arabica_washed_mt": 226339
+      }
+    },
+    {
+      "period": "2023-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 558806,
+      "value_raw": 9313433,
+      "types": {
+        "robusta_mt": 203552,
+        "arabica_unwashed_mt": 139429,
+        "arabica_washed_mt": 215825
+      }
+    },
+    {
+      "period": "2023-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 506411,
+      "value_raw": 8440183,
+      "types": {
+        "robusta_mt": 178472,
+        "arabica_unwashed_mt": 123335,
+        "arabica_washed_mt": 204604
+      }
+    },
+    {
+      "period": "2023-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 454639,
+      "value_raw": 7577317,
+      "types": {
+        "robusta_mt": 155591,
+        "arabica_unwashed_mt": 123343,
+        "arabica_washed_mt": 175705
+      }
+    },
+    {
+      "period": "2023-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+      "value_mt": 437059,
+      "value_raw": 7284317,
+      "types": {
+        "robusta_mt": 144559,
+        "arabica_unwashed_mt": 129668,
+        "arabica_washed_mt": 162833
+      }
+    },
+    {
+      "period": "2024-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 411949,
+      "value_raw": 6865817,
+      "types": {
+        "robusta_mt": 124156,
+        "arabica_unwashed_mt": 125653,
+        "arabica_washed_mt": 162140
+      }
+    },
+    {
+      "period": "2024-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 401787,
+      "value_raw": 6696450,
+      "types": {
+        "robusta_mt": 114117,
+        "arabica_unwashed_mt": 126150,
+        "arabica_washed_mt": 161520
+      }
+    },
+    {
+      "period": "2024-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 384240,
+      "value_raw": 6404000,
+      "ports": {
+        "Type of coffee": 3024
+      },
+      "types": {
+        "robusta_mt": 107661,
+        "arabica_unwashed_mt": 111371,
+        "arabica_washed_mt": 165208
+      }
+    },
+    {
+      "period": "2024-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 424860,
+      "value_raw": 7081000,
+      "types": {
+        "robusta_mt": 135387,
+        "arabica_unwashed_mt": 119781,
+        "arabica_washed_mt": 169692
+      }
+    },
+    {
+      "period": "2024-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 482855,
+      "value_raw": 8047583,
+      "types": {
+        "robusta_mt": 174993,
+        "arabica_unwashed_mt": 134313,
+        "arabica_washed_mt": 173549
+      }
+    },
+    {
+      "period": "2024-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 482855,
+      "value_raw": 8047583,
+      "types": {
+        "robusta_mt": 183755,
+        "arabica_unwashed_mt": 141523,
+        "arabica_washed_mt": 179368
+      }
+    },
+    {
+      "period": "2024-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 522144,
+      "value_raw": 8702400,
+      "types": {
+        "robusta_mt": 188544,
+        "arabica_unwashed_mt": 146388,
+        "arabica_washed_mt": 187212
+      }
+    },
+    {
+      "period": "2024-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 526674,
+      "value_raw": 8777900,
+      "types": {
+        "robusta_mt": 192232,
+        "arabica_unwashed_mt": 143275,
+        "arabica_washed_mt": 191166
+      }
+    },
+    {
+      "period": "2024-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 517572,
+      "value_raw": 8626200,
+      "types": {
+        "robusta_mt": 184940,
+        "arabica_unwashed_mt": 145470,
+        "arabica_washed_mt": 187162
+      }
+    },
+    {
+      "period": "2024-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 518770,
+      "value_raw": 8646167,
+      "types": {
+        "robusta_mt": 183322,
+        "arabica_unwashed_mt": 149973,
+        "arabica_washed_mt": 185475
+      }
+    },
+    {
+      "period": "2024-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 534771,
+      "value_raw": 8912850,
+      "types": {
+        "robusta_mt": 187292,
+        "arabica_unwashed_mt": 169285,
+        "arabica_washed_mt": 178194
+      }
+    },
+    {
+      "period": "2024-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+      "value_mt": 547124,
+      "value_raw": 9118733,
+      "types": {
+        "robusta_mt": 189019,
+        "arabica_unwashed_mt": 187289,
+        "arabica_washed_mt": 170817
+      }
+    },
+    {
+      "period": "2025-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 483417,
+      "value_raw": 8056950,
+      "types": {
+        "robusta_mt": 173748,
+        "arabica_unwashed_mt": 152787,
+        "arabica_washed_mt": 156882
+      }
+    },
+    {
+      "period": "2025-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 443565,
+      "value_raw": 7392750,
+      "types": {
+        "robusta_mt": 152094,
+        "arabica_unwashed_mt": 151982,
+        "arabica_washed_mt": 139489
+      }
+    },
+    {
+      "period": "2025-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 410239,
+      "value_raw": 6837317,
+      "types": {
+        "robusta_mt": 156060,
+        "arabica_unwashed_mt": 134596,
+        "arabica_washed_mt": 130066
+      }
+    },
+    {
+      "period": "2025-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 424403,
+      "value_raw": 7073383,
+      "types": {
+        "robusta_mt": 156060,
+        "arabica_unwashed_mt": 134596,
+        "arabica_washed_mt": 133748
+      }
+    },
+    {
+      "period": "2025-05",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 448094,
+      "value_raw": 7468233,
+      "types": {
+        "robusta_mt": 184870,
+        "arabica_unwashed_mt": 137056,
+        "arabica_washed_mt": 126167
+      }
+    },
+    {
+      "period": "2025-06",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 474916,
+      "value_raw": 7915267,
+      "types": {
+        "robusta_mt": 193509,
+        "arabica_unwashed_mt": 140172,
+        "arabica_washed_mt": 141235
+      }
+    },
+    {
+      "period": "2025-07",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 497045,
+      "value_raw": 8284083,
+      "types": {
+        "robusta_mt": 208387,
+        "arabica_unwashed_mt": 134517,
+        "arabica_washed_mt": 154141
+      }
+    },
+    {
+      "period": "2025-08",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 514662,
+      "value_raw": 8577700,
+      "types": {
+        "robusta_mt": 215348,
+        "arabica_unwashed_mt": 136441,
+        "arabica_washed_mt": 162873
+      }
+    },
+    {
+      "period": "2025-09",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 490162,
+      "value_raw": 8169367,
+      "types": {
+        "robusta_mt": 203860,
+        "arabica_unwashed_mt": 128583,
+        "arabica_washed_mt": 157718
+      }
+    },
+    {
+      "period": "2025-10",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 472617,
+      "value_raw": 7876950,
+      "types": {
+        "robusta_mt": 188548,
+        "arabica_unwashed_mt": 133352,
+        "arabica_washed_mt": 150717
+      }
+    },
+    {
+      "period": "2025-11",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 441661,
+      "value_raw": 7361017,
+      "types": {
+        "robusta_mt": 166908,
+        "arabica_unwashed_mt": 132275,
+        "arabica_washed_mt": 142478
+      }
+    },
+    {
+      "period": "2025-12",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+      "value_mt": 458801,
+      "value_raw": 7646683,
+      "types": {
+        "robusta_mt": 174104,
+        "arabica_unwashed_mt": 143206,
+        "arabica_washed_mt": 141491
+      }
+    },
+    {
+      "period": "2026-01",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+      "value_mt": 441323,
+      "value_raw": 7355383,
+      "types": {
+        "robusta_mt": 162450,
+        "arabica_unwashed_mt": 138941,
+        "arabica_washed_mt": 139933
+      }
+    },
+    {
+      "period": "2026-02",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+      "value_mt": 408152,
+      "value_raw": 6802533,
+      "types": {
+        "robusta_mt": 150126,
+        "arabica_unwashed_mt": 127113,
+        "arabica_washed_mt": 130913
+      }
+    },
+    {
+      "period": "2026-03",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+      "value_mt": 396190,
+      "value_raw": 6603167,
+      "types": {
+        "robusta_mt": 139191,
+        "arabica_unwashed_mt": 124504,
+        "arabica_washed_mt": 132496
+      }
+    },
+    {
+      "period": "2026-04",
+      "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+      "value_mt": 408956,
+      "value_raw": 6815933,
+      "types": {
+        "robusta_mt": 150769,
+        "arabica_unwashed_mt": 122093,
+        "arabica_washed_mt": 136093
+      }
+    }
+  ]
+}
