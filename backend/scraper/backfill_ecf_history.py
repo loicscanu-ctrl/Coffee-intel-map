@@ -76,6 +76,10 @@ YEARLY_PDFS: dict[int, str] = {
 
 _TYPE_LABELS = ("washed", "unwashed", "mild", "brazilian", "natural", "robusta", "other")
 
+# Plausible ECF European total stock (metric tonnes) ≈ 4-16M bags. Used to drop
+# mis-parsed totals from the oldest yearly PDFs.
+TOTAL_MT_MIN, TOTAL_MT_MAX = 150_000, 1_050_000
+
 
 def _norm(cell) -> str:
     return re.sub(r"\s+", " ", str(cell or "").strip())
@@ -286,7 +290,10 @@ def _finalise(period_map: dict[str, dict]) -> list[dict]:
         if total is None and types:           # 2020+ type-only periods
             total = sum(types.values())
         entry: dict = {"period": period, "source_pdf": rec.get("source_pdf")}
-        if total is not None:
+        # Sanity band for a European total (≈4-16M bags). Drops mis-parses from
+        # the oldest PDFs (e.g. 874 t, or 1.09M t) so they can't distort the
+        # chart; any valid port/type breakdown for the period is still kept.
+        if total is not None and TOTAL_MT_MIN <= int(total) <= TOTAL_MT_MAX:
             entry["value_mt"] = int(total)
             entry["value_raw"] = _tons_to_bags(int(total))
         if ports:
