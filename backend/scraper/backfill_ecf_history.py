@@ -59,16 +59,26 @@ ROOT     = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 OUT_PATH = DATA_DIR / "ecf_history.json"
 DEBUG_PATH = DATA_DIR / "ecf_history_debug.json"
-ARABICA_CERT_PATH = DATA_DIR / "certified_stocks_arabica.json"
-ROBUSTA_CERT_PATH = DATA_DIR / "certified_stocks_robusta.json"
+# Certified stock files: the recent rolling snapshot + the deep-history buckets.
+# The deep files extend coverage back years (robusta to 2020+, arabica to 2010+),
+# so last year's months (e.g. Jan–Apr) also get a certified overlay. Arabica
+# stores the port split under `by_port` (recent) or `by_port_totals` (deep);
+# robusta uses `by_port_lots` in both.
+ARABICA_CERT_PATHS = [DATA_DIR / "certified_stocks_arabica.json",
+                      *sorted(DATA_DIR.glob("certified_stocks_arabica_deep_*.json"))]
+ROBUSTA_CERT_PATHS = [DATA_DIR / "certified_stocks_robusta.json",
+                      *sorted(DATA_DIR.glob("certified_stocks_robusta_deep_*.json"))]
+ARABICA_PORT_KEYS = ("by_port", "by_port_totals")
+ROBUSTA_PORT_KEYS = ("by_port_lots",)
 
 # ICE certified warehouse codes that are European ports. Robusta (LIFFE) is all
-# European; arabica (ICE 'C') also lists US ports (HOU/MIAMI/NOLA/NY/VA) which
-# are excluded. 'NOR' is an uncertain robusta code — excluded per "filter by
-# warehouse". 'HA/BR' = Hamburg/Bremen (arabica reports them merged).
+# European (incl. GEN=Genoa); arabica (ICE 'C') also lists US ports
+# (HOU/MIA/MIAMI/NOLA/NY/NYK/VA/VIR and NOR=New Orleans) which are excluded.
+# Robusta 'NOR' is an uncertain code — also excluded, per "filter by warehouse".
+# 'HA/BR' = Hamburg/Bremen (arabica reports them merged).
 EUROPEAN_CERT_PORTS = {
-    "AMS", "ANT", "BAR", "BRE", "FEL", "HAM", "HA/BR", "LEH", "LIV", "LON",
-    "ROT", "TRI",
+    "AMS", "ANT", "BAR", "BRE", "FEL", "GEN", "HAM", "HA/BR", "LEH", "LIV",
+    "LON", "ROT", "TRI",
 }
 ROBUSTA_LOT_TONNES = 10  # LIFFE robusta lot = 10 t
 
@@ -335,21 +345,33 @@ def _european_sum(by_port: dict, scale: float) -> int:
                          and isinstance(v, (int, float))) * scale))
 
 
-def _cert_series(path: Path, by_port_key: str, scale: float) -> list[tuple[str, int]]:
-    """Load a certified file → sorted [(date, european_mt)] from its snapshots.
-    Returns [] if the file is absent/seed/empty so the join degrades gracefully."""
-    if not path.exists():
-        print(f"  [cert] {path.name} absent — no certified overlay")
-        return []
-    try:
-        snaps = json.loads(path.read_text(encoding="utf-8")).get("snapshots", [])
-    except Exception as e:
-        print(f"  [cert] {path.name} unreadable ({e})")
-        return []
-    out = [(s["date"], _european_sum(s.get(by_port_key, {}), scale))
-           for s in snaps if s.get("date")]
-    out.sort()
-    return out
+def _cert_series(paths: list[Path], port_keys: tuple[str, ...],
+                 scale: float) -> list[tuple[str, int]]:
+    """Merge the recent + deep-history certified files into a sorted
+    [(date, european_mt)] series. Each snapshot's port split is read from the
+    first present key in `port_keys` (recent vs deep files name it differently).
+    Dedup by date (later file wins). Empty/absent files degrade gracefully."""
+    by_date: dict[str, int] = {}
+    for path in paths:
+        if not path.exists():
+            continue
+        try:
+            snaps = json.loads(path.read_text(encoding="utf-8")).get("snapshots", [])
+        except Exception as e:
+            print(f"  [cert] {path.name} unreadable ({e})")
+            continue
+        n = 0
+        for s in snaps:
+            d = s.get("date")
+            if not d:
+                continue
+            ports = next((s[k] for k in port_keys if isinstance(s.get(k), dict)), None)
+            if ports is None:
+                continue
+            by_date[d] = _european_sum(ports, scale)
+            n += 1
+        print(f"  [cert] {path.name}: {n} snapshots")
+    return sorted(by_date.items())
 
 
 def _cert_at(series: list[tuple[str, int]], month_end: str,
@@ -371,8 +393,8 @@ def _merge_certified(monthly: list[dict]) -> int:
     """Add cert_eu_robusta_mt / cert_eu_arabica_mt (ICE certified at European
     ports, by type) to each ECF month where a near-date snapshot exists.
     Returns the number of months enriched."""
-    arabica = _cert_series(ARABICA_CERT_PATH, "by_port", 0.06)        # bags → t
-    robusta = _cert_series(ROBUSTA_CERT_PATH, "by_port_lots", ROBUSTA_LOT_TONNES)
+    arabica = _cert_series(ARABICA_CERT_PATHS, ARABICA_PORT_KEYS, 0.06)   # bags → t
+    robusta = _cert_series(ROBUSTA_CERT_PATHS, ROBUSTA_PORT_KEYS, ROBUSTA_LOT_TONNES)
     if not arabica and not robusta:
         return 0
     n = 0
