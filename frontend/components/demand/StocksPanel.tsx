@@ -174,6 +174,14 @@ function seasonTooltip(v: unknown, name: unknown): [string, string] {
 // Newest year full-opacity, older years progressively fainter.
 const yearOpacity = (idx: number) => Math.max(0.35, 1 - idx * 0.22);
 
+// Linear interpolate two #rrggbb colours (t 0→1).
+function hexLerp(a: string, b: string, t: number): string {
+  const ch = (s: string, i: number) => parseInt(s.slice(i, i + 2), 16);
+  const mix = (i: number) => Math.round(ch(a, i) + (ch(b, i) - ch(a, i)) * t)
+    .toString(16).padStart(2, "0");
+  return `#${mix(1)}${mix(3)}${mix(5)}`;
+}
+
 function YearWindowButtons({ n, set }: { n: number; set: (v: number) => void }) {
   return (
     <div className="flex gap-1">
@@ -314,9 +322,9 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
                 const op = yearOpacity(idx);
                 return [
                   <Bar key={`${y}_t`} dataKey={`y${y}_total`}    stackId={`y${y}`} fill="#475569" fillOpacity={op} />,
-                  <Bar key={`${y}_w`} dataKey={`y${y}_washed`}   stackId={`y${y}`} fill="#6366f1" fillOpacity={op} />,
-                  <Bar key={`${y}_u`} dataKey={`y${y}_unwashed`} stackId={`y${y}`} fill="#8b5cf6" fillOpacity={op} />,
-                  <Bar key={`${y}_r`} dataKey={`y${y}_robusta`}  stackId={`y${y}`} fill="#a78bfa" fillOpacity={op} radius={[2,2,0,0]} />,
+                  <Bar key={`${y}_w`} dataKey={`y${y}_washed`}   stackId={`y${y}`} fill="#b91c1c" fillOpacity={op} />,
+                  <Bar key={`${y}_u`} dataKey={`y${y}_unwashed`} stackId={`y${y}`} fill="#ec4899" fillOpacity={op} />,
+                  <Bar key={`${y}_r`} dataKey={`y${y}_robusta`}  stackId={`y${y}`} fill="#6b4423" fillOpacity={op} radius={[2,2,0,0]} />,
                 ];
               })}
             </BarChart>
@@ -330,15 +338,20 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
 
       <div className="flex items-center gap-x-2 gap-y-0.5 text-[8px] text-slate-500 flex-wrap">
         <span>Per month: newest left → oldest right{years1.length ? ` (${years1.join(" · ")})` : ""}; older years fade.</span>
-        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#6366f1" }} />Washed</span>
-        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#8b5cf6" }} />Unwashed</span>
-        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#a78bfa" }} />Robusta</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#b91c1c" }} />Arabica washed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#ec4899" }} />Arabica unwashed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#6b4423" }} />Robusta</span>
         <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#475569" }} />Total (pre-2020)</span>
       </div>
 
       {hasCert && (() => {
-        const dark  = cmpType === "robusta" ? "#6b4423" : "#b91c1c";
-        const light = cmpType === "robusta" ? "#cd9b6a" : "#fca5a5";
+        // Newest year = the type's base colour (robusta brown / arabica red);
+        // older years tint toward orange so each year reads clearly.
+        const baseDark  = cmpType === "robusta" ? "#6b4423" : "#b91c1c";
+        const baseLight = cmpType === "robusta" ? "#cd9b6a" : "#fca5a5";
+        const ORANGE_DARK = "#c2410c";
+        const ORANGE_LIGHT = "#fdba74";
+        const span = Math.max(1, years2.length - 1);
         return (
           <div className="space-y-1 pt-1 border-t border-slate-700/60">
             <div className="flex items-center justify-between">
@@ -364,19 +377,22 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
                          tickLine={false} tickFormatter={v => `${v}k`} />
                   <Tooltip contentStyle={TT_STYLE} formatter={seasonTooltip} />
                   {years2.flatMap((y, idx) => {
-                    const op = yearOpacity(idx);
+                    const t = idx / span;            // newest 0 → oldest 1
+                    const l = hexLerp(baseLight, ORANGE_LIGHT, t);
+                    const d = hexLerp(baseDark, ORANGE_DARK, t);
                     return [
-                      <Bar key={`${y}_c`} dataKey={`y${y}_cert`} stackId={`y${y}`} fill={light} fillOpacity={op} />,
-                      <Bar key={`${y}_r`} dataKey={`y${y}_rest`} stackId={`y${y}`} fill={dark}  fillOpacity={op} radius={[2,2,0,0]} />,
+                      <Bar key={`${y}_c`} dataKey={`y${y}_cert`} stackId={`y${y}`} fill={l} />,
+                      <Bar key={`${y}_r`} dataKey={`y${y}_rest`} stackId={`y${y}`} fill={d} radius={[2,2,0,0]} />,
                     ];
                   })}
                 </BarChart>
               </ResponsiveContainer>
             </div>
             <div className="flex items-center gap-x-2 text-[8px] text-slate-500 flex-wrap">
-              <span>Column = ECF {cmpType === "robusta" ? "Robusta" : "Washed Arabica"}; newest left{years2.length ? ` (${years2.join(" · ")})` : ""}.</span>
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: light }} />ICE-certified (EU)</span>
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: dark }} />Rest of ECF</span>
+              <span>Column = ECF {cmpType === "robusta" ? "Robusta" : "Washed Arabica"}; newest left{years2.length ? ` (${years2.join(" · ")})` : ""}; older years tint orange.</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: baseLight }} />ICE-certified (EU)</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: baseDark }} />Rest of ECF</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: ORANGE_DARK }} />older years</span>
             </div>
           </div>
         );
