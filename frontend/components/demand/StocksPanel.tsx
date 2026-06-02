@@ -77,7 +77,7 @@ interface ProducerEntry {
 
 interface StocksPayload {
   generated_at: string;
-  ecf: EcfData | null;
+  // ECF is its own flow now (read from /data/ecf_history.json), no longer here.
   eu: PsdData | null;
   japan: PsdData | null;
   usa: PsdData | null;
@@ -699,13 +699,21 @@ function StockToUseComparative({ eu, japan, usa }: { eu: PsdData | null; japan: 
 
 export default function StocksPanel() {
   const [data, setData] = useState<StocksPayload | null>(null);
+  const [ecf, setEcf] = useState<EcfData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/data/demand_stocks.json")
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+    // ECF is a self-contained flow with its own file; the rest comes from
+    // demand_stocks.json. Load both independently so one failing doesn't blank
+    // the other.
+    Promise.allSettled([
+      fetch("/data/demand_stocks.json").then(r => r.json()),
+      fetch("/data/ecf_history.json").then(r => r.json()),
+    ]).then(([d, e]) => {
+      if (d.status === "fulfilled") setData(d.value);
+      if (e.status === "fulfilled") setEcf(e.value);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -714,7 +722,8 @@ export default function StocksPanel() {
     );
   }
 
-  if (!data || (!data.ecf && !data.eu && !data.japan && !data.ajca && !data.usa)) {
+  const hasEcf = !!(ecf && ecf.monthly && ecf.monthly.length);
+  if (!hasEcf && (!data || (!data.eu && !data.japan && !data.ajca && !data.usa))) {
     return (
       <div className="bg-slate-900 border-b border-slate-700 p-4">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">Consumer Market Stocks</div>
@@ -725,7 +734,7 @@ export default function StocksPanel() {
     );
   }
 
-  const hasPsd = data.eu || data.japan || data.usa;
+  const hasPsd = !!(data && (data.eu || data.japan || data.usa));
 
   return (
     <div className="bg-slate-900 border-b border-slate-700 p-4 space-y-4">
@@ -733,14 +742,14 @@ export default function StocksPanel() {
 
       {/* Row 1: ECF + Japan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {data.ecf ? (
-          <EcfPanel ecf={data.ecf} />
+        {hasEcf ? (
+          <EcfPanel ecf={ecf!} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
             ECF monthly data pending scraper run
           </div>
         )}
-        {(data.japan || data.ajca) ? (
+        {(data?.japan || data?.ajca) ? (
           <JapanPanel japan={data.japan} ajca={data.ajca} />
         ) : (
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
@@ -750,12 +759,12 @@ export default function StocksPanel() {
       </div>
 
       {/* Row 2: PSD Analytical (full width, EU/Japan/USA tabs) */}
-      {hasPsd && (
+      {hasPsd && data && (
         <PsdAnalyticalPanel eu={data.eu} japan={data.japan} usa={data.usa} />
       )}
 
       {/* Row 3: Stock-to-Use Comparative (all 3 regions overlaid) */}
-      {hasPsd && (
+      {hasPsd && data && (
         <StockToUseComparative eu={data.eu} japan={data.japan} usa={data.usa} />
       )}
     </div>

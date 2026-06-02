@@ -2,12 +2,14 @@
 monthly_scraper.py — Runs data sources that publish monthly or less frequently.
 
 Sources:
-  ecf_stocks   — ECF European port stocks (bi-monthly publications)
   psd_coffee   — USDA FAS PSD (monthly release)
   ajca         — Japan coffee imports/stats (monthly)
   ucda_reports — Uganda UCDA monthly PDF reports
 
-Called by .github/workflows/scraper-monthly.yml on the 1st of each month.
+NB: ECF port stocks are NOT run here anymore — they are a self-contained flow
+('3.4 – ECF stocks' → scraper/backfill_ecf_history.py → ecf_history.json).
+
+Called by .github/workflows/scraper-slow-data.yml on the 1st of each month.
 """
 import asyncio
 import os
@@ -17,7 +19,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from scraper.db import get_session, upsert_news_item
 from scraper.sources import ajca as _ajca
-from scraper.sources import ecf_stocks as _ecf_stocks
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import ucda_reports as _ucda_reports
 from scraper.sources import un_wpp_age as _un_wpp_age
@@ -49,7 +50,6 @@ async def run_monthly() -> None:
             browser = await pw.chromium.launch(headless=True)
 
             for name, coro_fn in [
-                ("ecf_stocks",   lambda p: _ecf_stocks.run(p)),
                 ("psd_coffee",   lambda p: _psd_coffee.run(p, db)),
                 ("ajca",         lambda p: _ajca.run(p, db)),
                 ("ucda_reports", lambda p: _ucda_reports.run(p, db, start_id=1319, scan_back=30)),

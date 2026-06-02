@@ -62,8 +62,9 @@ def test_parse_real_by_type_table():
     pm: dict = {}
     assert _parse_table(table, 2020, "u", pm) == 4
     out = {e["period"]: e for e in _finalise(pm)}
-    assert out["2020-01"]["types"]["robusta_mt"] == 312_468
-    assert out["2020-01"]["types"]["arabica_unwashed_mt"] == 202_536
+    # Type fields are emitted FLAT (the shape StocksPanel reads).
+    assert out["2020-01"]["robusta_mt"] == 312_468
+    assert out["2020-01"]["arabica_unwashed_mt"] == 202_536
     assert out["2020-01"]["value_mt"] == 312_468 + 202_536
 
 
