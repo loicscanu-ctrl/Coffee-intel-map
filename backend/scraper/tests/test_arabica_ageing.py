@@ -8,7 +8,6 @@ from scraper.sources.ice_certified_stocks.parse_arabica_ageing import (
     parse_ageing_sheet,
 )
 
-
 # ── Band-header sniffer ─────────────────────────────────────────────────────
 
 def test_band_from_header_year_ranges():

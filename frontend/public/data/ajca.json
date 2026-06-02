@@ -1,0 +1,640 @@
+{
+  "source": "AJCA",
+  "source_url": "https://www.ajca.or.jp/data/",
+  "unit": "metric_tonnes",
+  "last_updated": "2026-06-02",
+  "stocks": {
+    "latest_period": "2026-04",
+    "latest_total_mt": 127337,
+    "monthly": [
+      {
+        "period": "2026-01",
+        "by_origin": {
+          "Brazil": 50267,
+          "Colombia": 17250,
+          "Indonesia": 4068,
+          "Vietnam": 16314,
+          "Central America": 20276,
+          "Others": 23665
+        },
+        "by_region": {
+          "Keihin": 77221,
+          "Chukyo": 16087,
+          "Hanshin": 38532
+        },
+        "total_origin": 131840,
+        "total_region": 131840,
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+      },
+      {
+        "period": "2026-02",
+        "by_origin": {
+          "Brazil": 51273,
+          "Colombia": 17347,
+          "Indonesia": 4258,
+          "Vietnam": 18515,
+          "Central America": 17534,
+          "Others": 23792
+        },
+        "by_region": {
+          "Keihin": 76769,
+          "Chukyo": 16247,
+          "Hanshin": 39703
+        },
+        "total_origin": 132719,
+        "total_region": 132719,
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+      },
+      {
+        "period": "2026-03",
+        "by_origin": {
+          "Brazil": 51647,
+          "Colombia": 16634,
+          "Indonesia": 3707,
+          "Vietnam": 18048,
+          "Central America": 16765,
+          "Others": 24405
+        },
+        "by_region": {
+          "Keihin": 77269,
+          "Chukyo": 15349,
+          "Hanshin": 38588
+        },
+        "total_origin": 131206,
+        "total_region": 131206,
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+      },
+      {
+        "period": "2026-04",
+        "by_origin": {
+          "Brazil": 48413,
+          "Colombia": 15293,
+          "Indonesia": 3609,
+          "Vietnam": 18629,
+          "Central America": 16956,
+          "Others": 24437
+        },
+        "by_region": {
+          "Keihin": 75461,
+          "Chukyo": 14052,
+          "Hanshin": 37824
+        },
+        "total_origin": 127337,
+        "total_region": 127337,
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+      }
+    ],
+    "annual": [
+      {
+        "year": 1996,
+        "ending_stocks_mt": 58696
+      },
+      {
+        "year": 1997,
+        "ending_stocks_mt": 55342
+      },
+      {
+        "year": 1998,
+        "ending_stocks_mt": 53372
+      },
+      {
+        "year": 1999,
+        "ending_stocks_mt": 69092
+      },
+      {
+        "year": 2000,
+        "ending_stocks_mt": 83801
+      },
+      {
+        "year": 2001,
+        "ending_stocks_mt": 83180
+      },
+      {
+        "year": 2002,
+        "ending_stocks_mt": 93457
+      },
+      {
+        "year": 2003,
+        "ending_stocks_mt": 93750
+      },
+      {
+        "year": 2004,
+        "ending_stocks_mt": 96744
+      },
+      {
+        "year": 2005,
+        "ending_stocks_mt": 109825
+      },
+      {
+        "year": 2006,
+        "ending_stocks_mt": 129374
+      },
+      {
+        "year": 2007,
+        "ending_stocks_mt": 111519
+      },
+      {
+        "year": 2008,
+        "ending_stocks_mt": 101272
+      },
+      {
+        "year": 2009,
+        "ending_stocks_mt": 100611
+      },
+      {
+        "year": 2010,
+        "ending_stocks_mt": 105304
+      },
+      {
+        "year": 2011,
+        "ending_stocks_mt": 132232
+      },
+      {
+        "year": 2012,
+        "ending_stocks_mt": 121604
+      },
+      {
+        "year": 2013,
+        "ending_stocks_mt": 172876
+      },
+      {
+        "year": 2014,
+        "ending_stocks_mt": 176023
+      },
+      {
+        "year": 2015,
+        "ending_stocks_mt": 191119
+      },
+      {
+        "year": 2016,
+        "ending_stocks_mt": 193720
+      },
+      {
+        "year": 2017,
+        "ending_stocks_mt": 181241
+      },
+      {
+        "year": 2018,
+        "ending_stocks_mt": 156180
+      },
+      {
+        "year": 2019,
+        "ending_stocks_mt": 176402
+      },
+      {
+        "year": 2020,
+        "ending_stocks_mt": 163264
+      },
+      {
+        "year": 2021,
+        "ending_stocks_mt": 169353
+      },
+      {
+        "year": 2022,
+        "ending_stocks_mt": 157468
+      },
+      {
+        "year": 2023,
+        "ending_stocks_mt": 143530
+      },
+      {
+        "year": 2024,
+        "ending_stocks_mt": 132005
+      },
+      {
+        "year": 2025,
+        "ending_stocks_mt": 131205
+      }
+    ]
+  },
+  "supply_demand": [
+    {
+      "year": 1996,
+      "ending_stocks_mt": 58696,
+      "begin_stocks_mt": 50153,
+      "green_imports_mt": 326914,
+      "product_imports_mt": 34631,
+      "consumption_mt": 352189,
+      "exports_mt": 813
+    },
+    {
+      "year": 1997,
+      "ending_stocks_mt": 55342,
+      "begin_stocks_mt": 58696,
+      "green_imports_mt": 325233,
+      "product_imports_mt": 33363,
+      "consumption_mt": 359889,
+      "exports_mt": 2061
+    },
+    {
+      "year": 1998,
+      "ending_stocks_mt": 53372,
+      "begin_stocks_mt": 55342,
+      "green_imports_mt": 332386,
+      "product_imports_mt": 30945,
+      "consumption_mt": 364244,
+      "exports_mt": 1057
+    },
+    {
+      "year": 1999,
+      "ending_stocks_mt": 69092,
+      "begin_stocks_mt": 53372,
+      "green_imports_mt": 363418,
+      "product_imports_mt": 31055,
+      "consumption_mt": 378081,
+      "exports_mt": 672
+    },
+    {
+      "year": 2000,
+      "ending_stocks_mt": 83801,
+      "begin_stocks_mt": 69092,
+      "green_imports_mt": 382230,
+      "product_imports_mt": 33860,
+      "consumption_mt": 399298,
+      "exports_mt": 2083
+    },
+    {
+      "year": 2001,
+      "ending_stocks_mt": 83180,
+      "begin_stocks_mt": 83801,
+      "green_imports_mt": 381745,
+      "product_imports_mt": 39565,
+      "consumption_mt": 413343,
+      "exports_mt": 8588
+    },
+    {
+      "year": 2002,
+      "ending_stocks_mt": 93457,
+      "begin_stocks_mt": 83180,
+      "green_imports_mt": 400771,
+      "product_imports_mt": 38968,
+      "consumption_mt": 415420,
+      "exports_mt": 14042
+    },
+    {
+      "year": 2003,
+      "ending_stocks_mt": 93750,
+      "begin_stocks_mt": 93457,
+      "green_imports_mt": 377647,
+      "product_imports_mt": 38550,
+      "consumption_mt": 407188,
+      "exports_mt": 8716
+    },
+    {
+      "year": 2004,
+      "ending_stocks_mt": 96744,
+      "begin_stocks_mt": 93750,
+      "green_imports_mt": 400977,
+      "product_imports_mt": 35155,
+      "consumption_mt": 427949,
+      "exports_mt": 5189
+    },
+    {
+      "year": 2005,
+      "ending_stocks_mt": 109825,
+      "begin_stocks_mt": 96744,
+      "green_imports_mt": 413264,
+      "product_imports_mt": 37344,
+      "consumption_mt": 433607,
+      "exports_mt": 3920
+    },
+    {
+      "year": 2006,
+      "ending_stocks_mt": 129374,
+      "begin_stocks_mt": 109825,
+      "green_imports_mt": 422696,
+      "product_imports_mt": 35811,
+      "consumption_mt": 436156,
+      "exports_mt": 2802
+    },
+    {
+      "year": 2007,
+      "ending_stocks_mt": 111519,
+      "begin_stocks_mt": 129374,
+      "green_imports_mt": 389818,
+      "product_imports_mt": 35959,
+      "consumption_mt": 438384,
+      "exports_mt": 5248
+    },
+    {
+      "year": 2008,
+      "ending_stocks_mt": 101272,
+      "begin_stocks_mt": 111519,
+      "green_imports_mt": 387538,
+      "product_imports_mt": 36120,
+      "consumption_mt": 423184,
+      "exports_mt": 10721
+    },
+    {
+      "year": 2009,
+      "ending_stocks_mt": 100611,
+      "begin_stocks_mt": 101272,
+      "green_imports_mt": 390938,
+      "product_imports_mt": 34497,
+      "consumption_mt": 418538,
+      "exports_mt": 7558
+    },
+    {
+      "year": 2010,
+      "ending_stocks_mt": 105304,
+      "begin_stocks_mt": 100611,
+      "green_imports_mt": 410530,
+      "product_imports_mt": 33957,
+      "consumption_mt": 431217,
+      "exports_mt": 8577
+    },
+    {
+      "year": 2011,
+      "ending_stocks_mt": 132232,
+      "begin_stocks_mt": 105304,
+      "green_imports_mt": 416805,
+      "product_imports_mt": 35867,
+      "consumption_mt": 420932,
+      "exports_mt": 4812
+    },
+    {
+      "year": 2012,
+      "ending_stocks_mt": 121604,
+      "begin_stocks_mt": 132232,
+      "green_imports_mt": 380041,
+      "product_imports_mt": 41646,
+      "consumption_mt": 428052,
+      "exports_mt": 4263
+    },
+    {
+      "year": 2013,
+      "ending_stocks_mt": 172876,
+      "begin_stocks_mt": 121604,
+      "green_imports_mt": 457142,
+      "product_imports_mt": 45997,
+      "consumption_mt": 446372,
+      "exports_mt": 5495
+    },
+    {
+      "year": 2014,
+      "ending_stocks_mt": 176023,
+      "begin_stocks_mt": 172876,
+      "green_imports_mt": 409473,
+      "product_imports_mt": 50233,
+      "consumption_mt": 449907,
+      "exports_mt": 6652
+    },
+    {
+      "year": 2015,
+      "ending_stocks_mt": 191119,
+      "begin_stocks_mt": 176023,
+      "green_imports_mt": 435362,
+      "product_imports_mt": 48618,
+      "consumption_mt": 461887,
+      "exports_mt": 6997
+    },
+    {
+      "year": 2016,
+      "ending_stocks_mt": 193720,
+      "begin_stocks_mt": 191119,
+      "green_imports_mt": 435268,
+      "product_imports_mt": 46496,
+      "consumption_mt": 472511,
+      "exports_mt": 6652
+    },
+    {
+      "year": 2017,
+      "ending_stocks_mt": 181241,
+      "begin_stocks_mt": 193720,
+      "green_imports_mt": 406449,
+      "product_imports_mt": 52513,
+      "consumption_mt": 464684,
+      "exports_mt": 6757
+    },
+    {
+      "year": 2018,
+      "ending_stocks_mt": 156180,
+      "begin_stocks_mt": 181241,
+      "green_imports_mt": 401249,
+      "product_imports_mt": 51338,
+      "consumption_mt": 470212,
+      "exports_mt": 7436
+    },
+    {
+      "year": 2019,
+      "ending_stocks_mt": 176402,
+      "begin_stocks_mt": 156180,
+      "green_imports_mt": 436654,
+      "product_imports_mt": 45940,
+      "consumption_mt": 452903,
+      "exports_mt": 9469
+    },
+    {
+      "year": 2020,
+      "ending_stocks_mt": 163264,
+      "begin_stocks_mt": 176402,
+      "green_imports_mt": 391713,
+      "product_imports_mt": 47567,
+      "consumption_mt": 430715,
+      "exports_mt": 21703
+    },
+    {
+      "year": 2021,
+      "ending_stocks_mt": 169353,
+      "begin_stocks_mt": 163264,
+      "green_imports_mt": 402241,
+      "product_imports_mt": 51180,
+      "consumption_mt": 423703,
+      "exports_mt": 23629
+    },
+    {
+      "year": 2022,
+      "ending_stocks_mt": 157468,
+      "begin_stocks_mt": 169353,
+      "green_imports_mt": 390208,
+      "product_imports_mt": 54403,
+      "consumption_mt": 432873,
+      "exports_mt": 23623
+    },
+    {
+      "year": 2023,
+      "ending_stocks_mt": 143530,
+      "begin_stocks_mt": 157468,
+      "green_imports_mt": 355819,
+      "product_imports_mt": 49001,
+      "consumption_mt": 401627,
+      "exports_mt": 17131
+    },
+    {
+      "year": 2024,
+      "ending_stocks_mt": 132005,
+      "begin_stocks_mt": 143530,
+      "green_imports_mt": 360430,
+      "product_imports_mt": 48822,
+      "consumption_mt": 400218,
+      "exports_mt": 20559
+    },
+    {
+      "year": 2025,
+      "ending_stocks_mt": 131205,
+      "begin_stocks_mt": 132005,
+      "green_imports_mt": 359629,
+      "product_imports_mt": 59143,
+      "consumption_mt": 397272,
+      "exports_mt": 22300
+    }
+  ],
+  "imports_origin": [
+    {
+      "year": 2021,
+      "by_country": {
+        "Brazil": 146243,
+        "Vietnam": 100325,
+        "Colombia": 47670,
+        "Indonesia": 24882,
+        "Guatemala": 19913,
+        "Ethiopia": 19677,
+        "Tanzania": 13524,
+        "Honduras": 10162,
+        "El Salvador": 2714,
+        "Peru": 2521,
+        "Nicaragua": 1733,
+        "Uganda": 1421,
+        "Kenya": 1402,
+        "Costa Rica": 1303,
+        "Mexico": 1136,
+        "Papua New Guinea": 803,
+        "India": 655,
+        "Rwanda": 304,
+        "Yemen": 204
+      }
+    },
+    {
+      "year": 2022,
+      "by_country": {
+        "Brazil": 112032,
+        "Vietnam": 105728,
+        "Colombia": 47159,
+        "Ethiopia": 27517,
+        "Guatemala": 21029,
+        "Indonesia": 19413,
+        "Tanzania": 16901,
+        "Honduras": 16474,
+        "Peru": 6032,
+        "El Salvador": 2237,
+        "Nicaragua": 2023,
+        "Uganda": 1900,
+        "Mexico": 1328,
+        "Kenya": 1274,
+        "Costa Rica": 1108,
+        "Papua New Guinea": 1077,
+        "Rwanda": 519,
+        "India": 237,
+        "Yemen": 157
+      }
+    },
+    {
+      "year": 2023,
+      "by_country": {
+        "Brazil": 124473,
+        "Vietnam": 99096,
+        "Colombia": 34031,
+        "Guatemala": 21877,
+        "Indonesia": 16185,
+        "Ethiopia": 15951,
+        "Tanzania": 12287,
+        "Honduras": 11430,
+        "Uganda": 3828,
+        "Peru": 3537,
+        "Nicaragua": 2077,
+        "Costa Rica": 1328,
+        "El Salvador": 1263,
+        "Kenya": 1172,
+        "Papua New Guinea": 1053,
+        "Mexico": 1038,
+        "Rwanda": 430,
+        "India": 314
+      }
+    },
+    {
+      "year": 2024,
+      "by_country": {
+        "Brazil": 130210,
+        "Vietnam": 97331,
+        "Colombia": 35858,
+        "Ethiopia": 21036,
+        "Guatemala": 19068,
+        "Indonesia": 16396,
+        "Tanzania": 12015,
+        "Honduras": 7166,
+        "Peru": 5175,
+        "Uganda": 4121,
+        "Nicaragua": 1561,
+        "Costa Rica": 1487,
+        "Papua New Guinea": 1371,
+        "El Salvador": 1095,
+        "Mexico": 942,
+        "Kenya": 764,
+        "Rwanda": 427,
+        "India": 298,
+        "Yemen": 197
+      }
+    },
+    {
+      "year": 2025,
+      "by_country": {
+        "Brazil": 146619,
+        "Vietnam": 89998,
+        "Colombia": 38034,
+        "Guatemala": 19630,
+        "Ethiopia": 15069,
+        "Tanzania": 11623,
+        "Indonesia": 9385,
+        "Honduras": 7646,
+        "Peru": 4754,
+        "Uganda": 4236,
+        "Papua New Guinea": 1925,
+        "Costa Rica": 1566,
+        "Kenya": 1269,
+        "Mexico": 1104,
+        "El Salvador": 1002,
+        "Nicaragua": 957,
+        "Rwanda": 300,
+        "India": 275
+      }
+    }
+  ],
+  "imports_type": [
+    {
+      "year": 2020,
+      "green_mt": 391611,
+      "regular_mt": 7367,
+      "instant_mt": 10700
+    },
+    {
+      "year": 2021,
+      "green_mt": 402100,
+      "regular_mt": 7661,
+      "instant_mt": 11657
+    },
+    {
+      "year": 2022,
+      "green_mt": 390032,
+      "regular_mt": 7846,
+      "instant_mt": 12588
+    },
+    {
+      "year": 2023,
+      "green_mt": 355652,
+      "regular_mt": 6911,
+      "instant_mt": 11583
+    },
+    {
+      "year": 2024,
+      "green_mt": 360287,
+      "regular_mt": 6011,
+      "instant_mt": 12137
+    },
+    {
+      "year": 2025,
+      "green_mt": 359382,
+      "regular_mt": 6341,
+      "instant_mt": 16031
+    }
+  ]
+}

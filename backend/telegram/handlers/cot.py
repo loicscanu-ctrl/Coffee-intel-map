@@ -2,6 +2,48 @@ from __future__ import annotations
 
 from telegram.data import load
 
+# Severity (lowercase) → fixed-width display tag. CRIT/ALERT/WARN/INFO matches
+# the per-rule listing block format spec in issue #132 Body-1.
+#
+# Schema drift caught on first live render: existing quant signals (CR5, ML5,
+# …) use severity="warn"; the Phase 5 agronomic engine (PR #140) uses
+# severity="watch". Both denote the same severity tier. We accept both spellings
+# everywhere so the sort + display work uniformly across categories. The
+# /signals page refactor (issue #132 item 21) should converge them at the
+# source eventually; until then, this handler treats them as synonyms.
+_SEVERITY_TAG = {
+    "critical": "CRIT",
+    "alert":    "ALERT",
+    "watch":    "WARN",
+    "warn":     "WARN",
+    "info":     "INFO",
+}
+_SEVERITY_RANK = {"critical": 4, "alert": 3, "watch": 2, "warn": 2, "info": 1}
+
+
+def _signal_line(s: dict) -> str:
+    """One Telegram-formatted line: `  [TAG] id name (+score, magnitude)`."""
+    sev = (s.get("severity") or "info").lower()
+    tag = _SEVERITY_TAG.get(sev, sev.upper()[:5])
+    score = s.get("score", 0)
+    magnitude = s.get("magnitude", "")
+    score_str = f"{'+' if score > 0 else ''}{score}"
+    detail = f"{score_str}, {magnitude}" if magnitude else score_str
+    return f"  [{tag}] {s.get('id', '?')} {s.get('name', '')} ({detail})"
+
+
+def _format_signals_block(signals: list, market: str) -> list[str]:
+    """Filter signals to the given market, sort by severity then |score|,
+    return display lines including the header. Empty list if no signals."""
+    filtered = [s for s in signals if s.get("market") == market]
+    if not filtered:
+        return []
+    filtered.sort(key=lambda s: (-_SEVERITY_RANK.get((s.get("severity") or "info").lower(), 0),
+                                  -abs(s.get("score", 0))))
+    lines = [f"\nSignals ({market}):"]
+    lines.extend(_signal_line(s) for s in filtered)
+    return lines
+
 
 def _arrow(current, previous) -> str:
     if current is None or previous is None:
@@ -86,5 +128,15 @@ def handle(args: str, context: dict) -> str:
             lines.append(f"  shorts: {cur.get('pmpu_short', 0):,} / longs: {cur.get('pmpu_long', 0):,}")
         if mm_net is None and prod_net is None:
             lines.append("  (data pending next release)")
+
+    # Per-rule signals block (issue #132 Body-1). signals.json is published
+    # daily by workflow 1.4; AGRO rows have market="PHYS" and are excluded
+    # naturally by the NY/LDN filter — they belong on a future /agro command.
+    sig_doc = load("signals.json")
+    if isinstance(sig_doc, dict):
+        signals = sig_doc.get("signals") or []
+        if signals:
+            lines.extend(_format_signals_block(signals, "NY"))
+            lines.extend(_format_signals_block(signals, "LDN"))
 
     return "\n".join(lines)

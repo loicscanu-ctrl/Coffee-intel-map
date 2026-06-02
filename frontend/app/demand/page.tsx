@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
+import AjcaPanel from "@/components/demand/AjcaPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
@@ -14,12 +15,12 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "destination" | "certified" | "demand" | "listed" | "test";
+type SubTab = "certified" | "destination" | "demand" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
-  { id: "destination", label: "Destination stocks" },
   { id: "certified",   label: "Certified stocks" },
-  { id: "demand",      label: "Demand" },
+  { id: "destination", label: "Destination stocks" },
+  { id: "demand",      label: "Consumption" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
 ];
@@ -50,7 +51,7 @@ function DemandPageInner() {
     <div className="flex flex-col h-full overflow-y-auto">
       <PageHeader
         title="Demand"
-        subtitle="Destination stocks · Certified stocks · Demand drivers · Listed companies"
+        subtitle="Certified stocks · Destination stocks · Consumption · Listed companies"
         healthKeys={["ecf", "psd_coffee", "ajca", "population"]}
       />
 
@@ -74,16 +75,18 @@ function DemandPageInner() {
       {/* Per-sub-tab content. Existing panels move under their tab, no panel
           renders on more than one tab. NewsFeedList stays as a persistent
           footer across all sub-tabs (demand-relevant news is general). */}
-      {tab === "destination" && (
-        <Section>
-          <StocksPanel />
-        </Section>
-      )}
-
       {tab === "certified" && (
         <Section>
           <CertifiedStocksPanel />
         </Section>
+      )}
+
+      {tab === "destination" && (
+        <>
+          <Section><StocksPanel /></Section>
+          {/* AJCA (Japan) lives at the bottom of Destination stocks */}
+          <Section><AjcaPanel /></Section>
+        </>
       )}
 
       {tab === "demand" && (

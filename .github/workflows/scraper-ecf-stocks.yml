@@ -1,0 +1,79 @@
+name: "3.4 – ECF stocks"
+
+# Builds frontend/public/data/ecf_history.json from ECF's yearly
+# "Stocks-European-Ports" PDFs (2014→present): per-month total, per-port and
+# (2020+) per-type breakdowns. The current-year PDF is refreshed by ECF on each
+# bi-monthly release, so re-running monthly keeps the full series current.
+#
+# Runs on a GitHub-hosted runner because ecf-coffee.org is reachable there
+# (the Claude sandbox is blocked by a host allowlist).
+
+on:
+  schedule:
+    - cron: "0 4 5 * *"   # 5th of each month, 04:00 UTC (after ECF releases)
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: "Print/dump raw parsed tables for verification"
+        type: boolean
+        default: false
+
+concurrency:
+  group: data-commit          # serialize all main-pushers
+  cancel-in-progress: false
+
+jobs:
+  ecf-stocks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install dependencies
+        run: pip install requests pdfplumber
+
+      - name: Run ECF stocks backfill
+        working-directory: backend
+        run: |
+          if [ "${{ inputs.debug }}" = "true" ]; then
+            python -m scraper.backfill_ecf_history --debug
+          else
+            python -m scraper.backfill_ecf_history
+          fi
+
+      - name: Upload debug artifact
+        if: ${{ inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecf-history-debug
+          path: frontend/public/data/ecf_history_debug.json
+          if-no-files-found: ignore
+
+      - name: Commit ecf_history.json if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Debug dump is for inspection only — never commit it.
+          rm -f frontend/public/data/ecf_history_debug.json
+          git add frontend/public/data/ecf_history.json
+          git diff --cached --quiet \
+            && echo "No changes — ecf_history.json already current." \
+            || (git commit -m "data: update ecf_history.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

@@ -2,13 +2,14 @@
 import { useEffect, useMemo, useState } from "react";
 import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
 import WeatherCharts from "../WeatherCharts";
+import WeatherAnalogs from "../WeatherAnalogs";
 import SupplyDemandBalance from "../SupplyDemandBalance";
 import { COUNTRY_HUB, EMPTY_CY, ICE_KC_COUNTRIES, ICE_RC_COUNTRIES } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
 import type { CecafeData, FilterState } from "./types";
 import { useUrlState } from "@/lib/useUrlState";
 
-type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather";
+type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs";
 
 import StatCard from "./StatCard";
 import DailyRegistrationSection from "./DailyRegistration";
@@ -27,7 +28,11 @@ export default function BrazilTab() {
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
   const [subTab, setSubTab] = useUrlState<BrazilSubTab>("brazilTab", "exports", (raw) =>
-    raw === "farmer-economics" ? "farmer-economics" : raw === "weather" ? "weather" : raw === "supply-demand" ? "supply-demand" : "exports"
+    raw === "farmer-economics" ? "farmer-economics"
+    : raw === "weather" ? "weather"
+    : raw === "analogs" ? "analogs"
+    : raw === "supply-demand" ? "supply-demand"
+    : "exports"
   );
 
   useEffect(() => {
@@ -103,7 +108,7 @@ export default function BrazilTab() {
     <div className="space-y-5">
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map((t) => (
+        {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -113,7 +118,11 @@ export default function BrazilTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "exports" ? "Exports" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Farmer Economics"}
+            {t === "exports" ? "Exports"
+              : t === "weather" ? "Weather"
+              : t === "analogs" ? "Analogs"
+              : t === "supply-demand" ? "Supply & Demand"
+              : "Farmer Economics"}
           </button>
         ))}
       </div>
@@ -129,6 +138,10 @@ export default function BrazilTab() {
           farmerEconomicsUrl="/data/farmer_economics.json"
           startMonthIdx={5}  // Brazil = southern hemisphere → calendar starts in June
         />
+      )}
+
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_brazil.json" label="Brazil arabica" />
       )}
 
       {subTab === "exports" && (

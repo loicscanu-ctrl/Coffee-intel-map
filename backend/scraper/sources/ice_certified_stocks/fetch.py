@@ -7,9 +7,9 @@ yet published (ICE typically publishes T-1 / T+0 mid-day).
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Iterable
 
 import requests
 

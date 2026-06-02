@@ -6,7 +6,7 @@ Keeps the last 30 trading-day snapshots per market.
 
 ALSO appends the same snapshot to data/contract_prices_archive.json — an
 UNBOUNDED, never-trimmed per-contract price+OI history. oi_history.json is
-the 30-day rolling window the frontend's OI tables read; the archive is the
+the 14-day rolling window the frontend's OI tables read; the archive is the
 permanent record so we accumulate true per-contract daily prices over time
 (the data we lacked when the Stooq backfill went wrong — see RUNBOOK).
 
@@ -29,7 +29,7 @@ import symbols  # noqa: E402  (sibling module: KC/RM/RC conventions)
 ROOT = Path(__file__).resolve().parents[2]   # …/Coffee-intel-map
 DATA_FILE = ROOT / "data" / "oi_history.json"
 ARCHIVE_FILE = ROOT / "data" / "contract_prices_archive.json"
-MAX_DAYS = 30
+MAX_DAYS = 14
 # Permanent archive retention: 5 years of trading days. The Industry Pulse
 # chart has a 5Y window, so we keep at least that much per-contract history
 # to source the price line from. ~261 trading days/yr × 5 + buffer.
@@ -140,7 +140,7 @@ def _save_history(history: dict) -> None:
 
 
 def _derive_oi_history_from_archive(archive: dict) -> dict:
-    """Build the 30-day rolling oi_history.json view FROM the archive — the
+    """Build the 14-day rolling oi_history.json view FROM the archive — the
     single OI source of truth. Returns {market: [{date, contracts:[{symbol,
     oi, last_price?}]}]} newest-first, symbols in DISPLAY form (RM for
     robusta) to match the futures-page OI table. Only dates that actually

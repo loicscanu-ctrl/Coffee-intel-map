@@ -26,15 +26,15 @@ import json
 import sys
 import time
 from collections import defaultdict
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import requests
 
 from . import fetch as F
 from .parse_age_allowance import parse_age_allowance_xlsx
-from .parse_arabica_xls import parse_arabica_xls
 from .parse_arabica_ageing import parse_arabica_ageing
+from .parse_arabica_xls import parse_arabica_xls
 from .parse_gradings import parse_gradings
 from .parse_iss_recv import parse_iss_recv_daily, parse_iss_recv_monthly
 from .parse_pdfs import parse_grading_overview_pdf, parse_infested_warrant_pdf
@@ -644,7 +644,7 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     robusta_latest_stock = robusta_stocks.get(robusta_latest_date) if robusta_latest_date else None
 
     # ── Assemble JSONs ──
-    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now = datetime.now(UTC).isoformat(timespec="seconds")
 
     arabica_json = {
         "generated_at": now,

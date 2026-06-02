@@ -3,9 +3,12 @@ export_stocks.py
 Reads DB + scraper caches and writes frontend/public/data/demand_stocks.json.
 
 Sections:
-  ecf    — ECF European port stocks (monthly), via NewsItem source="ECF"
   eu     — USDA FAS PSD annual EU green-coffee figures, from cache
   japan  — USDA FAS PSD annual Japan green-coffee figures, from cache
+
+NB: ECF is a separate, self-contained flow ('3.4 – ECF stocks' →
+ecf_history.json, read directly by the front-end) and is deliberately not part
+of demand_stocks.json anymore.
 """
 from __future__ import annotations
 
@@ -23,35 +26,6 @@ from scraper.sources import ajca, population, psd_coffee, un_wpp_age
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def _build_ecf(db) -> dict | None:
-    try:
-        item = (
-            db.query(NewsItem)
-            .filter(NewsItem.source == "ECF")
-            .order_by(NewsItem.pub_date.desc())
-            .first()
-        )
-        if not item:
-            return None
-        meta = json.loads(item.meta or "{}")
-        latest_bags = meta.get("latest_bags") or 0
-        return {
-            "source":        "ECF",
-            "last_updated":  meta.get("as_of", str(item.pub_date)[:10]),
-            "monthly":       meta.get("monthly", []),
-            "latest_bags":   latest_bags,
-            "latest_m_bags": round(latest_bags / 1_000_000, 2) if latest_bags else None,
-            "source_url":    meta.get("source_url"),
-            "latest_post":   meta.get("latest_post"),
-            "latest_pdf":    meta.get("latest_pdf"),
-            "yearly_pdfs":   meta.get("yearly_pdfs", []),
-        }
-    except Exception as e:
-        print(f"  [stocks] ECF section error: {e}")
-        return None
-
 
 def _psd_section(market_key: str, db_data: dict | None) -> dict | None:
     if not db_data:
@@ -342,9 +316,12 @@ def export_stocks(db) -> None:
             except Exception:
                 pass
 
+    # NB: ECF is intentionally NOT here. It is a self-contained flow owned by
+    # the '3.4 – ECF stocks' scraper, which writes frontend/public/data/
+    # ecf_history.json (read directly by the front-end). Do not re-add an "ecf"
+    # key — that would resurrect the duplicate the dismantling removed.
     result = {
         "generated_at":   datetime.utcnow().isoformat() + "Z",
-        "ecf":            _build_ecf(db),
         "eu":             _psd_section("eu",    psd_data),
         "japan":          _psd_section("japan", psd_data),
         "usa":            _psd_section("usa",   psd_data),

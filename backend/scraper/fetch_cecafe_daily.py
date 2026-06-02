@@ -23,14 +23,13 @@ Output: frontend/public/data/cecafe_daily.json
     "conillon": { "YYYY-MM": { "1": bags, "2": bags, ... } }
   }
 """
-import gzip
-import http.cookiejar
 import json
 import re
 import sys
-import urllib.request
 from datetime import date
 from pathlib import Path
+
+import requests
 
 ROOT     = Path(__file__).resolve().parents[2]
 OUT_DIR  = ROOT / "frontend" / "public" / "data"
@@ -58,68 +57,253 @@ DAILY_URL = "https://www.cecafe.com.br/dados-estatisticos/exportacoes-brasileira
 
 # ── Fetch ─────────────────────────────────────────────────────────────────────
 
-def _fetch_page() -> str:
-    jar = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    opener.addheaders = [
-        ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
-        ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-        ("Accept-Language", "pt-BR,pt;q=0.9"),
-        ("Accept-Encoding", "gzip, deflate"),
-        ("Connection", "keep-alive"),
-    ]
-    resp = opener.open(DAILY_URL, timeout=45)
-    raw = resp.read()
+# Headers chosen to look like a stock desktop Chrome request — the page
+# sometimes returns a 403 / shorter "block page" when called with a generic
+# Python User-Agent. The Accept-Language: pt-BR hint matters for some
+# Brazilian-hosted sites that geo-tune their response.
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "pt-BR,pt;q=0.9",
+    "Accept-Encoding": "gzip, deflate",
+    "Connection":      "keep-alive",
+}
+
+
+class CecafeUnreachable(RuntimeError):
+    """TCP connect or read timed out — Cecafe's server refused or dropped
+    the connection. Distinguished from a parser error (real bug in our code)
+    so the workflow can choose to treat it as a transient external issue."""
+
+
+def _is_challenge_page(html: str) -> bool:
+    """True when the response is a WAF / bot-challenge interstitial rather
+    than the real data page. Cecafé's edge began serving this to GitHub
+    Actions runner IPs in June 2026 — a ~7KB page reading 'Um momento, por
+    favor… Aguarde enquanto sua solicitação está sendo verificada…'.
+
+    A challenge page never carries the 'recebidas até:' reference date, so
+    feeding it to the parser yields the misleading 'Could not find reference
+    date' error. Detecting it explicitly lets us escalate to a real browser
+    (patchright) and log the true cause."""
+    if not html:
+        return True
+    low = html.lower()
+    markers = (
+        "um momento, por favor",
+        "aguarde enquanto sua solicita",            # accent-agnostic prefix
+        "solicitação está sendo verificada",
+        "just a moment",
+        "verificando se a cone",                    # "Verificando se a conexão…"
+        "checking your browser",
+        "cf-browser-verification",
+        "challenge-platform",
+        "_cf_chl_opt",
+    )
+    return any(m in low for m in markers)
+
+
+async def _browser_render() -> str:
+    """Render the Cecafé page with patchright (Cloudflare-evading Playwright
+    fork) so the JS/WAF challenge resolves and we get the real HTML. Mirrors
+    the proven pattern in scraper/sources/vietnam.py (giacaphe.com CF bypass)."""
+    from patchright.async_api import async_playwright
+
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent=_BROWSER_HEADERS["User-Agent"],
+            locale="pt-BR",
+        )
+        page = await context.new_page()
+        try:
+            await page.goto(DAILY_URL, wait_until="domcontentloaded", timeout=45000)
+            # Poll until the interstitial markers clear (CF challenges self-
+            # resolve in a few seconds once the JS runs in a real browser).
+            waited_ms = 0
+            max_wait_ms = 40000
+            poll_ms = 2000
+            while waited_ms < max_wait_ms:
+                html = await page.content()
+                if not _is_challenge_page(html):
+                    break
+                await page.wait_for_timeout(poll_ms)
+                waited_ms += poll_ms
+            # Settle: let the data table paint after the challenge clears.
+            await page.wait_for_timeout(2000)
+            html = await page.content()
+            if _is_challenge_page(html):
+                raise CecafeUnreachable(
+                    f"patchright could not clear the bot challenge within "
+                    f"{waited_ms / 1000:.0f}s (page still showing interstitial)"
+                )
+            print(f"  [fetch] patchright cleared the challenge after ~{waited_ms / 1000:.0f}s "
+                  f"({len(html):,} chars)")
+            return html
+        finally:
+            await browser.close()
+
+
+def _fetch_page_browser() -> str:
+    """Browser-render fallback when plain requests gets a challenge page.
+    Raises CecafeUnreachable when patchright is unavailable or the render
+    fails / never clears — same transient classification as a TCP failure
+    so the workflow retry/alert path treats it as an external issue, not a
+    parser bug."""
     try:
-        return gzip.decompress(raw).decode("utf-8", errors="ignore")
-    except Exception:
-        return raw.decode("utf-8", errors="ignore")
+        import asyncio
+
+        import patchright.async_api  # noqa: F401  (import-presence check)
+    except ImportError as e:
+        raise CecafeUnreachable(
+            "requests hit a bot-challenge page and patchright is not installed "
+            f"to render past it: {e}. Add 'pip install patchright && python -m "
+            "patchright install chromium' to the workflow."
+        ) from e
+    try:
+        return asyncio.run(_browser_render())
+    except CecafeUnreachable:
+        raise
+    except Exception as e:  # noqa: BLE001
+        raise CecafeUnreachable(
+            f"patchright render failed: {type(e).__name__}: {e}"
+        ) from e
+
+
+def _fetch_page() -> str:
+    """Fetch the Cecafe daily-resumo HTML.
+
+    Two-stage strategy:
+      1. Plain requests (fast/cheap) — works when no challenge is active.
+      2. If the response is a WAF/bot-challenge interstitial, escalate to a
+         patchright browser render that clears the JS challenge.
+
+    Raises:
+        CecafeUnreachable — TCP-level failure (connect/read timeout, DNS,
+            ConnectionError) OR a bot-challenge that patchright couldn't
+            clear / wasn't available to clear. All treated as transient
+            external issues so the workflow's retry + alert path fires.
+        requests.RequestException — non-timeout HTTP error (4xx/5xx),
+            re-raised so the caller sees the distinct failure mode.
+    """
+    try:
+        # (connect, read) — fail fast on connect so the bash retry loop
+        # cycles quicker; allow 45s of read time for the slow page itself.
+        r = requests.get(DAILY_URL, headers=_BROWSER_HEADERS, timeout=(15, 45))
+        r.raise_for_status()
+        html = r.text
+    except (requests.Timeout, requests.ConnectionError) as e:
+        raise CecafeUnreachable(
+            f"TCP-level failure reaching {DAILY_URL}: {type(e).__name__}: {e}"
+        ) from e
+
+    # Challenge wall? Escalate to a real browser. requests is left as the
+    # fast-path so the day Cecafé lifts the wall we automatically stop
+    # paying the browser-render cost.
+    if _is_challenge_page(html):
+        print("  [fetch] requests got a bot-challenge interstitial "
+              f"({len(html):,} chars) — escalating to patchright browser render…")
+        return _fetch_page_browser()
+    return html
 
 
 # ── Parse ─────────────────────────────────────────────────────────────────────
 
+# The Cecafé daily page carries two TOTAIS rows we want to capture both of:
+#
+#   embarques:    "Unidades de Embarques Marítimos e Rodoviários"
+#                 physical port loadings — truth of what shipped
+#   certificados: "Emissão de Certificados de Origem"
+#                 paperwork issued / clearance — runs ahead of loading
+#
+# Both follow the same 12-column TOTAIS layout (dia + acumulado + mês anterior
+# × 4 crop types). We fetch both per-day and the frontend lets the user toggle
+# between them — each tracks a different stage of the export pipeline and
+# the divergence between them is itself informative.
+TABLE_ANCHORS: dict[str, str] = {
+    "embarques":    "Unidades de Embarques",
+    "certificados": "Certificados de Origem",
+}
+
+
 def _parse_int_br(s: str) -> int:
     return int(s.replace(".", "").replace(",", "").strip())
+
+
+def _parse_totais_row(body: str, anchor_label: str) -> dict | None:
+    """Pull the 12-number TOTAIS row anchored on a section header.
+    Returns None when the anchor isn't found OR no TOTAIS row matches —
+    caller decides whether that's fatal."""
+    anchor_idx = body.lower().find(anchor_label.lower())
+    if anchor_idx < 0:
+        return None
+    section = body[anchor_idx:]
+
+    # Number pattern — Brazilian thousands ("123.456") with optional trailing
+    # footnote marker (*, ¹-⁹, †). 12-col primary, 8-col fallback.
+    _NUM = r'([\d\.]+)[\*¹²³⁴⁵⁶⁷⁸⁹†]?'
+    _SEP = r'\s+'
+    totais_12 = re.compile(r'TOTAIS' + _SEP + (_NUM + _SEP) * 11 + _NUM, re.IGNORECASE)
+    totais_8  = re.compile(r'TOTAIS' + _SEP + (_NUM + _SEP) *  7 + _NUM, re.IGNORECASE)
+
+    m = totais_12.search(section)
+    if m:
+        return {
+            "arabica":       _parse_int_br(m.group(5)),
+            "conillon":      _parse_int_br(m.group(6)),
+            "soluvel":       _parse_int_br(m.group(7)),
+            "prev_arabica":  _parse_int_br(m.group(9)),
+            "prev_conillon": _parse_int_br(m.group(10)),
+            "prev_soluvel":  _parse_int_br(m.group(11)),
+        }
+    m = totais_8.search(section)
+    if m:
+        return {
+            "arabica":       _parse_int_br(m.group(5)),
+            "conillon":      _parse_int_br(m.group(6)),
+            "soluvel":       _parse_int_br(m.group(7)),
+            "prev_arabica":  None,
+            "prev_conillon": None,
+            "prev_soluvel":  None,
+        }
+    return None
 
 
 def _parse_page(html: str) -> dict:
     """
     Returns:
       {
-        "ref_date":      date,   # date shown on page ("Informações recebidas até")
-        "arabica":       int,    # current month cumulative arabica bags
-        "conillon":      int,    # current month cumulative conilon bags
-        "soluvel":       int,    # current month cumulative soluvel bags
-        "prev_ym":       str,    # "YYYY-MM" of previous month
-        "prev_arabica":  int,    # same-day cumulative arabica last month
-        "prev_conillon": int,    # same-day cumulative conilon last month
-        "prev_soluvel":  int,    # same-day cumulative soluvel last month
+        "ref_date": date,
+        "prev_ym":  "YYYY-MM",
+        "sources":  {
+            "embarques":    {arabica, conillon, soluvel, prev_arabica, prev_conillon, prev_soluvel} | None,
+            "certificados": {arabica, conillon, soluvel, prev_arabica, prev_conillon, prev_soluvel} | None,
+        },
       }
 
-    The TOTAIS row for "Emissão de Certificados de Origem" has 12 numbers:
+    Each source TOTAIS row has 12 numbers in the same layout:
       [1] arabica_dia  [2] conillon_dia  [3] soluvel_dia  [4] total_dia
       [5] arabica_acum [6] conillon_acum [7] soluvel_acum [8] total_acum
       [9] arabica_prev [10] conillon_prev [11] soluvel_prev [12] total_prev
 
-    Columns 9-11 are "Mês Anterior" = same-day cumulative for prior month.
     Tolerates:
-      * Footnote markers after numbers ("123.456*", "123.456¹") — Cecafe
-        occasionally annotates retroactive corrections this way.
-      * 8-column variant (no Mês Anterior block) — fallback for layouts
-        where the prior-month column is dropped during the cross-year
-        transition. prev_* fields are set to None in that case.
-      * Variable whitespace / non-breaking spaces between cells.
+      * Footnote markers after numbers ("123.456*", "123.456¹")
+      * 8-column variant (no Mês Anterior block) — prev_* are None
+      * Variable whitespace / non-breaking spaces between cells
+      * A source missing — that source's entry is None; caller continues
+        as long as at least one source resolved.
     """
     # Strip scripts/styles then convert to plain text
     clean = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', '',
                    html, flags=re.DOTALL | re.IGNORECASE)
     clean = re.sub(r'<[^>]+>', ' ', clean)
-    # Normalise non-breaking spaces + Brazilian footnote markers before
-    # collapsing whitespace, so the TOTAIS regex sees a stable token stream.
     clean = clean.replace("\xa0", " ").replace("&nbsp;", " ")
     text  = re.sub(r'\s+', ' ', clean).strip()
 
-    # ── Reference date ────────────────────────────────────────────────────────
+    # ── Reference date ──────────────────────────────────────────────────────
     date_m = re.search(r'recebidas\s+at[eé]:\s*(\d{2})/(\d{2})/(\d{4})', text, re.IGNORECASE)
     if not date_m:
         idx = text.lower().find('recebidas')
@@ -131,163 +315,175 @@ def _parse_page(html: str) -> dict:
     ref_date = date(int(date_m.group(3)), int(date_m.group(2)), int(date_m.group(1)))
     print(f"  Reference date: {ref_date}")
 
-    # ── TOTAIS row for Certificados de Origem ────────────────────────────────
-    cert_idx = text.find("Certificados de Origem")
-    if cert_idx < 0:
-        cert_idx = 0
+    # ── Both TOTAIS sources ──────────────────────────────────────────────────
+    sources: dict[str, dict | None] = {}
+    for key, anchor in TABLE_ANCHORS.items():
+        sources[key] = _parse_totais_row(text, anchor)
+        if sources[key] is None:
+            print(f"  [{key}] no TOTAIS row found near {anchor!r} — skipping this source")
+        else:
+            s = sources[key]
+            print(f"  [{key}] acum A={s['arabica']:,} C={s['conillon']:,} S={s['soluvel']:,} | "
+                  f"prev A={s['prev_arabica']} C={s['prev_conillon']} S={s['prev_soluvel']}")
 
-    # Number pattern — Brazilian thousands ("123.456") with optional trailing
-    # footnote marker (*, ¹-⁹, †). Used by both 12-col and 8-col fallback.
-    _NUM = r'([\d\.]+)[\*¹²³⁴⁵⁶⁷⁸⁹†]?'
-    _SEP = r'\s+'
-
-    # Primary: 12-number row (dia + acum + Mês Anterior).
-    totais_12 = re.compile(
-        r'TOTAIS' + _SEP + (_NUM + _SEP) * 11 + _NUM,
-        re.IGNORECASE,
-    )
-    # Fallback: 8-number row (dia + acum only — no Mês Anterior block).
-    totais_8 = re.compile(
-        r'TOTAIS' + _SEP + (_NUM + _SEP) * 7 + _NUM,
-        re.IGNORECASE,
-    )
-
-    body = text[cert_idx:]
-    totais_m = totais_12.search(body)
-    prev_arab: int | None = None
-    prev_coni: int | None = None
-    prev_solv: int | None = None
-
-    if totais_m:
-        arabica_acum  = _parse_int_br(totais_m.group(5))
-        conillon_acum = _parse_int_br(totais_m.group(6))
-        soluvel_acum  = _parse_int_br(totais_m.group(7))
-        prev_arab     = _parse_int_br(totais_m.group(9))
-        prev_coni     = _parse_int_br(totais_m.group(10))
-        prev_solv     = _parse_int_br(totais_m.group(11))
-    else:
-        # Fallback: 8 columns means Mês Anterior was dropped. Keep going so
-        # the current-month line still records — prev_* stay None.
-        totais_m = totais_8.search(body)
-        if not totais_m:
-            # Dump a body snippet around the most likely TOTAIS location so the
-            # CI log shows what's actually on the page, not just a generic
-            # "could not find" message. Most-likely location: just after the
-            # "Certificados de Origem" anchor.
-            snippet = body[:1200].replace("\n", " ")
-            raise ValueError(
-                f"Could not find TOTAIS row for Certificados de Origem "
-                f"(tried 12-col and 8-col patterns). Body snippet (1.2kb): "
-                f"{snippet!r}"
-            )
-        print("  [parse] WARNING: fell back to 8-column layout (no Mês Anterior)")
-        arabica_acum  = _parse_int_br(totais_m.group(5))
-        conillon_acum = _parse_int_br(totais_m.group(6))
-        soluvel_acum  = _parse_int_br(totais_m.group(7))
-
-    print(f"  Acumulado    — Arabica: {arabica_acum:,}  Conilon: {conillon_acum:,}  Soluvel: {soluvel_acum:,}")
-    print(f"  Mês Anterior — Arabica: {prev_arab:,}  Conilon: {prev_coni:,}  Soluvel: {prev_solv:,}")
+    if all(v is None for v in sources.values()):
+        snippet = text[:1500].replace("\n", " ")
+        raise ValueError(
+            f"Could not find TOTAIS row for ANY known source ({list(TABLE_ANCHORS)}). "
+            f"Page-text excerpt: ...{snippet!r}..."
+        )
 
     prev_month = ref_date.month - 1 or 12
     prev_year  = ref_date.year if ref_date.month > 1 else ref_date.year - 1
     prev_ym    = f"{prev_year}-{prev_month:02d}"
 
     return {
-        "ref_date":      ref_date,
-        "arabica":       arabica_acum,
-        "conillon":      conillon_acum,
-        "soluvel":       soluvel_acum,
-        "prev_ym":       prev_ym,
-        "prev_arabica":  prev_arab,
-        "prev_conillon": prev_coni,
-        "prev_soluvel":  prev_solv,
+        "ref_date": ref_date,
+        "prev_ym":  prev_ym,
+        "sources":  sources,
     }
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def _empty_source() -> dict:
+    return {"arabica": {}, "conillon": {}, "soluvel": {}}
+
+
+def _load_existing() -> tuple[dict, str]:
+    """Load the dual-source JSON. Migrates the legacy flat schema
+    ({arabica, conillon, soluvel} at top level — originally fed by the
+    Certificados de Origem table) into sources["certificados"] so existing
+    historical data isn't lost. New schema:
+      {
+        "updated": "YYYY-MM-DD",
+        "_schema": "v2",
+        "sources": {
+          "embarques":    {arabica:{}, conillon:{}, soluvel:{}},
+          "certificados": {arabica:{}, conillon:{}, soluvel:{}},
+        }
+      }"""
+    existing: dict = {
+        "updated": "",
+        "_schema": "v2",
+        "sources": {
+            "embarques":    _empty_source(),
+            "certificados": _empty_source(),
+        },
+    }
+    prev_updated = ""
+    if not OUT_PATH.exists():
+        return existing, prev_updated
+    try:
+        raw = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return existing, prev_updated
+    prev_updated = raw.get("updated", "")
+    if "sources" in raw:
+        # Already new schema — copy through.
+        for key in ("embarques", "certificados"):
+            src = raw["sources"].get(key) or _empty_source()
+            existing["sources"][key] = {
+                "arabica":  src.get("arabica", {}),
+                "conillon": src.get("conillon", {}),
+                "soluvel":  src.get("soluvel", {}),
+            }
+    else:
+        # Legacy flat schema — historical data lived under top-level keys and
+        # came from Certificados de Origem. Migrate into certificados; leave
+        # embarques empty so it backfills cleanly going forward.
+        existing["sources"]["certificados"] = {
+            "arabica":  raw.get("arabica",  {}),
+            "conillon": raw.get("conillon", {}),
+            "soluvel":  raw.get("soluvel",  {}),
+        }
+        print("  [migrate] legacy flat schema → sources.certificados (one-shot)")
+    return existing, prev_updated
+
+
+def _store_source_day(source_bucket: dict, ym: str, day: str, parsed: dict) -> None:
+    """Merge one source's (arabica, conillon, soluvel) cumulative values
+    for the given (ym, day) into the source bucket in place."""
+    for crop in ("arabica", "conillon", "soluvel"):
+        if ym not in source_bucket[crop]:
+            source_bucket[crop][ym] = {}
+        source_bucket[crop][ym][day] = parsed[crop]
+
+
 def main():
     print("=== Cecafe daily registration scraper (public, no login) ===")
 
-    # 1. Load existing JSON
-    existing: dict = {"updated": "", "arabica": {}, "conillon": {}, "soluvel": {}}
-    prev_updated = ""
-    if OUT_PATH.exists():
-        try:
-            raw_json = json.loads(OUT_PATH.read_text(encoding="utf-8"))
-            existing["arabica"]  = raw_json.get("arabica",  {})
-            existing["conillon"] = raw_json.get("conillon", {})
-            existing["soluvel"]  = raw_json.get("soluvel",  {})
-            prev_updated = raw_json.get("updated", "")
-        except Exception:
-            pass
+    # 1. Load + migrate existing JSON.
+    existing, prev_updated = _load_existing()
 
-    # 2. Fetch page
+    # 2. Fetch page — surface unreachability cleanly so the workflow log
+    # explains a sustained outage (recurring May 2026 issue: GH Actions
+    # runner IPs periodically refused by Cecafe's edge for ~30+ min windows).
     print(f"\n[1] Fetching {DAILY_URL}...")
-    html = _fetch_page()
+    try:
+        html = _fetch_page()
+    except CecafeUnreachable as e:
+        print(f"  ERROR (transient): {e}")
+        print("  Source is unreachable — keeping last good JSON.")
+        print("  This is the recurring connect-timeout pattern; the next")
+        print("  scheduled cron (midday / evening) will retry with a fresh")
+        print("  network window.")
+        sys.exit(1)
     print(f"  Page size: {len(html):,} chars")
-    # Always capture the fetched page so a green-but-stale run is diagnosable
-    # (the parser only dumped on exceptions; the "data unchanged" case never hit
-    # that path, leaving us blind to whether the page itself stopped advancing).
     _dump_html("cecafe_daily_last_fetch.html", html)
 
-    # 3. Parse
+    # 3. Parse — extracts BOTH the embarques and certificados TOTAIS rows
+    # plus the ref date. A missing source yields None for that key; we
+    # carry on and write whichever sources did parse.
     print("\n[2] Parsing data...")
     try:
-        parsed = _parse_page(html)
+        parsed_doc = _parse_page(html)
     except ValueError as e:
-        # The fetched page was already captured above (cecafe_daily_last_fetch);
-        # also keep a distinctly-named copy of the failing page for clarity.
         _dump_html("cecafe_daily_last_failed.html", html)
         print(f"  ERROR: {e}")
-        # Retain existing JSON unchanged. Exit non-zero so the workflow's
-        # retry loop / failure-alert path fires, but the JSON file still has
-        # the last good data — frontend keeps rendering instead of showing
-        # an empty chart.
         sys.exit(1)
 
-    ref   = parsed["ref_date"]
-    ym    = f"{ref.year}-{ref.month:02d}"
-    day   = str(ref.day)
+    ref = parsed_doc["ref_date"]
+    ym  = f"{ref.year}-{ref.month:02d}"
+    day = str(ref.day)
+    prev_ym = parsed_doc["prev_ym"]
 
-    # Diagnostic: distinguish "Cecafe hasn't advanced the page" from a stale
-    # parse. If the page's reference date equals the last date we stored, no new
-    # day will be appended and the run goes green with no commit — which is the
-    # exact symptom of being "stuck". Surface it loudly in the log.
     if prev_updated and ref.isoformat() == prev_updated:
-        print(f"  [diag] page reference date {ref.isoformat()} == last stored "
-              f"date — source has NOT published a newer day (nothing to commit).")
+        print(f"  [diag] page reference date {ref.isoformat()} == last stored — "
+              "source has NOT published a newer day (nothing new to commit).")
     elif prev_updated:
         print(f"  [diag] page advanced: {prev_updated} -> {ref.isoformat()}")
 
-    # 4. Merge current month data
-    for key in ("arabica", "conillon", "soluvel"):
-        if ym not in existing[key]:
-            existing[key][ym] = {}
+    # 4. Merge each source's current-month + prev-month same-day cumulatives.
+    n_stored = 0
+    for source_key, parsed in parsed_doc["sources"].items():
+        if parsed is None:
+            continue
+        bucket = existing["sources"][source_key]
+        _store_source_day(bucket, ym, day, parsed)
+        if parsed.get("prev_arabica") is not None:
+            prev_row = {
+                "arabica":  parsed["prev_arabica"],
+                "conillon": parsed["prev_conillon"],
+                "soluvel":  parsed["prev_soluvel"],
+            }
+            _store_source_day(bucket, prev_ym, day, prev_row)
+        n_stored += 1
+        print(f"  [{source_key}] stored {ym} day {day}: "
+              f"A={parsed['arabica']:,} C={parsed['conillon']:,} S={parsed['soluvel']:,}")
 
-    existing["arabica"][ym][day]  = parsed["arabica"]
-    existing["conillon"][ym][day] = parsed["conillon"]
-    existing["soluvel"][ym][day]  = parsed["soluvel"]
-    print(f"\n[3] Stored {ym} day {day}: arabica={parsed['arabica']:,}  conilon={parsed['conillon']:,}  soluvel={parsed['soluvel']:,}")
+    if n_stored == 0:
+        print("  ERROR: no sources parsed successfully — keeping JSON unchanged.")
+        sys.exit(1)
 
-    # 5. Store previous month same-day cumulative (Mês Anterior = same-day last month)
-    prev_ym = parsed["prev_ym"]
-
-    for key in ("arabica", "conillon", "soluvel"):
-        if prev_ym not in existing[key]:
-            existing[key][prev_ym] = {}
-
-    existing["arabica"][prev_ym][day]  = parsed["prev_arabica"]
-    existing["conillon"][prev_ym][day] = parsed["prev_conillon"]
-    existing["soluvel"][prev_ym][day]  = parsed["prev_soluvel"]
-    print(f"  Stored {prev_ym} day {day} (same-day): arabica={parsed['prev_arabica']:,}  conilon={parsed['prev_conillon']:,}  soluvel={parsed['prev_soluvel']:,}")
-
-    # 6. Save
+    # 5. Save with the dual-source schema.
     existing["updated"] = ref.isoformat()
+    existing["_schema"] = "v2"
     OUT_PATH.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nWritten -> {OUT_PATH}  ({OUT_PATH.stat().st_size:,} bytes)")
-    months_a = sorted(existing["arabica"].keys())
-    print(f"Months stored: {months_a}")
+    for src_key, bucket in existing["sources"].items():
+        months = sorted(bucket["arabica"].keys())
+        print(f"  {src_key}: {len(months)} months stored ({months[:3]}…{months[-2:]})")
 
 
 if __name__ == "__main__":

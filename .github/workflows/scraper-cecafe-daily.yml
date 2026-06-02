@@ -2,8 +2,20 @@ name: "1.7 – Cecafe Daily Registration"
 
 on:
   schedule:
-    # Run every day at 09:00 UTC (06:00 Brasília) — Cecafe publishes previous day's data overnight
-    - cron: '0 9 * * *'
+    # Single daily window at 17:00 UTC (14:00 Brasília). Chosen as the LATE
+    # window deliberately: Cecafe publishes the day's resumo at a variable
+    # hour, and the afternoon run is the most likely to catch the page after
+    # it has advanced to the current day (an earlier run often finds
+    # yesterday's data still showing — see the "page reference date ==
+    # last stored, nothing new to commit" diag in the log).
+    #
+    # History: this used to be three windows (09/13/17 UTC) as a hedge
+    # against Cecafe's edge refusing GH Actions IPs for 30+ min stretches.
+    # The patchright browser-render path (added June 2026) now clears the
+    # bot-challenge wall reliably, so the extra windows became redundant
+    # cost (each spins up a headless chromium). Trimmed to one on the
+    # owner's call. workflow_dispatch stays for manual catch-up / one-offs.
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -13,10 +25,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    # 4 fetch attempts with 5-min gaps + a 45s socket timeout each can take
-    # ~16 min when Cecafe is flaky; keep the job cap comfortably above that so
-    # the retries actually run (the old 10-min cap killed the job mid-retry).
-    timeout-minutes: 25
+    # 3 attempts × (≤60s request + ≤45s patchright render) + 60s + 240s gaps
+    # ≈ 12 min worst case. Chromium install adds ~1 min. 20 min leaves
+    # headroom, still well under the original single-window 25min cap.
+    timeout-minutes: 20
     permissions:
       contents: write
 
@@ -30,15 +42,40 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        run: pip install pdfplumber
-
-      - name: Run Cecafe scraper (4 attempts)
-        working-directory: backend
+        # requests for the fast-path fetch; pdfplumber for the PDF mirror
+        # fallback. patchright (Cloudflare-evading Playwright fork) renders
+        # past the bot-challenge wall Cecafé's edge began serving to GH
+        # Actions IPs in June 2026 — same proven bypass scraper-daily.yml
+        # uses for giacaphe.com. Installed explicitly (not via requirements)
+        # because pip's resolver silently drops it against playwright==1.44.0.
         run: |
-          for attempt in 1 2 3 4; do
-            python -m scraper.fetch_cecafe_daily && break
-            [ $attempt -lt 4 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          set -e
+          pip install pdfplumber requests
+          pip install patchright
+          python -m patchright install chromium
+
+      - name: Run Cecafe scraper (3 attempts within the daily window)
+        working-directory: backend
+        # 3 in-run attempts with 60s/240s spacing. Now that there's a single
+        # daily window (no 13:00/17:00 backups), these within-run retries are
+        # the only safety net for a transient blip — patchright clears the
+        # challenge on the first try in the normal case, so the retries
+        # mostly cover a one-off network hiccup. The run is idempotent: a
+        # page that hasn't advanced to a new day commits nothing.
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            python -m scraper.fetch_cecafe_daily
+            rc=$?
+            [ $rc -eq 0 ] && exit 0
+            if [ $attempt -lt 3 ]; then
+              sleep_for=$((60 * attempt * attempt))   # 60, 240, ...
+              echo "Attempt $attempt failed (rc=$rc); retrying in ${sleep_for}s..."
+              sleep $sleep_for
+            fi
           done
+          echo "All 3 attempts failed within this cron window — next scheduled cron will retry."
+          exit 1
 
       - name: Upload fetched page (diagnostics)
         if: always()

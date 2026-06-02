@@ -13,7 +13,6 @@ from scraper.sources.ice_certified_stocks.cohort_outflow import (
     shift_month_iso,
 )
 
-
 # ── Month arithmetic ─────────────────────────────────────────────────────────
 
 def test_shift_month_iso_back():

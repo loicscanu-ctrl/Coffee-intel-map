@@ -76,6 +76,16 @@ FORECAST_DAYS = 8  # today + 7 future days (the 7 future days populate the chart
 TODAY = dt.date.today()
 CUR_YEAR = TODAY.year
 LAST_YEAR = CUR_YEAR - 1
+TWO_YEARS_AGO = CUR_YEAR - 2  # Needed by the crop-year LY line (e.g. Brazil
+                              # Jun-May): the prior crop year's first 7 months
+                              # fall in TWO_YEARS_AGO. See WeatherCharts.tsx
+                              # _rainForYear / _tempForYear lookups.
+# 10-year window for the daily-accum envelope. Built from the freshly
+# backfilled history (1995-2024) + the live 2025+ data, so it reflects
+# the actual recent decade rather than the stale fetched aggregates from
+# the original seed run.
+ENVELOPE_RANGE_START = CUR_YEAR - 10
+ENVELOPE_RANGE_END   = CUR_YEAR - 1
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 DAYS_IN_MONTH = [31, 29 if CUR_YEAR % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
@@ -187,7 +197,7 @@ def _warn_baseline_age(label: str, base: dict) -> None:
         gen = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
     except Exception:  # noqa: BLE001
         return
-    age_days = (dt.datetime.now(dt.timezone.utc) - gen).days
+    age_days = (dt.datetime.now(dt.UTC) - gen).days
     if age_days > _BASELINE_AGE_WARN_DAYS:
         print(f"  [{label}] baseline is {age_days}d old — consider re-running "
               f"the build-{label.lower()}-baselines workflow.")
@@ -380,6 +390,109 @@ def upsert(hist: dict, region: str, daily: dict) -> list[dict]:
 
 
 # ── Chart-JSON rebuild ───────────────────────────────────────────────────────
+def _pctl(vs: list[float], q: float) -> float:
+    """Linear-interpolated q-quantile (0..1) of a sorted-or-unsorted list.
+    Same shape as numpy.quantile(method='linear'). Caller is responsible
+    for filtering out None entries before passing."""
+    if not vs:
+        return 0.0
+    s = sorted(vs)
+    if len(s) == 1:
+        return s[0]
+    pos = q * (len(s) - 1)
+    lo = int(pos)
+    hi = min(lo + 1, len(s) - 1)
+    return s[lo] + (s[hi] - s[lo]) * (pos - lo)
+
+
+def _monthly_totals_per_year(reg_hist: dict, year_start: int, year_end: int,
+                              ) -> dict[str, list[float | None]]:
+    """{year_str: [12 monthly rain totals or None]} for each calendar year in
+    [year_start, year_end]. A month with fewer than (dim - 2) days of data is
+    emitted as None so partial months don't skew the cumulative-envelope
+    computation downstream. Stored in the published *_weather.json so the
+    chart can derive per-year cumulative curves client-side, then take min/
+    max across years for an honest cumulative envelope (sum of per-month
+    minima never lands on any single observed year — that was the old bug).
+    11-year window — caller passes (CUR_YEAR-11, CUR_YEAR-1) so the chart
+    can build 10 crop-year cumulative windows even when the displayed year
+    straddles a calendar boundary (e.g. Brazil's Jun-May)."""
+    out: dict[str, list[float | None]] = {}
+    for y in range(year_start, year_end + 1):
+        row: list[float | None] = []
+        for m in range(1, 13):
+            dim = DAYS_IN_MONTH[m - 1]
+            total = 0.0
+            n = 0
+            for d in range(1, dim + 1):
+                v = reg_hist.get(f"{y}-{m:02d}-{d:02d}")
+                if v and v.get("rain") is not None:
+                    total += v["rain"]
+                    n += 1
+            row.append(r1(total) if n >= dim - 2 else None)
+        out[str(y)] = row
+    return out
+
+
+def _monthly_aggregates_10y(reg_hist: dict, year_start: int, year_end: int,
+                             ) -> tuple[list[float | None], list[float | None],
+                                        list[float | None], list[float | None],
+                                        list[float | None], list[float | None],
+                                        list[float | None]]:
+    """For each calendar month 1..12, walk years [year_start, year_end] and
+    return (avg_rain, min_rain, max_rain, dry_warn_p20, avg_temp, min_temp,
+    max_temp) as 12-element lists. Months without ≥1 near-complete year
+    (≥dim-2 days) get None.
+
+    dry_warn_p20 = 20th percentile of monthly rain totals across the 10Y
+    window — the drought-risk floor used by the Monthly Rainfall bar chart's
+    orange "drought-risk zone" overlay. Previously sourced from
+    build_origin_weather.py's 30Y P20 (one-shot seed, never refreshed); now
+    auto-rolls with the rest of the climatology."""
+    avg_rain: list[float | None] = []
+    min_rain: list[float | None] = []
+    max_rain: list[float | None] = []
+    dry_warn: list[float | None] = []
+    avg_temp: list[float | None] = []
+    min_temp: list[float | None] = []
+    max_temp: list[float | None] = []
+    for m in range(1, 13):
+        dim = DAYS_IN_MONTH[m - 1]
+        rain_totals: list[float] = []
+        temp_means: list[float] = []
+        for y in range(year_start, year_end + 1):
+            r_total = 0.0
+            r_n = 0
+            t_sum = 0.0
+            t_n = 0
+            for d in range(1, dim + 1):
+                v = reg_hist.get(f"{y}-{m:02d}-{d:02d}")
+                if not v:
+                    continue
+                if v.get("rain") is not None:
+                    r_total += v["rain"]
+                    r_n += 1
+                if v.get("tmean") is not None:
+                    t_sum += v["tmean"]
+                    t_n += 1
+            # Require near-complete months only; partial months would skew
+            # both the average and the envelope endpoints downward.
+            if r_n >= dim - 2:
+                rain_totals.append(r_total)
+            if t_n >= dim - 2:
+                temp_means.append(t_sum / t_n)
+        def _agg(vs: list[float], op):
+            return r1(op(vs)) if vs else None
+        avg_rain.append(_agg(rain_totals, lambda xs: sum(xs) / len(xs)))
+        min_rain.append(_agg(rain_totals, min))
+        max_rain.append(_agg(rain_totals, max))
+        dry_warn.append(_agg(rain_totals, lambda xs: _pctl(xs, 0.20)))
+        avg_temp.append(_agg(temp_means, lambda xs: sum(xs) / len(xs)))
+        min_temp.append(_agg(temp_means, min))
+        max_temp.append(_agg(temp_means, max))
+    return avg_rain, min_rain, max_rain, dry_warn, avg_temp, min_temp, max_temp
+
+
 def _month_rain(reg_hist: dict, year: int, month: int) -> tuple[float, int]:
     """(total rain, day-count) for a region-history dict in year/month."""
     total = 0.0
@@ -441,6 +554,132 @@ def _daily_accum(reg_hist: dict, year: int, month: int, dim: int) -> list[float 
     return out if seen else []
 
 
+def _daily_accum_envelope(reg_hist: dict, month: int, dim: int,
+                          year_start: int, year_end: int,
+                          ) -> tuple[list[float | None], list[float | None], list[float | None]]:
+    """Per-day (1..dim) min / avg / max of cumulative rain across years in
+    [year_start, year_end]. Replaces the chart's linear interpolation of
+    monthly_min/avg/max_rain — that approach mis-flags bursty rainfall (a
+    single early-month storm pushes the cumulative line above a max
+    envelope that grows linearly from 0). With per-day percentiles built
+    from real history, the envelope contains every observed yearly curve
+    by construction. Returns ([min], [avg], [max]); each list has `dim`
+    entries. Years with no data for a given day-in-month are skipped (so
+    a partial-year doesn't pin the min at zero)."""
+    per_year_curves: list[list[float | None]] = []
+    for y in range(year_start, year_end + 1):
+        acc = 0.0
+        any_data = False
+        curve: list[float | None] = []
+        for d in range(1, dim + 1):
+            v = reg_hist.get(f"{y}-{month:02d}-{d:02d}")
+            rain = v.get("rain") if v else None
+            if rain is not None:
+                acc += rain
+                any_data = True
+                curve.append(acc)
+            else:
+                # Carry the accumulator forward (gap day = zero rain). Curve
+                # still emits the running total so a single missing day
+                # doesn't reset the year's progression.
+                curve.append(acc if any_data else None)
+        if any_data:
+            per_year_curves.append(curve)
+    if not per_year_curves:
+        return [None] * dim, [None] * dim, [None] * dim
+    mins: list[float | None] = []
+    avgs: list[float | None] = []
+    maxs: list[float | None] = []
+    for d in range(dim):
+        day_vals = [c[d] for c in per_year_curves if c[d] is not None]
+        if not day_vals:
+            mins.append(None); avgs.append(None); maxs.append(None)
+        else:
+            mins.append(r1(min(day_vals)))
+            avgs.append(r1(sum(day_vals) / len(day_vals)))
+            maxs.append(r1(max(day_vals)))
+    return mins, avgs, maxs
+
+
+def _daily_rain_history(reg_hist: dict, anchor: dt.date, n_months: int = 36,
+                         ) -> dict[str, list[float | None]]:
+    """{'YYYY-MM': [day1_rain, day2_rain, ..., dim_rain]} for the n_months
+    months ending at `anchor.month`. Used by the chart to render the Daily
+    Accumulated Rainfall panel for ANY selected month (not just the current
+    one), and to derive the LY line for any selected month by looking up
+    its (year-1, month) entry. 36 months ≈ 3 years means the user can pick
+    any of the last 24 months and still see both cur + LY lines."""
+    out: dict[str, list[float | None]] = {}
+    y, m = anchor.year, anchor.month
+    for _ in range(n_months):
+        dim = calendar.monthrange(y, m)[1]
+        row: list[float | None] = []
+        any_data = False
+        for d in range(1, dim + 1):
+            v = reg_hist.get(f"{y}-{m:02d}-{d:02d}")
+            rain = v.get("rain") if v else None
+            if rain is not None:
+                any_data = True
+            row.append(r1(rain) if rain is not None else None)
+        if any_data:
+            out[f"{y}-{m:02d}"] = row
+        # Step backwards one calendar month.
+        m -= 1
+        if m == 0:
+            m = 12
+            y -= 1
+    return out
+
+
+def _envelope_by_month(reg_hist: dict, year_start: int, year_end: int,
+                       ) -> dict[str, dict[str, list[float | None]]]:
+    """Pre-computes the 10Y daily-accum envelope for every month so the chart
+    can show a realistic band on ANY selected month (not just the current
+    one). {'1': {min, avg, max}, '2': {...}, ...} — each list has the day
+    count for that month. Inner arrays mirror the shape of
+    daily_accum_min_10y / _avg_10y / _max_10y."""
+    out: dict[str, dict[str, list[float | None]]] = {}
+    # Use a leap year for Feb so the 29-day envelope is always available;
+    # the chart selects dim from new Date(year, month+1, 0).getDate() and
+    # truncates Feb to 28 in non-leap years.
+    leap = 2024
+    for m in range(1, 13):
+        dim = calendar.monthrange(leap, m)[1]
+        mins, avgs, maxs = _daily_accum_envelope(reg_hist, m, dim, year_start, year_end)
+        out[str(m)] = {"min": mins, "avg": avgs, "max": maxs}
+    return out
+
+
+def _unmojibake(s: str) -> str:
+    """Reverse a past double-encoding round-trip: when accented UTF-8
+    was decoded as Latin-1 and re-encoded as UTF-8, the bytes look like
+    'EspÃ\\xadrito Santo'. Re-encoding as Latin-1 and decoding as UTF-8
+    inverts that transform. Returns s unchanged if the transform fails
+    or the result is unchanged."""
+    try:
+        fixed = s.encode("latin-1").decode("utf-8")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return s
+    return fixed if fixed != s else s
+
+
+def _resolve_region(prov_name: str, regions_hist: dict) -> tuple[str, dict]:
+    """Find the seed-history entry for a province, tolerating mojibake
+    introduced by a past round-trip. Once the published *_weather.json
+    has mojibake, the direct lookup misses, and monthly_actual_cur stops
+    refreshing for that province — the chart bars for the current year
+    appear empty (this was the March/April gap on Brazil/Colombia/Honduras).
+    Returns (canonical_name, history_dict). canonical_name differs from
+    prov_name when a heal happened; caller writes it back so the file
+    becomes UTF-8-clean on the next commit."""
+    if prov_name in regions_hist:
+        return prov_name, regions_hist[prov_name]
+    fixed = _unmojibake(prov_name)
+    if fixed != prov_name and fixed in regions_hist:
+        return fixed, regions_hist[fixed]
+    return prov_name, {}
+
+
 def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> dict | None:
     path = DATA_DIR / f"{origin}_weather.json"
     if not path.exists():
@@ -451,13 +690,84 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
     dim_cur = DAYS_IN_MONTH[cur_month - 1]
     regions_hist = hist["regions"]
 
+    # Heal mojibake in top-level station label too (display-only field).
+    if "station" in doc:
+        fixed_station = _unmojibake(doc["station"])
+        if fixed_station != doc["station"]:
+            print(f"  [heal] {origin}: top.station {doc['station']!r} → {fixed_station!r}")
+            doc["station"] = fixed_station
+
     for prov in doc["provinces"]:
-        rh = regions_hist.get(prov["name"], {})
+        canonical, rh = _resolve_region(prov["name"], regions_hist)
+        if canonical != prov["name"]:
+            print(f"  [heal] {origin}: mojibake {prov['name']!r} → {canonical!r}")
+            prov["name"] = canonical
+        # Per-province station label is display-only — heal without lookup.
+        if "station" in prov:
+            fixed = _unmojibake(prov["station"])
+            if fixed != prov["station"]:
+                print(f"  [heal] {origin}: {prov['name']} station {prov['station']!r} → {fixed!r}")
+                prov["station"] = fixed
         # Per-province daily accumulation for the current month (+ last year) so
         # the frontend can prod-weight the Daily Accumulated chart across the
         # selected regions, not just the single reference station.
+        # Kept for backward compatibility — the chart prefers daily_rain_history
+        # (lets it render any selected month, not just the current one).
         prov["daily_accum_cur"] = _daily_accum(rh, CUR_YEAR, cur_month, dim_cur)
         prov["daily_accum_ly"]  = _daily_accum(rh, LAST_YEAR, cur_month, dim_cur)
+        # Last 36 months of per-day rain → the chart can build cur + LY
+        # cumulative curves for ANY selected month within the last 24-25
+        # months (selected_month + selected_month - 12). Before this field
+        # existed, picking a past month blanked the cur line because
+        # daily_accum_cur only covered the current month.
+        prov["daily_rain_history"] = _daily_rain_history(rh, TODAY, n_months=36)
+        # Per-day 10Y min/avg/max envelope built from the real backfilled history.
+        # The chart used to interpolate a linear envelope from monthly_min/max
+        # totals (max_day_d = monthly_max * d/dim), which is physically wrong:
+        # a single early-month storm pushes the cumulative line above an
+        # envelope that grows linearly from 0. Now the band reflects real
+        # day-by-day percentiles across the 10 prior years.
+        env_min, env_avg, env_max = _daily_accum_envelope(
+            rh, cur_month, dim_cur, ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
+        prov["daily_accum_min_10y"] = env_min
+        prov["daily_accum_avg_10y"] = env_avg
+        prov["daily_accum_max_10y"] = env_max
+        # Same 10Y envelope but precomputed for every calendar month, so the
+        # band keeps its real shape when the user selects a non-current month.
+        prov["daily_envelope_by_month"] = _envelope_by_month(  # type: ignore[assignment]
+            rh, ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
+        # Refresh the monthly aggregates from the freshly backfilled history.
+        # The original seed values came from a one-shot Open-Meteo fetch in
+        # build_origin_weather.py; they're stale (ES Jun max was 27mm vs the
+        # real 38.8mm from 2018). Recomputing here per-cron means they
+        # auto-roll forward each year — by Jan 1 2027 the 10Y window slides
+        # to 2017-2026 with no manual intervention.
+        ar, ir, xr, dw, at, it, xt = _monthly_aggregates_10y(
+            rh, ENVELOPE_RANGE_START, ENVELOPE_RANGE_END)
+        # Only overwrite when every month is populated; partial coverage
+        # would mean keeping the seed values for the missing months.
+        if all(v is not None for v in ar):
+            prov["monthly_avg_rain"] = ar  # type: ignore[assignment]
+        if all(v is not None for v in ir):
+            prov["monthly_min_rain"] = ir  # type: ignore[assignment]
+        if all(v is not None for v in xr):
+            prov["monthly_max_rain"] = xr  # type: ignore[assignment]
+        if all(v is not None for v in dw):
+            prov["monthly_dry_warn"] = dw  # type: ignore[assignment]
+        if all(v is not None for v in at):
+            prov["monthly_avg_temp"] = at  # type: ignore[assignment]
+        if all(v is not None for v in it):
+            prov["monthly_min_temp"] = it  # type: ignore[assignment]
+        if all(v is not None for v in xt):
+            prov["monthly_max_temp"] = xt  # type: ignore[assignment]
+        # Per-year monthly rain totals (11Y window so the chart can build
+        # 10 crop-year cumulatives that may straddle a calendar boundary,
+        # e.g. Brazil's Jun-May display needs Jun-Dec of year y plus
+        # Jan-May of year y+1). Feeds the Cumulative YTD chart's proper
+        # min/max envelope — replaces the old naive sum-of-per-month-mins
+        # which couldn't correspond to any actually-observed year.
+        prov["monthly_totals_history"] = _monthly_totals_per_year(  # type: ignore[assignment]
+            rh, ENVELOPE_RANGE_START - 1, ENVELOPE_RANGE_END)
         # Current-year actuals (live, accumulating). Keep seed where history is absent.
         act_r = _trim_trailing_none(_year_actuals_rain(rh, CUR_YEAR, cur_month))
         act_t = _trim_trailing_none(_year_actuals_temp(rh, CUR_YEAR, cur_month))
@@ -472,6 +782,16 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         ly_t = _year_actuals_temp(rh, LAST_YEAR, 12)
         if all(v is not None for v in ly_t) and len(ly_t) == 12:
             prov["monthly_last_year_temp"] = ly_t
+        # Two-years-ago actuals. Populates only after the 0.9 backfill workflow
+        # has imported 1995-2024 into weather_history. Without these, crop-year
+        # charts (Brazil = Jun-May) have a null first half on the previous-crop-
+        # year line because the prior crop year's Jun-Dec falls in TWO_YEARS_AGO.
+        t2_r = _year_actuals_rain(rh, TWO_YEARS_AGO, 12)
+        if all(v is not None for v in t2_r) and len(t2_r) == 12:
+            prov["monthly_two_years_ago_rain"] = t2_r
+        t2_t = _year_actuals_temp(rh, TWO_YEARS_AGO, 12)
+        if all(v is not None for v in t2_t) and len(t2_t) == 12:
+            prov["monthly_two_years_ago_temp"] = t2_t
         # 7-day forecast rain.
         fc = forecasts.get(prov["name"], [])
         if fc:
@@ -535,7 +855,15 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
     month_norm = ref["monthly_avg_rain"][m_idx] if ref.get("monthly_avg_rain") else 0
     cur_days = sorted(int(date[8:10]) for date in ref_hist
                       if int(date[:4]) == CUR_YEAR and int(date[5:7]) == cur_month)
-    daily_rows = []
+    daily_rows: list[dict] = []
+    keep_prior_daily = False
+    if not cur_days and doc.get("daily_station"):
+        # Month rollover before the live fetch has captured the 1st: keep
+        # the previously-published daily_station rather than wipe it. The
+        # next cron run with fresh history will replace it with the new
+        # month. Without this guard, a one-shot heal or a day-1 fetch
+        # failure would leave the chart blank.
+        keep_prior_daily = True
     if cur_days:
         last_actual = max(cur_days)
         accum = 0.0
@@ -572,7 +900,8 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
                 "last_year_accum_mm": ly_val,
                 "temp_c": r1(v["tmean"]) if v.get("tmean") is not None else 0.0,
             })
-    doc["daily_station"] = daily_rows
+    if not keep_prior_daily:
+        doc["daily_station"] = daily_rows
 
     # 7-day forecast list from the reference province.
     ref_fc = forecasts.get(ref["name"], [])

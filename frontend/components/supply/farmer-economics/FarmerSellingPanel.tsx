@@ -30,7 +30,7 @@ interface ChartPoint {
 }
 
 interface SellingData {
-  brazil: { current: number; prev_month: number; avg_5y: number };
+  brazil: { current: number; prev_month: number; avg_5y: number; crop_year?: string };
   regions: RegionRow[];
   progression_months: string[];
   progression: ProgressionRow[];
@@ -205,11 +205,20 @@ function RegionCard({ r }: { r: RegionRow }) {
 
 // ── Seasonal line chart ────────────────────────────────────────────────────────
 
-function SeasonChart({ chart }: { chart: ChartPoint[] }) {
+function SeasonChart({ chart, cropYear }: { chart: ChartPoint[]; cropYear?: string }) {
+  // Filter out boundary-marker rows (e.g. "Apr*") where the current year has no data yet
+  const filteredChart = chart.filter(pt => !pt.x.endsWith("*") || pt.y2526 != null);
+  const isCropComplete = chart.length > 0 && chart[chart.length - 1].y2526 == null;
   return (
+    <div>
+    {isCropComplete && (
+      <div className="text-[7px] text-amber-500/70 mb-1 text-right">
+        {cropYear ?? "25/26"} crop year complete · 26/27 monitoring begins Apr 2026
+      </div>
+    )}
     <div className="h-44">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chart} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+        <LineChart data={filteredChart} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
           <XAxis dataKey="x" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false}
@@ -231,12 +240,15 @@ function SeasonChart({ chart }: { chart: ChartPoint[] }) {
         </LineChart>
       </ResponsiveContainer>
     </div>
+    </div>
   );
 }
 
 // ── Progression heatmap table ─────────────────────────────────────────────────
 
 function ProgressionTable({ data }: { data: SellingData }) {
+  // Filter out corrupted rows where month doesn't match expected MMM-YY format
+  const validRows = data.progression.filter(r => /^[A-Za-z]{3}-\d{2}$/.test(String(r.month)));
   const columns = Object.keys(data.progression[0]).filter(k => k !== "month");
   return (
     <div className="overflow-x-auto">
@@ -250,8 +262,8 @@ function ProgressionTable({ data }: { data: SellingData }) {
           </tr>
         </thead>
         <tbody>
-          {data.progression.map((row) => {
-            const isLatest = row === data.progression[data.progression.length - 1];
+          {validRows.map((row) => {
+            const isLatest = row === validRows[validRows.length - 1];
             return (
               <tr key={row.month}
                 className={`border-t border-slate-700/40 ${isLatest ? "border-t-2 border-t-amber-500/40" : ""}`}>
@@ -346,8 +358,7 @@ export default function FarmerSellingPanel() {
             </div>
           </div>
           <div className="text-right text-[7px] text-slate-600">
-            {data.harvest.survey_label ? `as of ${data.harvest.survey_label}` : ""}
-            {data.harvest.report_date ? ` · upd ${data.harvest.report_date}` : ""}
+            {data.harvest.report_date ? `upd ${data.harvest.report_date}` : ""}
           </div>
         </div>
       )}
@@ -355,7 +366,7 @@ export default function FarmerSellingPanel() {
       {/* Brazil headline */}
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center gap-6">
         <div>
-          <div className="text-[8px] text-slate-500 uppercase tracking-wide mb-1">Brazil · 25/26</div>
+          <div className="text-[8px] text-slate-500 uppercase tracking-wide mb-1">Brazil · {vd.brazil.crop_year ?? "25/26"}</div>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-extrabold" style={{ color: cellColor(brazil.current) }}>
               {brazil.current}
@@ -408,7 +419,7 @@ export default function FarmerSellingPanel() {
               <span className="flex items-center gap-1 text-amber-400"><span className="w-3 h-px bg-amber-400 inline-block" />25/26</span>
             </div>
           </div>
-          <SeasonChart chart={vd.chart} />
+          <SeasonChart chart={vd.chart} cropYear={vd.brazil.crop_year} />
         </div>
 
         {/* Progression table */}

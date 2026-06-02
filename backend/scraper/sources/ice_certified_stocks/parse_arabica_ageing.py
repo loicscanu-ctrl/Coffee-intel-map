@@ -28,19 +28,16 @@ auditing if the parse produces zero origins.
 """
 from __future__ import annotations
 
-import io
 import re
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
 
 import xlrd
-
 
 # Canonical year-band labels — match the frontend YEAR_BAND_ORDER.
 _BAND_ORDER = ("0Y", "1Y", "2Y", "3Y", ">4Y")
 
 
-def _band_from_header(header: str) -> Optional[str]:
+def _band_from_header(header: str) -> str | None:
     """Map a column header to a year-band label, or None if not an age column."""
     h = re.sub(r"\s+", " ", (header or "").strip()).lower()
     if not h:
@@ -59,7 +56,7 @@ def _band_from_header(header: str) -> Optional[str]:
     # Day-range patterns: 0-365, 366-730, 731-1095, 1096-1460, 1461+
     m = re.match(r"^(\d+)\s*[-–]\s*(\d+)", h)
     if m:
-        lo, hi = int(m[1]), int(m[2])
+        hi = int(m[2])
         if hi <= 365:    return "0Y"
         if hi <= 730:    return "1Y"
         if hi <= 1095:   return "2Y"

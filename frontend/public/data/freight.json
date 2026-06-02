@@ -1,12 +1,12 @@
 {
-  "updated": "2026-05-30",
+  "updated": "2026-06-02",
   "routes": [
     {
       "id": "vn-eu",
       "from": "Ho Chi Minh",
       "to": "Rotterdam",
       "rate": 2970,
-      "prev": 2891,
+      "prev": 2895,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -15,7 +15,7 @@
       "from": "Ho Chi Minh",
       "to": "Hamburg",
       "rate": 3029,
-      "prev": 2949,
+      "prev": 2953,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -23,8 +23,8 @@
       "id": "vn-us",
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
-      "rate": 3188,
-      "prev": 3188,
+      "rate": 3197,
+      "prev": 3181,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -32,8 +32,8 @@
       "id": "br-eu",
       "from": "Santos",
       "to": "Rotterdam",
-      "rate": 1723,
-      "prev": 1677,
+      "rate": 1722,
+      "prev": 1679,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -41,8 +41,8 @@
       "id": "co-eu",
       "from": "Cartagena",
       "to": "Rotterdam",
-      "rate": 1634,
-      "prev": 1590,
+      "rate": 1633,
+      "prev": 1592,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -51,7 +51,7 @@
       "from": "Djibouti",
       "to": "Rotterdam",
       "rate": 2079,
-      "prev": 2024,
+      "prev": 2027,
       "unit": "USD/FEU",
       "proxy": true
     },
@@ -59,8 +59,8 @@
       "id": "br-us",
       "from": "Santos",
       "to": "New York",
-      "rate": 2282,
-      "prev": 2170,
+      "rate": 2283,
+      "prev": 2189,
       "unit": "USD/FEU",
       "proxy": true
     }
@@ -587,9 +587,30 @@
     {
       "date": "2026-05-30",
       "vn-eu": 2970,
-      "br-eu": 1723,
+      "br-eu": 1722,
       "et-eu": 2079,
-      "vn-us": 3188
+      "vn-us": 3197
+    },
+    {
+      "date": "2026-05-31",
+      "vn-eu": 2970,
+      "br-eu": 1722,
+      "et-eu": 2079,
+      "vn-us": 3197
+    },
+    {
+      "date": "2026-06-01",
+      "vn-eu": 2970,
+      "br-eu": 1722,
+      "et-eu": 2079,
+      "vn-us": 3197
+    },
+    {
+      "date": "2026-06-02",
+      "vn-eu": 2970,
+      "br-eu": 1722,
+      "et-eu": 2079,
+      "vn-us": 3197
     }
   ]
 }

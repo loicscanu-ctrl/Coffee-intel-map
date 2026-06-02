@@ -35,11 +35,28 @@ export interface CecafeData {
   by_country_history?: Record<string, CountryYear>;
 }
 
-export interface DailyData {
-  updated: string;
-  arabica:  Record<string, Record<string, number>>; // "YYYY-MM" → { "1": cumBags, ... }
+export type CecafeSourceKey = "embarques" | "certificados";
+
+/** One source's per-crop, per-month, per-day cumulative bags. */
+export interface CecafeSourceBucket {
+  arabica:  Record<string, Record<string, number>>;   // "YYYY-MM" → { "1": cumBags, … }
   conillon: Record<string, Record<string, number>>;
   soluvel:  Record<string, Record<string, number>>;
+}
+
+export interface DailyData {
+  updated: string;
+  /** schema v2: parallel series per Cecafé table.
+   *    embarques    = physical port loadings (Unidades de Embarques Marítimos…)
+   *    certificados = paperwork issued (Emissão de Certificados de Origem)
+   *  Legacy v1 files with top-level arabica/conillon/soluvel are migrated to
+   *  sources.certificados on read. */
+  sources?: Record<CecafeSourceKey, CecafeSourceBucket>;
+  /** Legacy v1 fields — kept on the interface so old files still type-check.
+   *  Component code reads through normalizeSources() below. */
+  arabica?:  Record<string, Record<string, number>>;
+  conillon?: Record<string, Record<string, number>>;
+  soluvel?:  Record<string, Record<string, number>>;
 }
 
 export type SeriesKey = "total" | "arabica" | "conillon" | "soluvel" | "torrado";

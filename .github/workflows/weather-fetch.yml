@@ -55,12 +55,30 @@ jobs:
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
           python backend/scripts/fetch_origin_weather.py $ARGS
 
+      - name: Evaluate IPHM agronomic alerts
+        # Runs after the weather rebuild so SPI/SPEI/forecast are fresh.
+        # Writes frontend/public/data/agronomic_alerts.json AND merges the
+        # flattened entries into signals.json so the Telegram bot's existing
+        # consumer surfaces them automatically.
+        run: |
+          PYTHONPATH=backend python -m scraper.agronomic_alerts --write
+
+      - name: Compute weather analogs (Brazil arabica)
+        # Reads backend/seed/weather_history/brazil.json + the historical
+        # production seed, ranks past years by Euclidean distance on per-
+        # phenology-stage (rain, temp) signatures, and writes the analog
+        # forecast JSON the BrazilWeatherAnalogs panel consumes.
+        run: |
+          PYTHONPATH=backend python backend/scripts/compute_weather_analogs.py
+
       - name: Commit updated weather data
         run: |
           set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add backend/seed/weather_history/*.json frontend/public/data/*_weather.json
+          git add frontend/public/data/agronomic_alerts.json frontend/public/data/signals.json
+          git add frontend/public/data/weather_analogs_brazil.json
           if git diff --cached --quiet; then
             echo "No weather change."
             exit 0

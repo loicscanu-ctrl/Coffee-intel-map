@@ -226,6 +226,37 @@ def test_validate_cecafe_daily_empty():
     assert not ok
 
 
+def test_validate_cecafe_daily_v2_schema_passes():
+    """v2 dual-source schema must validate — this was the bug that reverted
+    the freshly-written file and kept embarques from ever committing."""
+    from scraper.validate_export import validate_cecafe_daily
+    doc = {
+        "updated": today_str(),
+        "_schema": "v2",
+        "sources": {
+            "embarques":    {"arabica": {}, "conillon": {"2026-06": {"1": 2520}}, "soluvel": {}},
+            "certificados": {"arabica": {"2026-06": {"1": 93535}}, "conillon": {}, "soluvel": {}},
+        },
+    }
+    ok, reason = validate_cecafe_daily(doc)
+    assert ok, reason
+
+
+def test_validate_cecafe_daily_v2_empty_fails():
+    """v2 with both sources empty should still be rejected."""
+    from scraper.validate_export import validate_cecafe_daily
+    doc = {
+        "updated": today_str(),
+        "_schema": "v2",
+        "sources": {
+            "embarques":    {"arabica": {}, "conillon": {}, "soluvel": {}},
+            "certificados": {"arabica": {}, "conillon": {}, "soluvel": {}},
+        },
+    }
+    ok, _ = validate_cecafe_daily(doc)
+    assert not ok
+
+
 # ── earnings ──────────────────────────────────────────────────────────────────
 
 def test_validate_earnings_passes():
