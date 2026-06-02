@@ -183,6 +183,41 @@ def parse_data24(pdf_bytes: bytes) -> dict[int, dict]:
     return out
 
 
+_YEAR_PAREN = re.compile(r"[（(](\d{4})[)）]")
+_DATA7_SKIP = ("合計", "総", "計", "前年", "暦", "数量", "単価", "品目", "単位", "令和")
+
+
+def parse_data7(pdf_bytes: bytes) -> dict[int, int]:
+    """Grand-total import quantity (kg) per year for one product type, by summing
+    country-row quantities on the 総括表 (summary) page. Rows read from page text
+    (one country per line: <name> then 3 figures × N years, '-' = missing)."""
+    import pdfplumber
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        pages = [(p.extract_text() or "") for p in pdf.pages]
+    summary = [t for t in pages if "総括表" in t]
+    target = summary[0] if summary else (pages[0] if pages else "")
+    years: list[int] = []
+    for line in target.split("\n"):
+        if "令和" in line and (ys := _YEAR_PAREN.findall(line)):
+            years = [int(y) for y in ys]
+            break
+    if not years:
+        return {}
+    n = len(years)
+    totals = [0] * n
+    for line in target.split("\n"):
+        if any(s in line for s in _DATA7_SKIP):
+            continue
+        norm = re.sub(r"(?<![\d.])-(?!\d)", " 0 ", line)   # '-' placeholder → 0
+        nums = re.findall(r"[\d,]+", norm)
+        if len(nums) < n * 3:
+            continue
+        vals = [int(x.replace(",", "")) for x in nums[-n * 3:]]
+        for i in range(n):
+            totals[i] += vals[i * 3]      # 数量 (qty) is the 1st of each (qty,val,price)
+    return {years[i]: totals[i] for i in range(n) if totals[i] > 0}
+
+
 def _hub_html(session: requests.Session) -> str | None:
     try:
         r = session.get(_HUB_URL, timeout=30)
@@ -283,6 +318,27 @@ def main(debug: bool = False) -> None:
         imports_origin = [{"year": y, "by_country": d24[y]} for y in sorted(d24)]
         print(f"  data-24: {len(imports_origin)} years  {d24_url.rsplit('/', 1)[-1]}")
 
+    # ── Imports by type: green / regular / instant (data7-import-*) ────────────
+    type_kinds = [("green", "data7-import-gc"), ("regular", "data7-import-rc"),
+                  ("instant", "data7-import-ic")]
+    per_type: dict[str, dict[int, int]] = {}
+    for label, kind in type_kinds:
+        url = _latest_pdf_by_kind(idx, kind)
+        if url and (hit := _fetch_first(session, [url])):
+            per_type[label] = parse_data7(hit[1])
+    type_years = sorted({y for d in per_type.values() for y in d})
+    imports_type = [{
+        "year": y,
+        "green_mt":   round(per_type.get("green", {}).get(y, 0) / 1000),
+        "regular_mt": round(per_type.get("regular", {}).get(y, 0) / 1000),
+        "instant_mt": round(per_type.get("instant", {}).get(y, 0) / 1000),
+    } for y in type_years]
+    if imports_type:
+        g = imports_type[-1]
+        print(f"  data7 imports_type: {len(imports_type)} yrs  "
+              f"latest green={g['green_mt']} regular={g['regular_mt']} "
+              f"instant={g['instant_mt']} t")
+
     if not monthly and not supply_demand:
         print("ERROR: parsed nothing — not writing ajca.json", file=sys.stderr)
         sys.exit(1)
@@ -305,6 +361,7 @@ def main(debug: bool = False) -> None:
         },
         "supply_demand": supply_demand,   # data-jukyu full annual balance
         "imports_origin": imports_origin,  # data-24 annual by country
+        "imports_type": imports_type,      # data7 annual green/regular/instant
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

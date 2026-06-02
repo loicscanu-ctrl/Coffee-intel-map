@@ -19,6 +19,7 @@ interface SupplyDemand {
   consumption_mt: number; exports_mt: number;
 }
 interface ImportsOrigin { year: number; by_country: Record<string, number> }
+interface ImportsType { year: number; green_mt: number; regular_mt: number; instant_mt: number }
 interface AjcaData {
   source: string; source_url: string; last_updated: string;
   stocks: {
@@ -27,6 +28,7 @@ interface AjcaData {
   };
   supply_demand: SupplyDemand[];
   imports_origin: ImportsOrigin[];
+  imports_type?: ImportsType[];
 }
 
 const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -95,6 +97,11 @@ export default function AjcaPanel() {
     for (const c of top5) row[c] = kt(r.by_country[c]);
     return row;
   });
+
+  // ── Panel D: imports by type (green / regular / instant) ────────────────────
+  const typeData = (d.imports_type ?? []).map(t => ({
+    year: t.year, green: kt(t.green_mt), regular: kt(t.regular_mt), instant: kt(t.instant_mt),
+  }));
 
   return (
     <div className="p-4 space-y-4">
@@ -230,6 +237,33 @@ export default function AjcaPanel() {
           Imports are green-coffee (生豆) by country; stocks panel above is end-of-month inventory.
         </div>
       </div>
+
+      {/* Panel D — Imports by type */}
+      {typeData.length > 0 && (
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
+          <div className="text-xs text-slate-300 font-semibold mb-2">
+            Imports by type · k t (product weight)
+          </div>
+          <div className="h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={typeData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} />
+                <YAxis tick={{ fontSize: 9, fill: "#64748b" }} tickFormatter={v => `${v}k`} />
+                <Tooltip contentStyle={TT} formatter={(v: unknown, n: unknown) => [`${v}k t`, String(n)]} />
+                <Legend wrapperStyle={{ fontSize: 9 }} />
+                <Bar dataKey="green" stackId="t" fill="#16a34a" name="Green (生豆)" />
+                <Bar dataKey="regular" stackId="t" fill="#b45309" name="Roasted (レギュラー)" />
+                <Bar dataKey="instant" stackId="t" fill="#6366f1" name="Instant (インスタント)"
+                     radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="text-[9px] text-slate-500 italic mt-1">
+            Green is overwhelmingly the largest; roasted &amp; instant are in product weight (not green-bean equivalent).
+          </div>
+        </div>
+      )}
     </div>
   );
 }
