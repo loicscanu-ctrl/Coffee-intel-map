@@ -14,6 +14,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 12          # hard cap — never let a probe storm run away
     permissions:
       contents: write
 
@@ -28,6 +29,18 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests openpyxl
+
+      # Decisive one-request connectivity check against a known-good BMF file
+      # (the March-2026 workbook). Tells us 200 vs 403/WAF vs timeout without
+      # the scraper's probe loop. Never fails the job.
+      - name: Connectivity probe (one known-good BMF file)
+        run: |
+          URL="https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Steuern/Steuerschaetzungen_und_Steuereinnahmen/2026-04-21-steuereinnahmen-maerz-2026-xlxs.xlsx?__blob=publicationFile&v=2"
+          curl -sS -m 25 -o /tmp/probe.xlsx \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+            -w "PROBE → HTTP %{http_code} | type=%{content_type} | size=%{size_download} | time=%{time_total}s\n" \
+            "$URL" || echo "PROBE → curl exit $?"
+          echo -n "first bytes: "; head -c 8 /tmp/probe.xlsx | xxd 2>/dev/null | head -1 || true
 
       - name: Run Kaffeesteuer scraper (3 attempts)
         run: |
