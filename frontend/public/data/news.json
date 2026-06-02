@@ -1,5 +1,168 @@
 [
   {
+    "id": 5986,
+    "title": "Colombia FNC Precio Interno \u2013 2026-06-02",
+    "body": "FNC internal purchase price: 2,060,000 COP/carga (125 kg) as of 2026-06-02.",
+    "source": "FNC",
+    "category": "supply",
+    "lat": 4.571,
+    "lng": -74.297,
+    "tags": [
+      "price",
+      "colombia",
+      "fnc",
+      "precio-interno"
+    ],
+    "meta": "{\"cop_per_carga\": 2060000, \"as_of\": \"2026-06-02\", \"source\": \"FNC\"}",
+    "pub_date": "2026-06-02T11:25:24.667395"
+  },
+  {
+    "id": 5985,
+    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-02",
+    "body": "B3 Arabica 4/5 settlement: 323.95 USD/sac | OI: 118 contracts | Expiry: 2026-07-23",
+    "source": "B3",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "futures",
+      "brazil",
+      "arabica",
+      "b3"
+    ],
+    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 323.95, \"oi\": 118, \"mty\": \"2026-07-23\"}",
+    "pub_date": "2026-06-02T11:25:09.735539"
+  },
+  {
+    "id": 5984,
+    "title": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-02",
+    "body": "Arabica coffee price: R$ 5.02",
+    "source": "Noticiasagricolas",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "brazil",
+      "arabica"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-02T11:25:05.076083"
+  },
+  {
+    "id": 5983,
+    "title": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-02",
+    "body": "Conilon Tipo 7 price: R$ 900,00/saca (01/06/2026)",
+    "source": "Cooabriel",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "brazil",
+      "conilon"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-02T11:25:03.721495"
+  },
+  {
+    "id": 5982,
+    "title": "Uganda Screen 15 \u2013 2026-06-02",
+    "body": "Uganda Fine Robusta Screen 15 price: 167.28 USD/cwt",
+    "source": "UCDA",
+    "category": "supply",
+    "lat": 1.3733,
+    "lng": 32.2903,
+    "tags": [
+      "price",
+      "robusta",
+      "uganda"
+    ],
+    "meta": "{\"usd_cwt\": 167.28, \"as_of\": \"2026-06-02\", \"grade\": \"Screen 15\"}",
+    "pub_date": "2026-06-02T11:25:02.361935"
+  },
+  {
+    "id": 5981,
+    "title": "ICE COT Robusta Coffee (London) \u2013 2026-05-26",
+    "body": "Report: 2026-05-26 | OI: 96,965 | MM net: +16,676 (L:33,887 S:17,211 Sp:14,248 \u0394L:+2,583 \u0394S:-1,287) | PMPU L:21,324 S:37,917 | Swap L:3,699 S:10,431 | Other L:8,806 S:3,946 | NR L:7,865 S:6,076",
+    "source": "ICE",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "cot",
+      "robusta"
+    ],
+    "meta": "{\"report_date\": \"2026-05-26\", \"open_interest\": 96965, \"pmpu\": {\"long\": 21324, \"short\": 37917, \"d_long\": -1303, \"d_short\": 1543}, \"swap\": {\"long\": 3699, \"short\": 10431, \"spread\": 1265, \"d_long\": -613, \"d_short\": 1023}, \"mm\": {\"long\": 33887, \"short\": 17211, \"spread\": 14248, \"d_long\": 2583, \"d_short\": -1287, \"d_spread\": 2380}, \"other\": {\"long\": 8806, \"short\": 3946, \"spread\": 5871, \"d_long\": 387, \"d_short\": 722}, \"nr\": {\"long\": 7865, \"short\": 6076, \"d_long\": 1089, \"d_short\": 142}}",
+    "pub_date": "2026-06-02T11:24:55.490244"
+  },
+  {
+    "id": 5980,
+    "title": "CFTC COT Coffee C (NY Arabica) \u2013 2026-05-26",
+    "body": "Report: 2026-05-26 | OI: 193,648 | MM net: +22,973 (L:44,090 S:21,117 Sp:33,755 \u0394L:-1,017 \u0394S:+596) | PMPU L:44,691 S:66,105 | Swap L:26,565 S:21,917 | Other L:9,484 S:15,826 | NR L:7,985 S:7,850",
+    "source": "CFTC",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "cot",
+      "arabica"
+    ],
+    "meta": "{\"report_date\": \"2026-05-26\", \"open_interest\": 193648, \"pmpu\": {\"long\": 44691, \"short\": 66105, \"d_long\": 1151, \"d_short\": 1734}, \"swap\": {\"long\": 26565, \"short\": 21917, \"spread\": 3413, \"d_long\": -145, \"d_short\": 657}, \"mm\": {\"long\": 44090, \"short\": 21117, \"spread\": 33755, \"d_long\": -1017, \"d_short\": 596, \"d_spread\": 1480}, \"other\": {\"long\": 9484, \"short\": 15826, \"spread\": 23665, \"d_long\": 792, \"d_short\": -1492}, \"nr\": {\"long\": 7985, \"short\": 7850, \"d_long\": -152, \"d_short\": -866}}",
+    "pub_date": "2026-06-02T11:24:54.581457"
+  },
+  {
+    "id": 5979,
+    "title": "ICE London Robusta (RM) Futures \u2013 2026-05-29",
+    "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,475.00 (+37) OI:44,366 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,350.00 (+35) OI:29,954",
+    "source": "Barchart",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "price",
+      "robusta"
+    ],
+    "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3475, \"chg\": 37, \"oi\": 44366, \"volume\": 3519, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3350, \"chg\": 35, \"oi\": 29954, \"volume\": 3551, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3276, \"chg\": 34, \"oi\": 12674, \"volume\": 648, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3205, \"chg\": 37, \"oi\": 6495, \"volume\": 301, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3162, \"chg\": 37, \"oi\": 2474, \"volume\": 177, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3098, \"chg\": 0, \"oi\": 1151, \"volume\": 224, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3080, \"chg\": 0, \"oi\": 516, \"volume\": 101, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3064, \"chg\": 0, \"oi\": 321, \"volume\": 41, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3048, \"chg\": 0, \"oi\": 143, \"volume\": 18, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-01\"}",
+    "pub_date": "2026-06-02T11:24:53.063380"
+  },
+  {
+    "id": 5978,
+    "title": "ICE NY Arabica (KC) Futures \u2013 2026-05-29",
+    "body": "Front (Coffee (Jul '26)): 260.60 (+0) OI:72,610 | 2nd (Coffee (Sep '26)): 254.25 (+0.050000000000011) OI:56,641",
+    "source": "Barchart",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "price",
+      "arabica"
+    ],
+    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 260.6, \"chg\": 0, \"oi\": 72610, \"volume\": 1946, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 254.25, \"chg\": 0.050000000000011, \"oi\": 56641, \"volume\": 1389, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 246.65, \"chg\": -0.099999999999994, \"oi\": 38885, \"volume\": 644, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 244.05, \"chg\": -0.5, \"oi\": 13757, \"volume\": 319, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 243.7, \"chg\": -0.70000000000002, \"oi\": 5401, \"volume\": 43, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 243.2, \"chg\": -0.80000000000001, \"oi\": 1901, \"volume\": 2, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 243.4, \"chg\": 0, \"oi\": 2550, \"volume\": 120, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 242.95, \"chg\": 0, \"oi\": 635, \"volume\": 48, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-01\"}",
+    "pub_date": "2026-06-02T11:24:51.535618"
+  },
+  {
+    "id": 5977,
+    "title": "Vietnam Robusta \u2013 2026-06-02",
+    "body": "Vietnam Robusta price: 86.700 VND/kg",
+    "source": "Giacaphe",
+    "category": "supply",
+    "lat": 14.058,
+    "lng": 108.277,
+    "tags": [
+      "price",
+      "robusta",
+      "vietnam"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-02T11:24:25.021860"
+  },
+  {
     "id": 5976,
     "title": "World Bank Population \u2013 2026-06-02",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -47,169 +210,6 @@
     ],
     "meta": "{\"oni_history\": [{\"month\": \"Oct-24\", \"value\": -0.21}, {\"month\": \"Nov-24\", \"value\": -0.3}, {\"month\": \"Dec-24\", \"value\": -0.42}, {\"month\": \"Jan-25\", \"value\": -0.45}, {\"month\": \"Feb-25\", \"value\": -0.24}, {\"month\": \"Mar-25\", \"value\": -0.06}, {\"month\": \"Apr-25\", \"value\": 0.02}, {\"month\": \"May-25\", \"value\": -0.02}, {\"month\": \"Jun-25\", \"value\": -0.04}, {\"month\": \"Jul-25\", \"value\": -0.14}, {\"month\": \"Aug-25\", \"value\": -0.28}, {\"month\": \"Sep-25\", \"value\": -0.4}, {\"month\": \"Oct-25\", \"value\": -0.51}, {\"month\": \"Nov-25\", \"value\": -0.55}, {\"month\": \"Dec-25\", \"value\": -0.54}, {\"month\": \"Jan-26\", \"value\": -0.37, \"preliminary\": true}, {\"month\": \"Feb-26\", \"value\": -0.15, \"preliminary\": true}, {\"month\": \"Mar-26\", \"value\": 0.11, \"preliminary\": true}]}",
     "pub_date": "2026-06-02T11:15:24.293260"
-  },
-  {
-    "id": 5973,
-    "title": "Colombia FNC Precio Interno \u2013 2026-06-02",
-    "body": "FNC internal purchase price: 2,060,000 COP/carga (125 kg) as of 2026-06-02.",
-    "source": "FNC",
-    "category": "supply",
-    "lat": 4.571,
-    "lng": -74.297,
-    "tags": [
-      "price",
-      "colombia",
-      "fnc",
-      "precio-interno"
-    ],
-    "meta": "{\"cop_per_carga\": 2060000, \"as_of\": \"2026-06-02\", \"source\": \"FNC\"}",
-    "pub_date": "2026-06-02T11:13:43.232415"
-  },
-  {
-    "id": 5972,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-02",
-    "body": "B3 Arabica 4/5 settlement: 323.95 USD/sac | OI: 118 contracts | Expiry: 2026-07-23",
-    "source": "B3",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "futures",
-      "brazil",
-      "arabica",
-      "b3"
-    ],
-    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 323.95, \"oi\": 118, \"mty\": \"2026-07-23\"}",
-    "pub_date": "2026-06-02T11:13:26.504251"
-  },
-  {
-    "id": 5971,
-    "title": "Uganda Screen 15 \u2013 2026-06-02",
-    "body": "Uganda Fine Robusta Screen 15 price: 167.28 USD/cwt",
-    "source": "UCDA",
-    "category": "supply",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "price",
-      "robusta",
-      "uganda"
-    ],
-    "meta": "{\"usd_cwt\": 167.28, \"as_of\": \"2026-06-02\", \"grade\": \"Screen 15\"}",
-    "pub_date": "2026-06-02T11:13:23.608604"
-  },
-  {
-    "id": 5970,
-    "title": "ICE COT Robusta Coffee (London) \u2013 2026-05-26",
-    "body": "Report: 2026-05-26 | OI: 96,965 | MM net: +16,676 (L:33,887 S:17,211 Sp:14,248 \u0394L:+2,583 \u0394S:-1,287) | PMPU L:21,324 S:37,917 | Swap L:3,699 S:10,431 | Other L:8,806 S:3,946 | NR L:7,865 S:6,076",
-    "source": "ICE",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "cot",
-      "robusta"
-    ],
-    "meta": "{\"report_date\": \"2026-05-26\", \"open_interest\": 96965, \"pmpu\": {\"long\": 21324, \"short\": 37917, \"d_long\": -1303, \"d_short\": 1543}, \"swap\": {\"long\": 3699, \"short\": 10431, \"spread\": 1265, \"d_long\": -613, \"d_short\": 1023}, \"mm\": {\"long\": 33887, \"short\": 17211, \"spread\": 14248, \"d_long\": 2583, \"d_short\": -1287, \"d_spread\": 2380}, \"other\": {\"long\": 8806, \"short\": 3946, \"spread\": 5871, \"d_long\": 387, \"d_short\": 722}, \"nr\": {\"long\": 7865, \"short\": 6076, \"d_long\": 1089, \"d_short\": 142}}",
-    "pub_date": "2026-06-02T11:13:18.748553"
-  },
-  {
-    "id": 5969,
-    "title": "CFTC COT Coffee C (NY Arabica) \u2013 2026-05-26",
-    "body": "Report: 2026-05-26 | OI: 193,648 | MM net: +22,973 (L:44,090 S:21,117 Sp:33,755 \u0394L:-1,017 \u0394S:+596) | PMPU L:44,691 S:66,105 | Swap L:26,565 S:21,917 | Other L:9,484 S:15,826 | NR L:7,985 S:7,850",
-    "source": "CFTC",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "cot",
-      "arabica"
-    ],
-    "meta": "{\"report_date\": \"2026-05-26\", \"open_interest\": 193648, \"pmpu\": {\"long\": 44691, \"short\": 66105, \"d_long\": 1151, \"d_short\": 1734}, \"swap\": {\"long\": 26565, \"short\": 21917, \"spread\": 3413, \"d_long\": -145, \"d_short\": 657}, \"mm\": {\"long\": 44090, \"short\": 21117, \"spread\": 33755, \"d_long\": -1017, \"d_short\": 596, \"d_spread\": 1480}, \"other\": {\"long\": 9484, \"short\": 15826, \"spread\": 23665, \"d_long\": 792, \"d_short\": -1492}, \"nr\": {\"long\": 7985, \"short\": 7850, \"d_long\": -152, \"d_short\": -866}}",
-    "pub_date": "2026-06-02T11:13:17.917511"
-  },
-  {
-    "id": 5968,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-05-29",
-    "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,476.00 (+38) OI:44,366 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,351.00 (+36) OI:29,954",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "robusta"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3476, \"chg\": 38, \"oi\": 44366, \"volume\": 3411, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3351, \"chg\": 36, \"oi\": 29954, \"volume\": 3455, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3278, \"chg\": 36, \"oi\": 12674, \"volume\": 598, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3190, \"chg\": 22, \"oi\": 6495, \"volume\": 279, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3152, \"chg\": 27, \"oi\": 2474, \"volume\": 167, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3098, \"chg\": 0, \"oi\": 1151, \"volume\": 224, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3080, \"chg\": 0, \"oi\": 516, \"volume\": 101, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3064, \"chg\": 0, \"oi\": 321, \"volume\": 41, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3048, \"chg\": 0, \"oi\": 143, \"volume\": 18, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-01\"}",
-    "pub_date": "2026-06-02T11:13:16.670075"
-  },
-  {
-    "id": 5967,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-05-29",
-    "body": "Front (Coffee (Jul '26)): 260.45 (-0.15000000000003) OI:72,610 | 2nd (Coffee (Sep '26)): 253.80 (-0.39999999999998) OI:56,641",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "arabica"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 260.45, \"chg\": -0.15000000000003, \"oi\": 72610, \"volume\": 1800, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 253.8, \"chg\": -0.39999999999998, \"oi\": 56641, \"volume\": 1280, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 246.4, \"chg\": -0.34999999999999, \"oi\": 38885, \"volume\": 596, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 243.95, \"chg\": -0.60000000000002, \"oi\": 13757, \"volume\": 313, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 243.7, \"chg\": -0.70000000000002, \"oi\": 5401, \"volume\": 43, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 243.2, \"chg\": -0.80000000000001, \"oi\": 1901, \"volume\": 2, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 243.4, \"chg\": 0, \"oi\": 2550, \"volume\": 120, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 242.95, \"chg\": 0, \"oi\": 635, \"volume\": 48, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-01\"}",
-    "pub_date": "2026-06-02T11:13:15.272283"
-  },
-  {
-    "id": 5966,
-    "title": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-02",
-    "body": "Arabica coffee price: R$ 5.02",
-    "source": "Noticiasagricolas",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "brazil",
-      "arabica"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-02T11:13:02.840707"
-  },
-  {
-    "id": 5965,
-    "title": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-02",
-    "body": "Conilon Tipo 7 price: R$ 900,00/saca (01/06/2026)",
-    "source": "Cooabriel",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "brazil",
-      "conilon"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-02T11:13:01.598497"
-  },
-  {
-    "id": 5964,
-    "title": "Vietnam Robusta \u2013 2026-06-02",
-    "body": "Vietnam Robusta price: 86.700 VND/kg",
-    "source": "Giacaphe",
-    "category": "supply",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "price",
-      "robusta",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-02T11:12:46.220671"
   },
   {
     "id": 5960,
