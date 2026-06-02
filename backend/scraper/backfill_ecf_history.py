@@ -1,0 +1,277 @@
+"""
+backfill_ecf_history.py — one-shot historical backfill of ECF European
+port-stocks from the yearly "Stocks-European-Ports" PDFs (2014 → present).
+
+ECF publishes one PDF per year listing green-coffee stocks by European port and
+month (tonnes). From 2020 onward the reports also break the figures down by
+coffee type (Arabica washed/unwashed, Robusta). We parse every yearly PDF into
+a single static series:
+
+    frontend/public/data/ecf_history.json
+    {
+      "source": "ECF",
+      "unit": "metric_tonnes",
+      "generated_at": "YYYY-MM-DD",
+      "monthly": [
+        { "period": "YYYY-MM",
+          "value_mt": <total tonnes>,
+          "value_raw": <total 60-kg bags>,
+          "ports": { "Antwerp": <mt>, "Hamburg": <mt>, ... },   # when available
+          "types": { "arabica_washed_mt": ..., "arabica_unwashed_mt": ...,
+                     "robusta_mt": ..., "other_mt": ... },        # 2020+ only
+          "source_pdf": "<url>" },
+        ...
+      ]
+    }
+
+This must run where ecf-coffee.org is reachable (the GitHub Actions runner or a
+local machine). The Claude sandbox is blocked by a host allowlist, so it can't
+download the PDFs itself — use .github/workflows/backfill-ecf-history.yml.
+
+Usage:
+    cd backend
+    python -m scraper.backfill_ecf_history            # write ecf_history.json
+    python -m scraper.backfill_ecf_history --debug    # also dump raw tables
+"""
+from __future__ import annotations
+
+import io
+import json
+import re
+import sys
+from datetime import date
+from pathlib import Path
+
+import requests
+
+from scraper.sources.ecf_stocks import (
+    _HEADERS,
+    _PDF_MONTHS_EN,
+    _cell_to_mt,
+    _tons_to_bags,
+    _type_field,
+)
+
+ROOT     = Path(__file__).resolve().parents[2]
+OUT_PATH = ROOT / "frontend" / "public" / "data" / "ecf_history.json"
+DEBUG_PATH = ROOT / "frontend" / "public" / "data" / "ecf_history_debug.json"
+
+# One PDF per year. 2021 is the "_updated" re-issue; for 2026 use the latest
+# (June) upload, which supersedes the March one.
+YEARLY_PDFS: dict[int, str] = {
+    2014: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
+    2015: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf",
+    2016: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf",
+    2017: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf",
+    2018: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf",
+    2019: "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf",
+    2020: "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
+    2021: "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
+    2022: "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
+    2023: "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
+    2024: "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
+    2025: "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
+    2026: "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+}
+
+_TYPE_LABELS = ("washed", "unwashed", "mild", "brazilian", "natural", "robusta", "other")
+
+
+def _norm(cell) -> str:
+    return re.sub(r"\s+", " ", str(cell or "").strip())
+
+
+def _month_in(text: str) -> int | None:
+    """Return a 1-12 month number if the cell text starts with / contains a
+    month name or abbreviation, else None."""
+    t = _norm(text).lower()
+    if not t:
+        return None
+    for abbr, mo in _PDF_MONTHS_EN.items():
+        if t == abbr or t.startswith(abbr + " ") or t.startswith(abbr + "-") \
+           or t.startswith(abbr + ".") or re.match(rf"{abbr}\b", t):
+            return mo
+    return None
+
+
+def _classify(label: str) -> tuple[str, str]:
+    """Classify a row/column label → (kind, name).
+    kind ∈ {'total', 'type', 'port'}; name is the type field or port label."""
+    low = _norm(label).lower()
+    if not low:
+        return "port", ""
+    if "total" in low or "grand total" in low or low in {"sum", "europe", "all ports"}:
+        return "total", "total"
+    field = _type_field(low)
+    if field and any(k in low for k in _TYPE_LABELS):
+        return "type", field
+    return "port", _norm(label)
+
+
+def _ingest(period_map: dict[str, dict], period: str, kind: str,
+            name: str, value: int, source_pdf: str) -> None:
+    rec = period_map.setdefault(period, {"ports": {}, "types": {}, "source_pdf": source_pdf})
+    if kind == "total":
+        rec["total_mt"] = value
+    elif kind == "type":
+        rec["types"][name] = value
+    elif kind == "port" and name:
+        rec["ports"][name] = value
+
+
+def _parse_table(table: list, default_year: int, source_pdf: str,
+                 period_map: dict[str, dict]) -> int:
+    """Parse one extracted table in either orientation; mutate period_map.
+    Returns the number of (period, value) cells ingested."""
+    if not table or len(table) < 2:
+        return 0
+    header = [_norm(c) for c in table[0]]
+    ingested = 0
+
+    # Year from any header/label cell, else the file's year.
+    year = default_year
+    for cell in header:
+        m = re.search(r"(20\d{2})", cell)
+        if m:
+            year = int(m.group(1))
+            break
+
+    # Orientation A: months across the header row, labels down the first column.
+    month_cols = {ci: mo for ci, h in enumerate(header) if (mo := _month_in(h))}
+    if month_cols:
+        for row in table[1:]:
+            if not row:
+                continue
+            label = _norm(row[0])
+            ym = re.search(r"(20\d{2})", label)
+            row_year = int(ym.group(1)) if ym else year
+            kind, name = _classify(label)
+            for ci, mo in month_cols.items():
+                if ci < len(row):
+                    val = _cell_to_mt(_norm(row[ci]))
+                    if val:
+                        _ingest(period_map, f"{row_year}-{mo:02d}", kind, name, val, source_pdf)
+                        ingested += 1
+        if ingested:
+            return ingested
+
+    # Orientation B: labels across the header, month/period down the first column.
+    label_cols = {ci: _classify(h) for ci, h in enumerate(header) if ci > 0 and _norm(h)}
+    for row in table[1:]:
+        if not row:
+            continue
+        first = _norm(row[0])
+        mo = _month_in(first)
+        if mo is None:
+            continue
+        ym = re.search(r"(20\d{2})", first)
+        row_year = int(ym.group(1)) if ym else year
+        period = f"{row_year}-{mo:02d}"
+        for ci, (kind, name) in label_cols.items():
+            if ci < len(row):
+                val = _cell_to_mt(_norm(row[ci]))
+                if val:
+                    _ingest(period_map, period, kind, name, val, source_pdf)
+                    ingested += 1
+    return ingested
+
+
+def _parse_pdf(pdf_bytes: bytes, year: int, source_pdf: str,
+               debug: dict) -> dict[str, dict]:
+    import pdfplumber
+    period_map: dict[str, dict] = {}
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        for pno, page in enumerate(pdf.pages, 1):
+            for table in (page.extract_tables() or []):
+                n = _parse_table(table, year, source_pdf, period_map)
+                if n:
+                    debug.setdefault(str(year), []).append(
+                        {"page": pno, "cells": n, "sample": table[:4]}
+                    )
+    return period_map
+
+
+def _finalise(period_map: dict[str, dict]) -> list[dict]:
+    """Turn the raw period map into the output schema: compute total (explicit
+    or summed from ports), bags, and drop empty breakdown dicts."""
+    out: list[dict] = []
+    for period in sorted(period_map):
+        rec = period_map[period]
+        ports = {k: v for k, v in rec.get("ports", {}).items()}
+        types = {k: v for k, v in rec.get("types", {}).items()}
+        total = rec.get("total_mt")
+        if total is None and ports:
+            total = sum(ports.values())
+        entry: dict = {"period": period, "source_pdf": rec.get("source_pdf")}
+        if total is not None:
+            entry["value_mt"] = int(total)
+            entry["value_raw"] = _tons_to_bags(int(total))
+        if ports:
+            entry["ports"] = ports
+        if types:
+            entry["types"] = types
+        out.append(entry)
+    return out
+
+
+def main(debug: bool = False) -> None:
+    period_map: dict[str, dict] = {}
+    debug_tables: dict = {}
+    failures: list[int] = []
+
+    for year, url in YEARLY_PDFS.items():
+        try:
+            r = requests.get(url, headers=_HEADERS, timeout=60)
+            if r.status_code != 200 or len(r.content) < 5_000:
+                print(f"  {year}: download failed (HTTP {r.status_code}, "
+                      f"{len(r.content)} bytes)", file=sys.stderr)
+                failures.append(year)
+                continue
+        except Exception as e:
+            print(f"  {year}: ERROR — {e}", file=sys.stderr)
+            failures.append(year)
+            continue
+        before = len(period_map)
+        parsed = _parse_pdf(r.content, year, url, debug_tables)
+        for period, rec in parsed.items():
+            dst = period_map.setdefault(period, {"ports": {}, "types": {}, "source_pdf": rec["source_pdf"]})
+            dst["ports"].update(rec.get("ports", {}))
+            dst["types"].update(rec.get("types", {}))
+            if "total_mt" in rec:
+                dst["total_mt"] = rec["total_mt"]
+        print(f"  {year}: {len(parsed)} periods parsed "
+              f"(running total {len(period_map)})")
+
+    monthly = _finalise(period_map)
+    payload = {
+        "source": "ECF",
+        "unit": "metric_tonnes",
+        "generated_at": date.today().isoformat(),
+        "count": len(monthly),
+        "monthly": monthly,
+    }
+
+    if not monthly:
+        print("ERROR: parsed zero periods — not writing ecf_history.json",
+              file=sys.stderr)
+        sys.exit(1)
+
+    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, sort_keys=False)
+        f.write("\n")
+    print(f"\nWrote {len(monthly)} periods → {OUT_PATH}")
+    print(f"  range: {monthly[0]['period']} … {monthly[-1]['period']}")
+    print(f"  with ports: {sum('ports' in m for m in monthly)}, "
+          f"with types: {sum('types' in m for m in monthly)}")
+    if failures:
+        print(f"  WARNING: {len(failures)} PDF(s) failed: {failures}")
+
+    if debug:
+        with open(DEBUG_PATH, "w", encoding="utf-8") as f:
+            json.dump(debug_tables, f, indent=2, default=str)
+        print(f"  debug tables → {DEBUG_PATH}")
+
+
+if __name__ == "__main__":
+    main(debug="--debug" in sys.argv)
