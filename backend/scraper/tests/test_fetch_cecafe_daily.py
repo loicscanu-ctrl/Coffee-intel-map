@@ -62,6 +62,74 @@ def test_fetch_page_http_error_propagates_naturally():
             fcd._fetch_page()
 
 
+# ── Bot-challenge detection + browser escalation ─────────────────────────────
+
+# The exact interstitial Cecafé served in June 2026 (from the failing CI log).
+_CHALLENGE_HTML = (
+    "<html><head><title>Um momento...</title></head><body>"
+    "Um momento, por favor… Aguarde enquanto sua solicitação está sendo verificada…"
+    "</body></html>"
+)
+
+
+def test_is_challenge_page_detects_cecafe_interstitial():
+    assert fcd._is_challenge_page(_CHALLENGE_HTML) is True
+
+
+def test_is_challenge_page_detects_cloudflare_just_a_moment():
+    assert fcd._is_challenge_page("<title>Just a moment...</title>") is True
+
+
+def test_is_challenge_page_false_on_real_data_page():
+    real = "<html>...Informações recebidas até: 01/06/2026... TOTAIS ...</html>"
+    assert fcd._is_challenge_page(real) is False
+
+
+def test_is_challenge_page_true_on_empty():
+    assert fcd._is_challenge_page("") is True
+
+
+def test_fetch_page_escalates_to_browser_on_challenge():
+    """When requests returns the challenge interstitial, _fetch_page must
+    fall back to the patchright browser render — not return the junk page."""
+    fake = MagicMock(status_code=200, text=_CHALLENGE_HTML)
+    fake.raise_for_status.return_value = None
+    good_html = "<html>Informações recebidas até: 02/06/2026 ... TOTAIS ...</html>"
+    with patch.object(fcd.requests, "get", return_value=fake), \
+         patch.object(fcd, "_fetch_page_browser", return_value=good_html) as mock_browser:
+        out = fcd._fetch_page()
+        assert out == good_html
+        mock_browser.assert_called_once()
+
+
+def test_fetch_page_no_browser_when_requests_clean():
+    """Fast-path: a clean (non-challenge) requests response is returned
+    directly, the expensive browser render is never invoked."""
+    fake = MagicMock(status_code=200, text="<html>...resumo-diario... recebidas até: ...</html>")
+    fake.raise_for_status.return_value = None
+    with patch.object(fcd.requests, "get", return_value=fake), \
+         patch.object(fcd, "_fetch_page_browser") as mock_browser:
+        out = fcd._fetch_page()
+        assert "resumo-diario" in out
+        mock_browser.assert_not_called()
+
+
+def test_fetch_page_browser_raises_unreachable_without_patchright():
+    """If patchright isn't installed, the browser fallback surfaces a clean
+    CecafeUnreachable (transient) rather than a bare ImportError."""
+    import builtins
+    real_import = builtins.__import__
+
+    def _blocked_import(name, *args, **kwargs):
+        if name.startswith("patchright"):
+            raise ImportError("No module named 'patchright'")
+        return real_import(name, *args, **kwargs)
+
+    with patch.object(builtins, "__import__", side_effect=_blocked_import):
+        with pytest.raises(fcd.CecafeUnreachable, match="patchright is not installed"):
+            fcd._fetch_page_browser()
+
+
 # ── _parse_page: anchor priority (Embarques > Certificados) ──────────────────
 
 def _build_two_table_html(emb_totais: str, cert_totais: str, ref_date: str = "01/06/2026") -> str:

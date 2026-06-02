@@ -19,11 +19,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    # 3 attempts × up to ~60s per request + 60s + 240s gaps ≈ 8 min worst
-    # case. 15 leaves comfortable headroom for slow pip-installs / repo
-    # checkout, well under the original 25min cap (which now lives across
-    # 3 cron windows instead of one).
-    timeout-minutes: 15
+    # 3 attempts × (≤60s request + ≤45s patchright render) + 60s + 240s gaps
+    # ≈ 12 min worst case. Chromium install adds ~1 min. 20 min leaves
+    # headroom, still well under the original single-window 25min cap.
+    timeout-minutes: 20
     permissions:
       contents: write
 
@@ -37,10 +36,17 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        # requests added — fetch_cecafe_daily switched from urllib.request
-        # to requests for cleaner connect/read timeout separation. pdfplumber
-        # stays for the PDF mirror fallback the parser can use.
-        run: pip install pdfplumber requests
+        # requests for the fast-path fetch; pdfplumber for the PDF mirror
+        # fallback. patchright (Cloudflare-evading Playwright fork) renders
+        # past the bot-challenge wall Cecafé's edge began serving to GH
+        # Actions IPs in June 2026 — same proven bypass scraper-daily.yml
+        # uses for giacaphe.com. Installed explicitly (not via requirements)
+        # because pip's resolver silently drops it against playwright==1.44.0.
+        run: |
+          set -e
+          pip install pdfplumber requests
+          pip install patchright
+          python -m patchright install chromium
 
       - name: Run Cecafe scraper (3 attempts within this cron window)
         working-directory: backend

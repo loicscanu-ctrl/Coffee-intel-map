@@ -79,32 +79,135 @@ class CecafeUnreachable(RuntimeError):
     so the workflow can choose to treat it as a transient external issue."""
 
 
+def _is_challenge_page(html: str) -> bool:
+    """True when the response is a WAF / bot-challenge interstitial rather
+    than the real data page. Cecafé's edge began serving this to GitHub
+    Actions runner IPs in June 2026 — a ~7KB page reading 'Um momento, por
+    favor… Aguarde enquanto sua solicitação está sendo verificada…'.
+
+    A challenge page never carries the 'recebidas até:' reference date, so
+    feeding it to the parser yields the misleading 'Could not find reference
+    date' error. Detecting it explicitly lets us escalate to a real browser
+    (patchright) and log the true cause."""
+    if not html:
+        return True
+    low = html.lower()
+    markers = (
+        "um momento, por favor",
+        "aguarde enquanto sua solicita",            # accent-agnostic prefix
+        "solicitação está sendo verificada",
+        "just a moment",
+        "verificando se a cone",                    # "Verificando se a conexão…"
+        "checking your browser",
+        "cf-browser-verification",
+        "challenge-platform",
+        "_cf_chl_opt",
+    )
+    return any(m in low for m in markers)
+
+
+async def _browser_render() -> str:
+    """Render the Cecafé page with patchright (Cloudflare-evading Playwright
+    fork) so the JS/WAF challenge resolves and we get the real HTML. Mirrors
+    the proven pattern in scraper/sources/vietnam.py (giacaphe.com CF bypass)."""
+    from patchright.async_api import async_playwright
+
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent=_BROWSER_HEADERS["User-Agent"],
+            locale="pt-BR",
+        )
+        page = await context.new_page()
+        try:
+            await page.goto(DAILY_URL, wait_until="domcontentloaded", timeout=45000)
+            # Poll until the interstitial markers clear (CF challenges self-
+            # resolve in a few seconds once the JS runs in a real browser).
+            waited_ms = 0
+            max_wait_ms = 40000
+            poll_ms = 2000
+            while waited_ms < max_wait_ms:
+                html = await page.content()
+                if not _is_challenge_page(html):
+                    break
+                await page.wait_for_timeout(poll_ms)
+                waited_ms += poll_ms
+            # Settle: let the data table paint after the challenge clears.
+            await page.wait_for_timeout(2000)
+            html = await page.content()
+            if _is_challenge_page(html):
+                raise CecafeUnreachable(
+                    f"patchright could not clear the bot challenge within "
+                    f"{waited_ms / 1000:.0f}s (page still showing interstitial)"
+                )
+            print(f"  [fetch] patchright cleared the challenge after ~{waited_ms / 1000:.0f}s "
+                  f"({len(html):,} chars)")
+            return html
+        finally:
+            await browser.close()
+
+
+def _fetch_page_browser() -> str:
+    """Browser-render fallback when plain requests gets a challenge page.
+    Raises CecafeUnreachable when patchright is unavailable or the render
+    fails / never clears — same transient classification as a TCP failure
+    so the workflow retry/alert path treats it as an external issue, not a
+    parser bug."""
+    try:
+        import asyncio
+
+        import patchright.async_api  # noqa: F401  (import-presence check)
+    except ImportError as e:
+        raise CecafeUnreachable(
+            "requests hit a bot-challenge page and patchright is not installed "
+            f"to render past it: {e}. Add 'pip install patchright && python -m "
+            "patchright install chromium' to the workflow."
+        ) from e
+    try:
+        return asyncio.run(_browser_render())
+    except CecafeUnreachable:
+        raise
+    except Exception as e:  # noqa: BLE001
+        raise CecafeUnreachable(
+            f"patchright render failed: {type(e).__name__}: {e}"
+        ) from e
+
+
 def _fetch_page() -> str:
     """Fetch the Cecafe daily-resumo HTML.
 
+    Two-stage strategy:
+      1. Plain requests (fast/cheap) — works when no challenge is active.
+      2. If the response is a WAF/bot-challenge interstitial, escalate to a
+         patchright browser render that clears the JS challenge.
+
     Raises:
         CecafeUnreachable — TCP-level failure (connect/read timeout, DNS,
-            ConnectionError). The 2026-05-30 outage was all four attempts
-            seeing the same TimeoutError at sock.connect — the runner's
-            IP range was being refused by Cecafe's edge for the whole
-            ~25min window. Spread retries across the day (multiple cron
-            entries in the workflow) to give the block time to clear.
-        requests.RequestException — non-timeout HTTP error (4xx/5xx).
-            Re-raised so the caller can decide.
+            ConnectionError) OR a bot-challenge that patchright couldn't
+            clear / wasn't available to clear. All treated as transient
+            external issues so the workflow's retry + alert path fires.
+        requests.RequestException — non-timeout HTTP error (4xx/5xx),
+            re-raised so the caller sees the distinct failure mode.
     """
     try:
         # (connect, read) — fail fast on connect so the bash retry loop
         # cycles quicker; allow 45s of read time for the slow page itself.
         r = requests.get(DAILY_URL, headers=_BROWSER_HEADERS, timeout=(15, 45))
         r.raise_for_status()
-        # requests auto-handles gzip/deflate via Content-Encoding header.
-        # .text uses apparent_encoding which works for utf-8 / latin-1
-        # pages without us second-guessing.
-        return r.text
+        html = r.text
     except (requests.Timeout, requests.ConnectionError) as e:
         raise CecafeUnreachable(
             f"TCP-level failure reaching {DAILY_URL}: {type(e).__name__}: {e}"
         ) from e
+
+    # Challenge wall? Escalate to a real browser. requests is left as the
+    # fast-path so the day Cecafé lifts the wall we automatically stop
+    # paying the browser-render cost.
+    if _is_challenge_page(html):
+        print("  [fetch] requests got a bot-challenge interstitial "
+              f"({len(html):,} chars) — escalating to patchright browser render…")
+        return _fetch_page_browser()
+    return html
 
 
 # ── Parse ─────────────────────────────────────────────────────────────────────
