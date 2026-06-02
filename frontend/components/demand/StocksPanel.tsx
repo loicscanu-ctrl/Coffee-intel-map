@@ -119,6 +119,70 @@ function deltaArrow(v: number | null): { symbol: string; cls: string } {
 
 // ── ECF Monthly Panel ─────────────────────────────────────────────────────────
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const kMT = (x?: number | null) => (x != null ? Math.round(x / 1000) : null);
+
+// Years present in the series (newest first), restricted to entries that carry
+// the field selected by `has`.
+function yearsWith(monthly: MonthlyEntry[], has: (m: MonthlyEntry) => boolean): number[] {
+  const ys = new Set<number>();
+  for (const m of monthly) {
+    const mt = (m.period ?? m.month ?? "").match(/^(\d{4})-\d{2}$/);
+    if (mt && has(m)) ys.add(parseInt(mt[1]));
+  }
+  return [...ys].sort((a, b) => b - a);
+}
+
+type SeasonRow = Record<string, number | string | null>;
+
+// Pivot the flat monthly series into 12 month rows (Jan→Dec), one set of keys
+// per year (`y<YEAR>_<measure>`). Years are emitted newest-first by the caller
+// so the stacked columns render newest-left within each month.
+function seasonalRows(
+  monthly: MonthlyEntry[], years: number[],
+  pick: (m: MonthlyEntry) => Record<string, number | null>,
+): SeasonRow[] {
+  const byPeriod = new Map<string, MonthlyEntry>();
+  for (const m of monthly) byPeriod.set(m.period ?? m.month ?? "", m);
+  return MONTHS.map((mon, i) => {
+    const row: SeasonRow = { month: mon };
+    for (const y of years) {
+      const e = byPeriod.get(`${y}-${String(i + 1).padStart(2, "0")}`);
+      if (!e) continue;
+      for (const [k, v] of Object.entries(pick(e))) row[`y${y}_${k}`] = v;
+    }
+    return row;
+  });
+}
+
+const SEASON_TT_LABELS: Record<string, string> = {
+  total: "Total", washed: "Arabica Washed", unwashed: "Arabica Unwashed",
+  robusta: "Robusta", cert: "ICE-certified (EU)", rest: "Rest of ECF",
+};
+function seasonTooltip(v: unknown, name: unknown): [string, string] {
+  const m = String(name ?? "").match(/^y(\d{4})_(\w+)$/);
+  const txt = `${Number(v).toLocaleString()}k MT`;
+  return m ? [txt, `${m[1]} · ${SEASON_TT_LABELS[m[2]] ?? m[2]}`] : [txt, String(name)];
+}
+
+// Newest year full-opacity, older years progressively fainter.
+const yearOpacity = (idx: number) => Math.max(0.35, 1 - idx * 0.22);
+
+function YearWindowButtons({ n, set }: { n: number; set: (v: number) => void }) {
+  return (
+    <div className="flex gap-1">
+      {[3, 5, 7].map(v => (
+        <button key={v} onClick={() => set(v)}
+          className={`text-[8px] px-1.5 py-0.5 rounded ${n === v
+            ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"}`}>
+          {v}Y
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function EcfPanel({ ecf }: { ecf: EcfData }) {
   const monthly = ecf.monthly;
 
@@ -159,28 +223,39 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
   const latestMt = ecf.latest_bags ? ecf.latest_bags * 0.06 / 1000 : null;
   const latestBagsM = ecf.latest_m_bags ?? (ecf.latest_bags ? +(ecf.latest_bags / 1_000_000).toFixed(1) : null);
   const yoyArrow = latest?.yoy != null ? deltaArrow(latest.yoy) : null;
-  const hasBreakdown = chartData.some(d => d.washed != null || d.robusta != null);
 
-  // ECF stock vs the ICE-certified subset at European warehouses, by type.
-  // Each column = the ECF type total; the light lower segment = certified (a
-  // subset), the dark upper segment = the rest. Only months with certified
-  // data appear.
-  const cmp = monthly.map(m => {
-    const rob = m.robusta_mt ?? null;
-    const ara = m.arabica_washed_mt ?? null;
-    const cr = m.cert_eu_robusta_mt ?? null;
-    const ca = m.cert_eu_arabica_mt ?? null;
-    if (cr == null && ca == null) return null;
-    const k = (x: number) => Math.round(x / 1000);
+  // ── Seasonal (month-of-year) views ─────────────────────────────────────────
+  const [nYears, setNYears] = useState(3);                 // 3Y default
+  const [cmpType, setCmpType] = useState<"robusta" | "arabica">("robusta");
+
+  // Chart 1: one stacked-by-type column per year, newest-left, within each
+  // calendar month. Pre-2020 months (no type split) show a single total bar.
+  const years1 = yearsWith(monthly, m => m.value_mt != null).slice(0, nYears);
+  const seasonal1 = seasonalRows(monthly, years1, m => {
+    const hasType = m.arabica_washed_mt != null || m.arabica_unwashed_mt != null
+                    || m.robusta_mt != null;
     return {
-      period: fmtPeriod(m.period ?? m.month ?? ""),
-      robCert: cr != null ? k(cr) : null,
-      robRest: rob != null && cr != null ? Math.max(0, k(rob - cr)) : null,
-      araCert: ca != null ? k(ca) : null,
-      araRest: ara != null && ca != null ? Math.max(0, k(ara - ca)) : null,
+      total:    hasType ? null : kMT(m.value_mt),
+      washed:   kMT(m.arabica_washed_mt),
+      unwashed: kMT(m.arabica_unwashed_mt),
+      robusta:  kMT(m.robusta_mt),
     };
-  }).filter((d): d is NonNullable<typeof d> => d !== null);
-  const hasCert = cmp.length > 0;
+  });
+
+  // Chart 2: ECF type stock with the ICE-certified-EU subset as a lighter base,
+  // for the toggled type, one column per year (newest-left) per month.
+  const certKey = cmpType === "robusta" ? "cert_eu_robusta_mt" : "cert_eu_arabica_mt";
+  const totKey  = cmpType === "robusta" ? "robusta_mt" : "arabica_washed_mt";
+  const years2 = yearsWith(monthly, m => m[certKey] != null).slice(0, nYears);
+  const hasCert = years2.length > 0;
+  const seasonal2 = seasonalRows(monthly, years2, m => {
+    const cert = m[certKey] ?? null;
+    const tot  = m[totKey] ?? null;
+    return {
+      cert: kMT(cert),
+      rest: tot != null && cert != null ? Math.max(0, kMT(tot)! - kMT(cert)!) : kMT(tot),
+    };
+  });
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
@@ -215,148 +290,92 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
         </div>
       </div>
 
-      {chartData.length > 1 ? (
-        <div className="h-40">
+      <div className="flex items-center justify-between">
+        <div className="text-[9px] text-slate-400 uppercase tracking-wide">
+          Seasonality — stock by type, by year
+        </div>
+        <YearWindowButtons n={nYears} set={setNYears} />
+      </div>
+      {years1.length > 0 ? (
+        <div className="h-44">
           <ResponsiveContainer width="100%" height="100%">
-            {hasBreakdown ? (
-              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
-                />
-                <YAxis
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={v => `${v}k`}
-                />
-                <Tooltip
-                  contentStyle={TT_STYLE}
-                  formatter={(v: unknown, name: unknown) => {
-                    const labels: Record<string, string> = {
-                      washed: "Arabica Washed", unwashed: "Arabica Unwashed",
-                      robusta: "Robusta", other: "Other",
-                      totalOnly: "Total (type split N/A)",
-                    };
-                    const key = String(name ?? "");
-                    return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 8 }}
-                  formatter={(v: string) => ({
-                    washed: "Arabica Washed", unwashed: "Arabica Unwashed",
-                    robusta: "Robusta", other: "Other",
-                    totalOnly: "Total (pre-2020)",
-                  }[v] ?? v)}
-                />
-                {/* Pre-2020 months: single neutral total column (no type split). */}
-                <Bar dataKey="totalOnly" stackId="s" fill="#475569" opacity={0.9} radius={[2,2,0,0]} name="totalOnly" />
-                <Bar dataKey="washed"   stackId="s" fill="#6366f1" opacity={0.9} name="washed" />
-                <Bar dataKey="unwashed" stackId="s" fill="#8b5cf6" opacity={0.9} name="unwashed" />
-                <Bar dataKey="robusta"  stackId="s" fill="#a78bfa" opacity={0.9} radius={[2,2,0,0]} name="robusta" />
-                {chartData.some(d => d.other) && (
-                  <Bar dataKey="other" stackId="s" fill="#c4b5fd" opacity={0.8} radius={[2,2,0,0]} name="other" />
-                )}
-              </BarChart>
-            ) : (
-              <ComposedChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
-                />
-                <YAxis
-                  yAxisId="mt"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={v => `${v}k`}
-                  domain={["auto", "auto"]}
-                />
-                <Tooltip
-                  contentStyle={TT_STYLE}
-                  formatter={(v: unknown) => [`${Number(v).toLocaleString()}k MT`, "ECF Stocks"]}
-                />
-                <Bar yAxisId="mt" dataKey="mt" fill="#6366f1" opacity={0.8} radius={[2,2,0,0]} />
-                <Line yAxisId="mt" dataKey="mt" type="monotone" stroke="#a5b4fc" strokeWidth={1.5} dot={{ r: 3, fill: "#a5b4fc" }} />
-              </ComposedChart>
-            )}
+            <BarChart data={seasonal1} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+              <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }}
+                     axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false}
+                     tickLine={false} tickFormatter={v => `${v}k`} />
+              <Tooltip contentStyle={TT_STYLE} formatter={seasonTooltip} />
+              {years1.flatMap((y, idx) => {
+                const op = yearOpacity(idx);
+                return [
+                  <Bar key={`${y}_t`} dataKey={`y${y}_total`}    stackId={`y${y}`} fill="#475569" fillOpacity={op} />,
+                  <Bar key={`${y}_w`} dataKey={`y${y}_washed`}   stackId={`y${y}`} fill="#6366f1" fillOpacity={op} />,
+                  <Bar key={`${y}_u`} dataKey={`y${y}_unwashed`} stackId={`y${y}`} fill="#8b5cf6" fillOpacity={op} />,
+                  <Bar key={`${y}_r`} dataKey={`y${y}_robusta`}  stackId={`y${y}`} fill="#a78bfa" fillOpacity={op} radius={[2,2,0,0]} />,
+                ];
+              })}
+            </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
         <div className="h-36 flex items-center justify-center text-[10px] text-slate-600 italic">
-          Bi-monthly series accumulating — {chartData.length} data point{chartData.length !== 1 ? "s" : ""} so far.
+          No ECF data yet.
         </div>
       )}
 
-      <div className="text-[9px] text-slate-500 italic">
-        {hasBreakdown
-          ? "Type breakdown parsed from ECF PDF (Arabica Washed · Arabica Unwashed · Robusta)."
-          : "Type breakdown pending — parsed from ECF PDF on next monthly scraper run."}
-        {" "}YoY comparison appears once 13+ months are collected.
+      <div className="flex items-center gap-x-2 gap-y-0.5 text-[8px] text-slate-500 flex-wrap">
+        <span>Per month: newest left → oldest right{years1.length ? ` (${years1.join(" · ")})` : ""}; older years fade.</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#6366f1" }} />Washed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#8b5cf6" }} />Unwashed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#a78bfa" }} />Robusta</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#475569" }} />Total (pre-2020)</span>
       </div>
 
-      {hasCert && (
-        <div className="space-y-1 pt-1 border-t border-slate-700/60">
-          <div className="text-[9px] text-slate-400 uppercase tracking-wide">
-            ECF stock vs ICE-certified at EU ports
+      {hasCert && (() => {
+        const dark  = cmpType === "robusta" ? "#6b4423" : "#b91c1c";
+        const light = cmpType === "robusta" ? "#cd9b6a" : "#fca5a5";
+        return (
+          <div className="space-y-1 pt-1 border-t border-slate-700/60">
+            <div className="flex items-center justify-between">
+              <div className="text-[9px] text-slate-400 uppercase tracking-wide">
+                ECF vs ICE-certified at EU ports
+              </div>
+              <div className="flex gap-1">
+                {(["robusta", "arabica"] as const).map(t => (
+                  <button key={t} onClick={() => setCmpType(t)}
+                    className={`text-[8px] px-1.5 py-0.5 rounded ${cmpType === t
+                      ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"}`}>
+                    {t === "robusta" ? "Robusta" : "Washed Arabica"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={seasonal2} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                  <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }}
+                         axisLine={false} tickLine={false} interval={0} />
+                  <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false}
+                         tickLine={false} tickFormatter={v => `${v}k`} />
+                  <Tooltip contentStyle={TT_STYLE} formatter={seasonTooltip} />
+                  {years2.flatMap((y, idx) => {
+                    const op = yearOpacity(idx);
+                    return [
+                      <Bar key={`${y}_c`} dataKey={`y${y}_cert`} stackId={`y${y}`} fill={light} fillOpacity={op} />,
+                      <Bar key={`${y}_r`} dataKey={`y${y}_rest`} stackId={`y${y}`} fill={dark}  fillOpacity={op} radius={[2,2,0,0]} />,
+                    ];
+                  })}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-x-2 text-[8px] text-slate-500 flex-wrap">
+              <span>Column = ECF {cmpType === "robusta" ? "Robusta" : "Washed Arabica"}; newest left{years2.length ? ` (${years2.join(" · ")})` : ""}.</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: light }} />ICE-certified (EU)</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: dark }} />Rest of ECF</span>
+            </div>
           </div>
-          <div className="h-40">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={cmp} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(cmp.length / 6) - 1)}
-                />
-                <YAxis
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={v => `${v}k`}
-                />
-                <Tooltip
-                  contentStyle={TT_STYLE}
-                  formatter={(v: unknown, name: unknown) => {
-                    const labels: Record<string, string> = {
-                      robCert: "Robusta · ICE-certified (EU)",
-                      robRest: "Robusta · rest of ECF",
-                      araCert: "Arabica washed · ICE-certified (EU)",
-                      araRest: "Arabica washed · rest of ECF",
-                    };
-                    const key = String(name ?? "");
-                    return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 8 }}
-                  formatter={(v: string) => ({
-                    robCert: "Robusta certified (EU)", robRest: "Robusta (ECF)",
-                    araCert: "Arabica certified (EU)", araRest: "Arabica washed (ECF)",
-                  }[v] ?? v)}
-                />
-                {/* Robusta column: light-brown certified subset at the base,
-                    brown remainder on top → total = ECF robusta. */}
-                <Bar dataKey="robCert" stackId="rob" fill="#cd9b6a" name="robCert" />
-                <Bar dataKey="robRest" stackId="rob" fill="#6b4423" radius={[2,2,0,0]} name="robRest" />
-                {/* Washed-arabica column: light-red certified subset + red. */}
-                <Bar dataKey="araCert" stackId="ara" fill="#fca5a5" name="araCert" />
-                <Bar dataKey="araRest" stackId="ara" fill="#b91c1c" radius={[2,2,0,0]} name="araRest" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="text-[9px] text-slate-500 italic">
-            Each column = ECF stock for that type; the lighter base is the
-            ICE-certified subset held at European warehouses.
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       <div className="text-[9px] text-slate-500 space-y-0.5">
         {ecf.latest_post && (
