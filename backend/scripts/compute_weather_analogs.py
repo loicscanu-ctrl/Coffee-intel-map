@@ -83,27 +83,76 @@ ONI_BY_YM: dict[tuple[int, int], float] = {
     (r["year"], r["month"]): float(r["value"]) for r in _ONI_DOC["oni"]
 }
 
-# Per-origin configuration. Phenology stages are (name, [calendar_months]);
-# months ≥ 8 belong to crop_year - 1, months < 8 to crop_year, for the
-# southern-hemisphere flows (Brazil + Indonesia south of equator). Vietnam
-# robusta has a different alignment — its harvest peak straddles the
-# year boundary (Nov-Jan), so its stages stay in calendar-year-Y for the
-# crop being harvested in Nov Y.
+# ── Phenology zone templates ─────────────────────────────────────────────────
+# Coffee phenology is climate-zone-dependent. Three structurally different
+# templates cover the producing belt:
+#
+#   southern_temperate (Brazil): distinct dry winter (Jun-Aug) + wet summer
+#     (Dec-Feb). Flowering triggered by spring rain Oct-Nov. Single
+#     concentrated harvest May-Sep. Stages cross Dec → Jan year boundary, so
+#     anchor "southern_hemisphere" maps months ≥ 8 to crop_year - 1.
+#
+#   northern_monsoon_asia (Vietnam): Asian SE monsoon — dry Nov-Apr, wet
+#     May-Oct. Robusta growers time bloom to Feb-Mar via dry-season
+#     irrigation withholding, so harvest falls in the dry season Nov-Jan
+#     for easier drying. Stages span calendar year with only Dec wrapping
+#     to crop_year - 1 (anchor "calendar_year").
+#
+#   equatorial (Indonesia, future Colombia / Uganda): weakly seasonal,
+#     near-equator climate. Real phenology is bimodal with multiple
+#     flushes; we collapse to a single annual cycle for analog ranking
+#     using the dominant Lampung-style pattern. Stages run Jul-Jun.
+#     Anchor matches southern_hemisphere (months ≥ 7 → Y-1) since most
+#     equatorial producers sit just south of the line.
+#
+# Future-zone hooks (add when porting Honduras / Ethiopia / etc.):
+#   northern_subtropical: Honduras-style. Flowering Apr-May, harvest
+#     Dec-Mar. Anchor "calendar_year_simple" (no wrap; all stages in Y).
+PHENOLOGY_ZONES: dict[str, dict] = {
+    "southern_temperate": {
+        "stages": [
+            ("pre_flowering", [8, 9]),       # Aug-Sep of (Y-1): end of dry season
+            ("flowering",     [10, 11]),     # Oct-Nov of (Y-1): spring rain triggers bloom
+            ("fruit_fill",    [12, 1, 2]),   # Dec (Y-1) - Feb (Y): summer wet, grand expansion
+            ("maturation",    [3, 4, 5]),    # Mar-May of (Y): autumn dry-down toward harvest
+        ],
+        "anchor":          "southern_hemisphere",  # months ≥ 8 → Y-1
+        "harvest_period":  "May-Sep of crop_year",
+    },
+    "northern_monsoon_asia": {
+        "stages": [
+            ("pre_flowering", [12, 1]),         # Dec (Y-1) - Jan (Y): dry rest
+            ("flowering",     [2, 3]),          # Feb-Mar (Y): irrigation-triggered bloom
+            ("fruit_fill",    [4, 5, 6, 7]),    # Apr-Jul (Y): main wet season
+            ("maturation",    [8, 9, 10]),      # Aug-Oct (Y): wet tapers, prep for dry harvest
+        ],
+        "anchor":          "calendar_year",     # only month 12 wraps to Y-1
+        "harvest_period":  "Nov Y - Jan Y+1",
+    },
+    "equatorial": {
+        # Less concentrated cycle — wider pre-flowering and fruit-fill windows
+        # reflect that equatorial origins rarely have a single sharp bloom.
+        "stages": [
+            ("pre_flowering", [7, 8, 9]),       # Jul-Sep (Y-1): mid-year dry, build-up
+            ("flowering",     [10, 11]),        # Oct-Nov (Y-1): wet-season trigger
+            ("fruit_fill",    [12, 1, 2, 3]),   # Dec (Y-1) - Mar (Y): wet season fill
+            ("maturation",    [4, 5]),          # Apr-May (Y): drier window before harvest
+        ],
+        "anchor":          "southern_hemisphere",  # most equatorial producers sit at 5-10°S
+        "harvest_period":  "May-Aug of crop_year (dominant cycle; smaller flush usually Nov-Jan)",
+    },
+}
+
+# Per-origin configuration — each origin references a phenology zone above
+# and adds its own region weights, production seed, history files.
 ORIGIN_CONFIGS = {
     "brazil_arabica": {
-        "label": "Brazil arabica",
+        "label":          "Brazil arabica",
         "history_file":   "brazil.json",
         "prod_seed_file": "brazil_arabica_production.json",
         "vhi_file":       "vhi_brazil.json",
         "out_file":       "weather_analogs_brazil.json",
-        # Brazilian arabica: harvest May-Sep of year Y, weather Aug Y-1 → May Y.
-        "phenology": [
-            ("pre_flowering", [8, 9]),       # Aug-Sep of (Y-1)
-            ("flowering",     [10, 11]),     # Oct-Nov of (Y-1)
-            ("fruit_fill",    [12, 1, 2]),   # Dec (Y-1) — Feb (Y)
-            ("maturation",    [3, 4, 5]),    # Mar-May of (Y)
-        ],
-        "stage_anchor": "southern_hemisphere",  # months ≥ 8 → Y-1
+        "zone":           "southern_temperate",
         # Production weights (arabica share only; Espírito Santo's conilon excluded).
         "prod_weights": {
             "Sul de Minas":   900,
@@ -113,24 +162,14 @@ ORIGIN_CONFIGS = {
         },
     },
     "vietnam_robusta": {
-        "label": "Vietnam robusta",
+        "label":          "Vietnam robusta",
         "history_file":   "vn.json",
         "prod_seed_file": "vietnam_robusta_production.json",
         "vhi_file":       "vhi_vn.json",
         "out_file":       "weather_analogs_vietnam.json",
-        # Vietnam robusta Central Highlands: harvest Nov-Jan of marketing
-        # year Y → Y+1. The weather window driving that crop is roughly
-        # Dec(Y-1) for pre-flowering rain trigger through Oct(Y) maturation.
-        # We key the analog by harvest-start year (Nov Y = crop_year Y).
-        "phenology": [
-            ("pre_flowering", [12, 1]),  # Dec (Y-1) — Jan (Y): dry-rest
-            ("flowering",     [2, 3]),   # Feb-Mar (Y): bloom triggered by post-dry rain
-            ("fruit_fill",    [4, 5, 6, 7]),  # Apr-Jul (Y): main wet season
-            ("maturation",    [8, 9, 10]),    # Aug-Oct (Y): rain tapers, prep for harvest
-        ],
-        "stage_anchor": "calendar_year",  # month 12 → Y-1, rest → Y
-        # USDA AEKI 2024 regional weights (robusta share — Vietnam is ~95%
-        # robusta so use total prod for all 5 regions).
+        "zone":           "northern_monsoon_asia",
+        # USDA AEKI 2024 regional weights (Vietnam is ~95% robusta so use
+        # total prod for all 5 regions in the Central Highlands).
         "prod_weights": {
             "Dak Lak":  480,
             "Lam Dong": 580,
@@ -140,29 +179,18 @@ ORIGIN_CONFIGS = {
         },
     },
     "indonesia_robusta": {
-        "label": "Indonesia robusta",
+        "label":          "Indonesia robusta",
         "history_file":   "indonesia.json",
         "prod_seed_file": "indonesia_robusta_production.json",
         "vhi_file":       "vhi_indonesia.json",
         "out_file":       "weather_analogs_indonesia.json",
-        # Indonesia robusta (Lampung-dominant, Sumatra southern): harvest
-        # May-Aug Y. Weather window: Sep(Y-1) through Apr(Y). Equatorial
-        # so seasonality is less pronounced, but Lampung does have a clear
-        # dry-wet cycle.
-        "phenology": [
-            ("pre_flowering", [9, 10]),    # Sep-Oct (Y-1): post-dry recovery
-            ("flowering",     [11, 12]),   # Nov-Dec (Y-1): wet-season trigger
-            ("fruit_fill",    [1, 2, 3]),  # Jan-Mar (Y): peak monsoon
-            ("maturation",    [4]),         # Apr (Y): single-month dry-down toward harvest
-        ],
-        "stage_anchor": "southern_hemisphere",  # months ≥ 8 → Y-1
-        # Robusta share only — Indonesia has both, the analog framework
-        # treats robusta-dominant Lampung + Java's robusta + Toraja's small share.
+        "zone":           "equatorial",
+        # Robusta share only — Lampung dominant; Java carries a smaller
+        # robusta load. Gayo/Toraja/Flores are arabica → excluded here so
+        # the signature tracks robusta-producing weather only.
         "prod_weights": {
-            "Lampung": 350,   # robusta-dominant
-            "Java":    80,    # robusta-dominant on Java
-            # Gayo/Toraja/Flores are arabica — excluded here so the signature
-            # tracks the robusta-producing weather actually.
+            "Lampung": 350,
+            "Java":    80,
         },
     },
 }
@@ -553,8 +581,25 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
         print(f"[{origin_key}] VHI history: {len(vhi_by_week)} weeks, "
               f"{years[0]}-{years[-1]}")
 
+    # Resolve phenology + stage anchor from the origin's climate-zone template.
+    # Zone-driven: brazil → southern_temperate, vietnam → northern_monsoon_asia,
+    # indonesia → equatorial. Stage definitions live in PHENOLOGY_ZONES above so
+    # adding Honduras / Colombia / Uganda is one zone-key reference + a new
+    # template entry.
+    zone_key = cfg.get("zone")
+    if zone_key not in PHENOLOGY_ZONES:
+        print(f"[{origin_key}] unknown zone {zone_key!r} — skipping", file=sys.stderr)
+        return 1
+    zone = PHENOLOGY_ZONES[zone_key]
+    phenology = zone["stages"]
+    stage_anchor = zone["anchor"]
+
     today = dt.date.today()
-    cur_crop_year = today.year + 1 if today.month >= 8 else today.year
+    # Crop-year rollover: when "today" sits past the zone's harvest window,
+    # the current cycle becomes the NEXT crop year. southern_temperate flips
+    # at Aug; northern_monsoon_asia at Nov; equatorial at Jul.
+    flip_month = {"southern_temperate": 8, "northern_monsoon_asia": 11, "equatorial": 7}.get(zone_key, 8)
+    cur_crop_year = today.year + 1 if today.month >= flip_month else today.year
 
     all_years = sorted({y for prov in history["regions"].values()
                           for y in {int(k[:4]) for k in prov}})
@@ -563,7 +608,7 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
         candidate_years.append(cur_crop_year)
 
     raw_signatures = {
-        y: build_country_signature(history, y, cfg["phenology"], cfg["stage_anchor"],
+        y: build_country_signature(history, y, phenology, stage_anchor,
                                     cfg["prod_weights"], vhi_by_week or None)
         for y in candidate_years
     }
@@ -666,7 +711,9 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
         "origin": origin_key,
         "origin_label": cfg["label"],
         "current_crop_year": cur_crop_year,
-        "phenology": [{"name": n, "months": m} for (n, m) in cfg["phenology"]],
+        "zone": zone_key,
+        "harvest_period": zone["harvest_period"],
+        "phenology": [{"name": n, "months": m} for (n, m) in phenology],
         "stage_normals_10y": stage_norms,
         "current_year_signature": all_signatures[cur_crop_year],
         "top_analogs": top_analogs,
