@@ -219,11 +219,26 @@ def validate_quant_report(data: dict) -> tuple[bool, str]:
 def validate_cecafe_daily(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
+    # v2 schema: per-source buckets under data["sources"]["embarques"|"certificados"].
+    # v1 legacy: arabica/conillon/soluvel at the top level (came from the
+    # Certificados de Origem table). Accept BOTH so the dual-source migration
+    # doesn't get rejected and reverted by the workflow's validate step (which
+    # was the bug that kept embarques from ever committing).
+    sources = data.get("sources")
+    if isinstance(sources, dict):
+        # Valid if ANY source carries arabica or conillon data.
+        for src_name, bucket in sources.items():
+            if not isinstance(bucket, dict):
+                continue
+            if (bucket.get("arabica") or {}) or (bucket.get("conillon") or {}):
+                return True, f"ok (v2, source={src_name})"
+        return False, "v2 schema but no source has arabica/conillon data"
+    # Legacy fallback.
     arabica = data.get("arabica") or {}
     conillon = data.get("conillon") or {}
     if not arabica and not conillon:
         return False, "no arabica or conillon data"
-    return True, "ok"
+    return True, "ok (v1 legacy)"
 
 
 def validate_earnings(data: dict) -> tuple[bool, str]:
