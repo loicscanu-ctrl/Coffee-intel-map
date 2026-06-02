@@ -18,3 +18,7 @@ yfinance==0.2.54
 # every ticker call returns empty body → JSONDecodeError.
 curl_cffi>=0.7,<1.0
 scipy
+# Jinja2 renders the news-tab commentary badges (scraper/commentary/builder.py).
+# 3.1.x is already a transitive dep through several libs; pinning it here makes
+# the requirement explicit so a future trim of transitive deps can't break it.
+jinja2>=3.1,<4.0
