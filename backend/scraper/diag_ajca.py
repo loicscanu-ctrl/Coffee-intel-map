@@ -79,13 +79,20 @@ def main() -> None:
     kinds = sorted({p["kind"] for p in idx})
     print(f"\n===== known pdf_index kinds: {kinds} =====")
 
-    for kind in ["data-jukyu", "data-24", "data7-import-nama", "data7-import-gc",
-                 "data7-import-rc", "data7-import-ic", "data7-import-other",
-                 "j-import", "j-export"]:
+    for kind in ["data-jukyu", "data-yunyu-suii", "data-24", "data7-import-nama",
+                 "data7-import-gc", "data7-import-rc", "data7-import-ic",
+                 "data7-import-other", "j-import", "j-export"]:
         u = _latest_pdf_by_kind(idx, kind)
         print(f"\n===== {kind}: {u} =====")
         if u:
             dump_pdf(u)
+
+    # Stocks PDFs (j-zaiko…) aren't in the known kinds — dump the latest couple
+    # directly so we can see whether stocks split by type and/or by port/origin.
+    stock_pdfs = sorted(u for u in all_pdfs if any(h in u.lower() for h in _STOCK_HINTS))
+    for u in stock_pdfs[-2:]:
+        print(f"\n===== STOCK PDF: {u} =====")
+        dump_pdf(u, max_pages=6)
 
 
 if __name__ == "__main__":
