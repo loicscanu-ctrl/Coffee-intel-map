@@ -176,6 +176,38 @@ def _parse_table(table: list, default_year: int, source_pdf: str,
     return ingested
 
 
+def _debug_pdf(pdf_bytes: bytes, year: int) -> dict:
+    """Print what pdfplumber actually sees in a PDF (text/table presence) so we
+    can tell a layout mismatch from an image-only/infographic PDF."""
+    import pdfplumber
+    info: dict = {"year": year, "pages": 0, "tables": 0, "text_chars": 0,
+                  "samples": []}
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        info["pages"] = len(pdf.pages)
+        for pno, page in enumerate(pdf.pages, 1):
+            text = page.extract_text() or ""
+            info["text_chars"] += len(text)
+            tables = page.extract_tables() or []
+            info["tables"] += len(tables)
+            for t in tables[:2]:
+                info["samples"].append({
+                    "page": pno,
+                    "dims": f"{len(t)}x{max((len(r) for r in t), default=0)}",
+                    "head": [[(str(c)[:16] if c is not None else None)
+                              for c in row[:8]] for row in t[:3]],
+                })
+            if pno == 1 and text:
+                info["page1_text"] = text[:400]
+    print(f"  [debug] {year}: pages={info['pages']} tables={info['tables']} "
+          f"text_chars={info['text_chars']}")
+    if info.get("page1_text"):
+        preview = info["page1_text"].replace("\n", " | ")[:240]
+        print(f"    page1 text: {preview}")
+    for s in info["samples"][:4]:
+        print(f"    p{s['page']} {s['dims']} head={s['head']}")
+    return info
+
+
 def _parse_pdf(pdf_bytes: bytes, year: int, source_pdf: str,
                debug: dict) -> dict[str, dict]:
     import pdfplumber
@@ -185,7 +217,7 @@ def _parse_pdf(pdf_bytes: bytes, year: int, source_pdf: str,
             for table in (page.extract_tables() or []):
                 n = _parse_table(table, year, source_pdf, period_map)
                 if n:
-                    debug.setdefault(str(year), []).append(
+                    debug.setdefault(f"{year}:parsed", []).append(
                         {"page": pno, "cells": n, "sample": table[:4]}
                     )
     return period_map
@@ -231,6 +263,11 @@ def main(debug: bool = False) -> None:
             print(f"  {year}: ERROR — {e}", file=sys.stderr)
             failures.append(year)
             continue
+        if debug:
+            try:
+                debug_tables[str(year)] = _debug_pdf(r.content, year)
+            except Exception as e:
+                print(f"  [debug] {year}: introspection error — {e}", file=sys.stderr)
         parsed = _parse_pdf(r.content, year, url, debug_tables)
         for period, rec in parsed.items():
             dst = period_map.setdefault(period, {"ports": {}, "types": {}, "source_pdf": rec["source_pdf"]})
