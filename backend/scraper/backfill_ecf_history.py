@@ -7,18 +7,21 @@ month (tonnes). From 2020 onward the reports also break the figures down by
 coffee type (Arabica washed/unwashed, Robusta). We parse every yearly PDF into
 a single static series:
 
+This is a self-contained ECF flow: it writes ONE file that the front-end ECF
+panel reads directly (no demand_stocks.json involvement):
+
     frontend/public/data/ecf_history.json
     {
-      "source": "ECF",
-      "unit": "metric_tonnes",
-      "generated_at": "YYYY-MM-DD",
+      "source": "ECF", "unit": "metric_tonnes", "last_updated": "YYYY-MM-DD",
+      "latest_bags": ..., "latest_m_bags": ..., "source_url": "...",
+      "latest_pdf": "...", "yearly_pdfs": [{"year": "2026", "pdf_url": "..."}],
+      "count": <n>,
       "monthly": [
         { "period": "YYYY-MM",
-          "value_mt": <total tonnes>,
-          "value_raw": <total 60-kg bags>,
-          "ports": { "Antwerp": <mt>, "Hamburg": <mt>, ... },   # when available
-          "types": { "arabica_washed_mt": ..., "arabica_unwashed_mt": ...,
-                     "robusta_mt": ..., "other_mt": ... },        # 2020+ only
+          "value_mt": <total tonnes>, "value_raw": <total 60-kg bags>,
+          "ports": { "Antwerp": <mt>, ... },                 # when available
+          "arabica_washed_mt": ..., "arabica_unwashed_mt": ...,
+          "robusta_mt": ...,                                  # flat, 2020+ only
           "source_pdf": "<url>" },
         ...
       ]
@@ -298,10 +301,33 @@ def _finalise(period_map: dict[str, dict]) -> list[dict]:
             entry["value_raw"] = _tons_to_bags(int(total))
         if ports:
             entry["ports"] = ports
-        if types:
-            entry["types"] = types
+        # Type fields are emitted FLAT (arabica_washed_mt/arabica_unwashed_mt/
+        # robusta_mt/…) — that's the shape StocksPanel reads for the breakdown.
+        entry.update(types)
         out.append(entry)
     return out
+
+
+def _build_payload(monthly: list[dict]) -> dict:
+    """Assemble the self-contained ECF file that the front-end reads directly:
+    historic series + the headline metadata the panel needs."""
+    latest = next((e for e in reversed(monthly) if e.get("value_raw")),
+                  monthly[-1] if monthly else {})
+    bags = latest.get("value_raw")
+    return {
+        "source": "ECF",
+        "unit": "metric_tonnes",
+        "last_updated": date.today().isoformat(),
+        "latest_bags": bags,
+        "latest_m_bags": round(bags / 1_000_000, 2) if bags else None,
+        "source_url": "https://www.ecf-coffee.org/category/publications/stocks/",
+        "latest_pdf": latest.get("source_pdf"),
+        # {year, pdf_url} list — matches the front-end EcfData.yearly_pdfs shape.
+        "yearly_pdfs": [{"year": str(y), "pdf_url": u}
+                        for y, u in sorted(YEARLY_PDFS.items(), reverse=True)],
+        "count": len(monthly),
+        "monthly": monthly,
+    }
 
 
 def main(debug: bool = False) -> None:
@@ -337,18 +363,11 @@ def main(debug: bool = False) -> None:
               f"(running total {len(period_map)})")
 
     monthly = _finalise(period_map)
-    payload = {
-        "source": "ECF",
-        "unit": "metric_tonnes",
-        "generated_at": date.today().isoformat(),
-        "count": len(monthly),
-        "monthly": monthly,
-    }
-
     if not monthly:
         print("ERROR: parsed zero periods — not writing ecf_history.json",
               file=sys.stderr)
         sys.exit(1)
+    payload = _build_payload(monthly)
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:
@@ -357,7 +376,8 @@ def main(debug: bool = False) -> None:
     print(f"\nWrote {len(monthly)} periods → {OUT_PATH}")
     print(f"  range: {monthly[0]['period']} … {monthly[-1]['period']}")
     print(f"  with ports: {sum('ports' in m for m in monthly)}, "
-          f"with types: {sum('types' in m for m in monthly)}")
+          f"with types: {sum('robusta_mt' in m for m in monthly)}")
+    print(f"  latest: {payload['latest_m_bags']}M bags ({payload['last_updated']})")
     if failures:
         print(f"  WARNING: {len(failures)} PDF(s) failed: {failures}")
 
