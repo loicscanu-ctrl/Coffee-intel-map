@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        run: pip install requests pdfplumber beautifulsoup4 lxml
+        run: pip install requests openpyxl
 
       - name: Run Kaffeesteuer scraper (3 attempts)
         run: |
