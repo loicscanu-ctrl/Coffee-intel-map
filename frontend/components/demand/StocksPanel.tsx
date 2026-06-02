@@ -55,21 +55,6 @@ interface PsdData {
   latest_stocks_mt: number | null;
 }
 
-interface AjcaData {
-  source: string;
-  source_url?: string | null;
-  last_updated: string;
-  latest_year: string | null;
-  latest_imports_mt: number | null;
-  latest_consumption_mt: number | null;
-  monthly_imports_pdf?: string | null;
-  monthly_exports_pdf?: string | null;
-  supply_demand_pdf?: string | null;
-  yearly_imports_pdf?: string | null;
-  latest_origin_breakdown?: { country: string; imports_mt: number }[] | null;
-  latest_origin_pdf?: string | null;
-}
-
 interface ProducerEntry {
   latest_year: string | null;
   latest_production_mt: number | null;
@@ -85,7 +70,6 @@ interface StocksPayload {
   eu: PsdData | null;
   japan: PsdData | null;
   usa: PsdData | null;
-  ajca: AjcaData | null;
   producers: Record<string, ProducerEntry> | null;
 }
 
@@ -427,128 +411,6 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
   );
 }
 
-// ── Japan Panel (PSD trend + AJCA origin) ────────────────────────────────────
-
-function JapanPanel({ japan, ajca }: { japan: PsdData | null; ajca: AjcaData | null }) {
-  const annual = (japan?.annual ?? []).filter(p => p.imports_mt != null);
-  const chartData = annual.map(p => ({
-    year: p.year.slice(2),
-    imports: Math.round((p.imports_mt ?? 0) / 1000),
-    stocks:  p.stocks_mt  != null ? Math.round(p.stocks_mt  / 1000) : null,
-    consumption: p.consumption_mt != null ? Math.round(p.consumption_mt / 1000) : null,
-  }));
-
-  const latest = annual[annual.length - 1];
-  const prev   = annual[annual.length - 2];
-  const importsDelta = (latest && prev && latest.imports_mt != null && prev.imports_mt != null)
-    ? ((latest.imports_mt - prev.imports_mt) / prev.imports_mt) * 100 : null;
-  const stocksDelta = (latest && prev && latest.stocks_mt != null && prev.stocks_mt != null)
-    ? ((latest.stocks_mt - prev.stocks_mt) / prev.stocks_mt) * 100 : null;
-
-  const breakdown = ajca?.latest_origin_breakdown;
-  const total = breakdown?.reduce((s, r) => s + r.imports_mt, 0) || 0;
-  const topRows = breakdown
-    ? [...breakdown].sort((a, b) => b.imports_mt - a.imports_mt).slice(0, 6)
-    : null;
-
-  return (
-    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
-      <div className="flex items-baseline justify-between">
-        <div className="text-[10px] text-slate-400 uppercase tracking-wide">Japan Green Coffee</div>
-        <div className="text-[8px] text-slate-600">USDA PSD · {japan?.last_updated ?? "—"}</div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 text-xs font-mono">
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Imports {latest?.year}</div>
-          <div className="text-sky-300 font-bold">{fmtThousands(latest?.imports_mt)}</div>
-          {importsDelta != null && (
-            <div className={`text-[9px] ${importsDelta >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-              {importsDelta >= 0 ? "+" : ""}{importsDelta.toFixed(1)}% YoY
-            </div>
-          )}
-        </div>
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Consumption</div>
-          <div className="text-white font-bold">{fmtThousands(latest?.consumption_mt)}</div>
-          <div className="text-[9px] text-slate-600">MT</div>
-        </div>
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Ending stocks</div>
-          <div className="text-violet-300 font-bold">{fmtThousands(latest?.stocks_mt)}</div>
-          {stocksDelta != null && (
-            <div className={`text-[9px] ${stocksDelta >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-              {stocksDelta >= 0 ? "+" : ""}{stocksDelta.toFixed(1)}% YoY
-            </div>
-          )}
-        </div>
-      </div>
-
-      {chartData.length > 1 ? (
-        <div className="h-32">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 2, right: 4, left: -10, bottom: 0 }}>
-              <XAxis dataKey="year" tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} interval={3} />
-              <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}k`} />
-              <Tooltip
-                contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: unknown) => [
-                  `${Number(v).toLocaleString()}k MT`,
-                  name === "imports" ? "Imports" : name === "stocks" ? "End Stocks" : "Consumption",
-                ]}
-              />
-              <Bar dataKey="imports" fill="#0ea5e9" opacity={0.7} radius={[2,2,0,0]} name="imports" />
-              <Line dataKey="stocks" type="monotone" stroke="#a78bfa" strokeWidth={1.5} dot={false} name="stocks" />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="h-32 flex items-center justify-center text-[10px] text-slate-600 italic">
-          Annual history not available.
-        </div>
-      )}
-
-      {topRows && topRows.length > 0 && (
-        <div>
-          <div className="text-[9px] text-slate-500 mb-1 uppercase tracking-wide">
-            Origin breakdown (AJCA · {ajca?.latest_year})
-            {ajca?.latest_origin_pdf && (
-              <a href={ajca.latest_origin_pdf} target="_blank" rel="noopener noreferrer"
-                 className="ml-1 text-sky-600 hover:text-sky-400 normal-case">PDF</a>
-            )}
-          </div>
-          <div className="space-y-0.5">
-            {topRows.map(r => {
-              const pct = total > 0 ? (r.imports_mt / total) * 100 : 0;
-              return (
-                <div key={r.country} className="flex items-center gap-1.5">
-                  <div className="text-[9px] text-slate-400 w-20 truncate">{r.country}</div>
-                  <div className="flex-1 bg-slate-700 rounded-full h-1.5">
-                    <div className="bg-sky-500 h-1.5 rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
-                  </div>
-                  <div className="text-[9px] text-slate-400 font-mono w-10 text-right">{fmtThousands(r.imports_mt)}</div>
-                  <div className="text-[9px] text-slate-600 w-8 text-right">{pct.toFixed(0)}%</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {ajca?.supply_demand_pdf && (
-        <div className="text-[9px] text-slate-500">
-          <a href={ajca.supply_demand_pdf} target="_blank" rel="noopener noreferrer"
-             className="text-sky-400 hover:text-sky-300 underline">AJCA Supply &amp; Demand PDF</a>
-          {ajca.source_url && (
-            <>{" · "}<a href={ajca.source_url} target="_blank" rel="noopener noreferrer"
-                       className="text-slate-500 hover:text-slate-300 underline">AJCA →</a></>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── PSD Analytical Panel ──────────────────────────────────────────────────────
 
 const REGION_LABELS: Record<Region, string> = { eu: "European Union", japan: "Japan", usa: "United States" };
@@ -854,7 +716,7 @@ export default function StocksPanel() {
   }
 
   const hasEcf = !!(ecf && ecf.monthly && ecf.monthly.length);
-  if (!hasEcf && (!data || (!data.eu && !data.japan && !data.ajca && !data.usa))) {
+  if (!hasEcf && (!data || (!data.eu && !data.japan && !data.usa))) {
     return (
       <div className="bg-slate-900 border-b border-slate-700 p-4">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">Consumer Market Stocks</div>
@@ -871,23 +733,14 @@ export default function StocksPanel() {
     <div className="bg-slate-900 border-b border-slate-700 p-4 space-y-4">
       <div className="text-[10px] text-slate-400 uppercase tracking-wide">Consumer Market Stocks</div>
 
-      {/* Row 1: ECF + Japan */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {hasEcf ? (
-          <EcfPanel ecf={ecf!} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
-            ECF monthly data pending scraper run
-          </div>
-        )}
-        {(data?.japan || data?.ajca) ? (
-          <JapanPanel japan={data.japan} ajca={data.ajca} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
-            Japan data pending scraper run
-          </div>
-        )}
-      </div>
+      {/* Row 1: ECF certified stocks (Japan now lives in its own AJCA tab) */}
+      {hasEcf ? (
+        <EcfPanel ecf={ecf!} />
+      ) : (
+        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
+          ECF monthly data pending scraper run
+        </div>
+      )}
 
       {/* Row 2: PSD Analytical (full width, EU/Japan/USA tabs) */}
       {hasPsd && data && (
