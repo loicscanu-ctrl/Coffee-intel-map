@@ -22,7 +22,7 @@ shows up later.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from scraper.commentary import embed_commentary, render, signed, thousep
 
@@ -101,7 +101,7 @@ def _news_item_for(market: str, date_iso: str, text: str, source_url: str | None
         "lng":      None,
         "tags":     ["ice", "certified-stocks", market.lower().split()[0], "auto-commentary"],
         "meta":     json.dumps(meta_obj, ensure_ascii=False),
-        "pub_date": datetime.now(timezone.utc),
+        "pub_date": datetime.now(UTC),
     }
 
 

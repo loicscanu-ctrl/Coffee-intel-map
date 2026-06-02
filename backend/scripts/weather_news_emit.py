@@ -27,9 +27,8 @@ the weather fetch itself doesn't depend on news_feed availability.
 from __future__ import annotations
 
 import json
-from datetime import datetime, date, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
-
 
 VHI_STRESS_THRESHOLD = 40.0   # NOAA STAR convention — see backend/seed/vhi/*.
 
@@ -232,7 +231,7 @@ def emit(data_dir: Path) -> int:
                 "lng":      lng,
                 "tags":     ["weather", origin_key, "agronomic", "auto-commentary"],
                 "meta":     json.dumps(meta_obj, ensure_ascii=False),
-                "pub_date": datetime.now(timezone.utc),
+                "pub_date": datetime.now(UTC),
             })
             written += 1
             print(f"[weather-news] {origin_key}: {text}")

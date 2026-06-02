@@ -20,7 +20,7 @@ import re
 import sys
 import urllib.request
 import zipfile
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 try:
@@ -254,7 +254,7 @@ def _emit_news(series: list[dict]) -> None:
     """Upsert a news_feed row for the latest CECAFE print. No-op when
     DATABASE_URL is unset."""
     import os
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     if not os.environ.get("DATABASE_URL"):
         print("[cecafe-news] DATABASE_URL unset — skipping news_feed upsert")
@@ -280,7 +280,7 @@ def _emit_news(series: list[dict]) -> None:
         "lng":      -47.93,
         "tags":     ["cecafe", "brazil", "exports", "auto-commentary"],
         "meta":     json.dumps(meta_obj, ensure_ascii=False),
-        "pub_date": datetime.now(timezone.utc),
+        "pub_date": datetime.now(UTC),
     }
     db = get_session()
     try:

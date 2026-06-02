@@ -315,7 +315,6 @@ def _physical_line(label: str, origin_key: str, fob_key: str,
 def _seed_weather_path(origin_key: str):
     """Locate backend/seed/weather_history/{origin}.json relative to the
     morning brief's data dir (which sits at frontend/public/data)."""
-    from pathlib import Path
     from telegram.data import _DATA_DIR
     repo_root = _DATA_DIR.parent.parent.parent
     return repo_root / "backend" / "seed" / "weather_history" / f"{origin_key}.json"
@@ -734,6 +733,57 @@ def _cert_stocks_block() -> str | None:
     return "🪤 <b>Certified stocks</b>\n" + "\n\n".join(parts)
 
 
+# ── Upcoming events (Coming up · next 24h) ───────────────────────────────────
+# Display label per events.json category code. Kept compact ([XXX] prefix
+# style) to match the brief's text-dense tone — no emoji decoration.
+_EVENT_CATEGORY_LABEL = {
+    "wasde":           "WASDE",
+    "ico":             "ICO",
+    "vietnam_customs": "VN",
+    "cecafe":          "CECAFÉ",
+    "fnd":             "FND",
+    "central_bank":    "CB",
+    "other":           "EVT",
+}
+
+
+def _upcoming_events_section(now: datetime | None = None) -> str | None:
+    """Format the "Coming up · next 24h" block.
+
+    Reads events.json (hand-curated + build_events_calendar.py output) and
+    returns a block for events dated today or tomorrow (UTC day boundary —
+    events are stored YYYY-MM-DD without timezone). Returns None when
+    nothing's scheduled so the brief silently omits the section.
+    """
+    doc = load("events.json")
+    if not isinstance(doc, dict):
+        return None
+    events = doc.get("events") or []
+    if not events:
+        return None
+
+    today_d = (now or datetime.now(UTC)).date()
+    tomorrow_d = today_d + timedelta(days=1)
+    today_iso, tomorrow_iso = today_d.isoformat(), tomorrow_d.isoformat()
+
+    upcoming = [
+        e for e in events
+        if isinstance(e, dict) and e.get("date") in (today_iso, tomorrow_iso)
+    ]
+    if not upcoming:
+        return None
+
+    upcoming.sort(key=lambda e: (e.get("date") or "", e.get("category") or ""))
+
+    lines = ["🗓 <b>Coming up · next 24h</b>"]
+    for e in upcoming:
+        when = "Today   " if e["date"] == today_iso else "Tomorrow"
+        cat = _EVENT_CATEGORY_LABEL.get(e.get("category") or "other", "EVT")
+        title = (e.get("title") or "").strip()
+        lines.append(f"  {when} · [{cat}] {title}")
+    return "\n".join(lines)
+
+
 # ── Main assembly ────────────────────────────────────────────────────────────
 
 def _load_archive() -> dict | None:
@@ -802,6 +852,7 @@ def build_brief_message(db=None) -> str:
     weather = _weather_block(today)
     exports = _exports_block(daily, vn_sup, ug_sup, today)
     certs   = _cert_stocks_block()
+    coming  = _upcoming_events_section(now)
 
     parts: list[str] = [f"☕ <b>Coffee Intel · {day_str}</b>", ""]
     parts.append(rc_line)
@@ -822,6 +873,9 @@ def build_brief_message(db=None) -> str:
     if certs:
         parts.append("")
         parts.append(certs)
+    if coming:
+        parts.append("")
+        parts.append(coming)
 
     parts.append("")
     parts.append("/quote · /cot · /stock · /certified · /brazil · /vietnam · /uganda · /freight · /macro")

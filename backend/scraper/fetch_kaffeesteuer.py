@@ -18,7 +18,7 @@ import io
 import json
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import openpyxl
@@ -164,7 +164,7 @@ def _emit_news(latest_period: str, results: dict[str, int]) -> None:
     the same month no-op; a new month creates a new row).
     """
     import os
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     if not os.environ.get("DATABASE_URL"):
         print("[kaffeesteuer-news] DATABASE_URL unset — skipping news_feed upsert")
@@ -192,7 +192,7 @@ def _emit_news(latest_period: str, results: dict[str, int]) -> None:
         "lng":      10.452,
         "tags":     ["kaffeesteuer", "germany", "demand", "auto-commentary"],
         "meta":     json.dumps(meta_obj, ensure_ascii=False),
-        "pub_date": datetime.now(timezone.utc),
+        "pub_date": datetime.now(UTC),
     }
     db = get_session()
     try:
