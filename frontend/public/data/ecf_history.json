@@ -72,7 +72,9 @@
         "Le Havre": 437717,
         "Trieste": 678642,
         "Antwerp": 92550
-      }
+      },
+      "cert_eu_robusta_mt": 30020,
+      "cert_eu_arabica_mt": 122256
     },
     {
       "period": "2014-01",
@@ -86,7 +88,9 @@
         "Le Havre": 491567,
         "Trieste": 655981,
         "Antwerp": 75600
-      }
+      },
+      "cert_eu_robusta_mt": 27770,
+      "cert_eu_arabica_mt": 119280
     },
     {
       "period": "2014-02",
@@ -98,7 +102,9 @@
         "Le Havre": 418950,
         "Trieste": 683604,
         "Antwerp": 5117
-      }
+      },
+      "cert_eu_robusta_mt": 24180,
+      "cert_eu_arabica_mt": 116687
     },
     {
       "period": "2014-03",
@@ -112,7 +118,9 @@
         "Le Havre": 435817,
         "Trieste": 690263,
         "Antwerp": 291783
-      }
+      },
+      "cert_eu_robusta_mt": 18330,
+      "cert_eu_arabica_mt": 115388
     },
     {
       "period": "2014-04",
@@ -124,7 +132,9 @@
         "Le Havre": 459417,
         "Trieste": 707225,
         "Antwerp": 612183
-      }
+      },
+      "cert_eu_robusta_mt": 16170,
+      "cert_eu_arabica_mt": 114825
     },
     {
       "period": "2014-05",
@@ -138,7 +148,9 @@
         "Le Havre": 482817,
         "Trieste": 734078,
         "Antwerp": 242733
-      }
+      },
+      "cert_eu_robusta_mt": 50760,
+      "cert_eu_arabica_mt": 113202
     },
     {
       "period": "2014-06",
@@ -152,7 +164,9 @@
         "Le Havre": 493467,
         "Trieste": 670007,
         "Antwerp": 371917
-      }
+      },
+      "cert_eu_robusta_mt": 66410,
+      "cert_eu_arabica_mt": 110170
     },
     {
       "period": "2014-07",
@@ -166,7 +180,9 @@
         "Le Havre": 500667,
         "Trieste": 717020,
         "Antwerp": 3850
-      }
+      },
+      "cert_eu_robusta_mt": 75900,
+      "cert_eu_arabica_mt": 108635
     },
     {
       "period": "2014-08",
@@ -180,7 +196,9 @@
         "Le Havre": 557167,
         "Trieste": 771202,
         "Antwerp": 418033
-      }
+      },
+      "cert_eu_robusta_mt": 84100,
+      "cert_eu_arabica_mt": 106713
     },
     {
       "period": "2014-09",
@@ -194,7 +212,9 @@
         "Le Havre": 545467,
         "Trieste": 754170,
         "Antwerp": 47383
-      }
+      },
+      "cert_eu_robusta_mt": 111670,
+      "cert_eu_arabica_mt": 104697
     },
     {
       "period": "2014-10",
@@ -206,7 +226,9 @@
         "Le Havre": 495483,
         "Trieste": 718526,
         "Antwerp": 152325
-      }
+      },
+      "cert_eu_robusta_mt": 120420,
+      "cert_eu_arabica_mt": 103926
     },
     {
       "period": "2014-11",
@@ -218,7 +240,9 @@
         "Le Havre": 495483,
         "Trieste": 718526,
         "Antwerp": 152325
-      }
+      },
+      "cert_eu_robusta_mt": 123960,
+      "cert_eu_arabica_mt": 102710
     },
     {
       "period": "2014-12",
@@ -232,7 +256,9 @@
         "Trieste": 46749,
         "Hamburg": 109791,
         "Antwerp": 363040
-      }
+      },
+      "cert_eu_robusta_mt": 126580,
+      "cert_eu_arabica_mt": 102061
     },
     {
       "period": "2015-01",
@@ -246,7 +272,9 @@
         "Genoa": 63572,
         "Le Havre": 32405,
         "Trieste": 43886
-      }
+      },
+      "cert_eu_robusta_mt": 140260,
+      "cert_eu_arabica_mt": 100169
     },
     {
       "period": "2015-02",
@@ -260,7 +288,9 @@
         "Genoa": 63572,
         "Le Havre": 29700,
         "Trieste": 42350
-      }
+      },
+      "cert_eu_robusta_mt": 152440,
+      "cert_eu_arabica_mt": 99266
     },
     {
       "period": "2015-03",
@@ -274,7 +304,9 @@
         "Genoa": 63572,
         "Le Havre": 29220,
         "Trieste": 43758
-      }
+      },
+      "cert_eu_robusta_mt": 169890,
+      "cert_eu_arabica_mt": 96794
     },
     {
       "period": "2015-04",
@@ -288,7 +320,9 @@
         "Genoa": 63572,
         "Le Havre": 28668,
         "Trieste": 41478
-      }
+      },
+      "cert_eu_robusta_mt": 175490,
+      "cert_eu_arabica_mt": 92294
     },
     {
       "period": "2015-05",
@@ -302,7 +336,9 @@
         "Genoa": 63572,
         "Le Havre": 28965,
         "Trieste": 41410
-      }
+      },
+      "cert_eu_robusta_mt": 180520,
+      "cert_eu_arabica_mt": 86711
     },
     {
       "period": "2015-06",
@@ -316,7 +352,9 @@
         "Genoa": 63572,
         "Le Havre": 32062,
         "Trieste": 43214
-      }
+      },
+      "cert_eu_robusta_mt": 186640,
+      "cert_eu_arabica_mt": 87374
     },
     {
       "period": "2015-07",
@@ -330,7 +368,9 @@
         "Genoa": 63572,
         "Le Havre": 33231,
         "Trieste": 41854
-      }
+      },
+      "cert_eu_robusta_mt": 198780,
+      "cert_eu_arabica_mt": 86373
     },
     {
       "period": "2015-08",
@@ -344,7 +384,9 @@
         "Genoa": 63572,
         "Le Havre": 33073,
         "Trieste": 43060
-      }
+      },
+      "cert_eu_robusta_mt": 201790,
+      "cert_eu_arabica_mt": 86319
     },
     {
       "period": "2015-09",
@@ -358,7 +400,9 @@
         "Genoa": 63572,
         "Le Havre": 31664,
         "Trieste": 43060
-      }
+      },
+      "cert_eu_robusta_mt": 201330,
+      "cert_eu_arabica_mt": 82189
     },
     {
       "period": "2015-10",
@@ -372,7 +416,9 @@
         "Genoa": 81807,
         "Le Havre": 31294,
         "Trieste": 35038
-      }
+      },
+      "cert_eu_robusta_mt": 197760,
+      "cert_eu_arabica_mt": 79545
     },
     {
       "period": "2015-11",
@@ -386,7 +432,9 @@
         "Genoa": 77262,
         "Le Havre": 28842,
         "Trieste": 42522
-      }
+      },
+      "cert_eu_robusta_mt": 197310,
+      "cert_eu_arabica_mt": 77133
     },
     {
       "period": "2015-12",
@@ -400,7 +448,9 @@
         "Genoa": 88755,
         "Le Havre": 30399,
         "Trieste": 44260
-      }
+      },
+      "cert_eu_robusta_mt": 194800,
+      "cert_eu_arabica_mt": 72856
     },
     {
       "period": "2016-01",
@@ -414,7 +464,9 @@
         "Genoa": 82256,
         "Le Havre": 32405,
         "Trieste": 44081
-      }
+      },
+      "cert_eu_robusta_mt": 190780,
+      "cert_eu_arabica_mt": 68691
     },
     {
       "period": "2016-02",
@@ -428,7 +480,9 @@
         "Genoa": 85479,
         "Le Havre": 31189,
         "Trieste": 43454
-      }
+      },
+      "cert_eu_robusta_mt": 180570,
+      "cert_eu_arabica_mt": 66335
     },
     {
       "period": "2016-03",
@@ -442,7 +496,9 @@
         "Genoa": 87174,
         "Le Havre": 29201,
         "Trieste": 42141
-      }
+      },
+      "cert_eu_robusta_mt": 172690,
+      "cert_eu_arabica_mt": 61800
     },
     {
       "period": "2016-04",
@@ -456,7 +512,9 @@
         "Genoa": 99314,
         "Le Havre": 27565,
         "Trieste": 47105
-      }
+      },
+      "cert_eu_robusta_mt": 164940,
+      "cert_eu_arabica_mt": 59904
     },
     {
       "period": "2016-05",
@@ -470,7 +528,9 @@
         "Genoa": 108093,
         "Le Havre": 30772,
         "Trieste": 49236
-      }
+      },
+      "cert_eu_robusta_mt": 155430,
+      "cert_eu_arabica_mt": 56636
     },
     {
       "period": "2016-06",
@@ -484,7 +544,9 @@
         "Genoa": 116483,
         "Le Havre": 33802,
         "Trieste": 48559
-      }
+      },
+      "cert_eu_robusta_mt": 149380,
+      "cert_eu_arabica_mt": 56684
     },
     {
       "period": "2016-07",
@@ -498,7 +560,9 @@
         "Genoa": 105546,
         "Le Havre": 35205,
         "Trieste": 49277
-      }
+      },
+      "cert_eu_robusta_mt": 144830,
+      "cert_eu_arabica_mt": 55112
     },
     {
       "period": "2016-08",
@@ -512,7 +576,9 @@
         "Genoa": 103603,
         "Le Havre": 36146,
         "Trieste": 50072
-      }
+      },
+      "cert_eu_robusta_mt": 141620,
+      "cert_eu_arabica_mt": 54618
     },
     {
       "period": "2016-09",
@@ -526,7 +592,9 @@
         "Genoa": 106655,
         "Le Havre": 35695,
         "Trieste": 48906
-      }
+      },
+      "cert_eu_robusta_mt": 138180,
+      "cert_eu_arabica_mt": 53740
     },
     {
       "period": "2016-10",
@@ -540,7 +608,9 @@
         "Genoa": 108207,
         "Le Havre": 35480,
         "Trieste": 47291
-      }
+      },
+      "cert_eu_robusta_mt": 136700,
+      "cert_eu_arabica_mt": 53493
     },
     {
       "period": "2016-11",
@@ -554,7 +624,9 @@
         "Genoa": 99933,
         "Le Havre": 34072,
         "Trieste": 48905
-      }
+      },
+      "cert_eu_robusta_mt": 141710,
+      "cert_eu_arabica_mt": 52952
     },
     {
       "period": "2016-12",
@@ -568,7 +640,9 @@
         "Genoa": 98619,
         "Le Havre": 34334,
         "Trieste": 51539
-      }
+      },
+      "cert_eu_robusta_mt": 143480,
+      "cert_eu_arabica_mt": 51963
     },
     {
       "period": "2017-01",
@@ -581,7 +655,9 @@
         "Genoa": 95587,
         "Le Havre": 34453,
         "Trieste": 52328
-      }
+      },
+      "cert_eu_robusta_mt": 160470,
+      "cert_eu_arabica_mt": 52927
     },
     {
       "period": "2017-02",
@@ -594,7 +670,9 @@
         "Genoa": 92688,
         "Le Havre": 31943,
         "Trieste": 53194
-      }
+      },
+      "cert_eu_robusta_mt": 164530,
+      "cert_eu_arabica_mt": 54643
     },
     {
       "period": "2017-03",
@@ -607,7 +685,9 @@
         "Genoa": 93070,
         "Le Havre": 33187,
         "Trieste": 55657
-      }
+      },
+      "cert_eu_robusta_mt": 168290,
+      "cert_eu_arabica_mt": 55248
     },
     {
       "period": "2017-04",
@@ -620,7 +700,9 @@
         "Genoa": 106488,
         "Le Havre": 31669,
         "Trieste": 54101
-      }
+      },
+      "cert_eu_robusta_mt": 170110,
+      "cert_eu_arabica_mt": 56985
     },
     {
       "period": "2017-05",
@@ -633,7 +715,9 @@
         "Genoa": 109531,
         "Le Havre": 31216,
         "Trieste": 56775
-      }
+      },
+      "cert_eu_robusta_mt": 168010,
+      "cert_eu_arabica_mt": 60535
     },
     {
       "period": "2017-06",
@@ -646,7 +730,9 @@
         "Genoa": 111386,
         "Le Havre": 33073,
         "Trieste": 56427
-      }
+      },
+      "cert_eu_robusta_mt": 163870,
+      "cert_eu_arabica_mt": 63312
     },
     {
       "period": "2017-07",
@@ -659,7 +745,9 @@
         "Genoa": 111106,
         "Le Havre": 32775,
         "Trieste": 55619
-      }
+      },
+      "cert_eu_robusta_mt": 154050,
+      "cert_eu_arabica_mt": 66507
     },
     {
       "period": "2017-08",
@@ -672,7 +760,9 @@
         "Genoa": 109522,
         "Le Havre": 33711,
         "Trieste": 56982
-      }
+      },
+      "cert_eu_robusta_mt": 145960,
+      "cert_eu_arabica_mt": 75748
     },
     {
       "period": "2017-09",
@@ -685,7 +775,9 @@
         "Genoa": 112166,
         "Le Havre": 38995,
         "Trieste": 55268
-      }
+      },
+      "cert_eu_robusta_mt": 141690,
+      "cert_eu_arabica_mt": 81147
     },
     {
       "period": "2017-10",
@@ -698,7 +790,9 @@
         "Genoa": 108882,
         "Le Havre": 31239,
         "Trieste": 53658
-      }
+      },
+      "cert_eu_robusta_mt": 128720,
+      "cert_eu_arabica_mt": 84698
     },
     {
       "period": "2017-11",
@@ -711,7 +805,9 @@
         "Genoa": 100826,
         "Le Havre": 28819,
         "Trieste": 51673
-      }
+      },
+      "cert_eu_robusta_mt": 128160,
+      "cert_eu_arabica_mt": 85034
     },
     {
       "period": "2017-12",
@@ -725,7 +821,9 @@
         "Le Havre": 28482,
         "Trieste": 48326,
         "Barcelona": 43365
-      }
+      },
+      "cert_eu_robusta_mt": 121040,
+      "cert_eu_arabica_mt": 87557
     },
     {
       "period": "2018-01",
@@ -739,7 +837,9 @@
         "Le Havre": 28396,
         "Trieste": 44784,
         "Barcelona": 43173
-      }
+      },
+      "cert_eu_robusta_mt": 103650,
+      "cert_eu_arabica_mt": 87669
     },
     {
       "period": "2018-02",
@@ -753,7 +853,9 @@
         "Le Havre": 26409,
         "Trieste": 43245,
         "Barcelona": 43535
-      }
+      },
+      "cert_eu_robusta_mt": 88690,
+      "cert_eu_arabica_mt": 86878
     },
     {
       "period": "2018-03",
@@ -767,7 +869,9 @@
         "Le Havre": 24248,
         "Trieste": 42758,
         "Barcelona": 43962
-      }
+      },
+      "cert_eu_robusta_mt": 80820,
+      "cert_eu_arabica_mt": 90056
     },
     {
       "period": "2018-04",
@@ -781,7 +885,9 @@
         "Le Havre": 26741,
         "Trieste": 46518,
         "Barcelona": 42697
-      }
+      },
+      "cert_eu_robusta_mt": 76690,
+      "cert_eu_arabica_mt": 92776
     },
     {
       "period": "2018-05",
@@ -795,7 +901,9 @@
         "Le Havre": 26669,
         "Trieste": 48215,
         "Barcelona": 44830
-      }
+      },
+      "cert_eu_robusta_mt": 77980,
+      "cert_eu_arabica_mt": 94897
     },
     {
       "period": "2018-06",
@@ -809,7 +917,9 @@
         "Le Havre": 28854,
         "Trieste": 48328,
         "Barcelona": 49411
-      }
+      },
+      "cert_eu_robusta_mt": 64250,
+      "cert_eu_arabica_mt": 97751
     },
     {
       "period": "2018-07",
@@ -823,7 +933,9 @@
         "Le Havre": 31231,
         "Trieste": 45870,
         "Barcelona": 55197
-      }
+      },
+      "cert_eu_robusta_mt": 72800,
+      "cert_eu_arabica_mt": 98341
     },
     {
       "period": "2018-08",
@@ -837,7 +949,9 @@
         "Le Havre": 32584,
         "Trieste": 47843,
         "Barcelona": 52700
-      }
+      },
+      "cert_eu_robusta_mt": 74320,
+      "cert_eu_arabica_mt": 108580
     },
     {
       "period": "2018-09",
@@ -851,7 +965,9 @@
         "Le Havre": 29903,
         "Trieste": 47096,
         "Barcelona": 46793
-      }
+      },
+      "cert_eu_robusta_mt": 88280,
+      "cert_eu_arabica_mt": 118846
     },
     {
       "period": "2018-10",
@@ -865,7 +981,9 @@
         "Le Havre": 28489,
         "Trieste": 44252,
         "Barcelona": 43875
-      }
+      },
+      "cert_eu_robusta_mt": 92540,
+      "cert_eu_arabica_mt": 123167
     },
     {
       "period": "2018-11",
@@ -879,7 +997,9 @@
         "Le Havre": 27814,
         "Trieste": 41971,
         "Barcelona": 41853
-      }
+      },
+      "cert_eu_robusta_mt": 99840,
+      "cert_eu_arabica_mt": 124249
     },
     {
       "period": "2018-12",
@@ -893,7 +1013,9 @@
         "Le Havre": 27684,
         "Trieste": 41122,
         "Barcelona": 42919
-      }
+      },
+      "cert_eu_robusta_mt": 110720,
+      "cert_eu_arabica_mt": 125154
     },
     {
       "period": "2019-01",
@@ -907,7 +1029,9 @@
         "Le Havre": 27452,
         "Trieste": 45261,
         "Barcelona": 43650
-      }
+      },
+      "cert_eu_robusta_mt": 123980,
+      "cert_eu_arabica_mt": 126982
     },
     {
       "period": "2019-02",
@@ -921,7 +1045,9 @@
         "Le Havre": 26657,
         "Trieste": 43504,
         "Barcelona": 46087
-      }
+      },
+      "cert_eu_robusta_mt": 118710,
+      "cert_eu_arabica_mt": 127123
     },
     {
       "period": "2019-03",
@@ -935,7 +1061,9 @@
         "Le Havre": 27344,
         "Trieste": 44246,
         "Barcelona": 40988
-      }
+      },
+      "cert_eu_robusta_mt": 116410,
+      "cert_eu_arabica_mt": 128238
     },
     {
       "period": "2019-04",
@@ -949,7 +1077,9 @@
         "Le Havre": 28333,
         "Trieste": 47769,
         "Barcelona": 40000
-      }
+      },
+      "cert_eu_robusta_mt": 117090,
+      "cert_eu_arabica_mt": 125516
     },
     {
       "period": "2019-05",
@@ -963,7 +1093,9 @@
         "Le Havre": 28548,
         "Trieste": 49926,
         "Barcelona": 37632
-      }
+      },
+      "cert_eu_robusta_mt": 124210,
+      "cert_eu_arabica_mt": 123530
     },
     {
       "period": "2019-06",
@@ -977,7 +1109,9 @@
         "Le Havre": 31598,
         "Trieste": 53678,
         "Barcelona": 35910
-      }
+      },
+      "cert_eu_robusta_mt": 129680,
+      "cert_eu_arabica_mt": 122679
     },
     {
       "period": "2019-07",
@@ -991,7 +1125,9 @@
         "Le Havre": 32634,
         "Trieste": 55205,
         "Barcelona": 38671
-      }
+      },
+      "cert_eu_robusta_mt": 145600,
+      "cert_eu_arabica_mt": 122635
     },
     {
       "period": "2019-08",
@@ -1004,7 +1140,9 @@
         "Le Havre": 32870,
         "Trieste": 58736,
         "Barcelona": 41837
-      }
+      },
+      "cert_eu_robusta_mt": 153030,
+      "cert_eu_arabica_mt": 121686
     },
     {
       "period": "2019-09",
@@ -1017,7 +1155,9 @@
         "Le Havre": 32568,
         "Trieste": 56555,
         "Barcelona": 45449
-      }
+      },
+      "cert_eu_robusta_mt": 153870,
+      "cert_eu_arabica_mt": 118954
     },
     {
       "period": "2019-10",
@@ -1030,7 +1170,9 @@
         "Le Havre": 29777,
         "Trieste": 54704,
         "Barcelona": 44660
-      }
+      },
+      "cert_eu_robusta_mt": 157630,
+      "cert_eu_arabica_mt": 117588
     },
     {
       "period": "2019-11",
@@ -1043,7 +1185,9 @@
         "Le Havre": 27778,
         "Trieste": 53516,
         "Barcelona": 40574
-      }
+      },
+      "cert_eu_robusta_mt": 152950,
+      "cert_eu_arabica_mt": 111380
     },
     {
       "period": "2019-12",
@@ -1059,7 +1203,9 @@
       },
       "robusta_mt": 312468,
       "arabica_unwashed_mt": 202536,
-      "arabica_washed_mt": 292383
+      "arabica_washed_mt": 292383,
+      "cert_eu_robusta_mt": 150040,
+      "cert_eu_arabica_mt": 107965
     },
     {
       "period": "2020-01",
@@ -1068,7 +1214,9 @@
       "value_raw": 13456450,
       "robusta_mt": 312468,
       "arabica_unwashed_mt": 202536,
-      "arabica_washed_mt": 292383
+      "arabica_washed_mt": 292383,
+      "cert_eu_robusta_mt": 142960,
+      "cert_eu_arabica_mt": 116667
     },
     {
       "period": "2020-02",
@@ -1077,7 +1225,9 @@
       "value_raw": 13293017,
       "robusta_mt": 308197,
       "arabica_unwashed_mt": 202652,
-      "arabica_washed_mt": 286733
+      "arabica_washed_mt": 286733,
+      "cert_eu_robusta_mt": 149660,
+      "cert_eu_arabica_mt": 115016
     },
     {
       "period": "2020-03",
@@ -1086,7 +1236,9 @@
       "value_raw": 12936983,
       "robusta_mt": 303213,
       "arabica_unwashed_mt": 190341,
-      "arabica_washed_mt": 282664
+      "arabica_washed_mt": 282664,
+      "cert_eu_robusta_mt": 143410,
+      "cert_eu_arabica_mt": 107399
     },
     {
       "period": "2020-04",
@@ -1095,7 +1247,9 @@
       "value_raw": 13402867,
       "robusta_mt": 316309,
       "arabica_unwashed_mt": 200478,
-      "arabica_washed_mt": 287385
+      "arabica_washed_mt": 287385,
+      "cert_eu_robusta_mt": 133390,
+      "cert_eu_arabica_mt": 98906
     },
     {
       "period": "2020-05",
@@ -1104,7 +1258,9 @@
       "value_raw": 13677750,
       "robusta_mt": 339257,
       "arabica_unwashed_mt": 185677,
-      "arabica_washed_mt": 295731
+      "arabica_washed_mt": 295731,
+      "cert_eu_robusta_mt": 124950,
+      "cert_eu_arabica_mt": 96111
     },
     {
       "period": "2020-06",
@@ -1113,7 +1269,9 @@
       "value_raw": 14624483,
       "robusta_mt": 347673,
       "arabica_unwashed_mt": 221546,
-      "arabica_washed_mt": 308250
+      "arabica_washed_mt": 308250,
+      "cert_eu_robusta_mt": 116170,
+      "cert_eu_arabica_mt": 92084
     },
     {
       "period": "2020-07",
@@ -1122,7 +1280,9 @@
       "value_raw": 15105617,
       "robusta_mt": 363538,
       "arabica_unwashed_mt": 225359,
-      "arabica_washed_mt": 317441
+      "arabica_washed_mt": 317441,
+      "cert_eu_robusta_mt": 110710,
+      "cert_eu_arabica_mt": 90076
     },
     {
       "period": "2020-08",
@@ -1131,7 +1291,9 @@
       "value_raw": 15444183,
       "robusta_mt": 368116,
       "arabica_unwashed_mt": 237760,
-      "arabica_washed_mt": 320775
+      "arabica_washed_mt": 320775,
+      "cert_eu_robusta_mt": 109440,
+      "cert_eu_arabica_mt": 69474
     },
     {
       "period": "2020-09",
@@ -1140,7 +1302,9 @@
       "value_raw": 15038300,
       "robusta_mt": 357174,
       "arabica_unwashed_mt": 229598,
-      "arabica_washed_mt": 315525
+      "arabica_washed_mt": 315525,
+      "cert_eu_robusta_mt": 109010,
+      "cert_eu_arabica_mt": 61882
     },
     {
       "period": "2020-10",
@@ -1149,7 +1313,9 @@
       "value_raw": 15076383,
       "robusta_mt": 358507,
       "arabica_unwashed_mt": 241409,
-      "arabica_washed_mt": 304667
+      "arabica_washed_mt": 304667,
+      "cert_eu_robusta_mt": 124230,
+      "cert_eu_arabica_mt": 64832
     },
     {
       "period": "2020-11",
@@ -1158,7 +1324,9 @@
       "value_raw": 15006883,
       "robusta_mt": 359790,
       "arabica_unwashed_mt": 245745,
-      "arabica_washed_mt": 294879
+      "arabica_washed_mt": 294879,
+      "cert_eu_robusta_mt": 132690,
+      "cert_eu_arabica_mt": 69821
     },
     {
       "period": "2020-12",
@@ -1167,7 +1335,9 @@
       "value_raw": 15162050,
       "robusta_mt": 350548,
       "arabica_unwashed_mt": 260081,
-      "arabica_washed_mt": 299095
+      "arabica_washed_mt": 299095,
+      "cert_eu_robusta_mt": 137740,
+      "cert_eu_arabica_mt": 80151
     },
     {
       "period": "2021-01",
@@ -1176,7 +1346,9 @@
       "value_raw": 14842717,
       "robusta_mt": 346220,
       "arabica_unwashed_mt": 248114,
-      "arabica_washed_mt": 296229
+      "arabica_washed_mt": 296229,
+      "cert_eu_robusta_mt": 141690,
+      "cert_eu_arabica_mt": 92251
     },
     {
       "period": "2021-02",
@@ -1185,7 +1357,9 @@
       "value_raw": 14609833,
       "robusta_mt": 334659,
       "arabica_unwashed_mt": 252085,
-      "arabica_washed_mt": 289847
+      "arabica_washed_mt": 289847,
+      "cert_eu_robusta_mt": 143980,
+      "cert_eu_arabica_mt": 100510
     },
     {
       "period": "2021-03",
@@ -1194,7 +1368,9 @@
       "value_raw": 14412333,
       "robusta_mt": 322843,
       "arabica_unwashed_mt": 255007,
-      "arabica_washed_mt": 286891
+      "arabica_washed_mt": 286891,
+      "cert_eu_robusta_mt": 147720,
+      "cert_eu_arabica_mt": 104979
     },
     {
       "period": "2021-04",
@@ -1203,7 +1379,9 @@
       "value_raw": 14472050,
       "robusta_mt": 320617,
       "arabica_unwashed_mt": 262306,
-      "arabica_washed_mt": 285400
+      "arabica_washed_mt": 285400,
+      "cert_eu_robusta_mt": 152150,
+      "cert_eu_arabica_mt": 110628
     },
     {
       "period": "2021-05",
@@ -1212,7 +1390,9 @@
       "value_raw": 14552950,
       "robusta_mt": 322903,
       "arabica_unwashed_mt": 261971,
-      "arabica_washed_mt": 288303
+      "arabica_washed_mt": 288303,
+      "cert_eu_robusta_mt": 157270,
+      "cert_eu_arabica_mt": 116019
     },
     {
       "period": "2021-06",
@@ -1221,7 +1401,9 @@
       "value_raw": 14442300,
       "robusta_mt": 314747,
       "arabica_unwashed_mt": 261571,
-      "arabica_washed_mt": 290220
+      "arabica_washed_mt": 290220,
+      "cert_eu_robusta_mt": 149590,
+      "cert_eu_arabica_mt": 122980
     },
     {
       "period": "2021-07",
@@ -1230,7 +1412,9 @@
       "value_raw": 14309517,
       "robusta_mt": 305627,
       "arabica_unwashed_mt": 256111,
-      "arabica_washed_mt": 296833
+      "arabica_washed_mt": 296833,
+      "cert_eu_robusta_mt": 144180,
+      "cert_eu_arabica_mt": 122406
     },
     {
       "period": "2021-08",
@@ -1239,7 +1423,9 @@
       "value_raw": 14124900,
       "robusta_mt": 297656,
       "arabica_unwashed_mt": 247685,
-      "arabica_washed_mt": 302152
+      "arabica_washed_mt": 302152,
+      "cert_eu_robusta_mt": 137570,
+      "cert_eu_arabica_mt": 122408
     },
     {
       "period": "2021-09",
@@ -1248,7 +1434,9 @@
       "value_raw": 13767917,
       "robusta_mt": 290077,
       "arabica_unwashed_mt": 233547,
-      "arabica_washed_mt": 302452
+      "arabica_washed_mt": 302452,
+      "cert_eu_robusta_mt": 122900,
+      "cert_eu_arabica_mt": 117915
     },
     {
       "period": "2021-10",
@@ -1257,7 +1445,9 @@
       "value_raw": 13321800,
       "robusta_mt": 285785,
       "arabica_unwashed_mt": 222090,
-      "arabica_washed_mt": 291433
+      "arabica_washed_mt": 291433,
+      "cert_eu_robusta_mt": 116610,
+      "cert_eu_arabica_mt": 107797
     },
     {
       "period": "2021-11",
@@ -1266,7 +1456,9 @@
       "value_raw": 12340483,
       "robusta_mt": 264697,
       "arabica_unwashed_mt": 212488,
-      "arabica_washed_mt": 263244
+      "arabica_washed_mt": 263244,
+      "cert_eu_robusta_mt": 105530,
+      "cert_eu_arabica_mt": 91725
     },
     {
       "period": "2021-12",
@@ -1275,7 +1467,9 @@
       "value_raw": 12040667,
       "robusta_mt": 259942,
       "arabica_unwashed_mt": 215013,
-      "arabica_washed_mt": 247486
+      "arabica_washed_mt": 247486,
+      "cert_eu_robusta_mt": 98460,
+      "cert_eu_arabica_mt": 88764
     },
     {
       "period": "2022-01",
@@ -1284,7 +1478,9 @@
       "value_raw": 11816467,
       "robusta_mt": 251299,
       "arabica_unwashed_mt": 215603,
-      "arabica_washed_mt": 242087
+      "arabica_washed_mt": 242087,
+      "cert_eu_robusta_mt": 93770,
+      "cert_eu_arabica_mt": 69494
     },
     {
       "period": "2022-02",
@@ -1293,7 +1489,9 @@
       "value_raw": 11857733,
       "robusta_mt": 248039,
       "arabica_unwashed_mt": 221337,
-      "arabica_washed_mt": 242087
+      "arabica_washed_mt": 242087,
+      "cert_eu_robusta_mt": 92040,
+      "cert_eu_arabica_mt": 55929
     },
     {
       "period": "2022-03",
@@ -1302,7 +1500,9 @@
       "value_raw": 11918533,
       "robusta_mt": 245923,
       "arabica_unwashed_mt": 221834,
-      "arabica_washed_mt": 247355
+      "arabica_washed_mt": 247355,
+      "cert_eu_robusta_mt": 95390,
+      "cert_eu_arabica_mt": 61607
     },
     {
       "period": "2022-04",
@@ -1311,7 +1511,9 @@
       "value_raw": 12447667,
       "robusta_mt": 260969,
       "arabica_unwashed_mt": 230687,
-      "arabica_washed_mt": 255204
+      "arabica_washed_mt": 255204,
+      "cert_eu_robusta_mt": 92090,
+      "cert_eu_arabica_mt": 64109
     },
     {
       "period": "2022-05",
@@ -1320,7 +1522,9 @@
       "value_raw": 13345883,
       "robusta_mt": 300733,
       "arabica_unwashed_mt": 238695,
-      "arabica_washed_mt": 261325
+      "arabica_washed_mt": 261325,
+      "cert_eu_robusta_mt": 101250,
+      "cert_eu_arabica_mt": 60857
     },
     {
       "period": "2022-06",
@@ -1329,7 +1533,9 @@
       "value_raw": 13630617,
       "robusta_mt": 315637,
       "arabica_unwashed_mt": 237954,
-      "arabica_washed_mt": 264246
+      "arabica_washed_mt": 264246,
+      "cert_eu_robusta_mt": 108300,
+      "cert_eu_arabica_mt": 50456
     },
     {
       "period": "2022-07",
@@ -1338,7 +1544,9 @@
       "value_raw": 13878783,
       "robusta_mt": 334174,
       "arabica_unwashed_mt": 226582,
-      "arabica_washed_mt": 271972
+      "arabica_washed_mt": 271972,
+      "cert_eu_robusta_mt": 102870,
+      "cert_eu_arabica_mt": 38639
     },
     {
       "period": "2022-08",
@@ -1347,7 +1555,9 @@
       "value_raw": 13979933,
       "robusta_mt": 334319,
       "arabica_unwashed_mt": 249301,
-      "arabica_washed_mt": 255176
+      "arabica_washed_mt": 255176,
+      "cert_eu_robusta_mt": 94750,
+      "cert_eu_arabica_mt": 38078
     },
     {
       "period": "2022-09",
@@ -1356,7 +1566,9 @@
       "value_raw": 14009617,
       "robusta_mt": 325217,
       "arabica_unwashed_mt": 234679,
-      "arabica_washed_mt": 280681
+      "arabica_washed_mt": 280681,
+      "cert_eu_robusta_mt": 94210,
+      "cert_eu_arabica_mt": 22315
     },
     {
       "period": "2022-10",
@@ -1365,7 +1577,9 @@
       "value_raw": 13857133,
       "robusta_mt": 317554,
       "arabica_unwashed_mt": 234543,
-      "arabica_washed_mt": 279330
+      "arabica_washed_mt": 279330,
+      "cert_eu_robusta_mt": 90230,
+      "cert_eu_arabica_mt": 19891
     },
     {
       "period": "2022-11",
@@ -1374,7 +1588,9 @@
       "value_raw": 13140983,
       "robusta_mt": 287700,
       "arabica_unwashed_mt": 235690,
-      "arabica_washed_mt": 265068
+      "arabica_washed_mt": 265068,
+      "cert_eu_robusta_mt": 85260,
+      "cert_eu_arabica_mt": 32388
     },
     {
       "period": "2022-12",
@@ -1383,7 +1599,9 @@
       "value_raw": 12855500,
       "robusta_mt": 273753,
       "arabica_unwashed_mt": 245811,
-      "arabica_washed_mt": 251766
+      "arabica_washed_mt": 251766,
+      "cert_eu_robusta_mt": 64260,
+      "cert_eu_arabica_mt": 46005
     },
     {
       "period": "2023-01",
@@ -1392,7 +1610,9 @@
       "value_raw": 11724633,
       "robusta_mt": 256216,
       "arabica_unwashed_mt": 237957,
-      "arabica_washed_mt": 209305
+      "arabica_washed_mt": 209305,
+      "cert_eu_robusta_mt": 61760,
+      "cert_eu_arabica_mt": 49088
     },
     {
       "period": "2023-02",
@@ -1401,7 +1621,9 @@
       "value_raw": 11357283,
       "robusta_mt": 249354,
       "arabica_unwashed_mt": 230263,
-      "arabica_washed_mt": 201820
+      "arabica_washed_mt": 201820,
+      "cert_eu_robusta_mt": 70120,
+      "cert_eu_arabica_mt": 44906
     },
     {
       "period": "2023-03",
@@ -1410,7 +1632,9 @@
       "value_raw": 11066367,
       "robusta_mt": 242327,
       "arabica_unwashed_mt": 213143,
-      "arabica_washed_mt": 208512
+      "arabica_washed_mt": 208512,
+      "cert_eu_robusta_mt": 75310,
+      "cert_eu_arabica_mt": 43046
     },
     {
       "period": "2023-04",
@@ -1419,7 +1643,9 @@
       "value_raw": 11189833,
       "robusta_mt": 268182,
       "arabica_unwashed_mt": 204447,
-      "arabica_washed_mt": 198761
+      "arabica_washed_mt": 198761,
+      "cert_eu_robusta_mt": 78690,
+      "cert_eu_arabica_mt": 39463
     },
     {
       "period": "2023-05",
@@ -1428,7 +1654,9 @@
       "value_raw": 11147233,
       "robusta_mt": 278022,
       "arabica_unwashed_mt": 193703,
-      "arabica_washed_mt": 197109
+      "arabica_washed_mt": 197109,
+      "cert_eu_robusta_mt": 81410,
+      "cert_eu_arabica_mt": 34223
     },
     {
       "period": "2023-06",
@@ -1437,7 +1665,9 @@
       "value_raw": 11564183,
       "robusta_mt": 277261,
       "arabica_unwashed_mt": 181182,
-      "arabica_washed_mt": 235408
+      "arabica_washed_mt": 235408,
+      "cert_eu_robusta_mt": 73900,
+      "cert_eu_arabica_mt": 32296
     },
     {
       "period": "2023-07",
@@ -1446,7 +1676,9 @@
       "value_raw": 10849083,
       "robusta_mt": 259807,
       "arabica_unwashed_mt": 160065,
-      "arabica_washed_mt": 231073
+      "arabica_washed_mt": 231073,
+      "cert_eu_robusta_mt": 51830,
+      "cert_eu_arabica_mt": 31166
     },
     {
       "period": "2023-08",
@@ -1455,7 +1687,9 @@
       "value_raw": 10227650,
       "robusta_mt": 237112,
       "arabica_unwashed_mt": 150207,
-      "arabica_washed_mt": 226339
+      "arabica_washed_mt": 226339,
+      "cert_eu_robusta_mt": 33630,
+      "cert_eu_arabica_mt": 28626
     },
     {
       "period": "2023-09",
@@ -1464,7 +1698,9 @@
       "value_raw": 9313433,
       "robusta_mt": 203552,
       "arabica_unwashed_mt": 139429,
-      "arabica_washed_mt": 215825
+      "arabica_washed_mt": 215825,
+      "cert_eu_robusta_mt": 42660,
+      "cert_eu_arabica_mt": 26086
     },
     {
       "period": "2023-10",
@@ -1473,7 +1709,9 @@
       "value_raw": 8440183,
       "robusta_mt": 178472,
       "arabica_unwashed_mt": 123335,
-      "arabica_washed_mt": 204604
+      "arabica_washed_mt": 204604,
+      "cert_eu_robusta_mt": 39120,
+      "cert_eu_arabica_mt": 23036
     },
     {
       "period": "2023-11",
@@ -1482,7 +1720,9 @@
       "value_raw": 7577317,
       "robusta_mt": 155591,
       "arabica_unwashed_mt": 123343,
-      "arabica_washed_mt": 175705
+      "arabica_washed_mt": 175705,
+      "cert_eu_robusta_mt": 39080,
+      "cert_eu_arabica_mt": 13148
     },
     {
       "period": "2023-12",
@@ -1491,7 +1731,9 @@
       "value_raw": 7284317,
       "robusta_mt": 144559,
       "arabica_unwashed_mt": 129668,
-      "arabica_washed_mt": 162833
+      "arabica_washed_mt": 162833,
+      "cert_eu_robusta_mt": 34380,
+      "cert_eu_arabica_mt": 14746
     },
     {
       "period": "2024-01",
@@ -1500,7 +1742,9 @@
       "value_raw": 6865817,
       "robusta_mt": 124156,
       "arabica_unwashed_mt": 125653,
-      "arabica_washed_mt": 162140
+      "arabica_washed_mt": 162140,
+      "cert_eu_robusta_mt": 28120,
+      "cert_eu_arabica_mt": 14696
     },
     {
       "period": "2024-02",
@@ -1509,7 +1753,9 @@
       "value_raw": 6696450,
       "robusta_mt": 114117,
       "arabica_unwashed_mt": 126150,
-      "arabica_washed_mt": 161520
+      "arabica_washed_mt": 161520,
+      "cert_eu_robusta_mt": 23990,
+      "cert_eu_arabica_mt": 20961
     },
     {
       "period": "2024-03",
@@ -1521,7 +1767,9 @@
       },
       "robusta_mt": 107661,
       "arabica_unwashed_mt": 111371,
-      "arabica_washed_mt": 165208
+      "arabica_washed_mt": 165208,
+      "cert_eu_robusta_mt": 30270,
+      "cert_eu_arabica_mt": 35587
     },
     {
       "period": "2024-04",
@@ -1530,7 +1778,9 @@
       "value_raw": 7081000,
       "robusta_mt": 135387,
       "arabica_unwashed_mt": 119781,
-      "arabica_washed_mt": 169692
+      "arabica_washed_mt": 169692,
+      "cert_eu_robusta_mt": 39250,
+      "cert_eu_arabica_mt": 39475
     },
     {
       "period": "2024-05",
@@ -1539,7 +1789,9 @@
       "value_raw": 8047583,
       "robusta_mt": 174993,
       "arabica_unwashed_mt": 134313,
-      "arabica_washed_mt": 173549
+      "arabica_washed_mt": 173549,
+      "cert_eu_robusta_mt": 46580,
+      "cert_eu_arabica_mt": 46751
     },
     {
       "period": "2024-06",
@@ -1548,7 +1800,9 @@
       "value_raw": 8047583,
       "robusta_mt": 183755,
       "arabica_unwashed_mt": 141523,
-      "arabica_washed_mt": 179368
+      "arabica_washed_mt": 179368,
+      "cert_eu_robusta_mt": 58040,
+      "cert_eu_arabica_mt": 47915
     },
     {
       "period": "2024-07",
@@ -1557,7 +1811,9 @@
       "value_raw": 8702400,
       "robusta_mt": 188544,
       "arabica_unwashed_mt": 146388,
-      "arabica_washed_mt": 187212
+      "arabica_washed_mt": 187212,
+      "cert_eu_robusta_mt": 63180,
+      "cert_eu_arabica_mt": 47957
     },
     {
       "period": "2024-08",
@@ -1566,7 +1822,9 @@
       "value_raw": 8777900,
       "robusta_mt": 192232,
       "arabica_unwashed_mt": 143275,
-      "arabica_washed_mt": 191166
+      "arabica_washed_mt": 191166,
+      "cert_eu_robusta_mt": 60420,
+      "cert_eu_arabica_mt": 49934
     },
     {
       "period": "2024-09",
@@ -1575,7 +1833,9 @@
       "value_raw": 8626200,
       "robusta_mt": 184940,
       "arabica_unwashed_mt": 145470,
-      "arabica_washed_mt": 187162
+      "arabica_washed_mt": 187162,
+      "cert_eu_robusta_mt": 44030,
+      "cert_eu_arabica_mt": 47795
     },
     {
       "period": "2024-10",
@@ -1584,7 +1844,9 @@
       "value_raw": 8646167,
       "robusta_mt": 183322,
       "arabica_unwashed_mt": 149973,
-      "arabica_washed_mt": 185475
+      "arabica_washed_mt": 185475,
+      "cert_eu_robusta_mt": 39040,
+      "cert_eu_arabica_mt": 50040
     },
     {
       "period": "2024-11",
@@ -1593,7 +1855,9 @@
       "value_raw": 8912850,
       "robusta_mt": 187292,
       "arabica_unwashed_mt": 169285,
-      "arabica_washed_mt": 178194
+      "arabica_washed_mt": 178194,
+      "cert_eu_robusta_mt": 38440,
+      "cert_eu_arabica_mt": 53007
     },
     {
       "period": "2024-12",
@@ -1602,7 +1866,9 @@
       "value_raw": 9118733,
       "robusta_mt": 189019,
       "arabica_unwashed_mt": 187289,
-      "arabica_washed_mt": 170817
+      "arabica_washed_mt": 170817,
+      "cert_eu_robusta_mt": 43520,
+      "cert_eu_arabica_mt": 57772
     },
     {
       "period": "2025-01",
@@ -1611,7 +1877,9 @@
       "value_raw": 8056950,
       "robusta_mt": 173748,
       "arabica_unwashed_mt": 152787,
-      "arabica_washed_mt": 156882
+      "arabica_washed_mt": 156882,
+      "cert_eu_robusta_mt": 44600,
+      "cert_eu_arabica_mt": 50793
     },
     {
       "period": "2025-02",
@@ -1620,7 +1888,9 @@
       "value_raw": 7392750,
       "robusta_mt": 152094,
       "arabica_unwashed_mt": 151982,
-      "arabica_washed_mt": 139489
+      "arabica_washed_mt": 139489,
+      "cert_eu_robusta_mt": 42440,
+      "cert_eu_arabica_mt": 46850
     },
     {
       "period": "2025-03",
@@ -1629,7 +1899,9 @@
       "value_raw": 6837317,
       "robusta_mt": 156060,
       "arabica_unwashed_mt": 134596,
-      "arabica_washed_mt": 130066
+      "arabica_washed_mt": 130066,
+      "cert_eu_robusta_mt": 43400,
+      "cert_eu_arabica_mt": 44087
     },
     {
       "period": "2025-04",
@@ -1638,7 +1910,9 @@
       "value_raw": 7073383,
       "robusta_mt": 156060,
       "arabica_unwashed_mt": 134596,
-      "arabica_washed_mt": 133748
+      "arabica_washed_mt": 133748,
+      "cert_eu_robusta_mt": 42200,
+      "cert_eu_arabica_mt": 45155
     },
     {
       "period": "2025-05",
@@ -1648,7 +1922,7 @@
       "robusta_mt": 184870,
       "arabica_unwashed_mt": 137056,
       "arabica_washed_mt": 126167,
-      "cert_eu_robusta_mt": 53870,
+      "cert_eu_robusta_mt": 54040,
       "cert_eu_arabica_mt": 48536
     },
     {
@@ -1659,7 +1933,7 @@
       "robusta_mt": 193509,
       "arabica_unwashed_mt": 140172,
       "arabica_washed_mt": 141235,
-      "cert_eu_robusta_mt": 51530,
+      "cert_eu_robusta_mt": 51690,
       "cert_eu_arabica_mt": 44680
     },
     {
@@ -1670,7 +1944,7 @@
       "robusta_mt": 208387,
       "arabica_unwashed_mt": 134517,
       "arabica_washed_mt": 154141,
-      "cert_eu_robusta_mt": 69890,
+      "cert_eu_robusta_mt": 70050,
       "cert_eu_arabica_mt": 41599
     },
     {
@@ -1681,7 +1955,7 @@
       "robusta_mt": 215348,
       "arabica_unwashed_mt": 136441,
       "arabica_washed_mt": 162873,
-      "cert_eu_robusta_mt": 67030,
+      "cert_eu_robusta_mt": 67160,
       "cert_eu_arabica_mt": 39344
     },
     {
@@ -1692,7 +1966,7 @@
       "robusta_mt": 203860,
       "arabica_unwashed_mt": 128583,
       "arabica_washed_mt": 157718,
-      "cert_eu_robusta_mt": 64370,
+      "cert_eu_robusta_mt": 64420,
       "cert_eu_arabica_mt": 30090
     },
     {
