@@ -39,11 +39,17 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests scipy   # scipy (+numpy) powers the SPI gamma-fit
+        # sqlalchemy/psycopg2/dotenv/jinja2 are needed for the optional
+        # news-feed drought-gate badge emitted at the tail of the weather
+        # rebuild (backend/scripts/weather_news_emit.py). The upsert is a
+        # no-op when DATABASE_URL is unset.
+        run: pip install requests scipy sqlalchemy psycopg2-binary python-dotenv jinja2
 
       - name: Fetch + accumulate + rebuild
         env:
           ORIGINS: ${{ inputs.origins }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: backend
         run: |
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"

@@ -660,6 +660,15 @@ def main():
         sys.exit(1)
     print(f"[fetch_origin_weather] done — {ok}/{len(selected)} origins.")
 
+    # News-feed drought-gate badge — additive, never fails the weather rebuild.
+    if args.write:
+        try:
+            from weather_news_emit import emit as _emit_weather_news
+            data_dir = Path(__file__).resolve().parents[2] / "frontend" / "public" / "data"
+            _emit_weather_news(data_dir)
+        except Exception as e:  # noqa: BLE001
+            print(f"[weather-news] FAILED: {e!r} — weather files already written")
+
 
 if __name__ == "__main__":
     main()

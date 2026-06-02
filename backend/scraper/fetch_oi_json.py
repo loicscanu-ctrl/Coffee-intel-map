@@ -264,6 +264,13 @@ async def main() -> None:
     print(f"[fetch_oi_json] Saved 30-day OI window to {DATA_FILE} (oi_date={oi_date})")
     print(f"[fetch_oi_json] Updated archive {ARCHIVE_FILE} ({arch_counts}); oi→{oi_date} price→{price_date}")
 
+    # News-feed badge — additive, never fails the snapshot.
+    try:
+        from scraper.oi_news_emit import emit_from_history_path
+        emit_from_history_path(DATA_FILE)
+    except Exception as e:  # noqa: BLE001
+        print(f"[oi-news] FAILED: {e!r} — snapshot already written")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

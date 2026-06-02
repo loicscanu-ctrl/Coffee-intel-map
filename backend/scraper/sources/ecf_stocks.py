@@ -477,6 +477,56 @@ def _post_to_entries(url: str) -> list[dict]:
 
 
 
+def _compute_commentary(series: list[dict]) -> str | None:
+    """Render the ECF inventory badge.
+
+    Net delta in metric tonnes. When the latest TWO series entries both
+    carry the per-type breakdown (arabica_washed_mt / arabica_unwashed_mt /
+    robusta_mt), include the arabica/robusta split — the template
+    conditional drops the clause when either delta is None.
+
+    Returns None when the series is too short or both bag totals are zero.
+    """
+    from scraper.commentary import render, signed
+
+    if not series or len(series) < 2:
+        return None
+    cur, prev = series[-1], series[-2]
+    cur_bags  = cur.get("value_raw") or 0
+    prev_bags = prev.get("value_raw") or 0
+    if cur_bags == 0 and prev_bags == 0:
+        return None
+    # 1 ECF bag = 60 kg; convert to tonnes for the cross-source convention.
+    net_tons = (cur_bags - prev_bags) * 60 / 1000
+
+    def _arabica_mt(row: dict) -> int | None:
+        w = row.get("arabica_washed_mt")
+        u = row.get("arabica_unwashed_mt")
+        if w is None and u is None:
+            return None
+        return (w or 0) + (u or 0)
+
+    arabica_cur,  arabica_prev  = _arabica_mt(cur),  _arabica_mt(prev)
+    robusta_cur,  robusta_prev  = cur.get("robusta_mt"), prev.get("robusta_mt")
+    arabica_delta: float | None
+    robusta_delta: float | None
+    arabica_delta = (arabica_cur - arabica_prev) if (arabica_cur is not None and arabica_prev is not None) else None
+    robusta_delta = (robusta_cur - robusta_prev) if (robusta_cur is not None and robusta_prev is not None) else None
+
+    ctx = {
+        "net_tons_signed":      signed(net_tons),
+        "arabica_delta":        arabica_delta,
+        "robusta_delta":        robusta_delta,
+        "arabica_delta_signed": signed(arabica_delta) if arabica_delta is not None else None,
+        "robusta_delta_signed": signed(robusta_delta) if robusta_delta is not None else None,
+    }
+    try:
+        return render("ecf_stocks", ctx)
+    except Exception as e:  # noqa: BLE001
+        print(f"[ecf-news] commentary render failed: {e!r}")
+        return None
+
+
 async def run(page) -> list[dict]:
     post_urls: list[str] = []
     pages_seen = 0
@@ -525,9 +575,21 @@ async def run(page) -> list[dict]:
                 entry.update(bd)
 
     value_bags = latest.get("value_raw") or 0
+    meta_obj = {
+        "monthly":     series,
+        "latest_bags": value_bags or None,
+        "as_of":       _today(),
+        "source_url":  _INDEX_URL,
+        "latest_post": latest.get("post_url"),
+        "latest_pdf":  latest.get("pdf_url"),
+    }
+    commentary = _compute_commentary(series)
+    if commentary:
+        from scraper.commentary import embed_commentary
+        embed_commentary(meta_obj, text=commentary, has_update=True, is_latest_trading_day=False)
     return [{
         "title":    f"ECF European Port Stocks – {latest['period']}",
-        "body":     (
+        "body":     commentary or (
             f"ECF European green coffee stocks for {latest['period']}: "
             f"{value_bags:,} bags ({value_bags / 1_000_000:.1f}M). "
             f"Source: {latest.get('post_url', _INDEX_URL)}"
@@ -536,13 +598,6 @@ async def run(page) -> list[dict]:
         "category": "demand",
         "lat":      51.5,
         "lng":      5.0,
-        "tags":     ["stocks", "europe", "ecf", "demand"],
-        "meta":     json.dumps({
-            "monthly":     series,
-            "latest_bags": value_bags or None,
-            "as_of":       _today(),
-            "source_url":  _INDEX_URL,
-            "latest_post": latest.get("post_url"),
-            "latest_pdf":  latest.get("pdf_url"),
-        }),
+        "tags":     ["stocks", "europe", "ecf", "demand", "auto-commentary"],
+        "meta":     json.dumps(meta_obj),
     }]

@@ -11,7 +11,7 @@
 
   "weather_normal": "Agronomic Status Update: {{ origin }} ({{ provinces }}) is currently flagged as normal.",
 
-  "cot_release": "CFTC Release for {{ market }}:\n  • Price {{ price_dir }} {{ price_delta_signed }} WoW (COT week vs. COT Week-1)\n  • Total OI {{ oi_dir }} {{ oi_delta_signed }} WoW\n  • Industry Long {{ comm_long_dir }} by {{ comm_long_delta_abs }} lots\n  • Industry Short {{ comm_short_dir }} by {{ comm_short_delta_abs }} lots\n  • Managed Money {{ mm_dir }} their net exposure by {{ mm_delta_abs }} contracts.",
+  "cot_release": "CFTC Release for {{ market }}:{% if price_delta_signed is defined and price_delta_signed %}\n  • Price {{ price_dir }} {{ price_delta_signed }} WoW (COT week vs. COT Week-1){% endif %}\n  • Total OI {{ oi_dir }} {{ oi_delta_signed }} WoW\n  • Industry Long {{ comm_long_dir }} by {{ comm_long_delta_abs }} lots\n  • Industry Short {{ comm_short_dir }} by {{ comm_short_delta_abs }} lots\n  • Managed Money {{ mm_dir }} their net exposure by {{ mm_delta_abs }} contracts.",
 
   "daily_oi": "{{ market }} Open Interest changed by {{ total_oi_delta_signed }} over the last session, with {{ nearby_delta_signed }} on nearby two contracts and {{ forward_delta_signed }} on forward contracts. Technical view: {{ price_dir_text }}, {{ regime_text }}.",
 

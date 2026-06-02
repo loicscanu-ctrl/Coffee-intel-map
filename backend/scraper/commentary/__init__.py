@@ -3,6 +3,7 @@ from scraper.commentary.builder import (
     embed_commentary,
     extract_commentary_from_meta,
     render,
+    render_absorption,
     signed,
     thousep,
 )
@@ -12,6 +13,7 @@ __all__ = [
     "embed_commentary",
     "extract_commentary_from_meta",
     "render",
+    "render_absorption",
     "signed",
     "thousep",
 ]

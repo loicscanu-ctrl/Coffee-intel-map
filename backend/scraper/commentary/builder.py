@@ -133,6 +133,36 @@ def extract_commentary_from_meta(meta_str: str | None) -> dict | None:
     }
 
 
+def render_absorption(*, origin: str, benchmark: str,
+                      phys_delta_usd_mt: int, futures_delta: int,
+                      currency: str = "USD") -> str:
+    """Physical-vs-futures absorption-ratio renderer, factual-only wording.
+
+    The user's locked phrasing: "X% of the market change has gone into the
+    local price". When the benchmark didn't move on the session, falls back
+    to the no-move template instead of dividing by zero.
+
+    Generic across origins (Vietnam Robusta, Brazil Conilon, …) so each
+    physical-price scraper builds the same calculation the same way.
+    """
+    if futures_delta == 0:
+        return render("physical_price_no_futures_move", {
+            "origin":            origin,
+            "phys_delta_signed": signed(phys_delta_usd_mt),
+            "currency":          currency,
+            "benchmark":         benchmark,
+        })
+    ratio_pct = round(phys_delta_usd_mt / futures_delta * 100)
+    return render("physical_price", {
+        "origin":               origin,
+        "phys_delta_signed":    signed(phys_delta_usd_mt),
+        "currency":             currency,
+        "benchmark":            benchmark,
+        "futures_delta_signed": signed(futures_delta),
+        "ratio":                ratio_pct,
+    })
+
+
 def embed_commentary(meta: dict, *, text: str, has_update: bool = True,
                      is_latest_trading_day: bool = False) -> dict:
     """Helper for scrapers: embed a `_commentary` block in a meta dict that

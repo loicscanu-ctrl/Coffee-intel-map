@@ -27,12 +27,21 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        run: pip install requests pdfplumber beautifulsoup4 lxml
+        # sqlalchemy/psycopg2/dotenv/jinja2 are needed for the news-feed
+        # commentary badge the scraper emits at the tail of main(). The upsert
+        # is a no-op when DATABASE_URL is unset.
+        run: pip install requests pdfplumber beautifulsoup4 lxml sqlalchemy psycopg2-binary python-dotenv jinja2
 
       - name: Run Kaffeesteuer scraper (3 attempts)
+        env:
+          # When set, the scraper writes a news_feed row with the monthly
+          # commentary badge. Workflow 1.4 (export-and-publish) then promotes
+          # that badge to a top-level `commentary` field in news.json.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: backend
         run: |
           for attempt in 1 2 3; do
-            python backend/scraper/fetch_kaffeesteuer.py && break
+            python -m scraper.fetch_kaffeesteuer && break
             [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
