@@ -598,5 +598,43 @@
         "India": 275
       }
     }
+  ],
+  "imports_type": [
+    {
+      "year": 2020,
+      "green_mt": 391611,
+      "regular_mt": 7367,
+      "instant_mt": 10700
+    },
+    {
+      "year": 2021,
+      "green_mt": 402100,
+      "regular_mt": 7661,
+      "instant_mt": 11657
+    },
+    {
+      "year": 2022,
+      "green_mt": 390032,
+      "regular_mt": 7846,
+      "instant_mt": 12588
+    },
+    {
+      "year": 2023,
+      "green_mt": 355652,
+      "regular_mt": 6911,
+      "instant_mt": 11583
+    },
+    {
+      "year": 2024,
+      "green_mt": 360287,
+      "regular_mt": 6011,
+      "instant_mt": 12137
+    },
+    {
+      "year": 2025,
+      "green_mt": 359382,
+      "regular_mt": 6341,
+      "instant_mt": 16031
+    }
   ]
 }
