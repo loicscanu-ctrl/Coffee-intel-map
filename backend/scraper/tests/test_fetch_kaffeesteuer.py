@@ -6,13 +6,49 @@ import io
 from openpyxl import Workbook
 
 from scraper.fetch_kaffeesteuer import (
+    _direct_candidates,
     _normalise_tsd,
     _parse_links,
+    _target_periods,
     _to_number,
     extract_kaffeesteuer_xlsx,
 )
 
 BASE = "https://www.bundesfinanzministerium.de"
+
+
+# ── direct URL construction (the primary path — straight to the file) ────────
+
+def test_direct_candidates_match_bmf_real_urls():
+    """The generator must produce BMF's actual known-good URLs for April 2026
+    (publication date 2026-05-21, version 2) — both xlsx and pdf."""
+    urls = {url for _, url in _direct_candidates("2026-04")}
+    prefix = (
+        BASE + "/Content/DE/Standardartikel/Themen/Steuern/"
+        "Steuerschaetzungen_und_Steuereinnahmen/"
+    )
+    assert (
+        prefix + "2026-05-21-steuereinnahmen-april-2026-xlxs.xlsx"
+        "?__blob=publicationFile&v=2"
+    ) in urls
+    assert (
+        prefix + "2026-05-21-steuereinnahmen-april-2026.pdf"
+        "?__blob=publicationFile&v=2"
+    ) in urls
+
+
+def test_direct_candidates_handle_december_year_rollover():
+    """A December report is published in January of the next year."""
+    urls = {url for _, url in _direct_candidates("2025-12")}
+    assert any("2026-01-" in u and "steuereinnahmen-dezember-2025" in u for u in urls)
+
+
+def test_target_periods_excludes_known_and_current_month():
+    from datetime import date
+    existing = {"2026-03": 1}
+    targets = _target_periods(existing, date(2026, 6, 2), lookback=4)
+    # June (current) excluded; March already known; expect Feb, Apr, May.
+    assert targets == ["2026-02", "2026-04", "2026-05"]
 
 
 # ── HTML link discovery ──────────────────────────────────────────────────────
