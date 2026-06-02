@@ -33,11 +33,17 @@ jobs:
           key: playwright-chromium-${{ runner.os }}
 
       - name: Install dependencies
+        # sqlalchemy/psycopg2/dotenv/jinja2 added so the orchestrator's tail
+        # step (oi_news_emit) can write a news_feed row with the regime-matrix
+        # commentary. No-op when DATABASE_URL is unset.
         run: |
-          pip install playwright
+          pip install playwright sqlalchemy psycopg2-binary python-dotenv jinja2
           playwright install chromium --with-deps
 
       - name: Fetch OI (3 attempts)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: backend
         run: |
           for attempt in 1 2 3; do
             python backend/scraper/fetch_oi_json.py && break

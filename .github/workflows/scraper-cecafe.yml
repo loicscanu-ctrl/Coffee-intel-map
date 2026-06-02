@@ -28,9 +28,11 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        run: pip install openpyxl pdfplumber
+        run: pip install openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
       - name: Run Cecafe scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python -m backend.scraper.fetch_cecafe
 
       - name: Commit updated JSON if changed

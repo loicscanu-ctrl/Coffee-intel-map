@@ -1,0 +1,23 @@
+{
+  "_comment": "Jinja2 templates for the news-tab commentary badges. Each scraper builds a context dict and calls scraper.commentary.render(event_type, ctx). Text is plain English, factual only — no directional labels (no 'bullish/bearish', no 'moderate/strong'). Conditional blocks use Jinja `{% if %}` so optional numbers degrade cleanly when the source didn't expose them.",
+
+  "ice_certified_stocks": "{{ market }} certified stocks shifted by {{ delta_signed }} {{ units }} today, bringing global visible exchange inventory to {{ total }} {{ units }}.{% if grading_delta %} {{ grading_delta }} lots graded.{% endif %}{% if decert_delta and port %} {{ decert_delta }} lots decertified in {{ port }}.{% endif %}",
+
+  "physical_price": "{{ origin }} physical cash price adjusted by {{ phys_delta_signed }} {{ currency }}/ton today while {{ benchmark }} moved by {{ futures_delta_signed }} USD/ton. {{ ratio }}% of the market change has gone into the local price.",
+
+  "physical_price_no_futures_move": "{{ origin }} physical cash price adjusted by {{ phys_delta_signed }} {{ currency }}/ton today; {{ benchmark }} did not move on the session, so no transmission ratio is computable.",
+
+  "weather_risk": "Agronomic Status Update: {{ origin }} ({{ provinces }}) is currently flagged as at drought risk. Forecasted rainfall of {{ forecast_mm }}mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at {{ vhi }}.",
+
+  "weather_normal": "Agronomic Status Update: {{ origin }} ({{ provinces }}) is currently flagged as normal.",
+
+  "cot_release": "CFTC Release for {{ market }}:{% if price_delta_signed is defined and price_delta_signed %}\n  • Price {{ price_dir }} {{ price_delta_signed }} WoW (COT week vs. COT Week-1){% endif %}\n  • Total OI {{ oi_dir }} {{ oi_delta_signed }} WoW\n  • Industry Long {{ comm_long_dir }} by {{ comm_long_delta_abs }} lots\n  • Industry Short {{ comm_short_dir }} by {{ comm_short_delta_abs }} lots\n  • Managed Money {{ mm_dir }} their net exposure by {{ mm_delta_abs }} contracts.",
+
+  "daily_oi": "{{ market }} Open Interest changed by {{ total_oi_delta_signed }} over the last session, with {{ nearby_delta_signed }} on nearby two contracts and {{ forward_delta_signed }} on forward contracts. Technical view: {{ price_dir_text }}, {{ regime_text }}.",
+
+  "kaffeesteuer": "Macro Demand Signal: German Kaffeesteuer revenue for {{ period }} settled at {{ volume }} Tsd. EUR, marking a {{ mom_delta_signed }}% shift against the prior month and {{ yoy_delta_signed }}% vs. last year.",
+
+  "ecf_stocks": "ECF Inventory Release: Total European port stocks shifted by {{ net_tons_signed }} tons over the reporting period.{% if arabica_delta is not none and robusta_delta is not none %} Type split: {{ arabica_delta_signed }} tons in Arabica and {{ robusta_delta_signed }} tons in Robusta visible inventory.{% endif %}",
+
+  "export_velocity": "{{ origin }} shipping velocity reports {{ total_export_tons }} tons exported for the month tracking cycle. Current terminal processing reflects a pace at {{ perc_vs_seas_signed }}% vs. seasonal standard."
+}

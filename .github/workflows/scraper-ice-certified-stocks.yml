@@ -56,7 +56,12 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber
+        # sqlalchemy / psycopg2-binary / python-dotenv / jinja2 are needed for
+        # the orchestrator's tail step that emits a news_feed commentary row
+        # (see scraper/sources/ice_certified_stocks/news_emit.py). The upsert
+        # is a no-op when DATABASE_URL is unset, but importing scraper.db
+        # still loads sqlalchemy at module-import time.
+        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
       - name: Pull ICE certified stocks
         working-directory: backend
@@ -65,6 +70,12 @@ jobs:
           # the Actions log instead of waiting for the (block-buffered) pipe
           # to fill — otherwise a long run looks "stalled" until completion.
           PYTHONUNBUFFERED: "1"
+          # Optional — when set, the orchestrator's tail step upserts a
+          # news_feed row carrying a `_commentary` block for each market.
+          # The next run of workflow 1.4 (Export and Publish) lifts that
+          # block to a top-level `commentary` field in news.json. Unset →
+          # no-op (snapshots still publish).
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           # Scheduled cron passes no inputs → default to a 3-day catch-up
           # (merge preserves the history). Manual dispatch can override with

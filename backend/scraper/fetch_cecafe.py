@@ -201,6 +201,95 @@ def _extract_country_volumes(raw_zip: bytes, year: int, suffix: str = "") -> dic
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def _compute_commentary(series: list[dict]) -> tuple[str, str] | None:
+    """Render the CECAFE export-velocity badge.
+
+    Returns (period, text) or None when there isn't enough history to compute
+    a seasonal reference. The seasonal standard is the median of the same
+    calendar month across the last 5 years (excluding the current row), which
+    smooths out a single anomalous year while staying close to "what's normal
+    right now" — coffee export seasonality drifts on a multi-decade timescale
+    so a deeper window would dilute that.
+    """
+    from statistics import median
+
+    from scraper.commentary import render, signed, thousep
+
+    if not series:
+        return None
+    latest = series[-1]
+    latest_total_bags = latest.get("total") or 0
+    if latest_total_bags == 0:
+        return None
+    latest_month = int(latest["date"].split("-")[1])
+
+    # Same calendar month across history, excluding the latest row itself.
+    same_month_history = [
+        r["total"] for r in series[:-1]
+        if r["date"].endswith(f"-{latest_month:02d}") and (r.get("total") or 0) > 0
+    ]
+    # Use the last 5 same-month rows for the seasonal reference.
+    reference_window = same_month_history[-5:]
+    if len(reference_window) < 3:
+        return None  # not enough history yet for a meaningful baseline
+    seasonal_ref = median(reference_window)
+    if seasonal_ref == 0:
+        return None
+    perc_vs_seas = (latest_total_bags - seasonal_ref) / seasonal_ref * 100
+
+    # CECAFE publishes volumes in 60-kg bags. Convert to metric tonnes for
+    # the template — that matches the template's tons unit and the
+    # cross-source convention used by ECF / ICE.
+    total_tons = latest_total_bags * 60 / 1000
+
+    text = render("export_velocity", {
+        "origin":               "Brazil",
+        "total_export_tons":    thousep(total_tons),
+        "perc_vs_seas_signed":  signed(perc_vs_seas, decimals=1),
+    })
+    return latest["date"], text
+
+
+def _emit_news(series: list[dict]) -> None:
+    """Upsert a news_feed row for the latest CECAFE print. No-op when
+    DATABASE_URL is unset."""
+    import os
+    from datetime import datetime, timezone
+
+    if not os.environ.get("DATABASE_URL"):
+        print("[cecafe-news] DATABASE_URL unset — skipping news_feed upsert")
+        return
+
+    result = _compute_commentary(series)
+    if result is None:
+        print("[cecafe-news] insufficient history for seasonal reference — skipping")
+        return
+    period, text = result
+
+    from scraper.commentary import embed_commentary
+    from scraper.db import get_session, upsert_news_item
+
+    meta_obj: dict = {"period": period}
+    embed_commentary(meta_obj, text=text, has_update=True, is_latest_trading_day=False)
+    item = {
+        "title":    f"CECAFE Brazil Exports – {period}",
+        "body":     text,
+        "source":   "CECAFE",
+        "category": "supply",
+        "lat":      -15.78,    # Brasília
+        "lng":      -47.93,
+        "tags":     ["cecafe", "brazil", "exports", "auto-commentary"],
+        "meta":     json.dumps(meta_obj, ensure_ascii=False),
+        "pub_date": datetime.now(timezone.utc),
+    }
+    db = get_session()
+    try:
+        upsert_news_item(db, item)
+        print(f"[cecafe-news] {period}: {text}")
+    finally:
+        db.close()
+
+
 def main():
     today = date.today()
     print("=== Cecafe export scraper ===")
@@ -270,6 +359,11 @@ def main():
     with open(path, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
     print(f"\nWritten: {path}  ({path.stat().st_size:,} bytes)")
+
+    try:
+        _emit_news(series)
+    except Exception as e:  # noqa: BLE001
+        print(f"[cecafe-news] FAILED: {e!r} — JSON already written")
 
 
 if __name__ == "__main__":

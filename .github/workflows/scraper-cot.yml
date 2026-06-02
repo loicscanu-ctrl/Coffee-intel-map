@@ -25,7 +25,8 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv
+        # jinja2 added so `_cot_commentary` can render the news-feed badge.
+        run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv jinja2
 
       - name: Run macro COT scraper (3 attempts)
         working-directory: backend

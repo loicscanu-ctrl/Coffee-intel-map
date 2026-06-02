@@ -711,6 +711,22 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
         print(f"=== wrote {OUT_DIR / 'certified_stocks_arabica.json'}")
         print(f"=== wrote {OUT_DIR / 'certified_stocks_robusta.json'}")
 
+        # News-feed commentary badge (no-op when DATABASE_URL is unset —
+        # keeps local backfills from needing a DB). The actual news.json
+        # republish happens in workflow 1.4 (export-and-publish) which
+        # reads news_feed and writes frontend/public/data/news.json.
+        from .news_emit import emit as _emit_news
+        try:
+            _emit_news(
+                arabica_json, robusta_json,
+                arabica_source_url=arabica_source_url,
+                robusta_source_url=robusta_stock_url,
+            )
+        except Exception as e:  # noqa: BLE001
+            # Commentary is additive — never fail the whole orchestrator
+            # over a news-feed write. The JSON snapshots already shipped.
+            print(f"[ice-news] FAILED: {e!r} — JSON snapshots already written")
+
     return {"arabica": arabica_json, "robusta": robusta_json}
 
 

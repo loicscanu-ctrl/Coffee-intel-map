@@ -123,6 +123,85 @@ def extract_kaffeesteuer_from_excel(excel_bytes: bytes) -> int | None:
     return None
 
 
+def _compute_commentary(period: str, value: int, history: dict[str, int]) -> str | None:
+    """Render the news-feed badge for the latest Kaffeesteuer print.
+
+    Returns None when the prior-month / same-month-last-year references are
+    unavailable (e.g. the first month of recorded history). Pure helper so the
+    wording can be pinned by a unit test without HTTP / PDF parsing.
+    """
+    from scraper.commentary import render, signed
+
+    year, month = period.split("-")
+    # Prior month — handle the January rollover into the previous year.
+    if month == "01":
+        prev_period = f"{int(year) - 1}-12"
+    else:
+        prev_period = f"{year}-{int(month) - 1:02d}"
+    yoy_period = f"{int(year) - 1}-{month}"
+
+    prev = history.get(prev_period)
+    yoy  = history.get(yoy_period)
+    if prev is None or yoy is None or prev == 0 or yoy == 0:
+        return None
+
+    mom_delta_pct = (value - prev) / prev * 100
+    yoy_delta_pct = (value - yoy) / yoy * 100
+    return render("kaffeesteuer", {
+        "period":           period,
+        "volume":           f"{value:,}",
+        "mom_delta_signed": signed(mom_delta_pct, decimals=1),
+        "yoy_delta_signed": signed(yoy_delta_pct, decimals=1),
+    })
+
+
+def _emit_news(latest_period: str, results: dict[str, int]) -> None:
+    """Upsert a news_feed row carrying the commentary badge. No-op when
+    DATABASE_URL is unset (local runs / smoke tests).
+
+    Kaffeesteuer is a monthly print, so the title carries the period — that
+    gives upsert_news_item's title-dedupe the right granularity (re-runs in
+    the same month no-op; a new month creates a new row).
+    """
+    import os
+    from datetime import datetime, timezone
+
+    if not os.environ.get("DATABASE_URL"):
+        print("[kaffeesteuer-news] DATABASE_URL unset — skipping news_feed upsert")
+        return
+
+    value = results.get(latest_period)
+    if value is None:
+        return
+    text = _compute_commentary(latest_period, value, results)
+    if text is None:
+        print(f"[kaffeesteuer-news] {latest_period}: not enough history for MoM/YoY — skipping")
+        return
+
+    from scraper.commentary import embed_commentary
+    from scraper.db import get_session, upsert_news_item
+
+    meta_obj: dict = {"period": latest_period, "value_tsd_eur": value}
+    embed_commentary(meta_obj, text=text, has_update=True, is_latest_trading_day=False)
+    item = {
+        "title":    f"German Kaffeesteuer Revenue – {latest_period}",
+        "body":     text,
+        "source":   "Bundesfinanzministerium",
+        "category": "demand",
+        "lat":      51.165,   # Germany centroid
+        "lng":      10.452,
+        "tags":     ["kaffeesteuer", "germany", "demand", "auto-commentary"],
+        "meta":     json.dumps(meta_obj, ensure_ascii=False),
+        "pub_date": datetime.now(timezone.utc),
+    }
+    db = get_session()
+    try:
+        upsert_news_item(db, item)
+        print(f"[kaffeesteuer-news] {latest_period}: {text}")
+    finally:
+        db.close()
+
+
 def get_periods_to_check(existing_data: dict[str, int]) -> list[tuple[int, int]]:
     """Determine which months need to be fetched, up to the current date."""
     periods: list[tuple[int, int]] = []
@@ -239,6 +318,13 @@ def main():
         json.dump(results, f, indent=2, sort_keys=True)
         f.write("\n")
     print(f"\nSaved {len(results)} total records (+{added}) → {OUT_PATH}")
+
+    # News-feed badge for the latest month — additive, never fails the scraper.
+    try:
+        latest_period = max(results)
+        _emit_news(latest_period, results)
+    except Exception as e:  # noqa: BLE001
+        print(f"[kaffeesteuer-news] FAILED: {e!r} — JSON already written")
 
 
 if __name__ == "__main__":

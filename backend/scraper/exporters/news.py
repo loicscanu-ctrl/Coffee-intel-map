@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from models import (
     NewsItem,
 )
+from scraper.commentary import extract_commentary_from_meta
 from scraper.exporters.base import OUT_DIR
 
 
@@ -19,8 +20,9 @@ def export_news(db) -> None:
         .limit(200)
         .all()
     )
-    items = [
-        {
+    items = []
+    for r in rows:
+        item = {
             "id": r.id,
             "title": r.title,
             "body": r.body,
@@ -32,7 +34,10 @@ def export_news(db) -> None:
             "meta": r.meta,
             "pub_date": r.pub_date.isoformat() if r.pub_date else None,
         }
-        for r in rows
-    ]
+        commentary = extract_commentary_from_meta(r.meta)
+        if commentary is not None:
+            item["commentary"] = commentary
+        items.append(item)
     (OUT_DIR / "news.json").write_text(json.dumps(items, indent=2), encoding="utf-8")
-    print(f"  news.json → {len(items)} items")
+    n_commentary = sum(1 for it in items if "commentary" in it)
+    print(f"  news.json → {len(items)} items ({n_commentary} with commentary)")
