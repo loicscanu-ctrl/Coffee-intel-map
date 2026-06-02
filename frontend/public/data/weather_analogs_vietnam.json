@@ -1,10 +1,12 @@
 {
   "_schema": "v3",
   "_note": "Vietnam robusta weather-analog forecast. Mahalanobis on 24-dim (rain, temp, rain_anom, SPI z, SPEI z, ONI) × 4 phenology stages. Detrended production residuals. Walk-forward backtest. Bootstrap 95% CI on ensemble.",
-  "generated_at": "2026-06-02T03:34:51+00:00",
+  "generated_at": "2026-06-02T03:45:21+00:00",
   "origin": "vietnam_robusta",
   "origin_label": "Vietnam robusta",
   "current_crop_year": 2026,
+  "zone": "northern_monsoon_asia",
+  "harvest_period": "Nov Y - Jan Y+1",
   "phenology": [
     {
       "name": "pre_flowering",
