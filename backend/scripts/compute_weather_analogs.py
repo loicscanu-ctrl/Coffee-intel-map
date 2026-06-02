@@ -35,6 +35,47 @@ HISTORY_DIR = REPO_ROOT / "backend" / "seed" / "weather_history"
 SEED_DIR    = REPO_ROOT / "backend" / "seed"
 OUT_DIR     = REPO_ROOT / "frontend" / "public" / "data"
 ONI_PATH    = SEED_DIR / "oni_history_full.json"
+VHI_DIR     = REPO_ROOT / "frontend" / "public" / "data"
+
+
+def _load_vhi_history(vhi_file: str, prod_weights: dict[str, int]
+                       ) -> dict[tuple[int, int], float]:
+    """{(year, week): prod-weighted VHI} pulled from the long-form
+    backfill (vhi_<origin>.json's weekly_history). Returns empty dict when
+    no long-form is present (only the rolling 3Y window is shipped) — the
+    analog engine then silently skips the VHI feature."""
+    path = VHI_DIR / vhi_file
+    if not path.exists():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+    out: dict[tuple[int, int], list[tuple[float, int]]] = {}
+    provs = doc.get("provinces", {}) or {}
+    for prov_name, weight in prod_weights.items():
+        history = (provs.get(prov_name) or {}).get("weekly_history") or []
+        for row in history:
+            y, w, v = row.get("year"), row.get("week"), row.get("vhi")
+            if y is None or w is None or v is None:
+                continue
+            out.setdefault((int(y), int(w)), []).append((float(v), int(weight)))
+    # Reduce to a single prod-weighted value per (year, week).
+    return {
+        ym: round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
+        for ym, vals in out.items() if vals
+    }
+
+
+def _iso_week_in_stage(year: int, week: int, stage_months: list[int], anchor: str,
+                       crop_year: int) -> bool:
+    """True when the ISO week belongs to one of the stage's calendar
+    (year, month) tuples for the given crop_year. Approximate: ISO week
+    midpoint = year-01-01 + (week-1)*7 + 3 (Thursday). Good enough for
+    bucketing weekly VHI into per-stage averages."""
+    midpoint = dt.date(year, 1, 1) + dt.timedelta(days=(week - 1) * 7 + 3)
+    target_months = {(cy, m) for cy, m in _stage_window(stage_months, crop_year, anchor)}
+    return (midpoint.year, midpoint.month) in target_months
 
 # ONI history: NOAA CPC 3-month running mean of Niño-3.4 SST anomaly.
 _ONI_DOC = json.loads(ONI_PATH.read_text(encoding="utf-8"))
@@ -53,6 +94,7 @@ ORIGIN_CONFIGS = {
         "label": "Brazil arabica",
         "history_file":   "brazil.json",
         "prod_seed_file": "brazil_arabica_production.json",
+        "vhi_file":       "vhi_brazil.json",
         "out_file":       "weather_analogs_brazil.json",
         # Brazilian arabica: harvest May-Sep of year Y, weather Aug Y-1 → May Y.
         "phenology": [
@@ -74,6 +116,7 @@ ORIGIN_CONFIGS = {
         "label": "Vietnam robusta",
         "history_file":   "vn.json",
         "prod_seed_file": "vietnam_robusta_production.json",
+        "vhi_file":       "vhi_vn.json",
         "out_file":       "weather_analogs_vietnam.json",
         # Vietnam robusta Central Highlands: harvest Nov-Jan of marketing
         # year Y → Y+1. The weather window driving that crop is roughly
@@ -100,6 +143,7 @@ ORIGIN_CONFIGS = {
         "label": "Indonesia robusta",
         "history_file":   "indonesia.json",
         "prod_seed_file": "indonesia_robusta_production.json",
+        "vhi_file":       "vhi_indonesia.json",
         "out_file":       "weather_analogs_indonesia.json",
         # Indonesia robusta (Lampung-dominant, Sumatra southern): harvest
         # May-Aug Y. Weather window: Sep(Y-1) through Apr(Y). Equatorial
@@ -197,8 +241,12 @@ def _oni_for_stage(stage_months: list[int], crop_year: int, anchor: str) -> floa
 
 def build_country_signature(history: dict, crop_year: int,
                             phenology, anchor: str,
-                            prod_weights: dict[str, int]) -> list[dict]:
-    """Per-stage prod-weighted (rain, temp, et0, ONI) for the country."""
+                            prod_weights: dict[str, int],
+                            vhi_by_week: dict[tuple[int, int], float] | None = None,
+                            ) -> list[dict]:
+    """Per-stage prod-weighted (rain, temp, et0, ONI, VHI) for the country.
+    vhi_by_week (when provided) is {(year, iso_week): prod-weighted VHI};
+    we average across all weeks falling within the stage's calendar window."""
     out = []
     for stage_name, months in phenology:
         rain_sum = temp_sum = et0_sum = 0.0
@@ -212,12 +260,21 @@ def build_country_signature(history: dict, crop_year: int,
                 temp_sum += t * weight; temp_w += weight
             if e is not None:
                 et0_sum += e * weight; et0_w += weight
+
+        vhi_avg: float | None = None
+        if vhi_by_week:
+            stage_vhis = [v for (y, w), v in vhi_by_week.items()
+                          if _iso_week_in_stage(y, w, months, anchor, crop_year)]
+            if stage_vhis:
+                vhi_avg = round(sum(stage_vhis) / len(stage_vhis), 2)
+
         out.append({
             "name": stage_name,
             "rain_mm": round(rain_sum / rain_w, 1) if rain_w else None,
             "temp_c":  round(temp_sum / temp_w, 2) if temp_w else None,
             "et0_mm":  round(et0_sum / et0_w, 1) if et0_w else None,
             "oni_avg": _oni_for_stage(months, crop_year, anchor),
+            "vhi":     vhi_avg,
         })
     return out
 
@@ -225,27 +282,22 @@ def build_country_signature(history: dict, crop_year: int,
 # ── Feature engineering: enrich raw signature with anomalies, SPI, SPEI ──
 
 def enrich_signature(sig: list[dict], stage_norms: dict[str, dict]) -> list[dict]:
-    """Add rain_anom_pct, spi_z, spei_z, temp_anom_c to each stage entry.
-    stage_norms[name] = {rain_mean, rain_std, temp_mean, water_balance_mean,
-    water_balance_std} computed across the historical population."""
+    """Add rain_anom_pct, spi_z, spei_z, temp_anom_c, vhi_z to each stage entry."""
     enriched = []
     for s in sig:
         sn = stage_norms.get(s["name"], {})
         rain = s.get("rain_mm")
         temp = s.get("temp_c")
         et0  = s.get("et0_mm")
+        vhi  = s.get("vhi")
         rain_anom = (
             ((rain - sn["rain_mean"]) / sn["rain_mean"] * 100)
             if rain is not None and sn.get("rain_mean") else None
         )
-        # SPI (proxy): z-score of stage rain across historical population.
-        # Proper gamma-fit SPI requires scipy, but z-score on log-rain is a
-        # close-enough approximation for analog ranking + display.
         spi_z = (
             ((rain - sn["rain_mean"]) / sn["rain_std"])
             if rain is not None and sn.get("rain_std") else None
         )
-        # SPEI: z-score of (rain - et0). When et0 missing, fall back to None.
         wb = (rain - et0) if rain is not None and et0 is not None else None
         spei_z = (
             ((wb - sn["wb_mean"]) / sn["wb_std"])
@@ -255,19 +307,24 @@ def enrich_signature(sig: list[dict], stage_norms: dict[str, dict]) -> list[dict
             (temp - sn["temp_mean"])
             if temp is not None and sn.get("temp_mean") is not None else None
         )
+        vhi_z = (
+            ((vhi - sn["vhi_mean"]) / sn["vhi_std"])
+            if vhi is not None and sn.get("vhi_std") else None
+        )
         enriched.append({
             **s,
             "rain_anom_pct": round(rain_anom, 1) if rain_anom is not None else None,
             "temp_anom_c":   round(temp_anom, 2) if temp_anom is not None else None,
             "spi_z":         round(spi_z,  3) if spi_z  is not None else None,
             "spei_z":        round(spei_z, 3) if spei_z is not None else None,
+            "vhi_z":         round(vhi_z,  3) if vhi_z  is not None else None,
         })
     return enriched
 
 
 def signature_to_vector(sig: list[dict]) -> list[float | None]:
-    """Flatten enriched signature → 24-dim feature vector for distance metric.
-    Order per stage: rain_mm, temp_c, rain_anom_pct, spi_z, spei_z, oni_avg."""
+    """Flatten enriched signature → 28-dim feature vector for distance metric.
+    Order per stage: rain_mm, temp_c, rain_anom_pct, spi_z, spei_z, oni_avg, vhi_z."""
     vec: list[float | None] = []
     for s in sig:
         vec.extend([
@@ -277,18 +334,19 @@ def signature_to_vector(sig: list[dict]) -> list[float | None]:
             s.get("spi_z"),
             s.get("spei_z"),
             s.get("oni_avg"),
+            s.get("vhi_z"),
         ])
     return vec
 
 
 def _stage_population_stats(all_signatures: dict[int, list[dict]],
                             range_years: list[int]) -> dict[str, dict]:
-    """Mean + std of stage rain, temp, and water-balance across the 10Y
-    rolling normal window. Drives the anomaly + SPI + SPEI features."""
+    """Mean + std of stage rain, temp, water-balance, and VHI across the
+    10Y rolling normal window. Drives the anomaly + SPI + SPEI + VHI-z features."""
     norms: dict[str, dict] = {}
     stage_names = [s["name"] for s in next(iter(all_signatures.values()))]
     for stage_name in stage_names:
-        rains, temps, wbs = [], [], []
+        rains, temps, wbs, vhis = [], [], [], []
         for y in range_years:
             sig = all_signatures.get(y)
             if not sig:
@@ -302,6 +360,8 @@ def _stage_population_stats(all_signatures: dict[int, list[dict]],
                 temps.append(s["temp_c"])
             if s.get("rain_mm") is not None and s.get("et0_mm") is not None:
                 wbs.append(s["rain_mm"] - s["et0_mm"])
+            if s.get("vhi") is not None:
+                vhis.append(s["vhi"])
         norms[stage_name] = {
             "rain_mean": round(statistics.fmean(rains), 1) if rains else None,
             "rain_std":  round(statistics.pstdev(rains), 1) if len(rains) > 1 else None,
@@ -309,6 +369,8 @@ def _stage_population_stats(all_signatures: dict[int, list[dict]],
             "temp_std":  round(statistics.pstdev(temps), 2) if len(temps) > 1 else None,
             "wb_mean":   round(statistics.fmean(wbs), 1) if wbs else None,
             "wb_std":    round(statistics.pstdev(wbs), 1) if len(wbs) > 1 else None,
+            "vhi_mean":  round(statistics.fmean(vhis), 2) if vhis else None,
+            "vhi_std":   round(statistics.pstdev(vhis), 2) if len(vhis) > 1 else None,
         }
     return norms
 
@@ -382,9 +444,16 @@ def _ensemble_stats(values: list[float | None]) -> dict | None:
 
 def _backtest(all_signatures: dict[int, list[dict]],
               detrended: dict[int, float],
-              candidate_years: list[int]) -> dict | None:
+              candidate_years: list[int],
+              kept_dims: list[int] | None = None) -> dict | None:
     """For each year Y in [BACKTEST_START, cur-1] with complete signature
-    AND production data, refit using only years < Y, predict, compare."""
+    AND production data, refit using only years < Y, predict, compare.
+    kept_dims, when provided, projects the signature vector to only those
+    indices — keeps the backtest consistent with the main-pass dim filter
+    (e.g. dropping VHI before its backfill has populated it)."""
+    def _project(vec: list[float | None]) -> list[float | None]:
+        return [vec[i] for i in kept_dims] if kept_dims is not None else vec
+
     eligible = sorted(y for y in candidate_years if y >= BACKTEST_START
                       and y in detrended and (y - 1) in detrended)
     if len(eligible) < 5:
@@ -393,12 +462,12 @@ def _backtest(all_signatures: dict[int, list[dict]],
     for target in eligible:
         train_years = sorted(y for y in candidate_years
                               if y < target
-                              and all(v is not None for v in signature_to_vector(all_signatures[y])))
+                              and all(v is not None for v in _project(signature_to_vector(all_signatures[y]))))
         if len(train_years) < 8:
             continue
-        train_vecs = [signature_to_vector(all_signatures[y]) for y in train_years]
+        train_vecs = [_project(signature_to_vector(all_signatures[y])) for y in train_years]
         inv_cov = _mahalanobis_setup(train_vecs)  # type: ignore[arg-type]
-        target_vec = signature_to_vector(all_signatures[target])
+        target_vec = _project(signature_to_vector(all_signatures[target]))
         if any(v is None for v in target_vec):
             continue
         distances = sorted(
@@ -476,6 +545,14 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
     prod_doc = json.loads((SEED_DIR / cfg["prod_seed_file"]).read_text(encoding="utf-8"))
     prod = {int(k): int(v) for k, v in prod_doc["production_kbags"].items()}
 
+    # VHI weekly history — empty dict when the long-form backfill hasn't
+    # run yet. The engine then quietly omits the VHI feature.
+    vhi_by_week = _load_vhi_history(cfg.get("vhi_file", ""), cfg["prod_weights"])
+    if vhi_by_week:
+        years = sorted({y for y, _ in vhi_by_week})
+        print(f"[{origin_key}] VHI history: {len(vhi_by_week)} weeks, "
+              f"{years[0]}-{years[-1]}")
+
     today = dt.date.today()
     cur_crop_year = today.year + 1 if today.month >= 8 else today.year
 
@@ -486,7 +563,8 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
         candidate_years.append(cur_crop_year)
 
     raw_signatures = {
-        y: build_country_signature(history, y, cfg["phenology"], cfg["stage_anchor"], cfg["prod_weights"])
+        y: build_country_signature(history, y, cfg["phenology"], cfg["stage_anchor"],
+                                    cfg["prod_weights"], vhi_by_week or None)
         for y in candidate_years
     }
 
@@ -500,18 +578,39 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
 
     detrended = _detrend_log_production(prod)
 
+    # First pass: detect which feature dimensions have enough population
+    # support for Mahalanobis. Dims with < 10 populated years (e.g. VHI
+    # before the long-form backfill workflow has run) get dropped entirely
+    # — otherwise every historical year would fail the "all dims non-None"
+    # gate. Once a backfill ships those years, the dim re-enters the engine.
+    full_vecs = {y: signature_to_vector(all_signatures[y])
+                 for y in candidate_years if y < cur_crop_year}
+    n_dims_total = len(next(iter(full_vecs.values())))
+    populated_per_dim = [
+        sum(1 for vec in full_vecs.values() if vec[i] is not None)
+        for i in range(n_dims_total)
+    ]
+    kept_dims = [i for i, n in enumerate(populated_per_dim) if n >= 10]
+    dropped_dims = [i for i, n in enumerate(populated_per_dim) if n < 10]
+    if dropped_dims:
+        print(f"[{origin_key}] dropping {len(dropped_dims)} feature dim(s) with "
+              f"< 10 populated years (likely VHI pre-backfill).")
+
+    def _project(vec: list[float | None]) -> list[float | None]:
+        return [vec[i] for i in kept_dims]
+
     historical_years = [
         y for y in candidate_years if y < cur_crop_year
-        and all(v is not None for v in signature_to_vector(all_signatures[y]))
+        and all(v is not None for v in _project(signature_to_vector(all_signatures[y])))
     ]
     if len(historical_years) < 5:
         print(f"[{origin_key}] insufficient historical signatures ({len(historical_years)})", file=sys.stderr)
         return 1
 
-    historical_vecs = [signature_to_vector(all_signatures[y]) for y in historical_years]
+    historical_vecs = [_project(signature_to_vector(all_signatures[y])) for y in historical_years]
     inv_cov_full = _mahalanobis_setup(historical_vecs)  # type: ignore[arg-type]
 
-    cur_vec = signature_to_vector(all_signatures[cur_crop_year])
+    cur_vec = _project(signature_to_vector(all_signatures[cur_crop_year]))
     present_idx = [i for i, v in enumerate(cur_vec) if v is not None]
     if not present_idx:
         print(f"[{origin_key}] current year has no features yet", file=sys.stderr)
@@ -555,7 +654,7 @@ def run_for_origin(origin_key: str, cfg: dict) -> int:
     ensemble_same = _ensemble_stats([a["same_cycle_yoy_detrended_pct"] for a in top_analogs])
     ensemble_next = _ensemble_stats([a["next_crop_yoy_detrended_pct"] for a in top_analogs])
 
-    backtest = _backtest(all_signatures, detrended, historical_years)
+    backtest = _backtest(all_signatures, detrended, historical_years, kept_dims=kept_dims)
 
     out_doc = {
         "_schema": "v3",
