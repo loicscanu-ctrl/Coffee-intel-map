@@ -90,6 +90,8 @@ interface HistoricalSig {
 interface AnalogDoc {
   origin?: string;
   origin_label?: string;
+  zone?: string;
+  harvest_period?: string;
   current_crop_year: number;
   phenology: { name: string; months: number[] }[];
   stage_normals_10y: Record<string, { rain_mean: number | null; temp_mean: number | null }>;
@@ -101,6 +103,13 @@ interface AnalogDoc {
   historical_signatures: HistoricalSig[];
   generated_at: string;
 }
+
+const ZONE_LABEL: Record<string, string> = {
+  southern_temperate:    "Southern hemisphere · temperate",
+  northern_monsoon_asia: "Northern hemisphere · Asian monsoon",
+  equatorial:            "Equatorial",
+  northern_subtropical:  "Northern hemisphere · subtropical",
+};
 
 const STAGE_LABEL: Record<string, string> = {
   pre_flowering: "Pre-flowering (Aug-Sep)",
@@ -555,7 +564,7 @@ export default function WeatherAnalogs({ dataUrl, label }: WeatherAnalogsProps) 
       <div className="flex items-baseline justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-sm font-semibold text-slate-200">
-            Weather analogs — {originLabel} · 24-dim Mahalanobis
+            Weather analogs — {originLabel} · Mahalanobis
           </h3>
           <p className="text-[10px] text-slate-500 mt-0.5 max-w-2xl">
             6 features per phenology stage (rain, temp, anomalies, SPI, SPEI, ENSO ONI) × 4 stages.
@@ -564,8 +573,16 @@ export default function WeatherAnalogs({ dataUrl, label }: WeatherAnalogsProps) 
             apples-to-apples. 95% CIs are 1000-resample bootstrap on the analog set.
           </p>
         </div>
-        <div className="text-[9px] text-slate-600 font-mono">
-          generated {doc.generated_at.slice(0, 10)}
+        <div className="text-[9px] text-slate-600 font-mono text-right">
+          {doc.zone && (
+            <div className="text-slate-500 mb-0.5">
+              zone · {ZONE_LABEL[doc.zone] ?? doc.zone}
+            </div>
+          )}
+          {doc.harvest_period && (
+            <div className="text-slate-600">harvest · {doc.harvest_period}</div>
+          )}
+          <div>generated {doc.generated_at.slice(0, 10)}</div>
         </div>
       </div>
 
