@@ -4,12 +4,31 @@ date headers ('31-Dec-17') with spacer columns that offset values from their
 header cell, port labels pre-2020 and coffee-type labels from 2020 on."""
 from scraper.backfill_ecf_history import (
     YEARLY_PDFS,
+    _cert_at,
     _classify,
     _date_to_period,
     _ecf_tonnes,
+    _european_sum,
     _finalise,
+    _month_end,
     _parse_table,
 )
+
+
+def test_certified_european_join_helpers():
+    assert _month_end("2026-04") == "2026-04-30"
+    assert _month_end("2025-12") == "2025-12-31"
+    # Arabica bags → t, European only (HOU/NY excluded):
+    assert _european_sum({"ANT": 294416, "HA/BR": 21028, "HOU": 62759, "NY": 11974},
+                         0.06) == round((294416 + 21028) * 0.06)
+    # Robusta lots ×10 t, uncertain 'NOR' excluded:
+    assert _european_sum({"ANT": 2103, "LON": 1721, "FEL": 31, "NOR": 500}, 10) \
+        == (2103 + 1721 + 31) * 10
+    # Nearest snapshot on/before month-end, within the gap window:
+    series = [("2026-03-15", 30000), ("2026-04-20", 38640), ("2026-06-01", 40000)]
+    assert _cert_at(series, "2026-04-30") == 38640
+    assert _cert_at(series, "2025-01-31") is None       # nothing before
+    assert _cert_at(series, "2026-09-30") is None       # too stale (>45d)
 
 
 def test_date_header_parsing():

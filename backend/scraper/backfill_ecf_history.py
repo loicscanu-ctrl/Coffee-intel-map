@@ -42,7 +42,7 @@ import io
 import json
 import re
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import requests
@@ -56,8 +56,21 @@ from scraper.sources.ecf_stocks import (
 )
 
 ROOT     = Path(__file__).resolve().parents[2]
-OUT_PATH = ROOT / "frontend" / "public" / "data" / "ecf_history.json"
-DEBUG_PATH = ROOT / "frontend" / "public" / "data" / "ecf_history_debug.json"
+DATA_DIR = ROOT / "frontend" / "public" / "data"
+OUT_PATH = DATA_DIR / "ecf_history.json"
+DEBUG_PATH = DATA_DIR / "ecf_history_debug.json"
+ARABICA_CERT_PATH = DATA_DIR / "certified_stocks_arabica.json"
+ROBUSTA_CERT_PATH = DATA_DIR / "certified_stocks_robusta.json"
+
+# ICE certified warehouse codes that are European ports. Robusta (LIFFE) is all
+# European; arabica (ICE 'C') also lists US ports (HOU/MIAMI/NOLA/NY/VA) which
+# are excluded. 'NOR' is an uncertain robusta code — excluded per "filter by
+# warehouse". 'HA/BR' = Hamburg/Bremen (arabica reports them merged).
+EUROPEAN_CERT_PORTS = {
+    "AMS", "ANT", "BAR", "BRE", "FEL", "HAM", "HA/BR", "LEH", "LIV", "LON",
+    "ROT", "TRI",
+}
+ROBUSTA_LOT_TONNES = 10  # LIFFE robusta lot = 10 t
 
 # One PDF per year. 2021 is the "_updated" re-issue; for 2026 use the latest
 # (June) upload, which supersedes the March one.
@@ -308,6 +321,74 @@ def _finalise(period_map: dict[str, dict]) -> list[dict]:
     return out
 
 
+def _month_end(period: str) -> str:
+    """'2026-04' → '2026-04-30' (ISO), for aligning daily certified snapshots."""
+    y, m = (int(x) for x in period.split("-"))
+    nxt = date(y + (m // 12), (m % 12) + 1, 1)
+    return (nxt - timedelta(days=1)).isoformat()
+
+
+def _european_sum(by_port: dict, scale: float) -> int:
+    """Sum European-port values and scale to metric tonnes."""
+    return int(round(sum(v for code, v in (by_port or {}).items()
+                         if code.strip().upper() in EUROPEAN_CERT_PORTS
+                         and isinstance(v, (int, float))) * scale))
+
+
+def _cert_series(path: Path, by_port_key: str, scale: float) -> list[tuple[str, int]]:
+    """Load a certified file → sorted [(date, european_mt)] from its snapshots.
+    Returns [] if the file is absent/seed/empty so the join degrades gracefully."""
+    if not path.exists():
+        print(f"  [cert] {path.name} absent — no certified overlay")
+        return []
+    try:
+        snaps = json.loads(path.read_text(encoding="utf-8")).get("snapshots", [])
+    except Exception as e:
+        print(f"  [cert] {path.name} unreadable ({e})")
+        return []
+    out = [(s["date"], _european_sum(s.get(by_port_key, {}), scale))
+           for s in snaps if s.get("date")]
+    out.sort()
+    return out
+
+
+def _cert_at(series: list[tuple[str, int]], month_end: str,
+             max_gap_days: int = 45) -> int | None:
+    """Latest certified value on/before month_end, if within max_gap_days."""
+    pick = None
+    for d, v in series:
+        if d <= month_end:
+            pick = (d, v)
+        else:
+            break
+    if not pick:
+        return None
+    gap = (date.fromisoformat(month_end) - date.fromisoformat(pick[0])).days
+    return pick[1] if gap <= max_gap_days else None
+
+
+def _merge_certified(monthly: list[dict]) -> int:
+    """Add cert_eu_robusta_mt / cert_eu_arabica_mt (ICE certified at European
+    ports, by type) to each ECF month where a near-date snapshot exists.
+    Returns the number of months enriched."""
+    arabica = _cert_series(ARABICA_CERT_PATH, "by_port", 0.06)        # bags → t
+    robusta = _cert_series(ROBUSTA_CERT_PATH, "by_port_lots", ROBUSTA_LOT_TONNES)
+    if not arabica and not robusta:
+        return 0
+    n = 0
+    for e in monthly:
+        me = _month_end(e["period"])
+        ra = _cert_at(robusta, me)
+        aa = _cert_at(arabica, me)
+        if ra is not None:
+            e["cert_eu_robusta_mt"] = ra
+        if aa is not None:
+            e["cert_eu_arabica_mt"] = aa
+        if ra is not None or aa is not None:
+            n += 1
+    return n
+
+
 def _build_payload(monthly: list[dict]) -> dict:
     """Assemble the self-contained ECF file that the front-end reads directly:
     historic series + the headline metadata the panel needs."""
@@ -367,6 +448,8 @@ def main(debug: bool = False) -> None:
         print("ERROR: parsed zero periods — not writing ecf_history.json",
               file=sys.stderr)
         sys.exit(1)
+    n_cert = _merge_certified(monthly)
+    print(f"  certified-European overlay added to {n_cert} month(s)")
     payload = _build_payload(monthly)
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)

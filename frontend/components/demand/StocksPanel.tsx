@@ -17,6 +17,10 @@ interface MonthlyEntry {
   arabica_unwashed_mt?: number | null;
   robusta_mt?: number | null;
   other_mt?: number | null;
+  // ICE-certified stock at European warehouses (subset of the ECF type total),
+  // joined in by the 3.4 ECF flow. Present only for recent months.
+  cert_eu_robusta_mt?: number | null;
+  cert_eu_arabica_mt?: number | null;
 }
 
 interface EcfData {
@@ -157,6 +161,27 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
   const yoyArrow = latest?.yoy != null ? deltaArrow(latest.yoy) : null;
   const hasBreakdown = chartData.some(d => d.washed != null || d.robusta != null);
 
+  // ECF stock vs the ICE-certified subset at European warehouses, by type.
+  // Each column = the ECF type total; the light lower segment = certified (a
+  // subset), the dark upper segment = the rest. Only months with certified
+  // data appear.
+  const cmp = monthly.map(m => {
+    const rob = m.robusta_mt ?? null;
+    const ara = m.arabica_washed_mt ?? null;
+    const cr = m.cert_eu_robusta_mt ?? null;
+    const ca = m.cert_eu_arabica_mt ?? null;
+    if (cr == null && ca == null) return null;
+    const k = (x: number) => Math.round(x / 1000);
+    return {
+      period: fmtPeriod(m.period ?? m.month ?? ""),
+      robCert: cr != null ? k(cr) : null,
+      robRest: rob != null && cr != null ? Math.max(0, k(rob - cr)) : null,
+      araCert: ca != null ? k(ca) : null,
+      araRest: ara != null && ca != null ? Math.max(0, k(ara - ca)) : null,
+    };
+  }).filter((d): d is NonNullable<typeof d> => d !== null);
+  const hasCert = cmp.length > 0;
+
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
       <div className="flex items-baseline justify-between">
@@ -275,6 +300,63 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
           : "Type breakdown pending — parsed from ECF PDF on next monthly scraper run."}
         {" "}YoY comparison appears once 13+ months are collected.
       </div>
+
+      {hasCert && (
+        <div className="space-y-1 pt-1 border-t border-slate-700/60">
+          <div className="text-[9px] text-slate-400 uppercase tracking-wide">
+            ECF stock vs ICE-certified at EU ports
+          </div>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={cmp} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                <XAxis
+                  dataKey="period"
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={Math.max(0, Math.floor(cmp.length / 6) - 1)}
+                />
+                <YAxis
+                  tick={{ fontSize: 7, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={v => `${v}k`}
+                />
+                <Tooltip
+                  contentStyle={TT_STYLE}
+                  formatter={(v: unknown, name: unknown) => {
+                    const labels: Record<string, string> = {
+                      robCert: "Robusta · ICE-certified (EU)",
+                      robRest: "Robusta · rest of ECF",
+                      araCert: "Arabica washed · ICE-certified (EU)",
+                      araRest: "Arabica washed · rest of ECF",
+                    };
+                    const key = String(name ?? "");
+                    return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: 8 }}
+                  formatter={(v: string) => ({
+                    robCert: "Robusta certified (EU)", robRest: "Robusta (ECF)",
+                    araCert: "Arabica certified (EU)", araRest: "Arabica washed (ECF)",
+                  }[v] ?? v)}
+                />
+                {/* Robusta column: light-brown certified subset at the base,
+                    brown remainder on top → total = ECF robusta. */}
+                <Bar dataKey="robCert" stackId="rob" fill="#cd9b6a" name="robCert" />
+                <Bar dataKey="robRest" stackId="rob" fill="#6b4423" radius={[2,2,0,0]} name="robRest" />
+                {/* Washed-arabica column: light-red certified subset + red. */}
+                <Bar dataKey="araCert" stackId="ara" fill="#fca5a5" name="araCert" />
+                <Bar dataKey="araRest" stackId="ara" fill="#b91c1c" radius={[2,2,0,0]} name="araRest" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="text-[9px] text-slate-500 italic">
+            Each column = ECF stock for that type; the lighter base is the
+            ICE-certified subset held at European warehouses.
+          </div>
+        </div>
+      )}
 
       <div className="text-[9px] text-slate-500 space-y-0.5">
         {ecf.latest_post && (
