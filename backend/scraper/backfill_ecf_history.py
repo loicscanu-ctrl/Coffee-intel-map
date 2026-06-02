@@ -231,7 +231,6 @@ def main(debug: bool = False) -> None:
             print(f"  {year}: ERROR — {e}", file=sys.stderr)
             failures.append(year)
             continue
-        before = len(period_map)
         parsed = _parse_pdf(r.content, year, url, debug_tables)
         for period, rec in parsed.items():
             dst = period_map.setdefault(period, {"ports": {}, "types": {}, "source_pdf": rec["source_pdf"]})
