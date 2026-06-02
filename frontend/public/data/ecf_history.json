@@ -7,8 +7,6 @@
     {
       "period": "2013-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
-      "value_mt": 29261,
-      "value_raw": 487683,
       "ports": {
         "Bremen": 983833,
         "Hamburg": 1651783,
@@ -35,8 +33,6 @@
     {
       "period": "2014-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
-      "value_mt": 874,
-      "value_raw": 14567,
       "ports": {
         "Bremen": 975100,
         "Hamburg": 1609433,
@@ -63,8 +59,6 @@
     {
       "period": "2014-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
-      "value_mt": 1090442,
-      "value_raw": 18174033,
       "ports": {
         "Bremen": 1166717,
         "Hamburg": 1622967,
@@ -147,8 +141,6 @@
     {
       "period": "2014-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
-      "value_mt": 17589,
-      "value_raw": 293150,
       "ports": {
         "Bremen": 1420067,
         "Hamburg": 1829417,
@@ -161,8 +153,6 @@
     {
       "period": "2014-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf",
-      "value_mt": 17589,
-      "value_raw": 293150,
       "ports": {
         "Bremen": 1420067,
         "Hamburg": 1829417,
