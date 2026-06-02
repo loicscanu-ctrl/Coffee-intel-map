@@ -1,6 +1,6 @@
-name: "3.5 – Japan stocks (AJCA)"
+name: "3.5 – AJCA (Japan)"
 
-# Builds frontend/public/data/japan_stocks.json from AJCA's monthly
+# Builds frontend/public/data/ajca.json from AJCA's monthly
 # "コーヒー豆在庫実績調査" (j-zaiko) reports: green-coffee stocks by origin and
 # by region/port, monthly. Runs on a GitHub runner because ajca.or.jp is
 # reachable there (the Claude sandbox is host-allowlist blocked).
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       debug:
-        description: "Also write japan_stocks_debug.json"
+        description: "Also write ajca_debug.json"
         type: boolean
         default: false
 
@@ -48,19 +48,19 @@ jobs:
         if: ${{ inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: japan-stocks-debug
-          path: frontend/public/data/japan_stocks_debug.json
+          name: ajca-debug
+          path: frontend/public/data/ajca_debug.json
           if-no-files-found: ignore
 
       - name: Commit japan_stocks.json if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          rm -f frontend/public/data/japan_stocks_debug.json
-          git add frontend/public/data/japan_stocks.json
+          rm -f frontend/public/data/ajca_debug.json
+          git add frontend/public/data/ajca.json
           git diff --cached --quiet \
             && echo "No changes." \
-            || (git commit -m "data: update japan_stocks.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+            || (git commit -m "data: update ajca.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
 
       - name: Notify on failure
         if: failure()
