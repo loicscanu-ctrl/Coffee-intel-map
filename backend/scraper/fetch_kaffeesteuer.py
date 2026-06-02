@@ -55,6 +55,9 @@ PUB_VERSIONS = [2, 1]
 # Plausible monthly Kaffeesteuer revenue in Tsd. EUR (historically 60k-121k).
 MIN_TSD, MAX_TSD = 5_000, 400_000
 
+REQUEST_TIMEOUT = 10          # per-request seconds
+ABORT_AFTER_NET_FAILS = 6     # consecutive timeouts/conn errors → BMF unreachable
+
 
 def generate_candidate_urls(target_year: int, target_month_num: int) -> list[str]:
     """
@@ -180,6 +183,7 @@ def main():
     print(f"Checking {len(periods_to_check)} missing periods...")
     results = dict(existing)
     added = 0
+    consec_net_fail = 0
 
     for year, month in periods_to_check:
         period_str = f"{year}-{month:02d}"
@@ -190,10 +194,17 @@ def main():
 
         for url in generate_candidate_urls(year, month):
             try:
-                r = session.get(url, timeout=15)
+                r = session.get(url, timeout=REQUEST_TIMEOUT)
             except requests.RequestException as e:
                 status_counts[f"exc:{type(e).__name__}"] += 1
+                consec_net_fail += 1
+                if consec_net_fail >= ABORT_AFTER_NET_FAILS:
+                    print(f"  [ABORT] {consec_net_fail} consecutive network "
+                          "failures — BMF unreachable/tarpitting this runner. "
+                          "Stopping to avoid hammering.")
+                    return
                 continue
+            consec_net_fail = 0
             status_counts[r.status_code] += 1
             # Log the first probe verbatim so the run exposes WAF 403s / HTML
             # redirects vs genuine 404s.
@@ -214,6 +225,11 @@ def main():
 
         if not found:
             print(f"  [NOT FOUND] {period_str} — status summary: {dict(status_counts)}")
+            # If a whole month saw only WAF 403s, further months will too.
+            if status_counts and set(status_counts) == {403}:
+                print("  [ABORT] BMF returned 403 for every candidate — WAF is "
+                      "blocking this runner. Stopping.")
+                return
 
     if not added:
         print("\nNo new values fetched — leaving JSON unchanged.")

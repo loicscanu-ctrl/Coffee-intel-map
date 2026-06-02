@@ -119,14 +119,63 @@ def _ingest(period_map: dict[str, dict], period: str, kind: str,
         rec["ports"][name] = value
 
 
+# ECF date headers look like "31-Dec-17", "29-Feb-20", "31-Jan-2026".
+_DATE_RE = re.compile(r"\b\d{1,2}[-/ ]([A-Za-z]{3,9})[-/ ](\d{2,4})\b")
+
+
+def _date_to_period(cell: str) -> str | None:
+    """'31-Dec-17' → '2017-12'; '29-Feb-2020' → '2020-02'. None if not a date."""
+    m = _DATE_RE.search(_norm(cell))
+    if not m:
+        return None
+    mo = _PDF_MONTHS_EN.get(m.group(1)[:3].lower())
+    if not mo:
+        return None
+    y = int(m.group(2))
+    if y < 100:
+        y += 2000
+    return f"{y}-{mo:02d}"
+
+
+def _ecf_tonnes(cell) -> int | None:
+    """ECF cells are whole tonnes with '.'/',' as thousands separators
+    ('321.519', '346,220'). Strip separators → int. Wider band than the
+    type-only helper so small ports are kept."""
+    s = re.sub(r"[^\d]", "", str(cell or "").strip())
+    if not s:
+        return None
+    n = int(s)
+    return n if 1 <= n <= 2_000_000 else None
+
+
 def _parse_table(table: list, default_year: int, source_pdf: str,
                  period_map: dict[str, dict]) -> int:
-    """Parse one extracted table in either orientation; mutate period_map.
-    Returns the number of (period, value) cells ingested."""
+    """Parse one extracted table; mutate period_map. Returns cells ingested.
+
+    Primary path = ECF's real layout: end-of-month date columns in the header
+    ('31-Dec-17'…) with port/type labels down the first column. pdfplumber
+    splits the wide tables with spacer columns and offsets values from their
+    header cell, so we zip the *ordered* date headers with the *ordered* numeric
+    cells of each row rather than matching by column index."""
     if not table or len(table) < 2:
         return 0
     header = [_norm(c) for c in table[0]]
     ingested = 0
+
+    date_periods = [p for c in header if (p := _date_to_period(c))]
+    if date_periods:
+        for row in table[1:]:
+            if not row:
+                continue
+            label = _norm(row[0])
+            if not label or _date_to_period(label):
+                continue
+            kind, name = _classify(label)
+            nums = [v for cell in row[1:] if (v := _ecf_tonnes(cell)) is not None]
+            for period, val in zip(date_periods, nums):
+                _ingest(period_map, period, kind, name, val, source_pdf)
+                ingested += 1
+        return ingested
 
     # Year from any header/label cell, else the file's year.
     year = default_year
@@ -234,6 +283,8 @@ def _finalise(period_map: dict[str, dict]) -> list[dict]:
         total = rec.get("total_mt")
         if total is None and ports:
             total = sum(ports.values())
+        if total is None and types:           # 2020+ type-only periods
+            total = sum(types.values())
         entry: dict = {"period": period, "source_pdf": rec.get("source_pdf")}
         if total is not None:
             entry["value_mt"] = int(total)

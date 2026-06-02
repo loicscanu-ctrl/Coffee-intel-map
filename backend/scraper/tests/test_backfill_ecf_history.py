@@ -1,76 +1,79 @@
-"""Tests for backfill_ecf_history.py table parsing (no network).
-Exercises both PDF table orientations and the total/port/type classification."""
+"""Tests for backfill_ecf_history.py parsing (no network).
+Uses the REAL ECF table shapes confirmed from the yearly PDFs: end-of-month
+date headers ('31-Dec-17') with spacer columns that offset values from their
+header cell, port labels pre-2020 and coffee-type labels from 2020 on."""
 from scraper.backfill_ecf_history import (
     YEARLY_PDFS,
     _classify,
+    _date_to_period,
+    _ecf_tonnes,
     _finalise,
-    _month_in,
     _parse_table,
 )
 
 
-def test_classify_distinguishes_total_type_port():
-    assert _classify("Total") == ("total", "total")
-    assert _classify("Grand Total") == ("total", "total")
-    assert _classify("Robusta") == ("type", "robusta_mt")
-    assert _classify("Arabica Washed") == ("type", "arabica_washed_mt")
+def test_date_header_parsing():
+    assert _date_to_period("31-Dec-17") == "2017-12"
+    assert _date_to_period("29-Feb-20") == "2020-02"
+    assert _date_to_period("31-Jan-2026") == "2026-01"
+    assert _date_to_period("Antwerp") is None
+    assert _date_to_period("Port") is None
+
+
+def test_ecf_tonnes_strips_separators():
+    assert _ecf_tonnes("321.519") == 321519   # dot thousands (older PDFs)
+    assert _ecf_tonnes("346,220") == 346220   # comma thousands (newer PDFs)
+    assert _ecf_tonnes(None) is None
+    assert _ecf_tonnes("Antwerp") is None
+
+
+def test_classify_port_type_total():
     assert _classify("Antwerp") == ("port", "Antwerp")
-    assert _classify("Le Havre") == ("port", "Le Havre")
+    assert _classify("Robusta") == ("type", "robusta_mt")
+    assert _classify("Natural Arabica") == ("type", "arabica_unwashed_mt")
+    assert _classify("Washed Arabica") == ("type", "arabica_washed_mt")
+    assert _classify("Total") == ("total", "total")
 
 
-def test_month_in_recognises_names_and_abbreviations():
-    assert _month_in("Jan") == 1
-    assert _month_in("February") == 2
-    assert _month_in("Dec.") == 12
-    assert _month_in("Port") is None
-
-
-def test_orientation_a_months_in_header_ports_in_rows():
-    """Pre-2020 layout: ports down the side, months across the top, plus Total."""
+def test_parse_real_by_port_table_offset_values():
+    """Pre-2020 layout: values sit one cell left of their date header; ordered
+    zip must still line them up."""
     table = [
-        ["Port", "Jan", "Feb"],
-        ["Antwerp", "120,000", "118,500"],
-        ["Hamburg", "95,000", "97,200"],
-        ["Total", "215,000", "215,700"],
+        ["", "Port", "", "", "31-Dec-17", "", "", "31-Jan-18"],
+        ["Antwerp", None, None, "321.519", None, None, "313.109", None],
+        ["Hamburg", None, None, "112.379", None, None, "115.997", None],
     ]
     pm: dict = {}
-    assert _parse_table(table, 2018, "u", pm) == 6
+    assert _parse_table(table, 2018, "u", pm) == 4
     out = {e["period"]: e for e in _finalise(pm)}
-    assert out["2018-01"]["value_mt"] == 215_000
-    assert out["2018-01"]["ports"] == {"Antwerp": 120_000, "Hamburg": 95_000}
-    # 215,000 t / 60 kg ≈ 3,583,333 bags
-    assert out["2018-01"]["value_raw"] == 3_583_333
+    assert out["2017-12"]["ports"] == {"Antwerp": 321_519, "Hamburg": 112_379}
+    assert out["2018-01"]["ports"]["Antwerp"] == 313_109
+    # total falls back to sum of ports
+    assert out["2017-12"]["value_mt"] == 321_519 + 112_379
 
 
-def test_orientation_b_months_in_rows_types_in_columns():
-    """2020+ layout variant: month rows, type columns."""
+def test_parse_real_by_type_table():
+    """2020+ layout: coffee-type rows → type breakdown; total = sum of types."""
     table = [
-        ["Month 2021", "Arabica Washed", "Robusta", "Total"],
-        ["January", "200,000", "150,000", "350,000"],
-        ["February", "210,000", "148,000", "358,000"],
+        ["", "Type of coffee", "", "", "31-Jan-20", "", "", "29-Feb-20"],
+        ["Robusta", None, None, "312.468", None, None, "308.197", None],
+        ["Natural Arabica", None, None, "202.536", None, None, "202.652", None],
     ]
     pm: dict = {}
-    assert _parse_table(table, 2021, "u", pm) == 6
+    assert _parse_table(table, 2020, "u", pm) == 4
     out = {e["period"]: e for e in _finalise(pm)}
-    assert out["2021-01"]["value_mt"] == 350_000
-    assert out["2021-01"]["types"]["arabica_washed_mt"] == 200_000
-    assert out["2021-01"]["types"]["robusta_mt"] == 150_000
+    assert out["2020-01"]["types"]["robusta_mt"] == 312_468
+    assert out["2020-01"]["types"]["arabica_unwashed_mt"] == 202_536
+    assert out["2020-01"]["value_mt"] == 312_468 + 202_536
 
 
-def test_total_summed_from_ports_when_no_total_row():
-    table = [
-        ["Port", "Jan"],
-        ["Antwerp", "100,000"],
-        ["Hamburg", "50,000"],
-    ]
+def test_parse_ignores_non_date_tables():
+    table = [["Disclaimer:", "text"], ["more", "text"]]
     pm: dict = {}
-    _parse_table(table, 2016, "u", pm)
-    out = {e["period"]: e for e in _finalise(pm)}
-    assert out["2016-01"]["value_mt"] == 150_000  # summed from ports
+    assert _parse_table(table, 2019, "u", pm) == 0
 
 
 def test_pdf_list_covers_2014_to_present():
     assert min(YEARLY_PDFS) == 2014
     assert 2025 in YEARLY_PDFS and 2026 in YEARLY_PDFS
-    # 2021 is the corrected "_updated" re-issue.
     assert "_updated" in YEARLY_PDFS[2021]
