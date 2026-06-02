@@ -1,5 +1,21 @@
 [
   {
+    "id": 5882,
+    "title": "Vietnam Robusta \u2013 2026-06-02",
+    "body": "Vietnam Robusta price: 86.700 VND/kg",
+    "source": "Giacaphe",
+    "category": "supply",
+    "lat": 14.058,
+    "lng": 108.277,
+    "tags": [
+      "price",
+      "robusta",
+      "vietnam"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-02T08:55:27.245793"
+  },
+  {
     "id": 5881,
     "title": "World Bank Population \u2013 2026-06-02",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -211,22 +227,6 @@
     ],
     "meta": null,
     "pub_date": "2026-06-02T08:42:12.620725"
-  },
-  {
-    "id": 5868,
-    "title": "Vietnam Robusta \u2013 2026-06-02",
-    "body": "Vietnam Robusta price: 86.700 VND/kg",
-    "source": "Giacaphe",
-    "category": "supply",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "price",
-      "robusta",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-02T08:41:58.111749"
   },
   {
     "id": 5811,
