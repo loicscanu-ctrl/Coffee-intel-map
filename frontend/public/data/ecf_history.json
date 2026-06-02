@@ -1,7 +1,65 @@
 {
   "source": "ECF",
   "unit": "metric_tonnes",
-  "generated_at": "2026-06-02",
+  "last_updated": "2026-06-02",
+  "latest_bags": 6815933,
+  "latest_m_bags": 6.82,
+  "source_url": "https://www.ecf-coffee.org/category/publications/stocks/",
+  "latest_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
+  "yearly_pdfs": [
+    {
+      "year": "2026",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2025",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2024",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2023",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2022",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2021",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf"
+    },
+    {
+      "year": "2020",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2019",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2019-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2018",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2018-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2017",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2017-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2016",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2016-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2015",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2015-Stocks-European-Ports.pdf"
+    },
+    {
+      "year": "2014",
+      "pdf_url": "https://www.ecf-coffee.org/wp-content/uploads/2020/09/2014-Stocks-European-Ports.pdf"
+    }
+  ],
   "count": 149,
   "monthly": [
     {
@@ -999,561 +1057,459 @@
         "Trieste": 54256,
         "Barcelona": 40205
       },
-      "types": {
-        "robusta_mt": 312468,
-        "arabica_unwashed_mt": 202536,
-        "arabica_washed_mt": 292383
-      }
+      "robusta_mt": 312468,
+      "arabica_unwashed_mt": 202536,
+      "arabica_washed_mt": 292383
     },
     {
       "period": "2020-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 807387,
       "value_raw": 13456450,
-      "types": {
-        "robusta_mt": 312468,
-        "arabica_unwashed_mt": 202536,
-        "arabica_washed_mt": 292383
-      }
+      "robusta_mt": 312468,
+      "arabica_unwashed_mt": 202536,
+      "arabica_washed_mt": 292383
     },
     {
       "period": "2020-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 797581,
       "value_raw": 13293017,
-      "types": {
-        "robusta_mt": 308197,
-        "arabica_unwashed_mt": 202652,
-        "arabica_washed_mt": 286733
-      }
+      "robusta_mt": 308197,
+      "arabica_unwashed_mt": 202652,
+      "arabica_washed_mt": 286733
     },
     {
       "period": "2020-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 776219,
       "value_raw": 12936983,
-      "types": {
-        "robusta_mt": 303213,
-        "arabica_unwashed_mt": 190341,
-        "arabica_washed_mt": 282664
-      }
+      "robusta_mt": 303213,
+      "arabica_unwashed_mt": 190341,
+      "arabica_washed_mt": 282664
     },
     {
       "period": "2020-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 804172,
       "value_raw": 13402867,
-      "types": {
-        "robusta_mt": 316309,
-        "arabica_unwashed_mt": 200478,
-        "arabica_washed_mt": 287385
-      }
+      "robusta_mt": 316309,
+      "arabica_unwashed_mt": 200478,
+      "arabica_washed_mt": 287385
     },
     {
       "period": "2020-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 820665,
       "value_raw": 13677750,
-      "types": {
-        "robusta_mt": 339257,
-        "arabica_unwashed_mt": 185677,
-        "arabica_washed_mt": 295731
-      }
+      "robusta_mt": 339257,
+      "arabica_unwashed_mt": 185677,
+      "arabica_washed_mt": 295731
     },
     {
       "period": "2020-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 877469,
       "value_raw": 14624483,
-      "types": {
-        "robusta_mt": 347673,
-        "arabica_unwashed_mt": 221546,
-        "arabica_washed_mt": 308250
-      }
+      "robusta_mt": 347673,
+      "arabica_unwashed_mt": 221546,
+      "arabica_washed_mt": 308250
     },
     {
       "period": "2020-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 906337,
       "value_raw": 15105617,
-      "types": {
-        "robusta_mt": 363538,
-        "arabica_unwashed_mt": 225359,
-        "arabica_washed_mt": 317441
-      }
+      "robusta_mt": 363538,
+      "arabica_unwashed_mt": 225359,
+      "arabica_washed_mt": 317441
     },
     {
       "period": "2020-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 926651,
       "value_raw": 15444183,
-      "types": {
-        "robusta_mt": 368116,
-        "arabica_unwashed_mt": 237760,
-        "arabica_washed_mt": 320775
-      }
+      "robusta_mt": 368116,
+      "arabica_unwashed_mt": 237760,
+      "arabica_washed_mt": 320775
     },
     {
       "period": "2020-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 902298,
       "value_raw": 15038300,
-      "types": {
-        "robusta_mt": 357174,
-        "arabica_unwashed_mt": 229598,
-        "arabica_washed_mt": 315525
-      }
+      "robusta_mt": 357174,
+      "arabica_unwashed_mt": 229598,
+      "arabica_washed_mt": 315525
     },
     {
       "period": "2020-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 904583,
       "value_raw": 15076383,
-      "types": {
-        "robusta_mt": 358507,
-        "arabica_unwashed_mt": 241409,
-        "arabica_washed_mt": 304667
-      }
+      "robusta_mt": 358507,
+      "arabica_unwashed_mt": 241409,
+      "arabica_washed_mt": 304667
     },
     {
       "period": "2020-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 900413,
       "value_raw": 15006883,
-      "types": {
-        "robusta_mt": 359790,
-        "arabica_unwashed_mt": 245745,
-        "arabica_washed_mt": 294879
-      }
+      "robusta_mt": 359790,
+      "arabica_unwashed_mt": 245745,
+      "arabica_washed_mt": 294879
     },
     {
       "period": "2020-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/03/2020-Stocks-European-Ports.pdf",
       "value_mt": 909723,
       "value_raw": 15162050,
-      "types": {
-        "robusta_mt": 350548,
-        "arabica_unwashed_mt": 260081,
-        "arabica_washed_mt": 299095
-      }
+      "robusta_mt": 350548,
+      "arabica_unwashed_mt": 260081,
+      "arabica_washed_mt": 299095
     },
     {
       "period": "2021-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 890563,
       "value_raw": 14842717,
-      "types": {
-        "robusta_mt": 346220,
-        "arabica_unwashed_mt": 248114,
-        "arabica_washed_mt": 296229
-      }
+      "robusta_mt": 346220,
+      "arabica_unwashed_mt": 248114,
+      "arabica_washed_mt": 296229
     },
     {
       "period": "2021-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 876590,
       "value_raw": 14609833,
-      "types": {
-        "robusta_mt": 334659,
-        "arabica_unwashed_mt": 252085,
-        "arabica_washed_mt": 289847
-      }
+      "robusta_mt": 334659,
+      "arabica_unwashed_mt": 252085,
+      "arabica_washed_mt": 289847
     },
     {
       "period": "2021-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 864740,
       "value_raw": 14412333,
-      "types": {
-        "robusta_mt": 322843,
-        "arabica_unwashed_mt": 255007,
-        "arabica_washed_mt": 286891
-      }
+      "robusta_mt": 322843,
+      "arabica_unwashed_mt": 255007,
+      "arabica_washed_mt": 286891
     },
     {
       "period": "2021-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 868323,
       "value_raw": 14472050,
-      "types": {
-        "robusta_mt": 320617,
-        "arabica_unwashed_mt": 262306,
-        "arabica_washed_mt": 285400
-      }
+      "robusta_mt": 320617,
+      "arabica_unwashed_mt": 262306,
+      "arabica_washed_mt": 285400
     },
     {
       "period": "2021-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 873177,
       "value_raw": 14552950,
-      "types": {
-        "robusta_mt": 322903,
-        "arabica_unwashed_mt": 261971,
-        "arabica_washed_mt": 288303
-      }
+      "robusta_mt": 322903,
+      "arabica_unwashed_mt": 261971,
+      "arabica_washed_mt": 288303
     },
     {
       "period": "2021-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 866538,
       "value_raw": 14442300,
-      "types": {
-        "robusta_mt": 314747,
-        "arabica_unwashed_mt": 261571,
-        "arabica_washed_mt": 290220
-      }
+      "robusta_mt": 314747,
+      "arabica_unwashed_mt": 261571,
+      "arabica_washed_mt": 290220
     },
     {
       "period": "2021-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 858571,
       "value_raw": 14309517,
-      "types": {
-        "robusta_mt": 305627,
-        "arabica_unwashed_mt": 256111,
-        "arabica_washed_mt": 296833
-      }
+      "robusta_mt": 305627,
+      "arabica_unwashed_mt": 256111,
+      "arabica_washed_mt": 296833
     },
     {
       "period": "2021-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 847494,
       "value_raw": 14124900,
-      "types": {
-        "robusta_mt": 297656,
-        "arabica_unwashed_mt": 247685,
-        "arabica_washed_mt": 302152
-      }
+      "robusta_mt": 297656,
+      "arabica_unwashed_mt": 247685,
+      "arabica_washed_mt": 302152
     },
     {
       "period": "2021-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 826075,
       "value_raw": 13767917,
-      "types": {
-        "robusta_mt": 290077,
-        "arabica_unwashed_mt": 233547,
-        "arabica_washed_mt": 302452
-      }
+      "robusta_mt": 290077,
+      "arabica_unwashed_mt": 233547,
+      "arabica_washed_mt": 302452
     },
     {
       "period": "2021-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 799308,
       "value_raw": 13321800,
-      "types": {
-        "robusta_mt": 285785,
-        "arabica_unwashed_mt": 222090,
-        "arabica_washed_mt": 291433
-      }
+      "robusta_mt": 285785,
+      "arabica_unwashed_mt": 222090,
+      "arabica_washed_mt": 291433
     },
     {
       "period": "2021-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 740429,
       "value_raw": 12340483,
-      "types": {
-        "robusta_mt": 264697,
-        "arabica_unwashed_mt": 212488,
-        "arabica_washed_mt": 263244
-      }
+      "robusta_mt": 264697,
+      "arabica_unwashed_mt": 212488,
+      "arabica_washed_mt": 263244
     },
     {
       "period": "2021-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2021/11/2021-Stocks-European-Ports_updated.pdf",
       "value_mt": 722440,
       "value_raw": 12040667,
-      "types": {
-        "robusta_mt": 259942,
-        "arabica_unwashed_mt": 215013,
-        "arabica_washed_mt": 247486
-      }
+      "robusta_mt": 259942,
+      "arabica_unwashed_mt": 215013,
+      "arabica_washed_mt": 247486
     },
     {
       "period": "2022-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 708988,
       "value_raw": 11816467,
-      "types": {
-        "robusta_mt": 251299,
-        "arabica_unwashed_mt": 215603,
-        "arabica_washed_mt": 242087
-      }
+      "robusta_mt": 251299,
+      "arabica_unwashed_mt": 215603,
+      "arabica_washed_mt": 242087
     },
     {
       "period": "2022-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 711464,
       "value_raw": 11857733,
-      "types": {
-        "robusta_mt": 248039,
-        "arabica_unwashed_mt": 221337,
-        "arabica_washed_mt": 242087
-      }
+      "robusta_mt": 248039,
+      "arabica_unwashed_mt": 221337,
+      "arabica_washed_mt": 242087
     },
     {
       "period": "2022-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 715112,
       "value_raw": 11918533,
-      "types": {
-        "robusta_mt": 245923,
-        "arabica_unwashed_mt": 221834,
-        "arabica_washed_mt": 247355
-      }
+      "robusta_mt": 245923,
+      "arabica_unwashed_mt": 221834,
+      "arabica_washed_mt": 247355
     },
     {
       "period": "2022-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 746860,
       "value_raw": 12447667,
-      "types": {
-        "robusta_mt": 260969,
-        "arabica_unwashed_mt": 230687,
-        "arabica_washed_mt": 255204
-      }
+      "robusta_mt": 260969,
+      "arabica_unwashed_mt": 230687,
+      "arabica_washed_mt": 255204
     },
     {
       "period": "2022-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 800753,
       "value_raw": 13345883,
-      "types": {
-        "robusta_mt": 300733,
-        "arabica_unwashed_mt": 238695,
-        "arabica_washed_mt": 261325
-      }
+      "robusta_mt": 300733,
+      "arabica_unwashed_mt": 238695,
+      "arabica_washed_mt": 261325
     },
     {
       "period": "2022-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 817837,
       "value_raw": 13630617,
-      "types": {
-        "robusta_mt": 315637,
-        "arabica_unwashed_mt": 237954,
-        "arabica_washed_mt": 264246
-      }
+      "robusta_mt": 315637,
+      "arabica_unwashed_mt": 237954,
+      "arabica_washed_mt": 264246
     },
     {
       "period": "2022-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 832727,
       "value_raw": 13878783,
-      "types": {
-        "robusta_mt": 334174,
-        "arabica_unwashed_mt": 226582,
-        "arabica_washed_mt": 271972
-      }
+      "robusta_mt": 334174,
+      "arabica_unwashed_mt": 226582,
+      "arabica_washed_mt": 271972
     },
     {
       "period": "2022-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 838796,
       "value_raw": 13979933,
-      "types": {
-        "robusta_mt": 334319,
-        "arabica_unwashed_mt": 249301,
-        "arabica_washed_mt": 255176
-      }
+      "robusta_mt": 334319,
+      "arabica_unwashed_mt": 249301,
+      "arabica_washed_mt": 255176
     },
     {
       "period": "2022-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 840577,
       "value_raw": 14009617,
-      "types": {
-        "robusta_mt": 325217,
-        "arabica_unwashed_mt": 234679,
-        "arabica_washed_mt": 280681
-      }
+      "robusta_mt": 325217,
+      "arabica_unwashed_mt": 234679,
+      "arabica_washed_mt": 280681
     },
     {
       "period": "2022-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 831428,
       "value_raw": 13857133,
-      "types": {
-        "robusta_mt": 317554,
-        "arabica_unwashed_mt": 234543,
-        "arabica_washed_mt": 279330
-      }
+      "robusta_mt": 317554,
+      "arabica_unwashed_mt": 234543,
+      "arabica_washed_mt": 279330
     },
     {
       "period": "2022-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 788459,
       "value_raw": 13140983,
-      "types": {
-        "robusta_mt": 287700,
-        "arabica_unwashed_mt": 235690,
-        "arabica_washed_mt": 265068
-      }
+      "robusta_mt": 287700,
+      "arabica_unwashed_mt": 235690,
+      "arabica_washed_mt": 265068
     },
     {
       "period": "2022-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2023/01/2022-Stocks-European-Ports.pdf",
       "value_mt": 771330,
       "value_raw": 12855500,
-      "types": {
-        "robusta_mt": 273753,
-        "arabica_unwashed_mt": 245811,
-        "arabica_washed_mt": 251766
-      }
+      "robusta_mt": 273753,
+      "arabica_unwashed_mt": 245811,
+      "arabica_washed_mt": 251766
     },
     {
       "period": "2023-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 703478,
       "value_raw": 11724633,
-      "types": {
-        "robusta_mt": 256216,
-        "arabica_unwashed_mt": 237957,
-        "arabica_washed_mt": 209305
-      }
+      "robusta_mt": 256216,
+      "arabica_unwashed_mt": 237957,
+      "arabica_washed_mt": 209305
     },
     {
       "period": "2023-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 681437,
       "value_raw": 11357283,
-      "types": {
-        "robusta_mt": 249354,
-        "arabica_unwashed_mt": 230263,
-        "arabica_washed_mt": 201820
-      }
+      "robusta_mt": 249354,
+      "arabica_unwashed_mt": 230263,
+      "arabica_washed_mt": 201820
     },
     {
       "period": "2023-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 663982,
       "value_raw": 11066367,
-      "types": {
-        "robusta_mt": 242327,
-        "arabica_unwashed_mt": 213143,
-        "arabica_washed_mt": 208512
-      }
+      "robusta_mt": 242327,
+      "arabica_unwashed_mt": 213143,
+      "arabica_washed_mt": 208512
     },
     {
       "period": "2023-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 671390,
       "value_raw": 11189833,
-      "types": {
-        "robusta_mt": 268182,
-        "arabica_unwashed_mt": 204447,
-        "arabica_washed_mt": 198761
-      }
+      "robusta_mt": 268182,
+      "arabica_unwashed_mt": 204447,
+      "arabica_washed_mt": 198761
     },
     {
       "period": "2023-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 668834,
       "value_raw": 11147233,
-      "types": {
-        "robusta_mt": 278022,
-        "arabica_unwashed_mt": 193703,
-        "arabica_washed_mt": 197109
-      }
+      "robusta_mt": 278022,
+      "arabica_unwashed_mt": 193703,
+      "arabica_washed_mt": 197109
     },
     {
       "period": "2023-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 693851,
       "value_raw": 11564183,
-      "types": {
-        "robusta_mt": 277261,
-        "arabica_unwashed_mt": 181182,
-        "arabica_washed_mt": 235408
-      }
+      "robusta_mt": 277261,
+      "arabica_unwashed_mt": 181182,
+      "arabica_washed_mt": 235408
     },
     {
       "period": "2023-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 650945,
       "value_raw": 10849083,
-      "types": {
-        "robusta_mt": 259807,
-        "arabica_unwashed_mt": 160065,
-        "arabica_washed_mt": 231073
-      }
+      "robusta_mt": 259807,
+      "arabica_unwashed_mt": 160065,
+      "arabica_washed_mt": 231073
     },
     {
       "period": "2023-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 613659,
       "value_raw": 10227650,
-      "types": {
-        "robusta_mt": 237112,
-        "arabica_unwashed_mt": 150207,
-        "arabica_washed_mt": 226339
-      }
+      "robusta_mt": 237112,
+      "arabica_unwashed_mt": 150207,
+      "arabica_washed_mt": 226339
     },
     {
       "period": "2023-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 558806,
       "value_raw": 9313433,
-      "types": {
-        "robusta_mt": 203552,
-        "arabica_unwashed_mt": 139429,
-        "arabica_washed_mt": 215825
-      }
+      "robusta_mt": 203552,
+      "arabica_unwashed_mt": 139429,
+      "arabica_washed_mt": 215825
     },
     {
       "period": "2023-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 506411,
       "value_raw": 8440183,
-      "types": {
-        "robusta_mt": 178472,
-        "arabica_unwashed_mt": 123335,
-        "arabica_washed_mt": 204604
-      }
+      "robusta_mt": 178472,
+      "arabica_unwashed_mt": 123335,
+      "arabica_washed_mt": 204604
     },
     {
       "period": "2023-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 454639,
       "value_raw": 7577317,
-      "types": {
-        "robusta_mt": 155591,
-        "arabica_unwashed_mt": 123343,
-        "arabica_washed_mt": 175705
-      }
+      "robusta_mt": 155591,
+      "arabica_unwashed_mt": 123343,
+      "arabica_washed_mt": 175705
     },
     {
       "period": "2023-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2024/01/2023-Stocks-European-Ports.pdf",
       "value_mt": 437059,
       "value_raw": 7284317,
-      "types": {
-        "robusta_mt": 144559,
-        "arabica_unwashed_mt": 129668,
-        "arabica_washed_mt": 162833
-      }
+      "robusta_mt": 144559,
+      "arabica_unwashed_mt": 129668,
+      "arabica_washed_mt": 162833
     },
     {
       "period": "2024-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 411949,
       "value_raw": 6865817,
-      "types": {
-        "robusta_mt": 124156,
-        "arabica_unwashed_mt": 125653,
-        "arabica_washed_mt": 162140
-      }
+      "robusta_mt": 124156,
+      "arabica_unwashed_mt": 125653,
+      "arabica_washed_mt": 162140
     },
     {
       "period": "2024-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 401787,
       "value_raw": 6696450,
-      "types": {
-        "robusta_mt": 114117,
-        "arabica_unwashed_mt": 126150,
-        "arabica_washed_mt": 161520
-      }
+      "robusta_mt": 114117,
+      "arabica_unwashed_mt": 126150,
+      "arabica_washed_mt": 161520
     },
     {
       "period": "2024-03",
@@ -1563,286 +1519,234 @@
       "ports": {
         "Type of coffee": 3024
       },
-      "types": {
-        "robusta_mt": 107661,
-        "arabica_unwashed_mt": 111371,
-        "arabica_washed_mt": 165208
-      }
+      "robusta_mt": 107661,
+      "arabica_unwashed_mt": 111371,
+      "arabica_washed_mt": 165208
     },
     {
       "period": "2024-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 424860,
       "value_raw": 7081000,
-      "types": {
-        "robusta_mt": 135387,
-        "arabica_unwashed_mt": 119781,
-        "arabica_washed_mt": 169692
-      }
+      "robusta_mt": 135387,
+      "arabica_unwashed_mt": 119781,
+      "arabica_washed_mt": 169692
     },
     {
       "period": "2024-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 482855,
       "value_raw": 8047583,
-      "types": {
-        "robusta_mt": 174993,
-        "arabica_unwashed_mt": 134313,
-        "arabica_washed_mt": 173549
-      }
+      "robusta_mt": 174993,
+      "arabica_unwashed_mt": 134313,
+      "arabica_washed_mt": 173549
     },
     {
       "period": "2024-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 482855,
       "value_raw": 8047583,
-      "types": {
-        "robusta_mt": 183755,
-        "arabica_unwashed_mt": 141523,
-        "arabica_washed_mt": 179368
-      }
+      "robusta_mt": 183755,
+      "arabica_unwashed_mt": 141523,
+      "arabica_washed_mt": 179368
     },
     {
       "period": "2024-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 522144,
       "value_raw": 8702400,
-      "types": {
-        "robusta_mt": 188544,
-        "arabica_unwashed_mt": 146388,
-        "arabica_washed_mt": 187212
-      }
+      "robusta_mt": 188544,
+      "arabica_unwashed_mt": 146388,
+      "arabica_washed_mt": 187212
     },
     {
       "period": "2024-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 526674,
       "value_raw": 8777900,
-      "types": {
-        "robusta_mt": 192232,
-        "arabica_unwashed_mt": 143275,
-        "arabica_washed_mt": 191166
-      }
+      "robusta_mt": 192232,
+      "arabica_unwashed_mt": 143275,
+      "arabica_washed_mt": 191166
     },
     {
       "period": "2024-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 517572,
       "value_raw": 8626200,
-      "types": {
-        "robusta_mt": 184940,
-        "arabica_unwashed_mt": 145470,
-        "arabica_washed_mt": 187162
-      }
+      "robusta_mt": 184940,
+      "arabica_unwashed_mt": 145470,
+      "arabica_washed_mt": 187162
     },
     {
       "period": "2024-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 518770,
       "value_raw": 8646167,
-      "types": {
-        "robusta_mt": 183322,
-        "arabica_unwashed_mt": 149973,
-        "arabica_washed_mt": 185475
-      }
+      "robusta_mt": 183322,
+      "arabica_unwashed_mt": 149973,
+      "arabica_washed_mt": 185475
     },
     {
       "period": "2024-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 534771,
       "value_raw": 8912850,
-      "types": {
-        "robusta_mt": 187292,
-        "arabica_unwashed_mt": 169285,
-        "arabica_washed_mt": 178194
-      }
+      "robusta_mt": 187292,
+      "arabica_unwashed_mt": 169285,
+      "arabica_washed_mt": 178194
     },
     {
       "period": "2024-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2025/01/2024-Stocks-European-Ports.pdf",
       "value_mt": 547124,
       "value_raw": 9118733,
-      "types": {
-        "robusta_mt": 189019,
-        "arabica_unwashed_mt": 187289,
-        "arabica_washed_mt": 170817
-      }
+      "robusta_mt": 189019,
+      "arabica_unwashed_mt": 187289,
+      "arabica_washed_mt": 170817
     },
     {
       "period": "2025-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 483417,
       "value_raw": 8056950,
-      "types": {
-        "robusta_mt": 173748,
-        "arabica_unwashed_mt": 152787,
-        "arabica_washed_mt": 156882
-      }
+      "robusta_mt": 173748,
+      "arabica_unwashed_mt": 152787,
+      "arabica_washed_mt": 156882
     },
     {
       "period": "2025-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 443565,
       "value_raw": 7392750,
-      "types": {
-        "robusta_mt": 152094,
-        "arabica_unwashed_mt": 151982,
-        "arabica_washed_mt": 139489
-      }
+      "robusta_mt": 152094,
+      "arabica_unwashed_mt": 151982,
+      "arabica_washed_mt": 139489
     },
     {
       "period": "2025-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 410239,
       "value_raw": 6837317,
-      "types": {
-        "robusta_mt": 156060,
-        "arabica_unwashed_mt": 134596,
-        "arabica_washed_mt": 130066
-      }
+      "robusta_mt": 156060,
+      "arabica_unwashed_mt": 134596,
+      "arabica_washed_mt": 130066
     },
     {
       "period": "2025-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 424403,
       "value_raw": 7073383,
-      "types": {
-        "robusta_mt": 156060,
-        "arabica_unwashed_mt": 134596,
-        "arabica_washed_mt": 133748
-      }
+      "robusta_mt": 156060,
+      "arabica_unwashed_mt": 134596,
+      "arabica_washed_mt": 133748
     },
     {
       "period": "2025-05",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 448094,
       "value_raw": 7468233,
-      "types": {
-        "robusta_mt": 184870,
-        "arabica_unwashed_mt": 137056,
-        "arabica_washed_mt": 126167
-      }
+      "robusta_mt": 184870,
+      "arabica_unwashed_mt": 137056,
+      "arabica_washed_mt": 126167
     },
     {
       "period": "2025-06",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 474916,
       "value_raw": 7915267,
-      "types": {
-        "robusta_mt": 193509,
-        "arabica_unwashed_mt": 140172,
-        "arabica_washed_mt": 141235
-      }
+      "robusta_mt": 193509,
+      "arabica_unwashed_mt": 140172,
+      "arabica_washed_mt": 141235
     },
     {
       "period": "2025-07",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 497045,
       "value_raw": 8284083,
-      "types": {
-        "robusta_mt": 208387,
-        "arabica_unwashed_mt": 134517,
-        "arabica_washed_mt": 154141
-      }
+      "robusta_mt": 208387,
+      "arabica_unwashed_mt": 134517,
+      "arabica_washed_mt": 154141
     },
     {
       "period": "2025-08",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 514662,
       "value_raw": 8577700,
-      "types": {
-        "robusta_mt": 215348,
-        "arabica_unwashed_mt": 136441,
-        "arabica_washed_mt": 162873
-      }
+      "robusta_mt": 215348,
+      "arabica_unwashed_mt": 136441,
+      "arabica_washed_mt": 162873
     },
     {
       "period": "2025-09",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 490162,
       "value_raw": 8169367,
-      "types": {
-        "robusta_mt": 203860,
-        "arabica_unwashed_mt": 128583,
-        "arabica_washed_mt": 157718
-      }
+      "robusta_mt": 203860,
+      "arabica_unwashed_mt": 128583,
+      "arabica_washed_mt": 157718
     },
     {
       "period": "2025-10",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 472617,
       "value_raw": 7876950,
-      "types": {
-        "robusta_mt": 188548,
-        "arabica_unwashed_mt": 133352,
-        "arabica_washed_mt": 150717
-      }
+      "robusta_mt": 188548,
+      "arabica_unwashed_mt": 133352,
+      "arabica_washed_mt": 150717
     },
     {
       "period": "2025-11",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 441661,
       "value_raw": 7361017,
-      "types": {
-        "robusta_mt": 166908,
-        "arabica_unwashed_mt": 132275,
-        "arabica_washed_mt": 142478
-      }
+      "robusta_mt": 166908,
+      "arabica_unwashed_mt": 132275,
+      "arabica_washed_mt": 142478
     },
     {
       "period": "2025-12",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/01/2025-Stocks-European-Ports.pdf",
       "value_mt": 458801,
       "value_raw": 7646683,
-      "types": {
-        "robusta_mt": 174104,
-        "arabica_unwashed_mt": 143206,
-        "arabica_washed_mt": 141491
-      }
+      "robusta_mt": 174104,
+      "arabica_unwashed_mt": 143206,
+      "arabica_washed_mt": 141491
     },
     {
       "period": "2026-01",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
       "value_mt": 441323,
       "value_raw": 7355383,
-      "types": {
-        "robusta_mt": 162450,
-        "arabica_unwashed_mt": 138941,
-        "arabica_washed_mt": 139933
-      }
+      "robusta_mt": 162450,
+      "arabica_unwashed_mt": 138941,
+      "arabica_washed_mt": 139933
     },
     {
       "period": "2026-02",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
       "value_mt": 408152,
       "value_raw": 6802533,
-      "types": {
-        "robusta_mt": 150126,
-        "arabica_unwashed_mt": 127113,
-        "arabica_washed_mt": 130913
-      }
+      "robusta_mt": 150126,
+      "arabica_unwashed_mt": 127113,
+      "arabica_washed_mt": 130913
     },
     {
       "period": "2026-03",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
       "value_mt": 396190,
       "value_raw": 6603167,
-      "types": {
-        "robusta_mt": 139191,
-        "arabica_unwashed_mt": 124504,
-        "arabica_washed_mt": 132496
-      }
+      "robusta_mt": 139191,
+      "arabica_unwashed_mt": 124504,
+      "arabica_washed_mt": 132496
     },
     {
       "period": "2026-04",
       "source_pdf": "https://www.ecf-coffee.org/wp-content/uploads/2026/06/2026-Stocks-European-Ports.pdf",
       "value_mt": 408956,
       "value_raw": 6815933,
-      "types": {
-        "robusta_mt": 150769,
-        "arabica_unwashed_mt": 122093,
-        "arabica_washed_mt": 136093
-      }
+      "robusta_mt": 150769,
+      "arabica_unwashed_mt": 122093,
+      "arabica_washed_mt": 136093
     }
   ]
 }
