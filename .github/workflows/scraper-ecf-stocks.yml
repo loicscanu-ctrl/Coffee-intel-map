@@ -1,25 +1,29 @@
-name: "3.2 – ECF History Backfill (one-shot)"
+name: "3.4 – ECF stocks"
 
-# Parses the yearly ECF "Stocks-European-Ports" PDFs (2014→present) into
-# frontend/public/data/ecf_history.json. Manual trigger — run once to seed the
-# historical series, and again whenever a new yearly PDF is published.
+# Builds frontend/public/data/ecf_history.json from ECF's yearly
+# "Stocks-European-Ports" PDFs (2014→present): per-month total, per-port and
+# (2020+) per-type breakdowns. The current-year PDF is refreshed by ECF on each
+# bi-monthly release, so re-running monthly keeps the full series current.
+#
 # Runs on a GitHub-hosted runner because ecf-coffee.org is reachable there
 # (the Claude sandbox is blocked by a host allowlist).
 
 on:
+  schedule:
+    - cron: "0 4 5 * *"   # 5th of each month, 04:00 UTC (after ECF releases)
   workflow_dispatch:
     inputs:
       debug:
-        description: "Also write ecf_history_debug.json (raw parsed tables)"
+        description: "Print/dump raw parsed tables for verification"
         type: boolean
-        default: true
+        default: false
 
 concurrency:
   group: data-commit          # serialize all main-pushers
   cancel-in-progress: false
 
 jobs:
-  backfill:
+  ecf-stocks:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests pdfplumber
 
-      - name: Run ECF history backfill
+      - name: Run ECF stocks backfill
         working-directory: backend
         run: |
           if [ "${{ inputs.debug }}" = "true" ]; then
@@ -62,7 +66,7 @@ jobs:
           git add frontend/public/data/ecf_history.json
           git diff --cached --quiet \
             && echo "No changes — ecf_history.json already current." \
-            || (git commit -m "data: backfill ecf_history.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+            || (git commit -m "data: update ecf_history.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
 
       - name: Notify on failure
         if: failure()

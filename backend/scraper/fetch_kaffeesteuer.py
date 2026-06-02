@@ -17,7 +17,7 @@ Usage:
 import io
 import json
 import sys
-import time
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -185,12 +185,24 @@ def main():
         period_str = f"{year}-{month:02d}"
         print(f"\nSearching for {period_str}...")
         found = False
+        status_counts: Counter = Counter()
+        first_logged = False
 
         for url in generate_candidate_urls(year, month):
             try:
                 r = session.get(url, timeout=15)
-                if r.status_code != 200 or not _is_workbook(r):
-                    continue
+            except requests.RequestException as e:
+                status_counts[f"exc:{type(e).__name__}"] += 1
+                continue
+            status_counts[r.status_code] += 1
+            # Log the first probe verbatim so the run exposes WAF 403s / HTML
+            # redirects vs genuine 404s.
+            if not first_logged:
+                print(f"    probe {url.split('/')[-1][:52]} → {r.status_code} "
+                      f"ctype={r.headers.get('Content-Type','?')} "
+                      f"{len(r.content)}B head={r.content[:8]!r}")
+                first_logged = True
+            if r.status_code == 200 and _is_workbook(r):
                 val = extract_kaffeesteuer_from_excel(r.content)
                 if val is not None:
                     results[period_str] = val
@@ -199,16 +211,9 @@ def main():
                     print(f"  Source: {url.split('?')[0]}")
                     found = True
                     break
-            except requests.RequestException:
-                pass
-            time.sleep(0.2)  # polite delay between probes
 
         if not found:
-            print(f"  [NOT FOUND] Exhausted candidates for {period_str} — "
-                  "likely not published yet.")
-            # Months are checked oldest-first; the first miss is the frontier,
-            # so stop probing further (still-unpublished) months.
-            break
+            print(f"  [NOT FOUND] {period_str} — status summary: {dict(status_counts)}")
 
     if not added:
         print("\nNo new values fetched — leaving JSON unchanged.")
