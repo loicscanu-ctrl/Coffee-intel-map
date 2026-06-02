@@ -27,21 +27,30 @@ interface DataPoint {
 
 function buildSeries(raw: Record<string, number>): DataPoint[] {
   const sorted = Object.keys(raw).sort();
-  return sorted.map((period, i) => {
-    const [y, m] = period.split("-").map(Number);
-    const val = toMillions(raw[period]);
 
-    const prevKey = `${y - 1}-${String(m).padStart(2, "0")}`;
-    const prev = raw[prevKey];
-    const yoy = prev != null ? +((raw[period] / prev - 1) * 100).toFixed(1) : null;
-
-    let ma12: number | null = null;
+  // Pass 1 — trailing 12-month average (EUR millions) per period.
+  const ma12By: Record<string, number | null> = {};
+  sorted.forEach((period, i) => {
     if (i >= 11) {
       const slice = sorted.slice(i - 11, i + 1).map(k => raw[k]);
-      ma12 = +(slice.reduce((a, b) => a + b, 0) / 12 / 1000).toFixed(2);
+      ma12By[period] = +(slice.reduce((a, b) => a + b, 0) / 12 / 1000).toFixed(2);
+    } else {
+      ma12By[period] = null;
     }
+  });
 
-    return { period, label: `${MONTH_ABB[m]} ${y}`, value: val, yoy, ma12, year: y };
+  // Pass 2 — YoY is the change in the 12-mo average vs the same month a year
+  // ago (e.g. Apr-26 88.06 / Apr-25 82.23 = +7.09%), matched by date so the
+  // historical gap doesn't skew it.
+  return sorted.map((period) => {
+    const [y, m] = period.split("-").map(Number);
+    const ma12 = ma12By[period];
+    const prevMa = ma12By[`${y - 1}-${String(m).padStart(2, "0")}`];
+    const yoy = (ma12 != null && prevMa != null && prevMa !== 0)
+      ? +((ma12 / prevMa - 1) * 100).toFixed(2)
+      : null;
+
+    return { period, label: `${MONTH_ABB[m]} ${y}`, value: toMillions(raw[period]), yoy, ma12, year: y };
   });
 }
 
@@ -54,7 +63,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
       <div className="text-amber-300">Kaffeesteuer: <span className="font-bold">€{d.value.toFixed(2)}M</span></div>
       {d.yoy !== null && (
         <div className={d.yoy >= 0 ? "text-emerald-400" : "text-red-400"}>
-          YoY: {d.yoy >= 0 ? "+" : ""}{d.yoy}%
+          12-mo avg YoY: {d.yoy >= 0 ? "+" : ""}{d.yoy}%
         </div>
       )}
       {d.ma12 !== null && (
