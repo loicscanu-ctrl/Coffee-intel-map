@@ -1,8 +1,32 @@
 """
 fetch_kaffeesteuer.py
-Auto-discovers monthly Steuereinnahmen PDFs from bundesfinanzministerium.de
-by scraping the ministry's listing page, then extracts the Kaffeesteuer value.
-Incrementally updates frontend/public/data/kaffeesteuer.json.
+Auto-discovers the monthly "Kassenmäßige Steuereinnahmen nach Steuerarten und
+Gebietskörperschaften" workbooks from bundesfinanzministerium.de and extracts
+the Kaffeesteuer value for the reported month.
+
+Why XLSX instead of PDF
+-----------------------
+BMF publishes the monthly tax-revenue table as an Excel workbook linked from:
+
+    https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/
+    Steuern/Steuerschaetzungen_und_Steuereinnahmen/
+    1-kassenmaessige-steuereinnahmen-nach-steuerarten-und-gebietskoerperschaften.html
+
+The xlsx links on that page look like (note BMF's own "xlxs" typo in the
+filename) — the German month + 4-digit year always vary, the rest is stable:
+
+    .../2026-05-21-steuereinnahmen-april-2026-xlxs.xlsx?__blob=publicationFile&v=2
+    .../2026-04-21-steuereinnahmen-maerz-2026-xlxs.xlsx?__blob=publicationFile&v=2
+    .../2026-03-20-steuereinnahmen-februar-2026-xlxs.xlsx?__blob=publicationFile&v=2
+
+The leading YYYY-MM-DD is the *publication* date (~20th-23rd of the following
+month) and is not predictable, so we still discover the links by scraping the
+landing page rather than hard-coding URLs. Inside the workbook we find the
+"Kaffeesteuer" row and take the current-month figure (Tsd. EUR), which is what
+the existing series stores.
+
+Output: incrementally updates frontend/public/data/kaffeesteuer.json
+        ({ "YYYY-MM": <Tsd EUR int>, ... }).
 
 Usage:
     cd backend
@@ -15,31 +39,30 @@ import sys
 import time
 from pathlib import Path
 
-import pdfplumber
 import requests
 from bs4 import BeautifulSoup
+from openpyxl import load_workbook
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 BASE = "https://www.bundesfinanzministerium.de"
-# BMF periodically reshuffles their URL tree (the original
-# /Steuereinnahmen/steuereinnahmen.html path 404'd as of 2026-06-01). The
-# scraper just needs ANY page that links the monthly steuereinnahmen-*.pdf
-# files — the PDF_RE pattern matches in any HTML — so we try a list of known
-# candidate landing pages in order. First 200 wins.
+
+# Primary source: the dedicated landing page for table 1 (the one that carries
+# the monthly xlsx links). The older candidates are kept as fallbacks in case
+# BMF reshuffles its URL tree again — _parse_links matches xlsx/pdf hrefs on
+# ANY of them, first page that yields links wins.
 INDEX_URL_CANDIDATES = [
+    # Current canonical page (verbatim from the task) — lists the monthly xlsx.
+    "https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/"
+    "Steuern/Steuerschaetzungen_und_Steuereinnahmen/"
+    "1-kassenmaessige-steuereinnahmen-nach-steuerarten-und-"
+    "gebietskoerperschaften.html",
     # Parent topic page — usually survives subtree reorgs.
     "https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/"
     "Steuerschaetzungen_und_Steuereinnahmen/Steuerschaetzungen_und_Steuereinnahmen.html",
-    # Original — kept first-class so we automatically recover if BMF restores it.
+    # Older paths kept first-class so we auto-recover if BMF restores them.
     "https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/"
     "Steuerschaetzungen_und_Steuereinnahmen/Steuereinnahmen/steuereinnahmen.html",
-    # Alternate path seen in past BMF redesigns.
-    "https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/"
-    "Steuerschaetzungen_und_Steuereinnahmen/Steuereinnahmen/"
-    "Monatliche-Steuereinnahmen/monatliche-steuereinnahmen.html",
-    # Monthly bulletin index — lists every monthly publication including the
-    # Steuereinnahmen PDFs. Last-resort because it's bigger and slower to parse.
     "https://www.bundesfinanzministerium.de/Web/DE/Service/Publikationen/"
     "Monatsberichte/Monatsberichte.html",
 ]
@@ -56,47 +79,68 @@ BROWSER_UA = (
 )
 
 GERMAN_MONTHS = {
-    "januar": "01", "februar": "02", "maerz": "03", "april": "04",
+    "januar": "01", "februar": "02", "maerz": "03", "märz": "03", "april": "04",
     "mai": "05", "juni": "06", "juli": "07", "august": "08",
     "september": "09", "oktober": "10", "november": "11", "dezember": "12",
 }
 
-# Matches filenames like: 2026-03-20-steuereinnahmen-februar-2026.pdf
-PDF_RE = re.compile(r"steuereinnahmen-([a-z]+)-(\d{4})\.pdf", re.IGNORECASE)
+# Matches xlsx links like: 2026-05-21-steuereinnahmen-april-2026-xlxs.xlsx
+# The "-xlxs"/"-xlsx" suffix is optional so we also tolerate a plain
+# steuereinnahmen-april-2026.xlsx should BMF ever fix the filename.
+XLSX_RE = re.compile(
+    r"steuereinnahmen-([a-zä]+)-(\d{4})(?:-xl[a-z]{2})?\.xlsx",
+    re.IGNORECASE,
+)
+# Legacy PDF fallback — only used for a period if no xlsx link is available.
+PDF_RE = re.compile(r"steuereinnahmen-([a-zä]+)-(\d{4})\.pdf", re.IGNORECASE)
+
+# Plausible monthly Kaffeesteuer revenue (Tsd. EUR). Historically 60k–121k;
+# guard band catches a stray header/year/forecast cell landing in the row.
+MIN_TSD, MAX_TSD = 5_000, 400_000
 
 
-def _parse_pdf_links(html: str) -> dict[str, str]:
-    """Extract {period: pdf_url} from any BMF page HTML. Period is YYYY-MM."""
+def _period_from(month_de: str, year: str) -> str | None:
+    month_num = GERMAN_MONTHS.get(month_de.lower())
+    return f"{year}-{month_num}" if month_num else None
+
+
+def _abs_url(href: str) -> str:
+    """Absolutise a BMF href, preserving the ?__blob=publicationFile query
+    string — without it BMF serves an HTML wrapper instead of the file."""
+    return BASE + href if href.startswith("/") else href
+
+
+def _parse_links(html: str) -> dict[str, dict[str, str]]:
+    """Extract {period: {"xlsx": url, "pdf": url}} from any BMF page HTML.
+    period is YYYY-MM. A format key is present only if a link was found."""
     soup = BeautifulSoup(html, "html.parser")
-    found: dict[str, str] = {}
+    found: dict[str, dict[str, str]] = {}
     for a in soup.find_all("a", href=True):
         href: str = a["href"]
-        if "steuereinnahmen" not in href.lower():
+        low = href.lower()
+        if "steuereinnahmen" not in low:
             continue
-        if not href.lower().endswith(".pdf"):
+        if ".xlsx" in low:
+            m, kind = XLSX_RE.search(href), "xlsx"
+        elif ".pdf" in low:
+            m, kind = PDF_RE.search(href), "pdf"
+        else:
             continue
-        m = PDF_RE.search(href)
         if not m:
             continue
-        month_de = m.group(1).lower()
-        year     = m.group(2)
-        month_num = GERMAN_MONTHS.get(month_de)
-        if not month_num:
+        period = _period_from(m.group(1), m.group(2))
+        if not period:
             continue
-        period = f"{year}-{month_num}"
-        url = BASE + href if href.startswith("/") else href
-        if period not in found:
-            found[period] = url
+        # First link of each kind per period wins (the page lists newest first).
+        found.setdefault(period, {}).setdefault(kind, _abs_url(href))
     return found
 
 
-def discover_pdf_urls(session: requests.Session) -> dict[str, str]:
-    """Walk the candidate index URLs and return {period: url} for any monthly
-    Steuereinnahmen PDFs we can find. Each candidate is tried independently;
-    we accept the first that returns a page containing PDF links — and merge
-    in results from later candidates only if the first returned nothing.
-    Errors on individual candidates are logged but don't abort the run."""
-    aggregated: dict[str, str] = {}
+def discover_links(session: requests.Session) -> dict[str, dict[str, str]]:
+    """Walk the candidate index URLs and merge {period: {kind: url}} for every
+    monthly Steuereinnahmen file we can find. Errors on individual candidates
+    are logged but never abort the run."""
+    aggregated: dict[str, dict[str, str]] = {}
     for url in INDEX_URL_CANDIDATES:
         try:
             resp = session.get(url, timeout=30)
@@ -104,32 +148,83 @@ def discover_pdf_urls(session: requests.Session) -> dict[str, str]:
         except requests.RequestException as e:
             print(f"  [candidate] {url} → {e}", file=sys.stderr)
             continue
-        found = _parse_pdf_links(resp.text)
-        print(f"  [candidate] {url} → {len(found)} PDF links")
-        if found and not aggregated:
-            # First successful candidate carries the canonical list. We still
-            # merge later candidates (in case BMF splits the listing across
-            # pages), but only adding periods not already discovered so the
-            # earlier candidate's URL wins on duplicates.
-            aggregated = dict(found)
-        else:
-            for period, pdf_url in found.items():
-                aggregated.setdefault(period, pdf_url)
-        if len(aggregated) >= 24:
-            # Two years of monthly data is plenty — we don't need to keep
-            # walking older candidates.
-            break
+        found = _parse_links(resp.text)
+        n_xlsx = sum("xlsx" in v for v in found.values())
+        print(f"  [candidate] {url} → {len(found)} periods ({n_xlsx} with xlsx)")
+        for period, links in found.items():
+            slot = aggregated.setdefault(period, {})
+            for kind, link in links.items():
+                slot.setdefault(kind, link)
+        if sum("xlsx" in v for v in aggregated.values()) >= 24:
+            break  # two years of xlsx is plenty
     if not aggregated:
         raise RuntimeError(
-            "No PDF links found on any candidate URL. BMF likely reorganised "
-            "the page tree again — investigate "
+            "No Steuereinnahmen links found on any candidate URL. BMF likely "
+            "reorganised the page tree again — investigate "
             f"{INDEX_URL_CANDIDATES[0]} and update INDEX_URL_CANDIDATES."
         )
     return aggregated
 
 
-def extract_kaffeesteuer(pdf_bytes: bytes) -> int | None:
-    """Open PDF in memory and return the Kaffeesteuer monthly value (Tsd. EUR)."""
+def _to_number(cell) -> float | None:
+    """Coerce an Excel cell to a float, accepting German-formatted strings
+    ('74.721', '74.721,0'). Returns None for blanks/placeholders ('-', '.')."""
+    if isinstance(cell, (int, float)):
+        return float(cell)
+    if isinstance(cell, str):
+        s = cell.strip()
+        if not s or s in {"-", ".", "–", "—", "x", "X"}:
+            return None
+        # German grouping: '.' = thousands, ',' = decimal.
+        s = s.replace(".", "").replace(",", ".")
+        try:
+            return float(re.sub(r"[^\d.\-]", "", s) or "x")
+        except ValueError:
+            return None
+    return None
+
+
+def _normalise_tsd(v: float) -> int:
+    """Normalise a raw cell value to thousands of EUR regardless of whether the
+    workbook stored it in Tsd EUR (74721), Mio EUR (74.721) or EUR (74721000)."""
+    v = abs(v)
+    if v < 1_000:            # given in Mio EUR with decimals → to Tsd
+        v *= 1_000
+    elif v >= 5_000_000:     # given in plain EUR → to Tsd
+        v /= 1_000
+    return int(round(v))
+
+
+def extract_kaffeesteuer_xlsx(xlsx_bytes: bytes) -> int | None:
+    """Find the 'Kaffeesteuer' row in the workbook and return the current-month
+    revenue (Tsd. EUR) — the first numeric cell on that row that falls in the
+    plausible monthly range. Searches every sheet; first plausible match wins."""
+    wb = load_workbook(io.BytesIO(xlsx_bytes), data_only=True, read_only=True)
+    try:
+        for ws in wb.worksheets:
+            for row in ws.iter_rows(values_only=True):
+                label_idx = next(
+                    (i for i, c in enumerate(row)
+                     if isinstance(c, str) and "kaffeesteuer" in c.lower()),
+                    None,
+                )
+                if label_idx is None:
+                    continue
+                for cell in row[label_idx + 1:]:
+                    num = _to_number(cell)
+                    if num is None:
+                        continue
+                    val = _normalise_tsd(num)
+                    if MIN_TSD <= val <= MAX_TSD:
+                        return val
+    finally:
+        wb.close()
+    return None
+
+
+def extract_kaffeesteuer_pdf(pdf_bytes: bytes) -> int | None:
+    """Legacy fallback: extract Kaffeesteuer from a Steuereinnahmen PDF."""
+    import pdfplumber  # lazy — only needed when no xlsx is available
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         for page in pdf.pages:
             text = page.extract_text() or ""
@@ -137,14 +232,34 @@ def extract_kaffeesteuer(pdf_bytes: bytes) -> int | None:
                 if "Kaffeesteuer" in line:
                     nums = re.findall(r"\d+\.\d+", line)
                     if nums:
-                        return int(nums[0].replace(".", ""))
+                        val = _normalise_tsd(int(nums[0].replace(".", "")))
+                        if MIN_TSD <= val <= MAX_TSD:
+                            return val
+    return None
+
+
+def fetch_value(session: requests.Session, links: dict[str, str]) -> int | None:
+    """Download and parse a period, preferring the xlsx over the legacy pdf."""
+    for kind, extract in (("xlsx", extract_kaffeesteuer_xlsx),
+                          ("pdf", extract_kaffeesteuer_pdf)):
+        url = links.get(kind)
+        if not url:
+            continue
+        try:
+            r = session.get(url, timeout=60)
+            r.raise_for_status()
+            val = extract(r.content)
+            if val:
+                return val
+            print(f"    {kind}: Kaffeesteuer not found in file", file=sys.stderr)
+        except Exception as e:
+            print(f"    {kind}: ERROR — {e}", file=sys.stderr)
     return None
 
 
 def main():
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load existing data
     existing: dict[str, int] = {}
     if OUT_PATH.exists():
         with open(OUT_PATH, encoding="utf-8") as f:
@@ -158,17 +273,15 @@ def main():
         "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     )
 
-    # Discover all available PDFs by walking candidate index URLs.
     print(f"Probing {len(INDEX_URL_CANDIDATES)} candidate BMF index URLs…")
     try:
-        discovered = discover_pdf_urls(session)
+        discovered = discover_links(session)
     except Exception as e:
         print(f"ERROR fetching index page: {e}", file=sys.stderr)
         sys.exit(1)
-    print(f"Discovered {len(discovered)} PDFs across candidate index pages")
+    print(f"Discovered {len(discovered)} periods across candidate index pages")
 
-    # Only process months not already stored
-    new_periods = {p: u for p, u in discovered.items() if p not in existing}
+    new_periods = {p: l for p, l in discovered.items() if p not in existing}
     if not new_periods:
         print("No new months found — JSON is up to date.")
         return
@@ -177,22 +290,17 @@ def main():
     results = dict(existing)
 
     for period in sorted(new_periods):
-        url = new_periods[period]
-        try:
-            r = session.get(url, timeout=30)
-            r.raise_for_status()
-            val = extract_kaffeesteuer(r.content)
-            if val:
-                results[period] = val
-                print(f"  {period}: {val}")
-            else:
-                print(f"  {period}: NOT FOUND in PDF")
-        except Exception as e:
-            print(f"  {period}: ERROR — {e}", file=sys.stderr)
+        val = fetch_value(session, new_periods[period])
+        if val:
+            results[period] = val
+            print(f"  {period}: {val}")
+        else:
+            print(f"  {period}: NOT FOUND")
         time.sleep(0.5)
 
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, sort_keys=True)
+        f.write("\n")
     print(f"\nSaved {len(results)} records → {OUT_PATH}")
 
 
