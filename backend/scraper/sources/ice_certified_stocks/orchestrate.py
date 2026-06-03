@@ -27,6 +27,7 @@ import re
 import sys
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -335,6 +336,45 @@ def _stock_report_from_listing(d: date) -> tuple[str | None, dict | None]:
     return None, None
 
 
+_SWEEP_WORKERS = 8
+
+
+def _probe_stock_url(d: date, hhmmss: str) -> tuple[str, int | None, str | None]:
+    """One lightweight GET for the concurrent sweep — no per-request throttle
+    (the pool size bounds the rate). Returns (hhmmss, status, csv_text|None)."""
+    url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
+    try:
+        r = requests.get(url, headers=F.HEADERS, timeout=TIMEOUT)
+    except requests.RequestException:
+        return hhmmss, None, None
+    if r.status_code == 200 and r.text[:1] == '"':       # stock CSV starts with a quote
+        return hhmmss, 200, r.text
+    return hhmmss, r.status_code, None
+
+
+def _sweep_stock_concurrent(d: date, candidates: list[str], *, workers: int = _SWEEP_WORKERS):
+    """Fix 4: probe the publish-window candidates with a SMALL thread pool
+    (bounded concurrency — never all at once), stop at the first CSV hit, and
+    abort immediately on any 429 so we never pummel ICE. Returns
+    (hhmmss, url, text) or None."""
+    hit: tuple[str, str, str] | None = None
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futures = [ex.submit(_probe_stock_url, d, t) for t in candidates]
+        try:
+            for fut in as_completed(futures):
+                hhmmss, status, text = fut.result()
+                if status == 429:
+                    print("  ! 429 during concurrent stock sweep — aborting (retry next run)")
+                    break
+                if text is not None:
+                    url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
+                    hit = (hhmmss, url, text)
+                    break
+        finally:
+            ex.shutdown(wait=False, cancel_futures=True)
+    return hit
+
+
 def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict | None]:
     """Resolve the robusta stock CSV (HHMMSS-stamped filename). Order:
     (0) directory listing — one request if ICE indexes the folder;
@@ -364,15 +404,17 @@ def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict 
     if not sweep:
         return None, None
 
-    # Tier 2 — 120-second sweep around the observed publish window.
-    # Already-tried tier-1 times are skipped to avoid wasted GETs.
+    # Tier 2 — bounded-concurrency sweep of the publish window. Sequential at
+    # 5s/req was up to ~30 min; a small pool (stop on first hit, abort on 429)
+    # brings a cold miss down to ~1-2 min without firing every candidate at once.
     tried = set(tier1)
-    for hhmmss in _stock_report_sweep_times():
-        if hhmmss in tried:
-            continue
-        url, parsed = _try(hhmmss)
-        if url:
-            return url, parsed
+    cands = [t for t in _stock_report_sweep_times() if t not in tried]
+    hit = _sweep_stock_concurrent(d, cands)
+    if hit:
+        hhmmss, url, text = hit
+        _record_stock_report_hit(d, hhmmss)
+        print(f"  ✓ stock report via concurrent sweep ({d} @ {hhmmss})")
+        return url, _safe_parse(parse_stock_report, "stock_report", d, text)
     return None, None
 
 
