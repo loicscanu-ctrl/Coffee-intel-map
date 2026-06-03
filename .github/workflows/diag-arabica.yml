@@ -1,0 +1,22 @@
+name: "Z – Arabica xls grading probe (diagnostic)"
+
+# One-off: dumps recent ICE arabica daily .xls rows (As-of line + grading
+# summary) so we can see the live label format. Removable after diagnosis.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install requests 'xlrd<2.0'
+      - name: Probe arabica xls
+        run: python -m scraper.sources.ice_certified_stocks.diag_arabica
+        working-directory: backend
