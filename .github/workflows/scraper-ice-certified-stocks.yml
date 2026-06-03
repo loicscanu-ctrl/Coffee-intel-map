@@ -25,20 +25,16 @@ on:
         default: "3"
         type: string
   schedule:
-    # 17:00 UTC Mon-Fri — past ICE's morning robusta publish (~10:30 UTC) and
-    # afternoon arabica publish (~13:30 UTC). Weekend skip: ICE doesn't
-    # publish Sat/Sun, so weekend runs spent 5-10 min apiece fetching the
-    # same Friday-EOD data already on disk. Monday's run still picks up
-    # whatever moved during the weekend (none — ICE is closed) AND that
-    # day's fresh publication, so no gap. Manual dispatch still allowed
-    # any day for backfills / one-offs.
-    - cron: '0 17 * * 1-5'
-    # 2nd of each month, 17:00 UTC — the monthly robusta age-allowance and
-    # arabica ageing reports are published a day or two into the new month,
-    # often AFTER the prior day's 17:00 run. This extra run guarantees the
-    # fresh month-end report is captured (runs even on weekends so a 1st/2nd
-    # falling on Sat/Sun is still covered).
-    - cron: '0 17 2 * *'
+    # 03:00 UTC Mon-Fri. The scraper anchors on the PREVIOUS business day
+    # (see orchestrate.run), so it fetches yesterday's already-published
+    # reports — the run time no longer has to chase same-day publication.
+    # Mon-Fri with a multi-day backfill window covers Friday's data on Monday;
+    # ICE doesn't publish Sat/Sun. Manual dispatch still allowed any day.
+    - cron: '0 3 * * 1-5'
+    # 2nd of each month, 03:00 UTC — the monthly robusta age-allowance and
+    # arabica ageing reports land a day or two into the new month. This extra
+    # run (also on weekends) guarantees the fresh month-end report is captured.
+    - cron: '0 3 2 * *'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
