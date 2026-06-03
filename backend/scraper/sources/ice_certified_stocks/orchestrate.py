@@ -526,11 +526,19 @@ def _merge_robusta(new: dict, old: dict) -> dict:
     return new
 
 def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
-    today = date.today()
-    days = _biz_days_back(today, days_back)
+    # Anchor the window on the PREVIOUS business day. ICE publishes every
+    # certified-stock report (arabica xls, robusta stock CSV, gradings, iss/
+    # recv, tenders, overview, …) for the prior business day, so the current
+    # day's file generally isn't posted yet when the daily cron runs. Targeting
+    # yesterday gets the latest actually-published data for every feed and
+    # avoids a wasted (and, for the robusta stock sweep, ~10-min) same-day fetch.
+    anchor = date.today() - timedelta(days=1)
+    while anchor.weekday() >= 5:        # back over Sat/Sun to the last weekday
+        anchor -= timedelta(days=1)
+    days = _biz_days_back(anchor, days_back)
     days_sorted_asc = sorted(days)
     print(f"=== ICE certified-stocks pull · window = {days_back} biz days "
-          f"({days_sorted_asc[0]} → {days_sorted_asc[-1]}) ===\n")
+          f"({days_sorted_asc[0]} → {days_sorted_asc[-1]}; anchored on prior biz day) ===\n")
 
     # ── Arabica: 1 source, loop dates ──
     arabica_snapshots: list[dict] = []
@@ -583,13 +591,17 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     # latest day so the daily cron stays bounded — older days that already
     # missed are filled by the workbook ingest instead.
     recent_days = days_sorted_asc[-5:]
-    last_day = recent_days[-1] if recent_days else None
+    # The window is already anchored on the prior business day (see run()), so
+    # the latest day here is the most recent published report — aim the costly
+    # tier-2 minute-sweep there.
+    sweep_day = recent_days[-1] if recent_days else None
     for d in recent_days:
-        url, parsed = pull_stock_report(d, sweep=(d == last_day))
+        url, parsed = pull_stock_report(d, sweep=(d == sweep_day))
         if parsed is not None:
             robusta_stocks[d] = parsed
             robusta_stock_url = url
-    print(f"  → {len(robusta_stocks)} stock-report snapshots captured\n")
+    print(f"  → {len(robusta_stocks)} stock-report snapshots captured "
+          f"(tier-2 sweep day: {sweep_day})\n")
 
     print(f"[robusta] gradings + iss/recv + tenders + overview, {len(days_sorted_asc)} days...")
     gradings_all: list[dict] = []      # list of (date, url, parsed)
