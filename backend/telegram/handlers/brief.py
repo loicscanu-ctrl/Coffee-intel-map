@@ -380,6 +380,71 @@ def _vn_weather_today_rain(vn_weather: dict | None, today: date) -> tuple[float 
     return actual, avg
 
 
+def _vn_mtd_rain(today: date) -> tuple[float | None, float | None]:
+    """Month-to-date rain (sum from day 1 through yesterday) averaged across
+    VN Central Highlands provinces, plus the 10-yr same-window average for
+    a "wetter / drier than typical so far this month" reading.
+
+    Both numbers are mean-across-regions, not summed — matches how the
+    yesterday-rain line is computed so the two figures are directly
+    comparable.
+    """
+    seed = _load_seed_weather("vn")
+    if not seed:
+        return None, None
+    regions = (seed or {}).get("regions") or {}
+    if not regions:
+        return None, None
+    yday = today - timedelta(days=1)
+    first = yday.replace(day=1)
+    region_totals: list[float] = []
+    for region_data in regions.values():
+        if not isinstance(region_data, dict):
+            continue
+        total = 0.0
+        days_present = 0
+        d = first
+        while d <= yday:
+            v = region_data.get(d.isoformat())
+            if isinstance(v, dict) and isinstance(v.get("rain"), (int, float)):
+                total += float(v["rain"])
+                days_present += 1
+            d += timedelta(days=1)
+        if days_present:
+            region_totals.append(total)
+    if not region_totals:
+        return None, None
+    mtd_mean = sum(region_totals) / len(region_totals)
+
+    # 10-yr average of the same first-of-month → same-day window across the
+    # last 10 calendar years (excluding the current year so the comparison is
+    # against history, not history-blended-with-today).
+    year_totals: list[float] = []
+    for back in range(1, 11):
+        target_year = yday.year - back
+        first_hist = first.replace(year=target_year)
+        yday_hist = yday.replace(year=target_year)
+        per_region: list[float] = []
+        for region_data in regions.values():
+            if not isinstance(region_data, dict):
+                continue
+            tot = 0.0
+            days_present = 0
+            d = first_hist
+            while d <= yday_hist:
+                v = region_data.get(d.isoformat())
+                if isinstance(v, dict) and isinstance(v.get("rain"), (int, float)):
+                    tot += float(v["rain"])
+                    days_present += 1
+                d += timedelta(days=1)
+            if days_present:
+                per_region.append(tot)
+        if per_region:
+            year_totals.append(sum(per_region) / len(per_region))
+    avg10 = sum(year_totals) / len(year_totals) if year_totals else None
+    return mtd_mean, avg10
+
+
 def _vn_month_status(vn_weather: dict | None, today: date) -> str:
     """"ok" or "at risk" based on monthly_actual_cur vs monthly_dry_warn for
     the current month (averaged across Central Highlands provinces)."""
@@ -490,14 +555,16 @@ def _weather_block(today: date) -> str | None:
         if rain_status:
             lines.append(f"Brazil: month rainfall {rain_status}")
 
-    # Vietnam: rain yesterday + month status + VHI
-    vn_actual, vn_clim = _vn_weather_today_rain(vn_weather, today)
+    # Vietnam: rain yesterday + MTD with 10y-avg comparison + month status + VHI
+    vn_actual, _ = _vn_weather_today_rain(vn_weather, today)
     if vn_actual is not None:
-        if vn_clim is not None:
-            diff = vn_actual - vn_clim
-            vn_rain_part = f"Vietnam: {vn_actual:.1f}mm rain yesterday ({_sign(diff, '.1f')} vs 10y avg)"
-        else:
-            vn_rain_part = f"Vietnam: {vn_actual:.1f}mm rain yesterday"
+        vn_rain_part = f"Vietnam: {vn_actual:.1f}mm rain yesterday"
+        mtd, mtd_avg = _vn_mtd_rain(today)
+        if mtd is not None and mtd_avg is not None:
+            diff = mtd - mtd_avg
+            vn_rain_part += f" (month to day at {mtd:.0f}mm, {_sign(diff, '.0f')}mm vs 10y avg)"
+        elif mtd is not None:
+            vn_rain_part += f" (month to day at {mtd:.0f}mm)"
         status = _vn_month_status(vn_weather, today)
         if status:
             vn_rain_part += f", full month forecast {status}"
@@ -677,15 +744,16 @@ def _cert_arabica_section(doc: dict | None) -> str:
     failed = cur.get("failed_today_bags") or 0
     total  = cur.get("total_bags") or 0
     origins = _arabica_origin_top(cur)
-    origin_str = f" ({', '.join(origins)})" if origins else ""
+    report_date = cur.get("report_date") or cur.get("date") or ""
 
-    lines = []
+    lines = [f"<b>New York</b>: {report_date}"]
     if graded or failed:
-        lines.append(f"NY: {graded:,} bags graded, {failed:,} passed{origin_str}")
+        origin_str = f" · top origins {', '.join(origins)}" if origins else ""
+        lines.append(f"Grading: {graded:,} bags graded, {failed:,} passed{origin_str}")
     elif origins:
-        lines.append(f"NY: no grading today · top origins {', '.join(origins)}")
+        lines.append(f"Grading: no grading today · top origins {', '.join(origins)}")
     else:
-        lines.append("NY: no grading activity reported")
+        lines.append("Grading: no grading activity reported")
 
     if prev and prev.get("total_bags") is not None:
         delta = total - prev["total_bags"]
@@ -709,8 +777,12 @@ def _cert_robusta_section(doc: dict | None) -> str:
     prev = snaps[-2] if len(snaps) >= 2 else None
     graded = cur.get("lots_graded_today") or 0
     total  = cur.get("total_lots_certified") or 0
+    report_date = cur.get("cut_off_date") or cur.get("date") or ""
 
-    lines = [f"LD: {graded:,} lots graded"]
+    lines = [
+        f"<b>London</b>: {report_date}",
+        f"Grading: {graded:,} lots graded",
+    ]
     if prev and prev.get("total_lots_certified") is not None:
         delta = total - prev["total_lots_certified"]
         lines.append(f"Stocks: {total:,} lots ({_sign(delta, ',d')})")

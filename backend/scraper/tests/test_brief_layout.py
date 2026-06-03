@@ -134,16 +134,45 @@ def test_brief_has_all_top_level_sections(fixture_data_dir):
 
 
 def test_brief_certified_stocks_block(fixture_data_dir):
-    """Cert stocks block has NY (bags) + LD (lots) sub-sections with the
-    stocks delta line."""
+    """Cert stocks block has New York (bags) + London (lots) sub-sections
+    each with a reporting-date header, a Grading line, and a Stocks delta line."""
     from telegram.handlers.brief import build_brief_message
     out = build_brief_message()
     assert "🪤 <b>Certified stocks</b>" in out
-    assert "NY:" in out
-    assert "LD:" in out
+    assert "<b>New York</b>:" in out
+    assert "<b>London</b>:" in out
+    assert "Grading:" in out
     # Day-over-day delta sign on both sides
     assert "434,930 bags" in out
     assert "3,864 lots" in out
+
+
+def test_vn_mtd_rain_wording_when_seed_available(tmp_path, monkeypatch):
+    """`_vn_mtd_rain` returns (MTD mean across regions, 10y average of the same
+    first-of-month → yesterday window across recent years)."""
+    from datetime import date as _date
+
+    import telegram.handlers.brief as bh
+
+    today = _date(2026, 6, 6)
+    seed = {"regions": {
+        "Dak Lak": {f"2026-06-0{d}": {"rain": 5.0} for d in range(1, 6)},
+        "Gia Lai": {f"2026-06-0{d}": {"rain": 5.0} for d in range(1, 6)},
+    }}
+    for back in range(1, 6):
+        yr = today.year - back
+        for d in range(1, 6):
+            seed["regions"]["Dak Lak"][f"{yr}-06-0{d}"] = {"rain": 2.0}
+            seed["regions"]["Gia Lai"][f"{yr}-06-0{d}"] = {"rain": 2.0}
+
+    monkeypatch.setattr(bh, "_load_seed_weather",
+                        lambda key: seed if key == "vn" else None)
+
+    mtd, avg = bh._vn_mtd_rain(today)
+    # 5 days, 5mm each → 25mm per region; mean across regions = 25mm.
+    assert mtd == 25.0
+    # Historic same window: 5 prior years × 5 days × 2mm = 10mm/year, mean = 10mm.
+    assert avg == 10.0
 
 
 def test_brief_physical_includes_basis_and_delta(fixture_data_dir):
