@@ -26,7 +26,6 @@ import json
 import sys
 import time
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -309,53 +308,14 @@ def pull_arabica_ageing(month_end: date) -> tuple[str, dict | None]:
     return url, _safe_parse(parse_arabica_ageing, "arabica_ageing", month_end, r.content, source_url=url)
 
 
-# Tier-2 sweep concurrency. Deliberately TUNABLE and starting small: ICE's
-# /marketdata/ host 429'd an 8-worker burst with a 1-hour penalty that wiped a
-# whole run. We're probing the safe ceiling incrementally — bump by 1 only after
-# a run confirms the current value draws no 429.
-_SWEEP_WORKERS = 2
-
-
-def _probe_stock_url(d: date, hhmmss: str) -> tuple[str, int | None, str | None]:
-    """One lightweight GET for the concurrent sweep — no per-request throttle
-    (pool size bounds the rate). Returns (hhmmss, status, csv_text|None)."""
-    url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
-    try:
-        r = requests.get(url, headers=F.HEADERS, timeout=TIMEOUT)
-    except requests.RequestException:
-        return hhmmss, None, None
-    if r.status_code == 200 and r.text[:1] == '"':       # stock CSV starts with a quote
-        return hhmmss, 200, r.text
-    return hhmmss, r.status_code, None
-
-
-def _sweep_stock_concurrent(d: date, candidates: list[str], *, workers: int = _SWEEP_WORKERS):
-    """Probe the publish-window candidates with a SMALL thread pool (bounded —
-    never all at once), stop at the first CSV hit, and abort immediately on any
-    429 so we don't deepen an ICE penalty. Returns (hhmmss, url, text) or None."""
-    hit: tuple[str, str, str] | None = None
-    with ThreadPoolExecutor(max_workers=workers) as ex:
-        futures = [ex.submit(_probe_stock_url, d, t) for t in candidates]
-        try:
-            for fut in as_completed(futures):
-                hhmmss, status, text = fut.result()
-                if status == 429:
-                    print(f"  ! 429 during concurrent stock sweep (workers={workers}) — aborting")
-                    break
-                if text is not None:
-                    url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
-                    hit = (hhmmss, url, text)
-                    break
-        finally:
-            ex.shutdown(wait=False, cancel_futures=True)
-    return hit
-
-
 def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict | None]:
     """Resolve the robusta stock CSV (HHMMSS-stamped filename). Order:
-    (1) tier-1 — recorded publish times ± 2s (cheap, sequential, ≤~50 GETs);
-    (2) tier-2 — bounded-concurrency sweep of the publish window (skipped when
-        sweep=False). Returns (url, parsed_dict) on hit, (None, None) on miss.
+    (1) tier-1 — recorded publish times ± 2s (cheap, ≤~50 GETs);
+    (2) tier-2 — sequential 5s-throttled sweep of the publish window (skipped
+        when sweep=False). Sequential is mandatory here: ICE's /marketdata/ host
+        429s ANY concurrency (even 2 parallel GETs drew a 1-hour Retry-After=3600
+        penalty that wiped the whole run), so the only safe knob is the recorded
+        tier-1 hits accumulating over time. Returns (url, parsed) or (None, None).
     """
     def _try(hhmmss: str) -> tuple[str | None, dict | None]:
         url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
@@ -374,15 +334,14 @@ def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict 
     if not sweep:
         return None, None
 
-    # Tier 2 — bounded-concurrency sweep (workers = _SWEEP_WORKERS).
+    # Tier 2 — sequential throttled sweep (concurrency bans the IP; see above).
     tried = set(tier1)
-    cands = [t for t in _stock_report_sweep_times() if t not in tried]
-    hit = _sweep_stock_concurrent(d, cands)
-    if hit:
-        hhmmss, url, text = hit
-        _record_stock_report_hit(d, hhmmss)
-        print(f"  ✓ stock report via concurrent sweep ({d} @ {hhmmss}, workers={_SWEEP_WORKERS})")
-        return url, _safe_parse(parse_stock_report, "stock_report", d, text)
+    for hhmmss in _stock_report_sweep_times():
+        if hhmmss in tried:
+            continue
+        url, parsed = _try(hhmmss)
+        if url:
+            return url, parsed
     return None, None
 
 
