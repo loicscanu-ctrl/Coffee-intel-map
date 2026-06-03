@@ -66,6 +66,25 @@ export interface RobustaJsonShape {
 const fmtNum = (n: number): string =>
   Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : "—";
 
+// ── Unit conversion (Bags / Tonnes / Lots) — mirrors the panel's helpers so
+// the toggle flows through the whole system-flow diagram. Values are stored in
+// each market's native unit (KC = bags, RC = lots) and converted to the chosen
+// display unit. Warrant/square counts are NOT converted (a square = a warrant).
+type FlowUnit = "bags" | "tonnes" | "lots";
+const _BAGS_PER_LOT = (10 * 1000) / 60;   // 166.67 (60-kg bags per 10-MT lot)
+function _toChosen(v: number, native: "bags" | "lots", unit: FlowUnit): number {
+  if (native === "bags") {
+    return unit === "bags" ? v : unit === "tonnes" ? (v * 60) / 1000 : v / _BAGS_PER_LOT;
+  }
+  return unit === "lots" ? v : unit === "tonnes" ? v * 10 : v * _BAGS_PER_LOT;
+}
+function _fmtUnit(v: number, native: "bags" | "lots", unit: FlowUnit): string {
+  const c = _toChosen(v, native, unit);
+  if (!Number.isFinite(c)) return "—";
+  return (unit === "lots" ? Math.round(c * 10) / 10 : Math.round(c)).toLocaleString("en-US");
+}
+const unitWord = (u: FlowUnit) => (u === "bags" ? "bags" : u === "tonnes" ? "t" : "lots");
+
 // ── Age bins ─────────────────────────────────────────────────────────────────
 // Per user spec — 4 fadeness levels for stock 1y+, plus full-opacity "fresh"
 // for anything under a year. Bin keys are stable so they survive cross-runs.
@@ -149,28 +168,44 @@ const ROBUSTA_PORT_NAMES: Record<string, string> = {
   TRI: "Trieste",
 };
 
-// ── Duration window selector ────────────────────────────────────────────────
-type DurationOpt = "7d" | "mtd" | "2m" | "3m" | "6m";
-const DURATION_LABELS: Record<DurationOpt, string> = {
-  "7d":  "Last 7 days",
-  "mtd": "Month to date",
-  "2m":  "Last 2 months",
-  "3m":  "Last 3 months",
-  "6m":  "Last 6 months",
-};
-function _durationCutoff(opt: DurationOpt, today: Date): Date {
-  // Normalise to local midnight so date-only event timestamps (which compare
-  // as 00:00:00) aren't accidentally excluded by the time-of-day component
-  // on `today`. Without this, picking "Last 7 days" near the end of the
-  // day cut off the boundary day's gradings event.
-  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  switch (opt) {
-    case "7d":  d.setDate(d.getDate() - 7); return d;
-    case "mtd": return new Date(today.getFullYear(), today.getMonth(), 1);
-    case "2m":  d.setMonth(d.getMonth() - 2); return d;
-    case "3m":  d.setMonth(d.getMonth() - 3); return d;
-    case "6m":  d.setMonth(d.getMonth() - 6); return d;
+// ── Flow window selector ─────────────────────────────────────────────────────
+// Date-anchored windows. Each is labelled by its START date ("since DATE"):
+//   1d → the latest reported day · 1w → 7 days back · then the 1st of the
+//   month going back 1/2/3/6 months. Anchored to the most recent DATA date
+//   (not the wall clock) so "1 day" is the last reported move, never empty.
+export type DurationOpt = "1d" | "1w" | "m1" | "m2" | "m3" | "m6";
+
+export function flowAnchor(
+  arabica: { snapshots?: { date: string }[] } | null,
+  robusta: { snapshots?: { date: string }[] } | null,
+): Date {
+  const dates: string[] = [];
+  const a = arabica?.snapshots?.at(-1)?.date; if (a) dates.push(a);
+  const r = robusta?.snapshots?.at(-1)?.date; if (r) dates.push(r);
+  const max = dates.sort().at(-1);
+  if (max) {
+    const [y, m, d] = max.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, d);
   }
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+
+export interface FlowWindow { key: DurationOpt; cutoff: Date; label: string }
+
+export function flowWindows(anchor: Date): FlowWindow[] {
+  const y = anchor.getFullYear(), m = anchor.getMonth(), day = anchor.getDate();
+  const monthStart = (back: number) => new Date(y, m - back, 1);
+  const opts: { key: DurationOpt; cutoff: Date }[] = [
+    { key: "1d", cutoff: new Date(y, m, day) },
+    { key: "1w", cutoff: new Date(y, m, day - 7) },
+    { key: "m1", cutoff: monthStart(1) },
+    { key: "m2", cutoff: monthStart(2) },
+    { key: "m3", cutoff: monthStart(3) },
+    { key: "m6", cutoff: monthStart(6) },
+  ];
+  const fmtD = (dt: Date) => dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return opts.map((o) => ({ ...o, label: fmtD(o.cutoff) }));
 }
 
 // ── Origin colors (market-aware) ────────────────────────────────────────────
@@ -734,10 +769,14 @@ const IconTruck = (p: { className?: string }) => (
 interface Props {
   arabica: ArabicaJsonShape | null;
   robusta: RobustaJsonShape | null;
+  // Flow window + display unit are owned by the parent panel (rendered up by
+  // the metric toggle) and passed down so both stay in sync.
+  flowDuration: DurationOpt;
+  unit: FlowUnit;
 }
 
-export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
-  const [flowDuration, setFlowDuration] = useState<DurationOpt>("7d");
+export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDuration, unit }: Props) {
+  const fmtU = (v: number, native: "bags" | "lots") => _fmtUnit(v, native, unit);
   // Hover-only inspector — no click state. The tooltip pops out of the
   // square the mouse is over and renders origin / age / (Robusta) class.
   const [hoveredSquare, setHoveredSquare] = useState<{
@@ -792,8 +831,9 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
   }
 
   const systemFlows = useMemo<{ kc: SystemFlowMarket; rc: SystemFlowMarket }>(() => {
-    const today = new Date();
-    const cutoff = _durationCutoff(flowDuration, today);
+    const anchor = flowAnchor(arabica, robusta);
+    const wins = flowWindows(anchor);
+    const cutoff = (wins.find((w) => w.key === flowDuration) ?? wins[1]).cutoff;
 
     // Find the snapshot closest to (but not after) `target` for the T0 baseline.
     const findSnapAt = <T extends { date: string }>(snaps: T[], target: Date): T | null => {
@@ -1330,28 +1370,6 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         <span className="flex items-center text-slate-300" title="−90 differential">
           <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" style={{ boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[4]}` }} /> 4 (−90)
         </span>
-
-        {/* Flow window selector — pill-button group, right-aligned, same
-            style as the chart range toggle on the panel above. */}
-        <div className="ml-auto flex items-center gap-1.5">
-          <span className="text-slate-500 uppercase text-[10px] tracking-wider">Flow window</span>
-          <div className="flex items-center gap-1">
-            {(Object.entries(DURATION_LABELS) as [DurationOpt, string][]).map(([k, v]) => (
-              <button
-                key={k}
-                onClick={() => setFlowDuration(k)}
-                className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
-                  flowDuration === k
-                    ? "bg-slate-800 text-amber-400 border-slate-700"
-                    : "text-slate-500 hover:text-slate-300 border-transparent"
-                }`}
-                title={v}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
@@ -1378,7 +1396,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 <div className="flex flex-col items-center">
                   <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Pending</div>
                   <div className="w-16 h-16 rounded-full bg-amber-950/40 border-2 border-amber-700/60 flex items-center justify-center">
-                    <span className="text-sm font-mono font-bold text-amber-300">{fmtNum(mkt.intake.pending)}</span>
+                    <span className="text-sm font-mono font-bold text-amber-300">{fmtU(mkt.intake.pending, mkt.unit)}</span>
                   </div>
                 </div>
                 <span className="hidden md:block w-6 h-px bg-slate-700" />
@@ -1386,22 +1404,22 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Graded</div>
                   <div className="w-20 h-20 rounded-full bg-indigo-900/40 border-2 border-indigo-500 flex items-center justify-center"
                        style={{ boxShadow: "0 0 12px rgba(99,102,241,0.18)" }}>
-                    <span className="text-base font-mono font-bold text-indigo-200">{fmtNum(mkt.intake.passed + mkt.intake.failed)}</span>
+                    <span className="text-base font-mono font-bold text-indigo-200">{fmtU(mkt.intake.passed + mkt.intake.failed, mkt.unit)}</span>
                   </div>
                 </div>
                 <span className="hidden md:block w-6 h-px bg-slate-700" />
                 <div className="flex flex-col gap-1 w-full md:w-auto md:min-w-[220px]">
                   <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-emerald-300">✓ Premium</span>
-                    <span className="font-mono font-bold text-sm text-emerald-300">{fmtNum(mkt.intake.passedPremium)}</span>
+                    <span className="font-mono font-bold text-sm text-emerald-300">{fmtU(mkt.intake.passedPremium, mkt.unit)}</span>
                   </div>
                   <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-amber-300">⚠ Borderline</span>
-                    <span className="font-mono font-bold text-sm text-amber-300">{fmtNum(mkt.intake.passedBorderline)}</span>
+                    <span className="font-mono font-bold text-sm text-amber-300">{fmtU(mkt.intake.passedBorderline, mkt.unit)}</span>
                   </div>
                   <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-rose-300">✕ Failed</span>
-                    <span className="font-mono font-bold text-sm text-rose-300">{fmtNum(mkt.intake.failed)}</span>
+                    <span className="font-mono font-bold text-sm text-rose-300">{fmtU(mkt.intake.failed, mkt.unit)}</span>
                   </div>
                 </div>
               </div>
@@ -1463,7 +1481,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   </div>
                   {/* Direction label + magnitude, centred above the belt */}
                   <div className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8.5px] font-mono text-emerald-400/80 px-1.5 bg-slate-950/60 rounded">
-                    → graded +{fmtNum(totalInflow)}
+                    → net in +{fmtU(totalInflow, mkt.unit)}
                   </div>
                 </div>
                 {/* Destination badge */}
@@ -1558,7 +1576,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       </div>
                     </div>
                     <div className="text-[9px] text-slate-500 mb-1 font-mono leading-tight">
-                      <span className="text-slate-300">{fmtNum(p.current)}</span>/{fmtNum(p.capacity)} {p.unit}
+                      <span className="text-slate-300">{fmtU(p.current, p.unit)}</span>/{fmtU(p.capacity, p.unit)} {unitWord(unit)}
                     </div>
 
                     {/* Poison breakdown — % + per-criterion contribution. */}
@@ -1567,7 +1585,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         <div className="flex items-center justify-between text-rose-300 font-bold">
                           <span>☣ poison</span>
                           <span className="font-mono">
-                            {Math.round(p.poison.pct * 100)}% · {fmtNum(p.poison.total)}
+                            {Math.round(p.poison.pct * 100)}% · {fmtU(p.poison.total, p.unit)}
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-rose-300/80 text-[8.5px]">
@@ -1603,7 +1621,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                     <div className="bg-emerald-950/20 border border-emerald-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
                       <div className="flex items-center justify-between text-emerald-400 font-bold">
                         <span>↓ in</span>
-                        <span className="font-mono">+{fmtNum(inflowSum)}</span>
+                        <span className="font-mono">+{fmtU(inflowSum, p.unit)}</span>
                       </div>
                       {inflowSum > 0 && topInflow.length > 0 && (
                         <div className="relative h-2.5 mt-0.5 overflow-hidden">
@@ -1630,7 +1648,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topInflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin}: {fmtNum(b.volume)}
+                              {b.origin}: {fmtU(b.volume, p.unit)}
                             </span>
                           ))}
                         </div>
@@ -1644,7 +1662,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         {topExisting.map((b) => (
                           <span key={b.origin} className="flex items-center text-slate-300">
                             <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                            {b.origin}: {fmtNum(b.volume)}
+                            {b.origin}: {fmtU(b.volume, p.unit)}
                           </span>
                         ))}
                       </div>
@@ -1679,14 +1697,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Net gained</span>
-                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGainedVol))}</span>
+                          <span className="text-[8px] font-mono text-emerald-400">+{fmtU(netGainedVol, p.unit)}</span>
                         </div>
                         {topNetGained.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topNetGained.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1716,14 +1734,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
-                          <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(lostVol))}</span>
+                          <span className="text-[8px] font-mono text-rose-400">−{fmtU(lostVol, p.unit)}</span>
                         </div>
                         {topGhost.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topGhost.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1754,14 +1772,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-amber-400/70 rounded p-1 bg-amber-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-amber-400 font-bold">In & out</span>
-                          <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transitVol))}</span>
+                          <span className="text-[8px] font-mono text-amber-400">↻{fmtU(transitVol, p.unit)}</span>
                         </div>
                         {topTransit.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topTransit.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1796,7 +1814,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                     <div className="bg-rose-950/20 border border-rose-900/50 rounded px-1 py-0.5 mt-1 text-[9px]">
                       <div className="flex items-center justify-between text-rose-400 font-bold">
                         <span>↓ out</span>
-                        <span className="font-mono">−{fmtNum(outflowSum)}</span>
+                        <span className="font-mono">−{fmtU(outflowSum, p.unit)}</span>
                       </div>
                       {outflowSum > 0 && topOutflow.length > 0 && (
                         <div className="relative h-3 mt-0.5 overflow-hidden">
@@ -1828,7 +1846,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topOutflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin}: {fmtNum(b.volume)}
+                              {b.origin}: {fmtU(b.volume, p.unit)}
                             </span>
                           ))}
                         </div>

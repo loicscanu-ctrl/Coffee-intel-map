@@ -1,6 +1,8 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
-import CertifiedStocksSystemFlow from "./CertifiedStocksSystemFlow";
+import CertifiedStocksSystemFlow, {
+  flowAnchor, flowWindows, type DurationOpt,
+} from "./CertifiedStocksSystemFlow";
 import CertifiedStocksFreshness from "./CertifiedStocksFreshness";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
@@ -1386,11 +1388,20 @@ function ArabicaPeriodTable({
 function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
   const live = !!d && d.snapshots.length > 0;
   const latestSnap = d?.snapshots.at(-1) || null;
+  const prevSnap = d?.snapshots.at(-2) || null;
 
-  const totalDisplay   = latestSnap ? fmt(fromBags(latestSnap.total_bags,           unit), unit) + " " + unitSuffix(unit) : "—";
-  const pendingDisplay = latestSnap ? fmt(fromBags(latestSnap.pending_grading_bags, unit), unit) + " " + unitSuffix(unit) : "—";
-  const gradedDisplay  = latestSnap ? fmt(fromBags(latestSnap.passed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
-  const failedDisplay  = latestSnap ? fmt(fromBags(latestSnap.failed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
+  // "Graded today" = everything that went through grading (passed + failed).
+  // "Passed grading today" = the tenderable share. "Decertified today" =
+  // certified bags that left the pool day-over-day (prev + passed − current,
+  // floored at 0 — a net increase means stock arrived, not decertified).
+  const gradedTodayBags = latestSnap ? latestSnap.passed_today_bags + latestSnap.failed_today_bags : null;
+  const decertTodayBags = (latestSnap && prevSnap)
+    ? Math.max(0, prevSnap.total_bags + latestSnap.passed_today_bags - latestSnap.total_bags) : null;
+
+  const totalDisplay  = latestSnap ? fmt(fromBags(latestSnap.total_bags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = gradedTodayBags != null ? fmt(fromBags(gradedTodayBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = latestSnap ? fmt(fromBags(latestSnap.passed_today_bags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = decertTodayBags != null ? fmt(fromBags(decertTodayBags, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -1406,10 +1417,10 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified" value={totalDisplay} />
-        <Stat label="Pending grading" value={pendingDisplay} />
-        <Stat label="Graded today"    value={gradedDisplay} />
-        <Stat label="Failed today"    value={failedDisplay} />
+        <Stat label="Total certified"      value={totalDisplay} />
+        <Stat label="Graded today"         value={gradedDisplay} />
+        <Stat label="Passed grading today" value={passedDisplay} />
+        <Stat label="Decertified today"    value={decertDisplay} />
       </div>
 
       {d?.errors && d.errors.length > 0 && (
@@ -2218,18 +2229,26 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
   const stock = d?.latest_detail?.stock_report || null;
   const live = !!d && (!!stock || (d.snapshots?.length || 0) > 0);
   const grand = stock?.grand_total;
+  const latestSnap = d?.snapshots?.at(-1) || null;
+  const prevSnap = d?.snapshots?.at(-2) || null;
 
-  const totalDisplay = grand ? fmt(fromLots(grand.with_val_cert, unit), unit) + " " + unitSuffix(unit) : "—";
-  const nontDisplay  = grand ? fmt(fromLots(grand.non_tend,      unit), unit) + " " + unitSuffix(unit) : "—";
-  const suspDisplay  = grand ? fmt(fromLots(grand.suspended,     unit), unit) + " " + unitSuffix(unit) : "—";
-
+  // Today's grading from the grading event on the latest snapshot's date.
+  // Graded = all lots graded; Passed = tenderable share; Decertified =
+  // certified lots that left day-over-day (prev + passed − current, floored).
   const ra = d?.recent_activity;
-  const activityCount = ra ? (
-    (ra.gradings?.length || 0) +
-    (ra.iss_recv_daily?.length || 0) +
-    (ra.tenders?.length || 0) +
-    (ra.grading_overview?.length || 0)
-  ) : 0;
+  const todaySum = (ra?.gradings || []).find(g => g.date === latestSnap?.date)?.summary;
+  const gradedTodayLots = todaySum?.lots_graded_today ?? latestSnap?.lots_graded_today ?? null;
+  const passedTodayLots = todaySum?.tenderable_today
+    ?? (gradedTodayLots != null && todaySum?.non_tenderable_today != null
+          ? gradedTodayLots - (todaySum?.non_tenderable_today ?? 0)
+          : (gradedTodayLots === 0 ? 0 : null));
+  const decertTodayLots = (latestSnap && prevSnap && passedTodayLots != null)
+    ? Math.max(0, prevSnap.total_lots_certified + passedTodayLots - latestSnap.total_lots_certified) : null;
+
+  const totalDisplay  = grand ? fmt(fromLots(grand.with_val_cert, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = gradedTodayLots != null ? fmt(fromLots(gradedTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = passedTodayLots != null ? fmt(fromLots(passedTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = decertTodayLots != null ? fmt(fromLots(decertTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -2245,12 +2264,10 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified" value={totalDisplay} />
-        <Stat label="Non-tenderable"  value={nontDisplay} />
-        <Stat label="Suspended"       value={suspDisplay} />
-        <Stat label="Recent events"
-              value={`${activityCount}`}
-              sub={`gradings/iss/tenders, ${d?.snapshots.length ?? 0}d window`} />
+        <Stat label="Total certified"      value={totalDisplay} />
+        <Stat label="Graded today"         value={gradedDisplay} />
+        <Stat label="Passed grading today" value={passedDisplay} />
+        <Stat label="Decertified today"    value={decertDisplay} />
       </div>
     </div>
   );
@@ -2333,6 +2350,7 @@ export default function CertifiedStocksPanel() {
   const [arabica, setArabica] = useState<ArabicaJson | null>(null);
   const [robusta, setRobusta] = useState<RobustaJson | null>(null);
   const [unit, setUnit] = useState<Unit>("bags");
+  const [flowDuration, setFlowDuration] = useState<DurationOpt>("1w");
   const [err, setErr] = useState(false);
 
   useEffect(() => {
@@ -2358,20 +2376,44 @@ export default function CertifiedStocksPanel() {
             futures market clears against. Daily scrape of ICE&rsquo;s publicdocs reports.
           </p>
         </div>
-        <div className="flex items-center gap-1.5">
-          {(["bags", "tonnes", "lots"] as Unit[]).map((u) => (
-            <button
-              key={u}
-              onClick={() => setUnit(u)}
-              className={`px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${
-                unit === u
-                  ? "bg-slate-800 text-amber-400 border-slate-700"
-                  : "text-slate-500 hover:text-slate-300 border-transparent"
-              }`}
-            >
-              {u}
-            </button>
-          ))}
+        <div className="flex flex-col items-end gap-1.5">
+          {/* Metric (unit) selection */}
+          <div className="flex items-center gap-1.5">
+            {(["bags", "tonnes", "lots"] as Unit[]).map((u) => (
+              <button
+                key={u}
+                onClick={() => setUnit(u)}
+                className={`px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${
+                  unit === u
+                    ? "bg-slate-800 text-amber-400 border-slate-700"
+                    : "text-slate-500 hover:text-slate-300 border-transparent"
+                }`}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
+          {/* Flow window — sits right under the metric toggle and drives the
+              system-flow windows below. Labelled by each window's start date
+              ("since DATE"). */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-slate-500 uppercase text-[10px] tracking-wider">Since</span>
+            <div className="flex items-center gap-1">
+              {flowWindows(flowAnchor(arabica, robusta)).map((w) => (
+                <button
+                  key={w.key}
+                  onClick={() => setFlowDuration(w.key)}
+                  className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
+                    flowDuration === w.key
+                      ? "bg-slate-800 text-amber-400 border-slate-700"
+                      : "text-slate-500 hover:text-slate-300 border-transparent"
+                  }`}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2406,6 +2448,8 @@ export default function CertifiedStocksPanel() {
         <CertifiedStocksSystemFlow
           arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
           robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
+          flowDuration={flowDuration}
+          unit={unit}
         />
       </div>
 
