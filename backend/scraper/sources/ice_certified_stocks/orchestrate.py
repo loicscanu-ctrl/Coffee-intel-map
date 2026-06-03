@@ -141,6 +141,24 @@ def _biz_days_back(start: date, n: int) -> list[date]:
     return out
 
 
+def _pull_month_end(pull_fn, cal_month_end: date, *, amplitude: int = 2):
+    """Resolve a robusta monthly report (age-allowance / iss-recv) whose file
+    ICE dates by a business day near the calendar month-end. When the month-end
+    falls on a weekend the file may be dated the last Friday (month-end −1/−2)
+    OR the next Monday (+1/+2), so probe month-end ± `amplitude` days,
+    nearest-first — e.g. 2026-05-31 (Sun) resolves to Fri 05-29 or Mon 06-01.
+    Returns (resolved_date, url, parsed); parsed is None if none resolved."""
+    offsets = [0]
+    for k in range(1, amplitude + 1):
+        offsets += [-k, k]              # 0, -1, +1, -2, +2 — nearest first
+    for off in offsets:
+        cand = cal_month_end + timedelta(days=off)
+        url, parsed = pull_fn(cand)
+        if parsed is not None:
+            return cand, url, parsed
+    return cal_month_end, None, None
+
+
 def _throttle_for(url: str) -> float:
     return _THROTTLE["marketdata"] if "/marketdata/" in url else _THROTTLE["public"]
 
@@ -631,14 +649,16 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     monthly_iss_recv: list[dict] = []
     age_allowance_list: list[dict] = []
     # Walk back from current month's end through last 3 month-ends.
-    cursor = today.replace(day=1) - timedelta(days=1)   # last day of previous month
+    cursor = today.replace(day=1) - timedelta(days=1)   # calendar last day of prev month
     for _ in range(3):
-        _, parsed = pull_iss_recv_monthly(cursor)
+        _, _, parsed = _pull_month_end(pull_iss_recv_monthly, cursor)
         if parsed:
             monthly_iss_recv.append(parsed)
-        _, parsed = pull_age_allowance(cursor)
+        me, _, parsed = _pull_month_end(pull_age_allowance, cursor)
         if parsed:
-            age_allowance_list.append({"month_end": cursor.isoformat(), **parsed})
+            # Store the resolved (last-business-day) date so a weekend month-end
+            # like May 31 → May 29 keeps the report's real file date.
+            age_allowance_list.append({"month_end": me.isoformat(), **parsed})
         cursor = (cursor.replace(day=1) - timedelta(days=1))
     print(f"  → monthly_iss_recv={len(monthly_iss_recv)}  age_allowance={len(age_allowance_list)}\n")
 
