@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T20:10:35+00:00",
+  "generated_at": "2026-06-03T09:17:05+00:00",
   "as_of": "2026-06-02",
   "source_url": "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260602.xls",
   "snapshots": [
@@ -70094,7 +70094,7 @@
     },
     {
       "date": "2026-06-01",
-      "report_date": null,
+      "report_date": "2026-06-01",
       "total_bags": 434930,
       "transition_bags": 308502,
       "pending_grading_bags": 1100,
@@ -70559,13 +70559,13 @@
     },
     {
       "date": "2026-06-02",
-      "report_date": null,
+      "report_date": "2026-06-02",
       "total_bags": 432781,
       "transition_bags": 307918,
       "pending_grading_bags": 0,
       "rebagging_bags": 0,
-      "passed_today_bags": 0,
-      "failed_today_bags": 0,
+      "passed_today_bags": 825,
+      "failed_today_bags": 275,
       "by_port": {
         "ANT": 294241,
         "BAR": 0,
@@ -70992,7 +70992,7 @@
     }
   ],
   "latest_detail": {
-    "report_date": null,
+    "report_date": "2026-06-02",
     "total_certified": {
       "ports": [
         "ANT",
@@ -71428,10 +71428,10 @@
       "grand_total": 0
     },
     "grading_today": {
-      "passed_today_bags": 0,
-      "failed_today_bags": 0,
-      "passed_text": null,
-      "failed_text": null
+      "passed_today_bags": 825,
+      "failed_today_bags": 275,
+      "passed_text": "825 bags passed (matrix)",
+      "failed_text": "275 bags failed (matrix)"
     }
   },
   "ageing_report": {
