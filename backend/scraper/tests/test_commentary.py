@@ -1,8 +1,7 @@
 import pytest
 
-from scraper.commentary import render, CommentaryError
+from scraper.commentary import CommentaryError, render
 from scraper.commentary.builder import signed, thousep
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 

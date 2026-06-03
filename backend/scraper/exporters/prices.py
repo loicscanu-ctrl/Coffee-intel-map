@@ -1,6 +1,6 @@
 """Price-ticker exporters (latest_prices, vn_physical_prices)."""
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from models import (
     NewsItem,
@@ -378,7 +378,7 @@ def _emit_vn_physical_news(db) -> None:
     """Upsert a Vietnam-physical news_feed row carrying the absorption-ratio
     commentary. No-op when DATABASE_URL is unset (covered by the upstream
     DB session being None in offline modes) or the commentary can't be built."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     text = _vn_physical_commentary(db)
     if not text:
@@ -399,7 +399,7 @@ def _emit_vn_physical_news(db) -> None:
         "lng":      108.040,
         "tags":     ["vietnam", "physical-price", "absorption", "auto-commentary"],
         "meta":     json.dumps(meta_obj, ensure_ascii=False),
-        "pub_date": datetime.now(timezone.utc),
+        "pub_date": datetime.now(UTC),
     })
     print(f"[vn-physical-news] {text}")
 

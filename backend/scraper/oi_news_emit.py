@@ -24,9 +24,8 @@ KNOWN CAVEAT — nearby-OI definition
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 _REGIME_MATRIX = {
     # (price_up, oi_up) → human regime label
@@ -143,7 +142,7 @@ def emit_from_history_path(history_path: Path) -> int:
                 "lng":      lng,
                 "tags":     ["daily-oi", market_key, "futures", "auto-commentary"],
                 "meta":     json.dumps(meta_obj, ensure_ascii=False),
-                "pub_date": datetime.now(timezone.utc),
+                "pub_date": datetime.now(UTC),
             })
             written += 1
             print(f"[oi-news] {label} {latest_date}: {text}")

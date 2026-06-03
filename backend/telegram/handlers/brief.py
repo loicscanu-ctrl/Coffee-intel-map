@@ -1,12 +1,36 @@
 from __future__ import annotations
 
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from telegram.data import load
 
-STC = {1:"H",2:"H",3:"K",4:"K",5:"N",6:"N",7:"U",8:"U",9:"X",10:"X",11:"F",12:"F"}
+# ── Constants ─────────────────────────────────────────────────────────────────
 
+# Farmgate-to-FOB cost per origin (USD/tonne). Mirrors frontend/components/
+# map/MarketTicker.tsx FOB_COST_USD — must stay in sync. Used so the basis
+# line is at-port parity vs. the nearby futures contract.
+_FOB_COST_USD: dict[str, int] = {
+    "VN_FAQ":  100,   # Vietnam: ~$65 logistics + ~$35 exporter margin
+    "CON_T7":  200,   # Brazil Conilon: logistics + quality upgrade to Class 1
+    "UGA_S15": 265,   # Uganda: ~$228 Northern Corridor logistics + ~$37 margin
+}
+
+# Brazil frost-monitor window. Per user spec: "June to late August. From Sept
+# it should focus on rain same as other countries." Inclusive on both ends.
+_FROST_MONTHS = {6, 7, 8}
+
+# Frost alert trigger: any monitored region whose 7-day forecast min temp
+# drops to or below this threshold. 4°C is the operational rule-of-thumb
+# coffee farmers use — leaves start showing damage around 3-4°C.
+_FROST_TEMP_C = 4.0
+
+# VHI severity threshold — NOAA STAR convention. Matches the same constant
+# in backend/scripts/weather_news_emit.py.
+_VHI_STRESS_THRESHOLD = 40.0
+
+
+# ── Small helpers ─────────────────────────────────────────────────────────────
 
 def _arrow(a, b) -> str:
     if a is None or b is None:
@@ -14,145 +38,492 @@ def _arrow(a, b) -> str:
     return "▲" if a > b else "▼" if a < b else "→"
 
 
-def _rc_section(chain: dict | None, acaphe: dict | None) -> tuple[str, str | None, float | None]:
-    """Returns (formatted line, front RC contract letter, front price)."""
+def _sign(n: float | int, fmt: str = ",.0f") -> str:
+    if n is None:
+        return ""
+    if n == 0:
+        return "0"
+    return f"{n:+{fmt}}"
+
+
+# ── Futures (RC + KC) — price + spread ────────────────────────────────────────
+
+def _front_two(market_contracts: list[dict]) -> tuple[dict | None, dict | None]:
+    """The two front contracts in display order. The futures_chain ships them
+    sorted by expiration so [0] = front, [1] = second month."""
+    if not market_contracts:
+        return None, None
+    if len(market_contracts) == 1:
+        return market_contracts[0], None
+    return market_contracts[0], market_contracts[1]
+
+
+def _archive_two_recent_dates(archive: dict | None, market: str) -> tuple[str | None, str | None]:
+    """Return (today, prior) ISO dates from the per-contract archive — used
+    for spread daily-change. Falls back to (None, None) if the archive can't
+    yield two distinct dates."""
+    if not archive:
+        return None, None
+    by_date = archive.get(market) or {}
+    if len(by_date) < 2:
+        return None, None
+    dates = sorted(by_date.keys(), reverse=True)
+    return dates[0], dates[1]
+
+
+def _spread_with_change(archive: dict | None, market: str,
+                        front_sym: str | None, second_sym: str | None) -> tuple[int | None, int | None]:
+    """Returns (today's front-second spread, day-over-day delta in spread).
+    Uses the per-contract archive so we can read yesterday's settlement
+    without needing a DB session."""
+    if not archive or not front_sym or not second_sym:
+        return None, None
+    today_d, prev_d = _archive_two_recent_dates(archive, market)
+    if not today_d or not prev_d:
+        return None, None
+    today_cells = (archive[market] or {}).get(today_d, {})
+    prev_cells  = (archive[market] or {}).get(prev_d, {})
+
+    # Archive uses canonical RC* for robusta; futures_chain may use RM*.
+    # Normalize the lookup so spread math survives the symbol convention.
+    def _lookup(cells: dict, sym: str) -> float | None:
+        for cand in (sym, sym.replace("RM", "RC", 1), sym.replace("RC", "RM", 1)):
+            v = cells.get(cand)
+            if v and v.get("price") is not None:
+                return float(v["price"])
+        return None
+
+    cur_f  = _lookup(today_cells, front_sym)
+    cur_s  = _lookup(today_cells, second_sym)
+    prev_f = _lookup(prev_cells,  front_sym)
+    prev_s = _lookup(prev_cells,  second_sym)
+    if cur_f is None or cur_s is None:
+        return None, None
+    cur_spread = round(cur_f - cur_s)
+    if prev_f is None or prev_s is None:
+        return cur_spread, None
+    return cur_spread, cur_spread - round(prev_f - prev_s)
+
+
+def _contract_letter(sym: str) -> str:
+    """RMN26 → N. Used so the spread line reads "N-U" instead of "RMN26-RMU26"."""
+    m = re.search(r"^[A-Z]{2}([A-Z])\d{2}$", sym)
+    return m.group(1) if m else "?"
+
+
+def _rc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -> tuple[str, str | None, float | None, str | None]:
+    """RC line with daily price change + N-U spread + spread daily change.
+    Returns (line, front letter, front price, front symbol) so downstream
+    basis lines can re-use the same front contract for yesterday's lookup."""
     if not chain:
-        return "RC  data unavailable", None, None
-    contracts = chain.get("robusta", {}).get("contracts", [])
-    if not contracts:
-        return "RC  data unavailable", None, None
-    c    = contracts[0]
-    last = c.get("last")
-    sym  = c.get("symbol", "?")
-    m    = re.match(r'^RM([A-Z])', sym)
-    letter = m.group(1) if m else "?"
-    if last is None:
-        return f"RC  data unavailable ({sym})", letter, None
-    # Try acaphe_live for daily change
+        return "RC  data unavailable", None, None, None
+    contracts = (chain.get("robusta") or {}).get("contracts") or []
+    front, second = _front_two(contracts)
+    if not front or front.get("last") is None:
+        return "RC  data unavailable", None, None, None
+    front_sym = front.get("symbol", "?")
+    front_last = front["last"]
+    letter = _contract_letter(front_sym)
+
+    # Daily price change — from Acaphe live tape (truer than futures_chain
+    # which only has settlement).
     change = None
     if acaphe:
-        rob_live = acaphe.get("robusta", [])
+        rob_live = acaphe.get("robusta") or []
         if rob_live:
             change = rob_live[0].get("change")
-    arrow   = ("▲" if change > 0 else "▼" if change < 0 else "→") if change is not None else "→"
+    arrow   = ("▲" if change and change > 0 else "▼" if change and change < 0 else "→") if change is not None else "→"
     delta_s = f"{arrow}{change:+,.0f}" if change is not None else arrow
-    return f"RC   {last:,.0f}  {delta_s}   ({sym})", letter, last
+
+    parts = [f"RC   {front_last:,.0f}  {delta_s}   ({front_sym})"]
+    if second and second.get("symbol"):
+        spread, spread_chg = _spread_with_change(archive, "robusta", front_sym, second["symbol"])
+        if spread is not None:
+            second_letter = _contract_letter(second["symbol"])
+            chg_part = f" ({spread_chg:+,d})" if spread_chg is not None else ""
+            parts.append(f"     {letter}-{second_letter} spread at {spread:,}{chg_part}")
+    return "\n".join(parts), letter, front_last, front_sym
 
 
-def _kc_section(chain: dict | None, acaphe: dict | None) -> str:
+def _kc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -> str:
     if not chain:
         return "KC  data unavailable"
-    contracts = chain.get("arabica", {}).get("contracts", [])
-    if not contracts:
+    contracts = (chain.get("arabica") or {}).get("contracts") or []
+    front, second = _front_two(contracts)
+    if not front or front.get("last") is None:
         return "KC  data unavailable"
-    c    = contracts[0]
-    last = c.get("last")
-    sym  = c.get("symbol", "?")
-    if last is None:
-        return "KC  data unavailable"
+    front_sym = front.get("symbol", "?")
+    front_last = front["last"]
+    letter = _contract_letter(front_sym)
+
     change = None
     if acaphe:
-        arab_live = acaphe.get("arabica", [])
+        arab_live = acaphe.get("arabica") or []
         if arab_live:
             change = arab_live[0].get("change")
-    arrow   = ("▲" if change > 0 else "▼" if change < 0 else "→") if change is not None else "→"
+    arrow   = ("▲" if change and change > 0 else "▼" if change and change < 0 else "→") if change is not None else "→"
     delta_s = f"{arrow}{change:+.2f}" if change is not None else arrow
-    return f"KC   {last:.2f}  {delta_s}   ({sym})"
+
+    parts = [f"KC   {front_last:.2f}  {delta_s}   ({front_sym})"]
+    if second and second.get("symbol"):
+        spread, spread_chg = _spread_with_change(archive, "arabica", front_sym, second["symbol"])
+        if spread is not None:
+            second_letter = _contract_letter(second["symbol"])
+            chg_part = f" ({spread_chg:+,d})" if spread_chg is not None else ""
+            parts.append(f"     {letter}-{second_letter} spread at {spread:,}{chg_part}")
+    return "\n".join(parts)
 
 
-def _vn_faq_line(latest: dict | None, front_letter: str | None, front_price: float | None) -> str:
-    if not latest:
-        return ""
-    for t in latest.get("tickers", []):
-        if t.get("label") == "VN FAQ":
-            val = t["value"]
-            # Format: "87.700 VND ($3,347)"
-            m_vnd = re.match(r'^([\d.]+)\s+VND', val)
-            m_usd = re.search(r'\$([0-9,]+)', val)
-            if m_vnd and m_usd and front_price:
-                vnd = int(m_vnd.group(1).replace(".", ""))
-                usd = int(m_usd.group(1).replace(",", ""))
-                diff = round(usd - front_price + 100)
-                letter = front_letter or "N"
-                return f"VN FAQ  {vnd:,} VND · {letter}{diff:+d} (incl. +100 logistics)"
-            return f"VN FAQ  {val}"
-    return ""
+# ── Physical cash lines (VN/BR/UG) with basis + day-over-day delta ───────────
 
-
-def _find_cot_rows(data: list) -> tuple[dict | None, dict | None]:
-    latest = prev = None
-    for row in reversed(data):
-        ny = row.get("ny", {})
-        if ny.get("mm_long") is not None:
-            if latest is None:
-                latest = row
-            elif prev is None:
-                prev = row
-                break
+def _last_two_prices(series: list[dict]) -> tuple[dict | None, dict | None]:
+    """Latest then prior — series is in chronological order (date asc)."""
+    if not series or len(series) < 1:
+        return None, None
+    latest = series[-1]
+    prev = series[-2] if len(series) >= 2 else None
     return latest, prev
 
 
-def _cot_brief_block(cot_data: list | None) -> str:
-    if not cot_data:
-        return ""
-    latest, prev = _find_cot_rows(cot_data)
-    if not latest:
-        return ""
+def _basis_for_date(price_local: float, currency_per_usd: float | None,
+                    rc_price_usd_mt: float | None, fob_usd: int,
+                    unit_to_usd_mt: float = 1000.0) -> int | None:
+    """USD/MT basis vs front Robusta: (local→USD) + fob − futures.
 
-    date_str = latest["date"]
+    `unit_to_usd_mt` is the multiplier to get USD/MT from (local_price / fx).
+    Default 1000 is for "VND per kg" and "USD per kg" patterns: divide by
+    fx (local-per-USD) gives USD/kg, multiply by 1000 gives USD/MT.
+    """
+    if currency_per_usd is None or currency_per_usd == 0 or rc_price_usd_mt is None:
+        return None
+    usd_mt = price_local / currency_per_usd * unit_to_usd_mt
+    return round(usd_mt + fob_usd - rc_price_usd_mt)
+
+
+def _fx_close_on(fx_history: dict | None, pair: str, on_date: str) -> float | None:
+    """Looks up the FX close for `on_date`; falls back to the most-recent
+    close on or before that date if the exact day is missing (weekend / FX
+    holiday)."""
+    if not fx_history:
+        return None
+    pair_doc = (fx_history.get("pairs") or {}).get(pair) or {}
+    history = pair_doc.get("history") or []
+    best: float | None = None
+    for row in history:
+        d = row.get("date")
+        if d and d <= on_date and row.get("close") is not None:
+            best = float(row["close"])
+    return best
+
+
+_MONTH_LETTER_ORDER = {"F": 1, "G": 2, "H": 3, "J": 4, "K": 5, "M": 6,
+                       "N": 7, "Q": 8, "U": 9, "V": 10, "X": 11, "Z": 12}
+
+
+def _sort_by_expiration(symbols: list[str]) -> list[str]:
+    """Order contract symbols by chronological expiration (front first).
+    A robusta archive row keyed by RCN26/RCU26/RCF27 sorts as N26 → U26 →
+    F27, not the alphabetic F27 → N26 sort that picks the wrong front."""
+    def _key(s: str):
+        # Expecting [A-Z]{2}[A-Z]\d{2}; degrade gracefully otherwise.
+        if len(s) < 5:
+            return (9999, 99, s)
+        letter = s[-3]
+        try:
+            yy = int(s[-2:])
+        except ValueError:
+            return (9999, 99, s)
+        return (2000 + yy, _MONTH_LETTER_ORDER.get(letter, 99), s)
+    return sorted(symbols, key=_key)
+
+
+def _rc_price_on(archive: dict | None, on_date: str, front_sym: str | None = None) -> float | None:
+    """Front Robusta settle on or before `on_date`. When `front_sym` is given
+    we look up that specific contract (so yesterday's basis uses the same
+    contract as today's basis); otherwise we pick the chronologically front
+    contract from the archive row."""
+    if not archive:
+        return None
+    rob = archive.get("robusta") or {}
+    for d in sorted([d for d in rob.keys() if d <= on_date], reverse=True):
+        cells = rob[d] or {}
+        if front_sym:
+            # Try the given symbol first, then both RM/RC conventions.
+            for cand in (front_sym, front_sym.replace("RM", "RC", 1), front_sym.replace("RC", "RM", 1)):
+                v = cells.get(cand)
+                if v and v.get("price") is not None:
+                    return float(v["price"])
+        # Fallback: chronologically-front contract that has a price.
+        for sym in _sort_by_expiration(list(cells.keys())):
+            v = cells[sym]
+            if v.get("price") is not None:
+                return float(v["price"])
+    return None
+
+
+def _physical_line(label: str, origin_key: str, fob_key: str,
+                   currency_label: str, history: list[dict],
+                   fx_history: dict | None, fx_pair: str,
+                   archive: dict | None, rc_price_today: float | None,
+                   front_letter: str | None, front_sym: str | None = None,
+                   *, unit_to_usd_mt: float = 1000.0) -> str:
+    """One physical-price line: "VN FAQ 86,700 VND · N-64 +5 FOB"
+
+    `+5` is the day-over-day change in the at-port basis (today vs prior
+    physical-price entry — typically yesterday, but tolerates weekend gaps).
+    "FOB" tags the line as a loadable-on-vessel parity figure, not raw
+    farmgate.
+    """
+    if not history or rc_price_today is None:
+        return ""
+    cur, prev = _last_two_prices(history)
+    if not cur:
+        return ""
+    cur_date  = cur.get("date") or ""
+    cur_price = cur.get("price")
+    if cur_price is None:
+        return ""
+    fob = _FOB_COST_USD.get(fob_key, 0)
+    fx_today = _fx_close_on(fx_history, fx_pair, cur_date) if fx_history else None
+    # FX scrape lags the physical scrape on weekends; if no FX for the cur_date,
+    # fall back to the most-recent FX. Without FX we still show the local price
+    # but skip the basis math.
+    if fx_today is None:
+        return f"{label}  {cur_price:,.0f} {currency_label}"
+
+    cur_basis = _basis_for_date(cur_price, fx_today, rc_price_today, fob, unit_to_usd_mt)
+    if cur_basis is None:
+        return f"{label}  {cur_price:,.0f} {currency_label}"
+
+    letter = front_letter or "N"
+    delta_part = ""
+    if prev and prev.get("price") is not None and prev.get("date"):
+        prev_date = prev["date"]
+        fx_prev = _fx_close_on(fx_history, fx_pair, prev_date)
+        rc_prev = _rc_price_on(archive, prev_date, front_sym)
+        prev_basis = _basis_for_date(prev["price"], fx_prev, rc_prev, fob, unit_to_usd_mt)
+        if prev_basis is not None:
+            delta = cur_basis - prev_basis
+            delta_part = f" {_sign(delta, 'd')}"
+
+    cur_local = f"{cur_price:,.0f} {currency_label}"
+    return f"{label}  {cur_local} · {letter}{cur_basis:+d}{delta_part} FOB"
+
+
+# ── Weather section ──────────────────────────────────────────────────────────
+
+def _seed_weather_path(origin_key: str):
+    """Locate backend/seed/weather_history/{origin}.json relative to the
+    morning brief's data dir (which sits at frontend/public/data)."""
+    from telegram.data import _DATA_DIR
+    repo_root = _DATA_DIR.parent.parent.parent
+    return repo_root / "backend" / "seed" / "weather_history" / f"{origin_key}.json"
+
+
+def _load_seed_weather(origin_key: str) -> dict | None:
+    import json as _json
+    p = _seed_weather_path(origin_key)
+    if not p.exists():
+        return None
     try:
-        d  = datetime.strptime(date_str, "%Y-%m-%d")
-        wk = f"{d.day} {d.strftime('%b')}"
-    except ValueError:
-        wk = date_str
+        return _json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
 
-    blocks = []
-    for label, mkt_key, price_key, unit in [
-        ("COT KC", "ny",  "price_ny",  "¢/lb"),
-        ("COT RC", "ldn", "price_ldn", "USD/MT"),
-    ]:
-        cur = latest.get(mkt_key, {})
-        prv = prev.get(mkt_key, {}) if prev else {}
 
-        mm_long  = cur.get("mm_long")
-        mm_short = cur.get("mm_short")
-        if mm_long is None:
-            blocks.append(f"<b>{label}</b> (wk {wk}): data pending")
+def _yesterday_avg(seed: dict | None, field: str, today: date) -> tuple[float | None, str | None]:
+    """Average `field` (rain / tmean / …) across all regions on the most
+    recent date ≤ today. Returns (value, date_used) so the brief can label
+    the day correctly (the seed sometimes has today's data too — then
+    "yesterday" is two days back). None when nothing usable is in scope."""
+    if not seed:
+        return None, None
+    regions = seed.get("regions") or {}
+    if not regions:
+        return None, None
+    target = (today - timedelta(days=1)).isoformat()
+    values: list[float] = []
+    for region_data in regions.values():
+        if not isinstance(region_data, dict):
             continue
-
-        mm_net   = mm_long - mm_short
-        p_mm_net = ((prv.get("mm_long") or 0) - (prv.get("mm_short") or 0)) if prv else None
-        wow_delta = mm_net - p_mm_net if p_mm_net is not None else None
-
-        price   = cur.get(price_key)
-        p_price = prv.get(price_key) if prv else None
-        oi      = cur.get("oi_total")
-        p_oi    = prv.get("oi_total") if prv else None
-        prod_net  = (cur.get("pmpu_long") or 0) - (cur.get("pmpu_short") or 0)
-        p_prod    = ((prv.get("pmpu_long") or 0) - (prv.get("pmpu_short") or 0)) if prv else None
-        other_net = (cur.get("other_long") or 0) - (cur.get("other_short") or 0)
-        p_other   = ((prv.get("other_long") or 0) - (prv.get("other_short") or 0)) if prv else None
-
-        price_s = f"{price:,.2f} {unit}" if price else "?"
-        oi_s    = f"{oi:,}" if oi else "?"
-        sign    = "+" if mm_net >= 0 else ""
-        wow_s   = f" {_arrow(mm_net, p_mm_net)}{'+' if (wow_delta or 0) >= 0 else ''}{wow_delta:,}" if wow_delta is not None else ""
-
-        lines = [
-            f"<b>{label}</b> (wk {wk}):",
-            f"Price {_arrow(price, p_price)} {price_s} · OI {_arrow(oi, p_oi)} {oi_s}",
-            f"Roasters {_arrow(other_net, p_other)} · Producers {_arrow(prod_net, p_prod)}",
-            f"MM net {sign}{mm_net:,}{wow_s}",
-        ]
-        blocks.append("\n".join(lines))
-
-    return "\n\n".join(blocks)
+        v = region_data.get(target)
+        if isinstance(v, dict) and isinstance(v.get(field), (int, float)):
+            values.append(float(v[field]))
+    if not values:
+        return None, None
+    return sum(values) / len(values), target
 
 
-def _brazil_brief_block(daily: dict | None) -> str:
+def _vn_weather_today_rain(vn_weather: dict | None, today: date) -> tuple[float | None, float | None]:
+    """Returns (yesterday's mean rain mm across VN provinces, 10-yr average
+    rain for the same calendar day). The "vs forecast" comparison the spec
+    asked for is actually a "vs climatology" comparison — there's no stored
+    forecast-snapshot history to diff against, but the 10-yr daily average
+    gives the trader the same "wetter or drier than typical" signal."""
+    seed = _load_seed_weather("vn")
+    actual, _ = _yesterday_avg(seed, "rain", today)
+    if actual is None:
+        return None, None
+    # 10-year average for the same day: walk the seed for the {month}-{day}
+    # entry across recent years and average.
+    regions = (seed or {}).get("regions") or {}
+    md = (today - timedelta(days=1)).strftime("-%m-%d")
+    historic: list[float] = []
+    for region_data in regions.values():
+        if not isinstance(region_data, dict):
+            continue
+        for d, v in region_data.items():
+            if d.endswith(md) and isinstance(v, dict) and isinstance(v.get("rain"), (int, float)):
+                if d != (today - timedelta(days=1)).isoformat():   # exclude the day we measured
+                    historic.append(float(v["rain"]))
+    avg = sum(historic) / len(historic) if historic else None
+    return actual, avg
+
+
+def _vn_month_status(vn_weather: dict | None, today: date) -> str:
+    """"ok" or "at risk" based on monthly_actual_cur vs monthly_dry_warn for
+    the current month (averaged across Central Highlands provinces)."""
+    if not vn_weather:
+        return ""
+    provs = vn_weather.get("provinces") or []
+    if not provs:
+        return ""
+    idx = today.month - 1
+    actuals: list[float] = []
+    warns: list[float] = []
+    for p in provs:
+        ac = p.get("monthly_actual_cur") or []
+        wn = p.get("monthly_dry_warn") or []
+        if idx < len(ac) and ac[idx] is not None:
+            actuals.append(float(ac[idx]))
+        if idx < len(wn) and wn[idx] is not None:
+            warns.append(float(wn[idx]))
+    if not actuals or not warns:
+        return ""
+    return "at risk" if sum(actuals) / len(actuals) < sum(warns) / len(warns) else "ok"
+
+
+def _vn_vhi(vn_vhi: dict | None) -> tuple[float | None, list[str]]:
+    """Latest VHI averaged across VN provinces + names of provinces currently
+    in stress (vhi < threshold). Stress names are surfaced in the brief so
+    "vhi at xx" can flip to "vhi at xx (Dak Lak, Gia Lai stressed)"."""
+    if not vn_vhi:
+        return None, []
+    provs = vn_vhi.get("provinces") or {}
+    values: list[float] = []
+    stressed: list[str] = []
+    for name, payload in provs.items():
+        latest = (payload or {}).get("vhi_latest") or {}
+        v = latest.get("vhi")
+        if isinstance(v, (int, float)):
+            values.append(float(v))
+            if v < _VHI_STRESS_THRESHOLD:
+                stressed.append(name)
+    avg = sum(values) / len(values) if values else None
+    return avg, stressed
+
+
+def _brazil_frost_alerts(today: date) -> tuple[list[str], date | None]:
+    """Return (regions in frost-risk territory, date measured).
+
+    Reads tmean from the last 3 days of backend/seed/weather_history/brazil.json
+    (the only daily temp series we ship). Frost risk fires when any monitored
+    region's tmean fell to or below 10°C — a Brazilian highland diurnal range
+    of ~6-8°C between tmean and tmin means a 10°C tmean corresponds to a
+    tmin in the 2-4°C frost zone.
+
+    Looking back 3 days catches a cold front that already arrived even if
+    the most-recent day had partial sun. The brief surfaces the worst-case
+    region, not all of them.
+    """
+    seed = _load_seed_weather("brazil")
+    if not seed:
+        return [], None
+    regions = seed.get("regions") or {}
+    if not regions:
+        return [], None
+    # Front-line frost-vulnerable regions only — Espírito Santo is too low-
+    # altitude to get frost.
+    targets = {"Sul de Minas", "Cerrado", "Paraná"}
+    worst: list[tuple[str, float, str]] = []
+    for name, region_data in regions.items():
+        if name not in targets or not isinstance(region_data, dict):
+            continue
+        for back in (1, 2, 3):
+            d_iso = (today - timedelta(days=back)).isoformat()
+            v = region_data.get(d_iso)
+            if isinstance(v, dict) and isinstance(v.get("tmean"), (int, float)):
+                tmean = float(v["tmean"])
+                # _FROST_TEMP_C is the tmin threshold; the tmean equivalent is
+                # roughly tmin + diurnal_range/2, conservatively +6°C.
+                if tmean <= _FROST_TEMP_C + 6.0:
+                    worst.append((name, tmean, d_iso))
+                    break
+    alerts = sorted(set(name for name, _, _ in worst))
+    most_recent = max((d for _, _, d in worst), default=None)
+    return alerts, date.fromisoformat(most_recent) if most_recent else None
+
+
+def _brazil_rain_status(brazil_weather: dict | None, today: date) -> str:
+    """Post-frost-season rain check, same logic as Vietnam."""
+    return _vn_month_status(brazil_weather, today)
+
+
+def _weather_block(today: date) -> str | None:
+    br_weather = load("brazil_weather.json")
+    vn_weather = load("vn_weather.json")
+    vn_vhi     = load("vhi_vn.json")
+
+    lines = ["☁️ <b>Weather</b>"]
+
+    # Brazil: frost vs rain, depending on the month
+    if today.month in _FROST_MONTHS:
+        alerts, when = _brazil_frost_alerts(today)
+        if alerts:
+            names = ", ".join(alerts[:3])
+            when_str = when.strftime("%d %b") if when else "recent obs"
+            lines.append(f"Brazil: frost season — <b>ALERT</b> {names} ({when_str} tmean cold)")
+        else:
+            lines.append("Brazil: frost season — no cold-front signal in recent observations")
+    else:
+        rain_status = _brazil_rain_status(br_weather, today)
+        if rain_status:
+            lines.append(f"Brazil: month rainfall {rain_status}")
+
+    # Vietnam: rain yesterday + month status + VHI
+    vn_actual, vn_clim = _vn_weather_today_rain(vn_weather, today)
+    if vn_actual is not None:
+        if vn_clim is not None:
+            diff = vn_actual - vn_clim
+            vn_rain_part = f"Vietnam: {vn_actual:.1f}mm rain yesterday ({_sign(diff, '.1f')} vs 10y avg)"
+        else:
+            vn_rain_part = f"Vietnam: {vn_actual:.1f}mm rain yesterday"
+        status = _vn_month_status(vn_weather, today)
+        if status:
+            vn_rain_part += f", full month forecast {status}"
+        lines.append(vn_rain_part)
+
+    avg_vhi, stressed = _vn_vhi(vn_vhi)
+    if avg_vhi is not None:
+        flag = ""
+        if avg_vhi < _VHI_STRESS_THRESHOLD:
+            flag = " <b>ALERT</b>"
+        elif stressed:
+            flag = f" ({', '.join(stressed[:3])} stressed)"
+        lines.append(f"VHI at {avg_vhi:.0f}{flag}")
+
+    return "\n".join(lines) if len(lines) > 1 else None
+
+
+# ── Exports section ──────────────────────────────────────────────────────────
+
+def _brazil_daily_block(daily: dict | None) -> str:
     if not daily:
         return ""
-    section = daily.get("arabica", {})
+    # cecafe_daily.json now nests categories under sources.embarques (shipments)
+    # — fall back to top-level keys for older snapshots.
+    daily = (daily.get("sources") or {}).get("embarques") or daily
+    section = daily.get("arabica") or {}
     if not section:
         return ""
     month = sorted(section.keys())[-1]
@@ -160,8 +531,8 @@ def _brazil_brief_block(daily: dict | None) -> str:
     day   = days[-1]
 
     arab = section[month][day]
-    con  = (daily.get("conillon", {}).get(month, {}).get(day) or 0)
-    sol  = (daily.get("soluvel",  {}).get(month, {}).get(day) or 0)
+    con  = (daily.get("conillon") or {}).get(month, {}).get(day, 0)
+    sol  = (daily.get("soluvel") or {}).get(month, {}).get(day, 0)
     total = arab + con + sol
 
     yr, mo = map(int, month.split("-"))
@@ -172,7 +543,7 @@ def _brazil_brief_block(daily: dict | None) -> str:
     day_int = int(day)
 
     def prior(key: str) -> int | None:
-        s = daily.get(key, {}).get(pm, {})
+        s = (daily.get(key) or {}).get(pm) or {}
         avail = sorted(s.keys(), key=int)
         best = next((d for d in reversed(avail) if int(d) <= day_int), None)
         return s[best] if best else None
@@ -185,65 +556,184 @@ def _brazil_brief_block(daily: dict | None) -> str:
         f"<b>Brazil daily reg</b> ({month}/{day}): {total:,} bags",
         "MoM:",
     ]
-    for label, cur, prv in [("Arabica", arab, p_arab), ("Conilon", con, p_con), ("Soluble", sol, p_sol)]:
+    for lbl, cur, prv in [("Arabica", arab, p_arab), ("Conilon", con, p_con), ("Soluble", sol, p_sol)]:
         if prv is not None:
             d = cur - prv
-            lines.append(f"  {_arrow(cur, prv)}{'+' if d >= 0 else ''}{d:,} {label}")
+            lines.append(f"  {_arrow(cur, prv)}{_sign(d, ',d')} {lbl}")
         else:
-            lines.append(f"  {label}: {cur:,}")
+            lines.append(f"  {lbl}: {cur:,}")
     return "\n".join(lines)
 
 
-def _drought_below_seasonal_floor(reg: dict) -> bool:
-    """True iff this region's current MTD rain is below the historical
-    minimum MTD rain for THIS calendar month — i.e. the dryness is
-    record-breaking for the season, not just an absolute-rainfall reading
-    the upstream scraper flagged as HIGH.
-
-    Without this gate, the brief alerts every "drought=HIGH" reading
-    including normal seasonal dryness (Sul de Minas in winter, Central
-    Highlands in December, Honduras in March). Issue #132 Body-3.
-
-    Returns False when either field is missing — fail-closed; absence of
-    baseline data shouldn't generate noise.
-    """
-    cur = reg.get("rain_mtd_mm")
-    floor = reg.get("rain_hist_min")
-    if not isinstance(cur, (int, float)) or not isinstance(floor, (int, float)):
-        return False
-    return cur < floor
-
-
-def _weather_line() -> str:
-    alerts = []
-    supply_files = [
-        ("brazil_supply",    "Brazil"),
-        ("vietnam_supply",   "Vietnam"),
-        ("colombia_supply",  "Colombia"),
-        ("honduras_supply",  "Honduras"),
-        ("indonesia_supply", "Indonesia"),
-        ("ethiopia_supply",  "Ethiopia"),
-    ]
-    for fname, country in supply_files:
-        data = load(f"{fname}.json")
-        if not data:
-            continue
-        weather = data.get("weather", {})
-        for reg in weather.get("regions", []):
-            # Drought alerts: gated by the seasonal baseline check so we
-            # only flag dryness that is anomalous for THIS month. Normal
-            # seasonal dry-season readings stay silent on the brief.
-            if reg.get("drought") == "HIGH" and _drought_below_seasonal_floor(reg):
-                alerts.append(f"{country}/{reg.get('name', '?')} drought")
-            # CSI alerts kept as-is — no per-month historical baseline
-            # ships in the supply JSON for CSI, and the categorical level
-            # H already incorporates an upstream severity assessment that
-            # blends multiple stress dimensions (rain + VHI + temp).
-            if reg.get("csi_30d_level") == "HIGH":
-                alerts.append(f"{country}/{reg.get('name', '?')} CSI")
-    return " · ".join(alerts[:3]) if alerts else ""
+def _vn_monthly_export_block(vn_supply: dict | None, today: date) -> str:
+    """Vietnam monthly export — show only when there's a release this month
+    (matching exports.last_updated)."""
+    if not vn_supply:
+        return ""
+    ex = vn_supply.get("exports") or {}
+    monthly = ex.get("monthly") or []
+    if not monthly:
+        return ""
+    latest = monthly[-1]
+    last_month = latest.get("month")
+    if last_month != ex.get("last_updated"):
+        return ""
+    # Only surface when the release is reasonably fresh — within the last 31
+    # days from today so we don't shout about a 3-month-old release every day.
+    try:
+        y, m = map(int, last_month.split("-"))
+        latest_d = date(y, m, 1)
+    except (ValueError, AttributeError):
+        return ""
+    if (today - latest_d).days > 35:
+        return ""
+    bags_k = latest.get("total_k_bags") or 0
+    tons = round(bags_k * 1000 * 60 / 1000)  # k-bags × 1000 × 60kg / 1000 = MT
+    # YoY: same month one year prior.
+    prev_month = f"{int(last_month.split('-')[0])-1}-{last_month.split('-')[1]}"
+    prev = next((r for r in monthly if r.get("month") == prev_month), None)
+    prev_tons = round((prev.get("total_k_bags") or 0) * 60) if prev else None
+    if prev_tons:
+        diff_pct = (tons - prev_tons) / prev_tons * 100
+        return f"<b>Vietnam ({last_month})</b>: {tons:,} tons, {_sign(diff_pct, '.1f')}% vs last year"
+    return f"<b>Vietnam ({last_month})</b>: {tons:,} tons"
 
 
+def _uganda_monthly_export_block(ug_supply: dict | None, today: date) -> str:
+    if not ug_supply:
+        return ""
+    ex = ug_supply.get("exports") or {}
+    monthly = ex.get("monthly") or []
+    if not monthly:
+        return ""
+    latest = monthly[-1]
+    last_month = latest.get("month")
+    if last_month != ex.get("last_updated"):
+        return ""
+    try:
+        y, m = map(int, last_month.split("-"))
+        latest_d = date(y, m, 1)
+    except (ValueError, AttributeError):
+        return ""
+    if (today - latest_d).days > 35:
+        return ""
+    bags = latest.get("total_bags") or 0
+    tons = round(bags * 60 / 1000)
+    prev_month = f"{int(last_month.split('-')[0])-1}-{last_month.split('-')[1]}"
+    prev = next((r for r in monthly if r.get("month") == prev_month), None)
+    prev_tons = round((prev.get("total_bags") or 0) * 60 / 1000) if prev else None
+    if prev_tons:
+        diff_pct = (tons - prev_tons) / prev_tons * 100
+        return f"<b>Uganda ({last_month})</b>: {tons:,} tons, {_sign(diff_pct, '.1f')}% vs last year"
+    return f"<b>Uganda ({last_month})</b>: {tons:,} tons"
+
+
+def _exports_block(daily: dict | None, vn_supply: dict | None,
+                   ug_supply: dict | None, today: date) -> str | None:
+    brazil = _brazil_daily_block(daily)
+    vn     = _vn_monthly_export_block(vn_supply, today)
+    ug     = _uganda_monthly_export_block(ug_supply, today)
+    parts = [p for p in (brazil, vn, ug) if p]
+    if not parts:
+        return None
+    return "🚢 <b>Exports</b>\n" + "\n\n".join(parts)
+
+
+# ── Certified stocks ─────────────────────────────────────────────────────────
+
+def _arabica_origin_top(snapshot: dict, n: int = 3) -> list[str]:
+    """Top-n contributing origins by bags in the latest snapshot.
+    Reads from sections.total_certified.by_origin which is keyed by origin
+    name → {total, ...}."""
+    sections = snapshot.get("sections") or {}
+    by_origin = (sections.get("total_certified") or {}).get("by_origin") or {}
+    pairs = [(name, (info or {}).get("total") or 0) for name, info in by_origin.items()]
+    pairs.sort(key=lambda x: x[1], reverse=True)
+    return [name for name, _ in pairs[:n] if _]
+
+
+def _largest_negative_port(prev_by_port: dict, cur_by_port: dict) -> tuple[str | None, int]:
+    """Port with the biggest day-over-day drop in stock. Returns (port_id,
+    decrease_magnitude). Used for the "decertified in [port]" attribution
+    when the snapshot itself doesn't expose per-port decertification."""
+    if not prev_by_port or not cur_by_port:
+        return None, 0
+    deltas = [(p, (cur_by_port.get(p) or 0) - (prev_by_port.get(p) or 0)) for p in cur_by_port]
+    deltas.sort(key=lambda x: x[1])  # most-negative first
+    if deltas and deltas[0][1] < 0:
+        return deltas[0][0], -deltas[0][1]
+    return None, 0
+
+
+def _cert_arabica_section(doc: dict | None) -> str:
+    if not doc:
+        return ""
+    snaps = doc.get("snapshots") or []
+    if not snaps:
+        return ""
+    cur = snaps[-1]
+    prev = snaps[-2] if len(snaps) >= 2 else None
+    graded = cur.get("passed_today_bags") or 0
+    failed = cur.get("failed_today_bags") or 0
+    total  = cur.get("total_bags") or 0
+    origins = _arabica_origin_top(cur)
+    origin_str = f" ({', '.join(origins)})" if origins else ""
+
+    lines = []
+    if graded or failed:
+        lines.append(f"NY: {graded:,} bags graded, {failed:,} passed{origin_str}")
+    elif origins:
+        lines.append(f"NY: no grading today · top origins {', '.join(origins)}")
+    else:
+        lines.append("NY: no grading activity reported")
+
+    if prev and prev.get("total_bags") is not None:
+        delta = total - prev["total_bags"]
+        lines.append(f"Stocks: {total:,} bags ({_sign(delta, ',d')})")
+    else:
+        lines.append(f"Stocks: {total:,} bags")
+
+    port, mag = _largest_negative_port(prev.get("by_port") if prev else {}, cur.get("by_port") or {})
+    if port and mag > 0:
+        lines.append(f"Decertified: {mag:,} bags in {port}")
+    return "\n".join(lines)
+
+
+def _cert_robusta_section(doc: dict | None) -> str:
+    if not doc:
+        return ""
+    snaps = doc.get("snapshots") or []
+    if not snaps:
+        return ""
+    cur = snaps[-1]
+    prev = snaps[-2] if len(snaps) >= 2 else None
+    graded = cur.get("lots_graded_today") or 0
+    total  = cur.get("total_lots_certified") or 0
+
+    lines = [f"LD: {graded:,} lots graded"]
+    if prev and prev.get("total_lots_certified") is not None:
+        delta = total - prev["total_lots_certified"]
+        lines.append(f"Stocks: {total:,} lots ({_sign(delta, ',d')})")
+    else:
+        lines.append(f"Stocks: {total:,} lots")
+    port, mag = _largest_negative_port(prev.get("by_port_lots") if prev else {}, cur.get("by_port_lots") or {})
+    if port and mag > 0:
+        lines.append(f"Decertified: {mag:,} lots in {port}")
+    return "\n".join(lines)
+
+
+def _cert_stocks_block() -> str | None:
+    arabica = load("certified_stocks_arabica.json")
+    robusta = load("certified_stocks_robusta.json")
+    ny = _cert_arabica_section(arabica)
+    ld = _cert_robusta_section(robusta)
+    parts = [p for p in (ny, ld) if p]
+    if not parts:
+        return None
+    return "🪤 <b>Certified stocks</b>\n" + "\n\n".join(parts)
+
+
+# ── Upcoming events (Coming up · next 24h) ───────────────────────────────────
 # Display label per events.json category code. Kept compact ([XXX] prefix
 # style) to match the brief's text-dense tone — no emoji decoration.
 _EVENT_CATEGORY_LABEL = {
@@ -258,12 +748,11 @@ _EVENT_CATEGORY_LABEL = {
 
 
 def _upcoming_events_section(now: datetime | None = None) -> str | None:
-    """Format the "Coming up · next 24h" block for the morning brief.
+    """Format the "Coming up · next 24h" block.
 
-    Reads frontend/public/data/events.json (the hand-curated +
-    build_events_calendar.py output) and returns a Telegram block for
-    events dated today or tomorrow (UTC day boundary, matching how event
-    dates are stored as YYYY-MM-DD without a timezone). Returns None when
+    Reads events.json (hand-curated + build_events_calendar.py output) and
+    returns a block for events dated today or tomorrow (UTC day boundary —
+    events are stored YYYY-MM-DD without timezone). Returns None when
     nothing's scheduled so the brief silently omits the section.
     """
     doc = load("events.json")
@@ -273,9 +762,9 @@ def _upcoming_events_section(now: datetime | None = None) -> str | None:
     if not events:
         return None
 
-    today = (now or datetime.now(UTC)).date()
-    tomorrow = today + timedelta(days=1)
-    today_iso, tomorrow_iso = today.isoformat(), tomorrow.isoformat()
+    today_d = (now or datetime.now(UTC)).date()
+    tomorrow_d = today_d + timedelta(days=1)
+    today_iso, tomorrow_iso = today_d.isoformat(), tomorrow_d.isoformat()
 
     upcoming = [
         e for e in events
@@ -284,8 +773,6 @@ def _upcoming_events_section(now: datetime | None = None) -> str | None:
     if not upcoming:
         return None
 
-    # Chronological — today before tomorrow, then by category for stable
-    # ordering across runs.
     upcoming.sort(key=lambda e: (e.get("date") or "", e.get("category") or ""))
 
     lines = ["🗓 <b>Coming up · next 24h</b>"]
@@ -297,54 +784,114 @@ def _upcoming_events_section(now: datetime | None = None) -> str | None:
     return "\n".join(lines)
 
 
+# ── Main assembly ────────────────────────────────────────────────────────────
+
+def _load_archive() -> dict | None:
+    """contract_prices_archive.json lives at the repo root in production
+    (data/contract_prices_archive.json, alongside oi_history.json). Fall
+    back to DATA_DIR/contract_prices_archive.json so test fixtures can
+    drop a tiny archive next to the other JSONs without recreating the
+    repo-root layout."""
+    import json as _json
+    try:
+        from telegram.data import _DATA_DIR
+        for candidate in (
+            _DATA_DIR.parent.parent.parent / "data" / "contract_prices_archive.json",
+            _DATA_DIR / "contract_prices_archive.json",
+        ):
+            if candidate.exists():
+                return _json.loads(candidate.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return None
+
+
 def build_brief_message(db=None) -> str:
     now = datetime.now(UTC)
-    # "%-d" strips leading zero on Linux/Mac; falls back to "%d" on Windows
+    today = now.date()
     try:
         day_str = now.strftime("%a %-d %b")
     except ValueError:
         day_str = now.strftime("%a %d %b").lstrip("0").replace(" 0", " ")
 
-    chain  = load("futures_chain.json")
-    latest = load("latest_prices.json")
-    acaphe = load("acaphe_live.json")
-    cot    = load("cot_recent.json")
-    daily  = load("cecafe_daily.json")
+    chain    = load("futures_chain.json")
+    acaphe   = load("acaphe_live.json")
+    archive  = _load_archive()
+    daily    = load("cecafe_daily.json")
+    vn_sup   = load("vietnam_supply.json")
+    ug_sup   = load("uganda_supply.json")
+    origin_prices = load("origin_prices_history.json")
+    fx_hist  = load("fx_history.json")
 
-    rc_line, front_letter, front_price = _rc_section(chain, acaphe)
-    kc_line   = _kc_section(chain, acaphe)
-    vn_line   = _vn_faq_line(latest, front_letter, front_price)
-    cot_block = _cot_brief_block(cot if isinstance(cot, list) else None)
-    bra_block = _brazil_brief_block(daily if isinstance(daily, dict) else None)
-    weather   = _weather_line()
-    upcoming  = _upcoming_events_section(now)
+    rc_line, front_letter, front_price, front_sym = _rc_section(chain, acaphe, archive)
+    kc_line = _kc_section(chain, acaphe, archive)
+
+    origins = (origin_prices or {}).get("origins") or {}
+    vn_line = _physical_line(
+        "VN FAQ", "vietnam", "VN_FAQ", "VND",
+        (origins.get("vietnam") or {}).get("history") or [],
+        fx_hist, "VND=X", archive, front_price, front_letter, front_sym,
+        unit_to_usd_mt=1000.0,   # VND/kg → USD/kg × 1000 = USD/MT
+    )
+    br_line = _physical_line(
+        "CON T7", "brazil_conilon", "CON_T7", "BRL",
+        (origins.get("brazil_conilon") or {}).get("history") or [],
+        fx_hist, "BRL=X", archive, front_price, front_letter, front_sym,
+        unit_to_usd_mt=1000.0 / 60.0,   # BRL/saca-60kg → USD/(60kg) × 1000/60 = USD/MT
+    )
+    ug_line = _physical_line(
+        "UGA S15", "uganda", "UGA_S15", "USD",
+        (origins.get("uganda") or {}).get("history") or [],
+        # Uganda is already quoted USD/cwt — no FX conversion → use a "1" pair.
+        # We feed a synthetic fx-1 history by reusing the same date list.
+        _synthetic_fx_one(origins.get("uganda")), "USD=1",
+        archive, front_price, front_letter, front_sym,
+        unit_to_usd_mt=1000.0 / 45.3592,  # USD/cwt → USD/MT (1 cwt = 45.3592 kg)
+    )
+
+    weather = _weather_block(today)
+    exports = _exports_block(daily, vn_sup, ug_sup, today)
+    certs   = _cert_stocks_block()
+    coming  = _upcoming_events_section(now)
 
     parts: list[str] = [f"☕ <b>Coffee Intel · {day_str}</b>", ""]
     parts.append(rc_line)
     parts.append(kc_line)
     if vn_line:
         parts.append(vn_line)
-
-    if cot_block:
-        parts.append("")
-        parts.append(cot_block)
-
-    if bra_block:
-        parts.append("")
-        parts.append(bra_block)
+    if br_line:
+        parts.append(br_line)
+    if ug_line:
+        parts.append(ug_line)
 
     if weather:
         parts.append("")
         parts.append(weather)
-
-    if upcoming:
+    if exports:
         parts.append("")
-        parts.append(upcoming)
+        parts.append(exports)
+    if certs:
+        parts.append("")
+        parts.append(certs)
+    if coming:
+        parts.append("")
+        parts.append(coming)
 
     parts.append("")
-    parts.append("/quote · /cot · /brazil · /ecf")
-
+    parts.append("/quote · /cot · /stock · /certified · /brazil · /vietnam · /uganda · /freight · /macro")
     return "\n".join(parts)
+
+
+def _synthetic_fx_one(origin_doc: dict | None) -> dict | None:
+    """Build a fake fx_history where every close = 1.0, for origins already
+    quoted in USD. Lets `_physical_line` keep one code path for FX-aware
+    and USD-native origins."""
+    if not origin_doc:
+        return None
+    hist = (origin_doc or {}).get("history") or []
+    return {"pairs": {"USD=1": {"history": [
+        {"date": r.get("date"), "close": 1.0} for r in hist if r.get("date")
+    ]}}}
 
 
 def handle(args: str, context: dict) -> str:
