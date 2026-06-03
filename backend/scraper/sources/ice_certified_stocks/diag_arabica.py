@@ -37,7 +37,7 @@ def dump(d: date) -> None:
         print(f"  {d}: GET error {e}")
         return
     print(f"\n===== {d}  HTTP {r.status_code}  {len(r.content)} bytes  {url}")
-    if r.status_code != 200 or not r.content[:4] in (b"\xd0\xcf\x11\xe0", b"PK\x03\x04"):
+    if r.status_code != 200 or r.content[:4] not in (b"\xd0\xcf\x11\xe0", b"PK\x03\x04"):
         print(f"  not an OLE2/xlsx body (head={r.content[:8]!r})")
         return
     try:
