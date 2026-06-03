@@ -285,11 +285,13 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     return result;
   }, [monthsBase]);
 
-  // Default basis: VN FAQ USD/MT − front RC price
+  // Default basis: VN FAQ USD/MT + FOB cost − front RC price. The +100 mirrors
+  // FOB_COST_USD["VN FAQ"] in components/map/MarketTicker.tsx so this control
+  // lands on the same N±diff the ticker band shows by default.
   const basisDefault = useMemo(() => {
     const frontLetter = monthsBase[0]?.letter;
     const frontPrice  = frontLetter ? rcPrices[frontLetter] : null;
-    if (vnFaqUsdMt && frontPrice) return Math.round(vnFaqUsdMt - frontPrice);
+    if (vnFaqUsdMt && frontPrice) return Math.round(vnFaqUsdMt + 100 - frontPrice);
     return 150;
   }, [vnFaqUsdMt, rcPrices, monthsBase]);
 
