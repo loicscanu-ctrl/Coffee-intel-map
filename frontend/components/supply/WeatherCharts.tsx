@@ -72,7 +72,8 @@ interface Province {
   // didn't correspond to any actually-observed year).
   monthly_totals_history?: Record<string, (number | null)[]>;
   essm_fraction?: number;                 // latest daily surface soil moisture (0–1)
-  essm_recent?: { date: string; essm: number }[];  // last ~14 days of daily ESSM
+  essm_recent?: { date: string; essm: number }[];  // last ~400 days of daily ESSM
+                                                    // (chart filters to month or year)
   spi_1?: number;                         // Standardised Precipitation Index, 1-mo
   spi_3?: number;                         //   …trailing 3-mo
   spi_month?: string;                     // 'YYYY-MM' target month of the SPI(s) above
@@ -549,24 +550,67 @@ function ProductionAtRisk({ month, regions }: { month: string; regions: RiskRegi
 // ── Surface soil moisture (ESSM) ───────────────────────────────────────────────
 interface SoilRow { label: string; essm: number }
 
-function SoilMoistureChart({ data }: { data: SoilRow[] }) {
-  if (!data.length) return null;
+type SoilView = "month" | "year";
+
+function SoilMoistureChart({
+  data, view, onViewChange, windowLabel,
+}: {
+  data: SoilRow[];
+  view: SoilView;
+  onViewChange: (v: SoilView) => void;
+  /** Human-readable label for the active window (e.g. "Jun 2026" or "2026"). */
+  windowLabel: string;
+}) {
+  // Year view squeezes ~365 daily points into the same panel width — thin out
+  // the X-axis ticks to roughly one per month so the labels don't overlap.
+  const tickInterval = view === "year"
+    ? Math.max(1, Math.floor(data.length / 12) - 1)
+    : "preserveStartEnd" as const;
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
-      <div className="text-xs font-semibold text-slate-300 mb-0.5">Surface Soil Moisture (last {data.length} days)</div>
+      <div className="flex items-baseline justify-between mb-0.5 gap-2">
+        <div className="text-xs font-semibold text-slate-300">
+          Surface Soil Moisture · {windowLabel}
+          {data.length > 0 && (
+            <span className="text-slate-500 font-normal ml-1.5">({data.length} day{data.length === 1 ? "" : "s"})</span>
+          )}
+        </div>
+        <div className="flex gap-0.5">
+          {(["month", "year"] as SoilView[]).map((v) => (
+            <button
+              key={v}
+              onClick={() => onViewChange(v)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-medium border transition-colors ${
+                view === v
+                  ? "bg-slate-700 text-slate-200 border-slate-500"
+                  : "bg-transparent text-slate-500 border-slate-700 hover:text-slate-300"
+              }`}
+              title={v === "month" ? "Show selected month" : "Show full calendar year"}
+            >
+              {v === "month" ? "Month" : "Year"}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="text-[9px] text-slate-500 mb-2">
         Prod-weighted daily ESSM · 0–1 volumetric fraction (0–81 cm) · dashed line = dry threshold
       </div>
-      <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 9 }} interval="preserveStartEnd" />
-          <YAxis domain={[0, "auto"]} tick={{ fill: "#94a3b8", fontSize: 9 }} width={34} tickFormatter={(v) => Number(v).toFixed(2)} />
-          <Tooltip contentStyle={TT} formatter={(v) => [Number(v).toFixed(3), "ESSM"]} />
-          <ReferenceLine y={0.15} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.5} />
-          <Area type="monotone" dataKey="essm" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.22} strokeWidth={2} dot={false} />
-        </ComposedChart>
-      </ResponsiveContainer>
+      {data.length === 0 ? (
+        <div className="h-[200px] flex items-center justify-center text-[10px] text-slate-600">
+          No ESSM samples for this window yet.
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={200}>
+          <ComposedChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+            <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 9 }} interval={tickInterval} />
+            <YAxis domain={[0, "auto"]} tick={{ fill: "#94a3b8", fontSize: 9 }} width={34} tickFormatter={(v) => Number(v).toFixed(2)} />
+            <Tooltip contentStyle={TT} formatter={(v) => [Number(v).toFixed(3), "ESSM"]} />
+            <ReferenceLine y={0.15} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.5} />
+            <Area type="monotone" dataKey="essm" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.22} strokeWidth={2} dot={false} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }
@@ -721,6 +765,10 @@ export default function WeatherCharts({
   const [selected, setSelected] = useState<Set<string> | null>(null);
   const [selectedYear, setSelectedYear]   = useState<number>(new Date().getFullYear());
   const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(new Date().getMonth());
+  // Soil moisture window: "month" follows the rain chart's selectedYear /
+  // selectedMonthIdx so the two charts line up; "year" shows the full
+  // calendar year (selectedYear) so the user can read seasonal drying.
+  const [soilView, setSoilView] = useState<SoilView>("month");
   // Crop-type filter for origins that produce both arabica and robusta
   // (Brazil, Indonesia). Routes the chart's prod weighting through
   // _prodFor() and hides provinces with zero matching production.
@@ -812,20 +860,39 @@ export default function WeatherCharts({
   }, [data, selected, vhi, cropFilter]);
 
   // Prod-weighted daily surface soil moisture (ESSM) across selected regions.
+  // Filtered to the active window:
+  //   "month" → dates whose YYYY-MM matches selectedYear / selectedMonthIdx
+  //             (synced with the rain-chart nav above), label = "DD"
+  //   "year"  → dates within selectedYear, label = "MMM DD" so the year-long
+  //             X-axis stays readable at month-level tick spacing
   const soilData = useMemo<SoilRow[]>(() => {
+    const ymPrefix = `${selectedYear}-${String(selectedMonthIdx + 1).padStart(2, "0")}`;
+    const yPrefix  = `${selectedYear}-`;
+    const matches  = (date: string) =>
+      soilView === "month" ? date.startsWith(ymPrefix) : date.startsWith(yPrefix);
+
     const sum = new Map<string, number>();    // date → Σ(essm·prod)
-    const wgt = new Map<string, number>();     // date → Σ(prod) present that date
+    const wgt = new Map<string, number>();    // date → Σ(prod) present that date
     for (const p of activeProv) {
       for (const r of p.essm_recent ?? []) {
-        if (r?.essm == null) continue;
+        if (r?.essm == null || !matches(r.date)) continue;
         sum.set(r.date, (sum.get(r.date) ?? 0) + r.essm * p.prod_mt_k);
         wgt.set(r.date, (wgt.get(r.date) ?? 0) + p.prod_mt_k);
       }
     }
     return Array.from(sum.keys())
       .sort()
-      .map((date) => ({ label: date.slice(5), essm: sum.get(date)! / (wgt.get(date) || 1) }));
-  }, [activeProv]);
+      .map((date) => {
+        const label = soilView === "month"
+          ? date.slice(8)                                       // "DD"
+          : `${MONTHS[parseInt(date.slice(5, 7), 10) - 1]} ${date.slice(8)}`; // "Jun 02"
+        return { label, essm: sum.get(date)! / (wgt.get(date) || 1) };
+      });
+  }, [activeProv, soilView, selectedYear, selectedMonthIdx]);
+
+  const soilWindowLabel = soilView === "month"
+    ? `${MONTHS[selectedMonthIdx]} ${selectedYear}`
+    : String(selectedYear);
 
   const totalProd = useMemo(
     () => activeProv.reduce((s, p) => s + p.prod_mt_k, 0),
@@ -1447,7 +1514,12 @@ export default function WeatherCharts({
         <MeanTempChart data={tempData} curLabel={curLabel} lyLabel={lyLabel} domain={tempDomain} />
         <MonthlyRainChart data={monthlyRainData} curLabel={curLabel} lyLabel={lyLabel} />
         <CumulativeRainChart data={cumulativeData} curLabel={curLabel} lyLabel={lyLabel} />
-        <SoilMoistureChart data={soilData} />
+        <SoilMoistureChart
+          data={soilData}
+          view={soilView}
+          onViewChange={setSoilView}
+          windowLabel={soilWindowLabel}
+        />
       </div>
 
       {/* Full-width forecast */}
