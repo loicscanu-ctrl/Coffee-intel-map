@@ -797,11 +797,14 @@ def rebuild_chart(origin: str, hist: dict, forecasts: dict[str, list[dict]]) -> 
         if fc:
             prov["forecast_7d_rain"] = [r1(f["rain"]) for f in fc]
         # Estimated Soil Moisture (0–1 fraction): latest reading + recent series.
+        # 400 days ≈ 13 months covers both the in-chart "current month" view and
+        # the "calendar year" toggle. Daily fetcher is forward-only, so the
+        # year view fills in over time on existing files (currently shallow).
         essm = sorted((d, v["essm"]) for d, v in rh.items()
                       if isinstance(v, dict) and v.get("essm") is not None)
         if essm:
             prov["essm_fraction"] = essm[-1][1]
-            prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-14:]]
+            prov["essm_recent"] = [{"date": d, "essm": e} for d, e in essm[-400:]]
         # SPI-1 / SPI-3 from the committed 30-yr baseline + live monthly rain.
         # Target the latest month that is past (current is partial), near-complete
         # in the history (≥ days−2), AND has non-zero rain. The non-zero check is
