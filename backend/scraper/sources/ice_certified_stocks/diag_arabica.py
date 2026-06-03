@@ -9,7 +9,6 @@ Run via .github/workflows/diag-arabica.yml (workflow_dispatch); read the log.
 """
 from __future__ import annotations
 
-import io
 import sys
 from datetime import date, timedelta
 
