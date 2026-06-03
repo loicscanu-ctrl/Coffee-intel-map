@@ -54,6 +54,13 @@ RETRY_AFTER_MAX_S = 90         # cap any Retry-After we'll wait for
 RETRY_AFTER_GIVE_UP_S = 600    # if Akamai asks > this, abort the rest of the run
 _RATE_STATE: dict[str, int] = {"consecutive_429s": 0, "aborted": 0}
 
+# Fix 5: per-request interval (seconds) for the SEQUENTIAL tier-2 stock-report
+# sweep only. Concurrency bans the IP at any level, so the per-request gap is
+# the one knob left. This overrides the 5s marketdata throttle for the sweep
+# (restored right after) to probe ICE's sequential-rate ceiling — step it down
+# 5 → 4 → 3 → 2 → 1 → 0.5 ONLY after a run at the current value draws no 429.
+_STOCK_SWEEP_INTERVAL_S = 4.0
+
 # Stock_report.csv's HHMMSS publish time varies daily. Strategy is tiered:
 #   Tier 1 — try the K most-frequent HHMMSS values from past successful
 #            captures (loaded from STOCK_REPORT_HITS_PATH). Cheap: ≤K GETs.
@@ -334,14 +341,23 @@ def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict 
     if not sweep:
         return None, None
 
-    # Tier 2 — sequential throttled sweep (concurrency bans the IP; see above).
+    # Tier 2 — sequential sweep. Concurrency bans the IP at any level, so the
+    # only lever is the per-request interval (_STOCK_SWEEP_INTERVAL_S), applied
+    # by temporarily overriding the marketdata throttle for the sweep and
+    # restoring it after. _http_get keeps its 429 guard, so an over-fast
+    # interval aborts cleanly rather than hammering.
     tried = set(tier1)
-    for hhmmss in _stock_report_sweep_times():
-        if hhmmss in tried:
-            continue
-        url, parsed = _try(hhmmss)
-        if url:
-            return url, parsed
+    saved_throttle = _THROTTLE["marketdata"]
+    _THROTTLE["marketdata"] = _STOCK_SWEEP_INTERVAL_S
+    try:
+        for hhmmss in _stock_report_sweep_times():
+            if hhmmss in tried:
+                continue
+            url, parsed = _try(hhmmss)
+            if url:
+                return url, parsed
+    finally:
+        _THROTTLE["marketdata"] = saved_throttle
     return None, None
 
 
