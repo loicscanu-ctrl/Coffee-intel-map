@@ -33,6 +33,12 @@ on:
     # day's fresh publication, so no gap. Manual dispatch still allowed
     # any day for backfills / one-offs.
     - cron: '0 17 * * 1-5'
+    # 2nd of each month, 17:00 UTC — the monthly robusta age-allowance and
+    # arabica ageing reports are published a day or two into the new month,
+    # often AFTER the prior day's 17:00 run. This extra run guarantees the
+    # fresh month-end report is captured (runs even on weekends so a 1st/2nd
+    # falling on Sat/Sun is still covered).
+    - cron: '0 17 2 * *'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
