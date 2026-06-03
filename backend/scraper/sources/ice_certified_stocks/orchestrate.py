@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from collections import defaultdict
@@ -82,24 +83,49 @@ def _load_stock_report_hits() -> list[dict]:
         return []
 
 def _record_stock_report_hit(d: date, hhmmss: str) -> None:
-    hits = _load_stock_report_hits()
+    # One entry per date (latest wins), capped — the file is committed back by
+    # the workflow so tier-1 learns across runs, so keep it small and clean.
+    hits = [h for h in _load_stock_report_hits() if h.get("date") != d.isoformat()]
     hits.append({"date": d.isoformat(), "hhmmss": hhmmss})
+    hits = hits[-400:]
     STOCK_REPORT_HITS_PATH.write_text(
         json.dumps({"hits": hits}, indent=2), encoding="utf-8",
     )
 
+
+def _hhmmss_pm(t: str, pm: int) -> list[str]:
+    """`t` plus ±1..pm seconds (nearest-first) as HHMMSS strings — absorbs the
+    day-to-day second-drift in ICE's publish time so a tier-1 near-miss still
+    hits without falling through to the full sweep."""
+    try:
+        base = int(t[:2]) * 3600 + int(t[2:4]) * 60 + int(t[4:6])
+    except (ValueError, IndexError):
+        return [t]
+    out = [t]
+    for k in range(1, pm + 1):
+        for s in (base - k, base + k):
+            if 0 <= s < 86400:
+                hh, rem = divmod(s, 3600)
+                mm, ss = divmod(rem, 60)
+                out.append(f"{hh:02d}{mm:02d}{ss:02d}")
+    return out
+
+
 def _stock_report_tier1_times() -> tuple[str, ...]:
-    """Top-K most-frequent HHMMSS from the hits log."""
+    """Top-K most-frequent HHMMSS from the hits log, each widened ±2s."""
     counts: dict[str, int] = defaultdict(int)
     for h in _load_stock_report_hits():
         if h.get("hhmmss"):
             counts[h["hhmmss"]] += 1
-    most_common = sorted(counts.items(), key=lambda kv: -kv[1])[:STOCK_REPORT_TIER1_K]
-    if most_common:
-        return tuple(t for t, _ in most_common)
-    # Bootstrap: best guesses from initial exploration. Replaced once the
-    # hits log accumulates ≥5 confirmed captures.
-    return ("103021", "103126", "103045")
+    most_common = [t for t, _ in sorted(counts.items(), key=lambda kv: -kv[1])[:STOCK_REPORT_TIER1_K]]
+    # Bootstrap guesses until the hits log accumulates real captures.
+    base = most_common or ["103021", "103126", "103045"]
+    out: list[str] = []
+    for t in base:                       # exact (by frequency) first, then ±2s
+        for e in _hhmmss_pm(t, 2):
+            if e not in out:
+                out.append(e)
+    return tuple(out)
 
 def _stock_report_sweep_times() -> list[str]:
     """Every HH:MM:SS in the configured publish window (inclusive)."""
@@ -283,10 +309,38 @@ def pull_arabica_ageing(month_end: date) -> tuple[str, dict | None]:
     return url, _safe_parse(parse_arabica_ageing, "arabica_ageing", month_end, r.content, source_url=url)
 
 
+# Folder that holds the robusta stock CSVs — derived from the file URL.
+_STOCK_REPORT_DIR = F.ROBUSTA_STOCK_REPORT_CSV.rsplit("/", 1)[0] + "/"
+
+
+def _stock_report_from_listing(d: date) -> tuple[str | None, dict | None]:
+    """Fix 2: if ICE serves a directory index for the stock_reports folder, the
+    exact filename is right there — resolve it in one request, no HHMMSS
+    guessing. Returns (url, parsed) or (None, None) if the folder isn't listable
+    (403 / no index) or has no file for `d`. Fetched with source=None so the
+    HTML listing isn't rejected by the CSV shape-check."""
+    r = _http_get(_STOCK_REPORT_DIR, source=None)
+    if not r or r.status_code != 200 or not r.text:
+        return None, None
+    secs = re.findall(rf"Stock_Report_RC_{F.yyyymmdd(d)}_(\d{{6}})\.csv", r.text)
+    if not secs:
+        return None, None
+    hhmmss = max(secs)                       # latest publish that day
+    url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
+    rr = _http_get(url, source="stock_report")
+    if rr and rr.status_code == 200 and rr.text:
+        _record_stock_report_hit(d, hhmmss)
+        print(f"  ✓ stock report via directory listing ({d} @ {hhmmss}) — no sweep")
+        return url, _safe_parse(parse_stock_report, "stock_report", d, rr.text)
+    return None, None
+
+
 def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict | None]:
-    """Tiered HHMMSS guesser. Returns (url, parsed_dict) on hit, (None, None)
-    on miss. `sweep=False` skips the Tier-2 minute-by-minute window — useful
-    for multi-day backfills that would otherwise spend 10 min per missed day.
+    """Resolve the robusta stock CSV (HHMMSS-stamped filename). Order:
+    (0) directory listing — one request if ICE indexes the folder;
+    (1) tier-1 — recorded publish times ± 2s (cheap, ≤~50 GETs);
+    (2) tier-2 minute-sweep over the publish window (skipped when sweep=False).
+    Returns (url, parsed_dict) on hit, (None, None) on miss.
     """
     def _try(hhmmss: str) -> tuple[str | None, dict | None]:
         url = F.ROBUSTA_STOCK_REPORT_CSV.format(yyyymmdd=F.yyyymmdd(d), hhmmss=hhmmss)
@@ -295,6 +349,11 @@ def pull_stock_report(d: date, *, sweep: bool = True) -> tuple[str | None, dict 
             _record_stock_report_hit(d, hhmmss)
             return url, _safe_parse(parse_stock_report, "stock_report", d, r.text)
         return None, None
+
+    # Tier 0 — directory listing (if available, this is the whole game).
+    url, parsed = _stock_report_from_listing(d)
+    if url:
+        return url, parsed
 
     tier1 = _stock_report_tier1_times()
     for hhmmss in tier1:

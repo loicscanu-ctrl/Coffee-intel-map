@@ -95,7 +95,8 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/data/certified_stocks_arabica.json \
-                  frontend/public/data/certified_stocks_robusta.json
+                  frontend/public/data/certified_stocks_robusta.json \
+                  backend/scraper/sources/ice_certified_stocks/stock_report_hits.json
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: ICE certified stocks (${{ inputs.days_back || 30 }}d) [skip ci]" \
