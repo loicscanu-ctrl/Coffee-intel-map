@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-03T07:23:34.048515Z",
+  "generated_at": "2026-06-04T07:06:40.420312Z",
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-03",
+    "last_updated": "2026-06-04",
     "annual": [
       {
         "year": "2002",
@@ -228,7 +228,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-03",
+    "last_updated": "2026-06-04",
     "annual": [
       {
         "year": "2002",
@@ -454,7 +454,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-03",
+    "last_updated": "2026-06-04",
     "annual": [
       {
         "year": "1960",
@@ -1059,12 +1059,12 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-06-03",
+    "last_updated": "2026-06-04",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
-    "monthly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-import202603.pdf",
-    "monthly_exports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-export202603.pdf",
+    "monthly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf",
+    "monthly_exports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf",
     "supply_demand_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-jukyu202603.pdf",
     "yearly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf",
     "latest_origin_breakdown": [
@@ -1145,7 +1145,7 @@
         "imports_mt": 602
       }
     ],
-    "latest_origin_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-import202603.pdf"
+    "latest_origin_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf"
   },
   "producers": {
     "brazil": {
@@ -7185,8 +7185,8 @@
       "name": "Brazil",
       "latest_year": "2025",
       "consumption_mt": 1336800,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 211998573,
+      "per_capita_kg": 6.31,
       "annual": [
         {
           "year": "1960",
@@ -12541,19 +12541,13 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-03",
+    "last_updated": "2026-06-04",
     "countries": {
       "eu": {
         "name": "European Union",
         "iso3": "EUU",
         "latest_year": "2024",
         "latest_population": 450228188
-      },
-      "japan": {
-        "name": "Japan",
-        "iso3": "JPN",
-        "latest_year": "2024",
-        "latest_population": 123975371
       },
       "usa": {
         "name": "United States",
@@ -12572,6 +12566,12 @@
         "iso3": "IND",
         "latest_year": "2024",
         "latest_population": 1450935791
+      },
+      "brazil": {
+        "name": "Brazil",
+        "iso3": "BRA",
+        "latest_year": "2024",
+        "latest_population": 211998573
       },
       "indonesia": {
         "name": "Indonesia",
