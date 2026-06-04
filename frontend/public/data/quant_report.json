@@ -1,234 +1,234 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-03T23:17:36.233959+00:00",
-    "index_value": 95.677899,
-    "daily_delta_i": -0.001443,
-    "daily_delta_pct": -0.144184,
-    "zscore": -1.484841,
-    "zscore_mean": 98.035557,
-    "zscore_std": 1.587818,
+    "scraped_at": "2026-06-04T22:53:16.646477+00:00",
+    "index_value": 96.235639,
+    "daily_delta_i": 0.005838,
+    "daily_delta_pct": 0.583726,
+    "zscore": -1.124322,
+    "zscore_mean": 98.024457,
+    "zscore_std": 1.591019,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.441685,
-        "contribution": -0.002266
+        "daily_chg": 1.214739,
+        "contribution": 0.006232
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": 0.082193,
-        "contribution": 0.000215
+        "daily_chg": -0.046325,
+        "contribution": -0.000121
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": 0.609566,
-        "contribution": 0.00078
+        "daily_chg": -0.330491,
+        "contribution": -0.000423
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": 0.367175,
-        "contribution": 0.000187
+        "daily_chg": 0.621161,
+        "contribution": 0.000317
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": -0.005678,
-        "contribution": -3e-06
+        "daily_chg": 0.00421,
+        "contribution": 2e-06
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": -0.097988,
-        "contribution": -0.000659
+        "daily_chg": -0.129676,
+        "contribution": -0.000873
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": 0.103682,
-        "contribution": 9.8e-05
+        "daily_chg": -0.039812,
+        "contribution": -3.8e-05
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.248705,
-        "contribution": 0.000129
+        "daily_chg": 0.293976,
+        "contribution": 0.000153
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.07262,
-        "contribution": 3.8e-05
+        "daily_chg": 0.132911,
+        "contribution": 6.9e-05
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": 0.032786,
-        "contribution": 1.5e-05
+        "daily_chg": 0.385968,
+        "contribution": 0.000178
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": 0.035166,
-        "contribution": 1.6e-05
+        "daily_chg": 0.571344,
+        "contribution": 0.000257
       },
       {
         "ticker": "GBP=X",
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": 0.017883,
-        "contribution": 7e-06
+        "daily_chg": 0.224181,
+        "contribution": 8.5e-05
       }
     ],
     "history": [
       {
-        "date": "2026-05-05",
-        "value": 95.79599
-      },
-      {
         "date": "2026-05-06",
-        "value": 95.304216
+        "value": 95.303466
       },
       {
         "date": "2026-05-07",
-        "value": 95.435143
+        "value": 95.434393
       },
       {
         "date": "2026-05-08",
-        "value": 95.500319
+        "value": 95.499568
       },
       {
         "date": "2026-05-09",
-        "value": 95.464703
+        "value": 95.463952
       },
       {
         "date": "2026-05-10",
-        "value": 95.407501
+        "value": 95.40675
       },
       {
         "date": "2026-05-11",
-        "value": 95.231889
+        "value": 95.23114
       },
       {
         "date": "2026-05-12",
-        "value": 95.393477
+        "value": 95.392727
       },
       {
         "date": "2026-05-13",
-        "value": 95.474611
+        "value": 95.47386
       },
       {
         "date": "2026-05-14",
-        "value": 96.444627
+        "value": 96.443868
       },
       {
         "date": "2026-05-15",
-        "value": 96.197489
+        "value": 96.196732
       },
       {
         "date": "2026-05-16",
-        "value": 96.706358
+        "value": 96.705598
       },
       {
         "date": "2026-05-17",
-        "value": 96.56525
+        "value": 96.56449
       },
       {
         "date": "2026-05-18",
-        "value": 96.748771
+        "value": 96.74801
       },
       {
         "date": "2026-05-19",
-        "value": 96.248244
+        "value": 96.247487
       },
       {
         "date": "2026-05-20",
-        "value": 96.56039
+        "value": 96.559631
       },
       {
         "date": "2026-05-21",
-        "value": 95.907333
+        "value": 95.906578
       },
       {
         "date": "2026-05-22",
-        "value": 95.841883
+        "value": 95.841129
       },
       {
         "date": "2026-05-23",
-        "value": 95.726073
+        "value": 95.72532
       },
       {
         "date": "2026-05-24",
-        "value": 95.825159
+        "value": 95.824405
       },
       {
         "date": "2026-05-25",
-        "value": 95.97196
+        "value": 95.971205
       },
       {
         "date": "2026-05-26",
-        "value": 95.692469
+        "value": 95.691716
       },
       {
         "date": "2026-05-27",
-        "value": 96.141732
+        "value": 96.140976
       },
       {
         "date": "2026-05-28",
-        "value": 96.215452
+        "value": 96.214695
       },
       {
         "date": "2026-05-29",
-        "value": 96.132747
+        "value": 96.13199
       },
       {
         "date": "2026-05-30",
-        "value": 96.152966
+        "value": 96.15221
       },
       {
         "date": "2026-05-31",
-        "value": 96.204146
+        "value": 96.20339
       },
       {
         "date": "2026-06-01",
-        "value": 96.211163
+        "value": 96.210406
       },
       {
         "date": "2026-06-02",
-        "value": 95.81605
+        "value": 95.815296
       },
       {
         "date": "2026-06-03",
-        "value": 95.677899
+        "value": 95.677147
+      },
+      {
+        "date": "2026-06-04",
+        "value": 96.235639
       }
     ]
   },
-  "scraped_at": "2026-06-03T23:18:15.307823Z",
+  "scraped_at": "2026-06-04T22:53:16.646477+00:00",
   "sentiment": {
     "available": true,
     "scraped_at": "2026-06-03T23:18:14.456266Z",
@@ -240,7 +240,7 @@
     "total": 25,
     "items": [
       {
-        "headline": "World Bank Population – 2026-06-03",
+        "headline": "World Bank Population \u2013 2026-06-03",
         "source": "World Bank",
         "sentiment": "Bullish",
         "confidence": 70.0,
@@ -251,7 +251,7 @@
         ]
       },
       {
-        "headline": "Fertilizer Prices – 2026-06",
+        "headline": "Fertilizer Prices \u2013 2026-06",
         "source": "World Bank",
         "sentiment": "Bullish",
         "confidence": 85.0,
@@ -262,7 +262,7 @@
         ]
       },
       {
-        "headline": "ENSO ONI – 2026-06",
+        "headline": "ENSO ONI \u2013 2026-06",
         "source": "NOAA CPC",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -273,7 +273,7 @@
         ]
       },
       {
-        "headline": "Ethiopia ECX Coffee Price – 2026-06-03",
+        "headline": "Ethiopia ECX Coffee Price \u2013 2026-06-03",
         "source": "ECX",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -284,7 +284,7 @@
         ]
       },
       {
-        "headline": "Colombia FNC Precio Interno – 2026-06-03",
+        "headline": "Colombia FNC Precio Interno \u2013 2026-06-03",
         "source": "FNC",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -295,7 +295,7 @@
         ]
       },
       {
-        "headline": "B3 ICF Arabica (Jul '26) – 2026-06-03",
+        "headline": "B3 ICF Arabica (Jul '26) \u2013 2026-06-03",
         "source": "B3",
         "sentiment": "Neutral",
         "confidence": 85.0,
@@ -306,7 +306,7 @@
         ]
       },
       {
-        "headline": "ICE COT Robusta Coffee (London) – 2026-05-26",
+        "headline": "ICE COT Robusta Coffee (London) \u2013 2026-05-26",
         "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -316,7 +316,7 @@
         ]
       },
       {
-        "headline": "CFTC COT Coffee C (NY Arabica) – 2026-05-26",
+        "headline": "CFTC COT Coffee C (NY Arabica) \u2013 2026-05-26",
         "source": "CFTC",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -326,7 +326,7 @@
         ]
       },
       {
-        "headline": "Uganda Screen 15 – 2026-06-03",
+        "headline": "Uganda Screen 15 \u2013 2026-06-03",
         "source": "UCDA",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -336,7 +336,7 @@
         ]
       },
       {
-        "headline": "Brazil Arabica Price (Noticiasagricolas) – 2026-06-03",
+        "headline": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-03",
         "source": "Noticiasagricolas",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -346,7 +346,7 @@
         ]
       },
       {
-        "headline": "Conilon Tipo 7 (Cooabriel) – 2026-06-03",
+        "headline": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-03",
         "source": "Cooabriel",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -356,7 +356,7 @@
         ]
       },
       {
-        "headline": "Vietnam Robusta – 2026-06-03",
+        "headline": "Vietnam Robusta \u2013 2026-06-03",
         "source": "Giacaphe",
         "sentiment": "Neutral",
         "confidence": 80.0,
@@ -366,7 +366,7 @@
         ]
       },
       {
-        "headline": "ICE London Robusta (RM) Futures – 2026-06-01",
+        "headline": "ICE London Robusta (RM) Futures \u2013 2026-06-01",
         "source": "Barchart",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -375,7 +375,7 @@
         ]
       },
       {
-        "headline": "ICE NY Arabica (KC) Futures – 2026-06-01",
+        "headline": "ICE NY Arabica (KC) Futures \u2013 2026-06-01",
         "source": "Barchart",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -384,7 +384,7 @@
         ]
       },
       {
-        "headline": "ICE-EU RC Daily OI Snapshot – 2026-06-01",
+        "headline": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-01",
         "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -395,7 +395,7 @@
         ]
       },
       {
-        "headline": "IFUS KC Daily OI Snapshot – 2026-06-01",
+        "headline": "IFUS KC Daily OI Snapshot \u2013 2026-06-01",
         "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -406,7 +406,7 @@
         ]
       },
       {
-        "headline": "Ethiopia Agronomic Status – 2026-06-03",
+        "headline": "Ethiopia Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -418,7 +418,7 @@
         ]
       },
       {
-        "headline": "Uganda Agronomic Status – 2026-06-03",
+        "headline": "Uganda Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -430,7 +430,7 @@
         ]
       },
       {
-        "headline": "Indonesia Agronomic Status – 2026-06-03",
+        "headline": "Indonesia Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -442,7 +442,7 @@
         ]
       },
       {
-        "headline": "Honduras Agronomic Status – 2026-06-03",
+        "headline": "Honduras Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -454,7 +454,7 @@
         ]
       },
       {
-        "headline": "Colombia Agronomic Status – 2026-06-03",
+        "headline": "Colombia Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -466,7 +466,7 @@
         ]
       },
       {
-        "headline": "Brazil Agronomic Status – 2026-06-03",
+        "headline": "Brazil Agronomic Status \u2013 2026-06-03",
         "source": "Open-Meteo + NOAA STAR",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -478,7 +478,7 @@
         ]
       },
       {
-        "headline": "Retail Coffee CPI – 2026-06-03",
+        "headline": "Retail Coffee CPI \u2013 2026-06-03",
         "source": "Retail CPI",
         "sentiment": "Neutral",
         "confidence": 85.0,
@@ -489,7 +489,7 @@
         ]
       },
       {
-        "headline": "AJCA Japan Coffee Data – 2026-06-03",
+        "headline": "AJCA Japan Coffee Data \u2013 2026-06-03",
         "source": "AJCA",
         "sentiment": "Neutral",
         "confidence": 85.0,
@@ -500,7 +500,7 @@
         ]
       },
       {
-        "headline": "USDA PSD Coffee Data – 2026-06-03",
+        "headline": "USDA PSD Coffee Data \u2013 2026-06-03",
         "source": "PSD Coffee",
         "sentiment": "Neutral",
         "confidence": 95.0,
