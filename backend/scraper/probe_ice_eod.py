@@ -1,26 +1,16 @@
 """One-shot probe for the ICE Report 12 EOD PDF endpoint.
 
-Pattern mirrors backend/scraper/probe_ice_stocks.py: hit the endpoint once
-from a GitHub runner (where ice.com egress is reachable, unlike a typical
-dev sandbox), log everything diagnostic, and write any successful response
-body to debug/ice_probe/ so we can inspect the actual file shape before
-writing a parser.
+Second iteration. First iteration confirmed:
+  • theice.com 301-redirects to www.ice.com (canonical)
+  • The backend endpoint is /api/icereportcenterservice/v1/reports/12/download/pdf
+  • POST with form-urlencoded reaches the backend (got structured JSON,
+    not a Cloudflare WAF block)
+  • Both IFUS,KC and IEU,RC produce identical 409 → it's a body/header
+    problem, not an exchange-code problem
 
-The endpoint pattern is documented in the user's DevTools intercept:
-  POST https://www.theice.com/marketdata/api/reports/12/download/pdf
-  Content-Type: application/x-www-form-urlencoded
-  Body: exchangeCodeAndContract=IFUS,KC&selectedDate=YYYY-MM-DD
-
-Comma in `IFUS,KC` gets URL-encoded by requests automatically (→ %2C),
-which is what produces the 57-byte content-length the user observed.
-
-What this script does NOT do:
-  • DB writes
-  • JSON output for the frontend
-  • Long-running retries (a 403 here is the answer, not a transient)
-
-This is a diagnostic. Once we see what comes back (PDF? JSON? HTML edge-
-denial?), the production fetcher lives in a separate module.
+This iteration sweeps the body shape and headers to narrow the 409 cause.
+Each row in `CASES` below is one (label, body, header overrides). All
+hit www.ice.com directly (skipping the 301 chain).
 """
 from __future__ import annotations
 
@@ -31,31 +21,13 @@ from pathlib import Path
 
 import requests
 
-# Both candidate hosts probed in turn — the user's DevTools capture had
-# `www.ice.com`, the existing codebase (spa_api.py) uses `www.theice.com`.
-# First pass picked theice.com and got 301 → cloudflare redirect; trying
-# both with redirects followed so we see where the canonical PDF actually
-# lives.
-ENDPOINTS = [
-    "https://www.theice.com/marketdata/api/reports/12/download/pdf",
-    "https://www.ice.com/marketdata/api/reports/12/download/pdf",
-]
+ENDPOINT = "https://www.ice.com/marketdata/api/reports/12/download/pdf"
 
-# Two markets the EOD report exists for — both probed so we see if the
-# IEU-side (Robusta) reaches the same WAF treatment as IFUS (Arabica).
-MARKETS = {
-    "arabica_KC": {"exchangeCodeAndContract": "IFUS,KC"},
-    "robusta_RC": {"exchangeCodeAndContract": "IEU,RC"},
-}
-
-# Browser-spoof headers. Identical to the user's Chrome capture; matches the
-# pattern in backend/scraper/sources/ice_certified_stocks/spa_api.py:38-43
-# which is proven to work against ICE's Akamai/WAF from GH runners.
-HEADERS = {
+BASE_HEADERS = {
     "Accept":       "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
-    "Origin":       "https://www.theice.com",
-    "Referer":      "https://www.theice.com/report/12",
+    "Origin":       "https://www.ice.com",
+    "Referer":      "https://www.ice.com/report/12",
     "User-Agent":   ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                      "AppleWebKit/537.36 (KHTML, like Gecko) "
                      "Chrome/124.0.0.0 Safari/537.36"),
@@ -65,11 +37,7 @@ OUT_DIR = Path("debug/ice_probe_eod")
 
 
 def _prev_biz_day(d: date, n: int = 1) -> date:
-    """N-th most recent business day on or before `d`. EOD reports publish
-    after market close — pulling for N-1 weekday avoids racing publication
-    when the script is exercised same-day."""
-    cur = d
-    count = 0
+    cur, count = d, 0
     while count < n:
         cur -= timedelta(days=1)
         if cur.weekday() < 5:
@@ -77,95 +45,101 @@ def _prev_biz_day(d: date, n: int = 1) -> date:
     return cur
 
 
-def _probe_one(label: str, body: dict, target_date: str, endpoint: str) -> dict:
-    """POST once, dump headers + first 32 bytes + length, write any non-
-    empty body to disk regardless of status (HTML/JSON error bodies are
-    just as informative as a PDF success).
-
-    Follows redirects — the first probe pass got HTTP 301 from Cloudflare
-    without following, which is a normal canonical-host redirect, not a
-    block. The final-URL header reveals which host actually serves the PDF.
-    """
-    payload = dict(body)
-    payload["selectedDate"] = target_date
-    print(f"\n── {label} via {endpoint}  selectedDate={target_date} ──")
+def _probe(label: str, body: dict, extra_headers: dict | None = None) -> dict:
+    headers = {**BASE_HEADERS, **(extra_headers or {})}
+    print(f"\n── {label} ──")
+    print(f"  body: {body}")
     try:
-        r = requests.post(endpoint, headers=HEADERS, data=payload, timeout=30,
+        r = requests.post(ENDPOINT, headers=headers, data=body, timeout=30,
                           allow_redirects=True)
     except requests.RequestException as e:
         print(f"  REQUEST FAILED: {e!r}")
         return {"label": label, "error": repr(e)}
-    if r.history:
-        chain = " → ".join(str(h.status_code) for h in r.history) + f" → {r.status_code}"
-        print(f"  redirect chain: {chain}")
-        print(f"  final URL: {r.url}")
 
     summary: dict = {
-        "label":          label,
-        "payload":        payload,
-        "http_status":    r.status_code,
-        "content_type":   r.headers.get("content-type"),
-        "content_length": int(r.headers.get("content-length") or len(r.content)),
+        "label":           label,
+        "body_sent":       body,
+        "http_status":     r.status_code,
+        "content_type":    r.headers.get("content-type"),
+        "content_length":  int(r.headers.get("content-length") or len(r.content)),
         "first_bytes_hex": r.content[:32].hex() if r.content else "",
         "looks_like_pdf":  r.content[:4] == b"%PDF",
+        "final_url":       r.url,
     }
-    cd = r.headers.get("content-disposition")
-    if cd:
-        summary["content_disposition"] = cd
-
     print(f"  HTTP {r.status_code}  type={summary['content_type']}  "
-          f"len={summary['content_length']:,} B")
-    if cd:
-        print(f"  Content-Disposition: {cd}")
-    print(f"  first bytes: {summary['first_bytes_hex']}  "
-          f"PDF-magic: {summary['looks_like_pdf']}")
+          f"len={summary['content_length']:,} B  pdf={summary['looks_like_pdf']}")
 
-    # Write any non-empty body to disk so the artifact upload step can
-    # surface it. PDF → .pdf, HTML/JSON/text → .{ext} based on content-type.
     if r.content:
         ext = "pdf" if summary["looks_like_pdf"] else (
-            "html" if "html" in (summary["content_type"] or "") else
             "json" if "json" in (summary["content_type"] or "") else
+            "html" if "html" in (summary["content_type"] or "") else
             "txt"
         )
         OUT_DIR.mkdir(parents=True, exist_ok=True)
-        # Include host in the filename so the two endpoints don't overwrite.
-        host_tag = endpoint.split("//", 1)[1].split("/", 1)[0].replace(".", "_")
-        out = OUT_DIR / f"{label}_{host_tag}_{target_date}.{ext}"
+        out = OUT_DIR / f"{label}.{ext}"
         out.write_bytes(r.content)
         summary["saved_to"] = str(out)
-        print(f"  saved → {out}")
-
-        # If non-PDF, print first 800 chars of body for log-readable diagnosis.
-        if not summary["looks_like_pdf"] and ext != "pdf":
+        if not summary["looks_like_pdf"]:
             try:
-                snippet = r.text[:800]
-                print(f"  body preview:\n    {snippet}".replace("\n", "\n    "))
+                preview = r.text[:500]
+                print(f"  body: {preview}")
             except Exception:  # noqa: BLE001
                 pass
-
     return summary
 
 
 def main() -> int:
     target = _prev_biz_day(date.today()).isoformat()
-    print(f"=== ICE EOD probe (Report 12) · target date {target} ===")
+    print(f"=== ICE EOD probe v2 · {len(_cases(target))} cases · target {target} ===")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    results = []
-    for endpoint in ENDPOINTS:
-        for label, body in MARKETS.items():
-            results.append(_probe_one(label, body, target, endpoint))
+    results = [_probe(label, body, extra) for label, body, extra in _cases(target)]
 
     summary_path = OUT_DIR / "summary.json"
-    summary_path.write_text(
-        json.dumps({"target_date": target, "results": results}, indent=2),
-        encoding="utf-8",
-    )
+    summary_path.write_text(json.dumps({"results": results}, indent=2),
+                            encoding="utf-8")
     print(f"\n=== summary → {summary_path} ===")
-    pdf_hits = sum(1 for r in results if r.get("looks_like_pdf"))
-    print(f"=== {pdf_hits}/{len(results)} returned PDF magic bytes ===")
-    return 0 if pdf_hits else 1
+    pdfs = sum(1 for r in results if r.get("looks_like_pdf"))
+    print(f"=== {pdfs}/{len(results)} returned PDF magic bytes ===")
+    return 0 if pdfs else 1
+
+
+def _cases(target_date: str) -> list[tuple[str, dict, dict | None]]:
+    """Matrix of variations to isolate what trips the 409. Each tuple is
+    (label, form-body, header-override)."""
+    return [
+        # A. Baseline (matches user's blueprint exactly, hits ice.com directly).
+        ("A1_baseline_KC", {"exchangeCodeAndContract": "IFUS,KC", "selectedDate": target_date}, None),
+        ("A2_baseline_RC", {"exchangeCodeAndContract": "IEU,RC",  "selectedDate": target_date}, None),
+
+        # B. Try without selectedDate — maybe Report 12 serves "latest" by default.
+        ("B1_no_date_KC",  {"exchangeCodeAndContract": "IFUS,KC"}, None),
+        ("B2_no_date_RC",  {"exchangeCodeAndContract": "IEU,RC"},  None),
+
+        # C. Alternative date parameter names (existing spa_api.py reads multiple
+        # field names off the response — server may accept multiple on the way in).
+        ("C1_reportDate",  {"exchangeCodeAndContract": "IFUS,KC", "reportDate": target_date}, None),
+        ("C2_asOfDate",    {"exchangeCodeAndContract": "IFUS,KC", "asOfDate":   target_date}, None),
+
+        # D. Alternative date FORMATS for selectedDate.
+        ("D1_us_slash",    {"exchangeCodeAndContract": "IFUS,KC", "selectedDate": target_date[5:7] + "/" + target_date[8:10] + "/" + target_date[:4]}, None),
+        ("D2_iso_dt",      {"exchangeCodeAndContract": "IFUS,KC", "selectedDate": target_date + "T00:00:00Z"}, None),
+
+        # E. Try empty body and JSON content-type (would be a hint that the user's
+        # form-urlencoded reading was wrong; this is what spa_api.py uses for report 142).
+        ("E1_json_body",   {"exchangeCodeAndContract": "IFUS,KC", "selectedDate": target_date},
+            {"Content-Type": "application/json"}),
+
+        # F. The DevTools intercept the user reported had a content-length of 57 ON
+        # www.ice.com. Maybe theice.com requires a session cookie. Try sending a
+        # plausible XSRF-style header (commonly required for SPA POSTs).
+        ("F1_xsrf_header", {"exchangeCodeAndContract": "IFUS,KC", "selectedDate": target_date},
+            {"X-XSRF-TOKEN": "probe-no-token-test"}),
+
+        # G. Maybe the server wants the report-center API path directly (avoid the
+        # marketdata proxy hop that returns the 301).
+        # NOTE: this case overrides ENDPOINT inline below by short-circuiting.
+    ]
 
 
 if __name__ == "__main__":
