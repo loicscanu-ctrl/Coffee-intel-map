@@ -2,7 +2,7 @@ name: "1.2 – Freight Rate Scraper"
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 02:00 UTC = 09:00 Vietnam time
+    - cron: '19 2 * * *'  # 02:19 UTC — off the :00 mark to dodge GH cron skip
   workflow_dispatch:      # allow manual trigger from GitHub UI
 
 jobs:

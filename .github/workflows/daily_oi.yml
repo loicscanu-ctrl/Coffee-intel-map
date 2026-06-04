@@ -2,7 +2,7 @@ name: "1.3 – Daily OI Snapshot"
 
 on:
   schedule:
-    - cron: "0 2 * * 1-5"   # 02:00 UTC every weekday (Mon–Fri)
+    - cron: "13 2 * * 1-5"  # 02:13 UTC every weekday — off the :00 mark to dodge GH cron skip
   workflow_dispatch:
 
 concurrency:

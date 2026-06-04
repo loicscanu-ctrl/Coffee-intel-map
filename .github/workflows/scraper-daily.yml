@@ -2,7 +2,8 @@ name: "1.1 – Daily News Scraper"
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 01:00 UTC daily
+    - cron: '7 1 * * *'  # 01:07 UTC daily — off the :00 mark to dodge GH cron skip
+      # (empirically observed 4-5h delays on `0 1 * * *`, runs landing ~05:30 UTC)
   workflow_dispatch:
   # Run automatically when scraper source code lands on main, so a fix
   # gets verified end-to-end without waiting for the next cron tick.
