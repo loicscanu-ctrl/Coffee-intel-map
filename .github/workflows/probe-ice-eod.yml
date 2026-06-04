@@ -8,6 +8,12 @@ name: "Z – Probe: ICE EOD Report 12 (diagnostic)"
 
 on:
   workflow_dispatch:
+  push:
+    # One-shot fire on the probe branch — workflow_dispatch doesn't work for
+    # workflows that haven't yet landed on the default branch, so this push
+    # trigger lets us exercise the probe directly from the feature branch.
+    branches: [claude/probe-ice-eod]
+    paths: ['backend/scraper/probe_ice_eod.py', '.github/workflows/probe-ice-eod.yml']
 
 jobs:
   probe:
