@@ -1,0 +1,37 @@
+name: "Z – Probe: ICE EOD Report 12 (diagnostic)"
+
+# One-shot reconnaissance: does POST /marketdata/api/reports/12/download/pdf
+# return a real PDF from a GH runner? Mirrors probe-ice-egress.yml — pure
+# diagnostic, no DB writes, no parsing, no commits. Any response body (PDF
+# success OR HTML edge-denial) is uploaded as the `ice-eod-probe` artifact
+# for offline inspection.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Probe ICE Report 12 EOD endpoint
+        run: python backend/scraper/probe_ice_eod.py
+        continue-on-error: true   # 1-exit (no PDF) is data, not a failure
+
+      - name: Upload fetched bodies (PDFs / error HTML / summary)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ice-eod-probe
+          path: debug/ice_probe_eod/
+          if-no-files-found: warn
+          retention-days: 14
