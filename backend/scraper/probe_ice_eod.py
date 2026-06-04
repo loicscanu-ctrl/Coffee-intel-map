@@ -31,7 +31,15 @@ from pathlib import Path
 
 import requests
 
-ENDPOINT = "https://www.theice.com/marketdata/api/reports/12/download/pdf"
+# Both candidate hosts probed in turn — the user's DevTools capture had
+# `www.ice.com`, the existing codebase (spa_api.py) uses `www.theice.com`.
+# First pass picked theice.com and got 301 → cloudflare redirect; trying
+# both with redirects followed so we see where the canonical PDF actually
+# lives.
+ENDPOINTS = [
+    "https://www.theice.com/marketdata/api/reports/12/download/pdf",
+    "https://www.ice.com/marketdata/api/reports/12/download/pdf",
+]
 
 # Two markets the EOD report exists for — both probed so we see if the
 # IEU-side (Robusta) reaches the same WAF treatment as IFUS (Arabica).
@@ -69,19 +77,28 @@ def _prev_biz_day(d: date, n: int = 1) -> date:
     return cur
 
 
-def _probe_one(label: str, body: dict, target_date: str) -> dict:
+def _probe_one(label: str, body: dict, target_date: str, endpoint: str) -> dict:
     """POST once, dump headers + first 32 bytes + length, write any non-
     empty body to disk regardless of status (HTML/JSON error bodies are
-    just as informative as a PDF success)."""
+    just as informative as a PDF success).
+
+    Follows redirects — the first probe pass got HTTP 301 from Cloudflare
+    without following, which is a normal canonical-host redirect, not a
+    block. The final-URL header reveals which host actually serves the PDF.
+    """
     payload = dict(body)
     payload["selectedDate"] = target_date
-    print(f"\n── {label}  selectedDate={target_date} ──")
+    print(f"\n── {label} via {endpoint}  selectedDate={target_date} ──")
     try:
-        r = requests.post(ENDPOINT, headers=HEADERS, data=payload, timeout=30,
-                          allow_redirects=False)
+        r = requests.post(endpoint, headers=HEADERS, data=payload, timeout=30,
+                          allow_redirects=True)
     except requests.RequestException as e:
         print(f"  REQUEST FAILED: {e!r}")
         return {"label": label, "error": repr(e)}
+    if r.history:
+        chain = " → ".join(str(h.status_code) for h in r.history) + f" → {r.status_code}"
+        print(f"  redirect chain: {chain}")
+        print(f"  final URL: {r.url}")
 
     summary: dict = {
         "label":          label,
@@ -112,7 +129,9 @@ def _probe_one(label: str, body: dict, target_date: str) -> dict:
             "txt"
         )
         OUT_DIR.mkdir(parents=True, exist_ok=True)
-        out = OUT_DIR / f"{label}_{target_date}.{ext}"
+        # Include host in the filename so the two endpoints don't overwrite.
+        host_tag = endpoint.split("//", 1)[1].split("/", 1)[0].replace(".", "_")
+        out = OUT_DIR / f"{label}_{host_tag}_{target_date}.{ext}"
         out.write_bytes(r.content)
         summary["saved_to"] = str(out)
         print(f"  saved → {out}")
@@ -133,7 +152,10 @@ def main() -> int:
     print(f"=== ICE EOD probe (Report 12) · target date {target} ===")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    results = [_probe_one(label, body, target) for label, body in MARKETS.items()]
+    results = []
+    for endpoint in ENDPOINTS:
+        for label, body in MARKETS.items():
+            results.append(_probe_one(label, body, target, endpoint))
 
     summary_path = OUT_DIR / "summary.json"
     summary_path.write_text(
