@@ -1127,14 +1127,26 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       const cohortOutflow = robusta?.monthly?.implied_outflow;
       const useCohort = !!cohortCurrent && !!cohortOutflow;
 
+      // Always compute the in-browser per-port stock simulation. In the
+      // fallback path it is the sole source of flows; in the cohort path it
+      // supplements the monthly implied_outflow with recent DAILY outflow
+      // (decertifications) that lands after the last month-end ageing report
+      // — otherwise a fresh drop like "22 lots decertified on Jun 2" never
+      // shows in the system flow because implied_outflow only updates monthly.
       const sims: Record<string, RobustaPortSim> = {};
-      if (!useCohort) {
+      {
         const allPortCodes = new Set<string>();
         for (const s of snaps) for (const p of Object.keys(s.by_port_lots || {})) allPortCodes.add(p);
         for (const p of Array.from(allPortCodes)) {
           sims[p] = _simulateRobustaPortStock(p, snaps, grads, portOriginLots[p] ?? {});
         }
       }
+      // Newest month_end covered by the cohort implied_outflow. Daily-sim
+      // outflow strictly AFTER this date is additive (no double counting),
+      // because implied_outflow has not yet absorbed it.
+      const lastCohortMonthEndT = (cohortOutflow && cohortOutflow.length)
+        ? Math.max(...cohortOutflow.map((e) => new Date(e.month_end).getTime()))
+        : -Infinity;
 
       // Real per-(port, origin) gradings inflow per calendar month —
       // needed when cohort-DNA outflow is the trusted source for gross_out;
@@ -1183,6 +1195,20 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
             if (!byO) continue;
             for (const [o, v] of Object.entries(byO)) {
               outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
+            }
+          }
+          // Supplement with recent DAILY outflow from the per-port sim for
+          // dates after the last month-end the cohort outflow covers. This
+          // surfaces same-month decertifications (e.g. the Jun 2 drop) that
+          // implied_outflow won't reflect until the next monthly ageing run.
+          const simRecent = sims[code];
+          if (simRecent) {
+            for (const [date, byO] of Object.entries(simRecent.outflowByOriginByDate)) {
+              const t = new Date(date).getTime();
+              if (t < cutT || t <= lastCohortMonthEndT) continue;
+              for (const [o, v] of Object.entries(byO)) {
+                outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
+              }
             }
           }
           for (const o of Array.from(new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]))) {
