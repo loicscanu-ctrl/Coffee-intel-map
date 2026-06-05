@@ -1,0 +1,53 @@
+name: "Z – Probe: ICE EOD Report 12 (auth replay)"
+
+# Auth-replay variant. Takes cookies pasted via workflow_dispatch input,
+# replays the user's browser request, dumps the resulting PDF (or error
+# body) as an artifact. Cookies never get committed to git — they live
+# only in the workflow_dispatch input log for this single run.
+#
+# Trigger from the Actions tab → "Run workflow" → paste the full Cookie:
+# header value from your browser's DevTools (Copy as cURL, then everything
+# after `-b ` in single quotes, excluding the quotes themselves).
+
+on:
+  workflow_dispatch:
+    inputs:
+      cookies:
+        description: "Full Cookie: header value pasted from DevTools curl"
+        required: true
+        type: string
+      target_date:
+        description: "Target date YYYY-MM-DD (defaults to yesterday biz day)"
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests pdfplumber
+
+      - name: Probe ICE Report 12 EOD (auth replay)
+        env:
+          ICE_COOKIES:     ${{ inputs.cookies }}
+          ICE_TARGET_DATE: ${{ inputs.target_date }}
+        run: python backend/scraper/probe_ice_eod_auth.py
+        continue-on-error: true
+
+      - name: Upload PDFs / error bodies
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ice-eod-auth-probe
+          path: debug/ice_probe_eod/
+          if-no-files-found: warn
+          retention-days: 7
