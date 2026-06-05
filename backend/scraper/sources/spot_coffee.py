@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -248,11 +249,60 @@ def probe() -> int:
     table = _find_main_table(soup)
     headers, rows = _parse_table(table)
     print(f"[spot] main table: {len(headers)} columns, {len(rows)} rows")
+    print(f"[spot] table id={table.get('id')!r} class={table.get('class')!r}")
     print(f"[spot] headers: {headers}")
     print("[spot] first rows:")
-    for r in rows[:5]:
+    for r in rows[:3]:
         print(f"        {json.dumps(r, ensure_ascii=False)}")
+    _pagination_report(soup)
     return 0
+
+
+_PAGE_RE = re.compile(r"__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)")
+_COUNT_RE = re.compile(
+    r"(page\s+\d+\s+of\s+\d+|\b\d{2,6}\s+(?:records|items|results|offers|rows|entries)\b)",
+    re.I,
+)
+
+
+def _pagination_report(soup) -> None:
+    """Dump every clue about how the offer table paginates so the full
+    fetcher can be made to walk all pages (ASP.NET GridView pager, page-size
+    <select>, total-count text, __doPostBack targets)."""
+    print("[spot] --- pagination report ---")
+
+    # __doPostBack targets (GridView pager links call these).
+    targets: list[tuple[str, str, str]] = []
+    for a in soup.find_all("a", href=True):
+        m = _PAGE_RE.search(a["href"])
+        if m:
+            targets.append((_cell_text(a) or "(no text)", m.group(1), m.group(2)))
+    if targets:
+        print(f"[spot] __doPostBack links: {len(targets)}")
+        for txt, tgt, arg in targets[:25]:
+            print(f"        {txt!r:>14} -> target={tgt!r} arg={arg!r}")
+    else:
+        print("[spot] no __doPostBack pager links found")
+
+    # Any inline onclick / input buttons that postback (Next/Last buttons).
+    for inp in soup.find_all("input"):
+        oc = inp.get("onclick") or ""
+        if "__doPostBack" in oc or "Page$" in oc:
+            print(f"        input name={inp.get('name')!r} value={inp.get('value')!r} onclick={oc[:120]!r}")
+
+    # Page-size / filter <select>s.
+    for sel in soup.find_all("select"):
+        opts = [(o.get("value"), _cell_text(o)) for o in sel.find_all("option")]
+        print(f"[spot] <select> name={sel.get('name')!r} options={opts[:20]}")
+
+    # Total-count / "Page X of Y" text anywhere on the page.
+    page_text = soup.get_text(" ", strip=True)
+    hits = {m.group(1) for m in _COUNT_RE.finditer(page_text)}
+    print(f"[spot] count/paging text hits: {sorted(hits) if hits else '(none)'}")
+
+    # Query-string knobs sometimes expose page size (?pageSize=, ?ps=).
+    print(f"[spot] final URL: {soup.find('base')['href'] if soup.find('base') else _BASE}")
+    print("[spot] --- end pagination report ---")
 
 
 def full() -> int:
