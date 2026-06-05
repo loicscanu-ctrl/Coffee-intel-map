@@ -51,7 +51,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO:     ${{ github.repository }}
           THIS_RUN: ${{ github.run_id }}
+          EVENT:    ${{ github.event_name }}
         run: |
+          # workflow_dispatch is an explicit human action — always bypass the
+          # idempotency guard. The guard exists to prevent the cron+workflow_run
+          # double-trigger from double-sending, not to block manual re-fires.
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — bypassing idempotency guard."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           today=$(date -u +%Y-%m-%d)
           export today THIS_RUN
           prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
