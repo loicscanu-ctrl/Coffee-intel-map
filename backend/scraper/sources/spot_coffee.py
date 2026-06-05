@@ -1,0 +1,296 @@
+"""
+spot_coffee.py — ATTE spot-coffee offer-list scraper.
+
+Source: https://attespotcoffee.azurewebsites.net/  — a login-gated, single
+HTML table of live spot green-coffee offers. Credentials come from the
+SPOT_COFFEE_USER / SPOT_COFFEE_PASS environment variables (GitHub secrets in
+CI). The host is NOT on the Claude sandbox allowlist, so this only ever runs
+on a GitHub runner (same constraint as the AJCA / ICE scrapers).
+
+The page is a single offer table whose columns are roughly:
+  Bags/Tons · Unit · Origin · Quality · Quality cont. · Crop year ·
+  Certification · Add. information · Port · Warehouse · Terms · Price
+
+We capture the table *header-faithfully* (whatever the live <th> text is) and
+emit frontend/public/data/spot_coffee.json:
+
+  {
+    "as_of":        "2026-06-05",
+    "generated_at": "2026-06-05T11:30:00Z",
+    "source_url":   "https://attespotcoffee.azurewebsites.net/",
+    "headers":      ["Bags/Tons", "Unit", "Origin", ...],
+    "rows":         [ {"Bags/Tons": "250", "Origin": "Colombia", ...}, ... ],
+    "row_count":    N
+  }
+
+Run modes (see __main__):
+  --probe : log in, dump login-form + table diagnostics to stdout, write
+            nothing. Validates the credentials and reveals the real markup so
+            the full parser can be finalised.
+  --full  : log in, parse the table, write the JSON file.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+from urllib.parse import urljoin
+
+import requests
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:  # pragma: no cover - bs4 is in requirements
+    BeautifulSoup = None  # type: ignore
+
+_BASE = "https://attespotcoffee.azurewebsites.net/"
+_OUT = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "spot_coffee.json"
+
+_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+# Heuristic: which form-field name carries the username/login.
+_USER_HINTS = ("user", "email", "login", "account", "uid", "username", "name")
+
+
+def _creds() -> tuple[str, str]:
+    user = os.environ.get("SPOT_COFFEE_USER", "")
+    pwd = os.environ.get("SPOT_COFFEE_PASS", "")
+    if not user or not pwd:
+        print("[spot] ERROR: SPOT_COFFEE_USER / SPOT_COFFEE_PASS not set", file=sys.stderr)
+    return user, pwd
+
+
+def _looks_user(name: str) -> bool:
+    n = (name or "").lower()
+    return any(h in n for h in _USER_HINTS)
+
+
+def _find_login_form(soup) -> object | None:
+    """The login <form> is the one containing an input[type=password]."""
+    for form in soup.find_all("form"):
+        if form.find("input", attrs={"type": "password"}):
+            return form
+    return None
+
+
+def _attempt_login(session: requests.Session, verbose: bool = False) -> requests.Response:
+    """GET the base page; if it presents a password form, submit credentials.
+
+    Carries over every existing input value (hidden anti-forgery tokens like
+    __RequestVerificationToken / __VIEWSTATE, "remember me" defaults, etc.) so
+    the POST mirrors a real browser submit. Returns the response of the page
+    that follows the login (or the original GET if no form was present —
+    e.g. the session is already authenticated).
+    """
+    user, pwd = _creds()
+    r = session.get(_BASE, headers=_HEADERS, timeout=30, allow_redirects=True)
+    if verbose:
+        print(f"[spot] GET {_BASE} -> {r.status_code} (final {r.url})")
+    if BeautifulSoup is None:
+        raise RuntimeError("beautifulsoup4 not installed")
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    form = _find_login_form(soup)
+    if form is None:
+        if verbose:
+            print("[spot] no password form on landing page (already authed, or table is public)")
+        return r
+
+    action = urljoin(r.url, form.get("action") or r.url)
+    method = (form.get("method") or "post").lower()
+
+    data: dict[str, str] = {}
+    user_field: str | None = None
+    pass_field: str | None = None
+    # Pass 1 — collect every named input; tag the password + username fields.
+    for inp in form.find_all(("input", "select", "textarea")):
+        name = inp.get("name")
+        if not name:
+            continue
+        itype = (inp.get("type") or "text").lower()
+        if itype == "password":
+            pass_field = name
+            data[name] = pwd
+        elif itype in ("text", "email") and pass_field is None and _looks_user(name) and user_field is None:
+            user_field = name
+            data[name] = user
+        else:
+            data[name] = inp.get("value") or ""
+    # Pass 2 — fallback if no field matched the username heuristics: take the
+    # first plain text/email input.
+    if user_field is None:
+        for inp in form.find_all("input"):
+            itype = (inp.get("type") or "text").lower()
+            nm = inp.get("name")
+            if itype in ("text", "email") and nm:
+                user_field = nm
+                data[nm] = user
+                break
+
+    if verbose:
+        print(f"[spot] login form: action={action} method={method}")
+        print(f"[spot] login fields: {sorted(data.keys())}")
+        print(f"[spot] username field = {user_field!r}, password field = {pass_field!r}")
+
+    submit_headers = {**_HEADERS, "Referer": r.url, "Origin": _BASE.rstrip("/")}
+    if method == "get":
+        resp = session.get(action, params=data, headers=submit_headers, timeout=30, allow_redirects=True)
+    else:
+        resp = session.post(action, data=data, headers=submit_headers, timeout=30, allow_redirects=True)
+    if verbose:
+        print(f"[spot] login POST -> {resp.status_code} (final {resp.url})")
+        post_soup = BeautifulSoup(resp.text, "html.parser")
+        still_login = post_soup.find("input", attrs={"type": "password"}) is not None
+        print(f"[spot] password field still present after login: {still_login} "
+              f"({'LOGIN LIKELY FAILED' if still_login else 'login looks OK'})")
+        print(f"[spot] cookies: {sorted(session.cookies.keys())}")
+    return resp
+
+
+def _uniq_headers(raw: list[str]) -> list[str]:
+    """Make header keys unique + non-empty so they can key row dicts."""
+    out: list[str] = []
+    seen: dict[str, int] = {}
+    for i, h in enumerate(raw):
+        key = (h or "").strip() or f"col{i + 1}"
+        if key in seen:
+            seen[key] += 1
+            key = f"{key} ({seen[key]})"
+        else:
+            seen[key] = 1
+        out.append(key)
+    return out
+
+
+def _cell_text(cell) -> str:
+    return " ".join(cell.get_text(" ", strip=True).split())
+
+
+def _find_main_table(soup):
+    """Return the <table> with the most data rows (the offer list)."""
+    best = None
+    best_rows = -1
+    for t in soup.find_all("table"):
+        n = len(t.find_all("tr"))
+        if n > best_rows:
+            best, best_rows = t, n
+    return best
+
+
+def _parse_table(table) -> tuple[list[str], list[dict]]:
+    """Extract (headers, rows) from the offer table, keyed by header text."""
+    headers: list[str] = []
+    thead = table.find("thead")
+    if thead:
+        hr = thead.find("tr")
+        if hr:
+            headers = [_cell_text(c) for c in hr.find_all(("th", "td"))]
+    trs = table.find_all("tr")
+    body_trs = trs
+    if not headers and trs:
+        # No <thead> — treat the first row as the header if it is all <th>.
+        first = trs[0]
+        if first.find_all("th") and not first.find_all("td"):
+            headers = [_cell_text(c) for c in first.find_all("th")]
+            body_trs = trs[1:]
+    elif thead:
+        body_trs = (table.find("tbody") or table).find_all("tr")
+
+    headers = _uniq_headers(headers)
+    rows: list[dict] = []
+    for tr in body_trs:
+        cells = tr.find_all(("td", "th"))
+        if not cells:
+            continue
+        vals = [_cell_text(c) for c in cells]
+        if headers and len(headers) >= len(vals):
+            row = {headers[i]: vals[i] for i in range(len(vals))}
+        elif headers:
+            row = {headers[i]: vals[i] for i in range(len(headers))}
+            row["_extra"] = " | ".join(vals[len(headers):])
+        else:
+            row = {f"col{i + 1}": v for i, v in enumerate(vals)}
+        rows.append(row)
+    return headers, rows
+
+
+def probe() -> int:
+    session = requests.Session()
+    resp = _attempt_login(session, verbose=True)
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    tables = soup.find_all("table")
+    print(f"[spot] tables on post-login page: {len(tables)}")
+    if not tables:
+        # Help discover the data page if it lives behind a link/redirect.
+        links = []
+        for a in soup.find_all("a", href=True)[:40]:
+            links.append(f"{_cell_text(a)!r} -> {a['href']}")
+        print("[spot] no <table> found. First links on page:")
+        for ln in links:
+            print(f"        {ln}")
+        print("[spot] --- page <title> ---")
+        title = soup.find("title")
+        print(f"        {title.get_text(strip=True) if title else '(none)'}")
+        return 0
+
+    table = _find_main_table(soup)
+    headers, rows = _parse_table(table)
+    print(f"[spot] main table: {len(headers)} columns, {len(rows)} rows")
+    print(f"[spot] headers: {headers}")
+    print("[spot] first rows:")
+    for r in rows[:5]:
+        print(f"        {json.dumps(r, ensure_ascii=False)}")
+    return 0
+
+
+def full() -> int:
+    session = requests.Session()
+    resp = _attempt_login(session, verbose=True)
+    soup = BeautifulSoup(resp.text, "html.parser")
+    table = _find_main_table(soup)
+    if table is None:
+        print("[spot] ERROR: no table found on post-login page — not writing.", file=sys.stderr)
+        return 1
+    headers, rows = _parse_table(table)
+    if not rows:
+        print("[spot] ERROR: table parsed to 0 rows — not writing.", file=sys.stderr)
+        return 1
+
+    now = datetime.now(UTC)
+    payload = {
+        "as_of": now.date().isoformat(),
+        "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": _BASE,
+        "headers": headers,
+        "rows": rows,
+        "row_count": len(rows),
+    }
+    _OUT.parent.mkdir(parents=True, exist_ok=True)
+    _OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[spot] wrote {_OUT.relative_to(Path(__file__).resolve().parents[3])} "
+          f"— {len(rows)} rows, {len(headers)} columns")
+    return 0
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="ATTE spot-coffee scraper")
+    g = ap.add_mutually_exclusive_group()
+    g.add_argument("--probe", action="store_true", help="dump login/table diagnostics, write nothing")
+    g.add_argument("--full", action="store_true", help="parse table and write spot_coffee.json")
+    args = ap.parse_args()
+    if args.probe:
+        sys.exit(probe())
+    else:
+        sys.exit(full())
