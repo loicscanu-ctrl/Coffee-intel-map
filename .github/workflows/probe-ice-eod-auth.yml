@@ -41,3 +41,5 @@ jobs:
           path: debug/ice_probe_eod/
           if-no-files-found: warn
           retention-days: 7
+
+# rerun trigger 1780633522
