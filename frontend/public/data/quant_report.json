@@ -228,127 +228,22 @@
       }
     ]
   },
-  "scraped_at": "2026-06-05T22:42:52.658253+00:00",
+  "scraped_at": "2026-06-05T22:43:26.382009Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-04T22:53:58.203472Z",
+    "scraped_at": "2026-06-05T22:43:25.526098Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 76.0,
+    "overall_confidence": 76.8,
     "bull_count": 0,
     "bear_count": 0,
     "neutral_count": 25,
     "total": 25,
     "items": [
       {
-        "headline": "Ethiopia Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "agronomic",
-          "ethiopia",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Uganda Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "agronomic",
-          "uganda",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Indonesia Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "agronomic",
-          "indonesia",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Honduras Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "agronomic",
-          "honduras",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Colombia Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "agronomic",
-          "colombia",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Brazil Agronomic Status \u2013 2026-06-04",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "weather",
-          "agronomic",
-          "auto-commentary",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-02",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "robusta",
-          "daily-oi",
-          "auto-commentary"
-        ]
-      },
-      {
-        "headline": "IFUS KC Daily OI Snapshot \u2013 2026-06-02",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "daily-oi",
-          "arabica",
-          "auto-commentary"
-        ]
-      },
-      {
-        "headline": "Retail Coffee CPI \u2013 2026-06-04",
-        "source": "Retail CPI",
-        "sentiment": "Neutral",
-        "confidence": 60.0,
-        "tags": [
-          "demand",
-          "retail",
-          "cpi"
-        ]
-      },
-      {
-        "headline": "World Bank Population \u2013 2026-06-04",
+        "headline": "World Bank Population – 2026-06-05",
         "source": "World Bank",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 70.0,
         "tags": [
           "population",
           "demand",
@@ -356,113 +251,61 @@
         ]
       },
       {
-        "headline": "AJCA Japan Coffee Data \u2013 2026-06-04",
-        "source": "AJCA",
-        "sentiment": "Neutral",
-        "confidence": 65.0,
-        "tags": [
-          "imports",
-          "demand",
-          "japan"
-        ]
-      },
-      {
-        "headline": "USDA PSD Coffee Data \u2013 2026-06-04",
-        "source": "PSD Coffee",
+        "headline": "Fertilizer Prices – 2026-06",
+        "source": "World Bank",
         "sentiment": "Neutral",
         "confidence": 75.0,
         "tags": [
-          "usda",
-          "psd",
-          "demand"
+          "brazil",
+          "fertilizer",
+          "supply"
         ]
       },
       {
-        "headline": "Fertilizer Prices \u2013 2026-06",
-        "source": "World Bank",
+        "headline": "ENSO ONI – 2026-06",
+        "source": "NOAA CPC",
         "sentiment": "Neutral",
         "confidence": 70.0,
         "tags": [
-          "fertilizer",
-          "supply",
-          "brazil"
+          "brazil",
+          "enso",
+          "supply"
         ]
       },
       {
-        "headline": "ENSO ONI \u2013 2026-06",
-        "source": "NOAA CPC",
+        "headline": "Colombia FNC Precio Interno – 2026-06-05",
+        "source": "FNC",
         "sentiment": "Neutral",
         "confidence": 80.0,
         "tags": [
-          "supply",
-          "enso",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "Colombia FNC Precio Interno \u2013 2026-06-04",
-        "source": "FNC",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "precio-interno",
           "colombia",
-          "fnc"
+          "fnc",
+          "precio-interno"
         ]
       },
       {
-        "headline": "B3 ICF Arabica (Jul '26) \u2013 2026-06-04",
+        "headline": "B3 ICF Arabica (Jul '26) – 2026-06-05",
         "source": "B3",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
-          "b3",
+          "brazil",
           "arabica",
-          "brazil"
+          "b3"
         ]
       },
       {
-        "headline": "Uganda Screen 15 \u2013 2026-06-04",
+        "headline": "Uganda Screen 15 – 2026-06-05",
         "source": "UCDA",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 80.0,
         "tags": [
-          "robusta",
-          "uganda"
+          "uganda",
+          "robusta"
         ]
       },
       {
-        "headline": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-04",
-        "source": "Cecafe",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "exports",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-04",
-        "source": "Noticiasagricolas",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "arabica",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-04",
-        "source": "Cooabriel",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "conilon",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "ICE COT Robusta Coffee (London) \u2013 2026-05-26",
+        "headline": "ICE COT Robusta Coffee (London) – 2026-05-26",
         "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 75.0,
@@ -472,7 +315,7 @@
         ]
       },
       {
-        "headline": "CFTC COT Coffee C (NY Arabica) \u2013 2026-05-26",
+        "headline": "CFTC COT Coffee C (NY Arabica) – 2026-05-26",
         "source": "CFTC",
         "sentiment": "Neutral",
         "confidence": 75.0,
@@ -482,31 +325,189 @@
         ]
       },
       {
-        "headline": "ICE London Robusta (RM) Futures \u2013 2026-06-02",
+        "headline": "ICE London Robusta (RM) Futures – 2026-06-03",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "robusta"
         ]
       },
       {
-        "headline": "ICE NY Arabica (KC) Futures \u2013 2026-06-02",
+        "headline": "ICE NY Arabica (KC) Futures – 2026-06-03",
         "source": "Barchart",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "arabica"
         ]
       },
       {
-        "headline": "USD/VND FX Rate \u2013 2026-06-04",
-        "source": "ExchangeRate-API",
+        "headline": "Brazil Arabica Price (Noticiasagricolas) – 2026-06-05",
+        "source": "Noticiasagricolas",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "brazil",
+          "arabica"
+        ]
+      },
+      {
+        "headline": "Conilon Tipo 7 (Cooabriel) – 2026-06-05",
+        "source": "Cooabriel",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "brazil",
+          "conilon"
+        ]
+      },
+      {
+        "headline": "Vietnam Robusta – 2026-06-05",
+        "source": "Giacaphe",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "robusta",
+          "vietnam"
+        ]
+      },
+      {
+        "headline": "Ethiopia ECX Coffee Price – 2026-06-05",
+        "source": "ECX",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "ethiopia",
+          "arabica",
+          "ecx"
+        ]
+      },
+      {
+        "headline": "Ethiopia Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "ethiopia",
+          "weather",
+          "agronomic",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "Uganda Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "uganda",
+          "weather",
+          "agronomic",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "Indonesia Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "indonesia",
+          "weather",
+          "agronomic",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "Honduras Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "weather",
+          "agronomic",
+          "auto-commentary",
+          "honduras"
+        ]
+      },
+      {
+        "headline": "Colombia Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "weather",
+          "agronomic",
+          "auto-commentary",
+          "colombia"
+        ]
+      },
+      {
+        "headline": "Brazil Agronomic Status – 2026-06-05",
+        "source": "Open-Meteo + NOAA STAR",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "brazil",
+          "weather",
+          "agronomic",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "ICE-EU RC Daily OI Snapshot – 2026-06-03",
+        "source": "ICE",
         "sentiment": "Neutral",
         "confidence": 70.0,
         "tags": [
-          "vietnam",
-          "fx"
+          "robusta",
+          "daily-oi",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "IFUS KC Daily OI Snapshot – 2026-06-03",
+        "source": "ICE",
+        "sentiment": "Neutral",
+        "confidence": 70.0,
+        "tags": [
+          "daily-oi",
+          "arabica",
+          "auto-commentary"
+        ]
+      },
+      {
+        "headline": "Retail Coffee CPI – 2026-06-05",
+        "source": "Retail CPI",
+        "sentiment": "Neutral",
+        "confidence": 70.0,
+        "tags": [
+          "cpi",
+          "demand",
+          "retail"
+        ]
+      },
+      {
+        "headline": "AJCA Japan Coffee Data – 2026-06-05",
+        "source": "AJCA",
+        "sentiment": "Neutral",
+        "confidence": 75.0,
+        "tags": [
+          "demand",
+          "imports",
+          "japan"
+        ]
+      },
+      {
+        "headline": "USDA PSD Coffee Data – 2026-06-05",
+        "source": "PSD Coffee",
+        "sentiment": "Neutral",
+        "confidence": 85.0,
+        "tags": [
+          "usda",
+          "demand",
+          "psd"
         ]
       }
     ]
