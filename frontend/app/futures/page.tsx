@@ -237,6 +237,7 @@ const CERT_OPTIONS = [
 
 function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; vnFaqUsdMt?: number | null }) {
   const [basisOverride, setBasisOverride]     = useState<number | null>(null);
+  const [basis2Override, setBasis2Override]   = useState<number | null>(null);
   const [freight, setFreight]                 = useState(0);
   const [financing, setFinancing]             = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
@@ -299,20 +300,59 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   // basisOverride = null means use the computed default; non-null = user's manual value
   const basisDiff = basisOverride ?? basisDefault;
 
-  // Months with cumulative inter-contract spread (auto from market prices)
+  // The next-contract letter (first letter that differs from the front).
+  // E.g. front N(Jul) → next U(Sep). Used both for the input label and the
+  // auto-spread fallback when the user hasn't manually set a second basis.
+  const nextContractLetter = useMemo(() => {
+    const frontLetter = monthsBase[0]?.letter;
+    return monthsBase.find(m => m.letter !== frontLetter)?.letter ?? null;
+  }, [monthsBase]);
+
+  // Default 2nd-contract basis: front basis adjusted by the front→next
+  // calendar spread the market is currently quoting. So if front N trades
+  // $50 above next U, the next-contract basis defaults to (front basis + 50)
+  // — the basis that keeps the at-port price level across the roll.
+  const basis2Default = useMemo(() => {
+    const frontLetter = monthsBase[0]?.letter;
+    const frontPrice  = frontLetter        ? rcPrices[frontLetter]        : null;
+    const nextPrice   = nextContractLetter ? rcPrices[nextContractLetter] : null;
+    if (frontPrice != null && nextPrice != null) {
+      return basisDiff + Math.round(frontPrice - nextPrice);
+    }
+    return basisDiff + 30;   // fallback when one of the prices is missing
+  }, [basisDiff, monthsBase, rcPrices, nextContractLetter]);
+
+  const basis2Diff = basis2Override ?? basis2Default;
+
+  // Months with per-contract basis + +30/month carry within each contract.
+  // Front contract uses basisDiff. Next contract (when shipment crosses the
+  // letter boundary) uses basis2Diff. Beyond the 2nd contract, basis auto-
+  // rolls via the market spread between consecutive contracts.
   const months = useMemo(() => {
-    let cumSpread = 0;
-    let lastLetter = monthsBase[0]?.letter ?? "";
+    let activeBasis    = basisDiff;
+    let activeStartIdx = 0;
+    let contractIdx    = 0;   // 0 = front, 1 = next, 2+ = auto-rolled
+    let lastLetter     = monthsBase[0]?.letter ?? "";
     return monthsBase.map((m, i) => {
       if (m.letter !== lastLetter) {
-        const fromPrice = rcPrices[lastLetter];
-        const toPrice   = rcPrices[m.letter];
-        if (fromPrice != null && toPrice != null) cumSpread += Math.round(fromPrice - toPrice);
+        contractIdx += 1;
+        activeStartIdx = i;
+        if (contractIdx === 1) {
+          activeBasis = basis2Diff;
+        } else {
+          // 3rd+ contract: roll from the previous contract via market spread.
+          const fromPrice = rcPrices[lastLetter];
+          const toPrice   = rcPrices[m.letter];
+          if (fromPrice != null && toPrice != null) {
+            activeBasis += Math.round(fromPrice - toPrice);
+          }
+        }
         lastLetter = m.letter;
       }
-      return { ...m, contractLetter: m.letter, basisForMonth: basisDiff + i * 30 + cumSpread };
+      const monthOffset = (i - activeStartIdx) * 30;
+      return { ...m, contractLetter: m.letter, basisForMonth: activeBasis + monthOffset };
     });
-  }, [monthsBase, rcPrices, basisDiff]);
+  }, [monthsBase, rcPrices, basisDiff, basis2Diff]);
 
   const sections: string[] = [];
   QUALITIES.forEach(q => { if (!sections.includes(q.section)) sections.push(q.section); });
@@ -323,7 +363,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
         <div>
           <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-            Basis — Grade 2 S13 — 1st Shipment Month
+            Basis — Grade 2 S13 — {monthsBase[0]?.letter ?? "Front"} contract
           </div>
           <div className="flex items-center gap-2">
             <input
@@ -335,6 +375,22 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
             <span className="text-slate-400 text-sm">USD / MT</span>
           </div>
         </div>
+        {nextContractLetter && (
+          <div className="border-l border-slate-700 pl-6">
+            <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
+              Basis — Grade 2 S13 — {nextContractLetter} contract
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={basis2Diff}
+                onChange={e => setBasis2Override(Number(e.target.value))}
+                className="w-24 bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right focus:outline-none focus:border-indigo-500"
+              />
+              <span className="text-slate-400 text-sm">USD / MT</span>
+            </div>
+          </div>
+        )}
         {(["Freight", "Financing"] as const).map(label => {
           const val   = label === "Freight" ? freight   : financing;
           const setVal = label === "Freight" ? setFreight : setFinancing;
