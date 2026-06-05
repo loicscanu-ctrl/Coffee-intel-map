@@ -1,26 +1,17 @@
 name: "Z – Probe: ICE EOD Report 12 (auth replay)"
 
-# Auth-replay variant. Takes cookies pasted via workflow_dispatch input,
-# replays the user's browser request, dumps the resulting PDF (or error
-# body) as an artifact. Cookies never get committed to git — they live
-# only in the workflow_dispatch input log for this single run.
-#
-# Trigger from the Actions tab → "Run workflow" → paste the full Cookie:
-# header value from your browser's DevTools (Copy as cURL, then everything
-# after `-b ` in single quotes, excluding the quotes themselves).
+# Auth-replay variant. Reads cookies from secrets.ICE_COOKIES (set in
+# repo settings) and replays the user's browser request from a GH runner.
+# Fires automatically on push so we don't depend on workflow_dispatch
+# being registered on main.
 
 on:
   workflow_dispatch:
-    inputs:
-      cookies:
-        description: "Full Cookie: header value pasted from DevTools curl"
-        required: true
-        type: string
-      target_date:
-        description: "Target date YYYY-MM-DD (defaults to yesterday biz day)"
-        required: false
-        default: ""
-        type: string
+  push:
+    branches: [claude/probe-ice-eod]
+    paths:
+      - 'backend/scraper/probe_ice_eod_auth.py'
+      - '.github/workflows/probe-ice-eod-auth.yml'
 
 jobs:
   probe:
@@ -38,8 +29,7 @@ jobs:
 
       - name: Probe ICE Report 12 EOD (auth replay)
         env:
-          ICE_COOKIES:     ${{ inputs.cookies }}
-          ICE_TARGET_DATE: ${{ inputs.target_date }}
+          ICE_COOKIES: ${{ secrets.ICE_COOKIES }}
         run: python backend/scraper/probe_ice_eod_auth.py
         continue-on-error: true
 
