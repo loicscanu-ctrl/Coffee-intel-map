@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-04T07:06:40.420312Z",
+  "generated_at": "2026-06-05T06:53:13.352431Z",
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-04",
+    "last_updated": "2026-06-05",
     "annual": [
       {
         "year": "2002",
@@ -228,7 +228,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-04",
+    "last_updated": "2026-06-05",
     "annual": [
       {
         "year": "2002",
@@ -454,7 +454,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-04",
+    "last_updated": "2026-06-05",
     "annual": [
       {
         "year": "1960",
@@ -1059,13 +1059,13 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-06-04",
+    "last_updated": "2026-06-05",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
     "monthly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf",
     "monthly_exports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf",
-    "supply_demand_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data-jukyu202603.pdf",
+    "supply_demand_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf",
     "yearly_imports_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf",
     "latest_origin_breakdown": [
       {
@@ -12541,13 +12541,19 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-04",
+    "last_updated": "2026-06-05",
     "countries": {
       "eu": {
         "name": "European Union",
         "iso3": "EUU",
         "latest_year": "2024",
         "latest_population": 450228188
+      },
+      "japan": {
+        "name": "Japan",
+        "iso3": "JPN",
+        "latest_year": "2024",
+        "latest_population": 123975371
       },
       "usa": {
         "name": "United States",
