@@ -43,8 +43,8 @@ export default function DemandPage() {
 function DemandPageInner() {
   // Deep-linkable sub-tab via `?tab=certified` — bookmarks, share-links,
   // and the browser back button all behave correctly.
-  const [tab, setTab] = useUrlState<SubTab>("tab", "destination", (raw) =>
-    (SUB_TABS as string[]).includes(raw) ? (raw as SubTab) : "destination",
+  const [tab, setTab] = useUrlState<SubTab>("tab", "certified", (raw) =>
+    (SUB_TABS as string[]).includes(raw) ? (raw as SubTab) : "certified",
   );
 
   return (

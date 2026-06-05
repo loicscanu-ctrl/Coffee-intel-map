@@ -1607,14 +1607,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
 
                     {/* Poison breakdown — % + per-criterion contribution. */}
                     {p.poison.pct > 0 && (
-                      <div className="bg-rose-950/30 border border-rose-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
-                        <div className="flex items-center justify-between text-rose-300 font-bold">
+                      <div className="bg-purple-950/30 border border-purple-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
+                        <div className="flex items-center justify-between text-purple-300 font-bold">
                           <span>☣ poison</span>
                           <span className="font-mono">
                             {Math.round(p.poison.pct * 100)}% · {fmtU(p.poison.total, p.unit)}
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-rose-300/80 text-[8.5px]">
+                        <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-purple-300/80 text-[8.5px]">
                           {p.poison.deadPort > 0 && (
                             <span title="London / US warehouse">
                               dead-port {Math.round((p.poison.deadPort / p.current) * 100)}%

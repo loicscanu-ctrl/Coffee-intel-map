@@ -1385,23 +1385,36 @@ function ArabicaPeriodTable({
 
 // ── Arabica column ────────────────────────────────────────────────────────────
 
-function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
+function ArabicaColumn({ d, unit, cutoff, sinceLabel }: { d: ArabicaJson | null; unit: Unit; cutoff: Date; sinceLabel: string }) {
   const live = !!d && d.snapshots.length > 0;
   const latestSnap = d?.snapshots.at(-1) || null;
-  const prevSnap = d?.snapshots.at(-2) || null;
 
-  // "Graded today" = everything that went through grading (passed + failed).
-  // "Passed grading today" = the tenderable share. "Decertified today" =
-  // certified bags that left the pool day-over-day (prev + passed − current,
-  // floored at 0 — a net increase means stock arrived, not decertified).
-  const gradedTodayBags = latestSnap ? latestSnap.passed_today_bags + latestSnap.failed_today_bags : null;
-  const decertTodayBags = (latestSnap && prevSnap)
-    ? Math.max(0, prevSnap.total_bags + latestSnap.passed_today_bags - latestSnap.total_bags) : null;
+  // Flow metrics aggregate over the selected "Since" window (cutoff → latest):
+  // "Graded" = everything that went through grading (passed + failed);
+  // "Passed grading" = the tenderable share; "Decertified" = certified bags
+  // that left the pool day-over-day (prev + passed − current, floored at 0 —
+  // a net increase means stock arrived, not decertified), summed across the
+  // window so a single tile matches the system flow below.
+  const snaps = d?.snapshots ?? [];
+  const cutT = cutoff.getTime();
+  const dayT = (ds: string) => {
+    const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, dd).getTime();
+  };
+  let gradedBags = 0, passedBags = 0, decertBags = 0;
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    if (dayT(s.date) < cutT) continue;
+    gradedBags += (s.passed_today_bags ?? 0) + (s.failed_today_bags ?? 0);
+    passedBags += s.passed_today_bags ?? 0;
+    const prev = snaps[i - 1];
+    if (prev) decertBags += Math.max(0, prev.total_bags + (s.passed_today_bags ?? 0) - s.total_bags);
+  }
 
   const totalDisplay  = latestSnap ? fmt(fromBags(latestSnap.total_bags, unit), unit) + " " + unitSuffix(unit) : "—";
-  const gradedDisplay = gradedTodayBags != null ? fmt(fromBags(gradedTodayBags, unit), unit) + " " + unitSuffix(unit) : "—";
-  const passedDisplay = latestSnap ? fmt(fromBags(latestSnap.passed_today_bags, unit), unit) + " " + unitSuffix(unit) : "—";
-  const decertDisplay = decertTodayBags != null ? fmt(fromBags(decertTodayBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = live ? fmt(fromBags(gradedBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = live ? fmt(fromBags(passedBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = live ? fmt(fromBags(decertBags, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -1417,10 +1430,10 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified"      value={totalDisplay} />
-        <Stat label="Graded today"         value={gradedDisplay} />
-        <Stat label="Passed grading today" value={passedDisplay} />
-        <Stat label="Decertified today"    value={decertDisplay} />
+        <Stat label="Total certified"          value={totalDisplay} />
+        <Stat label={`Graded since ${sinceLabel}`}         value={gradedDisplay} />
+        <Stat label={`Passed grading since ${sinceLabel}`} value={passedDisplay} />
+        <Stat label={`Decertified since ${sinceLabel}`}    value={decertDisplay} />
       </div>
 
       {d?.errors && d.errors.length > 0 && (
@@ -2225,30 +2238,50 @@ function RobustaPeriodTable({
 }
 // ── Robusta column ────────────────────────────────────────────────────────────
 
-function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
+function RobustaColumn({ d, unit, cutoff, sinceLabel }: { d: RobustaJson | null; unit: Unit; cutoff: Date; sinceLabel: string }) {
   const stock = d?.latest_detail?.stock_report || null;
   const live = !!d && (!!stock || (d.snapshots?.length || 0) > 0);
   const grand = stock?.grand_total;
-  const latestSnap = d?.snapshots?.at(-1) || null;
-  const prevSnap = d?.snapshots?.at(-2) || null;
 
-  // Today's grading from the grading event on the latest snapshot's date.
-  // Graded = all lots graded; Passed = tenderable share; Decertified =
-  // certified lots that left day-over-day (prev + passed − current, floored).
+  // Flow metrics aggregate over the selected "Since" window (cutoff → latest).
+  // Per-day grading comes from the grading event on each snapshot's date
+  // (fallback to the snapshot's own lots_graded_today). Graded = all lots
+  // graded; Passed = tenderable share; Decertified = certified lots that left
+  // day-over-day (prev + passed − current, floored). Summing across the window
+  // keeps the tile in step with the system flow below.
   const ra = d?.recent_activity;
-  const todaySum = (ra?.gradings || []).find(g => g.date === latestSnap?.date)?.summary;
-  const gradedTodayLots = todaySum?.lots_graded_today ?? latestSnap?.lots_graded_today ?? null;
-  const passedTodayLots = todaySum?.tenderable_today
-    ?? (gradedTodayLots != null && todaySum?.non_tenderable_today != null
-          ? gradedTodayLots - (todaySum?.non_tenderable_today ?? 0)
-          : (gradedTodayLots === 0 ? 0 : null));
-  const decertTodayLots = (latestSnap && prevSnap && passedTodayLots != null)
-    ? Math.max(0, prevSnap.total_lots_certified + passedTodayLots - latestSnap.total_lots_certified) : null;
+  const sumByDate = new Map((ra?.gradings || []).map((g) => [g.date, g.summary]));
+  const snaps = d?.snapshots ?? [];
+  const cutT = cutoff.getTime();
+  const dayT = (ds: string) => {
+    const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, dd).getTime();
+  };
+  // Per-day (graded, passed) lots, generalising the single-day derivation.
+  const dayFlow = (date: string, snapGraded: number | null | undefined) => {
+    const sm = sumByDate.get(date);
+    const g = sm?.lots_graded_today ?? snapGraded ?? null;
+    const p = sm?.tenderable_today
+      ?? (g != null && sm?.non_tenderable_today != null
+            ? g - (sm.non_tenderable_today ?? 0)
+            : (g === 0 ? 0 : null));
+    return { g, p };
+  };
+  let gradedLots = 0, passedLots = 0, decertLots = 0;
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    if (dayT(s.date) < cutT) continue;
+    const { g, p } = dayFlow(s.date, s.lots_graded_today);
+    gradedLots += g ?? 0;
+    passedLots += p ?? 0;
+    const prev = snaps[i - 1];
+    if (prev) decertLots += Math.max(0, prev.total_lots_certified + (p ?? 0) - s.total_lots_certified);
+  }
 
   const totalDisplay  = grand ? fmt(fromLots(grand.with_val_cert, unit), unit) + " " + unitSuffix(unit) : "—";
-  const gradedDisplay = gradedTodayLots != null ? fmt(fromLots(gradedTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
-  const passedDisplay = passedTodayLots != null ? fmt(fromLots(passedTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
-  const decertDisplay = decertTodayLots != null ? fmt(fromLots(decertTodayLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = live ? fmt(fromLots(gradedLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = live ? fmt(fromLots(passedLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = live ? fmt(fromLots(decertLots, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -2264,10 +2297,10 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified"      value={totalDisplay} />
-        <Stat label="Graded today"         value={gradedDisplay} />
-        <Stat label="Passed grading today" value={passedDisplay} />
-        <Stat label="Decertified today"    value={decertDisplay} />
+        <Stat label="Total certified"          value={totalDisplay} />
+        <Stat label={`Graded since ${sinceLabel}`}         value={gradedDisplay} />
+        <Stat label={`Passed grading since ${sinceLabel}`} value={passedDisplay} />
+        <Stat label={`Decertified since ${sinceLabel}`}    value={decertDisplay} />
       </div>
     </div>
   );
@@ -2434,11 +2467,19 @@ export default function CertifiedStocksPanel() {
         robustaImpliedOutflowLast={robusta?.monthly?.implied_outflow?.at(-1)?.month_end ?? null}
       />
 
-      {/* 1 · the 4 tiles per contract */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ArabicaColumn d={arabica} unit={unit} />
-        <RobustaColumn d={robusta} unit={unit} />
-      </div>
+      {/* 1 · the 4 tiles per contract. The flow metrics (Graded · Passed ·
+          Decertified) aggregate over the same window the "Since" selector
+          drives, so the tiles and the system flow below always agree. */}
+      {(() => {
+        const _wins = flowWindows(flowAnchor(arabica, robusta));
+        const _win = _wins.find((w) => w.key === flowDuration) ?? _wins[1];
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ArabicaColumn d={arabica} unit={unit} cutoff={_win.cutoff} sinceLabel={_win.label} />
+            <RobustaColumn d={robusta} unit={unit} cutoff={_win.cutoff} sinceLabel={_win.label} />
+          </div>
+        );
+      })()}
 
       {/* 2 · full-width system flow. The cast is needed because the panel's
           ArabicaJson.latest_detail carries the matrix-section shape while the
