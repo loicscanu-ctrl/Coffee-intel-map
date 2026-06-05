@@ -72,10 +72,11 @@ def _archive_two_recent_dates(archive: dict | None, market: str) -> tuple[str | 
 
 
 def _spread_with_change(archive: dict | None, market: str,
-                        front_sym: str | None, second_sym: str | None) -> tuple[int | None, int | None]:
+                        front_sym: str | None, second_sym: str | None) -> tuple[float | None, float | None]:
     """Returns (today's front-second spread, day-over-day delta in spread).
     Uses the per-contract archive so we can read yesterday's settlement
-    without needing a DB session."""
+    without needing a DB session. Returns floats so KC's 0.05-cent tick
+    precision survives — caller rounds for display."""
     if not archive or not front_sym or not second_sym:
         return None, None
     today_d, prev_d = _archive_two_recent_dates(archive, market)
@@ -99,10 +100,10 @@ def _spread_with_change(archive: dict | None, market: str,
     prev_s = _lookup(prev_cells,  second_sym)
     if cur_f is None or cur_s is None:
         return None, None
-    cur_spread = round(cur_f - cur_s)
+    cur_spread = cur_f - cur_s
     if prev_f is None or prev_s is None:
         return cur_spread, None
-    return cur_spread, cur_spread - round(prev_f - prev_s)
+    return cur_spread, cur_spread - (prev_f - prev_s)
 
 
 def _contract_letter(sym: str) -> str:
@@ -140,8 +141,9 @@ def _rc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -
         spread, spread_chg = _spread_with_change(archive, "robusta", front_sym, second["symbol"])
         if spread is not None:
             second_letter = _contract_letter(second["symbol"])
-            chg_part = f" ({spread_chg:+,d})" if spread_chg is not None else ""
-            parts.append(f"     {letter}-{second_letter} spread at {spread:,}{chg_part}")
+            # RC trades in whole-dollar/MT ticks → integer format is right here.
+            chg_part = f" ({round(spread_chg):+,d})" if spread_chg is not None else ""
+            parts.append(f"     {letter}-{second_letter} spread at {round(spread):,}{chg_part}")
     return "\n".join(parts), letter, front_last, front_sym
 
 
@@ -169,8 +171,10 @@ def _kc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -
         spread, spread_chg = _spread_with_change(archive, "arabica", front_sym, second["symbol"])
         if spread is not None:
             second_letter = _contract_letter(second["symbol"])
-            chg_part = f" ({spread_chg:+,d})" if spread_chg is not None else ""
-            parts.append(f"     {letter}-{second_letter} spread at {spread:,}{chg_part}")
+            # KC trades in 0.05-cent ticks, so spreads land on 2-decimal values
+            # (e.g. 4.75, not 6). Use 2dp here and let RC keep integer formatting.
+            chg_part = f" ({spread_chg:+,.2f})" if spread_chg is not None else ""
+            parts.append(f"     {letter}-{second_letter} spread at {spread:,.2f}{chg_part}")
     return "\n".join(parts)
 
 
@@ -267,10 +271,11 @@ def _physical_line(label: str, origin_key: str, fob_key: str,
                    archive: dict | None, rc_price_today: float | None,
                    front_letter: str | None, front_sym: str | None = None,
                    *, unit_to_usd_mt: float = 1000.0) -> str:
-    """One physical-price line: "VN FAQ 86,700 VND · N-64 +5 FOB"
+    """One physical-price line: "VN FAQ  86,700 VND · N-64 (+5) FOB"
 
-    `+5` is the day-over-day change in the at-port basis (today vs prior
-    physical-price entry — typically yesterday, but tolerates weekend gaps).
+    `(+5)` is the day-over-day change in the at-port basis (today vs prior
+    physical-price entry — typically yesterday, but tolerates weekend gaps),
+    shown in parens so it visually separates from the basis itself.
     "FOB" tags the line as a loadable-on-vessel parity figure, not raw
     farmgate.
     """
@@ -304,7 +309,7 @@ def _physical_line(label: str, origin_key: str, fob_key: str,
         prev_basis = _basis_for_date(prev["price"], fx_prev, rc_prev, fob, unit_to_usd_mt)
         if prev_basis is not None:
             delta = cur_basis - prev_basis
-            delta_part = f" {_sign(delta, 'd')}"
+            delta_part = f" ({_sign(delta, 'd')})"
 
     cur_local = f"{cur_price:,.0f} {currency_label}"
     return f"{label}  {cur_local} · {letter}{cur_basis:+d}{delta_part} FOB"
@@ -748,12 +753,14 @@ def _cert_arabica_section(doc: dict | None) -> str:
 
     lines = [f"<b>New York</b>: {report_date}"]
     if graded or failed:
+        # Only list top origins when ACTUAL grading happened today — that's
+        # when the origin attribution is meaningful (which countries supplied
+        # the bags that were graded). On a no-grading day, the list is just
+        # noise about what's already sitting in the warehouses.
         origin_str = f" · top origins {', '.join(origins)}" if origins else ""
         lines.append(f"Grading: {graded:,} bags graded, {failed:,} passed{origin_str}")
-    elif origins:
-        lines.append(f"Grading: no grading today · top origins {', '.join(origins)}")
     else:
-        lines.append("Grading: no grading activity reported")
+        lines.append("Grading: no grading today")
 
     if prev and prev.get("total_bags") is not None:
         delta = total - prev["total_bags"]
@@ -929,6 +936,11 @@ def build_brief_message(db=None) -> str:
     parts: list[str] = [f"☕ <b>Coffee Intel · {day_str}</b>", ""]
     parts.append(rc_line)
     parts.append(kc_line)
+    # Blank line between futures (RC/KC + their spread lines) and the
+    # physical block — visual break since the two groups read differently
+    # (futures = on-exchange, physical = farmgate-to-FOB basis).
+    if vn_line or br_line or ug_line:
+        parts.append("")
     if vn_line:
         parts.append(vn_line)
     if br_line:
