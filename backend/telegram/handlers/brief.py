@@ -126,10 +126,15 @@ def _rc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -
     front_last = front["last"]
     letter = _contract_letter(front_sym)
 
-    # Daily price change — from Acaphe live tape (truer than futures_chain
-    # which only has settlement).
-    change = None
-    if acaphe:
+    # Daily price change — from Barchart's settle delta (futures_chain.json
+    # already carries `chg` per contract = today's settle - yesterday's settle).
+    # That's the true closing-vs-closing tick. Acaphe was the previous source
+    # but it's an intraday Vietnamese feed whose last poll fires at 19:45 UTC,
+    # so a 03:09 UTC brief was reading a Thursday-late-afternoon snapshot
+    # instead of Thursday's actual close. Acaphe stays as a fallback in case
+    # Barchart hasn't published `chg` yet.
+    change = front.get("chg")
+    if change is None and acaphe:
         rob_live = acaphe.get("robusta") or []
         if rob_live:
             change = rob_live[0].get("change")
@@ -158,8 +163,10 @@ def _kc_section(chain: dict | None, acaphe: dict | None, archive: dict | None) -
     front_last = front["last"]
     letter = _contract_letter(front_sym)
 
-    change = None
-    if acaphe:
+    # Daily price change — Barchart settle delta from futures_chain.json.
+    # See _rc_section for the Acaphe-vs-Barchart timing rationale.
+    change = front.get("chg")
+    if change is None and acaphe:
         arab_live = acaphe.get("arabica") or []
         if arab_live:
             change = arab_live[0].get("change")
