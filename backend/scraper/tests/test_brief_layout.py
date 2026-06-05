@@ -176,14 +176,14 @@ def test_vn_mtd_rain_wording_when_seed_available(tmp_path, monkeypatch):
 
 
 def test_brief_physical_includes_basis_and_delta(fixture_data_dir):
-    """The VN line shows N±basis followed by a +/- delta and FOB tag —
-    the spec's locked format."""
+    """The VN line shows N±basis followed by a parenthesised +/- delta and FOB
+    tag — the spec's locked format."""
     from telegram.handlers.brief import build_brief_message
     out = build_brief_message()
-    # Pattern: "VN FAQ  86,700 VND · N-XX YY FOB" where YY can be +/- and is
+    # Pattern: "VN FAQ  86,700 VND · N-XX (+YY) FOB" where YY can be +/- and is
     # the basis delta vs yesterday.
     import re as _re
-    m = _re.search(r"VN FAQ\s+86,700 VND · N[+-]\d+\s+[+-]?\d+\s+FOB", out)
+    m = _re.search(r"VN FAQ\s+86,700 VND · N[+-]\d+ \([+-]?\d+\) FOB", out)
     assert m is not None, f"VN FAQ line wrong shape: {out!r}"
 
 
