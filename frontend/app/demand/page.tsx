@@ -10,16 +10,18 @@ import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
+import SpotPanel from "@/components/demand/SpotPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "certified" | "destination" | "demand" | "listed" | "test";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "certified",   label: "Certified stocks" },
   { id: "destination", label: "Destination stocks" },
+  { id: "spot",        label: "Spot" },
   { id: "demand",      label: "Consumption" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
@@ -51,7 +53,7 @@ function DemandPageInner() {
     <div className="flex flex-col h-full overflow-y-auto">
       <PageHeader
         title="Demand"
-        subtitle="Certified stocks · Destination stocks · Consumption · Listed companies"
+        subtitle="Certified stocks · Destination stocks · Spot offers · Consumption · Listed companies"
         healthKeys={["ecf", "psd_coffee", "ajca", "population"]}
       />
 
@@ -87,6 +89,12 @@ function DemandPageInner() {
           {/* AJCA (Japan) lives at the bottom of Destination stocks */}
           <Section><AjcaPanel /></Section>
         </>
+      )}
+
+      {tab === "spot" && (
+        <Section>
+          <SpotPanel />
+        </Section>
       )}
 
       {tab === "demand" && (
