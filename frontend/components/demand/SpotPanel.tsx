@@ -36,7 +36,7 @@ export default function SpotPanel() {
       }).catch(() => {});
   }, []);
 
-  const rows = d?.rows ?? [];
+  const rows = useMemo(() => d?.rows ?? [], [d]);
 
   // Per-type totals in the active unit.
   const totals = useMemo(() => {
@@ -254,7 +254,7 @@ function VolumeOverTime({ snaps, unit, totalsNow, asOf }: {
         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
         <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#94a3b8" }} />
         <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} width={48} />
-        <Tooltip contentStyle={TT} formatter={(v: number) => `${fmtVol(v, unit)} ${unitLabel(unit)}`} />
+        <Tooltip contentStyle={TT} formatter={(v) => `${fmtVol(Number(v), unit)} ${unitLabel(unit)}`} />
         <Area type="monotone" dataKey="Robusta" stackId="1" stroke={TYPE_COLORS.Robusta} fill={TYPE_COLORS.Robusta} fillOpacity={0.55} />
         <Area type="monotone" dataKey="Arabica" stackId="1" stroke={TYPE_COLORS.Arabica} fill={TYPE_COLORS.Arabica} fillOpacity={0.55} />
       </AreaChart>
@@ -561,7 +561,7 @@ function CropYearFreshness({ rows, unit }: { rows: SpotRow[]; unit: Unit }) {
         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
         <XAxis dataKey="label" tick={{ fontSize: 9, fill: "#94a3b8" }} interval={0} angle={-30} textAnchor="end" height={50} />
         <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} width={48} />
-        <Tooltip contentStyle={TT} formatter={(v: number) => `${fmtVol(v, unit)} ${unitLabel(unit)}`} />
+        <Tooltip contentStyle={TT} formatter={(v) => `${fmtVol(Number(v), unit)} ${unitLabel(unit)}`} />
         <Bar dataKey="vol">{data.map((d, i) => <Cell key={i} fill={d.color} />)}</Bar>
       </BarChart>
     </ResponsiveContainer>
