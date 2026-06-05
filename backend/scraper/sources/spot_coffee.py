@@ -36,6 +36,7 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urljoin
@@ -427,6 +428,78 @@ def _postback(session: requests.Session, soup, target: str, argument: str = "") 
     return BeautifulSoup(r.text, "html.parser")
 
 
+# The grid hard-caps at 200 rendered rows. The only way past it is to narrow
+# with the per-column filters. Activating the Origin filter renders a repeater
+# of one LinkButton per distinct origin (rep_Origin$ctlNN$lb_Origin); each
+# origin's slice is well under the cap, so iterating origins recovers the full
+# list per type.
+_ORIGIN_ACTIVATE = "ctl00$ContentPlaceHolder1$hb_origin_active"
+_ORIGIN_TARGET = "lb_Origin"
+_GRID_CAP = 200
+
+
+def _origin_filters(soup) -> list[str]:
+    """Distinct origin-filter postback targets in the (origin-activated) page."""
+    out: list[str] = []
+    for tgt, _arg in set(_PAGE_RE.findall(str(soup))):
+        if "rep_Origin" in tgt and _ORIGIN_TARGET in tgt:
+            out.append(tgt)
+    return sorted(out)  # ctl01..ctlNN are zero-padded → lexical sort = order
+
+
+def _collect_type(session: requests.Session, tsoup, label: str) -> tuple[list[str], list[dict]]:
+    """All offers for one type page, recovered by iterating the Origin filter.
+
+    De-dupes by full-row identity so an origin click that silently fails to
+    narrow (returning the capped grid again) can't inflate the result, and so
+    the capped default grid can be merged in as a safety net for any origin the
+    repeater might omit.
+    """
+    headers: list[str] = []
+    seen: set[tuple] = set()
+    rows_out: list[dict] = []
+
+    def _absorb(rws: list[dict]) -> int:
+        added = 0
+        for r in rws:
+            key = tuple(sorted(r.items()))
+            if key not in seen:
+                seen.add(key)
+                rows_out.append(r)
+                added += 1
+        return added
+
+    # Safety net: the default (capped) grid for this type.
+    base = _find_main_table(tsoup)
+    if base is not None:
+        headers, rws = _parse_table(base)
+        _absorb(rws)
+
+    osoup = _postback(session, tsoup, _ORIGIN_ACTIVATE)
+    origins = _origin_filters(osoup) if osoup is not None else []
+    print(f"[spot] {label or 'default'}: {len(origins)} origin filters")
+    if osoup is None or not origins:
+        print(f"[spot] WARN: no origin filters for {label!r} — using capped grid only", file=sys.stderr)
+        return headers, rows_out
+
+    for i, otgt in enumerate(origins, 1):
+        fsoup = _postback(session, osoup, otgt)
+        if fsoup is None:
+            continue
+        tbl = _find_main_table(fsoup)
+        if tbl is None:
+            continue
+        h, rws = _parse_table(tbl)
+        if not headers:
+            headers = h
+        _absorb(rws)
+        if len(rws) >= _GRID_CAP:
+            print(f"[spot] WARN: {label} origin #{i} hit the {_GRID_CAP}-row cap "
+                  f"— that origin may need a sub-filter", file=sys.stderr)
+        time.sleep(0.25)  # be polite to the small Azure app
+    return headers, rows_out
+
+
 def full() -> int:
     session = requests.Session()
     resp = _attempt_login(session, verbose=True)
@@ -438,12 +511,8 @@ def full() -> int:
     by_type: dict[str, int] = {}
 
     if not tabs:
-        # No type tabs — single table covers everything.
-        table = _find_main_table(soup0)
-        if table is None:
-            print("[spot] ERROR: no table found on post-login page — not writing.", file=sys.stderr)
-            return 1
-        headers, rows = _parse_table(table)
+        # No type tabs — one type, still origin-partition past the cap.
+        headers, rows = _collect_type(session, soup0, "")
         all_rows = [{"Type": "", **r} for r in rows]
         by_type[""] = len(rows)
     else:
@@ -453,17 +522,13 @@ def full() -> int:
             if tsoup is None:
                 print(f"[spot] WARN: postback for {label!r} returned nothing — skipping", file=sys.stderr)
                 continue
-            table = _find_main_table(tsoup)
-            if table is None:
-                print(f"[spot] WARN: no table for {label!r} — skipping", file=sys.stderr)
-                continue
-            h, rows = _parse_table(table)
+            h, rows = _collect_type(session, tsoup, label)
             if not headers:
                 headers = h
             for r in rows:
                 all_rows.append({"Type": label, **r})
             by_type[label] = len(rows)
-            print(f"[spot] type {label!r}: {len(rows)} rows")
+            print(f"[spot] type {label!r}: {len(rows)} unique rows")
 
     if not all_rows:
         print("[spot] ERROR: parsed 0 rows across all tabs — not writing.", file=sys.stderr)
