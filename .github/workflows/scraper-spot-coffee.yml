@@ -68,12 +68,13 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BR="$(git rev-parse --abbrev-ref HEAD)"
           git add frontend/public/data/spot_coffee.json
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: update spot_coffee.json [skip ci]" \
-                && git pull --rebase --autostash --strategy-option=theirs origin main \
-                && git push)
+                && git pull --rebase --autostash --strategy-option=theirs origin "$BR" \
+                && git push origin HEAD:"$BR")
 
       - name: Notify on failure
         if: failure()
