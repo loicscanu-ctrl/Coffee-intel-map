@@ -255,6 +255,40 @@ def probe() -> int:
     for r in rows[:3]:
         print(f"        {json.dumps(r, ensure_ascii=False)}")
     _pagination_report(soup)
+
+    # EXPERIMENT: activate the Origin filter via postback and dump what the
+    # server returns — reveals the origin option list + how the grid narrows
+    # (the only way past the 200-row cap).
+    for label, target in [
+        ("Origin", "ctl00$ContentPlaceHolder1$hb_origin_active"),
+        ("Port", "ctl00$ContentPlaceHolder1$hb_port_active"),
+    ]:
+        print(f"[spot] === EXPERIMENT: activate {label} filter ({target}) ===")
+        ex = _postback(session, soup, target)
+        if ex is None:
+            print("[spot] (postback returned nothing)")
+            continue
+        etbl = _find_main_table(ex)
+        erows = _parse_table(etbl)[1] if etbl is not None else []
+        print(f"[spot] after {label}-activate: table rows = {len(erows)}")
+        new_pbs = sorted(set(_PAGE_RE.findall(str(ex))))
+        print(f"[spot] postback targets now ({len(new_pbs)}):")
+        for tgt, arg in new_pbs[:80]:
+            print(f"        target={tgt!r} arg={arg!r}")
+        eform = ex.find("form")
+        if eform is not None:
+            efs = BeautifulSoup(str(eform), "html.parser")
+            for tbl in efs.find_all("table"):
+                tbl.decompose()
+            for sel in efs.find_all("select"):
+                opts = [(o.get("value"), _cell_text(o)) for o in sel.find_all("option")]
+                print(f"        select name={sel.get('name')!r} options={opts[:60]}")
+            lis = [_cell_text(li) for li in efs.find_all("li") if _cell_text(li)]
+            if lis:
+                print(f"        <li> items ({len(lis)}): {lis[:60]}")
+            raw = str(efs)
+            print(f"[spot] {label} filter raw HTML ({len(raw)} chars, first 4000):")
+            print(raw[:4000])
     return 0
 
 
