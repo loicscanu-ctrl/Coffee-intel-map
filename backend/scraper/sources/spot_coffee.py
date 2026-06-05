@@ -50,6 +50,9 @@ except ImportError:  # pragma: no cover - bs4 is in requirements
 
 _BASE = "https://attespotcoffee.azurewebsites.net/"
 _OUT = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "spot_coffee.json"
+_HIST_OUT = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "spot_coffee_history.json"
+_KG_PER_BAG = 60
+_HIST_KEEP = 80  # ~18 months of weekly snapshots
 
 _HEADERS = {
     "User-Agent": (
@@ -581,7 +584,130 @@ def full() -> int:
     _OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[spot] wrote {_OUT.relative_to(Path(__file__).resolve().parents[3])} "
           f"— {len(all_rows)} rows ({by_type}), {len(headers)} columns")
+    _update_history(all_rows, payload["as_of"])
     return 0
+
+
+# ── history / week-on-week ────────────────────────────────────────────────────
+# Each full run appends a dated snapshot to spot_coffee_history.json so the
+# panel can chart Arabica/Robusta offered volume over time and show a
+# week-on-week "volume in / volume out" tile. Offers carry no stable id, so an
+# offer's identity is its full row — a changed price counts as one offer out +
+# one in, which is the right semantics for "what moved this week".
+
+def _num(s: str) -> float:
+    """Parse a European-formatted number ('1.234,50' / '92,00' / '700')."""
+    t = (s or "").strip()
+    if not t:
+        return 0.0
+    t = t.replace(".", "").replace(",", ".") if ("," in t) else t.replace(",", "")
+    try:
+        return float(t)
+    except ValueError:
+        return 0.0
+
+
+def _offer_tons(r: dict) -> float:
+    """Offer volume in metric tonnes (Tons column, else Bags × 60 kg)."""
+    t = _num(r.get("Tons", ""))
+    if t:
+        return t
+    return _num(r.get("Bags", "")) * _KG_PER_BAG / 1000.0
+
+
+_KEY_FIELDS = ["Type", "Origin", "Quality", "Quality cont.", "Crop", "Certification",
+               "add. Information", "Port", "Warehouse", "Terms", "Price", "Bags", "Tons"]
+
+
+def _offer_key(r: dict) -> str:
+    return "|".join((r.get(k, "") or "").strip() for k in _KEY_FIELDS)
+
+
+def _snapshot(rows: list[dict], date: str) -> dict:
+    """Aggregate one run into a history snapshot (+ per-offer keys for diffing)."""
+    tons: dict[str, float] = {}
+    bags: dict[str, float] = {}
+    offers: dict[str, int] = {}
+    keys: dict[str, dict] = {}
+    for r in rows:
+        ty = (r.get("Type") or "").strip() or "Unknown"
+        v = _offer_tons(r)
+        tons[ty] = tons.get(ty, 0.0) + v
+        bags[ty] = bags.get(ty, 0.0) + v * 1000.0 / _KG_PER_BAG
+        offers[ty] = offers.get(ty, 0) + 1
+        keys[_offer_key(r)] = {"type": ty, "tons": round(v, 3)}
+    return {
+        "date": date,
+        "n_offers": len(rows),
+        "offers_by_type": offers,
+        "tons_by_type": {k: round(v, 1) for k, v in tons.items()},
+        "tons_total": round(sum(tons.values()), 1),
+        "bags_by_type": {k: round(v) for k, v in bags.items()},
+        "bags_total": round(sum(bags.values())),
+        "_keys": keys,  # stripped from older snapshots; used only for the next WoW diff
+    }
+
+
+def _wow(curr: dict, prev: dict | None) -> dict | None:
+    """Volume that entered / left between the previous snapshot and this one."""
+    if not prev or not prev.get("_keys"):
+        return None
+    pk, ck = prev["_keys"], curr["_keys"]
+    in_keys = [k for k in ck if k not in pk]
+    out_keys = [k for k in pk if k not in ck]
+
+    def _sum(keys, src):
+        by: dict[str, float] = {}
+        for k in keys:
+            e = src[k]
+            by[e["type"]] = by.get(e["type"], 0.0) + e["tons"]
+        return by, round(sum(by.values()), 1)
+
+    in_by, in_t = _sum(in_keys, ck)
+    out_by, out_t = _sum(out_keys, pk)
+    return {
+        "prev_date": prev["date"],
+        "in_offers": len(in_keys),
+        "out_offers": len(out_keys),
+        "in_tons": in_t,
+        "out_tons": out_t,
+        "net_tons": round(in_t - out_t, 1),
+        "in_tons_by_type": {k: round(v, 1) for k, v in in_by.items()},
+        "out_tons_by_type": {k: round(v, 1) for k, v in out_by.items()},
+    }
+
+
+def _update_history(rows: list[dict], date: str) -> None:
+    history: dict = {"snapshots": []}
+    if _HIST_OUT.exists():
+        try:
+            history = json.loads(_HIST_OUT.read_text(encoding="utf-8"))
+        except Exception as e:  # noqa: BLE001
+            print(f"[spot] history read failed ({e}) — starting fresh", file=sys.stderr)
+            history = {"snapshots": []}
+
+    snaps: list[dict] = [s for s in history.get("snapshots", []) if s.get("date") != date]
+    prev = snaps[-1] if snaps else None
+
+    snap = _snapshot(rows, date)
+    snap["wow"] = _wow(snap, prev)
+
+    # Keep per-offer keys only on the newest snapshot (for next run's diff).
+    if prev is not None:
+        prev.pop("_keys", None)
+    snaps.append(snap)
+    snaps = snaps[-_HIST_KEEP:]
+
+    out = {
+        "generated_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": _BASE,
+        "snapshots": snaps,
+    }
+    _HIST_OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    w = snap["wow"]
+    wtxt = (f"WoW +{w['in_tons']}/-{w['out_tons']} t (net {w['net_tons']})" if w else "WoW: n/a (first snapshot)")
+    print(f"[spot] history: {len(snaps)} snapshots, latest {date} "
+          f"{snap['tons_total']} t — {wtxt}")
 
 
 if __name__ == "__main__":

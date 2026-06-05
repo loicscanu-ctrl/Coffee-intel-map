@@ -69,7 +69,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           BR="$(git rev-parse --abbrev-ref HEAD)"
-          git add frontend/public/data/spot_coffee.json
+          git add frontend/public/data/spot_coffee.json frontend/public/data/spot_coffee_history.json
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: update spot_coffee.json [skip ci]" \
