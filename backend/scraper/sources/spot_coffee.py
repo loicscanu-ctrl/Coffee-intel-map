@@ -302,35 +302,154 @@ def _pagination_report(soup) -> None:
 
     # Query-string knobs sometimes expose page size (?pageSize=, ?ps=).
     print(f"[spot] final URL: {soup.find('base')['href'] if soup.find('base') else _BASE}")
+
+    # Every __doPostBack target anywhere in the raw HTML (origin/quality/port
+    # filter links live here too, not only in visible <a> tags).
+    pbs = sorted(set(_PAGE_RE.findall(str(soup))))
+    print(f"[spot] ALL __doPostBack targets ({len(pbs)}):")
+    for tgt, arg in pbs[:60]:
+        print(f"        target={tgt!r} arg={arg!r}")
+
+    # Filter controls = the form minus the big offers table. Dump named
+    # inputs / selects / filter links + the surrounding text so the filter
+    # mechanism (the only way past the 200-row cap) is fully visible.
+    form = soup.find("form")
+    if form is not None:
+        fsoup = BeautifulSoup(str(form), "html.parser")
+        for tbl in fsoup.find_all("table"):
+            tbl.decompose()
+        print("[spot] --- filter controls (form minus offers table) ---")
+        for inp in fsoup.find_all("input"):
+            ty = (inp.get("type") or "text").lower()
+            if ty in ("hidden", "submit", "image"):
+                continue
+            print(f"        input type={ty} name={inp.get('name')!r} value={inp.get('value')!r}")
+        for sel in fsoup.find_all("select"):
+            opts = [(o.get("value"), _cell_text(o)) for o in sel.find_all("option")]
+            print(f"        select name={sel.get('name')!r} options={opts[:30]}")
+        for a in fsoup.find_all("a"):
+            txt = _cell_text(a)
+            if txt:
+                print(f"        link {txt!r} href={(a.get('href') or '')[:90]!r}")
+        ftext = fsoup.get_text(" ", strip=True)
+        print(f"[spot] non-table form text ({len(ftext)} chars): {ftext[:1600]!r}")
     print("[spot] --- end pagination report ---")
+
+
+# The offer list is split across LinkButton "type" tabs (Arabica / Robusta),
+# each an ASP.NET __doPostBack target ending in "lb_Type". The default page
+# only shows one type — the other must be fetched by posting back the tab.
+_TYPE_TARGET = "lb_Type"
+
+
+def _type_tabs(soup) -> list[tuple[str, str]]:
+    """Return [(label, postback_target)] for every Arabica/Robusta-style tab."""
+    out: list[tuple[str, str]] = []
+    for a in soup.find_all("a", href=True):
+        m = _PAGE_RE.search(a["href"])
+        if m and _TYPE_TARGET in m.group(1):
+            label = _cell_text(a) or m.group(1)
+            if (label, m.group(1)) not in out:
+                out.append((label, m.group(1)))
+    return out
+
+
+def _postback(session: requests.Session, soup, target: str, argument: str = "") -> object | None:
+    """Replay an ASP.NET __doPostBack(target, argument) from the given page.
+
+    Re-submits the page's single server form with every current input value
+    (carrying __VIEWSTATE / __EVENTVALIDATION etc.) plus the event target, so
+    the server re-renders with the requested tab active. Returns the parsed
+    response soup, or None on failure.
+    """
+    form = soup.find("form")
+    if form is None:
+        return None
+    action = urljoin(_BASE, form.get("action") or _BASE)
+    data: dict[str, str] = {}
+    for inp in form.find_all("input"):
+        name = inp.get("name")
+        if not name:
+            continue
+        itype = (inp.get("type") or "text").lower()
+        if itype in ("submit", "button", "image"):
+            continue  # don't emulate a click on these
+        if itype in ("checkbox", "radio") and not inp.has_attr("checked"):
+            continue
+        data[name] = inp.get("value") or ""
+    for sel in form.find_all("select"):
+        name = sel.get("name")
+        if not name:
+            continue
+        opt = sel.find("option", selected=True) or sel.find("option")
+        data[name] = (opt.get("value") if opt and opt.has_attr("value") else _cell_text(opt) if opt else "")
+    data["__EVENTTARGET"] = target
+    data["__EVENTARGUMENT"] = argument
+    try:
+        r = session.post(action, data=data, headers={**_HEADERS, "Referer": _BASE}, timeout=30)
+    except Exception as e:  # noqa: BLE001
+        print(f"[spot] postback {target} failed: {e}", file=sys.stderr)
+        return None
+    return BeautifulSoup(r.text, "html.parser")
 
 
 def full() -> int:
     session = requests.Session()
     resp = _attempt_login(session, verbose=True)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    table = _find_main_table(soup)
-    if table is None:
-        print("[spot] ERROR: no table found on post-login page — not writing.", file=sys.stderr)
-        return 1
-    headers, rows = _parse_table(table)
-    if not rows:
-        print("[spot] ERROR: table parsed to 0 rows — not writing.", file=sys.stderr)
+    soup0 = BeautifulSoup(resp.text, "html.parser")
+
+    tabs = _type_tabs(soup0)
+    headers: list[str] = []
+    all_rows: list[dict] = []
+    by_type: dict[str, int] = {}
+
+    if not tabs:
+        # No type tabs — single table covers everything.
+        table = _find_main_table(soup0)
+        if table is None:
+            print("[spot] ERROR: no table found on post-login page — not writing.", file=sys.stderr)
+            return 1
+        headers, rows = _parse_table(table)
+        all_rows = [{"Type": "", **r} for r in rows]
+        by_type[""] = len(rows)
+    else:
+        print(f"[spot] type tabs: {[t[0] for t in tabs]}")
+        for label, target in tabs:
+            tsoup = _postback(session, soup0, target)
+            if tsoup is None:
+                print(f"[spot] WARN: postback for {label!r} returned nothing — skipping", file=sys.stderr)
+                continue
+            table = _find_main_table(tsoup)
+            if table is None:
+                print(f"[spot] WARN: no table for {label!r} — skipping", file=sys.stderr)
+                continue
+            h, rows = _parse_table(table)
+            if not headers:
+                headers = h
+            for r in rows:
+                all_rows.append({"Type": label, **r})
+            by_type[label] = len(rows)
+            print(f"[spot] type {label!r}: {len(rows)} rows")
+
+    if not all_rows:
+        print("[spot] ERROR: parsed 0 rows across all tabs — not writing.", file=sys.stderr)
         return 1
 
+    headers = ["Type", *headers]
     now = datetime.now(UTC)
     payload = {
         "as_of": now.date().isoformat(),
         "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source_url": _BASE,
         "headers": headers,
-        "rows": rows,
-        "row_count": len(rows),
+        "by_type": by_type,
+        "rows": all_rows,
+        "row_count": len(all_rows),
     }
     _OUT.parent.mkdir(parents=True, exist_ok=True)
     _OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[spot] wrote {_OUT.relative_to(Path(__file__).resolve().parents[3])} "
-          f"— {len(rows)} rows, {len(headers)} columns")
+          f"— {len(all_rows)} rows ({by_type}), {len(headers)} columns")
     return 0
 
 
