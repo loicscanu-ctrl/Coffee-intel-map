@@ -529,28 +529,32 @@ def _collect_type(session: requests.Session, tsoup, label: str) -> tuple[list[st
 
 
 def full() -> int:
-    session = requests.Session()
-    resp = _attempt_login(session, verbose=True)
-    soup0 = BeautifulSoup(resp.text, "html.parser")
-
+    # One login just to discover the type tabs.
+    disc = requests.Session()
+    soup0 = BeautifulSoup(_attempt_login(disc, verbose=True).text, "html.parser")
     tabs = _type_tabs(soup0)
+
     headers: list[str] = []
     all_rows: list[dict] = []
     by_type: dict[str, int] = {}
 
     if not tabs:
-        # No type tabs — one type, still origin-partition past the cap.
-        headers, rows = _collect_type(session, soup0, "")
+        headers, rows = _collect_type(disc, soup0, "")
         all_rows = [{"Type": "", **r} for r in rows]
         by_type[""] = len(rows)
     else:
         print(f"[spot] type tabs: {[t[0] for t in tabs]}")
         for label, target in tabs:
-            tsoup = _postback(session, soup0, target)
+            # Fresh session per type — the ASP.NET app keeps the active filter
+            # (e.g. the last origin search) in SERVER-SIDE session state, so a
+            # shared session would carry one type's origin filter into the next.
+            s = requests.Session()
+            fsoup = BeautifulSoup(_attempt_login(s).text, "html.parser")
+            tsoup = _postback(s, fsoup, target)
             if tsoup is None:
                 print(f"[spot] WARN: postback for {label!r} returned nothing — skipping", file=sys.stderr)
                 continue
-            h, rows = _collect_type(session, tsoup, label)
+            h, rows = _collect_type(s, tsoup, label)
             if not headers:
                 headers = h
             for r in rows:
