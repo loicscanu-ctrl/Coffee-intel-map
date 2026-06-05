@@ -1,6 +1,7 @@
 "use client";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
+import OIFndChart from "@/components/futures/OIFndChart";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
@@ -620,9 +621,19 @@ function FuturesPageInner() {
             )}
             {robustaChain && <ChainTable market="robusta" data={robustaChain} />}
           </div>
-          {/* OI 7-day tracking (NY & LDN OIHistoryTable + OIFndChart) was
-              here pre-2026-05; moved to /cot section 2 so the positioning
-              context lives next to the COT signal output. */}
+          {/* OI Evolution to FND — bottom of the Exchange tab. NY + LDN
+              side-by-side; each chart shows OI buildup over the trading days
+              leading into First Notice Day, which is the operational view
+              traders use for roll timing. */}
+          <div className="border-t border-slate-800 pt-4 mt-4">
+            <h2 className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-3">
+              OI Evolution to FND
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <OIFndChart market="arabica" />
+              <OIFndChart market="robusta" />
+            </div>
+          </div>
         </>
       )}
 

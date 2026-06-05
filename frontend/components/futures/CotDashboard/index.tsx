@@ -22,7 +22,6 @@ import Step6CycleLocation from "./Step6CycleLocation";
 import Step7Report from "./Step7Report";
 import Step8Analysis from "./Step8Analysis";
 import OIHistoryTable from "@/components/futures/OIHistoryTable";
-import OIFndChart from "@/components/futures/OIFndChart";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
@@ -199,10 +198,9 @@ export default function CotDashboard() {
             <OIHistoryTable market="robusta" />
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <OIFndChart market="arabica" />
-          <OIFndChart market="robusta" />
-        </div>
+        {/* OIFndChart (OI Evolution to FND) moved to /futures Exchange tab
+            (bottom) — the buildup-into-FND view is operational roll context,
+            not COT positioning context. */}
       </div>
 
       <div id="cot-section-2"><CotHeatmap data={data} /></div>
