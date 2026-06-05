@@ -257,40 +257,62 @@ def probe() -> int:
         print(f"        {json.dumps(r, ensure_ascii=False)}")
     _pagination_report(soup)
 
-    # EXPERIMENT: activate the Origin filter via postback and dump what the
-    # server returns — reveals the origin option list + how the grid narrows
-    # (the only way past the 200-row cap).
-    for label, target in [
-        ("Origin", "ctl00$ContentPlaceHolder1$hb_origin_active"),
-        ("Port", "ctl00$ContentPlaceHolder1$hb_port_active"),
-    ]:
-        print(f"[spot] === EXPERIMENT: activate {label} filter ({target}) ===")
-        ex = _postback(session, soup, target)
-        if ex is None:
-            print("[spot] (postback returned nothing)")
-            continue
-        etbl = _find_main_table(ex)
-        erows = _parse_table(etbl)[1] if etbl is not None else []
-        print(f"[spot] after {label}-activate: table rows = {len(erows)}")
-        new_pbs = sorted(set(_PAGE_RE.findall(str(ex))))
-        print(f"[spot] postback targets now ({len(new_pbs)}):")
-        for tgt, arg in new_pbs[:80]:
-            print(f"        target={tgt!r} arg={arg!r}")
-        eform = ex.find("form")
-        if eform is not None:
-            efs = BeautifulSoup(str(eform), "html.parser")
-            for tbl in efs.find_all("table"):
-                tbl.decompose()
-            for sel in efs.find_all("select"):
-                opts = [(o.get("value"), _cell_text(o)) for o in sel.find_all("option")]
-                print(f"        select name={sel.get('name')!r} options={opts[:60]}")
-            lis = [_cell_text(li) for li in efs.find_all("li") if _cell_text(li)]
-            if lis:
-                print(f"        <li> items ({len(lis)}): {lis[:60]}")
-            raw = str(efs)
-            print(f"[spot] {label} filter raw HTML ({len(raw)} chars, first 4000):")
-            print(raw[:4000])
+    _origin_filter_experiment(session, soup)
     return 0
+
+
+def _distinct_origins(rows: list[dict]) -> list[str]:
+    return sorted({(r.get("Origin") or "").strip() for r in rows if (r.get("Origin") or "").strip()})
+
+
+def _origin_filter_experiment(session, soup) -> None:
+    """Crack how the Origin filter actually narrows the grid. Tries, for one
+    mid-size origin, several activation strategies and reports the resulting
+    row count + distinct origins so the working recipe is obvious."""
+    print("[spot] === EXPERIMENT: origin filter mechanics ===")
+    osoup = _postback(session, soup, _ORIGIN_ACTIVATE)
+    if osoup is None:
+        print("[spot] origin-activate returned nothing")
+        return
+
+    # The origin LinkButtons carry the origin NAME as their link text.
+    origins: list[tuple[str, str]] = []  # (name, postback_target)
+    for a in osoup.find_all("a"):
+        aid = a.get("id") or ""
+        href = a.get("href") or ""
+        if "lb_Origin" in aid or "lb_Origin" in href:
+            m = _PAGE_RE.search(href)
+            origins.append((_cell_text(a), m.group(1) if m else ""))
+    print(f"[spot] origin options ({len(origins)}): {[o[0] for o in origins][:40]}")
+    if not origins:
+        return
+
+    # Pick a presumably-small origin to test narrowing (skip the first, often
+    # the biggest / 'all').
+    name, tgt = next((o for o in origins if o[0] and o[0].upper() not in ("", "ALL")), origins[0])
+    print(f"[spot] testing origin = {name!r} target={tgt!r}")
+    sel = "ctl00$ContentPlaceHolder1$txt_selected"
+    sea = "ctl00$ContentPlaceHolder1$txt_search"
+    apply_text = "ctl00$ContentPlaceHolder1$hb_origin_active_text"
+
+    trials = [
+        ("A: EVENTTARGET=lb_Origin only", tgt, None),
+        ("B: lb_Origin + txt_selected", tgt, {sel: name}),
+        ("C: hb_origin_active_text + txt_selected", apply_text, {sel: name}),
+        ("D: hb_origin_active_text + txt_search", apply_text, {sea: name}),
+        ("E: hb_origin_active_text + both", apply_text, {sel: name, sea: name}),
+    ]
+    for desc, target, extra in trials:
+        if not target:
+            continue
+        res = _postback(session, osoup, target, extra=extra)
+        if res is None:
+            print(f"[spot] {desc}: (no response)")
+            continue
+        tbl = _find_main_table(res)
+        rws = _parse_table(tbl)[1] if tbl is not None else []
+        print(f"[spot] {desc}: rows={len(rws)} origins={_distinct_origins(rws)[:8]}")
+    return
 
 
 _PAGE_RE = re.compile(r"__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)")
@@ -389,7 +411,8 @@ def _type_tabs(soup) -> list[tuple[str, str]]:
     return out
 
 
-def _postback(session: requests.Session, soup, target: str, argument: str = "") -> object | None:
+def _postback(session: requests.Session, soup, target: str, argument: str = "",
+              extra: dict[str, str] | None = None) -> object | None:
     """Replay an ASP.NET __doPostBack(target, argument) from the given page.
 
     Re-submits the page's single server form with every current input value
@@ -420,6 +443,8 @@ def _postback(session: requests.Session, soup, target: str, argument: str = "") 
         data[name] = (opt.get("value") if opt and opt.has_attr("value") else _cell_text(opt) if opt else "")
     data["__EVENTTARGET"] = target
     data["__EVENTARGUMENT"] = argument
+    if extra:
+        data.update(extra)
     try:
         r = session.post(action, data=data, headers={**_HEADERS, "Referer": _BASE}, timeout=30)
     except Exception as e:  # noqa: BLE001
