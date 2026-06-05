@@ -459,40 +459,43 @@ def _postback(session: requests.Session, soup, target: str, argument: str = "",
 # origin's slice is well under the cap, so iterating origins recovers the full
 # list per type.
 _ORIGIN_ACTIVATE = "ctl00$ContentPlaceHolder1$hb_origin_active"
-_ORIGIN_TARGET = "lb_Origin"
+_ORIGIN_APPLY = "ctl00$ContentPlaceHolder1$hb_origin_active_text"
+_TXT_SELECTED = "ctl00$ContentPlaceHolder1$txt_selected"
+_TXT_SEARCH = "ctl00$ContentPlaceHolder1$txt_search"
 _GRID_CAP = 200
 
 
-def _origin_filters(soup) -> list[str]:
-    """Distinct origin-filter postback targets in the (origin-activated) page."""
-    out: list[str] = []
-    for tgt, _arg in set(_PAGE_RE.findall(str(soup))):
-        if "rep_Origin" in tgt and _ORIGIN_TARGET in tgt:
-            out.append(tgt)
-    return sorted(out)  # ctl01..ctlNN are zero-padded → lexical sort = order
+def _origin_names(soup) -> list[str]:
+    """Origin values offered by the (origin-activated) filter, minus 'All'."""
+    names: list[str] = []
+    for a in soup.find_all("a"):
+        if "lb_Origin" in (a.get("id") or "") or "lb_Origin" in (a.get("href") or ""):
+            nm = _cell_text(a)
+            if nm and nm.upper() != "ALL" and nm not in names:
+                names.append(nm)
+    return names
 
 
 def _collect_type(session: requests.Session, tsoup, label: str) -> tuple[list[str], list[dict]]:
     """All offers for one type page, recovered by iterating the Origin filter.
 
-    De-dupes by full-row identity so an origin click that silently fails to
-    narrow (returning the capped grid again) can't inflate the result, and so
-    the capped default grid can be merged in as a safety net for any origin the
-    repeater might omit.
+    The grid caps at 200 rendered rows; narrowing by origin is the only way to
+    see the rest. The working recipe (proven by probe experiment): activate the
+    Origin filter, then for each origin name POST hb_origin_active_text with
+    txt_search/txt_selected = that name — the grid re-renders to just that
+    origin's offers (well under the cap). De-dupes by full-row identity and
+    keeps the capped default grid as a safety net.
     """
     headers: list[str] = []
     seen: set[tuple] = set()
     rows_out: list[dict] = []
 
-    def _absorb(rws: list[dict]) -> int:
-        added = 0
+    def _absorb(rws: list[dict]) -> None:
         for r in rws:
             key = tuple(sorted(r.items()))
             if key not in seen:
                 seen.add(key)
                 rows_out.append(r)
-                added += 1
-        return added
 
     # Safety net: the default (capped) grid for this type.
     base = _find_main_table(tsoup)
@@ -501,14 +504,14 @@ def _collect_type(session: requests.Session, tsoup, label: str) -> tuple[list[st
         _absorb(rws)
 
     osoup = _postback(session, tsoup, _ORIGIN_ACTIVATE)
-    origins = _origin_filters(osoup) if osoup is not None else []
-    print(f"[spot] {label or 'default'}: {len(origins)} origin filters")
-    if osoup is None or not origins:
-        print(f"[spot] WARN: no origin filters for {label!r} — using capped grid only", file=sys.stderr)
+    names = _origin_names(osoup) if osoup is not None else []
+    print(f"[spot] {label or 'default'}: {len(names)} origins -> {names}")
+    if osoup is None or not names:
+        print(f"[spot] WARN: no origin filter for {label!r} — using capped grid only", file=sys.stderr)
         return headers, rows_out
 
-    for i, otgt in enumerate(origins, 1):
-        fsoup = _postback(session, osoup, otgt)
+    for nm in names:
+        fsoup = _postback(session, osoup, _ORIGIN_APPLY, extra={_TXT_SEARCH: nm, _TXT_SELECTED: nm})
         if fsoup is None:
             continue
         tbl = _find_main_table(fsoup)
@@ -519,9 +522,9 @@ def _collect_type(session: requests.Session, tsoup, label: str) -> tuple[list[st
             headers = h
         _absorb(rws)
         if len(rws) >= _GRID_CAP:
-            print(f"[spot] WARN: {label} origin #{i} hit the {_GRID_CAP}-row cap "
-                  f"— that origin may need a sub-filter", file=sys.stderr)
-        time.sleep(0.25)  # be polite to the small Azure app
+            print(f"[spot] WARN: {label} origin {nm!r} hit the {_GRID_CAP}-row cap "
+                  f"— may need a sub-filter", file=sys.stderr)
+        time.sleep(0.2)  # be polite to the small Azure app
     return headers, rows_out
 
 
