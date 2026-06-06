@@ -359,7 +359,7 @@ const MACRO = `flowchart LR
   W12["1.2 Freight · 02:00<br/>Freightos · Yahoo"]
   W23["2.3 COT · Fri 20:00 · CFTC"]
   WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
-  WCPI["Retail CPI · BLS · Eurostat · BCB"]
+  WCPI["US/Retail CPI · BLS · Eurostat · BCB"]
   W33["3.3.1–3.3.3 CONAB + Fertilizer · 12th<br/>conab.gov.br · Comex · VN Customs"]
   EXP{{"1.4 Export · 02:30"}}
   J_mac[/macro_cot.json/]
@@ -367,6 +367,7 @@ const MACRO = `flowchart LR
   J_fx[/fx_history.json/]
   J_fr[/freight.json/]
   J_cpi[/retail_cpi.json/]
+  J_uscpi[/us_cpi.json/]
   J_fe[/farmer_economics.json/]
   J_orig[/origin_prices_history.json/]
   xc{{Cross-Commodity MM}}
@@ -374,6 +375,7 @@ const MACRO = `flowchart LR
   fx{{FX Pair Time-Series}}
   fr{{Freight Context}}
   cpi{{Retail CPI}}
+  uscpi{{US CPI}}
   fert{{Fertilizer Inputs}}
   orig{{Origin Prices}}
   W23 --> EXP
@@ -382,6 +384,7 @@ const MACRO = `flowchart LR
   WORIG --> EXP
   EXP --> J_mac --> xc
   EXP --> J_cpi --> cpi
+  EXP --> J_uscpi --> uscpi
   EXP --> J_fe --> fert
   EXP --> J_orig --> orig
   W19 --> J_q --> cci
@@ -391,8 +394,8 @@ ${DEFS}
   classDef vis fill:#042f2e,stroke:#14b8a6,color:#99f6e4;
   class W19,W12,W23,WORIG,WCPI,W33 scr;
   class EXP proc;
-  class J_mac,J_q,J_fx,J_fr,J_cpi,J_fe,J_orig json;
-  class xc,cci,fx,fr,cpi,fert,orig vis;`;
+  class J_mac,J_q,J_fx,J_fr,J_cpi,J_uscpi,J_fe,J_orig json;
+  class xc,cci,fx,fr,cpi,uscpi,fert,orig vis;`;
 
 const NEWSMAP = `flowchart LR
   W22["2.2 Commodity prices · Tue 22:55<br/>Barchart"]
@@ -729,6 +732,12 @@ const ROWS: FlowMetadata[] = [
     cadence: { recurrence: "monthly post-publish (BLS / Eurostat / BCB)", trigger: "manual" },
     transport: { provider: "BLS + Eurostat + BCB", method: "manual fetch + paste" },
     storage: { target: "retail_cpi.json", units: "YoY % coffee CPI per geography" },
+  },
+  {
+    wf: "1.1 News → 1.4 Export", output: "us_cpi.json", component: "UsCpiPanel", visual: "Macro · Inflation · US CPI",
+    cadence: { recurrence: "monthly post-publish (BLS CPI-U release)", trigger: "cron" },
+    transport: { provider: "US BLS (CPI-U)", method: "BLS public API fetch" },
+    storage: { target: "us_cpi.json", units: "YoY % headline/core/food/energy CPI" },
   },
   {
     wf: "various / manual", output: "origin_prices_history.json", component: "OriginPricesPanel", visual: "Macro · Origin Prices",

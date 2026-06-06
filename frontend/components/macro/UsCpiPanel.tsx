@@ -13,12 +13,14 @@ interface MonthlyEntry {
 
 interface SeriesEntry {
   name:       string;
+  series_id?: string;
   source_url: string;
   monthly:    MonthlyEntry[];
 }
 
-interface RetailCpi {
+interface UsCpi {
   source:       string;
+  source_url?:  string;
   last_updated: string;
   series:       Record<string, SeriesEntry>;
 }
@@ -30,20 +32,18 @@ const TT_STYLE = {
   fontSize: 10,
 };
 
-const SERIES_ORDER = ["us", "us_coffee", "eu", "brazil", "kc_futures"] as const;
+const SERIES_ORDER = ["all_items", "core", "food", "energy"] as const;
 const SERIES_LABEL: Record<string, string> = {
-  us:         "US roasted (BLS)",
-  us_coffee:  "US coffee, all (BLS)",
-  eu:         "EU retail (Eurostat)",
-  brazil:     "Brazil retail (BCB)",
-  kc_futures: "KC futures (Stooq)",
+  all_items: "Headline (all items)",
+  core:      "Core (ex food & energy)",
+  food:      "Food",
+  energy:    "Energy",
 };
 const SERIES_COLOR: Record<string, string> = {
-  us:         "#0ea5e9",
-  us_coffee:  "#ec4899",
-  eu:         "#10b981",
-  brazil:     "#f59e0b",
-  kc_futures: "#a855f7",
+  all_items: "#0ea5e9",
+  core:      "#a855f7",
+  food:      "#10b981",
+  energy:    "#f59e0b",
 };
 
 function fmtPeriodLabel(p: string): string {
@@ -52,12 +52,12 @@ function fmtPeriodLabel(p: string): string {
   return `${m}/${y.slice(2)}`;
 }
 
-export default function RetailCpiPanel() {
-  const [data, setData] = useState<RetailCpi | null>(null);
+export default function UsCpiPanel() {
+  const [data, setData] = useState<UsCpi | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("/data/retail_cpi.json")
+    fetch("/data/us_cpi.json")
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
@@ -81,12 +81,12 @@ export default function RetailCpiPanel() {
   if (error || !data) {
     return (
       <div className="p-4 text-xs text-slate-500">
-        Retail CPI data not yet available — requires BLS / Eurostat / BCB scraper run.
+        US CPI data not yet available — requires the BLS CPI-U scraper run.
       </div>
     );
   }
   if (chartData.length === 0) {
-    return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading retail-CPI data…</div>;
+    return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading US CPI data…</div>;
   }
 
   // Latest YoY per series for the KPI strip
@@ -106,10 +106,14 @@ export default function RetailCpiPanel() {
     <div className="p-4 space-y-4">
       <div className="flex items-baseline justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-lg font-bold text-white">Retail Coffee Inflation</h2>
+          <h2 className="text-lg font-bold text-white">US Inflation (CPI-U)</h2>
           <p className="text-xs text-slate-400">
-            Cost pass-through view — when futures spike but retail doesn&apos;t, the trade is absorbing.
-            Source: {data.source} · {data.last_updated}
+            Headline US consumer prices — the macro backdrop for the Fed-path / USD / real-rate
+            regime that frames the whole commodity complex. Source:{" "}
+            <a href={data.source_url ?? "https://www.bls.gov/news.release/cpi.t01.htm"}
+               target="_blank" rel="noreferrer"
+               className="underline hover:text-slate-200">{data.source}</a>{" "}
+            · {data.last_updated}
           </p>
         </div>
       </div>
@@ -136,7 +140,7 @@ export default function RetailCpiPanel() {
       {/* YoY trend chart */}
       <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
-          12-month change (YoY %) — 15 years
+          12-month change (YoY %)
         </div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
@@ -145,6 +149,7 @@ export default function RetailCpiPanel() {
               <XAxis dataKey="label" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false} interval={Math.max(0, Math.floor(chartData.length / 12) - 1)} />
               <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
               <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
+              <ReferenceLine y={2} stroke="#475569" strokeDasharray="4 3" strokeWidth={1} label={{ value: "2% target", position: "insideTopRight", fontSize: 8, fill: "#64748b" }} />
               <Tooltip
                 contentStyle={TT_STYLE}
                 formatter={(v: unknown, name: unknown) => [
@@ -160,8 +165,7 @@ export default function RetailCpiPanel() {
                     dataKey={key}
                     type="monotone"
                     stroke={SERIES_COLOR[key]}
-                    strokeWidth={key === "kc_futures" ? 1.2 : 1.8}
-                    strokeDasharray={key === "kc_futures" ? "4 2" : undefined}
+                    strokeWidth={key === "all_items" ? 2 : 1.5}
                     dot={false}
                     connectNulls
                     name={key}
@@ -172,9 +176,8 @@ export default function RetailCpiPanel() {
           </ResponsiveContainer>
         </div>
         <div className="text-[9px] text-slate-500 mt-2 italic">
-          When the dashed purple line (KC futures YoY) runs well above the solid retail lines, that&apos;s
-          pass-through compression — roasters and the trade eating the spike. Sustained gaps eventually
-          close through retail price hikes or specification cuts (bag fills, blend changes).
+          NSA 12-month change, the basis BLS quotes in the headline release (Table 1). Core strips
+          out food & energy to show the persistent trend; the dashed line marks the Fed&apos;s 2% goal.
         </div>
       </div>
     </div>

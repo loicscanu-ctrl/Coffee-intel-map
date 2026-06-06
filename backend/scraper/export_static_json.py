@@ -22,7 +22,7 @@ from scraper.exporters.cot import export_cot, export_macro_cot
 from scraper.exporters.demand import export_demand_stocks, export_factory_mix_step
 from scraper.exporters.futures import export_futures_chain, export_oi_fnd_chart
 from scraper.exporters.health import export_health
-from scraper.exporters.macro import export_freight, export_retail_cpi
+from scraper.exporters.macro import export_freight, export_retail_cpi, export_us_cpi
 from scraper.exporters.news import export_news
 from scraper.exporters.prices import export_latest_prices, export_vn_physical_prices
 from scraper.exporters.supply import (
@@ -89,6 +89,7 @@ def _exporters(db):
         ("demand_stocks",         lambda: export_demand_stocks(db)),
         ("factory_mix",           lambda: export_factory_mix_step()),
         ("retail_cpi",            lambda: export_retail_cpi(db)),
+        ("us_cpi",                lambda: export_us_cpi(db)),
         ("latest_prices",         lambda: export_latest_prices(db)),
         ("vn_physical_prices",    lambda: export_vn_physical_prices(db)),
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
