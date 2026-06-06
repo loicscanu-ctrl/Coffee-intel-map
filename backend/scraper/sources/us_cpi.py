@@ -70,6 +70,41 @@ _SERIES = {
     "energy":    {"id": "CUUR0000SA0E",   "name": "Energy"},
 }
 
+# Sub-components for the drill-down view: clicking a category tile in the panel
+# shows that category's total plus these breakdowns. All BLS CPI-U expenditure
+# series (CUUR0000…, NSA, U.S. city average), the same hierarchy as cpi.t01.
+# The fetch is resilient — any id BLS doesn't return is silently omitted, so a
+# stale/renamed series degrades the drill-down rather than breaking it.
+# Total fetched series (4 top-level + components) stays ≤ 25, the BLS keyless
+# per-request cap.
+_COMPONENTS: dict[str, list[tuple[str, str, str]]] = {
+    "food": [
+        ("food_at_home",   "CUUR0000SAF11",  "Food at home"),
+        ("food_away",      "CUUR0000SEFV",   "Food away from home"),
+        ("cereals_bakery", "CUUR0000SAF111", "Cereals & bakery products"),
+        ("meats",          "CUUR0000SAF112", "Meats, poultry, fish & eggs"),
+        ("dairy",          "CUUR0000SAF113", "Dairy & related products"),
+        ("fruits_veg",     "CUUR0000SAF114", "Fruits & vegetables"),
+    ],
+    "energy": [
+        ("energy_commodities", "CUUR0000SACE",   "Energy commodities"),
+        ("gasoline",           "CUUR0000SETB01", "Gasoline (all types)"),
+        ("fuel_oil",           "CUUR0000SEHE01", "Fuel oil"),
+        ("energy_services",    "CUUR0000SEHF",   "Energy services"),
+        ("electricity",        "CUUR0000SEHF01", "Electricity"),
+        ("utility_gas",        "CUUR0000SEHF02", "Utility (piped) gas"),
+    ],
+    "core": [
+        ("commodities_core",   "CUUR0000SACL1E", "Commodities less food & energy"),
+        ("services_core",      "CUUR0000SASLE",  "Services less energy services"),
+        ("shelter",            "CUUR0000SAH1",   "Shelter"),
+        ("medical_care",       "CUUR0000SAM",    "Medical care"),
+        ("transportation_svc", "CUUR0000SAS4",   "Transportation services"),
+        ("new_vehicles",       "CUUR0000SETA01", "New vehicles"),
+        ("apparel",            "CUUR0000SAA",    "Apparel"),
+    ],
+}
+
 _PERIOD_TO_MONTH = {f"M{i:02d}": f"{i:02d}" for i in range(1, 13)}
 
 
@@ -89,11 +124,12 @@ def _yoy_series(rows: list[dict]) -> list[dict]:
 
 
 def _fetch_bls() -> dict[str, dict] | None:
-    """One BLS API call for all four CPI-U series.
+    """One BLS API call for the four top-level CPI-U series + their drill-down
+    sub-components.
 
-    Returns {series_key: {rows}} parsed into our monthly/YoY shape, or None
-    if the request fails outright. Individual series that come back empty are
-    simply omitted.
+    Returns the nested series structure (top-level categories, each optionally
+    carrying a ``components`` map), or None if the request fails outright.
+    Individual series that come back empty are simply omitted.
     """
     api_key = os.environ.get("BLS_API_KEY", "").strip()
     end_year = datetime.utcnow().year
@@ -101,8 +137,16 @@ def _fetch_bls() -> dict[str, dict] | None:
     # to 20 — request the larger window only when we have one.
     start_year = end_year - (19 if api_key else 10)
 
+    # Flat fetch list: (request_key, series_id, display_name, parent_or_None).
+    wanted: list[tuple[str, str, str, str | None]] = [
+        (key, meta["id"], meta["name"], None) for key, meta in _SERIES.items()
+    ]
+    for parent, comps in _COMPONENTS.items():
+        for key, sid, name in comps:
+            wanted.append((key, sid, name, parent))
+
     payload: dict = {
-        "seriesid":  [s["id"] for s in _SERIES.values()],
+        "seriesid":  [w[1] for w in wanted],
         "startyear": str(start_year),
         "endyear":   str(end_year),
     }
@@ -122,15 +166,10 @@ def _fetch_bls() -> dict[str, dict] | None:
         logger.warning(f"[us_cpi] BLS status {body.get('status')}: {body.get('message')}")
         return None
 
-    # id -> series_key reverse map
-    id_to_key = {meta["id"]: key for key, meta in _SERIES.items()}
-
-    result: dict[str, dict] = {}
+    # Parse every returned series into {series_id: monthly_with_yoy}.
+    parsed: dict[str, list] = {}
     for s in body.get("Results", {}).get("series", []):
         sid = s.get("seriesID")
-        key = id_to_key.get(sid)
-        if not key:
-            continue
         rows: list[dict] = []
         for d in s.get("data", []):
             period = d.get("period", "")
@@ -141,16 +180,30 @@ def _fetch_bls() -> dict[str, dict] | None:
             except (KeyError, TypeError, ValueError):
                 continue
             rows.append({"period": f"{d['year']}-{_PERIOD_TO_MONTH[period]}", "index": idx})
-        if not rows:
+        if rows:
+            rows.sort(key=lambda r: r["period"])
+            parsed[sid] = _yoy_series(rows)
+
+    # Assemble the nested structure (top-level first, so a parent node exists
+    # before its components are attached).
+    result: dict[str, dict] = {}
+    for key, sid, name, parent in wanted:
+        monthly = parsed.get(sid)
+        if not monthly:
             continue
-        rows.sort(key=lambda r: r["period"])
-        result[key] = {
-            "name":       _SERIES[key]["name"],
+        node = {
+            "name":       name,
             "series_id":  sid,
             "source_url": f"https://data.bls.gov/timeseries/{sid}",
-            "monthly":    _yoy_series(rows),
+            "monthly":    monthly,
         }
-    return result or None
+        if parent is None:
+            result.setdefault(key, {}).update(node)
+        else:
+            result.setdefault(parent, {}).setdefault("components", {})[key] = node
+
+    # Keep only categories that actually have a top-level series.
+    return {k: v for k, v in result.items() if v.get("monthly")} or None
 
 
 def _build_payload() -> dict | None:
