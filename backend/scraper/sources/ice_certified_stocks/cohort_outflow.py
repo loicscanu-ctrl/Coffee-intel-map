@@ -137,8 +137,15 @@ def build_implied_outflow(
         magnitude larger. Threshold defaults to 0.5.
 
     Returns: [{"month_end": "YYYY-MM-DD",
-               "by_port": {port: {origin: lots}}}, ...]
+               "by_port":         {port: {origin: lots}},   # total outflow
+               "by_port_transit": {port: {origin: lots}}},  # "in & out" subset
+              ...]
     one entry per RP_t (skipping the very first since there's no prior pair).
+
+    `by_port_transit ⊆ by_port`: it is the outflow from cohorts graded inside
+    this very interval (arrived AND left). Subtract it from `by_port` to get
+    the legacy / pure outflow. The frontend uses it to split a window's
+    gradings into pure "in" (stayed) vs "in & out" (graded then left).
     """
     if not age_reports:
         return []
@@ -180,6 +187,12 @@ def build_implied_outflow(
 
         all_ports = set(prev_lots.keys()) | set(cur_lots.keys())
         port_origin_out: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        # Transit = outflow attributable to a cohort that was *graded inside
+        # this same report interval* and already (partly) decertified by RP_t
+        # — i.e. coffee that arrived AND left ("in & out"). It is the
+        # new-cohort shrinkage only; everything else is legacy ("pure out").
+        # `by_port_transit ⊆ by_port`, so pure_out = by_port − by_port_transit.
+        port_origin_transit: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
         # A "new cohort" first appears in RP_t — its `lp` is 0 because it
         # didn't exist in RP_{t-1}. The natural cohort_ids for this are
         # cur_month_iso (k=0 sources, e.g. the user's design example) and
@@ -195,7 +208,8 @@ def build_implied_outflow(
             for cohort in cohorts:
                 lp = prev_lots.get(port, {}).get(cohort, 0.0)
                 lc = cur_lots.get(port, {}).get(cohort, 0.0)
-                if cohort in new_cohort_ids and lp == 0:
+                is_transit = cohort in new_cohort_ids and lp == 0
+                if is_transit:
                     graded_origins = gradings_per_port_month_origin.get(port, {}).get(cohort, {})
                     graded_total = sum(graded_origins.values())
                     if graded_total <= 0:
@@ -212,11 +226,16 @@ def build_implied_outflow(
                     apportioned = shrink * share
                     if apportioned > 0:
                         port_origin_out[port][origin] += apportioned
+                        if is_transit:
+                            port_origin_transit[port][origin] += apportioned
 
         out.append({
             "month_end": cur["month_end"],
             "by_port": {p: {o: round(v, 2) for o, v in od.items() if v > 0}
                         for p, od in port_origin_out.items() if od},
+            # In & out subset (graded AND decertified inside this interval).
+            "by_port_transit": {p: {o: round(v, 2) for o, v in od.items() if v > 0}
+                                for p, od in port_origin_transit.items() if od},
         })
     return out
 

@@ -57,6 +57,9 @@ interface RobustaOverviewEvent { date: string; total_pending_lots?: number | nul
 interface ImpliedOutflowMonth {
   month_end: string;
   by_port: Record<string, Record<string, number>>;
+  // Subset of by_port that is "in & out": outflow from cohorts graded inside
+  // this same month-end interval (arrived AND left). by_port_transit ⊆ by_port.
+  by_port_transit?: Record<string, Record<string, number>>;
 }
 export interface RobustaJsonShape {
   snapshots: RobustaSnap[];
@@ -380,7 +383,11 @@ const CLASS_LABEL_RC: Record<number, string> = {
 //   • net_gained = max(0, net_delta)            (showed up in current stock)
 //   • lost      = max(0, −net_delta)            (disappeared, shown as ghost)
 //   • transit   = min(gross_in, gross_out)      (arrived AND left within window)
-interface OriginFlowPair { gross_in: number; gross_out: number }
+// gross_in / gross_out per origin over the window. `transit` is the
+// cohort-matched "in & out" amount (graded AND left in-window) when the
+// backend can resolve it from ageing-report cohort shrinkage — overrides the
+// min(gross_in, gross_out) heuristic in buildDensityGrid when present.
+interface OriginFlowPair { gross_in: number; gross_out: number; transit?: number }
 
 // Per-card grid sizing. Hard rule (locked at user's request):
 //   • Every Robusta square is exactly 13 px — matches the baseline size
@@ -638,12 +645,20 @@ function buildDensityGrid(
     const tOut = Math.max(0, f.gross_out);
     if (cohortMatched) {
       // Ageing report matched → split the overlap (arrived AND left) out as
-      // transited, and only the net residue lands in net-gained / lost.
-      const net = tIn - tOut;
-      const tr  = Math.min(tIn, tOut);
-      if (net > 0) { netGainedByOrigin[origin] = net;  netGainedVol += net;  }
-      if (net < 0) { ghostByOrigin[origin]     = -net; lostVol      += -net; }
-      if (tr  > 0) { transitByOrigin[origin]   = tr;   transitVol   += tr;   }
+      // transited. Prefer the backend's cohort-resolved transit (outflow from
+      // cohorts graded in-window); fall back to min(in, out) when it's absent.
+      // Clamp to [0, min(in, out)] so net-gained / lost stay non-negative.
+      const tr = Math.max(0, Math.min(
+        origin in flowByOrigin && flowByOrigin[origin].transit != null
+          ? (flowByOrigin[origin].transit as number)
+          : Math.min(tIn, tOut),
+        tIn, tOut,
+      ));
+      const ng = tIn - tr;   // pure in (graded and stayed)
+      const lo = tOut - tr;  // pure out (legacy decertifications)
+      if (ng > 0) { netGainedByOrigin[origin] = ng; netGainedVol += ng; }
+      if (lo > 0) { ghostByOrigin[origin]     = lo; lostVol      += lo; }
+      if (tr > 0) { transitByOrigin[origin]   = tr; transitVol   += tr; }
     } else {
       // No ageing report yet → we cannot tell which inflow also left, so all
       // inflow is "in" and all outflow is "out" (no in & out). This is what
@@ -1258,6 +1273,10 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
         const t = new Date(e.month_end).getTime();
         return t >= cutT && t <= endT;
       });
+      // Whether the data carries the cohort-resolved in & out subset
+      // (by_port_transit). New importer output has it; older JSON does not, in
+      // which case buildDensityGrid falls back to the min(in, out) heuristic.
+      const transitFieldPresent = (cohortOutflow ?? []).some((e) => e.by_port_transit != null);
 
       // Always compute the in-browser per-port stock simulation. In the
       // fallback path it is the sole source of flows; in the cohort path it
@@ -1319,16 +1338,22 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
             byOrigin["Unknown"] = current;
           }
           // gross_out from implied_outflow summed over months in window;
-          // gross_in from real gradings events.
+          // gross_in from real gradings events. `transitByOrigin` is the
+          // cohort-resolved "in & out" subset (by_port_transit) — outflow from
+          // cohorts graded inside the same interval, i.e. graded AND left.
           const inflowByOrigin = cohortInflowByPortOrigin[code] ?? {};
           const outflowByOrigin: Record<string, number> = {};
+          const transitByOrigin: Record<string, number> = {};
           for (const entry of cohortOutflow ?? []) {
             const t = new Date(entry.month_end).getTime();
             if (t < cutT || t > endT) continue;
             const byO = entry.by_port?.[code];
-            if (!byO) continue;
-            for (const [o, v] of Object.entries(byO)) {
-              outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
+            if (byO) {
+              for (const [o, v] of Object.entries(byO)) outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
+            }
+            const byT = entry.by_port_transit?.[code];
+            if (byT) {
+              for (const [o, v] of Object.entries(byT)) transitByOrigin[o] = (transitByOrigin[o] ?? 0) + v;
             }
           }
           // Supplement with recent DAILY outflow from the per-port sim for
@@ -1345,10 +1370,19 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
               }
             }
           }
+          // Attach the cohort-resolved transit when the window brackets an
+          // ageing report AND the data carries by_port_transit. Every origin
+          // then gets an explicit transit (0 = "no in & out for this origin"),
+          // which overrides the min(in, out) heuristic. Older JSON without the
+          // field leaves transit undefined → heuristic fallback downstream.
+          const haveTransit = cohortMatched && transitFieldPresent;
           for (const o of Array.from(new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]))) {
             const gi = inflowByOrigin[o] ?? 0;
             const go = outflowByOrigin[o] ?? 0;
-            if (gi > 0 || go > 0) flowByOrigin[o] = { gross_in: gi, gross_out: go };
+            if (gi > 0 || go > 0) {
+              flowByOrigin[o] = { gross_in: gi, gross_out: go };
+              if (haveTransit) flowByOrigin[o].transit = transitByOrigin[o] ?? 0;
+            }
           }
         } else {
           // FALLBACK: in-browser per-port stock simulation.
