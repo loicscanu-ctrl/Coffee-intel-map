@@ -54,7 +54,7 @@ jobs:
             case "$RUN_NAME" in
               *"COT Scraper"*)        topics="cot,macro_cot,oi_fnd_chart"; signals=true ;;
               *"Daily OI Snapshot"*)  topics="futures_chain,oi_fnd_chart,latest_prices" ;;
-              *"Daily News Scraper"*) topics="news,latest_prices,vn_physical_prices,retail_cpi" ;;
+              *"Daily News Scraper"*) topics="news,latest_prices,vn_physical_prices,retail_cpi,us_cpi" ;;
               *)                      signals=true ;;   # unknown upstream → full, safe
             esac
           fi
@@ -123,7 +123,7 @@ jobs:
                   frontend/public/data/latest_prices.json \
                   frontend/public/data/vietnam_supply.json \
                   frontend/public/data/signals.json
-          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json frontend/public/data/origin_prices_history.json frontend/public/data/news.json frontend/public/data/countries.json frontend/public/data/factories.json; do
+          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json frontend/public/data/retail_cpi.json frontend/public/data/us_cpi.json frontend/public/data/origin_prices_history.json frontend/public/data/news.json frontend/public/data/countries.json frontend/public/data/factories.json; do
             [ -f "$f" ] && git add "$f" || true
           done
 

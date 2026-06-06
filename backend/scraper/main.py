@@ -42,6 +42,7 @@ from scraper.sources import population as _population
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import retail_cpi as _retail_cpi
 from scraper.sources import uganda_weather as _uganda_weather
+from scraper.sources import us_cpi as _us_cpi
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
 CONCURRENCY       = 3    # Max parallel Playwright pages
@@ -130,6 +131,7 @@ async def run_all_scrapers():
                 ("ajca",              lambda p: _ajca.run(p, db_ref),                            SCRAPER_TIMEOUT),
                 ("population",        lambda p: _population.run(p, db_ref),                      120),
                 ("retail_cpi",        lambda p: _retail_cpi.run(p, db_ref),                      120),
+                ("us_cpi",            lambda p: _us_cpi.run(p, db_ref),                          120),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
                 ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),

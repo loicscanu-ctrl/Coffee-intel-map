@@ -7,7 +7,7 @@ import CrossCommodityPanel from "@/components/macro/CrossCommodityPanel";
 import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
 import FertilizerInputsPanel from "@/components/macro/FertilizerInputsPanel";
 import FreightContextPanel from "@/components/macro/FreightContextPanel";
-import RetailCpiPanel from "@/components/macro/RetailCpiPanel";
+import InflationSection from "@/components/macro/InflationSection";
 
 export default function MacroPage() {
   return (
@@ -15,16 +15,16 @@ export default function MacroPage() {
       <PageHeader
         title="Macro"
         subtitle="FX · inflation · cross-commodity positioning · origin prices · freight · macro flow"
-        healthKeys={["macro_cot", "freight", "quant_currency_index", "retail_cpi", "fx_history", "origin_prices"]}
+        healthKeys={["macro_cot", "freight", "quant_currency_index", "us_cpi", "retail_cpi", "fx_history", "origin_prices"]}
       />
       <div className="flex flex-col divide-y divide-slate-800">
         <CurrencyIndexSection />
         <FxTimeSeriesPanel />
         <CrossCommodityPanel />
+        <InflationSection />
         <OriginPricesPanel />
         <FertilizerInputsPanel />
         <FreightContextPanel />
-        <RetailCpiPanel />
       </div>
       <div className="flex-1 min-h-[400px] border-t border-slate-700">
         <NewsFeedList

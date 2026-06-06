@@ -48,7 +48,14 @@ _HEADERS = {
     "Accept": "application/json",
 }
 
-_BLS_SERIES = "CUSR0000SEFP02"
+# US coffee CPI series (BLS, seasonally adjusted). SEFP02 is roasted coffee
+# only; SEFP01 is the broader "Coffee" expenditure group (roasted + instant +
+# other). Both are overlaid in the retail panel so the roasted-vs-all spread is
+# visible. Both are fetched in a single BLS API call.
+_BLS_SERIES = {
+    "us":        {"id": "CUSR0000SEFP02", "name": "US — Roasted coffee (BLS CPI, SA)"},
+    "us_coffee": {"id": "CUSR0000SEFP01", "name": "US — Coffee, all (BLS CPI, SA)"},
+}
 _EUROSTAT_DATAFLOW = "prc_hicp_midx"
 _BCB_SGS = 1635
 
@@ -77,13 +84,17 @@ def _yoy_series(rows: list[dict]) -> list[dict]:
     return out
 
 
-def _fetch_bls() -> dict | None:
-    """BLS public API — request 15 years to give a 14yr YoY series."""
+def _fetch_bls() -> dict[str, dict] | None:
+    """BLS public API — both US coffee CPI series in one request (15yr window).
+
+    Returns {series_key: series_dict} for whichever of the configured series
+    came back with data, or None if the request failed outright.
+    """
     end_year = datetime.utcnow().year
     start_year = end_year - 15
-    url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/{_BLS_SERIES}"
+    url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
     payload = {
-        "seriesid": [_BLS_SERIES],
+        "seriesid":  [m["id"] for m in _BLS_SERIES.values()],
         "startyear": str(start_year),
         "endyear":   str(end_year),
     }
@@ -98,23 +109,32 @@ def _fetch_bls() -> dict | None:
     if body.get("status") != "REQUEST_SUCCEEDED":
         logger.warning(f"[retail_cpi] BLS status {body.get('status')}: {body.get('message')}")
         return None
-    series = (body.get("Results", {}).get("series") or [{}])[0].get("data", [])
-    rows: list[dict] = []
-    for s in series:
-        period = s.get("period", "")
-        if period not in _PERIOD_TO_MONTH:
+
+    id_to_key = {m["id"]: k for k, m in _BLS_SERIES.items()}
+    out: dict[str, dict] = {}
+    for s in body.get("Results", {}).get("series", []):
+        key = id_to_key.get(s.get("seriesID"))
+        if not key:
             continue
-        try:
-            idx = float(s["value"])
-        except (KeyError, TypeError, ValueError):
+        rows: list[dict] = []
+        for d in s.get("data", []):
+            period = d.get("period", "")
+            if period not in _PERIOD_TO_MONTH:
+                continue
+            try:
+                idx = float(d["value"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            rows.append({"period": f"{d['year']}-{_PERIOD_TO_MONTH[period]}", "index": idx})
+        if not rows:
             continue
-        rows.append({"period": f"{s['year']}-{_PERIOD_TO_MONTH[period]}", "index": idx})
-    rows.sort(key=lambda r: r["period"])
-    return {
-        "name":       "US — Roasted coffee (BLS CPI, SA)",
-        "source_url": f"https://data.bls.gov/timeseries/{_BLS_SERIES}",
-        "monthly":    _yoy_series(rows),
-    }
+        rows.sort(key=lambda r: r["period"])
+        out[key] = {
+            "name":       _BLS_SERIES[key]["name"],
+            "source_url": f"https://data.bls.gov/timeseries/{s['seriesID']}",
+            "monthly":    _yoy_series(rows),
+        }
+    return out or None
 
 
 def _fetch_eurostat_series(geo: str) -> list[dict] | None:
@@ -367,8 +387,17 @@ def _fetch_bcb() -> dict | None:
 
 def _build_payload() -> dict | None:
     series: dict[str, dict] = {}
-    fetchers = [("us", _fetch_bls), ("eu", _fetch_eurostat), ("brazil", _fetch_bcb), ("kc_futures", _fetch_kc_futures)]
-    for key, fn in fetchers:
+
+    # BLS returns multiple US coffee series (roasted + all-coffee) in one call.
+    try:
+        bls = _fetch_bls()
+    except Exception as e:
+        logger.warning(f"[retail_cpi] BLS unhandled error: {e}")
+        bls = None
+    if bls:
+        series.update(bls)
+
+    for key, fn in (("eu", _fetch_eurostat), ("brazil", _fetch_bcb), ("kc_futures", _fetch_kc_futures)):
         try:
             s = fn()
         except Exception as e:
@@ -398,7 +427,7 @@ async def run(page, db) -> None:  # noqa: ARG001
 
         n = len(payload["series"])
         names = ", ".join(payload["series"].keys())
-        print(f"[retail_cpi] OK: {n}/4 series ({names}), last_updated={payload['last_updated']}")
+        print(f"[retail_cpi] OK: {n} series ({names}), last_updated={payload['last_updated']}")
 
         if db is not None:
             # Build a headline-stat body so the news table / Telegram brief can
