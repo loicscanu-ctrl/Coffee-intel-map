@@ -20,6 +20,10 @@ interface ArabicaSectionHierarchy {
   by_port: Record<string, number>;
   by_origin: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
 }
+// Per-(origin, port) grading detail from the action-day matrix (June 2026+).
+// Present only on days ICE published the origin × port grading table; older
+// "N Bags Passed Today" days carry only the scalar passed_today_bags.
+type ArabicaGradingByOrigin = Record<string, { by_port: Record<string, number>; group?: string; total?: number }>;
 interface ArabicaSnap {
   date: string;
   total_bags: number;
@@ -28,6 +32,8 @@ interface ArabicaSnap {
   pending_grading_bags?: number;
   by_port?: Record<string, number>;
   sections?: { total_certified?: ArabicaSectionHierarchy; pending_grading?: ArabicaSectionHierarchy };
+  passed_by_origin?: ArabicaGradingByOrigin;
+  failed_by_origin?: ArabicaGradingByOrigin;
 }
 interface RobustaSnap { date: string; total_lots_certified: number; by_port_lots?: Record<string, number> }
 interface ArabicaAgeBucketRow { age_bucket: string; bags: number }
@@ -1034,12 +1040,11 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
       }
 
       // ── Cohort match + model-faithful flow re-sourcing ──────────────────
-      // Arabica gradings are a daily SCALAR (no per-origin split), so without
-      // an ageing report we follow the user's model: the window's passed
-      // gradings are the "in"; the gap between theoretical (base + passed) and
-      // real (current) stock is the "out"; there is no in & out. We only fall
-      // back to the signed-delta/min() split when a usable ageing report's
-      // month_end lands inside the window (cohortMatched = true).
+      // Per the user's model, without an ageing report inside the window the
+      // window's passed gradings are the "in", the gap between theoretical
+      // (base + passed) and real (current) stock is the "out", and there is no
+      // in & out. We only switch to the signed-delta/min() split when a usable
+      // ageing report's month_end lands inside the window (cohortMatched).
       const ar = arabica?.ageing_report;
       const arUsable = !!ar && (ar.grand_total ?? 0) > 0 &&
         Object.keys(ar.by_origin_band ?? {}).length > 0;
@@ -1047,33 +1052,54 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
       const cohortMatched = arUsable && arT != null && arT >= cutT && arT <= endT;
 
       if (!cohortMatched) {
-        // Window passed-grading total — the model's "in".
-        let P = 0;
+        // The window's passed-grading "in". Prefer the EXACT per-(origin,port)
+        // grading matrix (action-day reports, June 2026+); fall back to
+        // distributing the scalar total by where stock landed only for the
+        // portion of days that lack the matrix (legacy/no-action or old JSON).
+        let P = 0;                                   // scalar passed total
+        const gradedByPortOrigin: Record<string, Record<string, number>> = {};
+        let gradedDetailSum = 0;                     // covered by the matrix
         for (const s of snaps) {
           const t = new Date(s.date).getTime();
-          if (t >= cutT && t <= endT) P += s.passed_today_bags ?? 0;
+          if (t < cutT || t > endT) continue;
+          P += s.passed_today_bags ?? 0;
+          const pbo = s.passed_by_origin;
+          if (!pbo) continue;
+          for (const [origin, od] of Object.entries(pbo)) {
+            for (const [p, bags] of Object.entries(od.by_port ?? {})) {
+              if (!bags) continue;
+              const port = _canonicalKC(p);
+              gradedByPortOrigin[port] = gradedByPortOrigin[port] || {};
+              gradedByPortOrigin[port][origin] = (gradedByPortOrigin[port][origin] ?? 0) + bags;
+              gradedDetailSum += bags;
+            }
+          }
         }
         const baseC = collapseSec(base.sections?.total_certified);
         const curTotal = Object.values(latestC.byPort).reduce((a, b) => a + b, 0);
-        // Distribute the scalar passed total across (port, origin) by each
-        // pair's share of positive intra-window movement (where stock landed);
-        // fall back to current-stock share when nothing grew.
+        // Remainder = passed bags not covered by any matrix detail in-window.
+        const remainder = Math.max(0, P - gradedDetailSum);
+        // Distribute only the remainder by each pair's share of positive
+        // intra-window movement (where stock landed); fall back to current
+        // stock share when nothing grew.
         let posSum = 0;
         for (const port of Object.keys(flowByPort))
           for (const o of Object.keys(flowByPort[port])) posSum += Math.max(0, flowByPort[port][o].gross_in);
         const keys = new Set<string>();
         for (const port of Object.keys(flowByPort)) for (const o of Object.keys(flowByPort[port])) keys.add(`${port}|${o}`);
         for (const [o, perPort] of Object.entries(latestC.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${o}`);
+        for (const port of Object.keys(gradedByPortOrigin)) for (const o of Object.keys(gradedByPortOrigin[port])) keys.add(`${port}|${o}`);
         const reflow: Record<string, Record<string, OriginFlowPair>> = {};
         for (const key of Array.from(keys)) {
           const sep = key.indexOf("|");
           const port = key.slice(0, sep), origin = key.slice(sep + 1);
+          const exactIn  = gradedByPortOrigin[port]?.[origin] ?? 0;   // real grading inflow
           const deltaIn  = Math.max(0, flowByPort[port]?.[origin]?.gross_in ?? 0);
           const curLevel = latestC.byOriginPort[origin]?.[port] ?? 0;
           const baseLevel = baseC.byOriginPort[origin]?.[port] ?? 0;
           const netDelta = curLevel - baseLevel;
           const inShare = posSum > 0 ? deltaIn / posSum : (curTotal > 0 ? curLevel / curTotal : 0);
-          const inVol = P * inShare;
+          const inVol = exactIn + remainder * inShare;
           // netGained ≥ both the graded-in and any net growth (transfer-in);
           // lost is whatever must have left to land at the observed net delta.
           const ng = Math.max(inVol, Math.max(0, netDelta));

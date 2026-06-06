@@ -52,6 +52,11 @@ def test_grading_matrix_action_day():
     out = _parse_grading_summary(_FakeSheet(rows), 55)
     assert out["passed_today_bags"] == 825
     assert out["failed_today_bags"] == 275
+    # The full origin × port matrix is retained (not just the grand total),
+    # so gradings can be attributed to (origin, port) cohorts.
+    assert out["passed_detail"]["by_origin"]["Honduras"]["by_port"]["ANT"] == 825
+    assert out["passed_detail"]["by_port"]["ANT"] == 825
+    assert out["failed_detail"]["by_origin"]["Honduras"]["total"] == 275
 
 
 def test_grading_no_action_text():
@@ -64,6 +69,8 @@ def test_grading_no_action_text():
     out = _parse_grading_summary(_FakeSheet(rows), 55)
     assert out["passed_today_bags"] == 0
     assert out["failed_today_bags"] == 0
+    # Legacy/no-action layout has no per-origin matrix.
+    assert out["passed_detail"] is None and out["failed_detail"] is None
 
 
 def test_grading_legacy_text():

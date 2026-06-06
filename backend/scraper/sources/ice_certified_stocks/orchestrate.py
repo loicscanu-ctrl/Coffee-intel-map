@@ -455,7 +455,7 @@ def _arabica_snapshot(d: date, parsed: dict) -> dict:
             }
     tc = sections.get("total_certified", {})
     gt = parsed.get("grading_today") or {}
-    return {
+    snap = {
         "date":                 d.isoformat(),
         "report_date":          parsed.get("report_date"),
         # Headline scalars (kept flat for cheap reads):
@@ -471,6 +471,18 @@ def _arabica_snapshot(d: date, parsed: dict) -> dict:
         # Full hierarchy — port × group × origin per section, drives drill-down.
         "sections":             sections,
     }
+    # Per-(origin, port) grading detail — only present on action-day matrix
+    # reports (June 2026+). Lets the certified-stocks model attribute the day's
+    # gradings to real (origin, port) cohorts instead of distributing a scalar.
+    # Shape: {origin: {by_port: {code: bags}, group, total}}. Omitted on
+    # legacy/no-action days to keep the snapshot stream lean.
+    passed_detail = gt.get("passed_detail")
+    failed_detail = gt.get("failed_detail")
+    if passed_detail and passed_detail.get("by_origin"):
+        snap["passed_by_origin"] = passed_detail["by_origin"]
+    if failed_detail and failed_detail.get("by_origin"):
+        snap["failed_by_origin"] = failed_detail["by_origin"]
+    return snap
 
 
 def _robusta_snapshot(d: date, stock: dict | None, gradings_today: list[dict],

@@ -861,20 +861,30 @@ per origin, clamped so every bucket ≥ 0:
 gross_in  = net_gained + transit
 gross_out = lost       + transit`}</Fml>
 
-      <H2>Arabica: distributing the scalar grading count</H2>
+      <H2>Arabica: per-origin gradings (exact, with a fallback)</H2>
       <P>
-        Arabica publishes passed gradings as a <strong>daily scalar</strong> (no origin/port split). To place the
-        window&rsquo;s passed total <Code>P</Code> on the map we distribute it by where stock actually grew:
+        Since ~June 2026 ICE publishes the &ldquo;TODAY&rsquo;S GRADING SUMMARY&rdquo; as an{" "}
+        <strong>origin × port matrix</strong> (a <Code>BAGS PASSED GRADING</Code> table, then a
+        <Code> BAGS FAILED GRADING</Code> table), not the old <Code>&ldquo;825 Bags Passed Today&rdquo;</Code> one-liner.
+        We parse the full matrix, so on action days the &ldquo;in&rdquo; is sourced <strong>exactly</strong> per
+        <Code> (origin, port)</Code> — the same fidelity as Robusta gradings:
       </P>
-      <Fml>{`in[port,origin] = P × ( max(0, Δ[port,origin]) / Σ max(0, Δ) )
-                  (fallback: share of current stock if nothing grew)
+      <Fml>{`in[port,origin] = Σ_window passed_by_origin[origin][port]   (exact)
 
 net_gained = max(in, max(0, netΔ))
 lost       = net_gained − netΔ`}</Fml>
       <P>
-        This keeps the headline &ldquo;825 in&rdquo; visible instead of netting it to near-zero. The per-origin split
-        is therefore an <em>inference</em> (the feed doesn&rsquo;t attribute gradings to origins); the aggregate in/out
-        totals are exact.
+        Only for days that lack the matrix (legacy/no-action reports, or history captured before the matrix parser
+        shipped) do we fall back to distributing the <em>uncovered</em> passed bags <Code>P_remainder</Code> by where
+        stock grew:
+      </P>
+      <Fml>{`in[port,origin] += P_remainder × ( max(0, Δ[port,origin]) / Σ max(0, Δ) )
+   P_remainder = passed_total − Σ matrix-covered gradings`}</Fml>
+      <P>
+        So the per-origin split is now <strong>exact when the matrix is present</strong> and only an inference for the
+        residual; the aggregate in/out totals are exact either way. Capturing the matrix also gives Arabica true
+        <Code> (grading date, origin, port)</Code> cohorts, so once the monthly ageing report parses with a per-origin
+        band breakdown, Arabica in &amp; out can be cohort-matched exactly like Robusta.
       </P>
 
       <H2>The period selector</H2>
@@ -888,7 +898,8 @@ lost       = net_gained − netΔ`}</Fml>
 
       <H2>Data sources &amp; cadence</H2>
       <ul className="space-y-1">
-        <LI><strong>Arabica daily XLS</strong> — certified total, by-port, by-group, passed/failed gradings (daily).</LI>
+        <LI><strong>Arabica daily XLS</strong> — certified total, by-port, by-group, and the passed/failed grading
+          matrix (origin × port, June 2026+; scalar text on legacy days).</LI>
         <LI><strong>Arabica ageing report</strong> — certified stock by origin × age band (monthly; drives Arabica
           cohort-match when parseable).</LI>
         <LI><strong>Robusta stock CSV</strong> — port totals (daily, time-stamped).</LI>
@@ -900,8 +911,9 @@ lost       = net_gained − netΔ`}</Fml>
 
       <H2>Caveats</H2>
       <ul className="space-y-1">
-        <LI><strong>Arabica per-origin flows are inferred</strong> — the feed gives a daily scalar grading count, so the
-          origin/port split of &ldquo;in&rdquo; is a distribution, not ground truth. Aggregate totals are exact.</LI>
+        <LI><strong>Arabica per-origin flows are exact on action days</strong> — the June-2026+ grading matrix gives a
+          real <Code>(origin, port)</Code> split. Only days without the matrix (legacy text reports, or pre-matrix
+          history) fall back to a distribution for the uncovered bags. Aggregate totals are exact either way.</LI>
         <LI><strong>Robusta origins are modelled</strong> via cohort DNA; thin gradings history falls back to a
           port&rsquo;s all-time mix.</LI>
         <LI><strong>in &amp; out lags the ageing report</strong> — intra-month it reads 0 by design; it resolves at the
@@ -914,7 +926,9 @@ lost       = net_gained − netΔ`}</Fml>
 
       <H2>Where it lives</H2>
       <P>
-        Cohort algorithm: <Code>backend/scraper/sources/ice_certified_stocks/cohort_outflow.py</Code>{" "}
+        Arabica grading matrix parser: <Code>parse_arabica_xls.py</Code> (<Code>_parse_grading_summary</Code> →
+        <Code> passed_by_origin</Code> / <Code>failed_by_origin</Code> on each snapshot). Cohort algorithm:{" "}
+        <Code>backend/scraper/sources/ice_certified_stocks/cohort_outflow.py</Code>{" "}
         (<Code>build_cohort_dna</Code>, <Code>build_implied_outflow</Code> with <Code>by_port_transit</Code>,
         <Code> build_current_by_origin</Code>). Visualisation &amp; bucket math:{" "}
         <Code>frontend/components/demand/CertifiedStocksSystemFlow.tsx</Code> (<Code>buildDensityGrid</Code>); KPI tiles

@@ -123,38 +123,37 @@ def _parse_grading_summary(sheet, section_row: int) -> dict:
     """Parse "TODAY'S GRADING SUMMARY" in BOTH layouts:
 
     • No-action / legacy text:  "No Bags Passed Today" / "825 Bags Passed Today"
-      (a leading "No" or integer before "Bags Passed/Failed").
+      (a leading "No" or integer before "Bags Passed/Failed"). No origin detail.
     • Action-day matrix (ICE format from June 2026): a "BAGS PASSED GRADING"
       header followed by an origin × port table ending in a "Total in Bags"
-      row whose last column is the grand total; then "BAGS FAILED GRADING"
-      with its own table. We take each table's grand total.
+      row; then "BAGS FAILED GRADING" with its own table. We capture the FULL
+      matrix for each (by_origin × by_port), not just the grand total, so the
+      certified-stocks model can attribute gradings to (origin, port) cohorts.
     """
     passed = failed = 0
     passed_text = failed_text = None
-    cur: str | None = None        # which matrix sub-section we're inside
-    last_col = sheet.ncols - 1
-    for r in range(section_row + 1, min(section_row + 30, sheet.nrows)):
+    # Per-(origin, port) grading matrices — only present on action-day (matrix)
+    # reports; None on legacy/no-action days. Shape mirrors _parse_matrix:
+    #   {ports, by_origin: {origin: {by_port, group, total}}, by_port, by_group, grand_total}
+    passed_detail: dict | None = None
+    failed_detail: dict | None = None
+    for r in range(section_row + 1, min(section_row + 40, sheet.nrows)):
         text = str(sheet.cell_value(r, 0)).strip()
         low = text.lower()
         if "pending grading" in low or "flagged for rebagging" in low:
             break
         if not text:
             continue
-        # Matrix sub-section headers (new format).
+        # Matrix sub-section headers (new format) — parse the whole table.
         if _PASSED_HDR.search(low):
-            cur = "passed"; continue
+            passed_detail = _parse_matrix(sheet, r)
+            passed = passed_detail["grand_total"]
+            passed_text = f"{passed} bags passed (matrix)"
+            continue
         if _FAILED_HDR.search(low):
-            cur = "failed"; continue
-        # Grand-total row of the active matrix sub-section.
-        if low.startswith("total in bags") and cur:
-            tot = _to_int(sheet.cell_value(r, last_col))
-            if tot == 0:                          # no explicit Total column
-                tot = sum(_to_int(sheet.cell_value(r, c)) for c in range(1, last_col))
-            if cur == "passed":
-                passed = tot; passed_text = f"{tot} bags passed (matrix)"
-            else:
-                failed = tot; failed_text = f"{tot} bags failed (matrix)"
-            cur = None
+            failed_detail = _parse_matrix(sheet, r)
+            failed = failed_detail["grand_total"]
+            failed_text = f"{failed} bags failed (matrix)"
             continue
         # Legacy one-liner: "No|123 Bags Passed/Failed …".
         m = _BAG_COUNT.match(text)
@@ -170,6 +169,8 @@ def _parse_grading_summary(sheet, section_row: int) -> dict:
         "failed_today_bags": failed,
         "passed_text":       passed_text,
         "failed_text":       failed_text,
+        "passed_detail":     passed_detail,
+        "failed_detail":     failed_detail,
     }
 
 
