@@ -2,10 +2,13 @@
 # Daily scraper for multi-commodity COT positions + prices.
 # Integrates into scraper/main.py ALL_SOURCES via run(page) stub.
 
+import functools
 import io
+import json
 import sys
 import zipfile
 from datetime import date, timedelta
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -195,8 +198,12 @@ COMMODITY_SPECS = {
     "name": "Coffee Robusta", "sector": "softs", "exchange": "ICE Europe",
     "cftc_filter": None,
     "ice_filter": "ICE Robusta Coffee Futures - ICE Futures Europe",
-    "yfinance_ticker": "RM=F", "price_proxy": None,
-    "price_source": "yfinance",
+    # Yahoo's RM=F continuous feed is dead (empty downloads → null price),
+    # like LCC=F/LBS=F. Reuse the Barchart-sourced front-month price we
+    # already archive daily, read on the COT report date (Tuesday) so it
+    # lines up with every other commodity.
+    "yfinance_ticker": None, "price_proxy": None,
+    "price_source": "internal_archive", "internal_market": "robusta",
     "contract_unit": 10, "price_unit": "usd_per_mt", "currency": "USD",
   },
   "cocoa_ny": {
@@ -583,6 +590,86 @@ def _phase(name: str) -> None:
     print(f"[macro_cot] PHASE: {name}", file=sys.stderr, flush=True)
 
 
+# Date-keyed per-contract OI+price archive committed by the Daily OI Snapshot
+# workflow: {market: {YYYY-MM-DD: {SYMBOL: {price, oi}}}}. macro_cot.py lives at
+# backend/scraper/sources/, so the repo root is parents[3].
+_ARCHIVE_PATH = Path(__file__).resolve().parents[3] / "data" / "contract_prices_archive.json"
+
+
+@functools.lru_cache(maxsize=1)
+def _load_price_archive() -> dict:
+    """Load + cache the per-contract price archive once per process."""
+    try:
+        return json.loads(_ARCHIVE_PATH.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macro_cot] archive read failed: {e}", file=sys.stderr)
+        return {}
+
+
+def _front_month_price_from_archive(market: str, report_date) -> float | None:
+    """Front-month settlement price ($/t) for `market` on the COT report date.
+
+    Used for symbols whose Yahoo feed is dead (robusta / RM=F): instead of an
+    external download we read the Barchart-sourced prices we already archive
+    daily, on the *same* report date (Tuesday) the other commodities use. Looks
+    back up to 6 calendar days, mirroring the yfinance close-on-report-date
+    lookback, in case the exact Tuesday is a market holiday / archive gap.
+    """
+    by_date = _load_price_archive().get(market) or {}
+    for offset in range(6):
+        day = by_date.get((report_date - timedelta(days=offset)).isoformat())
+        if not day:
+            continue
+        # Front month = first contract in insertion (expiry) order; the archive
+        # drops expired contracts, so the first entry is the active front month.
+        first = next(iter(day.values()), None)
+        if first and first.get("price") is not None:
+            return float(first["price"])
+    return None
+
+
+def _backfill_archive_prices(db) -> None:
+    """Self-heal price history for internal_archive symbols (robusta).
+
+    The main upsert loop only writes the latest COT date, but the archive holds
+    every past Tuesday — so fill any CommodityPrice rows still missing in the
+    52-week window the macro_cot export reads. One run backfills the whole
+    history (robusta had no prices at all while RM=F was dead); subsequent runs
+    are no-ops once every date is populated.
+    """
+    from models import CommodityCot, CommodityPrice
+    from scraper.db_macro import upsert_commodity_price
+
+    cutoff = date.today() - timedelta(weeks=52)
+    for sym, spec in COMMODITY_SPECS.items():
+        if spec.get("price_source") != "internal_archive":
+            continue
+        have = {
+            p.date
+            for p in db.query(CommodityPrice).filter(
+                CommodityPrice.symbol == sym,
+                CommodityPrice.date > cutoff,
+                CommodityPrice.close_price.isnot(None),
+            )
+        }
+        cot_dates = [
+            r.date
+            for r in db.query(CommodityCot).filter(
+                CommodityCot.symbol == sym, CommodityCot.date > cutoff
+            )
+        ]
+        filled = 0
+        for d in cot_dates:
+            if d in have:
+                continue
+            price = _front_month_price_from_archive(spec["internal_market"], d)
+            if price is not None:
+                upsert_commodity_price(db, sym, d, price)
+                filled += 1
+        if filled:
+            print(f"[macro_cot] backfilled {filled} {sym} prices from archive", file=sys.stderr)
+
+
 def _fetch_and_upsert(db) -> None:
     from sqlalchemy import func
 
@@ -754,6 +841,18 @@ def _fetch_and_upsert(db) -> None:
                 print(f"[macro_cot] WARNING: no stooq price for {sym} on {report_date}", file=sys.stderr)
                 continue
             upsert_commodity_price(db, sym, report_date, price)
+
+        elif src == "internal_archive":
+            price = _front_month_price_from_archive(spec["internal_market"], report_date)
+            if price is None:
+                print(f"[macro_cot] WARNING: no internal-archive price for {sym} on {report_date}", file=sys.stderr)
+                continue
+            upsert_commodity_price(db, sym, report_date, price)
+
+    # Fill in the rest of the history for archive-priced symbols so the
+    # cross-commodity 1W/1M/YTD columns are correct immediately, not only after
+    # weeks of forward accumulation.
+    _backfill_archive_prices(db)
 
 
 async def run(page):  # page unused — no browser needed
