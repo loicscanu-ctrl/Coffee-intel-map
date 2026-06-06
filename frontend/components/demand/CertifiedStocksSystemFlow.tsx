@@ -168,12 +168,24 @@ const ROBUSTA_PORT_NAMES: Record<string, string> = {
   TRI: "Trieste",
 };
 
-// ── Flow window selector ─────────────────────────────────────────────────────
-// Date-anchored windows. Each is labelled by its START date ("since DATE"):
-//   1d → the latest reported day · 1w → 7 days back · then the 1st of the
-//   month going back 1/2/3/6 months. Anchored to the most recent DATA date
-//   (not the wall clock) so "1 day" is the last reported move, never empty.
-export type DurationOpt = "1d" | "1w" | "m1" | "m2" | "m3" | "m6";
+// ── Flow range selector ──────────────────────────────────────────────────────
+// The period is a [start, end] window. `end` is a free calendar pick that
+// defaults to the latest available data date; `start` is chosen from a small
+// menu computed *relative to end*: one week back, or the 1st of end's month
+// (month-to-date — the default view) and the 1st of each earlier month, back
+// to the first month we hold data for. Both ends are anchored to real data
+// dates (never the wall clock) so a window is never empty.
+
+const _localISO = (d: Date): string =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+// Local-midnight Date from a "YYYY-MM-DD" string (avoids the UTC-parse drift
+// `new Date("2026-06-06")` would introduce in western time zones).
+export function parseFlowISO(iso: string): Date {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+export const flowDateISO = _localISO;
 
 export function flowAnchor(
   arabica: { snapshots?: { date: string }[] } | null,
@@ -183,27 +195,43 @@ export function flowAnchor(
   const a = arabica?.snapshots?.at(-1)?.date; if (a) dates.push(a);
   const r = robusta?.snapshots?.at(-1)?.date; if (r) dates.push(r);
   const max = dates.sort().at(-1);
-  if (max) {
-    const [y, m, d] = max.slice(0, 10).split("-").map(Number);
-    return new Date(y, m - 1, d);
-  }
+  if (max) return parseFlowISO(max);
   const n = new Date();
   return new Date(n.getFullYear(), n.getMonth(), n.getDate());
 }
 
-export interface FlowWindow { key: DurationOpt; cutoff: Date; label: string }
+// Earliest / latest data date across both markets — drives the calendar
+// picker's min/max so the user can't scroll past the data we hold.
+export function flowDateBounds(
+  arabica: { snapshots?: { date: string }[] } | null,
+  robusta: { snapshots?: { date: string }[] } | null,
+): { min: Date; max: Date } {
+  const dates: string[] = [];
+  for (const s of arabica?.snapshots ?? []) if (s.date) dates.push(s.date.slice(0, 10));
+  for (const s of robusta?.snapshots ?? []) if (s.date) dates.push(s.date.slice(0, 10));
+  dates.sort();
+  const max = flowAnchor(arabica, robusta);
+  const min = dates.length ? parseFlowISO(dates[0]) : max;
+  return { min, max };
+}
 
-export function flowWindows(anchor: Date): FlowWindow[] {
-  const y = anchor.getFullYear(), m = anchor.getMonth(), day = anchor.getDate();
-  const monthStart = (back: number) => new Date(y, m - back, 1);
-  const opts: { key: DurationOpt; cutoff: Date }[] = [
-    { key: "1d", cutoff: new Date(y, m, day) },
-    { key: "1w", cutoff: new Date(y, m, day - 7) },
-    { key: "m1", cutoff: monthStart(1) },
-    { key: "m2", cutoff: monthStart(2) },
-    { key: "m3", cutoff: monthStart(3) },
-    { key: "m6", cutoff: monthStart(6) },
+// Start-date menu, all relative to `end`:
+//   "w1" → end − 7 days · "m0" → 1st of end's month (month-to-date, default)
+//   "m1".."mN" → 1st of each earlier month, back to `minDate`'s month (≤12).
+export interface FlowStartOpt { key: string; cutoff: Date; label: string }
+export const FLOW_START_DEFAULT = "m0"; // month-to-date
+
+export function flowStartOptions(end: Date, minDate?: Date | null): FlowStartOpt[] {
+  const y = end.getFullYear(), m = end.getMonth(), day = end.getDate();
+  const opts: { key: string; cutoff: Date }[] = [
+    { key: "w1", cutoff: new Date(y, m, day - 7) },
   ];
+  const minT = minDate ? new Date(minDate.getFullYear(), minDate.getMonth(), 1).getTime() : -Infinity;
+  for (let back = 0; back < 12; back++) {
+    const c = new Date(y, m - back, 1);
+    if (c.getTime() < minT) break;
+    opts.push({ key: `m${back}`, cutoff: c });
+  }
   const fmtD = (dt: Date) => dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   return opts.map((o) => ({ ...o, label: fmtD(o.cutoff) }));
 }
@@ -769,13 +797,15 @@ const IconTruck = (p: { className?: string }) => (
 interface Props {
   arabica: ArabicaJsonShape | null;
   robusta: RobustaJsonShape | null;
-  // Flow window + display unit are owned by the parent panel (rendered up by
-  // the metric toggle) and passed down so both stay in sync.
-  flowDuration: DurationOpt;
+  // Flow range + display unit are owned by the parent panel (rendered up by
+  // the metric toggle) and passed down so both stay in sync. `start`/`end`
+  // are the window bounds (local-midnight Dates).
+  start: Date;
+  end: Date;
   unit: FlowUnit;
 }
 
-export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDuration, unit }: Props) {
+export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end, unit }: Props) {
   const fmtU = (v: number, native: "bags" | "lots") => _fmtUnit(v, native, unit);
   // Hover-only inspector — no click state. The tooltip pops out of the
   // square the mouse is over and renders origin / age / (Robusta) class.
@@ -831,9 +861,9 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
   }
 
   const systemFlows = useMemo<{ kc: SystemFlowMarket; rc: SystemFlowMarket }>(() => {
-    const anchor = flowAnchor(arabica, robusta);
-    const wins = flowWindows(anchor);
-    const cutoff = (wins.find((w) => w.key === flowDuration) ?? wins[1]).cutoff;
+    const cutoff = start;
+    // Inclusive end-of-day so the chosen end date's own snapshot is in range.
+    const endT = end.getTime() + 86_400_000 - 1;
 
     // Find the snapshot closest to (but not after) `target` for the T0 baseline.
     const findSnapAt = <T extends { date: string }>(snaps: T[], target: Date): T | null => {
@@ -849,6 +879,17 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       return best ?? snaps[0];
     };
 
+    // Last snapshot at or before the window end — the "as-of" frame for the
+    // period (current stock / by-origin). Falls back to the newest snapshot.
+    const snapAtOrBefore = <T extends { date: string }>(snaps: T[]): T | null => {
+      let best: T | null = null, bestT = -Infinity;
+      for (const s of snaps) {
+        const t = new Date(s.date).getTime();
+        if (t <= endT && t > bestT) { best = s; bestT = t; }
+      }
+      return best ?? (snaps.length ? snaps[snaps.length - 1] : null);
+    };
+
     // ── Arabica market ─────────────────────────────────────────────────
     const buildArabica = (): SystemFlowMarket => {
       const empty: SystemFlowMarket = {
@@ -857,7 +898,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       };
       const snaps = arabica?.snapshots ?? [];
       if (snaps.length === 0) return empty;
-      const latest = snaps[snaps.length - 1];
+      const latest = snapAtOrBefore(snaps) ?? snaps[snaps.length - 1];
       const base = findSnapAt(snaps, cutoff) ?? snaps[0];
       const latestSec = latest.sections?.total_certified;
       if (!latestSec) return empty;
@@ -924,7 +965,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       // AND departed inside the period (the "transited" bucket).
       const cutT = cutoff.getTime();
       const winSnaps = snaps
-        .filter((s) => new Date(s.date).getTime() >= cutT)
+        .filter((s) => { const t = new Date(s.date).getTime(); return t >= cutT && t <= endT; })
         .sort((a, b) => a.date.localeCompare(b.date));
       const walk = winSnaps[0] === base ? winSnaps : [base, ...winSnaps];
       const flowByPort: Record<string, Record<string, OriginFlowPair>> = {};
@@ -986,7 +1027,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       const cutTime = cutoff.getTime();
       let passed = 0, failed = 0;
       for (const s of snaps) {
-        if (new Date(s.date).getTime() < cutTime) continue;
+        const t = new Date(s.date).getTime();
+        if (t < cutTime || t > endT) continue;
         passed += s.passed_today_bags ?? 0;
         failed += s.failed_today_bags ?? 0;
       }
@@ -1020,7 +1062,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       const grads = robusta?.recent_activity?.gradings ?? [];
       const overv = robusta?.recent_activity?.grading_overview ?? [];
       if (snaps.length === 0) return empty;
-      const latest = snaps[snaps.length - 1];
+      const latest = snapAtOrBefore(snaps) ?? snaps[snaps.length - 1];
 
       // Origin proportion per port — prefer the full-history rollup the
       // importer attached (covers stock graded outside the daily window,
@@ -1156,7 +1198,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       const cohortInflowByPortOrigin: Record<string, Record<string, number>> = {};
       if (useCohort) {
         for (const ev of grads) {
-          if (new Date(ev.date).getTime() < cutT) continue;
+          const t = new Date(ev.date).getTime();
+          if (t < cutT || t > endT) continue;
           for (const e of (ev.entries || [])) {
             if (e.tenderable === false) continue;
             const port = e.port || "?";
@@ -1190,7 +1233,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
           const inflowByOrigin = cohortInflowByPortOrigin[code] ?? {};
           const outflowByOrigin: Record<string, number> = {};
           for (const entry of cohortOutflow ?? []) {
-            if (new Date(entry.month_end).getTime() < cutT) continue;
+            const t = new Date(entry.month_end).getTime();
+            if (t < cutT || t > endT) continue;
             const byO = entry.by_port?.[code];
             if (!byO) continue;
             for (const [o, v] of Object.entries(byO)) {
@@ -1205,7 +1249,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
           if (simRecent) {
             for (const [date, byO] of Object.entries(simRecent.outflowByOriginByDate)) {
               const t = new Date(date).getTime();
-              if (t < cutT || t <= lastCohortMonthEndT) continue;
+              if (t < cutT || t > endT || t <= lastCohortMonthEndT) continue;
               for (const [o, v] of Object.entries(byO)) {
                 outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
               }
@@ -1227,14 +1271,16 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
           }
           if (sim) {
             for (const [date, byO] of Object.entries(sim.inflowByOriginByDate)) {
-              if (new Date(date).getTime() < cutT) continue;
+              const t = new Date(date).getTime();
+              if (t < cutT || t > endT) continue;
               for (const [o, v] of Object.entries(byO)) {
                 flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
                 flowByOrigin[o].gross_in += v;
               }
             }
             for (const [date, byO] of Object.entries(sim.outflowByOriginByDate)) {
-              if (new Date(date).getTime() < cutT) continue;
+              const t = new Date(date).getTime();
+              if (t < cutT || t > endT) continue;
               for (const [o, v] of Object.entries(byO)) {
                 flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
                 flowByOrigin[o].gross_out += v;
@@ -1276,7 +1322,8 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
       const cutTimeR = cutoff.getTime();
       let pPrem = 0, pBord = 0, fail = 0;
       for (const g of grads) {
-        if (new Date(g.date).getTime() < cutTimeR) continue;
+        const t = new Date(g.date).getTime();
+        if (t < cutTimeR || t > endT) continue;
         for (const e of (g.entries || [])) {
           const lots = e.lots || 0;
           if (e.tenderable === false) { fail += lots; continue; }
@@ -1284,12 +1331,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
           else pPrem += lots;
         }
       }
-      // Pending from the most recent grading_overview report (point-in-time
-      // queue + forecast — not a flow).
-      const lastOverv = overv.length ? overv[overv.length - 1] : null;
+      // Pending from the most recent grading_overview report at or before the
+      // window end (point-in-time queue + forecast — not a flow).
+      const overvInWin = overv.filter((o) => new Date(o.date).getTime() <= endT);
+      const lastOverv = overvInWin.length ? overvInWin[overvInWin.length - 1]
+        : (overv.length ? overv[overv.length - 1] : null);
       const pendingTotal = lastOverv?.total_pending_lots ?? 0;
       // Date label = latest event in window so the user knows the period end.
-      const inWinGrad = grads.filter((g) => new Date(g.date).getTime() >= cutTimeR);
+      const inWinGrad = grads.filter((g) => { const t = new Date(g.date).getTime(); return t >= cutTimeR && t <= endT; });
       const dateLabel = inWinGrad.length ? inWinGrad[inWinGrad.length - 1].date : (grads[grads.length - 1]?.date ?? null);
       return {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
@@ -1300,7 +1349,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, flowDurati
     };
 
     return { kc: buildArabica(), rc: buildRobusta() };
-  }, [arabica, robusta, flowDuration]);
+  }, [arabica, robusta, start, end]);
 
 
   return (
