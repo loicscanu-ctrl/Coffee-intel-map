@@ -54,7 +54,7 @@ jobs:
             case "$RUN_NAME" in
               *"COT Scraper"*)        topics="cot,macro_cot,oi_fnd_chart"; signals=true ;;
               *"Daily OI Snapshot"*)  topics="futures_chain,oi_fnd_chart,latest_prices" ;;
-              *"Daily News Scraper"*) topics="news,latest_prices,vn_physical_prices,retail_cpi,us_cpi" ;;
+              *"Daily News Scraper"*) topics="news,latest_prices,vn_physical_prices" ;;
               *)                      signals=true ;;   # unknown upstream → full, safe
             esac
           fi
