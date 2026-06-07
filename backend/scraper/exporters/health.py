@@ -128,6 +128,19 @@ def export_health(db) -> None:
         return None
     scrapers["retail_cpi"] = _cpi_ts()
 
+    # Headline US CPI (BLS CPI-U, monthly). Surfaces in the Macro tab's
+    # US Inflation (CPI-U) section.
+    def _us_cpi_ts() -> str | None:
+        try:
+            p = OUT_DIR / "us_cpi.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("last_updated")
+        except Exception:
+            return None
+        return None
+    scrapers["us_cpi"] = _us_cpi_ts()
+
     # FX history (12 currency pairs, daily closes, ~1 year window). Backs the
     # Macro tab's FX Pair Time-Series widget. Written by the quant currency
     # index workflow alongside quant_report.json.

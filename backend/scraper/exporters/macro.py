@@ -125,3 +125,41 @@ def export_retail_cpi(db) -> None:
         print(f"  retail_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
     except Exception as e:
         print(f"  retail_cpi.json → FAILED: {e}")
+
+
+def export_us_cpi(db) -> None:
+    """Publish headline US CPI (CPI-U) to /data/us_cpi.json for the Macro tab.
+
+    Resilient lookup order: the scraper's cache file (gitignored, may be lost
+    cross-job in CI) → the DB news item the scraper stashes → a fresh BLS
+    fetch. The fresh-fetch fallback means a full cron export reproduces the
+    file even when no scraper ran in the same job.
+    """
+    try:
+        from scraper.sources import us_cpi as _us_cpi
+
+        payload = _us_cpi.fetch_latest()
+        if not payload:
+            from models import NewsItem
+            item = (
+                db.query(NewsItem)
+                .filter(NewsItem.source == "US CPI")
+                .order_by(NewsItem.pub_date.desc())
+                .first()
+            )
+            if item and item.meta:
+                try:
+                    payload = json.loads(item.meta)
+                except Exception:
+                    payload = None
+        if not payload:
+            payload = _us_cpi._build_payload()
+        if not payload:
+            print("  us_cpi.json → no data")
+            return
+        path = OUT_DIR / "us_cpi.json"
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        n = len(payload.get("series") or {})
+        print(f"  us_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
+    except Exception as e:
+        print(f"  us_cpi.json → FAILED: {e}")
