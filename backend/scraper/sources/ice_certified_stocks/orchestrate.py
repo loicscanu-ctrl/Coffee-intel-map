@@ -634,26 +634,31 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     print(f"  → {len(arabica_snapshots)} snapshots; {len(arabica_errors)} misses\n")
 
     # ── Arabica monthly ageing report ──
-    # Last business day of the previous calendar month; fall back one
-    # more month if ICE hasn't published yet (typically published within
-    # a few business days of month-end).
+    # The file is dated around month-end but the exact day drifts (weekend /
+    # holiday → published a few days early, occasionally late), so for each
+    # recent month we try a small set of candidate dates (see
+    # F.month_end_publish_candidates) and take the first that parses with data.
+    # Walk back up to 2 months in case the latest isn't published yet.
     today = days_sorted_asc[-1] if days_sorted_asc else date.today()
     arabica_ageing: dict | None = None
     arabica_ageing_url: str | None = None
-    for back in (0, 1):
-        first_of_this_month = today.replace(day=1)
-        target_month_end = first_of_this_month - timedelta(days=1)
-        if back == 1:
-            target_month_end = target_month_end.replace(day=1) - timedelta(days=1)
-        # ICE files use the actual last calendar day, not the last business day.
-        print(f"[arabica] ageing report for {target_month_end.isoformat()}...")
-        url, parsed = pull_arabica_ageing(target_month_end)
-        if parsed and parsed.get("grand_total", 0) > 0:
-            arabica_ageing = parsed
-            arabica_ageing_url = url
-            n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
-                     else f"{len(parsed.get('ports', []))} ports")
-            print(f"  → captured ({parsed.get('grand_total', 0):,} bags across {n_dim})")
+    for back in (0, 1, 2):
+        anchor = today.replace(day=1) - timedelta(days=1)        # last day of prev month
+        for _ in range(back):
+            anchor = anchor.replace(day=1) - timedelta(days=1)   # one more month back
+        candidates = F.month_end_publish_candidates(anchor.year, anchor.month)
+        print(f"[arabica] ageing report for {anchor.year}-{anchor.month:02d} "
+              f"(trying {len(candidates)} candidate dates)...")
+        for cand in candidates:
+            url, parsed = pull_arabica_ageing(cand)
+            if parsed and parsed.get("grand_total", 0) > 0:
+                arabica_ageing = parsed
+                arabica_ageing_url = url
+                n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
+                         else f"{len(parsed.get('ports', []))} ports")
+                print(f"  → captured {cand.isoformat()} ({parsed.get('grand_total', 0):,} bags across {n_dim})")
+                break
+        if arabica_ageing is not None:
             break
         print(f"  → miss, will try {back+1} month(s) back")
 

@@ -2,11 +2,22 @@
 
 from datetime import date
 
+from scraper.sources.ice_certified_stocks.fetch import month_end_publish_candidates
 from scraper.sources.ice_certified_stocks.parse_arabica_ageing import (
     _band_from_header,
     fetch_url_for,
     parse_ageing_sheet,
 )
+
+
+def test_month_end_publish_candidates_cover_observed_dates():
+    # Real observed publish days in 2026: month-end shifts off weekends.
+    observed = {(2026, 1): 30, (2026, 2): 27, (2026, 3): 31, (2026, 4): 30, (2026, 5): 31}
+    for (y, m), day in observed.items():
+        cands = month_end_publish_candidates(y, m)
+        assert any(c.day == day and c.month == m for c in cands), (y, m, day, cands)
+        # Last calendar day is tried first.
+        assert cands[0].month == m and cands[0].day >= 28
 
 # ── Band-header sniffer ─────────────────────────────────────────────────────
 
