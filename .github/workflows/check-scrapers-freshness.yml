@@ -61,6 +61,15 @@ jobs:
               "ecf":              90 * 24,   # ECF port stocks (bi-monthly)
               # Daily business-day source — allow up to 10 days for gaps/holidays
               "cecafe_daily":     10 * 24,
+              # ICE certified stocks. Daily stock runs Mon-Fri (data is T-1), so
+              # 6 days buffers weekends + a holiday. The two monthly reports are
+              # captured by workflow 1.14's 1st-3rd catch window; their month_end
+              # tops out ~33 days old just before the next capture, so 38 days
+              # alerts within a few days of a missed window (the agreed red-alert
+              # that hands the monthly report back to a human).
+              "ice_certified_daily":       6 * 24,
+              "ice_arabica_ageing":        38 * 24,
+              "ice_robusta_age_allowance": 38 * 24,
           }
           DEFAULT_H = 48
 

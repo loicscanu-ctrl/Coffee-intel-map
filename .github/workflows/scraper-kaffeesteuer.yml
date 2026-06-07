@@ -2,9 +2,10 @@ name: "3.1 – Kaffeesteuer Scraper"
 
 on:
   schedule:
-    # 1st of each month at 08:00 UTC
-    # Reports are published on the 20th-23rd of the month after → safe buffer
-    - cron: "0 8 1 * *"
+    # 24th of each month at 08:00 UTC. Reports publish on the 20th-23rd, so the
+    # 24th picks each up within ~a day (was the 1st — correct cadence but ~8
+    # days stale). Still exactly 1x/month.
+    - cron: "0 8 24 * *"
   workflow_dispatch:   # allow manual trigger
 
 concurrency:

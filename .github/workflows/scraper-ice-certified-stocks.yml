@@ -30,11 +30,10 @@ on:
     # reports — the run time no longer has to chase same-day publication.
     # Mon-Fri with a multi-day backfill window covers Friday's data on Monday;
     # ICE doesn't publish Sat/Sun. Manual dispatch still allowed any day.
+    # Runs with --skip-monthly: the monthly ageing / age-allowance reports are
+    # handled by their own job (1.14 – ICE Monthly Reports), so the daily run
+    # no longer re-fetches a monthly report ~21×/month.
     - cron: '0 3 * * 1-5'
-    # 2nd of each month, 03:00 UTC — the monthly robusta age-allowance and
-    # arabica ageing reports land a day or two into the new month. This extra
-    # run (also on weekends) guarantees the fresh month-end report is captured.
-    - cron: '0 3 2 * *'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
@@ -85,8 +84,10 @@ jobs:
           if [ "${{ inputs.mode }}" = "smoke" ]; then
             python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
           else
+            # --skip-monthly: daily feeds only; the monthly ageing /
+            # age-allowance reports are pulled by workflow 1.14.
             python -m scraper.sources.ice_certified_stocks.orchestrate \
-              --days "${{ inputs.days_back || 3 }}"
+              --days "${{ inputs.days_back || 3 }}" --skip-monthly
           fi
 
       - name: Commit + push if changed

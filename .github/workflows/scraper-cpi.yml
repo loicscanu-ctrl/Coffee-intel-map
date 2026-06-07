@@ -7,11 +7,11 @@ name: "1.15 – Monthly CPI Scraper (US CPI · Retail Coffee CPI)"
 on:
   schedule:
     # US BLS CPI-U drops ~08:30 ET (12:30/13:30 UTC) on a day between the
-    # 10th–18th; Brazil BCB IPCA lands ~10th; Eurostat HICP mid-month. Run a
-    # mid-month daily window at 13:40 UTC (after the BLS release) so each is
-    # picked up within a day of publication — the exporter only commits when
-    # the numbers actually change, so the extra runs are cheap no-ops.
-    - cron: '40 13 10-18 * *'
+    # 10th–18th; Brazil BCB IPCA lands ~10th; Eurostat HICP mid-month. Narrowed
+    # to the 11th–16th (the window the BLS release has actually fallen in) at
+    # 13:40 UTC — the exporter only commits when the numbers change, and the
+    # 1st-of-month backstop below still catches an unusually late release.
+    - cron: '40 13 11-16 * *'
     # 1st-of-month backstop for any late or missed release.
     - cron: '0 3 1 * *'
   workflow_dispatch:
