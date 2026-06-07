@@ -148,36 +148,44 @@ def _rows_from_xlsx(path: Path, sheet_name: str | None):
         yield (_to_date(r[0]), _str(r[1]), _str(r[3]), _int(r[4]), _str(r[5]))
 
 
-def _rows_from_csv(path: Path):
-    with path.open(newline="", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
-        header = next(reader, None)
-        if not header:
-            raise SystemExit("empty CSV")
-        low = [h.strip().lower() for h in header]
+def _rows_from_delimited(path: Path):
+    """Read a .csv / .tsv / .txt export of the grading sheet. Delimiter is
+    auto-detected (tab vs comma vs semicolon). Columns are matched by header
+    name, so column order doesn't matter. Rows with an empty origin (older
+    history, before ICE published origins) still feed the day's pass/fail
+    totals but carry no origin — handled downstream by leaving the snapshot's
+    scalar untouched."""
+    raw = path.read_text(encoding="utf-8-sig")
+    first = raw.split("\n", 1)[0]
+    delim = "\t" if "\t" in first else ";" if (";" in first and "," not in first) else ","
+    reader = csv.reader(raw.splitlines(), delimiter=delim)
+    header = next(reader, None)
+    if not header:
+        raise SystemExit("empty file")
+    low = [h.strip().lower() for h in header]
 
-        def find(*keys, avoid=()):
-            for i, h in enumerate(low):
-                if any(k in h for k in keys) and not any(a in h for a in avoid):
-                    return i
-            return None
+    def find(*keys, avoid=()):
+        for i, h in enumerate(low):
+            if any(k in h for k in keys) and not any(a in h for a in avoid):
+                return i
+        return None
 
-        i_date = find("date")
-        i_port = find("port_code", "port code") or find("port", avoid=("name",)) or find("port")
-        i_status = find("status", "pass", "result")
-        i_bags = find("bag", "lot", "qty", "quantity", "volume")
-        i_origin = find("origin", "growth", "country")
-        missing = [n for n, i in (("date", i_date), ("port", i_port), ("status", i_status),
-                                  ("bags", i_bags), ("origin", i_origin)) if i is None]
-        if missing:
-            raise SystemExit(f"CSV missing column(s) {missing}; header was: {header}")
-        print(f"    CSV columns → date={header[i_date]}, port={header[i_port]}, "
-              f"status={header[i_status]}, bags={header[i_bags]}, origin={header[i_origin]}")
-        for row in reader:
-            if not row or len(row) <= max(i_date, i_port, i_status, i_bags, i_origin):
-                continue
-            yield (_to_date(row[i_date]), _str(row[i_port]), _str(row[i_status]),
-                   _int(row[i_bags]), _str(row[i_origin]))
+    i_date = find("date")
+    i_port = find("port_code", "port code") or find("port", avoid=("name",)) or find("port")
+    i_status = find("status", "pass", "result")
+    i_bags = find("bag", "lot", "qty", "quantity", "volume")
+    i_origin = find("origin", "growth", "country")
+    missing = [n for n, i in (("date", i_date), ("port", i_port), ("status", i_status),
+                              ("bags", i_bags), ("origin", i_origin)) if i is None]
+    if missing:
+        raise SystemExit(f"file missing column(s) {missing}; header was: {header}")
+    print(f"    delimiter={delim!r}; columns → date={header[i_date]}, port={header[i_port]}, "
+          f"status={header[i_status]}, bags={header[i_bags]}, origin={header[i_origin]}")
+    for row in reader:
+        if not row or len(row) <= max(i_date, i_port, i_status, i_bags, i_origin):
+            continue
+        yield (_to_date(row[i_date]), _str(row[i_port]), _str(row[i_status]),
+               _int(row[i_bags]), _str(row[i_origin]))
 
 
 def _to_scraper_shape(by_port_origin_status: dict) -> tuple[dict, dict]:
@@ -203,7 +211,8 @@ def backfill(src: Path, json_path: Path, *, sheet: str | None, write: bool, allo
     earliest = min(by_date) if by_date else "1900-01-01"
     since = date(*(int(x) for x in earliest.split("-")))
 
-    rows = _rows_from_csv(src) if src.suffix.lower() == ".csv" else _rows_from_xlsx(src, sheet)
+    rows = (_rows_from_delimited(src) if src.suffix.lower() in {".csv", ".tsv", ".txt"}
+            else _rows_from_xlsx(src, sheet))
     per_date = _aggregate(rows, since)
 
     summary = {
@@ -252,7 +261,8 @@ def backfill(src: Path, json_path: Path, *, sheet: str | None, write: bool, allo
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("source", type=Path, help="path to the workbook (.xlsx) or a CSV export of the grading sheet")
+    ap.add_argument("source", type=Path,
+                    help="the workbook (.xlsx) or a delimited export of the grading sheet (.csv/.tsv/.txt)")
     ap.add_argument("--json", type=Path, default=DEFAULT_JSON, dest="json_path")
     ap.add_argument("--sheet", default=None, help="force a sheet name (xlsx only)")
     ap.add_argument("--write", action="store_true", help="patch the JSON in place")
