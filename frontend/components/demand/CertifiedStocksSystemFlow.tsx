@@ -921,9 +921,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
     unit: "bags" | "lots";
     squareUnit: number;
     ports: PortFlow[];
-    // Whether an ageing report inside the window lets us match cohorts (and so
-    // surface in & out). Drives the per-market caption + the density-grid split.
+    // Whether we can surface in & out for this market/window. Drives the
+    // density-grid split (transit-aware when true).
     cohortMatched: boolean;
+    // How in & out is derived — drives the per-market caption:
+    //   "fifo"   = Arabica daily per-(origin,port) ledger (oldest-leaves-first)
+    //   "ageing" = Robusta cohort-DNA matched against an ageing report in-window
+    //   "none"   = no in & out yet (Robusta intra-month, before the next report)
+    inOutBasis: "fifo" | "ageing" | "none";
     intake: {
       pending: number;
       passed: number;
@@ -968,7 +973,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
     const buildArabica = (): SystemFlowMarket => {
       const empty: SystemFlowMarket = {
         market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports: [], cohortMatched: false, intake: null,
+        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports: [], cohortMatched: false, inOutBasis: "none", intake: null,
       };
       const snaps = arabica?.snapshots ?? [];
       if (snaps.length === 0) return empty;
@@ -1064,75 +1069,102 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
         }
       }
 
-      // ── Cohort match + model-faithful flow re-sourcing ──────────────────
-      // Per the user's model, without an ageing report inside the window the
-      // window's passed gradings are the "in", the gap between theoretical
-      // (base + passed) and real (current) stock is the "out", and there is no
-      // in & out. We only switch to the signed-delta/min() split when a usable
-      // ageing report's month_end lands inside the window (cohortMatched).
-      const ar = arabica?.ageing_report;
-      const arUsable = !!ar && (ar.grand_total ?? 0) > 0 &&
-        Object.keys(ar.by_origin_band ?? {}).length > 0;
-      const arT = ar?.month_end ? new Date(ar.month_end).getTime() : null;
-      const cohortMatched = arUsable && arT != null && arT >= cutT && arT <= endT;
-
-      if (!cohortMatched) {
-        // The window's passed-grading "in". Prefer the EXACT per-(origin,port)
-        // grading matrix (action-day reports, June 2026+); fall back to
-        // distributing the scalar total by where stock landed only for the
-        // portion of days that lack the matrix (legacy/no-action or old JSON).
-        let P = 0;                                   // scalar passed total
-        const gradedByPortOrigin: Record<string, Record<string, number>> = {};
-        let gradedDetailSum = 0;                     // covered by the matrix
-        for (const s of snaps) {
-          const t = new Date(s.date).getTime();
-          if (t < cutT || t > endT) continue;
-          P += s.passed_today_bags ?? 0;
-          const rows = _arabicaPassedByPortOrigin(s);
-          if (!rows) continue;
-          for (const [port, origin, bags] of rows) {
-            gradedByPortOrigin[port] = gradedByPortOrigin[port] || {};
-            gradedByPortOrigin[port][origin] = (gradedByPortOrigin[port][origin] ?? 0) + bags;
-            gradedDetailSum += bags;
+      // ── Exact per-(origin, port) ledger via daily FIFO ──────────────────
+      // Arabica publishes exact daily per-(origin,port) stock AND per-origin
+      // gradings, so we don't infer — we account exactly:
+      //   in  = passed gradings in the window           (exact)
+      //   out = base + in − current per (origin,port)   (exact mass balance)
+      //   in & out (transit) = of the window's gradings, how much also LEFT in
+      //     the window, by a per-(origin,port) FIFO ledger seeded with the
+      //     start-of-window stock as the oldest cohort (oldest warrants leave
+      //     first — age allowances make that the realistic tender order).
+      // The monthly ageing report is age×port with no origin, so it can't drive
+      // an origin cohort match; it powers the age fade and validates this ledger.
+      // `walk` is the chronological [base, …window snapshots] built above.
+      {
+        type LedgerCell = { in: number; out: number; transit: number };
+        const ledger: Record<string, Record<string, LedgerCell>> = {};
+        const cell = (p: string, o: string): LedgerCell => {
+          ledger[p] = ledger[p] || {};
+          return (ledger[p][o] = ledger[p][o] || { in: 0, out: 0, transit: 0 });
+        };
+        // FIFO queues per (port, origin): [cohortDate | "LEGACY", qty].
+        const queues = new Map<string, Array<[string, number]>>();
+        const qOf = (p: string, o: string) => {
+          const k = `${p}|${o}`;
+          let q = queues.get(k);
+          if (!q) { q = []; queues.set(k, q); }
+          return q;
+        };
+        // Seed legacy = start-of-window stock (oldest cohort).
+        let prev = collapseSec(walk[0]?.sections?.total_certified).byOriginPort;
+        for (const [o, perPort] of Object.entries(prev))
+          for (const [p, v] of Object.entries(perPort)) if (v > 0) qOf(p, o).push(["LEGACY", v]);
+        // Per-day grading inflow for a snapshot, canonical-port keyed. Uses the
+        // exact per-origin matrix; if a day only has the scalar (pre-matrix),
+        // spreads it across origins by that day's positive stock movement.
+        const gradOf = (snap: ArabicaSnap, prevBO: Record<string, Record<string, number>>,
+                        curBO: Record<string, Record<string, number>>): Record<string, Record<string, number>> => {
+          const rows = _arabicaPassedByPortOrigin(snap);
+          const out: Record<string, Record<string, number>> = {};
+          if (rows && rows.length) {
+            for (const [p, o, b] of rows) { out[p] = out[p] || {}; out[p][o] = (out[p][o] ?? 0) + b; }
+            return out;
           }
+          const scalar = snap.passed_today_bags ?? 0;
+          if (scalar <= 0) return out;
+          const ups: Array<[string, string, number]> = [];
+          let upSum = 0;
+          const keys = new Set<string>();
+          for (const o of Object.keys({ ...prevBO, ...curBO })) for (const p of Object.keys({ ...(prevBO[o] || {}), ...(curBO[o] || {}) })) keys.add(`${p}|${o}`);
+          for (const key of Array.from(keys)) {
+            const sep = key.indexOf("|"); const p = key.slice(0, sep), o = key.slice(sep + 1);
+            const d = (curBO[o]?.[p] ?? 0) - (prevBO[o]?.[p] ?? 0);
+            if (d > 0) { ups.push([p, o, d]); upSum += d; }
+          }
+          for (const [p, o, d] of ups) { out[p] = out[p] || {}; out[p][o] = scalar * (d / (upSum || 1)); }
+          return out;
+        };
+        for (let i = 1; i < walk.length; i++) {
+          const cur = collapseSec(walk[i]?.sections?.total_certified).byOriginPort;
+          const grad = gradOf(walk[i], prev, cur);
+          const keys = new Set<string>();
+          for (const o of Object.keys(prev)) for (const p of Object.keys(prev[o])) keys.add(`${p}|${o}`);
+          for (const o of Object.keys(cur)) for (const p of Object.keys(cur[o])) keys.add(`${p}|${o}`);
+          for (const p of Object.keys(grad)) for (const o of Object.keys(grad[p])) keys.add(`${p}|${o}`);
+          for (const key of Array.from(keys)) {
+            const sep = key.indexOf("|"); const p = key.slice(0, sep), o = key.slice(sep + 1);
+            const gin = grad[p]?.[o] ?? 0;
+            const c = cell(p, o);
+            if (gin > 0) { c.in += gin; qOf(p, o).push([walk[i].date, gin]); }
+            const outToday = Math.max(0, (prev[o]?.[p] ?? 0) + gin - (cur[o]?.[p] ?? 0));
+            if (outToday > 0) {
+              c.out += outToday;
+              let rem = outToday;
+              const q = qOf(p, o);
+              while (rem > 1e-9 && q.length) {
+                const head = q[0];
+                const take = Math.min(rem, head[1]);
+                if (head[0] !== "LEGACY") c.transit += take;   // graded in-window AND left
+                head[1] -= take; rem -= take;
+                if (head[1] <= 1e-9) q.shift();
+              }
+            }
+          }
+          prev = cur;
         }
-        const baseC = collapseSec(base.sections?.total_certified);
-        const curTotal = Object.values(latestC.byPort).reduce((a, b) => a + b, 0);
-        // Remainder = passed bags not covered by any matrix detail in-window.
-        const remainder = Math.max(0, P - gradedDetailSum);
-        // Distribute only the remainder by each pair's share of positive
-        // intra-window movement (where stock landed); fall back to current
-        // stock share when nothing grew.
-        let posSum = 0;
-        for (const port of Object.keys(flowByPort))
-          for (const o of Object.keys(flowByPort[port])) posSum += Math.max(0, flowByPort[port][o].gross_in);
-        const keys = new Set<string>();
-        for (const port of Object.keys(flowByPort)) for (const o of Object.keys(flowByPort[port])) keys.add(`${port}|${o}`);
-        for (const [o, perPort] of Object.entries(latestC.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${o}`);
-        for (const port of Object.keys(gradedByPortOrigin)) for (const o of Object.keys(gradedByPortOrigin[port])) keys.add(`${port}|${o}`);
-        const reflow: Record<string, Record<string, OriginFlowPair>> = {};
-        for (const key of Array.from(keys)) {
-          const sep = key.indexOf("|");
-          const port = key.slice(0, sep), origin = key.slice(sep + 1);
-          const exactIn  = gradedByPortOrigin[port]?.[origin] ?? 0;   // real grading inflow
-          const deltaIn  = Math.max(0, flowByPort[port]?.[origin]?.gross_in ?? 0);
-          const curLevel = latestC.byOriginPort[origin]?.[port] ?? 0;
-          const baseLevel = baseC.byOriginPort[origin]?.[port] ?? 0;
-          const netDelta = curLevel - baseLevel;
-          const inShare = posSum > 0 ? deltaIn / posSum : (curTotal > 0 ? curLevel / curTotal : 0);
-          const inVol = exactIn + remainder * inShare;
-          // netGained ≥ both the graded-in and any net growth (transfer-in);
-          // lost is whatever must have left to land at the observed net delta.
-          const ng = Math.max(inVol, Math.max(0, netDelta));
-          const lo = ng - netDelta;
-          if (ng <= 0 && lo <= 0) continue;
-          reflow[port] = reflow[port] || {};
-          reflow[port][origin] = { gross_in: ng, gross_out: lo };
-        }
-        // Replace the delta-derived flows with the model-faithful ones.
+        // Replace the signed-delta flows with the exact ledger (carrying transit).
         for (const k of Object.keys(flowByPort)) delete flowByPort[k];
-        Object.assign(flowByPort, reflow);
+        for (const [p, byO] of Object.entries(ledger))
+          for (const [o, f] of Object.entries(byO))
+            if (f.in > 0 || f.out > 0) {
+              flowByPort[p] = flowByPort[p] || {};
+              flowByPort[p][o] = { gross_in: f.in, gross_out: f.out, transit: f.transit };
+            }
       }
+      // Arabica always has the daily ledger as its in & out basis.
+      const cohortMatched = true;
+      const inOutBasis: "fifo" | "ageing" | "none" = "fifo";
 
       const ports: PortFlow[] = [];
       for (const [code, current] of Object.entries(latestC.byPort)) {
@@ -1188,7 +1220,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
       const passedBorderline = Math.round(passed * (borderlineShare / sum));
       return {
         market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports, cohortMatched,
+        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports, cohortMatched, inOutBasis,
         intake: { pending: latest.pending_grading_bags ?? 0, passed, failed, passedPremium, passedBorderline, date: latest.date },
       };
     };
@@ -1200,7 +1232,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
     const buildRobusta = (): SystemFlowMarket => {
       const empty: SystemFlowMarket = {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
-        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports: [], cohortMatched: false, intake: null,
+        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports: [], cohortMatched: false, inOutBasis: "none", intake: null,
       };
       const snaps = robusta?.snapshots ?? [];
       const grads = robusta?.recent_activity?.gradings ?? [];
@@ -1514,6 +1546,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
       return {
         market: "RC", label: "Robusta · ICE Futures Europe (RC)",
         unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports, cohortMatched,
+        inOutBasis: cohortMatched ? "ageing" : "none",
         intake: { pending: pendingTotal, passed: pPrem + pBord, failed: fail,
                   passedPremium: pPrem, passedBorderline: pBord, date: dateLabel },
       };
@@ -1627,16 +1660,22 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
                 origin per port inferred from gradings flow*
               </span>
             )}
-            {/* Cohort-match state — in & out only appears once an ageing report
-                inside the window lets us match cohorts; otherwise all passed is
-                "in" and the decline is "out". */}
+            {/* How in & out is derived for this market. */}
             <span
-              className={`ml-2 text-[10px] normal-case font-normal ${mkt.cohortMatched ? "text-amber-400/80" : "text-slate-500"}`}
-              title={mkt.cohortMatched
-                ? "An ageing report inside this window lets us match cohorts — stock that arrived AND left is split out as in & out."
-                : "No ageing report inside this window yet — every passed lot counts as in and the decline as out; in & out is matched once the next ageing report lands."}
+              className={`ml-2 text-[10px] normal-case font-normal ${mkt.inOutBasis === "none" ? "text-slate-500" : "text-amber-400/80"}`}
+              title={
+                mkt.inOutBasis === "fifo"
+                  ? "in & out from the exact daily per-(origin, port) ledger: in = gradings, out = mass balance, in & out = FIFO (oldest warrants leave first). The monthly ageing report has no origin column, so it powers the age fade and validates this ledger."
+                  : mkt.inOutBasis === "ageing"
+                  ? "An ageing report inside this window lets us cohort-match outflow — stock graded AND decertified in-window is split out as in & out."
+                  : "No ageing report inside this window yet — every passed lot counts as in and the decline as out; in & out is matched once the next ageing report lands."
+              }
             >
-              · {mkt.cohortMatched ? "in & out matched (ageing report)" : "in & out pending next ageing report"}
+              · {mkt.inOutBasis === "fifo"
+                  ? "in & out · daily per-origin ledger (FIFO)"
+                  : mkt.inOutBasis === "ageing"
+                  ? "in & out matched (ageing report)"
+                  : "in & out pending next ageing report"}
             </span>
           </div>
 

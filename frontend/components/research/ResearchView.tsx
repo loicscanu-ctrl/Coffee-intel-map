@@ -884,15 +884,32 @@ lost       = net_gained − netΔ`}</Fml>
         So the per-origin split is now <strong>exact when the matrix is present</strong> and only an inference for the
         residual; the aggregate in/out totals are exact either way.
       </P>
+      <H2>Arabica in &amp; out — the daily FIFO ledger</H2>
       <P>
-        <strong>Arabica in &amp; out — current status.</strong> The ICE monthly ageing report (
-        <Code>coffee_aging_YYYYMMDD.xls</Code>) turned out to be laid out as <strong>age-in-days × port</strong> with
-        <em> no origin column</em> — so it can&rsquo;t be used directly for an origin-resolved match the way Robusta&rsquo;s
-        is. Arabica therefore shows <em>in</em> and <em>out</em> but no <em>in &amp; out</em> yet. The path to close it
-        is the same cohort-DNA engine as Robusta: use the per-origin <em>gradings</em> as each (port, grading-month)
-        cohort&rsquo;s DNA, and the ageing report&rsquo;s per-port day-buckets (30-day bins ≈ monthly cohorts) as that
-        cohort&rsquo;s survival, then apportion month-to-month shrinkage by DNA. The grading side is already exact; the
-        ageing parser now reads the real port layout (restoring the age distribution that drives the fade and age tiles).
+        The ICE monthly ageing report (<Code>coffee_aging_YYYYMMDD.xls</Code>) turned out to be laid out as
+        <strong> age-in-days × port</strong> with <em>no origin column</em>, and its day-buckets don&rsquo;t support a
+        clean report-to-report cohort match (a 0–120-day lumped young bucket, fixed bins that a cohort drifts across as
+        it ages, and non-uniform ~30-day intervals). Prototyped against real April→May files it <strong>overcounted
+        outflow ~2.3×</strong> versus the exact mass balance — so it&rsquo;s not the right engine for Arabica.
+      </P>
+      <P>
+        Instead we use what Arabica has and Robusta doesn&rsquo;t: <strong>exact daily per-(origin, port) stock</strong>
+        plus exact per-origin gradings. So in/out are computed, not inferred, and in &amp; out comes from a per-(origin,
+        port) <strong>FIFO ledger</strong>:
+      </P>
+      <Fml>{`in[port,origin]  = Σ_window gradings                         (exact)
+out[port,origin] = Σ_window daily decertifications           (exact)
+seed: start-of-window stock = the oldest ("LEGACY") cohort
+each day:  add that day's gradings as a new cohort
+           remove the day's decert FIFO — oldest first
+in & out (transit) = decerted bags whose cohort was graded in-window`}</Fml>
+      <P>
+        Oldest-leaves-first is also the realistic tender order, since age allowances penalise old warrants. A key
+        consequence (and a good sanity check): when a window&rsquo;s gradings are small relative to a large outflow of
+        old stock, <Code>in &amp; out ≈ 0</Code> — the fresh lots stayed, the old stock left — which is exactly the
+        model&rsquo;s &ldquo;850 in, big out, 0 in &amp; out&rdquo; case. The ageing report still earns its keep: it
+        powers the age fade / age tiles and independently validates the ledger&rsquo;s young-cohort survivors. The
+        per-market caption reads <em>&ldquo;in &amp; out · daily per-origin ledger (FIFO)&rdquo;</em> for Arabica.
       </P>
 
       <H2>The period selector</H2>
