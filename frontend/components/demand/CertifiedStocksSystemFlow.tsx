@@ -20,10 +20,15 @@ interface ArabicaSectionHierarchy {
   by_port: Record<string, number>;
   by_origin: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
 }
-// Per-(origin, port) grading detail from the action-day matrix (June 2026+).
-// Present only on days ICE published the origin × port grading table; older
-// "N Bags Passed Today" days carry only the scalar passed_today_bags.
+// Per-(origin, port) grading detail. Two equivalent shapes are accepted:
+//   • live scraper  — passed_by_origin / failed_by_origin:
+//       { origin: { by_port: { code: bags }, group?, total? } }
+//   • xlsx importer — graded_today_by_port_origin (sheet 6_ny_gradings):
+//       { port: { origin: { passed: bags, failed: bags } } }
+// Present only on action days; older "N Bags Passed Today" days carry only
+// the scalar passed_today_bags.
 type ArabicaGradingByOrigin = Record<string, { by_port: Record<string, number>; group?: string; total?: number }>;
+type ArabicaGradingByPortOrigin = Record<string, Record<string, { passed?: number; failed?: number }>>;
 interface ArabicaSnap {
   date: string;
   total_bags: number;
@@ -34,6 +39,26 @@ interface ArabicaSnap {
   sections?: { total_certified?: ArabicaSectionHierarchy; pending_grading?: ArabicaSectionHierarchy };
   passed_by_origin?: ArabicaGradingByOrigin;
   failed_by_origin?: ArabicaGradingByOrigin;
+  graded_today_by_port_origin?: ArabicaGradingByPortOrigin;
+}
+
+// Normalise either snapshot shape into passed bags per (canonical port, origin).
+// Returns null when the day carries no per-origin grading detail at all.
+function _arabicaPassedByPortOrigin(s: ArabicaSnap): Array<[string, string, number]> | null {
+  const out: Array<[string, string, number]> = [];
+  if (s.passed_by_origin) {
+    for (const [origin, od] of Object.entries(s.passed_by_origin))
+      for (const [p, bags] of Object.entries(od.by_port ?? {}))
+        if (bags) out.push([_canonicalKC(p), origin, bags]);
+    return out;
+  }
+  if (s.graded_today_by_port_origin) {
+    for (const [p, byO] of Object.entries(s.graded_today_by_port_origin))
+      for (const [origin, st] of Object.entries(byO))
+        if (st?.passed) out.push([_canonicalKC(p), origin, st.passed]);
+    return out;
+  }
+  return null;
 }
 interface RobustaSnap { date: string; total_lots_certified: number; by_port_lots?: Record<string, number> }
 interface ArabicaAgeBucketRow { age_bucket: string; bags: number }
@@ -1063,16 +1088,12 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
           const t = new Date(s.date).getTime();
           if (t < cutT || t > endT) continue;
           P += s.passed_today_bags ?? 0;
-          const pbo = s.passed_by_origin;
-          if (!pbo) continue;
-          for (const [origin, od] of Object.entries(pbo)) {
-            for (const [p, bags] of Object.entries(od.by_port ?? {})) {
-              if (!bags) continue;
-              const port = _canonicalKC(p);
-              gradedByPortOrigin[port] = gradedByPortOrigin[port] || {};
-              gradedByPortOrigin[port][origin] = (gradedByPortOrigin[port][origin] ?? 0) + bags;
-              gradedDetailSum += bags;
-            }
+          const rows = _arabicaPassedByPortOrigin(s);
+          if (!rows) continue;
+          for (const [port, origin, bags] of rows) {
+            gradedByPortOrigin[port] = gradedByPortOrigin[port] || {};
+            gradedByPortOrigin[port][origin] = (gradedByPortOrigin[port][origin] ?? 0) + bags;
+            gradedDetailSum += bags;
           }
         }
         const baseC = collapseSec(base.sections?.total_certified);
