@@ -1,7 +1,7 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import CertifiedStocksSystemFlow, {
-  flowAnchor, flowWindows, type DurationOpt,
+  flowAnchor, flowDateBounds, flowStartOptions, flowDateISO, parseFlowISO, FLOW_START_DEFAULT,
 } from "./CertifiedStocksSystemFlow";
 import CertifiedStocksFreshness from "./CertifiedStocksFreshness";
 
@@ -1385,11 +1385,10 @@ function ArabicaPeriodTable({
 
 // ── Arabica column ────────────────────────────────────────────────────────────
 
-function ArabicaColumn({ d, unit, cutoff, sinceLabel }: { d: ArabicaJson | null; unit: Unit; cutoff: Date; sinceLabel: string }) {
+function ArabicaColumn({ d, unit, cutoff, end, sinceLabel }: { d: ArabicaJson | null; unit: Unit; cutoff: Date; end: Date; sinceLabel: string }) {
   const live = !!d && d.snapshots.length > 0;
-  const latestSnap = d?.snapshots.at(-1) || null;
 
-  // Flow metrics aggregate over the selected "Since" window (cutoff → latest):
+  // Flow metrics aggregate over the selected window (cutoff → end):
   // "Graded" = everything that went through grading (passed + failed);
   // "Passed grading" = the tenderable share; "Decertified" = certified bags
   // that left the pool day-over-day (prev + passed − current, floored at 0 —
@@ -1397,14 +1396,18 @@ function ArabicaColumn({ d, unit, cutoff, sinceLabel }: { d: ArabicaJson | null;
   // window so a single tile matches the system flow below.
   const snaps = d?.snapshots ?? [];
   const cutT = cutoff.getTime();
+  const endT = end.getTime() + 86_400_000 - 1;
   const dayT = (ds: string) => {
     const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
     return new Date(y, m - 1, dd).getTime();
   };
+  // "Total certified" reflects the window end, not necessarily the newest snap.
+  const inRange = snaps.filter((s) => dayT(s.date) <= endT);
+  const latestSnap = inRange.length ? inRange[inRange.length - 1] : (d?.snapshots.at(-1) || null);
   let gradedBags = 0, passedBags = 0, decertBags = 0;
   for (let i = 0; i < snaps.length; i++) {
     const s = snaps[i];
-    if (dayT(s.date) < cutT) continue;
+    if (dayT(s.date) < cutT || dayT(s.date) > endT) continue;
     gradedBags += (s.passed_today_bags ?? 0) + (s.failed_today_bags ?? 0);
     passedBags += s.passed_today_bags ?? 0;
     const prev = snaps[i - 1];
@@ -2238,12 +2241,12 @@ function RobustaPeriodTable({
 }
 // ── Robusta column ────────────────────────────────────────────────────────────
 
-function RobustaColumn({ d, unit, cutoff, sinceLabel }: { d: RobustaJson | null; unit: Unit; cutoff: Date; sinceLabel: string }) {
+function RobustaColumn({ d, unit, cutoff, end, sinceLabel }: { d: RobustaJson | null; unit: Unit; cutoff: Date; end: Date; sinceLabel: string }) {
   const stock = d?.latest_detail?.stock_report || null;
   const live = !!d && (!!stock || (d.snapshots?.length || 0) > 0);
   const grand = stock?.grand_total;
 
-  // Flow metrics aggregate over the selected "Since" window (cutoff → latest).
+  // Flow metrics aggregate over the selected window (cutoff → end).
   // Per-day grading comes from the grading event on each snapshot's date
   // (fallback to the snapshot's own lots_graded_today). Graded = all lots
   // graded; Passed = tenderable share; Decertified = certified lots that left
@@ -2253,6 +2256,7 @@ function RobustaColumn({ d, unit, cutoff, sinceLabel }: { d: RobustaJson | null;
   const sumByDate = new Map((ra?.gradings || []).map((g) => [g.date, g.summary]));
   const snaps = d?.snapshots ?? [];
   const cutT = cutoff.getTime();
+  const endT = end.getTime() + 86_400_000 - 1;
   const dayT = (ds: string) => {
     const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
     return new Date(y, m - 1, dd).getTime();
@@ -2270,7 +2274,7 @@ function RobustaColumn({ d, unit, cutoff, sinceLabel }: { d: RobustaJson | null;
   let gradedLots = 0, passedLots = 0, decertLots = 0;
   for (let i = 0; i < snaps.length; i++) {
     const s = snaps[i];
-    if (dayT(s.date) < cutT) continue;
+    if (dayT(s.date) < cutT || dayT(s.date) > endT) continue;
     const { g, p } = dayFlow(s.date, s.lots_graded_today);
     gradedLots += g ?? 0;
     passedLots += p ?? 0;
@@ -2383,8 +2387,26 @@ export default function CertifiedStocksPanel() {
   const [arabica, setArabica] = useState<ArabicaJson | null>(null);
   const [robusta, setRobusta] = useState<RobustaJson | null>(null);
   const [unit, setUnit] = useState<Unit>("bags");
-  const [flowDuration, setFlowDuration] = useState<DurationOpt>("1w");
+  // Period selector — a [start, end] window. `endISO` is a free calendar pick
+  // (null → defaults to the latest available date); `startKey` picks the start
+  // from a menu computed relative to that end. Default view = month-to-date.
+  const [endISO, setEndISO] = useState<string | null>(null);
+  const [startKey, setStartKey] = useState<string>(FLOW_START_DEFAULT);
   const [err, setErr] = useState(false);
+
+  // Resolve the window from the two controls + the available data range.
+  const { anchor, bounds, endDate, startOpts, startWin } = useMemo(() => {
+    const anchor = flowAnchor(arabica, robusta);
+    const bounds = flowDateBounds(arabica, robusta);
+    const endDate = endISO ? parseFlowISO(endISO) : anchor;
+    const startOpts = flowStartOptions(endDate, bounds.min);
+    const startWin =
+      startOpts.find((o) => o.key === startKey) ??
+      startOpts.find((o) => o.key === FLOW_START_DEFAULT) ??
+      startOpts[0];
+    return { anchor, bounds, endDate, startOpts, startWin };
+  }, [arabica, robusta, endISO, startKey]);
+  const startDate = startWin.cutoff;
 
   useEffect(() => {
     Promise.all([
@@ -2426,26 +2448,48 @@ export default function CertifiedStocksPanel() {
               </button>
             ))}
           </div>
-          {/* Flow window — sits right under the metric toggle and drives the
-              system-flow windows below. Labelled by each window's start date
-              ("since DATE"). */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-500 uppercase text-[10px] tracking-wider">Since</span>
-            <div className="flex items-center gap-1">
-              {flowWindows(flowAnchor(arabica, robusta)).map((w) => (
+          {/* Period selector — sits under the metric toggle and drives the
+              tiles + system flow below. The start menu is computed relative to
+              the chosen end date (1 week back, or the 1st of each month back to
+              the start of our data); the end is a free calendar pick that
+              defaults to the latest available date. Default view = month-to-date. */}
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            <span className="text-slate-500 uppercase text-[10px] tracking-wider">From</span>
+            <div className="flex items-center gap-1 flex-wrap">
+              {startOpts.map((o) => (
                 <button
-                  key={w.key}
-                  onClick={() => setFlowDuration(w.key)}
+                  key={o.key}
+                  onClick={() => setStartKey(o.key)}
+                  title={o.key === "w1" ? "One week back" : o.key === FLOW_START_DEFAULT ? "Month-to-date" : "1st of month"}
                   className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
-                    flowDuration === w.key
+                    startWin.key === o.key
                       ? "bg-slate-800 text-amber-400 border-slate-700"
                       : "text-slate-500 hover:text-slate-300 border-transparent"
                   }`}
                 >
-                  {w.label}
+                  {o.key === "w1" ? "1w" : o.label}
                 </button>
               ))}
             </div>
+            <span className="text-slate-500 uppercase text-[10px] tracking-wider ml-1">To</span>
+            <input
+              type="date"
+              value={endISO ?? flowDateISO(anchor)}
+              min={flowDateISO(bounds.min)}
+              max={flowDateISO(bounds.max)}
+              onChange={(e) => setEndISO(e.target.value || null)}
+              className="bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-[9px] font-mono text-slate-200
+                         [color-scheme:dark] focus:outline-none focus:border-slate-500"
+            />
+            {endISO && endISO !== flowDateISO(anchor) && (
+              <button
+                onClick={() => setEndISO(null)}
+                title="Reset to latest available date"
+                className="px-1 py-0.5 rounded text-[9px] text-slate-500 hover:text-slate-300 border border-transparent"
+              >
+                ↺
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -2470,16 +2514,10 @@ export default function CertifiedStocksPanel() {
       {/* 1 · the 4 tiles per contract. The flow metrics (Graded · Passed ·
           Decertified) aggregate over the same window the "Since" selector
           drives, so the tiles and the system flow below always agree. */}
-      {(() => {
-        const _wins = flowWindows(flowAnchor(arabica, robusta));
-        const _win = _wins.find((w) => w.key === flowDuration) ?? _wins[1];
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ArabicaColumn d={arabica} unit={unit} cutoff={_win.cutoff} sinceLabel={_win.label} />
-            <RobustaColumn d={robusta} unit={unit} cutoff={_win.cutoff} sinceLabel={_win.label} />
-          </div>
-        );
-      })()}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ArabicaColumn d={arabica} unit={unit} cutoff={startDate} end={endDate} sinceLabel={startWin.label} />
+        <RobustaColumn d={robusta} unit={unit} cutoff={startDate} end={endDate} sinceLabel={startWin.label} />
+      </div>
 
       {/* 2 · full-width system flow. The cast is needed because the panel's
           ArabicaJson.latest_detail carries the matrix-section shape while the
@@ -2489,7 +2527,8 @@ export default function CertifiedStocksPanel() {
         <CertifiedStocksSystemFlow
           arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
           robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
-          flowDuration={flowDuration}
+          start={startDate}
+          end={endDate}
           unit={unit}
         />
       </div>

@@ -455,7 +455,7 @@ def _arabica_snapshot(d: date, parsed: dict) -> dict:
             }
     tc = sections.get("total_certified", {})
     gt = parsed.get("grading_today") or {}
-    return {
+    snap = {
         "date":                 d.isoformat(),
         "report_date":          parsed.get("report_date"),
         # Headline scalars (kept flat for cheap reads):
@@ -471,6 +471,18 @@ def _arabica_snapshot(d: date, parsed: dict) -> dict:
         # Full hierarchy — port × group × origin per section, drives drill-down.
         "sections":             sections,
     }
+    # Per-(origin, port) grading detail — only present on action-day matrix
+    # reports (June 2026+). Lets the certified-stocks model attribute the day's
+    # gradings to real (origin, port) cohorts instead of distributing a scalar.
+    # Shape: {origin: {by_port: {code: bags}, group, total}}. Omitted on
+    # legacy/no-action days to keep the snapshot stream lean.
+    passed_detail = gt.get("passed_detail")
+    failed_detail = gt.get("failed_detail")
+    if passed_detail and passed_detail.get("by_origin"):
+        snap["passed_by_origin"] = passed_detail["by_origin"]
+    if failed_detail and failed_detail.get("by_origin"):
+        snap["failed_by_origin"] = failed_detail["by_origin"]
+    return snap
 
 
 def _robusta_snapshot(d: date, stock: dict | None, gradings_today: list[dict],
@@ -622,27 +634,40 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     print(f"  → {len(arabica_snapshots)} snapshots; {len(arabica_errors)} misses\n")
 
     # ── Arabica monthly ageing report ──
-    # Last business day of the previous calendar month; fall back one
-    # more month if ICE hasn't published yet (typically published within
-    # a few business days of month-end).
+    # The file is dated around month-end but the exact day drifts (weekend /
+    # holiday → published a few days early, occasionally late), so for each
+    # recent month we try a small set of candidate dates (see
+    # F.month_end_publish_candidates) and take the first that parses with data.
+    # Walk back up to 2 months in case the latest isn't published yet.
     today = days_sorted_asc[-1] if days_sorted_asc else date.today()
     arabica_ageing: dict | None = None
     arabica_ageing_url: str | None = None
-    for back in (0, 1):
-        first_of_this_month = today.replace(day=1)
-        target_month_end = first_of_this_month - timedelta(days=1)
-        if back == 1:
-            target_month_end = target_month_end.replace(day=1) - timedelta(days=1)
-        # ICE files use the actual last calendar day, not the last business day.
-        print(f"[arabica] ageing report for {target_month_end.isoformat()}...")
-        url, parsed = pull_arabica_ageing(target_month_end)
-        if parsed:
-            arabica_ageing = parsed
-            arabica_ageing_url = url
-            print(f"  → captured ({parsed.get('grand_total', 0):,} bags across "
-                  f"{len(parsed.get('origins', []))} origins)")
+    for back in (0, 1, 2):
+        anchor = today.replace(day=1) - timedelta(days=1)        # last day of prev month
+        for _ in range(back):
+            anchor = anchor.replace(day=1) - timedelta(days=1)   # one more month back
+        candidates = F.month_end_publish_candidates(anchor.year, anchor.month)
+        print(f"[arabica] ageing report for {anchor.year}-{anchor.month:02d} "
+              f"(trying {len(candidates)} candidate dates)...")
+        for cand in candidates:
+            url, parsed = pull_arabica_ageing(cand)
+            if parsed and parsed.get("grand_total", 0) > 0:
+                arabica_ageing = parsed
+                arabica_ageing_url = url
+                n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
+                         else f"{len(parsed.get('ports', []))} ports")
+                print(f"  → captured {cand.isoformat()} ({parsed.get('grand_total', 0):,} bags across {n_dim})")
+                break
+        if arabica_ageing is not None:
             break
         print(f"  → miss, will try {back+1} month(s) back")
+
+    # The daily Arabica XLS carries no age data — fold the ageing report's
+    # per-port day-buckets into latest_detail so the frontend's age fade /
+    # age tiles have something to render.
+    if arabica_latest is not None and arabica_ageing and arabica_ageing.get("age_detail"):
+        arabica_latest["age_detail"] = arabica_ageing["age_detail"]
+        arabica_latest["age_detail_date"] = arabica_ageing.get("month_end")
 
 
     print("[robusta] stock report (.csv, today + recent)...")

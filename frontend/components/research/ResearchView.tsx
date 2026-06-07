@@ -5,7 +5,7 @@ import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "certstocks";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",        label: "COT & positioning" },
   { id: "weather",    label: "Weather" },
@@ -13,6 +13,7 @@ const CATS: { id: Cat; label: string }[] = [
   { id: "contracts",  label: "Contract rules" },
   { id: "agronomy",   label: "Agronomy" },
   { id: "logistics",  label: "Origin Logistics" },
+  { id: "certstocks", label: "Certified stocks" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -30,6 +31,17 @@ function LI({ children }: { children: React.ReactNode }) {
 }
 const Code = ({ children }: { children: React.ReactNode }) =>
   <code className="px-1 py-px rounded bg-slate-800 text-slate-200 text-[11px]">{children}</code>;
+// Block-level formula / pseudo-code, monospace on a tinted panel.
+function Fml({ children }: { children: React.ReactNode }) {
+  return (
+    <pre className="font-mono text-[11px] leading-relaxed bg-slate-800/70 border border-slate-700/60 rounded px-3 py-2 my-2 text-amber-200 whitespace-pre-wrap">
+      {children}
+    </pre>
+  );
+}
+function H2({ children }: { children: React.ReactNode }) {
+  return <h3 className="text-base font-bold text-slate-100 mt-7 mb-1 pb-1 border-b border-slate-700">{children}</h3>;
+}
 
 function IntraweekMethodology() {
   return (
@@ -702,6 +714,255 @@ function OriginLogistics() {
   );
 }
 
+function CertifiedStocksMethodology() {
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+
+      <H2>What this page documents</H2>
+      <P>
+        The <strong>Demand → Certified Stocks</strong> tab visualises the ICE-deliverable inventory the coffee
+        futures market clears against — Arabica (Coffee &ldquo;C&rdquo; / KC, US warehouses) and Robusta (RC,
+        European warehouses) — and decomposes each period&rsquo;s change into three flows: <strong>in</strong>{" "}
+        (newly graded coffee that stayed), <strong>in &amp; out</strong> (graded <em>and</em> decertified inside the
+        same window), and <strong>out</strong> (older stock that left). This document explains exactly how those
+        numbers are computed, the formulas, and the cohort model that makes &ldquo;in &amp; out&rdquo; meaningful.
+      </P>
+
+      <H2>The core problem</H2>
+      <P>
+        The exchange publishes a <strong>daily certified-stock total</strong> and a <strong>daily grading count</strong>,
+        but these are two different ledgers. In a quiet week they reconcile; in a busy week they do not. If 850 bags
+        pass grading while the total stock <em>falls</em> 14,722, naïvely netting per-origin daily deltas makes the
+        fresh gradings cancel against same-week decertifications and <em>vanish</em>. The model below fixes that by
+        treating gradings and decertifications as separate flows and only merging them into &ldquo;in &amp; out&rdquo;
+        once an <strong>ageing report</strong> lets us match cohorts.
+      </P>
+
+      <H2>Cohorts — the unit of accounting</H2>
+      <P>Every graded lot is labelled by a <strong>cohort</strong>, the atomic key all flows are tracked against:</P>
+      <ul className="space-y-1">
+        <LI><strong>Arabica:</strong> <Code>(grading date, origin, port)</Code>.</LI>
+        <LI><strong>Robusta:</strong> <Code>(grading date, origin, port, class)</Code> — class is the C-contract
+          quality tier (1 = par, 2 = −$30/t, 3 = −$60/t, 4 = −$90/t).</LI>
+      </ul>
+      <P>
+        For cohort arithmetic the <em>grading date</em> is bucketed to its <strong>calendar month</strong>
+        (<Code>cohort_id = YYYY-MM</Code>). The monthly ageing report tells us, per cohort, how many lots are still on
+        warrant — comparing two consecutive reports gives each cohort&rsquo;s shrinkage.
+      </P>
+
+      <H2>Theoretical vs. real stock (the daily trace)</H2>
+      <P>
+        Each day we maintain a <strong>theoretical stock</strong> per origin and port (Arabica) or per port (Robusta,
+        whose daily report carries no origin breakdown):
+      </P>
+      <Fml>{`theoretical(t) = stock_report(reference_date)
+               + Σ passed_gradings(reference_date … t)`}</Fml>
+      <P>
+        Real (reported) stock can only be <strong>equal to or below</strong> theoretical — coffee can leave, it cannot
+        appear without being graded. The gap is what left:
+      </P>
+      <Fml>{`out(window) = theoretical − real
+            = Σ passed_gradings − (stock_end − stock_start)
+            = passed − netΔ        (netΔ = stock_end − stock_start)`}</Fml>
+      <ul className="space-y-1">
+        <LI>If real = theoretical → nothing left; <strong>all passed gradings are &ldquo;in&rdquo;</strong>, out = 0.</LI>
+        <LI>If real &lt; theoretical → the difference is <strong>&ldquo;out&rdquo;</strong>.</LI>
+      </ul>
+
+      <H2>When does &ldquo;in &amp; out&rdquo; appear?</H2>
+      <P>
+        Crucially, <strong>before an ageing report we cannot know which lots left</strong> — the freshly graded ones or
+        old stock. So the model shows:
+      </P>
+      <ul className="space-y-1">
+        <LI><strong>No ageing report inside the window</strong> → <Code>in = passed</Code>, <Code>out = passed − netΔ</Code>,
+          and <Code>in &amp; out = 0</Code>. This is the &ldquo;assume nothing until month-end&rdquo; state.</LI>
+        <LI><strong>An ageing report falls inside the window</strong> → we match cohorts (below) and reclassify part of
+          the gradings as &ldquo;in &amp; out&rdquo;.</LI>
+      </ul>
+      <P>
+        The Certified Stocks panel surfaces this with a per-market caption: <em>&ldquo;in &amp; out pending next ageing
+        report&rdquo;</em> vs <em>&ldquo;in &amp; out matched (ageing report)&rdquo;</em>.
+      </P>
+
+      <H2>Worked example (the design case)</H2>
+      <P>
+        Today is June 6; we look at the last week. <strong>850</strong> bags passed grading and total stock fell
+        <strong> 14,722</strong>. Before the month-end ageing report:
+      </P>
+      <Fml>{`in       = 850                       (all passed)
+out      = 850 − (−14,722) = 15,572   (passed − netΔ)
+in & out = 0                         (no ageing report yet)
+check:   in − out = 850 − 15,572 = −14,722  ✓`}</Fml>
+      <P>
+        At month-end the ageing report arrives. Suppose the June cohort (this month&rsquo;s gradings) shows a net
+        <strong> +278</strong> still on warrant, while old cohorts (e.g. Jan-26) shrank <strong>15,000</strong>. We can
+        now split the 850:
+      </P>
+      <Fml>{`in & out (transit) = 850 − 278 = 572   (graded then left)
+in (pure)          = 278               (graded and stayed)
+out (legacy)       = 15,000            (old cohorts decertified)
+check: in − (in&out + out) = 278 − (572 + 15,000) = −14,722  ✓`}</Fml>
+
+      <H2>Cohort-DNA: inferring Robusta origins</H2>
+      <P>
+        The Robusta daily stock report has <strong>no per-origin breakdown</strong> — only port totals. We recover
+        origins with the <strong>cohort-DNA</strong> algorithm:
+      </P>
+      <ul className="space-y-1">
+        <LI><strong>DNA</strong> — for each <Code>(port, cohort)</Code>, the normalised origin split of the gradings
+          recorded that month: <Fml>{`DNA[port][cohort][origin]
+  = graded_lots[port][cohort][origin] / Σ_origin graded_lots[port][cohort]`}</Fml></LI>
+        <LI><strong>Shrinkage</strong> — between consecutive month-end reports RP<sub>t−1</sub> → RP<sub>t</sub>, each
+          cohort&rsquo;s lost lots: <Fml>{`shrink[port][cohort] = max(0, lots_in_RP(t−1) − lots_in_RP(t))`}</Fml>
+          A cohort first appearing in RP<sub>t</sub> (just graded) instead uses
+          <Code>shrink = max(0, graded_total − lots_in_RP(t))</Code>.</LI>
+        <LI><strong>Apportion</strong> — distribute each cohort&rsquo;s shrinkage to origins by its DNA:
+          <Fml>{`implied_outflow[port][origin]
+  = Σ_cohort shrink[port][cohort] × DNA[port][cohort][origin]`}</Fml>
+          When a cohort predates our gradings history (no DNA), we fall back to the port&rsquo;s all-time origin mix;
+          a coverage guard (gradings &lt; 50% of the bucket) also triggers the fallback.</LI>
+      </ul>
+
+      <H2>Cohort-resolved &ldquo;in &amp; out&rdquo;</H2>
+      <P>
+        To split the matched window exactly, the backend emits — alongside total <Code>implied_outflow</Code> — a
+        <strong> transit subset</strong> <Code>by_port_transit</Code>: the outflow from cohorts graded <em>inside the
+        same interval</em> (the &ldquo;new cohort&rdquo; shrinkage only). By construction
+        <Code> by_port_transit ⊆ by_port</Code>, so:
+      </P>
+      <Fml>{`transit  (in & out) = Σ_window by_port_transit[port][origin]
+out_total           = Σ_window by_port[port][origin]  (+ recent daily sim)
+pure_out            = out_total − transit
+in_total            = Σ_window gradings[port][origin]
+
+per origin, clamped so every bucket ≥ 0:
+  t        = clamp(transit, 0, min(in_total, out_total))
+  in_pure  = in_total  − t
+  out_pure = out_total − t`}</Fml>
+      <P>
+        For the Feb worked example (cohort 2026-02 graded 100 lots, 80 remain, DNA 75% Vietnam / 25% Indonesia):
+        transit = 20 lots → <strong>15 Vietnam + 5 Indonesia</strong> in &amp; out, while older cohorts&rsquo;
+        shrinkage (10 lots) stays pure out — total outflow 19 Vietnam / 11 Indonesia.
+      </P>
+
+      <H2>The four density-grid buckets</H2>
+      <P>Each warehouse card draws warrants (1 square = 1 warrant: KC ≈ 37,500 lb ≈ 283 bags; RC = 10 t = 1 lot) in four buckets:</P>
+      <ul className="space-y-1">
+        <LI><strong>existing</strong> — stock present at window start that&rsquo;s still here:
+          <Code> existing = current − net_gained</Code> (inherits the port&rsquo;s age mix).</LI>
+        <LI><strong>net gained (in)</strong> — graded and stayed (green dashed, fresh age).</LI>
+        <LI><strong>in &amp; out (transit)</strong> — graded then left (amber dashed); only non-zero when cohort-matched.</LI>
+        <LI><strong>lost / out</strong> — older stock that left (red ghost squares).</LI>
+      </ul>
+      <P>Invariants that always hold:</P>
+      <Fml>{`current   = existing + net_gained
+gross_in  = net_gained + transit
+gross_out = lost       + transit`}</Fml>
+
+      <H2>Arabica: per-origin gradings (exact, with a fallback)</H2>
+      <P>
+        Since ~June 2026 ICE publishes the &ldquo;TODAY&rsquo;S GRADING SUMMARY&rdquo; as an{" "}
+        <strong>origin × port matrix</strong> (a <Code>BAGS PASSED GRADING</Code> table, then a
+        <Code> BAGS FAILED GRADING</Code> table), not the old <Code>&ldquo;825 Bags Passed Today&rdquo;</Code> one-liner.
+        We parse the full matrix, so on action days the &ldquo;in&rdquo; is sourced <strong>exactly</strong> per
+        <Code> (origin, port)</Code> — the same fidelity as Robusta gradings:
+      </P>
+      <Fml>{`in[port,origin] = Σ_window passed_by_origin[origin][port]   (exact)
+
+net_gained = max(in, max(0, netΔ))
+lost       = net_gained − netΔ`}</Fml>
+      <P>
+        Only for days that lack the matrix (legacy/no-action reports, or history captured before the matrix parser
+        shipped) do we fall back to distributing the <em>uncovered</em> passed bags <Code>P_remainder</Code> by where
+        stock grew:
+      </P>
+      <Fml>{`in[port,origin] += P_remainder × ( max(0, Δ[port,origin]) / Σ max(0, Δ) )
+   P_remainder = passed_total − Σ matrix-covered gradings`}</Fml>
+      <P>
+        So the per-origin split is now <strong>exact when the matrix is present</strong> and only an inference for the
+        residual; the aggregate in/out totals are exact either way.
+      </P>
+      <H2>Arabica in &amp; out — the daily FIFO ledger</H2>
+      <P>
+        The ICE monthly ageing report (<Code>coffee_aging_YYYYMMDD.xls</Code>) turned out to be laid out as
+        <strong> age-in-days × port</strong> with <em>no origin column</em>, and its day-buckets don&rsquo;t support a
+        clean report-to-report cohort match (a 0–120-day lumped young bucket, fixed bins that a cohort drifts across as
+        it ages, and non-uniform ~30-day intervals). Prototyped against real April→May files it <strong>overcounted
+        outflow ~2.3×</strong> versus the exact mass balance — so it&rsquo;s not the right engine for Arabica.
+      </P>
+      <P>
+        Instead we use what Arabica has and Robusta doesn&rsquo;t: <strong>exact daily per-(origin, port) stock</strong>
+        plus exact per-origin gradings. So in/out are computed, not inferred, and in &amp; out comes from a per-(origin,
+        port) <strong>FIFO ledger</strong>:
+      </P>
+      <Fml>{`in[port,origin]  = Σ_window gradings                         (exact)
+out[port,origin] = Σ_window daily decertifications           (exact)
+seed: start-of-window stock = the oldest ("LEGACY") cohort
+each day:  add that day's gradings as a new cohort
+           remove the day's decert FIFO — oldest first
+in & out (transit) = decerted bags whose cohort was graded in-window`}</Fml>
+      <P>
+        Oldest-leaves-first is also the realistic tender order, since age allowances penalise old warrants. A key
+        consequence (and a good sanity check): when a window&rsquo;s gradings are small relative to a large outflow of
+        old stock, <Code>in &amp; out ≈ 0</Code> — the fresh lots stayed, the old stock left — which is exactly the
+        model&rsquo;s &ldquo;850 in, big out, 0 in &amp; out&rdquo; case. The ageing report still earns its keep: it
+        powers the age fade / age tiles and independently validates the ledger&rsquo;s young-cohort survivors. The
+        per-market caption reads <em>&ldquo;in &amp; out · daily per-origin ledger (FIFO)&rdquo;</em> for Arabica.
+      </P>
+
+      <H2>The period selector</H2>
+      <P>
+        The window is <Code>[start, end]</Code>. <strong>End</strong> is a calendar pick defaulting to the latest
+        available data date (bounded to the data range). <strong>Start</strong> is chosen relative to end:
+        <Code> end − 7 days</Code>, or the 1st of end&rsquo;s month (month-to-date — the default view) and the 1st of
+        each earlier month. Every aggregation above is clamped to this window, and current stock is framed off the last
+        snapshot at or before <Code>end</Code>.
+      </P>
+
+      <H2>Data sources &amp; cadence</H2>
+      <ul className="space-y-1">
+        <LI><strong>Arabica daily XLS</strong> — certified total, by-port, by-group, and the passed/failed grading
+          matrix (origin × port, June 2026+; scalar text on legacy days).</LI>
+        <LI><strong>Arabica ageing report</strong> — certified stock by <em>age-in-days × port</em> (monthly; no origin
+          column — supplies the per-port age distribution that drives the age fade / age tiles).</LI>
+        <LI><strong>Robusta stock CSV</strong> — port totals (daily, time-stamped).</LI>
+        <LI><strong>Robusta gradings</strong> — per <Code>(date, origin, port, class, tenderable, lots)</Code> (daily) →
+          cohort DNA.</LI>
+        <LI><strong>Robusta age-allowance report</strong> — lots by <Code>months_since_graded</Code> × port (monthly) →
+          cohort shrinkage &amp; implied outflow.</LI>
+      </ul>
+
+      <H2>Caveats</H2>
+      <ul className="space-y-1">
+        <LI><strong>Arabica per-origin flows are exact on action days</strong> — the June-2026+ grading matrix gives a
+          real <Code>(origin, port)</Code> split. Only days without the matrix (legacy text reports, or pre-matrix
+          history) fall back to a distribution for the uncovered bags. Aggregate totals are exact either way.</LI>
+        <LI><strong>Robusta origins are modelled</strong> via cohort DNA; thin gradings history falls back to a
+          port&rsquo;s all-time mix.</LI>
+        <LI><strong>in &amp; out lags the ageing report</strong> — intra-month it reads 0 by design; it resolves at the
+          next month-end. Same-month decertifications after the last report are surfaced via a daily stock simulation as
+          pure out (never as in &amp; out).</LI>
+        <LI><strong>transit is clamped to in-window gradings</strong> — if cohort DNA attributes more shrinkage to an
+          origin than the window&rsquo;s recorded gradings, the excess stays in pure out, since in &amp; out can never
+          exceed what arrived.</LI>
+      </ul>
+
+      <H2>Where it lives</H2>
+      <P>
+        Arabica grading matrix parser: <Code>parse_arabica_xls.py</Code> (<Code>_parse_grading_summary</Code> →
+        <Code> passed_by_origin</Code> / <Code>failed_by_origin</Code> on each snapshot). Cohort algorithm:{" "}
+        <Code>backend/scraper/sources/ice_certified_stocks/cohort_outflow.py</Code>{" "}
+        (<Code>build_cohort_dna</Code>, <Code>build_implied_outflow</Code> with <Code>by_port_transit</Code>,
+        <Code> build_current_by_origin</Code>). Visualisation &amp; bucket math:{" "}
+        <Code>frontend/components/demand/CertifiedStocksSystemFlow.tsx</Code> (<Code>buildDensityGrid</Code>); KPI tiles
+        and the period selector live in <Code>CertifiedStocksPanel.tsx</Code>.
+      </P>
+    </div>
+  );
+}
+
 export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
   const router = useRouter();
   const [cat, setCat] = useState<Cat>(initialTab ?? "cot");
@@ -740,6 +1001,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "contracts" && <ContractRules />}
       {cat === "agronomy"  && <AgronomyArticles />}
       {cat === "logistics" && <OriginLogistics />}
+      {cat === "certstocks" && <CertifiedStocksMethodology />}
     </>
   );
 }

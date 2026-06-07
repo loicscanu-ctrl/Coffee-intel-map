@@ -128,6 +128,35 @@ def test_implied_outflow_user_example():
     assert abs(feb_ant["Vietnam"]   - 19.0) < 0.01, f"Vietnam outflow = {feb_ant['Vietnam']}"
     assert abs(feb_ant["Indonesia"] - 11.0) < 0.01, f"Indonesia outflow = {feb_ant['Indonesia']}"
 
+    # in & out subset = the Feb cohort (2026-02) shrinkage only: graded 100,
+    # 80 remain → 20 lots arrived AND left → 20 × 75%/25% = 15 Vn + 5 Indo.
+    # The legacy cohorts (2025-09, 2025-01) are pure out, not transit.
+    feb_transit = feb["by_port_transit"]["ANT"]
+    assert abs(feb_transit["Vietnam"]   - 15.0) < 0.01, f"Vietnam in&out = {feb_transit['Vietnam']}"
+    assert abs(feb_transit["Indonesia"] -  5.0) < 0.01, f"Indonesia in&out = {feb_transit['Indonesia']}"
+    # pure out = total − transit
+    assert abs((feb_ant["Vietnam"]   - feb_transit["Vietnam"])   - 4.0) < 0.01
+    assert abs((feb_ant["Indonesia"] - feb_transit["Indonesia"]) - 6.0) < 0.01
+
+
+def test_implied_outflow_no_transit_when_only_legacy_cohorts():
+    """A window where only old cohorts shrink has zero in & out."""
+    age_reports = [
+        {"month_end": "2026-01-31", "valid": {"buckets": [
+            {"months_since_graded": 24, "by_port": {"ANT": 100}},  # cohort 2024-01
+        ]}},
+        {"month_end": "2026-02-28", "valid": {"buckets": [
+            {"months_since_graded": 25, "by_port": {"ANT": 60}},   # cohort 2024-01
+        ]}},
+    ]
+    out = build_implied_outflow(
+        age_reports, cohort_dna={}, port_alltime_dna={"ANT": {"Vietnam": 1.0}},
+        gradings_per_port_month_origin={},
+    )
+    assert out[0]["by_port"]["ANT"]["Vietnam"] > 0
+    # No newly-graded cohort left in this interval → empty transit map.
+    assert out[0]["by_port_transit"] == {}
+
 
 def test_implied_outflow_falls_back_to_port_alltime_dna():
     # Cohort that the gradings dict doesn't cover (predates our gradings
