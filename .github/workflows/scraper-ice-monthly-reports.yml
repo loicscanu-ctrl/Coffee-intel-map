@@ -20,10 +20,14 @@ on:
         default: "3"
         type: string
   schedule:
-    # Daily 2nd-6th at 14:00 UTC. The month-end reports land a day or two into
-    # the new month, but the exact day drifts onto weekends/holidays, so a short
-    # catch window guarantees capture; runs after the first hit are no-ops.
-    - cron: '0 14 2-6 * *'
+    # Self-terminating catch window. Fires the 1st, 2nd, 3rd at 14:00 UTC, but
+    # the "already captured?" guard below turns every run after the report lands
+    # into an instant no-op — so in practice it runs once (the 1st) and stops.
+    # The 1st targets the previous month-end (orchestrate's candidate-date logic
+    # walks 31→30→29 for weekend month-ends within that single run); if the file
+    # isn't published yet the 2nd retries, then the 3rd. After the 3rd we give
+    # up — the per-feed freshness monitor then raises the red alert to handle.
+    - cron: '0 14 1-3 * *'
 
 concurrency:
   group: data-commit
@@ -44,13 +48,43 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      # Guard: stop once the PREVIOUS month's reports are already in the JSON.
+      # On the 1st-5th the target is last month; if both the arabica ageing and
+      # robusta age-allowance month_end already sit in that month, skip the
+      # fetch + commit (a ~10-second no-op). This is how the schedule "stops
+      # until next month" — cron can't be cancelled, but captured runs do nothing.
+      # workflow_dispatch always proceeds (no guard) for manual catch-up.
+      - name: Already captured this month?
+        id: guard
+        run: |
+          python - <<'PY'
+          import json, os, datetime
+          today = datetime.date.today()
+          prev = (today.replace(day=1) - datetime.timedelta(days=1)).strftime("%Y-%m")
+          try:
+              a = json.load(open("frontend/public/data/certified_stocks_arabica.json"))
+              r = json.load(open("frontend/public/data/certified_stocks_robusta.json"))
+              a_me = ((a.get("ageing_report") or {}).get("month_end") or "")[:7]
+              aa = (r.get("monthly") or {}).get("age_allowance") or []
+              r_me = ((aa[-1].get("month_end") if aa else "") or "")[:7]
+          except Exception as e:
+              a_me = r_me = ""
+              print(f"guard read error (will fetch): {e}")
+          done = (a_me == prev) and (r_me == prev)
+          print(f"target month={prev} · arabica ageing={a_me!r} · robusta age-allowance={r_me!r} · already_captured={done}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"done={'true' if done else 'false'}\n")
+          PY
+
       - name: Install dependencies
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.guard.outputs.done != 'true' }}
         # sqlalchemy / psycopg2-binary / python-dotenv / jinja2 match workflow
         # 1.13 — the orchestrator's tail step imports scraper.db (news_emit) at
         # write time even on a monthly-only run.
         run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
       - name: Pull ICE monthly reports (--only-monthly)
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.guard.outputs.done != 'true' }}
         working-directory: backend
         env:
           PYTHONUNBUFFERED: "1"
@@ -60,6 +94,7 @@ jobs:
             --days "${{ inputs.days_back || 3 }}" --only-monthly
 
       - name: Commit + push if changed
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.guard.outputs.done != 'true' }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
