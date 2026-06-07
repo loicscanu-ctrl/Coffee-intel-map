@@ -294,6 +294,78 @@
       "score": 0,
       "magnitude": "small",
       "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
+    },
+    {
+      "id": "AGRO_colombia_Antioquia_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Antioquia: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-3.18, forecast_7d_rain=51.4]"
+    },
+    {
+      "id": "AGRO_colombia_Caldas_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=74.2]"
+    },
+    {
+      "id": "AGRO_honduras_El_Paraíso_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "honduras/El Paraíso: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.27, forecast_7d_rain=134.5]"
+    },
+    {
+      "id": "AGRO_honduras_Montecillos_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "honduras/Montecillos: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.4, forecast_7d_rain=115.3]"
+    },
+    {
+      "id": "AGRO_indonesia_Toraja_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "indonesia/Toraja: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.22, forecast_7d_rain=89.1]"
+    },
+    {
+      "id": "AGRO_vn_Lam_Dong_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=53.7]"
     }
   ],
   "history": [
@@ -2633,5 +2705,5 @@
       "priceLDN": 3462
     }
   ],
-  "generatedAt": "2026-06-07T06:51:35.722Z"
+  "generatedAt": "2026-06-07T08:44:23.452Z"
 }
