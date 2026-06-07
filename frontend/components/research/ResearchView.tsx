@@ -882,9 +882,17 @@ lost       = net_gained − netΔ`}</Fml>
    P_remainder = passed_total − Σ matrix-covered gradings`}</Fml>
       <P>
         So the per-origin split is now <strong>exact when the matrix is present</strong> and only an inference for the
-        residual; the aggregate in/out totals are exact either way. Capturing the matrix also gives Arabica true
-        <Code> (grading date, origin, port)</Code> cohorts, so once the monthly ageing report parses with a per-origin
-        band breakdown, Arabica in &amp; out can be cohort-matched exactly like Robusta.
+        residual; the aggregate in/out totals are exact either way.
+      </P>
+      <P>
+        <strong>Arabica in &amp; out — current status.</strong> The ICE monthly ageing report (
+        <Code>coffee_aging_YYYYMMDD.xls</Code>) turned out to be laid out as <strong>age-in-days × port</strong> with
+        <em> no origin column</em> — so it can&rsquo;t be used directly for an origin-resolved match the way Robusta&rsquo;s
+        is. Arabica therefore shows <em>in</em> and <em>out</em> but no <em>in &amp; out</em> yet. The path to close it
+        is the same cohort-DNA engine as Robusta: use the per-origin <em>gradings</em> as each (port, grading-month)
+        cohort&rsquo;s DNA, and the ageing report&rsquo;s per-port day-buckets (30-day bins ≈ monthly cohorts) as that
+        cohort&rsquo;s survival, then apportion month-to-month shrinkage by DNA. The grading side is already exact; the
+        ageing parser now reads the real port layout (restoring the age distribution that drives the fade and age tiles).
       </P>
 
       <H2>The period selector</H2>
@@ -900,8 +908,8 @@ lost       = net_gained − netΔ`}</Fml>
       <ul className="space-y-1">
         <LI><strong>Arabica daily XLS</strong> — certified total, by-port, by-group, and the passed/failed grading
           matrix (origin × port, June 2026+; scalar text on legacy days).</LI>
-        <LI><strong>Arabica ageing report</strong> — certified stock by origin × age band (monthly; drives Arabica
-          cohort-match when parseable).</LI>
+        <LI><strong>Arabica ageing report</strong> — certified stock by <em>age-in-days × port</em> (monthly; no origin
+          column — supplies the per-port age distribution that drives the age fade / age tiles).</LI>
         <LI><strong>Robusta stock CSV</strong> — port totals (daily, time-stamped).</LI>
         <LI><strong>Robusta gradings</strong> — per <Code>(date, origin, port, class, tenderable, lots)</Code> (daily) →
           cohort DNA.</LI>

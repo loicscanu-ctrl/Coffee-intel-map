@@ -102,3 +102,32 @@ def test_parse_ageing_sheet_day_range_headers():
     assert data["by_origin_band"]["Honduras"] == {
         "0Y": 500, "1Y": 200, "2Y": 100, "3Y": 50, ">4Y": 10,
     }
+
+
+def test_parse_ageing_sheet_port_layout():
+    """Live ICE layout: leftmost 'Days' day-range buckets × port columns,
+    no origin. Day-buckets roll into year-bands by upper bound."""
+    rows = [
+        ["As of Delivery 7/1/2026"],
+        [],
+        ["Days",         "ANTWERP", "NEW ORLEANS", "NEW YORK", "Total"],
+        ["0000 to 0120",  100000,    20000,         1000,       121000],   # 0Y
+        ["0361 to 0390",   5000,         0,            0,         5000],   # 0Y (upper 390 ≤365? no→ but <=730 →1Y)
+        ["0721 to 0750",   2000,         0,          500,         2500],   # 731? upper 750 → 1Y? 750<=730 no →2Y? 750>730 →2Y
+        ["1461 and over",   300,         0,            0,          300],   # >4Y
+        ["Total in Bags", 107300,    20000,         1500,       128800],   # ignored
+    ]
+    data = parse_ageing_sheet(_StubSheet(rows), "http://test", date(2026, 5, 31))
+    assert data["origins"] == []                       # no origin in this layout
+    assert data["ports"] == ["ANT", "NOLA", "NY"]
+    assert data["by_port"]["ANT"] == 100000 + 5000 + 2000 + 300
+    assert data["by_port"]["NY"] == 1000 + 500
+    # 0000-0120 (≤365) → 0Y ; 0361-0390 (≤730) → 1Y ; 0721-0750 (≤1095) → 2Y ; 1461+ → >4Y
+    assert data["by_band"]["0Y"] == 100000 + 20000 + 1000
+    assert data["by_band"]["1Y"] == 5000
+    assert data["by_band"]["2Y"] == 2000 + 500
+    assert data["by_band"][">4Y"] == 300
+    assert data["grand_total"] == 128800 - 0  # totals row excluded; sum of data rows
+    # age_detail keeps the raw day-range buckets per port for the square fade.
+    assert data["age_detail"]["ANT"][0] == {"age_bucket": "0000 to 0120", "bags": 100000}
+    assert "Total" not in str(data["age_detail"])

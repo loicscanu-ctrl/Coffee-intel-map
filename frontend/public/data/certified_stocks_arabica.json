@@ -78806,23 +78806,685 @@
       "failed_today_bags": 0,
       "passed_text": "No Bags Passed Today",
       "failed_text": "No Bags Failed Today"
-    }
+    },
+    "age_detail": {
+      "ANT": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 109031
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 31520
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 9757
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 20274
+        },
+        {
+          "age_bucket": "0211 to 0240",
+          "bags": 16187
+        },
+        {
+          "age_bucket": "0241 to 0270",
+          "bags": 1083
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 5275
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 10870
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 5144
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 14958
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 20097
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 8259
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 3625
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 2161
+        },
+        {
+          "age_bucket": "0571 to 0600",
+          "bags": 220
+        },
+        {
+          "age_bucket": "0601 to 0630",
+          "bags": 2576
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 2520
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 2834
+        },
+        {
+          "age_bucket": "0691 to 0720",
+          "bags": 2370
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 1405
+        },
+        {
+          "age_bucket": "0751 to 0780",
+          "bags": 73
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 2288
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 5643
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 3604
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 2952
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 1933
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 2850
+        },
+        {
+          "age_bucket": "1081 to 1110",
+          "bags": 3408
+        },
+        {
+          "age_bucket": "1201 to 1230",
+          "bags": 570
+        },
+        {
+          "age_bucket": "1261 to 1290",
+          "bags": 253
+        },
+        {
+          "age_bucket": "1291 to 1320",
+          "bags": 671
+        },
+        {
+          "age_bucket": "1381 to 1410",
+          "bags": 250
+        },
+        {
+          "age_bucket": "1681 to 1710",
+          "bags": 200
+        },
+        {
+          "age_bucket": "3001 to 3030",
+          "bags": 50
+        },
+        {
+          "age_bucket": "5911 to 5940",
+          "bags": 5
+        }
+      ],
+      "HA/BR": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 640
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2000
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 750
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 320
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 375
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 285
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 855
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 125
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 1388
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 1280
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 25
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 150
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 1278
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 1103
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 284
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 960
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 8070
+        }
+      ],
+      "HOU": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 34951
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 21707
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 1401
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 4677
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 23
+        }
+      ],
+      "MIAMI": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 4823
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 6423
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 3500
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 250
+        },
+        {
+          "age_bucket": "0511 to 0540",
+          "bags": 1740
+        }
+      ],
+      "NOLA": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 27680
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 112
+        },
+        {
+          "age_bucket": "1051 to 1080",
+          "bags": 225
+        }
+      ],
+      "NY": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 1500
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2375
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 6801
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 740
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 35
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 523
+        }
+      ]
+    },
+    "age_detail_date": "2026-05-31"
   },
   "ageing_report": {
     "month_end": "2026-05-31",
     "source_url": "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_aging_20260531.xls",
     "by_origin_band": {},
-    "by_band": {
-      "0Y": 0,
-      "1Y": 0,
-      "2Y": 0,
-      "3Y": 0,
-      ">4Y": 0
-    },
-    "grand_total": 0,
     "origins": [],
+    "by_port_band": {
+      "ANT": {
+        "0Y": 209141,
+        "1Y": 59620,
+        "2Y": 20748,
+        "3Y": 5152,
+        ">4Y": 255
+      },
+      "HA/BR": {
+        "0Y": 4370,
+        "1Y": 4788,
+        "2Y": 11870
+      },
+      "HOU": {
+        "0Y": 56658,
+        "1Y": 6078,
+        "2Y": 23
+      },
+      "MIAMI": {
+        "0Y": 14746,
+        "1Y": 1990
+      },
+      "NOLA": {
+        "0Y": 27680,
+        "1Y": 112,
+        "2Y": 225
+      },
+      "NY": {
+        "0Y": 11416,
+        "1Y": 35,
+        "2Y": 523
+      }
+    },
+    "by_port": {
+      "ANT": 294916,
+      "HA/BR": 21028,
+      "HOU": 62759,
+      "MIAMI": 16736,
+      "NOLA": 28017,
+      "NY": 11974
+    },
+    "age_detail": {
+      "ANT": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 109031
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 31520
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 9757
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 20274
+        },
+        {
+          "age_bucket": "0211 to 0240",
+          "bags": 16187
+        },
+        {
+          "age_bucket": "0241 to 0270",
+          "bags": 1083
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 5275
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 10870
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 5144
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 14958
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 20097
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 8259
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 3625
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 2161
+        },
+        {
+          "age_bucket": "0571 to 0600",
+          "bags": 220
+        },
+        {
+          "age_bucket": "0601 to 0630",
+          "bags": 2576
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 2520
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 2834
+        },
+        {
+          "age_bucket": "0691 to 0720",
+          "bags": 2370
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 1405
+        },
+        {
+          "age_bucket": "0751 to 0780",
+          "bags": 73
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 2288
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 5643
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 3604
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 2952
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 1933
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 2850
+        },
+        {
+          "age_bucket": "1081 to 1110",
+          "bags": 3408
+        },
+        {
+          "age_bucket": "1201 to 1230",
+          "bags": 570
+        },
+        {
+          "age_bucket": "1261 to 1290",
+          "bags": 253
+        },
+        {
+          "age_bucket": "1291 to 1320",
+          "bags": 671
+        },
+        {
+          "age_bucket": "1381 to 1410",
+          "bags": 250
+        },
+        {
+          "age_bucket": "1681 to 1710",
+          "bags": 200
+        },
+        {
+          "age_bucket": "3001 to 3030",
+          "bags": 50
+        },
+        {
+          "age_bucket": "5911 to 5940",
+          "bags": 5
+        }
+      ],
+      "HA/BR": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 640
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2000
+        },
+        {
+          "age_bucket": "0151 to 0180",
+          "bags": 750
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 320
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 375
+        },
+        {
+          "age_bucket": "0331 to 0360",
+          "bags": 285
+        },
+        {
+          "age_bucket": "0361 to 0390",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 855
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 125
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 1388
+        },
+        {
+          "age_bucket": "0481 to 0510",
+          "bags": 1280
+        },
+        {
+          "age_bucket": "0661 to 0690",
+          "bags": 570
+        },
+        {
+          "age_bucket": "0721 to 0750",
+          "bags": 25
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 150
+        },
+        {
+          "age_bucket": "0811 to 0840",
+          "bags": 1278
+        },
+        {
+          "age_bucket": "0841 to 0870",
+          "bags": 1103
+        },
+        {
+          "age_bucket": "0871 to 0900",
+          "bags": 284
+        },
+        {
+          "age_bucket": "0901 to 0930",
+          "bags": 960
+        },
+        {
+          "age_bucket": "0931 to 0960",
+          "bags": 8070
+        }
+      ],
+      "HOU": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 34951
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 21707
+        },
+        {
+          "age_bucket": "0421 to 0450",
+          "bags": 1401
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 4677
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 23
+        }
+      ],
+      "MIAMI": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 4823
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 6423
+        },
+        {
+          "age_bucket": "0181 to 0210",
+          "bags": 3500
+        },
+        {
+          "age_bucket": "0451 to 0480",
+          "bags": 250
+        },
+        {
+          "age_bucket": "0511 to 0540",
+          "bags": 1740
+        }
+      ],
+      "NOLA": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 27680
+        },
+        {
+          "age_bucket": "0631 to 0660",
+          "bags": 112
+        },
+        {
+          "age_bucket": "1051 to 1080",
+          "bags": 225
+        }
+      ],
+      "NY": [
+        {
+          "age_bucket": "0000 to 0120",
+          "bags": 1500
+        },
+        {
+          "age_bucket": "0121 to 0150",
+          "bags": 2375
+        },
+        {
+          "age_bucket": "0271 to 0300",
+          "bags": 6801
+        },
+        {
+          "age_bucket": "0301 to 0330",
+          "bags": 740
+        },
+        {
+          "age_bucket": "0391 to 0420",
+          "bags": 35
+        },
+        {
+          "age_bucket": "0781 to 0810",
+          "bags": 523
+        }
+      ]
+    },
+    "ports": [
+      "ANT",
+      "HA/BR",
+      "HOU",
+      "MIAMI",
+      "NOLA",
+      "NY"
+    ],
+    "by_band": {
+      "0Y": 324011,
+      "1Y": 72623,
+      "2Y": 33389,
+      "3Y": 5152,
+      ">4Y": 255
+    },
+    "grand_total": 435430,
     "parser_notes": [
-      "no header row matched (looked for Origin/Coffee + band columns)"
+      "port layout: 6 ports × day-buckets (grand_total=435,430 bags)"
     ]
   },
   "ageing_report_url": "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_aging_20260531.xls",

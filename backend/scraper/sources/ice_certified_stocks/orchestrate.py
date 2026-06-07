@@ -648,13 +648,21 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
         # ICE files use the actual last calendar day, not the last business day.
         print(f"[arabica] ageing report for {target_month_end.isoformat()}...")
         url, parsed = pull_arabica_ageing(target_month_end)
-        if parsed:
+        if parsed and parsed.get("grand_total", 0) > 0:
             arabica_ageing = parsed
             arabica_ageing_url = url
-            print(f"  → captured ({parsed.get('grand_total', 0):,} bags across "
-                  f"{len(parsed.get('origins', []))} origins)")
+            n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
+                     else f"{len(parsed.get('ports', []))} ports")
+            print(f"  → captured ({parsed.get('grand_total', 0):,} bags across {n_dim})")
             break
         print(f"  → miss, will try {back+1} month(s) back")
+
+    # The daily Arabica XLS carries no age data — fold the ageing report's
+    # per-port day-buckets into latest_detail so the frontend's age fade /
+    # age tiles have something to render.
+    if arabica_latest is not None and arabica_ageing and arabica_ageing.get("age_detail"):
+        arabica_latest["age_detail"] = arabica_ageing["age_detail"]
+        arabica_latest["age_detail_date"] = arabica_ageing.get("month_end")
 
 
     print("[robusta] stock report (.csv, today + recent)...")
