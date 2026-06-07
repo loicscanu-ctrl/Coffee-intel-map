@@ -64,9 +64,6 @@ export function computeOiSplit(
   return { total, nearby, forward: total - nearby };
 }
 
-// Placeholder — counterparty deltas are computed inline in buildMarketMetrics
-export function computeCounterpartyDeltas() { return {}; }
-
 // ── High-level builders ──────────────────────────────────────────────────────
 
 // Static contract_unit lookup — mirrors COMMODITY_SPECS in backend/scraper/sources/macro_cot.py.

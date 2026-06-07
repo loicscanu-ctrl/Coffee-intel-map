@@ -123,30 +123,3 @@ export interface GlobalFlowMetrics {
   softsGrossB: number;          // current softs sector gross $B
   commodityTable: CommodityRow[]; // all commodities sorted sector-then-gross-desc
 }
-
-export interface ReportData {
-  weekNumber: number;       // ISO week number
-  year: number;
-  cotDate: string;          // "March 10, 2026"
-  generatedAt: string;      // ISO timestamp
-  globalFlow: GlobalFlowMetrics;
-  coffeeOverview: {
-    combinedNetLots: number;    // NY mmNet + LDN mmNet
-    combinedNetMT: number;
-    alignedDirection: boolean;  // NY and LDN net pointing same direction
-    nyCombinedOiRank: number;
-    ldnCombinedOiRank: number;
-  };
-  ny: MarketMetrics;
-  ldn: MarketMetrics;
-  // PNG data URLs for chart images (set during capture phase)
-  charts: {
-    macroGross:    string | null;
-    macroNet:      string | null;
-    softsContract: string | null;
-    indPulseNy:    string | null;
-    indPulseLdn:   string | null;
-    dryPowderNy:   string | null;
-    dryPowderLdn:  string | null;
-  };
-}

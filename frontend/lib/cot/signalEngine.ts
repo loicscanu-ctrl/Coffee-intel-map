@@ -148,7 +148,6 @@ export const isLow  = (s: number[], i: number) => pct52(s, i) <= THRESHOLDS.PCT_
 
 // Re-exported for tests; not part of the public engine API otherwise.
 export { THRESHOLDS as __THRESHOLDS };
-export type { Dir as __Dir, DirCount as __DirCount };
 
 export type Magnitude = "small" | "medium" | "large";
 
@@ -187,12 +186,6 @@ const MAG_ORDER: Record<Magnitude, number> = { small: 0, medium: 1, large: 2 };
 /** Returns the larger of two magnitudes. */
 export function magBig(a: Magnitude, b: Magnitude): Magnitude {
   return MAG_ORDER[a] >= MAG_ORDER[b] ? a : b;
-}
-
-/** Signed lot delta string, e.g. "+5.2k lots" or "−800 lots". */
-export function fmtLots(delta: number): string {
-  const a = Math.abs(delta);
-  return (delta >= 0 ? "+" : "−") + (a >= 1000 ? (a / 1000).toFixed(1) + "k" : String(Math.round(a))) + " lots";
 }
 
 // ── Main engine ───────────────────────────────────────────────────────────────
