@@ -647,9 +647,3 @@ export const ROUTES: {
     path: [[51.26, 4.35], [50.9, 6.9], [49.5, 8.4], [48.6, 7.8], [47.55, 7.59]],
   },
 ];
-
-export const MAP_CONFIG = {
-  theme: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  initView: [20, -10] as [number, number],
-  initZoom: 3,
-};
