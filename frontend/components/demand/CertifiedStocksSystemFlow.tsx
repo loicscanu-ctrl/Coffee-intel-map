@@ -1348,9 +1348,12 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end
       // lets us cohort-match the outflow. Intra-month (no new month_end yet)
       // we show all gradings as "in" and the decline as "out", no in & out —
       // exactly the "assume nothing until end of month" state in the model.
+      // NB: use cutoff.getTime() here, not the `cutT` const below — this runs
+      // immediately inside .some(), before cutT is declared (TDZ otherwise).
+      const cutStartT = cutoff.getTime();
       const cohortMatched = useCohort && (cohortOutflow ?? []).some((e) => {
         const t = new Date(e.month_end).getTime();
-        return t >= cutT && t <= endT;
+        return t >= cutStartT && t <= endT;
       });
       // Whether the data carries the cohort-resolved in & out subset
       // (by_port_transit). New importer output has it; older JSON does not, in
