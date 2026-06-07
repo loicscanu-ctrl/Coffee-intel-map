@@ -1,26 +1,29 @@
-name: "1.14 – ICE Arabica Ageing (monthly)"
+name: "1.14 – ICE Monthly Reports (arabica ageing + robusta age-allowance)"
 
-# Dedicated monthly trigger for the C-contract ageing report at
-# https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_aging_YYYYMMDD.xls
+# Monthly-only ICE pull: the C-contract ageing report
+#   https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_aging_YYYYMMDD.xls
+# and the robusta age-allowance report. These publish once a month, so the
+# daily scraper (1.13) runs with --skip-monthly and this job owns them.
 #
-# The daily ICE scraper (workflow 1.13) already attempts this fetch via
-# pull_arabica_ageing(), so the data flows through that path too. This
-# workflow exists to give the file a focused run on the day after each
-# month-end — clearer signal in the Actions log when the publish lands.
+# Runs --only-monthly: it skips the daily feeds + the ~10-min robusta stock
+# sweep, fetching just the two monthly reports (each run is cheap). The merge
+# preserves the daily snapshots, and the exporter/commit only fires when the
+# numbers actually change — so the early-month catch window is a no-op once the
+# fresh report is captured.
 
 on:
   workflow_dispatch:
     inputs:
       days_back:
-        description: "Backfill window in business days (small — we only need a fresh run, the merge keeps history)"
+        description: "Backfill window in business days (small — the merge keeps history)"
         required: false
         default: "3"
         type: string
   schedule:
-    # Day 1 of every month at 14:00 UTC — after ICE's typical morning
-    # publish window. Falls back one month internally if the new file
-    # isn't up yet.
-    - cron: '0 14 1 * *'
+    # Daily 2nd-6th at 14:00 UTC. The month-end reports land a day or two into
+    # the new month, but the exact day drifts onto weekends/holidays, so a short
+    # catch window guarantees capture; runs after the first hit are no-ops.
+    - cron: '0 14 2-6 * *'
 
 concurrency:
   group: data-commit
@@ -42,15 +45,19 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber
+        # sqlalchemy / psycopg2-binary / python-dotenv / jinja2 match workflow
+        # 1.13 — the orchestrator's tail step imports scraper.db (news_emit) at
+        # write time even on a monthly-only run.
+        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Pull ICE certified stocks (includes the ageing report)
+      - name: Pull ICE monthly reports (--only-monthly)
         working-directory: backend
         env:
           PYTHONUNBUFFERED: "1"
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           python -m scraper.sources.ice_certified_stocks.orchestrate \
-            --days "${{ inputs.days_back || 3 }}"
+            --days "${{ inputs.days_back || 3 }}" --only-monthly
 
       - name: Commit + push if changed
         run: |
@@ -60,7 +67,7 @@ jobs:
                   frontend/public/data/certified_stocks_robusta.json
           git diff --cached --quiet \
             && echo "No changes." \
-            || (git commit -m "data: ICE arabica ageing (monthly) [skip ci]" \
+            || (git commit -m "data: ICE monthly reports (ageing + age-allowance) [skip ci]" \
                 && git pull --rebase --autostash --strategy-option=theirs origin main \
                 && git push)
 

@@ -533,6 +533,13 @@ def _merge_arabica(new: dict, old: dict) -> dict:
     new["snapshots"] = sorted(by_date.values(), key=lambda s: s["date"])
     if not new.get("latest_detail") and old.get("latest_detail"):
         new["latest_detail"] = old["latest_detail"]
+    # Preserve the monthly-sourced age_detail across daily (skip_monthly) runs,
+    # which rebuild latest_detail from the daily XLS (no age data of its own).
+    new_ld = new.get("latest_detail")
+    old_ld = old.get("latest_detail") or {}
+    if isinstance(new_ld, dict) and not new_ld.get("age_detail") and old_ld.get("age_detail"):
+        new_ld["age_detail"] = old_ld["age_detail"]
+        new_ld["age_detail_date"] = old_ld.get("age_detail_date")
     # Ageing report — keep the older snapshot when the current run didn't
     # land one (e.g. mid-month, no new file published yet). When a fresher
     # month_end comes in it naturally wins because we overwrite.
@@ -599,7 +606,13 @@ def _merge_robusta(new: dict, old: dict) -> dict:
         new["as_of"] = new["snapshots"][-1]["date"]
     return new
 
-def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
+def run(days_back: int = 30, write: bool = True, merge: bool = True,
+        skip_monthly: bool = False, only_monthly: bool = False) -> dict:
+    # skip_monthly  → daily scraper: pull the daily feeds, skip the monthly
+    #                 ageing / age-allowance reports (those have their own job).
+    # only_monthly  → monthly scraper: pull ONLY the ageing / age-allowance
+    #                 reports, skip the (heavy) daily feeds + robusta sweep.
+    # The merge step preserves whichever half this run didn't fetch.
     # Anchor the window on the PREVIOUS business day. ICE publishes every
     # certified-stock report (arabica xls, robusta stock CSV, gradings, iss/
     # recv, tenders, overview, …) for the prior business day, so the current
@@ -611,8 +624,12 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
         anchor -= timedelta(days=1)
     days = _biz_days_back(anchor, days_back)
     days_sorted_asc = sorted(days)
+    # Defined unconditionally so the monthly blocks have it even when the daily
+    # arabica loop is skipped (only_monthly mode).
+    today = days_sorted_asc[-1] if days_sorted_asc else date.today()
     print(f"=== ICE certified-stocks pull · window = {days_back} biz days "
-          f"({days_sorted_asc[0]} → {days_sorted_asc[-1]}; anchored on prior biz day) ===\n")
+          f"({days_sorted_asc[0]} → {days_sorted_asc[-1]}; anchored on prior biz day) "
+          f"[skip_monthly={skip_monthly} only_monthly={only_monthly}] ===\n")
 
     # ── Arabica: 1 source, loop dates ──
     arabica_snapshots: list[dict] = []
@@ -621,17 +638,18 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     arabica_source_url: str | None = None
     arabica_errors: list[str] = []
 
-    print(f"[arabica] daily xls, {len(days_sorted_asc)} days...")
-    for d in days_sorted_asc:
-        url, parsed = pull_arabica_xls(d)
-        if parsed is None:
-            arabica_errors.append(f"{d.isoformat()}: no file")
-            continue
-        arabica_snapshots.append(_arabica_snapshot(d, parsed))
-        arabica_latest = parsed
-        arabica_latest_date = d
-        arabica_source_url = url
-    print(f"  → {len(arabica_snapshots)} snapshots; {len(arabica_errors)} misses\n")
+    if not only_monthly:
+        print(f"[arabica] daily xls, {len(days_sorted_asc)} days...")
+        for d in days_sorted_asc:
+            url, parsed = pull_arabica_xls(d)
+            if parsed is None:
+                arabica_errors.append(f"{d.isoformat()}: no file")
+                continue
+            arabica_snapshots.append(_arabica_snapshot(d, parsed))
+            arabica_latest = parsed
+            arabica_latest_date = d
+            arabica_source_url = url
+        print(f"  → {len(arabica_snapshots)} snapshots; {len(arabica_errors)} misses\n")
 
     # ── Arabica monthly ageing report ──
     # The file is dated around month-end but the exact day drifts (weekend /
@@ -639,97 +657,93 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
     # recent month we try a small set of candidate dates (see
     # F.month_end_publish_candidates) and take the first that parses with data.
     # Walk back up to 2 months in case the latest isn't published yet.
-    today = days_sorted_asc[-1] if days_sorted_asc else date.today()
     arabica_ageing: dict | None = None
     arabica_ageing_url: str | None = None
-    for back in (0, 1, 2):
-        anchor = today.replace(day=1) - timedelta(days=1)        # last day of prev month
-        for _ in range(back):
-            anchor = anchor.replace(day=1) - timedelta(days=1)   # one more month back
-        candidates = F.month_end_publish_candidates(anchor.year, anchor.month)
-        print(f"[arabica] ageing report for {anchor.year}-{anchor.month:02d} "
-              f"(trying {len(candidates)} candidate dates)...")
-        for cand in candidates:
-            url, parsed = pull_arabica_ageing(cand)
-            if parsed and parsed.get("grand_total", 0) > 0:
-                arabica_ageing = parsed
-                arabica_ageing_url = url
-                n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
-                         else f"{len(parsed.get('ports', []))} ports")
-                print(f"  → captured {cand.isoformat()} ({parsed.get('grand_total', 0):,} bags across {n_dim})")
+    if not skip_monthly:
+        for back in (0, 1, 2):
+            anchor = today.replace(day=1) - timedelta(days=1)        # last day of prev month
+            for _ in range(back):
+                anchor = anchor.replace(day=1) - timedelta(days=1)   # one more month back
+            candidates = F.month_end_publish_candidates(anchor.year, anchor.month)
+            print(f"[arabica] ageing report for {anchor.year}-{anchor.month:02d} "
+                  f"(trying {len(candidates)} candidate dates)...")
+            for cand in candidates:
+                url, parsed = pull_arabica_ageing(cand)
+                if parsed and parsed.get("grand_total", 0) > 0:
+                    arabica_ageing = parsed
+                    arabica_ageing_url = url
+                    n_dim = (f"{len(parsed.get('origins', []))} origins" if parsed.get("origins")
+                             else f"{len(parsed.get('ports', []))} ports")
+                    print(f"  → captured {cand.isoformat()} ({parsed.get('grand_total', 0):,} bags across {n_dim})")
+                    break
+            if arabica_ageing is not None:
                 break
-        if arabica_ageing is not None:
-            break
-        print(f"  → miss, will try {back+1} month(s) back")
-
-    # The daily Arabica XLS carries no age data — fold the ageing report's
-    # per-port day-buckets into latest_detail so the frontend's age fade /
-    # age tiles have something to render.
-    if arabica_latest is not None and arabica_ageing and arabica_ageing.get("age_detail"):
-        arabica_latest["age_detail"] = arabica_ageing["age_detail"]
-        arabica_latest["age_detail_date"] = arabica_ageing.get("month_end")
+            print(f"  → miss, will try {back+1} month(s) back")
+    # (age_detail is folded into latest_detail AFTER the merge below, so a
+    # monthly-only run patches it onto the carried-forward daily latest_detail.)
 
 
-    print("[robusta] stock report (.csv, today + recent)...")
+    # ── Robusta daily feeds (stock sweep + gradings/iss/tenders/overview) ──
     robusta_stocks: dict[date, dict] = {}
     robusta_stock_url: str | None = None
-    # Try most-recent business days for stock_report; ICE only keeps one per day
-    # under a HHMMSS-stamped URL. Tier-2 sweep (~10 min) runs only for the
-    # latest day so the daily cron stays bounded — older days that already
-    # missed are filled by the workbook ingest instead.
-    recent_days = days_sorted_asc[-5:]
-    # The window is already anchored on the prior business day (see run()), so
-    # the latest day here is the most recent published report — aim the costly
-    # tier-2 minute-sweep there.
-    sweep_day = recent_days[-1] if recent_days else None
-    for d in recent_days:
-        url, parsed = pull_stock_report(d, sweep=(d == sweep_day))
-        if parsed is not None:
-            robusta_stocks[d] = parsed
-            robusta_stock_url = url
-    print(f"  → {len(robusta_stocks)} stock-report snapshots captured "
-          f"(tier-2 sweep day: {sweep_day})\n")
-
-    print(f"[robusta] gradings + iss/recv + tenders + overview, {len(days_sorted_asc)} days...")
     gradings_all: list[dict] = []      # list of (date, url, parsed)
     appeals_all: list[dict] = []
     iss_recv_all: dict[date, dict] = {}
     tenders_all: dict[date, dict] = {}
     overview_all: dict[date, dict] = {}
     infested_all: list[dict] = []
-    for d in days_sorted_asc:
-        for url, parsed in pull_gradings(d):
-            gradings_all.append({"date": d.isoformat(), "url": url, **parsed})
-        for url, parsed in pull_grading_appeals(d):
-            appeals_all.append({"date": d.isoformat(), "url": url, **parsed})
-        _, parsed = pull_iss_recv_daily(d)
-        if parsed: iss_recv_all[d] = parsed
-        _, parsed = pull_tenders(d)
-        if parsed: tenders_all[d] = parsed
-        _, parsed = pull_grading_overview(d)
-        if parsed: overview_all[d] = parsed
-        _, parsed = pull_infested_warrant(d)
-        if parsed: infested_all.append({"date": d.isoformat(), **parsed})
-    print(f"  → gradings={len(gradings_all)}  appeals={len(appeals_all)}  "
-          f"iss/recv={len(iss_recv_all)}  tenders={len(tenders_all)}  "
-          f"overview={len(overview_all)}  infested={len(infested_all)}\n")
+    if not only_monthly:
+        print("[robusta] stock report (.csv, today + recent)...")
+        # Try most-recent business days for stock_report; ICE only keeps one per
+        # day under a HHMMSS-stamped URL. Tier-2 sweep (~10 min) runs only for
+        # the latest day so the daily cron stays bounded — older days that
+        # already missed are filled by the workbook ingest instead.
+        recent_days = days_sorted_asc[-5:]
+        sweep_day = recent_days[-1] if recent_days else None
+        for d in recent_days:
+            url, parsed = pull_stock_report(d, sweep=(d == sweep_day))
+            if parsed is not None:
+                robusta_stocks[d] = parsed
+                robusta_stock_url = url
+        print(f"  → {len(robusta_stocks)} stock-report snapshots captured "
+              f"(tier-2 sweep day: {sweep_day})\n")
 
-    print("[robusta] monthly: iss/recv + age allowance (last 3 month-ends)...")
+        print(f"[robusta] gradings + iss/recv + tenders + overview, {len(days_sorted_asc)} days...")
+        for d in days_sorted_asc:
+            for url, parsed in pull_gradings(d):
+                gradings_all.append({"date": d.isoformat(), "url": url, **parsed})
+            for url, parsed in pull_grading_appeals(d):
+                appeals_all.append({"date": d.isoformat(), "url": url, **parsed})
+            _, parsed = pull_iss_recv_daily(d)
+            if parsed: iss_recv_all[d] = parsed
+            _, parsed = pull_tenders(d)
+            if parsed: tenders_all[d] = parsed
+            _, parsed = pull_grading_overview(d)
+            if parsed: overview_all[d] = parsed
+            _, parsed = pull_infested_warrant(d)
+            if parsed: infested_all.append({"date": d.isoformat(), **parsed})
+        print(f"  → gradings={len(gradings_all)}  appeals={len(appeals_all)}  "
+              f"iss/recv={len(iss_recv_all)}  tenders={len(tenders_all)}  "
+              f"overview={len(overview_all)}  infested={len(infested_all)}\n")
+
+    # ── Robusta monthly reports (iss/recv + age allowance) ──
     monthly_iss_recv: list[dict] = []
     age_allowance_list: list[dict] = []
-    # Walk back from current month's end through last 3 month-ends.
-    cursor = today.replace(day=1) - timedelta(days=1)   # calendar last day of prev month
-    for _ in range(3):
-        _, _, parsed = _pull_month_end(pull_iss_recv_monthly, cursor)
-        if parsed:
-            monthly_iss_recv.append(parsed)
-        me, _, parsed = _pull_month_end(pull_age_allowance, cursor)
-        if parsed:
-            # Store the resolved (last-business-day) date so a weekend month-end
-            # like May 31 → May 29 keeps the report's real file date.
-            age_allowance_list.append({"month_end": me.isoformat(), **parsed})
-        cursor = (cursor.replace(day=1) - timedelta(days=1))
-    print(f"  → monthly_iss_recv={len(monthly_iss_recv)}  age_allowance={len(age_allowance_list)}\n")
+    if not skip_monthly:
+        print("[robusta] monthly: iss/recv + age allowance (last 3 month-ends)...")
+        # Walk back from current month's end through last 3 month-ends.
+        cursor = today.replace(day=1) - timedelta(days=1)   # calendar last day of prev month
+        for _ in range(3):
+            _, _, parsed = _pull_month_end(pull_iss_recv_monthly, cursor)
+            if parsed:
+                monthly_iss_recv.append(parsed)
+            me, _, parsed = _pull_month_end(pull_age_allowance, cursor)
+            if parsed:
+                # Store the resolved (last-business-day) date so a weekend
+                # month-end like May 31 → May 29 keeps the report's real file date.
+                age_allowance_list.append({"month_end": me.isoformat(), **parsed})
+            cursor = (cursor.replace(day=1) - timedelta(days=1))
+        print(f"  → monthly_iss_recv={len(monthly_iss_recv)}  age_allowance={len(age_allowance_list)}\n")
 
     # ── Build robusta snapshots (one per business day with any data) ──
     robusta_snapshots: list[dict] = []
@@ -798,6 +812,15 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True) -> dict:
                   f"(events: gradings={len(ra['gradings'])} iss={len(ra['iss_recv_daily'])} "
                   f"tend={len(ra['tenders'])} overview={len(ra['grading_overview'])} "
                   f"infested={len(ra['infested_warrants'])} appeals={len(ra['grading_appeals'])})")
+
+    # The daily Arabica XLS carries no age data — fold the ageing report's
+    # per-port day-buckets into latest_detail so the frontend's age fade / age
+    # tiles render. Done AFTER the merge so a monthly-only run patches it onto
+    # the carried-forward daily latest_detail. (A daily/skip-monthly run leaves
+    # arabica_ageing None here and _merge_arabica preserves the prior age_detail.)
+    if arabica_ageing and arabica_ageing.get("age_detail") and arabica_json.get("latest_detail"):
+        arabica_json["latest_detail"]["age_detail"] = arabica_ageing["age_detail"]
+        arabica_json["latest_detail"]["age_detail_date"] = arabica_ageing.get("month_end")
 
     if write:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -874,13 +897,23 @@ def _cli() -> None:
                     help="hit probe-verified URLs once each; skip the backfill")
     ap.add_argument("--no-merge", action="store_true",
                     help="overwrite the JSONs instead of merging with existing")
+    ap.add_argument("--skip-monthly", action="store_true",
+                    help="daily scraper: pull daily feeds only, skip the monthly "
+                         "ageing / age-allowance reports")
+    ap.add_argument("--only-monthly", action="store_true",
+                    help="monthly scraper: pull only the ageing / age-allowance "
+                         "reports, skip the daily feeds + robusta sweep")
     args = ap.parse_args()
+
+    if args.skip_monthly and args.only_monthly:
+        ap.error("--skip-monthly and --only-monthly are mutually exclusive")
 
     if args.smoke:
         ok = smoke()
         sys.exit(0 if ok == len(_SMOKE_URLS) else 1)
 
-    out = run(days_back=args.days, write=not args.no_write, merge=not args.no_merge)
+    out = run(days_back=args.days, write=not args.no_write, merge=not args.no_merge,
+              skip_monthly=args.skip_monthly, only_monthly=args.only_monthly)
     print(f"\nSUMMARY: arabica snapshots={len(out['arabica']['snapshots'])} · "
           f"robusta snapshots={len(out['robusta']['snapshots'])} · "
           f"gradings={len(out['robusta']['recent_activity']['gradings'])}")
