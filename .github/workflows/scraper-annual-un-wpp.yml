@@ -1,13 +1,11 @@
-name: "1.11 – Monthly Slow-Data Scraper (USDA PSD)"
+name: "3.7 – Annual Scraper · UN WPP age structure"
 
-# Trimmed to USDA PSD only. AJCA, UCDA and ECF each have their own correctly
-# timed workflows (3.5 / 3.3.5 / 3.4) — running them here on the 1st was a
-# duplicate AND premature (those sources release ~6th-14th). un_wpp_age is
-# annual now (scraper-annual-un-wpp). PSD lands ~mid-month, so this runs the
-# 12th rather than the 1st.
+# UN World Population Prospects is revised ~once a year (the revision lands
+# mid-year). Running it monthly was ~11 wasted runs/year, so it lives in its
+# own annual job. Runs on 15 July; manual dispatch covers off-cycle revisions.
 on:
   schedule:
-    - cron: '0 3 12 * *'   # 12th of each month, 03:00 UTC (after the USDA PSD release)
+    - cron: '0 3 15 7 *'   # 15 July, 03:00 UTC
   workflow_dispatch:
 
 concurrency:
@@ -15,9 +13,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  slow-data:
+  annual-data:
     runs-on: ubuntu-22.04
-    timeout-minutes: 45
+    timeout-minutes: 30
     permissions:
       contents: write
 
@@ -32,7 +30,7 @@ jobs:
 
       - name: Install Python dependencies
         working-directory: backend
-        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl pdfplumber
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
 
       - name: Cache Playwright browser
         uses: actions/cache@v4
@@ -43,11 +41,11 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run monthly scrapers
+      - name: Run annual scrapers
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.monthly_scraper
+        run: python -m scraper.annual_scraper
 
       - name: Export static JSON
         working-directory: backend
@@ -59,25 +57,12 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add \
-                  frontend/public/data/futures_chain.json \
-                  frontend/public/data/oi_fnd_chart.json \
-                  frontend/public/data/oi_history.json \
-                  frontend/public/data/cot.json \
-                  frontend/public/data/cot_recent.json \
-                  frontend/public/data/macro_cot.json \
-                  frontend/public/data/freight.json \
-                  frontend/public/data/farmer_economics.json \
-                  frontend/public/data/farmer_selling_brazil.json \
-                  frontend/public/data/health.json \
-                  frontend/public/data/latest_prices.json \
-                  frontend/public/data/vietnam_supply.json
-          for f in frontend/public/data/vietnam_last.json frontend/public/data/vn_physical_prices.json frontend/public/data/colombia_supply.json frontend/public/data/honduras_supply.json frontend/public/data/indonesia_supply.json frontend/public/data/uganda_supply.json frontend/public/data/ethiopia_supply.json frontend/public/data/demand_stocks.json; do
+          for f in frontend/public/data/*.json; do
             [ -f "$f" ] && git add "$f" || true
           done
           git diff --cached --quiet \
             && echo "No changes." \
-            || (git commit -m "data: monthly slow-data update [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+            || (git commit -m "data: annual UN-WPP update [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
 
       - name: Notify on failure
         if: failure()
