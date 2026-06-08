@@ -23,7 +23,7 @@ interface MonthlyEntry {
   cert_eu_arabica_mt?: number | null;
 }
 
-interface EcfData {
+export interface EcfData {
   source: string;
   last_updated: string;
   monthly: MonthlyEntry[];
@@ -180,7 +180,7 @@ function YearWindowButtons({ n, set }: { n: number; set: (v: number) => void }) 
   );
 }
 
-function EcfPanel({ ecf }: { ecf: EcfData }) {
+export function EcfPanel({ ecf }: { ecf: EcfData }) {
   const monthly = ecf.monthly;
 
   // Build period → value_mt map for YoY lookup

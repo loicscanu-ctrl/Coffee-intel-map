@@ -16,7 +16,7 @@ export interface ExportMonth {
   yoy_pct:      number | null;
 }
 
-export default function MonthlyVolumeChart({ monthly }: { monthly: ExportMonth[] }) {
+export default function MonthlyVolumeChart({ monthly, isReportMode = false }: { monthly: ExportMonth[]; isReportMode?: boolean }) {
   const [cropYears, setCropYears] = useState(3);
 
   // Group by crop year key → month number → kt
@@ -55,14 +55,16 @@ export default function MonthlyVolumeChart({ monthly }: { monthly: ExportMonth[]
             Crop year (Oct–Sep) · Thousand metric tons (60 kg bags)
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2, 3, 5].map(n => (
-            <button key={n} onClick={() => setCropYears(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {n}Y
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2, 3, 5].map(n => (
+              <button key={n} onClick={() => setCropYears(n)}
+                className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {n}Y
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>

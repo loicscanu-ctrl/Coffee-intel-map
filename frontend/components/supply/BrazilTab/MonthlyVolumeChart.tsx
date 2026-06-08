@@ -28,11 +28,12 @@ const STATUS_LABEL: Record<ProjectionStatus, string> = {
   seasonality:  "Seasonality projection",
 };
 
-export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, projection }: {
+export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, projection, isReportMode = false }: {
   series: VolumeSeries[];
   typeFilter?: SeriesKey | null;
   isFiltered?: boolean;
   projection?: BrazilProjection | null;
+  isReportMode?: boolean;
 }) {
   const activeKey: SeriesKey = typeFilter ?? "total";
   const [cropYears, setCropYears] = useState(3);
@@ -134,14 +135,16 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, pro
             )}
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2, 3, 5].map(n => (
-            <button key={n} onClick={() => setCropYears(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {n}Y
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2, 3, 5].map(n => (
+              <button key={n} onClick={() => setCropYears(n)}
+                className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {n}Y
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>

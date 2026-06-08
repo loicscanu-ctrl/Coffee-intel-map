@@ -22,6 +22,7 @@ import Step6CycleLocation from "./Step6CycleLocation";
 import Step7Report from "./Step7Report";
 import Step8Analysis from "./Step8Analysis";
 import OIHistoryTable from "@/components/futures/OIHistoryTable";
+import PinToReport from "@/components/report/PinToReport";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
@@ -176,7 +177,10 @@ export default function CotDashboard() {
         </div>
       )}
 
-      <div id="cot-section-10"><Overview data={data} /></div>
+      <div id="cot-section-10" className="relative">
+        <div className="absolute right-0 -top-1 z-10"><PinToReport id="cot_overview" /></div>
+        <Overview data={data} />
+      </div>
 
       {/* 2. NY & London OI — 14-Day Tracking. Moved from /futures Exchange
           tab so positioning context sits next to the COT signal output. */}

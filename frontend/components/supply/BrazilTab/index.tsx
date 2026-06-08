@@ -23,6 +23,7 @@ import RollingAvgChart from "./RollingAvgChart";
 import CumulativePaceChart from "./CumulativePaceChart";
 import CountryHubFilter from "./CountryHubFilter";
 import DestinationChart from "./DestinationChart";
+import PinToReport from "@/components/report/PinToReport";
 
 export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
@@ -210,7 +211,10 @@ export default function BrazilTab() {
           {/* Charts */}
           <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} projection={projection} />
           <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} projection={projection} />
-          <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <div className="relative">
+            <div className="absolute right-3 top-3 z-10"><PinToReport id="brazil_annual_trend" /></div>
+            <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          </div>
           <TypeShareChart series={series} />
           <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <SeasonalityHeatmap series={series} />

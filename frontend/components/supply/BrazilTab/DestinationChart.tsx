@@ -19,6 +19,7 @@ export default function DestinationChart({
   bySoluvel, bySoluvelPrev,
   byTorrado, byTorradoPrev,
   byCountryHistory,
+  isReportMode = false,
 }: {
   byCountry: CountryYear; byCountryPrev: CountryYear;
   byArabica?: CountryYear; byArabicaPrev?: CountryYear;
@@ -26,6 +27,7 @@ export default function DestinationChart({
   bySoluvel?: CountryYear; bySoluvelPrev?: CountryYear;
   byTorrado?: CountryYear; byTorradoPrev?: CountryYear;
   byCountryHistory?: Record<string, CountryYear>;
+  isReportMode?: boolean;
 }) {
   const [mode, setMode]           = useState<ViewMode>("country");
   const [topN, setTopN]           = useState(15);
@@ -207,7 +209,7 @@ export default function DestinationChart({
             {TYPE_LABELS[coffeeType]} · {periodLabel} (green) vs {prevPeriodLabel} (grey) · Thousand metric tons
           </div>
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1" style={isReportMode ? { display: "none" } : undefined}>
           {/* Window selector */}
           <div className="flex gap-1 border border-slate-600 rounded p-0.5">
             {DEST_WINDOWS.map(w => (
