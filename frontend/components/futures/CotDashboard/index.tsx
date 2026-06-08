@@ -128,7 +128,7 @@ export default function CotDashboard() {
 
     doExport();
     return () => { cancelled = true; };
-  }, [exporting, data, macroData, globalFlowMetrics]);
+  }, [exporting, data, macroData, globalFlowMetrics, signals, historicalSignals]);
 
   return (
     <div className="space-y-4" style={{ position: "relative" }}>

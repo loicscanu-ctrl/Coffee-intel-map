@@ -1,8 +1,7 @@
 "use client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { IMPACT_COLOR, MONTHS, PHASE_COLOR, TT_STYLE } from "@/components/supply/farmer-economics/farmerEconomicsConstants";
 
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 const currentMonth = new Date().getMonth(); // 0-indexed
 
 // Explicit month mapping
@@ -61,8 +60,6 @@ interface HarvestCal {
   description: string;
 }
 
-const PHASE_COLOR: Record<string, string> = { "el-nino": "text-orange-400", "la-nina": "text-blue-400", "neutral": "text-slate-400" };
-const IMPACT_COLOR: Record<string, string> = { DRY: "text-orange-400", WET: "text-blue-400", WARM: "text-yellow-400", COLD: "text-cyan-400" };
 
 export default function UgandaFarmerEconomics({
   enso, harvest_cal, production_mix,

@@ -55,10 +55,14 @@ export default function VietnamDestinationEstimate({ monthlyExports, sharesData 
     [allShares, topN]
   );
 
-  // Normalize top-N shares to sum to 1 (rest = "Other")
-  const topShareSum = topCountries.reduce((s, c) => s + allShares[c], 0);
-  const normalizedShares: Record<string, number> = {};
-  topCountries.forEach(c => { normalizedShares[c] = allShares[c] / topShareSum; });
+  // Normalize top-N shares to sum to 1 (rest = "Other"). Memoised so its
+  // object identity is stable across renders (it feeds two downstream useMemos).
+  const normalizedShares = useMemo<Record<string, number>>(() => {
+    const topShareSum = topCountries.reduce((s, c) => s + allShares[c], 0);
+    const ns: Record<string, number> = {};
+    topCountries.forEach(c => { ns[c] = allShares[c] / topShareSum; });
+    return ns;
+  }, [topCountries, allShares]);
 
   // Only show 2025+ months (estimated)
   const estimatedMonths = useMemo(() =>
