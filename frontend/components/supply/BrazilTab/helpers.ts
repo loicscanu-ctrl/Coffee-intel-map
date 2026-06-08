@@ -1,7 +1,9 @@
 // Pure helper functions for the Brazil tab. No React imports.
 
 import { COUNTRY_EN, COUNTRY_HUB, MONTH_LABELS } from "./constants";
-import type { CountryYear, VolumeSeries } from "./types";
+import type {
+  CecafeSourceBucket, CecafeSourceKey, CountryYear, DailyData, VolumeSeries,
+} from "./types";
 
 export function toEn(pt: string): string {
   return COUNTRY_EN[pt] ?? pt;
@@ -23,6 +25,23 @@ export function shortMonthLabel(ym: string): string {
   const [y, m] = ym.split("-").map(Number);
   const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1];
   return `${mo}-${String(y).slice(2)}`;
+}
+
+/** Migrate legacy v1 ({arabica, conillon, soluvel} flat) into the dual-source
+ * structure so callers can render either source uniformly. Legacy files came
+ * from Certificados de Origem — that's where their values map. */
+export function normalizeSources(
+  data: DailyData,
+): Record<CecafeSourceKey, CecafeSourceBucket> {
+  if (data.sources) return data.sources;
+  return {
+    embarques: { arabica: {}, conillon: {}, soluvel: {} },
+    certificados: {
+      arabica:  data.arabica  ?? {},
+      conillon: data.conillon ?? {},
+      soluvel:  data.soluvel  ?? {},
+    },
+  };
 }
 
 /** Crop year: Apr Y → Mar Y+1, labelled "Y/Y+1" (e.g. "2024/25") */

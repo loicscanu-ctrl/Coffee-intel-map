@@ -9,7 +9,7 @@ import {
   TYPE_FILTER_OPTS,
 } from "./constants";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
-import { bagsToKT, cropYearKey } from "./helpers";
+import { bagsToKT, cropYearKey, normalizeSources } from "./helpers";
 import type { DailyData, SeriesKey, VolumeSeries } from "./types";
 
 export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
@@ -44,47 +44,75 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
   const showCrops      = sortedCropKeys.slice(-cropYears).reverse();
   const YEAR_COLORS    = CROP_YEAR_COLORS.slice(0, cropYears);
 
-  // Registration-based forecast for the current unreleased month
-  const forecast = useMemo(() => {
-    if (!dailyData) return null;
-    const ym = dailyData.updated.slice(0, 7); // "YYYY-MM"
-    if (series.some(r => r.date === ym)) return null; // Cecafe already released it
+  // Registration-based forecast for every month present in the daily
+  // registration that Cecafé hasn't yet published in the official `series`.
+  // Reads through the v2 schema (sources.certificados) with v1 fallback,
+  // because the historical monthly series is Certificados-based — using
+  // Embarques here would mix two different counting bases on one chart.
+  const forecasts = useMemo<Array<{
+    kt: number; monthNum: number; cropKey: string; refDay: number;
+    daysInMonth: number; ym: string;
+  }>>(() => {
+    if (!dailyData) return [];
+    const cert = normalizeSources(dailyData).certificados;
+    if (activeKey === "torrado") return [];   // not tracked daily
 
-    const [fy, fm] = ym.split("-").map(Number);
-    const daysInMonth = new Date(fy, fm, 0).getDate();
-
-    const latestVal = (monthMap: Record<string, Record<string, number>> | undefined) => {
-      const md = monthMap?.[ym] ?? {};
-      const keys = Object.keys(md).map(Number).sort((a, b) => b - a);
-      return keys.length ? { val: md[String(keys[0])], day: keys[0] } : { val: 0, day: 0 };
-    };
-
-    const arab = latestVal(dailyData.arabica);
-    const coni = latestVal(dailyData.conillon);
-    const solv = latestVal(dailyData.soluvel);
-
-    let cum = 0, refDay = 0;
-    switch (activeKey) {
-      case "arabica":  cum = arab.val; refDay = arab.day; break;
-      case "conillon": cum = coni.val; refDay = coni.day; break;
-      case "soluvel":  cum = solv.val; refDay = solv.day; break;
-      case "torrado": return null;
-      // Defensive: SeriesKey doesn't list total_verde/total_industria but the
-      // original code branched on them — preserve the safety net.
-      default:
-        refDay = Math.max(arab.day, coni.day, solv.day);
-        cum = arab.val + coni.val + solv.val;
+    // Collect every YYYY-MM that has at least one day in any tracked type.
+    const allMonths = new Set<string>();
+    for (const t of ["arabica", "conillon", "soluvel"] as const) {
+      for (const ym of Object.keys(cert[t] ?? {})) allMonths.add(ym);
     }
+    const released = new Set(series.map(r => r.date));
 
-    if (!cum || !refDay) return null;
-    return {
-      kt:       Math.round(bagsToKT((cum / refDay) * daysInMonth) * 10) / 10,
-      monthNum: fm,
-      cropKey:  cropYearKey(ym),
-      refDay,
-      daysInMonth,
+    const latestDay = (md: Record<string, number> | undefined) => {
+      const keys = Object.keys(md ?? {}).map(Number).sort((a, b) => b - a);
+      return keys.length ? { val: md![String(keys[0])], day: keys[0] } : { val: 0, day: 0 };
     };
+
+    const out: Array<{
+      kt: number; monthNum: number; cropKey: string; refDay: number;
+      daysInMonth: number; ym: string;
+    }> = [];
+    for (const ym of Array.from(allMonths)) {
+      if (released.has(ym)) continue;        // Cecafé already published it
+      const [fy, fm] = ym.split("-").map(Number);
+      const daysInMonth = new Date(fy, fm, 0).getDate();
+      const arab = latestDay(cert.arabica?.[ym]);
+      const coni = latestDay(cert.conillon?.[ym]);
+      const solv = latestDay(cert.soluvel?.[ym]);
+
+      let cum = 0, refDay = 0;
+      switch (activeKey) {
+        case "arabica":  cum = arab.val; refDay = arab.day; break;
+        case "conillon": cum = coni.val; refDay = coni.day; break;
+        case "soluvel":  cum = solv.val; refDay = solv.day; break;
+        default:
+          refDay = Math.max(arab.day, coni.day, solv.day);
+          cum = arab.val + coni.val + solv.val;
+      }
+      if (!cum || !refDay) continue;
+      out.push({
+        kt:       Math.round(bagsToKT((cum / refDay) * daysInMonth) * 10) / 10,
+        monthNum: fm,
+        cropKey:  cropYearKey(ym),
+        refDay,
+        daysInMonth,
+        ym,
+      });
+    }
+    return out.sort((a, b) => a.ym.localeCompare(b.ym));
   }, [dailyData, series, activeKey]);
+
+  // Fast lookup by calendar month, and the latest forecast for the header
+  // sub-line / color picker (the chart only has one fill-color per bar key,
+  // so multi-month forecasts share the latest one's color — they're
+  // typically in the same crop year anyway).
+  const forecastByMonth = useMemo(() => {
+    const m: Record<number, (typeof forecasts)[number]> = {};
+    for (const f of forecasts) m[f.monthNum] = f;
+    return m;
+  }, [forecasts]);
+  const forecast = forecasts.length ? forecasts[forecasts.length - 1] : null;
 
   // Fixed key so Bar is always in DOM — avoids recharts reordering on dynamic add
   const EST_KEY = "__forecast__";
@@ -97,8 +125,10 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
 
   const chartData = CROP_MONTH_ORDER.map((mo, i) => {
     const row: Record<string, number | string> = { month: CROP_MONTH_LABELS[i] };
-    // Always include estimate key (0 when no forecast or wrong month) so bar slot is stable
-    row[EST_KEY] = forecast && mo === forecast.monthNum ? forecast.kt : 0;
+    // EST_KEY carries every forecast month — they share a single bar series
+    // but populate different month slots, so the visualization shows one
+    // semi-transparent bar per unreleased month.
+    row[EST_KEY] = forecastByMonth[mo]?.kt ?? 0;
     showCrops.forEach(ck => {
       const r = cropGroups[ck]?.[mo];
       row[ck] = r ? bagsToKT(r[activeKey] ?? r.total) : 0;
@@ -115,9 +145,16 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
           </div>
           <div className="text-[10px] text-slate-500">
             Crop year (Apr–Mar) · Thousand metric tons (60 kg bags)
-            {forecast && (
+            {forecasts.length > 0 && (
               <span className="ml-2 text-slate-600 italic">
-                · est. based on registrations day {forecast.refDay}/{forecast.daysInMonth}
+                · est. from Certificados de Origem (
+                {forecasts.map((f, i) => (
+                  <span key={f.ym}>
+                    {i > 0 && ", "}
+                    {f.ym.slice(5)} day {f.refDay}/{f.daysInMonth}
+                  </span>
+                ))}
+                )
               </span>
             )}
           </div>
