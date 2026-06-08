@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { SeasonalRow } from "./FreightCharts";
 import { VESSEL_TYPE_META, VESSEL_TYPE_KEYS, type VesselTypeKey } from "./vesselTypes";
-import { calIdx } from "./seasonal";
+import { calIdx, MONTHS } from "./seasonal";
 
 // Heavy recharts bundle — lazy-load (client-only) like the other freight charts.
 const SeasonalChart = dynamic(
@@ -146,8 +146,49 @@ export default function PortActivity() {
     const ytdPrev = ytd(prevY);
     const ytdPct = ytdPrev > 0 ? ((ytdCur - ytdPrev) / ytdPrev) * 100 : null;
 
-    return { rows, cumRows, years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct };
+    // Current-month cumulative: the month of the latest data point, with each
+    // year's running total within that month (x axis = day-of-month).
+    const curM = Number(port.series[port.series.length - 1].date.slice(5, 7));
+    const domByYear: Record<number, Record<number, number>> = {};
+    const monthRun: Record<number, number> = {};
+    let daysInMonth = 0;
+    for (const pt of port.series) {
+      if (Number(pt.date.slice(5, 7)) !== curM) continue;
+      const Y = Number(pt.date.slice(0, 4));
+      const D = Number(pt.date.slice(8, 10));
+      const val = activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
+      monthRun[Y] = (monthRun[Y] || 0) + val;
+      (domByYear[Y] ||= {})[D] = monthRun[Y];
+      if (D > daysInMonth) daysInMonth = D;
+    }
+    const monthRows: SeasonalRow[] = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const band = priorYears.map((y) => domByYear[y]?.[d]).filter((v): v is number => v != null);
+      monthRows.push({
+        idx: d,
+        cur: domByYear[curY]?.[d] ?? null,
+        prev: domByYear[prevY]?.[d] ?? null,
+        prev2: domByYear[prev2Y]?.[d] ?? null,
+        band: band.length ? [Math.min(...band), Math.max(...band)] : null,
+      });
+    }
+    const month = { name: MONTHS[curM - 1], days: daysInMonth };
+
+    return {
+      rows, cumRows, monthRows, month,
+      years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct,
+    };
   }, [port, metric, activeTypes]);
+
+  // Day-of-month ticks for the monthly chart: 1, 5, 10, … plus the last day.
+  const monthTicks = useMemo(() => {
+    const days = seasonal?.month.days ?? 0;
+    if (!days) return [] as number[];
+    const t = [1];
+    for (let d = 5; d < days; d += 5) t.push(d);
+    if (t[t.length - 1] !== days) t.push(days);
+    return t;
+  }, [seasonal?.month.days]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 space-y-3">
@@ -280,11 +321,34 @@ export default function PortActivity() {
               Select at least one vessel type to display.
             </div>
           ) : seasonal ? (
-            <SeasonalChart
-              data={view === "cumulative" ? seasonal.cumRows : seasonal.rows}
-              unit={unit}
-              years={seasonal.years}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Full-year seasonal (daily or cumulative per the toggle) */}
+              <div>
+                <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
+                  Full year · {view === "cumulative" ? "cumulative" : "daily"}
+                </div>
+                <SeasonalChart
+                  data={view === "cumulative" ? seasonal.cumRows : seasonal.rows}
+                  unit={unit}
+                  years={seasonal.years}
+                />
+              </div>
+              {/* Current month, cumulative day-by-day */}
+              <div>
+                <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
+                  {seasonal.month.name} · month-to-date cumulative
+                </div>
+                <SeasonalChart
+                  data={seasonal.monthRows}
+                  unit={unit}
+                  years={seasonal.years}
+                  xDomain={[1, seasonal.month.days]}
+                  xTicks={monthTicks}
+                  xTickFormat={(d) => `${d}`}
+                  xLabelFormat={(d) => `${seasonal.month.name} ${d}`}
+                />
+              </div>
+            </div>
           ) : null}
 
           <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">

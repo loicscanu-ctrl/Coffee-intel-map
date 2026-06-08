@@ -97,10 +97,16 @@ export type SeasonalRow = {
 };
 
 // Year-over-year seasonal overlay: current year (red), prior two years (orange),
-// and a grey min–max band across the remaining prior years. X axis = Jan→Dec.
+// and a grey min–max band across the remaining prior years. The x-axis defaults
+// to a full Jan→Dec calendar but can be reconfigured for a single-month view.
 export function SeasonalChart(
-  { data, unit, years }:
-  { data: SeasonalRow[]; unit: "count" | "tons"; years: { cur: number; prev: number; prev2: number } },
+  { data, unit, years, xDomain = [1, 365], xTicks = MONTH_TICKS,
+    xTickFormat = monthTickLabel, xLabelFormat = idxToLabel, height = 300 }:
+  {
+    data: SeasonalRow[]; unit: "count" | "tons"; years: { cur: number; prev: number; prev2: number };
+    xDomain?: [number, number]; xTicks?: number[];
+    xTickFormat?: (v: number) => string; xLabelFormat?: (v: number) => string; height?: number;
+  },
 ) {
   const fmtAxis = unit === "tons" ? fmtTons : (v: number) => `${v}`;
   const fmtVal = (v: unknown) =>
@@ -108,16 +114,16 @@ export function SeasonalChart(
       ? `${Math.round(Number(v)).toLocaleString("en-US")} t`
       : `${Math.round(Number(v)).toLocaleString("en-US")}`;
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-        <XAxis dataKey="idx" type="number" domain={[1, 365]} ticks={MONTH_TICKS}
+        <XAxis dataKey="idx" type="number" domain={xDomain} ticks={xTicks}
           tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
-          tickFormatter={(v: number) => monthTickLabel(v)} />
+          tickFormatter={(v: number) => xTickFormat(v)} />
         <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} width={48}
           tickFormatter={(v: number) => fmtAxis(v)} />
         <Tooltip contentStyle={TT_STYLE} labelStyle={{ color: "#94a3b8" }}
-          labelFormatter={(v) => idxToLabel(Number(v))}
+          labelFormatter={(v) => xLabelFormat(Number(v))}
           formatter={(v: unknown, name: unknown) =>
             Array.isArray(v)
               ? [`${fmtVal(v[0])} – ${fmtVal(v[1])}`, name as string]
