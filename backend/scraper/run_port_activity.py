@@ -12,7 +12,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from scraper.sources.port_activity import run
 
-
 if __name__ == "__main__":
     payload = run()
     # Non-zero exit if nothing was fetched, so the workflow surfaces the failure.

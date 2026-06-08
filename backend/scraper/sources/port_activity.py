@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Repo layout: backend/scraper/sources/port_activity.py → frontend/public/data
@@ -261,7 +261,7 @@ def run() -> dict | None:
         return None
 
     index = {
-        "updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "updated": datetime.now(UTC).isoformat(timespec="seconds"),
         "source": "IMF PortWatch (UN Global Platform; PortWatch)",
         "dataset": "Daily Port Activity Data and Trade Estimates",
         "metrics": {

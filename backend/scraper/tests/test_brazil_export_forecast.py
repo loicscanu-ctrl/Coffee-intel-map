@@ -10,7 +10,6 @@ import datetime as dt
 
 from scraper import brazil_export_forecast as bef
 
-
 # ── helper builders ──────────────────────────────────────────────────────────
 
 def _series_row(date: str, total: int) -> dict:

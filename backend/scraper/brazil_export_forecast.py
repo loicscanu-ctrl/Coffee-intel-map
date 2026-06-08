@@ -439,7 +439,8 @@ def main() -> int:
         # replaces only when content changed, and prints a clear failure
         # reason on rejection. Same pattern as the other daily exports.
         from scraper.validate_export import (  # local import keeps cli light
-            safe_write_json, validate_brazil_export_projection,
+            safe_write_json,
+            validate_brazil_export_projection,
         )
         OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
         wrote = safe_write_json(OUT_PATH, payload,
