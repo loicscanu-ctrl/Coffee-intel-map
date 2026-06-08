@@ -1,21 +1,15 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { PortActivityRow, SeasonalRow } from "./FreightCharts";
+import type { SeasonalRow } from "./FreightCharts";
 import { VESSEL_TYPE_META, VESSEL_TYPE_KEYS, type VesselTypeKey } from "./vesselTypes";
 import { calIdx } from "./seasonal";
 
 // Heavy recharts bundle — lazy-load (client-only) like the other freight charts.
-const PortActivityChart = dynamic(
-  () => import("./FreightCharts").then((m) => m.PortActivityChart),
-  { ssr: false, loading: () => <div className="h-[300px] animate-pulse" /> },
-);
 const SeasonalChart = dynamic(
   () => import("./FreightCharts").then((m) => m.SeasonalChart),
   { ssr: false, loading: () => <div className="h-[300px] animate-pulse" /> },
 );
-
-const VESSEL_TYPES = VESSEL_TYPE_KEYS;
 
 const METRICS = [
   { key: "portcalls", label: "Port Calls",        sub: "Arrival of ships · daily count" },
@@ -23,15 +17,6 @@ const METRICS = [
   { key: "export",    label: "Outgoing Shipment", sub: "Estimated exports · metric tons" },
 ] as const;
 type MetricKey = (typeof METRICS)[number]["key"];
-
-const RANGES = [
-  { k: "1m", days: 30 },
-  { k: "3m", days: 90 },
-  { k: "6m", days: 180 },
-  { k: "1y", days: 365 },
-  { k: "all", days: Infinity },
-] as const;
-type RangeKey = (typeof RANGES)[number]["k"];
 
 type SeriesPoint = { date: string } & Record<string, number | string>;
 // Index lists ports without their (heavy) series; the series lives in a
@@ -51,9 +36,9 @@ export default function PortActivity() {
   const [loaded, setLoaded] = useState(false);
   const [portKey, setPortKey] = useState<string>("");
   const [metric, setMetric] = useState<MetricKey>("portcalls");
-  const [range, setRange] = useState<RangeKey>("3m");
-  // "seasonal" = year-over-year overlay (default); "detailed" = stacked-bar time series.
-  const [view, setView] = useState<"seasonal" | "detailed">("seasonal");
+  // Both views are seasonal calendar overlays: "daily" = per-day; "cumulative"
+  // = running total from Jan 1. Default: daily.
+  const [view, setView] = useState<"daily" | "cumulative">("daily");
   // Which vessel types are shown — toggled via the chips below. Default: all.
   const [activeTypes, setActiveTypes] = useState<VesselTypeKey[]>([...VESSEL_TYPE_KEYS]);
   // Per-port series fetched lazily and cached so re-selecting a port is instant.
@@ -90,69 +75,29 @@ export default function PortActivity() {
     [data, portKey],
   );
 
-  // Build chart rows: per-vessel-type values for the selected metric plus a
-  // 7-day trailing moving average of the daily total. The MA is computed over
-  // the *full* series first, then the visible window is sliced out — so the
-  // left edge of a zoomed view still shows a correct trailing average.
-  const chartData: PortActivityRow[] = useMemo(() => {
-    if (!port) return [];
-    // Total (and thus the moving average) reflects only the selected vessel types.
-    const totals = port.series.map((pt) =>
-      activeTypes.reduce((acc, t) => acc + (Number(pt[`${metric}_${t}`]) || 0), 0),
-    );
-    const ma = totals.map((_, i) => {
-      let sum = 0, n = 0;
-      for (let j = Math.max(0, i - 6); j <= i; j++) { sum += totals[j]; n++; }
-      return n ? sum / n : 0;
-    });
-
-    const span = RANGES.find((r) => r.k === range)!.days;
-    const start = span === Infinity ? 0 : Math.max(0, port.series.length - span);
-
-    return port.series.slice(start).map((pt, idx) => {
-      const i = start + idx;
-      const row = { date: pt.date, ma: Math.round(ma[i] * 10) / 10 } as PortActivityRow;
-      for (const t of VESSEL_TYPES) {
-        (row as Record<string, number | string>)[t] = Number(pt[`${metric}_${t}`]) || 0;
-      }
-      return row;
-    });
-  }, [port, metric, range, activeTypes]);
-
   const unit = metric === "portcalls" ? "count" : "tons";
   const activeMetric = METRICS.find((m) => m.key === metric)!;
 
-  // Window total + a vs-prior-window delta for a quick at-a-glance read.
-  // Both sums respect the selected vessel types.
-  const summary = useMemo(() => {
-    if (chartData.length === 0) return null;
-    const sumRow = (pt: SeriesPoint) =>
-      activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
-    const cur = chartData.reduce((a, r) => {
-      const rr = r as unknown as Record<string, number>;
-      return a + activeTypes.reduce((s, t) => s + (rr[t] || 0), 0);
-    }, 0);
-    const span = chartData.length;
-    const prevRows = port!.series.slice(
-      Math.max(0, port!.series.length - 2 * span),
-      Math.max(0, port!.series.length - span),
-    );
-    const prev = prevRows.reduce((a, pt) => a + sumRow(pt), 0);
-    const pct = prev > 0 ? ((cur - prev) / prev) * 100 : null;
-    return { cur, pct };
-  }, [chartData, port, metric, activeTypes]);
-
-  // Seasonal (year-over-year) data: align each year on a Jan→Dec calendar index,
-  // smooth with a trailing 7-day MA, overlay the latest 3 years, and build a grey
-  // min–max band across the *prior* years (excluding the current year).
+  // Seasonal (year-over-year) data, built once for both views. Each year is
+  // aligned on a Jan→Dec calendar index. We produce two row sets:
+  //   • daily      — per-day total, 7-day smoothed
+  //   • cumulative — running total from Jan 1
+  // Each overlays the latest 3 years (current / prev / prev2) and a grey min–max
+  // band across the *prior* years (excluding the current year).
   const seasonal = useMemo(() => {
     if (!port) return null;
-    const byYear: Record<number, Record<number, number>> = {};
+    const byYear: Record<number, Record<number, number>> = {};   // collapsed daily
+    const cumByYear: Record<number, Record<number, number>> = {}; // running total
+    const run: Record<number, number> = {};
+    // port.series is already date-sorted (scraper orders by year,month,day), so a
+    // single forward pass yields a correct running total per year.
     for (const pt of port.series) {
       const [Y, M, D] = pt.date.split("-").map(Number);
       const idx = calIdx(M, D);
       const val = activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
       (byYear[Y] ||= {})[idx] = val;
+      run[Y] = (run[Y] || 0) + val;
+      (cumByYear[Y] ||= {})[idx] = run[Y];
     }
     const allYears = Object.keys(byYear).map(Number).sort((a, b) => a - b);
     if (allYears.length === 0) return null;
@@ -175,17 +120,22 @@ export default function PortActivity() {
     }
 
     const priorYears = allYears.filter((y) => y < curY); // band excludes current year
-    const rows: SeasonalRow[] = [];
-    for (let i = 1; i <= 365; i++) {
-      const band = priorYears.map((y) => smooth[y]?.[i]).filter((v): v is number => v != null);
-      rows.push({
-        idx: i,
-        cur: smooth[curY]?.[i] ?? null,
-        prev: smooth[prevY]?.[i] ?? null,
-        prev2: smooth[prev2Y]?.[i] ?? null,
-        band: band.length ? [Math.min(...band), Math.max(...band)] : null,
-      });
-    }
+    const buildRows = (src: Record<number, Record<number, number>>): SeasonalRow[] => {
+      const out: SeasonalRow[] = [];
+      for (let i = 1; i <= 365; i++) {
+        const band = priorYears.map((y) => src[y]?.[i]).filter((v): v is number => v != null);
+        out.push({
+          idx: i,
+          cur: src[curY]?.[i] ?? null,
+          prev: src[prevY]?.[i] ?? null,
+          prev2: src[prev2Y]?.[i] ?? null,
+          band: band.length ? [Math.min(...band), Math.max(...band)] : null,
+        });
+      }
+      return out;
+    };
+    const rows = buildRows(smooth);
+    const cumRows = buildRows(cumByYear);
 
     // YTD: current year vs prior year over the same elapsed calendar window.
     const curIdxs = Object.keys(byYear[curY]).map(Number);
@@ -196,7 +146,7 @@ export default function PortActivity() {
     const ytdPrev = ytd(prevY);
     const ytdPct = ytdPrev > 0 ? ((ytdCur - ytdPrev) / ytdPrev) * 100 : null;
 
-    return { rows, years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct };
+    return { rows, cumRows, years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct };
   }, [port, metric, activeTypes]);
 
   return (
@@ -254,7 +204,7 @@ export default function PortActivity() {
               })}
             </div>
             <div className="flex gap-0.5 mb-1 bg-slate-800 rounded p-0.5">
-              {([["seasonal", "Seasonal"], ["detailed", "Detailed"]] as const).map(([v, label]) => (
+              {([["daily", "Daily"], ["cumulative", "Cumulative"]] as const).map(([v, label]) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
@@ -268,23 +218,11 @@ export default function PortActivity() {
             </div>
           </div>
 
-          {/* Sub-header: metric description + summary; range buttons (detailed only) */}
+          {/* Sub-header: metric description + YTD-vs-prior-year */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-[10px] text-slate-500">
               {activeMetric.sub}
-              {view === "detailed" && summary && (
-                <span className="ml-2 text-slate-400">
-                  · {unit === "tons"
-                      ? `${Math.round(summary.cur).toLocaleString("en-US")} t`
-                      : `${Math.round(summary.cur).toLocaleString("en-US")} calls`} this window
-                  {summary.pct != null && (
-                    <span className={summary.pct >= 0 ? "text-emerald-400 ml-1" : "text-red-400 ml-1"}>
-                      ({summary.pct >= 0 ? "+" : ""}{summary.pct.toFixed(1)}% vs prior)
-                    </span>
-                  )}
-                </span>
-              )}
-              {view === "seasonal" && seasonal && (
+              {seasonal && (
                 <span className="ml-2 text-slate-400">
                   · {seasonal.years.cur} YTD {unit === "tons"
                       ? `${Math.round(seasonal.ytdCur).toLocaleString("en-US")} t`
@@ -297,21 +235,6 @@ export default function PortActivity() {
                 </span>
               )}
             </div>
-            {view === "detailed" && (
-              <div className="flex gap-1">
-                {RANGES.map((r) => (
-                  <button
-                    key={r.k}
-                    onClick={() => setRange(r.k)}
-                    className={`px-2 py-0.5 text-[10px] rounded font-mono uppercase ${
-                      r.k === range ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"
-                    }`}
-                  >
-                    {r.k}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Vessel-type filter — toggle which types are shown/summed */}
@@ -356,11 +279,13 @@ export default function PortActivity() {
             <div className="h-[300px] flex items-center justify-center text-slate-500 text-xs">
               Select at least one vessel type to display.
             </div>
-          ) : view === "seasonal" ? (
-            seasonal && <SeasonalChart data={seasonal.rows} unit={unit} years={seasonal.years} />
-          ) : (
-            <PortActivityChart data={chartData} unit={unit} activeTypes={activeTypes} />
-          )}
+          ) : seasonal ? (
+            <SeasonalChart
+              data={view === "cumulative" ? seasonal.cumRows : seasonal.rows}
+              unit={unit}
+              years={seasonal.years}
+            />
+          ) : null}
 
           <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">
             <span>{portMeta.name} ({portMeta.portid}) — {portMeta.note}</span>
