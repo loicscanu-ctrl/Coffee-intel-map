@@ -84,7 +84,9 @@ function VnStackedTooltip({ active, payload, label }: {
 }
 
 export default function VietnamFertilizerContext({ context }: Props) {
-  const monthly = context.monthly ?? [];
+  // Memoised so the `?? []` fallback doesn't hand a fresh array to the memos
+  // below on every render.
+  const monthly = useMemo(() => context.monthly ?? [], [context.monthly]);
   const [view, setView] = useState<"monthly" | "cumulative">("monthly");
 
   const { byKey, sortedYears, lastMonthIdx } = useMemo(() => {
@@ -137,7 +139,7 @@ export default function VietnamFertilizerContext({ context }: Props) {
         return row;
       });
     }
-  }, [monthly, view, byKey, sortedYears, lastMonthIdx]);
+  }, [view, byKey, sortedYears, lastMonthIdx]);
 
   const last = monthly[monthly.length - 1];
   const avg12 = monthly.slice(-13, -1);

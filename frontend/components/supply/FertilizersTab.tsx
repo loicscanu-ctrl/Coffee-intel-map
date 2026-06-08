@@ -184,7 +184,7 @@ function BrazilImportChart({ monthly }: { monthly: BrazilImportMonth[] }) {
         return row;
       });
     }
-  }, [monthly, view, byKey, sortedYears, lastMonthIdx]);
+  }, [view, byKey, sortedYears, lastMonthIdx]);
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">

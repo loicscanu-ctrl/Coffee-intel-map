@@ -260,6 +260,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
   // ── Map initialization (runs once) ────────────────────────────────────────
   useEffect(() => {
     if (mapInstanceRef.current || !mapRef.current) return;
+    // Capture the container node for the cleanup closure — mapRef.current may
+    // read differently by teardown, but the node itself is stable for the
+    // component's life.
+    const mapEl = mapRef.current;
     let cancelled = false;
 
     import("leaflet").then(async (L) => {
@@ -584,7 +588,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
       }
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
-      if (mapRef.current) (mapRef.current as unknown as Record<string, unknown>)._leaflet_id = null;
+      if (mapEl) (mapEl as unknown as Record<string, unknown>)._leaflet_id = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
