@@ -109,7 +109,7 @@ export default function CotHeatmap({ data }: { data: ProcessedCotRow[] }) {
 
   return (
     <>
-      <SectionHeader icon="Grid" title="3. 13-Week Positioning Heatmap"
+      <SectionHeader icon="Grid" title="13-Week Positioning Heatmap"
         subtitle="Weekly position levels by category. Color intensity = level within 13-week range. Purple outline = latest week." />
 
       <div className="flex items-center gap-3 mb-4">

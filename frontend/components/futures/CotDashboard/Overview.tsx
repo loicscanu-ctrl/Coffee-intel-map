@@ -206,7 +206,7 @@ export default function Overview({ data }: { data: ProcessedCotRow[] }) {
 
   return (
     <>
-      <SectionHeader icon="Eye" title="1. Overview"
+      <SectionHeader icon="Eye" title="Overview"
         subtitle="Weekly positioning summary per market — OI, price/structure, industry coverage and managed-money flow vs. the prior COT week, plus an intraweek update from the COT day to the latest data." />
       {ny && ldn ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

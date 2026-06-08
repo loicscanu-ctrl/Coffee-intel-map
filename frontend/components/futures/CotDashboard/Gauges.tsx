@@ -112,7 +112,7 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
 
   return (
     <>
-      <SectionHeader icon="Sliders" title="4. 52-Week Positioning Gauges"
+      <SectionHeader icon="Sliders" title="52-Week Positioning Gauges"
         subtitle="Current level vs. 52-week range, per market (Arabica left · Robusta right). Longs then shorts. Colored dot = current week, blue tick = previous week. Red ≥80th pct · Green ≤20th." />
       {extremes.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 mb-4 flex flex-wrap gap-3">

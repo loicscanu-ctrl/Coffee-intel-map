@@ -4,13 +4,8 @@ import { fetchMacroCot, type MacroCotWeek, type CotWeekly } from "@/lib/api";
 import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { transformApiData } from "@/lib/cot/transformApiData";
-import { buildStandaloneHtml } from "@/lib/cot/standaloneTemplate";
-import { useUrlState } from "@/lib/useUrlState";
 
-import { NAV_STEPS } from "./constants";
 import { generateData } from "./generateData";
-import { ICONS } from "./icons";
-import type { Step } from "./types";
 
 import Overview from "./Overview";
 import CotGauges from "./Gauges";
@@ -26,10 +21,6 @@ import PinToReport from "@/components/report/PinToReport";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 
 export default function CotDashboard() {
-  const [step, setStep] = useUrlState<Step>("step", 10, (raw) => {
-    const n = Number(raw);
-    return ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number[]).includes(n) ? (n as Step) : 10;
-  });
   const [cotRows, setCotRows] = useState<CotWeekly[] | null>(null);
   const [cotError, setCotError] = useState(false);
   const [macroData, setMacroData] = useState<MacroCotWeek[]>([]);
@@ -72,65 +63,6 @@ export default function CotDashboard() {
     [macroData]
   );
 
-  // ── HTML export ──────────────────────────────────────────────────────────────
-  const [exporting, setExporting] = useState(false);
-
-  useEffect(() => {
-    if (!exporting) return;
-    let cancelled = false;
-
-    const doExport = async () => {
-      if (cancelled) return;
-      try {
-        // 1. Fetch CDN libraries (once — they get embedded in the file)
-        const CDN = {
-          react:     "https://unpkg.com/react@18.2.0/umd/react.production.min.js",
-          reactDom:  "https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js",
-          propTypes: "https://unpkg.com/prop-types@15.8.1/prop-types.min.js",
-          recharts:  "https://unpkg.com/recharts@2.12.7/umd/Recharts.js",
-          babel:     "https://unpkg.com/@babel/standalone/babel.min.js",
-        };
-        const [reactJs, reactDomJs, propTypesJs, rechartsJs, babelJs] = await Promise.all(
-          Object.values(CDN).map(url => fetch(url).then(r => { if (!r.ok) throw new Error(url); return r.text(); }))
-        );
-
-        // 2. Fetch compiled app CSS (Tailwind output — exact classes used in the app)
-        const linkEls = Array.from(document.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
-        const cssTexts = await Promise.all(linkEls.map(l => fetch(l.href).then(r => r.text()).catch(() => "")));
-        const inlineStyleEls = Array.from(document.querySelectorAll("style")).map(s => s.textContent ?? "");
-        const appCss = [...cssTexts, ...inlineStyleEls].join("\n");
-
-        // 3. Build the standalone HTML
-        const dateStr = new Date().toISOString().split("T")[0];
-        const html = buildStandaloneHtml(
-          data,
-          macroData,
-          globalFlowMetrics ?? null,
-          signals,
-          historicalSignals,
-          dateStr,
-          reactJs, reactDomJs, propTypesJs, rechartsJs, babelJs,
-          appCss
-        );
-
-        // 4. Download
-        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement("a");
-        a.href = url;
-        a.download = `COT-Dashboard-${dateStr}.html`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        alert("Export failed — check your internet connection and try again.\n" + String(err));
-      }
-      if (!cancelled) setExporting(false);
-    };
-
-    doExport();
-    return () => { cancelled = true; };
-  }, [exporting, data, macroData, globalFlowMetrics, signals, historicalSignals]);
-
   return (
     <div className="space-y-4" style={{ position: "relative" }}>
       {/* Mock-data warning only when the static cot.json failed to load. */}
@@ -145,31 +77,6 @@ export default function CotDashboard() {
           <div className="h-full bg-slate-600 animate-pulse w-full" />
         </div>
       )}
-      {/* Horizontal step nav — sticky, scrolls to section */}
-      <div className="flex items-center gap-1 flex-wrap border-b border-slate-700 pb-1 sticky top-0 z-10 bg-gray-900 pt-1">
-        {NAV_STEPS.map(s => (
-          <button key={s.id} data-nav={String(s.id)}
-            onClick={() => { setStep(s.id); document.getElementById(`cot-section-${s.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-              step === s.id ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300"
-            }`}>
-            <span className={step === s.id ? "text-amber-400" : "text-slate-600"}>{ICONS[s.icon]}</span>
-            {s.label}
-          </button>
-        ))}
-        {cotRows !== null && (
-          <span className="ml-auto text-[10px] text-slate-600 font-mono">
-            NY {latest.priceNY.toFixed(2)}¢ · LDN ${latest.priceLDN.toFixed(0)}
-          </span>
-        )}
-        <button
-          onClick={() => setExporting(true)}
-          disabled={!recent52.length || exporting}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-        >
-          {exporting ? "Generating…" : "↓ Download HTML"}
-        </button>
-      </div>
 
       {cotRows !== null && !cotError && (
         <div className="text-[10px] text-slate-500 font-mono px-1">
@@ -182,11 +89,11 @@ export default function CotDashboard() {
         <Overview data={data} />
       </div>
 
-      {/* 2. NY & London OI — 14-Day Tracking. Moved from /futures Exchange
+      {/* NY & London OI — 14-Day Tracking. Moved from /futures Exchange
           tab so positioning context sits next to the COT signal output. */}
       <div id="cot-section-9" className="space-y-3">
         <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-1">
-          2. NY & London OI — 14-Day Tracking
+          NY & London OI — 14-Day Tracking
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>

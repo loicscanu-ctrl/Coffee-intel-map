@@ -58,7 +58,7 @@ export default function Step6CycleLocation({ recent52 }: { recent52: ProcessedCo
 
   return (
     <div id="cot-section-6">
-      <SectionHeader icon="Scale" title="8. Cycle Location (OB/OS Matrix)"
+      <SectionHeader icon="Scale" title="Cycle Location (OB/OS Matrix)"
         subtitle="X = MM Net Positioning 5Y rank · Y = Price 5Y rank · Red=last week · Orange=prior week · Yellow=prior 4 weeks · Grey=history." />
       <div className="grid grid-cols-2 gap-4">
         <div>
