@@ -70,3 +70,26 @@ export interface FilterState {
 export type ViewMode  = "country" | "hub";
 export type CoffeeType = "total" | "arabica" | "conillon" | "soluvel" | "torrado";
 export type DestWindow = "CTD" | "L1M" | "L3M" | "L6M" | "L12M";
+
+/** SSOT projection emitted daily by `backend/scraper/brazil_export_forecast.py`.
+ *  See backend module docstring for math. Three Brazil-tab charts consume this
+ *  without doing any forecast math of their own. */
+export type ProjectionStatus = "realized" | "certificados" | "seasonality";
+
+export interface ProjectionMonth {
+  month:  string;             // "Apr"
+  value:  number;             // bags (60 kg)
+  status: ProjectionStatus;
+  ym?:    string;             // "YYYY-MM" (helper field; tolerant if absent)
+}
+
+export interface BrazilProjection {
+  crop_year:           string;             // "26/27"
+  annual_target:       number;             // bags
+  monthly_curve:       ProjectionMonth[];  // 12 rows, Apr → Mar
+  generated_at?:       string;
+  target_source?:      string;             // e.g. "USDA PSD (year 2025)"
+  safeguard_triggered?: boolean;
+  realized_through?:   string;             // "YYYY-MM"
+  last_year_total?:    number;
+}

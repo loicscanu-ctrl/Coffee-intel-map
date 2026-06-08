@@ -1,0 +1,83 @@
+{
+  "crop_year": "26/27",
+  "annual_target": 37000000,
+  "monthly_curve": [
+    {
+      "month": "Apr",
+      "value": 3121804,
+      "status": "realized",
+      "ym": "2026-04"
+    },
+    {
+      "month": "May",
+      "value": 3111810,
+      "status": "certificados",
+      "ym": "2026-05"
+    },
+    {
+      "month": "Jun",
+      "value": 3654966,
+      "status": "certificados",
+      "ym": "2026-06"
+    },
+    {
+      "month": "Jul",
+      "value": 2563892,
+      "status": "seasonality",
+      "ym": "2026-07"
+    },
+    {
+      "month": "Aug",
+      "value": 2952118,
+      "status": "seasonality",
+      "ym": "2026-08"
+    },
+    {
+      "month": "Sep",
+      "value": 3517166,
+      "status": "seasonality",
+      "ym": "2026-09"
+    },
+    {
+      "month": "Oct",
+      "value": 3861657,
+      "status": "seasonality",
+      "ym": "2026-10"
+    },
+    {
+      "month": "Nov",
+      "value": 3373162,
+      "status": "seasonality",
+      "ym": "2026-11"
+    },
+    {
+      "month": "Dec",
+      "value": 2933631,
+      "status": "seasonality",
+      "ym": "2026-12"
+    },
+    {
+      "month": "Jan",
+      "value": 2599031,
+      "status": "seasonality",
+      "ym": "2027-01"
+    },
+    {
+      "month": "Feb",
+      "value": 2451389,
+      "status": "seasonality",
+      "ym": "2027-02"
+    },
+    {
+      "month": "Mar",
+      "value": 2859374,
+      "status": "seasonality",
+      "ym": "2027-03"
+    }
+  ],
+  "generated_at": "2026-06-08T08:16:14Z",
+  "target_source": "USDA PSD (year 2025)",
+  "safeguard_triggered": false,
+  "realized_through": "2026-04",
+  "last_year_total": 37827090
+}

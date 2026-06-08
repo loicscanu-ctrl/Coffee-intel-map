@@ -216,6 +216,34 @@ def validate_quant_report(data: dict) -> tuple[bool, str]:
     return True, "ok"
 
 
+def validate_brazil_export_projection(data: dict) -> tuple[bool, str]:
+    """Brazil daily SSOT forecast — emitted by scraper.brazil_export_forecast.
+
+    Sanity-gate so a broken engine run can't blow up the three downstream
+    front-end consumers (MonthlyVolume, CumulativePace, SupplyDemand)."""
+    if not isinstance(data, dict):
+        return False, "not a dict"
+    curve = data.get("monthly_curve")
+    if not isinstance(curve, list) or len(curve) != 12:
+        return False, f"monthly_curve must be a 12-row list (got {len(curve) if isinstance(curve, list) else type(curve).__name__})"
+    target = data.get("annual_target")
+    if not isinstance(target, int) or target <= 0:
+        return False, f"annual_target must be a positive int (got {target!r})"
+    allowed = {"realized", "certificados", "seasonality"}
+    for i, row in enumerate(curve):
+        if not isinstance(row, dict):
+            return False, f"row {i} not a dict"
+        if row.get("status") not in allowed:
+            return False, f"row {i} status={row.get('status')!r} not in {allowed}"
+        if not isinstance(row.get("value"), int):
+            return False, f"row {i} value must be int (got {row.get('value')!r})"
+    # Curve should sum to the (possibly safeguard-adjusted) annual target.
+    s = sum(r["value"] for r in curve)
+    if abs(s - target) > 12:           # ≤ 1-bag rounding per month
+        return False, f"curve sum {s} drifts > 12 bags from annual_target {target}"
+    return True, "ok"
+
+
 def validate_cecafe_daily(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
