@@ -28,31 +28,49 @@ const RANGES = [
 type RangeKey = (typeof RANGES)[number]["k"];
 
 type SeriesPoint = { date: string } & Record<string, number | string>;
-type Port = {
+// Index lists ports without their (heavy) series; the series lives in a
+// per-port file fetched on demand.
+type PortMeta = {
   key: string; portid: string; name: string; label: string;
-  country: string; note: string; start: string; end: string; series: SeriesPoint[];
+  country: string; note: string; start: string; end: string;
 };
-type PortActivityData = {
+type Port = PortMeta & { series: SeriesPoint[] };
+type PortActivityIndex = {
   updated: string; source: string; dataset: string;
-  vessel_types: string[]; ports: Port[];
+  vessel_types: string[]; ports: PortMeta[];
 };
 
 export default function PortActivity() {
-  const [data, setData] = useState<PortActivityData | null>(null);
+  const [data, setData] = useState<PortActivityIndex | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [portKey, setPortKey] = useState<string>("");
   const [metric, setMetric] = useState<MetricKey>("portcalls");
   const [range, setRange] = useState<RangeKey>("3m");
+  // Per-port series fetched lazily and cached so re-selecting a port is instant.
+  const [portCache, setPortCache] = useState<Record<string, Port>>({});
 
+  // Load the lightweight index up front.
   useEffect(() => {
-    fetch("/data/port_activity.json")
+    fetch("/data/port_activity/index.json")
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: PortActivityData) => { setData(d); setPortKey(d.ports?.[0]?.key ?? ""); })
+      .then((d: PortActivityIndex) => { setData(d); setPortKey(d.ports?.[0]?.key ?? ""); })
       .catch(() => {})
       .finally(() => setLoaded(true));
   }, []);
 
-  const port = useMemo(
+  // Fetch the selected port's series on demand (once).
+  useEffect(() => {
+    if (!portKey || portCache[portKey]) return;
+    let cancelled = false;
+    fetch(`/data/port_activity/${portKey}.json`)
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((p: Port) => { if (!cancelled) setPortCache((c) => ({ ...c, [p.key]: p })); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [portKey, portCache]);
+
+  const port = portCache[portKey];
+  const portMeta = useMemo(
     () => data?.ports.find((p) => p.key === portKey) ?? data?.ports[0],
     [data, portKey],
   );
@@ -120,9 +138,9 @@ export default function PortActivity() {
           </div>
         </div>
         {/* Port selector */}
-        {data && port && (
+        {data && portMeta && (
           <select
-            value={port.key}
+            value={portKey}
             onChange={(e) => setPortKey(e.target.value)}
             className="bg-slate-800 border border-slate-700 rounded text-xs text-slate-200 px-2 py-1 focus:outline-none focus:border-sky-600"
           >
@@ -142,7 +160,7 @@ export default function PortActivity() {
         </div>
       )}
 
-      {data && port && (
+      {data && portMeta && (
         <>
           {/* Metric tabs */}
           <div className="flex gap-1 border-b border-slate-800">
@@ -194,10 +212,16 @@ export default function PortActivity() {
             </div>
           </div>
 
-          <PortActivityChart data={chartData} unit={unit} />
+          {port ? (
+            <PortActivityChart data={chartData} unit={unit} />
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-slate-500 text-xs animate-pulse">
+              Loading {portMeta.label}…
+            </div>
+          )}
 
           <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">
-            <span>{port.name} ({port.portid}) — {port.note}</span>
+            <span>{portMeta.name} ({portMeta.portid}) — {portMeta.note}</span>
             <span>
               Source: {data.source}
               {data.updated && ` · updated ${data.updated.slice(0, 10)}`}
