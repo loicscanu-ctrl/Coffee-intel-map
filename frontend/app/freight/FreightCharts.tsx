@@ -44,6 +44,53 @@ export function FreightHistoryChart({ history }: { history: Record<string, numbe
   );
 }
 
+// Vessel-type bands for the PortWatch stacked bars — colors/labels mirror the
+// IMF PortWatch chart legend (Container / Dry Bulk / General Cargo / RoRo / Tanker).
+const PA_TYPES = [
+  { key: "container",     label: "Container",        color: "#ef4444" },
+  { key: "dry_bulk",      label: "Dry Bulk",         color: "#f97316" },
+  { key: "general_cargo", label: "General Cargo",    color: "#facc15" },
+  { key: "roro",          label: "Roll-on/roll-off", color: "#7dd3fc" },
+  { key: "tanker",        label: "Tanker",           color: "#15803d" },
+];
+
+function fmtTons(v: number): string {
+  const a = Math.abs(v);
+  if (a >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
+  if (a >= 1e3) return `${(v / 1e3).toFixed(0)}k`;
+  return `${v}`;
+}
+
+export type PortActivityRow = {
+  date: string; ma: number;
+  container: number; dry_bulk: number; general_cargo: number; roro: number; tanker: number;
+};
+
+export function PortActivityChart({ data, unit }: { data: PortActivityRow[]; unit: "count" | "tons" }) {
+  const fmtAxis = unit === "tons" ? fmtTons : (v: number) => `${v}`;
+  const fmtVal = (v: unknown) =>
+    unit === "tons" ? `${Number(v).toLocaleString("en-US")} t` : `${Number(v).toLocaleString("en-US")}`;
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+        <XAxis dataKey="date" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
+          minTickGap={28} tickFormatter={(v: string) => v.slice(5)} />
+        <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} width={48}
+          tickFormatter={(v: number) => fmtAxis(v)} />
+        <Tooltip contentStyle={TT_STYLE} labelStyle={{ color: "#94a3b8" }}
+          formatter={(v: unknown, name: unknown) => [fmtVal(v), name as string]} />
+        <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8" }} />
+        {PA_TYPES.map((t) => (
+          <Bar key={t.key} dataKey={t.key} stackId="a" name={t.label} fill={t.color} isAnimationActive={false} />
+        ))}
+        <Line type="monotone" dataKey="ma" name="7-day Moving Average" stroke="#f59e0b"
+          strokeWidth={2} dot={false} isAnimationActive={false} />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function DryBulkChart({ chartData, ticker }: { chartData: { label: string; close: number }[]; ticker: string }) {
   return (
     <ResponsiveContainer width="100%" height={180}>
