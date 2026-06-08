@@ -74,6 +74,7 @@ _HEADERS = {
 PORTS: list[dict] = [
     {"key": "hcmc",          "portid": "port2085",        "label": "Ho Chi Minh City", "country": "Vietnam",   "note": "Vietnam robusta export gateway (Cat Lai / Saigon New Port)"},
     {"key": "santos",        "match": "SANTOS",           "iso3": "BRA", "label": "Santos",          "country": "Brazil",     "note": "World's largest coffee export port (arabica)"},
+    {"key": "vitoria",       "match": "VITORIA",          "iso3": "BRA", "label": "Vitória",         "country": "Brazil",     "note": "Espírito Santo conilon/robusta & arabica export port"},
     {"key": "buenaventura",  "match": "BUENAVENTURA",     "iso3": "COL", "label": "Buenaventura",    "country": "Colombia",   "note": "Colombia's main Pacific coffee export port"},
     {"key": "cartagena_co",  "match": "CARTAGENA",        "iso3": "COL", "label": "Cartagena",       "country": "Colombia",   "note": "Colombia Caribbean coffee export port"},
     {"key": "panjang",       "match": "PANJANG",          "iso3": "IDN", "label": "Panjang",         "country": "Indonesia",  "note": "Lampung robusta export port"},

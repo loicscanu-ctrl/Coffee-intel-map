@@ -1,12 +1,17 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { PortActivityRow } from "./FreightCharts";
+import type { PortActivityRow, SeasonalRow } from "./FreightCharts";
 import { VESSEL_TYPE_META, VESSEL_TYPE_KEYS, type VesselTypeKey } from "./vesselTypes";
+import { calIdx } from "./seasonal";
 
 // Heavy recharts bundle — lazy-load (client-only) like the other freight charts.
 const PortActivityChart = dynamic(
   () => import("./FreightCharts").then((m) => m.PortActivityChart),
+  { ssr: false, loading: () => <div className="h-[300px] animate-pulse" /> },
+);
+const SeasonalChart = dynamic(
+  () => import("./FreightCharts").then((m) => m.SeasonalChart),
   { ssr: false, loading: () => <div className="h-[300px] animate-pulse" /> },
 );
 
@@ -47,6 +52,8 @@ export default function PortActivity() {
   const [portKey, setPortKey] = useState<string>("");
   const [metric, setMetric] = useState<MetricKey>("portcalls");
   const [range, setRange] = useState<RangeKey>("3m");
+  // "seasonal" = year-over-year overlay (default); "detailed" = stacked-bar time series.
+  const [view, setView] = useState<"seasonal" | "detailed">("seasonal");
   // Which vessel types are shown — toggled via the chips below. Default: all.
   const [activeTypes, setActiveTypes] = useState<VesselTypeKey[]>([...VESSEL_TYPE_KEYS]);
   // Per-port series fetched lazily and cached so re-selecting a port is instant.
@@ -135,6 +142,63 @@ export default function PortActivity() {
     return { cur, pct };
   }, [chartData, port, metric, activeTypes]);
 
+  // Seasonal (year-over-year) data: align each year on a Jan→Dec calendar index,
+  // smooth with a trailing 7-day MA, overlay the latest 3 years, and build a grey
+  // min–max band across the *prior* years (excluding the current year).
+  const seasonal = useMemo(() => {
+    if (!port) return null;
+    const byYear: Record<number, Record<number, number>> = {};
+    for (const pt of port.series) {
+      const [Y, M, D] = pt.date.split("-").map(Number);
+      const idx = calIdx(M, D);
+      const val = activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
+      (byYear[Y] ||= {})[idx] = val;
+    }
+    const allYears = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+    if (allYears.length === 0) return null;
+    const curY = allYears[allYears.length - 1];
+    const prevY = curY - 1;
+    const prev2Y = curY - 2;
+
+    // Trailing 7-point MA within each year (data is daily/contiguous).
+    const smooth: Record<number, Record<number, number>> = {};
+    for (const y of allYears) {
+      const idxs = Object.keys(byYear[y]).map(Number).sort((a, b) => a - b);
+      const win: number[] = [];
+      const out: Record<number, number> = {};
+      for (const i of idxs) {
+        win.push(byYear[y][i]);
+        if (win.length > 7) win.shift();
+        out[i] = win.reduce((a, b) => a + b, 0) / win.length;
+      }
+      smooth[y] = out;
+    }
+
+    const priorYears = allYears.filter((y) => y < curY); // band excludes current year
+    const rows: SeasonalRow[] = [];
+    for (let i = 1; i <= 365; i++) {
+      const band = priorYears.map((y) => smooth[y]?.[i]).filter((v): v is number => v != null);
+      rows.push({
+        idx: i,
+        cur: smooth[curY]?.[i] ?? null,
+        prev: smooth[prevY]?.[i] ?? null,
+        prev2: smooth[prev2Y]?.[i] ?? null,
+        band: band.length ? [Math.min(...band), Math.max(...band)] : null,
+      });
+    }
+
+    // YTD: current year vs prior year over the same elapsed calendar window.
+    const curIdxs = Object.keys(byYear[curY]).map(Number);
+    const latest = curIdxs.length ? Math.max(...curIdxs) : 0;
+    const ytd = (y: number) =>
+      Object.entries(byYear[y] || {}).reduce((a, [i, v]) => (Number(i) <= latest ? a + v : a), 0);
+    const ytdCur = ytd(curY);
+    const ytdPrev = ytd(prevY);
+    const ytdPct = ytdPrev > 0 ? ((ytdCur - ytdPrev) / ytdPrev) * 100 : null;
+
+    return { rows, years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct };
+  }, [port, metric, activeTypes]);
+
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 space-y-3">
       <div className="flex items-start justify-between flex-wrap gap-2">
@@ -171,29 +235,44 @@ export default function PortActivity() {
 
       {data && portMeta && (
         <>
-          {/* Metric tabs */}
-          <div className="flex gap-1 border-b border-slate-800">
-            {METRICS.map((m) => {
-              const on = m.key === metric;
-              return (
+          {/* Metric tabs + view toggle */}
+          <div className="flex items-end justify-between gap-2 border-b border-slate-800">
+            <div className="flex gap-1">
+              {METRICS.map((m) => {
+                const on = m.key === metric;
+                return (
+                  <button
+                    key={m.key}
+                    onClick={() => setMetric(m.key)}
+                    className={`px-3 py-1.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
+                      on ? "border-sky-500 text-sky-300" : "border-transparent text-slate-500 hover:text-slate-300"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex gap-0.5 mb-1 bg-slate-800 rounded p-0.5">
+              {([["seasonal", "Seasonal"], ["detailed", "Detailed"]] as const).map(([v, label]) => (
                 <button
-                  key={m.key}
-                  onClick={() => setMetric(m.key)}
-                  className={`px-3 py-1.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
-                    on ? "border-sky-500 text-sky-300" : "border-transparent text-slate-500 hover:text-slate-300"
+                  key={v}
+                  onClick={() => setView(v)}
+                  className={`px-2.5 py-0.5 text-[10px] rounded transition-colors ${
+                    view === v ? "bg-sky-600 text-white" : "text-slate-400 hover:text-slate-200"
                   }`}
                 >
-                  {m.label}
+                  {label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {/* Sub-header: metric description, window total, range buttons */}
+          {/* Sub-header: metric description + summary; range buttons (detailed only) */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-[10px] text-slate-500">
               {activeMetric.sub}
-              {summary && (
+              {view === "detailed" && summary && (
                 <span className="ml-2 text-slate-400">
                   · {unit === "tons"
                       ? `${Math.round(summary.cur).toLocaleString("en-US")} t`
@@ -205,20 +284,34 @@ export default function PortActivity() {
                   )}
                 </span>
               )}
+              {view === "seasonal" && seasonal && (
+                <span className="ml-2 text-slate-400">
+                  · {seasonal.years.cur} YTD {unit === "tons"
+                      ? `${Math.round(seasonal.ytdCur).toLocaleString("en-US")} t`
+                      : `${Math.round(seasonal.ytdCur).toLocaleString("en-US")} calls`}
+                  {seasonal.ytdPct != null && (
+                    <span className={seasonal.ytdPct >= 0 ? "text-emerald-400 ml-1" : "text-red-400 ml-1"}>
+                      ({seasonal.ytdPct >= 0 ? "+" : ""}{seasonal.ytdPct.toFixed(1)}% vs {seasonal.years.prev})
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
-            <div className="flex gap-1">
-              {RANGES.map((r) => (
-                <button
-                  key={r.k}
-                  onClick={() => setRange(r.k)}
-                  className={`px-2 py-0.5 text-[10px] rounded font-mono uppercase ${
-                    r.k === range ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"
-                  }`}
-                >
-                  {r.k}
-                </button>
-              ))}
-            </div>
+            {view === "detailed" && (
+              <div className="flex gap-1">
+                {RANGES.map((r) => (
+                  <button
+                    key={r.k}
+                    onClick={() => setRange(r.k)}
+                    className={`px-2 py-0.5 text-[10px] rounded font-mono uppercase ${
+                      r.k === range ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                    }`}
+                  >
+                    {r.k}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Vessel-type filter — toggle which types are shown/summed */}
@@ -263,6 +356,8 @@ export default function PortActivity() {
             <div className="h-[300px] flex items-center justify-center text-slate-500 text-xs">
               Select at least one vessel type to display.
             </div>
+          ) : view === "seasonal" ? (
+            seasonal && <SeasonalChart data={seasonal.rows} unit={unit} years={seasonal.years} />
           ) : (
             <PortActivityChart data={chartData} unit={unit} activeTypes={activeTypes} />
           )}
