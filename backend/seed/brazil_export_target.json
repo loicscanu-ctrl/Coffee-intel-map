@@ -1,0 +1,12 @@
+{
+  "annual_target_bags": 49070000,
+  "crop_year": "2026/27",
+  "source": "USDA FAS GAIN report BR2026-0025 — Brazil Coffee Annual, June 1 2026",
+  "breakdown_bags": {
+    "green":   45000000,
+    "soluble":  4000000,
+    "roasted":    70000
+  },
+  "notes": "Total includes green + roasted + soluble to match Cecafe series[].total. Update when USDA publishes the next semi-annual revision.",
+  "updated_at": "2026-06-08"
+}

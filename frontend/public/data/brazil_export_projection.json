@@ -1,6 +1,6 @@
 {
   "crop_year": "2026/27",
-  "annual_target": 37000000,
+  "annual_target": 49070000,
   "monthly_curve": [
     {
       "month": "Apr",
@@ -22,61 +22,61 @@
     },
     {
       "month": "Jul",
-      "value": 2563892,
+      "value": 3705337,
       "status": "seasonality",
       "ym": "2026-07"
     },
     {
       "month": "Aug",
-      "value": 2952118,
+      "value": 4266401,
       "status": "seasonality",
       "ym": "2026-08"
     },
     {
       "month": "Sep",
-      "value": 3517166,
+      "value": 5083007,
       "status": "seasonality",
       "ym": "2026-09"
     },
     {
       "month": "Oct",
-      "value": 3861657,
+      "value": 5580865,
       "status": "seasonality",
       "ym": "2026-10"
     },
     {
       "month": "Nov",
-      "value": 3373162,
+      "value": 4874893,
       "status": "seasonality",
       "ym": "2026-11"
     },
     {
       "month": "Dec",
-      "value": 2933631,
+      "value": 4239683,
       "status": "seasonality",
       "ym": "2026-12"
     },
     {
       "month": "Jan",
-      "value": 2599031,
+      "value": 3756119,
       "status": "seasonality",
       "ym": "2027-01"
     },
     {
       "month": "Feb",
-      "value": 2451389,
+      "value": 3542748,
       "status": "seasonality",
       "ym": "2027-02"
     },
     {
       "month": "Mar",
-      "value": 2859374,
+      "value": 4132367,
       "status": "seasonality",
       "ym": "2027-03"
     }
   ],
-  "generated_at": "2026-06-08T08:58:20Z",
-  "target_source": "USDA PSD (year 2025)",
+  "generated_at": "2026-06-08T12:26:33Z",
+  "target_source": "Manual override (USDA FAS GAIN report BR2026-0025 \u2014 Brazil Coffee Annual, June 1 2026)",
   "safeguard_triggered": false,
   "realized_through": "2026-04",
   "last_year_total": 37827090
