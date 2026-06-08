@@ -12,10 +12,11 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import { bagsToKT, cropYearKey, normalizeSources } from "./helpers";
 import type { DailyData, SeriesKey, VolumeSeries } from "./types";
 
-export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
+export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, isReportMode = false }: {
   series: VolumeSeries[];
   typeFilter?: SeriesKey | null;
   isFiltered?: boolean;
+  isReportMode?: boolean;
 }) {
   const activeKey: SeriesKey = typeFilter ?? "total";
   const [cropYears, setCropYears] = useState(3);
@@ -159,14 +160,16 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
             )}
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2, 3, 5].map(n => (
-            <button key={n} onClick={() => setCropYears(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {n}Y
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2, 3, 5].map(n => (
+              <button key={n} onClick={() => setCropYears(n)}
+                className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {n}Y
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>

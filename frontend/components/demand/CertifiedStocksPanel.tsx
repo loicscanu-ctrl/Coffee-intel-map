@@ -2428,7 +2428,7 @@ export default function CertifiedStocksPanel() {
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
-            <PinToReport id="certified_stocks_flow" />
+            <PinToReport id="certified_stocks_tiles" />
           </div>
           <p className="text-[11px] text-slate-500">
             ICE-certified arabica (US warehouses) &amp; robusta (European warehouses) — the deliverable inventory the
