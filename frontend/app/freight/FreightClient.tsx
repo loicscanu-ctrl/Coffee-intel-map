@@ -1,10 +1,27 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  ComposedChart, Bar,
-} from "recharts";
+import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
+
+// Charts carry the heavy recharts dependency — lazy-load them (client-only) so
+// they stay out of the page's initial bundle. The page chrome renders first.
+const FreightHistoryChart = dynamic(
+  () => import("./FreightCharts").then((m) => m.FreightHistoryChart),
+  { ssr: false, loading: () => <ChartFallback height={260} /> },
+);
+const DryBulkChart = dynamic(
+  () => import("./FreightCharts").then((m) => m.DryBulkChart),
+  { ssr: false, loading: () => <ChartFallback height={180} /> },
+);
+
+function ChartFallback({ height }: { height: number }) {
+  return (
+    <div className="flex items-center justify-center text-slate-600 text-[10px] animate-pulse"
+      style={{ height }}>
+      Loading chart…
+    </div>
+  );
+}
 
 type FreightRoute = {
   id: string;
@@ -30,15 +47,6 @@ interface DryBulkData {
   series: { date: string; close: number }[];
   source: string;
 }
-
-const TT_STYLE = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
-
-const CHART_LINES = [
-  { key: "vn-eu", label: "VN → EU", color: "#38bdf8" },
-  { key: "br-eu", label: "BR → EU", color: "#4ade80" },
-  { key: "vn-us", label: "VN → US", color: "#fb923c" },
-  { key: "et-eu", label: "ET → EU", color: "#c084fc" },
-];
 
 interface Props { data: FreightData | null; }
 
@@ -90,16 +98,7 @@ function BdryPanel({ data }: { data: DryBulkData }) {
       )}
 
       {chartData.length > 0 && (
-        <ResponsiveContainer width="100%" height={180}>
-          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="label" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
-              tickFormatter={v => `$${Number(v).toFixed(0)}`} />
-            <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`$${Number(v).toFixed(2)}`, data.ticker]} />
-            <Bar dataKey="close" fill="#3b82f6" opacity={0.75} radius={[2,2,0,0]} isAnimationActive={false} />
-          </ComposedChart>
-        </ResponsiveContainer>
+        <DryBulkChart chartData={chartData} ticker={data.ticker} />
       )}
 
       <div className="grid grid-cols-3 gap-3 text-[9px] font-mono border-t border-slate-800 pt-2">
@@ -164,28 +163,7 @@ export default function FreightClient({ data }: Props) {
         )}
 
         {data && data.history.length > 0 && (
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={data.history} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false}
-                tickFormatter={(v: string) => v.slice(5)} />
-              <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={50}
-                tickFormatter={(v: number) => `$${(v / 1000).toFixed(1)}k`} />
-              <Tooltip
-                contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-                labelStyle={{ color: "#94a3b8" }}
-                formatter={(v: unknown) => [`$${Number(v).toLocaleString("en-US")}`, ""]}
-              />
-              <Legend
-                wrapperStyle={{ fontSize: 11, color: "#94a3b8" }}
-                formatter={(value) => CHART_LINES.find((l) => l.key === value)?.label ?? value}
-              />
-              {CHART_LINES.map((l) => (
-                <Line key={l.key} type="monotone" dataKey={l.key} stroke={l.color}
-                  strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+          <FreightHistoryChart history={data.history} />
         )}
       </div>
 
