@@ -12,6 +12,7 @@ import { useUrlState } from "@/lib/useUrlState";
 type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs";
 
 import StatCard from "./StatCard";
+import CecafeDailyKPIs from "./CecafeDailyKPIs";
 import DailyRegistrationSection from "./DailyRegistration";
 import MonthlyVolumeChart from "./MonthlyVolumeChart";
 import AnnualTrendChart from "./AnnualTrendChart";
@@ -174,7 +175,12 @@ export default function BrazilTab() {
           {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
           <DailyRegistrationSection />
 
-          {/* KPI cards */}
+          {/* Daily MTD KPIs — Embarques + Certificados month-to-date with
+              vs-same-day-last-month deltas. Fed by the same cecafe_daily.json
+              the panel above reads, so the numbers always match. */}
+          <CecafeDailyKPIs />
+
+          {/* KPI cards (released monthly data) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <StatCard
               label={`${latest.date} — total exports`}

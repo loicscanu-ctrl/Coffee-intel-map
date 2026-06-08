@@ -62,7 +62,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR  = REPO_ROOT / "frontend" / "public" / "data"
+SEED_DIR  = REPO_ROOT / "backend"  / "seed"
 OUT_PATH  = DATA_DIR / "brazil_export_projection.json"
+TARGET_OVERRIDE_PATH = SEED_DIR / "brazil_export_target.json"
 
 CROP_MONTH_ORDER = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3]    # Apr → Mar
 MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun",
@@ -207,6 +209,38 @@ def _usda_brazil_target_bags(stocks_payload: dict) -> tuple[int | None, str | No
     return bags, f"USDA PSD (year {latest.get('year','?')})"
 
 
+def _override_target_bags(override_payload: dict | None,
+                          expected_crop_year: str) -> tuple[int | None, str | None]:
+    """Honour a hand-maintained seed override when it matches the active
+    crop year. Lets a human set the USDA forecast the moment it's published,
+    without waiting for the psd_coffee scraper to roll forward.
+
+    Returns (bags, label) when valid, else (None, None) so the caller falls
+    back to the PSD-derived number.
+
+    Override schema (backend/seed/brazil_export_target.json):
+      {
+        "annual_target_bags": 46000000,
+        "crop_year":          "2026/27",
+        "source":             "USDA FAS PSD June 2026",
+        "updated_at":         "2026-06-08"
+      }
+    """
+    if not isinstance(override_payload, dict):
+        return None, None
+    cy = override_payload.get("crop_year")
+    if cy != expected_crop_year:
+        # Stale or wrong-year override → ignore silently. The engine will
+        # log it via target_source = "USDA PSD …" so the operator can spot
+        # that their override didn't take effect.
+        return None, None
+    bags = override_payload.get("annual_target_bags")
+    if not isinstance(bags, int) or not (1_000_000 <= bags <= 100_000_000):
+        return None, None
+    label = f"Manual override ({override_payload.get('source','seed file')})"
+    return bags, label
+
+
 # ── seasonality + safeguard ─────────────────────────────────────────────────
 
 def last_year_curve(series: list[dict], start: dt.date) -> dict[str, int]:
@@ -319,25 +353,43 @@ def build_monthly_curve(
 
 # ── top-level orchestrator ──────────────────────────────────────────────────
 
+def _maybe_load(path: Path) -> dict | None:
+    """Same as _load but returns None when the file is absent — used for
+    the optional override seed."""
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:           # noqa: BLE001 — corrupt seed → fall back to PSD
+        return None
+
+
 def build_projection(today: dt.date | None = None,
                      cecafe: dict | None = None,
                      daily: dict | None = None,
-                     stocks: dict | None = None) -> dict:
+                     stocks: dict | None = None,
+                     override: dict | None = None) -> dict:
     """Pure function — takes the three payloads + today's date, returns the
-    JSON payload to write. Caller passes `None` to load from disk."""
+    JSON payload to write. Caller passes `None` to load from disk. `override`
+    is the optional seed/brazil_export_target.json shape and wins over PSD
+    when it matches the active crop year."""
     today  = today  or dt.date.today()
     cecafe = cecafe if cecafe is not None else _load(DATA_DIR / "cecafe.json")
     daily  = daily  if daily  is not None else _load(DATA_DIR / "cecafe_daily.json")
     stocks = stocks if stocks is not None else _load(DATA_DIR / "demand_stocks.json")
+    override = override if override is not None else _maybe_load(TARGET_OVERRIDE_PATH)
 
     start  = crop_year_start(today)
     series = cecafe.get("series") or []
+    crop_label = crop_year_label(start)
 
     realized      = realized_from_series(series, start)
     certificados  = certificados_forecast(daily, start, realized)
-    annual_target, target_source = _usda_brazil_target_bags(stocks)
+    # Override wins; PSD is the fallback; sum-of-prior-year is the last resort.
+    annual_target, target_source = _override_target_bags(override, crop_label)
     if not annual_target:
-        # Failsafe: if PSD data is missing, default to last full crop year.
+        annual_target, target_source = _usda_brazil_target_bags(stocks)
+    if not annual_target:
         prior = last_year_curve(series, start)
         annual_target = sum(prior.values()) or 40_000_000
         target_source = "fallback (sum of prior crop-year)"
@@ -353,7 +405,7 @@ def build_projection(today: dt.date | None = None,
 
     prior_total = sum(last_year_curve(series, start).values())
     return {
-        "crop_year":           crop_year_label(start),
+        "crop_year":           crop_label,
         "annual_target":       annual_target,
         "monthly_curve":       curve,
         "generated_at":        dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),

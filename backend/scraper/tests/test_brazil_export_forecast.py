@@ -184,6 +184,63 @@ def test_safeguard_raises_target_and_sets_flag():
     assert aug["value"] == 100
 
 
+def test_override_wins_over_psd():
+    """A matching-crop-year override beats whatever PSD says."""
+    series = [
+        *[_series_row(f"2025-{m:02d}", 1) for m in range(4, 13)],
+        *[_series_row(f"2026-{m:02d}", 1) for m in (1, 2, 3)],
+        _series_row("2026-04", 1),
+    ]
+    payload = bef.build_projection(
+        today=dt.date(2026, 6, 1),
+        cecafe={"series": series},
+        daily={"updated": "2026-06-01", "_schema": "v2",
+               "sources": {"embarques": {}, "certificados": {}}},
+        stocks=_stocks(exports_mt=37_000_000 * 60 / 1_000),  # PSD says 37M
+        override={"crop_year": "2026/27",
+                  "annual_target_bags": 46_000_000,
+                  "source": "USDA Jun 2026"},
+    )
+    assert payload["annual_target"] == 46_000_000
+    assert "Manual override" in (payload["target_source"] or "")
+
+
+def test_override_stale_crop_year_ignored():
+    """A wrong-year override is silently ignored so we don't ship a
+    forecast against last year's number."""
+    series = [
+        *[_series_row(f"2025-{m:02d}", 1) for m in range(4, 13)],
+        *[_series_row(f"2026-{m:02d}", 1) for m in (1, 2, 3)],
+        _series_row("2026-04", 1),
+    ]
+    payload = bef.build_projection(
+        today=dt.date(2026, 6, 1),
+        cecafe={"series": series},
+        daily={"updated": "2026-06-01", "_schema": "v2",
+               "sources": {"embarques": {}, "certificados": {}}},
+        stocks=_stocks(exports_mt=37_000_000 * 60 / 1_000),
+        override={"crop_year": "2024/25",  # stale
+                  "annual_target_bags": 99_000_000},
+    )
+    assert payload["annual_target"] == 37_000_000     # fell back to PSD
+    assert "USDA PSD" in (payload["target_source"] or "")
+
+
+def test_override_out_of_sanity_range_ignored():
+    """An override outside [1M, 100M] bags is rejected as a typo guard."""
+    payload = bef.build_projection(
+        today=dt.date(2026, 6, 1),
+        cecafe={"series": [_series_row("2026-04", 1)]},
+        daily={"updated": "2026-06-01", "_schema": "v2",
+               "sources": {"embarques": {}, "certificados": {}}},
+        stocks=_stocks(exports_mt=37_000_000 * 60 / 1_000),
+        override={"crop_year": "2026/27",
+                  "annual_target_bags": 500_000_000},  # 500M bags = absurd
+    )
+    assert payload["annual_target"] == 37_000_000
+    assert "USDA PSD" in (payload["target_source"] or "")
+
+
 def test_target_falls_back_when_psd_missing():
     """If demand_stocks.json has no Brazil entry, the engine still emits a
     coherent projection using the prior crop year's total as the target."""
