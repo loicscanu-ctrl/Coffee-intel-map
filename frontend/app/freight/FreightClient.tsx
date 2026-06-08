@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
+import PortActivity from "./PortActivity";
 
 // Charts carry the heavy recharts dependency — lazy-load them (client-only) so
 // they stay out of the page's initial bundle. The page chrome renders first.
@@ -220,6 +221,9 @@ export default function FreightClient({ data }: Props) {
           </table>
         )}
       </div>
+
+      {/* Port activity — IMF PortWatch */}
+      <PortActivity />
 
       {/* Dry bulk freight indicator */}
       {dryBulk ? (

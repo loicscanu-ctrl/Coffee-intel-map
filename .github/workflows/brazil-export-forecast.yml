@@ -1,0 +1,94 @@
+name: "1.8 – Brazil Export Forecast (SSOT projection)"
+
+# Daily Python engine that synthesizes cecafe.json (monthly), cecafe_daily.json
+# (intra-month certificados pacing) and demand_stocks.json (USDA PSD annual
+# target) into ONE static file the front-end fans out from:
+#
+#   frontend/public/data/brazil_export_projection.json
+#
+# Three Brazil-tab visuals (MonthlyVolumeChart, CumulativePaceChart,
+# SupplyDemandBalance) read this file directly — no per-chart math —
+# so a single source of truth eliminates drift between the bar / line /
+# table views.
+#
+# Scheduled AFTER scraper-cecafe-daily.yml (17:00 UTC) so we pick up the
+# day's fresh certificados before projecting.
+
+on:
+  schedule:
+    # 18:00 UTC = 15:00 Brasília. cecafe-daily runs at 17:00 UTC and
+    # commits in the same data-commit concurrency group, so this lands
+    # serialized behind it on the same daily cycle.
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: data-commit           # serialize all main-pushers
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install minimal dependencies
+        # Engine is pure-Python stdlib + json. No external deps needed.
+        run: |
+          python --version
+
+      - name: Run forecast engine
+        id: forecast
+        working-directory: backend
+        run: |
+          set +e
+          PYTHONPATH=. python -m scraper.brazil_export_forecast --write
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ $rc -eq 2 ]; then
+            # Safeguard fired — keep the file but flag for the alert step.
+            echo "safeguard=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          exit $rc
+
+      - name: Commit updated projection if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/brazil_export_projection.json
+          git diff --cached --quiet \
+            && echo "No projection change." \
+            || (git commit -m "data: brazil export projection $(date -u +%Y-%m-%d) [skip ci]" \
+                && git pull --rebase --autostash --strategy-option=theirs origin main \
+                && git push)
+
+      - name: Notify safeguard activation (Telegram)
+        if: steps.forecast.outputs.safeguard == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=⚠️ Brazil Export pace has broken the annual USDA projection. Target dynamically adjusted in brazil_export_projection.json — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

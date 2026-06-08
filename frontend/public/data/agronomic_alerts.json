@@ -1,21 +1,8 @@
 {
-  "generated_at": "2026-06-07T08:44:23+00:00",
+  "generated_at": "2026-06-08T10:14:12+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
-      "Antioquia": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -3.18,
-            "forecast_7d_rain": 51.4
-          }
-        }
-      ],
       "Caldas": [
         {
           "threat_id": "blossom_drop",
@@ -25,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 74.2
+            "forecast_7d_rain": 95.4
           }
         }
       ]
@@ -43,19 +30,6 @@
             "forecast_7d_rain": 134.5
           }
         }
-      ],
-      "Montecillos": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.4,
-            "forecast_7d_rain": 115.3
-          }
-        }
       ]
     },
     "indonesia": {
@@ -68,7 +42,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.22,
-            "forecast_7d_rain": 89.1
+            "forecast_7d_rain": 60.1
           }
         }
       ]
@@ -83,19 +57,32 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.17,
-            "forecast_7d_rain": 53.7
+            "forecast_7d_rain": 70.1
+          }
+        }
+      ],
+      "Dak Nong": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.26,
+            "forecast_7d_rain": 61.1
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 6,
+    "total_alerts": 5,
     "by_severity": {
-      "watch": 6
+      "watch": 5
     },
     "by_threat": {
-      "blossom_drop": 6
+      "blossom_drop": 5
     }
   }
 }
