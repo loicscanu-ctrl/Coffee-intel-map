@@ -1,14 +1,17 @@
 "use client";
 /**
- * Report wrappers for futures visuals. OIFndChart self-fetches and switches on
- * its `market` prop, so NY (arabica) and LDN (robusta) are two clean entries.
+ * Report wrapper for OI Evolution to FND — both markets in one visual, side by
+ * side (NY Arabica left, London Robusta right), shrunk to fit two-up. OIFndChart
+ * self-fetches per market, so this is pure layout.
  */
 import OIFndChart from "@/components/futures/OIFndChart";
 
-export function OiFndArabica() {
-  return <OIFndChart market="arabica" />;
-}
-
-export function OiFndRobusta() {
-  return <OIFndChart market="robusta" />;
+export default function OiFndReport({ isReportMode = true }: { isReportMode?: boolean }) {
+  void isReportMode;
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <OIFndChart market="arabica" height={240} />
+      <OIFndChart market="robusta" height={240} />
+    </div>
+  );
 }

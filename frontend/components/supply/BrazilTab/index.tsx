@@ -14,15 +14,12 @@ type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather"
 import StatCard from "./StatCard";
 import CecafeDailyKPIs from "./CecafeDailyKPIs";
 import DailyRegistrationSection from "./DailyRegistration";
-import MonthlyVolumeChart from "./MonthlyVolumeChart";
-import AnnualTrendChart from "./AnnualTrendChart";
 import TypeShareChart from "./TypeShareChart";
 import SeasonalityHeatmap from "./SeasonalityHeatmap";
 import YoYByTypeChart from "./YoYByTypeChart";
 import RollingAvgChart from "./RollingAvgChart";
-import CumulativePaceChart from "./CumulativePaceChart";
 import CountryHubFilter from "./CountryHubFilter";
-import DestinationChart from "./DestinationChart";
+import { MonthlyVolumeCard, CumulativePaceCard, AnnualTrendCard, DestinationCard } from "./exportCharts";
 import PinToReport from "@/components/report/PinToReport";
 
 export default function BrazilTab() {
@@ -81,16 +78,7 @@ export default function BrazilTab() {
     <div className="text-center text-slate-500 py-16 text-sm animate-pulse">Loading Cecafe data…</div>
   );
 
-  const {
-    series,
-    by_country, by_country_prev,
-    by_country_arabica, by_country_arabica_prev,
-    by_country_conillon, by_country_conillon_prev,
-    by_country_soluvel, by_country_soluvel_prev,
-    by_country_torrado, by_country_torrado_prev,
-    by_country_history,
-    report, updated,
-  } = data;
+  const { series, by_country, report, updated } = data;
   const latest = series[series.length - 1];
   const prev   = series[series.length - 13]; // same month last year
 
@@ -208,26 +196,19 @@ export default function BrazilTab() {
           {/* Origin filter */}
           <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
 
-          {/* Charts */}
-          <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} projection={projection} />
-          <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} projection={projection} />
+          {/* Charts — instantiated through the shared exportCharts module so the
+              News report builder renders these identically. */}
+          <MonthlyVolumeCard data={data} projection={projection} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <CumulativePaceCard data={data} projection={projection} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <div className="relative">
             <div className="absolute right-3 top-3 z-10"><PinToReport id="brazil_annual_trend" /></div>
-            <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+            <AnnualTrendCard data={data} filteredSeries={filteredSeries} typeFilter={filter.type} />
           </div>
           <TypeShareChart series={series} />
           <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <SeasonalityHeatmap series={series} />
           <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-          <DestinationChart
-            byCountry={by_country}
-            byCountryPrev={by_country_prev}
-            byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
-            byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
-            bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}
-            byTorrado={by_country_torrado} byTorradoPrev={by_country_torrado_prev}
-            byCountryHistory={by_country_history}
-          />
+          <DestinationCard data={data} />
         </>
       )}
     </div>

@@ -43,18 +43,11 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     Component: dynamic(() => import("@/components/report/charts/CotOverviewReport"), { ssr: false, loading }),
   },
   {
-    id: "oi_fnd_ny",
-    label: "OI Evolution to FND — NY (Arabica)",
+    id: "oi_fnd",
+    label: "OI Evolution to FND — NY & London",
     category: "Futures",
-    description: "Open-interest run-down into First Notice Day, NY Arabica, current vs historical contracts.",
-    Component: dynamic(() => import("@/components/report/charts/FuturesReports").then((m) => ({ default: m.OiFndArabica })), { ssr: false, loading }),
-  },
-  {
-    id: "oi_fnd_ldn",
-    label: "OI Evolution to FND — London (Robusta)",
-    category: "Futures",
-    description: "Open-interest run-down into First Notice Day, London Robusta, current vs historical contracts.",
-    Component: dynamic(() => import("@/components/report/charts/FuturesReports").then((m) => ({ default: m.OiFndRobusta })), { ssr: false, loading }),
+    description: "Open-interest run-down into First Notice Day — NY Arabica (left) & London Robusta (right).",
+    Component: dynamic(() => import("@/components/report/charts/FuturesReports"), { ssr: false, loading }),
   },
 
   // ── Freight ────────────────────────────────────────────────────────────────
