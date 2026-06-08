@@ -14,7 +14,8 @@
 // arriving at Antwerp 6mo ago and leaving 4mo ago shows up as transited (in &
 // out), not as net_gained that never materialises.
 
-import type { RobustaSnap, RobustaGradingEvent, RobustaPortSim } from "./types";
+import type { RobustaSnap, RobustaGradingEvent } from "./shapes";
+import type { RobustaPortSim } from "./types";
 
 export function _simulateRobustaPortStock(
   port: string,

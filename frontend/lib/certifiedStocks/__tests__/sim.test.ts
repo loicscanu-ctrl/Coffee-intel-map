@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { _simulateRobustaPortStock } from "../sim";
-import type { RobustaSnap, RobustaGradingEvent } from "../types";
+import type { RobustaSnap, RobustaGradingEvent } from "../shapes";
 
 const sum = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0);
 

@@ -4,10 +4,8 @@
 
 import type { AgeBin, AgeDist } from "./age";
 
-// ── Robusta source JSON shapes (the subset the simulation reads) ──────────────
-export interface RobustaSnap { date: string; total_lots_certified: number; by_port_lots?: Record<string, number> }
-export interface RobustaGradingEntry { port?: string; origin?: string; class?: number | null; tenderable?: boolean; lots: number }
-export interface RobustaGradingEvent { date: string; entries?: RobustaGradingEntry[] }
+// (Source JSON shapes — RobustaSnap / RobustaGradingEvent etc. — live in
+// ./shapes; this module holds the derived view/domain types.)
 
 // ── Density-grid square ──────────────────────────────────────────────────────
 export interface DensitySquare {
