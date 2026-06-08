@@ -9,23 +9,8 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
-import { fmtBags, shiftMonth, shortMonthLabel } from "./helpers";
-import type { CecafeSourceBucket, CecafeSourceKey, DailyData } from "./types";
-
-/** Migrate legacy v1 ({arabica, conillon, soluvel} flat) into the dual-source
- * structure so the chart can render either source uniformly. Legacy files
- * came from Certificados de Origem — that's where their values map. */
-function normalizeSources(data: DailyData): Record<CecafeSourceKey, CecafeSourceBucket> {
-  if (data.sources) return data.sources;
-  return {
-    embarques: { arabica: {}, conillon: {}, soluvel: {} },
-    certificados: {
-      arabica:  data.arabica  ?? {},
-      conillon: data.conillon ?? {},
-      soluvel:  data.soluvel  ?? {},
-    },
-  };
-}
+import { fmtBags, normalizeSources, shiftMonth, shortMonthLabel } from "./helpers";
+import type { CecafeSourceKey, DailyData } from "./types";
 
 const SOURCE_LABEL: Record<CecafeSourceKey, { title: string; sub: string }> = {
   embarques:    { title: "Embarques",    sub: "physical port loadings" },
