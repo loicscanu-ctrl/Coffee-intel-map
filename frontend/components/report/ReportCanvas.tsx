@@ -26,7 +26,7 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
   const setComment = useReportStore((s) => s.setComment);
 
   return (
-    <div ref={ref} className="bg-slate-950 text-slate-100">
+    <div ref={ref} id="report-canvas" className="bg-slate-950 text-slate-100 mx-auto w-full max-w-[800px]">
       {/* Auto-injected briefing header */}
       <header className="border-b border-slate-700 pb-3 mb-4">
         <h1 className="text-lg font-semibold text-amber-400">Coffee Intel Map — Market Briefing</h1>
