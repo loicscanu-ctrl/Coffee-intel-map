@@ -16,6 +16,7 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+from scraper._export_common import _badge, _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
 
@@ -29,7 +30,6 @@ OUT_DIR = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 _INDONESIA_REGIONS = ["Lampung", "Gayo", "Java", "Toraja", "Flores"]
-_RISK_ORDER = {"-": 0, "L": 1, "M": 2, "H": 3}
 
 # Indonesia ENSO impact: among the most sensitive coffee producers globally
 _INDONESIA_ENSO_IMPACT = {
@@ -81,14 +81,6 @@ _HARVEST_WINDOWS = [
     {"island": "Sulawesi",          "harvest": "Oct–Mar",   "flowering": "Apr–Jun", "crop": "arabica"},
     {"island": "Flores",            "harvest": "Jun–Sep",   "flowering": "Jan–Mar", "crop": "arabica"},
 ]
-
-
-def _worst_risk(risks: list) -> str:
-    return max(risks, key=lambda r: _RISK_ORDER.get(r, 0)) if risks else "-"
-
-
-def _badge(code: str) -> str:
-    return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
 
 
 
