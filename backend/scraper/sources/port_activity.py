@@ -15,9 +15,12 @@ the UN Global Platform AIS feed). Public ArcGIS Feature Service, no auth.
   where <type> ∈ {container, dry_bulk, general_cargo, roro, tanker}
 
 PortWatch refreshes weekly (Tuesdays ~09:00 ET). We track a curated set of
-coffee export gateways and write a single static JSON the Freight page reads.
+coffee export gateways. To keep page loads light, each port's full series is
+written to its own file and a small `index.json` lists the ports (no series);
+the Freight page loads the index up front and fetches one port on demand.
 
-Writes → frontend/public/data/port_activity.json
+Writes → frontend/public/data/port_activity/index.json
+         frontend/public/data/port_activity/<key>.json   (one per port)
 """
 from __future__ import annotations
 
@@ -27,9 +30,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # Repo layout: backend/scraper/sources/port_activity.py → frontend/public/data
-_OUT_PATH = (
+_OUT_DIR = (
     Path(__file__).resolve().parents[3]
-    / "frontend" / "public" / "data" / "port_activity.json"
+    / "frontend" / "public" / "data" / "port_activity"
 )
 
 _BASE = (
@@ -71,6 +74,7 @@ _HEADERS = {
 PORTS: list[dict] = [
     {"key": "hcmc",          "portid": "port2085",        "label": "Ho Chi Minh City", "country": "Vietnam",   "note": "Vietnam robusta export gateway (Cat Lai / Saigon New Port)"},
     {"key": "santos",        "match": "SANTOS",           "iso3": "BRA", "label": "Santos",          "country": "Brazil",     "note": "World's largest coffee export port (arabica)"},
+    {"key": "vitoria",       "match": "VITORIA",          "iso3": "BRA", "label": "Vitória",         "country": "Brazil",     "note": "Espírito Santo conilon/robusta & arabica export port"},
     {"key": "buenaventura",  "match": "BUENAVENTURA",     "iso3": "COL", "label": "Buenaventura",    "country": "Colombia",   "note": "Colombia's main Pacific coffee export port"},
     {"key": "cartagena_co",  "match": "CARTAGENA",        "iso3": "COL", "label": "Cartagena",       "country": "Colombia",   "note": "Colombia Caribbean coffee export port"},
     {"key": "panjang",       "match": "PANJANG",          "iso3": "IDN", "label": "Panjang",         "country": "Indonesia",  "note": "Lampung robusta export port"},
@@ -156,7 +160,13 @@ def _resolve_portid(match: str, iso3: str) -> tuple[str, str] | None:
 
 
 def _fetch_series(portid: str) -> list[dict]:
-    """Fetch the full (windowed) daily series for one portid, paginated."""
+    """Fetch the full (windowed) daily series for one portid, paginated.
+
+    PortWatch's FeatureServer caps each page at its own maxRecordCount (1000),
+    which can be smaller than what we request — so we page until the server
+    stops setting `exceededTransferLimit`, advancing by the rows it actually
+    returns (never by the requested page size).
+    """
     rows: list[dict] = []
     offset = 0
     while True:
@@ -170,6 +180,8 @@ def _fetch_series(portid: str) -> list[dict]:
             "f": "json",
         })
         feats = payload.get("features", [])
+        if not feats:
+            break
         for f in feats:
             a = f.get("attributes", {})
             if a.get("year") is None:
@@ -180,9 +192,9 @@ def _fetch_series(portid: str) -> list[dict]:
                 for t in _TYPES:
                     point[f"{m}_{t}"] = _num(a.get(f"{m}_{t}"))
             rows.append(point)
-        if len(feats) < _PAGE or not payload.get("exceededTransferLimit", False):
+        offset += len(feats)
+        if not payload.get("exceededTransferLimit", False):
             break
-        offset += _PAGE
     return rows
 
 
@@ -194,9 +206,18 @@ def _num(v) -> float | int:
     return int(f) if f.is_integer() else f
 
 
+def _write_json(path: Path, obj) -> None:
+    path.write_text(json.dumps(obj, separators=(",", ":")), encoding="utf-8")
+
+
 def run() -> dict | None:
-    """Fetch all configured ports and write the static JSON. Returns the payload."""
-    out_ports: list[dict] = []
+    """Fetch all configured ports and write per-port files + an index.
+
+    Each port → `<key>.json` (metadata + series); `index.json` lists the ports
+    without their series. Returns the index payload (None if nothing fetched).
+    """
+    index_ports: list[dict] = []
+    written_files: set[str] = set()
     for spec in PORTS:
         key = spec["key"]
         try:
@@ -215,7 +236,7 @@ def run() -> dict | None:
                 print(f"[port_activity] {key} ({portid}): no rows — skipped")
                 continue
 
-            out_ports.append({
+            meta = {
                 "key": key,
                 "portid": portid,
                 "name": portname or spec["label"],
@@ -224,18 +245,22 @@ def run() -> dict | None:
                 "note": spec["note"],
                 "start": series[0]["date"],
                 "end": series[-1]["date"],
-                "series": series,
-            })
+            }
+            index_ports.append(meta)
+
+            _OUT_DIR.mkdir(parents=True, exist_ok=True)
+            _write_json(_OUT_DIR / f"{key}.json", {**meta, "vessel_types": _TYPES, "series": series})
+            written_files.add(f"{key}.json")
             print(f"[port_activity] {key} ({portid}): {len(series)} days "
                   f"{series[0]['date']}→{series[-1]['date']}")
         except Exception as e:  # noqa: BLE001 — one port must not sink the rest
             print(f"[port_activity] {key}: ERROR — {e}")
 
-    if not out_ports:
-        print("[port_activity] No ports fetched — retaining existing file")
+    if not index_ports:
+        print("[port_activity] No ports fetched — retaining existing files")
         return None
 
-    payload = {
+    index = {
         "updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source": "IMF PortWatch (UN Global Platform; PortWatch)",
         "dataset": "Daily Port Activity Data and Trade Estimates",
@@ -245,13 +270,22 @@ def run() -> dict | None:
             "export": "Estimated export volume, metric tons (Outgoing Shipment)",
         },
         "vessel_types": _TYPES,
-        "ports": out_ports,
+        "ports": index_ports,
     }
 
-    _OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    _OUT_PATH.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
-    print(f"[port_activity] wrote {len(out_ports)} ports → {_OUT_PATH}")
-    return payload
+    _OUT_DIR.mkdir(parents=True, exist_ok=True)
+    _write_json(_OUT_DIR / "index.json", index)
+    written_files.add("index.json")
+
+    # Drop stale per-port files (ports removed from config) so the committed
+    # directory always reflects exactly the current port set.
+    for old in _OUT_DIR.glob("*.json"):
+        if old.name not in written_files:
+            old.unlink()
+            print(f"[port_activity] removed stale {old.name}")
+
+    print(f"[port_activity] wrote {len(index_ports)} ports → {_OUT_DIR}")
+    return index
 
 
 if __name__ == "__main__":
