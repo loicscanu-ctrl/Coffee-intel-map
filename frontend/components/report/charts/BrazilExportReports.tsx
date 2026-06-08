@@ -1,14 +1,18 @@
 "use client";
 /**
- * Report wrappers for Brazil (Cecafe) export charts. All read /data/cecafe.json
- * once and feed the prop-driven BrazilTab charts, unfiltered/all-origins, with
- * isReportMode set so filter controls are hidden.
+ * Report wrappers for Brazil (Cecafe) export charts.
+ *
+ * These reuse the EXACT BrazilTab chart components, so any format change made to
+ * those charts shows up here automatically. To match the Supply tab we must
+ * also feed the same inputs — including the SSOT crop-year projection
+ * (brazil_export_projection.json) that drives the current-year bars + status
+ * colours on Monthly Volume / Cumulative Pace.
  */
 import { useEffect, useState } from "react";
 import MonthlyVolumeChart from "@/components/supply/BrazilTab/MonthlyVolumeChart";
 import CumulativePaceChart from "@/components/supply/BrazilTab/CumulativePaceChart";
 import DestinationChart from "@/components/supply/BrazilTab/DestinationChart";
-import type { CecafeData } from "@/components/supply/BrazilTab/types";
+import type { BrazilProjection, CecafeData } from "@/components/supply/BrazilTab/types";
 
 function useCecafe() {
   const [data, setData] = useState<CecafeData | null>(null);
@@ -22,6 +26,19 @@ function useCecafe() {
   return { data, err };
 }
 
+// SSOT projection — same source the Brazil tab reads. Absent file is non-fatal
+// (charts fall back to history-only, exactly like the tab).
+function useBrazilProjection() {
+  const [projection, setProjection] = useState<BrazilProjection | null>(null);
+  useEffect(() => {
+    fetch("/data/brazil_export_projection.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: BrazilProjection | null) => d && setProjection(d))
+      .catch(() => { /* engine hasn't run yet — silent */ });
+  }, []);
+  return projection;
+}
+
 const fallback = (err: boolean, d: unknown) =>
   err ? <div className="p-4 text-xs text-slate-500">Cecafe data unavailable.</div>
       : !d ? <div className="p-4 text-xs text-slate-500">Loading Brazil exports…</div>
@@ -29,12 +46,14 @@ const fallback = (err: boolean, d: unknown) =>
 
 export function BrazilMonthlyVolume() {
   const { data, err } = useCecafe();
-  return fallback(err, data) ?? <MonthlyVolumeChart series={data!.series} isReportMode />;
+  const projection = useBrazilProjection();
+  return fallback(err, data) ?? <MonthlyVolumeChart series={data!.series} projection={projection} isReportMode />;
 }
 
 export function BrazilCumulativePace() {
   const { data, err } = useCecafe();
-  return fallback(err, data) ?? <CumulativePaceChart series={data!.series} />;
+  const projection = useBrazilProjection();
+  return fallback(err, data) ?? <CumulativePaceChart series={data!.series} projection={projection} />;
 }
 
 export function BrazilDestination() {

@@ -62,7 +62,7 @@ function buildChartData(series: Series[]) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OIFndChart({ market }: { market: "robusta" | "arabica" }) {
+export default function OIFndChart({ market, height = 320 }: { market: "robusta" | "arabica"; height?: number }) {
   const [series, setSeries] = useState<Series[]>([]);
   const [isMock, setIsMock] = useState(false);
 
@@ -127,7 +127,7 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
       <p className="text-center text-[10px] text-slate-500 mb-3">
         Open Interest (K contracts) vs trading days to First Notice Day
       </p>
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 20, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis
