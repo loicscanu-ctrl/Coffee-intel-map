@@ -8,7 +8,10 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import CommodityCot, CommodityPrice
-from scraper.sources.macro_cot import COMMODITY_SPECS
+from scraper.sources.macro_cot import (
+    COMMODITY_SPECS,
+    _front_month_price_from_archive,
+)
 
 router = APIRouter(prefix="/api/macro-cot", tags=["macro-cot"])
 
@@ -104,6 +107,14 @@ def get_macro_cot(
             latest = symbol_latest.get(row.symbol)
             if latest and abs((row.date - latest[0]).days) <= 14:
                 close_price = latest[1]
+        # Final fallback for archive-priced symbols (robusta): the weekly
+        # CommodityPrice backfill leaves gaps that drop the contract out of the
+        # money flow. The in-repo per-contract archive always has the front-month
+        # price for the COT report date, so source it from there directly.
+        if close_price is None and spec.get("price_source") == "internal_archive":
+            close_price = _front_month_price_from_archive(
+                spec["internal_market"], row.date
+            )
 
         exposures = _compute_exposures(mm_long, mm_short, mm_spread, close_price, spec)
 

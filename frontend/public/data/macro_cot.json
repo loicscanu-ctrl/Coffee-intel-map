@@ -13710,9 +13710,9 @@
         "mm_short": 22698,
         "mm_spread": 12159,
         "oi_total": 90068,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null
+        "close_price": 3641.0,
+        "gross_exposure_usd": 1662953930.0,
+        "net_exposure_usd": 10085570.0
       },
       {
         "symbol": "cocoa_ldn",
@@ -17024,9 +17024,9 @@
         "mm_short": 17211,
         "mm_spread": 14248,
         "oi_total": 96965,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null
+        "close_price": 3519.0,
+        "gross_exposure_usd": 1798138620.0,
+        "net_exposure_usd": 586828440.0
       },
       {
         "symbol": "cocoa_ldn",
@@ -17365,9 +17365,9 @@
         "mm_short": 14595,
         "mm_spread": 13713,
         "oi_total": 99183,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null
+        "close_price": 3462.0,
+        "gross_exposure_usd": 1714520880.0,
+        "net_exposure_usd": 703963080.0
       },
       {
         "symbol": "cocoa_ldn",
