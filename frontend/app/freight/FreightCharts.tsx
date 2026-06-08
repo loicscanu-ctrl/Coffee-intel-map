@@ -5,9 +5,10 @@
 // these stream in a moment later.
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  ComposedChart, Bar,
+  ComposedChart, Bar, Area,
 } from "recharts";
 import { VESSEL_TYPE_META } from "./vesselTypes";
+import { MONTH_TICKS, monthTickLabel, idxToLabel } from "./seasonal";
 
 const TT_STYLE = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
 
@@ -84,6 +85,53 @@ export function PortActivityChart(
         ))}
         <Line type="monotone" dataKey="ma" name="7-day Moving Average" stroke="#f59e0b"
           strokeWidth={2} dot={false} isAnimationActive={false} />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export type SeasonalRow = {
+  idx: number;
+  cur: number | null; prev: number | null; prev2: number | null;
+  band: [number, number] | null; // [min, max] across prior years — a range area
+};
+
+// Year-over-year seasonal overlay: current year (red), prior two years (orange),
+// and a grey min–max band across the remaining prior years. X axis = Jan→Dec.
+export function SeasonalChart(
+  { data, unit, years }:
+  { data: SeasonalRow[]; unit: "count" | "tons"; years: { cur: number; prev: number; prev2: number } },
+) {
+  const fmtAxis = unit === "tons" ? fmtTons : (v: number) => `${v}`;
+  const fmtVal = (v: unknown) =>
+    v == null ? "—" : unit === "tons"
+      ? `${Math.round(Number(v)).toLocaleString("en-US")} t`
+      : `${Math.round(Number(v)).toLocaleString("en-US")}`;
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+        <XAxis dataKey="idx" type="number" domain={[1, 365]} ticks={MONTH_TICKS}
+          tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
+          tickFormatter={(v: number) => monthTickLabel(v)} />
+        <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} width={48}
+          tickFormatter={(v: number) => fmtAxis(v)} />
+        <Tooltip contentStyle={TT_STYLE} labelStyle={{ color: "#94a3b8" }}
+          labelFormatter={(v) => idxToLabel(Number(v))}
+          formatter={(v: unknown, name: unknown) =>
+            Array.isArray(v)
+              ? [`${fmtVal(v[0])} – ${fmtVal(v[1])}`, name as string]
+              : [fmtVal(v), name as string]} />
+        <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8" }} />
+        {/* Grey min–max band across prior years (range area between min and max). */}
+        <Area dataKey="band" stroke="none" fill="#64748b" fillOpacity={0.18}
+          name="Min–max (prior years)" isAnimationActive={false} activeDot={false} connectNulls />
+        <Line type="monotone" dataKey="prev2" name={`${years.prev2}`} stroke="#fdba74"
+          strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
+        <Line type="monotone" dataKey="prev" name={`${years.prev}`} stroke="#ea580c"
+          strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
+        <Line type="monotone" dataKey="cur" name={`${years.cur}`} stroke="#ef4444"
+          strokeWidth={2.2} dot={false} isAnimationActive={false} connectNulls={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );
