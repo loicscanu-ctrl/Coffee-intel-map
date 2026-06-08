@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PortActivityRow } from "./FreightCharts";
+import { VESSEL_TYPE_META, VESSEL_TYPE_KEYS, type VesselTypeKey } from "./vesselTypes";
 
 // Heavy recharts bundle — lazy-load (client-only) like the other freight charts.
 const PortActivityChart = dynamic(
@@ -9,7 +10,7 @@ const PortActivityChart = dynamic(
   { ssr: false, loading: () => <div className="h-[300px] animate-pulse" /> },
 );
 
-const VESSEL_TYPES = ["container", "dry_bulk", "general_cargo", "roro", "tanker"] as const;
+const VESSEL_TYPES = VESSEL_TYPE_KEYS;
 
 const METRICS = [
   { key: "portcalls", label: "Port Calls",        sub: "Arrival of ships · daily count" },
@@ -46,8 +47,15 @@ export default function PortActivity() {
   const [portKey, setPortKey] = useState<string>("");
   const [metric, setMetric] = useState<MetricKey>("portcalls");
   const [range, setRange] = useState<RangeKey>("3m");
+  // Which vessel types are shown — toggled via the chips below. Default: all.
+  const [activeTypes, setActiveTypes] = useState<VesselTypeKey[]>([...VESSEL_TYPE_KEYS]);
   // Per-port series fetched lazily and cached so re-selecting a port is instant.
   const [portCache, setPortCache] = useState<Record<string, Port>>({});
+
+  const toggleType = (k: VesselTypeKey) =>
+    setActiveTypes((cur) =>
+      cur.includes(k) ? cur.filter((t) => t !== k) : [...VESSEL_TYPE_KEYS.filter((t) => cur.includes(t) || t === k)],
+    );
 
   // Load the lightweight index up front.
   useEffect(() => {
@@ -81,8 +89,9 @@ export default function PortActivity() {
   // left edge of a zoomed view still shows a correct trailing average.
   const chartData: PortActivityRow[] = useMemo(() => {
     if (!port) return [];
+    // Total (and thus the moving average) reflects only the selected vessel types.
     const totals = port.series.map((pt) =>
-      VESSEL_TYPES.reduce((acc, t) => acc + (Number(pt[`${metric}_${t}`]) || 0), 0),
+      activeTypes.reduce((acc, t) => acc + (Number(pt[`${metric}_${t}`]) || 0), 0),
     );
     const ma = totals.map((_, i) => {
       let sum = 0, n = 0;
@@ -101,30 +110,30 @@ export default function PortActivity() {
       }
       return row;
     });
-  }, [port, metric, range]);
+  }, [port, metric, range, activeTypes]);
 
   const unit = metric === "portcalls" ? "count" : "tons";
   const activeMetric = METRICS.find((m) => m.key === metric)!;
 
   // Window total + a vs-prior-window delta for a quick at-a-glance read.
+  // Both sums respect the selected vessel types.
   const summary = useMemo(() => {
     if (chartData.length === 0) return null;
-    const tot = (rows: PortActivityRow[]) =>
-      rows.reduce((a, r) => a + r.container + r.dry_bulk + r.general_cargo + r.roro + r.tanker, 0);
-    const cur = tot(chartData);
+    const sumRow = (pt: SeriesPoint) =>
+      activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
+    const cur = chartData.reduce((a, r) => {
+      const rr = r as unknown as Record<string, number>;
+      return a + activeTypes.reduce((s, t) => s + (rr[t] || 0), 0);
+    }, 0);
     const span = chartData.length;
-    const prevRows = port!.series.slice(Math.max(0, port!.series.length - 2 * span), Math.max(0, port!.series.length - span))
-      .map((pt) => ({
-        container: Number(pt[`${metric}_container`]) || 0,
-        dry_bulk: Number(pt[`${metric}_dry_bulk`]) || 0,
-        general_cargo: Number(pt[`${metric}_general_cargo`]) || 0,
-        roro: Number(pt[`${metric}_roro`]) || 0,
-        tanker: Number(pt[`${metric}_tanker`]) || 0,
-      })) as PortActivityRow[];
-    const prev = tot(prevRows);
+    const prevRows = port!.series.slice(
+      Math.max(0, port!.series.length - 2 * span),
+      Math.max(0, port!.series.length - span),
+    );
+    const prev = prevRows.reduce((a, pt) => a + sumRow(pt), 0);
     const pct = prev > 0 ? ((cur - prev) / prev) * 100 : null;
     return { cur, pct };
-  }, [chartData, port, metric]);
+  }, [chartData, port, metric, activeTypes]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 space-y-3">
@@ -212,12 +221,50 @@ export default function PortActivity() {
             </div>
           </div>
 
-          {port ? (
-            <PortActivityChart data={chartData} unit={unit} />
-          ) : (
+          {/* Vessel-type filter — toggle which types are shown/summed */}
+          <div className="flex items-center flex-wrap gap-1.5">
+            <span className="text-[9px] text-slate-600 uppercase tracking-wider mr-1">Vessel types</span>
+            {VESSEL_TYPE_META.map((t) => {
+              const on = activeTypes.includes(t.key);
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => toggleType(t.key)}
+                  aria-pressed={on}
+                  className={`flex items-center gap-1 px-2 py-0.5 text-[10px] rounded-full border transition-colors ${
+                    on
+                      ? "border-slate-600 bg-slate-800 text-slate-200"
+                      : "border-slate-800 bg-transparent text-slate-600 hover:text-slate-400"
+                  }`}
+                >
+                  <span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ background: on ? t.color : "transparent", border: `1px solid ${t.color}` }}
+                  />
+                  {t.label}
+                </button>
+              );
+            })}
+            {activeTypes.length !== VESSEL_TYPE_META.length && (
+              <button
+                onClick={() => setActiveTypes([...VESSEL_TYPE_KEYS])}
+                className="ml-1 px-2 py-0.5 text-[10px] rounded-full text-sky-400 hover:text-sky-300"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+
+          {!port ? (
             <div className="h-[300px] flex items-center justify-center text-slate-500 text-xs animate-pulse">
               Loading {portMeta.label}…
             </div>
+          ) : activeTypes.length === 0 ? (
+            <div className="h-[300px] flex items-center justify-center text-slate-500 text-xs">
+              Select at least one vessel type to display.
+            </div>
+          ) : (
+            <PortActivityChart data={chartData} unit={unit} activeTypes={activeTypes} />
           )}
 
           <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">
