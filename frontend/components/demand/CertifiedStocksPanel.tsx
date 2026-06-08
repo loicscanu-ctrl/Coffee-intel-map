@@ -4,6 +4,7 @@ import CertifiedStocksSystemFlow, {
   flowAnchor, flowDateBounds, flowStartOptions, flowDateISO, parseFlowISO, FLOW_START_DEFAULT,
 } from "./CertifiedStocksSystemFlow";
 import CertifiedStocksFreshness from "./CertifiedStocksFreshness";
+import PinToReport from "@/components/report/PinToReport";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
 
@@ -2425,7 +2426,10 @@ export default function CertifiedStocksPanel() {
     <div className="p-4 space-y-3">
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
+            <PinToReport id="certified_stocks_flow" />
+          </div>
           <p className="text-[11px] text-slate-500">
             ICE-certified arabica (US warehouses) &amp; robusta (European warehouses) — the deliverable inventory the
             futures market clears against. Daily scrape of ICE&rsquo;s publicdocs reports.

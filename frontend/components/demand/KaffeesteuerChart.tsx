@@ -4,6 +4,7 @@ import {
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import { useState, useMemo, useEffect } from "react";
+import PinToReport from "@/components/report/PinToReport";
 
 const YEAR_COLORS: Record<number, string> = {
   2016: "#64748b", 2017: "#6366f1", 2018: "#8b5cf6",
@@ -73,7 +74,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
   );
 };
 
-export default function KaffeesteuerChart() {
+export default function KaffeesteuerChart({ isReportMode = false }: { isReportMode?: boolean }) {
   const [raw, setRaw] = useState<Record<string, number> | null>(null);
   const [error, setError] = useState(false);
 
@@ -133,7 +134,10 @@ export default function KaffeesteuerChart() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-lg font-bold text-white">German Coffee Tax (Kaffeesteuer)</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-lg font-bold text-white">German Coffee Tax (Kaffeesteuer)</h2>
+            {!isReportMode && <PinToReport id="kaffeesteuer" />}
+          </div>
           <p className="text-xs text-slate-400">Monthly revenue — Bundesfinanzministerium · Tsd. EUR → millions</p>
         </div>
         <div className="flex gap-4 text-xs">
@@ -162,6 +166,7 @@ export default function KaffeesteuerChart() {
       </div>
 
       {/* Year filter */}
+      {!isReportMode && (
       <div className="flex flex-wrap gap-1">
         <button
           onClick={() => setSelectedYears(allYears)}
@@ -192,6 +197,7 @@ export default function KaffeesteuerChart() {
           12-mo avg
         </button>
       </div>
+      )}
 
       {/* Main chart */}
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-3" style={{ height: 340 }}>

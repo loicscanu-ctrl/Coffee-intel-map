@@ -15,6 +15,7 @@
 import { forwardRef } from "react";
 import { REPORT_BY_ID } from "@/lib/report/registry";
 import { useReportStore } from "@/lib/report/store";
+import Markdown from "@/lib/report/markdown";
 
 const PRINT_DATE = () =>
   new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -60,15 +61,17 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
                   <textarea
                     value={note}
                     onChange={(e) => setComment(id, e.target.value)}
-                    placeholder="Add your executive summary / technical breakdown…"
+                    placeholder="Add your executive summary… Markdown supported: **bold**, *italic*, `code`, - bullets"
                     rows={3}
                     className="print:hidden w-full resize-y rounded-md bg-slate-950 border border-slate-700 px-2 py-1.5
                                text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60"
                   />
                   {note.trim() && (
-                    <p className="hidden print:block whitespace-pre-wrap text-xs text-slate-200 leading-relaxed mt-1">
+                    // Rendered Markdown — live preview on screen, the only note
+                    // shown in print (the editable textarea is print:hidden).
+                    <Markdown className="text-xs text-slate-200 leading-relaxed space-y-1 mt-2 print:mt-0">
                       {note}
-                    </p>
+                    </Markdown>
                   )}
                 </div>
               </section>

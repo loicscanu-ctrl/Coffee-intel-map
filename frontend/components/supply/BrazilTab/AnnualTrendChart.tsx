@@ -11,7 +11,7 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
 
-export default function AnnualTrendChart({ series, filteredSeries, typeFilter }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+export default function AnnualTrendChart({ series, filteredSeries, typeFilter, isReportMode = false }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null; isReportMode?: boolean }) {
   const [since, setSince] = useState(2010);
   const isFiltered = !!filteredSeries;
   const activeSeries = filteredSeries ?? series;
@@ -90,14 +90,16 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
             kt · {isFiltered ? "Total exports for selected origin" : "incl. domestic consumption (USDA est.) · † projected full year"}
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2000, 2010, 2015].map(y => (
-            <button key={y} onClick={() => setSince(y)}
-              className={`text-[10px] px-2 py-0.5 rounded ${since === y ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {y}+
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2000, 2010, 2015].map(y => (
+              <button key={y} onClick={() => setSince(y)}
+                className={`text-[10px] px-2 py-0.5 rounded ${since === y ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {y}+
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart data={annualData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }}>
