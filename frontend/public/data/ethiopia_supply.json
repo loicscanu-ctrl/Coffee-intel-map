@@ -1,9 +1,9 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-06-07T06:51:26.136261Z",
+  "scraped_at": "2026-06-08T07:17:42.356759Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-07",
+    "last_updated": "2026-06-08",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
@@ -341,12 +341,12 @@
   },
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-06-07",
+    "as_of": "2026-06-08",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-06-07T05:59:20.957876Z",
+    "scraped_at": "2026-06-08T06:15:40.432045Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -355,9 +355,9 @@
         "csi_60d": 0.0,
         "csi_30d_level": "OK",
         "csi_60d_level": "OK",
-        "rain_mtd_mm": 171.5,
-        "rain_hist_min": 20.7,
-        "rain_hist_max": 97.1
+        "rain_mtd_mm": 166.6,
+        "rain_hist_min": 30.9,
+        "rain_hist_max": 111.7
       },
       {
         "name": "Harrar",
@@ -428,7 +428,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "-",
           "-",
@@ -456,12 +455,13 @@
           "-",
           "L",
           "L",
-          "M",
-          "M",
+          "L",
           "M",
           "M",
           "L",
           "L",
+          "M",
+          "M",
           "M"
         ]
       },
@@ -514,7 +514,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "-",
           "-",
@@ -530,9 +529,10 @@
           "L",
           "-",
           "-",
+          "L",
+          "L",
           "-",
-          "-",
-          "-",
+          "L",
           "L",
           "L"
         ]
@@ -656,7 +656,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-06-07"
+    "last_updated": "2026-06-08"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",

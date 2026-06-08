@@ -1,5 +1,49 @@
 [
   {
+    "id": 6515,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-04",
+    "body": "ICE-EU RC Open Interest changed by -665 over the last session, with -624 on nearby two contracts and -41 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-04\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by -665 over the last session, with -624 on nearby two contracts and -41 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-08T07:02:58.228324",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by -665 over the last session, with -624 on nearby two contracts and -41 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6514,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-04",
+    "body": "IFUS KC Open Interest changed by +2,891 over the last session, with +1,295 on nearby two contracts and +1,596 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-04\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by +2,891 over the last session, with +1,295 on nearby two contracts and +1,596 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-08T07:02:54.963819",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by +2,891 over the last session, with +1,295 on nearby two contracts and +1,596 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 6513,
     "title": "World Bank Population \u2013 2026-06-08",
     "body": "Tracked 11 countries for demand-tab per-capita normalization.",
@@ -3365,35 +3409,5 @@
     ],
     "meta": null,
     "pub_date": "2026-05-29T05:12:41.266907"
-  },
-  {
-    "id": 5432,
-    "title": "USD/HNL FX Rate \u2013 2026-05-29",
-    "body": "USD/HNL FX Rate price: 26.5801",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-05-29T05:12:39.947206"
-  },
-  {
-    "id": 5431,
-    "title": "USD/IDR FX Rate \u2013 2026-05-29",
-    "body": "USD/IDR FX Rate price: 17804",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -0.789,
-    "lng": 113.921,
-    "tags": [
-      "fx",
-      "indonesia"
-    ],
-    "meta": null,
-    "pub_date": "2026-05-29T05:12:38.625677"
   }
 ]
