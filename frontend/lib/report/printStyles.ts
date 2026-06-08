@@ -23,7 +23,7 @@ const EXACT = `html, body { -webkit-print-color-adjust: exact; print-color-adjus
 // So we only guard non-chart overflow (tables/images) and keep each chart card
 // whole across page breaks.
 const FIT = `
-  #report-canvas { width: 100% !important; }
+  #report-canvas { width: 100% !important; zoom: 0.8; }
   #report-canvas img, #report-canvas table { max-width: 100% !important; }
   #report-canvas section { break-inside: avoid; page-break-inside: avoid; }
 `;

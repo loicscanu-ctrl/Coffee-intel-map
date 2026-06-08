@@ -28,9 +28,9 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
   return (
     <div ref={ref} id="report-canvas" className="bg-slate-950 text-slate-100 mx-auto w-[700px] max-w-full">
       {/* Auto-injected briefing header */}
-      <header className="border-b border-slate-700 pb-3 mb-4">
-        <h1 className="text-lg font-semibold text-amber-400">Coffee Intel Map — Market Briefing</h1>
-        <p className="text-[11px] text-slate-400">{PRINT_DATE()}</p>
+      <header className="border-b border-slate-700 pb-2 mb-3">
+        <h1 className="text-base font-semibold text-amber-400">Coffee Intel Map — Market Briefing</h1>
+        <p className="text-[10px] text-slate-400">{PRINT_DATE()}</p>
       </header>
 
       {selectedIds.length === 0 ? (
@@ -38,7 +38,7 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
           Tick visuals on the left to build your briefing. Each one appears here with a note box.
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {selectedIds.map((id) => {
             const def = REPORT_BY_ID[id];
             if (!def) return null;
@@ -51,10 +51,10 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
                 className="rounded-lg border border-slate-700 bg-slate-900/60 overflow-hidden"
                 style={{ breakInside: "avoid" }}
               >
-                <div className="px-3 py-2 border-b border-slate-800">
-                  <h2 className="text-sm font-semibold text-slate-100">{def.label}</h2>
+                <div className="px-2 py-1 border-b border-slate-800">
+                  <h2 className="text-xs font-semibold text-slate-100">{def.label}</h2>
                 </div>
-                <div className="p-3 overflow-x-auto">
+                <div className="p-2 overflow-x-auto">
                   <Visual isReportMode />
                 </div>
                 <div className="px-3 pb-3">

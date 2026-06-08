@@ -36,39 +36,33 @@ function firstNoticeDay(symbol: string): string {
   const fnd = subtractBusinessDays(firstBusinessDay(2000 + parseInt(yr), monthNum), days);
   return `${fnd.getDate()}/${fnd.getMonth() + 1}`;
 }
-function fmtExpiry(raw: string): string {
-  const d = new Date(raw);
-  return isNaN(d.getTime()) ? raw : `${d.getDate()}/${d.getMonth() + 1}`;
-}
-
 function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: ChainData }) {
   if (!data?.contracts?.length) return null;
   const isArabica = market === "arabica";
   const unit = isArabica ? "¢/lb" : "$/t";
-  const sublabel = isArabica ? "ICE NY · Arabica (KC)" : "ICE London · Robusta (RC)";
+  const sublabel = isArabica ? "NY · Arabica (KC)" : "London · Robusta (RC)";
   const accent = isArabica ? "text-amber-400" : "text-emerald-400";
   const dec = isArabica ? 2 : 0;
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden mb-3">
-      <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-        <div>
-          <span className="font-semibold text-sm text-white">Daily Quotes</span>
-          <span className={`text-xs ml-2 ${accent}`}>{sublabel}</span>
+    <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+      <div className="px-2 py-1 bg-slate-800 border-b border-slate-700 flex items-center justify-between gap-1">
+        <div className="leading-tight">
+          <span className="font-semibold text-[10px] text-white">Daily Quotes</span>
+          <span className={`text-[9px] ml-1 ${accent}`}>{sublabel}</span>
         </div>
-        <span className="text-xs text-slate-500 ml-2">Barchart · {data.pub_date ?? ""}</span>
+        <span className="text-[8px] text-slate-500 whitespace-nowrap">Barchart · {data.pub_date ?? ""}</span>
       </div>
-      <table className="w-full text-[11px] font-mono">
+      <table className="w-full text-[9px] font-mono">
         <thead>
           <tr className="text-slate-500 bg-slate-800/40">
-            <th className="text-left px-1.5 py-1">Ct.</th>
-            <th className="text-center px-1.5 py-1">FND</th>
-            <th className="text-center px-1.5 py-1">Exp.</th>
-            <th className="text-right px-1.5 py-1">Last ({unit})</th>
-            <th className="text-right px-1.5 py-1">Chg</th>
-            <th className="text-right px-1.5 py-1">Sprd</th>
-            <th className="text-right px-1.5 py-1">OI</th>
-            <th className="text-right px-1.5 py-1">Vol</th>
+            <th className="text-left px-1 py-0.5">Ct.</th>
+            <th className="text-center px-1 py-0.5">FND</th>
+            <th className="text-right px-1 py-0.5">Last ({unit})</th>
+            <th className="text-right px-1 py-0.5">Chg</th>
+            <th className="text-right px-1 py-0.5">Sprd</th>
+            <th className="text-right px-1 py-0.5">Sprd Chg</th>
+            <th className="text-right px-1 py-0.5">OI</th>
           </tr>
         </thead>
         <tbody>
@@ -76,19 +70,21 @@ function ChainTable({ market, data }: { market: "arabica" | "robusta"; data: Cha
             const chgColor = (c.chg ?? 0) >= 0 ? "text-emerald-400" : "text-red-400";
             const next = data.contracts[i + 1];
             const spread = c.last != null && next?.last != null ? c.last - next.last : null;
+            const spreadChg = c.chg != null && next?.chg != null ? c.chg - next.chg : null;
             const shortSym = c.symbol.slice(0, 5);
             return (
               <tr key={c.symbol} className={`border-t border-slate-700 ${i === 0 ? "text-white bg-slate-800/60" : "text-slate-300"}`}>
-                <td className="px-1.5 py-1.5 font-bold">{shortSym}</td>
-                <td className="px-1.5 py-1.5 text-center text-amber-400/80">{firstNoticeDay(c.symbol)}</td>
-                <td className="px-1.5 py-1.5 text-center text-slate-500">{fmtExpiry(c.expiry)}</td>
-                <td className={`px-1.5 py-1.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(dec)}</td>
-                <td className={`px-1.5 py-1.5 text-right ${chgColor}`}>{c.chg == null ? "—" : (c.chg >= 0 ? "+" : "") + c.chg.toFixed(dec)}</td>
-                <td className={`px-1.5 py-1.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+                <td className="px-1 py-0.5 font-bold">{shortSym}</td>
+                <td className="px-1 py-0.5 text-center text-amber-400/80">{firstNoticeDay(c.symbol)}</td>
+                <td className={`px-1 py-0.5 text-right font-bold ${i === 0 ? accent : ""}`}>{c.last?.toFixed(dec)}</td>
+                <td className={`px-1 py-0.5 text-right ${chgColor}`}>{c.chg == null ? "—" : (c.chg >= 0 ? "+" : "") + c.chg.toFixed(dec)}</td>
+                <td className={`px-1 py-0.5 text-right ${spread === null ? "text-slate-600" : spread >= 0 ? "text-sky-400" : "text-orange-400"}`}>
                   {spread !== null ? (spread >= 0 ? "+" : "") + spread.toFixed(dec) : "—"}
                 </td>
-                <td className="px-1.5 py-1.5 text-right">{fmt(c.oi)}</td>
-                <td className="px-1.5 py-1.5 text-right text-slate-400">{fmt(c.volume)}</td>
+                <td className={`px-1 py-0.5 text-right ${spreadChg === null ? "text-slate-600" : spreadChg >= 0 ? "text-sky-400" : "text-orange-400"}`}>
+                  {spreadChg !== null ? (spreadChg >= 0 ? "+" : "") + spreadChg.toFixed(dec) : "—"}
+                </td>
+                <td className="px-1 py-0.5 text-right">{fmt(c.oi)}</td>
               </tr>
             );
           })}
@@ -113,7 +109,7 @@ export default function DailyQuotesReport({ isReportMode = true }: { isReportMod
   if (err) return <div className="p-4 text-xs text-slate-500">Daily quotes unavailable.</div>;
   if (!chain) return <div className="p-4 text-xs text-slate-500">Loading daily quotes…</div>;
   return (
-    <div className="p-3">
+    <div className="p-2 grid grid-cols-2 gap-2">
       {chain.arabica && <ChainTable market="arabica" data={chain.arabica} />}
       {chain.robusta && <ChainTable market="robusta" data={chain.robusta} />}
     </div>
