@@ -6,12 +6,13 @@ import WeatherAnalogs from "../WeatherAnalogs";
 import SupplyDemandBalance from "../SupplyDemandBalance";
 import { COUNTRY_HUB, EMPTY_CY, ICE_KC_COUNTRIES, ICE_RC_COUNTRIES } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
-import type { CecafeData, FilterState } from "./types";
+import type { BrazilProjection, CecafeData, FilterState } from "./types";
 import { useUrlState } from "@/lib/useUrlState";
 
 type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs";
 
 import StatCard from "./StatCard";
+import CecafeDailyKPIs from "./CecafeDailyKPIs";
 import DailyRegistrationSection from "./DailyRegistration";
 import MonthlyVolumeChart from "./MonthlyVolumeChart";
 import AnnualTrendChart from "./AnnualTrendChart";
@@ -25,6 +26,7 @@ import DestinationChart from "./DestinationChart";
 
 export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
+  const [projection, setProjection] = useState<BrazilProjection | null>(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
   const [subTab, setSubTab] = useUrlState<BrazilSubTab>("brazilTab", "exports", (raw) =>
@@ -40,6 +42,15 @@ export default function BrazilTab() {
       .then(r => r.json())
       .then(setData)
       .catch(() => setError(true));
+  }, []);
+
+  // SSOT projection — one fetch feeds MonthlyVolume, CumulativePace and the
+  // S&D table. Absent file is non-fatal (charts fall back to history-only).
+  useEffect(() => {
+    fetch("/data/brazil_export_projection.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BrazilProjection | null) => d && setProjection(d))
+      .catch(() => { /* engine hasn't run yet — silent */ });
   }, []);
 
   // All hooks must be called before any conditional return
@@ -129,7 +140,9 @@ export default function BrazilTab() {
 
       {subTab === "farmer-economics" && <BrazilFarmerEconomics />}
 
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="brazil" label="Brazil" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance origin="brazil" label="Brazil" projection={projection} />
+      )}
 
       {subTab === "weather" && (
         <WeatherCharts
@@ -162,7 +175,12 @@ export default function BrazilTab() {
           {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
           <DailyRegistrationSection />
 
-          {/* KPI cards */}
+          {/* Daily MTD KPIs — Embarques + Certificados month-to-date with
+              vs-same-day-last-month deltas. Fed by the same cecafe_daily.json
+              the panel above reads, so the numbers always match. */}
+          <CecafeDailyKPIs />
+
+          {/* KPI cards (released monthly data) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <StatCard
               label={`${latest.date} — total exports`}
@@ -190,8 +208,8 @@ export default function BrazilTab() {
           <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
 
           {/* Charts */}
-          <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} />
-          <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} projection={projection} />
+          <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} projection={projection} />
           <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <TypeShareChart series={series} />
           <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
