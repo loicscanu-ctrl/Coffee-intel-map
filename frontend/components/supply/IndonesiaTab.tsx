@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import IndonesiaExportPanel from "@/components/supply/indonesia/IndonesiaExportPanel";
+import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
@@ -129,7 +129,7 @@ export default function IndonesiaTab() {
         data.exports?.annual?.length ? (
           <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Indonesia Green Coffee Exports" />
         ) : data.exports?.monthly?.length ? (
-          <IndonesiaExportPanel exports={data.exports} />
+          <OriginExportPanel exports={data.exports} title="Indonesia Green Coffee Exports" barColor="#8b5cf6" originNote="Indonesia: world's 4th largest producer (~75% robusta)." />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
             Export data not yet available — pending the next USDA PSD scrape.

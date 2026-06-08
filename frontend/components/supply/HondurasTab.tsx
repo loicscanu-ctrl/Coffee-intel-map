@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import HondurasExportPanel from "@/components/supply/honduras/HondurasExportPanel";
+import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import HondurasFarmerEconomics from "@/components/supply/honduras/HondurasFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
@@ -116,7 +116,7 @@ export default function HondurasTab() {
         data.exports?.annual?.length ? (
           <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Honduras Green Coffee Exports" />
         ) : data.exports?.monthly?.length ? (
-          <HondurasExportPanel exports={data.exports} />
+          <OriginExportPanel exports={data.exports} title="Honduras Green Coffee Exports" barColor="#10b981" originNote="Honduras: largest arabica producer in Central America." />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
             Export data not yet available — pending the next USDA PSD scrape.

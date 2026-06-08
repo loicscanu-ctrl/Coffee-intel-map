@@ -10,7 +10,7 @@ interface ExportMonth {
   yoy_pct: number | null;
 }
 
-interface ExportsData {
+export interface ExportsData {
   source: string;
   last_updated: string;
   unit: string;
@@ -25,11 +25,29 @@ function fmtMonth(m: string) {
 }
 
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
-
 const toMT = (k: number) => Math.round(k * 60);
 
-export default function ColombiaExportPanel({ exports: exp }: { exports: ExportsData }) {
-  const recent   = exp.monthly.slice(-24);
+/**
+ * Generic green-coffee monthly-exports panel, shared across origins.
+ * Per-origin differences are passed as props:
+ *   title      — panel heading
+ *   barColor   — volume-bar fill
+ *   originNote — trailing descriptor appended to the source line (optional)
+ * (Origins with extra stats — e.g. Ethiopia's ECX price — or a materially
+ * different layout — e.g. Uganda — keep their own panel.)
+ */
+export default function OriginExportPanel({
+  exports: exp,
+  title,
+  barColor,
+  originNote = "",
+}: {
+  exports: ExportsData;
+  title: string;
+  barColor: string;
+  originNote?: string;
+}) {
+  const recent    = exp.monthly.slice(-24);
   const chartData = recent.map(m => ({
     month: fmtMonth(m.month),
     mt:    toMT(m.total_k_bags),
@@ -48,7 +66,7 @@ export default function ColombiaExportPanel({ exports: exp }: { exports: Exports
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
       <div className="flex items-baseline justify-between">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide">
-          Colombia Green Coffee Exports
+          {title}
         </div>
         <div className="text-[8px] text-slate-600">{exp.source} · {fmtMonth(exp.last_updated)}</div>
       </div>
@@ -90,14 +108,14 @@ export default function ColombiaExportPanel({ exports: exp }: { exports: Exports
                 return [`${Number(v).toLocaleString()} MT`, "Volume"];
               }}
             />
-            <Bar  yAxisId="vol" dataKey="mt"  name="vol" fill="#f97316" opacity={0.8} radius={[2,2,0,0]} />
+            <Bar  yAxisId="vol" dataKey="mt"  name="vol" fill={barColor} opacity={0.8} radius={[2,2,0,0]} />
             <Line yAxisId="yoy" dataKey="yoy" name="yoy" type="monotone" stroke="#f59e0b" strokeWidth={1.5} dot={false} connectNulls />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       <div className="text-[9px] text-slate-600">
-        Source: ICO Historical CSV — Green coffee exports, {exp.unit}
+        Source: ICO Historical CSV — Green coffee exports, {exp.unit}.{originNote ? ` ${originNote}` : ""}
       </div>
     </div>
   );
