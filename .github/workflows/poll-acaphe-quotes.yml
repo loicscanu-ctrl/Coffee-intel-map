@@ -17,9 +17,16 @@ name: "0.1 – Acaphe Live Quotes Poll"
 on:
   schedule:
     # Every 15 min during trading hours Mon–Fri UTC:
-    #   RC London  08:00–18:30 UTC
+    #   RC London   08:00–18:30 UTC
     #   KC New York 08:30–19:00 UTC
-    - cron: '*/15 8-19 * * 1-5'
+    # Explicit minute list (0,15,30,45) instead of `*/15`: GH Actions has
+    # silently throttled the `*/N` form on this workflow before — observed
+    # 2026-06-03 → 06-08 where only 5/48 ticks fired on Fri and zero fired
+    # on Mon. Explicit lists land in a different scheduler bucket and have
+    # been more reliable in practice. Editing the file also resets the
+    # workflow's scheduling priority, which is the standard GH workaround
+    # for a throttled cron.
+    - cron: '0,15,30,45 8-19 * * 1-5'
   workflow_dispatch:
 
 # If a previous run is still in progress when the next cron tick fires,
