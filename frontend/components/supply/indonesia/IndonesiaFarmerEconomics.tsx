@@ -3,6 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ReferenceLine,
   Tooltip, Cell, ResponsiveContainer,
 } from "recharts";
+import { IMPACT_TEXT, MONTHS as MONTH_NAMES, PHASE_STYLE, TT_STYLE } from "@/components/supply/farmer-economics/farmerEconomicsConstants";
 
 type RiskLevel = "HIGH" | "MED" | "LOW" | "NONE";
 type DayRisk   = "H" | "M" | "L" | "-";
@@ -55,20 +56,6 @@ interface Props {
   production_mix: ProductionMix;
 }
 
-const PHASE_STYLE = {
-  "el-nino": { label: "El Niño",  border: "border-purple-500", text: "text-purple-300", bg: "bg-purple-950" },
-  "la-nina": { label: "La Niña",  border: "border-blue-400",   text: "text-blue-300",   bg: "bg-blue-950"   },
-  "neutral":  { label: "Neutral",  border: "border-slate-500",  text: "text-slate-400",  bg: "bg-slate-900"  },
-};
-
-const IMPACT_TEXT: Record<string, string> = {
-  DRY:  "text-amber-300",
-  WET:  "text-cyan-300",
-  WARM: "text-orange-300",
-};
-
-const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
-
 const CROP_COLOR: Record<string, string> = {
   robusta: "bg-violet-700",
   arabica: "bg-emerald-700",
@@ -76,7 +63,6 @@ const CROP_COLOR: Record<string, string> = {
 };
 
 // Build month-level harvest bar for a given island window string like "Mar–Aug"
-const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function parseMonthRange(range: string): Set<number> {
   const [start, end] = range.split("–").map(s => MONTH_NAMES.indexOf(s.trim()));
