@@ -12,13 +12,15 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { BrazilProjection, ProjectionStatus, SeriesKey, VolumeSeries } from "./types";
 
-// Status palette (spec): realized = solid dark green, certificados = solid
-// light green, seasonality = striped (SVG pattern, defined per-render in
-// <defs> so it travels with the chart's responsive container).
+// Status palette — current crop year is red across the dashboard, so the
+// three status tones live in the red family: realized = solid dark red,
+// certificados = solid light red, seasonality = diagonal-striped (SVG
+// pattern defined per-render in <defs> so it travels with the chart's
+// responsive container).
 const STATUS_COLOR: Record<ProjectionStatus, string> = {
-  realized:     "#15803d",
-  certificados: "#4ade80",
-  seasonality:  "url(#brz-seasonality)",   // SVG pattern fill
+  realized:     "#991b1b",                 // dark red
+  certificados: "#f87171",                 // light red / coral
+  seasonality:  "url(#brz-seasonality)",   // SVG striped pattern
 };
 const STATUS_LABEL: Record<ProjectionStatus, string> = {
   realized:     "Realized (Cecafé monthly)",
@@ -143,14 +145,14 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, pro
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
-          {/* SVG pattern for the seasonality bars — diagonal stripes on the
-              current crop year's light-green tone so the eye reads them as
-              projected without losing the green family. */}
+          {/* SVG pattern for the seasonality bars — diagonal red stripes
+              on a faded red background so the eye reads them as projected
+              while keeping the current-crop-year red family. */}
           <defs>
             <pattern id="brz-seasonality" patternUnits="userSpaceOnUse"
                      width="6" height="6" patternTransform="rotate(45)">
-              <rect width="6" height="6" fill="#4ade80" fillOpacity="0.35" />
-              <line x1="0" y1="0" x2="0" y2="6" stroke="#4ade80" strokeWidth="2" />
+              <rect width="6" height="6" fill="#ef4444" fillOpacity="0.25" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#ef4444" strokeWidth="2" />
             </pattern>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />

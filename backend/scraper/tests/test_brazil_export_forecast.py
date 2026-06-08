@@ -43,7 +43,7 @@ def test_crop_year_start_before_april():
 
 
 def test_crop_year_label():
-    assert bef.crop_year_label(dt.date(2026, 4, 1)) == "26/27"
+    assert bef.crop_year_label(dt.date(2026, 4, 1)) == "2026/27"
 
 
 def test_crop_year_months_wraps_calendar_year():

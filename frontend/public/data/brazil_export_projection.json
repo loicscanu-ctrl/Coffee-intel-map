@@ -1,5 +1,5 @@
 {
-  "crop_year": "26/27",
+  "crop_year": "2026/27",
   "annual_target": 37000000,
   "monthly_curve": [
     {
@@ -75,7 +75,7 @@
       "ym": "2027-03"
     }
   ],
-  "generated_at": "2026-06-08T08:16:14Z",
+  "generated_at": "2026-06-08T08:36:42Z",
   "target_source": "USDA PSD (year 2025)",
   "safeguard_triggered": false,
   "realized_through": "2026-04",

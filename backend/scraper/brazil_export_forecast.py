@@ -79,8 +79,10 @@ def crop_year_start(today: dt.date) -> dt.date:
 
 
 def crop_year_label(start: dt.date) -> str:
-    """'YY/YY+1' for the crop-year starting on `start`."""
-    return f"{start.year % 100:02d}/{(start.year + 1) % 100:02d}"
+    """'YYYY/YY+1' for the crop-year starting on `start` — matches the
+    frontend's `cropYearKey()` exactly so dedup against the existing
+    series-derived bars/lines works on a plain string compare."""
+    return f"{start.year}/{(start.year + 1) % 100:02d}"
 
 
 def crop_year_months(start: dt.date) -> list[tuple[int, int]]:
