@@ -109,7 +109,7 @@ export default function UsCpiPanel() {
         lines: all,
         tiles: all,
         title: `${cat.name} — sub-components`,
-        subtitle: `Breakdown of ${cat.name.toLowerCase()} (BLS CPI-U). The other top-level lines are hidden — click “Overview” to return.`,
+        subtitle: `Breakdown of ${cat.name.toLowerCase()} (BLS CPI-U). The other top-level lines are hidden — click "Overview" to return.`,
       };
     }
 
@@ -240,7 +240,7 @@ export default function UsCpiPanel() {
         <div className="text-[9px] text-slate-500 mt-2 italic">
           {drill
             ? "Sub-component 12-month change (NSA, BLS CPI-U). The bold line is the category total."
-            : "NSA 12-month change, the basis BLS quotes in the headline release (Table 1). Core strips out food & energy; the dashed line marks the Fed’s 2% goal. Tap a category tile to drill in."}
+            : "NSA 12-month change, the basis BLS quotes in the headline release (Table 1). Core strips out food & energy; the dashed line marks the Fed's 2% goal. Tap a category tile to drill in."}
         </div>
       </div>
     </div>
