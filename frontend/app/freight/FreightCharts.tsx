@@ -7,6 +7,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   ComposedChart, Bar,
 } from "recharts";
+import { VESSEL_TYPE_META } from "./vesselTypes";
 
 const TT_STYLE = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
 
@@ -44,15 +45,8 @@ export function FreightHistoryChart({ history }: { history: Record<string, numbe
   );
 }
 
-// Vessel-type bands for the PortWatch stacked bars — colors/labels mirror the
-// IMF PortWatch chart legend (Container / Dry Bulk / General Cargo / RoRo / Tanker).
-const PA_TYPES = [
-  { key: "container",     label: "Container",        color: "#ef4444" },
-  { key: "dry_bulk",      label: "Dry Bulk",         color: "#f97316" },
-  { key: "general_cargo", label: "General Cargo",    color: "#facc15" },
-  { key: "roro",          label: "Roll-on/roll-off", color: "#7dd3fc" },
-  { key: "tanker",        label: "Tanker",           color: "#15803d" },
-];
+// Vessel-type bands for the PortWatch stacked bars (shared with the toggle chips).
+const PA_TYPES = VESSEL_TYPE_META;
 
 function fmtTons(v: number): string {
   const a = Math.abs(v);
@@ -66,10 +60,14 @@ export type PortActivityRow = {
   container: number; dry_bulk: number; general_cargo: number; roro: number; tanker: number;
 };
 
-export function PortActivityChart({ data, unit }: { data: PortActivityRow[]; unit: "count" | "tons" }) {
+export function PortActivityChart(
+  { data, unit, activeTypes }:
+  { data: PortActivityRow[]; unit: "count" | "tons"; activeTypes?: readonly string[] },
+) {
   const fmtAxis = unit === "tons" ? fmtTons : (v: number) => `${v}`;
   const fmtVal = (v: unknown) =>
     unit === "tons" ? `${Number(v).toLocaleString("en-US")} t` : `${Number(v).toLocaleString("en-US")}`;
+  const bars = activeTypes ? PA_TYPES.filter((t) => activeTypes.includes(t.key)) : PA_TYPES;
   return (
     <ResponsiveContainer width="100%" height={300}>
       <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
@@ -81,7 +79,7 @@ export function PortActivityChart({ data, unit }: { data: PortActivityRow[]; uni
         <Tooltip contentStyle={TT_STYLE} labelStyle={{ color: "#94a3b8" }}
           formatter={(v: unknown, name: unknown) => [fmtVal(v), name as string]} />
         <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8" }} />
-        {PA_TYPES.map((t) => (
+        {bars.map((t) => (
           <Bar key={t.key} dataKey={t.key} stackId="a" name={t.label} fill={t.color} isAnimationActive={false} />
         ))}
         <Line type="monotone" dataKey="ma" name="7-day Moving Average" stroke="#f59e0b"
