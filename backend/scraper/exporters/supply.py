@@ -8,6 +8,8 @@ from models import (
     NewsItem,
     WeatherSnapshot,
 )
+from scraper._export_common import _badge as _badge_from_risk_code
+from scraper._export_common import _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
 from scraper.exporters.base import OUT_DIR, ROOT
@@ -15,9 +17,6 @@ from scraper.validate_export import (
     safe_write_json,
     validate_farmer_economics,
 )
-
-_RISK_ORDER = {"-": 0, "L": 1, "M": 2, "H": 3}
-
 
 _REGIONAL_IMPACT_BY_PHASE = {
     "el-nino": [
@@ -53,17 +52,6 @@ _FERT_CONFIG = {
     "dap":  {"name": "MAP (P)",  "input_weight": 0.20, "base_usd_per_bag": 10.8},
     "kcl":  {"name": "KCl (K)",  "input_weight": 0.25, "base_usd_per_bag": 13.5},
 }
-
-
-def _worst_risk(risks: list) -> str:
-    """Return the worst risk code from a list (H > M > L > -)."""
-    if not risks:
-        return "-"
-    return max(risks, key=lambda r: _RISK_ORDER.get(r, 0))
-
-
-def _badge_from_risk_code(code: str) -> str:
-    return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
 
 
 def _load_dry_bulk_cache() -> dict | None:
