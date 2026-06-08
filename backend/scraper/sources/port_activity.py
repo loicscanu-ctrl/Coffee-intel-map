@@ -156,7 +156,13 @@ def _resolve_portid(match: str, iso3: str) -> tuple[str, str] | None:
 
 
 def _fetch_series(portid: str) -> list[dict]:
-    """Fetch the full (windowed) daily series for one portid, paginated."""
+    """Fetch the full (windowed) daily series for one portid, paginated.
+
+    PortWatch's FeatureServer caps each page at its own maxRecordCount (1000),
+    which can be smaller than what we request — so we page until the server
+    stops setting `exceededTransferLimit`, advancing by the rows it actually
+    returns (never by the requested page size).
+    """
     rows: list[dict] = []
     offset = 0
     while True:
@@ -170,6 +176,8 @@ def _fetch_series(portid: str) -> list[dict]:
             "f": "json",
         })
         feats = payload.get("features", [])
+        if not feats:
+            break
         for f in feats:
             a = f.get("attributes", {})
             if a.get("year") is None:
@@ -180,9 +188,9 @@ def _fetch_series(portid: str) -> list[dict]:
                 for t in _TYPES:
                     point[f"{m}_{t}"] = _num(a.get(f"{m}_{t}"))
             rows.append(point)
-        if len(feats) < _PAGE or not payload.get("exceededTransferLimit", False):
+        offset += len(feats)
+        if not payload.get("exceededTransferLimit", False):
             break
-        offset += _PAGE
     return rows
 
 
