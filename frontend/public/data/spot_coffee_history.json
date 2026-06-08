@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T04:44:24Z",
+  "generated_at": "2026-06-08T10:53:02Z",
   "source_url": "https://attespotcoffee.azurewebsites.net/",
   "snapshots": [
     {
@@ -23,6 +23,34 @@
     },
     {
       "date": "2026-06-06",
+      "n_offers": 587,
+      "offers_by_type": {
+        "Arabica": 427,
+        "Robusta": 160
+      },
+      "tons_by_type": {
+        "Arabica": 23302.1,
+        "Robusta": 10746.4
+      },
+      "tons_total": 34048.6,
+      "bags_by_type": {
+        "Arabica": 388369,
+        "Robusta": 179107
+      },
+      "bags_total": 567476,
+      "wow": {
+        "prev_date": "2026-06-05",
+        "in_offers": 0,
+        "out_offers": 0,
+        "in_tons": 0,
+        "out_tons": 0,
+        "net_tons": 0,
+        "in_tons_by_type": {},
+        "out_tons_by_type": {}
+      }
+    },
+    {
+      "date": "2026-06-08",
       "n_offers": 587,
       "offers_by_type": {
         "Arabica": 427,
@@ -2389,7 +2417,7 @@
         }
       },
       "wow": {
-        "prev_date": "2026-06-05",
+        "prev_date": "2026-06-06",
         "in_offers": 0,
         "out_offers": 0,
         "in_tons": 0,
