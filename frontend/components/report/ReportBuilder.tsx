@@ -130,8 +130,9 @@ export default function ReportBuilder() {
           })}
         </div>
 
-        {/* The preview canvas (also the print target) */}
-        <div className="rounded-lg border border-slate-800 bg-slate-950 p-4 min-h-[200px]">
+        {/* The preview canvas (also the print target). Fixed ~A4 width inside,
+            so allow horizontal scroll on narrow screens. */}
+        <div className="rounded-lg border border-slate-800 bg-slate-950 p-4 min-h-[200px] overflow-x-auto">
           <ReportCanvas ref={canvasRef} />
         </div>
       </div>

@@ -16,22 +16,16 @@
 const PAGE = `@page { size: A4; margin: 12mm; }`;
 const EXACT = `html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }`;
 
-// Fit-to-A4. Charts bake the on-screen column width into their SVG, which
-// overflows the page when that column is wider than the A4 content box (~186mm).
-// Force every chart/table/image to never exceed the printable column; Recharts
-// SVGs carry a viewBox, so width:100% + height:auto rescales them proportionally
-// (and crisply — they're vectors) to whatever the page allows.
+// Fit-to-A4. The canvas already renders at ~A4 content width on screen (see
+// ReportCanvas), so charts are sized to fit the page — we must NOT rescale
+// Recharts SVGs here. Forcing width/height on them moves their absolutely-
+// positioned HTML legends out of place and warps the plot ("weird" charts).
+// So we only guard non-chart overflow (tables/images) and keep each chart card
+// whole across page breaks.
 const FIT = `
-  #report-canvas { width:100% !important; max-width:100% !important; }
-  #report-canvas .recharts-responsive-container { width:100% !important; max-width:100% !important; }
-  #report-canvas .recharts-wrapper,
-  #report-canvas .recharts-wrapper svg,
-  #report-canvas .recharts-responsive-container svg { width:100% !important; height:auto !important; }
-  #report-canvas svg { max-width:100% !important; }
-  #report-canvas table { max-width:100% !important; }
-  #report-canvas img { max-width:100% !important; height:auto !important; }
-  /* Don't split a chart card across two pages. */
-  #report-canvas section { break-inside:avoid; page-break-inside:avoid; }
+  #report-canvas { width: 100% !important; }
+  #report-canvas img, #report-canvas table { max-width: 100% !important; }
+  #report-canvas section { break-inside: avoid; page-break-inside: avoid; }
 `;
 
 export const PRINT_CSS_DARK = `

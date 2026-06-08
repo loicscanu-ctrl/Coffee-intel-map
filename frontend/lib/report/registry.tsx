@@ -32,8 +32,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     id: "daily_quotes",
     label: "Daily Quotes",
     category: "Futures",
-    description: "Live ACAPHE price chain — Arabica / Robusta / KC-RC arbitrage and Vietnam differentials.",
-    Component: dynamic(() => import("@/components/futures/AcapheLiveQuotes"), { ssr: false, loading }),
+    description: "ICE futures chain (Barchart) — NY Arabica & London Robusta, last/change/spread/OI/volume.",
+    Component: dynamic(() => import("@/components/report/charts/DailyQuotesReport"), { ssr: false, loading }),
   },
   {
     id: "cot_overview",
