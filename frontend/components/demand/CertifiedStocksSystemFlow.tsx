@@ -12,6 +12,13 @@
  * arabica + robusta JSON in as props.
  */
 import { useEffect, useMemo, useState } from "react";
+import { fmtNum, _fmtUnit, unitWord, type FlowUnit } from "@/lib/certifiedStocks/units";
+import {
+  AGE_OPACITY, AGE_LABEL, AGE_BIN_ORDER, _binByMonths, _binByDays,
+  type AgeBin, type AgeDist,
+} from "@/lib/certifiedStocks/age";
+import { ARABICA_PORT_NAMES, ROBUSTA_PORT_NAMES, _canonicalKC } from "@/lib/certifiedStocks/ports";
+import { KC_ORIGIN_COLORS, RC_ORIGIN_COLORS, _originColor } from "@/lib/certifiedStocks/colors";
 
 // ── Local data shapes (a subset of the rich panel types) ─────────────────────
 
@@ -104,113 +111,6 @@ export interface RobustaJsonShape {
   port_origin_history?: Record<string, Record<string, { tenderable: number; class34: number }>>;
 }
 
-// ── Format helpers ───────────────────────────────────────────────────────────
-
-const fmtNum = (n: number): string =>
-  Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : "—";
-
-// ── Unit conversion (Bags / Tonnes / Lots) — mirrors the panel's helpers so
-// the toggle flows through the whole system-flow diagram. Values are stored in
-// each market's native unit (KC = bags, RC = lots) and converted to the chosen
-// display unit. Warrant/square counts are NOT converted (a square = a warrant).
-type FlowUnit = "bags" | "tonnes" | "lots";
-const _BAGS_PER_LOT = (10 * 1000) / 60;   // 166.67 (60-kg bags per 10-MT lot)
-function _toChosen(v: number, native: "bags" | "lots", unit: FlowUnit): number {
-  if (native === "bags") {
-    return unit === "bags" ? v : unit === "tonnes" ? (v * 60) / 1000 : v / _BAGS_PER_LOT;
-  }
-  return unit === "lots" ? v : unit === "tonnes" ? v * 10 : v * _BAGS_PER_LOT;
-}
-function _fmtUnit(v: number, native: "bags" | "lots", unit: FlowUnit): string {
-  const c = _toChosen(v, native, unit);
-  if (!Number.isFinite(c)) return "—";
-  return (unit === "lots" ? Math.round(c * 10) / 10 : Math.round(c)).toLocaleString("en-US");
-}
-const unitWord = (u: FlowUnit) => (u === "bags" ? "bags" : u === "tonnes" ? "t" : "lots");
-
-// ── Age bins ─────────────────────────────────────────────────────────────────
-// Per user spec — 4 fadeness levels for stock 1y+, plus full-opacity "fresh"
-// for anything under a year. Bin keys are stable so they survive cross-runs.
-type AgeBin = "fresh" | "y1to2" | "y2to3" | "y3to4" | "y4plus";
-interface AgeDist { fresh: number; y1to2: number; y2to3: number; y3to4: number; y4plus: number }  // shares 0..1
-// Opacity floor lifted from 0.14 → 0.35 so 4y+ squares stay visibly
-// colored. The earlier fade was too aggressive — rows of old stock
-// were reading as "empty lines" in the grid.
-const AGE_OPACITY: Record<AgeBin, number> = {
-  fresh:  1.00,
-  y1to2:  0.80,
-  y2to3:  0.62,
-  y3to4:  0.47,
-  y4plus: 0.35,
-};
-const AGE_LABEL: Record<AgeBin, string> = {
-  fresh: "< 1y", y1to2: "1-2y", y2to3: "2-3y", y3to4: "3-4y", y4plus: "4y+",
-};
-const AGE_BIN_ORDER: AgeBin[] = ["fresh", "y1to2", "y2to3", "y3to4", "y4plus"];
-
-const _binByMonths = (months: number): AgeBin =>
-  months < 12 ? "fresh"
-  : months < 24 ? "y1to2"
-  : months < 36 ? "y2to3"
-  : months < 48 ? "y3to4"
-  : "y4plus";
-const _binByDays = (days: number): AgeBin => _binByMonths(days / 30);
-
-// Port-name lookup for arabica port labels. Workbook + live scraper both
-// settle on the long forms (NOLA, MIAMI, NY, HA/BR, VA, BAR) but older
-// snapshots can carry short forms (NOR, MIA, NYK, HAM, VIR). Canonical
-// forms below are the long names; aliases get mapped via _canonicalKC.
-const ARABICA_PORT_NAMES: Record<string, string> = {
-  ANT:    "Antwerp",
-  BAR:    "Barcelona",
-  "HA/BR": "Hamburg/Bremen",
-  HOU:    "Houston",
-  MIAMI:  "Miami",
-  NOLA:   "New Orleans",
-  NY:     "New York",
-  VA:     "Virginia",
-};
-
-// Short → canonical KC port codes. The workbook & live xls flip-flopped
-// between the short and long forms; the system flow comparing periods
-// across both forms would otherwise count an entire port's stock as
-// "gained" (current code missing from the base, so delta = current − 0).
-const KC_PORT_ALIASES: Record<string, string> = {
-  // short → canonical (the workbook + live scraper now use the long forms)
-  NOR:  "NOLA",   // observed Apr-May 2026: NOR (with 28k bags) ↔ NOLA same volume
-  NO:   "NOLA",
-  MIA:  "MIAMI",
-  MI:   "MIAMI",
-  NYK:  "NY",
-  HAM:  "HA/BR",
-  HA:   "HA/BR",
-  HO:   "HOU",
-  VIR:  "VA",
-};
-const _canonicalKC = (code: string): string => {
-  const c = (code || "").toUpperCase();
-  return KC_PORT_ALIASES[c] ?? c;
-};
-const ROBUSTA_PORT_NAMES: Record<string, string> = {
-  AMS: "Amsterdam",
-  ANT: "Antwerp",
-  BAR: "Barcelona",
-  BRE: "Bremen",
-  FEL: "Felixstowe",
-  GEN: "Genoa",
-  HAM: "Hamburg",
-  HUL: "Hull",
-  HUM: "Humberside",
-  LEH: "Le Havre",
-  LIV: "Liverpool",
-  LON: "London",
-  NOR: "Norfolk",
-  NYK: "New York",
-  ROT: "Rotterdam",
-  TEE: "Teesside",
-  TRI: "Trieste",
-};
-
 // ── Flow range selector ──────────────────────────────────────────────────────
 // The period is a [start, end] window. `end` is a free calendar pick that
 // defaults to the latest available data date; `start` is chosen from a small
@@ -225,91 +125,6 @@ export {
   parseFlowISO, flowDateISO, flowAnchor, flowDateBounds, flowStartOptions,
   FLOW_START_DEFAULT, type FlowStartOpt,
 } from "@/lib/certifiedStocks/window";
-
-// ── Origin colors (market-aware) ────────────────────────────────────────────
-// Arabica (KC) palette is structured by ICE C-contract group, then by
-// continent within Group 0:
-//   • Group 0 — cold colors. Latin American → greens, Asian → blues,
-//                            African → purples.
-//   • Group 1 — dark green (Colombian milds).
-//   • Group 2 — yellow to light orange (warm light).
-//   • Group 3 — red / pink (warmer).
-//   • Group 4 — dark red-brown (Brazil naturals + Vietnam KC).
-//
-// Robusta (RC) palette follows the user's origin spec:
-//   • Vietnam     → dark blue   (primary RC origin)
-//   • Indonesia   → blue
-//   • Brazil      → dark red-brown
-//   • African     → purple nuances (Uganda, Tanzania, Cameroon, etc.)
-//   • Other Asian → cold colour nuances
-//   • Other LA    → warm colour nuances
-//
-// Vietnam carries different roles in each market so the dicts must be
-// kept separate (RC blue ≠ KC dark brown). _originColor() routes by market.
-
-const KC_ORIGIN_COLORS: Record<string, string> = {
-  // ── Group 0 — cold colours (LA green, AS blue, AF purple) ──
-  "Costa Rica":        "#16a34a",   // green-600
-  "El Salvador":       "#22c55e",   // green-500
-  "Guatemala":         "#10b981",   // emerald-500
-  "Honduras":          "#14b8a6",   // teal-500
-  "Mexico":            "#84cc16",   // lime-500
-  "Nicaragua":         "#15803d",   // green-700
-  "Panama":            "#34d399",   // emerald-400
-  "Peru":              "#4ade80",   // green-400
-  "Papua New Guinea":  "#0ea5e9",   // sky-500
-  "Kenya":             "#a855f7",   // purple-500
-  "Tanzania":          "#9333ea",   // purple-600
-  "Uganda":            "#c084fc",   // purple-400
-  // ── Group 1 — dark green ──
-  "Colombia":          "#14532d",   // green-900
-  // ── Group 2 — yellow to light orange ──
-  "Burundi":           "#facc15",   // yellow-400
-  "India":             "#fb923c",   // orange-400
-  "Rwanda":            "#fbbf24",   // amber-400
-  "Venezuela":         "#fdba74",   // orange-300
-  // ── Group 3 — red / pink ──
-  "Dominican Republic": "#f43f5e",  // rose-500
-  "Ecuador":           "#ec4899",   // pink-500
-  // ── Group 4 — dark red-brown ──
-  "Brazil":            "#7c2d12",   // red-brown-900
-  "Vietnam":           "#92400e",   // amber-900-brown
-};
-
-const RC_ORIGIN_COLORS: Record<string, string> = {
-  "Vietnam":                       "#1e3a8a",  // dark blue (blue-900)
-  "Indonesia":                     "#3b82f6",  // blue-500
-  // Brazil — dark red-brown
-  "Brazil":                        "#7c2d12",
-  "Brazilian Conillon":            "#7c2d12",
-  // African origins — purple nuances
-  "Uganda":                        "#a855f7",  // purple-500
-  "Tanzania":                      "#9333ea",  // purple-600
-  "Ethiopia":                      "#c084fc",  // purple-400
-  "Cameroon":                      "#7e22ce",  // purple-700
-  "Angola":                        "#6b21a8",  // purple-800
-  "Cote dIvoire":                  "#9d4edd",
-  "Cote d'Ivoire":                 "#9d4edd",
-  "Ghana":                         "#a78bfa",  // violet-400
-  "Guinea":                        "#8b5cf6",  // violet-500
-  "Madagascar":                    "#7c3aed",  // violet-600
-  "Republic of Madagascar":        "#7c3aed",
-  "Sierra Leone":                  "#d8b4fe",  // purple-300
-  "Togo":                          "#a855f7",
-  "Nigeria":                       "#9d4edd",
-  "DRC":                           "#7e22ce",
-  "Congo":                         "#7e22ce",
-  "Democratic Republic of Congo":  "#7e22ce",
-  // Other Asian — cold (blue / cyan)
-  "India":                         "#0ea5e9",  // sky-500
-  "Laos":                          "#06b6d4",  // cyan-500
-};
-const ORIGIN_DEFAULT = "#64748b";  // slate-500 (unknown / catch-all)
-
-function _originColor(origin: string, market: "KC" | "RC"): string {
-  const dict = market === "KC" ? KC_ORIGIN_COLORS : RC_ORIGIN_COLORS;
-  return dict[origin] ?? ORIGIN_DEFAULT;
-}
 
 // ── Density grid (vertical orientation, one square ≈ one warrant) ──────────
 // Each square targets one ICE warrant. Tunable cap so giant ports (ANT at
