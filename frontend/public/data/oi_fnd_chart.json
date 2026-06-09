@@ -1774,6 +1774,7 @@
       ]
     }
   ],
+  "arabica_front_spread": null,
   "robusta": [
     {
       "symbol": "RMF25",
@@ -4020,5 +4021,6 @@
         }
       ]
     }
-  ]
+  ],
+  "robusta_front_spread": null
 }

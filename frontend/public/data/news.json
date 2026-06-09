@@ -1,5 +1,49 @@
 [
   {
+    "id": 6676,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-08",
+    "body": "RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,732 lots.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260608_103247.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,732 lots.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-09T07:00:46.493457",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,732 lots.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6675,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-08",
+    "body": "KC Arabica certified stocks shifted by -7,082 bags today, bringing global visible exchange inventory to 412,422 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260608.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -7,082 bags today, bringing global visible exchange inventory to 412,422 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-09T07:00:43.319599",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -7,082 bags today, bringing global visible exchange inventory to 412,422 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 6674,
     "title": "Retail Coffee CPI \u2013 2026-06-09",
     "body": "Retail coffee CPI YoY \u2014 US: +2.57%, EU: +18.40%, Brazil: +2.67%",
@@ -3444,35 +3488,5 @@
     ],
     "meta": null,
     "pub_date": "2026-05-31T04:53:46.355542"
-  },
-  {
-    "id": 5673,
-    "title": "USD/UGX FX Rate \u2013 2026-05-31",
-    "body": "USD/UGX FX Rate price: 3743",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "fx",
-      "uganda"
-    ],
-    "meta": null,
-    "pub_date": "2026-05-31T04:53:22.154344"
-  },
-  {
-    "id": 5672,
-    "title": "USD/HNL FX Rate \u2013 2026-05-31",
-    "body": "USD/HNL FX Rate price: 26.5806",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-05-31T04:53:21.168807"
   }
 ]
