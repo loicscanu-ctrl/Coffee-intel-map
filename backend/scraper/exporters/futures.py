@@ -18,6 +18,31 @@ from scraper.validate_export import (
     validate_oi_fnd_chart,
 )
 
+# Per-market contract month cycle, ordered. Used to derive the "next contract
+# after the front" without depending on whether the next contract has data
+# in the [-45, 0] day-to-its-own-FND window the candidates list is filtered by.
+_CONTRACT_CYCLE = {
+    "KC": ["H", "K", "N", "U", "Z"],
+    "RM": ["F", "H", "K", "N", "U", "X"],
+    "RC": ["F", "H", "K", "N", "U", "X"],
+}
+
+
+def _next_in_cycle(sym: str) -> str | None:
+    """Given e.g. 'RMN26' returns 'RMU26'; 'KCZ26' → 'KCH27' (year wraps).
+    Returns None for unparseable symbols or unknown roots."""
+    p = _sym.parse(sym)
+    if not p:
+        return None
+    root, letter, yy = p
+    cycle = _CONTRACT_CYCLE.get(root)
+    if not cycle or letter not in cycle:
+        return None
+    idx = cycle.index(letter)
+    next_idx = (idx + 1) % len(cycle)
+    next_yy  = f"{(int(yy) + 1) % 100:02d}" if next_idx == 0 else yy
+    return f"{root}{cycle[next_idx]}{next_yy}"
+
 
 def export_futures_chain(db) -> None:
     # Bound the scan to a recent window rather than pulling the entire
@@ -262,62 +287,66 @@ def export_oi_fnd_chart(db) -> None:
         # frontend join across {day_front, day_next} compares prices on
         # different calendar dates. And the next-FND contract often sits ~60+
         # trading days from its own FND when the front is near rollover, which
-        # is outside the export's [-45, 0] window — so the next contract's
-        # prices in the relevant calendar range aren't in the JSON at all.
+        # is outside the export's [-45, 0] window — so the next contract isn't
+        # even in `candidates`.
         #
         # Pre-compute the spread here using calendar dates from the archive,
-        # then index it to the FRONT's day-to-FND so the frontend can just plot
-        # it on a secondary axis without any cross-series gymnastics.
+        # then index it to the FRONT's day-to-FND so the frontend can plot it
+        # on a secondary axis directly. The next contract is derived from the
+        # contract-month CYCLE — not from `candidates` — so the spread works
+        # right up to and through rollover.
         today_iso  = today.isoformat()
         upcoming   = [c for c in candidates if c["fnd"] >= today_iso]
         spread_obj: dict | None = None
-        if len(upcoming) >= 2:
-            front_disp = upcoming[0]["symbol"]   # chart-display symbol (RM for robusta)
-            next_disp  = upcoming[1]["symbol"]
-            # The archive keys robusta as RC, arabica as KC. _sym.to_display()
-            # was applied on read; reverse it for the lookup. Single pass over
-            # the archive, dispatching each row into the right bucket.
-            archive_market_map = contract_archive.get(mkt_key, {})
-            front_prices: dict[str, float] = {}
-            next_prices:  dict[str, float] = {}
-            for snap_date_str, contracts_at in archive_market_map.items():
-                for s, cell in contracts_at.items():
-                    p = cell.get("price")
-                    if p is None:
-                        continue
-                    disp = _sym.to_display(s)
-                    if disp == front_disp:
-                        front_prices[snap_date_str] = p
-                    elif disp == next_disp:
-                        next_prices[snap_date_str] = p
-            front_fnd    = _calc_fnd(front_disp)
-            spread_data  = []
-            if front_fnd is not None and front_prices and next_prices:
-                # Walk every calendar date with a front price; emit the spread
-                # whenever the next contract also has a price for that date and
-                # the resulting day_val lands inside the chart window.
-                for snap_date_str, fp in front_prices.items():
-                    np_ = next_prices.get(snap_date_str)
-                    if np_ is None:
-                        continue
-                    try:
-                        snap_date = date.fromisoformat(snap_date_str)
-                    except Exception:
-                        continue
-                    day_val = _trading_days_to(snap_date, front_fnd)
-                    if day_val < -45 or day_val > 0:
-                        continue
-                    # Round to 2dp — settle prices come in at the exchange's
-                    # native precision (0.05 for KC, 1 for RC) so this is lossless.
-                    spread_data.append({"day": day_val, "spread": round(fp - np_, 2)})
-                spread_data.sort(key=lambda r: r["day"])
-                spread_obj = {
-                    "frontSym":   front_disp,
-                    "nextSym":    next_disp,
-                    "frontLabel": upcoming[0]["label"],
-                    "nextLabel":  upcoming[1]["label"],
-                    "data":       spread_data,
-                }
+        if upcoming:
+            front_disp = upcoming[0]["symbol"]                 # display form (RM for robusta)
+            next_disp  = _next_in_cycle(front_disp)
+            if next_disp:
+                # The archive keys robusta as RC, arabica as KC. _sym.to_display()
+                # normalises both legs to display form (RM / KC) before comparing.
+                archive_market_map = contract_archive.get(mkt_key, {})
+                front_prices: dict[str, float] = {}
+                next_prices:  dict[str, float] = {}
+                for snap_date_str, contracts_at in archive_market_map.items():
+                    for s, cell in contracts_at.items():
+                        p = cell.get("price")
+                        if p is None:
+                            continue
+                        disp = _sym.to_display(s)
+                        if disp == front_disp:
+                            front_prices[snap_date_str] = p
+                        elif disp == next_disp:
+                            next_prices[snap_date_str] = p
+                front_fnd   = _calc_fnd(front_disp)
+                spread_data = []
+                if front_fnd is not None and front_prices and next_prices:
+                    # Walk every calendar date with a front price; emit the
+                    # spread when the next contract also has a price on the
+                    # same date and day_val lands in the chart window.
+                    for snap_date_str, fp in front_prices.items():
+                        np_ = next_prices.get(snap_date_str)
+                        if np_ is None:
+                            continue
+                        try:
+                            snap_date = date.fromisoformat(snap_date_str)
+                        except Exception:
+                            continue
+                        day_val = _trading_days_to(snap_date, front_fnd)
+                        if day_val < -45 or day_val > 0:
+                            continue
+                        # Round to 2dp — settle prices come at the exchange's
+                        # native precision (0.05 for KC, 1 for RC) so this is
+                        # lossless.
+                        spread_data.append({"day": day_val, "spread": round(fp - np_, 2)})
+                    spread_data.sort(key=lambda r: r["day"])
+                    if spread_data:
+                        spread_obj = {
+                            "frontSym":   front_disp,
+                            "nextSym":    next_disp,
+                            "frontLabel": _sym.month_label(front_disp),
+                            "nextLabel":  _sym.month_label(next_disp),
+                            "data":       spread_data,
+                        }
         result[f"{market}_front_spread"] = spread_obj
 
     path = OUT_DIR / "oi_fnd_chart.json"
