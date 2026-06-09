@@ -11,7 +11,7 @@ name: "1.10 – Daily Weather Fetch & Accumulate"
 
 on:
   schedule:
-    - cron: "40 5 * * *"   # 05:40 UTC daily — independent of 1.4 (02:30) and scrapers
+    - cron: "0 2 * * *"   # 02:00 UTC daily — early window ahead of every other data-commit job
   workflow_dispatch:
     inputs:
       origins:
@@ -84,7 +84,7 @@ jobs:
             exit 0
           fi
           git commit -m "data: daily weather fetch + accumulate [skip ci]"
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Notify on failure
