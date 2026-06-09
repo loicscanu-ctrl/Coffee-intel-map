@@ -10,7 +10,6 @@ import datetime as dt
 
 from scraper import brazil_export_forecast as bef
 
-
 # ── helper builders ──────────────────────────────────────────────────────────
 
 def _series_row(date: str, total: int) -> dict:
@@ -124,6 +123,7 @@ def test_seasonality_distributes_remaining_via_prior_year():
         cecafe={"series": series},
         daily=daily,
         stocks=_stocks(exports_mt=30 * 60 / 1_000),    # 30 bags
+        override=None,                                  # ignore any on-disk seed
     )
     curve = {r["ym"]: r for r in payload["monthly_curve"]}
     assert curve["2026-04"]["status"] == "realized"     and curve["2026-04"]["value"] == 10
@@ -150,6 +150,7 @@ def test_seasonality_uniform_when_prior_subset_empty():
         daily={"updated": "2026-06-01", "_schema": "v2",
                "sources": {"embarques": {}, "certificados": {}}},
         stocks=_stocks(exports_mt=11 * 60 / 1_000),   # 11 bags annual target
+        override=None,
     )
     # Realized only carries 1 month at 0, so remaining = 11 spread uniformly
     # over 11 months → 1 bag each.
@@ -175,6 +176,7 @@ def test_safeguard_raises_target_and_sets_flag():
         daily={"updated": "2026-05-01", "_schema": "v2",
                "sources": {"embarques": {}, "certificados": {}}},
         stocks=_stocks(exports_mt=30 * 60 / 1_000),
+        override=None,
     )
     assert payload["safeguard_triggered"] is True
     # New target = 50 (realized) + 100 (Aug min) + 0 (every other month: no
@@ -255,6 +257,7 @@ def test_target_falls_back_when_psd_missing():
         daily={"updated": "2026-05-01", "_schema": "v2",
                "sources": {"embarques": {}, "certificados": {}}},
         stocks={},
+        override=None,
     )
     # Prior crop year (Apr 2025 → Mar 2026) sums to 12 bags.
     assert payload["annual_target"] == 12

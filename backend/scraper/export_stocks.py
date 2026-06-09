@@ -382,7 +382,6 @@ def export_stocks(db) -> None:
     growth_count = len(result["growth_markets"] or [])
     print(
         f"  demand_stocks.json -> "
-        f"ecf:{result['ecf'] is not None} "
         f"eu:{result['eu'] is not None} "
         f"japan:{result['japan'] is not None} "
         f"usa:{result['usa'] is not None} "

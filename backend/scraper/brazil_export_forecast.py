@@ -364,20 +364,29 @@ def _maybe_load(path: Path) -> dict | None:
         return None
 
 
+# Sentinel for `build_projection`'s optional kwargs — lets tests pass
+# `override=None` to mean "explicitly no override" while a production call
+# that omits the kwarg still auto-loads from disk.
+_UNSET: object = object()
+
+
 def build_projection(today: dt.date | None = None,
                      cecafe: dict | None = None,
                      daily: dict | None = None,
                      stocks: dict | None = None,
-                     override: dict | None = None) -> dict:
+                     override: dict | None | object = _UNSET) -> dict:
     """Pure function — takes the three payloads + today's date, returns the
-    JSON payload to write. Caller passes `None` to load from disk. `override`
-    is the optional seed/brazil_export_target.json shape and wins over PSD
-    when it matches the active crop year."""
+    JSON payload to write. Caller passes `None` for any payload to load that
+    one from disk. `override` is the optional `seed/brazil_export_target.json`
+    payload and wins over PSD when it matches the active crop year. Pass
+    `override=None` to opt out of the on-disk override (tests use this);
+    omit it entirely (production) to auto-load from disk."""
     today  = today  or dt.date.today()
     cecafe = cecafe if cecafe is not None else _load(DATA_DIR / "cecafe.json")
     daily  = daily  if daily  is not None else _load(DATA_DIR / "cecafe_daily.json")
     stocks = stocks if stocks is not None else _load(DATA_DIR / "demand_stocks.json")
-    override = override if override is not None else _maybe_load(TARGET_OVERRIDE_PATH)
+    if override is _UNSET:
+        override = _maybe_load(TARGET_OVERRIDE_PATH)
 
     start  = crop_year_start(today)
     series = cecafe.get("series") or []
@@ -430,7 +439,8 @@ def main() -> int:
         # replaces only when content changed, and prints a clear failure
         # reason on rejection. Same pattern as the other daily exports.
         from scraper.validate_export import (  # local import keeps cli light
-            safe_write_json, validate_brazil_export_projection,
+            safe_write_json,
+            validate_brazil_export_projection,
         )
         OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
         wrote = safe_write_json(OUT_PATH, payload,
