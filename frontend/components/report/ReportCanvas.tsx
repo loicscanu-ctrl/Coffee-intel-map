@@ -71,18 +71,21 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
           Tick visuals on the left to build your briefing. Each one appears here with a note box.
         </div>
       ) : (
-        <div className="space-y-3">
+        // flex-wrap so half-width visuals pack two-up; full-width ones take the
+        // whole row. gap-3 (12px) → half = calc(50% - 6px) keeps the pair flush.
+        <div className="flex flex-wrap items-start gap-3">
           {selectedIds.map((id) => {
             const def = REPORT_BY_ID[id];
             if (!def) return null;
             const Visual = def.Component;
             const splitNotes = def.notes && def.notes.length > 1 ? def.notes : null;
+            const half = def.width === "half";
             return (
               // break-inside-avoid keeps a chart + its note on one printed page.
               <section
                 key={id}
                 className="rounded-lg border border-slate-700 bg-slate-900/60 overflow-hidden"
-                style={{ breakInside: "avoid" }}
+                style={{ breakInside: "avoid", width: half ? "calc(50% - 6px)" : "100%" }}
               >
                 <div className="px-2 py-1 border-b border-slate-800">
                   <h2 className="text-xs font-semibold text-slate-100">{def.label}</h2>

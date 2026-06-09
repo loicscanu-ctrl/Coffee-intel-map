@@ -744,6 +744,7 @@ export default function WeatherCharts({
   title,
   farmerEconomicsUrl,
   startMonthIdx = 0,
+  isReportMode = false,
 }: {
   /** Path under /public, e.g. "/data/brazil_weather.json". */
   dataUrl: string;
@@ -760,6 +761,11 @@ export default function WeatherCharts({
    *  matches the local coffee year. The underlying JSON arrays stay
    *  Jan-Dec; we just rotate the display order. */
   startMonthIdx?: number;
+  /** Report/briefing mode: render only the four core charts (daily accumulated
+   *  rainfall, mean temperature, monthly rainfall, cumulative YTD rainfall) in a
+   *  2×2 grid over the default all-regions, latest-month selection — no nav,
+   *  filters, forecast, soil, drought or ENSO chrome. */
+  isReportMode?: boolean;
 }) {
   const [data, setData] = useState<WeatherData | null>(null);
   const [selected, setSelected] = useState<Set<string> | null>(null);
@@ -1441,6 +1447,36 @@ export default function WeatherCharts({
     } else {
       setSelectedMonthIdx(m => m + 1);
     }
+  }
+
+  // Report/briefing mode — only the four core charts over the default
+  // all-regions, latest-month selection. All the data hooks above already ran,
+  // so this just renders a trimmed tree (no nav/filters/forecast/soil/drought).
+  if (isReportMode) {
+    return (
+      <div className="space-y-2">
+        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+          {title} <span className="font-normal text-slate-600">· {data.updated}</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <DailyAccumChart
+            daily={weightedDaily ?? data.daily_station}
+            forecast={weightedDaily ? weightedForecast : data.forecast_7d}
+            sourceLabel={weightedDaily
+              ? `Prod-weighted · ${activeProv.length} region${activeProv.length > 1 ? "s" : ""}`
+              : `${data.station} station`}
+            updated={data.updated}
+            curYear={data.cur_year}
+            lastYear={data.last_year}
+            selectedYear={selectedYear}
+            selectedMonthIdx={selectedMonthIdx}
+          />
+          <MeanTempChart data={tempData} curLabel={curLabel} lyLabel={lyLabel} domain={tempDomain} />
+          <MonthlyRainChart data={monthlyRainData} curLabel={curLabel} lyLabel={lyLabel} />
+          <CumulativeRainChart data={cumulativeData} curLabel={curLabel} lyLabel={lyLabel} />
+        </div>
+      </div>
+    );
   }
 
   return (
