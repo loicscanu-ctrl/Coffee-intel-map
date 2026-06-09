@@ -11,6 +11,18 @@ type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelForma
 
 interface SeriesPoint { day: number; oi?: number; price?: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }
+// Pre-computed front calendar spread (front-FND contract − contract after it),
+// indexed to the FRONT contract's day-to-FND. Computed by the backend because
+// the next contract's days-to-its-own-FND fall outside the chart's [-45, 0]
+// window when the front is near rollover, so a frontend join over individual
+// series would render all-null.
+interface FrontSpread {
+  frontSym: string;
+  nextSym:  string;
+  frontLabel: string;
+  nextLabel:  string;
+  data: { day: number; spread: number }[];
+}
 
 const COLORS = [
   "#94a3b8","#64748b","#475569","#334155","#cbd5e1",
@@ -52,17 +64,16 @@ const STATIC_SERIES: Record<"robusta" | "arabica", Series[]> = {
 // namespace so it can't collide with a future contract label like "N–U25".
 const SPREAD_KEY = "__spread";
 
-function buildChartData(
-  series: Series[],
-  spread: { frontLabel: string; nextLabel: string; frontSym: string; nextSym: string } | null,
-) {
+function buildChartData(series: Series[], spread: FrontSpread | null) {
   const daySet = new Set<number>();
   series.forEach(s => s.data.forEach(p => daySet.add(p.day)));
+  spread?.data.forEach(p => daySet.add(p.day));
   const days = Array.from(daySet).sort((a, b) => a - b);
 
-  // Cache front / next contract data lookup for the spread computation.
-  const frontSeries = spread ? series.find(s => s.symbol === spread.frontSym) ?? null : null;
-  const nextSeries  = spread ? series.find(s => s.symbol === spread.nextSym)  ?? null : null;
+  // Spread is keyed by day, so a Map is O(1) per lookup instead of the linear
+  // scan we'd otherwise do per (day × contract) cell.
+  const spreadByDay = new Map<number, number>();
+  spread?.data.forEach(p => spreadByDay.set(p.day, p.spread));
 
   return days.map(day => {
     const row: Record<string, number | null> = { day };
@@ -70,10 +81,9 @@ function buildChartData(
       const point = s.data.find(p => p.day === day);
       row[s.label] = point && point.oi != null ? Math.round(point.oi / 1000 * 10) / 10 : null;
     });
-    if (spread && frontSeries && nextSeries) {
-      const f = frontSeries.data.find(p => p.day === day)?.price;
-      const n = nextSeries.data.find(p => p.day === day)?.price;
-      row[SPREAD_KEY] = (f != null && n != null) ? Math.round((f - n) * 100) / 100 : null;
+    if (spread) {
+      const v = spreadByDay.get(day);
+      row[SPREAD_KEY] = v != null ? v : null;
     }
     return row;
   });
@@ -83,15 +93,18 @@ function buildChartData(
 
 export default function OIFndChart({ market, height = 320 }: { market: "robusta" | "arabica"; height?: number }) {
   const [series, setSeries] = useState<Series[]>([]);
+  const [spread, setSpread] = useState<FrontSpread | null>(null);
   const [isMock, setIsMock] = useState(false);
 
   useEffect(() => {
     fetch(`/data/oi_fnd_chart.json`)
       .then(r => r.json())
-      .then((json: { arabica: Series[]; robusta: Series[] }) => {
+      .then((json: { arabica: Series[]; robusta: Series[]; arabica_front_spread?: FrontSpread | null; robusta_front_spread?: FrontSpread | null }) => {
         const apiSeries: Series[] = json?.[market] ?? [];
+        const apiSpread = json?.[`${market}_front_spread`] ?? null;
         if (!apiSeries.length) {
           setSeries(STATIC_SERIES[market]);
+          setSpread(null);
           setIsMock(true);
           return;
         }
@@ -114,10 +127,12 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
           if (!merged.find(s => s.symbol === apiS.symbol)) merged.push(apiS);
         });
         setSeries(merged);
+        setSpread(apiSpread && apiSpread.data?.length ? apiSpread : null);
         setIsMock(false);
       })
       .catch(() => {
         setSeries(STATIC_SERIES[market]);
+        setSpread(null);
         setIsMock(true);
       });
   }, [market]);
@@ -129,21 +144,10 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
   if (!series.length) return null;
 
   const today = new Date().toISOString().slice(0, 10);
-  // FND-sorted view of contracts whose FND is today or later. The first
-  // entry is the next FND ("front"), the second is the one after it
-  // ("next") — together they define the front calendar spread.
-  const upcoming = series
+  const nextSymbol = series
     .filter(s => s.fnd && s.fnd >= today)
-    .sort((a, b) => (a.fnd ?? "").localeCompare(b.fnd ?? ""));
-  const nextSymbol = upcoming[0]?.symbol ?? null;
-  const spread = (upcoming.length >= 2 && upcoming[0].data.some(p => p.price != null))
-    ? {
-        frontSym:   upcoming[0].symbol,
-        nextSym:    upcoming[1].symbol,
-        frontLabel: upcoming[0].label,
-        nextLabel:  upcoming[1].label,
-      }
-    : null;
+    .sort((a, b) => (a.fnd ?? "").localeCompare(b.fnd ?? ""))[0]?.symbol ?? null;
+
   const spreadLegend = spread ? `${spread.frontLabel}–${spread.nextLabel} spread` : "";
   const spreadUnit   = isRobusta ? "$/t" : "¢/lb";
 
