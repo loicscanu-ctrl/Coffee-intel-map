@@ -38,6 +38,10 @@ interface ArabicaSnap {
   stoppers_today?:       Array<{ port: string; stopper: string; value: number }>;
   issued_total_today?:   number;
   received_total_today?: number;
+  // Per-origin grading breakdown for the day (passed / failed bags), each
+  // split by port. Drives the recent-activity feed.
+  passed_by_origin?: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
+  failed_by_origin?: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
 }
 interface MatrixSection {
   ports: string[];
@@ -145,6 +149,9 @@ interface RobustaJson {
     // cohort-DNA pipeline wired in.
     implied_outflow?: Array<{ month_end: string }>;
   };
+  // Latest per-port origin composition (origin → tenderable / class34 lot
+  // counts). Used to imply the origin behind a port's decertification.
+  port_origin_history?: Record<string, Record<string, { tenderable?: number; class34?: number }>>;
 }
 
 // ── Unit conversion (raw stored in native units: arabica=bags, robusta=lots) ──
@@ -1367,47 +1374,190 @@ function ArabicaColumn({ d, unit, cutoff, end, sinceLabel }: { d: ArabicaJson | 
   );
 }
 
-// Arabica recent activity — last N days of passed/failed grading events
-// from the snapshot stream. Mirrors robusta's gradings feed in shape so
-// the two markets sit side-by-side under "Recent activity".
-function ArabicaActivityFeed({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
-  const feed = useMemo(() => {
-    if (!d?.snapshots) return [];
-    type Evt = { date: string; kind: string; detail: string };
-    const out: Evt[] = [];
-    for (const s of d.snapshots) {
-      if ((s.passed_today_bags || 0) > 0) {
-        out.push({ date: s.date, kind: "passed",
-                   detail: `${fmt(fromBags(s.passed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} graded` });
-      }
-      if ((s.failed_today_bags || 0) > 0) {
-        out.push({ date: s.date, kind: "failed",
-                   detail: `${fmt(fromBags(s.failed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} rejected` });
-      }
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  }, [d, unit]);
+// ── Recent-activity feed (shared model + renderer) ───────────────────────────
+// Arabica and Robusta both normalise their raw feeds into ActivityEvent[] and
+// render through the SAME component, so wording and colour coding are identical
+// across the two markets. Only the section title/accent identifies the market.
 
+const FEED_MAX = 24;
+type Market = "kc" | "rc";
+type ActivityKind = "grading" | "issuance" | "reception" | "decert";
+interface ActivityEvent { date: string; kind: ActivityKind; detail: string }
+
+const _ACTIVITY_LABEL: Record<ActivityKind, string> = {
+  grading: "Grading", issuance: "Issuance", reception: "Reception", decert: "Decertification",
+};
+// Identical colour code across both markets.
+const _ACTIVITY_COLOR: Record<ActivityKind, string> = {
+  grading:   "text-sky-400/90",
+  issuance:  "text-rose-400/90",
+  reception: "text-emerald-400/90",
+  decert:    "text-orange-400/90",
+};
+
+// Friendly (name-only) port label for the feed. Canonicalises KC codes and
+// covers the 2-letter codes the KC delivery note uses (AN, MI, …).
+const _FEED_PORT_KC: Record<string, string> = {
+  AN: "Antwerp", ANT: "Antwerp", BAR: "Barcelona", "HA/BR": "Hamburg/Bremen",
+  HA: "Hamburg/Bremen", HAM: "Hamburg", HO: "Houston", HOU: "Houston",
+  MI: "Miami", MIA: "Miami", MIAMI: "Miami", NO: "New Orleans", NOLA: "New Orleans",
+  NOR: "Norfolk", NY: "New York", NYK: "New York", VA: "Virginia", VIR: "Virginia",
+};
+function _feedPort(code: string, market: Market): string {
+  const c = (code || "").toUpperCase();
+  if (market === "kc") return _FEED_PORT_KC[c] ?? _FEED_PORT_KC[_canonKC(c)] ?? c;
+  return ROBUSTA_PORT_NAMES[c] ?? c;
+}
+
+// Native→display amount (bare number) for the feed. KC native = bags, RC = lots.
+const _amt = (v: number, unit: Unit, market: Market): string =>
+  fmt(market === "kc" ? fromBags(v, unit) : fromLots(v, unit), unit);
+
+// "Grading" sentence — total graded for an origin, passed split by port, failed.
+function _gradingDetail(
+  graded: number, origin: string, passedByPort: Record<string, number>,
+  failed: number, unit: Unit, market: Market,
+): string {
+  const parts = [`${_amt(graded, unit, market)} ${unitSuffix(unit)} ${origin} graded`];
+  for (const [p, v] of Object.entries(passedByPort).sort((a, b) => b[1] - a[1])) {
+    if (v > 0) parts.push(`${_amt(v, unit, market)} passed in ${_feedPort(p, market)} port`);
+  }
+  if (failed > 0) parts.push(`${_amt(failed, unit, market)} failed`);
+  return parts.join(", ");
+}
+
+// "Issuance" / "Reception" sentence — amount, origin (if known), broker, port.
+function _flowDetail(
+  lots: number, origin: string | undefined, port: string | undefined,
+  broker: string | undefined, unit: Unit, market: Market,
+): string {
+  const parts = [`${_amt(lots, unit, market)} ${unitSuffix(unit)}`];
+  if (origin) parts.push(origin);
+  if (broker) parts.push(`by ${market === "kc" ? _displayFirmName(broker) : broker}`);
+  if (port) parts.push(`in ${_feedPort(port, market)} port`);
+  return parts.join(" ");
+}
+
+// "Decertification" sentence — amount, origin, port it left from.
+function _decertDetail(lots: number, origin: string, port: string, unit: Unit, market: Market): string {
+  return `−${_amt(lots, unit, market)} ${unitSuffix(unit)} ${origin} in ${_feedPort(port, market)}`;
+}
+
+// Largest tenderable origin at a port — implies the origin behind a decert.
+function _dominantOrigin(m: Record<string, { tenderable?: number }> | undefined): string | null {
+  if (!m) return null;
+  let best: string | null = null; let bestV = -1;
+  for (const [o, v] of Object.entries(m)) { const t = v?.tenderable ?? 0; if (t > bestV) { bestV = t; best = o; } }
+  return best;
+}
+
+function ActivityFeed({ title, accent, events }: { title: string; accent: string; events: ActivityEvent[] }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-amber-400/80 mb-1">
-        Arabica · recent activity
-      </div>
-      {feed.length === 0 ? <Pending label="Activity feed" /> : (
+      <div className={`text-[10px] uppercase tracking-wider ${accent} mb-1`}>{title}</div>
+      {events.length === 0 ? <Pending label="Activity feed" /> : (
         <ul className="space-y-0.5 text-[11px] font-mono">
-          {feed.map((e, i) => (
+          {events.map((e, i) => (
             <li key={i} className="flex items-baseline gap-2 text-slate-300">
-              <span className="text-slate-500 w-16">{e.date}</span>
-              <span className={`w-16 text-[9px] uppercase tracking-wider ${e.kind === "passed" ? "text-emerald-400/80" : "text-rose-400/80"}`}>
-                {e.kind}
+              <span className="text-slate-500 w-16 shrink-0">{e.date}</span>
+              <span className="flex-1">
+                <span className={`${_ACTIVITY_COLOR[e.kind]} font-semibold`}>{_ACTIVITY_LABEL[e.kind]}:</span>{" "}{e.detail}
               </span>
-              <span className="flex-1">{e.detail}</span>
             </li>
           ))}
         </ul>
       )}
     </div>
   );
+}
+
+// Arabica raw snapshots → ActivityEvent[].
+function _buildArabicaActivity(d: ArabicaJson | null, unit: Unit): ActivityEvent[] {
+  const out: ActivityEvent[] = [];
+  const snaps = d?.snapshots ?? [];
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    const passedBO = s.passed_by_origin ?? {};
+    const failedBO = s.failed_by_origin ?? {};
+    // Grading per origin: total graded = passed + failed, passed split by port.
+    for (const o of Array.from(new Set([...Object.keys(passedBO), ...Object.keys(failedBO)]))) {
+      const passedPorts = passedBO[o]?.by_port ?? {};
+      const graded = (passedBO[o]?.total ?? 0) + (failedBO[o]?.total ?? 0);
+      if (graded > 0) out.push({ date: s.date, kind: "grading", detail: _gradingDetail(graded, o, passedPorts, failedBO[o]?.total ?? 0, unit, "kc") });
+    }
+    // Issuance / reception (the KC delivery note carries no origin column).
+    for (const e of s.issuers_today ?? []) if ((e.value || 0) > 0)
+      out.push({ date: s.date, kind: "issuance", detail: _flowDetail(e.value, undefined, e.port, e.issuer, unit, "kc") });
+    for (const e of s.stoppers_today ?? []) if ((e.value || 0) > 0)
+      out.push({ date: s.date, kind: "reception", detail: _flowDetail(e.value, undefined, e.port, e.stopper, unit, "kc") });
+    // Decertification — exact (origin, port) from day-over-day stock delta:
+    // outflow = prev_stock + passed − cur_stock.
+    const prev = i > 0 ? snaps[i - 1] : null;
+    if (prev) {
+      const curBO = s.sections?.total_certified?.by_origin ?? {};
+      const prevBO = prev.sections?.total_certified?.by_origin ?? {};
+      for (const o of Array.from(new Set([...Object.keys(curBO), ...Object.keys(prevBO)]))) {
+        const curPorts = curBO[o]?.by_port ?? {};
+        const prevPorts = prevBO[o]?.by_port ?? {};
+        const passedPorts = passedBO[o]?.by_port ?? {};
+        for (const p of Array.from(new Set([...Object.keys(curPorts), ...Object.keys(prevPorts)]))) {
+          const decert = (prevPorts[p] ?? 0) + (passedPorts[p] ?? 0) - (curPorts[p] ?? 0);
+          if (decert > 0) out.push({ date: s.date, kind: "decert", detail: _decertDetail(decert, o, p, unit, "kc") });
+        }
+      }
+    }
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, FEED_MAX);
+}
+
+// Robusta raw feed → ActivityEvent[].
+function _buildRobustaActivity(d: RobustaJson | null, unit: Unit): ActivityEvent[] {
+  const out: ActivityEvent[] = [];
+  const ra = d?.recent_activity;
+  // Grading — group entries by (date, origin); tenderable = passed, else failed.
+  for (const g of ra?.gradings ?? []) {
+    const byOrigin: Record<string, { passed: Record<string, number>; failed: number; graded: number }> = {};
+    for (const e of g.entries ?? []) {
+      const o = e.origin || "?"; const p = e.port || "?"; const lots = e.lots || 0;
+      const b = (byOrigin[o] = byOrigin[o] ?? { passed: {}, failed: 0, graded: 0 });
+      b.graded += lots;
+      if (e.tenderable !== false) b.passed[p] = (b.passed[p] ?? 0) + lots;
+      else b.failed += lots;
+    }
+    for (const [o, b] of Object.entries(byOrigin))
+      if (b.graded > 0) out.push({ date: g.date, kind: "grading", detail: _gradingDetail(b.graded, o, b.passed, b.failed, unit, "rc") });
+  }
+  // Issuance / reception — per clearing member, per origin row (no port column).
+  for (const day of ra?.iss_recv_daily ?? []) {
+    for (const m of day.members ?? []) {
+      for (const row of m.rows ?? []) {
+        if ((row.sold || 0) > 0) out.push({ date: day.date, kind: "issuance", detail: _flowDetail(row.sold, row.origin, undefined, m.code, unit, "rc") });
+        if ((row.bought || 0) > 0) out.push({ date: day.date, kind: "reception", detail: _flowDetail(row.bought, row.origin, undefined, m.code, unit, "rc") });
+      }
+    }
+  }
+  // Decertification — per port from day-over-day lot delta (outflow = prev +
+  // passed − cur); origin is IMPLIED by the port's dominant tenderable origin.
+  const snaps = d?.snapshots ?? [];
+  const poh = d?.port_origin_history ?? {};
+  for (let i = 1; i < snaps.length; i++) {
+    const s = snaps[i]; const prev = snaps[i - 1];
+    const passedAtPort: Record<string, number> = {};
+    for (const g of ra?.gradings ?? []) if (g.date === s.date)
+      for (const e of g.entries ?? []) if (e.tenderable !== false)
+        passedAtPort[e.port || "?"] = (passedAtPort[e.port || "?"] ?? 0) + (e.lots || 0);
+    const curP = s.by_port_lots ?? {}; const prevP = prev.by_port_lots ?? {};
+    for (const p of Array.from(new Set([...Object.keys(curP), ...Object.keys(prevP)]))) {
+      const decert = (prevP[p] ?? 0) + (passedAtPort[p] ?? 0) - (curP[p] ?? 0);
+      if (decert > 0) out.push({ date: s.date, kind: "decert", detail: _decertDetail(decert, _dominantOrigin(poh[p]) ?? "mixed origins", p, unit, "rc") });
+    }
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, FEED_MAX);
+}
+
+function ArabicaActivityFeed({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
+  const events = useMemo(() => _buildArabicaActivity(d, unit), [d, unit]);
+  return <ActivityFeed title="Arabica · recent activity" accent="text-amber-400/80" events={events} />;
 }
 
 // ── Robusta period table (parallel to arabica's, lots-native) ────────────────
@@ -2235,24 +2385,9 @@ function RobustaColumn({ d, unit, cutoff, end, sinceLabel }: { d: RobustaJson | 
 // infested/appeal anomaly block underneath when present. Extracted out of
 // RobustaColumn so it can sit below the period view tables in the new
 // vertical layout.
-function RobustaActivityFeed({ d }: { d: RobustaJson | null }) {
+function RobustaActivityFeed({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
   const ra = d?.recent_activity;
-
-  const feed = useMemo(() => {
-    if (!ra) return [];
-    type Evt = { date: string; kind: string; detail: string };
-    const out: Evt[] = [];
-    for (const g of ra.gradings || []) {
-      out.push({ date: g.date, kind: "grading", detail: `${g.summary?.lots_graded_today ?? "?"} lots graded` });
-    }
-    for (const i of ra.iss_recv_daily || []) {
-      out.push({ date: i.date, kind: "issuance", detail: `${i.grand_total?.sold ?? 0} sold · ${i.grand_total?.bought ?? 0} bought` });
-    }
-    for (const t of ra.tenders || []) {
-      out.push({ date: t.date, kind: "tender", detail: `${t.totals_today?.originals ?? 0} originals` });
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  }, [ra]);
+  const events = useMemo(() => _buildRobustaActivity(d, unit), [d, unit]);
 
   const anomalies = useMemo(() => {
     const out: { date: string; kind: string; detail: string }[] = [];
@@ -2267,22 +2402,7 @@ function RobustaActivityFeed({ d }: { d: RobustaJson | null }) {
 
   return (
     <div className="space-y-3">
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-emerald-400/80 mb-1">
-          Robusta · recent activity
-        </div>
-        {feed.length === 0 ? <Pending label="Activity feed" /> : (
-          <ul className="space-y-0.5 text-[11px] font-mono">
-            {feed.map((e, i) => (
-              <li key={i} className="flex items-baseline gap-2 text-slate-300">
-                <span className="text-slate-500 w-16">{e.date}</span>
-                <span className="w-16 text-[9px] uppercase tracking-wider text-emerald-500/70">{e.kind}</span>
-                <span className="flex-1">{e.detail}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <ActivityFeed title="Robusta · recent activity" accent="text-emerald-400/80" events={events} />
 
       {anomalies.length > 0 && (
         <div>
@@ -2440,7 +2560,15 @@ export default function CertifiedStocksPanel() {
         <RobustaColumn d={robusta} unit={unit} cutoff={startDate} end={endDate} sinceLabel={startWin.label} />
       </div>
 
-      {/* 2 · full-width system flow. The cast is needed because the panel's
+      {/* 2 · recent activity feed per contract — sits between the tiles and
+          the system flow. Arabica + Robusta share one renderer so wording and
+          colour code are identical across markets. */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ArabicaActivityFeed d={arabica} unit={unit} />
+        <RobustaActivityFeed d={robusta} unit={unit} />
+      </div>
+
+      {/* 3 · full-width system flow. The cast is needed because the panel's
           ArabicaJson.latest_detail carries the matrix-section shape while the
           system flow only consumes latest_detail.age_detail (workbook-side).
           The component handles missing latest_detail gracefully. */}
@@ -2454,7 +2582,7 @@ export default function CertifiedStocksPanel() {
         />
       </div>
 
-      {/* 3 · period view tables — side-by-side per contract */}
+      {/* 4 · period view tables — side-by-side per contract */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ArabicaPeriodTable
           snapshots={arabica?.snapshots || []}
@@ -2471,12 +2599,6 @@ export default function CertifiedStocksPanel() {
           issuance={(robusta?.recent_activity?.iss_recv_daily || []) as unknown as IssRecvDailyEvt[]}
           unit={unit}
         />
-      </div>
-
-      {/* 4 · recent activity feed per contract */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ArabicaActivityFeed d={arabica} unit={unit} />
-        <RobustaActivityFeed d={robusta} />
       </div>
     </div>
   );
