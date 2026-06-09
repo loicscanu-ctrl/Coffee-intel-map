@@ -127,7 +127,13 @@ def export_oi_fnd_chart(db) -> None:
     result = {}
     for market in ("arabica", "robusta"):
         mkt_key = "arabica" if market == "arabica" else "robusta"
-        series: dict[str, dict[int, int]] = {}  # sym → {day → oi}
+        series:       dict[str, dict[int, int]]   = {}  # sym → {day → oi}
+        # Per-contract settlement price, indexed the same way. Used by the
+        # frontend to render the front calendar spread (next-FND contract
+        # − contract after it) on a secondary y-axis. Source is the 5-year
+        # archive — same series the OI numbers come from — so price and OI
+        # for a given (sym, day) always agree.
+        series_price: dict[str, dict[int, float]] = {}  # sym → {day → price}
 
         # 1. DB-derived points (from daily futures scraper)
         chain_items = [
@@ -203,9 +209,6 @@ def export_oi_fnd_chart(db) -> None:
             except Exception:
                 continue
             for sym, cell in contracts.items():
-                oi = cell.get("oi")
-                if oi is None:
-                    continue
                 chart_sym = _sym.to_display(sym)  # RC→RM for the FND chart convention
                 fnd = _calc_fnd(chart_sym)
                 if not fnd:
@@ -213,23 +216,43 @@ def export_oi_fnd_chart(db) -> None:
                 day_val = _trading_days_to(snap_date, fnd)
                 if day_val < -45 or day_val > 0:
                     continue
-                series.setdefault(chart_sym, {}).setdefault(day_val, oi)
+                oi    = cell.get("oi")
+                price = cell.get("price")
+                # OI and price live on independent keys in the archive; the
+                # latest snapshot is often price-only (intraday). Record
+                # whichever is present without forcing both.
+                if oi is not None:
+                    series.setdefault(chart_sym, {}).setdefault(day_val, oi)
+                if price is not None:
+                    series_price.setdefault(chart_sym, {}).setdefault(day_val, price)
 
         candidates = []
-        for sym, day_map in series.items():
+        # Build the full set of contracts to emit. Some symbols may have
+        # price data but no OI (e.g. when the archive's intraday/latest
+        # snapshot only carries prices), so union both keys before filtering.
+        all_syms = set(series.keys()) | set(series_price.keys())
+        for sym in all_syms:
             if sym[-2:] not in allowed:
                 continue
             fnd = _calc_fnd(sym)
             if not fnd:
                 continue
+            day_oi    = series.get(sym, {})
+            day_price = series_price.get(sym, {})
+            all_days  = sorted(set(day_oi) | set(day_price))
+            data      = []
+            for d in all_days:
+                row: dict = {"day": d}
+                if d in day_oi:
+                    row["oi"] = day_oi[d]
+                if d in day_price:
+                    row["price"] = day_price[d]
+                data.append(row)
             candidates.append({
                 "symbol": sym,
                 "label":  sym.replace("RM", "").replace("KC", ""),
                 "fnd":    fnd.isoformat(),
-                "data":   sorted(
-                    [{"day": d, "oi": o} for d, o in day_map.items()],
-                    key=lambda x: x["day"],
-                ),
+                "data":   data,
             })
         candidates.sort(key=lambda x: x["fnd"])
         result[market] = candidates

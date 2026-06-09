@@ -9,7 +9,7 @@ import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
 
-interface SeriesPoint { day: number; oi: number; }
+interface SeriesPoint { day: number; oi?: number; price?: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }
 
 const COLORS = [
@@ -17,6 +17,9 @@ const COLORS = [
   "#a8a29e","#78716c","#57534e","#d6d3d1","#e7e5e4",
 ];
 const NEXT_CONTRACT_COLOR = "#ef4444";
+// Spread line — amber so it's distinguishable from the grey OI lines and the
+// red next-FND OI highlight.
+const SPREAD_COLOR = "#fbbf24";
 
 // ── Embedded static data (real OI, last 30 trading days before each FND) ──────
 
@@ -45,17 +48,33 @@ const STATIC_SERIES: Record<"robusta" | "arabica", Series[]> = {
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
 
-function buildChartData(series: Series[]) {
+// Stable dataKey used by the spread line — kept out of the contract-label
+// namespace so it can't collide with a future contract label like "N–U25".
+const SPREAD_KEY = "__spread";
+
+function buildChartData(
+  series: Series[],
+  spread: { frontLabel: string; nextLabel: string; frontSym: string; nextSym: string } | null,
+) {
   const daySet = new Set<number>();
   series.forEach(s => s.data.forEach(p => daySet.add(p.day)));
   const days = Array.from(daySet).sort((a, b) => a - b);
+
+  // Cache front / next contract data lookup for the spread computation.
+  const frontSeries = spread ? series.find(s => s.symbol === spread.frontSym) ?? null : null;
+  const nextSeries  = spread ? series.find(s => s.symbol === spread.nextSym)  ?? null : null;
 
   return days.map(day => {
     const row: Record<string, number | null> = { day };
     series.forEach(s => {
       const point = s.data.find(p => p.day === day);
-      row[s.label] = point ? Math.round(point.oi / 1000 * 10) / 10 : null;
+      row[s.label] = point && point.oi != null ? Math.round(point.oi / 1000 * 10) / 10 : null;
     });
+    if (spread && frontSeries && nextSeries) {
+      const f = frontSeries.data.find(p => p.day === day)?.price;
+      const n = nextSeries.data.find(p => p.day === day)?.price;
+      row[SPREAD_KEY] = (f != null && n != null) ? Math.round((f - n) * 100) / 100 : null;
+    }
     return row;
   });
 }
@@ -76,18 +95,18 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
           setIsMock(true);
           return;
         }
-        // Merge: start from static, overlay JSON data points per symbol
+        // Merge: start from static, overlay JSON data points per symbol.
+        // Union by day with JSON taking precedence on collision; preserve
+        // both `oi` and `price` so the spread overlay still has the price
+        // series available for the front-month pair.
         const apiBySymbol = new Map(apiSeries.map(s => [s.symbol, s]));
         const merged = STATIC_SERIES[market].map(staticS => {
           const apiS = apiBySymbol.get(staticS.symbol);
           if (!apiS) return staticS;
-          // Union of days; JSON point takes precedence on collision
-          const apiDayMap = new Map(apiS.data.map(p => [p.day, p.oi]));
-          const days = new Map(staticS.data.map(p => [p.day, p.oi]));
-          apiDayMap.forEach((oi, day) => days.set(day, oi));
-          const data = Array.from(days.entries())
-            .map(([day, oi]) => ({ day, oi }))
-            .sort((a, b) => a.day - b.day);
+          const byDay = new Map<number, SeriesPoint>();
+          staticS.data.forEach(p => byDay.set(p.day, p));
+          apiS.data.forEach(p => byDay.set(p.day, p));   // JSON wins on collision
+          const data = Array.from(byDay.values()).sort((a, b) => a.day - b.day);
           return { ...staticS, data };
         });
         // Add any new symbols from JSON not in static
@@ -110,11 +129,25 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
   if (!series.length) return null;
 
   const today = new Date().toISOString().slice(0, 10);
-  const nextSymbol = series
+  // FND-sorted view of contracts whose FND is today or later. The first
+  // entry is the next FND ("front"), the second is the one after it
+  // ("next") — together they define the front calendar spread.
+  const upcoming = series
     .filter(s => s.fnd && s.fnd >= today)
-    .sort((a, b) => (a.fnd ?? "").localeCompare(b.fnd ?? ""))[0]?.symbol ?? null;
+    .sort((a, b) => (a.fnd ?? "").localeCompare(b.fnd ?? ""));
+  const nextSymbol = upcoming[0]?.symbol ?? null;
+  const spread = (upcoming.length >= 2 && upcoming[0].data.some(p => p.price != null))
+    ? {
+        frontSym:   upcoming[0].symbol,
+        nextSym:    upcoming[1].symbol,
+        frontLabel: upcoming[0].label,
+        nextLabel:  upcoming[1].label,
+      }
+    : null;
+  const spreadLegend = spread ? `${spread.frontLabel}–${spread.nextLabel} spread` : "";
+  const spreadUnit   = isRobusta ? "$/t" : "¢/lb";
 
-  const chartData = buildChartData(series);
+  const chartData = buildChartData(series, spread);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -126,6 +159,9 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
       </div>
       <p className="text-center text-[10px] text-slate-500 mb-3">
         Open Interest (K contracts) vs trading days to First Notice Day
+        {spread && (
+          <> · front spread <span style={{ color: SPREAD_COLOR }}>{spreadLegend}</span> ({spreadUnit})</>
+        )}
       </p>
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 20, left: 0 }}>
@@ -139,13 +175,27 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
             label={{ value: "trading days to FND", position: "insideBottom", offset: -10, fill: "#64748b", fontSize: 11 }}
           />
           <YAxis
+            yAxisId="oi"
             tickFormatter={v => `${v}K`}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
             label={{ value: "OI (K)", angle: -90, position: "insideLeft", offset: 10, fill: "#64748b", fontSize: 11 }}
           />
+          {spread && (
+            <YAxis
+              yAxisId="spread"
+              orientation="right"
+              tick={{ fill: SPREAD_COLOR, fontSize: 11 }}
+              label={{ value: `Spread (${spreadUnit})`, angle: 90, position: "insideRight", offset: 10, fill: SPREAD_COLOR, fontSize: 11 }}
+            />
+          )}
           <Tooltip
             contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-            formatter={((v, name) => [`${v}K`, name as NameType]) satisfies Formatter<ValueType, NameType>}
+            // OI lines display as "{v}K"; the spread line shows the raw value
+            // in its native unit ($/t for RC, ¢/lb for KC).
+            formatter={((v, name) => {
+              if (name === spreadLegend) return [`${v} ${spreadUnit}`, name as NameType];
+              return [`${v}K`, name as NameType];
+            }) satisfies Formatter<ValueType, NameType>}
             labelFormatter={((l) => `Day ${l} to FND`) satisfies LabelFmt}
           />
           <Legend
@@ -157,6 +207,7 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
             return (
               <Line
                 key={s.symbol}
+                yAxisId="oi"
                 type="monotone"
                 dataKey={s.label}
                 stroke={isNext ? NEXT_CONTRACT_COLOR : COLORS[i % COLORS.length]}
@@ -169,6 +220,19 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
               />
             );
           })}
+          {spread && (
+            <Line
+              yAxisId="spread"
+              type="monotone"
+              dataKey={SPREAD_KEY}
+              name={spreadLegend}
+              stroke={SPREAD_COLOR}
+              strokeWidth={2.5}
+              strokeDasharray="4 2"
+              dot={false}
+              connectNulls={true}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
