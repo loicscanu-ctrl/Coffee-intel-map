@@ -152,13 +152,17 @@ interface RobustaJson {
 
 type Unit = "bags" | "tonnes" | "lots";
 const KG_PER_BAG = 60;
+// Robusta (RC): 1 lot = 10 MT = 166.67 bags. Arabica (KC): 1 lot = 37,500 lb
+// = 17.009 MT ≈ 283.49 bags. Each market converts with its own lot size.
 const TONNES_PER_LOT = 10;
-const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67
+const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67 (RC)
+const TONNES_PER_LOT_KC = (37_500 * 0.45359237) / 1000;     // 17.009
+const BAGS_PER_LOT_KC = (TONNES_PER_LOT_KC * 1000) / KG_PER_BAG;  // ≈ 283.49
 
 function fromBags(bags: number, u: Unit): number {
   if (u === "bags")   return bags;
   if (u === "tonnes") return (bags * KG_PER_BAG) / 1000;
-  return bags / BAGS_PER_LOT;
+  return bags / BAGS_PER_LOT_KC;
 }
 function fromLots(lots: number, u: Unit): number {
   if (u === "lots")   return lots;
@@ -461,17 +465,17 @@ const ARABICA_METRICS: ArabicaMetric[] = [
 type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
            | "port_origin_inferred" | "port" | "port_issuer" | "port_member_signed"
            | "member_signed_origin" | "passing_breakdown" | "graded_with_poison" | "queue_forecast"
-           | "age_group_origin";
+           | "port_origin_age";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
   "Pending grading": "port_group_origin",     // port → ICE group → origin
   "Graded":          "graded_with_poison",    // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
   "Passing rate":    "none",                  // failed_today_bags carries no origin → no breakdown
-  // Stocks drill walks Age (year-banded) → Group → Origin. Every cell
-  // is inferred (`*`) for now because sheet 12 publishes per (port, age)
-  // and the daily section publishes per (port, origin) but never their
-  // joint distribution. Will become real reads once the new /publicdocs
-  // arabica ageing xls is fetched and parsed (see backend).
-  "Stocks":          "age_group_origin",
+  // Stocks drill walks Port → Origin → Ageing (year-banded). Port and
+  // origin are real reads from the daily section's by_port / by_origin
+  // hierarchy; the ageing leaf is inferred (`*`) by applying each origin's
+  // port-weighted age-band share, since the daily section and the ageing
+  // report never publish their joint (port × origin × age) distribution.
+  "Stocks":          "port_origin_age",
   "Decertified":     "port_group_origin",     // per-port outflow split by group → origin
   "Tenders":         "port_member_signed",    // port → member, issuer side as −, stopper side as +
 };
@@ -775,62 +779,18 @@ function _arabicaOriginAgeShape(
   return { ageLabels, yearBands, shareByOriginAge, shareByOriginBand };
 }
 
-// Cell values for Stocks → Age (year band) [→ Group [→ Origin]].
-// All three levels carry `*` — sheet 12 never resolves the joint
-// (port × age × origin) distribution, so the year-band totals here are
-// inferred from each origin's port-weighted age share. Once the new
-// /publicdocs Arabica age report lands, these can switch to real reads.
-function _arabicaStocksBandValue(
+// The Arabica ageing leaf applies each origin's port-weighted age-band share
+// (from `_arabicaOriginAgeShape`) to that origin's stock at a given port. It is
+// inferred (`*`) because the daily section publishes per (port, origin) and the
+// ageing report publishes per (origin, age band) but never their joint
+// (port × origin × age) distribution. Returns end-of-window stock × band share.
+function _arabicaPortOriginBandValue(
   snaps: ArabicaSnap[], w: PeriodCol, shape: ArabicaOriginAgeShape,
-  band: string, group?: string, origin?: string,
+  port: string, origin: string, band: string,
 ): RowVal {
-  const endSnap = _endOfWindowSnap(snaps, w);
-  if (!endSnap) return { value: null };
-  const byOrigin = endSnap.sections?.total_certified?.by_origin || {};
-  let bags = 0;
-  if (origin) {
-    const od = byOrigin[origin];
-    if (!od) return { value: null };
-    if (group && od.group !== group) return { value: 0, isInferred: true };
-    bags = (od.total ?? 0) * (shape.shareByOriginBand[origin]?.[band] ?? 0);
-  } else if (group) {
-    for (const [o, od] of Object.entries(byOrigin)) {
-      if (od.group !== group) continue;
-      bags += (od.total ?? 0) * (shape.shareByOriginBand[o]?.[band] ?? 0);
-    }
-  } else {
-    for (const [o, od] of Object.entries(byOrigin)) {
-      bags += (od.total ?? 0) * (shape.shareByOriginBand[o]?.[band] ?? 0);
-    }
-  }
-  return { value: bags, isInferred: true };
-}
-
-// Groups present in Stocks across the column set — drives the Group row
-// list. Origin → group lookup via the snapshot's by_origin metadata.
-function _arabicaStocksGroups(snaps: ArabicaSnap[], cols: PeriodCol[]): string[] {
-  const set = new Set<string>();
-  for (const w of cols) {
-    const endSnap = _endOfWindowSnap(snaps, w);
-    for (const od of Object.values(endSnap?.sections?.total_certified?.by_origin || {})) {
-      if ((od.total ?? 0) > 0) set.add(od.group);
-    }
-  }
-  return ARABICA_GROUP_ORDER.filter((g) => set.has(g));
-}
-
-// Origins under a given Stocks group across the column set.
-function _arabicaStocksOriginsForGroup(
-  snaps: ArabicaSnap[], cols: PeriodCol[], group: string,
-): string[] {
-  const set = new Set<string>();
-  for (const w of cols) {
-    const endSnap = _endOfWindowSnap(snaps, w);
-    for (const [o, od] of Object.entries(endSnap?.sections?.total_certified?.by_origin || {})) {
-      if (od.group === group && (od.total ?? 0) > 0) set.add(o);
-    }
-  }
-  return Array.from(set).sort();
+  const stock = _sectValue(_endOfWindowSnap(snaps, w), "total_certified", port, undefined, origin);
+  if (stock == null) return { value: null };
+  return { value: stock * (shape.shareByOriginBand[origin]?.[band] ?? 0), isInferred: true };
 }
 
 // Period rollups for the top-level cells.
@@ -1172,91 +1132,8 @@ function ArabicaPeriodTable({
                     });
                   })()}
 
-                  {/* Stocks → Group → Origin → Ageing (the leaf is inferred,
-                      Group + Origin are real reads from by_origin). */}
-                  {isOpen && drill === "age_group_origin" && (() => {
-                    if (!ageShape.yearBands.length) {
-                      return (
-                        <tr className="border-b border-slate-900">
-                          <td className="text-slate-600 text-left py-0.5 italic" style={indent(1)}>
-                            ageing detail pending — feed not yet fetched
-                          </td>
-                          {cols.map((_c, i) => (
-                            <td key={i} className="text-slate-600 text-right py-0.5 px-1.5">—</td>
-                          ))}
-                        </tr>
-                      );
-                    }
-                    return ageShape.yearBands.map((band) => {
-                      const bandKey = `${metric}/${band}`;
-                      const bandOpen = expanded.has(bandKey);
-                      const bandVals = cols.map((c) => _arabicaStocksBandValue(snapshots, c, ageShape, band));
-                      if (allZero(bandVals)) return null;
-                      const groupsInBand = bandOpen
-                        ? ARABICA_GROUP_ORDER.filter((g) =>
-                            cols.some((c) => (_arabicaStocksBandValue(snapshots, c, ageShape, band, g).value ?? 0) > 0))
-                        : [];
-                      return (
-                        <Fragment key={bandKey}>
-                          <tr className="border-b border-slate-900 bg-slate-900/40">
-                            <td
-                              className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-amber-300"
-                              style={indent(1)}
-                              onClick={() => toggle(bandKey)}
-                            >
-                              <span className="text-amber-500/60 inline-block w-3">{bandOpen ? "▾" : "▸"}</span>{" "}{band}
-                            </td>
-                            {bandVals.map((v, i) => (
-                              <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                            ))}
-                          </tr>
-                          {groupsInBand.map((group) => {
-                            const grpKey = `${bandKey}/${group}`;
-                            const grpOpen = expanded.has(grpKey);
-                            const grpVals = cols.map((c) => _arabicaStocksBandValue(snapshots, c, ageShape, band, group));
-                            if (allZero(grpVals)) return null;
-                            const originsInGrp = grpOpen
-                              ? _arabicaStocksOriginsForGroup(snapshots, cols, group)
-                                  .filter((o) => cols.some((c) =>
-                                    (_arabicaStocksBandValue(snapshots, c, ageShape, band, group, o).value ?? 0) > 0))
-                              : [];
-                            return (
-                              <Fragment key={grpKey}>
-                                <tr className="border-b border-slate-900 bg-slate-900/20">
-                                  <td
-                                    className="text-slate-500 text-left py-0.5 cursor-pointer hover:text-amber-300"
-                                    style={indent(2)}
-                                    onClick={() => toggle(grpKey)}
-                                  >
-                                    <span className="text-amber-500/40 inline-block w-3">{grpOpen ? "▾" : "▸"}</span>{" "}{group}
-                                  </td>
-                                  {grpVals.map((v, i) => (
-                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                                  ))}
-                                </tr>
-                                {originsInGrp.map((origin) => {
-                                  const origVals = cols.map((c) =>
-                                    _arabicaStocksBandValue(snapshots, c, ageShape, band, group, origin));
-                                  if (allZero(origVals)) return null;
-                                  return (
-                                    <tr key={`${grpKey}/${origin}`} className="border-b border-slate-900">
-                                      <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
-                                      {origVals.map((v, i) => (
-                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                                      ))}
-                                    </tr>
-                                  );
-                                })}
-                              </Fragment>
-                            );
-                          })}
-                        </Fragment>
-                      );
-                    });
-                  })()}
-
-                  {/* Port sub-rows (Pending grading · Decertified · Issued) */}
-                  {isOpen && drill !== "graded_with_poison" && drill !== "age_group_origin" && cols.length > 0 && (() => {
+                  {/* Port sub-rows (Stocks · Pending grading · Decertified · Issued) */}
+                  {isOpen && drill !== "graded_with_poison" && cols.length > 0 && (() => {
                     const ports = _portsForMetric(snapshots, cols, metric);
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
@@ -1320,6 +1197,47 @@ function ArabicaPeriodTable({
                             );
                           })}
 
+                          {/* Stocks: port → origin (real) → ageing band (inferred
+                              by each origin's port-weighted age share). */}
+                          {portOpen && drill === "port_origin_age" && _originsForCell(snapshots, cols, metric, port).map((origin) => {
+                            const origKey = `${portKey}/${origin}`;
+                            const origOpen = expanded.has(origKey);
+                            const oVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port, undefined, origin));
+                            if (allZero(oVals)) return null;
+                            const bands = origOpen
+                              ? ageShape.yearBands.filter((b) =>
+                                  cols.some((c) => (_arabicaPortOriginBandValue(snapshots, c, ageShape, port, origin, b).value ?? 0) > 0))
+                              : [];
+                            return (
+                              <Fragment key={origKey}>
+                                <tr className="border-b border-slate-900 bg-slate-900/20">
+                                  <td
+                                    className={`text-slate-500 text-left py-0.5 ${ageShape.yearBands.length ? "cursor-pointer hover:text-amber-300" : ""}`}
+                                    style={indent(2)}
+                                    onClick={() => ageShape.yearBands.length && toggle(origKey)}
+                                  >
+                                    <span className="text-amber-500/40 inline-block w-3">{ageShape.yearBands.length ? (origOpen ? "▾" : "▸") : ""}</span>{" "}{origin}
+                                  </td>
+                                  {oVals.map((v, i) => (
+                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                  ))}
+                                </tr>
+                                {bands.map((band) => {
+                                  const bandVals = cols.map((c) => _arabicaPortOriginBandValue(snapshots, c, ageShape, port, origin, band));
+                                  if (allZero(bandVals)) return null;
+                                  return (
+                                    <tr key={`${origKey}/${band}`} className="border-b border-slate-900">
+                                      <td className="text-slate-600 text-left py-0.5 italic" style={indent(3)}>{band}</td>
+                                      {bandVals.map((v, i) => (
+                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                      ))}
+                                    </tr>
+                                  );
+                                })}
+                              </Fragment>
+                            );
+                          })}
+
                           {/* Origin level for Graded (port → origin inferred from delta) */}
                           {portOpen && (drill === "port_origin" || drill === "port_origin_inferred") &&
                             _originsForCell(snapshots, cols, metric, port).map((origin) => {
@@ -1370,7 +1288,10 @@ function ArabicaPeriodTable({
       <div className="text-[9px] text-slate-600 italic mt-1 space-y-0.5">
         <div>
           Flow metrics (Graded · Decertified · Issued) sum across each window. Inventory metrics
-          (Stocks · Pending) show the end-of-window snapshot. <strong>* = inferred</strong> from
+          (Stocks · Pending) show the end-of-window snapshot. Stocks drills
+          <em>Port → Origin → Ageing</em> — port and origin are real reads; the ageing band is
+          inferred (<strong>*</strong>) from each origin&apos;s port-weighted age share.
+          Other <strong>* = inferred</strong> from
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock

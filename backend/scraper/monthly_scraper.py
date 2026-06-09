@@ -2,7 +2,10 @@
 monthly_scraper.py — Runs monthly data sources that don't have their own flow.
 
 Sources:
-  psd_coffee   — USDA FAS PSD (monthly release, ~mid-month)
+  psd_coffee       — USDA FAS PSD CSV (monthly release, ~mid-month)
+  usda_gain_pdf    — USDA GAIN Coffee Annual PDFs (forward-year forecasts
+                     USDA only publishes in the narrative reports, never in
+                     the CSV). Merged on top of psd_coffee in export_stocks.
 
 NB on what is NOT run here (to avoid duplicate scrapes):
   • ECF port stocks → '3.4 – ECF stocks' (scraper/backfill_ecf_history.py).
@@ -21,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from scraper.db import get_session, upsert_news_item
 from scraper.sources import psd_coffee as _psd_coffee
+from scraper.sources import usda_gain_pdf as _usda_gain_pdf
 
 TIMEOUT = 300  # 5 min per source
 
@@ -49,7 +53,8 @@ async def run_monthly() -> None:
             browser = await pw.chromium.launch(headless=True)
 
             for name, coro_fn in [
-                ("psd_coffee",   lambda p: _psd_coffee.run(p, db)),
+                ("psd_coffee",    lambda p: _psd_coffee.run(p, db)),
+                ("usda_gain_pdf", lambda p: _usda_gain_pdf.run(p, db)),
             ]:
                 page = await browser.new_page()
                 try:

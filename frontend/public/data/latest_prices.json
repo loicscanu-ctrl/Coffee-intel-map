@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-06-08T11:54:48.540816Z",
+  "generated_at": "2026-06-08T18:24:33.727817Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "247.10 (+0.60)",
+      "value": "245.90 (-0.60)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,329 (+13)",
+      "value": "3,333 (+17)",
       "category": "futures"
     },
     {
       "label": "B3 4/5 Jul '26",
-      "value": "305.30 USD/sac",
+      "value": "304.50 USD/sac",
       "category": "futures"
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "label": "CON T7",
-      "value": "870,00 BRL ($2,846)",
+      "value": "880,00 BRL ($2,878)",
       "category": "physical"
     },
     {
