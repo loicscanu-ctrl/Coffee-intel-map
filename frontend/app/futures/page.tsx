@@ -2,11 +2,12 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import OIFndChart from "@/components/futures/OIFndChart";
+import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type FuturesTab = "exchange" | "quotation";
-const FUTURES_TABS: FuturesTab[] = ["exchange", "quotation"];
+type FuturesTab = "price" | "quotation";
+const FUTURES_TABS: FuturesTab[] = ["price", "quotation"];
 
 interface Contract {
   contract: string;
@@ -593,8 +594,8 @@ export default function FuturesPage() {
 function FuturesPageInner() {
   const [chainJson, setChainJson]   = useState<FuturesChainJson | null>(null);
   const [vnFaqUsdMt, setVnFaqUsdMt] = useState<number | null>(null);
-  const [tab, setTab]               = useUrlState<FuturesTab>("tab", "exchange", (raw) =>
-    (FUTURES_TABS as string[]).includes(raw) ? (raw as FuturesTab) : "exchange"
+  const [tab, setTab]               = useUrlState<FuturesTab>("tab", "price", (raw) =>
+    (FUTURES_TABS as string[]).includes(raw) ? (raw as FuturesTab) : "price"
   );
 
   // Chain data: instant from static JSON, no backend needed
@@ -620,13 +621,13 @@ function FuturesPageInner() {
     <div className="h-full overflow-y-auto">
       <PageHeader
         title="Futures"
-        subtitle="ICE Arabica (KC) · ICE Robusta (RC) — chain, quotation & arbitrage"
-        healthKeys={["futures", "cot", "macro_cot"]}
+        subtitle="ICE Arabica (KC) · ICE Robusta (RC) — chain, quotation, arbitrage & origin farmgate prices"
+        healthKeys={["futures", "cot", "macro_cot", "origin_prices"]}
       />
       <div className="p-6 space-y-4">
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-slate-700 flex-wrap">
-        {(["exchange", "quotation"] as const).map(t => (
+        {(["price", "quotation"] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -641,8 +642,10 @@ function FuturesPageInner() {
         ))}
       </div>
 
-      {/* Exchange tab */}
-      {tab === "exchange" && (
+      {/* Price tab — live + daily exchange quotes, OI rollover, and the
+          origin farmgate-price overlay moved here from the Macro tab so
+          futures and physical pricing sit on the same page. */}
+      {tab === "price" && (
         <>
           {/* Live quotes — acaphe.com (run acaphe_poller.py locally for real-time updates) */}
           <AcapheLiveQuotes />
@@ -677,10 +680,10 @@ function FuturesPageInner() {
             )}
             {robustaChain && <ChainTable market="robusta" data={robustaChain} />}
           </div>
-          {/* OI Evolution to FND — bottom of the Exchange tab. NY + LDN
-              side-by-side; each chart shows OI buildup over the trading days
-              leading into First Notice Day, which is the operational view
-              traders use for roll timing. */}
+          {/* OI Evolution to FND — NY + LDN side-by-side; each chart shows
+              OI buildup over the trading days leading into First Notice Day
+              (operational view for roll timing) overlaid with the front
+              calendar spread. */}
           <div className="border-t border-slate-800 pt-4 mt-4">
             <h2 className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-3">
               OI Evolution to FND
@@ -689,6 +692,12 @@ function FuturesPageInner() {
               <OIFndChart market="arabica" />
               <OIFndChart market="robusta" />
             </div>
+          </div>
+
+          {/* Origin Farmgate Prices — moved from /macro so the physical
+              side of the price story sits next to the futures chain. */}
+          <div className="border-t border-slate-800 pt-4 mt-4">
+            <OriginPricesPanel />
           </div>
         </>
       )}
