@@ -39,8 +39,11 @@ export const useReportStore = create<ReportState>()(
         set((s) => (s.selectedIds.includes(id) ? s : { selectedIds: [...s.selectedIds, id] })),
       remove: (id) =>
         set((s) => {
-          // Drop the comment too so removed charts don't leave orphaned notes.
-          const { [id]: _drop, ...rest } = s.comments;
+          // Drop the chart's notes too so removed charts leave none orphaned —
+          // both the single note (keyed by id) and any split notes (`${id}__*`).
+          const rest = Object.fromEntries(
+            Object.entries(s.comments).filter(([k]) => k !== id && !k.startsWith(`${id}__`)),
+          );
           return { selectedIds: s.selectedIds.filter((x) => x !== id), comments: rest };
         }),
       setComment: (id, text) => set((s) => ({ comments: { ...s.comments, [id]: text } })),

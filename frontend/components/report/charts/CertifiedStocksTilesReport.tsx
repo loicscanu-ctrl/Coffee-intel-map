@@ -94,39 +94,42 @@ export default function CertifiedStocksTilesReport({ isReportMode = true }: { is
   const rTotal = rSnaps[rSnaps.length - 1]?.total_lots_certified ?? 0;
 
   return (
-    <div className="p-3 space-y-4">
+    <div className="p-3 space-y-3">
       <div>
         <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
         <p className="text-[11px] text-slate-500">ICE-certified deliverable inventory — month-to-date flows.</p>
       </div>
 
-      {aSnaps.length > 0 && (
-        <div>
-          <div className="text-sm font-semibold text-amber-400 mb-1.5">
-            Arabica · ICE Futures US (KC) <span className="text-[10px] font-normal text-slate-500">as of {arabica?.as_of ?? "—"}</span>
+      {/* Arabica packed 2×2 on the left, Robusta 2×2 on the right. */}
+      <div className="grid grid-cols-2 gap-3">
+        {aSnaps.length > 0 && (
+          <div>
+            <div className="text-sm font-semibold text-amber-400 mb-1.5">
+              Arabica · ICE Futures US (KC) <span className="text-[10px] font-normal text-slate-500">as of {arabica?.as_of ?? "—"}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Tile label="Total certified" value={fmt(aTotal)} unit="bags" />
+              <Tile label={`Graded since ${aWin?.label ?? ""}`} value={fmt(aGraded)} unit="bags" />
+              <Tile label={`Passed since ${aWin?.label ?? ""}`} value={fmt(aPassed)} unit="bags" />
+              <Tile label={`Decertified since ${aWin?.label ?? ""}`} value={fmt(aDecert)} unit="bags" />
+            </div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            <Tile label="Total certified" value={fmt(aTotal)} unit="bags" />
-            <Tile label={`Graded since ${aWin?.label ?? ""}`} value={fmt(aGraded)} unit="bags" />
-            <Tile label={`Passed since ${aWin?.label ?? ""}`} value={fmt(aPassed)} unit="bags" />
-            <Tile label={`Decertified since ${aWin?.label ?? ""}`} value={fmt(aDecert)} unit="bags" />
-          </div>
-        </div>
-      )}
+        )}
 
-      {rSnaps.length > 0 && (
-        <div>
-          <div className="text-sm font-semibold text-emerald-400 mb-1.5">
-            Robusta · ICE Futures Europe (RC) <span className="text-[10px] font-normal text-slate-500">as of {robusta?.as_of ?? "—"}</span>
+        {rSnaps.length > 0 && (
+          <div>
+            <div className="text-sm font-semibold text-emerald-400 mb-1.5">
+              Robusta · ICE Futures Europe (RC) <span className="text-[10px] font-normal text-slate-500">as of {robusta?.as_of ?? "—"}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Tile label="Total certified" value={fmt(rTotal)} unit="lots" />
+              <Tile label={`Graded since ${rWin?.label ?? ""}`} value={fmt(rGraded)} unit="lots" />
+              <Tile label={`Sold since ${rWin?.label ?? ""}`} value={fmt(rSold)} unit="lots" />
+              <Tile label={`Decertified since ${rWin?.label ?? ""}`} value={fmt(rDecert)} unit="lots" />
+            </div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            <Tile label="Total certified" value={fmt(rTotal)} unit="lots" />
-            <Tile label={`Graded since ${rWin?.label ?? ""}`} value={fmt(rGraded)} unit="lots" />
-            <Tile label={`Sold since ${rWin?.label ?? ""}`} value={fmt(rSold)} unit="lots" />
-            <Tile label={`Decertified since ${rWin?.label ?? ""}`} value={fmt(rDecert)} unit="lots" />
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
