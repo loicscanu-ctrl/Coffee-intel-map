@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-08T12:51:37.380524Z",
+  "generated_at": "2026-06-09T05:07:35.376425Z",
   "eu": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-08",
+    "last_updated": "2026-06-09",
     "annual": [
       {
         "year": "2002",
@@ -228,7 +228,7 @@
   },
   "japan": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-08",
+    "last_updated": "2026-06-09",
     "annual": [
       {
         "year": "2002",
@@ -454,7 +454,7 @@
   },
   "usa": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-08",
+    "last_updated": "2026-06-09",
     "annual": [
       {
         "year": "1960",
@@ -1059,7 +1059,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-06-08",
+    "last_updated": "2026-06-09",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
@@ -1749,7 +1749,8 @@
           "stocks_mt": 29100,
           "production_mt": 3780000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "vietnam": {
       "latest_year": "2025",
@@ -2352,7 +2353,8 @@
           "stocks_mt": 23340,
           "production_mt": 1848000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "colombia": {
       "latest_year": "2025",
@@ -2955,7 +2957,8 @@
           "stocks_mt": 57780,
           "production_mt": 828000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "indonesia": {
       "latest_year": "2025",
@@ -3558,7 +3561,8 @@
           "stocks_mt": 39420,
           "production_mt": 747000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "honduras": {
       "latest_year": "2025",
@@ -4161,7 +4165,8 @@
           "stocks_mt": 5160,
           "production_mt": 348000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "ethiopia": {
       "latest_year": "2025",
@@ -4764,7 +4769,8 @@
           "stocks_mt": 8400,
           "production_mt": 693600
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "uganda": {
       "latest_year": "2025",
@@ -5367,7 +5373,8 @@
           "stocks_mt": 17940,
           "production_mt": 412500
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "india": {
       "latest_year": "2025",
@@ -5970,7 +5977,8 @@
           "stocks_mt": 14040,
           "production_mt": 363000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "peru": {
       "latest_year": "2025",
@@ -6573,7 +6581,8 @@
           "stocks_mt": 1560,
           "production_mt": 252000
         }
-      ]
+      ],
+      "forecast_source": null
     },
     "mexico": {
       "latest_year": "2025",
@@ -7176,7 +7185,8 @@
           "stocks_mt": 6660,
           "production_mt": 234180
         }
-      ]
+      ],
+      "forecast_source": null
     }
   },
   "growth_markets": [
@@ -12541,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-08",
+    "last_updated": "2026-06-09",
     "countries": {
       "eu": {
         "name": "European Union",
