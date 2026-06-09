@@ -22,6 +22,13 @@ export interface ReportChartDef {
   category: ReportCategory;
   description?: string;
   Component: ComponentType<{ isReportMode?: boolean }>;
+  /**
+   * Split note boxes. When set, the report canvas renders one note textarea per
+   * entry (laid out in a row that aligns under the chart's columns) instead of a
+   * single full-width box — e.g. a separate note under the NY and London charts.
+   * Each note is stored under `${id}__${key}`.
+   */
+  notes?: { key: string; label: string }[];
 }
 
 const loading = () => <div className="p-4 text-xs text-slate-500">Loading…</div>;
@@ -34,6 +41,10 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Futures",
     description: "ICE futures chain (Barchart) — NY Arabica & London Robusta, last/change/spread/OI/volume.",
     Component: dynamic(() => import("@/components/report/charts/DailyQuotesReport"), { ssr: false, loading }),
+    notes: [
+      { key: "ny", label: "NY · Arabica" },
+      { key: "ldn", label: "London · Robusta" },
+    ],
   },
   {
     id: "cot_overview",
@@ -48,6 +59,10 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Futures",
     description: "Open-interest run-down into First Notice Day — NY Arabica (left) & London Robusta (right).",
     Component: dynamic(() => import("@/components/report/charts/FuturesReports"), { ssr: false, loading }),
+    notes: [
+      { key: "ny", label: "NY · Arabica" },
+      { key: "ldn", label: "London · Robusta" },
+    ],
   },
 
   // ── Freight ────────────────────────────────────────────────────────────────
@@ -166,6 +181,10 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Demand",
     description: "ICE-certified deliverable inventory — headline tiles for Arabica (KC) and Robusta (RC).",
     Component: dynamic(() => import("@/components/report/charts/CertifiedStocksTilesReport"), { ssr: false, loading }),
+    notes: [
+      { key: "arabica", label: "Arabica · KC" },
+      { key: "robusta", label: "Robusta · RC" },
+    ],
   },
   {
     id: "ecf_port_stocks",

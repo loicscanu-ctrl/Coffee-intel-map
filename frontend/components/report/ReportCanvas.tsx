@@ -20,10 +20,43 @@ import Markdown from "@/lib/report/markdown";
 const PRINT_DATE = () =>
   new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
+/**
+ * A single executive-summary box: editable <textarea> on screen, static rendered
+ * Markdown in print (cloned textarea values don't survive react-to-print). An
+ * optional label distinguishes split notes (e.g. "NY" vs "London"); in print the
+ * label is hidden when the note is empty so blank halves leave no orphaned title.
+ */
+function NoteField({ noteId, label }: { noteId: string; label?: string }) {
+  const note = useReportStore((s) => s.comments[noteId] ?? "");
+  const setComment = useReportStore((s) => s.setComment);
+  return (
+    <div>
+      {label && (
+        <div className={`text-[9px] uppercase tracking-wider text-slate-500 mb-1 ${note.trim() ? "" : "print:hidden"}`}>
+          {label}
+        </div>
+      )}
+      <textarea
+        value={note}
+        onChange={(e) => setComment(noteId, e.target.value)}
+        placeholder="Add your executive summary… Markdown supported: **bold**, *italic*, `code`, - bullets"
+        rows={3}
+        className="print:hidden w-full resize-y rounded-md bg-slate-950 border border-slate-700 px-2 py-1.5
+                   text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60"
+      />
+      {note.trim() && (
+        // Rendered Markdown — live preview on screen, the only note shown in
+        // print (the editable textarea is print:hidden).
+        <Markdown className="text-xs text-slate-200 leading-relaxed space-y-1 mt-2 print:mt-0">
+          {note}
+        </Markdown>
+      )}
+    </div>
+  );
+}
+
 const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, ref) {
   const selectedIds = useReportStore((s) => s.selectedIds);
-  const comments = useReportStore((s) => s.comments);
-  const setComment = useReportStore((s) => s.setComment);
 
   return (
     <div ref={ref} id="report-canvas" className="bg-slate-950 text-slate-100 mx-auto w-[700px] max-w-full">
@@ -43,7 +76,7 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
             const def = REPORT_BY_ID[id];
             if (!def) return null;
             const Visual = def.Component;
-            const note = comments[id] ?? "";
+            const splitNotes = def.notes && def.notes.length > 1 ? def.notes : null;
             return (
               // break-inside-avoid keeps a chart + its note on one printed page.
               <section
@@ -58,20 +91,19 @@ const ReportCanvas = forwardRef<HTMLDivElement>(function ReportCanvas(_props, re
                   <Visual isReportMode />
                 </div>
                 <div className="px-3 pb-3">
-                  <textarea
-                    value={note}
-                    onChange={(e) => setComment(id, e.target.value)}
-                    placeholder="Add your executive summary… Markdown supported: **bold**, *italic*, `code`, - bullets"
-                    rows={3}
-                    className="print:hidden w-full resize-y rounded-md bg-slate-950 border border-slate-700 px-2 py-1.5
-                               text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60"
-                  />
-                  {note.trim() && (
-                    // Rendered Markdown — live preview on screen, the only note
-                    // shown in print (the editable textarea is print:hidden).
-                    <Markdown className="text-xs text-slate-200 leading-relaxed space-y-1 mt-2 print:mt-0">
-                      {note}
-                    </Markdown>
+                  {splitNotes ? (
+                    // One note per sub-chart, laid out to align under the chart's
+                    // columns (the multi-part visuals render their parts 2-up).
+                    <div
+                      className="grid gap-2"
+                      style={{ gridTemplateColumns: `repeat(${splitNotes.length}, minmax(0,1fr))` }}
+                    >
+                      {splitNotes.map((n) => (
+                        <NoteField key={n.key} noteId={`${id}__${n.key}`} label={n.label} />
+                      ))}
+                    </div>
+                  ) : (
+                    <NoteField noteId={id} />
                   )}
                 </div>
               </section>
