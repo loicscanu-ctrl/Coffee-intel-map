@@ -253,7 +253,7 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "medium",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -264,7 +264,7 @@
       "market": "LDN",
       "severity": "warn",
       "score": -1,
-      "magnitude": "small",
+      "magnitude": "medium",
       "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
@@ -2584,7 +2584,7 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "medium",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2595,7 +2595,7 @@
           "market": "LDN",
           "severity": "warn",
           "score": -1,
-          "magnitude": "small",
+          "magnitude": "medium",
           "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
@@ -2633,5 +2633,5 @@
       "priceLDN": 3462
     }
   ],
-  "generatedAt": "2026-06-09T08:50:30.898Z"
+  "generatedAt": "2026-06-09T09:17:44.345Z"
 }
