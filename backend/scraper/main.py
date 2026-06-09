@@ -13,6 +13,10 @@ from scraper.errors import CriticalSourceError
 # Side-channel scrapers added in the feature branch — registered in the
 # side-channel block further down. ajca + psd_coffee write directly to
 # JSON caches consumed by export_stocks.py.
+#
+# NOTE: `freightos` is intentionally NOT in the daily suite — the dedicated
+# "1.2 – Freight Rate Scraper" workflow scrapes it on Fri/Sun only (the FBX
+# index only moves end-of-week), so running it here daily was redundant.
 from scraper.sources import ajca as _ajca
 from scraper.sources import (
     b3,
@@ -20,7 +24,6 @@ from scraper.sources import (
     barchart,
     brazil,
     cepea,
-    freightos,
     futures,
     origins,
     rss,
@@ -42,7 +45,7 @@ from scraper.sources import population as _population
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import uganda_weather as _uganda_weather
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 
