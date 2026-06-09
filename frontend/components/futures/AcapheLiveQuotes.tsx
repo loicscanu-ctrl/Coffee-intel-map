@@ -312,9 +312,13 @@ function VietnamPanel({ data }: { data: VietnamPrices }) {
 // ── Root component ─────────────────────────────────────────────────────────────
 
 export default function AcapheLiveQuotes() {
-  const [data,  setData]  = useState<AcapheLiveData | null>(null);
-  const [ago,   setAgo]   = useState<number | null>(null);
-  const [error, setError] = useState(false);
+  const [data,        setData]        = useState<AcapheLiveData | null>(null);
+  const [ago,         setAgo]         = useState<number | null>(null);
+  const [error,       setError]       = useState(false);
+  const [refreshing,  setRefreshing]  = useState(false);
+  // null = no message; "ok" / "stale" / "fail" drive a small toast under the
+  // status bar. Auto-clears after 10s so it never lingers.
+  const [refreshMsg,  setRefreshMsg]  = useState<null | "triggered" | "noop" | "fail">(null);
 
   const load = () => {
     // Try live Redis-backed endpoint first; fall back to static snapshot
@@ -330,6 +334,38 @@ export default function AcapheLiveQuotes() {
           .then((d: AcapheLiveData) => { setData(d); setAgo(secsAgo(d.fetched_at)); setError(false); })
           .catch(() => setError(true))
       );
+  };
+
+  // Manually trigger the GH Actions Acaphe poller, then poll /api/live a few
+  // times over the next ~90s to pick up the fresh snapshot the workflow
+  // writes to Redis. The button stays disabled while refreshing so a user
+  // can't queue up duplicate dispatches.
+  const triggerRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setRefreshMsg(null);
+    let triggered = false;
+    try {
+      const r = await fetch("/api/refresh-acaphe", { method: "POST" });
+      triggered = r.ok;
+      setRefreshMsg(r.ok ? "triggered" : (r.status === 503 ? "noop" : "fail"));
+    } catch {
+      setRefreshMsg("fail");
+    }
+    // Always re-fetch immediately so the button has visible effect even if
+    // the dispatch failed (e.g. token not configured → still pick up the
+    // latest Redis snapshot in case the cron just landed).
+    load();
+    // If we actually kicked off a poll, sample for fresh data while it runs.
+    // Spaced to cover the ~60–90s end-to-end runtime without spamming Redis.
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    if (triggered) {
+      [25_000, 45_000, 70_000, 95_000].forEach(ms => {
+        timers.push(setTimeout(load, ms));
+      });
+    }
+    timers.push(setTimeout(() => setRefreshing(false), triggered ? 95_000 : 1_500));
+    timers.push(setTimeout(() => setRefreshMsg(null), 10_000));
   };
 
   useEffect(() => {
@@ -372,15 +408,61 @@ export default function AcapheLiveQuotes() {
           <span className="text-slate-400">acaphe.com</span>
           <span className="text-slate-600">{data.now_time}</span>
         </div>
-        <div className="text-slate-600">
-          {ago != null ? (
+        <div className="flex items-center gap-3 text-slate-600">
+          {ago != null && (
             <span className={isStale ? "text-yellow-500" : ""}>
               {ago < 60 ? `${ago}s ago` : `${Math.round(ago / 60)}m ago`}
-              {isStale && " · run acaphe_poller.py"}
             </span>
-          ) : "—"}
+          )}
+          <button
+            type="button"
+            onClick={triggerRefresh}
+            disabled={refreshing}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded border border-slate-700 transition-colors ${
+              refreshing
+                ? "text-slate-500 cursor-not-allowed"
+                : "text-slate-300 hover:bg-slate-800 hover:border-slate-600 cursor-pointer"
+            }`}
+            title="Trigger a manual Acaphe poll (takes ~60–90s)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={refreshing ? "animate-spin" : ""}
+            >
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+            <span>{refreshing ? "Refreshing…" : "Refresh"}</span>
+          </button>
         </div>
       </div>
+
+      {refreshMsg && (
+        <div
+          className={`text-[10px] font-mono px-2 py-1 rounded border ${
+            refreshMsg === "triggered"
+              ? "text-emerald-400 border-emerald-700/50 bg-emerald-900/20"
+              : refreshMsg === "noop"
+                ? "text-amber-400 border-amber-700/50 bg-amber-900/20"
+                : "text-red-400 border-red-700/50 bg-red-900/20"
+          }`}
+        >
+          {refreshMsg === "triggered"
+            ? "Poller triggered. Fresh quotes in ~60–90s."
+            : refreshMsg === "noop"
+              ? "Refresh endpoint not configured (set GH_DISPATCH_TOKEN on Vercel). Re-fetched cached data instead."
+              : "Refresh failed. Check Vercel function logs."}
+        </div>
+      )}
 
       {/* Chain tables + KC/RC ratio column */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 items-start">
