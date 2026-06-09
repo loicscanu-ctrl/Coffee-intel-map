@@ -151,13 +151,17 @@ interface RobustaJson {
 
 type Unit = "bags" | "tonnes" | "lots";
 const KG_PER_BAG = 60;
+// Robusta (RC): 1 lot = 10 MT = 166.67 bags. Arabica (KC): 1 lot = 37,500 lb
+// = 17.009 MT ≈ 283.49 bags. Each market converts with its own lot size.
 const TONNES_PER_LOT = 10;
-const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67
+const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67 (RC)
+const TONNES_PER_LOT_KC = (37_500 * 0.45359237) / 1000;     // 17.009
+const BAGS_PER_LOT_KC = (TONNES_PER_LOT_KC * 1000) / KG_PER_BAG;  // ≈ 283.49
 
 function fromBags(bags: number, u: Unit): number {
   if (u === "bags")   return bags;
   if (u === "tonnes") return (bags * KG_PER_BAG) / 1000;
-  return bags / BAGS_PER_LOT;
+  return bags / BAGS_PER_LOT_KC;
 }
 function fromLots(lots: number, u: Unit): number {
   if (u === "lots")   return lots;
