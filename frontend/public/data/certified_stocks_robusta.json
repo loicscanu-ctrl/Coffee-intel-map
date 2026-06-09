@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-08T08:08:50+00:00",
-  "as_of": "2026-06-05",
+  "generated_at": "2026-06-09T07:00:42+00:00",
+  "as_of": "2026-06-08",
   "snapshots": [
     {
       "date": "2025-05-28",
@@ -4763,11 +4763,37 @@
         "ROT": 0,
         "TRI": 0
       }
+    },
+    {
+      "date": "2026-06-08",
+      "cut_off_date": "2026-06-07",
+      "total_lots_certified": 3732,
+      "total_bags_60kg_equivalent": 622000,
+      "non_tend_lots": 1,
+      "suspended_lots": 0,
+      "lots_graded_today": 0,
+      "lots_sold_today": 0,
+      "lots_bought_today": 0,
+      "tenders_today": 0,
+      "by_port_lots": {
+        "ANT": 2056,
+        "LON": 1636,
+        "FEL": 31,
+        "BAR": 9,
+        "AMS": 0,
+        "BRE": 0,
+        "HAM": 0,
+        "LEH": 0,
+        "LIV": 0,
+        "NOR": 0,
+        "ROT": 0,
+        "TRI": 0
+      }
     }
   ],
   "latest_detail": {
     "stock_report": {
-      "cut_off_date": "2026-06-04",
+      "cut_off_date": "2026-06-07",
       "ports": [
         {
           "port_id": "ANT",
@@ -4860,7 +4886,7 @@
         "suspended": 0
       }
     },
-    "stock_report_url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260605_103912.csv"
+    "stock_report_url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260608_103247.csv"
   },
   "recent_activity": {
     "gradings": [
