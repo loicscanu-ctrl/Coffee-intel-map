@@ -1,6 +1,6 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-06-09T05:07:32.914499Z",
+  "scraped_at": "2026-06-09T06:36:29.419075Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-09",
@@ -493,6 +493,7 @@
           "M",
           "M",
           "M",
+          "M",
           "M"
         ]
       },
@@ -545,6 +546,7 @@
           "H",
           "H",
           "H",
+          "M",
           "M"
         ]
       },
@@ -586,6 +588,7 @@
           "M",
           "M",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -645,6 +648,7 @@
           "-",
           "-",
           "-",
+          "L",
           "L",
           "L",
           "L",
@@ -1319,6 +1323,13 @@
             "precip_mm": 6.6,
             "soil_moisture": 0.313,
             "drought_risk": "M"
+          },
+          {
+            "date": "2026-06-22",
+            "precip_prob": 66,
+            "precip_mm": 0.6,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
           }
         ]
       },
@@ -1651,6 +1662,13 @@
             "date": "2026-06-21",
             "precip_prob": 69,
             "precip_mm": 6.2,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
+          },
+          {
+            "date": "2026-06-22",
+            "precip_prob": 53,
+            "precip_mm": 3.2,
             "soil_moisture": 0.313,
             "drought_risk": "M"
           }
@@ -1987,6 +2005,13 @@
             "precip_mm": 2.2,
             "soil_moisture": 0.313,
             "drought_risk": "M"
+          },
+          {
+            "date": "2026-06-22",
+            "precip_prob": 88,
+            "precip_mm": 2.0,
+            "soil_moisture": 0.313,
+            "drought_risk": "M"
           }
         ]
       },
@@ -2319,6 +2344,13 @@
             "date": "2026-06-21",
             "precip_prob": 99,
             "precip_mm": 17.0,
+            "soil_moisture": 0.313,
+            "drought_risk": "L"
+          },
+          {
+            "date": "2026-06-22",
+            "precip_prob": 100,
+            "precip_mm": 27.6,
             "soil_moisture": 0.313,
             "drought_risk": "L"
           }

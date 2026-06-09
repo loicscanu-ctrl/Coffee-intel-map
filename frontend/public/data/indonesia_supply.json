@@ -1,6 +1,6 @@
 {
   "country": "indonesia",
-  "scraped_at": "2026-06-09T05:07:33.952868Z",
+  "scraped_at": "2026-06-09T06:36:30.594362Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-09",
@@ -340,7 +340,7 @@
     ]
   },
   "weather": {
-    "scraped_at": "2026-06-09T04:52:33.824182Z",
+    "scraped_at": "2026-06-09T05:23:33.954773Z",
     "regions": [
       {
         "name": "Lampung",
@@ -643,8 +643,8 @@
           "M",
           "M",
           "M",
-          "M",
-          "M"
+          "L",
+          "L"
         ]
       }
     ],
@@ -2221,101 +2221,101 @@
           },
           {
             "date": "2026-06-09",
-            "precip_prob": 8,
+            "precip_prob": 6,
             "precip_mm": 0.0,
             "soil_moisture": 0.15,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-10",
-            "precip_prob": 34,
+            "precip_prob": 31,
             "precip_mm": 0.0,
             "soil_moisture": 0.148,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-11",
-            "precip_prob": 82,
-            "precip_mm": 4.2,
-            "soil_moisture": 0.146,
+            "precip_prob": 79,
+            "precip_mm": 3.0,
+            "soil_moisture": 0.147,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-12",
-            "precip_prob": 37,
+            "precip_prob": 29,
             "precip_mm": 0.0,
             "soil_moisture": 0.145,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-13",
-            "precip_prob": 25,
+            "precip_prob": 21,
             "precip_mm": 0.0,
             "soil_moisture": 0.143,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-14",
-            "precip_prob": 25,
+            "precip_prob": 41,
             "precip_mm": 0.0,
             "soil_moisture": 0.142,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-15",
-            "precip_prob": 37,
+            "precip_prob": 41,
             "precip_mm": 0.0,
             "soil_moisture": 0.14,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-16",
-            "precip_prob": 15,
+            "precip_prob": 22,
             "precip_mm": 0.0,
-            "soil_moisture": 0.14,
+            "soil_moisture": 0.139,
             "drought_risk": "H"
           },
           {
             "date": "2026-06-17",
-            "precip_prob": 25,
+            "precip_prob": 32,
             "precip_mm": 0.0,
             "soil_moisture": 0.313,
             "drought_risk": "M"
           },
           {
             "date": "2026-06-18",
-            "precip_prob": 52,
-            "precip_mm": 0.0,
+            "precip_prob": 66,
+            "precip_mm": 0.6,
             "soil_moisture": 0.313,
             "drought_risk": "M"
           },
           {
             "date": "2026-06-19",
-            "precip_prob": 62,
+            "precip_prob": 61,
             "precip_mm": 0.0,
             "soil_moisture": 0.313,
             "drought_risk": "M"
           },
           {
             "date": "2026-06-20",
-            "precip_prob": 71,
-            "precip_mm": 0.0,
-            "soil_moisture": 0.313,
-            "drought_risk": "M"
-          },
-          {
-            "date": "2026-06-21",
             "precip_prob": 64,
             "precip_mm": 0.0,
             "soil_moisture": 0.313,
             "drought_risk": "M"
           },
           {
+            "date": "2026-06-21",
+            "precip_prob": 73,
+            "precip_mm": 6.0,
+            "soil_moisture": 0.313,
+            "drought_risk": "L"
+          },
+          {
             "date": "2026-06-22",
             "precip_prob": 65,
-            "precip_mm": 0.0,
+            "precip_mm": 5.4,
             "soil_moisture": 0.313,
-            "drought_risk": "M"
+            "drought_risk": "L"
           }
         ]
       }
