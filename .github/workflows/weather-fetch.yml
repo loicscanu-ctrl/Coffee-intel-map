@@ -11,7 +11,10 @@ name: "1.10 – Daily Weather Fetch & Accumulate"
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 02:00 UTC daily — early window ahead of every other data-commit job
+    # 01:53 UTC daily — early window ahead of every other data-commit job,
+    # moved off the :00 mark (GH cron skip risk documented across this repo)
+    # so the ~10-min run reliably lands before export-and-publish at 02:41.
+    - cron: "53 1 * * *"
   workflow_dispatch:
     inputs:
       origins:

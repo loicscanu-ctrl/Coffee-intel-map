@@ -25,15 +25,20 @@ on:
         default: "3"
         type: string
   schedule:
-    # 03:00 UTC Mon-Fri. The scraper anchors on the PREVIOUS business day
-    # (see orchestrate.run), so it fetches yesterday's already-published
-    # reports — the run time no longer has to chase same-day publication.
+    # 02:47 UTC Mon-Fri (was 03:00 — moved off the :00 mark to dodge the GH
+    # cron skip, and earlier so the run finishes ~03:05: in time for BOTH the
+    # 03:09 morning brief (which previously missed it by minutes every day
+    # and showed cert stocks a day staler than necessary) and the 03:41
+    # production deploy that puts the day's data live before 04:00 UTC.
+    # The scraper anchors on the PREVIOUS business day (see orchestrate.run),
+    # so it fetches yesterday's already-published reports — the run time
+    # doesn't chase same-day publication and an earlier start loses nothing.
     # Mon-Fri with a multi-day backfill window covers Friday's data on Monday;
     # ICE doesn't publish Sat/Sun. Manual dispatch still allowed any day.
     # Runs with --skip-monthly: the monthly ageing / age-allowance reports are
     # handled by their own job (1.14 – ICE Monthly Reports), so the daily run
     # no longer re-fetches a monthly report ~21×/month.
-    - cron: '0 3 * * 1-5'
+    - cron: '47 2 * * 1-5'
 
 concurrency:
   group: data-commit          # same group as the other data pushers
