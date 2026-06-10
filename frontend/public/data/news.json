@@ -1,5 +1,93 @@
 [
   {
+    "id": 6751,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-08",
+    "body": "ICE-EU RC Open Interest changed by -1,362 over the last session, with -1,220 on nearby two contracts and -142 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-08\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by -1,362 over the last session, with -1,220 on nearby two contracts and -142 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-10T06:04:46.898992",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by -1,362 over the last session, with -1,220 on nearby two contracts and -142 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6750,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-08",
+    "body": "IFUS KC Open Interest changed by -95 over the last session, with -1,893 on nearby two contracts and +1,798 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-08\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -95 over the last session, with -1,893 on nearby two contracts and +1,798 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-10T06:04:43.997484",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -95 over the last session, with -1,893 on nearby two contracts and +1,798 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6749,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-09",
+    "body": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260609_103232.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-10T06:03:45.063711",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6748,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-09",
+    "body": "KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260609.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-10T06:03:41.665131",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 6747,
     "title": "World Bank Population \u2013 2026-06-10",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3462,68 +3550,5 @@
     ],
     "meta": null,
     "pub_date": "2026-06-02T04:27:21.062420"
-  },
-  {
-    "id": 5788,
-    "title": "USD/BRL FX Rate \u2013 2026-06-02",
-    "body": "USD/BRL FX Rate price: 5.0290",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "fx",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-02T04:27:20.145719"
-  },
-  {
-    "id": 5803,
-    "title": "Build-Outs Of Coffee: Gray Squirrel Coffee Co. In Carrboro, NC",
-    "body": "Gray Squirrel Coffee Co. in Carrboro, North Carolina.",
-    "source": "Sprudge",
-    "category": "general",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/build-outs-of-coffee-gray-squirrel-coffee-co-in-carrboro-nc-996503.html",
-    "pub_date": "2026-06-01T17:30:23"
-  },
-  {
-    "id": 5804,
-    "title": "Roast Retreat Brings Michigan\u2019s Best Roasters Together For A One-Day Event In Detroit",
-    "body": "Roast Retreat takes place Saturday, August 1st at The Eastern in Detroit, Michigan.",
-    "source": "Sprudge",
-    "category": "demand",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/roast-retreat-brings-michigans-best-roasters-together-for-a-one-day-event-in-detroit-1028929.html",
-    "pub_date": "2026-06-01T17:14:42"
-  },
-  {
-    "id": 5781,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-01",
-    "body": "B3 Arabica 4/5 settlement: 330.55 USD/sac | OI: 97 contracts | Expiry: 2026-07-23",
-    "source": "B3",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "futures",
-      "brazil",
-      "arabica",
-      "b3"
-    ],
-    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 330.55, \"oi\": 97, \"mty\": \"2026-07-23\"}",
-    "pub_date": "2026-06-01T14:05:42.579212"
   }
 ]
