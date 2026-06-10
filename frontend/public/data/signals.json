@@ -242,8 +242,19 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS6",
+      "name": "Inversion Easing",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "NY",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "large",
+      "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
       "id": "CS1",
@@ -253,7 +264,7 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -264,7 +275,7 @@
       "market": "LDN",
       "severity": "warn",
       "score": -1,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
@@ -283,17 +294,6 @@
         }
       ],
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
-    },
-    {
-      "id": "SP3",
-      "name": "Spreading vs Inversion",
-      "category": "SP",
-      "categoryLabel": "Spreading",
-      "market": "NY",
-      "severity": "warn",
-      "score": 0,
-      "magnitude": "small",
-      "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     }
   ],
   "history": [
@@ -2573,8 +2573,19 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "large",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS6",
+          "name": "Inversion Easing",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "NY",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "large",
+          "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
           "id": "CS1",
@@ -2584,7 +2595,7 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2595,7 +2606,7 @@
           "market": "LDN",
           "severity": "warn",
           "score": -1,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
@@ -2614,17 +2625,6 @@
             }
           ],
           "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
-        },
-        {
-          "id": "SP3",
-          "name": "Spreading vs Inversion",
-          "category": "SP",
-          "categoryLabel": "Spreading",
-          "market": "NY",
-          "severity": "warn",
-          "score": 0,
-          "magnitude": "small",
-          "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         }
       ],
       "scoreNY": -1,
@@ -2633,5 +2633,5 @@
       "priceLDN": 3462
     }
   ],
-  "generatedAt": "2026-06-09T09:17:44.345Z"
+  "generatedAt": "2026-06-10T04:47:44.674Z"
 }
