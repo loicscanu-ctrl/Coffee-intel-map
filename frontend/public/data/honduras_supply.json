@@ -1,9 +1,9 @@
 {
   "country": "honduras",
-  "scraped_at": "2026-06-10T06:57:01.118577Z",
+  "scraped_at": "2026-06-10T11:22:20.975024Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-09",
+    "last_updated": "2026-06-10",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
