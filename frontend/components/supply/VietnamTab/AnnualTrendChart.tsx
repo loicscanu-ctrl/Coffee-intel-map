@@ -8,17 +8,33 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import { TT_STYLE, vnCropYearKey, kBagsToKT } from "./helpers";
 import type { ExportMonth } from "./MonthlyVolumeChart";
 
-/** Latest USDA PSD row the component needs for the balance-sheet projection.
- *  Read from /data/demand_stocks.json → producers.vietnam.annual[last]. */
+/** USDA PSD row shape from demand_stocks.json. We may consult two of them:
+ *  the latest realized year (proxy when no forecast exists) and the row
+ *  that explicitly carries the in-progress USDA marketing-year forecast. */
 interface VnPSDRow {
   year?: string;
-  stocks_mt?: number;        // ending stocks of THIS USDA row (= opening for the next)
+  begin_stocks_mt?: number;
+  stocks_mt?: number;
   production_mt?: number;
   consumption_mt?: number;
 }
 
+/** USDA MY for Vietnam (Oct–Sep) is labelled by the ENDING calendar year.
+ *  Currently in MY 25/26 (Oct 2025–Sep 2026) → label "2026". From Oct
+ *  onwards we roll into the next ending year. */
+function _inProgressUsdaYear(today: Date): string {
+  const m = today.getUTCMonth();      // 0..11
+  const y = today.getUTCFullYear();
+  return String(m >= 9 ? y + 1 : y);
+}
+
 export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }) {
-  const [psd, setPsd] = useState<VnPSDRow | null>(null);
+  // Two rows: the forecast for the in-progress USDA MY (if USDA has
+  // published it via GAIN already), and the latest realized row as a
+  // fallback proxy. Pre-merger demand_stocks only carries realized data,
+  // so we need both code paths.
+  const [forecastRow, setForecastRow] = useState<VnPSDRow | null>(null);
+  const [latestRow,   setLatestRow]   = useState<VnPSDRow | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,8 +42,11 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
         if (cancelled) return;
-        const rows = d?.producers?.vietnam?.annual ?? [];
-        setPsd(rows.length ? rows[rows.length - 1] : null);
+        const rows: VnPSDRow[] = d?.producers?.vietnam?.annual ?? [];
+        if (!rows.length) return;
+        const target = _inProgressUsdaYear(new Date());
+        setForecastRow(rows.find(r => r.year === target) ?? null);
+        setLatestRow(rows[rows.length - 1]);
       })
       .catch(() => { /* silent — projection falls back to "no gap" */ });
     return () => { cancelled = true; };
@@ -49,29 +68,40 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
     //                          + this year's production
     //                          − this year's consumption
     //
-    // The chart "projected (gap)" bar = expected_total − already_exported.
+    // Two source rows depending on what demand_stocks.json carries:
+    //   • `forecastRow` — USDA's GAIN forecast row for the in-progress MY
+    //     (added by the usda_gain_pdf scraper). begin_stocks_mt = opening
+    //     of THIS year; production/consumption are the published forecasts.
+    //   • `latestRow`   — the latest realized row, used as a proxy when no
+    //     GAIN forecast is in the file yet. The realized row's stocks_mt
+    //     (= ENDING of last year) = opening of THIS year; production /
+    //     consumption are used as proxies for the in-progress year.
     //
-    // `psd` is the latest USDA row in demand_stocks.json. USDA's Coffee MY
-    // for Vietnam (Oct–Sep) aligns 1:1 with our chart's crop year, so the
-    // latest row's `stocks_mt` = last year's ending = this year's opening,
-    // and its `production_mt` / `consumption_mt` are the best-available
-    // proxy for the in-progress year until USDA publishes the forward
-    // forecast (the GAIN PDF scraper backfills that on its next monthly
-    // run). Linear pace extrapolation is intentionally NOT used — that
-    // over-stated the gap because Vietnam's crop is heavily front-loaded.
+    // Linear pace extrapolation is intentionally NOT used — that overstated
+    // the gap because Vietnam's crop is heavily front-loaded.
     let proj = 0;
     let projTotal = 0;
     let projOpening = 0;
     let projProd    = 0;
     let projCons    = 0;
+    let psdYear: string | undefined;
+    let psdMode: "forecast" | "proxy" | null = null;
     const incomplete = byCrop[latestKey].months < 12;
-    if (psd && incomplete) {
-      projOpening = (psd.stocks_mt       ?? 0) / 1000;   // MT → kt
-      projProd    = (psd.production_mt   ?? 0) / 1000;
-      projCons    = (psd.consumption_mt  ?? 0) / 1000;
-      projTotal   = projOpening + projProd - projCons;
-      proj        = Math.max(0, projTotal - byCrop[latestKey].kt);
-      proj        = Math.round(proj * 10) / 10;
+    if (incomplete) {
+      const row = forecastRow ?? latestRow;
+      if (row) {
+        const openingMt = forecastRow
+          ? (forecastRow.begin_stocks_mt ?? 0)   // GAIN row: opening of in-progress year
+          : (latestRow?.stocks_mt        ?? 0);  // proxy: prior year's ENDING
+        projOpening = openingMt           / 1000;        // MT → kt
+        projProd    = (row.production_mt  ?? 0) / 1000;
+        projCons    = (row.consumption_mt ?? 0) / 1000;
+        projTotal   = projOpening + projProd - projCons;
+        proj        = Math.max(0, projTotal - byCrop[latestKey].kt);
+        proj        = Math.round(proj * 10) / 10;
+        psdYear     = row.year;
+        psdMode     = forecastRow ? "forecast" : "proxy";
+      }
     }
 
     return {
@@ -82,9 +112,9 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
         months:    byCrop[k].months,
       })),
       projMeta: { proj, total: projTotal, opening: projOpening, prod: projProd, cons: projCons,
-                  psdYear: psd?.year, incomplete },
+                  psdYear, psdMode, incomplete },
     };
-  }, [monthly, psd]);
+  }, [monthly, forecastRow, latestRow]);
 
   if (data.length < 2) return null;
 
@@ -98,15 +128,18 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
             <span
               className="ml-1 italic"
               title={
-                `Balance-sheet projection (USDA PSD ${projMeta.psdYear ?? "latest"} proxy):\n` +
-                `  + Opening stocks  ${Math.round(projMeta.opening).toLocaleString()} kt\n` +
-                `  + Production       ${Math.round(projMeta.prod).toLocaleString()} kt\n` +
-                `  − Consumption      ${Math.round(projMeta.cons).toLocaleString()} kt\n` +
-                `  = Expected exports ${Math.round(projMeta.total).toLocaleString()} kt`
+                `Balance-sheet projection (USDA PSD ${projMeta.psdYear ?? "latest"}` +
+                `${projMeta.psdMode === "forecast" ? " forecast" : " proxy"}):\n` +
+                `  + Opening stocks   ${Math.round(projMeta.opening).toLocaleString()} kt\n` +
+                `  + Production        ${Math.round(projMeta.prod).toLocaleString()} kt\n` +
+                `  − Consumption       ${Math.round(projMeta.cons).toLocaleString()} kt\n` +
+                `  = Expected exports  ${Math.round(projMeta.total).toLocaleString()} kt`
               }>
               · expected total {Math.round(projMeta.total).toLocaleString()} kt
               {projMeta.psdYear && (
-                <span className="text-slate-600 not-italic"> (USDA {projMeta.psdYear})</span>
+                <span className="text-slate-600 not-italic">
+                  {" "}(USDA {projMeta.psdYear}{projMeta.psdMode === "proxy" ? " proxy" : ""})
+                </span>
               )}
             </span>
           )}

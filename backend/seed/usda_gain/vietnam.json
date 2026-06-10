@@ -1,0 +1,26 @@
+{
+  "_doc": "USDA FAS GAIN Vietnam Coffee Annual — manually transcribed from VM2026-* (May 2026 release). Used as a seed fallback by scraper/sources/usda_gain_pdf.py when the live FAS landing-page fetch fails (current state: FAS Cloudflare-blocks GitHub Actions IPs with 403). Update when USDA publishes a new Coffee Annual or Coffee Semi-annual. Values are in metric tons (USDA's native PSD unit × 60 to convert from thousand 60-kg bags).",
+  "source": "USDA FAS GAIN VM2026-* (Vietnam Coffee Annual, May 2026)",
+  "last_updated": "2026-06-10",
+  "annual": [
+    {
+      "year": "2026",
+      "production_mt":      1902000,
+      "exports_mt":         1710000,
+      "bean_exports_mt":    1506000,
+      "soluble_exports_mt":  162000,
+      "roast_exports_mt":     42000,
+      "consumption_mt":      294000,
+      "stocks_mt":            54000,
+      "begin_stocks_mt":      23340,
+      "imports_mt":           51000
+    }
+  ],
+  "latest_year":            "2026",
+  "latest_production_mt":   1902000,
+  "latest_exports_mt":      1710000,
+  "latest_consumption_mt":  294000,
+  "latest_stocks_mt":       54000,
+  "latest_begin_stocks_mt": 23340,
+  "source_pdf": "https://www.fas.usda.gov/data/gain/2026/05/vietnam-coffee-annual"
+}

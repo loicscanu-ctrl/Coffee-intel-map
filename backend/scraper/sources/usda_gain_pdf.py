@@ -315,22 +315,48 @@ def fetch_pdf_text(pdf_url: str) -> str | None:
 
 def fetch_country_forecast(short: str) -> dict | None:
     """Top-level orchestrator: discover → fetch → parse → shape.
-    Returns the psd_coffee-compatible dict, or None on any step's failure."""
+
+    Live path (preferred): FAS landing page → newgainapi PDF link → pdfplumber.
+    Seed fallback: when the live path returns None for any reason (FAS
+    Cloudflare-blocks GitHub Actions IPs with 403 today), read a hand-
+    maintained file at `backend/seed/usda_gain/<short>.json` shaped exactly
+    like the live output. Lets us ship USDA-published forecasts even while
+    the live scrape is blocked. The seed wins the moment it exists, so the
+    operator can use it as a manual override too — same pattern as the
+    brazil_export_target.json seed."""
     slug = PRODUCER_SLUGS.get(short)
     if not slug:
         logger.info(f"[usda_gain] no slug registered for {short}")
         return None
+
     pdf_url = discover_latest_pdf_url(slug)
-    if not pdf_url:
+    if pdf_url:
+        text = fetch_pdf_text(pdf_url)
+        if text:
+            parsed = parse_psd_text(text)
+            shaped = to_psd_coffee_shape(parsed, short)
+            if shaped:
+                shaped["source_pdf"] = pdf_url
+                return shaped
+
+    # Live path produced nothing — try the seed.
+    seed = _load_seed(short)
+    if seed:
+        print(f"[usda_gain] {short}: using seed fallback (live FAS fetch unavailable)")
+        return seed
+    return None
+
+
+def _load_seed(short: str) -> dict | None:
+    """Return the committed seed override for a country, or None."""
+    seed_path = (Path(__file__).resolve().parents[2]
+                 / "seed" / "usda_gain" / f"{short}.json")
+    if not seed_path.exists():
         return None
-    text = fetch_pdf_text(pdf_url)
-    if not text:
+    try:
+        return json.loads(seed_path.read_text(encoding="utf-8"))
+    except Exception:                       # noqa: BLE001
         return None
-    parsed = parse_psd_text(text)
-    shaped = to_psd_coffee_shape(parsed, short)
-    if shaped:
-        shaped["source_pdf"] = pdf_url
-    return shaped
 
 
 # ── cache + DB integration ──────────────────────────────────────────────────
