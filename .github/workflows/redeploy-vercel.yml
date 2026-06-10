@@ -25,9 +25,21 @@ name: "1.12 – Daily Publish (Vercel redeploy)"
 
 on:
   schedule:
+    # NOTE: GH cron on this repo fires 4-5h LATE systematically (verified
+    # 2026-06-10). These crons are FALLBACKS — the primary trigger is the
+    # workflow_run chain below, which fires within minutes of the data
+    # actually landing.
     - cron: '41 3 * * *'
     - cron: '0 10 * * *'
   workflow_dispatch:
+  workflow_run:
+    # Deploy as soon as fresh data is committed: export-and-publish is the
+    # main daily publisher; ICE certified stocks commits its own JSONs
+    # outside the export. Each successful upstream completion triggers a
+    # deploy; the concurrency group serialises bursts and Vercel dedups
+    # identical builds, so chained deploys are cheap.
+    workflows: ["1.4 – Export and Publish Static JSON", "1.13 – ICE Certified Stocks (arabica + robusta)"]
+    types: [completed]
 
 concurrency:
   group: vercel-redeploy
@@ -35,6 +47,8 @@ concurrency:
 
 jobs:
   redeploy:
+    # Only deploy off a SUCCESSFUL upstream — a failed export shouldn't ship.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -52,16 +52,18 @@ jobs:
         run: |
           # Non-schedule triggers (push, workflow_dispatch) always run —
           # they exist precisely to refresh data outside the cron cycle.
+          # The primary daily trigger is an EXTERNAL cron service hitting
+          # workflow_dispatch at 01:07 UTC sharp, because GH cron on this
+          # repo fires 4-5h late systematically (verified 2026-06-10).
           if [ "$EVENT" != "schedule" ]; then
             echo "Non-schedule trigger ($EVENT) — proceeding."
             echo "skip=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          # The 01:07 UTC primary cron always runs.
-          if [ "$SCHEDULE" = "7 1 * * *" ]; then
-            echo "Primary 01:07 schedule — proceeding."
-            echo "skip=false" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          # 02:00 backup: skip if today already saw a successful run.
+          # BOTH crons (01:07 + 02:00) are now fallbacks behind the external
+          # dispatch: skip if today already saw a successful run, so the
+          # hours-late GH ticks don't re-run a chain the external trigger
+          # already completed. If the external service ever fails, the GH
+          # cron finds no success today and self-heals (hours late, but runs).
           today=$(date -u +%Y-%m-%d)
           export today THIS_RUN
           prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \

@@ -2,8 +2,21 @@ name: "1.3 – Daily OI Snapshot"
 
 on:
   schedule:
+    # NOTE: GH cron on this repo fires 4-5h LATE systematically (verified
+    # 2026-06-10 against 10 days of run history — every scheduled workflow
+    # repo-wide). This cron is therefore the FALLBACK; the primary trigger
+    # is the workflow_run chain off 1.1, whose head is dispatched at an
+    # exact time by an external cron service (see runbook in repo issue).
     - cron: "13 2 * * 1-5"  # 02:13 UTC every weekday — off the :00 mark to dodge GH cron skip
   workflow_dispatch:
+  workflow_run:
+    # Chain off the daily scraper so OI lands minutes after the scrape
+    # instead of waiting for this workflow's own (hours-late) cron. Only
+    # dispatch/schedule-originated scraper runs chain through — push-
+    # triggered scraper verifications (every backend/scraper/** merge)
+    # shouldn't cascade a full OI fetch.
+    workflows: ["1.1 – Daily News Scraper"]
+    types: [completed]
 
 concurrency:
   group: data-commit          # serialize all main-pushers
@@ -11,6 +24,9 @@ concurrency:
 
 jobs:
   fetch-oi:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'workflow_dispatch' || github.event.workflow_run.event == 'schedule')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,7 +35,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Weekend guard — no exchange OI to snapshot on Sat/Sun
+        id: weekday
+        # The cron is already Mon-Fri, but the workflow_run chain fires daily
+        # (the news scraper runs 7 days). Exit-success skip keeps the chain
+        # alive: export-and-publish still triggers off this run's completion.
+        run: |
+          dow=$(date -u +%u)
+          if [ "$dow" -ge 6 ]; then
+            echo "Weekend (dow=$dow) — skipping OI snapshot."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Python
+        if: steps.weekday.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -27,12 +58,14 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Cache Playwright browser
+        if: steps.weekday.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}
 
       - name: Install dependencies
+        if: steps.weekday.outputs.skip != 'true'
         # sqlalchemy/psycopg2/dotenv/jinja2 added so the orchestrator's tail
         # step (oi_news_emit) can write a news_feed row with the regime-matrix
         # commentary. No-op when DATABASE_URL is unset.
@@ -41,6 +74,7 @@ jobs:
           playwright install chromium --with-deps
 
       - name: Fetch OI (3 attempts)
+        if: steps.weekday.outputs.skip != 'true'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           PYTHONPATH: backend
@@ -51,9 +85,11 @@ jobs:
           done
 
       - name: Copy OI history to frontend
+        if: steps.weekday.outputs.skip != 'true'
         run: cp data/oi_history.json frontend/public/data/oi_history.json
 
       - name: Validate output
+        if: steps.weekday.outputs.skip != 'true'
         run: |
           python -c "
           import json, sys, subprocess
@@ -67,6 +103,7 @@ jobs:
           "
 
       - name: Commit updated OI data
+        if: steps.weekday.outputs.skip != 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
