@@ -100,7 +100,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Supply",
     description: "Cecafe daily cumulative registration (Arabica + Conilon) vs prior crop years.",
     Component: dynamic(() => import("@/components/supply/BrazilTab/DailyRegistration"), { ssr: false, loading }),
-    width: "half",
+    width: "full",
   },
   {
     id: "brazil_monthly_volume",
