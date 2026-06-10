@@ -9,14 +9,23 @@ name: "1.12 – Daily Publish (Vercel redeploy)"
 # out CI IPs), which made deploys hostage to the least-reliable source. Decoupled
 # here so the site publishes every day regardless of any single scraper.
 #
-# Schedule: 10:00 UTC — after the last daily data job (1.7 Cecafe, 09:00, plus
-# its ~25-min retry budget), so this deploy captures the full day's committed
-# data. workflow_dispatch gives a manual "deploy now" button in the Actions tab.
+# Schedule — two deploys a day:
+#   03:41 UTC  the MORNING deploy. The overnight chain ends with export-and-
+#              publish committing ~02:55 and ICE certified stocks ~03:05; this
+#              deploy puts all of it on production before the 04:00 UTC
+#              office-arrival target. Off the :00/:30 marks to dodge the GH
+#              cron skip documented across this repo's workflows.
+#   10:00 UTC  the CATCH-UP deploy — picks up the late, source-constrained
+#              jobs (VN water levels 10:00 fetch misses it and rides the next
+#              morning's deploy; weekly spot-coffee 06:00 Mon and port
+#              activity 06:17 Wed land here).
+# workflow_dispatch gives a manual "deploy now" button in the Actions tab.
 #
 # No-op until the VERCEL_DEPLOY_HOOK repo secret is set.
 
 on:
   schedule:
+    - cron: '41 3 * * *'
     - cron: '0 10 * * *'
   workflow_dispatch:
 
