@@ -151,6 +151,28 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
   const spreadLegend = spread ? `${spread.frontLabel}–${spread.nextLabel} spread` : "";
   const spreadUnit   = isRobusta ? "$/t" : "¢/lb";
 
+  // Collapse the legend to three entries: the highlighted next-FND contract
+  // (red), every other contract merged into one grey "Past contracts", and the
+  // amber front spread. The per-contract grey lines are otherwise indistinct and
+  // their ~10 legend rows crowded the plot (worst in the compact PDF).
+  const nextLabel = series.find((s) => s.symbol === nextSymbol)?.label ?? null;
+  const legendItems: { id: string; value: string; color: string }[] = [
+    ...(nextLabel ? [{ id: "next", value: `${nextLabel} · next FND`, color: NEXT_CONTRACT_COLOR }] : []),
+    { id: "past", value: "Past contracts", color: "#64748b" },
+    ...(spread ? [{ id: "spread", value: spreadLegend, color: SPREAD_COLOR }] : []),
+  ];
+  const renderLegend = () => (
+    <ul style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14,
+                 listStyle: "none", margin: 0, padding: "8px 0 0", fontSize: 11 }}>
+      {legendItems.map((it) => (
+        <li key={it.id} style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <span style={{ width: 16, borderTop: `2px solid ${it.color}`, display: "inline-block" }} />
+          <span className="recharts-legend-item-text" style={{ color: "#cbd5e1" }}>{it.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
   const chartData = buildChartData(series, spread);
 
   return (
@@ -202,10 +224,7 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
             }) satisfies Formatter<ValueType, NameType>}
             labelFormatter={((l) => `Day ${l} to FND`) satisfies LabelFmt}
           />
-          <Legend
-            wrapperStyle={{ fontSize: 11, color: "#94a3b8", paddingTop: 8 }}
-            formatter={(value) => <span style={{ color: "#cbd5e1" }}>{value}</span>}
-          />
+          <Legend content={renderLegend} />
           {series.map((s, i) => {
             const isNext = s.symbol === nextSymbol;
             return (

@@ -16,14 +16,13 @@
 const PAGE = `@page { size: A4; margin: 12mm; }`;
 const EXACT = `html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }`;
 
-// Fit-to-A4. The canvas already renders at ~A4 content width on screen (see
-// ReportCanvas), so charts are sized to fit the page — we must NOT rescale
-// Recharts SVGs here. Forcing width/height on them moves their absolutely-
-// positioned HTML legends out of place and warps the plot ("weird" charts).
-// So we only guard non-chart overflow (tables/images) and keep each chart card
-// whole across page breaks.
+// Fit-to-A4. The canvas renders at ~A4 content width (700px ≈ 186mm at the 12mm
+// @page margin), so it already fits the page 1:1 — render it at full size so
+// charts use the whole column. We must NOT force width/height on the Recharts
+// SVGs (that dislodges their absolutely-positioned HTML legends and warps the
+// plot); we only guard non-chart overflow and keep each card whole across pages.
 const FIT = `
-  #report-canvas { width: 100% !important; zoom: 0.8; }
+  #report-canvas { width: 100% !important; }
   #report-canvas img, #report-canvas table { max-width: 100% !important; }
   #report-canvas section { break-inside: avoid; page-break-inside: avoid; }
 `;
