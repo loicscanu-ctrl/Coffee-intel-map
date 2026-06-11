@@ -355,7 +355,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Macro",
     description: "Headline N-P-K prices (World Bank Pink Sheet) that drive coffee production cost, with history.",
     Component: dynamic(() => import("@/components/macro/FertilizerInputsPanel"), { ssr: false, loading }),
-    width: "full",
+    width: "half",
   },
 ];
 
