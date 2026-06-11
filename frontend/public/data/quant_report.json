@@ -1,234 +1,234 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-10T23:08:30.636619+00:00",
-    "index_value": 97.249323,
-    "daily_delta_i": -0.002656,
-    "daily_delta_pct": -0.265832,
-    "zscore": -0.555397,
-    "zscore_mean": 98.132458,
-    "zscore_std": 1.590096,
+    "scraped_at": "2026-06-11T23:06:33.588481+00:00",
+    "index_value": 97.062389,
+    "daily_delta_i": -0.000656,
+    "daily_delta_pct": -0.065648,
+    "zscore": -0.590458,
+    "zscore_mean": 97.999681,
+    "zscore_std": 1.587397,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.263193,
-        "contribution": -0.00135
+        "daily_chg": 0.013011,
+        "contribution": 6.7e-05
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": -0.037106,
-        "contribution": -9.7e-05
+        "daily_chg": 0.011409,
+        "contribution": 3e-05
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": -0.444777,
-        "contribution": -0.000569
+        "daily_chg": -0.524305,
+        "contribution": -0.000671
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": -1.28618,
-        "contribution": -0.000656
+        "daily_chg": 0.099613,
+        "contribution": 5.1e-05
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": -1.647104,
-        "contribution": -0.000774
+        "daily_chg": -0.358633,
+        "contribution": -0.000169
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.091553,
-        "contribution": 0.000616
+        "daily_chg": -0.008113,
+        "contribution": -5.5e-05
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": 0.064885,
-        "contribution": 6.2e-05
+        "daily_chg": 0.093294,
+        "contribution": 8.9e-05
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.176039,
-        "contribution": 9.2e-05
+        "daily_chg": -0.051725,
+        "contribution": -2.7e-05
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.070162,
-        "contribution": -3.6e-05
+        "daily_chg": 0.008719,
+        "contribution": 5e-06
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": -0.01131,
-        "contribution": -5e-06
+        "daily_chg": -0.067196,
+        "contribution": -3.1e-05
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": 0.364336,
-        "contribution": 0.000164
+        "daily_chg": 0.099614,
+        "contribution": 4.5e-05
       },
       {
         "ticker": "GBP=X",
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": -0.271368,
-        "contribution": -0.000103
+        "daily_chg": 0.026763,
+        "contribution": 1e-05
       }
     ],
     "history": [
       {
-        "date": "2026-05-12",
-        "value": 95.552036
-      },
-      {
         "date": "2026-05-13",
-        "value": 95.633305
+        "value": 95.512179
       },
       {
         "date": "2026-05-14",
-        "value": 96.604933
+        "value": 96.482576
       },
       {
         "date": "2026-05-15",
-        "value": 96.357384
+        "value": 96.235341
       },
       {
         "date": "2026-05-16",
-        "value": 96.867099
+        "value": 96.744411
       },
       {
         "date": "2026-05-17",
-        "value": 96.725756
+        "value": 96.603246
       },
       {
         "date": "2026-05-18",
-        "value": 96.909582
+        "value": 96.78684
       },
       {
         "date": "2026-05-19",
-        "value": 96.408223
+        "value": 96.286116
       },
       {
         "date": "2026-05-20",
-        "value": 96.720889
+        "value": 96.598385
       },
       {
         "date": "2026-05-21",
-        "value": 96.066746
+        "value": 95.945071
       },
       {
         "date": "2026-05-22",
-        "value": 96.001187
+        "value": 95.879595
       },
       {
         "date": "2026-05-23",
-        "value": 95.885185
+        "value": 95.76374
       },
       {
         "date": "2026-05-24",
-        "value": 95.984435
+        "value": 95.862864
       },
       {
         "date": "2026-05-25",
-        "value": 96.13148
+        "value": 96.009724
       },
       {
         "date": "2026-05-26",
-        "value": 95.851524
+        "value": 95.730122
       },
       {
         "date": "2026-05-27",
-        "value": 96.301534
+        "value": 96.179562
       },
       {
         "date": "2026-05-28",
-        "value": 96.375377
+        "value": 96.253311
       },
       {
         "date": "2026-05-29",
-        "value": 96.292534
+        "value": 96.170573
       },
       {
         "date": "2026-05-30",
-        "value": 96.312787
+        "value": 96.1908
       },
       {
         "date": "2026-05-31",
-        "value": 96.364052
+        "value": 96.242001
       },
       {
         "date": "2026-06-01",
-        "value": 96.371081
+        "value": 96.24902
       },
       {
         "date": "2026-06-02",
-        "value": 95.975311
+        "value": 95.853752
       },
       {
         "date": "2026-06-03",
-        "value": 95.836931
+        "value": 95.715547
       },
       {
         "date": "2026-06-04",
-        "value": 96.396356
+        "value": 96.274263
       },
       {
         "date": "2026-06-05",
-        "value": 96.347803
+        "value": 96.225772
       },
       {
         "date": "2026-06-06",
-        "value": 97.14649
+        "value": 97.023448
       },
       {
         "date": "2026-06-07",
-        "value": 97.161495
+        "value": 97.038434
       },
       {
         "date": "2026-06-08",
-        "value": 97.300552
+        "value": 97.177315
       },
       {
         "date": "2026-06-09",
-        "value": 97.508532
+        "value": 97.385031
       },
       {
         "date": "2026-06-10",
-        "value": 97.249323
+        "value": 97.12615
+      },
+      {
+        "date": "2026-06-11",
+        "value": 97.062389
       }
     ]
   },
-  "scraped_at": "2026-06-10T23:17:47.236476Z",
+  "scraped_at": "2026-06-11T23:06:33.588481+00:00",
   "sentiment": {
     "available": false,
     "reason": "sentiment crashed: (psycopg2.OperationalError) connection to server at \"aws-1-ap-northeast-1.pooler.supabase.com\" (57.182.231.186), port 6543 failed: Connection timed out\n\tIs the server running on that host and accepting TCP/IP connections?\nconnection to server at \"aws-1-ap-northeast-1.pooler.supabase.com\" (13.114.6.6), port 6543 failed: Connection timed out\n\tIs the server running on that host and accepting TCP/IP connections?\n\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
