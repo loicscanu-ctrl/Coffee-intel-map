@@ -390,7 +390,14 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
     for line in text.splitlines():
         low = line.lower()
         for c in known_countries:
-            if re.search(rf"\b{re.escape(c)}\b", low):
+            # Tolerate rank-prefix without space ("2Germany"). pdfplumber's
+            # text extraction sometimes drops the space between the row
+            # number and the country name, so a plain \b boundary at the
+            # left fails on those rows (digit→letter isn't a word boundary).
+            # Use a negative lookbehind on letters instead — matches both
+            # "1 Italy" and "2Germany" but not "Burundi" inside another
+            # word.
+            if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
                 nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
                 # No Uganda destination has ever shipped > 250k bags in a
                 # single month (Italy's monthly peak ≈ 200k). Cap at 250k
@@ -400,7 +407,14 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
                 # polluting the all-time aggregate.
                 nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
                 if nums:
-                    rep.by_destination.append({"country": c.title(), "bags": nums[0]})
+                    # Pick the LARGEST plausible value on the row — that's
+                    # the Total column (Robusta + Arabica). Picking the
+                    # first plausible number was returning the Robusta-only
+                    # column for every multi-stream destination (Italy total
+                    # 198,746 → was being read as 183,308 Robusta-only;
+                    # India total 38,833 → as 35,233; etc.). %share columns
+                    # (39.67, 71.44 etc.) are < 100 so already rejected.
+                    rep.by_destination.append({"country": c.title(), "bags": max(nums)})
                 break
     # Dedupe destinations.
     seen_c: set[str] = set()

@@ -105,6 +105,57 @@ Screen 18    180,000   35.0%
     assert rep.robusta_bags == 180_000
 
 
+def test_v1_destination_picks_total_column_not_robusta_only():
+    """Regression: user spot-checked August 2022 against the source PDF and
+    found the parser was reading the ROBUSTA column for multi-stream
+    destinations (Italy 183,308 instead of Total 198,746; India 35,233
+    instead of Total 38,833; Belgium 27,820 instead of Total 28,170).
+    The Total column is reliably the largest plausible cell on the row;
+    %share columns (39.67, etc.) are < 100 and already rejected by the
+    cap filter."""
+    text = """\
+MONTHLY COFFEE REPORT - AUGUST 2022
+
+Annex 3: Destinations
+1 Italy 1 183,308 15,438 198,746 39.67 39.67
+2Germany 3 62,875 6,423 69,298 13.83 53.50
+3Sudan 2 51,100 51,100 10.20 63.69
+4 India 4 35,233 3,600 38,833 7.75 71.44
+5Belgium 5 27,820 350 28,170 5.62 77.07
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    dests = {d["country"]: d["bags"] for d in rep.by_destination}
+    # The Total column wins for multi-stream destinations.
+    assert dests["Italy"]   == 198_746
+    assert dests["India"]   == 38_833
+    assert dests["Belgium"] == 28_170
+    # Single-stream rows return the only value (= the Total).
+    assert dests["Sudan"]   == 51_100
+
+
+def test_v1_destination_matches_country_after_rank_without_space():
+    """Regression: "2Germany 3 62,875 ..." with no space between the rank
+    number and the country name didn't match `\\bgermany\\b` (digit→letter
+    is not a word boundary). Switched to a negative lookbehind on letters
+    so both layouts work."""
+    text = """\
+MONTHLY COFFEE REPORT - AUGUST 2022
+
+1 Italy 1 100,000 50,000 150,000
+2Germany 3 62,875 6,423 69,298 13.83 53.50
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    dests = {d["country"]: d["bags"] for d in rep.by_destination}
+    assert "Germany" in dests
+    assert dests["Germany"] == 69_298
+    # The lookbehind still rejects mid-word matches (e.g. "Mauritania"
+    # shouldn't trigger "Mauritania"-not-in-list, but neither would a
+    # false positive on "germanypoint"). Easy to check Italy stays clean.
+    assert "Italy" in dests
+
+
 def test_v1_destination_rejects_pdfplumber_outliers():
     """Regression for the Feb-2024 India = 20,242,023 outlier. pdfplumber's
     text extraction occasionally concatenates two adjacent cells across rows
