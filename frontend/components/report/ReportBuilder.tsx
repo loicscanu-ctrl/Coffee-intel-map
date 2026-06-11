@@ -16,6 +16,19 @@ import ReportCanvas from "./ReportCanvas";
 
 type PrintTheme = "light" | "dark";
 
+/** Bucket items by a key, preserving first-seen (registry) order of both the
+ *  buckets and the items within them. Key `undefined` = "no group". */
+function orderedBy<T>(arr: T[], key: (t: T) => string | undefined): [string | undefined, T[]][] {
+  const out: [string | undefined, T[]][] = [];
+  const idx = new Map<string | undefined, number>();
+  for (const it of arr) {
+    const k = key(it);
+    if (!idx.has(k)) { idx.set(k, out.length); out.push([k, []]); }
+    out[idx.get(k)!][1].push(it);
+  }
+  return out;
+}
+
 export default function ReportBuilder() {
   const selectedIds = useReportStore((s) => s.selectedIds);
   const toggle = useReportStore((s) => s.toggle);
@@ -88,7 +101,9 @@ export default function ReportBuilder() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 p-4">
-        {/* The cart */}
+        {/* The cart — mirrors the app's tab hierarchy: category → group (origin)
+            → subgroup (Exports / S&D / Weather) → visual. Descriptions are
+            dropped to keep the list compact. */}
         <div className="space-y-4">
           {REPORT_CATEGORIES.map((cat) => {
             const items = REPORT_REGISTRY.filter((d) => d.category === cat);
@@ -97,33 +112,47 @@ export default function ReportBuilder() {
               <div key={cat}>
                 <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">{cat}</div>
                 <div className="space-y-1.5">
-                  {items.map((d) => {
-                    const checked = mounted && selectedIds.includes(d.id);
-                    return (
-                      <label
-                        key={d.id}
-                        className={`flex items-start gap-2.5 rounded-lg border px-2.5 py-2 cursor-pointer transition-colors
-                          ${checked
-                            ? "border-amber-600/50 bg-amber-500/5"
-                            : "border-slate-800 bg-slate-950/40 hover:border-slate-700"}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggle(d.id)}
-                          className="mt-0.5 accent-amber-500"
-                        />
-                        <span>
-                          <span className="block text-xs font-medium text-slate-200">{d.label}</span>
-                          {d.description && (
-                            <span className="block text-[10px] text-slate-500 leading-snug mt-0.5">
-                              {d.description}
-                            </span>
+                  {orderedBy(items, (d) => d.group).map(([group, gItems]) => (
+                    <div key={group ?? "_"} className={group ? "pl-2 border-l border-slate-800/80 space-y-1" : "space-y-1"}>
+                      {group && (
+                        <div className="text-[11px] font-semibold text-slate-300">{group}</div>
+                      )}
+                      {orderedBy(gItems, (d) => d.subgroup).map(([sub, sItems]) => (
+                        <div key={sub ?? "_"} className={sub ? "pl-2" : ""}>
+                          {sub && (
+                            <div className="text-[8.5px] uppercase tracking-wider text-slate-600 mb-0.5 mt-1">{sub}</div>
                           )}
-                        </span>
-                      </label>
-                    );
-                  })}
+                          <div className="space-y-1">
+                            {sItems.map((d) => {
+                              const checked = mounted && selectedIds.includes(d.id);
+                              // Strip the redundant "Origin — " prefix when nested
+                              // under that origin's group header.
+                              const label = group && d.label.startsWith(`${group} — `)
+                                ? d.label.slice(group.length + 3)
+                                : d.label;
+                              return (
+                                <label
+                                  key={d.id}
+                                  className={`flex items-center gap-2.5 rounded-md border px-2.5 py-1.5 cursor-pointer transition-colors
+                                    ${checked
+                                      ? "border-amber-600/50 bg-amber-500/5"
+                                      : "border-slate-800 bg-slate-950/40 hover:border-slate-700"}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => toggle(d.id)}
+                                    className="accent-amber-500"
+                                  />
+                                  <span className="text-xs font-medium text-slate-200">{label}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             );
