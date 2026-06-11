@@ -1,13 +1,14 @@
 "use client";
 import { useMemo, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend,
   ResponsiveContainer,
 } from "recharts";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { TT_STYLE, bagsToKT, type UgandaMonthlyRow } from "./helpers";
 
 type Window = "L12M" | "L24M" | "CTD" | "ALL";
+type Mode   = "total" | "stack";
 
 const WINDOW_LABELS: Record<Window, string> = {
   L12M: "Last 12 months",
@@ -22,13 +23,28 @@ const COLORS = [
   "#f43f5e", "#ef4444", "#f97316", "#eab308", "#65a30d",
 ];
 
+interface AggRow {
+  country: string;
+  robusta_bags: number;
+  arabica_bags: number;
+  total_bags: number;
+  robusta_kt: number;
+  arabica_kt: number;
+  total_kt:   number;
+}
+
 export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMonthlyRow[] }) {
   const [window, setWindow] = useState<Window>("L12M");
   const [topN, setTopN]     = useState(10);
+  const [mode, setMode]     = useState<Mode>("stack");
 
-  // Filter `monthly` to the active window, then aggregate by_destination.
-  const data = useMemo(() => {
-    if (!monthly.length) return [];
+  // Filter `monthly` to the active window, then aggregate by_destination
+  // with Robusta + Arabica + Total. The R/A split lands on each row once
+  // the UCDA scraper writes the enriched schema (PR #296 onwards). Rows
+  // from older runs only carry `bags`; we treat their R/A as 0 so the
+  // stacked view still renders a meaningful column.
+  const { data, hasSplit } = useMemo<{ data: AggRow[]; hasSplit: boolean }>(() => {
+    if (!monthly.length) return { data: [], hasSplit: false };
     const sorted = monthly.slice().sort((a, b) => a.month.localeCompare(b.month));
     const latestYm = sorted[sorted.length - 1].month;
     const [latestY, latestM] = latestYm.split("-").map(Number);
@@ -47,28 +63,47 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
       // CTD: same crop year (Oct-Sep) as latest month.
       const cropStartY = latestM >= 10 ? latestY : latestY - 1;
       const cropEndY   = cropStartY + 1;
-      const cropStart  = cropStartY * 12 + 10;        // Oct of start year
-      const cropEnd    = cropEndY * 12 + 9;           // Sep of end year
+      const cropStart  = cropStartY * 12 + 10;
+      const cropEnd    = cropEndY * 12 + 9;
       const idx        = y * 12 + m;
       return idx >= cropStart && idx <= cropEnd;
     };
 
-    const agg: Record<string, number> = {};
+    interface Acc { robusta_bags: number; arabica_bags: number; total_bags: number }
+    const agg: Record<string, Acc> = {};
+    let anySplit = false;
     for (const r of sorted) {
       if (!inWindow(r.month) || !r.by_destination) continue;
       for (const d of r.by_destination) {
-        agg[d.country] = (agg[d.country] ?? 0) + (d.bags ?? 0);
+        const dRec = d as { country: string; bags?: number;
+          robusta_bags?: number; arabica_bags?: number };
+        if (!agg[dRec.country]) agg[dRec.country] = { robusta_bags: 0, arabica_bags: 0, total_bags: 0 };
+        const rob = dRec.robusta_bags ?? 0;
+        const ara = dRec.arabica_bags ?? 0;
+        if (rob || ara) anySplit = true;
+        agg[dRec.country].robusta_bags += rob;
+        agg[dRec.country].arabica_bags += ara;
+        agg[dRec.country].total_bags   += dRec.bags ?? 0;
       }
     }
     const rows = Object.entries(agg)
-      .map(([country, bags]) => ({ country, bags, kt: bagsToKT(bags) }))
-      .sort((a, b) => b.bags - a.bags)
+      .map(([country, a]) => ({
+        country,
+        robusta_bags: a.robusta_bags,
+        arabica_bags: a.arabica_bags,
+        total_bags:   a.total_bags,
+        robusta_kt:   bagsToKT(a.robusta_bags),
+        arabica_kt:   bagsToKT(a.arabica_bags),
+        total_kt:     bagsToKT(a.total_bags),
+      }))
+      .sort((a, b) => b.total_bags - a.total_bags)
       .slice(0, topN);
-    return rows;
+    return { data: rows, hasSplit: anySplit };
   }, [monthly, window, topN]);
 
   if (data.length === 0) return null;
-  const totalKt = data.reduce((s, r) => s + r.kt, 0);
+  const totalKt = data.reduce((s, r) => s + r.total_kt, 0);
+  const effectiveMode: Mode = hasSplit ? mode : "total";
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -80,7 +115,7 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
             <span className="ml-2 text-slate-600">· Total {Math.round(totalKt).toLocaleString()} kt</span>
           </div>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
           {(["L12M", "L24M", "CTD", "ALL"] as Window[]).map(w => (
             <button key={w} onClick={() => setWindow(w)}
               className={`text-[10px] px-2 py-0.5 rounded ${window === w ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
@@ -94,21 +129,48 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
               top {n}
             </button>
           ))}
+          {hasSplit && (
+            <>
+              <span className="text-slate-700 mx-1">·</span>
+              {(["total", "stack"] as Mode[]).map(m => (
+                <button key={m} onClick={() => setMode(m)}
+                  className={`text-[10px] px-2 py-0.5 rounded ${mode === m ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}
+                  title={m === "stack" ? "Stack Robusta + Arabica per country" : "Show Total only"}>
+                  {m === "stack" ? "R/A split" : "Total"}
+                </button>
+              ))}
+            </>
+          )}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={Math.max(180, data.length * 24)}>
+      <ResponsiveContainer width="100%" height={Math.max(180, data.length * 26)}>
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, bottom: 4, left: 60 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis type="number" tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis dataKey="country" type="category" tick={{ fill: "#cbd5e1", fontSize: 10 }} width={90} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={((v, _name, p) => {
-              const row = p?.payload as { country?: string; bags?: number; kt?: number } | undefined;
-              return [`${v} kt (${row?.bags?.toLocaleString() ?? "—"} bags)`, row?.country as NameType];
+            formatter={((v, name, p) => {
+              const row = p?.payload as AggRow | undefined;
+              if (name === "robusta_kt") return [`${v} kt`, "Robusta" as NameType];
+              if (name === "arabica_kt") return [`${v} kt`, "Arabica" as NameType];
+              return [`${v} kt (${row?.total_bags.toLocaleString() ?? "—"} bags)`, row?.country as NameType];
             }) satisfies Formatter<ValueType, NameType>} />
-          <Bar dataKey="kt">
-            {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-          </Bar>
+          {effectiveMode === "stack" ? (
+            <>
+              <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
+                formatter={v => (
+                  <span style={{ color: "#cbd5e1" }}>
+                    {v === "robusta_kt" ? "Robusta" : v === "arabica_kt" ? "Arabica" : v}
+                  </span>
+                )} />
+              <Bar dataKey="robusta_kt" name="robusta_kt" stackId="a" fill="#f59e0b" />
+              <Bar dataKey="arabica_kt" name="arabica_kt" stackId="a" fill="#22c55e" />
+            </>
+          ) : (
+            <Bar dataKey="total_kt">
+              {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+            </Bar>
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
