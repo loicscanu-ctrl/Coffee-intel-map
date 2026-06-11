@@ -2295,10 +2295,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 636458
-        },
-        {
           "country": "Greece",
           "bags": 320
         },
@@ -2386,7 +2382,7 @@
       "by_destination": [
         {
           "country": "Brazil",
-          "bags": 543279
+          "bags": 2021
         },
         {
           "country": "Italy",
@@ -5522,16 +5518,16 @@
       ],
       "by_destination": [
         {
-          "country": "India",
-          "bags": 20242023
-        },
-        {
           "country": "Brazil",
           "bags": 164
         },
         {
           "country": "Italy",
           "bags": 149362
+        },
+        {
+          "country": "India",
+          "bags": 45313
         },
         {
           "country": "Sudan",
@@ -5869,7 +5865,7 @@
         },
         {
           "country": "Italy",
-          "bags": 261921
+          "bags": 29858
         },
         {
           "country": "Germany",
@@ -6063,7 +6059,7 @@
         },
         {
           "country": "Italy",
-          "bags": 284495
+          "bags": 26764
         },
         {
           "country": "Germany",
