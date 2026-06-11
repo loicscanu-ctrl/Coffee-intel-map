@@ -1,8 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
+import UgandaCumulativePaceChart from "@/components/supply/uganda/UgandaCumulativePaceChart";
+import UgandaDestinationChart from "@/components/supply/uganda/UgandaDestinationChart";
 import UgandaExportPanel from "@/components/supply/uganda/UgandaExportPanel";
 import UgandaFarmerEconomics from "@/components/supply/uganda/UgandaFarmerEconomics";
+import UgandaMonthlyVolumeChart from "@/components/supply/uganda/UgandaMonthlyVolumeChart";
+import UgandaTypeShareChart from "@/components/supply/uganda/UgandaTypeShareChart";
+import type { UgandaMonthlyFile, UgandaMonthlyRow } from "@/components/supply/uganda/helpers";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 import UgandaDestPanel from "@/components/supply/uganda/UgandaDestinationsPanel";
@@ -90,6 +95,7 @@ const DEFAULT_MIX = {
 export default function UgandaTab() {
   const [subTab, setSubTab] = useState<SubTab>("exports");
   const [data, setData]     = useState<UgandaSupply | null>(null);
+  const [monthly, setMonthly] = useState<UgandaMonthlyRow[] | null>(null);
   const [error, setError]   = useState(false);
 
   useEffect(() => {
@@ -97,6 +103,15 @@ export default function UgandaTab() {
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
+  }, []);
+
+  // uganda_monthly.json — multi-year UCDA series (parsed by the scraper).
+  // Drives the Brazil-style chart suite below; absent file is non-fatal.
+  useEffect(() => {
+    fetch("/data/uganda_monthly.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: UgandaMonthlyFile | null) => d && setMonthly(d.series ?? []))
+      .catch(() => { /* file absent → charts hidden gracefully */ });
   }, []);
 
   return (
@@ -144,7 +159,20 @@ export default function UgandaTab() {
               ucda_price={data.ucda_price ?? null}
               ucda_detail={data.ucda_detail ?? null}
             />
-            <UgandaAnnualTrendChart monthly={data.exports.monthly} />
+            {/* Brazil-style chart suite — driven by uganda_monthly.json
+                (multi-year UCDA history from the scraper). Falls back to
+                the legacy 28-month feed when the UCDA file is absent. */}
+            {monthly && monthly.length > 0 ? (
+              <>
+                <UgandaMonthlyVolumeChart monthly={monthly} />
+                <UgandaCumulativePaceChart monthly={monthly} />
+                <UgandaAnnualTrendChart monthly={monthly} />
+                <UgandaTypeShareChart monthly={monthly} />
+                <UgandaDestinationChart monthly={monthly} />
+              </>
+            ) : (
+              <UgandaAnnualTrendChart monthly={data.exports.monthly} />
+            )}
           </div>
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
