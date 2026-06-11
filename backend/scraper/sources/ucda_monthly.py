@@ -398,10 +398,18 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
                 if nums:
                     rep.by_grade.append({"grade": label, "bags": nums[0]})
                 break
-    # Dedupe (in case the same grade hits multiple lines, keep first).
-    seen_g: set[str] = set()
-    rep.by_grade = [g for g in rep.by_grade
-                    if not (g["grade"] in seen_g or seen_g.add(g["grade"]))]
+    # Dedupe — keep the LARGEST value per grade when the parser sees the
+    # same name more than once. Two cases produce dupes: (a) narrative
+    # mentions of a grade before the table (often tiny numbers from prior-
+    # period comparisons), (b) the table line being split across two
+    # pdfplumber lines so the same grade fires twice. Keeping max(bags)
+    # picks the real table row over the narrative noise.
+    _g_max: dict[str, int] = {}
+    for g in rep.by_grade:
+        cur = _g_max.get(g["grade"], 0)
+        if g["bags"] > cur:
+            _g_max[g["grade"]] = g["bags"]
+    rep.by_grade = [{"grade": name, "bags": bags} for name, bags in _g_max.items()]
 
     # Destinations — a "country …  N bags" table pattern. Country names from
     # the common UCDA destination set; very permissive on the number column.
@@ -446,10 +454,17 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
                         "arabica_bags": ara,
                     })
                 break
-    # Dedupe destinations.
-    seen_c: set[str] = set()
-    rep.by_destination = [d for d in rep.by_destination
-                          if not (d["country"] in seen_c or seen_c.add(d["country"]))]
+    # Dedupe destinations — keep the LARGEST value per country (same logic as
+    # grades above). Sanity-check from PR #297 surfaced an August 2022 Germany
+    # row of 2,022 bags because a narrative mention earlier in the PDF fired
+    # the regex before the real Annex 3 table row (69,298 bags). max(bags)
+    # rejects those narrative-noise dupes and keeps the table cell.
+    _d_max: dict[str, dict] = {}
+    for d in rep.by_destination:
+        cur = _d_max.get(d["country"])
+        if cur is None or d["bags"] > cur["bags"]:
+            _d_max[d["country"]] = d
+    rep.by_destination = list(_d_max.values())
 
     # Derive robusta/arabica/total volumes from the grade table — these are
     # MUCH more reliable than regex-matching "Total Robusta" out of the text
