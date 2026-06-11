@@ -356,6 +356,98 @@ def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
     return R, A, T
 
 
+# Markers that flag the start / end of the destinations table across the
+# observed UCDA report formats. The Annex number drifts between years (Annex
+# 3 in 2022-23, Annex 4 in 2024, etc.); detecting any of them is fine since
+# we use the FIRST matched header position. End markers stop the scope so
+# we don't pick up countries from the following section (TRADE ACTORS,
+# EXPORTERS, BUYERS — all of which mention countries too).
+_DEST_START_MARKERS = (
+    "Main Destinations of Uganda",
+    "DESTINATION POSITION HELD",
+    "Destinations of Uganda Coffee",
+    "Top Destinations",
+)
+_DEST_END_MARKERS = (
+    "Annex 4:", "Annex 5:", "Annex 6:", "Annex 7:", "Annex 8:",
+    "TRADE ACTORS", "Trade Actors",
+    "EXPORTERS", "Top Exporters", "Top Coffee Exporters",
+    "BUYERS", "Top Buyers", "Top International Buyers",
+    "GRADE BREAKDOWN", "Grade Breakdown",
+    "Top Coffee Exporters",
+)
+
+
+def _extract_destinations_table(text: str, known_countries: tuple[str, ...]) -> list[dict]:
+    """Slice the text at the destinations-table boundaries and walk every
+    country match inside that scope.
+
+    Why this approach beats the line-by-line scan:
+      • pdfplumber sometimes collapses an entire table page onto one line —
+        the `break`-after-first-match in the old scan dropped every country
+        except the first when this happened (the 2024-26 under-counting
+        pattern in the sanity check).
+      • Narrative paragraphs and trade-actor tables mention country names
+        too; the old scan added their (small) numbers as if they were
+        destination cells (the 2020-23 over-counting pattern).
+
+    Returns a list shaped like the old line-by-line output. Empty list when
+    no table header is found, signalling the caller to fall back to the
+    flat scan."""
+    # Find the start of the destinations table by scanning for any known
+    # header marker. Headers can be wrapped across lines (newline before /
+    # after) so we search case-insensitively.
+    table_start = -1
+    low = text.lower()
+    for marker in _DEST_START_MARKERS:
+        i = low.find(marker.lower())
+        if i >= 0:
+            table_start = i
+            break
+    if table_start < 0:
+        return []
+
+    # Find the end of the table — first end-marker strictly after the start.
+    # If nothing matches, run to the end of the text (the report's last
+    # section is sometimes the destinations table itself).
+    table_end = len(text)
+    for end_marker in _DEST_END_MARKERS:
+        i = low.find(end_marker.lower(), table_start + 30)
+        if 0 < i < table_end:
+            table_end = i
+
+    scope = text[table_start:table_end]
+
+    # Find every (position, country) inside the scope, sorted by position.
+    positions: list[tuple[int, str]] = []
+    for c in known_countries:
+        for m in re.finditer(rf"(?<![A-Za-z]){re.escape(c)}\b", scope, re.I):
+            positions.append((m.start(), c))
+    if not positions:
+        return []
+    positions.sort(key=lambda p: p[0])
+
+    # Slice the scope between consecutive country positions and extract the
+    # numeric cells from each per-row segment. Each country claims the text
+    # from its name to the next country's name (or scope end if last).
+    out: list[dict] = []
+    for i, (pos, country) in enumerate(positions):
+        next_pos = positions[i + 1][0] if i + 1 < len(positions) else len(scope)
+        row_text = scope[pos:next_pos]
+        nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(row_text)]
+        nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
+        if not nums:
+            continue
+        rob, ara, tot = _split_dest_row(nums)
+        out.append({
+            "country":      country.title(),
+            "bags":         tot,
+            "robusta_bags": rob,
+            "arabica_bags": ara,
+        })
+    return out
+
+
 def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
     """First-pass parser modelled on the recent (2024+) report layout
     suggested by UCDA's search snippets ("Period/Coffee Type … Qty(60-kg bags)
@@ -411,8 +503,18 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
             _g_max[g["grade"]] = g["bags"]
     rep.by_grade = [{"grade": name, "bags": bags} for name, bags in _g_max.items()]
 
-    # Destinations — a "country …  N bags" table pattern. Country names from
-    # the common UCDA destination set; very permissive on the number column.
+    # Destinations — TWO-STAGE approach. The original line-by-line scan was
+    # fragile because (a) pdfplumber sometimes collapses multiple table rows
+    # onto one parsed line (causing the `break`-after-first-match to drop
+    # every country except the first), and (b) narrative paragraphs
+    # mentioning country names anywhere in the PDF added noise. The new
+    # `_extract_destinations_table` slices the text at the Annex header
+    # boundaries first, then walks every country position inside that
+    # scope, taking the per-row substring between consecutive matches as
+    # the source of cells. Both stages share the same _split_dest_row
+    # heuristic for R / A / Total. The line-by-line fallback runs only if
+    # the table-slicing path returns nothing, so older formats without the
+    # Annex header still get a best-effort extraction.
     known_countries = (
         "italy", "germany", "sudan", "belgium", "morocco", "spain", "usa",
         "united states", "kenya", "russia", "russian federation", "switzerland",
@@ -421,44 +523,34 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
         "egypt", "turkey", "korea", "south korea", "portugal", "greece",
         "ethiopia", "rwanda", "tanzania", "burundi", "south sudan", "djibouti",
         "algeria", "tunisia", "australia", "canada", "mexico", "brazil",
+        "estonia", "poland", "romania", "singapore", "croatia", "israel",
     )
-    for line in text.splitlines():
-        low = line.lower()
-        for c in known_countries:
-            # Tolerate rank-prefix without space ("2Germany"). pdfplumber's
-            # text extraction sometimes drops the space between the row
-            # number and the country name, so a plain \b boundary at the
-            # left fails on those rows (digit→letter isn't a word boundary).
-            # Use a negative lookbehind on letters instead — matches both
-            # "1 Italy" and "2Germany" but not "Burundi" inside another
-            # word.
-            if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
-                nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                # No Uganda destination has ever shipped > 250k bags in a
-                # single month (Italy's monthly peak ≈ 200k). Cap at 250k
-                # so a pdfplumber cell-concatenation artifact like the
-                # Feb-2024 India=20,242,023 outlier (vs the real 48,303
-                # bag total in that report) gets rejected instead of
-                # polluting the all-time aggregate.
-                nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
-                if nums:
-                    rob, ara, tot = _split_dest_row(nums)
-                    # Keep `bags` = total as the canonical aggregate the
-                    # frontend already consumes; surface the split as
-                    # `robusta_bags` / `arabica_bags` so any future
-                    # stacked-bar visual can use them.
-                    rep.by_destination.append({
-                        "country":      c.title(),
-                        "bags":         tot,
-                        "robusta_bags": rob,
-                        "arabica_bags": ara,
-                    })
-                break
-    # Dedupe destinations — keep the LARGEST value per country (same logic as
-    # grades above). Sanity-check from PR #297 surfaced an August 2022 Germany
-    # row of 2,022 bags because a narrative mention earlier in the PDF fired
-    # the regex before the real Annex 3 table row (69,298 bags). max(bags)
-    # rejects those narrative-noise dupes and keeps the table cell.
+    sliced = _extract_destinations_table(text, known_countries)
+    if sliced:
+        rep.by_destination = sliced
+    else:
+        for line in text.splitlines():
+            low = line.lower()
+            for c in known_countries:
+                # Tolerate rank-prefix without space ("2Germany"): negative
+                # lookbehind on letters instead of \b so "2Germany" matches
+                # (digit→letter is not a word boundary).
+                if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
+                    nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
+                    nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
+                    if nums:
+                        rob, ara, tot = _split_dest_row(nums)
+                        rep.by_destination.append({
+                            "country":      c.title(),
+                            "bags":         tot,
+                            "robusta_bags": rob,
+                            "arabica_bags": ara,
+                        })
+                    break
+    # Dedupe destinations — keep the LARGEST value per country. Sanity-check
+    # from PR #297 surfaced an August 2022 Germany row of 2,022 bags because
+    # a narrative mention earlier in the PDF fired the regex before the real
+    # Annex 3 table row (69,298 bags). max(bags) rejects those.
     _d_max: dict[str, dict] = {}
     for d in rep.by_destination:
         cur = _d_max.get(d["country"])
