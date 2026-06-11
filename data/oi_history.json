@@ -1,6 +1,56 @@
 {
   "arabica": [
     {
+      "date": "2026-06-09",
+      "contracts": [
+        {
+          "symbol": "KCN26",
+          "oi": 46011,
+          "last_price": 244.4
+        },
+        {
+          "symbol": "KCU26",
+          "oi": 84258,
+          "last_price": 240.9
+        },
+        {
+          "symbol": "KCZ26",
+          "oi": 49408,
+          "last_price": 233.9
+        },
+        {
+          "symbol": "KCH27",
+          "oi": 17561,
+          "last_price": 231.75
+        },
+        {
+          "symbol": "KCK27",
+          "oi": 6542,
+          "last_price": 231.75
+        },
+        {
+          "symbol": "KCN27",
+          "oi": 4410,
+          "last_price": 232.35
+        },
+        {
+          "symbol": "KCU27",
+          "oi": 1900,
+          "last_price": 232.15
+        },
+        {
+          "symbol": "KCZ27",
+          "oi": 2697,
+          "last_price": 231.8
+        },
+        {
+          "symbol": "KCH28",
+          "oi": 732,
+          "last_price": 231.55
+        }
+      ]
+    },
+    {
       "date": "2026-06-08",
       "contracts": [
         {
@@ -649,59 +699,59 @@
           "last_price": 250.85
         }
       ]
-    },
-    {
-      "date": "2026-05-20",
-      "contracts": [
-        {
-          "symbol": "KCN26",
-          "oi": 75945,
-          "last_price": 268.3
-        },
-        {
-          "symbol": "KCU26",
-          "oi": 52216,
-          "last_price": 260.5
-        },
-        {
-          "symbol": "KCZ26",
-          "oi": 36558,
-          "last_price": 252.9
-        },
-        {
-          "symbol": "KCH27",
-          "oi": 13621,
-          "last_price": 250.65
-        },
-        {
-          "symbol": "KCK27",
-          "oi": 4385,
-          "last_price": 249.95
-        },
-        {
-          "symbol": "KCN27",
-          "oi": 3534,
-          "last_price": 249.75
-        },
-        {
-          "symbol": "KCU27",
-          "oi": 1923,
-          "last_price": 248.8
-        },
-        {
-          "symbol": "KCZ27",
-          "oi": 2453,
-          "last_price": 247.7
-        },
-        {
-          "symbol": "KCH28",
-          "oi": 550,
-          "last_price": 247.2
-        }
-      ]
     }
   ],
   "robusta": [
+    {
+      "date": "2026-06-09",
+      "contracts": [
+        {
+          "symbol": "RMN26",
+          "oi": 24934,
+          "last_price": 3293.0
+        },
+        {
+          "symbol": "RMU26",
+          "oi": 46102,
+          "last_price": 3230.0
+        },
+        {
+          "symbol": "RMX26",
+          "oi": 13622,
+          "last_price": 3161.0
+        },
+        {
+          "symbol": "RMF27",
+          "oi": 7134,
+          "last_price": 3098.0
+        },
+        {
+          "symbol": "RMH27",
+          "oi": 2806,
+          "last_price": 3063.0
+        },
+        {
+          "symbol": "RMK27",
+          "oi": 1256,
+          "last_price": 3039.0
+        },
+        {
+          "symbol": "RMN27",
+          "oi": 565,
+          "last_price": 3021.0
+        },
+        {
+          "symbol": "RMU27",
+          "oi": 354,
+          "last_price": 3003.0
+        },
+        {
+          "symbol": "RMX27",
+          "oi": 202,
+          "last_price": 2987.0
+        }
+      ]
+    },
     {
       "date": "2026-06-08",
       "contracts": [
@@ -1325,51 +1375,6 @@
           "symbol": "RMU27",
           "oi": 320,
           "last_price": 2986.0
-        }
-      ]
-    },
-    {
-      "date": "2026-05-18",
-      "contracts": [
-        {
-          "symbol": "RMN26",
-          "oi": 49446,
-          "last_price": 3306.0
-        },
-        {
-          "symbol": "RMU26",
-          "oi": 20473,
-          "last_price": 3175.0
-        },
-        {
-          "symbol": "RMX26",
-          "oi": 10757,
-          "last_price": 3100.0
-        },
-        {
-          "symbol": "RMF27",
-          "oi": 5875,
-          "last_price": 3034.0
-        },
-        {
-          "symbol": "RMH27",
-          "oi": 2002,
-          "last_price": 3001.0
-        },
-        {
-          "symbol": "RMK27",
-          "oi": 966,
-          "last_price": 2980.0
-        },
-        {
-          "symbol": "RMN27",
-          "oi": 438,
-          "last_price": 2964.0
-        },
-        {
-          "symbol": "RMU27",
-          "oi": 328,
-          "last_price": 2950.0
         }
       ]
     }
