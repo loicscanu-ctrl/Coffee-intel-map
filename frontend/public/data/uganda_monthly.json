@@ -70,15 +70,99 @@
         },
         {
           "country": "Germany",
-          "bags": 2150
+          "bags": 4300
         },
         {
           "country": "Sudan",
-          "bags": 450
+          "bags": 67715
+        },
+        {
+          "country": "United States",
+          "bags": 28436
+        },
+        {
+          "country": "Spain",
+          "bags": 26666
+        },
+        {
+          "country": "Belgium",
+          "bags": 22761
+        },
+        {
+          "country": "India",
+          "bags": 21800
+        },
+        {
+          "country": "Morocco",
+          "bags": 13648
+        },
+        {
+          "country": "Switzerland",
+          "bags": 4463
+        },
+        {
+          "country": "Russia",
+          "bags": 3554
+        },
+        {
+          "country": "Japan",
+          "bags": 3373
+        },
+        {
+          "country": "South Africa",
+          "bags": 2240
+        },
+        {
+          "country": "France",
+          "bags": 1848
+        },
+        {
+          "country": "Mexico",
+          "bags": 1450
+        },
+        {
+          "country": "Australia",
+          "bags": 1300
+        },
+        {
+          "country": "China",
+          "bags": 1260
+        },
+        {
+          "country": "Netherlands",
+          "bags": 680
+        },
+        {
+          "country": "Egypt",
+          "bags": 670
+        },
+        {
+          "country": "Algeria",
+          "bags": 660
+        },
+        {
+          "country": "Turkey",
+          "bags": 660
+        },
+        {
+          "country": "Kenya",
+          "bags": 654
+        },
+        {
+          "country": "Canada",
+          "bags": 320
         },
         {
           "country": "Korea",
           "bags": 320
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 320
+        },
+        {
+          "country": "Greece",
+          "bags": 200
         }
       ],
       "parser_version": "v1_recent",
@@ -152,27 +236,27 @@
         },
         {
           "country": "Sudan",
-          "bags": 62270
+          "bags": 63040
         },
         {
           "country": "Germany",
-          "bags": 37962
+          "bags": 59560
         },
         {
           "country": "Spain",
-          "bags": 51612
+          "bags": 53552
         },
         {
           "country": "United States",
-          "bags": 9228
+          "bags": 31368
         },
         {
           "country": "India",
-          "bags": 26785
+          "bags": 30525
         },
         {
           "country": "Belgium",
-          "bags": 17882
+          "bags": 19762
         },
         {
           "country": "Morocco",
@@ -184,19 +268,19 @@
         },
         {
           "country": "Russia",
-          "bags": 3894
+          "bags": 4729
         },
         {
           "country": "Greece",
-          "bags": 1600
+          "bags": 4480
         },
         {
           "country": "Switzerland",
-          "bags": 720
+          "bags": 3520
         },
         {
           "country": "Japan",
-          "bags": 2174
+          "bags": 2374
         },
         {
           "country": "Australia",
@@ -204,15 +288,15 @@
         },
         {
           "country": "Netherlands",
-          "bags": 720
+          "bags": 1395
         },
         {
           "country": "South Africa",
-          "bags": 320
+          "bags": 1345
         },
         {
           "country": "Korea",
-          "bags": 960
+          "bags": 1280
         },
         {
           "country": "France",
@@ -322,7 +406,7 @@
         },
         {
           "country": "Italy",
-          "bags": 120742
+          "bags": 135987
         },
         {
           "country": "Sudan",
@@ -330,27 +414,27 @@
         },
         {
           "country": "Spain",
-          "bags": 51205
+          "bags": 52175
         },
         {
           "country": "India",
-          "bags": 46244
+          "bags": 51182
         },
         {
           "country": "United States",
-          "bags": 6762
+          "bags": 31146
         },
         {
           "country": "Belgium",
-          "bags": 21848
+          "bags": 28053
         },
         {
           "country": "Morocco",
-          "bags": 6004
+          "bags": 7324
         },
         {
           "country": "Russia",
-          "bags": 3900
+          "bags": 4540
         },
         {
           "country": "Portugal",
@@ -358,11 +442,11 @@
         },
         {
           "country": "Greece",
-          "bags": 1280
+          "bags": 2894
         },
         {
           "country": "Japan",
-          "bags": 2160
+          "bags": 2460
         },
         {
           "country": "Mexico",
@@ -378,7 +462,7 @@
         },
         {
           "country": "China",
-          "bags": 960
+          "bags": 1280
         },
         {
           "country": "Kenya",
@@ -386,11 +470,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 360
+          "bags": 710
         },
         {
           "country": "Switzerland",
-          "bags": 320
+          "bags": 654
         },
         {
           "country": "Saudi Arabia",
@@ -487,12 +571,84 @@
       ],
       "by_destination": [
         {
-          "country": "Korea",
-          "bags": 320
+          "country": "Italy",
+          "bags": 91826
+        },
+        {
+          "country": "Germany",
+          "bags": 63177
         },
         {
           "country": "Sudan",
-          "bags": 900
+          "bags": 54220
+        },
+        {
+          "country": "India",
+          "bags": 37902
+        },
+        {
+          "country": "Spain",
+          "bags": 28414
+        },
+        {
+          "country": "United States",
+          "bags": 26069
+        },
+        {
+          "country": "Belgium",
+          "bags": 19204
+        },
+        {
+          "country": "Morocco",
+          "bags": 5226
+        },
+        {
+          "country": "Korea",
+          "bags": 4368
+        },
+        {
+          "country": "Russia",
+          "bags": 3534
+        },
+        {
+          "country": "Australia",
+          "bags": 2645
+        },
+        {
+          "country": "Japan",
+          "bags": 2434
+        },
+        {
+          "country": "Greece",
+          "bags": 1600
+        },
+        {
+          "country": "Mexico",
+          "bags": 1500
+        },
+        {
+          "country": "Portugal",
+          "bags": 1344
+        },
+        {
+          "country": "Kenya",
+          "bags": 960
+        },
+        {
+          "country": "Netherlands",
+          "bags": 700
+        },
+        {
+          "country": "China",
+          "bags": 320
+        },
+        {
+          "country": "Switzerland",
+          "bags": 300
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 200
         }
       ],
       "parser_version": "v1_recent",
@@ -566,7 +722,7 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 3800
+          "bags": 4500
         },
         {
           "country": "Germany",
@@ -574,19 +730,43 @@
         },
         {
           "country": "India",
-          "bags": 4000
+          "bags": 4750
+        },
+        {
+          "country": "Sudan",
+          "bags": 79450
+        },
+        {
+          "country": "United States",
+          "bags": 30134
+        },
+        {
+          "country": "Spain",
+          "bags": 27314
+        },
+        {
+          "country": "Belgium",
+          "bags": 22178
+        },
+        {
+          "country": "Morocco",
+          "bags": 6504
+        },
+        {
+          "country": "Netherlands",
+          "bags": 4802
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 4776
         },
         {
           "country": "Russia",
-          "bags": 2570
+          "bags": 4170
         },
         {
           "country": "China",
-          "bags": 3400
+          "bags": 3800
         },
         {
           "country": "Portugal",
@@ -594,11 +774,11 @@
         },
         {
           "country": "Mexico",
-          "bags": 2625
+          "bags": 3285
         },
         {
           "country": "Greece",
-          "bags": 640
+          "bags": 1720
         },
         {
           "country": "Japan",
@@ -606,11 +786,7 @@
         },
         {
           "country": "Canada",
-          "bags": 640
-        },
-        {
-          "country": "Sudan",
-          "bags": 900
+          "bags": 960
         },
         {
           "country": "Saudi Arabia",
@@ -708,7 +884,7 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 3700
+          "bags": 4200
         },
         {
           "country": "Germany",
@@ -716,15 +892,91 @@
         },
         {
           "country": "Belgium",
-          "bags": 3850
+          "bags": 4500
         },
         {
-          "country": "Korea",
-          "bags": 320
+          "country": "Sudan",
+          "bags": 96250
+        },
+        {
+          "country": "India",
+          "bags": 26025
+        },
+        {
+          "country": "Spain",
+          "bags": 24742
+        },
+        {
+          "country": "Mexico",
+          "bags": 14650
+        },
+        {
+          "country": "United States",
+          "bags": 13322
+        },
+        {
+          "country": "Morocco",
+          "bags": 8535
+        },
+        {
+          "country": "Netherlands",
+          "bags": 4374
         },
         {
           "country": "Portugal",
-          "bags": 2160
+          "bags": 2719
+        },
+        {
+          "country": "China",
+          "bags": 1650
+        },
+        {
+          "country": "Korea",
+          "bags": 1370
+        },
+        {
+          "country": "Canada",
+          "bags": 1280
+        },
+        {
+          "country": "Russia",
+          "bags": 1280
+        },
+        {
+          "country": "Japan",
+          "bags": 1120
+        },
+        {
+          "country": "France",
+          "bags": 960
+        },
+        {
+          "country": "Kenya",
+          "bags": 960
+        },
+        {
+          "country": "Greece",
+          "bags": 694
+        },
+        {
+          "country": "Australia",
+          "bags": 653
+        },
+        {
+          "country": "Turkey",
+          "bags": 640
+        },
+        {
+          "country": "South Africa",
+          "bags": 620
+        },
+        {
+          "country": "Egypt",
+          "bags": 350
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -821,8 +1073,92 @@
           "bags": 2020
         },
         {
+          "country": "Germany",
+          "bags": 58351
+        },
+        {
+          "country": "Spain",
+          "bags": 28366
+        },
+        {
+          "country": "Morocco",
+          "bags": 27031
+        },
+        {
+          "country": "Belgium",
+          "bags": 26772
+        },
+        {
+          "country": "India",
+          "bags": 20499
+        },
+        {
+          "country": "United States",
+          "bags": 18788
+        },
+        {
+          "country": "Russia",
+          "bags": 11190
+        },
+        {
+          "country": "China",
+          "bags": 7960
+        },
+        {
+          "country": "Portugal",
+          "bags": 4996
+        },
+        {
           "country": "Korea",
-          "bags": 586
+          "bags": 4329
+        },
+        {
+          "country": "Netherlands",
+          "bags": 3480
+        },
+        {
+          "country": "Kenya",
+          "bags": 2240
+        },
+        {
+          "country": "Greece",
+          "bags": 1774
+        },
+        {
+          "country": "Canada",
+          "bags": 1600
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 1201
+        },
+        {
+          "country": "France",
+          "bags": 1120
+        },
+        {
+          "country": "South Africa",
+          "bags": 960
+        },
+        {
+          "country": "Japan",
+          "bags": 940
+        },
+        {
+          "country": "Mexico",
+          "bags": 900
+        },
+        {
+          "country": "Egypt",
+          "bags": 668
+        },
+        {
+          "country": "Australia",
+          "bags": 339
+        },
+        {
+          "country": "Switzerland",
+          "bags": 100
         }
       ],
       "parser_version": "v1_recent",
@@ -916,19 +1252,19 @@
         },
         {
           "country": "Sudan",
-          "bags": 137860
+          "bags": 138180
         },
         {
           "country": "Belgium",
-          "bags": 25942
+          "bags": 26582
         },
         {
           "country": "United States",
-          "bags": 6258
+          "bags": 24128
         },
         {
           "country": "India",
-          "bags": 18630
+          "bags": 21630
         },
         {
           "country": "Morocco",
@@ -936,7 +1272,7 @@
         },
         {
           "country": "China",
-          "bags": 8320
+          "bags": 8960
         },
         {
           "country": "Spain",
@@ -944,15 +1280,15 @@
         },
         {
           "country": "Russia",
-          "bags": 6763
+          "bags": 8053
         },
         {
           "country": "Japan",
-          "bags": 4860
+          "bags": 5975
         },
         {
           "country": "Greece",
-          "bags": 3480
+          "bags": 4134
         },
         {
           "country": "Portugal",
@@ -964,11 +1300,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 2040
+          "bags": 2090
         },
         {
           "country": "Korea",
-          "bags": 990
+          "bags": 1630
         },
         {
           "country": "France",
@@ -984,11 +1320,11 @@
         },
         {
           "country": "Saudi Arabia",
-          "bags": 700
+          "bags": 1000
         },
         {
           "country": "Turkey",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "Mexico",
@@ -1077,12 +1413,88 @@
           "bags": 2020
         },
         {
-          "country": "Korea",
-          "bags": 300
+          "country": "Italy",
+          "bags": 149355
         },
         {
           "country": "Sudan",
-          "bags": 450
+          "bags": 114166
+        },
+        {
+          "country": "Belgium",
+          "bags": 41281
+        },
+        {
+          "country": "India",
+          "bags": 37415
+        },
+        {
+          "country": "Morocco",
+          "bags": 20080
+        },
+        {
+          "country": "United States",
+          "bags": 17180
+        },
+        {
+          "country": "Spain",
+          "bags": 14790
+        },
+        {
+          "country": "Russia",
+          "bags": 7241
+        },
+        {
+          "country": "Portugal",
+          "bags": 6699
+        },
+        {
+          "country": "China",
+          "bags": 5905
+        },
+        {
+          "country": "Korea",
+          "bags": 3630
+        },
+        {
+          "country": "Japan",
+          "bags": 3278
+        },
+        {
+          "country": "Greece",
+          "bags": 2374
+        },
+        {
+          "country": "South Africa",
+          "bags": 1920
+        },
+        {
+          "country": "France",
+          "bags": 1770
+        },
+        {
+          "country": "Australia",
+          "bags": 1165
+        },
+        {
+          "country": "Turkey",
+          "bags": 990
+        },
+        {
+          "country": "Algeria",
+          "bags": 960
+        },
+        {
+          "country": "Canada",
+          "bags": 640
+        },
+        {
+          "country": "Kenya",
+          "bags": 320
+        },
+        {
+          "country": "Egypt",
+          "bags": 300
         }
       ],
       "parser_version": "v1_recent",
@@ -1176,15 +1588,15 @@
         },
         {
           "country": "Germany",
-          "bags": 25590
+          "bags": 41140
         },
         {
           "country": "India",
-          "bags": 36647
+          "bags": 37207
         },
         {
           "country": "Belgium",
-          "bags": 13465
+          "bags": 24087
         },
         {
           "country": "Morocco",
@@ -1192,19 +1604,19 @@
         },
         {
           "country": "Spain",
-          "bags": 15970
+          "bags": 16964
         },
         {
           "country": "United States",
-          "bags": 1003
+          "bags": 12051
         },
         {
           "country": "China",
-          "bags": 10770
+          "bags": 11090
         },
         {
           "country": "Portugal",
-          "bags": 4257
+          "bags": 7254
         },
         {
           "country": "Russia",
@@ -1216,7 +1628,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 120
+          "bags": 2684
         },
         {
           "country": "Greece",
@@ -1228,7 +1640,7 @@
         },
         {
           "country": "South Africa",
-          "bags": 640
+          "bags": 960
         },
         {
           "country": "Netherlands",
@@ -1333,8 +1745,88 @@
           "bags": 2020
         },
         {
+          "country": "Italy",
+          "bags": 131400
+        },
+        {
+          "country": "Sudan",
+          "bags": 67050
+        },
+        {
+          "country": "Germany",
+          "bags": 60453
+        },
+        {
+          "country": "India",
+          "bags": 33510
+        },
+        {
+          "country": "United States",
+          "bags": 18212
+        },
+        {
+          "country": "Morocco",
+          "bags": 17041
+        },
+        {
+          "country": "China",
+          "bags": 16060
+        },
+        {
+          "country": "Spain",
+          "bags": 12176
+        },
+        {
+          "country": "Algeria",
+          "bags": 9000
+        },
+        {
+          "country": "Portugal",
+          "bags": 3996
+        },
+        {
+          "country": "Russia",
+          "bags": 3560
+        },
+        {
+          "country": "Japan",
+          "bags": 2860
+        },
+        {
+          "country": "Kenya",
+          "bags": 2087
+        },
+        {
+          "country": "Canada",
+          "bags": 1654
+        },
+        {
+          "country": "Egypt",
+          "bags": 1280
+        },
+        {
           "country": "Korea",
           "bags": 1050
+        },
+        {
+          "country": "South Africa",
+          "bags": 960
+        },
+        {
+          "country": "Turkey",
+          "bags": 334
+        },
+        {
+          "country": "Australia",
+          "bags": 320
+        },
+        {
+          "country": "France",
+          "bags": 270
+        },
+        {
+          "country": "Switzerland",
+          "bags": 100
         }
       ],
       "parser_version": "v1_recent",
@@ -1407,16 +1899,92 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 101793
+        },
+        {
+          "country": "Germany",
+          "bags": 74758
+        },
+        {
           "country": "Sudan",
-          "bags": 900
+          "bags": 55188
+        },
+        {
+          "country": "Belgium",
+          "bags": 43749
+        },
+        {
+          "country": "India",
+          "bags": 29448
+        },
+        {
+          "country": "Spain",
+          "bags": 23747
+        },
+        {
+          "country": "United States",
+          "bags": 16303
+        },
+        {
+          "country": "Morocco",
+          "bags": 16142
+        },
+        {
+          "country": "Algeria",
+          "bags": 7848
+        },
+        {
+          "country": "China",
+          "bags": 7086
+        },
+        {
+          "country": "Greece",
+          "bags": 6600
+        },
+        {
+          "country": "Russia",
+          "bags": 4824
+        },
+        {
+          "country": "Portugal",
+          "bags": 3640
+        },
+        {
+          "country": "Egypt",
+          "bags": 1730
+        },
+        {
+          "country": "South Africa",
+          "bags": 1280
+        },
+        {
+          "country": "Kenya",
+          "bags": 1010
+        },
+        {
+          "country": "Australia",
+          "bags": 960
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 960
         },
         {
           "country": "Korea",
           "bags": 880
         },
         {
-          "country": "India",
-          "bags": 5440
+          "country": "France",
+          "bags": 640
+        },
+        {
+          "country": "Turkey",
+          "bags": 552
+        },
+        {
+          "country": "Japan",
+          "bags": 300
         }
       ],
       "parser_version": "v1_recent",
@@ -1502,11 +2070,11 @@
         },
         {
           "country": "Germany",
-          "bags": 52705
+          "bags": 59705
         },
         {
           "country": "Belgium",
-          "bags": 41468
+          "bags": 47931
         },
         {
           "country": "India",
@@ -1514,11 +2082,11 @@
         },
         {
           "country": "United States",
-          "bags": 11928
+          "bags": 23625
         },
         {
           "country": "Spain",
-          "bags": 15692
+          "bags": 16012
         },
         {
           "country": "Algeria",
@@ -1534,11 +2102,11 @@
         },
         {
           "country": "Japan",
-          "bags": 729
+          "bags": 3449
         },
         {
           "country": "China",
-          "bags": 1920
+          "bags": 3415
         },
         {
           "country": "Portugal",
@@ -1546,7 +2114,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 1575
+          "bags": 1992
         },
         {
           "country": "Switzerland",
@@ -1652,31 +2220,31 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 152791
+          "bags": 158242
         },
         {
           "country": "Germany",
-          "bags": 107005
+          "bags": 117142
         },
         {
           "country": "Belgium",
-          "bags": 45890
+          "bags": 54438
         },
         {
           "country": "India",
-          "bags": 48602
+          "bags": 51403
         },
         {
           "country": "United States",
-          "bags": 11318
+          "bags": 28754
         },
         {
           "country": "Spain",
-          "bags": 24674
+          "bags": 25430
         },
         {
           "country": "Sudan",
-          "bags": 21270
+          "bags": 21720
         },
         {
           "country": "Algeria",
@@ -1684,15 +2252,15 @@
         },
         {
           "country": "Morocco",
-          "bags": 17342
+          "bags": 18008
         },
         {
           "country": "Russia",
-          "bags": 8284
+          "bags": 8354
         },
         {
           "country": "China",
-          "bags": 3180
+          "bags": 7104
         },
         {
           "country": "Portugal",
@@ -1700,7 +2268,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 5320
+          "bags": 5342
         },
         {
           "country": "Egypt",
@@ -1716,7 +2284,7 @@
         },
         {
           "country": "Japan",
-          "bags": 600
+          "bags": 1640
         },
         {
           "country": "France",
@@ -1728,11 +2296,11 @@
         },
         {
           "country": "Australia",
-          "bags": 668
+          "bags": 988
         },
         {
           "country": "Netherlands",
-          "bags": 360
+          "bags": 422
         },
         {
           "country": "Turkey",
@@ -1813,12 +2381,104 @@
           "bags": 2021
         },
         {
-          "country": "Korea",
-          "bags": 300
+          "country": "Italy",
+          "bags": 145566
+        },
+        {
+          "country": "Germany",
+          "bags": 87768
+        },
+        {
+          "country": "India",
+          "bags": 60295
         },
         {
           "country": "Sudan",
-          "bags": 225
+          "bags": 57259
+        },
+        {
+          "country": "Belgium",
+          "bags": 55811
+        },
+        {
+          "country": "Spain",
+          "bags": 34159
+        },
+        {
+          "country": "Algeria",
+          "bags": 25280
+        },
+        {
+          "country": "United States",
+          "bags": 24078
+        },
+        {
+          "country": "Portugal",
+          "bags": 8034
+        },
+        {
+          "country": "China",
+          "bags": 6436
+        },
+        {
+          "country": "Greece",
+          "bags": 6278
+        },
+        {
+          "country": "Russia",
+          "bags": 5863
+        },
+        {
+          "country": "France",
+          "bags": 2700
+        },
+        {
+          "country": "Japan",
+          "bags": 2664
+        },
+        {
+          "country": "Egypt",
+          "bags": 2330
+        },
+        {
+          "country": "Canada",
+          "bags": 1933
+        },
+        {
+          "country": "Australia",
+          "bags": 1504
+        },
+        {
+          "country": "Kenya",
+          "bags": 1280
+        },
+        {
+          "country": "South Africa",
+          "bags": 1210
+        },
+        {
+          "country": "Switzerland",
+          "bags": 988
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 986
+        },
+        {
+          "country": "Korea",
+          "bags": 782
+        },
+        {
+          "country": "Turkey",
+          "bags": 640
+        },
+        {
+          "country": "Ethiopia",
+          "bags": 167
+        },
+        {
+          "country": "Netherlands",
+          "bags": 100
         }
       ],
       "parser_version": "v1_recent",
@@ -1904,23 +2564,23 @@
         },
         {
           "country": "Italy",
-          "bags": 148896
+          "bags": 154508
         },
         {
           "country": "India",
-          "bags": 64425
+          "bags": 67621
         },
         {
           "country": "Belgium",
-          "bags": 27392
+          "bags": 42489
         },
         {
           "country": "United States",
-          "bags": 9013
+          "bags": 31992
         },
         {
           "country": "Spain",
-          "bags": 26522
+          "bags": 26842
         },
         {
           "country": "Algeria",
@@ -1932,11 +2592,11 @@
         },
         {
           "country": "Russia",
-          "bags": 7858
+          "bags": 8818
         },
         {
           "country": "Egypt",
-          "bags": 7182
+          "bags": 7190
         },
         {
           "country": "Portugal",
@@ -1944,11 +2604,11 @@
         },
         {
           "country": "Greece",
-          "bags": 3890
+          "bags": 4224
         },
         {
           "country": "Japan",
-          "bags": 1220
+          "bags": 4130
         },
         {
           "country": "Turkey",
@@ -1956,11 +2616,11 @@
         },
         {
           "country": "China",
-          "bags": 1666
+          "bags": 2051
         },
         {
           "country": "Canada",
-          "bags": 654
+          "bags": 1986
         },
         {
           "country": "Korea",
@@ -1976,7 +2636,7 @@
         },
         {
           "country": "Netherlands",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "United Kingdom",
@@ -2053,8 +2713,104 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 182920
+        },
+        {
+          "country": "Germany",
+          "bags": 70939
+        },
+        {
+          "country": "United States",
+          "bags": 46228
+        },
+        {
+          "country": "Belgium",
+          "bags": 33310
+        },
+        {
+          "country": "Algeria",
+          "bags": 28674
+        },
+        {
+          "country": "India",
+          "bags": 24715
+        },
+        {
+          "country": "Spain",
+          "bags": 21925
+        },
+        {
+          "country": "Sudan",
+          "bags": 19950
+        },
+        {
+          "country": "Morocco",
+          "bags": 16852
+        },
+        {
+          "country": "Russia",
+          "bags": 8696
+        },
+        {
+          "country": "Portugal",
+          "bags": 3902
+        },
+        {
+          "country": "Japan",
+          "bags": 3818
+        },
+        {
+          "country": "Egypt",
+          "bags": 2740
+        },
+        {
+          "country": "Greece",
+          "bags": 2500
+        },
+        {
           "country": "Korea",
           "bags": 1652
+        },
+        {
+          "country": "China",
+          "bags": 1600
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1600
+        },
+        {
+          "country": "France",
+          "bags": 1350
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 960
+        },
+        {
+          "country": "Kenya",
+          "bags": 800
+        },
+        {
+          "country": "Mexico",
+          "bags": 580
+        },
+        {
+          "country": "Turkey",
+          "bags": 334
+        },
+        {
+          "country": "South Africa",
+          "bags": 333
+        },
+        {
+          "country": "Australia",
+          "bags": 320
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -2137,6 +2893,94 @@
         {
           "country": "Sudan",
           "bags": 2021
+        },
+        {
+          "country": "Germany",
+          "bags": 81090
+        },
+        {
+          "country": "India",
+          "bags": 58875
+        },
+        {
+          "country": "Algeria",
+          "bags": 38851
+        },
+        {
+          "country": "United States",
+          "bags": 38446
+        },
+        {
+          "country": "Belgium",
+          "bags": 34880
+        },
+        {
+          "country": "Spain",
+          "bags": 25591
+        },
+        {
+          "country": "Morocco",
+          "bags": 20805
+        },
+        {
+          "country": "Russia",
+          "bags": 8126
+        },
+        {
+          "country": "Portugal",
+          "bags": 6584
+        },
+        {
+          "country": "Mexico",
+          "bags": 4615
+        },
+        {
+          "country": "Japan",
+          "bags": 3600
+        },
+        {
+          "country": "China",
+          "bags": 3202
+        },
+        {
+          "country": "France",
+          "bags": 3022
+        },
+        {
+          "country": "Egypt",
+          "bags": 2370
+        },
+        {
+          "country": "Kenya",
+          "bags": 1940
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1750
+        },
+        {
+          "country": "Greece",
+          "bags": 974
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 555
+        },
+        {
+          "country": "Turkey",
+          "bags": 330
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 320
+        },
+        {
+          "country": "Ethiopia",
+          "bags": 167
+        },
+        {
+          "country": "South Africa",
+          "bags": 150
         }
       ],
       "parser_version": "v1_recent",
@@ -2213,8 +3057,100 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 249647
+        },
+        {
+          "country": "Germany",
+          "bags": 84845
+        },
+        {
+          "country": "India",
+          "bags": 61782
+        },
+        {
+          "country": "Algeria",
+          "bags": 59755
+        },
+        {
           "country": "Sudan",
-          "bags": 7000
+          "bags": 57246
+        },
+        {
+          "country": "United States",
+          "bags": 36885
+        },
+        {
+          "country": "Belgium",
+          "bags": 34518
+        },
+        {
+          "country": "Spain",
+          "bags": 28792
+        },
+        {
+          "country": "Morocco",
+          "bags": 25085
+        },
+        {
+          "country": "Russia",
+          "bags": 9624
+        },
+        {
+          "country": "Portugal",
+          "bags": 6288
+        },
+        {
+          "country": "Switzerland",
+          "bags": 5330
+        },
+        {
+          "country": "France",
+          "bags": 5070
+        },
+        {
+          "country": "China",
+          "bags": 3919
+        },
+        {
+          "country": "Mexico",
+          "bags": 3705
+        },
+        {
+          "country": "Egypt",
+          "bags": 3316
+        },
+        {
+          "country": "Kenya",
+          "bags": 1920
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1020
+        },
+        {
+          "country": "Australia",
+          "bags": 988
+        },
+        {
+          "country": "Greece",
+          "bags": 974
+        },
+        {
+          "country": "Japan",
+          "bags": 560
+        },
+        {
+          "country": "Turkey",
+          "bags": 335
+        },
+        {
+          "country": "Canada",
+          "bags": 320
+        },
+        {
+          "country": "Netherlands",
+          "bags": 311
         }
       ],
       "parser_version": "v1_recent",
@@ -2295,12 +3231,100 @@
       ],
       "by_destination": [
         {
-          "country": "Greece",
-          "bags": 320
+          "country": "Italy",
+          "bags": 238449
+        },
+        {
+          "country": "Germany",
+          "bags": 93849
+        },
+        {
+          "country": "Sudan",
+          "bags": 73130
+        },
+        {
+          "country": "Algeria",
+          "bags": 71654
         },
         {
           "country": "India",
-          "bags": 5020
+          "bags": 54373
+        },
+        {
+          "country": "Belgium",
+          "bags": 45704
+        },
+        {
+          "country": "Spain",
+          "bags": 19189
+        },
+        {
+          "country": "United States",
+          "bags": 18575
+        },
+        {
+          "country": "Morocco",
+          "bags": 17690
+        },
+        {
+          "country": "Russia",
+          "bags": 9344
+        },
+        {
+          "country": "Switzerland",
+          "bags": 6248
+        },
+        {
+          "country": "Portugal",
+          "bags": 5996
+        },
+        {
+          "country": "Egypt",
+          "bags": 4740
+        },
+        {
+          "country": "France",
+          "bags": 3828
+        },
+        {
+          "country": "Mexico",
+          "bags": 3445
+        },
+        {
+          "country": "China",
+          "bags": 2240
+        },
+        {
+          "country": "Japan",
+          "bags": 2160
+        },
+        {
+          "country": "Turkey",
+          "bags": 2003
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 865
+        },
+        {
+          "country": "Canada",
+          "bags": 653
+        },
+        {
+          "country": "Kenya",
+          "bags": 439
+        },
+        {
+          "country": "Australia",
+          "bags": 320
+        },
+        {
+          "country": "Greece",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -2386,11 +3410,11 @@
         },
         {
           "country": "Italy",
-          "bags": 161159
+          "bags": 162469
         },
         {
           "country": "Germany",
-          "bags": 69645
+          "bags": 71885
         },
         {
           "country": "Algeria",
@@ -2398,31 +3422,31 @@
         },
         {
           "country": "India",
-          "bags": 39668
+          "bags": 59088
         },
         {
           "country": "Sudan",
-          "bags": 54723
+          "bags": 55650
         },
         {
           "country": "Morocco",
-          "bags": 35273
+          "bags": 35913
         },
         {
           "country": "United States",
-          "bags": 19969
+          "bags": 29448
         },
         {
           "country": "Spain",
-          "bags": 20931
+          "bags": 23551
         },
         {
           "country": "Belgium",
-          "bags": 14054
+          "bags": 16294
         },
         {
           "country": "Russia",
-          "bags": 10798
+          "bags": 11118
         },
         {
           "country": "South Africa",
@@ -2438,7 +3462,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 2454
+          "bags": 2774
         },
         {
           "country": "Turkey",
@@ -2454,7 +3478,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 1976
+          "bags": 2003
         },
         {
           "country": "Greece",
@@ -2474,7 +3498,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 320
+          "bags": 570
         },
         {
           "country": "Netherlands",
@@ -2567,8 +3591,96 @@
           "bags": 60386
         },
         {
+          "country": "Italy",
+          "bags": 127813
+        },
+        {
+          "country": "Algeria",
+          "bags": 72127
+        },
+        {
+          "country": "Germany",
+          "bags": 69077
+        },
+        {
+          "country": "United States",
+          "bags": 34988
+        },
+        {
+          "country": "Belgium",
+          "bags": 29736
+        },
+        {
+          "country": "India",
+          "bags": 28895
+        },
+        {
+          "country": "Spain",
+          "bags": 25666
+        },
+        {
+          "country": "Morocco",
+          "bags": 23340
+        },
+        {
+          "country": "Portugal",
+          "bags": 11950
+        },
+        {
+          "country": "Turkey",
+          "bags": 6990
+        },
+        {
+          "country": "Russia",
+          "bags": 6680
+        },
+        {
+          "country": "Egypt",
+          "bags": 5034
+        },
+        {
+          "country": "Sudan",
+          "bags": 4900
+        },
+        {
+          "country": "Japan",
+          "bags": 4820
+        },
+        {
+          "country": "Greece",
+          "bags": 4085
+        },
+        {
+          "country": "France",
+          "bags": 3512
+        },
+        {
           "country": "Korea",
           "bags": 3265
+        },
+        {
+          "country": "China",
+          "bags": 1920
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1670
+        },
+        {
+          "country": "Kenya",
+          "bags": 1280
+        },
+        {
+          "country": "Netherlands",
+          "bags": 990
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 640
+        },
+        {
+          "country": "Australia",
+          "bags": 320
         },
         {
           "country": "South Africa",
@@ -2669,8 +3781,108 @@
           "bags": 2021
         },
         {
+          "country": "Italy",
+          "bags": 171976
+        },
+        {
+          "country": "Germany",
+          "bags": 91503
+        },
+        {
+          "country": "Belgium",
+          "bags": 42282
+        },
+        {
+          "country": "India",
+          "bags": 34686
+        },
+        {
+          "country": "Algeria",
+          "bags": 29189
+        },
+        {
+          "country": "Morocco",
+          "bags": 26715
+        },
+        {
+          "country": "Spain",
+          "bags": 25342
+        },
+        {
+          "country": "United States",
+          "bags": 24456
+        },
+        {
+          "country": "Portugal",
+          "bags": 10450
+        },
+        {
+          "country": "Switzerland",
+          "bags": 6216
+        },
+        {
+          "country": "South Africa",
+          "bags": 4520
+        },
+        {
+          "country": "Japan",
+          "bags": 2760
+        },
+        {
+          "country": "Egypt",
+          "bags": 2650
+        },
+        {
+          "country": "Russia",
+          "bags": 1948
+        },
+        {
+          "country": "Kenya",
+          "bags": 1756
+        },
+        {
+          "country": "Greece",
+          "bags": 1657
+        },
+        {
+          "country": "Turkey",
+          "bags": 1634
+        },
+        {
           "country": "Korea",
           "bags": 1613
+        },
+        {
+          "country": "China",
+          "bags": 1566
+        },
+        {
+          "country": "Netherlands",
+          "bags": 1040
+        },
+        {
+          "country": "France",
+          "bags": 938
+        },
+        {
+          "country": "Canada",
+          "bags": 640
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 640
+        },
+        {
+          "country": "Australia",
+          "bags": 320
+        },
+        {
+          "country": "Mexico",
+          "bags": 320
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -2751,7 +3963,103 @@
           "bags": 2021
         },
         {
+          "country": "Italy",
+          "bags": 199260
+        },
+        {
+          "country": "Germany",
+          "bags": 93300
+        },
+        {
+          "country": "United States",
+          "bags": 25114
+        },
+        {
+          "country": "Spain",
+          "bags": 24813
+        },
+        {
+          "country": "India",
+          "bags": 24761
+        },
+        {
+          "country": "Morocco",
+          "bags": 20452
+        },
+        {
+          "country": "Algeria",
+          "bags": 19534
+        },
+        {
+          "country": "Belgium",
+          "bags": 19266
+        },
+        {
+          "country": "Egypt",
+          "bags": 10422
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 9092
+        },
+        {
+          "country": "Russia",
+          "bags": 8148
+        },
+        {
+          "country": "Portugal",
+          "bags": 7579
+        },
+        {
+          "country": "France",
+          "bags": 5238
+        },
+        {
+          "country": "Switzerland",
+          "bags": 5122
+        },
+        {
+          "country": "South Africa",
+          "bags": 4220
+        },
+        {
+          "country": "Turkey",
+          "bags": 3710
+        },
+        {
           "country": "Korea",
+          "bags": 2318
+        },
+        {
+          "country": "Japan",
+          "bags": 2180
+        },
+        {
+          "country": "Mexico",
+          "bags": 2004
+        },
+        {
+          "country": "Greece",
+          "bags": 1920
+        },
+        {
+          "country": "Kenya",
+          "bags": 1753
+        },
+        {
+          "country": "Netherlands",
+          "bags": 1690
+        },
+        {
+          "country": "Australia",
+          "bags": 640
+        },
+        {
+          "country": "Canada",
+          "bags": 640
+        },
+        {
+          "country": "Saudi Arabia",
           "bags": 320
         }
       ],
@@ -2834,11 +4142,11 @@
         },
         {
           "country": "Italy",
-          "bags": 100957
+          "bags": 120791
         },
         {
           "country": "Germany",
-          "bags": 30560
+          "bags": 40840
         },
         {
           "country": "India",
@@ -2846,19 +4154,19 @@
         },
         {
           "country": "Belgium",
-          "bags": 12090
+          "bags": 25498
         },
         {
           "country": "Spain",
-          "bags": 21596
+          "bags": 22584
         },
         {
           "country": "United States",
-          "bags": 1920
+          "bags": 17759
         },
         {
           "country": "Algeria",
-          "bags": 8696
+          "bags": 9336
         },
         {
           "country": "Korea",
@@ -2866,11 +4174,11 @@
         },
         {
           "country": "Egypt",
-          "bags": 7306
+          "bags": 7762
         },
         {
           "country": "Portugal",
-          "bags": 3390
+          "bags": 7320
         },
         {
           "country": "Morocco",
@@ -2878,7 +4186,7 @@
         },
         {
           "country": "Turkey",
-          "bags": 3792
+          "bags": 3953
         },
         {
           "country": "Switzerland",
@@ -2886,7 +4194,7 @@
         },
         {
           "country": "Russia",
-          "bags": 1940
+          "bags": 2914
         },
         {
           "country": "Greece",
@@ -2898,11 +4206,11 @@
         },
         {
           "country": "Japan",
-          "bags": 1200
+          "bags": 1800
         },
         {
           "country": "South Africa",
-          "bags": 360
+          "bags": 1692
         },
         {
           "country": "France",
@@ -3015,12 +4323,104 @@
           "bags": 2022
         },
         {
+          "country": "Italy",
+          "bags": 170675
+        },
+        {
+          "country": "Germany",
+          "bags": 53696
+        },
+        {
+          "country": "India",
+          "bags": 29353
+        },
+        {
+          "country": "United States",
+          "bags": 19690
+        },
+        {
+          "country": "Spain",
+          "bags": 19045
+        },
+        {
+          "country": "Belgium",
+          "bags": 11888
+        },
+        {
+          "country": "Morocco",
+          "bags": 11072
+        },
+        {
+          "country": "Portugal",
+          "bags": 8689
+        },
+        {
+          "country": "Egypt",
+          "bags": 5394
+        },
+        {
+          "country": "China",
+          "bags": 4800
+        },
+        {
+          "country": "Mexico",
+          "bags": 4800
+        },
+        {
+          "country": "Russia",
+          "bags": 4620
+        },
+        {
+          "country": "Japan",
+          "bags": 4487
+        },
+        {
+          "country": "South Africa",
+          "bags": 3413
+        },
+        {
+          "country": "Switzerland",
+          "bags": 3270
+        },
+        {
           "country": "Korea",
           "bags": 2706
         },
         {
-          "country": "South Africa",
-          "bags": 1800
+          "country": "Algeria",
+          "bags": 2560
+        },
+        {
+          "country": "Kenya",
+          "bags": 2480
+        },
+        {
+          "country": "Australia",
+          "bags": 2155
+        },
+        {
+          "country": "Turkey",
+          "bags": 1692
+        },
+        {
+          "country": "Greece",
+          "bags": 1050
+        },
+        {
+          "country": "Netherlands",
+          "bags": 670
+        },
+        {
+          "country": "France",
+          "bags": 668
+        },
+        {
+          "country": "Canada",
+          "bags": 666
+        },
+        {
+          "country": "Tanzania",
+          "bags": 560
         }
       ],
       "parser_version": "v1_recent",
@@ -3098,27 +4498,27 @@
         },
         {
           "country": "Italy",
-          "bags": 135489
+          "bags": 154843
         },
         {
           "country": "Germany",
-          "bags": 32872
+          "bags": 58809
         },
         {
           "country": "Belgium",
-          "bags": 9978
+          "bags": 27196
         },
         {
           "country": "India",
-          "bags": 17710
+          "bags": 19830
         },
         {
           "country": "Spain",
-          "bags": 8008
+          "bags": 10902
         },
         {
           "country": "Portugal",
-          "bags": 3560
+          "bags": 8515
         },
         {
           "country": "Tunisia",
@@ -3126,11 +4526,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 4541
+          "bags": 4874
         },
         {
           "country": "Japan",
-          "bags": 1340
+          "bags": 4614
         },
         {
           "country": "Algeria",
@@ -3138,7 +4538,7 @@
         },
         {
           "country": "Morocco",
-          "bags": 3344
+          "bags": 3664
         },
         {
           "country": "Korea",
@@ -3158,19 +4558,19 @@
         },
         {
           "country": "France",
-          "bags": 938
+          "bags": 1578
         },
         {
           "country": "Australia",
-          "bags": 1020
+          "bags": 1461
         },
         {
           "country": "Switzerland",
-          "bags": 1002
+          "bags": 1005
         },
         {
           "country": "Canada",
-          "bags": 320
+          "bags": 986
         },
         {
           "country": "Mexico",
@@ -3287,12 +4687,108 @@
           "bags": 7586
         },
         {
+          "country": "Italy",
+          "bags": 135063
+        },
+        {
           "country": "Sudan",
-          "bags": 1734
+          "bags": 59483
+        },
+        {
+          "country": "Germany",
+          "bags": 54697
+        },
+        {
+          "country": "India",
+          "bags": 31445
+        },
+        {
+          "country": "Belgium",
+          "bags": 23226
+        },
+        {
+          "country": "Spain",
+          "bags": 12578
+        },
+        {
+          "country": "Morocco",
+          "bags": 9921
+        },
+        {
+          "country": "South Africa",
+          "bags": 6580
+        },
+        {
+          "country": "Tunisia",
+          "bags": 6570
+        },
+        {
+          "country": "Portugal",
+          "bags": 5712
+        },
+        {
+          "country": "Algeria",
+          "bags": 4202
+        },
+        {
+          "country": "Mexico",
+          "bags": 3646
+        },
+        {
+          "country": "China",
+          "bags": 3520
+        },
+        {
+          "country": "Tanzania",
+          "bags": 3416
+        },
+        {
+          "country": "Russia",
+          "bags": 2560
+        },
+        {
+          "country": "Canada",
+          "bags": 1969
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1834
+        },
+        {
+          "country": "Australia",
+          "bags": 1613
+        },
+        {
+          "country": "France",
+          "bags": 668
+        },
+        {
+          "country": "Switzerland",
+          "bags": 668
         },
         {
           "country": "Korea",
           "bags": 653
+        },
+        {
+          "country": "Greece",
+          "bags": 640
+        },
+        {
+          "country": "Kenya",
+          "bags": 522
+        },
+        {
+          "country": "Japan",
+          "bags": 445
+        },
+        {
+          "country": "Turkey",
+          "bags": 300
+        },
+        {
+          "country": "Netherlands",
+          "bags": 290
         }
       ],
       "parser_version": "v1_recent",
@@ -3373,12 +4869,112 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 177804
+        },
+        {
+          "country": "Germany",
+          "bags": 57547
+        },
+        {
+          "country": "Sudan",
+          "bags": 48867
+        },
+        {
+          "country": "India",
+          "bags": 33078
+        },
+        {
+          "country": "Belgium",
+          "bags": 30866
+        },
+        {
+          "country": "Spain",
+          "bags": 11561
+        },
+        {
+          "country": "Morocco",
+          "bags": 8882
+        },
+        {
+          "country": "China",
+          "bags": 7092
+        },
+        {
+          "country": "Tunisia",
+          "bags": 6600
+        },
+        {
           "country": "Korea",
           "bags": 6327
         },
         {
-          "country": "Sudan",
-          "bags": 1000
+          "country": "Russia",
+          "bags": 5108
+        },
+        {
+          "country": "Portugal",
+          "bags": 3453
+        },
+        {
+          "country": "Switzerland",
+          "bags": 2894
+        },
+        {
+          "country": "Algeria",
+          "bags": 2880
+        },
+        {
+          "country": "Japan",
+          "bags": 2780
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 2240
+        },
+        {
+          "country": "Netherlands",
+          "bags": 2144
+        },
+        {
+          "country": "South Africa",
+          "bags": 1913
+        },
+        {
+          "country": "Mexico",
+          "bags": 1670
+        },
+        {
+          "country": "France",
+          "bags": 1600
+        },
+        {
+          "country": "Turkey",
+          "bags": 1008
+        },
+        {
+          "country": "Australia",
+          "bags": 973
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 746
+        },
+        {
+          "country": "Greece",
+          "bags": 680
+        },
+        {
+          "country": "Kenya",
+          "bags": 640
+        },
+        {
+          "country": "Canada",
+          "bags": 317
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 293
         }
       ],
       "parser_version": "v1_recent",
@@ -3464,15 +5060,119 @@
         },
         {
           "country": "United States",
-          "bags": 29820
+          "bags": 34063
+        },
+        {
+          "country": "Italy",
+          "bags": 213477
+        },
+        {
+          "country": "Sudan",
+          "bags": 54867
+        },
+        {
+          "country": "India",
+          "bags": 39373
+        },
+        {
+          "country": "Morocco",
+          "bags": 25587
+        },
+        {
+          "country": "Belgium",
+          "bags": 19670
+        },
+        {
+          "country": "Spain",
+          "bags": 17202
+        },
+        {
+          "country": "Tunisia",
+          "bags": 16013
+        },
+        {
+          "country": "China",
+          "bags": 7920
+        },
+        {
+          "country": "Algeria",
+          "bags": 6080
+        },
+        {
+          "country": "Portugal",
+          "bags": 5226
+        },
+        {
+          "country": "Mexico",
+          "bags": 4109
+        },
+        {
+          "country": "Turkey",
+          "bags": 3338
+        },
+        {
+          "country": "South Africa",
+          "bags": 2540
+        },
+        {
+          "country": "Switzerland",
+          "bags": 2004
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1980
+        },
+        {
+          "country": "Russia",
+          "bags": 1970
+        },
+        {
+          "country": "Tanzania",
+          "bags": 1850
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 1619
+        },
+        {
+          "country": "Australia",
+          "bags": 1613
+        },
+        {
+          "country": "Kenya",
+          "bags": 1535
+        },
+        {
+          "country": "Japan",
+          "bags": 1520
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 1092
+        },
+        {
+          "country": "Egypt",
+          "bags": 1034
+        },
+        {
+          "country": "France",
+          "bags": 988
+        },
+        {
+          "country": "Netherlands",
+          "bags": 885
+        },
+        {
+          "country": "Greece",
+          "bags": 334
+        },
+        {
+          "country": "Canada",
+          "bags": 320
         },
         {
           "country": "Korea",
           "bags": 320
-        },
-        {
-          "country": "Sudan",
-          "bags": 7700
         }
       ],
       "parser_version": "v1_recent",
@@ -3561,8 +5261,104 @@
           "bags": 118694
         },
         {
+          "country": "Italy",
+          "bags": 234171
+        },
+        {
+          "country": "Germany",
+          "bags": 50584
+        },
+        {
+          "country": "India",
+          "bags": 37372
+        },
+        {
+          "country": "Belgium",
+          "bags": 30991
+        },
+        {
+          "country": "Morocco",
+          "bags": 29761
+        },
+        {
+          "country": "United States",
+          "bags": 19928
+        },
+        {
+          "country": "China",
+          "bags": 15960
+        },
+        {
+          "country": "Spain",
+          "bags": 14260
+        },
+        {
+          "country": "Algeria",
+          "bags": 8330
+        },
+        {
+          "country": "Turkey",
+          "bags": 5951
+        },
+        {
+          "country": "Mexico",
+          "bags": 5009
+        },
+        {
+          "country": "Netherlands",
+          "bags": 4640
+        },
+        {
+          "country": "Portugal",
+          "bags": 4616
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 3700
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 3332
+        },
+        {
           "country": "Korea",
+          "bags": 3278
+        },
+        {
+          "country": "Russia",
+          "bags": 2580
+        },
+        {
+          "country": "Japan",
+          "bags": 1280
+        },
+        {
+          "country": "Switzerland",
+          "bags": 988
+        },
+        {
+          "country": "South Africa",
+          "bags": 953
+        },
+        {
+          "country": "Australia",
           "bags": 640
+        },
+        {
+          "country": "France",
+          "bags": 320
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 320
+        },
+        {
+          "country": "Greece",
+          "bags": 317
+        },
+        {
+          "country": "Kenya",
+          "bags": 200
         }
       ],
       "parser_version": "v1_recent",
@@ -3644,7 +5440,7 @@
         },
         {
           "country": "Italy",
-          "bags": 183308
+          "bags": 198746
         },
         {
           "country": "Sudan",
@@ -3652,11 +5448,11 @@
         },
         {
           "country": "India",
-          "bags": 35233
+          "bags": 38833
         },
         {
           "country": "Belgium",
-          "bags": 27820
+          "bags": 28170
         },
         {
           "country": "Tunisia",
@@ -3664,15 +5460,15 @@
         },
         {
           "country": "Spain",
-          "bags": 18952
+          "bags": 20232
         },
         {
           "country": "Morocco",
-          "bags": 16556
+          "bags": 16876
         },
         {
           "country": "China",
-          "bags": 4480
+          "bags": 4800
         },
         {
           "country": "Portugal",
@@ -3692,11 +5488,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 1304
+          "bags": 2704
         },
         {
           "country": "Turkey",
-          "bags": 1694
+          "bags": 2044
         },
         {
           "country": "Japan",
@@ -3724,7 +5520,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 339
+          "bags": 521
         },
         {
           "country": "South Africa",
@@ -3801,12 +5597,112 @@
           "bags": 254
         },
         {
-          "country": "Korea",
-          "bags": 640
+          "country": "Italy",
+          "bags": 182110
         },
         {
           "country": "Sudan",
-          "bags": 13300
+          "bags": 64753
+        },
+        {
+          "country": "Germany",
+          "bags": 57745
+        },
+        {
+          "country": "India",
+          "bags": 33688
+        },
+        {
+          "country": "Morocco",
+          "bags": 30092
+        },
+        {
+          "country": "Belgium",
+          "bags": 25416
+        },
+        {
+          "country": "Tunisia",
+          "bags": 20979
+        },
+        {
+          "country": "Spain",
+          "bags": 14562
+        },
+        {
+          "country": "Turkey",
+          "bags": 4930
+        },
+        {
+          "country": "Japan",
+          "bags": 4383
+        },
+        {
+          "country": "China",
+          "bags": 4310
+        },
+        {
+          "country": "Netherlands",
+          "bags": 4214
+        },
+        {
+          "country": "Russia",
+          "bags": 4180
+        },
+        {
+          "country": "Portugal",
+          "bags": 3953
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 3326
+        },
+        {
+          "country": "Korea",
+          "bags": 3291
+        },
+        {
+          "country": "Switzerland",
+          "bags": 2310
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 2199
+        },
+        {
+          "country": "France",
+          "bags": 1940
+        },
+        {
+          "country": "Egypt",
+          "bags": 1383
+        },
+        {
+          "country": "Canada",
+          "bags": 1380
+        },
+        {
+          "country": "South Africa",
+          "bags": 1050
+        },
+        {
+          "country": "Mexico",
+          "bags": 1002
+        },
+        {
+          "country": "Kenya",
+          "bags": 720
+        },
+        {
+          "country": "Algeria",
+          "bags": 668
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 640
+        },
+        {
+          "country": "Australia",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -3887,16 +5783,108 @@
           "bags": 2022
         },
         {
-          "country": "Korea",
-          "bags": 320
+          "country": "Italy",
+          "bags": 151051
+        },
+        {
+          "country": "Germany",
+          "bags": 52305
         },
         {
           "country": "India",
-          "bags": 3488
+          "bags": 41600
+        },
+        {
+          "country": "Belgium",
+          "bags": 28182
         },
         {
           "country": "Sudan",
-          "bags": 2450
+          "bags": 27250
+        },
+        {
+          "country": "Morocco",
+          "bags": 25930
+        },
+        {
+          "country": "Spain",
+          "bags": 25670
+        },
+        {
+          "country": "Netherlands",
+          "bags": 11408
+        },
+        {
+          "country": "Turkey",
+          "bags": 10323
+        },
+        {
+          "country": "Mexico",
+          "bags": 9493
+        },
+        {
+          "country": "Tunisia",
+          "bags": 6660
+        },
+        {
+          "country": "France",
+          "bags": 5466
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 4434
+        },
+        {
+          "country": "Japan",
+          "bags": 4160
+        },
+        {
+          "country": "China",
+          "bags": 3990
+        },
+        {
+          "country": "Russia",
+          "bags": 3840
+        },
+        {
+          "country": "Portugal",
+          "bags": 2924
+        },
+        {
+          "country": "Egypt",
+          "bags": 2035
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 1040
+        },
+        {
+          "country": "Korea",
+          "bags": 960
+        },
+        {
+          "country": "Tanzania",
+          "bags": 705
+        },
+        {
+          "country": "Greece",
+          "bags": 640
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 640
+        },
+        {
+          "country": "Kenya",
+          "bags": 345
+        },
+        {
+          "country": "Australia",
+          "bags": 320
+        },
+        {
+          "country": "Switzerland",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -3977,12 +5965,108 @@
           "bags": 2022
         },
         {
-          "country": "Korea",
-          "bags": 472
+          "country": "Italy",
+          "bags": 153806
+        },
+        {
+          "country": "Germany",
+          "bags": 48503
         },
         {
           "country": "Sudan",
-          "bags": 5250
+          "bags": 44900
+        },
+        {
+          "country": "India",
+          "bags": 44404
+        },
+        {
+          "country": "Morocco",
+          "bags": 29810
+        },
+        {
+          "country": "Belgium",
+          "bags": 24380
+        },
+        {
+          "country": "Spain",
+          "bags": 16445
+        },
+        {
+          "country": "Switzerland",
+          "bags": 6244
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 5790
+        },
+        {
+          "country": "Turkey",
+          "bags": 5275
+        },
+        {
+          "country": "China",
+          "bags": 4188
+        },
+        {
+          "country": "Korea",
+          "bags": 3589
+        },
+        {
+          "country": "South Africa",
+          "bags": 3316
+        },
+        {
+          "country": "Russia",
+          "bags": 2580
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 2279
+        },
+        {
+          "country": "Tanzania",
+          "bags": 2190
+        },
+        {
+          "country": "France",
+          "bags": 1876
+        },
+        {
+          "country": "Portugal",
+          "bags": 1710
+        },
+        {
+          "country": "Egypt",
+          "bags": 1707
+        },
+        {
+          "country": "Greece",
+          "bags": 1400
+        },
+        {
+          "country": "Japan",
+          "bags": 920
+        },
+        {
+          "country": "Algeria",
+          "bags": 668
+        },
+        {
+          "country": "Kenya",
+          "bags": 596
+        },
+        {
+          "country": "Netherlands",
+          "bags": 322
+        },
+        {
+          "country": "Canada",
+          "bags": 320
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 100
         }
       ],
       "parser_version": "v1_recent",
@@ -4064,7 +6148,7 @@
         },
         {
           "country": "Italy",
-          "bags": 145178
+          "bags": 161123
         },
         {
           "country": "Sudan",
@@ -4072,27 +6156,27 @@
         },
         {
           "country": "Germany",
-          "bags": 37864
+          "bags": 48879
         },
         {
           "country": "Belgium",
-          "bags": 12646
+          "bags": 25951
         },
         {
           "country": "United States",
-          "bags": 1640
+          "bags": 14433
         },
         {
           "country": "Morocco",
-          "bags": 10126
+          "bags": 10779
         },
         {
           "country": "Spain",
-          "bags": 6433
+          "bags": 10643
         },
         {
           "country": "Netherlands",
-          "bags": 3934
+          "bags": 6368
         },
         {
           "country": "Korea",
@@ -4100,7 +6184,7 @@
         },
         {
           "country": "Russia",
-          "bags": 2880
+          "bags": 3540
         },
         {
           "country": "Turkey",
@@ -4108,15 +6192,15 @@
         },
         {
           "country": "France",
-          "bags": 270
+          "bags": 2204
         },
         {
           "country": "Egypt",
-          "bags": 1734
+          "bags": 2068
         },
         {
           "country": "United Kingdom",
-          "bags": 1564
+          "bags": 1580
         },
         {
           "country": "South Africa",
@@ -4225,12 +6309,96 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 192426
+        },
+        {
           "country": "Sudan",
-          "bags": 10500
+          "bags": 95234
+        },
+        {
+          "country": "Germany",
+          "bags": 61741
         },
         {
           "country": "India",
-          "bags": 3500
+          "bags": 41863
+        },
+        {
+          "country": "Belgium",
+          "bags": 17761
+        },
+        {
+          "country": "Morocco",
+          "bags": 14135
+        },
+        {
+          "country": "United States",
+          "bags": 12990
+        },
+        {
+          "country": "Spain",
+          "bags": 9797
+        },
+        {
+          "country": "Algeria",
+          "bags": 7971
+        },
+        {
+          "country": "Netherlands",
+          "bags": 7234
+        },
+        {
+          "country": "Russia",
+          "bags": 5209
+        },
+        {
+          "country": "Turkey",
+          "bags": 3250
+        },
+        {
+          "country": "Japan",
+          "bags": 2826
+        },
+        {
+          "country": "China",
+          "bags": 2240
+        },
+        {
+          "country": "France",
+          "bags": 1542
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1391
+        },
+        {
+          "country": "South Africa",
+          "bags": 1180
+        },
+        {
+          "country": "Greece",
+          "bags": 1050
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1002
+        },
+        {
+          "country": "Australia",
+          "bags": 960
+        },
+        {
+          "country": "Portugal",
+          "bags": 720
+        },
+        {
+          "country": "Kenya",
+          "bags": 420
+        },
+        {
+          "country": "Egypt",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -4308,7 +6476,7 @@
         },
         {
           "country": "Italy",
-          "bags": 103680
+          "bags": 139201
         },
         {
           "country": "Sudan",
@@ -4316,47 +6484,47 @@
         },
         {
           "country": "India",
-          "bags": 49847
+          "bags": 51429
         },
         {
           "country": "Belgium",
-          "bags": 11836
+          "bags": 17298
         },
         {
           "country": "Morocco",
-          "bags": 11640
+          "bags": 12920
         },
         {
           "country": "Netherlands",
-          "bags": 2460
+          "bags": 11020
         },
         {
           "country": "Spain",
-          "bags": 5785
+          "bags": 10024
         },
         {
           "country": "Algeria",
-          "bags": 7320
+          "bags": 9880
         },
         {
           "country": "Switzerland",
-          "bags": 4670
+          "bags": 5310
         },
         {
           "country": "Japan",
-          "bags": 3840
+          "bags": 5156
         },
         {
           "country": "United Arab Emirates",
-          "bags": 3173
+          "bags": 3507
         },
         {
           "country": "Russia",
-          "bags": 2240
+          "bags": 2560
         },
         {
           "country": "United Kingdom",
-          "bags": 640
+          "bags": 2259
         },
         {
           "country": "Portugal",
@@ -4368,15 +6536,15 @@
         },
         {
           "country": "Canada",
-          "bags": 1050
+          "bags": 1370
         },
         {
           "country": "Turkey",
-          "bags": 1030
+          "bags": 1364
         },
         {
           "country": "China",
-          "bags": 640
+          "bags": 960
         },
         {
           "country": "France",
@@ -4489,12 +6657,112 @@
       ],
       "by_destination": [
         {
-          "country": "Korea",
-          "bags": 330
+          "country": "Italy",
+          "bags": 159052
         },
         {
           "country": "Sudan",
-          "bags": 5600
+          "bags": 86155
+        },
+        {
+          "country": "Germany",
+          "bags": 63478
+        },
+        {
+          "country": "India",
+          "bags": 56144
+        },
+        {
+          "country": "Usa",
+          "bags": 21322
+        },
+        {
+          "country": "Spain",
+          "bags": 20937
+        },
+        {
+          "country": "Netherlands",
+          "bags": 13791
+        },
+        {
+          "country": "Belgium",
+          "bags": 11391
+        },
+        {
+          "country": "Morocco",
+          "bags": 6780
+        },
+        {
+          "country": "Algeria",
+          "bags": 5468
+        },
+        {
+          "country": "Turkey",
+          "bags": 3234
+        },
+        {
+          "country": "China",
+          "bags": 2880
+        },
+        {
+          "country": "Switzerland",
+          "bags": 2690
+        },
+        {
+          "country": "Russia",
+          "bags": 2560
+        },
+        {
+          "country": "Greece",
+          "bags": 2450
+        },
+        {
+          "country": "Kenya",
+          "bags": 2214
+        },
+        {
+          "country": "Egypt",
+          "bags": 2100
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 2089
+        },
+        {
+          "country": "France",
+          "bags": 1620
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1280
+        },
+        {
+          "country": "Australia",
+          "bags": 919
+        },
+        {
+          "country": "Korea",
+          "bags": 832
+        },
+        {
+          "country": "Japan",
+          "bags": 675
+        },
+        {
+          "country": "Portugal",
+          "bags": 668
+        },
+        {
+          "country": "South Africa",
+          "bags": 570
+        },
+        {
+          "country": "Mexico",
+          "bags": 333
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 306
         }
       ],
       "parser_version": "v1_recent",
@@ -4571,8 +6839,100 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 99618
+        },
+        {
+          "country": "Germany",
+          "bags": 72012
+        },
+        {
+          "country": "India",
+          "bags": 47080
+        },
+        {
           "country": "Sudan",
-          "bags": 3500
+          "bags": 39567
+        },
+        {
+          "country": "Usa",
+          "bags": 21582
+        },
+        {
+          "country": "Belgium",
+          "bags": 20007
+        },
+        {
+          "country": "Spain",
+          "bags": 14206
+        },
+        {
+          "country": "Netherlands",
+          "bags": 12380
+        },
+        {
+          "country": "China",
+          "bags": 5133
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 4438
+        },
+        {
+          "country": "Morocco",
+          "bags": 4391
+        },
+        {
+          "country": "Russia",
+          "bags": 3905
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3413
+        },
+        {
+          "country": "South Africa",
+          "bags": 2880
+        },
+        {
+          "country": "Japan",
+          "bags": 2670
+        },
+        {
+          "country": "Mexico",
+          "bags": 2560
+        },
+        {
+          "country": "Egypt",
+          "bags": 2100
+        },
+        {
+          "country": "Kenya",
+          "bags": 1830
+        },
+        {
+          "country": "France",
+          "bags": 1500
+        },
+        {
+          "country": "Portugal",
+          "bags": 960
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 685
+        },
+        {
+          "country": "Algeria",
+          "bags": 650
+        },
+        {
+          "country": "Greece",
+          "bags": 334
+        },
+        {
+          "country": "Switzerland",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -4645,8 +7005,108 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 169223
+        },
+        {
+          "country": "Germany",
+          "bags": 78934
+        },
+        {
+          "country": "India",
+          "bags": 49583
+        },
+        {
+          "country": "Sudan",
+          "bags": 31849
+        },
+        {
+          "country": "Spain",
+          "bags": 18646
+        },
+        {
+          "country": "Usa",
+          "bags": 18285
+        },
+        {
+          "country": "Netherlands",
+          "bags": 15939
+        },
+        {
+          "country": "Belgium",
+          "bags": 14539
+        },
+        {
+          "country": "Portugal",
+          "bags": 11852
+        },
+        {
+          "country": "Japan",
+          "bags": 7910
+        },
+        {
+          "country": "Morocco",
+          "bags": 7743
+        },
+        {
+          "country": "China",
+          "bags": 4225
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 3079
+        },
+        {
+          "country": "Egypt",
+          "bags": 1575
+        },
+        {
+          "country": "Turkey",
+          "bags": 1380
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1280
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1160
+        },
+        {
+          "country": "South Africa",
+          "bags": 1009
+        },
+        {
+          "country": "Kenya",
+          "bags": 935
+        },
+        {
+          "country": "Greece",
+          "bags": 720
+        },
+        {
+          "country": "Algeria",
+          "bags": 666
+        },
+        {
           "country": "Korea",
-          "bags": 630
+          "bags": 950
+        },
+        {
+          "country": "Canada",
+          "bags": 555
+        },
+        {
+          "country": "Russia",
+          "bags": 320
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 653
+        },
+        {
+          "country": "France",
+          "bags": 270
         }
       ],
       "parser_version": "v1_recent",
@@ -4714,6 +7174,106 @@
         }
       ],
       "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 212433
+        },
+        {
+          "country": "Sudan",
+          "bags": 88902
+        },
+        {
+          "country": "Germany",
+          "bags": 68395
+        },
+        {
+          "country": "India",
+          "bags": 44249
+        },
+        {
+          "country": "Belgium",
+          "bags": 21712
+        },
+        {
+          "country": "Spain",
+          "bags": 19982
+        },
+        {
+          "country": "Usa",
+          "bags": 18754
+        },
+        {
+          "country": "Netherlands",
+          "bags": 13814
+        },
+        {
+          "country": "Japan",
+          "bags": 10560
+        },
+        {
+          "country": "Morocco",
+          "bags": 9408
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 8218
+        },
+        {
+          "country": "China",
+          "bags": 6136
+        },
+        {
+          "country": "Portugal",
+          "bags": 4674
+        },
+        {
+          "country": "Greece",
+          "bags": 4254
+        },
+        {
+          "country": "Russia",
+          "bags": 4225
+        },
+        {
+          "country": "Turkey",
+          "bags": 2020
+        },
+        {
+          "country": "Egypt",
+          "bags": 1718
+        },
+        {
+          "country": "Mexico",
+          "bags": 1710
+        },
+        {
+          "country": "Kenya",
+          "bags": 1643
+        },
+        {
+          "country": "Canada",
+          "bags": 1395
+        },
+        {
+          "country": "South Africa",
+          "bags": 1280
+        },
+        {
+          "country": "Switzerland",
+          "bags": 960
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 825
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 650
+        },
+        {
+          "country": "France",
+          "bags": 527
+        },
         {
           "country": "Korea",
           "bags": 320
@@ -4786,7 +7346,7 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 226260
+          "bags": 244110
         },
         {
           "country": "Sudan",
@@ -4794,11 +7354,11 @@
         },
         {
           "country": "Germany",
-          "bags": 59419
+          "bags": 70810
         },
         {
           "country": "India",
-          "bags": 44306
+          "bags": 48485
         },
         {
           "country": "Morocco",
@@ -4806,19 +7366,19 @@
         },
         {
           "country": "Spain",
-          "bags": 20219
+          "bags": 20552
         },
         {
           "country": "Belgium",
-          "bags": 17654
+          "bags": 19455
         },
         {
           "country": "Usa",
-          "bags": 2980
+          "bags": 16248
         },
         {
           "country": "Netherlands",
-          "bags": 8564
+          "bags": 10687
         },
         {
           "country": "Algeria",
@@ -4826,11 +7386,11 @@
         },
         {
           "country": "China",
-          "bags": 7766
+          "bags": 8726
         },
         {
           "country": "United Arab Emirates",
-          "bags": 8162
+          "bags": 8482
         },
         {
           "country": "Portugal",
@@ -4838,7 +7398,7 @@
         },
         {
           "country": "Japan",
-          "bags": 4162
+          "bags": 4942
         },
         {
           "country": "Switzerland",
@@ -4854,15 +7414,15 @@
         },
         {
           "country": "Russia",
-          "bags": 1498
+          "bags": 1885
         },
         {
           "country": "Kenya",
-          "bags": 320
+          "bags": 1450
         },
         {
           "country": "Egypt",
-          "bags": 1170
+          "bags": 1259
         },
         {
           "country": "Saudi Arabia",
@@ -4878,7 +7438,7 @@
         },
         {
           "country": "South Africa",
-          "bags": 410
+          "bags": 430
         },
         {
           "country": "Korea",
@@ -4961,6 +7521,102 @@
         {
           "country": "Sudan",
           "bags": 2023
+        },
+        {
+          "country": "Italy",
+          "bags": 225045
+        },
+        {
+          "country": "Germany",
+          "bags": 81813
+        },
+        {
+          "country": "India",
+          "bags": 71300
+        },
+        {
+          "country": "Algeria",
+          "bags": 36151
+        },
+        {
+          "country": "Spain",
+          "bags": 30467
+        },
+        {
+          "country": "Morocco",
+          "bags": 18348
+        },
+        {
+          "country": "Belgium",
+          "bags": 16449
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 14617
+        },
+        {
+          "country": "Japan",
+          "bags": 10235
+        },
+        {
+          "country": "Netherlands",
+          "bags": 8770
+        },
+        {
+          "country": "Turkey",
+          "bags": 6974
+        },
+        {
+          "country": "Portugal",
+          "bags": 6630
+        },
+        {
+          "country": "Egypt",
+          "bags": 5336
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 4842
+        },
+        {
+          "country": "Russia",
+          "bags": 4559
+        },
+        {
+          "country": "Switzerland",
+          "bags": 3340
+        },
+        {
+          "country": "Greece",
+          "bags": 1974
+        },
+        {
+          "country": "Mexico",
+          "bags": 1710
+        },
+        {
+          "country": "China",
+          "bags": 1630
+        },
+        {
+          "country": "Australia",
+          "bags": 986
+        },
+        {
+          "country": "Kenya",
+          "bags": 908
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 674
+        },
+        {
+          "country": "Canada",
+          "bags": 670
+        },
+        {
+          "country": "France",
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -5045,6 +7701,90 @@
           "bags": 1641
         },
         {
+          "country": "Italy",
+          "bags": 202612
+        },
+        {
+          "country": "Germany",
+          "bags": 129703
+        },
+        {
+          "country": "Sudan",
+          "bags": 52850
+        },
+        {
+          "country": "India",
+          "bags": 40828
+        },
+        {
+          "country": "Algeria",
+          "bags": 24524
+        },
+        {
+          "country": "Spain",
+          "bags": 22623
+        },
+        {
+          "country": "Morocco",
+          "bags": 19426
+        },
+        {
+          "country": "Belgium",
+          "bags": 16741
+        },
+        {
+          "country": "Russia",
+          "bags": 9146
+        },
+        {
+          "country": "Egypt",
+          "bags": 5780
+        },
+        {
+          "country": "Netherlands",
+          "bags": 5240
+        },
+        {
+          "country": "Portugal",
+          "bags": 4414
+        },
+        {
+          "country": "Japan",
+          "bags": 3840
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 3660
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3400
+        },
+        {
+          "country": "Switzerland",
+          "bags": 3340
+        },
+        {
+          "country": "China",
+          "bags": 1564
+        },
+        {
+          "country": "Kenya",
+          "bags": 1324
+        },
+        {
+          "country": "Turkey",
+          "bags": 960
+        },
+        {
+          "country": "South Africa",
+          "bags": 940
+        },
+        {
+          "country": "Australia",
+          "bags": 654
+        },
+        {
           "country": "Korea",
           "bags": 320
         }
@@ -5121,7 +7861,100 @@
           "bags": 9000
         }
       ],
-      "by_destination": [],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 136107
+        },
+        {
+          "country": "Germany",
+          "bags": 80786
+        },
+        {
+          "country": "Spain",
+          "bags": 45763
+        },
+        {
+          "country": "India",
+          "bags": 34802
+        },
+        {
+          "country": "Algeria",
+          "bags": 26153
+        },
+        {
+          "country": "Sudan",
+          "bags": 25504
+        },
+        {
+          "country": "Tunisia",
+          "bags": 16800
+        },
+        {
+          "country": "Morocco",
+          "bags": 15774
+        },
+        {
+          "country": "Belgium",
+          "bags": 15354
+        },
+        {
+          "country": "Russia",
+          "bags": 14446
+        },
+        {
+          "country": "Japan",
+          "bags": 5440
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 4260
+        },
+        {
+          "country": "Portugal",
+          "bags": 3900
+        },
+        {
+          "country": "Egypt",
+          "bags": 3521
+        },
+        {
+          "country": "China",
+          "bags": 3452
+        },
+        {
+          "country": "Netherlands",
+          "bags": 3130
+        },
+        {
+          "country": "Kenya",
+          "bags": 1995
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1336
+        },
+        {
+          "country": "Turkey",
+          "bags": 990
+        },
+        {
+          "country": "Greece",
+          "bags": 654
+        },
+        {
+          "country": "France",
+          "bags": 640
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 640
+        },
+        {
+          "country": "South Africa",
+          "bags": 295
+        }
+      ],
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-11/October%202023.pdf",
       "parse_warnings": []
@@ -5196,8 +8029,104 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 117797
+        },
+        {
+          "country": "Germany",
+          "bags": 87228
+        },
+        {
+          "country": "Sudan",
+          "bags": 37146
+        },
+        {
+          "country": "India",
+          "bags": 32278
+        },
+        {
+          "country": "Spain",
+          "bags": 23523
+        },
+        {
+          "country": "Belgium",
+          "bags": 23032
+        },
+        {
+          "country": "Algeria",
+          "bags": 15391
+        },
+        {
+          "country": "Morocco",
+          "bags": 12172
+        },
+        {
+          "country": "Russia",
+          "bags": 8784
+        },
+        {
+          "country": "Netherlands",
+          "bags": 7862
+        },
+        {
+          "country": "Switzerland",
+          "bags": 7148
+        },
+        {
+          "country": "Japan",
+          "bags": 7040
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 5469
+        },
+        {
+          "country": "Egypt",
+          "bags": 3452
+        },
+        {
+          "country": "Portugal",
+          "bags": 3304
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3010
+        },
+        {
+          "country": "China",
+          "bags": 1810
+        },
+        {
           "country": "Korea",
           "bags": 1665
+        },
+        {
+          "country": "Greece",
+          "bags": 974
+        },
+        {
+          "country": "Canada",
+          "bags": 748
+        },
+        {
+          "country": "Tunisia",
+          "bags": 700
+        },
+        {
+          "country": "Australia",
+          "bags": 667
+        },
+        {
+          "country": "South Africa",
+          "bags": 320
+        },
+        {
+          "country": "Turkey",
+          "bags": 320
+        },
+        {
+          "country": "Kenya",
+          "bags": 107
         }
       ],
       "parser_version": "v1_recent",
@@ -5275,23 +8204,23 @@
         },
         {
           "country": "Italy",
-          "bags": 145587
+          "bags": 158326
         },
         {
           "country": "India",
-          "bags": 45847
+          "bags": 48367
         },
         {
           "country": "Germany",
-          "bags": 33063
+          "bags": 46020
         },
         {
           "country": "Morocco",
-          "bags": 23264
+          "bags": 24544
         },
         {
           "country": "Spain",
-          "bags": 22257
+          "bags": 23904
         },
         {
           "country": "Sudan",
@@ -5299,11 +8228,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 5932
+          "bags": 14752
         },
         {
           "country": "Netherlands",
-          "bags": 7660
+          "bags": 9340
         },
         {
           "country": "Algeria",
@@ -5311,7 +8240,7 @@
         },
         {
           "country": "United Arab Emirates",
-          "bags": 3550
+          "bags": 4190
         },
         {
           "country": "Switzerland",
@@ -5319,19 +8248,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 1730
+          "bags": 3062
         },
         {
           "country": "Portugal",
-          "bags": 2740
+          "bags": 3060
         },
         {
           "country": "Japan",
-          "bags": 1293
+          "bags": 2483
         },
         {
           "country": "Russia",
-          "bags": 1974
+          "bags": 2294
         },
         {
           "country": "China",
@@ -5339,19 +8268,19 @@
         },
         {
           "country": "Canada",
-          "bags": 345
+          "bags": 985
         },
         {
           "country": "Egypt",
-          "bags": 350
+          "bags": 684
         },
         {
           "country": "Australia",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "Kenya",
@@ -5371,7 +8300,7 @@
         },
         {
           "country": "Saudi Arabia",
-          "bags": 193
+          "bags": 227
         }
       ],
       "parser_version": "v1_recent",
@@ -5444,8 +8373,96 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 201311
+        },
+        {
+          "country": "Germany",
+          "bags": 64502
+        },
+        {
+          "country": "India",
+          "bags": 47038
+        },
+        {
+          "country": "Spain",
+          "bags": 25611
+        },
+        {
+          "country": "Morocco",
+          "bags": 21028
+        },
+        {
+          "country": "Sudan",
+          "bags": 17500
+        },
+        {
+          "country": "Belgium",
+          "bags": 17298
+        },
+        {
+          "country": "Netherlands",
+          "bags": 9200
+        },
+        {
+          "country": "Russia",
+          "bags": 7120
+        },
+        {
+          "country": "Portugal",
+          "bags": 6616
+        },
+        {
+          "country": "China",
+          "bags": 4873
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 4545
+        },
+        {
+          "country": "Egypt",
+          "bags": 3755
+        },
+        {
+          "country": "Switzerland",
+          "bags": 3355
+        },
+        {
+          "country": "Algeria",
+          "bags": 2846
+        },
+        {
+          "country": "Kenya",
+          "bags": 2760
+        },
+        {
+          "country": "Japan",
+          "bags": 2100
+        },
+        {
+          "country": "Turkey",
+          "bags": 1321
+        },
+        {
           "country": "Korea",
-          "bags": 320
+          "bags": 986
+        },
+        {
+          "country": "South Africa",
+          "bags": 960
+        },
+        {
+          "country": "Greece",
+          "bags": 720
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 668
+        },
+        {
+          "country": "Canada",
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -5523,7 +8540,11 @@
         },
         {
           "country": "Italy",
-          "bags": 149362
+          "bags": 164010
+        },
+        {
+          "country": "India",
+          "bags": 48303
         },
         {
           "country": "India",
@@ -5535,35 +8556,35 @@
         },
         {
           "country": "Germany",
-          "bags": 34355
+          "bags": 39445
         },
         {
           "country": "Morocco",
-          "bags": 15394
+          "bags": 16994
         },
         {
           "country": "Spain",
-          "bags": 15879
+          "bags": 16513
         },
         {
           "country": "Belgium",
-          "bags": 6602
+          "bags": 12682
         },
         {
           "country": "Portugal",
-          "bags": 8942
+          "bags": 11502
         },
         {
           "country": "China",
-          "bags": 6144
+          "bags": 9144
         },
         {
           "country": "Russia",
-          "bags": 5513
+          "bags": 6792
         },
         {
           "country": "Netherlands",
-          "bags": 3550
+          "bags": 4710
         },
         {
           "country": "Japan",
@@ -5579,11 +8600,11 @@
         },
         {
           "country": "Greece",
-          "bags": 1440
+          "bags": 1800
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1002
+          "bags": 1642
         },
         {
           "country": "Kenya",
@@ -5599,7 +8620,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 320
+          "bags": 630
         },
         {
           "country": "Egypt",
@@ -5692,12 +8713,88 @@
           "bags": 164
         },
         {
-          "country": "Korea",
-          "bags": 320
+          "country": "Italy",
+          "bags": 125549
+        },
+        {
+          "country": "Germany",
+          "bags": 34617
+        },
+        {
+          "country": "Belgium",
+          "bags": 24479
         },
         {
           "country": "Sudan",
-          "bags": 2800
+          "bags": 16450
+        },
+        {
+          "country": "Spain",
+          "bags": 14359
+        },
+        {
+          "country": "Morocco",
+          "bags": 11156
+        },
+        {
+          "country": "China",
+          "bags": 9817
+        },
+        {
+          "country": "Portugal",
+          "bags": 3912
+        },
+        {
+          "country": "Japan",
+          "bags": 3867
+        },
+        {
+          "country": "Netherlands",
+          "bags": 3350
+        },
+        {
+          "country": "Russia",
+          "bags": 2602
+        },
+        {
+          "country": "Egypt",
+          "bags": 2434
+        },
+        {
+          "country": "Greece",
+          "bags": 1976
+        },
+        {
+          "country": "Kenya",
+          "bags": 1838
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1560
+        },
+        {
+          "country": "South Africa",
+          "bags": 1450
+        },
+        {
+          "country": "Canada",
+          "bags": 1440
+        },
+        {
+          "country": "Turkey",
+          "bags": 1294
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 653
+        },
+        {
+          "country": "Korea",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -5782,8 +8879,96 @@
           "bags": 164
         },
         {
+          "country": "Italy",
+          "bags": 171517
+        },
+        {
+          "country": "Germany",
+          "bags": 26944
+        },
+        {
+          "country": "Belgium",
+          "bags": 26428
+        },
+        {
+          "country": "Spain",
+          "bags": 16220
+        },
+        {
+          "country": "Morocco",
+          "bags": 14505
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 9204
+        },
+        {
+          "country": "China",
+          "bags": 8414
+        },
+        {
+          "country": "Sudan",
+          "bags": 7700
+        },
+        {
+          "country": "Russia",
+          "bags": 6876
+        },
+        {
+          "country": "Netherlands",
+          "bags": 4940
+        },
+        {
+          "country": "Japan",
+          "bags": 4160
+        },
+        {
+          "country": "Greece",
+          "bags": 3032
+        },
+        {
+          "country": "Portugal",
+          "bags": 2908
+        },
+        {
           "country": "Korea",
           "bags": 1962
+        },
+        {
+          "country": "Canada",
+          "bags": 1740
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1530
+        },
+        {
+          "country": "South Africa",
+          "bags": 1364
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1002
+        },
+        {
+          "country": "Australia",
+          "bags": 762
+        },
+        {
+          "country": "Kenya",
+          "bags": 680
+        },
+        {
+          "country": "Mexico",
+          "bags": 640
+        },
+        {
+          "country": "Egypt",
+          "bags": 334
+        },
+        {
+          "country": "Turkey",
+          "bags": 334
         }
       ],
       "parser_version": "v1_recent",
@@ -5869,15 +9054,15 @@
         },
         {
           "country": "Germany",
-          "bags": 65966
+          "bags": 78436
         },
         {
           "country": "Spain",
-          "bags": 46671
+          "bags": 51805
         },
         {
           "country": "India",
-          "bags": 40818
+          "bags": 47122
         },
         {
           "country": "Sudan",
@@ -5885,15 +9070,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 13535
+          "bags": 25872
         },
         {
           "country": "China",
-          "bags": 20377
+          "bags": 22597
         },
         {
           "country": "Algeria",
-          "bags": 22095
+          "bags": 22428
         },
         {
           "country": "Morocco",
@@ -5901,11 +9086,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 10080
+          "bags": 14905
         },
         {
           "country": "Russia",
-          "bags": 8107
+          "bags": 11392
         },
         {
           "country": "Turkey",
@@ -5913,7 +9098,7 @@
         },
         {
           "country": "Japan",
-          "bags": 560
+          "bags": 3894
         },
         {
           "country": "Saudi Arabia",
@@ -5929,11 +9114,11 @@
         },
         {
           "country": "France",
-          "bags": 2520
+          "bags": 2854
         },
         {
           "country": "Portugal",
-          "bags": 1336
+          "bags": 2616
         },
         {
           "country": "Switzerland",
@@ -5941,7 +9126,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 1280
+          "bags": 1946
         },
         {
           "country": "Tunisia",
@@ -5949,7 +9134,7 @@
         },
         {
           "country": "Australia",
-          "bags": 320
+          "bags": 1312
         },
         {
           "country": "Tanzania",
@@ -6047,11 +9232,11 @@
       "by_destination": [
         {
           "country": "Brazil",
-          "bags": 13500
+          "bags": 14000
         },
         {
           "country": "United States",
-          "bags": 13750
+          "bags": 14500
         },
         {
           "country": "China",
@@ -6063,7 +9248,7 @@
         },
         {
           "country": "Germany",
-          "bags": 57860
+          "bags": 74427
         },
         {
           "country": "Sudan",
@@ -6071,31 +9256,31 @@
         },
         {
           "country": "Algeria",
-          "bags": 49236
+          "bags": 49902
         },
         {
           "country": "Spain",
-          "bags": 35731
+          "bags": 41009
         },
         {
           "country": "India",
-          "bags": 26685
+          "bags": 31332
         },
         {
           "country": "Morocco",
-          "bags": 23027
+          "bags": 23693
         },
         {
           "country": "Belgium",
-          "bags": 12184
+          "bags": 18693
         },
         {
           "country": "Netherlands",
-          "bags": 15942
+          "bags": 16062
         },
         {
           "country": "Russia",
-          "bags": 9254
+          "bags": 10228
         },
         {
           "country": "Egypt",
@@ -6103,27 +9288,27 @@
         },
         {
           "country": "Portugal",
-          "bags": 6564
+          "bags": 6897
         },
         {
           "country": "Greece",
-          "bags": 4778
+          "bags": 5781
         },
         {
           "country": "Japan",
-          "bags": 3394
+          "bags": 5464
         },
         {
           "country": "Turkey",
-          "bags": 4772
+          "bags": 5106
         },
         {
           "country": "Korea",
-          "bags": 2320
+          "bags": 2960
         },
         {
           "country": "South Africa",
-          "bags": 1985
+          "bags": 2945
         },
         {
           "country": "France",
@@ -6131,23 +9316,23 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 990
+          "bags": 2590
         },
         {
           "country": "Tunisia",
-          "bags": 1308
+          "bags": 2310
         },
         {
           "country": "Saudi Arabia",
-          "bags": 640
+          "bags": 2240
         },
         {
           "country": "Switzerland",
-          "bags": 1384
+          "bags": 2024
         },
         {
           "country": "Australia",
-          "bags": 1306
+          "bags": 1626
         },
         {
           "country": "Canada",
@@ -6231,6 +9416,94 @@
         }
       ],
       "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 12635
+        },
+        {
+          "country": "Germany",
+          "bags": 129407
+        },
+        {
+          "country": "Sudan",
+          "bags": 44450
+        },
+        {
+          "country": "India",
+          "bags": 43196
+        },
+        {
+          "country": "Netherlands",
+          "bags": 33997
+        },
+        {
+          "country": "Morocco",
+          "bags": 31340
+        },
+        {
+          "country": "Algeria",
+          "bags": 29902
+        },
+        {
+          "country": "Spain",
+          "bags": 26898
+        },
+        {
+          "country": "Belgium",
+          "bags": 22019
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 20300
+        },
+        {
+          "country": "Portugal",
+          "bags": 14620
+        },
+        {
+          "country": "Russia",
+          "bags": 13001
+        },
+        {
+          "country": "Japan",
+          "bags": 11840
+        },
+        {
+          "country": "Egypt",
+          "bags": 4720
+        },
+        {
+          "country": "Greece",
+          "bags": 4240
+        },
+        {
+          "country": "Turkey",
+          "bags": 3611
+        },
+        {
+          "country": "China",
+          "bags": 2100
+        },
+        {
+          "country": "Kenya",
+          "bags": 1631
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "Canada",
+          "bags": 720
+        },
+        {
+          "country": "Tunisia",
+          "bags": 350
+        },
+        {
+          "country": "South Africa",
+          "bags": 320
+        },
         {
           "country": "Korea",
           "bags": 320
@@ -6327,31 +9600,31 @@
         },
         {
           "country": "Belgium",
-          "bags": 36429
+          "bags": 41529
         },
         {
           "country": "Morocco",
-          "bags": 37196
+          "bags": 37546
         },
         {
           "country": "India",
-          "bags": 29710
+          "bags": 30295
         },
         {
           "country": "Spain",
-          "bags": 26453
+          "bags": 27413
         },
         {
           "country": "China",
-          "bags": 17508
+          "bags": 21474
         },
         {
           "country": "Netherlands",
-          "bags": 18885
+          "bags": 19841
         },
         {
           "country": "Russia",
-          "bags": 13398
+          "bags": 16052
         },
         {
           "country": "Switzerland",
@@ -6359,7 +9632,7 @@
         },
         {
           "country": "Greece",
-          "bags": 9253
+          "bags": 11403
         },
         {
           "country": "Egypt",
@@ -6367,7 +9640,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 6869
+          "bags": 9495
         },
         {
           "country": "France",
@@ -6375,11 +9648,11 @@
         },
         {
           "country": "Japan",
-          "bags": 3670
+          "bags": 5270
         },
         {
           "country": "Turkey",
-          "bags": 4888
+          "bags": 5238
         },
         {
           "country": "Tunisia",
@@ -6387,19 +9660,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 2880
+          "bags": 4497
         },
         {
           "country": "South Africa",
-          "bags": 1580
+          "bags": 3655
         },
         {
           "country": "Australia",
-          "bags": 2686
+          "bags": 3030
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 2612
         },
         {
           "country": "Mexico",
@@ -6415,7 +9688,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 100
+          "bags": 520
         },
         {
           "country": "Saudi Arabia",
@@ -6505,19 +9778,19 @@
         },
         {
           "country": "Germany",
-          "bags": 77648
+          "bags": 85721
         },
         {
           "country": "Algeria",
-          "bags": 45695
+          "bags": 46028
         },
         {
           "country": "India",
-          "bags": 38111
+          "bags": 38401
         },
         {
           "country": "Spain",
-          "bags": 31957
+          "bags": 34721
         },
         {
           "country": "Morocco",
@@ -6525,23 +9798,23 @@
         },
         {
           "country": "Belgium",
-          "bags": 28081
+          "bags": 31694
         },
         {
           "country": "Russia",
-          "bags": 24619
+          "bags": 26593
         },
         {
           "country": "Netherlands",
-          "bags": 17934
+          "bags": 20444
         },
         {
           "country": "China",
-          "bags": 11033
+          "bags": 14864
         },
         {
           "country": "Portugal",
-          "bags": 8534
+          "bags": 10199
         },
         {
           "country": "Turkey",
@@ -6549,7 +9822,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 5734
+          "bags": 7014
         },
         {
           "country": "Greece",
@@ -6561,19 +9834,19 @@
         },
         {
           "country": "Australia",
-          "bags": 3972
+          "bags": 4292
         },
         {
           "country": "Japan",
-          "bags": 2450
+          "bags": 3657
         },
         {
           "country": "South Africa",
-          "bags": 1280
+          "bags": 2510
         },
         {
           "country": "Canada",
-          "bags": 1050
+          "bags": 1370
         },
         {
           "country": "Korea",
@@ -6658,8 +9931,88 @@
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 185553
+        },
+        {
+          "country": "Germany",
+          "bags": 87017
+        },
+        {
+          "country": "India",
+          "bags": 46543
+        },
+        {
+          "country": "Algeria",
+          "bags": 24383
+        },
+        {
+          "country": "Morocco",
+          "bags": 22175
+        },
+        {
+          "country": "Russia",
+          "bags": 21918
+        },
+        {
+          "country": "China",
+          "bags": 20005
+        },
+        {
+          "country": "Netherlands",
+          "bags": 10780
+        },
+        {
           "country": "Sudan",
-          "bags": 3500
+          "bags": 9890
+        },
+        {
+          "country": "Belgium",
+          "bags": 8860
+        },
+        {
+          "country": "Spain",
+          "bags": 8465
+        },
+        {
+          "country": "Tunisia",
+          "bags": 6583
+        },
+        {
+          "country": "United Arab Emirates",
+          "bags": 5712
+        },
+        {
+          "country": "Japan",
+          "bags": 5440
+        },
+        {
+          "country": "Portugal",
+          "bags": 3400
+        },
+        {
+          "country": "Egypt",
+          "bags": 2100
+        },
+        {
+          "country": "Turkey",
+          "bags": 1400
+        },
+        {
+          "country": "Australia",
+          "bags": 1344
+        },
+        {
+          "country": "Kenya",
+          "bags": 1283
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "Canada",
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -6741,19 +10094,19 @@
         },
         {
           "country": "Germany",
-          "bags": 70460
+          "bags": 73187
         },
         {
           "country": "Algeria",
-          "bags": 51004
+          "bags": 51337
         },
         {
           "country": "India",
-          "bags": 42198
+          "bags": 45418
         },
         {
           "country": "Switzerland",
-          "bags": 31718
+          "bags": 33642
         },
         {
           "country": "Sudan",
@@ -6765,43 +10118,43 @@
         },
         {
           "country": "Spain",
-          "bags": 21605
+          "bags": 23901
         },
         {
           "country": "Belgium",
-          "bags": 15076
+          "bags": 19494
         },
         {
           "country": "Netherlands",
-          "bags": 15289
+          "bags": 17809
         },
         {
           "country": "Russia",
-          "bags": 15615
+          "bags": 16649
         },
         {
           "country": "Portugal",
-          "bags": 9950
+          "bags": 12601
         },
         {
           "country": "China",
-          "bags": 9407
+          "bags": 10391
         },
         {
           "country": "Greece",
-          "bags": 7479
+          "bags": 7813
         },
         {
           "country": "Turkey",
-          "bags": 3254
+          "bags": 4761
         },
         {
           "country": "Australia",
-          "bags": 3164
+          "bags": 3654
         },
         {
           "country": "United Kingdom",
-          "bags": 3214
+          "bags": 3631
         },
         {
           "country": "Tunisia",
@@ -6813,15 +10166,15 @@
         },
         {
           "country": "South Africa",
-          "bags": 1319
+          "bags": 1959
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1274
+          "bags": 1914
         },
         {
           "country": "Kenya",
-          "bags": 333
+          "bags": 1693
         },
         {
           "country": "Canada",
@@ -6833,7 +10186,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 607
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -6911,27 +10264,27 @@
         },
         {
           "country": "Germany",
-          "bags": 74215
+          "bags": 89720
         },
         {
           "country": "India",
-          "bags": 40415
+          "bags": 45685
         },
         {
           "country": "Belgium",
-          "bags": 20066
+          "bags": 33963
         },
         {
           "country": "Spain",
-          "bags": 21268
+          "bags": 25802
         },
         {
           "country": "Russia",
-          "bags": 21172
+          "bags": 23325
         },
         {
           "country": "Netherlands",
-          "bags": 16008
+          "bags": 18801
         },
         {
           "country": "Morocco",
@@ -6939,7 +10292,7 @@
         },
         {
           "country": "Algeria",
-          "bags": 13421
+          "bags": 14714
         },
         {
           "country": "Sudan",
@@ -6947,23 +10300,23 @@
         },
         {
           "country": "Greece",
-          "bags": 10762
+          "bags": 11780
         },
         {
           "country": "Switzerland",
-          "bags": 9154
+          "bags": 10474
         },
         {
           "country": "China",
-          "bags": 3910
+          "bags": 9088
         },
         {
           "country": "Portugal",
-          "bags": 7378
+          "bags": 8710
         },
         {
           "country": "United Kingdom",
-          "bags": 6040
+          "bags": 7000
         },
         {
           "country": "Tunisia",
@@ -6971,15 +10324,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 2804
+          "bags": 4512
         },
         {
           "country": "Canada",
-          "bags": 2356
+          "bags": 4328
         },
         {
           "country": "Australia",
-          "bags": 3291
+          "bags": 3611
         },
         {
           "country": "Mexico",
@@ -6991,11 +10344,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 999
+          "bags": 2599
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 1280
         },
         {
           "country": "Saudi Arabia",
@@ -7007,7 +10360,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 316
+          "bags": 350
         },
         {
           "country": "Japan",
@@ -7081,15 +10434,15 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 188459
+          "bags": 203278
         },
         {
           "country": "Belgium",
-          "bags": 48657
+          "bags": 65507
         },
         {
           "country": "India",
-          "bags": 50709
+          "bags": 53699
         },
         {
           "country": "Sudan",
@@ -7097,19 +10450,19 @@
         },
         {
           "country": "Germany",
-          "bags": 44946
+          "bags": 45666
         },
         {
           "country": "Spain",
-          "bags": 22572
+          "bags": 25209
         },
         {
           "country": "China",
-          "bags": 12837
+          "bags": 13777
         },
         {
           "country": "Netherlands",
-          "bags": 7118
+          "bags": 13684
         },
         {
           "country": "Morocco",
@@ -7117,27 +10470,27 @@
         },
         {
           "country": "Egypt",
-          "bags": 5465
+          "bags": 5820
         },
         {
           "country": "Russia",
-          "bags": 2306
+          "bags": 5590
         },
         {
           "country": "Portugal",
-          "bags": 4440
+          "bags": 5080
         },
         {
           "country": "France",
-          "bags": 2520
+          "bags": 3240
         },
         {
           "country": "Turkey",
-          "bags": 2656
+          "bags": 2985
         },
         {
           "country": "Japan",
-          "bags": 2618
+          "bags": 2938
         },
         {
           "country": "Canada",
@@ -7158,6 +10511,18 @@
         {
           "country": "Australia",
           "bags": 666
+        },
+        {
+          "country": "South Africa",
+          "bags": 666
+        },
+        {
+          "country": "Greece",
+          "bags": 640
+        },
+        {
+          "country": "Tunisia",
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -7243,7 +10608,7 @@
         },
         {
           "country": "Germany",
-          "bags": 37953
+          "bags": 59464
         },
         {
           "country": "Sudan",
@@ -7251,43 +10616,43 @@
         },
         {
           "country": "India",
-          "bags": 34150
+          "bags": 37170
         },
         {
           "country": "Belgium",
-          "bags": 19470
+          "bags": 34996
         },
         {
           "country": "China",
-          "bags": 20378
+          "bags": 34862
         },
         {
           "country": "Spain",
-          "bags": 29169
+          "bags": 31103
         },
         {
           "country": "Morocco",
-          "bags": 17232
+          "bags": 17900
         },
         {
           "country": "Algeria",
-          "bags": 15953
+          "bags": 16273
         },
         {
           "country": "Portugal",
-          "bags": 7750
+          "bags": 11150
         },
         {
           "country": "Russia",
-          "bags": 8675
+          "bags": 10729
         },
         {
           "country": "Turkey",
-          "bags": 6770
+          "bags": 7120
         },
         {
           "country": "United Kingdom",
-          "bags": 3013
+          "bags": 6592
         },
         {
           "country": "Greece",
@@ -7295,11 +10660,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 3133
+          "bags": 6146
         },
         {
           "country": "Switzerland",
-          "bags": 4008
+          "bags": 4013
         },
         {
           "country": "Egypt",
@@ -7307,23 +10672,23 @@
         },
         {
           "country": "France",
-          "bags": 2856
+          "bags": 3206
         },
         {
           "country": "Australia",
-          "bags": 1776
+          "bags": 3079
         },
         {
           "country": "South Africa",
-          "bags": 790
+          "bags": 1750
         },
         {
           "country": "Canada",
-          "bags": 700
+          "bags": 1660
         },
         {
           "country": "Saudi Arabia",
-          "bags": 960
+          "bags": 1280
         },
         {
           "country": "Korea",
@@ -7331,7 +10696,7 @@
         },
         {
           "country": "Japan",
-          "bags": 640
+          "bags": 950
         },
         {
           "country": "Mexico",
@@ -7425,11 +10790,11 @@
         },
         {
           "country": "Germany",
-          "bags": 36026
+          "bags": 54831
         },
         {
           "country": "India",
-          "bags": 49702
+          "bags": 51802
         },
         {
           "country": "Morocco",
@@ -7437,11 +10802,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 13913
+          "bags": 29370
         },
         {
           "country": "China",
-          "bags": 8900
+          "bags": 23747
         },
         {
           "country": "Algeria",
@@ -7449,31 +10814,31 @@
         },
         {
           "country": "Spain",
-          "bags": 10353
+          "bags": 12613
         },
         {
           "country": "Portugal",
-          "bags": 8963
+          "bags": 12483
         },
         {
           "country": "Netherlands",
-          "bags": 3550
+          "bags": 10698
         },
         {
           "country": "Russia",
-          "bags": 3678
+          "bags": 9986
         },
         {
           "country": "United Kingdom",
-          "bags": 3708
+          "bags": 7147
         },
         {
           "country": "Greece",
-          "bags": 6190
+          "bags": 6540
         },
         {
           "country": "Turkey",
-          "bags": 5514
+          "bags": 6214
         },
         {
           "country": "Switzerland",
@@ -7485,31 +10850,31 @@
         },
         {
           "country": "South Africa",
-          "bags": 2559
+          "bags": 3899
         },
         {
           "country": "Saudi Arabia",
-          "bags": 768
+          "bags": 3648
         },
         {
           "country": "Canada",
-          "bags": 1630
+          "bags": 2962
         },
         {
           "country": "Australia",
-          "bags": 973
+          "bags": 2069
         },
         {
           "country": "Tanzania",
-          "bags": 1218
+          "bags": 1886
         },
         {
           "country": "Japan",
-          "bags": 206
+          "bags": 1406
         },
         {
           "country": "Kenya",
-          "bags": 720
+          "bags": 737
         },
         {
           "country": "Mexico",
@@ -7517,7 +10882,7 @@
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "France",
@@ -7607,11 +10972,11 @@
         },
         {
           "country": "Germany",
-          "bags": 49323
+          "bags": 53395
         },
         {
           "country": "India",
-          "bags": 41902
+          "bags": 44038
         },
         {
           "country": "Morocco",
@@ -7619,19 +10984,19 @@
         },
         {
           "country": "China",
-          "bags": 17507
+          "bags": 28172
         },
         {
           "country": "Spain",
-          "bags": 19986
+          "bags": 22573
         },
         {
           "country": "Belgium",
-          "bags": 16280
+          "bags": 20600
         },
         {
           "country": "Portugal",
-          "bags": 15324
+          "bags": 18632
         },
         {
           "country": "Algeria",
@@ -7639,15 +11004,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 15568
+          "bags": 16208
         },
         {
           "country": "Netherlands",
-          "bags": 8428
+          "bags": 14012
         },
         {
           "country": "Russia",
-          "bags": 8457
+          "bags": 10517
         },
         {
           "country": "Egypt",
@@ -7655,23 +11020,23 @@
         },
         {
           "country": "South Africa",
-          "bags": 2295
+          "bags": 4445
         },
         {
           "country": "Australia",
-          "bags": 2313
+          "bags": 2953
         },
         {
           "country": "Switzerland",
-          "bags": 2573
+          "bags": 2893
         },
         {
           "country": "Greece",
-          "bags": 1925
+          "bags": 2259
         },
         {
           "country": "United Kingdom",
-          "bags": 1924
+          "bags": 2224
         },
         {
           "country": "Kenya",
@@ -7683,11 +11048,11 @@
         },
         {
           "country": "France",
-          "bags": 1080
+          "bags": 1564
         },
         {
           "country": "Korea",
-          "bags": 650
+          "bags": 1290
         },
         {
           "country": "Tanzania",
@@ -7695,7 +11060,7 @@
         },
         {
           "country": "Japan",
-          "bags": 100
+          "bags": 390
         },
         {
           "country": "Saudi Arabia",
@@ -7789,11 +11154,11 @@
         },
         {
           "country": "Germany",
-          "bags": 56090
+          "bags": 63613
         },
         {
           "country": "India",
-          "bags": 46245
+          "bags": 48045
         },
         {
           "country": "Morocco",
@@ -7805,27 +11170,27 @@
         },
         {
           "country": "China",
-          "bags": 14800
+          "bags": 22395
         },
         {
           "country": "Spain",
-          "bags": 19549
+          "bags": 21544
         },
         {
           "country": "Belgium",
-          "bags": 9433
+          "bags": 15986
         },
         {
           "country": "Netherlands",
-          "bags": 8595
+          "bags": 15366
         },
         {
           "country": "Portugal",
-          "bags": 14134
+          "bags": 15107
         },
         {
           "country": "Russia",
-          "bags": 6934
+          "bags": 13768
         },
         {
           "country": "Egypt",
@@ -7833,31 +11198,31 @@
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 7958
         },
         {
           "country": "Australia",
-          "bags": 1653
+          "bags": 7032
         },
         {
           "country": "Greece",
-          "bags": 6270
+          "bags": 6954
         },
         {
           "country": "United Kingdom",
-          "bags": 2660
+          "bags": 5658
         },
         {
           "country": "South Africa",
-          "bags": 1469
+          "bags": 4599
         },
         {
           "country": "Turkey",
-          "bags": 4146
+          "bags": 4250
         },
         {
           "country": "Saudi Arabia",
-          "bags": 640
+          "bags": 3959
         },
         {
           "country": "Mexico",
@@ -7865,19 +11230,19 @@
         },
         {
           "country": "Canada",
-          "bags": 986
+          "bags": 3252
         },
         {
           "country": "Switzerland",
-          "bags": 988
+          "bags": 2307
         },
         {
           "country": "Uae",
-          "bags": 1400
+          "bags": 1720
         },
         {
           "country": "Japan",
-          "bags": 306
+          "bags": 1466
         },
         {
           "country": "Tanzania",
@@ -7893,7 +11258,7 @@
         },
         {
           "country": "France",
-          "bags": 360
+          "bags": 680
         }
       ],
       "parser_version": "v1_recent",
@@ -7971,15 +11336,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 13737
+          "bags": 23689
         },
         {
           "country": "Switzerland",
-          "bags": 15459
+          "bags": 16929
         },
         {
           "country": "Netherlands",
-          "bags": 15040
+          "bags": 16573
         },
         {
           "country": "Greece",
@@ -7987,11 +11352,11 @@
         },
         {
           "country": "France",
-          "bags": 9000
+          "bags": 10072
         },
         {
           "country": "Portugal",
-          "bags": 9016
+          "bags": 9669
         },
         {
           "country": "Mexico",
@@ -7999,11 +11364,11 @@
         },
         {
           "country": "Turkey",
-          "bags": 8302
+          "bags": 8942
         },
         {
           "country": "United Kingdom",
-          "bags": 7241
+          "bags": 8243
         },
         {
           "country": "Egypt",
@@ -8011,15 +11376,15 @@
         },
         {
           "country": "Tunisia",
-          "bags": 3422
+          "bags": 4062
         },
         {
           "country": "Japan",
-          "bags": 655
+          "bags": 1960
         },
         {
           "country": "Australia",
-          "bags": 960
+          "bags": 1600
         },
         {
           "country": "Canada",
@@ -8031,7 +11396,7 @@
         },
         {
           "country": "Korea",
-          "bags": 640
+          "bags": 960
         },
         {
           "country": "Kenya",
@@ -8133,31 +11498,31 @@
         },
         {
           "country": "Belgium",
-          "bags": 36429
+          "bags": 41529
         },
         {
           "country": "Morocco",
-          "bags": 37196
+          "bags": 37546
         },
         {
           "country": "India",
-          "bags": 29710
+          "bags": 30295
         },
         {
           "country": "Spain",
-          "bags": 26453
+          "bags": 27413
         },
         {
           "country": "China",
-          "bags": 17508
+          "bags": 21474
         },
         {
           "country": "Netherlands",
-          "bags": 18885
+          "bags": 19841
         },
         {
           "country": "Russia",
-          "bags": 13398
+          "bags": 16052
         },
         {
           "country": "Switzerland",
@@ -8165,7 +11530,7 @@
         },
         {
           "country": "Greece",
-          "bags": 9253
+          "bags": 11403
         },
         {
           "country": "Egypt",
@@ -8173,7 +11538,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 6869
+          "bags": 9495
         },
         {
           "country": "France",
@@ -8181,11 +11546,11 @@
         },
         {
           "country": "Japan",
-          "bags": 3670
+          "bags": 5270
         },
         {
           "country": "Turkey",
-          "bags": 4888
+          "bags": 5238
         },
         {
           "country": "Tunisia",
@@ -8193,19 +11558,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 2880
+          "bags": 4497
         },
         {
           "country": "South Africa",
-          "bags": 1580
+          "bags": 3655
         },
         {
           "country": "Australia",
-          "bags": 2686
+          "bags": 3030
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 2612
         },
         {
           "country": "Mexico",
@@ -8221,7 +11586,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 100
+          "bags": 520
         },
         {
           "country": "Saudi Arabia",
@@ -8311,19 +11676,19 @@
         },
         {
           "country": "Germany",
-          "bags": 77648
+          "bags": 85721
         },
         {
           "country": "Algeria",
-          "bags": 45695
+          "bags": 46028
         },
         {
           "country": "India",
-          "bags": 38111
+          "bags": 38401
         },
         {
           "country": "Spain",
-          "bags": 31957
+          "bags": 34721
         },
         {
           "country": "Morocco",
@@ -8331,23 +11696,23 @@
         },
         {
           "country": "Belgium",
-          "bags": 28081
+          "bags": 31694
         },
         {
           "country": "Russia",
-          "bags": 24619
+          "bags": 26593
         },
         {
           "country": "Netherlands",
-          "bags": 17934
+          "bags": 20444
         },
         {
           "country": "China",
-          "bags": 11033
+          "bags": 14864
         },
         {
           "country": "Portugal",
-          "bags": 8534
+          "bags": 10199
         },
         {
           "country": "Turkey",
@@ -8355,7 +11720,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 5734
+          "bags": 7014
         },
         {
           "country": "Greece",
@@ -8367,19 +11732,19 @@
         },
         {
           "country": "Australia",
-          "bags": 3972
+          "bags": 4292
         },
         {
           "country": "Japan",
-          "bags": 2450
+          "bags": 3657
         },
         {
           "country": "South Africa",
-          "bags": 1280
+          "bags": 2510
         },
         {
           "country": "Canada",
-          "bags": 1050
+          "bags": 1370
         },
         {
           "country": "Korea",
@@ -8485,11 +11850,11 @@
         },
         {
           "country": "Germany",
-          "bags": 105635
+          "bags": 110220
         },
         {
           "country": "Morocco",
-          "bags": 63247
+          "bags": 63567
         },
         {
           "country": "Algeria",
@@ -8497,39 +11862,39 @@
         },
         {
           "country": "India",
-          "bags": 44129
+          "bags": 45690
         },
         {
           "country": "Belgium",
-          "bags": 28914
+          "bags": 34630
         },
         {
           "country": "Spain",
-          "bags": 22757
+          "bags": 26320
         },
         {
           "country": "Netherlands",
-          "bags": 23883
+          "bags": 25993
         },
         {
           "country": "Russia",
-          "bags": 24760
+          "bags": 25404
         },
         {
           "country": "Switzerland",
-          "bags": 16837
+          "bags": 18077
         },
         {
           "country": "China",
-          "bags": 12834
+          "bags": 13251
         },
         {
           "country": "Portugal",
-          "bags": 8268
+          "bags": 9920
         },
         {
           "country": "Turkey",
-          "bags": 8356
+          "bags": 8538
         },
         {
           "country": "Korea",
@@ -8545,7 +11910,7 @@
         },
         {
           "country": "Australia",
-          "bags": 2339
+          "bags": 3339
         },
         {
           "country": "Greece",
@@ -8561,11 +11926,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 333
+          "bags": 1933
         },
         {
           "country": "Kenya",
-          "bags": 320
+          "bags": 1280
         },
         {
           "country": "Japan",
@@ -8651,19 +12016,19 @@
         },
         {
           "country": "Germany",
-          "bags": 70460
+          "bags": 73187
         },
         {
           "country": "Algeria",
-          "bags": 51004
+          "bags": 51337
         },
         {
           "country": "India",
-          "bags": 42198
+          "bags": 45418
         },
         {
           "country": "Switzerland",
-          "bags": 31718
+          "bags": 33642
         },
         {
           "country": "Sudan",
@@ -8675,43 +12040,43 @@
         },
         {
           "country": "Spain",
-          "bags": 21605
+          "bags": 23901
         },
         {
           "country": "Belgium",
-          "bags": 15076
+          "bags": 19494
         },
         {
           "country": "Netherlands",
-          "bags": 15289
+          "bags": 17809
         },
         {
           "country": "Russia",
-          "bags": 15615
+          "bags": 16649
         },
         {
           "country": "Portugal",
-          "bags": 9950
+          "bags": 12601
         },
         {
           "country": "China",
-          "bags": 9407
+          "bags": 10391
         },
         {
           "country": "Greece",
-          "bags": 7479
+          "bags": 7813
         },
         {
           "country": "Turkey",
-          "bags": 3254
+          "bags": 4761
         },
         {
           "country": "Australia",
-          "bags": 3164
+          "bags": 3654
         },
         {
           "country": "United Kingdom",
-          "bags": 3214
+          "bags": 3631
         },
         {
           "country": "Tunisia",
@@ -8723,15 +12088,15 @@
         },
         {
           "country": "South Africa",
-          "bags": 1319
+          "bags": 1959
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1274
+          "bags": 1914
         },
         {
           "country": "Kenya",
-          "bags": 333
+          "bags": 1693
         },
         {
           "country": "Canada",
@@ -8743,7 +12108,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 607
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -8821,27 +12186,27 @@
         },
         {
           "country": "Germany",
-          "bags": 74215
+          "bags": 89720
         },
         {
           "country": "India",
-          "bags": 40415
+          "bags": 45685
         },
         {
           "country": "Belgium",
-          "bags": 20066
+          "bags": 33963
         },
         {
           "country": "Spain",
-          "bags": 21268
+          "bags": 25802
         },
         {
           "country": "Russia",
-          "bags": 21172
+          "bags": 23325
         },
         {
           "country": "Netherlands",
-          "bags": 16008
+          "bags": 18801
         },
         {
           "country": "Morocco",
@@ -8849,7 +12214,7 @@
         },
         {
           "country": "Algeria",
-          "bags": 13421
+          "bags": 14714
         },
         {
           "country": "Sudan",
@@ -8857,23 +12222,23 @@
         },
         {
           "country": "Greece",
-          "bags": 10762
+          "bags": 11780
         },
         {
           "country": "Switzerland",
-          "bags": 9154
+          "bags": 10474
         },
         {
           "country": "China",
-          "bags": 3910
+          "bags": 9088
         },
         {
           "country": "Portugal",
-          "bags": 7378
+          "bags": 8710
         },
         {
           "country": "United Kingdom",
-          "bags": 6040
+          "bags": 7000
         },
         {
           "country": "Tunisia",
@@ -8881,15 +12246,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 2804
+          "bags": 4512
         },
         {
           "country": "Canada",
-          "bags": 2356
+          "bags": 4328
         },
         {
           "country": "Australia",
-          "bags": 3291
+          "bags": 3611
         },
         {
           "country": "Mexico",
@@ -8901,11 +12266,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 999
+          "bags": 2599
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 1280
         },
         {
           "country": "Saudi Arabia",
@@ -8917,7 +12282,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 316
+          "bags": 350
         },
         {
           "country": "Japan",
@@ -8999,15 +12364,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 17378
+          "bags": 57571
         },
         {
           "country": "Germany",
-          "bags": 33092
+          "bags": 44903
         },
         {
           "country": "India",
-          "bags": 26620
+          "bags": 28739
         },
         {
           "country": "Sudan",
@@ -9015,75 +12380,75 @@
         },
         {
           "country": "Algeria",
-          "bags": 23615
+          "bags": 25015
         },
         {
           "country": "Morocco",
-          "bags": 22896
+          "bags": 23562
         },
         {
           "country": "China",
-          "bags": 12037
+          "bags": 23311
         },
         {
           "country": "Spain",
-          "bags": 18536
+          "bags": 22729
         },
         {
           "country": "Russia",
-          "bags": 8383
+          "bags": 12885
         },
         {
           "country": "France",
-          "bags": 1774
+          "bags": 7398
         },
         {
           "country": "Greece",
-          "bags": 6863
+          "bags": 7197
         },
         {
           "country": "Portugal",
-          "bags": 6375
+          "bags": 6695
         },
         {
           "country": "Australia",
-          "bags": 4138
+          "bags": 5215
         },
         {
           "country": "Switzerland",
-          "bags": 3230
+          "bags": 3870
         },
         {
           "country": "Netherlands",
-          "bags": 1080
+          "bags": 3780
         },
         {
           "country": "Turkey",
-          "bags": 2064
+          "bags": 3704
         },
         {
           "country": "United Kingdom",
-          "bags": 1706
+          "bags": 3633
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1990
+          "bags": 2950
         },
         {
           "country": "Korea",
-          "bags": 1200
+          "bags": 1520
         },
         {
           "country": "Kenya",
-          "bags": 640
+          "bags": 1333
         },
         {
           "country": "Canada",
-          "bags": 700
+          "bags": 1020
         },
         {
           "country": "South Africa",
-          "bags": 930
+          "bags": 970
         },
         {
           "country": "Egypt",
@@ -9181,7 +12546,7 @@
         },
         {
           "country": "Germany",
-          "bags": 37953
+          "bags": 59464
         },
         {
           "country": "Sudan",
@@ -9189,43 +12554,43 @@
         },
         {
           "country": "India",
-          "bags": 34150
+          "bags": 37170
         },
         {
           "country": "Belgium",
-          "bags": 19470
+          "bags": 34996
         },
         {
           "country": "China",
-          "bags": 20378
+          "bags": 34862
         },
         {
           "country": "Spain",
-          "bags": 29169
+          "bags": 31103
         },
         {
           "country": "Morocco",
-          "bags": 17232
+          "bags": 17900
         },
         {
           "country": "Algeria",
-          "bags": 15953
+          "bags": 16273
         },
         {
           "country": "Portugal",
-          "bags": 7750
+          "bags": 11150
         },
         {
           "country": "Russia",
-          "bags": 8675
+          "bags": 10729
         },
         {
           "country": "Turkey",
-          "bags": 6770
+          "bags": 7120
         },
         {
           "country": "United Kingdom",
-          "bags": 3013
+          "bags": 6592
         },
         {
           "country": "Greece",
@@ -9233,11 +12598,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 3133
+          "bags": 6146
         },
         {
           "country": "Switzerland",
-          "bags": 4008
+          "bags": 4013
         },
         {
           "country": "Egypt",
@@ -9245,23 +12610,23 @@
         },
         {
           "country": "France",
-          "bags": 2856
+          "bags": 3206
         },
         {
           "country": "Australia",
-          "bags": 1776
+          "bags": 3079
         },
         {
           "country": "South Africa",
-          "bags": 790
+          "bags": 1750
         },
         {
           "country": "Canada",
-          "bags": 700
+          "bags": 1660
         },
         {
           "country": "Saudi Arabia",
-          "bags": 960
+          "bags": 1280
         },
         {
           "country": "Korea",
@@ -9269,7 +12634,7 @@
         },
         {
           "country": "Japan",
-          "bags": 640
+          "bags": 950
         },
         {
           "country": "Mexico",
@@ -9363,11 +12728,11 @@
         },
         {
           "country": "Germany",
-          "bags": 36026
+          "bags": 54831
         },
         {
           "country": "India",
-          "bags": 49702
+          "bags": 51802
         },
         {
           "country": "Morocco",
@@ -9375,11 +12740,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 13913
+          "bags": 29370
         },
         {
           "country": "China",
-          "bags": 8900
+          "bags": 23747
         },
         {
           "country": "Algeria",
@@ -9387,31 +12752,31 @@
         },
         {
           "country": "Spain",
-          "bags": 10353
+          "bags": 12613
         },
         {
           "country": "Portugal",
-          "bags": 8963
+          "bags": 12483
         },
         {
           "country": "Netherlands",
-          "bags": 3550
+          "bags": 10698
         },
         {
           "country": "Russia",
-          "bags": 3678
+          "bags": 9986
         },
         {
           "country": "United Kingdom",
-          "bags": 3708
+          "bags": 7147
         },
         {
           "country": "Greece",
-          "bags": 6190
+          "bags": 6540
         },
         {
           "country": "Turkey",
-          "bags": 5514
+          "bags": 6214
         },
         {
           "country": "Switzerland",
@@ -9423,31 +12788,31 @@
         },
         {
           "country": "South Africa",
-          "bags": 2559
+          "bags": 3899
         },
         {
           "country": "Saudi Arabia",
-          "bags": 768
+          "bags": 3648
         },
         {
           "country": "Canada",
-          "bags": 1630
+          "bags": 2962
         },
         {
           "country": "Australia",
-          "bags": 973
+          "bags": 2069
         },
         {
           "country": "Tanzania",
-          "bags": 1218
+          "bags": 1886
         },
         {
           "country": "Japan",
-          "bags": 206
+          "bags": 1406
         },
         {
           "country": "Kenya",
-          "bags": 720
+          "bags": 737
         },
         {
           "country": "Mexico",
@@ -9455,7 +12820,7 @@
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 640
         },
         {
           "country": "France",
@@ -9545,11 +12910,11 @@
         },
         {
           "country": "Germany",
-          "bags": 49323
+          "bags": 53395
         },
         {
           "country": "India",
-          "bags": 41902
+          "bags": 44038
         },
         {
           "country": "Morocco",
@@ -9557,19 +12922,19 @@
         },
         {
           "country": "China",
-          "bags": 17507
+          "bags": 28172
         },
         {
           "country": "Spain",
-          "bags": 19986
+          "bags": 22573
         },
         {
           "country": "Belgium",
-          "bags": 16280
+          "bags": 20600
         },
         {
           "country": "Portugal",
-          "bags": 15324
+          "bags": 18632
         },
         {
           "country": "Algeria",
@@ -9577,15 +12942,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 15568
+          "bags": 16208
         },
         {
           "country": "Netherlands",
-          "bags": 8428
+          "bags": 14012
         },
         {
           "country": "Russia",
-          "bags": 8457
+          "bags": 10517
         },
         {
           "country": "Egypt",
@@ -9593,23 +12958,23 @@
         },
         {
           "country": "South Africa",
-          "bags": 2295
+          "bags": 4445
         },
         {
           "country": "Australia",
-          "bags": 2313
+          "bags": 2953
         },
         {
           "country": "Switzerland",
-          "bags": 2573
+          "bags": 2893
         },
         {
           "country": "Greece",
-          "bags": 1925
+          "bags": 2259
         },
         {
           "country": "United Kingdom",
-          "bags": 1924
+          "bags": 2224
         },
         {
           "country": "Kenya",
@@ -9621,11 +12986,11 @@
         },
         {
           "country": "France",
-          "bags": 1080
+          "bags": 1564
         },
         {
           "country": "Korea",
-          "bags": 650
+          "bags": 1290
         },
         {
           "country": "Tanzania",
@@ -9633,7 +12998,7 @@
         },
         {
           "country": "Japan",
-          "bags": 100
+          "bags": 390
         },
         {
           "country": "Saudi Arabia",
@@ -9727,11 +13092,11 @@
         },
         {
           "country": "Germany",
-          "bags": 56090
+          "bags": 63613
         },
         {
           "country": "India",
-          "bags": 46245
+          "bags": 48045
         },
         {
           "country": "Morocco",
@@ -9743,27 +13108,27 @@
         },
         {
           "country": "China",
-          "bags": 14800
+          "bags": 22395
         },
         {
           "country": "Spain",
-          "bags": 19549
+          "bags": 21544
         },
         {
           "country": "Belgium",
-          "bags": 9433
+          "bags": 15986
         },
         {
           "country": "Netherlands",
-          "bags": 8595
+          "bags": 15366
         },
         {
           "country": "Portugal",
-          "bags": 14134
+          "bags": 15107
         },
         {
           "country": "Russia",
-          "bags": 6934
+          "bags": 13768
         },
         {
           "country": "Egypt",
@@ -9771,31 +13136,31 @@
         },
         {
           "country": "Korea",
-          "bags": 320
+          "bags": 7958
         },
         {
           "country": "Australia",
-          "bags": 1653
+          "bags": 7032
         },
         {
           "country": "Greece",
-          "bags": 6270
+          "bags": 6954
         },
         {
           "country": "United Kingdom",
-          "bags": 2660
+          "bags": 5658
         },
         {
           "country": "South Africa",
-          "bags": 1469
+          "bags": 4599
         },
         {
           "country": "Turkey",
-          "bags": 4146
+          "bags": 4250
         },
         {
           "country": "Saudi Arabia",
-          "bags": 640
+          "bags": 3959
         },
         {
           "country": "Mexico",
@@ -9803,19 +13168,19 @@
         },
         {
           "country": "Canada",
-          "bags": 986
+          "bags": 3252
         },
         {
           "country": "Switzerland",
-          "bags": 988
+          "bags": 2307
         },
         {
           "country": "Uae",
-          "bags": 1400
+          "bags": 1720
         },
         {
           "country": "Japan",
-          "bags": 306
+          "bags": 1466
         },
         {
           "country": "Tanzania",
@@ -9831,7 +13196,7 @@
         },
         {
           "country": "France",
-          "bags": 360
+          "bags": 680
         }
       ],
       "parser_version": "v1_recent",
