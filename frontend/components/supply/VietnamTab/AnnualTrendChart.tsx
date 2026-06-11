@@ -7,18 +7,13 @@ import {
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { TT_STYLE, vnCropYearKey, kBagsToKT } from "./helpers";
 import type { ExportMonth } from "./MonthlyVolumeChart";
-
-/** Latest USDA PSD row the component needs for the balance-sheet projection.
- *  Read from /data/demand_stocks.json → producers.vietnam.annual[last]. */
-interface VnPSDRow {
-  year?: string;
-  stocks_mt?: number;        // ending stocks of THIS USDA row (= opening for the next)
-  production_mt?: number;
-  consumption_mt?: number;
-}
+import {
+  computeBalanceSheet, formatBalanceSheetTooltip, selectProjectionRows,
+  usdaYearForCropYear, type PsdRow,
+} from "@/lib/balanceSheetProjection";
 
 export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }) {
-  const [psd, setPsd] = useState<VnPSDRow | null>(null);
+  const [rows, setRows] = useState<PsdRow[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,14 +21,14 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
         if (cancelled) return;
-        const rows = d?.producers?.vietnam?.annual ?? [];
-        setPsd(rows.length ? rows[rows.length - 1] : null);
+        const a = d?.producers?.vietnam?.annual ?? null;
+        setRows(Array.isArray(a) ? a : null);
       })
       .catch(() => { /* silent — projection falls back to "no gap" */ });
     return () => { cancelled = true; };
   }, []);
 
-  const { data, projMeta } = useMemo(() => {
+  const { data, projection } = useMemo(() => {
     const byCrop: Record<string, { kt: number; months: number }> = {};
     monthly.forEach(r => {
       const key = vnCropYearKey(r.month);
@@ -43,48 +38,27 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
     });
     const keys = Object.keys(byCrop).sort();
     const latestKey = keys[keys.length - 1];
+    const latestData = byCrop[latestKey];
+    const incomplete = latestData && latestData.months < 12;
 
-    // Balance-sheet projection (per user spec): for the in-progress crop year,
-    //   total expected exports = prior year's ending stocks
-    //                          + this year's production
-    //                          − this year's consumption
-    //
-    // The chart "projected (gap)" bar = expected_total − already_exported.
-    //
-    // `psd` is the latest USDA row in demand_stocks.json. USDA's Coffee MY
-    // for Vietnam (Oct–Sep) aligns 1:1 with our chart's crop year, so the
-    // latest row's `stocks_mt` = last year's ending = this year's opening,
-    // and its `production_mt` / `consumption_mt` are the best-available
-    // proxy for the in-progress year until USDA publishes the forward
-    // forecast (the GAIN PDF scraper backfills that on its next monthly
-    // run). Linear pace extrapolation is intentionally NOT used — that
-    // over-stated the gap because Vietnam's crop is heavily front-loaded.
-    let proj = 0;
-    let projTotal = 0;
-    let projOpening = 0;
-    let projProd    = 0;
-    let projCons    = 0;
-    const incomplete = byCrop[latestKey].months < 12;
-    if (psd && incomplete) {
-      projOpening = (psd.stocks_mt       ?? 0) / 1000;   // MT → kt
-      projProd    = (psd.production_mt   ?? 0) / 1000;
-      projCons    = (psd.consumption_mt  ?? 0) / 1000;
-      projTotal   = projOpening + projProd - projCons;
-      proj        = Math.max(0, projTotal - byCrop[latestKey].kt);
-      proj        = Math.round(proj * 10) / 10;
-    }
+    // Derive USDA MY ending-year label from the latest crop-year key.
+    const inYear = usdaYearForCropYear(latestKey);
+    const { forecastRow, latestRow } = selectProjectionRows(rows, inYear);
+    const proj = incomplete
+      ? computeBalanceSheet(forecastRow, latestRow, latestData.kt)
+      : null;
 
+    const projGap = proj ? proj.projected_gap_kt : 0;
     return {
       data: keys.map(k => ({
         year:      k,
         actual:    Math.round(byCrop[k].kt * 10) / 10,
-        projected: k === latestKey ? proj : 0,
+        projected: k === latestKey && incomplete ? projGap : 0,
         months:    byCrop[k].months,
       })),
-      projMeta: { proj, total: projTotal, opening: projOpening, prod: projProd, cons: projCons,
-                  psdYear: psd?.year, incomplete },
+      projection: proj,
     };
-  }, [monthly, psd]);
+  }, [monthly, rows]);
 
   if (data.length < 2) return null;
 
@@ -94,19 +68,15 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
         <div className="text-sm font-semibold text-slate-200">Annual Export Volume</div>
         <div className="text-[10px] text-slate-500">
           Crop year totals (Oct–Sep) · kt · † projected when crop is incomplete
-          {projMeta.incomplete && projMeta.total > 0 && (
+          {projection && (
             <span
               className="ml-1 italic"
-              title={
-                `Balance-sheet projection (USDA PSD ${projMeta.psdYear ?? "latest"} proxy):\n` +
-                `  + Opening stocks  ${Math.round(projMeta.opening).toLocaleString()} kt\n` +
-                `  + Production       ${Math.round(projMeta.prod).toLocaleString()} kt\n` +
-                `  − Consumption      ${Math.round(projMeta.cons).toLocaleString()} kt\n` +
-                `  = Expected exports ${Math.round(projMeta.total).toLocaleString()} kt`
-              }>
-              · expected total {Math.round(projMeta.total).toLocaleString()} kt
-              {projMeta.psdYear && (
-                <span className="text-slate-600 not-italic"> (USDA {projMeta.psdYear})</span>
+              title={formatBalanceSheetTooltip(projection)}>
+              · expected total {Math.round(projection.expected_total_kt).toLocaleString()} kt
+              {projection.psd_year && (
+                <span className="text-slate-600 not-italic">
+                  {" "}(USDA {projection.psd_year}{projection.mode === "proxy" ? " proxy" : ""})
+                </span>
               )}
             </span>
           )}

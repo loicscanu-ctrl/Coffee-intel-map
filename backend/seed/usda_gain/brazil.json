@@ -1,0 +1,25 @@
+{
+  "_doc": "USDA FAS GAIN Brazil Coffee Annual — manually transcribed from BR2026-0025 (June 1 2026 release). Used as a seed fallback by scraper/sources/usda_gain_pdf.py when the live FAS landing-page fetch fails (current state: FAS Cloudflare-blocks GitHub Actions IPs with 403). Update when USDA publishes a new Coffee Annual or Coffee Semi-annual. Values are in metric tons.",
+  "source": "USDA FAS GAIN BR2026-0025 (Brazil Coffee Annual, June 1 2026)",
+  "last_updated": "2026-06-10",
+  "annual": [
+    {
+      "year": "2027",
+      "production_mt":      4314000,
+      "exports_mt":         2944200,
+      "bean_exports_mt":    2700000,
+      "soluble_exports_mt":  240000,
+      "roast_exports_mt":      4200,
+      "consumption_mt":     1350000,
+      "stocks_mt":           178800,
+      "begin_stocks_mt":      29100
+    }
+  ],
+  "latest_year":            "2027",
+  "latest_production_mt":   4314000,
+  "latest_exports_mt":      2944200,
+  "latest_consumption_mt":  1350000,
+  "latest_stocks_mt":       178800,
+  "latest_begin_stocks_mt": 29100,
+  "source_pdf": "https://www.fas.usda.gov/data/gain/2026/06/brazil-coffee-annual"
+}
