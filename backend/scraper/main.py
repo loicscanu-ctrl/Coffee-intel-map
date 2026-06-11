@@ -40,7 +40,6 @@ from scraper.sources import farmer_economics as _farmer_economics
 from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
-from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import population as _population
 from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import retail_cpi as _retail_cpi
@@ -85,9 +84,8 @@ async def _run_one(source, browser, semaphore, db) -> int:
 
 async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEOUT) -> None:
     """Run a side-channel scraper (no news items returned) with its own page.
-    timeout: per-source override. macro_cot in particular needs more headroom
-    than the news scrapers because it does ~25 sequential yfinance.download()
-    calls plus CFTC + ICE + stooq downloads.
+    timeout: per-source override for sources that need more headroom than the
+    default news-scraper budget.
     """
     page = await browser.new_page()
     try:
@@ -118,12 +116,15 @@ async def run_all_scrapers():
             total = sum(r for r in results if isinstance(r, int))
 
             # Phase 2: side-channel scrapers — run sequentially (they write to
-            # their own tables and don't return news items). Per-source timeout
-            # overrides: macro_cot downloads CFTC + ICE ZIPs + yfinance batch
-            # which routinely takes 3–5 minutes.
+            # their own tables and don't return news items).
+            #
+            # COT positions are NOT scraped here: CFTC publishes once a week
+            # (Friday ~20:30 UTC) and scraper-cot.yml at 21:30 UTC Friday owns
+            # that download exclusively. Running it daily was a no-op on six
+            # days out of seven — the staleness guard in macro_cot returned
+            # early because the downloaded report date wasn't newer than DB.
             db_ref = db
             for name, coro_fn, timeout in [
-                ("macro_cot",         lambda p: _macro_cot.run(p),                               420),
                 ("farmer_economics",  lambda p: _farmer_economics.run(p, db_ref),                SCRAPER_TIMEOUT),
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
                 ("psd_coffee",        lambda p: _psd_coffee.run(p, db_ref),                      SCRAPER_TIMEOUT),

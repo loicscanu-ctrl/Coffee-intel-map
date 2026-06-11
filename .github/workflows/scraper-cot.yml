@@ -2,9 +2,16 @@ name: "2.3 – COT Scraper"
 
 on:
   schedule:
-    # 20:00 UTC Friday = 3:00 PM ET winter / 4:00 PM ET summer
-    # CFTC releases every Friday at 3:30 PM ET — run at 20:00 UTC, retry manually if data not yet published.
-    - cron: '0 20 * * 5'
+    # 21:30 UTC Friday. CFTC publishes every Friday at 3:30 PM ET, which is
+    # 20:30 UTC in summer (EDT) and 19:30 UTC in winter (EST). 21:30 UTC sits
+    # 1h after the latest publish window year-round, so the run never misses
+    # that week's data. (Prior 20:00 UTC schedule fired 30 min BEFORE summer
+    # publish and was a silent no-op every other week — daily macro_cot had
+    # been the de-facto safety net.)
+    # Sole owner of COT positions writes — daily scraper no longer touches
+    # commodity_cot, so if this misses a week, downstream goes stale until
+    # the next Friday.
+    - cron: '30 21 * * 5'
   workflow_dispatch:
 
 jobs:
