@@ -9,14 +9,14 @@
   "series": [
     {
       "month": "2020-01",
-      "robusta_bags": 1977089,
-      "arabica_bags": 1203415,
-      "total_bags": 3180504,
+      "robusta_bags": 136290,
+      "arabica_bags": 26347,
+      "total_bags": 162637,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4300
+          "bags": 2150
         },
         {
           "grade": "Drugar",
@@ -24,11 +24,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 436366
+          "bags": 3537
         },
         {
           "grade": "Screen 15",
-          "bags": 48096
+          "bags": 360
         },
         {
           "grade": "Screen 18",
@@ -40,7 +40,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 218939
+          "bags": 2658
         },
         {
           "grade": "Screen 12",
@@ -48,11 +48,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 1143002
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1184995
+          "bags": 7927
         },
         {
           "grade": "Wugar",
@@ -70,7 +70,7 @@
         },
         {
           "country": "Germany",
-          "bags": 4300
+          "bags": 2150
         },
         {
           "country": "Sudan",
@@ -87,14 +87,14 @@
     },
     {
       "month": "2020-02",
-      "robusta_bags": 2569336,
-      "arabica_bags": 1325329,
-      "total_bags": 3894665,
+      "robusta_bags": 159966,
+      "arabica_bags": 14070,
+      "total_bags": 174036,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 2150
         },
         {
           "grade": "Drugar",
@@ -102,11 +102,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 158385
+          "bags": 1294
         },
         {
           "grade": "Screen 15",
-          "bags": 138943
+          "bags": 1040
         },
         {
           "grade": "Screen 18",
@@ -118,11 +118,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 49969
+          "bags": 640
         },
         {
           "grade": "Screen 13",
-          "bags": 718810
+          "bags": 8280
         },
         {
           "grade": "Screen 12",
@@ -130,15 +130,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1353866
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 59260
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1260319
+          "bags": 8000
         },
         {
           "grade": "Kiboko",
@@ -152,27 +152,27 @@
         },
         {
           "country": "Sudan",
-          "bags": 63040
+          "bags": 62270
         },
         {
           "country": "Germany",
-          "bags": 59560
+          "bags": 37962
         },
         {
           "country": "Spain",
-          "bags": 53552
+          "bags": 51612
         },
         {
           "country": "United States",
-          "bags": 31368
+          "bags": 9228
         },
         {
           "country": "India",
-          "bags": 30525
+          "bags": 26785
         },
         {
           "country": "Belgium",
-          "bags": 19762
+          "bags": 17882
         },
         {
           "country": "Morocco",
@@ -184,19 +184,19 @@
         },
         {
           "country": "Russia",
-          "bags": 4729
+          "bags": 3894
         },
         {
           "country": "Greece",
-          "bags": 4480
+          "bags": 1600
         },
         {
           "country": "Switzerland",
-          "bags": 3520
+          "bags": 720
         },
         {
           "country": "Japan",
-          "bags": 2374
+          "bags": 2174
         },
         {
           "country": "Australia",
@@ -204,15 +204,15 @@
         },
         {
           "country": "Netherlands",
-          "bags": 1395
+          "bags": 720
         },
         {
           "country": "South Africa",
-          "bags": 1345
+          "bags": 320
         },
         {
           "country": "Korea",
-          "bags": 1280
+          "bags": 960
         },
         {
           "country": "France",
@@ -249,14 +249,14 @@
     },
     {
       "month": "2020-03",
-      "robusta_bags": 3648818,
-      "arabica_bags": 1686988,
-      "total_bags": 5335806,
+      "robusta_bags": 332852,
+      "arabica_bags": 21645,
+      "total_bags": 354497,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 2000
         },
         {
           "grade": "Drugar",
@@ -264,11 +264,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 80123
+          "bags": 680
         },
         {
           "grade": "Washed Robusta",
-          "bags": 305628
+          "bags": 2648
         },
         {
           "grade": "Screen 18",
@@ -276,7 +276,7 @@
         },
         {
           "grade": "Screen 17",
-          "bags": 1673529
+          "bags": 17542
         },
         {
           "grade": "Screen 15",
@@ -284,11 +284,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 24847
+          "bags": 334
         },
         {
           "grade": "Screen 13",
-          "bags": 1233337
+          "bags": 14040
         },
         {
           "grade": "Screen 12",
@@ -296,23 +296,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 32725
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 29762
+          "bags": 152
         },
         {
           "grade": "Wugar",
-          "bags": 1573854
+          "bags": 12093
         },
         {
           "grade": "Kiboko",
-          "bags": 2020
+          "bags": 1800
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 77972
+          "bags": 4000
         }
       ],
       "by_destination": [
@@ -322,7 +322,7 @@
         },
         {
           "country": "Italy",
-          "bags": 135987
+          "bags": 120742
         },
         {
           "country": "Sudan",
@@ -330,27 +330,27 @@
         },
         {
           "country": "Spain",
-          "bags": 52175
+          "bags": 51205
         },
         {
           "country": "India",
-          "bags": 51182
+          "bags": 46244
         },
         {
           "country": "United States",
-          "bags": 31146
+          "bags": 6762
         },
         {
           "country": "Belgium",
-          "bags": 28053
+          "bags": 21848
         },
         {
           "country": "Morocco",
-          "bags": 7324
+          "bags": 6004
         },
         {
           "country": "Russia",
-          "bags": 4540
+          "bags": 3900
         },
         {
           "country": "Portugal",
@@ -358,11 +358,11 @@
         },
         {
           "country": "Greece",
-          "bags": 2894
+          "bags": 1280
         },
         {
           "country": "Japan",
-          "bags": 2460
+          "bags": 2160
         },
         {
           "country": "Mexico",
@@ -378,7 +378,7 @@
         },
         {
           "country": "China",
-          "bags": 1280
+          "bags": 960
         },
         {
           "country": "Kenya",
@@ -386,11 +386,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 710
+          "bags": 360
         },
         {
           "country": "Switzerland",
-          "bags": 654
+          "bags": 320
         },
         {
           "country": "Saudi Arabia",
@@ -419,14 +419,14 @@
     },
     {
       "month": "2020-04",
-      "robusta_bags": 5501147,
-      "arabica_bags": 2993941,
-      "total_bags": 8495088,
+      "robusta_bags": 225675,
+      "arabica_bags": 27611,
+      "total_bags": 253286,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 3900
+          "bags": 1900
         },
         {
           "grade": "Drugar",
@@ -438,19 +438,19 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 41643
+          "bags": 360
         },
         {
           "grade": "Washed Robusta",
-          "bags": 119612
+          "bags": 1029
         },
         {
           "grade": "Screen 18",
-          "bags": 1637222
+          "bags": 17909
         },
         {
           "grade": "Screen 17",
-          "bags": 1822381
+          "bags": 18950
         },
         {
           "grade": "Screen 15",
@@ -458,7 +458,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 27937
+          "bags": 320
         },
         {
           "grade": "Screen 12",
@@ -466,15 +466,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1664444
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1103711
+          "bags": 5868
         },
         {
           "grade": "Wugar",
-          "bags": 1879430
+          "bags": 12443
         },
         {
           "grade": "Kiboko",
@@ -482,13 +482,13 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 5400
+          "bags": 3900
         }
       ],
       "by_destination": [
         {
           "country": "Korea",
-          "bags": 4368
+          "bags": 320
         },
         {
           "country": "Sudan",
@@ -501,9 +501,9 @@
     },
     {
       "month": "2020-05",
-      "robusta_bags": 4373662,
-      "arabica_bags": 1275519,
-      "total_bags": 5649181,
+      "robusta_bags": 295494,
+      "arabica_bags": 39333,
+      "total_bags": 334827,
       "value_usd": null,
       "by_grade": [
         {
@@ -512,7 +512,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 1900
         },
         {
           "grade": "Drugar",
@@ -524,7 +524,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 661168
+          "bags": 6080
         },
         {
           "grade": "Screen 18",
@@ -532,7 +532,7 @@
         },
         {
           "grade": "Screen 17",
-          "bags": 1938451
+          "bags": 19938
         },
         {
           "grade": "Screen 15",
@@ -540,7 +540,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 27090
+          "bags": 320
         },
         {
           "grade": "Screen 12",
@@ -548,11 +548,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 1476896
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1243235
+          "bags": 7799
         },
         {
           "grade": "Wugar",
@@ -560,13 +560,13 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 4750
+          "bags": 4000
         }
       ],
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 4500
+          "bags": 3800
         },
         {
           "country": "Germany",
@@ -574,19 +574,19 @@
         },
         {
           "country": "India",
-          "bags": 4750
+          "bags": 4000
         },
         {
           "country": "Korea",
-          "bags": 4776
+          "bags": 320
         },
         {
           "country": "Russia",
-          "bags": 4170
+          "bags": 2570
         },
         {
           "country": "China",
-          "bags": 3800
+          "bags": 3400
         },
         {
           "country": "Portugal",
@@ -594,11 +594,11 @@
         },
         {
           "country": "Mexico",
-          "bags": 3285
+          "bags": 2625
         },
         {
           "country": "Greece",
-          "bags": 1720
+          "bags": 640
         },
         {
           "country": "Japan",
@@ -606,7 +606,7 @@
         },
         {
           "country": "Canada",
-          "bags": 960
+          "bags": 640
         },
         {
           "country": "Sudan",
@@ -635,14 +635,14 @@
     },
     {
       "month": "2020-06",
-      "robusta_bags": 2637840,
-      "arabica_bags": 79754,
-      "total_bags": 2717594,
+      "robusta_bags": 307192,
+      "arabica_bags": 26090,
+      "total_bags": 333282,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 3850
+          "bags": 1850
         },
         {
           "grade": "Drugar",
@@ -658,7 +658,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 105821
+          "bags": 1060
         },
         {
           "grade": "Screen 18",
@@ -666,7 +666,7 @@
         },
         {
           "grade": "Screen 17",
-          "bags": 1997302
+          "bags": 21290
         },
         {
           "grade": "Screen 15",
@@ -674,7 +674,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 111747
+          "bags": 1280
         },
         {
           "grade": "Screen 12",
@@ -682,15 +682,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 29610
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 109657
+          "bags": 660
         },
         {
           "grade": "Mt Elgon",
-          "bags": 53334
+          "bags": 320
         },
         {
           "grade": "Wugar",
@@ -702,13 +702,13 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 4500
+          "bags": 3850
         }
       ],
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 4200
+          "bags": 3700
         },
         {
           "country": "Germany",
@@ -716,11 +716,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 4500
+          "bags": 3850
         },
         {
           "country": "Korea",
-          "bags": 1370
+          "bags": 320
         },
         {
           "country": "Portugal",
@@ -733,9 +733,9 @@
     },
     {
       "month": "2020-07",
-      "robusta_bags": 2905657,
-      "arabica_bags": 2181247,
-      "total_bags": 5086904,
+      "robusta_bags": 443791,
+      "arabica_bags": 22705,
+      "total_bags": 466496,
       "value_usd": null,
       "by_grade": [
         {
@@ -744,7 +744,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 3900
+          "bags": 1900
         },
         {
           "grade": "Drugar",
@@ -756,11 +756,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 208429
+          "bags": 2020
         },
         {
           "grade": "Washed Robusta",
-          "bags": 128808
+          "bags": 1297
         },
         {
           "grade": "Screen 18",
@@ -776,7 +776,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 791264
+          "bags": 8880
         },
         {
           "grade": "Screen 12",
@@ -784,23 +784,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 1344761
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 59260
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 674257
+          "bags": 3928
         },
         {
           "grade": "Bugisu A+",
-          "bags": 680392
+          "bags": 4242
         },
         {
           "grade": "Bugisu AA",
-          "bags": 758067
+          "bags": 4944
         },
         {
           "grade": "Bugisu A",
@@ -822,7 +822,7 @@
         },
         {
           "country": "Korea",
-          "bags": 4329
+          "bags": 586
         }
       ],
       "parser_version": "v1_recent",
@@ -831,9 +831,9 @@
     },
     {
       "month": "2020-08",
-      "robusta_bags": 1892075,
-      "arabica_bags": 3089106,
-      "total_bags": 4981181,
+      "robusta_bags": 430791,
+      "arabica_bags": 60007,
+      "total_bags": 490798,
       "value_usd": null,
       "by_grade": [
         {
@@ -842,7 +842,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 4100
+          "bags": 2100
         },
         {
           "grade": "Drugar",
@@ -850,7 +850,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 52808
+          "bags": 470
         },
         {
           "grade": "Screen 18",
@@ -866,7 +866,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 181694
+          "bags": 1680
         },
         {
           "grade": "Screen 12",
@@ -874,19 +874,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 1228131
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 515052
+          "bags": 2873
         },
         {
           "grade": "Bugisu A+",
-          "bags": 1053469
+          "bags": 7280
         },
         {
           "grade": "Bugisu AA",
-          "bags": 697179
+          "bags": 4388
         },
         {
           "grade": "Bugisu A",
@@ -902,7 +902,7 @@
         },
         {
           "grade": "Wugar",
-          "bags": 782938
+          "bags": 4998
         }
       ],
       "by_destination": [
@@ -916,19 +916,19 @@
         },
         {
           "country": "Sudan",
-          "bags": 138180
+          "bags": 137860
         },
         {
           "country": "Belgium",
-          "bags": 26582
+          "bags": 25942
         },
         {
           "country": "United States",
-          "bags": 24128
+          "bags": 6258
         },
         {
           "country": "India",
-          "bags": 21630
+          "bags": 18630
         },
         {
           "country": "Morocco",
@@ -936,7 +936,7 @@
         },
         {
           "country": "China",
-          "bags": 8960
+          "bags": 8320
         },
         {
           "country": "Spain",
@@ -944,15 +944,15 @@
         },
         {
           "country": "Russia",
-          "bags": 8053
+          "bags": 6763
         },
         {
           "country": "Japan",
-          "bags": 5975
+          "bags": 4860
         },
         {
           "country": "Greece",
-          "bags": 4134
+          "bags": 3480
         },
         {
           "country": "Portugal",
@@ -964,11 +964,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 2090
+          "bags": 2040
         },
         {
           "country": "Korea",
-          "bags": 1630
+          "bags": 990
         },
         {
           "country": "France",
@@ -984,11 +984,11 @@
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1000
+          "bags": 700
         },
         {
           "country": "Turkey",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "Mexico",
@@ -1013,14 +1013,14 @@
     },
     {
       "month": "2020-09",
-      "robusta_bags": 3086296,
-      "arabica_bags": 166025,
-      "total_bags": 3252321,
+      "robusta_bags": 392126,
+      "arabica_bags": 8047,
+      "total_bags": 400173,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4100
+          "bags": 2100
         },
         {
           "grade": "Drugar",
@@ -1032,11 +1032,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 256534
+          "bags": 2320
         },
         {
           "grade": "Washed Robusta",
-          "bags": 344553
+          "bags": 3200
         },
         {
           "grade": "Screen 18",
@@ -1052,7 +1052,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 187883
+          "bags": 1680
         },
         {
           "grade": "Screen 12",
@@ -1060,15 +1060,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1911379
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 159105
+          "bags": 1127
         },
         {
           "grade": "Kiboko",
-          "bags": 2020
+          "bags": 1800
         }
       ],
       "by_destination": [
@@ -1078,7 +1078,7 @@
         },
         {
           "country": "Korea",
-          "bags": 3630
+          "bags": 300
         },
         {
           "country": "Sudan",
@@ -1091,14 +1091,14 @@
     },
     {
       "month": "2020-10",
-      "robusta_bags": 792167,
-      "arabica_bags": 2720396,
-      "total_bags": 3512563,
+      "robusta_bags": 317874,
+      "arabica_bags": 22695,
+      "total_bags": 340569,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 2000
         },
         {
           "grade": "Drugar",
@@ -1106,11 +1106,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 231120
+          "bags": 2087
         },
         {
           "grade": "Washed Robusta",
-          "bags": 35133
+          "bags": 320
         },
         {
           "grade": "Screen 18",
@@ -1126,11 +1126,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 57016
+          "bags": 640
         },
         {
           "grade": "Screen 13",
-          "bags": 116458
+          "bags": 1440
         },
         {
           "grade": "Screen 12",
@@ -1138,27 +1138,27 @@
         },
         {
           "grade": "BHP",
-          "bags": 38252
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 494471
+          "bags": 3328
         },
         {
           "grade": "Bugisu A+",
-          "bags": 82921
+          "bags": 640
         },
         {
           "grade": "Bugisu AA",
-          "bags": 1736040
+          "bags": 10850
         },
         {
           "grade": "Bugisu A",
-          "bags": 272502
+          "bags": 1800
         },
         {
           "grade": "Wugar",
-          "bags": 129062
+          "bags": 677
         },
         {
           "grade": "Kiboko",
@@ -1176,15 +1176,15 @@
         },
         {
           "country": "Germany",
-          "bags": 41140
+          "bags": 25590
         },
         {
           "country": "India",
-          "bags": 37207
+          "bags": 36647
         },
         {
           "country": "Belgium",
-          "bags": 24087
+          "bags": 13465
         },
         {
           "country": "Morocco",
@@ -1192,19 +1192,19 @@
         },
         {
           "country": "Spain",
-          "bags": 16964
+          "bags": 15970
         },
         {
           "country": "United States",
-          "bags": 12051
+          "bags": 1003
         },
         {
           "country": "China",
-          "bags": 11090
+          "bags": 10770
         },
         {
           "country": "Portugal",
-          "bags": 7254
+          "bags": 4257
         },
         {
           "country": "Russia",
@@ -1216,7 +1216,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 2684
+          "bags": 120
         },
         {
           "country": "Greece",
@@ -1228,7 +1228,7 @@
         },
         {
           "country": "South Africa",
-          "bags": 960
+          "bags": 640
         },
         {
           "country": "Netherlands",
@@ -1265,14 +1265,14 @@
     },
     {
       "month": "2020-11",
-      "robusta_bags": 4271119,
-      "arabica_bags": 1714281,
-      "total_bags": 5985400,
+      "robusta_bags": 329775,
+      "arabica_bags": 16399,
+      "total_bags": 346174,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 3900
+          "bags": 2000
         },
         {
           "grade": "Drugar",
@@ -1280,7 +1280,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 317740
+          "bags": 2890
         },
         {
           "grade": "Screen 18",
@@ -1288,7 +1288,7 @@
         },
         {
           "grade": "Screen 17",
-          "bags": 1371229
+          "bags": 15846
         },
         {
           "grade": "Screen 15",
@@ -1296,11 +1296,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 102548
+          "bags": 1180
         },
         {
           "grade": "Screen 13",
-          "bags": 267336
+          "bags": 3519
         },
         {
           "grade": "Screen 12",
@@ -1308,19 +1308,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 1789813
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 116112
+          "bags": 700
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1018780
+          "bags": 6919
         },
         {
           "grade": "Wugar",
-          "bags": 690251
+          "bags": 4230
         },
         {
           "grade": "Kiboko",
@@ -1343,14 +1343,14 @@
     },
     {
       "month": "2020-12",
-      "robusta_bags": 2271200,
-      "arabica_bags": 3205562,
-      "total_bags": 5476762,
+      "robusta_bags": 143056,
+      "arabica_bags": 26136,
+      "total_bags": 169192,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 2000
         },
         {
           "grade": "Drugar",
@@ -1358,11 +1358,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 24630
+          "bags": 266
         },
         {
           "grade": "Screen 15",
-          "bags": 187038
+          "bags": 1400
         },
         {
           "grade": "Screen 18",
@@ -1374,7 +1374,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 86743
+          "bags": 960
         },
         {
           "grade": "Screen 12",
@@ -1382,23 +1382,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 1831558
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 126928
+          "bags": 760
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1320920
+          "bags": 8468
         },
         {
           "grade": "Bugisu A+",
-          "bags": 709296
+          "bags": 4800
         },
         {
           "grade": "Bugisu A",
-          "bags": 1043118
+          "bags": 6808
         },
         {
           "grade": "Kiboko",
@@ -1425,14 +1425,14 @@
     },
     {
       "month": "2021-01",
-      "robusta_bags": 869984,
-      "arabica_bags": 2224030,
-      "total_bags": 3094014,
+      "robusta_bags": 353806,
+      "arabica_bags": 19125,
+      "total_bags": 372931,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 1900
         },
         {
           "grade": "Drugar",
@@ -1444,11 +1444,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 63433
+          "bags": 640
         },
         {
           "grade": "Washed Robusta",
-          "bags": 211362
+          "bags": 1920
         },
         {
           "grade": "Screen 18",
@@ -1464,7 +1464,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 213792
+          "bags": 2120
         },
         {
           "grade": "Screen 12",
@@ -1472,15 +1472,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 31370
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1487839
+          "bags": 8820
         },
         {
           "grade": "Wugar",
-          "bags": 730891
+          "bags": 5005
         },
         {
           "grade": "Kiboko",
@@ -1502,11 +1502,11 @@
         },
         {
           "country": "Germany",
-          "bags": 59705
+          "bags": 52705
         },
         {
           "country": "Belgium",
-          "bags": 47931
+          "bags": 41468
         },
         {
           "country": "India",
@@ -1514,11 +1514,11 @@
         },
         {
           "country": "United States",
-          "bags": 23625
+          "bags": 11928
         },
         {
           "country": "Spain",
-          "bags": 16012
+          "bags": 15692
         },
         {
           "country": "Algeria",
@@ -1534,11 +1534,11 @@
         },
         {
           "country": "Japan",
-          "bags": 3449
+          "bags": 729
         },
         {
           "country": "China",
-          "bags": 3415
+          "bags": 1920
         },
         {
           "country": "Portugal",
@@ -1546,7 +1546,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 1992
+          "bags": 1575
         },
         {
           "country": "Switzerland",
@@ -1587,14 +1587,14 @@
     },
     {
       "month": "2021-02",
-      "robusta_bags": 2246546,
-      "arabica_bags": 672921,
-      "total_bags": 2919467,
+      "robusta_bags": 440715,
+      "arabica_bags": 21537,
+      "total_bags": 462252,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 1900
         },
         {
           "grade": "Drugar",
@@ -1602,7 +1602,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 453729
+          "bags": 4363
         },
         {
           "grade": "Screen 18",
@@ -1618,11 +1618,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 140740
+          "bags": 1560
         },
         {
           "grade": "Screen 13",
-          "bags": 350959
+          "bags": 4464
         },
         {
           "grade": "Screen 12",
@@ -1630,15 +1630,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 42555
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 830360
+          "bags": 3026
         },
         {
           "grade": "Mt Elgon",
-          "bags": 655118
+          "bags": 3734
         },
         {
           "grade": "Wugar",
@@ -1652,31 +1652,31 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 158242
+          "bags": 152791
         },
         {
           "country": "Germany",
-          "bags": 117142
+          "bags": 107005
         },
         {
           "country": "Belgium",
-          "bags": 54438
+          "bags": 45890
         },
         {
           "country": "India",
-          "bags": 51403
+          "bags": 48602
         },
         {
           "country": "United States",
-          "bags": 28754
+          "bags": 11318
         },
         {
           "country": "Spain",
-          "bags": 25430
+          "bags": 24674
         },
         {
           "country": "Sudan",
-          "bags": 21720
+          "bags": 21270
         },
         {
           "country": "Algeria",
@@ -1684,15 +1684,15 @@
         },
         {
           "country": "Morocco",
-          "bags": 18008
+          "bags": 17342
         },
         {
           "country": "Russia",
-          "bags": 8354
+          "bags": 8284
         },
         {
           "country": "China",
-          "bags": 7104
+          "bags": 3180
         },
         {
           "country": "Portugal",
@@ -1700,7 +1700,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 5342
+          "bags": 5320
         },
         {
           "country": "Egypt",
@@ -1716,7 +1716,7 @@
         },
         {
           "country": "Japan",
-          "bags": 1640
+          "bags": 600
         },
         {
           "country": "France",
@@ -1728,11 +1728,11 @@
         },
         {
           "country": "Australia",
-          "bags": 988
+          "bags": 668
         },
         {
           "country": "Netherlands",
-          "bags": 422
+          "bags": 360
         },
         {
           "country": "Turkey",
@@ -1749,14 +1749,14 @@
     },
     {
       "month": "2021-03",
-      "robusta_bags": 1477907,
-      "arabica_bags": 1231137,
-      "total_bags": 2709044,
+      "robusta_bags": 432107,
+      "arabica_bags": 23573,
+      "total_bags": 455680,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4000
+          "bags": 2000
         },
         {
           "grade": "Drugar",
@@ -1764,7 +1764,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 640617
+          "bags": 5750
         },
         {
           "grade": "Screen 18",
@@ -1780,11 +1780,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 124792
+          "bags": 1340
         },
         {
           "grade": "Screen 13",
-          "bags": 250272
+          "bags": 3132
         },
         {
           "grade": "Screen 12",
@@ -1792,11 +1792,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 39540
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1214376
+          "bags": 6812
         },
         {
           "grade": "Wugar",
@@ -1814,7 +1814,7 @@
         },
         {
           "country": "Korea",
-          "bags": 782
+          "bags": 300
         },
         {
           "country": "Sudan",
@@ -1827,14 +1827,14 @@
     },
     {
       "month": "2021-04",
-      "robusta_bags": 1183717,
-      "arabica_bags": 107145,
-      "total_bags": 1290862,
+      "robusta_bags": 383935,
+      "arabica_bags": 6230,
+      "total_bags": 390165,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4300
+          "bags": 2250
         },
         {
           "grade": "Drugar",
@@ -1842,11 +1842,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 104182
+          "bags": 999
         },
         {
           "grade": "Washed Robusta",
-          "bags": 113617
+          "bags": 980
         },
         {
           "grade": "Screen 18",
@@ -1862,11 +1862,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 350130
+          "bags": 3340
         },
         {
           "grade": "Screen 13",
-          "bags": 197687
+          "bags": 2520
         },
         {
           "grade": "Screen 12",
@@ -1874,15 +1874,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 41154
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 42185
+          "bags": 210
         },
         {
           "grade": "Wugar",
-          "bags": 59260
+          "bags": 320
         },
         {
           "grade": "Kiboko",
@@ -1904,23 +1904,23 @@
         },
         {
           "country": "Italy",
-          "bags": 154508
+          "bags": 148896
         },
         {
           "country": "India",
-          "bags": 67621
+          "bags": 64425
         },
         {
           "country": "Belgium",
-          "bags": 42489
+          "bags": 27392
         },
         {
           "country": "United States",
-          "bags": 31992
+          "bags": 9013
         },
         {
           "country": "Spain",
-          "bags": 26842
+          "bags": 26522
         },
         {
           "country": "Algeria",
@@ -1932,11 +1932,11 @@
         },
         {
           "country": "Russia",
-          "bags": 8818
+          "bags": 7858
         },
         {
           "country": "Egypt",
-          "bags": 7190
+          "bags": 7182
         },
         {
           "country": "Portugal",
@@ -1944,11 +1944,11 @@
         },
         {
           "country": "Greece",
-          "bags": 4224
+          "bags": 3890
         },
         {
           "country": "Japan",
-          "bags": 4130
+          "bags": 1220
         },
         {
           "country": "Turkey",
@@ -1956,11 +1956,11 @@
         },
         {
           "country": "China",
-          "bags": 2051
+          "bags": 1666
         },
         {
           "country": "Canada",
-          "bags": 1986
+          "bags": 654
         },
         {
           "country": "Korea",
@@ -1976,7 +1976,7 @@
         },
         {
           "country": "Netherlands",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "United Kingdom",
@@ -1989,14 +1989,14 @@
     },
     {
       "month": "2021-05",
-      "robusta_bags": 2493150,
-      "arabica_bags": 423074,
-      "total_bags": 2916224,
+      "robusta_bags": 389081,
+      "arabica_bags": 12842,
+      "total_bags": 401923,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4350
+          "bags": 2250
         },
         {
           "grade": "Drugar",
@@ -2004,11 +2004,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 181548
+          "bags": 1665
         },
         {
           "grade": "Washed Robusta",
-          "bags": 33025
+          "bags": 320
         },
         {
           "grade": "Screen 18",
@@ -2024,7 +2024,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 319863
+          "bags": 2940
         },
         {
           "grade": "Screen 12",
@@ -2032,15 +2032,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1573657
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 65609
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 343965
+          "bags": 1422
         },
         {
           "grade": "Kiboko",
@@ -2048,7 +2048,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 6750
+          "bags": 4350
         }
       ],
       "by_destination": [
@@ -2063,14 +2063,14 @@
     },
     {
       "month": "2021-06",
-      "robusta_bags": 1027863,
-      "arabica_bags": 560354,
-      "total_bags": 1588217,
+      "robusta_bags": 166676,
+      "arabica_bags": 9199,
+      "total_bags": 175875,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4350
+          "bags": 2250
         },
         {
           "grade": "Drugar",
@@ -2082,19 +2082,19 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 28275
+          "bags": 334
         },
         {
           "grade": "Washed Robusta",
-          "bags": 12361
+          "bags": 105
         },
         {
           "grade": "Screen 18",
-          "bags": 46760
+          "bags": 350
         },
         {
           "grade": "Screen 15",
-          "bags": 240478
+          "bags": 1800
         },
         {
           "grade": "Screen 17",
@@ -2102,11 +2102,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 325007
+          "bags": 2880
         },
         {
           "grade": "Screen 13",
-          "bags": 172877
+          "bags": 2160
         },
         {
           "grade": "Screen 12",
@@ -2114,19 +2114,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 39359
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 315921
+          "bags": 1304
         },
         {
           "grade": "Wugar",
-          "bags": 237783
+          "bags": 1245
         },
         {
           "grade": "Kiboko",
-          "bags": 4798
+          "bags": 2000
         }
       ],
       "by_destination": [
@@ -2145,14 +2145,14 @@
     },
     {
       "month": "2021-07",
-      "robusta_bags": 1588141,
-      "arabica_bags": 1286425,
-      "total_bags": 2874566,
+      "robusta_bags": 599401,
+      "arabica_bags": 18991,
+      "total_bags": 618392,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 4870
+          "bags": 2250
         },
         {
           "grade": "Drugar",
@@ -2160,11 +2160,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 161737
+          "bags": 1440
         },
         {
           "grade": "Screen 14",
-          "bags": 91715
+          "bags": 720
         },
         {
           "grade": "Screen 18",
@@ -2180,7 +2180,7 @@
         },
         {
           "grade": "Screen 13",
-          "bags": 373498
+          "bags": 4320
         },
         {
           "grade": "Screen 12",
@@ -2188,23 +2188,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 35436
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 250689
+          "bags": 1160
         },
         {
           "grade": "Mt Elgon",
-          "bags": 99971
+          "bags": 441
         },
         {
           "grade": "Wugar",
-          "bags": 1173554
+          "bags": 5650
         },
         {
           "grade": "Kiboko",
-          "bags": 83884
+          "bags": 2000
         },
         {
           "grade": "Arabica Parchment",
@@ -2223,14 +2223,14 @@
     },
     {
       "month": "2021-08",
-      "robusta_bags": 1552888,
-      "arabica_bags": 1330107,
-      "total_bags": 2882995,
+      "robusta_bags": 494027,
+      "arabica_bags": 20777,
+      "total_bags": 514804,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 5150
+          "bags": 2650
         },
         {
           "grade": "Drugar",
@@ -2242,15 +2242,15 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 44868
+          "bags": 320
         },
         {
           "grade": "Washed Robusta",
-          "bags": 41664
+          "bags": 320
         },
         {
           "grade": "Screen 18",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 17",
@@ -2262,11 +2262,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 502771
+          "bags": 4228
         },
         {
           "grade": "Screen 13",
-          "bags": 348098
+          "bags": 3600
         },
         {
           "grade": "Screen 12",
@@ -2274,15 +2274,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 33156
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 135578
+          "bags": 640
         },
         {
           "grade": "Wugar",
-          "bags": 1179529
+          "bags": 5137
         },
         {
           "grade": "Kiboko",
@@ -2313,9 +2313,9 @@
     },
     {
       "month": "2021-09",
-      "robusta_bags": 2688426,
-      "arabica_bags": 1911065,
-      "total_bags": 4599491,
+      "robusta_bags": 131636,
+      "arabica_bags": 23514,
+      "total_bags": 155150,
       "value_usd": null,
       "by_grade": [
         {
@@ -2324,7 +2324,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 5150
+          "bags": 2650
         },
         {
           "grade": "Drugar",
@@ -2332,19 +2332,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 42874
+          "bags": 320
         },
         {
           "grade": "Screen 18",
-          "bags": 128255
+          "bags": 960
         },
         {
           "grade": "Screen 15",
-          "bags": 331325
+          "bags": 2480
         },
         {
           "grade": "Screen 14",
-          "bags": 91715
+          "bags": 720
         },
         {
           "grade": "Screen 17",
@@ -2352,7 +2352,7 @@
         },
         {
           "grade": "Screen 13",
-          "bags": 208863
+          "bags": 1800
         },
         {
           "grade": "Screen 12",
@@ -2360,23 +2360,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 1758737
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 50794
+          "bags": 320
         },
         {
           "grade": "Bugisu AA",
-          "bags": 652791
+          "bags": 2827
         },
         {
           "grade": "Bugisu A",
-          "bags": 77461
+          "bags": 320
         },
         {
           "grade": "Wugar",
-          "bags": 1114769
+          "bags": 4797
         },
         {
           "grade": "Arabica Parchment",
@@ -2390,11 +2390,11 @@
         },
         {
           "country": "Italy",
-          "bags": 162469
+          "bags": 161159
         },
         {
           "country": "Germany",
-          "bags": 71885
+          "bags": 69645
         },
         {
           "country": "Algeria",
@@ -2402,31 +2402,31 @@
         },
         {
           "country": "India",
-          "bags": 59088
+          "bags": 39668
         },
         {
           "country": "Sudan",
-          "bags": 55650
+          "bags": 54723
         },
         {
           "country": "Morocco",
-          "bags": 35913
+          "bags": 35273
         },
         {
           "country": "United States",
-          "bags": 29448
+          "bags": 19969
         },
         {
           "country": "Spain",
-          "bags": 23551
+          "bags": 20931
         },
         {
           "country": "Belgium",
-          "bags": 16294
+          "bags": 14054
         },
         {
           "country": "Russia",
-          "bags": 11118
+          "bags": 10798
         },
         {
           "country": "South Africa",
@@ -2442,7 +2442,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 2774
+          "bags": 2454
         },
         {
           "country": "Turkey",
@@ -2458,7 +2458,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 2003
+          "bags": 1976
         },
         {
           "country": "Greece",
@@ -2478,7 +2478,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 570
+          "bags": 320
         },
         {
           "country": "Netherlands",
@@ -2495,14 +2495,14 @@
     },
     {
       "month": "2021-10",
-      "robusta_bags": 3707774,
-      "arabica_bags": 1012061,
-      "total_bags": 4719835,
+      "robusta_bags": 109107,
+      "arabica_bags": 22700,
+      "total_bags": 131807,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 5200
+          "bags": 2650
         },
         {
           "grade": "Drugar",
@@ -2518,15 +2518,15 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 660155
+          "bags": 5250
         },
         {
           "grade": "Screen 18",
-          "bags": 32064
+          "bags": 240
         },
         {
           "grade": "Screen 15",
-          "bags": 235134
+          "bags": 1760
         },
         {
           "grade": "Screen 17",
@@ -2534,11 +2534,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 574187
+          "bags": 4597
         },
         {
           "grade": "Screen 13",
-          "bags": 219025
+          "bags": 1800
         },
         {
           "grade": "Screen 12",
@@ -2546,15 +2546,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1890398
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 857840
+          "bags": 3290
         },
         {
           "grade": "Wugar",
-          "bags": 135451
+          "bags": 640
         },
         {
           "grade": "Kiboko",
@@ -2585,14 +2585,14 @@
     },
     {
       "month": "2021-11",
-      "robusta_bags": 1278349,
-      "arabica_bags": 1634217,
-      "total_bags": 2912566,
+      "robusta_bags": 133116,
+      "arabica_bags": 36373,
+      "total_bags": 169489,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 5750
+          "bags": 2750
         },
         {
           "grade": "Drugar",
@@ -2604,23 +2604,23 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 225401
+          "bags": 1780
         },
         {
           "grade": "Washed Robusta",
-          "bags": 207036
+          "bags": 1280
         },
         {
           "grade": "Screen 18",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 288573
+          "bags": 2160
         },
         {
           "grade": "Screen 14",
-          "bags": 46619
+          "bags": 360
         },
         {
           "grade": "Screen 17",
@@ -2628,7 +2628,7 @@
         },
         {
           "grade": "Screen 13",
-          "bags": 258326
+          "bags": 2160
         },
         {
           "grade": "Screen 12",
@@ -2636,11 +2636,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 29746
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 215874
+          "bags": 960
         },
         {
           "grade": "Mt Elgon",
@@ -2648,11 +2648,11 @@
         },
         {
           "grade": "Bugisu A+",
-          "bags": 103056
+          "bags": 350
         },
         {
           "grade": "Bugisu A",
-          "bags": 1285334
+          "bags": 5110
         },
         {
           "grade": "Bugisu PB",
@@ -2683,14 +2683,14 @@
     },
     {
       "month": "2021-12",
-      "robusta_bags": 1577755,
-      "arabica_bags": 1471196,
-      "total_bags": 3048951,
+      "robusta_bags": 203705,
+      "arabica_bags": 40650,
+      "total_bags": 244355,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6250
+          "bags": 3100
         },
         {
           "grade": "Drugar",
@@ -2698,15 +2698,15 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 621043
+          "bags": 3941
         },
         {
           "grade": "Screen 15",
-          "bags": 370069
+          "bags": 2770
         },
         {
           "grade": "Screen 14",
-          "bags": 141334
+          "bags": 1080
         },
         {
           "grade": "Screen 18",
@@ -2718,7 +2718,7 @@
         },
         {
           "grade": "Screen 13",
-          "bags": 218168
+          "bags": 1800
         },
         {
           "grade": "Screen 12",
@@ -2726,7 +2726,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 31076
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
@@ -2734,7 +2734,7 @@
         },
         {
           "grade": "Wugar",
-          "bags": 1435875
+          "bags": 5329
         },
         {
           "grade": "Kiboko",
@@ -2756,7 +2756,7 @@
         },
         {
           "country": "Korea",
-          "bags": 2318
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -2765,14 +2765,14 @@
     },
     {
       "month": "2022-01",
-      "robusta_bags": 3032689,
-      "arabica_bags": 87760,
-      "total_bags": 3120449,
+      "robusta_bags": 104760,
+      "arabica_bags": 24588,
+      "total_bags": 129348,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
-          "bags": 7000
+          "bags": 3100
         },
         {
           "grade": "Drugar",
@@ -2784,27 +2784,27 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 133461
+          "bags": 960
         },
         {
           "grade": "Washed Robusta",
-          "bags": 452836
+          "bags": 2940
         },
         {
           "grade": "Screen 18",
-          "bags": 49432
+          "bags": 370
         },
         {
           "grade": "Screen 15",
-          "bags": 259182
+          "bags": 1940
         },
         {
           "grade": "Screen 17",
-          "bags": 1923284
+          "bags": 14260
         },
         {
           "grade": "Screen 14",
-          "bags": 41664
+          "bags": 320
         },
         {
           "grade": "Screen 12",
@@ -2812,11 +2812,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 26765
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 63492
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
@@ -2828,7 +2828,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 65894
+          "bags": 6500
         }
       ],
       "by_destination": [
@@ -2838,11 +2838,11 @@
         },
         {
           "country": "Italy",
-          "bags": 120791
+          "bags": 100957
         },
         {
           "country": "Germany",
-          "bags": 40840
+          "bags": 30560
         },
         {
           "country": "India",
@@ -2850,19 +2850,19 @@
         },
         {
           "country": "Belgium",
-          "bags": 25498
+          "bags": 12090
         },
         {
           "country": "Spain",
-          "bags": 22584
+          "bags": 21596
         },
         {
           "country": "United States",
-          "bags": 17759
+          "bags": 1920
         },
         {
           "country": "Algeria",
-          "bags": 9336
+          "bags": 8696
         },
         {
           "country": "Korea",
@@ -2870,11 +2870,11 @@
         },
         {
           "country": "Egypt",
-          "bags": 7762
+          "bags": 7306
         },
         {
           "country": "Portugal",
-          "bags": 7320
+          "bags": 3390
         },
         {
           "country": "Morocco",
@@ -2882,7 +2882,7 @@
         },
         {
           "country": "Turkey",
-          "bags": 3953
+          "bags": 3792
         },
         {
           "country": "Switzerland",
@@ -2890,7 +2890,7 @@
         },
         {
           "country": "Russia",
-          "bags": 2914
+          "bags": 1940
         },
         {
           "country": "Greece",
@@ -2902,11 +2902,11 @@
         },
         {
           "country": "Japan",
-          "bags": 1800
+          "bags": 1200
         },
         {
           "country": "South Africa",
-          "bags": 1692
+          "bags": 360
         },
         {
           "country": "France",
@@ -2947,14 +2947,14 @@
     },
     {
       "month": "2022-02",
-      "robusta_bags": 1763291,
+      "robusta_bags": 159741,
       "arabica_bags": 32326,
-      "total_bags": 1795617,
+      "total_bags": 192067,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6750
+          "bags": 2950
         },
         {
           "grade": "Drugar",
@@ -2966,11 +2966,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 83519
+          "bags": 350
         },
         {
           "grade": "Washed Robusta",
-          "bags": 582207
+          "bags": 3354
         },
         {
           "grade": "Screen 18",
@@ -2978,7 +2978,7 @@
         },
         {
           "grade": "Screen 15",
-          "bags": 42752
+          "bags": 320
         },
         {
           "grade": "Screen 17",
@@ -2986,11 +2986,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 337737
+          "bags": 2594
         },
         {
           "grade": "Screen 13",
-          "bags": 526275
+          "bags": 3960
         },
         {
           "grade": "Screen 12",
@@ -2998,7 +2998,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 39037
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
@@ -3033,30 +3033,30 @@
     },
     {
       "month": "2022-03",
-      "robusta_bags": 3778394,
-      "arabica_bags": 248875,
-      "total_bags": 4027269,
+      "robusta_bags": 103190,
+      "arabica_bags": 8496,
+      "total_bags": 111686,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
-          "bags": 6550
+          "bags": 2750
         },
         {
           "grade": "Organic Robusta",
-          "bags": 48016
+          "bags": 330
         },
         {
           "grade": "Washed Robusta",
-          "bags": 817998
+          "bags": 4330
         },
         {
           "grade": "Screen 18",
-          "bags": 44088
+          "bags": 330
         },
         {
           "grade": "Screen 15",
-          "bags": 92183
+          "bags": 690
         },
         {
           "grade": "Screen 17",
@@ -3064,7 +3064,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 886657
+          "bags": 6810
         },
         {
           "grade": "Screen 12",
@@ -3072,15 +3072,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1788172
+          "bags": 1199
         },
         {
           "grade": "Drugar",
-          "bags": 177847
+          "bags": 640
         },
         {
           "grade": "Wugar",
-          "bags": 63492
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
@@ -3092,7 +3092,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 10000
+          "bags": 2021
         }
       ],
       "by_destination": [
@@ -3102,27 +3102,27 @@
         },
         {
           "country": "Italy",
-          "bags": 154843
+          "bags": 135489
         },
         {
           "country": "Germany",
-          "bags": 58809
+          "bags": 32872
         },
         {
           "country": "Belgium",
-          "bags": 27196
+          "bags": 9978
         },
         {
           "country": "India",
-          "bags": 19830
+          "bags": 17710
         },
         {
           "country": "Spain",
-          "bags": 10902
+          "bags": 8008
         },
         {
           "country": "Portugal",
-          "bags": 8515
+          "bags": 3560
         },
         {
           "country": "Tunisia",
@@ -3130,11 +3130,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 4874
+          "bags": 4541
         },
         {
           "country": "Japan",
-          "bags": 4614
+          "bags": 1340
         },
         {
           "country": "Algeria",
@@ -3142,7 +3142,7 @@
         },
         {
           "country": "Morocco",
-          "bags": 3664
+          "bags": 3344
         },
         {
           "country": "Korea",
@@ -3162,19 +3162,19 @@
         },
         {
           "country": "France",
-          "bags": 1578
+          "bags": 938
         },
         {
           "country": "Australia",
-          "bags": 1461
+          "bags": 1020
         },
         {
           "country": "Switzerland",
-          "bags": 1005
+          "bags": 1002
         },
         {
           "country": "Canada",
-          "bags": 986
+          "bags": 320
         },
         {
           "country": "Mexico",
@@ -3215,14 +3215,14 @@
     },
     {
       "month": "2022-04",
-      "robusta_bags": 2078942,
-      "arabica_bags": 1691270,
-      "total_bags": 3770212,
+      "robusta_bags": 239844,
+      "arabica_bags": 33533,
+      "total_bags": 273377,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
-          "bags": 6550
+          "bags": 2750
         },
         {
           "grade": "Drugar",
@@ -3230,11 +3230,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 139683
+          "bags": 960
         },
         {
           "grade": "Washed Robusta",
-          "bags": 857288
+          "bags": 4502
         },
         {
           "grade": "Screen 18",
@@ -3250,11 +3250,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 460534
+          "bags": 3596
         },
         {
           "grade": "Screen 13",
-          "bags": 354039
+          "bags": 2664
         },
         {
           "grade": "Screen 12",
@@ -3262,7 +3262,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 32975
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
@@ -3270,7 +3270,7 @@
         },
         {
           "grade": "Wugar",
-          "bags": 1663119
+          "bags": 5382
         },
         {
           "grade": "Kiboko",
@@ -3278,7 +3278,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 10000
+          "bags": 6300
         },
         {
           "grade": "Arabica Parchment",
@@ -3305,14 +3305,14 @@
     },
     {
       "month": "2022-05",
-      "robusta_bags": 2134090,
-      "arabica_bags": 230316,
-      "total_bags": 2364406,
+      "robusta_bags": 305818,
+      "arabica_bags": 22217,
+      "total_bags": 328035,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6450
+          "bags": 2600
         },
         {
           "grade": "Drugar",
@@ -3328,11 +3328,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 300567
+          "bags": 2024
         },
         {
           "grade": "Washed Robusta",
-          "bags": 113985
+          "bags": 680
         },
         {
           "grade": "Screen 18",
@@ -3348,11 +3348,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 95192
+          "bags": 694
         },
         {
           "grade": "Screen 13",
-          "bags": 1304399
+          "bags": 9990
         },
         {
           "grade": "Screen 12",
@@ -3360,11 +3360,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 24866
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 208794
+          "bags": 695
         },
         {
           "grade": "Kiboko",
@@ -3391,14 +3391,14 @@
     },
     {
       "month": "2022-06",
-      "robusta_bags": 1702402,
-      "arabica_bags": 638472,
-      "total_bags": 2340874,
+      "robusta_bags": 169685,
+      "arabica_bags": 23075,
+      "total_bags": 192760,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6450
+          "bags": 2600
         },
         {
           "grade": "Drugar",
@@ -3410,15 +3410,15 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 97649
+          "bags": 700
         },
         {
           "grade": "Washed Robusta",
-          "bags": 468173
+          "bags": 2990
         },
         {
           "grade": "Screen 15",
-          "bags": 48096
+          "bags": 360
         },
         {
           "grade": "Screen 18",
@@ -3430,11 +3430,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 668696
+          "bags": 4820
         },
         {
           "grade": "Screen 13",
-          "bags": 85814
+          "bags": 666
         },
         {
           "grade": "Screen 12",
@@ -3442,15 +3442,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 35578
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 135996
+          "bags": 400
         },
         {
           "grade": "Mt Elgon",
-          "bags": 616950
+          "bags": 1553
         },
         {
           "grade": "Kiboko",
@@ -3468,7 +3468,7 @@
         },
         {
           "country": "United States",
-          "bags": 34063
+          "bags": 29820
         },
         {
           "country": "Korea",
@@ -3485,14 +3485,14 @@
     },
     {
       "month": "2022-07",
-      "robusta_bags": 1823145,
-      "arabica_bags": 133911,
-      "total_bags": 1957056,
+      "robusta_bags": 131583,
+      "arabica_bags": 29422,
+      "total_bags": 161005,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6250
+          "bags": 2250
         },
         {
           "grade": "Drugar",
@@ -3504,19 +3504,19 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 159087
+          "bags": 1080
         },
         {
           "grade": "Washed Robusta",
-          "bags": 196973
+          "bags": 1335
         },
         {
           "grade": "Screen 18",
-          "bags": 42752
+          "bags": 320
         },
         {
           "grade": "Screen 15",
-          "bags": 48096
+          "bags": 360
         },
         {
           "grade": "Screen 17",
@@ -3524,11 +3524,11 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 840463
+          "bags": 6064
         },
         {
           "grade": "Screen 13",
-          "bags": 322889
+          "bags": 2664
         },
         {
           "grade": "Screen 12",
@@ -3536,15 +3536,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 29347
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 61387
+          "bags": 410
         },
         {
           "grade": "Mt Elgon",
-          "bags": 104843
+          "bags": 354
         },
         {
           "grade": "Wugar",
@@ -3566,7 +3566,7 @@
         },
         {
           "country": "Korea",
-          "bags": 3278
+          "bags": 640
         }
       ],
       "parser_version": "v1_recent",
@@ -3575,14 +3575,14 @@
     },
     {
       "month": "2022-08",
-      "robusta_bags": 2131171,
-      "arabica_bags": 3446481,
-      "total_bags": 5577652,
+      "robusta_bags": 177220,
+      "arabica_bags": 26489,
+      "total_bags": 203709,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 7050
+          "bags": 2700
         },
         {
           "grade": "Drugar",
@@ -3590,15 +3590,15 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 306547
+          "bags": 2054
         },
         {
           "grade": "Washed Robusta",
-          "bags": 417311
+          "bags": 3000
         },
         {
           "grade": "Screen 15",
-          "bags": 224045
+          "bags": 1677
         },
         {
           "grade": "Screen 18",
@@ -3610,7 +3610,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 982161
+          "bags": 7014
         },
         {
           "grade": "Screen 12",
@@ -3618,11 +3618,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 34481
+          "bags": 1199
         },
         {
           "grade": "Bugisu A+",
-          "bags": 445328
+          "bags": 1430
         },
         {
           "grade": "Bugisu AA",
@@ -3630,11 +3630,11 @@
         },
         {
           "grade": "Bugisu A",
-          "bags": 1654478
+          "bags": 5862
         },
         {
           "grade": "Wugar",
-          "bags": 1332331
+          "bags": 4853
         },
         {
           "grade": "Kiboko",
@@ -3648,7 +3648,7 @@
         },
         {
           "country": "Italy",
-          "bags": 198746
+          "bags": 183308
         },
         {
           "country": "Sudan",
@@ -3656,11 +3656,11 @@
         },
         {
           "country": "India",
-          "bags": 38833
+          "bags": 35233
         },
         {
           "country": "Belgium",
-          "bags": 28170
+          "bags": 27820
         },
         {
           "country": "Tunisia",
@@ -3668,15 +3668,15 @@
         },
         {
           "country": "Spain",
-          "bags": 20232
+          "bags": 18952
         },
         {
           "country": "Morocco",
-          "bags": 16876
+          "bags": 16556
         },
         {
           "country": "China",
-          "bags": 4800
+          "bags": 4480
         },
         {
           "country": "Portugal",
@@ -3696,11 +3696,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 2704
+          "bags": 1304
         },
         {
           "country": "Turkey",
-          "bags": 2044
+          "bags": 1694
         },
         {
           "country": "Japan",
@@ -3728,7 +3728,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 521
+          "bags": 339
         },
         {
           "country": "South Africa",
@@ -3745,14 +3745,14 @@
     },
     {
       "month": "2022-09",
-      "robusta_bags": 1196367,
-      "arabica_bags": 903511,
-      "total_bags": 2099878,
+      "robusta_bags": 146110,
+      "arabica_bags": 14526,
+      "total_bags": 160636,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 7050
+          "bags": 2700
         },
         {
           "grade": "Drugar",
@@ -3760,15 +3760,15 @@
         },
         {
           "grade": "Screen 18",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Washed Robusta",
-          "bags": 296218
+          "bags": 1990
         },
         {
           "grade": "Screen 17",
@@ -3776,7 +3776,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 482978
+          "bags": 3340
         },
         {
           "grade": "Screen 12",
@@ -3784,15 +3784,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 30166
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 52282
+          "bags": 150
         },
         {
           "grade": "Wugar",
-          "bags": 892011
+          "bags": 3026
         },
         {
           "grade": "Kiboko",
@@ -3806,7 +3806,7 @@
         },
         {
           "country": "Korea",
-          "bags": 3291
+          "bags": 640
         },
         {
           "country": "Sudan",
@@ -3819,14 +3819,14 @@
     },
     {
       "month": "2022-10",
-      "robusta_bags": 1631043,
-      "arabica_bags": 1771459,
-      "total_bags": 3402502,
+      "robusta_bags": 113374,
+      "arabica_bags": 16098,
+      "total_bags": 129472,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6550
+          "bags": 2600
         },
         {
           "grade": "Drugar",
@@ -3834,19 +3834,19 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 176537
+          "bags": 1160
         },
         {
           "grade": "Washed Robusta",
-          "bags": 249208
+          "bags": 1670
         },
         {
           "grade": "Screen 18",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 17",
@@ -3854,7 +3854,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 580263
+          "bags": 3980
         },
         {
           "grade": "Screen 12",
@@ -3862,19 +3862,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 37258
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 288240
+          "bags": 720
         },
         {
           "grade": "Mt Elgon",
-          "bags": 419467
+          "bags": 1223
         },
         {
           "grade": "Wugar",
-          "bags": 1341492
+          "bags": 4375
         },
         {
           "grade": "Kiboko",
@@ -3892,7 +3892,7 @@
         },
         {
           "country": "Korea",
-          "bags": 960
+          "bags": 320
         },
         {
           "country": "India",
@@ -3909,14 +3909,14 @@
     },
     {
       "month": "2022-11",
-      "robusta_bags": 1218164,
-      "arabica_bags": 2755486,
-      "total_bags": 3973650,
+      "robusta_bags": 108086,
+      "arabica_bags": 22852,
+      "total_bags": 130938,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 6400
+          "bags": 2400
         },
         {
           "grade": "Drugar",
@@ -3932,15 +3932,15 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 141086
+          "bags": 1070
         },
         {
           "grade": "Screen 18",
-          "bags": 43152
+          "bags": 323
         },
         {
           "grade": "Screen 15",
-          "bags": 410415
+          "bags": 3072
         },
         {
           "grade": "Screen 17",
@@ -3948,7 +3948,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 486954
+          "bags": 3340
         },
         {
           "grade": "Screen 12",
@@ -3956,15 +3956,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 33475
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1335615
+          "bags": 5228
         },
         {
           "grade": "Wugar",
-          "bags": 1408349
+          "bags": 6102
         },
         {
           "grade": "Kiboko",
@@ -3982,7 +3982,7 @@
         },
         {
           "country": "Korea",
-          "bags": 3589
+          "bags": 472
         },
         {
           "country": "Sudan",
@@ -3995,9 +3995,9 @@
     },
     {
       "month": "2022-12",
-      "robusta_bags": 743163,
-      "arabica_bags": 717330,
-      "total_bags": 1460493,
+      "robusta_bags": 90730,
+      "arabica_bags": 21380,
+      "total_bags": 112110,
       "value_usd": null,
       "by_grade": [
         {
@@ -4006,7 +4006,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 6150
+          "bags": 2450
         },
         {
           "grade": "Drugar",
@@ -4014,19 +4014,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 44021
+          "bags": 320
         },
         {
           "grade": "Screen 18",
-          "bags": 21376
+          "bags": 160
         },
         {
           "grade": "Screen 15",
-          "bags": 33400
+          "bags": 250
         },
         {
           "grade": "Screen 14",
-          "bags": 43598
+          "bags": 320
         },
         {
           "grade": "Screen 17",
@@ -4034,7 +4034,7 @@
         },
         {
           "grade": "Screen 13",
-          "bags": 151049
+          "bags": 1332
         },
         {
           "grade": "Screen 12",
@@ -4042,19 +4042,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 23045
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 337175
+          "bags": 1350
         },
         {
           "grade": "Wugar",
-          "bags": 68403
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 629927
+          "bags": 2060
         },
         {
           "grade": "Arabica Parchment",
@@ -4068,7 +4068,7 @@
         },
         {
           "country": "Italy",
-          "bags": 161123
+          "bags": 145178
         },
         {
           "country": "Sudan",
@@ -4076,27 +4076,27 @@
         },
         {
           "country": "Germany",
-          "bags": 48879
+          "bags": 37864
         },
         {
           "country": "Belgium",
-          "bags": 25951
+          "bags": 12646
         },
         {
           "country": "United States",
-          "bags": 14433
+          "bags": 1640
         },
         {
           "country": "Morocco",
-          "bags": 10779
+          "bags": 10126
         },
         {
           "country": "Spain",
-          "bags": 10643
+          "bags": 6433
         },
         {
           "country": "Netherlands",
-          "bags": 6368
+          "bags": 3934
         },
         {
           "country": "Korea",
@@ -4104,7 +4104,7 @@
         },
         {
           "country": "Russia",
-          "bags": 3540
+          "bags": 2880
         },
         {
           "country": "Turkey",
@@ -4112,15 +4112,15 @@
         },
         {
           "country": "France",
-          "bags": 2204
+          "bags": 270
         },
         {
           "country": "Egypt",
-          "bags": 2068
+          "bags": 1734
         },
         {
           "country": "United Kingdom",
-          "bags": 1580
+          "bags": 1564
         },
         {
           "country": "South Africa",
@@ -4165,9 +4165,9 @@
     },
     {
       "month": "2023-01",
-      "robusta_bags": 1368138,
-      "arabica_bags": 555747,
-      "total_bags": 1923885,
+      "robusta_bags": 139452,
+      "arabica_bags": 31077,
+      "total_bags": 170529,
       "value_usd": null,
       "by_grade": [
         {
@@ -4176,7 +4176,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 5900
+          "bags": 2200
         },
         {
           "grade": "Drugar",
@@ -4188,19 +4188,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 350577
+          "bags": 2650
         },
         {
           "grade": "Screen 18",
-          "bags": 42752
+          "bags": 320
         },
         {
           "grade": "Screen 15",
-          "bags": 428852
+          "bags": 3210
         },
         {
           "grade": "Screen 14",
-          "bags": 372473
+          "bags": 2788
         },
         {
           "grade": "Screen 17",
@@ -4212,11 +4212,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 40499
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 525668
+          "bags": 1998
         },
         {
           "grade": "Wugar",
@@ -4224,7 +4224,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9000
+          "bags": 8000
         }
       ],
       "by_destination": [
@@ -4243,9 +4243,9 @@
     },
     {
       "month": "2023-02",
-      "robusta_bags": 1038961,
-      "arabica_bags": 1952381,
-      "total_bags": 2991342,
+      "robusta_bags": 97833,
+      "arabica_bags": 43451,
+      "total_bags": 141284,
       "value_usd": null,
       "by_grade": [
         {
@@ -4254,7 +4254,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 6450
+          "bags": 2450
         },
         {
           "grade": "Drugar",
@@ -4270,19 +4270,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 355288
+          "bags": 2590
         },
         {
           "grade": "Screen 18",
-          "bags": 21376
+          "bags": 160
         },
         {
           "grade": "Screen 15",
-          "bags": 321973
+          "bags": 2410
         },
         {
           "grade": "Screen 14",
-          "bags": 209750
+          "bags": 1570
         },
         {
           "grade": "Screen 12",
@@ -4290,11 +4290,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 36670
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1915515
+          "bags": 7585
         },
         {
           "grade": "Wugar",
@@ -4302,7 +4302,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9500
+          "bags": 8500
         }
       ],
       "by_destination": [
@@ -4312,7 +4312,7 @@
         },
         {
           "country": "Italy",
-          "bags": 139201
+          "bags": 103680
         },
         {
           "country": "Sudan",
@@ -4320,47 +4320,47 @@
         },
         {
           "country": "India",
-          "bags": 51429
+          "bags": 49847
         },
         {
           "country": "Belgium",
-          "bags": 17298
+          "bags": 11836
         },
         {
           "country": "Morocco",
-          "bags": 12920
+          "bags": 11640
         },
         {
           "country": "Netherlands",
-          "bags": 11020
+          "bags": 2460
         },
         {
           "country": "Spain",
-          "bags": 10024
+          "bags": 5785
         },
         {
           "country": "Algeria",
-          "bags": 9880
+          "bags": 7320
         },
         {
           "country": "Switzerland",
-          "bags": 5310
+          "bags": 4670
         },
         {
           "country": "Japan",
-          "bags": 5156
+          "bags": 3840
         },
         {
           "country": "United Arab Emirates",
-          "bags": 3507
+          "bags": 3173
         },
         {
           "country": "Russia",
-          "bags": 2560
+          "bags": 2240
         },
         {
           "country": "United Kingdom",
-          "bags": 2259
+          "bags": 640
         },
         {
           "country": "Portugal",
@@ -4372,15 +4372,15 @@
         },
         {
           "country": "Canada",
-          "bags": 1370
+          "bags": 1050
         },
         {
           "country": "Turkey",
-          "bags": 1364
+          "bags": 1030
         },
         {
           "country": "China",
-          "bags": 960
+          "bags": 640
         },
         {
           "country": "France",
@@ -4421,9 +4421,9 @@
     },
     {
       "month": "2023-03",
-      "robusta_bags": 475620,
-      "arabica_bags": 46124,
-      "total_bags": 521744,
+      "robusta_bags": 138813,
+      "arabica_bags": 45624,
+      "total_bags": 184437,
       "value_usd": null,
       "by_grade": [
         {
@@ -4432,7 +4432,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 6750
+          "bags": 2500
         },
         {
           "grade": "Drugar",
@@ -4444,19 +4444,19 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 86053
+          "bags": 640
         },
         {
           "grade": "Washed Robusta",
-          "bags": 164399
+          "bags": 850
         },
         {
           "grade": "Screen 18",
-          "bags": 21376
+          "bags": 160
         },
         {
           "grade": "Screen 15",
-          "bags": 22311
+          "bags": 167
         },
         {
           "grade": "Screen 17",
@@ -4472,7 +4472,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 41434
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -4488,13 +4488,13 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9000
+          "bags": 8500
         }
       ],
       "by_destination": [
         {
           "country": "Korea",
-          "bags": 832
+          "bags": 330
         },
         {
           "country": "Sudan",
@@ -4507,9 +4507,9 @@
     },
     {
       "month": "2023-04",
-      "robusta_bags": 3060304,
-      "arabica_bags": 1908131,
-      "total_bags": 4968435,
+      "robusta_bags": 36167,
+      "arabica_bags": 25131,
+      "total_bags": 61298,
       "value_usd": null,
       "by_grade": [
         {
@@ -4518,7 +4518,7 @@
         },
         {
           "grade": "Sustainable",
-          "bags": 7050
+          "bags": 2900
         },
         {
           "grade": "Drugar",
@@ -4526,27 +4526,27 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 212706
+          "bags": 1440
         },
         {
           "grade": "Washed Robusta",
-          "bags": 361243
+          "bags": 1920
         },
         {
           "grade": "Screen 18",
-          "bags": 96191
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 42752
+          "bags": 320
         },
         {
           "grade": "Screen 14",
-          "bags": 48096
+          "bags": 360
         },
         {
           "grade": "Screen 12",
-          "bags": 267198
+          "bags": 2000
         },
         {
           "grade": "Screen 17",
@@ -4554,15 +4554,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 1999760
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 79620
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1809861
+          "bags": 6861
         },
         {
           "grade": "FAQ",
@@ -4570,7 +4570,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9500
+          "bags": 8800
         }
       ],
       "by_destination": [
@@ -4585,14 +4585,14 @@
     },
     {
       "month": "2023-05",
-      "robusta_bags": 1353087,
-      "arabica_bags": 44625,
-      "total_bags": 1397712,
+      "robusta_bags": 127954,
+      "arabica_bags": 44125,
+      "total_bags": 172079,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 7750
+          "bags": 3750
         },
         {
           "grade": "Drugar",
@@ -4600,15 +4600,15 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 106214
+          "bags": 640
         },
         {
           "grade": "Screen 15",
-          "bags": 42752
+          "bags": 320
         },
         {
           "grade": "Screen 14",
-          "bags": 213758
+          "bags": 1600
         },
         {
           "grade": "Screen 18",
@@ -4624,11 +4624,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 27190
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 828176
+          "bags": 3198
         },
         {
           "grade": "Wugar",
@@ -4636,11 +4636,11 @@
         },
         {
           "grade": "Kiboko",
-          "bags": 13500
+          "bags": 3500
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9500
+          "bags": 9000
         },
         {
           "grade": "Mt Elgon",
@@ -4650,7 +4650,7 @@
       "by_destination": [
         {
           "country": "Korea",
-          "bags": 950
+          "bags": 630
         }
       ],
       "parser_version": "v1_recent",
@@ -4659,9 +4659,9 @@
     },
     {
       "month": "2023-06",
-      "robusta_bags": 1522813,
-      "arabica_bags": 588157,
-      "total_bags": 2110970,
+      "robusta_bags": 133883,
+      "arabica_bags": 22326,
+      "total_bags": 156209,
       "value_usd": null,
       "by_grade": [
         {
@@ -4670,7 +4670,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 8250
+          "bags": 4250
         },
         {
           "grade": "Drugar",
@@ -4678,19 +4678,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 352423
+          "bags": 2040
         },
         {
           "grade": "Screen 18",
-          "bags": 106879
+          "bags": 800
         },
         {
           "grade": "Screen 15",
-          "bags": 371405
+          "bags": 2780
         },
         {
           "grade": "Screen 14",
-          "bags": 22712
+          "bags": 170
         },
         {
           "grade": "Screen 17",
@@ -4702,15 +4702,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 28615
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 511805
+          "bags": 1920
         },
         {
           "grade": "Mt Elgon",
-          "bags": 567720
+          "bags": 1889
         },
         {
           "grade": "Wugar",
@@ -4724,19 +4724,19 @@
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-07/June%20%202023_0.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-07/June%20%202023.pdf",
       "parse_warnings": []
     },
     {
       "month": "2023-07",
-      "robusta_bags": 2394149,
-      "arabica_bags": 1859285,
-      "total_bags": 4253434,
+      "robusta_bags": 227812,
+      "arabica_bags": 17576,
+      "total_bags": 245388,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 8000
+          "bags": 4000
         },
         {
           "grade": "Drugar",
@@ -4744,15 +4744,15 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 188415
+          "bags": 1070
         },
         {
           "grade": "Washed Robusta",
-          "bags": 409406
+          "bags": 2280
         },
         {
           "grade": "Screen 15",
-          "bags": 44088
+          "bags": 330
         },
         {
           "grade": "Screen 18",
@@ -4764,7 +4764,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1508135
+          "bags": 9096
         },
         {
           "grade": "Screen 12",
@@ -4772,15 +4772,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 26268
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 106270
+          "bags": 321
         },
         {
           "grade": "Wugar",
-          "bags": 1742765
+          "bags": 7005
         },
         {
           "grade": "Kiboko",
@@ -4790,7 +4790,7 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 244110
+          "bags": 226260
         },
         {
           "country": "Sudan",
@@ -4798,11 +4798,11 @@
         },
         {
           "country": "Germany",
-          "bags": 70810
+          "bags": 59419
         },
         {
           "country": "India",
-          "bags": 48485
+          "bags": 44306
         },
         {
           "country": "Morocco",
@@ -4810,19 +4810,19 @@
         },
         {
           "country": "Spain",
-          "bags": 20552
+          "bags": 20219
         },
         {
           "country": "Belgium",
-          "bags": 19455
+          "bags": 17654
         },
         {
           "country": "Usa",
-          "bags": 16248
+          "bags": 2980
         },
         {
           "country": "Netherlands",
-          "bags": 10687
+          "bags": 8564
         },
         {
           "country": "Algeria",
@@ -4830,11 +4830,11 @@
         },
         {
           "country": "China",
-          "bags": 8726
+          "bags": 7766
         },
         {
           "country": "United Arab Emirates",
-          "bags": 8482
+          "bags": 8162
         },
         {
           "country": "Portugal",
@@ -4842,7 +4842,7 @@
         },
         {
           "country": "Japan",
-          "bags": 4942
+          "bags": 4162
         },
         {
           "country": "Switzerland",
@@ -4858,15 +4858,15 @@
         },
         {
           "country": "Russia",
-          "bags": 1885
+          "bags": 1498
         },
         {
           "country": "Kenya",
-          "bags": 1450
+          "bags": 320
         },
         {
           "country": "Egypt",
-          "bags": 1259
+          "bags": 1170
         },
         {
           "country": "Saudi Arabia",
@@ -4882,7 +4882,7 @@
         },
         {
           "country": "South Africa",
-          "bags": 430
+          "bags": 410
         },
         {
           "country": "Korea",
@@ -4895,14 +4895,14 @@
     },
     {
       "month": "2023-08",
-      "robusta_bags": 1063640,
-      "arabica_bags": 1911679,
-      "total_bags": 2975319,
+      "robusta_bags": 291537,
+      "arabica_bags": 27709,
+      "total_bags": 319246,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 8000
+          "bags": 4000
         },
         {
           "grade": "Drugar",
@@ -4910,11 +4910,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 279533
+          "bags": 1640
         },
         {
           "grade": "Screen 15",
-          "bags": 240002
+          "bags": 1440
         },
         {
           "grade": "Screen 18",
@@ -4934,23 +4934,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 39173
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 214634
+          "bags": 960
         },
         {
           "grade": "Bugisu AA",
-          "bags": 920467
+          "bags": 4027
         },
         {
           "grade": "Bugisu A",
-          "bags": 171213
+          "bags": 821
         },
         {
           "grade": "Wugar",
-          "bags": 799749
+          "bags": 3611
         },
         {
           "grade": "Kiboko",
@@ -4958,7 +4958,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 10000
+          "bags": 9000
         }
       ],
       "by_destination": [
@@ -4973,14 +4973,14 @@
     },
     {
       "month": "2023-09",
-      "robusta_bags": 1897892,
-      "arabica_bags": 1565324,
-      "total_bags": 3463216,
+      "robusta_bags": 168966,
+      "arabica_bags": 18285,
+      "total_bags": 187251,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 7900
+          "bags": 4000
         },
         {
           "grade": "Drugar",
@@ -4988,23 +4988,23 @@
         },
         {
           "grade": "Bugisu A+",
-          "bags": 2023
+          "bags": 2022
         },
         {
           "grade": "Organic Robusta",
-          "bags": 462081
+          "bags": 2620
         },
         {
           "grade": "Washed Robusta",
-          "bags": 290428
+          "bags": 1684
         },
         {
           "grade": "Screen 18",
-          "bags": 102435
+          "bags": 640
         },
         {
           "grade": "Screen 15",
-          "bags": 849490
+          "bags": 5240
         },
         {
           "grade": "Screen 17",
@@ -5020,23 +5020,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 31975
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 93122
+          "bags": 320
         },
         {
           "grade": "Bugisu AA",
-          "bags": 504471
+          "bags": 2280
         },
         {
           "grade": "Bugisu A",
-          "bags": 131548
+          "bags": 640
         },
         {
           "grade": "Wugar",
-          "bags": 824910
+          "bags": 3773
         },
         {
           "grade": "Kiboko",
@@ -5059,14 +5059,14 @@
     },
     {
       "month": "2023-10",
-      "robusta_bags": 1297633,
-      "arabica_bags": 1060993,
-      "total_bags": 2358626,
+      "robusta_bags": 40252,
+      "arabica_bags": 24435,
+      "total_bags": 64687,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 7650
+          "bags": 3900
         },
         {
           "grade": "Bugisu A+",
@@ -5078,27 +5078,27 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 368775
+          "bags": 2030
         },
         {
           "grade": "Washed Robusta",
-          "bags": 223287
+          "bags": 1340
         },
         {
           "grade": "Screen 18",
-          "bags": 108572
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 312494
+          "bags": 2120
         },
         {
           "grade": "Screen 14",
-          "bags": 170795
+          "bags": 1040
         },
         {
           "grade": "Screen 12",
-          "bags": 52143
+          "bags": 360
         },
         {
           "grade": "Screen 17",
@@ -5106,15 +5106,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 26374
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 84657
+          "bags": 320
         },
         {
           "grade": "Wugar",
-          "bags": 955563
+          "bags": 3842
         },
         {
           "grade": "Kiboko",
@@ -5122,7 +5122,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 9500
+          "bags": 9000
         }
       ],
       "by_destination": [],
@@ -5132,9 +5132,9 @@
     },
     {
       "month": "2023-11",
-      "robusta_bags": 1466540,
-      "arabica_bags": 1942590,
-      "total_bags": 3409130,
+      "robusta_bags": 109251,
+      "arabica_bags": 27618,
+      "total_bags": 136869,
       "value_usd": null,
       "by_grade": [
         {
@@ -5147,23 +5147,23 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 495831
+          "bags": 2910
         },
         {
           "grade": "Washed Robusta",
-          "bags": 165120
+          "bags": 1007
         },
         {
           "grade": "Screen 18",
-          "bags": 153144
+          "bags": 1080
         },
         {
           "grade": "Screen 15",
-          "bags": 425470
+          "bags": 2930
         },
         {
           "grade": "Screen 14",
-          "bags": 102096
+          "bags": 720
         },
         {
           "grade": "Screen 17",
@@ -5175,15 +5175,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 25474
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 374266
+          "bags": 1604
         },
         {
           "grade": "Wugar",
-          "bags": 1549324
+          "bags": 7014
         },
         {
           "grade": "Kiboko",
@@ -5210,14 +5210,14 @@
     },
     {
       "month": "2023-12",
-      "robusta_bags": 3006551,
-      "arabica_bags": 783767,
-      "total_bags": 3790318,
+      "robusta_bags": 90332,
+      "arabica_bags": 23570,
+      "total_bags": 113902,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 8750
+          "bags": 4050
         },
         {
           "grade": "Drugar",
@@ -5225,23 +5225,23 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 62356
+          "bags": 363
         },
         {
           "grade": "Screen 18",
-          "bags": 55324
+          "bags": 382
         },
         {
           "grade": "Screen 15",
-          "bags": 144572
+          "bags": 908
         },
         {
           "grade": "Screen 14",
-          "bags": 50953
+          "bags": 360
         },
         {
           "grade": "Screen 17",
-          "bags": 1687582
+          "bags": 10392
         },
         {
           "grade": "Screen 12",
@@ -5249,19 +5249,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 32292
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 895244
+          "bags": 3200
         },
         {
           "grade": "Wugar",
-          "bags": 80424
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 682593
+          "bags": 3000
         },
         {
           "grade": "Kiboko",
@@ -5269,7 +5269,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 10500
+          "bags": 10000
         }
       ],
       "by_destination": [
@@ -5279,23 +5279,23 @@
         },
         {
           "country": "Italy",
-          "bags": 158326
+          "bags": 145587
         },
         {
           "country": "India",
-          "bags": 48367
+          "bags": 45847
         },
         {
           "country": "Germany",
-          "bags": 46020
+          "bags": 33063
         },
         {
           "country": "Morocco",
-          "bags": 24544
+          "bags": 23264
         },
         {
           "country": "Spain",
-          "bags": 23904
+          "bags": 22257
         },
         {
           "country": "Sudan",
@@ -5303,11 +5303,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 14752
+          "bags": 5932
         },
         {
           "country": "Netherlands",
-          "bags": 9340
+          "bags": 7660
         },
         {
           "country": "Algeria",
@@ -5315,7 +5315,7 @@
         },
         {
           "country": "United Arab Emirates",
-          "bags": 4190
+          "bags": 3550
         },
         {
           "country": "Switzerland",
@@ -5323,19 +5323,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 3062
+          "bags": 1730
         },
         {
           "country": "Portugal",
-          "bags": 3060
+          "bags": 2740
         },
         {
           "country": "Japan",
-          "bags": 2483
+          "bags": 1293
         },
         {
           "country": "Russia",
-          "bags": 2294
+          "bags": 1974
         },
         {
           "country": "China",
@@ -5343,19 +5343,19 @@
         },
         {
           "country": "Canada",
-          "bags": 985
+          "bags": 345
         },
         {
           "country": "Egypt",
-          "bags": 684
+          "bags": 350
         },
         {
           "country": "Australia",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "Korea",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "Kenya",
@@ -5375,7 +5375,7 @@
         },
         {
           "country": "Saudi Arabia",
-          "bags": 227
+          "bags": 193
         }
       ],
       "parser_version": "v1_recent",
@@ -5384,14 +5384,14 @@
     },
     {
       "month": "2024-01",
-      "robusta_bags": 3225884,
-      "arabica_bags": 1449123,
-      "total_bags": 4675007,
+      "robusta_bags": 113248,
+      "arabica_bags": 26660,
+      "total_bags": 139908,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 9750
+          "bags": 4250
         },
         {
           "grade": "Drugar",
@@ -5399,15 +5399,15 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 309044
+          "bags": 1649
         },
         {
           "grade": "Screen 18",
-          "bags": 50794
+          "bags": 320
         },
         {
           "grade": "Screen 15",
-          "bags": 526501
+          "bags": 3520
         },
         {
           "grade": "Screen 17",
@@ -5415,7 +5415,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 851279
+          "bags": 4661
         },
         {
           "grade": "Screen 12",
@@ -5423,19 +5423,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 33558
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 1351828
+          "bags": 4519
         },
         {
           "grade": "Wugar",
-          "bags": 76191
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1351432
+          "bags": 5840
         },
         {
           "grade": "Kiboko",
@@ -5443,13 +5443,13 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 11000
+          "bags": 10000
         }
       ],
       "by_destination": [
         {
           "country": "Korea",
-          "bags": 986
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
@@ -5458,14 +5458,14 @@
     },
     {
       "month": "2024-02",
-      "robusta_bags": 1477027,
-      "arabica_bags": 1658615,
-      "total_bags": 3135642,
+      "robusta_bags": 100468,
+      "arabica_bags": 28737,
+      "total_bags": 129205,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 10500
+          "bags": 5250
         },
         {
           "grade": "Drugar",
@@ -5473,23 +5473,23 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 892953
+          "bags": 4510
         },
         {
           "grade": "Sustainable",
-          "bags": 60899
+          "bags": 350
         },
         {
           "grade": "Screen 18",
-          "bags": 164980
+          "bags": 970
         },
         {
           "grade": "Screen 15",
-          "bags": 165657
+          "bags": 970
         },
         {
           "grade": "Screen 14",
-          "bags": 56109
+          "bags": 334
         },
         {
           "grade": "Screen 17",
@@ -5501,15 +5501,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 39044
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1004393
+          "bags": 3870
         },
         {
           "grade": "Wugar",
-          "bags": 630722
+          "bags": 2367
         },
         {
           "grade": "Kiboko",
@@ -5517,21 +5517,21 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 12000
+          "bags": 11000
         }
       ],
       "by_destination": [
+        {
+          "country": "India",
+          "bags": 20242023
+        },
         {
           "country": "Brazil",
           "bags": 164
         },
         {
           "country": "Italy",
-          "bags": 164010
-        },
-        {
-          "country": "India",
-          "bags": 48303
+          "bags": 149362
         },
         {
           "country": "Sudan",
@@ -5539,35 +5539,35 @@
         },
         {
           "country": "Germany",
-          "bags": 39445
+          "bags": 34355
         },
         {
           "country": "Morocco",
-          "bags": 16994
+          "bags": 15394
         },
         {
           "country": "Spain",
-          "bags": 16513
+          "bags": 15879
         },
         {
           "country": "Belgium",
-          "bags": 12682
+          "bags": 6602
         },
         {
           "country": "Portugal",
-          "bags": 11502
+          "bags": 8942
         },
         {
           "country": "China",
-          "bags": 9144
+          "bags": 6144
         },
         {
           "country": "Russia",
-          "bags": 6792
+          "bags": 5513
         },
         {
           "country": "Netherlands",
-          "bags": 4710
+          "bags": 3550
         },
         {
           "country": "Japan",
@@ -5583,11 +5583,11 @@
         },
         {
           "country": "Greece",
-          "bags": 1800
+          "bags": 1440
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1642
+          "bags": 1002
         },
         {
           "country": "Kenya",
@@ -5603,7 +5603,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 630
+          "bags": 320
         },
         {
           "country": "Egypt",
@@ -5624,9 +5624,9 @@
     },
     {
       "month": "2024-03",
-      "robusta_bags": 1265442,
-      "arabica_bags": 1656099,
-      "total_bags": 2921541,
+      "robusta_bags": 213123,
+      "arabica_bags": 28919,
+      "total_bags": 242042,
       "value_usd": null,
       "by_grade": [
         {
@@ -5635,7 +5635,7 @@
         },
         {
           "grade": "Sustainable",
-          "bags": 10750
+          "bags": 5100
         },
         {
           "grade": "Drugar",
@@ -5643,7 +5643,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 283084
+          "bags": 1115
         },
         {
           "grade": "Screen 18",
@@ -5659,7 +5659,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 739100
+          "bags": 3600
         },
         {
           "grade": "Screen 12",
@@ -5667,15 +5667,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 30399
+          "bags": 1199
         },
         {
           "grade": "Wugar",
-          "bags": 76191
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 1556408
+          "bags": 6099
         },
         {
           "grade": "FAQ",
@@ -5683,7 +5683,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 12000
+          "bags": 11000
         }
       ],
       "by_destination": [
@@ -5710,9 +5710,9 @@
     },
     {
       "month": "2024-04",
-      "robusta_bags": 2143311,
-      "arabica_bags": 2348463,
-      "total_bags": 4491774,
+      "robusta_bags": 99311,
+      "arabica_bags": 34211,
+      "total_bags": 133522,
       "value_usd": null,
       "by_grade": [
         {
@@ -5721,7 +5721,7 @@
         },
         {
           "grade": "FAQ",
-          "bags": 12250
+          "bags": 5750
         },
         {
           "grade": "Drugar",
@@ -5729,11 +5729,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 98724
+          "bags": 355
         },
         {
           "grade": "Washed Robusta",
-          "bags": 465398
+          "bags": 2150
         },
         {
           "grade": "Screen 18",
@@ -5741,7 +5741,7 @@
         },
         {
           "grade": "Screen 15",
-          "bags": 115006
+          "bags": 640
         },
         {
           "grade": "Screen 17",
@@ -5749,7 +5749,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 205100
+          "bags": 999
         },
         {
           "grade": "Screen 12",
@@ -5757,23 +5757,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 17928
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 1144284
+          "bags": 3597
         },
         {
           "grade": "Mt Elgon",
-          "bags": 570150
+          "bags": 2265
         },
         {
           "grade": "Wugar",
-          "bags": 1752563
+          "bags": 6696
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 13000
+          "bags": 12500
         }
       ],
       "by_destination": [
@@ -5796,14 +5796,14 @@
     },
     {
       "month": "2024-05",
-      "robusta_bags": 2753814,
-      "arabica_bags": 388102,
-      "total_bags": 3141916,
+      "robusta_bags": 331094,
+      "arabica_bags": 43943,
+      "total_bags": 375037,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 14500
+          "bags": 7200
         },
         {
           "grade": "Drugar",
@@ -5811,11 +5811,11 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 519457
+          "bags": 1630
         },
         {
           "grade": "Screen 15",
-          "bags": 83344
+          "bags": 320
         },
         {
           "grade": "Screen 18",
@@ -5827,7 +5827,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1772190
+          "bags": 6435
         },
         {
           "grade": "Screen 12",
@@ -5835,7 +5835,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 49613
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -5843,7 +5843,7 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 344632
+          "bags": 973
         },
         {
           "grade": "Wugar",
@@ -5851,11 +5851,11 @@
         },
         {
           "grade": "Kiboko",
-          "bags": 7400
+          "bags": 7000
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 15000
+          "bags": 14500
         }
       ],
       "by_destination": [
@@ -5869,19 +5869,19 @@
         },
         {
           "country": "Italy",
-          "bags": 291779
+          "bags": 261921
         },
         {
           "country": "Germany",
-          "bags": 78436
+          "bags": 65966
         },
         {
           "country": "Spain",
-          "bags": 51805
+          "bags": 46671
         },
         {
           "country": "India",
-          "bags": 47122
+          "bags": 40818
         },
         {
           "country": "Sudan",
@@ -5889,15 +5889,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 25872
+          "bags": 13535
         },
         {
           "country": "China",
-          "bags": 22597
+          "bags": 20377
         },
         {
           "country": "Algeria",
-          "bags": 22428
+          "bags": 22095
         },
         {
           "country": "Morocco",
@@ -5905,11 +5905,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 14905
+          "bags": 10080
         },
         {
           "country": "Russia",
-          "bags": 11392
+          "bags": 8107
         },
         {
           "country": "Turkey",
@@ -5917,7 +5917,7 @@
         },
         {
           "country": "Japan",
-          "bags": 3894
+          "bags": 560
         },
         {
           "country": "Saudi Arabia",
@@ -5933,11 +5933,11 @@
         },
         {
           "country": "France",
-          "bags": 2854
+          "bags": 2520
         },
         {
           "country": "Portugal",
-          "bags": 2616
+          "bags": 1336
         },
         {
           "country": "Switzerland",
@@ -5945,7 +5945,7 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 1946
+          "bags": 1280
         },
         {
           "country": "Tunisia",
@@ -5953,7 +5953,7 @@
         },
         {
           "country": "Australia",
-          "bags": 1312
+          "bags": 320
         },
         {
           "country": "Tanzania",
@@ -5982,14 +5982,14 @@
     },
     {
       "month": "2024-06",
-      "robusta_bags": 3858527,
-      "arabica_bags": 436843,
-      "total_bags": 4295370,
+      "robusta_bags": 600534,
+      "arabica_bags": 44608,
+      "total_bags": 645142,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 13500
+          "bags": 6250
         },
         {
           "grade": "Arabica Parchment",
@@ -6001,11 +6001,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 122848
+          "bags": 350
         },
         {
           "grade": "Washed Robusta",
-          "bags": 518217
+          "bags": 1600
         },
         {
           "grade": "Screen 18",
@@ -6021,7 +6021,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1586296
+          "bags": 5760
         },
         {
           "grade": "Screen 12",
@@ -6029,15 +6029,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 54191
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 979520
+          "bags": 1920
         },
         {
           "grade": "Mt Elgon",
-          "bags": 393075
+          "bags": 840
         },
         {
           "grade": "Wugar",
@@ -6045,17 +6045,17 @@
         },
         {
           "grade": "Kiboko",
-          "bags": 6500
+          "bags": 6000
         }
       ],
       "by_destination": [
         {
           "country": "Brazil",
-          "bags": 14000
+          "bags": 13500
         },
         {
           "country": "United States",
-          "bags": 14500
+          "bags": 13750
         },
         {
           "country": "China",
@@ -6063,11 +6063,11 @@
         },
         {
           "country": "Italy",
-          "bags": 311259
+          "bags": 284495
         },
         {
           "country": "Germany",
-          "bags": 74427
+          "bags": 57860
         },
         {
           "country": "Sudan",
@@ -6075,31 +6075,31 @@
         },
         {
           "country": "Algeria",
-          "bags": 49902
+          "bags": 49236
         },
         {
           "country": "Spain",
-          "bags": 41009
+          "bags": 35731
         },
         {
           "country": "India",
-          "bags": 31332
+          "bags": 26685
         },
         {
           "country": "Morocco",
-          "bags": 23693
+          "bags": 23027
         },
         {
           "country": "Belgium",
-          "bags": 18693
+          "bags": 12184
         },
         {
           "country": "Netherlands",
-          "bags": 16062
+          "bags": 15942
         },
         {
           "country": "Russia",
-          "bags": 10228
+          "bags": 9254
         },
         {
           "country": "Egypt",
@@ -6107,27 +6107,27 @@
         },
         {
           "country": "Portugal",
-          "bags": 6897
+          "bags": 6564
         },
         {
           "country": "Greece",
-          "bags": 5781
+          "bags": 4778
         },
         {
           "country": "Japan",
-          "bags": 5464
+          "bags": 3394
         },
         {
           "country": "Turkey",
-          "bags": 5106
+          "bags": 4772
         },
         {
           "country": "Korea",
-          "bags": 2960
+          "bags": 2320
         },
         {
           "country": "South Africa",
-          "bags": 2945
+          "bags": 1985
         },
         {
           "country": "France",
@@ -6135,23 +6135,23 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 2590
+          "bags": 990
         },
         {
           "country": "Tunisia",
-          "bags": 2310
+          "bags": 1308
         },
         {
           "country": "Saudi Arabia",
-          "bags": 2240
+          "bags": 640
         },
         {
           "country": "Switzerland",
-          "bags": 2024
+          "bags": 1384
         },
         {
           "country": "Australia",
-          "bags": 1626
+          "bags": 1306
         },
         {
           "country": "Canada",
@@ -6172,14 +6172,14 @@
     },
     {
       "month": "2024-07",
-      "robusta_bags": 2125944,
-      "arabica_bags": 1531767,
-      "total_bags": 3657711,
+      "robusta_bags": 315165,
+      "arabica_bags": 30802,
+      "total_bags": 345967,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 12000
+          "bags": 5900
         },
         {
           "grade": "Drugar",
@@ -6187,19 +6187,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 513114
+          "bags": 1930
         },
         {
           "grade": "Organic Robusta",
-          "bags": 943987
+          "bags": 3443
         },
         {
           "grade": "Screen 15",
-          "bags": 250968
+          "bags": 980
         },
         {
           "grade": "Screen 14",
-          "bags": 71958
+          "bags": 320
         },
         {
           "grade": "Screen 18",
@@ -6215,23 +6215,23 @@
         },
         {
           "grade": "BHP",
-          "bags": 26824
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 91549
+          "bags": 249
         },
         {
           "grade": "Wugar",
-          "bags": 1414718
+          "bags": 5303
         },
         {
           "grade": "Kiboko",
-          "bags": 11500
+          "bags": 5800
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 12750
+          "bags": 12500
         }
       ],
       "by_destination": [
@@ -6246,14 +6246,14 @@
     },
     {
       "month": "2024-08",
-      "robusta_bags": 2031423,
-      "arabica_bags": 391765,
-      "total_bags": 2423188,
+      "robusta_bags": 865535,
+      "arabica_bags": 29127,
+      "total_bags": 894662,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 10250
+          "bags": 5250
         },
         {
           "grade": "Arabica Parchment",
@@ -6269,11 +6269,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 382751
+          "bags": 1349
         },
         {
           "grade": "Washed Robusta",
-          "bags": 742937
+          "bags": 3040
         },
         {
           "grade": "Screen 18",
@@ -6293,7 +6293,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 40788
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -6301,7 +6301,7 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 363490
+          "bags": 852
         },
         {
           "grade": "Kiboko",
@@ -6331,31 +6331,31 @@
         },
         {
           "country": "Belgium",
-          "bags": 41529
+          "bags": 36429
         },
         {
           "country": "Morocco",
-          "bags": 37546
+          "bags": 37196
         },
         {
           "country": "India",
-          "bags": 30295
+          "bags": 29710
         },
         {
           "country": "Spain",
-          "bags": 27413
+          "bags": 26453
         },
         {
           "country": "China",
-          "bags": 21474
+          "bags": 17508
         },
         {
           "country": "Netherlands",
-          "bags": 19841
+          "bags": 18885
         },
         {
           "country": "Russia",
-          "bags": 16052
+          "bags": 13398
         },
         {
           "country": "Switzerland",
@@ -6363,7 +6363,7 @@
         },
         {
           "country": "Greece",
-          "bags": 11403
+          "bags": 9253
         },
         {
           "country": "Egypt",
@@ -6371,7 +6371,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 9495
+          "bags": 6869
         },
         {
           "country": "France",
@@ -6379,11 +6379,11 @@
         },
         {
           "country": "Japan",
-          "bags": 5270
+          "bags": 3670
         },
         {
           "country": "Turkey",
-          "bags": 5238
+          "bags": 4888
         },
         {
           "country": "Tunisia",
@@ -6391,19 +6391,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 4497
+          "bags": 2880
         },
         {
           "country": "South Africa",
-          "bags": 3655
+          "bags": 1580
         },
         {
           "country": "Australia",
-          "bags": 3030
+          "bags": 2686
         },
         {
           "country": "Korea",
-          "bags": 2612
+          "bags": 320
         },
         {
           "country": "Mexico",
@@ -6419,7 +6419,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 520
+          "bags": 100
         },
         {
           "country": "Saudi Arabia",
@@ -6432,9 +6432,9 @@
     },
     {
       "month": "2024-09",
-      "robusta_bags": 1964669,
-      "arabica_bags": 468824,
-      "total_bags": 2433493,
+      "robusta_bags": 738444,
+      "arabica_bags": 32905,
+      "total_bags": 771349,
       "value_usd": null,
       "by_grade": [
         {
@@ -6451,7 +6451,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 570214
+          "bags": 2390
         },
         {
           "grade": "Screen 18",
@@ -6467,7 +6467,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 372235
+          "bags": 1630
         },
         {
           "grade": "Screen 12",
@@ -6475,15 +6475,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 43465
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 246180
+          "bags": 650
         },
         {
           "grade": "Mt Elgon",
-          "bags": 432434
+          "bags": 765
         },
         {
           "grade": "Wugar",
@@ -6491,7 +6491,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 14500
+          "bags": 10250
         }
       ],
       "by_destination": [
@@ -6509,19 +6509,19 @@
         },
         {
           "country": "Germany",
-          "bags": 85721
+          "bags": 77648
         },
         {
           "country": "Algeria",
-          "bags": 46028
+          "bags": 45695
         },
         {
           "country": "India",
-          "bags": 38401
+          "bags": 38111
         },
         {
           "country": "Spain",
-          "bags": 34721
+          "bags": 31957
         },
         {
           "country": "Morocco",
@@ -6529,23 +6529,23 @@
         },
         {
           "country": "Belgium",
-          "bags": 31694
+          "bags": 28081
         },
         {
           "country": "Russia",
-          "bags": 26593
+          "bags": 24619
         },
         {
           "country": "Netherlands",
-          "bags": 20444
+          "bags": 17934
         },
         {
           "country": "China",
-          "bags": 14864
+          "bags": 11033
         },
         {
           "country": "Portugal",
-          "bags": 10199
+          "bags": 8534
         },
         {
           "country": "Turkey",
@@ -6553,7 +6553,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 7014
+          "bags": 5734
         },
         {
           "country": "Greece",
@@ -6565,19 +6565,19 @@
         },
         {
           "country": "Australia",
-          "bags": 4292
+          "bags": 3972
         },
         {
           "country": "Japan",
-          "bags": 3657
+          "bags": 2450
         },
         {
           "country": "South Africa",
-          "bags": 2510
+          "bags": 1280
         },
         {
           "country": "Canada",
-          "bags": 1370
+          "bags": 1050
         },
         {
           "country": "Korea",
@@ -6602,14 +6602,14 @@
     },
     {
       "month": "2024-10",
-      "robusta_bags": 3815138,
-      "arabica_bags": 1962607,
-      "total_bags": 5777745,
+      "robusta_bags": 51204,
+      "arabica_bags": 18940,
+      "total_bags": 70144,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 12500
+          "bags": 6500
         },
         {
           "grade": "Drugar",
@@ -6617,27 +6617,27 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 579143
+          "bags": 1736
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1695459
+          "bags": 5488
         },
         {
           "grade": "Screen 18",
-          "bags": 239049
+          "bags": 720
         },
         {
           "grade": "Screen 15",
-          "bags": 434844
+          "bags": 1740
         },
         {
           "grade": "Screen 14",
-          "bags": 302341
+          "bags": 1040
         },
         {
           "grade": "Screen 12",
-          "bags": 478098
+          "bags": 1440
         },
         {
           "grade": "Screen 17",
@@ -6645,15 +6645,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 42363
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 93122
+          "bags": 320
         },
         {
           "grade": "Wugar",
-          "bags": 1856985
+          "bags": 6120
         },
         {
           "grade": "Kiboko",
@@ -6672,9 +6672,9 @@
     },
     {
       "month": "2024-11",
-      "robusta_bags": 2395809,
-      "arabica_bags": 312912,
-      "total_bags": 2708721,
+      "robusta_bags": 527033,
+      "arabica_bags": 33180,
+      "total_bags": 560213,
       "value_usd": null,
       "by_grade": [
         {
@@ -6691,7 +6691,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1365652
+          "bags": 4661
         },
         {
           "grade": "Screen 18",
@@ -6715,19 +6715,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 56535
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453389
+          "bags": 940
         },
         {
           "grade": "Wugar",
-          "bags": 174168
+          "bags": 360
         },
         {
           "grade": "Mt Elgon",
-          "bags": 106244
+          "bags": 320
         },
         {
           "grade": "Arabica Parchment",
@@ -6745,19 +6745,19 @@
         },
         {
           "country": "Germany",
-          "bags": 73187
+          "bags": 70460
         },
         {
           "country": "Algeria",
-          "bags": 51337
+          "bags": 51004
         },
         {
           "country": "India",
-          "bags": 45418
+          "bags": 42198
         },
         {
           "country": "Switzerland",
-          "bags": 33642
+          "bags": 31718
         },
         {
           "country": "Sudan",
@@ -6769,43 +6769,43 @@
         },
         {
           "country": "Spain",
-          "bags": 23901
+          "bags": 21605
         },
         {
           "country": "Belgium",
-          "bags": 19494
+          "bags": 15076
         },
         {
           "country": "Netherlands",
-          "bags": 17809
+          "bags": 15289
         },
         {
           "country": "Russia",
-          "bags": 16649
+          "bags": 15615
         },
         {
           "country": "Portugal",
-          "bags": 12601
+          "bags": 9950
         },
         {
           "country": "China",
-          "bags": 10391
+          "bags": 9407
         },
         {
           "country": "Greece",
-          "bags": 7813
+          "bags": 7479
         },
         {
           "country": "Turkey",
-          "bags": 4761
+          "bags": 3254
         },
         {
           "country": "Australia",
-          "bags": 3654
+          "bags": 3164
         },
         {
           "country": "United Kingdom",
-          "bags": 3631
+          "bags": 3214
         },
         {
           "country": "Tunisia",
@@ -6817,15 +6817,15 @@
         },
         {
           "country": "South Africa",
-          "bags": 1959
+          "bags": 1319
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1914
+          "bags": 1274
         },
         {
           "country": "Kenya",
-          "bags": 1693
+          "bags": 333
         },
         {
           "country": "Canada",
@@ -6837,7 +6837,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 640
+          "bags": 607
         }
       ],
       "parser_version": "v1_recent",
@@ -6846,9 +6846,9 @@
     },
     {
       "month": "2024-12",
-      "robusta_bags": 2394809,
-      "arabica_bags": 140768,
-      "total_bags": 2535577,
+      "robusta_bags": 526033,
+      "arabica_bags": 34844,
+      "total_bags": 560877,
       "value_usd": null,
       "by_grade": [
         {
@@ -6869,7 +6869,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1365652
+          "bags": 4661
         },
         {
           "grade": "Screen 18",
@@ -6893,15 +6893,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 56535
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453389
+          "bags": 940
         },
         {
           "grade": "Mt Elgon",
-          "bags": 106244
+          "bags": 320
         },
         {
           "grade": "Arabica Parchment",
@@ -6915,27 +6915,27 @@
         },
         {
           "country": "Germany",
-          "bags": 89720
+          "bags": 74215
         },
         {
           "country": "India",
-          "bags": 45685
+          "bags": 40415
         },
         {
           "country": "Belgium",
-          "bags": 33963
+          "bags": 20066
         },
         {
           "country": "Spain",
-          "bags": 25802
+          "bags": 21268
         },
         {
           "country": "Russia",
-          "bags": 23325
+          "bags": 21172
         },
         {
           "country": "Netherlands",
-          "bags": 18801
+          "bags": 16008
         },
         {
           "country": "Morocco",
@@ -6943,7 +6943,7 @@
         },
         {
           "country": "Algeria",
-          "bags": 14714
+          "bags": 13421
         },
         {
           "country": "Sudan",
@@ -6951,23 +6951,23 @@
         },
         {
           "country": "Greece",
-          "bags": 11780
+          "bags": 10762
         },
         {
           "country": "Switzerland",
-          "bags": 10474
+          "bags": 9154
         },
         {
           "country": "China",
-          "bags": 9088
+          "bags": 3910
         },
         {
           "country": "Portugal",
-          "bags": 8710
+          "bags": 7378
         },
         {
           "country": "United Kingdom",
-          "bags": 7000
+          "bags": 6040
         },
         {
           "country": "Tunisia",
@@ -6975,15 +6975,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 4512
+          "bags": 2804
         },
         {
           "country": "Canada",
-          "bags": 4328
+          "bags": 2356
         },
         {
           "country": "Australia",
-          "bags": 3611
+          "bags": 3291
         },
         {
           "country": "Mexico",
@@ -6995,11 +6995,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 2599
+          "bags": 999
         },
         {
           "country": "Korea",
-          "bags": 1280
+          "bags": 320
         },
         {
           "country": "Saudi Arabia",
@@ -7011,7 +7011,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 350
+          "bags": 316
         },
         {
           "country": "Japan",
@@ -7024,14 +7024,14 @@
     },
     {
       "month": "2025-01",
-      "robusta_bags": 2227153,
-      "arabica_bags": 504110,
-      "total_bags": 2731263,
+      "robusta_bags": 58194,
+      "arabica_bags": 14530,
+      "total_bags": 72724,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 13000
+          "bags": 7000
         },
         {
           "grade": "Drugar",
@@ -7039,19 +7039,19 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 522832
+          "bags": 1594
         },
         {
           "grade": "Screen 18",
-          "bags": 93763
+          "bags": 360
         },
         {
           "grade": "Screen 15",
-          "bags": 187525
+          "bags": 720
         },
         {
           "grade": "Screen 12",
-          "bags": 93763
+          "bags": 360
         },
         {
           "grade": "Screen 17",
@@ -7059,23 +7059,23 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1118865
+          "bags": 3600
         },
         {
           "grade": "BHP",
-          "bags": 42491
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 111886
+          "bags": 333
         },
         {
           "grade": "Wugar",
-          "bags": 131493
+          "bags": 320
         },
         {
           "grade": "Mt Elgon",
-          "bags": 359367
+          "bags": 960
         },
         {
           "grade": "Kiboko",
@@ -7085,15 +7085,15 @@
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 203278
+          "bags": 188459
         },
         {
           "country": "Belgium",
-          "bags": 65507
+          "bags": 48657
         },
         {
           "country": "India",
-          "bags": 53699
+          "bags": 50709
         },
         {
           "country": "Sudan",
@@ -7101,19 +7101,19 @@
         },
         {
           "country": "Germany",
-          "bags": 45666
+          "bags": 44946
         },
         {
           "country": "Spain",
-          "bags": 25209
+          "bags": 22572
         },
         {
           "country": "China",
-          "bags": 13777
+          "bags": 12837
         },
         {
           "country": "Netherlands",
-          "bags": 13684
+          "bags": 7118
         },
         {
           "country": "Morocco",
@@ -7121,27 +7121,27 @@
         },
         {
           "country": "Egypt",
-          "bags": 5820
+          "bags": 5465
         },
         {
           "country": "Russia",
-          "bags": 5590
+          "bags": 2306
         },
         {
           "country": "Portugal",
-          "bags": 5080
+          "bags": 4440
         },
         {
           "country": "France",
-          "bags": 3240
+          "bags": 2520
         },
         {
           "country": "Turkey",
-          "bags": 2985
+          "bags": 2656
         },
         {
           "country": "Japan",
-          "bags": 2938
+          "bags": 2618
         },
         {
           "country": "Canada",
@@ -7170,9 +7170,9 @@
     },
     {
       "month": "2025-02",
-      "robusta_bags": 3596654,
-      "arabica_bags": 318751,
-      "total_bags": 3915405,
+      "robusta_bags": 407228,
+      "arabica_bags": 61516,
+      "total_bags": 468744,
       "value_usd": null,
       "by_grade": [
         {
@@ -7193,7 +7193,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 949715
+          "bags": 3140
         },
         {
           "grade": "Screen 18",
@@ -7209,7 +7209,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1394150
+          "bags": 5656
         },
         {
           "grade": "Screen 12",
@@ -7217,15 +7217,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 26696
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 830845
+          "bags": 1985
         },
         {
           "grade": "Mt Elgon",
-          "bags": 257880
+          "bags": 645
         },
         {
           "grade": "Wugar",
@@ -7247,7 +7247,7 @@
         },
         {
           "country": "Germany",
-          "bags": 59464
+          "bags": 37953
         },
         {
           "country": "Sudan",
@@ -7255,43 +7255,43 @@
         },
         {
           "country": "India",
-          "bags": 37170
+          "bags": 34150
         },
         {
           "country": "Belgium",
-          "bags": 34996
+          "bags": 19470
         },
         {
           "country": "China",
-          "bags": 34862
+          "bags": 20378
         },
         {
           "country": "Spain",
-          "bags": 31103
+          "bags": 29169
         },
         {
           "country": "Morocco",
-          "bags": 17900
+          "bags": 17232
         },
         {
           "country": "Algeria",
-          "bags": 16273
+          "bags": 15953
         },
         {
           "country": "Portugal",
-          "bags": 11150
+          "bags": 7750
         },
         {
           "country": "Russia",
-          "bags": 10729
+          "bags": 8675
         },
         {
           "country": "Turkey",
-          "bags": 7120
+          "bags": 6770
         },
         {
           "country": "United Kingdom",
-          "bags": 6592
+          "bags": 3013
         },
         {
           "country": "Greece",
@@ -7299,11 +7299,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 6146
+          "bags": 3133
         },
         {
           "country": "Switzerland",
-          "bags": 4013
+          "bags": 4008
         },
         {
           "country": "Egypt",
@@ -7311,23 +7311,23 @@
         },
         {
           "country": "France",
-          "bags": 3206
+          "bags": 2856
         },
         {
           "country": "Australia",
-          "bags": 3079
+          "bags": 1776
         },
         {
           "country": "South Africa",
-          "bags": 1750
+          "bags": 790
         },
         {
           "country": "Canada",
-          "bags": 1660
+          "bags": 700
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1280
+          "bags": 960
         },
         {
           "country": "Korea",
@@ -7335,7 +7335,7 @@
         },
         {
           "country": "Japan",
-          "bags": 950
+          "bags": 640
         },
         {
           "country": "Mexico",
@@ -7348,9 +7348,9 @@
     },
     {
       "month": "2025-03",
-      "robusta_bags": 3559443,
-      "arabica_bags": 819306,
-      "total_bags": 4378749,
+      "robusta_bags": 465819,
+      "arabica_bags": 42773,
+      "total_bags": 508592,
       "value_usd": null,
       "by_grade": [
         {
@@ -7383,7 +7383,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1225629
+          "bags": 4974
         },
         {
           "grade": "Screen 12",
@@ -7391,15 +7391,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 38013
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 1840194
+          "bags": 4039
         },
         {
           "grade": "Mt Elgon",
-          "bags": 777831
+          "bags": 1298
         },
         {
           "grade": "Wugar",
@@ -7429,11 +7429,11 @@
         },
         {
           "country": "Germany",
-          "bags": 54831
+          "bags": 36026
         },
         {
           "country": "India",
-          "bags": 51802
+          "bags": 49702
         },
         {
           "country": "Morocco",
@@ -7441,11 +7441,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 29370
+          "bags": 13913
         },
         {
           "country": "China",
-          "bags": 23747
+          "bags": 8900
         },
         {
           "country": "Algeria",
@@ -7453,31 +7453,31 @@
         },
         {
           "country": "Spain",
-          "bags": 12613
+          "bags": 10353
         },
         {
           "country": "Portugal",
-          "bags": 12483
+          "bags": 8963
         },
         {
           "country": "Netherlands",
-          "bags": 10698
+          "bags": 3550
         },
         {
           "country": "Russia",
-          "bags": 9986
+          "bags": 3678
         },
         {
           "country": "United Kingdom",
-          "bags": 7147
+          "bags": 3708
         },
         {
           "country": "Greece",
-          "bags": 6540
+          "bags": 6190
         },
         {
           "country": "Turkey",
-          "bags": 6214
+          "bags": 5514
         },
         {
           "country": "Switzerland",
@@ -7489,31 +7489,31 @@
         },
         {
           "country": "South Africa",
-          "bags": 3899
+          "bags": 2559
         },
         {
           "country": "Saudi Arabia",
-          "bags": 3648
+          "bags": 768
         },
         {
           "country": "Canada",
-          "bags": 2962
+          "bags": 1630
         },
         {
           "country": "Australia",
-          "bags": 2069
+          "bags": 973
         },
         {
           "country": "Tanzania",
-          "bags": 1886
+          "bags": 1218
         },
         {
           "country": "Japan",
-          "bags": 1406
+          "bags": 206
         },
         {
           "country": "Kenya",
-          "bags": 737
+          "bags": 720
         },
         {
           "country": "Mexico",
@@ -7521,7 +7521,7 @@
         },
         {
           "country": "Korea",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "France",
@@ -7534,9 +7534,9 @@
     },
     {
       "month": "2025-04",
-      "robusta_bags": 2470508,
-      "arabica_bags": 851981,
-      "total_bags": 3322489,
+      "robusta_bags": 516535,
+      "arabica_bags": 39862,
+      "total_bags": 556397,
       "value_usd": null,
       "by_grade": [
         {
@@ -7553,11 +7553,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 700155
+          "bags": 2280
         },
         {
           "grade": "Washed Robusta",
-          "bags": 770091
+          "bags": 3110
         },
         {
           "grade": "Screen 18",
@@ -7581,15 +7581,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 38206
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453038
+          "bags": 928
         },
         {
           "grade": "Mt Elgon",
-          "bags": 813497
+          "bags": 1378
         },
         {
           "grade": "Wugar",
@@ -7611,11 +7611,11 @@
         },
         {
           "country": "Germany",
-          "bags": 53395
+          "bags": 49323
         },
         {
           "country": "India",
-          "bags": 44038
+          "bags": 41902
         },
         {
           "country": "Morocco",
@@ -7623,19 +7623,19 @@
         },
         {
           "country": "China",
-          "bags": 28172
+          "bags": 17507
         },
         {
           "country": "Spain",
-          "bags": 22573
+          "bags": 19986
         },
         {
           "country": "Belgium",
-          "bags": 20600
+          "bags": 16280
         },
         {
           "country": "Portugal",
-          "bags": 18632
+          "bags": 15324
         },
         {
           "country": "Algeria",
@@ -7643,15 +7643,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 16208
+          "bags": 15568
         },
         {
           "country": "Netherlands",
-          "bags": 14012
+          "bags": 8428
         },
         {
           "country": "Russia",
-          "bags": 10517
+          "bags": 8457
         },
         {
           "country": "Egypt",
@@ -7659,23 +7659,23 @@
         },
         {
           "country": "South Africa",
-          "bags": 4445
+          "bags": 2295
         },
         {
           "country": "Australia",
-          "bags": 2953
+          "bags": 2313
         },
         {
           "country": "Switzerland",
-          "bags": 2893
+          "bags": 2573
         },
         {
           "country": "Greece",
-          "bags": 2259
+          "bags": 1925
         },
         {
           "country": "United Kingdom",
-          "bags": 2224
+          "bags": 1924
         },
         {
           "country": "Kenya",
@@ -7687,11 +7687,11 @@
         },
         {
           "country": "France",
-          "bags": 1564
+          "bags": 1080
         },
         {
           "country": "Korea",
-          "bags": 1290
+          "bags": 650
         },
         {
           "country": "Tanzania",
@@ -7699,7 +7699,7 @@
         },
         {
           "country": "Japan",
-          "bags": 390
+          "bags": 100
         },
         {
           "country": "Saudi Arabia",
@@ -7712,9 +7712,9 @@
     },
     {
       "month": "2025-05",
-      "robusta_bags": 4970820,
-      "arabica_bags": 553913,
-      "total_bags": 5524733,
+      "robusta_bags": 424603,
+      "arabica_bags": 41509,
+      "total_bags": 466112,
       "value_usd": null,
       "by_grade": [
         {
@@ -7731,11 +7731,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 1956567
+          "bags": 7172
         },
         {
           "grade": "Washed Robusta",
-          "bags": 634777
+          "bags": 2700
         },
         {
           "grade": "Screen 18",
@@ -7751,7 +7751,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1948690
+          "bags": 8616
         },
         {
           "grade": "Screen 12",
@@ -7759,7 +7759,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 25870
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -7767,7 +7767,7 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 513624
+          "bags": 1220
         },
         {
           "grade": "Wugar",
@@ -7793,11 +7793,11 @@
         },
         {
           "country": "Germany",
-          "bags": 63613
+          "bags": 56090
         },
         {
           "country": "India",
-          "bags": 48045
+          "bags": 46245
         },
         {
           "country": "Morocco",
@@ -7809,27 +7809,27 @@
         },
         {
           "country": "China",
-          "bags": 22395
+          "bags": 14800
         },
         {
           "country": "Spain",
-          "bags": 21544
+          "bags": 19549
         },
         {
           "country": "Belgium",
-          "bags": 15986
+          "bags": 9433
         },
         {
           "country": "Netherlands",
-          "bags": 15366
+          "bags": 8595
         },
         {
           "country": "Portugal",
-          "bags": 15107
+          "bags": 14134
         },
         {
           "country": "Russia",
-          "bags": 13768
+          "bags": 6934
         },
         {
           "country": "Egypt",
@@ -7837,31 +7837,31 @@
         },
         {
           "country": "Korea",
-          "bags": 7958
+          "bags": 320
         },
         {
           "country": "Australia",
-          "bags": 7032
+          "bags": 1653
         },
         {
           "country": "Greece",
-          "bags": 6954
+          "bags": 6270
         },
         {
           "country": "United Kingdom",
-          "bags": 5658
+          "bags": 2660
         },
         {
           "country": "South Africa",
-          "bags": 4599
+          "bags": 1469
         },
         {
           "country": "Turkey",
-          "bags": 4250
+          "bags": 4146
         },
         {
           "country": "Saudi Arabia",
-          "bags": 3959
+          "bags": 640
         },
         {
           "country": "Mexico",
@@ -7869,19 +7869,19 @@
         },
         {
           "country": "Canada",
-          "bags": 3252
+          "bags": 986
         },
         {
           "country": "Switzerland",
-          "bags": 2307
+          "bags": 988
         },
         {
           "country": "Uae",
-          "bags": 1720
+          "bags": 1400
         },
         {
           "country": "Japan",
-          "bags": 1466
+          "bags": 306
         },
         {
           "country": "Tanzania",
@@ -7897,7 +7897,7 @@
         },
         {
           "country": "France",
-          "bags": 680
+          "bags": 360
         }
       ],
       "parser_version": "v1_recent",
@@ -7906,14 +7906,14 @@
     },
     {
       "month": "2025-06",
-      "robusta_bags": 2701377,
-      "arabica_bags": 193930,
-      "total_bags": 2895307,
+      "robusta_bags": 811360,
+      "arabica_bags": 38379,
+      "total_bags": 849739,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 11500
+          "bags": 5750
         },
         {
           "grade": "Arabica Parchment",
@@ -7925,7 +7925,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 633479
+          "bags": 1960
         },
         {
           "grade": "Screen 18",
@@ -7941,7 +7941,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1060578
+          "bags": 3600
         },
         {
           "grade": "Screen 12",
@@ -7949,15 +7949,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 41701
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 155068
+          "bags": 300
         },
         {
           "grade": "Mt Elgon",
-          "bags": 155986
+          "bags": 435
         },
         {
           "grade": "Wugar",
@@ -7965,7 +7965,7 @@
         },
         {
           "grade": "Kiboko",
-          "bags": 6000
+          "bags": 5500
         }
       ],
       "by_destination": [
@@ -7975,15 +7975,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 23689
+          "bags": 13737
         },
         {
           "country": "Switzerland",
-          "bags": 16929
+          "bags": 15459
         },
         {
           "country": "Netherlands",
-          "bags": 16573
+          "bags": 15040
         },
         {
           "country": "Greece",
@@ -7991,11 +7991,11 @@
         },
         {
           "country": "France",
-          "bags": 10072
+          "bags": 9000
         },
         {
           "country": "Portugal",
-          "bags": 9669
+          "bags": 9016
         },
         {
           "country": "Mexico",
@@ -8003,11 +8003,11 @@
         },
         {
           "country": "Turkey",
-          "bags": 8942
+          "bags": 8302
         },
         {
           "country": "United Kingdom",
-          "bags": 8243
+          "bags": 7241
         },
         {
           "country": "Egypt",
@@ -8015,15 +8015,15 @@
         },
         {
           "country": "Tunisia",
-          "bags": 4062
+          "bags": 3422
         },
         {
           "country": "Japan",
-          "bags": 1960
+          "bags": 655
         },
         {
           "country": "Australia",
-          "bags": 1600
+          "bags": 960
         },
         {
           "country": "Canada",
@@ -8035,7 +8035,7 @@
         },
         {
           "country": "Korea",
-          "bags": 960
+          "bags": 640
         },
         {
           "country": "Kenya",
@@ -8052,14 +8052,14 @@
     },
     {
       "month": "2025-07",
-      "robusta_bags": 2031423,
-      "arabica_bags": 391765,
-      "total_bags": 2423188,
+      "robusta_bags": 865535,
+      "arabica_bags": 29127,
+      "total_bags": 894662,
       "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
-          "bags": 10250
+          "bags": 5250
         },
         {
           "grade": "Arabica Parchment",
@@ -8075,11 +8075,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 382751
+          "bags": 1349
         },
         {
           "grade": "Washed Robusta",
-          "bags": 742937
+          "bags": 3040
         },
         {
           "grade": "Screen 18",
@@ -8099,7 +8099,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 40788
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -8107,7 +8107,7 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 363490
+          "bags": 852
         },
         {
           "grade": "Kiboko",
@@ -8137,31 +8137,31 @@
         },
         {
           "country": "Belgium",
-          "bags": 41529
+          "bags": 36429
         },
         {
           "country": "Morocco",
-          "bags": 37546
+          "bags": 37196
         },
         {
           "country": "India",
-          "bags": 30295
+          "bags": 29710
         },
         {
           "country": "Spain",
-          "bags": 27413
+          "bags": 26453
         },
         {
           "country": "China",
-          "bags": 21474
+          "bags": 17508
         },
         {
           "country": "Netherlands",
-          "bags": 19841
+          "bags": 18885
         },
         {
           "country": "Russia",
-          "bags": 16052
+          "bags": 13398
         },
         {
           "country": "Switzerland",
@@ -8169,7 +8169,7 @@
         },
         {
           "country": "Greece",
-          "bags": 11403
+          "bags": 9253
         },
         {
           "country": "Egypt",
@@ -8177,7 +8177,7 @@
         },
         {
           "country": "Portugal",
-          "bags": 9495
+          "bags": 6869
         },
         {
           "country": "France",
@@ -8185,11 +8185,11 @@
         },
         {
           "country": "Japan",
-          "bags": 5270
+          "bags": 3670
         },
         {
           "country": "Turkey",
-          "bags": 5238
+          "bags": 4888
         },
         {
           "country": "Tunisia",
@@ -8197,19 +8197,19 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 4497
+          "bags": 2880
         },
         {
           "country": "South Africa",
-          "bags": 3655
+          "bags": 1580
         },
         {
           "country": "Australia",
-          "bags": 3030
+          "bags": 2686
         },
         {
           "country": "Korea",
-          "bags": 2612
+          "bags": 320
         },
         {
           "country": "Mexico",
@@ -8225,7 +8225,7 @@
         },
         {
           "country": "Kenya",
-          "bags": 520
+          "bags": 100
         },
         {
           "country": "Saudi Arabia",
@@ -8238,9 +8238,9 @@
     },
     {
       "month": "2025-08",
-      "robusta_bags": 1964669,
-      "arabica_bags": 468824,
-      "total_bags": 2433493,
+      "robusta_bags": 738444,
+      "arabica_bags": 32905,
+      "total_bags": 771349,
       "value_usd": null,
       "by_grade": [
         {
@@ -8257,7 +8257,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 570214
+          "bags": 2390
         },
         {
           "grade": "Screen 18",
@@ -8273,7 +8273,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 372235
+          "bags": 1630
         },
         {
           "grade": "Screen 12",
@@ -8281,15 +8281,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 43465
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 246180
+          "bags": 650
         },
         {
           "grade": "Mt Elgon",
-          "bags": 432434
+          "bags": 765
         },
         {
           "grade": "Wugar",
@@ -8297,7 +8297,7 @@
         },
         {
           "grade": "Arabica Parchment",
-          "bags": 14500
+          "bags": 10250
         }
       ],
       "by_destination": [
@@ -8315,19 +8315,19 @@
         },
         {
           "country": "Germany",
-          "bags": 85721
+          "bags": 77648
         },
         {
           "country": "Algeria",
-          "bags": 46028
+          "bags": 45695
         },
         {
           "country": "India",
-          "bags": 38401
+          "bags": 38111
         },
         {
           "country": "Spain",
-          "bags": 34721
+          "bags": 31957
         },
         {
           "country": "Morocco",
@@ -8335,23 +8335,23 @@
         },
         {
           "country": "Belgium",
-          "bags": 31694
+          "bags": 28081
         },
         {
           "country": "Russia",
-          "bags": 26593
+          "bags": 24619
         },
         {
           "country": "Netherlands",
-          "bags": 20444
+          "bags": 17934
         },
         {
           "country": "China",
-          "bags": 14864
+          "bags": 11033
         },
         {
           "country": "Portugal",
-          "bags": 10199
+          "bags": 8534
         },
         {
           "country": "Turkey",
@@ -8359,7 +8359,7 @@
         },
         {
           "country": "Switzerland",
-          "bags": 7014
+          "bags": 5734
         },
         {
           "country": "Greece",
@@ -8371,19 +8371,19 @@
         },
         {
           "country": "Australia",
-          "bags": 4292
+          "bags": 3972
         },
         {
           "country": "Japan",
-          "bags": 3657
+          "bags": 2450
         },
         {
           "country": "South Africa",
-          "bags": 2510
+          "bags": 1280
         },
         {
           "country": "Canada",
-          "bags": 1370
+          "bags": 1050
         },
         {
           "country": "Korea",
@@ -8408,9 +8408,9 @@
     },
     {
       "month": "2025-09",
-      "robusta_bags": 1721345,
-      "arabica_bags": 624245,
-      "total_bags": 2345590,
+      "robusta_bags": 698411,
+      "arabica_bags": 37593,
+      "total_bags": 736004,
       "value_usd": null,
       "by_grade": [
         {
@@ -8431,7 +8431,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 541493
+          "bags": 2513
         },
         {
           "grade": "Screen 18",
@@ -8455,15 +8455,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 50952
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 587971
+          "bags": 1319
         },
         {
           "grade": "Sustainable",
-          "bags": 435191
+          "bags": 990
         },
         {
           "grade": "Wugar",
@@ -8489,11 +8489,11 @@
         },
         {
           "country": "Germany",
-          "bags": 110220
+          "bags": 105635
         },
         {
           "country": "Morocco",
-          "bags": 63567
+          "bags": 63247
         },
         {
           "country": "Algeria",
@@ -8501,39 +8501,39 @@
         },
         {
           "country": "India",
-          "bags": 45690
+          "bags": 44129
         },
         {
           "country": "Belgium",
-          "bags": 34630
+          "bags": 28914
         },
         {
           "country": "Spain",
-          "bags": 26320
+          "bags": 22757
         },
         {
           "country": "Netherlands",
-          "bags": 25993
+          "bags": 23883
         },
         {
           "country": "Russia",
-          "bags": 25404
+          "bags": 24760
         },
         {
           "country": "Switzerland",
-          "bags": 18077
+          "bags": 16837
         },
         {
           "country": "China",
-          "bags": 13251
+          "bags": 12834
         },
         {
           "country": "Portugal",
-          "bags": 9920
+          "bags": 8268
         },
         {
           "country": "Turkey",
-          "bags": 8538
+          "bags": 8356
         },
         {
           "country": "Korea",
@@ -8549,7 +8549,7 @@
         },
         {
           "country": "Australia",
-          "bags": 3339
+          "bags": 2339
         },
         {
           "country": "Greece",
@@ -8565,11 +8565,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 1933
+          "bags": 333
         },
         {
           "country": "Kenya",
-          "bags": 1280
+          "bags": 320
         },
         {
           "country": "Japan",
@@ -8582,9 +8582,9 @@
     },
     {
       "month": "2025-10",
-      "robusta_bags": 2395809,
-      "arabica_bags": 312912,
-      "total_bags": 2708721,
+      "robusta_bags": 527033,
+      "arabica_bags": 33180,
+      "total_bags": 560213,
       "value_usd": null,
       "by_grade": [
         {
@@ -8601,7 +8601,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1365652
+          "bags": 4661
         },
         {
           "grade": "Screen 18",
@@ -8625,19 +8625,19 @@
         },
         {
           "grade": "BHP",
-          "bags": 56535
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453389
+          "bags": 940
         },
         {
           "grade": "Wugar",
-          "bags": 174168
+          "bags": 360
         },
         {
           "grade": "Mt Elgon",
-          "bags": 106244
+          "bags": 320
         },
         {
           "grade": "Arabica Parchment",
@@ -8655,19 +8655,19 @@
         },
         {
           "country": "Germany",
-          "bags": 73187
+          "bags": 70460
         },
         {
           "country": "Algeria",
-          "bags": 51337
+          "bags": 51004
         },
         {
           "country": "India",
-          "bags": 45418
+          "bags": 42198
         },
         {
           "country": "Switzerland",
-          "bags": 33642
+          "bags": 31718
         },
         {
           "country": "Sudan",
@@ -8679,43 +8679,43 @@
         },
         {
           "country": "Spain",
-          "bags": 23901
+          "bags": 21605
         },
         {
           "country": "Belgium",
-          "bags": 19494
+          "bags": 15076
         },
         {
           "country": "Netherlands",
-          "bags": 17809
+          "bags": 15289
         },
         {
           "country": "Russia",
-          "bags": 16649
+          "bags": 15615
         },
         {
           "country": "Portugal",
-          "bags": 12601
+          "bags": 9950
         },
         {
           "country": "China",
-          "bags": 10391
+          "bags": 9407
         },
         {
           "country": "Greece",
-          "bags": 7813
+          "bags": 7479
         },
         {
           "country": "Turkey",
-          "bags": 4761
+          "bags": 3254
         },
         {
           "country": "Australia",
-          "bags": 3654
+          "bags": 3164
         },
         {
           "country": "United Kingdom",
-          "bags": 3631
+          "bags": 3214
         },
         {
           "country": "Tunisia",
@@ -8727,15 +8727,15 @@
         },
         {
           "country": "South Africa",
-          "bags": 1959
+          "bags": 1319
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1914
+          "bags": 1274
         },
         {
           "country": "Kenya",
-          "bags": 1693
+          "bags": 333
         },
         {
           "country": "Canada",
@@ -8747,7 +8747,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 640
+          "bags": 607
         }
       ],
       "parser_version": "v1_recent",
@@ -8756,9 +8756,9 @@
     },
     {
       "month": "2025-11",
-      "robusta_bags": 2394809,
-      "arabica_bags": 140768,
-      "total_bags": 2535577,
+      "robusta_bags": 526033,
+      "arabica_bags": 34844,
+      "total_bags": 560877,
       "value_usd": null,
       "by_grade": [
         {
@@ -8779,7 +8779,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1365652
+          "bags": 4661
         },
         {
           "grade": "Screen 18",
@@ -8803,15 +8803,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 56535
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453389
+          "bags": 940
         },
         {
           "grade": "Mt Elgon",
-          "bags": 106244
+          "bags": 320
         },
         {
           "grade": "Arabica Parchment",
@@ -8825,27 +8825,27 @@
         },
         {
           "country": "Germany",
-          "bags": 89720
+          "bags": 74215
         },
         {
           "country": "India",
-          "bags": 45685
+          "bags": 40415
         },
         {
           "country": "Belgium",
-          "bags": 33963
+          "bags": 20066
         },
         {
           "country": "Spain",
-          "bags": 25802
+          "bags": 21268
         },
         {
           "country": "Russia",
-          "bags": 23325
+          "bags": 21172
         },
         {
           "country": "Netherlands",
-          "bags": 18801
+          "bags": 16008
         },
         {
           "country": "Morocco",
@@ -8853,7 +8853,7 @@
         },
         {
           "country": "Algeria",
-          "bags": 14714
+          "bags": 13421
         },
         {
           "country": "Sudan",
@@ -8861,23 +8861,23 @@
         },
         {
           "country": "Greece",
-          "bags": 11780
+          "bags": 10762
         },
         {
           "country": "Switzerland",
-          "bags": 10474
+          "bags": 9154
         },
         {
           "country": "China",
-          "bags": 9088
+          "bags": 3910
         },
         {
           "country": "Portugal",
-          "bags": 8710
+          "bags": 7378
         },
         {
           "country": "United Kingdom",
-          "bags": 7000
+          "bags": 6040
         },
         {
           "country": "Tunisia",
@@ -8885,15 +8885,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 4512
+          "bags": 2804
         },
         {
           "country": "Canada",
-          "bags": 4328
+          "bags": 2356
         },
         {
           "country": "Australia",
-          "bags": 3611
+          "bags": 3291
         },
         {
           "country": "Mexico",
@@ -8905,11 +8905,11 @@
         },
         {
           "country": "South Africa",
-          "bags": 2599
+          "bags": 999
         },
         {
           "country": "Korea",
-          "bags": 1280
+          "bags": 320
         },
         {
           "country": "Saudi Arabia",
@@ -8921,7 +8921,7 @@
         },
         {
           "country": "Egypt",
-          "bags": 350
+          "bags": 316
         },
         {
           "country": "Japan",
@@ -8934,9 +8934,9 @@
     },
     {
       "month": "2025-12",
-      "robusta_bags": 770651,
-      "arabica_bags": 989573,
-      "total_bags": 1760224,
+      "robusta_bags": 332620,
+      "arabica_bags": 42636,
+      "total_bags": 375256,
       "value_usd": null,
       "by_grade": [
         {
@@ -8969,7 +8969,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 402979
+          "bags": 1773
         },
         {
           "grade": "Screen 12",
@@ -8977,11 +8977,11 @@
         },
         {
           "grade": "BHP",
-          "bags": 38024
+          "bags": 1199
         },
         {
           "grade": "Mt Elgon",
-          "bags": 948857
+          "bags": 1920
         },
         {
           "grade": "Wugar",
@@ -9003,15 +9003,15 @@
         },
         {
           "country": "Belgium",
-          "bags": 57571
+          "bags": 17378
         },
         {
           "country": "Germany",
-          "bags": 44903
+          "bags": 33092
         },
         {
           "country": "India",
-          "bags": 28739
+          "bags": 26620
         },
         {
           "country": "Sudan",
@@ -9019,75 +9019,75 @@
         },
         {
           "country": "Algeria",
-          "bags": 25015
+          "bags": 23615
         },
         {
           "country": "Morocco",
-          "bags": 23562
+          "bags": 22896
         },
         {
           "country": "China",
-          "bags": 23311
+          "bags": 12037
         },
         {
           "country": "Spain",
-          "bags": 22729
+          "bags": 18536
         },
         {
           "country": "Russia",
-          "bags": 12885
+          "bags": 8383
         },
         {
           "country": "France",
-          "bags": 7398
+          "bags": 1774
         },
         {
           "country": "Greece",
-          "bags": 7197
+          "bags": 6863
         },
         {
           "country": "Portugal",
-          "bags": 6695
+          "bags": 6375
         },
         {
           "country": "Australia",
-          "bags": 5215
+          "bags": 4138
         },
         {
           "country": "Switzerland",
-          "bags": 3870
+          "bags": 3230
         },
         {
           "country": "Netherlands",
-          "bags": 3780
+          "bags": 1080
         },
         {
           "country": "Turkey",
-          "bags": 3704
+          "bags": 2064
         },
         {
           "country": "United Kingdom",
-          "bags": 3633
+          "bags": 1706
         },
         {
           "country": "Saudi Arabia",
-          "bags": 2950
+          "bags": 1990
         },
         {
           "country": "Korea",
-          "bags": 1520
+          "bags": 1200
         },
         {
           "country": "Kenya",
-          "bags": 1333
+          "bags": 640
         },
         {
           "country": "Canada",
-          "bags": 1020
+          "bags": 700
         },
         {
           "country": "South Africa",
-          "bags": 970
+          "bags": 930
         },
         {
           "country": "Egypt",
@@ -9108,9 +9108,9 @@
     },
     {
       "month": "2026-01",
-      "robusta_bags": 3596654,
-      "arabica_bags": 318751,
-      "total_bags": 3915405,
+      "robusta_bags": 407228,
+      "arabica_bags": 61516,
+      "total_bags": 468744,
       "value_usd": null,
       "by_grade": [
         {
@@ -9131,7 +9131,7 @@
         },
         {
           "grade": "Washed Robusta",
-          "bags": 949715
+          "bags": 3140
         },
         {
           "grade": "Screen 18",
@@ -9147,7 +9147,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1394150
+          "bags": 5656
         },
         {
           "grade": "Screen 12",
@@ -9155,15 +9155,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 26696
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 830845
+          "bags": 1985
         },
         {
           "grade": "Mt Elgon",
-          "bags": 257880
+          "bags": 645
         },
         {
           "grade": "Wugar",
@@ -9185,7 +9185,7 @@
         },
         {
           "country": "Germany",
-          "bags": 59464
+          "bags": 37953
         },
         {
           "country": "Sudan",
@@ -9193,43 +9193,43 @@
         },
         {
           "country": "India",
-          "bags": 37170
+          "bags": 34150
         },
         {
           "country": "Belgium",
-          "bags": 34996
+          "bags": 19470
         },
         {
           "country": "China",
-          "bags": 34862
+          "bags": 20378
         },
         {
           "country": "Spain",
-          "bags": 31103
+          "bags": 29169
         },
         {
           "country": "Morocco",
-          "bags": 17900
+          "bags": 17232
         },
         {
           "country": "Algeria",
-          "bags": 16273
+          "bags": 15953
         },
         {
           "country": "Portugal",
-          "bags": 11150
+          "bags": 7750
         },
         {
           "country": "Russia",
-          "bags": 10729
+          "bags": 8675
         },
         {
           "country": "Turkey",
-          "bags": 7120
+          "bags": 6770
         },
         {
           "country": "United Kingdom",
-          "bags": 6592
+          "bags": 3013
         },
         {
           "country": "Greece",
@@ -9237,11 +9237,11 @@
         },
         {
           "country": "Netherlands",
-          "bags": 6146
+          "bags": 3133
         },
         {
           "country": "Switzerland",
-          "bags": 4013
+          "bags": 4008
         },
         {
           "country": "Egypt",
@@ -9249,23 +9249,23 @@
         },
         {
           "country": "France",
-          "bags": 3206
+          "bags": 2856
         },
         {
           "country": "Australia",
-          "bags": 3079
+          "bags": 1776
         },
         {
           "country": "South Africa",
-          "bags": 1750
+          "bags": 790
         },
         {
           "country": "Canada",
-          "bags": 1660
+          "bags": 700
         },
         {
           "country": "Saudi Arabia",
-          "bags": 1280
+          "bags": 960
         },
         {
           "country": "Korea",
@@ -9273,7 +9273,7 @@
         },
         {
           "country": "Japan",
-          "bags": 950
+          "bags": 640
         },
         {
           "country": "Mexico",
@@ -9286,9 +9286,9 @@
     },
     {
       "month": "2026-02",
-      "robusta_bags": 3559443,
-      "arabica_bags": 819306,
-      "total_bags": 4378749,
+      "robusta_bags": 465819,
+      "arabica_bags": 42773,
+      "total_bags": 508592,
       "value_usd": null,
       "by_grade": [
         {
@@ -9321,7 +9321,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1225629
+          "bags": 4974
         },
         {
           "grade": "Screen 12",
@@ -9329,15 +9329,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 38013
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 1840194
+          "bags": 4039
         },
         {
           "grade": "Mt Elgon",
-          "bags": 777831
+          "bags": 1298
         },
         {
           "grade": "Wugar",
@@ -9367,11 +9367,11 @@
         },
         {
           "country": "Germany",
-          "bags": 54831
+          "bags": 36026
         },
         {
           "country": "India",
-          "bags": 51802
+          "bags": 49702
         },
         {
           "country": "Morocco",
@@ -9379,11 +9379,11 @@
         },
         {
           "country": "Belgium",
-          "bags": 29370
+          "bags": 13913
         },
         {
           "country": "China",
-          "bags": 23747
+          "bags": 8900
         },
         {
           "country": "Algeria",
@@ -9391,31 +9391,31 @@
         },
         {
           "country": "Spain",
-          "bags": 12613
+          "bags": 10353
         },
         {
           "country": "Portugal",
-          "bags": 12483
+          "bags": 8963
         },
         {
           "country": "Netherlands",
-          "bags": 10698
+          "bags": 3550
         },
         {
           "country": "Russia",
-          "bags": 9986
+          "bags": 3678
         },
         {
           "country": "United Kingdom",
-          "bags": 7147
+          "bags": 3708
         },
         {
           "country": "Greece",
-          "bags": 6540
+          "bags": 6190
         },
         {
           "country": "Turkey",
-          "bags": 6214
+          "bags": 5514
         },
         {
           "country": "Switzerland",
@@ -9427,31 +9427,31 @@
         },
         {
           "country": "South Africa",
-          "bags": 3899
+          "bags": 2559
         },
         {
           "country": "Saudi Arabia",
-          "bags": 3648
+          "bags": 768
         },
         {
           "country": "Canada",
-          "bags": 2962
+          "bags": 1630
         },
         {
           "country": "Australia",
-          "bags": 2069
+          "bags": 973
         },
         {
           "country": "Tanzania",
-          "bags": 1886
+          "bags": 1218
         },
         {
           "country": "Japan",
-          "bags": 1406
+          "bags": 206
         },
         {
           "country": "Kenya",
-          "bags": 737
+          "bags": 720
         },
         {
           "country": "Mexico",
@@ -9459,7 +9459,7 @@
         },
         {
           "country": "Korea",
-          "bags": 640
+          "bags": 320
         },
         {
           "country": "France",
@@ -9472,9 +9472,9 @@
     },
     {
       "month": "2026-03",
-      "robusta_bags": 2470508,
-      "arabica_bags": 851981,
-      "total_bags": 3322489,
+      "robusta_bags": 516535,
+      "arabica_bags": 39862,
+      "total_bags": 556397,
       "value_usd": null,
       "by_grade": [
         {
@@ -9491,11 +9491,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 700155
+          "bags": 2280
         },
         {
           "grade": "Washed Robusta",
-          "bags": 770091
+          "bags": 3110
         },
         {
           "grade": "Screen 18",
@@ -9519,15 +9519,15 @@
         },
         {
           "grade": "BHP",
-          "bags": 38206
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
-          "bags": 453038
+          "bags": 928
         },
         {
           "grade": "Mt Elgon",
-          "bags": 813497
+          "bags": 1378
         },
         {
           "grade": "Wugar",
@@ -9549,11 +9549,11 @@
         },
         {
           "country": "Germany",
-          "bags": 53395
+          "bags": 49323
         },
         {
           "country": "India",
-          "bags": 44038
+          "bags": 41902
         },
         {
           "country": "Morocco",
@@ -9561,19 +9561,19 @@
         },
         {
           "country": "China",
-          "bags": 28172
+          "bags": 17507
         },
         {
           "country": "Spain",
-          "bags": 22573
+          "bags": 19986
         },
         {
           "country": "Belgium",
-          "bags": 20600
+          "bags": 16280
         },
         {
           "country": "Portugal",
-          "bags": 18632
+          "bags": 15324
         },
         {
           "country": "Algeria",
@@ -9581,15 +9581,15 @@
         },
         {
           "country": "Turkey",
-          "bags": 16208
+          "bags": 15568
         },
         {
           "country": "Netherlands",
-          "bags": 14012
+          "bags": 8428
         },
         {
           "country": "Russia",
-          "bags": 10517
+          "bags": 8457
         },
         {
           "country": "Egypt",
@@ -9597,23 +9597,23 @@
         },
         {
           "country": "South Africa",
-          "bags": 4445
+          "bags": 2295
         },
         {
           "country": "Australia",
-          "bags": 2953
+          "bags": 2313
         },
         {
           "country": "Switzerland",
-          "bags": 2893
+          "bags": 2573
         },
         {
           "country": "Greece",
-          "bags": 2259
+          "bags": 1925
         },
         {
           "country": "United Kingdom",
-          "bags": 2224
+          "bags": 1924
         },
         {
           "country": "Kenya",
@@ -9625,11 +9625,11 @@
         },
         {
           "country": "France",
-          "bags": 1564
+          "bags": 1080
         },
         {
           "country": "Korea",
-          "bags": 1290
+          "bags": 650
         },
         {
           "country": "Tanzania",
@@ -9637,7 +9637,7 @@
         },
         {
           "country": "Japan",
-          "bags": 390
+          "bags": 100
         },
         {
           "country": "Saudi Arabia",
@@ -9650,9 +9650,9 @@
     },
     {
       "month": "2026-04",
-      "robusta_bags": 4970820,
-      "arabica_bags": 553913,
-      "total_bags": 5524733,
+      "robusta_bags": 424603,
+      "arabica_bags": 41509,
+      "total_bags": 466112,
       "value_usd": null,
       "by_grade": [
         {
@@ -9669,11 +9669,11 @@
         },
         {
           "grade": "Organic Robusta",
-          "bags": 1956567
+          "bags": 7172
         },
         {
           "grade": "Washed Robusta",
-          "bags": 634777
+          "bags": 2700
         },
         {
           "grade": "Screen 18",
@@ -9689,7 +9689,7 @@
         },
         {
           "grade": "Screen 14",
-          "bags": 1948690
+          "bags": 8616
         },
         {
           "grade": "Screen 12",
@@ -9697,7 +9697,7 @@
         },
         {
           "grade": "BHP",
-          "bags": 25870
+          "bags": 1199
         },
         {
           "grade": "Sustainable",
@@ -9705,7 +9705,7 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 513624
+          "bags": 1220
         },
         {
           "grade": "Wugar",
@@ -9731,11 +9731,11 @@
         },
         {
           "country": "Germany",
-          "bags": 63613
+          "bags": 56090
         },
         {
           "country": "India",
-          "bags": 48045
+          "bags": 46245
         },
         {
           "country": "Morocco",
@@ -9747,27 +9747,27 @@
         },
         {
           "country": "China",
-          "bags": 22395
+          "bags": 14800
         },
         {
           "country": "Spain",
-          "bags": 21544
+          "bags": 19549
         },
         {
           "country": "Belgium",
-          "bags": 15986
+          "bags": 9433
         },
         {
           "country": "Netherlands",
-          "bags": 15366
+          "bags": 8595
         },
         {
           "country": "Portugal",
-          "bags": 15107
+          "bags": 14134
         },
         {
           "country": "Russia",
-          "bags": 13768
+          "bags": 6934
         },
         {
           "country": "Egypt",
@@ -9775,31 +9775,31 @@
         },
         {
           "country": "Korea",
-          "bags": 7958
+          "bags": 320
         },
         {
           "country": "Australia",
-          "bags": 7032
+          "bags": 1653
         },
         {
           "country": "Greece",
-          "bags": 6954
+          "bags": 6270
         },
         {
           "country": "United Kingdom",
-          "bags": 5658
+          "bags": 2660
         },
         {
           "country": "South Africa",
-          "bags": 4599
+          "bags": 1469
         },
         {
           "country": "Turkey",
-          "bags": 4250
+          "bags": 4146
         },
         {
           "country": "Saudi Arabia",
-          "bags": 3959
+          "bags": 640
         },
         {
           "country": "Mexico",
@@ -9807,19 +9807,19 @@
         },
         {
           "country": "Canada",
-          "bags": 3252
+          "bags": 986
         },
         {
           "country": "Switzerland",
-          "bags": 2307
+          "bags": 988
         },
         {
           "country": "Uae",
-          "bags": 1720
+          "bags": 1400
         },
         {
           "country": "Japan",
-          "bags": 1466
+          "bags": 306
         },
         {
           "country": "Tanzania",
@@ -9835,7 +9835,7 @@
         },
         {
           "country": "France",
-          "bags": 680
+          "bags": 360
         }
       ],
       "parser_version": "v1_recent",
