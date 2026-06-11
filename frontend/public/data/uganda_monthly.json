@@ -9,10 +9,10 @@
   "series": [
     {
       "month": "2020-01",
-      "robusta_bags": 377182,
-      "arabica_bags": 92769,
-      "total_bags": 84,
-      "value_usd": 60.0,
+      "robusta_bags": 136290,
+      "arabica_bags": 26347,
+      "total_bags": 162637,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -87,10 +87,10 @@
     },
     {
       "month": "2020-02",
-      "robusta_bags": 388646,
-      "arabica_bags": 84348,
-      "total_bags": 32,
-      "value_usd": 60.0,
+      "robusta_bags": 159966,
+      "arabica_bags": 14070,
+      "total_bags": 174036,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -249,10 +249,10 @@
     },
     {
       "month": "2020-03",
-      "robusta_bags": 385978,
-      "arabica_bags": 91583,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 332852,
+      "arabica_bags": 21645,
+      "total_bags": 354497,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -419,10 +419,10 @@
     },
     {
       "month": "2020-04",
-      "robusta_bags": 262676,
-      "arabica_bags": 97297,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 225675,
+      "arabica_bags": 27611,
+      "total_bags": 253286,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -501,10 +501,10 @@
     },
     {
       "month": "2020-05",
-      "robusta_bags": 340830,
-      "arabica_bags": 96767,
-      "total_bags": 72,
-      "value_usd": 60.0,
+      "robusta_bags": 295494,
+      "arabica_bags": 39333,
+      "total_bags": 334827,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -635,10 +635,10 @@
     },
     {
       "month": "2020-06",
-      "robusta_bags": 344438,
-      "arabica_bags": 10,
-      "total_bags": 77,
-      "value_usd": 60.0,
+      "robusta_bags": 307192,
+      "arabica_bags": 26090,
+      "total_bags": 333282,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -733,10 +733,10 @@
     },
     {
       "month": "2020-07",
-      "robusta_bags": 467160,
-      "arabica_bags": 1,
-      "total_bags": 79,
-      "value_usd": 60.0,
+      "robusta_bags": 443791,
+      "arabica_bags": 22705,
+      "total_bags": 466496,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -795,12 +795,16 @@
           "bags": 3928
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 4242
         },
         {
           "grade": "Bugisu AA",
           "bags": 4944
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 1019
         },
         {
           "grade": "Bugisu PB",
@@ -827,10 +831,10 @@
     },
     {
       "month": "2020-08",
-      "robusta_bags": 414940,
-      "arabica_bags": 73924,
-      "total_bags": 4854389,
-      "value_usd": 60.0,
+      "robusta_bags": 430791,
+      "arabica_bags": 60007,
+      "total_bags": 490798,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -877,12 +881,16 @@
           "bags": 2873
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 7280
         },
         {
           "grade": "Bugisu AA",
           "bags": 4388
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 12472
         },
         {
           "grade": "Bugisu PB",
@@ -1005,10 +1013,10 @@
     },
     {
       "month": "2020-09",
-      "robusta_bags": 310863,
-      "arabica_bags": 51356,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 392126,
+      "arabica_bags": 8047,
+      "total_bags": 400173,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1083,10 +1091,10 @@
     },
     {
       "month": "2020-10",
-      "robusta_bags": 303430,
-      "arabica_bags": 75501,
-      "total_bags": 87,
-      "value_usd": 60.0,
+      "robusta_bags": 317874,
+      "arabica_bags": 22695,
+      "total_bags": 340569,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1137,12 +1145,16 @@
           "bags": 3328
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 640
         },
         {
           "grade": "Bugisu AA",
           "bags": 10850
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 1800
         },
         {
           "grade": "Wugar",
@@ -1253,10 +1265,10 @@
     },
     {
       "month": "2020-11",
-      "robusta_bags": 336366,
-      "arabica_bags": 450359260,
-      "total_bags": 86,
-      "value_usd": 60.0,
+      "robusta_bags": 329775,
+      "arabica_bags": 16399,
+      "total_bags": 346174,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1331,10 +1343,10 @@
     },
     {
       "month": "2020-12",
-      "robusta_bags": 280603,
-      "arabica_bags": 3,
-      "total_bags": 86,
-      "value_usd": 60.0,
+      "robusta_bags": 143056,
+      "arabica_bags": 26136,
+      "total_bags": 169192,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1381,8 +1393,12 @@
           "bags": 8468
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 4800
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 6808
         },
         {
           "grade": "Kiboko",
@@ -1409,10 +1425,10 @@
     },
     {
       "month": "2021-01",
-      "robusta_bags": 376874,
-      "arabica_bags": 92789,
-      "total_bags": 88,
-      "value_usd": 60.0,
+      "robusta_bags": 353806,
+      "arabica_bags": 19125,
+      "total_bags": 372931,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1571,10 +1587,10 @@
     },
     {
       "month": "2021-02",
-      "robusta_bags": 388980,
-      "arabica_bags": 84348,
-      "total_bags": 89,
-      "value_usd": 60.0,
+      "robusta_bags": 440715,
+      "arabica_bags": 21537,
+      "total_bags": 462252,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1733,10 +1749,10 @@
     },
     {
       "month": "2021-03",
-      "robusta_bags": 389378,
-      "arabica_bags": 91583,
-      "total_bags": 88,
-      "value_usd": 60.0,
+      "robusta_bags": 432107,
+      "arabica_bags": 23573,
+      "total_bags": 455680,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1811,10 +1827,10 @@
     },
     {
       "month": "2021-04",
-      "robusta_bags": 262996,
-      "arabica_bags": 97297,
-      "total_bags": 86,
-      "value_usd": 60.0,
+      "robusta_bags": 383935,
+      "arabica_bags": 6230,
+      "total_bags": 390165,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -1973,10 +1989,10 @@
     },
     {
       "month": "2021-05",
-      "robusta_bags": 340830,
-      "arabica_bags": 5026612,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 389081,
+      "arabica_bags": 12842,
+      "total_bags": 401923,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2047,10 +2063,10 @@
     },
     {
       "month": "2021-06",
-      "robusta_bags": 345008,
-      "arabica_bags": 75555,
-      "total_bags": 12,
-      "value_usd": 60.0,
+      "robusta_bags": 166676,
+      "arabica_bags": 9199,
+      "total_bags": 175875,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2129,10 +2145,10 @@
     },
     {
       "month": "2021-07",
-      "robusta_bags": 467526,
-      "arabica_bags": 76091,
-      "total_bags": 91,
-      "value_usd": 60.0,
+      "robusta_bags": 599401,
+      "arabica_bags": 18991,
+      "total_bags": 618392,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2207,10 +2223,10 @@
     },
     {
       "month": "2021-08",
-      "robusta_bags": 457897,
-      "arabica_bags": 4,
-      "total_bags": 2021,
-      "value_usd": 60.0,
+      "robusta_bags": 494027,
+      "arabica_bags": 20777,
+      "total_bags": 514804,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2297,10 +2313,10 @@
     },
     {
       "month": "2021-09",
-      "robusta_bags": 444741,
-      "arabica_bags": 60840,
-      "total_bags": 91,
-      "value_usd": 60.0,
+      "robusta_bags": 131636,
+      "arabica_bags": 23514,
+      "total_bags": 155150,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -2479,10 +2495,10 @@
     },
     {
       "month": "2021-10",
-      "robusta_bags": 371258,
-      "arabica_bags": 6,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 109107,
+      "arabica_bags": 22700,
+      "total_bags": 131807,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2569,10 +2585,10 @@
     },
     {
       "month": "2021-11",
-      "robusta_bags": 372517,
-      "arabica_bags": 53,
-      "total_bags": 86,
-      "value_usd": 60.0,
+      "robusta_bags": 133116,
+      "arabica_bags": 36373,
+      "total_bags": 169489,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2631,8 +2647,12 @@
           "bags": 10380
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 350
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 5110
         },
         {
           "grade": "Bugisu PB",
@@ -2663,10 +2683,10 @@
     },
     {
       "month": "2021-12",
-      "robusta_bags": 371625,
-      "arabica_bags": 76,
-      "total_bags": 12,
-      "value_usd": 60.0,
+      "robusta_bags": 203705,
+      "arabica_bags": 40650,
+      "total_bags": 244355,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -2745,10 +2765,10 @@
     },
     {
       "month": "2022-01",
-      "robusta_bags": 397840,
-      "arabica_bags": 48080,
-      "total_bags": 1723561,
-      "value_usd": 60.0,
+      "robusta_bags": 104760,
+      "arabica_bags": 24588,
+      "total_bags": 129348,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
@@ -2927,10 +2947,10 @@
     },
     {
       "month": "2022-02",
-      "robusta_bags": 502125,
-      "arabica_bags": 13,
-      "total_bags": 2287764,
-      "value_usd": 60.0,
+      "robusta_bags": 159741,
+      "arabica_bags": 32326,
+      "total_bags": 192067,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3013,10 +3033,10 @@
     },
     {
       "month": "2022-03",
-      "robusta_bags": 493183,
-      "arabica_bags": 49,
-      "total_bags": 2859563,
-      "value_usd": 60.0,
+      "robusta_bags": 103190,
+      "arabica_bags": 8496,
+      "total_bags": 111686,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
@@ -3195,10 +3215,10 @@
     },
     {
       "month": "2022-04",
-      "robusta_bags": 464484,
-      "arabica_bags": 72944,
-      "total_bags": 75,
-      "value_usd": 60.0,
+      "robusta_bags": 239844,
+      "arabica_bags": 33533,
+      "total_bags": 273377,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
@@ -3285,10 +3305,10 @@
     },
     {
       "month": "2022-05",
-      "robusta_bags": 429040,
-      "arabica_bags": 64384,
-      "total_bags": 3890415,
-      "value_usd": 60.0,
+      "robusta_bags": 305818,
+      "arabica_bags": 22217,
+      "total_bags": 328035,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3371,10 +3391,10 @@
     },
     {
       "month": "2022-06",
-      "robusta_bags": 565396,
-      "arabica_bags": 52939,
-      "total_bags": 4508750,
-      "value_usd": 60.0,
+      "robusta_bags": 169685,
+      "arabica_bags": 23075,
+      "total_bags": 192760,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3465,10 +3485,10 @@
     },
     {
       "month": "2022-07",
-      "robusta_bags": 659592,
-      "arabica_bags": 39783,
-      "total_bags": 84,
-      "value_usd": 60.0,
+      "robusta_bags": 131583,
+      "arabica_bags": 29422,
+      "total_bags": 161005,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3555,10 +3575,10 @@
     },
     {
       "month": "2022-08",
-      "robusta_bags": 636458,
-      "arabica_bags": 64532,
-      "total_bags": 5909115,
-      "value_usd": 60.0,
+      "robusta_bags": 177220,
+      "arabica_bags": 26489,
+      "total_bags": 203709,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3601,12 +3621,16 @@
           "bags": 1199
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 1430
         },
         {
           "grade": "Bugisu AA",
           "bags": 2844
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 5862
         },
         {
           "grade": "Wugar",
@@ -3721,10 +3745,10 @@
     },
     {
       "month": "2022-09",
-      "robusta_bags": 544248,
-      "arabica_bags": 42297,
-      "total_bags": 91,
-      "value_usd": 60.0,
+      "robusta_bags": 146110,
+      "arabica_bags": 14526,
+      "total_bags": 160636,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3795,10 +3819,10 @@
     },
     {
       "month": "2022-10",
-      "robusta_bags": 426158,
-      "arabica_bags": 0,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 113374,
+      "arabica_bags": 16098,
+      "total_bags": 129472,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3885,10 +3909,10 @@
     },
     {
       "month": "2022-11",
-      "robusta_bags": 437413,
-      "arabica_bags": 88502,
-      "total_bags": 87,
-      "value_usd": 60.0,
+      "robusta_bags": 108086,
+      "arabica_bags": 22852,
+      "total_bags": 130938,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -3971,10 +3995,10 @@
     },
     {
       "month": "2022-12",
-      "robusta_bags": 452878,
-      "arabica_bags": 84396,
-      "total_bags": 82,
-      "value_usd": 60.0,
+      "robusta_bags": 90730,
+      "arabica_bags": 21380,
+      "total_bags": 112110,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4141,10 +4165,10 @@
     },
     {
       "month": "2023-01",
-      "robusta_bags": 314945,
-      "arabica_bags": 5,
-      "total_bags": 79,
-      "value_usd": 60.0,
+      "robusta_bags": 139452,
+      "arabica_bags": 31077,
+      "total_bags": 170529,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4219,10 +4243,10 @@
     },
     {
       "month": "2023-02",
-      "robusta_bags": 353039,
-      "arabica_bags": 7,
-      "total_bags": 2400452,
-      "value_usd": 60.0,
+      "robusta_bags": 97833,
+      "arabica_bags": 43451,
+      "total_bags": 141284,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4397,10 +4421,10 @@
     },
     {
       "month": "2023-03",
-      "robusta_bags": 360529,
-      "arabica_bags": 117478,
-      "total_bags": 2878459,
-      "value_usd": 60.0,
+      "robusta_bags": 138813,
+      "arabica_bags": 45624,
+      "total_bags": 184437,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4483,10 +4507,10 @@
     },
     {
       "month": "2023-04",
-      "robusta_bags": 277206,
-      "arabica_bags": 3,
-      "total_bags": 3286183,
-      "value_usd": 60.0,
+      "robusta_bags": 36167,
+      "arabica_bags": 25131,
+      "total_bags": 61298,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4561,10 +4585,10 @@
     },
     {
       "month": "2023-05",
-      "robusta_bags": 350022,
-      "arabica_bags": 19,
-      "total_bags": 3741059,
-      "value_usd": 60.0,
+      "robusta_bags": 127954,
+      "arabica_bags": 44125,
+      "total_bags": 172079,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -4635,10 +4659,10 @@
     },
     {
       "month": "2023-06",
-      "robusta_bags": 444197,
-      "arabica_bags": 13,
-      "total_bags": 4271424,
-      "value_usd": 60.0,
+      "robusta_bags": 133883,
+      "arabica_bags": 22326,
+      "total_bags": 156209,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -4705,10 +4729,10 @@
     },
     {
       "month": "2023-07",
-      "robusta_bags": 526815,
-      "arabica_bags": 20,
-      "total_bags": 6,
-      "value_usd": 60.0,
+      "robusta_bags": 227812,
+      "arabica_bags": 17576,
+      "total_bags": 245388,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -4871,10 +4895,10 @@
     },
     {
       "month": "2023-08",
-      "robusta_bags": 456618,
-      "arabica_bags": 20,
-      "total_bags": 5348958,
-      "value_usd": 60.0,
+      "robusta_bags": 291537,
+      "arabica_bags": 27709,
+      "total_bags": 319246,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -4949,10 +4973,10 @@
     },
     {
       "month": "2023-09",
-      "robusta_bags": 472773,
-      "arabica_bags": 38986,
-      "total_bags": 5,
-      "value_usd": 2.36,
+      "robusta_bags": 168966,
+      "arabica_bags": 18285,
+      "total_bags": 187251,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -4963,7 +4987,7 @@
           "bags": 9250
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 2022
         },
         {
@@ -5007,6 +5031,10 @@
           "bags": 2280
         },
         {
+          "grade": "Bugisu A",
+          "bags": 640
+        },
+        {
           "grade": "Wugar",
           "bags": 3773
         },
@@ -5031,17 +5059,17 @@
     },
     {
       "month": "2023-10",
-      "robusta_bags": 396548,
-      "arabica_bags": 2,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "robusta_bags": 40252,
+      "arabica_bags": 24435,
+      "total_bags": 64687,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
           "bags": 3900
         },
         {
-          "grade": "Bugisu A",
+          "grade": "Bugisu A+",
           "bags": 9250
         },
         {
@@ -5104,10 +5132,10 @@
     },
     {
       "month": "2023-11",
-      "robusta_bags": 364875,
-      "arabica_bags": 82287,
-      "total_bags": 87197,
-      "value_usd": 60.0,
+      "robusta_bags": 109251,
+      "arabica_bags": 27618,
+      "total_bags": 136869,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Sustainable",
@@ -5182,10 +5210,10 @@
     },
     {
       "month": "2023-12",
-      "robusta_bags": 331446,
-      "arabica_bags": 26,
-      "total_bags": 80,
-      "value_usd": 60.0,
+      "robusta_bags": 90332,
+      "arabica_bags": 23570,
+      "total_bags": 113902,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -5356,10 +5384,10 @@
     },
     {
       "month": "2024-01",
-      "robusta_bags": 412518,
-      "arabica_bags": 81564,
-      "total_bags": 2023,
-      "value_usd": 60.0,
+      "robusta_bags": 113248,
+      "arabica_bags": 26660,
+      "total_bags": 139908,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -5430,10 +5458,10 @@
     },
     {
       "month": "2024-02",
-      "robusta_bags": 374359,
-      "arabica_bags": 105087,
-      "total_bags": 84,
-      "value_usd": 60.0,
+      "robusta_bags": 100468,
+      "arabica_bags": 28737,
+      "total_bags": 129205,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -5596,10 +5624,10 @@
     },
     {
       "month": "2024-03",
-      "robusta_bags": 365797,
-      "arabica_bags": 121938,
-      "total_bags": 68,
-      "value_usd": 60.0,
+      "robusta_bags": 213123,
+      "arabica_bags": 28919,
+      "total_bags": 242042,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -5682,10 +5710,10 @@
     },
     {
       "month": "2024-04",
-      "robusta_bags": 238286,
-      "arabica_bags": 134626,
-      "total_bags": 3154986,
-      "value_usd": 60.0,
+      "robusta_bags": 99311,
+      "arabica_bags": 34211,
+      "total_bags": 133522,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -5768,10 +5796,10 @@
     },
     {
       "month": "2024-05",
-      "robusta_bags": 290367,
-      "arabica_bags": 100940,
-      "total_bags": 82,
-      "value_usd": 60.0,
+      "robusta_bags": 331094,
+      "arabica_bags": 43943,
+      "total_bags": 375037,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -5949,15 +5977,15 @@
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-05/07-April%202025%20Report%20pptx%281%29.pptxii.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1114",
       "parse_warnings": []
     },
     {
       "month": "2024-06",
-      "robusta_bags": 691176,
-      "arabica_bags": 6,
-      "total_bags": 86,
-      "value_usd": 60.0,
+      "robusta_bags": 600534,
+      "arabica_bags": 44608,
+      "total_bags": 645142,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -6139,15 +6167,15 @@
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-06/08-May%202025%20Report%20pptx%281%29.pptx_II.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1128",
       "parse_warnings": []
     },
     {
       "month": "2024-07",
-      "robusta_bags": 591392,
-      "arabica_bags": 59881,
-      "total_bags": 4823529,
-      "value_usd": 60.0,
+      "robusta_bags": 315165,
+      "arabica_bags": 30802,
+      "total_bags": 345967,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -6218,10 +6246,1816 @@
     },
     {
       "month": "2024-08",
-      "robusta_bags": 914448,
-      "arabica_bags": 13750,
-      "total_bags": 89,
-      "value_usd": 60.0,
+      "robusta_bags": 865535,
+      "arabica_bags": 29127,
+      "total_bags": 894662,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "FAQ",
+          "bags": 5250
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 13750
+        },
+        {
+          "grade": "Drugar",
+          "bags": 12500
+        },
+        {
+          "grade": "Wugar",
+          "bags": 2025
+        },
+        {
+          "grade": "Organic Robusta",
+          "bags": 1349
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 3040
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 147519
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 65872
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 475730
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 126921
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 33655
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 852
+        },
+        {
+          "grade": "Kiboko",
+          "bags": 5000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2025
+        },
+        {
+          "country": "Germany",
+          "bags": 2025
+        },
+        {
+          "country": "Sudan",
+          "bags": 20255
+        },
+        {
+          "country": "Brazil",
+          "bags": 169
+        },
+        {
+          "country": "Algeria",
+          "bags": 61327
+        },
+        {
+          "country": "Belgium",
+          "bags": 36429
+        },
+        {
+          "country": "Morocco",
+          "bags": 37196
+        },
+        {
+          "country": "India",
+          "bags": 29710
+        },
+        {
+          "country": "Spain",
+          "bags": 26453
+        },
+        {
+          "country": "China",
+          "bags": 17508
+        },
+        {
+          "country": "Netherlands",
+          "bags": 18885
+        },
+        {
+          "country": "Russia",
+          "bags": 13398
+        },
+        {
+          "country": "Switzerland",
+          "bags": 12411
+        },
+        {
+          "country": "Greece",
+          "bags": 9253
+        },
+        {
+          "country": "Egypt",
+          "bags": 9680
+        },
+        {
+          "country": "Portugal",
+          "bags": 6869
+        },
+        {
+          "country": "France",
+          "bags": 6280
+        },
+        {
+          "country": "Japan",
+          "bags": 3670
+        },
+        {
+          "country": "Turkey",
+          "bags": 4888
+        },
+        {
+          "country": "Tunisia",
+          "bags": 4930
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 2880
+        },
+        {
+          "country": "South Africa",
+          "bags": 1580
+        },
+        {
+          "country": "Australia",
+          "bags": 2686
+        },
+        {
+          "country": "Korea",
+          "bags": 320
+        },
+        {
+          "country": "Mexico",
+          "bags": 1160
+        },
+        {
+          "country": "Canada",
+          "bags": 986
+        },
+        {
+          "country": "Tanzania",
+          "bags": 700
+        },
+        {
+          "country": "Kenya",
+          "bags": 100
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 320
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1168",
+      "parse_warnings": []
+    },
+    {
+      "month": "2024-09",
+      "robusta_bags": 738444,
+      "arabica_bags": 32905,
+      "total_bags": 771349,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 6500
+        },
+        {
+          "grade": "FAQ",
+          "bags": 13500
+        },
+        {
+          "grade": "Drugar",
+          "bags": 14500
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 2390
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 134289
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 42983
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 425867
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 1630
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 109436
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 650
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 765
+        },
+        {
+          "grade": "Wugar",
+          "bags": 7390
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 10250
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2025
+        },
+        {
+          "country": "Sudan",
+          "bags": 2025
+        },
+        {
+          "country": "Brazil",
+          "bags": 169
+        },
+        {
+          "country": "Germany",
+          "bags": 77648
+        },
+        {
+          "country": "Algeria",
+          "bags": 45695
+        },
+        {
+          "country": "India",
+          "bags": 38111
+        },
+        {
+          "country": "Spain",
+          "bags": 31957
+        },
+        {
+          "country": "Morocco",
+          "bags": 33645
+        },
+        {
+          "country": "Belgium",
+          "bags": 28081
+        },
+        {
+          "country": "Russia",
+          "bags": 24619
+        },
+        {
+          "country": "Netherlands",
+          "bags": 17934
+        },
+        {
+          "country": "China",
+          "bags": 11033
+        },
+        {
+          "country": "Portugal",
+          "bags": 8534
+        },
+        {
+          "country": "Turkey",
+          "bags": 8888
+        },
+        {
+          "country": "Switzerland",
+          "bags": 5734
+        },
+        {
+          "country": "Greece",
+          "bags": 5540
+        },
+        {
+          "country": "Egypt",
+          "bags": 4746
+        },
+        {
+          "country": "Australia",
+          "bags": 3972
+        },
+        {
+          "country": "Japan",
+          "bags": 2450
+        },
+        {
+          "country": "South Africa",
+          "bags": 1280
+        },
+        {
+          "country": "Canada",
+          "bags": 1050
+        },
+        {
+          "country": "Korea",
+          "bags": 653
+        },
+        {
+          "country": "Tunisia",
+          "bags": 650
+        },
+        {
+          "country": "France",
+          "bags": 320
+        },
+        {
+          "country": "Kenya",
+          "bags": 100
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1196",
+      "parse_warnings": []
+    },
+    {
+      "month": "2024-10",
+      "robusta_bags": 51204,
+      "arabica_bags": 18940,
+      "total_bags": 70144,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "FAQ",
+          "bags": 6500
+        },
+        {
+          "grade": "Drugar",
+          "bags": 12500
+        },
+        {
+          "grade": "Organic Robusta",
+          "bags": 1736
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 5488
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 720
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 1740
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 1040
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 1440
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 25341
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 320
+        },
+        {
+          "grade": "Wugar",
+          "bags": 6120
+        },
+        {
+          "grade": "Kiboko",
+          "bags": 6000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Sudan",
+          "bags": 3500
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-11/October%202024.pdf",
+      "parse_warnings": []
+    },
+    {
+      "month": "2024-11",
+      "robusta_bags": 527033,
+      "arabica_bags": 33180,
+      "total_bags": 560213,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 7000
+        },
+        {
+          "grade": "FAQ",
+          "bags": 14500
+        },
+        {
+          "grade": "Drugar",
+          "bags": 16500
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 4661
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 85546
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 35259
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 295977
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 13163
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 68788
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 940
+        },
+        {
+          "grade": "Wugar",
+          "bags": 360
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 320
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 16000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2025
+        },
+        {
+          "country": "Brazil",
+          "bags": 169
+        },
+        {
+          "country": "Germany",
+          "bags": 70460
+        },
+        {
+          "country": "Algeria",
+          "bags": 51004
+        },
+        {
+          "country": "India",
+          "bags": 42198
+        },
+        {
+          "country": "Switzerland",
+          "bags": 31718
+        },
+        {
+          "country": "Sudan",
+          "bags": 28688
+        },
+        {
+          "country": "Morocco",
+          "bags": 24776
+        },
+        {
+          "country": "Spain",
+          "bags": 21605
+        },
+        {
+          "country": "Belgium",
+          "bags": 15076
+        },
+        {
+          "country": "Netherlands",
+          "bags": 15289
+        },
+        {
+          "country": "Russia",
+          "bags": 15615
+        },
+        {
+          "country": "Portugal",
+          "bags": 9950
+        },
+        {
+          "country": "China",
+          "bags": 9407
+        },
+        {
+          "country": "Greece",
+          "bags": 7479
+        },
+        {
+          "country": "Turkey",
+          "bags": 3254
+        },
+        {
+          "country": "Australia",
+          "bags": 3164
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3214
+        },
+        {
+          "country": "Tunisia",
+          "bags": 2574
+        },
+        {
+          "country": "Korea",
+          "bags": 2560
+        },
+        {
+          "country": "South Africa",
+          "bags": 1319
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1274
+        },
+        {
+          "country": "Kenya",
+          "bags": 333
+        },
+        {
+          "country": "Canada",
+          "bags": 1306
+        },
+        {
+          "country": "Japan",
+          "bags": 1270
+        },
+        {
+          "country": "Egypt",
+          "bags": 607
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1246",
+      "parse_warnings": []
+    },
+    {
+      "month": "2024-12",
+      "robusta_bags": 526033,
+      "arabica_bags": 34844,
+      "total_bags": 560877,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 6800
+        },
+        {
+          "grade": "FAQ",
+          "bags": 13700
+        },
+        {
+          "grade": "Drugar",
+          "bags": 16500
+        },
+        {
+          "grade": "Wugar",
+          "bags": 2024
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 4661
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 85546
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 35259
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 295977
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 13163
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 68788
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 940
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 320
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 16000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2025
+        },
+        {
+          "country": "Germany",
+          "bags": 74215
+        },
+        {
+          "country": "India",
+          "bags": 40415
+        },
+        {
+          "country": "Belgium",
+          "bags": 20066
+        },
+        {
+          "country": "Spain",
+          "bags": 21268
+        },
+        {
+          "country": "Russia",
+          "bags": 21172
+        },
+        {
+          "country": "Netherlands",
+          "bags": 16008
+        },
+        {
+          "country": "Morocco",
+          "bags": 18748
+        },
+        {
+          "country": "Algeria",
+          "bags": 13421
+        },
+        {
+          "country": "Sudan",
+          "bags": 12950
+        },
+        {
+          "country": "Greece",
+          "bags": 10762
+        },
+        {
+          "country": "Switzerland",
+          "bags": 9154
+        },
+        {
+          "country": "China",
+          "bags": 3910
+        },
+        {
+          "country": "Portugal",
+          "bags": 7378
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 6040
+        },
+        {
+          "country": "Tunisia",
+          "bags": 5662
+        },
+        {
+          "country": "Turkey",
+          "bags": 2804
+        },
+        {
+          "country": "Canada",
+          "bags": 2356
+        },
+        {
+          "country": "Australia",
+          "bags": 3291
+        },
+        {
+          "country": "Mexico",
+          "bags": 3200
+        },
+        {
+          "country": "France",
+          "bags": 2760
+        },
+        {
+          "country": "South Africa",
+          "bags": 999
+        },
+        {
+          "country": "Korea",
+          "bags": 320
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "Kenya",
+          "bags": 680
+        },
+        {
+          "country": "Egypt",
+          "bags": 316
+        },
+        {
+          "country": "Japan",
+          "bags": 150
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1262",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-01",
+      "robusta_bags": 58194,
+      "arabica_bags": 14530,
+      "total_bags": 72724,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "FAQ",
+          "bags": 7000
+        },
+        {
+          "grade": "Drugar",
+          "bags": 13250
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 1594
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 360
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 720
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 360
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 36528
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 3600
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 333
+        },
+        {
+          "grade": "Wugar",
+          "bags": 320
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 960
+        },
+        {
+          "grade": "Kiboko",
+          "bags": 6500
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 188459
+        },
+        {
+          "country": "Belgium",
+          "bags": 48657
+        },
+        {
+          "country": "India",
+          "bags": 50709
+        },
+        {
+          "country": "Sudan",
+          "bags": 51760
+        },
+        {
+          "country": "Germany",
+          "bags": 44946
+        },
+        {
+          "country": "Spain",
+          "bags": 22572
+        },
+        {
+          "country": "China",
+          "bags": 12837
+        },
+        {
+          "country": "Netherlands",
+          "bags": 7118
+        },
+        {
+          "country": "Morocco",
+          "bags": 13478
+        },
+        {
+          "country": "Egypt",
+          "bags": 5465
+        },
+        {
+          "country": "Russia",
+          "bags": 2306
+        },
+        {
+          "country": "Portugal",
+          "bags": 4440
+        },
+        {
+          "country": "France",
+          "bags": 2520
+        },
+        {
+          "country": "Turkey",
+          "bags": 2656
+        },
+        {
+          "country": "Japan",
+          "bags": 2618
+        },
+        {
+          "country": "Canada",
+          "bags": 1920
+        },
+        {
+          "country": "Switzerland",
+          "bags": 1666
+        },
+        {
+          "country": "Algeria",
+          "bags": 960
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "Australia",
+          "bags": 666
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-02/04-January%202025%20Report%20%281%29.Final_.pdf",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-02",
+      "robusta_bags": 407228,
+      "arabica_bags": 61516,
+      "total_bags": 468744,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 6250
+        },
+        {
+          "grade": "FAQ",
+          "bags": 12500
+        },
+        {
+          "grade": "Drugar",
+          "bags": 16500
+        },
+        {
+          "grade": "Bugisu AA",
+          "bags": 16500
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 3140
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 65371
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 17704
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 238243
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 5656
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 55180
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 1985
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 645
+        },
+        {
+          "grade": "Wugar",
+          "bags": 11871
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 16000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Brazil",
+          "bags": 395
+        },
+        {
+          "country": "Italy",
+          "bags": 2026
+        },
+        {
+          "country": "Germany",
+          "bags": 37953
+        },
+        {
+          "country": "Sudan",
+          "bags": 55824
+        },
+        {
+          "country": "India",
+          "bags": 34150
+        },
+        {
+          "country": "Belgium",
+          "bags": 19470
+        },
+        {
+          "country": "China",
+          "bags": 20378
+        },
+        {
+          "country": "Spain",
+          "bags": 29169
+        },
+        {
+          "country": "Morocco",
+          "bags": 17232
+        },
+        {
+          "country": "Algeria",
+          "bags": 15953
+        },
+        {
+          "country": "Portugal",
+          "bags": 7750
+        },
+        {
+          "country": "Russia",
+          "bags": 8675
+        },
+        {
+          "country": "Turkey",
+          "bags": 6770
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3013
+        },
+        {
+          "country": "Greece",
+          "bags": 6460
+        },
+        {
+          "country": "Netherlands",
+          "bags": 3133
+        },
+        {
+          "country": "Switzerland",
+          "bags": 4008
+        },
+        {
+          "country": "Egypt",
+          "bags": 3870
+        },
+        {
+          "country": "France",
+          "bags": 2856
+        },
+        {
+          "country": "Australia",
+          "bags": 1776
+        },
+        {
+          "country": "South Africa",
+          "bags": 790
+        },
+        {
+          "country": "Canada",
+          "bags": 700
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 960
+        },
+        {
+          "country": "Korea",
+          "bags": 973
+        },
+        {
+          "country": "Japan",
+          "bags": 640
+        },
+        {
+          "country": "Mexico",
+          "bags": 810
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1299",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-03",
+      "robusta_bags": 465819,
+      "arabica_bags": 42773,
+      "total_bags": 508592,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 5750
+        },
+        {
+          "grade": "FAQ",
+          "bags": 12250
+        },
+        {
+          "grade": "Drugar",
+          "bags": 15500
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 2026
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 62713
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 39480
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 269783
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 4974
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 63605
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 4039
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 1298
+        },
+        {
+          "grade": "Wugar",
+          "bags": 10975
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 15000
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Brazil",
+          "bags": 200
+        },
+        {
+          "country": "Italy",
+          "bags": 2026
+        },
+        {
+          "country": "United States",
+          "bags": 2026
+        },
+        {
+          "country": "Sudan",
+          "bags": 64864
+        },
+        {
+          "country": "Germany",
+          "bags": 36026
+        },
+        {
+          "country": "India",
+          "bags": 49702
+        },
+        {
+          "country": "Morocco",
+          "bags": 47307
+        },
+        {
+          "country": "Belgium",
+          "bags": 13913
+        },
+        {
+          "country": "China",
+          "bags": 8900
+        },
+        {
+          "country": "Algeria",
+          "bags": 16841
+        },
+        {
+          "country": "Spain",
+          "bags": 10353
+        },
+        {
+          "country": "Portugal",
+          "bags": 8963
+        },
+        {
+          "country": "Netherlands",
+          "bags": 3550
+        },
+        {
+          "country": "Russia",
+          "bags": 3678
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 3708
+        },
+        {
+          "country": "Greece",
+          "bags": 6190
+        },
+        {
+          "country": "Turkey",
+          "bags": 5514
+        },
+        {
+          "country": "Switzerland",
+          "bags": 5783
+        },
+        {
+          "country": "Egypt",
+          "bags": 5160
+        },
+        {
+          "country": "South Africa",
+          "bags": 2559
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 768
+        },
+        {
+          "country": "Canada",
+          "bags": 1630
+        },
+        {
+          "country": "Australia",
+          "bags": 973
+        },
+        {
+          "country": "Tanzania",
+          "bags": 1218
+        },
+        {
+          "country": "Japan",
+          "bags": 206
+        },
+        {
+          "country": "Kenya",
+          "bags": 720
+        },
+        {
+          "country": "Mexico",
+          "bags": 640
+        },
+        {
+          "country": "Korea",
+          "bags": 320
+        },
+        {
+          "country": "France",
+          "bags": 360
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1319",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-04",
+      "robusta_bags": 516535,
+      "arabica_bags": 39862,
+      "total_bags": 556397,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 5650
+        },
+        {
+          "grade": "FAQ",
+          "bags": 12000
+        },
+        {
+          "grade": "Drugar",
+          "bags": 15000
+        },
+        {
+          "grade": "Organic Robusta",
+          "bags": 2280
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 3110
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 71204
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 34516
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 267192
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 29841
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 88615
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 928
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 1378
+        },
+        {
+          "grade": "Wugar",
+          "bags": 8984
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 14500
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2026
+        },
+        {
+          "country": "Sudan",
+          "bags": 74790
+        },
+        {
+          "country": "Germany",
+          "bags": 49323
+        },
+        {
+          "country": "India",
+          "bags": 41902
+        },
+        {
+          "country": "Morocco",
+          "bags": 40191
+        },
+        {
+          "country": "China",
+          "bags": 17507
+        },
+        {
+          "country": "Spain",
+          "bags": 19986
+        },
+        {
+          "country": "Belgium",
+          "bags": 16280
+        },
+        {
+          "country": "Portugal",
+          "bags": 15324
+        },
+        {
+          "country": "Algeria",
+          "bags": 16767
+        },
+        {
+          "country": "Turkey",
+          "bags": 15568
+        },
+        {
+          "country": "Netherlands",
+          "bags": 8428
+        },
+        {
+          "country": "Russia",
+          "bags": 8457
+        },
+        {
+          "country": "Egypt",
+          "bags": 5610
+        },
+        {
+          "country": "South Africa",
+          "bags": 2295
+        },
+        {
+          "country": "Australia",
+          "bags": 2313
+        },
+        {
+          "country": "Switzerland",
+          "bags": 2573
+        },
+        {
+          "country": "Greece",
+          "bags": 1925
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 1924
+        },
+        {
+          "country": "Kenya",
+          "bags": 1800
+        },
+        {
+          "country": "Canada",
+          "bags": 1636
+        },
+        {
+          "country": "France",
+          "bags": 1080
+        },
+        {
+          "country": "Korea",
+          "bags": 650
+        },
+        {
+          "country": "Tanzania",
+          "bags": 551
+        },
+        {
+          "country": "Japan",
+          "bags": 100
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 320
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1333",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-05",
+      "robusta_bags": 424603,
+      "arabica_bags": 41509,
+      "total_bags": 466112,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "Kiboko",
+          "bags": 5750
+        },
+        {
+          "grade": "FAQ",
+          "bags": 11750
+        },
+        {
+          "grade": "Drugar",
+          "bags": 15750
+        },
+        {
+          "grade": "Organic Robusta",
+          "bags": 7172
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 2700
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 56545
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 23242
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 226779
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 8616
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 72522
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 8328
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 1220
+        },
+        {
+          "grade": "Wugar",
+          "bags": 9039
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 15500
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Italy",
+          "bags": 2026
+        },
+        {
+          "country": "Sudan",
+          "bags": 2026
+        },
+        {
+          "country": "Brazil",
+          "bags": 5835
+        },
+        {
+          "country": "Germany",
+          "bags": 56090
+        },
+        {
+          "country": "India",
+          "bags": 46245
+        },
+        {
+          "country": "Morocco",
+          "bags": 34132
+        },
+        {
+          "country": "Algeria",
+          "bags": 22594
+        },
+        {
+          "country": "China",
+          "bags": 14800
+        },
+        {
+          "country": "Spain",
+          "bags": 19549
+        },
+        {
+          "country": "Belgium",
+          "bags": 9433
+        },
+        {
+          "country": "Netherlands",
+          "bags": 8595
+        },
+        {
+          "country": "Portugal",
+          "bags": 14134
+        },
+        {
+          "country": "Russia",
+          "bags": 6934
+        },
+        {
+          "country": "Egypt",
+          "bags": 10480
+        },
+        {
+          "country": "Korea",
+          "bags": 320
+        },
+        {
+          "country": "Australia",
+          "bags": 1653
+        },
+        {
+          "country": "Greece",
+          "bags": 6270
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 2660
+        },
+        {
+          "country": "South Africa",
+          "bags": 1469
+        },
+        {
+          "country": "Turkey",
+          "bags": 4146
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 640
+        },
+        {
+          "country": "Mexico",
+          "bags": 3330
+        },
+        {
+          "country": "Canada",
+          "bags": 986
+        },
+        {
+          "country": "Switzerland",
+          "bags": 988
+        },
+        {
+          "country": "Uae",
+          "bags": 1400
+        },
+        {
+          "country": "Japan",
+          "bags": 306
+        },
+        {
+          "country": "Tanzania",
+          "bags": 872
+        },
+        {
+          "country": "Kenya",
+          "bags": 720
+        },
+        {
+          "country": "Tunisia",
+          "bags": 700
+        },
+        {
+          "country": "France",
+          "bags": 360
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/file-download/download/public/1348",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-06",
+      "robusta_bags": 811360,
+      "arabica_bags": 38379,
+      "total_bags": 849739,
+      "value_usd": null,
+      "by_grade": [
+        {
+          "grade": "FAQ",
+          "bags": 5750
+        },
+        {
+          "grade": "Arabica Parchment",
+          "bags": 14000
+        },
+        {
+          "grade": "Drugar",
+          "bags": 13500
+        },
+        {
+          "grade": "Washed Robusta",
+          "bags": 1960
+        },
+        {
+          "grade": "Screen 18",
+          "bags": 118034
+        },
+        {
+          "grade": "Screen 17",
+          "bags": 52786
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 497287
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 3600
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 124944
+        },
+        {
+          "grade": "BHP",
+          "bags": 1199
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 300
+        },
+        {
+          "grade": "Mt Elgon",
+          "bags": 435
+        },
+        {
+          "grade": "Wugar",
+          "bags": 10444
+        },
+        {
+          "grade": "Kiboko",
+          "bags": 5500
+        }
+      ],
+      "by_destination": [
+        {
+          "country": "Ethiopia",
+          "bags": 122
+        },
+        {
+          "country": "Belgium",
+          "bags": 13737
+        },
+        {
+          "country": "Switzerland",
+          "bags": 15459
+        },
+        {
+          "country": "Netherlands",
+          "bags": 15040
+        },
+        {
+          "country": "Greece",
+          "bags": 15555
+        },
+        {
+          "country": "France",
+          "bags": 9000
+        },
+        {
+          "country": "Portugal",
+          "bags": 9016
+        },
+        {
+          "country": "Mexico",
+          "bags": 9280
+        },
+        {
+          "country": "Turkey",
+          "bags": 8302
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 7241
+        },
+        {
+          "country": "Egypt",
+          "bags": 4250
+        },
+        {
+          "country": "Tunisia",
+          "bags": 3422
+        },
+        {
+          "country": "Japan",
+          "bags": 655
+        },
+        {
+          "country": "Australia",
+          "bags": 960
+        },
+        {
+          "country": "Canada",
+          "bags": 1370
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1280
+        },
+        {
+          "country": "Korea",
+          "bags": 640
+        },
+        {
+          "country": "Kenya",
+          "bags": 757
+        },
+        {
+          "country": "South Africa",
+          "bags": 660
+        }
+      ],
+      "parser_version": "v1_recent",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-07/09-June%202025%20Report%20pptx%281%29.pdf",
+      "parse_warnings": []
+    },
+    {
+      "month": "2025-07",
+      "robusta_bags": 865535,
+      "arabica_bags": 29127,
+      "total_bags": 894662,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "FAQ",
@@ -6403,11 +8237,11 @@
       "parse_warnings": []
     },
     {
-      "month": "2024-09",
-      "robusta_bags": 797363,
-      "arabica_bags": 22,
-      "total_bags": 92,
-      "value_usd": 60.0,
+      "month": "2025-08",
+      "robusta_bags": 738444,
+      "arabica_bags": 32905,
+      "total_bags": 771349,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -6573,47 +8407,51 @@
       "parse_warnings": []
     },
     {
-      "month": "2024-10",
-      "robusta_bags": 410053,
-      "arabica_bags": 59647,
-      "total_bags": null,
-      "value_usd": 60.0,
+      "month": "2025-09",
+      "robusta_bags": 698411,
+      "arabica_bags": 37593,
+      "total_bags": 736004,
+      "value_usd": null,
       "by_grade": [
         {
-          "grade": "FAQ",
+          "grade": "Kiboko",
           "bags": 6500
         },
         {
-          "grade": "Drugar",
-          "bags": 12500
+          "grade": "FAQ",
+          "bags": 13500
         },
         {
-          "grade": "Organic Robusta",
-          "bags": 1736
+          "grade": "Drugar",
+          "bags": 14500
+        },
+        {
+          "grade": "Bugisu A",
+          "bags": 2024
         },
         {
           "grade": "Washed Robusta",
-          "bags": 5488
+          "bags": 2513
         },
         {
           "grade": "Screen 18",
-          "bags": 720
-        },
-        {
-          "grade": "Screen 15",
-          "bags": 1740
-        },
-        {
-          "grade": "Screen 14",
-          "bags": 1040
-        },
-        {
-          "grade": "Screen 12",
-          "bags": 1440
+          "bags": 122141
         },
         {
           "grade": "Screen 17",
-          "bags": 25341
+          "bags": 49851
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 391894
+        },
+        {
+          "grade": "Screen 14",
+          "bags": 10305
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 99518
         },
         {
           "grade": "BHP",
@@ -6621,33 +8459,133 @@
         },
         {
           "grade": "Mt Elgon",
-          "bags": 320
+          "bags": 1319
+        },
+        {
+          "grade": "Sustainable",
+          "bags": 990
         },
         {
           "grade": "Wugar",
-          "bags": 6120
+          "bags": 5750
         },
         {
-          "grade": "Kiboko",
-          "bags": 6000
+          "grade": "Arabica Parchment",
+          "bags": 14000
         }
       ],
       "by_destination": [
         {
+          "country": "Italy",
+          "bags": 2025
+        },
+        {
           "country": "Sudan",
-          "bags": 3500
+          "bags": 2025
+        },
+        {
+          "country": "Brazil",
+          "bags": 169
+        },
+        {
+          "country": "Germany",
+          "bags": 105635
+        },
+        {
+          "country": "Morocco",
+          "bags": 63247
+        },
+        {
+          "country": "Algeria",
+          "bags": 50233
+        },
+        {
+          "country": "India",
+          "bags": 44129
+        },
+        {
+          "country": "Belgium",
+          "bags": 28914
+        },
+        {
+          "country": "Spain",
+          "bags": 22757
+        },
+        {
+          "country": "Netherlands",
+          "bags": 23883
+        },
+        {
+          "country": "Russia",
+          "bags": 24760
+        },
+        {
+          "country": "Switzerland",
+          "bags": 16837
+        },
+        {
+          "country": "China",
+          "bags": 12834
+        },
+        {
+          "country": "Portugal",
+          "bags": 8268
+        },
+        {
+          "country": "Turkey",
+          "bags": 8356
+        },
+        {
+          "country": "Korea",
+          "bags": 6980
+        },
+        {
+          "country": "France",
+          "bags": 5332
+        },
+        {
+          "country": "Egypt",
+          "bags": 4810
+        },
+        {
+          "country": "Australia",
+          "bags": 2339
+        },
+        {
+          "country": "Greece",
+          "bags": 2962
+        },
+        {
+          "country": "Tunisia",
+          "bags": 2560
+        },
+        {
+          "country": "Canada",
+          "bags": 1970
+        },
+        {
+          "country": "South Africa",
+          "bags": 333
+        },
+        {
+          "country": "Kenya",
+          "bags": 320
+        },
+        {
+          "country": "Japan",
+          "bags": 902
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-11/October%202024.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-10/12-September%202025%20Report%20pptx%281%29%20%281%29%20%281%29.pdf",
       "parse_warnings": []
     },
     {
-      "month": "2024-11",
-      "robusta_bags": 31,
-      "arabica_bags": 40467,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2025-10",
+      "robusta_bags": 527033,
+      "arabica_bags": 33180,
+      "total_bags": 560213,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -6817,11 +8755,11 @@
       "parse_warnings": []
     },
     {
-      "month": "2024-12",
-      "robusta_bags": 340839,
-      "arabica_bags": 58542,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2025-11",
+      "robusta_bags": 526033,
+      "arabica_bags": 34844,
+      "total_bags": 560877,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -6995,157 +8933,185 @@
       "parse_warnings": []
     },
     {
-      "month": "2025-01",
-      "robusta_bags": 402858,
-      "arabica_bags": 78078,
-      "total_bags": 88,
-      "value_usd": 60.0,
+      "month": "2025-12",
+      "robusta_bags": 332620,
+      "arabica_bags": 42636,
+      "total_bags": 375256,
+      "value_usd": null,
       "by_grade": [
         {
+          "grade": "Kiboko",
+          "bags": 6750
+        },
+        {
           "grade": "FAQ",
-          "bags": 7000
+          "bags": 13500
         },
         {
           "grade": "Drugar",
-          "bags": 13250
+          "bags": 16750
         },
         {
           "grade": "Washed Robusta",
-          "bags": 1594
+          "bags": 2025
         },
         {
           "grade": "Screen 18",
-          "bags": 360
-        },
-        {
-          "grade": "Screen 15",
-          "bags": 720
-        },
-        {
-          "grade": "Screen 12",
-          "bags": 360
+          "bags": 44325
         },
         {
           "grade": "Screen 17",
-          "bags": 36528
+          "bags": 26317
+        },
+        {
+          "grade": "Screen 15",
+          "bags": 190080
         },
         {
           "grade": "Screen 14",
-          "bags": 3600
+          "bags": 1773
+        },
+        {
+          "grade": "Screen 12",
+          "bags": 46651
         },
         {
           "grade": "BHP",
           "bags": 1199
         },
         {
-          "grade": "Sustainable",
-          "bags": 333
+          "grade": "Mt Elgon",
+          "bags": 1920
         },
         {
           "grade": "Wugar",
-          "bags": 320
+          "bags": 7466
         },
         {
-          "grade": "Mt Elgon",
-          "bags": 960
-        },
-        {
-          "grade": "Kiboko",
-          "bags": 6500
+          "grade": "Arabica Parchment",
+          "bags": 16500
         }
       ],
       "by_destination": [
         {
           "country": "Italy",
-          "bags": 188459
+          "bags": 2025
+        },
+        {
+          "country": "Ethiopia",
+          "bags": 2791
         },
         {
           "country": "Belgium",
-          "bags": 48657
-        },
-        {
-          "country": "India",
-          "bags": 50709
-        },
-        {
-          "country": "Sudan",
-          "bags": 51760
+          "bags": 17378
         },
         {
           "country": "Germany",
-          "bags": 44946
+          "bags": 33092
         },
         {
-          "country": "Spain",
-          "bags": 22572
+          "country": "India",
+          "bags": 26620
         },
         {
-          "country": "China",
-          "bags": 12837
-        },
-        {
-          "country": "Netherlands",
-          "bags": 7118
-        },
-        {
-          "country": "Morocco",
-          "bags": 13478
-        },
-        {
-          "country": "Egypt",
-          "bags": 5465
-        },
-        {
-          "country": "Russia",
-          "bags": 2306
-        },
-        {
-          "country": "Portugal",
-          "bags": 4440
-        },
-        {
-          "country": "France",
-          "bags": 2520
-        },
-        {
-          "country": "Turkey",
-          "bags": 2656
-        },
-        {
-          "country": "Japan",
-          "bags": 2618
-        },
-        {
-          "country": "Canada",
-          "bags": 1920
-        },
-        {
-          "country": "Switzerland",
-          "bags": 1666
+          "country": "Sudan",
+          "bags": 26945
         },
         {
           "country": "Algeria",
-          "bags": 960
+          "bags": 23615
         },
         {
-          "country": "Saudi Arabia",
-          "bags": 960
+          "country": "Morocco",
+          "bags": 22896
+        },
+        {
+          "country": "China",
+          "bags": 12037
+        },
+        {
+          "country": "Spain",
+          "bags": 18536
+        },
+        {
+          "country": "Russia",
+          "bags": 8383
+        },
+        {
+          "country": "France",
+          "bags": 1774
+        },
+        {
+          "country": "Greece",
+          "bags": 6863
+        },
+        {
+          "country": "Portugal",
+          "bags": 6375
         },
         {
           "country": "Australia",
-          "bags": 666
+          "bags": 4138
+        },
+        {
+          "country": "Switzerland",
+          "bags": 3230
+        },
+        {
+          "country": "Netherlands",
+          "bags": 1080
+        },
+        {
+          "country": "Turkey",
+          "bags": 2064
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 1706
+        },
+        {
+          "country": "Saudi Arabia",
+          "bags": 1990
+        },
+        {
+          "country": "Korea",
+          "bags": 1200
+        },
+        {
+          "country": "Kenya",
+          "bags": 640
+        },
+        {
+          "country": "Canada",
+          "bags": 700
+        },
+        {
+          "country": "South Africa",
+          "bags": 930
+        },
+        {
+          "country": "Egypt",
+          "bags": 920
+        },
+        {
+          "country": "Japan",
+          "bags": 759
+        },
+        {
+          "country": "Mexico",
+          "bags": 320
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-02/04-January%202025%20Report%20%281%29.Final_.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-02/03-December%202025%20Report%20pptx.pdf",
       "parse_warnings": []
     },
     {
-      "month": "2025-02",
-      "robusta_bags": 4,
-      "arabica_bags": 7,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2026-01",
+      "robusta_bags": 407228,
+      "arabica_bags": 61516,
+      "total_bags": 468744,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -7319,11 +9285,11 @@
       "parse_warnings": []
     },
     {
-      "month": "2025-03",
-      "robusta_bags": 79,
-      "arabica_bags": 11,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2026-02",
+      "robusta_bags": 465819,
+      "arabica_bags": 42773,
+      "total_bags": 508592,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -7505,11 +9471,11 @@
       "parse_warnings": []
     },
     {
-      "month": "2025-04",
-      "robusta_bags": 567405,
-      "arabica_bags": 6,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2026-03",
+      "robusta_bags": 516535,
+      "arabica_bags": 39862,
+      "total_bags": 556397,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -7683,11 +9649,11 @@
       "parse_warnings": []
     },
     {
-      "month": "2025-05",
-      "robusta_bags": 463361,
-      "arabica_bags": 128326,
-      "total_bags": 10,
-      "value_usd": 60.0,
+      "month": "2026-04",
+      "robusta_bags": 424603,
+      "arabica_bags": 41509,
+      "total_bags": 466112,
+      "value_usd": null,
       "by_grade": [
         {
           "grade": "Kiboko",
@@ -7874,500 +9840,6 @@
       ],
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-05/07-April%202026%20Report%20pptx%281%29%20%281%29.pdf",
-      "parse_warnings": []
-    },
-    {
-      "month": "2025-06",
-      "robusta_bags": 47,
-      "arabica_bags": 14000,
-      "total_bags": 87,
-      "value_usd": 60.0,
-      "by_grade": [
-        {
-          "grade": "FAQ",
-          "bags": 5750
-        },
-        {
-          "grade": "Arabica Parchment",
-          "bags": 14000
-        },
-        {
-          "grade": "Drugar",
-          "bags": 13500
-        },
-        {
-          "grade": "Washed Robusta",
-          "bags": 1960
-        },
-        {
-          "grade": "Screen 18",
-          "bags": 118034
-        },
-        {
-          "grade": "Screen 17",
-          "bags": 52786
-        },
-        {
-          "grade": "Screen 15",
-          "bags": 497287
-        },
-        {
-          "grade": "Screen 14",
-          "bags": 3600
-        },
-        {
-          "grade": "Screen 12",
-          "bags": 124944
-        },
-        {
-          "grade": "BHP",
-          "bags": 1199
-        },
-        {
-          "grade": "Sustainable",
-          "bags": 300
-        },
-        {
-          "grade": "Mt Elgon",
-          "bags": 435
-        },
-        {
-          "grade": "Wugar",
-          "bags": 10444
-        },
-        {
-          "grade": "Kiboko",
-          "bags": 5500
-        }
-      ],
-      "by_destination": [
-        {
-          "country": "Ethiopia",
-          "bags": 122
-        },
-        {
-          "country": "Belgium",
-          "bags": 13737
-        },
-        {
-          "country": "Switzerland",
-          "bags": 15459
-        },
-        {
-          "country": "Netherlands",
-          "bags": 15040
-        },
-        {
-          "country": "Greece",
-          "bags": 15555
-        },
-        {
-          "country": "France",
-          "bags": 9000
-        },
-        {
-          "country": "Portugal",
-          "bags": 9016
-        },
-        {
-          "country": "Mexico",
-          "bags": 9280
-        },
-        {
-          "country": "Turkey",
-          "bags": 8302
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 7241
-        },
-        {
-          "country": "Egypt",
-          "bags": 4250
-        },
-        {
-          "country": "Tunisia",
-          "bags": 3422
-        },
-        {
-          "country": "Japan",
-          "bags": 655
-        },
-        {
-          "country": "Australia",
-          "bags": 960
-        },
-        {
-          "country": "Canada",
-          "bags": 1370
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1280
-        },
-        {
-          "country": "Korea",
-          "bags": 640
-        },
-        {
-          "country": "Kenya",
-          "bags": 757
-        },
-        {
-          "country": "South Africa",
-          "bags": 660
-        }
-      ],
-      "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-07/09-June%202025%20Report%20pptx%281%29.pdf",
-      "parse_warnings": []
-    },
-    {
-      "month": "2025-09",
-      "robusta_bags": 513806,
-      "arabica_bags": 27512,
-      "total_bags": 10,
-      "value_usd": 60.0,
-      "by_grade": [
-        {
-          "grade": "Kiboko",
-          "bags": 6500
-        },
-        {
-          "grade": "FAQ",
-          "bags": 13500
-        },
-        {
-          "grade": "Drugar",
-          "bags": 14500
-        },
-        {
-          "grade": "Bugisu A",
-          "bags": 2024
-        },
-        {
-          "grade": "Washed Robusta",
-          "bags": 2513
-        },
-        {
-          "grade": "Screen 18",
-          "bags": 122141
-        },
-        {
-          "grade": "Screen 17",
-          "bags": 49851
-        },
-        {
-          "grade": "Screen 15",
-          "bags": 391894
-        },
-        {
-          "grade": "Screen 14",
-          "bags": 10305
-        },
-        {
-          "grade": "Screen 12",
-          "bags": 99518
-        },
-        {
-          "grade": "BHP",
-          "bags": 1199
-        },
-        {
-          "grade": "Mt Elgon",
-          "bags": 1319
-        },
-        {
-          "grade": "Sustainable",
-          "bags": 990
-        },
-        {
-          "grade": "Wugar",
-          "bags": 5750
-        },
-        {
-          "grade": "Arabica Parchment",
-          "bags": 14000
-        }
-      ],
-      "by_destination": [
-        {
-          "country": "Italy",
-          "bags": 2025
-        },
-        {
-          "country": "Sudan",
-          "bags": 2025
-        },
-        {
-          "country": "Brazil",
-          "bags": 169
-        },
-        {
-          "country": "Germany",
-          "bags": 105635
-        },
-        {
-          "country": "Morocco",
-          "bags": 63247
-        },
-        {
-          "country": "Algeria",
-          "bags": 50233
-        },
-        {
-          "country": "India",
-          "bags": 44129
-        },
-        {
-          "country": "Belgium",
-          "bags": 28914
-        },
-        {
-          "country": "Spain",
-          "bags": 22757
-        },
-        {
-          "country": "Netherlands",
-          "bags": 23883
-        },
-        {
-          "country": "Russia",
-          "bags": 24760
-        },
-        {
-          "country": "Switzerland",
-          "bags": 16837
-        },
-        {
-          "country": "China",
-          "bags": 12834
-        },
-        {
-          "country": "Portugal",
-          "bags": 8268
-        },
-        {
-          "country": "Turkey",
-          "bags": 8356
-        },
-        {
-          "country": "Korea",
-          "bags": 6980
-        },
-        {
-          "country": "France",
-          "bags": 5332
-        },
-        {
-          "country": "Egypt",
-          "bags": 4810
-        },
-        {
-          "country": "Australia",
-          "bags": 2339
-        },
-        {
-          "country": "Greece",
-          "bags": 2962
-        },
-        {
-          "country": "Tunisia",
-          "bags": 2560
-        },
-        {
-          "country": "Canada",
-          "bags": 1970
-        },
-        {
-          "country": "South Africa",
-          "bags": 333
-        },
-        {
-          "country": "Kenya",
-          "bags": 320
-        },
-        {
-          "country": "Japan",
-          "bags": 902
-        }
-      ],
-      "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-10/12-September%202025%20Report%20pptx%281%29%20%281%29%20%281%29.pdf",
-      "parse_warnings": []
-    },
-    {
-      "month": "2025-12",
-      "robusta_bags": 4,
-      "arabica_bags": 5,
-      "total_bags": 10,
-      "value_usd": 60.0,
-      "by_grade": [
-        {
-          "grade": "Kiboko",
-          "bags": 6750
-        },
-        {
-          "grade": "FAQ",
-          "bags": 13500
-        },
-        {
-          "grade": "Drugar",
-          "bags": 16750
-        },
-        {
-          "grade": "Washed Robusta",
-          "bags": 2025
-        },
-        {
-          "grade": "Screen 18",
-          "bags": 44325
-        },
-        {
-          "grade": "Screen 17",
-          "bags": 26317
-        },
-        {
-          "grade": "Screen 15",
-          "bags": 190080
-        },
-        {
-          "grade": "Screen 14",
-          "bags": 1773
-        },
-        {
-          "grade": "Screen 12",
-          "bags": 46651
-        },
-        {
-          "grade": "BHP",
-          "bags": 1199
-        },
-        {
-          "grade": "Mt Elgon",
-          "bags": 1920
-        },
-        {
-          "grade": "Wugar",
-          "bags": 7466
-        },
-        {
-          "grade": "Arabica Parchment",
-          "bags": 16500
-        }
-      ],
-      "by_destination": [
-        {
-          "country": "Italy",
-          "bags": 2025
-        },
-        {
-          "country": "Ethiopia",
-          "bags": 2791
-        },
-        {
-          "country": "Belgium",
-          "bags": 17378
-        },
-        {
-          "country": "Germany",
-          "bags": 33092
-        },
-        {
-          "country": "India",
-          "bags": 26620
-        },
-        {
-          "country": "Sudan",
-          "bags": 26945
-        },
-        {
-          "country": "Algeria",
-          "bags": 23615
-        },
-        {
-          "country": "Morocco",
-          "bags": 22896
-        },
-        {
-          "country": "China",
-          "bags": 12037
-        },
-        {
-          "country": "Spain",
-          "bags": 18536
-        },
-        {
-          "country": "Russia",
-          "bags": 8383
-        },
-        {
-          "country": "France",
-          "bags": 1774
-        },
-        {
-          "country": "Greece",
-          "bags": 6863
-        },
-        {
-          "country": "Portugal",
-          "bags": 6375
-        },
-        {
-          "country": "Australia",
-          "bags": 4138
-        },
-        {
-          "country": "Switzerland",
-          "bags": 3230
-        },
-        {
-          "country": "Netherlands",
-          "bags": 1080
-        },
-        {
-          "country": "Turkey",
-          "bags": 2064
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 1706
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1990
-        },
-        {
-          "country": "Korea",
-          "bags": 1200
-        },
-        {
-          "country": "Kenya",
-          "bags": 640
-        },
-        {
-          "country": "Canada",
-          "bags": 700
-        },
-        {
-          "country": "South Africa",
-          "bags": 930
-        },
-        {
-          "country": "Egypt",
-          "bags": 920
-        },
-        {
-          "country": "Japan",
-          "bags": 759
-        },
-        {
-          "country": "Mexico",
-          "bags": 320
-        }
-      ],
-      "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-02/03-December%202025%20Report%20pptx.pdf",
       "parse_warnings": []
     }
   ]
