@@ -10,19 +10,20 @@ import UgandaTypeShareChart from "@/components/supply/uganda/UgandaTypeShareChar
 import type { UgandaMonthlyFile, UgandaMonthlyRow } from "@/components/supply/uganda/helpers";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
-import UgandaDestPanel from "@/components/supply/uganda/UgandaDestinationsPanel";
 import UgandaTradeActors from "@/components/supply/uganda/UgandaTradeActorsPanel";
 // UgandaTab itself is dynamic-imported from supply/page.tsx with { ssr: false },
 // so these panels are already lazy-loaded as part of UgandaTab's chunk —
 // nested dynamic() would just add per-subtab RTTs without bundle-size benefit
 // (recharts and shared libs go into the vendor chunk regardless).
 
-type SubTab = "exports" | "supply-demand" | "destinations" | "trade-actors" | "farmer-economics" | "weather";
+type SubTab = "exports" | "supply-demand" | "trade-actors" | "farmer-economics" | "weather";
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: "exports",          label: "Exports" },
   { id: "supply-demand",    label: "Supply & Demand" },
-  { id: "destinations",     label: "Destinations" },
+  // "Destinations" sub-tab removed — the destination chart now lives in
+  // the Exports sub-tab (UgandaDestinationChart aggregates per-country
+  // across L12M/L24M/CTD/ALL windows + Robusta/Arabica stacking).
   { id: "trade-actors",     label: "Exporters / Buyers" },
   { id: "farmer-economics", label: "Farmer Economics" },
   { id: "weather",          label: "Weather" },
@@ -179,15 +180,6 @@ export default function UgandaTab() {
             Export data not yet available — run UCDA report bootstrap
           </div>
         )
-      )}
-
-      {data && subTab === "destinations" && (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <UgandaDestPanel
-            destinations={data.ucda_detail?.destinations ?? []}
-            month={data.ucda_detail?.month ?? ""}
-          />
-        </div>
       )}
 
       {data && subTab === "trade-actors" && (
