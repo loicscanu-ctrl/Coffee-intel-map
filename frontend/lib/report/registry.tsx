@@ -35,6 +35,14 @@ export interface ReportChartDef {
    * column so two consecutive half visuals pack side by side. Defaults to "full".
    */
   width?: "full" | "half";
+  /**
+   * Cart hierarchy mirroring the app's tab structure: category → group → subgroup
+   * → item (e.g. Supply → Brazil → Exports). Both optional; items with no group
+   * render directly under the category, items with no subgroup directly under the
+   * group. Order follows the registry array.
+   */
+  group?: string;
+  subgroup?: string;
 }
 
 const loading = () => <div className="p-4 text-xs text-slate-500">Loading…</div>;
@@ -97,6 +105,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_daily_registration",
     label: "Brazil — Daily Export Registration",
+    group: "Brazil",
+    subgroup: "Exports",
     category: "Supply",
     description: "Cecafe daily cumulative registration (Arabica + Conilon) vs prior crop years.",
     Component: dynamic(() => import("@/components/supply/BrazilTab/DailyRegistration"), { ssr: false, loading }),
@@ -105,6 +115,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_monthly_volume",
     label: "Brazil — Monthly Export Volume",
+    group: "Brazil",
+    subgroup: "Exports",
     category: "Supply",
     description: "Cecafe monthly export volumes by crop year (Apr–Mar).",
     Component: dynamic(() => import("@/components/report/charts/BrazilExportReports").then((m) => ({ default: m.BrazilMonthlyVolume })), { ssr: false, loading }),
@@ -113,6 +125,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_annual_trend",
     label: "Brazil — Annual Exports by Type",
+    group: "Brazil",
+    subgroup: "Exports",
     category: "Supply",
     description: "Cecafe crop-year exports split by arabica / conillon / soluble / R&G, with projected gap.",
     Component: dynamic(() => import("@/components/report/charts/BrazilAnnualTrendReport"), { ssr: false, loading }),
@@ -121,6 +135,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_cumulative_pace",
     label: "Brazil — Cumulative Crop-Year Pace",
+    group: "Brazil",
+    subgroup: "Exports",
     category: "Supply",
     description: "Current vs prior two crop years, cumulative export pace through the marketing year.",
     Component: dynamic(() => import("@/components/report/charts/BrazilExportReports").then((m) => ({ default: m.BrazilCumulativePace })), { ssr: false, loading }),
@@ -129,6 +145,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_destination",
     label: "Brazil — Export by Destination",
+    group: "Brazil",
+    subgroup: "Exports",
     category: "Supply",
     description: "Top destinations for Brazilian coffee, current vs prior period.",
     Component: dynamic(() => import("@/components/report/charts/BrazilExportReports").then((m) => ({ default: m.BrazilDestination })), { ssr: false, loading }),
@@ -137,6 +155,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_supply_demand",
     label: "Brazil — Supply & Demand",
+    group: "Brazil",
+    subgroup: "Supply & Demand",
     category: "Supply",
     description: "USDA PSD balance: production, exports, domestic use and ending stocks.",
     Component: dynamic(() => import("@/components/report/charts/SupplyDemandReports").then((m) => ({ default: m.BrazilSupplyDemand })), { ssr: false, loading }),
@@ -145,6 +165,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_weather_analogs",
     label: "Brazil — Top-5 Weather Analogs",
+    group: "Brazil",
+    subgroup: "Weather",
     category: "Supply",
     description: "Closest historical weather analogs with detrended crop outcomes.",
     Component: dynamic(() => import("@/components/report/charts/WeatherAnalogReports").then((m) => ({ default: m.BrazilWeatherAnalogs })), { ssr: false, loading }),
@@ -153,6 +175,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "brazil_weather_pack",
     label: "Brazil — Weather (rainfall & temperature)",
+    group: "Brazil",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.BrazilWeather })), { ssr: false, loading }),
@@ -161,6 +185,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_monthly_volume",
     label: "Vietnam — Monthly Export Volume",
+    group: "Vietnam",
+    subgroup: "Exports",
     category: "Supply",
     description: "Green coffee monthly exports by crop year (Oct–Sep).",
     Component: dynamic(() => import("@/components/report/charts/VietnamExportReports").then((m) => ({ default: m.VietnamMonthlyVolume })), { ssr: false, loading }),
@@ -169,6 +195,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_cumulative_pace",
     label: "Vietnam — Cumulative Crop-Year Pace",
+    group: "Vietnam",
+    subgroup: "Exports",
     category: "Supply",
     description: "Current vs prior crop years, cumulative export pace (Oct–Sep).",
     Component: dynamic(() => import("@/components/report/charts/VietnamExportReports").then((m) => ({ default: m.VietnamCumulativePace })), { ssr: false, loading }),
@@ -177,6 +205,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_annual_volume",
     label: "Vietnam — Annual Export Volume",
+    group: "Vietnam",
+    subgroup: "Exports",
     category: "Supply",
     description: "Annual green coffee export totals.",
     Component: dynamic(() => import("@/components/report/charts/VietnamExportReports").then((m) => ({ default: m.VietnamAnnualVolume })), { ssr: false, loading }),
@@ -185,6 +215,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_supply_demand",
     label: "Vietnam — Supply & Demand",
+    group: "Vietnam",
+    subgroup: "Supply & Demand",
     category: "Supply",
     description: "USDA PSD balance: production, exports, domestic use and ending stocks.",
     Component: dynamic(() => import("@/components/report/charts/SupplyDemandReports").then((m) => ({ default: m.VietnamSupplyDemand })), { ssr: false, loading }),
@@ -193,6 +225,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_weather_analogs",
     label: "Vietnam — Top-5 Weather Analogs",
+    group: "Vietnam",
+    subgroup: "Weather",
     category: "Supply",
     description: "Closest historical weather analogs with detrended crop outcomes.",
     Component: dynamic(() => import("@/components/report/charts/WeatherAnalogReports").then((m) => ({ default: m.VietnamWeatherAnalogs })), { ssr: false, loading }),
@@ -201,6 +235,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "vietnam_weather_pack",
     label: "Vietnam — Weather (rainfall & temperature)",
+    group: "Vietnam",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.VietnamWeather })), { ssr: false, loading }),
@@ -209,6 +245,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "colombia_weather_pack",
     label: "Colombia — Weather (rainfall & temperature)",
+    group: "Colombia",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.ColombiaWeather })), { ssr: false, loading }),
@@ -217,6 +255,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "honduras_weather_pack",
     label: "Honduras — Weather (rainfall & temperature)",
+    group: "Honduras",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.HondurasWeather })), { ssr: false, loading }),
@@ -225,6 +265,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "ethiopia_weather_pack",
     label: "Ethiopia — Weather (rainfall & temperature)",
+    group: "Ethiopia",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.EthiopiaWeather })), { ssr: false, loading }),
@@ -233,6 +275,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "uganda_weather_pack",
     label: "Uganda — Weather (rainfall & temperature)",
+    group: "Uganda",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.UgandaWeather })), { ssr: false, loading }),
@@ -241,6 +285,8 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "indonesia_weather_pack",
     label: "Indonesia — Weather (rainfall & temperature)",
+    group: "Indonesia",
+    subgroup: "Weather",
     category: "Supply",
     description: "Daily accumulated rainfall, mean temperature, monthly rainfall and cumulative YTD rainfall — prod-weighted.",
     Component: dynamic(() => import("@/components/report/charts/WeatherPackReports").then((m) => ({ default: m.IndonesiaWeather })), { ssr: false, loading }),
@@ -249,6 +295,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "enso_oni",
     label: "ENSO — ONI Trajectory & Analogs",
+    group: "Cross-origin",
     category: "Supply",
     description: "Current ONI window vs closest historical ENSO analogs (offset 0 = latest month).",
     Component: dynamic(() => import("@/components/report/charts/EnsoReport"), { ssr: false, loading }),
