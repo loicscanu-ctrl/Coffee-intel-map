@@ -1,0 +1,26 @@
+{
+  "_doc": "USDA FAS GAIN Uganda Coffee Annual — manually transcribed from UG2025-* (May 2025 release; the May 2026 release isn't yet captured by the live scraper because FAS Cloudflare-blocks GitHub Actions IPs with 403). Same seed-fallback mechanism as Brazil and Vietnam. Uganda exports are almost entirely green-bean — soluble/roast streams are negligible, so exports_mt ≈ bean_exports_mt.",
+  "source": "USDA FAS GAIN UG2025-* (Uganda Coffee Annual, May 2025)",
+  "last_updated": "2026-06-10",
+  "annual": [
+    {
+      "year": "2026",
+      "production_mt":      412800,
+      "exports_mt":         391800,
+      "bean_exports_mt":    391800,
+      "soluble_exports_mt":      0,
+      "roast_exports_mt":        0,
+      "consumption_mt":      19800,
+      "stocks_mt":           19140,
+      "begin_stocks_mt":     17940,
+      "imports_mt":              0
+    }
+  ],
+  "latest_year":            "2026",
+  "latest_production_mt":   412800,
+  "latest_exports_mt":      391800,
+  "latest_consumption_mt":  19800,
+  "latest_stocks_mt":       19140,
+  "latest_begin_stocks_mt": 17940,
+  "source_pdf": "https://www.fas.usda.gov/data/uganda-coffee-annual-7"
+}

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
 import UgandaExportPanel from "@/components/supply/uganda/UgandaExportPanel";
 import UgandaFarmerEconomics from "@/components/supply/uganda/UgandaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
@@ -137,11 +138,14 @@ export default function UgandaTab() {
 
       {data && subTab === "exports" && (
         data.exports ? (
-          <UgandaExportPanel
-            exports={data.exports}
-            ucda_price={data.ucda_price ?? null}
-            ucda_detail={data.ucda_detail ?? null}
-          />
+          <div className="space-y-4">
+            <UgandaExportPanel
+              exports={data.exports}
+              ucda_price={data.ucda_price ?? null}
+              ucda_detail={data.ucda_detail ?? null}
+            />
+            <UgandaAnnualTrendChart monthly={data.exports.monthly} />
+          </div>
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
             Export data not yet available — run UCDA report bootstrap

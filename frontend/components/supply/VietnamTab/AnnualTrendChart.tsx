@@ -7,34 +7,13 @@ import {
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { TT_STYLE, vnCropYearKey, kBagsToKT } from "./helpers";
 import type { ExportMonth } from "./MonthlyVolumeChart";
-
-/** USDA PSD row shape from demand_stocks.json. We may consult two of them:
- *  the latest realized year (proxy when no forecast exists) and the row
- *  that explicitly carries the in-progress USDA marketing-year forecast. */
-interface VnPSDRow {
-  year?: string;
-  begin_stocks_mt?: number;
-  stocks_mt?: number;
-  production_mt?: number;
-  consumption_mt?: number;
-}
-
-/** USDA MY for Vietnam (Oct–Sep) is labelled by the ENDING calendar year.
- *  Currently in MY 25/26 (Oct 2025–Sep 2026) → label "2026". From Oct
- *  onwards we roll into the next ending year. */
-function _inProgressUsdaYear(today: Date): string {
-  const m = today.getUTCMonth();      // 0..11
-  const y = today.getUTCFullYear();
-  return String(m >= 9 ? y + 1 : y);
-}
+import {
+  computeBalanceSheet, formatBalanceSheetTooltip, selectProjectionRows,
+  usdaYearForCropYear, type PsdRow,
+} from "@/lib/balanceSheetProjection";
 
 export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }) {
-  // Two rows: the forecast for the in-progress USDA MY (if USDA has
-  // published it via GAIN already), and the latest realized row as a
-  // fallback proxy. Pre-merger demand_stocks only carries realized data,
-  // so we need both code paths.
-  const [forecastRow, setForecastRow] = useState<VnPSDRow | null>(null);
-  const [latestRow,   setLatestRow]   = useState<VnPSDRow | null>(null);
+  const [rows, setRows] = useState<PsdRow[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,17 +21,14 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
         if (cancelled) return;
-        const rows: VnPSDRow[] = d?.producers?.vietnam?.annual ?? [];
-        if (!rows.length) return;
-        const target = _inProgressUsdaYear(new Date());
-        setForecastRow(rows.find(r => r.year === target) ?? null);
-        setLatestRow(rows[rows.length - 1]);
+        const a = d?.producers?.vietnam?.annual ?? null;
+        setRows(Array.isArray(a) ? a : null);
       })
       .catch(() => { /* silent — projection falls back to "no gap" */ });
     return () => { cancelled = true; };
   }, []);
 
-  const { data, projMeta } = useMemo(() => {
+  const { data, projection } = useMemo(() => {
     const byCrop: Record<string, { kt: number; months: number }> = {};
     monthly.forEach(r => {
       const key = vnCropYearKey(r.month);
@@ -62,59 +38,27 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
     });
     const keys = Object.keys(byCrop).sort();
     const latestKey = keys[keys.length - 1];
+    const latestData = byCrop[latestKey];
+    const incomplete = latestData && latestData.months < 12;
 
-    // Balance-sheet projection (per user spec): for the in-progress crop year,
-    //   total expected exports = prior year's ending stocks
-    //                          + this year's production
-    //                          − this year's consumption
-    //
-    // Two source rows depending on what demand_stocks.json carries:
-    //   • `forecastRow` — USDA's GAIN forecast row for the in-progress MY
-    //     (added by the usda_gain_pdf scraper). begin_stocks_mt = opening
-    //     of THIS year; production/consumption are the published forecasts.
-    //   • `latestRow`   — the latest realized row, used as a proxy when no
-    //     GAIN forecast is in the file yet. The realized row's stocks_mt
-    //     (= ENDING of last year) = opening of THIS year; production /
-    //     consumption are used as proxies for the in-progress year.
-    //
-    // Linear pace extrapolation is intentionally NOT used — that overstated
-    // the gap because Vietnam's crop is heavily front-loaded.
-    let proj = 0;
-    let projTotal = 0;
-    let projOpening = 0;
-    let projProd    = 0;
-    let projCons    = 0;
-    let psdYear: string | undefined;
-    let psdMode: "forecast" | "proxy" | null = null;
-    const incomplete = byCrop[latestKey].months < 12;
-    if (incomplete) {
-      const row = forecastRow ?? latestRow;
-      if (row) {
-        const openingMt = forecastRow
-          ? (forecastRow.begin_stocks_mt ?? 0)   // GAIN row: opening of in-progress year
-          : (latestRow?.stocks_mt        ?? 0);  // proxy: prior year's ENDING
-        projOpening = openingMt           / 1000;        // MT → kt
-        projProd    = (row.production_mt  ?? 0) / 1000;
-        projCons    = (row.consumption_mt ?? 0) / 1000;
-        projTotal   = projOpening + projProd - projCons;
-        proj        = Math.max(0, projTotal - byCrop[latestKey].kt);
-        proj        = Math.round(proj * 10) / 10;
-        psdYear     = row.year;
-        psdMode     = forecastRow ? "forecast" : "proxy";
-      }
-    }
+    // Derive USDA MY ending-year label from the latest crop-year key.
+    const inYear = usdaYearForCropYear(latestKey);
+    const { forecastRow, latestRow } = selectProjectionRows(rows, inYear);
+    const proj = incomplete
+      ? computeBalanceSheet(forecastRow, latestRow, latestData.kt)
+      : null;
 
+    const projGap = proj ? proj.projected_gap_kt : 0;
     return {
       data: keys.map(k => ({
         year:      k,
         actual:    Math.round(byCrop[k].kt * 10) / 10,
-        projected: k === latestKey ? proj : 0,
+        projected: k === latestKey && incomplete ? projGap : 0,
         months:    byCrop[k].months,
       })),
-      projMeta: { proj, total: projTotal, opening: projOpening, prod: projProd, cons: projCons,
-                  psdYear, psdMode, incomplete },
+      projection: proj,
     };
-  }, [monthly, forecastRow, latestRow]);
+  }, [monthly, rows]);
 
   if (data.length < 2) return null;
 
@@ -124,21 +68,14 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
         <div className="text-sm font-semibold text-slate-200">Annual Export Volume</div>
         <div className="text-[10px] text-slate-500">
           Crop year totals (Oct–Sep) · kt · † projected when crop is incomplete
-          {projMeta.incomplete && projMeta.total > 0 && (
+          {projection && (
             <span
               className="ml-1 italic"
-              title={
-                `Balance-sheet projection (USDA PSD ${projMeta.psdYear ?? "latest"}` +
-                `${projMeta.psdMode === "forecast" ? " forecast" : " proxy"}):\n` +
-                `  + Opening stocks   ${Math.round(projMeta.opening).toLocaleString()} kt\n` +
-                `  + Production        ${Math.round(projMeta.prod).toLocaleString()} kt\n` +
-                `  − Consumption       ${Math.round(projMeta.cons).toLocaleString()} kt\n` +
-                `  = Expected exports  ${Math.round(projMeta.total).toLocaleString()} kt`
-              }>
-              · expected total {Math.round(projMeta.total).toLocaleString()} kt
-              {projMeta.psdYear && (
+              title={formatBalanceSheetTooltip(projection)}>
+              · expected total {Math.round(projection.expected_total_kt).toLocaleString()} kt
+              {projection.psd_year && (
                 <span className="text-slate-600 not-italic">
-                  {" "}(USDA {projMeta.psdYear}{projMeta.psdMode === "proxy" ? " proxy" : ""})
+                  {" "}(USDA {projection.psd_year}{projection.mode === "proxy" ? " proxy" : ""})
                 </span>
               )}
             </span>
