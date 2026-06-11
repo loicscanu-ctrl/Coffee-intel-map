@@ -127,8 +127,8 @@
         {
           "country": "Japan",
           "bags": 3373,
-          "robusta_bags": 2773,
-          "arabica_bags": 600
+          "robusta_bags": 2880,
+          "arabica_bags": 493
         },
         {
           "country": "South Africa",
@@ -137,10 +137,16 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 1920,
+          "robusta_bags": 1920,
+          "arabica_bags": 0
+        },
+        {
           "country": "France",
           "bags": 1848,
-          "robusta_bags": 1528,
-          "arabica_bags": 320
+          "robusta_bags": 1600,
+          "arabica_bags": 248
         },
         {
           "country": "Mexico",
@@ -174,9 +180,9 @@
         },
         {
           "country": "Algeria",
-          "bags": 660,
+          "bags": 2020,
           "robusta_bags": 660,
-          "arabica_bags": 0
+          "arabica_bags": 1360
         },
         {
           "country": "Turkey",
@@ -187,11 +193,29 @@
         {
           "country": "Kenya",
           "bags": 654,
-          "robusta_bags": 334,
-          "arabica_bags": 320
+          "robusta_bags": 600,
+          "arabica_bags": 54
+        },
+        {
+          "country": "Poland",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
         },
         {
           "country": "Canada",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -419,9 +443,21 @@
           "arabica_bags": 0
         },
         {
+          "country": "Poland",
+          "bags": 350,
+          "robusta_bags": 350,
+          "arabica_bags": 0
+        },
+        {
           "country": "Turkey",
           "bags": 350,
           "robusta_bags": 350,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 320,
+          "robusta_bags": 320,
           "arabica_bags": 0
         }
       ],
@@ -571,6 +607,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 2110,
+          "robusta_bags": 2110,
+          "arabica_bags": 0
+        },
+        {
           "country": "Mexico",
           "bags": 1790,
           "robusta_bags": 1790,
@@ -640,6 +682,12 @@
           "country": "Turkey",
           "bags": 320,
           "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 283,
+          "robusta_bags": 283,
           "arabica_bags": 0
         }
       ],
@@ -777,6 +825,12 @@
           "arabica_bags": 640
         },
         {
+          "country": "Israel",
+          "bags": 3520,
+          "robusta_bags": 2240,
+          "arabica_bags": 1280
+        },
+        {
           "country": "Australia",
           "bags": 2645,
           "robusta_bags": 1332,
@@ -787,6 +841,12 @@
           "bags": 2434,
           "robusta_bags": 2434,
           "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1780,
+          "robusta_bags": 1430,
+          "arabica_bags": 350
         },
         {
           "country": "Greece",
@@ -813,16 +873,40 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 700,
+          "robusta_bags": 700,
+          "arabica_bags": 0
+        },
+        {
           "country": "Netherlands",
           "bags": 700,
           "robusta_bags": 350,
           "arabica_bags": 350
         },
         {
+          "country": "Estonia",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 350,
+          "robusta_bags": 350,
+          "arabica_bags": 0
+        },
+        {
           "country": "China",
           "bags": 320,
           "robusta_bags": 200,
           "arabica_bags": 120
+        },
+        {
+          "country": "Singapore",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
         },
         {
           "country": "Switzerland",
@@ -961,6 +1045,12 @@
           "arabica_bags": 1430
         },
         {
+          "country": "Israel",
+          "bags": 4800,
+          "robusta_bags": 3200,
+          "arabica_bags": 1600
+        },
+        {
           "country": "Korea",
           "bags": 4776,
           "robusta_bags": 4456,
@@ -991,6 +1081,12 @@
           "arabica_bags": 660
         },
         {
+          "country": "Croatia",
+          "bags": 2800,
+          "robusta_bags": 2800,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 1720,
           "robusta_bags": 1080,
@@ -1016,6 +1112,12 @@
         },
         {
           "country": "Australia",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -1165,6 +1267,12 @@
           "arabica_bags": 1290
         },
         {
+          "country": "Israel",
+          "bags": 7400,
+          "robusta_bags": 4800,
+          "arabica_bags": 2600
+        },
+        {
           "country": "Netherlands",
           "bags": 4374,
           "robusta_bags": 3654,
@@ -1240,6 +1348,18 @@
           "country": "South Africa",
           "bags": 620,
           "robusta_bags": 620,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 350,
+          "robusta_bags": 350,
           "arabica_bags": 0
         },
         {
@@ -1401,6 +1521,12 @@
           "arabica_bags": 3840
         },
         {
+          "country": "Israel",
+          "bags": 6410,
+          "robusta_bags": 3530,
+          "arabica_bags": 2880
+        },
+        {
           "country": "Portugal",
           "bags": 4996,
           "robusta_bags": 4996,
@@ -1435,6 +1561,12 @@
           "bags": 1600,
           "robusta_bags": 1280,
           "arabica_bags": 320
+        },
+        {
+          "country": "Poland",
+          "bags": 1440,
+          "robusta_bags": 1080,
+          "arabica_bags": 360
         },
         {
           "country": "United Kingdom",
@@ -1627,6 +1759,12 @@
           "arabica_bags": 1290
         },
         {
+          "country": "Israel",
+          "bags": 7054,
+          "robusta_bags": 4494,
+          "arabica_bags": 2560
+        },
+        {
           "country": "Japan",
           "bags": 5975,
           "robusta_bags": 4860,
@@ -1637,6 +1775,12 @@
           "bags": 4134,
           "robusta_bags": 3480,
           "arabica_bags": 654
+        },
+        {
+          "country": "Poland",
+          "bags": 2520,
+          "robusta_bags": 2160,
+          "arabica_bags": 360
         },
         {
           "country": "Portugal",
@@ -1687,6 +1831,12 @@
           "arabica_bags": 300
         },
         {
+          "country": "Romania",
+          "bags": 855,
+          "robusta_bags": 855,
+          "arabica_bags": 0
+        },
+        {
           "country": "Turkey",
           "bags": 640,
           "robusta_bags": 320,
@@ -1699,6 +1849,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
+        },
+        {
           "country": "Australia",
           "bags": 333,
           "robusta_bags": 333,
@@ -1708,6 +1864,12 @@
           "country": "Canada",
           "bags": 320,
           "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 100,
+          "robusta_bags": 100,
           "arabica_bags": 0
         },
         {
@@ -1783,136 +1945,10 @@
       ],
       "by_destination": [
         {
-          "country": "Germany",
-          "bags": 62656,
-          "robusta_bags": 50386,
-          "arabica_bags": 12270
-        },
-        {
-          "country": "Italy",
-          "bags": 149355,
-          "robusta_bags": 138286,
-          "arabica_bags": 11069
-        },
-        {
-          "country": "Sudan",
-          "bags": 114166,
-          "robusta_bags": 114166,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 41281,
-          "robusta_bags": 35141,
-          "arabica_bags": 6140
-        },
-        {
-          "country": "India",
-          "bags": 37415,
-          "robusta_bags": 37130,
-          "arabica_bags": 285
-        },
-        {
-          "country": "Morocco",
-          "bags": 20080,
-          "robusta_bags": 18160,
-          "arabica_bags": 1920
-        },
-        {
-          "country": "United States",
-          "bags": 17180,
-          "robusta_bags": 14940,
-          "arabica_bags": 2240
-        },
-        {
-          "country": "Spain",
-          "bags": 14790,
-          "robusta_bags": 12520,
-          "arabica_bags": 2270
-        },
-        {
-          "country": "Russia",
-          "bags": 7241,
-          "robusta_bags": 6591,
-          "arabica_bags": 650
-        },
-        {
-          "country": "Portugal",
-          "bags": 6699,
-          "robusta_bags": 6699,
-          "arabica_bags": 0
-        },
-        {
-          "country": "China",
-          "bags": 5905,
-          "robusta_bags": 5585,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 3630,
-          "robusta_bags": 3330,
-          "arabica_bags": 300
-        },
-        {
-          "country": "Japan",
-          "bags": 3278,
-          "robusta_bags": 2793,
-          "arabica_bags": 485
-        },
-        {
-          "country": "Greece",
-          "bags": 2374,
-          "robusta_bags": 2040,
-          "arabica_bags": 334
-        },
-        {
-          "country": "South Africa",
-          "bags": 1920,
-          "robusta_bags": 1600,
-          "arabica_bags": 320
-        },
-        {
-          "country": "France",
-          "bags": 1770,
-          "robusta_bags": 1770,
-          "arabica_bags": 0
-        },
-        {
           "country": "Australia",
-          "bags": 1165,
-          "robusta_bags": 845,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Turkey",
-          "bags": 990,
-          "robusta_bags": 670,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Algeria",
-          "bags": 960,
-          "robusta_bags": 960,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 300,
-          "robusta_bags": 269,
-          "arabica_bags": 31
+          "bags": 50750,
+          "robusta_bags": 5200,
+          "arabica_bags": 45550
         }
       ],
       "parser_version": "v1_recent",
@@ -2063,6 +2099,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 4462,
+          "robusta_bags": 3560,
+          "arabica_bags": 902
+        },
+        {
           "country": "Korea",
           "bags": 3650,
           "robusta_bags": 3650,
@@ -2085,6 +2127,18 @@
           "bags": 2270,
           "robusta_bags": 2270,
           "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1000,
+          "robusta_bags": 640,
+          "arabica_bags": 360
         },
         {
           "country": "South Africa",
@@ -2124,6 +2178,12 @@
         },
         {
           "country": "Canada",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -2205,12 +2265,6 @@
       ],
       "by_destination": [
         {
-          "country": "Belgium",
-          "bags": 35810,
-          "robusta_bags": 21990,
-          "arabica_bags": 13820
-        },
-        {
           "country": "Italy",
           "bags": 131400,
           "robusta_bags": 126096,
@@ -2227,6 +2281,12 @@
           "bags": 60453,
           "robusta_bags": 43923,
           "arabica_bags": 16530
+        },
+        {
+          "country": "Belgium",
+          "bags": 35810,
+          "robusta_bags": 21990,
+          "arabica_bags": 13820
         },
         {
           "country": "India",
@@ -2265,6 +2325,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 4470,
+          "robusta_bags": 2930,
+          "arabica_bags": 1540
+        },
+        {
           "country": "Portugal",
           "bags": 3996,
           "robusta_bags": 2997,
@@ -2285,20 +2351,26 @@
         {
           "country": "Kenya",
           "bags": 2087,
-          "robusta_bags": 1280,
-          "arabica_bags": 807
+          "robusta_bags": 1667,
+          "arabica_bags": 420
         },
         {
           "country": "Canada",
           "bags": 1654,
-          "robusta_bags": 988,
-          "arabica_bags": 666
+          "robusta_bags": 1440,
+          "arabica_bags": 214
         },
         {
           "country": "Egypt",
           "bags": 1280,
           "robusta_bags": 1280,
           "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1054,
+          "robusta_bags": 720,
+          "arabica_bags": 334
         },
         {
           "country": "Korea",
@@ -2313,6 +2385,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 720,
+          "robusta_bags": 720,
+          "arabica_bags": 0
+        },
+        {
           "country": "Turkey",
           "bags": 334,
           "robusta_bags": 334,
@@ -2320,6 +2398,12 @@
         },
         {
           "country": "Australia",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -2455,6 +2539,12 @@
           "arabica_bags": 666
         },
         {
+          "country": "Israel",
+          "bags": 8290,
+          "robusta_bags": 4800,
+          "arabica_bags": 3490
+        },
+        {
           "country": "Algeria",
           "bags": 7848,
           "robusta_bags": 7848,
@@ -2485,6 +2575,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 3074,
+          "robusta_bags": 2420,
+          "arabica_bags": 654
+        },
+        {
           "country": "Egypt",
           "bags": 1730,
           "robusta_bags": 1380,
@@ -2497,16 +2593,28 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1050,
+          "robusta_bags": 1050,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 1010,
-          "robusta_bags": 960,
-          "arabica_bags": 50
+          "robusta_bags": 990,
+          "arabica_bags": 20
         },
         {
           "country": "Australia",
-          "bags": 960,
-          "robusta_bags": 640,
-          "arabica_bags": 320
+          "bags": 2020,
+          "robusta_bags": 960,
+          "arabica_bags": 1060
         },
         {
           "country": "United Kingdom",
@@ -2615,22 +2723,16 @@
           "arabica_bags": 4560
         },
         {
-          "country": "Sudan",
-          "bags": 53650,
-          "robusta_bags": 53200,
-          "arabica_bags": 450
-        },
-        {
-          "country": "Brazil",
-          "bags": 219,
-          "robusta_bags": 170,
-          "arabica_bags": 49
-        },
-        {
           "country": "Germany",
           "bags": 59705,
           "robusta_bags": 52705,
           "arabica_bags": 7000
+        },
+        {
+          "country": "Sudan",
+          "bags": 53650,
+          "robusta_bags": 53200,
+          "arabica_bags": 450
         },
         {
           "country": "Belgium",
@@ -2669,10 +2771,22 @@
           "arabica_bags": 0
         },
         {
+          "country": "Poland",
+          "bags": 5200,
+          "robusta_bags": 2880,
+          "arabica_bags": 2320
+        },
+        {
           "country": "Russia",
           "bags": 5147,
           "robusta_bags": 5147,
           "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 3570,
+          "robusta_bags": 3280,
+          "arabica_bags": 290
         },
         {
           "country": "Japan",
@@ -2690,6 +2804,12 @@
           "country": "Portugal",
           "bags": 3290,
           "robusta_bags": 3290,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 2160,
+          "robusta_bags": 2160,
           "arabica_bags": 0
         },
         {
@@ -2727,6 +2847,12 @@
           "bags": 700,
           "robusta_bags": 700,
           "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 2021,
+          "robusta_bags": 668,
+          "arabica_bags": 1353
         },
         {
           "country": "France",
@@ -2889,6 +3015,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 5570,
+          "robusta_bags": 4960,
+          "arabica_bags": 610
+        },
+        {
           "country": "Switzerland",
           "bags": 5342,
           "robusta_bags": 5320,
@@ -2907,6 +3039,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Poland",
+          "bags": 2805,
+          "robusta_bags": 2455,
+          "arabica_bags": 350
+        },
+        {
           "country": "Greece",
           "bags": 2100,
           "robusta_bags": 2100,
@@ -2915,8 +3053,14 @@
         {
           "country": "Japan",
           "bags": 1640,
-          "robusta_bags": 1040,
-          "arabica_bags": 600
+          "robusta_bags": 1600,
+          "arabica_bags": 40
+        },
+        {
+          "country": "Romania",
+          "bags": 1400,
+          "robusta_bags": 1400,
+          "arabica_bags": 0
         },
         {
           "country": "France",
@@ -2932,9 +3076,9 @@
         },
         {
           "country": "Australia",
-          "bags": 988,
-          "robusta_bags": 668,
-          "arabica_bags": 320
+          "bags": 2021,
+          "robusta_bags": 988,
+          "arabica_bags": 1033
         },
         {
           "country": "Netherlands",
@@ -2952,6 +3096,12 @@
           "country": "South Africa",
           "bags": 320,
           "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 180,
+          "robusta_bags": 180,
           "arabica_bags": 0
         }
       ],
@@ -3021,12 +3171,6 @@
       ],
       "by_destination": [
         {
-          "country": "Morocco",
-          "bags": 18411,
-          "robusta_bags": 17771,
-          "arabica_bags": 640
-        },
-        {
           "country": "Italy",
           "bags": 145566,
           "robusta_bags": 135819,
@@ -3075,6 +3219,12 @@
           "arabica_bags": 7099
         },
         {
+          "country": "Morocco",
+          "bags": 18411,
+          "robusta_bags": 17771,
+          "arabica_bags": 640
+        },
+        {
           "country": "Portugal",
           "bags": 8034,
           "robusta_bags": 8034,
@@ -3099,6 +3249,12 @@
           "arabica_bags": 683
         },
         {
+          "country": "Israel",
+          "bags": 5040,
+          "robusta_bags": 5040,
+          "arabica_bags": 0
+        },
+        {
           "country": "France",
           "bags": 2700,
           "robusta_bags": 2700,
@@ -3109,6 +3265,12 @@
           "bags": 2664,
           "robusta_bags": 1344,
           "arabica_bags": 1320
+        },
+        {
+          "country": "Croatia",
+          "bags": 2520,
+          "robusta_bags": 2520,
+          "arabica_bags": 0
         },
         {
           "country": "Egypt",
@@ -3141,6 +3303,12 @@
           "arabica_bags": 570
         },
         {
+          "country": "Romania",
+          "bags": 1014,
+          "robusta_bags": 654,
+          "arabica_bags": 360
+        },
+        {
           "country": "Switzerland",
           "bags": 988,
           "robusta_bags": 988,
@@ -3148,20 +3316,26 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 986,
+          "bags": 2021,
           "robusta_bags": 986,
-          "arabica_bags": 0
+          "arabica_bags": 1035
         },
         {
           "country": "Korea",
           "bags": 782,
-          "robusta_bags": 482,
-          "arabica_bags": 300
+          "robusta_bags": 700,
+          "arabica_bags": 82
         },
         {
           "country": "Turkey",
           "bags": 640,
           "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 285,
+          "robusta_bags": 285,
           "arabica_bags": 0
         },
         {
@@ -3247,28 +3421,16 @@
       ],
       "by_destination": [
         {
-          "country": "Germany",
-          "bags": 81196,
-          "robusta_bags": 69762,
-          "arabica_bags": 11434
-        },
-        {
-          "country": "Sudan",
-          "bags": 34530,
-          "robusta_bags": 34530,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 3600,
-          "robusta_bags": 3600,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 154508,
           "robusta_bags": 148896,
           "arabica_bags": 5612
+        },
+        {
+          "country": "Germany",
+          "bags": 81196,
+          "robusta_bags": 69762,
+          "arabica_bags": 11434
         },
         {
           "country": "India",
@@ -3281,6 +3443,12 @@
           "bags": 42489,
           "robusta_bags": 27392,
           "arabica_bags": 15097
+        },
+        {
+          "country": "Sudan",
+          "bags": 34530,
+          "robusta_bags": 34530,
+          "arabica_bags": 0
         },
         {
           "country": "United States",
@@ -3325,16 +3493,28 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 4600,
+          "robusta_bags": 4600,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 4224,
-          "robusta_bags": 3890,
-          "arabica_bags": 334
+          "robusta_bags": 4200,
+          "arabica_bags": 24
         },
         {
           "country": "Japan",
           "bags": 4130,
           "robusta_bags": 2910,
           "arabica_bags": 1220
+        },
+        {
+          "country": "Romania",
+          "bags": 2645,
+          "robusta_bags": 2295,
+          "arabica_bags": 350
         },
         {
           "country": "Turkey",
@@ -3373,15 +3553,33 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 2021,
+          "robusta_bags": 1440,
+          "arabica_bags": 581
+        },
+        {
           "country": "Netherlands",
           "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
+          "robusta_bags": 640,
+          "arabica_bags": 0
         },
         {
           "country": "United Kingdom",
           "bags": 519,
           "robusta_bags": 519,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Australia",
+          "bags": 100,
+          "robusta_bags": 100,
           "arabica_bags": 0
         }
       ],
@@ -3515,6 +3713,12 @@
           "arabica_bags": 1628
         },
         {
+          "country": "Israel",
+          "bags": 3960,
+          "robusta_bags": 3960,
+          "arabica_bags": 0
+        },
+        {
           "country": "Portugal",
           "bags": 3902,
           "robusta_bags": 3902,
@@ -3531,6 +3735,12 @@
           "bags": 2740,
           "robusta_bags": 2565,
           "arabica_bags": 175
+        },
+        {
+          "country": "Croatia",
+          "bags": 2520,
+          "robusta_bags": 2520,
+          "arabica_bags": 0
         },
         {
           "country": "Greece",
@@ -3570,9 +3780,9 @@
         },
         {
           "country": "Kenya",
-          "bags": 800,
+          "bags": 2021,
           "robusta_bags": 800,
-          "arabica_bags": 0
+          "arabica_bags": 1221
         },
         {
           "country": "Mexico",
@@ -3685,12 +3895,6 @@
           "arabica_bags": 7513
         },
         {
-          "country": "Sudan",
-          "bags": 48300,
-          "robusta_bags": 48300,
-          "arabica_bags": 0
-        },
-        {
           "country": "Germany",
           "bags": 81090,
           "robusta_bags": 75180,
@@ -3701,6 +3905,12 @@
           "bags": 58875,
           "robusta_bags": 54531,
           "arabica_bags": 4344
+        },
+        {
+          "country": "Sudan",
+          "bags": 48300,
+          "robusta_bags": 48300,
+          "arabica_bags": 0
         },
         {
           "country": "Algeria",
@@ -3731,6 +3941,12 @@
           "bags": 20805,
           "robusta_bags": 19499,
           "arabica_bags": 1306
+        },
+        {
+          "country": "Israel",
+          "bags": 9400,
+          "robusta_bags": 9080,
+          "arabica_bags": 320
         },
         {
           "country": "Russia",
@@ -3775,6 +3991,12 @@
           "arabica_bags": 509
         },
         {
+          "country": "Croatia",
+          "bags": 2160,
+          "robusta_bags": 2160,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 1940,
           "robusta_bags": 1620,
@@ -3788,14 +4010,20 @@
         },
         {
           "country": "Greece",
-          "bags": 974,
-          "robusta_bags": 640,
-          "arabica_bags": 334
+          "bags": 2021,
+          "robusta_bags": 974,
+          "arabica_bags": 1047
         },
         {
           "country": "Saudi Arabia",
           "bags": 555,
           "robusta_bags": 555,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 350,
+          "robusta_bags": 350,
           "arabica_bags": 0
         },
         {
@@ -3957,6 +4185,12 @@
           "arabica_bags": 1650
         },
         {
+          "country": "Israel",
+          "bags": 7360,
+          "robusta_bags": 7360,
+          "arabica_bags": 0
+        },
+        {
           "country": "Portugal",
           "bags": 6288,
           "robusta_bags": 6288,
@@ -3995,8 +4229,14 @@
         {
           "country": "Kenya",
           "bags": 1920,
-          "robusta_bags": 1600,
-          "arabica_bags": 320
+          "robusta_bags": 1706,
+          "arabica_bags": 214
+        },
+        {
+          "country": "Romania",
+          "bags": 1050,
+          "robusta_bags": 1050,
+          "arabica_bags": 0
         },
         {
           "country": "Saudi Arabia",
@@ -4013,13 +4253,19 @@
         {
           "country": "Greece",
           "bags": 974,
-          "robusta_bags": 640,
-          "arabica_bags": 334
+          "robusta_bags": 960,
+          "arabica_bags": 14
         },
         {
           "country": "Japan",
-          "bags": 560,
+          "bags": 2021,
           "robusta_bags": 560,
+          "arabica_bags": 1461
+        },
+        {
+          "country": "Croatia",
+          "bags": 360,
+          "robusta_bags": 360,
           "arabica_bags": 0
         },
         {
@@ -4027,6 +4273,12 @@
           "bags": 335,
           "robusta_bags": 333,
           "arabica_bags": 2
+        },
+        {
+          "country": "Poland",
+          "bags": 330,
+          "robusta_bags": 330,
+          "arabica_bags": 0
         },
         {
           "country": "Canada",
@@ -4191,6 +4443,12 @@
           "arabica_bags": 320
         },
         {
+          "country": "Israel",
+          "bags": 5200,
+          "robusta_bags": 5200,
+          "arabica_bags": 0
+        },
+        {
           "country": "Egypt",
           "bags": 4740,
           "robusta_bags": 4740,
@@ -4206,6 +4464,12 @@
           "country": "Mexico",
           "bags": 3445,
           "robusta_bags": 3445,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 2880,
+          "robusta_bags": 2880,
           "arabica_bags": 0
         },
         {
@@ -4228,9 +4492,9 @@
         },
         {
           "country": "Saudi Arabia",
-          "bags": 960,
+          "bags": 2021,
           "robusta_bags": 960,
-          "arabica_bags": 0
+          "arabica_bags": 1061
         },
         {
           "country": "United Kingdom",
@@ -4248,6 +4512,24 @@
           "country": "Kenya",
           "bags": 439,
           "robusta_bags": 439,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
+          "bags": 333,
+          "robusta_bags": 333,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 330,
+          "robusta_bags": 330,
           "arabica_bags": 0
         },
         {
@@ -4341,12 +4623,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 2021,
-          "robusta_bags": 2021,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 162469,
           "robusta_bags": 161159,
@@ -4401,6 +4677,12 @@
           "arabica_bags": 2240
         },
         {
+          "country": "Israel",
+          "bags": 11294,
+          "robusta_bags": 10974,
+          "arabica_bags": 320
+        },
+        {
           "country": "Russia",
           "bags": 11118,
           "robusta_bags": 10798,
@@ -4408,8 +4690,8 @@
         },
         {
           "country": "South Africa",
-          "bags": 18190,
-          "robusta_bags": 18190,
+          "bags": 5400,
+          "robusta_bags": 5400,
           "arabica_bags": 0
         },
         {
@@ -4474,9 +4756,9 @@
         },
         {
           "country": "Kenya",
-          "bags": 1280,
+          "bags": 2021,
           "robusta_bags": 1280,
-          "arabica_bags": 0
+          "arabica_bags": 741
         },
         {
           "country": "United Kingdom",
@@ -4491,9 +4773,21 @@
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 333,
+          "robusta_bags": 333,
+          "arabica_bags": 0
+        },
+        {
           "country": "Australia",
           "bags": 320,
           "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 210,
+          "robusta_bags": 210,
           "arabica_bags": 0
         }
       ],
@@ -4574,12 +4868,6 @@
         }
       ],
       "by_destination": [
-        {
-          "country": "Brazil",
-          "bags": 60386,
-          "robusta_bags": 2021,
-          "arabica_bags": 58365
-        },
         {
           "country": "Italy",
           "bags": 127813,
@@ -4665,10 +4953,16 @@
           "arabica_bags": 2000
         },
         {
+          "country": "Israel",
+          "bags": 4360,
+          "robusta_bags": 4360,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 4085,
-          "robusta_bags": 2500,
-          "arabica_bags": 1585
+          "robusta_bags": 3900,
+          "arabica_bags": 185
         },
         {
           "country": "France",
@@ -4701,10 +4995,16 @@
           "arabica_bags": 0
         },
         {
-          "country": "Netherlands",
-          "bags": 990,
-          "robusta_bags": 990,
+          "country": "Croatia",
+          "bags": 1080,
+          "robusta_bags": 1080,
           "arabica_bags": 0
+        },
+        {
+          "country": "Netherlands",
+          "bags": 2021,
+          "robusta_bags": 990,
+          "arabica_bags": 1031
         },
         {
           "country": "Saudi Arabia",
@@ -4719,9 +5019,9 @@
           "arabica_bags": 0
         },
         {
-          "country": "South Africa",
-          "bags": 4610,
-          "robusta_bags": 4610,
+          "country": "Estonia",
+          "bags": 320,
+          "robusta_bags": 320,
           "arabica_bags": 0
         }
       ],
@@ -4815,12 +5115,6 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 17790,
-          "robusta_bags": 17150,
-          "arabica_bags": 640
-        },
-        {
           "country": "Italy",
           "bags": 171976,
           "robusta_bags": 161473,
@@ -4869,6 +5163,12 @@
           "arabica_bags": 5919
         },
         {
+          "country": "Sudan",
+          "bags": 17790,
+          "robusta_bags": 17150,
+          "arabica_bags": 640
+        },
+        {
           "country": "Portugal",
           "bags": 10450,
           "robusta_bags": 7880,
@@ -4896,6 +5196,12 @@
           "country": "Egypt",
           "bags": 2650,
           "robusta_bags": 2650,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 2040,
+          "robusta_bags": 2040,
           "arabica_bags": 0
         },
         {
@@ -4931,14 +5237,14 @@
         {
           "country": "China",
           "bags": 1566,
-          "robusta_bags": 926,
-          "arabica_bags": 640
+          "robusta_bags": 1322,
+          "arabica_bags": 244
         },
         {
           "country": "Netherlands",
-          "bags": 1040,
+          "bags": 2021,
           "robusta_bags": 1040,
-          "arabica_bags": 0
+          "arabica_bags": 981
         },
         {
           "country": "France",
@@ -4948,6 +5254,12 @@
         },
         {
           "country": "Canada",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
           "bags": 640,
           "robusta_bags": 640,
           "arabica_bags": 0
@@ -5047,18 +5359,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 100,
-          "robusta_bags": 100,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Sudan",
-          "bags": 32165,
-          "robusta_bags": 32165,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 199260,
           "robusta_bags": 186389,
@@ -5069,6 +5369,12 @@
           "bags": 93300,
           "robusta_bags": 63629,
           "arabica_bags": 29671
+        },
+        {
+          "country": "Sudan",
+          "bags": 32165,
+          "robusta_bags": 32165,
+          "arabica_bags": 0
         },
         {
           "country": "United States",
@@ -5173,6 +5479,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 2000,
+          "robusta_bags": 2000,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 1920,
           "robusta_bags": 960,
@@ -5187,8 +5499,14 @@
         {
           "country": "Netherlands",
           "bags": 1690,
-          "robusta_bags": 1050,
-          "arabica_bags": 640
+          "robusta_bags": 1644,
+          "arabica_bags": 46
+        },
+        {
+          "country": "Croatia",
+          "bags": 2021,
+          "robusta_bags": 1080,
+          "arabica_bags": 941
         },
         {
           "country": "Australia",
@@ -5283,16 +5601,16 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 68438,
-          "robusta_bags": 68104,
-          "arabica_bags": 334
-        },
-        {
           "country": "Italy",
           "bags": 120791,
           "robusta_bags": 100957,
           "arabica_bags": 19834
+        },
+        {
+          "country": "Sudan",
+          "bags": 68438,
+          "robusta_bags": 68104,
+          "arabica_bags": 334
         },
         {
           "country": "Germany",
@@ -5379,6 +5697,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 2040,
+          "robusta_bags": 2040,
+          "arabica_bags": 0
+        },
+        {
           "country": "United Arab Emirates",
           "bags": 1920,
           "robusta_bags": 1920,
@@ -5403,10 +5727,16 @@
           "arabica_bags": 0
         },
         {
+          "country": "Croatia",
+          "bags": 1400,
+          "robusta_bags": 1080,
+          "arabica_bags": 320
+        },
+        {
           "country": "Kenya",
-          "bags": 1158,
+          "bags": 2022,
           "robusta_bags": 1158,
-          "arabica_bags": 0
+          "arabica_bags": 864
         },
         {
           "country": "Australia",
@@ -5433,7 +5763,19 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
           "country": "Saudi Arabia",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -5519,16 +5861,16 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 68368,
-          "robusta_bags": 68368,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 170675,
           "robusta_bags": 145833,
           "arabica_bags": 24842
+        },
+        {
+          "country": "Sudan",
+          "bags": 68368,
+          "robusta_bags": 68368,
+          "arabica_bags": 0
         },
         {
           "country": "Germany",
@@ -5635,8 +5977,8 @@
         {
           "country": "Australia",
           "bags": 2155,
-          "robusta_bags": 1835,
-          "arabica_bags": 320
+          "robusta_bags": 1940,
+          "arabica_bags": 215
         },
         {
           "country": "Turkey",
@@ -5645,10 +5987,34 @@
           "arabica_bags": 170
         },
         {
-          "country": "Greece",
-          "bags": 1050,
-          "robusta_bags": 1050,
+          "country": "Israel",
+          "bags": 1280,
+          "robusta_bags": 960,
+          "arabica_bags": 320
+        },
+        {
+          "country": "Croatia",
+          "bags": 1080,
+          "robusta_bags": 1080,
           "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Greece",
+          "bags": 2022,
+          "robusta_bags": 1050,
+          "arabica_bags": 972
         },
         {
           "country": "Netherlands",
@@ -5745,16 +6111,16 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 119422,
-          "robusta_bags": 119422,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 154843,
           "robusta_bags": 135489,
           "arabica_bags": 19354
+        },
+        {
+          "country": "Sudan",
+          "bags": 119422,
+          "robusta_bags": 119422,
+          "arabica_bags": 0
         },
         {
           "country": "Germany",
@@ -5767,6 +6133,12 @@
           "bags": 27196,
           "robusta_bags": 17218,
           "arabica_bags": 9978
+        },
+        {
+          "country": "United States",
+          "bags": 21736,
+          "robusta_bags": 19656,
+          "arabica_bags": 2080
         },
         {
           "country": "India",
@@ -5793,6 +6165,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 5440,
+          "robusta_bags": 4800,
+          "arabica_bags": 640
+        },
+        {
           "country": "South Africa",
           "bags": 4874,
           "robusta_bags": 4541,
@@ -5813,8 +6191,8 @@
         {
           "country": "Morocco",
           "bags": 3664,
-          "robusta_bags": 3344,
-          "arabica_bags": 320
+          "robusta_bags": 3600,
+          "arabica_bags": 64
         },
         {
           "country": "Korea",
@@ -5853,6 +6231,18 @@
           "arabica_bags": 441
         },
         {
+          "country": "Poland",
+          "bags": 1081,
+          "robusta_bags": 1081,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 1005,
           "robusta_bags": 1002,
@@ -5863,6 +6253,12 @@
           "bags": 986,
           "robusta_bags": 666,
           "arabica_bags": 320
+        },
+        {
+          "country": "Singapore",
+          "bags": 2022,
+          "robusta_bags": 960,
+          "arabica_bags": 1062
         },
         {
           "country": "Mexico",
@@ -5991,12 +6387,6 @@
       ],
       "by_destination": [
         {
-          "country": "United States",
-          "bags": 7586,
-          "robusta_bags": 7586,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 135063,
           "robusta_bags": 99674,
@@ -6017,8 +6407,8 @@
         {
           "country": "India",
           "bags": 31445,
-          "robusta_bags": 27893,
-          "arabica_bags": 3552
+          "robusta_bags": 29777,
+          "arabica_bags": 1668
         },
         {
           "country": "Belgium",
@@ -6105,6 +6495,12 @@
           "arabica_bags": 320
         },
         {
+          "country": "Israel",
+          "bags": 1570,
+          "robusta_bags": 960,
+          "arabica_bags": 610
+        },
+        {
           "country": "France",
           "bags": 668,
           "robusta_bags": 668,
@@ -6124,9 +6520,9 @@
         },
         {
           "country": "Greece",
-          "bags": 640,
+          "bags": 2022,
           "robusta_bags": 640,
-          "arabica_bags": 0
+          "arabica_bags": 1382
         },
         {
           "country": "Kenya",
@@ -6137,8 +6533,14 @@
         {
           "country": "Japan",
           "bags": 445,
-          "robusta_bags": 290,
-          "arabica_bags": 155
+          "robusta_bags": 360,
+          "arabica_bags": 85
+        },
+        {
+          "country": "Poland",
+          "bags": 330,
+          "robusta_bags": 330,
+          "arabica_bags": 0
         },
         {
           "country": "Turkey",
@@ -6261,6 +6663,12 @@
           "arabica_bags": 14478
         },
         {
+          "country": "United States",
+          "bags": 23409,
+          "robusta_bags": 18017,
+          "arabica_bags": 5392
+        },
+        {
           "country": "Spain",
           "bags": 11561,
           "robusta_bags": 10604,
@@ -6303,6 +6711,12 @@
           "arabica_bags": 973
         },
         {
+          "country": "Israel",
+          "bags": 3280,
+          "robusta_bags": 3280,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 2894,
           "robusta_bags": 1614,
@@ -6327,6 +6741,12 @@
           "arabica_bags": 600
         },
         {
+          "country": "Poland",
+          "bags": 2160,
+          "robusta_bags": 2160,
+          "arabica_bags": 0
+        },
+        {
           "country": "Netherlands",
           "bags": 2144,
           "robusta_bags": 1274,
@@ -6339,6 +6759,12 @@
           "arabica_bags": 953
         },
         {
+          "country": "Croatia",
+          "bags": 1800,
+          "robusta_bags": 1800,
+          "arabica_bags": 0
+        },
+        {
           "country": "Mexico",
           "bags": 1670,
           "robusta_bags": 1670,
@@ -6346,6 +6772,12 @@
         },
         {
           "country": "France",
+          "bags": 1600,
+          "robusta_bags": 1600,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
           "bags": 1600,
           "robusta_bags": 1600,
           "arabica_bags": 0
@@ -6371,11 +6803,17 @@
         {
           "country": "Greece",
           "bags": 680,
-          "robusta_bags": 360,
-          "arabica_bags": 320
+          "robusta_bags": 660,
+          "arabica_bags": 20
         },
         {
           "country": "Kenya",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
           "bags": 640,
           "robusta_bags": 640,
           "arabica_bags": 0
@@ -6471,22 +6909,16 @@
       ],
       "by_destination": [
         {
-          "country": "Germany",
-          "bags": 70769,
-          "robusta_bags": 58509,
-          "arabica_bags": 12260
-        },
-        {
-          "country": "United States",
-          "bags": 34063,
-          "robusta_bags": 29820,
-          "arabica_bags": 4243
-        },
-        {
           "country": "Italy",
           "bags": 213477,
           "robusta_bags": 191894,
           "arabica_bags": 21583
+        },
+        {
+          "country": "Germany",
+          "bags": 70769,
+          "robusta_bags": 58509,
+          "arabica_bags": 12260
         },
         {
           "country": "Sudan",
@@ -6525,6 +6957,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "United States",
+          "bags": 9577,
+          "robusta_bags": 6897,
+          "arabica_bags": 2680
+        },
+        {
           "country": "China",
           "bags": 7920,
           "robusta_bags": 5620,
@@ -6539,8 +6977,14 @@
         {
           "country": "Portugal",
           "bags": 5226,
-          "robusta_bags": 4586,
-          "arabica_bags": 640
+          "robusta_bags": 4721,
+          "arabica_bags": 505
+        },
+        {
+          "country": "Poland",
+          "bags": 4460,
+          "robusta_bags": 2710,
+          "arabica_bags": 1750
         },
         {
           "country": "Mexico",
@@ -6553,6 +6997,12 @@
           "bags": 3338,
           "robusta_bags": 3338,
           "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 2800,
+          "robusta_bags": 2480,
+          "arabica_bags": 320
         },
         {
           "country": "South Africa",
@@ -6610,9 +7060,9 @@
         },
         {
           "country": "United Kingdom",
-          "bags": 1092,
-          "robusta_bags": 772,
-          "arabica_bags": 320
+          "bags": 2022,
+          "robusta_bags": 1092,
+          "arabica_bags": 930
         },
         {
           "country": "Egypt",
@@ -6623,14 +7073,20 @@
         {
           "country": "France",
           "bags": 988,
-          "robusta_bags": 668,
-          "arabica_bags": 320
+          "robusta_bags": 982,
+          "arabica_bags": 6
         },
         {
           "country": "Netherlands",
           "bags": 885,
           "robusta_bags": 720,
           "arabica_bags": 165
+        },
+        {
+          "country": "Romania",
+          "bags": 350,
+          "robusta_bags": 350,
+          "arabica_bags": 0
         },
         {
           "country": "Greece",
@@ -6640,6 +7096,12 @@
         },
         {
           "country": "Canada",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -6733,16 +7195,16 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 118694,
-          "robusta_bags": 118694,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 234171,
           "robusta_bags": 225448,
           "arabica_bags": 8723
+        },
+        {
+          "country": "Sudan",
+          "bags": 79450,
+          "robusta_bags": 79450,
+          "arabica_bags": 0
         },
         {
           "country": "Germany",
@@ -6785,6 +7247,12 @@
           "bags": 14260,
           "robusta_bags": 12980,
           "arabica_bags": 1280
+        },
+        {
+          "country": "Israel",
+          "bags": 9050,
+          "robusta_bags": 8440,
+          "arabica_bags": 610
         },
         {
           "country": "Algeria",
@@ -6841,10 +7309,22 @@
           "arabica_bags": 412
         },
         {
+          "country": "Romania",
+          "bags": 1380,
+          "robusta_bags": 1336,
+          "arabica_bags": 44
+        },
+        {
+          "country": "Poland",
+          "bags": 1285,
+          "robusta_bags": 1285,
+          "arabica_bags": 0
+        },
+        {
           "country": "Japan",
           "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
+          "robusta_bags": 1002,
+          "arabica_bags": 278
         },
         {
           "country": "Switzerland",
@@ -6854,12 +7334,24 @@
         },
         {
           "country": "South Africa",
-          "bags": 953,
-          "robusta_bags": 803,
-          "arabica_bags": 150
+          "bags": 2022,
+          "robusta_bags": 953,
+          "arabica_bags": 1069
+        },
+        {
+          "country": "Croatia",
+          "bags": 720,
+          "robusta_bags": 720,
+          "arabica_bags": 0
         },
         {
           "country": "Australia",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
           "bags": 640,
           "robusta_bags": 640,
           "arabica_bags": 0
@@ -6963,16 +7455,16 @@
       ],
       "by_destination": [
         {
-          "country": "Germany",
-          "bags": 69298,
-          "robusta_bags": 62875,
-          "arabica_bags": 6423
-        },
-        {
           "country": "Italy",
           "bags": 198746,
           "robusta_bags": 183308,
           "arabica_bags": 15438
+        },
+        {
+          "country": "Germany",
+          "bags": 69298,
+          "robusta_bags": 62875,
+          "arabica_bags": 6423
         },
         {
           "country": "Sudan",
@@ -7011,10 +7503,16 @@
           "arabica_bags": 320
         },
         {
+          "country": "Israel",
+          "bags": 7640,
+          "robusta_bags": 7030,
+          "arabica_bags": 610
+        },
+        {
           "country": "China",
           "bags": 4800,
-          "robusta_bags": 4480,
-          "arabica_bags": 320
+          "robusta_bags": 4570,
+          "arabica_bags": 230
         },
         {
           "country": "Portugal",
@@ -7041,10 +7539,28 @@
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 2880,
+          "robusta_bags": 1600,
+          "arabica_bags": 1280
+        },
+        {
           "country": "Netherlands",
           "bags": 2704,
           "robusta_bags": 1400,
           "arabica_bags": 1304
+        },
+        {
+          "country": "Poland",
+          "bags": 2520,
+          "robusta_bags": 2160,
+          "arabica_bags": 360
+        },
+        {
+          "country": "Romania",
+          "bags": 2470,
+          "robusta_bags": 2470,
+          "arabica_bags": 0
         },
         {
           "country": "Turkey",
@@ -7065,6 +7581,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Singapore",
+          "bags": 1425,
+          "robusta_bags": 1425,
+          "arabica_bags": 0
+        },
+        {
           "country": "Egypt",
           "bags": 1340,
           "robusta_bags": 1340,
@@ -7077,10 +7599,16 @@
           "arabica_bags": 0
         },
         {
-          "country": "Kenya",
-          "bags": 680,
-          "robusta_bags": 680,
+          "country": "Croatia",
+          "bags": 720,
+          "robusta_bags": 720,
           "arabica_bags": 0
+        },
+        {
+          "country": "Kenya",
+          "bags": 2022,
+          "robusta_bags": 680,
+          "arabica_bags": 1342
         },
         {
           "country": "Algeria",
@@ -7091,8 +7619,8 @@
         {
           "country": "United Kingdom",
           "bags": 521,
-          "robusta_bags": 339,
-          "arabica_bags": 182
+          "robusta_bags": 360,
+          "arabica_bags": 161
         },
         {
           "country": "South Africa",
@@ -7168,12 +7696,6 @@
         }
       ],
       "by_destination": [
-        {
-          "country": "United States",
-          "bags": 254,
-          "robusta_bags": 226,
-          "arabica_bags": 28
-        },
         {
           "country": "Italy",
           "bags": 182110,
@@ -7271,6 +7793,18 @@
           "arabica_bags": 640
         },
         {
+          "country": "Estonia",
+          "bags": 3200,
+          "robusta_bags": 3200,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 2680,
+          "robusta_bags": 1600,
+          "arabica_bags": 1080
+        },
+        {
           "country": "Switzerland",
           "bags": 2310,
           "robusta_bags": 2310,
@@ -7281,6 +7815,12 @@
           "bags": 2199,
           "robusta_bags": 1559,
           "arabica_bags": 640
+        },
+        {
+          "country": "Poland",
+          "bags": 2160,
+          "robusta_bags": 1080,
+          "arabica_bags": 1080
         },
         {
           "country": "France",
@@ -7296,9 +7836,15 @@
         },
         {
           "country": "Canada",
-          "bags": 1380,
-          "robusta_bags": 1050,
-          "arabica_bags": 330
+          "bags": 2022,
+          "robusta_bags": 1380,
+          "arabica_bags": 642
+        },
+        {
+          "country": "Croatia",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
         },
         {
           "country": "South Africa",
@@ -7407,18 +7953,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 175,
-          "robusta_bags": 175,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United States",
-          "bags": 2022,
-          "robusta_bags": 2022,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 151051,
           "robusta_bags": 139870,
@@ -7491,6 +8025,12 @@
           "arabica_bags": 2254
         },
         {
+          "country": "Israel",
+          "bags": 5440,
+          "robusta_bags": 4594,
+          "arabica_bags": 846
+        },
+        {
           "country": "United Arab Emirates",
           "bags": 4434,
           "robusta_bags": 4220,
@@ -7527,10 +8067,22 @@
           "arabica_bags": 0
         },
         {
-          "country": "United Kingdom",
-          "bags": 1040,
-          "robusta_bags": 1040,
+          "country": "Croatia",
+          "bags": 1080,
+          "robusta_bags": 1080,
           "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
+        },
+        {
+          "country": "United Kingdom",
+          "bags": 2022,
+          "robusta_bags": 1040,
+          "arabica_bags": 982
         },
         {
           "country": "Korea",
@@ -7557,6 +8109,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 360,
+          "robusta_bags": 360,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 345,
           "robusta_bags": 345,
@@ -7564,6 +8122,12 @@
         },
         {
           "country": "Australia",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0
@@ -7645,18 +8209,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 175,
-          "robusta_bags": 175,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United States",
-          "bags": 2022,
-          "robusta_bags": 2022,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 153806,
           "robusta_bags": 139240,
@@ -7699,6 +8251,12 @@
           "arabica_bags": 1987
         },
         {
+          "country": "United States",
+          "bags": 14506,
+          "robusta_bags": 12826,
+          "arabica_bags": 1680
+        },
+        {
           "country": "Switzerland",
           "bags": 6244,
           "robusta_bags": 5284,
@@ -7717,22 +8275,34 @@
           "arabica_bags": 1000
         },
         {
+          "country": "Estonia",
+          "bags": 4800,
+          "robusta_bags": 4160,
+          "arabica_bags": 640
+        },
+        {
           "country": "China",
           "bags": 4188,
           "robusta_bags": 3200,
           "arabica_bags": 988
         },
         {
+          "country": "Israel",
+          "bags": 3640,
+          "robusta_bags": 3640,
+          "arabica_bags": 0
+        },
+        {
           "country": "Korea",
           "bags": 3589,
-          "robusta_bags": 3117,
-          "arabica_bags": 472
+          "robusta_bags": 3420,
+          "arabica_bags": 169
         },
         {
           "country": "South Africa",
           "bags": 3316,
-          "robusta_bags": 2836,
-          "arabica_bags": 480
+          "robusta_bags": 2936,
+          "arabica_bags": 380
         },
         {
           "country": "Russia",
@@ -7777,6 +8347,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 2022,
+          "robusta_bags": 1400,
+          "arabica_bags": 622
+        },
+        {
           "country": "Japan",
           "bags": 920,
           "robusta_bags": 640,
@@ -7789,9 +8365,21 @@
           "arabica_bags": 0
         },
         {
+          "country": "Singapore",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 596,
           "robusta_bags": 596,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 360,
+          "robusta_bags": 360,
           "arabica_bags": 0
         },
         {
@@ -7887,12 +8475,6 @@
       ],
       "by_destination": [
         {
-          "country": "India",
-          "bags": 32283,
-          "robusta_bags": 26554,
-          "arabica_bags": 5729
-        },
-        {
           "country": "Italy",
           "bags": 161123,
           "robusta_bags": 145178,
@@ -7909,6 +8491,12 @@
           "bags": 48879,
           "robusta_bags": 37864,
           "arabica_bags": 11015
+        },
+        {
+          "country": "India",
+          "bags": 32283,
+          "robusta_bags": 26554,
+          "arabica_bags": 5729
         },
         {
           "country": "Belgium",
@@ -7941,6 +8529,12 @@
           "arabica_bags": 2434
         },
         {
+          "country": "Israel",
+          "bags": 6200,
+          "robusta_bags": 3320,
+          "arabica_bags": 2880
+        },
+        {
           "country": "Korea",
           "bags": 3650,
           "robusta_bags": 3650,
@@ -7959,6 +8553,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Poland",
+          "bags": 2880,
+          "robusta_bags": 2160,
+          "arabica_bags": 720
+        },
+        {
           "country": "France",
           "bags": 2204,
           "robusta_bags": 1934,
@@ -7969,6 +8569,12 @@
           "bags": 2068,
           "robusta_bags": 1734,
           "arabica_bags": 334
+        },
+        {
+          "country": "Estonia",
+          "bags": 1920,
+          "robusta_bags": 1280,
+          "arabica_bags": 640
         },
         {
           "country": "United Kingdom",
@@ -8002,14 +8608,26 @@
         },
         {
           "country": "Algeria",
-          "bags": 668,
+          "bags": 2022,
           "robusta_bags": 668,
+          "arabica_bags": 1354
+        },
+        {
+          "country": "Singapore",
+          "bags": 640,
+          "robusta_bags": 640,
           "arabica_bags": 0
         },
         {
           "country": "United Arab Emirates",
           "bags": 640,
           "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Romania",
+          "bags": 350,
+          "robusta_bags": 350,
           "arabica_bags": 0
         },
         {
@@ -8181,14 +8799,20 @@
         {
           "country": "China",
           "bags": 2240,
-          "robusta_bags": 1280,
-          "arabica_bags": 960
+          "robusta_bags": 2240,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 1600,
+          "robusta_bags": 960,
+          "arabica_bags": 640
         },
         {
           "country": "France",
           "bags": 1542,
-          "robusta_bags": 1208,
-          "arabica_bags": 334
+          "robusta_bags": 1430,
+          "arabica_bags": 112
         },
         {
           "country": "Saudi Arabia",
@@ -8201,6 +8825,12 @@
           "bags": 1180,
           "robusta_bags": 760,
           "arabica_bags": 420
+        },
+        {
+          "country": "Poland",
+          "bags": 1080,
+          "robusta_bags": 1080,
+          "arabica_bags": 0
         },
         {
           "country": "Greece",
@@ -8227,6 +8857,18 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 2023,
+          "robusta_bags": 720,
+          "arabica_bags": 1303
+        },
+        {
+          "country": "Estonia",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 420,
           "robusta_bags": 420,
@@ -8236,6 +8878,12 @@
           "country": "Egypt",
           "bags": 320,
           "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 275,
+          "robusta_bags": 275,
           "arabica_bags": 0
         }
       ],
@@ -8309,12 +8957,6 @@
       ],
       "by_destination": [
         {
-          "country": "Germany",
-          "bags": 55038,
-          "robusta_bags": 38747,
-          "arabica_bags": 16291
-        },
-        {
           "country": "Italy",
           "bags": 139201,
           "robusta_bags": 103680,
@@ -8325,6 +8967,12 @@
           "bags": 105235,
           "robusta_bags": 105235,
           "arabica_bags": 0
+        },
+        {
+          "country": "Germany",
+          "bags": 55038,
+          "robusta_bags": 38747,
+          "arabica_bags": 16291
         },
         {
           "country": "India",
@@ -8375,10 +9023,22 @@
           "arabica_bags": 1316
         },
         {
+          "country": "Israel",
+          "bags": 4334,
+          "robusta_bags": 4334,
+          "arabica_bags": 0
+        },
+        {
           "country": "United Arab Emirates",
           "bags": 3507,
           "robusta_bags": 3173,
           "arabica_bags": 334
+        },
+        {
+          "country": "Poland",
+          "bags": 2880,
+          "robusta_bags": 1800,
+          "arabica_bags": 1080
         },
         {
           "country": "Russia",
@@ -8403,6 +9063,12 @@
           "bags": 1690,
           "robusta_bags": 1690,
           "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
+          "bags": 1600,
+          "robusta_bags": 960,
+          "arabica_bags": 640
         },
         {
           "country": "Canada",
@@ -8436,9 +9102,9 @@
         },
         {
           "country": "Egypt",
-          "bags": 700,
+          "bags": 2023,
           "robusta_bags": 700,
-          "arabica_bags": 0
+          "arabica_bags": 1323
         },
         {
           "country": "Mexico",
@@ -8609,6 +9275,12 @@
           "arabica_bags": 668
         },
         {
+          "country": "Israel",
+          "bags": 4820,
+          "robusta_bags": 4240,
+          "arabica_bags": 580
+        },
+        {
           "country": "Turkey",
           "bags": 3234,
           "robusta_bags": 1922,
@@ -8639,6 +9311,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 2254,
+          "robusta_bags": 2254,
+          "arabica_bags": 0
+        },
+        {
           "country": "Kenya",
           "bags": 2214,
           "robusta_bags": 2084,
@@ -8657,16 +9335,34 @@
           "arabica_bags": 360
         },
         {
+          "country": "Croatia",
+          "bags": 1800,
+          "robusta_bags": 1800,
+          "arabica_bags": 0
+        },
+        {
           "country": "France",
           "bags": 1620,
           "robusta_bags": 1568,
           "arabica_bags": 52
         },
         {
+          "country": "Romania",
+          "bags": 1440,
+          "robusta_bags": 1440,
+          "arabica_bags": 0
+        },
+        {
           "country": "Saudi Arabia",
           "bags": 1280,
           "robusta_bags": 1280,
           "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 2023,
+          "robusta_bags": 1080,
+          "arabica_bags": 943
         },
         {
           "country": "Australia",
@@ -8705,10 +9401,16 @@
           "arabica_bags": 0
         },
         {
+          "country": "Singapore",
+          "bags": 320,
+          "robusta_bags": 320,
+          "arabica_bags": 0
+        },
+        {
           "country": "United Arab Emirates",
           "bags": 306,
-          "robusta_bags": 250,
-          "arabica_bags": 56
+          "robusta_bags": 290,
+          "arabica_bags": 16
         }
       ],
       "parser_version": "v1_recent",
@@ -8851,6 +9553,12 @@
           "arabica_bags": 999
         },
         {
+          "country": "Israel",
+          "bags": 4240,
+          "robusta_bags": 2640,
+          "arabica_bags": 1600
+        },
+        {
           "country": "Russia",
           "bags": 3905,
           "robusta_bags": 3265,
@@ -8905,6 +9613,18 @@
           "arabica_bags": 0
         },
         {
+          "country": "Romania",
+          "bags": 770,
+          "robusta_bags": 770,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 720,
+          "robusta_bags": 720,
+          "arabica_bags": 0
+        },
+        {
           "country": "Saudi Arabia",
           "bags": 685,
           "robusta_bags": 685,
@@ -8912,8 +9632,20 @@
         },
         {
           "country": "Algeria",
-          "bags": 650,
+          "bags": 2023,
           "robusta_bags": 650,
+          "arabica_bags": 1373
+        },
+        {
+          "country": "Singapore",
+          "bags": 595,
+          "robusta_bags": 595,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
+          "bags": 334,
+          "robusta_bags": 334,
           "arabica_bags": 0
         },
         {
@@ -9077,6 +9809,18 @@
           "arabica_bags": 229
         },
         {
+          "country": "Poland",
+          "bags": 1670,
+          "robusta_bags": 960,
+          "arabica_bags": 710
+        },
+        {
+          "country": "Romania",
+          "bags": 1650,
+          "robusta_bags": 1650,
+          "arabica_bags": 0
+        },
+        {
           "country": "Egypt",
           "bags": 1575,
           "robusta_bags": 1575,
@@ -9107,6 +9851,12 @@
           "arabica_bags": 430
         },
         {
+          "country": "Israel",
+          "bags": 1293,
+          "robusta_bags": 973,
+          "arabica_bags": 320
+        },
+        {
           "country": "Kenya",
           "bags": 935,
           "robusta_bags": 935,
@@ -9119,10 +9869,16 @@
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 668,
+          "robusta_bags": 668,
+          "arabica_bags": 0
+        },
+        {
           "country": "Algeria",
-          "bags": 666,
-          "robusta_bags": 333,
-          "arabica_bags": 333
+          "bags": 2023,
+          "robusta_bags": 666,
+          "arabica_bags": 1357
         },
         {
           "country": "Korea",
@@ -9293,6 +10049,12 @@
           "arabica_bags": 1123
         },
         {
+          "country": "Israel",
+          "bags": 5120,
+          "robusta_bags": 4800,
+          "arabica_bags": 320
+        },
+        {
           "country": "Portugal",
           "bags": 4674,
           "robusta_bags": 4674,
@@ -9356,24 +10118,6 @@
           "country": "Saudi Arabia",
           "bags": 825,
           "robusta_bags": 825,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 650,
-          "robusta_bags": 330,
-          "arabica_bags": 320
-        },
-        {
-          "country": "France",
-          "bags": 527,
-          "robusta_bags": 270,
-          "arabica_bags": 257
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
           "arabica_bags": 0
         }
       ],
@@ -9527,6 +10271,12 @@
           "arabica_bags": 780
         },
         {
+          "country": "Croatia",
+          "bags": 4266,
+          "robusta_bags": 4266,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 3340,
           "robusta_bags": 3340,
@@ -9545,10 +10295,16 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 2240,
+          "robusta_bags": 2240,
+          "arabica_bags": 0
+        },
+        {
           "country": "Russia",
           "bags": 1885,
-          "robusta_bags": 1498,
-          "arabica_bags": 387
+          "robusta_bags": 1740,
+          "arabica_bags": 145
         },
         {
           "country": "Kenya",
@@ -9569,27 +10325,9 @@
           "arabica_bags": 0
         },
         {
-          "country": "Greece",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 550,
-          "robusta_bags": 550,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 430,
-          "robusta_bags": 410,
-          "arabica_bags": 20
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
+          "country": "Estonia",
+          "bags": 700,
+          "robusta_bags": 700,
           "arabica_bags": 0
         }
       ],
@@ -9667,16 +10405,16 @@
       ],
       "by_destination": [
         {
-          "country": "Sudan",
-          "bags": 164398,
-          "robusta_bags": 164398,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 225045,
           "robusta_bags": 206161,
           "arabica_bags": 18884
+        },
+        {
+          "country": "Sudan",
+          "bags": 164398,
+          "robusta_bags": 164398,
+          "arabica_bags": 0
         },
         {
           "country": "Germany",
@@ -9717,8 +10455,8 @@
         {
           "country": "United Arab Emirates",
           "bags": 14617,
-          "robusta_bags": 13130,
-          "arabica_bags": 1487
+          "robusta_bags": 13200,
+          "arabica_bags": 1417
         },
         {
           "country": "Japan",
@@ -9769,10 +10507,22 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 3200,
+          "robusta_bags": 3200,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Estonia",
+          "bags": 2658,
+          "robusta_bags": 2658,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 1974,
-          "robusta_bags": 1640,
-          "arabica_bags": 334
+          "robusta_bags": 1740,
+          "arabica_bags": 234
         },
         {
           "country": "Mexico",
@@ -9790,30 +10540,6 @@
           "country": "Australia",
           "bags": 986,
           "robusta_bags": 986,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 908,
-          "robusta_bags": 541,
-          "arabica_bags": 367
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 674,
-          "robusta_bags": 640,
-          "arabica_bags": 34
-        },
-        {
-          "country": "Canada",
-          "bags": 670,
-          "robusta_bags": 350,
-          "arabica_bags": 320
-        },
-        {
-          "country": "France",
-          "bags": 640,
-          "robusta_bags": 640,
           "arabica_bags": 0
         }
       ],
@@ -9895,12 +10621,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 1641,
-          "robusta_bags": 1641,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 202612,
           "robusta_bags": 185822,
@@ -9967,6 +10687,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 4800,
+          "robusta_bags": 4480,
+          "arabica_bags": 320
+        },
+        {
           "country": "Portugal",
           "bags": 4414,
           "robusta_bags": 4414,
@@ -10005,8 +10731,14 @@
         {
           "country": "Kenya",
           "bags": 1324,
-          "robusta_bags": 684,
-          "arabica_bags": 640
+          "robusta_bags": 1080,
+          "arabica_bags": 244
+        },
+        {
+          "country": "Poland",
+          "bags": 1054,
+          "robusta_bags": 1054,
+          "arabica_bags": 0
         },
         {
           "country": "Turkey",
@@ -10017,20 +10749,8 @@
         {
           "country": "South Africa",
           "bags": 940,
-          "robusta_bags": 640,
-          "arabica_bags": 300
-        },
-        {
-          "country": "Australia",
-          "bags": 654,
-          "robusta_bags": 334,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
+          "robusta_bags": 700,
+          "arabica_bags": 240
         }
       ],
       "parser_version": "v1_recent",
@@ -10157,8 +10877,8 @@
         {
           "country": "Belgium",
           "bags": 15354,
-          "robusta_bags": 7860,
-          "arabica_bags": 7494
+          "robusta_bags": 14830,
+          "arabica_bags": 524
         },
         {
           "country": "Russia",
@@ -10204,14 +10924,20 @@
         },
         {
           "country": "Kenya",
-          "bags": 1995,
-          "robusta_bags": 1695,
-          "arabica_bags": 300
+          "bags": 2960,
+          "robusta_bags": 1995,
+          "arabica_bags": 965
         },
         {
           "country": "Switzerland",
           "bags": 1336,
           "robusta_bags": 1336,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 1280,
+          "robusta_bags": 1280,
           "arabica_bags": 0
         },
         {
@@ -10221,28 +10947,22 @@
           "arabica_bags": 350
         },
         {
+          "country": "Estonia",
+          "bags": 974,
+          "robusta_bags": 974,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 680,
+          "robusta_bags": 680,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 654,
           "robusta_bags": 434,
           "arabica_bags": 220
-        },
-        {
-          "country": "France",
-          "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 295,
-          "robusta_bags": 295,
-          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
@@ -10415,6 +11135,12 @@
           "arabica_bags": 654
         },
         {
+          "country": "Poland",
+          "bags": 2970,
+          "robusta_bags": 2880,
+          "arabica_bags": 90
+        },
+        {
           "country": "China",
           "bags": 1810,
           "robusta_bags": 1460,
@@ -10424,6 +11150,18 @@
           "country": "Korea",
           "bags": 1665,
           "robusta_bags": 1665,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Croatia",
+          "bags": 1440,
+          "robusta_bags": 1440,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 1332,
+          "robusta_bags": 1332,
           "arabica_bags": 0
         },
         {
@@ -10449,24 +11187,6 @@
           "bags": 667,
           "robusta_bags": 667,
           "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 107,
-          "robusta_bags": 100,
-          "arabica_bags": 7
         }
       ],
       "parser_version": "v1_recent",
@@ -10538,12 +11258,6 @@
         }
       ],
       "by_destination": [
-        {
-          "country": "Brazil",
-          "bags": 164,
-          "robusta_bags": 164,
-          "arabica_bags": 0
-        },
         {
           "country": "Italy",
           "bags": 158326,
@@ -10631,13 +11345,19 @@
         {
           "country": "Russia",
           "bags": 2294,
-          "robusta_bags": 1974,
-          "arabica_bags": 320
+          "robusta_bags": 2240,
+          "arabica_bags": 54
         },
         {
           "country": "China",
           "bags": 1637,
           "robusta_bags": 1637,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Israel",
+          "bags": 1600,
+          "robusta_bags": 1600,
           "arabica_bags": 0
         },
         {
@@ -10655,8 +11375,8 @@
         {
           "country": "Australia",
           "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
+          "robusta_bags": 640,
+          "arabica_bags": 0
         },
         {
           "country": "Korea",
@@ -10669,30 +11389,6 @@
           "bags": 606,
           "robusta_bags": 606,
           "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 227,
-          "robusta_bags": 193,
-          "arabica_bags": 34
         }
       ],
       "parser_version": "v1_recent",
@@ -10849,6 +11545,12 @@
           "arabica_bags": 353
         },
         {
+          "country": "Israel",
+          "bags": 2906,
+          "robusta_bags": 2906,
+          "arabica_bags": 0
+        },
+        {
           "country": "Algeria",
           "bags": 2846,
           "robusta_bags": 2846,
@@ -10867,40 +11569,34 @@
           "arabica_bags": 300
         },
         {
+          "country": "Poland",
+          "bags": 1990,
+          "robusta_bags": 1540,
+          "arabica_bags": 450
+        },
+        {
+          "country": "Croatia",
+          "bags": 1440,
+          "robusta_bags": 1440,
+          "arabica_bags": 0
+        },
+        {
           "country": "Turkey",
           "bags": 1321,
           "robusta_bags": 1321,
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 1050,
+          "robusta_bags": 1050,
+          "arabica_bags": 0
+        },
+        {
           "country": "Korea",
           "bags": 986,
-          "robusta_bags": 666,
-          "arabica_bags": 320
-        },
-        {
-          "country": "South Africa",
-          "bags": 960,
           "robusta_bags": 960,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 720,
-          "robusta_bags": 720,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 668,
-          "robusta_bags": 668,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
+          "arabica_bags": 26
         }
       ],
       "parser_version": "v1_recent",
@@ -10973,12 +11669,6 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 164,
-          "robusta_bags": 164,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 164010,
           "robusta_bags": 149362,
@@ -11027,6 +11717,12 @@
           "arabica_bags": 2560
         },
         {
+          "country": "Israel",
+          "bags": 9610,
+          "robusta_bags": 9610,
+          "arabica_bags": 0
+        },
+        {
           "country": "China",
           "bags": 9144,
           "robusta_bags": 6144,
@@ -11057,6 +11753,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Poland",
+          "bags": 2579,
+          "robusta_bags": 2579,
+          "arabica_bags": 0
+        },
+        {
           "country": "Turkey",
           "bags": 1920,
           "robusta_bags": 1920,
@@ -11071,8 +11773,14 @@
         {
           "country": "Saudi Arabia",
           "bags": 1642,
-          "robusta_bags": 1002,
-          "arabica_bags": 640
+          "robusta_bags": 1600,
+          "arabica_bags": 42
+        },
+        {
+          "country": "Estonia",
+          "bags": 1034,
+          "robusta_bags": 1034,
+          "arabica_bags": 0
         },
         {
           "country": "Kenya",
@@ -11084,36 +11792,6 @@
           "country": "Algeria",
           "bags": 973,
           "robusta_bags": 973,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Australia",
-          "bags": 754,
-          "robusta_bags": 754,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 630,
-          "robusta_bags": 320,
-          "arabica_bags": 310
-        },
-        {
-          "country": "Egypt",
-          "bags": 350,
-          "robusta_bags": 350,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 300,
-          "robusta_bags": 300,
           "arabica_bags": 0
         }
       ],
@@ -11187,22 +11865,16 @@
       ],
       "by_destination": [
         {
-          "country": "India",
-          "bags": 40531,
-          "robusta_bags": 31863,
-          "arabica_bags": 8668
-        },
-        {
-          "country": "Brazil",
-          "bags": 164,
-          "robusta_bags": 164,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 125549,
           "robusta_bags": 103036,
           "arabica_bags": 22513
+        },
+        {
+          "country": "India",
+          "bags": 40531,
+          "robusta_bags": 31863,
+          "arabica_bags": 8668
         },
         {
           "country": "Germany",
@@ -11225,8 +11897,8 @@
         {
           "country": "Spain",
           "bags": 14359,
-          "robusta_bags": 11751,
-          "arabica_bags": 2608
+          "robusta_bags": 13451,
+          "arabica_bags": 908
         },
         {
           "country": "Morocco",
@@ -11255,8 +11927,8 @@
         {
           "country": "Netherlands",
           "bags": 3350,
-          "robusta_bags": 2110,
-          "arabica_bags": 1240
+          "robusta_bags": 2800,
+          "arabica_bags": 550
         },
         {
           "country": "Russia",
@@ -11313,15 +11985,15 @@
           "arabica_bags": 0
         },
         {
+          "country": "Estonia",
+          "bags": 670,
+          "robusta_bags": 350,
+          "arabica_bags": 320
+        },
+        {
           "country": "United Kingdom",
           "bags": 653,
           "robusta_bags": 653,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
           "arabica_bags": 0
         }
       ],
@@ -11399,22 +12071,16 @@
       ],
       "by_destination": [
         {
-          "country": "India",
-          "bags": 31593,
-          "robusta_bags": 23118,
-          "arabica_bags": 8475
-        },
-        {
-          "country": "Brazil",
-          "bags": 164,
-          "robusta_bags": 164,
-          "arabica_bags": 0
-        },
-        {
           "country": "Italy",
           "bags": 171517,
           "robusta_bags": 153261,
           "arabica_bags": 18256
+        },
+        {
+          "country": "India",
+          "bags": 31593,
+          "robusta_bags": 27361,
+          "arabica_bags": 4232
         },
         {
           "country": "Germany",
@@ -11485,8 +12151,14 @@
         {
           "country": "Portugal",
           "bags": 2908,
-          "robusta_bags": 2574,
-          "arabica_bags": 334
+          "robusta_bags": 2818,
+          "arabica_bags": 90
+        },
+        {
+          "country": "Poland",
+          "bags": 2080,
+          "robusta_bags": 2080,
+          "arabica_bags": 0
         },
         {
           "country": "Korea",
@@ -11497,8 +12169,14 @@
         {
           "country": "Canada",
           "bags": 1740,
-          "robusta_bags": 1020,
-          "arabica_bags": 720
+          "robusta_bags": 1600,
+          "arabica_bags": 140
+        },
+        {
+          "country": "Romania",
+          "bags": 1600,
+          "robusta_bags": 1600,
+          "arabica_bags": 0
         },
         {
           "country": "Saudi Arabia",
@@ -11513,6 +12191,12 @@
           "arabica_bags": 642
         },
         {
+          "country": "Israel",
+          "bags": 1280,
+          "robusta_bags": 1280,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 1002,
           "robusta_bags": 1002,
@@ -11522,30 +12206,6 @@
           "country": "Australia",
           "bags": 762,
           "robusta_bags": 762,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 680,
-          "robusta_bags": 680,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Mexico",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 334,
-          "robusta_bags": 334,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 334,
-          "robusta_bags": 334,
           "arabica_bags": 0
         }
       ],
@@ -11619,177 +12279,9 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 14500,
-          "robusta_bags": 14500,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United States",
-          "bags": 14500,
-          "robusta_bags": 14500,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Italy",
-          "bags": 29858,
-          "robusta_bags": 29858,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 78436,
-          "robusta_bags": 65966,
-          "arabica_bags": 12470
-        },
-        {
-          "country": "Spain",
-          "bags": 51805,
-          "robusta_bags": 46671,
-          "arabica_bags": 5134
-        },
-        {
-          "country": "India",
-          "bags": 47122,
-          "robusta_bags": 40818,
-          "arabica_bags": 6304
-        },
-        {
-          "country": "Sudan",
-          "bags": 32768,
-          "robusta_bags": 32768,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 25872,
-          "robusta_bags": 13535,
-          "arabica_bags": 12337
-        },
-        {
-          "country": "China",
-          "bags": 22597,
-          "robusta_bags": 20377,
-          "arabica_bags": 2220
-        },
-        {
-          "country": "Algeria",
-          "bags": 22428,
-          "robusta_bags": 22095,
-          "arabica_bags": 333
-        },
-        {
-          "country": "Morocco",
-          "bags": 15668,
-          "robusta_bags": 15668,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Netherlands",
-          "bags": 14905,
-          "robusta_bags": 10080,
-          "arabica_bags": 4825
-        },
-        {
-          "country": "Russia",
-          "bags": 11392,
-          "robusta_bags": 8107,
-          "arabica_bags": 3285
-        },
-        {
-          "country": "Turkey",
-          "bags": 5605,
-          "robusta_bags": 5605,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 3894,
-          "robusta_bags": 3334,
-          "arabica_bags": 560
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 3530,
-          "robusta_bags": 3530,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 3030,
-          "robusta_bags": 3030,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 2855,
-          "robusta_bags": 2855,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 2854,
-          "robusta_bags": 2520,
-          "arabica_bags": 334
-        },
-        {
-          "country": "Portugal",
-          "bags": 2616,
-          "robusta_bags": 1336,
-          "arabica_bags": 1280
-        },
-        {
-          "country": "Switzerland",
-          "bags": 2240,
-          "robusta_bags": 2240,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 1946,
-          "robusta_bags": 1280,
-          "arabica_bags": 666
-        },
-        {
-          "country": "Tunisia",
-          "bags": 1368,
-          "robusta_bags": 1368,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Australia",
-          "bags": 1312,
-          "robusta_bags": 992,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Tanzania",
-          "bags": 700,
-          "robusta_bags": 700,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 700,
-          "robusta_bags": 700,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 360,
-          "robusta_bags": 360,
-          "arabica_bags": 0
-        },
-        {
           "country": "South Africa",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -11957,6 +12449,12 @@
           "arabica_bags": 333
         },
         {
+          "country": "Poland",
+          "bags": 6767,
+          "robusta_bags": 4325,
+          "arabica_bags": 2442
+        },
+        {
           "country": "Greece",
           "bags": 5781,
           "robusta_bags": 4778,
@@ -11999,6 +12497,12 @@
           "arabica_bags": 990
         },
         {
+          "country": "Israel",
+          "bags": 2560,
+          "robusta_bags": 2560,
+          "arabica_bags": 0
+        },
+        {
           "country": "Tunisia",
           "bags": 2310,
           "robusta_bags": 1308,
@@ -12021,6 +12525,18 @@
           "bags": 1626,
           "robusta_bags": 1306,
           "arabica_bags": 320
+        },
+        {
+          "country": "Romania",
+          "bags": 700,
+          "robusta_bags": 700,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 640,
+          "robusta_bags": 640,
+          "arabica_bags": 0
         },
         {
           "country": "Canada",
@@ -12195,6 +12711,12 @@
           "arabica_bags": 0
         },
         {
+          "country": "Israel",
+          "bags": 4587,
+          "robusta_bags": 4587,
+          "arabica_bags": 0
+        },
+        {
           "country": "Greece",
           "bags": 4240,
           "robusta_bags": 3920,
@@ -12215,38 +12737,20 @@
         {
           "country": "Kenya",
           "bags": 1631,
-          "robusta_bags": 1001,
-          "arabica_bags": 630
+          "robusta_bags": 1400,
+          "arabica_bags": 231
+        },
+        {
+          "country": "Poland",
+          "bags": 1040,
+          "robusta_bags": 1040,
+          "arabica_bags": 0
         },
         {
           "country": "Saudi Arabia",
           "bags": 960,
           "robusta_bags": 640,
           "arabica_bags": 320
-        },
-        {
-          "country": "Canada",
-          "bags": 720,
-          "robusta_bags": 720,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tunisia",
-          "bags": 350,
-          "robusta_bags": 350,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 320,
-          "robusta_bags": 320,
-          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
@@ -12319,177 +12823,15 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 25442,
-          "robusta_bags": 25442,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 113659,
-          "robusta_bags": 99422,
-          "arabica_bags": 14237
-        },
-        {
-          "country": "Sudan",
-          "bags": 124754,
-          "robusta_bags": 124754,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Algeria",
-          "bags": 61327,
-          "robusta_bags": 61327,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 41529,
-          "robusta_bags": 36429,
-          "arabica_bags": 5100
-        },
-        {
-          "country": "Morocco",
-          "bags": 37546,
-          "robusta_bags": 37196,
-          "arabica_bags": 350
-        },
-        {
-          "country": "India",
-          "bags": 30295,
-          "robusta_bags": 29710,
-          "arabica_bags": 585
-        },
-        {
-          "country": "Spain",
-          "bags": 27413,
-          "robusta_bags": 26453,
-          "arabica_bags": 960
-        },
-        {
-          "country": "China",
-          "bags": 21474,
-          "robusta_bags": 17508,
-          "arabica_bags": 3966
-        },
-        {
-          "country": "Netherlands",
-          "bags": 19841,
-          "robusta_bags": 18885,
-          "arabica_bags": 956
-        },
-        {
-          "country": "Russia",
-          "bags": 16052,
-          "robusta_bags": 13398,
-          "arabica_bags": 2654
-        },
-        {
-          "country": "Switzerland",
-          "bags": 12411,
-          "robusta_bags": 12411,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 11403,
-          "robusta_bags": 9253,
-          "arabica_bags": 2150
-        },
-        {
-          "country": "Egypt",
-          "bags": 9680,
-          "robusta_bags": 9680,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Portugal",
-          "bags": 9495,
-          "robusta_bags": 6869,
-          "arabica_bags": 2626
-        },
-        {
-          "country": "France",
-          "bags": 6280,
-          "robusta_bags": 6280,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 5270,
-          "robusta_bags": 3670,
-          "arabica_bags": 1600
-        },
-        {
-          "country": "Turkey",
-          "bags": 5238,
-          "robusta_bags": 4888,
-          "arabica_bags": 350
-        },
-        {
           "country": "Tunisia",
-          "bags": 4930,
-          "robusta_bags": 4930,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 4497,
-          "robusta_bags": 2880,
-          "arabica_bags": 1617
-        },
-        {
-          "country": "South Africa",
-          "bags": 3655,
-          "robusta_bags": 2075,
-          "arabica_bags": 1580
-        },
-        {
-          "country": "Australia",
-          "bags": 3030,
-          "robusta_bags": 2686,
-          "arabica_bags": 344
-        },
-        {
-          "country": "Korea",
-          "bags": 2612,
-          "robusta_bags": 2292,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Mexico",
-          "bags": 1160,
-          "robusta_bags": 1160,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 986,
-          "robusta_bags": 986,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tanzania",
-          "bags": 700,
-          "robusta_bags": 700,
+          "bags": 20255,
+          "robusta_bags": 20255,
           "arabica_bags": 0
         },
         {
           "country": "Kenya",
-          "bags": 520,
-          "robusta_bags": 420,
-          "arabica_bags": 100
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -12563,153 +12905,15 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 238072,
-          "robusta_bags": 12327,
-          "arabica_bags": 225745
-        },
-        {
           "country": "Sudan",
-          "bags": 112323,
-          "robusta_bags": 112323,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 85721,
-          "robusta_bags": 77648,
-          "arabica_bags": 8073
-        },
-        {
-          "country": "Algeria",
-          "bags": 46028,
-          "robusta_bags": 45695,
-          "arabica_bags": 333
-        },
-        {
-          "country": "India",
-          "bags": 38401,
-          "robusta_bags": 38111,
-          "arabica_bags": 290
-        },
-        {
-          "country": "Spain",
-          "bags": 34721,
-          "robusta_bags": 31957,
-          "arabica_bags": 2764
-        },
-        {
-          "country": "Morocco",
-          "bags": 33645,
-          "robusta_bags": 33645,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 31694,
-          "robusta_bags": 28081,
-          "arabica_bags": 3613
-        },
-        {
-          "country": "Russia",
-          "bags": 26593,
-          "robusta_bags": 24619,
-          "arabica_bags": 1974
-        },
-        {
-          "country": "Netherlands",
-          "bags": 20444,
-          "robusta_bags": 17934,
-          "arabica_bags": 2510
-        },
-        {
-          "country": "China",
-          "bags": 14864,
-          "robusta_bags": 11033,
-          "arabica_bags": 3831
-        },
-        {
-          "country": "Portugal",
-          "bags": 10199,
-          "robusta_bags": 8534,
-          "arabica_bags": 1665
-        },
-        {
-          "country": "Turkey",
-          "bags": 8888,
-          "robusta_bags": 8888,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Switzerland",
-          "bags": 7014,
-          "robusta_bags": 5734,
-          "arabica_bags": 1280
-        },
-        {
-          "country": "Greece",
-          "bags": 5540,
-          "robusta_bags": 5540,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 4746,
-          "robusta_bags": 4746,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Australia",
-          "bags": 4292,
-          "robusta_bags": 3972,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Japan",
-          "bags": 3657,
-          "robusta_bags": 2450,
-          "arabica_bags": 1207
-        },
-        {
-          "country": "South Africa",
-          "bags": 2510,
-          "robusta_bags": 1280,
-          "arabica_bags": 1230
-        },
-        {
-          "country": "Canada",
-          "bags": 1370,
-          "robusta_bags": 1050,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 653,
-          "robusta_bags": 653,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tunisia",
-          "bags": 650,
-          "robusta_bags": 650,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         },
         {
           "country": "Kenya",
-          "bags": 100,
-          "robusta_bags": 100,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -12845,6 +13049,12 @@
           "arabica_bags": 960
         },
         {
+          "country": "Israel",
+          "bags": 7491,
+          "robusta_bags": 7491,
+          "arabica_bags": 0
+        },
+        {
           "country": "Tunisia",
           "bags": 6583,
           "robusta_bags": 6583,
@@ -12975,160 +13185,10 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 179802,
-          "robusta_bags": 166612,
-          "arabica_bags": 13190
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 73187,
-          "robusta_bags": 70460,
-          "arabica_bags": 2727
-        },
-        {
-          "country": "Algeria",
-          "bags": 51337,
-          "robusta_bags": 51004,
-          "arabica_bags": 333
-        },
-        {
-          "country": "India",
-          "bags": 45418,
-          "robusta_bags": 42198,
-          "arabica_bags": 3220
-        },
-        {
-          "country": "Switzerland",
-          "bags": 33642,
-          "robusta_bags": 31718,
-          "arabica_bags": 1924
-        },
-        {
-          "country": "Sudan",
-          "bags": 28688,
-          "robusta_bags": 28688,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Morocco",
-          "bags": 24776,
-          "robusta_bags": 24776,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Spain",
-          "bags": 23901,
-          "robusta_bags": 21605,
-          "arabica_bags": 2296
-        },
-        {
-          "country": "Belgium",
-          "bags": 19494,
-          "robusta_bags": 15076,
-          "arabica_bags": 4418
-        },
-        {
-          "country": "Netherlands",
-          "bags": 17809,
-          "robusta_bags": 15289,
-          "arabica_bags": 2520
-        },
-        {
-          "country": "Russia",
-          "bags": 16649,
-          "robusta_bags": 15615,
-          "arabica_bags": 1034
-        },
-        {
-          "country": "Portugal",
-          "bags": 12601,
-          "robusta_bags": 9950,
-          "arabica_bags": 2651
-        },
-        {
-          "country": "China",
-          "bags": 10391,
-          "robusta_bags": 9407,
-          "arabica_bags": 984
-        },
-        {
-          "country": "Greece",
-          "bags": 7813,
-          "robusta_bags": 7479,
-          "arabica_bags": 334
-        },
-        {
-          "country": "Turkey",
-          "bags": 4761,
-          "robusta_bags": 3254,
-          "arabica_bags": 1507
-        },
-        {
-          "country": "Australia",
-          "bags": 3654,
-          "robusta_bags": 3164,
-          "arabica_bags": 490
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 3631,
-          "robusta_bags": 3214,
-          "arabica_bags": 417
-        },
-        {
-          "country": "Tunisia",
-          "bags": 2574,
-          "robusta_bags": 2574,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 2560,
-          "robusta_bags": 2560,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 1959,
-          "robusta_bags": 1319,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1914,
-          "robusta_bags": 1274,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Kenya",
-          "bags": 1693,
-          "robusta_bags": 1360,
-          "arabica_bags": 333
-        },
-        {
-          "country": "Canada",
-          "bags": 1306,
-          "robusta_bags": 1306,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 1270,
-          "robusta_bags": 1270,
-          "arabica_bags": 0
-        },
-        {
           "country": "Egypt",
-          "bags": 640,
-          "robusta_bags": 607,
-          "arabica_bags": 33
+          "bags": 2025,
+          "robusta_bags": 2025,
+          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
@@ -13201,165 +13261,9 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 165219,
-          "robusta_bags": 144765,
-          "arabica_bags": 20454
-        },
-        {
-          "country": "Germany",
-          "bags": 89720,
-          "robusta_bags": 74215,
-          "arabica_bags": 15505
-        },
-        {
-          "country": "India",
-          "bags": 45685,
-          "robusta_bags": 40415,
-          "arabica_bags": 5270
-        },
-        {
-          "country": "Belgium",
-          "bags": 33963,
-          "robusta_bags": 20066,
-          "arabica_bags": 13897
-        },
-        {
-          "country": "Spain",
-          "bags": 25802,
-          "robusta_bags": 21268,
-          "arabica_bags": 4534
-        },
-        {
-          "country": "Russia",
-          "bags": 23325,
-          "robusta_bags": 21172,
-          "arabica_bags": 2153
-        },
-        {
-          "country": "Netherlands",
-          "bags": 18801,
-          "robusta_bags": 16008,
-          "arabica_bags": 2793
-        },
-        {
-          "country": "Morocco",
-          "bags": 18748,
-          "robusta_bags": 18748,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Algeria",
-          "bags": 14714,
-          "robusta_bags": 13421,
-          "arabica_bags": 1293
-        },
-        {
-          "country": "Sudan",
-          "bags": 12950,
-          "robusta_bags": 12950,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 11780,
-          "robusta_bags": 10762,
-          "arabica_bags": 1018
-        },
-        {
-          "country": "Switzerland",
-          "bags": 10474,
-          "robusta_bags": 9154,
-          "arabica_bags": 1320
-        },
-        {
-          "country": "China",
-          "bags": 9088,
-          "robusta_bags": 5178,
-          "arabica_bags": 3910
-        },
-        {
-          "country": "Portugal",
-          "bags": 8710,
-          "robusta_bags": 7378,
-          "arabica_bags": 1332
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 7000,
-          "robusta_bags": 6040,
-          "arabica_bags": 960
-        },
-        {
-          "country": "Tunisia",
-          "bags": 5662,
-          "robusta_bags": 5662,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 4512,
-          "robusta_bags": 2804,
-          "arabica_bags": 1708
-        },
-        {
-          "country": "Canada",
-          "bags": 4328,
-          "robusta_bags": 2356,
-          "arabica_bags": 1972
-        },
-        {
-          "country": "Australia",
-          "bags": 3611,
-          "robusta_bags": 3291,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Mexico",
-          "bags": 3200,
-          "robusta_bags": 3200,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 2760,
-          "robusta_bags": 2760,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 2599,
-          "robusta_bags": 1600,
-          "arabica_bags": 999
-        },
-        {
-          "country": "Korea",
-          "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 960,
-          "robusta_bags": 960,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 680,
-          "robusta_bags": 680,
-          "arabica_bags": 0
-        },
-        {
           "country": "Egypt",
-          "bags": 350,
-          "robusta_bags": 316,
-          "arabica_bags": 34
-        },
-        {
-          "country": "Japan",
-          "bags": 150,
-          "robusta_bags": 150,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -13515,8 +13419,8 @@
         {
           "country": "Japan",
           "bags": 2938,
-          "robusta_bags": 2618,
-          "arabica_bags": 320
+          "robusta_bags": 2672,
+          "arabica_bags": 266
         },
         {
           "country": "Canada",
@@ -13528,6 +13432,18 @@
           "country": "Switzerland",
           "bags": 1666,
           "robusta_bags": 1666,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Poland",
+          "bags": 1349,
+          "robusta_bags": 1349,
+          "arabica_bags": 0
+        },
+        {
+          "country": "Singapore",
+          "bags": 1041,
+          "robusta_bags": 1041,
           "arabica_bags": 0
         },
         {
@@ -13546,24 +13462,6 @@
           "country": "Australia",
           "bags": 666,
           "robusta_bags": 666,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 666,
-          "robusta_bags": 666,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tunisia",
-          "bags": 640,
-          "robusta_bags": 640,
           "arabica_bags": 0
         }
       ],
@@ -13641,159 +13539,9 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 395,
-          "robusta_bags": 121,
-          "arabica_bags": 274
-        },
-        {
-          "country": "Italy",
-          "bags": 148144,
-          "robusta_bags": 130906,
-          "arabica_bags": 17238
-        },
-        {
-          "country": "Germany",
-          "bags": 59464,
-          "robusta_bags": 37953,
-          "arabica_bags": 21511
-        },
-        {
-          "country": "Sudan",
-          "bags": 55824,
-          "robusta_bags": 55824,
-          "arabica_bags": 0
-        },
-        {
-          "country": "India",
-          "bags": 37170,
-          "robusta_bags": 34150,
-          "arabica_bags": 3020
-        },
-        {
-          "country": "Belgium",
-          "bags": 34996,
-          "robusta_bags": 19470,
-          "arabica_bags": 15526
-        },
-        {
-          "country": "China",
-          "bags": 34862,
-          "robusta_bags": 20378,
-          "arabica_bags": 14484
-        },
-        {
-          "country": "Spain",
-          "bags": 31103,
-          "robusta_bags": 29169,
-          "arabica_bags": 1934
-        },
-        {
-          "country": "Morocco",
-          "bags": 17900,
-          "robusta_bags": 17232,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Algeria",
-          "bags": 16273,
-          "robusta_bags": 15953,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Portugal",
-          "bags": 11150,
-          "robusta_bags": 7750,
-          "arabica_bags": 3400
-        },
-        {
-          "country": "Russia",
-          "bags": 10729,
-          "robusta_bags": 8675,
-          "arabica_bags": 2054
-        },
-        {
-          "country": "Turkey",
-          "bags": 7120,
-          "robusta_bags": 6770,
-          "arabica_bags": 350
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 6592,
-          "robusta_bags": 3579,
-          "arabica_bags": 3013
-        },
-        {
-          "country": "Greece",
-          "bags": 6460,
-          "robusta_bags": 6460,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Netherlands",
-          "bags": 6146,
-          "robusta_bags": 3133,
-          "arabica_bags": 3013
-        },
-        {
-          "country": "Switzerland",
-          "bags": 4013,
-          "robusta_bags": 4008,
-          "arabica_bags": 5
-        },
-        {
-          "country": "Egypt",
-          "bags": 3870,
-          "robusta_bags": 3870,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 3206,
-          "robusta_bags": 2856,
-          "arabica_bags": 350
-        },
-        {
-          "country": "Australia",
-          "bags": 3079,
-          "robusta_bags": 1776,
-          "arabica_bags": 1303
-        },
-        {
           "country": "South Africa",
-          "bags": 1750,
-          "robusta_bags": 960,
-          "arabica_bags": 790
-        },
-        {
-          "country": "Canada",
-          "bags": 1660,
-          "robusta_bags": 960,
-          "arabica_bags": 700
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 973,
-          "robusta_bags": 973,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 950,
-          "robusta_bags": 640,
-          "arabica_bags": 310
-        },
-        {
-          "country": "Mexico",
-          "bags": 810,
-          "robusta_bags": 810,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -13867,177 +13615,9 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 1336,
-          "robusta_bags": 668,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Italy",
-          "bags": 187732,
-          "robusta_bags": 166295,
-          "arabica_bags": 21437
-        },
-        {
-          "country": "United States",
+          "country": "Kenya",
           "bags": 2026,
           "robusta_bags": 2026,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Sudan",
-          "bags": 64864,
-          "robusta_bags": 64864,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 54831,
-          "robusta_bags": 36026,
-          "arabica_bags": 18805
-        },
-        {
-          "country": "India",
-          "bags": 51802,
-          "robusta_bags": 49702,
-          "arabica_bags": 2100
-        },
-        {
-          "country": "Morocco",
-          "bags": 47307,
-          "robusta_bags": 47307,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 29370,
-          "robusta_bags": 15457,
-          "arabica_bags": 13913
-        },
-        {
-          "country": "China",
-          "bags": 23747,
-          "robusta_bags": 14847,
-          "arabica_bags": 8900
-        },
-        {
-          "country": "Algeria",
-          "bags": 16841,
-          "robusta_bags": 16841,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Spain",
-          "bags": 12613,
-          "robusta_bags": 10353,
-          "arabica_bags": 2260
-        },
-        {
-          "country": "Portugal",
-          "bags": 12483,
-          "robusta_bags": 8963,
-          "arabica_bags": 3520
-        },
-        {
-          "country": "Netherlands",
-          "bags": 10698,
-          "robusta_bags": 7148,
-          "arabica_bags": 3550
-        },
-        {
-          "country": "Russia",
-          "bags": 9986,
-          "robusta_bags": 6308,
-          "arabica_bags": 3678
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 7147,
-          "robusta_bags": 3708,
-          "arabica_bags": 3439
-        },
-        {
-          "country": "Greece",
-          "bags": 6540,
-          "robusta_bags": 6190,
-          "arabica_bags": 350
-        },
-        {
-          "country": "Turkey",
-          "bags": 6214,
-          "robusta_bags": 5514,
-          "arabica_bags": 700
-        },
-        {
-          "country": "Switzerland",
-          "bags": 5783,
-          "robusta_bags": 5783,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 5160,
-          "robusta_bags": 5160,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 3899,
-          "robusta_bags": 2559,
-          "arabica_bags": 1340
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 3648,
-          "robusta_bags": 2880,
-          "arabica_bags": 768
-        },
-        {
-          "country": "Canada",
-          "bags": 2962,
-          "robusta_bags": 1630,
-          "arabica_bags": 1332
-        },
-        {
-          "country": "Australia",
-          "bags": 2069,
-          "robusta_bags": 1096,
-          "arabica_bags": 973
-        },
-        {
-          "country": "Tanzania",
-          "bags": 1886,
-          "robusta_bags": 1218,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Japan",
-          "bags": 1406,
-          "robusta_bags": 1200,
-          "arabica_bags": 206
-        },
-        {
-          "country": "Kenya",
-          "bags": 737,
-          "robusta_bags": 720,
-          "arabica_bags": 17
-        },
-        {
-          "country": "Mexico",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
-        },
-        {
-          "country": "France",
-          "bags": 360,
-          "robusta_bags": 360,
           "arabica_bags": 0
         }
       ],
@@ -14115,159 +13695,9 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 215931,
-          "robusta_bags": 194229,
-          "arabica_bags": 21702
-        },
-        {
-          "country": "Sudan",
-          "bags": 74790,
-          "robusta_bags": 74790,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 53395,
-          "robusta_bags": 49323,
-          "arabica_bags": 4072
-        },
-        {
-          "country": "India",
-          "bags": 44038,
-          "robusta_bags": 41902,
-          "arabica_bags": 2136
-        },
-        {
-          "country": "Morocco",
-          "bags": 40191,
-          "robusta_bags": 40191,
-          "arabica_bags": 0
-        },
-        {
-          "country": "China",
-          "bags": 28172,
-          "robusta_bags": 17507,
-          "arabica_bags": 10665
-        },
-        {
-          "country": "Spain",
-          "bags": 22573,
-          "robusta_bags": 19986,
-          "arabica_bags": 2587
-        },
-        {
-          "country": "Belgium",
-          "bags": 20600,
-          "robusta_bags": 16280,
-          "arabica_bags": 4320
-        },
-        {
-          "country": "Portugal",
-          "bags": 18632,
-          "robusta_bags": 15324,
-          "arabica_bags": 3308
-        },
-        {
-          "country": "Algeria",
-          "bags": 16767,
-          "robusta_bags": 16767,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 16208,
-          "robusta_bags": 15568,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Netherlands",
-          "bags": 14012,
-          "robusta_bags": 8428,
-          "arabica_bags": 5584
-        },
-        {
-          "country": "Russia",
-          "bags": 10517,
-          "robusta_bags": 8457,
-          "arabica_bags": 2060
-        },
-        {
-          "country": "Egypt",
-          "bags": 5610,
-          "robusta_bags": 5610,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 4445,
-          "robusta_bags": 2295,
-          "arabica_bags": 2150
-        },
-        {
-          "country": "Australia",
-          "bags": 2953,
-          "robusta_bags": 2313,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Switzerland",
-          "bags": 2893,
-          "robusta_bags": 2573,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Greece",
-          "bags": 2259,
-          "robusta_bags": 1925,
-          "arabica_bags": 334
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 2224,
-          "robusta_bags": 1924,
-          "arabica_bags": 300
-        },
-        {
-          "country": "Kenya",
-          "bags": 1800,
-          "robusta_bags": 1800,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 1636,
-          "robusta_bags": 1636,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 1564,
-          "robusta_bags": 1080,
-          "arabica_bags": 484
-        },
-        {
-          "country": "Korea",
-          "bags": 1290,
-          "robusta_bags": 650,
-          "arabica_bags": 640
-        },
-        {
           "country": "Tanzania",
-          "bags": 551,
-          "robusta_bags": 551,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 390,
-          "robusta_bags": 290,
-          "arabica_bags": 100
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2026,
+          "robusta_bags": 2026,
           "arabica_bags": 0
         }
       ],
@@ -14423,6 +13853,12 @@
           "arabica_bags": 6834
         },
         {
+          "country": "Poland",
+          "bags": 13546,
+          "robusta_bags": 8600,
+          "arabica_bags": 4946
+        },
+        {
           "country": "Egypt",
           "bags": 10480,
           "robusta_bags": 10480,
@@ -14483,6 +13919,12 @@
           "arabica_bags": 986
         },
         {
+          "country": "Israel",
+          "bags": 2638,
+          "robusta_bags": 2638,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 2307,
           "robusta_bags": 1319,
@@ -14523,6 +13965,12 @@
           "bags": 680,
           "robusta_bags": 360,
           "arabica_bags": 320
+        },
+        {
+          "country": "Singapore",
+          "bags": 275,
+          "robusta_bags": 275,
+          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
@@ -14595,117 +14043,9 @@
       ],
       "by_destination": [
         {
-          "country": "Ethiopia",
-          "bags": 122,
-          "robusta_bags": 122,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 23689,
-          "robusta_bags": 13737,
-          "arabica_bags": 9952
-        },
-        {
-          "country": "Switzerland",
-          "bags": 16929,
-          "robusta_bags": 15459,
-          "arabica_bags": 1470
-        },
-        {
-          "country": "Netherlands",
-          "bags": 16573,
-          "robusta_bags": 15040,
-          "arabica_bags": 1533
-        },
-        {
-          "country": "Greece",
-          "bags": 15555,
-          "robusta_bags": 15555,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 10072,
-          "robusta_bags": 9000,
-          "arabica_bags": 1072
-        },
-        {
-          "country": "Portugal",
-          "bags": 9669,
-          "robusta_bags": 9016,
-          "arabica_bags": 653
-        },
-        {
-          "country": "Mexico",
-          "bags": 9280,
-          "robusta_bags": 9280,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 8942,
-          "robusta_bags": 8302,
-          "arabica_bags": 640
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 8243,
-          "robusta_bags": 7241,
-          "arabica_bags": 1002
-        },
-        {
-          "country": "Egypt",
-          "bags": 4250,
-          "robusta_bags": 4250,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tunisia",
-          "bags": 4062,
-          "robusta_bags": 3422,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Japan",
-          "bags": 1960,
-          "robusta_bags": 1305,
-          "arabica_bags": 655
-        },
-        {
-          "country": "Australia",
-          "bags": 1600,
-          "robusta_bags": 960,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Canada",
-          "bags": 1370,
-          "robusta_bags": 1370,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1280,
-          "robusta_bags": 1280,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 960,
-          "robusta_bags": 640,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Kenya",
-          "bags": 757,
-          "robusta_bags": 757,
-          "arabica_bags": 0
-        },
-        {
           "country": "South Africa",
-          "bags": 660,
-          "robusta_bags": 660,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -14779,177 +14119,15 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 25442,
-          "robusta_bags": 25442,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 113659,
-          "robusta_bags": 99422,
-          "arabica_bags": 14237
-        },
-        {
-          "country": "Sudan",
-          "bags": 124754,
-          "robusta_bags": 124754,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Algeria",
-          "bags": 61327,
-          "robusta_bags": 61327,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 41529,
-          "robusta_bags": 36429,
-          "arabica_bags": 5100
-        },
-        {
-          "country": "Morocco",
-          "bags": 37546,
-          "robusta_bags": 37196,
-          "arabica_bags": 350
-        },
-        {
-          "country": "India",
-          "bags": 30295,
-          "robusta_bags": 29710,
-          "arabica_bags": 585
-        },
-        {
-          "country": "Spain",
-          "bags": 27413,
-          "robusta_bags": 26453,
-          "arabica_bags": 960
-        },
-        {
-          "country": "China",
-          "bags": 21474,
-          "robusta_bags": 17508,
-          "arabica_bags": 3966
-        },
-        {
-          "country": "Netherlands",
-          "bags": 19841,
-          "robusta_bags": 18885,
-          "arabica_bags": 956
-        },
-        {
-          "country": "Russia",
-          "bags": 16052,
-          "robusta_bags": 13398,
-          "arabica_bags": 2654
-        },
-        {
-          "country": "Switzerland",
-          "bags": 12411,
-          "robusta_bags": 12411,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 11403,
-          "robusta_bags": 9253,
-          "arabica_bags": 2150
-        },
-        {
-          "country": "Egypt",
-          "bags": 9680,
-          "robusta_bags": 9680,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Portugal",
-          "bags": 9495,
-          "robusta_bags": 6869,
-          "arabica_bags": 2626
-        },
-        {
-          "country": "France",
-          "bags": 6280,
-          "robusta_bags": 6280,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 5270,
-          "robusta_bags": 3670,
-          "arabica_bags": 1600
-        },
-        {
-          "country": "Turkey",
-          "bags": 5238,
-          "robusta_bags": 4888,
-          "arabica_bags": 350
-        },
-        {
           "country": "Tunisia",
-          "bags": 4930,
-          "robusta_bags": 4930,
-          "arabica_bags": 0
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 4497,
-          "robusta_bags": 2880,
-          "arabica_bags": 1617
-        },
-        {
-          "country": "South Africa",
-          "bags": 3655,
-          "robusta_bags": 2075,
-          "arabica_bags": 1580
-        },
-        {
-          "country": "Australia",
-          "bags": 3030,
-          "robusta_bags": 2686,
-          "arabica_bags": 344
-        },
-        {
-          "country": "Korea",
-          "bags": 2612,
-          "robusta_bags": 2292,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Mexico",
-          "bags": 1160,
-          "robusta_bags": 1160,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 986,
-          "robusta_bags": 986,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tanzania",
-          "bags": 700,
-          "robusta_bags": 700,
+          "bags": 20255,
+          "robusta_bags": 20255,
           "arabica_bags": 0
         },
         {
           "country": "Kenya",
-          "bags": 520,
-          "robusta_bags": 420,
-          "arabica_bags": 100
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -15023,153 +14201,15 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 238072,
-          "robusta_bags": 12327,
-          "arabica_bags": 225745
-        },
-        {
           "country": "Sudan",
-          "bags": 112323,
-          "robusta_bags": 112323,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 85721,
-          "robusta_bags": 77648,
-          "arabica_bags": 8073
-        },
-        {
-          "country": "Algeria",
-          "bags": 46028,
-          "robusta_bags": 45695,
-          "arabica_bags": 333
-        },
-        {
-          "country": "India",
-          "bags": 38401,
-          "robusta_bags": 38111,
-          "arabica_bags": 290
-        },
-        {
-          "country": "Spain",
-          "bags": 34721,
-          "robusta_bags": 31957,
-          "arabica_bags": 2764
-        },
-        {
-          "country": "Morocco",
-          "bags": 33645,
-          "robusta_bags": 33645,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 31694,
-          "robusta_bags": 28081,
-          "arabica_bags": 3613
-        },
-        {
-          "country": "Russia",
-          "bags": 26593,
-          "robusta_bags": 24619,
-          "arabica_bags": 1974
-        },
-        {
-          "country": "Netherlands",
-          "bags": 20444,
-          "robusta_bags": 17934,
-          "arabica_bags": 2510
-        },
-        {
-          "country": "China",
-          "bags": 14864,
-          "robusta_bags": 11033,
-          "arabica_bags": 3831
-        },
-        {
-          "country": "Portugal",
-          "bags": 10199,
-          "robusta_bags": 8534,
-          "arabica_bags": 1665
-        },
-        {
-          "country": "Turkey",
-          "bags": 8888,
-          "robusta_bags": 8888,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Switzerland",
-          "bags": 7014,
-          "robusta_bags": 5734,
-          "arabica_bags": 1280
-        },
-        {
-          "country": "Greece",
-          "bags": 5540,
-          "robusta_bags": 5540,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 4746,
-          "robusta_bags": 4746,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Australia",
-          "bags": 4292,
-          "robusta_bags": 3972,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Japan",
-          "bags": 3657,
-          "robusta_bags": 2450,
-          "arabica_bags": 1207
-        },
-        {
-          "country": "South Africa",
-          "bags": 2510,
-          "robusta_bags": 1280,
-          "arabica_bags": 1230
-        },
-        {
-          "country": "Canada",
-          "bags": 1370,
-          "robusta_bags": 1050,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 653,
-          "robusta_bags": 653,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Tunisia",
-          "bags": 650,
-          "robusta_bags": 650,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         },
         {
           "country": "Kenya",
-          "bags": 100,
-          "robusta_bags": 100,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -15247,153 +14287,15 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 216549,
-          "robusta_bags": 202797,
-          "arabica_bags": 13752
-        },
-        {
-          "country": "Sudan",
-          "bags": 57380,
-          "robusta_bags": 57380,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 110220,
-          "robusta_bags": 105635,
-          "arabica_bags": 4585
-        },
-        {
-          "country": "Morocco",
-          "bags": 63567,
-          "robusta_bags": 63247,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Algeria",
-          "bags": 50233,
-          "robusta_bags": 50233,
-          "arabica_bags": 0
-        },
-        {
-          "country": "India",
-          "bags": 45690,
-          "robusta_bags": 44129,
-          "arabica_bags": 1561
-        },
-        {
-          "country": "Belgium",
-          "bags": 34630,
-          "robusta_bags": 28914,
-          "arabica_bags": 5716
-        },
-        {
-          "country": "Spain",
-          "bags": 26320,
-          "robusta_bags": 22757,
-          "arabica_bags": 3563
-        },
-        {
-          "country": "Netherlands",
-          "bags": 25993,
-          "robusta_bags": 23883,
-          "arabica_bags": 2110
-        },
-        {
-          "country": "Russia",
-          "bags": 25404,
-          "robusta_bags": 24760,
-          "arabica_bags": 644
-        },
-        {
-          "country": "Switzerland",
-          "bags": 18077,
-          "robusta_bags": 16837,
-          "arabica_bags": 1240
-        },
-        {
-          "country": "China",
-          "bags": 13251,
-          "robusta_bags": 12834,
-          "arabica_bags": 417
-        },
-        {
-          "country": "Portugal",
-          "bags": 9920,
-          "robusta_bags": 8268,
-          "arabica_bags": 1652
-        },
-        {
-          "country": "Turkey",
-          "bags": 8538,
-          "robusta_bags": 8356,
-          "arabica_bags": 182
-        },
-        {
-          "country": "Korea",
-          "bags": 6980,
-          "robusta_bags": 6980,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 5332,
-          "robusta_bags": 5332,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 4810,
-          "robusta_bags": 4810,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Australia",
-          "bags": 3339,
-          "robusta_bags": 2339,
-          "arabica_bags": 1000
-        },
-        {
-          "country": "Greece",
-          "bags": 2962,
-          "robusta_bags": 2962,
-          "arabica_bags": 0
-        },
-        {
           "country": "Tunisia",
-          "bags": 2560,
-          "robusta_bags": 2560,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 1970,
-          "robusta_bags": 1970,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 1933,
-          "robusta_bags": 1600,
-          "arabica_bags": 333
         },
         {
           "country": "Kenya",
-          "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Japan",
-          "bags": 902,
-          "robusta_bags": 902,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -15467,160 +14369,10 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 179802,
-          "robusta_bags": 166612,
-          "arabica_bags": 13190
-        },
-        {
-          "country": "Brazil",
-          "bags": 169,
-          "robusta_bags": 169,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 73187,
-          "robusta_bags": 70460,
-          "arabica_bags": 2727
-        },
-        {
-          "country": "Algeria",
-          "bags": 51337,
-          "robusta_bags": 51004,
-          "arabica_bags": 333
-        },
-        {
-          "country": "India",
-          "bags": 45418,
-          "robusta_bags": 42198,
-          "arabica_bags": 3220
-        },
-        {
-          "country": "Switzerland",
-          "bags": 33642,
-          "robusta_bags": 31718,
-          "arabica_bags": 1924
-        },
-        {
-          "country": "Sudan",
-          "bags": 28688,
-          "robusta_bags": 28688,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Morocco",
-          "bags": 24776,
-          "robusta_bags": 24776,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Spain",
-          "bags": 23901,
-          "robusta_bags": 21605,
-          "arabica_bags": 2296
-        },
-        {
-          "country": "Belgium",
-          "bags": 19494,
-          "robusta_bags": 15076,
-          "arabica_bags": 4418
-        },
-        {
-          "country": "Netherlands",
-          "bags": 17809,
-          "robusta_bags": 15289,
-          "arabica_bags": 2520
-        },
-        {
-          "country": "Russia",
-          "bags": 16649,
-          "robusta_bags": 15615,
-          "arabica_bags": 1034
-        },
-        {
-          "country": "Portugal",
-          "bags": 12601,
-          "robusta_bags": 9950,
-          "arabica_bags": 2651
-        },
-        {
-          "country": "China",
-          "bags": 10391,
-          "robusta_bags": 9407,
-          "arabica_bags": 984
-        },
-        {
-          "country": "Greece",
-          "bags": 7813,
-          "robusta_bags": 7479,
-          "arabica_bags": 334
-        },
-        {
-          "country": "Turkey",
-          "bags": 4761,
-          "robusta_bags": 3254,
-          "arabica_bags": 1507
-        },
-        {
-          "country": "Australia",
-          "bags": 3654,
-          "robusta_bags": 3164,
-          "arabica_bags": 490
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 3631,
-          "robusta_bags": 3214,
-          "arabica_bags": 417
-        },
-        {
-          "country": "Tunisia",
-          "bags": 2574,
-          "robusta_bags": 2574,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 2560,
-          "robusta_bags": 2560,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 1959,
-          "robusta_bags": 1319,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1914,
-          "robusta_bags": 1274,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Kenya",
-          "bags": 1693,
-          "robusta_bags": 1360,
-          "arabica_bags": 333
-        },
-        {
-          "country": "Canada",
-          "bags": 1306,
-          "robusta_bags": 1306,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 1270,
-          "robusta_bags": 1270,
-          "arabica_bags": 0
-        },
-        {
           "country": "Egypt",
-          "bags": 640,
-          "robusta_bags": 607,
-          "arabica_bags": 33
+          "bags": 2025,
+          "robusta_bags": 2025,
+          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
@@ -15693,165 +14445,9 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 165219,
-          "robusta_bags": 144765,
-          "arabica_bags": 20454
-        },
-        {
-          "country": "Germany",
-          "bags": 89720,
-          "robusta_bags": 74215,
-          "arabica_bags": 15505
-        },
-        {
-          "country": "India",
-          "bags": 45685,
-          "robusta_bags": 40415,
-          "arabica_bags": 5270
-        },
-        {
-          "country": "Belgium",
-          "bags": 33963,
-          "robusta_bags": 20066,
-          "arabica_bags": 13897
-        },
-        {
-          "country": "Spain",
-          "bags": 25802,
-          "robusta_bags": 21268,
-          "arabica_bags": 4534
-        },
-        {
-          "country": "Russia",
-          "bags": 23325,
-          "robusta_bags": 21172,
-          "arabica_bags": 2153
-        },
-        {
-          "country": "Netherlands",
-          "bags": 18801,
-          "robusta_bags": 16008,
-          "arabica_bags": 2793
-        },
-        {
-          "country": "Morocco",
-          "bags": 18748,
-          "robusta_bags": 18748,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Algeria",
-          "bags": 14714,
-          "robusta_bags": 13421,
-          "arabica_bags": 1293
-        },
-        {
-          "country": "Sudan",
-          "bags": 12950,
-          "robusta_bags": 12950,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Greece",
-          "bags": 11780,
-          "robusta_bags": 10762,
-          "arabica_bags": 1018
-        },
-        {
-          "country": "Switzerland",
-          "bags": 10474,
-          "robusta_bags": 9154,
-          "arabica_bags": 1320
-        },
-        {
-          "country": "China",
-          "bags": 9088,
-          "robusta_bags": 5178,
-          "arabica_bags": 3910
-        },
-        {
-          "country": "Portugal",
-          "bags": 8710,
-          "robusta_bags": 7378,
-          "arabica_bags": 1332
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 7000,
-          "robusta_bags": 6040,
-          "arabica_bags": 960
-        },
-        {
-          "country": "Tunisia",
-          "bags": 5662,
-          "robusta_bags": 5662,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 4512,
-          "robusta_bags": 2804,
-          "arabica_bags": 1708
-        },
-        {
-          "country": "Canada",
-          "bags": 4328,
-          "robusta_bags": 2356,
-          "arabica_bags": 1972
-        },
-        {
-          "country": "Australia",
-          "bags": 3611,
-          "robusta_bags": 3291,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Mexico",
-          "bags": 3200,
-          "robusta_bags": 3200,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 2760,
-          "robusta_bags": 2760,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 2599,
-          "robusta_bags": 1600,
-          "arabica_bags": 999
-        },
-        {
-          "country": "Korea",
-          "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 960,
-          "robusta_bags": 960,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Kenya",
-          "bags": 680,
-          "robusta_bags": 680,
-          "arabica_bags": 0
-        },
-        {
           "country": "Egypt",
-          "bags": 350,
-          "robusta_bags": 316,
-          "arabica_bags": 34
-        },
-        {
-          "country": "Japan",
-          "bags": 150,
-          "robusta_bags": 150,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -15921,165 +14517,9 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 121829,
-          "robusta_bags": 104854,
-          "arabica_bags": 16975
-        },
-        {
-          "country": "Ethiopia",
-          "bags": 2791,
-          "robusta_bags": 2005,
-          "arabica_bags": 786
-        },
-        {
-          "country": "Belgium",
-          "bags": 57571,
-          "robusta_bags": 40193,
-          "arabica_bags": 17378
-        },
-        {
-          "country": "Germany",
-          "bags": 44903,
-          "robusta_bags": 33092,
-          "arabica_bags": 11811
-        },
-        {
-          "country": "India",
-          "bags": 28739,
-          "robusta_bags": 26620,
-          "arabica_bags": 2119
-        },
-        {
-          "country": "Sudan",
-          "bags": 26945,
-          "robusta_bags": 26945,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Algeria",
-          "bags": 25015,
-          "robusta_bags": 23615,
-          "arabica_bags": 1400
-        },
-        {
-          "country": "Morocco",
-          "bags": 23562,
-          "robusta_bags": 22896,
-          "arabica_bags": 666
-        },
-        {
-          "country": "China",
-          "bags": 23311,
-          "robusta_bags": 12037,
-          "arabica_bags": 11274
-        },
-        {
-          "country": "Spain",
-          "bags": 22729,
-          "robusta_bags": 18536,
-          "arabica_bags": 4193
-        },
-        {
-          "country": "Russia",
-          "bags": 12885,
-          "robusta_bags": 8383,
-          "arabica_bags": 4502
-        },
-        {
-          "country": "France",
-          "bags": 7398,
-          "robusta_bags": 5624,
-          "arabica_bags": 1774
-        },
-        {
-          "country": "Greece",
-          "bags": 7197,
-          "robusta_bags": 6863,
-          "arabica_bags": 334
-        },
-        {
-          "country": "Portugal",
-          "bags": 6695,
-          "robusta_bags": 6375,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Australia",
-          "bags": 5215,
-          "robusta_bags": 4138,
-          "arabica_bags": 1077
-        },
-        {
-          "country": "Switzerland",
-          "bags": 3870,
-          "robusta_bags": 3230,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Netherlands",
-          "bags": 3780,
-          "robusta_bags": 2700,
-          "arabica_bags": 1080
-        },
-        {
-          "country": "Turkey",
-          "bags": 3704,
-          "robusta_bags": 2064,
-          "arabica_bags": 1640
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 3633,
-          "robusta_bags": 1927,
-          "arabica_bags": 1706
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 2950,
-          "robusta_bags": 1990,
-          "arabica_bags": 960
-        },
-        {
-          "country": "Korea",
-          "bags": 1520,
-          "robusta_bags": 1200,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Kenya",
-          "bags": 1333,
-          "robusta_bags": 693,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Canada",
-          "bags": 1020,
-          "robusta_bags": 700,
-          "arabica_bags": 320
-        },
-        {
-          "country": "South Africa",
-          "bags": 970,
-          "robusta_bags": 930,
-          "arabica_bags": 40
-        },
-        {
           "country": "Egypt",
-          "bags": 920,
-          "robusta_bags": 920,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 759,
-          "robusta_bags": 759,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Mexico",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -16157,159 +14597,9 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 395,
-          "robusta_bags": 121,
-          "arabica_bags": 274
-        },
-        {
-          "country": "Italy",
-          "bags": 148144,
-          "robusta_bags": 130906,
-          "arabica_bags": 17238
-        },
-        {
-          "country": "Germany",
-          "bags": 59464,
-          "robusta_bags": 37953,
-          "arabica_bags": 21511
-        },
-        {
-          "country": "Sudan",
-          "bags": 55824,
-          "robusta_bags": 55824,
-          "arabica_bags": 0
-        },
-        {
-          "country": "India",
-          "bags": 37170,
-          "robusta_bags": 34150,
-          "arabica_bags": 3020
-        },
-        {
-          "country": "Belgium",
-          "bags": 34996,
-          "robusta_bags": 19470,
-          "arabica_bags": 15526
-        },
-        {
-          "country": "China",
-          "bags": 34862,
-          "robusta_bags": 20378,
-          "arabica_bags": 14484
-        },
-        {
-          "country": "Spain",
-          "bags": 31103,
-          "robusta_bags": 29169,
-          "arabica_bags": 1934
-        },
-        {
-          "country": "Morocco",
-          "bags": 17900,
-          "robusta_bags": 17232,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Algeria",
-          "bags": 16273,
-          "robusta_bags": 15953,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Portugal",
-          "bags": 11150,
-          "robusta_bags": 7750,
-          "arabica_bags": 3400
-        },
-        {
-          "country": "Russia",
-          "bags": 10729,
-          "robusta_bags": 8675,
-          "arabica_bags": 2054
-        },
-        {
-          "country": "Turkey",
-          "bags": 7120,
-          "robusta_bags": 6770,
-          "arabica_bags": 350
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 6592,
-          "robusta_bags": 3579,
-          "arabica_bags": 3013
-        },
-        {
-          "country": "Greece",
-          "bags": 6460,
-          "robusta_bags": 6460,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Netherlands",
-          "bags": 6146,
-          "robusta_bags": 3133,
-          "arabica_bags": 3013
-        },
-        {
-          "country": "Switzerland",
-          "bags": 4013,
-          "robusta_bags": 4008,
-          "arabica_bags": 5
-        },
-        {
-          "country": "Egypt",
-          "bags": 3870,
-          "robusta_bags": 3870,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 3206,
-          "robusta_bags": 2856,
-          "arabica_bags": 350
-        },
-        {
-          "country": "Australia",
-          "bags": 3079,
-          "robusta_bags": 1776,
-          "arabica_bags": 1303
-        },
-        {
           "country": "South Africa",
-          "bags": 1750,
-          "robusta_bags": 960,
-          "arabica_bags": 790
-        },
-        {
-          "country": "Canada",
-          "bags": 1660,
-          "robusta_bags": 960,
-          "arabica_bags": 700
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 1280,
-          "robusta_bags": 960,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Korea",
-          "bags": 973,
-          "robusta_bags": 973,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 950,
-          "robusta_bags": 640,
-          "arabica_bags": 310
-        },
-        {
-          "country": "Mexico",
-          "bags": 810,
-          "robusta_bags": 810,
+          "bags": 2025,
+          "robusta_bags": 2025,
           "arabica_bags": 0
         }
       ],
@@ -16383,177 +14673,9 @@
       ],
       "by_destination": [
         {
-          "country": "Brazil",
-          "bags": 1336,
-          "robusta_bags": 668,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Italy",
-          "bags": 187732,
-          "robusta_bags": 166295,
-          "arabica_bags": 21437
-        },
-        {
-          "country": "United States",
+          "country": "Kenya",
           "bags": 2026,
           "robusta_bags": 2026,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Sudan",
-          "bags": 64864,
-          "robusta_bags": 64864,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 54831,
-          "robusta_bags": 36026,
-          "arabica_bags": 18805
-        },
-        {
-          "country": "India",
-          "bags": 51802,
-          "robusta_bags": 49702,
-          "arabica_bags": 2100
-        },
-        {
-          "country": "Morocco",
-          "bags": 47307,
-          "robusta_bags": 47307,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Belgium",
-          "bags": 29370,
-          "robusta_bags": 15457,
-          "arabica_bags": 13913
-        },
-        {
-          "country": "China",
-          "bags": 23747,
-          "robusta_bags": 14847,
-          "arabica_bags": 8900
-        },
-        {
-          "country": "Algeria",
-          "bags": 16841,
-          "robusta_bags": 16841,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Spain",
-          "bags": 12613,
-          "robusta_bags": 10353,
-          "arabica_bags": 2260
-        },
-        {
-          "country": "Portugal",
-          "bags": 12483,
-          "robusta_bags": 8963,
-          "arabica_bags": 3520
-        },
-        {
-          "country": "Netherlands",
-          "bags": 10698,
-          "robusta_bags": 7148,
-          "arabica_bags": 3550
-        },
-        {
-          "country": "Russia",
-          "bags": 9986,
-          "robusta_bags": 6308,
-          "arabica_bags": 3678
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 7147,
-          "robusta_bags": 3708,
-          "arabica_bags": 3439
-        },
-        {
-          "country": "Greece",
-          "bags": 6540,
-          "robusta_bags": 6190,
-          "arabica_bags": 350
-        },
-        {
-          "country": "Turkey",
-          "bags": 6214,
-          "robusta_bags": 5514,
-          "arabica_bags": 700
-        },
-        {
-          "country": "Switzerland",
-          "bags": 5783,
-          "robusta_bags": 5783,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Egypt",
-          "bags": 5160,
-          "robusta_bags": 5160,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 3899,
-          "robusta_bags": 2559,
-          "arabica_bags": 1340
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 3648,
-          "robusta_bags": 2880,
-          "arabica_bags": 768
-        },
-        {
-          "country": "Canada",
-          "bags": 2962,
-          "robusta_bags": 1630,
-          "arabica_bags": 1332
-        },
-        {
-          "country": "Australia",
-          "bags": 2069,
-          "robusta_bags": 1096,
-          "arabica_bags": 973
-        },
-        {
-          "country": "Tanzania",
-          "bags": 1886,
-          "robusta_bags": 1218,
-          "arabica_bags": 668
-        },
-        {
-          "country": "Japan",
-          "bags": 1406,
-          "robusta_bags": 1200,
-          "arabica_bags": 206
-        },
-        {
-          "country": "Kenya",
-          "bags": 737,
-          "robusta_bags": 720,
-          "arabica_bags": 17
-        },
-        {
-          "country": "Mexico",
-          "bags": 640,
-          "robusta_bags": 640,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Korea",
-          "bags": 640,
-          "robusta_bags": 320,
-          "arabica_bags": 320
-        },
-        {
-          "country": "France",
-          "bags": 360,
-          "robusta_bags": 360,
           "arabica_bags": 0
         }
       ],
@@ -16631,159 +14753,9 @@
       ],
       "by_destination": [
         {
-          "country": "Italy",
-          "bags": 215931,
-          "robusta_bags": 194229,
-          "arabica_bags": 21702
-        },
-        {
-          "country": "Sudan",
-          "bags": 74790,
-          "robusta_bags": 74790,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Germany",
-          "bags": 53395,
-          "robusta_bags": 49323,
-          "arabica_bags": 4072
-        },
-        {
-          "country": "India",
-          "bags": 44038,
-          "robusta_bags": 41902,
-          "arabica_bags": 2136
-        },
-        {
-          "country": "Morocco",
-          "bags": 40191,
-          "robusta_bags": 40191,
-          "arabica_bags": 0
-        },
-        {
-          "country": "China",
-          "bags": 28172,
-          "robusta_bags": 17507,
-          "arabica_bags": 10665
-        },
-        {
-          "country": "Spain",
-          "bags": 22573,
-          "robusta_bags": 19986,
-          "arabica_bags": 2587
-        },
-        {
-          "country": "Belgium",
-          "bags": 20600,
-          "robusta_bags": 16280,
-          "arabica_bags": 4320
-        },
-        {
-          "country": "Portugal",
-          "bags": 18632,
-          "robusta_bags": 15324,
-          "arabica_bags": 3308
-        },
-        {
-          "country": "Algeria",
-          "bags": 16767,
-          "robusta_bags": 16767,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Turkey",
-          "bags": 16208,
-          "robusta_bags": 15568,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Netherlands",
-          "bags": 14012,
-          "robusta_bags": 8428,
-          "arabica_bags": 5584
-        },
-        {
-          "country": "Russia",
-          "bags": 10517,
-          "robusta_bags": 8457,
-          "arabica_bags": 2060
-        },
-        {
-          "country": "Egypt",
-          "bags": 5610,
-          "robusta_bags": 5610,
-          "arabica_bags": 0
-        },
-        {
-          "country": "South Africa",
-          "bags": 4445,
-          "robusta_bags": 2295,
-          "arabica_bags": 2150
-        },
-        {
-          "country": "Australia",
-          "bags": 2953,
-          "robusta_bags": 2313,
-          "arabica_bags": 640
-        },
-        {
-          "country": "Switzerland",
-          "bags": 2893,
-          "robusta_bags": 2573,
-          "arabica_bags": 320
-        },
-        {
-          "country": "Greece",
-          "bags": 2259,
-          "robusta_bags": 1925,
-          "arabica_bags": 334
-        },
-        {
-          "country": "United Kingdom",
-          "bags": 2224,
-          "robusta_bags": 1924,
-          "arabica_bags": 300
-        },
-        {
-          "country": "Kenya",
-          "bags": 1800,
-          "robusta_bags": 1800,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Canada",
-          "bags": 1636,
-          "robusta_bags": 1636,
-          "arabica_bags": 0
-        },
-        {
-          "country": "France",
-          "bags": 1564,
-          "robusta_bags": 1080,
-          "arabica_bags": 484
-        },
-        {
-          "country": "Korea",
-          "bags": 1290,
-          "robusta_bags": 650,
-          "arabica_bags": 640
-        },
-        {
           "country": "Tanzania",
-          "bags": 551,
-          "robusta_bags": 551,
-          "arabica_bags": 0
-        },
-        {
-          "country": "Japan",
-          "bags": 390,
-          "robusta_bags": 290,
-          "arabica_bags": 100
-        },
-        {
-          "country": "Saudi Arabia",
-          "bags": 320,
-          "robusta_bags": 320,
+          "bags": 2026,
+          "robusta_bags": 2026,
           "arabica_bags": 0
         }
       ],
@@ -16939,6 +14911,12 @@
           "arabica_bags": 6834
         },
         {
+          "country": "Poland",
+          "bags": 13546,
+          "robusta_bags": 8600,
+          "arabica_bags": 4946
+        },
+        {
           "country": "Egypt",
           "bags": 10480,
           "robusta_bags": 10480,
@@ -16999,6 +14977,12 @@
           "arabica_bags": 986
         },
         {
+          "country": "Israel",
+          "bags": 2638,
+          "robusta_bags": 2638,
+          "arabica_bags": 0
+        },
+        {
           "country": "Switzerland",
           "bags": 2307,
           "robusta_bags": 1319,
@@ -17039,6 +15023,12 @@
           "bags": 680,
           "robusta_bags": 360,
           "arabica_bags": 320
+        },
+        {
+          "country": "Singapore",
+          "bags": 275,
+          "robusta_bags": 275,
+          "arabica_bags": 0
         }
       ],
       "parser_version": "v1_recent",
