@@ -232,6 +232,77 @@ Annex 3: Destinations
     assert dests["Italy"] == 198_746
 
 
+def test_extract_destinations_table_slices_at_annex_headers():
+    """The table-slicing path scopes the destinations search between the
+    Annex header and the next major section, so narrative mentions of
+    country names outside that window don't pollute the result."""
+    # Tunisia is mentioned in the narrative ("declined to Tunisia 1,500
+    # bags") and then again in the table at 21,978. The slicer should pick
+    # up the table value only because the narrative is BEFORE the Annex
+    # header.
+    text = """\
+MONTHLY COFFEE REPORT - AUGUST 2022
+The month saw declined sales to Tunisia 1,500 bags as wholesalers paused.
+
+Annex 3: Main Destinations of Uganda Coffee by Type
+1 Italy 1 183,308 15,438 198,746 39.67 39.67
+2Germany 3 62,875 6,423 69,298 13.83 53.50
+3Sudan 2 51,100 51,100 10.20 63.69
+6Tunisia 21,978 21,978 4.39 81.45
+
+Annex 4: Top Coffee Exporters
+The exporter group from Italy held the largest share of 18,000 bags.
+"""
+    countries = ("italy", "germany", "sudan", "tunisia")
+    rows = um._extract_destinations_table(text, countries)
+    by_country = {r["country"]: r for r in rows}
+    # All four table rows are captured even though they're on consecutive
+    # lines (the slicer doesn't care about line breaks within the scope).
+    assert by_country["Italy"]["bags"]   == 198_746
+    assert by_country["Germany"]["bags"] == 69_298
+    assert by_country["Sudan"]["bags"]   == 51_100
+    # Tunisia's table value wins; the 1,500 narrative mention BEFORE the
+    # Annex header isn't captured because it's outside the slicer's scope.
+    assert by_country["Tunisia"]["bags"] == 21_978
+    # The "Italy 18,000" mention AFTER "Annex 4" is also excluded.
+    assert by_country["Italy"]["bags"] != 18_000
+
+
+def test_extract_destinations_table_handles_one_line_table():
+    """pdfplumber sometimes collapses an entire table onto one physical
+    line. The slicer walks country positions within the scope rather than
+    splitting by line breaks, so this case works just like multi-line."""
+    text = (
+        "MONTHLY COFFEE REPORT - JUNE 2025\n"
+        "Annex 4: Main Destinations of Uganda Coffee\n"
+        "1 Italy 1 100,000 50,000 150,000 30.00 30.00 "
+        "2Germany 2 80,000 5,000 85,000 17.00 47.00 "
+        "3Sudan 3 60,000 60,000 12.00 59.00 "
+        "4 India 4 40,000 5,000 45,000 9.00 68.00\n"
+        "End of report."
+    )
+    countries = ("italy", "germany", "sudan", "india")
+    rows = um._extract_destinations_table(text, countries)
+    by_country = {r["country"]: r for r in rows}
+    assert by_country["Italy"]["bags"]   == 150_000
+    assert by_country["Germany"]["bags"] == 85_000
+    assert by_country["Sudan"]["bags"]   == 60_000
+    assert by_country["India"]["bags"]   == 45_000
+
+
+def test_extract_destinations_table_falls_back_when_no_marker():
+    """No Annex header → return [] so the caller falls back to the
+    line-by-line scan (older report formats)."""
+    text = """\
+MONTHLY COFFEE REPORT - JUNE 2020
+Some narrative paragraph without an Annex section header.
+1 Italy 100,000
+"""
+    countries = ("italy",)
+    rows = um._extract_destinations_table(text, countries)
+    assert rows == []
+
+
 def test_v1_returns_stub_when_grade_table_missing():
     """Format drift case — month resolves but the grade table fails to match.
     Stub still surfaces month + warning so the diagnostic dump catches the
