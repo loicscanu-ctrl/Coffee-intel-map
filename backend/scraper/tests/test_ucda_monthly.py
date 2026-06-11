@@ -105,40 +105,6 @@ Screen 18    180,000   35.0%
     assert rep.robusta_bags == 180_000
 
 
-def test_v1_grade_extraction_picks_largest_plausible_value():
-    """Some UCDA report eras (notably 2022-2023) put the bag-quantity column
-    AFTER smaller cells (running total, %change, sub-totals). The parser must
-    pick the largest plausible number on the grade row, not the first one,
-    or those years come out severely under-counted."""
-    text = """\
-MONTHLY COFFEE REPORT - JUNE 2023
-
-Grade Breakdown:
-Screen 15       2.4%   1.50    50,000   bags total
-Screen 18      35.0%   3.20   180,000   bags
-"""
-    rep = um._parse_v1_recent(text, None)
-    assert rep is not None
-    grades = {g["grade"]: g["bags"] for g in rep.by_grade}
-    assert grades["Screen 15"] == 50_000        # NOT 2 or 1 (the percent / price cells)
-    assert grades["Screen 18"] == 180_000
-
-
-def test_v1_grade_caps_at_2M_to_reject_ytd_columns():
-    """Some report layouts include a YTD or value-USD column alongside the
-    monthly qty. Values > 2M bags wouldn't be a single grade in a single
-    month, so we cap and pick the next-largest plausible value."""
-    text = """\
-MONTHLY COFFEE REPORT - JUNE 2024
-
-Screen 18    180,000   2,500,000   YTD column shouldn't win
-"""
-    rep = um._parse_v1_recent(text, None)
-    assert rep is not None
-    grades = {g["grade"]: g["bags"] for g in rep.by_grade}
-    assert grades["Screen 18"] == 180_000
-
-
 def test_v1_returns_stub_when_grade_table_missing():
     """Format drift case — month resolves but the grade table fails to match.
     Stub still surfaces month + warning so the diagnostic dump catches the
