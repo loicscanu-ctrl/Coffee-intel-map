@@ -105,14 +105,26 @@ Screen 18    180,000   35.0%
     assert rep.robusta_bags == 180_000
 
 
-def test_v1_destination_picks_total_column_not_robusta_only():
-    """Regression: user spot-checked August 2022 against the source PDF and
-    found the parser was reading the ROBUSTA column for multi-stream
-    destinations (Italy 183,308 instead of Total 198,746; India 35,233
-    instead of Total 38,833; Belgium 27,820 instead of Total 28,170).
-    The Total column is reliably the largest plausible cell on the row;
-    %share columns (39.67, etc.) are < 100 and already rejected by the
-    cap filter."""
+def test_split_dest_row_helper():
+    """Lock down the cell-split logic across the layouts observed in UCDA's
+    PDFs. R / A / T order in the helper is destinational pdfplumber-cell
+    semantics, NOT sorted order."""
+    # 3 cells (Italy 198,746 / India 38,833 / Germany 69,298 / Belgium 28,170)
+    assert um._split_dest_row([183_308, 15_438, 198_746]) == (183_308, 15_438, 198_746)
+    assert um._split_dest_row([35_233, 3_600, 38_833])    == (35_233, 3_600, 38_833)
+    assert um._split_dest_row([62_875, 6_423, 69_298])    == (62_875, 6_423, 69_298)
+    assert um._split_dest_row([27_820, 350, 28_170])      == (27_820, 350, 28_170)
+    # 2 cells where Total == Robusta (Sudan, Tunisia — robusta-only)
+    assert um._split_dest_row([51_100, 51_100]) == (51_100, 0, 51_100)
+    assert um._split_dest_row([21_978, 21_978]) == (21_978, 0, 21_978)
+    # 1 cell — partial row
+    assert um._split_dest_row([10_000]) == (10_000, 0, 10_000)
+
+
+def test_v1_destination_emits_robusta_arabica_total_split():
+    """Each destination row now carries R/A/Total instead of only Total —
+    matches the layout the source PDFs publish (Robusta col + Arabica col +
+    Total col + %share cols)."""
     text = """\
 MONTHLY COFFEE REPORT - AUGUST 2022
 
@@ -125,13 +137,28 @@ Annex 3: Destinations
 """
     rep = um._parse_v1_recent(text, None)
     assert rep is not None
-    dests = {d["country"]: d["bags"] for d in rep.by_destination}
-    # The Total column wins for multi-stream destinations.
-    assert dests["Italy"]   == 198_746
-    assert dests["India"]   == 38_833
-    assert dests["Belgium"] == 28_170
-    # Single-stream rows return the only value (= the Total).
-    assert dests["Sudan"]   == 51_100
+    by_country = {d["country"]: d for d in rep.by_destination}
+    italy = by_country["Italy"]
+    assert italy["robusta_bags"] == 183_308
+    assert italy["arabica_bags"] == 15_438
+    assert italy["bags"]         == 198_746
+    germany = by_country["Germany"]
+    assert germany["robusta_bags"] == 62_875
+    assert germany["arabica_bags"] == 6_423
+    assert germany["bags"]         == 69_298
+    india = by_country["India"]
+    assert india["robusta_bags"] == 35_233
+    assert india["arabica_bags"] == 3_600
+    assert india["bags"]         == 38_833
+    belgium = by_country["Belgium"]
+    assert belgium["robusta_bags"] == 27_820
+    assert belgium["arabica_bags"] == 350
+    assert belgium["bags"]         == 28_170
+    # Sudan is robusta-only: total = robusta, arabica = 0
+    sudan = by_country["Sudan"]
+    assert sudan["robusta_bags"] == 51_100
+    assert sudan["arabica_bags"] == 0
+    assert sudan["bags"]         == 51_100
 
 
 def test_v1_destination_matches_country_after_rank_without_space():

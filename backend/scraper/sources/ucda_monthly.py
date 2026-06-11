@@ -329,6 +329,33 @@ def _sum_arabica(by_grade: list[dict]) -> int | None:
     return s or None
 
 
+def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
+    """Split a row's plausible cell values into (Robusta, Arabica, Total) bags.
+
+    UCDA's destinations table columns are R / A / Total / %ind / %cum.
+    %ind and %cum are < 100 and already filtered out before this helper runs.
+    For a typical row pdfplumber gives us 2-3 plausible cells:
+
+      • 3 cells [R, A, T] (e.g. Italy 183,308 / 15,438 / 198,746)
+        → Total is the max; the next-largest is Robusta; Arabica = T − R
+      • 2 cells [R, T] where T == R (e.g. Sudan 51,100 / 51,100 — robusta-only
+        destination, Arabica column blank in the source)
+        → R = T, A = 0
+      • 1 cell — a single value got captured (rare partial row)
+        → R = T = the value, A = 0
+    """
+    sorted_desc = sorted(nums, reverse=True)
+    T = sorted_desc[0]
+    if len(sorted_desc) == 1:
+        return T, 0, T
+    # Sudan-style row: same value repeats → robusta-only.
+    if sorted_desc[1] == T:
+        return T, 0, T
+    R = sorted_desc[1]
+    A = max(0, T - R)
+    return R, A, T
+
+
 def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
     """First-pass parser modelled on the recent (2024+) report layout
     suggested by UCDA's search snippets ("Period/Coffee Type … Qty(60-kg bags)
@@ -407,14 +434,17 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
                 # polluting the all-time aggregate.
                 nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
                 if nums:
-                    # Pick the LARGEST plausible value on the row — that's
-                    # the Total column (Robusta + Arabica). Picking the
-                    # first plausible number was returning the Robusta-only
-                    # column for every multi-stream destination (Italy total
-                    # 198,746 → was being read as 183,308 Robusta-only;
-                    # India total 38,833 → as 35,233; etc.). %share columns
-                    # (39.67, 71.44 etc.) are < 100 so already rejected.
-                    rep.by_destination.append({"country": c.title(), "bags": max(nums)})
+                    rob, ara, tot = _split_dest_row(nums)
+                    # Keep `bags` = total as the canonical aggregate the
+                    # frontend already consumes; surface the split as
+                    # `robusta_bags` / `arabica_bags` so any future
+                    # stacked-bar visual can use them.
+                    rep.by_destination.append({
+                        "country":      c.title(),
+                        "bags":         tot,
+                        "robusta_bags": rob,
+                        "arabica_bags": ara,
+                    })
                 break
     # Dedupe destinations.
     seen_c: set[str] = set()
