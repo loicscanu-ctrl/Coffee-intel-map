@@ -207,6 +207,31 @@ Germany      34,355      5,090    39,445    9.08
     assert dests["India"] <= 250_000
 
 
+def test_v1_destination_dedup_keeps_largest_not_first():
+    """Sanity-check from main surfaced an August 2022 Germany row of 2,022
+    bags because a narrative comparison line ("…exports to Germany of 2,022
+    bags reached…") fired the regex BEFORE the real Annex 3 table row
+    (69,298 bags). The dedupe pass now keeps max(bags) per country instead
+    of first-seen, so the table row wins."""
+    text = """\
+MONTHLY COFFEE REPORT - AUGUST 2022
+
+Narrative paragraph mentioning Germany 2,022 bags as a prior-month note.
+…etc…
+
+Annex 3: Destinations
+1 Italy 1 183,308 15,438 198,746 39.67 39.67
+2Germany 3 62,875 6,423 69,298 13.83 53.50
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    dests = {d["country"]: d["bags"] for d in rep.by_destination}
+    # The table row wins; the narrative 2,022 gets discarded.
+    assert dests["Germany"] == 69_298
+    # Italy is still correctly captured.
+    assert dests["Italy"] == 198_746
+
+
 def test_v1_returns_stub_when_grade_table_missing():
     """Format drift case — month resolves but the grade table fails to match.
     Stub still surfaces month + warning so the diagnostic dump catches the
