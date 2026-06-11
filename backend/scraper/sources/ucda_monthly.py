@@ -392,7 +392,13 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
         for c in known_countries:
             if re.search(rf"\b{re.escape(c)}\b", low):
                 nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                nums = [n for n in nums if n and n >= 100]
+                # No Uganda destination has ever shipped > 250k bags in a
+                # single month (Italy's monthly peak ≈ 200k). Cap at 250k
+                # so a pdfplumber cell-concatenation artifact like the
+                # Feb-2024 India=20,242,023 outlier (vs the real 48,303
+                # bag total in that report) gets rejected instead of
+                # polluting the all-time aggregate.
+                nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
                 if nums:
                     rep.by_destination.append({"country": c.title(), "bags": nums[0]})
                 break

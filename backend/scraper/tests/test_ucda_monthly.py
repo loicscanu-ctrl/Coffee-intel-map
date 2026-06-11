@@ -105,6 +105,30 @@ Screen 18    180,000   35.0%
     assert rep.robusta_bags == 180_000
 
 
+def test_v1_destination_rejects_pdfplumber_outliers():
+    """Regression for the Feb-2024 India = 20,242,023 outlier. pdfplumber's
+    text extraction occasionally concatenates two adjacent cells across rows
+    (the "20"-prefix from a row number sticking to the value cell from the
+    line below), producing impossible single-month destinations of ~20M bags.
+    The 250k cap rejects that and the next plausible cell wins."""
+    text = """\
+MONTHLY COFFEE REPORT - FEBRUARY 2024
+
+Annex 4: Destinations
+Italy        149,362    14,648    164,010   37.74
+India   3    20,242,023            48,303   11.11
+Germany      34,355      5,090    39,445    9.08
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    dests = {d["country"]: d["bags"] for d in rep.by_destination}
+    # The 20.2M outlier is capped out; the parser falls back to the next
+    # plausible cell on the row (in pdfplumber's flattened text that's
+    # whichever cell ≤ 250k it found first).
+    assert "India" in dests
+    assert dests["India"] <= 250_000
+
+
 def test_v1_returns_stub_when_grade_table_missing():
     """Format drift case — month resolves but the grade table fails to match.
     Stub still surfaces month + warning so the diagnostic dump catches the
