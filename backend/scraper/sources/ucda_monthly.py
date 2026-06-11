@@ -251,20 +251,34 @@ _NUM_RE = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
 
 
 def _ym_from_text(text: str, fallback_url: str | None) -> str | None:
-    """Heuristic report-month detection. Tries the text first ("March 2024"
-    headers), then falls back to picking month/year out of the URL slug."""
-    m = _MONTH_YEAR_RE.search(text or "")
-    if m:
-        mo = MONTH_NAMES.get(m.group("month").lower())
-        yr = int(m.group("year"))
-        if mo: return f"{yr:04d}-{mo:02d}"
+    """Heuristic report-month detection. Strategy (first round of diagnostic
+    runs showed the original priority was inverted — text matches inside
+    comparison columns like "Volume vs June 2024" overrode the correct month
+    from the URL filename):
+
+      1. PREFER the URL filename — those carry the explicit reporting month
+         (e.g. ".../2025-07/09-June 2025 Report.pdf" → "2025-06"). The
+         leading "09-" / "08-" prefix is an upload sequence, not a date.
+      2. Fall back to text scan — pick the FIRST `<Month> <Year>` that
+         appears in the upper third of the document (title region), since
+         later occurrences are typically comparison-period mentions.
+    """
+    # 1. URL-first detection — most reliable signal for UCDA's recent files.
     if fallback_url:
-        # Patterns: ".../2022-03/July%202020.pdf" → "2020-07"
         slug = fallback_url.replace("%20", " ")
         for word, mo_num in MONTH_NAMES.items():
             mw = re.search(rf"\b{re.escape(word)}\s+(20\d{{2}})\b", slug, re.I)
             if mw:
                 return f"{int(mw.group(1)):04d}-{mo_num:02d}"
+
+    # 2. Text fallback — only scan the first ~3000 chars (title region) so we
+    #    don't pick up comparison-period mentions further down.
+    head = (text or "")[:3000]
+    m = _MONTH_YEAR_RE.search(head)
+    if m:
+        mo = MONTH_NAMES.get(m.group("month").lower())
+        yr = int(m.group("year"))
+        if mo: return f"{yr:04d}-{mo:02d}"
     return None
 
 
@@ -285,16 +299,34 @@ def _to_float(s: str) -> float | None:
 # Known coffee grades to look for in a line-keyed scan. Robusta first (more
 # common in Uganda), then Arabica varieties. The matchers are case-insensitive
 # substring tests — small surface area, easy to extend.
+#
+# IMPORTANT: order matters. Longer/more-specific labels go first so we don't
+# accidentally collapse "Organic Robusta" → "Robusta". `Sustainable` is its
+# own thing UCDA reports separately (washed/sustainable Robusta program).
 GRADE_LABELS_ROBUSTA = [
     "Screen 18", "Screen 17", "Screen 15", "Screen 14", "Screen 13",
     "Screen 12", "Screen 10", "BHP", "Organic Robusta", "Sustainable",
     "Washed Robusta", "Kiboko", "FAQ",
 ]
 GRADE_LABELS_ARABICA = [
-    "Bugisu AA", "Bugisu A", "Bugisu PB", "Bugisu B", "Bugisu A+",
+    "Bugisu AA", "Bugisu A+", "Bugisu A", "Bugisu PB", "Bugisu B",
     "Drugar", "Wugar", "Arabica Parchment", "Mt Elgon", "Washed Arabica",
     "Organic Arabica",
 ]
+_ROBUSTA_GRADE_SET = {g.lower() for g in GRADE_LABELS_ROBUSTA}
+_ARABICA_GRADE_SET = {g.lower() for g in GRADE_LABELS_ARABICA}
+
+
+def _sum_robusta(by_grade: list[dict]) -> int | None:
+    s = sum(g.get("bags", 0) for g in by_grade
+            if g.get("grade", "").lower() in _ROBUSTA_GRADE_SET)
+    return s or None
+
+
+def _sum_arabica(by_grade: list[dict]) -> int | None:
+    s = sum(g.get("bags", 0) for g in by_grade
+            if g.get("grade", "").lower() in _ARABICA_GRADE_SET)
+    return s or None
 
 
 def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
@@ -312,27 +344,21 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
         return None
     rep = MonthlyReport(month=ym, parser_version="v1", source_pdf=source_url)
 
-    # Robusta / Arabica totals — common phrasings:
-    #   "Robusta exports … 1,234,567 bags"
-    #   "Total Robusta : 1,234,567"
-    for label, attr in (("Robusta", "robusta_bags"), ("Arabica", "arabica_bags")):
-        pattern = re.compile(
-            rf"(?:total\s+{label}|^{label})[^\n\d]*?({_NUM_RE.pattern})",
-            re.I | re.M,
-        )
-        m = pattern.search(text)
-        if m:
-            setattr(rep, attr, _to_int(m.group(1)))
-
-    # Total bags / value (US$) — header row pattern.
-    m = re.search(rf"(?:total\s+exports?|grand\s+total)[^\n\d]*?({_NUM_RE.pattern})",
-                  text, re.I)
-    if m:
-        rep.total_bags = _to_int(m.group(1))
+    # NB: we deliberately do NOT regex "Total Robusta" / "Total Arabica" out of
+    # the text. The first round of dispatch showed that pattern wildly
+    # unreliable: it matched footnote numbers, % values, screen sub-totals,
+    # etc., producing values like robusta=4, arabica=5 for some months. The
+    # grade table downstream parses cleanly across every era, so we SUM by
+    # family below — see _sum_robusta / _sum_arabica.
+    # Per-line USD value capture is still done by regex since the report
+    # doesn't break value down by grade in a stable way.
     m = re.search(rf"value\s*\(?\s*US\s*\$?\s*\)?[^\n\d]*?({_NUM_RE.pattern})",
                   text, re.I)
     if m:
-        rep.value_usd = _to_float(m.group(1))
+        v = _to_float(m.group(1))
+        # USD value for a Uganda month is six-figure+ — reject obvious noise.
+        if v is not None and v >= 100_000:
+            rep.value_usd = v
 
     # Grade breakdown — scan every line for known grade labels followed by
     # at least one numeric column. Captures `{grade, bags}` only when the
@@ -375,12 +401,21 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
     rep.by_destination = [d for d in rep.by_destination
                           if not (d["country"] in seen_c or seen_c.add(d["country"]))]
 
-    # Require minimum classification confidence — we want at least the month
-    # AND one of the volume signals. Without that we punt to the next parser
-    # (or fall through to diagnostic-only output).
-    if rep.robusta_bags is None and rep.arabica_bags is None \
-            and rep.total_bags is None:
-        rep.parse_warnings.append("No volume signals matched — likely format drift.")
+    # Derive robusta/arabica/total volumes from the grade table — these are
+    # MUCH more reliable than regex-matching "Total Robusta" out of the text
+    # (which was prone to footnote / sub-total noise). When the grade table
+    # is empty (format drift on grades themselves), the report still surfaces
+    # the month + warnings so the operator can spot the failure mode.
+    rep.robusta_bags = _sum_robusta(rep.by_grade)
+    rep.arabica_bags = _sum_arabica(rep.by_grade)
+    if rep.robusta_bags is not None or rep.arabica_bags is not None:
+        rep.total_bags = (rep.robusta_bags or 0) + (rep.arabica_bags or 0)
+
+    if rep.robusta_bags is None and rep.arabica_bags is None:
+        rep.parse_warnings.append(
+            "No robusta/arabica grade rows matched — likely format drift on the "
+            "grade breakdown table."
+        )
         return rep        # still surface the month + warnings
     return rep
 

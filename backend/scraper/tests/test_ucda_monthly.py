@@ -46,14 +46,16 @@ def test_month_year_fallback_from_url_slug():
     assert um._ym_from_text(text, url) == "2020-07"
 
 
-def test_v1_parser_extracts_basics():
-    """Synthetic 'recent format' text — header + total rows + a grade row."""
+def test_v1_parser_derives_totals_from_grade_table():
+    """Synthetic recent-format text. The parser SUMS grade-family rows to get
+    robusta/arabica totals rather than regex-matching "Total Robusta" — the
+    first dispatch found that regex unreliable (matched footnotes / sub-totals
+    yielding garbage like robusta=4)."""
     text = """\
 MONTHLY COFFEE REPORT - MARCH 2024
 
-Total Robusta 425,123 60-kg bags
-Total Arabica 88,456 60-kg bags
-Total Exports 513,579 bags Value (US $) 92,345,678
+Some narrative text. Total exports figure mentioned elsewhere.
+Value (US $) 92,345,678 for the month.
 
 Grade Breakdown:
 Screen 18    180,000   35.0%
@@ -61,6 +63,7 @@ Screen 15     90,500   18.0%
 Screen 12     55,200   10.7%
 Organic Robusta  12,300  2.4%
 Bugisu AA      35,000   6.8%
+Drugar         28,000   5.4%
 
 Destinations:
 Italy        102,400
@@ -71,9 +74,11 @@ USA           48,123
     rep = um._parse_v1_recent(text, "/sites/default/files/2024-04/March%202024.pdf")
     assert rep is not None
     assert rep.month == "2024-03"
-    assert rep.robusta_bags == 425_123
-    assert rep.arabica_bags == 88_456
-    assert rep.total_bags   == 513_579
+    # Robusta = Screen 18 + Screen 15 + Screen 12 + Organic Robusta
+    assert rep.robusta_bags == 180_000 + 90_500 + 55_200 + 12_300
+    # Arabica = Bugisu AA + Drugar
+    assert rep.arabica_bags == 35_000 + 28_000
+    assert rep.total_bags   == rep.robusta_bags + rep.arabica_bags
     assert rep.value_usd    == 92_345_678
     grade_names = [g["grade"] for g in rep.by_grade]
     assert "Screen 18" in grade_names
@@ -83,16 +88,34 @@ USA           48,123
     assert "Sudan" in dest_names
 
 
-def test_v1_returns_stub_when_no_volumes_detected():
-    """Format drift case — month resolves but volumes don't. Stub still
-    surfaces month + warning so the diagnostic dump catches the change."""
+def test_v1_parser_rejects_tiny_usd_value():
+    """A USD value below 100,000 is treated as a regex misfire (e.g. captured
+    a percentage or a single-stream value). Real Uganda monthly value > 100M."""
+    text = """\
+MONTHLY COFFEE REPORT - JUNE 2024
+
+Value (US $) 42 for some sub-total cell.
+
+Grade Breakdown:
+Screen 18    180,000   35.0%
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    assert rep.value_usd is None
+    assert rep.robusta_bags == 180_000
+
+
+def test_v1_returns_stub_when_grade_table_missing():
+    """Format drift case — month resolves but the grade table fails to match.
+    Stub still surfaces month + warning so the diagnostic dump catches the
+    drift; downstream parsers in the registry can attempt their own pattern."""
     text = "MONTHLY COFFEE REPORT - JULY 2018\nSome unrecognized layout"
     rep = um._parse_v1_recent(text, None)
     assert rep is not None
     assert rep.month == "2018-07"
     assert rep.robusta_bags is None
     assert rep.arabica_bags is None
-    assert any("No volume signals" in w for w in rep.parse_warnings)
+    assert any("grade breakdown" in w for w in rep.parse_warnings)
 
 
 def test_parse_pdf_returns_failed_stub_on_unknown_format():
