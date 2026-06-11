@@ -28,7 +28,10 @@ const STATUS_LABEL: Record<CurveStatus, string> = {
 };
 
 export default function UgandaMonthlyVolumeChart({ monthly }: { monthly: UgandaMonthlyRow[] }) {
-  const [cropYears, setCropYears] = useState(3);
+  // Default 5 so 2020/21 onwards is visible out-of-the-box; selector goes
+  // up to 7 because the UCDA backfill carries Jan 2020 → present (7 crop
+  // years including the partial 19/20 and in-progress 25/26).
+  const [cropYears, setCropYears] = useState(5);
   const [psdRows, setPsdRows] = useState<PsdRow[] | null>(null);
 
   useEffect(() => {
@@ -133,7 +136,7 @@ export default function UgandaMonthlyVolumeChart({ monthly }: { monthly: UgandaM
           </div>
         </div>
         <div className="flex gap-1">
-          {[2, 3, 5].map(n => (
+          {[2, 3, 5, 7].map(n => (
             <button key={n} onClick={() => setCropYears(n)}
               className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
               {n}Y
