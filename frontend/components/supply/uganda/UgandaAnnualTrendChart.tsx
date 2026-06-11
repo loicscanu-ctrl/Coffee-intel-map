@@ -10,14 +10,20 @@ import {
   usdaYearForCropYear, type BalanceSheetProjection, type PsdRow,
 } from "@/lib/balanceSheetProjection";
 
+/** Per-month row consumed by the annual chart. Accepts both shapes:
+ *   • uganda_monthly.json (from UCDA scraper) — robusta_bags / arabica_bags
+ *     are FULL bags (not thousand-bags). total_bags is the sum.
+ *   • Legacy uganda_supply.json shape — robusta_k_bags / arabica_k_bags /
+ *     total_k_bags in thousand-bag units.
+ *  The aggregator below tolerates either and converts to kt. */
 interface ExportMonth {
   month: string;                // "YYYY-MM"
-  total_bags: number;
-  total_k_bags: number;
-  robusta_bags?: number;
-  arabica_bags?: number;
-  robusta_k_bags?: number;
-  arabica_k_bags?: number;
+  total_bags?: number | null;
+  total_k_bags?: number | null;
+  robusta_bags?: number | null;
+  arabica_bags?: number | null;
+  robusta_k_bags?: number | null;
+  arabica_k_bags?: number | null;
 }
 
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
@@ -66,17 +72,28 @@ export default function UgandaAnnualTrendChart({ monthly }: { monthly: ExportMon
   }, []);
 
   const { data, projection, hasSplit } = useMemo(() => {
+    // Tolerant of two input shapes — full bags (uganda_monthly.json) or
+    // thousand-bags (legacy uganda_supply.json). bags → kt: bags × 60 / 1e6.
+    const bagsToKt = (n: number) => Math.round((n * 60) / 1_000_000 * 10) / 10;
     const byCrop: Record<string, { robusta: number; arabica: number; total: number; months: number }> = {};
     let anyRobArab = false;
     monthly.forEach(r => {
       const key = ugCropYearKey(r.month);
       if (!byCrop[key]) byCrop[key] = { robusta: 0, arabica: 0, total: 0, months: 0 };
-      const rob_kt = r.robusta_k_bags != null ? kBagsToKT(r.robusta_k_bags) : 0;
-      const ara_kt = r.arabica_k_bags != null ? kBagsToKT(r.arabica_k_bags) : 0;
-      if (r.robusta_k_bags != null || r.arabica_k_bags != null) anyRobArab = true;
+      // Prefer full-bag fields (new schema); fall back to thousand-bags.
+      const rob_kt = r.robusta_bags   != null ? bagsToKt(r.robusta_bags)
+                   : r.robusta_k_bags != null ? kBagsToKT(r.robusta_k_bags)
+                   : 0;
+      const ara_kt = r.arabica_bags   != null ? bagsToKt(r.arabica_bags)
+                   : r.arabica_k_bags != null ? kBagsToKT(r.arabica_k_bags)
+                   : 0;
+      if (r.robusta_bags != null || r.arabica_bags != null
+          || r.robusta_k_bags != null || r.arabica_k_bags != null) anyRobArab = true;
       byCrop[key].robusta += rob_kt;
       byCrop[key].arabica += ara_kt;
-      byCrop[key].total   += kBagsToKT(r.total_k_bags);
+      byCrop[key].total   += r.total_bags   != null ? bagsToKt(r.total_bags)
+                          : r.total_k_bags != null ? kBagsToKT(r.total_k_bags)
+                          : 0;
       byCrop[key].months  += 1;
     });
     const keys = Object.keys(byCrop).sort();
