@@ -242,7 +242,7 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -253,7 +253,7 @@
       "market": "NY",
       "severity": "warn",
       "score": -1,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
@@ -294,54 +294,6 @@
         }
       ],
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=168.6]"
-    },
-    {
-      "id": "AGRO_honduras_El_Paraíso_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "honduras/El Paraíso: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.27, forecast_7d_rain=134.5]"
-    },
-    {
-      "id": "AGRO_indonesia_Toraja_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "indonesia/Toraja: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.22, forecast_7d_rain=55.7]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=69.4]"
     }
   ],
   "history": [
@@ -2621,7 +2573,7 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "large",
+          "magnitude": "medium",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2632,7 +2584,7 @@
           "market": "NY",
           "severity": "warn",
           "score": -1,
-          "magnitude": "large",
+          "magnitude": "medium",
           "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
@@ -2681,5 +2633,5 @@
       "priceLDN": 3462
     }
   ],
-  "generatedAt": "2026-06-11T06:36:36.606Z"
+  "generatedAt": "2026-06-11T07:19:10.442Z"
 }

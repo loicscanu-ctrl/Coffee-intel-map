@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-11T04:40:47.029536Z",
+  "generated_at": "2026-06-11T07:19:02.082014Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-11",
@@ -1149,11 +1149,11 @@
   },
   "producers": {
     "brazil": {
-      "latest_year": "2027",
-      "latest_production_mt": 4314000,
-      "latest_exports_mt": 2944200,
-      "latest_consumption_mt": 1350000,
-      "latest_stocks_mt": 178800,
+      "latest_year": "2025",
+      "latest_production_mt": 3780000,
+      "latest_exports_mt": 2220000,
+      "latest_consumption_mt": 1336800,
+      "latest_stocks_mt": 29100,
       "annual": [
         {
           "year": "1960",
@@ -1748,27 +1748,16 @@
           "consumption_mt": 1336800,
           "stocks_mt": 29100,
           "production_mt": 3780000
-        },
-        {
-          "year": "2027",
-          "production_mt": 4314000,
-          "exports_mt": 2944200,
-          "bean_exports_mt": 2700000,
-          "soluble_exports_mt": 240000,
-          "roast_exports_mt": 4200,
-          "consumption_mt": 1350000,
-          "stocks_mt": 178800,
-          "begin_stocks_mt": 29100
         }
       ],
-      "forecast_source": "https://www.fas.usda.gov/data/gain/2026/06/brazil-coffee-annual"
+      "forecast_source": null
     },
     "vietnam": {
-      "latest_year": "2026",
-      "latest_production_mt": 1902000,
-      "latest_exports_mt": 1710000,
+      "latest_year": "2025",
+      "latest_production_mt": 1848000,
+      "latest_exports_mt": 1476000,
       "latest_consumption_mt": 294000,
-      "latest_stocks_mt": 54000,
+      "latest_stocks_mt": 23340,
       "annual": [
         {
           "year": "1960",
@@ -2363,21 +2352,9 @@
           "consumption_mt": 294000,
           "stocks_mt": 23340,
           "production_mt": 1848000
-        },
-        {
-          "year": "2026",
-          "production_mt": 1902000,
-          "exports_mt": 1710000,
-          "bean_exports_mt": 1506000,
-          "soluble_exports_mt": 162000,
-          "roast_exports_mt": 42000,
-          "consumption_mt": 294000,
-          "stocks_mt": 54000,
-          "begin_stocks_mt": 23340,
-          "imports_mt": 51000
         }
       ],
-      "forecast_source": "https://www.fas.usda.gov/data/gain/2026/05/vietnam-coffee-annual"
+      "forecast_source": null
     },
     "colombia": {
       "latest_year": "2025",
@@ -4796,11 +4773,11 @@
       "forecast_source": null
     },
     "uganda": {
-      "latest_year": "2026",
-      "latest_production_mt": 412800,
-      "latest_exports_mt": 391800,
+      "latest_year": "2025",
+      "latest_production_mt": 412500,
+      "latest_exports_mt": 390900,
       "latest_consumption_mt": 19800,
-      "latest_stocks_mt": 19140,
+      "latest_stocks_mt": 17940,
       "annual": [
         {
           "year": "1960",
@@ -5395,21 +5372,9 @@
           "consumption_mt": 19800,
           "stocks_mt": 17940,
           "production_mt": 412500
-        },
-        {
-          "year": "2026",
-          "production_mt": 412800,
-          "exports_mt": 391800,
-          "bean_exports_mt": 391800,
-          "soluble_exports_mt": 0,
-          "roast_exports_mt": 0,
-          "consumption_mt": 19800,
-          "stocks_mt": 19140,
-          "begin_stocks_mt": 17940,
-          "imports_mt": 0
         }
       ],
-      "forecast_source": "https://www.fas.usda.gov/data/uganda-coffee-annual-7"
+      "forecast_source": null
     },
     "india": {
       "latest_year": "2025",
