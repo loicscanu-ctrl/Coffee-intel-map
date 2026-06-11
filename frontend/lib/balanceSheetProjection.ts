@@ -140,3 +140,76 @@ export function formatBalanceSheetTooltip(p: BalanceSheetProjection): string {
     `  = Expected exports  ${r(p.expected_total_kt)} kt`
   );
 }
+
+// ── Monthly curve builder (per-month forecast over an Oct-Sep / Apr-Mar crop) ──
+
+export type CurveStatus = "realized" | "seasonality";
+
+export interface MonthlyCurveRow {
+  /** Crop-month index, 0..11 (0 = first month of the crop year). */
+  idx: number;
+  /** Calendar month number, 1..12. */
+  month_num: number;
+  /** Cumulative bags shipped (realized) OR projected for the month (seasonality). */
+  value_kt: number;
+  status: CurveStatus;
+}
+
+/** Build a 12-row monthly curve for the in-progress crop year, blending
+ *  realized months with a seasonality-distributed projection over the
+ *  remaining ones.
+ *
+ *  Method (matches the Brazil SSOT engine without the certificados step,
+ *  which Vietnam / Uganda / etc. don't have a daily equivalent for):
+ *    1. Each month already present in `realizedByMonth` keeps its actual
+ *       value, status="realized".
+ *    2. The remaining months share `remainingBudgetKt` weighted by what
+ *       the SAME calendar months represented during the prior crop year.
+ *       If the prior year carried no data for that subset, fall back to a
+ *       uniform split.
+ *
+ *  Inputs are in kt; output values stay in kt. */
+export function buildMonthlyCurve(opts: {
+  /** Calendar-month numbers in crop-year order (e.g. Vietnam: [10,11,12,1,…,9],
+   *  Brazil: [4,5,6,…,3]). */
+  cropMonthOrder: number[];
+  /** {calendar_month: realized_kt} for the in-progress crop year. */
+  realizedByMonth: Record<number, number>;
+  /** {calendar_month: prior_year_kt} — same calendar months from the
+   *  previous crop year, used for seasonality weighting. */
+  priorYearByMonth: Record<number, number>;
+  /** Budget left to spread across the unrealized months (typically
+   *  expected_total − already_exported). */
+  remainingBudgetKt: number;
+}): MonthlyCurveRow[] {
+  const remainingMonths: number[] = [];
+  for (const m of opts.cropMonthOrder) {
+    if (opts.realizedByMonth[m] == null) remainingMonths.push(m);
+  }
+
+  // Seasonality weights from the prior-year subset.
+  let subsetTotal = 0;
+  for (const m of remainingMonths) subsetTotal += opts.priorYearByMonth[m] ?? 0;
+  const weights: Record<number, number> = {};
+  if (subsetTotal > 0) {
+    for (const m of remainingMonths) {
+      weights[m] = (opts.priorYearByMonth[m] ?? 0) / subsetTotal;
+    }
+  } else if (remainingMonths.length > 0) {
+    const uniform = 1 / remainingMonths.length;
+    for (const m of remainingMonths) weights[m] = uniform;
+  }
+
+  const budget = Math.max(0, opts.remainingBudgetKt);
+  return opts.cropMonthOrder.map((m, idx) => {
+    const realized = opts.realizedByMonth[m];
+    if (realized != null) {
+      return { idx, month_num: m, value_kt: realized, status: "realized" as const };
+    }
+    return {
+      idx, month_num: m,
+      value_kt: Math.round(budget * (weights[m] ?? 0) * 10) / 10,
+      status: "seasonality" as const,
+    };
+  });
+}
