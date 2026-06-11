@@ -29,7 +29,12 @@ on:
         type: string
 
 concurrency:
-  group: data-commit
+  # Own group, not data-commit — the daily cron jobs (cecafe, weather,
+  # slow-data) all share `data-commit` and were squeezing this one-shot
+  # diagnostic backfill out of the queue. UCDA backfill is manual-only and
+  # serializes against itself; it doesn't need to coordinate with the daily
+  # writers (commit step uses pull --rebase --strategy-option=theirs).
+  group: ucda-monthly-backfill
   cancel-in-progress: false
 
 jobs:
