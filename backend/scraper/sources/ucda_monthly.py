@@ -361,15 +361,23 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
             rep.value_usd = v
 
     # Grade breakdown — scan every line for known grade labels followed by
-    # at least one numeric column. Captures `{grade, bags}` only when the
-    # number looks plausible (≥ 100 bags to skip percentage cells).
+    # at least one numeric column. Across the format eras observed
+    # (2020-2026), the BAG QUANTITY column position is inconsistent: in
+    # recent reports it's first after the label; in some 2022-2023 reports
+    # the line carries multiple sub-columns (e.g. running totals, %change,
+    # value) where the qty cell isn't first. The qty value is reliably the
+    # LARGEST plausible number on the line though — picking max-with-filter
+    # recovered ~3M bags/year of 2022-2023 coverage that "first number"
+    # was missing. Numbers ≥ 100 still pass (so small genuine grades stay);
+    # we also reject single-digit / tiny outliers and values > 2M (which
+    # would imply a misread of a YTD or value column).
     for line in text.splitlines():
         for label in GRADE_LABELS_ROBUSTA + GRADE_LABELS_ARABICA:
             if label.lower() in line.lower():
                 nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                nums = [n for n in nums if n and n >= 100]
+                nums = [n for n in nums if n is not None and 100 <= n <= 2_000_000]
                 if nums:
-                    rep.by_grade.append({"grade": label, "bags": nums[0]})
+                    rep.by_grade.append({"grade": label, "bags": max(nums)})
                 break
     # Dedupe (in case the same grade hits multiple lines, keep first).
     seen_g: set[str] = set()
@@ -387,14 +395,20 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
         "ethiopia", "rwanda", "tanzania", "burundi", "south sudan", "djibouti",
         "algeria", "tunisia", "australia", "canada", "mexico", "brazil",
     )
+    # Same max-with-filter strategy as the grade extractor — UCDA's
+    # destination tables also have column-order drift across eras (e.g. value
+    # in USD sometimes precedes the bag qty), and the qty is reliably the
+    # largest plausible number on the line.
     for line in text.splitlines():
         low = line.lower()
         for c in known_countries:
             if re.search(rf"\b{re.escape(c)}\b", low):
                 nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                nums = [n for n in nums if n and n >= 100]
+                # Destinations top out around 200k bags for a single country.
+                # 800k cap keeps us safe from picking a value-USD column.
+                nums = [n for n in nums if n is not None and 100 <= n <= 800_000]
                 if nums:
-                    rep.by_destination.append({"country": c.title(), "bags": nums[0]})
+                    rep.by_destination.append({"country": c.title(), "bags": max(nums)})
                 break
     # Dedupe destinations.
     seen_c: set[str] = set()
