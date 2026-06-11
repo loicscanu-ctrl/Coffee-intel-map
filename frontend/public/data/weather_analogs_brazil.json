@@ -1,7 +1,7 @@
 {
   "_schema": "v3",
   "_note": "Brazil arabica weather-analog forecast. Mahalanobis on 24-dim (rain, temp, rain_anom, SPI z, SPEI z, ONI) × 4 phenology stages. Detrended production residuals. Walk-forward backtest. Bootstrap 95% CI on ensemble.",
-  "generated_at": "2026-06-08T10:14:12+00:00",
+  "generated_at": "2026-06-11T06:36:36+00:00",
   "origin": "brazil_arabica",
   "origin_label": "Brazil arabica",
   "current_crop_year": 2026,
@@ -113,7 +113,7 @@
       "rain_mm": 623.2,
       "temp_c": 22.72,
       "et0_mm": 383.5,
-      "oni_avg": -0.353,
+      "oni_avg": -0.35,
       "vhi": null,
       "rain_anom_pct": 5.6,
       "temp_anom_c": -0.2,
@@ -205,7 +205,7 @@
     },
     {
       "year": 2009,
-      "distance": 3.096,
+      "distance": 3.098,
       "features_compared": 23,
       "same_cycle_crop_year": 2009,
       "same_cycle_production_kbags": 41800,
@@ -406,7 +406,7 @@
     },
     {
       "year": 2025,
-      "distance": 3.513,
+      "distance": 3.514,
       "features_compared": 23,
       "same_cycle_crop_year": 2025,
       "same_cycle_production_kbags": 39800,
