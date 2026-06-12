@@ -96,11 +96,22 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -f frontend/public/data/uganda_monthly.json ]; then
             git add frontend/public/data/uganda_monthly.json
-            git diff --cached --quiet \
-              && echo "No JSON change." \
-              || (git commit -m "data: UCDA monthly reports backfill $(date -u +%Y-%m-%d) [skip ci]" \
-                  && git pull --rebase --autostash --strategy-option=theirs origin main \
-                  && git push)
+            if git diff --cached --quiet; then
+              echo "No JSON change."
+            else
+              CURRENT=$(git rev-parse --abbrev-ref HEAD)
+              git commit -m "data: UCDA monthly reports backfill $(date -u +%Y-%m-%d) [skip ci]"
+              if [ "$CURRENT" = "main" ]; then
+                # Daily-cron path: rebase against concurrent writers on main.
+                git pull --rebase --autostash --strategy-option=theirs origin main
+                git push
+              else
+                # Feature-branch dispatch: push the data commit straight up
+                # without rebasing on main (rebase rewrites SHAs → push
+                # would need --force-with-lease).
+                git push origin "HEAD:$CURRENT"
+              fi
+            fi
           fi
 
       - name: Notify on failure
