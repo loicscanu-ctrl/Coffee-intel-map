@@ -56,6 +56,7 @@ jobs:
           name: ecf-history-debug
           path: frontend/public/data/ecf_history_debug.json
           if-no-files-found: ignore
+          retention-days: 14
 
       - name: Commit ecf_history.json if changed
         run: |

@@ -51,6 +51,7 @@ jobs:
           name: ajca-debug
           path: frontend/public/data/ajca_debug.json
           if-no-files-found: ignore
+          retention-days: 14
 
       - name: Commit japan_stocks.json if changed
         run: |
