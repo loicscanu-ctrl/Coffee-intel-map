@@ -384,7 +384,39 @@ def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
         → R = T, A = 0
       • 1 cell — a single value got captured (rare partial row)
         → R = T = the value, A = 0
+      • 6+ cells when the report layout puts MONTH and CTD side-by-side
+        (e.g. Italy 4,500 / 600 / 5,100 / 161,159 / 1,310 / 162,469).
+        Both triples pass the 250k filter for small destinations or early
+        in the crop year. Picking the larger T over-counts by a factor of
+        ~2x (the 2020-23 over-counter pattern in the invariant check). We
+        find ALL (a, b, c) triples where a+b=c and prefer the smallest T,
+        which is the MONTH triple.
     """
+    if not nums:
+        return 0, 0, 0
+
+    # Find every (a, b, c) triple in the cell list where a + b == c (with
+    # 1-bag rounding tolerance). Tiny T values (< 500 bags) are rejected
+    # because spurious format-marker triples like "33 + 12 = 45" would
+    # otherwise hijack the row.
+    triples: list[tuple[int, int, int]] = []
+    sorted_nums = sorted(nums)
+    n = len(sorted_nums)
+    for i in range(n):
+        for j in range(i + 1, n):
+            for k in range(j + 1, n):
+                a, b, c = sorted_nums[i], sorted_nums[j], sorted_nums[k]
+                if c >= 500 and abs(a + b - c) <= 1:
+                    triples.append((a, b, c))
+    if triples:
+        # Smallest T wins — for multi-column rows this picks the MONTH
+        # triple over the CTD/YTD one. The triple's larger leg is Robusta,
+        # smaller is Arabica.
+        triples.sort(key=lambda t: t[2])
+        a, b, c = triples[0]
+        return b, a, c  # (R=larger leg, A=smaller leg, T=sum)
+
+    # Fallback for 1- or 2-cell rows (no triple available).
     sorted_desc = sorted(nums, reverse=True)
     T = sorted_desc[0]
     if len(sorted_desc) == 1:

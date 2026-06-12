@@ -166,6 +166,32 @@ def test_split_dest_row_helper():
     assert um._split_dest_row([10_000]) == (10_000, 0, 10_000)
 
 
+def test_split_dest_row_prefers_month_over_ctd_triple():
+    """Regression for 2020-23 over-counter pattern. When the report layout
+    puts MONTH cells next to CTD/cumulative cells on the same row and both
+    triples pass the 250k cap (small destination or early in the crop
+    year), pdfplumber's flat-text output gives the parser 6 numbers. The
+    earlier behaviour picked max(filtered) = CTD-Total, doubling the row's
+    contribution. The split logic now picks the SMALLER (R, A, T) triple."""
+    # Italy with month [4500, 600, 5100] + CTD [161,159, 1,310, 162,469].
+    nums = [4_500, 600, 5_100, 161_159, 1_310, 162_469]
+    assert um._split_dest_row(nums) == (4_500, 600, 5_100)
+    # India with month [1200, 150, 1350] + CTD [35,000, 3,600, 38,600].
+    nums = [1_200, 150, 1_350, 35_000, 3_600, 38_600]
+    assert um._split_dest_row(nums) == (1_200, 150, 1_350)
+    # Sanity-check: the existing single-triple test still picks that triple.
+    assert um._split_dest_row([183_308, 15_438, 198_746]) == (183_308, 15_438, 198_746)
+
+
+def test_split_dest_row_rejects_spurious_tiny_triple():
+    """A coincidental low-value triple like (33, 12, 45) — e.g. from a row
+    number or footnote artifact — must not hijack the real R/A/T. The
+    `c >= 500` cutoff filters those out."""
+    # Real triple is Italy 183,308/15,438/198,746 — junk triple (10+22=32).
+    nums = [10, 22, 32, 183_308, 15_438, 198_746]
+    assert um._split_dest_row(nums) == (183_308, 15_438, 198_746)
+
+
 def test_v1_destination_emits_robusta_arabica_total_split():
     """Each destination row now carries R/A/Total instead of only Total —
     matches the layout the source PDFs publish (Robusta col + Arabica col +
