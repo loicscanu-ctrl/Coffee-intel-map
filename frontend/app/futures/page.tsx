@@ -236,12 +236,95 @@ const CERT_OPTIONS = [
   { key: "rfa",  label: "RFA  (excl. 1.75 cts/lb buyer royalty fee)",  display: "+5 cts/lb · +60 USD/MT (Robusta)",  val: 60 },
 ];
 
+interface ShippingMonth {
+  label:       string;
+  mo:          number;
+  yr:          number;
+  letter:      string;
+  contractSym: string;
+}
+
+interface MonthWithBasis extends ShippingMonth {
+  contractLetter: string;
+  basisForMonth:  number;
+}
+
+// Robusta crop year identifier: the calendar year of the X (Nov delivery)
+// contract that closes a crop year. Shipments in Dec belong to NEXT year's
+// crop — so Dec 2026 belongs to crop year 2027 (which ends Nov 2027). This
+// is the boundary the user wants explicit: current crop ends Nov X; new crop
+// starts Dec, even though both ship against the same F (Jan delivery)
+// contract.
+function cropYearEndYear(yr: number, mo: number): number {
+  return mo === 12 ? yr + 1 : yr;
+}
+
+function getNextLetter(months: ShippingMonth[]): string | null {
+  const front = months[0]?.letter;
+  if (!front) return null;
+  return months.find(m => m.letter !== front)?.letter ?? null;
+}
+
+function getTransitions(months: ShippingMonth[]): { from: string; to: string; key: string }[] {
+  const result: { from: string; to: string; key: string }[] = [];
+  let prev = months[0]?.letter ?? "";
+  months.slice(1).forEach(m => {
+    if (m.letter !== prev) {
+      const key = `${prev}-${m.letter}`;
+      if (!result.find(t => t.key === key)) result.push({ from: prev, to: m.letter, key });
+      prev = m.letter;
+    }
+  });
+  return result;
+}
+
+// Walks the months array applying basisDiff to the front contract, basis2Diff
+// to the next contract (the editable one), and auto-rolling the market spread
+// for any 3rd+ contract transition. Within a single contract, applies +30
+// USD/MT per shipment month carry.
+function computeMonthsBasis(
+  months:     ShippingMonth[],
+  basisDiff:  number,
+  basis2Diff: number,
+  rcPrices:   Record<string, number>,
+): MonthWithBasis[] {
+  let activeBasis    = basisDiff;
+  let activeStartIdx = 0;
+  let contractIdx    = 0;
+  let lastLetter     = months[0]?.letter ?? "";
+  return months.map((m, i) => {
+    if (m.letter !== lastLetter) {
+      contractIdx += 1;
+      activeStartIdx = i;
+      if (contractIdx === 1) {
+        activeBasis = basis2Diff;
+      } else {
+        const fromPrice = rcPrices[lastLetter];
+        const toPrice   = rcPrices[m.letter];
+        if (fromPrice != null && toPrice != null) {
+          activeBasis += Math.round(fromPrice - toPrice);
+        }
+      }
+      lastLetter = m.letter;
+    }
+    const monthOffset = (i - activeStartIdx) * 30;
+    return { ...m, contractLetter: m.letter, basisForMonth: activeBasis + monthOffset };
+  });
+}
+
 function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; vnFaqUsdMt?: number | null }) {
-  const [basisOverride, setBasisOverride]     = useState<number | null>(null);
-  const [basis2Override, setBasis2Override]   = useState<number | null>(null);
-  const [freight, setFreight]                 = useState(0);
-  const [financing, setFinancing]             = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
+  // Basis state: separate inputs per crop year. The user can override the
+  // front + next-contract basis independently for current crop (ending Nov
+  // of todayCropEndYear) and new crop (next crop year, starting Dec). 3rd+
+  // contract transitions within each crop year auto-roll via the market
+  // spread.
+  const [currentBasisOverride,  setCurrentBasisOverride]  = useState<number | null>(null);
+  const [currentBasis2Override, setCurrentBasis2Override] = useState<number | null>(null);
+  const [newBasisOverride,      setNewBasisOverride]      = useState<number | null>(null);
+  const [newBasis2Override,     setNewBasis2Override]     = useState<number | null>(null);
+  const [freight,               setFreight]               = useState(0);
+  const [financing,             setFinancing]             = useState(0);
+  const [selectedOptions,       setSelectedOptions]       = useState<Set<string>>(new Set());
 
   const toggleOption = (key: string) =>
     setSelectedOptions(prev => { const s = new Set(prev); if (s.has(key)) { s.delete(key); } else { s.add(key); } return s; });
@@ -250,19 +333,20 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     .filter(o => selectedOptions.has(o.key))
     .reduce((sum, o) => sum + o.val, 0);
 
-  // Build RC price lookup from fetched chain data
+  // RC price lookup — first occurrence of each letter (nearest expiry).
   const rcPrices = useMemo(() => {
     const p: Record<string, number> = {};
     contracts.forEach(c => {
       const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])\d{2}$/i);
-      if (m && !(m[1].toUpperCase() in p)) p[m[1].toUpperCase()] = c.last; // first = nearest expiry
+      if (m && !(m[1].toUpperCase() in p)) p[m[1].toUpperCase()] = c.last;
     });
     return p;
   }, [contracts]);
 
-  // 8 shipping months base (stable, only depends on today)
-  const monthsBase = useMemo(() => {
-    const today = new Date();
+  // 8 shipping months from today (skips current month after the 14th to
+  // roll off near-FND contracts).
+  const monthsBase = useMemo<ShippingMonth[]>(() => {
+    const today  = new Date();
     const offset = today.getDate() >= 14 ? 1 : 0;
     return Array.from({ length: 8 }, (_, i) => {
       const d  = new Date(today.getFullYear(), today.getMonth() + offset + i, 1);
@@ -274,129 +358,253 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     });
   }, []);
 
-  // Detect unique contract transitions in the 8-month window
-  const transitions = useMemo(() => {
-    const result: { from: string; to: string; key: string }[] = [];
-    let prev = monthsBase[0]?.letter ?? "";
-    monthsBase.slice(1).forEach(m => {
-      if (m.letter !== prev) {
-        const key = `${prev}-${m.letter}`;
-        if (!result.find(t => t.key === key)) result.push({ from: prev, to: m.letter, key });
-        prev = m.letter;
-      }
-    });
-    return result;
-  }, [monthsBase]);
+  // Today's crop year (Nov-ending calendar year).
+  const todayCropEndYear = useMemo(() => {
+    const today = new Date();
+    return cropYearEndYear(today.getFullYear(), today.getMonth() + 1);
+  }, []);
 
-  // Default basis: VN FAQ USD/MT + FOB cost − front RC price. The +100 mirrors
-  // FOB_COST_USD["VN FAQ"] in components/map/MarketTicker.tsx so this control
-  // lands on the same N±diff the ticker band shows by default.
-  const basisDefault = useMemo(() => {
-    const frontLetter = monthsBase[0]?.letter;
-    const frontPrice  = frontLetter ? rcPrices[frontLetter] : null;
-    if (vnFaqUsdMt && frontPrice) return Math.round(vnFaqUsdMt + 100 - frontPrice);
+  // Split monthsBase at the Nov/Dec crop year boundary.
+  const { currentCropMonths, newCropMonths } = useMemo(() => {
+    const cur:  ShippingMonth[] = [];
+    const next: ShippingMonth[] = [];
+    monthsBase.forEach(m => {
+      if (cropYearEndYear(m.yr, m.mo) === todayCropEndYear) cur.push(m);
+      else                                                  next.push(m);
+    });
+    return { currentCropMonths: cur, newCropMonths: next };
+  }, [monthsBase, todayCropEndYear]);
+
+  // ── Current crop computed state ────────────────────────────────────────
+  const currentNextLetter  = useMemo(() => getNextLetter(currentCropMonths),  [currentCropMonths]);
+  const currentTransitions = useMemo(() => getTransitions(currentCropMonths), [currentCropMonths]);
+  // Default basis: VN FAQ USD/MT + FOB cost − current-crop's front RC price.
+  // The +100 mirrors FOB_COST_USD["VN FAQ"] in components/map/MarketTicker.tsx.
+  const currentBasisDefault = useMemo(() => {
+    const fl = currentCropMonths[0]?.letter;
+    const fp = fl ? rcPrices[fl] : null;
+    if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
     return 150;
-  }, [vnFaqUsdMt, rcPrices, monthsBase]);
+  }, [vnFaqUsdMt, rcPrices, currentCropMonths]);
+  const currentBasisDiff = currentBasisOverride ?? currentBasisDefault;
+  // Default 2nd-contract basis: front-basis + (frontPrice − nextPrice) of the
+  // within-current-crop next contract. Keeps at-port level across the roll.
+  const currentBasis2Default = useMemo(() => {
+    const fl = currentCropMonths[0]?.letter;
+    const fp = fl ? rcPrices[fl] : null;
+    const np = currentNextLetter ? rcPrices[currentNextLetter] : null;
+    if (fp != null && np != null) return currentBasisDiff + Math.round(fp - np);
+    return currentBasisDiff + 30;
+  }, [currentBasisDiff, currentCropMonths, rcPrices, currentNextLetter]);
+  const currentBasis2Diff = currentBasis2Override ?? currentBasis2Default;
+  const currentMonths = useMemo(
+    () => computeMonthsBasis(currentCropMonths, currentBasisDiff, currentBasis2Diff, rcPrices),
+    [currentCropMonths, currentBasisDiff, currentBasis2Diff, rcPrices],
+  );
 
-  // basisOverride = null means use the computed default; non-null = user's manual value
-  const basisDiff = basisOverride ?? basisDefault;
+  // ── New crop computed state ────────────────────────────────────────────
+  const newNextLetter  = useMemo(() => getNextLetter(newCropMonths),  [newCropMonths]);
+  const newTransitions = useMemo(() => getTransitions(newCropMonths), [newCropMonths]);
+  const newBasisDefault = useMemo(() => {
+    const fl = newCropMonths[0]?.letter;
+    const fp = fl ? rcPrices[fl] : null;
+    if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
+    return 150;
+  }, [vnFaqUsdMt, rcPrices, newCropMonths]);
+  const newBasisDiff = newBasisOverride ?? newBasisDefault;
+  const newBasis2Default = useMemo(() => {
+    const fl = newCropMonths[0]?.letter;
+    const fp = fl ? rcPrices[fl] : null;
+    const np = newNextLetter ? rcPrices[newNextLetter] : null;
+    if (fp != null && np != null) return newBasisDiff + Math.round(fp - np);
+    return newBasisDiff + 30;
+  }, [newBasisDiff, newCropMonths, rcPrices, newNextLetter]);
+  const newBasis2Diff = newBasis2Override ?? newBasis2Default;
+  const newMonths = useMemo(
+    () => computeMonthsBasis(newCropMonths, newBasisDiff, newBasis2Diff, rcPrices),
+    [newCropMonths, newBasisDiff, newBasis2Diff, rcPrices],
+  );
 
-  // The next-contract letter (first letter that differs from the front).
-  // E.g. front N(Jul) → next U(Sep). Used both for the input label and the
-  // auto-spread fallback when the user hasn't manually set a second basis.
-  const nextContractLetter = useMemo(() => {
-    const frontLetter = monthsBase[0]?.letter;
-    return monthsBase.find(m => m.letter !== frontLetter)?.letter ?? null;
-  }, [monthsBase]);
-
-  // Default 2nd-contract basis: front basis adjusted by the front→next
-  // calendar spread the market is currently quoting. So if front N trades
-  // $50 above next U, the next-contract basis defaults to (front basis + 50)
-  // — the basis that keeps the at-port price level across the roll.
-  const basis2Default = useMemo(() => {
-    const frontLetter = monthsBase[0]?.letter;
-    const frontPrice  = frontLetter        ? rcPrices[frontLetter]        : null;
-    const nextPrice   = nextContractLetter ? rcPrices[nextContractLetter] : null;
-    if (frontPrice != null && nextPrice != null) {
-      return basisDiff + Math.round(frontPrice - nextPrice);
-    }
-    return basisDiff + 30;   // fallback when one of the prices is missing
-  }, [basisDiff, monthsBase, rcPrices, nextContractLetter]);
-
-  const basis2Diff = basis2Override ?? basis2Default;
-
-  // Months with per-contract basis + +30/month carry within each contract.
-  // Front contract uses basisDiff. Next contract (when shipment crosses the
-  // letter boundary) uses basis2Diff. Beyond the 2nd contract, basis auto-
-  // rolls via the market spread between consecutive contracts.
-  const months = useMemo(() => {
-    let activeBasis    = basisDiff;
-    let activeStartIdx = 0;
-    let contractIdx    = 0;   // 0 = front, 1 = next, 2+ = auto-rolled
-    let lastLetter     = monthsBase[0]?.letter ?? "";
-    return monthsBase.map((m, i) => {
-      if (m.letter !== lastLetter) {
-        contractIdx += 1;
-        activeStartIdx = i;
-        if (contractIdx === 1) {
-          activeBasis = basis2Diff;
-        } else {
-          // 3rd+ contract: roll from the previous contract via market spread.
-          const fromPrice = rcPrices[lastLetter];
-          const toPrice   = rcPrices[m.letter];
-          if (fromPrice != null && toPrice != null) {
-            activeBasis += Math.round(fromPrice - toPrice);
-          }
-        }
-        lastLetter = m.letter;
-      }
-      const monthOffset = (i - activeStartIdx) * 30;
-      return { ...m, contractLetter: m.letter, basisForMonth: activeBasis + monthOffset };
-    });
-  }, [monthsBase, rcPrices, basisDiff, basis2Diff]);
+  // Market spread between current crop's last and new crop's first contract.
+  // Renders as the inter-table badge so the X→F roll the new-crop basisDefault
+  // implicitly bakes in is also visible to the eye.
+  const cropYearRoll = useMemo(() => {
+    const lastCur  = currentCropMonths[currentCropMonths.length - 1];
+    const firstNew = newCropMonths[0];
+    if (!lastCur || !firstNew) return null;
+    const lp = rcPrices[lastCur.letter];
+    const fp = rcPrices[firstNew.letter];
+    if (lp == null || fp == null) return null;
+    return { from: lastCur.letter, to: firstNew.letter, value: Math.round(lp - fp) };
+  }, [currentCropMonths, newCropMonths, rcPrices]);
 
   const sections: string[] = [];
   QUALITIES.forEach(q => { if (!sections.includes(q.section)) sections.push(q.section); });
 
-  return (
-    <div className="space-y-4">
-      {/* Controls */}
-      <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
-        <div>
-          <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-            Basis — Grade 2 S13 — {monthsBase[0]?.letter ?? "Front"} contract
+  // ── Render one crop year's controls + table ─────────────────────────────
+  function renderCropPanel(opts: {
+    title:          string;
+    subtitle:       string;
+    months:         MonthWithBasis[];
+    transitions:    { from: string; to: string; key: string }[];
+    nextLetter:     string | null;
+    basisDiff:      number;
+    basis2Diff:     number;
+    onBasisChange:  (n: number) => void;
+    onBasis2Change: (n: number) => void;
+  }) {
+    if (opts.months.length === 0) return null;
+    const frontLetter = opts.months[0].letter;
+    return (
+      <div className="space-y-3">
+        {/* Per-crop controls */}
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
+          <div className="flex-shrink-0">
+            <div className="text-[11px] text-amber-300 uppercase font-bold tracking-widest">{opts.title}</div>
+            <div className="text-[9px] text-slate-500 mt-0.5">{opts.subtitle}</div>
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={basisDiff}
-              onChange={e => setBasisOverride(Number(e.target.value))}
-              className="w-24 bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right focus:outline-none focus:border-indigo-500"
-            />
-            <span className="text-slate-400 text-sm">USD / MT</span>
-          </div>
-        </div>
-        {nextContractLetter && (
           <div className="border-l border-slate-700 pl-6">
             <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-              Basis — Grade 2 S13 — {nextContractLetter} contract
+              Basis — Grade 2 S13 — {frontLetter} contract
             </div>
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                value={basis2Diff}
-                onChange={e => setBasis2Override(Number(e.target.value))}
+                value={opts.basisDiff}
+                onChange={e => opts.onBasisChange(Number(e.target.value))}
                 className="w-24 bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right focus:outline-none focus:border-indigo-500"
               />
               <span className="text-slate-400 text-sm">USD / MT</span>
             </div>
           </div>
-        )}
+          {opts.nextLetter && (
+            <div className="border-l border-slate-700 pl-6">
+              <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
+                Basis — Grade 2 S13 — {opts.nextLetter} contract
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={opts.basis2Diff}
+                  onChange={e => opts.onBasis2Change(Number(e.target.value))}
+                  className="w-24 bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right focus:outline-none focus:border-indigo-500"
+                />
+                <span className="text-slate-400 text-sm">USD / MT</span>
+              </div>
+            </div>
+          )}
+          {opts.transitions.length > 0 && (
+            <div className="border-l border-slate-700 pl-6">
+              <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
+                Calendar Spreads — USD/MT
+              </div>
+              <div className="flex flex-wrap gap-4">
+                {opts.transitions.map(({ key, from, to }) => {
+                  const val = (rcPrices[from] != null && rcPrices[to] != null)
+                    ? Math.round(rcPrices[from] - rcPrices[to])
+                    : null;
+                  return (
+                    <div key={key} className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400 font-mono">RC {from}→{to}</span>
+                      <span className="text-amber-300 font-mono text-sm font-bold">
+                        {val != null ? (val >= 0 ? `+${val}` : `${val}`) : "—"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Per-crop table */}
+        <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="text-xs font-mono min-w-full">
+              <thead>
+                <tr className="bg-slate-800 border-b border-slate-600">
+                  <th className="text-left px-4 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[110px] border-r border-slate-700">
+                    Grade
+                  </th>
+                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[230px] border-r border-slate-700">
+                    Specification
+                  </th>
+                  <th className="text-center px-2 py-2.5 text-slate-400 text-[10px] w-16 border-r border-slate-700">
+                    Unit
+                  </th>
+                  {opts.months.map((m, i) => (
+                    <th key={i} className="px-3 py-2.5 text-center min-w-[84px] border-l border-slate-700">
+                      <div className="text-white font-bold">{m.label}</div>
+                      <div className="text-[9px] text-slate-500 mt-0.5">{m.contractSym}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sections.map(section => {
+                  const sectionQuals = QUALITIES.filter(q => q.section === section);
+                  return (
+                    <React.Fragment key={section}>
+                      <tr className="bg-slate-800/50 border-t border-slate-600">
+                        <td
+                          colSpan={3 + opts.months.length}
+                          className="px-4 py-1.5 text-[10px] text-slate-400 uppercase font-bold tracking-widest"
+                        >
+                          {section}
+                        </td>
+                      </tr>
+                      {sectionQuals.map(q => (
+                        <tr
+                          key={q.key}
+                          className={`border-t border-slate-800/60 transition-colors ${
+                            q.isBasis ? "bg-indigo-950/30" : "hover:bg-slate-800/20"
+                          }`}
+                        >
+                          <td className={`px-4 py-2 border-r border-slate-800 font-medium ${
+                            q.isBasis ? "text-indigo-300" : "text-slate-200"
+                          }`}>
+                            {q.label}
+                          </td>
+                          <td className="px-3 py-2 text-slate-500 text-[10px] border-r border-slate-800">
+                            {q.desc}
+                          </td>
+                          <td className="px-2 py-2 text-center text-slate-500 border-r border-slate-800">
+                            USD/MT
+                          </td>
+                          {opts.months.map((m, i) => {
+                            const totalDiff = Math.round((m.basisForMonth + q.diff + optionsAddon + freight + financing) / 5) * 5;
+                            const display   = fmtDiff(m.contractLetter, totalDiff);
+                            const color = q.isBasis
+                              ? "text-indigo-300"
+                              : totalDiff >= 0 ? "text-emerald-400" : "text-red-400";
+                            return (
+                              <td key={i} className={`px-3 py-2 text-center font-bold border-l border-slate-800/50 ${color}`}>
+                                {display}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Shared controls: freight + financing apply across both crops */}
+      <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
         {(["Freight", "Financing"] as const).map(label => {
           const val   = label === "Freight" ? freight   : financing;
           const setVal = label === "Freight" ? setFreight : setFinancing;
           return (
-            <div key={label} className="border-l border-slate-700 pl-6">
+            <div key={label}>
               <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">{label} — USD/MT</div>
               <div className="flex items-center gap-2">
                 <input
@@ -409,28 +617,6 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
             </div>
           );
         })}
-        {transitions.length > 0 && (
-          <div className="border-l border-slate-700 pl-6">
-            <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-              Calendar Spreads — USD/MT
-            </div>
-            <div className="flex flex-wrap gap-4">
-              {transitions.map(({ key, from, to }) => {
-                const val = (rcPrices[from] != null && rcPrices[to] != null)
-                  ? Math.round(rcPrices[from] - rcPrices[to])
-                  : null;
-                return (
-                  <div key={key} className="flex items-center gap-2">
-                    <span className="text-[10px] text-slate-400 font-mono">RC {from}→{to}</span>
-                    <span className="text-amber-300 font-mono text-sm font-bold">
-                      {val != null ? (val >= 0 ? `+${val}` : `${val}`) : "—"}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
         <div className="text-xs text-slate-500 leading-relaxed border-l border-slate-700 pl-6">
           Monthly carry <span className="text-slate-300 font-medium">+30 USD/MT</span> per shipment month<br />
           RC bimonthly cycle: K (May) · N (Jul) · U (Sep) · X (Nov) · F (Jan)<br />
@@ -438,84 +624,49 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="text-xs font-mono min-w-full">
-            <thead>
-              <tr className="bg-slate-800 border-b border-slate-600">
-                <th className="text-left px-4 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[110px] border-r border-slate-700">
-                  Grade
-                </th>
-                <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[230px] border-r border-slate-700">
-                  Specification
-                </th>
-                <th className="text-center px-2 py-2.5 text-slate-400 text-[10px] w-16 border-r border-slate-700">
-                  Unit
-                </th>
-                {months.map((m, i) => (
-                  <th key={i} className="px-3 py-2.5 text-center min-w-[84px] border-l border-slate-700">
-                    <div className="text-white font-bold">{m.label}</div>
-                    <div className="text-[9px] text-slate-500 mt-0.5">{m.contractSym}</div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sections.map(section => {
-                const sectionQuals = QUALITIES.filter(q => q.section === section);
-                return (
-                  <React.Fragment key={section}>
-                    <tr className="bg-slate-800/50 border-t border-slate-600">
-                      <td
-                        colSpan={3 + months.length}
-                        className="px-4 py-1.5 text-[10px] text-slate-400 uppercase font-bold tracking-widest"
-                      >
-                        {section}
-                      </td>
-                    </tr>
-                    {sectionQuals.map(q => (
-                      <tr
-                        key={q.key}
-                        className={`border-t border-slate-800/60 transition-colors ${
-                          q.isBasis ? "bg-indigo-950/30" : "hover:bg-slate-800/20"
-                        }`}
-                      >
-                        <td className={`px-4 py-2 border-r border-slate-800 font-medium ${
-                          q.isBasis ? "text-indigo-300" : "text-slate-200"
-                        }`}>
-                          {q.label}
-                        </td>
-                        <td className="px-3 py-2 text-slate-500 text-[10px] border-r border-slate-800">
-                          {q.desc}
-                        </td>
-                        <td className="px-2 py-2 text-center text-slate-500 border-r border-slate-800">
-                          USD/MT
-                        </td>
-                        {months.map((m, i) => {
-                          const totalDiff = Math.round((m.basisForMonth + q.diff + optionsAddon + freight + financing) / 5) * 5;
-                          const display   = fmtDiff(m.contractLetter, totalDiff);
-                          const color = q.isBasis
-                            ? "text-indigo-300"
-                            : totalDiff >= 0 ? "text-emerald-400" : "text-red-400";
-                          return (
-                            <td key={i} className={`px-3 py-2 text-center font-bold border-l border-slate-800/50 ${color}`}>
-                              {display}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* Current crop */}
+      {renderCropPanel({
+        title:          `Current Crop · ending Nov ${String(todayCropEndYear).slice(2)}`,
+        subtitle:       "Physical shipments in the current crop year",
+        months:         currentMonths,
+        transitions:    currentTransitions,
+        nextLetter:     currentNextLetter,
+        basisDiff:      currentBasisDiff,
+        basis2Diff:     currentBasis2Diff,
+        onBasisChange:  setCurrentBasisOverride,
+        onBasis2Change: setCurrentBasis2Override,
+      })}
+
+      {/* Crop year roll indicator (only when both tables render) */}
+      {cropYearRoll && currentCropMonths.length > 0 && newCropMonths.length > 0 && (
+        <div className="flex justify-center">
+          <div className="bg-slate-900 border border-amber-600/40 rounded-full px-5 py-1.5 flex items-center gap-3 text-[10px]">
+            <span className="text-amber-300 uppercase font-bold tracking-widest">Crop Year Roll</span>
+            <span className="text-slate-400 font-mono">RC {cropYearRoll.from}→{cropYearRoll.to}</span>
+            <span className="text-amber-300 font-mono font-bold">
+              {cropYearRoll.value >= 0 ? `+${cropYearRoll.value}` : cropYearRoll.value} USD/MT
+            </span>
+          </div>
         </div>
-        <div className="px-4 py-2.5 border-t border-slate-700 text-[10px] text-slate-500">
-          * Diffs quoted vs ICE London (RC) bimonthly contracts. Basis = Grade 2 S13 Standard.
-          Screen 18 = Screen 16 + 10. Grade 3 = Basis − 250. Prices indicative, subject to availability and confirmation.
-        </div>
+      )}
+
+      {/* New crop */}
+      {renderCropPanel({
+        title:          `New Crop · starting Dec ${String(todayCropEndYear).slice(2)}`,
+        subtitle:       "Physical shipments in next crop year",
+        months:         newMonths,
+        transitions:    newTransitions,
+        nextLetter:     newNextLetter,
+        basisDiff:      newBasisDiff,
+        basis2Diff:     newBasis2Diff,
+        onBasisChange:  setNewBasisOverride,
+        onBasis2Change: setNewBasis2Override,
+      })}
+
+      {/* Footer note */}
+      <div className="px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-[10px] text-slate-500">
+        * Diffs quoted vs ICE London (RC) bimonthly contracts. Basis = Grade 2 S13 Standard.
+        Screen 18 = Screen 16 + 10. Grade 3 = Basis − 250. Prices indicative, subject to availability and confirmation.
       </div>
 
       {/* Packing & Compliance */}
