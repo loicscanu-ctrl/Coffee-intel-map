@@ -643,15 +643,27 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
             _d_max[d["country"]] = d
     rep.by_destination = list(_d_max.values())
 
-    # Derive robusta/arabica/total volumes from the grade table — these are
-    # MUCH more reliable than regex-matching "Total Robusta" out of the text
-    # (which was prone to footnote / sub-total noise). When the grade table
-    # is empty (format drift on grades themselves), the report still surfaces
-    # the month + warnings so the operator can spot the failure mode.
-    rep.robusta_bags = _sum_robusta(rep.by_grade)
-    rep.arabica_bags = _sum_arabica(rep.by_grade)
-    if rep.robusta_bags is not None or rep.arabica_bags is not None:
-        rep.total_bags = (rep.robusta_bags or 0) + (rep.arabica_bags or 0)
+    # Derive robusta/arabica/total volumes. Two sources contribute, and we
+    # reconcile per-family by taking the LARGER reading:
+    #   • Σ grade table by family (the per-quality breakdown), and
+    #   • Σ by_destination by family (the per-country breakdown).
+    # Both should sum to the same total per month — when they disagree, one
+    # source's extractor missed cells (a grade row picked the wrong column,
+    # or a destination row failed to match the country regex). The cross-
+    # check max-merge means whichever extractor caught more wins for that
+    # family, and a downstream Σdest=monthly_total invariant only fails on
+    # months where BOTH stages under-extracted — a much sharper signal of
+    # genuine format drift than the prior grade-only derivation produced.
+    grade_r = _sum_robusta(rep.by_grade) or 0
+    grade_a = _sum_arabica(rep.by_grade) or 0
+    dest_r  = sum(d.get("robusta_bags", 0) for d in rep.by_destination)
+    dest_a  = sum(d.get("arabica_bags", 0) for d in rep.by_destination)
+    merged_r = max(grade_r, dest_r) or None
+    merged_a = max(grade_a, dest_a) or None
+    rep.robusta_bags = merged_r
+    rep.arabica_bags = merged_a
+    if merged_r is not None or merged_a is not None:
+        rep.total_bags = (merged_r or 0) + (merged_a or 0)
 
     if rep.robusta_bags is None and rep.arabica_bags is None:
         rep.parse_warnings.append(

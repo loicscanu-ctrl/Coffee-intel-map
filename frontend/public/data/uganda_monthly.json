@@ -9,9 +9,9 @@
   "series": [
     {
       "month": "2020-01",
-      "robusta_bags": 340256,
-      "arabica_bags": 63775,
-      "total_bags": 404031,
+      "robusta_bags": 381179,
+      "arabica_bags": 67731,
+      "total_bags": 448910,
       "value_usd": null,
       "by_grade": [
         {
@@ -245,9 +245,9 @@
     },
     {
       "month": "2020-02",
-      "robusta_bags": 353052,
-      "arabica_bags": 58933,
-      "total_bags": 411985,
+      "robusta_bags": 413179,
+      "arabica_bags": 59546,
+      "total_bags": 472725,
       "value_usd": null,
       "by_grade": [
         {
@@ -467,9 +467,9 @@
     },
     {
       "month": "2020-03",
-      "robusta_bags": 334852,
+      "robusta_bags": 402405,
       "arabica_bags": 63856,
-      "total_bags": 398708,
+      "total_bags": 466261,
       "value_usd": null,
       "by_grade": [
         {
@@ -697,9 +697,9 @@
     },
     {
       "month": "2020-04",
-      "robusta_bags": 231270,
-      "arabica_bags": 57102,
-      "total_bags": 288372,
+      "robusta_bags": 292511,
+      "arabica_bags": 60742,
+      "total_bags": 353253,
       "value_usd": null,
       "by_grade": [
         {
@@ -927,9 +927,9 @@
     },
     {
       "month": "2020-05",
-      "robusta_bags": 297394,
+      "robusta_bags": 368698,
       "arabica_bags": 78472,
-      "total_bags": 375866,
+      "total_bags": 447170,
       "value_usd": null,
       "by_grade": [
         {
@@ -1141,9 +1141,9 @@
     },
     {
       "month": "2020-06",
-      "robusta_bags": 309192,
-      "arabica_bags": 58104,
-      "total_bags": 367296,
+      "robusta_bags": 357265,
+      "arabica_bags": 59245,
+      "total_bags": 416510,
       "value_usd": null,
       "by_grade": [
         {
@@ -1381,9 +1381,9 @@
     },
     {
       "month": "2020-07",
-      "robusta_bags": 445791,
-      "arabica_bags": 61720,
-      "total_bags": 507511,
+      "robusta_bags": 474983,
+      "arabica_bags": 63706,
+      "total_bags": 538689,
       "value_usd": null,
       "by_grade": [
         {
@@ -1623,9 +1623,9 @@
     },
     {
       "month": "2020-08",
-      "robusta_bags": 432771,
+      "robusta_bags": 472092,
       "arabica_bags": 73775,
-      "total_bags": 506546,
+      "total_bags": 545867,
       "value_usd": null,
       "by_grade": [
         {
@@ -1885,9 +1885,9 @@
     },
     {
       "month": "2020-09",
-      "robusta_bags": 394376,
-      "arabica_bags": 40183,
-      "total_bags": 434559,
+      "robusta_bags": 464610,
+      "arabica_bags": 41584,
+      "total_bags": 506194,
       "value_usd": null,
       "by_grade": [
         {
@@ -2107,9 +2107,9 @@
     },
     {
       "month": "2020-10",
-      "robusta_bags": 320074,
+      "robusta_bags": 385042,
       "arabica_bags": 49912,
-      "total_bags": 369986,
+      "total_bags": 434954,
       "value_usd": null,
       "by_grade": [
         {
@@ -2351,9 +2351,9 @@
     },
     {
       "month": "2020-11",
-      "robusta_bags": 331875,
-      "arabica_bags": 37401,
-      "total_bags": 369276,
+      "robusta_bags": 371487,
+      "arabica_bags": 54260,
+      "total_bags": 425747,
       "value_usd": null,
       "by_grade": [
         {
@@ -2577,9 +2577,9 @@
     },
     {
       "month": "2020-12",
-      "robusta_bags": 332856,
-      "arabica_bags": 35211,
-      "total_bags": 368067,
+      "robusta_bags": 376818,
+      "arabica_bags": 36114,
+      "total_bags": 412932,
       "value_usd": null,
       "by_grade": [
         {
@@ -2803,9 +2803,9 @@
     },
     {
       "month": "2021-01",
-      "robusta_bags": 356369,
-      "arabica_bags": 34027,
-      "total_bags": 390396,
+      "robusta_bags": 399919,
+      "arabica_bags": 35790,
+      "total_bags": 435709,
       "value_usd": null,
       "by_grade": [
         {
@@ -3035,9 +3035,9 @@
     },
     {
       "month": "2021-02",
-      "robusta_bags": 442915,
-      "arabica_bags": 36889,
-      "total_bags": 479804,
+      "robusta_bags": 502302,
+      "arabica_bags": 45341,
+      "total_bags": 547643,
       "value_usd": null,
       "by_grade": [
         {
@@ -3267,9 +3267,9 @@
     },
     {
       "month": "2021-03",
-      "robusta_bags": 434307,
-      "arabica_bags": 47713,
-      "total_bags": 482020,
+      "robusta_bags": 498809,
+      "arabica_bags": 62572,
+      "total_bags": 561381,
       "value_usd": null,
       "by_grade": [
         {
@@ -3513,9 +3513,9 @@
     },
     {
       "month": "2021-04",
-      "robusta_bags": 386235,
+      "robusta_bags": 483776,
       "arabica_bags": 56323,
-      "total_bags": 442558,
+      "total_bags": 540099,
       "value_usd": null,
       "by_grade": [
         {
@@ -3751,9 +3751,9 @@
     },
     {
       "month": "2021-05",
-      "robusta_bags": 391281,
+      "robusta_bags": 431677,
       "arabica_bags": 60890,
-      "total_bags": 452171,
+      "total_bags": 492567,
       "value_usd": null,
       "by_grade": [
         {
@@ -3983,9 +3983,9 @@
     },
     {
       "month": "2021-06",
-      "robusta_bags": 505722,
-      "arabica_bags": 37209,
-      "total_bags": 542931,
+      "robusta_bags": 561976,
+      "arabica_bags": 48276,
+      "total_bags": 610252,
       "value_usd": null,
       "by_grade": [
         {
@@ -4220,8 +4220,8 @@
     {
       "month": "2021-07",
       "robusta_bags": 604761,
-      "arabica_bags": 30233,
-      "total_bags": 634994,
+      "arabica_bags": 277874,
+      "total_bags": 882635,
       "value_usd": null,
       "by_grade": [
         {
@@ -4461,9 +4461,9 @@
     },
     {
       "month": "2021-08",
-      "robusta_bags": 593002,
+      "robusta_bags": 632529,
       "arabica_bags": 55776,
-      "total_bags": 648778,
+      "total_bags": 688305,
       "value_usd": null,
       "by_grade": [
         {
@@ -4713,9 +4713,9 @@
     },
     {
       "month": "2021-09",
-      "robusta_bags": 253647,
-      "arabica_bags": 25107,
-      "total_bags": 278754,
+      "robusta_bags": 549331,
+      "arabica_bags": 40113,
+      "total_bags": 589444,
       "value_usd": null,
       "by_grade": [
         {
@@ -4965,9 +4965,9 @@
     },
     {
       "month": "2021-10",
-      "robusta_bags": 393533,
-      "arabica_bags": 54544,
-      "total_bags": 448077,
+      "robusta_bags": 428534,
+      "arabica_bags": 111920,
+      "total_bags": 540454,
       "value_usd": null,
       "by_grade": [
         {
@@ -5211,9 +5211,9 @@
     },
     {
       "month": "2021-11",
-      "robusta_bags": 395546,
+      "robusta_bags": 450579,
       "arabica_bags": 89710,
-      "total_bags": 485256,
+      "total_bags": 540289,
       "value_usd": null,
       "by_grade": [
         {
@@ -5475,9 +5475,9 @@
     },
     {
       "month": "2021-12",
-      "robusta_bags": 413981,
+      "robusta_bags": 463669,
       "arabica_bags": 68259,
-      "total_bags": 482240,
+      "total_bags": 531928,
       "value_usd": null,
       "by_grade": [
         {
@@ -5719,9 +5719,9 @@
     },
     {
       "month": "2022-01",
-      "robusta_bags": 284385,
+      "robusta_bags": 338137,
       "arabica_bags": 75507,
-      "total_bags": 359892,
+      "total_bags": 413644,
       "value_usd": null,
       "by_grade": [
         {
@@ -5979,9 +5979,9 @@
     },
     {
       "month": "2022-02",
-      "robusta_bags": 304384,
-      "arabica_bags": 60004,
-      "total_bags": 364388,
+      "robusta_bags": 374414,
+      "arabica_bags": 68573,
+      "total_bags": 442987,
       "value_usd": null,
       "by_grade": [
         {
@@ -6233,9 +6233,9 @@
     },
     {
       "month": "2022-03",
-      "robusta_bags": 334920,
-      "arabica_bags": 70187,
-      "total_bags": 405107,
+      "robusta_bags": 400552,
+      "arabica_bags": 70280,
+      "total_bags": 470832,
       "value_usd": null,
       "by_grade": [
         {
@@ -6501,9 +6501,9 @@
     },
     {
       "month": "2022-04",
-      "robusta_bags": 240344,
+      "robusta_bags": 302871,
       "arabica_bags": 82636,
-      "total_bags": 322980,
+      "total_bags": 385507,
       "value_usd": null,
       "by_grade": [
         {
@@ -6753,9 +6753,9 @@
     },
     {
       "month": "2022-05",
-      "robusta_bags": 309868,
+      "robusta_bags": 381949,
       "arabica_bags": 71006,
-      "total_bags": 380874,
+      "total_bags": 452955,
       "value_usd": null,
       "by_grade": [
         {
@@ -7029,9 +7029,9 @@
     },
     {
       "month": "2022-06",
-      "robusta_bags": 396194,
+      "robusta_bags": 490730,
       "arabica_bags": 98696,
-      "total_bags": 494890,
+      "total_bags": 589426,
       "value_usd": null,
       "by_grade": [
         {
@@ -7311,9 +7311,9 @@
     },
     {
       "month": "2022-07",
-      "robusta_bags": 486707,
+      "robusta_bags": 571685,
       "arabica_bags": 53167,
-      "total_bags": 539874,
+      "total_bags": 624852,
       "value_usd": null,
       "by_grade": [
         {
@@ -7579,9 +7579,9 @@
     },
     {
       "month": "2022-08",
-      "robusta_bags": 413782,
+      "robusta_bags": 463296,
       "arabica_bags": 34403,
-      "total_bags": 448185,
+      "total_bags": 497699,
       "value_usd": null,
       "by_grade": [
         {
@@ -7833,9 +7833,9 @@
     },
     {
       "month": "2022-09",
-      "robusta_bags": 445041,
-      "arabica_bags": 24874,
-      "total_bags": 469915,
+      "robusta_bags": 456892,
+      "arabica_bags": 26946,
+      "total_bags": 483838,
       "value_usd": null,
       "by_grade": [
         {
@@ -8087,9 +8087,9 @@
     },
     {
       "month": "2022-10",
-      "robusta_bags": 344934,
+      "robusta_bags": 390286,
       "arabica_bags": 63023,
-      "total_bags": 407957,
+      "total_bags": 453309,
       "value_usd": null,
       "by_grade": [
         {
@@ -8355,9 +8355,9 @@
     },
     {
       "month": "2022-11",
-      "robusta_bags": 316179,
-      "arabica_bags": 49750,
-      "total_bags": 365929,
+      "robusta_bags": 368270,
+      "arabica_bags": 56783,
+      "total_bags": 425053,
       "value_usd": null,
       "by_grade": [
         {
@@ -8623,9 +8623,9 @@
     },
     {
       "month": "2022-12",
-      "robusta_bags": 294314,
-      "arabica_bags": 38389,
-      "total_bags": 332703,
+      "robusta_bags": 354891,
+      "arabica_bags": 59792,
+      "total_bags": 414683,
       "value_usd": null,
       "by_grade": [
         {
@@ -8871,9 +8871,9 @@
     },
     {
       "month": "2023-01",
-      "robusta_bags": 365675,
-      "arabica_bags": 60749,
-      "total_bags": 426424,
+      "robusta_bags": 422071,
+      "arabica_bags": 65506,
+      "total_bags": 487577,
       "value_usd": null,
       "by_grade": [
         {
@@ -9109,9 +9109,9 @@
     },
     {
       "month": "2023-02",
-      "robusta_bags": 260878,
+      "robusta_bags": 376168,
       "arabica_bags": 76922,
-      "total_bags": 337800,
+      "total_bags": 453090,
       "value_usd": null,
       "by_grade": [
         {
@@ -9359,9 +9359,9 @@
     },
     {
       "month": "2023-03",
-      "robusta_bags": 317935,
-      "arabica_bags": 77699,
-      "total_bags": 395634,
+      "robusta_bags": 392322,
+      "arabica_bags": 91330,
+      "total_bags": 483652,
       "value_usd": null,
       "by_grade": [
         {
@@ -9635,9 +9635,9 @@
     },
     {
       "month": "2023-04",
-      "robusta_bags": 201092,
-      "arabica_bags": 87835,
-      "total_bags": 288927,
+      "robusta_bags": 269492,
+      "arabica_bags": 101388,
+      "total_bags": 370880,
       "value_usd": null,
       "by_grade": [
         {
@@ -9883,9 +9883,9 @@
     },
     {
       "month": "2023-05",
-      "robusta_bags": 288518,
-      "arabica_bags": 86936,
-      "total_bags": 375454,
+      "robusta_bags": 343621,
+      "arabica_bags": 104940,
+      "total_bags": 448561,
       "value_usd": null,
       "by_grade": [
         {
@@ -10133,9 +10133,9 @@
     },
     {
       "month": "2023-06",
-      "robusta_bags": 448030,
+      "robusta_bags": 492886,
       "arabica_bags": 75050,
-      "total_bags": 523080,
+      "total_bags": 567936,
       "value_usd": null,
       "by_grade": [
         {
@@ -10367,9 +10367,9 @@
     },
     {
       "month": "2023-07",
-      "robusta_bags": 541651,
+      "robusta_bags": 595573,
       "arabica_bags": 72646,
-      "total_bags": 614297,
+      "total_bags": 668219,
       "value_usd": null,
       "by_grade": [
         {
@@ -10607,9 +10607,9 @@
     },
     {
       "month": "2023-08",
-      "robusta_bags": 635808,
-      "arabica_bags": 42093,
-      "total_bags": 677901,
+      "robusta_bags": 681673,
+      "arabica_bags": 42971,
+      "total_bags": 724644,
       "value_usd": null,
       "by_grade": [
         {
@@ -10849,9 +10849,9 @@
     },
     {
       "month": "2023-09",
-      "robusta_bags": 497968,
-      "arabica_bags": 25114,
-      "total_bags": 523082,
+      "robusta_bags": 530696,
+      "arabica_bags": 30688,
+      "total_bags": 561384,
       "value_usd": null,
       "by_grade": [
         {
@@ -11077,9 +11077,9 @@
     },
     {
       "month": "2023-10",
-      "robusta_bags": 371306,
+      "robusta_bags": 400069,
       "arabica_bags": 62256,
-      "total_bags": 433562,
+      "total_bags": 462325,
       "value_usd": null,
       "by_grade": [
         {
@@ -11313,9 +11313,9 @@
     },
     {
       "month": "2023-11",
-      "robusta_bags": 299061,
+      "robusta_bags": 354942,
       "arabica_bags": 63556,
-      "total_bags": 362617,
+      "total_bags": 418498,
       "value_usd": null,
       "by_grade": [
         {
@@ -11561,9 +11561,9 @@
     },
     {
       "month": "2023-12",
-      "robusta_bags": 294191,
+      "robusta_bags": 336671,
       "arabica_bags": 46035,
-      "total_bags": 340226,
+      "total_bags": 382706,
       "value_usd": null,
       "by_grade": [
         {
@@ -11805,9 +11805,9 @@
     },
     {
       "month": "2024-01",
-      "robusta_bags": 355580,
+      "robusta_bags": 407866,
       "arabica_bags": 56804,
-      "total_bags": 412384,
+      "total_bags": 464670,
       "value_usd": null,
       "by_grade": [
         {
@@ -12043,9 +12043,9 @@
     },
     {
       "month": "2024-02",
-      "robusta_bags": 325327,
+      "robusta_bags": 362095,
       "arabica_bags": 56961,
-      "total_bags": 382288,
+      "total_bags": 419056,
       "value_usd": null,
       "by_grade": [
         {
@@ -12287,9 +12287,9 @@
     },
     {
       "month": "2024-03",
-      "robusta_bags": 216199,
-      "arabica_bags": 58603,
-      "total_bags": 274802,
+      "robusta_bags": 241413,
+      "arabica_bags": 65330,
+      "total_bags": 306743,
       "value_usd": null,
       "by_grade": [
         {
@@ -12519,9 +12519,9 @@
     },
     {
       "month": "2024-04",
-      "robusta_bags": 273692,
+      "robusta_bags": 299276,
       "arabica_bags": 74879,
-      "total_bags": 348571,
+      "total_bags": 374155,
       "value_usd": null,
       "by_grade": [
         {
@@ -12779,9 +12779,9 @@
     },
     {
       "month": "2024-05",
-      "robusta_bags": 431014,
+      "robusta_bags": 466700,
       "arabica_bags": 68371,
-      "total_bags": 499385,
+      "total_bags": 535071,
       "value_usd": null,
       "by_grade": [
         {
@@ -13747,9 +13747,9 @@
     },
     {
       "month": "2024-09",
-      "robusta_bags": 475256,
-      "arabica_bags": 16915,
-      "total_bags": 492171,
+      "robusta_bags": 524713,
+      "arabica_bags": 23050,
+      "total_bags": 547763,
       "value_usd": null,
       "by_grade": [
         {
@@ -13979,9 +13979,9 @@
     },
     {
       "month": "2024-10",
-      "robusta_bags": 399401,
+      "robusta_bags": 456272,
       "arabica_bags": 28157,
-      "total_bags": 427558,
+      "total_bags": 484429,
       "value_usd": null,
       "by_grade": [
         {
@@ -14183,9 +14183,9 @@
     },
     {
       "month": "2024-11",
-      "robusta_bags": 315949,
-      "arabica_bags": 33662,
-      "total_bags": 349611,
+      "robusta_bags": 331839,
+      "arabica_bags": 36531,
+      "total_bags": 368370,
       "value_usd": null,
       "by_grade": [
         {
@@ -14429,9 +14429,9 @@
     },
     {
       "month": "2024-12",
-      "robusta_bags": 327159,
-      "arabica_bags": 29826,
-      "total_bags": 356985,
+      "robusta_bags": 352198,
+      "arabica_bags": 32347,
+      "total_bags": 384545,
       "value_usd": null,
       "by_grade": [
         {
@@ -14643,9 +14643,9 @@
     },
     {
       "month": "2025-01",
-      "robusta_bags": 427087,
-      "arabica_bags": 27868,
-      "total_bags": 454955,
+      "robusta_bags": 472347,
+      "arabica_bags": 50512,
+      "total_bags": 522859,
       "value_usd": null,
       "by_grade": [
         {
@@ -14866,8 +14866,8 @@
     {
       "month": "2025-02",
       "robusta_bags": 421687,
-      "arabica_bags": 50866,
-      "total_bags": 472553,
+      "arabica_bags": 265178,
+      "total_bags": 686865,
       "value_usd": null,
       "by_grade": [
         {
@@ -16386,8 +16386,8 @@
     {
       "month": "2025-08",
       "robusta_bags": 738444,
-      "arabica_bags": 46034,
-      "total_bags": 784478,
+      "arabica_bags": 259475,
+      "total_bags": 997919,
       "value_usd": null,
       "by_grade": [
         {
@@ -16629,9 +16629,9 @@
     },
     {
       "month": "2025-09",
-      "robusta_bags": 698661,
+      "robusta_bags": 709798,
       "arabica_bags": 61457,
-      "total_bags": 760118,
+      "total_bags": 771255,
       "value_usd": null,
       "by_grade": [
         {
@@ -16877,9 +16877,9 @@
     },
     {
       "month": "2025-10",
-      "robusta_bags": 527033,
+      "robusta_bags": 548230,
       "arabica_bags": 69857,
-      "total_bags": 596890,
+      "total_bags": 618087,
       "value_usd": null,
       "by_grade": [
         {
@@ -17134,8 +17134,8 @@
     {
       "month": "2025-11",
       "robusta_bags": 526333,
-      "arabica_bags": 69857,
-      "total_bags": 596190,
+      "arabica_bags": 80812,
+      "total_bags": 607145,
       "value_usd": null,
       "by_grade": [
         {
@@ -17377,9 +17377,9 @@
     },
     {
       "month": "2025-12",
-      "robusta_bags": 341870,
-      "arabica_bags": 61663,
-      "total_bags": 403533,
+      "robusta_bags": 371139,
+      "arabica_bags": 86928,
+      "total_bags": 458067,
       "value_usd": null,
       "by_grade": [
         {
@@ -17635,9 +17635,9 @@
     },
     {
       "month": "2026-01",
-      "robusta_bags": 416978,
-      "arabica_bags": 90356,
-      "total_bags": 507334,
+      "robusta_bags": 424750,
+      "arabica_bags": 93889,
+      "total_bags": 518639,
       "value_usd": null,
       "by_grade": [
         {
@@ -17889,9 +17889,9 @@
     },
     {
       "month": "2026-02",
-      "robusta_bags": 474710,
-      "arabica_bags": 79757,
-      "total_bags": 554467,
+      "robusta_bags": 496735,
+      "arabica_bags": 90239,
+      "total_bags": 586974,
       "value_usd": null,
       "by_grade": [
         {
@@ -18151,9 +18151,9 @@
     },
     {
       "month": "2026-03",
-      "robusta_bags": 524885,
-      "arabica_bags": 66533,
-      "total_bags": 591418,
+      "robusta_bags": 556623,
+      "arabica_bags": 68965,
+      "total_bags": 625588,
       "value_usd": null,
       "by_grade": [
         {
@@ -18411,9 +18411,9 @@
     },
     {
       "month": "2026-04",
-      "robusta_bags": 430275,
+      "robusta_bags": 460499,
       "arabica_bags": 94375,
-      "total_bags": 524650,
+      "total_bags": 554874,
       "value_usd": null,
       "by_grade": [
         {

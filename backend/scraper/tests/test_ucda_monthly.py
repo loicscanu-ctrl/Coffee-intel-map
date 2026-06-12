@@ -192,6 +192,63 @@ def test_split_dest_row_rejects_spurious_tiny_triple():
     assert um._split_dest_row(nums) == (183_308, 15_438, 198_746)
 
 
+def test_v1_totals_take_max_of_grade_sum_and_dest_sum():
+    """When the grade-table extractor under-counted Robusta (e.g. picked
+    the wrong cell on a Screen 15 row) but the destinations table caught
+    a fuller picture, the total uses the larger reading. Avoids the
+    2020-23 over-counter shape where Σ destinations was already correct
+    but Σ grade-table robusta clocked in at ~half the reality."""
+    text = """\
+MONTHLY COFFEE REPORT - MAY 2022
+
+Grade Breakdown:
+Screen 18    50,000   12.5%
+Screen 12    20,000   5.0%
+
+Annex 3: Main Destinations
+1 Italy 155,170 22,634 177,804 39.5 39.5
+2 Germany 41,855 15,692 57,547 12.7 52.2
+3 Sudan 48,867 48,867 10.8 63.0
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    # Grade sum: Screen 18 + Screen 12 = 70,000 robusta. No arabica grades.
+    # Dest sum: 155,170 + 41,855 + 48,867 = 245,892 robusta;
+    #           22,634 + 15,692 + 0       =  38,326 arabica.
+    # max merge: robusta = max(70_000, 245_892) = 245_892
+    #            arabica = max(0,      38_326)  =  38_326
+    assert rep.robusta_bags == 245_892
+    assert rep.arabica_bags == 38_326
+    assert rep.total_bags   == 245_892 + 38_326
+
+
+def test_v1_totals_fall_back_to_grade_sum_when_dests_under_count():
+    """The opposite direction — destinations table missed some countries
+    (e.g. Italy/Germany not picked up on a pptx-converted PDF) but the
+    grade table is intact. The total should reflect the grade sum so the
+    front-end doesn't quietly drop volume on under-extracted reports."""
+    text = """\
+MONTHLY COFFEE REPORT - AUGUST 2024
+
+Grade Breakdown:
+Screen 18    400,000   55.0%
+Screen 15    250,000   35.0%
+Bugisu AA     30,000    4.0%
+
+Annex 3: Main Destinations
+1 Belgium 10,000 5,000 15,000 5.0 5.0
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    # Grade sum: 400_000 + 250_000 = 650_000 robusta; 30_000 arabica.
+    # Dest sum: 10_000 robusta; 5_000 arabica.
+    # max merge: robusta = max(650_000, 10_000) = 650_000
+    #            arabica = max(30_000,   5_000) =  30_000
+    assert rep.robusta_bags == 650_000
+    assert rep.arabica_bags == 30_000
+    assert rep.total_bags   == 680_000
+
+
 def test_v1_destinations_pick_month_columns_not_ctd():
     """End-to-end check that _parse_v1_recent produces the MONTH values
     when the row has a month triple AND a CTD/YTD triple side-by-side.
