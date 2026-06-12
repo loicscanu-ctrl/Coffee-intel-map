@@ -1,5 +1,93 @@
 [
   {
+    "id": 6960,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-10",
+    "body": "ICE-EU RC Open Interest changed by +2,949 over the last session, with +2,604 on nearby two contracts and +345 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-10\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +2,949 over the last session, with +2,604 on nearby two contracts and +345 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-12T03:40:00.919204",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +2,949 over the last session, with +2,604 on nearby two contracts and +345 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6959,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-10",
+    "body": "IFUS KC Open Interest changed by +1,950 over the last session, with +106 on nearby two contracts and +1,844 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-10\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by +1,950 over the last session, with +106 on nearby two contracts and +1,844 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-12T03:39:57.668770",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by +1,950 over the last session, with +106 on nearby two contracts and +1,844 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6958,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-11",
+    "body": "RC Robusta certified stocks shifted by -13 lots today, bringing global visible exchange inventory to 3,713 lots. 55 lots graded.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260611_103235.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by -13 lots today, bringing global visible exchange inventory to 3,713 lots. 55 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-12T03:39:10.893549",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by -13 lots today, bringing global visible exchange inventory to 3,713 lots. 55 lots graded.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 6957,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-11",
+    "body": "KC Arabica certified stocks shifted by -3,219 bags today, bringing global visible exchange inventory to 399,490 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260611.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -3,219 bags today, bringing global visible exchange inventory to 399,490 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-12T03:39:08.683630",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -3,219 bags today, bringing global visible exchange inventory to 399,490 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 6956,
     "title": "World Bank Population \u2013 2026-06-12",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3483,65 +3571,5 @@
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 253.1, \"chg\": -6.1, \"oi\": 71436, \"volume\": 19790, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 247.6, \"chg\": -5.25, \"oi\": 60228, \"volume\": 17294, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 240.45, \"chg\": -4.8, \"oi\": 42167, \"volume\": 7809, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 238.3, \"chg\": -4.75, \"oi\": 14297, \"volume\": 3466, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 238.2, \"chg\": -4.75, \"oi\": 5789, \"volume\": 999, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 238.45, \"chg\": -4.65, \"oi\": 3825, \"volume\": 343, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 238, \"chg\": -4.65, \"oi\": 1907, \"volume\": 171, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 237.45, \"chg\": -4.6, \"oi\": 2542, \"volume\": 59, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 237.15, \"chg\": -4.5, \"oi\": 664, \"volume\": 36, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-03\"}",
     "pub_date": "2026-06-04T05:55:19.504922"
-  },
-  {
-    "id": 6233,
-    "title": "USD/UGX FX Rate \u2013 2026-06-04",
-    "body": "USD/UGX FX Rate price: 3742",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "fx",
-      "uganda"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-04T05:55:00.153939"
-  },
-  {
-    "id": 6232,
-    "title": "USD/HNL FX Rate \u2013 2026-06-04",
-    "body": "USD/HNL FX Rate price: 26.5834",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-04T05:54:59.153536"
-  },
-  {
-    "id": 6231,
-    "title": "USD/IDR FX Rate \u2013 2026-06-04",
-    "body": "USD/IDR FX Rate price: 17983",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -0.789,
-    "lng": 113.921,
-    "tags": [
-      "fx",
-      "indonesia"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-04T05:54:58.130818"
-  },
-  {
-    "id": 6230,
-    "title": "USD/VND FX Rate \u2013 2026-06-04",
-    "body": "USD/VND FX Rate price: 26230",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "fx",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-04T05:54:57.127726"
   }
 ]
