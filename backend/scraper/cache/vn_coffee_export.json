@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-05-16T13:44:50.785136Z",
+  "scraped_at": "2026-06-12T09:15:28.107294Z",
   "source": "Vietnam Customs (customs.gov.vn) 2x monthly export bulletins",
   "unit": "tonnes",
   "monthly": [
@@ -521,6 +521,26 @@
         "3.578.105.898",
         "11,7",
         "-9,8"
+      ]
+    },
+    {
+      "month": "2026-05",
+      "tonnes": 143009.0,
+      "period_qty_tonnes": 143009.0,
+      "ytd_cum_qty_tonnes": 927339.0,
+      "ytd_diff_tonnes": 145322.0,
+      "raw_row": [
+        "4",
+        "Cà phê",
+        "Tấn",
+        "143.009",
+        "639.393.552",
+        "-24,7",
+        "-22,3",
+        "927.339",
+        "4.225.736.599",
+        "7,8",
+        "-13,5"
       ]
     }
   ]
