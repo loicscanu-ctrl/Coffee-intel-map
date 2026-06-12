@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-10T06:03:41+00:00",
-  "as_of": "2026-06-09",
+  "generated_at": "2026-06-12T03:39:08+00:00",
+  "as_of": "2026-06-11",
   "snapshots": [
     {
       "date": "2025-05-28",
@@ -4815,16 +4815,42 @@
         "ROT": 0,
         "TRI": 0
       }
+    },
+    {
+      "date": "2026-06-11",
+      "cut_off_date": "2026-06-10",
+      "total_lots_certified": 3713,
+      "total_bags_60kg_equivalent": 618833,
+      "non_tend_lots": 1,
+      "suspended_lots": 0,
+      "lots_graded_today": 55,
+      "lots_sold_today": 0,
+      "lots_bought_today": 0,
+      "tenders_today": 0,
+      "by_port_lots": {
+        "ANT": 2037,
+        "LON": 1636,
+        "FEL": 31,
+        "BAR": 9,
+        "AMS": 0,
+        "BRE": 0,
+        "HAM": 0,
+        "LEH": 0,
+        "LIV": 0,
+        "NOR": 0,
+        "ROT": 0,
+        "TRI": 0
+      }
     }
   ],
   "latest_detail": {
     "stock_report": {
-      "cut_off_date": "2026-06-08",
+      "cut_off_date": "2026-06-10",
       "ports": [
         {
           "port_id": "ANT",
           "port_name": "Antwerp",
-          "with_val_cert": 2050,
+          "with_val_cert": 2037,
           "non_tend": 1,
           "suspended": 0
         },
@@ -4907,12 +4933,12 @@
         }
       ],
       "grand_total": {
-        "with_val_cert": 3726,
+        "with_val_cert": 3713,
         "non_tend": 1,
         "suspended": 0
       }
     },
-    "stock_report_url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260609_103232.csv"
+    "stock_report_url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260611_103235.csv"
   },
   "recent_activity": {
     "gradings": [
@@ -7148,6 +7174,42 @@
           "tenderable_month": 0,
           "non_tenderable_month": 0,
           "lots_graded_month": 0
+        }
+      },
+      {
+        "date": "2026-06-11",
+        "url": "https://www.ice.com/marketdata/publicdocs/liffe/coffee/gradings/gradrc_260611-1.txt",
+        "report_date": "2026-06-11",
+        "report_time": "18:09",
+        "panel_date": "2026-06-11",
+        "panel_time": "08:00",
+        "entries": [
+          {
+            "section": "UK LOTS",
+            "origin": "Brazilian Conillon",
+            "port": "LON",
+            "class": 1,
+            "tenderable": true,
+            "allowance_cts_lb": 0.0,
+            "lots": 32
+          },
+          {
+            "section": "UK LOTS",
+            "origin": "Brazilian Conillon",
+            "port": "LON",
+            "class": 2,
+            "tenderable": true,
+            "allowance_cts_lb": -30.0,
+            "lots": 23
+          }
+        ],
+        "summary": {
+          "tenderable_today": 55,
+          "tenderable_month": 55,
+          "non_tenderable_today": 0,
+          "non_tenderable_month": 0,
+          "lots_graded_today": 55,
+          "lots_graded_month": 55
         }
       }
     ],
@@ -13203,6 +13265,20 @@
         "queue_lots": 0,
         "forecast_lots": 0,
         "total_pending_lots": 0
+      },
+      {
+        "date": "2026-06-10",
+        "report_date": "2026-06-10",
+        "queue_lots": 0,
+        "forecast_lots": 50,
+        "total_pending_lots": 50
+      },
+      {
+        "date": "2026-06-11",
+        "report_date": "2026-06-11",
+        "queue_lots": 0,
+        "forecast_lots": 80,
+        "total_pending_lots": 80
       }
     ],
     "infested_warrants": []
