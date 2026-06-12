@@ -362,9 +362,9 @@
       ],
       "by_destination": [
         {
-          "bags": 3,
-          "robusta_bags": 3,
-          "arabica_bags": 0,
+          "bags": 156911,
+          "robusta_bags": 140991,
+          "arabica_bags": 15920,
           "country": "Italy"
         },
         {
@@ -569,7 +569,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/February%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=250,633 vs published 388,646 (\u0394+138,013); \u03a3arabica=64,498 vs published 84,348 (\u0394+19,850)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=391,621 vs published 388,646 (\u0394-2,975); \u03a3arabica=80,418 vs published 84,348 (\u0394+3,930)",
         "grade-table sum 411,985 differs >5% from published export total 472,994"
       ]
     },
@@ -17288,9 +17288,9 @@
     },
     {
       "month": "2025-03",
-      "robusta_bags": 446393,
-      "arabica_bags": 82884,
-      "total_bags": 529277,
+      "robusta_bags": 525220,
+      "arabica_bags": 117761,
+      "total_bags": 642981,
       "value_usd": null,
       "by_grade": [
         {
@@ -17352,9 +17352,9 @@
       ],
       "by_destination": [
         {
-          "bags": 1,
-          "robusta_bags": 1,
-          "arabica_bags": 0,
+          "bags": 247078,
+          "robusta_bags": 216530,
+          "arabica_bags": 30548,
           "country": "Italy"
         },
         {
@@ -17605,9 +17605,10 @@
         }
       ],
       "parser_version": "v1_recent",
-      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-05/06-March%202025%20Report%20%281%29_ppt_0.pdf",
+      "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-05/06-March%202025%20Report%20%281%29_ppt%20%281%29.pdf",
       "parse_warnings": [
-        "no published Total row found on destinations page(s)"
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=527,243 vs published 525,220 (\u0394-2,023); \u03a3arabica=113,432 vs published 117,761 (\u0394+4,329)",
+        "grade-table sum 524,945 differs >5% from published export total 642,981"
       ]
     },
     {
