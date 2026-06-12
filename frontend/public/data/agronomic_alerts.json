@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-11T06:36:36+00:00",
+  "generated_at": "2026-06-12T06:27:53+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,37 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 168.6
-          }
-        }
-      ]
-    },
-    "honduras": {
-      "El Paraíso": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.27,
-            "forecast_7d_rain": 134.5
-          }
-        }
-      ]
-    },
-    "indonesia": {
-      "Toraja": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -2.22,
-            "forecast_7d_rain": 55.7
+            "forecast_7d_rain": 182.1
           }
         }
       ]
@@ -57,19 +27,19 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.17,
-            "forecast_7d_rain": 69.4
+            "forecast_7d_rain": 74.3
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 4,
+    "total_alerts": 2,
     "by_severity": {
-      "watch": 4
+      "watch": 2
     },
     "by_threat": {
-      "blossom_drop": 4
+      "blossom_drop": 2
     }
   }
 }
