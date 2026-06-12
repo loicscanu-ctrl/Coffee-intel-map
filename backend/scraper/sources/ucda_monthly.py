@@ -240,10 +240,28 @@ def _extract_text(pdf_bytes: bytes) -> str:
 # Adding a new format: write `_parse_vN(text, source_url)`, append to PARSERS,
 # write a synthetic-text test in tests/test_ucda_monthly.py.
 
+_MONTH_NAMES_RE = (
+    r"January|February|March|April|May|June|July|August|"
+    r"September|October|November|December|Jan|Feb|Mar|Apr|Jul|Aug|Sept?|Oct|Nov|Dec"
+)
+
+# Title pattern — strict. Only matches the month-year when it sits inside a
+# title-shaped phrase ("Monthly Coffee Report - <Month> <Year>", "Report For
+# <Month> <Year>", etc.). Picking this BEFORE the generic first-match avoids
+# the year-misdetection bug observed on /file-download/public/{id} PDFs: those
+# PDFs have no month in the URL, and the head of the document mentioned a
+# comparison period ("December 2024") BEFORE the actual title ("November
+# 2025") in the extracted text — the old regex picked the comparison.
+_TITLE_MONTH_YEAR_RE = re.compile(
+    rf"(?:monthly\s+(?:coffee\s+)?report|coffee\s+report|report\s+for|"
+    rf"report\s+of|for\s+the\s+month\s+of)\s*[-–:]?\s*"
+    rf"(?P<month>{_MONTH_NAMES_RE})\s*[,.]?\s*(?P<year>20\d{{2}})",
+    re.I,
+)
+
+# Generic fallback — first <Month> <Year>, possibly with "Coffee Report" between.
 _MONTH_YEAR_RE = re.compile(
-    r"(?P<month>January|February|March|April|May|June|July|August|"
-    r"September|October|November|December|Jan|Feb|Mar|Apr|Jul|Aug|Sept?|Oct|Nov|Dec)"
-    r"\s+(?:Coffee\s+Report\s*[-–]?\s*)?(?P<year>20\d{2})",
+    rf"(?P<month>{_MONTH_NAMES_RE})\s+(?:Coffee\s+Report\s*[-–]?\s*)?(?P<year>20\d{{2}})",
     re.I,
 )
 
@@ -251,17 +269,20 @@ _NUM_RE = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
 
 
 def _ym_from_text(text: str, fallback_url: str | None) -> str | None:
-    """Heuristic report-month detection. Strategy (first round of diagnostic
-    runs showed the original priority was inverted — text matches inside
-    comparison columns like "Volume vs June 2024" overrode the correct month
-    from the URL filename):
+    """Heuristic report-month detection. Strategy (refined after dispatch #N
+    showed the generic first-match producing wrong-month entries for the
+    `/file-download/download/public/{id}` PDFs whose URL slug carries no
+    month):
 
       1. PREFER the URL filename — those carry the explicit reporting month
          (e.g. ".../2025-07/09-June 2025 Report.pdf" → "2025-06"). The
          leading "09-" / "08-" prefix is an upload sequence, not a date.
-      2. Fall back to text scan — pick the FIRST `<Month> <Year>` that
-         appears in the upper third of the document (title region), since
-         later occurrences are typically comparison-period mentions.
+      2. Look for a TITLE-shaped match in the text head ("Monthly Coffee
+         Report - November 2025"). Comparison-period mentions like
+         "vs November 2024" don't match this pattern.
+      3. Fall back to the FIRST generic `<Month> <Year>` in the head. This
+         is best-effort for old reports whose title doesn't match the
+         title pattern.
     """
     # 1. URL-first detection — most reliable signal for UCDA's recent files.
     if fallback_url:
@@ -271,15 +292,35 @@ def _ym_from_text(text: str, fallback_url: str | None) -> str | None:
             if mw:
                 return f"{int(mw.group(1)):04d}-{mo_num:02d}"
 
-    # 2. Text fallback — only scan the first ~3000 chars (title region) so we
-    #    don't pick up comparison-period mentions further down.
     head = (text or "")[:3000]
+
+    # 2. Title-shaped match — strict.
+    tm = _TITLE_MONTH_YEAR_RE.search(head)
+    if tm:
+        mo = MONTH_NAMES.get(tm.group("month").lower())
+        yr = int(tm.group("year"))
+        if mo: return f"{yr:04d}-{mo:02d}"
+
+    # 3. Generic fallback.
     m = _MONTH_YEAR_RE.search(head)
     if m:
         mo = MONTH_NAMES.get(m.group("month").lower())
         yr = int(m.group("year"))
         if mo: return f"{yr:04d}-{mo:02d}"
     return None
+
+
+def _url_carries_month(url: str | None) -> bool:
+    """True iff the URL slug contains an English month name + 4-digit year
+    (after %20 → space). Used to prefer URL-anchored YM detections over
+    text-scan ones when content-deduping the report list."""
+    if not url:
+        return False
+    slug = url.replace("%20", " ")
+    for word in MONTH_NAMES:
+        if re.search(rf"\b{re.escape(word)}\s+20\d{{2}}\b", slug, re.I):
+            return True
+    return False
 
 
 def _to_int(s: str) -> int | None:
@@ -668,6 +709,40 @@ async def run_async(write: bool = False, diag: bool = False,
               f"grades={len(rep.by_grade)} dests={len(rep.by_destination)}")
         if diag:
             _dump_diagnostics(url, text, rep)
+
+    # Content-fingerprint dedupe — drop reports whose parsed numbers exactly
+    # match another report's. UCDA hosts many recent PDFs at TWO URLs (a
+    # `/sites/default/files/...named.pdf` AND a `/file-download/download/
+    # public/{id}` alias). The numeric URL has no month in the slug, so its
+    # YM detection falls through to the text scan and historically picked
+    # the comparison-period mention (off by ~11 months). After this dedupe
+    # only the URL-anchored detection survives per fingerprint.
+    by_fingerprint: dict[tuple, MonthlyReport] = {}
+    for r in reports:
+        if r.robusta_bags is None and r.arabica_bags is None:
+            # Stubs (failed parsers, no totals) — never collapse, they all
+            # surface independently for the operator.
+            by_fingerprint[(id(r),)] = r
+            continue
+        key = (
+            r.robusta_bags, r.arabica_bags,
+            tuple(sorted((g["grade"], g.get("bags", 0)) for g in r.by_grade)),
+            tuple(sorted((d["country"], d.get("bags", 0)) for d in r.by_destination)),
+        )
+        prior = by_fingerprint.get(key)
+        if prior is None:
+            by_fingerprint[key] = r
+        else:
+            # Prefer the report whose URL slug names the month — its YM
+            # detection is anchored, not heuristic.
+            prior_anchored = _url_carries_month(prior.source_pdf)
+            new_anchored   = _url_carries_month(r.source_pdf)
+            if new_anchored and not prior_anchored:
+                by_fingerprint[key] = r
+    dropped = len(reports) - len(by_fingerprint)
+    if dropped:
+        print(f"[ucda] content-fingerprint dedupe collapsed {dropped} alias PDFs")
+    reports = list(by_fingerprint.values())
 
     # Sort + dedupe by month (keep the most-classified report per month).
     reports.sort(key=lambda r: (r.month, r.parser_version != "failed"))

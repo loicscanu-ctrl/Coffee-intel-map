@@ -46,6 +46,51 @@ def test_month_year_fallback_from_url_slug():
     assert um._ym_from_text(text, url) == "2020-07"
 
 
+def test_month_year_title_pattern_beats_comparison_mention():
+    """Regression for the `/file-download/download/public/{id}` PDFs.
+    These PDFs carry no month in the URL, so YM detection falls through to
+    a text scan. The actual report (November 2025) had a comparison-period
+    line ("December 2024 was the peak month") appear BEFORE the title line
+    in pdfplumber's extracted text — the generic first-match picked
+    "December 2024" and produced wrong-year duplicate entries. The title-
+    shaped pattern ("Monthly Coffee Report - November 2025") now wins."""
+    text = (
+        "Some narrative referencing December 2024 as last year's peak.\n"
+        "MONTHLY COFFEE REPORT - NOVEMBER 2025\n"
+        "Then the body of the report."
+    )
+    # No URL hint — the text scan must still land on the title.
+    assert um._ym_from_text(text, None) == "2025-11"
+
+
+def test_month_year_title_pattern_handles_for_the_month_of_phrasing():
+    """Older UCDA layouts phrase the title as "Report for the month of
+    January 2022". The title pattern accepts that phrasing too."""
+    text = (
+        "Reference to October 2023 trade volumes appears in the executive summary.\n"
+        "Report for the month of January 2022\n"
+        "..."
+    )
+    assert um._ym_from_text(text, None) == "2022-01"
+
+
+def test_url_carries_month_helper():
+    """Used by the content-fingerprint dedupe to pick the URL-anchored
+    detection over the text-scan one. %20 → space normalization needed."""
+    assert um._url_carries_month(
+        "https://ugandacoffee.go.ug/sites/default/files/2025-07/09-June%202025%20Report.pdf"
+    ) is True
+    assert um._url_carries_month(
+        "https://ugandacoffee.go.ug/sites/default/files/2024-08/July 2024.pdf"
+    ) is True
+    # Numeric-id URL: no month in slug.
+    assert um._url_carries_month(
+        "https://ugandacoffee.go.ug/file-download/download/public/1262"
+    ) is False
+    assert um._url_carries_month(None) is False
+    assert um._url_carries_month("") is False
+
+
 def test_v1_parser_derives_totals_from_grade_table():
     """Synthetic recent-format text. The parser SUMS grade-family rows to get
     robusta/arabica totals rather than regex-matching "Total Robusta" — the
