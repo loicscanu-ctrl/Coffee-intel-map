@@ -83,15 +83,18 @@ jobs:
         # write time even on a monthly-only run.
         run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Pull ICE monthly reports (--only-monthly)
+      - name: Pull ICE monthly reports (--only-monthly, 3 attempts)
         if: ${{ github.event_name == 'workflow_dispatch' || steps.guard.outputs.done != 'true' }}
         working-directory: backend
         env:
           PYTHONUNBUFFERED: "1"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m scraper.sources.ice_certified_stocks.orchestrate \
-            --days "${{ inputs.days_back || 3 }}" --only-monthly
+          for attempt in 1 2 3; do
+            python -m scraper.sources.ice_certified_stocks.orchestrate \
+              --days "${{ inputs.days_back || 3 }}" --only-monthly && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit + push if changed
         if: ${{ github.event_name == 'workflow_dispatch' || steps.guard.outputs.done != 'true' }}

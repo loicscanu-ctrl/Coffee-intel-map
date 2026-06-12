@@ -48,7 +48,7 @@ jobs:
         # no-op when DATABASE_URL is unset.
         run: pip install requests scipy sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Fetch + accumulate + rebuild
+      - name: Fetch + accumulate + rebuild (3 attempts)
         env:
           ORIGINS: ${{ inputs.origins }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -56,7 +56,10 @@ jobs:
         run: |
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/fetch_origin_weather.py $ARGS
+          for attempt in 1 2 3; do
+            python backend/scripts/fetch_origin_weather.py $ARGS && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Evaluate IPHM agronomic alerts
         # Runs after the weather rebuild so SPI/SPEI/forecast are fresh.

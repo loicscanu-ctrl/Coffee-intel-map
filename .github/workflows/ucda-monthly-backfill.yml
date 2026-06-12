@@ -64,19 +64,29 @@ jobs:
           pip install patchright
           python -m patchright install chromium
 
-      - name: Run UCDA scraper
+      - name: Run UCDA scraper (3 attempts)
         id: scrape
         working-directory: backend
         env:
           DIAG: ${{ inputs.diag }}
           MAX:  ${{ inputs.max }}
         run: |
+          # set +e: UCDA is best-effort (known-flaky source, not on critical
+          # chain). Failure dumps diagnostics + skips commit, but doesn't fail
+          # the workflow. Retry runs inside this guard so transient 403s /
+          # timeouts get a second + third chance before we give up.
           set +e
           ARGS="--write"
           [ "$DIAG" = "true" ] && ARGS="$ARGS --diag"
           [ -n "$MAX" ] && ARGS="$ARGS --max $MAX"
-          PYTHONPATH=. python -m scraper.sources.ucda_monthly $ARGS
-          echo "rc=$?" >> "$GITHUB_OUTPUT"
+          rc=1
+          for attempt in 1 2 3; do
+            PYTHONPATH=. python -m scraper.sources.ucda_monthly $ARGS
+            rc=$?
+            [ $rc -eq 0 ] && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed (rc=$rc), retrying in 5m..." && sleep 300
+          done
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
 
       - name: Upload diagnostic artifacts
         if: always()

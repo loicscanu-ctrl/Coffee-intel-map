@@ -30,10 +30,14 @@ jobs:
       - name: Install dependencies
         run: pip install openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Run Cecafe scraper
+      - name: Run Cecafe scraper (3 attempts)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m backend.scraper.fetch_cecafe
+        run: |
+          for attempt in 1 2 3; do
+            python -m backend.scraper.fetch_cecafe && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated JSON if changed
         run: |
