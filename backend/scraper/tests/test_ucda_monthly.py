@@ -772,3 +772,71 @@ def test_v2_isreal_typo_canonicalises_to_israel():
     assert israel["bags"] == 8_340
     assert israel["robusta_bags"] == 7_040
     assert israel["arabica_bags"] == 1_300
+
+
+# The 2025-03 PDF blanked the table's Total row to "Total 100" and spilled
+# the actual grand total into Italy's row. Operator-confirmed fixture text.
+
+_MARCH_2025_TABLE = (
+    "Annex 3: Main Destinations of Uganda Coffee by Type in March 2025 "
+    "DESTINATION POSITION HELD IN FEBRUARY QUANTITY (60kg bags) "
+    "%AGE MARKET SHARE Robusta Arabica Total Individual Cumulative "
+    "Total 100 "
+    "1 Italy 1 525,220 117,761 642,981 38.43 38.43 "
+    "2 India 3 54,306 3,054 57,360 8.92 47.35 "
+    "3 Germany 2 36,163 8,118 44,281 6.89 54.23 "
+    "4 Spain 6 33,752 5,236 38,988 6.06 60.30 "
+    "5 Sudan 5 36,750 36,750 5.72 66.01 "
+    "6 China 9 30,184 5,348 35,532 5.53 71.54 "
+    "7 U.S.A 8 14,348 19,209 33,557 5.22 76.76 "
+    "8 Belgium 4 16,458 11,377 27,835 4.33 81.09 "
+    "9 Algeria 22 14,832 14,832 2.31 83.39 "
+    "10 Russia 11 8,988 1,688 10,676 1.66 85.06 "
+)
+
+
+def test_v2_march_2025_top_row_total_misfile_is_recovered():
+    """Operator-confirmed pattern: UCDA blanked the Total row and dropped
+    the table grand total into Italy's cells. Recovery treats Italy's
+    cells as the published totals, then subtracts every other row from
+    them to back out Italy's real contribution."""
+    rows, published, warnings = um._extract_destinations_v2([_MARCH_2025_TABLE])
+    by_country = {r["country"]: r for r in rows}
+    # The misfiled values became the published Total — UCDA's authoritative
+    # total for the month.
+    assert published == (525_220, 117_761, 642_981)
+    italy = by_country["Italy"]
+    # Σ rows 2..10 robusta:  54_306+36_163+33_752+36_750+30_184+14_348+
+    #                        16_458+14_832+8_988                     = 245_781
+    # Italy recomputed = 525_220 − 245_781 = 279_439 (residual = the long
+    # tail past row 10, which the fixture deliberately truncates — in the
+    # real PDF those rows make the recovered Italy land ~250k).
+    assert italy["robusta_bags"] == 525_220 - 245_781
+    # Σ rows 2..10 arabica = 3_054 + 8_118 + 5_236 + 0 + 5_348 + 19_209
+    #                       + 11_377 + 0 + 1_688 = 54_030
+    assert italy["arabica_bags"] == 117_761 - 54_030
+    assert italy["bags"] == italy["robusta_bags"] + italy["arabica_bags"]
+    assert any("Total misfile recovered" in w for w in warnings)
+    # Cross-check now matches because Σ(rows) == published by construction.
+    assert not any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_does_not_recover_when_top_only_3x_second():
+    """Real months commonly have Italy 2-3× the next destination; the
+    recovery must NOT fire unless top > BOTH 5× second AND 1.5× Σ others."""
+    page = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "1 Italy 1 200,000 100,000 300,000 40.0 40.0\n"
+        "2 Germany 2 80,000 20,000 100,000 13.3 53.3\n"
+        "3 Sudan 3 50,000 50,000 6.7 60.0\n"
+        "4 Spain 5 40,000 10,000 50,000 6.7 66.7\n"
+        "Total 370,000 130,000 500,000"
+    )
+    rows, published, warnings = um._extract_destinations_v2([page])
+    by_country = {r["country"]: r for r in rows}
+    # Top (300k) is 3x second (100k) and 1.5x Σ others (200k) — but the
+    # ratios require >5× and >1.5×, so the recovery skips it. The
+    # legitimate published Total wins instead.
+    assert by_country["Italy"]["bags"] == 300_000
+    assert published == (370_000, 130_000, 500_000)
+    assert not any("Total misfile recovered" in w for w in warnings)

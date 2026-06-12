@@ -718,6 +718,47 @@ def _v2_published_totals(scope: str) -> tuple[int, int, int] | None:
     return best
 
 
+def _v2_recover_top_total_misfile(
+    rows: list[dict], published: tuple[int, int, int] | None,
+) -> tuple[tuple[int, int, int] | None, str | None]:
+    """Operator-confirmed 2025-03 case: UCDA blanked the table's Total row
+    in the source PDF and spilled the actual totals into the top row's
+    cells (Italy showed 642,981 bags — the table grand total — instead of
+    its ~247k real contribution). Recovery only runs when no published
+    Total was found independently and the top destination dwarfs both the
+    second-largest (>2×) AND the sum of every other row — together a
+    pattern no real month ever produces.
+
+    When triggered, the top's original cells become the published totals
+    and the top's real R/A/T are recomputed as (original − Σ other rows).
+    Tail rows past what the parser captured stay missing — Σ(captured)
+    ends up overcrediting the top by exactly that residual, which the
+    cross-check will surface.
+
+    Thresholds chosen against the observed extremes: true misfile (2025-03)
+    has Italy 11× second-largest and 1.69× Σ-other-captured. Real high-
+    concentration months (Italy ~2.8× #2 in 2025-06, never > others) sit
+    well below both. 5× / 1.5× clears the gap without false-positives."""
+    if published is not None or len(rows) < 3:
+        return published, None
+    sorted_rows = sorted(rows, key=lambda r: -r["bags"])
+    top, second = sorted_rows[0], sorted_rows[1]
+    others = sorted_rows[1:]
+    others_sum   = sum(r["bags"]         for r in others)
+    others_sum_r = sum(r["robusta_bags"] for r in others)
+    others_sum_a = sum(r["arabica_bags"] for r in others)
+    if not (top["bags"] > 5 * second["bags"] and top["bags"] > 1.5 * others_sum):
+        return published, None
+    new_published = (top["robusta_bags"], top["arabica_bags"], top["bags"])
+    top["robusta_bags"] = max(0, top["robusta_bags"] - others_sum_r)
+    top["arabica_bags"] = max(0, top["arabica_bags"] - others_sum_a)
+    top["bags"]         = max(0, top["bags"]         - others_sum)
+    return new_published, (
+        f"top-row Total misfile recovered: {top['country']}'s cells held the "
+        f"table grand total {new_published[2]:,}; recomputed contribution = "
+        f"{top['bags']:,} bags (published Total − Σ other rows)")
+
+
 def _extract_destinations_v2(
     pages: list[str],
 ) -> tuple[list[dict], tuple[int, int, int] | None, list[str]]:
@@ -732,6 +773,9 @@ def _extract_destinations_v2(
         return [], None, []
     published = _v2_published_totals(scope)
     warnings: list[str] = []
+    published, misfile_note = _v2_recover_top_total_misfile(rows, published)
+    if misfile_note:
+        warnings.append(misfile_note)
     if published:
         pr, pa, pt = published
         sr = sum(r["robusta_bags"] for r in rows)
