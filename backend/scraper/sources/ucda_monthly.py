@@ -615,9 +615,16 @@ def _extract_destinations_table(text: str, known_countries: tuple[str, ...]) -> 
 #      parse warning the dashboard can display.
 
 _V2_HEADER_RE = re.compile(r"main\s*destinations?\s*of\s*uganda\s*coffee", re.I)
-_V2_TOTAL_ROW_RE = re.compile(r"total\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)", re.I)
+# Column header that only the actual table pages carry. The report's
+# summary page lists the annex TITLES (so it matches _V2_HEADER_RE) and
+# mentions Italy & co. in narrative — Feb-2020's Italy=3 came from junk
+# numbers near such a mention winning the first-occurrence dedupe. Pages
+# must match BOTH regexes to be in scope.
+_V2_COLUMNS_RE = re.compile(r"robusta\s+arabica\s+total", re.I)
 _V2_RANK_MAX = 70          # rank columns (current + prior month) stay under this
 _V2_CELL_MAX = 800_000     # no single destination plausibly exceeds this / month
+_V2_ROW_MIN = 50           # degenerate pairs ((1,1), (3,3) — header/page-number
+                           # debris) are junk; smallest real row seen is 66 bags
 
 # Single-type destinations whose blank column is the ROBUSTA one. Everything
 # else defaults to robusta-only. Grows as cross-check warnings surface.
@@ -649,10 +656,11 @@ def _v2_row_from_nums(country: str, nums: list[int]) -> dict | None:
     pair (single-type row). Month columns precede CTD columns in every
     observed layout, so leftmost == the month reading."""
     for i in range(len(nums) - 1):
-        if i + 2 < len(nums) and abs(nums[i] + nums[i + 1] - nums[i + 2]) <= 1:
+        if (i + 2 < len(nums) and nums[i + 2] >= _V2_ROW_MIN
+                and abs(nums[i] + nums[i + 1] - nums[i + 2]) <= 1):
             return {"bags": nums[i + 2], "robusta_bags": nums[i],
                     "arabica_bags": nums[i + 1]}
-        if nums[i] == nums[i + 1]:
+        if nums[i] == nums[i + 1] and nums[i] >= _V2_ROW_MIN:
             if country in _V2_ARABICA_ONLY:
                 return {"bags": nums[i], "robusta_bags": 0,
                         "arabica_bags": nums[i], "_single_type": True}
@@ -707,16 +715,42 @@ def _v2_parse_rows(scope: str) -> list[dict]:
 
 def _v2_published_totals(scope: str) -> tuple[int, int, int] | None:
     """The footer row "Total <Robusta> <Arabica> <Total>". Candidates must
-    satisfy R + A ≈ T and clear a 50k floor (real monthly totals are 200k+;
-    the floor rejects sub-table 'Total' rows). Largest T wins — that's the
-    grand total when a multi-page table prints intermediate ones."""
+    satisfy R + A ≈ T and land in [50k, 5M] (real monthly totals are
+    200k-1M; the band rejects sub-table 'Total' rows and the annual
+    comparative tables). Largest T wins — that's the grand total when a
+    multi-page table prints intermediate ones.
+
+    pdfplumber sometimes SPLITS a cell across tokens — the 2025-03 PDF
+    prints 117,761 as "1 1 7,761" (and "1 17,761" in the buyers annex).
+    Rather than three fixed captures, we walk the numeric tokens after
+    each "Total" and try every adjacent-group partition of each token
+    prefix into (R, A, T); digit concatenation re-joins the splits and
+    the R + A == T identity validates the grouping."""
     best: tuple[int, int, int] | None = None
-    for m in _V2_TOTAL_ROW_RE.finditer(scope):
-        r, a, t = _to_int(m.group(1)), _to_int(m.group(2)), _to_int(m.group(3))
-        if r is None or a is None or t is None:
-            continue
-        if abs(r + a - t) <= 1 and t >= 50_000 and (best is None or t > best[2]):
-            best = (r, a, t)
+    for m in re.finditer(r"total\b", scope, re.I):
+        # Consecutive numeric tokens after "Total" — a non-numeric word or
+        # a decimal-pointed token (the % columns) ends the row.
+        toks: list[str] = []
+        for t in re.finditer(r"\S+", scope[m.end():m.end() + 120]):
+            word = t.group(0).strip(".,;:")
+            if "." in t.group(0).rstrip(".,;:") or not re.fullmatch(r"\d[\d,]*", word):
+                break
+            toks.append(word.replace(",", ""))
+            if len(toks) >= 7:
+                break
+        for end in range(3, len(toks) + 1):
+            pre = toks[:end]
+            for i in range(1, end - 1):
+                for j in range(i + 1, end):
+                    try:
+                        r = int("".join(pre[:i]))
+                        a = int("".join(pre[i:j]))
+                        t_ = int("".join(pre[j:]))
+                    except ValueError:
+                        continue
+                    if (abs(r + a - t_) <= 1 and 50_000 <= t_ <= 5_000_000
+                            and (best is None or t_ > best[2])):
+                        best = (r, a, t_)
     return best
 
 
@@ -766,7 +800,8 @@ def _extract_destinations_v2(
 ) -> tuple[list[dict], tuple[int, int, int] | None, list[str]]:
     """Returns (rows, published_totals, warnings). Empty rows ⇒ the caller
     falls back to the v1 slicer + line-scan (older report formats)."""
-    scoped = [p for p in pages if p and _V2_HEADER_RE.search(p)]
+    scoped = [p for p in pages
+              if p and _V2_HEADER_RE.search(p) and _V2_COLUMNS_RE.search(p)]
     if not scoped:
         return [], None, []
     scope = "\n".join(scoped)
@@ -1114,12 +1149,22 @@ async def run_async(write: bool = False, diag: bool = False,
         print(f"[ucda] content-fingerprint dedupe collapsed {dropped} alias PDFs")
     reports = list(by_fingerprint.values())
 
-    # Sort + dedupe by month (keep the most-classified report per month).
-    reports.sort(key=lambda r: (r.month, r.parser_version != "failed"))
+    # Sort + dedupe by month. UCDA occasionally RE-PUBLISHES a corrected
+    # PDF for the same month (2025-03 exists both broken — totals misfiled
+    # into Italy's row — and fixed); prefer the candidate whose parse is
+    # healthiest: non-failed parser first, then Σ destinations closest to
+    # the month's total.
+    def _quality(rep: MonthlyReport) -> tuple[bool, float]:
+        sd = sum(d.get("bags", 0) for d in rep.by_destination)
+        t = rep.total_bags or 0
+        closeness = max(0.0, 1.0 - abs(t - sd) / t) if (t and sd) else 0.0
+        return (rep.parser_version != "failed", closeness)
+
+    reports.sort(key=lambda r: r.month)
     deduped: dict[str, MonthlyReport] = {}
     for r in reports:
         prior = deduped.get(r.month)
-        if prior is None or (prior.parser_version == "failed" and r.parser_version != "failed"):
+        if prior is None or _quality(r) > _quality(prior):
             deduped[r.month] = r
     series = sorted(deduped.values(), key=lambda r: r.month)
 

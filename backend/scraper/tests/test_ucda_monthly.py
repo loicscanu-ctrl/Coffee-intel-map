@@ -645,6 +645,7 @@ def test_v2_scopes_to_header_pages_only():
     toc = "Narrative page. Italy received 999,999 bags in some year. 123,456"
     table = (
         "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
         "Total 100,000 50,000 150,000"
     )
@@ -665,6 +666,7 @@ def test_v2_single_flip_fixes_family_mismatch():
     arabica that month. The unique exact one-flip is applied and noted."""
     page = (
         "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
         "2 Kenya 2 4,000 4,000 1.6 61.6\n"
         "Total 100,000 54,000 154,000"
@@ -684,6 +686,7 @@ def test_v2_month_pair_beats_ctd_triple_on_same_row():
     leftmost candidate (the pair) must win."""
     page = (
         "Annex 3: Main Destinations of Uganda Coffee by Type\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Sudan 3 1,800 1,800 0.65 3.29 54,723 927 55,650 11.13 58.01\n"
     )
     rows, _, _ = um._extract_destinations_v2([page])
@@ -695,6 +698,7 @@ def test_v2_month_pair_beats_ctd_triple_on_same_row():
 def test_v2_south_sudan_does_not_double_count_sudan():
     page = (
         "Annex 3: Main Destinations of Uganda Coffee by Type\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Sudan 1 50,000 50,000 10.0 10.0\n"
         "2 South Sudan 2 7,000 7,000 1.4 11.4\n"
         "Total 57,000 0 57,000\n"
@@ -713,6 +717,7 @@ def test_v2_large_shortfall_still_flags_failed():
     reclassifies micro-residuals."""
     page = (
         "Annex 3: Main Destinations of Uganda Coffee by Type in Feb 2020\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
         "Total 200,000 100,000 300,000"
     )
@@ -826,6 +831,7 @@ def test_v2_does_not_recover_when_top_only_3x_second():
     recovery must NOT fire unless top > BOTH 5× second AND 1.5× Σ others."""
     page = (
         "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "DESTINATION Robusta Arabica Total Individual Cumulative\n"
         "1 Italy 1 200,000 100,000 300,000 40.0 40.0\n"
         "2 Germany 2 80,000 20,000 100,000 13.3 53.3\n"
         "3 Sudan 3 50,000 50,000 6.7 60.0\n"
@@ -952,3 +958,53 @@ def test_v2_april_2020_equal_valued_twins_stay_ambiguous():
     assert not any("flipped" in w for w in warnings)
     assert any("cross-check residual" in w for w in warnings)
     assert not any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_published_totals_merges_split_number_tokens():
+    """2025-03 PDFs print 117,761 as "1 1 7,761" (dest annex) and
+    "1 17,761" (buyers annex) — pdfplumber splits the cell. The partition
+    search re-joins the digits and validates with R + A == T."""
+    scope = "Robusta Arabica Total\nTotal\n525,220 1 1 7,761 642,981 100\n"
+    assert um._v2_published_totals(scope) == (525_220, 117_761, 642_981)
+    scope2 = "Total 525,220 1 17,761 642,981 100"
+    assert um._v2_published_totals(scope2) == (525_220, 117_761, 642_981)
+    # Healthy rows unaffected; the trailing decimal stops the token walk.
+    scope3 = "Total 388,646 84,348 472,994 100.00"
+    assert um._v2_published_totals(scope3) == (388_646, 84_348, 472_994)
+    # Annual comparative tables ("Grand Total 2,090,956 205,740,948 …")
+    # never validate: no partition satisfies R + A == T within the band.
+    scope4 = "Grand Total 2,090,956 205,740,948 1,787,208 180,294,565"
+    assert um._v2_published_totals(scope4) is None
+
+
+def test_v2_row_floor_rejects_degenerate_pairs():
+    """(1,1) and (3,3) pairs are header/page-number debris (the broken
+    2025-03 Italy row, Feb-2020's narrative junk). The 50-bag floor kills
+    them while keeping the smallest real rows (Czech Republic at 66)."""
+    assert um._v2_row_from_nums("italy", [3, 3]) is None
+    assert um._v2_row_from_nums("italy", [525_220, 1, 1, 7_761, 642_981]) is None
+    row = um._v2_row_from_nums("czech republic", [66, 66])
+    assert row is not None and row["bags"] == 66
+
+
+def test_v2_excludes_header_pages_without_column_header():
+    """Feb-2020 root cause: the summary page lists the annex titles (so it
+    matches the destinations-header phrase) AND mentions Italy in the
+    narrative, ahead of the real table in document order. Scope now also
+    requires the table's column header on the page."""
+    summary = (
+        "EXECUTIVE SUMMARY\n"
+        "Italy remained the leading destination as shown in Annex 3.\n"
+        "Annexes: Annex 3: Main Destinations of Uganda Coffee by Type in "
+        "February 2020 ........ page 8\n"
+    )
+    table = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in February 2020\n"
+        "DESTINATION POSITION HELD IN JANUARY Robusta Arabica Total Individual Cumulative\n"
+        "Total 140,991 15,920 156,911 100.00\n"
+        "1 Italy 1 140,991 15,920 156,911 100.00 100.00\n"
+    )
+    rows, published, _ = um._extract_destinations_v2([summary, table])
+    by_country = {r["country"]: r for r in rows}
+    assert by_country["Italy"]["bags"] == 156_911
+    assert published == (140_991, 15_920, 156_911)

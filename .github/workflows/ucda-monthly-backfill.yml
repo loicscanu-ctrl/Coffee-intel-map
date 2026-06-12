@@ -78,24 +78,6 @@ jobs:
           PYTHONPATH=. python -m scraper.sources.ucda_monthly $ARGS
           echo "rc=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Dump destination pages for problem months (temp debug)
-        if: always()
-        run: |
-          shopt -s nullglob
-          for f in backend/scraper/debug/ucda/*February_202020*.txt \
-                   backend/scraper/debug/ucda/*March_202025*.txt; do
-            echo "=== $f ==="
-            python3 - "$f" << 'EOF'
-          import sys, re
-          text = open(sys.argv[1], encoding="utf-8").read()
-          for m in re.finditer(r"main\s*destinations?\s*of\s*uganda\s*coffee", text, re.I):
-              s = max(0, m.start() - 200)
-              e = min(len(text), m.end() + 2500)
-              print(text[s:e])
-              print("-----8<-----")
-          EOF
-          done
-
       - name: Upload diagnostic artifacts
         if: always()
         uses: actions/upload-artifact@v4
