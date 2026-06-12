@@ -395,11 +395,20 @@ def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
     if not nums:
         return 0, 0, 0
 
-    # Find every (a, b, c) triple in the cell list where a + b == c (with
-    # 1-bag rounding tolerance). Tiny T values (< 500 bags) are rejected
-    # because spurious format-marker triples like "33 + 12 = 45" would
-    # otherwise hijack the row.
-    triples: list[tuple[int, int, int]] = []
+    # Collect candidate (T, R, A) interpretations of the row, then pick the
+    # smallest T. Two sources contribute:
+    #   • TRIPLES: (a, b, c) with a + b ≈ c — the standard R-A-T tuple.
+    #     Tiny T values (< 500 bags) are rejected so spurious format-
+    #     marker triples like "33 + 12 = 45" can't hijack the row.
+    #   • PAIRS: a value appearing twice in the row — the Sudan-style
+    #     robusta-only signature where the source PDF leaves the Arabica
+    #     cell blank, so pdfplumber emits two copies of the Total (R = T).
+    #     The smallest qualifying pair wins (so a month pair beats a CTD
+    #     pair in the same row).
+    # Preferring the smallest T across candidate sets means the MONTH
+    # interpretation beats the CTD/YTD one on multi-column rows.
+    candidates: list[tuple[int, int, int]] = []  # (T, R, A)
+
     sorted_nums = sorted(nums)
     n = len(sorted_nums)
     for i in range(n):
@@ -407,22 +416,21 @@ def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
             for k in range(j + 1, n):
                 a, b, c = sorted_nums[i], sorted_nums[j], sorted_nums[k]
                 if c >= 500 and abs(a + b - c) <= 1:
-                    triples.append((a, b, c))
-    if triples:
-        # Smallest T wins — for multi-column rows this picks the MONTH
-        # triple over the CTD/YTD one. The triple's larger leg is Robusta,
-        # smaller is Arabica.
-        triples.sort(key=lambda t: t[2])
-        a, b, c = triples[0]
-        return b, a, c  # (R=larger leg, A=smaller leg, T=sum)
+                    candidates.append((c, b, a))  # T=c, R=larger leg, A=smaller
+    for i in range(n - 1):
+        if sorted_nums[i] == sorted_nums[i + 1] and sorted_nums[i] >= 500:
+            candidates.append((sorted_nums[i], sorted_nums[i], 0))
+            break  # smallest pair only — repeats further up are redundant
 
-    # Fallback for 1- or 2-cell rows (no triple available).
+    if candidates:
+        candidates.sort(key=lambda c: c[0])
+        T, R, A = candidates[0]
+        return R, A, T
+
+    # Fallback for 1- or 2-cell rows that produced no triple or pair.
     sorted_desc = sorted(nums, reverse=True)
     T = sorted_desc[0]
     if len(sorted_desc) == 1:
-        return T, 0, T
-    # Sudan-style row: same value repeats → robusta-only.
-    if sorted_desc[1] == T:
         return T, 0, T
     R = sorted_desc[1]
     A = max(0, T - R)

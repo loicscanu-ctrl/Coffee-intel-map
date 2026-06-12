@@ -192,6 +192,39 @@ def test_split_dest_row_rejects_spurious_tiny_triple():
     assert um._split_dest_row(nums) == (183_308, 15_438, 198_746)
 
 
+def test_v1_destinations_pick_month_columns_not_ctd():
+    """End-to-end check that _parse_v1_recent produces the MONTH values
+    when the row has a month triple AND a CTD/YTD triple side-by-side.
+    Synthetic text mimics the 2020-23 era layout where both triples slip
+    under the 250k cap (small destination or early-crop-year cells) and
+    the previous max-as-Total rule picked the CTD triple, doubling the
+    invariant total."""
+    text = """\
+MONTHLY COFFEE REPORT - SEPTEMBER 2021
+
+Some narrative.
+
+Annex 3: Main Destinations of Uganda Coffee by Type
+1 Italy 4,500 600 5,100 1.83 1.83 161,159 1,310 162,469 32.50 32.50
+2 Germany 2,000 250 2,250 0.81 2.64 69,645 2,240 71,885 14.38 46.88
+3 Sudan 1,800 1,800 0.65 3.29 54,723 927 55,650 11.13 58.01
+"""
+    rep = um._parse_v1_recent(text, None)
+    assert rep is not None
+    assert rep.month == "2021-09"
+    by_country = {d["country"]: d for d in rep.by_destination}
+    # MONTH values land, not CTD.
+    assert by_country["Italy"]["bags"]   == 5_100
+    assert by_country["Italy"]["robusta_bags"] == 4_500
+    assert by_country["Italy"]["arabica_bags"] == 600
+    assert by_country["Germany"]["bags"] == 2_250
+    assert by_country["Germany"]["robusta_bags"] == 2_000
+    assert by_country["Sudan"]["bags"]   == 1_800
+    # Sudan is robusta-only: no triple, falls back to T=R=1,800.
+    assert by_country["Sudan"]["robusta_bags"] == 1_800
+    assert by_country["Sudan"]["arabica_bags"] == 0
+
+
 def test_v1_destination_emits_robusta_arabica_total_split():
     """Each destination row now carries R/A/Total instead of only Total —
     matches the layout the source PDFs publish (Robusta col + Arabica col +
