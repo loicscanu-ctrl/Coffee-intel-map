@@ -526,31 +526,35 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
         "estonia", "poland", "romania", "singapore", "croatia", "israel",
     )
     sliced = _extract_destinations_table(text, known_countries)
+    # ALWAYS run the line-scan in addition to the slicer, then dedupe by
+    # max(bags). The 2024-05/24-11/25-04/25-06 etc. cases showed the slicer
+    # can lock onto a region that contains a header marker but not the
+    # actual table — e.g. a TOC or a slide footer — yielding 1 country with
+    # the year (2025) as its bag count. Without the line-scan as a backup,
+    # those months end up with Σ destinations ≈ 2k. Running both and taking
+    # max means: the slicer's clean data wins where it's right, the line-
+    # scan's coverage wins where the slicer missed the real table.
     if sliced:
-        rep.by_destination = sliced
-    else:
-        for line in text.splitlines():
-            low = line.lower()
-            for c in known_countries:
-                # Tolerate rank-prefix without space ("2Germany"): negative
-                # lookbehind on letters instead of \b so "2Germany" matches
-                # (digit→letter is not a word boundary).
-                if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
-                    nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                    nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
-                    if nums:
-                        rob, ara, tot = _split_dest_row(nums)
-                        rep.by_destination.append({
-                            "country":      c.title(),
-                            "bags":         tot,
-                            "robusta_bags": rob,
-                            "arabica_bags": ara,
-                        })
-                    break
-    # Dedupe destinations — keep the LARGEST value per country. Sanity-check
-    # from PR #297 surfaced an August 2022 Germany row of 2,022 bags because
-    # a narrative mention earlier in the PDF fired the regex before the real
-    # Annex 3 table row (69,298 bags). max(bags) rejects those.
+        rep.by_destination.extend(sliced)
+    for line in text.splitlines():
+        low = line.lower()
+        for c in known_countries:
+            # Tolerate rank-prefix without space ("2Germany"): negative
+            # lookbehind on letters instead of \b so "2Germany" matches
+            # (digit→letter is not a word boundary).
+            if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
+                nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
+                nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
+                if nums:
+                    rob, ara, tot = _split_dest_row(nums)
+                    rep.by_destination.append({
+                        "country":      c.title(),
+                        "bags":         tot,
+                        "robusta_bags": rob,
+                        "arabica_bags": ara,
+                    })
+                break
+    # Dedupe destinations — keep the LARGEST value per country.
     _d_max: dict[str, dict] = {}
     for d in rep.by_destination:
         cur = _d_max.get(d["country"])
