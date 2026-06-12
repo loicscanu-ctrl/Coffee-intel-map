@@ -720,3 +720,55 @@ def test_v2_large_shortfall_still_flags_failed():
     assert published == (200_000, 100_000, 300_000)
     assert any("cross-check failed" in w for w in warnings)
     assert not any("cross-check residual" in w for w in warnings)
+
+
+# Synthetic text from the operator's screenshot of the Feb 2020 PDF — the
+# format that defeats v2 without the year-noise filter and the typo alias.
+
+_FEB_2020_TABLE = (
+    "Annex 3: Main Destinations of Uganda Coffee by Type in February 2020 "
+    "DESTINATION POSITION HELD IN JANUARY QUANTITY (60kg bags) "
+    "Robusta Arabica Total Individual Cumulative "
+    "Total 388,646 84,348 472,994 100.00 "
+    "Annex 3: Main Destinations of Uganda Coffee by Type in February 2020 "
+    "1 Italy 1 140,991 15,920 156,911 33.17 33.17 "
+    "2 Sudan 3 62,270 770 63,040 13.33 46.50 "
+    "3 Germany 2 37,962 21,598 59,560 12.59 59.09 "
+    "4 Spain 5 51,612 1,940 53,552 11.32 70.42 "
+    "5 United States 4 9,228 22,140 31,368 6.63 77.05 "
+    "6 India 7 26,785 3,740 30,525 6.45 83.50 "
+    "7 Belgium 6 17,882 1,880 19,762 4.18 87.68 "
+    "8 Morocco 8 11,772 11,772 2.49 90.17 "
+    "9 Isreal 9 7,040 1,300 8,340 1.76 91.93 "
+    "10 Portugal 4,974 4,974 1.05 92.98 "
+    "11 Russia 12 3,894 835 4,729 1.00 93.98 "
+)
+
+
+def test_v2_feb_2020_year_noise_does_not_hijack_italy():
+    """Regression for 2020-02 — without year filtering the page header
+    "February 2020" leaks 2020 twice into Italy's row scope and the
+    leftmost-pair rule captured (2020, 2020) ahead of the real 140k Robusta
+    cell. Italy is the first country on the page so this hit hardest there."""
+    rows, published, _ = um._extract_destinations_v2([_FEB_2020_TABLE])
+    by_country = {r["country"]: r for r in rows}
+    assert published == (388_646, 84_348, 472_994)
+    italy = by_country["Italy"]
+    assert (italy["robusta_bags"], italy["arabica_bags"], italy["bags"]) == \
+        (140_991, 15_920, 156_911)
+    # Morocco is single-type robusta in this report (Arabica cell blank).
+    morocco = by_country["Morocco"]
+    assert (morocco["robusta_bags"], morocco["arabica_bags"], morocco["bags"]) == \
+        (11_772, 0, 11_772)
+
+
+def test_v2_isreal_typo_canonicalises_to_israel():
+    """The 2020-02 PDF spells it "Isreal"; downstream charts aggregate by
+    display name, so the canonicalised "Israel" must land on the row."""
+    rows, _, _ = um._extract_destinations_v2([_FEB_2020_TABLE])
+    by_country = {r["country"]: r for r in rows}
+    israel = by_country.get("Israel")
+    assert israel is not None
+    assert israel["bags"] == 8_340
+    assert israel["robusta_bags"] == 7_040
+    assert israel["arabica_bags"] == 1_300

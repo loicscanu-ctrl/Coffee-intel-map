@@ -465,7 +465,16 @@ KNOWN_COUNTRIES = (
     "denmark", "finland", "norway", "ireland", "ukraine", "lithuania",
     "hungary", "bulgaria", "slovakia", "serbia", "malta", "cyprus",
     "qatar", "kuwait", "hong kong", "taiwan", "indonesia", "malaysia",
+    # Source-PDF misspellings observed in the operator's screenshots:
+    "isreal",       # 2020-02 PDF — typo for Israel
 )
+
+# Plausible year values that pdfplumber sometimes carries over from the
+# page header ("Annex 3 … February 2020") into the row scope, where they
+# can fake an equal-pair candidate before the real R/A/T cells. The v2 row
+# parser drops them — every UCDA report is dated 2018+, and bag counts
+# below 2,500 are rare enough that the loss is acceptable.
+_V2_YEAR_NOISE = set(range(2018, 2031))
 
 # Spelling variants → one canonical display name, so the frontend's
 # per-country aggregation doesn't split "U.S.A" / "Usa" / "United States"
@@ -478,6 +487,7 @@ _COUNTRY_DISPLAY_OVERRIDES = {
     "united arab emirates": "United Arab Emirates",
     "russian federation": "Russia",
     "korea": "South Korea", "south korea": "South Korea",
+    "isreal": "Israel",
 }
 
 
@@ -674,6 +684,8 @@ def _v2_parse_rows(scope: str) -> list[dict]:
                 continue                    # cell-concatenation outliers
             if n <= _V2_RANK_MAX and not seen_big:
                 continue                    # prior-month rank before the data
+            if n in _V2_YEAR_NOISE:
+                continue                    # page-header year leaking into the row
             nums.append(n)
             if n > _V2_RANK_MAX:
                 seen_big = True
