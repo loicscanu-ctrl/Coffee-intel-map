@@ -467,6 +467,8 @@ KNOWN_COUNTRIES = (
     "qatar", "kuwait", "hong kong", "taiwan", "indonesia", "malaysia",
     # Source-PDF misspellings observed in the operator's screenshots:
     "isreal",       # 2020-02 PDF — typo for Israel
+    # Operator's 2020-03 screenshot:
+    "iran",
 )
 
 # Plausible year values that pdfplumber sometimes carries over from the
@@ -782,21 +784,43 @@ def _extract_destinations_v2(
         sa = sum(r["arabica_bags"] for r in rows)
         if (sr, sa) != (pr, pa):
             dr, da = pr - sr, pa - sa
-            # A wrong single-type family default moves the SAME amount off
-            # one family onto the other. Flip the unique row that fixes both
-            # sums exactly; anything fuzzier stays a warning for the
-            # operator (no speculative auto-corrections).
+            # Wrong single-type family defaults move the SAME amount off one
+            # family onto the other — the source PDF's blank cell can sit in
+            # either column and flat text can't tell which (operator's
+            # 2020-03/04 screenshots: Mexico, Australia, Kenya, Sweden are
+            # arabica-only in some months, robusta-only in others). Find the
+            # UNIQUE subset of single-type rows whose totals sum exactly to
+            # the imbalance and flip it; anything ambiguous (e.g. two
+            # equal-valued single-type rows — April 2020's Estonia/Finland
+            # 640-bag twins) stays a warning, no speculative guessing.
             if dr == -da and dr != 0:
-                over = "robusta_bags" if dr < 0 else "arabica_bags"
+                over  = "robusta_bags" if dr < 0 else "arabica_bags"
                 under = "arabica_bags" if dr < 0 else "robusta_bags"
                 cands = [r for r in rows
-                         if r.get("_single_type") and r[over] == abs(dr)]
-                if len(cands) == 1:
-                    row = cands[0]
-                    row[under], row[over] = row[over], 0
+                         if r.get("_single_type") and r[over] > 0]
+                target = abs(dr)
+                # 0/1-knapsack DP: sum → (subset count capped at 2, witness
+                # bitmask). Snapshot iteration keeps each row single-use.
+                dp: dict[int, tuple[int, int]] = {0: (1, 0)}
+                for i, c in enumerate(cands):
+                    v = c[over]
+                    for s, (cnt, mask) in list(dp.items()):
+                        ns = s + v
+                        if ns > target:
+                            continue
+                        pc, pm = dp.get(ns, (0, 0))
+                        dp[ns] = (min(2, pc + cnt),
+                                  pm if pc else mask | (1 << i))
+                fl_cnt, fl_mask = dp.get(target, (0, 0))
+                if fl_cnt == 1:
+                    flipped = []
+                    for i, c in enumerate(cands):
+                        if fl_mask & (1 << i):
+                            c[under], c[over] = c[over], 0
+                            flipped.append(c["country"])
                     warnings.append(
-                        f"single-type family flipped for {row['country']} "
-                        f"({abs(dr):,} bags) to match published totals")
+                        f"single-type family flipped for {', '.join(flipped)} "
+                        f"({target:,} bags) to match published totals")
                     sr = sum(r["robusta_bags"] for r in rows)
                     sa = sum(r["arabica_bags"] for r in rows)
         if (sr, sa) != (pr, pa):

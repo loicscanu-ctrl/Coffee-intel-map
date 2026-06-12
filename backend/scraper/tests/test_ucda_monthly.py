@@ -840,3 +840,115 @@ def test_v2_does_not_recover_when_top_only_3x_second():
     assert by_country["Italy"]["bags"] == 300_000
     assert published == (370_000, 130_000, 500_000)
     assert not any("Total misfile recovered" in w for w in warnings)
+
+
+# Fixtures from the operator's 2020-03 / 2020-04 screenshots. The real PDFs
+# have a tail of micro-rows below what the screenshots show; the published
+# Total in each fixture is adjusted to the VISIBLE rows so the family-flip
+# arithmetic is deterministic (the engine itself doesn't care — it just
+# reconciles whatever rows it captured against whatever Total it found).
+
+_MARCH_2020_TABLE = (
+    "Annex 3: Main Destinations of Uganda Coffee by Type in March 2020 "
+    "DESTINATION POSITION HELD IN FEBRUARY QUANTITY (60kg bags) "
+    "Robusta Arabica Total Individual Cumulative "
+    "Total 383,495 88,814 472,309 100.00 "
+    "1 Italy 1 120,742 15,245 135,987 28.48 28.48 "
+    "2 Sudan 2 68,900 68,900 14.43 42.90 "
+    "3 Germany 3 35,601 20,568 56,169 11.76 54.66 "
+    "4 Spain 4 51,205 970 52,175 10.93 65.59 "
+    "5 India 6 46,244 4,938 51,182 10.72 76.31 "
+    "6 United States 5 6,762 24,384 31,146 6.52 82.83 "
+    "7 Belgium 7 21,848 6,205 28,053 5.87 88.70 "
+    "8 Morocco 8 6,004 1,320 7,324 1.53 90.24 "
+    "9 Sweden 13 680 6,318 6,998 1.47 91.70 "
+    "10 Isreal 9 5,130 610 5,740 1.20 92.90 "
+    "11 Russia 11 3,900 640 4,540 0.95 93.85 "
+    "12 Portugal 10 4,469 4,469 0.94 94.79 "
+    "13 Greece 12 1,280 1,614 2,894 0.61 95.40 "
+    "14 Japan 15 2,160 300 2,460 0.52 95.91 "
+    "15 Croatia 2,110 2,110 0.44 96.35 "
+    "16 Mexico 22 1,790 1,790 0.37 96.73 "
+    "17 Finland 26 640 1,000 1,640 0.34 97.07 "
+    "18 Iran 1,600 1,600 0.34 97.41 "
+    "19 Vietnam 1,500 1,500 0.31 97.72 "
+    "22 Australia 16 1,499 1,499 0.31 98.03 "
+    "21 United Kingdom 1,400 1,400 0.29 98.33 "
+    "22 China 25 960 320 1,280 0.27 98.60 "
+    "23 Kenya 23 743 743 0.16 98.75 "
+    "24 Netherlands 17 360 350 710 0.15 98.90"
+)
+
+
+def test_v2_march_2020_multi_row_family_flip():
+    """Mexico (1,790), Australia (1,499) and Kenya (743) are arabica-only
+    in this report — their blank cell sits in the ROBUSTA column, which
+    flat text can't see, so the default guesses robusta. The published
+    totals reveal a 4,032-bag imbalance whose unique subset across the
+    single-type rows is exactly those three — the engine flips them all."""
+    rows, published, warnings = um._extract_destinations_v2([_MARCH_2020_TABLE])
+    by_country = {r["country"]: r for r in rows}
+    assert published == (383_495, 88_814, 472_309)
+    for c, bags in [("Mexico", 1_790), ("Australia", 1_499), ("Kenya", 743)]:
+        row = by_country[c]
+        assert (row["robusta_bags"], row["arabica_bags"], row["bags"]) == \
+            (0, bags, bags), c
+    # Robusta-only single-type rows stay put.
+    for c, bags in [("Sudan", 68_900), ("Portugal", 4_469), ("Croatia", 2_110),
+                    ("Iran", 1_600), ("Vietnam", 1_500), ("United Kingdom", 1_400)]:
+        row = by_country[c]
+        assert (row["robusta_bags"], row["arabica_bags"]) == (bags, 0), c
+    # After the flip the books balance — no cross-check warning at all.
+    assert any("flipped" in w for w in warnings)
+    assert not any("cross-check" in w for w in warnings)
+    # Iran (new to the country list) + Isreal-typo both captured.
+    assert by_country["Israel"]["bags"] == 5_740
+
+
+def test_v2_april_2020_equal_valued_twins_stay_ambiguous():
+    """April 2020 has Estonia (arabica-only, 640) and Finland (robusta-only,
+    640) — equal-valued single-type twins. The 8,480-bag imbalance has TWO
+    exact subsets (one per twin), so the engine must refuse to guess:
+    no flip, residual warning recorded, published totals still land."""
+    table = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in April 2020 "
+        "Robusta Arabica Total Individual Cumulative "
+        "Total 262,144 96,339 358,483 100.00 "
+        "1 Italy 1 76,238 15,588 91,826 25.51 25.51 "
+        "2 Germany 3 38,487 24,690 63,177 17.55 43.06 "
+        "3 Sudan 2 53,900 320 54,220 15.06 58.12 "
+        "4 India 5 33,667 4,235 37,902 10.53 68.65 "
+        "5 Spain 4 28,094 320 28,414 7.89 76.54 "
+        "6 United States 6 1,280 24,789 26,069 7.24 83.79 "
+        "7 Belgium 7 10,894 8,310 19,204 5.33 89.12 "
+        "8 Morocco 8 4,240 986 5,226 1.45 90.57 "
+        "9 South Korea 32 320 4,048 4,368 1.21 91.79 "
+        "10 Sweden 9 4,130 4,130 1.15 92.93 "
+        "11 Russia 11 2,894 640 3,534 0.98 93.92 "
+        "12 Israel 10 2,240 1,280 3,520 0.98 94.89 "
+        "13 Australia 22 1,332 1,313 2,645 0.73 95.63 "
+        "14 Japan 14 2,434 2,434 0.68 96.30 "
+        "15 Poland 1,430 350 1,780 0.49 96.80 "
+        "16 Greece 13 960 640 1,600 0.44 97.24 "
+        "17 Mexico 16 1,500 1,500 0.42 97.66 "
+        "18 Portugal 12 1,344 1,344 0.37 98.03 "
+        "19 Kenya 23 960 960 0.27 98.30 "
+        "22 South Sudan 28 900 900 0.25 98.55 "
+        "21 Croatia 15 700 700 0.19 98.74 "
+        "22 Netherlands 24 350 350 700 0.19 98.94 "
+        "23 Slovenia 36 700 700 0.19 99.13 "
+        "24 Estonia 640 640 0.18 99.31 "
+        "25 Finland 17 640 640 0.18 99.49 "
+        "26 Romania 35 350 350 0.10 99.59"
+    )
+    rows, published, warnings = um._extract_destinations_v2([table])
+    by_country = {r["country"]: r for r in rows}
+    assert published == (262_144, 96_339, 358_483)
+    # Netherlands' 350+350=700 row is a TRIPLE (R == A), not a pair.
+    nl = by_country["Netherlands"]
+    assert (nl["robusta_bags"], nl["arabica_bags"], nl["bags"]) == (350, 350, 700)
+    # Ambiguous → nothing flipped, imbalance recorded as a residual (net
+    # volume matches published, so the dashboard is NOT flagged).
+    assert not any("flipped" in w for w in warnings)
+    assert any("cross-check residual" in w for w in warnings)
+    assert not any("cross-check failed" in w for w in warnings)
