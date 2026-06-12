@@ -482,15 +482,222 @@ def test_parse_pdf_returns_failed_stub_on_unknown_format():
     the operator can spot the URL + the month and add a new parser."""
     import io
     # Pre-compute fake "pdf bytes" the extractor doesn't actually parse —
-    # we exercise the dispatcher's behavior by monkey-patching _extract_text.
+    # we exercise the dispatcher's behavior by monkey-patching _extract_pages.
     text = "no recognizable structure at all"
-    original_extract = um._extract_text
-    um._extract_text = lambda b: text          # type: ignore[assignment]
+    original_extract = um._extract_pages
+    um._extract_pages = lambda b: [text]        # type: ignore[assignment]
     try:
         rep = um.parse_pdf(b"fake", "/sites/default/files/2017-05/some.pdf")
     finally:
-        um._extract_text = original_extract     # type: ignore[assignment]
+        um._extract_pages = original_extract    # type: ignore[assignment]
     # No month in text, no slug month in URL → "unknown" month.
     assert rep is not None
     assert rep.parser_version in ("v1_recent", "failed")
     _ = io  # unused safeguard for the import
+
+
+# ── v2 destinations engine ──────────────────────────────────────────────────
+# Fixture text is the operator's verbatim copy-paste from the June 2025 PDF
+# (the worst under-counter before v2: 84% of volume missing). Two pages —
+# the table wraps and the second page reprints the Annex header.
+
+_JUNE_2025_PAGE_1 = (
+    "Annex3:MainDestinationsofUgandaCoffeebyTypeinJune2025 "
+    "DESTINATION POSITION HELDIN MAY QUANTITY(60kgbags) %AGEMARKETSHARE "
+    "Robusta Arabica Total Individual Cummilative "
+    "1 Italy 1 321,460 30,150 351,610 34.67 34.67 "
+    "2 Germany 2 106,777 17,162 123,939 12.22 46.90 "
+    "3 Sudan 3 79,080 79,080 7.80 54.69 "
+    "4 Spain 5 47,914 1,290 49,204 4.85 59.55 "
+    "5 India 6 38,358 5,850 44,208 4.36 63.91 "
+    "6 Algeria 4 43,054 13 43,067 4.25 68.15 "
+    "7 Morocco 8 30,161 999 31,160 3.07 71.23 "
+    "8 China 9 27,724 2,768 30,492 3.01 74.23 "
+    "9 U.S.A 12 10,675 15,270 25,945 2.56 76.79 "
+    "10 Russia 14 23,318 988 24,306 2.40 79.19 "
+    "11Belgium 10 13,737 9,952 23,689 2.34 81.52 "
+    "12Vietnam 7 21,184 21,184 2.09 83.61 "
+    "13Switzerland 33 15,459 1,470 16,929 1.67 85.28 "
+    "14Netherlands 11 15,040 1,533 16,573 1.63 86.92 "
+    "15Greece 20 15,555 15,555 1.53 88.45 "
+    "16Poland 18 10,516 544 11,060 1.09 89.54 "
+    "17France 25 9,000 1,072 10,072 0.99 90.53 "
+    "18Portugal 17 9,016 653 9,669 0.95 91.49 "
+    "19Mexico 42 9,280 9,280 0.92 92.40 "
+    "20U.A.E 16 8,024 1,090 9,114 0.90 93.30 "
+    "21Latvia 13 5,670 3,340 9,010 0.89 94.19 "
+    "22Turkey 22 8,302 640 8,942 0.88 95.07 "
+    "23United Kingdom 7,241 1,002 8,243 0.81 95.88 "
+    "24Slovenia 26 5,260 5,260 0.52 96.40 "
+    "25Egypt 15 4,250 4,250 0.42 96.82 "
+    "26Tunisia 30 3,422 640 4,062 0.40 97.22 "
+    "Ecuador DESTINATION POSITION QUANTITY(60kgbags) HELDIN MAY "
+    "%AGEMARKETSHARE Robusta Arabica Total Individual Cummilative "
+    "100 Total 907,058 107,004 1,014,062"
+)
+_JUNE_2025_PAGE_2 = (
+    "Annex3:MainDestinationsofUgandaCoffeebyTypeinJune2025POSITION "
+    "QUANTITY(60kgBags) Destination HELDIN MAY %AgeMarketShare "
+    "Robusta Arabica Total Individual Cumulative "
+    "28Romania 37 100 3,357 3,457 0.34 97.96 "
+    "29Lebanon 3,124 3,124 0.31 98.27 "
+    "30Jordan 31 2,736 2,736 0.27 98.54 "
+    "31Japan 21 655 1,305 1,960 0.19 98.74 "
+    "32Australia 35 960 640 1,600 0.16 98.89 "
+    "33Canada 40 1,370 1,370 0.14 99.03 "
+    "34Albania 29 1,336 1,336 0.13 99.16 "
+    "35Saudi Arabia 32 1,280 1,280 0.13 99.29 "
+    "36Singapore 39 320 960 1,280 0.13 99.41 "
+    "37Austria 45 320 668 988 0.10 99.51 "
+    "38 Israel 28 640 320 960 0.09 99.60 "
+    "39South Korea 23 640 320 960 0.09 99.70 "
+    "40Kenya 46 757 757 0.07 99.77 "
+    "41Sweden 19 720 720 0.07 99.85 "
+    "42Libya 660 660 0.07 99.91 "
+    "43South Africa 24 660 660 0.07 99.98 "
+    "44 New Zealand 251 251 0.02 100.00"
+)
+
+
+def test_v2_june_2025_full_fixture():
+    """End-to-end on the real June-2025 layout that defeated every earlier
+    parser iteration (Italy > 250k cap, rank-glued names, single-type
+    pairs, page-wrapped table, mangled Ecuador row at the page break)."""
+    rows, published, warnings = um._extract_destinations_v2(
+        [_JUNE_2025_PAGE_1, _JUNE_2025_PAGE_2])
+    by_country = {r["country"]: r for r in rows}
+
+    # 44 table rows minus Ecuador (numbers lost to the page-break chrome).
+    assert len(rows) == 43
+    assert "Ecuador" not in by_country
+
+    # Headline row — above the old 250k cap that used to reject it.
+    italy = by_country["Italy"]
+    assert (italy["robusta_bags"], italy["arabica_bags"], italy["bags"]) == \
+        (321_460, 30_150, 351_610)
+    germany = by_country["Germany"]
+    assert germany["bags"] == 123_939
+
+    # Single-type pair (Arabica column blank in the source).
+    sudan = by_country["Sudan"]
+    assert (sudan["robusta_bags"], sudan["arabica_bags"], sudan["bags"]) == \
+        (79_080, 0, 79_080)
+    assert by_country["Vietnam"]["bags"] == 21_184
+
+    # Algeria's 13-bag Arabica cell sits below the rank cutoff — kept
+    # because it comes AFTER the first big number.
+    algeria = by_country["Algeria"]
+    assert (algeria["robusta_bags"], algeria["arabica_bags"], algeria["bags"]) == \
+        (43_054, 13, 43_067)
+
+    # Order-based split: U.S.A has MORE arabica than robusta.
+    usa = by_country["United States"]
+    assert (usa["robusta_bags"], usa["arabica_bags"], usa["bags"]) == \
+        (10_675, 15_270, 25_945)
+    austria = by_country["Austria"]
+    assert (austria["robusta_bags"], austria["arabica_bags"]) == (320, 668)
+
+    # No prior-month rank printed for UK — row still parses.
+    uk = by_country["United Kingdom"]
+    assert (uk["robusta_bags"], uk["arabica_bags"], uk["bags"]) == \
+        (7_241, 1_002, 8_243)
+
+    # Arabica-only mapping.
+    saudi = by_country["Saudi Arabia"]
+    assert (saudi["robusta_bags"], saudi["arabica_bags"], saudi["bags"]) == \
+        (0, 1_280, 1_280)
+
+    # Page-2 rows made it across the page break.
+    romania = by_country["Romania"]
+    assert (romania["robusta_bags"], romania["arabica_bags"], romania["bags"]) == \
+        (100, 3_357, 3_457)
+    assert by_country["New Zealand"]["bags"] == 251
+
+    # Published footer == ground truth.
+    assert published == (907_058, 107_004, 1_014_062)
+
+    # Ecuador's loss makes the sums fall short of published — the
+    # cross-check must SAY so rather than silently under-report.
+    assert any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_end_to_end_published_total_becomes_monthly_total():
+    pages = ["MONTHLY COFFEE REPORT - JUNE 2025\n" + _JUNE_2025_PAGE_1,
+             _JUNE_2025_PAGE_2]
+    rep = um._parse_v1_recent("\n".join(pages), None, pages)
+    assert rep is not None
+    assert rep.month == "2025-06"
+    # Published totals override the grade-table / destination merges.
+    assert rep.robusta_bags == 907_058
+    assert rep.arabica_bags == 107_004
+    assert rep.total_bags == 1_014_062
+    assert any("cross-check failed" in w for w in rep.parse_warnings)
+    assert {d["country"] for d in rep.by_destination} >= {"Italy", "Germany", "Sudan"}
+
+
+def test_v2_scopes_to_header_pages_only():
+    """A page without the destinations header — even one that mentions
+    countries with plausible numbers — contributes nothing."""
+    toc = "Narrative page. Italy received 999,999 bags in some year. 123,456"
+    table = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
+        "Total 100,000 50,000 150,000"
+    )
+    rows, published, warnings = um._extract_destinations_v2([toc, table])
+    assert {r["country"] for r in rows} == {"Italy"}
+    assert rows[0]["bags"] == 150_000
+    assert published == (100_000, 50_000, 150_000)
+    assert not any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_no_header_anywhere_returns_empty():
+    pages = ["1 Italy 1 100,000 50,000 150,000"]
+    assert um._extract_destinations_v2(pages) == ([], None, [])
+
+
+def test_v2_single_flip_fixes_family_mismatch():
+    """Kenya defaults to robusta-only; the published totals reveal it was
+    arabica that month. The unique exact one-flip is applied and noted."""
+    page = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in May 2024\n"
+        "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
+        "2 Kenya 2 4,000 4,000 1.6 61.6\n"
+        "Total 100,000 54,000 154,000"
+    )
+    rows, published, warnings = um._extract_destinations_v2([page])
+    kenya = next(r for r in rows if r["country"] == "Kenya")
+    assert kenya["robusta_bags"] == 0
+    assert kenya["arabica_bags"] == 4_000
+    assert published == (100_000, 54_000, 154_000)
+    assert any("flipped" in w for w in warnings)
+    assert not any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_month_pair_beats_ctd_triple_on_same_row():
+    """Single-type destination in a month+CTD layout: the month side is an
+    equal PAIR while the CTD side forms a valid triple further right. The
+    leftmost candidate (the pair) must win."""
+    page = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type\n"
+        "1 Sudan 3 1,800 1,800 0.65 3.29 54,723 927 55,650 11.13 58.01\n"
+    )
+    rows, _, _ = um._extract_destinations_v2([page])
+    sudan = next(r for r in rows if r["country"] == "Sudan")
+    assert (sudan["robusta_bags"], sudan["arabica_bags"], sudan["bags"]) == \
+        (1_800, 0, 1_800)
+
+
+def test_v2_south_sudan_does_not_double_count_sudan():
+    page = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type\n"
+        "1 Sudan 1 50,000 50,000 10.0 10.0\n"
+        "2 South Sudan 2 7,000 7,000 1.4 11.4\n"
+        "Total 57,000 0 57,000\n"
+    )
+    rows, published, warnings = um._extract_destinations_v2([page])
+    by_country = {r["country"]: r for r in rows}
+    assert by_country["Sudan"]["bags"] == 50_000
+    assert by_country["South Sudan"]["bags"] == 7_000
+    assert published == (57_000, 0, 57_000)
+    assert not any("cross-check failed" in w for w in warnings)

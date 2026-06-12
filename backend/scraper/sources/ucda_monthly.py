@@ -214,23 +214,30 @@ async def discover_all_pdfs() -> list[str]:
 
 # ── PDF text extraction ────────────────────────────────────────────────────
 
-def _extract_text(pdf_bytes: bytes) -> str:
-    """Run pdfplumber on the PDF and concatenate every page's text. Returns
-    "" on any extraction failure (parser then logs a warning and skips)."""
+def _extract_pages(pdf_bytes: bytes) -> list[str]:
+    """Run pdfplumber on the PDF and return per-page text. Page boundaries
+    matter: the v2 destinations engine scopes its search to the page(s)
+    carrying the table header, which kills TOC / narrative false-matches by
+    construction. Returns [] on any extraction failure."""
     try:
         import io
 
         import pdfplumber
     except ImportError:
         logger.error("[ucda] pdfplumber not installed")
-        return ""
+        return []
     try:
         with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-            parts = [p.extract_text() or "" for p in pdf.pages]
-        return "\n".join(parts)
+            return [p.extract_text() or "" for p in pdf.pages]
     except Exception as e:                  # noqa: BLE001
         logger.warning(f"[ucda] pdfplumber failed: {e}")
-        return ""
+        return []
+
+
+def _extract_text(pdf_bytes: bytes) -> str:
+    """All pages concatenated — used for diagnostics dumps and the v1
+    whole-text parsing paths."""
+    return "\n".join(_extract_pages(pdf_bytes))
 
 
 # ── parsers (one per observed report format) ────────────────────────────────
@@ -437,6 +444,47 @@ def _split_dest_row(nums: list[int]) -> tuple[int, int, int]:
     return R, A, T
 
 
+# Destination countries observed across UCDA's reports. Order matters only
+# for the v1 line-scan (break-after-first-match) — new names go at the END
+# so v1 behavior on already-passing months is unchanged. The v2 engine is
+# position-based and order-independent. When the v2 published-total
+# cross-check reports a shortfall, a missing country is the usual culprit —
+# add it here.
+KNOWN_COUNTRIES = (
+    "italy", "germany", "sudan", "belgium", "morocco", "spain", "usa",
+    "united states", "kenya", "russia", "russian federation", "switzerland",
+    "netherlands", "south africa", "uk", "united kingdom", "france",
+    "japan", "china", "india", "saudi arabia", "uae", "united arab emirates",
+    "egypt", "turkey", "korea", "south korea", "portugal", "greece",
+    "ethiopia", "rwanda", "tanzania", "burundi", "south sudan", "djibouti",
+    "algeria", "tunisia", "australia", "canada", "mexico", "brazil",
+    "estonia", "poland", "romania", "singapore", "croatia", "israel",
+    # Added with the v2 engine (observed in the 2025-06 walkthrough):
+    "u.s.a", "u.a.e", "vietnam", "latvia", "slovenia", "lebanon", "jordan",
+    "albania", "austria", "sweden", "libya", "new zealand", "ecuador",
+    "denmark", "finland", "norway", "ireland", "ukraine", "lithuania",
+    "hungary", "bulgaria", "slovakia", "serbia", "malta", "cyprus",
+    "qatar", "kuwait", "hong kong", "taiwan", "indonesia", "malaysia",
+)
+
+# Spelling variants → one canonical display name, so the frontend's
+# per-country aggregation doesn't split "U.S.A" / "Usa" / "United States"
+# into three bars.
+_COUNTRY_DISPLAY_OVERRIDES = {
+    "usa": "United States", "u.s.a": "United States",
+    "united states": "United States",
+    "uk": "United Kingdom", "united kingdom": "United Kingdom",
+    "uae": "United Arab Emirates", "u.a.e": "United Arab Emirates",
+    "united arab emirates": "United Arab Emirates",
+    "russian federation": "Russia",
+    "korea": "South Korea", "south korea": "South Korea",
+}
+
+
+def _country_display(c: str) -> str:
+    return _COUNTRY_DISPLAY_OVERRIDES.get(c, c.title())
+
+
 # Markers that flag the start / end of the destinations table across the
 # observed UCDA report formats. The Annex number drifts between years (Annex
 # 3 in 2022-23, Annex 4 in 2024, etc.); detecting any of them is fine since
@@ -521,7 +569,7 @@ def _extract_destinations_table(text: str, known_countries: tuple[str, ...]) -> 
             continue
         rob, ara, tot = _split_dest_row(nums)
         out.append({
-            "country":      country.title(),
+            "country":      _country_display(country),
             "bags":         tot,
             "robusta_bags": rob,
             "arabica_bags": ara,
@@ -529,7 +577,188 @@ def _extract_destinations_table(text: str, known_countries: tuple[str, ...]) -> 
     return out
 
 
-def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
+# ── v2 destinations engine (page-scoped, published-total cross-check) ───────
+#
+# Designed off the operator's June-2025 walkthrough of the real PDF layout:
+#
+#   1. SCOPE: only the page(s) whose text carries the "Main Destinations of
+#      Uganda Coffee" header participate. pdfplumber often drops the spaces
+#      ("MainDestinationsofUgandaCoffeebyTypeinJune2025"), so the regex
+#      allows zero-width gaps. TOC pages match too, but they carry no
+#      country+number rows, so they contribute nothing.
+#   2. ROWS look like  "1 Italy 1 321,460 30,150 351,610 34.67 34.67":
+#      rank / name / prior-month rank / Robusta / Arabica / Total / %ind /
+#      %cum. Cells classify by FORM, not position: ranks are small ints
+#      (≤ _V2_RANK_MAX) sitting BEFORE the first big number; the % columns
+#      carry decimal points. A row's reading is the LEFTMOST candidate —
+#      either an R+A=T triple or an equal-value pair — so month columns
+#      beat CTD/cumulative columns when both are present.
+#   3. SINGLE-TYPE destinations print value + total only ("Sudan 79,080
+#      79,080") — an equal pair. Family defaults to Robusta (Uganda is
+#      ~80% robusta); known arabica-only buyers live in _V2_ARABICA_ONLY.
+#   4. CROSS-CHECK: the table's published footer ("Total 907,058 107,004
+#      1,014,062") is parse-time ground truth. Σ row robusta/arabica must
+#      match it. A mismatch first tries flipping single-type family
+#      assignments (unique exact one-flip fixes only), then surfaces a
+#      parse warning the dashboard can display.
+
+_V2_HEADER_RE = re.compile(r"main\s*destinations?\s*of\s*uganda\s*coffee", re.I)
+_V2_TOTAL_ROW_RE = re.compile(r"total\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)", re.I)
+_V2_RANK_MAX = 70          # rank columns (current + prior month) stay under this
+_V2_CELL_MAX = 800_000     # no single destination plausibly exceeds this / month
+
+# Single-type destinations whose blank column is the ROBUSTA one. Everything
+# else defaults to robusta-only. Grows as cross-check warnings surface.
+_V2_ARABICA_ONLY = {"saudi arabia"}
+
+
+def _v2_country_matches(scope: str) -> list[tuple[int, int, str]]:
+    """Every (start, end, country) for KNOWN_COUNTRIES in the scope, with
+    overlapping spans resolved longest-wins ("South Sudan" beats the "Sudan"
+    embedded in it). Multi-word names tolerate squeezed spaces
+    ("SouthAfrica") since pdfplumber drops them on packed slides."""
+    found: list[tuple[int, int, str]] = []
+    for c in KNOWN_COUNTRIES:
+        pat = r"\s*".join(re.escape(w) for w in c.split())
+        for m in re.finditer(rf"(?<![A-Za-z]){pat}\b", scope, re.I):
+            found.append((m.start(), m.end(), c))
+    found.sort(key=lambda t: (t[0], -(t[1] - t[0])))
+    kept: list[tuple[int, int, str]] = []
+    for s, e, c in found:
+        if any(s < ke and ks < e for ks, ke, _ in kept):
+            continue
+        kept.append((s, e, c))
+    return kept
+
+
+def _v2_row_from_nums(country: str, nums: list[int]) -> dict | None:
+    """LEFTMOST-candidate cell split. Walk the cells left to right; at each
+    position prefer an R+A=T triple (±1 bag rounding), else an equal-value
+    pair (single-type row). Month columns precede CTD columns in every
+    observed layout, so leftmost == the month reading."""
+    for i in range(len(nums) - 1):
+        if i + 2 < len(nums) and abs(nums[i] + nums[i + 1] - nums[i + 2]) <= 1:
+            return {"bags": nums[i + 2], "robusta_bags": nums[i],
+                    "arabica_bags": nums[i + 1]}
+        if nums[i] == nums[i + 1]:
+            if country in _V2_ARABICA_ONLY:
+                return {"bags": nums[i], "robusta_bags": 0,
+                        "arabica_bags": nums[i], "_single_type": True}
+            return {"bags": nums[i], "robusta_bags": nums[i],
+                    "arabica_bags": 0, "_single_type": True}
+    return None
+
+
+def _v2_parse_rows(scope: str) -> list[dict]:
+    matches = _v2_country_matches(scope)
+    rows: list[dict] = []
+    seen: set[str] = set()
+    for i, (s, e, country) in enumerate(matches):
+        seg_end = matches[i + 1][0] if i + 1 < len(matches) else len(scope)
+        seg = scope[e:seg_end]
+        # The published footer ("Total 907,058 …") and the repeated column
+        # headers ("Robusta Arabica Total Individual …") both contain the
+        # word "Total" — anything from there on is table chrome, not row
+        # cells. This is what protects the row that spans a page break.
+        cut = re.search(r"total", seg, re.I)
+        if cut:
+            seg = seg[:cut.start()]
+        nums: list[int] = []
+        seen_big = False
+        for m in _NUM_RE.finditer(seg):
+            tok = m.group(0)
+            if "." in tok:
+                continue                    # % columns carry decimals
+            n = _to_int(tok)
+            if n is None or n > _V2_CELL_MAX:
+                continue                    # cell-concatenation outliers
+            if n <= _V2_RANK_MAX and not seen_big:
+                continue                    # prior-month rank before the data
+            nums.append(n)
+            if n > _V2_RANK_MAX:
+                seen_big = True
+        if len(nums) < 2:
+            continue                        # page-break-mangled row — dropped
+        row = _v2_row_from_nums(country, nums)
+        if row is None:
+            continue
+        disp = _country_display(country)
+        if disp in seen:
+            continue                        # first (rank-ordered) match wins
+        seen.add(disp)
+        row["country"] = disp
+        rows.append(row)
+    return rows
+
+
+def _v2_published_totals(scope: str) -> tuple[int, int, int] | None:
+    """The footer row "Total <Robusta> <Arabica> <Total>". Candidates must
+    satisfy R + A ≈ T and clear a 50k floor (real monthly totals are 200k+;
+    the floor rejects sub-table 'Total' rows). Largest T wins — that's the
+    grand total when a multi-page table prints intermediate ones."""
+    best: tuple[int, int, int] | None = None
+    for m in _V2_TOTAL_ROW_RE.finditer(scope):
+        r, a, t = _to_int(m.group(1)), _to_int(m.group(2)), _to_int(m.group(3))
+        if r is None or a is None or t is None:
+            continue
+        if abs(r + a - t) <= 1 and t >= 50_000 and (best is None or t > best[2]):
+            best = (r, a, t)
+    return best
+
+
+def _extract_destinations_v2(
+    pages: list[str],
+) -> tuple[list[dict], tuple[int, int, int] | None, list[str]]:
+    """Returns (rows, published_totals, warnings). Empty rows ⇒ the caller
+    falls back to the v1 slicer + line-scan (older report formats)."""
+    scoped = [p for p in pages if p and _V2_HEADER_RE.search(p)]
+    if not scoped:
+        return [], None, []
+    scope = "\n".join(scoped)
+    rows = _v2_parse_rows(scope)
+    if not rows:
+        return [], None, []
+    published = _v2_published_totals(scope)
+    warnings: list[str] = []
+    if published:
+        pr, pa, pt = published
+        sr = sum(r["robusta_bags"] for r in rows)
+        sa = sum(r["arabica_bags"] for r in rows)
+        if (sr, sa) != (pr, pa):
+            dr, da = pr - sr, pa - sa
+            # A wrong single-type family default moves the SAME amount off
+            # one family onto the other. Flip the unique row that fixes both
+            # sums exactly; anything fuzzier stays a warning for the
+            # operator (no speculative auto-corrections).
+            if dr == -da and dr != 0:
+                over = "robusta_bags" if dr < 0 else "arabica_bags"
+                under = "arabica_bags" if dr < 0 else "robusta_bags"
+                cands = [r for r in rows
+                         if r.get("_single_type") and r[over] == abs(dr)]
+                if len(cands) == 1:
+                    row = cands[0]
+                    row[under], row[over] = row[over], 0
+                    warnings.append(
+                        f"single-type family flipped for {row['country']} "
+                        f"({abs(dr):,} bags) to match published totals")
+                    sr = sum(r["robusta_bags"] for r in rows)
+                    sa = sum(r["arabica_bags"] for r in rows)
+        if (sr, sa) != (pr, pa):
+            warnings.append(
+                "destinations cross-check failed: "
+                f"Σrobusta={sr:,} vs published {pr:,} (Δ{pr - sr:+,}); "
+                f"Σarabica={sa:,} vs published {pa:,} (Δ{pa - sa:+,})")
+        if abs(pr + pa - pt) > 1:
+            warnings.append("published destinations Total row inconsistent (R+A != T)")
+    else:
+        warnings.append("no published Total row found on destinations page(s)")
+    for r in rows:
+        r.pop("_single_type", None)
+    return rows, published, warnings
+
+
+def _parse_v1_recent(text: str, source_url: str | None,
+                     pages: list[str] | None = None) -> MonthlyReport | None:
     """First-pass parser modelled on the recent (2024+) report layout
     suggested by UCDA's search snippets ("Period/Coffee Type … Qty(60-kg bags)
     Value (US $)"). Conservative: only emits a MonthlyReport when it can
@@ -584,86 +813,81 @@ def _parse_v1_recent(text: str, source_url: str | None) -> MonthlyReport | None:
             _g_max[g["grade"]] = g["bags"]
     rep.by_grade = [{"grade": name, "bags": bags} for name, bags in _g_max.items()]
 
-    # Destinations — TWO-STAGE approach. The original line-by-line scan was
-    # fragile because (a) pdfplumber sometimes collapses multiple table rows
-    # onto one parsed line (causing the `break`-after-first-match to drop
-    # every country except the first), and (b) narrative paragraphs
-    # mentioning country names anywhere in the PDF added noise. The new
-    # `_extract_destinations_table` slices the text at the Annex header
-    # boundaries first, then walks every country position inside that
-    # scope, taking the per-row substring between consecutive matches as
-    # the source of cells. Both stages share the same _split_dest_row
-    # heuristic for R / A / Total. The line-by-line fallback runs only if
-    # the table-slicing path returns nothing, so older formats without the
-    # Annex header still get a best-effort extraction.
-    known_countries = (
-        "italy", "germany", "sudan", "belgium", "morocco", "spain", "usa",
-        "united states", "kenya", "russia", "russian federation", "switzerland",
-        "netherlands", "south africa", "uk", "united kingdom", "france",
-        "japan", "china", "india", "saudi arabia", "uae", "united arab emirates",
-        "egypt", "turkey", "korea", "south korea", "portugal", "greece",
-        "ethiopia", "rwanda", "tanzania", "burundi", "south sudan", "djibouti",
-        "algeria", "tunisia", "australia", "canada", "mexico", "brazil",
-        "estonia", "poland", "romania", "singapore", "croatia", "israel",
-    )
-    sliced = _extract_destinations_table(text, known_countries)
-    # ALWAYS run the line-scan in addition to the slicer, then dedupe by
-    # max(bags). The 2024-05/24-11/25-04/25-06 etc. cases showed the slicer
-    # can lock onto a region that contains a header marker but not the
-    # actual table — e.g. a TOC or a slide footer — yielding 1 country with
-    # the year (2025) as its bag count. Without the line-scan as a backup,
-    # those months end up with Σ destinations ≈ 2k. Running both and taking
-    # max means: the slicer's clean data wins where it's right, the line-
-    # scan's coverage wins where the slicer missed the real table.
-    if sliced:
-        rep.by_destination.extend(sliced)
-    for line in text.splitlines():
-        low = line.lower()
-        for c in known_countries:
-            # Tolerate rank-prefix without space ("2Germany"): negative
-            # lookbehind on letters instead of \b so "2Germany" matches
-            # (digit→letter is not a word boundary).
-            if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
-                nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
-                nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
-                if nums:
-                    rob, ara, tot = _split_dest_row(nums)
-                    rep.by_destination.append({
-                        "country":      c.title(),
-                        "bags":         tot,
-                        "robusta_bags": rob,
-                        "arabica_bags": ara,
-                    })
-                break
-    # Dedupe destinations — keep the LARGEST value per country.
-    _d_max: dict[str, dict] = {}
-    for d in rep.by_destination:
-        cur = _d_max.get(d["country"])
-        if cur is None or d["bags"] > cur["bags"]:
-            _d_max[d["country"]] = d
-    rep.by_destination = list(_d_max.values())
+    # Destinations — v2 engine first: page-scoped to the "Main Destinations
+    # of Uganda Coffee" header, order-based cell classification, and a
+    # published-Total cross-check (see _extract_destinations_v2). Reports
+    # whose format predates that header fall back to the older two-stage
+    # slicer + line-scan below.
+    pages_list = [p for p in (pages or []) if p] or [text]
+    v2_rows, v2_published, v2_warnings = _extract_destinations_v2(pages_list)
+    if v2_rows:
+        rep.by_destination = v2_rows
+        rep.parse_warnings.extend(v2_warnings)
+    else:
+        sliced = _extract_destinations_table(text, KNOWN_COUNTRIES)
+        # ALWAYS run the line-scan in addition to the slicer, then dedupe by
+        # max(bags). The 2024-05/24-11/25-04/25-06 etc. cases showed the
+        # slicer can lock onto a region that contains a header marker but
+        # not the actual table — e.g. a TOC or a slide footer — yielding 1
+        # country with the year (2025) as its bag count. Without the
+        # line-scan as a backup, those months end up with Σ destinations
+        # ≈ 2k. Running both and taking max means: the slicer's clean data
+        # wins where it's right, the line-scan's coverage wins where the
+        # slicer missed the real table.
+        if sliced:
+            rep.by_destination.extend(sliced)
+        for line in text.splitlines():
+            low = line.lower()
+            for c in KNOWN_COUNTRIES:
+                # Tolerate rank-prefix without space ("2Germany"): negative
+                # lookbehind on letters instead of \b so "2Germany" matches
+                # (digit→letter is not a word boundary).
+                if re.search(rf"(?<![A-Za-z]){re.escape(c)}\b", low):
+                    nums = [_to_int(m.group(0)) for m in _NUM_RE.finditer(line)]
+                    nums = [n for n in nums if n is not None and 100 <= n <= 250_000]
+                    if nums:
+                        rob, ara, tot = _split_dest_row(nums)
+                        rep.by_destination.append({
+                            "country":      _country_display(c),
+                            "bags":         tot,
+                            "robusta_bags": rob,
+                            "arabica_bags": ara,
+                        })
+                    break
+        # Dedupe destinations — keep the LARGEST value per country.
+        _d_max: dict[str, dict] = {}
+        for d in rep.by_destination:
+            cur = _d_max.get(d["country"])
+            if cur is None or d["bags"] > cur["bags"]:
+                _d_max[d["country"]] = d
+        rep.by_destination = list(_d_max.values())
 
-    # Derive robusta/arabica/total volumes. Two sources contribute, and we
-    # reconcile per-family by taking the LARGER reading:
-    #   • Σ grade table by family (the per-quality breakdown), and
-    #   • Σ by_destination by family (the per-country breakdown).
-    # Both should sum to the same total per month — when they disagree, one
-    # source's extractor missed cells (a grade row picked the wrong column,
-    # or a destination row failed to match the country regex). The cross-
-    # check max-merge means whichever extractor caught more wins for that
-    # family, and a downstream Σdest=monthly_total invariant only fails on
-    # months where BOTH stages under-extracted — a much sharper signal of
-    # genuine format drift than the prior grade-only derivation produced.
-    grade_r = _sum_robusta(rep.by_grade) or 0
-    grade_a = _sum_arabica(rep.by_grade) or 0
-    dest_r  = sum(d.get("robusta_bags", 0) for d in rep.by_destination)
-    dest_a  = sum(d.get("arabica_bags", 0) for d in rep.by_destination)
-    merged_r = max(grade_r, dest_r) or None
-    merged_a = max(grade_a, dest_a) or None
-    rep.robusta_bags = merged_r
-    rep.arabica_bags = merged_a
-    if merged_r is not None or merged_a is not None:
-        rep.total_bags = (merged_r or 0) + (merged_a or 0)
+    # Derive robusta/arabica/total volumes. Source priority:
+    #   1. The destinations table's published Total row (v2) — printed by
+    #      UCDA itself, so it IS the month's export total. Authoritative.
+    #   2. Otherwise reconcile the two decompositions we extracted —
+    #      Σ grade table vs Σ by_destination — per family, taking the
+    #      LARGER reading. When they disagree, one extractor missed cells;
+    #      whichever caught more wins for that family.
+    if v2_published:
+        pr, pa, pt = v2_published
+        rep.robusta_bags, rep.arabica_bags, rep.total_bags = pr, pa, pt
+        gsum = (_sum_robusta(rep.by_grade) or 0) + (_sum_arabica(rep.by_grade) or 0)
+        if gsum and abs(gsum - pt) / pt > 0.05:
+            rep.parse_warnings.append(
+                f"grade-table sum {gsum:,} differs >5% from published "
+                f"export total {pt:,}")
+    else:
+        grade_r = _sum_robusta(rep.by_grade) or 0
+        grade_a = _sum_arabica(rep.by_grade) or 0
+        dest_r  = sum(d.get("robusta_bags", 0) for d in rep.by_destination)
+        dest_a  = sum(d.get("arabica_bags", 0) for d in rep.by_destination)
+        merged_r = max(grade_r, dest_r) or None
+        merged_a = max(grade_a, dest_a) or None
+        rep.robusta_bags = merged_r
+        rep.arabica_bags = merged_a
+        if merged_r is not None or merged_a is not None:
+            rep.total_bags = (merged_r or 0) + (merged_a or 0)
 
     if rep.robusta_bags is None and rep.arabica_bags is None:
         rep.parse_warnings.append(
@@ -681,12 +905,13 @@ PARSERS = [
 
 
 def parse_pdf(pdf_bytes: bytes, source_url: str | None) -> MonthlyReport | None:
-    text = _extract_text(pdf_bytes)
-    if not text:
+    pages = _extract_pages(pdf_bytes)
+    text = "\n".join(pages)
+    if not text.strip():
         return None
     for name, parser in PARSERS:
         try:
-            rep = parser(text, source_url)
+            rep = parser(text, source_url, pages)
             if rep:
                 rep.parser_version = name
                 return rep
@@ -758,7 +983,8 @@ async def run_async(write: bool = False, diag: bool = False,
         parser_counts[rep.parser_version] = parser_counts.get(rep.parser_version, 0) + 1
         print(f"  [{i+1:>3}/{len(pdf_urls)}] {rep.month}  parser={rep.parser_version}  "
               f"rob={rep.robusta_bags or '?'} ara={rep.arabica_bags or '?'} "
-              f"grades={len(rep.by_grade)} dests={len(rep.by_destination)}")
+              f"grades={len(rep.by_grade)} dests={len(rep.by_destination)} "
+              f"warn={len(rep.parse_warnings)}")
         if diag:
             _dump_diagnostics(url, text, rep)
 

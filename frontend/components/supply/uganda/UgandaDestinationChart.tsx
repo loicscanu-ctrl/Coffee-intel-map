@@ -43,8 +43,8 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
   // the UCDA scraper writes the enriched schema (PR #296 onwards). Rows
   // from older runs only carry `bags`; we treat their R/A as 0 so the
   // stacked view still renders a meaningful column.
-  const { data, hasSplit } = useMemo<{ data: AggRow[]; hasSplit: boolean }>(() => {
-    if (!monthly.length) return { data: [], hasSplit: false };
+  const { data, hasSplit, warned } = useMemo<{ data: AggRow[]; hasSplit: boolean; warned: string[] }>(() => {
+    if (!monthly.length) return { data: [], hasSplit: false, warned: [] };
     const sorted = monthly.slice().sort((a, b) => a.month.localeCompare(b.month));
     const latestYm = sorted[sorted.length - 1].month;
     const [latestY, latestM] = latestYm.split("-").map(Number);
@@ -98,7 +98,14 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
       }))
       .sort((a, b) => b.total_bags - a.total_bags)
       .slice(0, topN);
-    return { data: rows, hasSplit: anySplit };
+    // Months in this window where the scraper's published-total cross-check
+    // failed — their destination volumes are likely incomplete in the
+    // aggregation above, so the operator gets an explicit flag.
+    const warnedMonths = sorted
+      .filter(r => inWindow(r.month) &&
+        r.parse_warnings?.some(w => /cross-check failed|no published total/i.test(w)))
+      .map(r => r.month);
+    return { data: rows, hasSplit: anySplit, warned: warnedMonths };
   }, [monthly, window, topN]);
 
   if (data.length === 0) return null;
@@ -143,6 +150,12 @@ export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMon
           )}
         </div>
       </div>
+      {warned.length > 0 && (
+        <div className="text-[10px] text-amber-500/90 mb-1">
+          ⚠ Source-PDF totals cross-check failed for {warned.join(", ")} —
+          destination volumes for {warned.length === 1 ? "this month" : "these months"} may be incomplete.
+        </div>
+      )}
       <ResponsiveContainer width="100%" height={Math.max(180, data.length * 26)}>
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, bottom: 4, left: 60 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
