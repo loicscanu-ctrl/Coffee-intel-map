@@ -15,18 +15,23 @@ on:
     - cron: '7 1 * * *'
     - cron: '0 2 * * *'
   workflow_dispatch:
-  # Run automatically when scraper source code lands on main, so a fix
-  # gets verified end-to-end without waiting for the next cron tick.
-  push:
-    branches: [main]
-    paths:
-      - 'backend/scraper/**'
+  # Note: previously also triggered on `push` to main when backend/scraper/**
+  # changed, so a scraper fix would auto-verify end-to-end. Removed 2026-06-12
+  # because every overnight PR merge kicked off the full daily chain
+  # (scraper-daily → export-and-publish → morning-brief → vercel-redeploy →
+  # ICE stocks) DURING the cron-job.org 01:07 UTC dispatch window, producing
+  # duplicate cascades. On 2026-06-12 it actively broke the cascade: the
+  # workflow_run payload from the push-triggered scraper arrived with
+  # `conclusion: null` because the upstream was still finalising, so every
+  # downstream job's `if: == 'success'` gate evaluated false and the entire
+  # 01:16 chain was `skipped`. To verify a scraper fix end-to-end, hit
+  # "Run workflow" on the Actions tab manually.
 
-# Serialise across all triggers so the 01:07 + 02:00 cron pair, push-triggered
-# runs, and manual dispatches never race on the DB. cancel-in-progress: false
-# turns the 02:00 backup cron into a no-op queued behind the 01:07 run when
-# both fire — vs cancel-in-progress: true which would kill the running primary
-# and restart from zero, wasting its progress.
+# Serialise across all triggers so the 01:07 + 02:00 cron pair and manual
+# dispatches never race on the DB. cancel-in-progress: false turns the 02:00
+# backup cron into a no-op queued behind the 01:07 run when both fire — vs
+# cancel-in-progress: true which would kill the running primary and restart
+# from zero, wasting its progress.
 concurrency:
   group: scraper-daily
   cancel-in-progress: false
