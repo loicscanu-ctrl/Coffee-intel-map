@@ -1,7 +1,7 @@
 {
-  "date": "2026-06-02",
+  "date": "2026-06-09",
   "scoreNY": -1,
-  "scoreLDN": -4,
+  "scoreLDN": 0,
   "signals": [
     {
       "id": "CP2",
@@ -15,15 +15,15 @@
       "text": "Producers selling into weakness — suggests stock overhang or cash flow pressure regardless of price."
     },
     {
-      "id": "CP2",
-      "name": "Forced Liquidation",
+      "id": "CP4",
+      "name": "Defensive De-hedging",
       "category": "CP",
       "categoryLabel": "Producer",
       "market": "LDN",
-      "severity": "warn",
-      "score": -2,
-      "magnitude": "large",
-      "text": "Producers selling into weakness — suggests stock overhang or cash flow pressure regardless of price."
+      "severity": "info",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Producers covering shorts on weakness — normal deleveraging, low conviction."
     },
     {
       "id": "CP5",
@@ -33,7 +33,7 @@
       "market": "LDN",
       "severity": "warn",
       "score": 2,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "Producers near fully hedged (>75th pct, 52-week) — limited additional selling capacity from this actor."
     },
     {
@@ -66,8 +66,30 @@
       "market": "LDN",
       "severity": "info",
       "score": 0,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "Roasters adding coverage into price weakness — standard buying flow."
+    },
+    {
+      "id": "CR7",
+      "name": "Roaster Concentration",
+      "category": "CR",
+      "categoryLabel": "Roaster",
+      "market": "LDN",
+      "severity": "warn",
+      "score": 1,
+      "magnitude": "large",
+      "text": "Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact."
+    },
+    {
+      "id": "CI1",
+      "name": "Commercial Convergence Bullish",
+      "category": "CI",
+      "categoryLabel": "Commercial",
+      "market": "LDN",
+      "severity": "warn",
+      "score": 3,
+      "magnitude": "large",
+      "text": "Both commercials aligned bullish — strong fundamental demand signal."
     },
     {
       "id": "ML4",
@@ -81,21 +103,15 @@
       "text": "Funds reducing longs into falling price — bearish momentum, trend following."
     },
     {
-      "id": "ML3",
-      "name": "Contrarian Fund Buying",
+      "id": "ML4",
+      "name": "Fund Long Liquidation",
       "category": "ML",
       "categoryLabel": "MM Longs",
       "market": "LDN",
-      "severity": "warn",
-      "score": 1,
-      "magnitude": "small",
-      "links": [
-        {
-          "label": "Global Flow",
-          "href": "#cot-section-1"
-        }
-      ],
-      "text": "Funds buying into weakness — contrarian positioning. Cross-reference OI sequence and the brother contract."
+      "severity": "info",
+      "score": -1,
+      "magnitude": "medium",
+      "text": "Funds reducing longs into falling price — bearish momentum, trend following."
     },
     {
       "id": "ML6",
@@ -105,7 +121,7 @@
       "market": "LDN",
       "severity": "alert",
       "score": -3,
-      "magnitude": "large",
+      "magnitude": "medium",
       "text": "Large speculative long position (>75th pct) with price already reversing — liquidation underway, momentum risk elevated."
     },
     {
@@ -120,15 +136,15 @@
       "text": "Funds adding shorts near capacity (>75th pct) — bearish momentum likely limited, short covering risk increasing."
     },
     {
-      "id": "MS5",
-      "name": "Reluctant Short Cover",
+      "id": "MS1",
+      "name": "Fund Bearish Entry",
       "category": "MS",
       "categoryLabel": "MM Shorts",
       "market": "LDN",
-      "severity": "warn",
-      "score": 1,
+      "severity": "info",
+      "score": -1,
       "magnitude": "large",
-      "text": "Funds covering shorts despite falling price — may signal exhaustion of bearish thesis."
+      "text": "Funds building shorts into price weakness — conviction depends on magnitude of the move."
     },
     {
       "id": "MI2",
@@ -138,7 +154,7 @@
       "market": "NY",
       "severity": "warn",
       "score": -2,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "Funds reducing longs and adding shorts simultaneously — strong bearish conviction."
     },
     {
@@ -153,26 +169,15 @@
       "text": "MM net position near 52-week low (<25th pct) — speculative net shorts at extreme, limited room to extend. Short-covering catalyst risk elevated."
     },
     {
-      "id": "MI1",
-      "name": "Speculative Conviction Bullish",
-      "category": "MI",
-      "categoryLabel": "MM Interaction",
-      "market": "LDN",
-      "severity": "warn",
-      "score": 2,
-      "magnitude": "large",
-      "text": "Funds adding longs and covering shorts simultaneously — strong bullish conviction."
-    },
-    {
-      "id": "MI5",
-      "name": "Net Long Exhaustion",
+      "id": "MI2",
+      "name": "Speculative Conviction Bearish",
       "category": "MI",
       "categoryLabel": "MM Interaction",
       "market": "LDN",
       "severity": "warn",
       "score": -2,
       "magnitude": "large",
-      "text": "MM net long position near 52-week high (>75th pct) — speculative net longs at extreme, limited room to add. Mean-reversion risk elevated."
+      "text": "Funds reducing longs and adding shorts simultaneously — strong bearish conviction."
     },
     {
       "id": "MPI4",
@@ -192,27 +197,6 @@
       "text": "Funds liquidating longs while producers add hedges — broad bearish alignment. Roaster behavior confirms breadth: if they're also reducing coverage, conviction is across all actors."
     },
     {
-      "id": "MPI2",
-      "name": "Forced Market",
-      "category": "MPI",
-      "categoryLabel": "MM × Producer",
-      "market": "LDN",
-      "severity": "warn",
-      "score": -2,
-      "magnitude": "large",
-      "links": [
-        {
-          "label": "Gauges",
-          "href": "#cot-section-3"
-        },
-        {
-          "label": "Global Flow",
-          "href": "#cot-section-1"
-        }
-      ],
-      "text": "Funds buying against producer selling into falling price — min/max levels of both actors and daily OI sequence reveal the dominant pressure."
-    },
-    {
       "id": "MRI6",
       "name": "Roaster Coverage Opportunity",
       "category": "MRI",
@@ -224,59 +208,15 @@
       "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
     },
     {
-      "id": "TC1",
-      "name": "Bullish Concentration",
-      "category": "TC",
-      "categoryLabel": "Trader Count",
+      "id": "MRI6",
+      "name": "Roaster Coverage Opportunity",
+      "category": "MRI",
+      "categoryLabel": "MM × Roaster",
       "market": "LDN",
-      "severity": "warn",
-      "score": -1,
+      "severity": "info",
+      "score": 1,
       "magnitude": "large",
-      "text": "MM net position growing bullish while net trader count shrinks — the bullish move is driven by fewer actors. Concentration increases reversal fragility."
-    },
-    {
-      "id": "CS1",
-      "name": "Backwardation Incentive",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
-      "market": "NY",
-      "severity": "info",
-      "score": 1,
-      "magnitude": "medium",
-      "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-    },
-    {
-      "id": "CS6",
-      "name": "Inversion Easing",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
-      "market": "NY",
-      "severity": "warn",
-      "score": -1,
-      "magnitude": "medium",
-      "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
-    },
-    {
-      "id": "CS1",
-      "name": "Backwardation Incentive",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
-      "market": "LDN",
-      "severity": "info",
-      "score": 1,
-      "magnitude": "medium",
-      "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-    },
-    {
-      "id": "CS6",
-      "name": "Inversion Easing",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
-      "market": "LDN",
-      "severity": "warn",
-      "score": -1,
-      "magnitude": "medium",
-      "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
+      "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
     },
     {
       "id": "SP1",
@@ -286,7 +226,7 @@
       "market": "NY",
       "severity": "info",
       "score": 0,
-      "magnitude": "small",
+      "magnitude": "medium",
       "links": [
         {
           "label": "Cycle",
@@ -294,232 +234,20 @@
         }
       ],
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
+    },
+    {
+      "id": "SP2",
+      "name": "Spreading Decrease",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "LDN",
+      "severity": "info",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
     }
   ],
   "history": [
-    {
-      "date": "2026-04-07",
-      "signals": [
-        {
-          "id": "CP4",
-          "name": "Defensive De-hedging",
-          "category": "CP",
-          "categoryLabel": "Producer",
-          "market": "NY",
-          "severity": "info",
-          "score": 0,
-          "magnitude": "small",
-          "text": "Producers covering shorts on weakness — normal deleveraging, low conviction."
-        },
-        {
-          "id": "CP4",
-          "name": "Defensive De-hedging",
-          "category": "CP",
-          "categoryLabel": "Producer",
-          "market": "LDN",
-          "severity": "info",
-          "score": 0,
-          "magnitude": "small",
-          "text": "Producers covering shorts on weakness — normal deleveraging, low conviction."
-        },
-        {
-          "id": "CR1",
-          "name": "Normal Coverage",
-          "category": "CR",
-          "categoryLabel": "Roaster",
-          "market": "NY",
-          "severity": "info",
-          "score": 0,
-          "magnitude": "small",
-          "text": "Roasters adding coverage into price weakness — standard buying flow."
-        },
-        {
-          "id": "CR3",
-          "name": "Coverage Reduction",
-          "category": "CR",
-          "categoryLabel": "Roaster",
-          "market": "LDN",
-          "severity": "info",
-          "score": -1,
-          "magnitude": "small",
-          "text": "Roasters reducing coverage on weakness — expecting further downside or reducing exposure."
-        },
-        {
-          "id": "CI1",
-          "name": "Commercial Convergence Bullish",
-          "category": "CI",
-          "categoryLabel": "Commercial",
-          "market": "NY",
-          "severity": "warn",
-          "score": 3,
-          "magnitude": "small",
-          "text": "Both commercials aligned bullish — strong fundamental demand signal."
-        },
-        {
-          "id": "ML4",
-          "name": "Fund Long Liquidation",
-          "category": "ML",
-          "categoryLabel": "MM Longs",
-          "market": "NY",
-          "severity": "info",
-          "score": -1,
-          "magnitude": "small",
-          "text": "Funds reducing longs into falling price — bearish momentum, trend following."
-        },
-        {
-          "id": "ML3",
-          "name": "Contrarian Fund Buying",
-          "category": "ML",
-          "categoryLabel": "MM Longs",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 1,
-          "magnitude": "medium",
-          "links": [
-            {
-              "label": "Global Flow",
-              "href": "#cot-section-1"
-            }
-          ],
-          "text": "Funds buying into weakness — contrarian positioning. Cross-reference OI sequence and the brother contract."
-        },
-        {
-          "id": "MS1",
-          "name": "Fund Bearish Entry",
-          "category": "MS",
-          "categoryLabel": "MM Shorts",
-          "market": "NY",
-          "severity": "info",
-          "score": -1,
-          "magnitude": "large",
-          "text": "Funds building shorts into price weakness — conviction depends on magnitude of the move."
-        },
-        {
-          "id": "MS2",
-          "name": "Fund Bearish Exhaustion",
-          "category": "MS",
-          "categoryLabel": "MM Shorts",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 2,
-          "magnitude": "large",
-          "text": "Funds adding shorts near capacity (>75th pct) — bearish momentum likely limited, short covering risk increasing."
-        },
-        {
-          "id": "MS7",
-          "name": "Short Concentration",
-          "category": "MS",
-          "categoryLabel": "MM Shorts",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 1,
-          "magnitude": "medium",
-          "text": "MM short OI rising while number of short traders falls — fewer, larger short positions. Concentration increases squeeze fragility: a stop-out by one large actor can compress the market rapidly."
-        },
-        {
-          "id": "MI2",
-          "name": "Speculative Conviction Bearish",
-          "category": "MI",
-          "categoryLabel": "MM Interaction",
-          "market": "NY",
-          "severity": "warn",
-          "score": -2,
-          "magnitude": "large",
-          "text": "Funds reducing longs and adding shorts simultaneously — strong bearish conviction."
-        },
-        {
-          "id": "MI3",
-          "name": "Speculative Confusion",
-          "category": "MI",
-          "categoryLabel": "MM Interaction",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 0,
-          "magnitude": "medium",
-          "links": [
-            {
-              "label": "Gauges",
-              "href": "#cot-section-3"
-            },
-            {
-              "label": "Global Flow",
-              "href": "#cot-section-1"
-            }
-          ],
-          "text": "Both sides growing — net position will decide which side dominates."
-        },
-        {
-          "id": "MI6",
-          "name": "Net Short Exhaustion",
-          "category": "MI",
-          "categoryLabel": "MM Interaction",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 2,
-          "magnitude": "medium",
-          "text": "MM net position near 52-week low (<25th pct) — speculative net shorts at extreme, limited room to extend. Short-covering catalyst risk elevated."
-        },
-        {
-          "id": "MRI6",
-          "name": "Roaster Coverage Opportunity",
-          "category": "MRI",
-          "categoryLabel": "MM × Roaster",
-          "market": "NY",
-          "severity": "info",
-          "score": 1,
-          "magnitude": "small",
-          "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
-        },
-        {
-          "id": "CS1",
-          "name": "Backwardation Incentive",
-          "category": "CS",
-          "categoryLabel": "Curve Structure",
-          "market": "NY",
-          "severity": "info",
-          "score": 1,
-          "magnitude": "large",
-          "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-        },
-        {
-          "id": "CS1",
-          "name": "Backwardation Incentive",
-          "category": "CS",
-          "categoryLabel": "Curve Structure",
-          "market": "LDN",
-          "severity": "info",
-          "score": 1,
-          "magnitude": "large",
-          "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-        },
-        {
-          "id": "OB3",
-          "name": "Oversold Opportunity",
-          "category": "OB",
-          "categoryLabel": "OB/OS",
-          "market": "NY",
-          "severity": "warn",
-          "score": 2,
-          "magnitude": "large",
-          "text": "KC technically oversold (≤25th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst."
-        },
-        {
-          "id": "SP2",
-          "name": "Spreading Decrease",
-          "category": "SP",
-          "categoryLabel": "Spreading",
-          "market": "LDN",
-          "severity": "info",
-          "score": 0,
-          "magnitude": "medium",
-          "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-        }
-      ],
-      "scoreNY": -1,
-      "scoreLDN": 6,
-      "priceNY": 281.3,
-      "priceLDN": 3231
-    },
     {
       "date": "2026-04-14",
       "signals": [
@@ -2631,7 +2359,259 @@
       "scoreLDN": -4,
       "priceNY": 259.2,
       "priceLDN": 3462
+    },
+    {
+      "date": "2026-06-09",
+      "signals": [
+        {
+          "id": "CP2",
+          "name": "Forced Liquidation",
+          "category": "CP",
+          "categoryLabel": "Producer",
+          "market": "NY",
+          "severity": "warn",
+          "score": -2,
+          "magnitude": "small",
+          "text": "Producers selling into weakness — suggests stock overhang or cash flow pressure regardless of price."
+        },
+        {
+          "id": "CP4",
+          "name": "Defensive De-hedging",
+          "category": "CP",
+          "categoryLabel": "Producer",
+          "market": "LDN",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Producers covering shorts on weakness — normal deleveraging, low conviction."
+        },
+        {
+          "id": "CP5",
+          "name": "Producer Exhaustion",
+          "category": "CP",
+          "categoryLabel": "Producer",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "medium",
+          "text": "Producers near fully hedged (>75th pct, 52-week) — limited additional selling capacity from this actor."
+        },
+        {
+          "id": "CR1",
+          "name": "Normal Coverage",
+          "category": "CR",
+          "categoryLabel": "Roaster",
+          "market": "NY",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "large",
+          "text": "Roasters adding coverage into price weakness — standard buying flow."
+        },
+        {
+          "id": "CR6",
+          "name": "Roaster Dry Powder",
+          "category": "CR",
+          "categoryLabel": "Roaster",
+          "market": "NY",
+          "severity": "warn",
+          "score": -2,
+          "magnitude": "large",
+          "text": "Roasters near fully covered (>75th pct) — limited additional buying capacity from this actor."
+        },
+        {
+          "id": "CR1",
+          "name": "Normal Coverage",
+          "category": "CR",
+          "categoryLabel": "Roaster",
+          "market": "LDN",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "large",
+          "text": "Roasters adding coverage into price weakness — standard buying flow."
+        },
+        {
+          "id": "CR7",
+          "name": "Roaster Concentration",
+          "category": "CR",
+          "categoryLabel": "Roaster",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 1,
+          "magnitude": "large",
+          "text": "Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact."
+        },
+        {
+          "id": "CI1",
+          "name": "Commercial Convergence Bullish",
+          "category": "CI",
+          "categoryLabel": "Commercial",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 3,
+          "magnitude": "large",
+          "text": "Both commercials aligned bullish — strong fundamental demand signal."
+        },
+        {
+          "id": "ML4",
+          "name": "Fund Long Liquidation",
+          "category": "ML",
+          "categoryLabel": "MM Longs",
+          "market": "NY",
+          "severity": "info",
+          "score": -1,
+          "magnitude": "small",
+          "text": "Funds reducing longs into falling price — bearish momentum, trend following."
+        },
+        {
+          "id": "ML4",
+          "name": "Fund Long Liquidation",
+          "category": "ML",
+          "categoryLabel": "MM Longs",
+          "market": "LDN",
+          "severity": "info",
+          "score": -1,
+          "magnitude": "medium",
+          "text": "Funds reducing longs into falling price — bearish momentum, trend following."
+        },
+        {
+          "id": "ML6",
+          "name": "Fund Long Overhang",
+          "category": "ML",
+          "categoryLabel": "MM Longs",
+          "market": "LDN",
+          "severity": "alert",
+          "score": -3,
+          "magnitude": "medium",
+          "text": "Large speculative long position (>75th pct) with price already reversing — liquidation underway, momentum risk elevated."
+        },
+        {
+          "id": "MS2",
+          "name": "Fund Bearish Exhaustion",
+          "category": "MS",
+          "categoryLabel": "MM Shorts",
+          "market": "NY",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "large",
+          "text": "Funds adding shorts near capacity (>75th pct) — bearish momentum likely limited, short covering risk increasing."
+        },
+        {
+          "id": "MS1",
+          "name": "Fund Bearish Entry",
+          "category": "MS",
+          "categoryLabel": "MM Shorts",
+          "market": "LDN",
+          "severity": "info",
+          "score": -1,
+          "magnitude": "large",
+          "text": "Funds building shorts into price weakness — conviction depends on magnitude of the move."
+        },
+        {
+          "id": "MI2",
+          "name": "Speculative Conviction Bearish",
+          "category": "MI",
+          "categoryLabel": "MM Interaction",
+          "market": "NY",
+          "severity": "warn",
+          "score": -2,
+          "magnitude": "large",
+          "text": "Funds reducing longs and adding shorts simultaneously — strong bearish conviction."
+        },
+        {
+          "id": "MI6",
+          "name": "Net Short Exhaustion",
+          "category": "MI",
+          "categoryLabel": "MM Interaction",
+          "market": "NY",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "large",
+          "text": "MM net position near 52-week low (<25th pct) — speculative net shorts at extreme, limited room to extend. Short-covering catalyst risk elevated."
+        },
+        {
+          "id": "MI2",
+          "name": "Speculative Conviction Bearish",
+          "category": "MI",
+          "categoryLabel": "MM Interaction",
+          "market": "LDN",
+          "severity": "warn",
+          "score": -2,
+          "magnitude": "large",
+          "text": "Funds reducing longs and adding shorts simultaneously — strong bearish conviction."
+        },
+        {
+          "id": "MPI4",
+          "name": "Bearish Capitulation",
+          "category": "MPI",
+          "categoryLabel": "MM × Producer",
+          "market": "NY",
+          "severity": "alert",
+          "score": -3,
+          "magnitude": "small",
+          "links": [
+            {
+              "label": "Gauges",
+              "href": "#cot-section-3"
+            }
+          ],
+          "text": "Funds liquidating longs while producers add hedges — broad bearish alignment. Roaster behavior confirms breadth: if they're also reducing coverage, conviction is across all actors."
+        },
+        {
+          "id": "MRI6",
+          "name": "Roaster Coverage Opportunity",
+          "category": "MRI",
+          "categoryLabel": "MM × Roaster",
+          "market": "NY",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "large",
+          "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
+        },
+        {
+          "id": "MRI6",
+          "name": "Roaster Coverage Opportunity",
+          "category": "MRI",
+          "categoryLabel": "MM × Roaster",
+          "market": "LDN",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "large",
+          "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
+        },
+        {
+          "id": "SP1",
+          "name": "Spreading Increase",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "NY",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "links": [
+            {
+              "label": "Cycle",
+              "href": "#cot-section-6"
+            }
+          ],
+          "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
+        },
+        {
+          "id": "SP2",
+          "name": "Spreading Decrease",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "LDN",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+        }
+      ],
+      "scoreNY": -1,
+      "scoreLDN": 0,
+      "priceNY": 240.9,
+      "priceLDN": 3230
     }
   ],
-  "generatedAt": "2026-06-12T07:08:56.500Z"
+  "generatedAt": "2026-06-12T21:49:32.640Z"
 }
