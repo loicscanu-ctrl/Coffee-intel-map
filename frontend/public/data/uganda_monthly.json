@@ -113,6 +113,12 @@
           "country": "Morocco"
         },
         {
+          "bags": 5760,
+          "robusta_bags": 4480,
+          "arabica_bags": 1280,
+          "country": "Israel"
+        },
+        {
           "bags": 4472,
           "robusta_bags": 2404,
           "arabica_bags": 2068,
@@ -171,6 +177,12 @@
           "robusta_bags": 1528,
           "arabica_bags": 320,
           "country": "France"
+        },
+        {
+          "bags": 1600,
+          "robusta_bags": 1600,
+          "arabica_bags": 0,
+          "country": "Iran"
         },
         {
           "bags": 1450,
@@ -284,7 +296,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/January%202020_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=377,202 vs published 377,182 (\u0394-20); \u03a3arabica=84,705 vs published 92,769 (\u0394+8,064)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=383,282 vs published 377,182 (\u0394-6,100); \u03a3arabica=85,985 vs published 92,769 (\u0394+6,784)",
         "grade-table sum 404,031 differs >5% from published export total 469,951"
       ]
     },
@@ -350,8 +362,8 @@
       ],
       "by_destination": [
         {
-          "bags": 2020,
-          "robusta_bags": 2020,
+          "bags": 3,
+          "robusta_bags": 3,
           "arabica_bags": 0,
           "country": "Italy"
         },
@@ -396,6 +408,12 @@
           "robusta_bags": 11772,
           "arabica_bags": 0,
           "country": "Morocco"
+        },
+        {
+          "bags": 8340,
+          "robusta_bags": 7040,
+          "arabica_bags": 1300,
+          "country": "Israel"
         },
         {
           "bags": 4974,
@@ -551,7 +569,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/February%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=245,610 vs published 388,646 (\u0394+143,036); \u03a3arabica=63,198 vs published 84,348 (\u0394+21,150)",
+        "destinations cross-check failed: \u03a3robusta=250,633 vs published 388,646 (\u0394+138,013); \u03a3arabica=64,498 vs published 84,348 (\u0394+19,850)",
         "grade-table sum 411,985 differs >5% from published export total 472,994"
       ]
     },
@@ -625,18 +643,6 @@
       ],
       "by_destination": [
         {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "Germany"
-        },
-        {
-          "bags": 3,
-          "robusta_bags": 3,
-          "arabica_bags": 0,
-          "country": "Brazil"
-        },
-        {
           "bags": 135987,
           "robusta_bags": 120742,
           "arabica_bags": 15245,
@@ -647,6 +653,12 @@
           "robusta_bags": 68900,
           "arabica_bags": 0,
           "country": "Sudan"
+        },
+        {
+          "bags": 56169,
+          "robusta_bags": 35601,
+          "arabica_bags": 20568,
+          "country": "Germany"
         },
         {
           "bags": 52175,
@@ -683,6 +695,12 @@
           "robusta_bags": 680,
           "arabica_bags": 6318,
           "country": "Sweden"
+        },
+        {
+          "bags": 5740,
+          "robusta_bags": 5130,
+          "arabica_bags": 610,
+          "country": "Israel"
         },
         {
           "bags": 4540,
@@ -725,6 +743,12 @@
           "robusta_bags": 640,
           "arabica_bags": 1000,
           "country": "Finland"
+        },
+        {
+          "bags": 1600,
+          "robusta_bags": 1600,
+          "arabica_bags": 0,
+          "country": "Iran"
         },
         {
           "bags": 1500,
@@ -844,7 +868,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/March%202020_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=350,857 vs published 385,978 (\u0394+35,121); \u03a3arabica=64,578 vs published 91,583 (\u0394+27,005)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=391,165 vs published 385,978 (\u0394-5,187); \u03a3arabica=85,756 vs published 91,583 (\u0394+5,827)",
         "grade-table sum 398,708 differs >5% from published export total 477,561"
       ]
     },
@@ -918,9 +942,9 @@
       ],
       "by_destination": [
         {
-          "bags": 19,
-          "robusta_bags": 19,
-          "arabica_bags": 0,
+          "bags": 91826,
+          "robusta_bags": 76238,
+          "arabica_bags": 15588,
           "country": "Italy"
         },
         {
@@ -1107,7 +1131,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/April%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=195,557 vs published 262,676 (\u0394+67,119); \u03a3arabica=72,609 vs published 97,297 (\u0394+24,688)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=271,776 vs published 262,676 (\u0394-9,100); \u03a3arabica=88,197 vs published 97,297 (\u0394+9,100)",
         "grade-table sum 288,372 differs >5% from published export total 359,973"
       ]
     },
@@ -1176,12 +1200,6 @@
         }
       ],
       "by_destination": [
-        {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "Mexico"
-        },
         {
           "bags": 136454,
           "robusta_bags": 120546,
@@ -1267,6 +1285,12 @@
           "country": "Portugal"
         },
         {
+          "bags": 3285,
+          "robusta_bags": 2625,
+          "arabica_bags": 660,
+          "country": "Mexico"
+        },
+        {
           "bags": 2800,
           "robusta_bags": 2800,
           "arabica_bags": 0,
@@ -1348,7 +1372,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/May%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=341,765 vs published 340,830 (\u0394-935); \u03a3arabica=94,567 vs published 96,767 (\u0394+2,200)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=342,370 vs published 340,830 (\u0394-1,540); \u03a3arabica=95,227 vs published 96,767 (\u0394+1,540)",
         "grade-table sum 375,866 differs >5% from published export total 437,597"
       ]
     },
@@ -1425,12 +1449,6 @@
         }
       ],
       "by_destination": [
-        {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "South Africa"
-        },
         {
           "bags": 130653,
           "robusta_bags": 110594,
@@ -1576,6 +1594,12 @@
           "country": "Turkey"
         },
         {
+          "bags": 620,
+          "robusta_bags": 620,
+          "arabica_bags": 0,
+          "country": "South Africa"
+        },
+        {
           "bags": 580,
           "robusta_bags": 580,
           "arabica_bags": 0,
@@ -1621,7 +1645,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/June%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=350,941 vs published 344,438 (\u0394-6,503); \u03a3arabica=70,739 vs published 75,935 (\u0394+5,196)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=349,541 vs published 344,438 (\u0394-5,103); \u03a3arabica=70,739 vs published 75,935 (\u0394+5,196)",
         "grade-table sum 367,296 differs >5% from published export total 420,373"
       ]
     },
@@ -1707,12 +1731,6 @@
       ],
       "by_destination": [
         {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "Kenya"
-        },
-        {
           "bags": 180035,
           "robusta_bags": 159061,
           "arabica_bags": 20974,
@@ -1795,6 +1813,12 @@
           "robusta_bags": 2780,
           "arabica_bags": 700,
           "country": "Netherlands"
+        },
+        {
+          "bags": 2240,
+          "robusta_bags": 1210,
+          "arabica_bags": 1030,
+          "country": "Kenya"
         },
         {
           "bags": 1774,
@@ -1890,7 +1914,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/July%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=469,208 vs published 467,160 (\u0394-2,048); \u03a3arabica=73,481 vs published 76,091 (\u0394+2,610)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=468,398 vs published 467,160 (\u0394-1,238); \u03a3arabica=74,511 vs published 76,091 (\u0394+1,580)",
         "grade-table sum 507,511 differs >5% from published export total 543,251"
       ]
     },
@@ -1971,12 +1995,6 @@
         }
       ],
       "by_destination": [
-        {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "Egypt"
-        },
         {
           "bags": 152667,
           "robusta_bags": 144658,
@@ -2092,6 +2110,12 @@
           "country": "France"
         },
         {
+          "bags": 1340,
+          "robusta_bags": 1340,
+          "arabica_bags": 0,
+          "country": "Egypt"
+        },
+        {
           "bags": 1280,
           "robusta_bags": 1280,
           "arabica_bags": 0,
@@ -2179,7 +2203,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/August%202020_0.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=461,081 vs published 457,897 (\u0394-3,184); \u03a3arabica=57,246 vs published 61,786 (\u0394+4,540)"
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=460,401 vs published 457,897 (\u0394-2,504); \u03a3arabica=57,246 vs published 61,786 (\u0394+4,540)"
       ]
     },
     {
@@ -2243,12 +2267,6 @@
         }
       ],
       "by_destination": [
-        {
-          "bags": 2,
-          "robusta_bags": 1,
-          "arabica_bags": 1,
-          "country": "Algeria"
-        },
         {
           "bags": 149355,
           "robusta_bags": 138286,
@@ -2382,6 +2400,12 @@
           "country": "Turkey"
         },
         {
+          "bags": 960,
+          "robusta_bags": 960,
+          "arabica_bags": 0,
+          "country": "Algeria"
+        },
+        {
           "bags": 640,
           "robusta_bags": 640,
           "arabica_bags": 0,
@@ -2421,7 +2445,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/September%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=445,912 vs published 445,461 (\u0394-451); \u03a3arabica=59,600 vs published 61,009 (\u0394+1,409)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=446,871 vs published 445,461 (\u0394-1,410); \u03a3arabica=59,599 vs published 61,009 (\u0394+1,410)",
         "grade-table sum 434,559 differs >5% from published export total 506,470"
       ]
     },
@@ -2502,12 +2526,6 @@
         }
       ],
       "by_destination": [
-        {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "South Africa"
-        },
         {
           "bags": 164871,
           "robusta_bags": 158943,
@@ -2623,6 +2641,12 @@
           "country": "Poland"
         },
         {
+          "bags": 960,
+          "robusta_bags": 640,
+          "arabica_bags": 320,
+          "country": "South Africa"
+        },
+        {
           "bags": 670,
           "robusta_bags": 670,
           "arabica_bags": 0,
@@ -2668,7 +2692,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/October%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=374,953 vs published 371,280 (\u0394-3,673); \u03a3arabica=52,125 vs published 56,735 (\u0394+4,610)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=373,573 vs published 371,280 (\u0394-2,293); \u03a3arabica=52,445 vs published 56,735 (\u0394+4,290)",
         "grade-table sum 369,986 differs >5% from published export total 428,015"
       ]
     },
@@ -3641,6 +3665,12 @@
           "country": "Japan"
         },
         {
+          "bags": 1600,
+          "robusta_bags": 1600,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 1500,
           "robusta_bags": 1500,
           "arabica_bags": 0,
@@ -3716,7 +3746,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/February%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=498,564 vs published 500,685 (\u0394+2,121); \u03a3arabica=57,603 vs published 62,078 (\u0394+4,475)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=500,164 vs published 500,685 (\u0394+521); \u03a3arabica=57,603 vs published 62,078 (\u0394+4,475)",
         "grade-table sum 479,804 differs >5% from published export total 562,763"
       ]
     },
@@ -7292,12 +7322,6 @@
           "country": "Turkey"
         },
         {
-          "bags": 2022,
-          "robusta_bags": 2022,
-          "arabica_bags": 0,
-          "country": "Egypt"
-        },
-        {
           "bags": 1859,
           "robusta_bags": 1859,
           "arabica_bags": 0,
@@ -7421,7 +7445,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-05/March%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=377,412 vs published 360,229 (\u0394-17,183); \u03a3arabica=99,341 vs published 117,794 (\u0394+18,453)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=375,390 vs published 360,229 (\u0394-15,161); \u03a3arabica=99,341 vs published 117,794 (\u0394+18,453)",
         "grade-table sum 405,107 differs >5% from published export total 478,023"
       ]
     },
@@ -8448,12 +8472,6 @@
           "country": "Mexico"
         },
         {
-          "bags": 4640,
-          "robusta_bags": 2030,
-          "arabica_bags": 2610,
-          "country": "Netherlands"
-        },
-        {
           "bags": 4616,
           "robusta_bags": 4616,
           "arabica_bags": 0,
@@ -8571,7 +8589,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-08/July%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=528,372 vs published 528,235 (\u0394-137); \u03a3arabica=46,756 vs published 48,233 (\u0394+1,477)",
+        "destinations cross-check failed: \u03a3robusta=526,342 vs published 528,235 (\u0394+1,893); \u03a3arabica=44,146 vs published 48,233 (\u0394+4,087)",
         "grade-table sum 539,874 differs >5% from published export total 576,468"
       ]
     },
@@ -10923,12 +10941,6 @@
           "country": "Spain"
         },
         {
-          "bags": 12380,
-          "robusta_bags": 10360,
-          "arabica_bags": 2020,
-          "country": "Netherlands"
-        },
-        {
           "bags": 5133,
           "robusta_bags": 2880,
           "arabica_bags": 2253,
@@ -11025,6 +11037,12 @@
           "country": "Poland"
         },
         {
+          "bags": 700,
+          "robusta_bags": 700,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 685,
           "robusta_bags": 0,
           "arabica_bags": 685,
@@ -11070,7 +11088,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-05/April%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=243,585 vs published 238,636 (\u0394-4,949); \u03a3arabica=128,685 vs published 134,974 (\u0394+6,289)",
+        "destinations cross-check failed: \u03a3robusta=233,925 vs published 238,636 (\u0394+4,711); \u03a3arabica=126,665 vs published 134,974 (\u0394+8,309)",
         "grade-table sum 288,927 differs >5% from published export total 373,610"
       ]
     },
@@ -11347,9 +11365,9 @@
     },
     {
       "month": "2023-06",
-      "robusta_bags": 492013,
+      "robusta_bags": 489993,
       "arabica_bags": 75050,
-      "total_bags": 567063,
+      "total_bags": 565043,
       "value_usd": null,
       "by_grade": [
         {
@@ -11519,12 +11537,6 @@
           "robusta_bags": 2160,
           "arabica_bags": 0,
           "country": "Sweden"
-        },
-        {
-          "bags": 2020,
-          "robusta_bags": 2020,
-          "arabica_bags": 0,
-          "country": "Turkey"
         },
         {
           "bags": 1718,
@@ -12705,6 +12717,12 @@
           "country": "Romania"
         },
         {
+          "bags": 350,
+          "robusta_bags": 350,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 334,
           "robusta_bags": 334,
           "arabica_bags": 0,
@@ -12726,7 +12744,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-11/October%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=412,535 vs published 410,113 (\u0394-2,422); \u03a3arabica=56,182 vs published 59,967 (\u0394+3,785)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=412,885 vs published 410,113 (\u0394-2,772); \u03a3arabica=56,182 vs published 59,967 (\u0394+3,785)",
         "grade-table sum 433,562 differs >5% from published export total 470,080"
       ]
     },
@@ -12980,6 +12998,12 @@
           "country": "Estonia"
         },
         {
+          "bags": 334,
+          "robusta_bags": 334,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 320,
           "robusta_bags": 320,
           "arabica_bags": 0,
@@ -13007,7 +13031,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-12/November%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=354,601 vs published 338,329 (\u0394-16,272); \u03a3arabica=69,510 vs published 87,197 (\u0394+17,687)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=354,935 vs published 338,329 (\u0394-16,606); \u03a3arabica=69,510 vs published 87,197 (\u0394+17,687)",
         "grade-table sum 362,617 differs >5% from published export total 425,526"
       ]
     },
@@ -15009,6 +15033,12 @@
           "country": "Ukraine"
         },
         {
+          "bags": 332,
+          "robusta_bags": 332,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 250,
           "robusta_bags": 250,
           "arabica_bags": 0,
@@ -15018,7 +15048,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-07/June%202024_0.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=618,354 vs published 614,486 (\u0394-3,868); \u03a3arabica=48,601 vs published 52,551 (\u0394+3,950)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=618,686 vs published 614,486 (\u0394-4,200); \u03a3arabica=48,601 vs published 52,551 (\u0394+3,950)",
         "grade-table sum 603,956 differs >5% from published export total 667,037"
       ]
     },
@@ -15752,6 +15782,12 @@
           "country": "United Arab Emirates"
         },
         {
+          "bags": 5400,
+          "robusta_bags": 5400,
+          "arabica_bags": 0,
+          "country": "Israel"
+        },
+        {
           "bags": 5164,
           "robusta_bags": 4524,
           "arabica_bags": 640,
@@ -15812,6 +15848,12 @@
           "country": "United Kingdom"
         },
         {
+          "bags": 1017,
+          "robusta_bags": 1017,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 700,
           "robusta_bags": 700,
           "arabica_bags": 0,
@@ -15857,7 +15899,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-10/September%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=497,752 vs published 504,576 (\u0394+6,824); \u03a3arabica=26,981 vs published 27,636 (\u0394+655)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=504,169 vs published 504,576 (\u0394+407); \u03a3arabica=26,981 vs published 27,636 (\u0394+655)",
         "grade-table sum 492,171 differs >5% from published export total 532,212"
       ]
     },
@@ -16346,6 +16388,12 @@
           "country": "Latvia"
         },
         {
+          "bags": 665,
+          "robusta_bags": 665,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 475,
           "robusta_bags": 475,
           "arabica_bags": 0,
@@ -16391,7 +16439,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-12/November%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=345,715 vs published 342,982 (\u0394-2,733); \u03a3arabica=53,220 vs published 57,554 (\u0394+4,334)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=346,380 vs published 342,982 (\u0394-3,398); \u03a3arabica=53,220 vs published 57,554 (\u0394+4,334)",
         "grade-table sum 349,611 differs >5% from published export total 400,536"
       ]
     },
@@ -17223,12 +17271,18 @@
           "robusta_bags": 285,
           "arabica_bags": 0,
           "country": "Mexico"
+        },
+        {
+          "bags": 166,
+          "robusta_bags": 166,
+          "arabica_bags": 0,
+          "country": "Iran"
         }
       ],
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-03/05-February%202025%20Report%20%281%29_Final.pdfI_.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=472,019 vs published 466,691 (\u0394-5,328); \u03a3arabica=83,237 vs published 89,065 (\u0394+5,828)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=472,185 vs published 466,691 (\u0394-5,494); \u03a3arabica=83,237 vs published 89,065 (\u0394+5,828)",
         "grade-table sum 472,553 differs >5% from published export total 555,756"
       ]
     },
@@ -17871,9 +17925,9 @@
     },
     {
       "month": "2025-05",
-      "robusta_bags": 690316,
-      "arabica_bags": 99955,
-      "total_bags": 790271,
+      "robusta_bags": 690672,
+      "arabica_bags": 99315,
+      "total_bags": 789987,
       "value_usd": null,
       "by_grade": [
         {
@@ -18131,9 +18185,9 @@
           "country": "Saudi Arabia"
         },
         {
-          "bags": 2024,
-          "robusta_bags": 1384,
-          "arabica_bags": 640,
+          "bags": 1740,
+          "robusta_bags": 1740,
+          "arabica_bags": 0,
           "country": "Switzerland"
         },
         {
@@ -18845,6 +18899,12 @@
           "country": "Estonia"
         },
         {
+          "bags": 666,
+          "robusta_bags": 666,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 654,
           "robusta_bags": 654,
           "arabica_bags": 0,
@@ -18878,7 +18938,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-08/10-July%202025%20Report%20pptx..pdfI_.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=912,488 vs published 914,448 (\u0394+1,960); \u03a3arabica=82,307 vs published 82,657 (\u0394+350)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=913,154 vs published 914,448 (\u0394+1,294); \u03a3arabica=82,307 vs published 82,657 (\u0394+350)",
         "grade-table sum 939,295 differs >5% from published export total 997,105"
       ]
     },
@@ -19153,6 +19213,12 @@
         },
         {
           "bags": 653,
+          "robusta_bags": 333,
+          "arabica_bags": 320,
+          "country": "Iran"
+        },
+        {
+          "bags": 653,
           "robusta_bags": 653,
           "arabica_bags": 0,
           "country": "South Korea"
@@ -19209,15 +19275,15 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-10/11-August%202025%20Report%20pptx%281%29%20%281%29%20%281%29.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=800,912 vs published 797,363 (\u0394-3,549); \u03a3arabica=52,212 vs published 58,078 (\u0394+5,866)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=801,245 vs published 797,363 (\u0394-3,882); \u03a3arabica=52,532 vs published 58,078 (\u0394+5,546)",
         "grade-table sum 784,478 differs >5% from published export total 855,441"
       ]
     },
     {
       "month": "2025-09",
-      "robusta_bags": 779436,
+      "robusta_bags": 779922,
       "arabica_bags": 64349,
-      "total_bags": 843785,
+      "total_bags": 844271,
       "value_usd": null,
       "by_grade": [
         {
@@ -19523,6 +19589,12 @@
           "country": "Ukraine"
         },
         {
+          "bags": 486,
+          "robusta_bags": 486,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 452,
           "robusta_bags": 452,
           "arabica_bags": 0,
@@ -19543,9 +19615,9 @@
     },
     {
       "month": "2025-10",
-      "robusta_bags": 598674,
+      "robusta_bags": 600326,
       "arabica_bags": 83166,
-      "total_bags": 681840,
+      "total_bags": 683492,
       "value_usd": null,
       "by_grade": [
         {
@@ -19785,6 +19857,12 @@
           "robusta_bags": 333,
           "arabica_bags": 1360,
           "country": "Kenya"
+        },
+        {
+          "bags": 1652,
+          "robusta_bags": 1652,
+          "arabica_bags": 0,
+          "country": "Iran"
         },
         {
           "bags": 1306,
@@ -20324,12 +20402,6 @@
           "country": "Australia"
         },
         {
-          "bags": 4685,
-          "robusta_bags": 2020,
-          "arabica_bags": 2665,
-          "country": "Latvia"
-        },
-        {
           "bags": 4178,
           "robusta_bags": 4178,
           "arabica_bags": 0,
@@ -20477,7 +20549,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-02/03-December%202025%20Report%20pptx.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=369,959 vs published 367,627 (\u0394-2,332); \u03a3arabica=130,946 vs published 134,955 (\u0394+4,009)",
+        "destinations cross-check failed: \u03a3robusta=367,939 vs published 367,627 (\u0394-312); \u03a3arabica=128,281 vs published 134,955 (\u0394+6,674)",
         "grade-table sum 403,533 differs >5% from published export total 502,582"
       ]
     },
@@ -21074,6 +21146,12 @@
           "country": "Lebanon"
         },
         {
+          "bags": 1015,
+          "robusta_bags": 999,
+          "arabica_bags": 16,
+          "country": "Iran"
+        },
+        {
           "bags": 730,
           "robusta_bags": 730,
           "arabica_bags": 0,
@@ -21131,7 +21209,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-04/05-February%202026%20Report%20pptx.pptx_final.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=512,436 vs published 512,237 (\u0394-199); \u03a3arabica=137,276 vs published 139,696 (\u0394+2,420)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=513,435 vs published 512,237 (\u0394-1,198); \u03a3arabica=137,292 vs published 139,696 (\u0394+2,404)",
         "grade-table sum 554,467 differs >5% from published export total 651,933"
       ]
     },
@@ -21738,6 +21816,12 @@
           "country": "Japan"
         },
         {
+          "bags": 1332,
+          "robusta_bags": 1332,
+          "arabica_bags": 0,
+          "country": "Iran"
+        },
+        {
           "bags": 1288,
           "robusta_bags": 1288,
           "arabica_bags": 0,
@@ -21807,7 +21891,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-05/07-April%202026%20Report%20pptx%281%29%20%281%29.pdf",
       "parse_warnings": [
-        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=463,584 vs published 463,361 (\u0394-223); \u03a3arabica=124,437 vs published 128,326 (\u0394+3,889)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=464,916 vs published 463,361 (\u0394-1,555); \u03a3arabica=124,437 vs published 128,326 (\u0394+3,889)",
         "grade-table sum 524,650 differs >5% from published export total 591,687"
       ]
     }
