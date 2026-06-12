@@ -617,8 +617,12 @@ def test_v2_june_2025_full_fixture():
     assert published == (907_058, 107_004, 1_014_062)
 
     # Ecuador's loss makes the sums fall short of published — the
-    # cross-check must SAY so rather than silently under-report.
-    assert any("cross-check failed" in w for w in warnings)
+    # cross-check must SAY so rather than silently under-report. At
+    # ~4k bags of a 1.01M month it's under the 1% severity gate, so it's
+    # worded as a residual (recorded in JSON, ignored by the dashboard's
+    # /cross-check failed/ filter).
+    assert any("cross-check residual" in w for w in warnings)
+    assert not any("cross-check failed" in w for w in warnings)
 
 
 def test_v2_end_to_end_published_total_becomes_monthly_total():
@@ -631,7 +635,7 @@ def test_v2_end_to_end_published_total_becomes_monthly_total():
     assert rep.robusta_bags == 907_058
     assert rep.arabica_bags == 107_004
     assert rep.total_bags == 1_014_062
-    assert any("cross-check failed" in w for w in rep.parse_warnings)
+    assert any("cross-check residual" in w for w in rep.parse_warnings)
     assert {d["country"] for d in rep.by_destination} >= {"Italy", "Germany", "Sudan"}
 
 
@@ -701,3 +705,18 @@ def test_v2_south_sudan_does_not_double_count_sudan():
     assert by_country["South Sudan"]["bags"] == 7_000
     assert published == (57_000, 0, 57_000)
     assert not any("cross-check failed" in w for w in warnings)
+
+
+def test_v2_large_shortfall_still_flags_failed():
+    """A big gap (here 33% of trade missing vs published) must keep the
+    dashboard-visible "failed" wording — the 1% severity gate only
+    reclassifies micro-residuals."""
+    page = (
+        "Annex 3: Main Destinations of Uganda Coffee by Type in Feb 2020\n"
+        "1 Italy 1 100,000 50,000 150,000 60.0 60.0\n"
+        "Total 200,000 100,000 300,000"
+    )
+    rows, published, warnings = um._extract_destinations_v2([page])
+    assert published == (200_000, 100_000, 300_000)
+    assert any("cross-check failed" in w for w in warnings)
+    assert not any("cross-check residual" in w for w in warnings)

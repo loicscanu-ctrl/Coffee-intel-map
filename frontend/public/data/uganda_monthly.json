@@ -1348,7 +1348,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/May%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=341,765 vs published 340,830 (\u0394-935); \u03a3arabica=94,567 vs published 96,767 (\u0394+2,200)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=341,765 vs published 340,830 (\u0394-935); \u03a3arabica=94,567 vs published 96,767 (\u0394+2,200)",
         "grade-table sum 375,866 differs >5% from published export total 437,597"
       ]
     },
@@ -1621,7 +1621,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/June%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=350,941 vs published 344,438 (\u0394-6,503); \u03a3arabica=70,739 vs published 75,935 (\u0394+5,196)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=350,941 vs published 344,438 (\u0394-6,503); \u03a3arabica=70,739 vs published 75,935 (\u0394+5,196)",
         "grade-table sum 367,296 differs >5% from published export total 420,373"
       ]
     },
@@ -1890,7 +1890,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/July%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=469,208 vs published 467,160 (\u0394-2,048); \u03a3arabica=73,481 vs published 76,091 (\u0394+2,610)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=469,208 vs published 467,160 (\u0394-2,048); \u03a3arabica=73,481 vs published 76,091 (\u0394+2,610)",
         "grade-table sum 507,511 differs >5% from published export total 543,251"
       ]
     },
@@ -2179,7 +2179,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/August%202020_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=461,081 vs published 457,897 (\u0394-3,184); \u03a3arabica=57,246 vs published 61,786 (\u0394+4,540)"
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=461,081 vs published 457,897 (\u0394-3,184); \u03a3arabica=57,246 vs published 61,786 (\u0394+4,540)"
       ]
     },
     {
@@ -2421,7 +2421,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/September%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=445,912 vs published 445,461 (\u0394-451); \u03a3arabica=59,600 vs published 61,009 (\u0394+1,409)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=445,912 vs published 445,461 (\u0394-451); \u03a3arabica=59,600 vs published 61,009 (\u0394+1,409)",
         "grade-table sum 434,559 differs >5% from published export total 506,470"
       ]
     },
@@ -2668,7 +2668,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/October%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=374,953 vs published 371,280 (\u0394-3,673); \u03a3arabica=52,125 vs published 56,735 (\u0394+4,610)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=374,953 vs published 371,280 (\u0394-3,673); \u03a3arabica=52,125 vs published 56,735 (\u0394+4,610)",
         "grade-table sum 369,986 differs >5% from published export total 428,015"
       ]
     },
@@ -2915,7 +2915,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/November%202020_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=372,270 vs published 372,211 (\u0394-59); \u03a3arabica=56,191 vs published 58,113 (\u0394+1,922)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=372,270 vs published 372,211 (\u0394-59); \u03a3arabica=56,191 vs published 58,113 (\u0394+1,922)",
         "grade-table sum 369,276 differs >5% from published export total 430,324"
       ]
     },
@@ -3192,7 +3192,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/December%202020.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=377,999 vs published 375,209 (\u0394-2,790); \u03a3arabica=41,933 vs published 47,713 (\u0394+5,780)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=377,999 vs published 375,209 (\u0394-2,790); \u03a3arabica=41,933 vs published 47,713 (\u0394+5,780)",
         "grade-table sum 368,067 differs >5% from published export total 422,922"
       ]
     },
@@ -3451,7 +3451,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/January%202021_1.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=401,088 vs published 398,160 (\u0394-2,928); \u03a3arabica=44,822 vs published 48,400 (\u0394+3,578)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=401,088 vs published 398,160 (\u0394-2,928); \u03a3arabica=44,822 vs published 48,400 (\u0394+3,578)",
         "grade-table sum 390,396 differs >5% from published export total 446,560"
       ]
     },
@@ -3995,7 +3995,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/March%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=492,989 vs published 494,223 (\u0394+1,234); \u03a3arabica=75,115 vs published 78,616 (\u0394+3,501)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=492,989 vs published 494,223 (\u0394+1,234); \u03a3arabica=75,115 vs published 78,616 (\u0394+3,501)",
         "grade-table sum 482,020 differs >5% from published export total 572,839"
       ]
     },
@@ -4266,7 +4266,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/April%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=467,704 vs published 464,544 (\u0394-3,160); \u03a3arabica=68,757 vs published 72,994 (\u0394+4,237)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=467,704 vs published 464,544 (\u0394-3,160); \u03a3arabica=68,757 vs published 72,994 (\u0394+4,237)",
         "grade-table sum 442,558 differs >5% from published export total 537,538"
       ]
     },
@@ -4543,7 +4543,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/May%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=431,811 vs published 429,374 (\u0394-2,437); \u03a3arabica=61,301 vs published 64,676 (\u0394+3,375)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=431,811 vs published 429,374 (\u0394-2,437); \u03a3arabica=61,301 vs published 64,676 (\u0394+3,375)",
         "grade-table sum 452,171 differs >5% from published export total 494,050"
       ]
     },
@@ -4830,7 +4830,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/June%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=565,327 vs published 565,449 (\u0394+122); \u03a3arabica=51,781 vs published 52,939 (\u0394+1,158)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=565,327 vs published 565,449 (\u0394+122); \u03a3arabica=51,781 vs published 52,939 (\u0394+1,158)",
         "grade-table sum 542,931 differs >5% from published export total 618,388"
       ]
     },
@@ -5093,7 +5093,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/July%202021_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=660,271 vs published 660,458 (\u0394+187); \u03a3arabica=38,445 vs published 39,577 (\u0394+1,132)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=660,271 vs published 660,458 (\u0394+187); \u03a3arabica=38,445 vs published 39,577 (\u0394+1,132)",
         "grade-table sum 634,994 differs >5% from published export total 700,035"
       ]
     },
@@ -5378,7 +5378,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/August%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=633,082 vs published 636,458 (\u0394+3,376); \u03a3arabica=64,413 vs published 64,532 (\u0394+119)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=633,082 vs published 636,458 (\u0394+3,376); \u03a3arabica=64,413 vs published 64,532 (\u0394+119)",
         "grade-table sum 648,778 differs >5% from published export total 700,990"
       ]
     },
@@ -5681,7 +5681,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/September%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=539,364 vs published 543,279 (\u0394+3,915); \u03a3arabica=42,829 vs published 42,297 (\u0394-532)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=539,364 vs published 543,279 (\u0394+3,915); \u03a3arabica=42,829 vs published 42,297 (\u0394-532)",
         "grade-table sum 278,754 differs >5% from published export total 585,576"
       ]
     },
@@ -5960,7 +5960,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/October%202021_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=428,664 vs published 426,148 (\u0394-2,516); \u03a3arabica=55,715 vs published 60,386 (\u0394+4,671)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=428,664 vs published 426,148 (\u0394-2,516); \u03a3arabica=55,715 vs published 60,386 (\u0394+4,671)",
         "grade-table sum 448,077 differs >5% from published export total 486,534"
       ]
     },
@@ -6275,7 +6275,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/November%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=441,637 vs published 436,417 (\u0394-5,220); \u03a3arabica=82,082 vs published 88,485 (\u0394+6,403)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=441,637 vs published 436,417 (\u0394-5,220); \u03a3arabica=82,082 vs published 88,485 (\u0394+6,403)",
         "grade-table sum 485,256 differs >5% from published export total 524,902"
       ]
     },
@@ -6546,7 +6546,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/December%202021.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=457,501 vs published 452,588 (\u0394-4,913); \u03a3arabica=78,768 vs published 84,301 (\u0394+5,533)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=457,501 vs published 452,588 (\u0394-4,913); \u03a3arabica=78,768 vs published 84,301 (\u0394+5,533)",
         "grade-table sum 482,240 differs >5% from published export total 536,889"
       ]
     },
@@ -6827,7 +6827,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/January%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=331,719 vs published 315,265 (\u0394-16,454); \u03a3arabica=69,736 vs published 86,947 (\u0394+17,211)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=331,719 vs published 315,265 (\u0394-16,454); \u03a3arabica=69,736 vs published 86,947 (\u0394+17,211)",
         "grade-table sum 359,892 differs >5% from published export total 402,212"
       ]
     },
@@ -7120,7 +7120,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-03/February%202022_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=357,366 vs published 351,944 (\u0394-5,422); \u03a3arabica=90,601 vs published 97,013 (\u0394+6,412)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=357,366 vs published 351,944 (\u0394-5,422); \u03a3arabica=90,601 vs published 97,013 (\u0394+6,412)",
         "grade-table sum 364,388 differs >5% from published export total 448,957"
       ]
     },
@@ -7421,7 +7421,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-05/March%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=377,412 vs published 360,229 (\u0394-17,183); \u03a3arabica=99,341 vs published 117,794 (\u0394+18,453)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=377,412 vs published 360,229 (\u0394-17,183); \u03a3arabica=99,341 vs published 117,794 (\u0394+18,453)",
         "grade-table sum 405,107 differs >5% from published export total 478,023"
       ]
     },
@@ -7694,7 +7694,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-05/April%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=287,554 vs published 277,244 (\u0394-10,310); \u03a3arabica=118,772 vs published 130,518 (\u0394+11,746)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=287,554 vs published 277,244 (\u0394-10,310); \u03a3arabica=118,772 vs published 130,518 (\u0394+11,746)",
         "grade-table sum 322,980 differs >5% from published export total 407,762"
       ]
     },
@@ -7985,7 +7985,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-06/May%202022_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=370,281 vs published 350,312 (\u0394-19,969); \u03a3arabica=83,891 vs published 104,854 (\u0394+20,963)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=370,281 vs published 350,312 (\u0394-19,969); \u03a3arabica=83,891 vs published 104,854 (\u0394+20,963)",
         "grade-table sum 380,874 differs >5% from published export total 455,166"
       ]
     },
@@ -8288,7 +8288,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-07/June%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=462,990 vs published 444,197 (\u0394-18,793); \u03a3arabica=64,538 vs published 86,168 (\u0394+21,630)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=462,990 vs published 444,197 (\u0394-18,793); \u03a3arabica=64,538 vs published 86,168 (\u0394+21,630)",
         "grade-table sum 494,890 differs >5% from published export total 530,365"
       ]
     },
@@ -8571,7 +8571,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-08/July%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=528,372 vs published 528,235 (\u0394-137); \u03a3arabica=46,756 vs published 48,233 (\u0394+1,477)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=528,372 vs published 528,235 (\u0394-137); \u03a3arabica=46,756 vs published 48,233 (\u0394+1,477)",
         "grade-table sum 539,874 differs >5% from published export total 576,468"
       ]
     },
@@ -8846,7 +8846,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-12/August%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=461,190 vs published 456,271 (\u0394-4,919); \u03a3arabica=39,193 vs published 44,783 (\u0394+5,590)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=461,190 vs published 456,271 (\u0394-4,919); \u03a3arabica=39,193 vs published 44,783 (\u0394+5,590)",
         "grade-table sum 448,185 differs >5% from published export total 501,054"
       ]
     },
@@ -9127,7 +9127,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-12/September%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=463,500 vs published 464,118 (\u0394+618); \u03a3arabica=38,237 vs published 39,577 (\u0394+1,340)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=463,500 vs published 464,118 (\u0394+618); \u03a3arabica=38,237 vs published 39,577 (\u0394+1,340)",
         "grade-table sum 469,915 differs >5% from published export total 503,695"
       ]
     },
@@ -9410,7 +9410,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-11/October%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=398,443 vs published 398,592 (\u0394+149); \u03a3arabica=56,827 vs published 58,652 (\u0394+1,825)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=398,443 vs published 398,592 (\u0394+149); \u03a3arabica=56,827 vs published 58,652 (\u0394+1,825)",
         "grade-table sum 407,957 differs >5% from published export total 457,244"
       ]
     },
@@ -9693,7 +9693,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2022-12/November%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=366,005 vs published 364,875 (\u0394-1,130); \u03a3arabica=78,219 vs published 82,287 (\u0394+4,068)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=366,005 vs published 364,875 (\u0394-1,130); \u03a3arabica=78,219 vs published 82,287 (\u0394+4,068)",
         "grade-table sum 365,929 differs >5% from published export total 447,162"
       ]
     },
@@ -9956,7 +9956,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-01/December%202022.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=340,085 vs published 331,476 (\u0394-8,609); \u03a3arabica=75,392 vs published 87,353 (\u0394+11,961)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=340,085 vs published 331,476 (\u0394-8,609); \u03a3arabica=75,392 vs published 87,353 (\u0394+11,961)",
         "grade-table sum 332,703 differs >5% from published export total 418,829"
       ]
     },
@@ -10221,7 +10221,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-02/January%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=414,363 vs published 412,282 (\u0394-2,081); \u03a3arabica=79,244 vs published 81,944 (\u0394+2,700)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=414,363 vs published 412,282 (\u0394-2,081); \u03a3arabica=79,244 vs published 81,944 (\u0394+2,700)",
         "grade-table sum 426,424 differs >5% from published export total 494,226"
       ]
     },
@@ -10498,7 +10498,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-03/February%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=376,703 vs published 373,559 (\u0394-3,144); \u03a3arabica=101,006 vs published 105,087 (\u0394+4,081)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=376,703 vs published 373,559 (\u0394-3,144); \u03a3arabica=101,006 vs published 105,087 (\u0394+4,081)",
         "grade-table sum 337,800 differs >5% from published export total 478,646"
       ]
     },
@@ -10807,7 +10807,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-04/March%202023_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=369,383 vs published 365,613 (\u0394-3,770); \u03a3arabica=117,373 vs published 122,184 (\u0394+4,811)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=369,383 vs published 365,613 (\u0394-3,770); \u03a3arabica=117,373 vs published 122,184 (\u0394+4,811)",
         "grade-table sum 395,634 differs >5% from published export total 487,797"
       ]
     },
@@ -11070,7 +11070,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-05/April%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=243,585 vs published 238,636 (\u0394-4,949); \u03a3arabica=128,685 vs published 134,974 (\u0394+6,289)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=243,585 vs published 238,636 (\u0394-4,949); \u03a3arabica=128,685 vs published 134,974 (\u0394+6,289)",
         "grade-table sum 288,927 differs >5% from published export total 373,610"
       ]
     },
@@ -11341,7 +11341,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-06/May%202023_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=333,295 vs published 328,151 (\u0394-5,144); \u03a3arabica=118,896 vs published 125,018 (\u0394+6,122)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=333,295 vs published 328,151 (\u0394-5,144); \u03a3arabica=118,896 vs published 125,018 (\u0394+6,122)",
         "grade-table sum 375,454 differs >5% from published export total 453,169"
       ]
     },
@@ -11898,7 +11898,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-08/July%20%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=588,781 vs published 586,871 (\u0394-1,910); \u03a3arabica=55,719 vs published 58,961 (\u0394+3,242)"
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=588,781 vs published 586,871 (\u0394-1,910); \u03a3arabica=55,719 vs published 58,961 (\u0394+3,242)"
       ]
     },
     {
@@ -12190,7 +12190,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-09/August%202023_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=691,679 vs published 689,261 (\u0394-2,418); \u03a3arabica=50,836 vs published 54,256 (\u0394+3,420)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=691,679 vs published 689,261 (\u0394-2,418); \u03a3arabica=50,836 vs published 54,256 (\u0394+3,420)",
         "grade-table sum 677,901 differs >5% from published export total 743,517"
       ]
     },
@@ -12451,7 +12451,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-10/September%20%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=544,441 vs published 543,361 (\u0394-1,080); \u03a3arabica=32,628 vs published 33,712 (\u0394+1,084)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=544,441 vs published 543,361 (\u0394-1,080); \u03a3arabica=32,628 vs published 33,712 (\u0394+1,084)",
         "grade-table sum 523,082 differs >5% from published export total 577,073"
       ]
     },
@@ -12726,7 +12726,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-11/October%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=412,535 vs published 410,113 (\u0394-2,422); \u03a3arabica=56,182 vs published 59,967 (\u0394+3,785)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=412,535 vs published 410,113 (\u0394-2,422); \u03a3arabica=56,182 vs published 59,967 (\u0394+3,785)",
         "grade-table sum 433,562 differs >5% from published export total 470,080"
       ]
     },
@@ -13007,7 +13007,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2023-12/November%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=354,601 vs published 338,329 (\u0394-16,272); \u03a3arabica=69,510 vs published 87,197 (\u0394+17,687)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=354,601 vs published 338,329 (\u0394-16,272); \u03a3arabica=69,510 vs published 87,197 (\u0394+17,687)",
         "grade-table sum 362,617 differs >5% from published export total 425,526"
       ]
     },
@@ -13272,7 +13272,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-01/December%202023.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=341,155 vs published 337,026 (\u0394-4,129); \u03a3arabica=59,954 vs published 64,310 (\u0394+4,356)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=341,155 vs published 337,026 (\u0394-4,129); \u03a3arabica=59,954 vs published 64,310 (\u0394+4,356)",
         "grade-table sum 340,226 differs >5% from published export total 401,336"
       ]
     },
@@ -13555,7 +13555,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-02/January%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=407,790 vs published 403,508 (\u0394-4,282); \u03a3arabica=73,476 vs published 78,078 (\u0394+4,602)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=407,790 vs published 403,508 (\u0394-4,282); \u03a3arabica=73,476 vs published 78,078 (\u0394+4,602)",
         "grade-table sum 412,384 differs >5% from published export total 481,586"
       ]
     },
@@ -13844,7 +13844,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-03/February%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=379,292 vs published 372,407 (\u0394-6,885); \u03a3arabica=54,940 vs published 62,175 (\u0394+7,235)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=379,292 vs published 372,407 (\u0394-6,885); \u03a3arabica=54,940 vs published 62,175 (\u0394+7,235)",
         "grade-table sum 382,288 differs >5% from published export total 434,582"
       ]
     },
@@ -14139,7 +14139,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-04/March%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=249,613 vs published 244,975 (\u0394-4,638); \u03a3arabica=79,837 vs published 84,711 (\u0394+4,874)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=249,613 vs published 244,975 (\u0394-4,638); \u03a3arabica=79,837 vs published 84,711 (\u0394+4,874)",
         "grade-table sum 274,802 differs >5% from published export total 329,686"
       ]
     },
@@ -14450,7 +14450,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-05/April%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=296,391 vs published 290,037 (\u0394-6,354); \u03a3arabica=94,586 vs published 100,940 (\u0394+6,354)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=296,391 vs published 290,037 (\u0394-6,354); \u03a3arabica=94,586 vs published 100,940 (\u0394+6,354)",
         "grade-table sum 348,571 differs >5% from published export total 390,977"
       ]
     },
@@ -14741,7 +14741,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-07/May%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=480,428 vs published 473,693 (\u0394-6,735); \u03a3arabica=73,100 vs published 79,836 (\u0394+6,736)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=480,428 vs published 473,693 (\u0394-6,735); \u03a3arabica=73,100 vs published 79,836 (\u0394+6,736)",
         "grade-table sum 499,385 differs >5% from published export total 553,529"
       ]
     },
@@ -15018,7 +15018,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-07/June%202024_0.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=618,354 vs published 614,486 (\u0394-3,868); \u03a3arabica=48,601 vs published 52,551 (\u0394+3,950)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=618,354 vs published 614,486 (\u0394-3,868); \u03a3arabica=48,601 vs published 52,551 (\u0394+3,950)",
         "grade-table sum 603,956 differs >5% from published export total 667,037"
       ]
     },
@@ -15313,7 +15313,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-08/July%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=771,575 vs published 772,444 (\u0394+869); \u03a3arabica=47,714 vs published 49,149 (\u0394+1,435)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=771,575 vs published 772,444 (\u0394+869); \u03a3arabica=47,714 vs published 49,149 (\u0394+1,435)",
         "grade-table sum 779,536 differs >5% from published export total 821,593"
       ]
     },
@@ -15604,7 +15604,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-09/August%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=783,537 vs published 785,667 (\u0394+2,130); \u03a3arabica=50,829 vs published 52,248 (\u0394+1,419)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=783,537 vs published 785,667 (\u0394+2,130); \u03a3arabica=50,829 vs published 52,248 (\u0394+1,419)",
         "grade-table sum 773,401 differs >5% from published export total 837,915"
       ]
     },
@@ -16118,7 +16118,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-11/October%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=461,070 vs published 457,853 (\u0394-3,217); \u03a3arabica=35,084 vs published 38,967 (\u0394+3,883)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=461,070 vs published 457,853 (\u0394-3,217); \u03a3arabica=35,084 vs published 38,967 (\u0394+3,883)",
         "grade-table sum 427,558 differs >5% from published export total 496,820"
       ]
     },
@@ -16391,7 +16391,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2024-12/November%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=345,715 vs published 342,982 (\u0394-2,733); \u03a3arabica=53,220 vs published 57,554 (\u0394+4,334)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=345,715 vs published 342,982 (\u0394-2,733); \u03a3arabica=53,220 vs published 57,554 (\u0394+4,334)",
         "grade-table sum 349,611 differs >5% from published export total 400,536"
       ]
     },
@@ -16650,7 +16650,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-01/December%202024.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=369,655 vs published 365,853 (\u0394-3,802); \u03a3arabica=43,390 vs published 47,226 (\u0394+3,836)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=369,655 vs published 365,853 (\u0394-3,802); \u03a3arabica=43,390 vs published 47,226 (\u0394+3,836)",
         "grade-table sum 356,985 differs >5% from published export total 413,079"
       ]
     },
@@ -16917,7 +16917,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-02/04-January%202025%20Report%20%281%29.Final_.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=490,279 vs published 485,999 (\u0394-4,280); \u03a3arabica=59,795 vs published 64,342 (\u0394+4,547)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=490,279 vs published 485,999 (\u0394-4,280); \u03a3arabica=59,795 vs published 64,342 (\u0394+4,547)",
         "grade-table sum 454,955 differs >5% from published export total 550,341"
       ]
     },
@@ -17228,7 +17228,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-03/05-February%202025%20Report%20%281%29_Final.pdfI_.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=472,019 vs published 466,691 (\u0394-5,328); \u03a3arabica=83,237 vs published 89,065 (\u0394+5,828)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=472,019 vs published 466,691 (\u0394-5,328); \u03a3arabica=83,237 vs published 89,065 (\u0394+5,828)",
         "grade-table sum 472,553 differs >5% from published export total 555,756"
       ]
     },
@@ -18878,7 +18878,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-08/10-July%202025%20Report%20pptx..pdfI_.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=912,488 vs published 914,448 (\u0394+1,960); \u03a3arabica=82,307 vs published 82,657 (\u0394+350)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=912,488 vs published 914,448 (\u0394+1,960); \u03a3arabica=82,307 vs published 82,657 (\u0394+350)",
         "grade-table sum 939,295 differs >5% from published export total 997,105"
       ]
     },
@@ -19209,7 +19209,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2025-10/11-August%202025%20Report%20pptx%281%29%20%281%29%20%281%29.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=800,912 vs published 797,363 (\u0394-3,549); \u03a3arabica=52,212 vs published 58,078 (\u0394+5,866)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=800,912 vs published 797,363 (\u0394-3,549); \u03a3arabica=52,212 vs published 58,078 (\u0394+5,866)",
         "grade-table sum 784,478 differs >5% from published export total 855,441"
       ]
     },
@@ -20156,7 +20156,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-01/02-November%202025%20Report%20pptx%281%29%20%281%29.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=512,925 vs published 510,091 (\u0394-2,834); \u03a3arabica=127,085 vs published 130,237 (\u0394+3,152)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=512,925 vs published 510,091 (\u0394-2,834); \u03a3arabica=127,085 vs published 130,237 (\u0394+3,152)",
         "grade-table sum 596,190 differs >5% from published export total 640,328"
       ]
     },
@@ -20477,7 +20477,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-02/03-December%202025%20Report%20pptx.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=369,959 vs published 367,627 (\u0394-2,332); \u03a3arabica=130,946 vs published 134,955 (\u0394+4,009)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=369,959 vs published 367,627 (\u0394-2,332); \u03a3arabica=130,946 vs published 134,955 (\u0394+4,009)",
         "grade-table sum 403,533 differs >5% from published export total 502,582"
       ]
     },
@@ -20788,7 +20788,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-03/04-January%202026%20Report%20pptx%20%281%29_Final.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=451,332 vs published 447,599 (\u0394-3,733); \u03a3arabica=116,408 vs published 121,855 (\u0394+5,447)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=451,332 vs published 447,599 (\u0394-3,733); \u03a3arabica=116,408 vs published 121,855 (\u0394+5,447)",
         "grade-table sum 507,334 differs >5% from published export total 569,454"
       ]
     },
@@ -21131,7 +21131,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-04/05-February%202026%20Report%20pptx.pptx_final.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=512,436 vs published 512,237 (\u0394-199); \u03a3arabica=137,276 vs published 139,696 (\u0394+2,420)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=512,436 vs published 512,237 (\u0394-199); \u03a3arabica=137,276 vs published 139,696 (\u0394+2,420)",
         "grade-table sum 554,467 differs >5% from published export total 651,933"
       ]
     },
@@ -21466,7 +21466,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-05/06-March%202026%20Report%20pptx%281%29_Final.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=574,942 vs published 567,405 (\u0394-7,537); \u03a3arabica=95,222 vs published 103,747 (\u0394+8,525)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=574,942 vs published 567,405 (\u0394-7,537); \u03a3arabica=95,222 vs published 103,747 (\u0394+8,525)",
         "grade-table sum 591,418 differs >5% from published export total 671,152"
       ]
     },
@@ -21807,7 +21807,7 @@
       "parser_version": "v1_recent",
       "source_pdf": "https://ugandacoffee.go.ug/sites/default/files/2026-05/07-April%202026%20Report%20pptx%281%29%20%281%29.pdf",
       "parse_warnings": [
-        "destinations cross-check failed: \u03a3robusta=463,584 vs published 463,361 (\u0394-223); \u03a3arabica=124,437 vs published 128,326 (\u0394+3,889)",
+        "destinations cross-check residual (\u22641% of trade): \u03a3robusta=463,584 vs published 463,361 (\u0394-223); \u03a3arabica=124,437 vs published 128,326 (\u0394+3,889)",
         "grade-table sum 524,650 differs >5% from published export total 591,687"
       ]
     }
