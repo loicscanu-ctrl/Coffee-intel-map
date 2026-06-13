@@ -24,7 +24,7 @@
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
       "rate": 4836,
-      "prev": 3197,
+      "prev": 4841,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -60,19 +60,12 @@
       "from": "Santos",
       "to": "New York",
       "rate": 2851,
-      "prev": 2283,
+      "prev": 2845,
       "unit": "USD/FEU",
       "proxy": true
     }
   ],
   "history": [
-    {
-      "date": "2026-03-20",
-      "vn-eu": 2883,
-      "br-eu": 1672,
-      "et-eu": 2018,
-      "vn-us": 2039
-    },
     {
       "date": "2026-03-21",
       "vn-eu": 2870,

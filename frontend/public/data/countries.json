@@ -8,7 +8,7 @@
       "prod": "3,122k bags exp (2026-04)",
       "stock": "",
       "cons": "",
-      "intel": "Drought MED: Sul de Minas, Cerrado \u00b7 ENSO neutral (ONI 0.48)"
+      "intel": "Drought MED: Sul de Minas, Cerrado, Esp\u00edrito Santo \u00b7 ENSO neutral (ONI 0.48)"
     }
   },
   {
@@ -17,7 +17,7 @@
     "lng": 108.1,
     "name": "Vietnam",
     "data": {
-      "prod": "3,165k bags (2026-04)",
+      "prod": "2,384k bags (2026-05)",
       "stock": "",
       "cons": "",
       "intel": ""
@@ -68,7 +68,7 @@
       "prod": "592k bags (2026-04)",
       "stock": "",
       "cons": "",
-      "intel": "ENSO neutral (ONI 0.48) \u00b7 UCDA $163.48/cwt"
+      "intel": "ENSO neutral (ONI 0.48) \u00b7 UCDA $168.42/cwt"
     }
   },
   {
@@ -80,7 +80,7 @@
       "prod": "exports pending",
       "stock": "",
       "cons": "",
-      "intel": "ENSO neutral (ONI 0.48) \u00b7 ECX 404.0 ETB/kg"
+      "intel": "ENSO neutral (ONI 0.48) \u00b7 ECX 300.0 ETB/kg"
     }
   }
 ]

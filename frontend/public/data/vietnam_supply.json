@@ -1,16 +1,11 @@
 {
-  "scraped_at": "2026-06-12T07:27:36.965791Z",
+  "scraped_at": "2026-06-13T06:47:26.341164Z",
   "country": "vietnam",
   "exports": {
     "source": "Vietnam Customs (customs.gov.vn) 2x + Vietnam Customs (vn_export_destination_port)",
-    "last_updated": "2026-04",
+    "last_updated": "2026-05",
     "unit": "thousand_60kg_bags",
     "monthly": [
-      {
-        "month": "2023-05",
-        "total_k_bags": 2279.6,
-        "yoy_pct": 5.0
-      },
       {
         "month": "2023-06",
         "total_k_bags": 2151.1,
@@ -185,6 +180,11 @@
         "month": "2026-04",
         "total_k_bags": 3164.9,
         "yoy_pct": 14.0
+      },
+      {
+        "month": "2026-05",
+        "total_k_bags": 2383.5,
+        "yoy_pct": -3.9
       }
     ]
   },

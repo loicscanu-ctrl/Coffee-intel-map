@@ -219,6 +219,28 @@
       "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
     },
     {
+      "id": "CS1",
+      "name": "Backwardation Incentive",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "NY",
+      "severity": "info",
+      "score": 1,
+      "magnitude": "small",
+      "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS1",
+      "name": "Backwardation Incentive",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "LDN",
+      "severity": "info",
+      "score": 1,
+      "magnitude": "small",
+      "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
       "id": "SP1",
       "name": "Spreading Increase",
       "category": "SP",
@@ -236,6 +258,17 @@
       "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
     },
     {
+      "id": "SP3",
+      "name": "Spreading vs Inversion",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "NY",
+      "severity": "warn",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
+    },
+    {
       "id": "SP2",
       "name": "Spreading Decrease",
       "category": "SP",
@@ -245,42 +278,6 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=189.5]"
-    },
-    {
-      "id": "AGRO_indonesia_Lampung_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "indonesia/Lampung: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=52.1]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=56.2]"
     }
   ],
   "history": [
@@ -2615,6 +2612,28 @@
           "text": "Funds reducing while roasters opportunistically add coverage into weakness — puts a floor under the price decline."
         },
         {
+          "id": "CS1",
+          "name": "Backwardation Incentive",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "NY",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "small",
+          "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS1",
+          "name": "Backwardation Incentive",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "LDN",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "small",
+          "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
           "id": "SP1",
           "name": "Spreading Increase",
           "category": "SP",
@@ -2630,6 +2649,17 @@
             }
           ],
           "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
+        },
+        {
+          "id": "SP3",
+          "name": "Spreading vs Inversion",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "NY",
+          "severity": "warn",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         },
         {
           "id": "SP2",
@@ -2649,5 +2679,5 @@
       "priceLDN": 3230
     }
   ],
-  "generatedAt": "2026-06-13T06:10:41.941Z"
+  "generatedAt": "2026-06-13T06:47:38.719Z"
 }
