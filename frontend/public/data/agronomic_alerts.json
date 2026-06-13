@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-12T06:27:53+00:00",
+  "generated_at": "2026-06-13T06:10:41+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,7 +12,22 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 182.1
+            "forecast_7d_rain": 189.5
+          }
+        }
+      ]
+    },
+    "indonesia": {
+      "Lampung": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.26,
+            "forecast_7d_rain": 52.1
           }
         }
       ]
@@ -27,19 +42,19 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.17,
-            "forecast_7d_rain": 74.3
+            "forecast_7d_rain": 56.2
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 2,
+    "total_alerts": 3,
     "by_severity": {
-      "watch": 2
+      "watch": 3
     },
     "by_threat": {
-      "blossom_drop": 2
+      "blossom_drop": 3
     }
   }
 }
