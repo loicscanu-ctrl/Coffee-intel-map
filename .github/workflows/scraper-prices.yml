@@ -26,8 +26,12 @@ jobs:
         working-directory: backend
         run: pip install sqlalchemy psycopg2-binary pandas yfinance requests python-dotenv
 
-      - name: Run prices scraper
+      - name: Run prices scraper (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.run_prices
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.run_prices && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done

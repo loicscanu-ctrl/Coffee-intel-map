@@ -30,9 +30,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install requests
 
-      - name: Run PortWatch port-activity scraper
+      - name: Run PortWatch port-activity scraper (3 attempts)
         working-directory: backend
-        run: python -m scraper.run_port_activity
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.run_port_activity && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated port activity if changed
         run: |
