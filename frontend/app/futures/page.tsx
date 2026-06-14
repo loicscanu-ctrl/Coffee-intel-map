@@ -1,9 +1,11 @@
 "use client";
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import OIFndChart from "@/components/futures/OIFndChart";
 import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
 import PageHeader from "@/components/PageHeader";
+import { fmtNum as fmt } from "@/lib/formatters";
+import { useFetchJson } from "@/lib/useFetchJson";
 import { useUrlState } from "@/lib/useUrlState";
 
 type FuturesTab = "price" | "quotation";
@@ -18,8 +20,6 @@ interface Contract {
   volume: number;
   symbol: string;
 }
-
-function fmt(n: number) { return n?.toLocaleString() ?? "—"; }
 
 // ─── First Notice Day ─────────────────────────────────────────────────────────
 
@@ -743,26 +743,21 @@ export default function FuturesPage() {
 }
 
 function FuturesPageInner() {
-  const [chainJson, setChainJson]   = useState<FuturesChainJson | null>(null);
-  const [vnFaqUsdMt, setVnFaqUsdMt] = useState<number | null>(null);
-  const [tab, setTab]               = useUrlState<FuturesTab>("tab", "price", (raw) =>
+  const [tab, setTab] = useUrlState<FuturesTab>("tab", "price", (raw) =>
     (FUTURES_TABS as string[]).includes(raw) ? (raw as FuturesTab) : "price"
   );
 
-  // Chain data: instant from static JSON, no backend needed
-  useEffect(() => {
-    fetch("/data/futures_chain.json")
-      .then(r => r.json())
-      .then(setChainJson)
-      .catch(() => setChainJson({ arabica: null, robusta: null }));
-  }, []);
+  // Static JSON, no backend needed. useFetchJson handles AbortController +
+  // error states; on fetch failure we fall back to an empty chain so the
+  // page still renders.
+  const { data: chainData, error: chainError } =
+    useFetchJson<FuturesChainJson>("/data/futures_chain.json");
+  const chainJson: FuturesChainJson | null =
+    chainError ? { arabica: null, robusta: null } : chainData;
 
-  useEffect(() => {
-    fetch("/data/vn_physical_prices.json")
-      .then(r => r.json())
-      .then((d: { vn_faq?: { usd_per_mt?: number } }) => { if (d?.vn_faq?.usd_per_mt) setVnFaqUsdMt(d.vn_faq.usd_per_mt); })
-      .catch((err) => console.error("[FuturesPage] vn_physical_prices fetch failed:", err));
-  }, []);
+  const { data: vnFaqData } =
+    useFetchJson<{ vn_faq?: { usd_per_mt?: number } }>("/data/vn_physical_prices.json");
+  const vnFaqUsdMt = vnFaqData?.vn_faq?.usd_per_mt ?? null;
 
   const arabicaChain = chainJson?.arabica ?? null;
   const robustaChain = chainJson?.robusta ?? null;

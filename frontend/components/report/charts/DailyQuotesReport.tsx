@@ -6,13 +6,13 @@
  * report uses the Barchart feed (not the ACAPHE live widget).
  */
 import { useEffect, useState } from "react";
+import { fmtNum as fmt } from "@/lib/formatters";
 
 interface Contract {
   contract: string; expiry: string; last: number; chg: number; oi: number; volume: number; symbol: string;
 }
 interface ChainData { pub_date: string; contracts: Contract[] }
 
-const fmt = (n: number) => n?.toLocaleString() ?? "—";
 const LETTER_TO_MONTH: Record<string, number> = { F: 1, G: 2, H: 3, J: 4, K: 5, M: 6, N: 7, Q: 8, U: 9, V: 10, X: 11, Z: 12 };
 
 function firstBusinessDay(year: number, month: number): Date {

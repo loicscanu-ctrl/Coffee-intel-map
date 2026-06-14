@@ -15,6 +15,8 @@ import {
   AreaChart, Area, Bar, ComposedChart, Line,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
+import { fmtNumRounded as fmtNum } from "@/lib/formatters";
+
 import CohortExplainer from "./CohortExplainer";
 
 // ── Data shapes (subset of the rich JSON — only what this view consumes) ─────
@@ -66,8 +68,6 @@ const KG_PER_BAG = 60;
 const TONNES_PER_LOT = 10;
 const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67
 
-const fmtNum = (n: number): string =>
-  Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : "—";
 const fmtShortDate = (iso: string): string => {
   const d = new Date(iso);
   return d.toLocaleString("en-US", { month: "short", day: "2-digit" });

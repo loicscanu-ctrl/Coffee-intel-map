@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { fmtAgo } from "@/lib/formatters";
 
 interface SentimentItem {
   headline: string;
@@ -33,12 +34,6 @@ const SENT_BAR = {
   Neutral: "bg-slate-600",
 };
 
-function fmtAgo(iso: string): string {
-  const h = (Date.now() - Date.parse(iso)) / 3_600_000;
-  if (h < 1)  return `${Math.round(h * 60)}m ago`;
-  if (h < 24) return `${Math.round(h)}h ago`;
-  return `${Math.round(h / 24)}d ago`;
-}
 
 export default function SentimentSection() {
   const [data, setData] = useState<SentimentData | null>(null);
