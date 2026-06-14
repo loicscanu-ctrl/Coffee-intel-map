@@ -58,6 +58,30 @@ def test_upsert_rolls_back_on_commit_error():
     db.rollback.assert_called_once()
 
 
+def test_upsert_replace_branch_is_single_transaction():
+    """In the replace branch (tags=price+futures), DELETE+INSERT must be a
+    single transaction. The pre-fix shape committed the DELETE first, then
+    attempted the INSERT — a failed INSERT permanently lost the deleted row.
+    The new shape queues both halves and commits once, so rollback reverts
+    both. Locks the contract in via call_count."""
+    db = make_db()
+    db.commit.side_effect = Exception("DB error on commit")
+    upsert_news_item(db, {
+        "title": "ICE Arabica – 2026-03-09",
+        "body": "Settlement: 220.50 USc/lb",
+        "source": "Barchart",
+        "category": "general",
+        "lat": 0.0,
+        "lng": 0.0,
+        "tags": ["futures", "price"],   # triggers the replace branch
+    })
+    # Exactly one commit attempt — not the pre-fix pattern of two commits with
+    # the first one (the DELETE) succeeding before the second one (the INSERT)
+    # blew up.
+    assert db.commit.call_count == 1
+    db.rollback.assert_called_once()
+
+
 # ── extract_physical_price: structured price_data (Phase 1) ───────────────────
 
 def test_extract_prefers_structured_price_data():

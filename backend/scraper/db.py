@@ -24,26 +24,28 @@ def get_session():
 
 def upsert_news_item(db, item: dict):
     from models import NewsItem
-    # For price items, replace any existing entry from the same source
+    # Replace+insert run in a SINGLE transaction. The previous shape committed
+    # the DELETE before attempting the INSERT, so a failed INSERT could not
+    # roll the DELETE back — the row was permanently lost. By queuing the
+    # DELETE alongside the ADD and committing once at the end, a rollback now
+    # reverts both halves atomically.
     tags = item.get("tags", [])
     replace_tags = {"price", "cot", "futures_chain"}
-    if "futures" in tags and "price" in tags and item.get("source"):
-        # Futures chain: keep history — only replace same-date entry (title includes date)
-        (db.query(NewsItem)
-           .filter(NewsItem.title == item["title"])
-           .delete(synchronize_session=False))
-        db.commit()
-    elif replace_tags.intersection(tags) and item.get("source"):
-        # Other price items: replace by source + title prefix (no history needed)
-        title_prefix = item["title"].split("–")[0].strip()
-        (db.query(NewsItem)
-           .filter(NewsItem.source == item["source"],
-                   NewsItem.title.like(f"{title_prefix}%"))
-           .delete(synchronize_session=False))
-        db.commit()
-    elif db.query(NewsItem).filter_by(title=item["title"]).first():
-        return
     try:
+        if "futures" in tags and "price" in tags and item.get("source"):
+            # Futures chain: keep history — only replace same-date entry (title includes date)
+            (db.query(NewsItem)
+               .filter(NewsItem.title == item["title"])
+               .delete(synchronize_session=False))
+        elif replace_tags.intersection(tags) and item.get("source"):
+            # Other price items: replace by source + title prefix (no history needed)
+            title_prefix = item["title"].split("–")[0].strip()
+            (db.query(NewsItem)
+               .filter(NewsItem.source == item["source"],
+                       NewsItem.title.like(f"{title_prefix}%"))
+               .delete(synchronize_session=False))
+        elif db.query(NewsItem).filter_by(title=item["title"]).first():
+            return
         db.add(NewsItem(
             title=item["title"],
             body=item.get("body", ""),
@@ -58,7 +60,7 @@ def upsert_news_item(db, item: dict):
         db.commit()
     except Exception as e:
         db.rollback()
-        print(f"[db] Failed to insert '{item.get('title')}': {e}")
+        print(f"[db] Failed to upsert '{item.get('title')}': {e}", file=sys.stderr, flush=True)
 
 def upsert_freight_rate(index_code: str, rate_date, rate: float):
     from models import FreightRate

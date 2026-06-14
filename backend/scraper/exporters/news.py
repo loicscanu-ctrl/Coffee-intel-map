@@ -1,5 +1,4 @@
 """News-feed static export."""
-import json
 from datetime import datetime, timedelta
 
 from models import (
@@ -7,6 +6,7 @@ from models import (
 )
 from scraper.commentary import extract_commentary_from_meta
 from scraper.exporters.base import OUT_DIR
+from scraper.validate_export import safe_write_json
 
 
 def export_news(db) -> None:
@@ -38,6 +38,10 @@ def export_news(db) -> None:
         if commentary is not None:
             item["commentary"] = commentary
         items.append(item)
-    (OUT_DIR / "news.json").write_text(json.dumps(items, indent=2), encoding="utf-8")
+    safe_write_json(
+        OUT_DIR / "news.json",
+        items,
+        lambda d: (isinstance(d, list) and len(d) > 0, "empty news feed"),
+    )
     n_commentary = sum(1 for it in items if "commentary" in it)
     print(f"  news.json → {len(items)} items ({n_commentary} with commentary)")

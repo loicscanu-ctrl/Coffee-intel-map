@@ -27,9 +27,14 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+# Make backend/ importable so we can pull the shared safe_write_json helper.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 import numpy as np
 import pandas as pd
 import requests
+
+from scraper.validate_export import safe_write_json
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -341,8 +346,10 @@ def main():
     existing["currency_index"] = cci_output
     existing["scraped_at"]     = scraped_at
 
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(existing, f, indent=2)
+    safe_write_json(
+        OUT_PATH, existing,
+        lambda d: (d.get("currency_index") is not None, "missing currency_index"),
+    )
 
     print(f"\nCCI = {today_value:.2f}  ΔI = {total_delta_i:+.4f}  Z = {zscore:+.2f}")
     print(f"Saved → {OUT_PATH}")
@@ -388,8 +395,10 @@ def main():
         "history_days": FX_HISTORY_DAYS,
         "pairs":        fx_pairs,
     }
-    with open(FX_OUT, "w", encoding="utf-8") as f:
-        json.dump(fx_output, f, indent=2)
+    safe_write_json(
+        FX_OUT, fx_output,
+        lambda d: (bool(d.get("pairs")), "no fx pairs"),
+    )
     print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs)")
 
 
