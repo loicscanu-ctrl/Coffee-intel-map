@@ -1,5 +1,137 @@
 [
   {
+    "id": 7033,
+    "title": "Ethiopia Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 9.15,
+    "lng": 40.49,
+    "tags": [
+      "weather",
+      "ethiopia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:11.272902",
+    "commentary": {
+      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7032,
+    "title": "Uganda Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 1.37,
+    "lng": 32.29,
+    "tags": [
+      "weather",
+      "uganda",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:10.763514",
+    "commentary": {
+      "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7031,
+    "title": "Indonesia Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -2.55,
+    "lng": 118.01,
+    "tags": [
+      "weather",
+      "indonesia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:10.254466",
+    "commentary": {
+      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7030,
+    "title": "Honduras Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 14.07,
+    "lng": -87.2,
+    "tags": [
+      "weather",
+      "honduras",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:09.745684",
+    "commentary": {
+      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7029,
+    "title": "Colombia Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 4.71,
+    "lng": -74.07,
+    "tags": [
+      "weather",
+      "colombia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:09.236396",
+    "commentary": {
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7028,
+    "title": "Brazil Agronomic Status \u2013 2026-06-14",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -15.78,
+    "lng": -47.93,
+    "tags": [
+      "weather",
+      "brazil",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-14T06:29:06.732353",
+    "commentary": {
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 7027,
     "title": "World Bank Population \u2013 2026-06-14",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3432,95 +3564,5 @@
     ],
     "meta": null,
     "pub_date": "2026-06-06T05:04:00.505217"
-  },
-  {
-    "id": 6344,
-    "title": "USD/UGX FX Rate \u2013 2026-06-06",
-    "body": "USD/UGX FX Rate price: 3737",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "fx",
-      "uganda"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-06T05:03:47.687147"
-  },
-  {
-    "id": 6343,
-    "title": "USD/HNL FX Rate \u2013 2026-06-06",
-    "body": "USD/HNL FX Rate price: 26.5943",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-06T05:03:46.517826"
-  },
-  {
-    "id": 6342,
-    "title": "USD/IDR FX Rate \u2013 2026-06-06",
-    "body": "USD/IDR FX Rate price: 18089",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -0.789,
-    "lng": 113.921,
-    "tags": [
-      "fx",
-      "indonesia"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-06T05:03:45.347899"
-  },
-  {
-    "id": 6341,
-    "title": "USD/VND FX Rate \u2013 2026-06-06",
-    "body": "USD/VND FX Rate price: 26268",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "fx",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-06T05:03:44.176902"
-  },
-  {
-    "id": 6340,
-    "title": "USD/BRL FX Rate \u2013 2026-06-06",
-    "body": "USD/BRL FX Rate price: 5.0685",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "fx",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-06T05:03:42.995543"
-  },
-  {
-    "id": 6355,
-    "title": "The Alliance For Coffee Excellence Has Suspended The Taiwan Cup Of Excellence",
-    "body": "The auction has been held annually since 2023.",
-    "source": "Sprudge",
-    "category": "general",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/the-alliance-for-coffee-excellence-has-suspended-the-taiwan-cup-of-excellence-1043306.html",
-    "pub_date": "2026-06-05T16:20:04"
   }
 ]
