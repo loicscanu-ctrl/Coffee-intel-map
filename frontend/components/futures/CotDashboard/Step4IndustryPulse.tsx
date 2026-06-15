@@ -79,15 +79,17 @@ export default function Step4IndustryPulse({ data }: { data: ProcessedCotRow[] }
     return (
       <div>
         {/* Panel A — levels (lines, no Area fill) */}
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[300px] mb-3">
+        <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl h-[300px] mb-3">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={windowed}>
+            <ComposedChart data={windowed} margin={{ top: 8, right: 6, bottom: 4, left: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
               <XAxis dataKey="date" stroke="#475569" fontSize={10}
                 tickFormatter={v => windowWeeks > 52 ? v.slice(0, 7) : v.slice(5)} />
-              <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain}
-                label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
-              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} />
+              {/* Tight axis widths (no rotated "MT" title — the section is titled
+                  "Metric Tons" and ticks carry the k suffix) so the plot isn't
+                  boxed in by left+right gutters. */}
+              <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickFormatter={mtFmt} domain={mtDomain} width={34} />
+              <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} domain={priceDomain} width={36} />
               <Tooltip contentStyle={CHART_STYLE} formatter={((v, name) => [
                 name === "Price" ? Number(v).toFixed(0) : `${(Number(v) / 1000).toFixed(1)}k MT`, name as NameType,
               ]) satisfies Formatter<ValueType, NameType>} />
@@ -144,14 +146,13 @@ export default function Step4IndustryPulse({ data }: { data: ProcessedCotRow[] }
           </ResponsiveContainer>
         </div>
         {/* Panel B — weekly deltas (bars), colors match Panel A */}
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[240px]">
+        <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl h-[240px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={deltaData}>
+            <ComposedChart data={deltaData} margin={{ top: 8, right: 6, bottom: 4, left: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
               <XAxis dataKey="date" stroke="#475569" fontSize={10}
                 tickFormatter={v => windowWeeks > 52 ? v.slice(0, 7) : v.slice(5)} />
-              <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt}
-                label={{ value: "MT", angle: -90, position: "insideLeft", offset: 10, fill: "#475569", fontSize: 9 }} />
+              <YAxis stroke="#475569" fontSize={10} tickFormatter={mtFmt} width={34} />
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="4 4" />
               <Tooltip contentStyle={CHART_STYLE} formatter={((v, name) => [`${(Number(v) / 1000).toFixed(1)}k MT`, name as NameType]) satisfies Formatter<ValueType, NameType>} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
