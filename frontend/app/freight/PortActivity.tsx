@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { useFetchJson } from "@/lib/useFetchJson";
 import type { SeasonalRow } from "./FreightCharts";
 import { VESSEL_TYPE_META, VESSEL_TYPE_KEYS, type VesselTypeKey } from "./vesselTypes";
 import { calIdx, MONTHS } from "./seasonal";
@@ -32,8 +33,6 @@ type PortActivityIndex = {
 };
 
 export default function PortActivity() {
-  const [data, setData] = useState<PortActivityIndex | null>(null);
-  const [loaded, setLoaded] = useState(false);
   const [portKey, setPortKey] = useState<string>("");
   const [metric, setMetric] = useState<MetricKey>("portcalls");
   // Both views are seasonal calendar overlays: "daily" = per-day; "cumulative"
@@ -49,25 +48,26 @@ export default function PortActivity() {
       cur.includes(k) ? cur.filter((t) => t !== k) : [...VESSEL_TYPE_KEYS.filter((t) => cur.includes(t) || t === k)],
     );
 
-  // Load the lightweight index up front.
-  useEffect(() => {
-    fetch("/data/port_activity/index.json")
-      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: PortActivityIndex) => { setData(d); setPortKey(d.ports?.[0]?.key ?? ""); })
-      .catch(() => {})
-      .finally(() => setLoaded(true));
-  }, []);
+  // Lightweight index — useFetchJson handles AbortController + error states.
+  const { data, loading: idxLoading, error: idxError } =
+    useFetchJson<PortActivityIndex>("/data/port_activity/index.json");
+  const loaded = !idxLoading || idxError !== null;
 
-  // Fetch the selected port's series on demand (once).
+  // Seed portKey with the first port once the index has resolved (one-shot).
   useEffect(() => {
-    if (!portKey || portCache[portKey]) return;
-    let cancelled = false;
-    fetch(`/data/port_activity/${portKey}.json`)
-      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((p: Port) => { if (!cancelled) setPortCache((c) => ({ ...c, [p.key]: p })); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [portKey, portCache]);
+    if (data && !portKey) setPortKey(data.ports?.[0]?.key ?? "");
+  }, [data, portKey]);
+
+  // Per-port series fetched lazily. Pass null to skip when the cache already
+  // holds the series — useFetchJson aborts the previous request when portKey
+  // changes mid-flight.
+  const needsFetch = portKey && !portCache[portKey];
+  const { data: fetchedPort } = useFetchJson<Port>(
+    needsFetch ? `/data/port_activity/${portKey}.json` : null,
+  );
+  useEffect(() => {
+    if (fetchedPort) setPortCache((c) => ({ ...c, [fetchedPort.key]: fetchedPort }));
+  }, [fetchedPort]);
 
   const port = portCache[portKey];
   const portMeta = useMemo(

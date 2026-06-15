@@ -1,12 +1,9 @@
 "use client";
 import React from "react";
+import { fmtAttr } from "@/lib/formatters";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { SECTOR_LABELS_ATTR, SECTOR_ORDER_ATTR } from "./constants";
 
-function fmtAttr(n: number | null): string {
-  if (n == null) return "—";
-  return (n >= 0 ? "+" : "") + n.toFixed(2) + "B";
-}
 function attrColor(n: number | null): string {
   if (n == null) return "#6b7280";
   return n >= 0 ? "#10b981" : "#ef4444";

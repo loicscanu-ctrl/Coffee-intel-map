@@ -5,6 +5,8 @@ import {
   Legend, CartesianGrid, ReferenceLine,
 } from "recharts";
 
+import { fmtDateLabel } from "@/lib/formatters";
+
 interface HistoryPoint {
   date:  string;
   price: number;
@@ -38,11 +40,6 @@ type Window = "1M" | "3M" | "6M" | "1Y" | "2Y";
 const WINDOW_DAYS: Record<Window, number> = {
   "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "2Y": 730,
 };
-
-function fmtDateLabel(d: string): string {
-  const [, m, day] = d.split("-");
-  return `${m}/${day}`;
-}
 
 function fmtNative(price: number, unit: string, currency: string): string {
   const big = Math.abs(price) >= 1000;

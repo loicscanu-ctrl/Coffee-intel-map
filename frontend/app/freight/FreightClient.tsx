@@ -1,7 +1,8 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
+import { useFetchJson } from "@/lib/useFetchJson";
 import PortActivity from "./PortActivity";
 
 // Charts carry the heavy recharts dependency — lazy-load them (client-only) so
@@ -128,16 +129,10 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 }
 
 export default function FreightClient({ data }: Props) {
-  const [dryBulk, setDryBulk] = useState<DryBulkData | null>(null);
-  const [dryLoaded, setDryLoaded] = useState(false);
-
-  useEffect(() => {
-    fetch("/data/farmer_economics.json")
-      .then(r => r.json())
-      .then(d => setDryBulk(d.fertilizer?.dry_bulk ?? null))
-      .catch((err) => console.error("[FreightClient] fetch failed:", err))
-      .finally(() => setDryLoaded(true));
-  }, []);
+  const { data: farmerEcon, loading: dryLoading, error: dryError } =
+    useFetchJson<{ fertilizer?: { dry_bulk?: DryBulkData } }>("/data/farmer_economics.json");
+  const dryBulk: DryBulkData | null = farmerEcon?.fertilizer?.dry_bulk ?? null;
+  const dryLoaded = !dryLoading || dryError !== null;
 
   return (
     <div className="h-full overflow-y-auto">

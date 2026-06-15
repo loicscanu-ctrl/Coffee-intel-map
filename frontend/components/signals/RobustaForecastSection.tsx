@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { fmtAgo } from "@/lib/formatters";
 
 interface FactorRow {
   label: string;
@@ -62,12 +63,6 @@ function QuantileBar({ value }: { value: number }) {
   );
 }
 
-function fmtAgo(iso: string): string {
-  const h = (Date.now() - Date.parse(iso)) / 3_600_000;
-  if (h < 1)  return `${Math.round(h * 60)}m ago`;
-  if (h < 24) return `${Math.round(h)}h ago`;
-  return `${Math.round(h / 24)}d ago`;
-}
 
 export default function RobustaForecastSection() {
   const [data, setData] = useState<RobustaData | null>(null);

@@ -10,6 +10,7 @@
  *     Sold = Σ sold; Decertified = Σ max(0, prevTotal − curTotal).
  */
 import { useEffect, useState } from "react";
+import { fmtNumRounded as fmt, MONTH_ABBR as MONTHS } from "@/lib/formatters";
 
 interface ArabicaSnap { date: string; total_bags: number; passed_today_bags?: number; failed_today_bags?: number }
 interface RobustaSnap { date: string; total_lots_certified: number; lots_graded_today?: number; lots_sold_today?: number }
@@ -20,8 +21,6 @@ const dayT = (ds: string) => {
   const [y, m, d] = ds.slice(0, 10).split("-").map(Number);
   return new Date(y, m - 1, d).getTime();
 };
-const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function Tile({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
