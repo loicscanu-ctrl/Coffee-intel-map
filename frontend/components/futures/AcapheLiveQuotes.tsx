@@ -180,7 +180,6 @@ function ChainTable({
           <span className="font-semibold text-sm text-white">Live Quotes</span>
           <span className={`text-xs ml-2 ${accent}`}>{title}</span>
         </div>
-        <span className="text-xs text-slate-500 whitespace-nowrap ml-2">acaphe.com</span>
       </div>
 
       <table className="w-full text-[11px] font-mono">
