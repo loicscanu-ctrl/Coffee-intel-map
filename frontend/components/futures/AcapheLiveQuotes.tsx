@@ -377,7 +377,7 @@ export default function AcapheLiveQuotes() {
   if (error && !data) {
     return (
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-6 text-center">
-        <p className="text-slate-400 text-sm mb-2">Live acaphe.com quotes not available.</p>
+        <p className="text-slate-400 text-sm mb-2">Live quotes not available.</p>
         <p className="text-slate-600 text-xs font-mono">python backend/scraper/acaphe_poller.py</p>
       </div>
     );
