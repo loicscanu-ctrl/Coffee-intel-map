@@ -197,7 +197,7 @@ export default function PortActivity() {
           <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Port Activity — IMF PortWatch
           </div>
-          <div className="text-[9px] text-slate-600 mt-0.5">
+          <div className="text-[9px] text-slate-500 mt-0.5">
             Satellite-tracked vessel calls &amp; trade-volume estimates at coffee export gateways
           </div>
         </div>
@@ -280,7 +280,7 @@ export default function PortActivity() {
 
           {/* Vessel-type filter — toggle which types are shown/summed */}
           <div className="flex items-center flex-wrap gap-1.5">
-            <span className="text-[9px] text-slate-600 uppercase tracking-wider mr-1">Vessel types</span>
+            <span className="text-[9px] text-slate-500 uppercase tracking-wider mr-1">Vessel types</span>
             {VESSEL_TYPE_META.map((t) => {
               const on = activeTypes.includes(t.key);
               return (
@@ -291,7 +291,7 @@ export default function PortActivity() {
                   className={`flex items-center gap-1 px-2 py-0.5 text-[10px] rounded-full border transition-colors ${
                     on
                       ? "border-slate-600 bg-slate-800 text-slate-200"
-                      : "border-slate-800 bg-transparent text-slate-600 hover:text-slate-400"
+                      : "border-slate-800 bg-transparent text-slate-500 hover:text-slate-400"
                   }`}
                 >
                   <span
@@ -351,7 +351,7 @@ export default function PortActivity() {
             </div>
           ) : null}
 
-          <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">
+          <div className="text-[9px] text-slate-500 italic border-t border-slate-800 pt-2 flex justify-between flex-wrap gap-1">
             <span>{portMeta.name} ({portMeta.portid}) — {portMeta.note}</span>
             <span>
               Source: {data.source}
