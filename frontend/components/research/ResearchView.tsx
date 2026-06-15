@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
+import { FOBBING_USD } from "@/lib/originCosts";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 
@@ -557,7 +558,7 @@ function OriginLogistics() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Vietnam · Dak Lak / Central Highlands</div>
         <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
-          VN FAQ Robusta — FOBbing cost ~$100/t
+          VN FAQ Robusta — FOBbing cost ~${FOBBING_USD["VN FAQ"]}/t
         </h3>
         <P>
           Vietnam runs the tightest logistics chain of the three origins. The port of Cat Lai (Ho Chi Minh City) is
@@ -584,7 +585,7 @@ function OriginLogistics() {
           <CostRow label="Exporter margin" cost="~35" note="~1% of FOB value on ~$3,500 reference price" />
           <tr className="border-t border-slate-600 font-semibold">
             <td className="pt-2 text-slate-200">Total</td>
-            <td className="pt-2 text-right font-mono text-amber-300">~100</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~{FOBBING_USD["VN FAQ"]}</td>
             <td className="pt-2 text-slate-500 text-[11px]">~2.9% of $3,500 reference price</td>
           </tr>
         </CostTable>
@@ -599,7 +600,7 @@ function OriginLogistics() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Brazil · Espírito Santo / Rondônia</div>
         <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
-          CON T7 Conilon — FOBbing cost ~$200/t
+          CON T7 Conilon — FOBbing cost ~${FOBBING_USD["CON T7"]}/t
         </h3>
         <P>
           Brazil&#39;s larger figure reflects a structural cost that Vietnam doesn&#39;t face: <strong>quality
@@ -618,7 +619,7 @@ function OriginLogistics() {
           <CostRow label="Exporter margin" cost="~30" note="~1% of FOB price; the competitive floor for origin traders" />
           <tr className="border-t border-slate-600 font-semibold">
             <td className="pt-2 text-slate-200">Total</td>
-            <td className="pt-2 text-right font-mono text-amber-300">~200</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~{FOBBING_USD["CON T7"]}</td>
             <td className="pt-2 text-slate-500 text-[11px]">~6.5% of $3,000 reference price</td>
           </tr>
         </CostTable>
@@ -634,7 +635,7 @@ function OriginLogistics() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Uganda · Western / Central Region</div>
         <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
-          UGA S15 Robusta — FOBbing cost ~$265/t
+          UGA S15 Robusta — FOBbing cost ~${FOBBING_USD["UGA S15"]}/t
         </h3>
         <P>
           Uganda&#39;s logistics cost is dominated by one line: the <strong>Northern Corridor</strong>. As a
@@ -654,7 +655,7 @@ function OriginLogistics() {
           <CostRow label="Exporter margin" cost="~37" note="~1% of FOB value on ~$3,700 reference price (UGA S15)" />
           <tr className="border-t border-slate-600 font-semibold">
             <td className="pt-2 text-slate-200">Total</td>
-            <td className="pt-2 text-right font-mono text-amber-300">~265</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~{FOBBING_USD["UGA S15"]}</td>
             <td className="pt-2 text-slate-500 text-[11px]">~7% of $3,700 reference price</td>
           </tr>
         </CostTable>

@@ -5,6 +5,7 @@ import OIFndChart from "@/components/futures/OIFndChart";
 import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
 import PageHeader from "@/components/PageHeader";
 import { fmtNum as fmt } from "@/lib/formatters";
+import { FOBBING_USD, MONTHLY_CARRY_USD } from "@/lib/originCosts";
 import { useFetchJson } from "@/lib/useFetchJson";
 import { useUrlState } from "@/lib/useUrlState";
 
@@ -250,7 +251,12 @@ interface ShippingMonth {
 
 interface MonthWithBasis extends ShippingMonth {
   contractLetter: string;
-  basisForMonth:  number;
+  // Flat at-port price for this shipment month (USD/MT). null if its contract
+  // price is unavailable.
+  flat:           number | null;
+  // Differential vs this month's own contract (flat − contract price). null when
+  // the flat or contract price is missing.
+  basisForMonth:  number | null;
 }
 
 // Robusta crop year identifier: the calendar year of the X (Nov delivery)
@@ -288,48 +294,53 @@ function getTransitions(months: ShippingMonth[]): { from: string; to: string; ke
   return result;
 }
 
-// Walks the months array applying basisDiff to the front contract, basis2Diff
-// to the next contract (the editable one), and auto-rolling the market spread
-// for any 3rd+ contract transition. Within a single contract, applies +30
-// USD/MT per shipment month carry. Spreads are read from priceByKey using each
-// month's priceKey (letter+year), so every contract switch incorporates the
-// price difference between the two real contracts.
-function computeMonthsBasis(
-  months:     ShippingMonth[],
-  basisDiff:  number,
-  basis2Diff: number,
-  priceByKey: Record<string, number>,
+// Flat-price model. The front shipping month's at-port flat price (flatFront =
+// VN FAQ USD/MT + origin FOBbing) ramps by `carry` USD/MT every shipment month,
+// continuously across the whole crop (it does NOT reset at contract rolls). Each
+// month's differential is then flat − that month's own contract price, so the
+// calendar spread is incorporated automatically (no manual spread roll).
+//
+// The two basis boxes act as manual overrides: a non-null frontBasisOverride
+// re-anchors the flat at the front contract (flat = override + front price); a
+// non-null nextBasisOverride re-anchors it at the first non-front contract. From
+// each anchor the carry ramp and the flat→differential conversion continue.
+function computeMonthsFlat(
+  months:             ShippingMonth[],
+  flatFront:          number,
+  carry:              number,
+  priceByKey:         Record<string, number>,
+  frontBasisOverride: number | null,
+  nextBasisOverride:  number | null,
 ): MonthWithBasis[] {
-  let activeBasis    = basisDiff;
-  let activeStartIdx = 0;
-  let contractIdx    = 0;
-  let lastKey        = months[0]?.priceKey ?? "";
+  let lastKey     = months[0]?.priceKey ?? "";
+  let contractIdx = 0;
+  const frontPrice = priceByKey[lastKey];
+  let flat = (frontBasisOverride != null && frontPrice != null)
+    ? frontBasisOverride + frontPrice
+    : flatFront;
   return months.map((m, i) => {
-    if (m.priceKey !== lastKey) {
-      contractIdx += 1;
-      activeStartIdx = i;
-      if (contractIdx === 1) {
-        activeBasis = basis2Diff;
-      } else {
-        const fromPrice = priceByKey[lastKey];
-        const toPrice   = priceByKey[m.priceKey];
-        if (fromPrice != null && toPrice != null) {
-          activeBasis += Math.round(fromPrice - toPrice);
+    if (i > 0) {
+      flat += carry;                       // continuous carry, including across rolls
+      if (m.priceKey !== lastKey) {
+        contractIdx += 1;
+        lastKey = m.priceKey;
+        const price = priceByKey[m.priceKey];
+        if (contractIdx === 1 && nextBasisOverride != null && price != null) {
+          flat = nextBasisOverride + price;
         }
       }
-      lastKey = m.priceKey;
     }
-    const monthOffset = (i - activeStartIdx) * 30;
-    return { ...m, contractLetter: m.letter, basisForMonth: activeBasis + monthOffset };
+    const price = priceByKey[m.priceKey];
+    const basisForMonth = price != null ? Math.round(flat - price) : null;
+    return { ...m, contractLetter: m.letter, flat: price != null ? Math.round(flat) : null, basisForMonth };
   });
 }
 
 function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; vnFaqUsdMt?: number | null }) {
-  // Basis state: separate inputs per crop year. The user can override the
-  // front + next-contract basis independently for current crop (ending Nov
-  // of todayCropEndYear) and new crop (next crop year, starting Dec). 3rd+
-  // contract transitions within each crop year auto-roll via the market
-  // spread.
+  // Basis overrides per crop year. Left null, each crop's differentials come
+  // from the flat-price model (VN FAQ + FOBbing, ramped by carry). A non-null
+  // value re-anchors the flat at the front or next contract; the carry ramp and
+  // the per-month flat→differential conversion continue from there.
   const [currentBasisOverride,  setCurrentBasisOverride]  = useState<number | null>(null);
   const [currentBasis2Override, setCurrentBasis2Override] = useState<number | null>(null);
   const [newBasisOverride,      setNewBasisOverride]      = useState<number | null>(null);
@@ -400,54 +411,56 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     return { currentCropMonths: cur, newCropMonths: next };
   }, [monthsBase, todayCropEndYear]);
 
+  // Flat front price for a crop = VN FAQ USD/MT + origin FOBbing (single source:
+  // lib/originCosts). Falls back to front contract + 150 when the VN FAQ spot
+  // isn't available.
+  const flatFrontFor = (months: ShippingMonth[]): { flatFront: number; frontPrice: number | null } => {
+    const fk = months[0]?.priceKey;
+    const frontPrice = fk ? priceByKey[fk] ?? null : null;
+    const flatFront = vnFaqUsdMt != null ? vnFaqUsdMt + FOBBING_USD["VN FAQ"] : (frontPrice ?? 0) + 150;
+    return { flatFront, frontPrice };
+  };
+  // Differential the next-contract box should show when un-overridden: the flat
+  // (front anchor + carry to that contract's first month) minus its price. Uses
+  // the effective front flat so a front-box override propagates into this box.
+  const nextBasisDefaultFor = (
+    months: ShippingMonth[], next: ShippingMonth | null, effFlatFront: number, fallback: number,
+  ): number => {
+    if (!next) return fallback;
+    const idx = months.findIndex(m => m.priceKey === next.priceKey);
+    const np  = priceByKey[next.priceKey];
+    if (idx < 0 || np == null) return fallback;
+    return Math.round(effFlatFront + idx * MONTHLY_CARRY_USD - np);
+  };
+
   // ── Current crop computed state ────────────────────────────────────────
   const currentNext        = useMemo(() => getNextContract(currentCropMonths), [currentCropMonths]);
   const currentTransitions = useMemo(() => getTransitions(currentCropMonths),  [currentCropMonths]);
-  // Default basis: VN FAQ USD/MT + FOB cost − current-crop's front RC price.
-  // The +100 mirrors FOB_COST_USD["VN FAQ"] in components/map/MarketTicker.tsx.
-  const currentBasisDefault = useMemo(() => {
-    const fk = currentCropMonths[0]?.priceKey;
-    const fp = fk ? priceByKey[fk] : null;
-    if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
-    return 150;
-  }, [vnFaqUsdMt, priceByKey, currentCropMonths]);
-  const currentBasisDiff = currentBasisOverride ?? currentBasisDefault;
-  // Default 2nd-contract basis: front-basis + (frontPrice − nextPrice) of the
-  // within-current-crop next contract. Keeps at-port level across the roll.
-  const currentBasis2Default = useMemo(() => {
-    const fk = currentCropMonths[0]?.priceKey;
-    const fp = fk ? priceByKey[fk] : null;
-    const np = currentNext ? priceByKey[currentNext.priceKey] : null;
-    if (fp != null && np != null) return currentBasisDiff + Math.round(fp - np);
-    return currentBasisDiff + 30;
-  }, [currentBasisDiff, currentCropMonths, priceByKey, currentNext]);
-  const currentBasis2Diff = currentBasis2Override ?? currentBasis2Default;
+  const { flatFront: currentFlatFront, frontPrice: currentFrontPrice } = flatFrontFor(currentCropMonths);
+  const currentEffFlatFront = (currentBasisOverride != null && currentFrontPrice != null)
+    ? currentBasisOverride + currentFrontPrice : currentFlatFront;
+  const currentBasisDefault = currentFrontPrice != null ? Math.round(currentFlatFront - currentFrontPrice) : 150;
+  const currentBasisDiff    = currentBasisOverride ?? currentBasisDefault;
+  const currentBasis2Default = nextBasisDefaultFor(currentCropMonths, currentNext, currentEffFlatFront, currentBasisDiff + MONTHLY_CARRY_USD);
+  const currentBasis2Diff    = currentBasis2Override ?? currentBasis2Default;
   const currentMonths = useMemo(
-    () => computeMonthsBasis(currentCropMonths, currentBasisDiff, currentBasis2Diff, priceByKey),
-    [currentCropMonths, currentBasisDiff, currentBasis2Diff, priceByKey],
+    () => computeMonthsFlat(currentCropMonths, currentFlatFront, MONTHLY_CARRY_USD, priceByKey, currentBasisOverride, currentBasis2Override),
+    [currentCropMonths, currentFlatFront, priceByKey, currentBasisOverride, currentBasis2Override],
   );
 
-  // ── New crop computed state ────────────────────────────────────────────
+  // ── New crop computed state (restarts at VN FAQ + FOBbing) ──────────────
   const newNext        = useMemo(() => getNextContract(newCropMonths), [newCropMonths]);
   const newTransitions = useMemo(() => getTransitions(newCropMonths),  [newCropMonths]);
-  const newBasisDefault = useMemo(() => {
-    const fk = newCropMonths[0]?.priceKey;
-    const fp = fk ? priceByKey[fk] : null;
-    if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
-    return 150;
-  }, [vnFaqUsdMt, priceByKey, newCropMonths]);
-  const newBasisDiff = newBasisOverride ?? newBasisDefault;
-  const newBasis2Default = useMemo(() => {
-    const fk = newCropMonths[0]?.priceKey;
-    const fp = fk ? priceByKey[fk] : null;
-    const np = newNext ? priceByKey[newNext.priceKey] : null;
-    if (fp != null && np != null) return newBasisDiff + Math.round(fp - np);
-    return newBasisDiff + 30;
-  }, [newBasisDiff, newCropMonths, priceByKey, newNext]);
-  const newBasis2Diff = newBasis2Override ?? newBasis2Default;
+  const { flatFront: newFlatFront, frontPrice: newFrontPrice } = flatFrontFor(newCropMonths);
+  const newEffFlatFront = (newBasisOverride != null && newFrontPrice != null)
+    ? newBasisOverride + newFrontPrice : newFlatFront;
+  const newBasisDefault = newFrontPrice != null ? Math.round(newFlatFront - newFrontPrice) : 150;
+  const newBasisDiff    = newBasisOverride ?? newBasisDefault;
+  const newBasis2Default = nextBasisDefaultFor(newCropMonths, newNext, newEffFlatFront, newBasisDiff + MONTHLY_CARRY_USD);
+  const newBasis2Diff    = newBasis2Override ?? newBasis2Default;
   const newMonths = useMemo(
-    () => computeMonthsBasis(newCropMonths, newBasisDiff, newBasis2Diff, priceByKey),
-    [newCropMonths, newBasisDiff, newBasis2Diff, priceByKey],
+    () => computeMonthsFlat(newCropMonths, newFlatFront, MONTHLY_CARRY_USD, priceByKey, newBasisOverride, newBasis2Override),
+    [newCropMonths, newFlatFront, priceByKey, newBasisOverride, newBasis2Override],
   );
 
   // Market spread between current crop's last and new crop's first contract.
@@ -475,6 +488,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     nextLabel:      string | null;
     basisDiff:      number;
     basis2Diff:     number;
+    flatFront:      number;
     onBasisChange:  (n: number) => void;
     onBasis2Change: (n: number) => void;
   }) {
@@ -487,6 +501,17 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
           <div className="flex-shrink-0">
             <div className="text-[11px] text-amber-300 uppercase font-bold tracking-widest">{opts.title}</div>
             <div className="text-[9px] text-slate-500 mt-0.5">{opts.subtitle}</div>
+          </div>
+          <div className="border-l border-slate-700 pl-6">
+            <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
+              Flat front · {frontLabel}
+            </div>
+            <div className="text-sm font-mono text-emerald-300 font-bold">
+              ${opts.flatFront.toLocaleString()}<span className="text-slate-500 font-normal">/MT</span>
+            </div>
+            <div className="text-[9px] text-slate-500 mt-0.5">
+              VN FAQ {vnFaqUsdMt != null ? `$${vnFaqUsdMt.toLocaleString()}` : "—"} + FOBbing ${FOBBING_USD["VN FAQ"]} · +${MONTHLY_CARRY_USD}/mo carry
+            </div>
           </div>
           <div className="border-l border-slate-700 pl-6">
             <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
@@ -597,6 +622,13 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
                             USD/MT
                           </td>
                           {opts.months.map((m, i) => {
+                            if (m.basisForMonth == null) {
+                              return (
+                                <td key={i} className="px-3 py-2 text-center font-bold border-l border-slate-800/50 text-slate-600">
+                                  —
+                                </td>
+                              );
+                            }
                             const totalDiff = Math.round((m.basisForMonth + q.diff + optionsAddon + freight + financing) / 5) * 5;
                             const display   = fmtDiff(m.contractLetter, totalDiff);
                             const color = q.isBasis
@@ -658,6 +690,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         nextLabel:      currentNext?.priceKey ?? null,
         basisDiff:      currentBasisDiff,
         basis2Diff:     currentBasis2Diff,
+        flatFront:      currentFlatFront,
         onBasisChange:  setCurrentBasisOverride,
         onBasis2Change: setCurrentBasis2Override,
       })}
@@ -684,6 +717,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         nextLabel:      newNext?.priceKey ?? null,
         basisDiff:      newBasisDiff,
         basis2Diff:     newBasis2Diff,
+        flatFront:      newFlatFront,
         onBasisChange:  setNewBasisOverride,
         onBasis2Change: setNewBasis2Override,
       })}
