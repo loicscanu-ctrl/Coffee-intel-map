@@ -47,8 +47,7 @@ async def _run(name: str, coro, db=None) -> None:
 async def run_monthly() -> None:
     from playwright.async_api import async_playwright
 
-    db = get_session()
-    try:
+    with get_session() as db:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
 
@@ -63,8 +62,6 @@ async def run_monthly() -> None:
                     await page.close()
 
             await browser.close()
-    finally:
-        db.close()
     print("[monthly] Done.")
 
 

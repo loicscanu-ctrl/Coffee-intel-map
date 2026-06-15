@@ -859,8 +859,5 @@ async def run(page):  # page unused — no browser needed
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from scraper.db import get_session
-    db = get_session()
-    try:
+    with get_session() as db:
         _fetch_and_upsert(db)
-    finally:
-        db.close()

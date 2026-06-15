@@ -105,8 +105,7 @@ async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEO
 
 async def run_all_scrapers():
     print("[scraper] Starting daily scrape run...")
-    db = get_session()
-    try:
+    with get_session() as db:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
             semaphore = asyncio.Semaphore(CONCURRENCY)
@@ -140,8 +139,6 @@ async def run_all_scrapers():
                 await _run_side_channel(name, coro_fn, browser, timeout=timeout)
 
             await browser.close()
-    finally:
-        db.close()
     print(f"[scraper] Done. {total} items inserted.")
     if critical_errors:
         raise critical_errors[0]
