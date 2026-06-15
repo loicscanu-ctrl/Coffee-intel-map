@@ -1,5 +1,6 @@
 """Price-ticker exporters (latest_prices, vn_physical_prices)."""
-from datetime import datetime, timedelta
+import json
+from datetime import UTC, datetime, timedelta
 
 from models import (
     NewsItem,
@@ -297,6 +298,112 @@ def _vn_faq_from_news(db, stale_hours: int):
     return vnd_per_kg, usd_vnd, "ok"
 
 
+def _vn_physical_commentary(db) -> str | None:
+    """Render the Vietnam Robusta absorption-ratio badge.
+
+    Compares the latest two PhysicalPrice rows for VN_FAQ (Vietnam farmgate
+    in VND/kg, converted to USD/MT via the same-date USD/VND row) against the
+    latest two `commodity_prices.robusta` rows (London Robusta front-month
+    close, already in USD/MT). The result is the share of the London move
+    that landed in the local Vietnam farmgate — the user's locked wording:
+
+      "X% of the market change has gone into the local price"
+
+    Returns None when the historical pairs aren't available (e.g. first run,
+    or the futures price for the matching session hasn't landed yet).
+    """
+    from models import CommodityPrice, PhysicalPrice
+
+    # Two most recent VN_FAQ rows. Pulling distinct dates protects us from
+    # multiple intra-day scrapes — we want the per-day series.
+    vn_rows = (
+        db.query(PhysicalPrice)
+          .filter(PhysicalPrice.symbol == "VN_FAQ")
+          .order_by(PhysicalPrice.price_date.desc(), PhysicalPrice.scraped_at.desc())
+          .limit(20)
+          .all()
+    )
+    # Dedupe to one row per price_date (keep most-recent scrape).
+    by_date: dict = {}
+    for r in vn_rows:
+        if r.price_date not in by_date:
+            by_date[r.price_date] = r
+    distinct = sorted(by_date.values(), key=lambda r: r.price_date, reverse=True)
+    if len(distinct) < 2:
+        return None
+    cur_vn, prev_vn = distinct[0], distinct[1]
+
+    # USD/VND on the matching dates so the USD/MT conversion uses the right rate
+    # on each side of the comparison (FX-only moves shouldn't pollute the
+    # physical-vs-futures absorption ratio).
+    fx_rows = (
+        db.query(PhysicalPrice)
+          .filter(PhysicalPrice.symbol == "USD_VND")
+          .filter(PhysicalPrice.price_date.in_([cur_vn.price_date, prev_vn.price_date]))
+          .all()
+    )
+    fx_by_date = {r.price_date: r.price for r in fx_rows}
+    cur_fx  = fx_by_date.get(cur_vn.price_date)
+    prev_fx = fx_by_date.get(prev_vn.price_date)
+    if not cur_fx or not prev_fx:
+        return None
+    cur_usd_mt  = cur_vn.price  / cur_fx  * 1000
+    prev_usd_mt = prev_vn.price / prev_fx * 1000
+    phys_delta_usd_mt = round(cur_usd_mt - prev_usd_mt)
+
+    # London Robusta closes on the same two dates. CommodityPrice symbol is
+    # "robusta", price_unit is usd_per_mt — see macro_cot COMMODITY_SPECS.
+    fut_rows = (
+        db.query(CommodityPrice)
+          .filter(CommodityPrice.symbol == "robusta")
+          .filter(CommodityPrice.date.in_([cur_vn.price_date, prev_vn.price_date]))
+          .all()
+    )
+    fut_by_date = {r.date: r.close_price for r in fut_rows}
+    cur_fut  = fut_by_date.get(cur_vn.price_date)
+    prev_fut = fut_by_date.get(prev_vn.price_date)
+
+    if cur_fut is None or prev_fut is None:
+        return None  # futures price for the matching session isn't in yet
+    from scraper.commentary import render_absorption
+    return render_absorption(
+        origin="Vietnam Robusta",
+        benchmark="London Robusta",
+        phys_delta_usd_mt=phys_delta_usd_mt,
+        futures_delta=round(cur_fut - prev_fut),
+    )
+
+
+def _emit_vn_physical_news(db) -> None:
+    """Upsert a Vietnam-physical news_feed row carrying the absorption-ratio
+    commentary. No-op when DATABASE_URL is unset (covered by the upstream
+    DB session being None in offline modes) or the commentary can't be built."""
+    from datetime import datetime
+
+    text = _vn_physical_commentary(db)
+    if not text:
+        print("[vn-physical-news] insufficient history — skipping")
+        return
+
+    from scraper.commentary import embed_commentary
+    from scraper.db import upsert_news_item
+
+    meta_obj: dict = {"origin": "vietnam"}
+    embed_commentary(meta_obj, text=text, has_update=True, is_latest_trading_day=True)
+    upsert_news_item(db, {
+        "title":    f"Vietnam FAQ vs London Robusta – {datetime.utcnow().date().isoformat()}",
+        "body":     text,
+        "source":   "VICOFA",
+        "category": "supply",
+        "lat":      12.668,    # Đắk Lắk
+        "lng":      108.040,
+        "tags":     ["vietnam", "physical-price", "absorption", "auto-commentary"],
+        "meta":     json.dumps(meta_obj, ensure_ascii=False),
+        "pub_date": datetime.now(UTC),
+    })
+    print(f"[vn-physical-news] {text}")
+
+
 def export_vn_physical_prices(db) -> None:
     """vn_physical_prices.json from the latest VN FAQ + USD/VND.
 
@@ -337,3 +444,10 @@ def export_vn_physical_prices(db) -> None:
     path = OUT_DIR / "vn_physical_prices.json"
     written = safe_write_json(path, result, lambda d: (d.get("vn_faq") is not None, "no vn_faq"))
     print(f"  vn_physical_prices.json → written:{written} {vnd_per_kg} VND/kg = ${usd_per_mt}/MT (rate:{round(usd_vnd)})")
+
+    # News-feed badge: absorption ratio Vietnam vs London. Additive — never
+    # fails the JSON export over a commentary write.
+    try:
+        _emit_vn_physical_news(db)
+    except Exception as e:  # noqa: BLE001
+        print(f"[vn-physical-news] FAILED: {e!r} — JSON already written")

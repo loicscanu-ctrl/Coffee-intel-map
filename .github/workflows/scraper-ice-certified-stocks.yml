@@ -25,11 +25,31 @@ on:
         default: "3"
         type: string
   schedule:
-    # 17:00 UTC daily — past ICE's morning robusta publish (~10:30 UTC) and
-    # afternoon arabica publish (~13:30 UTC). Small window (days_back=3) is
-    # enough to catch any missed day; the merge step preserves the full history
-    # on disk from prior backfill runs.
-    - cron: '0 17 * * *'
+    # 02:47 UTC Mon-Fri (was 03:00 — moved off the :00 mark to dodge the GH
+    # cron skip, and earlier so the run finishes ~03:05: in time for BOTH the
+    # 03:09 morning brief (which previously missed it by minutes every day
+    # and showed cert stocks a day staler than necessary) and the 03:41
+    # production deploy that puts the day's data live before 04:00 UTC.
+    # The scraper anchors on the PREVIOUS business day (see orchestrate.run),
+    # so it fetches yesterday's already-published reports — the run time
+    # doesn't chase same-day publication and an earlier start loses nothing.
+    # Mon-Fri with a multi-day backfill window covers Friday's data on Monday;
+    # ICE doesn't publish Sat/Sun. Manual dispatch still allowed any day.
+    # Runs with --skip-monthly: the monthly ageing / age-allowance reports are
+    # handled by their own job (1.14 – ICE Monthly Reports), so the daily run
+    # no longer re-fetches a monthly report ~21×/month.
+    #
+    # NOTE: GH cron on this repo fires 4-5h LATE systematically (verified
+    # 2026-06-10 against run history). This cron is the FALLBACK; the primary
+    # trigger is the workflow_run chain off 1.1 below.
+    - cron: '47 2 * * 1-5'
+  workflow_run:
+    # Chain off the daily scraper so cert stocks land minutes after the
+    # scrape (and before the chained morning deploy + brief), instead of
+    # waiting on the hours-late cron. Push-originated scraper runs don't
+    # cascade — only dispatch/schedule ones (see job-level if).
+    workflows: ["1.1 – Daily News Scraper"]
+    types: [completed]
 
 concurrency:
   group: data-commit          # same group as the other data pushers
@@ -37,6 +57,9 @@ concurrency:
 
 jobs:
   scrape:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'workflow_dispatch' || github.event.workflow_run.event == 'schedule')
     runs-on: ubuntu-latest
     # Big enough for a one-off 180-day backfill at 5s/req on /marketdata/ (~90
     # min worst case). Daily cron runs in ~5-10 min on a 3-day window.
@@ -47,39 +70,77 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Weekend guard — ICE doesn't publish Sat/Sun
+        id: weekday
+        # The cron is Mon-Fri already, but the workflow_run chain fires daily.
+        # The scraper anchors on the previous business day with a multi-day
+        # backfill window, so skipping weekends loses nothing (Friday's data
+        # is covered by Monday's run).
+        run: |
+          dow=$(date -u +%u)
+          if [ "$dow" -ge 6 ] && [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "Weekend chain trigger (dow=$dow) — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.weekday.outputs.skip != 'true'
         with:
           python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber
+        if: steps.weekday.outputs.skip != 'true'
+        # sqlalchemy / psycopg2-binary / python-dotenv / jinja2 are needed for
+        # the orchestrator's tail step that emits a news_feed commentary row
+        # (see scraper/sources/ice_certified_stocks/news_emit.py). The upsert
+        # is a no-op when DATABASE_URL is unset, but importing scraper.db
+        # still loads sqlalchemy at module-import time.
+        run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Pull ICE certified stocks
+      - name: Pull ICE certified stocks (3 attempts)
+        if: steps.weekday.outputs.skip != 'true'
         working-directory: backend
         env:
           # Force unbuffered stdout so every print() shows up immediately in
           # the Actions log instead of waiting for the (block-buffered) pipe
           # to fill — otherwise a long run looks "stalled" until completion.
           PYTHONUNBUFFERED: "1"
+          # Optional — when set, the orchestrator's tail step upserts a
+          # news_feed row carrying a `_commentary` block for each market.
+          # The next run of workflow 1.4 (Export and Publish) lifts that
+          # block to a top-level `commentary` field in news.json. Unset →
+          # no-op (snapshots still publish).
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           # Scheduled cron passes no inputs → default to a 3-day catch-up
           # (merge preserves the history). Manual dispatch can override with
           # days_back=180 for the one-off historical backfill.
-          if [ "${{ inputs.mode }}" = "smoke" ]; then
-            python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
-          else
-            python -m scraper.sources.ice_certified_stocks.orchestrate \
-              --days "${{ inputs.days_back || 3 }}"
-          fi
+          run_scraper() {
+            if [ "${{ inputs.mode }}" = "smoke" ]; then
+              python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
+            else
+              # --skip-monthly: daily feeds only; the monthly ageing /
+              # age-allowance reports are pulled by workflow 1.14.
+              python -m scraper.sources.ice_certified_stocks.orchestrate \
+                --days "${{ inputs.days_back || 3 }}" --skip-monthly
+            fi
+          }
+          for attempt in 1 2 3; do
+            run_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit + push if changed
-        if: ${{ inputs.mode != 'smoke' }}
+        if: ${{ steps.weekday.outputs.skip != 'true' && inputs.mode != 'smoke' }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/data/certified_stocks_arabica.json \
-                  frontend/public/data/certified_stocks_robusta.json
+                  frontend/public/data/certified_stocks_robusta.json \
+                  backend/scraper/sources/ice_certified_stocks/stock_report_hits.json
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: ICE certified stocks (${{ inputs.days_back || 30 }}d) [skip ci]" \

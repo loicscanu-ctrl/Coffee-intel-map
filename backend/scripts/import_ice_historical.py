@@ -32,27 +32,32 @@ import argparse
 import json
 import re
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 # Make backend/ importable when running from anywhere.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from scraper.sources.ice_certified_stocks.orchestrate import (
+    OUT_DIR,
+    _arabica_snapshot,
+    _merge_arabica,
+    _merge_robusta,
+    _robusta_snapshot,
+)
 from scraper.sources.ice_certified_stocks.parse_age_allowance import parse_age_allowance_xlsx
 from scraper.sources.ice_certified_stocks.parse_arabica_xls import parse_arabica_xls
 from scraper.sources.ice_certified_stocks.parse_gradings import parse_gradings
 from scraper.sources.ice_certified_stocks.parse_iss_recv import (
-    parse_iss_recv_daily, parse_iss_recv_monthly,
+    parse_iss_recv_daily,
+    parse_iss_recv_monthly,
 )
 from scraper.sources.ice_certified_stocks.parse_pdfs import (
-    parse_grading_overview_pdf, parse_infested_warrant_pdf,
+    parse_grading_overview_pdf,
+    parse_infested_warrant_pdf,
 )
 from scraper.sources.ice_certified_stocks.parse_stock_report import parse_stock_report
 from scraper.sources.ice_certified_stocks.parse_tenders import parse_tenders
-from scraper.sources.ice_certified_stocks.orchestrate import (
-    _arabica_snapshot, _robusta_snapshot,
-    _merge_arabica, _merge_robusta, OUT_DIR,
-)
 
 
 def _ymd8(s: str) -> date:  return date(int(s[:4]), int(s[4:6]), int(s[6:8]))
@@ -166,7 +171,7 @@ def run(root: Path, write: bool = True) -> dict:
     robusta_latest_date = max(stock_per_date) if stock_per_date else None
     robusta_latest_stock = stock_per_date.get(robusta_latest_date) if robusta_latest_date else None
 
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now_iso = datetime.now(UTC).isoformat(timespec="seconds")
     arabica_json = {
         "generated_at":  now_iso,
         "as_of":         arabica_latest_date.isoformat() if arabica_latest_date else None,

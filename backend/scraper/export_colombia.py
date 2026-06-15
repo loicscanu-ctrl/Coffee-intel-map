@@ -16,6 +16,7 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+from scraper._export_common import _badge, _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
 
@@ -30,7 +31,6 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 _COLOMBIA_REGIONS = ["Huila", "Nariño", "Antioquia", "Cauca", "Caldas"]
 
-_RISK_ORDER = {"-": 0, "L": 1, "M": 2, "H": 3}
 
 # Colombia ENSO impact (OPPOSITE to Brazil: El Niño → drier → bad)
 _COLOMBIA_ENSO_IMPACT = {
@@ -72,14 +72,6 @@ _SEASON_MONTH = {
     "AMJ": 5, "MJJ": 6, "JJA": 7, "JAS": 8,
     "ASO": 9, "SON": 10, "OND": 11, "NDJ": 12,
 }
-
-
-def _worst_risk(risks: list) -> str:
-    return max(risks, key=lambda r: _RISK_ORDER.get(r, 0)) if risks else "-"
-
-
-def _badge(code: str) -> str:
-    return {"H": "HIGH", "M": "MED", "L": "LOW", "-": "NONE"}.get(code, "NONE")
 
 
 

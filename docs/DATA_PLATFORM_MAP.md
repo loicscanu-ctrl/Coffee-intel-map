@@ -214,6 +214,7 @@ flowchart TD
 | | `global_fertilizers.json` | `FertilizersTab` | **Supply · Fertilizers** |
 | | `manual_intel.json` | `ManualIntelPanel` | **Supply · Manual Intel** |
 | | `retail_cpi.json` | `RetailCpiPanel` | **Macro · Retail CPI** |
+| **1.1 → 1.4** | `us_cpi.json` | `UsCpiPanel` | **Macro · Inflation · US CPI** |
 | | `origin_prices_history.json` | `OriginPricesPanel` | **Macro · Origin Prices** |
 | | `farmer_selling_brazil.json` | `FarmerSellingPanel` | **Supply · Farmer Selling** |
 | | `*_supply.json` (colombia/vietnam/…) | per-country tabs | **Supply · country pages**; **Map** |
@@ -354,7 +355,6 @@ flowchart LR
   J_fe[/farmer_economics.json/]
   J_fsell[/farmer_selling_brazil.json/]
   J_vn[/vietnam_supply.json/]
-  J_vnx[/vn_country_shares/]
   J_vnfe[/vn_farmer_economics/]
   J_vnwl[/vn_water_levels.json/]
   J_vnw[/vn_weather.json/]
@@ -375,7 +375,6 @@ flowchart LR
   sell{{BR Farmer Selling}}
   cec{{BR Monthly Exports}}
   vnexp{{VN Export Explorer}}
-  vndest{{VN Destination Estimate}}
   vnbal{{VN Balance Sheet}}
   vnfe{{VN Farmer Economics}}
   vnwl{{VN Water Levels}}
@@ -405,7 +404,6 @@ flowchart LR
   EXP --> J_fe
   EXP --> J_fsell
   EXP --> J_vn
-  EXP --> J_vnx
   EXP --> J_vnfe
   EXP --> J_vnwl
   EXP --> J_vnw
@@ -418,7 +416,6 @@ flowchart LR
   J_fsell --> sell
   J_vn --> vnexp
   J_vn --> vnbal
-  J_vnx --> vndest
   J_vnfe --> vnfe
   J_vnwl --> vnwl
   J_vnw --> vnw
@@ -443,8 +440,8 @@ flowchart LR
   class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,W110 scr;
   class DB store;
   class EXP proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_whist,J_owx json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel,owx vis;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnfe,J_vnwl,J_vnw,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_whist,J_owx json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vnbal,vnfe,vnwl,vnw,coexp,et,hn,idn,ug,fert,intel,owx vis;
 ```
 
 #### Demand
@@ -504,7 +501,7 @@ flowchart LR
   W12["1.2 Freight · 02:00<br/>Freightos · Yahoo"]
   W23["2.3 COT · Fri 20:00 · CFTC"]
   WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
-  WCPI["Retail CPI · BLS · Eurostat · BCB"]
+  WCPI["US/Retail CPI · BLS · Eurostat · BCB"]
   W33["3.3.1–3.3.3 CONAB + Fertilizer · 12th<br/>conab.gov.br · Comex · VN Customs"]
   EXP{{"1.4 Export · 02:30"}}
   J_mac[/macro_cot.json/]
@@ -512,6 +509,7 @@ flowchart LR
   J_fx[/fx_history.json/]
   J_fr[/freight.json/]
   J_cpi[/retail_cpi.json/]
+  J_uscpi[/us_cpi.json/]
   J_fe[/farmer_economics.json/]
   J_orig[/origin_prices_history.json/]
   xc{{Cross-Commodity MM}}
@@ -519,6 +517,7 @@ flowchart LR
   fx{{FX Pair Time-Series}}
   fr{{Freight Context}}
   cpi{{Retail CPI}}
+  uscpi{{US CPI}}
   fert{{Fertilizer Inputs}}
   orig{{Origin Prices}}
   W23 --> EXP
@@ -527,6 +526,7 @@ flowchart LR
   WORIG --> EXP
   EXP --> J_mac --> xc
   EXP --> J_cpi --> cpi
+  EXP --> J_uscpi --> uscpi
   EXP --> J_fe --> fert
   EXP --> J_orig --> orig
   W19 --> J_q --> cci
@@ -540,8 +540,8 @@ flowchart LR
   classDef vis fill:#042f2e,stroke:#14b8a6,color:#99f6e4;
   class W19,W12,W23,WORIG,WCPI,W33 scr;
   class EXP proc;
-  class J_mac,J_q,J_fx,J_fr,J_cpi,J_fe,J_orig json;
-  class xc,cci,fx,fr,cpi,fert,orig vis;
+  class J_mac,J_q,J_fx,J_fr,J_cpi,J_uscpi,J_fe,J_orig json;
+  class xc,cci,fx,fr,cpi,uscpi,fert,orig vis;
 ```
 
 #### News & Intel (Map)
@@ -642,7 +642,7 @@ flowchart LR
 
 - **COT** (`/cot`): Industry Pulse, Signals (computed in-browser from `cot.json`), Gauges, Heatmap, Global Flow (`macro_cot.json`), Dry Powder, Cycle, Report ← `cot.json`; OI 7-day ← `oi_history.json`, OI→FND ← `oi_fnd_chart.json`. (`signals.json` feeds only the Telegram brief.)
 - **Futures** (`/futures`): daily quotes ← `acaphe_live.json`; chain ← `futures_chain.json`; OI table ← `oi_history.json`; OI→FND ← `oi_fnd_chart.json`.
-- **Macro** (`/macro`): CCI ← `quant_report.json`; FX ← `fx_history.json`; cross-commodity MM ← `macro_cot.json`; freight ← `freight.json`; retail CPI ← `retail_cpi.json`; fertilizer inputs/origin prices ← `farmer_economics.json`/`origin_prices_history.json`.
+- **Macro** (`/macro`): CCI ← `quant_report.json`; FX ← `fx_history.json`; cross-commodity MM ← `macro_cot.json`; freight ← `freight.json`; inflation (US CPI ← `us_cpi.json`, retail coffee CPI ← `retail_cpi.json`); fertilizer inputs/origin prices ← `farmer_economics.json`/`origin_prices_history.json`.
 - **Demand** (`/demand`): stocks ← `demand_stocks.json`; roasting mix ← `factory_mix.json`; earnings ← `earnings.json`; DE tax ← `kaffeesteuer.json`.
 - **Supply** (`/supply`): Brazil daily reg ← `cecafe_daily.json`; fertilizers ← `global_fertilizers.json`; farmer economics ← `farmer_*`; manual intel ← `manual_intel.json`; country pages ← `*_supply.json`.
 - **Map** (`/map`): price labels ← `latest_prices.json`; exports ← `cecafe.json`; intel/news ← `/api/news`+`country_intel`.

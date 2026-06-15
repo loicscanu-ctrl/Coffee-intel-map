@@ -1,0 +1,681 @@
+{
+  "generated_at": "2026-06-15T14:43:56.935968Z",
+  "count": 49,
+  "workflows": [
+    {
+      "file": "backfill-30yr-history.yml",
+      "name": "0.9 \u2013 One-shot \u2014 Backfill 30Y daily weather history (1995-2024)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 60
+    },
+    {
+      "file": "backfill-essm-history.yml",
+      "name": "0.7 \u2013 One-shot \u2014 Backfill Surface Soil Moisture history (ERA5 archive)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 45
+    },
+    {
+      "file": "backfill-history-gap.yml",
+      "name": "0.7 \u2013 One-shot \u2014 Backfill 2025 history gap (Open-Meteo archive)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 30
+    },
+    {
+      "file": "backfill-missing-fields.yml",
+      "name": "0.6 \u2013 One-shot \u2014 Backfill missing weather-history fields (Open-Meteo archive)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 30
+    },
+    {
+      "file": "backfill-vhi.yml",
+      "name": "0.10 \u2013 One-shot \u2014 Backfill VHI long-form history (NOAA STAR)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 20
+    },
+    {
+      "file": "brazil-export-forecast.yml",
+      "name": "1.8 \u2013 Brazil Export Forecast (SSOT projection)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 18 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 10
+    },
+    {
+      "file": "build-oni-history.yml",
+      "name": "0.6 \u2013 Monthly \u2014 Build ONI history seed (NOAA CPC 1980\u2192present)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 6 10 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "build-spei-baselines.yml",
+      "name": "0.4 \u2013 One-shot \u2014 Build SPEI baselines (Open-Meteo 30-yr archive)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 90
+    },
+    {
+      "file": "build-spi-baselines.yml",
+      "name": "0.3 \u2013 One-shot \u2014 Build SPI baselines (Open-Meteo 30-yr archive)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 25
+    },
+    {
+      "file": "build-vhi.yml",
+      "name": "0.5 \u2013 Weekly \u2014 Vegetation Health Index (NOAA STAR VHI)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 23 * * 6"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 15
+    },
+    {
+      "file": "build-workflow-inventory.yml",
+      "name": "0.2 \u2013 Refresh Workflow Inventory",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "build-workflow-inventory",
+      "timeout_minutes": 5
+    },
+    {
+      "file": "check-live-quotes.yml",
+      "name": "1.8 \u2013 Check Live Quotes Freshness",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "15 9-20 * * 1-5"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 5
+    },
+    {
+      "file": "check-scrapers-freshness.yml",
+      "name": "1.5 \u2013 Check Scrapers Freshness",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 7 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 5
+    },
+    {
+      "file": "check-stocks-fetch.yml",
+      "name": "Z \u2013 Stocks Fetch Smoke Test (diagnostic)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "ci-tests.yml",
+      "name": "9.1 \u2013 CI Tests",
+      "triggers": [
+        "pull_request",
+        "push",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 6 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "daily_oi.yml",
+      "name": "1.3 \u2013 Daily OI Snapshot",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch",
+        "workflow_run"
+      ],
+      "crons": [
+        "13 2 * * 1-5"
+      ],
+      "workflow_run_deps": [
+        "1.1 \u2013 Daily News Scraper"
+      ],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": null
+    },
+    {
+      "file": "export-and-publish.yml",
+      "name": "1.4 \u2013 Export and Publish Static JSON",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch",
+        "workflow_run"
+      ],
+      "crons": [
+        "41 2 * * *"
+      ],
+      "workflow_run_deps": [
+        "1.1 \u2013 Daily News Scraper",
+        "2.3 \u2013 COT Scraper",
+        "1.3 \u2013 Daily OI Snapshot"
+      ],
+      "concurrency_group": "export-and-publish",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "lint-backend.yml",
+      "name": "9.2 \u2013 Backend Lint",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 3
+    },
+    {
+      "file": "lint-smart-quotes.yml",
+      "name": "9.3 \u2013 Smart-quote guard (TS/TSX)",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 3
+    },
+    {
+      "file": "morning-brief.yml",
+      "name": "1.6 \u2013 Morning Brief",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch",
+        "workflow_run"
+      ],
+      "crons": [
+        "9 3 * * *"
+      ],
+      "workflow_run_deps": [
+        "1.4 \u2013 Export and Publish Static JSON"
+      ],
+      "concurrency_group": "morning-brief",
+      "timeout_minutes": 5
+    },
+    {
+      "file": "poll-acaphe-quotes.yml",
+      "name": "0.1 \u2013 Acaphe Live Quotes Poll",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0,15,30,45 8-19 * * 1-5"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "acaphe-poll",
+      "timeout_minutes": 4
+    },
+    {
+      "file": "probe-ice-egress.yml",
+      "name": "Z \u2013 Probe: ICE certified-stocks egress (diagnostic)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "quant-currency-index.yml",
+      "name": "1.9 \u2013 Quant Coffee Currency Index",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 21 * * 1-5"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": null
+    },
+    {
+      "file": "redeploy-vercel.yml",
+      "name": "1.12 \u2013 Daily Publish (Vercel redeploy)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch",
+        "workflow_run"
+      ],
+      "crons": [
+        "41 3 * * *",
+        "0 10 * * *"
+      ],
+      "workflow_run_deps": [
+        "1.4 \u2013 Export and Publish Static JSON",
+        "1.13 \u2013 ICE Certified Stocks (arabica + robusta)"
+      ],
+      "concurrency_group": "vercel-redeploy",
+      "timeout_minutes": 5
+    },
+    {
+      "file": "scraper-annual-un-wpp.yml",
+      "name": "3.7 \u2013 Annual Scraper \u00b7 UN WPP age structure",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 3 15 7 *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-cecafe-daily.yml",
+      "name": "1.7 \u2013 Cecafe Daily Registration",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 17 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 20
+    },
+    {
+      "file": "scraper-cecafe.yml",
+      "name": "3.2 \u2013 Cecafe Export Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 8 15 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-cot.yml",
+      "name": "2.3 \u2013 COT Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 20 * * 5"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-cpi.yml",
+      "name": "1.15 \u2013 Monthly CPI Scraper (US CPI \u00b7 Retail Coffee CPI)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "40 13 11-16 * *",
+        "0 3 1 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-daily.yml",
+      "name": "1.1 \u2013 Daily News Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "7 1 * * *",
+        "0 2 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "scraper-daily",
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-earnings.yml",
+      "name": "4.1 \u2013 Earnings Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 8 15 2,5,8,11 *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": null
+    },
+    {
+      "file": "scraper-ecf-stocks.yml",
+      "name": "3.4 \u2013 ECF stocks",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 4 5 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": null
+    },
+    {
+      "file": "scraper-freight.yml",
+      "name": "1.2 \u2013 Freight Rate Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "19 2 * * 5,0"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-ice-certified-stocks.yml",
+      "name": "1.13 \u2013 ICE Certified Stocks (arabica + robusta)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch",
+        "workflow_run"
+      ],
+      "crons": [
+        "47 2 * * 1-5"
+      ],
+      "workflow_run_deps": [
+        "1.1 \u2013 Daily News Scraper"
+      ],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 120
+    },
+    {
+      "file": "scraper-ice-monthly-reports.yml",
+      "name": "1.14 \u2013 ICE Monthly Reports (arabica ageing + robusta age-allowance)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 14 1-3 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-japan-stocks.yml",
+      "name": "3.5 \u2013 AJCA (Japan)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 5 6 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-kaffeesteuer.yml",
+      "name": "3.1 \u2013 Kaffeesteuer Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 8 24 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 12
+    },
+    {
+      "file": "scraper-monthly-br-fertilizer.yml",
+      "name": "3.3.2 \u2013 Monthly Scraper \u00b7 Brazil Fertilizer (Comex)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 3 12 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-monthly-conab.yml",
+      "name": "3.3.1 \u2013 Monthly Scraper \u00b7 CONAB (Brazil supply)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 2 12 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-monthly-uganda.yml",
+      "name": "3.3.5 \u2013 Monthly Scraper \u00b7 Uganda UCDA Reports",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 2 14 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 20
+    },
+    {
+      "file": "scraper-monthly-vn-exports.yml",
+      "name": "3.3.4 \u2013 Monthly Scraper \u00b7 Vietnam Coffee Exports",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 4 12 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-monthly-vn-fertilizer.yml",
+      "name": "3.3.3 \u2013 Monthly Scraper \u00b7 Vietnam Fertilizer",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 4 12 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-port-activity.yml",
+      "name": "1.11 \u2013 Port Activity Scraper (PortWatch)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "17 6 * * 3"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "scraper-port-activity",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-prices.yml",
+      "name": "2.2 \u2013 Commodity Prices Scraper",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "55 22 * * 2"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-slow-data.yml",
+      "name": "1.11 \u2013 Monthly Slow-Data Scraper (USDA PSD)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 3 12 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 45
+    },
+    {
+      "file": "scraper-spot-coffee.yml",
+      "name": "3.6 \u2013 Spot Coffee (ATTE)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 6 * * 1"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-vn-water-levels.yml",
+      "name": "0.8 \u2013 VN River Flow (NCHMF daily bulletin)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 10 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "ucda-monthly-backfill.yml",
+      "name": "0.8 \u2013 One-shot \u2014 UCDA Uganda monthly reports backfill",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "ucda-monthly-backfill",
+      "timeout_minutes": 60
+    },
+    {
+      "file": "weather-fetch.yml",
+      "name": "1.10 \u2013 Daily Weather Fetch & Accumulate",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "53 1 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "weather-fetch",
+      "timeout_minutes": 20
+    }
+  ]
+}

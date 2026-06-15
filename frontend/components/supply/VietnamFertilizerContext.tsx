@@ -4,6 +4,7 @@ import {
   ComposedChart, Bar, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 interface FertMonth {
   month: string;
@@ -23,8 +24,6 @@ interface FertContext {
 }
 
 interface Props { context: FertContext }
-
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const VN_TYPES = ["urea_kt", "kcl_kt", "npk_kt", "dap_kt"] as const;
 type VnType = typeof VN_TYPES[number];
@@ -84,7 +83,9 @@ function VnStackedTooltip({ active, payload, label }: {
 }
 
 export default function VietnamFertilizerContext({ context }: Props) {
-  const monthly = context.monthly ?? [];
+  // Memoised so the `?? []` fallback doesn't hand a fresh array to the memos
+  // below on every render.
+  const monthly = useMemo(() => context.monthly ?? [], [context.monthly]);
   const [view, setView] = useState<"monthly" | "cumulative">("monthly");
 
   const { byKey, sortedYears, lastMonthIdx } = useMemo(() => {
@@ -137,7 +138,7 @@ export default function VietnamFertilizerContext({ context }: Props) {
         return row;
       });
     }
-  }, [monthly, view, byKey, sortedYears, lastMonthIdx]);
+  }, [view, byKey, sortedYears, lastMonthIdx]);
 
   const last = monthly[monthly.length - 1];
   const avg12 = monthly.slice(-13, -1);

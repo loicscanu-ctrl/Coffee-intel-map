@@ -8,7 +8,7 @@ name: "1.5 – Check Scrapers Freshness"
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # 07:00 UTC daily — 3 h after export-and-publish (04:00 UTC)
+    - cron: '0 7 * * *'   # 07:00 UTC daily — ~4 h after export-and-publish typically lands (~02:55 UTC)
   workflow_dispatch:
 
 jobs:
@@ -37,15 +37,25 @@ jobs:
           THRESHOLDS_H = {
               # Daily / near-daily sources (2-day buffer)
               "futures":              48,
-              "freight":              48,
+              # Freight: scraped Fri + Sun only (1.2 cron `19 2 * * 5,0`). The
+              # Freightos index publishes weekly with the data stamped at end-of-
+              # week, so `FreightRate.date` lands on Fridays and stays there
+              # through the Sun re-scrape. 9-day limit = one missed weekly
+              # publish + 2-day buffer; a 2-day limit fires every Monday morning
+              # by design even when the scraper is healthy.
+              "freight":              9 * 24,
               "weather":              48,
               "enso":                 48,
               "vietnam_price":        48,  # giacaphe.com via vietnam.py — silent-failed Apr 23 → May 14 2026
-              "quant_currency_index": 48,  # Macro tab Coffee Currency Index (quant_report.json)
+              # CCI is produced by quant-currency-index Mon-Fri only (`30 21 * * 1-5`).
+              # 96 h matches sibling fx_history's "4-day buffer over weekends"
+              # threshold — both files come out of the same workflow run.
+              "quant_currency_index": 96,
               "fx_history":           96,  # Macro tab FX time-series; weekday-only workflow, 4-day buffer over weekends
               "origin_prices":        48,  # Macro tab Origin Prices time-series (accumulator, runs in 1.4)
               # Monthly source — Retail CPI series publishes on the 10th–15th of each month
               "retail_cpi":           45 * 24,
+              "us_cpi":               45 * 24,  # BLS CPI-U release, monthly (~mid-month)
               # Weekly/rolling sources
               "cot":              11 * 24,   # CFTC COT report (weekly, Fri PM)
               "macro_cot":        11 * 24,
@@ -60,6 +70,15 @@ jobs:
               "ecf":              90 * 24,   # ECF port stocks (bi-monthly)
               # Daily business-day source — allow up to 10 days for gaps/holidays
               "cecafe_daily":     10 * 24,
+              # ICE certified stocks. Daily stock runs Mon-Fri (data is T-1), so
+              # 6 days buffers weekends + a holiday. The two monthly reports are
+              # captured by workflow 1.14's 1st-3rd catch window; their month_end
+              # tops out ~33 days old just before the next capture, so 38 days
+              # alerts within a few days of a missed window (the agreed red-alert
+              # that hands the monthly report back to a human).
+              "ice_certified_daily":       6 * 24,
+              "ice_arabica_ageing":        38 * 24,
+              "ice_robusta_age_allowance": 38 * 24,
           }
           DEFAULT_H = 48
 

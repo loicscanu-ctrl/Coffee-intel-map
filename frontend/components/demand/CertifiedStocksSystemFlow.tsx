@@ -12,704 +12,33 @@
  * arabica + robusta JSON in as props.
  */
 import { useEffect, useMemo, useState } from "react";
+import { fmtNum, _fmtUnit, unitWord, type FlowUnit } from "@/lib/certifiedStocks/units";
+import { AGE_OPACITY, AGE_LABEL, AGE_BIN_ORDER, type AgeBin } from "@/lib/certifiedStocks/age";
+import { KC_ORIGIN_COLORS, RC_ORIGIN_COLORS, _originColor } from "@/lib/certifiedStocks/colors";
+import { type DensitySquare } from "@/lib/certifiedStocks/types";
+import {
+  CLASS_BORDER_RC, CLASS_LABEL_RC, CELL_PX_KC, CELL_PX_RC,
+  _gridCols, _rowsForCount, buildDensityGrid,
+} from "@/lib/certifiedStocks/grid";
+import { type ArabicaJsonShape, type RobustaJsonShape } from "@/lib/certifiedStocks/shapes";
+import { buildArabica, buildRobusta, type SystemFlowMarket } from "@/lib/certifiedStocks/builders";
 
-// ── Local data shapes (a subset of the rich panel types) ─────────────────────
 
-interface ArabicaSectionHierarchy {
-  grand_total: number;
-  by_port: Record<string, number>;
-  by_origin: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
-}
-interface ArabicaSnap {
-  date: string;
-  total_bags: number;
-  passed_today_bags?: number;
-  failed_today_bags?: number;
-  pending_grading_bags?: number;
-  by_port?: Record<string, number>;
-  sections?: { total_certified?: ArabicaSectionHierarchy; pending_grading?: ArabicaSectionHierarchy };
-}
-interface RobustaSnap { date: string; total_lots_certified: number; by_port_lots?: Record<string, number> }
-interface ArabicaAgeBucketRow { age_bucket: string; bags: number }
-export interface ArabicaJsonShape {
-  snapshots: ArabicaSnap[];
-  as_of?: string | null;
-  latest_detail?: { age_detail?: Record<string, ArabicaAgeBucketRow[]>; age_detail_date?: string | null } | null;
-}
+// ── Flow range selector ──────────────────────────────────────────────────────
+// The period is a [start, end] window. `end` is a free calendar pick that
+// defaults to the latest available data date; `start` is chosen from a small
+// menu computed *relative to end*: one week back, or the 1st of end's month
+// (month-to-date — the default view) and the 1st of each earlier month, back
+// to the first month we hold data for. Both ends are anchored to real data
+// dates (never the wall clock) so a window is never empty.
 
-interface RobustaAgeBucket { months_since_graded: number; by_port: Record<string, number>; grand_total_mt: number }
-interface RobustaAgeMonth  { month_end: string; valid?: { ports?: string[]; buckets?: RobustaAgeBucket[] } | null }
-interface RobustaGradingEntry { port?: string; origin?: string; class?: number | null; tenderable?: boolean; lots: number }
-interface RobustaGradingEvent { date: string; entries?: RobustaGradingEntry[] }
-interface RobustaOverviewEvent { date: string; total_pending_lots?: number | null; queue_lots?: number | null; forecast_lots?: number | null }
-// Output of the cohort-DNA pipeline (backend cohort_outflow.py). When
-// present these drive the system flow's per-origin buckets; missing →
-// we fall back to the in-browser stock simulation.
-interface ImpliedOutflowMonth {
-  month_end: string;
-  by_port: Record<string, Record<string, number>>;
-}
-export interface RobustaJsonShape {
-  snapshots: RobustaSnap[];
-  as_of?: string | null;
-  monthly?: {
-    age_allowance?: RobustaAgeMonth[];
-    implied_outflow?: ImpliedOutflowMonth[];
-    current_by_origin?: Record<string, Record<string, number>>;
-  };
-  recent_activity?: { gradings?: RobustaGradingEvent[]; grading_overview?: RobustaOverviewEvent[] };
-  port_origin_history?: Record<string, Record<string, { tenderable: number; class34: number }>>;
-}
+// Period-window helpers live in lib/certifiedStocks/window (shared with the
+// panel). Re-exported here for existing importers.
+export {
+  parseFlowISO, flowDateISO, flowAnchor, flowDateBounds, flowStartOptions,
+  FLOW_START_DEFAULT, type FlowStartOpt,
+} from "@/lib/certifiedStocks/window";
 
-// ── Format helpers ───────────────────────────────────────────────────────────
-
-const fmtNum = (n: number): string =>
-  Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : "—";
-
-// ── Age bins ─────────────────────────────────────────────────────────────────
-// Per user spec — 4 fadeness levels for stock 1y+, plus full-opacity "fresh"
-// for anything under a year. Bin keys are stable so they survive cross-runs.
-type AgeBin = "fresh" | "y1to2" | "y2to3" | "y3to4" | "y4plus";
-interface AgeDist { fresh: number; y1to2: number; y2to3: number; y3to4: number; y4plus: number }  // shares 0..1
-// Opacity floor lifted from 0.14 → 0.35 so 4y+ squares stay visibly
-// colored. The earlier fade was too aggressive — rows of old stock
-// were reading as "empty lines" in the grid.
-const AGE_OPACITY: Record<AgeBin, number> = {
-  fresh:  1.00,
-  y1to2:  0.80,
-  y2to3:  0.62,
-  y3to4:  0.47,
-  y4plus: 0.35,
-};
-const AGE_LABEL: Record<AgeBin, string> = {
-  fresh: "< 1y", y1to2: "1-2y", y2to3: "2-3y", y3to4: "3-4y", y4plus: "4y+",
-};
-const AGE_BIN_ORDER: AgeBin[] = ["fresh", "y1to2", "y2to3", "y3to4", "y4plus"];
-
-const _binByMonths = (months: number): AgeBin =>
-  months < 12 ? "fresh"
-  : months < 24 ? "y1to2"
-  : months < 36 ? "y2to3"
-  : months < 48 ? "y3to4"
-  : "y4plus";
-const _binByDays = (days: number): AgeBin => _binByMonths(days / 30);
-
-// Port-name lookup for arabica port labels. Workbook + live scraper both
-// settle on the long forms (NOLA, MIAMI, NY, HA/BR, VA, BAR) but older
-// snapshots can carry short forms (NOR, MIA, NYK, HAM, VIR). Canonical
-// forms below are the long names; aliases get mapped via _canonicalKC.
-const ARABICA_PORT_NAMES: Record<string, string> = {
-  ANT:    "Antwerp",
-  BAR:    "Barcelona",
-  "HA/BR": "Hamburg/Bremen",
-  HOU:    "Houston",
-  MIAMI:  "Miami",
-  NOLA:   "New Orleans",
-  NY:     "New York",
-  VA:     "Virginia",
-};
-
-// Short → canonical KC port codes. The workbook & live xls flip-flopped
-// between the short and long forms; the system flow comparing periods
-// across both forms would otherwise count an entire port's stock as
-// "gained" (current code missing from the base, so delta = current − 0).
-const KC_PORT_ALIASES: Record<string, string> = {
-  // short → canonical (the workbook + live scraper now use the long forms)
-  NOR:  "NOLA",   // observed Apr-May 2026: NOR (with 28k bags) ↔ NOLA same volume
-  NO:   "NOLA",
-  MIA:  "MIAMI",
-  MI:   "MIAMI",
-  NYK:  "NY",
-  HAM:  "HA/BR",
-  HA:   "HA/BR",
-  HO:   "HOU",
-  VIR:  "VA",
-};
-const _canonicalKC = (code: string): string => {
-  const c = (code || "").toUpperCase();
-  return KC_PORT_ALIASES[c] ?? c;
-};
-const ROBUSTA_PORT_NAMES: Record<string, string> = {
-  AMS: "Amsterdam",
-  ANT: "Antwerp",
-  BAR: "Barcelona",
-  BRE: "Bremen",
-  FEL: "Felixstowe",
-  GEN: "Genoa",
-  HAM: "Hamburg",
-  HUL: "Hull",
-  HUM: "Humberside",
-  LEH: "Le Havre",
-  LIV: "Liverpool",
-  LON: "London",
-  NOR: "Norfolk",
-  NYK: "New York",
-  ROT: "Rotterdam",
-  TEE: "Teesside",
-  TRI: "Trieste",
-};
-
-// ── Duration window selector ────────────────────────────────────────────────
-type DurationOpt = "7d" | "mtd" | "2m" | "3m" | "6m";
-const DURATION_LABELS: Record<DurationOpt, string> = {
-  "7d":  "Last 7 days",
-  "mtd": "Month to date",
-  "2m":  "Last 2 months",
-  "3m":  "Last 3 months",
-  "6m":  "Last 6 months",
-};
-function _durationCutoff(opt: DurationOpt, today: Date): Date {
-  // Normalise to local midnight so date-only event timestamps (which compare
-  // as 00:00:00) aren't accidentally excluded by the time-of-day component
-  // on `today`. Without this, picking "Last 7 days" near the end of the
-  // day cut off the boundary day's gradings event.
-  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  switch (opt) {
-    case "7d":  d.setDate(d.getDate() - 7); return d;
-    case "mtd": return new Date(today.getFullYear(), today.getMonth(), 1);
-    case "2m":  d.setMonth(d.getMonth() - 2); return d;
-    case "3m":  d.setMonth(d.getMonth() - 3); return d;
-    case "6m":  d.setMonth(d.getMonth() - 6); return d;
-  }
-}
-
-// ── Origin colors (market-aware) ────────────────────────────────────────────
-// Arabica (KC) palette is structured by ICE C-contract group, then by
-// continent within Group 0:
-//   • Group 0 — cold colors. Latin American → greens, Asian → blues,
-//                            African → purples.
-//   • Group 1 — dark green (Colombian milds).
-//   • Group 2 — yellow to light orange (warm light).
-//   • Group 3 — red / pink (warmer).
-//   • Group 4 — dark red-brown (Brazil naturals + Vietnam KC).
-//
-// Robusta (RC) palette follows the user's origin spec:
-//   • Vietnam     → dark blue   (primary RC origin)
-//   • Indonesia   → blue
-//   • Brazil      → dark red-brown
-//   • African     → purple nuances (Uganda, Tanzania, Cameroon, etc.)
-//   • Other Asian → cold colour nuances
-//   • Other LA    → warm colour nuances
-//
-// Vietnam carries different roles in each market so the dicts must be
-// kept separate (RC blue ≠ KC dark brown). _originColor() routes by market.
-
-const KC_ORIGIN_COLORS: Record<string, string> = {
-  // ── Group 0 — cold colours (LA green, AS blue, AF purple) ──
-  "Costa Rica":        "#16a34a",   // green-600
-  "El Salvador":       "#22c55e",   // green-500
-  "Guatemala":         "#10b981",   // emerald-500
-  "Honduras":          "#14b8a6",   // teal-500
-  "Mexico":            "#84cc16",   // lime-500
-  "Nicaragua":         "#15803d",   // green-700
-  "Panama":            "#34d399",   // emerald-400
-  "Peru":              "#4ade80",   // green-400
-  "Papua New Guinea":  "#0ea5e9",   // sky-500
-  "Kenya":             "#a855f7",   // purple-500
-  "Tanzania":          "#9333ea",   // purple-600
-  "Uganda":            "#c084fc",   // purple-400
-  // ── Group 1 — dark green ──
-  "Colombia":          "#14532d",   // green-900
-  // ── Group 2 — yellow to light orange ──
-  "Burundi":           "#facc15",   // yellow-400
-  "India":             "#fb923c",   // orange-400
-  "Rwanda":            "#fbbf24",   // amber-400
-  "Venezuela":         "#fdba74",   // orange-300
-  // ── Group 3 — red / pink ──
-  "Dominican Republic": "#f43f5e",  // rose-500
-  "Ecuador":           "#ec4899",   // pink-500
-  // ── Group 4 — dark red-brown ──
-  "Brazil":            "#7c2d12",   // red-brown-900
-  "Vietnam":           "#92400e",   // amber-900-brown
-};
-
-const RC_ORIGIN_COLORS: Record<string, string> = {
-  "Vietnam":                       "#1e3a8a",  // dark blue (blue-900)
-  "Indonesia":                     "#3b82f6",  // blue-500
-  // Brazil — dark red-brown
-  "Brazil":                        "#7c2d12",
-  "Brazilian Conillon":            "#7c2d12",
-  // African origins — purple nuances
-  "Uganda":                        "#a855f7",  // purple-500
-  "Tanzania":                      "#9333ea",  // purple-600
-  "Ethiopia":                      "#c084fc",  // purple-400
-  "Cameroon":                      "#7e22ce",  // purple-700
-  "Angola":                        "#6b21a8",  // purple-800
-  "Cote dIvoire":                  "#9d4edd",
-  "Cote d'Ivoire":                 "#9d4edd",
-  "Ghana":                         "#a78bfa",  // violet-400
-  "Guinea":                        "#8b5cf6",  // violet-500
-  "Madagascar":                    "#7c3aed",  // violet-600
-  "Republic of Madagascar":        "#7c3aed",
-  "Sierra Leone":                  "#d8b4fe",  // purple-300
-  "Togo":                          "#a855f7",
-  "Nigeria":                       "#9d4edd",
-  "DRC":                           "#7e22ce",
-  "Congo":                         "#7e22ce",
-  "Democratic Republic of Congo":  "#7e22ce",
-  // Other Asian — cold (blue / cyan)
-  "India":                         "#0ea5e9",  // sky-500
-  "Laos":                          "#06b6d4",  // cyan-500
-};
-const ORIGIN_DEFAULT = "#64748b";  // slate-500 (unknown / catch-all)
-
-function _originColor(origin: string, market: "KC" | "RC"): string {
-  const dict = market === "KC" ? KC_ORIGIN_COLORS : RC_ORIGIN_COLORS;
-  return dict[origin] ?? ORIGIN_DEFAULT;
-}
-
-// ── Density grid (vertical orientation, one square ≈ one warrant) ──────────
-// Each square targets one ICE warrant. Tunable cap so giant ports (ANT at
-// 1k+ arabica warrants, LON at 1.7k robusta lots) don't blow up the DOM —
-// when a port exceeds the cap we scale uniformly across {existing, gained,
-// ghost} groups and surface the effective per-square volume in the click
-// popover so the visual stays honest.
-// DENSITY_COLS is now per-card: `p.span * 3` (span ∈ 1-4 → cols ∈ 3-12).
-// HARD RULE — never compromise: 1 square = exactly 1 ICE warrant.
-//   • Robusta: 1 warrant = 1 lot = 10 MT.
-//   • Arabica: 1 warrant = 37,500 lb = 17.009 MT ≈ 283.49 bags @ 60 kg.
-// The cap that used to scale down giant ports has been raised to a value
-// large enough that we never hit it in practice (max historical robusta
-// peak ≈ 12k lots). Cards grow as tall as the data demands — the user
-// chose accuracy over compactness.
-const DENSITY_MAX_SQUARES = 20000;
-const BAGS_PER_WARRANT_KC = (37_500 * 0.45359237) / 60;   // ≈ 283.49
-const LOTS_PER_WARRANT_RC = 1;
-
-interface DensitySquare {
-  status: "filled" | "gained" | "ghost" | "transit";
-  origin: string;
-  color: string;
-  ageBin: AgeBin;
-  warrants: number;            // effective warrants this square represents
-  klass: number | null;        // Robusta C-contract class (1..4) — null for KC.
-}
-
-// Robusta-class contour colours (1px inset border). Class 1 = par (no
-// border, the cleanest visual), faded yellow / orange / red walk down
-// the differential ladder (-30 / -60 / -90). Class P (premium, +30)
-// would be green when the source feed starts emitting it.
-const CLASS_BORDER_RC: Record<number, string> = {
-  2: "rgba(250, 204, 21, 0.65)",  // faded yellow (-30)
-  3: "rgba(249, 115, 22, 0.95)",  // orange       (-60)
-  4: "rgba(239, 68, 68, 0.98)",   // red          (-90)
-};
-const CLASS_LABEL_RC: Record<number, string> = {
-  1: "Class 1 (par)",
-  2: "Class 2 (−30)",
-  3: "Class 3 (−60)",
-  4: "Class 4 (−90)",
-};
-
-// Per-origin gross flow over the window. gross_in = sum of all positive daily
-// deltas (or grading events for Robusta). gross_out = sum of all negative
-// daily deltas. We derive net / lost / transit from these:
-//   • net_delta = gross_in − gross_out
-//   • net_gained = max(0, net_delta)            (showed up in current stock)
-//   • lost      = max(0, −net_delta)            (disappeared, shown as ghost)
-//   • transit   = min(gross_in, gross_out)      (arrived AND left within window)
-interface OriginFlowPair { gross_in: number; gross_out: number }
-
-// Per-card grid sizing. Hard rule (locked at user's request):
-//   • Every Robusta square is exactly 13 px — matches the baseline size
-//     a Houston-Arabica square previously rendered at (small warehouse,
-//     used as the reference point).
-//   • Every Arabica square is 17 px (= 13 × √(17 MT / 10 MT) ≈ 13 × 1.30
-//     so the square area scales with the contract's warrant volume —
-//     Arabica 17 MT lot vs Robusta 10 MT lot).
-// cols = ceil(√squares) keeps the grid square-ish; cards grow to fit and
-// the parent row wraps. This means visual area is comparable across
-// warehouses and contracts — one Antwerp lot covers the same number of
-// pixels regardless of how many lots Antwerp holds.
-const CELL_PX_KC = 17;
-const CELL_PX_RC = 13;
-const _gridCols = (squares: number) => (squares <= 0 ? 4 : Math.max(4, Math.ceil(Math.sqrt(squares))));
-const _rowsForCount = (n: number, cols: number) => (n <= 0 ? 0 : Math.ceil(n / cols));
-
-// ── Density-grid formulas ────────────────────────────────────────────────────
-//
-// Per port, over a chosen window:
-//
-//   • Per origin we know two gross flows:
-//       gross_in[o]  = lots arriving in the window
-//       gross_out[o] = lots leaving in the window
-//
-//   • Per-origin invariant (mass balance):
-//       base[o] + gross_in[o] − gross_out[o]  =  cur[o]
-//     so:
-//       net_delta[o] = gross_in[o] − gross_out[o]
-//
-//   • Buckets rendered on the card:
-//       net_gained[o] = max(0,  net_delta[o])      arrived and still here
-//       lost[o]       = max(0, −net_delta[o])      were here, gone now
-//       transited[o]  = min(gross_in[o], gross_out[o])   arrived AND left
-//
-//   • Existing portion (the colored grid above the dashed boxes):
-//       existing[o]   = max(0, cur[o] − net_gained[o])
-//     i.e. what's still on hand from before the window started.
-//
-//   • Port-level invariant:
-//       current = existing_total + net_gained_total
-//       gross_in_total  = net_gained_total + transited_total
-//       gross_out_total = lost_total        + transited_total
-//
-// How gross_in / gross_out are sourced:
-//
-//   Arabica (KC) — we walk every snapshot in the window and read
-//   `total_certified.by_origin[o].by_port[p]` directly. Positive daily
-//   deltas at (p, o) accumulate into gross_in[o], negative into gross_out[o].
-//
-//   Robusta (RC) — the source only carries port-level totals, never
-//   per-origin stock. So we run a simulation per port:
-//       1. Initialise per-origin state from port_origin_history shares ×
-//          first snapshot's port total.
-//       2. Walk daily. Each gradings event (date, port, origin, lots) adds
-//          to state[o] and to gross_in[o]. Each day's port-level outflow
-//          (mass balance: prev_total + total_in − new_total) is apportioned
-//          across the current state proportionally, decrementing state[o]
-//          and accumulating into gross_out[o].
-//       3. End state = inferred current per-origin stock (cur[o]).
-//   This is what lets transited and net_gained stay self-consistent:
-//   Indonesia arriving at Antwerp 6mo ago and leaving 4mo ago shows up
-//   as transited (in & out), not as net_gained that never materialises.
-//   ─────────────────────────────────────────────────────────────────────────
-
-interface RobustaPortSim {
-  state: Record<string, number>;
-  inflowByOriginByDate:  Record<string, Record<string, number>>;
-  outflowByOriginByDate: Record<string, Record<string, number>>;
-}
-
-function _simulateRobustaPortStock(
-  port: string,
-  snaps: RobustaSnap[],
-  grads: RobustaGradingEvent[],
-  histShare: Record<string, number>,
-): RobustaPortSim {
-  const sortedSnaps = [...snaps].sort((a, b) => a.date.localeCompare(b.date));
-  // Bucket gradings into daily per-origin inflow for this port only.
-  const gradsByDate: Record<string, Record<string, number>> = {};
-  for (const ev of grads) {
-    for (const e of (ev.entries || [])) {
-      if (e.tenderable === false) continue;
-      if ((e.port || "") !== port) continue;
-      const origin = (e.origin || "?").trim();
-      gradsByDate[ev.date] = gradsByDate[ev.date] || {};
-      gradsByDate[ev.date][origin] = (gradsByDate[ev.date][origin] ?? 0) + (e.lots ?? 0);
-    }
-  }
-  const state: Record<string, number> = {};
-  const firstTotal = sortedSnaps[0]?.by_port_lots?.[port] ?? 0;
-  const shareSum = Object.values(histShare).reduce((a, b) => a + b, 0);
-  if (firstTotal > 0 && shareSum > 0) {
-    for (const [o, v] of Object.entries(histShare)) state[o] = (v / shareSum) * firstTotal;
-  }
-  const inflowByOriginByDate:  Record<string, Record<string, number>> = {};
-  const outflowByOriginByDate: Record<string, Record<string, number>> = {};
-  let prevTotal = firstTotal;
-  for (let i = 1; i < sortedSnaps.length; i++) {
-    const date = sortedSnaps[i].date;
-    const newTotal = sortedSnaps[i].by_port_lots?.[port] ?? 0;
-    const dayIn = gradsByDate[date] ?? {};
-    let totalIn = 0;
-    for (const [o, v] of Object.entries(dayIn)) {
-      state[o] = (state[o] ?? 0) + v;
-      totalIn += v;
-    }
-    if (Object.keys(dayIn).length > 0) inflowByOriginByDate[date] = { ...dayIn };
-    const totalOut = Math.max(0, prevTotal + totalIn - newTotal);
-    const stateSum = Object.values(state).reduce((a, b) => a + b, 0);
-    if (totalOut > 0 && stateSum > 0) {
-      const dayOut: Record<string, number> = {};
-      for (const [o, v] of Object.entries(state)) {
-        const out = (v / stateSum) * totalOut;
-        state[o] = Math.max(0, v - out);
-        if (out > 0) dayOut[o] = out;
-      }
-      if (Object.keys(dayOut).length > 0) outflowByOriginByDate[date] = dayOut;
-    }
-    prevTotal = newTotal;
-  }
-  return { state, inflowByOriginByDate, outflowByOriginByDate };
-}
-
-// Helper — distribute `count` squares across origins proportionally and
-// stamp each with an age bin sampled from the age distribution. For
-// Robusta squares an optional `originClassShares` lets us also stamp
-// each square's C-contract class (1..4) proportionally to that
-// origin's class mix recorded in gradings at the port.
-function _allocSquares(
-  count: number,
-  byOrigin: Record<string, number>,
-  age: AgeDist,
-  status: DensitySquare["status"],
-  perSquareWarrants: number,
-  market: "KC" | "RC",
-  originClassShares?: Record<string, Record<number, number>>,
-): DensitySquare[] {
-  if (count <= 0) return [];
-  const origins = Object.entries(byOrigin).filter(([, v]) => v > 0);
-  const total = origins.reduce((a, [, v]) => a + v, 0);
-  if (total <= 0) return [];
-
-  const originPool: string[] = [];
-  for (const [origin, v] of origins) {
-    const n = Math.round(count * (v / total));
-    for (let i = 0; i < n; i++) originPool.push(origin);
-  }
-  while (originPool.length < count) originPool.push(origins[0][0]);
-  while (originPool.length > count) originPool.pop();
-
-  const agePool: AgeBin[] = [];
-  for (const bin of AGE_BIN_ORDER) {
-    const n = Math.round(count * age[bin]);
-    for (let i = 0; i < n; i++) agePool.push(bin);
-  }
-  while (agePool.length < count) agePool.push("fresh");
-  while (agePool.length > count) agePool.pop();
-
-  // Per-square class assignment (Robusta only). Group indices by origin,
-  // then partition each origin's slot of the pool proportionally to its
-  // gradings-derived class mix; the leftover fills with class 1 (par).
-  const klassByIdx: (number | null)[] = new Array(count).fill(null);
-  if (market === "RC" && originClassShares) {
-    const indicesByOrigin: Record<string, number[]> = {};
-    originPool.forEach((o, i) => {
-      indicesByOrigin[o] = indicesByOrigin[o] || [];
-      indicesByOrigin[o].push(i);
-    });
-    for (const [origin, indices] of Object.entries(indicesByOrigin)) {
-      const shares = originClassShares[origin] ?? {};
-      const classes = Object.entries(shares)
-        .map(([k, v]) => [Number(k), v] as [number, number])
-        .sort((a, b) => a[0] - b[0]);
-      let assigned = 0;
-      for (const [cls, share] of classes) {
-        const n = Math.round(indices.length * share);
-        for (let j = 0; j < n && assigned < indices.length; j++) {
-          klassByIdx[indices[assigned]] = cls;
-          assigned++;
-        }
-      }
-      while (assigned < indices.length) {
-        klassByIdx[indices[assigned]] = 1;
-        assigned++;
-      }
-    }
-  }
-
-  return originPool.map((origin, i) => ({
-    status,
-    origin,
-    color: _originColor(origin, market),
-    ageBin: agePool[i] ?? "fresh",
-    warrants: perSquareWarrants,
-    klass: klassByIdx[i],
-  }));
-}
-
-// Build the four sub-grids for one port from per-origin gross flows:
-//   • `existing`   — what's still here from before the window started
-//                    (current − net-gained). Inherits the port's age mix.
-//   • `netGained`  — net new warrants added over the window (sum of per-
-//                    origin max(0, in−out)). Green dashed border, fresh.
-//   • `ghosts`     — net warrants that disappeared (sum of per-origin
-//                    max(0, out−in)). Red dashed border.
-//   • `transited`  — coffee that arrived AND left within the window
-//                    (sum of per-origin min(in, out)). Amber dashed,
-//                    fresh — these never show up in current stock.
-//
-// Invariant: current = existing + netGained, so the visible current stock
-// is exactly `existing` + `netGained`. `ghosts` and `transited` sit
-// alongside as window-only ghost groups.
-function buildDensityGrid(
-  current: number,
-  byOrigin: Record<string, number>,
-  age: AgeDist,
-  flowByOrigin: Record<string, OriginFlowPair>,
-  unit: number,
-  market: "KC" | "RC",
-  originClassShares?: Record<string, Record<number, number>>,
-): {
-  existing:  DensitySquare[];
-  netGained: DensitySquare[];
-  ghosts:    DensitySquare[];
-  transited: DensitySquare[];
-  // Volume breakdown per origin for each bucket. Drives the small
-  // top-origin chip strip beneath each sub-grid header.
-  byOriginExisting:  Record<string, number>;
-  byOriginNetGained: Record<string, number>;
-  byOriginGhost:     Record<string, number>;
-  byOriginTransit:   Record<string, number>;
-  // Raw volume per bucket (bags for KC, lots for RC). Square counts are
-  // ceil'd to whole warrants for visual integrity, so the headline label
-  // must use these to avoid a rounding inflation (e.g. 500 lost bags
-  // → 2 warrants → 567 bags via the warrant count).
-  netGainedVol: number;
-  lostVol:      number;
-  transitVol:   number;
-  effectivePerSquare: number;
-  totalWarrants: number;
-} {
-  // 1. Decompose per-origin gross flows into net / lost / transit volumes.
-  let netGainedVol = 0, lostVol = 0, transitVol = 0;
-  const netGainedByOrigin: Record<string, number> = {};
-  const ghostByOrigin:     Record<string, number> = {};
-  const transitByOrigin:   Record<string, number> = {};
-  for (const [origin, f] of Object.entries(flowByOrigin)) {
-    const tIn  = Math.max(0, f.gross_in);
-    const tOut = Math.max(0, f.gross_out);
-    const net  = tIn - tOut;
-    const tr   = Math.min(tIn, tOut);
-    if (net > 0)  { netGainedByOrigin[origin] = net;  netGainedVol += net;  }
-    if (net < 0)  { ghostByOrigin[origin]     = -net; lostVol      += -net; }
-    if (tr  > 0)  { transitByOrigin[origin]   = tr;   transitVol   += tr;   }
-  }
-
-  const totalWarrants    = Math.max(0, Math.ceil(current / unit));
-  const netGainedWarrants = Math.max(0, Math.ceil(netGainedVol / unit));
-  const lostWarrants      = Math.max(0, Math.ceil(lostVol      / unit));
-  const transitWarrants   = Math.max(0, Math.ceil(transitVol   / unit));
-  const existingWarrants  = Math.max(0, totalWarrants - netGainedWarrants);
-
-  // 2. Uniform scale-down if the grand total of squares would overflow.
-  const grand = existingWarrants + netGainedWarrants + lostWarrants + transitWarrants;
-  void market;
-  const scale = grand > DENSITY_MAX_SQUARES ? DENSITY_MAX_SQUARES / grand : 1;
-  const existingShown  = Math.round(existingWarrants  * scale);
-  const netGainedShown = Math.round(netGainedWarrants * scale);
-  const lostShown      = Math.round(lostWarrants      * scale);
-  const transitShown   = Math.round(transitWarrants   * scale);
-  const effectivePerSquare = scale === 1 ? 1 : 1 / scale;
-
-  // 3. Existing origin shares = byOrigin minus per-origin net-gained.
-  const existingByOrigin: Record<string, number> = {};
-  for (const [origin, v] of Object.entries(byOrigin)) {
-    const ng = netGainedByOrigin[origin] ?? 0;
-    existingByOrigin[origin] = Math.max(0, v - ng);
-  }
-
-  // 4. Stamp squares. Existing inherits the port's age mix; net-gained and
-  // transit are fresh by definition; ghosts have no surviving age info.
-  const FRESH_ONLY: AgeDist = { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-  const existing  = _allocSquares(existingShown,  existingByOrigin,  age,        "filled",  effectivePerSquare, market, originClassShares);
-  const netGained = _allocSquares(netGainedShown, netGainedByOrigin, FRESH_ONLY, "gained",  effectivePerSquare, market, originClassShares);
-  const ghosts    = _allocSquares(lostShown,      ghostByOrigin,     FRESH_ONLY, "ghost",   effectivePerSquare, market, originClassShares);
-  const transited = _allocSquares(transitShown,   transitByOrigin,   FRESH_ONLY, "transit", effectivePerSquare, market, originClassShares);
-
-  return {
-    existing, netGained, ghosts, transited,
-    byOriginExisting:  existingByOrigin,
-    byOriginNetGained: netGainedByOrigin,
-    byOriginGhost:     ghostByOrigin,
-    byOriginTransit:   transitByOrigin,
-    netGainedVol, lostVol, transitVol,
-    effectivePerSquare, totalWarrants,
-  };
-}
-
-interface OriginFlow { origin: string; volume: number; color: string }
-// Card-width spans (1–4 of a 12-col container). Sqrt scaling so a port at
-// 5% of max capacity still gets span 1 (visible) rather than collapsing.
-// Top-8 sum ≤ 12 typically; if it overflows the container grid wraps.
-function _assignSpans(ports: PortFlow[]): void {
-  if (ports.length === 0) return;
-  const maxCap = Math.max(...ports.map((p) => p.capacity));
-  for (const p of ports) {
-    const r = maxCap > 0 ? Math.sqrt(p.capacity / maxCap) : 0;
-    const raw = Math.round(4 * r);
-    p.span = Math.max(1, Math.min(4, raw)) as 1 | 2 | 3 | 4;
-  }
-}
-
-// ── Poison criteria (v2 per user spec) ─────────────────────────────────────
-// Arabica: aged > 1 year OR Brazil origin.
-// Robusta: Brazilian Conillon OR aged > 1 year OR port ∈ London / US
-//          (LON, NYK, NEW, NOR) OR graded class ∈ {3, 4}.
-const RC_DEAD_PORTS  = new Set(["LON", "NYK", "NEW", "NOR"]);
-const KC_BAD_ORIGINS = new Set(["Brazil"]);
-const RC_BAD_ORIGINS = new Set(["Brazilian Conillon", "Brazil"]);
-
-interface PoisonStats {
-  pct:        number;   // 0..1 — share of standing stock flagged poison
-  total:      number;   // volume (bags or lots) flagged poison
-  aged:       number;   // contribution of the aged>1y criterion
-  badOrigin:  number;   // contribution of bad-origin (Brazil / Conillon)
-  deadPort:   number;   // contribution of dead-port (RC only)
-  lowClass:   number;   // contribution of class 3/4 (RC only, inferred)
-}
-
-function _computePoison(
-  current: number,
-  market: "KC" | "RC",
-  port: string,
-  byOrigin: Record<string, number>,
-  age: AgeDist,
-  class34ShareAtPort: number,
-): PoisonStats {
-  if (current <= 0) {
-    return { pct: 0, total: 0, aged: 0, badOrigin: 0, deadPort: 0, lowClass: 0 };
-  }
-  const agedShare = age.y1to2 + age.y2to3 + age.y3to4 + age.y4plus;
-
-  let badOriginVol = 0;
-  const badSet = market === "KC" ? KC_BAD_ORIGINS : RC_BAD_ORIGINS;
-  for (const [origin, v] of Object.entries(byOrigin)) {
-    if (badSet.has(origin)) badOriginVol += v;
-  }
-  const badShare = badOriginVol / current;
-
-  // Dead-port: robusta only. If the port itself is dead, ALL stock is poison.
-  const deadShare = market === "RC" && RC_DEAD_PORTS.has(port) ? 1 : 0;
-
-  // Class 3/4 share — robusta only, inferred from gradings history at port.
-  const classShare = market === "RC" ? class34ShareAtPort : 0;
-
-  // Combined: if the port is dead, 100% poison. Otherwise assume the three
-  // criteria are roughly independent → P(any) = 1 − ∏(1 − Pᵢ).
-  const pct = deadShare === 1
-    ? 1
-    : 1 - (1 - agedShare) * (1 - badShare) * (1 - classShare);
-
-  return {
-    pct,
-    total:     pct        * current,
-    aged:      agedShare  * current,
-    badOrigin: badShare   * current,
-    deadPort:  deadShare  * current,
-    lowClass:  classShare * current,
-  };
-}
-
-interface PortFlow {
-  market: "KC" | "RC";
-  code: string;
-  name: string;
-  current: number;
-  capacity: number;
-  pctFull: number;
-  unit: "bags" | "lots";
-  squareUnit: number;            // bags-per-square or lots-per-square
-  byOrigin: Record<string, number>;
-  age: AgeDist;
-  // Per-origin gross flows over the window — drives the four-bucket density
-  // grid (existing / net-gained / lost / transited). Replaces the older
-  // signed-delta-only model so we can surface intra-window churn.
-  flowByOrigin: Record<string, OriginFlowPair>;
-  // Per-origin C-contract class mix (Robusta only). Tagged on each square
-  // so a hover reveals "Class 2 (−30)" etc. and the border colour reflects
-  // the class differential.
-  classShares?: Record<string, Record<number, number>>;
-  inflow: OriginFlow[];
-  outflow: OriginFlow[];
-  // Display sizing — assigned after all ports are computed. Card spans
-  // 1–4 columns of a 12-col container grid based on capacity-rank (sqrt-
-  // scaled so small ports don't collapse to invisible). Density grid
-  // inside each card uses span × 3 columns.
-  span: 1 | 2 | 3 | 4;
-  // Poison stats — share + per-criterion breakdown for the card header.
-  poison: PoisonStats;
-}
 
 // ── Main test panel ──────────────────────────────────────────────────────────
 
@@ -734,10 +63,16 @@ const IconTruck = (p: { className?: string }) => (
 interface Props {
   arabica: ArabicaJsonShape | null;
   robusta: RobustaJsonShape | null;
+  // Flow range + display unit are owned by the parent panel (rendered up by
+  // the metric toggle) and passed down so both stay in sync. `start`/`end`
+  // are the window bounds (local-midnight Dates).
+  start: Date;
+  end: Date;
+  unit: FlowUnit;
 }
 
-export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
-  const [flowDuration, setFlowDuration] = useState<DurationOpt>("7d");
+export default function CertifiedStocksSystemFlow({ arabica, robusta, start, end, unit }: Props) {
+  const fmtU = (v: number, native: "bags" | "lots") => _fmtUnit(v, native, unit);
   // Hover-only inspector — no click state. The tooltip pops out of the
   // square the mouse is over and renders origin / age / (Robusta) class.
   const [hoveredSquare, setHoveredSquare] = useState<{
@@ -772,470 +107,13 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
     document.head.appendChild(s);
   }, []);
 
-  //   • flowByOrigin (gross_in / gross_out) per origin over the window,
-  //     used to derive the existing / net-gained / lost / transited squares
-  //   • inflow / outflow lists for the side indicators
-  interface SystemFlowMarket {
-    market: "KC" | "RC";
-    label: string;
-    unit: "bags" | "lots";
-    squareUnit: number;
-    ports: PortFlow[];
-    intake: {
-      pending: number;
-      passed: number;
-      failed: number;
-      passedPremium: number;
-      passedBorderline: number;
-      date: string | null;
-    } | null;
-  }
-
-  const systemFlows = useMemo<{ kc: SystemFlowMarket; rc: SystemFlowMarket }>(() => {
-    const today = new Date();
-    const cutoff = _durationCutoff(flowDuration, today);
-
-    // Find the snapshot closest to (but not after) `target` for the T0 baseline.
-    const findSnapAt = <T extends { date: string }>(snaps: T[], target: Date): T | null => {
-      if (!snaps.length) return null;
-      let best: T | null = null;
-      let bestDist = Infinity;
-      for (const s of snaps) {
-        const t = new Date(s.date).getTime();
-        if (t > target.getTime()) continue;
-        const dist = target.getTime() - t;
-        if (dist < bestDist) { best = s; bestDist = dist; }
-      }
-      return best ?? snaps[0];
-    };
-
-    // ── Arabica market ─────────────────────────────────────────────────
-    const buildArabica = (): SystemFlowMarket => {
-      const empty: SystemFlowMarket = {
-        market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports: [], intake: null,
-      };
-      const snaps = arabica?.snapshots ?? [];
-      if (snaps.length === 0) return empty;
-      const latest = snaps[snaps.length - 1];
-      const base = findSnapAt(snaps, cutoff) ?? snaps[0];
-      const latestSec = latest.sections?.total_certified;
-      if (!latestSec) return empty;
-
-      // 365-day per-port max, keyed by canonical port code so the snapshot
-      // history's short codes (NOR/MIA/NYK/HAM) merge into the long forms.
-      const maxByPort = new Map<string, number>();
-      for (const s of snaps) {
-        for (const [p, v] of Object.entries(s.by_port || {})) {
-          const k = _canonicalKC(p);
-          if (v > (maxByPort.get(k) ?? 0)) maxByPort.set(k, v);
-        }
-      }
-
-      // Age distribution per port from latest_detail.age_detail. Canonicalise
-      // here too so the latest's "NOLA" key picks up workbook rows still
-      // written as "NOR" (older imports of sheet 12).
-      const ageByPort: Record<string, AgeDist> = {};
-      const ageDetail = arabica?.latest_detail?.age_detail ?? {};
-      for (const [port, rows] of Object.entries(ageDetail)) {
-        const canon = _canonicalKC(port);
-        const dist: AgeDist = ageByPort[canon] ?? { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-        for (const r of rows) {
-          const m = r.age_bucket?.match(/^(\d+)/);
-          const days = m ? parseInt(m[1], 10) : 0;
-          dist[_binByDays(days)] += r.bags || 0;
-        }
-        ageByPort[canon] = dist;
-      }
-      // Renormalise to shares per canonical port.
-      for (const port of Object.keys(ageByPort)) {
-        const a = ageByPort[port];
-        const sum = a.fresh + a.y1to2 + a.y2to3 + a.y3to4 + a.y4plus;
-        if (sum > 0) {
-          a.fresh /= sum; a.y1to2 /= sum; a.y2to3 /= sum; a.y3to4 /= sum; a.y4plus /= sum;
-        }
-      }
-
-      // Roll up latest + base port volumes per canonical code so periods
-      // with mismatched short/long codes compare cleanly.
-      const collapseSec = (sec: typeof latestSec | undefined) => {
-        const byPort: Record<string, number> = {};
-        const byOriginPort: Record<string, Record<string, number>> = {};
-        const originMeta: Record<string, { group: string }> = {};
-        for (const [p, v] of Object.entries(sec?.by_port ?? {})) {
-          byPort[_canonicalKC(p)] = (byPort[_canonicalKC(p)] ?? 0) + v;
-        }
-        for (const [origin, od] of Object.entries(sec?.by_origin ?? {})) {
-          byOriginPort[origin] = byOriginPort[origin] ?? {};
-          originMeta[origin] = { group: od.group };
-          for (const [p, v] of Object.entries(od.by_port ?? {})) {
-            const k = _canonicalKC(p);
-            byOriginPort[origin][k] = (byOriginPort[origin][k] ?? 0) + v;
-          }
-        }
-        return { byPort, byOriginPort, originMeta };
-      };
-      const latestC = collapseSec(latestSec);
-
-      // Walk every snapshot in the window in chronological order and
-      // accumulate per-(port, origin) gross inflows / outflows from daily
-      // deltas. Including `base` at the start captures the first transition
-      // into the window. This is what lets us surface stock that arrived
-      // AND departed inside the period (the "transited" bucket).
-      const cutT = cutoff.getTime();
-      const winSnaps = snaps
-        .filter((s) => new Date(s.date).getTime() >= cutT)
-        .sort((a, b) => a.date.localeCompare(b.date));
-      const walk = winSnaps[0] === base ? winSnaps : [base, ...winSnaps];
-      const flowByPort: Record<string, Record<string, OriginFlowPair>> = {};
-      for (let i = 0; i < walk.length - 1; i++) {
-        const a = collapseSec(walk[i].sections?.total_certified);
-        const b = collapseSec(walk[i + 1].sections?.total_certified);
-        const keys = new Set<string>();
-        for (const [origin, perPort] of Object.entries(a.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${origin}`);
-        for (const [origin, perPort] of Object.entries(b.byOriginPort)) for (const p of Object.keys(perPort)) keys.add(`${p}|${origin}`);
-        for (const key of Array.from(keys)) {
-          const sep = key.indexOf("|");
-          const port = key.slice(0, sep);
-          const origin = key.slice(sep + 1);
-          const av = (a.byOriginPort[origin] || {})[port] ?? 0;
-          const bv = (b.byOriginPort[origin] || {})[port] ?? 0;
-          const d = bv - av;
-          if (d === 0) continue;
-          flowByPort[port] = flowByPort[port] || {};
-          flowByPort[port][origin] = flowByPort[port][origin] || { gross_in: 0, gross_out: 0 };
-          if (d > 0) flowByPort[port][origin].gross_in  += d;
-          else       flowByPort[port][origin].gross_out += -d;
-        }
-      }
-
-      const ports: PortFlow[] = [];
-      for (const [code, current] of Object.entries(latestC.byPort)) {
-        if (current <= 0) continue;
-        const byOrigin: Record<string, number> = {};
-        for (const [origin, perPort] of Object.entries(latestC.byOriginPort)) {
-          const v = perPort[code] ?? 0;
-          if (v > 0) byOrigin[origin] = v;
-        }
-        const flowByOrigin = flowByPort[code] ?? {};
-        const inflow: OriginFlow[] = [];
-        const outflow: OriginFlow[] = [];
-        for (const [origin, f] of Object.entries(flowByOrigin)) {
-          if (f.gross_in  > 0) inflow.push({  origin, volume: f.gross_in,  color: _originColor(origin, "KC") });
-          if (f.gross_out > 0) outflow.push({ origin, volume: f.gross_out, color: _originColor(origin, "KC") });
-        }
-        inflow.sort((a, b) => b.volume - a.volume);
-        outflow.sort((a, b) => b.volume - a.volume);
-        const cap = Math.max(maxByPort.get(code) ?? current, current);
-        const ageFinal = ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-        const poison = _computePoison(current, "KC", code, byOrigin, ageFinal, 0);
-        ports.push({
-          market: "KC", code, name: ARABICA_PORT_NAMES[code] ?? code,
-          current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
-          unit: "bags", squareUnit: BAGS_PER_WARRANT_KC,
-          byOrigin, age: ageFinal,
-          flowByOrigin, inflow, outflow, span: 1, poison,
-        });
-      }
-      ports.sort((a, b) => b.current - a.current);
-      _assignSpans(ports);
-
-      // Intake summary — SUM over the window (so it aligns with the
-      // per-warehouse inflow numbers below). Pending stays point-in-time
-      // (it's a standing queue, not a flow).
-      const cutTime = cutoff.getTime();
-      let passed = 0, failed = 0;
-      for (const s of snaps) {
-        if (new Date(s.date).getTime() < cutTime) continue;
-        passed += s.passed_today_bags ?? 0;
-        failed += s.failed_today_bags ?? 0;
-      }
-      let premiumShare = 0, borderlineShare = 0;
-      for (const [origin, perPort] of Object.entries(latestC.byOriginPort)) {
-        const tot = Object.values(perPort).reduce((a, b) => a + b, 0);
-        const group = latestC.originMeta[origin]?.group ?? "";
-        if (group === "Group 3" || group === "Group 4") borderlineShare += tot;
-        else premiumShare += tot;
-      }
-      const sum = premiumShare + borderlineShare || 1;
-      const passedPremium    = Math.round(passed * (premiumShare    / sum));
-      const passedBorderline = Math.round(passed * (borderlineShare / sum));
-      return {
-        market: "KC", label: "Arabica · ICE Futures US (KC)",
-        unit: "bags", squareUnit: BAGS_PER_WARRANT_KC, ports,
-        intake: { pending: latest.pending_grading_bags ?? 0, passed, failed, passedPremium, passedBorderline, date: latest.date },
-      };
-    };
-
-    // ── Robusta market ──────────────────────────────────────────────────
-    // No standing by_origin per port in the source — inferred from gradings
-    // flow proportions (per port, full history). Mark every robusta panel
-    // with the inferred caveat.
-    const buildRobusta = (): SystemFlowMarket => {
-      const empty: SystemFlowMarket = {
-        market: "RC", label: "Robusta · ICE Futures Europe (RC)",
-        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports: [], intake: null,
-      };
-      const snaps = robusta?.snapshots ?? [];
-      const grads = robusta?.recent_activity?.gradings ?? [];
-      const overv = robusta?.recent_activity?.grading_overview ?? [];
-      if (snaps.length === 0) return empty;
-      const latest = snaps[snaps.length - 1];
-
-      // Origin proportion per port — prefer the full-history rollup the
-      // importer attached (covers stock graded outside the daily window,
-      // e.g. Felixstowe's 34 lots that pre-date our gradings events).
-      // Fall back to the rolling window's gradings entries when the
-      // workbook field isn't present.
-      const portOriginLots: Record<string, Record<string, number>> = {};
-      const portClass34Lots: Record<string, number> = {};
-      const portTotalLotsHist: Record<string, number> = {};
-      const fullHist = robusta?.port_origin_history;
-      if (fullHist) {
-        for (const [port, byOrigin] of Object.entries(fullHist)) {
-          portOriginLots[port] = {};
-          let class34 = 0, total = 0;
-          for (const [origin, d] of Object.entries(byOrigin) as Array<[string, { tenderable: number; class34: number }]>) {
-            portOriginLots[port][origin] = (portOriginLots[port][origin] ?? 0) + d.tenderable;
-            class34 += d.class34;
-            total   += d.tenderable;
-          }
-          portClass34Lots[port] = class34;
-          portTotalLotsHist[port] = total;
-        }
-      } else {
-        for (const ev of grads) {
-          for (const e of (ev.entries || [])) {
-            if (e.tenderable === false) continue;
-            const port = e.port || "?";
-            const origin = e.origin?.trim() || "?";
-            portOriginLots[port] = portOriginLots[port] ?? {};
-            portOriginLots[port][origin] = (portOriginLots[port][origin] ?? 0) + (e.lots ?? 0);
-            portTotalLotsHist[port] = (portTotalLotsHist[port] ?? 0) + (e.lots ?? 0);
-            if (e.class === 3 || e.class === 4) {
-              portClass34Lots[port] = (portClass34Lots[port] ?? 0) + (e.lots ?? 0);
-            }
-          }
-        }
-      }
-
-      // Per-(port, origin, class) tenderable lots from gradings events —
-      // drives the per-square Robusta class assignment + border colour.
-      // Normalised to shares per (port, origin) so each square is stamped
-      // with a class sampled from that origin's quality mix at the port.
-      const portOriginClassMix: Record<string, Record<string, Record<number, number>>> = {};
-      for (const ev of grads) {
-        for (const e of (ev.entries || [])) {
-          if (e.tenderable === false) continue;
-          const klass = e.class;
-          if (klass == null) continue;
-          const port = e.port || "?";
-          const origin = e.origin?.trim() || "?";
-          portOriginClassMix[port] = portOriginClassMix[port] || {};
-          portOriginClassMix[port][origin] = portOriginClassMix[port][origin] || {};
-          portOriginClassMix[port][origin][klass] = (portOriginClassMix[port][origin][klass] ?? 0) + (e.lots ?? 0);
-        }
-      }
-      const portOriginClassShares: Record<string, Record<string, Record<number, number>>> = {};
-      for (const [port, byOrigin] of Object.entries(portOriginClassMix)) {
-        const out: Record<string, Record<number, number>> = {};
-        for (const [origin, byClass] of Object.entries(byOrigin)) {
-          const total = Object.values(byClass).reduce((a, b) => a + b, 0);
-          if (total <= 0) continue;
-          const shares: Record<number, number> = {};
-          for (const [k, v] of Object.entries(byClass)) shares[Number(k)] = v / total;
-          out[origin] = shares;
-        }
-        if (Object.keys(out).length > 0) portOriginClassShares[port] = out;
-      }
-
-      // Age distribution per port from the latest age_allowance month.
-      const ageByPort: Record<string, AgeDist> = {};
-      const ageMonths = robusta?.monthly?.age_allowance ?? [];
-      const latestAge = ageMonths.reduce<RobustaAgeMonth | null>((acc, m) =>
-        !acc || new Date(m.month_end) > new Date(acc.month_end) ? m : acc, null);
-      const buckets = latestAge?.valid?.buckets ?? [];
-      for (const b of buckets) {
-        const bin = _binByMonths(b.months_since_graded);
-        for (const [port, mt] of Object.entries(b.by_port || {})) {
-          ageByPort[port] = ageByPort[port] ?? { fresh: 0, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-          ageByPort[port][bin] += Number(mt) || 0;
-        }
-      }
-      for (const port of Object.keys(ageByPort)) {
-        const a = ageByPort[port];
-        const sum = a.fresh + a.y1to2 + a.y2to3 + a.y3to4 + a.y4plus;
-        if (sum > 0) {
-          a.fresh /= sum; a.y1to2 /= sum; a.y2to3 /= sum; a.y3to4 /= sum; a.y4plus /= sum;
-        }
-      }
-
-      const maxByPort = new Map<string, number>();
-      for (const s of snaps) {
-        for (const [p, v] of Object.entries(s.by_port_lots || {})) {
-          if (v > (maxByPort.get(p) ?? 0)) maxByPort.set(p, v);
-        }
-      }
-
-      // Preferred path: read backend's cohort-DNA outputs (cohort_outflow.py).
-      // `current_by_origin` gives the per-origin breakdown of the latest
-      // ageing report; `implied_outflow` gives per-origin outflow per
-      // calendar month, apportioned by each cohort's own DNA. Falls back
-      // to the in-browser per-port stock simulation when either field is
-      // missing (older JSON or fresh builds before the importer re-runs).
-      const cohortCurrent = robusta?.monthly?.current_by_origin;
-      const cohortOutflow = robusta?.monthly?.implied_outflow;
-      const useCohort = !!cohortCurrent && !!cohortOutflow;
-
-      const sims: Record<string, RobustaPortSim> = {};
-      if (!useCohort) {
-        const allPortCodes = new Set<string>();
-        for (const s of snaps) for (const p of Object.keys(s.by_port_lots || {})) allPortCodes.add(p);
-        for (const p of Array.from(allPortCodes)) {
-          sims[p] = _simulateRobustaPortStock(p, snaps, grads, portOriginLots[p] ?? {});
-        }
-      }
-
-      // Real per-(port, origin) gradings inflow per calendar month —
-      // needed when cohort-DNA outflow is the trusted source for gross_out;
-      // gross_in still comes straight from gradings events (the source
-      // of truth for inflows).
-      const cutT = cutoff.getTime();
-      const cohortInflowByPortOrigin: Record<string, Record<string, number>> = {};
-      if (useCohort) {
-        for (const ev of grads) {
-          if (new Date(ev.date).getTime() < cutT) continue;
-          for (const e of (ev.entries || [])) {
-            if (e.tenderable === false) continue;
-            const port = e.port || "?";
-            const origin = (e.origin || "?").trim();
-            cohortInflowByPortOrigin[port] = cohortInflowByPortOrigin[port] || {};
-            cohortInflowByPortOrigin[port][origin] = (cohortInflowByPortOrigin[port][origin] ?? 0) + (e.lots ?? 0);
-          }
-        }
-      }
-
-      const ports: PortFlow[] = [];
-      for (const [code, current] of Object.entries(latest.by_port_lots || {})) {
-        if (current <= 0) continue;
-        const byOrigin: Record<string, number> = {};
-        const flowByOrigin: Record<string, OriginFlowPair> = {};
-
-        if (useCohort) {
-          // PREFERRED: cohort-DNA pipeline outputs.
-          // byOrigin from current_by_origin, normalised to the live port
-          // total so it always sums to `current` (which comes from the
-          // most recent daily snapshot, not the month-end ageing report).
-          const cur = cohortCurrent?.[code] ?? {};
-          const curSum = Object.values(cur).reduce((a, b) => a + b, 0);
-          if (curSum > 0) {
-            for (const [o, v] of Object.entries(cur)) if (v > 0) byOrigin[o] = (v / curSum) * current;
-          } else {
-            byOrigin["Unknown"] = current;
-          }
-          // gross_out from implied_outflow summed over months in window;
-          // gross_in from real gradings events.
-          const inflowByOrigin = cohortInflowByPortOrigin[code] ?? {};
-          const outflowByOrigin: Record<string, number> = {};
-          for (const entry of cohortOutflow ?? []) {
-            if (new Date(entry.month_end).getTime() < cutT) continue;
-            const byO = entry.by_port?.[code];
-            if (!byO) continue;
-            for (const [o, v] of Object.entries(byO)) {
-              outflowByOrigin[o] = (outflowByOrigin[o] ?? 0) + v;
-            }
-          }
-          for (const o of Array.from(new Set([...Object.keys(inflowByOrigin), ...Object.keys(outflowByOrigin)]))) {
-            const gi = inflowByOrigin[o] ?? 0;
-            const go = outflowByOrigin[o] ?? 0;
-            if (gi > 0 || go > 0) flowByOrigin[o] = { gross_in: gi, gross_out: go };
-          }
-        } else {
-          // FALLBACK: in-browser per-port stock simulation.
-          const sim = sims[code];
-          const stateSum = sim ? Object.values(sim.state).reduce((a, b) => a + b, 0) : 0;
-          if (sim && stateSum > 0) {
-            for (const [o, v] of Object.entries(sim.state)) if (v > 0) byOrigin[o] = (v / stateSum) * current;
-          } else {
-            byOrigin["Unknown"] = current;
-          }
-          if (sim) {
-            for (const [date, byO] of Object.entries(sim.inflowByOriginByDate)) {
-              if (new Date(date).getTime() < cutT) continue;
-              for (const [o, v] of Object.entries(byO)) {
-                flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
-                flowByOrigin[o].gross_in += v;
-              }
-            }
-            for (const [date, byO] of Object.entries(sim.outflowByOriginByDate)) {
-              if (new Date(date).getTime() < cutT) continue;
-              for (const [o, v] of Object.entries(byO)) {
-                flowByOrigin[o] = flowByOrigin[o] || { gross_in: 0, gross_out: 0 };
-                flowByOrigin[o].gross_out += v;
-              }
-            }
-          }
-        }
-        const inflow:  OriginFlow[] = [];
-        const outflow: OriginFlow[] = [];
-        for (const [origin, f] of Object.entries(flowByOrigin)) {
-          if (f.gross_in  > 0) inflow.push({  origin, volume: f.gross_in,  color: _originColor(origin, "RC") });
-          if (f.gross_out > 0) outflow.push({ origin, volume: f.gross_out, color: _originColor(origin, "RC") });
-        }
-        inflow.sort((a, b) => b.volume - a.volume);
-        outflow.sort((a, b) => b.volume - a.volume);
-        // Class 3/4 share — taken from the precomputed full-history rollup
-        // when present, falls back to per-window inference above.
-        const totalHist = portTotalLotsHist[code] ?? 0;
-        const class34Share = totalHist > 0 ? (portClass34Lots[code] ?? 0) / totalHist : 0;
-        const cap = Math.max(maxByPort.get(code) ?? current, current);
-        const ageFinal = ageByPort[code] ?? { fresh: 1, y1to2: 0, y2to3: 0, y3to4: 0, y4plus: 0 };
-        const poison = _computePoison(current, "RC", code, byOrigin, ageFinal, class34Share);
-        ports.push({
-          market: "RC", code, name: ROBUSTA_PORT_NAMES[code] ?? code,
-          current, capacity: cap, pctFull: cap > 0 ? (current / cap) * 100 : 0,
-          unit: "lots", squareUnit: LOTS_PER_WARRANT_RC,
-          byOrigin, age: ageFinal,
-          flowByOrigin, classShares: portOriginClassShares[code],
-          inflow, outflow, span: 1, poison,
-        });
-      }
-      ports.sort((a, b) => b.current - a.current);
-      _assignSpans(ports);
-
-      // Intake summary — SUM all gradings entries in the window. Aligns
-      // with the per-warehouse inflow numbers below (which also sum lots
-      // from the same gradings events). Pending stays point-in-time from
-      // the most recent grading_overview report.
-      const cutTimeR = cutoff.getTime();
-      let pPrem = 0, pBord = 0, fail = 0;
-      for (const g of grads) {
-        if (new Date(g.date).getTime() < cutTimeR) continue;
-        for (const e of (g.entries || [])) {
-          const lots = e.lots || 0;
-          if (e.tenderable === false) { fail += lots; continue; }
-          if (e.class === 3 || e.class === 4) pBord += lots;
-          else pPrem += lots;
-        }
-      }
-      // Pending from the most recent grading_overview report (point-in-time
-      // queue + forecast — not a flow).
-      const lastOverv = overv.length ? overv[overv.length - 1] : null;
-      const pendingTotal = lastOverv?.total_pending_lots ?? 0;
-      // Date label = latest event in window so the user knows the period end.
-      const inWinGrad = grads.filter((g) => new Date(g.date).getTime() >= cutTimeR);
-      const dateLabel = inWinGrad.length ? inWinGrad[inWinGrad.length - 1].date : (grads[grads.length - 1]?.date ?? null);
-      return {
-        market: "RC", label: "Robusta · ICE Futures Europe (RC)",
-        unit: "lots", squareUnit: LOTS_PER_WARRANT_RC, ports,
-        intake: { pending: pendingTotal, passed: pPrem + pBord, failed: fail,
-                  passedPremium: pPrem, passedBorderline: pBord, date: dateLabel },
-      };
-    };
-
-    return { kc: buildArabica(), rc: buildRobusta() };
-  }, [arabica, robusta, flowDuration]);
-
+  // Resolve both markets' flows from the raw JSON. The heavy lifting lives in
+  // lib/certifiedStocks/builders (pure, unit-tested); this component only
+  // renders the result.
+  const systemFlows = useMemo<{ kc: SystemFlowMarket; rc: SystemFlowMarket }>(
+    () => ({ kc: buildArabica(arabica, start, end), rc: buildRobusta(robusta, start, end) }),
+    [arabica, robusta, start, end],
+  );
 
   return (
     <div>
@@ -1330,28 +208,6 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
         <span className="flex items-center text-slate-300" title="−90 differential">
           <span className="w-2.5 h-2.5 rounded mr-1 bg-slate-700" style={{ boxShadow: `inset 0 0 0 1px ${CLASS_BORDER_RC[4]}` }} /> 4 (−90)
         </span>
-
-        {/* Flow window selector — pill-button group, right-aligned, same
-            style as the chart range toggle on the panel above. */}
-        <div className="ml-auto flex items-center gap-1.5">
-          <span className="text-slate-500 uppercase text-[10px] tracking-wider">Flow window</span>
-          <div className="flex items-center gap-1">
-            {(Object.entries(DURATION_LABELS) as [DurationOpt, string][]).map(([k, v]) => (
-              <button
-                key={k}
-                onClick={() => setFlowDuration(k)}
-                className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
-                  flowDuration === k
-                    ? "bg-slate-800 text-amber-400 border-slate-700"
-                    : "text-slate-500 hover:text-slate-300 border-transparent"
-                }`}
-                title={v}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {([systemFlows.kc, systemFlows.rc] as SystemFlowMarket[]).map((mkt) => (
@@ -1363,6 +219,23 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 origin per port inferred from gradings flow*
               </span>
             )}
+            {/* How in & out is derived for this market. */}
+            <span
+              className={`ml-2 text-[10px] normal-case font-normal ${mkt.inOutBasis === "none" ? "text-slate-500" : "text-amber-400/80"}`}
+              title={
+                mkt.inOutBasis === "fifo"
+                  ? "in & out from the exact daily per-(origin, port) ledger: in = gradings, out = mass balance, in & out = FIFO (oldest warrants leave first). The monthly ageing report has no origin column, so it powers the age fade and validates this ledger."
+                  : mkt.inOutBasis === "ageing"
+                  ? "An ageing report inside this window lets us cohort-match outflow — stock graded AND decertified in-window is split out as in & out."
+                  : "No ageing report inside this window yet — every passed lot counts as in and the decline as out; in & out is matched once the next ageing report lands."
+              }
+            >
+              · {mkt.inOutBasis === "fifo"
+                  ? "in & out · daily per-origin ledger (FIFO)"
+                  : mkt.inOutBasis === "ageing"
+                  ? "in & out matched (ageing report)"
+                  : "in & out pending next ageing report"}
+            </span>
           </div>
 
           {/* Stage 1 — intake row */}
@@ -1378,7 +251,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                 <div className="flex flex-col items-center">
                   <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Pending</div>
                   <div className="w-16 h-16 rounded-full bg-amber-950/40 border-2 border-amber-700/60 flex items-center justify-center">
-                    <span className="text-sm font-mono font-bold text-amber-300">{fmtNum(mkt.intake.pending)}</span>
+                    <span className="text-sm font-mono font-bold text-amber-300">{fmtU(mkt.intake.pending, mkt.unit)}</span>
                   </div>
                 </div>
                 <span className="hidden md:block w-6 h-px bg-slate-700" />
@@ -1386,22 +259,22 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   <div className="text-[10px] text-slate-400 font-bold uppercase mb-1">Graded</div>
                   <div className="w-20 h-20 rounded-full bg-indigo-900/40 border-2 border-indigo-500 flex items-center justify-center"
                        style={{ boxShadow: "0 0 12px rgba(99,102,241,0.18)" }}>
-                    <span className="text-base font-mono font-bold text-indigo-200">{fmtNum(mkt.intake.passed + mkt.intake.failed)}</span>
+                    <span className="text-base font-mono font-bold text-indigo-200">{fmtU(mkt.intake.passed + mkt.intake.failed, mkt.unit)}</span>
                   </div>
                 </div>
                 <span className="hidden md:block w-6 h-px bg-slate-700" />
                 <div className="flex flex-col gap-1 w-full md:w-auto md:min-w-[220px]">
                   <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-emerald-300">✓ Premium</span>
-                    <span className="font-mono font-bold text-sm text-emerald-300">{fmtNum(mkt.intake.passedPremium)}</span>
+                    <span className="font-mono font-bold text-sm text-emerald-300">{fmtU(mkt.intake.passedPremium, mkt.unit)}</span>
                   </div>
                   <div className="flex items-center justify-between bg-amber-950/40 border border-amber-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-amber-300">⚠ Borderline</span>
-                    <span className="font-mono font-bold text-sm text-amber-300">{fmtNum(mkt.intake.passedBorderline)}</span>
+                    <span className="font-mono font-bold text-sm text-amber-300">{fmtU(mkt.intake.passedBorderline, mkt.unit)}</span>
                   </div>
                   <div className="flex items-center justify-between bg-rose-950/40 border border-rose-800/60 px-2 py-1 rounded">
                     <span className="text-[10px] text-rose-300">✕ Failed</span>
-                    <span className="font-mono font-bold text-sm text-rose-300">{fmtNum(mkt.intake.failed)}</span>
+                    <span className="font-mono font-bold text-sm text-rose-300">{fmtU(mkt.intake.failed, mkt.unit)}</span>
                   </div>
                 </div>
               </div>
@@ -1463,7 +336,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   </div>
                   {/* Direction label + magnitude, centred above the belt */}
                   <div className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8.5px] font-mono text-emerald-400/80 px-1.5 bg-slate-950/60 rounded">
-                    → graded +{fmtNum(totalInflow)}
+                    → net in +{fmtU(totalInflow, mkt.unit)}
                   </div>
                 </div>
                 {/* Destination badge */}
@@ -1485,7 +358,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                   byOriginExisting, byOriginNetGained, byOriginGhost, byOriginTransit,
                   netGainedVol, lostVol, transitVol,
                   effectivePerSquare, totalWarrants,
-                } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market, p.classShares);
+                } = buildDensityGrid(p.current, p.byOrigin, p.age, p.flowByOrigin, p.squareUnit, p.market, p.classShares, mkt.cohortMatched);
                 const inflowSum  = p.inflow.reduce((a, b) => a + b.volume, 0);
                 const outflowSum = p.outflow.reduce((a, b) => a + b.volume, 0);
                 const topInflow  = p.inflow.slice(0, 2);
@@ -1558,19 +431,19 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       </div>
                     </div>
                     <div className="text-[9px] text-slate-500 mb-1 font-mono leading-tight">
-                      <span className="text-slate-300">{fmtNum(p.current)}</span>/{fmtNum(p.capacity)} {p.unit}
+                      <span className="text-slate-300">{fmtU(p.current, p.unit)}</span>/{fmtU(p.capacity, p.unit)} {unitWord(unit)}
                     </div>
 
                     {/* Poison breakdown — % + per-criterion contribution. */}
                     {p.poison.pct > 0 && (
-                      <div className="bg-rose-950/30 border border-rose-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
-                        <div className="flex items-center justify-between text-rose-300 font-bold">
+                      <div className="bg-purple-950/30 border border-purple-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
+                        <div className="flex items-center justify-between text-purple-300 font-bold">
                           <span>☣ poison</span>
                           <span className="font-mono">
-                            {Math.round(p.poison.pct * 100)}% · {fmtNum(p.poison.total)}
+                            {Math.round(p.poison.pct * 100)}% · {fmtU(p.poison.total, p.unit)}
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-rose-300/80 text-[8.5px]">
+                        <div className="flex flex-wrap gap-x-1.5 gap-y-0 text-purple-300/80 text-[8.5px]">
                           {p.poison.deadPort > 0 && (
                             <span title="London / US warehouse">
                               dead-port {Math.round((p.poison.deadPort / p.current) * 100)}%
@@ -1603,7 +476,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                     <div className="bg-emerald-950/20 border border-emerald-900/50 rounded px-1 py-0.5 mb-1 text-[9px]">
                       <div className="flex items-center justify-between text-emerald-400 font-bold">
                         <span>↓ in</span>
-                        <span className="font-mono">+{fmtNum(inflowSum)}</span>
+                        <span className="font-mono">+{fmtU(inflowSum, p.unit)}</span>
                       </div>
                       {inflowSum > 0 && topInflow.length > 0 && (
                         <div className="relative h-2.5 mt-0.5 overflow-hidden">
@@ -1630,7 +503,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topInflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin}: {fmtNum(b.volume)}
+                              {b.origin}: {fmtU(b.volume, p.unit)}
                             </span>
                           ))}
                         </div>
@@ -1644,7 +517,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                         {topExisting.map((b) => (
                           <span key={b.origin} className="flex items-center text-slate-300">
                             <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                            {b.origin}: {fmtNum(b.volume)}
+                            {b.origin}: {fmtU(b.volume, p.unit)}
                           </span>
                         ))}
                       </div>
@@ -1679,14 +552,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-emerald-400/70 rounded p-1 bg-emerald-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-bold">Net gained</span>
-                          <span className="text-[8px] font-mono text-emerald-400">+{fmtNum(Math.round(netGainedVol))}</span>
+                          <span className="text-[8px] font-mono text-emerald-400">+{fmtU(netGainedVol, p.unit)}</span>
                         </div>
                         {topNetGained.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topNetGained.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1716,14 +589,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-rose-400/70 rounded p-1 bg-rose-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-rose-400 font-bold">Lost</span>
-                          <span className="text-[8px] font-mono text-rose-400">−{fmtNum(Math.round(lostVol))}</span>
+                          <span className="text-[8px] font-mono text-rose-400">−{fmtU(lostVol, p.unit)}</span>
                         </div>
                         {topGhost.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topGhost.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1754,14 +627,14 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                       <div className="mt-1 border border-dashed border-amber-400/70 rounded p-1 bg-amber-950/10 relative">
                         <div className="flex justify-between items-baseline mb-0.5">
                           <span className="text-[8px] uppercase tracking-wider text-amber-400 font-bold">In & out</span>
-                          <span className="text-[8px] font-mono text-amber-400">↻{fmtNum(Math.round(transitVol))}</span>
+                          <span className="text-[8px] font-mono text-amber-400">↻{fmtU(transitVol, p.unit)}</span>
                         </div>
                         {topTransit.length > 0 && (
                           <div className="flex flex-wrap gap-x-1.5 mb-0.5 text-[8.5px]">
                             {topTransit.map((b) => (
                               <span key={b.origin} className="flex items-center text-slate-300">
                                 <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                                {b.origin}: {fmtNum(b.volume)}
+                                {b.origin}: {fmtU(b.volume, p.unit)}
                               </span>
                             ))}
                           </div>
@@ -1796,7 +669,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                     <div className="bg-rose-950/20 border border-rose-900/50 rounded px-1 py-0.5 mt-1 text-[9px]">
                       <div className="flex items-center justify-between text-rose-400 font-bold">
                         <span>↓ out</span>
-                        <span className="font-mono">−{fmtNum(outflowSum)}</span>
+                        <span className="font-mono">−{fmtU(outflowSum, p.unit)}</span>
                       </div>
                       {outflowSum > 0 && topOutflow.length > 0 && (
                         <div className="relative h-3 mt-0.5 overflow-hidden">
@@ -1828,7 +701,7 @@ export default function CertifiedStocksSystemFlow({ arabica, robusta }: Props) {
                           {topOutflow.map((b) => (
                             <span key={b.origin} className="flex items-center text-slate-300 text-[8.5px]">
                               <span className="w-1 h-1 rounded-full mr-0.5" style={{ background: b.color }} />
-                              {b.origin}: {fmtNum(b.volume)}
+                              {b.origin}: {fmtU(b.volume, p.unit)}
                             </span>
                           ))}
                         </div>

@@ -3,23 +3,26 @@ import { Suspense } from "react";
 
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
+import AjcaPanel from "@/components/demand/AjcaPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
+import SpotPanel from "@/components/demand/SpotPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
 import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "destination" | "certified" | "demand" | "listed" | "test";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
-  { id: "destination", label: "Destination stocks" },
   { id: "certified",   label: "Certified stocks" },
-  { id: "demand",      label: "Demand" },
+  { id: "destination", label: "Destination stocks" },
+  { id: "spot",        label: "Spot" },
+  { id: "demand",      label: "Consumption" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
 ];
@@ -42,15 +45,15 @@ export default function DemandPage() {
 function DemandPageInner() {
   // Deep-linkable sub-tab via `?tab=certified` — bookmarks, share-links,
   // and the browser back button all behave correctly.
-  const [tab, setTab] = useUrlState<SubTab>("tab", "destination", (raw) =>
-    (SUB_TABS as string[]).includes(raw) ? (raw as SubTab) : "destination",
+  const [tab, setTab] = useUrlState<SubTab>("tab", "certified", (raw) =>
+    (SUB_TABS as string[]).includes(raw) ? (raw as SubTab) : "certified",
   );
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       <PageHeader
         title="Demand"
-        subtitle="Destination stocks · Certified stocks · Demand drivers · Listed companies"
+        subtitle="Certified stocks · Destination stocks · Spot offers · Consumption · Listed companies"
         healthKeys={["ecf", "psd_coffee", "ajca", "population"]}
       />
 
@@ -74,15 +77,23 @@ function DemandPageInner() {
       {/* Per-sub-tab content. Existing panels move under their tab, no panel
           renders on more than one tab. NewsFeedList stays as a persistent
           footer across all sub-tabs (demand-relevant news is general). */}
-      {tab === "destination" && (
-        <Section>
-          <StocksPanel />
-        </Section>
-      )}
-
       {tab === "certified" && (
         <Section>
           <CertifiedStocksPanel />
+        </Section>
+      )}
+
+      {tab === "destination" && (
+        <>
+          <Section><StocksPanel /></Section>
+          {/* AJCA (Japan) lives at the bottom of Destination stocks */}
+          <Section><AjcaPanel /></Section>
+        </>
+      )}
+
+      {tab === "spot" && (
+        <Section>
+          <SpotPanel />
         </Section>
       )}
 

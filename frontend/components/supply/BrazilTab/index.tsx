@@ -1,33 +1,39 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
 import WeatherCharts from "../WeatherCharts";
+import WeatherAnalogs from "../WeatherAnalogs";
 import SupplyDemandBalance from "../SupplyDemandBalance";
 import { COUNTRY_HUB, EMPTY_CY, ICE_KC_COUNTRIES, ICE_RC_COUNTRIES } from "./constants";
 import { bagsToKT, buildFilteredSeries, cropYearKey, monthLabel } from "./helpers";
-import type { CecafeData, FilterState } from "./types";
+import type { BrazilProjection, CecafeData, FilterState } from "./types";
 import { useUrlState } from "@/lib/useUrlState";
 
-type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather";
+type BrazilSubTab = "exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs";
 
 import StatCard from "./StatCard";
+import CecafeDailyKPIs from "./CecafeDailyKPIs";
 import DailyRegistrationSection from "./DailyRegistration";
-import MonthlyVolumeChart from "./MonthlyVolumeChart";
-import AnnualTrendChart from "./AnnualTrendChart";
 import TypeShareChart from "./TypeShareChart";
 import SeasonalityHeatmap from "./SeasonalityHeatmap";
 import YoYByTypeChart from "./YoYByTypeChart";
 import RollingAvgChart from "./RollingAvgChart";
-import CumulativePaceChart from "./CumulativePaceChart";
 import CountryHubFilter from "./CountryHubFilter";
-import DestinationChart from "./DestinationChart";
+import { MonthlyVolumeCard, CumulativePaceCard, AnnualTrendCard, DestinationCard } from "./exportCharts";
+import PinToReport from "@/components/report/PinToReport";
 
 export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
+  const [projection, setProjection] = useState<BrazilProjection | null>(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
   const [subTab, setSubTab] = useUrlState<BrazilSubTab>("brazilTab", "exports", (raw) =>
-    raw === "farmer-economics" ? "farmer-economics" : raw === "weather" ? "weather" : raw === "supply-demand" ? "supply-demand" : "exports"
+    raw === "farmer-economics" ? "farmer-economics"
+    : raw === "weather" ? "weather"
+    : raw === "analogs" ? "analogs"
+    : raw === "supply-demand" ? "supply-demand"
+    : "exports"
   );
 
   useEffect(() => {
@@ -35,6 +41,15 @@ export default function BrazilTab() {
       .then(r => r.json())
       .then(setData)
       .catch(() => setError(true));
+  }, []);
+
+  // SSOT projection — one fetch feeds MonthlyVolume, CumulativePace and the
+  // S&D table. Absent file is non-fatal (charts fall back to history-only).
+  useEffect(() => {
+    fetch("/data/brazil_export_projection.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BrazilProjection | null) => d && setProjection(d))
+      .catch(() => { /* engine hasn't run yet — silent */ });
   }, []);
 
   // All hooks must be called before any conditional return
@@ -64,16 +79,7 @@ export default function BrazilTab() {
     <div className="text-center text-slate-500 py-16 text-sm animate-pulse">Loading Cecafe data…</div>
   );
 
-  const {
-    series,
-    by_country, by_country_prev,
-    by_country_arabica, by_country_arabica_prev,
-    by_country_conillon, by_country_conillon_prev,
-    by_country_soluvel, by_country_soluvel_prev,
-    by_country_torrado, by_country_torrado_prev,
-    by_country_history,
-    report, updated,
-  } = data;
+  const { series, by_country, report, updated } = data;
   const latest = series[series.length - 1];
   const prev   = series[series.length - 13]; // same month last year
 
@@ -101,9 +107,11 @@ export default function BrazilTab() {
 
   return (
     <div className="space-y-5">
+      <DataHealthBar keys={["brazil_exports", "cecafe_daily", "conab_costs", "conab_safra"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map((t) => (
+        {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -113,14 +121,20 @@ export default function BrazilTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "exports" ? "Exports" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Farmer Economics"}
+            {t === "exports" ? "Exports"
+              : t === "weather" ? "Weather"
+              : t === "analogs" ? "Analogs"
+              : t === "supply-demand" ? "Supply & Demand"
+              : "Farmer Economics"}
           </button>
         ))}
       </div>
 
       {subTab === "farmer-economics" && <BrazilFarmerEconomics />}
 
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="brazil" label="Brazil" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance origin="brazil" label="Brazil" projection={projection} />
+      )}
 
       {subTab === "weather" && (
         <WeatherCharts
@@ -129,6 +143,10 @@ export default function BrazilTab() {
           farmerEconomicsUrl="/data/farmer_economics.json"
           startMonthIdx={5}  // Brazil = southern hemisphere → calendar starts in June
         />
+      )}
+
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_brazil.json" label="Brazil arabica" />
       )}
 
       {subTab === "exports" && (
@@ -149,7 +167,12 @@ export default function BrazilTab() {
           {/* Daily export registration (top section, rendered only when cecafe_daily.json exists) */}
           <DailyRegistrationSection />
 
-          {/* KPI cards */}
+          {/* Daily MTD KPIs — Embarques + Certificados month-to-date with
+              vs-same-day-last-month deltas. Fed by the same cecafe_daily.json
+              the panel above reads, so the numbers always match. */}
+          <CecafeDailyKPIs />
+
+          {/* KPI cards (released monthly data) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <StatCard
               label={`${latest.date} — total exports`}
@@ -176,23 +199,19 @@ export default function BrazilTab() {
           {/* Origin filter */}
           <CountryHubFilter byCountry={by_country} filter={filter} onChange={setFilter} />
 
-          {/* Charts */}
-          <MonthlyVolumeChart series={filteredSeries ?? series} typeFilter={filter.type} isFiltered={!!filteredSeries} />
-          <CumulativePaceChart series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-          <AnnualTrendChart    series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          {/* Charts — instantiated through the shared exportCharts module so the
+              News report builder renders these identically. */}
+          <MonthlyVolumeCard data={data} projection={projection} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <CumulativePaceCard data={data} projection={projection} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          <div className="relative">
+            <div className="absolute right-3 top-3 z-10"><PinToReport id="brazil_annual_trend" /></div>
+            <AnnualTrendCard data={data} filteredSeries={filteredSeries} typeFilter={filter.type} />
+          </div>
           <TypeShareChart series={series} />
           <YoYByTypeChart      series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
           <SeasonalityHeatmap series={series} />
           <RollingAvgChart     series={series} filteredSeries={filteredSeries} typeFilter={filter.type} />
-          <DestinationChart
-            byCountry={by_country}
-            byCountryPrev={by_country_prev}
-            byArabica={by_country_arabica} byArabicaPrev={by_country_arabica_prev}
-            byConillon={by_country_conillon} byConillonPrev={by_country_conillon_prev}
-            bySoluvel={by_country_soluvel} bySoluvelPrev={by_country_soluvel_prev}
-            byTorrado={by_country_torrado} byTorradoPrev={by_country_torrado_prev}
-            byCountryHistory={by_country_history}
-          />
+          <DestinationCard data={data} />
         </>
       )}
     </div>

@@ -11,7 +11,10 @@ name: "1.10 – Daily Weather Fetch & Accumulate"
 
 on:
   schedule:
-    - cron: "40 5 * * *"   # 05:40 UTC daily — independent of 1.4 (02:30) and scrapers
+    # 01:53 UTC daily — early window ahead of every other data-commit job,
+    # moved off the :00 mark (GH cron skip risk documented across this repo)
+    # so the ~10-min run reliably lands before export-and-publish at 02:41.
+    - cron: "53 1 * * *"
   workflow_dispatch:
     inputs:
       origins:
@@ -39,23 +42,46 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests scipy   # scipy (+numpy) powers the SPI gamma-fit
+        # sqlalchemy/psycopg2/dotenv/jinja2 are needed for the optional
+        # news-feed drought-gate badge emitted at the tail of the weather
+        # rebuild (backend/scripts/weather_news_emit.py). The upsert is a
+        # no-op when DATABASE_URL is unset.
+        run: pip install requests scipy sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Fetch + accumulate + rebuild
+      - name: Fetch + accumulate + rebuild (3 attempts)
         env:
           ORIGINS: ${{ inputs.origins }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: backend
         run: |
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/fetch_origin_weather.py $ARGS
+          for attempt in 1 2 3; do
+            python backend/scripts/fetch_origin_weather.py $ARGS && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Evaluate IPHM agronomic alerts
+      - name: Evaluate IPHM agronomic alerts (3 attempts)
         # Runs after the weather rebuild so SPI/SPEI/forecast are fresh.
         # Writes frontend/public/data/agronomic_alerts.json AND merges the
         # flattened entries into signals.json so the Telegram bot's existing
         # consumer surfaces them automatically.
         run: |
-          PYTHONPATH=backend python -m scraper.agronomic_alerts --write
+          for attempt in 1 2 3; do
+            PYTHONPATH=backend python -m scraper.agronomic_alerts --write && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Compute weather analogs (Brazil arabica, 3 attempts)
+        # Reads backend/seed/weather_history/brazil.json + the historical
+        # production seed, ranks past years by Euclidean distance on per-
+        # phenology-stage (rain, temp) signatures, and writes the analog
+        # forecast JSON the BrazilWeatherAnalogs panel consumes.
+        run: |
+          for attempt in 1 2 3; do
+            PYTHONPATH=backend python backend/scripts/compute_weather_analogs.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated weather data
         run: |
@@ -64,12 +90,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add backend/seed/weather_history/*.json frontend/public/data/*_weather.json
           git add frontend/public/data/agronomic_alerts.json frontend/public/data/signals.json
+          git add frontend/public/data/weather_analogs_brazil.json
           if git diff --cached --quiet; then
             echo "No weather change."
             exit 0
           fi
           git commit -m "data: daily weather fetch + accumulate [skip ci]"
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Notify on failure

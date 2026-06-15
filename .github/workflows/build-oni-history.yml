@@ -38,13 +38,21 @@ jobs:
       - name: Install dependencies
         run: pip install requests numpy
 
-      - name: Build ONI history — DRY RUN (preview only)
+      - name: Build ONI history — DRY RUN (preview only, 3 attempts)
         if: ${{ inputs.dry_run }}
-        run: python backend/scripts/build_oni_history.py
+        run: |
+          for attempt in 1 2 3; do
+            python backend/scripts/build_oni_history.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Build ONI history — APPLY
+      - name: Build ONI history — APPLY (3 attempts)
         if: ${{ !inputs.dry_run }}
-        run: python backend/scripts/build_oni_history.py --write
+        run: |
+          for attempt in 1 2 3; do
+            python backend/scripts/build_oni_history.py --write && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit seed to main
         if: ${{ !inputs.dry_run }}

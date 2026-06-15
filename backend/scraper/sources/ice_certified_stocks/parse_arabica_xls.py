@@ -12,7 +12,6 @@ ice_arabica_groups for the by_group rollups the certified-stocks panel needs.
 """
 from __future__ import annotations
 
-import io
 import re
 from datetime import datetime
 
@@ -22,6 +21,10 @@ from ..ice_arabica_groups import group_of
 
 _AS_OF = re.compile(r"As of:\s*([A-Za-z]+ \d{1,2}, \d{4})")
 _BAG_COUNT = re.compile(r"^\s*(\d[\d,]*|No)\s+Bags\s+(Passed|Failed)", re.IGNORECASE)
+# Action-day (June-2026+) grading layout uses matrix sub-section headers
+# instead of the old "N Bags Passed Today" one-liner.
+_PASSED_HDR = re.compile(r"bags\s+passed\s+grading", re.IGNORECASE)
+_FAILED_HDR = re.compile(r"bags\s+failed\s+grading", re.IGNORECASE)
 
 _SECTION_TITLES = (
     ("total_certified", "TOTAL BAGS CERTIFIED"),
@@ -117,32 +120,57 @@ def _parse_matrix(sheet, section_row: int) -> dict:
 
 
 def _parse_grading_summary(sheet, section_row: int) -> dict:
-    """The "TODAY'S GRADING SUMMARY" section is text on no-action days
-    ("No Bags Passed Today" / "No Bags Failed Today") and likely a table or
-    counted text on action days — we parse a leading integer ("123 Bags
-    Passed…") or fall back to 0 for "No"."""
+    """Parse "TODAY'S GRADING SUMMARY" in BOTH layouts:
+
+    • No-action / legacy text:  "No Bags Passed Today" / "825 Bags Passed Today"
+      (a leading "No" or integer before "Bags Passed/Failed"). No origin detail.
+    • Action-day matrix (ICE format from June 2026): a "BAGS PASSED GRADING"
+      header followed by an origin × port table ending in a "Total in Bags"
+      row; then "BAGS FAILED GRADING" with its own table. We capture the FULL
+      matrix for each (by_origin × by_port), not just the grand total, so the
+      certified-stocks model can attribute gradings to (origin, port) cohorts.
+    """
     passed = failed = 0
     passed_text = failed_text = None
-    for r in range(section_row + 1, min(section_row + 12, sheet.nrows)):
+    # Per-(origin, port) grading matrices — only present on action-day (matrix)
+    # reports; None on legacy/no-action days. Shape mirrors _parse_matrix:
+    #   {ports, by_origin: {origin: {by_port, group, total}}, by_port, by_group, grand_total}
+    passed_detail: dict | None = None
+    failed_detail: dict | None = None
+    for r in range(section_row + 1, min(section_row + 40, sheet.nrows)):
         text = str(sheet.cell_value(r, 0)).strip()
+        low = text.lower()
+        if "pending grading" in low or "flagged for rebagging" in low:
+            break
         if not text:
             continue
-        if "pending grading" in text.lower() or "flagged for rebagging" in text.lower():
-            break
-        m = _BAG_COUNT.match(text)
-        if not m:
+        # Matrix sub-section headers (new format) — parse the whole table.
+        if _PASSED_HDR.search(low):
+            passed_detail = _parse_matrix(sheet, r)
+            passed = passed_detail["grand_total"]
+            passed_text = f"{passed} bags passed (matrix)"
             continue
-        token, kind = m.group(1), m.group(2).lower()
-        n = 0 if token.lower() == "no" else int(token.replace(",", ""))
-        if kind == "passed":
-            passed = n; passed_text = text
-        else:
-            failed = n; failed_text = text
+        if _FAILED_HDR.search(low):
+            failed_detail = _parse_matrix(sheet, r)
+            failed = failed_detail["grand_total"]
+            failed_text = f"{failed} bags failed (matrix)"
+            continue
+        # Legacy one-liner: "No|123 Bags Passed/Failed …".
+        m = _BAG_COUNT.match(text)
+        if m:
+            token, kind = m.group(1), m.group(2).lower()
+            n = 0 if token.lower() == "no" else int(token.replace(",", ""))
+            if kind == "passed":
+                passed = n; passed_text = text
+            else:
+                failed = n; failed_text = text
     return {
         "passed_today_bags": passed,
         "failed_today_bags": failed,
         "passed_text":       passed_text,
         "failed_text":       failed_text,
+        "passed_detail":     passed_detail,
+        "failed_detail":     failed_detail,
     }
 
 
@@ -156,10 +184,14 @@ def parse_arabica_xls(content: bytes) -> dict:
         v = str(sheet.cell_value(r, 0))
         m = _AS_OF.search(v)
         if m:
-            try:
-                report_date_iso = datetime.strptime(m.group(1), "%B %d, %Y").date().isoformat()
-            except ValueError:
-                pass
+            # ICE switched to abbreviated month names ("Jun 1, 2026") in
+            # mid-2026; accept both abbreviated (%b) and full (%B).
+            for fmt in ("%b %d, %Y", "%B %d, %Y"):
+                try:
+                    report_date_iso = datetime.strptime(m.group(1), fmt).date().isoformat()
+                    break
+                except ValueError:
+                    continue
             break
 
     sections = _find_sections(sheet)

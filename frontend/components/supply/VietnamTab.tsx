@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
-import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEstimate";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
+import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 
 interface VietnamSupply {
@@ -25,9 +26,6 @@ interface VietnamSupply {
     monthly?: { month: string; urea_kt: number; kcl_kt: number; npk_kt: number; dap_kt: number; total_kt: number }[];
   } | null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SharesData = any;
 
 function VnEnsoNote() {
   return (
@@ -63,26 +61,23 @@ function VnEnsoNote() {
 }
 
 export default function VietnamTab() {
-  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
+  const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
-  const [sharesData, setSharesData] = useState<SharesData | null>(null);
 
   useEffect(() => {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
       .then(setVnSupply)
       .catch((err) => console.error("[VietnamTab] vietnam_supply fetch failed:", err));
-    fetch("/data/vn_country_shares.json")
-      .then(r => r.json())
-      .then(setSharesData)
-      .catch((err) => console.error("[VietnamTab] vn_country_shares fetch failed:", err));
   }, []);
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["vietnam_exports", "vietnam_price"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
-        {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map((t) => (
+        {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setSubTab(t)}
@@ -92,7 +87,11 @@ export default function VietnamTab() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
-            {t === "exports" ? "Exports" : t === "weather" ? "Weather" : t === "supply-demand" ? "Supply & Demand" : "Farmer Economics"}
+            {t === "exports" ? "Exports"
+              : t === "weather" ? "Weather"
+              : t === "analogs" ? "Analogs"
+              : t === "supply-demand" ? "Supply & Demand"
+              : "Farmer Economics"}
           </button>
         ))}
       </div>
@@ -112,6 +111,11 @@ export default function VietnamTab() {
           <VnWaterLevels />
           <VnEnsoNote />
         </div>
+      )}
+
+      {/* ── Analogs ────────────────────────────────────────────────── */}
+      {subTab === "analogs" && (
+        <WeatherAnalogs dataUrl="/data/weather_analogs_vietnam.json" label="Vietnam robusta" />
       )}
 
       {/* ── Exports ────────────────────────────────────────────────── */}
@@ -135,19 +139,6 @@ export default function VietnamTab() {
               </div>
             )}
           </div>
-
-          {/* Estimated destination breakdown */}
-          {vnSupply?.exports && sharesData && (
-            <div>
-              <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
-                Estimated Destination · 2025–2026
-              </h2>
-              <VietnamDestinationEstimate
-                monthlyExports={vnSupply.exports.monthly}
-                sharesData={sharesData}
-              />
-            </div>
-          )}
 
         </div>
       )}

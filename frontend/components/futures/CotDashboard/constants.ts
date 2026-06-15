@@ -1,25 +1,5 @@
 // Lookup tables, palettes, and shared style tokens for the CoT dashboard.
 
-import type { Step } from "./types";
-
-// ── Step navigation ───────────────────────────────────────────────────────────
-
-// Display order is the order listed here — the visible "N." prefix in
-// each section's title must match this order. Step IDs themselves are
-// stable URL slugs, decoupled from display order.
-export const NAV_STEPS = [
-  { id: 10 as Step, icon: "Eye",       label: "Overview" },    //  1. Overview (per-market summary)
-  { id: 9 as Step,  icon: "Bars",      label: "OI 14d" },      //  2. OI 14-day tracking (moved from /futures Exchange)
-  { id: 2 as Step,  icon: "Grid",      label: "Heatmap" },     //  3.
-  { id: 3 as Step,  icon: "Sliders",   label: "Gauges" },      //  4.
-  { id: 1 as Step,  icon: "Globe",     label: "Flow" },        //  5.
-  { id: 4 as Step,  icon: "Factory",   label: "Industry" },    //  6.
-  { id: 5 as Step,  icon: "Droplets",  label: "Dry Powder" },  //  7.
-  { id: 6 as Step,  icon: "Scale",     label: "Cycle" },       //  8.
-  { id: 7 as Step,  icon: "FileText",  label: "Report" },      //  9.
-  { id: 8 as Step,  icon: "Signals",   label: "Signals" },     // 10. Signals (moved to end)
-];
-
 // ── Macro COT (cross-commodity) palettes ──────────────────────────────────────
 
 export const SECTORS = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;

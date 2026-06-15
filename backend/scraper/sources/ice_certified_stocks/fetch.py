@@ -7,9 +7,10 @@ yet published (ICE typically publishes T-1 / T+0 mid-day).
 """
 from __future__ import annotations
 
+import calendar
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Iterable
 
 import requests
 
@@ -45,6 +46,26 @@ def yyyymmdd(d: date) -> str:
 
 def yymmdd(d: date) -> str:
     return d.strftime("%y%m%d")
+
+
+def month_end_publish_candidates(year: int, month: int) -> list[date]:
+    """Candidate publish dates for a month's Arabica ageing report, best-guess
+    order. ICE dates the file around month-end but the exact day drifts: it can
+    be the last calendar day (Mar→0331, Apr→0430, May→0531) or a few days
+    earlier when month-end lands on a weekend/holiday (Jan 2026→0130,
+    Feb 2026→0227), and occasionally a day or two into the next month. We try
+    the last calendar day first, then walk back up to 3 days, then +1/+2.
+    Weekends are included because at least one observed file (May) is dated on
+    the weekend month-end itself."""
+    last = date(year, month, calendar.monthrange(year, month)[1])
+    out: list[date] = []
+    seen: set[date] = set()
+    for delta in (0, -1, -2, -3, 1, 2):
+        d = last + timedelta(days=delta)
+        if d not in seen:
+            seen.add(d)
+            out.append(d)
+    return out
 
 
 def business_days_back(start: date, n: int) -> Iterable[date]:

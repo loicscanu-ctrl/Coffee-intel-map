@@ -7,7 +7,6 @@ import pytest
 
 from telegram.handlers import brief
 
-
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
 # "Now" — picking a fixed date so the test isn't time-dependent. May 30 is
@@ -146,104 +145,7 @@ def test_build_brief_message_does_not_crash_with_no_events(monkeypatch):
     assert "Coming up · next 24h" not in out   # section omitted gracefully
 
 
-# ── Body-3: weather seasonal baseline filter ─────────────────────────────────
-
-def _supply_doc(*regions: dict) -> dict:
-    """Wrap a list of region dicts in the {country}_supply.json shape."""
-    return {"weather": {"regions": list(regions)}}
-
-
-def _patch_supply_loader(monkeypatch, supply_doc: dict):
-    """Return supply_doc for any *_supply.json filename; None for others
-    so the brief's optional blocks gracefully omit."""
-    def fake_load(name: str):
-        if name.endswith("_supply.json"):
-            return supply_doc
-        return None
-    monkeypatch.setattr(brief, "load", fake_load)
-
-
-def test_drought_below_seasonal_floor_helper():
-    # Current rain < historical floor for this month → anomalous → True
-    assert brief._drought_below_seasonal_floor(
-        {"rain_mtd_mm": 10.0, "rain_hist_min": 25.0}) is True
-    # Current rain == historical floor → still within range → False
-    assert brief._drought_below_seasonal_floor(
-        {"rain_mtd_mm": 25.0, "rain_hist_min": 25.0}) is False
-    # Current rain > historical floor → normal seasonal noise → False
-    assert brief._drought_below_seasonal_floor(
-        {"rain_mtd_mm": 40.0, "rain_hist_min": 25.0}) is False
-
-
-def test_drought_below_seasonal_floor_fail_closed_on_missing_data():
-    # Either field missing → False (don't fire on incomplete baselines).
-    assert brief._drought_below_seasonal_floor({"rain_mtd_mm": 10.0}) is False
-    assert brief._drought_below_seasonal_floor({"rain_hist_min": 25.0}) is False
-    assert brief._drought_below_seasonal_floor({}) is False
-    # Non-numeric values → False
-    assert brief._drought_below_seasonal_floor(
-        {"rain_mtd_mm": None, "rain_hist_min": 25.0}) is False
-
-
-def test_weather_line_suppresses_drought_within_seasonal_range(monkeypatch):
-    """Sul de Minas in winter: drought=HIGH from upstream but rain is
-    within the historical July range. Brief must stay silent."""
-    _patch_supply_loader(monkeypatch, _supply_doc({
-        "name": "Sul de Minas",
-        "drought": "HIGH",
-        "rain_mtd_mm": 18.0,
-        "rain_hist_min": 12.0,   # Current 18 > floor 12 → normal dry season
-    }))
-    out = brief._weather_line()
-    assert out == ""   # no false-positive alert
-
-
-def test_weather_line_fires_drought_when_below_seasonal_floor(monkeypatch):
-    """Sul de Minas in Mar/Apr (wet season): drought=HIGH AND rain
-    below the historical March floor → genuinely anomalous."""
-    _patch_supply_loader(monkeypatch, _supply_doc({
-        "name": "Sul de Minas",
-        "drought": "HIGH",
-        "rain_mtd_mm": 8.0,
-        "rain_hist_min": 45.0,   # Current 8 << floor 45 → real signal
-    }))
-    out = brief._weather_line()
-    assert "Sul de Minas drought" in out
-
-
-def test_weather_line_fires_when_baseline_missing_and_high(monkeypatch):
-    """Without baseline data, the seasonal filter returns False so
-    HIGH alone is no longer enough — matches the architect's
-    "fail-closed" preference for noisy regions."""
-    _patch_supply_loader(monkeypatch, _supply_doc({
-        "name": "RegionWithoutBaseline",
-        "drought": "HIGH",
-        # rain_mtd_mm + rain_hist_min absent → seasonal check returns False
-    }))
-    out = brief._weather_line()
-    assert "drought" not in out
-
-
-def test_weather_line_csi_unchanged_by_baseline_filter(monkeypatch):
-    """CSI alerts have no per-month baseline in the supply schema —
-    they pass through the categorical level as before."""
-    _patch_supply_loader(monkeypatch, _supply_doc({
-        "name": "TestRegion",
-        "drought": "LOW",
-        "csi_30d_level": "HIGH",
-    }))
-    out = brief._weather_line()
-    assert "TestRegion CSI" in out
-
-
-def test_weather_line_caps_at_three_alerts(monkeypatch):
-    """The existing 3-alert cap on the weather line is preserved by
-    the new gate (not broken by the new filter)."""
-    _patch_supply_loader(monkeypatch, _supply_doc(*[
-        {"name": f"R{i}", "drought": "HIGH",
-         "rain_mtd_mm": 0.0, "rain_hist_min": 30.0}  # all genuinely below floor
-        for i in range(5)
-    ]))
-    out = brief._weather_line()
-    # 5 regions qualify but cap at 3
-    assert out.count("drought") == 3
+# Note: the old `_weather_line` + `_drought_below_seasonal_floor` tests were
+# removed in the brief redesign (PR #215). The weather section is now driven
+# by `_weather_block` (frost-gate Jun-Aug + Vietnam rain/VHI dual-gate),
+# tested in scraper/tests/test_brief_layout.py.

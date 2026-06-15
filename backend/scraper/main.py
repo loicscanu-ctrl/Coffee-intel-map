@@ -13,6 +13,10 @@ from scraper.errors import CriticalSourceError
 # Side-channel scrapers added in the feature branch — registered in the
 # side-channel block further down. ajca + psd_coffee write directly to
 # JSON caches consumed by export_stocks.py.
+#
+# NOTE: `freightos` is intentionally NOT in the daily suite — the dedicated
+# "1.2 – Freight Rate Scraper" workflow scrapes it on Fri/Sun only (the FBX
+# index only moves end-of-week), so running it here daily was redundant.
 from scraper.sources import ajca as _ajca
 from scraper.sources import (
     b3,
@@ -20,7 +24,6 @@ from scraper.sources import (
     barchart,
     brazil,
     cepea,
-    freightos,
     futures,
     origins,
     rss,
@@ -40,10 +43,9 @@ from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import population as _population
 from scraper.sources import psd_coffee as _psd_coffee
-from scraper.sources import retail_cpi as _retail_cpi
 from scraper.sources import uganda_weather as _uganda_weather
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, freightos, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 
@@ -103,8 +105,7 @@ async def _run_side_channel(name, coro_fn, browser, timeout: int = SCRAPER_TIMEO
 
 async def run_all_scrapers():
     print("[scraper] Starting daily scrape run...")
-    db = get_session()
-    try:
+    with get_session() as db:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
             semaphore = asyncio.Semaphore(CONCURRENCY)
@@ -129,7 +130,6 @@ async def run_all_scrapers():
                 ("psd_coffee",        lambda p: _psd_coffee.run(p, db_ref),                      SCRAPER_TIMEOUT),
                 ("ajca",              lambda p: _ajca.run(p, db_ref),                            SCRAPER_TIMEOUT),
                 ("population",        lambda p: _population.run(p, db_ref),                      120),
-                ("retail_cpi",        lambda p: _retail_cpi.run(p, db_ref),                      120),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),
                 ("indonesia_weather", lambda p: _indonesia_weather.run(p, db_ref),               60),
@@ -139,8 +139,6 @@ async def run_all_scrapers():
                 await _run_side_channel(name, coro_fn, browser, timeout=timeout)
 
             await browser.close()
-    finally:
-        db.close()
     print(f"[scraper] Done. {total} items inserted.")
     if critical_errors:
         raise critical_errors[0]

@@ -12,34 +12,54 @@ interface ScraperConfig {
   thresholdHours: number;
 }
 
+// Thresholds reflect each feed's actual publication cadence, not generic
+// "old data" timers. A monthly publication 25 days old is mid-cycle normal,
+// not stale; a daily M-F feed 5 days old IS stale. See FreshnessGrid.tsx
+// for the matching set on the News page.
+//
+// Conventions:
+//   Daily M-F sources → 96h (4 days), tolerates weekend non-publication.
+//   Weekly COT → 264h (11 days). COT releases Fri with Tue data (3-day
+//     baseline lag); worst-case = Fri-evening-pre-next-release = 3+7 = 10d.
+//   Monthly → 720h (30 days). Reflects standard month-end-to-month-end.
+//   Bi-monthly / quarterly → 1440h+ (60 days+).
 const SCRAPER_CONFIGS: ScraperConfig[] = [
   // Futures / market data
-  { key: "futures",           label: "Barchart",   thresholdHours: 36   },
-  { key: "cot",               label: "COT",        thresholdHours: 192  }, // 8 days (weekly)
-  { key: "macro_cot",         label: "Macro COT",  thresholdHours: 192  },
-  { key: "freight",           label: "Freight",    thresholdHours: 48   },
+  { key: "futures",           label: "Barchart",   thresholdHours:  96 }, // daily M-F (weekend skip)
+  { key: "cot",               label: "COT",        thresholdHours: 264 }, // 11d: Fri release of Tue data, worst-case 3+7
+  { key: "macro_cot",         label: "Macro COT",  thresholdHours: 264 },
+  { key: "freight",           label: "Freight",    thresholdHours: 216 }, // Fri+Sun publish, weekly index date (see check-scrapers-freshness.yml)
   // Weather / macro
-  { key: "weather",           label: "Weather",    thresholdHours: 48   },
-  { key: "enso",              label: "ENSO",       thresholdHours: 720  }, // monthly
+  { key: "weather",           label: "Weather",    thresholdHours:  72 }, // daily 7-day cron
+  { key: "enso",              label: "ENSO",       thresholdHours: 720 }, // monthly
+  { key: "fx_history",        label: "FX",         thresholdHours:  96 }, // Mon-Fri quant-currency-index
+  { key: "quant_currency_index", label: "CCI",     thresholdHours:  96 }, // sibling of fx_history
+  { key: "us_cpi",            label: "US CPI",     thresholdHours: 840 }, // monthly BLS, 35d buffer
+  { key: "retail_cpi",        label: "Retail CPI", thresholdHours: 840 }, // monthly BLS/Eurostat/BCB
+  { key: "origin_prices",     label: "Origin Prices", thresholdHours: 96 }, // accumulator, runs in 1.4
   // Fertilizer
-  { key: "fertilizer_wb",     label: "Fert. WB",   thresholdHours: 720  },
-  { key: "fertilizer_comex",  label: "Fert. Comex",thresholdHours: 720  },
+  { key: "fertilizer_wb",     label: "Fert. WB",   thresholdHours: 720 }, // monthly Pink Sheet
+  { key: "fertilizer_comex",  label: "Fert. Comex",thresholdHours: 720 }, // monthly
   // Demand stocks
-  { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // 60 days (bi-monthly publish)
-  { key: "psd_coffee",        label: "USDA PSD",   thresholdHours: 1440 }, // 60 days (monthly refresh)
-  { key: "ajca",              label: "AJCA",       thresholdHours: 720  }, // 30 days (monthly publish)
+  { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // bi-monthly
+  { key: "psd_coffee",        label: "USDA PSD",   thresholdHours: 2160 }, // ~quarterly (Jan, May, Jun, Dec)
+  { key: "ajca",              label: "AJCA",       thresholdHours: 720 }, // monthly
+  { key: "ice_certified_daily",       label: "ICE Cert. Daily",   thresholdHours: 144 }, // Mon-Fri T-1
+  { key: "ice_arabica_ageing",        label: "ICE Arabica Age.",  thresholdHours: 912 }, // monthly, 38d buffer for missed-window
+  { key: "ice_robusta_age_allowance", label: "ICE Robusta Age.",  thresholdHours: 912 },
   // Farmer economics (Brazil)
-  { key: "conab_costs",       label: "CONAB Costs",thresholdHours: 720  }, // monthly
-  { key: "conab_safra",       label: "CONAB Safra",thresholdHours: 720  }, // monthly
+  { key: "conab_costs",       label: "CONAB Costs",thresholdHours: 720 }, // monthly
+  { key: "conab_safra",       label: "CONAB Safra",thresholdHours: 720 }, // monthly safra release
   // Origin export data
-  { key: "cecafe_daily",      label: "Cecafe Daily",thresholdHours: 36  }, // business-daily
-  { key: "brazil_exports",    label: "BR Exports", thresholdHours: 720  }, // monthly (Cecafe)
-  { key: "colombia_exports",  label: "CO Exports", thresholdHours: 48   },
-  { key: "honduras_exports",  label: "HN Exports", thresholdHours: 48   },
-  { key: "ethiopia_exports",  label: "ET Exports", thresholdHours: 48   },
-  { key: "vietnam_exports",   label: "VN Exports", thresholdHours: 48   },
-  { key: "indonesia_exports", label: "ID Exports", thresholdHours: 48   },
-  { key: "uganda_exports",    label: "UG Exports", thresholdHours: 48   },
+  { key: "cecafe_daily",      label: "Cecafe Daily",thresholdHours: 96 }, // daily M-F + Brazilian holidays
+  { key: "brazil_exports",    label: "BR Exports", thresholdHours: 720 }, // monthly (Cecafé export report ~15th)
+  { key: "colombia_exports",  label: "CO Exports", thresholdHours:  96 }, // daily cumulative
+  { key: "honduras_exports",  label: "HN Exports", thresholdHours:  96 },
+  { key: "ethiopia_exports",  label: "ET Exports", thresholdHours:  96 },
+  { key: "vietnam_exports",   label: "VN Exports", thresholdHours:  96 },
+  { key: "vietnam_price",     label: "VN Price",   thresholdHours:  96 }, // daily giacaphe domestic survey
+  { key: "indonesia_exports", label: "ID Exports", thresholdHours:  96 },
+  { key: "uganda_exports",    label: "UG Exports", thresholdHours:  96 },
 ];
 
 function fmtAge(isoTimestamp: string): string {

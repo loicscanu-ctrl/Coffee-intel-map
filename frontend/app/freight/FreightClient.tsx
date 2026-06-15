@@ -1,10 +1,29 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  ComposedChart, Bar,
-} from "recharts";
+import React, { useMemo } from "react";
+import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
+import { useFetchJson } from "@/lib/useFetchJson";
+import PortActivity from "./PortActivity";
+
+// Charts carry the heavy recharts dependency — lazy-load them (client-only) so
+// they stay out of the page's initial bundle. The page chrome renders first.
+const FreightHistoryChart = dynamic(
+  () => import("./FreightCharts").then((m) => m.FreightHistoryChart),
+  { ssr: false, loading: () => <ChartFallback height={260} /> },
+);
+const DryBulkChart = dynamic(
+  () => import("./FreightCharts").then((m) => m.DryBulkChart),
+  { ssr: false, loading: () => <ChartFallback height={180} /> },
+);
+
+function ChartFallback({ height }: { height: number }) {
+  return (
+    <div className="flex items-center justify-center text-slate-500 text-[10px] animate-pulse"
+      style={{ height }}>
+      Loading chart…
+    </div>
+  );
+}
 
 type FreightRoute = {
   id: string;
@@ -30,15 +49,6 @@ interface DryBulkData {
   series: { date: string; close: number }[];
   source: string;
 }
-
-const TT_STYLE = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 };
-
-const CHART_LINES = [
-  { key: "vn-eu", label: "VN → EU", color: "#38bdf8" },
-  { key: "br-eu", label: "BR → EU", color: "#4ade80" },
-  { key: "vn-us", label: "VN → US", color: "#fb923c" },
-  { key: "et-eu", label: "ET → EU", color: "#c084fc" },
-];
 
 interface Props { data: FreightData | null; }
 
@@ -66,7 +76,7 @@ function BdryPanel({ data }: { data: DryBulkData }) {
           <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Dry Bulk Freight · {data.ticker}
           </div>
-          <div className="text-[9px] text-slate-600 mt-0.5">{data.description}</div>
+          <div className="text-[9px] text-slate-500 mt-0.5">{data.description}</div>
         </div>
         <div className="text-right">
           <div className="text-xl font-mono font-bold text-slate-100">${data.last_price.toFixed(2)}</div>
@@ -78,7 +88,7 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 
       {w52Pos != null && (
         <div className="space-y-0.5">
-          <div className="flex justify-between text-[8px] text-slate-600 font-mono">
+          <div className="flex justify-between text-[8px] text-slate-500 font-mono">
             <span>52w L ${data.week52_low?.toFixed(2)}</span>
             <span>52w H ${data.week52_high?.toFixed(2)}</span>
           </div>
@@ -90,36 +100,27 @@ function BdryPanel({ data }: { data: DryBulkData }) {
       )}
 
       {chartData.length > 0 && (
-        <ResponsiveContainer width="100%" height={180}>
-          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="label" tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false}
-              tickFormatter={v => `$${Number(v).toFixed(0)}`} />
-            <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`$${Number(v).toFixed(2)}`, data.ticker]} />
-            <Bar dataKey="close" fill="#3b82f6" opacity={0.75} radius={[2,2,0,0]} isAnimationActive={false} />
-          </ComposedChart>
-        </ResponsiveContainer>
+        <DryBulkChart chartData={chartData} ticker={data.ticker} />
       )}
 
       <div className="grid grid-cols-3 gap-3 text-[9px] font-mono border-t border-slate-800 pt-2">
         <div>
-          <div className="text-slate-600">WoW</div>
+          <div className="text-slate-500">WoW</div>
           <div style={{ color: wowColor }}>
             {data.wow_pct != null ? `${data.wow_pct >= 0 ? "+" : ""}${data.wow_pct}%` : "—"}
           </div>
         </div>
         <div>
-          <div className="text-slate-600">As of</div>
+          <div className="text-slate-500">As of</div>
           <div className="text-slate-400">{data.last_date}</div>
         </div>
         <div>
-          <div className="text-slate-600">Exchange</div>
+          <div className="text-slate-500">Exchange</div>
           <div className="text-slate-400">NYSE Arca</div>
         </div>
       </div>
 
-      <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2">
+      <div className="text-[9px] text-slate-500 italic border-t border-slate-800 pt-2">
         Rising {data.ticker} → tighter dry bulk freight → higher CIF fertilizer cost into Brazil.
         Tracks Capesize + Supramax freight futures. Source: {data.source}.
       </div>
@@ -128,16 +129,10 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 }
 
 export default function FreightClient({ data }: Props) {
-  const [dryBulk, setDryBulk] = useState<DryBulkData | null>(null);
-  const [dryLoaded, setDryLoaded] = useState(false);
-
-  useEffect(() => {
-    fetch("/data/farmer_economics.json")
-      .then(r => r.json())
-      .then(d => setDryBulk(d.fertilizer?.dry_bulk ?? null))
-      .catch((err) => console.error("[FreightClient] fetch failed:", err))
-      .finally(() => setDryLoaded(true));
-  }, []);
+  const { data: farmerEcon, loading: dryLoading, error: dryError } =
+    useFetchJson<{ fertilizer?: { dry_bulk?: DryBulkData } }>("/data/farmer_economics.json");
+  const dryBulk: DryBulkData | null = farmerEcon?.fertilizer?.dry_bulk ?? null;
+  const dryLoaded = !dryLoading || dryError !== null;
 
   return (
     <div className="h-full overflow-y-auto">
@@ -154,7 +149,7 @@ export default function FreightClient({ data }: Props) {
           Freight Rate Evolution — USD / FEU
         </div>
         {data?.updated && (
-          <div className="text-[10px] text-slate-600 mb-3">Last updated: {data.updated}</div>
+          <div className="text-[10px] text-slate-500 mb-3">Last updated: {data.updated}</div>
         )}
 
         {(!data || data.history.length === 0) && (
@@ -164,28 +159,7 @@ export default function FreightClient({ data }: Props) {
         )}
 
         {data && data.history.length > 0 && (
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={data.history} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false}
-                tickFormatter={(v: string) => v.slice(5)} />
-              <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={50}
-                tickFormatter={(v: number) => `$${(v / 1000).toFixed(1)}k`} />
-              <Tooltip
-                contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-                labelStyle={{ color: "#94a3b8" }}
-                formatter={(v: unknown) => [`$${Number(v).toLocaleString("en-US")}`, ""]}
-              />
-              <Legend
-                wrapperStyle={{ fontSize: 11, color: "#94a3b8" }}
-                formatter={(value) => CHART_LINES.find((l) => l.key === value)?.label ?? value}
-              />
-              {CHART_LINES.map((l) => (
-                <Line key={l.key} type="monotone" dataKey={l.key} stroke={l.color}
-                  strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+          <FreightHistoryChart history={data.history} />
         )}
       </div>
 
@@ -243,11 +217,14 @@ export default function FreightClient({ data }: Props) {
         )}
       </div>
 
+      {/* Port activity — IMF PortWatch */}
+      <PortActivity />
+
       {/* Dry bulk freight indicator */}
       {dryBulk ? (
         <BdryPanel data={dryBulk} />
       ) : (
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 text-[10px] text-slate-600 italic">
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 text-[10px] text-slate-500 italic">
           {dryLoaded
             ? "Dry bulk freight indicator not yet available — pending the next dry-bulk scrape."
             : "Loading dry bulk indicator…"}

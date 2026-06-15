@@ -3,9 +3,12 @@ export_stocks.py
 Reads DB + scraper caches and writes frontend/public/data/demand_stocks.json.
 
 Sections:
-  ecf    — ECF European port stocks (monthly), via NewsItem source="ECF"
   eu     — USDA FAS PSD annual EU green-coffee figures, from cache
   japan  — USDA FAS PSD annual Japan green-coffee figures, from cache
+
+NB: ECF is a separate, self-contained flow ('3.4 – ECF stocks' →
+ecf_history.json, read directly by the front-end) and is deliberately not part
+of demand_stocks.json anymore.
 """
 from __future__ import annotations
 
@@ -18,40 +21,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from database import SessionLocal
 from models import NewsItem
-from scraper.sources import ajca, population, psd_coffee, un_wpp_age
+from scraper.sources import ajca, population, psd_coffee, un_wpp_age, usda_gain_pdf
 
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def _build_ecf(db) -> dict | None:
-    try:
-        item = (
-            db.query(NewsItem)
-            .filter(NewsItem.source == "ECF")
-            .order_by(NewsItem.pub_date.desc())
-            .first()
-        )
-        if not item:
-            return None
-        meta = json.loads(item.meta or "{}")
-        latest_bags = meta.get("latest_bags") or 0
-        return {
-            "source":        "ECF",
-            "last_updated":  meta.get("as_of", str(item.pub_date)[:10]),
-            "monthly":       meta.get("monthly", []),
-            "latest_bags":   latest_bags,
-            "latest_m_bags": round(latest_bags / 1_000_000, 2) if latest_bags else None,
-            "source_url":    meta.get("source_url"),
-            "latest_post":   meta.get("latest_post"),
-            "latest_pdf":    meta.get("latest_pdf"),
-            "yearly_pdfs":   meta.get("yearly_pdfs", []),
-        }
-    except Exception as e:
-        print(f"  [stocks] ECF section error: {e}")
-        return None
-
 
 def _psd_section(market_key: str, db_data: dict | None) -> dict | None:
     if not db_data:
@@ -108,8 +82,49 @@ def _build_ajca(db=None) -> dict | None:
     }
 
 
+def _merge_gain_into_producer(producer: dict, gain_block: dict | None) -> dict:
+    """Layer the latest GAIN PDF forecast onto a PSD CSV producer block.
+
+    USDA's downloadable PSD CSV currently stops at the last realized
+    marketing year. The forward-year forecast lives in the GAIN narrative
+    PDF (e.g. BR2026-0025) — parsed by scraper/sources/usda_gain_pdf.py
+    into the same {annual: [...], latest_*} shape.
+
+    Merge rules:
+      • Years already present in `producer.annual` win — the CSV is the
+        canonical realized series.
+      • Forward years (those NOT in the CSV) are appended from `gain_block`.
+      • `latest_*` summary fields are recomputed from the merged tail.
+    """
+    if not gain_block:
+        return producer
+    csv_years = {row.get("year") for row in producer.get("annual") or []}
+    forward_rows = [r for r in (gain_block.get("annual") or [])
+                    if r.get("year") and r["year"] not in csv_years]
+    if not forward_rows:
+        return producer
+
+    merged_annual = list(producer.get("annual") or []) + forward_rows
+    merged_annual.sort(key=lambda r: str(r.get("year") or ""))
+    latest = merged_annual[-1]
+
+    out = dict(producer)
+    out["annual"] = merged_annual
+    out["latest_year"]           = latest.get("year")
+    out["latest_production_mt"]  = latest.get("production_mt")  or out.get("latest_production_mt")
+    out["latest_exports_mt"]     = latest.get("exports_mt")     or out.get("latest_exports_mt")
+    out["latest_consumption_mt"] = latest.get("consumption_mt") or out.get("latest_consumption_mt")
+    out["latest_stocks_mt"]      = latest.get("stocks_mt")      or out.get("latest_stocks_mt")
+    out["forecast_source"]       = gain_block.get("source_pdf") or gain_block.get("source")
+    return out
+
+
 def _psd_producers(psd_data: dict | None) -> dict | None:
-    """Return {country: {latest_year, production_mt, exports_mt, ...}} summary."""
+    """Return {country: {latest_year, production_mt, exports_mt, ...}} summary.
+
+    Merges GAIN PDF forecasts on top of the PSD CSV series, so forward
+    years USDA only publishes in the GAIN narrative reach demand_stocks.json.
+    Cache misses fall back to PSD CSV only — the merge never blocks export."""
     if not psd_data:
         return None
     producers = psd_data.get("producers")
@@ -117,13 +132,16 @@ def _psd_producers(psd_data: dict | None) -> dict | None:
         return None
     out: dict[str, dict] = {}
     for country, d in producers.items():
+        gain_block = usda_gain_pdf.load_cached(country)
+        merged = _merge_gain_into_producer(d, gain_block)
         out[country] = {
-            "latest_year":            d.get("latest_year"),
-            "latest_production_mt":   d.get("latest_production_mt"),
-            "latest_exports_mt":      d.get("latest_exports_mt"),
-            "latest_consumption_mt":  d.get("latest_consumption_mt"),
-            "latest_stocks_mt":       d.get("latest_stocks_mt"),
-            "annual":                 d.get("annual", []),
+            "latest_year":            merged.get("latest_year"),
+            "latest_production_mt":   merged.get("latest_production_mt"),
+            "latest_exports_mt":      merged.get("latest_exports_mt"),
+            "latest_consumption_mt":  merged.get("latest_consumption_mt"),
+            "latest_stocks_mt":       merged.get("latest_stocks_mt"),
+            "annual":                 merged.get("annual", []),
+            "forecast_source":        merged.get("forecast_source"),
         }
     return out or None
 
@@ -342,9 +360,12 @@ def export_stocks(db) -> None:
             except Exception:
                 pass
 
+    # NB: ECF is intentionally NOT here. It is a self-contained flow owned by
+    # the '3.4 – ECF stocks' scraper, which writes frontend/public/data/
+    # ecf_history.json (read directly by the front-end). Do not re-add an "ecf"
+    # key — that would resurrect the duplicate the dismantling removed.
     result = {
         "generated_at":   datetime.utcnow().isoformat() + "Z",
-        "ecf":            _build_ecf(db),
         "eu":             _psd_section("eu",    psd_data),
         "japan":          _psd_section("japan", psd_data),
         "usa":            _psd_section("usa",   psd_data),
@@ -361,7 +382,6 @@ def export_stocks(db) -> None:
     growth_count = len(result["growth_markets"] or [])
     print(
         f"  demand_stocks.json -> "
-        f"ecf:{result['ecf'] is not None} "
         f"eu:{result['eu'] is not None} "
         f"japan:{result['japan'] is not None} "
         f"usa:{result['usa'] is not None} "

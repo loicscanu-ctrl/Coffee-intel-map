@@ -1,0 +1,76 @@
+name: "9.3 – Smart-quote guard (TS/TSX)"
+
+# Catches typographic smart quotes (U+201C/U+201D, U+2018/U+2019) sneaking
+# into TS/TSX source. They render fine in text but break JSX when they
+# replace an attribute boundary — exactly the bug that took down the Vercel
+# build in commit 8e7aaf0 (ResearchView.tsx ContractRules block).
+#
+# Common contamination sources: editors / IDEs / paste flows that
+# auto-correct ASCII " into typographic “ ” (Notion, Apple Notes, Word,
+# some VS Code extensions on macOS).
+#
+# Backstop, not a developer experience: this is a CI check, not a local
+# pre-commit hook (the repo has no husky / pre-commit infra to extend).
+# Runs in ~5s; fails loudly with an exact-line listing.
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+      - '.github/workflows/lint-smart-quotes.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan TS/TSX for typographic smart quotes
+        # U+201C  “  LEFT  DOUBLE QUOTATION MARK
+        # U+201D  ”  RIGHT DOUBLE QUOTATION MARK
+        # U+2018  ‘  LEFT  SINGLE QUOTATION MARK
+        # U+2019  ’  RIGHT SINGLE QUOTATION MARK
+        # We intentionally allow em-dash, en-dash, bullets, ellipsis, etc.
+        # — those rarely break JSX (they only land in text content where
+        # they render correctly). Smart quotes are the proven JSX-breaker.
+        #
+        # Excludes node_modules + .next (vendored / build output, full of
+        # third-party typographic strings we can't and shouldn't edit).
+        # In-text typography in OUR JSX should use HTML entities
+        # (&ldquo; &rdquo; &lsquo; &rsquo;) which the source stays
+        # ASCII-clean and React still renders the typographic glyph.
+        run: |
+          set -e
+          # grep -P for PCRE so we can use \x{NNNN}. -rn for recursive + line nums.
+          # --include limits to TS/TSX; --exclude-dir skips vendored trees.
+          if grep -rnP \
+                 --include='*.ts' --include='*.tsx' \
+                 --exclude-dir=node_modules --exclude-dir=.next \
+                 '[\x{2018}\x{2019}\x{201C}\x{201D}]' frontend/; then
+            echo
+            echo "❌ Smart quotes found in TS/TSX source."
+            echo
+            echo "These typographic quotes (U+2018 ‘  U+2019 ’  U+201C “  U+201D ”)"
+            echo "render fine in prose but BREAK JSX parsing when they replace"
+            echo "an attribute boundary — that's what wedged the Vercel build in"
+            echo "commit 8e7aaf0 (ResearchView.tsx ContractRules)."
+            echo
+            echo "Likely cause: your editor / paste source auto-corrected ASCII \""
+            echo "into typographic “ ”. Common culprits: Notion paste, Apple Notes,"
+            echo "Word, some VS Code extensions on macOS."
+            echo
+            echo "Fix:"
+            echo "  • In code / attributes — replace with ASCII \" or '"
+            echo "  • In JSX text where you genuinely want a typographic glyph —"
+            echo "    use HTML entities: &ldquo; &rdquo; &lsquo; &rsquo;"
+            exit 1
+          fi
+          echo "✓ No smart quotes found in TS/TSX source."

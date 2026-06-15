@@ -2,14 +2,20 @@ name: "1.7 – Cecafe Daily Registration"
 
 on:
   schedule:
-    # Recurring failure pattern (May 2026): Cecafe's edge periodically
-    # refuses GH Actions IPs for 30+ min windows. A single 09:00 UTC cron
-    # whose 4 retries fit in ~25 min has been losing whole days. Three
-    # spread-out attempts give the block time to clear naturally — same-day
-    # IP throttles typically lift inside 2-3h.
-    - cron: '0  9 * * *'   # 06:00 Brasília — primary attempt after overnight publish
-    - cron: '0 13 * * *'   # 10:00 Brasília — midday backup if 09:00 was blocked
-    - cron: '0 17 * * *'   # 14:00 Brasília — afternoon backup
+    # Single daily window at 17:00 UTC (14:00 Brasília). Chosen as the LATE
+    # window deliberately: Cecafe publishes the day's resumo at a variable
+    # hour, and the afternoon run is the most likely to catch the page after
+    # it has advanced to the current day (an earlier run often finds
+    # yesterday's data still showing — see the "page reference date ==
+    # last stored, nothing new to commit" diag in the log).
+    #
+    # History: this used to be three windows (09/13/17 UTC) as a hedge
+    # against Cecafe's edge refusing GH Actions IPs for 30+ min stretches.
+    # The patchright browser-render path (added June 2026) now clears the
+    # bot-challenge wall reliably, so the extra windows became redundant
+    # cost (each spins up a headless chromium). Trimmed to one on the
+    # owner's call. workflow_dispatch stays for manual catch-up / one-offs.
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -19,11 +25,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    # 3 attempts × up to ~60s per request + 60s + 240s gaps ≈ 8 min worst
-    # case. 15 leaves comfortable headroom for slow pip-installs / repo
-    # checkout, well under the original 25min cap (which now lives across
-    # 3 cron windows instead of one).
-    timeout-minutes: 15
+    # 3 attempts × (≤60s request + ≤45s patchright render) + 60s + 240s gaps
+    # ≈ 12 min worst case. Chromium install adds ~1 min. 20 min leaves
+    # headroom, still well under the original single-window 25min cap.
+    timeout-minutes: 20
     permissions:
       contents: write
 
@@ -37,19 +42,26 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install dependencies
-        # requests added — fetch_cecafe_daily switched from urllib.request
-        # to requests for cleaner connect/read timeout separation. pdfplumber
-        # stays for the PDF mirror fallback the parser can use.
-        run: pip install pdfplumber requests
+        # requests for the fast-path fetch; pdfplumber for the PDF mirror
+        # fallback. patchright (Cloudflare-evading Playwright fork) renders
+        # past the bot-challenge wall Cecafé's edge began serving to GH
+        # Actions IPs in June 2026 — same proven bypass scraper-daily.yml
+        # uses for giacaphe.com. Installed explicitly (not via requirements)
+        # because pip's resolver silently drops it against playwright==1.44.0.
+        run: |
+          set -e
+          pip install pdfplumber requests
+          pip install patchright
+          python -m patchright install chromium
 
-      - name: Run Cecafe scraper (3 attempts within this cron window)
+      - name: Run Cecafe scraper (3 attempts within the daily window)
         working-directory: backend
-        # 3 attempts with exponential 60s/180s/360s spacing — total ~10 min
-        # per cron run vs the old 4-at-5min = 20 min. The big resilience
-        # win is now the *additional cron runs* at 13:00 and 17:00 UTC, not
-        # within-run retries — same-day IP blocks usually clear in hours,
-        # not minutes, so spacing retries 4h apart works where 5-min
-        # spacing all hit the same block.
+        # 3 in-run attempts with 60s/240s spacing. Now that there's a single
+        # daily window (no 13:00/17:00 backups), these within-run retries are
+        # the only safety net for a transient blip — patchright clears the
+        # challenge on the first try in the normal case, so the retries
+        # mostly cover a one-off network hiccup. The run is idempotent: a
+        # page that hasn't advanced to a new day commits nothing.
         run: |
           set +e
           for attempt in 1 2 3; do

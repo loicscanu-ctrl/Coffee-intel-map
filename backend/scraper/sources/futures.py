@@ -640,6 +640,42 @@ def _ice_date_to_iso(mm_dd_yyyy: str) -> str:
         return mm_dd_yyyy
 
 
+def _cot_commentary(*, market: str, oi_delta: int, pmpu_long_delta: int,
+                    pmpu_short_delta: int, mm_long_delta: int,
+                    mm_short_delta: int) -> str | None:
+    """Render the news-feed badge for a COT release. Pure helper — both
+    NY (CFTC) and LDN (ICE) callers share the same structure.
+
+    "Industry" maps to PMPU (Producer/Merchant/Processor/User) — the
+    commercial cohort that physically handles the coffee.
+
+    Price WoW is intentionally not included here: the COT scraper doesn't
+    have a clean price-WoW reference in scope at the time `_make_*_cot_item`
+    runs (price upserts happen on a separate cadence). The template
+    conditional drops the line when `price_delta_signed` is None.
+    """
+    from scraper.commentary import render, signed
+
+    mm_net_delta = mm_long_delta - mm_short_delta
+    try:
+        return render("cot_release", {
+            "market":                market,
+            "price_dir":             None,
+            "price_delta_signed":    None,
+            "oi_dir":                "up" if oi_delta >= 0 else "down",
+            "oi_delta_signed":       signed(oi_delta),
+            "comm_long_dir":         "increased" if pmpu_long_delta >= 0  else "decreased",
+            "comm_long_delta_abs":   f"{abs(pmpu_long_delta):,}",
+            "comm_short_dir":        "increased" if pmpu_short_delta >= 0 else "decreased",
+            "comm_short_delta_abs":  f"{abs(pmpu_short_delta):,}",
+            "mm_dir":                "increased" if mm_net_delta >= 0 else "decreased",
+            "mm_delta_abs":          f"{abs(mm_net_delta):,}",
+        })
+    except Exception as e:  # noqa: BLE001 — commentary failures must not abort the COT row
+        print(f"[cot-news] commentary render failed for {market}: {e!r}")
+        return None
+
+
 def _make_ice_cot_item(latest: dict, prev: dict | None) -> dict:
     """Build a COT news item from ICE Robusta data, computing changes from prev row."""
     report_date = _ice_date_to_iso(latest.get("As_of_Date_Form_MM/DD/YYYY", ""))
@@ -679,6 +715,7 @@ def _make_ice_cot_item(latest: dict, prev: dict | None) -> dict:
     nr_dl   = chg("NonRept_Positions_Long_All")
     nr_ds   = chg("NonRept_Positions_Short_All")
 
+    oi_delta = chg("Open_Interest_All")
     cot_struct = {
         "report_date": report_date,
         "open_interest": oi,
@@ -688,6 +725,15 @@ def _make_ice_cot_item(latest: dict, prev: dict | None) -> dict:
         "other": {"long": oth_l, "short": oth_s, "spread": oth_sp, "d_long": oth_dl, "d_short": oth_ds},
         "nr":    {"long": nr_l, "short": nr_s, "d_long": nr_dl, "d_short": nr_ds},
     }
+    commentary = _cot_commentary(
+        market="London Robusta (RC)",
+        oi_delta=oi_delta,
+        pmpu_long_delta=pmpu_dl,   pmpu_short_delta=pmpu_ds,
+        mm_long_delta=mm_dl,       mm_short_delta=mm_ds,
+    )
+    if commentary:
+        from scraper.commentary import embed_commentary
+        embed_commentary(cot_struct, text=commentary, has_update=True, is_latest_trading_day=False)
     # Persist to cot_weekly for the CoT dashboard
     try:
         upsert_cot_weekly("ldn", report_date, {
@@ -800,6 +846,7 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
     nr_l_other    = _int(row["NonRept_Positions_Long_Other"])
     nr_s_other    = _int(row["NonRept_Positions_Short_Other"])
 
+    oi_delta = _int(row.get("Change_in_Open_Interest_All", "0"))
     cot_struct = {
         "report_date": report_date,
         "open_interest": oi,
@@ -809,6 +856,15 @@ def _make_cot_item(row: dict, title: str, source: str, tags: list[str]) -> dict:
         "other": {"long": oth_l, "short": oth_s, "spread": oth_sp, "d_long": oth_dl, "d_short": oth_ds},
         "nr":    {"long": nr_l, "short": nr_s, "d_long": nr_dl, "d_short": nr_ds},
     }
+    commentary = _cot_commentary(
+        market="NY Arabica (KC)",
+        oi_delta=oi_delta,
+        pmpu_long_delta=pmpu_dl,   pmpu_short_delta=pmpu_ds,
+        mm_long_delta=mm_dl,       mm_short_delta=mm_ds,
+    )
+    if commentary:
+        from scraper.commentary import embed_commentary
+        embed_commentary(cot_struct, text=commentary, has_update=True, is_latest_trading_day=False)
     # Persist to cot_weekly for the CoT dashboard
     try:
         upsert_cot_weekly("ny", report_date, {

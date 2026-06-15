@@ -4,6 +4,7 @@ import {
   ComposedChart, Bar, BarChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Legend, ReferenceLine,
 } from "recharts";
+import { MONTH_ABBR, MONTH_ABBR as MONTHS } from "@/lib/formatters";
 
 type Region = "eu" | "japan" | "usa";
 
@@ -17,9 +18,13 @@ interface MonthlyEntry {
   arabica_unwashed_mt?: number | null;
   robusta_mt?: number | null;
   other_mt?: number | null;
+  // ICE-certified stock at European warehouses (subset of the ECF type total),
+  // joined in by the 3.4 ECF flow. Present only for recent months.
+  cert_eu_robusta_mt?: number | null;
+  cert_eu_arabica_mt?: number | null;
 }
 
-interface EcfData {
+export interface EcfData {
   source: string;
   last_updated: string;
   monthly: MonthlyEntry[];
@@ -51,21 +56,6 @@ interface PsdData {
   latest_stocks_mt: number | null;
 }
 
-interface AjcaData {
-  source: string;
-  source_url?: string | null;
-  last_updated: string;
-  latest_year: string | null;
-  latest_imports_mt: number | null;
-  latest_consumption_mt: number | null;
-  monthly_imports_pdf?: string | null;
-  monthly_exports_pdf?: string | null;
-  supply_demand_pdf?: string | null;
-  yearly_imports_pdf?: string | null;
-  latest_origin_breakdown?: { country: string; imports_mt: number }[] | null;
-  latest_origin_pdf?: string | null;
-}
-
 interface ProducerEntry {
   latest_year: string | null;
   latest_production_mt: number | null;
@@ -77,11 +67,10 @@ interface ProducerEntry {
 
 interface StocksPayload {
   generated_at: string;
-  ecf: EcfData | null;
+  // ECF is its own flow now (read from /data/ecf_history.json), no longer here.
   eu: PsdData | null;
   japan: PsdData | null;
   usa: PsdData | null;
-  ajca: AjcaData | null;
   producers: Record<string, ProducerEntry> | null;
 }
 
@@ -92,7 +81,6 @@ const TT_STYLE = {
   fontSize: 10,
 };
 
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function fmtPeriod(p: string): string {
   const m = p.match(/(\d{4})-(\d{2})/);
   if (m) return `${MONTH_ABBR[parseInt(m[2]) - 1]}-${m[1].slice(2)}`;
@@ -115,7 +103,82 @@ function deltaArrow(v: number | null): { symbol: string; cls: string } {
 
 // ── ECF Monthly Panel ─────────────────────────────────────────────────────────
 
-function EcfPanel({ ecf }: { ecf: EcfData }) {
+const kMT = (x?: number | null) => (x != null ? Math.round(x / 1000) : null);
+
+// Years present in the series (newest first), restricted to entries that carry
+// the field selected by `has`.
+function yearsWith(monthly: MonthlyEntry[], has: (m: MonthlyEntry) => boolean): number[] {
+  // Plain array + includes (no Set spread — repo's TS target predates es2015
+  // iteration, so [...set] fails to compile).
+  const ys: number[] = [];
+  for (const m of monthly) {
+    const mt = (m.period ?? m.month ?? "").match(/^(\d{4})-\d{2}$/);
+    if (mt && has(m)) {
+      const y = parseInt(mt[1]);
+      if (!ys.includes(y)) ys.push(y);
+    }
+  }
+  return ys.sort((a, b) => b - a);
+}
+
+type SeasonRow = Record<string, number | string | null>;
+
+// Pivot the flat monthly series into 12 month rows (Jan→Dec), one set of keys
+// per year (`y<YEAR>_<measure>`). Years are emitted newest-first by the caller
+// so the stacked columns render newest-left within each month.
+function seasonalRows(
+  monthly: MonthlyEntry[], years: number[],
+  pick: (m: MonthlyEntry) => Record<string, number | null>,
+): SeasonRow[] {
+  const byPeriod = new Map<string, MonthlyEntry>();
+  for (const m of monthly) byPeriod.set(m.period ?? m.month ?? "", m);
+  return MONTHS.map((mon, i) => {
+    const row: SeasonRow = { month: mon };
+    for (const y of years) {
+      const e = byPeriod.get(`${y}-${String(i + 1).padStart(2, "0")}`);
+      if (!e) continue;
+      for (const [k, v] of Object.entries(pick(e))) row[`y${y}_${k}`] = v;
+    }
+    return row;
+  });
+}
+
+const SEASON_TT_LABELS: Record<string, string> = {
+  total: "Total", washed: "Arabica Washed", unwashed: "Arabica Unwashed",
+  robusta: "Robusta", cert: "ICE-certified (EU)", rest: "Rest of ECF",
+};
+function seasonTooltip(v: unknown, name: unknown): [string, string] {
+  const m = String(name ?? "").match(/^y(\d{4})_(\w+)$/);
+  const txt = `${Number(v).toLocaleString()}k MT`;
+  return m ? [txt, `${m[1]} · ${SEASON_TT_LABELS[m[2]] ?? m[2]}`] : [txt, String(name)];
+}
+
+// Newest year full-opacity, older years progressively fainter.
+const yearOpacity = (idx: number) => Math.max(0.35, 1 - idx * 0.22);
+
+// Linear interpolate two #rrggbb colours (t 0→1).
+function hexLerp(a: string, b: string, t: number): string {
+  const ch = (s: string, i: number) => parseInt(s.slice(i, i + 2), 16);
+  const mix = (i: number) => Math.round(ch(a, i) + (ch(b, i) - ch(a, i)) * t)
+    .toString(16).padStart(2, "0");
+  return `#${mix(1)}${mix(3)}${mix(5)}`;
+}
+
+function YearWindowButtons({ n, set }: { n: number; set: (v: number) => void }) {
+  return (
+    <div className="flex gap-1">
+      {[3, 5, 7].map(v => (
+        <button key={v} onClick={() => set(v)}
+          className={`text-[8px] px-1.5 py-0.5 rounded ${n === v
+            ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"}`}>
+          {v}Y
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function EcfPanel({ ecf }: { ecf: EcfData }) {
   const monthly = ecf.monthly;
 
   // Build period → value_mt map for YoY lookup
@@ -142,6 +205,11 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
       unwashed: m.arabica_unwashed_mt != null ? Math.round(m.arabica_unwashed_mt / 1000) : null,
       robusta:  m.robusta_mt          != null ? Math.round(m.robusta_mt          / 1000) : null,
       other:    m.other_mt            != null ? Math.round(m.other_mt            / 1000) : null,
+      // Months without a type split (pre-2020 PDFs) still have a total — show it
+      // as a single neutral column so the early history isn't blank.
+      totalOnly: (m.arabica_washed_mt == null && m.arabica_unwashed_mt == null &&
+                  m.robusta_mt == null && m.other_mt == null && mt != null)
+                 ? Math.round(mt / 1000) : null,
       yoy,
     };
   }).filter(d => d.mt != null);
@@ -150,7 +218,39 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
   const latestMt = ecf.latest_bags ? ecf.latest_bags * 0.06 / 1000 : null;
   const latestBagsM = ecf.latest_m_bags ?? (ecf.latest_bags ? +(ecf.latest_bags / 1_000_000).toFixed(1) : null);
   const yoyArrow = latest?.yoy != null ? deltaArrow(latest.yoy) : null;
-  const hasBreakdown = chartData.some(d => d.washed != null || d.robusta != null);
+
+  // ── Seasonal (month-of-year) views ─────────────────────────────────────────
+  const [nYears, setNYears] = useState(3);                 // 3Y default
+  const [cmpType, setCmpType] = useState<"robusta" | "arabica">("robusta");
+
+  // Chart 1: one stacked-by-type column per year, newest-left, within each
+  // calendar month. Pre-2020 months (no type split) show a single total bar.
+  const years1 = yearsWith(monthly, m => m.value_mt != null).slice(0, nYears);
+  const seasonal1 = seasonalRows(monthly, years1, m => {
+    const hasType = m.arabica_washed_mt != null || m.arabica_unwashed_mt != null
+                    || m.robusta_mt != null;
+    return {
+      total:    hasType ? null : kMT(m.value_mt),
+      washed:   kMT(m.arabica_washed_mt),
+      unwashed: kMT(m.arabica_unwashed_mt),
+      robusta:  kMT(m.robusta_mt),
+    };
+  });
+
+  // Chart 2: ECF type stock with the ICE-certified-EU subset as a lighter base,
+  // for the toggled type, one column per year (newest-left) per month.
+  const certKey = cmpType === "robusta" ? "cert_eu_robusta_mt" : "cert_eu_arabica_mt";
+  const totKey  = cmpType === "robusta" ? "robusta_mt" : "arabica_washed_mt";
+  const years2 = yearsWith(monthly, m => m[certKey] != null).slice(0, nYears);
+  const hasCert = years2.length > 0;
+  const seasonal2 = seasonalRows(monthly, years2, m => {
+    const cert = m[certKey] ?? null;
+    const tot  = m[totKey] ?? null;
+    return {
+      cert: kMT(cert),
+      rest: tot != null && cert != null ? Math.max(0, kMT(tot)! - kMT(cert)!) : kMT(tot),
+    };
+  });
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
@@ -185,87 +285,100 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
         </div>
       </div>
 
-      {chartData.length > 1 ? (
-        <div className="h-40">
+      <div className="flex items-center justify-between">
+        <div className="text-[9px] text-slate-400 uppercase tracking-wide">
+          Seasonality — stock by type, by year
+        </div>
+        <YearWindowButtons n={nYears} set={setNYears} />
+      </div>
+      {years1.length > 0 ? (
+        <div className="h-44">
           <ResponsiveContainer width="100%" height="100%">
-            {hasBreakdown ? (
-              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
-                />
-                <YAxis
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={v => `${v}k`}
-                />
-                <Tooltip
-                  contentStyle={TT_STYLE}
-                  formatter={(v: unknown, name: unknown) => {
-                    const labels: Record<string, string> = {
-                      washed: "Arabica Washed", unwashed: "Arabica Unwashed",
-                      robusta: "Robusta", other: "Other",
-                    };
-                    const key = String(name ?? "");
-                    return [`${Number(v).toLocaleString()}k MT`, labels[key] ?? key];
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 8 }}
-                  formatter={(v: string) => ({
-                    washed: "Arabica Washed", unwashed: "Arabica Unwashed",
-                    robusta: "Robusta", other: "Other",
-                  }[v] ?? v)}
-                />
-                <Bar dataKey="washed"   stackId="s" fill="#6366f1" opacity={0.9} name="washed" />
-                <Bar dataKey="unwashed" stackId="s" fill="#8b5cf6" opacity={0.9} name="unwashed" />
-                <Bar dataKey="robusta"  stackId="s" fill="#a78bfa" opacity={0.9} radius={[2,2,0,0]} name="robusta" />
-                {chartData.some(d => d.other) && (
-                  <Bar dataKey="other" stackId="s" fill="#c4b5fd" opacity={0.8} radius={[2,2,0,0]} name="other" />
-                )}
-              </BarChart>
-            ) : (
-              <ComposedChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
-                />
-                <YAxis
-                  yAxisId="mt"
-                  tick={{ fontSize: 7, fill: "#64748b" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={v => `${v}k`}
-                  domain={["auto", "auto"]}
-                />
-                <Tooltip
-                  contentStyle={TT_STYLE}
-                  formatter={(v: unknown) => [`${Number(v).toLocaleString()}k MT`, "ECF Stocks"]}
-                />
-                <Bar yAxisId="mt" dataKey="mt" fill="#6366f1" opacity={0.8} radius={[2,2,0,0]} />
-                <Line yAxisId="mt" dataKey="mt" type="monotone" stroke="#a5b4fc" strokeWidth={1.5} dot={{ r: 3, fill: "#a5b4fc" }} />
-              </ComposedChart>
-            )}
+            <BarChart data={seasonal1} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+              <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }}
+                     axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false}
+                     tickLine={false} tickFormatter={v => `${v}k`} />
+              <Tooltip contentStyle={TT_STYLE} formatter={seasonTooltip} />
+              {years1.flatMap((y, idx) => {
+                const op = yearOpacity(idx);
+                return [
+                  <Bar key={`${y}_t`} dataKey={`y${y}_total`}    stackId={`y${y}`} fill="#475569" fillOpacity={op} />,
+                  <Bar key={`${y}_w`} dataKey={`y${y}_washed`}   stackId={`y${y}`} fill="#b91c1c" fillOpacity={op} />,
+                  <Bar key={`${y}_u`} dataKey={`y${y}_unwashed`} stackId={`y${y}`} fill="#ec4899" fillOpacity={op} />,
+                  <Bar key={`${y}_r`} dataKey={`y${y}_robusta`}  stackId={`y${y}`} fill="#6b4423" fillOpacity={op} radius={[2,2,0,0]} />,
+                ];
+              })}
+            </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
         <div className="h-36 flex items-center justify-center text-[10px] text-slate-600 italic">
-          Bi-monthly series accumulating — {chartData.length} data point{chartData.length !== 1 ? "s" : ""} so far.
+          No ECF data yet.
         </div>
       )}
 
-      <div className="text-[9px] text-slate-500 italic">
-        {hasBreakdown
-          ? "Type breakdown parsed from ECF PDF (Arabica Washed · Arabica Unwashed · Robusta)."
-          : "Type breakdown pending — parsed from ECF PDF on next monthly scraper run."}
-        {" "}YoY comparison appears once 13+ months are collected.
+      <div className="flex items-center gap-x-2 gap-y-0.5 text-[8px] text-slate-500 flex-wrap">
+        <span>Per month: newest left → oldest right{years1.length ? ` (${years1.join(" · ")})` : ""}; older years fade.</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#b91c1c" }} />Arabica washed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#ec4899" }} />Arabica unwashed</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#6b4423" }} />Robusta</span>
+        <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: "#475569" }} />Total (pre-2020)</span>
       </div>
+
+      {hasCert && (() => {
+        // Newest year = the type's base colour (robusta brown / arabica red);
+        // older years tint toward orange so each year reads clearly.
+        const baseDark  = cmpType === "robusta" ? "#6b4423" : "#b91c1c";
+        const baseLight = cmpType === "robusta" ? "#cd9b6a" : "#fca5a5";
+        const ORANGE_DARK = "#c2410c";
+        const ORANGE_LIGHT = "#fdba74";
+        const span = Math.max(1, years2.length - 1);
+        return (
+          <div className="space-y-1 pt-1 border-t border-slate-700/60">
+            <div className="flex items-center justify-between">
+              <div className="text-[9px] text-slate-400 uppercase tracking-wide">
+                ECF vs ICE-certified at EU ports
+              </div>
+              <div className="flex gap-1">
+                {(["robusta", "arabica"] as const).map(t => (
+                  <button key={t} onClick={() => setCmpType(t)}
+                    className={`text-[8px] px-1.5 py-0.5 rounded ${cmpType === t
+                      ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"}`}>
+                    {t === "robusta" ? "Robusta" : "Washed Arabica"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={seasonal2} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                  <XAxis dataKey="month" tick={{ fontSize: 7, fill: "#64748b" }}
+                         axisLine={false} tickLine={false} interval={0} />
+                  <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false}
+                         tickLine={false} tickFormatter={v => `${v}k`} />
+                  <Tooltip contentStyle={TT_STYLE} formatter={seasonTooltip} />
+                  {years2.flatMap((y, idx) => {
+                    const t = idx / span;            // newest 0 → oldest 1
+                    const l = hexLerp(baseLight, ORANGE_LIGHT, t);
+                    const d = hexLerp(baseDark, ORANGE_DARK, t);
+                    return [
+                      <Bar key={`${y}_c`} dataKey={`y${y}_cert`} stackId={`y${y}`} fill={l} />,
+                      <Bar key={`${y}_r`} dataKey={`y${y}_rest`} stackId={`y${y}`} fill={d} radius={[2,2,0,0]} />,
+                    ];
+                  })}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-x-2 text-[8px] text-slate-500 flex-wrap">
+              <span>Column = ECF {cmpType === "robusta" ? "Robusta" : "Washed Arabica"}; newest left{years2.length ? ` (${years2.join(" · ")})` : ""}; older years tint orange.</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: baseLight }} />ICE-certified (EU)</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: baseDark }} />Rest of ECF</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: ORANGE_DARK }} />older years</span>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="text-[9px] text-slate-500 space-y-0.5">
         {ecf.latest_post && (
@@ -292,128 +405,6 @@ function EcfPanel({ ecf }: { ecf: EcfData }) {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-// ── Japan Panel (PSD trend + AJCA origin) ────────────────────────────────────
-
-function JapanPanel({ japan, ajca }: { japan: PsdData | null; ajca: AjcaData | null }) {
-  const annual = (japan?.annual ?? []).filter(p => p.imports_mt != null);
-  const chartData = annual.map(p => ({
-    year: p.year.slice(2),
-    imports: Math.round((p.imports_mt ?? 0) / 1000),
-    stocks:  p.stocks_mt  != null ? Math.round(p.stocks_mt  / 1000) : null,
-    consumption: p.consumption_mt != null ? Math.round(p.consumption_mt / 1000) : null,
-  }));
-
-  const latest = annual[annual.length - 1];
-  const prev   = annual[annual.length - 2];
-  const importsDelta = (latest && prev && latest.imports_mt != null && prev.imports_mt != null)
-    ? ((latest.imports_mt - prev.imports_mt) / prev.imports_mt) * 100 : null;
-  const stocksDelta = (latest && prev && latest.stocks_mt != null && prev.stocks_mt != null)
-    ? ((latest.stocks_mt - prev.stocks_mt) / prev.stocks_mt) * 100 : null;
-
-  const breakdown = ajca?.latest_origin_breakdown;
-  const total = breakdown?.reduce((s, r) => s + r.imports_mt, 0) || 0;
-  const topRows = breakdown
-    ? [...breakdown].sort((a, b) => b.imports_mt - a.imports_mt).slice(0, 6)
-    : null;
-
-  return (
-    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">
-      <div className="flex items-baseline justify-between">
-        <div className="text-[10px] text-slate-400 uppercase tracking-wide">Japan Green Coffee</div>
-        <div className="text-[8px] text-slate-600">USDA PSD · {japan?.last_updated ?? "—"}</div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 text-xs font-mono">
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Imports {latest?.year}</div>
-          <div className="text-sky-300 font-bold">{fmtThousands(latest?.imports_mt)}</div>
-          {importsDelta != null && (
-            <div className={`text-[9px] ${importsDelta >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-              {importsDelta >= 0 ? "+" : ""}{importsDelta.toFixed(1)}% YoY
-            </div>
-          )}
-        </div>
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Consumption</div>
-          <div className="text-white font-bold">{fmtThousands(latest?.consumption_mt)}</div>
-          <div className="text-[9px] text-slate-600">MT</div>
-        </div>
-        <div>
-          <div className="text-slate-500 text-[9px] mb-0.5">Ending stocks</div>
-          <div className="text-violet-300 font-bold">{fmtThousands(latest?.stocks_mt)}</div>
-          {stocksDelta != null && (
-            <div className={`text-[9px] ${stocksDelta >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-              {stocksDelta >= 0 ? "+" : ""}{stocksDelta.toFixed(1)}% YoY
-            </div>
-          )}
-        </div>
-      </div>
-
-      {chartData.length > 1 ? (
-        <div className="h-32">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 2, right: 4, left: -10, bottom: 0 }}>
-              <XAxis dataKey="year" tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} interval={3} />
-              <YAxis tick={{ fontSize: 7, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}k`} />
-              <Tooltip
-                contentStyle={TT_STYLE}
-                formatter={(v: unknown, name: unknown) => [
-                  `${Number(v).toLocaleString()}k MT`,
-                  name === "imports" ? "Imports" : name === "stocks" ? "End Stocks" : "Consumption",
-                ]}
-              />
-              <Bar dataKey="imports" fill="#0ea5e9" opacity={0.7} radius={[2,2,0,0]} name="imports" />
-              <Line dataKey="stocks" type="monotone" stroke="#a78bfa" strokeWidth={1.5} dot={false} name="stocks" />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="h-32 flex items-center justify-center text-[10px] text-slate-600 italic">
-          Annual history not available.
-        </div>
-      )}
-
-      {topRows && topRows.length > 0 && (
-        <div>
-          <div className="text-[9px] text-slate-500 mb-1 uppercase tracking-wide">
-            Origin breakdown (AJCA · {ajca?.latest_year})
-            {ajca?.latest_origin_pdf && (
-              <a href={ajca.latest_origin_pdf} target="_blank" rel="noopener noreferrer"
-                 className="ml-1 text-sky-600 hover:text-sky-400 normal-case">PDF</a>
-            )}
-          </div>
-          <div className="space-y-0.5">
-            {topRows.map(r => {
-              const pct = total > 0 ? (r.imports_mt / total) * 100 : 0;
-              return (
-                <div key={r.country} className="flex items-center gap-1.5">
-                  <div className="text-[9px] text-slate-400 w-20 truncate">{r.country}</div>
-                  <div className="flex-1 bg-slate-700 rounded-full h-1.5">
-                    <div className="bg-sky-500 h-1.5 rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
-                  </div>
-                  <div className="text-[9px] text-slate-400 font-mono w-10 text-right">{fmtThousands(r.imports_mt)}</div>
-                  <div className="text-[9px] text-slate-600 w-8 text-right">{pct.toFixed(0)}%</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {ajca?.supply_demand_pdf && (
-        <div className="text-[9px] text-slate-500">
-          <a href={ajca.supply_demand_pdf} target="_blank" rel="noopener noreferrer"
-             className="text-sky-400 hover:text-sky-300 underline">AJCA Supply &amp; Demand PDF</a>
-          {ajca.source_url && (
-            <>{" · "}<a href={ajca.source_url} target="_blank" rel="noopener noreferrer"
-                       className="text-slate-500 hover:text-slate-300 underline">AJCA →</a></>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -699,13 +690,21 @@ function StockToUseComparative({ eu, japan, usa }: { eu: PsdData | null; japan: 
 
 export default function StocksPanel() {
   const [data, setData] = useState<StocksPayload | null>(null);
+  const [ecf, setEcf] = useState<EcfData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/data/demand_stocks.json")
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+    // ECF is a self-contained flow with its own file; the rest comes from
+    // demand_stocks.json. Load both independently so one failing doesn't blank
+    // the other.
+    Promise.allSettled([
+      fetch("/data/demand_stocks.json").then(r => r.json()),
+      fetch("/data/ecf_history.json").then(r => r.json()),
+    ]).then(([d, e]) => {
+      if (d.status === "fulfilled") setData(d.value);
+      if (e.status === "fulfilled") setEcf(e.value);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -714,7 +713,8 @@ export default function StocksPanel() {
     );
   }
 
-  if (!data || (!data.ecf && !data.eu && !data.japan && !data.ajca && !data.usa)) {
+  const hasEcf = !!(ecf && ecf.monthly && ecf.monthly.length);
+  if (!hasEcf && (!data || (!data.eu && !data.japan && !data.usa))) {
     return (
       <div className="bg-slate-900 border-b border-slate-700 p-4">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">Consumer Market Stocks</div>
@@ -725,37 +725,28 @@ export default function StocksPanel() {
     );
   }
 
-  const hasPsd = data.eu || data.japan || data.usa;
+  const hasPsd = !!(data && (data.eu || data.japan || data.usa));
 
   return (
     <div className="bg-slate-900 border-b border-slate-700 p-4 space-y-4">
       <div className="text-[10px] text-slate-400 uppercase tracking-wide">Consumer Market Stocks</div>
 
-      {/* Row 1: ECF + Japan */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {data.ecf ? (
-          <EcfPanel ecf={data.ecf} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
-            ECF monthly data pending scraper run
-          </div>
-        )}
-        {(data.japan || data.ajca) ? (
-          <JapanPanel japan={data.japan} ajca={data.ajca} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
-            Japan data pending scraper run
-          </div>
-        )}
-      </div>
+      {/* Row 1: ECF certified stocks (Japan now lives in its own AJCA tab) */}
+      {hasEcf ? (
+        <EcfPanel ecf={ecf!} />
+      ) : (
+        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 text-center text-[10px] text-slate-500">
+          ECF monthly data pending scraper run
+        </div>
+      )}
 
       {/* Row 2: PSD Analytical (full width, EU/Japan/USA tabs) */}
-      {hasPsd && (
+      {hasPsd && data && (
         <PsdAnalyticalPanel eu={data.eu} japan={data.japan} usa={data.usa} />
       )}
 
       {/* Row 3: Stock-to-Use Comparative (all 3 regions overlaid) */}
-      {hasPsd && (
+      {hasPsd && data && (
         <StockToUseComparative eu={data.eu} japan={data.japan} usa={data.usa} />
       )}
     </div>

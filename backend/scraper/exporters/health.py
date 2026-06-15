@@ -128,6 +128,19 @@ def export_health(db) -> None:
         return None
     scrapers["retail_cpi"] = _cpi_ts()
 
+    # Headline US CPI (BLS CPI-U, monthly). Surfaces in the Macro tab's
+    # US Inflation (CPI-U) section.
+    def _us_cpi_ts() -> str | None:
+        try:
+            p = OUT_DIR / "us_cpi.json"
+            if p.exists():
+                d = json.loads(p.read_text(encoding="utf-8"))
+                return d.get("last_updated")
+        except Exception:
+            return None
+        return None
+    scrapers["us_cpi"] = _us_cpi_ts()
+
     # FX history (12 currency pairs, daily closes, ~1 year window). Backs the
     # Macro tab's FX Pair Time-Series widget. Written by the quant currency
     # index workflow alongside quant_report.json.
@@ -166,6 +179,31 @@ def export_health(db) -> None:
     scrapers["vietnam_exports"]   = _supply_ts("vietnam_supply.json")
     scrapers["indonesia_exports"] = _supply_ts("indonesia_supply.json")
     scrapers["uganda_exports"]    = _supply_ts("uganda_supply.json")
+
+    # ICE certified stocks — three freshness rows on two cadences (the daily
+    # stock scraper and the two monthly reports run as separate workflows):
+    #   ice_certified_daily        — newest snapshot date (daily, Mon-Fri)
+    #   ice_arabica_ageing         — arabica ageing report month_end (monthly)
+    #   ice_robusta_age_allowance  — robusta age-allowance month_end (monthly)
+    def _cert_json(fname: str) -> dict:
+        try:
+            p = OUT_DIR / fname
+            if p.exists():
+                return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+        return {}
+    _ca = _cert_json("certified_stocks_arabica.json")
+    _cr = _cert_json("certified_stocks_robusta.json")
+
+    def _last_snap_date(d: dict) -> str | None:
+        ss = d.get("snapshots") or []
+        return ss[-1].get("date") if ss else None
+    _daily = [x for x in (_last_snap_date(_ca), _last_snap_date(_cr)) if x]
+    scrapers["ice_certified_daily"]       = max(_daily) if _daily else None
+    scrapers["ice_arabica_ageing"]        = (_ca.get("ageing_report") or {}).get("month_end")
+    _aa = (_cr.get("monthly") or {}).get("age_allowance") or []
+    scrapers["ice_robusta_age_allowance"] = _aa[-1].get("month_end") if _aa else None
 
     healthy = sum(1 for v in scrapers.values() if v)
     result = {

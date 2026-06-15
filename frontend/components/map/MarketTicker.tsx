@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { cachedFetchStatic } from "@/lib/api";
+import { FOBBING_USD } from "@/lib/originCosts";
 
 type TickerCategory = "futures" | "physical" | "fx";
 
@@ -70,13 +71,12 @@ async function fetchAcaphe(): Promise<AcapheData | null> {
   return null;
 }
 
-// Farmgate-to-FOB cost per origin (USD/tonne). Added to physical price before
-// computing the N±diff so all tickers are comparable at port/exchange parity.
-const FOB_COST_USD: Record<string, number> = {
-  "VN FAQ":  100,  // Vietnam: ~$65 logistics + ~$35 exporter margin (1% of ~$3,500)
-  "CON T7":  200,  // Brazil Conilon: logistics + quality-upgrade to Class 1
-  "UGA S15": 265,  // Uganda: ~$228 logistics (incl. Northern Corridor) + ~$37 exporter margin (1% of ~$3,700)
-};
+// Origin FOBbing cost (USD/tonne) is the single source of truth in
+// lib/originCosts; it's added to the physical spot before computing the N±diff
+// so all tickers are comparable at port/exchange parity.
+
+interface ChainContract { symbol: string; last: number; oi: number }
+interface ChainData { robusta: { contracts: ChainContract[] } | null }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -84,6 +84,7 @@ export default function MarketTicker() {
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [acaphe, setAcaphe] = useState<AcapheData | null>(null);
+  const [chain, setChain] = useState<ChainData | null>(null);
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -96,10 +97,14 @@ export default function MarketTicker() {
         // request serves both within the 5-min window.
         cachedFetchStatic<{ tickers?: TickerItem[]; generated_at?: string }>("/data/latest_prices.json").catch(() => null),
         fetchAcaphe(),
-      ]).then(([prices, live]) => {
+        // Barchart daily chain — the physical N±diff references this (the
+        // settled exchange curve), not the intraday Acaphe quote.
+        cachedFetchStatic<ChainData>("/data/futures_chain.json").catch(() => null),
+      ]).then(([prices, live, chainData]) => {
         setTickers(prices?.tickers ?? []);
         setGeneratedAt(prices?.generated_at ?? null);
         if (live?.arabica && live?.robusta) setAcaphe(live);
+        if (chainData?.robusta) setChain(chainData);
       });
     };
     load();
@@ -144,8 +149,21 @@ export default function MarketTicker() {
   const otherTickers = tickers.filter(t => t.category !== "futures");
   const allTickers = [...futureTickers, ...otherTickers];
 
-  // RC nearby price in USD/tonne — live first, then parse from static string
+  // RC reference = Barchart robusta contract with the highest open interest (the
+  // active front the physical diffs are quoted against), not necessarily the
+  // nearest expiry. Fall back to the live/static quote only if the chain isn't
+  // available.
+  const rcFront = (() => {
+    const cs = chain?.robusta?.contracts;
+    if (!cs?.length) return null;
+    return cs.reduce((best, c) => (c.oi ?? 0) > (best.oi ?? 0) ? c : best, cs[0]);
+  })();
+  const rcLetter: string = (() => {
+    const m = rcFront?.symbol.match(/^R[CM]([FGHJKMNQUVXZ])\d{2}$/i);
+    return m ? m[1].toUpperCase() : "N";
+  })();
   const rcPrice: number | null = (() => {
+    if (rcFront?.last != null) return Math.round(rcFront.last);
     if (acaphe) {
       const rc = frontByOI(acaphe.robusta);
       if (rc?.last != null) return Math.round(rc.last);
@@ -158,17 +176,17 @@ export default function MarketTicker() {
     return null;
   })();
 
-  // Inject "N±diff" into physical value strings. diff = physical + FOBbing − RC
-  // so the result is an at-port parity comparison vs. the nearby futures contract.
+  // Rewrite physical value strings to show the at-port USD (spot + FOBbing) and
+  // its differential vs the Barchart front: "$3,522, N-72". diff = at-port − RC.
   const formatPhysical = (value: string, label: string): string => {
     if (rcPrice == null) return value;
     const usdMatch = value.match(/\$([0-9,]+)/);
     if (!usdMatch) return value;
     const usd = parseInt(usdMatch[1].replace(/,/g, ""), 10);
-    const fobCost = FOB_COST_USD[label] ?? 0;
-    const diff = usd + fobCost - rcPrice;
+    const atPort = usd + (FOBBING_USD[label] ?? 0);
+    const diff = atPort - rcPrice;
     const sign = diff >= 0 ? "+" : "";
-    return value.replace(/(\$[0-9,]+)(\))/, `$1, N${sign}${diff}$2`);
+    return value.replace(/\$[0-9,]+(?=\))/, `$${atPort.toLocaleString()}, ${rcLetter}${sign}${diff}`);
   };
 
   const futuresTs  = acaphe?.fetched_at ?? null;

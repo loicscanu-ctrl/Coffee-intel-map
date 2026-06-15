@@ -30,15 +30,17 @@ const TT_STYLE = {
   fontSize: 10,
 };
 
-const SERIES_ORDER = ["us", "eu", "brazil", "kc_futures"] as const;
+const SERIES_ORDER = ["us", "us_coffee", "eu", "brazil", "kc_futures"] as const;
 const SERIES_LABEL: Record<string, string> = {
-  us:         "US retail (BLS)",
+  us:         "US roasted (BLS)",
+  us_coffee:  "US coffee, all (BLS)",
   eu:         "EU retail (Eurostat)",
   brazil:     "Brazil retail (BCB)",
   kc_futures: "KC futures (Stooq)",
 };
 const SERIES_COLOR: Record<string, string> = {
   us:         "#0ea5e9",
+  us_coffee:  "#ec4899",
   eu:         "#10b981",
   brazil:     "#f59e0b",
   kc_futures: "#a855f7",

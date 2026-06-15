@@ -16,6 +16,7 @@ NewsItem) are themselves up-to-date for the day.
 
 import json
 import re
+import sys
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta
@@ -77,7 +78,9 @@ def _load_existing() -> dict:
     if OUT_PATH.exists():
         try:
             return json.loads(OUT_PATH.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as e:
+            print(f"[origin_prices_history] failed to parse {OUT_PATH}: {e} — starting from empty",
+                  file=sys.stderr, flush=True)
             return {}
     return {}
 
@@ -159,7 +162,9 @@ def _today_vn_price() -> float | None:
         d = json.loads(p.read_text(encoding="utf-8"))
         v = d.get("vn_faq", {}).get("vnd_per_kg")
         return float(v) if v else None
-    except Exception:
+    except Exception as e:
+        print(f"[origin_prices_history] vn_price unavailable from {p}: {e}",
+              file=sys.stderr, flush=True)
         return None
 
 
@@ -176,7 +181,9 @@ def _today_brazil_conilon_price(db) -> float | None:
         if not m:
             return None
         return float(m.group(1).replace(".", "").replace(",", "."))
-    except Exception:
+    except Exception as e:
+        print(f"[origin_prices_history] brazil_conilon_price unavailable from Cooabriel NewsItem: {e}",
+              file=sys.stderr, flush=True)
         return None
 
 
@@ -204,7 +211,9 @@ def _today_brazil_arabica_price(db) -> float | None:
         if not m:
             return None
         return float(m.group(1).replace(".", "").replace(",", "."))
-    except Exception:
+    except Exception as e:
+        print(f"[origin_prices_history] brazil_arabica_price unavailable from CEPEA/ESALQ NewsItem: {e}",
+              file=sys.stderr, flush=True)
         return None
 
 
@@ -215,7 +224,9 @@ def _today_uganda_price() -> float | None:
         d = json.loads(p.read_text(encoding="utf-8"))
         v = d.get("ucda_price", {}).get("usd_cwt")
         return float(v) if v else None
-    except Exception:
+    except Exception as e:
+        print(f"[origin_prices_history] uganda_price unavailable from {p}: {e}",
+              file=sys.stderr, flush=True)
         return None
 
 

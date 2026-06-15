@@ -9,7 +9,10 @@ from models import (
     CotWeekly,
 )
 from scraper.exporters.base import OUT_DIR
-from scraper.sources.macro_cot import COMMODITY_SPECS
+from scraper.sources.macro_cot import (
+    COMMODITY_SPECS,
+    _front_month_price_from_archive,
+)
 from scraper.validate_export import (
     safe_write_json,
     validate_cot,
@@ -92,6 +95,17 @@ def export_macro_cot(db) -> None:
             latest = symbol_latest.get(row.symbol)
             if latest and abs((row.date - latest[0]).days) <= 14:
                 close_price = latest[1]
+        # Last resort for archive-priced symbols (robusta): the DB CommodityPrice
+        # rows are backfilled on a fragile weekly cadence and routinely leave
+        # gaps, which silently drops the contract out of the Global Money Flow.
+        # The per-contract archive we ship in-repo always has the front-month
+        # price for every COT Tuesday, so read it straight from there on the COT
+        # report date — same source #245 wired into the scraper, just applied at
+        # export time so display no longer depends on backfill timing.
+        if close_price is None and spec.get("price_source") == "internal_archive":
+            close_price = _front_month_price_from_archive(
+                spec["internal_market"], row.date
+            )
 
         cv = close_price * spec["contract_unit"] if close_price else None
         entry = {

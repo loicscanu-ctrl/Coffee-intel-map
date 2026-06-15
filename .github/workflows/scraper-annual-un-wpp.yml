@@ -1,0 +1,83 @@
+name: "3.7 – Annual Scraper · UN WPP age structure"
+
+# UN World Population Prospects is revised ~once a year (the revision lands
+# mid-year). Running it monthly was ~11 wasted runs/year, so it lives in its
+# own annual job. Runs on 15 July; manual dispatch covers off-cycle revisions.
+on:
+  schedule:
+    - cron: '0 3 15 7 *'   # 15 July, 03:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: data-commit          # serialize all main-pushers
+  cancel-in-progress: false
+
+jobs:
+  annual-data:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
+
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
+
+      - name: Install Playwright browser
+        run: playwright install chromium --with-deps
+
+      - name: Run annual scrapers (3 attempts)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.annual_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Export static JSON (3 attempts)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.export_static_json && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Commit updated static JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for f in frontend/public/data/*.json; do
+            [ -f "$f" ] && git add "$f" || true
+          done
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || (git commit -m "data: annual UN-WPP update [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

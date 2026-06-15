@@ -17,12 +17,9 @@ from scraper.sources.macro_cot import _fetch_and_upsert
 
 
 def main():
-    db = get_session()
-    try:
+    with get_session() as db:
         _fetch_and_upsert(db)
         print("Done.")
-    finally:
-        db.close()
 
 
 if __name__ == "__main__":

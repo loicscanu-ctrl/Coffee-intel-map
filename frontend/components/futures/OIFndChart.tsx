@@ -9,14 +9,29 @@ import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
 
-interface SeriesPoint { day: number; oi: number; }
+interface SeriesPoint { day: number; oi?: number; price?: number; }
 interface Series { symbol: string; label: string; fnd: string | null; data: SeriesPoint[]; }
+// Pre-computed front calendar spread (front-FND contract − contract after it),
+// indexed to the FRONT contract's day-to-FND. Computed by the backend because
+// the next contract's days-to-its-own-FND fall outside the chart's [-45, 0]
+// window when the front is near rollover, so a frontend join over individual
+// series would render all-null.
+interface FrontSpread {
+  frontSym: string;
+  nextSym:  string;
+  frontLabel: string;
+  nextLabel:  string;
+  data: { day: number; spread: number }[];
+}
 
 const COLORS = [
   "#94a3b8","#64748b","#475569","#334155","#cbd5e1",
   "#a8a29e","#78716c","#57534e","#d6d3d1","#e7e5e4",
 ];
 const NEXT_CONTRACT_COLOR = "#ef4444";
+// Spread line — amber so it's distinguishable from the grey OI lines and the
+// red next-FND OI highlight.
+const SPREAD_COLOR = "#fbbf24";
 
 // ── Embedded static data (real OI, last 30 trading days before each FND) ──────
 
@@ -45,49 +60,66 @@ const STATIC_SERIES: Record<"robusta" | "arabica", Series[]> = {
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
 
-function buildChartData(series: Series[]) {
+// Stable dataKey used by the spread line — kept out of the contract-label
+// namespace so it can't collide with a future contract label like "N–U25".
+const SPREAD_KEY = "__spread";
+
+function buildChartData(series: Series[], spread: FrontSpread | null) {
   const daySet = new Set<number>();
   series.forEach(s => s.data.forEach(p => daySet.add(p.day)));
+  spread?.data.forEach(p => daySet.add(p.day));
   const days = Array.from(daySet).sort((a, b) => a - b);
+
+  // Spread is keyed by day, so a Map is O(1) per lookup instead of the linear
+  // scan we'd otherwise do per (day × contract) cell.
+  const spreadByDay = new Map<number, number>();
+  spread?.data.forEach(p => spreadByDay.set(p.day, p.spread));
 
   return days.map(day => {
     const row: Record<string, number | null> = { day };
     series.forEach(s => {
       const point = s.data.find(p => p.day === day);
-      row[s.label] = point ? Math.round(point.oi / 1000 * 10) / 10 : null;
+      row[s.label] = point && point.oi != null ? Math.round(point.oi / 1000 * 10) / 10 : null;
     });
+    if (spread) {
+      const v = spreadByDay.get(day);
+      row[SPREAD_KEY] = v != null ? v : null;
+    }
     return row;
   });
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OIFndChart({ market }: { market: "robusta" | "arabica" }) {
+export default function OIFndChart({ market, height = 320 }: { market: "robusta" | "arabica"; height?: number }) {
   const [series, setSeries] = useState<Series[]>([]);
+  const [spread, setSpread] = useState<FrontSpread | null>(null);
   const [isMock, setIsMock] = useState(false);
 
   useEffect(() => {
     fetch(`/data/oi_fnd_chart.json`)
       .then(r => r.json())
-      .then((json: { arabica: Series[]; robusta: Series[] }) => {
+      .then((json: { arabica: Series[]; robusta: Series[]; arabica_front_spread?: FrontSpread | null; robusta_front_spread?: FrontSpread | null }) => {
         const apiSeries: Series[] = json?.[market] ?? [];
+        const apiSpread = json?.[`${market}_front_spread`] ?? null;
         if (!apiSeries.length) {
           setSeries(STATIC_SERIES[market]);
+          setSpread(null);
           setIsMock(true);
           return;
         }
-        // Merge: start from static, overlay JSON data points per symbol
+        // Merge: start from static, overlay JSON data points per symbol.
+        // Union by day with JSON taking precedence on collision; preserve
+        // both `oi` and `price` so the spread overlay still has the price
+        // series available for the front-month pair.
         const apiBySymbol = new Map(apiSeries.map(s => [s.symbol, s]));
         const merged = STATIC_SERIES[market].map(staticS => {
           const apiS = apiBySymbol.get(staticS.symbol);
           if (!apiS) return staticS;
-          // Union of days; JSON point takes precedence on collision
-          const apiDayMap = new Map(apiS.data.map(p => [p.day, p.oi]));
-          const days = new Map(staticS.data.map(p => [p.day, p.oi]));
-          apiDayMap.forEach((oi, day) => days.set(day, oi));
-          const data = Array.from(days.entries())
-            .map(([day, oi]) => ({ day, oi }))
-            .sort((a, b) => a.day - b.day);
+          const byDay = new Map<number, SeriesPoint>();
+          staticS.data.forEach(p => byDay.set(p.day, p));
+          apiS.data.forEach(p => byDay.set(p.day, p));   // JSON wins on collision
+          const data = Array.from(byDay.values()).sort((a, b) => a.day - b.day);
           return { ...staticS, data };
         });
         // Add any new symbols from JSON not in static
@@ -95,10 +127,12 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
           if (!merged.find(s => s.symbol === apiS.symbol)) merged.push(apiS);
         });
         setSeries(merged);
+        setSpread(apiSpread && apiSpread.data?.length ? apiSpread : null);
         setIsMock(false);
       })
       .catch(() => {
         setSeries(STATIC_SERIES[market]);
+        setSpread(null);
         setIsMock(true);
       });
   }, [market]);
@@ -114,10 +148,35 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
     .filter(s => s.fnd && s.fnd >= today)
     .sort((a, b) => (a.fnd ?? "").localeCompare(b.fnd ?? ""))[0]?.symbol ?? null;
 
-  const chartData = buildChartData(series);
+  const spreadLegend = spread ? `${spread.frontLabel}–${spread.nextLabel} spread` : "";
+  const spreadUnit   = isRobusta ? "$/t" : "¢/lb";
+
+  // Collapse the legend to three entries: the highlighted next-FND contract
+  // (red), every other contract merged into one grey "Past contracts", and the
+  // amber front spread. The per-contract grey lines are otherwise indistinct and
+  // their ~10 legend rows crowded the plot (worst in the compact PDF).
+  const nextLabel = series.find((s) => s.symbol === nextSymbol)?.label ?? null;
+  const legendItems: { id: string; value: string; color: string }[] = [
+    ...(nextLabel ? [{ id: "next", value: `${nextLabel} · next FND`, color: NEXT_CONTRACT_COLOR }] : []),
+    { id: "past", value: "Past contracts", color: "#64748b" },
+    ...(spread ? [{ id: "spread", value: spreadLegend, color: SPREAD_COLOR }] : []),
+  ];
+  const renderLegend = () => (
+    <ul style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14,
+                 listStyle: "none", margin: 0, padding: "8px 0 0", fontSize: 11 }}>
+      {legendItems.map((it) => (
+        <li key={it.id} style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <span style={{ width: 16, borderTop: `2px solid ${it.color}`, display: "inline-block" }} />
+          <span className="recharts-legend-item-text" style={{ color: "#cbd5e1" }}>{it.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
+  const chartData = buildChartData(series, spread);
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
       <div className={`text-center text-sm font-semibold text-slate-200 mb-1 ${accent} rounded py-1 flex items-center justify-center gap-2`}>
         {title}
         {isMock && (
@@ -126,37 +185,55 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
       </div>
       <p className="text-center text-[10px] text-slate-500 mb-3">
         Open Interest (K contracts) vs trading days to First Notice Day
+        {spread && (
+          <> · front spread <span style={{ color: SPREAD_COLOR }}>{spreadLegend}</span> ({spreadUnit})</>
+        )}
       </p>
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 20, left: 0 }}>
+      <ResponsiveContainer width="100%" height={height}>
+        <LineChart data={chartData} margin={{ top: 4, right: 6, bottom: 4, left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          {/* Axis titles dropped — the caption above already states OI (K) vs
+              trading days to FND and the spread unit; tight widths reclaim the
+              left/right gutters so the plot fills the card. */}
           <XAxis
             dataKey="day"
             type="number"
             domain={[-45, 0]}
             tickCount={10}
+            height={18}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
-            label={{ value: "trading days to FND", position: "insideBottom", offset: -10, fill: "#64748b", fontSize: 11 }}
           />
           <YAxis
+            yAxisId="oi"
+            width={32}
             tickFormatter={v => `${v}K`}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
-            label={{ value: "OI (K)", angle: -90, position: "insideLeft", offset: 10, fill: "#64748b", fontSize: 11 }}
           />
+          {spread && (
+            <YAxis
+              yAxisId="spread"
+              orientation="right"
+              width={34}
+              tick={{ fill: SPREAD_COLOR, fontSize: 11 }}
+            />
+          )}
           <Tooltip
             contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 11 }}
-            formatter={((v, name) => [`${v}K`, name as NameType]) satisfies Formatter<ValueType, NameType>}
+            // OI lines display as "{v}K"; the spread line shows the raw value
+            // in its native unit ($/t for RC, ¢/lb for KC).
+            formatter={((v, name) => {
+              if (name === spreadLegend) return [`${v} ${spreadUnit}`, name as NameType];
+              return [`${v}K`, name as NameType];
+            }) satisfies Formatter<ValueType, NameType>}
             labelFormatter={((l) => `Day ${l} to FND`) satisfies LabelFmt}
           />
-          <Legend
-            wrapperStyle={{ fontSize: 11, color: "#94a3b8", paddingTop: 8 }}
-            formatter={(value) => <span style={{ color: "#cbd5e1" }}>{value}</span>}
-          />
+          <Legend content={renderLegend} />
           {series.map((s, i) => {
             const isNext = s.symbol === nextSymbol;
             return (
               <Line
                 key={s.symbol}
+                yAxisId="oi"
                 type="monotone"
                 dataKey={s.label}
                 stroke={isNext ? NEXT_CONTRACT_COLOR : COLORS[i % COLORS.length]}
@@ -169,6 +246,19 @@ export default function OIFndChart({ market }: { market: "robusta" | "arabica" }
               />
             );
           })}
+          {spread && (
+            <Line
+              yAxisId="spread"
+              type="monotone"
+              dataKey={SPREAD_KEY}
+              name={spreadLegend}
+              stroke={SPREAD_COLOR}
+              strokeWidth={2.5}
+              strokeDasharray="4 2"
+              dot={false}
+              connectNulls={true}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

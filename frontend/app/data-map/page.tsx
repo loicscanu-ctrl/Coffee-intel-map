@@ -1,6 +1,8 @@
 "use client";
+import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import Mermaid from "@/components/Mermaid";
+import { useFetchJson } from "@/lib/useFetchJson";
 
 // Shared class definitions appended to every per-tab diagram. `vis` (the tab's
 // own colour) is supplied per diagram.
@@ -69,7 +71,7 @@ const COT = `flowchart LR
   J_cot[/cot.json · 312wk/]
   J_mac[/macro_cot.json/]
   J_fnd[/oi_fnd_chart.json/]
-  J_oi[/oi_history.json<br/>14-day rolling slice of ARC (was 30)/]
+  J_oi[/"oi_history.json<br/>14-day rolling slice of ARC (was 30)"/]
   J_sig[/signals.json<br/>· quant + AGRO rows merged/]
   ip{{Industry Pulse}}
   sig{{"Signals · computed in-browser from cot.json<br/>+ /cot Telegram appends per-rule listing from signals.json"}}
@@ -183,12 +185,11 @@ const SUPPLY = `flowchart LR
   J_fe[/farmer_economics.json/]
   J_fsell[/farmer_selling_brazil.json/]
   J_vn[/vietnam_supply.json/]
-  J_vnx[/vn_country_shares/]
   J_vnfe[/vn_farmer_economics/]
   J_vnwl[/vn_water_levels.json/]
   J_vnw[/vn_weather.json/]
   J_wx[/×7 origin weather.json<br/>+ spi_1/3 + spei_1/3/]
-  J_vhi[/×7 vhi_{origin}.json<br/>weekly NOAA STAR VHI by province/]
+  J_vhi[/×7 vhi_*.json<br/>weekly NOAA STAR VHI by province/]
   J_agro[/agronomic_alerts.json<br/>+ AGRO rows merged into signals.json/]
   J_co[/colombia_supply.json/]
   J_et[/ethiopia_supply.json/]
@@ -205,16 +206,15 @@ const SUPPLY = `flowchart LR
   sell{{BR Farmer Selling}}
   cec{{BR Monthly Exports}}
   vnexp{{VN Export Explorer}}
-  vndest{{VN Destination Estimate}}
   vnbal{{VN Balance Sheet}}
   vnfe{{VN Farmer Economics}}
   vnwl{{VN Water Levels}}
   vnw{{VN Weather}}
   wx{{Weather charts · rain · temp · cum · forecast}}
   soil{{Soil Moisture · ESSM}}
-  drought{{Drought + vegetation indices panel · SPI / SPEI / VHI columns}}
+  drought{{"Drought + vegetation indices panel · SPI / SPEI / VHI columns"}}
   frost{{14-day Frost Risk grid · moved here from farmer-econ}}
-  agroAlert{{Agronomic alerts canonical · used by /map ticker + /signals merge}}
+  agroAlert{{"Agronomic alerts canonical · used by /map ticker + /signals merge"}}
   ensoSub{{ENSO subtab · forecast plume · analogs · risk map}}
   coexp{{Colombia}}
   et{{Ethiopia}}
@@ -240,7 +240,6 @@ const SUPPLY = `flowchart LR
   EXP --> J_fe
   EXP --> J_fsell
   EXP --> J_vn
-  EXP --> J_vnx
   EXP --> J_vnfe
   EXP --> J_vnwl
   EXP --> J_vnw
@@ -263,7 +262,6 @@ const SUPPLY = `flowchart LR
   J_fsell --> sell
   J_vn --> vnexp
   J_vn --> vnbal
-  J_vnx --> vndest
   J_vnfe --> vnfe
   J_vnwl --> vnwl
   J_vnw --> vnw
@@ -281,8 +279,8 @@ ${DEFS}
   class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WVHI,WENSO,WENFC,WBFL scr;
   class DB,SEED_SPI,SEED_SPEI,SEED_VHI store;
   class EXP,AGRO proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_agro,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,agroAlert,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_agro,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,agroAlert,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
 
 const DEMAND = `flowchart LR
   W3B["1.3b Slow-data · 1st/mo<br/>ECF stocks · USDA PSD · AJCA · UCDA"]
@@ -300,7 +298,7 @@ const DEMAND = `flowchart LR
   J_earn[/earnings.json/]
   J_tax[/kaffeesteuer.json/]
   J_mix[/factory_mix.json/]
-  J_csa[/certified_stocks_arabica.json<br/>+ ageing_report (year-bands)/]
+  J_csa[/"certified_stocks_arabica.json<br/>+ ageing_report (year-bands)"/]
   J_csr[/certified_stocks_robusta.json<br/>+ monthly.implied_outflow<br/>+ monthly.current_by_origin/]
   J_h[/health.json/]
   stk{{"ICE/ECF Stocks"}}
@@ -315,8 +313,8 @@ const DEMAND = `flowchart LR
   mix{{Roasting Mix}}
   tiles{{4-tile header per contract}}
   period{{Period view drills · age-banded}}
-  sysflow{{System Flow · warehouses · in/out/transit · cohort outflow}}
-  fresh{{Freshness chip strip (per-feed)}}
+  sysflow{{"System Flow · warehouses · in/out/transit · cohort outflow"}}
+  fresh{{"Freshness chip strip (per-feed)"}}
   W3B --> EXP
   WPOP --> EXP
   EXP --> J_stk
@@ -358,7 +356,7 @@ const MACRO = `flowchart LR
   W12["1.2 Freight · 02:00<br/>Freightos · Yahoo"]
   W23["2.3 COT · Fri 20:00 · CFTC"]
   WORIG["Origin prices (1.1) · 01:00<br/>BCB·giacaphe·FNC·IHCAFE·UCDA·ECX·CEPEA"]
-  WCPI["Retail CPI · BLS · Eurostat · BCB"]
+  WCPI["US/Retail CPI · BLS · Eurostat · BCB"]
   W33["3.3.1–3.3.3 CONAB + Fertilizer · 12th<br/>conab.gov.br · Comex · VN Customs"]
   EXP{{"1.4 Export · 02:30"}}
   J_mac[/macro_cot.json/]
@@ -366,6 +364,7 @@ const MACRO = `flowchart LR
   J_fx[/fx_history.json/]
   J_fr[/freight.json/]
   J_cpi[/retail_cpi.json/]
+  J_uscpi[/us_cpi.json/]
   J_fe[/farmer_economics.json/]
   J_orig[/origin_prices_history.json/]
   xc{{Cross-Commodity MM}}
@@ -373,6 +372,7 @@ const MACRO = `flowchart LR
   fx{{FX Pair Time-Series}}
   fr{{Freight Context}}
   cpi{{Retail CPI}}
+  uscpi{{US CPI}}
   fert{{Fertilizer Inputs}}
   orig{{Origin Prices}}
   W23 --> EXP
@@ -381,6 +381,7 @@ const MACRO = `flowchart LR
   WORIG --> EXP
   EXP --> J_mac --> xc
   EXP --> J_cpi --> cpi
+  EXP --> J_uscpi --> uscpi
   EXP --> J_fe --> fert
   EXP --> J_orig --> orig
   W19 --> J_q --> cci
@@ -390,8 +391,8 @@ ${DEFS}
   classDef vis fill:#042f2e,stroke:#14b8a6,color:#99f6e4;
   class W19,W12,W23,WORIG,WCPI,W33 scr;
   class EXP proc;
-  class J_mac,J_q,J_fx,J_fr,J_cpi,J_fe,J_orig json;
-  class xc,cci,fx,fr,cpi,fert,orig vis;`;
+  class J_mac,J_q,J_fx,J_fr,J_cpi,J_uscpi,J_fe,J_orig json;
+  class xc,cci,fx,fr,cpi,uscpi,fert,orig vis;`;
 
 const NEWSMAP = `flowchart LR
   W22["2.2 Commodity prices · Tue 22:55<br/>Barchart"]
@@ -412,7 +413,7 @@ const NEWSMAP = `flowchart LR
   J_cec[/cecafe.json/]
   J_fr[/freight.json/]
   J_vnx[/vn_export_destination_port/]
-  J_agro[/agronomic_alerts.json<br/>(produced end of 1.10 weather run)/]
+  J_agro[/"agronomic_alerts.json<br/>(produced end of 1.10 weather run)"/]
   base{{Coffee Map base}}
   price{{Price labels}}
   country{{Country pins + intel}}
@@ -420,7 +421,7 @@ const NEWSMAP = `flowchart LR
   exports{{Exports overlay}}
   freight{{Freight overlay}}
   vnport{{VN port-flow arrows}}
-  news{{News Feed / Sidebar}}
+  news{{"News Feed / Sidebar"}}
   ticker{{"Agronomic Threats Ticker — top overlay<br/>country chips, severity sort, click→region detail"}}
   W22 --> EXP --> J_lp --> price
   WPOLL --> J_aca --> price
@@ -488,86 +489,670 @@ const TAB_DIAGRAMS: Array<{ title: string; chart: string }> = [
   { title: "Global — Ticker & Telegram brief", chart: GLOBAL },
 ];
 
-// Per-workflow → exact visual (mirrors docs/DATA_PLATFORM_MAP.md §4a).
-type Row = { wf: string; output: string; component: string; visual: string };
-const ROWS: Row[] = [
-  { wf: "1.3 Daily OI", output: "oi_history.json", component: "OIHistoryTable", visual: "Futures · OI 7-day table (+ COT §2)" },
-  { wf: "1.3 Daily OI", output: "oi_fnd_chart.json", component: "OIFndChart", visual: "Futures + COT · OI Evolution to FND" },
-  { wf: "1.3 → 2.3 rebuild", output: "cot.json price", component: "Step4IndustryPulse", visual: "COT · Industry Pulse — price + switch dots" },
-  { wf: "1.1 Daily News", output: "news_feed / country_intel", component: "/api/news · CoffeeMap", visual: "Map · news labels / country intel" },
-  { wf: "1.2 Freight", output: "freight.json", component: "FreightContextPanel", visual: "Macro · Freight Context" },
-  { wf: "1.4 Export & Publish", output: "all static JSON", component: "—", visual: "plumbing — feeds every JSON visual" },
-  { wf: "1.5 Fresh check", output: "—", component: "—", visual: "Telegram alert only" },
-  { wf: "1.6 Morning Brief", output: "reads signals/events/JSON", component: "—", visual: "Telegram brief (the message)" },
-  { wf: "1.7 Cecafe Daily", output: "cecafe_daily.json", component: "DailyRegistration", visual: "Supply · Brazil · Daily Registration" },
-  { wf: "1.9 Quant CCI", output: "quant_report.json", component: "CurrencyIndexSection", visual: "Macro · Coffee Currency Index" },
-  { wf: "1.9 Quant CCI", output: "fx_history.json", component: "FxTimeSeriesPanel", visual: "Macro · FX Pair Time-Series" },
-  { wf: "Acaphe poll", output: "acaphe_live.json", component: "AcapheLiveQuotes", visual: "Futures · Daily Live Quotes" },
-  { wf: "1.3b Slow-data", output: "demand_stocks.json", component: "StocksPanel", visual: "Demand · Stocks (ICE cert + PSD)" },
-  { wf: "2.2 Commodity Prices", output: "latest_prices.json", component: "CoffeeMap", visual: "Map · price labels + ticker" },
-  { wf: "2.3 COT + rebuild", output: "cot.json", component: "Step1/4/5/6/7/8", visual: "COT · Signals, Gauges, Heatmap, Global Flow, Industry Pulse, Dry Powder, Cycle, Report" },
-  { wf: "2.3 COT + rebuild", output: "macro_cot.json", component: "CrossCommodityPanel", visual: "Macro · Cross-Commodity MM" },
-  { wf: "2.3 COT + rebuild", output: "signals.json", component: "morning_brief", visual: "Telegram · CoT signals" },
-  { wf: "3.1 Kaffeesteuer", output: "kaffeesteuer.json", component: "KaffeesteuerChart", visual: "Demand · Kaffeesteuer (DE tax)" },
-  { wf: "3.2 Cecafe Export", output: "cecafe.json", component: "CoffeeMap", visual: "Map · Brazil monthly exports" },
-  { wf: "3.3.1 CONAB", output: "farmer_economics.json", component: "FarmerSellingPanel", visual: "Supply · Brazil Farmer Economics" },
-  { wf: "3.3.2 BR Fertilizer", output: "farmer_economics.json", component: "FertilizerInputsPanel", visual: "Macro · Fertilizer Inputs (Brazil)" },
-  { wf: "3.3.3 VN Fertilizer", output: "vn_fertilizer.json", component: "VnFarmerEconomics", visual: "Supply · VN Farmer Economics (fertilizer cost)" },
-  { wf: "3.3.4 VN Coffee Exports", output: "vn_coffee_export.json → vietnam_supply.json", component: "VnExportExplorer · VnBalanceSheet", visual: "Supply · VN Export Explorer + Balance Sheet" },
-  { wf: "3.3.5 Uganda UCDA", output: "uganda_supply.json", component: "UgandaTab", visual: "Supply · Uganda (exports, split, grades, destinations)" },
-  { wf: "4.1 Earnings", output: "earnings.json", component: "EarningsTable", visual: "Demand · Roaster Earnings" },
-  { wf: "various / manual", output: "factory_mix.json", component: "RoastingMixPanel", visual: "Demand · Roasting Mix" },
-  { wf: "various / manual", output: "global_fertilizers.json", component: "FertilizersTab", visual: "Supply · Fertilizers" },
-  { wf: "various / manual", output: "manual_intel.json", component: "ManualIntelPanel", visual: "Supply · Manual Intel" },
-  { wf: "various / manual", output: "retail_cpi.json", component: "RetailCpiPanel", visual: "Macro · Retail CPI" },
-  { wf: "various / manual", output: "origin_prices_history.json", component: "OriginPricesPanel", visual: "Macro · Origin Prices" },
-  { wf: "various / manual", output: "*_supply.json (CO·ET·HN·ID)", component: "country tabs", visual: "Supply · country pages + Map (UG now via 3.3.5)" },
+// Per-workflow operational metadata. The first four fields (wf, output,
+// component, visual) describe what trader-facing value the flow produces;
+// the optional five-group blocks below describe the OPS reality — when,
+// where, how, what-if-it-breaks, and what-it-costs. Designed for the
+// "if Cecafé's Akamai posture changes overnight, what do I check first"
+// question.
+//
+// All ops blocks are optional; "TBD" surfaces unfilled slots in the UI
+// rather than hiding them, so the audit gap is visible.
+type TriggerType = "cron" | "manual" | "edge" | "composite" | "tbd";
+
+interface FlowMetadata {
+  // ── Trader-facing summary (always populated) ───────────────────────────
+  wf: string;          // Workflow name / id, e.g. "1.13 ICE Certified Stocks"
+  output: string;      // What it writes (JSON path or "—" for compute-only)
+  component: string;   // Frontend / handler consumer
+  visual: string;      // User-facing surface description
+
+  // ── 1. Timing & Cadence — the "when" ───────────────────────────────────
+  cadence?: {
+    recurrence?: string;     // e.g. "Daily 17:00 UTC Mon-Fri"
+    window?: string;         // Active execution window if any, e.g. "Market hrs 09:00-20:00 UTC"
+    trigger?: TriggerType;   // cron | manual | edge | composite
+  };
+
+  // ── 2. Sourcing & Transport — the "where & how" ───────────────────────
+  transport?: {
+    provider?: string;       // e.g. "ICE Portal", "Open-Meteo", "CECAFÉ"
+    method?: string;         // e.g. "Direct API GET", "BeautifulSoup HTML parse", "PDF extract"
+    bypass?: string;         // Armor: e.g. "browser headers", "Akamai-friendly UA", "none"
+  };
+
+  // ── 3. Output & State — the "destination" ─────────────────────────────
+  storage?: {
+    target?: string;         // Same as `output` but normalized for filtering
+    footprint?: string;      // e.g. "~2KB capped at 14d", "~150KB monthly"
+    units?: string;          // Critical for ambiguous data: e.g. "60kg bags (KC) / 10MT lots (RC)"
+  };
+
+  // ── 4. Resiliency & Fallbacks — the "safety net" ──────────────────────
+  resiliency?: {
+    onMissing?: string;      // e.g. "keep last good JSON", "fail-closed", "use SPI baseline"
+    debounce?: string;       // Alert flap rule: e.g. "2 consecutive days before Telegram ping"
+    parserFallback?: string; // e.g. "regex extraction if structured JSON fails"
+  };
+
+  // ── 5. Compute & Cost — the "budget" ──────────────────────────────────
+  runtime?: {
+    duration?: string;       // Average run time, e.g. "~5s API", "~45s Playwright"
+    cost?: string;           // CI minutes / month, e.g. "~10 min/mo"
+  };
+}
+
+const ROWS: FlowMetadata[] = [
+  {
+    wf: "1.3 Daily OI", output: "oi_history.json", component: "OIHistoryTable", visual: "Futures · OI 14-day table (+ COT §2)",
+    cadence: { recurrence: "02:00 UTC Mon-Fri", trigger: "cron" },
+    transport: { provider: "Barchart core-api", method: "Direct API GET", bypass: "browser-shaped headers" },
+    storage: { target: "oi_history.json (14d slice) + contract_prices_archive.json (5y)", footprint: "~50KB rolling + ~5MB archive", units: "lots (RC) / contracts (KC)" },
+    resiliency: { onMissing: "keep 5y archive untouched; rolling view rebuilds next run" },
+    runtime: { duration: "~30s" },
+  },
+  {
+    wf: "1.3 Daily OI", output: "oi_fnd_chart.json", component: "OIFndChart", visual: "Futures + COT · OI Evolution to FND",
+    cadence: { recurrence: "02:00 UTC Mon-Fri", trigger: "cron" },
+    transport: { provider: "Barchart core-api", method: "derived from contract_prices_archive.json" },
+    storage: { target: "oi_history.json (14d slice) + contract_prices_archive.json (5y)" },
+    resiliency: { onMissing: "render last good archive snapshot" },
+  },
+  {
+    wf: "1.3 → 2.3 rebuild", output: "cot.json price", component: "Step4IndustryPulse", visual: "COT · Industry Pulse — price + switch dots",
+    cadence: { recurrence: "weekly: 1.3 daily M-F → 2.3 max-OI rebuild Fri 20:00 UTC", trigger: "composite" },
+    transport: { provider: "Barchart + CFTC", method: "max-OI synthesis across the rolling archive" },
+    storage: { target: "cot.json (312-week window)", units: "lots / Mgmd-Money net + Producer net" },
+  },
+  {
+    wf: "1.1 Daily News", output: "news_feed / country_intel", component: "/api/news · CoffeeMap", visual: "Map · news labels / country intel",
+    cadence: { recurrence: "01:00 UTC daily", trigger: "cron" },
+    transport: { provider: "RSS + B3 + CEPEA + Cooabriel + AJCA + World Bank", method: "RSS + BeautifulSoup HTML parse" },
+    storage: { target: "Postgres news_feed → news.json export", footprint: "~80KB" },
+    resiliency: { onMissing: "per-source failures logged; rest of run proceeds" },
+  },
+  {
+    wf: "1.2 Freight", output: "freight.json", component: "FreightContextPanel", visual: "Macro · Freight Context",
+    cadence: { recurrence: "02:00 UTC daily (09:00 Vietnam)", trigger: "cron" },
+    transport: { provider: "Freightos containers + Yahoo dry-bulk", method: "Direct API GET" },
+    storage: { target: "freight.json", units: "$/FEU containers + BDRY proxy" },
+    runtime: { duration: "~5s" },
+  },
+  {
+    wf: "1.4 Export & Publish", output: "all static JSON", component: "—", visual: "plumbing — feeds every JSON visual",
+    cadence: { recurrence: "02:30 UTC daily", trigger: "cron" },
+    transport: { provider: "Postgres + caches", method: "composite re-export from DB" },
+    storage: { target: "frontend/public/data/*.json + health.json" },
+    runtime: { duration: "~3 min" },
+  },
+  {
+    wf: "1.5 Fresh check", output: "—", component: "—", visual: "Telegram alert only",
+    cadence: { recurrence: "07:00 UTC daily (3h after 1.4)", trigger: "cron" },
+    transport: { method: "scan health.json freshness diff" },
+    resiliency: { onMissing: "Telegram ping per stale feed", debounce: "fires daily as long as stale (no cool-down yet)" },
+  },
+  {
+    wf: "1.6 Morning Brief", output: "reads signals/events/JSON", component: "—", visual: "Telegram brief (the message)",
+    cadence: { recurrence: "03:00 UTC daily", trigger: "cron" },
+    transport: { provider: "composite of all static JSONs", method: "compose-from-disk" },
+    storage: { target: "Telegram channel post (not persisted)" },
+    resiliency: { onMissing: "section omitted silently if its JSON is absent" },
+  },
+  {
+    wf: "1.7 Cecafe Daily", output: "cecafe_daily.json", component: "DailyRegistration", visual: "Supply · Brazil · Daily Registration",
+    cadence: { recurrence: "09:00 + 13:00 + 17:00 UTC (3 spread attempts/day)", trigger: "cron" },
+    transport: { provider: "cecafe.com.br", method: "BeautifulSoup HTML + regex on TOTAIS row (requests after PR #149)", bypass: "Chrome-shaped UA + Accept-Language pt-BR" },
+    storage: { target: "cecafe_daily.json", units: "60kg bags (arabica + conillon + soluvel)" },
+    resiliency: { onMissing: "keep last good JSON; CecafeUnreachable surfaces TCP failures as distinct from parser bugs", parserFallback: "8-col TOTAIS row when 12-col layout drops" },
+    runtime: { duration: "~10s per attempt; ~10min full retry window" },
+  },
+  {
+    wf: "1.9 Quant CCI", output: "quant_report.json", component: "CurrencyIndexSection", visual: "Macro · Coffee Currency Index",
+    cadence: { recurrence: "21:30 UTC Mon-Fri (post US close)", trigger: "cron" },
+    transport: { provider: "jsDelivr FX CDN", method: "Direct API GET" },
+    storage: { target: "quant_report.json", units: "weighted currency-basket index" },
+    resiliency: { onMissing: "Robusta sentiment/factors decoupled; can fail independently" },
+  },
+  {
+    wf: "1.9 Quant CCI", output: "fx_history.json", component: "FxTimeSeriesPanel", visual: "Macro · FX Pair Time-Series",
+    cadence: { recurrence: "21:30 UTC Mon-Fri", trigger: "cron" },
+    transport: { provider: "jsDelivr FX CDN", method: "Direct API GET" },
+    storage: { target: "fx_history.json", footprint: "365-day per-pair history", units: "USD-quoted FX for 12 pairs (5 exporters + 7 importers)" },
+  },
+  {
+    wf: "Acaphe poll", output: "acaphe_live.json", component: "AcapheLiveQuotes", visual: "Futures · Daily Live Quotes",
+    cadence: { recurrence: "every 15 min", window: "08:00–19:45 UTC Mon-Fri (Brazil market hrs)", trigger: "cron" },
+    transport: { provider: "acaphe.com", method: "Direct API GET" },
+    storage: { target: "acaphe_live.json", footprint: "<5KB", units: "¢/lb KC + $/MT RC live mid" },
+    runtime: { duration: "~3s" },
+  },
+  {
+    wf: "1.3b Slow-data", output: "demand_stocks.json", component: "StocksPanel", visual: "Demand · Stocks (ICE cert + PSD)",
+    cadence: { recurrence: "03:00 UTC on the 1st of each month", trigger: "cron" },
+    transport: { provider: "ECF + USDA PSD + AJCA + UCDA", method: "various per-source scrapers" },
+    storage: { target: "demand_stocks.json (composite)" },
+    resiliency: { onMissing: "per-source failure isolation; previous month's data retained" },
+  },
+  {
+    wf: "2.2 Commodity Prices", output: "latest_prices.json", component: "CoffeeMap", visual: "Map · price labels + ticker",
+    cadence: { recurrence: "22:55 UTC Tuesdays", trigger: "cron" },
+    transport: { provider: "Barchart", method: "Direct API GET" },
+    storage: { target: "latest_prices.json", units: "spot ¢/lb + $/MT for KC + RC" },
+  },
+  {
+    wf: "2.3 COT + rebuild", output: "cot.json", component: "Step1/4/5/6/7/8", visual: "COT · Signals, Gauges, Heatmap, Global Flow, Industry Pulse, Dry Powder, Cycle, Report",
+    cadence: { recurrence: "20:00 UTC Friday (CFTC publish window)", trigger: "cron" },
+    transport: { provider: "CFTC disagg report", method: "ZIP+CSV download" },
+    storage: { target: "cot.json", footprint: "312 weeks of disagg positions", units: "lots / MM-long, MM-short, PMPU-long, PMPU-short …" },
+    resiliency: { onMissing: "previous week's data retained; signals re-compute from cot.json on next run" },
+  },
+  {
+    wf: "2.3 COT + rebuild", output: "macro_cot.json", component: "CrossCommodityPanel", visual: "Macro · Cross-Commodity MM",
+    cadence: { recurrence: "20:00 UTC Friday", trigger: "cron" },
+    transport: { provider: "CFTC disagg report", method: "ZIP+CSV download (multi-commodity slice)" },
+    storage: { target: "macro_cot.json", units: "MM net per commodity (coffee, sugar, cocoa, …)" },
+  },
+  {
+    wf: "2.3 COT + rebuild", output: "signals.json", component: "morning_brief · /cot Telegram", visual: "Telegram · CoT signals",
+    cadence: { recurrence: "rebuilt end of 1.4 (02:30 UTC) from latest cot.json", trigger: "composite" },
+    transport: { method: "in-process signal-engine evaluation (frontend/scripts/export-signals.mjs)" },
+    storage: { target: "signals.json", units: "rules with severity (info|watch|alert|critical) + score + magnitude" },
+  },
+  {
+    wf: "3.1 Kaffeesteuer", output: "kaffeesteuer.json", component: "KaffeesteuerChart", visual: "Demand · Kaffeesteuer (DE tax)",
+    cadence: { recurrence: "08:00 UTC on the 1st of each month", trigger: "cron" },
+    transport: { provider: "DESTATIS", method: "PDF parse" },
+    storage: { target: "kaffeesteuer.json", units: "€ tax revenue" },
+  },
+  {
+    wf: "3.2 Cecafe Export", output: "cecafe.json", component: "CoffeeMap", visual: "Map · Brazil monthly exports",
+    cadence: { recurrence: "08:00 UTC on the 15th of each month", trigger: "cron" },
+    transport: { provider: "cecafe.com.br", method: "BeautifulSoup HTML + table extract", bypass: "Chrome-shaped UA" },
+    storage: { target: "cecafe.json", units: "60kg bags monthly exports + per-destination split" },
+  },
+  {
+    wf: "3.3.1 CONAB", output: "farmer_economics.json", component: "FarmerSellingPanel", visual: "Supply · Brazil Farmer Economics",
+    cadence: { recurrence: "02:00 UTC on the 12th of each month", trigger: "cron" },
+    transport: { provider: "conab.gov.br", method: "PDF parse + Safras echo" },
+    storage: { target: "farmer_economics.json (CONAB block)", units: "% sold + R$ cost components" },
+  },
+  {
+    wf: "3.3.2 BR Fertilizer", output: "farmer_economics.json", component: "FertilizerInputsPanel", visual: "Macro · Fertilizer Inputs (Brazil)",
+    cadence: { recurrence: "03:00 UTC on the 12th of each month", trigger: "cron" },
+    transport: { provider: "Comex Stat", method: "Direct API GET" },
+    storage: { target: "farmer_economics.json (.fertilizer block)", units: "tonnes + USD imports per nutrient" },
+  },
+  {
+    wf: "3.3.3 VN Fertilizer", output: "vn_fertilizer.json", component: "VnFarmerEconomics", visual: "Supply · VN Farmer Economics (fertilizer cost)",
+    cadence: { recurrence: "04:00 UTC on the 12th of each month", trigger: "cron" },
+    transport: { provider: "Vietnam Customs", method: "HTML scrape" },
+    storage: { target: "vn_fertilizer.json", units: "tonnes + VND/USD imports" },
+  },
+  {
+    wf: "3.3.4 VN Coffee Exports", output: "vn_coffee_export.json → vietnam_supply.json", component: "VnExportExplorer · VnBalanceSheet", visual: "Supply · VN Export Explorer + Balance Sheet",
+    cadence: { recurrence: "04:30 UTC on the 12th of each month", trigger: "cron" },
+    transport: { provider: "Vietnam Customs (GSO)", method: "HTML scrape" },
+    storage: { target: "vn_coffee_export.json + vietnam_supply.json", units: "60kg bags + tonnes by destination" },
+  },
+  {
+    wf: "3.3.5 Uganda UCDA", output: "uganda_supply.json", component: "UgandaTab", visual: "Supply · Uganda (exports, split, grades, destinations)",
+    cadence: { recurrence: "02:00 UTC on the 14th of each month (mid-month publish)", trigger: "cron" },
+    transport: { provider: "ugandacoffee.go.ug", method: "BeautifulSoup HTML + table extract" },
+    storage: { target: "uganda_supply.json", units: "60kg bags + by-grade splits" },
+  },
+  {
+    wf: "4.1 Earnings", output: "earnings.json", component: "EarningsTable", visual: "Demand · Roaster Earnings",
+    cadence: { recurrence: "08:00 UTC on the 15th of Feb/May/Aug/Nov (post-quarter)", trigger: "cron" },
+    transport: { provider: "10-K / 10-Q filings", method: "manual + filings scrape" },
+    storage: { target: "earnings.json", units: "USD revenue / volumes per roaster" },
+  },
+  {
+    wf: "various / manual", output: "factory_mix.json", component: "RoastingMixPanel", visual: "Demand · Roasting Mix",
+    cadence: { trigger: "manual" },
+    transport: { method: "manual / industry estimates" },
+    storage: { target: "factory_mix.json" },
+  },
+  {
+    wf: "various / manual", output: "global_fertilizers.json", component: "FertilizersTab", visual: "Supply · Fertilizers",
+    cadence: { trigger: "manual" },
+    transport: { provider: "UN Comtrade + World Bank", method: "manual aggregation" },
+    storage: { target: "global_fertilizers.json" },
+  },
+  {
+    wf: "various / manual", output: "manual_intel.json", component: "ManualIntelPanel", visual: "Supply · Manual Intel",
+    cadence: { trigger: "manual" },
+    transport: { method: "hand-curated entries" },
+    storage: { target: "manual_intel.json" },
+  },
+  {
+    wf: "various / manual", output: "retail_cpi.json", component: "RetailCpiPanel", visual: "Macro · Retail CPI",
+    cadence: { recurrence: "monthly post-publish (BLS / Eurostat / BCB)", trigger: "manual" },
+    transport: { provider: "BLS + Eurostat + BCB", method: "manual fetch + paste" },
+    storage: { target: "retail_cpi.json", units: "YoY % coffee CPI per geography" },
+  },
+  {
+    wf: "1.1 News → 1.4 Export", output: "us_cpi.json", component: "UsCpiPanel", visual: "Macro · Inflation · US CPI",
+    cadence: { recurrence: "monthly post-publish (BLS CPI-U release)", trigger: "cron" },
+    transport: { provider: "US BLS (CPI-U)", method: "BLS public API fetch" },
+    storage: { target: "us_cpi.json", units: "YoY % headline/core/food/energy CPI" },
+  },
+  {
+    wf: "various / manual", output: "origin_prices_history.json", component: "OriginPricesPanel", visual: "Macro · Origin Prices",
+    cadence: { trigger: "manual" },
+    transport: { method: "manual / aggregated origin sources" },
+    storage: { target: "origin_prices_history.json", units: "¢/lb FOB differentials per origin" },
+  },
+  {
+    wf: "various / manual", output: "*_supply.json (CO·ET·HN·ID)", component: "country tabs", visual: "Supply · country pages + Map (UG now via 3.3.5)",
+    cadence: { trigger: "manual" },
+    transport: { method: "country-specific manual updates" },
+    storage: { target: "colombia/ethiopia/honduras/indonesia_supply.json" },
+  },
   // ── Added in the last 10 days ────────────────────────────────────────────
-  { wf: "1.13 ICE Certified Stocks", output: "certified_stocks_arabica.json + …robusta.json", component: "CertifiedStocksPanel · CertifiedStocksSystemFlow", visual: "Demand · Tiles + Period view + System flow + Freshness chips" },
-  { wf: "1.14 ICE Arabica Ageing (monthly)", output: "certified_stocks_arabica.json.ageing_report", component: "ArabicaPeriodTable", visual: "Demand · Stocks drill Age (0Y/1Y/2Y/3Y/>4Y) → Group → Origin" },
-  { wf: "cohort_outflow (inline 1.13)", output: "certified_stocks_robusta.json.monthly.{implied_outflow, current_by_origin}", component: "CertifiedStocksSystemFlow", visual: "Demand · Robusta per-origin in/out/lost/transit (cohort DNA + coverage guard)" },
-  { wf: "0.3 SPI baseline (one-shot)", output: "spi_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts", visual: "Supply · Weather · Drought Indices (SPI-1 / SPI-3)" },
-  { wf: "0.4 SPEI baseline (one-shot)", output: "spei_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts", visual: "Supply · Weather · Drought Indices (SPEI = D vs 30y, D = P − ET₀)" },
-  { wf: "/enso → /supply subtab", output: "enso.json", component: "SupplyEnsoTab", visual: "Supply · ENSO subtab (PhaseSummary + ForecastPlume + AnalogChart + RiskMap)" },
-  { wf: "EnsoPanel + WeatherRiskPanel relocation", output: "farmer_economics.json {.enso, .weather}", component: "WeatherCharts (farmerEconomicsUrl)", visual: "Supply · Brazil · Weather subtab (was: Farmer Economics)" },
-  { wf: "build_events_calendar.py", output: "events.json (seed + /public mirror)", component: "UpcomingCalendar", visual: "News · Coming up next 30 days (ISO-week timeline)" },
-  { wf: "1.1 News (existing)", output: "news.json", component: "HeadlinesDigest + RiskRadar", visual: "News · Filtered headlines digest · keyword-velocity radar" },
-  { wf: "1.4 Export (existing)", output: "health.json", component: "FreshnessGrid", visual: "News · 'What changed since yesterday' chip grid (26 feeds, today pulse)" },
+  {
+    wf: "1.13 ICE Certified Stocks", output: "certified_stocks_arabica.json + …robusta.json", component: "CertifiedStocksPanel · CertifiedStocksSystemFlow",
+    visual: "Demand · Tiles + Period view + System flow + Freshness chips",
+    cadence: { recurrence: "17:00 UTC Mon-Fri (weekend-skip added 2026-05)", window: "after ICE robusta ~10:30 UTC + arabica ~13:30 UTC publish", trigger: "cron" },
+    transport: { provider: "ICE marketdata (10 source feeds)", method: "Direct API GET (XLS + PDF + XML)", bypass: "browser-shaped UA + Referer chain" },
+    storage: { target: "certified_stocks_arabica.json + certified_stocks_robusta.json", footprint: "~200KB combined", units: "60kg bags (KC) / 10MT lots (RC) — both surfaced" },
+    resiliency: { onMissing: "per-source failures logged but don't block the run; last-good JSON retained", parserFallback: "XLS-first → PDF fallback when ICE varies the daily file format" },
+    runtime: { duration: "~5-10 min daily / ~90 min one-off 180d backfill", cost: "weekend-skip saves ~10 CI min/wk" },
+  },
+  {
+    wf: "1.14 ICE Arabica Ageing (monthly)", output: "certified_stocks_arabica.json.ageing_report", component: "ArabicaPeriodTable",
+    visual: "Demand · Stocks drill Age (0Y/1Y/2Y/3Y/>4Y) → Group → Origin",
+    cadence: { recurrence: "14:00 UTC on the 1st of each month", trigger: "cron" },
+    transport: { provider: "ICE marketdata (KC ageing report)", method: "PDF parse (pdfplumber)" },
+    storage: { target: "certified_stocks_arabica.json.ageing_report block", units: "60kg bags by age bucket × origin × warehouse group" },
+    resiliency: { onMissing: "previous month's ageing block retained" },
+    runtime: { duration: "~30s" },
+  },
+  {
+    wf: "cohort_outflow (inline 1.13)", output: "certified_stocks_robusta.json.monthly.{implied_outflow, current_by_origin}", component: "CertifiedStocksSystemFlow",
+    visual: "Demand · Robusta per-origin in/out/lost/transit (cohort DNA + coverage guard)",
+    cadence: { recurrence: "after each 1.13 run (effectively daily M-F)", trigger: "composite" },
+    transport: { method: "in-process derivation from age-allowance + grading + tender feeds" },
+    storage: { target: "certified_stocks_robusta.json.monthly.implied_outflow + .current_by_origin", units: "10MT lots / per-origin in-flow vs out-flow vs in-transit" },
+    resiliency: { onMissing: "coverage guard refuses to publish when any source feed missing — readers see last good cohort instead of a half-built one" },
+  },
+  {
+    wf: "0.3 SPI baseline (one-shot)", output: "spi_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts",
+    visual: "Supply · Weather · Drought Indices (SPI-1 / SPI-3)",
+    cadence: { recurrence: "one-shot (workflow_dispatch)", trigger: "manual" },
+    transport: { provider: "Open-Meteo ERA5 archive (1991-2020 baseline)", method: "Direct API GET per province" },
+    storage: { target: "backend/seed/spi_30yr_baselines.json", footprint: "~50KB seed", units: "monthly precip μ + σ per province × calendar month" },
+    runtime: { duration: "~10 min full backfill across all provinces" },
+  },
+  {
+    wf: "0.4 SPEI baseline (one-shot)", output: "spei_30yr_baselines.json", component: "fetch_origin_weather + WeatherCharts",
+    visual: "Supply · Weather · Drought Indices (SPEI = D vs 30y, D = P − ET₀)",
+    cadence: { recurrence: "one-shot (workflow_dispatch)", trigger: "manual" },
+    transport: { provider: "Open-Meteo ERA5 (precip + et0_fao_evapotranspiration)", method: "Direct API GET" },
+    storage: { target: "backend/seed/spei_30yr_baselines.json", footprint: "~80KB seed", units: "monthly (P − ET₀) μ + σ per province" },
+    resiliency: { onMissing: "0.6 + 0.7 backfill workflows heal gaps in source weather_history before this rebuilds" },
+    runtime: { duration: "~15 min full backfill" },
+  },
+  {
+    wf: "/enso → /supply subtab", output: "enso.json", component: "SupplyEnsoTab",
+    visual: "Supply · ENSO subtab (PhaseSummary + ForecastPlume + AnalogChart + RiskMap)",
+    cadence: { recurrence: "rebuilt with the monthly ENSO scraper (~5th of each month)", trigger: "cron" },
+    transport: { provider: "NOAA CPC + IRI + composite analogs", method: "Direct API GET + computed" },
+    storage: { target: "enso.json", footprint: "~30KB", units: "ONI °C + phase + plume bands" },
+    resiliency: { onMissing: "PR #127's IRI fallback handles CPC outages (still under investigation per issue #132 comment-11)" },
+  },
+  {
+    wf: "EnsoPanel + WeatherRiskPanel relocation", output: "farmer_economics.json {.enso, .weather}", component: "WeatherCharts (farmerEconomicsUrl)",
+    visual: "Supply · Brazil · Weather subtab (was: Farmer Economics)",
+    cadence: { recurrence: "follows farmer_economics.json rebuild (12th monthly)", trigger: "cron" },
+    transport: { method: "frontend re-route only — data path unchanged" },
+    storage: { target: "farmer_economics.json (existing) re-surfaced under Weather subtab" },
+  },
+  {
+    wf: "build_events_calendar.py", output: "events.json (seed + /public mirror)", component: "UpcomingCalendar",
+    visual: "News · Coming up next 30 days (ISO-week timeline)",
+    cadence: { recurrence: "rebuilt on every backend deploy + nightly export 1.4", trigger: "composite" },
+    transport: { method: "compose from CFTC/USDA/ICE/CONAB known publish calendars" },
+    storage: { target: "backend/seed/events.json → frontend/public/data/events.json mirror", footprint: "~10KB", units: "calendar events {date, source, label, importance}" },
+  },
+  {
+    wf: "1.1 News (existing)", output: "news.json", component: "HeadlinesDigest + RiskRadar",
+    visual: "News · Filtered headlines digest · keyword-velocity radar",
+    cadence: { recurrence: "01:00 UTC daily (same as 1.1)", trigger: "cron" },
+    transport: { method: "frontend re-use of existing news_feed → news.json export" },
+    storage: { target: "news.json (already produced by 1.1)" },
+  },
+  {
+    wf: "1.4 Export (existing)", output: "health.json", component: "FreshnessGrid",
+    visual: "News · 'What changed since yesterday' chip grid (26 feeds, today pulse)",
+    cadence: { recurrence: "02:30 UTC daily (piggybacks on 1.4)", trigger: "cron" },
+    transport: { method: "frontend re-use of health.json with cadence-aware thresholds per feed" },
+    storage: { target: "health.json (already produced by 1.4) — consumed client-side", units: "per-feed last-success ISO + threshold-relative tone" },
+    resiliency: { onMissing: "grid renders 'Freshness signal unavailable' instead of stale grey-out" },
+  },
   // ── Added this sprint (Phase 5 Path A + Sprint 2) ────────────────────────
-  { wf: "0.5 NOAA STAR VHI (weekly, Sat 23:00)", output: "vhi_{origin}.json ×7", component: "WeatherCharts (VHI column in Drought + vegetation panel)", visual: "Supply · Weather · VHI chip per province · stress<40 / fair 40-60 / healthy>60" },
-  { wf: "0.6 backfill_missing_fields (one-shot)", output: "weather_history/*.json (rain + et0 + tmean heal)", component: "(internal: unblocks SPEI emit when forecast endpoint truncates et0/rain)", visual: "—" },
-  { wf: "0.7 backfill_history_gap (one-shot)", output: "weather_history/*.json (2025 gap fill)", component: "(internal: unblocks SPEI-3 by making seed↔history contiguous)", visual: "—" },
-  { wf: "Agronomic Alert Engine (Phase 5 Path A · end of 1.10)", output: "agronomic_alerts.json + AGRO rows in signals.json", component: "AgronomicTicker", visual: "Map · Live Agronomic Threats top overlay · country chips · click→region detail" },
-  { wf: "1.6 Morning Brief (Body-4)", output: "reads events.json", component: "telegram/handlers/brief.py::_upcoming_events_section", visual: "Telegram · 'Coming up · next 24h' block under weather" },
-  { wf: "1.6 Morning Brief (Body-3)", output: "—", component: "telegram/handlers/brief.py::_weather_line", visual: "Telegram · drought alerts gated by rain_mtd_mm < rain_hist_min (seasonal baseline)" },
-  { wf: "/cot Telegram command (Body-1)", output: "reads signals.json", component: "telegram/handlers/cot.py", visual: "Telegram · 'Signals (NY)/(LDN)' per-rule listing under position block · CRIT/ALERT/WARN/INFO" },
-  { wf: "OI 14-day cap (Body-8)", output: "oi_history.json sliced to 14 days (was 30)", component: "OIHistoryTable", visual: "COT · OI 14-day table · contract_prices_archive.json (5y) untouched" },
-  { wf: "COT Robusta nearby-OI fix (Body-7)", output: "—", component: "lib/cot/oiNearby.ts · Overview.tsx", visual: "COT · 'X k lots in nearby (N and U)' re-derived from per-contract oi_history.json (was 0.0 bug)" },
+  {
+    wf: "0.5 NOAA STAR VHI (weekly, Sat 23:00)", output: "vhi_{origin}.json ×7", component: "WeatherCharts (VHI column in Drought + vegetation panel)",
+    visual: "Supply · Weather · VHI chip per province · stress<40 / fair 40-60 / healthy>60",
+    cadence: { recurrence: "23:00 UTC Saturday (after NOAA's Sat publish)", trigger: "cron" },
+    transport: { provider: "NOAA STAR VHI service", method: "Direct API GET per province (latin-1 header guards added PR #147)" },
+    storage: { target: "weather_history/vhi_{br,co,ho,et,vn,id,ug}.json ×7", footprint: "~20KB/origin", units: "VHI 0-100 by province × week" },
+    resiliency: { onMissing: "per-origin .errors[] populated, rest of run continues; future-proofing watch on Sidama (#132-c1-20)" },
+    runtime: { duration: "~2 min per Saturday run" },
+  },
+  {
+    wf: "0.6 backfill_missing_fields (one-shot)", output: "weather_history/*.json (rain + et0 + tmean heal)", component: "(internal: unblocks SPEI emit when forecast endpoint truncates et0/rain)",
+    visual: "—",
+    cadence: { recurrence: "one-shot (workflow_dispatch)", trigger: "manual" },
+    transport: { provider: "Open-Meteo ERA5 archive", method: "Direct API GET — re-fetches days where forecast endpoint dropped et0/rain/tmean" },
+    storage: { target: "weather_history/*.json fields healed in place" },
+  },
+  {
+    wf: "0.7 backfill_history_gap (one-shot)", output: "weather_history/*.json (2025 gap fill)", component: "(internal: unblocks SPEI-3 by making seed↔history contiguous)",
+    visual: "—",
+    cadence: { recurrence: "one-shot (workflow_dispatch)", trigger: "manual" },
+    transport: { provider: "Open-Meteo ERA5 archive", method: "Direct API GET window: seed_end → today" },
+    storage: { target: "weather_history/*.json (filled 2025 gap so SPEI-3 has a continuous 3-month look-back)" },
+  },
+  {
+    wf: "Agronomic Alert Engine (Phase 5 Path A · end of 1.10)", output: "agronomic_alerts.json + AGRO rows in signals.json", component: "AgronomicTicker",
+    visual: "Map · Live Agronomic Threats top overlay · country chips · click→region detail",
+    cadence: { recurrence: "after each weather refresh (daily) + Saturday VHI run", trigger: "composite" },
+    transport: { method: "rule engine over weather_history + VHI + SPI/SPEI baselines" },
+    storage: { target: "agronomic_alerts.json + 6 AGRO rows appended to signals.json", units: "rule rows with severity (info|watch|alert|critical) + region + magnitude" },
+    resiliency: { onMissing: "rules silently skip provinces with no underlying weather data instead of false-alarming" },
+  },
+  {
+    wf: "1.6 Morning Brief (Body-4)", output: "reads events.json", component: "telegram/handlers/brief.py::_upcoming_events_section",
+    visual: "Telegram · 'Coming up · next 24h' block under weather",
+    cadence: { recurrence: "03:00 UTC daily (piggybacks on 1.6)", trigger: "cron" },
+    transport: { method: "compose-from-disk: events.json filtered to next 24h" },
+    storage: { target: "Telegram channel post (not persisted)" },
+    resiliency: { onMissing: "section omitted silently if events.json absent (same pattern as the rest of brief)" },
+  },
+  {
+    wf: "1.6 Morning Brief (Body-3)", output: "—", component: "telegram/handlers/brief.py::_weather_line",
+    visual: "Telegram · drought alerts gated by rain_mtd_mm < rain_hist_min (seasonal baseline)",
+    cadence: { recurrence: "03:00 UTC daily (piggybacks on 1.6)", trigger: "cron" },
+    transport: { method: "compose from weather_history + 30y seasonal baseline" },
+    storage: { target: "Telegram channel post (not persisted)" },
+    resiliency: { onMissing: "seasonal-baseline gate prevents false alarms during the dry season (was firing 'drought' in normal dry months pre-fix)" },
+  },
+  {
+    wf: "/cot Telegram command (Body-1)", output: "reads signals.json", component: "telegram/handlers/cot.py",
+    visual: "Telegram · 'Signals (NY)/(LDN)' per-rule listing under position block · CRIT/ALERT/WARN/INFO",
+    cadence: { trigger: "edge", window: "on-demand (user types /cot)" },
+    transport: { method: "compose-from-disk: signals.json filtered by market == NY|LDN, AGRO excluded" },
+    storage: { target: "Telegram message (not persisted)", units: "rule rows with severity tag + score + magnitude" },
+    resiliency: { onMissing: "block omitted silently if signals.json absent" },
+  },
+  {
+    wf: "OI 14-day cap (Body-8)", output: "oi_history.json sliced to 14 days (was 30)", component: "OIHistoryTable",
+    visual: "COT · OI 14-day table · contract_prices_archive.json (5y) untouched",
+    cadence: { recurrence: "follows 1.3 (02:00 UTC Mon-Fri)", trigger: "cron" },
+    transport: { method: "fetch_oi_json MAX_DAYS=14 + defensive frontend slice" },
+    storage: { target: "oi_history.json", footprint: "~50% of pre-change size", units: "lots (RC) / contracts (KC)" },
+  },
+  {
+    wf: "COT Robusta nearby-OI fix (Body-7)", output: "—", component: "lib/cot/oiNearby.ts · Overview.tsx",
+    visual: "COT · 'X k lots in nearby (N and U)' re-derived from per-contract oi_history.json (was 0.0 bug)",
+    cadence: { trigger: "edge", window: "on-demand client-side render" },
+    transport: { method: "client-side derivation from per-contract oi_history.json (no fetch)" },
+    storage: { target: "—" },
+    resiliency: { onMissing: "falls back to last-good per-contract OI rather than the bugged exch_oi_ldn aggregate" },
+  },
 ];
 
-function WorkflowTable() {
+// ── Operational metadata card view ──────────────────────────────────────────
+// Replaces the flat 4-column table with an expandable per-flow card.
+// Always-visible header line carries wf · output · component · visual.
+// Click toggles a detail panel that surfaces the five ops blocks:
+// cadence · transport · storage · resiliency · runtime. Empty sub-fields
+// render "TBD" rather than disappearing — the audit gap stays visible.
+
+// Three-letter chip per trigger type — uniform width, instantly scannable.
+const TRIGGER_BADGE: Record<TriggerType, { tag: string; cls: string }> = {
+  cron:      { tag: "CRON", cls: "text-sky-300 border-sky-700/60 bg-sky-950/40" },
+  manual:    { tag: "MAN",  cls: "text-amber-300 border-amber-700/60 bg-amber-950/40" },
+  edge:      { tag: "EDGE", cls: "text-emerald-300 border-emerald-700/60 bg-emerald-950/40" },
+  composite: { tag: "COMP", cls: "text-violet-300 border-violet-700/60 bg-violet-950/40" },
+  tbd:       { tag: "TBD",  cls: "text-slate-500 border-slate-700 bg-slate-900" },
+};
+
+function _fieldsFilledRatio(meta: FlowMetadata): { filled: number; total: number } {
+  // Walks the five ops blocks and counts populated sub-fields. Helper
+  // for the header progress dot — "5/14 ops fields filled".
+  const groups: Array<Record<string, string | TriggerType | undefined> | undefined> = [
+    meta.cadence, meta.transport, meta.storage, meta.resiliency, meta.runtime,
+  ];
+  // 14 = 3+3+3+3+2 sub-fields across the five blocks.
+  let filled = 0;
+  for (const g of groups) {
+    if (!g) continue;
+    for (const v of Object.values(g)) {
+      if (typeof v === "string" && v.trim().length > 0) filled++;
+      else if (v && v !== "tbd") filled++;   // TriggerType passthrough
+    }
+  }
+  return { filled, total: 14 };
+}
+
+function DimensionRow({ label, value }: { label: string; value: string | undefined }) {
+  const populated = value && value.trim().length > 0;
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-[11px] border-collapse">
-        <thead>
-          <tr className="text-left text-slate-500 border-b border-slate-700">
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Workflow</th>
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Output</th>
-            <th className="py-1.5 pr-3 font-medium whitespace-nowrap">Component</th>
-            <th className="py-1.5 font-medium">Tab · Visual</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ROWS.map((r, i) => (
-            <tr key={i} className="border-b border-slate-800/60 align-top">
-              <td className="py-1.5 pr-3 text-amber-400 whitespace-nowrap">{r.wf}</td>
-              <td className="py-1.5 pr-3 font-mono text-slate-400 whitespace-nowrap">{r.output}</td>
-              <td className="py-1.5 pr-3 font-mono text-slate-500 whitespace-nowrap">{r.component}</td>
-              <td className="py-1.5 text-slate-300">{r.visual}</td>
+    <div className="flex gap-2 text-[10.5px] leading-snug">
+      <span className="text-slate-500 w-28 shrink-0">{label}</span>
+      <span className={populated ? "text-slate-300" : "text-slate-700 italic"}>
+        {populated ? value : "TBD"}
+      </span>
+    </div>
+  );
+}
+
+function DimensionBlock({ title, accent, children }: {
+  title: string; accent: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className={`text-[9px] uppercase tracking-widest font-bold ${accent}`}>{title}</div>
+      <div className="space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function FlowCard({ meta }: { meta: FlowMetadata }) {
+  const [open, setOpen] = useState(false);
+  const trig = meta.cadence?.trigger ?? "tbd";
+  const badge = TRIGGER_BADGE[trig];
+  const ratio = _fieldsFilledRatio(meta);
+  const ratioPct = (ratio.filled / ratio.total) * 100;
+  return (
+    <div className="border border-slate-800 rounded-lg bg-slate-950/60 hover:border-slate-700 transition-colors">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="w-full flex items-start gap-3 px-3 py-2 text-left"
+      >
+        <span className={`shrink-0 text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border ${badge.cls}`}>
+          {badge.tag}
+        </span>
+        <div className="flex-1 min-w-0">
+          <div className="text-[12px] text-amber-300 font-semibold truncate">{meta.wf}</div>
+          <div className="text-[10.5px] text-slate-300 leading-snug mt-0.5">{meta.visual}</div>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px]">
+            <span className="font-mono text-slate-400">→ {meta.output}</span>
+            <span className="font-mono text-slate-500">{meta.component}</span>
+          </div>
+        </div>
+        <div className="shrink-0 flex items-center gap-2">
+          <span
+            title={`Ops detail: ${ratio.filled}/${ratio.total} fields filled`}
+            className="text-[9px] font-mono text-slate-500 whitespace-nowrap"
+          >
+            {ratio.filled}/{ratio.total} ops
+          </span>
+          <div className="w-10 h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div
+              className={`h-full ${ratioPct >= 75 ? "bg-emerald-500" : ratioPct >= 40 ? "bg-amber-500" : "bg-slate-600"}`}
+              style={{ width: `${Math.max(4, ratioPct)}%` }}
+            />
+          </div>
+          <span className="text-slate-500">{open ? "▾" : "▸"}</span>
+        </div>
+      </button>
+
+      {open && (
+        <div className="px-3 pb-3 pt-1 border-t border-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <DimensionBlock title="Cadence · when" accent="text-sky-300">
+            <DimensionRow label="recurrence" value={meta.cadence?.recurrence} />
+            <DimensionRow label="window"     value={meta.cadence?.window} />
+            <DimensionRow label="trigger"    value={meta.cadence?.trigger} />
+          </DimensionBlock>
+          <DimensionBlock title="Transport · where & how" accent="text-violet-300">
+            <DimensionRow label="provider" value={meta.transport?.provider} />
+            <DimensionRow label="method"   value={meta.transport?.method} />
+            <DimensionRow label="bypass"   value={meta.transport?.bypass} />
+          </DimensionBlock>
+          <DimensionBlock title="Storage · destination" accent="text-emerald-300">
+            <DimensionRow label="target"    value={meta.storage?.target} />
+            <DimensionRow label="footprint" value={meta.storage?.footprint} />
+            <DimensionRow label="units"     value={meta.storage?.units} />
+          </DimensionBlock>
+          <DimensionBlock title="Resiliency · safety net" accent="text-amber-300">
+            <DimensionRow label="onMissing"     value={meta.resiliency?.onMissing} />
+            <DimensionRow label="debounce"      value={meta.resiliency?.debounce} />
+            <DimensionRow label="parserFallback" value={meta.resiliency?.parserFallback} />
+          </DimensionBlock>
+          <DimensionBlock title="Runtime · budget" accent="text-rose-300">
+            <DimensionRow label="duration" value={meta.runtime?.duration} />
+            <DimensionRow label="cost"     value={meta.runtime?.cost} />
+          </DimensionBlock>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WorkflowTable() {
+  const totalFilled = ROWS.reduce((acc, r) => acc + _fieldsFilledRatio(r).filled, 0);
+  const totalSlots  = ROWS.length * 14;
+  const auditPct    = Math.round((totalFilled / totalSlots) * 100);
+  return (
+    <div className="space-y-3">
+      <div className="flex items-baseline justify-between flex-wrap gap-2 text-[11px]">
+        <div className="text-slate-400">
+          <span className="font-semibold text-slate-200">{ROWS.length}</span> flows ·
+          click any to expand the operational metadata (cadence · transport · storage · resiliency · runtime).
+        </div>
+        <div className="font-mono text-slate-500">
+          Audit fill: <span className="text-slate-300">{totalFilled}/{totalSlots}</span> · {auditPct}%
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        {ROWS.map((meta, i) => (
+          <FlowCard key={i} meta={meta} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Live Workflow Inventory ─────────────────────────────────────────────────
+// Auto-generated from .github/workflows/*.yml by build_workflow_inventory.py
+// (run on every push that touches a workflow file). Renders structural
+// metadata only — name, triggers, cron, workflow_run chains, concurrency,
+// timeout — so the page reflects the actual YAML without manual editing.
+
+interface InventoryWorkflow {
+  file:              string;
+  name:              string;
+  triggers:          string[];
+  crons:             string[];
+  workflow_run_deps: string[];
+  concurrency_group: string | null;
+  timeout_minutes:   number | null;
+}
+interface InventoryPayload {
+  generated_at: string;
+  count:        number;
+  workflows:    InventoryWorkflow[];
+}
+
+const TRIGGER_COLORS: Record<string, string> = {
+  schedule:           "bg-sky-900/60 border-sky-700 text-sky-200",
+  workflow_run:       "bg-indigo-900/60 border-indigo-700 text-indigo-200",
+  workflow_dispatch:  "bg-slate-800 border-slate-700 text-slate-300",
+  push:               "bg-amber-900/60 border-amber-700 text-amber-200",
+  pull_request:       "bg-amber-900/40 border-amber-700/60 text-amber-200/80",
+};
+
+function TriggerChip({ kind }: { kind: string }) {
+  const cls = TRIGGER_COLORS[kind] ?? "bg-slate-800 border-slate-700 text-slate-400";
+  return (
+    <span className={`inline-block text-[9px] px-1.5 py-0.5 rounded border font-mono ${cls}`}>
+      {kind}
+    </span>
+  );
+}
+
+function LiveWorkflowInventory() {
+  const { data, loading, error } =
+    useFetchJson<InventoryPayload>("/data/workflows_inventory.json");
+
+  if (loading) return <div className="text-[11px] text-slate-500">Loading inventory…</div>;
+  if (error)   return <div className="text-[11px] text-red-400">Failed to load: {error.message}</div>;
+  if (!data)   return null;
+
+  return (
+    <div>
+      <div className="text-[11px] text-slate-500 mb-3 leading-relaxed">
+        <span className="text-slate-300">{data.count} workflows</span> auto-detected from{" "}
+        <code className="text-slate-300">.github/workflows/*.yml</code> · regenerated on push by{" "}
+        <code className="text-slate-300">build-workflow-inventory.yml</code> · last refresh{" "}
+        <span className="text-slate-300 font-mono">{data.generated_at}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[11px] font-mono">
+          <thead>
+            <tr className="text-slate-500 bg-slate-800/40">
+              <th className="text-left px-2 py-1.5">File</th>
+              <th className="text-left px-2 py-1.5">Name</th>
+              <th className="text-left px-2 py-1.5">Triggers</th>
+              <th className="text-left px-2 py-1.5">Cron</th>
+              <th className="text-left px-2 py-1.5">Chains off</th>
+              <th className="text-left px-2 py-1.5">Concurrency</th>
+              <th className="text-right px-2 py-1.5">Timeout</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.workflows.map((w) => (
+              <tr key={w.file} className="border-t border-slate-800/60 align-top">
+                <td className="px-2 py-1.5 text-slate-400 whitespace-nowrap">{w.file}</td>
+                <td className="px-2 py-1.5 text-slate-200">{w.name}</td>
+                <td className="px-2 py-1.5">
+                  <div className="flex flex-wrap gap-1">
+                    {w.triggers.map((t) => <TriggerChip key={t} kind={t} />)}
+                  </div>
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.crons.length === 0 ? <span className="text-slate-600">—</span>
+                    : w.crons.map((c, i) => <div key={i}>{c}</div>)}
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.workflow_run_deps.length === 0 ? <span className="text-slate-600">—</span>
+                    : w.workflow_run_deps.map((d, i) => <div key={i} className="text-indigo-300">{d}</div>)}
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.concurrency_group ?? <span className="text-slate-600">—</span>}
+                </td>
+                <td className="px-2 py-1.5 text-right text-slate-300">
+                  {w.timeout_minutes != null ? `${w.timeout_minutes}m` : <span className="text-slate-600">—</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -612,6 +1197,10 @@ export default function DataMapPage() {
 
         <Card title="Per-workflow → exact dashboard visual">
           <WorkflowTable />
+        </Card>
+
+        <Card title="Live workflow inventory — auto-generated from YAML">
+          <LiveWorkflowInventory />
         </Card>
       </div>
     </div>

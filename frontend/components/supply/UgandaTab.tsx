@@ -1,22 +1,30 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
+import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
+import UgandaCumulativePaceChart from "@/components/supply/uganda/UgandaCumulativePaceChart";
+import UgandaDestinationChart from "@/components/supply/uganda/UgandaDestinationChart";
 import UgandaExportPanel from "@/components/supply/uganda/UgandaExportPanel";
 import UgandaFarmerEconomics from "@/components/supply/uganda/UgandaFarmerEconomics";
+import UgandaMonthlyVolumeChart from "@/components/supply/uganda/UgandaMonthlyVolumeChart";
+import UgandaTypeShareChart from "@/components/supply/uganda/UgandaTypeShareChart";
+import type { UgandaMonthlyFile, UgandaMonthlyRow } from "@/components/supply/uganda/helpers";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
-import UgandaDestPanel from "@/components/supply/uganda/UgandaDestinationsPanel";
 import UgandaTradeActors from "@/components/supply/uganda/UgandaTradeActorsPanel";
 // UgandaTab itself is dynamic-imported from supply/page.tsx with { ssr: false },
 // so these panels are already lazy-loaded as part of UgandaTab's chunk —
 // nested dynamic() would just add per-subtab RTTs without bundle-size benefit
 // (recharts and shared libs go into the vendor chunk regardless).
 
-type SubTab = "exports" | "supply-demand" | "destinations" | "trade-actors" | "farmer-economics" | "weather";
+type SubTab = "exports" | "supply-demand" | "trade-actors" | "farmer-economics" | "weather";
 
 const SUB_TABS: { id: SubTab; label: string }[] = [
   { id: "exports",          label: "Exports" },
   { id: "supply-demand",    label: "Supply & Demand" },
-  { id: "destinations",     label: "Destinations" },
+  // "Destinations" sub-tab removed — the destination chart now lives in
+  // the Exports sub-tab (UgandaDestinationChart aggregates per-country
+  // across L12M/L24M/CTD/ALL windows + Robusta/Arabica stacking).
   { id: "trade-actors",     label: "Exporters / Buyers" },
   { id: "farmer-economics", label: "Farmer Economics" },
   { id: "weather",          label: "Weather" },
@@ -89,6 +97,7 @@ const DEFAULT_MIX = {
 export default function UgandaTab() {
   const [subTab, setSubTab] = useState<SubTab>("exports");
   const [data, setData]     = useState<UgandaSupply | null>(null);
+  const [monthly, setMonthly] = useState<UgandaMonthlyRow[] | null>(null);
   const [error, setError]   = useState(false);
 
   useEffect(() => {
@@ -98,8 +107,19 @@ export default function UgandaTab() {
       .catch(() => setError(true));
   }, []);
 
+  // uganda_monthly.json — multi-year UCDA series (parsed by the scraper).
+  // Drives the Brazil-style chart suite below; absent file is non-fatal.
+  useEffect(() => {
+    fetch("/data/uganda_monthly.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: UgandaMonthlyFile | null) => d && setMonthly(d.series ?? []))
+      .catch(() => { /* file absent → charts hidden gracefully */ });
+  }, []);
+
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["uganda_exports"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit flex-wrap">
         {SUB_TABS.map(t => (
@@ -137,25 +157,32 @@ export default function UgandaTab() {
 
       {data && subTab === "exports" && (
         data.exports ? (
-          <UgandaExportPanel
-            exports={data.exports}
-            ucda_price={data.ucda_price ?? null}
-            ucda_detail={data.ucda_detail ?? null}
-          />
+          <div className="space-y-4">
+            <UgandaExportPanel
+              exports={data.exports}
+              ucda_price={data.ucda_price ?? null}
+              ucda_detail={data.ucda_detail ?? null}
+            />
+            {/* Brazil-style chart suite — driven by uganda_monthly.json
+                (multi-year UCDA history from the scraper). Falls back to
+                the legacy 28-month feed when the UCDA file is absent. */}
+            {monthly && monthly.length > 0 ? (
+              <>
+                <UgandaMonthlyVolumeChart monthly={monthly} />
+                <UgandaCumulativePaceChart monthly={monthly} />
+                <UgandaAnnualTrendChart monthly={monthly} />
+                <UgandaTypeShareChart monthly={monthly} />
+                <UgandaDestinationChart monthly={monthly} />
+              </>
+            ) : (
+              <UgandaAnnualTrendChart monthly={data.exports.monthly} />
+            )}
+          </div>
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
             Export data not yet available — run UCDA report bootstrap
           </div>
         )
-      )}
-
-      {data && subTab === "destinations" && (
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <UgandaDestPanel
-            destinations={data.ucda_detail?.destinations ?? []}
-            month={data.ucda_detail?.month ?? ""}
-          />
-        </div>
       )}
 
       {data && subTab === "trade-actors" && (

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
@@ -7,9 +7,28 @@ import {
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { TT_STYLE, vnCropYearKey, kBagsToKT } from "./helpers";
 import type { ExportMonth } from "./MonthlyVolumeChart";
+import {
+  computeBalanceSheet, formatBalanceSheetTooltip, selectProjectionRows,
+  usdaYearForCropYear, type PsdRow,
+} from "@/lib/balanceSheetProjection";
 
 export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }) {
-  const data = useMemo(() => {
+  const [rows, setRows] = useState<PsdRow[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/data/demand_stocks.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (cancelled) return;
+        const a = d?.producers?.vietnam?.annual ?? null;
+        setRows(Array.isArray(a) ? a : null);
+      })
+      .catch(() => { /* silent — projection falls back to "no gap" */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  const { data, projection } = useMemo(() => {
     const byCrop: Record<string, { kt: number; months: number }> = {};
     monthly.forEach(r => {
       const key = vnCropYearKey(r.month);
@@ -19,23 +38,27 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
     });
     const keys = Object.keys(byCrop).sort();
     const latestKey = keys[keys.length - 1];
-    const prevKey   = keys.length >= 2 ? keys[keys.length - 2] : null;
+    const latestData = byCrop[latestKey];
+    const incomplete = latestData && latestData.months < 12;
 
-    // Project current crop if incomplete: scale by same-period prior year ratio
-    let proj = 0;
-    if (prevKey && byCrop[latestKey].months < 12) {
-      const ratio = byCrop[latestKey].kt / Math.max(byCrop[prevKey].kt * (byCrop[latestKey].months / 12), 1);
-      proj = Math.max(0, byCrop[prevKey].kt * ratio - byCrop[latestKey].kt);
-      proj = Math.round(proj * 10) / 10;
-    }
+    // Derive USDA MY ending-year label from the latest crop-year key.
+    const inYear = usdaYearForCropYear(latestKey);
+    const { forecastRow, latestRow } = selectProjectionRows(rows, inYear);
+    const proj = incomplete
+      ? computeBalanceSheet(forecastRow, latestRow, latestData.kt)
+      : null;
 
-    return keys.map(k => ({
-      year:      k,
-      actual:    Math.round(byCrop[k].kt * 10) / 10,
-      projected: k === latestKey ? proj : 0,
-      months:    byCrop[k].months,
-    }));
-  }, [monthly]);
+    const projGap = proj ? proj.projected_gap_kt : 0;
+    return {
+      data: keys.map(k => ({
+        year:      k,
+        actual:    Math.round(byCrop[k].kt * 10) / 10,
+        projected: k === latestKey && incomplete ? projGap : 0,
+        months:    byCrop[k].months,
+      })),
+      projection: proj,
+    };
+  }, [monthly, rows]);
 
   if (data.length < 2) return null;
 
@@ -45,6 +68,18 @@ export default function AnnualTrendChart({ monthly }: { monthly: ExportMonth[] }
         <div className="text-sm font-semibold text-slate-200">Annual Export Volume</div>
         <div className="text-[10px] text-slate-500">
           Crop year totals (Oct–Sep) · kt · † projected when crop is incomplete
+          {projection && (
+            <span
+              className="ml-1 italic"
+              title={formatBalanceSheetTooltip(projection)}>
+              · expected total {Math.round(projection.expected_total_kt).toLocaleString()} kt
+              {projection.psd_year && (
+                <span className="text-slate-600 not-italic">
+                  {" "}(USDA {projection.psd_year}{projection.mode === "proxy" ? " proxy" : ""})
+                </span>
+              )}
+            </span>
+          )}
         </div>
       </div>
       <ResponsiveContainer width="100%" height={220}>

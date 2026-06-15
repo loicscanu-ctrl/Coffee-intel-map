@@ -5,6 +5,8 @@ import {
   Legend, CartesianGrid, ReferenceLine,
 } from "recharts";
 
+import { fmtDateLabel } from "@/lib/formatters";
+
 interface HistoryPoint {
   date:  string;
   close: number;
@@ -52,11 +54,6 @@ type Group = "exporters" | "importers";
 type Window = "1M" | "3M" | "6M" | "1Y";
 
 const WINDOW_DAYS: Record<Window, number> = { "1M": 30, "3M": 90, "6M": 180, "1Y": 365 };
-
-function fmtDateLabel(d: string): string {
-  const [, m, day] = d.split("-");
-  return `${m}/${day}`;
-}
 
 export default function FxTimeSeriesPanel() {
   const [data,   setData]   = useState<FxHistory | null>(null);

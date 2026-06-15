@@ -5,13 +5,13 @@ debug/ice_probe/*.{csv,txt}). If the source format drifts in production, these
 tests are the canary."""
 from __future__ import annotations
 
-from scraper.sources.ice_certified_stocks.parse_stock_report import parse_stock_report
 from scraper.sources.ice_certified_stocks.parse_gradings import parse_gradings
 from scraper.sources.ice_certified_stocks.parse_iss_recv import (
-    parse_iss_recv_daily, parse_iss_recv_monthly,
+    parse_iss_recv_daily,
+    parse_iss_recv_monthly,
 )
+from scraper.sources.ice_certified_stocks.parse_stock_report import parse_stock_report
 from scraper.sources.ice_certified_stocks.parse_tenders import parse_tenders
-
 
 # ── 1. Robusta stock report (CSV) ────────────────────────────────────────────
 

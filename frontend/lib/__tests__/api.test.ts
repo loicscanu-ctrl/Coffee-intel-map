@@ -89,34 +89,35 @@ describe("lib/api LRU cap", () => {
   afterEach(() => clearApiCache());
 
   /**
-   * Use fetchCot(after=) to inject many distinct cache keys without needing
-   * 50 separate exported helpers. Each unique `after` value is a separate
-   * cache entry under cachedFetch's internal Map.
+   * Drive distinct cache keys straight through cachedFetchStatic — one entry
+   * per unique path — so we exercise the LRU primitive directly. (fetchCot is
+   * unsuitable here: it's static-first, so every `after` collapses onto the one
+   * shared "/data/cot.json" entry.)
    */
   it("evicts the oldest entry when more than 50 keys are in use", async () => {
-    const { fetchCot } = await import("../api");
+    const { cachedFetchStatic } = await import("../api");
 
     // Fill cache with 50 entries
     for (let i = 0; i < 50; i++) {
-      await fetchCot(`2026-01-${String(i + 1).padStart(2, "0")}`);
+      await cachedFetchStatic(`/data/f${i}.json`);
     }
     expect(fetchMock).toHaveBeenCalledTimes(50);
 
-    // The oldest entry (i=0) is still cached
-    await fetchCot("2026-01-01");
+    // The oldest entry (f0) is still cached — and the hit re-inserts it as MRU
+    await cachedFetchStatic("/data/f0.json");
     expect(fetchMock).toHaveBeenCalledTimes(50);
 
-    // 51st distinct key triggers eviction of THE oldest (which is now date 02
-    // because the i=0 key was just re-inserted on the previous call).
-    await fetchCot("2026-02-01");
+    // 51st distinct key triggers eviction of THE oldest (which is now f1
+    // because the f0 key was just re-inserted on the previous call).
+    await cachedFetchStatic("/data/f50.json");
     expect(fetchMock).toHaveBeenCalledTimes(51);
 
-    // Re-fetching the just-evicted oldest (date 02) → cache miss
-    await fetchCot("2026-01-02");
+    // Re-fetching the just-evicted oldest (f1) → cache miss
+    await cachedFetchStatic("/data/f1.json");
     expect(fetchMock).toHaveBeenCalledTimes(52);
 
-    // Re-fetching the most-recently-used (date 01) → still hit
-    await fetchCot("2026-01-01");
+    // Re-fetching the most-recently-used (f0) → still hit
+    await cachedFetchStatic("/data/f0.json");
     expect(fetchMock).toHaveBeenCalledTimes(52);
   });
 });

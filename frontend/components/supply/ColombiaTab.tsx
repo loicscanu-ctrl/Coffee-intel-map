@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import ColombiaExportPanel from "@/components/supply/colombia/ColombiaExportPanel";
+import { DataHealthBar } from "@/components/DataHealthBar";
+import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
@@ -78,6 +79,8 @@ export default function ColombiaTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["colombia_exports"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map(t => (
@@ -118,7 +121,7 @@ export default function ColombiaTab() {
         data.exports?.annual?.length ? (
           <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Colombia Green Coffee Exports" />
         ) : data.exports?.monthly?.length ? (
-          <ColombiaExportPanel exports={data.exports} />
+          <OriginExportPanel exports={data.exports} title="Colombia Green Coffee Exports" barColor="#f97316" />
         ) : (
           <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
             Export data not yet available — pending the next USDA PSD scrape.

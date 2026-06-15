@@ -5,6 +5,8 @@ import {
   Legend, CartesianGrid, ReferenceLine,
 } from "recharts";
 
+import { fmtDateLabel } from "@/lib/formatters";
+
 interface HistoryPoint {
   date:  string;
   price: number;
@@ -39,9 +41,39 @@ const WINDOW_DAYS: Record<Window, number> = {
   "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "2Y": 730,
 };
 
-function fmtDateLabel(d: string): string {
-  const [, m, day] = d.split("-");
-  return `${m}/${day}`;
+// Native unit → metric tonne multiplier, so every origin converts to a single
+// comparable USD/MT figure (1 cwt = 45.359237 kg; 1 saca = 60 kg).
+const UNIT_TO_MT: Record<string, number> = {
+  per_kg:         1000,
+  per_saca_60kg:  1000 / 60,
+  per_cwt:        1000 / 45.359237,
+};
+
+// Daily FX close (units of currency per 1 USD), ascending by date.
+type FxSeries = Record<string, { date: string; close: number }[]>;
+
+// Rate on a given date: the last close on or before it (forward-fill across
+// weekends/holidays / dates past the last FX point). Falls back to the earliest
+// close for dates before the series starts.
+function rateOnDate(hist: { date: string; close: number }[] | undefined, date: string): number | null {
+  if (!hist?.length) return null;
+  let rate: number | null = null;
+  for (const h of hist) {
+    if (h.date <= date) rate = h.close;
+    else break;
+  }
+  return rate ?? hist[0].close;
+}
+
+// Convert a native-currency, native-unit farmgate price to USD/MT using the FX
+// rate for THAT day. Uganda's series is already USD (factor only).
+function toUsdMtOnDate(price: number, unit: string, currency: string, date: string, fx: FxSeries): number | null {
+  const factor = UNIT_TO_MT[unit];
+  if (factor == null) return null;
+  if (currency === "USD") return price * factor;
+  const rate = rateOnDate(fx[currency], date);
+  if (!rate) return null;
+  return (price / rate) * factor;
 }
 
 function fmtNative(price: number, unit: string, currency: string): string {
@@ -61,12 +93,32 @@ export default function OriginPricesPanel() {
   const [data,    setData]    = useState<OriginPricesData | null>(null);
   const [error,   setError]   = useState(false);
   const [window,  setWindow]  = useState<Window>("3M");
+  const [usd,     setUsd]     = useState(false);
+  const [fx,      setFx]      = useState<FxSeries>({});
 
   useEffect(() => {
     fetch("/data/origin_prices_history.json")
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
+    // Daily FX history (one close per day per pair) for the USD-equivalent
+    // toggle, so each historical local price converts at its own day's rate.
+    // Best-effort: on failure the toggle simply has no rates and falls back to
+    // native display.
+    fetch("/data/fx_history.json")
+      .then(r => r.ok ? r.json() : null)
+      .then((fh: { pairs?: Record<string, { history?: { date: string; close: number }[] }> } | null) => {
+        if (!fh?.pairs) return;
+        const series: FxSeries = {};
+        for (const [pair, v] of Object.entries(fh.pairs)) {
+          const m = pair.match(/^([A-Z]{3})=X$/);   // "VND=X" → "VND"
+          if (m && v?.history?.length) {
+            series[m[1]] = [...v.history].sort((a, b) => a.date.localeCompare(b.date));
+          }
+        }
+        setFx(series);
+      })
+      .catch(() => { /* native-only */ });
   }, []);
 
   // Only render origins that actually have a price history — otherwise an
@@ -95,25 +147,34 @@ export default function OriginPricesPanel() {
     const dates = Array.from(dateSet).sort();
     if (dates.length === 0) return [];
 
+    // Per-point chart value: native price, or USD/MT converted at THAT day's FX
+    // (so a moving exchange rate shows up in the rebased USD trend).
+    const valueOf = (k: OriginKey, h: HistoryPoint): number | null => {
+      if (h.price == null) return null;
+      if (!usd) return h.price;
+      const o = data.origins[k];
+      return o ? toUsdMtOnDate(h.price, o.unit, o.currency, h.date, fx) : null;
+    };
+
     // Rebase each series to 100 at first available point in window
     const base: Record<string, number | null> = {};
     for (const k of presentOrigins) {
-      const hist = data.origins[k]?.history.filter(h => h.date >= cutoffIso);
-      const first = hist?.find(h => h.price > 0)?.price ?? null;
+      const hist  = data.origins[k]?.history.filter(h => h.date >= cutoffIso) ?? [];
+      const first = hist.map(h => valueOf(k, h)).find(v => v != null && v > 0) ?? null;
       base[k] = first;
     }
 
     return dates.map(d => {
       const row: Record<string, number | string | null> = { date: d, label: fmtDateLabel(d) };
       for (const k of presentOrigins) {
-        const hist = data.origins[k]?.history;
-        const point = hist?.find(h => h.date === d);
+        const point = data.origins[k]?.history.find(h => h.date === d);
+        const v = point ? valueOf(k, point) : null;
         const b = base[k];
-        row[k] = point?.price != null && b ? (point.price / b) * 100 : null;
+        row[k] = v != null && b ? (v / b) * 100 : null;
       }
       return row;
     });
-  }, [data, window, presentOrigins]);
+  }, [data, window, presentOrigins, usd, fx]);
 
   const stats = useMemo(() => {
     if (!data) return [] as { key: OriginKey; name: string; latest: HistoryPoint | null; pct: number | null; color: string; unit: string; currency: string; source: string; count: number }[];
@@ -128,16 +189,21 @@ export default function OriginPricesPanel() {
         return { key: k, name: k, latest: null, pct: null, color: "#64748b", unit: "", currency: "", source: "", count: 0 };
       }
       const inWindow = o.history.filter(h => h.date >= cutoffIso);
-      const first = inWindow.find(h => h.price > 0)?.price ?? null;
-      const last  = inWindow.length ? inWindow[inWindow.length - 1] : null;
-      const pct   = first && last?.price ? ((last.price - first) / first) * 100 : null;
+      const firstPt  = inWindow.find(h => h.price > 0) ?? null;
+      const last     = inWindow.length ? inWindow[inWindow.length - 1] : null;
+      // % move in the active denomination: USD (per-day FX) when toggled, else
+      // native. Keeps the headline % consistent with the displayed price.
+      const conv = (h: HistoryPoint) => usd ? toUsdMtOnDate(h.price, o.unit, o.currency, h.date, fx) : h.price;
+      const fv = firstPt ? conv(firstPt) : null;
+      const lv = last ? conv(last) : null;
+      const pct = fv && lv ? ((lv - fv) / fv) * 100 : null;
       return {
         key: k, name: o.name, latest: last, pct,
         color: o.color, unit: o.unit, currency: o.currency,
         source: o.source, count: inWindow.length,
       };
     });
-  }, [data, window, presentOrigins]);
+  }, [data, window, presentOrigins, usd, fx]);
 
   if (error) {
     return (
@@ -163,16 +229,30 @@ export default function OriginPricesPanel() {
             Last update {new Date(data.scraped_at).toISOString().slice(0,10)}
           </p>
         </div>
-        <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
-          {(["1M","3M","6M","1Y","2Y"] as Window[]).map(w => (
-            <button
-              key={w}
-              onClick={() => setWindow(w)}
-              className={`px-2.5 py-1.5 transition ${window === w ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-700"}`}
-            >
-              {w}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          {/* Native ⇄ USD/MT toggle */}
+          <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
+            {([["native","Native"],["usd","USD/MT"]] as const).map(([mode, label]) => (
+              <button
+                key={mode}
+                onClick={() => setUsd(mode === "usd")}
+                className={`px-2.5 py-1.5 transition ${(usd ? "usd" : "native") === mode ? "bg-emerald-600 text-white" : "text-slate-300 hover:bg-slate-700"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
+            {(["1M","3M","6M","1Y","2Y"] as Window[]).map(w => (
+              <button
+                key={w}
+                onClick={() => setWindow(w)}
+                className={`px-2.5 py-1.5 transition ${window === w ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-700"}`}
+              >
+                {w}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -190,7 +270,15 @@ export default function OriginPricesPanel() {
               </div>
               <div className="flex items-baseline justify-between">
                 <div className="text-base font-bold font-mono text-slate-100">
-                  {s.latest ? fmtNative(s.latest.price, s.unit, s.currency) : "—"}
+                  {(() => {
+                    if (!s.latest) return "—";
+                    if (usd) {
+                      const v = toUsdMtOnDate(s.latest.price, s.unit, s.currency, s.latest.date, fx);
+                      // Fall back to native if FX/unit conversion isn't available.
+                      if (v != null) return `$${Math.round(v).toLocaleString()}/MT`;
+                    }
+                    return fmtNative(s.latest.price, s.unit, s.currency);
+                  })()}
                 </div>
                 <div className={`text-sm font-bold font-mono ${cls}`}>
                   {s.pct == null ? "—" : `${s.pct >= 0 ? "+" : ""}${s.pct.toFixed(1)}%`}
@@ -206,7 +294,7 @@ export default function OriginPricesPanel() {
 
       <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
-          Rebased to 100 at start of {window} · local currency, native unit
+          Rebased to 100 at start of {window} · {usd ? "USD/MT, per-day FX" : "local currency, native unit"}
         </div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">

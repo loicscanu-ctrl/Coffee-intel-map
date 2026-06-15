@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import EthiopiaExportPanel from "@/components/supply/ethiopia/EthiopiaExportPanel";
 import EthiopiaFarmerEconomics from "@/components/supply/ethiopia/EthiopiaFarmerEconomics";
 import EthiopiaSupplyDemand from "@/components/supply/ethiopia/EthiopiaSupplyDemand";
@@ -93,6 +94,8 @@ export default function EthiopiaTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["ethiopia_exports"]} />
+
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {SUB_TABS.map(t => (
           <button

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T23:52:00+00:00",
+  "generated_at": "2026-06-13T23:57:36+00:00",
   "country_iso3": "BRA",
   "year_window": [
     2023,
@@ -9,23 +9,15 @@
     "Sul de Minas": {
       "province_id": 13,
       "noaa_name": "Minas Gerais",
-      "weeks_in_window": 176,
+      "weeks_in_window": 178,
       "vhi_latest": {
         "year": 2026,
-        "week": 21,
-        "iso_week": "2026-W21",
-        "vhi": 58.88,
+        "week": 23,
+        "iso_week": "2026-W23",
+        "vhi": 57.79,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W10",
-          "vhi": 56.83
-        },
-        {
-          "iso_week": "2026-W11",
-          "vhi": 57.67
-        },
         {
           "iso_week": "2026-W12",
           "vhi": 56.75
@@ -44,50 +36,50 @@
         },
         {
           "iso_week": "2026-W16",
-          "vhi": 54.05
+          "vhi": 52.84
         },
         {
           "iso_week": "2026-W17",
-          "vhi": 54.26
+          "vhi": 51.59
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 55.42
+          "vhi": 51.37
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 56.28
+          "vhi": 50.96
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 57.91
+          "vhi": 52.19
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 58.88
+          "vhi": 53.11
+        },
+        {
+          "iso_week": "2026-W22",
+          "vhi": 54.56
+        },
+        {
+          "iso_week": "2026-W23",
+          "vhi": 57.79
         }
       ]
     },
     "Cerrado": {
       "province_id": 13,
       "noaa_name": "Minas Gerais",
-      "weeks_in_window": 176,
+      "weeks_in_window": 178,
       "vhi_latest": {
         "year": 2026,
-        "week": 21,
-        "iso_week": "2026-W21",
-        "vhi": 58.88,
+        "week": 23,
+        "iso_week": "2026-W23",
+        "vhi": 57.79,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W10",
-          "vhi": 56.83
-        },
-        {
-          "iso_week": "2026-W11",
-          "vhi": 57.67
-        },
         {
           "iso_week": "2026-W12",
           "vhi": 56.75
@@ -106,50 +98,50 @@
         },
         {
           "iso_week": "2026-W16",
-          "vhi": 54.05
+          "vhi": 52.84
         },
         {
           "iso_week": "2026-W17",
-          "vhi": 54.26
+          "vhi": 51.59
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 55.42
+          "vhi": 51.37
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 56.28
+          "vhi": 50.96
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 57.91
+          "vhi": 52.19
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 58.88
+          "vhi": 53.11
+        },
+        {
+          "iso_week": "2026-W22",
+          "vhi": 54.56
+        },
+        {
+          "iso_week": "2026-W23",
+          "vhi": 57.79
         }
       ]
     },
     "Espírito Santo": {
       "province_id": 8,
       "noaa_name": "Espirito Santo",
-      "weeks_in_window": 176,
+      "weeks_in_window": 178,
       "vhi_latest": {
         "year": 2026,
-        "week": 21,
-        "iso_week": "2026-W21",
-        "vhi": 59.46,
+        "week": 23,
+        "iso_week": "2026-W23",
+        "vhi": 54.89,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W10",
-          "vhi": 60.6
-        },
-        {
-          "iso_week": "2026-W11",
-          "vhi": 61.96
-        },
         {
           "iso_week": "2026-W12",
           "vhi": 60.79
@@ -168,50 +160,50 @@
         },
         {
           "iso_week": "2026-W16",
-          "vhi": 58.42
+          "vhi": 57.57
         },
         {
           "iso_week": "2026-W17",
-          "vhi": 57.41
+          "vhi": 54.53
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 57.27
+          "vhi": 52.99
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 57.92
+          "vhi": 52.14
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 59.4
+          "vhi": 53.32
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 59.46
+          "vhi": 53.48
+        },
+        {
+          "iso_week": "2026-W22",
+          "vhi": 53.8
+        },
+        {
+          "iso_week": "2026-W23",
+          "vhi": 54.89
         }
       ]
     },
     "Paraná": {
       "province_id": 16,
       "noaa_name": "Parana",
-      "weeks_in_window": 176,
+      "weeks_in_window": 178,
       "vhi_latest": {
         "year": 2026,
-        "week": 21,
-        "iso_week": "2026-W21",
-        "vhi": 50.73,
+        "week": 23,
+        "iso_week": "2026-W23",
+        "vhi": 54.38,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W10",
-          "vhi": 38.8
-        },
-        {
-          "iso_week": "2026-W11",
-          "vhi": 38.55
-        },
         {
           "iso_week": "2026-W12",
           "vhi": 40.24
@@ -230,7 +222,7 @@
         },
         {
           "iso_week": "2026-W16",
-          "vhi": 46.45
+          "vhi": 46.48
         },
         {
           "iso_week": "2026-W17",
@@ -238,19 +230,27 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 50.51
+          "vhi": 50.6
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 51.98
+          "vhi": 52.35
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 52.03
+          "vhi": 53.0
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 50.73
+          "vhi": 52.13
+        },
+        {
+          "iso_week": "2026-W22",
+          "vhi": 54.13
+        },
+        {
+          "iso_week": "2026-W23",
+          "vhi": 54.38
         }
       ]
     }

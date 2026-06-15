@@ -133,7 +133,7 @@ export default function FertilizerInputsPanel() {
             <h3 className="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">
               Historical prices (USD/MT)
             </h3>
-            <span className="text-[9px] text-slate-600 font-mono">
+            <span className="text-[9px] text-slate-500 font-mono">
               {chartData[0].month} → {chartData[chartData.length - 1].month}
             </span>
           </div>

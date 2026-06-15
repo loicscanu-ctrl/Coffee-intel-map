@@ -9,8 +9,13 @@ import type { Formatter, ValueType, NameType } from "recharts/types/component/De
 import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
-import { fmtBags, shiftMonth, shortMonthLabel } from "./helpers";
-import type { DailyData } from "./types";
+import { fmtBags, normalizeSources, shiftMonth, shortMonthLabel } from "./helpers";
+import type { CecafeSourceKey, DailyData } from "./types";
+
+const SOURCE_LABEL: Record<CecafeSourceKey, { title: string; sub: string }> = {
+  embarques:    { title: "Embarques",    sub: "physical port loadings" },
+  certificados: { title: "Certificados", sub: "paperwork issued" },
+};
 
 function DailyRegChart({
   title, monthsData, currentMonth, soluvelData,
@@ -132,6 +137,9 @@ function DailyRegChart({
 export default function DailyRegistrationSection() {
   const [data, setData] = useState<DailyData | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  // Default to Embarques (physical loadings — the trade truth). Falls back
+  // to Certificados below when only legacy data is present.
+  const [source, setSource] = useState<CecafeSourceKey>("embarques");
 
   useEffect(() => {
     fetch("/data/cecafe_daily.json")
@@ -141,14 +149,25 @@ export default function DailyRegistrationSection() {
   }, []);
 
   if (!data) return null;
+  const sources = normalizeSources(data);
 
-  // Only render if we have actual daily data for at least one month
-  const hasData = Object.keys(data.arabica).length > 0 || Object.keys(data.conillon).length > 0;
-  if (!hasData) return null;
+  // Which sources actually have any data? Drives the toggle's availability.
+  const sourceHasData: Record<CecafeSourceKey, boolean> = {
+    embarques:    Object.keys(sources.embarques.arabica).length    > 0 || Object.keys(sources.embarques.conillon).length    > 0,
+    certificados: Object.keys(sources.certificados.arabica).length > 0 || Object.keys(sources.certificados.conillon).length > 0,
+  };
+  if (!sourceHasData.embarques && !sourceHasData.certificados) return null;
 
-  // Months with daily data, newest-first; the latest is the live one.
+  // If the user-selected source has no data yet (e.g. pre-backfill), auto-pick
+  // the one that does. Otherwise honor the toggle.
+  const effectiveSource: CecafeSourceKey = sourceHasData[source]
+    ? source
+    : (sourceHasData.embarques ? "embarques" : "certificados");
+  const active = sources[effectiveSource];
+
+  // Months with daily data for the ACTIVE source, newest-first.
   const availableMonths = Array.from(
-    new Set([...Object.keys(data.arabica), ...Object.keys(data.conillon)]),
+    new Set([...Object.keys(active.arabica), ...Object.keys(active.conillon)]),
   ).sort().reverse();
   const latestMonth = data.updated.slice(0, 7);
   const currentMonth =
@@ -159,12 +178,45 @@ export default function DailyRegistrationSection() {
   const idx = availableMonths.indexOf(currentMonth);
   const hasOlder = idx < availableMonths.length - 1;
   const hasNewer = idx > 0;
+  const sourceLabel = SOURCE_LABEL[effectiveSource];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="text-sm font-semibold text-slate-200">Brazil — Daily Export Registration</div>
-        <div className="flex items-center gap-1.5">
+        <div>
+          <div className="text-sm font-semibold text-slate-200">Brazil — Daily Export Registration</div>
+          <div className="text-[10px] text-slate-500">
+            Source: <span className="text-slate-300">{sourceLabel.title}</span> · {sourceLabel.sub}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Source toggle: Embarques vs Certificados.
+              A source with no data yet is rendered disabled so the user
+              sees both options but can't switch to an empty series. */}
+          <div className="flex bg-slate-900 border border-slate-700 rounded overflow-hidden mr-2">
+            {(["embarques", "certificados"] as const).map((k) => {
+              const enabled = sourceHasData[k];
+              const isOn = effectiveSource === k;
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => enabled && setSource(k)}
+                  disabled={!enabled}
+                  title={enabled ? SOURCE_LABEL[k].sub : `${SOURCE_LABEL[k].title} — no data yet`}
+                  className={`px-2.5 py-1 text-[11px] leading-none transition-colors ${
+                    isOn
+                      ? "bg-slate-700 text-slate-100"
+                      : enabled
+                        ? "text-slate-400 hover:bg-slate-800"
+                        : "text-slate-600 cursor-not-allowed"
+                  }`}
+                >
+                  {SOURCE_LABEL[k].title}
+                </button>
+              );
+            })}
+          </div>
           <button
             type="button"
             onClick={() => setSelectedMonth(availableMonths[idx + 1])}
@@ -193,17 +245,17 @@ export default function DailyRegistrationSection() {
           >›</button>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <DailyRegChart
-          title="Arabica Export Registration (Daily, Bags)"
-          monthsData={data.arabica}
+          title={`Arabica · ${sourceLabel.title} (Daily, Bags)`}
+          monthsData={active.arabica}
           currentMonth={currentMonth}
         />
         <DailyRegChart
-          title="Conilon Export Registration (Daily, Bags)"
-          monthsData={data.conillon}
+          title={`Conilon · ${sourceLabel.title} (Daily, Bags)`}
+          monthsData={active.conillon}
           currentMonth={currentMonth}
-          soluvelData={data.soluvel}
+          soluvelData={active.soluvel}
         />
       </div>
     </div>

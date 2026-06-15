@@ -1,4 +1,5 @@
 import React from "react";
+import { fmtAttr } from "@/lib/formatters";
 import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 
 const SECTOR_ORDER_ATTR = ["energy", "metals", "grains", "meats", "softs", "micros"] as const;
@@ -7,10 +8,6 @@ const SECTOR_LABELS_ATTR: Record<string, string> = {
   meats: "Meats", softs: "Softs", micros: "Micros",
 };
 
-function fmtAttr(n: number | null): string {
-  if (n == null) return "—";
-  return (n >= 0 ? "+" : "") + n.toFixed(2) + "B";
-}
 
 function attrColor(n: number | null): string {
   if (n == null) return "#6b7280";

@@ -2,14 +2,39 @@ name: "1.1 – Daily News Scraper"
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 01:00 UTC daily
+    # 01:07 UTC daily, with a 02:00 UTC safety-net tick. Off the :00 mark
+    # to dodge GH cron skip — empirically observed 4-5h delays on `0 1 * *
+    # *` (runs landing ~05:30 UTC) AND throttling even at :07 (2026-06-09
+    # schedule landed at 05:14 UTC, 4h late; 2026-06-10 skipped entirely).
+    #
+    # Two cron lines act as redundancy: if 01:07 is throttled the 02:00
+    # tick still fires before export-and-publish at 02:41 UTC, so the day
+    # gets fresh data into the published JSON. concurrency below queues
+    # rather than cancels if both fire, so the second is a no-op when the
+    # first ran on time.
+    - cron: '7 1 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch:
-  # Run automatically when scraper source code lands on main, so a fix
-  # gets verified end-to-end without waiting for the next cron tick.
-  push:
-    branches: [main]
-    paths:
-      - 'backend/scraper/**'
+  # Note: previously also triggered on `push` to main when backend/scraper/**
+  # changed, so a scraper fix would auto-verify end-to-end. Removed 2026-06-12
+  # because every overnight PR merge kicked off the full daily chain
+  # (scraper-daily → export-and-publish → morning-brief → vercel-redeploy →
+  # ICE stocks) DURING the cron-job.org 01:07 UTC dispatch window, producing
+  # duplicate cascades. On 2026-06-12 it actively broke the cascade: the
+  # workflow_run payload from the push-triggered scraper arrived with
+  # `conclusion: null` because the upstream was still finalising, so every
+  # downstream job's `if: == 'success'` gate evaluated false and the entire
+  # 01:16 chain was `skipped`. To verify a scraper fix end-to-end, hit
+  # "Run workflow" on the Actions tab manually.
+
+# Serialise across all triggers so the 01:07 + 02:00 cron pair and manual
+# dispatches never race on the DB. cancel-in-progress: false turns the 02:00
+# backup cron into a no-op queued behind the 01:07 run when both fire — vs
+# cancel-in-progress: true which would kill the running primary and restart
+# from zero, wasting its progress.
+concurrency:
+  group: scraper-daily
+  cancel-in-progress: false
 
 jobs:
   scrape:
@@ -21,26 +46,77 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Idempotency guard — skip 02:00 backup if 01:07 already succeeded
+        id: guard
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:     ${{ github.repository }}
+          THIS_RUN: ${{ github.run_id }}
+          EVENT:    ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          # Non-schedule triggers (push, workflow_dispatch) always run —
+          # they exist precisely to refresh data outside the cron cycle.
+          # The primary daily trigger is an EXTERNAL cron service hitting
+          # workflow_dispatch at 01:07 UTC sharp, because GH cron on this
+          # repo fires 4-5h late systematically (verified 2026-06-10).
+          if [ "$EVENT" != "schedule" ]; then
+            echo "Non-schedule trigger ($EVENT) — proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # BOTH crons (01:07 + 02:00) are now fallbacks behind the external
+          # dispatch: skip if today already saw a successful run, so the
+          # hours-late GH ticks don't re-run a chain the external trigger
+          # already completed. If the external service ever fails, the GH
+          # cron finds no success today and self-heals (hours late, but runs).
+          today=$(date -u +%Y-%m-%d)
+          export today THIS_RUN
+          prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/actions/workflows/scraper-daily.yml/runs?status=success&per_page=30" \
+            | python3 -c "
+          import json, sys, os
+          d = json.load(sys.stdin)
+          today    = os.environ['today']
+          this_run = os.environ['THIS_RUN']
+          for r in d.get('workflow_runs', []):
+              if str(r['id']) == this_run:
+                  continue
+              if r.get('updated_at', '').startswith(today):
+                  print(r['id']); break
+          ")
+          if [ -n "$prior" ]; then
+            echo "Today already had a successful run ($prior) — skipping backup."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No successful run today yet — backup proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.guard.outputs.skip != 'true'
         with:
           python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install Python dependencies
+        if: steps.guard.outputs.skip != 'true'
         working-directory: backend
         run: pip install -r scraper/requirements.txt pandas requests yfinance python-dotenv openpyxl
 
       - name: Cache Playwright browser
+        if: steps.guard.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}
 
       - name: Install Playwright browser
+        if: steps.guard.outputs.skip != 'true'
         run: playwright install chromium --with-deps
 
       - name: Install Patchright (Python + Chromium)
+        if: steps.guard.outputs.skip != 'true'
         # Patchright is a Playwright fork that patches the runtime fingerprint
         # leaks Cloudflare uses to detect headless browsers. Used by vietnam.py
         # to get past giacaphe.com's CF JS challenge after stealth-rejection
@@ -64,6 +140,7 @@ jobs:
           python -m patchright install chromium
 
       - name: Run daily scraper (3 attempts)
+        if: steps.guard.outputs.skip != 'true'
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

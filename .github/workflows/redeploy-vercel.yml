@@ -9,23 +9,100 @@ name: "1.12 – Daily Publish (Vercel redeploy)"
 # out CI IPs), which made deploys hostage to the least-reliable source. Decoupled
 # here so the site publishes every day regardless of any single scraper.
 #
-# Schedule: 10:00 UTC — after the last daily data job (1.7 Cecafe, 09:00, plus
-# its ~25-min retry budget), so this deploy captures the full day's committed
-# data. workflow_dispatch gives a manual "deploy now" button in the Actions tab.
+# Schedule — two deploys a day:
+#   03:41 UTC  the MORNING deploy. The overnight chain ends with export-and-
+#              publish committing ~02:55 and ICE certified stocks ~03:05; this
+#              deploy puts all of it on production before the 04:00 UTC
+#              office-arrival target. Off the :00/:30 marks to dodge the GH
+#              cron skip documented across this repo's workflows.
+#   10:00 UTC  the CATCH-UP deploy — picks up the late, source-constrained
+#              jobs (VN water levels 10:00 fetch misses it and rides the next
+#              morning's deploy; weekly spot-coffee 06:00 Mon and port
+#              activity 06:17 Wed land here).
+# workflow_dispatch gives a manual "deploy now" button in the Actions tab.
 #
 # No-op until the VERCEL_DEPLOY_HOOK repo secret is set.
 
 on:
   schedule:
+    # NOTE: GH cron on this repo fires 4-5h LATE systematically (verified
+    # 2026-06-10). These crons are FALLBACKS — the primary trigger is the
+    # workflow_run chain below, which fires within minutes of the data
+    # actually landing.
+    - cron: '41 3 * * *'
     - cron: '0 10 * * *'
   workflow_dispatch:
+  workflow_run:
+    # Deploy as soon as fresh data is committed: export-and-publish is the
+    # main daily publisher; ICE certified stocks commits its own JSONs
+    # outside the export. Each successful upstream completion triggers a
+    # deploy; the concurrency group serialises bursts and Vercel dedups
+    # identical builds, so chained deploys are cheap.
+    workflows: ["1.4 – Export and Publish Static JSON", "1.13 – ICE Certified Stocks (arabica + robusta)"]
+    types: [completed]
 
 concurrency:
   group: vercel-redeploy
   cancel-in-progress: false
 
 jobs:
+  # Lightweight dedup gate — no checkout, no setup. Two upstream workflows
+  # (Export and Publish + ICE Certified Stocks) frequently complete within
+  # the same minute, which previously fired this workflow twice for the
+  # same head SHA. Vercel dedups identical deploys but we still burn runner
+  # minutes; this gate skips the second fire cheaply (~3-5 s) by checking
+  # GH API for a prior successful or in-progress run on the same SHA.
+  guard:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      skip: ${{ steps.dedupe.outputs.skip }}
+    steps:
+      - name: Skip if a recent run already deployed this SHA
+        id: dedupe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:     ${{ github.repository }}
+          THIS_RUN: ${{ github.run_id }}
+          THIS_SHA: ${{ github.sha }}
+          EVENT:    ${{ github.event_name }}
+        run: |
+          # Manual dispatch always proceeds — operators may want to re-deploy
+          # the same SHA after a Vercel-side issue. The schedule branch also
+          # bypasses (the scheduled redeploys are a fallback for late data
+          # commits and the SHA may match a recent deploy by coincidence).
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$EVENT" = "schedule" ]; then
+            echo "$EVENT — bypassing dedup."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/actions/workflows/redeploy-vercel.yml/runs?per_page=20" \
+            | python3 -c "
+          import json, sys, os
+          d = json.load(sys.stdin)
+          this_run = os.environ['THIS_RUN']
+          this_sha = os.environ['THIS_SHA']
+          for r in d.get('workflow_runs', []):
+              if str(r['id']) == this_run:
+                  continue
+              if r.get('head_sha') != this_sha:
+                  continue
+              if r.get('conclusion') == 'success' or r.get('status') == 'in_progress':
+                  print(r['id']); break
+          ")
+          if [ -n "$prior" ]; then
+            echo "Redeploy already running/done for sha $THIS_SHA via run $prior — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No prior redeploy for sha $THIS_SHA. Proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   redeploy:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

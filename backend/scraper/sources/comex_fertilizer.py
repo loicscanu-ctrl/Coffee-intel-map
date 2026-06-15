@@ -131,6 +131,10 @@ def _stream_chapter31_rows(year: int) -> list[dict]:
 
     url = MDIC_URL.format(year=year)
     try:
+        # comexstat.mdic.gov.br ships an intermediate cert that GH runners
+        # don't have in their default truststore; verify=False here is a
+        # workaround. The host is a non-auth public bulk download — the
+        # downstream parser sanity-checks rows before upserting.
         resp = requests.get(url, stream=True, timeout=120, verify=False)
         resp.raise_for_status()
     except Exception as e:

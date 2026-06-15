@@ -6,6 +6,7 @@ import {
   LineChart, CartesianGrid,
 } from "recharts";
 import VietnamFertilizerContext from "@/components/supply/VietnamFertilizerContext";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -30,7 +31,6 @@ interface OriginCountry { code: string; name: string; kg_kt: number; share: numb
 interface OriginEntry { countries: OriginCountry[]; states: { name: string; kg_kt: number }[]; }
 type ImportOrigins = Record<string, Record<string, OriginEntry>>;
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const FERT_TYPES = ["urea_kt","kcl_kt","map_kt","dap_kt","an_kt","as_kt","superp_kt"] as const;
 type FertType = typeof FERT_TYPES[number];
@@ -184,7 +184,7 @@ function BrazilImportChart({ monthly }: { monthly: BrazilImportMonth[] }) {
         return row;
       });
     }
-  }, [monthly, view, byKey, sortedYears, lastMonthIdx]);
+  }, [view, byKey, sortedYears, lastMonthIdx]);
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3">

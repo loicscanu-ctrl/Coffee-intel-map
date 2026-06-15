@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
@@ -10,14 +10,35 @@ import {
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
 import type { SeriesKey, VolumeSeries } from "./types";
+import {
+  computeBalanceSheet, formatBalanceSheetTooltip, selectProjectionRows,
+  usdaYearForCropYear, type BalanceSheetProjection, type PsdRow,
+} from "@/lib/balanceSheetProjection";
 
-export default function AnnualTrendChart({ series, filteredSeries, typeFilter }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null }) {
+export default function AnnualTrendChart({ series, filteredSeries, typeFilter, isReportMode = false }: { series: VolumeSeries[]; filteredSeries?: VolumeSeries[]; typeFilter?: SeriesKey | null; isReportMode?: boolean }) {
   const [since, setSince] = useState(2010);
+  const [psdRows, setPsdRows] = useState<PsdRow[] | null>(null);
   const isFiltered = !!filteredSeries;
   const activeSeries = filteredSeries ?? series;
   const activeKey: SeriesKey = typeFilter ?? "total";
 
-  const annualData = useMemo(() => {
+  // demand_stocks.json → producers.brazil.annual (incl. GAIN-merged forecast
+  // row when available) drives the balance-sheet projection on the latest
+  // incomplete crop year.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/data/demand_stocks.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (cancelled) return;
+        const a = d?.producers?.brazil?.annual ?? null;
+        setPsdRows(Array.isArray(a) ? a : null);
+      })
+      .catch(() => { /* silent */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  const { annualData, projection } = useMemo(() => {
     const byCrop: Record<string, { arabica: number; conillon: number; soluvel: number; torrado: number; total: number; months: number }> = {};
     activeSeries.forEach(r => {
       const key = cropYearKey(r.date);
@@ -31,24 +52,26 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
     });
     const sortedKeys = Object.keys(byCrop).sort();
     const latestKey  = sortedKeys[sortedKeys.length - 1];
-    const prevKey    = sortedKeys.length >= 2 ? sortedKeys[sortedKeys.length - 2] : null;
     const latestData = byCrop[latestKey];
-    const prevData   = prevKey ? byCrop[prevKey] : null;
 
-    // Projection gap for incomplete current crop (skip if destination or type filter active)
+    // Projection: skipped when a type/country filter narrows the view (the
+    // balance-sheet identity assumes total exports, not per-type slices).
     const skipProj  = isFiltered || !!typeFilter;
-    let projGap = 0;
-    if (!skipProj && prevData && latestData.months < 12) {
-      const ctdMonths = new Set(
-        series.filter(r => cropYearKey(r.date) === latestKey).map(r => parseInt(r.date.split("-")[1]))
-      );
-      const prevCTD = series
-        .filter(r => cropYearKey(r.date) === prevKey && ctdMonths.has(parseInt(r.date.split("-")[1])))
-        .reduce((s, r) => s + r.arabica + r.conillon + r.soluvel + r.torrado, 0);
-      const currCTD = latestData.arabica + latestData.conillon + latestData.soluvel + latestData.torrado;
-      if (prevCTD > 0) {
-        const prevFull = prevData.arabica + prevData.conillon + prevData.soluvel + prevData.torrado;
-        projGap = Math.max(0, prevFull * (currCTD / prevCTD) - currCTD);
+    let proj: BalanceSheetProjection | null = null;
+    let projGapBags = 0;
+    if (!skipProj && latestData && latestData.months < 12) {
+      const inYear = usdaYearForCropYear(latestKey);
+      const { forecastRow, latestRow } = selectProjectionRows(psdRows, inYear);
+      // Already-exported in kt (bags-to-kt: ×60/1e6). The chart's bars are
+      // already in kt, so we keep the projection in the same unit.
+      const alreadyKt = bagsToKT(latestData.total);
+      const result = computeBalanceSheet(forecastRow, latestRow, alreadyKt);
+      if (result) {
+        proj = result;
+        // Convert the kt gap back to bags for the per-type stacked bar
+        // alignment (the downstream `row[..]` cells are populated from
+        // `bagsToKT(...)` on integer-bag counts).
+        projGapBags = result.projected_gap_kt * 1e6 / 60;
       }
     }
 
@@ -58,7 +81,7 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
       ? (TYPE_FILTER_OPTS.find(t => t.key === typeFilter)?.label ?? "Selected")
       : "Total";
 
-    return sortedKeys
+    const rows = sortedKeys
       .map(k => {
         const d = byCrop[k];
         const isIncomplete = k === latestKey && d.months < 12;
@@ -66,7 +89,7 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
           year: k,
           startYear: parseInt(k.split("/")[0]),
           domestic:  (!isFiltered && !typeFilter) ? (BRAZIL_DOMESTIC_KT[k] ?? null) : null,
-          proj_gap:  isIncomplete ? Math.round(bagsToKT(projGap) * 10) / 10 : 0,
+          proj_gap:  isIncomplete ? Math.round(bagsToKT(projGapBags) * 10) / 10 : 0,
         };
         if (showSingle) {
           row[typeLabel] = bagsToKT(d[activeKey]);
@@ -79,7 +102,8 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
         return row;
       })
       .filter(r => (r.startYear as number) >= since);
-  }, [activeSeries, series, since, isFiltered, typeFilter, activeKey]);
+    return { annualData: rows, projection: proj };
+  }, [activeSeries, series, since, isFiltered, typeFilter, activeKey, psdRows]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -88,16 +112,28 @@ export default function AnnualTrendChart({ series, filteredSeries, typeFilter }:
           <div className="text-sm font-semibold text-slate-200">Annual Export by Coffee Type — Crop Year (Apr–Mar)</div>
           <div className="text-[10px] text-slate-500">
             kt · {isFiltered ? "Total exports for selected origin" : "incl. domestic consumption (USDA est.) · † projected full year"}
+            {projection && (
+              <span className="ml-1 italic" title={formatBalanceSheetTooltip(projection)}>
+                · expected total {Math.round(projection.expected_total_kt).toLocaleString()} kt
+                {projection.psd_year && (
+                  <span className="text-slate-600 not-italic">
+                    {" "}(USDA {projection.psd_year}{projection.mode === "proxy" ? " proxy" : ""})
+                  </span>
+                )}
+              </span>
+            )}
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2000, 2010, 2015].map(y => (
-            <button key={y} onClick={() => setSince(y)}
-              className={`text-[10px] px-2 py-0.5 rounded ${since === y ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {y}+
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2000, 2010, 2015].map(y => (
+              <button key={y} onClick={() => setSince(y)}
+                className={`text-[10px] px-2 py-0.5 rounded ${since === y ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {y}+
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart data={annualData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }}>

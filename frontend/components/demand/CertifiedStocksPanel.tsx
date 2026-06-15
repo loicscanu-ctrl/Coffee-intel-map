@@ -1,7 +1,10 @@
 "use client";
 import { Fragment, useEffect, useMemo, useState } from "react";
-import CertifiedStocksSystemFlow from "./CertifiedStocksSystemFlow";
+import CertifiedStocksSystemFlow, {
+  flowAnchor, flowDateBounds, flowStartOptions, flowDateISO, parseFlowISO, FLOW_START_DEFAULT,
+} from "./CertifiedStocksSystemFlow";
 import CertifiedStocksFreshness from "./CertifiedStocksFreshness";
+import PinToReport from "@/components/report/PinToReport";
 
 // ── Data shapes (mirror backend/scraper/sources/ice_certified_stocks/orchestrate.py) ─
 
@@ -36,6 +39,10 @@ interface ArabicaSnap {
   stoppers_today?:       Array<{ port: string; stopper: string; value: number }>;
   issued_total_today?:   number;
   received_total_today?: number;
+  // Per-origin grading breakdown for the day (passed / failed bags), each
+  // split by port. Drives the recent-activity feed.
+  passed_by_origin?: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
+  failed_by_origin?: Record<string, { by_port: Record<string, number>; group: string; total: number }>;
 }
 interface MatrixSection {
   ports: string[];
@@ -143,19 +150,26 @@ interface RobustaJson {
     // cohort-DNA pipeline wired in.
     implied_outflow?: Array<{ month_end: string }>;
   };
+  // Latest per-port origin composition (origin → tenderable / class34 lot
+  // counts). Used to imply the origin behind a port's decertification.
+  port_origin_history?: Record<string, Record<string, { tenderable?: number; class34?: number }>>;
 }
 
 // ── Unit conversion (raw stored in native units: arabica=bags, robusta=lots) ──
 
 type Unit = "bags" | "tonnes" | "lots";
 const KG_PER_BAG = 60;
+// Robusta (RC): 1 lot = 10 MT = 166.67 bags. Arabica (KC): 1 lot = 37,500 lb
+// = 17.009 MT ≈ 283.49 bags. Each market converts with its own lot size.
 const TONNES_PER_LOT = 10;
-const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67
+const BAGS_PER_LOT = (TONNES_PER_LOT * 1000) / KG_PER_BAG;   // 166.67 (RC)
+const TONNES_PER_LOT_KC = (37_500 * 0.45359237) / 1000;     // 17.009
+const BAGS_PER_LOT_KC = (TONNES_PER_LOT_KC * 1000) / KG_PER_BAG;  // ≈ 283.49
 
 function fromBags(bags: number, u: Unit): number {
   if (u === "bags")   return bags;
   if (u === "tonnes") return (bags * KG_PER_BAG) / 1000;
-  return bags / BAGS_PER_LOT;
+  return bags / BAGS_PER_LOT_KC;
 }
 function fromLots(lots: number, u: Unit): number {
   if (u === "lots")   return lots;
@@ -458,17 +472,17 @@ const ARABICA_METRICS: ArabicaMetric[] = [
 type Drill = "none" | "port_origin" | "port_group_origin" | "port_age_origin"
            | "port_origin_inferred" | "port" | "port_issuer" | "port_member_signed"
            | "member_signed_origin" | "passing_breakdown" | "graded_with_poison" | "queue_forecast"
-           | "age_group_origin";
+           | "port_origin_age";
 const ARABICA_DRILL: Record<ArabicaMetric, Drill> = {
   "Pending grading": "port_group_origin",     // port → ICE group → origin
   "Graded":          "graded_with_poison",    // Coffee (Groups 0/1/2) + Poison (Groups 3/4), each → port → origin
   "Passing rate":    "none",                  // failed_today_bags carries no origin → no breakdown
-  // Stocks drill walks Age (year-banded) → Group → Origin. Every cell
-  // is inferred (`*`) for now because sheet 12 publishes per (port, age)
-  // and the daily section publishes per (port, origin) but never their
-  // joint distribution. Will become real reads once the new /publicdocs
-  // arabica ageing xls is fetched and parsed (see backend).
-  "Stocks":          "age_group_origin",
+  // Stocks drill walks Port → Origin → Ageing (year-banded). Port and
+  // origin are real reads from the daily section's by_port / by_origin
+  // hierarchy; the ageing leaf is inferred (`*`) by applying each origin's
+  // port-weighted age-band share, since the daily section and the ageing
+  // report never publish their joint (port × origin × age) distribution.
+  "Stocks":          "port_origin_age",
   "Decertified":     "port_group_origin",     // per-port outflow split by group → origin
   "Tenders":         "port_member_signed",    // port → member, issuer side as −, stopper side as +
 };
@@ -772,62 +786,18 @@ function _arabicaOriginAgeShape(
   return { ageLabels, yearBands, shareByOriginAge, shareByOriginBand };
 }
 
-// Cell values for Stocks → Age (year band) [→ Group [→ Origin]].
-// All three levels carry `*` — sheet 12 never resolves the joint
-// (port × age × origin) distribution, so the year-band totals here are
-// inferred from each origin's port-weighted age share. Once the new
-// /publicdocs Arabica age report lands, these can switch to real reads.
-function _arabicaStocksBandValue(
+// The Arabica ageing leaf applies each origin's port-weighted age-band share
+// (from `_arabicaOriginAgeShape`) to that origin's stock at a given port. It is
+// inferred (`*`) because the daily section publishes per (port, origin) and the
+// ageing report publishes per (origin, age band) but never their joint
+// (port × origin × age) distribution. Returns end-of-window stock × band share.
+function _arabicaPortOriginBandValue(
   snaps: ArabicaSnap[], w: PeriodCol, shape: ArabicaOriginAgeShape,
-  band: string, group?: string, origin?: string,
+  port: string, origin: string, band: string,
 ): RowVal {
-  const endSnap = _endOfWindowSnap(snaps, w);
-  if (!endSnap) return { value: null };
-  const byOrigin = endSnap.sections?.total_certified?.by_origin || {};
-  let bags = 0;
-  if (origin) {
-    const od = byOrigin[origin];
-    if (!od) return { value: null };
-    if (group && od.group !== group) return { value: 0, isInferred: true };
-    bags = (od.total ?? 0) * (shape.shareByOriginBand[origin]?.[band] ?? 0);
-  } else if (group) {
-    for (const [o, od] of Object.entries(byOrigin)) {
-      if (od.group !== group) continue;
-      bags += (od.total ?? 0) * (shape.shareByOriginBand[o]?.[band] ?? 0);
-    }
-  } else {
-    for (const [o, od] of Object.entries(byOrigin)) {
-      bags += (od.total ?? 0) * (shape.shareByOriginBand[o]?.[band] ?? 0);
-    }
-  }
-  return { value: bags, isInferred: true };
-}
-
-// Groups present in Stocks across the column set — drives the Group row
-// list. Origin → group lookup via the snapshot's by_origin metadata.
-function _arabicaStocksGroups(snaps: ArabicaSnap[], cols: PeriodCol[]): string[] {
-  const set = new Set<string>();
-  for (const w of cols) {
-    const endSnap = _endOfWindowSnap(snaps, w);
-    for (const od of Object.values(endSnap?.sections?.total_certified?.by_origin || {})) {
-      if ((od.total ?? 0) > 0) set.add(od.group);
-    }
-  }
-  return ARABICA_GROUP_ORDER.filter((g) => set.has(g));
-}
-
-// Origins under a given Stocks group across the column set.
-function _arabicaStocksOriginsForGroup(
-  snaps: ArabicaSnap[], cols: PeriodCol[], group: string,
-): string[] {
-  const set = new Set<string>();
-  for (const w of cols) {
-    const endSnap = _endOfWindowSnap(snaps, w);
-    for (const [o, od] of Object.entries(endSnap?.sections?.total_certified?.by_origin || {})) {
-      if (od.group === group && (od.total ?? 0) > 0) set.add(o);
-    }
-  }
-  return Array.from(set).sort();
+  const stock = _sectValue(_endOfWindowSnap(snaps, w), "total_certified", port, undefined, origin);
+  if (stock == null) return { value: null };
+  return { value: stock * (shape.shareByOriginBand[origin]?.[band] ?? 0), isInferred: true };
 }
 
 // Period rollups for the top-level cells.
@@ -1169,91 +1139,8 @@ function ArabicaPeriodTable({
                     });
                   })()}
 
-                  {/* Stocks → Group → Origin → Ageing (the leaf is inferred,
-                      Group + Origin are real reads from by_origin). */}
-                  {isOpen && drill === "age_group_origin" && (() => {
-                    if (!ageShape.yearBands.length) {
-                      return (
-                        <tr className="border-b border-slate-900">
-                          <td className="text-slate-600 text-left py-0.5 italic" style={indent(1)}>
-                            ageing detail pending — feed not yet fetched
-                          </td>
-                          {cols.map((_c, i) => (
-                            <td key={i} className="text-slate-600 text-right py-0.5 px-1.5">—</td>
-                          ))}
-                        </tr>
-                      );
-                    }
-                    return ageShape.yearBands.map((band) => {
-                      const bandKey = `${metric}/${band}`;
-                      const bandOpen = expanded.has(bandKey);
-                      const bandVals = cols.map((c) => _arabicaStocksBandValue(snapshots, c, ageShape, band));
-                      if (allZero(bandVals)) return null;
-                      const groupsInBand = bandOpen
-                        ? ARABICA_GROUP_ORDER.filter((g) =>
-                            cols.some((c) => (_arabicaStocksBandValue(snapshots, c, ageShape, band, g).value ?? 0) > 0))
-                        : [];
-                      return (
-                        <Fragment key={bandKey}>
-                          <tr className="border-b border-slate-900 bg-slate-900/40">
-                            <td
-                              className="text-slate-400 text-left py-0.5 cursor-pointer hover:text-amber-300"
-                              style={indent(1)}
-                              onClick={() => toggle(bandKey)}
-                            >
-                              <span className="text-amber-500/60 inline-block w-3">{bandOpen ? "▾" : "▸"}</span>{" "}{band}
-                            </td>
-                            {bandVals.map((v, i) => (
-                              <td key={i} className="text-slate-200 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                            ))}
-                          </tr>
-                          {groupsInBand.map((group) => {
-                            const grpKey = `${bandKey}/${group}`;
-                            const grpOpen = expanded.has(grpKey);
-                            const grpVals = cols.map((c) => _arabicaStocksBandValue(snapshots, c, ageShape, band, group));
-                            if (allZero(grpVals)) return null;
-                            const originsInGrp = grpOpen
-                              ? _arabicaStocksOriginsForGroup(snapshots, cols, group)
-                                  .filter((o) => cols.some((c) =>
-                                    (_arabicaStocksBandValue(snapshots, c, ageShape, band, group, o).value ?? 0) > 0))
-                              : [];
-                            return (
-                              <Fragment key={grpKey}>
-                                <tr className="border-b border-slate-900 bg-slate-900/20">
-                                  <td
-                                    className="text-slate-500 text-left py-0.5 cursor-pointer hover:text-amber-300"
-                                    style={indent(2)}
-                                    onClick={() => toggle(grpKey)}
-                                  >
-                                    <span className="text-amber-500/40 inline-block w-3">{grpOpen ? "▾" : "▸"}</span>{" "}{group}
-                                  </td>
-                                  {grpVals.map((v, i) => (
-                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                                  ))}
-                                </tr>
-                                {originsInGrp.map((origin) => {
-                                  const origVals = cols.map((c) =>
-                                    _arabicaStocksBandValue(snapshots, c, ageShape, band, group, origin));
-                                  if (allZero(origVals)) return null;
-                                  return (
-                                    <tr key={`${grpKey}/${origin}`} className="border-b border-slate-900">
-                                      <td className="text-slate-500 text-left py-0.5 italic" style={indent(3)}>{origin}</td>
-                                      {origVals.map((v, i) => (
-                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
-                                      ))}
-                                    </tr>
-                                  );
-                                })}
-                              </Fragment>
-                            );
-                          })}
-                        </Fragment>
-                      );
-                    });
-                  })()}
-
-                  {/* Port sub-rows (Pending grading · Decertified · Issued) */}
-                  {isOpen && drill !== "graded_with_poison" && drill !== "age_group_origin" && cols.length > 0 && (() => {
+                  {/* Port sub-rows (Stocks · Pending grading · Decertified · Issued) */}
+                  {isOpen && drill !== "graded_with_poison" && cols.length > 0 && (() => {
                     const ports = _portsForMetric(snapshots, cols, metric);
                     return ports.map((port) => {
                       const portKey = `${metric}/${port}`;
@@ -1317,6 +1204,47 @@ function ArabicaPeriodTable({
                             );
                           })}
 
+                          {/* Stocks: port → origin (real) → ageing band (inferred
+                              by each origin's port-weighted age share). */}
+                          {portOpen && drill === "port_origin_age" && _originsForCell(snapshots, cols, metric, port).map((origin) => {
+                            const origKey = `${portKey}/${origin}`;
+                            const origOpen = expanded.has(origKey);
+                            const oVals = cols.map((c) => _arabicaRowValue(metric, snapshots, c, port, undefined, origin));
+                            if (allZero(oVals)) return null;
+                            const bands = origOpen
+                              ? ageShape.yearBands.filter((b) =>
+                                  cols.some((c) => (_arabicaPortOriginBandValue(snapshots, c, ageShape, port, origin, b).value ?? 0) > 0))
+                              : [];
+                            return (
+                              <Fragment key={origKey}>
+                                <tr className="border-b border-slate-900 bg-slate-900/20">
+                                  <td
+                                    className={`text-slate-500 text-left py-0.5 ${ageShape.yearBands.length ? "cursor-pointer hover:text-amber-300" : ""}`}
+                                    style={indent(2)}
+                                    onClick={() => ageShape.yearBands.length && toggle(origKey)}
+                                  >
+                                    <span className="text-amber-500/40 inline-block w-3">{ageShape.yearBands.length ? (origOpen ? "▾" : "▸") : ""}</span>{" "}{origin}
+                                  </td>
+                                  {oVals.map((v, i) => (
+                                    <td key={i} className="text-slate-300 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                  ))}
+                                </tr>
+                                {bands.map((band) => {
+                                  const bandVals = cols.map((c) => _arabicaPortOriginBandValue(snapshots, c, ageShape, port, origin, band));
+                                  if (allZero(bandVals)) return null;
+                                  return (
+                                    <tr key={`${origKey}/${band}`} className="border-b border-slate-900">
+                                      <td className="text-slate-600 text-left py-0.5 italic" style={indent(3)}>{band}</td>
+                                      {bandVals.map((v, i) => (
+                                        <td key={i} className="text-slate-400 text-right py-0.5 px-1.5">{fmtCell(v)}</td>
+                                      ))}
+                                    </tr>
+                                  );
+                                })}
+                              </Fragment>
+                            );
+                          })}
+
                           {/* Origin level for Graded (port → origin inferred from delta) */}
                           {portOpen && (drill === "port_origin" || drill === "port_origin_inferred") &&
                             _originsForCell(snapshots, cols, metric, port).map((origin) => {
@@ -1367,7 +1295,10 @@ function ArabicaPeriodTable({
       <div className="text-[9px] text-slate-600 italic mt-1 space-y-0.5">
         <div>
           Flow metrics (Graded · Decertified · Issued) sum across each window. Inventory metrics
-          (Stocks · Pending) show the end-of-window snapshot. <strong>* = inferred</strong> from
+          (Stocks · Pending) show the end-of-window snapshot. Stocks drills
+          <em>Port → Origin → Ageing</em> — port and origin are real reads; the ageing band is
+          inferred (<strong>*</strong>) from each origin&apos;s port-weighted age share.
+          Other <strong>* = inferred</strong> from
           day-over-day delta of certified by port × origin (the xls publishes only daily totals
           for grading, not per-port breakdown). Graded → <em>Poison</em> = origins in Group 3 or 4
           (the discount-tier naturals); <em>Coffee</em> = everything else. Decertified = prev_stock
@@ -1383,14 +1314,39 @@ function ArabicaPeriodTable({
 
 // ── Arabica column ────────────────────────────────────────────────────────────
 
-function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
+function ArabicaColumn({ d, unit, cutoff, end, sinceLabel }: { d: ArabicaJson | null; unit: Unit; cutoff: Date; end: Date; sinceLabel: string }) {
   const live = !!d && d.snapshots.length > 0;
-  const latestSnap = d?.snapshots.at(-1) || null;
 
-  const totalDisplay   = latestSnap ? fmt(fromBags(latestSnap.total_bags,           unit), unit) + " " + unitSuffix(unit) : "—";
-  const pendingDisplay = latestSnap ? fmt(fromBags(latestSnap.pending_grading_bags, unit), unit) + " " + unitSuffix(unit) : "—";
-  const gradedDisplay  = latestSnap ? fmt(fromBags(latestSnap.passed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
-  const failedDisplay  = latestSnap ? fmt(fromBags(latestSnap.failed_today_bags,    unit), unit) + " " + unitSuffix(unit) : "—";
+  // Flow metrics aggregate over the selected window (cutoff → end):
+  // "Graded" = everything that went through grading (passed + failed);
+  // "Passed grading" = the tenderable share; "Decertified" = certified bags
+  // that left the pool day-over-day (prev + passed − current, floored at 0 —
+  // a net increase means stock arrived, not decertified), summed across the
+  // window so a single tile matches the system flow below.
+  const snaps = d?.snapshots ?? [];
+  const cutT = cutoff.getTime();
+  const endT = end.getTime() + 86_400_000 - 1;
+  const dayT = (ds: string) => {
+    const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, dd).getTime();
+  };
+  // "Total certified" reflects the window end, not necessarily the newest snap.
+  const inRange = snaps.filter((s) => dayT(s.date) <= endT);
+  const latestSnap = inRange.length ? inRange[inRange.length - 1] : (d?.snapshots.at(-1) || null);
+  let gradedBags = 0, passedBags = 0, decertBags = 0;
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    if (dayT(s.date) < cutT || dayT(s.date) > endT) continue;
+    gradedBags += (s.passed_today_bags ?? 0) + (s.failed_today_bags ?? 0);
+    passedBags += s.passed_today_bags ?? 0;
+    const prev = snaps[i - 1];
+    if (prev) decertBags += Math.max(0, prev.total_bags + (s.passed_today_bags ?? 0) - s.total_bags);
+  }
+
+  const totalDisplay  = latestSnap ? fmt(fromBags(latestSnap.total_bags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = live ? fmt(fromBags(gradedBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = live ? fmt(fromBags(passedBags, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = live ? fmt(fromBags(decertBags, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -1406,10 +1362,10 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified" value={totalDisplay} />
-        <Stat label="Pending grading" value={pendingDisplay} />
-        <Stat label="Graded today"    value={gradedDisplay} />
-        <Stat label="Failed today"    value={failedDisplay} />
+        <Stat label="Total certified"          value={totalDisplay} />
+        <Stat label={`Graded since ${sinceLabel}`}         value={gradedDisplay} />
+        <Stat label={`Passed grading since ${sinceLabel}`} value={passedDisplay} />
+        <Stat label={`Decertified since ${sinceLabel}`}    value={decertDisplay} />
       </div>
 
       {d?.errors && d.errors.length > 0 && (
@@ -1419,47 +1375,190 @@ function ArabicaColumn({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
   );
 }
 
-// Arabica recent activity — last N days of passed/failed grading events
-// from the snapshot stream. Mirrors robusta's gradings feed in shape so
-// the two markets sit side-by-side under "Recent activity".
-function ArabicaActivityFeed({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
-  const feed = useMemo(() => {
-    if (!d?.snapshots) return [];
-    type Evt = { date: string; kind: string; detail: string };
-    const out: Evt[] = [];
-    for (const s of d.snapshots) {
-      if ((s.passed_today_bags || 0) > 0) {
-        out.push({ date: s.date, kind: "passed",
-                   detail: `${fmt(fromBags(s.passed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} graded` });
-      }
-      if ((s.failed_today_bags || 0) > 0) {
-        out.push({ date: s.date, kind: "failed",
-                   detail: `${fmt(fromBags(s.failed_today_bags || 0, unit), unit)} ${unitSuffix(unit)} rejected` });
-      }
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  }, [d, unit]);
+// ── Recent-activity feed (shared model + renderer) ───────────────────────────
+// Arabica and Robusta both normalise their raw feeds into ActivityEvent[] and
+// render through the SAME component, so wording and colour coding are identical
+// across the two markets. Only the section title/accent identifies the market.
 
+const FEED_MAX = 24;
+type Market = "kc" | "rc";
+type ActivityKind = "grading" | "issuance" | "reception" | "decert";
+interface ActivityEvent { date: string; kind: ActivityKind; detail: string }
+
+const _ACTIVITY_LABEL: Record<ActivityKind, string> = {
+  grading: "Grading", issuance: "Issuance", reception: "Reception", decert: "Decertification",
+};
+// Identical colour code across both markets.
+const _ACTIVITY_COLOR: Record<ActivityKind, string> = {
+  grading:   "text-sky-400/90",
+  issuance:  "text-rose-400/90",
+  reception: "text-emerald-400/90",
+  decert:    "text-orange-400/90",
+};
+
+// Friendly (name-only) port label for the feed. Canonicalises KC codes and
+// covers the 2-letter codes the KC delivery note uses (AN, MI, …).
+const _FEED_PORT_KC: Record<string, string> = {
+  AN: "Antwerp", ANT: "Antwerp", BAR: "Barcelona", "HA/BR": "Hamburg/Bremen",
+  HA: "Hamburg/Bremen", HAM: "Hamburg", HO: "Houston", HOU: "Houston",
+  MI: "Miami", MIA: "Miami", MIAMI: "Miami", NO: "New Orleans", NOLA: "New Orleans",
+  NOR: "Norfolk", NY: "New York", NYK: "New York", VA: "Virginia", VIR: "Virginia",
+};
+function _feedPort(code: string, market: Market): string {
+  const c = (code || "").toUpperCase();
+  if (market === "kc") return _FEED_PORT_KC[c] ?? _FEED_PORT_KC[_canonKC(c)] ?? c;
+  return ROBUSTA_PORT_NAMES[c] ?? c;
+}
+
+// Native→display amount (bare number) for the feed. KC native = bags, RC = lots.
+const _amt = (v: number, unit: Unit, market: Market): string =>
+  fmt(market === "kc" ? fromBags(v, unit) : fromLots(v, unit), unit);
+
+// "Grading" sentence — total graded for an origin, passed split by port, failed.
+function _gradingDetail(
+  graded: number, origin: string, passedByPort: Record<string, number>,
+  failed: number, unit: Unit, market: Market,
+): string {
+  const parts = [`${_amt(graded, unit, market)} ${unitSuffix(unit)} ${origin} graded`];
+  for (const [p, v] of Object.entries(passedByPort).sort((a, b) => b[1] - a[1])) {
+    if (v > 0) parts.push(`${_amt(v, unit, market)} passed in ${_feedPort(p, market)} port`);
+  }
+  if (failed > 0) parts.push(`${_amt(failed, unit, market)} failed`);
+  return parts.join(", ");
+}
+
+// "Issuance" / "Reception" sentence — amount, origin (if known), broker, port.
+function _flowDetail(
+  lots: number, origin: string | undefined, port: string | undefined,
+  broker: string | undefined, unit: Unit, market: Market,
+): string {
+  const parts = [`${_amt(lots, unit, market)} ${unitSuffix(unit)}`];
+  if (origin) parts.push(origin);
+  if (broker) parts.push(`by ${market === "kc" ? _displayFirmName(broker) : broker}`);
+  if (port) parts.push(`in ${_feedPort(port, market)} port`);
+  return parts.join(" ");
+}
+
+// "Decertification" sentence — amount, origin, port it left from.
+function _decertDetail(lots: number, origin: string, port: string, unit: Unit, market: Market): string {
+  return `−${_amt(lots, unit, market)} ${unitSuffix(unit)} ${origin} in ${_feedPort(port, market)}`;
+}
+
+// Largest tenderable origin at a port — implies the origin behind a decert.
+function _dominantOrigin(m: Record<string, { tenderable?: number }> | undefined): string | null {
+  if (!m) return null;
+  let best: string | null = null; let bestV = -1;
+  for (const [o, v] of Object.entries(m)) { const t = v?.tenderable ?? 0; if (t > bestV) { bestV = t; best = o; } }
+  return best;
+}
+
+function ActivityFeed({ title, accent, events }: { title: string; accent: string; events: ActivityEvent[] }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-amber-400/80 mb-1">
-        Arabica · recent activity
-      </div>
-      {feed.length === 0 ? <Pending label="Activity feed" /> : (
+      <div className={`text-[10px] uppercase tracking-wider ${accent} mb-1`}>{title}</div>
+      {events.length === 0 ? <Pending label="Activity feed" /> : (
         <ul className="space-y-0.5 text-[11px] font-mono">
-          {feed.map((e, i) => (
+          {events.map((e, i) => (
             <li key={i} className="flex items-baseline gap-2 text-slate-300">
-              <span className="text-slate-500 w-16">{e.date}</span>
-              <span className={`w-16 text-[9px] uppercase tracking-wider ${e.kind === "passed" ? "text-emerald-400/80" : "text-rose-400/80"}`}>
-                {e.kind}
+              <span className="text-slate-500 w-16 shrink-0">{e.date}</span>
+              <span className="flex-1">
+                <span className={`${_ACTIVITY_COLOR[e.kind]} font-semibold`}>{_ACTIVITY_LABEL[e.kind]}:</span>{" "}{e.detail}
               </span>
-              <span className="flex-1">{e.detail}</span>
             </li>
           ))}
         </ul>
       )}
     </div>
   );
+}
+
+// Arabica raw snapshots → ActivityEvent[].
+function _buildArabicaActivity(d: ArabicaJson | null, unit: Unit): ActivityEvent[] {
+  const out: ActivityEvent[] = [];
+  const snaps = d?.snapshots ?? [];
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    const passedBO = s.passed_by_origin ?? {};
+    const failedBO = s.failed_by_origin ?? {};
+    // Grading per origin: total graded = passed + failed, passed split by port.
+    for (const o of Array.from(new Set([...Object.keys(passedBO), ...Object.keys(failedBO)]))) {
+      const passedPorts = passedBO[o]?.by_port ?? {};
+      const graded = (passedBO[o]?.total ?? 0) + (failedBO[o]?.total ?? 0);
+      if (graded > 0) out.push({ date: s.date, kind: "grading", detail: _gradingDetail(graded, o, passedPorts, failedBO[o]?.total ?? 0, unit, "kc") });
+    }
+    // Issuance / reception (the KC delivery note carries no origin column).
+    for (const e of s.issuers_today ?? []) if ((e.value || 0) > 0)
+      out.push({ date: s.date, kind: "issuance", detail: _flowDetail(e.value, undefined, e.port, e.issuer, unit, "kc") });
+    for (const e of s.stoppers_today ?? []) if ((e.value || 0) > 0)
+      out.push({ date: s.date, kind: "reception", detail: _flowDetail(e.value, undefined, e.port, e.stopper, unit, "kc") });
+    // Decertification — exact (origin, port) from day-over-day stock delta:
+    // outflow = prev_stock + passed − cur_stock.
+    const prev = i > 0 ? snaps[i - 1] : null;
+    if (prev) {
+      const curBO = s.sections?.total_certified?.by_origin ?? {};
+      const prevBO = prev.sections?.total_certified?.by_origin ?? {};
+      for (const o of Array.from(new Set([...Object.keys(curBO), ...Object.keys(prevBO)]))) {
+        const curPorts = curBO[o]?.by_port ?? {};
+        const prevPorts = prevBO[o]?.by_port ?? {};
+        const passedPorts = passedBO[o]?.by_port ?? {};
+        for (const p of Array.from(new Set([...Object.keys(curPorts), ...Object.keys(prevPorts)]))) {
+          const decert = (prevPorts[p] ?? 0) + (passedPorts[p] ?? 0) - (curPorts[p] ?? 0);
+          if (decert > 0) out.push({ date: s.date, kind: "decert", detail: _decertDetail(decert, o, p, unit, "kc") });
+        }
+      }
+    }
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, FEED_MAX);
+}
+
+// Robusta raw feed → ActivityEvent[].
+function _buildRobustaActivity(d: RobustaJson | null, unit: Unit): ActivityEvent[] {
+  const out: ActivityEvent[] = [];
+  const ra = d?.recent_activity;
+  // Grading — group entries by (date, origin); tenderable = passed, else failed.
+  for (const g of ra?.gradings ?? []) {
+    const byOrigin: Record<string, { passed: Record<string, number>; failed: number; graded: number }> = {};
+    for (const e of g.entries ?? []) {
+      const o = e.origin || "?"; const p = e.port || "?"; const lots = e.lots || 0;
+      const b = (byOrigin[o] = byOrigin[o] ?? { passed: {}, failed: 0, graded: 0 });
+      b.graded += lots;
+      if (e.tenderable !== false) b.passed[p] = (b.passed[p] ?? 0) + lots;
+      else b.failed += lots;
+    }
+    for (const [o, b] of Object.entries(byOrigin))
+      if (b.graded > 0) out.push({ date: g.date, kind: "grading", detail: _gradingDetail(b.graded, o, b.passed, b.failed, unit, "rc") });
+  }
+  // Issuance / reception — per clearing member, per origin row (no port column).
+  for (const day of ra?.iss_recv_daily ?? []) {
+    for (const m of day.members ?? []) {
+      for (const row of m.rows ?? []) {
+        if ((row.sold || 0) > 0) out.push({ date: day.date, kind: "issuance", detail: _flowDetail(row.sold, row.origin, undefined, m.code, unit, "rc") });
+        if ((row.bought || 0) > 0) out.push({ date: day.date, kind: "reception", detail: _flowDetail(row.bought, row.origin, undefined, m.code, unit, "rc") });
+      }
+    }
+  }
+  // Decertification — per port from day-over-day lot delta (outflow = prev +
+  // passed − cur); origin is IMPLIED by the port's dominant tenderable origin.
+  const snaps = d?.snapshots ?? [];
+  const poh = d?.port_origin_history ?? {};
+  for (let i = 1; i < snaps.length; i++) {
+    const s = snaps[i]; const prev = snaps[i - 1];
+    const passedAtPort: Record<string, number> = {};
+    for (const g of ra?.gradings ?? []) if (g.date === s.date)
+      for (const e of g.entries ?? []) if (e.tenderable !== false)
+        passedAtPort[e.port || "?"] = (passedAtPort[e.port || "?"] ?? 0) + (e.lots || 0);
+    const curP = s.by_port_lots ?? {}; const prevP = prev.by_port_lots ?? {};
+    for (const p of Array.from(new Set([...Object.keys(curP), ...Object.keys(prevP)]))) {
+      const decert = (prevP[p] ?? 0) + (passedAtPort[p] ?? 0) - (curP[p] ?? 0);
+      if (decert > 0) out.push({ date: s.date, kind: "decert", detail: _decertDetail(decert, _dominantOrigin(poh[p]) ?? "mixed origins", p, unit, "rc") });
+    }
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, FEED_MAX);
+}
+
+function ArabicaActivityFeed({ d, unit }: { d: ArabicaJson | null; unit: Unit }) {
+  const events = useMemo(() => _buildArabicaActivity(d, unit), [d, unit]);
+  return <ActivityFeed title="Arabica · recent activity" accent="text-amber-400/80" events={events} />;
 }
 
 // ── Robusta period table (parallel to arabica's, lots-native) ────────────────
@@ -2214,22 +2313,51 @@ function RobustaPeriodTable({
 }
 // ── Robusta column ────────────────────────────────────────────────────────────
 
-function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
+function RobustaColumn({ d, unit, cutoff, end, sinceLabel }: { d: RobustaJson | null; unit: Unit; cutoff: Date; end: Date; sinceLabel: string }) {
   const stock = d?.latest_detail?.stock_report || null;
   const live = !!d && (!!stock || (d.snapshots?.length || 0) > 0);
   const grand = stock?.grand_total;
 
-  const totalDisplay = grand ? fmt(fromLots(grand.with_val_cert, unit), unit) + " " + unitSuffix(unit) : "—";
-  const nontDisplay  = grand ? fmt(fromLots(grand.non_tend,      unit), unit) + " " + unitSuffix(unit) : "—";
-  const suspDisplay  = grand ? fmt(fromLots(grand.suspended,     unit), unit) + " " + unitSuffix(unit) : "—";
-
+  // Flow metrics aggregate over the selected window (cutoff → end).
+  // Per-day grading comes from the grading event on each snapshot's date
+  // (fallback to the snapshot's own lots_graded_today). Graded = all lots
+  // graded; Passed = tenderable share; Decertified = certified lots that left
+  // day-over-day (prev + passed − current, floored). Summing across the window
+  // keeps the tile in step with the system flow below.
   const ra = d?.recent_activity;
-  const activityCount = ra ? (
-    (ra.gradings?.length || 0) +
-    (ra.iss_recv_daily?.length || 0) +
-    (ra.tenders?.length || 0) +
-    (ra.grading_overview?.length || 0)
-  ) : 0;
+  const sumByDate = new Map((ra?.gradings || []).map((g) => [g.date, g.summary]));
+  const snaps = d?.snapshots ?? [];
+  const cutT = cutoff.getTime();
+  const endT = end.getTime() + 86_400_000 - 1;
+  const dayT = (ds: string) => {
+    const [y, m, dd] = ds.slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, dd).getTime();
+  };
+  // Per-day (graded, passed) lots, generalising the single-day derivation.
+  const dayFlow = (date: string, snapGraded: number | null | undefined) => {
+    const sm = sumByDate.get(date);
+    const g = sm?.lots_graded_today ?? snapGraded ?? null;
+    const p = sm?.tenderable_today
+      ?? (g != null && sm?.non_tenderable_today != null
+            ? g - (sm.non_tenderable_today ?? 0)
+            : (g === 0 ? 0 : null));
+    return { g, p };
+  };
+  let gradedLots = 0, passedLots = 0, decertLots = 0;
+  for (let i = 0; i < snaps.length; i++) {
+    const s = snaps[i];
+    if (dayT(s.date) < cutT || dayT(s.date) > endT) continue;
+    const { g, p } = dayFlow(s.date, s.lots_graded_today);
+    gradedLots += g ?? 0;
+    passedLots += p ?? 0;
+    const prev = snaps[i - 1];
+    if (prev) decertLots += Math.max(0, prev.total_lots_certified + (p ?? 0) - s.total_lots_certified);
+  }
+
+  const totalDisplay  = grand ? fmt(fromLots(grand.with_val_cert, unit), unit) + " " + unitSuffix(unit) : "—";
+  const gradedDisplay = live ? fmt(fromLots(gradedLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const passedDisplay = live ? fmt(fromLots(passedLots, unit), unit) + " " + unitSuffix(unit) : "—";
+  const decertDisplay = live ? fmt(fromLots(decertLots, unit), unit) + " " + unitSuffix(unit) : "—";
 
   return (
     <div className="space-y-3">
@@ -2245,12 +2373,10 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Total certified" value={totalDisplay} />
-        <Stat label="Non-tenderable"  value={nontDisplay} />
-        <Stat label="Suspended"       value={suspDisplay} />
-        <Stat label="Recent events"
-              value={`${activityCount}`}
-              sub={`gradings/iss/tenders, ${d?.snapshots.length ?? 0}d window`} />
+        <Stat label="Total certified"          value={totalDisplay} />
+        <Stat label={`Graded since ${sinceLabel}`}         value={gradedDisplay} />
+        <Stat label={`Passed grading since ${sinceLabel}`} value={passedDisplay} />
+        <Stat label={`Decertified since ${sinceLabel}`}    value={decertDisplay} />
       </div>
     </div>
   );
@@ -2260,24 +2386,9 @@ function RobustaColumn({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
 // infested/appeal anomaly block underneath when present. Extracted out of
 // RobustaColumn so it can sit below the period view tables in the new
 // vertical layout.
-function RobustaActivityFeed({ d }: { d: RobustaJson | null }) {
+function RobustaActivityFeed({ d, unit }: { d: RobustaJson | null; unit: Unit }) {
   const ra = d?.recent_activity;
-
-  const feed = useMemo(() => {
-    if (!ra) return [];
-    type Evt = { date: string; kind: string; detail: string };
-    const out: Evt[] = [];
-    for (const g of ra.gradings || []) {
-      out.push({ date: g.date, kind: "grading", detail: `${g.summary?.lots_graded_today ?? "?"} lots graded` });
-    }
-    for (const i of ra.iss_recv_daily || []) {
-      out.push({ date: i.date, kind: "issuance", detail: `${i.grand_total?.sold ?? 0} sold · ${i.grand_total?.bought ?? 0} bought` });
-    }
-    for (const t of ra.tenders || []) {
-      out.push({ date: t.date, kind: "tender", detail: `${t.totals_today?.originals ?? 0} originals` });
-    }
-    return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  }, [ra]);
+  const events = useMemo(() => _buildRobustaActivity(d, unit), [d, unit]);
 
   const anomalies = useMemo(() => {
     const out: { date: string; kind: string; detail: string }[] = [];
@@ -2292,22 +2403,7 @@ function RobustaActivityFeed({ d }: { d: RobustaJson | null }) {
 
   return (
     <div className="space-y-3">
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-emerald-400/80 mb-1">
-          Robusta · recent activity
-        </div>
-        {feed.length === 0 ? <Pending label="Activity feed" /> : (
-          <ul className="space-y-0.5 text-[11px] font-mono">
-            {feed.map((e, i) => (
-              <li key={i} className="flex items-baseline gap-2 text-slate-300">
-                <span className="text-slate-500 w-16">{e.date}</span>
-                <span className="w-16 text-[9px] uppercase tracking-wider text-emerald-500/70">{e.kind}</span>
-                <span className="flex-1">{e.detail}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <ActivityFeed title="Robusta · recent activity" accent="text-emerald-400/80" events={events} />
 
       {anomalies.length > 0 && (
         <div>
@@ -2333,7 +2429,26 @@ export default function CertifiedStocksPanel() {
   const [arabica, setArabica] = useState<ArabicaJson | null>(null);
   const [robusta, setRobusta] = useState<RobustaJson | null>(null);
   const [unit, setUnit] = useState<Unit>("bags");
+  // Period selector — a [start, end] window. `endISO` is a free calendar pick
+  // (null → defaults to the latest available date); `startKey` picks the start
+  // from a menu computed relative to that end. Default view = month-to-date.
+  const [endISO, setEndISO] = useState<string | null>(null);
+  const [startKey, setStartKey] = useState<string>(FLOW_START_DEFAULT);
   const [err, setErr] = useState(false);
+
+  // Resolve the window from the two controls + the available data range.
+  const { anchor, bounds, endDate, startOpts, startWin } = useMemo(() => {
+    const anchor = flowAnchor(arabica, robusta);
+    const bounds = flowDateBounds(arabica, robusta);
+    const endDate = endISO ? parseFlowISO(endISO) : anchor;
+    const startOpts = flowStartOptions(endDate, bounds.min);
+    const startWin =
+      startOpts.find((o) => o.key === startKey) ??
+      startOpts.find((o) => o.key === FLOW_START_DEFAULT) ??
+      startOpts[0];
+    return { anchor, bounds, endDate, startOpts, startWin };
+  }, [arabica, robusta, endISO, startKey]);
+  const startDate = startWin.cutoff;
 
   useEffect(() => {
     Promise.all([
@@ -2352,26 +2467,75 @@ export default function CertifiedStocksPanel() {
     <div className="p-4 space-y-3">
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-base font-semibold text-slate-100">Certified Stocks (exchange-deliverable)</h2>
+            <PinToReport id="certified_stocks_tiles" />
+          </div>
           <p className="text-[11px] text-slate-500">
             ICE-certified arabica (US warehouses) &amp; robusta (European warehouses) — the deliverable inventory the
-            futures market clears against. Daily scrape of ICE’s publicdocs reports.
+            futures market clears against. Daily scrape of ICE&rsquo;s publicdocs reports.
           </p>
         </div>
-        <div className="flex items-center gap-1.5">
-          {(["bags", "tonnes", "lots"] as Unit[]).map((u) => (
-            <button
-              key={u}
-              onClick={() => setUnit(u)}
-              className={`px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${
-                unit === u
-                  ? "bg-slate-800 text-amber-400 border-slate-700"
-                  : "text-slate-500 hover:text-slate-300 border-transparent"
-              }`}
-            >
-              {u}
-            </button>
-          ))}
+        <div className="flex flex-col items-end gap-1.5">
+          {/* Metric (unit) selection */}
+          <div className="flex items-center gap-1.5">
+            {(["bags", "tonnes", "lots"] as Unit[]).map((u) => (
+              <button
+                key={u}
+                onClick={() => setUnit(u)}
+                className={`px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${
+                  unit === u
+                    ? "bg-slate-800 text-amber-400 border-slate-700"
+                    : "text-slate-500 hover:text-slate-300 border-transparent"
+                }`}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
+          {/* Period selector — sits under the metric toggle and drives the
+              tiles + system flow below. The start menu is computed relative to
+              the chosen end date (1 week back, or the 1st of each month back to
+              the start of our data); the end is a free calendar pick that
+              defaults to the latest available date. Default view = month-to-date. */}
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            <span className="text-slate-500 uppercase text-[10px] tracking-wider">From</span>
+            <div className="flex items-center gap-1 flex-wrap">
+              {startOpts.map((o) => (
+                <button
+                  key={o.key}
+                  onClick={() => setStartKey(o.key)}
+                  title={o.key === "w1" ? "One week back" : o.key === FLOW_START_DEFAULT ? "Month-to-date" : "1st of month"}
+                  className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border ${
+                    startWin.key === o.key
+                      ? "bg-slate-800 text-amber-400 border-slate-700"
+                      : "text-slate-500 hover:text-slate-300 border-transparent"
+                  }`}
+                >
+                  {o.key === "w1" ? "1w" : o.label}
+                </button>
+              ))}
+            </div>
+            <span className="text-slate-500 uppercase text-[10px] tracking-wider ml-1">To</span>
+            <input
+              type="date"
+              value={endISO ?? flowDateISO(anchor)}
+              min={flowDateISO(bounds.min)}
+              max={flowDateISO(bounds.max)}
+              onChange={(e) => setEndISO(e.target.value || null)}
+              className="bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-[9px] font-mono text-slate-200
+                         [color-scheme:dark] focus:outline-none focus:border-slate-500"
+            />
+            {endISO && endISO !== flowDateISO(anchor) && (
+              <button
+                onClick={() => setEndISO(null)}
+                title="Reset to latest available date"
+                className="px-1 py-0.5 rounded text-[9px] text-slate-500 hover:text-slate-300 border border-transparent"
+              >
+                ↺
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -2392,13 +2556,23 @@ export default function CertifiedStocksPanel() {
         robustaImpliedOutflowLast={robusta?.monthly?.implied_outflow?.at(-1)?.month_end ?? null}
       />
 
-      {/* 1 · the 4 tiles per contract */}
+      {/* 1 · the 4 tiles per contract. The flow metrics (Graded · Passed ·
+          Decertified) aggregate over the same window the "Since" selector
+          drives, so the tiles and the system flow below always agree. */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ArabicaColumn d={arabica} unit={unit} />
-        <RobustaColumn d={robusta} unit={unit} />
+        <ArabicaColumn d={arabica} unit={unit} cutoff={startDate} end={endDate} sinceLabel={startWin.label} />
+        <RobustaColumn d={robusta} unit={unit} cutoff={startDate} end={endDate} sinceLabel={startWin.label} />
       </div>
 
-      {/* 2 · full-width system flow. The cast is needed because the panel's
+      {/* 2 · recent activity feed per contract — sits between the tiles and
+          the system flow. Arabica + Robusta share one renderer so wording and
+          colour code are identical across markets. */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ArabicaActivityFeed d={arabica} unit={unit} />
+        <RobustaActivityFeed d={robusta} unit={unit} />
+      </div>
+
+      {/* 3 · full-width system flow. The cast is needed because the panel's
           ArabicaJson.latest_detail carries the matrix-section shape while the
           system flow only consumes latest_detail.age_detail (workbook-side).
           The component handles missing latest_detail gracefully. */}
@@ -2406,10 +2580,13 @@ export default function CertifiedStocksPanel() {
         <CertifiedStocksSystemFlow
           arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
           robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
+          start={startDate}
+          end={endDate}
+          unit={unit}
         />
       </div>
 
-      {/* 3 · period view tables — side-by-side per contract */}
+      {/* 4 · period view tables — side-by-side per contract */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ArabicaPeriodTable
           snapshots={arabica?.snapshots || []}
@@ -2426,12 +2603,6 @@ export default function CertifiedStocksPanel() {
           issuance={(robusta?.recent_activity?.iss_recv_daily || []) as unknown as IssRecvDailyEvt[]}
           unit={unit}
         />
-      </div>
-
-      {/* 4 · recent activity feed per contract */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ArabicaActivityFeed d={arabica} unit={unit} />
-        <RobustaActivityFeed d={robusta} />
       </div>
     </div>
   );

@@ -1,8 +1,44 @@
 {
-  "_doc": "Successful HHMMSS captures of ICE Robusta stock_report. Tier-1 guesses are the top-5 most frequent values here. Appended to by pull_stock_report() on every 200 OK. Bootstrap entries are best-guess starting points until real captures accumulate.",
   "hits": [
-    {"date": "bootstrap", "hhmmss": "103021"},
-    {"date": "bootstrap", "hhmmss": "103126"},
-    {"date": "bootstrap", "hhmmss": "103045"}
+    {
+      "date": "bootstrap",
+      "hhmmss": "103021"
+    },
+    {
+      "date": "bootstrap",
+      "hhmmss": "103126"
+    },
+    {
+      "date": "bootstrap",
+      "hhmmss": "103045"
+    },
+    {
+      "date": "2026-06-03",
+      "hhmmss": "105119"
+    },
+    {
+      "date": "2026-06-04",
+      "hhmmss": "103016"
+    },
+    {
+      "date": "2026-06-05",
+      "hhmmss": "103912"
+    },
+    {
+      "date": "2026-06-08",
+      "hhmmss": "103247"
+    },
+    {
+      "date": "2026-06-09",
+      "hhmmss": "103232"
+    },
+    {
+      "date": "2026-06-11",
+      "hhmmss": "103235"
+    },
+    {
+      "date": "2026-06-12",
+      "hhmmss": "103045"
+    }
   ]
 }

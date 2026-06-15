@@ -2,14 +2,18 @@ name: "1.6 – Morning Brief"
 
 on:
   schedule:
-    # 03:00 UTC = 10:00 Vietnam time (UTC+7). Primary delivery target.
+    # 03:09 UTC ≈ 10:09 Vietnam time (UTC+7). Primary delivery target.
     # Upstream chain ends well before this:
-    #   01:00 UTC  scraper-daily       (~30-50 min)
-    #   01:30 UTC  export-and-publish  (~10 min)
-    #   02:00 UTC  scraper-freight     (~5 min)
-    #   02:00 UTC  daily_oi            (~3 min)
-    # → all done by ~02:15 UTC, leaving 45 min headroom before 10am VN.
-    - cron: '0 3 * * *'
+    #   01:07 UTC  scraper-daily       (~30-50 min)
+    #   02:13 UTC  daily_oi            (~3 min, weekdays)
+    #   02:19 UTC  scraper-freight     (~5 min)
+    #   02:41 UTC  export-and-publish  (~10 min)
+    # → all done by ~02:55 UTC, leaving ~15 min headroom before 10am VN.
+    # All five workflows use off-:00/:30 minutes (7, 13, 19, 41, 9) to dodge
+    # GH Actions' well-known cron skip on top-of-hour and :30 marks. Before
+    # this change, scraper-daily was firing 4-5h late (~05:30 UTC), so the
+    # 03:00 brief read 24h-stale JSONs from yesterday's run.
+    - cron: '9 3 * * *'
   workflow_run:
     # Safety net for skipped scheduled runs. GH Actions cron has a known
     # skip rate during peak load (esp. :00/:30 minute slots) — empirically
@@ -32,22 +36,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  brief:
+  # Lightweight dedup gate — no checkout, no setup. Export-and-Publish itself
+  # fires from three upstream workflows (scraper-daily, COT, daily-OI), so on
+  # a busy data morning this workflow's workflow_run trigger can fire 2-3x in
+  # quick succession. Running the gate as a standalone job means the duplicate
+  # fires exit in ~5 s instead of ~15-20 s (the previous shape paid for
+  # actions/checkout@v4 inside the main job before the guard could short-circuit).
+  guard:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
-    # Only run on the workflow_run trigger if the upstream succeeded.
+    timeout-minutes: 2
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-
+    outputs:
+      skip: ${{ steps.dedupe.outputs.skip }}
     steps:
-      - uses: actions/checkout@v4
-
       - name: Idempotency guard — skip if brief already sent today
-        id: guard
+        id: dedupe
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO:     ${{ github.repository }}
           THIS_RUN: ${{ github.run_id }}
+          EVENT:    ${{ github.event_name }}
         run: |
+          # workflow_dispatch is an explicit human action — always bypass the
+          # guard. The guard exists to prevent the cron+workflow_run double-
+          # trigger from double-sending, not to block manual re-fires.
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — bypassing idempotency guard."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           today=$(date -u +%Y-%m-%d)
           export today THIS_RUN
           prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
@@ -71,13 +88,19 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+  brief:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        if: steps.guard.outputs.skip != 'true'
         with:
           python-version: '3.11'
 
       - name: Install Python dependencies
-        if: steps.guard.outputs.skip != 'true'
         # The brief reads published static JSON + posts to Telegram — it needs
         # only `requests`, NOT the full scraper stack (playwright/scipy/yfinance/
         # curl_cffi/…). Installing the whole requirements file is what made this
@@ -85,7 +108,6 @@ jobs:
         run: pip install requests
 
       - name: Send morning brief
-        if: steps.guard.outputs.skip != 'true'
         working-directory: backend
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

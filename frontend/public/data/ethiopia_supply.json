@@ -1,9 +1,9 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-05-31T06:45:31.621889Z",
+  "scraped_at": "2026-06-15T08:41:42.656783Z",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05-31",
+    "last_updated": "2026-06-15",
     "unit": "thousand 60-kg bags (marketing year)",
     "monthly": [],
     "annual": [
@@ -341,12 +341,12 @@
   },
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-05-31",
+    "as_of": "2026-06-15",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-05-31T05:47:56.928076Z",
+    "scraped_at": "2026-06-15T03:15:21.638609Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -355,15 +355,15 @@
         "csi_60d": 0.0,
         "csi_30d_level": "OK",
         "csi_60d_level": "OK",
-        "rain_mtd_mm": 286.9,
-        "rain_hist_min": 303.7,
-        "rain_hist_max": 544.6
+        "rain_mtd_mm": 210.0,
+        "rain_hist_min": 51.1,
+        "rain_hist_max": 185.6
       },
       {
         "name": "Harrar",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.07,
+        "csi_60d": 0.094,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW"
       },
@@ -371,9 +371,9 @@
         "name": "Kaffa",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.0,
+        "csi_60d": 0.094,
         "csi_30d_level": "OK",
-        "csi_60d_level": "OK"
+        "csi_60d_level": "LOW"
       },
       {
         "name": "Limu",
@@ -394,7 +394,7 @@
     ],
     "daily_drought": [
       {
-        "region": "Harrar",
+        "region": "Sidama/Yirgacheffe",
         "days": [
           "-",
           "-",
@@ -436,33 +436,105 @@
           "-",
           "-",
           "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
           "L",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
+          "L",
+          "L",
           "M",
           "M",
-          "M",
           "L",
-          "L",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
           "-",
           "-",
           "L"
+        ]
+      },
+      {
+        "region": "Harrar",
+        "days": [
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "L",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "M",
+          "M",
+          "M",
+          "L",
+          "L",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "-",
+          "L",
+          "L",
+          "L",
+          "M",
+          "-",
+          "-",
+          "-",
+          "L",
+          "L",
+          "L",
+          "L",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M"
         ]
       },
       {
@@ -507,10 +579,7 @@
           "-",
           "-",
           "-",
-          "-",
-          "-",
-          "-",
-          "-",
+          "L",
           "-",
           "-",
           "-",
@@ -524,17 +593,20 @@
           "-",
           "L",
           "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-",
-          "-"
+          "L",
+          "L",
+          "L",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M"
         ]
       }
     ]
@@ -542,14 +614,10 @@
   "enso": {
     "phase": "neutral",
     "intensity": "Weak",
-    "oni": 0.11,
+    "oni": 0.48,
     "peak_month": "Nov-25",
     "forecast_direction": "Neutral - No strong signal for 2026",
     "oni_history": [
-      {
-        "month": "Oct-24",
-        "value": -0.21
-      },
       {
         "month": "Nov-24",
         "value": -0.3
@@ -608,17 +676,21 @@
       },
       {
         "month": "Jan-26",
-        "value": -0.37,
-        "preliminary": true
+        "value": -0.37
       },
       {
         "month": "Feb-26",
-        "value": -0.15,
+        "value": -0.14,
         "preliminary": true
       },
       {
         "month": "Mar-26",
-        "value": 0.11,
+        "value": 0.13,
+        "preliminary": true
+      },
+      {
+        "month": "Apr-26",
+        "value": 0.48,
         "preliminary": true
       }
     ],
@@ -656,7 +728,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-05-31"
+    "last_updated": "2026-06-15"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",

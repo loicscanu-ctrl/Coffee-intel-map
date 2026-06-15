@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
 } from "recharts";
 import {
@@ -10,24 +10,35 @@ import {
 } from "./constants";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey } from "./helpers";
-import type { DailyData, SeriesKey, VolumeSeries } from "./types";
+import type { BrazilProjection, ProjectionStatus, SeriesKey, VolumeSeries } from "./types";
 
-export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
+// Status palette — current crop year is red across the dashboard, so the
+// three status tones live in the red family: realized = solid dark red,
+// certificados = solid light red, seasonality = diagonal-striped (SVG
+// pattern defined per-render in <defs> so it travels with the chart's
+// responsive container).
+const STATUS_COLOR: Record<ProjectionStatus, string> = {
+  realized:     "#991b1b",                 // dark red
+  certificados: "#f87171",                 // light red / coral
+  seasonality:  "url(#brz-seasonality)",   // SVG striped pattern
+};
+const STATUS_LABEL: Record<ProjectionStatus, string> = {
+  realized:     "Realized (Cecafé monthly)",
+  certificados: "Certificados pacing",
+  seasonality:  "Seasonality projection",
+};
+
+export default function MonthlyVolumeChart({ series, typeFilter, isFiltered, projection, isReportMode = false }: {
   series: VolumeSeries[];
   typeFilter?: SeriesKey | null;
   isFiltered?: boolean;
+  projection?: BrazilProjection | null;
+  isReportMode?: boolean;
 }) {
   const activeKey: SeriesKey = typeFilter ?? "total";
   const [cropYears, setCropYears] = useState(3);
-  const [dailyData, setDailyData] = useState<DailyData | null>(null);
 
-  useEffect(() => {
-    if (isFiltered) { setDailyData(null); return; }
-    fetch("/data/cecafe_daily.json")
-      .then(r => r.json()).then(setDailyData).catch(() => {});
-  }, [isFiltered]);
-
-  // Group by crop year key → month number → record
+  // Group by crop year key → month number → record (prior-year bars only).
   const cropGroups = useMemo(() => {
     const m: Record<string, Record<number, VolumeSeries>> = {};
     series.forEach(r => {
@@ -41,70 +52,69 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
 
   const sortedCropKeys = Object.keys(cropGroups).sort();
   const latestCrop     = sortedCropKeys[sortedCropKeys.length - 1];
-  const showCrops      = sortedCropKeys.slice(-cropYears).reverse();
-  const YEAR_COLORS    = CROP_YEAR_COLORS.slice(0, cropYears);
 
-  // Registration-based forecast for the current unreleased month
-  const forecast = useMemo(() => {
-    if (!dailyData) return null;
-    const ym = dailyData.updated.slice(0, 7); // "YYYY-MM"
-    if (series.some(r => r.date === ym)) return null; // Cecafe already released it
+  // Use the projection (SSOT) for the current crop year when nothing's
+  // filtered. Filters (country / hub / type ≠ total) fall back to history
+  // only — the projection doesn't carry per-type or per-destination splits.
+  const projectionApplies = !!projection && !isFiltered && activeKey === "total";
+  const currentCropKey   = projectionApplies ? projection!.crop_year : latestCrop;
 
-    const [fy, fm] = ym.split("-").map(Number);
-    const daysInMonth = new Date(fy, fm, 0).getDate();
-
-    const latestVal = (monthMap: Record<string, Record<string, number>> | undefined) => {
-      const md = monthMap?.[ym] ?? {};
-      const keys = Object.keys(md).map(Number).sort((a, b) => b - a);
-      return keys.length ? { val: md[String(keys[0])], day: keys[0] } : { val: 0, day: 0 };
-    };
-
-    const arab = latestVal(dailyData.arabica);
-    const coni = latestVal(dailyData.conillon);
-    const solv = latestVal(dailyData.soluvel);
-
-    let cum = 0, refDay = 0;
-    switch (activeKey) {
-      case "arabica":  cum = arab.val; refDay = arab.day; break;
-      case "conillon": cum = coni.val; refDay = coni.day; break;
-      case "soluvel":  cum = solv.val; refDay = solv.day; break;
-      case "torrado": return null;
-      // Defensive: SeriesKey doesn't list total_verde/total_industria but the
-      // original code branched on them — preserve the safety net.
-      default:
-        refDay = Math.max(arab.day, coni.day, solv.day);
-        cum = arab.val + coni.val + solv.val;
+  // Show only PAST crop years from the series — the current year comes
+  // from the projection (avoids drawing partial bars from cecafe.json
+  // alongside the SSOT bar). When the projection is absent or doesn't
+  // apply, render every crop year from history as before.
+  const showCrops = (() => {
+    const all = sortedCropKeys.slice();
+    if (projectionApplies) {
+      const idx = all.indexOf(currentCropKey);
+      if (idx >= 0) all.splice(idx, 1);
     }
-
-    if (!cum || !refDay) return null;
-    return {
-      kt:       Math.round(bagsToKT((cum / refDay) * daysInMonth) * 10) / 10,
-      monthNum: fm,
-      cropKey:  cropYearKey(ym),
-      refDay,
-      daysInMonth,
-    };
-  }, [dailyData, series, activeKey]);
-
-  // Fixed key so Bar is always in DOM — avoids recharts reordering on dynamic add
-  const EST_KEY = "__forecast__";
-
-  const estColor = (() => {
-    if (!forecast) return CROP_YEAR_COLORS[0];
-    const idx = showCrops.indexOf(forecast.cropKey);
-    return idx >= 0 ? YEAR_COLORS[idx] : CROP_YEAR_COLORS[0];
+    return all.slice(-(cropYears - (projectionApplies ? 1 : 0))).reverse();
   })();
+  const YEAR_COLORS = CROP_YEAR_COLORS.slice(0, cropYears);
+
+  // Projection: month-num → row, for the current crop year.
+  const projectionByMonth = useMemo(() => {
+    const m: Record<number, { kt: number; status: ProjectionStatus }> = {};
+    if (projectionApplies) {
+      for (const row of projection!.monthly_curve) {
+        // Recover month-number from the abbr (1–12).
+        const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+          .indexOf(row.month) + 1;
+        if (mo >= 1) m[mo] = { kt: bagsToKT(row.value), status: row.status };
+      }
+    }
+    return m;
+  }, [projection, projectionApplies]);
+
+  const CURRENT_BAR_KEY = "__current__";
 
   const chartData = CROP_MONTH_ORDER.map((mo, i) => {
-    const row: Record<string, number | string> = { month: CROP_MONTH_LABELS[i] };
-    // Always include estimate key (0 when no forecast or wrong month) so bar slot is stable
-    row[EST_KEY] = forecast && mo === forecast.monthNum ? forecast.kt : 0;
+    const row: Record<string, number | string | null> = { month: CROP_MONTH_LABELS[i] };
+    if (projectionApplies) {
+      row[CURRENT_BAR_KEY] = projectionByMonth[mo]?.kt ?? null;
+    } else {
+      const r = cropGroups[currentCropKey]?.[mo];
+      row[CURRENT_BAR_KEY] = r ? bagsToKT(r[activeKey] ?? r.total) : null;
+    }
     showCrops.forEach(ck => {
       const r = cropGroups[ck]?.[mo];
       row[ck] = r ? bagsToKT(r[activeKey] ?? r.total) : 0;
     });
     return row;
   });
+
+  // Header sub-line listing the months in each status (when projection applies).
+  const statusBreakdown = useMemo(() => {
+    if (!projectionApplies) return null;
+    const buckets: Record<ProjectionStatus, string[]> = {
+      realized: [], certificados: [], seasonality: [],
+    };
+    for (const r of projection!.monthly_curve) {
+      buckets[r.status].push(r.month);
+    }
+    return buckets;
+  }, [projection, projectionApplies]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -115,48 +125,85 @@ export default function MonthlyVolumeChart({ series, typeFilter, isFiltered }: {
           </div>
           <div className="text-[10px] text-slate-500">
             Crop year (Apr–Mar) · Thousand metric tons (60 kg bags)
-            {forecast && (
+            {statusBreakdown && (
               <span className="ml-2 text-slate-600 italic">
-                · est. based on registrations day {forecast.refDay}/{forecast.daysInMonth}
+                · {projection!.crop_year}: realized {statusBreakdown.realized.length}, certs {statusBreakdown.certificados.length}, seasonality {statusBreakdown.seasonality.length}
+                {projection!.safeguard_triggered && (
+                  <span className="ml-1 text-amber-400 not-italic font-semibold">· safeguard active</span>
+                )}
               </span>
             )}
           </div>
         </div>
-        <div className="flex gap-1">
-          {[2, 3, 5].map(n => (
-            <button key={n} onClick={() => setCropYears(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {n}Y
-            </button>
-          ))}
-        </div>
+        {!isReportMode && (
+          <div className="flex gap-1">
+            {[2, 3, 5].map(n => (
+              <button key={n} onClick={() => setCropYears(n)}
+                className={`text-[10px] px-2 py-0.5 rounded ${cropYears === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                {n}Y
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+          {/* SVG pattern for the seasonality bars — diagonal red stripes
+              on a faded red background so the eye reads them as projected
+              while keeping the current-crop-year red family. */}
+          <defs>
+            <pattern id="brz-seasonality" patternUnits="userSpaceOnUse"
+                     width="6" height="6" patternTransform="rotate(45)">
+              <rect width="6" height="6" fill="#ef4444" fillOpacity="0.25" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#ef4444" strokeWidth="2" />
+            </pattern>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 10 }} />
           <YAxis tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} width={42} />
           <Tooltip contentStyle={TT_STYLE}
-            formatter={((v, name) => [
-              `${v} kt${name === EST_KEY ? " (est.)" : ""}`,
-              (name === EST_KEY ? `Crop ${forecast?.cropKey ?? ""} (forecast)` : `Crop ${name}`) as NameType,
-            ]) satisfies Formatter<ValueType, NameType>} />
+            formatter={((v, name, props) => {
+              if (name === CURRENT_BAR_KEY) {
+                const monthLabel = props?.payload?.month;
+                const monthNum = CROP_MONTH_LABELS.indexOf(monthLabel) >= 0
+                  ? CROP_MONTH_ORDER[CROP_MONTH_LABELS.indexOf(monthLabel)] : null;
+                const status = monthNum ? projectionByMonth[monthNum]?.status : undefined;
+                const label = projectionApplies && status
+                  ? `${projection!.crop_year} (${STATUS_LABEL[status]})`
+                  : `Crop ${currentCropKey}`;
+                return [`${v} kt`, label as NameType];
+              }
+              return [`${v} kt`, `Crop ${name}` as NameType];
+            }) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, color: "#94a3b8", paddingTop: 6 }}
             formatter={v => (
               <span style={{ color: "#cbd5e1" }}>
-                {v === EST_KEY
-                  ? forecast ? `Crop ${forecast.cropKey} (est.)` : ""
+                {v === CURRENT_BAR_KEY
+                  ? projectionApplies ? `Crop ${currentCropKey} (projection)` : `Crop ${currentCropKey}`
                   : `Crop ${v}`}
               </span>
             )} />
-          {/* Always first = leftmost; hidden until forecast loads */}
-          <Bar key={EST_KEY} dataKey={EST_KEY} name={EST_KEY}
-            fill={estColor} fillOpacity={forecast ? 0.35 : 0}
-            legendType={forecast ? "square" : "none"} />
+          {/* Current crop year — per-cell coloring driven by projection status.
+              When projection is absent, falls back to a single solid colour
+              matching the prior pattern. */}
+          <Bar key={CURRENT_BAR_KEY} dataKey={CURRENT_BAR_KEY} name={CURRENT_BAR_KEY}
+               fill={projectionApplies ? STATUS_COLOR.realized : YEAR_COLORS[0]}>
+            {chartData.map((row, i) => {
+              if (!projectionApplies) {
+                return <Cell key={`c-${i}`} fill={YEAR_COLORS[0]} />;
+              }
+              const mo     = CROP_MONTH_ORDER[i];
+              const status = projectionByMonth[mo]?.status;
+              return (
+                <Cell key={`c-${i}`}
+                      fill={status ? STATUS_COLOR[status] : "transparent"} />
+              );
+            })}
+          </Bar>
           {showCrops.map((ck, i) => (
             <Bar key={ck} dataKey={ck} name={ck}
-              fill={YEAR_COLORS[i % YEAR_COLORS.length]}
-              opacity={ck === latestCrop ? 1 : 0.65}
+              fill={YEAR_COLORS[(i + 1) % YEAR_COLORS.length]}
+              opacity={0.6}
             />
           ))}
         </BarChart>

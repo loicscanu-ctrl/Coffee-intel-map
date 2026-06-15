@@ -1,0 +1,93 @@
+name: "3.6 – Spot Coffee (ATTE)"
+
+# Builds frontend/public/data/spot_coffee.json from the ATTE spot-coffee
+# offer list (https://attespotcoffee.azurewebsites.net/), a single login-gated
+# HTML table. Runs on a GitHub runner because the host is not on the Claude
+# sandbox allowlist. Credentials are provided via repository secrets:
+#   SPOT_COFFEE_USER  /  SPOT_COFFEE_PASS
+#
+# Modes:
+#   probe = log in, dump the login-form + table structure to the run log,
+#           commit nothing. Use this to validate the credentials / markup.
+#   full  = parse the table and commit spot_coffee.json.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly, Monday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "probe = diagnostics only (no commit); full = parse + commit"
+        required: false
+        default: "probe"
+        type: choice
+        options:
+          - probe
+          - full
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  spot-coffee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      SPOT_COFFEE_USER: ${{ secrets.SPOT_COFFEE_USER }}
+      SPOT_COFFEE_PASS: ${{ secrets.SPOT_COFFEE_PASS }}
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run spot-coffee scraper (3 attempts)
+        working-directory: backend
+        run: |
+          # Scheduled runs default to the full parse+commit; manual dispatch
+          # defaults to probe so a credential/markup test never commits.
+          MODE="${{ inputs.mode }}"
+          if [ -z "$MODE" ]; then MODE="full"; fi
+          run_scraper() {
+            if [ "$MODE" = "probe" ]; then
+              python -m scraper.sources.spot_coffee --probe
+            else
+              python -m scraper.sources.spot_coffee --full
+            fi
+          }
+          for attempt in 1 2 3; do
+            run_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
+
+      - name: Commit spot_coffee.json if changed
+        # Never commit on a probe run.
+        if: ${{ inputs.mode != 'probe' }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BR="$(git rev-parse --abbrev-ref HEAD)"
+          git add frontend/public/data/spot_coffee.json frontend/public/data/spot_coffee_history.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || (git commit -m "data: update spot_coffee.json [skip ci]" \
+                && git pull --rebase --autostash --strategy-option=theirs origin "$BR" \
+                && git push origin HEAD:"$BR")
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
