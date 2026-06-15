@@ -126,8 +126,7 @@ def emit(arabica_json: dict, robusta_json: dict,
     from scraper.db import get_session, upsert_news_item
 
     written = 0
-    db = get_session()
-    try:
+    with get_session() as db:
         for market_label, snapshots_key, compute_fn, src_url in (
             ("KC Arabica", "snapshots", compute_arabica_commentary, arabica_source_url),
             ("RC Robusta", "snapshots", compute_robusta_commentary, robusta_source_url),
@@ -142,6 +141,4 @@ def emit(arabica_json: dict, robusta_json: dict,
             upsert_news_item(db, _news_item_for(market_label, date_iso, text, src_url))
             written += 1
             print(f"[ice-news] {market_label} {date_iso}: {text}")
-    finally:
-        db.close()
     return written

@@ -38,8 +38,7 @@ async def _run(name: str, coro, db=None) -> None:
 async def run_annual() -> None:
     from playwright.async_api import async_playwright
 
-    db = get_session()
-    try:
+    with get_session() as db:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
             for name, coro_fn in [
@@ -51,8 +50,6 @@ async def run_annual() -> None:
                 finally:
                     await page.close()
             await browser.close()
-    finally:
-        db.close()
     print("[annual] Done.")
 
 

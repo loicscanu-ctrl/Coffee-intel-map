@@ -40,15 +40,12 @@ async def _run(name: str, coro_fn, db) -> None:
 
 
 async def run_cpi() -> None:
-    db = get_session()
-    try:
+    with get_session() as db:
         for name, coro_fn in [
             ("us_cpi",     lambda p: _us_cpi.run(p, db)),
             ("retail_cpi", lambda p: _retail_cpi.run(p, db)),
         ]:
             await _run(name, coro_fn, db)
-    finally:
-        db.close()
     print("[cpi] Done.")
 
 

@@ -56,11 +56,8 @@ async def run_source(key: str) -> None:
     label, fn, needs_browser = SOURCES[key]
     print(f"[scraper-monthly] Running source: {label}")
     create_farmer_economics_tables()
-    db = get_session()
-    try:
+    with get_session() as db:
         await _run(fn, needs_browser, db)
-    finally:
-        db.close()
     print(f"[scraper-monthly] {label}: OK")
 
 
@@ -68,16 +65,13 @@ async def run_all() -> None:
     """Legacy: run every source, logging failures without aborting the rest."""
     print("[scraper-monthly] Running ALL sources...")
     create_farmer_economics_tables()
-    db = get_session()
-    try:
+    with get_session() as db:
         for _key, (label, fn, needs_browser) in SOURCES.items():
             try:
                 await _run(fn, needs_browser, db)
                 print(f"[scraper-monthly] {label}: OK")
             except Exception as e:
                 print(f"[scraper-monthly] {label} failed: {e}")
-    finally:
-        db.close()
     print("[scraper-monthly] Done.")
 
 

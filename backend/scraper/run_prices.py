@@ -50,8 +50,7 @@ def main():
     )
     gbpusd_cache = _fetch_gbpusd_rates({today}) if needs_gbp else {}
 
-    db = get_session()
-    try:
+    with get_session() as db:
         inserted = 0
         for sym, spec in COMMODITY_SPECS.items():
             src = spec["price_source"]
@@ -92,8 +91,6 @@ def main():
                     print(f"  WARNING: no cot_weekly price_ldn for {sym} on {today}", file=sys.stderr)
 
         print(f"Done. {inserted} prices upserted.")
-    finally:
-        db.close()
 
 
 if __name__ == "__main__":

@@ -119,8 +119,7 @@ def emit_from_history_path(history_path: Path) -> int:
     from scraper.db import get_session, upsert_news_item
 
     written = 0
-    db = get_session()
-    try:
+    with get_session() as db:
         for market_key, label, lat, lng in (
             ("arabica", "IFUS KC",  40.74, -74.05),  # ICE Futures U.S. (NY)
             ("robusta", "ICE-EU RC", 51.51,  -0.09), # ICE Futures Europe (London)
@@ -146,6 +145,4 @@ def emit_from_history_path(history_path: Path) -> int:
             })
             written += 1
             print(f"[oi-news] {label} {latest_date}: {text}")
-    finally:
-        db.close()
     return written
