@@ -200,6 +200,10 @@ def _download_pdf(url: str) -> bytes | None:
     """Download PDF from files.customs.gov.vn (no auth required)."""
     import requests
     try:
+        # files.customs.gov.vn ships a misconfigured TLS chain (intermediate
+        # cert is sometimes missing on the edge). verify=False is intentional;
+        # the host is non-auth and we validate the response body (PDF magic)
+        # before trusting it.
         resp = requests.get(url, timeout=60, verify=False)
         resp.raise_for_status()
         if b"%PDF" not in resp.content[:10]:

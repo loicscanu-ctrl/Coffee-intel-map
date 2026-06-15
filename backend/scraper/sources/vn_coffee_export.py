@@ -279,6 +279,8 @@ def _try_download_pdf(url: str) -> bytes | None:
     """
     import requests
     try:
+        # files.customs.gov.vn ships a misconfigured TLS chain; see the host
+        # comment near _FILES_HOST. verify=False is intentional here.
         resp = requests.get(url, timeout=30, verify=False, allow_redirects=True)
         if resp.status_code == 200 and b"%PDF" in resp.content[:10]:
             return resp.content
@@ -418,6 +420,7 @@ def _download_pdf(url: str) -> bytes | None:
     """Download PDF from files.customs.gov.vn (no auth required)."""
     import requests
     try:
+        # files.customs.gov.vn ships a misconfigured TLS chain; see _FILES_HOST.
         resp = requests.get(url, timeout=60, verify=False)
         resp.raise_for_status()
         if b"%PDF" not in resp.content[:10]:

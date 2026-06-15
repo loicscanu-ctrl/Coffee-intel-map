@@ -13,6 +13,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
+from scraper.utils.http import get_with_backoff
+
 # ── COMMODITY_SPECS ────────────────────────────────────────────────────────────
 # One entry per traded symbol.
 # Entries marked *est* require manual verification at ice.com.
@@ -358,8 +360,7 @@ def _fetch_gbpusd_rates(dates: set) -> dict:
 
 def _download_cftc_df(year: int) -> pd.DataFrame:
     url = f"https://www.cftc.gov/files/dea/history/fut_disagg_txt_{year}.zip"
-    resp = requests.get(url, timeout=60)
-    resp.raise_for_status()
+    resp = get_with_backoff(url, timeout=(10, 60))
     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
         csv_name = [n for n in z.namelist() if n.endswith(".txt") or n.endswith(".csv")][0]
         with z.open(csv_name) as f:
@@ -368,8 +369,7 @@ def _download_cftc_df(year: int) -> pd.DataFrame:
 
 def _download_ice_df(year: int) -> pd.DataFrame:
     url = f"https://www.ice.com/publicdocs/futures/COTHist{year}.csv"
-    resp = requests.get(url, timeout=60)
-    resp.raise_for_status()
+    resp = get_with_backoff(url, timeout=(10, 60))
     # ICE files may have a UTF-8 BOM on the first column — use utf-8-sig to strip it
     return pd.read_csv(io.StringIO(resp.content.decode("utf-8-sig")), low_memory=False)
 
