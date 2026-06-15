@@ -116,11 +116,11 @@ function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNear
             )}
             <Bullet>Price <Tone sign={m.priceChangePct}>{pct1(m.priceChangePct)} ({priceAbs})</Tone>{structureClause}.</Bullet>
             <Bullet>
-              Roasters covered <Tone sign={m.cats.pmpu.dLong}>{lotsSigned(m.cats.pmpu.dLong)} ({kTonsSigned(m.roasterMTWoW)})</Tone>,
+              {m.cats.pmpu.dLong > 0 ? "Roasters are covering for" : "Roasters holding & fixing for"} <Tone sign={m.cats.pmpu.dLong}>{lotsSigned(m.cats.pmpu.dLong)} ({kTonsSigned(m.roasterMTWoW)})</Tone>,
               reaching {kTons(m.roasterMT)} ({pct1(m.roasterCovPct)} maxed).
             </Bullet>
             <Bullet>
-              Producers covered <Tone sign={m.cats.pmpu.dShort} invert>{lotsSigned(m.cats.pmpu.dShort)} ({kTonsSigned(m.producerMTWoW)})</Tone>,
+              {m.cats.pmpu.dShort > 0 ? "Producers are selling for" : "Producers holding & exporters are fixing for"} <Tone sign={m.cats.pmpu.dShort} invert>{lotsSigned(m.cats.pmpu.dShort)} ({kTonsSigned(m.producerMTWoW)})</Tone>,
               reaching {kTons(m.producerMT)} ({pct1(m.producerCovPct)} maxed).
             </Bullet>
             <Bullet>
