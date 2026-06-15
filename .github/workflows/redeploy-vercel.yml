@@ -46,9 +46,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  redeploy:
-    # Only deploy off a SUCCESSFUL upstream — a failed export shouldn't ship.
+  # Lightweight dedup gate — no checkout, no setup. Two upstream workflows
+  # (Export and Publish + ICE Certified Stocks) frequently complete within
+  # the same minute, which previously fired this workflow twice for the
+  # same head SHA. Vercel dedups identical deploys but we still burn runner
+  # minutes; this gate skips the second fire cheaply (~3-5 s) by checking
+  # GH API for a prior successful or in-progress run on the same SHA.
+  guard:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      skip: ${{ steps.dedupe.outputs.skip }}
+    steps:
+      - name: Skip if a recent run already deployed this SHA
+        id: dedupe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:     ${{ github.repository }}
+          THIS_RUN: ${{ github.run_id }}
+          THIS_SHA: ${{ github.sha }}
+          EVENT:    ${{ github.event_name }}
+        run: |
+          # Manual dispatch always proceeds — operators may want to re-deploy
+          # the same SHA after a Vercel-side issue. The schedule branch also
+          # bypasses (the scheduled redeploys are a fallback for late data
+          # commits and the SHA may match a recent deploy by coincidence).
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$EVENT" = "schedule" ]; then
+            echo "$EVENT — bypassing dedup."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          prior=$(curl -sf -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/actions/workflows/redeploy-vercel.yml/runs?per_page=20" \
+            | python3 -c "
+          import json, sys, os
+          d = json.load(sys.stdin)
+          this_run = os.environ['THIS_RUN']
+          this_sha = os.environ['THIS_SHA']
+          for r in d.get('workflow_runs', []):
+              if str(r['id']) == this_run:
+                  continue
+              if r.get('head_sha') != this_sha:
+                  continue
+              if r.get('conclusion') == 'success' or r.get('status') == 'in_progress':
+                  print(r['id']); break
+          ")
+          if [ -n "$prior" ]; then
+            echo "Redeploy already running/done for sha $THIS_SHA via run $prior — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No prior redeploy for sha $THIS_SHA. Proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  redeploy:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
