@@ -115,10 +115,10 @@ export default function CurrencyIndexSection() {
                     <span className="text-[9px] px-1.5 py-0.5 rounded border text-emerald-400 bg-emerald-950/50 border-emerald-800">Export</span>
                   </td>
                   <td className="px-3 py-1.5 text-right font-mono text-slate-300">{(c.weight * 100).toFixed(1)}%</td>
-                  <td className={`px-3 py-1.5 text-right font-mono ${c.daily_chg == null ? "text-slate-600" : c.daily_chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <td className={`px-3 py-1.5 text-right font-mono ${c.daily_chg == null ? "text-slate-500" : c.daily_chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {c.daily_chg == null ? "—" : `${c.daily_chg >= 0 ? "+" : ""}${c.daily_chg.toFixed(2)}%`}
                   </td>
-                  <td className={`px-3 py-1.5 text-right font-mono font-semibold ${c.contribution == null ? "text-slate-600" : c.contribution >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <td className={`px-3 py-1.5 text-right font-mono font-semibold ${c.contribution == null ? "text-slate-500" : c.contribution >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {fmt4(c.contribution)}
                   </td>
                 </tr>
@@ -138,10 +138,10 @@ export default function CurrencyIndexSection() {
                     <span className="text-[9px] px-1.5 py-0.5 rounded border text-blue-400 bg-blue-950/50 border-blue-800">Import</span>
                   </td>
                   <td className="px-3 py-1.5 text-right font-mono text-slate-300">{(c.weight * 100).toFixed(1)}%</td>
-                  <td className={`px-3 py-1.5 text-right font-mono ${c.daily_chg == null ? "text-slate-600" : c.daily_chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <td className={`px-3 py-1.5 text-right font-mono ${c.daily_chg == null ? "text-slate-500" : c.daily_chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {c.daily_chg == null ? "—" : `${c.daily_chg >= 0 ? "+" : ""}${c.daily_chg.toFixed(2)}%`}
                   </td>
-                  <td className={`px-3 py-1.5 text-right font-mono font-semibold ${c.contribution == null ? "text-slate-600" : c.contribution >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <td className={`px-3 py-1.5 text-right font-mono font-semibold ${c.contribution == null ? "text-slate-500" : c.contribution >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {fmt4(c.contribution)}
                   </td>
                 </tr>
@@ -214,8 +214,8 @@ export default function CurrencyIndexSection() {
               })}
             </div>
             <div className="flex justify-between mt-1">
-              <span className="text-[9px] text-slate-600">{history[0]?.date ?? ""}</span>
-              <span className="text-[9px] text-slate-600">{history[history.length - 1]?.date ?? ""}</span>
+              <span className="text-[9px] text-slate-500">{history[0]?.date ?? ""}</span>
+              <span className="text-[9px] text-slate-500">{history[history.length - 1]?.date ?? ""}</span>
             </div>
           </div>
 

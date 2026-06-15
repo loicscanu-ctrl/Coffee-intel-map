@@ -18,7 +18,7 @@ const DryBulkChart = dynamic(
 
 function ChartFallback({ height }: { height: number }) {
   return (
-    <div className="flex items-center justify-center text-slate-600 text-[10px] animate-pulse"
+    <div className="flex items-center justify-center text-slate-500 text-[10px] animate-pulse"
       style={{ height }}>
       Loading chart…
     </div>
@@ -76,7 +76,7 @@ function BdryPanel({ data }: { data: DryBulkData }) {
           <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Dry Bulk Freight · {data.ticker}
           </div>
-          <div className="text-[9px] text-slate-600 mt-0.5">{data.description}</div>
+          <div className="text-[9px] text-slate-500 mt-0.5">{data.description}</div>
         </div>
         <div className="text-right">
           <div className="text-xl font-mono font-bold text-slate-100">${data.last_price.toFixed(2)}</div>
@@ -88,7 +88,7 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 
       {w52Pos != null && (
         <div className="space-y-0.5">
-          <div className="flex justify-between text-[8px] text-slate-600 font-mono">
+          <div className="flex justify-between text-[8px] text-slate-500 font-mono">
             <span>52w L ${data.week52_low?.toFixed(2)}</span>
             <span>52w H ${data.week52_high?.toFixed(2)}</span>
           </div>
@@ -105,22 +105,22 @@ function BdryPanel({ data }: { data: DryBulkData }) {
 
       <div className="grid grid-cols-3 gap-3 text-[9px] font-mono border-t border-slate-800 pt-2">
         <div>
-          <div className="text-slate-600">WoW</div>
+          <div className="text-slate-500">WoW</div>
           <div style={{ color: wowColor }}>
             {data.wow_pct != null ? `${data.wow_pct >= 0 ? "+" : ""}${data.wow_pct}%` : "—"}
           </div>
         </div>
         <div>
-          <div className="text-slate-600">As of</div>
+          <div className="text-slate-500">As of</div>
           <div className="text-slate-400">{data.last_date}</div>
         </div>
         <div>
-          <div className="text-slate-600">Exchange</div>
+          <div className="text-slate-500">Exchange</div>
           <div className="text-slate-400">NYSE Arca</div>
         </div>
       </div>
 
-      <div className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2">
+      <div className="text-[9px] text-slate-500 italic border-t border-slate-800 pt-2">
         Rising {data.ticker} → tighter dry bulk freight → higher CIF fertilizer cost into Brazil.
         Tracks Capesize + Supramax freight futures. Source: {data.source}.
       </div>
@@ -149,7 +149,7 @@ export default function FreightClient({ data }: Props) {
           Freight Rate Evolution — USD / FEU
         </div>
         {data?.updated && (
-          <div className="text-[10px] text-slate-600 mb-3">Last updated: {data.updated}</div>
+          <div className="text-[10px] text-slate-500 mb-3">Last updated: {data.updated}</div>
         )}
 
         {(!data || data.history.length === 0) && (
@@ -224,7 +224,7 @@ export default function FreightClient({ data }: Props) {
       {dryBulk ? (
         <BdryPanel data={dryBulk} />
       ) : (
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 text-[10px] text-slate-600 italic">
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 text-[10px] text-slate-500 italic">
           {dryLoaded
             ? "Dry bulk freight indicator not yet available — pending the next dry-bulk scrape."
             : "Loading dry bulk indicator…"}

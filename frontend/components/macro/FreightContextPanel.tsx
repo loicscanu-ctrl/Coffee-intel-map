@@ -130,7 +130,7 @@ export default function FreightContextPanel() {
                     {series && series.length > 1 ? (
                       <Sparkline values={series} color="#0ea5e9" />
                     ) : (
-                      <span className="text-[9px] text-slate-600">—</span>
+                      <span className="text-[9px] text-slate-500">—</span>
                     )}
                   </td>
                 </tr>
