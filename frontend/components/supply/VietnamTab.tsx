@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
 import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEstimate";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
@@ -81,6 +82,8 @@ export default function VietnamTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["vietnam_exports", "vietnam_price"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
