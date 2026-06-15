@@ -64,21 +64,21 @@ def upsert_news_item(db, item: dict):
 
 def upsert_freight_rate(index_code: str, rate_date, rate: float):
     from models import FreightRate
-    db = get_session()
-    try:
-        existing = db.query(FreightRate).filter_by(
-            index_code=index_code, date=rate_date
-        ).first()
-        if existing:
-            existing.rate = rate
-        else:
-            db.add(FreightRate(index_code=index_code, date=rate_date, rate=rate))
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise  # Let the caller (scraper loop) decide how to handle failures
-    finally:
-        db.close()
+    # `with` calls session.close() on exit (success or exception) — replaces
+    # the old try/finally pattern and matches SQLAlchemy 1.4+ idiom.
+    with get_session() as db:
+        try:
+            existing = db.query(FreightRate).filter_by(
+                index_code=index_code, date=rate_date
+            ).first()
+            if existing:
+                existing.rate = rate
+            else:
+                db.add(FreightRate(index_code=index_code, date=rate_date, rate=rate))
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise  # Let the caller (scraper loop) decide how to handle failures
 
 
 def migrate_cot_weekly_columns():
@@ -164,40 +164,38 @@ def upsert_cot_weekly(market: str, report_date, fields: dict):
     scalar_fields = {k: v for k, v in fields.items() if field_to_position(k) is None}
     position_rows = position_rows_from_fields(fields)
 
-    db = get_session()
-    try:
-        existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
-        if existing:
-            for k, v in scalar_fields.items():
-                setattr(existing, k, v)
-        else:
-            db.add(CotWeekly(date=report_date, market=market, **scalar_fields))
-
-        for pos in position_rows:
-            row = (
-                db.query(CotPosition)
-                .filter_by(date=report_date, market=market,
-                           crop=pos["crop"], category=pos["category"],
-                           side=pos["side"])
-                .first()
-            )
-            if row:
-                if pos["oi"]      is not None: row.oi      = pos["oi"]
-                if pos["traders"] is not None: row.traders = pos["traders"]
+    with get_session() as db:
+        try:
+            existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
+            if existing:
+                for k, v in scalar_fields.items():
+                    setattr(existing, k, v)
             else:
-                db.add(CotPosition(
-                    date=report_date, market=market,
-                    crop=pos["crop"], category=pos["category"],
-                    side=pos["side"],
-                    oi=pos["oi"], traders=pos["traders"],
-                ))
+                db.add(CotWeekly(date=report_date, market=market, **scalar_fields))
 
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+            for pos in position_rows:
+                row = (
+                    db.query(CotPosition)
+                    .filter_by(date=report_date, market=market,
+                               crop=pos["crop"], category=pos["category"],
+                               side=pos["side"])
+                    .first()
+                )
+                if row:
+                    if pos["oi"]      is not None: row.oi      = pos["oi"]
+                    if pos["traders"] is not None: row.traders = pos["traders"]
+                else:
+                    db.add(CotPosition(
+                        date=report_date, market=market,
+                        crop=pos["crop"], category=pos["category"],
+                        side=pos["side"],
+                        oi=pos["oi"], traders=pos["traders"],
+                    ))
+
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
 
 
 def upsert_cot_price(
@@ -220,28 +218,26 @@ def upsert_cot_price(
     """
     from models import CotWeekly
     contract_field = "price_contract_ny" if price_field == "price_ny" else "price_contract_ldn"
-    db = get_session()
-    try:
-        existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
-        if existing:
-            if getattr(existing, price_field) is not None:
-                print(f"[db] {market} {price_field} for {report_date} already set — skipping")
-                return False
-            setattr(existing, price_field, value)
-            if contract is not None:
-                setattr(existing, contract_field, contract)
-        else:
-            payload = {price_field: value}
-            if contract is not None:
-                payload[contract_field] = contract
-            db.add(CotWeekly(date=report_date, market=market, **payload))
-        db.commit()
-        return True
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+    with get_session() as db:
+        try:
+            existing = db.query(CotWeekly).filter_by(date=report_date, market=market).first()
+            if existing:
+                if getattr(existing, price_field) is not None:
+                    print(f"[db] {market} {price_field} for {report_date} already set — skipping")
+                    return False
+                setattr(existing, price_field, value)
+                if contract is not None:
+                    setattr(existing, contract_field, contract)
+            else:
+                payload = {price_field: value}
+                if contract is not None:
+                    payload[contract_field] = contract
+                db.add(CotWeekly(date=report_date, market=market, **payload))
+            db.commit()
+            return True
+        except Exception:
+            db.rollback()
+            raise
 
 
 def create_farmer_economics_tables():
@@ -308,43 +304,39 @@ def create_vn_local_prices_table():
 def upsert_vn_local_price(prices: dict, recorded_at) -> None:
     """Insert a new VN local price snapshot. Keeps last 60 rows, purges older ones."""
     from models import VnLocalPrice
-    db = get_session()
-    try:
-        db.add(VnLocalPrice(
-            recorded_at=recorded_at,
-            local_time=prices.get("local_time"),
-            prices=prices,
-        ))
-        db.commit()
-        # Purge rows older than the newest 60
-        subq = (
-            db.query(VnLocalPrice.id)
-            .order_by(VnLocalPrice.recorded_at.desc())
-            .limit(60)
-            .subquery()
-        )
-        db.query(VnLocalPrice).filter(~VnLocalPrice.id.in_(subq)).delete(synchronize_session=False)
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+    with get_session() as db:
+        try:
+            db.add(VnLocalPrice(
+                recorded_at=recorded_at,
+                local_time=prices.get("local_time"),
+                prices=prices,
+            ))
+            db.commit()
+            # Purge rows older than the newest 60
+            subq = (
+                db.query(VnLocalPrice.id)
+                .order_by(VnLocalPrice.recorded_at.desc())
+                .limit(60)
+                .subquery()
+            )
+            db.query(VnLocalPrice).filter(~VnLocalPrice.id.in_(subq)).delete(synchronize_session=False)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
 
 
 def get_latest_vn_local_price() -> dict | None:
     """Return the most recently captured VN local prices dict, or None."""
     from models import VnLocalPrice
-    db = get_session()
-    try:
-        row = db.query(VnLocalPrice).order_by(VnLocalPrice.recorded_at.desc()).first()
-        if not row:
+    with get_session() as db:
+        try:
+            row = db.query(VnLocalPrice).order_by(VnLocalPrice.recorded_at.desc()).first()
+            if not row:
+                return None
+            return {"saved_at": row.recorded_at.isoformat() + "Z", **row.prices}
+        except Exception:
             return None
-        return {"saved_at": row.recorded_at.isoformat() + "Z", **row.prices}
-    except Exception:
-        return None
-    finally:
-        db.close()
 
 
 def extract_physical_price(item: dict) -> dict | None:
