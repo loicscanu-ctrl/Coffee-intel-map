@@ -4,80 +4,80 @@
   "monthly_curve": [
     {
       "month": "Apr",
-      "value": 3121804,
+      "value": 3161375,
       "status": "realized",
       "ym": "2026-04"
     },
     {
       "month": "May",
-      "value": 3111810,
-      "status": "certificados",
+      "value": 3088877,
+      "status": "realized",
       "ym": "2026-05"
     },
     {
       "month": "Jun",
-      "value": 3301408,
+      "value": 2991452,
       "status": "certificados",
       "ym": "2026-06"
     },
     {
       "month": "Jul",
-      "value": 3738772,
+      "value": 3766888,
       "status": "seasonality",
       "ym": "2026-07"
     },
     {
       "month": "Aug",
-      "value": 4304899,
+      "value": 4337273,
       "status": "seasonality",
       "ym": "2026-08"
     },
     {
       "month": "Sep",
-      "value": 5128874,
+      "value": 5167444,
       "status": "seasonality",
       "ym": "2026-09"
     },
     {
       "month": "Oct",
-      "value": 5631225,
+      "value": 5673572,
       "status": "seasonality",
       "ym": "2026-10"
     },
     {
       "month": "Nov",
-      "value": 4918882,
+      "value": 4955872,
       "status": "seasonality",
       "ym": "2026-11"
     },
     {
       "month": "Dec",
-      "value": 4277940,
+      "value": 4310110,
       "status": "seasonality",
       "ym": "2026-12"
     },
     {
       "month": "Jan",
-      "value": 3790013,
+      "value": 3818952,
       "status": "seasonality",
       "ym": "2027-01"
     },
     {
       "month": "Feb",
-      "value": 3574716,
+      "value": 3601598,
       "status": "seasonality",
       "ym": "2027-02"
     },
     {
       "month": "Mar",
-      "value": 4169656,
+      "value": 4196587,
       "status": "seasonality",
       "ym": "2027-03"
     }
   ],
-  "generated_at": "2026-06-14T19:26:51Z",
+  "generated_at": "2026-06-15T20:55:46Z",
   "target_source": "Manual override (USDA FAS GAIN report BR2026-0025 \u2014 Brazil Coffee Annual, June 1 2026)",
   "safeguard_triggered": false,
-  "realized_through": "2026-04",
-  "last_year_total": 37827090
+  "realized_through": "2026-05",
+  "last_year_total": 37825842
 }
