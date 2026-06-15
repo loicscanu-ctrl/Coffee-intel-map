@@ -214,7 +214,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     category: "Supply",
     description: "Top destinations for Brazilian coffee, current vs prior period.",
     Component: dynamic(() => import("@/components/report/charts/BrazilExportReports").then((m) => ({ default: m.BrazilDestination })), { ssr: false, loading }),
-    width: "half",
+    width: "full",
   },
   {
     id: "brazil_supply_demand",
