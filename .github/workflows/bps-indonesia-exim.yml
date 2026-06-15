@@ -1,0 +1,121 @@
+name: "0.9 – BPS Indonesia coffee exports (monthly)"
+
+# Pulls Indonesia's national coffee export numbers from BPS. The page sits
+# behind Cloudflare Turnstile, which fingerprints headless Chromium and
+# rejects it indefinitely. The workaround is Xvfb (virtual X display)
+# under which patchright runs Chromium in HEADED mode — the spinner
+# resolves in ~2 s and BPS lets the POST through.
+#
+# Cron is disabled until the first manual backfill (2022-04 → 2026-03)
+# confirms the Xvfb path is stable end-to-end. Once it is, uncomment the
+# monthly schedule below.
+
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: "Single month YYYY-MM (overrides from/to)"
+        required: false
+        default: ""
+        type: string
+      from:
+        description: "Range start YYYY-MM (inclusive)"
+        required: false
+        default: ""
+        type: string
+      to:
+        description: "Range end YYYY-MM (inclusive)"
+        required: false
+        default: ""
+        type: string
+  # schedule:
+  #   - cron: '15 4 5 * *'    # re-enable after Xvfb run is proven
+
+concurrency:
+  group: bps-indonesia-exim
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90       # 75 months × ~20 s with xvfb + CF wait ≈ 25 min worst case
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install Xvfb and Python dependencies
+        # Xvfb is the X virtual framebuffer — it provides a fake display
+        # so Chromium can run in HEADED mode on a headless ubuntu runner.
+        # That's what turns the "Just a moment…" Turnstile spinner into a
+        # cleared-and-resolved page on CI.
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          pip install patchright
+          python -m patchright install chromium
+          python -m patchright install-deps chromium
+
+      - name: Run BPS scraper under Xvfb
+        id: scrape
+        working-directory: backend
+        env:
+          MONTH:   ${{ inputs.month }}
+          FROM_M:  ${{ inputs.from }}
+          TO_M:    ${{ inputs.to }}
+        # `xvfb-run -a` allocates a free display number and starts Xvfb
+        # for us; `-s "-screen 0 1280x800x24"` gives a 1280×800 24-bit
+        # virtual screen, close to a typical laptop, so Chromium's
+        # window-dimension fingerprint matches what CF expects from a
+        # real user. The scraper itself runs with --headed which flips
+        # patchright's `headless=False`, putting the browser onto Xvfb.
+        run: |
+          set +e
+          ARGS="--write --headed"
+          if [ -n "$MONTH" ]; then
+            ARGS="$ARGS --month $MONTH"
+          elif [ -n "$FROM_M" ] && [ -n "$TO_M" ]; then
+            ARGS="$ARGS --from $FROM_M --to $TO_M"
+          fi
+          xvfb-run -a -s "-screen 0 1280x800x24" \
+            python -m scraper.sources.bps_indonesia_exim $ARGS
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated JSON if changed
+        if: steps.scrape.outputs.rc == '0'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f frontend/public/data/indonesia_exports.json ]; then
+            git add frontend/public/data/indonesia_exports.json
+            if git diff --cached --quiet; then
+              echo "No JSON change."
+            else
+              CURRENT=$(git rev-parse --abbrev-ref HEAD)
+              git commit -m "data: BPS Indonesia exports $(date -u +%Y-%m-%d) [skip ci]"
+              if [ "$CURRENT" = "main" ]; then
+                git pull --rebase --autostash --strategy-option=theirs origin main
+                git push
+              else
+                git push origin "HEAD:$CURRENT"
+              fi
+            fi
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
