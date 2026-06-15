@@ -41,17 +41,25 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run annual scrapers
+      - name: Run annual scrapers (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.annual_scraper
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.annual_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Export static JSON
+      - name: Export static JSON (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.export_static_json
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.export_static_json && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated static JSON if changed
         run: |

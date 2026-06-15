@@ -37,13 +37,16 @@ jobs:
         # No more netCDF4 / numpy: the gridded approach never produced data.
         run: pip install requests
 
-      - name: Fetch VHI
+      - name: Fetch VHI (3 attempts)
         env:
           ORIGINS: ${{ inputs.origins }}
         run: |
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/fetch_vhi.py $ARGS
+          for attempt in 1 2 3; do
+            python backend/scripts/fetch_vhi.py $ARGS && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated VHI data
         run: |

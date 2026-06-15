@@ -48,7 +48,7 @@ jobs:
         # no-op when DATABASE_URL is unset.
         run: pip install requests scipy sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Fetch + accumulate + rebuild
+      - name: Fetch + accumulate + rebuild (3 attempts)
         env:
           ORIGINS: ${{ inputs.origins }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -56,23 +56,32 @@ jobs:
         run: |
           ARGS="--write"
           [ -n "$ORIGINS" ] && ARGS="$ARGS --origins $ORIGINS"
-          python backend/scripts/fetch_origin_weather.py $ARGS
+          for attempt in 1 2 3; do
+            python backend/scripts/fetch_origin_weather.py $ARGS && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Evaluate IPHM agronomic alerts
+      - name: Evaluate IPHM agronomic alerts (3 attempts)
         # Runs after the weather rebuild so SPI/SPEI/forecast are fresh.
         # Writes frontend/public/data/agronomic_alerts.json AND merges the
         # flattened entries into signals.json so the Telegram bot's existing
         # consumer surfaces them automatically.
         run: |
-          PYTHONPATH=backend python -m scraper.agronomic_alerts --write
+          for attempt in 1 2 3; do
+            PYTHONPATH=backend python -m scraper.agronomic_alerts --write && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Compute weather analogs (Brazil arabica)
+      - name: Compute weather analogs (Brazil arabica, 3 attempts)
         # Reads backend/seed/weather_history/brazil.json + the historical
         # production seed, ranks past years by Euclidean distance on per-
         # phenology-stage (rain, temp) signatures, and writes the analog
         # forecast JSON the BrazilWeatherAnalogs panel consumes.
         run: |
-          PYTHONPATH=backend python backend/scripts/compute_weather_analogs.py
+          for attempt in 1 2 3; do
+            PYTHONPATH=backend python backend/scripts/compute_weather_analogs.py && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated weather data
         run: |

@@ -49,18 +49,24 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
 
-      - name: Run spot-coffee scraper
+      - name: Run spot-coffee scraper (3 attempts)
         working-directory: backend
         run: |
           # Scheduled runs default to the full parse+commit; manual dispatch
           # defaults to probe so a credential/markup test never commits.
           MODE="${{ inputs.mode }}"
           if [ -z "$MODE" ]; then MODE="full"; fi
-          if [ "$MODE" = "probe" ]; then
-            python -m scraper.sources.spot_coffee --probe
-          else
-            python -m scraper.sources.spot_coffee --full
-          fi
+          run_scraper() {
+            if [ "$MODE" = "probe" ]; then
+              python -m scraper.sources.spot_coffee --probe
+            else
+              python -m scraper.sources.spot_coffee --full
+            fi
+          }
+          for attempt in 1 2 3; do
+            run_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit spot_coffee.json if changed
         # Never commit on a probe run.

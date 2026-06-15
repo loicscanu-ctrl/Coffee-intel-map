@@ -40,14 +40,20 @@ jobs:
       - name: Install dependencies
         run: pip install requests pdfplumber
 
-      - name: Run ECF stocks backfill
+      - name: Run ECF stocks backfill (3 attempts)
         working-directory: backend
         run: |
-          if [ "${{ inputs.debug }}" = "true" ]; then
-            python -m scraper.backfill_ecf_history --debug
-          else
-            python -m scraper.backfill_ecf_history
-          fi
+          run_scraper() {
+            if [ "${{ inputs.debug }}" = "true" ]; then
+              python -m scraper.backfill_ecf_history --debug
+            else
+              python -m scraper.backfill_ecf_history
+            fi
+          }
+          for attempt in 1 2 3; do
+            run_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Upload debug artifact
         if: ${{ inputs.debug }}
