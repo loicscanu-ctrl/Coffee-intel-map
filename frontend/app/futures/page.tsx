@@ -242,6 +242,10 @@ interface ShippingMonth {
   yr:          number;
   letter:      string;
   contractSym: string;
+  // Letter + 2-digit contract year (e.g. "U26", "F27"). Uniquely identifies the
+  // underlying futures contract so spreads stay correct even when the strip
+  // spans more than one crop year and a letter (N, U, X, F…) recurs.
+  priceKey:    string;
 }
 
 interface MonthWithBasis extends ShippingMonth {
@@ -259,20 +263,26 @@ function cropYearEndYear(yr: number, mo: number): number {
   return mo === 12 ? yr + 1 : yr;
 }
 
-function getNextLetter(months: ShippingMonth[]): string | null {
-  const front = months[0]?.letter;
-  if (!front) return null;
-  return months.find(m => m.letter !== front)?.letter ?? null;
+// First shipping month whose underlying contract differs from the front. Keyed
+// by priceKey (letter+year), not bare letter, so e.g. a new-crop strip running
+// F27 → … → F28 still finds the genuine next contract (H27) rather than treating
+// the two F's as one.
+function getNextContract(months: ShippingMonth[]): ShippingMonth | null {
+  const frontKey = months[0]?.priceKey;
+  if (!frontKey) return null;
+  return months.find(m => m.priceKey !== frontKey) ?? null;
 }
 
+// Unique contract transitions in the strip, identified by priceKey so a letter
+// recurring in a later crop year (e.g. N26 vs N27) is treated as a real roll.
 function getTransitions(months: ShippingMonth[]): { from: string; to: string; key: string }[] {
   const result: { from: string; to: string; key: string }[] = [];
-  let prev = months[0]?.letter ?? "";
+  let prevKey = months[0]?.priceKey ?? "";
   months.slice(1).forEach(m => {
-    if (m.letter !== prev) {
-      const key = `${prev}-${m.letter}`;
-      if (!result.find(t => t.key === key)) result.push({ from: prev, to: m.letter, key });
-      prev = m.letter;
+    if (m.priceKey !== prevKey) {
+      const key = `${prevKey}-${m.priceKey}`;
+      if (!result.find(t => t.key === key)) result.push({ from: prevKey, to: m.priceKey, key });
+      prevKey = m.priceKey;
     }
   });
   return result;
@@ -281,31 +291,33 @@ function getTransitions(months: ShippingMonth[]): { from: string; to: string; ke
 // Walks the months array applying basisDiff to the front contract, basis2Diff
 // to the next contract (the editable one), and auto-rolling the market spread
 // for any 3rd+ contract transition. Within a single contract, applies +30
-// USD/MT per shipment month carry.
+// USD/MT per shipment month carry. Spreads are read from priceByKey using each
+// month's priceKey (letter+year), so every contract switch incorporates the
+// price difference between the two real contracts.
 function computeMonthsBasis(
   months:     ShippingMonth[],
   basisDiff:  number,
   basis2Diff: number,
-  rcPrices:   Record<string, number>,
+  priceByKey: Record<string, number>,
 ): MonthWithBasis[] {
   let activeBasis    = basisDiff;
   let activeStartIdx = 0;
   let contractIdx    = 0;
-  let lastLetter     = months[0]?.letter ?? "";
+  let lastKey        = months[0]?.priceKey ?? "";
   return months.map((m, i) => {
-    if (m.letter !== lastLetter) {
+    if (m.priceKey !== lastKey) {
       contractIdx += 1;
       activeStartIdx = i;
       if (contractIdx === 1) {
         activeBasis = basis2Diff;
       } else {
-        const fromPrice = rcPrices[lastLetter];
-        const toPrice   = rcPrices[m.letter];
+        const fromPrice = priceByKey[lastKey];
+        const toPrice   = priceByKey[m.priceKey];
         if (fromPrice != null && toPrice != null) {
           activeBasis += Math.round(fromPrice - toPrice);
         }
       }
-      lastLetter = m.letter;
+      lastKey = m.priceKey;
     }
     const monthOffset = (i - activeStartIdx) * 30;
     return { ...m, contractLetter: m.letter, basisForMonth: activeBasis + monthOffset };
@@ -333,28 +345,41 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     .filter(o => selectedOptions.has(o.key))
     .reduce((sum, o) => sum + o.val, 0);
 
-  // RC price lookup — first occurrence of each letter (nearest expiry).
-  const rcPrices = useMemo(() => {
+  // Price lookup keyed by contract (letter + 2-digit year), e.g. "U26", "F27".
+  // Keeps the nearest expiry per contract. Keying by the full contract — not the
+  // bare letter — is what lets a multi-crop-year strip read the correct price for
+  // each roll (N26 ≠ N27, F27 ≠ F28).
+  const priceByKey = useMemo(() => {
     const p: Record<string, number> = {};
     contracts.forEach(c => {
-      const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])\d{2}$/i);
-      if (m && !(m[1].toUpperCase() in p)) p[m[1].toUpperCase()] = c.last;
+      const m = c.symbol.match(/^R[CM]([FGHJKMNQUVXZ])(\d{2})$/i);
+      if (m) {
+        const k = `${m[1].toUpperCase()}${m[2]}`;
+        if (!(k in p)) p[k] = c.last;
+      }
     });
     return p;
   }, [contracts]);
 
-  // 8 shipping months from today (skips current month after the 14th to
-  // roll off near-FND contracts).
+  // Shipping months from the front (skips current month after the 14th to roll
+  // off near-FND contracts) through November of the NEXT crop year, so the
+  // new-crop table can run all the way to its Nov close.
   const monthsBase = useMemo<ShippingMonth[]>(() => {
     const today  = new Date();
     const offset = today.getDate() >= 14 ? 1 : 0;
-    return Array.from({ length: 8 }, (_, i) => {
-      const d  = new Date(today.getFullYear(), today.getMonth() + offset + i, 1);
+    const start  = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+    const startCropEnd = cropYearEndYear(start.getFullYear(), start.getMonth() + 1);
+    // Last shipping month we need = Nov of the next crop year (month index 10).
+    const end    = new Date(startCropEnd + 1, 10, 1);
+    const count  = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
+    return Array.from({ length: count }, (_, i) => {
+      const d  = new Date(start.getFullYear(), start.getMonth() + i, 1);
       const mo = d.getMonth() + 1;
       const yr = d.getFullYear();
       const letter = SHIPMENT_TO_CONTRACT[mo];
       const cYear  = letter === "F" && mo >= 11 ? yr + 1 : yr;
-      return { label: `${MONTH_ABB[mo]}-${String(yr).slice(2)}`, mo, yr, letter, contractSym: `RC${letter}${String(cYear).slice(2)}` };
+      const yy     = String(cYear).slice(2);
+      return { label: `${MONTH_ABB[mo]}-${String(yr).slice(2)}`, mo, yr, letter, contractSym: `RC${letter}${yy}`, priceKey: `${letter}${yy}` };
     });
   }, []);
 
@@ -376,67 +401,67 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   }, [monthsBase, todayCropEndYear]);
 
   // ── Current crop computed state ────────────────────────────────────────
-  const currentNextLetter  = useMemo(() => getNextLetter(currentCropMonths),  [currentCropMonths]);
-  const currentTransitions = useMemo(() => getTransitions(currentCropMonths), [currentCropMonths]);
+  const currentNext        = useMemo(() => getNextContract(currentCropMonths), [currentCropMonths]);
+  const currentTransitions = useMemo(() => getTransitions(currentCropMonths),  [currentCropMonths]);
   // Default basis: VN FAQ USD/MT + FOB cost − current-crop's front RC price.
   // The +100 mirrors FOB_COST_USD["VN FAQ"] in components/map/MarketTicker.tsx.
   const currentBasisDefault = useMemo(() => {
-    const fl = currentCropMonths[0]?.letter;
-    const fp = fl ? rcPrices[fl] : null;
+    const fk = currentCropMonths[0]?.priceKey;
+    const fp = fk ? priceByKey[fk] : null;
     if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
     return 150;
-  }, [vnFaqUsdMt, rcPrices, currentCropMonths]);
+  }, [vnFaqUsdMt, priceByKey, currentCropMonths]);
   const currentBasisDiff = currentBasisOverride ?? currentBasisDefault;
   // Default 2nd-contract basis: front-basis + (frontPrice − nextPrice) of the
   // within-current-crop next contract. Keeps at-port level across the roll.
   const currentBasis2Default = useMemo(() => {
-    const fl = currentCropMonths[0]?.letter;
-    const fp = fl ? rcPrices[fl] : null;
-    const np = currentNextLetter ? rcPrices[currentNextLetter] : null;
+    const fk = currentCropMonths[0]?.priceKey;
+    const fp = fk ? priceByKey[fk] : null;
+    const np = currentNext ? priceByKey[currentNext.priceKey] : null;
     if (fp != null && np != null) return currentBasisDiff + Math.round(fp - np);
     return currentBasisDiff + 30;
-  }, [currentBasisDiff, currentCropMonths, rcPrices, currentNextLetter]);
+  }, [currentBasisDiff, currentCropMonths, priceByKey, currentNext]);
   const currentBasis2Diff = currentBasis2Override ?? currentBasis2Default;
   const currentMonths = useMemo(
-    () => computeMonthsBasis(currentCropMonths, currentBasisDiff, currentBasis2Diff, rcPrices),
-    [currentCropMonths, currentBasisDiff, currentBasis2Diff, rcPrices],
+    () => computeMonthsBasis(currentCropMonths, currentBasisDiff, currentBasis2Diff, priceByKey),
+    [currentCropMonths, currentBasisDiff, currentBasis2Diff, priceByKey],
   );
 
   // ── New crop computed state ────────────────────────────────────────────
-  const newNextLetter  = useMemo(() => getNextLetter(newCropMonths),  [newCropMonths]);
-  const newTransitions = useMemo(() => getTransitions(newCropMonths), [newCropMonths]);
+  const newNext        = useMemo(() => getNextContract(newCropMonths), [newCropMonths]);
+  const newTransitions = useMemo(() => getTransitions(newCropMonths),  [newCropMonths]);
   const newBasisDefault = useMemo(() => {
-    const fl = newCropMonths[0]?.letter;
-    const fp = fl ? rcPrices[fl] : null;
+    const fk = newCropMonths[0]?.priceKey;
+    const fp = fk ? priceByKey[fk] : null;
     if (vnFaqUsdMt && fp) return Math.round(vnFaqUsdMt + 100 - fp);
     return 150;
-  }, [vnFaqUsdMt, rcPrices, newCropMonths]);
+  }, [vnFaqUsdMt, priceByKey, newCropMonths]);
   const newBasisDiff = newBasisOverride ?? newBasisDefault;
   const newBasis2Default = useMemo(() => {
-    const fl = newCropMonths[0]?.letter;
-    const fp = fl ? rcPrices[fl] : null;
-    const np = newNextLetter ? rcPrices[newNextLetter] : null;
+    const fk = newCropMonths[0]?.priceKey;
+    const fp = fk ? priceByKey[fk] : null;
+    const np = newNext ? priceByKey[newNext.priceKey] : null;
     if (fp != null && np != null) return newBasisDiff + Math.round(fp - np);
     return newBasisDiff + 30;
-  }, [newBasisDiff, newCropMonths, rcPrices, newNextLetter]);
+  }, [newBasisDiff, newCropMonths, priceByKey, newNext]);
   const newBasis2Diff = newBasis2Override ?? newBasis2Default;
   const newMonths = useMemo(
-    () => computeMonthsBasis(newCropMonths, newBasisDiff, newBasis2Diff, rcPrices),
-    [newCropMonths, newBasisDiff, newBasis2Diff, rcPrices],
+    () => computeMonthsBasis(newCropMonths, newBasisDiff, newBasis2Diff, priceByKey),
+    [newCropMonths, newBasisDiff, newBasis2Diff, priceByKey],
   );
 
   // Market spread between current crop's last and new crop's first contract.
-  // Renders as the inter-table badge so the X→F roll the new-crop basisDefault
+  // Renders as the inter-table badge so the roll the new-crop basisDefault
   // implicitly bakes in is also visible to the eye.
   const cropYearRoll = useMemo(() => {
     const lastCur  = currentCropMonths[currentCropMonths.length - 1];
     const firstNew = newCropMonths[0];
     if (!lastCur || !firstNew) return null;
-    const lp = rcPrices[lastCur.letter];
-    const fp = rcPrices[firstNew.letter];
+    const lp = priceByKey[lastCur.priceKey];
+    const fp = priceByKey[firstNew.priceKey];
     if (lp == null || fp == null) return null;
-    return { from: lastCur.letter, to: firstNew.letter, value: Math.round(lp - fp) };
-  }, [currentCropMonths, newCropMonths, rcPrices]);
+    return { from: lastCur.priceKey, to: firstNew.priceKey, value: Math.round(lp - fp) };
+  }, [currentCropMonths, newCropMonths, priceByKey]);
 
   const sections: string[] = [];
   QUALITIES.forEach(q => { if (!sections.includes(q.section)) sections.push(q.section); });
@@ -447,14 +472,14 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     subtitle:       string;
     months:         MonthWithBasis[];
     transitions:    { from: string; to: string; key: string }[];
-    nextLetter:     string | null;
+    nextLabel:      string | null;
     basisDiff:      number;
     basis2Diff:     number;
     onBasisChange:  (n: number) => void;
     onBasis2Change: (n: number) => void;
   }) {
     if (opts.months.length === 0) return null;
-    const frontLetter = opts.months[0].letter;
+    const frontLabel = opts.months[0].priceKey;
     return (
       <div className="space-y-3">
         {/* Per-crop controls */}
@@ -465,7 +490,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
           </div>
           <div className="border-l border-slate-700 pl-6">
             <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-              Basis — Grade 2 S13 — {frontLetter} contract
+              Basis — Grade 2 S13 — {frontLabel} contract
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -477,10 +502,10 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
               <span className="text-slate-400 text-sm">USD / MT</span>
             </div>
           </div>
-          {opts.nextLetter && (
+          {opts.nextLabel && (
             <div className="border-l border-slate-700 pl-6">
               <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5">
-                Basis — Grade 2 S13 — {opts.nextLetter} contract
+                Basis — Grade 2 S13 — {opts.nextLabel} contract
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -500,8 +525,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
               </div>
               <div className="flex flex-wrap gap-4">
                 {opts.transitions.map(({ key, from, to }) => {
-                  const val = (rcPrices[from] != null && rcPrices[to] != null)
-                    ? Math.round(rcPrices[from] - rcPrices[to])
+                  const val = (priceByKey[from] != null && priceByKey[to] != null)
+                    ? Math.round(priceByKey[from] - priceByKey[to])
                     : null;
                   return (
                     <div key={key} className="flex items-center gap-2">
@@ -630,7 +655,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         subtitle:       "Physical shipments in the current crop year",
         months:         currentMonths,
         transitions:    currentTransitions,
-        nextLetter:     currentNextLetter,
+        nextLabel:      currentNext?.priceKey ?? null,
         basisDiff:      currentBasisDiff,
         basis2Diff:     currentBasis2Diff,
         onBasisChange:  setCurrentBasisOverride,
@@ -656,7 +681,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         subtitle:       "Physical shipments in next crop year",
         months:         newMonths,
         transitions:    newTransitions,
-        nextLetter:     newNextLetter,
+        nextLabel:      newNext?.priceKey ?? null,
         basisDiff:      newBasisDiff,
         basis2Diff:     newBasis2Diff,
         onBasisChange:  setNewBasisOverride,
