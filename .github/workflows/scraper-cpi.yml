@@ -42,21 +42,29 @@ jobs:
         working-directory: backend
         run: pip install -r scraper/requirements.txt pandas requests python-dotenv openpyxl
 
-      - name: Run CPI scrapers
+      - name: Run CPI scrapers (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           # Optional: lifts the BLS API window from 10 to 20 years. Works
           # without it (keyless access allows 25 queries/day).
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
-        run: python -m scraper.cpi_scraper
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.cpi_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Export CPI static JSON
+      - name: Export CPI static JSON (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
-        run: python -m scraper.export_static_json --only us_cpi,retail_cpi
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.export_static_json --only us_cpi,retail_cpi && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated CPI JSON if changed
         run: |
