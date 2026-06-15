@@ -176,7 +176,7 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
   const chartData = buildChartData(series, spread);
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
       <div className={`text-center text-sm font-semibold text-slate-200 mb-1 ${accent} rounded py-1 flex items-center justify-center gap-2`}>
         {title}
         {isMock && (
@@ -190,28 +190,31 @@ export default function OIFndChart({ market, height = 320 }: { market: "robusta"
         )}
       </p>
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 20, left: 0 }}>
+        <LineChart data={chartData} margin={{ top: 4, right: 6, bottom: 4, left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          {/* Axis titles dropped — the caption above already states OI (K) vs
+              trading days to FND and the spread unit; tight widths reclaim the
+              left/right gutters so the plot fills the card. */}
           <XAxis
             dataKey="day"
             type="number"
             domain={[-45, 0]}
             tickCount={10}
+            height={18}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
-            label={{ value: "trading days to FND", position: "insideBottom", offset: -10, fill: "#64748b", fontSize: 11 }}
           />
           <YAxis
             yAxisId="oi"
+            width={32}
             tickFormatter={v => `${v}K`}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
-            label={{ value: "OI (K)", angle: -90, position: "insideLeft", offset: 10, fill: "#64748b", fontSize: 11 }}
           />
           {spread && (
             <YAxis
               yAxisId="spread"
               orientation="right"
+              width={34}
               tick={{ fill: SPREAD_COLOR, fontSize: 11 }}
-              label={{ value: `Spread (${spreadUnit})`, angle: 90, position: "insideRight", offset: 10, fill: SPREAD_COLOR, fontSize: 11 }}
             />
           )}
           <Tooltip
