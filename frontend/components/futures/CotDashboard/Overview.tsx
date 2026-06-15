@@ -14,6 +14,7 @@ const lotsAbs    = (v: number) => `${(Math.abs(v) / 1000).toFixed(1)} k lots`;
 const pctSigned  = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`;
 const pct1       = (v: number) => `${v.toFixed(1)}%`;
 const kTons      = (mt: number) => `${(mt / 1000).toFixed(1)} k tons`;
+const kTonsSigned = (mt: number) => `${mt >= 0 ? "+" : ""}${(mt / 1000).toFixed(1)} k tons`;
 const num        = (x: unknown) => (typeof x === "number" ? x : 0);
 
 const md = (iso: string) => { const [, m, d] = iso.split("-"); return `${MONTHS[+m - 1]} ${+d}`; };
@@ -75,13 +76,12 @@ function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNear
     const backwardated = m.structureValue <= 0;
     const movingToward = invPrev === null ? null : invNow > invPrev ? "backwardation" : "carry";
     structureClause = (
-      <> with a structure{movingToward ? ` moving toward ${movingToward}` : ""}, now{" "}
+      <>; structure{movingToward ? ` moving toward ${movingToward}` : ""},{" "}
         {backwardated ? "inverted" : "in carry"} at {pct1(Math.abs(invNow))}
-        {invPrev !== null ? ` (${pct1(Math.abs(invPrev))} last week)` : ""}</>
+        {invPrev !== null ? ` (vs ${pct1(Math.abs(invPrev))} LW)` : ""}</>
     );
   }
 
-  const covVar = (mtWoW: number, mt: number) => { const prev = mt - mtWoW; return prev !== 0 ? (mtWoW / Math.abs(prev)) * 100 : 0; };
   const longVerb  = m.mmLongChangeLots  < 0 ? "liquidating" : m.mmLongChangeLots  > 0 ? "adding to" : "holding";
   const shortVerb = m.mmShortChangeLots > 0 ? "increasing"  : m.mmShortChangeLots < 0 ? "covering"  : "holding";
 
@@ -105,18 +105,19 @@ function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNear
             {forwardShown !== null && (
               <Bullet sub>{lotsSigned(forwardShown)} in forward contracts</Bullet>
             )}
-            <Bullet>Price change of {pct1(m.priceChangePct)} ({priceAbs}){structureClause}.</Bullet>
+            <Bullet>Price {pct1(m.priceChangePct)} ({priceAbs}){structureClause}.</Bullet>
             <Bullet>
-              Roasters&rsquo; coverage variation of {pct1(covVar(m.roasterMTWoW, m.roasterMT))}, reaching{" "}
-              {pct1(m.roasterCovPct)} of range, now at {kTons(m.roasterMT)} equivalent.
+              Roasters covered {lotsSigned(m.cats.pmpu.dLong)} ({kTonsSigned(m.roasterMTWoW)}),
+              reaching {kTons(m.roasterMT)} ({pct1(m.roasterCovPct)} maxed).
             </Bullet>
             <Bullet>
-              Producers&rsquo; coverage variation of {pct1(covVar(m.producerMTWoW, m.producerMT))}, reaching{" "}
-              {pct1(m.producerCovPct)} of range, now at {kTons(m.producerMT)} equivalent.
+              Producers covered {lotsSigned(m.cats.pmpu.dShort)} ({kTonsSigned(m.producerMTWoW)}),
+              reaching {kTons(m.producerMT)} ({pct1(m.producerCovPct)} maxed).
             </Bullet>
             <Bullet>
               MM {longVerb} longs ({lotsSigned(m.mmLongChangeLots)} / {pctSigned(m.mmLongChangePct)} of their position)
-              {" "}and {shortVerb} shorts ({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)}).
+              {" "}and {shortVerb} shorts ({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)} of their position).
+              {" "}Net {m.mmLong - m.mmShort >= 0 ? "long" : "short"} of {lotsAbs(m.mmLong - m.mmShort)}.
             </Bullet>
           </ul>
         );
