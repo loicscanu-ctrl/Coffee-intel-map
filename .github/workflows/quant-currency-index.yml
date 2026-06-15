@@ -33,14 +33,17 @@ jobs:
         # which run_quant.py imports.
         run: pip install requests pandas numpy sqlalchemy psycopg2-binary google-generativeai python-dotenv
 
-      - name: Run Currency Index scraper (3 attempts, 15m between)
+      - name: Run Currency Index scraper (3 attempts)
         id: fetch_cci
-        # Yahoo Finance per-IP rate limits typically clear in ~15 minutes,
-        # not 5. Old 5-minute retry hit the same wall three times in a row.
+        # 5-minute backoff matches the repo-wide retry standard (PR #302).
+        # The historical 15-minute window was added when fetch_currency_index
+        # talked to yfinance and needed Yahoo's per-IP rate limit to clear;
+        # PR #54 migrated to jsDelivr (CDN-cached static file, no rate limit)
+        # so the wider backoff is no longer justified.
         run: |
           for attempt in 1 2 3; do
             python -m backend.scraper.quant_model.fetch_currency_index && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 15m..." && sleep 900 || exit 1
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
       - name: Validate CCI output
@@ -93,7 +96,7 @@ jobs:
         run: |
           for attempt in 1 2 3; do
             python -m backend.scraper.quant_model.run_quant && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 2m..." && sleep 120 || exit 1
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
           done
 
       - name: Commit Robusta additions (only if Robusta succeeded)

@@ -30,10 +30,14 @@ on:
   workflow_dispatch:
 
 # If a previous run is still in progress when the next cron tick fires,
-# skip rather than queue. Keeps the workflow log clean during incidents.
+# cancel it and let the fresh one through. Stale snapshots are worthless for
+# live quotes — and queueing would let backlog build unbounded if a slow
+# fetch coincides with the next tick (4-min timeout × 15-min cadence is
+# tight enough that this matters). cancel-in-progress: true ensures the
+# freshest tick wins.
 concurrency:
   group: acaphe-poll
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   poll:
