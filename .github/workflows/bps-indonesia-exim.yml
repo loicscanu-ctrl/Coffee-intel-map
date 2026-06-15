@@ -36,6 +36,16 @@ on:
     # 5th of each month, 04:15 UTC. BPS publishes the prior-prior month
     # somewhere mid-month, so by the 5th of N we're confident N-2 is up.
     - cron: '15 4 5 * *'
+  # TEMPORARY — pre-merge smoke test on the feature branch only.
+  # workflow_dispatch from a non-default branch returns 404 until the
+  # workflow has landed on main at least once. This block goes away
+  # before the PR opens.
+  push:
+    branches:
+      - claude/bps-indonesia-exim
+    paths:
+      - '.github/workflows/bps-indonesia-exim.yml'
+      - 'backend/scraper/sources/bps_indonesia_exim.py'
 
 concurrency:
   # Own group, not data-commit — same reasoning as UCDA's workflow.
