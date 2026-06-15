@@ -34,8 +34,12 @@ Operator workflow (post-BPS-publication, ~6 weeks after month-end):
 
     cd backend
     PYTHONPATH=. python -m scraper.sources.bps_indonesia_exim \
-        --month 2026-04 --write
+        --month 2026-04 --write --headed
     cd ..
+
+(--headed launches a visible browser window; required because BPS's CF
+config fingerprints headless Chromium and rejects it even from a
+residential IP. The window flashes briefly during the scrape.)
     git add frontend/public/data/indonesia_exports.json
     git commit -m "data: BPS Indonesia exports 2026-04"
     git push
@@ -130,7 +134,7 @@ class MonthlySummary:
 # ── fetch ───────────────────────────────────────────────────────────────────
 
 
-async def fetch_month(year: int, month: int) -> list[dict] | None:
+async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict] | None:
     """Hit the BPS server action once and return the flat list of data rows
     (one per HS×port×country). Returns None on any network/parse failure;
     the caller logs + skips that month.
@@ -163,7 +167,14 @@ async def fetch_month(year: int, month: int) -> list[dict] | None:
     body = json.dumps(payload, separators=(",", ":"))
 
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        # headless=False (passed via --headed) opens a visible browser
+        # window. First live local run (operator's laptop, 2026-06-15)
+        # showed BPS's Cloudflare config rejects HEADLESS Chromium even
+        # from a residential IP — CF fingerprints the browser, not just
+        # the network. Headed mode + patchright stealth profile clears
+        # CF reliably. The window flashes for a few seconds during the
+        # scrape; that's the cost of by-passing the bot detection.
+        browser = await pw.chromium.launch(headless=not headed)
         try:
             # No custom user_agent — patchright's stealth profile sets a UA
             # that MATCHES its bundled Chromium's TLS fingerprint. First
@@ -381,14 +392,14 @@ def _summary_to_dict(s: MonthlySummary) -> dict:
     }
 
 
-async def run_async(months: list[tuple[int, int]], write: bool) -> int:
+async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = False) -> int:
     existing = _load_existing() if write else {}
     by_month: dict[str, dict] = {row["month"]: row for row in existing.get("series", [])}
 
     for y, m in months:
         ym = f"{y:04d}-{m:02d}"
         print(f"[bps] fetching {ym}…")
-        rows = await fetch_month(y, m)
+        rows = await fetch_month(y, m, headed=headed)
         if rows is None:
             print(f"  → fetch failed; skipping {ym}")
             continue
@@ -428,6 +439,12 @@ def main() -> int:
     ap.add_argument("--to",    dest="end",   help="Range end YYYY-MM (inclusive)")
     ap.add_argument("--write", action="store_true",
                     help="Persist the merged JSON to public/data")
+    ap.add_argument("--headed", action="store_true",
+                    help="Launch Chromium with a visible window. Required to "
+                         "clear BPS's Cloudflare bot challenge — headless "
+                         "Chromium is fingerprinted and rejected even from "
+                         "a residential IP. The window flashes briefly while "
+                         "the scrape runs.")
     args = ap.parse_args()
 
     if args.month:
@@ -445,7 +462,7 @@ def main() -> int:
             y, m = y - 1, m + 12
         months = [(y, m)]
 
-    return asyncio.run(run_async(months, write=args.write))
+    return asyncio.run(run_async(months, write=args.write, headed=args.headed))
 
 
 if __name__ == "__main__":
