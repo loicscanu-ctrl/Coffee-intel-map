@@ -1,5 +1,93 @@
 [
   {
+    "id": 7059,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-11",
+    "body": "ICE-EU RC Open Interest changed by +2,108 over the last session, with +1,679 on nearby two contracts and +429 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-11\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +2,108 over the last session, with +1,679 on nearby two contracts and +429 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-15T03:27:02.110583",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +2,108 over the last session, with +1,679 on nearby two contracts and +429 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7058,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-11",
+    "body": "IFUS KC Open Interest changed by -4,784 over the last session, with -5,576 on nearby two contracts and +792 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-11\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -4,784 over the last session, with -5,576 on nearby two contracts and +792 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-15T03:26:58.984225",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -4,784 over the last session, with -5,576 on nearby two contracts and +792 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7057,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-12",
+    "body": "RC Robusta certified stocks shifted by +48 lots today, bringing global visible exchange inventory to 3,761 lots. 97 lots graded.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260612_103045.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by +48 lots today, bringing global visible exchange inventory to 3,761 lots. 97 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-15T03:26:02.312118",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by +48 lots today, bringing global visible exchange inventory to 3,761 lots. 97 lots graded.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7056,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-12",
+    "body": "KC Arabica certified stocks shifted by -550 bags today, bringing global visible exchange inventory to 398,940 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260612.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -550 bags today, bringing global visible exchange inventory to 398,940 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-15T03:26:00.004578",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -550 bags today, bringing global visible exchange inventory to 398,940 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 7055,
     "title": "World Bank Population \u2013 2026-06-15",
     "body": "Tracked 13 countries for demand-tab per-capita normalization.",
@@ -3462,79 +3550,5 @@
     ],
     "meta": null,
     "pub_date": "2026-06-07T05:49:43.556390"
-  },
-  {
-    "id": 6410,
-    "title": "USD/VND FX Rate \u2013 2026-06-07",
-    "body": "USD/VND FX Rate price: 26236",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "fx",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-07T05:49:42.359618"
-  },
-  {
-    "id": 6409,
-    "title": "USD/BRL FX Rate \u2013 2026-06-07",
-    "body": "USD/BRL FX Rate price: 5.0687",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "fx",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-07T05:49:41.157676"
-  },
-  {
-    "id": 6407,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-06",
-    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 9.15,
-    "lng": 40.49,
-    "tags": [
-      "weather",
-      "ethiopia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-06T08:16:11.854766",
-    "commentary": {
-      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6406,
-    "title": "Uganda Agronomic Status \u2013 2026-06-06",
-    "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 1.37,
-    "lng": 32.29,
-    "tags": [
-      "weather",
-      "uganda",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-06T08:16:11.172437",
-    "commentary": {
-      "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
   }
 ]
