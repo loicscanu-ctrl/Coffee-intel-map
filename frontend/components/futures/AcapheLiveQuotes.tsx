@@ -180,7 +180,6 @@ function ChainTable({
           <span className="font-semibold text-sm text-white">Live Quotes</span>
           <span className={`text-xs ml-2 ${accent}`}>{title}</span>
         </div>
-        <span className="text-xs text-slate-500 whitespace-nowrap ml-2">acaphe.com</span>
       </div>
 
       <table className="w-full text-[11px] font-mono">
@@ -378,7 +377,7 @@ export default function AcapheLiveQuotes() {
   if (error && !data) {
     return (
       <div className="bg-slate-900 border border-slate-700 rounded-lg p-6 text-center">
-        <p className="text-slate-400 text-sm mb-2">Live acaphe.com quotes not available.</p>
+        <p className="text-slate-400 text-sm mb-2">Live quotes not available.</p>
         <p className="text-slate-600 text-xs font-mono">python backend/scraper/acaphe_poller.py</p>
       </div>
     );
