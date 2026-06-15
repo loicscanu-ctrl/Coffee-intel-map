@@ -64,11 +64,15 @@ export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
       const tMax  = tVals.length ? Math.max(...tVals) : 1000;
       const oMin  = oVals.length ? Math.min(...oVals) : -5000000;
       const oMax  = oVals.length ? Math.max(...oVals) : 5000000;
-      const tPad  = (tMax - tMin) * 0.1 || 10;
-      const oPad  = Math.max(Math.abs(oMax), Math.abs(oMin)) * 0.1;
+      // Tight padding so the point cloud fills the frame — the dominant "squeeze"
+      // was ~10% empty margin baked into the domain on every side, which no card
+      // resize could recover. ~3% keeps points off the very edge without wasting
+      // space. (No clipping: tMin/tMax/oMin/oMax still span every point.)
+      const tPad  = (tMax - tMin) * 0.03 || 2;
+      const oPad  = Math.max(Math.abs(oMax), Math.abs(oMin)) * 0.03;
       return {
         x: [Math.floor(tMin - tPad), Math.ceil(tMax + tPad)] as [number, number],
-        y: [Math.floor(oMin < 0 ? oMin * 1.1 : oMin - oPad), Math.ceil(oMax > 0 ? oMax * 1.1 : oMax + oPad)] as [number, number],
+        y: [Math.floor(oMin < 0 ? oMin * 1.03 : oMin - oPad), Math.ceil(oMax > 0 ? oMax * 1.03 : oMax + oPad)] as [number, number],
       };
     };
     return { ny: calc(processedDpData.ny), ldn: calc(processedDpData.ldn) };
@@ -93,15 +97,16 @@ export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
     return (
       <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl h-[460px]">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 12, right: 10, bottom: 26, left: 48 }}>
+          <ScatterChart margin={{ top: 12, right: 12, bottom: 8, left: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
-              domain={dom.x}
-              label={{ value: "# traders", position: "insideBottom", offset: -10, fill: "#475569", fontSize: 10 }} />
+              domain={dom.x} height={20} />
+            {/* width kept tight (just the tick labels); the rotated "OI (k MT)"
+                and "# traders" titles are dropped — the section subtitle already
+                names both axes — so the plot isn't boxed into the centre. */}
             <YAxis type="number" dataKey="oi" name="OI" stroke="#475569" fontSize={10}
-              domain={dom.y}
-              tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
-              label={{ value: "OI (k MT)", angle: -90, position: "insideLeft", offset: -10, fill: "#475569", fontSize: 10 }} />
+              domain={dom.y} width={34}
+              tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
             <ReferenceLine y={0} stroke="#475569" strokeWidth={1} strokeDasharray="4 4" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={CHART_STYLE}
               formatter={((v, name) => name === "# traders"
