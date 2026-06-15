@@ -640,7 +640,10 @@ def export_vietnam_last() -> None:
         if not snapshot:
             print("  vietnam_last.json → no data in DB yet — skipped")
             return
-        path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(
+            path, snapshot,
+            lambda d: (bool(d.get("saved_at")), "missing saved_at"),
+        )
         saved_at = snapshot.get("saved_at", "?")
         bmt_bid  = snapshot.get("bmt_bid", "?")
         print(f"  vietnam_last.json → BMT bid={bmt_bid}, recorded {saved_at}")

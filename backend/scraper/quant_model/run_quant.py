@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from database import SessionLocal
 from scraper.quant_model import sentiment as sentiment_mod
 from scraper.quant_model import robusta_factors as factors_mod
+from scraper.validate_export import safe_write_json
 
 ROOT     = Path(__file__).resolve().parents[3]
 OUT_PATH = ROOT / "frontend" / "public" / "data" / "quant_report.json"
@@ -69,8 +70,11 @@ def main() -> None:
     existing["robusta_factors"] = factors
     existing["scraped_at"]      = datetime.utcnow().isoformat() + "Z"
 
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(existing, f, indent=2, ensure_ascii=False)
+    safe_write_json(
+        OUT_PATH, existing,
+        lambda d: (d.get("sentiment") is not None and d.get("robusta_factors") is not None,
+                   "missing sentiment or robusta_factors"),
+    )
 
     print(f"Saved → {OUT_PATH}")
 
