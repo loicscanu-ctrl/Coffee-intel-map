@@ -37,11 +37,20 @@ jobs:
           THRESHOLDS_H = {
               # Daily / near-daily sources (2-day buffer)
               "futures":              48,
-              "freight":              48,
+              # Freight: scraped Fri + Sun only (1.2 cron `19 2 * * 5,0`). The
+              # Freightos index publishes weekly with the data stamped at end-of-
+              # week, so `FreightRate.date` lands on Fridays and stays there
+              # through the Sun re-scrape. 9-day limit = one missed weekly
+              # publish + 2-day buffer; a 2-day limit fires every Monday morning
+              # by design even when the scraper is healthy.
+              "freight":              9 * 24,
               "weather":              48,
               "enso":                 48,
               "vietnam_price":        48,  # giacaphe.com via vietnam.py — silent-failed Apr 23 → May 14 2026
-              "quant_currency_index": 48,  # Macro tab Coffee Currency Index (quant_report.json)
+              # CCI is produced by quant-currency-index Mon-Fri only (`30 21 * * 1-5`).
+              # 96 h matches sibling fx_history's "4-day buffer over weekends"
+              # threshold — both files come out of the same workflow run.
+              "quant_currency_index": 96,
               "fx_history":           96,  # Macro tab FX time-series; weekday-only workflow, 4-day buffer over weekends
               "origin_prices":        48,  # Macro tab Origin Prices time-series (accumulator, runs in 1.4)
               # Monthly source — Retail CPI series publishes on the 10th–15th of each month
