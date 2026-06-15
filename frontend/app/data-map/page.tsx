@@ -2,6 +2,7 @@
 import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import Mermaid from "@/components/Mermaid";
+import { useFetchJson } from "@/lib/useFetchJson";
 
 // Shared class definitions appended to every per-tab diagram. `vis` (the tab's
 // own colour) is supplied per diagram.
@@ -1060,6 +1061,106 @@ function WorkflowTable() {
   );
 }
 
+// ── Live Workflow Inventory ─────────────────────────────────────────────────
+// Auto-generated from .github/workflows/*.yml by build_workflow_inventory.py
+// (run on every push that touches a workflow file). Renders structural
+// metadata only — name, triggers, cron, workflow_run chains, concurrency,
+// timeout — so the page reflects the actual YAML without manual editing.
+
+interface InventoryWorkflow {
+  file:              string;
+  name:              string;
+  triggers:          string[];
+  crons:             string[];
+  workflow_run_deps: string[];
+  concurrency_group: string | null;
+  timeout_minutes:   number | null;
+}
+interface InventoryPayload {
+  generated_at: string;
+  count:        number;
+  workflows:    InventoryWorkflow[];
+}
+
+const TRIGGER_COLORS: Record<string, string> = {
+  schedule:           "bg-sky-900/60 border-sky-700 text-sky-200",
+  workflow_run:       "bg-indigo-900/60 border-indigo-700 text-indigo-200",
+  workflow_dispatch:  "bg-slate-800 border-slate-700 text-slate-300",
+  push:               "bg-amber-900/60 border-amber-700 text-amber-200",
+  pull_request:       "bg-amber-900/40 border-amber-700/60 text-amber-200/80",
+};
+
+function TriggerChip({ kind }: { kind: string }) {
+  const cls = TRIGGER_COLORS[kind] ?? "bg-slate-800 border-slate-700 text-slate-400";
+  return (
+    <span className={`inline-block text-[9px] px-1.5 py-0.5 rounded border font-mono ${cls}`}>
+      {kind}
+    </span>
+  );
+}
+
+function LiveWorkflowInventory() {
+  const { data, loading, error } =
+    useFetchJson<InventoryPayload>("/data/workflows_inventory.json");
+
+  if (loading) return <div className="text-[11px] text-slate-500">Loading inventory…</div>;
+  if (error)   return <div className="text-[11px] text-red-400">Failed to load: {error.message}</div>;
+  if (!data)   return null;
+
+  return (
+    <div>
+      <div className="text-[11px] text-slate-500 mb-3 leading-relaxed">
+        <span className="text-slate-300">{data.count} workflows</span> auto-detected from{" "}
+        <code className="text-slate-300">.github/workflows/*.yml</code> · regenerated on push by{" "}
+        <code className="text-slate-300">build-workflow-inventory.yml</code> · last refresh{" "}
+        <span className="text-slate-300 font-mono">{data.generated_at}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[11px] font-mono">
+          <thead>
+            <tr className="text-slate-500 bg-slate-800/40">
+              <th className="text-left px-2 py-1.5">File</th>
+              <th className="text-left px-2 py-1.5">Name</th>
+              <th className="text-left px-2 py-1.5">Triggers</th>
+              <th className="text-left px-2 py-1.5">Cron</th>
+              <th className="text-left px-2 py-1.5">Chains off</th>
+              <th className="text-left px-2 py-1.5">Concurrency</th>
+              <th className="text-right px-2 py-1.5">Timeout</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.workflows.map((w) => (
+              <tr key={w.file} className="border-t border-slate-800/60 align-top">
+                <td className="px-2 py-1.5 text-slate-400 whitespace-nowrap">{w.file}</td>
+                <td className="px-2 py-1.5 text-slate-200">{w.name}</td>
+                <td className="px-2 py-1.5">
+                  <div className="flex flex-wrap gap-1">
+                    {w.triggers.map((t) => <TriggerChip key={t} kind={t} />)}
+                  </div>
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.crons.length === 0 ? <span className="text-slate-600">—</span>
+                    : w.crons.map((c, i) => <div key={i}>{c}</div>)}
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.workflow_run_deps.length === 0 ? <span className="text-slate-600">—</span>
+                    : w.workflow_run_deps.map((d, i) => <div key={i} className="text-indigo-300">{d}</div>)}
+                </td>
+                <td className="px-2 py-1.5 text-slate-300">
+                  {w.concurrency_group ?? <span className="text-slate-600">—</span>}
+                </td>
+                <td className="px-2 py-1.5 text-right text-slate-300">
+                  {w.timeout_minutes != null ? `${w.timeout_minutes}m` : <span className="text-slate-600">—</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
@@ -1100,6 +1201,10 @@ export default function DataMapPage() {
 
         <Card title="Per-workflow → exact dashboard visual">
           <WorkflowTable />
+        </Card>
+
+        <Card title="Live workflow inventory — auto-generated from YAML">
+          <LiveWorkflowInventory />
         </Card>
       </div>
     </div>
