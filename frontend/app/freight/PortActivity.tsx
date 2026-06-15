@@ -82,7 +82,7 @@ export default function PortActivity() {
 
   // Seasonal (year-over-year) data, built once for both views. Each year is
   // aligned on a Jan→Dec calendar index. We produce two row sets:
-  //   • daily      — per-day total, 7-day smoothed
+  //   • daily      — raw per-day total (no smoothing)
   //   • cumulative — running total from Jan 1
   // Each overlays the latest 3 years (current / prev / prev2) and a grey min–max
   // band across the *prior* years (excluding the current year).
@@ -107,20 +107,6 @@ export default function PortActivity() {
     const prevY = curY - 1;
     const prev2Y = curY - 2;
 
-    // Trailing 7-point MA within each year (data is daily/contiguous).
-    const smooth: Record<number, Record<number, number>> = {};
-    for (const y of allYears) {
-      const idxs = Object.keys(byYear[y]).map(Number).sort((a, b) => a - b);
-      const win: number[] = [];
-      const out: Record<number, number> = {};
-      for (const i of idxs) {
-        win.push(byYear[y][i]);
-        if (win.length > 7) win.shift();
-        out[i] = win.reduce((a, b) => a + b, 0) / win.length;
-      }
-      smooth[y] = out;
-    }
-
     const priorYears = allYears.filter((y) => y < curY); // band excludes current year
     const buildRows = (src: Record<number, Record<number, number>>): SeasonalRow[] => {
       const out: SeasonalRow[] = [];
@@ -136,7 +122,7 @@ export default function PortActivity() {
       }
       return out;
     };
-    const rows = buildRows(smooth);
+    const rows = buildRows(byYear);     // raw daily counts (no smoothing)
     const cumRows = buildRows(cumByYear);
 
     // YTD: current year vs prior year over the same elapsed calendar window.
