@@ -392,27 +392,8 @@ def _summary_to_dict(s: MonthlySummary) -> dict:
     }
 
 
-async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = False) -> int:
-    existing = _load_existing() if write else {}
-    by_month: dict[str, dict] = {row["month"]: row for row in existing.get("series", [])}
-
-    for y, m in months:
-        ym = f"{y:04d}-{m:02d}"
-        print(f"[bps] fetching {ym}…")
-        rows = await fetch_month(y, m, headed=headed)
-        if rows is None:
-            print(f"  → fetch failed; skipping {ym}")
-            continue
-        summary = aggregate(rows, ym)
-        # Source metadata sits inside the same response — capture the
-        # `date_source` so the JSON shows when BPS last touched the
-        # numbers we just ingested.
-        by_month[ym] = _summary_to_dict(summary)
-        print(f"  → {summary.row_count} rows · total {summary.total_coffee_kg:,.2f} kg "
-              f"· robusta-green {summary.robusta_green_kg:,.2f} kg "
-              f"· arabica-green {summary.arabica_green_kg:,.2f} kg")
-
-    payload = {
+def _build_payload(by_month: dict[str, dict]) -> dict:
+    return {
         "source":     "BPS Indonesia (lampung.bps.go.id/en/exim, national export rows)",
         "source_url": BPS_PAGE_URL,
         "scraped_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -423,12 +404,52 @@ async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = F
         "series":      sorted(by_month.values(), key=lambda r: r["month"]),
     }
 
+
+def _persist(by_month: dict[str, dict]) -> None:
+    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUT_PATH.write_text(json.dumps(_build_payload(by_month), indent=2) + "\n",
+                        encoding="utf-8")
+
+
+async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = False) -> int:
+    existing = _load_existing() if write else {}
+    by_month: dict[str, dict] = {row["month"]: row for row in existing.get("series", [])}
+
+    for i, (y, m) in enumerate(months):
+        ym = f"{y:04d}-{m:02d}"
+        print(f"[bps] fetching {ym}… ({i + 1}/{len(months)})")
+        rows = await fetch_month(y, m, headed=headed)
+        if rows is None:
+            print(f"  → fetch failed; skipping {ym}")
+            # Brief politeness sleep even on failure — back off rather
+            # than hammer CF when something's already misbehaving.
+            if i + 1 < len(months):
+                await asyncio.sleep(3)
+            continue
+        summary = aggregate(rows, ym)
+        by_month[ym] = _summary_to_dict(summary)
+        print(f"  → {summary.row_count} rows · total {summary.total_coffee_kg:,.2f} kg "
+              f"· robusta-green {summary.robusta_green_kg:,.2f} kg "
+              f"· arabica-green {summary.arabica_green_kg:,.2f} kg")
+
+        # Persist after EACH successful month. A backfill of 75+ months
+        # in one shot would otherwise lose everything on a single
+        # mid-range crash (CF flakes, network blip, laptop sleep). With
+        # incremental writes, re-running the same range is idempotent
+        # and resumes from wherever the JSON currently stands.
+        if write:
+            _persist(by_month)
+
+        # ~2 s gap between months so we look less like a tight loop to
+        # CF / BPS's WAF. Cheap insurance on a long backfill.
+        if i + 1 < len(months):
+            await asyncio.sleep(2)
+
     if write:
-        OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        OUT_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-        print(f"[bps] wrote {OUT_PATH} ({len(payload['series'])} months)")
+        print(f"[bps] wrote {OUT_PATH} ({len(by_month)} months)")
     else:
-        print(f"[bps] preview only — {len(payload['series'])} months would be written")
+        # Preview mode — render the payload once at the end without persisting.
+        print(f"[bps] preview only — {len(by_month)} months would be written")
     return 0
 
 
