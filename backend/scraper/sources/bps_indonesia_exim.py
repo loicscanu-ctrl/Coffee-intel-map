@@ -20,42 +20,51 @@ Output: frontend/public/data/indonesia_exports.json — one row per month
 with headline totals, by-destination and by-port breakdowns, and the
 raw per-HS detail kept so the frontend can re-aggregate as needed.
 
-⚠ RUN FROM A RESIDENTIAL IP — NOT FROM GITHUB ACTIONS / OTHER CLOUD CI
+⚠ HEADED CHROMIUM ONLY — bypasses Cloudflare Turnstile
 
-BPS guards the page with Cloudflare in a "challenge every datacenter IP"
-mode. Three CI smoke runs (#27568532810, #27569193240, #27569356350) all
-saw the patchright-rendered page stuck on Cloudflare's "Just a moment…"
-interstitial — the `wait_for_selector` guard below picks this up
-explicitly and bails. From a residential IP (your laptop, your phone
-hotspot) the same code clears CF in <1 s and returns the JSON cleanly,
-so this stays a manual monthly run rather than a scheduled workflow.
+Live ops history: BPS's CF config fingerprints HEADLESS Chromium and
+holds the Turnstile spinner open indefinitely. Three CI smokes
+(#27568532810, #27569193240, #27569356350) and one local laptop run all
+confirmed this from different IPs. The fix is to drive a VISIBLE browser
+window — the patchright stealth profile holds up under fingerprinting
+once a real browser process is in play.
 
-Operator workflow (post-BPS-publication, ~6 weeks after month-end):
+Two hosts:
+
+  • Local laptop — pass `--headed`; a window flashes briefly.
+  • GitHub Actions runner — `.github/workflows/bps-indonesia-exim.yml`
+    wraps the call in `xvfb-run` so headed Chromium gets a virtual
+    display. Same `--headed` flag, no visible window because there's
+    no real screen.
+
+Operator workflow (CI dispatch, the default path):
+
+  GitHub UI → Actions → "0.9 – BPS Indonesia coffee exports (monthly)"
+    → Run workflow → pick a single month or from/to range → Run.
+
+The workflow commits the merged JSON back to the dispatched ref.
+
+Local fallback (test code changes, debug a stuck month):
 
     cd backend
     PYTHONPATH=. python -m scraper.sources.bps_indonesia_exim \
         --month 2026-04 --write --headed
     cd ..
 
-(--headed launches a visible browser window; required because BPS's CF
-config fingerprints headless Chromium and rejects it even from a
-residential IP. The window flashes briefly during the scrape.)
-    git add frontend/public/data/indonesia_exports.json
-    git commit -m "data: BPS Indonesia exports 2026-04"
-    git push
-
 The `--write` flag merges into the existing series (idempotent month-
 keyed dedupe). Backfill uses `--from YYYY-MM --to YYYY-MM`.
 
-Implementation notes (relevant if you ever revisit the CI path):
-  - patchright stealth profile + `wait_until="networkidle"` are not
-    enough on their own; a residential-IP proxy in front of patchright
-    (Bright Data / Oxylabs / ScraperAPI) would unblock CI but adds a
-    paid vendor dependency.
-  - The browser GETs the page once to clear CF, then dispatches the
-    POST via `page.evaluate(fetch(...))` so the request inherits the
-    page's Origin/Referer/Sec-Fetch-* headers + CF cookies — important
-    even from a residential IP, since `ctx.request.post()` skips those.
+Implementation notes:
+  - patchright stealth profile + page.evaluate(fetch) are still
+    necessary on top of headed mode — without them the POST gets
+    fingerprinted independently of the page even after CF clears.
+  - The `next-action: 7f8a3808bc9f1e85e184f370fe19cced09f7c7ca50`
+    header value is per-deploy. If BPS rebuilds and the ID rotates, the
+    POST returns 4xx; re-grab from DevTools and update the constant.
+  - BPS adopted BTKI-2022 (= HS-2022) in March 2022; the 13 codes in
+    COFFEE_HS_CODES are HS-2022 only, so pre-2022-04 months return the
+    ~1% slice that overlaps between revisions (tea/spice-adjacent
+    codes). Start dates earlier than 2022-04 are not useful.
 """
 from __future__ import annotations
 
