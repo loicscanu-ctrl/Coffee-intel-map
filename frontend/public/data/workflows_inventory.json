@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-15T14:43:56.935968Z",
-  "count": 49,
+  "generated_at": "2026-06-15T20:04:00.909355Z",
+  "count": 50,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -56,6 +56,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 20
+    },
+    {
+      "file": "bps-indonesia-exim.yml",
+      "name": "0.9 \u2013 BPS Indonesia coffee exports (monthly)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "bps-indonesia-exim",
+      "timeout_minutes": 90
     },
     {
       "file": "brazil-export-forecast.yml",
