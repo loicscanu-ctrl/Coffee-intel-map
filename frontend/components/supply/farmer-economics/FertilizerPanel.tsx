@@ -6,9 +6,8 @@ import {
 } from "recharts";
 import type { FarmerEconomicsData, FertilizerItem, FertilizerImportMonth } from "./farmerEconomicsData";
 import { fertCostDelta, netFertImpact } from "./farmerEconomicsUtils";
+import { MONTH_ABBR } from "@/lib/formatters";
 import { useDataFreshness } from "@/lib/useDataFreshness";
-
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function fmtMonth(m: string): string {
   const [yr, mo] = m.split("-");

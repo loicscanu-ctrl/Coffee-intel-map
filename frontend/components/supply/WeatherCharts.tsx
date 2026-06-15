@@ -5,6 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import { MONTH_ABBR as MONTHS } from "@/lib/formatters";
 import EnsoPanel from "./farmer-economics/EnsoPanel";
 import WeatherRiskPanel from "./farmer-economics/WeatherRiskPanel";
 import type { FarmerEconomicsData } from "./farmer-economics/farmerEconomicsData";
@@ -128,7 +129,6 @@ interface WeatherData {
 }
 
 const TT = { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 

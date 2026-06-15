@@ -4,6 +4,8 @@
 // crop-year grouping logic below mirrors the Brazil helpers but with that
 // 10-month offset.
 
+import { MONTH_ABBR } from "@/lib/formatters";
+
 export const VN_CROP_MONTH_ORDER  = [10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const VN_CROP_MONTH_LABELS = ["Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"];
 
@@ -38,7 +40,6 @@ export function kBagsToMT(k_bags: number): number {
   return Math.round(k_bags * 60);
 }
 
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 export function shortMonthLabel(ym: string): string {
   const [y, m] = ym.split("-").map(Number);
   return `${MONTH_ABBR[m - 1]}-${String(y).slice(2)}`;

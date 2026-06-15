@@ -24,6 +24,7 @@ import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, BarChart,
 } from "recharts";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 interface Stage {
   name: string;
@@ -115,7 +116,6 @@ const ZONE_LABEL: Record<string, string> = {
 // — pre-flowering looks different in southern vs northern hemisphere, so a
 // hard-coded "Aug-Sep" tag is wrong for Vietnam (Feb-Mar) and any future
 // northern_hemisphere origin.
-const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const STAGE_PRETTY: Record<string, string> = {
   pre_flowering: "Pre-flowering",

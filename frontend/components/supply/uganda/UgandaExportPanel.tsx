@@ -3,6 +3,7 @@ import {
   ComposedChart, Bar, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 interface ExportMonth {
   month: string;
@@ -55,7 +56,6 @@ interface UcdaDetail {
   farmgate: Farmgate;
 }
 
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const TT_STYLE   = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 
 function fmtMonth(m: string) {
