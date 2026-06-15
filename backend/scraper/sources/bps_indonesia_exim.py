@@ -144,21 +144,33 @@ async def fetch_month(year: int, month: int) -> list[dict] | None:
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         try:
-            ctx = await browser.new_context(user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/124.0.0.0 Safari/537.36"
-            ))
+            # No custom user_agent — patchright's stealth profile sets a UA
+            # that MATCHES its bundled Chromium's TLS fingerprint. First
+            # smoke runs overrode it with a stale Chrome-124 string while
+            # patchright runs Chromium 148 underneath; Cloudflare flagged
+            # the JA3/UA mismatch and served the "Just a moment…"
+            # interstitial on every request.
+            ctx = await browser.new_context()
             page = await ctx.new_page()
             try:
-                # 1. Render the page so Cloudflare's challenge resolves and
-                #    cf_clearance / __cf_bm land in the cookie jar. The 5s
-                #    extra wait covers slow CF round-trips; 2.5s was too
-                #    tight on the first live run.
-                await page.goto(BPS_PAGE_URL, wait_until="domcontentloaded", timeout=45_000)
-                await page.wait_for_timeout(5_000)
+                # 1. Render the page until network goes quiet — `networkidle`
+                #    waits for CF's challenge JS to finish its round-trips
+                #    before returning. `domcontentloaded` returned while
+                #    the interstitial HTML was still on screen.
+                await page.goto(BPS_PAGE_URL, wait_until="networkidle", timeout=60_000)
 
-                # 2. Dispatch the POST from the page's own JS context.
+                # 2. Explicit sanity check: wait for an element that only
+                #    appears on the real BPS UI, not the CF interstitial.
+                #    The "Select the Data" heading is a stable, prominent
+                #    marker of the rendered exim form.
+                try:
+                    await page.wait_for_selector("text=Select the Data", timeout=15_000)
+                except Exception:                   # noqa: BLE001
+                    snippet = (await page.content())[:300]
+                    logger.warning(f"[bps] CF challenge not cleared for {year}-{month:02d}: {snippet}")
+                    return None
+
+                # 3. Dispatch the POST from the page's own JS context.
                 #    `fetch()` here automatically attaches Origin, Referer,
                 #    Sec-Fetch-Site/Mode/Dest, the CF cookies, the right TLS
                 #    fingerprint — everything a user click would carry.
