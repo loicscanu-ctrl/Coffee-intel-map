@@ -91,9 +91,9 @@ export default function Step5DryPowder({ data }: { data: ProcessedCotRow[] }) {
       );
     };
     return (
-      <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl h-[420px]">
+      <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl h-[460px]">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 50 }}>
+          <ScatterChart margin={{ top: 12, right: 10, bottom: 26, left: 48 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis type="number" dataKey="traders" name="# traders" stroke="#475569" fontSize={10}
               domain={dom.x}
