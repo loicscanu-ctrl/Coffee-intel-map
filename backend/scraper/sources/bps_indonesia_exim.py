@@ -112,7 +112,16 @@ class MonthlySummary:
 async def fetch_month(year: int, month: int) -> list[dict] | None:
     """Hit the BPS server action once and return the flat list of data rows
     (one per HS×port×country). Returns None on any network/parse failure;
-    the caller logs + skips that month."""
+    the caller logs + skips that month.
+
+    The fetch is dispatched from INSIDE the rendered page via
+    `page.evaluate(...)` rather than `ctx.request.post(...)`. First live
+    smoke (run 27568532810, 2026-06-15) showed the latter served Cloudflare's
+    "Just a moment..." interstitial on the POST even though the GET cleared
+    cleanly — the request API doesn't replay all the headers a true page
+    fetch carries (Origin, Referer, Sec-Fetch-*, …) so CF treats it as a
+    different client. Going through `fetch()` in page context inherits the
+    exact same fingerprint as a user clicking the Download button."""
     try:
         from patchright.async_api import async_playwright
     except ImportError:
@@ -140,35 +149,47 @@ async def fetch_month(year: int, month: int) -> list[dict] | None:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/124.0.0.0 Safari/537.36"
             ))
-            # Bootstrap: GET the page once so the patchright stealth
-            # browser clears the Cloudflare challenge and populates
-            # cf_clearance / __cf_bm into the context cookie jar.
             page = await ctx.new_page()
             try:
+                # 1. Render the page so Cloudflare's challenge resolves and
+                #    cf_clearance / __cf_bm land in the cookie jar. The 5s
+                #    extra wait covers slow CF round-trips; 2.5s was too
+                #    tight on the first live run.
                 await page.goto(BPS_PAGE_URL, wait_until="domcontentloaded", timeout=45_000)
-                await page.wait_for_timeout(2_500)
+                await page.wait_for_timeout(5_000)
+
+                # 2. Dispatch the POST from the page's own JS context.
+                #    `fetch()` here automatically attaches Origin, Referer,
+                #    Sec-Fetch-Site/Mode/Dest, the CF cookies, the right TLS
+                #    fingerprint — everything a user click would carry.
+                raw = await page.evaluate(
+                    """async ({ url, body, action }) => {
+                        const r = await fetch(url, {
+                            method: "POST",
+                            credentials: "include",
+                            headers: {
+                                "Content-Type": "text/plain;charset=UTF-8",
+                                "Accept":       "text/x-component",
+                                "Next-Action":  action,
+                            },
+                            body,
+                        });
+                        return { status: r.status, text: await r.text() };
+                    }""",
+                    {"url": BPS_PAGE_URL, "body": body, "action": NEXT_ACTION_ID},
+                )
             finally:
                 await page.close()
-
-            resp = await ctx.request.post(
-                BPS_PAGE_URL,
-                data=body,
-                headers={
-                    "Content-Type": "text/plain;charset=UTF-8",
-                    "Accept":       "text/x-component",
-                    "Next-Action":  NEXT_ACTION_ID,
-                },
-                timeout=CALL_TIMEOUT * 1000,
-            )
-            if not resp.ok:
-                text = (await resp.text())[:400]
-                logger.warning(f"[bps] POST {year}-{month:02d} → HTTP {resp.status}: {text}")
-                return None
-            raw = await resp.text()
         finally:
             await browser.close()
 
-    return parse_rsc_response(raw)
+    status = raw.get("status") if isinstance(raw, dict) else None
+    text   = raw.get("text",   "") if isinstance(raw, dict) else ""
+    if status != 200:
+        logger.warning(f"[bps] POST {year}-{month:02d} → HTTP {status}: {text[:400]}")
+        return None
+
+    return parse_rsc_response(text)
 
 
 def parse_rsc_response(raw: str) -> list[dict] | None:
