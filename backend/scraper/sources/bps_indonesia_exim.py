@@ -72,6 +72,7 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 import re
 import sys
 from collections import defaultdict
@@ -143,25 +144,13 @@ class MonthlySummary:
 # ── fetch ───────────────────────────────────────────────────────────────────
 
 
-async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict] | None:
-    """Hit the BPS server action once and return the flat list of data rows
-    (one per HS×port×country). Returns None on any network/parse failure;
-    the caller logs + skips that month.
+ZENROWS_API_URL = "https://api.zenrows.com/v1/"
 
-    The fetch is dispatched from INSIDE the rendered page via
-    `page.evaluate(...)` rather than `ctx.request.post(...)`. First live
-    smoke (run 27568532810, 2026-06-15) showed the latter served Cloudflare's
-    "Just a moment..." interstitial on the POST even though the GET cleared
-    cleanly — the request API doesn't replay all the headers a true page
-    fetch carries (Origin, Referer, Sec-Fetch-*, …) so CF treats it as a
-    different client. Going through `fetch()` in page context inherits the
-    exact same fingerprint as a user clicking the Download button."""
-    try:
-        from patchright.async_api import async_playwright
-    except ImportError:
-        logger.error("[bps] patchright unavailable — cannot reach Cloudflare-gated BPS")
-        return None
 
+def _build_payload_body(year: int, month: int) -> str:
+    """The 9-element Next.js Server Action payload, JSON-stringified
+    exactly the way the BPS UI serialises it. Captured 2026-06-15 via
+    DevTools; do NOT reformat (whitespace differences trip the action)."""
     payload = [
         "en",                                       # ui language
         "lampung.bps.go.id",                        # subdomain (national data despite the name)
@@ -173,48 +162,86 @@ async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict]
         f"{year:04d}",
         f"{month:02d}",
     ]
-    body = json.dumps(payload, separators=(",", ":"))
+    return json.dumps(payload, separators=(",", ":"))
+
+
+async def fetch_month_via_zenrows(year: int, month: int) -> list[dict] | None:
+    """Default network path: send the POST through ZenRows' Scraping API
+    which runs the request from a residential IP behind their managed
+    Cloudflare-bypass infrastructure. CF on github.com / cloud IPs flagged
+    every direct-patchright attempt we tried (run IDs 27568532810,
+    27569193240, 27569356350, 27572914986); going through a service that
+    presents a residential fingerprint is the supported answer.
+
+    Returns None on any error (auth, quota, target HTTP non-200, RSC
+    parse failure); the caller logs + skips that month."""
+    import requests
+
+    api_key = os.environ.get("ZENROWS_API_KEY")
+    if not api_key:
+        return None
+    body = _build_payload_body(year, month)
+    try:
+        resp = await asyncio.to_thread(
+            requests.post,
+            ZENROWS_API_URL,
+            params={
+                "apikey":          api_key,
+                "url":             BPS_PAGE_URL,
+                "premium_proxy":   "true",      # residential proxy pool
+                "antibot":         "true",      # Cloudflare Turnstile bypass
+                "custom_headers":  "true",      # forward Next-Action et al.
+                "original_status": "true",      # return BPS's HTTP status, not ZenRows'
+            },
+            data=body,
+            headers={
+                "Content-Type": "text/plain;charset=UTF-8",
+                "Accept":       "text/x-component",
+                "Next-Action":  NEXT_ACTION_ID,
+            },
+            timeout=180,        # CF bypass can take 20-30 s; pad generously
+        )
+    except Exception as e:                  # noqa: BLE001
+        logger.warning(f"[bps] ZenRows {year}-{month:02d} request error: {e}")
+        return None
+    if resp.status_code != 200:
+        body_snippet = (resp.text or "")[:400]
+        logger.warning(f"[bps] ZenRows {year}-{month:02d} → HTTP {resp.status_code}: {body_snippet}")
+        return None
+    return parse_rsc_response(resp.text)
+
+
+async def fetch_month_via_patchright(year: int, month: int, headed: bool = False) -> list[dict] | None:
+    """Local-debug network path: drive a headed Chromium directly. CF
+    rejects this from any cloud IP, but works from a residential laptop
+    when ZENROWS_API_KEY isn't set or you want to test a code change
+    without burning service credits."""
+    try:
+        from patchright.async_api import async_playwright
+    except ImportError:
+        logger.error("[bps] patchright unavailable and ZENROWS_API_KEY not set — no path to BPS")
+        return None
+    body = _build_payload_body(year, month)
 
     async with async_playwright() as pw:
         # headless=False (passed via --headed) opens a visible browser
-        # window. First live local run (operator's laptop, 2026-06-15)
-        # showed BPS's Cloudflare config rejects HEADLESS Chromium even
-        # from a residential IP — CF fingerprints the browser, not just
-        # the network. Headed mode + patchright stealth profile clears
-        # CF reliably. The window flashes for a few seconds during the
-        # scrape; that's the cost of by-passing the bot detection.
+        # window. BPS's Cloudflare config rejects HEADLESS Chromium even
+        # from a residential IP — CF fingerprints the browser process,
+        # not just the network ASN.
         browser = await pw.chromium.launch(headless=not headed)
         try:
             # No custom user_agent — patchright's stealth profile sets a UA
-            # that MATCHES its bundled Chromium's TLS fingerprint. First
-            # smoke runs overrode it with a stale Chrome-124 string while
-            # patchright runs Chromium 148 underneath; Cloudflare flagged
-            # the JA3/UA mismatch and served the "Just a moment…"
-            # interstitial on every request.
+            # that MATCHES its bundled Chromium's TLS fingerprint.
             ctx = await browser.new_context()
             page = await ctx.new_page()
             try:
-                # 1. Render the page until network goes quiet — `networkidle`
-                #    waits for CF's challenge JS to finish its round-trips
-                #    before returning. `domcontentloaded` returned while
-                #    the interstitial HTML was still on screen.
                 await page.goto(BPS_PAGE_URL, wait_until="networkidle", timeout=60_000)
-
-                # 2. Explicit sanity check: wait for an element that only
-                #    appears on the real BPS UI, not the CF interstitial.
-                #    The "Select the Data" heading is a stable, prominent
-                #    marker of the rendered exim form.
                 try:
                     await page.wait_for_selector("text=Select the Data", timeout=15_000)
                 except Exception:                   # noqa: BLE001
                     snippet = (await page.content())[:300]
                     logger.warning(f"[bps] CF challenge not cleared for {year}-{month:02d}: {snippet}")
                     return None
-
-                # 3. Dispatch the POST from the page's own JS context.
-                #    `fetch()` here automatically attaches Origin, Referer,
-                #    Sec-Fetch-Site/Mode/Dest, the CF cookies, the right TLS
-                #    fingerprint — everything a user click would carry.
                 raw = await page.evaluate(
                     """async ({ url, body, action }) => {
                         const r = await fetch(url, {
@@ -243,6 +270,16 @@ async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict]
         return None
 
     return parse_rsc_response(text)
+
+
+async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict] | None:
+    """Dispatcher: prefer ZenRows (works from CI + residential IPs alike)
+    and fall back to local patchright when the ZENROWS_API_KEY env var
+    isn't set. The `headed` flag is only meaningful on the patchright
+    fallback path."""
+    if os.environ.get("ZENROWS_API_KEY"):
+        return await fetch_month_via_zenrows(year, month)
+    return await fetch_month_via_patchright(year, month, headed=headed)
 
 
 def parse_rsc_response(raw: str) -> list[dict] | None:
