@@ -20,17 +20,38 @@ Output: frontend/public/data/indonesia_exports.json — one row per month
 with headline totals, by-destination and by-port breakdowns, and the
 raw per-HS detail kept so the frontend can re-aggregate as needed.
 
-Patchright drives the network call because BPS sits behind Cloudflare
-(cf_clearance, __cf_bm cookies) — `requests.post()` from a plain
-GitHub Actions IP 403's. The browser GETs the page once to clear the
-CF challenge, then reuses the same context's request API for the POST,
-which sends matching TLS-fingerprint, cookies and headers.
+⚠ RUN FROM A RESIDENTIAL IP — NOT FROM GITHUB ACTIONS / OTHER CLOUD CI
 
-Usage:
+BPS guards the page with Cloudflare in a "challenge every datacenter IP"
+mode. Three CI smoke runs (#27568532810, #27569193240, #27569356350) all
+saw the patchright-rendered page stuck on Cloudflare's "Just a moment…"
+interstitial — the `wait_for_selector` guard below picks this up
+explicitly and bails. From a residential IP (your laptop, your phone
+hotspot) the same code clears CF in <1 s and returns the JSON cleanly,
+so this stays a manual monthly run rather than a scheduled workflow.
+
+Operator workflow (post-BPS-publication, ~6 weeks after month-end):
+
     cd backend
-    python -m scraper.sources.bps_indonesia_exim --month 2026-04
-    python -m scraper.sources.bps_indonesia_exim --month 2026-04 --write
-    python -m scraper.sources.bps_indonesia_exim --from 2020-01 --to 2026-04 --write
+    PYTHONPATH=. python -m scraper.sources.bps_indonesia_exim \
+        --month 2026-04 --write
+    cd ..
+    git add frontend/public/data/indonesia_exports.json
+    git commit -m "data: BPS Indonesia exports 2026-04"
+    git push
+
+The `--write` flag merges into the existing series (idempotent month-
+keyed dedupe). Backfill uses `--from YYYY-MM --to YYYY-MM`.
+
+Implementation notes (relevant if you ever revisit the CI path):
+  - patchright stealth profile + `wait_until="networkidle"` are not
+    enough on their own; a residential-IP proxy in front of patchright
+    (Bright Data / Oxylabs / ScraperAPI) would unblock CI but adds a
+    paid vendor dependency.
+  - The browser GETs the page once to clear CF, then dispatches the
+    POST via `page.evaluate(fetch(...))` so the request inherits the
+    page's Origin/Referer/Sec-Fetch-* headers + CF cookies — important
+    even from a residential IP, since `ctx.request.post()` skips those.
 """
 from __future__ import annotations
 
