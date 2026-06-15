@@ -38,6 +38,8 @@ export default function PortActivity() {
   // Both views are seasonal calendar overlays: "daily" = per-day; "cumulative"
   // = running total from Jan 1. Default: daily.
   const [view, setView] = useState<"daily" | "cumulative">("daily");
+  // Right-hand month chart: how many months back from the latest data month.
+  const [monthOffset, setMonthOffset] = useState(0);
   // Which vessel types are shown — toggled via the chips below. Default: all.
   const [activeTypes, setActiveTypes] = useState<VesselTypeKey[]>([...VESSEL_TYPE_KEYS]);
   // Per-port series fetched lazily and cached so re-selecting a port is instant.
@@ -146,49 +148,62 @@ export default function PortActivity() {
     const ytdPrev = ytd(prevY);
     const ytdPct = ytdPrev > 0 ? ((ytdCur - ytdPrev) / ytdPrev) * 100 : null;
 
-    // Current-month cumulative: the month of the latest data point, with each
-    // year's running total within that month (x axis = day-of-month).
-    const curM = Number(port.series[port.series.length - 1].date.slice(5, 7));
-    const domByYear: Record<number, Record<number, number>> = {};
-    const monthRun: Record<number, number> = {};
-    let daysInMonth = 0;
-    for (const pt of port.series) {
-      if (Number(pt.date.slice(5, 7)) !== curM) continue;
-      const Y = Number(pt.date.slice(0, 4));
-      const D = Number(pt.date.slice(8, 10));
-      const val = activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
-      monthRun[Y] = (monthRun[Y] || 0) + val;
-      (domByYear[Y] ||= {})[D] = monthRun[Y];
-      if (D > daysInMonth) daysInMonth = D;
-    }
-    const monthRows: SeasonalRow[] = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const band = priorYears.map((y) => domByYear[y]?.[d]).filter((v): v is number => v != null);
-      monthRows.push({
-        idx: d,
-        cur: domByYear[curY]?.[d] ?? null,
-        prev: domByYear[prevY]?.[d] ?? null,
-        prev2: domByYear[prev2Y]?.[d] ?? null,
-        band: band.length ? [Math.min(...band), Math.max(...band)] : null,
-      });
-    }
-    const month = { name: MONTHS[curM - 1], days: daysInMonth };
-
     return {
-      rows, cumRows, monthRows, month,
+      rows, cumRows,
       years: { cur: curY, prev: prevY, prev2: prev2Y }, ytdCur, ytdPct,
     };
   }, [port, metric, activeTypes]);
 
-  // Day-of-month ticks for the monthly chart: 1, 5, 10, … plus the last day.
-  const monthTicks = useMemo(() => {
-    const days = seasonal?.month.days ?? 0;
-    if (!days) return [] as number[];
-    const t = [1];
-    for (let d = 5; d < days; d += 5) t.push(d);
-    if (t[t.length - 1] !== days) t.push(days);
-    return t;
-  }, [seasonal?.month.days]);
+  // Right-hand chart: cumulative within one calendar month, anchored by
+  // `monthOffset` months back from the latest data month — so you can scrub
+  // back to view the month-to-date of past months. The anchor year is the
+  // "current" (red) line; prior years overlay with the grey min–max band.
+  const monthly = useMemo(() => {
+    if (!port) return null;
+    const toIdx = (s: string) => Number(s.slice(0, 4)) * 12 + (Number(s.slice(5, 7)) - 1);
+    const latestIdx = toIdx(port.series[port.series.length - 1].date);
+    const earliestIdx = toIdx(port.series[0].date);
+    const maxOffset = latestIdx - earliestIdx;
+    const off = Math.min(Math.max(monthOffset, 0), maxOffset);
+    const anchorIdx = latestIdx - off;
+    const anchorY = Math.floor(anchorIdx / 12);
+    const anchorM = (anchorIdx % 12) + 1;
+
+    const domByYear: Record<number, Record<number, number>> = {};
+    const run: Record<number, number> = {};
+    let days = 0;
+    for (const pt of port.series) {
+      if (Number(pt.date.slice(5, 7)) !== anchorM) continue;
+      const Y = Number(pt.date.slice(0, 4));
+      const D = Number(pt.date.slice(8, 10));
+      const val = activeTypes.reduce((a, t) => a + (Number(pt[`${metric}_${t}`]) || 0), 0);
+      run[Y] = (run[Y] || 0) + val;
+      (domByYear[Y] ||= {})[D] = run[Y];
+      if (D > days) days = D;
+    }
+    const prior = Object.keys(domByYear).map(Number).filter((y) => y < anchorY);
+    const rows: SeasonalRow[] = [];
+    for (let d = 1; d <= days; d++) {
+      const band = prior.map((y) => domByYear[y]?.[d]).filter((v): v is number => v != null);
+      rows.push({
+        idx: d,
+        cur: domByYear[anchorY]?.[d] ?? null,
+        prev: domByYear[anchorY - 1]?.[d] ?? null,
+        prev2: domByYear[anchorY - 2]?.[d] ?? null,
+        band: band.length ? [Math.min(...band), Math.max(...band)] : null,
+      });
+    }
+    // Day-of-month ticks: 1, 5, 10, … plus the last day.
+    const ticks = [1];
+    for (let d = 5; d < days; d += 5) ticks.push(d);
+    if (ticks[ticks.length - 1] !== days) ticks.push(days);
+
+    return {
+      rows, ticks, days, off, maxOffset,
+      name: MONTHS[anchorM - 1], label: `${MONTHS[anchorM - 1]} ${anchorY}`,
+      years: { cur: anchorY, prev: anchorY - 1, prev2: anchorY - 2 },
+    };
+  }, [port, metric, activeTypes, monthOffset]);
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 space-y-3">
@@ -333,21 +348,51 @@ export default function PortActivity() {
                   years={seasonal.years}
                 />
               </div>
-              {/* Current month, cumulative day-by-day */}
-              <div>
-                <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
-                  {seasonal.month.name} · month-to-date cumulative
+              {/* Selected month, cumulative day-by-day — scrub back in time with ◀ ▶ */}
+              {monthly && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="text-[9px] text-slate-500 uppercase tracking-wider">
+                      {monthly.label} · month-to-date cumulative
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setMonthOffset((o) => Math.min(monthly.maxOffset, o + 1))}
+                        disabled={monthly.off >= monthly.maxOffset}
+                        aria-label="Previous month"
+                        className="px-1.5 py-0.5 text-[11px] leading-none rounded bg-slate-800 text-slate-300 enabled:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        ◀
+                      </button>
+                      <button
+                        onClick={() => setMonthOffset((o) => Math.max(0, o - 1))}
+                        disabled={monthly.off <= 0}
+                        aria-label="Next month"
+                        className="px-1.5 py-0.5 text-[11px] leading-none rounded bg-slate-800 text-slate-300 enabled:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        ▶
+                      </button>
+                      {monthly.off > 0 && (
+                        <button
+                          onClick={() => setMonthOffset(0)}
+                          className="ml-0.5 px-1.5 py-0.5 text-[9px] rounded text-sky-400 hover:text-sky-300"
+                        >
+                          Latest
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <SeasonalChart
+                    data={monthly.rows}
+                    unit={unit}
+                    years={monthly.years}
+                    xDomain={[1, monthly.days]}
+                    xTicks={monthly.ticks}
+                    xTickFormat={(d) => `${d}`}
+                    xLabelFormat={(d) => `${monthly.name} ${d}`}
+                  />
                 </div>
-                <SeasonalChart
-                  data={seasonal.monthRows}
-                  unit={unit}
-                  years={seasonal.years}
-                  xDomain={[1, seasonal.month.days]}
-                  xTicks={monthTicks}
-                  xTickFormat={(d) => `${d}`}
-                  xLabelFormat={(d) => `${seasonal.month.name} ${d}`}
-                />
-              </div>
+              )}
             </div>
           ) : null}
 
