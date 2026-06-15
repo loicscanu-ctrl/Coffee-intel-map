@@ -4,6 +4,7 @@ import {
   ComposedChart, Bar, BarChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Legend, ReferenceLine,
 } from "recharts";
+import { MONTH_ABBR, MONTH_ABBR as MONTHS } from "@/lib/formatters";
 
 type Region = "eu" | "japan" | "usa";
 
@@ -80,7 +81,6 @@ const TT_STYLE = {
   fontSize: 10,
 };
 
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function fmtPeriod(p: string): string {
   const m = p.match(/(\d{4})-(\d{2})/);
   if (m) return `${MONTH_ABBR[parseInt(m[2]) - 1]}-${m[1].slice(2)}`;
@@ -103,8 +103,6 @@ function deltaArrow(v: number | null): { symbol: string; cls: string } {
 
 // ── ECF Monthly Panel ─────────────────────────────────────────────────────────
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const kMT = (x?: number | null) => (x != null ? Math.round(x / 1000) : null);
 
 // Years present in the series (newest first), restricted to entries that carry

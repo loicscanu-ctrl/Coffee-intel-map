@@ -13,6 +13,7 @@
 // "Total" sums arabica + conillon + soluvel because both Cecafé tables emit
 // the three streams in parallel and the user asked for one combined figure.
 import { useEffect, useState } from "react";
+import { MONTH_ABBR } from "@/lib/formatters";
 import StatCard from "./StatCard";
 import { bagsToKT, normalizeSources } from "./helpers";
 import type { CecafeSourceBucket, DailyData } from "./types";
@@ -86,8 +87,6 @@ function _delta(cur: SourceLatest | null, prev: SourceLatest | null) {
   return { abs, pct };
 }
 
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun",
-                    "Jul","Aug","Sep","Oct","Nov","Dec"];
 const _monthAbbr = (ym: string) => MONTH_ABBR[parseInt(ym.slice(5, 7), 10) - 1] ?? ym.slice(5);
 const _kt = (bags: number) => `${bagsToKT(bags).toFixed(1)} kt`;
 

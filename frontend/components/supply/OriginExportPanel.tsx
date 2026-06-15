@@ -3,6 +3,7 @@ import {
   ComposedChart, Bar, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 interface ExportMonth {
   month: string;
@@ -16,8 +17,6 @@ export interface ExportsData {
   unit: string;
   monthly: ExportMonth[];
 }
-
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function fmtMonth(m: string) {
   const [yr, mo] = m.split("-");

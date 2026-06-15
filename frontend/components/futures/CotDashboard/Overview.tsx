@@ -5,6 +5,7 @@ import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import type { MarketMetrics } from "@/lib/pdf/types";
 import { buildPostCot, confidenceTier, LDN_PARAMS, NY_PARAMS, type IntraweekParams, type OiDay, type PostCot } from "@/lib/cot/intraweekModel";
 import { nearbyOiDelta } from "@/lib/cot/oiNearby";
+import { MONTH_ABBR as MONTHS } from "@/lib/formatters";
 import SectionHeader from "./SectionHeader";
 
 // ── number formatting (mirrors the COT weekly PDF) ────────────────────────────
@@ -15,7 +16,6 @@ const pct1       = (v: number) => `${v.toFixed(1)}%`;
 const kTons      = (mt: number) => `${(mt / 1000).toFixed(1)} k tons`;
 const num        = (x: unknown) => (typeof x === "number" ? x : 0);
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const md = (iso: string) => { const [, m, d] = iso.split("-"); return `${MONTHS[+m - 1]} ${+d}`; };
 
 const priceAbsNY  = (v: number, signed = false) => `${signed && v >= 0 ? "+" : ""}${Math.round(v)} cents/lb`;

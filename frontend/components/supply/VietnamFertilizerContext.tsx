@@ -4,6 +4,7 @@ import {
   ComposedChart, Bar, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { MONTH_ABBR } from "@/lib/formatters";
 
 interface FertMonth {
   month: string;
@@ -23,8 +24,6 @@ interface FertContext {
 }
 
 interface Props { context: FertContext }
-
-const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const VN_TYPES = ["urea_kt", "kcl_kt", "npk_kt", "dap_kt"] as const;
 type VnType = typeof VN_TYPES[number];
