@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import BrazilFarmerEconomics from "../farmer-economics/BrazilFarmerEconomics";
 import WeatherCharts from "../WeatherCharts";
 import WeatherAnalogs from "../WeatherAnalogs";
@@ -106,6 +107,8 @@ export default function BrazilTab() {
 
   return (
     <div className="space-y-5">
+      <DataHealthBar keys={["brazil_exports", "cecafe_daily", "conab_costs", "conab_safra"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (

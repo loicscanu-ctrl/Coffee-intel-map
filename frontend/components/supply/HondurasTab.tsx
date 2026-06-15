@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import HondurasFarmerEconomics from "@/components/supply/honduras/HondurasFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
@@ -77,6 +78,8 @@ export default function HondurasTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["honduras_exports"]} />
+
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map(t => (
           <button

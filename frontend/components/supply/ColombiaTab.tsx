@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
@@ -78,6 +79,8 @@ export default function ColombiaTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["colombia_exports"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather"] as const).map(t => (
