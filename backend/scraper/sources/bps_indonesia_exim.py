@@ -223,7 +223,13 @@ async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
         return None
 
     if year not in _BPS_API_YEAR_CACHE:
-        codes = _hs_codes_for_year(year)
+        forced = os.environ.get("BPS_FORCE_HS")
+        if forced == "2017":
+            codes = COFFEE_HS_CODES_HS2017
+        elif forced == "2022":
+            codes = COFFEE_HS_CODES_HS2022
+        else:
+            codes = _hs_codes_for_year(year)
         all_rows: list[dict] = []
         for code in codes:
             # jenishs=2 = full 8-digit HS precision (1 would be 2-digit

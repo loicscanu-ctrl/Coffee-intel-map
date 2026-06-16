@@ -31,6 +31,11 @@ on:
         required: false
         default: ""
         type: string
+      force_hs:
+        description: "Override HS revision dispatch (2017 or 2022). Empty = auto by year."
+        required: false
+        default: ""
+        type: string
   # schedule:
   #   - cron: '15 4 5 * *'    # re-enable after Xvfb run is proven
 
@@ -66,6 +71,7 @@ jobs:
           MONTH:              ${{ inputs.month }}
           FROM_M:              ${{ inputs.from }}
           TO_M:                ${{ inputs.to }}
+          BPS_FORCE_HS:       ${{ inputs.force_hs }}
           BPS_API_KEY:        ${{ secrets.BPS_API_KEY }}
         # fetch_month() prefers BPS_API_KEY (official Web API). The
         # legacy CF-Worker / ScraperAPI / ZenRows / patchright paths
