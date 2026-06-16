@@ -145,6 +145,17 @@ export default function ReportBuilder() {
                                     className="accent-amber-500"
                                   />
                                   <span className="text-xs font-medium text-slate-200">{label}</span>
+                                  {/* Width badge so the layout footprint is
+                                      visible before ticking. */}
+                                  <span
+                                    className={`ml-auto shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-mono uppercase tracking-wider border ${
+                                      d.width === "half"
+                                        ? "text-slate-400 border-slate-700 bg-slate-800/40"
+                                        : "text-sky-300 border-sky-800/60 bg-sky-900/20"
+                                    }`}
+                                  >
+                                    {d.width === "half" ? "half" : "full"}
+                                  </span>
                                 </label>
                               );
                             })}
