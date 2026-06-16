@@ -38,9 +38,11 @@ const COLOR_ARABICA = "#3b82f6";
 const COLOR_LUMPED  = "#10b981";
 const COLOR_OTHER   = "#475569";
 
-const HS_LUMPED_GREEN  = "09011110";  // BTKI-2017 Arabica WIB / robusta OIB
-const HS_ROBUSTA_GREEN = "09011130";  // BTKI-2022
-const HS_ARABICA_GREEN = "09011120";  // BTKI-2022
+// Robusta + Arabica green volumes come pre-computed on the JSON
+// (robusta_green_kg / arabica_green_kg). The HS-2017 lumped code
+// (09011110 — Arabica WIB / robusta OIB) doesn't have a dedicated
+// field, so we recover it from the by_hs breakdown.
+const HS_LUMPED_GREEN  = "09011110";
 
 function fmtMonth(m: string) {
   const [yr, mo] = m.split("-");
