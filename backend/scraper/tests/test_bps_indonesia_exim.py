@@ -192,20 +192,18 @@ def test_iter_months_single_month():
     assert list(bps._iter_months("2026-04", "2026-04")) == [(2026, 4)]
 
 
-def test_hs_revision_for_year_pre2022_uses_hs2017():
-    """Year < 2022 hits jenishs=1 + the 9-code HS-2017 dict. The HS-2017
-    dict has 09011110 (Arabica WIB / robusta OIB lumped) but NOT the
-    HS-2022 split codes 09011120 / 09011130."""
-    jenishs, codes = bps._hs_revision_for_year(2020)
-    assert jenishs == 1
+def test_hs_codes_for_year_pre2022_uses_hs2017():
+    """Year < 2022 → HS-2017 9-code list including 09011110 (Arabica
+    WIB / robusta OIB lumped). Does NOT include the HS-2022 split codes
+    09011120 / 09011130."""
+    codes = bps._hs_codes_for_year(2020)
     assert "09011110" in codes
     assert "09011120" not in codes
     assert "09011130" not in codes
 
 
-def test_hs_revision_for_year_2022plus_uses_hs2022():
-    jenishs, codes = bps._hs_revision_for_year(2022)
-    assert jenishs == 2
+def test_hs_codes_for_year_2022plus_uses_hs2022():
+    codes = bps._hs_codes_for_year(2022)
     assert "09011120" in codes and "09011130" in codes
     assert "09011110" not in codes
 

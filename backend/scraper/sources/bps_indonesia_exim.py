@@ -141,20 +141,27 @@ COFFEE_HS_CODES: dict[str, dict[str, str]] = {
 }
 
 
-def _hs_revision_for_year(year: int) -> tuple[int, dict[str, dict[str, str]]]:
-    """Picks the BPS HS revision for a given year. Returns the `jenishs`
-    URL parameter value the Web API expects and the code dict for that
-    revision. BTKI-2022 (= HS-2022, `jenishs=2`) took effect April 2022;
-    earlier years sit in BTKI-2017 (= HS-2017, `jenishs=1`).
+def _hs_codes_for_year(year: int) -> dict[str, dict[str, str]]:
+    """Picks the right BPS HS code list for the year being queried.
+    Indonesia adopted BTKI-2022 (= HS-2022) effective 01-Apr-2022, so
+    months prior to that use the 9-code BTKI-2017 list. Earlier
+    revisions reused 09011110 ("Arabica WIB or robusta OIB") for green
+    coffee — Arabica and Robusta are NOT separable for those months.
 
-    Year 2022 itself is a borderline edge: Q1 2022 data lives in HS-2017
-    and Apr-Dec 2022 in HS-2022. We pick HS-2022 for year=2022 since the
-    existing backfill already populated 2022-04 through 2022-12 from
-    HS-2022; if Q1 2022 is needed separately, dispatch a Q1-only run
-    against an explicit HS-2017 ref."""
+    Note: the `jenishs` URL parameter is the aggregation level
+    (1 = 2-digit chapter, 2 = full 8-digit), NOT the HS revision —
+    that's a common gotcha. We always send `jenishs=2` because we want
+    8-digit precision; the BPS API responds with the codes from
+    whichever revision is in force for the requested year.
+
+    Year 2022 itself is a borderline edge: Q1 2022 data sits in
+    HS-2017 and Apr-Dec 2022 in HS-2022. We pick HS-2022 for year=2022
+    because the existing backfill 2022-04 → 2022-12 already shipped
+    under that code list; if Q1 2022 is needed it can be dispatched
+    with the HS-2017 list separately."""
     if year < 2022:
-        return 1, COFFEE_HS_CODES_HS2017
-    return 2, COFFEE_HS_CODES_HS2022
+        return COFFEE_HS_CODES_HS2017
+    return COFFEE_HS_CODES_HS2022
 
 CALL_TIMEOUT = 60   # seconds, applied per network call
 
@@ -216,12 +223,14 @@ async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
         return None
 
     if year not in _BPS_API_YEAR_CACHE:
-        jenishs, codes = _hs_revision_for_year(year)
+        codes = _hs_codes_for_year(year)
         all_rows: list[dict] = []
         for code in codes:
+            # jenishs=2 = full 8-digit HS precision (1 would be 2-digit
+            # chapter level, useless here). Always 2 regardless of year.
             url = (
                 f"{BPS_API_BASE}/sumber/1/periode/1/kodehs/{code}"
-                f"/jenishs/{jenishs}/tahun/{year}/key/{api_key}"
+                f"/jenishs/2/tahun/{year}/key/{api_key}"
             )
             try:
                 resp = await asyncio.to_thread(requests.get, url, timeout=CALL_TIMEOUT)
@@ -238,17 +247,12 @@ async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
                 logger.warning(f"[bps] API {year} {code} → non-JSON response")
                 continue
             availability = (payload or {}).get("data-availability")
-            data = (payload or {}).get("data")
-            row_count = len(data) if isinstance(data, list) else 0
-            # Diagnostic for HS-2017 backfills. jenishs=1 expectations are
-            # still being validated against BPS's actual schema; this line
-            # exposes whether the API recognises each code / whether the
-            # year is published yet. Remove (or downgrade to debug) once
-            # the HS-2017 code list is locked.
-            logger.warning(f"[bps] API {year} {code} jenishs={jenishs} "
-                           f"availability={availability!r} rows={row_count}")
             if availability and availability != "available":
+                # Common for HS codes with zero exports in the requested
+                # year (e.g. niche substitutes/husks). Silent skip — would
+                # flood the log on every backfill otherwise.
                 continue
+            data = (payload or {}).get("data")
             if isinstance(data, list):
                 all_rows.extend(data)
         _BPS_API_YEAR_CACHE[year] = all_rows
