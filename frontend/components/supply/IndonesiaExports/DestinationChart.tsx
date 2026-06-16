@@ -213,17 +213,22 @@ export default function DestinationChart({
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-        <div>
-          <div className="text-sm font-semibold text-slate-200">
-            Export by {titleLeaf}
-          </div>
-          <div className="text-[10px] text-slate-500">
-            {destMode === "destination" ? TYPE_LABELS[coffeeType as SeriesKey] : "Total"} ·{" "}
-            {periodLabel} (green) vs {prevPeriodLabel} (grey) · Thousand metric tons
-          </div>
+      {/* Title — kept on its own row so the toggle bar below has a
+          predictable position regardless of how many controls wrap. */}
+      <div className="mb-2">
+        <div className="text-sm font-semibold text-slate-200">
+          Export by {titleLeaf}
         </div>
-        <div className="flex flex-wrap gap-1" style={isReportMode ? { display: "none" } : undefined}>
+        <div className="text-[10px] text-slate-500">
+          {destMode === "destination" ? TYPE_LABELS[coffeeType as SeriesKey] : "Total"} ·{" "}
+          {periodLabel} (green) vs {prevPeriodLabel} (grey) · Thousand metric tons
+        </div>
+      </div>
+
+      {/* Toggle bar — always sits below the title; flex-wraps freely
+          without ever moving back next to the heading. */}
+      {!isReportMode && (
+        <div className="flex flex-wrap gap-1 mb-3">
           {/* Leaf-axis selector (destination ↔ port) */}
           <div className="flex gap-1 border border-slate-600 rounded p-0.5">
             {(["destination", "port"] as DestMode[]).map(m => (
@@ -286,7 +291,7 @@ export default function DestinationChart({
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Bar chart */}
       <ResponsiveContainer width="100%" height={barH}>
