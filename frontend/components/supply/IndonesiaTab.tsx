@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
-import IndonesiaBPSExportsPanel from "@/components/supply/indonesia/IndonesiaBPSExportsPanel";
+import IndonesiaExportsPanel from "@/components/supply/IndonesiaExports";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
@@ -127,7 +127,7 @@ export default function IndonesiaTab() {
         <WeatherAnalogs dataUrl="/data/weather_analogs_indonesia.json" label="Indonesia robusta" />
       )}
 
-      {subTab === "exports" && <IndonesiaBPSExportsPanel />}
+      {subTab === "exports" && <IndonesiaExportsPanel />}
 
       {data && subTab === "farmer-economics" && (
         <IndonesiaFarmerEconomics
