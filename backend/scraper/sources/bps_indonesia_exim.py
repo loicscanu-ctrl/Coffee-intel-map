@@ -168,37 +168,71 @@ def _build_payload_body(year: int, month: int) -> str:
 
 async def fetch_month_via_scraperapi(year: int, month: int) -> list[dict] | None:
     """Default network path: ScraperAPI's `ultra_premium` mode forwards
-    our POST through their residential-proxy pool, runs a headed browser
-    that resolves Cloudflare Turnstile, and pipes the upstream response
-    back to us. ~25 API credits per call (free trial: 5,000 credits, so
-    the 24-month backfill costs ~600 + leaves comfortable headroom).
+    our request through their residential-proxy pool with managed
+    Cloudflare bypass.
 
     Returns None on any error (auth, plan limit, target HTTP non-200,
     RSC parse failure); the caller logs + skips that month.
 
-    Param notes:
-      - `render=true`         — JS rendering, runs the CF challenge.
-      - `ultra_premium=true`  — residential proxy + advanced anti-bot.
-      - `keep_headers=true`   — forwards Next-Action / Content-Type /
-                                Accept so BPS' server action accepts the
-                                payload.
-    """
+    Two-call session pattern (free-tier compatible):
+      1. GET the page with `render=true` + `ultra_premium=true` +
+         `session_number=N`. Their browser solves the CF Turnstile
+         challenge and stores the resulting cookies + IP under the
+         session id. We discard the HTML body — we only wanted the
+         side-effect of the CF clearance.
+      2. POST the server-action body with the SAME `session_number=N`
+         (no `render`). ScraperAPI replays the session cookies +
+         routes through the same residential IP, so CF lets the POST
+         through and BPS responds with the RSC stream we parse.
+
+    Why two calls instead of one: ScraperAPI's docs state explicitly
+    that `render=true` is GET-only ("Rendering is only supported for
+    GET requests" — observed verbatim in smoke run 27594067937).
+    Doubles credit cost (~50 vs ~25 per month) but stays inside the
+    5,000-credit trial budget for the 24-month backfill (~1.2k) plus
+    monthly cadence (~50 each)."""
     import requests
+    import secrets
 
     api_key = os.environ.get("SCRAPERAPI_API_KEY")
     if not api_key:
         return None
+    # Per-month session token so concurrent backfill calls (5 threads on
+    # ScraperAPI's free trial) don't collide on the same proxy IP.
+    session_id = f"bps-{year:04d}{month:02d}-{secrets.token_hex(3)}"
     body = _build_payload_body(year, month)
+
+    try:
+        warmup = await asyncio.to_thread(
+            requests.get,
+            SCRAPERAPI_URL,
+            params={
+                "api_key":        api_key,
+                "url":            BPS_PAGE_URL,
+                "render":         "true",
+                "ultra_premium":  "true",
+                "session_number": session_id,
+            },
+            timeout=180,
+        )
+    except Exception as e:                  # noqa: BLE001
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} GET warmup error: {e}")
+        return None
+    if warmup.status_code != 200:
+        snippet = (warmup.text or "")[:400]
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} GET warmup → HTTP {warmup.status_code}: {snippet}")
+        return None
+
     try:
         resp = await asyncio.to_thread(
             requests.post,
             SCRAPERAPI_URL,
             params={
-                "api_key":       api_key,
-                "url":           BPS_PAGE_URL,
-                "render":        "true",
-                "ultra_premium": "true",
-                "keep_headers":  "true",
+                "api_key":        api_key,
+                "url":            BPS_PAGE_URL,
+                "ultra_premium":  "true",
+                "session_number": session_id,
+                "keep_headers":   "true",
             },
             data=body,
             headers={
@@ -209,11 +243,11 @@ async def fetch_month_via_scraperapi(year: int, month: int) -> list[dict] | None
             timeout=180,
         )
     except Exception as e:                  # noqa: BLE001
-        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} request error: {e}")
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} POST error: {e}")
         return None
     if resp.status_code != 200:
         snippet = (resp.text or "")[:400]
-        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} → HTTP {resp.status_code}: {snippet}")
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} POST → HTTP {resp.status_code}: {snippet}")
         return None
     return parse_rsc_response(resp.text)
 
