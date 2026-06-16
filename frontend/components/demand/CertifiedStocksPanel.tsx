@@ -2425,7 +2425,9 @@ function RobustaActivityFeed({ d, unit }: { d: RobustaJson | null; unit: Unit })
 
 // ── Top-level panel ───────────────────────────────────────────────────────────
 
-export default function CertifiedStocksPanel() {
+export default function CertifiedStocksPanel(
+  { section = "all" }: { section?: "all" | "activity" | "flow" | "period_arabica" | "period_robusta" } = {},
+) {
   const [arabica, setArabica] = useState<ArabicaJson | null>(null);
   const [robusta, setRobusta] = useState<RobustaJson | null>(null);
   const [unit, setUnit] = useState<Unit>("bags");
@@ -2461,6 +2463,62 @@ export default function CertifiedStocksPanel() {
 
   if (err) {
     return <div className="p-4 text-xs text-slate-500">Certified stocks data unavailable.</div>;
+  }
+
+  // Report/briefing mode — render a single section without the panel chrome
+  // (header, unit/period controls, freshness strip). Uses the default unit
+  // (bags) and month-to-date window the controls would otherwise drive.
+  if (section !== "all") {
+    if (!arabica && !robusta) {
+      return <div className="p-4 text-xs text-slate-500">Loading certified stocks…</div>;
+    }
+    if (section === "activity") {
+      return (
+        <div className="p-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ArabicaActivityFeed d={arabica} unit={unit} />
+          <RobustaActivityFeed d={robusta} unit={unit} />
+        </div>
+      );
+    }
+    if (section === "flow") {
+      return (
+        <div className="p-2">
+          <CertifiedStocksSystemFlow
+            arabica={arabica as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["arabica"]}
+            robusta={robusta as unknown as Parameters<typeof CertifiedStocksSystemFlow>[0]["robusta"]}
+            start={startDate}
+            end={endDate}
+            unit={unit}
+          />
+        </div>
+      );
+    }
+    if (section === "period_arabica") {
+      return (
+        <div className="p-2">
+          <ArabicaPeriodTable
+            snapshots={arabica?.snapshots || []}
+            latestSec={arabica?.latest_detail?.total_certified ?? null}
+            ageDetail={arabica?.latest_detail?.age_detail}
+            ageingReport={arabica?.ageing_report ?? null}
+            unit={unit}
+          />
+        </div>
+      );
+    }
+    // period_robusta
+    return (
+      <div className="p-2">
+        <RobustaPeriodTable
+          snapshots={robusta?.snapshots || []}
+          gradings={(robusta?.recent_activity?.gradings || []) as unknown as GradingEvent[]}
+          overview={(robusta?.recent_activity?.grading_overview || []) as unknown as OverviewEvent[]}
+          ageMonths={(robusta?.monthly?.age_allowance || []) as unknown as AgeAllowanceMonth[]}
+          issuance={(robusta?.recent_activity?.iss_recv_daily || []) as unknown as IssRecvDailyEvt[]}
+          unit={unit}
+        />
+      </div>
+    );
   }
 
   return (
