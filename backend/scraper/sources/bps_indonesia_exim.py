@@ -144,7 +144,8 @@ class MonthlySummary:
 # ── fetch ───────────────────────────────────────────────────────────────────
 
 
-ZENROWS_API_URL = "https://api.zenrows.com/v1/"
+ZENROWS_API_URL    = "https://api.zenrows.com/v1/"
+SCRAPERAPI_URL     = "https://api.scraperapi.com"
 
 
 def _build_payload_body(year: int, month: int) -> str:
@@ -163,6 +164,58 @@ def _build_payload_body(year: int, month: int) -> str:
         f"{month:02d}",
     ]
     return json.dumps(payload, separators=(",", ":"))
+
+
+async def fetch_month_via_scraperapi(year: int, month: int) -> list[dict] | None:
+    """Default network path: ScraperAPI's `ultra_premium` mode forwards
+    our POST through their residential-proxy pool, runs a headed browser
+    that resolves Cloudflare Turnstile, and pipes the upstream response
+    back to us. ~25 API credits per call (free trial: 5,000 credits, so
+    the 24-month backfill costs ~600 + leaves comfortable headroom).
+
+    Returns None on any error (auth, plan limit, target HTTP non-200,
+    RSC parse failure); the caller logs + skips that month.
+
+    Param notes:
+      - `render=true`         — JS rendering, runs the CF challenge.
+      - `ultra_premium=true`  — residential proxy + advanced anti-bot.
+      - `keep_headers=true`   — forwards Next-Action / Content-Type /
+                                Accept so BPS' server action accepts the
+                                payload.
+    """
+    import requests
+
+    api_key = os.environ.get("SCRAPERAPI_API_KEY")
+    if not api_key:
+        return None
+    body = _build_payload_body(year, month)
+    try:
+        resp = await asyncio.to_thread(
+            requests.post,
+            SCRAPERAPI_URL,
+            params={
+                "api_key":       api_key,
+                "url":           BPS_PAGE_URL,
+                "render":        "true",
+                "ultra_premium": "true",
+                "keep_headers":  "true",
+            },
+            data=body,
+            headers={
+                "Content-Type": "text/plain;charset=UTF-8",
+                "Accept":       "text/x-component",
+                "Next-Action":  NEXT_ACTION_ID,
+            },
+            timeout=180,
+        )
+    except Exception as e:                  # noqa: BLE001
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} request error: {e}")
+        return None
+    if resp.status_code != 200:
+        snippet = (resp.text or "")[:400]
+        logger.warning(f"[bps] ScraperAPI {year}-{month:02d} → HTTP {resp.status_code}: {snippet}")
+        return None
+    return parse_rsc_response(resp.text)
 
 
 async def fetch_month_via_zenrows(year: int, month: int) -> list[dict] | None:
@@ -273,10 +326,21 @@ async def fetch_month_via_patchright(year: int, month: int, headed: bool = False
 
 
 async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict] | None:
-    """Dispatcher: prefer ZenRows (works from CI + residential IPs alike)
-    and fall back to local patchright when the ZENROWS_API_KEY env var
-    isn't set. The `headed` flag is only meaningful on the patchright
-    fallback path."""
+    """Dispatcher across the three supported transports, prioritised by
+    what works without manual intervention:
+
+      1. ScraperAPI (`SCRAPERAPI_API_KEY` env var) — CI default. Their
+         `ultra_premium` mode handles CF Turnstile on free trial.
+      2. ZenRows (`ZENROWS_API_KEY`) — first vendor we tried; left in
+         place so the codebase still works if a future operator switches
+         back. `antibot` mode is paid-only on their free tier so the
+         live smoke (run 27574157444) failed with RESP001.
+      3. Local patchright in headed mode — for code-change debugging
+         from a residential laptop. The `headed` flag only matters
+         here; the service paths ignore it.
+    """
+    if os.environ.get("SCRAPERAPI_API_KEY"):
+        return await fetch_month_via_scraperapi(year, month)
     if os.environ.get("ZENROWS_API_KEY"):
         return await fetch_month_via_zenrows(year, month)
     return await fetch_month_via_patchright(year, month, headed=headed)
