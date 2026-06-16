@@ -166,6 +166,46 @@ def _build_payload_body(year: int, month: int) -> str:
     return json.dumps(payload, separators=(",", ":"))
 
 
+async def fetch_month_via_cf_worker(year: int, month: int) -> list[dict] | None:
+    """Default network path when a Cloudflare-Worker proxy is deployed
+    (`BPS_WORKER_URL` + `BPS_WORKER_SECRET` env vars). The worker lives
+    inside Cloudflare's own edge network, so its outbound `fetch()` to
+    BPS appears as intra-CF traffic and (usually) clears Turnstile
+    without being challenged. See cf-worker/bps-proxy.js for the
+    deployable source + setup notes.
+
+    100k req/day free, no rate limiter beyond that. Returns None on any
+    error (auth, target HTTP non-200, RSC parse failure)."""
+    import requests
+
+    worker_url    = os.environ.get("BPS_WORKER_URL")
+    worker_secret = os.environ.get("BPS_WORKER_SECRET")
+    if not (worker_url and worker_secret):
+        return None
+    body = _build_payload_body(year, month)
+    try:
+        resp = await asyncio.to_thread(
+            requests.post,
+            worker_url,
+            data=body,
+            headers={
+                "Content-Type":   "text/plain;charset=UTF-8",
+                "Accept":         "text/x-component",
+                "Next-Action":    NEXT_ACTION_ID,
+                "x-proxy-secret": worker_secret,
+            },
+            timeout=60,
+        )
+    except Exception as e:                  # noqa: BLE001
+        logger.warning(f"[bps] CF Worker {year}-{month:02d} request error: {e}")
+        return None
+    if resp.status_code != 200:
+        snippet = (resp.text or "")[:400]
+        logger.warning(f"[bps] CF Worker {year}-{month:02d} → HTTP {resp.status_code}: {snippet}")
+        return None
+    return parse_rsc_response(resp.text)
+
+
 async def fetch_month_via_scraperapi(year: int, month: int) -> list[dict] | None:
     """Default network path: ScraperAPI's `ultra_premium` mode forwards
     our request through their residential-proxy pool with managed
@@ -360,19 +400,23 @@ async def fetch_month_via_patchright(year: int, month: int, headed: bool = False
 
 
 async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict] | None:
-    """Dispatcher across the three supported transports, prioritised by
-    what works without manual intervention:
+    """Dispatcher. Picks the highest-priority transport whose env vars
+    are set:
 
-      1. ScraperAPI (`SCRAPERAPI_API_KEY` env var) — CI default. Their
-         `ultra_premium` mode handles CF Turnstile on free trial.
-      2. ZenRows (`ZENROWS_API_KEY`) — first vendor we tried; left in
-         place so the codebase still works if a future operator switches
-         back. `antibot` mode is paid-only on their free tier so the
-         live smoke (run 27574157444) failed with RESP001.
-      3. Local patchright in headed mode — for code-change debugging
+      1. Cloudflare-Worker proxy (`BPS_WORKER_URL` + `BPS_WORKER_SECRET`)
+         — free, intra-CF traffic clears Turnstile without challenge.
+         See cf-worker/bps-proxy.js for the deployable source.
+      2. ScraperAPI (`SCRAPERAPI_API_KEY`) — premium proxy + render is
+         paid-only; the free-tier 7-day trial returns a permission
+         error (smoke run 27594246940).
+      3. ZenRows (`ZENROWS_API_KEY`) — antibot mode is paid-only on
+         their free tier (smoke run 27574157444 returned RESP001).
+      4. Local patchright in headed mode — for code-change debugging
          from a residential laptop. The `headed` flag only matters
          here; the service paths ignore it.
     """
+    if os.environ.get("BPS_WORKER_URL") and os.environ.get("BPS_WORKER_SECRET"):
+        return await fetch_month_via_cf_worker(year, month)
     if os.environ.get("SCRAPERAPI_API_KEY"):
         return await fetch_month_via_scraperapi(year, month)
     if os.environ.get("ZENROWS_API_KEY"):
@@ -558,6 +602,8 @@ def _persist(by_month: dict[str, dict]) -> None:
 async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = False) -> int:
     existing = _load_existing() if write else {}
     by_month: dict[str, dict] = {row["month"]: row for row in existing.get("series", [])}
+    requested = set(f"{y:04d}-{m:02d}" for y, m in months)
+    fetched_this_run: set[str] = set()
 
     for i, (y, m) in enumerate(months):
         ym = f"{y:04d}-{m:02d}"
@@ -572,6 +618,7 @@ async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = F
             continue
         summary = aggregate(rows, ym)
         by_month[ym] = _summary_to_dict(summary)
+        fetched_this_run.add(ym)
         print(f"  → {summary.row_count} rows · total {summary.total_coffee_kg:,.2f} kg "
               f"· robusta-green {summary.robusta_green_kg:,.2f} kg "
               f"· arabica-green {summary.arabica_green_kg:,.2f} kg")
@@ -594,6 +641,16 @@ async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = F
     else:
         # Preview mode — render the payload once at the end without persisting.
         print(f"[bps] preview only — {len(by_month)} months would be written")
+
+    # Non-zero exit when nothing fetched this run, so CI fails LOUDLY
+    # rather than the "no diff" → "no JSON change" → "success" chain
+    # we kept hitting. Smoke runs 27568532810, 27569193240, 27569356350,
+    # 27572914986, 27574157444, 27594067937 and 27594246940 all reported
+    # the workflow conclusion as success while no data was fetched.
+    if requested and not fetched_this_run:
+        print(f"[bps] FATAL: 0 of {len(requested)} requested months fetched. "
+              f"Check the per-month error logs above.")
+        return 1
     return 0
 
 
