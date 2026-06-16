@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -125,7 +125,7 @@ def build_inventory() -> list[dict]:
 def main() -> None:
     workflows = build_inventory()
     payload = {
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "count": len(workflows),
         "workflows": workflows,
     }
