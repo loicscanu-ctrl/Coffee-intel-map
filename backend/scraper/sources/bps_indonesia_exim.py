@@ -96,7 +96,7 @@ NEXT_ACTION_ID = "7f8a3808bc9f1e85e184f370fe19cced09f7c7ca50"
 # 09011120 (green Arabica) make it into the "green" aggregates that
 # match how ICO / GAIN report Indonesian coffee exports — roasted and
 # decaf flows are real but small and tracked separately.
-COFFEE_HS_CODES: dict[str, dict[str, str]] = {
+COFFEE_HS_CODES_HS2022: dict[str, dict[str, str]] = {
     "09011120": {"family": "arabica_green", "desc": "Arabica, not roasted, not decaffeinated"},
     "09011130": {"family": "robusta_green", "desc": "Robusta, not roasted, not decaffeinated"},
     "09011190": {"family": "other",         "desc": "Coffee other than arabica and robusta, not roasted, not decaffeinated"},
@@ -111,6 +111,50 @@ COFFEE_HS_CODES: dict[str, dict[str, str]] = {
     "09019010": {"family": "husks",         "desc": "Coffee husks and skins"},
     "09019020": {"family": "substitutes",   "desc": "Coffee substitutes containing coffee"},
 }
+
+# BTKI-2017 codes (HS-2017 revision) for months before 2022-04. KEY
+# CONSTRAINT: pre-2022 Indonesia lumped Arabica + Robusta under a single
+# "not roasted, not decaffeinated" code (09011110 — "Arabica WIB or
+# robusta OIB"). The species split that powers `robusta_green_kg` /
+# `arabica_green_kg` is therefore NOT recoverable for these months;
+# those fields stay 0 and only `total_coffee_kg` + per-port / per-
+# destination breakdowns carry useful signal. The split was introduced
+# in BTKI-2022 effective April 2022.
+COFFEE_HS_CODES_HS2017: dict[str, dict[str, str]] = {
+    "09011110": {"family": "green_unsplit", "desc": "Arabica WIB or robusta OIB, not roasted, not decaffeinated"},
+    "09011190": {"family": "other",         "desc": "Coffee other than [Arabica WIB / robusta OIB], not roasted, not decaffeinated"},
+    "09011200": {"family": "other",         "desc": "Coffee, decaffeinated, not roasted"},
+    "09012110": {"family": "other_roast",   "desc": "Coffee, roasted, not decaffeinated, unground"},
+    "09012120": {"family": "other_roast",   "desc": "Coffee, roasted, not decaffeinated, ground"},
+    "09012210": {"family": "other",         "desc": "Coffee, roasted, decaffeinated, unground"},
+    "09012220": {"family": "other",         "desc": "Coffee, roasted, decaffeinated, ground"},
+    "09019010": {"family": "husks",         "desc": "Coffee husks and skins"},
+    "09019020": {"family": "substitutes",   "desc": "Coffee substitutes containing coffee"},
+}
+
+# Merged allowlist for the aggregator's "is this row coffee?" check. The
+# HS-2022 entries win on collision (09011190, 09012120, 09012220, 09019010,
+# 09019020 exist in both revisions with effectively identical meaning).
+COFFEE_HS_CODES: dict[str, dict[str, str]] = {
+    **COFFEE_HS_CODES_HS2017,
+    **COFFEE_HS_CODES_HS2022,
+}
+
+
+def _hs_revision_for_year(year: int) -> tuple[int, dict[str, dict[str, str]]]:
+    """Picks the BPS HS revision for a given year. Returns the `jenishs`
+    URL parameter value the Web API expects and the code dict for that
+    revision. BTKI-2022 (= HS-2022, `jenishs=2`) took effect April 2022;
+    earlier years sit in BTKI-2017 (= HS-2017, `jenishs=1`).
+
+    Year 2022 itself is a borderline edge: Q1 2022 data lives in HS-2017
+    and Apr-Dec 2022 in HS-2022. We pick HS-2022 for year=2022 since the
+    existing backfill already populated 2022-04 through 2022-12 from
+    HS-2022; if Q1 2022 is needed separately, dispatch a Q1-only run
+    against an explicit HS-2017 ref."""
+    if year < 2022:
+        return 1, COFFEE_HS_CODES_HS2017
+    return 2, COFFEE_HS_CODES_HS2022
 
 CALL_TIMEOUT = 60   # seconds, applied per network call
 
@@ -145,8 +189,9 @@ SCRAPERAPI_URL     = "https://api.scraperapi.com"
 
 # Year-wide in-memory cache for the official Web API. One (HS code, year)
 # request returns every month of that year, so a multi-month backfill
-# within the same year only fires 13 requests (one per HS code), not
-# 13 × N requests. Scoped to the process; cleared automatically on exit.
+# within the same year only fires N requests (one per HS code in that
+# year's revision: 13 for HS-2022, 9 for HS-2017), not N × months.
+# Scoped to the process; cleared automatically on exit.
 _BPS_API_YEAR_CACHE: dict[int, list[dict]] = {}
 
 
@@ -171,11 +216,12 @@ async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
         return None
 
     if year not in _BPS_API_YEAR_CACHE:
+        jenishs, codes = _hs_revision_for_year(year)
         all_rows: list[dict] = []
-        for code in COFFEE_HS_CODES:
+        for code in codes:
             url = (
                 f"{BPS_API_BASE}/sumber/1/periode/1/kodehs/{code}"
-                f"/jenishs/2/tahun/{year}/key/{api_key}"
+                f"/jenishs/{jenishs}/tahun/{year}/key/{api_key}"
             )
             try:
                 resp = await asyncio.to_thread(requests.get, url, timeout=CALL_TIMEOUT)
