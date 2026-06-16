@@ -1,7 +1,7 @@
 {
   "source": "BPS Indonesia (lampung.bps.go.id/en/exim, national export rows)",
   "source_url": "https://lampung.bps.go.id/en/exim",
-  "scraped_at": "2026-06-16T09:32:41+00:00",
+  "scraped_at": "2026-06-16T09:37:02+00:00",
   "unit_weight": "kg",
   "unit_value": "USD",
   "hs_codes": {
@@ -43,16 +43,397 @@
   "series": [
     {
       "month": "2020-04",
-      "row_count": 0,
-      "total_coffee_kg": 0.0,
-      "total_coffee_usd": 0.0,
+      "row_count": 105,
+      "total_coffee_kg": 26695928.69,
+      "total_coffee_usd": 63508427.414,
       "robusta_green_kg": 0.0,
       "arabica_green_kg": 0.0,
       "robusta_green_usd": 0.0,
       "arabica_green_usd": 0.0,
-      "by_destination": [],
-      "by_port": [],
-      "by_hs": [],
+      "by_destination": [
+        {
+          "country": "UNITED STATES",
+          "kg": 5958070.0,
+          "usd": 20888023.202,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "ITALY",
+          "kg": 4480000.0,
+          "usd": 7271878.43,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "MALAYSIA",
+          "kg": 2600479.0,
+          "usd": 4179780.0759999994,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "JAPAN",
+          "kg": 2153190.0,
+          "usd": 5150433.97,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "SPAIN",
+          "kg": 1930400.0,
+          "usd": 3000211.44,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "EGYPT",
+          "kg": 1668850.0,
+          "usd": 2757874.16,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "VIET NAM",
+          "kg": 1076000.0,
+          "usd": 1704318.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "GEORGIA",
+          "kg": 952500.0,
+          "usd": 1485850.04,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "MOROCCO",
+          "kg": 823800.0,
+          "usd": 1332090.38,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "INDIA",
+          "kg": 698000.0,
+          "usd": 935870.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "GERMANY, FED. REP. OF",
+          "kg": 585530.0,
+          "usd": 2147580.334,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "BELGIUM",
+          "kg": 522400.0,
+          "usd": 2398320.35,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "RUSSIA FEDERATION",
+          "kg": 470400.0,
+          "usd": 710061.6,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "TAIWAN",
+          "kg": 458934.22000000003,
+          "usd": 1917717.66,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "SINGAPORE",
+          "kg": 437845.87,
+          "usd": 692070.371,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "CANADA",
+          "kg": 364800.0,
+          "usd": 1990211.48,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "AUSTRALIA",
+          "kg": 201400.0,
+          "usd": 471115.147,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "UNITED KINGDOM",
+          "kg": 174400.0,
+          "usd": 978680.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "ALGERIA",
+          "kg": 171000.0,
+          "usd": 243795.6,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "EAST TIMOR",
+          "kg": 125289.0,
+          "usd": 352394.87,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "CHINA",
+          "kg": 103248.90000000001,
+          "usd": 506503.04099999997,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "KOREA, REPUBLIC OF",
+          "kg": 102005.2,
+          "usd": 429351.996,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "BULGARIA",
+          "kg": 96000.0,
+          "usd": 168323.6,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "THAILAND",
+          "kg": 62040.5,
+          "usd": 147695.09000000003,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "NEW ZEALAND",
+          "kg": 57600.0,
+          "usd": 307200.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "UNITED ARAB EMIRATES",
+          "kg": 57600.0,
+          "usd": 110820.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "HONG KONG",
+          "kg": 42680.0,
+          "usd": 95993.362,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "NETHERLANDS",
+          "kg": 41100.0,
+          "usd": 217862.42,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "PORTUGAL",
+          "kg": 38400.0,
+          "usd": 58841.66,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "ROMANIA",
+          "kg": 38400.0,
+          "usd": 66547.2,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "DENMARK",
+          "kg": 37800.0,
+          "usd": 202836.235,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "GREECE",
+          "kg": 37800.0,
+          "usd": 69508.8,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "IRELAND",
+          "kg": 37200.0,
+          "usd": 156983.16,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "PHILIPPINES",
+          "kg": 19980.0,
+          "usd": 33966.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "FINLAND",
+          "kg": 19200.0,
+          "usd": 103488.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "ISRAEL",
+          "kg": 19200.0,
+          "usd": 112032.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "OMAN",
+          "kg": 18000.0,
+          "usd": 51400.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "SAUDI ARABIA",
+          "kg": 12672.0,
+          "usd": 53577.3,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "BRUNEI DARUSSALAM",
+          "kg": 1502.0,
+          "usd": 5546.94,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "UZBEKISTAN",
+          "kg": 210.0,
+          "usd": 1643.5,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "country": "UKRAINE",
+          "kg": 2.0,
+          "usd": 30.0,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        }
+      ],
+      "by_port": [
+        {
+          "port": "PANJANG",
+          "kg": 16258314.0,
+          "usd": 24969694.182,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "BELAWAN",
+          "kg": 6140825.0,
+          "usd": 30127261.06,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "TANJUNG PERAK",
+          "kg": 3411844.9,
+          "usd": 6594698.471,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "TANJUNG EMAS",
+          "kg": 687572.8,
+          "usd": 1123531.426,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "TANJUNG PRIOK",
+          "kg": 195851.37000000002,
+          "usd": 643772.437,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "SOEKARNO-HATTA (U)",
+          "kg": 880.62,
+          "usd": 31908.237999999998,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        },
+        {
+          "port": "NGURAH RAI (U)",
+          "kg": 640.0,
+          "usd": 17561.6,
+          "robusta_green_kg": 0.0,
+          "arabica_green_kg": 0.0
+        }
+      ],
+      "by_hs": [
+        {
+          "code": "09011110",
+          "description": "Arabica WIB or robusta OIB, not roasted, not decaffeinated",
+          "kg": 26027078.98,
+          "usd": 61984451.12800001
+        },
+        {
+          "code": "09011190",
+          "description": "Coffee other than arabica and robusta, not roasted, not decaffeinated",
+          "kg": 306607.3,
+          "usd": 436771.054
+        },
+        {
+          "code": "09012110",
+          "description": "Coffee, roasted, not decaffeinated, unground",
+          "kg": 41570.3,
+          "usd": 161509.657
+        },
+        {
+          "code": "09012120",
+          "description": "Coffee, roasted, not decaffeinated, ground",
+          "kg": 175143.27,
+          "usd": 559916.175
+        },
+        {
+          "code": "09012210",
+          "description": "Coffee, roasted, decaffeinated, unground",
+          "kg": 164.0,
+          "usd": 8800.0
+        },
+        {
+          "code": "09019010",
+          "description": "Coffee husks and skins",
+          "kg": 20060.0,
+          "usd": 3777.05
+        },
+        {
+          "code": "09019020",
+          "description": "Coffee substitutes containing coffee",
+          "kg": 125304.84,
+          "usd": 353202.35
+        }
+      ],
       "source_metadata": {}
     },
     {
