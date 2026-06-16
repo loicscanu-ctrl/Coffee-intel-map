@@ -1,20 +1,17 @@
 name: "0.9 – BPS Indonesia coffee exports (monthly)"
 
-# Pulls Indonesia's national coffee export numbers from BPS. The page sits
-# behind Cloudflare Turnstile, which rejects every datacenter IP on
-# fingerprint regardless of how human-like the browser process looks.
-# After ZenRows (run 27574157444), ScraperAPI (runs 27594067937 /
-# 27594246940) and Xvfb-headed Chromium (run 27572914986) all failed
-# on their respective free tiers (residential / antibot / premium proxy
-# are paid-only across the board), we deploy our own Cloudflare-Worker
-# proxy and route the POST through it — intra-CF traffic clears the
-# challenge without challenge.
+# Pulls Indonesia's national coffee export numbers from BPS via the
+# official Web API (https://webapi.bps.go.id/v1/api/dataexim). Plain
+# JSON GETs, no Cloudflare. Earlier attempts at the Cloudflare-fronted
+# lampung.bps.go.id/en/exim Server Action all failed from CI — headless
+# Chromium (#27568532810, #27569193240, #27569356350), Xvfb-headed
+# Chromium (#27572914986), ZenRows free tier (#27574157444), ScraperAPI
+# free tier (#27594067937, #27594246940), and a Cloudflare-Worker proxy
+# (intra-CF traffic still 403'd). The Web API is BPS's published path
+# for programmatic access and returns the same row shape.
 #
-# Requires repository secrets:
-#   BPS_WORKER_URL    — https://<your-worker>.workers.dev
-#   BPS_WORKER_SECRET — shared secret matching the worker's PROXY_SECRET
-#
-# Source for the worker lives at cf-worker/bps-proxy.js.
+# Requires repository secret:
+#   BPS_API_KEY — the "App ID" from webapi.bps.go.id after registering.
 
 on:
   workflow_dispatch:
@@ -44,7 +41,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-22.04
-    timeout-minutes: 90       # 75 months × ~20 s with xvfb + CF wait ≈ 25 min worst case
+    timeout-minutes: 30       # 13 HS codes × ~1 s per year-call × a few years ≈ <5 min
     permissions:
       contents: write
 
@@ -58,10 +55,8 @@ jobs:
           cache-dependency-path: backend/scraper/requirements.txt
 
       - name: Install Python dependencies
-        # Just `requests`. ZenRows handles the browser + Cloudflare
-        # bypass + residential IP on their side; we make a plain HTTP
-        # POST to their API and parse the response. No more Chromium,
-        # patchright, or Xvfb on the runner.
+        # Just `requests`. The official BPS Web API is plain JSON over
+        # HTTPS — no Chromium, no Xvfb, no proxy provider needed.
         run: pip install requests
 
       - name: Run BPS scraper
@@ -71,12 +66,10 @@ jobs:
           MONTH:              ${{ inputs.month }}
           FROM_M:              ${{ inputs.from }}
           TO_M:                ${{ inputs.to }}
-          BPS_WORKER_URL:      ${{ secrets.BPS_WORKER_URL }}
-          BPS_WORKER_SECRET:   ${{ secrets.BPS_WORKER_SECRET }}
-          SCRAPERAPI_API_KEY:  ${{ secrets.SCRAPERAPI_API_KEY }}
-        # The scraper's fetch_month() dispatcher prefers BPS_WORKER_*
-        # when both are set; SCRAPERAPI_API_KEY is the fallback once we
-        # have a paid plan; patchright is the local-debug last resort.
+          BPS_API_KEY:        ${{ secrets.BPS_API_KEY }}
+        # fetch_month() prefers BPS_API_KEY (official Web API). The
+        # legacy CF-Worker / ScraperAPI / ZenRows / patchright paths
+        # are kept in source as documentation of what doesn't work.
         run: |
           set +e
           ARGS="--write"

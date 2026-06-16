@@ -1,15 +1,16 @@
 """bps_indonesia_exim.py — Indonesia national export data from BPS.
 
-Hits the Next.js Server Action behind https://lampung.bps.go.id/en/exim
-(despite the `lampung.` subdomain, the data is national — all Indonesian
-ports show up in the rows). One POST per (year, month) returns a flat
-list of rows shaped:
+Canonical path: the official BPS Web API at https://webapi.bps.go.id —
+no Cloudflare, no JS rendering, plain JSON GETs keyed by HS code and
+year. Returns rows shaped:
 
-    { jenishs, value, netweight, kodehs, pod, ctr, tahun, bulan }
+    { tahun, bulan, kodehs, jenishs, pod, ctr, value, netweight }
 
 where `kodehs` is "[<code>] <description>", `pod` is the Indonesian
 port of departure, `ctr` is the destination country, `value` is USD,
-`netweight` is kilograms.
+`netweight` is kilograms, `bulan` is "[MM] MonthName". Identical schema
+to the legacy lampung.bps.go.id Server Action — the aggregator works
+unchanged.
 
 The 13 HS codes in COFFEE_HS_CODES below cover the full HS-0901xx coffee
 family (green / roasted, Arabica / Robusta / other, decaf / regular,
@@ -20,47 +21,41 @@ Output: frontend/public/data/indonesia_exports.json — one row per month
 with headline totals, by-destination and by-port breakdowns, and the
 raw per-HS detail kept so the frontend can re-aggregate as needed.
 
-⚠ HEADED CHROMIUM ONLY — bypasses Cloudflare Turnstile
-
-Live ops history: BPS's CF config fingerprints HEADLESS Chromium and
-holds the Turnstile spinner open indefinitely. Three CI smokes
-(#27568532810, #27569193240, #27569356350) and one local laptop run all
-confirmed this from different IPs. The fix is to drive a VISIBLE browser
-window — the patchright stealth profile holds up under fingerprinting
-once a real browser process is in play.
-
-Two hosts:
-
-  • Local laptop — pass `--headed`; a window flashes briefly.
-  • GitHub Actions runner — `.github/workflows/bps-indonesia-exim.yml`
-    wraps the call in `xvfb-run` so headed Chromium gets a virtual
-    display. Same `--headed` flag, no visible window because there's
-    no real screen.
+Why an official API path: every Cloudflare-fronted attempt at
+lampung.bps.go.id/en/exim failed from CI — headless Chromium
+(#27568532810, #27569193240, #27569356350), Xvfb-headed Chromium
+(#27572914986), ZenRows free tier (#27574157444, RESP001), ScraperAPI
+free tier (#27594067937, #27594246940, premium-proxy-only), and a
+Cloudflare-Worker proxy (intra-CF traffic still 403'd). The Web API at
+webapi.bps.go.id is published by BPS specifically for programmatic
+access, has no bot challenge, and returns the same row shape — so we
+use it as the primary transport and keep the four CF-fronted fallbacks
+below as documentation of what doesn't work.
 
 Operator workflow (CI dispatch, the default path):
 
   GitHub UI → Actions → "0.9 – BPS Indonesia coffee exports (monthly)"
     → Run workflow → pick a single month or from/to range → Run.
 
-The workflow commits the merged JSON back to the dispatched ref.
+Requires repository secret `BPS_API_KEY` (the BPS "App ID" issued at
+webapi.bps.go.id after registering an application). The workflow
+commits the merged JSON back to the dispatched ref.
 
 Local fallback (test code changes, debug a stuck month):
 
     cd backend
-    PYTHONPATH=. python -m scraper.sources.bps_indonesia_exim \
-        --month 2026-04 --write --headed
+    BPS_API_KEY=<your-app-id> PYTHONPATH=. \
+        python -m scraper.sources.bps_indonesia_exim --month 2026-04 --write
     cd ..
 
 The `--write` flag merges into the existing series (idempotent month-
 keyed dedupe). Backfill uses `--from YYYY-MM --to YYYY-MM`.
 
 Implementation notes:
-  - patchright stealth profile + page.evaluate(fetch) are still
-    necessary on top of headed mode — without them the POST gets
-    fingerprinted independently of the page even after CF clears.
-  - The `next-action: 7f8a3808bc9f1e85e184f370fe19cced09f7c7ca50`
-    header value is per-deploy. If BPS rebuilds and the ID rotates, the
-    POST returns 4xx; re-grab from DevTools and update the constant.
+  - The Web API returns a FULL YEAR per (HS code, year) call, so the
+    per-month dispatcher caches by year and serves later months in the
+    same year from the in-memory cache. A 24-month backfill across 2
+    years × 13 codes = 26 HTTP requests total, not 24 × 13 = 312.
   - BPS adopted BTKI-2022 (= HS-2022) in March 2022; the 13 codes in
     COFFEE_HS_CODES are HS-2022 only, so pre-2022-04 months return the
     ~1% slice that overlaps between revisions (tea/spice-adjacent
@@ -144,8 +139,72 @@ class MonthlySummary:
 # ── fetch ───────────────────────────────────────────────────────────────────
 
 
+BPS_API_BASE       = "https://webapi.bps.go.id/v1/api/dataexim"
 ZENROWS_API_URL    = "https://api.zenrows.com/v1/"
 SCRAPERAPI_URL     = "https://api.scraperapi.com"
+
+# Year-wide in-memory cache for the official Web API. One (HS code, year)
+# request returns every month of that year, so a multi-month backfill
+# within the same year only fires 13 requests (one per HS code), not
+# 13 × N requests. Scoped to the process; cleared automatically on exit.
+_BPS_API_YEAR_CACHE: dict[int, list[dict]] = {}
+
+
+async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
+    """Canonical network path: the official BPS Web API at
+    https://webapi.bps.go.id/v1/api/dataexim. Plain JSON GETs keyed by
+    HS code + year, no Cloudflare, no JS rendering. Envelope:
+
+        {"status":"OK","data-availability":"available",
+         "metadata":{...}, "data":[ {tahun,bulan,kodehs,...}, ... ]}
+
+    One call per (HS code, year). 13 codes × 1 year = 13 requests to
+    populate the cache for a 12-month backfill of that year. Requires
+    `BPS_API_KEY` env var (the "App ID" issued at webapi.bps.go.id).
+    Returns None on env-not-set; otherwise returns the rows for the
+    requested month filtered out of the year cache (empty list if BPS
+    has no rows for that month yet)."""
+    import requests
+
+    api_key = os.environ.get("BPS_API_KEY")
+    if not api_key:
+        return None
+
+    if year not in _BPS_API_YEAR_CACHE:
+        all_rows: list[dict] = []
+        for code in COFFEE_HS_CODES:
+            url = (
+                f"{BPS_API_BASE}/sumber/1/periode/1/kodehs/{code}"
+                f"/jenishs/2/tahun/{year}/key/{api_key}"
+            )
+            try:
+                resp = await asyncio.to_thread(requests.get, url, timeout=CALL_TIMEOUT)
+            except Exception as e:                  # noqa: BLE001
+                logger.warning(f"[bps] API {year} {code} request error: {e}")
+                continue
+            if resp.status_code != 200:
+                snippet = (resp.text or "")[:300]
+                logger.warning(f"[bps] API {year} {code} → HTTP {resp.status_code}: {snippet}")
+                continue
+            try:
+                payload = resp.json()
+            except ValueError:
+                logger.warning(f"[bps] API {year} {code} → non-JSON response")
+                continue
+            availability = (payload or {}).get("data-availability")
+            if availability and availability != "available":
+                # Common for HS codes with zero exports in the requested
+                # year (e.g. niche substitutes/husks). Silent skip — would
+                # flood the log on every backfill otherwise.
+                continue
+            data = (payload or {}).get("data")
+            if isinstance(data, list):
+                all_rows.extend(data)
+        _BPS_API_YEAR_CACHE[year] = all_rows
+
+    month_tag = f"[{month:02d}]"
+    return [r for r in _BPS_API_YEAR_CACHE[year]
+            if isinstance(r.get("bulan"), str) and r["bulan"].startswith(month_tag)]
 
 
 def _build_payload_body(year: int, month: int) -> str:
@@ -403,18 +462,24 @@ async def fetch_month(year: int, month: int, headed: bool = False) -> list[dict]
     """Dispatcher. Picks the highest-priority transport whose env vars
     are set:
 
-      1. Cloudflare-Worker proxy (`BPS_WORKER_URL` + `BPS_WORKER_SECRET`)
-         — free, intra-CF traffic clears Turnstile without challenge.
-         See cf-worker/bps-proxy.js for the deployable source.
-      2. ScraperAPI (`SCRAPERAPI_API_KEY`) — premium proxy + render is
+      1. Official BPS Web API (`BPS_API_KEY`) — canonical path, free,
+         no Cloudflare. Returns a whole year per HS-code call; the
+         per-month dispatcher caches the year to amortise.
+      2. Cloudflare-Worker proxy (`BPS_WORKER_URL` + `BPS_WORKER_SECRET`)
+         — intra-CF traffic was the plan B; in practice BPS's CF
+         config still 403'd intra-CF Workers traffic. Kept as
+         documentation of what doesn't work.
+      3. ScraperAPI (`SCRAPERAPI_API_KEY`) — premium proxy + render is
          paid-only; the free-tier 7-day trial returns a permission
          error (smoke run 27594246940).
-      3. ZenRows (`ZENROWS_API_KEY`) — antibot mode is paid-only on
+      4. ZenRows (`ZENROWS_API_KEY`) — antibot mode is paid-only on
          their free tier (smoke run 27574157444 returned RESP001).
-      4. Local patchright in headed mode — for code-change debugging
+      5. Local patchright in headed mode — for code-change debugging
          from a residential laptop. The `headed` flag only matters
          here; the service paths ignore it.
     """
+    if os.environ.get("BPS_API_KEY"):
+        return await fetch_month_via_bps_api(year, month)
     if os.environ.get("BPS_WORKER_URL") and os.environ.get("BPS_WORKER_SECRET"):
         return await fetch_month_via_cf_worker(year, month)
     if os.environ.get("SCRAPERAPI_API_KEY"):
