@@ -192,6 +192,38 @@ def test_iter_months_single_month():
     assert list(bps._iter_months("2026-04", "2026-04")) == [(2026, 4)]
 
 
+def test_hs_codes_for_year_pre2022_uses_hs2017():
+    """Year < 2022 → HS-2017 9-code list including 09011110 (Arabica
+    WIB / robusta OIB lumped). Does NOT include the HS-2022 split codes
+    09011120 / 09011130."""
+    codes = bps._hs_codes_for_year(2020)
+    assert "09011110" in codes
+    assert "09011120" not in codes
+    assert "09011130" not in codes
+
+
+def test_hs_codes_for_year_2022plus_uses_hs2022():
+    codes = bps._hs_codes_for_year(2022)
+    assert "09011120" in codes and "09011130" in codes
+    assert "09011110" not in codes
+
+
+def test_aggregate_hs2017_lumped_green_contributes_to_total_not_species():
+    """09011110 is the BTKI-2017 'Arabica WIB or robusta OIB' lumped code.
+    It must NOT bump robusta_green_kg or arabica_green_kg (those columns
+    are species-specific) but MUST land in total_coffee_kg."""
+    rows = [{
+        "jenishs": "hs2017", "value": 500, "netweight": 100,
+        "kodehs": "[09011110] Arabica WIB or robusta OIB, not roasted, not decaffeinated",
+        "pod": "PANJANG", "ctr": "ITALY", "tahun": "2020", "bulan": "[04] April",
+    }]
+    s = bps.aggregate(rows, "2020-04")
+    assert s.total_coffee_kg == 100
+    assert s.robusta_green_kg == 0
+    assert s.arabica_green_kg == 0
+    assert s.row_count == 1
+
+
 def test_summary_to_dict_round_trips_through_json():
     """The output JSON must be json.dump-able with no surprises (e.g. no
     floats that smell like NaN, no dataclass leaks)."""
