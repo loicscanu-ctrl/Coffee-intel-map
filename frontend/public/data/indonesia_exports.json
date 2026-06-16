@@ -1,6 +1,6 @@
 {
-  "source": "BPS Indonesia (lampung.bps.go.id/en/exim, national export rows)",
-  "source_url": "https://lampung.bps.go.id/en/exim",
+  "source": "BPS Indonesia (webapi.bps.go.id/v1/api/dataexim, national export rows)",
+  "source_url": "https://webapi.bps.go.id/v1/api/dataexim",
   "scraped_at": "2026-06-16T10:16:15+00:00",
   "unit_weight": "kg",
   "unit_value": "USD",

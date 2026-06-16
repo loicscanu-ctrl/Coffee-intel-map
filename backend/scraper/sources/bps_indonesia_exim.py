@@ -708,8 +708,8 @@ def _summary_to_dict(s: MonthlySummary) -> dict:
 
 def _build_payload(by_month: dict[str, dict]) -> dict:
     return {
-        "source":     "BPS Indonesia (lampung.bps.go.id/en/exim, national export rows)",
-        "source_url": BPS_PAGE_URL,
+        "source":     "BPS Indonesia (webapi.bps.go.id/v1/api/dataexim, national export rows)",
+        "source_url": BPS_API_BASE,
         "scraped_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "unit_weight": "kg",
         "unit_value":  "USD",
