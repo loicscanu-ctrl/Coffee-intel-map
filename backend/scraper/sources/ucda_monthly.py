@@ -673,7 +673,7 @@ def _v2_parse_rows(scope: str) -> list[dict]:
     matches = _v2_country_matches(scope)
     rows: list[dict] = []
     seen: set[str] = set()
-    for i, (s, e, country) in enumerate(matches):
+    for i, (_s, e, country) in enumerate(matches):
         seg_end = matches[i + 1][0] if i + 1 < len(matches) else len(scope)
         seg = scope[e:seg_end]
         # The published footer ("Total 907,058 …") and the repeated column

@@ -72,7 +72,7 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -351,8 +351,9 @@ async def fetch_month_via_scraperapi(year: int, month: int) -> list[dict] | None
     Doubles credit cost (~50 vs ~25 per month) but stays inside the
     5,000-credit trial budget for the 24-month backfill (~1.2k) plus
     monthly cadence (~50 each)."""
-    import requests
     import secrets
+
+    import requests
 
     api_key = os.environ.get("SCRAPERAPI_API_KEY")
     if not api_key:
@@ -710,7 +711,7 @@ def _build_payload(by_month: dict[str, dict]) -> dict:
     return {
         "source":     "BPS Indonesia (webapi.bps.go.id/v1/api/dataexim, national export rows)",
         "source_url": BPS_API_BASE,
-        "scraped_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "scraped_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "unit_weight": "kg",
         "unit_value":  "USD",
         "hs_codes":    {c: v["desc"] for c, v in COFFEE_HS_CODES.items()},
@@ -804,7 +805,7 @@ def main() -> int:
         # Default: fetch the most recently published month. BPS lags by
         # roughly six weeks, so two months back from today is a safe
         # bet to land on something `data-availability: available`.
-        today = datetime.now(timezone.utc).date()
+        today = datetime.now(UTC).date()
         y, m = today.year, today.month - 2
         while m < 1:
             y, m = y - 1, m + 12
