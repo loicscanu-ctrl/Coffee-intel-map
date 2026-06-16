@@ -2,15 +2,19 @@ name: "0.9 – BPS Indonesia coffee exports (monthly)"
 
 # Pulls Indonesia's national coffee export numbers from BPS. The page sits
 # behind Cloudflare Turnstile, which rejects every datacenter IP on
-# fingerprint regardless of how human-like the browser process looks
-# (Xvfb-headed Chromium under patchright was still 403'd, run
-# 27572914986). We route the POST through ScraperAPI's `ultra_premium`
-# mode — residential proxy pool + managed CF bypass — and pipe the
-# upstream response through our existing RSC parser. ZenRows was the
-# first vendor we tried (run 27574157444) but their antibot mode is
-# paid-only on the free tier, so it returned RESP001 every time.
+# fingerprint regardless of how human-like the browser process looks.
+# After ZenRows (run 27574157444), ScraperAPI (runs 27594067937 /
+# 27594246940) and Xvfb-headed Chromium (run 27572914986) all failed
+# on their respective free tiers (residential / antibot / premium proxy
+# are paid-only across the board), we deploy our own Cloudflare-Worker
+# proxy and route the POST through it — intra-CF traffic clears the
+# challenge without challenge.
 #
-# Requires repository secret SCRAPERAPI_API_KEY.
+# Requires repository secrets:
+#   BPS_WORKER_URL    — https://<your-worker>.workers.dev
+#   BPS_WORKER_SECRET — shared secret matching the worker's PROXY_SECRET
+#
+# Source for the worker lives at cf-worker/bps-proxy.js.
 
 on:
   workflow_dispatch:
@@ -64,12 +68,15 @@ jobs:
         id: scrape
         working-directory: backend
         env:
-          MONTH:               ${{ inputs.month }}
+          MONTH:              ${{ inputs.month }}
           FROM_M:              ${{ inputs.from }}
           TO_M:                ${{ inputs.to }}
+          BPS_WORKER_URL:      ${{ secrets.BPS_WORKER_URL }}
+          BPS_WORKER_SECRET:   ${{ secrets.BPS_WORKER_SECRET }}
           SCRAPERAPI_API_KEY:  ${{ secrets.SCRAPERAPI_API_KEY }}
-        # The scraper's fetch_month() dispatcher auto-routes to ScraperAPI
-        # when SCRAPERAPI_API_KEY is set, so no extra CLI flag is needed.
+        # The scraper's fetch_month() dispatcher prefers BPS_WORKER_*
+        # when both are set; SCRAPERAPI_API_KEY is the fallback once we
+        # have a paid plan; patchright is the local-debug last resort.
         run: |
           set +e
           ARGS="--write"
