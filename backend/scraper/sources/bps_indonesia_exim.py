@@ -238,12 +238,17 @@ async def fetch_month_via_bps_api(year: int, month: int) -> list[dict] | None:
                 logger.warning(f"[bps] API {year} {code} → non-JSON response")
                 continue
             availability = (payload or {}).get("data-availability")
-            if availability and availability != "available":
-                # Common for HS codes with zero exports in the requested
-                # year (e.g. niche substitutes/husks). Silent skip — would
-                # flood the log on every backfill otherwise.
-                continue
             data = (payload or {}).get("data")
+            row_count = len(data) if isinstance(data, list) else 0
+            # Diagnostic for HS-2017 backfills. jenishs=1 expectations are
+            # still being validated against BPS's actual schema; this line
+            # exposes whether the API recognises each code / whether the
+            # year is published yet. Remove (or downgrade to debug) once
+            # the HS-2017 code list is locked.
+            logger.warning(f"[bps] API {year} {code} jenishs={jenishs} "
+                           f"availability={availability!r} rows={row_count}")
+            if availability and availability != "available":
+                continue
             if isinstance(data, list):
                 all_rows.extend(data)
         _BPS_API_YEAR_CACHE[year] = all_rows
