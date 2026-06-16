@@ -4,12 +4,13 @@ name: "0.9 – BPS Indonesia coffee exports (monthly)"
 # behind Cloudflare Turnstile, which rejects every datacenter IP on
 # fingerprint regardless of how human-like the browser process looks
 # (Xvfb-headed Chromium under patchright was still 403'd, run
-# 27572914986). The supported path is ZenRows' Scraping API — they run
-# our POST through their residential-proxy pool with managed CF bypass.
-# Free tier (1k credits/month) covers our 12 monthly runs + a 24-month
-# backfill with credits to spare.
+# 27572914986). We route the POST through ScraperAPI's `ultra_premium`
+# mode — residential proxy pool + managed CF bypass — and pipe the
+# upstream response through our existing RSC parser. ZenRows was the
+# first vendor we tried (run 27574157444) but their antibot mode is
+# paid-only on the free tier, so it returned RESP001 every time.
 #
-# Requires repository secret ZENROWS_API_KEY.
+# Requires repository secret SCRAPERAPI_API_KEY.
 
 on:
   workflow_dispatch:
@@ -63,12 +64,12 @@ jobs:
         id: scrape
         working-directory: backend
         env:
-          MONTH:            ${{ inputs.month }}
-          FROM_M:           ${{ inputs.from }}
-          TO_M:             ${{ inputs.to }}
-          ZENROWS_API_KEY:  ${{ secrets.ZENROWS_API_KEY }}
-        # The scraper's fetch_month() dispatcher auto-routes to ZenRows
-        # when ZENROWS_API_KEY is set, so no extra CLI flag is needed.
+          MONTH:               ${{ inputs.month }}
+          FROM_M:              ${{ inputs.from }}
+          TO_M:                ${{ inputs.to }}
+          SCRAPERAPI_API_KEY:  ${{ secrets.SCRAPERAPI_API_KEY }}
+        # The scraper's fetch_month() dispatcher auto-routes to ScraperAPI
+        # when SCRAPERAPI_API_KEY is set, so no extra CLI flag is needed.
         run: |
           set +e
           ARGS="--write"
