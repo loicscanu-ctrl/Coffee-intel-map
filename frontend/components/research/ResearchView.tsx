@@ -5,8 +5,9 @@ import { LDN_PARAMS, NY_PARAMS } from "@/lib/cot/intraweekModel";
 import { FOBBING_USD } from "@/lib/originCosts";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
+import DemandArticles from "./DemandArticles";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "certstocks";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "certstocks" | "demand";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",        label: "COT & positioning" },
   { id: "weather",    label: "Weather" },
@@ -15,6 +16,7 @@ const CATS: { id: Cat; label: string }[] = [
   { id: "agronomy",   label: "Agronomy" },
   { id: "logistics",  label: "Origin Logistics" },
   { id: "certstocks", label: "Certified stocks" },
+  { id: "demand",     label: "Demand modelling" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -1003,6 +1005,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "agronomy"  && <AgronomyArticles />}
       {cat === "logistics" && <OriginLogistics />}
       {cat === "certstocks" && <CertifiedStocksMethodology />}
+      {cat === "demand" && <DemandArticles />}
     </>
   );
 }
