@@ -7,6 +7,7 @@ import WeatherCharts from "@/components/supply/WeatherCharts";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
+import { toMultiSource, type BalanceSheetFile } from "@/lib/sdMultiSource";
 
 interface BpsMonthRow { month: string; total_coffee_kg: number; }
 interface BpsExportsFile { series?: BpsMonthRow[]; }
@@ -77,6 +78,7 @@ export default function IndonesiaTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [data, setData] = useState<IndonesiaSupply | null>(null);
   const [bpsExports, setBpsExports] = useState<BpsExportsFile | null>(null);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheetFile | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -92,6 +94,12 @@ export default function IndonesiaTab() {
       .then(r => (r.ok ? r.json() : null))
       .then((d: BpsExportsFile | null) => d && setBpsExports(d))
       .catch(() => { /* feed absent → S&D falls back to USDA PSD */ });
+    // Multi-source production estimates (USDA / GAEKI / ICO) for the
+    // S&D card's equation strip + production spread block.
+    fetch("/data/id_balance_sheet.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BalanceSheetFile | null) => d && setBalanceSheet(d))
+      .catch(() => { /* absent → equation strip + spread block hide */ });
   }, []);
 
   // BPS publishes kg per month — divide by 60 000 to land in
@@ -153,6 +161,7 @@ export default function IndonesiaTab() {
           label="Indonesia"
           cropYearMonths="Apr–Mar"
           realizedExports={realizedIdnExports}
+          multiSource={toMultiSource(balanceSheet)}
         />
       )}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/indonesia_weather.json" title="Weather · Indonesia" />}

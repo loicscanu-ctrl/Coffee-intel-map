@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
+import { toMultiSource, type BalanceSheetFile } from "@/lib/sdMultiSource";
 import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
 import UgandaCumulativePaceChart from "@/components/supply/uganda/UgandaCumulativePaceChart";
 import UgandaDestinationChart from "@/components/supply/uganda/UgandaDestinationChart";
@@ -99,6 +100,7 @@ export default function UgandaTab() {
   const [subTab, setSubTab] = useState<SubTab>("exports");
   const [data, setData]     = useState<UgandaSupply | null>(null);
   const [monthly, setMonthly] = useState<UgandaMonthlyRow[] | null>(null);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheetFile | null>(null);
   const [error, setError]   = useState(false);
 
   useEffect(() => {
@@ -106,6 +108,12 @@ export default function UgandaTab() {
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
+    // Multi-source production estimates (USDA / UCDA / ICO) for the
+    // S&D card's equation strip + production spread block.
+    fetch("/data/ug_balance_sheet.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BalanceSheetFile | null) => d && setBalanceSheet(d))
+      .catch(() => { /* absent → equation strip + spread block hide */ });
   }, []);
 
   // uganda_monthly.json — multi-year UCDA series (parsed by the scraper).
@@ -180,6 +188,7 @@ export default function UgandaTab() {
           label="Uganda"
           cropYearMonths="Oct–Sep"
           realizedExports={realizedUgExports}
+          multiSource={toMultiSource(balanceSheet)}
         />
       )}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/uganda_weather.json" title="Weather · Uganda" />}

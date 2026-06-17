@@ -354,6 +354,15 @@ export default function SupplyDemandBalance({
   const realisedForCrop = (cropKey: string) =>
     realizedExports?.byCropYear[cropKey];
 
+  // Snapshot of the last USDA-backbone row's stocks + consumption so the
+  // projection / multiSource / realised-feed forecast branches can carry
+  // them forward without each other's writes (e.g. the projection branch
+  // setting consumption=0 used to poison the realised-feed fall-through's
+  // `lastRealizedRow.consumption` lookup).
+  const lastUsdaRow = recent[recent.length - 1];
+  const carryConsumption = lastUsdaRow?.consumption ?? 0;
+  const carryEnding      = lastUsdaRow?.ending      ?? 0;
+
   if (projection && projection.crop_year) {
     const lastRealized = recent[recent.length - 1];
     const projectedKbags = Math.round(projection.annual_target / 1000);
@@ -374,12 +383,16 @@ export default function SupplyDemandBalance({
       yearLabel:   `${projection.crop_year}*`,
       yearTooltip: cropYearMonths ? `Forecast · ${projection.crop_year} (${cropYearMonths})`
                                   : `Forecast · ${projection.crop_year}`,
-      opening:     lastRealized?.ending ?? 0,
+      opening:     lastRealized?.ending ?? carryEnding,
       production:  0,
       exports:           realisedYTD ? realizedKbags  : 0,
       exportsRemaining:  realisedYTD ? remainingKbags : projectedKbags,
       exportsSource:     realisedYTD ? "realized+forecast" : "usda",
-      consumption: 0,
+      // Carry the last realised USDA consumption forward — projection
+      // engines don't ship per-year consumption, but the equation strip
+      // and the chart's blue segment both need a non-zero value to stay
+      // aligned with the Demand tab's per-country consumption chart.
+      consumption: carryConsumption,
       ending:      0,
       stockBuild:  0,
       stockDraw:   0,
@@ -396,9 +409,14 @@ export default function SupplyDemandBalance({
       // Mark this crop as already handled so the realised-only fall-through
       // below doesn't double-append it.
       usdaYearsSeen.add(fullEnd);
-      const lastRealized = recent[recent.length - 1];
       const fields = buildMultiSourceFields(s);
-      const totalKbags = s.exports != null ? Math.round(s.exports / MBAGS_PER_KBAGS) : 0;
+      // If the balance sheet doesn't carry exports for this forecast crop,
+      // proxy with the latest USDA-realised annual exports so the
+      // in-progress crop's remaining segment isn't 0. Same fallback the
+      // realised-feed branch uses below.
+      const totalKbags = s.exports != null
+        ? Math.round(s.exports / MBAGS_PER_KBAGS)
+        : (lastUsdaRow?.exports ?? 0);
       const realisedYTD = realisedForCrop(s.cropYear);
       const realizedKbags  = realisedYTD?.kbags ?? 0;
       const remainingKbags = realisedYTD
@@ -408,7 +426,7 @@ export default function SupplyDemandBalance({
         year:        fullEnd,
         yearLabel:   `${cropYearShort(fullEnd, cropYearMonths)}*`,
         yearTooltip: `Forecast · ${cropYearLong(fullEnd, cropYearMonths)}`,
-        opening:     lastRealized?.ending ?? 0,
+        opening:     carryEnding,
         production:  fields.prodAvg ?? 0,
         exports:           realisedYTD ? realizedKbags  : 0,
         exportsRemaining:  realisedYTD ? remainingKbags : totalKbags,
@@ -417,7 +435,7 @@ export default function SupplyDemandBalance({
         // consumption chart on the Demand tab) — carry the latest realised
         // PSD value forward as the forecast crop's estimate so the equation
         // strip and the consumption chart never disagree.
-        consumption: lastRealized?.consumption ?? 0,
+        consumption: carryConsumption,
         ending:      0,
         stockBuild:  0,
         stockDraw:   0,
@@ -461,11 +479,10 @@ export default function SupplyDemandBalance({
       if (coveredEnd.has(endYear) || endYear <= latestUsdaEnd) continue;
       const realised = realizedExports.byCropYear[cy];
       const fullEnd = String(endYear);
-      const lastRealizedRow = recent[recent.length - 1];
-      // No explicit forecast total available — extrapolate from the
-      // last realised crop year's exports so the in-progress bar shows
-      // a plausible remaining segment.
-      const lastExports = lastRealizedRow?.exports ?? 0;
+      // Use lastUsdaRow's exports as the rough total for the in-progress
+      // crop's "remaining" estimate (the only data we have on annual
+      // export size without a dedicated forecast engine).
+      const lastExports = lastUsdaRow?.exports ?? 0;
       const remaining   = realised.isPartial
         ? Math.max(0, lastExports - realised.kbags)
         : 0;
@@ -475,14 +492,15 @@ export default function SupplyDemandBalance({
         yearTooltip: realised.isPartial
           ? `In progress · ${cropYearLong(fullEnd, cropYearMonths)}`
           : `Realised · ${cropYearLong(fullEnd, cropYearMonths)}`,
-        opening:     lastRealizedRow?.ending ?? 0,
+        // Opening + consumption carry from the USDA backbone snapshot
+        // rather than `recent[last]` so an earlier projection / multiSource
+        // push with consumption=0 can't poison this row.
+        opening:     carryEnding,
         production:  0,
         exports:           realised.kbags,
         exportsRemaining:  remaining,
         exportsSource:     realised.isPartial ? "realized+forecast" : "realized",
-        // Consumption carries forward from the last realised USDA row —
-        // matches the consumption chart on the Demand tab.
-        consumption: lastRealizedRow?.consumption ?? 0,
+        consumption: carryConsumption,
         ending:      0,
         stockBuild:  0,
         stockDraw:   0,
