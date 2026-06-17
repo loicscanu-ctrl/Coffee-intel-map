@@ -350,6 +350,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   const [freight,               setFreight]               = useState(0);
   const [financing,             setFinancing]             = useState(0);
   const [selectedOptions,       setSelectedOptions]       = useState<Set<string>>(new Set());
+  // Pricelist scope: current crop only (default) or both crops.
+  const [scope,                 setScope]                 = useState<"current" | "both">("current");
   // Pricelist export (browser print → Save as PDF), mirroring Build a Briefing.
   // Defaults to dark so the PDF keeps the web-app look (rounded cards, colour-
   // coded prices); the toggle can flip to a light, ink-friendly sheet.
@@ -697,6 +699,21 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-md border border-slate-700 overflow-hidden" role="group" aria-label="Pricelist scope">
+            {([["current", "Current crop"], ["both", "Both crops"]] as const).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setScope(val)}
+                aria-pressed={scope === val}
+                title={val === "current" ? "Show only the current crop" : "Show current + new crop"}
+                className={`px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                  scope === val ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center rounded-md border border-slate-700 overflow-hidden" role="group" aria-label="PDF theme">
             {(["light", "dark"] as const).map(t => (
               <button
@@ -773,7 +790,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
       })}
 
       {/* Crop year roll indicator (only when both tables render) — screen only */}
-      {cropYearRoll && currentCropMonths.length > 0 && newCropMonths.length > 0 && (
+      {scope === "both" && cropYearRoll && currentCropMonths.length > 0 && newCropMonths.length > 0 && (
         <div className="print:hidden flex justify-center">
           <div className="bg-slate-900 border border-amber-600/40 rounded-full px-5 py-1.5 flex items-center gap-3 text-[10px]">
             <span className="text-amber-300 uppercase font-bold tracking-widest">Crop Year Roll</span>
@@ -785,8 +802,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         </div>
       )}
 
-      {/* New crop */}
-      {renderCropPanel({
+      {/* New crop — only when the user opts into both crops */}
+      {scope === "both" && renderCropPanel({
         title:          `New Crop · starting Dec ${String(todayCropEndYear).slice(2)}`,
         subtitle:       "Physical shipments in next crop year",
         months:         newMonths,
