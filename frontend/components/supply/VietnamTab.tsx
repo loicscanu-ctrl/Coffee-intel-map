@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
@@ -7,6 +7,7 @@ import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
+import type { RealizedExportsOverlay } from "@/components/supply/SupplyDemandBalance";
 
 // Vietnam's multi-source production estimates (USDA / MARD / ICO) ship in
 // vn_farmer_economics.json under `balance_sheet`. We keep just the season
@@ -85,6 +86,46 @@ export default function VietnamTab() {
   // error bars on the production line.
   const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
+  // Realised customs exports by Vietnam crop year (Oct → Sep) computed
+  // from vietnam_supply.json so the S&D table doesn't disagree with the
+  // Exports sub-tab. Older crops with incomplete monthly coverage stay on
+  // USDA PSD; the in-progress crop gets a realised + remaining split.
+  const realizedVnExports = useMemo<RealizedExportsOverlay | null>(() => {
+    if (!vnSupply?.exports?.monthly?.length) return null;
+    const cropOf = (ym: string) => {
+      const [y, m] = ym.split("-").map(Number);
+      const start = m >= 10 ? y : y - 1;
+      return `${start}/${String(start + 1).slice(-2)}`;
+    };
+    type Bucket = { kbags: number; months: string[] };
+    const byCrop: Record<string, Bucket> = {};
+    for (const e of vnSupply.exports.monthly) {
+      const cy = cropOf(e.month);
+      (byCrop[cy] ??= { kbags: 0, months: [] }).kbags += e.total_k_bags;
+      byCrop[cy].months.push(e.month);
+    }
+    const lastMonthOverall = vnSupply.exports.monthly[vnSupply.exports.monthly.length - 1].month;
+    const currentCropYear = cropOf(lastMonthOverall);
+    const out: RealizedExportsOverlay["byCropYear"] = {};
+    for (const [cy, bucket] of Object.entries(byCrop)) {
+      const isComplete = bucket.months.length === 12;
+      const isCurrent  = cy === currentCropYear;
+      // Use realised data only for crops that are either fully covered or
+      // are the in-progress crop. Older partial crops (e.g. the months we
+      // happen to have for 22/23 before the customs feed started) fall
+      // back to USDA PSD.
+      if (!isComplete && !isCurrent) continue;
+      out[cy] = {
+        kbags:       bucket.kbags,
+        isPartial:   !isComplete,
+        latestMonth: bucket.months[bucket.months.length - 1],
+      };
+    }
+    return Object.keys(out).length > 0
+      ? { byCropYear: out, sourceLabel: "Vietnam Customs" }
+      : null;
+  }, [vnSupply]);
+
   useEffect(() => {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
@@ -134,18 +175,21 @@ export default function VietnamTab() {
           origin="vietnam"
           label="Vietnam"
           cropYearMonths="Oct–Sep"
+          realizedExports={realizedVnExports}
           multiSource={vnBalanceSheet ? {
             sources: [
               { key: "usda", label: "USDA", color: "#3b82f6" },
               { key: "mard", label: "MARD", color: "#10b981" },
               { key: "ico",  label: "ICO",  color: "#f59e0b" },
             ],
+            // Consumption deliberately omitted: the equation strip now pulls
+            // it from USDA PSD (same source as the Demand tab's per-country
+            // consumption chart) so the two surfaces can't drift apart.
             seasons: vnBalanceSheet.seasons.map(s => ({
               cropYear:    s.season,
               forecast:    s.forecast,
               production:  s.production,
               exports:     s.exports_ico,
-              consumption: s.consumption,
             })),
           } : null}
         />
