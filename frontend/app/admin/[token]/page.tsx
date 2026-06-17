@@ -1,18 +1,23 @@
-// /admin/access — access-log dashboard.
+// /admin/<SECRET_TOKEN> — access-log dashboard.
 //
-// Server component. Reads the session cookie, validates against Upstash,
-// and on success pulls the raw log + per-IP rollups from Upstash to
-// render two tables: unique visitors (sorted by hit count) and the
-// most-recent N hits. Unauthenticated visitors get redirected to the
-// login page.
+// Security model: secret URL. The `[token]` path segment must
+// constant-time-match `process.env.ADMIN_ACCESS_TOKEN`. Any mismatch
+// returns a real Next.js 404 — same response shape as a non-existent
+// page, so the URL is undiscoverable without already knowing it.
 //
-// The Upstash reads happen server-side so the REST token never reaches
-// the browser. Tables are static HTML; no client-side JS / re-fetching.
-// Refresh the page to refresh the data.
+// Trade-offs vs the previous password-form model:
+//   + No cookies, no session store, no login round-trip.
+//   - The secret is in the URL. Anywhere the URL goes (bookmarks,
+//     browser history, screen shares, chat), the secret goes too.
+//     If it leaks, rotate ADMIN_ACCESS_TOKEN in Vercel.
+//
+// The middleware already excludes /admin/* from the access log, so the
+// owner's own visits to this page do not appear in the dashboard's
+// recent-activity table — and the token itself never lands in
+// access:log.
 
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { ADMIN_COOKIE, isValidSession, upstashConfigured, upstashPipeline } from "@/lib/adminAuth";
+import { notFound } from "next/navigation";
+import { upstashConfigured, upstashPipeline } from "@/lib/upstashRest";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,6 +55,15 @@ interface DashboardData {
 const RECENT_LIMIT = 100;
 const VISITORS_LIMIT = 200;
 
+function constantTimeEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
 function hashToRollup(ip: string, fields: string[]): VisitorRollup {
   // Upstash HGETALL returns flat ["k1","v1","k2","v2",...]
   const h: Record<string, string> = {};
@@ -69,7 +83,7 @@ function hashToRollup(ip: string, fields: string[]): VisitorRollup {
 
 function shortUa(ua: string): string {
   if (!ua) return "—";
-  // Trim down the Mozilla soup to the readable token (Chrome/X, Safari, etc.).
+  // Trim down the Mozilla soup to the readable token (Chrome/X, Safari, …).
   const m = ua.match(/(Edg|Chrome|Firefox|Safari|Mobile|Android|iPhone|iPad)\/[\d.]+/i);
   return m ? m[0] : ua.slice(0, 40) + (ua.length > 40 ? "…" : "");
 }
@@ -89,7 +103,6 @@ function fmtAge(iso: string): string {
 async function loadDashboard(): Promise<DashboardData | null> {
   if (!upstashConfigured()) return null;
 
-  // First round-trip: the IPs set and the latest log entries.
   const head = await upstashPipeline<[string[] | null, string[] | null]>([
     ["SMEMBERS", "access:ips"],
     ["LRANGE", "access:log", "0", String(RECENT_LIMIT - 1)],
@@ -103,16 +116,11 @@ async function loadDashboard(): Promise<DashboardData | null> {
     })
     .filter((x): x is LogEntry => x !== null);
 
-  // The set isn't capped, so a long-lived deployment could accumulate
-  // thousands of one-off IPs. Cap the rollup pull to keep the page snappy
-  // (and the Upstash pipeline reasonably sized).
   const capped = ips.slice(0, VISITORS_LIMIT);
   if (capped.length === 0) {
     return { visitors: [], recent, totalUniqueIps: ips.length, truncated: false };
   }
 
-  // Second round-trip: HGETALL for each IP in the cap. Pipeline so all
-  // hash reads happen in one HTTP request.
   const hashResults = await upstashPipeline<(string[] | null)[]>(
     capped.map((ip) => ["HGETALL", `access:ips:${ip}`]),
   );
@@ -131,10 +139,15 @@ async function loadDashboard(): Promise<DashboardData | null> {
   };
 }
 
-export default async function AdminAccessPage() {
-  const token = cookies().get(ADMIN_COOKIE)?.value;
-  if (!(await isValidSession(token))) {
-    redirect("/admin/login");
+export default async function AdminAccessPage({
+  params,
+}: {
+  params: { token: string };
+}) {
+  const expected = process.env.ADMIN_ACCESS_TOKEN;
+  if (!expected || !constantTimeEquals(params.token, expected)) {
+    // Match exactly the shape of any other non-existent page — undiscoverable.
+    notFound();
   }
 
   const data = await loadDashboard();
@@ -142,21 +155,11 @@ export default async function AdminAccessPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 px-4 sm:px-6 py-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-xl font-bold text-white">Access log</h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Real page loads (bots & sub-resource fetches filtered). Refresh the page to refresh the data.
-            </p>
-          </div>
-          <form action="/api/admin/logout" method="POST">
-            <button
-              type="submit"
-              className="text-[11px] text-slate-400 hover:text-slate-200 border border-slate-700 hover:border-slate-500 rounded px-2 py-1 transition-colors"
-            >
-              Sign out
-            </button>
-          </form>
+        <header>
+          <h1 className="text-xl font-bold text-white">Access log</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real page loads (bots & sub-resource fetches filtered). Refresh the page to refresh the data.
+          </p>
         </header>
 
         {!data && (
