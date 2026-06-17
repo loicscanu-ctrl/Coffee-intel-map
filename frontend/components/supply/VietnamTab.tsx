@@ -7,8 +7,22 @@ import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
-import VnBalanceSheetPanel from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
-import type { VnBalanceSheet } from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
+
+// Vietnam's multi-source production estimates (USDA / MARD / ICO) ship in
+// vn_farmer_economics.json under `balance_sheet`. We keep just the season
+// rows here so SupplyDemandBalance gets fed via its multiSource prop.
+interface VnSeasonRow {
+  season:   string;
+  forecast: boolean;
+  production: { usda: number; mard: number; ico: number };
+  exports_ico: number;
+  consumption: number;
+}
+interface VnBalanceSheet {
+  unit: string;
+  note: string;
+  seasons: VnSeasonRow[];
+}
 
 interface VietnamSupply {
   scraped_at: string | null;
@@ -65,10 +79,10 @@ function VnEnsoNote() {
 export default function VietnamTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
-  // Supply-Demand sub-tab renders the VnBalanceSheetPanel above
-  // SupplyDemandBalance. The same panel currently lives at the top of
-  // the Farmer Economics tab too — the duplicate is intentional until
-  // we decide which surface keeps it.
+  // Multi-source production / exports / consumption series fed into
+  // SupplyDemandBalance on the Supply & Demand sub-tab. Drives the
+  // equation strip, production-spread block, table range cells and the
+  // error bars on the production line.
   const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
   useEffect(() => {
@@ -116,28 +130,25 @@ export default function VietnamTab() {
 
       {/* ── Supply & Demand ────────────────────────────────────────── */}
       {subTab === "supply-demand" && (
-        <div className="space-y-5">
-          {vnBalanceSheet && <VnBalanceSheetPanel balance={vnBalanceSheet} />}
-          <SupplyDemandBalance
-            origin="vietnam"
-            label="Vietnam"
-            cropYearMonths="Oct–Sep"
-            multiSource={vnBalanceSheet ? {
-              sources: [
-                { key: "usda", label: "USDA", color: "#3b82f6" },
-                { key: "mard", label: "MARD", color: "#10b981" },
-                { key: "ico",  label: "ICO",  color: "#f59e0b" },
-              ],
-              seasons: vnBalanceSheet.seasons.map(s => ({
-                cropYear:    s.season,
-                forecast:    s.forecast,
-                production:  s.production,
-                exports:     s.exports_ico,
-                consumption: s.consumption,
-              })),
-            } : null}
-          />
-        </div>
+        <SupplyDemandBalance
+          origin="vietnam"
+          label="Vietnam"
+          cropYearMonths="Oct–Sep"
+          multiSource={vnBalanceSheet ? {
+            sources: [
+              { key: "usda", label: "USDA", color: "#3b82f6" },
+              { key: "mard", label: "MARD", color: "#10b981" },
+              { key: "ico",  label: "ICO",  color: "#f59e0b" },
+            ],
+            seasons: vnBalanceSheet.seasons.map(s => ({
+              cropYear:    s.season,
+              forecast:    s.forecast,
+              production:  s.production,
+              exports:     s.exports_ico,
+              consumption: s.consumption,
+            })),
+          } : null}
+        />
       )}
 
       {/* ── Weather ────────────────────────────────────────────────── */}
