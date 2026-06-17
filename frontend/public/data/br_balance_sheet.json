@@ -1,32 +1,57 @@
 {
   "unit": "million 60-kg bags",
-  "note": "Production estimates from independent sources. USDA = USDA FAS PSD (Coffee: World Markets and Trade, Dec 2025); CONAB = Companhia Nacional de Abastecimento, 4º Levantamento Café, Dec 2025; ICO = International Coffee Organization Coffee Market Report. USDA persistently reports higher than CONAB (CONAB is a field survey, USDA includes adjustments). Static seed — refresh after each crop year's Dec USDA / CONAB release.",
+  "note": "Production estimates from independent sources. USDA = USDA FAS PSD (Coffee: World Markets and Trade, Dec 2025); CONAB = Companhia Nacional de Abastecimento, 4\u00ba Levantamento Caf\u00e9, Dec 2025; ICO = International Coffee Organization Coffee Market Report. USDA persistently reports higher than CONAB (CONAB is a field survey, USDA includes adjustments). Static seed \u2014 refresh after each crop year's Dec USDA / CONAB release.",
   "updated": "2025-12",
   "sources": [
-    { "key": "usda",  "label": "USDA",  "color": "#3b82f6" },
-    { "key": "conab", "label": "CONAB", "color": "#10b981" },
-    { "key": "ico",   "label": "ICO",   "color": "#f59e0b" }
+    {
+      "key": "usda",
+      "label": "USDA",
+      "color": "#3b82f6"
+    },
+    {
+      "key": "conab",
+      "label": "CONAB",
+      "color": "#10b981"
+    },
+    {
+      "key": "ico",
+      "label": "ICO",
+      "color": "#f59e0b"
+    }
   ],
   "seasons": [
     {
       "season": "2022/23",
       "forecast": false,
-      "production": { "usda": 64.3, "conab": 50.9 }
+      "production": {
+        "usda": 62.6,
+        "conab": 50.9
+      }
     },
     {
       "season": "2023/24",
       "forecast": false,
-      "production": { "usda": 66.3, "conab": 55.1 }
+      "production": {
+        "usda": 66.3,
+        "conab": 55.1
+      }
     },
     {
       "season": "2024/25",
       "forecast": false,
-      "production": { "usda": 64.7, "conab": 54.2, "ico": 54.5 }
+      "production": {
+        "usda": 65.0,
+        "conab": 54.2,
+        "ico": 54.5
+      }
     },
     {
       "season": "2025/26",
       "forecast": true,
-      "production": { "usda": 63.0, "conab": 56.5 }
+      "production": {
+        "usda": 63.0,
+        "conab": 56.5
+      }
     }
   ]
 }

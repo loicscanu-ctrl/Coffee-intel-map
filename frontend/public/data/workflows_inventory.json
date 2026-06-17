@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-17T08:52:15.014968Z",
-  "count": 50,
+  "generated_at": "2026-06-17T20:14:56.329739Z",
+  "count": 51,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -335,6 +335,20 @@
       ],
       "concurrency_group": "vercel-redeploy",
       "timeout_minutes": 5
+    },
+    {
+      "file": "refresh-balance-sheets.yml",
+      "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/ID/UG)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 6 20 6,12 *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "refresh-balance-sheets",
+      "timeout_minutes": 10
     },
     {
       "file": "scraper-annual-un-wpp.yml",
