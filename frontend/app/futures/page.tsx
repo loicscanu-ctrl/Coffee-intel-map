@@ -1,11 +1,13 @@
 "use client";
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import AcapheLiveQuotes from "@/components/futures/AcapheLiveQuotes";
 import OIFndChart from "@/components/futures/OIFndChart";
 import OriginPricesPanel from "@/components/macro/OriginPricesPanel";
 import PageHeader from "@/components/PageHeader";
 import { fmtNum as fmt } from "@/lib/formatters";
 import { FOBBING_USD, MONTHLY_CARRY_USD } from "@/lib/originCosts";
+import { PRINT_CSS_LIGHT, PRINT_CSS_DARK } from "@/lib/report/printStyles";
 import { useFetchJson } from "@/lib/useFetchJson";
 import { useUrlState } from "@/lib/useUrlState";
 
@@ -228,13 +230,13 @@ function fmtDiff(letter: string, diff: number): string {
 }
 
 const PACKING_OPTIONS = [
-  { key: "jute",   label: "Food-grade jute bags  60 kg each", display: "+25 USD/MT", val: 25 },
-  { key: "bigbag", label: "Big bags  1 MT per bag",           display: "+15 USD/MT", val: 15 },
+  { key: "jute",   label: "Food-grade jute bags  60 kg each", short: "Jute bags", display: "+25 USD/MT", val: 25 },
+  { key: "bigbag", label: "Big bags  1 MT per bag",           short: "Big bags",  display: "+15 USD/MT", val: 15 },
 ];
 const CERT_OPTIONS = [
-  { key: "eudr", label: "EUDR",                                        display: "+50 USD/MT",                        val: 50 },
-  { key: "4c",   label: "4C",                                          display: "+15 USD/MT",                        val: 15 },
-  { key: "rfa",  label: "RFA  (excl. 1.75 cts/lb buyer royalty fee)",  display: "+5 cts/lb · +60 USD/MT (Robusta)",  val: 60 },
+  { key: "eudr", label: "EUDR",                                        short: "EUDR", display: "+50 USD/MT",                        val: 50 },
+  { key: "4c",   label: "4C",                                          short: "4C",   display: "+15 USD/MT",                        val: 15 },
+  { key: "rfa",  label: "RFA  (excl. 1.75 cts/lb buyer royalty fee)",  short: "RFA",  display: "+5 cts/lb · +60 USD/MT (Robusta)",  val: 60 },
 ];
 
 interface ShippingMonth {
@@ -348,6 +350,14 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   const [freight,               setFreight]               = useState(0);
   const [financing,             setFinancing]             = useState(0);
   const [selectedOptions,       setSelectedOptions]       = useState<Set<string>>(new Set());
+  // Pricelist export (browser print → Save as PDF), mirroring Build a Briefing.
+  const [printTheme,            setPrintTheme]            = useState<"light" | "dark">("light");
+  const printRef = useRef<HTMLDivElement>(null);
+  const printPricelist = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Robusta Price List - ${new Date().toISOString().slice(0, 10)}`,
+    pageStyle: printTheme === "light" ? PRINT_CSS_LIGHT : PRINT_CSS_DARK,
+  });
 
   const toggleOption = (key: string) =>
     setSelectedOptions(prev => { const s = new Set(prev); if (s.has(key)) { s.delete(key); } else { s.add(key); } return s; });
@@ -355,6 +365,13 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   const optionsAddon = [...PACKING_OPTIONS, ...CERT_OPTIONS]
     .filter(o => selectedOptions.has(o.key))
     .reduce((sum, o) => sum + o.val, 0);
+
+  // "Detail" column = selected packing + certification, defaulting to the
+  // conventional bulk offer so the pricelist always reads e.g. "Bulk, Conv.".
+  const selPacking = PACKING_OPTIONS.filter(o => selectedOptions.has(o.key));
+  const selCert    = CERT_OPTIONS.filter(o => selectedOptions.has(o.key));
+  const detailLabel = `${selPacking.length ? selPacking.map(o => o.short).join(" + ") : "Bulk"}, `
+                    + `${selCert.length ? selCert.map(o => o.short).join(" + ") : "Conv."}`;
 
   // Price lookup keyed by contract (letter + 2-digit year), e.g. "U26", "F27".
   // Keeps the nearest expiry per contract. Keying by the full contract — not the
@@ -496,8 +513,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
     const frontLabel = opts.months[0].priceKey;
     return (
       <div className="space-y-3">
-        {/* Per-crop controls */}
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
+        {/* Per-crop controls — screen only (excluded from the pricelist PDF) */}
+        <div className="print:hidden bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
           <div className="flex-shrink-0">
             <div className="text-[11px] text-amber-300 uppercase font-bold tracking-widest">{opts.title}</div>
             <div className="text-[9px] text-slate-500 mt-0.5">{opts.subtitle}</div>
@@ -567,23 +584,31 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
           )}
         </div>
 
-        {/* Per-crop table */}
-        <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+        {/* Print-only crop heading (the screen title lives in the controls above) */}
+        <div className="hidden print:block mb-1">
+          <div className="text-sm font-bold uppercase tracking-widest">{opts.title}</div>
+          <div className="text-[10px]">{opts.subtitle}</div>
+        </div>
+
+        {/* Per-crop table. No min-w-full: columns keep a fixed width so the
+            current crop's months line up with the wider new-crop table instead
+            of stretching to fill the row. */}
+        <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden inline-block max-w-full align-top">
           <div className="overflow-x-auto">
-            <table className="text-xs font-mono min-w-full">
+            <table className="text-xs font-mono w-auto">
               <thead>
                 <tr className="bg-slate-800 border-b border-slate-600">
-                  <th className="text-left px-4 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[110px] border-r border-slate-700">
+                  <th className="text-left px-4 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[110px] border-r border-slate-700">
                     Grade
                   </th>
-                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] min-w-[230px] border-r border-slate-700">
+                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[230px] border-r border-slate-700">
                     Specification
                   </th>
-                  <th className="text-center px-2 py-2.5 text-slate-400 text-[10px] w-16 border-r border-slate-700">
-                    Unit
+                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[120px] border-r border-slate-700">
+                    Detail
                   </th>
                   {opts.months.map((m, i) => (
-                    <th key={i} className="px-3 py-2.5 text-center min-w-[84px] border-l border-slate-700">
+                    <th key={i} className="px-3 py-2.5 text-center w-[84px] border-l border-slate-700">
                       <div className="text-white font-bold">{m.label}</div>
                       <div className="text-[9px] text-slate-500 mt-0.5">{m.contractSym}</div>
                     </th>
@@ -618,8 +643,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
                           <td className="px-3 py-2 text-slate-500 text-[10px] border-r border-slate-800">
                             {q.desc}
                           </td>
-                          <td className="px-2 py-2 text-center text-slate-500 border-r border-slate-800">
-                            USD/MT
+                          <td className="px-3 py-2 text-slate-400 text-[10px] border-r border-slate-800 whitespace-nowrap">
+                            {detailLabel}
                           </td>
                           {opts.months.map((m, i) => {
                             if (m.basisForMonth == null) {
@@ -655,8 +680,43 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
 
   return (
     <div className="space-y-4">
+      {/* Export toolbar — screen only. Mirrors Build a Briefing: light/dark PDF
+          theme + a browser-print "Build pricelist" the user can Save as PDF. */}
+      <div className="print:hidden flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-base font-semibold text-slate-100">Robusta Pricelist</h2>
+          <p className="text-[11px] text-slate-500">
+            Set the basis, packing &amp; certification, then export a customer-ready price list (print → Save as PDF).
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-md border border-slate-700 overflow-hidden" role="group" aria-label="PDF theme">
+            {(["light", "dark"] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setPrintTheme(t)}
+                aria-pressed={printTheme === t}
+                title={t === "light" ? "Light PDF — best for printing" : "Dark PDF — matches the screen"}
+                className={`px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                  printTheme === t ? "bg-slate-800 text-amber-400" : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => printPricelist()}
+            className="px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors
+                       bg-amber-500/10 text-amber-300 border-amber-600/50 hover:bg-amber-500/20"
+          >
+            Build pricelist
+          </button>
+        </div>
+      </div>
+
       {/* Shared controls: freight + financing apply across both crops */}
-      <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
+      <div className="print:hidden bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-wrap items-center gap-6">
         {(["Freight", "Financing"] as const).map(label => {
           const val   = label === "Freight" ? freight   : financing;
           const setVal = label === "Freight" ? setFreight : setFinancing;
@@ -681,6 +741,17 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         </div>
       </div>
 
+      {/* Printable pricelist (react-to-print target) */}
+      <div ref={printRef} id="report-canvas" className="space-y-4">
+      {/* Print-only letterhead */}
+      <div className="hidden print:block border-b border-slate-400 pb-2 mb-2">
+        <div className="text-lg font-bold">Robusta Green Coffee — Price List</div>
+        <div className="text-[11px]">
+          Vietnam origin · FOB · USD/MT differentials vs ICE London Robusta (RC) · {new Date().toISOString().slice(0, 10)}
+        </div>
+        <div className="text-[10px]">Offer basis: {detailLabel}</div>
+      </div>
+
       {/* Current crop */}
       {renderCropPanel({
         title:          `Current Crop · ending Nov ${String(todayCropEndYear).slice(2)}`,
@@ -695,9 +766,9 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         onBasis2Change: setCurrentBasis2Override,
       })}
 
-      {/* Crop year roll indicator (only when both tables render) */}
+      {/* Crop year roll indicator (only when both tables render) — screen only */}
       {cropYearRoll && currentCropMonths.length > 0 && newCropMonths.length > 0 && (
-        <div className="flex justify-center">
+        <div className="print:hidden flex justify-center">
           <div className="bg-slate-900 border border-amber-600/40 rounded-full px-5 py-1.5 flex items-center gap-3 text-[10px]">
             <span className="text-amber-300 uppercase font-bold tracking-widest">Crop Year Roll</span>
             <span className="text-slate-400 font-mono">RC {cropYearRoll.from}→{cropYearRoll.to}</span>
@@ -727,9 +798,10 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
         * Diffs quoted vs ICE London (RC) bimonthly contracts. Basis = Grade 2 S13 Standard.
         Screen 18 = Screen 16 + 10. Grade 3 = Basis − 250. Prices indicative, subject to availability and confirmation.
       </div>
+      </div>{/* /printable pricelist */}
 
-      {/* Packing & Compliance */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Packing & Compliance — screen only; selection feeds the Detail column */}
+      <div className="print:hidden grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
           <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-3">
             Packing Options
