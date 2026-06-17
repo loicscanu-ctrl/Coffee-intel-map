@@ -44,6 +44,15 @@ def upsert_news_item(db, item: dict):
                .filter(NewsItem.source == item["source"],
                        NewsItem.title.like(f"{title_prefix}%"))
                .delete(synchronize_session=False))
+        elif "latest_only" in tags and item.get("source"):
+            # Single-snapshot feeds (USDA PSD, AJCA): only the most recent reading
+            # is ever needed (health reads the latest by pub_date; exports read the
+            # latest row). Replace ALL prior rows for the source so the stored
+            # pub_date reflects the real data date — not stale daily-run rows whose
+            # pub_date=now would otherwise shadow it on the pub_date.desc() read.
+            (db.query(NewsItem)
+               .filter(NewsItem.source == item["source"])
+               .delete(synchronize_session=False))
         elif db.query(NewsItem).filter_by(title=item["title"]).first():
             return
         db.add(NewsItem(

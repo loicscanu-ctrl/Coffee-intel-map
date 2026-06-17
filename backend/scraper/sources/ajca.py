@@ -340,10 +340,21 @@ def _parse_hub(html: str) -> dict | None:
 
     pdf_index = _collect_pdf_index(html)
 
+    # Real data date = the latest monthly import report's period (e.g. "202603"
+    # → 2026-03-01), not the run time, so freshness reflects the actual AJCA
+    # release. Falls back to the latest yearly figure, then run-date.
+    _periods = [p.get("data_period") for p in pdf_index
+                if p.get("kind") == "j-import" and p.get("data_period")]
+    _last_updated = datetime.utcnow().date().isoformat()
+    if _periods:
+        _lp = max(_periods)  # "YYYYMM" — lexical max == chronological max
+        if len(_lp) >= 6 and _lp[:6].isdigit():
+            _last_updated = f"{_lp[:4]}-{_lp[4:6]}-01"
+
     return {
         "source":                  "AJCA",
         "source_url":              _HUB_URL,
-        "last_updated":            datetime.utcnow().date().isoformat(),
+        "last_updated":            _last_updated,
         "latest_year":             latest_year,
         "latest_consumption_mt":   consumption_mt,
         "latest_imports_mt":       imports_mt,
@@ -418,6 +429,10 @@ async def run(page, db) -> None:  # noqa: ARG001
             body = body_parts[0] + " " + ", ".join(body_parts[1:])
 
             from scraper.db import upsert_news_item
+            try:
+                _pub = datetime.strptime(parsed["last_updated"][:10], "%Y-%m-%d")
+            except Exception:
+                _pub = datetime.utcnow()
             upsert_news_item(db, {
                 "title":    f"AJCA Japan Coffee Data – {parsed['last_updated']}",
                 "body":     body,
@@ -425,8 +440,9 @@ async def run(page, db) -> None:  # noqa: ARG001
                 "category": "demand",
                 "lat":      35.689,
                 "lng":      139.692,
-                "tags":     ["japan", "demand", "imports"],
+                "tags":     ["japan", "demand", "imports", "latest_only"],
                 "meta":     json.dumps(parsed),
+                "pub_date": _pub,
             })
     except Exception as e:
         print(f"[ajca] FAILED: {e} — retaining cache")
