@@ -41,13 +41,14 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "frontend" / "public" / "data"
 DEMAND_STOCKS = DATA / "demand_stocks.json"
 
-# Seed file ↔ demand_stocks producer key. Vietnam is intentionally absent:
-# its multi-source numbers live in vn_farmer_economics.json (a different
-# pipeline) and aren't managed here.
+# Seed file ↔ demand_stocks producer key. Vietnam is nested inside
+# vn_farmer_economics.json under `balance_sheet`; we handle that as a
+# sub-path below.
 ORIGINS = {
     "brazil":    "br_balance_sheet.json",
     "indonesia": "id_balance_sheet.json",
     "uganda":    "ug_balance_sheet.json",
+    "vietnam":   "vn_farmer_economics.json::balance_sheet",
 }
 
 # Non-USDA sources are curated by hand from these reports. Surfaced in the
@@ -63,6 +64,10 @@ MANUAL_SOURCE_REFS = {
     ],
     "uganda": [
         ("UCDA", "https://ugandacoffee.go.ug/resource-center — Monthly Reports (production/exports)"),
+        ("ICO",  "https://www.ico.org/coffee-market-report — Coffee Market Report (monthly)"),
+    ],
+    "vietnam": [
+        ("MARD", "https://www.mard.gov.vn — Bộ Nông nghiệp / monthly statistics"),
         ("ICO",  "https://www.ico.org/coffee-market-report — Coffee Market Report (monthly)"),
     ],
 }
@@ -101,13 +106,26 @@ def _season_start_year(season: str) -> int | None:
         return None
 
 
+def _split_target(filename: str) -> tuple[Path, str | None]:
+    """Resolve a "file" or "file::subkey" target into (path, subkey).
+    Vietnam stores its balance sheet at vn_farmer_economics.json under
+    `balance_sheet`; the other three sit at top level."""
+    if "::" in filename:
+        f, sub = filename.split("::", 1)
+        return DATA / f, sub
+    return DATA / filename, None
+
+
 def refresh_origin(origin: str, filename: str, demand: dict) -> list[str]:
     """Sync one seed file's USDA column from demand_stocks. Returns a list
     of human-readable change lines (empty when nothing changed)."""
-    path = DATA / filename
-    seed = _load(path)
-    if not seed or not isinstance(seed.get("seasons"), list):
+    path, subkey = _split_target(filename)
+    doc = _load(path)
+    if doc is None:
         return [f"⚠ {filename}: missing or unparseable — skipped"]
+    seed = doc.get(subkey) if subkey else doc
+    if not isinstance(seed, dict) or not isinstance(seed.get("seasons"), list):
+        return [f"⚠ {filename}: seasons block missing — skipped"]
 
     usda = _usda_by_start_year(demand, origin)
     if not usda:
@@ -139,7 +157,9 @@ def refresh_origin(origin: str, filename: str, demand: dict) -> list[str]:
         )
 
     if changes:
-        path.write_text(json.dumps(seed, indent=2) + "\n", encoding="utf-8")
+        # Write back via the original document so the nested vn_farmer_economics
+        # subkey case doesn't lose its sibling fields (cost_robusta, acreage…).
+        path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     return changes
 
 
@@ -158,7 +178,9 @@ def main() -> int:
     for origin, filename in ORIGINS.items():
         if args.check:
             # Dry-run: load, compute would-be changes, but don't persist.
-            seed = _load(DATA / filename)
+            path, subkey = _split_target(filename)
+            doc = _load(path)
+            seed = doc.get(subkey) if doc and subkey else doc
             usda = _usda_by_start_year(demand, origin)
             if seed and usda:
                 for season in seed.get("seasons", []):
