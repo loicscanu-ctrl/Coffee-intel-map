@@ -1,11 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import IndonesiaExportsPanel from "@/components/supply/IndonesiaExports";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
+
+interface BpsMonthRow { month: string; total_coffee_kg: number; }
+interface BpsExportsFile { series?: BpsMonthRow[]; }
 
 interface IndonesiaSupply {
   country: string;
@@ -72,6 +76,7 @@ const DEFAULT_HARVEST: IndonesiaSupply["harvest_windows"] = [
 export default function IndonesiaTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [data, setData] = useState<IndonesiaSupply | null>(null);
+  const [bpsExports, setBpsExports] = useState<BpsExportsFile | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -79,7 +84,28 @@ export default function IndonesiaTab() {
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
+    // indonesia_exports.json drives both the Exports panel (its own
+    // fetch) and the realised-exports overlay we feed into
+    // SupplyDemandBalance below. Two parallel requests, dedupe is the
+    // browser's job — the file is static + cached.
+    fetch("/data/indonesia_exports.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BpsExportsFile | null) => d && setBpsExports(d))
+      .catch(() => { /* feed absent → S&D falls back to USDA PSD */ });
   }, []);
+
+  // BPS publishes kg per month — divide by 60 000 to land in
+  // thousand 60-kg bags ("kbags") before the helper buckets them.
+  const realizedIdnExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (bpsExports?.series ?? []).map(r => ({
+        month: r.month, kbags: r.total_coffee_kg / 60_000,
+      })),
+      cropYearStartMonth: 4,
+      sourceLabel: "BPS Indonesia",
+    }),
+    [bpsExports],
+  );
 
   return (
     <div className="space-y-4">
@@ -121,7 +147,14 @@ export default function IndonesiaTab() {
         </div>
       )}
 
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="indonesia" label="Indonesia" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance
+          origin="indonesia"
+          label="Indonesia"
+          cropYearMonths="Apr–Mar"
+          realizedExports={realizedIdnExports}
+        />
+      )}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/indonesia_weather.json" title="Weather · Indonesia" />}
       {subTab === "analogs" && (
         <WeatherAnalogs dataUrl="/data/weather_analogs_indonesia.json" label="Indonesia robusta" />
