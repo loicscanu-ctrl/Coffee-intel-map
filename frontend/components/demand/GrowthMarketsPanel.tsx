@@ -40,13 +40,6 @@ const NAME_ISO3: Record<string, string> = {
   turkey: "tur", india: "ind", egypt: "egy", philippines: "phl",
 };
 
-const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x));
-
-// The recent per-adult intensity growth we extrapolate for the dotted "trend"
-// scenario is capped to this band — markets saturate, so compounding a hot
-// recent rate unchecked for 25 years would be misleading.
-const TREND_CAGR_MIN = -0.025;
-const TREND_CAGR_MAX = 0.04;
 const PROJ_END = 2050;
 
 const TT_STYLE = {
@@ -124,12 +117,12 @@ function DemandProjection({ markets, cohorts }: {
   const i0 = inten[ly];
   if (!overlap.length || i0 == null) return null;
 
-  // Full-window CAGR of intensity, clamped — the dotted scenario's growth rate.
+  // Full-window CAGR of intensity — the dotted scenario's growth rate. Left
+  // uncapped on purpose: fast-growers (China, India) extrapolate to large,
+  // deliberately unrealistic 2050 demand — a raw "if this rate held" signal we
+  // can dampen later.
   const y0 = overlap[0];
-  const g = clamp(
-    Math.pow(inten[ly] / inten[y0], 1 / (ly - y0)) - 1,
-    TREND_CAGR_MIN, TREND_CAGR_MAX,
-  );
+  const g = Math.pow(inten[ly] / inten[y0], 1 / (ly - y0)) - 1;
 
   const color = COUNTRY_COLORS[mkt.short] ?? "#6366f1";
   const isTotal = metric === "total";
@@ -236,7 +229,7 @@ function DemandProjection({ markets, cohorts }: {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         <Stat label={`Intensity ${ly}`} value={`${(i0 as number).toFixed(2)}`} sub="kg/adult/yr" tone="text-amber-300" />
-        <Stat label="Trend rate" value={`${g >= 0 ? "+" : ""}${(g * 100).toFixed(1)}%`} sub="per yr (capped)" />
+        <Stat label="Trend rate" value={`${g >= 0 ? "+" : ""}${(g * 100).toFixed(1)}%`} sub="per yr" />
         <Stat label="Adults 2050" value={pct(adultGrowth)} sub={`vs ${ly}`} />
         <Stat label="2050 demand · flat" value={`${Math.round(base2050)} kt`} sub={pct(base2050 / act - 1)} tone="text-slate-100" />
         <Stat label="2050 demand · trend" value={`${Math.round(trend2050)} kt`} sub={pct(trend2050 / act - 1)} tone="text-slate-100" />
@@ -244,7 +237,7 @@ function DemandProjection({ markets, cohorts }: {
 
       <div className="text-[9px] text-slate-500 italic">
         Intensity = USDA domestic consumption ÷ UN WPP 18+ population (true {unit} per drinking-age adult, vs {mkt.per_capita_kg?.toFixed(2) ?? "—"} kg per total head).
-        Flat case holds {ly} intensity and scales by projected adults; dotted case continues the {y0}–{ly} intensity trend (capped {(TREND_CAGR_MIN * 100).toFixed(1)}…+{(TREND_CAGR_MAX * 100).toFixed(0)}%/yr).
+        Flat case holds {ly} intensity and scales by projected adults; dotted case continues the {y0}–{ly} intensity trend uncapped (fast-growers extrapolate to deliberately unrealistic 2050 totals — to be dampened later).
       </div>
     </div>
   );
