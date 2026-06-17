@@ -351,12 +351,16 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   const [financing,             setFinancing]             = useState(0);
   const [selectedOptions,       setSelectedOptions]       = useState<Set<string>>(new Set());
   // Pricelist export (browser print → Save as PDF), mirroring Build a Briefing.
-  const [printTheme,            setPrintTheme]            = useState<"light" | "dark">("light");
+  // Defaults to dark so the PDF keeps the web-app look (rounded cards, colour-
+  // coded prices); the toggle can flip to a light, ink-friendly sheet.
+  const [printTheme,            setPrintTheme]            = useState<"light" | "dark">("dark");
   const printRef = useRef<HTMLDivElement>(null);
   const printPricelist = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `Robusta Price List - ${new Date().toISOString().slice(0, 10)}`,
-    pageStyle: printTheme === "light" ? PRINT_CSS_LIGHT : PRINT_CSS_DARK,
+    documentTitle: `Vietnam coffee prices - ${new Date().toISOString().slice(0, 10)}`,
+    // Base theme CSS + a landscape override so the (up to 5-month) tables have
+    // room without clipping. The later @page rule wins over the portrait default.
+    pageStyle: `${printTheme === "light" ? PRINT_CSS_LIGHT : PRINT_CSS_DARK}\n@page { size: A4 landscape; }`,
   });
 
   const toggleOption = (key: string) =>
@@ -589,8 +593,8 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
 
         {/* Print-only crop heading (the screen title lives in the controls above) */}
         <div className="hidden print:block mb-1">
-          <div className="text-sm font-bold uppercase tracking-widest">{opts.title}</div>
-          <div className="text-[10px]">{opts.subtitle}</div>
+          <div className="text-sm font-bold uppercase tracking-widest text-amber-300">{opts.title}</div>
+          <div className="text-[10px] text-slate-400">{opts.subtitle}</div>
         </div>
 
         {/* Per-crop table. No min-w-full: columns keep a fixed width so the
@@ -746,13 +750,12 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
 
       {/* Printable pricelist (react-to-print target) */}
       <div ref={printRef} id="report-canvas" className="space-y-4">
-      {/* Print-only letterhead */}
-      <div className="hidden print:block border-b border-slate-400 pb-2 mb-2">
-        <div className="text-lg font-bold">Robusta Green Coffee — Price List</div>
-        <div className="text-[11px]">
-          Vietnam origin · FOB · USD/MT differentials vs ICE London Robusta (RC) · {new Date().toISOString().slice(0, 10)}
+      {/* Print-only letterhead — matches the app: rounded card, amber accent */}
+      <div className="hidden print:block">
+        <div className="bg-slate-900 border border-slate-700 rounded-lg px-5 py-3 flex items-baseline justify-between gap-4">
+          <div className="text-xl font-bold tracking-tight text-amber-300">Vietnam coffee prices</div>
+          <div className="text-[11px] font-mono text-slate-400">{new Date().toISOString().slice(0, 10)}</div>
         </div>
-        <div className="text-[10px]">Offer basis: {detailLabel}</div>
       </div>
 
       {/* Current crop */}
