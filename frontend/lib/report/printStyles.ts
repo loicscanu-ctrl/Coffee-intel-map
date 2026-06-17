@@ -48,6 +48,10 @@ export const PRINT_CSS_LIGHT = `
     [class*="bg-slate-9"], [class*="bg-slate-8"], [class*="bg-gray-9"] { background-color:#ffffff !important; }
     [class*="bg-slate-700"] { background-color:#f1f5f9 !important; }
 
+    /* Highlight rows (e.g. the ★ Basis line, bg-indigo-950/30) → light blue,
+       so they stay called out instead of rendering as muddy grey on white. */
+    [class*="bg-indigo-9"] { background-color:#dbeafe !important; }
+
     /* Text: light → near-black; muted greys → mid-slate (readable on white). */
     [class*="text-white"], [class*="text-slate-100"], [class*="text-slate-200"], [class*="text-slate-300"] { color:#0f172a !important; }
     [class*="text-slate-400"], [class*="text-slate-500"], [class*="text-slate-600"] { color:#475569 !important; }
