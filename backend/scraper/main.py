@@ -17,7 +17,7 @@ from scraper.errors import CriticalSourceError
 # NOTE: `freightos` is intentionally NOT in the daily suite — the dedicated
 # "1.2 – Freight Rate Scraper" workflow scrapes it on Fri/Sun only (the FBX
 # index only moves end-of-week), so running it here daily was redundant.
-from scraper.sources import ajca as _ajca
+# ajca + psd_coffee moved off the daily run → monthly_scraper (slow-data).
 from scraper.sources import (
     b3,
     b3_icf,
@@ -42,7 +42,6 @@ from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
 from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import population as _population
-from scraper.sources import psd_coffee as _psd_coffee
 from scraper.sources import uganda_weather as _uganda_weather
 
 ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
@@ -127,8 +126,10 @@ async def run_all_scrapers():
                 ("macro_cot",         lambda p: _macro_cot.run(p),                               420),
                 ("farmer_economics",  lambda p: _farmer_economics.run(p, db_ref),                SCRAPER_TIMEOUT),
                 ("dry_bulk",          lambda p: _dry_bulk.run(p, db_ref),                        SCRAPER_TIMEOUT),
-                ("psd_coffee",        lambda p: _psd_coffee.run(p, db_ref),                      SCRAPER_TIMEOUT),
-                ("ajca",              lambda p: _ajca.run(p, db_ref),                            SCRAPER_TIMEOUT),
+                # psd_coffee + ajca are NOT run daily: USDA PSD releases twice a
+                # year (Jun/Dec) and AJCA monthly, so they run on the slow-data
+                # workflow (monthly_scraper) instead. Running them daily re-stamped
+                # their freshness to "today" every day. See monthly_scraper.py.
                 ("population",        lambda p: _population.run(p, db_ref),                      120),
                 ("colombia_weather",  lambda p: _colombia_weather.run(p, db_ref),                60),
                 ("honduras_weather",  lambda p: _honduras_weather.run(p, db_ref),                60),

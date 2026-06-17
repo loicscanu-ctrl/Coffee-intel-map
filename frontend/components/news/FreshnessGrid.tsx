@@ -49,7 +49,8 @@ type Category = (typeof CATEGORY_ORDER)[number];
 //     (3-day baseline lag), and "worst case is Friday evening just before
 //     the next release", i.e. 3 + 7 = 10d. 11 gives one day safety.
 //   - Monthly sources (CONAB, fertilizer, ENSO, ageing, AJCA): 35d.
-//   - Bi-monthly / quarterly (USDA PSD, ECF): 70-100d.
+//   - Bi-monthly (ECF): 70d.
+//   - Biannual (USDA PSD coffee, released June + December): 210d.
 const SCRAPER_META: Record<string, { label: string; category: Category; thresholdDays: number }> = {
   futures:              { label: "Barchart futures",      category: "Futures",          thresholdDays:  4  }, // daily M-F
   cot:                  { label: "CFTC COT",              category: "COT",              thresholdDays: 11  }, // Fri release of Tue data, worst-case = 3+7
@@ -60,7 +61,7 @@ const SCRAPER_META: Record<string, { label: string; category: Category; threshol
   fertilizer_wb:        { label: "World Bank fert.",      category: "Fertilizer",       thresholdDays: 35  }, // monthly Pink Sheet
   fertilizer_comex:     { label: "Comex fert.",           category: "Fertilizer",       thresholdDays: 35  }, // monthly
   ecf:                  { label: "ECF stocks",            category: "Demand & stocks",  thresholdDays: 70  }, // bi-monthly
-  psd_coffee:           { label: "USDA PSD",              category: "Demand & stocks",  thresholdDays: 70  }, // ~quarterly refresh
+  psd_coffee:           { label: "USDA PSD",              category: "Demand & stocks",  thresholdDays: 210 }, // biannual (USDA coffee PSD: June + December)
   ajca:                 { label: "AJCA Japan stocks",     category: "Demand & stocks",  thresholdDays: 35  }, // monthly
   conab_costs:          { label: "CONAB costs",           category: "Supply (origins)", thresholdDays: 35  }, // monthly
   conab_safra:          { label: "CONAB safra",           category: "Supply (origins)", thresholdDays: 35  }, // monthly safra release
