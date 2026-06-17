@@ -7,6 +7,8 @@ import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
+import VnBalanceSheetPanel from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
+import type { VnBalanceSheet } from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
 
 interface VietnamSupply {
   scraped_at: string | null;
@@ -63,12 +65,23 @@ function VnEnsoNote() {
 export default function VietnamTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
+  // Supply-Demand sub-tab renders the VnBalanceSheetPanel above
+  // SupplyDemandBalance. The same panel currently lives at the top of
+  // the Farmer Economics tab too — the duplicate is intentional until
+  // we decide which surface keeps it.
+  const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
   useEffect(() => {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
       .then(setVnSupply)
       .catch((err) => console.error("[VietnamTab] vietnam_supply fetch failed:", err));
+    fetch("/data/vn_farmer_economics.json")
+      .then(r => r.json())
+      .then((d: { balance_sheet?: VnBalanceSheet }) => {
+        if (d?.balance_sheet) setVnBalanceSheet(d.balance_sheet);
+      })
+      .catch((err) => console.error("[VietnamTab] vn_farmer_economics fetch failed:", err));
   }, []);
 
   return (
@@ -102,7 +115,12 @@ export default function VietnamTab() {
       )}
 
       {/* ── Supply & Demand ────────────────────────────────────────── */}
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="vietnam" label="Vietnam" />}
+      {subTab === "supply-demand" && (
+        <div className="space-y-5">
+          {vnBalanceSheet && <VnBalanceSheetPanel balance={vnBalanceSheet} />}
+          <SupplyDemandBalance origin="vietnam" label="Vietnam" />
+        </div>
+      )}
 
       {/* ── Weather ────────────────────────────────────────────────── */}
       {subTab === "weather" && (
