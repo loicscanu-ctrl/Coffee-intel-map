@@ -7,7 +7,7 @@ import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
-import type { RealizedExportsOverlay } from "@/components/supply/SupplyDemandBalance";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
 
 // Vietnam's multi-source production estimates (USDA / MARD / ICO) ship in
 // vn_farmer_economics.json under `balance_sheet`. We keep just the season
@@ -86,45 +86,19 @@ export default function VietnamTab() {
   // error bars on the production line.
   const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
-  // Realised customs exports by Vietnam crop year (Oct → Sep) computed
-  // from vietnam_supply.json so the S&D table doesn't disagree with the
-  // Exports sub-tab. Older crops with incomplete monthly coverage stay on
-  // USDA PSD; the in-progress crop gets a realised + remaining split.
-  const realizedVnExports = useMemo<RealizedExportsOverlay | null>(() => {
-    if (!vnSupply?.exports?.monthly?.length) return null;
-    const cropOf = (ym: string) => {
-      const [y, m] = ym.split("-").map(Number);
-      const start = m >= 10 ? y : y - 1;
-      return `${start}/${String(start + 1).slice(-2)}`;
-    };
-    type Bucket = { kbags: number; months: string[] };
-    const byCrop: Record<string, Bucket> = {};
-    for (const e of vnSupply.exports.monthly) {
-      const cy = cropOf(e.month);
-      (byCrop[cy] ??= { kbags: 0, months: [] }).kbags += e.total_k_bags;
-      byCrop[cy].months.push(e.month);
-    }
-    const lastMonthOverall = vnSupply.exports.monthly[vnSupply.exports.monthly.length - 1].month;
-    const currentCropYear = cropOf(lastMonthOverall);
-    const out: RealizedExportsOverlay["byCropYear"] = {};
-    for (const [cy, bucket] of Object.entries(byCrop)) {
-      const isComplete = bucket.months.length === 12;
-      const isCurrent  = cy === currentCropYear;
-      // Use realised data only for crops that are either fully covered or
-      // are the in-progress crop. Older partial crops (e.g. the months we
-      // happen to have for 22/23 before the customs feed started) fall
-      // back to USDA PSD.
-      if (!isComplete && !isCurrent) continue;
-      out[cy] = {
-        kbags:       bucket.kbags,
-        isPartial:   !isComplete,
-        latestMonth: bucket.months[bucket.months.length - 1],
-      };
-    }
-    return Object.keys(out).length > 0
-      ? { byCropYear: out, sourceLabel: "Vietnam Customs" }
-      : null;
-  }, [vnSupply]);
+  // Realised customs exports by Vietnam crop year (Oct → Sep). Helper
+  // owns the bucketing + partial-crop policy so the four origins that
+  // need this overlay can't drift apart.
+  const realizedVnExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (vnSupply?.exports?.monthly ?? []).map(e => ({
+        month: e.month, kbags: e.total_k_bags,
+      })),
+      cropYearStartMonth: 10,
+      sourceLabel: "Vietnam Customs",
+    }),
+    [vnSupply],
+  );
 
   useEffect(() => {
     fetch("/data/vietnam_supply.json")

@@ -22,6 +22,7 @@ import RollingAvgChart from "./RollingAvgChart";
 import CountryHubFilter from "./CountryHubFilter";
 import { MonthlyVolumeCard, CumulativePaceCard, AnnualTrendCard, DestinationCard } from "./exportCharts";
 import PinToReport from "@/components/report/PinToReport";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
 
 export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
@@ -51,6 +52,20 @@ export default function BrazilTab() {
       .then((d: BrazilProjection | null) => d && setProjection(d))
       .catch(() => { /* engine hasn't run yet — silent */ });
   }, []);
+
+  // Realised Cecafé exports by Brazilian crop year (Apr → Mar). cecafe's
+  // `series` ships totals in 60-kg bags, so we divide by 1000 to feed
+  // the helper in kbags.
+  const realizedBrExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (data?.series ?? []).map(r => ({
+        month: r.date, kbags: r.total / 1000,
+      })),
+      cropYearStartMonth: 4,
+      sourceLabel: "Cecafé",
+    }),
+    [data],
+  );
 
   // All hooks must be called before any conditional return
   const filteredSeries = useMemo(() => {
@@ -133,7 +148,13 @@ export default function BrazilTab() {
       {subTab === "farmer-economics" && <BrazilFarmerEconomics />}
 
       {subTab === "supply-demand" && (
-        <SupplyDemandBalance origin="brazil" label="Brazil" projection={projection} />
+        <SupplyDemandBalance
+          origin="brazil"
+          label="Brazil"
+          projection={projection}
+          cropYearMonths="Apr–Mar"
+          realizedExports={realizedBrExports}
+        />
       )}
 
       {subTab === "weather" && (

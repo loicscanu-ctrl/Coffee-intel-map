@@ -393,6 +393,9 @@ export default function SupplyDemandBalance({
       const startCentury = parseInt(s.cropYear.split("/")[0], 10);
       const fullEnd = String(Math.floor(startCentury / 100) * 100 + parseInt(endStr ?? "", 10));
       if (!fullEnd || usdaYearsSeen.has(fullEnd)) continue;
+      // Mark this crop as already handled so the realised-only fall-through
+      // below doesn't double-append it.
+      usdaYearsSeen.add(fullEnd);
       const lastRealized = recent[recent.length - 1];
       const fields = buildMultiSourceFields(s);
       const totalKbags = s.exports != null ? Math.round(s.exports / MBAGS_PER_KBAGS) : 0;
@@ -423,6 +426,80 @@ export default function SupplyDemandBalance({
       });
     }
   }
+
+  // Realised-feed fall-through — append crops the realisedExports overlay
+  // already covers but USDA / projection / multiSource haven't surfaced yet.
+  // Gives Indonesia / Uganda / etc. their in-progress crop visibility even
+  // without a forecast engine, and shows complete-but-not-yet-USDA crops
+  // (e.g. Brazil 25/26 between USDA 24/25 and the projection's 26/27) so
+  // there are no holes in the chart's crop-year axis. Bounded to crops
+  // that END AFTER the last realised USDA row — Brazil's Cecafé feed
+  // reaches back to 1990 and we don't want to repopulate the table with
+  // empty pre-USDA rows.
+  if (realizedExports && cropYearMonths) {
+    // Canonical "covered" set: ending YEAR as an int. Handles both USDA
+    // backbone rows (r.year = "2025") and projection/multiSource rows
+    // (r.year = "26/27" → ending 2027).
+    const coveredEnd = new Set<number>();
+    for (const r of recent) {
+      const ey = r.year.includes("/")
+        ? 2000 + parseInt(r.year.split("/")[1] ?? "", 10)
+        : parseInt(r.year, 10);
+      if (Number.isFinite(ey)) coveredEnd.add(ey);
+    }
+    // Highest USDA ending year we have a backbone row for (rows is the
+    // unsliced PSD array, so this captures the actual newest realised
+    // year even when `years` limits the visible window).
+    const latestUsdaEnd = rows.reduce(
+      (max, r) => Math.max(max, parseInt(r.year ?? "", 10) || 0),
+      0,
+    );
+    for (const cy of Object.keys(realizedExports.byCropYear).sort()) {
+      const startYear = parseInt(cy.split("/")[0], 10);
+      if (!Number.isFinite(startYear)) continue;
+      const endYear = startYear + 1;
+      if (coveredEnd.has(endYear) || endYear <= latestUsdaEnd) continue;
+      const realised = realizedExports.byCropYear[cy];
+      const fullEnd = String(endYear);
+      const lastRealizedRow = recent[recent.length - 1];
+      // No explicit forecast total available — extrapolate from the
+      // last realised crop year's exports so the in-progress bar shows
+      // a plausible remaining segment.
+      const lastExports = lastRealizedRow?.exports ?? 0;
+      const remaining   = realised.isPartial
+        ? Math.max(0, lastExports - realised.kbags)
+        : 0;
+      recent.push({
+        year:        fullEnd,
+        yearLabel:   `${cropYearShort(fullEnd, cropYearMonths)}${realised.isPartial ? "*" : ""}`,
+        yearTooltip: realised.isPartial
+          ? `In progress · ${cropYearLong(fullEnd, cropYearMonths)}`
+          : `Realised · ${cropYearLong(fullEnd, cropYearMonths)}`,
+        opening:     lastRealizedRow?.ending ?? 0,
+        production:  0,
+        exports:           realised.kbags,
+        exportsRemaining:  remaining,
+        exportsSource:     realised.isPartial ? "realized+forecast" : "realized",
+        // Consumption carries forward from the last realised USDA row —
+        // matches the consumption chart on the Demand tab.
+        consumption: lastRealizedRow?.consumption ?? 0,
+        ending:      0,
+        stockBuild:  0,
+        stockDraw:   0,
+        // Complete realised crops render solid; in-progress crops stripe.
+        isForecast:  realised.isPartial,
+      });
+    }
+  }
+
+  // Ensure chronological order — fall-through and projection branches
+  // can push in either order so the in-progress crop appears between the
+  // last realised year and any further-out forecast.
+  const endYearOf = (year: string): number =>
+    year.includes("/")
+      ? 2000 + (parseInt(year.split("/")[1] ?? "", 10) || 0)
+      : (parseInt(year, 10) || 0);
+  recent.sort((a, b) => endYearOf(a.year) - endYearOf(b.year));
 
   // Production line + error-bar data. We feed every row (history + forecast)
   // into the chart so the projection sits visibly to the right of the
