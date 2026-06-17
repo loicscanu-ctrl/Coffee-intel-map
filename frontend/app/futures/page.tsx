@@ -511,6 +511,9 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
   }) {
     if (opts.months.length === 0) return null;
     const frontLabel = opts.months[0].priceKey;
+    // Cap the strip at 5 shipment months so the table stays within a printable
+    // column width; a crop with more months (the new crop) shows only its first 5.
+    const months = opts.months.slice(0, 5);
     return (
       <div className="space-y-3">
         {/* Per-crop controls — screen only (excluded from the pricelist PDF) */}
@@ -601,13 +604,13 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
                   <th className="text-left px-4 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[110px] border-r border-slate-700">
                     Grade
                   </th>
-                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[230px] border-r border-slate-700">
+                  <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-px whitespace-nowrap border-r border-slate-700">
                     Specification
                   </th>
                   <th className="text-left px-3 py-2.5 text-slate-400 font-bold uppercase text-[10px] w-[120px] border-r border-slate-700">
                     Detail
                   </th>
-                  {opts.months.map((m, i) => (
+                  {months.map((m, i) => (
                     <th key={i} className="px-3 py-2.5 text-center w-[84px] border-l border-slate-700">
                       <div className="text-white font-bold">{m.label}</div>
                       <div className="text-[9px] text-slate-500 mt-0.5">{m.contractSym}</div>
@@ -622,7 +625,7 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
                     <React.Fragment key={section}>
                       <tr className="bg-slate-800/50 border-t border-slate-600">
                         <td
-                          colSpan={3 + opts.months.length}
+                          colSpan={3 + months.length}
                           className="px-4 py-1.5 text-[10px] text-slate-400 uppercase font-bold tracking-widest"
                         >
                           {section}
@@ -640,13 +643,13 @@ function QuotationTab({ contracts = [], vnFaqUsdMt }: { contracts?: Contract[]; 
                           }`}>
                             {q.label}
                           </td>
-                          <td className="px-3 py-2 text-slate-500 text-[10px] border-r border-slate-800">
+                          <td className="px-3 py-2 text-slate-500 text-[10px] border-r border-slate-800 whitespace-nowrap">
                             {q.desc}
                           </td>
                           <td className="px-3 py-2 text-slate-400 text-[10px] border-r border-slate-800 whitespace-nowrap">
                             {detailLabel}
                           </td>
-                          {opts.months.map((m, i) => {
+                          {months.map((m, i) => {
                             if (m.basisForMonth == null) {
                               return (
                                 <td key={i} className="px-3 py-2 text-center font-bold border-l border-slate-800/50 text-slate-600">
