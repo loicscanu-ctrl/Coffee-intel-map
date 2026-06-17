@@ -1,4 +1,4 @@
-name: "3.4 – Semi-annual · Multi-source balance sheets (BR/ID/UG)"
+name: "3.4 – Semi-annual · Multi-source balance sheets (BR/CO/ID/UG)"
 
 # Keeps the per-origin production-estimate seed files
 # (frontend/public/data/{br,id,ug}_balance_sheet.json) fed.
@@ -56,8 +56,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/data/br_balance_sheet.json \
+                  frontend/public/data/co_balance_sheet.json \
                   frontend/public/data/id_balance_sheet.json \
-                  frontend/public/data/ug_balance_sheet.json
+                  frontend/public/data/ug_balance_sheet.json \
+                  frontend/public/data/vn_farmer_economics.json
           if git diff --cached --quiet; then
             echo "No balance-sheet change."
           else
