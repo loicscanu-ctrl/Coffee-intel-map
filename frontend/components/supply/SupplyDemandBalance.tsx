@@ -56,6 +56,24 @@ export interface MultiSourceOverlay {
   seasons: MultiSourceSeason[];
 }
 
+/** Realised customs/monthly exports keyed by crop year — when present,
+ *  overrides USDA PSD's annual exports number on the matching rows so
+ *  the S&D table never disagrees with the per-origin Exports sub-tab.
+ *  Crops that have no monthly data on file fall back to USDA. The
+ *  in-progress crop reports `isPartial: true` and the row is split into
+ *  realised YTD + the multi-source / projection-derived remaining
+ *  budget. Values are in thousand 60-kg bags ("kbags"). */
+export interface RealizedExportsOverlay {
+  byCropYear: Record<string, {
+    kbags:        number;
+    isPartial:    boolean;
+    /** "YYYY-MM" of the most recent monthly observation in this crop year. */
+    latestMonth?: string;
+  }>;
+  /** Display name surfaced on the table footnote, e.g. "Vietnam Customs". */
+  sourceLabel: string;
+}
+
 const TT = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 const CARD = "bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-3";
 const MT_PER_KBAG = 60;                         // 1 thousand 60-kg bags = 60 MT
@@ -189,12 +207,13 @@ function cropYearLong(usdaYear: string, cropYearMonths?: string): string {
  */
 export default function SupplyDemandBalance({
   origin, label, years = 12, projection,
-  cropYearMonths, multiSource,
+  cropYearMonths, multiSource, realizedExports,
 }: {
   origin: string; label: string; years?: number;
   projection?: { crop_year: string; annual_target: number; monthly_curve?: { value: number }[]; safeguard_triggered?: boolean } | null;
   cropYearMonths?: string;
   multiSource?: MultiSourceOverlay | null;
+  realizedExports?: RealizedExportsOverlay | null;
 }) {
   const [rows, setRows] = useState<AnnualRow[] | null>(null);
   const [error, setError] = useState(false);
@@ -238,7 +257,9 @@ export default function SupplyDemandBalance({
     yearTooltip: string;     // hover label
     opening: number;
     production: number;      // single-source kbags
-    exports: number;
+    exports: number;         // kbags — realised portion when realizedExports overrides
+    exportsRemaining: number;// kbags — projected leftover when crop is in-progress
+    exportsSource:    "usda" | "realized" | "realized+forecast";
     consumption: number;
     ending: number;
     stockBuild: number;
@@ -249,6 +270,15 @@ export default function SupplyDemandBalance({
     prodMin?: number;
     prodMax?: number;
     prodSources?: { key: string; label: string; value_kbags: number; color: string }[];
+  };
+
+  /** Resolve a USDA ending year ("2025") to the crop-year key the
+   *  realizedExports overlay uses ("2024/25"). Returns null when the
+   *  caller hasn't supplied `cropYearMonths`. */
+  const cropKeyOf = (endYearStr: string): string | null => {
+    const end = parseInt(endYearStr, 10);
+    if (!Number.isFinite(end) || !cropYearMonths) return null;
+    return `${end - 1}/${String(end).slice(-2)}`;
   };
 
   const buildMultiSourceFields = (season: MultiSourceSeason | undefined): Partial<Row> => {
@@ -275,11 +305,39 @@ export default function SupplyDemandBalance({
     const delta   = ending - opening;
     const year    = r.year ?? "";
     const ms      = msByEndYear.get(year);
+    const usdaExports = kbags(r.exports_mt);
+    // Realized customs data wins on years where it's complete; older
+    // years with missing months fall back to USDA PSD. Realised partial
+    // years (typically the current in-progress crop) get the YTD value
+    // in `exports` and the forecast remainder in `exportsRemaining`.
+    const cropKey = cropKeyOf(year);
+    const realized = cropKey ? realizedExports?.byCropYear[cropKey] : undefined;
+    let exportsKbags     = usdaExports;
+    let remainingKbags   = 0;
+    let exportsSource: Row["exportsSource"] = "usda";
+    if (realized) {
+      if (!realized.isPartial) {
+        exportsKbags  = realized.kbags;
+        exportsSource = "realized";
+      } else {
+        // Partial: prefer the multi-source forecast for the total, otherwise
+        // the USDA PSD figure. Remaining = max(0, total − realised).
+        const forecastTotalKbags = ms?.exports != null
+          ? Math.round(ms.exports / MBAGS_PER_KBAGS)
+          : usdaExports;
+        exportsKbags    = realized.kbags;
+        remainingKbags  = Math.max(0, forecastTotalKbags - realized.kbags);
+        exportsSource   = "realized+forecast";
+      }
+    }
     return {
       year,
       yearLabel:   cropYearShort(year, cropYearMonths),
       yearTooltip: cropYearLong(year, cropYearMonths),
-      opening, production: kbags(r.production_mt), exports: kbags(r.exports_mt),
+      opening, production: kbags(r.production_mt),
+      exports:           exportsKbags,
+      exportsRemaining:  remainingKbags,
+      exportsSource,
       consumption: kbags(r.consumption_mt), ending,
       stockBuild: Math.max(delta, 0), stockDraw: Math.min(delta, 0),
       isForecast: false,
@@ -292,12 +350,25 @@ export default function SupplyDemandBalance({
   // carries a forecast season the USDA backbone doesn't know about yet,
   // append it so the chart and table both show the forward outlook.
   const usdaYearsSeen = new Set(recent.map(r => r.year));
+  // Per-crop-year realised lookup helper for the forecast rows below.
+  const realisedForCrop = (cropKey: string) =>
+    realizedExports?.byCropYear[cropKey];
+
   if (projection && projection.crop_year) {
     const lastRealized = recent[recent.length - 1];
     const projectedKbags = Math.round(projection.annual_target / 1000);
     // Brazil projection's crop_year is already "26/27" — match it against the
     // multiSource map's cropYear key directly to pick up production ranges.
     const ms = msByCropYear.get(projection.crop_year);
+    // Brazil's projection bundles the realised + projection split inside
+    // monthly_curve, so we leave the split-by-monthly-customs logic alone
+    // here. If the customs overlay happens to cover the same crop, prefer
+    // the realised YTD + (projection − realised) split.
+    const realisedYTD = realisedForCrop(projection.crop_year);
+    const realizedKbags  = realisedYTD?.kbags ?? 0;
+    const remainingKbags = realisedYTD
+      ? Math.max(0, projectedKbags - realizedKbags)
+      : projectedKbags;
     recent.push({
       year:        projection.crop_year,
       yearLabel:   `${projection.crop_year}*`,
@@ -305,7 +376,9 @@ export default function SupplyDemandBalance({
                                   : `Forecast · ${projection.crop_year}`,
       opening:     lastRealized?.ending ?? 0,
       production:  0,
-      exports:     projectedKbags,
+      exports:           realisedYTD ? realizedKbags  : 0,
+      exportsRemaining:  realisedYTD ? remainingKbags : projectedKbags,
+      exportsSource:     realisedYTD ? "realized+forecast" : "usda",
       consumption: 0,
       ending:      0,
       stockBuild:  0,
@@ -322,14 +395,26 @@ export default function SupplyDemandBalance({
       if (!fullEnd || usdaYearsSeen.has(fullEnd)) continue;
       const lastRealized = recent[recent.length - 1];
       const fields = buildMultiSourceFields(s);
+      const totalKbags = s.exports != null ? Math.round(s.exports / MBAGS_PER_KBAGS) : 0;
+      const realisedYTD = realisedForCrop(s.cropYear);
+      const realizedKbags  = realisedYTD?.kbags ?? 0;
+      const remainingKbags = realisedYTD
+        ? Math.max(0, totalKbags - realizedKbags)
+        : totalKbags;
       recent.push({
         year:        fullEnd,
         yearLabel:   `${cropYearShort(fullEnd, cropYearMonths)}*`,
         yearTooltip: `Forecast · ${cropYearLong(fullEnd, cropYearMonths)}`,
         opening:     lastRealized?.ending ?? 0,
         production:  fields.prodAvg ?? 0,
-        exports:     s.exports != null ? Math.round(s.exports / MBAGS_PER_KBAGS) : 0,
-        consumption: s.consumption != null ? Math.round(s.consumption / MBAGS_PER_KBAGS) : 0,
+        exports:           realisedYTD ? realizedKbags  : 0,
+        exportsRemaining:  realisedYTD ? remainingKbags : totalKbags,
+        exportsSource:     realisedYTD ? "realized+forecast" : "usda",
+        // Consumption flows from USDA PSD (same source as the per-country
+        // consumption chart on the Demand tab) — carry the latest realised
+        // PSD value forward as the forecast crop's estimate so the equation
+        // strip and the consumption chart never disagree.
+        consumption: lastRealized?.consumption ?? 0,
         ending:      0,
         stockBuild:  0,
         stockDraw:   0,
@@ -347,7 +432,8 @@ export default function SupplyDemandBalance({
     year:        r.yearLabel,
     yearTooltip: r.yearTooltip,
     opening:     r.opening,
-    exports:     r.exports,
+    exports:           r.exports,
+    exportsRemaining:  r.exportsRemaining,
     consumption: r.consumption,
     stockBuild:  r.stockBuild,
     stockDraw:   r.stockDraw,
@@ -389,10 +475,25 @@ export default function SupplyDemandBalance({
     return `${mBags.toFixed(1)}M`;
   };
   const _eqUnit  = unit === "tons" ? "MT" : "60-kg bags";
-  const focusExports     = focusSeason?.exports     ?? 0;
-  const focusConsumption = focusSeason?.consumption ?? 0;
-  const focusNetStocks   = focusProdAvg - focusExports - focusConsumption;
-  const focusDeficit     = focusNetStocks < 0;
+  // Equation strip reads its EXPORTS and CONSUMPTION from the in-built
+  // `recent` table — that table prefers realized customs data when
+  // present and USDA PSD when not, so the strip cannot disagree with the
+  // bar chart or the table below it.
+  const focusRow = focusSeason
+    ? recent.find(r => r.yearLabel.replace("*", "") ===
+                       (cropYearMonths
+                         ? cropYearShort(String(parseInt(focusSeason.cropYear.split("/")[0]) + 1), cropYearMonths)
+                         : focusSeason.cropYear))
+    : undefined;
+  // Convert kbags → M bags so the equation strip stays in the natural
+  // annual-balance scale the legacy panel used.
+  const kbagsToMbags = (k: number) => k * MBAGS_PER_KBAGS;
+  const focusExportsRealized = focusRow ? kbagsToMbags(focusRow.exports)          : 0;
+  const focusExportsRemain   = focusRow ? kbagsToMbags(focusRow.exportsRemaining) : 0;
+  const focusExports         = focusExportsRealized + focusExportsRemain;
+  const focusConsumption     = focusRow ? kbagsToMbags(focusRow.consumption)      : 0;
+  const focusNetStocks       = focusProdAvg - focusExports - focusConsumption;
+  const focusDeficit         = focusNetStocks < 0;
 
   return (
     <div className="space-y-3">
@@ -425,6 +526,11 @@ export default function SupplyDemandBalance({
                   · +{multiSource.sources.map(s => s.label).join(" / ")} range
                 </span>
               )}
+              {realizedExports && (
+                <span className="ml-1">
+                  · exports linked to {realizedExports.sourceLabel}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -443,18 +549,20 @@ export default function SupplyDemandBalance({
               sub={`${multiSource!.sources.map(s => s.label).join(" / ")} · ${focusSeason.cropYear}${focusSeason.forecast ? " (f)" : ""}`}
             />
             <Eq
-              label={multiSource!.sources.length === 1 ? `${multiSource!.sources[0].label} Exports` : "Exports"}
+              label="Exports"
               value={_eqValue(focusExports)}
               sign="−"
               color="#ef4444"
-              sub={`Annual exports · ${_eqUnit}`}
+              sub={focusExportsRemain > 0
+                ? `${focusExportsRealized.toFixed(1)} realised + ${focusExportsRemain.toFixed(1)} est.`
+                : (realizedExports ? `${realizedExports.sourceLabel} (realised)` : `Annual exports · ${_eqUnit}`)}
             />
             <Eq
               label="Local Consumption"
               value={_eqValue(focusConsumption)}
               sign="−"
               color="#f97316"
-              sub="Domestic estimate"
+              sub="USDA PSD · matches Demand tab"
             />
             <Eq
               label="Net Stocks"
@@ -518,6 +626,12 @@ export default function SupplyDemandBalance({
               <Bar dataKey="exports"     name="Exports"     stackId="a" fill="#f59e0b">
                 {chartData.map((_, i) => <Cell key={`e-${i}`} fill={stripedCellFill(i, "#f59e0b", "exp")} />)}
                 <LabelList dataKey="exports"     position="center" fontSize={8} fill="#1e293b" formatter={_segLabel(unit)} />
+              </Bar>
+              {/* Remaining-budget portion of the in-progress crop's exports.
+                  Always striped (so it visibly splits the bar), zero on all
+                  rows except the one carrying realizedExports.isPartial. */}
+              <Bar dataKey="exportsRemaining" name="Exports (forecast remaining)" stackId="a" fill="url(#sd-stripe-exp)">
+                <LabelList dataKey="exportsRemaining" position="center" fontSize={8} fill="#1e293b" formatter={_segLabel(unit)} />
               </Bar>
               <Bar dataKey="consumption" name="Consumption" stackId="a" fill="#3b82f6">
                 {chartData.map((_, i) => <Cell key={`c-${i}`} fill={stripedCellFill(i, "#3b82f6", "cons")} />)}
@@ -606,12 +720,37 @@ export default function SupplyDemandBalance({
                     </span>
                   );
                 })();
+                // Exports cell: for the in-progress crop, surface the
+                // realised + remaining split so a reader can tell what's
+                // been customs-confirmed vs. what's still a forecast.
+                // Tooltip names the realised source explicitly.
+                const exportsCell = (() => {
+                  if (r.exportsRemaining > 0 && r.exports > 0) {
+                    const tip = realizedExports
+                      ? `${fmt(r.exports)} realised (${realizedExports.sourceLabel}${r.exportsSource === "realized+forecast" ? `, through ${realisedForCrop(cropKeyOf(r.year) ?? r.year)?.latestMonth ?? "—"}` : ""}) + ${fmt(r.exportsRemaining)} forecast remaining`
+                      : `${fmt(r.exports)} realised + ${fmt(r.exportsRemaining)} forecast remaining`;
+                    return (
+                      <span title={tip} className="cursor-help">
+                        <span>{fmt(r.exports)}</span>
+                        <span className="text-slate-500 text-[8px] ml-1">+{fmt(r.exportsRemaining)} est.</span>
+                      </span>
+                    );
+                  }
+                  if (r.exportsSource === "realized" && realizedExports) {
+                    return (
+                      <span title={`Realised (${realizedExports.sourceLabel})`} className="cursor-help">
+                        {fmt(r.exports)}
+                      </span>
+                    );
+                  }
+                  return <span>{fmt(r.exports)}</span>;
+                })();
                 return (
                   <tr key={r.year + "_" + r.yearLabel} className={`border-t border-slate-700/50 ${rowCls}`}>
                     <td className="py-0.5 pr-2" title={r.yearTooltip}>{r.yearLabel}</td>
                     <td className="py-0.5 px-1 text-right">{dash(r.opening)}</td>
                     <td className="py-0.5 px-1 text-right">{prodCell}</td>
-                    <td className="py-0.5 px-1 text-right">{fmt(r.exports)}</td>
+                    <td className="py-0.5 px-1 text-right">{exportsCell}</td>
                     <td className="py-0.5 px-1 text-right">{dash(r.consumption)}</td>
                     <td className={`py-0.5 pl-1 text-right ${r.isForecast ? "" : chgCls(r.ending - r.opening)}`}>{dash(r.ending)}</td>
                   </tr>
