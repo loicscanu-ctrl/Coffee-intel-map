@@ -1,6 +1,6 @@
 "use client";
 import { AgronomyCard, H, P, LI, Code } from "../agronomy/prose";
-import { K_CEILING } from "@/lib/demandCeilings";
+import { K_BASE, ceilingK, demographicFactor } from "@/lib/demandCeilings";
 
 // Proposed saturation ceilings (K) for the 12 markets actually in the
 // Consumption-tab projection. Everything is expressed in the table's native
@@ -102,22 +102,31 @@ export default function MarketCeilings() {
               <th className="text-left py-1.5 pr-2">Market</th>
               <th className="text-left py-1.5 pr-2">Class</th>
               <th className="text-right py-1.5 pr-2">Now</th>
+              <th className="text-right py-1.5 pr-2">Base</th>
+              <th className="text-right py-1.5 pr-2">Med.age</th>
+              <th className="text-right py-1.5 pr-2">Demo ×</th>
               <th className="text-right py-1.5 pr-2">K</th>
-              <th className="text-right py-1.5 pr-2">≈kg/head</th>
               <th className="text-right py-1.5 pr-3">Headroom</th>
               <th className="text-left py-1.5">Anchor &amp; reasoning</th>
             </tr>
           </thead>
           <tbody>
             {ROWS.map(r => {
-              const K = K_CEILING[r.key];
+              const c = K_BASE[r.key];
+              const analog = c.anchor === "analog";
+              const demo = analog ? demographicFactor(c.medianAge) : 1;
+              const K = ceilingK(r.key);
               return (
               <tr key={r.key} className="border-b border-slate-800 align-top">
                 <td className="py-1.5 pr-2 text-slate-100 font-medium whitespace-nowrap">{r.m}</td>
                 <td className={`py-1.5 pr-2 ${clsTone(r.cls)} whitespace-nowrap`}>{r.cls}</td>
                 <td className="py-1.5 pr-2 text-right font-mono text-slate-400">{r.now.toFixed(2)}</td>
+                <td className="py-1.5 pr-2 text-right font-mono text-slate-400">{c.base.toFixed(1)}</td>
+                <td className="py-1.5 pr-2 text-right font-mono text-slate-500">{c.medianAge}</td>
+                <td className={`py-1.5 pr-2 text-right font-mono ${analog && demo < 1 ? "text-red-300" : "text-slate-600"}`}>
+                  {analog ? `×${demo.toFixed(2)}` : "—"}
+                </td>
                 <td className="py-1.5 pr-2 text-right font-mono text-amber-300">{K.toFixed(1)}</td>
-                <td className="py-1.5 pr-2 text-right font-mono text-slate-500">{(K * r.share).toFixed(1)}</td>
                 <td className="py-1.5 pr-3 text-right font-mono text-emerald-300">{(K / r.now).toFixed(1)}×</td>
                 <td className="py-1.5 text-slate-400 leading-relaxed">
                   <span className="text-slate-300">{r.anchor}.</span> {r.logic}
@@ -129,9 +138,11 @@ export default function MarketCeilings() {
         </table>
       </div>
       <p className="text-[9px] text-slate-500 mt-2">
-        Units: <Code>Now</Code> &amp; <Code>K</Code> in kg/adult/yr (USDA consumption ÷ UN WPP 18+, 2025).
-        <Code>≈kg/head</Code> = K × adult-share, shown only to sanity-check against the study&rsquo;s analog plateaus
-        (Japan ~3.5, Korea ~2.6, Algeria ~3.1 kg/head). <Code>Headroom</Code> = K ÷ now.
+        Units: <Code>Now</Code>, <Code>Base</Code> &amp; <Code>K</Code> in kg/adult/yr. <Code>Base</Code> is the
+        demographically-neutral ceiling (analog plateau × stomach-share × infra); <Code>Demo ×</Code> is the live
+        median-age discount applied only to analog-anchored markets (self/plateau markets already embed their
+        demographics, shown &ldquo;—&rdquo;). <Code>K = Base × Demo</Code>. <Code>Headroom</Code> = K ÷ now. Median age
+        is the UN WPP whole-population figure, recomputed from the age data each refresh.
       </p>
 
       <H>What this does to the projection</H>

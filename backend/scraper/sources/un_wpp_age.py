@@ -20,7 +20,8 @@ Cache shape:
     "countries": {
       "china": {
         "name": "China", "location_id": 156,
-        "annual": [{"year": 2000, "pop_18plus": 980000000}, ...]
+        "annual": [{"year": 2000, "pop_18plus": 980000000,
+                    "median_age": 30.0}, ...]
       },
       ...
     }
@@ -259,9 +260,11 @@ def _pick(row: dict, *names: str):
     return None
 
 
-def _accumulate(url: str, acc: dict, seen: set) -> int:
-    """Stream one gzipped CSV and fold its rows into acc[iso3][year]. Returns
-    the number of rows kept (0 if the file isn't available / not usable)."""
+def _accumulate(url: str, acc: dict, dist: dict, seen: set) -> int:
+    """Stream one gzipped CSV and fold its rows into acc[iso3][year] (the 18+
+    weighted sum) and dist[iso3][year][age_start] (the full age distribution,
+    kept for the whole-population median-age calc). Returns the number of rows
+    kept (0 if the file isn't available / not usable)."""
     try:
         r = requests.get(url, headers=_headers(), timeout=120, stream=True)
         if r.status_code != 200:
@@ -287,29 +290,52 @@ def _accumulate(url: str, acc: dict, seen: set) -> int:
             pop_k = float(_pick(row, "PopTotal", "Value") or 0)   # thousands
         except (TypeError, ValueError):
             continue
-        if year < _START_YEAR or year > _END_YEAR or age_start < 15:
+        if year < _START_YEAR or year > _END_YEAR or age_start < 0:
             continue
         key = (iso3, year, age_start)
         if key in seen:
             continue
         seen.add(key)
-        # 15-19 group contributes ages 18-19 = 2/5; every group ≥20 is full.
-        weight = 0.4 if age_start == 15 else 1.0
-        acc.setdefault(iso3, {})
-        acc[iso3][year] = acc[iso3].get(year, 0.0) + pop_k * weight
+        # Full age distribution (all bands) for the median-age computation.
+        dist.setdefault(iso3, {}).setdefault(year, {})[age_start] = pop_k
+        # 18+ cohort: 15-19 group contributes ages 18-19 = 2/5; every ≥20 is full.
+        if age_start >= 15:
+            weight = 0.4 if age_start == 15 else 1.0
+            acc.setdefault(iso3, {})
+            acc[iso3][year] = acc[iso3].get(year, 0.0) + pop_k * weight
         kept += 1
 
     logger.info(f"[un_wpp_age] bulk OK ({kept} rows kept): {url}")
     return kept
 
 
+def _median_age(bands: dict[int, float]) -> float | None:
+    """Whole-population median age from 5-year age bands ({age_start: pop}).
+    Linear interpolation within the band that straddles the 50th percentile."""
+    if not bands:
+        return None
+    total = sum(bands.values())
+    if total <= 0:
+        return None
+    half = total / 2
+    cum = 0.0
+    for age_start in sorted(bands):
+        p = bands[age_start]
+        if cum + p >= half:
+            frac = (half - cum) / p if p > 0 else 0.0
+            return round(age_start + frac * 5, 1)   # 5-yr band width
+        cum += p
+    return None
+
+
 def _build_payload() -> dict | None:
     acc: dict[str, dict[int, float]] = {}
+    dist: dict[str, dict[int, dict[int, float]]] = {}
     seen: set = set()
     total_kept = 0
     for base in _BULK_BASES:
         for fname in _BULK_FILES:
-            total_kept += _accumulate(base + fname, acc, seen)
+            total_kept += _accumulate(base + fname, acc, dist, seen)
         if total_kept:
             break   # this base works; no need to try the other host paths
 
@@ -323,7 +349,9 @@ def _build_payload() -> dict | None:
         if not ydata:
             logger.warning(f"[un_wpp_age] no data for {iso3}")
             continue
-        annual = [{"year": y, "pop_18plus": int(round(ydata[y] * 1000))}
+        ddata = dist.get(iso3, {})
+        annual = [{"year": y, "pop_18plus": int(round(ydata[y] * 1000)),
+                   "median_age": _median_age(ddata.get(y, {}))}
                   for y in sorted(ydata)]
         latest = annual[-1]
         countries[iso3.lower()] = {

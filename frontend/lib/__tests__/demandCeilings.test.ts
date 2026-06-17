@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { K_CEILING, logisticIntensity } from "../demandCeilings";
+import {
+  K_CEILING, K_BASE, logisticIntensity, ceilingK, demographicFactor,
+  isDemographicallyDiscounted,
+} from "../demandCeilings";
 
 describe("logisticIntensity", () => {
   it("starts exactly at i0 in the from-year", () => {
@@ -45,5 +48,53 @@ describe("logisticIntensity", () => {
       "russia", "ethiopia", "vietnam", "korea", "philippines", "brazil"]) {
       expect(K_CEILING[k]).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("demographicFactor", () => {
+  it("is 1.0 at or below median age 30", () => {
+    expect(demographicFactor(30)).toBe(1);
+    expect(demographicFactor(22)).toBe(1);
+  });
+  it("is 0.6 at or above median age 42", () => {
+    expect(demographicFactor(42)).toBe(0.6);
+    expect(demographicFactor(50)).toBe(0.6);
+  });
+  it("interpolates linearly in between (China ~41 → ~0.63)", () => {
+    expect(demographicFactor(41)).toBeCloseTo(0.633, 2);
+    expect(demographicFactor(36)).toBeCloseTo(0.8, 2);
+  });
+});
+
+describe("ceilingK", () => {
+  it("applies the live median-age discount for analog markets", () => {
+    // base 2.84 × factor(41)=0.633 ≈ 1.8 (reproduces the published K)
+    expect(ceilingK("china")).toBeCloseTo(1.8, 1);
+    expect(ceilingK("russia")).toBeCloseTo(3.3, 1);
+  });
+  it("returns base unchanged for self/plateau markets", () => {
+    expect(ceilingK("brazil")).toBe(K_BASE.brazil.base);
+    expect(ceilingK("korea")).toBe(K_BASE.korea.base);
+  });
+  it("raises an analog market's K when the population is younger", () => {
+    const baseline = ceilingK("china");                 // fallback median 41
+    const younger = ceilingK("china", 30);              // hypothetically young
+    expect(younger).toBeGreaterThan(baseline);
+    expect(younger).toBeCloseTo(K_BASE.china.base, 5);  // factor 1.0 → full base
+  });
+  it("ignores median age for self markets", () => {
+    expect(ceilingK("brazil", 25)).toBe(K_BASE.brazil.base);
+  });
+  it("returns NaN for unknown markets", () => {
+    expect(Number.isNaN(ceilingK("atlantis"))).toBe(true);
+  });
+});
+
+describe("isDemographicallyDiscounted", () => {
+  it("flags analog-anchored markets only", () => {
+    expect(isDemographicallyDiscounted("china")).toBe(true);
+    expect(isDemographicallyDiscounted("russia")).toBe(true);
+    expect(isDemographicallyDiscounted("brazil")).toBe(false);
+    expect(isDemographicallyDiscounted("korea")).toBe(false);
   });
 });
