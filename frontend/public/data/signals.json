@@ -278,6 +278,18 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "AGRO_colombia_Caldas_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=198.1]"
     }
   ],
   "history": [
@@ -2679,5 +2691,5 @@
       "priceLDN": 3230
     }
   ],
-  "generatedAt": "2026-06-16T08:34:56.043Z"
+  "generatedAt": "2026-06-17T07:02:27.083Z"
 }
