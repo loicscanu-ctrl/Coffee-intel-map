@@ -243,8 +243,8 @@ export default function AgeCohortPanel() {
       </div>
 
       <div className="text-[9px] text-slate-500 italic">
-        Cohort = total population aged 18+ ≈ Σ(5yr brackets) with the 15–19 bracket weighted ×3/5 (uniform-distribution
-        assumption). Source: UN World Population Prospects, medium-variant projections.
+        Cohort = total population aged 18+ ≈ Σ(5yr brackets) with the 15–19 bracket weighted ×2/5 (ages 18–19,
+        uniform-distribution assumption). Source: UN World Population Prospects, medium-variant projections.
       </div>
     </div>
   );
