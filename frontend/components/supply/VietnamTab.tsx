@@ -118,7 +118,25 @@ export default function VietnamTab() {
       {subTab === "supply-demand" && (
         <div className="space-y-5">
           {vnBalanceSheet && <VnBalanceSheetPanel balance={vnBalanceSheet} />}
-          <SupplyDemandBalance origin="vietnam" label="Vietnam" />
+          <SupplyDemandBalance
+            origin="vietnam"
+            label="Vietnam"
+            cropYearMonths="Oct–Sep"
+            multiSource={vnBalanceSheet ? {
+              sources: [
+                { key: "usda", label: "USDA", color: "#3b82f6" },
+                { key: "mard", label: "MARD", color: "#10b981" },
+                { key: "ico",  label: "ICO",  color: "#f59e0b" },
+              ],
+              seasons: vnBalanceSheet.seasons.map(s => ({
+                cropYear:    s.season,
+                forecast:    s.forecast,
+                production:  s.production,
+                exports:     s.exports_ico,
+                consumption: s.consumption,
+              })),
+            } : null}
+          />
         </div>
       )}
 
