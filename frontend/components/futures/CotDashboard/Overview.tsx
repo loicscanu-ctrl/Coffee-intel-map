@@ -58,6 +58,15 @@ function Bullet({ children, sub }: { children: React.ReactNode; sub?: boolean })
   );
 }
 
+// Bullish=green / bearish=red tint for a variation value. `sign` drives the
+// colour; `invert` flips it (shorts & producers, where a positive change is
+// bearish). sign === 0 stays neutral, so "holding"/"stable" reads plain.
+function Tone({ sign, invert, children }: { sign: number; invert?: boolean; children: React.ReactNode }) {
+  const dir = invert ? -sign : sign;
+  const cls = dir > 0 ? "text-emerald-400" : dir < 0 ? "text-red-400" : "";
+  return <span className={cls}>{children}</span>;
+}
+
 function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNearbyOverride }: {
   m: MarketMetrics; prevPrice: number; letters: string | null; label: string; post: PostCot | null; params: IntraweekParams;
   /** Re-derived nearby delta from per-contract OI history (issue #132 Body-7
@@ -105,18 +114,18 @@ function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNear
             {forwardShown !== null && (
               <Bullet sub>{lotsSigned(forwardShown)} in forward contracts</Bullet>
             )}
-            <Bullet>Price {pct1(m.priceChangePct)} ({priceAbs}){structureClause}.</Bullet>
+            <Bullet>Price <Tone sign={m.priceChangePct}>{pct1(m.priceChangePct)} ({priceAbs})</Tone>{structureClause}.</Bullet>
             <Bullet>
-              Roasters covered {lotsSigned(m.cats.pmpu.dLong)} ({kTonsSigned(m.roasterMTWoW)}),
+              {m.cats.pmpu.dLong > 0 ? "Roasters are covering for" : "Roasters holding & fixing for"} <Tone sign={m.cats.pmpu.dLong}>{lotsSigned(m.cats.pmpu.dLong)} ({kTonsSigned(m.roasterMTWoW)})</Tone>,
               reaching {kTons(m.roasterMT)} ({pct1(m.roasterCovPct)} maxed).
             </Bullet>
             <Bullet>
-              Producers covered {lotsSigned(m.cats.pmpu.dShort)} ({kTonsSigned(m.producerMTWoW)}),
+              {m.cats.pmpu.dShort > 0 ? "Producers are selling for" : "Producers holding & exporters are fixing for"} <Tone sign={m.cats.pmpu.dShort} invert>{lotsSigned(m.cats.pmpu.dShort)} ({kTonsSigned(m.producerMTWoW)})</Tone>,
               reaching {kTons(m.producerMT)} ({pct1(m.producerCovPct)} maxed).
             </Bullet>
             <Bullet>
-              MM {longVerb} longs ({lotsSigned(m.mmLongChangeLots)} / {pctSigned(m.mmLongChangePct)} of their position)
-              {" "}and {shortVerb} shorts ({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)} of their position).
+              MM {longVerb} longs <Tone sign={m.mmLongChangeLots}>({lotsSigned(m.mmLongChangeLots)} / {pctSigned(m.mmLongChangePct)} of their position)</Tone>
+              {" "}and {shortVerb} shorts <Tone sign={m.mmShortChangeLots} invert>({lotsSigned(m.mmShortChangeLots)} / {pctSigned(m.mmShortChangePct)} of their position)</Tone>.
               {" "}Net {m.mmLong - m.mmShort >= 0 ? "long" : "short"} of {lotsAbs(m.mmLong - m.mmShort)}.
             </Bullet>
           </ul>
@@ -134,26 +143,26 @@ function MarketColumn({ m, prevPrice, letters, label, post, params, oiChangeNear
             <Bullet sub>{lotsSigned(post.nearbyChange)} in nearby contracts</Bullet>
             <Bullet sub>{lotsSigned(post.forwardChange)} in forward contracts</Bullet>
             <Bullet>
-              Price changed of {pctSigned(post.priceChangePct)} ({isNY ? priceAbsNY(post.priceChangeAbs, true) : priceAbsLDN(post.priceChangeAbs, true)})
-              {" "}with a structure moving toward {post.movingToward}, now {post.inCarry ? "in carry" : "inverted"} at {pct1(post.invertedNow)}.
+              Price <Tone sign={post.priceChangePct}>{pctSigned(post.priceChangePct)} ({isNY ? priceAbsNY(post.priceChangeAbs, true) : priceAbsLDN(post.priceChangeAbs, true)})</Tone>;
+              {" "}structure moving toward {post.movingToward}, {post.inCarry ? "in carry" : "inverted"} at {pct1(post.invertedNow)}.
             </Bullet>
             <Bullet>
-              Roasters&rsquo; coverage probably {post.roasterLotsDelta > FLOW_THRESHOLD
+              Roasters&rsquo; coverage probably <Tone sign={Math.abs(post.roasterLotsDelta) > FLOW_THRESHOLD ? post.roasterLotsDelta : 0}>{post.roasterLotsDelta > FLOW_THRESHOLD
                 ? <>increasing ~{lotsAbs(post.roasterLotsDelta)} long — buying into weakness, counterparty to MM<ConfChip lots={post.roasterLotsDelta} params={params} /></>
                 : post.roasterLotsDelta < -FLOW_THRESHOLD
                 ? <>reducing ~{lotsAbs(post.roasterLotsDelta)} long — trimming into strength<ConfChip lots={post.roasterLotsDelta} params={params} /></>
-                : "stable"}.
+                : "stable"}</Tone>.
             </Bullet>
             <Bullet>
-              Producers&rsquo; coverage probably {post.producerLotsDelta > FLOW_THRESHOLD
+              Producers&rsquo; coverage probably <Tone sign={Math.abs(post.producerLotsDelta) > FLOW_THRESHOLD ? post.producerLotsDelta : 0} invert>{post.producerLotsDelta > FLOW_THRESHOLD
                 ? <>increasing ~{lotsAbs(post.producerLotsDelta)} short — selling into strength, counterparty to MM<ConfChip lots={post.producerLotsDelta} params={params} /></>
                 : post.producerLotsDelta < -FLOW_THRESHOLD
                 ? <>reducing ~{lotsAbs(post.producerLotsDelta)} short — covering into weakness<ConfChip lots={post.producerLotsDelta} params={params} /></>
-                : "stable"}.
+                : "stable"}</Tone>.
             </Bullet>
             <Bullet>
-              MM probably {post.mmLongDelta < -FLOW_THRESHOLD ? "liquidating" : post.mmLongDelta > FLOW_THRESHOLD ? "building" : "holding"} longs ({lotsSigned(post.mmLongDelta)})
-              {" "}and {post.mmShortDelta > FLOW_THRESHOLD ? "increasing" : post.mmShortDelta < -FLOW_THRESHOLD ? "covering" : "holding"} shorts ({lotsSigned(post.mmShortDelta)}){" "}
+              MM probably {post.mmLongDelta < -FLOW_THRESHOLD ? "liquidating" : post.mmLongDelta > FLOW_THRESHOLD ? "building" : "holding"} longs <Tone sign={Math.abs(post.mmLongDelta) > FLOW_THRESHOLD ? post.mmLongDelta : 0}>({lotsSigned(post.mmLongDelta)})</Tone>
+              {" "}and {post.mmShortDelta > FLOW_THRESHOLD ? "increasing" : post.mmShortDelta < -FLOW_THRESHOLD ? "covering" : "holding"} shorts <Tone sign={Math.abs(post.mmShortDelta) > FLOW_THRESHOLD ? post.mmShortDelta : 0} invert>({lotsSigned(post.mmShortDelta)})</Tone>{" "}
               <span className="text-slate-600">(est. OI&times;price regime)</span>.
             </Bullet>
             {Math.abs(post.othersDelta) > FLOW_THRESHOLD && (

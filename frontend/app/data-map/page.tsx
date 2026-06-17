@@ -185,7 +185,6 @@ const SUPPLY = `flowchart LR
   J_fe[/farmer_economics.json/]
   J_fsell[/farmer_selling_brazil.json/]
   J_vn[/vietnam_supply.json/]
-  J_vnx[/vn_country_shares/]
   J_vnfe[/vn_farmer_economics/]
   J_vnwl[/vn_water_levels.json/]
   J_vnw[/vn_weather.json/]
@@ -207,7 +206,6 @@ const SUPPLY = `flowchart LR
   sell{{BR Farmer Selling}}
   cec{{BR Monthly Exports}}
   vnexp{{VN Export Explorer}}
-  vndest{{VN Destination Estimate}}
   vnbal{{VN Balance Sheet}}
   vnfe{{VN Farmer Economics}}
   vnwl{{VN Water Levels}}
@@ -242,7 +240,6 @@ const SUPPLY = `flowchart LR
   EXP --> J_fe
   EXP --> J_fsell
   EXP --> J_vn
-  EXP --> J_vnx
   EXP --> J_vnfe
   EXP --> J_vnwl
   EXP --> J_vnw
@@ -265,7 +262,6 @@ const SUPPLY = `flowchart LR
   J_fsell --> sell
   J_vn --> vnexp
   J_vn --> vnbal
-  J_vnx --> vndest
   J_vnfe --> vnfe
   J_vnwl --> vnwl
   J_vnw --> vnw
@@ -283,8 +279,8 @@ ${DEFS}
   class W17,W32,W331,W332,W333,W334,W335,WCNTRY,WFERT,WINTEL,WWX,WSPI,WSPEI,WVHI,WENSO,WENFC,WBFL scr;
   class DB,SEED_SPI,SEED_SPEI,SEED_VHI store;
   class EXP,AGRO proc;
-  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnx,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_agro,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
-  class br,mv,brexp,bfe,sell,cec,vnexp,vndest,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,agroAlert,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
+  class J_cecd,J_cec,J_fe,J_fsell,J_vn,J_vnfe,J_vnwl,J_vnw,J_wx,J_vhi,J_agro,J_co,J_et,J_hn,J_id,J_ug,J_ferts,J_intel,J_enso json;
+  class br,mv,brexp,bfe,sell,cec,vnexp,vnbal,vnfe,vnwl,vnw,wx,soil,drought,frost,agroAlert,ensoSub,coexp,et,hn,idn,ug,fert,intel vis;`;
 
 const DEMAND = `flowchart LR
   W3B["1.3b Slow-data · 1st/mo<br/>ECF stocks · USDA PSD · AJCA · UCDA"]

@@ -226,7 +226,7 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -265,7 +265,7 @@
       "market": "NY",
       "severity": "warn",
       "score": 0,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     },
     {
@@ -2619,7 +2619,7 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "large",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2658,7 +2658,7 @@
           "market": "NY",
           "severity": "warn",
           "score": 0,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         },
         {
@@ -2679,5 +2679,5 @@
       "priceLDN": 3230
     }
   ],
-  "generatedAt": "2026-06-15T08:41:50.301Z"
+  "generatedAt": "2026-06-17T07:39:37.035Z"
 }

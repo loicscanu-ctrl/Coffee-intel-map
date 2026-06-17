@@ -199,9 +199,23 @@ def _parse_psd(csv_bytes: bytes) -> dict | None:
     if not markets and not producers:
         return None
 
+    # Real data date = the latest Market_Year in the release, not the run time.
+    # USDA FAS publishes the coffee PSD in June (new marketing year) and revises
+    # in December; we stamp June 1 of the latest year so freshness reflects the
+    # data vintage and ages correctly between releases. Falls back to run-date
+    # only if no parseable year is present.
+    import re as _re
+    _years = []
+    for _grp in (markets, producers):
+        for _m in _grp.values():
+            _mm = _re.search(r"\d{4}", str(_m.get("latest_year") or ""))
+            if _mm:
+                _years.append(int(_mm.group()))
+    _last_updated = f"{max(_years)}-06-01" if _years else datetime.utcnow().date().isoformat()
+
     return {
         "source":       "USDA FAS PSD",
-        "last_updated": datetime.utcnow().date().isoformat(),
+        "last_updated": _last_updated,
         "markets":      markets,
         "producers":    producers,
     }
@@ -239,9 +253,15 @@ async def run(page, db) -> None:  # noqa: ARG001
             f"VN prod={vn.get('latest_production_mt')} MT "
             f"({len(producers)} countries)"
         )
-        # Persist to DB so export jobs on separate runners can fall back to DB
+        # Persist to DB so export jobs on separate runners can fall back to DB.
+        # pub_date = the real data date (latest Market_Year), and "latest_only"
+        # replaces prior rows so freshness tracks the release, not the run time.
         if db is not None:
             from scraper.db import upsert_news_item
+            try:
+                _pub = datetime.strptime(parsed["last_updated"][:10], "%Y-%m-%d")
+            except Exception:
+                _pub = datetime.utcnow()
             upsert_news_item(db, {
                 "title":    f"USDA PSD Coffee Data – {parsed['last_updated']}",
                 "body":     (
@@ -252,8 +272,9 @@ async def run(page, db) -> None:  # noqa: ARG001
                 "category": "demand",
                 "lat":      0.0,
                 "lng":      0.0,
-                "tags":     ["psd", "demand", "usda"],
+                "tags":     ["psd", "demand", "usda", "latest_only"],
                 "meta":     json.dumps(parsed),
+                "pub_date": _pub,
             })
     except Exception as e:
         print(f"[psd_coffee] FAILED: {e} — retaining cache")

@@ -100,7 +100,7 @@ jobs:
         # still loads sqlalchemy at module-import time.
         run: pip install requests 'xlrd<2.0' openpyxl pdfplumber sqlalchemy psycopg2-binary python-dotenv jinja2
 
-      - name: Pull ICE certified stocks
+      - name: Pull ICE certified stocks (3 attempts)
         if: steps.weekday.outputs.skip != 'true'
         working-directory: backend
         env:
@@ -118,14 +118,20 @@ jobs:
           # Scheduled cron passes no inputs → default to a 3-day catch-up
           # (merge preserves the history). Manual dispatch can override with
           # days_back=180 for the one-off historical backfill.
-          if [ "${{ inputs.mode }}" = "smoke" ]; then
-            python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
-          else
-            # --skip-monthly: daily feeds only; the monthly ageing /
-            # age-allowance reports are pulled by workflow 1.14.
-            python -m scraper.sources.ice_certified_stocks.orchestrate \
-              --days "${{ inputs.days_back || 3 }}" --skip-monthly
-          fi
+          run_scraper() {
+            if [ "${{ inputs.mode }}" = "smoke" ]; then
+              python -m scraper.sources.ice_certified_stocks.orchestrate --smoke
+            else
+              # --skip-monthly: daily feeds only; the monthly ageing /
+              # age-allowance reports are pulled by workflow 1.14.
+              python -m scraper.sources.ice_certified_stocks.orchestrate \
+                --days "${{ inputs.days_back || 3 }}" --skip-monthly
+            fi
+          }
+          for attempt in 1 2 3; do
+            run_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit + push if changed
         if: ${{ steps.weekday.outputs.skip != 'true' && inputs.mode != 'smoke' }}

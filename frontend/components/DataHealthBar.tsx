@@ -28,10 +28,15 @@ const SCRAPER_CONFIGS: ScraperConfig[] = [
   { key: "futures",           label: "Barchart",   thresholdHours:  96 }, // daily M-F (weekend skip)
   { key: "cot",               label: "COT",        thresholdHours: 264 }, // 11d: Fri release of Tue data, worst-case 3+7
   { key: "macro_cot",         label: "Macro COT",  thresholdHours: 264 },
-  { key: "freight",           label: "Freight",    thresholdHours:  96 }, // daily M-F
+  { key: "freight",           label: "Freight",    thresholdHours: 216 }, // Fri+Sun publish, weekly index date (see check-scrapers-freshness.yml)
   // Weather / macro
   { key: "weather",           label: "Weather",    thresholdHours:  72 }, // daily 7-day cron
   { key: "enso",              label: "ENSO",       thresholdHours: 720 }, // monthly
+  { key: "fx_history",        label: "FX",         thresholdHours:  96 }, // Mon-Fri quant-currency-index
+  { key: "quant_currency_index", label: "CCI",     thresholdHours:  96 }, // sibling of fx_history
+  { key: "us_cpi",            label: "US CPI",     thresholdHours: 840 }, // monthly BLS, 35d buffer
+  { key: "retail_cpi",        label: "Retail CPI", thresholdHours: 840 }, // monthly BLS/Eurostat/BCB
+  { key: "origin_prices",     label: "Origin Prices", thresholdHours: 96 }, // accumulator, runs in 1.4
   // Fertilizer
   { key: "fertilizer_wb",     label: "Fert. WB",   thresholdHours: 720 }, // monthly Pink Sheet
   { key: "fertilizer_comex",  label: "Fert. Comex",thresholdHours: 720 }, // monthly
@@ -39,6 +44,9 @@ const SCRAPER_CONFIGS: ScraperConfig[] = [
   { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // bi-monthly
   { key: "psd_coffee",        label: "USDA PSD",   thresholdHours: 2160 }, // ~quarterly (Jan, May, Jun, Dec)
   { key: "ajca",              label: "AJCA",       thresholdHours: 720 }, // monthly
+  { key: "ice_certified_daily",       label: "ICE Cert. Daily",   thresholdHours: 144 }, // Mon-Fri T-1
+  { key: "ice_arabica_ageing",        label: "ICE Arabica Age.",  thresholdHours: 912 }, // monthly, 38d buffer for missed-window
+  { key: "ice_robusta_age_allowance", label: "ICE Robusta Age.",  thresholdHours: 912 },
   // Farmer economics (Brazil)
   { key: "conab_costs",       label: "CONAB Costs",thresholdHours: 720 }, // monthly
   { key: "conab_safra",       label: "CONAB Safra",thresholdHours: 720 }, // monthly safra release
@@ -49,6 +57,7 @@ const SCRAPER_CONFIGS: ScraperConfig[] = [
   { key: "honduras_exports",  label: "HN Exports", thresholdHours:  96 },
   { key: "ethiopia_exports",  label: "ET Exports", thresholdHours:  96 },
   { key: "vietnam_exports",   label: "VN Exports", thresholdHours:  96 },
+  { key: "vietnam_price",     label: "VN Price",   thresholdHours:  96 }, // daily giacaphe domestic survey
   { key: "indonesia_exports", label: "ID Exports", thresholdHours:  96 },
   { key: "uganda_exports",    label: "UG Exports", thresholdHours:  96 },
 ];

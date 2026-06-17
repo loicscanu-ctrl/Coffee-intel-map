@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
 import UgandaCumulativePaceChart from "@/components/supply/uganda/UgandaCumulativePaceChart";
 import UgandaDestinationChart from "@/components/supply/uganda/UgandaDestinationChart";
@@ -117,6 +118,8 @@ export default function UgandaTab() {
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["uganda_exports"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit flex-wrap">
         {SUB_TABS.map(t => (

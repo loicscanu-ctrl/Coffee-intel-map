@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T10:53:02Z",
+  "generated_at": "2026-06-15T12:12:35Z",
   "source_url": "https://attespotcoffee.azurewebsites.net/",
   "snapshots": [
     {
@@ -66,16 +66,44 @@
         "Robusta": 179107
       },
       "bags_total": 567476,
+      "wow": {
+        "prev_date": "2026-06-06",
+        "in_offers": 0,
+        "out_offers": 0,
+        "in_tons": 0,
+        "out_tons": 0,
+        "net_tons": 0,
+        "in_tons_by_type": {},
+        "out_tons_by_type": {}
+      }
+    },
+    {
+      "date": "2026-06-15",
+      "n_offers": 567,
+      "offers_by_type": {
+        "Arabica": 410,
+        "Robusta": 157
+      },
+      "tons_by_type": {
+        "Arabica": 21569.3,
+        "Robusta": 9899.4
+      },
+      "tons_total": 31468.7,
+      "bags_by_type": {
+        "Arabica": 359489,
+        "Robusta": 164989
+      },
+      "bags_total": 524478,
       "_keys": {
-        "Arabica|BRAZIL|Stocklot|450 def.||||Hamburg||IS|minus 35||92,00": {
+        "Arabica|BRAZIL|Stocklot|450 def.||||Hamburg||IS|minus 34||92,00": {
           "type": "Arabica",
           "tons": 92.0
         },
-        "Arabica|BRAZIL|Stocklot|800 def.||||Hamburg||IS|minus 54||340,00": {
+        "Arabica|BRAZIL|Stocklot|800 def.||||Hamburg||IS|minus 49||340,00": {
           "type": "Arabica",
           "tons": 340.0
         },
-        "Arabica|BRAZIL|Stocklot|1500 def.||||Hamburg||IS|minus 99||200,00": {
+        "Arabica|BRAZIL|Stocklot|1500 def.||||Hamburg||IS|minus 89||200,00": {
           "type": "Arabica",
           "tons": 200.0
         },
@@ -95,7 +123,7 @@
           "type": "Arabica",
           "tons": 4.98
         },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2024/25|||Hamburg||FCA|plus 47|1800|": {
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2024/25|||Hamburg||FCA|plus 44|1800|": {
           "type": "Arabica",
           "tons": 108.0
         },
@@ -103,13 +131,21 @@
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|BRAZIL|NY 2/3 17/18|FC|2025/26|||Hamburg||FCA|plus 51|1440|": {
+        "Arabica|BRAZIL|NY 2/3 17/18|FC|2025/26|||Hamburg||FCA|plus 49|1440|": {
           "type": "Arabica",
           "tons": 86.4
         },
-        "Arabica|BRAZIL|Rio Minas|NY 3/4 15/16|2025/26|||Hamburg||FCA|minus 9|200|": {
+        "Arabica|BRAZIL|NY 2/3 17/18|FC|2025/26|RFA||Hamburg||FCA|plus 41|125|": {
+          "type": "Arabica",
+          "tons": 7.5
+        },
+        "Arabica|BRAZIL|Rio Minas|NY 3/4 15/16|2023/24|||Hamburg|Schwarze|FCA|minus 20|200|": {
           "type": "Arabica",
           "tons": 12.0
+        },
+        "Arabica|BRAZIL|Rio Minas|NY 3/4 15/16|2025/26|||Hamburg||FCA|minus 21|360|": {
+          "type": "Arabica",
+          "tons": 21.6
         },
         "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Bremen|Vollers|FCA|minus 33|368|": {
           "type": "Arabica",
@@ -131,11 +167,11 @@
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|||Bremen|Vollers|FCA|plus 47|100|": {
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|||Bremen|Vollers|FCA|plus 44|100|": {
           "type": "Arabica",
           "tons": 6.0
         },
-        "Arabica|BRAZIL|SW MTGB||2024/25|||Antwerp|Commodity Centre|FCA|plus 47|1080|": {
+        "Arabica|BRAZIL|SW MTGB||2024/25|||Antwerp|Commodity Centre|FCA|plus 44|1080|": {
           "type": "Arabica",
           "tons": 64.8
         },
@@ -159,6 +195,10 @@
           "type": "Arabica",
           "tons": 20.0
         },
+        "Arabica|BRAZIL|Rio Minas|15/16|2026|||Koper|Pacorini|FCA|minus 4|325|": {
+          "type": "Arabica",
+          "tons": 19.5
+        },
         "Arabica|BRAZIL|NY 2/3 17/18|FC|2025/26||ETA 24/07|Antwerp|Steinweg|FCA|plus 36|1650|": {
           "type": "Arabica",
           "tons": 99.0
@@ -167,35 +207,27 @@
           "type": "Arabica",
           "tons": 100.0
         },
-        "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26||ETA 24/07|Antwerp|Steinweg|FCA|plus 26|1600|": {
-          "type": "Arabica",
-          "tons": 96.0
-        },
         "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26||ETA 24/07|Antwerp|Steinweg|FCA|plus 26||100,00": {
           "type": "Arabica",
           "tons": 100.0
         },
-        "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26||ETA 31/07|Hamburg|Steinweg|FCA|plus 26||100,00": {
+        "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26||ETA 16/07|Genoa|Pacorini|FCA|plus 26||56,00": {
           "type": "Arabica",
-          "tons": 100.0
+          "tons": 56.0
         },
-        "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26||ETA 16/07|Genoa|Pacorini|FCA|plus 26||100,00": {
-          "type": "Arabica",
-          "tons": 100.0
-        },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26||ETA 24/07|Antwerp|Steinweg|FCA|plus 21|1600|": {
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|||Antwerp|Steinweg|FCA|plus 26|1600|": {
           "type": "Arabica",
           "tons": 96.0
         },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26||ETA 31/07|Hamburg|Steinweg|FCA|plus 21||200,00": {
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26||ETA 29/07|Antwerp|Steinweg|FCA|plus 21|1600|": {
+          "type": "Arabica",
+          "tons": 96.0
+        },
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26||ETA 29/07|Antwerp|Steinweg|FCA|plus 21||200,00": {
           "type": "Arabica",
           "tons": 200.0
         },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26||ETA 24/07|Antwerp|Steinweg|FCA|plus 21||200,00": {
-          "type": "Arabica",
-          "tons": 200.0
-        },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|RFA|ETA 24/07|Antwerp|Steinweg|FCA|plus 29||100,00": {
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|RFA|ETA 24/07|Antwerp|Steinweg|FCA|plus 31||100,00": {
           "type": "Arabica",
           "tons": 100.0
         },
@@ -215,17 +247,9 @@
           "type": "Arabica",
           "tons": 151.6
         },
-        "Arabica|BRAZIL|NY 3/4 MTGB|GC|2025/26|||Vado Ligure|Pacorini|FCA|plus 11||28,00": {
-          "type": "Arabica",
-          "tons": 28.0
-        },
         "Arabica|BRAZIL|Grinder 14up|FC|2025/26|||Antwerp|Steinweg|FCA|minus 29||10,00": {
           "type": "Arabica",
           "tons": 10.0
-        },
-        "Arabica|BRAZIL|Grinder 13up|FC|2025/26|||Antwerp|Pacorini|FCA|minus 34||210,00": {
-          "type": "Arabica",
-          "tons": 210.0
         },
         "Arabica|BRAZIL|Grinder 13up|GC|2025/26|||Hamburg||FCA|minus 44||34,60": {
           "type": "Arabica",
@@ -239,10 +263,6 @@
           "type": "Arabica",
           "tons": 160.0
         },
-        "Arabica|BRAZIL|Rio Minas|15/16|2026|||Koper|Pacorini|FCA|minus 4|325|": {
-          "type": "Arabica",
-          "tons": 19.5
-        },
         "Arabica|BRAZIL|NY 2/3 MTGB|FC|2024/25|||Hamburg|Schwarze|FCA|plus 29||21,50": {
           "type": "Arabica",
           "tons": 21.5
@@ -250,26 +270,6 @@
         "Arabica|BRAZIL|NY 2/3 PB|FC|2024/25|||Hamburg|Schwarze|FCA|plus 26||21,50": {
           "type": "Arabica",
           "tons": 21.5
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Antwerp|Pacorini|FCA|minus 41||62,10": {
-          "type": "Arabica",
-          "tons": 62.1
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|||France||FCA|minus 54||46,00": {
-          "type": "Arabica",
-          "tons": 46.0
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|||France||FCA|minus 54||200,00": {
-          "type": "Arabica",
-          "tons": 200.0
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|||France||FCA|minus 52||12,00": {
-          "type": "Arabica",
-          "tons": 12.0
-        },
-        "Arabica|BRAZIL|SW NY 2/3 15up|FC|2025/26|||Antwerp||FCA|plus 21|575|": {
-          "type": "Arabica",
-          "tons": 34.5
         },
         "Arabica|BRAZIL|NY 2/3 17/18|GC|2025/26|RFA||Bremen||FCA|plus 16||432,00": {
           "type": "Arabica",
@@ -279,15 +279,19 @@
           "type": "Arabica",
           "tons": 432.0
         },
-        "Arabica|BRAZIL|NY 3/4 MTGB|GC|2025/26|RFA||Bremen||FCA|plus 6||108,00": {
+        "Arabica|BRAZIL|NY 3/4 MTGB|GC|2025/26|RFA||Bremen||FCA|plus 8||108,00": {
           "type": "Arabica",
           "tons": 108.0
         },
-        "Arabica|BRAZIL|Grinder 13up|GC|2025/26|RFA||Bremen||FCA|minus 29||285,00": {
+        "Arabica|BRAZIL|NY 4/5 MTGB|GC|2025/26|||Bremen||FCA|plus 4||64,80": {
+          "type": "Arabica",
+          "tons": 64.8
+        },
+        "Arabica|BRAZIL|Grinder 13up|GC|2025/26|RFA||Bremen||FCA|minus 34||285,00": {
           "type": "Arabica",
           "tons": 285.0
         },
-        "Arabica|BRAZIL|Grinder 13up|GC|2025/26|||Bremen||FCA|minus 34||216,00": {
+        "Arabica|BRAZIL|Grinder 13up|GC|2025/26|||Bremen||FCA|minus 39||216,00": {
           "type": "Arabica",
           "tons": 216.0
         },
@@ -299,13 +303,13 @@
           "type": "Arabica",
           "tons": 216.0
         },
-        "Arabica|BRAZIL|NY 3/4 MTGB|GC|2025/26|RFA||Bremen||FCA|plus 6||216,00": {
-          "type": "Arabica",
-          "tons": 216.0
-        },
         "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Le Havre|Sealogis|FCA|minus 14||14,00": {
           "type": "Arabica",
           "tons": 14.0
+        },
+        "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Antwerp|Pacorini|FCA|minus 41||62,10": {
+          "type": "Arabica",
+          "tons": 62.1
         },
         "Arabica|BRAZIL|Grinder 13up|GC||RFA||Antwerp||IS|minus 14||43,20": {
           "type": "Arabica",
@@ -331,26 +335,6 @@
           "type": "Arabica",
           "tons": 9.0
         },
-        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|||Antwerp|Pacorini|FCA|plus 39||43,20": {
-          "type": "Arabica",
-          "tons": 43.2
-        },
-        "Arabica|BRAZIL|Grinder 13up|GC|2025/26|RFA||Antwerp|Vollers|FCA|minus 16||39,60": {
-          "type": "Arabica",
-          "tons": 39.6
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|RFA||Antwerp|Pacorini|FCA|minus 19||61,20": {
-          "type": "Arabica",
-          "tons": 61.2
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Antwerp|Pacorini|FCA|minus 27||19,40": {
-          "type": "Arabica",
-          "tons": 19.4
-        },
-        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|||Barcelona|Masiques|FCA|minus 41||20,40": {
-          "type": "Arabica",
-          "tons": 20.4
-        },
         "Arabica|BRAZIL|Grinder 12up|GC|2024/25|RFA||Antwerp||FCA|minus 35||29,00": {
           "type": "Arabica",
           "tons": 29.0
@@ -375,6 +359,18 @@
           "type": "Arabica",
           "tons": 9.0
         },
+        "Arabica|BRAZIL|NY 2/3 MTGB|FC|2025/26|||Antwerp|Pacorini|FCA|plus 39||43,20": {
+          "type": "Arabica",
+          "tons": 43.2
+        },
+        "Arabica|BRAZIL|Grinder 12up|GC|2024/25|||Antwerp|Pacorini|FCA|minus 27||19,40": {
+          "type": "Arabica",
+          "tons": 19.4
+        },
+        "Arabica|BRAZIL|Grinder 12up|GC|2025/26|||Barcelona|Masiques|FCA|minus 41||20,40": {
+          "type": "Arabica",
+          "tons": 20.4
+        },
         "Arabica|BRAZIL|NY 2 16up|FC|||Cerrado|Hamburg||FCA|plus 72|100|": {
           "type": "Arabica",
           "tons": 6.0
@@ -387,19 +383,23 @@
           "type": "Arabica",
           "tons": 46.0
         },
-        "Arabica|BRAZIL|Grinder 12up|GC|||cleared|Hamburg|Kala|FCA|minus 54||86,00": {
+        "Arabica|BRAZIL|Grinder 12up|GC|||cleared|Hamburg|Kala|FCA|minus 50||86,00": {
           "type": "Arabica",
           "tons": 86.0
         },
-        "Arabica|BRAZIL|NY 3/4 PB|GC||||Bremen|J.MW|FCA|plus 13||21,60": {
+        "Arabica|BRAZIL|NY 3/4 PB|GC||||Bremen|J.MW|FCA|plus 9||21,60": {
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|BRAZIL|Grinder 12up|GC|||cleared|Antwerp|Molenberg|FCA|minus 37||61,20": {
+        "Arabica|BRAZIL|Grinder 12up|GC||RFA|cleared|Antwerp|Molenberg|FCA|minus 41||61,20": {
           "type": "Arabica",
           "tons": 61.2
         },
-        "Arabica|BRAZIL|NY 2/3 PB|FC|||cleared|Hamburg|Schwarze|FCA|plus 21||43,20": {
+        "Arabica|BRAZIL|NY 2/3 17/18|FC|||cleared|Hamburg|Schwarze|FCA|plus 25||21,60": {
+          "type": "Arabica",
+          "tons": 21.6
+        },
+        "Arabica|BRAZIL|NY 2/3 PB|FC|||cleared|Hamburg|Schwarze|FCA|plus 17||43,20": {
           "type": "Arabica",
           "tons": 43.2
         },
@@ -439,6 +439,10 @@
           "type": "Arabica",
           "tons": 5.1
         },
+        "Arabica|BURUNDI|15up|FW|2024/25|RFA||Antwerp|Vollers|FCA|plus 21|161|": {
+          "type": "Arabica",
+          "tons": 9.66
+        },
         "Arabica|BURUNDI|15||2025/26|||Hamburg||FCA|plus 23||17,00": {
           "type": "Arabica",
           "tons": 17.0
@@ -446,14 +450,6 @@
         "Arabica|BURUNDI|15||2025/26|||Antwerp||FCA|plus 22||17,00": {
           "type": "Arabica",
           "tons": 17.0
-        },
-        "Arabica|BURUNDI|15up|FW|2025/26|RFA||Antwerp|Vollers|FCA|plus 46||21,00": {
-          "type": "Arabica",
-          "tons": 21.0
-        },
-        "Arabica|BURUNDI|15up|FW|2024/25|RFA||Antwerp|Vollers|FCA|plus 21|161|": {
-          "type": "Arabica",
-          "tons": 9.66
         },
         "Arabica|BURUNDI|A|FW||||Middelburg||IS|plus 67|300|": {
           "type": "Arabica",
@@ -463,49 +459,37 @@
           "type": "Arabica",
           "tons": 20.4
         },
-        "Arabica|BURUNDI|14up|FW|2024/25|RFA||Antwerp||IS|plus 1|166|": {
+        "Arabica|BURUNDI|14up|FW|2024/25|RFA||Antwerp||IS|plus 2|156|": {
           "type": "Arabica",
-          "tons": 9.96
+          "tons": 9.36
         },
-        "Arabica|BURUNDI|15up|FW|2025/26|RFA||Antwerp||CIF|plus 52|2512|": {
+        "Arabica|BURUNDI|15up|FW|2025/26|RFA||Antwerp||CIF|plus 69|589|": {
           "type": "Arabica",
-          "tons": 150.72
+          "tons": 35.34
         },
-        "Arabica|BURUNDI|Stocklot|UW|2024/25|RFA||Antwerp||IS|plus 46|205|": {
+        "Arabica|BURUNDI|Stocklot|UW|2024/25|RFA||Antwerp||IS|plus 47|205|": {
           "type": "Arabica",
           "tons": 12.3
-        },
-        "Arabica|BURUNDI|14up|FW|2025/26|RFA||Antwerp||CIF|plus 39|320|": {
-          "type": "Arabica",
-          "tons": 19.2
         },
         "Arabica|BURUNDI|C/PB||2025/26|RFA||Antwerp||CIF|plus 26|327|": {
           "type": "Arabica",
           "tons": 19.62
         },
-        "Arabica|CHINA|Gr.2|W|2025/26||ETA 18/07|Antwerp||CIF|minus 19|320|": {
+        "Arabica|CHINA|Gr.2|W|2025/26||ETA 01/08|Antwerp||CIF|minus 19|320|": {
           "type": "Arabica",
           "tons": 19.2
         },
-        "Arabica|CHINA|Gr.1|Simao|2025/26|RFA||Hamburg||FCA|plus 29|1440|": {
+        "Arabica|CHINA|Gr.1|Simao|2025/26|RFA|ETA 28/06|Hamburg||CFR|plus 27|1440|": {
           "type": "Arabica",
           "tons": 86.4
+        },
+        "Arabica|COLOMBIA|Excelso|EP10|2025/26|FTO||Antwerp||FCA|plus 143||21,00": {
+          "type": "Arabica",
+          "tons": 21.0
         },
         "Arabica|COLOMBIA|Excelso|EP10||RFA||Antwerp||FOB|plus 83|139|": {
           "type": "Arabica",
           "tons": 8.34
-        },
-        "Arabica|COLOMBIA|UGQ|decaf|2016/17|||Hamburg|Schwarze|FCA|minus 18||10,70": {
-          "type": "Arabica",
-          "tons": 10.7
-        },
-        "Arabica|COLOMBIA|Supremo|18|2025/26||ETA 10/06|Antwerp|Pacorini|FCA|plus 84|275|": {
-          "type": "Arabica",
-          "tons": 16.5
-        },
-        "Arabica|COLOMBIA|UGQ||2025/26|||Hamburg|Vollers|FCA|plus 66||76,00": {
-          "type": "Arabica",
-          "tons": 76.0
         },
         "Arabica|COLOMBIA|Excelso|||ORG||Antwerp||IS|plus 96|275|": {
           "type": "Arabica",
@@ -531,7 +515,7 @@
           "type": "Arabica",
           "tons": 20.0
         },
-        "Arabica|COLOMBIA|UGQ||2025/26|||Antwerp||FCA|plus 36||42,00": {
+        "Arabica|COLOMBIA|UGQ||2025/26|||Antwerp||FCA|plus 61||42,00": {
           "type": "Arabica",
           "tons": 42.0
         },
@@ -539,15 +523,15 @@
           "type": "Arabica",
           "tons": 6.0
         },
+        "Arabica|CONGO|Kivu|Gr.4|2023/24|||Le Havre|Sealogis|FCA|plus 21|320|": {
+          "type": "Arabica",
+          "tons": 19.2
+        },
         "Arabica|CONGO|Kivu|Gr.7||RFA||Antwerp||IS|minus 19||43,20": {
           "type": "Arabica",
           "tons": 43.2
         },
         "Arabica|CONGO|Kivu|Gr.7||RFA + ORG||Antwerp||IS|minus 4|320|": {
-          "type": "Arabica",
-          "tons": 19.2
-        },
-        "Arabica|CONGO|Kivu|Gr.4|2023/24|||Le Havre|Sealogis|FCA|plus 21|320|": {
           "type": "Arabica",
           "tons": 19.2
         },
@@ -563,10 +547,6 @@
           "type": "Arabica",
           "tons": 9.0
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5||||Antwerp||IS|plus 6|320|": {
-          "type": "Arabica",
-          "tons": 19.2
-        },
         "Arabica|ETHIOPIA|Djimmah|Gr.5||RFA||Antwerp||IS|plus 26|320|": {
           "type": "Arabica",
           "tons": 19.2
@@ -579,29 +559,25 @@
           "type": "Arabica",
           "tons": 21.0
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2023/24|RFA||Hamburg||IS|plus 7|1596|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.4|2024/25|||Antwerp|Vollers|FCA|minus 5|74|": {
           "type": "Arabica",
-          "tons": 95.76
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2024/25|RFA||Hamburg||IS|plus 9|320|": {
-          "type": "Arabica",
-          "tons": 19.2
-        },
-        "Arabica|ETHIOPIA|Lekempti|Gr.4|2024/25|||Hamburg||IS|plus 2|160|": {
-          "type": "Arabica",
-          "tons": 9.6
-        },
-        "Arabica|ETHIOPIA|Lekempti|Gr.4|2023/24|RFA||Hamburg||IS|plus 10|320|": {
-          "type": "Arabica",
-          "tons": 19.2
-        },
-        "Arabica|ETHIOPIA|Limu|Gr.2|2023/24|||Hamburg||IS|plus 33|320|": {
-          "type": "Arabica",
-          "tons": 19.2
+          "tons": 4.44
         },
         "Arabica|ETHIOPIA|Yirgacheffe|Gr.4|2024/25|RFA + ORG||Hamburg|Vollers|FCA|plus 72||53,70": {
           "type": "Arabica",
           "tons": 53.7
+        },
+        "Arabica|ETHIOPIA|Lekempti|Gr.4|2024/25|||Bremen|J.MW|FCA|minus 7,5||7,50": {
+          "type": "Arabica",
+          "tons": 7.5
+        },
+        "Arabica|ETHIOPIA|Stocklot|UW|2025|||Antwerp|Molenberg|IS|plus 21||19,00": {
+          "type": "Arabica",
+          "tons": 19.0
+        },
+        "Arabica|ETHIOPIA|Sidamo|UG|2025/26||ETA 14/07|Antwerp|Pacorini|FCA|plus 46|1280|": {
+          "type": "Arabica",
+          "tons": 76.8
         },
         "Arabica|ETHIOPIA|Lekempti|Gr.4|2025/26|||Antwerp|Steinweg|FCA|plus 11|1280|": {
           "type": "Arabica",
@@ -623,91 +599,71 @@
           "type": "Arabica",
           "tons": 247.0
         },
-        "Arabica|ETHIOPIA|Stocklot|UW|2025|||Antwerp|Molenberg|IS|plus 21||19,00": {
-          "type": "Arabica",
-          "tons": 19.0
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.4|2024/25|||Antwerp|Vollers|FCA|minus 5|74|": {
-          "type": "Arabica",
-          "tons": 4.44
-        },
-        "Arabica|ETHIOPIA|Lekempti|Gr.4|2024/25|||Bremen|J.MW|FCA|minus 7,5||7,50": {
-          "type": "Arabica",
-          "tons": 7.5
-        },
-        "Arabica|ETHIOPIA|Sidamo|Gr.4|2025/26|||Le Havre||IS|plus 22|29|": {
+        "Arabica|ETHIOPIA|Sidamo|Gr.4|2025/26|||Le Havre|Sealogis|IS|plus 25|29|": {
           "type": "Arabica",
           "tons": 1.74
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.4|2025/26||ETA 28/06|Le Havre||CIF|plus 6|1280|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.4|2025/26||ETA 19/06|Le Havre||CIF|plus 6|1280|": {
           "type": "Arabica",
           "tons": 76.8
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.4|2025/26|ORG||Le Havre||IS|plus 41||60,00": {
+          "type": "Arabica",
+          "tons": 60.0
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2025/26|RFA + ORG||Hamburg|Schwarze|IS|plus 36|1600|": {
+          "type": "Arabica",
+          "tons": 96.0
+        },
+        "Arabica|ETHIOPIA|Lekempti|Gr.5|2026|ORG|ETA 24/06|Hamburg||CIF|plus 26|1280|": {
+          "type": "Arabica",
+          "tons": 76.8
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 22/06|Hamburg||CIF|plus 26|640|": {
+          "type": "Arabica",
+          "tons": 38.4
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 24/06|Hamburg||CIF|plus 26|1280|": {
+          "type": "Arabica",
+          "tons": 76.8
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 24/06|Hamburg||CIF|plus 26|1920|": {
+          "type": "Arabica",
+          "tons": 115.2
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 06/07|Hamburg||CIF|plus 26|640|": {
+          "type": "Arabica",
+          "tons": 38.4
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG||Hamburg||CIF|plus 26|640|": {
+          "type": "Arabica",
+          "tons": 38.4
         },
         "Arabica|ETHIOPIA|Djimmah|Gr.4||||Genoa||IS|plus 11|320|": {
           "type": "Arabica",
           "tons": 19.2
         },
-        "Arabica|ETHIOPIA|Guji|Gr.2|2026|RFA + ORG|ETA 01/07|Hamburg||CIF|plus 158|1280|": {
-          "type": "Arabica",
-          "tons": 76.8
-        },
-        "Arabica|ETHIOPIA|Guji|Gr.2|2026|RFA + ORG|ETA 02/07|Hamburg||CIF|plus 158|960|": {
-          "type": "Arabica",
-          "tons": 57.6
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG||Hamburg|Schwarze|FCA|plus 26|960|": {
-          "type": "Arabica",
-          "tons": 57.6
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 27/06|Hamburg||CIF|plus 21|1280|": {
-          "type": "Arabica",
-          "tons": 76.8
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 27/06|Hamburg||CIF|plus 21|640|": {
-          "type": "Arabica",
-          "tons": 38.4
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 01/07|Hamburg||CIF|plus 21|3200|": {
-          "type": "Arabica",
-          "tons": 192.0
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 04/07|Hamburg||CIF|plus 21|1280|": {
-          "type": "Arabica",
-          "tons": 76.8
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 01/07|Hamburg||CIF|plus 21|1920|": {
-          "type": "Arabica",
-          "tons": 115.2
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|RFA + ORG|ETA 01/07|Hamburg||CIF|plus 21|1280|": {
-          "type": "Arabica",
-          "tons": 76.8
-        },
         "Arabica|ETHIOPIA|Limu|Gr.1||FTO||Antwerp||FCA|plus 264|320|": {
           "type": "Arabica",
           "tons": 19.2
         },
-        "Arabica|ETHIOPIA|Yirgacheffe|Gr.1||RFA||Tillbury||FCA|plus 211|160|": {
-          "type": "Arabica",
-          "tons": 9.6
-        },
-        "Arabica|ETHIOPIA|Yirgacheffe|Gr.2||RFA||Tillbury||FCA|plus 180|60|": {
+        "Arabica|ETHIOPIA|Yirgacheffe|Gr.1||RFA||Tillbury||FCA|plus 231|60|": {
           "type": "Arabica",
           "tons": 3.6
         },
-        "Arabica|ETHIOPIA|Yirgacheffe|Gr.2||RFA||Antwerp||FCA|plus 180|40|": {
+        "Arabica|ETHIOPIA|Yirgacheffe|Gr.2||RFA||Tillbury||FCA|plus 186|60|": {
           "type": "Arabica",
-          "tons": 2.4
+          "tons": 3.6
         },
-        "Arabica|ETHIOPIA|Sidamo|Gr.2||||Tillbury||FCA|plus 174|210|": {
+        "Arabica|ETHIOPIA|Sidamo|Gr.2||||Tillbury||FCA|plus 165|210|": {
           "type": "Arabica",
           "tons": 12.6
         },
-        "Arabica|ETHIOPIA|Limu|Gr.4||RFA + ORG|ETA 06/06|Antwerp||FOB|plus 42|320|": {
+        "Arabica|ETHIOPIA|Limu|Gr.4||RFA + ORG|ETA 06/06|Antwerp||FOB|plus 47|320|": {
           "type": "Arabica",
           "tons": 19.2
         },
-        "Arabica|ETHIOPIA|Yirgacheffe|Gr.5||RFA + ORG|ETA 06/07|Antwerp||FOB|plus 62|640|": {
+        "Arabica|ETHIOPIA|Yirgacheffe|Gr.5||RFA + ORG|ETA 06/07|Antwerp||FOB|plus 65|640|": {
           "type": "Arabica",
           "tons": 38.4
         },
@@ -727,33 +683,29 @@
           "type": "Arabica",
           "tons": 110.7
         },
-        "Arabica|ETHIOPIA|Lekempti|Gr.5|2026|ORG|ETA 01/07|Hamburg||CIF|plus 21|3200|": {
+        "Arabica|ETHIOPIA|Lekempti|Gr.5|2026|||Bremen||FCA|plus 11|155|": {
           "type": "Arabica",
-          "tons": 192.0
+          "tons": 9.3
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 14/07|Antwerp||CIF|plus 6|1280|": {
+        "Arabica|ETHIOPIA|Lekempti|Gr.5|2026||ETA 02/07|Bremen||FCA|plus 11|320|": {
           "type": "Arabica",
-          "tons": 76.8
+          "tons": 19.2
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 14/07|Trieste||CIF|plus 6|1280|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026|||Antwerp||FCA|plus 11|960|": {
           "type": "Arabica",
-          "tons": 76.8
+          "tons": 57.6
         },
-        "Arabica|ETHIOPIA|Lekempti|Gr.5|2026||ETA 02/07|Bremen||CIF|plus 1|3200|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 12/07|Hamburg||CIF|plus 7|1600|": {
           "type": "Arabica",
-          "tons": 192.0
+          "tons": 96.0
         },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 07/06|Antwerp||CIF|plus 1|1920|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 15/07|Antwerp||CIF|plus 7|1920|": {
           "type": "Arabica",
           "tons": 115.2
         },
-        "Arabica|ETHIOPIA|Decaf|Guji Gr.3|||Co2|Hamburg||FCA|plus 245|1100|": {
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026||ETA 08/07|Trieste||CIF|plus 7|1280|": {
           "type": "Arabica",
-          "tons": 66.0
-        },
-        "Arabica|ETHIOPIA|Djimmah|Gr.5||||Le Havre||FCA|plus 3|1690|": {
-          "type": "Arabica",
-          "tons": 101.4
+          "tons": 76.8
         },
         "Arabica|ETHIOPIA|Lekempti|Gr.5|past|||Bremen|Vollers|FCA|cts/lb 293|300|": {
           "type": "Arabica",
@@ -763,17 +715,37 @@
           "type": "Arabica",
           "tons": 120.0
         },
+        "Arabica|ETHIOPIA|Decaf|Guji Gr.3|||Co2|Hamburg||FCA|plus 245|1100|": {
+          "type": "Arabica",
+          "tons": 66.0
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5||||Le Havre||FCA|plus 3|1690|": {
+          "type": "Arabica",
+          "tons": 101.4
+        },
         "Arabica|ETHIOPIA|Djimmah|Gr.5||||Le Havre||IS|minus 7,5|960|": {
           "type": "Arabica",
           "tons": 57.6
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026/27||ETA 16/06|Hamburg||CFR|plus 6||86,40": {
+          "type": "Arabica",
+          "tons": 86.4
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026/27||ETA 28/06|Hamburg||CFR|plus 11||86,40": {
+          "type": "Arabica",
+          "tons": 86.4
+        },
+        "Arabica|ETHIOPIA|Djimmah|Gr.5|2026/27||ETA 07/07|Hamburg||CFR|plus 11||129,60": {
+          "type": "Arabica",
+          "tons": 129.6
         },
         "Arabica|GUATEMALA|SHB|EP||RFA||Bremen|J.MW|FCA|plus 75||62,70": {
           "type": "Arabica",
           "tons": 62.7
         },
-        "Arabica|GUATEMALA|SHB|||RFA|Huehuetenango|Antwerp||FOB|plus 83|75|": {
+        "Arabica|GUATEMALA|SHB|||RFA|Huehuetenango|Antwerp||FOB|plus 83|74|": {
           "type": "Arabica",
-          "tons": 4.5
+          "tons": 4.44
         },
         "Arabica|GUATEMALA|SHB|EP||RFA||Antwerp||FOB|plus 82|100|": {
           "type": "Arabica",
@@ -783,15 +755,15 @@
           "type": "Arabica",
           "tons": 2.4
         },
-        "Arabica|GUATEMALA|SHB|EP|2025/26|||Hamburg||FCA|plus 76|325|": {
-          "type": "Arabica",
-          "tons": 19.5
-        },
         "Arabica|GUATEMALA|SHB|EP|2025/26|RFA||Hamburg||FCA|plus 88|150|": {
           "type": "Arabica",
           "tons": 9.0
         },
-        "Arabica|GUATEMALA|Stocklot|800 def.|2025/26|RFA||Antwerp||FCA|minus 64||120,00": {
+        "Arabica|GUATEMALA|SHB|EP|2025/26|||Antwerp|Steinweg|IS|plus 66|1100|": {
+          "type": "Arabica",
+          "tons": 66.0
+        },
+        "Arabica|GUATEMALA|Stocklot|800 def.|2025/26|RFA||Antwerp||FCA|minus 69||120,00": {
           "type": "Arabica",
           "tons": 120.0
         },
@@ -831,14 +803,6 @@
           "type": "Arabica",
           "tons": 20.7
         },
-        "Arabica|HONDURAS|HG||2024/25|RFA||Antwerp|Vollers|FCA|plus 26|235|": {
-          "type": "Arabica",
-          "tons": 14.1
-        },
-        "Arabica|HONDURAS|HG||2025/26|||Antwerp|Vollers|FCA|plus 22||12,10": {
-          "type": "Arabica",
-          "tons": 12.1
-        },
         "Arabica|HONDURAS|Stocklot|300 def.|2025/26|RFA||Antwerp||FCA|minus 19||17,00": {
           "type": "Arabica",
           "tons": 17.0
@@ -855,9 +819,61 @@
           "type": "Arabica",
           "tons": 207.0
         },
-        "Arabica|HONDURAS|SHG|EP|2025/26|FTO||Bremen|J.MW|FCA|plus 87|300|": {
+        "Arabica|HONDURAS|HG||2024/25|RFA||Antwerp|Vollers|FCA|plus 26|235|": {
           "type": "Arabica",
-          "tons": 18.0
+          "tons": 14.1
+        },
+        "Arabica|HONDURAS|HG||2025/26|||Antwerp|Vollers|FCA|plus 22||12,10": {
+          "type": "Arabica",
+          "tons": 12.1
+        },
+        "Arabica|HONDURAS|SHG||2025/26|RFA + ORG||Antwerp||IS|plus 63|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|HONDURAS|SHG|EP|2025/26||ETD 07/07|Hamburg||CIF|plus 40||41,00": {
+          "type": "Arabica",
+          "tons": 41.0
+        },
+        "Arabica|HONDURAS|Stocklot|300 def.|2025/26|RFA||Hamburg||IS|minus 15|825|": {
+          "type": "Arabica",
+          "tons": 49.5
+        },
+        "Arabica|HONDURAS|HG|23 def.|2025/26|||Hamburg|Schwarze|FCA|plus 26|235|": {
+          "type": "Arabica",
+          "tons": 14.1
+        },
+        "Arabica|HONDURAS|Stocklot||2016/17|||Hamburg|Schwarze|FCA|minus 48||15,30": {
+          "type": "Arabica",
+          "tons": 15.3
+        },
+        "Arabica|HONDURAS|Stocklot||2016/17|||Hamburg|Schwarze|FCA|minus 48||17,20": {
+          "type": "Arabica",
+          "tons": 17.2
+        },
+        "Arabica|HONDURAS|SHG|EP||||Genoa||IS|plus 31||10,00": {
+          "type": "Arabica",
+          "tons": 10.0
+        },
+        "Arabica|HONDURAS|HG|EP|||ETA 08/06|Trieste||CIF|plus 27||15,70": {
+          "type": "Arabica",
+          "tons": 15.7
+        },
+        "Arabica|HONDURAS|Stocklot|300 def.||||Hamburg||IS|minus 29||75,00": {
+          "type": "Arabica",
+          "tons": 75.0
+        },
+        "Arabica|HONDURAS|Stocklot|300 def.||||Antwerp||IS|minus 29|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|HONDURAS|Stocklot|1000 def.||||Antwerp||IS|minus 93||53,00": {
+          "type": "Arabica",
+          "tons": 53.0
+        },
+        "Arabica|HONDURAS|SHG|EP|2025/26|FTO||Antwerp||FCA|plus 86||21,00": {
+          "type": "Arabica",
+          "tons": 21.0
         },
         "Arabica|HONDURAS|SHG||2025/26|RFA||Tillbury||FCA|plus 63|275|": {
           "type": "Arabica",
@@ -866,6 +882,18 @@
         "Arabica|HONDURAS|SHG||2025/26|RFA||Antwerp||FCA|plus 61||20,70": {
           "type": "Arabica",
           "tons": 20.7
+        },
+        "Arabica|HONDURAS|Stocklot|500 def.|2025/26|||Hamburg||IS|minus 23||45,00": {
+          "type": "Arabica",
+          "tons": 45.0
+        },
+        "Arabica|HONDURAS|Stocklot|300 def.||RFA||Hamburg||IS|minus 24||17,00": {
+          "type": "Arabica",
+          "tons": 17.0
+        },
+        "Arabica|HONDURAS|Stocklot|500 def.||||Hamburg||FOB|minus 44||27,00": {
+          "type": "Arabica",
+          "tons": 27.0
         },
         "Arabica|VIETNAM|Gr.1 16|||||Antwerp||IS|plus 26|300|": {
           "type": "Arabica",
@@ -891,65 +919,21 @@
           "type": "Arabica",
           "tons": 60.0
         },
-        "Arabica|HONDURAS|Stocklot|500 def.|2025/26|||Hamburg||IS|minus 23||45,00": {
-          "type": "Arabica",
-          "tons": 45.0
-        },
-        "Arabica|HONDURAS|SHG|EP||||Genoa||IS|plus 31||10,00": {
-          "type": "Arabica",
-          "tons": 10.0
-        },
-        "Arabica|HONDURAS|HG|EP|||ETA 08/06|Trieste||CIF|plus 27||15,70": {
-          "type": "Arabica",
-          "tons": 15.7
-        },
-        "Arabica|HONDURAS|SHG||2025/26|RFA + ORG||Antwerp||IS|plus 63|275|": {
-          "type": "Arabica",
-          "tons": 16.5
-        },
-        "Arabica|HONDURAS|SHG|EP|2025/26||ETD 13/06|Hamburg||CIF|plus 40||41,00": {
-          "type": "Arabica",
-          "tons": 41.0
-        },
-        "Arabica|HONDURAS|Stocklot|300 def.|2025/26|RFA|ETA 29/05|Hamburg||CIF|minus 20|825|": {
-          "type": "Arabica",
-          "tons": 49.5
-        },
-        "Arabica|HONDURAS|Stocklot|300 def.||||Hamburg||IS|minus 29||75,00": {
-          "type": "Arabica",
-          "tons": 75.0
-        },
-        "Arabica|HONDURAS|Stocklot|300 def.||||Antwerp||IS|minus 29|275|": {
-          "type": "Arabica",
-          "tons": 16.5
-        },
-        "Arabica|HONDURAS|Stocklot|1000 def.||||Antwerp||IS|minus 93||53,00": {
-          "type": "Arabica",
-          "tons": 53.0
-        },
-        "Arabica|HONDURAS|HG|23 def.|2025/26|||Hamburg|Schwarze|FCA|plus 26|235|": {
-          "type": "Arabica",
-          "tons": 14.1
-        },
-        "Arabica|HONDURAS|Stocklot||2016/17|||Hamburg|Schwarze|FCA|minus 48||15,30": {
-          "type": "Arabica",
-          "tons": 15.3
-        },
-        "Arabica|HONDURAS|Stocklot||2016/17|||Hamburg|Schwarze|FCA|minus 48||17,20": {
-          "type": "Arabica",
-          "tons": 17.2
-        },
-        "Arabica|HONDURAS|Stocklot|300 def.||RFA||Hamburg||IS|minus 24||68,00": {
-          "type": "Arabica",
-          "tons": 68.0
-        },
         "Arabica|HONDURAS|Stocklot|90 def.|2025/26|FTO||Antwerp||IS|plus 66|550|": {
           "type": "Arabica",
           "tons": 33.0
         },
-        "Arabica|HONDURAS|SHG|EP|2025/26|FT||Antwerp||IS|plus 51|550|": {
+        "Arabica|HONDURAS|SHG|EP|2025/26|FT||Antwerp||IS|plus 51|825|": {
           "type": "Arabica",
-          "tons": 33.0
+          "tons": 49.5
+        },
+        "Arabica|HONDURAS|SHG|EP|2025/26|||Antwerp|Pacorini|FCA|plus 33||20,70": {
+          "type": "Arabica",
+          "tons": 20.7
+        },
+        "Arabica|HONDURAS|Stocklot|450 def.|2024/25|||Antwerp|Pacorini|FCA|minus 41||40,30": {
+          "type": "Arabica",
+          "tons": 40.3
         },
         "Arabica|HONDURAS|HG||2025/26|||Antwerp||FCA|plus 25||120,00": {
           "type": "Arabica",
@@ -958,18 +942,6 @@
         "Arabica|HONDURAS|Stocklot||2023/24|||Bremen||FCA|minus 77||14,00": {
           "type": "Arabica",
           "tons": 14.0
-        },
-        "Arabica|HONDURAS|SHG|EP|2025/26|||Antwerp|Pacorini|FCA|plus 33||20,70": {
-          "type": "Arabica",
-          "tons": 20.7
-        },
-        "Arabica|HONDURAS|Stocklot|450 def.|2025/26|RFA||Antwerp|Pacorini|FCA|minus 27||20,70": {
-          "type": "Arabica",
-          "tons": 20.7
-        },
-        "Arabica|HONDURAS|Stocklot|450 def.|2024/25|||Antwerp|Pacorini|FCA|minus 41||40,30": {
-          "type": "Arabica",
-          "tons": 40.3
         },
         "Arabica|INDIA|Plantation|B|2023/24|||Hamburg||FCA|plus 23||107,00": {
           "type": "Arabica",
@@ -1007,14 +979,6 @@
           "type": "Arabica",
           "tons": 16.2
         },
-        "Arabica|INDIA|Plantation|B|2026|||Antwerp|Pacorini|FCA|plus 16|1600|": {
-          "type": "Arabica",
-          "tons": 96.0
-        },
-        "Arabica|INDIA|Cherry|AB|2026|RFA|polished|Hamburg||FCA|plus 6|1080|": {
-          "type": "Arabica",
-          "tons": 64.8
-        },
         "Arabica|INDIA|Cherry|A||||Genoa||CIF|plus 3||20,00": {
           "type": "Arabica",
           "tons": 20.0
@@ -1031,9 +995,13 @@
           "type": "Arabica",
           "tons": 20.0
         },
-        "Arabica|INDIA|Plantation|AA|2025/26|||Antwerp|Vollers|FCA|plus 36||20,00": {
+        "Arabica|INDIA|Plantation|B|2025|||Antwerp|4Stox|FCA|plus 16|1600|": {
           "type": "Arabica",
-          "tons": 20.0
+          "tons": 96.0
+        },
+        "Arabica|INDIA|Cherry|AB|2026|RFA|polished|Hamburg||FCA|plus 6|1080|": {
+          "type": "Arabica",
+          "tons": 64.8
         },
         "Arabica|INDIA|Monsoon Malabar||2025|||Antwerp|Molenberg|IS|plus 31||13,00": {
           "type": "Arabica",
@@ -1042,6 +1010,18 @@
         "Arabica|INDIA|Plantation|B|2024/25|||Antwerp|Pacorini|FCA|plus 16|640|": {
           "type": "Arabica",
           "tons": 38.4
+        },
+        "Arabica|INDIA|Plantation|AA|2025/26|||Antwerp|Vollers|FCA|plus 36||20,00": {
+          "type": "Arabica",
+          "tons": 20.0
+        },
+        "Arabica|INDIA|Plantation|B|2025/26|||Antwerp||FCA|plus 16||112,80": {
+          "type": "Arabica",
+          "tons": 112.8
+        },
+        "Arabica|INDIA|Plantation|C|2025/26|RFA|ETA 16/06|Bremen||CIF|plus 21||86,40": {
+          "type": "Arabica",
+          "tons": 86.4
         },
         "Arabica|INDIA|Plantation|AA|||ETA 06/06|Antwerp||IS|plus 61|300|": {
           "type": "Arabica",
@@ -1059,14 +1039,6 @@
           "type": "Arabica",
           "tons": 16.2
         },
-        "Arabica|INDIA|Plantation|B|2025/26|||Antwerp||FCA|plus 16||112,80": {
-          "type": "Arabica",
-          "tons": 112.8
-        },
-        "Arabica|INDIA|Plantation|C|2025/26|RFA|AFLOAT|Bremen||CIF|plus 21||86,40": {
-          "type": "Arabica",
-          "tons": 86.4
-        },
         "Arabica|INDONESIA|Mandheling|Gr.1||||Middelburg||IS|USD/mt 9875|100|": {
           "type": "Arabica",
           "tons": 6.0
@@ -1074,14 +1046,6 @@
         "Arabica|INDONESIA|Mandheling|Gr.1||FT||Middelburg||IS|plus 165|150|": {
           "type": "Arabica",
           "tons": 9.0
-        },
-        "Arabica|INDONESIA|Java||2025|||Antwerp|Molenberg|IS|plus 51||18,00": {
-          "type": "Arabica",
-          "tons": 18.0
-        },
-        "Arabica|INDONESIA|Wet Huled||2025|||Antwerp|Molenberg|IS|plus 51||19,20": {
-          "type": "Arabica",
-          "tons": 19.2
         },
         "Arabica|INDONESIA|Mandheling|Gr.1 DP|2024/25|||Antwerp|Commodity Centre|FCA|plus 110|320|": {
           "type": "Arabica",
@@ -1091,21 +1055,25 @@
           "type": "Arabica",
           "tons": 28.8
         },
-        "Arabica|INDONESIA|Sumatra Mandheling|Gr.5||||Antwerp||FCA|minus 37||28,80": {
+        "Arabica|INDONESIA|Java||2025|||Antwerp|Molenberg|IS|plus 51||18,00": {
+          "type": "Arabica",
+          "tons": 18.0
+        },
+        "Arabica|INDONESIA|Wet Huled||2025|||Antwerp|Molenberg|IS|plus 51||19,20": {
+          "type": "Arabica",
+          "tons": 19.2
+        },
+        "Arabica|INDONESIA|Sumatra Mandheling|Gr.5||||Antwerp||FCA|minus 34||28,80": {
           "type": "Arabica",
           "tons": 28.8
         },
-        "Arabica|INDONESIA|Sumatra Mandheling|Gr.5||FT||Antwerp||FCA|minus 22|300|": {
+        "Arabica|INDONESIA|Sumatra Mandheling|Gr.5||FT||Antwerp||FCA|minus 19|300|": {
           "type": "Arabica",
           "tons": 18.0
         },
         "Arabica|INDONESIA|Bali|Gr.1||||Antwerp||FCA|plus 175|80|": {
           "type": "Arabica",
           "tons": 4.8
-        },
-        "Arabica|KENYA|AA|FAQ|2022/23|||Bremen|Vollers|FCA|plus 62|120|": {
-          "type": "Arabica",
-          "tons": 7.2
         },
         "Arabica|KENYA|AB|FAQ||||Middelburg||IS|plus 87|300|": {
           "type": "Arabica",
@@ -1127,17 +1095,21 @@
           "type": "Arabica",
           "tons": 12.6
         },
-        "Arabica|KENYA|AA|Top|2025|||Antwerp|Molenberg|IS|plus 61||19,20": {
+        "Arabica|KENYA|AA|FAQ|2022/23|||Bremen|Vollers|FCA|plus 62|120|": {
           "type": "Arabica",
-          "tons": 19.2
+          "tons": 7.2
         },
         "Arabica|KENYA|Grinder||2024/25|||Antwerp|Molenberg|FCA|plus 15|720|": {
           "type": "Arabica",
           "tons": 43.2
         },
-        "Arabica|KENYA|Stocklot||2025/26|||Hamburg||FCA|plus 11|3600|": {
+        "Arabica|KENYA|Stocklot||2025/26||ETA 30/06|Hamburg||CFR|plus 11|3600|": {
           "type": "Arabica",
           "tons": 216.0
+        },
+        "Arabica|KENYA|AA|Top|2025|||Antwerp|Molenberg|IS|plus 61||19,20": {
+          "type": "Arabica",
+          "tons": 19.2
         },
         "Arabica|KENYA|AB|Plus|2023/24|||Hamburg|Schwarze|FCA|plus 51||19,10": {
           "type": "Arabica",
@@ -1155,21 +1127,17 @@
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|KENYA|Grinder||2024/25|||Antwerp|Vollers|FCA|minus 16||21,60": {
-          "type": "Arabica",
-          "tons": 21.6
-        },
         "Arabica|LAOS|Gr.2||2024/25|RFA||Hamburg|Schwarze|FCA|plus 8||151,70": {
           "type": "Arabica",
           "tons": 151.7
         },
-        "Arabica|MEXICO|SHG||2024/25|||Hamburg|Schwarze|FCA|plus 28||20,70": {
+        "Arabica|MEXICO|SHG||2024/25|RFA||Hamburg|Schwarze|FCA|plus 35||20,70": {
           "type": "Arabica",
           "tons": 20.7
         },
-        "Arabica|MEXICO|SHG||2021/22|||Hamburg|Schwarze|FCA|plus 16||20,60": {
+        "Arabica|MEXICO|HG||2025/26|||Antwerp||FCA|plus 26|508|": {
           "type": "Arabica",
-          "tons": 20.6
+          "tons": 30.48
         },
         "Arabica|MEXICO|SHG|||ORG||Antwerp||IS|plus 109|150|": {
           "type": "Arabica",
@@ -1179,9 +1147,13 @@
           "type": "Arabica",
           "tons": 16.5
         },
-        "Arabica|MEXICO|Stocklot|250 def.|2024/25|||Antwerp|Pacorini|FCA|minus 3|535|": {
+        "Arabica|MEXICO|HG||2023/24|||Barcelona|Masiques|FCA|plus 13|255|": {
           "type": "Arabica",
-          "tons": 32.1
+          "tons": 15.3
+        },
+        "Arabica|MEXICO|Stocklot|250 def.|2024/25|||Antwerp|Pacorini|FCA|minus 3||19,00": {
+          "type": "Arabica",
+          "tons": 19.0
         },
         "Arabica|MEXICO|HG||2024/25|||Antwerp||FCA|plus 24||140,00": {
           "type": "Arabica",
@@ -1191,9 +1163,9 @@
           "type": "Arabica",
           "tons": 140.0
         },
-        "Arabica|MEXICO|HG||2023/24|||Barcelona|Masiques|FCA|plus 13|255|": {
+        "Arabica|NICARAGUA|Stocklot|300 def.|2025/26|||Antwerp|Pacorini|FCA|minus 26||19,00": {
           "type": "Arabica",
-          "tons": 15.3
+          "tons": 19.0
         },
         "Arabica|NICARAGUA|HG||2024/25|||Antwerp||FCA|plus 24||140,00": {
           "type": "Arabica",
@@ -1203,41 +1175,49 @@
           "type": "Arabica",
           "tons": 140.0
         },
-        "Arabica|NICARAGUA|Stocklot|300 def.|2025/26|||Antwerp|Pacorini|FCA|minus 26||19,30": {
-          "type": "Arabica",
-          "tons": 19.3
-        },
         "Arabica|NICARAGUA|SHG|EP|2025/26|||Antwerp||IS|plus 31|2750|": {
           "type": "Arabica",
           "tons": 165.0
         },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETA 02/06|Antwerp||IS|plus 93|550|": {
-          "type": "Arabica",
-          "tons": 33.0
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETA 08/06|Antwerp||CIF|plus 89|825|": {
-          "type": "Arabica",
-          "tons": 49.5
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 07/06|Antwerp||CIF|plus 54|825|": {
-          "type": "Arabica",
-          "tons": 49.5
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FT||Antwerp||IS|plus 59|275|": {
-          "type": "Arabica",
-          "tons": 16.5
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 22/06|Antwerp||FOB|plus 47|550|": {
-          "type": "Arabica",
-          "tons": 33.0
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 07/06|Antwerp||CIF|plus 44|550|": {
-          "type": "Arabica",
-          "tons": 33.0
-        },
         "Arabica|NICARAGUA|SHG|EP||||Le Havre||FCA|plus 34||20,00": {
           "type": "Arabica",
           "tons": 20.0
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETA 11/06|Hamburg||CIF|plus 91|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETA 09/06|Antwerp||CIF|plus 91|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETD 13/06|Hamburg||CIF|plus 91|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO||Antwerp||IS|plus 93|550|": {
+          "type": "Arabica",
+          "tons": 33.0
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FTO|ETA 10/06|Hamburg||CIF|plus 91|825|": {
+          "type": "Arabica",
+          "tons": 49.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 09/06|Antwerp||CIF|plus 58|825|": {
+          "type": "Arabica",
+          "tons": 49.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FT||Antwerp|Pacorini|IS|plus 61|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 25/06|Antwerp||CIF|plus 58|550|": {
+          "type": "Arabica",
+          "tons": 33.0
+        },
+        "Arabica|NICARAGUA|SHG|EP|2025/26|FT|ETA 09/06|Antwerp||CIF|plus 58|550|": {
+          "type": "Arabica",
+          "tons": 33.0
         },
         "Arabica|NICARAGUA|SHG|||||Antwerp||IS|plus 46|275|": {
           "type": "Arabica",
@@ -1251,9 +1231,9 @@
           "type": "Arabica",
           "tons": 9.0
         },
-        "Arabica|NICARAGUA|SHG||2025/26|||Bremen||FCA|plus 36||41,40": {
+        "Arabica|NICARAGUA|SHG||2025/26|||Bremen||FCA|plus 36||20,70": {
           "type": "Arabica",
-          "tons": 41.4
+          "tons": 20.7
         },
         "Arabica|NICARAGUA|Stocklot||2024/25|RFA||Hamburg|Schwarze|FCA|minus 14||75,00": {
           "type": "Arabica",
@@ -1263,17 +1243,13 @@
           "type": "Arabica",
           "tons": 6.8
         },
-        "Arabica|NICARAGUA|SHG|EP|2025/26||ETA 05/06|Antwerp||CIF|plus 47|550|": {
+        "Arabica|NICARAGUA|SHG|EP|2025/26|||Antwerp||IS|plus 52|550|": {
           "type": "Arabica",
           "tons": 33.0
         },
         "Arabica|NICARAGUA|SHG|EP|2025/26|||Hamburg|Schwarze|IS|plus 50|825|": {
           "type": "Arabica",
           "tons": 49.5
-        },
-        "Arabica|NICARAGUA|SHG|EP|2025/26||ETA 01/06|Antwerp||CIF|plus 47|550|": {
-          "type": "Arabica",
-          "tons": 33.0
         },
         "Arabica|NICARAGUA|SHG||||ETA 18/06|Trieste||IS|plus 28|175|": {
           "type": "Arabica",
@@ -1283,7 +1259,7 @@
           "type": "Arabica",
           "tons": 33.0
         },
-        "Arabica|NICARAGUA|Stocklot|1000 def.||||Hamburg||IS|minus 94||200,00": {
+        "Arabica|NICARAGUA|Stocklot|1000 def.||||Hamburg||IS|minus 89||200,00": {
           "type": "Arabica",
           "tons": 200.0
         },
@@ -1299,41 +1275,33 @@
           "type": "Arabica",
           "tons": 15.9
         },
-        "Arabica|PERU|Stocklot|700 def.||||Hamburg||IS|minus 54||27,00": {
+        "Arabica|PERU|Stocklot|700 def.||||Hamburg||IS|minus 49||27,00": {
           "type": "Arabica",
           "tons": 27.0
         },
-        "Arabica|PERU|Stocklot|700 def.||RFA||Hamburg||IS|minus 59||57,00": {
+        "Arabica|PERU|Stocklot|700 def.||RFA||Hamburg||IS|minus 44||57,00": {
           "type": "Arabica",
           "tons": 57.0
         },
-        "Arabica|PERU|Stocklot|90 def.|2025/26|ORG||Antwerp||FCA|plus 41|300|": {
+        "Arabica|PERU|Gr.1|HB|2026/27|RFA + ORG||Antwerp||CIF|plus 77|300|": {
           "type": "Arabica",
           "tons": 18.0
         },
-        "Arabica|PERU|Stocklot|150 def.|2025/26|ORG||Antwerp||FCA|plus 31|300|": {
+        "Arabica|PERU|Stocklot|90 def.|2025/26|FTO||Antwerp||FCA|plus 61|300|": {
           "type": "Arabica",
           "tons": 18.0
         },
-        "Arabica|PERU|Stocklot|90 def.|2025/26|FTO||Antwerp||FCA|plus 51|300|": {
+        "Arabica|PERU|Stocklot|150 def.|2025/26|FTO||Antwerp||FCA|plus 51|300|": {
           "type": "Arabica",
           "tons": 18.0
-        },
-        "Arabica|PERU|Stocklot|150 def.|2025/26|FTO||Antwerp||FCA|plus 41|300|": {
-          "type": "Arabica",
-          "tons": 18.0
-        },
-        "Arabica|PERU|||2025/26|RFA||Bremen|Vollers|FCA|plus 37|140|": {
-          "type": "Arabica",
-          "tons": 8.4
-        },
-        "Arabica|PERU|||2025/26|FTO US||Bremen|J.MW|FCA|plus 76|900|": {
-          "type": "Arabica",
-          "tons": 54.0
         },
         "Arabica|PERU|Gr.2|HB|2025/26|RFA||Hamburg||FCA|plus 42|50|": {
           "type": "Arabica",
           "tons": 3.0
+        },
+        "Arabica|PERU|Gr.1||2025/26|FTO US||Bremen|J.MW|FCA|plus 76|900|": {
+          "type": "Arabica",
+          "tons": 54.0
         },
         "Arabica|PERU|Gr.2||||ETA 19/07|Trieste||CIF|plus 28|570|": {
           "type": "Arabica",
@@ -1343,13 +1311,9 @@
           "type": "Arabica",
           "tons": 41.1
         },
-        "Arabica|PERU|Gr.1||2025/26|FT||Bremen||FCA|plus 46||21,00": {
+        "Arabica|PERU|Gr.2||2025/26|FT||Bremen||FCA|plus 36||39,50": {
           "type": "Arabica",
-          "tons": 21.0
-        },
-        "Arabica|PERU|Gr.2||2025/26|FT||Bremen||FCA|plus 36||104,00": {
-          "type": "Arabica",
-          "tons": 104.0
+          "tons": 39.5
         },
         "Arabica|PERU|Gr.1||2024/25|||Hamburg|Schwarze|FCA|plus 18||56,70": {
           "type": "Arabica",
@@ -1379,7 +1343,7 @@
           "type": "Arabica",
           "tons": 16.5
         },
-        "Arabica|PERU|Gr.1||2026/27|FT|ETA 02/06|Antwerp||CIF|plus 54|550|": {
+        "Arabica|PERU|Gr.1||2026/27|FT|ETA 02/06|Antwerp||CIF|plus 58|550|": {
           "type": "Arabica",
           "tons": 33.0
         },
@@ -1407,6 +1371,10 @@
           "type": "Arabica",
           "tons": 20.7
         },
+        "Arabica|PERU|Gr.1||2026|RFA + ORG|ETA 17/06|Antwerp||FOB|plus 76|275|": {
+          "type": "Arabica",
+          "tons": 16.5
+        },
         "Arabica|PERU|Gr.2||2024/25|||Antwerp||FCA|plus 23||130,00": {
           "type": "Arabica",
           "tons": 130.0
@@ -1427,25 +1395,29 @@
           "type": "Arabica",
           "tons": 140.0
         },
+        "Arabica|PNG|Y1||2025/26|||Antwerp||IS|minus 4||22,00": {
+          "type": "Arabica",
+          "tons": 22.0
+        },
         "Arabica|PNG|B|||||Middelburg||IS|plus 47|300|": {
           "type": "Arabica",
           "tons": 18.0
-        },
-        "Arabica|PNG|15up||2025|||Hamburg|Schwarze|FCA|plus 13|320|": {
-          "type": "Arabica",
-          "tons": 19.2
         },
         "Arabica|PNG|Y1||2025/26|||Hamburg|Schwarze|FCA|plus 21||21,50": {
           "type": "Arabica",
           "tons": 21.5
         },
+        "Arabica|PNG|15up||2025|||Hamburg|Schwarze|FCA|plus 13|707|": {
+          "type": "Arabica",
+          "tons": 42.42
+        },
+        "Arabica|RWANDA|15up||2024/25|||Antwerp|Pacorini|FCA|plus 26|640|": {
+          "type": "Arabica",
+          "tons": 38.4
+        },
         "Arabica|RWANDA|A3|150 def.|2022/23|RFA|FW|Hamburg|Vollers|FCA|minus 14||10,60": {
           "type": "Arabica",
           "tons": 10.6
-        },
-        "Arabica|RWANDA|A3|FW|2024/25|RFA|150 def.|Antwerp|Vollers|FCA|minus 9|1920|": {
-          "type": "Arabica",
-          "tons": 115.2
         },
         "Arabica|RWANDA|15up|FW|2023/24|||Antwerp|Vollers|FCA|minus 13|320|": {
           "type": "Arabica",
@@ -1483,13 +1455,13 @@
           "type": "Arabica",
           "tons": 19.2
         },
-        "Arabica|RWANDA|Triage||2024/25|||Hamburg|Schwarze|FCA|minus 17||19,40": {
+        "Arabica|RWANDA|Triage||2024/25|||Hamburg|Schwarze|FCA|minus 19||19,40": {
           "type": "Arabica",
           "tons": 19.4
         },
-        "Arabica|RWANDA|15up||2024/25|||Antwerp|Pacorini|FCA|plus 26|640|": {
+        "Arabica|RWANDA|C|FW||||Antwerp||IS|plus 6|280|": {
           "type": "Arabica",
-          "tons": 38.4
+          "tons": 16.8
         },
         "Arabica|RWANDA|A3||2024/25|||Antwerp||FCA|plus 23||125,00": {
           "type": "Arabica",
@@ -1499,14 +1471,6 @@
           "type": "Arabica",
           "tons": 6.0
         },
-        "Arabica|RWANDA|15up|FW|2024/25|||Antwerp|Pacorini|FCA|plus 17||12,00": {
-          "type": "Arabica",
-          "tons": 12.0
-        },
-        "Arabica|RWANDA|C|FW||||Antwerp||IS|plus 6|280|": {
-          "type": "Arabica",
-          "tons": 16.8
-        },
         "Arabica|SALVADOR|SHG|||||Antwerp||IS|plus 56|275|": {
           "type": "Arabica",
           "tons": 16.5
@@ -1515,9 +1479,41 @@
           "type": "Arabica",
           "tons": 11.0
         },
-        "Arabica|TANZANIA|AAA||2021/22|RFA||Hamburg|Schwarze|FCA|plus 1||19,00": {
+        "Arabica|TANZANIA|AA|North||||Antwerp||IS|plus 65|50|": {
           "type": "Arabica",
-          "tons": 19.0
+          "tons": 3.0
+        },
+        "Arabica|TANZANIA|AB|South|2024/25|||Bremen|Vollers|FCA|plus 14||5,40": {
+          "type": "Arabica",
+          "tons": 5.4
+        },
+        "Arabica|TANZANIA|AB|South|2024/25|||Bremen|Vollers|FCA|plus 11||21,60": {
+          "type": "Arabica",
+          "tons": 21.6
+        },
+        "Arabica|TANZANIA|AB|FAQ|2025/26|RFA||Antwerp|Pacorini|FCA|plus 33||7,20": {
+          "type": "Arabica",
+          "tons": 7.2
+        },
+        "Arabica|TANZANIA|Grinder|150 def.|2025/26|||Antwerp|Pacorini|FCA|plus 1||100,00": {
+          "type": "Arabica",
+          "tons": 100.0
+        },
+        "Arabica|TANZANIA|AB||2023/24|||Antwerp||FCA|plus 21||49,00": {
+          "type": "Arabica",
+          "tons": 49.0
+        },
+        "Arabica|TANZANIA|AB||2023/24|||Hamburg||FCA|plus 21||52,00": {
+          "type": "Arabica",
+          "tons": 52.0
+        },
+        "Arabica|TANZANIA|AB|FAQ|2026/27||ETA 28/06|Hamburg||CFR|plus 55||38,40": {
+          "type": "Arabica",
+          "tons": 38.4
+        },
+        "Arabica|TANZANIA|AB|||||Hamburg||FCA|plus 103|60|": {
+          "type": "Arabica",
+          "tons": 3.6
         },
         "Arabica|TANZANIA|PB||2024/25|||Hamburg|Schwarze|FCA|plus 6||19,00": {
           "type": "Arabica",
@@ -1551,6 +1547,10 @@
           "type": "Arabica",
           "tons": 16.32
         },
+        "Arabica|TANZANIA|AB|South|2023/24|||Antwerp|Pacorini|FCA|plus 26|960|": {
+          "type": "Arabica",
+          "tons": 57.6
+        },
         "Arabica|TANZANIA|AB|||||Genoa||CIF|plus 20||38,00": {
           "type": "Arabica",
           "tons": 38.0
@@ -1571,13 +1571,13 @@
           "type": "Arabica",
           "tons": 61.2
         },
-        "Arabica|TANZANIA|Grinder||2024/25|RFA||Antwerp|Molenberg|FCA|minus 6|360|": {
+        "Arabica|TANZANIA|Grinder||2024/25|RFA||Antwerp|Molenberg|FCA|plus 6|360|": {
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|TANZANIA|AB|FAQ|2025/26|||Antwerp|Pacorini|FCA|plus 15|2573|": {
+        "Arabica|TANZANIA|AB|FAQ|2025/26|||Antwerp|Pacorini|FCA|plus 15|2216|": {
           "type": "Arabica",
-          "tons": 154.38
+          "tons": 132.96
         },
         "Arabica|TANZANIA|AB|South|2024/25|||Antwerp|Molenberg|FCA|plus 26|720|": {
           "type": "Arabica",
@@ -1591,46 +1591,6 @@
           "type": "Arabica",
           "tons": 21.6
         },
-        "Arabica|TANZANIA|AA|South|past|||Hamburg|Steinweg|FCA|plus 1|250|": {
-          "type": "Arabica",
-          "tons": 15.0
-        },
-        "Arabica|TANZANIA|AB|South|2024/25|||Bremen|Vollers|FCA|plus 8||5,40": {
-          "type": "Arabica",
-          "tons": 5.4
-        },
-        "Arabica|TANZANIA|AB||2023/24|||Antwerp||FCA|plus 21||49,00": {
-          "type": "Arabica",
-          "tons": 49.0
-        },
-        "Arabica|TANZANIA|AB||2023/24|||Hamburg||FCA|plus 21||52,00": {
-          "type": "Arabica",
-          "tons": 52.0
-        },
-        "Arabica|TANZANIA|AA|North||||Antwerp||IS|plus 65|50|": {
-          "type": "Arabica",
-          "tons": 3.0
-        },
-        "Arabica|TANZANIA|AB|South|2023/24|||Antwerp|Pacorini|FCA|plus 26|960|": {
-          "type": "Arabica",
-          "tons": 57.6
-        },
-        "Arabica|TANZANIA|AB|FAQ|2025/26|RFA||Antwerp|Pacorini|FCA|plus 33||7,20": {
-          "type": "Arabica",
-          "tons": 7.2
-        },
-        "Arabica|TANZANIA|AB|||||Hamburg||FCA|plus 103|60|": {
-          "type": "Arabica",
-          "tons": 3.6
-        },
-        "Arabica|TANZANIA|AB|FAQ|2026/27||ETA 28/06|Hamburg||CFR|plus 55||38,40": {
-          "type": "Arabica",
-          "tons": 38.4
-        },
-        "Arabica|TIMOR|Stocklot||2015/16|||Hamburg|Schwarze|FCA|minus 28||18,90": {
-          "type": "Arabica",
-          "tons": 18.9
-        },
         "Arabica|TIMOR|Triage||2015/16|||Hamburg|Vollers|FCA|minus 78||19,20": {
           "type": "Arabica",
           "tons": 19.2
@@ -1638,18 +1598,6 @@
         "Arabica|UGANDA|Drugar|||||Middelburg||IS|minus 9||43,20": {
           "type": "Arabica",
           "tons": 43.2
-        },
-        "Arabica|UGANDA|Bugisu|AB|2022/23|||Le Havre|Sealogis|FCA|minus 14|325|": {
-          "type": "Arabica",
-          "tons": 19.5
-        },
-        "Arabica|UGANDA|Bugisu|AB|2023/24|||Hamburg|Vollers|FCA|plus 9|320|": {
-          "type": "Arabica",
-          "tons": 19.2
-        },
-        "Arabica|UGANDA|Stocklot||2023/24|||Antwerp|Steinweg|FCA|minus 49|304|": {
-          "type": "Arabica",
-          "tons": 18.24
         },
         "Arabica|UGANDA|Drugar|||||Middelburg||IS|plus 36||43,20": {
           "type": "Arabica",
@@ -1667,25 +1615,17 @@
           "type": "Arabica",
           "tons": 140.0
         },
-        "Arabica|UGANDA|Stocklot||2025/26|FTO||Antwerp||CIF|plus 54|320|": {
+        "Arabica|UGANDA|Stocklot||2025/26|FTO||Antwerp||CIF|plus 54||19,00": {
           "type": "Arabica",
-          "tons": 19.2
+          "tons": 19.0
         },
-        "Arabica|UGANDA|Bugisu|AA|2025/26||ETA 03/06|Antwerp|Vollers|FCA|plus 29|1400|": {
+        "Arabica|UGANDA|Drugar||2025/26|RFA|AFLOAT|EU||CIF|minus 9||108,00": {
           "type": "Arabica",
-          "tons": 84.0
+          "tons": 108.0
         },
-        "Arabica|UGANDA|Bugisu|C|2025/26|||Antwerp|Vollers|FCA|plus 3|416|": {
+        "Arabica|UGANDA|Drugar||2025/26||AFLOAT|EU||CIF|minus 14||21,60": {
           "type": "Arabica",
-          "tons": 24.96
-        },
-        "Arabica|UGANDA|Triage|UW|||ETA 13/05|Antwerp|Vollers|FCA|minus 74|825|": {
-          "type": "Arabica",
-          "tons": 49.5
-        },
-        "Arabica|UGANDA|Triage|W||||Antwerp|Vollers|FCA|minus 64|640|": {
-          "type": "Arabica",
-          "tons": 38.4
+          "tons": 21.6
         },
         "Arabica|UGANDA|BB|||||Hamburg|Vollers|FCA|minus 88|142|": {
           "type": "Arabica",
@@ -1735,19 +1675,39 @@
           "type": "Arabica",
           "tons": 38.4
         },
-        "Arabica|UGANDA|Drugar||2025/26|RFA|AFLOAT|EU||CIF|minus 9||108,00": {
+        "Arabica|UGANDA|Bugisu|AA|2025/26||ETA 03/06|Antwerp|Vollers|FCA|plus 29|1400|": {
           "type": "Arabica",
-          "tons": 108.0
+          "tons": 84.0
         },
-        "Arabica|UGANDA|Drugar||2025/26||AFLOAT|EU||CIF|minus 14||21,60": {
+        "Arabica|UGANDA|Bugisu|C|2025/26|||Antwerp|Vollers|FCA|plus 3|416|": {
           "type": "Arabica",
-          "tons": 21.6
+          "tons": 24.96
+        },
+        "Arabica|UGANDA|Triage|UW|||ETA 13/05|Antwerp|Vollers|FCA|minus 74|825|": {
+          "type": "Arabica",
+          "tons": 49.5
+        },
+        "Arabica|UGANDA|Triage|W||||Antwerp|Vollers|FCA|minus 64|640|": {
+          "type": "Arabica",
+          "tons": 38.4
+        },
+        "Arabica|UGANDA|Bugisu|AB|2023/24|||Hamburg|Vollers|FCA|plus 9|320|": {
+          "type": "Arabica",
+          "tons": 19.2
+        },
+        "Arabica|UGANDA|Stocklot||2023/24|||Antwerp|Steinweg|FCA|minus 49|304|": {
+          "type": "Arabica",
+          "tons": 18.24
+        },
+        "Arabica|UGANDA|Bugisu|AB|2022/23|||Le Havre|Sealogis|FCA|minus 14|325|": {
+          "type": "Arabica",
+          "tons": 19.5
         },
         "Arabica|UGANDA|Wugar||2025/26|||Antwerp|Pacorini|FCA|plus 11|2420|": {
           "type": "Arabica",
           "tons": 145.2
         },
-        "Arabica|UGANDA|Triage|1000 def.||||Hamburg||IS|minus 99||87,00": {
+        "Arabica|UGANDA|Triage|1000 def.||||Hamburg||IS|minus 94||87,00": {
           "type": "Arabica",
           "tons": 87.0
         },
@@ -1771,13 +1731,9 @@
           "type": "Arabica",
           "tons": 38.1
         },
-        "Arabica|ZAMBIA|AB||2023/24|||Hamburg|Schwarze|FCA|plus 1||19,20": {
+        "Arabica|ZAMBIA|Stocklot|250 def.||RFA|FW|Hamburg||FOB|minus 29||57,00": {
           "type": "Arabica",
-          "tons": 19.2
-        },
-        "Robusta|BRAZIL|16up|||RFA||Hamburg||FCA|plus 770|610|": {
-          "type": "Robusta",
-          "tons": 36.6
+          "tons": 57.0
         },
         "Robusta|BRAZIL|13up|||||Antwerp|Vollers|FCA|plus 400||4,60": {
           "type": "Robusta",
@@ -1807,6 +1763,26 @@
           "type": "Robusta",
           "tons": 17.0
         },
+        "Robusta|CAMEROON|Gr.1||2025/26||ETD 14/06|Trieste||CIF|plus 570|1500|": {
+          "type": "Robusta",
+          "tons": 90.0
+        },
+        "Robusta|CAMEROON|Gr.1||2025/26||ETD 11/07|Genoa||CIF|plus 570|600|": {
+          "type": "Robusta",
+          "tons": 36.0
+        },
+        "Robusta|CAMEROON|Gr.1||2025/26||ETD 21/06|Gioia Tauro||CIF|plus 570|300|": {
+          "type": "Robusta",
+          "tons": 18.0
+        },
+        "Robusta|CAMEROON|Gr.2||2024/25||ETA 22/07|Trieste||CIF|plus 370|300|": {
+          "type": "Robusta",
+          "tons": 18.0
+        },
+        "Robusta|CAMEROON|Gr.2||2025/26||ETA 12/07|Trieste||CIF|plus 320|600|": {
+          "type": "Robusta",
+          "tons": 36.0
+        },
         "Robusta|CAMEROON|Gr.1|16/18|||ETA 01/06|Antwerp||IS|plus 820|5500|": {
           "type": "Robusta",
           "tons": 330.0
@@ -1819,21 +1795,17 @@
           "type": "Robusta",
           "tons": 12.0
         },
-        "Robusta|CAMEROON|Gr.1||2024/25||ETD 16/06|Gioia Tauro||CIF|plus 570|300|": {
-          "type": "Robusta",
-          "tons": 18.0
-        },
-        "Robusta|CAMEROON|Gr.2||2024/25||ETA 15/07|Trieste||CIF|plus 370|300|": {
-          "type": "Robusta",
-          "tons": 18.0
-        },
-        "Robusta|CAMEROON|Gr.2||2025/26||ETD 27/05|Trieste||CIF|plus 320|600|": {
-          "type": "Robusta",
-          "tons": 36.0
-        },
         "Robusta|CONGO|HTM/N/M|||||Antwerp||IS|plus 700|320|": {
           "type": "Robusta",
           "tons": 19.2
+        },
+        "Robusta|INDIA|Parchment|AB|2025/26|||Vado Ligure|Pacorini|IS|plus 2130||21,00": {
+          "type": "Robusta",
+          "tons": 21.0
+        },
+        "Robusta|INDIA|Parchment|AB|2025/26|||Trieste|Pacorini|IS|plus 2130||22,00": {
+          "type": "Robusta",
+          "tons": 22.0
         },
         "Robusta|INDIA|Parchment|AB||ORG||Antwerp||IS|USD/mt 7650|300|": {
           "type": "Robusta",
@@ -1854,14 +1826,6 @@
         "Robusta|INDIA|Monsoon|AA||||Antwerp||IS|plus 3200|300|": {
           "type": "Robusta",
           "tons": 18.0
-        },
-        "Robusta|INDIA|Parchment|AB|2025/26|||Vado Ligure|Pacorini|IS|plus 2130|320|": {
-          "type": "Robusta",
-          "tons": 19.2
-        },
-        "Robusta|INDIA|Parchment|AB|2025/26|||Trieste|Pacorini|IS|plus 2130|320|": {
-          "type": "Robusta",
-          "tons": 19.2
         },
         "Robusta|INDIA|Cherry|A|||ETA 02/06|Trieste||CIF|plus 980||16,00": {
           "type": "Robusta",
@@ -1963,17 +1927,17 @@
           "type": "Robusta",
           "tons": 105.0
         },
-        "Robusta|INDIA|Cherry|AB|2025/26||ETA 11/06|Trieste|Pacorini|FCA|plus 935||20,00": {
+        "Robusta|INDIA|Cherry|AB|2025/26||ETA 11/06|Trieste|Pacorini|FCA|plus 955||20,00": {
           "type": "Robusta",
           "tons": 20.0
         },
-        "Robusta|INDIA|Cherry|AB|2025/26|||Vado Ligure|Pacorini|FCA|plus 895||80,00": {
+        "Robusta|INDIA|Cherry|AB|2025/26|||Vado Ligure|Pacorini|FCA|plus 925||80,00": {
           "type": "Robusta",
           "tons": 80.0
         },
-        "Robusta|INDIA|Cherry|AB||||Hamburg||FCA|plus 970|900|": {
+        "Robusta|INDIA|Cherry|AB||||Hamburg||FCA|plus 970|540|": {
           "type": "Robusta",
-          "tons": 54.0
+          "tons": 32.4
         },
         "Robusta|INDIA|Cherry|A||||Naples||FCA|plus 1030||41,00": {
           "type": "Robusta",
@@ -1995,29 +1959,37 @@
           "type": "Robusta",
           "tons": 44.0
         },
-        "Robusta|INDIA|Cherry|AB|2025/26||ETA 18/07|Naples|Eurocaf|FCA|plus 910||38,40": {
+        "Robusta|INDIA|Cherry|AB|2025/26||ETA 18/07|Naples|Eurocaf|FCA|plus 995||38,40": {
           "type": "Robusta",
           "tons": 38.4
         },
-        "Robusta|INDIA|Cherry|AB|2025/26||ETA 15/07|Trieste|Pacorini|FCA|plus 895||100,00": {
+        "Robusta|INDIA|Cherry|AB|2025/26||ETA 15/07|Trieste|Pacorini|FCA|plus 980||100,00": {
           "type": "Robusta",
           "tons": 100.0
         },
-        "Robusta|INDIA|Cherry|Clean bulk|2025/26||ETA 14/07|Trieste|Pacorini|FCA|plus 865||100,00": {
+        "Robusta|INDIA|Cherry|Clean bulk|2025/26||ETA 14/07|Trieste|Pacorini|FCA|plus 950||100,00": {
           "type": "Robusta",
           "tons": 100.0
         },
-        "Robusta|INDIA|Cherry|AB|2025/26||ETA 10/07|Vado Ligure|Pacorini|FCA|plus 880||60,00": {
+        "Robusta|INDIA|Cherry|AB|2025/26||ETA 10/07|Vado Ligure|Pacorini|FCA|plus 960||60,00": {
           "type": "Robusta",
           "tons": 60.0
         },
-        "Robusta|INDIA|Cherry|A|2025/26||ETA 10/07|Vado Ligure|Pacorini|FCA|plus 900||100,00": {
+        "Robusta|INDIA|Cherry|A|2025/26||ETA 10/07|Vado Ligure|Pacorini|FCA|plus 980||100,00": {
           "type": "Robusta",
           "tons": 100.0
         },
-        "Robusta|INDONESIA|EK-1 Gr.5|150 def.|2025/26|||Hamburg|Schwarze|FCA|plus 540||188,60": {
+        "Robusta|INDONESIA|EK-1 Gr.4|80 def.|||ETA 17/07|Hamburg||CFR|plus 330|360|": {
           "type": "Robusta",
-          "tons": 188.6
+          "tons": 21.6
+        },
+        "Robusta|INDONESIA|AP-1|MB||||Trieste||IS|plus 470||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|INDONESIA|EK-1 Gr.4|60 def.|||ETA 17/07|Trieste||CIF|plus 370||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
         },
         "Robusta|INDONESIA|EK-1 Gr.3|45 def.||||Antwerp|Vollers|FCA|plus 440||86,00": {
           "type": "Robusta",
@@ -2027,7 +1999,15 @@
           "type": "Robusta",
           "tons": 500.0
         },
-        "Robusta|INDONESIA|AP-1|Gr.1 LB Java|2025/26||ETA 10/06|Antwerp||CIF|plus 1500|320|": {
+        "Robusta|INDONESIA|EK-1 Gr.5|150 def.|2025/26|||Hamburg|Schwarze|FCA|plus 540||188,60": {
+          "type": "Robusta",
+          "tons": 188.6
+        },
+        "Robusta|INDONESIA|ELB Gr.3|350 BC|2025/26|||Antwerp|Steinweg|FCA|plus 720|960|": {
+          "type": "Robusta",
+          "tons": 57.6
+        },
+        "Robusta|INDONESIA|AP-1|Gr.1 LB Java|2025/26||ETA 12/06|Antwerp||CIF|plus 1500|320|": {
           "type": "Robusta",
           "tons": 19.2
         },
@@ -2043,19 +2023,7 @@
           "type": "Robusta",
           "tons": 19.5
         },
-        "Robusta|INDONESIA|AP1|MB||||Trieste||IS|plus 470||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|INDONESIA|EK-1 Gr.4|60 def.|||ETA 17/07|Trieste||CIF|plus 370||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|INDONESIA|ELB Gr.3|350 BC|2025/26|||Antwerp|Steinweg|FCA|plus 720|1280|": {
-          "type": "Robusta",
-          "tons": 76.8
-        },
-        "Robusta|IVORY COAST|Gr.4||2023/24|||Antwerp|Pacorini|FCA|plus 220|241|": {
+        "Robusta|IVORY COAST|Gr.4||2023/24|||Antwerp|Pacorini|FCA|plus 280|241|": {
           "type": "Robusta",
           "tons": 14.46
         },
@@ -2070,26 +2038,6 @@
         "Robusta|RWANDA||||||Hamburg||FCA|plus 3050|130|": {
           "type": "Robusta",
           "tons": 7.8
-        },
-        "Robusta|TANZANIA|14||2025/26|FTO||Hamburg||IS|plus 3500|320|": {
-          "type": "Robusta",
-          "tons": 19.2
-        },
-        "Robusta|TANZANIA|16||2025/26|FTO||Hamburg||IS|plus 3600|320|": {
-          "type": "Robusta",
-          "tons": 19.2
-        },
-        "Robusta|TANZANIA|14|FAQ||FTO + RFA|ETA 17/05|Antwerp|Vollers|FCA|plus 2500|614|": {
-          "type": "Robusta",
-          "tons": 36.84
-        },
-        "Robusta|TANZANIA|16|||FTO + RFA|ETA 17/05|Antwerp|Molenberg|FCA|plus 2600|50|": {
-          "type": "Robusta",
-          "tons": 3.0
-        },
-        "Robusta|TANZANIA|16|||FTO + RFA|ETA 17/05|Antwerp|Vollers|FCA|plus 2500||43,20": {
-          "type": "Robusta",
-          "tons": 43.2
         },
         "Robusta|TANZANIA|14|||RFA + ORG||Antwerp||IS|plus 2350|640|": {
           "type": "Robusta",
@@ -2107,65 +2055,45 @@
           "type": "Robusta",
           "tons": 20.0
         },
-        "Robusta|TOGO|Gr.1||2025/26||ETA 08/06|Vado Ligure|Pacorini|FCA|plus 730|640|": {
+        "Robusta|TANZANIA|14|FAQ||FTO + RFA|ETA 17/05|Antwerp|Vollers|FCA|plus 2500|614|": {
+          "type": "Robusta",
+          "tons": 36.84
+        },
+        "Robusta|TANZANIA|16|||FTO + RFA|ETA 17/05|Antwerp|Molenberg|FCA|plus 2600|50|": {
+          "type": "Robusta",
+          "tons": 3.0
+        },
+        "Robusta|TANZANIA|16|||FTO + RFA|ETA 17/05|Antwerp|Vollers|FCA|plus 2500||43,20": {
+          "type": "Robusta",
+          "tons": 43.2
+        },
+        "Robusta|TANZANIA|14||2025/26|FTO||Hamburg||IS|plus 3500|320|": {
+          "type": "Robusta",
+          "tons": 19.2
+        },
+        "Robusta|TANZANIA|16||2025/26|FTO||Hamburg||IS|plus 3600|320|": {
+          "type": "Robusta",
+          "tons": 19.2
+        },
+        "Robusta|TOGO|Gr.1||2025/26||AFLOAT|Vado Ligure|Pacorini|FCA|plus 730|640|": {
           "type": "Robusta",
           "tons": 38.4
         },
-        "Robusta|TOGO|Gr.2||2025/26||ETA 11/06|Antwerp|Steinweg|FCA|plus 600|1600|": {
+        "Robusta|TOGO|Gr.2||2025/26||AFLOAT|Antwerp|Steinweg|FCA|plus 600|1600|": {
           "type": "Robusta",
           "tons": 96.0
         },
-        "Robusta|UGANDA|15|W|||ETA 30/04|Trieste||CIF|plus 1230|334|": {
+        "Robusta|UGANDA|12||||ETA 15/06|Hamburg||CFR|plus 1370|360|": {
           "type": "Robusta",
-          "tons": 20.04
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 29/06|Antwerp||FCA|plus 900|960|": {
-          "type": "Robusta",
-          "tons": 57.6
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 21/07|Antwerp||FCA|plus 890|640|": {
-          "type": "Robusta",
-          "tons": 38.4
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 29/07|Barcelona||FCA|plus 920||60,00": {
-          "type": "Robusta",
-          "tons": 60.0
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 03/08|Vigo||FCA|plus 920||100,00": {
-          "type": "Robusta",
-          "tons": 100.0
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 10/08|Vigo||FCA|plus 880||100,00": {
-          "type": "Robusta",
-          "tons": 100.0
-        },
-        "Robusta|UGANDA|18|NB|2025/26||ETA 12/08|Vigo||FCA|plus 880||100,00": {
-          "type": "Robusta",
-          "tons": 100.0
-        },
-        "Robusta|UGANDA|12|NB|2026/27|4C|ETA 27/08|Bremen||FCA|plus 710||100,00": {
-          "type": "Robusta",
-          "tons": 100.0
-        },
-        "Robusta|UGANDA|BB||2026/27||ETA 25/08|Antwerp||FCA|plus 50||120,00": {
-          "type": "Robusta",
-          "tons": 120.0
+          "tons": 21.6
         },
         "Robusta|UGANDA|15||2025/26|||Hamburg|Vollers|FCA|plus 1280||21,60": {
           "type": "Robusta",
           "tons": 21.6
         },
-        "Robusta|UGANDA|12|NB|||ETA 01/06|Bremen|Vollers|FCA|plus 670||518,40": {
+        "Robusta|UGANDA|17||2025/26|||Hamburg|Vollers|FCA|plus 1370|320|": {
           "type": "Robusta",
-          "tons": 518.4
-        },
-        "Robusta|UGANDA|12|NB|||ETA 07/05|Bremen|Vollers|FCA|plus 670||21,60": {
-          "type": "Robusta",
-          "tons": 21.6
-        },
-        "Robusta|UGANDA|12|NB||||Hamburg|Vollers|FCA|plus 620||21,60": {
-          "type": "Robusta",
-          "tons": 21.6
+          "tons": 19.2
         },
         "Robusta|UGANDA|15|||||Antwerp||IS|plus 1150|320|": {
           "type": "Robusta",
@@ -2183,6 +2111,54 @@
           "type": "Robusta",
           "tons": 19.2
         },
+        "Robusta|UGANDA|12|NB|||ETA 01/06|Bremen|Vollers|FCA|plus 670||518,40": {
+          "type": "Robusta",
+          "tons": 518.4
+        },
+        "Robusta|UGANDA|12|NB|||ETA 07/05|Bremen|Vollers|FCA|plus 670||21,60": {
+          "type": "Robusta",
+          "tons": 21.6
+        },
+        "Robusta|UGANDA|12|NB||||Hamburg|Vollers|FCA|plus 620||21,60": {
+          "type": "Robusta",
+          "tons": 21.6
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 29/06|Antwerp||FCA|plus 900|590|": {
+          "type": "Robusta",
+          "tons": 35.4
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 22/07|Antwerp||FCA|plus 890|540|": {
+          "type": "Robusta",
+          "tons": 32.4
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 01/08|Vado Ligure||FCA|plus 920||60,00": {
+          "type": "Robusta",
+          "tons": 60.0
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 03/08|Vado Ligure||FCA|plus 920||100,00": {
+          "type": "Robusta",
+          "tons": 100.0
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 27/07|Vado Ligure||FCA|plus 920|960|": {
+          "type": "Robusta",
+          "tons": 57.6
+        },
+        "Robusta|UGANDA|18|NB|2026/27||ETA 17/08|Barcelona||FCA|plus 920||40,00": {
+          "type": "Robusta",
+          "tons": 40.0
+        },
+        "Robusta|UGANDA|15|NB|2026/27||ETA 05/08|Trieste||FCA|plus 840||60,00": {
+          "type": "Robusta",
+          "tons": 60.0
+        },
+        "Robusta|UGANDA|15||2025/26|||Hamburg||IS|plus 1230||40,00": {
+          "type": "Robusta",
+          "tons": 40.0
+        },
+        "Robusta|UGANDA|15|W|||ETA 30/04|Trieste||CIF|plus 1230|334|": {
+          "type": "Robusta",
+          "tons": 20.04
+        },
         "Robusta|UGANDA|BHP|18/99|||ETA 01/07|Antwerp|Vollers|FCA|plus 10|1225|": {
           "type": "Robusta",
           "tons": 73.5
@@ -2195,19 +2171,7 @@
           "type": "Robusta",
           "tons": 34.98
         },
-        "Robusta|UGANDA|15||2025/26|||Hamburg||IS|plus 1230||40,00": {
-          "type": "Robusta",
-          "tons": 40.0
-        },
-        "Robusta|UGANDA|12||||ETA 15/06|Hamburg||CFR|plus 1370|360|": {
-          "type": "Robusta",
-          "tons": 21.6
-        },
-        "Robusta|UGANDA|15|||||Hamburg||FCA|plus 970|243|": {
-          "type": "Robusta",
-          "tons": 14.58
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%||2025/26|||Bremen||FCA|plus 720||216,00": {
+        "Robusta|VIETNAM|Gr.2 13 5%||2025/26|||Bremen||FCA|plus 670||216,00": {
           "type": "Robusta",
           "tons": 216.0
         },
@@ -2219,13 +2183,9 @@
           "type": "Robusta",
           "tons": 43.2
         },
-        "Robusta|VIETNAM|Gr.1 16 2%||2025/26|||Bremen||FCA|plus 940||21,60": {
+        "Robusta|VIETNAM|Gr.1 16 2%||2025/26|4C||Bremen||FCA|plus 970||12,50": {
           "type": "Robusta",
-          "tons": 21.6
-        },
-        "Robusta|VIETNAM|Gr.1 16 2%||2025/26|4C||Bremen||FCA|plus 970||216,00": {
-          "type": "Robusta",
-          "tons": 216.0
+          "tons": 12.5
         },
         "Robusta|VIETNAM|Gr.1 16 2%||2025/26|4C||Hamburg||FCA|plus 920||216,00": {
           "type": "Robusta",
@@ -2235,37 +2195,89 @@
           "type": "Robusta",
           "tons": 216.0
         },
-        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||ETA 31/05|Barcelona|Masiques|FCA|plus 675||40,00": {
-          "type": "Robusta",
-          "tons": 40.0
-        },
-        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||ETA 15/06|Vigo|Access World|FCA|plus 695|290|": {
-          "type": "Robusta",
-          "tons": 17.4
-        },
-        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||ETA 30/06|Vado Ligure|Pacorini|FCA|plus 695|1920|": {
-          "type": "Robusta",
-          "tons": 115.2
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|||Vado Ligure|Pacorini|FCA|plus 665||180,00": {
-          "type": "Robusta",
-          "tons": 180.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|||Naples|Il Polo de Caffe|FCA|plus 665||40,00": {
-          "type": "Robusta",
-          "tons": 40.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%||2024/25|||Barcelona|Masiques|FCA|plus 445||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%||2024/25|||Antwerp|Commodity Centre|FCA|plus 420||52,00": {
-          "type": "Robusta",
-          "tons": 52.0
-        },
         "Robusta|VIETNAM|Gr.1 16 2%||||ETA 28/07|Trieste||CIF|plus 425||21,00": {
           "type": "Robusta",
           "tons": 21.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 2%|||RFA||Bremen|J.MW|FCA|plus 920||42,00": {
+          "type": "Robusta",
+          "tons": 42.0
+        },
+        "Robusta|VIETNAM|Gr.3||2024/25|||Hamburg||IS|minus 50||24,00": {
+          "type": "Robusta",
+          "tons": 24.0
+        },
+        "Robusta|VIETNAM|Gr.2 13 5%|||4C||Bremen|Vollers|FCA|plus 320||10,00": {
+          "type": "Robusta",
+          "tons": 10.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean|||||Trieste|Romani|FCA|plus 560||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|RFA||Barcelona|Masiques|FCA|plus 830||21,60": {
+          "type": "Robusta",
+          "tons": 21.6
+        },
+        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|RFA||Vado Ligure|Pacorini|IS|plus 1120||43,00": {
+          "type": "Robusta",
+          "tons": 43.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|RFA||Bremen||FCA|plus 1380||43,20": {
+          "type": "Robusta",
+          "tons": 43.2
+        },
+        "Robusta|VIETNAM|Gr.1 18 2%||2025/26|||Bremen||FCA|plus 1000||38,40": {
+          "type": "Robusta",
+          "tons": 38.4
+        },
+        "Robusta|VIETNAM|Gr.1 18 clean||2025/26|||Bremen||FCA|plus 1125||108,00": {
+          "type": "Robusta",
+          "tons": 108.0
+        },
+        "Robusta|VIETNAM|Gr.1 18 WP||2025/26|||Bremen||FCA|plus 1230||64,80": {
+          "type": "Robusta",
+          "tons": 64.8
+        },
+        "Robusta|VIETNAM|Gr.1 18 clean||||ETA 12/06|Genoa||CIF|plus 640||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.1 18 clean||||ETA 12/06|Trieste||CIF|plus 640||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||||ETA 15/07|Genoa||CIF|plus 630||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||||ETA 02/08|Genoa||CIF|plus 630||30,00": {
+          "type": "Robusta",
+          "tons": 30.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|||Le Havre|Sealogis|IS|plus 970||10,00": {
+          "type": "Robusta",
+          "tons": 10.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 WP||2025/26||ETA 30/06|Antwerp||CIF|plus 900||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|RFA|ETA 17/07|Vado Ligure||CIF|plus 820||43,00": {
+          "type": "Robusta",
+          "tons": 43.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|||Vado Ligure|Pacorini|IS|plus 820|320|": {
+          "type": "Robusta",
+          "tons": 19.2
+        },
+        "Robusta|VIETNAM|Gr.2 13 5%||2024/25|||Antwerp|Pacorini|IS|plus 520||22,00": {
+          "type": "Robusta",
+          "tons": 22.0
+        },
+        "Robusta|VIETNAM|Gr.2 13 5%||2025/26||ETA 12/07|Hamburg||CIF|plus 470||65,00": {
+          "type": "Robusta",
+          "tons": 65.0
         },
         "Robusta|VIETNAM|Gr.2 13 5%|||||Antwerp||IS|plus 550||20,00": {
           "type": "Robusta",
@@ -2299,109 +2311,21 @@
           "type": "Robusta",
           "tons": 12.0
         },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|FT||Antwerp||IS|plus 2030|720|": {
-          "type": "Robusta",
-          "tons": 43.2
-        },
-        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|RFA||Vado Ligure|Pacorini|IS|plus 1070||43,00": {
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|FT||Antwerp||IS|plus 2030||43,00": {
           "type": "Robusta",
           "tons": 43.0
-        },
-        "Robusta|VIETNAM|Gr.3||2024/25|||Hamburg||IS|minus 50||24,00": {
-          "type": "Robusta",
-          "tons": 24.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%|||4C||Bremen|Vollers|FCA|plus 320||10,00": {
-          "type": "Robusta",
-          "tons": 10.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean|||||Trieste|Romani|FCA|plus 560||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|RFA||Barcelona|Masiques|FCA|plus 830||21,60": {
-          "type": "Robusta",
-          "tons": 21.6
-        },
-        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|RFA||Bremen||FCA|plus 1380||43,20": {
-          "type": "Robusta",
-          "tons": 43.2
-        },
-        "Robusta|VIETNAM|Gr.1 16 2%|||RFA||Bremen|J.MW|FCA|plus 970||42,00": {
-          "type": "Robusta",
-          "tons": 42.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%|||||Hamburg||FCA|plus 510|3600|": {
-          "type": "Robusta",
-          "tons": 216.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%|||RFA||Hamburg||FCA|plus 710|1800|": {
-          "type": "Robusta",
-          "tons": 108.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 2%|||RFA||Hamburg||FCA|plus 780|2160|": {
-          "type": "Robusta",
-          "tons": 129.6
         },
         "Robusta|VIETNAM|Gr.2 13 5%|||||Barcelona|Masiques|FCA|plus 200||8,00": {
           "type": "Robusta",
           "tons": 8.0
         },
-        "Robusta|VIETNAM|Gr.1 18 2%||2025/26|||Bremen||FCA|plus 1000||38,40": {
-          "type": "Robusta",
-          "tons": 38.4
-        },
-        "Robusta|VIETNAM|Gr.1 18 clean||2025/26|||Bremen||FCA|plus 1125||108,00": {
-          "type": "Robusta",
-          "tons": 108.0
-        },
-        "Robusta|VIETNAM|Gr.1 18 WP||2025/26|||Bremen||FCA|plus 1230||64,80": {
-          "type": "Robusta",
-          "tons": 64.8
-        },
         "Robusta|VIETNAM|Gr.1 16 clean|||||Koper|Pacorini|FCA|USD/mt 4250||400,00": {
           "type": "Robusta",
           "tons": 400.0
         },
-        "Robusta|VIETNAM|Gr.1 18 clean||||ETA 12/06|Genoa||CIF|plus 640||20,00": {
+        "Robusta|VIETNAM|Gr.2 13 5%||||ETA 31/05|Antwerp|Vollers|FCA|plus 400||21,60": {
           "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.1 18 clean||||ETA 12/06|Trieste||CIF|plus 640||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||||ETA 15/07|Genoa||CIF|plus 630||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||||ETA 02/08|Genoa||CIF|plus 630||30,00": {
-          "type": "Robusta",
-          "tons": 30.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 WP||2025/26|||Le Havre|Sealogis|IS|plus 940||10,00": {
-          "type": "Robusta",
-          "tons": 10.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 WP||2025/26||ETA 30/06|Antwerp||CIF|plus 870||20,00": {
-          "type": "Robusta",
-          "tons": 20.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|RFA|ETA 15/07|Vado Ligure||CIF|plus 800||43,00": {
-          "type": "Robusta",
-          "tons": 43.0
-        },
-        "Robusta|VIETNAM|Gr.1 16 clean||2025/26||ETA 03/06|Vado Ligure||CIF|plus 700|320|": {
-          "type": "Robusta",
-          "tons": 19.2
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%||2025/26|||Antwerp|Pacorini|IS|plus 520||22,00": {
-          "type": "Robusta",
-          "tons": 22.0
-        },
-        "Robusta|VIETNAM|Gr.2 13 5%||2025/26|||Antwerp|Pacorini|IS|plus 600||22,00": {
-          "type": "Robusta",
-          "tons": 22.0
+          "tons": 21.6
         },
         "Robusta|VIETNAM|Gr.1 16 clean||2025/26|RFA||Hamburg||IS|plus 1250||40,00": {
           "type": "Robusta",
@@ -2411,20 +2335,50 @@
           "type": "Robusta",
           "tons": 60.0
         },
-        "Robusta|VIETNAM|Gr.2 13 5%||||ETA 31/05|Antwerp|Vollers|FCA|plus 400||21,60": {
+        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||AFLOAT|Barcelona|Masiques|FCA|plus 675||40,00": {
           "type": "Robusta",
-          "tons": 21.6
+          "tons": 40.0
+        },
+        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||AFLOAT|Vigo|Access World|FCA|plus 695|290|": {
+          "type": "Robusta",
+          "tons": 17.4
+        },
+        "Robusta|VIETNAM|Gr.1 18 clean||2025/26||AFLOAT|Vado Ligure|Pacorini|FCA|plus 695|1920|": {
+          "type": "Robusta",
+          "tons": 115.2
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|||Vado Ligure|Pacorini|FCA|plus 665||180,00": {
+          "type": "Robusta",
+          "tons": 180.0
+        },
+        "Robusta|VIETNAM|Gr.1 16 clean||2025/26|||Naples|Il Polo de Caffe|FCA|plus 665||40,00": {
+          "type": "Robusta",
+          "tons": 40.0
+        },
+        "Robusta|VIETNAM|Gr.2 13 5%||2024/25|||Barcelona|Masiques|FCA|plus 445||20,00": {
+          "type": "Robusta",
+          "tons": 20.0
+        },
+        "Robusta|VIETNAM|Gr.2 13 5%||2024/25|||Antwerp|Commodity Centre|FCA|plus 420||52,00": {
+          "type": "Robusta",
+          "tons": 52.0
         }
       },
       "wow": {
-        "prev_date": "2026-06-06",
-        "in_offers": 0,
-        "out_offers": 0,
-        "in_tons": 0,
-        "out_tons": 0,
-        "net_tons": 0,
-        "in_tons_by_type": {},
-        "out_tons_by_type": {}
+        "prev_date": "2026-06-08",
+        "in_offers": 150,
+        "out_offers": 170,
+        "in_tons": 8477.4,
+        "out_tons": 11057.3,
+        "net_tons": -2579.9,
+        "in_tons_by_type": {
+          "Arabica": 6325.4,
+          "Robusta": 2152.0
+        },
+        "out_tons_by_type": {
+          "Arabica": 8058.3,
+          "Robusta": 2999.0
+        }
       }
     }
   ]

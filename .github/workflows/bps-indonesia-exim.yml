@@ -1,0 +1,119 @@
+name: "0.9 – BPS Indonesia coffee exports (monthly)"
+
+# Pulls Indonesia's national coffee export numbers from BPS via the
+# official Web API (https://webapi.bps.go.id/v1/api/dataexim). Plain
+# JSON GETs, no Cloudflare. Earlier attempts at the Cloudflare-fronted
+# lampung.bps.go.id/en/exim Server Action all failed from CI — headless
+# Chromium (#27568532810, #27569193240, #27569356350), Xvfb-headed
+# Chromium (#27572914986), ZenRows free tier (#27574157444), ScraperAPI
+# free tier (#27594067937, #27594246940), and a Cloudflare-Worker proxy
+# (intra-CF traffic still 403'd). The Web API is BPS's published path
+# for programmatic access and returns the same row shape.
+#
+# Requires repository secret:
+#   BPS_API_KEY — the "App ID" from webapi.bps.go.id after registering.
+
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: "Single month YYYY-MM (overrides from/to)"
+        required: false
+        default: ""
+        type: string
+      from:
+        description: "Range start YYYY-MM (inclusive)"
+        required: false
+        default: ""
+        type: string
+      to:
+        description: "Range end YYYY-MM (inclusive)"
+        required: false
+        default: ""
+        type: string
+      force_hs:
+        description: "Override HS revision dispatch (2017 or 2022). Empty = auto by year."
+        required: false
+        default: ""
+        type: string
+  # schedule:
+  #   - cron: '15 4 5 * *'    # re-enable after Xvfb run is proven
+
+concurrency:
+  group: bps-indonesia-exim
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30       # 13 HS codes × ~1 s per year-call × a few years ≈ <5 min
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install Python dependencies
+        # Just `requests`. The official BPS Web API is plain JSON over
+        # HTTPS — no Chromium, no Xvfb, no proxy provider needed.
+        run: pip install requests
+
+      - name: Run BPS scraper
+        id: scrape
+        working-directory: backend
+        env:
+          MONTH:              ${{ inputs.month }}
+          FROM_M:              ${{ inputs.from }}
+          TO_M:                ${{ inputs.to }}
+          BPS_FORCE_HS:       ${{ inputs.force_hs }}
+          BPS_API_KEY:        ${{ secrets.BPS_API_KEY }}
+        # fetch_month() prefers BPS_API_KEY (official Web API). The
+        # legacy CF-Worker / ScraperAPI / ZenRows / patchright paths
+        # are kept in source as documentation of what doesn't work.
+        run: |
+          set +e
+          ARGS="--write"
+          if [ -n "$MONTH" ]; then
+            ARGS="$ARGS --month $MONTH"
+          elif [ -n "$FROM_M" ] && [ -n "$TO_M" ]; then
+            ARGS="$ARGS --from $FROM_M --to $TO_M"
+          fi
+          PYTHONPATH=. python -m scraper.sources.bps_indonesia_exim $ARGS
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated JSON if changed
+        if: steps.scrape.outputs.rc == '0'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f frontend/public/data/indonesia_exports.json ]; then
+            git add frontend/public/data/indonesia_exports.json
+            if git diff --cached --quiet; then
+              echo "No JSON change."
+            else
+              CURRENT=$(git rev-parse --abbrev-ref HEAD)
+              git commit -m "data: BPS Indonesia exports $(date -u +%Y-%m-%d) [skip ci]"
+              if [ "$CURRENT" = "main" ]; then
+                git pull --rebase --autostash --strategy-option=theirs origin main
+                git push
+              else
+                git push origin "HEAD:$CURRENT"
+              fi
+            fi
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

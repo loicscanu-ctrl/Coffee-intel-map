@@ -17,7 +17,9 @@ interface EcfMonth {
   robusta_mt?: number; arabica_unwashed_mt?: number; arabica_washed_mt?: number;
 }
 
-export default function SpotPanel() {
+export default function SpotPanel(
+  { section = "all" }: { section?: "all" | "tiles" | "square_map" | "ecf" | "origin_port" } = {},
+) {
   const [d, setD] = useState<SpotData | null>(null);
   const [hist, setHist] = useState<History | null>(null);
   const [ecf, setEcf] = useState<EcfMonth | null>(null);
@@ -48,6 +50,23 @@ export default function SpotPanel() {
 
   if (err) return <div className="p-4 text-xs text-slate-500">Spot offer data unavailable.</div>;
   if (!d) return <div className="p-4 text-xs text-slate-500">Loading spot offers…</div>;
+
+  // Report/briefing mode — render a single section without the panel chrome.
+  if (section !== "all") {
+    if (section === "tiles") {
+      return (
+        <div className="p-2 grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <TotalTile totals={totals} grand={grand} unit={unit} />
+          <WowTile snap={hist?.snapshots?.[hist.snapshots.length - 1] ?? null} unit={unit} />
+          <OffersTile by={d.by_type} n={d.row_count} />
+          <EcfTile totals={totals} ecf={ecf} unit={unit} />
+        </div>
+      );
+    }
+    if (section === "square_map") return <div className="p-2"><PortSquareMap rows={rows} unit={unit} /></div>;
+    if (section === "ecf") return <div className="p-2"><EcfComparison totals={totals} ecf={ecf} unit={unit} /></div>;
+    return <div className="p-2"><OriginPortHeatmap rows={rows} unit={unit} /></div>; // origin_port
+  }
 
   return (
     <div className="p-4 space-y-5">

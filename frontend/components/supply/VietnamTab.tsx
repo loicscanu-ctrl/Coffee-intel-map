@@ -1,12 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
+import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
-import VietnamDestinationEstimate from "@/components/supply/VietnamDestinationEstimate";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
+
+// Vietnam's multi-source production estimates (USDA / MARD / ICO) ship in
+// vn_farmer_economics.json under `balance_sheet`. We keep just the season
+// rows here so SupplyDemandBalance gets fed via its multiSource prop.
+interface VnSeasonRow {
+  season:   string;
+  forecast: boolean;
+  production: { usda: number; mard: number; ico: number };
+  exports_ico: number;
+  consumption: number;
+}
+interface VnBalanceSheet {
+  unit: string;
+  note: string;
+  seasons: VnSeasonRow[];
+}
 
 interface VietnamSupply {
   scraped_at: string | null;
@@ -26,9 +42,6 @@ interface VietnamSupply {
     monthly?: { month: string; urea_kt: number; kcl_kt: number; npk_kt: number; dap_kt: number; total_kt: number }[];
   } | null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SharesData = any;
 
 function VnEnsoNote() {
   return (
@@ -66,21 +79,29 @@ function VnEnsoNote() {
 export default function VietnamTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather" | "analogs">("exports");
   const [vnSupply, setVnSupply] = useState<VietnamSupply | null>(null);
-  const [sharesData, setSharesData] = useState<SharesData | null>(null);
+  // Multi-source production / exports / consumption series fed into
+  // SupplyDemandBalance on the Supply & Demand sub-tab. Drives the
+  // equation strip, production-spread block, table range cells and the
+  // error bars on the production line.
+  const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
   useEffect(() => {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
       .then(setVnSupply)
       .catch((err) => console.error("[VietnamTab] vietnam_supply fetch failed:", err));
-    fetch("/data/vn_country_shares.json")
+    fetch("/data/vn_farmer_economics.json")
       .then(r => r.json())
-      .then(setSharesData)
-      .catch((err) => console.error("[VietnamTab] vn_country_shares fetch failed:", err));
+      .then((d: { balance_sheet?: VnBalanceSheet }) => {
+        if (d?.balance_sheet) setVnBalanceSheet(d.balance_sheet);
+      })
+      .catch((err) => console.error("[VietnamTab] vn_farmer_economics fetch failed:", err));
   }, []);
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["vietnam_exports", "vietnam_price"]} />
+
       {/* Sub-tab bar */}
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map((t) => (
@@ -108,7 +129,27 @@ export default function VietnamTab() {
       )}
 
       {/* ── Supply & Demand ────────────────────────────────────────── */}
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="vietnam" label="Vietnam" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance
+          origin="vietnam"
+          label="Vietnam"
+          cropYearMonths="Oct–Sep"
+          multiSource={vnBalanceSheet ? {
+            sources: [
+              { key: "usda", label: "USDA", color: "#3b82f6" },
+              { key: "mard", label: "MARD", color: "#10b981" },
+              { key: "ico",  label: "ICO",  color: "#f59e0b" },
+            ],
+            seasons: vnBalanceSheet.seasons.map(s => ({
+              cropYear:    s.season,
+              forecast:    s.forecast,
+              production:  s.production,
+              exports:     s.exports_ico,
+              consumption: s.consumption,
+            })),
+          } : null}
+        />
+      )}
 
       {/* ── Weather ────────────────────────────────────────────────── */}
       {subTab === "weather" && (
@@ -145,19 +186,6 @@ export default function VietnamTab() {
               </div>
             )}
           </div>
-
-          {/* Estimated destination breakdown */}
-          {vnSupply?.exports && sharesData && (
-            <div>
-              <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
-                Estimated Destination · 2025–2026
-              </h2>
-              <VietnamDestinationEstimate
-                monthlyExports={vnSupply.exports.monthly}
-                sharesData={sharesData}
-              />
-            </div>
-          )}
 
         </div>
       )}

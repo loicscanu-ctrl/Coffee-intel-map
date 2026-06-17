@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import OriginExportPanel from "@/components/supply/OriginExportPanel";
+import { DataHealthBar } from "@/components/DataHealthBar";
+import IndonesiaExportsPanel from "@/components/supply/IndonesiaExports";
 import IndonesiaFarmerEconomics from "@/components/supply/indonesia/IndonesiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
-import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
 
 interface IndonesiaSupply {
   country: string;
@@ -77,12 +77,14 @@ export default function IndonesiaTab() {
   useEffect(() => {
     fetch("/data/indonesia_supply.json")
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
-      .then((d) => { setData(d); if (!d.exports) setSubTab("farmer-economics"); })
+      .then(setData)
       .catch(() => setError(true));
   }, []);
 
   return (
     <div className="space-y-4">
+      <DataHealthBar keys={["indonesia_exports"]} />
+
       <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1 w-fit">
         {(["exports", "supply-demand", "farmer-economics", "weather", "analogs"] as const).map(t => (
           <button
@@ -103,9 +105,9 @@ export default function IndonesiaTab() {
         ))}
       </div>
 
-      {error && subTab !== "weather" && subTab !== "supply-demand" && (
+      {error && subTab === "farmer-economics" && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center space-y-1">
-          <div className="text-sm text-slate-400">Indonesia data not yet available</div>
+          <div className="text-sm text-slate-400">Farmer-economics data not yet available</div>
           <div className="text-[10px] text-slate-600">
             Requires at least one scraper run with <code className="text-slate-400">indonesia</code> and{" "}
             <code className="text-slate-400">indonesia_weather</code> sources active.
@@ -113,7 +115,7 @@ export default function IndonesiaTab() {
         </div>
       )}
 
-      {!error && !data && subTab !== "weather" && subTab !== "supply-demand" && (
+      {!error && !data && subTab === "farmer-economics" && (
         <div className="text-xs text-slate-500 animate-pulse py-12 text-center">
           Loading Indonesia data…
         </div>
@@ -125,17 +127,7 @@ export default function IndonesiaTab() {
         <WeatherAnalogs dataUrl="/data/weather_analogs_indonesia.json" label="Indonesia robusta" />
       )}
 
-      {data && subTab === "exports" && (
-        data.exports?.annual?.length ? (
-          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Indonesia Green Coffee Exports" />
-        ) : data.exports?.monthly?.length ? (
-          <OriginExportPanel exports={data.exports} title="Indonesia Green Coffee Exports" barColor="#8b5cf6" originNote="Indonesia: world's 4th largest producer (~75% robusta)." />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — pending the next USDA PSD scrape.
-          </div>
-        )
-      )}
+      {subTab === "exports" && <IndonesiaExportsPanel />}
 
       {data && subTab === "farmer-economics" && (
         <IndonesiaFarmerEconomics

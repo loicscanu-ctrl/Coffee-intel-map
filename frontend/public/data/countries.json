@@ -5,10 +5,10 @@
     "lng": -46.0,
     "name": "Brazil",
     "data": {
-      "prod": "3,122k bags exp (2026-04)",
+      "prod": "3,089k bags exp (2026-05)",
       "stock": "",
       "cons": "",
-      "intel": "Drought MED: Sul de Minas, Cerrado, Esp\u00edrito Santo \u00b7 ENSO neutral (ONI 0.48)"
+      "intel": "Drought MED: Sul de Minas, Cerrado \u00b7 ENSO neutral (ONI 0.48)"
     }
   },
   {
@@ -32,7 +32,7 @@
       "prod": "exports pending",
       "stock": "",
       "cons": "",
-      "intel": "Drought HIGH: Huila, Nari\u00f1o, Antioquia, Cauca \u00b7 ENSO neutral (ONI 0.48) \u00b7 FNC 2,030,000 COP/carga"
+      "intel": "Drought HIGH: Huila, Nari\u00f1o, Antioquia, Cauca \u00b7 ENSO neutral (ONI 0.48) \u00b7 FNC 2,130,000 COP/carga"
     }
   },
   {
@@ -68,7 +68,7 @@
       "prod": "592k bags (2026-04)",
       "stock": "",
       "cons": "",
-      "intel": "ENSO neutral (ONI 0.48) \u00b7 UCDA $168.42/cwt"
+      "intel": "ENSO neutral (ONI 0.48) \u00b7 UCDA $171.41/cwt"
     }
   },
   {

@@ -41,17 +41,29 @@ jobs:
       - name: Install Playwright browser
         run: playwright install chromium --with-deps
 
-      - name: Run annual scrapers
+      - name: Run annual scrapers (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.annual_scraper
+          # UN DataPortal API requires a bearer token (anonymous calls 401).
+          # Register a free token at https://population.un.org/dataportal/about/dataapi
+          # and add it as the UN_WPP_TOKEN repository secret.
+          UN_WPP_TOKEN: ${{ secrets.UN_WPP_TOKEN }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.annual_scraper && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
-      - name: Export static JSON
+      - name: Export static JSON (3 attempts)
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m scraper.export_static_json
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.export_static_json && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 5m..." && sleep 300 || exit 1
+          done
 
       - name: Commit updated static JSON if changed
         run: |
@@ -60,9 +72,12 @@ jobs:
           for f in frontend/public/data/*.json; do
             [ -f "$f" ] && git add "$f" || true
           done
+          branch="${GITHUB_REF_NAME}"
           git diff --cached --quiet \
             && echo "No changes." \
-            || (git commit -m "data: annual UN-WPP update [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+            || (git commit -m "data: annual UN-WPP update [skip ci]" \
+                && git pull --rebase --autostash --strategy-option=theirs origin "$branch" \
+                && git push origin "HEAD:$branch")
 
       - name: Notify on failure
         if: failure()
