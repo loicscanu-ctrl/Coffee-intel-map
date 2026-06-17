@@ -1,5 +1,6 @@
 "use client";
 import { AgronomyCard, H, P, LI, Code } from "../agronomy/prose";
+import { K_CEILING } from "@/lib/demandCeilings";
 
 // Proposed saturation ceilings (K) for the 12 markets actually in the
 // Consumption-tab projection. Everything is expressed in the table's native
@@ -12,23 +13,25 @@ import { AgronomyCard, H, P, LI, Code } from "../agronomy/prose";
 //   x    = headroom multiple (K / now)
 //
 // Sorted by headroom so the genuine emerging upside (India, China…) is on top.
+// K is sourced from @/lib/demandCeilings (shared with the live projection);
+// `head` = implied kg/head = K × adultShare, `now` = 2025 USDA ÷ WPP 18+.
 type Row = {
-  m: string; cls: "Emerging" | "Origin" | "Mature";
-  now: number; anchor: string; logic: string; K: number; head: number;
+  key: string; m: string; cls: "Emerging" | "Origin" | "Mature";
+  now: number; share: number; anchor: string; logic: string;
 };
 const ROWS: Row[] = [
-  { m: "India",       cls: "Emerging", now: 0.08, anchor: "Korea − heavy",   logic: "Coffee confined to the south; very young (med. 28) is the one tailwind, but no national coffee culture and tea-leaning. Huge multiple, tiny absolute.", K: 0.6,  head: 0.43 },
-  { m: "China",       cls: "Emerging", now: 0.31, anchor: "Korea/Japan − heavy", logic: "Tea base 0.57, median age 41, Boba/tea substitution, 85–92% lactose, O2O leapfrog weakening at-home base. All four dampeners fire → far below the East-Asian plateau.", K: 1.8, head: 1.47 },
-  { m: "Egypt",       cls: "Emerging", now: 0.81, anchor: "MENA",            logic: "Strong tea culture; young (med. 24) tailwind offset by low disposable income capping premium retail.", K: 1.8,  head: 1.15 },
-  { m: "Indonesia",   cls: "Origin",   now: 1.43, anchor: "self / SEA",      logic: "Origin country, young, urban café culture rising fast off a modest base.", K: 3.0, head: 2.14 },
-  { m: "Turkey",      cls: "Emerging", now: 1.60, anchor: "Turkey − tea",    logic: "Tea wall (3.16 kg/head, world #1) is the binding constraint; Gen-Z espresso/chains grow but cezve tradition + tea cap K hard.", K: 2.5, head: 1.91 },
-  { m: "Mexico",      cls: "Origin",   now: 1.99, anchor: "LatAm",           logic: "Producer with rising domestic demand; instant→retail shift, 75k+ outlets. Moderate ceiling.", K: 3.0, head: 2.14 },
-  { m: "Russia",      cls: "Emerging", now: 2.40, anchor: "E. Europe",       logic: "Entrenched tea base and an ageing population (med. 40) damp it; RTD + instant + urban chains push it up modestly.", K: 3.3, head: 2.63 },
-  { m: "Ethiopia",    cls: "Origin",   now: 3.00, anchor: "self",            logic: "Birthplace of coffee, ceremonial daily culture, very young; ceiling set by income/urbanisation, not appetite.", K: 4.5, head: 2.52 },
-  { m: "Vietnam",     cls: "Origin",   now: 3.98, anchor: "self",            logic: "Origin with robust, distinctive domestic café culture; still climbing but approaching maturity.", K: 5.0, head: 3.66 },
-  { m: "South Korea", cls: "Mature",   now: 4.53, anchor: "self (plateau)",  logic: "The hyper-adopter analog itself — near its barbell-market plateau; little headroom left.", K: 5.0, head: 4.35 },
-  { m: "Philippines", cls: "Mature",   now: 5.18, anchor: "self / E-Asia",   logic: "Instant / 3-in-1 culture already very high per adult; young population but RTD/instant largely saturated.", K: 6.0, head: 4.05 },
-  { m: "Brazil",      cls: "Mature",   now: 8.21, anchor: "self (plateau)",  logic: "Coffee is the national drink; mature consumer-producer essentially at plateau.", K: 9.0, head: 6.91 },
+  { key: "india",       m: "India",       cls: "Emerging", now: 0.08, share: 0.712, anchor: "Korea − heavy",   logic: "Coffee confined to the south; very young (med. 28) is the one tailwind, but no national coffee culture and tea-leaning. Huge multiple, tiny absolute." },
+  { key: "china",       m: "China",       cls: "Emerging", now: 0.31, share: 0.814, anchor: "Korea/Japan − heavy", logic: "Tea base 0.57, median age 41, Boba/tea substitution, 85–92% lactose, O2O leapfrog weakening at-home base. All four dampeners fire → far below the East-Asian plateau." },
+  { key: "egypt",       m: "Egypt",       cls: "Emerging", now: 0.81, share: 0.638, anchor: "MENA",            logic: "Strong tea culture; young (med. 24) tailwind offset by low disposable income capping premium retail." },
+  { key: "indonesia",   m: "Indonesia",   cls: "Origin",   now: 1.43, share: 0.714, anchor: "self / SEA",      logic: "Origin country, young, urban café culture rising fast off a modest base." },
+  { key: "turkey",      m: "Turkey",      cls: "Emerging", now: 1.60, share: 0.765, anchor: "Turkey − tea",    logic: "Tea wall (3.16 kg/head, world #1) is the binding constraint; Gen-Z espresso/chains grow but cezve tradition + tea cap K hard." },
+  { key: "mexico",      m: "Mexico",      cls: "Origin",   now: 1.99, share: 0.714, anchor: "LatAm",           logic: "Producer with rising domestic demand; instant→retail shift, 75k+ outlets. Moderate ceiling." },
+  { key: "russia",      m: "Russia",      cls: "Emerging", now: 2.40, share: 0.798, anchor: "E. Europe",       logic: "Entrenched tea base and an ageing population (med. 40) damp it; RTD + instant + urban chains push it up modestly." },
+  { key: "ethiopia",    m: "Ethiopia",    cls: "Origin",   now: 3.00, share: 0.561, anchor: "self",            logic: "Birthplace of coffee, ceremonial daily culture, very young; ceiling set by income/urbanisation, not appetite." },
+  { key: "vietnam",     m: "Vietnam",     cls: "Origin",   now: 3.98, share: 0.732, anchor: "self",            logic: "Origin with robust, distinctive domestic café culture; still climbing but approaching maturity." },
+  { key: "korea",       m: "South Korea", cls: "Mature",   now: 4.53, share: 0.870, anchor: "self (plateau)",  logic: "The hyper-adopter analog itself — near its barbell-market plateau; little headroom left." },
+  { key: "philippines", m: "Philippines", cls: "Mature",   now: 5.18, share: 0.675, anchor: "self / E-Asia",   logic: "Instant / 3-in-1 culture already very high per adult; young population but RTD/instant largely saturated." },
+  { key: "brazil",      m: "Brazil",      cls: "Mature",   now: 8.21, share: 0.768, anchor: "self (plateau)",  logic: "Coffee is the national drink; mature consumer-producer essentially at plateau." },
 ];
 
 const FACTORS = [
@@ -106,19 +109,22 @@ export default function MarketCeilings() {
             </tr>
           </thead>
           <tbody>
-            {ROWS.map(r => (
-              <tr key={r.m} className="border-b border-slate-800 align-top">
+            {ROWS.map(r => {
+              const K = K_CEILING[r.key];
+              return (
+              <tr key={r.key} className="border-b border-slate-800 align-top">
                 <td className="py-1.5 pr-2 text-slate-100 font-medium whitespace-nowrap">{r.m}</td>
                 <td className={`py-1.5 pr-2 ${clsTone(r.cls)} whitespace-nowrap`}>{r.cls}</td>
                 <td className="py-1.5 pr-2 text-right font-mono text-slate-400">{r.now.toFixed(2)}</td>
-                <td className="py-1.5 pr-2 text-right font-mono text-amber-300">{r.K.toFixed(1)}</td>
-                <td className="py-1.5 pr-2 text-right font-mono text-slate-500">{r.head.toFixed(1)}</td>
-                <td className="py-1.5 pr-3 text-right font-mono text-emerald-300">{(r.K / r.now).toFixed(1)}×</td>
+                <td className="py-1.5 pr-2 text-right font-mono text-amber-300">{K.toFixed(1)}</td>
+                <td className="py-1.5 pr-2 text-right font-mono text-slate-500">{(K * r.share).toFixed(1)}</td>
+                <td className="py-1.5 pr-3 text-right font-mono text-emerald-300">{(K / r.now).toFixed(1)}×</td>
                 <td className="py-1.5 text-slate-400 leading-relaxed">
                   <span className="text-slate-300">{r.anchor}.</span> {r.logic}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
