@@ -1,32 +1,57 @@
 {
   "unit": "million 60-kg bags",
-  "note": "Production estimates from independent sources. USDA = USDA FAS Coffee Semi-Annual (ID2025-0039, Dec 2025); GAEKI = Indonesian Coffee Exporters Association (AEKI/GAEKI press releases); ICO = International Coffee Organization Coffee Market Report. GAEKI does not publish a wide-syndication production series; entries shown are association-cited figures or local-industry consensus. Static seed — refresh after each USDA semi-annual.",
+  "note": "Production estimates from independent sources. USDA = USDA FAS Coffee Semi-Annual (ID2025-0039, Dec 2025); GAEKI = Indonesian Coffee Exporters Association (AEKI/GAEKI press releases); ICO = International Coffee Organization Coffee Market Report. GAEKI does not publish a wide-syndication production series; entries shown are association-cited figures or local-industry consensus. Static seed \u2014 refresh after each USDA semi-annual.",
   "updated": "2025-12",
   "sources": [
-    { "key": "usda",  "label": "USDA",  "color": "#3b82f6" },
-    { "key": "gaeki", "label": "GAEKI", "color": "#10b981" },
-    { "key": "ico",   "label": "ICO",   "color": "#f59e0b" }
+    {
+      "key": "usda",
+      "label": "USDA",
+      "color": "#3b82f6"
+    },
+    {
+      "key": "gaeki",
+      "label": "GAEKI",
+      "color": "#10b981"
+    },
+    {
+      "key": "ico",
+      "label": "ICO",
+      "color": "#f59e0b"
+    }
   ],
   "seasons": [
     {
       "season": "2022/23",
       "forecast": false,
-      "production": { "usda": 11.85, "ico": 11.0 }
+      "production": {
+        "usda": 10.7,
+        "ico": 11.0
+      }
     },
     {
       "season": "2023/24",
       "forecast": false,
-      "production": { "usda": 8.4, "ico": 9.7 }
+      "production": {
+        "usda": 8.2,
+        "ico": 9.7
+      }
     },
     {
       "season": "2024/25",
       "forecast": false,
-      "production": { "usda": 10.0, "gaeki": 11.0, "ico": 11.3 }
+      "production": {
+        "usda": 10.7,
+        "gaeki": 11.0,
+        "ico": 11.3
+      }
     },
     {
       "season": "2025/26",
       "forecast": true,
-      "production": { "usda": 12.5, "gaeki": 11.3 }
+      "production": {
+        "usda": 12.4,
+        "gaeki": 11.3
+      }
     }
   ]
 }
