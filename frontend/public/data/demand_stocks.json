@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T08:34:48.783355Z",
+  "generated_at": "2026-06-17T05:49:27.854132Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -1059,7 +1059,7 @@
   "ajca": {
     "source": "AJCA",
     "source_url": "https://www.ajca.or.jp/data/",
-    "last_updated": "2026-06-16",
+    "last_updated": "2026-06-17",
     "latest_year": "2025",
     "latest_imports_mt": 359382,
     "latest_consumption_mt": 397272,
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-16",
+    "last_updated": "2026-06-17",
     "countries": {
       "eu": {
         "name": "European Union",
