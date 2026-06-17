@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import type { CostData } from "@/components/supply/farmer-economics/farmerEconomicsData";
 import ProductionCostPanel from "@/components/supply/farmer-economics/ProductionCostPanel";
 import AcreageYieldPanel   from "@/components/supply/farmer-economics/AcreageYieldPanel";
-import VnBalanceSheetPanel from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
-import type { VnBalanceSheet } from "@/components/supply/farmer-economics/VnBalanceSheetPanel";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+// `balance_sheet` is read by VietnamTab now and piped into the
+// SupplyDemandBalance card on the Supply & Demand sub-tab. We don't render
+// it here anymore — keeping the field on the interface for parsing tolerance.
 interface VnEconomicsData {
   updated: string;
   note: string;
   cost_robusta: CostData;
   acreage: { thousand_ha: number; yoy_pct: number; source_label: string };
   yield:   { bags_per_ha:  number; yoy_pct: number; source_label: string };
-  balance_sheet: VnBalanceSheet;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -47,10 +47,9 @@ export default function VietnamFarmerEconomics() {
 
   return (
     <div className="space-y-5">
-      {/* Balance sheet — full width */}
-      <VnBalanceSheetPanel balance={data.balance_sheet} />
-
-      {/* Production cost + acreage/yield */}
+      {/* The Supply Balance Sheet that used to live at the top of this card
+          is now part of SupplyDemandBalance on the Supply & Demand sub-tab —
+          the formula, multi-source range, and the chart all live there. */}
       <div className="space-y-4">
         <ProductionCostPanel
           cost={vnFaqSpot ? { ...data.cost_robusta, rc_spot: vnFaqSpot } : data.cost_robusta}
@@ -59,7 +58,6 @@ export default function VietnamFarmerEconomics() {
         />
         <AcreageYieldPanel acreage={data.acreage} yield_={data.yield} yieldUnit="mt/ha" />
       </div>
-
     </div>
   );
 }

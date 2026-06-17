@@ -79,6 +79,76 @@ const _segLabel = (u: SDUnit) => (v: unknown) => {
   return Math.round(native).toLocaleString();
 };
 
+// ── Equation strip + production-spread helpers ──────────────────────────────
+// These two were the standout features of the old VnBalanceSheetPanel; they
+// are inlined here so any origin that provides a `multiSource` overlay gets
+// the equation header + per-source spread block "for free". Stand-alone
+// components keep the main render readable.
+
+function Eq({ label, value, sign, color, sub }: {
+  label: string; value: string; sign?: string; color: string; sub?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 flex-1 min-w-0">
+      {sign && <span className="text-slate-500 text-lg font-light shrink-0">{sign}</span>}
+      <div className="bg-slate-900 border rounded-lg px-3 py-2 flex-1 min-w-0"
+        style={{ borderColor: color + "55" }}>
+        <div className="text-[8px] uppercase tracking-wide font-bold mb-0.5" style={{ color }}>
+          {label}
+        </div>
+        <div className="text-sm font-extrabold truncate" style={{ color }}>
+          {value}
+        </div>
+        {sub && <div className="text-[7px] text-slate-600 mt-0.5 truncate">{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+function ProductionSpread({
+  cropYear, isForecast, sources,
+}: {
+  cropYear: string; isForecast: boolean;
+  sources: { key: string; label: string; color: string; mBags: number }[];
+}) {
+  if (sources.length === 0) return null;
+  const values = sources.map(s => s.mBags);
+  const min   = Math.min(...values);
+  const max   = Math.max(...values);
+  const range = max - min || 1;
+  const avg   = values.reduce((s, v) => s + v, 0) / values.length;
+
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-2">
+      <div className="text-[9px] text-slate-400 uppercase tracking-wide font-bold">
+        Production estimates · {cropYear}{isForecast ? " (f)" : ""}
+      </div>
+      {sources.map(s => {
+        // Min source still gets a visible nub; everything above scales linearly.
+        const pct = ((s.mBags - min) / range) * 100;
+        return (
+          <div key={s.key} className="flex items-center gap-2">
+            <span className="text-[8px] font-bold w-11 shrink-0" style={{ color: s.color }}>
+              {s.label}
+            </span>
+            <div className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div className="h-full rounded-full"
+                style={{ width: `${Math.max(pct, 8)}%`, background: s.color }} />
+            </div>
+            <span className="text-[8px] font-mono text-slate-300 w-10 text-right">
+              {s.mBags.toFixed(1)}
+            </span>
+          </div>
+        );
+      })}
+      <div className="flex justify-between text-[7px] text-slate-600 border-t border-slate-800 pt-1.5 mt-1">
+        <span>Spread: {(max - min).toFixed(1)} M bags</span>
+        <span>Avg: <span className="text-slate-400 font-bold">{avg.toFixed(1)}</span></span>
+      </div>
+    </div>
+  );
+}
+
 /** Convert "2025" → "24/25" when `cropYearMonths` is set; otherwise keep
  *  the last 2 digits of the year unchanged. USDA marketing-year labels are
  *  always the ENDING year, so the crop year span starts at (end − 1). */
@@ -293,6 +363,37 @@ export default function SupplyDemandBalance({
   const stripedCellFill = (i: number, native: string, kind: "exp" | "open" | "cons" | "build" | "draw") =>
     chartData[i].isForecast ? seriesPattern(kind) : native;
 
+  // ── Equation strip + production spread inputs ───────────────────────────
+  // Both panels lean on the LATEST multi-source season (forecast preferred,
+  // else the most recent realized one). Numbers come in million 60-kg bags
+  // off the wire — we convert to the active unit at render time so the
+  // "k bags ↔ MT" toggle drives every surface.
+  const focusSeason = multiSource && multiSource.seasons.length
+    ? (multiSource.seasons.slice().reverse().find(s => s.forecast)
+       ?? multiSource.seasons[multiSource.seasons.length - 1])
+    : null;
+  const focusSourceValues = (multiSource && focusSeason)
+    ? multiSource.sources
+        .map(s => ({ ...s, mBags: focusSeason.production[s.key] }))
+        .filter(s => Number.isFinite(s.mBags))
+    : [];
+  const focusProdAvg = focusSourceValues.length
+    ? focusSourceValues.reduce((a, s) => a + (s.mBags as number), 0) / focusSourceValues.length
+    : 0;
+  // Equation strip values stay in million-bag space because that's the
+  // natural scale for an annual balance — even when the unit toggle is on
+  // tons we'd be looking at fractions of a million MT, so the {value}M
+  // formatter on `_eqValue` below adapts the suffix without losing legibility.
+  const _eqValue = (mBags: number): string => {
+    if (unit === "tons") return `${(mBags * 60 / 1000).toFixed(2)}M`;
+    return `${mBags.toFixed(1)}M`;
+  };
+  const _eqUnit  = unit === "tons" ? "MT" : "60-kg bags";
+  const focusExports     = focusSeason?.exports     ?? 0;
+  const focusConsumption = focusSeason?.consumption ?? 0;
+  const focusNetStocks   = focusProdAvg - focusExports - focusConsumption;
+  const focusDeficit     = focusNetStocks < 0;
+
   return (
     <div className="space-y-3">
       <div className={CARD}>
@@ -327,6 +428,44 @@ export default function SupplyDemandBalance({
             </div>
           </div>
         </div>
+
+        {/* ── Equation strip (Production avg − Exports − Consumption = Net stocks).
+            Renders only when a multi-source overlay is wired in, using its latest
+            forecast row when available, otherwise the most recent realized one.
+            Lifted from the legacy VnBalanceSheetPanel so the formula is now a
+            first-class feature of the generic balance card. */}
+        {focusSeason && focusSourceValues.length > 0 && (
+          <div className="flex items-stretch gap-1">
+            <Eq
+              label="Production avg"
+              value={_eqValue(focusProdAvg)}
+              color="#22c55e"
+              sub={`${multiSource!.sources.map(s => s.label).join(" / ")} · ${focusSeason.cropYear}${focusSeason.forecast ? " (f)" : ""}`}
+            />
+            <Eq
+              label={multiSource!.sources.length === 1 ? `${multiSource!.sources[0].label} Exports` : "Exports"}
+              value={_eqValue(focusExports)}
+              sign="−"
+              color="#ef4444"
+              sub={`Annual exports · ${_eqUnit}`}
+            />
+            <Eq
+              label="Local Consumption"
+              value={_eqValue(focusConsumption)}
+              sign="−"
+              color="#f97316"
+              sub="Domestic estimate"
+            />
+            <Eq
+              label="Net Stocks"
+              value={`${focusNetStocks >= 0 ? "+" : "−"}${_eqValue(Math.abs(focusNetStocks))}`}
+              sign="="
+              color={focusDeficit ? "#f87171" : "#34d399"}
+              sub={focusDeficit ? "Supply deficit" : "Supply surplus"}
+            />
+          </div>
+        )}
+
         <div className="h-60">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} stackOffset="sign" margin={{ top: 14, right: 8, left: -6, bottom: 0 }}>
@@ -413,6 +552,21 @@ export default function SupplyDemandBalance({
             </span>
           )}
         </div>
+
+        {/* Per-source production spread for the focus crop — same layout the
+            old VnBalanceSheetPanel shipped, but now driven by the same prop
+            the rest of the card consumes. Hidden when no multi-source row
+            exists for the focus crop. */}
+        {focusSeason && focusSourceValues.length > 0 && (
+          <ProductionSpread
+            cropYear={focusSeason.cropYear}
+            isForecast={focusSeason.forecast}
+            sources={focusSourceValues.map(s => ({
+              key: s.key, label: s.label, color: s.color, mBags: s.mBags as number,
+            }))}
+          />
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full text-[9px] font-mono">
             <thead>
