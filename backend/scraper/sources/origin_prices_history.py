@@ -79,7 +79,7 @@ ORIGINS = {
         "name":      "Uganda Drugar (UCDA)",
         "source":    "Uganda Coffee Development Authority",
         "currency":  "USD",
-        "unit":      "per_kg",
+        "unit":      "per_cwt",
         "color":     "#ec4899",
         "commodity": "arabica",
     },
@@ -87,7 +87,7 @@ ORIGINS = {
         "name":      "Uganda Wugar (UCDA)",
         "source":    "Uganda Coffee Development Authority",
         "currency":  "USD",
-        "unit":      "per_kg",
+        "unit":      "per_cwt",
         "color":     "#14b8a6",
         "commodity": "arabica",
     },
@@ -251,18 +251,18 @@ def _today_uganda_price() -> float | None:
 
 
 def _today_uganda_arabica_price(grade_names: list[str]) -> float | None:
-    """Read a UCDA arabica grade farmgate price (USD/kg) from uganda_supply.json
-    → ucda_detail.grades. Used for Drugar / Wugar. Returns None when the grade
-    isn't in the latest monthly table (UCDA reports arabica grades seasonally)."""
+    """Read a UCDA arabica grade daily farmgate price (USD/cwt) from the UCDA
+    homepage table captured in uganda_supply.json → ucda_price.grades. Used for
+    Drugar / Wugar (scraped alongside Robusta Screen 15 in one pass). Returns
+    None when the grade isn't listed that day."""
     p = ROOT / "frontend" / "public" / "data" / "uganda_supply.json"
     try:
         d = json.loads(p.read_text(encoding="utf-8"))
-        grades = (d.get("ucda_detail") or {}).get("grades") or []
-        wanted = {g.lower() for g in grade_names}
-        for g in grades:
-            if str(g.get("grade", "")).lower() in wanted:
-                v = g.get("price_usd_kg")
-                return float(v) if v else None
+        grades = (d.get("ucda_price") or {}).get("grades") or {}
+        for name in grade_names:
+            for gk, gv in grades.items():
+                if gk.lower() == name.lower() and gv:
+                    return float(gv)
         return None
     except Exception as e:
         print(f"[origin_prices_history] uganda arabica price unavailable from {p}: {e}",

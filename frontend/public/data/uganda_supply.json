@@ -754,7 +754,12 @@
   "ucda_price": {
     "usd_cwt": 171.41,
     "as_of": "2026-06-17",
-    "grade": "Screen 15"
+    "grade": "Screen 15",
+    "grades": {
+      "Screen 15": 171.41,
+      "Wugar": 265.8,
+      "Drugar": 246.8
+    }
   },
   "weather": {
     "scraped_at": "2026-06-17T03:09:54.204890Z",

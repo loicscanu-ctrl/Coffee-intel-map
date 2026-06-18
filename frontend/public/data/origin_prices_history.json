@@ -464,22 +464,27 @@
       "name": "Uganda Drugar (UCDA)",
       "source": "Uganda Coffee Development Authority",
       "currency": "USD",
-      "unit": "per_kg",
+      "unit": "per_cwt",
       "color": "#ec4899",
       "commodity": "arabica",
-      "history": []
+      "history": [
+        {
+          "date": "2026-06-17",
+          "price": 246.8
+        }
+      ]
     },
     "uganda_wugar": {
       "name": "Uganda Wugar (UCDA)",
       "source": "Uganda Coffee Development Authority",
       "currency": "USD",
-      "unit": "per_kg",
+      "unit": "per_cwt",
       "color": "#14b8a6",
       "commodity": "arabica",
       "history": [
         {
           "date": "2026-06-17",
-          "price": 6.37
+          "price": 265.8
         }
       ]
     }
