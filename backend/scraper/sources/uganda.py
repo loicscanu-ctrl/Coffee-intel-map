@@ -69,7 +69,7 @@ def _make_price_item(price: float, grades: dict | None = None) -> dict:
     extra = ", ".join(f"{g} {p:.2f}" for g, p in grades.items() if g != "Screen 15")
     return {
         "title":    f"Uganda Screen 15 – {_today()}",
-        "body":     f"Uganda Fine Robusta Screen 15 price: {price:.2f} USD/cwt"
+        "body":     f"Uganda Fine Robusta Screen 15 price: {price:.2f} US¢/lb"
                     + (f" · Arabica: {extra}" if extra else ""),
         "source":   "UCDA",
         "category": "supply",

@@ -400,7 +400,9 @@ def extract_physical_price(item: dict) -> dict | None:
 
     # UGA S15
     if "price" in tags and "uganda" in tags and "futures" not in tags:
-        m = re.search(r"price:\s*([\d.]+)\s*USD/cwt", body, re.I)
+        # Accept the current "US¢/lb" label and the legacy "USD/cwt" (same
+        # number — 1 cwt = 100 lb) so older NewsItems still parse.
+        m = re.search(r"price:\s*([\d.]+)\s*(?:US¢/lb|¢/lb|USD/cwt)", body, re.I)
         if not m:
             return None
         return dict(symbol="UGA_S15", price=float(m.group(1)), currency="USD", unit="per_cwt",

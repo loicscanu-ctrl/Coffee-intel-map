@@ -103,7 +103,7 @@ def test_extract_falls_back_to_regex_without_price_data():
     """Un-migrated items (no price_data) still parse via the body regex."""
     pp = extract_physical_price({
         "tags": ["price", "uganda"],
-        "body": "Uganda Fine Robusta Screen 15 price: 245.50 USD/cwt",
+        "body": "Uganda Fine Robusta Screen 15 price: 245.50 US¢/lb",
         "source": "UCDA",
     })
     assert pp["symbol"] == "UGA_S15"
@@ -114,7 +114,7 @@ def test_extract_malformed_price_data_falls_through():
     """A non-numeric price_data must not crash — it falls back to regex."""
     pp = extract_physical_price({
         "tags": ["price", "uganda"],
-        "body": "Uganda Fine Robusta Screen 15 price: 245.50 USD/cwt",
+        "body": "Uganda Fine Robusta Screen 15 price: 245.50 US¢/lb",
         "source": "UCDA",
         "price_data": {"symbol": "UGA_S15", "price": "not-a-number"},
     })

@@ -63,7 +63,7 @@ ORIGINS = {
         "name":      "Uganda Robusta Screen 15 (UCDA)",
         "source":    "Uganda Coffee Development Authority",
         "currency":  "USD",
-        "unit":      "per_cwt",
+        "unit":      "cents_lb",
         "color":     "#f59e0b",
         "commodity": "robusta",
     },
