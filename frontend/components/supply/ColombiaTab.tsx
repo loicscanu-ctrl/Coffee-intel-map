@@ -1,11 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import OriginExportPanel from "@/components/supply/OriginExportPanel";
 import ColombiaFarmerEconomics from "@/components/supply/colombia/ColombiaFarmerEconomics";
 import WeatherCharts from "@/components/supply/WeatherCharts";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
 import AnnualExportsPanel from "@/components/supply/AnnualExportsPanel";
+import { toMultiSource, type BalanceSheetFile } from "@/lib/sdMultiSource";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
 
 interface ColombiaSupply {
   country: string;
@@ -14,7 +16,17 @@ interface ColombiaSupply {
     source: string;
     last_updated: string;
     unit: string;
-    monthly: { month: string; total_k_bags: number; yoy_pct: number | null }[];
+    monthly: {
+      month: string;
+      total_k_bags: number;
+      yoy_pct: number | null;
+      // Optional fields populated by DANE (NANDINA breakdown + FOB USD)
+      // and FNC (national production). All tabs degrade gracefully when
+      // absent so the older USDA-PSD-only seed still renders.
+      production_k_bags?: number | null;
+      total_t?: number | null;
+      by_nandina?: { code: string; tons: number | null; fob_usd: number | null }[];
+    }[];
     annual?: { year: string; total_k_bags: number; yoy_pct: number | null }[];
   } | null;
   fnc_price: {
@@ -68,6 +80,7 @@ const DEFAULT_MITACA = {
 export default function ColombiaTab() {
   const [subTab, setSubTab] = useState<"exports" | "supply-demand" | "farmer-economics" | "weather">("exports");
   const [data, setData] = useState<ColombiaSupply | null>(null);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheetFile | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -75,7 +88,29 @@ export default function ColombiaTab() {
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then((d) => { setData(d); if (!d.exports) setSubTab("farmer-economics"); })
       .catch(() => setError(true));
+    // Multi-source production estimates (USDA / FNC / ICO) for the
+    // S&D card's equation strip + production-spread block.
+    fetch("/data/co_balance_sheet.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BalanceSheetFile | null) => d && setBalanceSheet(d))
+      .catch(() => { /* absent → equation strip + spread block hide */ });
   }, []);
+
+  // Colombia ships two coffee crops (main Oct–Mar + mitaca Apr–Jun)
+  // inside one USDA marketing year that starts Oct 1. The realised
+  // exports overlay buckets by that 10-9 window so customs YTD
+  // overrides USDA PSD on the in-progress crop, consistent with VN/UG.
+  const realizedCoExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (data?.exports?.monthly ?? []).map(r => ({
+        month: r.month,
+        kbags: r.total_k_bags,
+      })),
+      cropYearStartMonth: 10,
+      sourceLabel: "DANE / FNC Colombia",
+    }),
+    [data?.exports?.monthly],
+  );
 
   return (
     <div className="space-y-4">
@@ -114,19 +149,49 @@ export default function ColombiaTab() {
         </div>
       )}
 
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="colombia" label="Colombia" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance
+          origin="colombia"
+          label="Colombia"
+          cropYearMonths="Oct–Sep"
+          realizedExports={realizedCoExports}
+          multiSource={toMultiSource(balanceSheet)}
+        />
+      )}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/colombia_weather.json" title="Weather · Colombia" />}
 
       {data && subTab === "exports" && (
-        data.exports?.annual?.length ? (
-          <AnnualExportsPanel exports={{ ...data.exports, annual: data.exports.annual }} title="Colombia Green Coffee Exports" />
-        ) : data.exports?.monthly?.length ? (
-          <OriginExportPanel exports={data.exports} title="Colombia Green Coffee Exports" barColor="#f97316" />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
-            Export data not yet available — pending the next USDA PSD scrape.
-          </div>
-        )
+        (() => {
+          const hasMonthly = !!data.exports?.monthly?.length;
+          const hasAnnual  = !!data.exports?.annual?.length;
+          if (!hasMonthly && !hasAnnual) {
+            return (
+              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center text-xs text-slate-500">
+                Export data not yet available — pending the next USDA PSD / DANE / FNC scrape.
+              </div>
+            );
+          }
+          // Monthly first (granular, recent — DANE NANDINA + FNC headline);
+          // annual second for long-run USDA context.
+          return (
+            <div className="space-y-4">
+              {hasMonthly && (
+                <OriginExportPanel
+                  exports={data.exports!}
+                  title="Colombia Green Coffee Exports (Monthly)"
+                  barColor="#f97316"
+                  originNote="DANE customs annex + FNC bulletins; suave-lavado (0901.11.10.00) + los demás (0901.11.90.00)."
+                />
+              )}
+              {hasAnnual && (
+                <AnnualExportsPanel
+                  exports={{ ...data.exports!, annual: data.exports!.annual! }}
+                  title="Colombia Green Coffee Exports (Annual · USDA)"
+                />
+              )}
+            </div>
+          );
+        })()
       )}
 
       {data && subTab === "farmer-economics" && (

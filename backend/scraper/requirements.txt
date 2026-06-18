@@ -11,6 +11,10 @@ feedparser==6.0.11
 requests==2.32.3
 pdfplumber==0.11.4
 openpyxl==3.1.5
+# xlrd 2.x dropped support for the legacy .xls BIFF format; DANE
+# (Colombia customs) still publishes its monthly export annex as .xls,
+# so we pin to the last 1.x release that keeps xls parsing.
+xlrd==1.2.0
 yfinance==0.2.54
 # curl_cffi mimics Chrome's TLS fingerprint so yfinance can fetch Yahoo's
 # Cloudflare-protected crumb-token endpoint from cloud IPs (PR #48).
