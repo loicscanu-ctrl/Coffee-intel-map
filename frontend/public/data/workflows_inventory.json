@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T14:56:01.165638Z",
+  "generated_at": "2026-06-18T15:33:58.920612Z",
   "count": 52,
   "workflows": [
     {
@@ -555,12 +555,9 @@
       "file": "scraper-monthly-colombia.yml",
       "name": "0.10 \u2013 Colombia coffee exports (monthly \u00b7 DANE + FNC)",
       "triggers": [
-        "schedule",
         "workflow_dispatch"
       ],
-      "crons": [
-        "30 6 * * *"
-      ],
+      "crons": [],
       "workflow_run_deps": [],
       "concurrency_group": "scraper-monthly-colombia",
       "timeout_minutes": 25
