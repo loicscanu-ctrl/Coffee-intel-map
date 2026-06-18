@@ -464,7 +464,7 @@
       "name": "Uganda Drugar (UCDA)",
       "source": "Uganda Coffee Development Authority",
       "currency": "USD",
-      "unit": "per_cwt",
+      "unit": "cents_lb",
       "color": "#ec4899",
       "commodity": "arabica",
       "history": [
@@ -478,7 +478,7 @@
       "name": "Uganda Wugar (UCDA)",
       "source": "Uganda Coffee Development Authority",
       "currency": "USD",
-      "unit": "per_cwt",
+      "unit": "cents_lb",
       "color": "#14b8a6",
       "commodity": "arabica",
       "history": [
