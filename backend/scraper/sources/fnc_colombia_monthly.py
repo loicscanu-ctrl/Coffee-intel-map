@@ -111,22 +111,59 @@ SPANISH_MONTHS = {
     "ago": 8, "sep": 9, "oct": 10, "nov": 11, "dic": 12,
 }
 
-# Heuristic patterns for the production + exports lines in the combined
-# bulletin. FNC writes numbers in Colombian locale (thousands separator
-# `.`, decimal `,`) and labels columns in Spanish ("Producción",
-# "Exportaciones"). The bulletin also reports YoY % which we capture for
-# the table KPI. Keep these tolerant — minor wording changes happen.
-_PRODUCTION_RE = re.compile(
-    r"(?:Producci[oó]n)\s+(?:mensual|del\s+mes|colombiana)?[^\d\-]{0,40}"
-    r"(?P<k_bags>-?[\d\.,]+)",
+# Real bulletin format (verified from January 2026 sample):
+#
+#   • Para este mes, la producción de café alcanzó 893 mil sacos, lo que
+#     representa una variación anual negativa del 34,2 %
+#   • Las exportaciones definitivas de café en diciembre se ubicaron en 1,1
+#     millones de sacos de 60 kg, lo que representa una caída de 19,0%
+#     frente al mismo mes de 2024.
+#
+# Two critical features of these bullets:
+#   1. Unit is EXPLICIT ("mil sacos" or "millones de sacos") — we use it to
+#      scale, so the parser can't be fooled by section numbers or page
+#      numbers (the v1 failure mode).
+#   2. Exports report the PREVIOUS month ("en diciembre" in the January
+#      bulletin) — the bullet names the month so we can read it back from
+#      the body.
+
+# "893 mil sacos" or "1,1 millones de sacos de 60 kg".
+_PROD_BULLET_RE = re.compile(
+    r"producci[oó]n\s+de\s+caf[eé]\s+alcanz[oó]\s+(?P<num>[\d.,]+)\s+"
+    r"(?P<unit>mil(?:lones)?)\s+(?:de\s+)?sacos",
     re.I,
 )
-_EXPORTS_RE = re.compile(
-    r"(?:Exportaciones)\s+(?:definitivas|de\s+caf[eé]|colombianas|mensuales)?[^\d\-]{0,40}"
-    r"(?P<k_bags>-?[\d\.,]+)",
+_EXP_BULLET_RE = re.compile(
+    r"exportaciones\s+definitivas\s+de\s+caf[eé]\s+en\s+(?P<month>"
+    + "|".join(SPANISH_MONTHS)
+    + r")(?:\s+(?:de\s+)?(?P<yr>20\d{2}))?\s+se\s+ubicaron\s+en\s+"
+    r"(?P<num>[\d.,]+)\s+(?P<unit>mil(?:lones)?)\s+(?:de\s+)?sacos",
     re.I,
 )
-_YOY_RE = re.compile(r"(?P<sign>[+\-])?\s*(?P<pct>[\d\.,]+)\s*%", re.I)
+# YoY pulled from the same bullet — the bulletin always pairs the volume
+# with the variación anual right after. Capture the sign by keyword so
+# we don't depend on a leading minus sign (the bulletin says "caída de
+# 19,0%" / "variación anual negativa del 34,2 %" instead).
+# YoY % regex. We scan the tail for the percent first, then look for a
+# Spanish sign keyword anywhere in the same window — the lazy regex
+# approach can't bind the keyword and the percent together reliably
+# because the bulletin can put 30+ chars of filler between them
+# ("variación anual negativa del 34,2 %").
+_YOY_PCT_RE = re.compile(r"(?P<pct>\d+(?:[.,]\d+)?)\s*%")
+_YOY_NEG_KW_RE = re.compile(
+    r"negativ[ao]|ca[ií]da|disminuci[oó]n|reducci[oó]n", re.I,
+)
+
+# URL filter: only the actual monthly statistical bulletin carries the
+# headline numbers we want. The other PDFs the FNC site links from the
+# same landing pages — FEPCafé reports, ad-hoc reports, daily
+# precio_cafe sheets, statutes, ethics codes — share the URL prefix but
+# don't carry the data. Matches "Informe-mensual-{month}" and
+# "Informe-Expos-{month}" variants (the latter is the exports-only
+# bulletin which uses the same bullet wording for exports).
+_BULLETIN_FILENAME_RE = re.compile(
+    r"informe[\-_](?:mensual|expos)[\-_]", re.I,
+)
 
 # Filename-derived month hint: e.g. "Informe-mensual-Marzo-2026-p.pdf"
 # or "Informe-Expos-Enero-2026.pdf". The body text always trumps the
@@ -147,7 +184,7 @@ class MonthlyEntry:
     production_k_bags:  float | None = None   # production for the same month
     yoy_pct:            float | None = None   # vs same month last year
     source_pdf:         str  = ""             # remote URL we parsed
-    parser_version:     str  = "v1"
+    parser_version:     str  = "v2"
 
 
 # ── HTTP fetching ───────────────────────────────────────────────────────────
@@ -246,11 +283,15 @@ def _extract_text(pdf_bytes: bytes) -> str:
 
 
 def _month_from_filename(url: str) -> tuple[int, int] | None:
-    """Recover (year, month) from the PDF URL when the body parse fails.
-    Filenames like 'Informe-mensual-Marzo-2026-p.pdf' or
-    '.../2026/04/3.-Informe-mensual-Marzo-2026-p.pdf'. We look at the
-    SLUG segment, not the upload-folder month, because the folder
-    upload date does NOT track the data month per the recon."""
+    """Recover (year, month) from the PDF URL.
+
+    Format A — filename carries both: 'Informe-mensual-Marzo-2026-p.pdf'.
+    Format B — filename carries the month only: '1.-Informe-mensual-enero-p-1.pdf'.
+                In this case the upload-folder YEAR ('/2026/03/') is the
+                only year anchor; we take it from the path.
+
+    The upload-folder MONTH is never used — recon confirmed the folder
+    upload month doesn't track the data month."""
     slug = url.rsplit("/", 1)[-1].lower()
     m = _FN_MONTH_RE.search(slug)
     if not m:
@@ -260,59 +301,126 @@ def _month_from_filename(url: str) -> tuple[int, int] | None:
     mn = SPANISH_MONTHS.get(base)
     if not mn:
         return None
+    # Year: prefer one in the filename slug, fall back to the
+    # /YYYY/MM/ upload-folder year.
     yr_match = re.search(r"20\d{2}", slug)
-    if not yr_match:
+    if yr_match:
+        return int(yr_match.group(0)), mn
+    folder_match = re.search(r"/uploads/(20\d{2})/\d{2}/", url, re.I)
+    if folder_match:
+        return int(folder_match.group(1)), mn
+    return None
+
+
+def _unit_scale(unit: str) -> float:
+    """'mil sacos' = thousand bags (output already in k-bags ⇒ ×1).
+    'millones de sacos' = million bags = ×1000 k-bags."""
+    return 1000.0 if unit.lower().startswith("millon") else 1.0
+
+
+def _yoy_near(text: str, end_idx: int) -> float | None:
+    """Pull the variación anual percentage from the bullet's tail. The
+    bulletin pairs the volume with the YoY directly after, e.g.
+    "...893 mil sacos, lo que representa una variación anual negativa
+    del 34,2 %". The leading sign is encoded as a Spanish keyword
+    ("negativa", "caída", "disminución") rather than a `-`, so we scan
+    for the percent first and then look for the sign keyword anywhere
+    between the volume and the percent."""
+    tail = text[end_idx: end_idx + 250]
+    pct_m = _YOY_PCT_RE.search(tail)
+    if not pct_m:
         return None
-    return int(yr_match.group(0)), mn
-
-
-def parse_bulletin(text: str, source_url: str) -> MonthlyEntry | None:
-    """Pull the headline monthly production + exports numbers out of one
-    bulletin's full text. Returns None if neither is found — better to
-    drop the row than ship a half-row with one field missing.
-
-    Heuristic — FNC's bulletins are PDFs designed for human reading, so
-    we look for the keyword + the next number on the same or following
-    line. The parser stays tolerant of layout drift (extra whitespace,
-    swapped column order); when the layout changes meaningfully we add
-    a `_parse_v2` and rely on the diagnostic dump to design it."""
-    prod_m = _PRODUCTION_RE.search(text)
-    exp_m  = _EXPORTS_RE.search(text)
-    if not (prod_m or exp_m):
+    pct = _fnc_number(pct_m.group("pct"))
+    if pct is None:
         return None
+    # Sign keyword has to appear before the percent in the same tail.
+    window = tail[: pct_m.start()]
+    if _YOY_NEG_KW_RE.search(window):
+        return -pct
+    return pct
 
-    prod_kbags = _fnc_number(prod_m.group("k_bags")) if prod_m else None
-    exp_kbags  = _fnc_number(exp_m.group("k_bags"))  if exp_m  else None
 
-    # YoY % is the first signed percentage near the exports line. Best-effort
-    # extraction — if it's missing we'll still ship the volumes.
-    yoy_pct: float | None = None
-    if exp_m:
-        tail = text[exp_m.end(): exp_m.end() + 200]
-        ym = _YOY_RE.search(tail)
-        if ym:
-            sign = -1 if (ym.group("sign") == "-") else 1
-            pct = _fnc_number(ym.group("pct"))
-            if pct is not None:
-                yoy_pct = sign * pct
+def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
+    """Pull production (bulletin month) AND exports (previous month, per
+    FNC's convention) from one bulletin. Returns 0, 1, or 2 entries:
+    production is keyed to the bulletin's title month, exports to the
+    month the bullet explicitly names.
 
-    # Month from filename. The bulletin's body title also names the
-    # month but title styling varies more than the URL slug, so we
-    # prefer the filename here.
+    Strict format requirements (the v1 loose match shipped garbage):
+      • The URL must be an Informe Mensual / Informe Expos PDF.
+      • The volume regex requires explicit "mil sacos" / "millones de
+        sacos" units, so a section number like "1.1 PRECIOS" can no
+        longer leak through.
+      • The month for exports is read FROM THE BULLET ("en diciembre"),
+        not assumed equal to the bulletin date.
+
+    Returns an empty tuple when nothing matches — caller treats that as
+    a non-bulletin PDF and skips it without polluting the data file."""
+    if not _BULLETIN_FILENAME_RE.search(source_url):
+        return ()
+
+    # Bulletin date (from filename) — used as the production month +
+    # fallback year for the exports month.
     fn_month = _month_from_filename(source_url)
     if not fn_month:
-        # No identifiable month → can't key the entry. Skip.
-        return None
-    yr, mn = fn_month
+        return ()
+    bulletin_yr, bulletin_mn = fn_month
 
-    return MonthlyEntry(
-        month=             f"{yr:04d}-{mn:02d}",
-        total_k_bags=      exp_kbags,
-        production_k_bags= prod_kbags,
-        yoy_pct=           yoy_pct,
-        source_pdf=        source_url,
-        parser_version=    "v1",
-    )
+    entries: list[MonthlyEntry] = []
+
+    # ── Production: this is the bulletin month.
+    prod_m = _PROD_BULLET_RE.search(text)
+    if prod_m:
+        num = _fnc_number(prod_m.group("num"))
+        if num is not None:
+            k_bags = num * _unit_scale(prod_m.group("unit"))
+            yoy = _yoy_near(text, prod_m.end())
+            entries.append(MonthlyEntry(
+                month=             f"{bulletin_yr:04d}-{bulletin_mn:02d}",
+                production_k_bags= round(k_bags, 1),
+                yoy_pct=           yoy,
+                source_pdf=        source_url,
+                parser_version=    "v2",
+            ))
+
+    # ── Exports: bullet names the month explicitly (usually M-1).
+    exp_m = _EXP_BULLET_RE.search(text)
+    if exp_m:
+        num = _fnc_number(exp_m.group("num"))
+        exp_mn = SPANISH_MONTHS.get(exp_m.group("month").lower())
+        if num is not None and exp_mn is not None:
+            # Year: explicit if the bullet carries it, else fall back to
+            # the bulletin year — adjusted backward by one year if the
+            # exports month is later in the calendar than the bulletin's
+            # (e.g. Jan bulletin reports Dec → previous year).
+            if exp_m.group("yr"):
+                exp_yr = int(exp_m.group("yr"))
+            elif exp_mn > bulletin_mn:
+                exp_yr = bulletin_yr - 1
+            else:
+                exp_yr = bulletin_yr
+            k_bags = num * _unit_scale(exp_m.group("unit"))
+            yoy = _yoy_near(text, exp_m.end())
+            # Same-month merge: when production already added a row for
+            # this exact month, augment it instead of adding a duplicate.
+            target = next(
+                (e for e in entries if e.month == f"{exp_yr:04d}-{exp_mn:02d}"),
+                None,
+            )
+            if target is not None:
+                target.total_k_bags = round(k_bags, 1)
+                if target.yoy_pct is None:
+                    target.yoy_pct = yoy
+            else:
+                entries.append(MonthlyEntry(
+                    month=          f"{exp_yr:04d}-{exp_mn:02d}",
+                    total_k_bags=   round(k_bags, 1),
+                    yoy_pct=        yoy,
+                    source_pdf=     source_url,
+                    parser_version= "v2",
+                ))
+
+    return tuple(entries)
 
 
 # ── orchestration ───────────────────────────────────────────────────────────
@@ -415,12 +523,13 @@ def run(*, write: bool, diag: bool, max_pdfs: int | None) -> int:
         if diag:
             _dump_debug(text, url)
 
-        entry = parse_bulletin(text, url)
-        if entry:
-            entries.append(entry)
-            print(f"[{i}/{len(pdf_urls)}] {entry.month}: "
-                  f"exp={entry.total_k_bags} kBg · prod={entry.production_k_bags} kBg "
-                  f"· yoy={entry.yoy_pct}%")
+        new_entries = parse_bulletin(text, url)
+        if new_entries:
+            entries.extend(new_entries)
+            for entry in new_entries:
+                print(f"[{i}/{len(pdf_urls)}] {entry.month}: "
+                      f"exp={entry.total_k_bags} kBg · prod={entry.production_k_bags} kBg "
+                      f"· yoy={entry.yoy_pct}%")
         else:
             print(f"[{i}/{len(pdf_urls)}] no match for {url}")
 

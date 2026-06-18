@@ -234,9 +234,17 @@ def _cell_number(raw: object) -> float | None:
 
 
 def inspect_xls(xls_bytes: bytes, source_url: str) -> str:
-    """Dump every sheet's name + first 30 rows so the operator can
-    re-derive the real header structure when parse_xls returns nothing.
-    Output is a text report we'll upload as a workflow artifact."""
+    """Locate coffee-bearing sheets in a 33-Cuadro workbook. Two passes:
+
+      1. Coverage — for every sheet, find rows whose cells contain
+         '0901', 'NANDINA', or 'Café'. Tells us WHICH Cuadro carries
+         the coffee detail.
+      2. Detail — for each hit-bearing sheet, dump the rows around the
+         hits (±3 neighbours) so we can read the header structure
+         inline.
+
+    Output is a text report we mirror to the job log + upload as a
+    workflow artifact."""
     try:
         import xlrd  # type: ignore
     except ImportError:
@@ -245,15 +253,51 @@ def inspect_xls(xls_bytes: bytes, source_url: str) -> str:
         wb = xlrd.open_workbook(file_contents=xls_bytes)
     except Exception as e:                           # noqa: BLE001
         return f"xlrd open failed: {e}"
+
+    # Tokens to search for. ASCII + accented variants since xlrd
+    # preserves whatever the workbook stored.
+    needles = ("0901", "nandina", "café", "cafe")
+
     lines: list[str] = [
         f"=== {source_url}",
         f"sheets: {[s.name for s in wb.sheets()]}",
+        "",
+        "── COVERAGE PASS (sheets with coffee-bearing rows) ──",
     ]
+    coffee_sheets: list[tuple[str, list[int]]] = []
     for sheet in wb.sheets():
-        lines.append(f"\n── sheet: {sheet.name!r}  ({sheet.nrows} rows × {sheet.ncols} cols)")
-        for r in range(min(sheet.nrows, 30)):
-            cells = [str(sheet.cell_value(r, c))[:40] for c in range(sheet.ncols)]
-            lines.append(f"  r{r:02d}: " + " | ".join(cells))
+        hit_rows: list[int] = []
+        for r in range(sheet.nrows):
+            row_text = " ".join(
+                str(sheet.cell_value(r, c)).lower() for c in range(sheet.ncols)
+            )
+            if any(n in row_text for n in needles):
+                hit_rows.append(r)
+        if hit_rows:
+            coffee_sheets.append((sheet.name, hit_rows))
+            lines.append(
+                f"  {sheet.name!r}: {len(hit_rows)} coffee-bearing rows "
+                f"({hit_rows[:6]}{'…' if len(hit_rows) > 6 else ''})"
+            )
+    if not coffee_sheets:
+        lines.append("  (none — workbook has no 0901/NANDINA/Café anywhere)")
+        return "\n".join(lines)
+
+    lines.append("")
+    lines.append("── DETAIL DUMP (rows ±3 around each first 5 hits per sheet) ──")
+    for name, hit_rows in coffee_sheets:
+        sheet = wb.sheet_by_name(name)
+        lines.append(
+            f"\n── sheet: {name!r}  ({sheet.nrows} rows × {sheet.ncols} cols) ──"
+        )
+        windows: set[int] = set()
+        for r in hit_rows[:5]:
+            for d in range(-3, 4):
+                if 0 <= r + d < sheet.nrows:
+                    windows.add(r + d)
+        for r in sorted(windows):
+            cells = [str(sheet.cell_value(r, c))[:50] for c in range(sheet.ncols)]
+            lines.append(f"  r{r:03d}: " + " | ".join(cells))
     return "\n".join(lines)
 
 

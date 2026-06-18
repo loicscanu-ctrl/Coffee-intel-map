@@ -35,28 +35,59 @@ def test_fnc_month_from_filename_returns_none_when_unparseable():
     assert fnc._month_from_filename(url) is None
 
 
-def test_fnc_parse_bulletin_extracts_production_exports_and_yoy():
+def test_fnc_parse_bulletin_emits_production_for_bulletin_month_and_exports_for_named_month():
+    """Real Jan-2026 bulletin sample (paraphrased from the live PDF).
+    Production line names no month (it's THIS bulletin's month), exports
+    bullet names December — so we must emit two rows, one for Jan and one
+    for Dec, the latter dated to year-1."""
     text = (
-        "Boletín FNC — Informe Mensual\n"
-        "Producción mensual de café colombiano fue de 1.095,2 miles de sacos\n"
-        "Exportaciones de café del mes alcanzaron 1.180,4 miles de sacos, "
-        "una variación de -29,1% frente al mismo mes del año anterior\n"
+        "• Para este mes, la producción de café alcanzó 893 mil sacos, lo que\n"
+        "  representa una variación anual negativa del 34,2 %.\n"
+        "• Las exportaciones definitivas de café en diciembre se ubicaron en 1,1\n"
+        "  millones de sacos de 60 kg, lo que representa una caída de 19,0% frente\n"
+        "  al mismo mes de 2024.\n"
     )
-    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/04/"
-           "3.-Informe-mensual-Marzo-2026-p.pdf")
-    entry = fnc.parse_bulletin(text, url)
-    assert entry is not None
-    assert entry.month             == "2026-03"
-    assert entry.production_k_bags == 1095.2
-    assert entry.total_k_bags      == 1180.4
-    assert entry.yoy_pct           == -29.1
-    assert entry.source_pdf        == url
-    assert entry.parser_version    == "v1"
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/03/"
+           "1.-Informe-mensual-enero-p-1.pdf")
+    entries = fnc.parse_bulletin(text, url)
+    by_month = {e.month: e for e in entries}
+    # Production for the bulletin month, Jan 2026: 893 mil sacos = 893 k-bags.
+    assert by_month["2026-01"].production_k_bags == 893.0
+    assert by_month["2026-01"].yoy_pct           == -34.2
+    # Exports for the named month December — year inferred as 2025 because
+    # the bullet says "en diciembre" with no year, and Dec > Jan ⇒ prior year.
+    assert by_month["2025-12"].total_k_bags == 1100.0     # 1.1 × 1000
+    assert by_month["2025-12"].yoy_pct       == -19.0
+    for e in entries:
+        assert e.parser_version == "v2"
+        assert e.source_pdf     == url
 
 
-def test_fnc_parse_bulletin_returns_none_when_nothing_matches():
-    url = "https://federaciondecafeteros.org/wp-content/uploads/2026/04/Informe-Marzo-2026.pdf"
-    assert fnc.parse_bulletin("totally unrelated text\n", url) is None
+def test_fnc_parse_bulletin_rejects_non_bulletin_pdfs():
+    """v1 bug: the daily precio_cafe.pdf and FEPCafé monthly reports lived
+    on the same listing URL prefix and were treated as data sources.
+    v2 filters by filename so only Informe-mensual / Informe-Expos PDFs
+    are parsed."""
+    url = "https://federaciondecafeteros.org/wp-content/uploads/2026/03/precio_cafe.pdf"
+    text = "Junio 17 / 2026 Cierre contrato C Nueva York 277.85 USCent/Lb"
+    assert fnc.parse_bulletin(text, url) == ()
+
+
+def test_fnc_parse_bulletin_ignores_section_numbers_and_year_tokens():
+    """v1 captured '1.1 PRECIOS' as 1.1 k-bags and '2026' as 2026 k-bags.
+    v2 requires an explicit 'mil sacos' / 'millones de sacos' unit so
+    those tokens can't leak through."""
+    text = (
+        "TABLA DE CONTENIDO – INFORME MENSUAL ENERO 2026\n"
+        "1. PRECIOS 4. PRODUCCIÓN\n"
+        "1.1 Precio Interno 4.1 Producción Mensual\n"
+        "2. VARIABLES MACRO 5. EXPORTACIONES\n"
+        "2.1 Tasa de cambio 5.1 Exportaciones Definitivas\n"
+        # No bullet with the explicit "mil sacos" / "millones de sacos" — should drop.
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/03/"
+           "1.-Informe-mensual-enero-p-1.pdf")
+    assert fnc.parse_bulletin(text, url) == ()
 
 
 # ── DANE ────────────────────────────────────────────────────────────────────
