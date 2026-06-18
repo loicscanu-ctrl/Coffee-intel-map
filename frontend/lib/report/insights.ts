@@ -363,11 +363,27 @@ const enso: Builder = async () => {
 };
 
 // ── Weather pack (per origin {origin}_weather.json) ───────────────────────────
+interface WxDaily { day: number; accum_mm: number | null; avg_accum_mm?: number; min_accum_mm?: number; max_accum_mm?: number; }
+interface Wx { label?: string; updated?: string; station?: string; daily_station?: WxDaily[]; forecast_7d?: { rain_mm?: number }[]; }
 const weatherPack = (origin: string, label: string): Builder => async () => {
-  const d = await load<{ updated?: string; cur_year?: number }>(`/data/${origin}_weather.json`);
-  if (!d) return null;
-  return `Production-weighted weather for **${label}** (updated ${d.updated ?? "recently"}): daily accumulated rainfall, monthly rainfall, cumulative YTD rainfall and mean temperature against the 10-year band. `
-    + `Watch for the current-year line breaking below the band during the rainy season — an early drought-stress signal for the crop.`;
+  const d = await load<Wx>(`/data/${origin}_weather.json`);
+  const ds = d?.daily_station;
+  if (!Array.isArray(ds) || !ds.length) return null;
+  // Latest day with an actual (non-null) accumulation = month-to-date so far.
+  const actual = [...ds].reverse().find((r) => r.accum_mm != null);
+  if (!actual || actual.accum_mm == null) return null;
+  const mtd = actual.accum_mm, avg = actual.avg_accum_mm, lo = actual.min_accum_mm, hi = actual.max_accum_mm;
+  const mo = +(d?.updated ?? "").slice(5, 7);
+  const monAbbr = mo >= 1 && mo <= 12 ? MONTHS[mo - 1] : "";
+  const fc = (d?.forecast_7d ?? []).reduce((a, r) => a + (r.rain_mm ?? 0), 0);
+  const vsAvg = avg != null ? chgPct(mtd, avg) : null;
+  let zone = "within", risk = "tracking in line with the seasonal norm";
+  if (lo != null && mtd < lo) { zone = "below"; risk = "a dry start worth watching for crop-moisture stress"; }
+  else if (hi != null && mtd > hi) { zone = "above"; risk = "wetter than normal — flag flowering/harvest disruption risk"; }
+  const band = lo != null && hi != null ? `${n0(lo)}–${n0(hi)} mm safe zone` : "seasonal band";
+  return `${label} month-to-date rainfall${d?.station ? ` (${d.station})` : ""} is **${n0(mtd)} mm** through ${actual.day} ${monAbbr}`
+    + `${avg != null ? ` — **${pct(vsAvg)}** vs the ${n0(avg)} mm normal` : ""}, **${zone}** the ${band}. `
+    + `The 7-day forecast adds **${n0(fc)} mm**, ${risk}.`;
 };
 const weatherAnalogs = (origin: string, label: string): Builder => async () => {
   const d = await load<{ analogs?: { year?: number | string }[] }>(`/data/weather_analogs_${origin}.json`);
