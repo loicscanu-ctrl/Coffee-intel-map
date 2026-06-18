@@ -49,11 +49,13 @@ const WINDOW_DAYS: Record<Window, number> = {
 };
 
 // Native unit → metric tonne multiplier, so every origin converts to a single
-// comparable USD/MT figure (1 cwt = 45.359237 kg; 1 saca = 60 kg).
+// comparable USD/MT figure (1 cwt = 45.359237 kg; 1 saca = 60 kg; ¢/lb via
+// 2204.62 lb/MT ÷ 100). USD/cwt and ¢/lb are numerically identical (×22.0462).
 const UNIT_TO_MT: Record<string, number> = {
   per_kg:         1000,
   per_saca_60kg:  1000 / 60,
   per_cwt:        1000 / 45.359237,
+  cents_lb:       2204.62 / 100,
 };
 // KC arabica ¢/lb → USD/MT (1 MT = 2204.62 lb, 1¢ = $0.01).
 const KC_CENTS_TO_USD_MT = 2204.62 / 100;
@@ -93,6 +95,7 @@ function toUsdMtOnDate(price: number, unit: string, currency: string, date: stri
 }
 
 function fmtNative(price: number, unit: string, currency: string): string {
+  if (unit === "cents_lb") return `${price.toFixed(2)} ¢/lb`;
   const big = Math.abs(price) >= 1000;
   const n = big
     ? price.toLocaleString(undefined, { maximumFractionDigits: 0 })
