@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-17T07:39:31.716114Z",
+  "scraped_at": "2026-06-18T07:21:19.730655Z",
   "origins": {
     "vietnam": {
       "name": "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
@@ -147,6 +147,10 @@
         {
           "date": "2026-06-17",
           "price": 89300.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 89700.0
         }
       ],
       "commodity": "robusta"
@@ -297,6 +301,10 @@
         {
           "date": "2026-06-17",
           "price": 171.41
+        },
+        {
+          "date": "2026-06-18",
+          "price": 174.54
         }
       ],
       "commodity": "robusta"
@@ -447,6 +455,10 @@
         {
           "date": "2026-06-17",
           "price": 950.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 960.0
         }
       ],
       "commodity": "robusta"

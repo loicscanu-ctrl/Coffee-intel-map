@@ -237,8 +237,19 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS6",
+      "name": "Inversion Easing",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "LDN",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "large",
+      "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
       "id": "SP1",
@@ -278,30 +289,6 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=136.6]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=57.3]"
     }
   ],
   "history": [
@@ -2654,8 +2641,19 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "large",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS6",
+          "name": "Inversion Easing",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "LDN",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "large",
+          "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
           "id": "SP1",
@@ -2703,5 +2701,5 @@
       "priceLDN": 3230
     }
   ],
-  "generatedAt": "2026-06-18T06:39:03.002Z"
+  "generatedAt": "2026-06-18T07:21:24.559Z"
 }
