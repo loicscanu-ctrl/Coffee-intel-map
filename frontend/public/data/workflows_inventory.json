@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-17T20:16:36.227016Z",
-  "count": 51,
+  "generated_at": "2026-06-18T14:56:01.165638Z",
+  "count": 52,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -338,7 +338,7 @@
     },
     {
       "file": "refresh-balance-sheets.yml",
-      "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/ID/UG)",
+      "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/CO/ID/UG)",
       "triggers": [
         "schedule",
         "workflow_dispatch"
@@ -550,6 +550,20 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-monthly-colombia.yml",
+      "name": "0.10 \u2013 Colombia coffee exports (monthly \u00b7 DANE + FNC)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 6 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "scraper-monthly-colombia",
+      "timeout_minutes": 25
     },
     {
       "file": "scraper-monthly-conab.yml",
