@@ -1,5 +1,137 @@
 [
   {
+    "id": 7170,
+    "title": "Ethiopia Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 9.15,
+    "lng": 40.49,
+    "tags": [
+      "weather",
+      "ethiopia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:39:02.269333",
+    "commentary": {
+      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7169,
+    "title": "Uganda Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 1.37,
+    "lng": 32.29,
+    "tags": [
+      "weather",
+      "uganda",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:39:01.717078",
+    "commentary": {
+      "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7168,
+    "title": "Indonesia Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -2.55,
+    "lng": 118.01,
+    "tags": [
+      "weather",
+      "indonesia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:39:01.164812",
+    "commentary": {
+      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7167,
+    "title": "Honduras Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 14.07,
+    "lng": -87.2,
+    "tags": [
+      "weather",
+      "honduras",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:39:00.612464",
+    "commentary": {
+      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7166,
+    "title": "Colombia Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 4.71,
+    "lng": -74.07,
+    "tags": [
+      "weather",
+      "colombia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:39:00.060484",
+    "commentary": {
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7165,
+    "title": "Brazil Agronomic Status \u2013 2026-06-18",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -15.78,
+    "lng": -47.93,
+    "tags": [
+      "weather",
+      "brazil",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-18T06:38:57.112326",
+    "commentary": {
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 7164,
     "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-17",
     "body": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,985 lots. 51 lots graded.",
@@ -3471,113 +3603,5 @@
       "hasUpdate": true,
       "isLatestTradingDay": true
     }
-  },
-  {
-    "id": 6749,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-09",
-    "body": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "rc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260609_103232.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-10T06:03:45.063711",
-    "commentary": {
-      "text": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,726 lots.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6748,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-09",
-    "body": "KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "kc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260609.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-10T06:03:41.665131",
-    "commentary": {
-      "text": "KC Arabica certified stocks shifted by -2,525 bags today, bringing global visible exchange inventory to 409,897 bags.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6746,
-    "title": "AJCA Japan Coffee Data \u2013 2026-06-10",
-    "body": "AJCA Japan 2025: imports=359382 MT, consumption=397272 MT",
-    "source": "AJCA",
-    "category": "demand",
-    "lat": 35.689,
-    "lng": 139.692,
-    "tags": [
-      "japan",
-      "demand",
-      "imports"
-    ],
-    "meta": "{\"source\": \"AJCA\", \"source_url\": \"https://www.ajca.or.jp/data/\", \"last_updated\": \"2026-06-10\", \"latest_year\": \"2025\", \"latest_consumption_mt\": 397272, \"latest_imports_mt\": 359382, \"latest_stocks_mt\": null, \"prev_imports_mt\": null, \"prev_consumption_mt\": null, \"prev_stocks_mt\": null, \"imports_yoy_pct\": null, \"consumption_yoy_pct\": null, \"stocks_yoy_pct\": null, \"monthly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"monthly_exports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"supply_demand_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"yearly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"pdf_index\": [{\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}], \"latest_origin_breakdown\": [{\"country\": \"Vietnam\", \"imports_mt\": 110}, {\"country\": \"Indonesia\", \"imports_mt\": 118}, {\"country\": \"India\", \"imports_mt\": 123}, {\"country\": \"Yemen\", \"imports_mt\": 149}, {\"country\": \"Mexico\", \"imports_mt\": 305}, {\"country\": \"Guatemala\", \"imports_mt\": 306}, {\"country\": \"Honduras\", \"imports_mt\": 307}, {\"country\": \"El Salvador\", \"imports_mt\": 309}, {\"country\": \"Nicaragua\", \"imports_mt\": 310}, {\"country\": \"Costa Rica\", \"imports_mt\": 311}, {\"country\": \"Colombia\", \"imports_mt\": 401}, {\"country\": \"Peru\", \"imports_mt\": 407}, {\"country\": \"Brazil\", \"imports_mt\": 410}, {\"country\": \"Rwanda\", \"imports_mt\": 526}, {\"country\": \"Ethiopia\", \"imports_mt\": 538}, {\"country\": \"Kenya\", \"imports_mt\": 541}, {\"country\": \"Uganda\", \"imports_mt\": 542}, {\"country\": \"Tanzania\", \"imports_mt\": 543}, {\"country\": \"Papua New Guinea\", \"imports_mt\": 602}], \"latest_origin_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\"}",
-    "pub_date": "2026-06-10T04:11:57.614044"
-  },
-  {
-    "id": 6741,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-10",
-    "body": "B3 Arabica 4/5 settlement: 302.50 USD/sac | OI: 119 contracts | Expiry: 2026-07-23",
-    "source": "B3",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "futures",
-      "brazil",
-      "arabica",
-      "b3"
-    ],
-    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 302.5, \"oi\": 119, \"mty\": \"2026-07-23\"}",
-    "pub_date": "2026-06-10T04:08:08.220854"
-  },
-  {
-    "id": 6737,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-10",
-    "body": "Ocean freight market: FCL \u202220'ST",
-    "source": "Searates",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "logistics",
-      "freight"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-10T04:08:00.548581"
-  },
-  {
-    "id": 6736,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-10",
-    "body": "Brazil coffee export data: Issuance | 1,007,108 | 28.1",
-    "source": "Cecafe",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "exports",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-10T04:07:59.174820"
   }
 ]
