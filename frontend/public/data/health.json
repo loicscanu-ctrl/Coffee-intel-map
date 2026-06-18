@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T03:19:31.002552Z",
+  "generated_at": "2026-06-18T06:07:18.370063Z",
   "scrapers": {
     "futures": "2026-06-18T03:03:19.889130",
     "cot": "2026-06-09",
@@ -28,7 +28,7 @@
     "vietnam_exports": "2026-06-17T07:39:18.061825Z",
     "indonesia_exports": "2026-06-17T07:39:20.833891Z",
     "uganda_exports": "2026-06-17T07:39:21.492968+00:00",
-    "ice_certified_daily": "2026-06-16",
+    "ice_certified_daily": "2026-06-17",
     "ice_arabica_ageing": "2026-05-31",
     "ice_robusta_age_allowance": "2026-05-29"
   }
