@@ -1,11 +1,116 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-06-18T07:21:13.208123Z",
+  "scraped_at": "2026-06-18T14:59:05+00:00",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-16",
-    "unit": "thousand 60-kg bags (marketing year)",
-    "monthly": [],
+    "last_updated": "2026-05",
+    "unit": "thousand 60-kg bags",
+    "monthly": [
+      {
+        "month": "2025-02",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-Febrero-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-03",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-p-Marzo-2025.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-04",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/4.-Informe-mensual-Abril-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-05",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/5.-Informe-mensual-Mayo-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-06",
+        "total_k_bags": 2.0,
+        "production_k_bags": 1.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/6.-Informe-mensual-Junio-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-07",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/7.-Informe-mensual-Julio-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-08",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/8.-Informe-mensual-Agosto-2025-p-1.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-09",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/9.-Informe-mensual-Septiembre-2025-p-1.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-10",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/10.-Informe-mensual-Octubre-2025-p-1.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2025-11",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/10.-Informe-mensual-Noviembre-2025-p.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2026-01",
+        "total_k_bags": 2026.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-Expos-Enero-2026.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2026-02",
+        "total_k_bags": 2026.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/04/Informe-Expos-Febrero-2026.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2026-03",
+        "total_k_bags": 2026.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/04/Informe-Expos-Marzo-2026.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2026-04",
+        "total_k_bags": 2026.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/05/Informe-Expos-Abril-2026.pdf",
+        "parser_version": "v1"
+      },
+      {
+        "month": "2026-05",
+        "total_k_bags": 21.0,
+        "production_k_bags": 11.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/06/5.-Informe-mensual-Mayo-2026-p-1.pdf",
+        "parser_version": "v1"
+      }
+    ],
     "annual": [
       {
         "year": "1960",
