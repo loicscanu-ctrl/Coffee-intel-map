@@ -129,6 +129,33 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Dump diagnostics to job log
+        # The artifact host (Azure blob storage) is sometimes unreachable
+        # from the dev sandbox; the workflow log is always reachable via
+        # the GitHub MCP / API, so we mirror the debug files inline.
+        # set +e because cat-of-empty-glob would otherwise crash the step
+        # on a no-data day.
+        if: ${{ inputs.diag_only == 'true' }}
+        working-directory: backend
+        run: |
+          set +e
+          echo "================ FNC samples ================"
+          for f in scraper/debug/fnc/*.txt; do
+            [ -f "$f" ] || continue
+            echo "── $f ──"
+            head -c 4000 "$f"
+            echo
+            echo "────────"
+          done
+          echo "================ DANE samples ================"
+          for f in scraper/debug/dane/*.txt; do
+            [ -f "$f" ] || continue
+            echo "── $f ──"
+            head -c 8000 "$f"
+            echo
+            echo "────────"
+          done
+
       - name: Commit updated colombia_supply.json if changed
         # Run even when one source failed — the other may have updated
         # the file. The two scrapers merge into the same `exports.monthly`
