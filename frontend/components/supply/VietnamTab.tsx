@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
@@ -7,6 +7,7 @@ import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
 import WeatherAnalogs from "@/components/supply/WeatherAnalogs";
 import SupplyDemandBalance from "@/components/supply/SupplyDemandBalance";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
 
 // Vietnam's multi-source production estimates (USDA / MARD / ICO) ship in
 // vn_farmer_economics.json under `balance_sheet`. We keep just the season
@@ -85,6 +86,20 @@ export default function VietnamTab() {
   // error bars on the production line.
   const [vnBalanceSheet, setVnBalanceSheet] = useState<VnBalanceSheet | null>(null);
 
+  // Realised customs exports by Vietnam crop year (Oct → Sep). Helper
+  // owns the bucketing + partial-crop policy so the four origins that
+  // need this overlay can't drift apart.
+  const realizedVnExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (vnSupply?.exports?.monthly ?? []).map(e => ({
+        month: e.month, kbags: e.total_k_bags,
+      })),
+      cropYearStartMonth: 10,
+      sourceLabel: "Vietnam Customs",
+    }),
+    [vnSupply],
+  );
+
   useEffect(() => {
     fetch("/data/vietnam_supply.json")
       .then(r => r.json())
@@ -134,18 +149,21 @@ export default function VietnamTab() {
           origin="vietnam"
           label="Vietnam"
           cropYearMonths="Oct–Sep"
+          realizedExports={realizedVnExports}
           multiSource={vnBalanceSheet ? {
             sources: [
               { key: "usda", label: "USDA", color: "#3b82f6" },
               { key: "mard", label: "MARD", color: "#10b981" },
               { key: "ico",  label: "ICO",  color: "#f59e0b" },
             ],
+            // Consumption deliberately omitted: the equation strip now pulls
+            // it from USDA PSD (same source as the Demand tab's per-country
+            // consumption chart) so the two surfaces can't drift apart.
             seasons: vnBalanceSheet.seasons.map(s => ({
               cropYear:    s.season,
               forecast:    s.forecast,
               production:  s.production,
               exports:     s.exports_ico,
-              consumption: s.consumption,
             })),
           } : null}
         />

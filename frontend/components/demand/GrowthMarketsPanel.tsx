@@ -4,6 +4,7 @@ import {
   BarChart, Bar, ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Legend, CartesianGrid, ReferenceLine, ReferenceArea,
 } from "recharts";
+import { ceilingK, isDemographicallyDiscounted, demographicFactor, K_BASE, logisticIntensity, MODEL_LIMITS } from "@/lib/demandCeilings";
 
 interface AnnualEntry {
   year: string;
@@ -23,7 +24,7 @@ interface GrowthMarket {
 
 interface CohortCountry {
   name: string;
-  annual: { year: number; pop_18plus: number }[];
+  annual: { year: number; pop_18plus: number; median_age?: number | null }[];
 }
 
 interface DemandStocks {
@@ -83,28 +84,28 @@ function fmtPop(p: number | null | undefined): string {
 // Joins each market's USDA consumption series with its projected 18+ population
 // to (a) express consumption per drinking-age adult ("intensity") and (b) carry
 // demand past 2025 to 2050: base case freezes intensity (demand moves only with
-// the adult population); the dotted scenario lets the recent intensity trend
-// continue. Both ride the same projected-adult population.
-function DemandProjection({ markets, cohorts }: {
-  markets: GrowthMarket[];
-  cohorts: Record<string, CohortCountry>;
-}) {
-  // Only markets we can both join (have a cohort) and that carry consumption.
-  const joinable = markets.filter(m => cohorts[NAME_ISO3[m.short] ?? ""]);
-  const [sel, setSel] = useState(joinable[0]?.short ?? "");
-  const [metric, setMetric] = useState<"total" | "intensity">("total");
+// the adult population); the S-curve scenario bends intensity toward the market's
+// saturation ceiling K (per the Demand-modelling research methodology) at the
+// observed recent growth rate. Both ride the same projected-adult population.
 
-  const mkt = joinable.find(m => m.short === sel) ?? joinable[0];
-  if (!mkt) return null;
-  const cohort = cohorts[NAME_ISO3[mkt.short]];
+interface MarketSeries {
+  short: string; name: string; perCapitaKg: number | null;
+  ly: number; y0: number; i0: number; g: number; K: number;
+  medianAge?: number; demoDiscounted: boolean; effAge: number; demoFactor: number;
+  cons: Record<number, number>;   // USDA domestic consumption, MT
+  pop: Record<number, number>;    // 18+ population
+  inten: Record<number, number>;  // kg/adult/yr (overlap years)
+  projI: Record<number, number>;  // logistic intensity, ly → 2050
+}
 
+// Build one market's full projection inputs, or null if it can't be joined.
+function computeSeries(mkt: GrowthMarket, cohort: CohortCountry): MarketSeries | null {
   const pop: Record<number, number> = {};
   for (const a of cohort.annual) pop[a.year] = a.pop_18plus;
   const cons: Record<number, number> = {};
   for (const a of mkt.annual) {
     if (a.consumption_mt != null) cons[Number(a.year)] = a.consumption_mt;
   }
-  // Per-adult intensity (kg/adult/yr) for years present in BOTH series.
   const inten: Record<number, number> = {};
   for (const ys of Object.keys(cons)) {
     const y = Number(ys);
@@ -117,42 +118,106 @@ function DemandProjection({ markets, cohorts }: {
   const i0 = inten[ly];
   if (!overlap.length || i0 == null) return null;
 
-  // Full-window CAGR of intensity — the dotted scenario's growth rate. Left
-  // uncapped on purpose: fast-growers (China, India) extrapolate to large,
-  // deliberately unrealistic 2050 demand — a raw "if this rate held" signal we
-  // can dampen later.
+  // Full-window CAGR of intensity — seeds the S-curve's initial growth rate.
   const y0 = overlap[0];
   const g = Math.pow(inten[ly] / inten[y0], 1 / (ly - y0)) - 1;
 
-  const color = COUNTRY_COLORS[mkt.short] ?? "#6366f1";
-  const isTotal = metric === "total";
+  // Live whole-population median age (UN WPP) at the latest actual year. For
+  // analog-anchored markets it drives the demographic discount on K; ceilingK
+  // falls back to the baked-in 2025 median when the series carries none yet.
+  const medianAgeByYear: Record<number, number> = {};
+  for (const a of cohort.annual) if (a.median_age != null) medianAgeByYear[a.year] = a.median_age;
+  const medianAge = medianAgeByYear[ly];
+  const demoDiscounted = isDemographicallyDiscounted(mkt.short);
+  const effAge = medianAge ?? K_BASE[mkt.short]?.medianAge ?? 30;
+  const demoFactor = demoDiscounted ? demographicFactor(effAge) : 1;
+
+  // Saturation ceiling (kg/adult), and the bounded logistic intensity path
+  // toward it. Replaces the old uncapped CAGR extrapolation.
+  const K = ceilingK(mkt.short, medianAge) || i0 * 3;
+  const projI = logisticIntensity(i0, g, K, ly, PROJ_END);
+
+  return {
+    short: mkt.short, name: mkt.name, perCapitaKg: mkt.per_capita_kg,
+    ly, y0, i0, g, K, medianAge, demoDiscounted, effAge, demoFactor,
+    cons, pop, inten, projI,
+  };
+}
+
+const AGG = "__all__";
+
+function DemandProjection({ markets, cohorts }: {
+  markets: GrowthMarket[];
+  cohorts: Record<string, CohortCountry>;
+}) {
+  // Only markets we can both join (have a cohort) and that carry consumption.
+  const joinable = markets.filter(m => cohorts[NAME_ISO3[m.short] ?? ""]);
+  const [sel, setSel] = useState(joinable[0]?.short ?? "");
+  const [metric, setMetric] = useState<"total" | "intensity">("total");
+  const [showLimits, setShowLimits] = useState(false);
+
+  // Every joinable market's series (also summed for the aggregate "top-line").
+  const seriesList = joinable
+    .map(m => computeSeries(m, cohorts[NAME_ISO3[m.short]]))
+    .filter((s): s is MarketSeries => s != null);
+  if (!seriesList.length) return null;
+
+  const isAgg = sel === AGG;
+  const s = seriesList.find(x => x.short === sel) ?? seriesList[0];
+  const isTotal = isAgg ? true : metric === "total";   // intensity is per-market only
+  const color = isAgg ? "#e2e8f0" : (COUNTRY_COLORS[s.short] ?? "#6366f1");
+  const ly = s.ly;
+  const pct = (x: number) => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(0)}%`;
 
   // One row per year (2000 → 2050). actual stops at the latest year; base/trend
   // start there (sharing the latest point so the lines connect seamlessly).
   const chart: Record<string, number | null>[] = [];
   for (let y = 2000; y <= PROJ_END; y++) {
-    const p = pop[y];
-    const projI = i0 * Math.pow(1 + g, y - ly);
     const row: Record<string, number | null> = { year: y };
-    if (isTotal) {
-      row.actual = y <= ly && cons[y] != null ? cons[y] / 1000 : null;
-      row.base   = y >= ly && p ? i0 * p / 1e6 : null;
-      row.trend  = y >= ly && p ? projI * p / 1e6 : null;
+    if (isAgg) {
+      // Sum total demand (kt) across every market.
+      let a = 0, b = 0, t = 0, hasA = false, hasB = false;
+      for (const m of seriesList) {
+        const p = m.pop[y];
+        if (y <= m.ly && m.cons[y] != null) { a += m.cons[y] / 1000; hasA = true; }
+        if (y >= m.ly && p) { b += m.i0 * p / 1e6; t += (m.projI[y] ?? m.i0) * p / 1e6; hasB = true; }
+      }
+      row.actual = hasA ? a : null;
+      row.base   = hasB ? b : null;
+      row.trend  = hasB ? t : null;
+    } else if (isTotal) {
+      const p = s.pop[y]; const iy = s.projI[y];
+      row.actual = y <= ly && s.cons[y] != null ? s.cons[y] / 1000 : null;
+      row.base   = y >= ly && p ? s.i0 * p / 1e6 : null;
+      row.trend  = y >= ly && p && iy != null ? iy * p / 1e6 : null;
     } else {
-      row.actual = y <= ly && inten[y] != null ? inten[y] : null;
-      row.base   = y >= ly ? i0 : null;
-      row.trend  = y >= ly ? projI : null;
+      const iy = s.projI[y];
+      row.actual = y <= ly && s.inten[y] != null ? s.inten[y] : null;
+      row.base   = y >= ly ? s.i0 : null;
+      row.trend  = y >= ly && iy != null ? iy : null;
     }
     chart.push(row);
   }
 
-  const p2050 = pop[PROJ_END] ?? 0;
-  const base2050 = i0 * p2050 / 1e6;
-  const trend2050 = i0 * Math.pow(1 + g, PROJ_END - ly) * p2050 / 1e6;
-  const act = cons[ly] / 1000;
-  const adultGrowth = pop[ly] ? p2050 / pop[ly] - 1 : 0;
+  // 2050 headline numbers (single market or summed).
+  let act: number, base2050: number, trend2050: number, adultGrowth: number;
+  if (isAgg) {
+    const sum = (fn: (m: MarketSeries) => number) => seriesList.reduce((acc, m) => acc + fn(m), 0);
+    act       = sum(m => (m.cons[m.ly] ?? 0) / 1000);
+    base2050  = sum(m => m.i0 * (m.pop[PROJ_END] ?? 0) / 1e6);
+    trend2050 = sum(m => (m.projI[PROJ_END] ?? m.i0) * (m.pop[PROJ_END] ?? 0) / 1e6);
+    const pop0 = sum(m => m.pop[m.ly] ?? 0);
+    const pop1 = sum(m => m.pop[PROJ_END] ?? 0);
+    adultGrowth = pop0 ? pop1 / pop0 - 1 : 0;
+  } else {
+    const p2050 = s.pop[PROJ_END] ?? 0;
+    act       = s.cons[ly] / 1000;
+    base2050  = s.i0 * p2050 / 1e6;
+    trend2050 = (s.projI[PROJ_END] ?? s.i0) * p2050 / 1e6;
+    adultGrowth = s.pop[ly] ? p2050 / s.pop[ly] - 1 : 0;
+  }
   const unit = isTotal ? "kt" : "kg/adult";
-  const pct = (x: number) => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(0)}%`;
+  const limitsForMkt = isAgg ? [] : MODEL_LIMITS.filter(l => l.markets.includes(s.short));
 
   const Stat = ({ label, value, sub, tone }: {
     label: string; value: string; sub?: string; tone?: string;
@@ -170,26 +235,80 @@ function DemandProjection({ markets, cohorts }: {
         <div className="text-[10px] text-slate-400 uppercase tracking-wide">
           Demand Projection to 2050 — per-adult intensity × drinking-age population
         </div>
-        <div className="flex rounded overflow-hidden border border-slate-700 text-[9px]">
-          {([["total", "Total demand (kt)"], ["intensity", "Per-adult (kg)"]] as const).map(([m, lbl]) => (
-            <button key={m} onClick={() => setMetric(m)}
-              className={`px-2 py-0.5 ${metric === m ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:text-slate-200"}`}>
-              {lbl}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowLimits(v => !v)}
+            className={`text-[9px] px-2 py-0.5 rounded border ${showLimits ? "border-amber-500/60 text-amber-300" : "border-slate-700 text-slate-400 hover:text-slate-200"}`}>
+            ⚠ Model limits
+          </button>
+          {!isAgg && (
+            <div className="flex rounded overflow-hidden border border-slate-700 text-[9px]">
+              {([["total", "Total demand (kt)"], ["intensity", "Per-adult (kg)"]] as const).map(([m, lbl]) => (
+                <button key={m} onClick={() => setMetric(m)}
+                  className={`px-2 py-0.5 ${metric === m ? "bg-slate-600 text-white" : "bg-slate-800 text-slate-400 hover:text-slate-200"}`}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Country selector */}
+      {showLimits && (
+        <div className="rounded border border-amber-500/30 bg-amber-500/5 p-2.5 space-y-1.5">
+          <div className="text-[9px] uppercase tracking-wide text-amber-400/90">
+            Confidence &amp; limits — the S-curve ceiling K is a research anchor, not a measured value
+          </div>
+          {MODEL_LIMITS.map(l => {
+            const hits = !isAgg && l.markets.includes(s.short);
+            return (
+              <div key={l.title} className="text-[10px] leading-snug">
+                <span className={hits ? "text-amber-300 font-medium" : "text-slate-300 font-medium"}>
+                  {hits ? "▸ " : ""}{l.title}
+                  {hits && <span className="text-amber-400/80"> · flagged for {s.name}</span>}
+                </span>
+                <span className="text-slate-400"> — {l.detail}</span>
+              </div>
+            );
+          })}
+          {isAgg ? (
+            <div className="text-[10px] text-slate-500 italic">Aggregated across all markets — the caveats above bite hardest on China / India / Russia within the total.</div>
+          ) : limitsForMkt.length === 0 && (
+            <div className="text-[10px] text-slate-500 italic">No specific caveat flagged for {s.name}; general limits still apply.</div>
+          )}
+          {!isAgg && (
+            <div className="text-[10px] leading-snug pt-0.5 border-t border-amber-500/20">
+              <span className="text-slate-300 font-medium">Demographic discount</span>
+              <span className="text-slate-400">
+                {" — "}
+                {s.demoDiscounted
+                  ? <>K discounted live by ×{s.demoFactor.toFixed(2)} for median age {s.effAge.toFixed(0)}
+                      {s.medianAge == null && <span className="text-slate-500 italic"> (fallback — WPP median-age series not in data yet)</span>}.</>
+                  : <>none — {s.name} is anchored on its own observed plateau, so its demographics are already embedded.</>}
+              </span>
+            </div>
+          )}
+          <div className="text-[9px] text-slate-500 pt-0.5">
+            Full methodology &amp; the per-market K table: Research → Demand modelling.
+          </div>
+        </div>
+      )}
+
+      {/* Country selector + aggregate top-line */}
       <div className="flex flex-wrap gap-1">
+        <button onClick={() => setSel(AGG)}
+          className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
+            isAgg ? "border-transparent bg-slate-200 text-slate-900 font-medium" : "border-slate-600 text-slate-300 hover:text-white"
+          }`}>
+          🌍 All markets
+        </button>
         {joinable.map(m => (
           <button key={m.short} onClick={() => setSel(m.short)}
             className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-              m.short === sel
+              !isAgg && m.short === sel
                 ? "border-transparent text-white"
                 : "border-slate-700 text-slate-400 hover:text-slate-200"
             }`}
-            style={m.short === sel ? { background: COUNTRY_COLORS[m.short] ?? "#6366f1" } : undefined}>
+            style={!isAgg && m.short === sel ? { background: COUNTRY_COLORS[m.short] ?? "#6366f1" } : undefined}>
             {m.name}
           </button>
         ))}
@@ -202,6 +321,10 @@ function DemandProjection({ markets, cohorts }: {
             <ReferenceArea x1={ly} x2={PROJ_END} fill="#64748b" fillOpacity={0.06} />
             <ReferenceLine x={ly} stroke="#64748b" strokeDasharray="2 2"
               label={{ value: "projection →", position: "insideTopRight", fontSize: 9, fill: "#94a3b8" }} />
+            {!isTotal && (
+              <ReferenceLine y={s.K} stroke={color} strokeDasharray="4 3" strokeOpacity={0.55}
+                label={{ value: `ceiling K = ${s.K.toFixed(1)}`, position: "insideTopLeft", fontSize: 8, fill: color }} />
+            )}
             <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false}
               type="number" domain={[2000, PROJ_END]} ticks={[2000, 2010, 2020, 2030, 2040, 2050]} />
             <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false}
@@ -212,14 +335,14 @@ function DemandProjection({ markets, cohorts }: {
                 if (v == null) return ["—", String(name)];
                 const lbl = name === "actual" ? "Actual"
                   : name === "base" ? "Projection (flat intensity)"
-                  : "Projection (recent trend)";
+                  : "Projection (S-curve to ceiling)";
                 const num = isTotal ? `${Number(v).toLocaleString()} kt` : `${Number(v).toFixed(2)} kg/adult`;
                 return [num, lbl];
               }} />
             <Legend wrapperStyle={{ fontSize: 9 }} formatter={(v: string) =>
               v === "actual" ? "Actual (USDA)"
                 : v === "base" ? "Flat intensity"
-                : "Recent trend"} />
+                : "S-curve → ceiling"} />
             <Line dataKey="actual" stroke={color} strokeWidth={2.2} dot={false} connectNulls />
             <Line dataKey="base"   stroke={color} strokeWidth={2.2} dot={false} connectNulls strokeOpacity={0.85} />
             <Line dataKey="trend"  stroke={color} strokeWidth={1.8} dot={false} connectNulls strokeDasharray="2 3" />
@@ -227,17 +350,29 @@ function DemandProjection({ markets, cohorts }: {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-        <Stat label={`Intensity ${ly}`} value={`${(i0 as number).toFixed(2)}`} sub="kg/adult/yr" tone="text-amber-300" />
-        <Stat label="Trend rate" value={`${g >= 0 ? "+" : ""}${(g * 100).toFixed(1)}%`} sub="per yr" />
-        <Stat label="Adults 2050" value={pct(adultGrowth)} sub={`vs ${ly}`} />
-        <Stat label="2050 demand · flat" value={`${Math.round(base2050)} kt`} sub={pct(base2050 / act - 1)} tone="text-slate-100" />
-        <Stat label="2050 demand · trend" value={`${Math.round(trend2050)} kt`} sub={pct(trend2050 / act - 1)} tone="text-slate-100" />
-      </div>
+      {isAgg ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <Stat label="Markets" value={`${seriesList.length}`} sub="summed" />
+          <Stat label={`Demand ${ly}`} value={`${Math.round(act).toLocaleString()} kt`} sub="actual" tone="text-amber-300" />
+          <Stat label="2050 demand · flat" value={`${Math.round(base2050).toLocaleString()} kt`} sub={pct(base2050 / act - 1)} />
+          <Stat label="2050 demand · S-curve" value={`${Math.round(trend2050).toLocaleString()} kt`} sub={pct(trend2050 / act - 1)} tone="text-slate-100" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          <Stat label={`Intensity ${ly}`} value={`${s.i0.toFixed(2)}`} sub="kg/adult/yr" tone="text-amber-300" />
+          <Stat label="Ceiling K" value={s.K.toFixed(1)} sub={`${(s.K / s.i0).toFixed(1)}× now`} tone="text-amber-300" />
+          <Stat label="Initial rate" value={`${s.g >= 0 ? "+" : ""}${(s.g * 100).toFixed(1)}%`} sub="per yr" />
+          <Stat label="Adults 2050" value={pct(adultGrowth)} sub={`vs ${ly}`} />
+          <Stat label="2050 demand · flat" value={`${Math.round(base2050)} kt`} sub={pct(base2050 / act - 1)} tone="text-slate-100" />
+          <Stat label="2050 demand · S-curve" value={`${Math.round(trend2050)} kt`} sub={pct(trend2050 / act - 1)} tone="text-slate-100" />
+        </div>
+      )}
 
       <div className="text-[9px] text-slate-500 italic">
-        Intensity = USDA domestic consumption ÷ UN WPP 18+ population (true {unit} per drinking-age adult, vs {mkt.per_capita_kg?.toFixed(2) ?? "—"} kg per total head).
-        Flat case holds {ly} intensity and scales by projected adults; dotted case continues the {y0}–{ly} intensity trend uncapped (fast-growers extrapolate to deliberately unrealistic 2050 totals — to be dampened later).
+        {isAgg
+          ? <>Top-line = Σ of all {seriesList.length} markets&rsquo; capped projections. Each market bends its per-adult intensity toward its own ceiling K then scales by projected 18+ population; the flat case holds {ly} intensity. Per-market ceilings &amp; logic: Research → Demand modelling.</>
+          : <>Intensity = USDA domestic consumption ÷ UN WPP 18+ population (true {unit} per drinking-age adult, vs {s.perCapitaKg?.toFixed(2) ?? "—"} kg per total head).
+              Flat case holds {ly} intensity and scales by projected adults; dotted case bends intensity from the {s.y0}–{ly} growth rate ({(s.g * 100).toFixed(1)}%/yr) toward the saturation ceiling K = {s.K.toFixed(1)} kg/adult via a logistic g·(1−i/K) — see Research → Demand modelling.</>}
       </div>
     </div>
   );

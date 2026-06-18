@@ -22,10 +22,13 @@ import RollingAvgChart from "./RollingAvgChart";
 import CountryHubFilter from "./CountryHubFilter";
 import { MonthlyVolumeCard, CumulativePaceCard, AnnualTrendCard, DestinationCard } from "./exportCharts";
 import PinToReport from "@/components/report/PinToReport";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
+import { toMultiSource, type BalanceSheetFile } from "@/lib/sdMultiSource";
 
 export default function BrazilTab() {
   const [data, setData]   = useState<CecafeData | null>(null);
   const [projection, setProjection] = useState<BrazilProjection | null>(null);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheetFile | null>(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<FilterState>({ hub: null, country: null, type: null });
   const [subTab, setSubTab] = useUrlState<BrazilSubTab>("brazilTab", "exports", (raw) =>
@@ -51,6 +54,29 @@ export default function BrazilTab() {
       .then((d: BrazilProjection | null) => d && setProjection(d))
       .catch(() => { /* engine hasn't run yet — silent */ });
   }, []);
+
+  // Multi-source production estimates (USDA / CONAB / ICO) for the
+  // S&D card's equation strip + production spread block.
+  useEffect(() => {
+    fetch("/data/br_balance_sheet.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BalanceSheetFile | null) => d && setBalanceSheet(d))
+      .catch(() => { /* absent → equation strip + spread block hide gracefully */ });
+  }, []);
+
+  // Realised Cecafé exports by Brazilian crop year (Apr → Mar). cecafe's
+  // `series` ships totals in 60-kg bags, so we divide by 1000 to feed
+  // the helper in kbags.
+  const realizedBrExports = useMemo(
+    () => buildRealizedExportsOverlay({
+      monthly: (data?.series ?? []).map(r => ({
+        month: r.date, kbags: r.total / 1000,
+      })),
+      cropYearStartMonth: 4,
+      sourceLabel: "Cecafé",
+    }),
+    [data],
+  );
 
   // All hooks must be called before any conditional return
   const filteredSeries = useMemo(() => {
@@ -133,7 +159,14 @@ export default function BrazilTab() {
       {subTab === "farmer-economics" && <BrazilFarmerEconomics />}
 
       {subTab === "supply-demand" && (
-        <SupplyDemandBalance origin="brazil" label="Brazil" projection={projection} />
+        <SupplyDemandBalance
+          origin="brazil"
+          label="Brazil"
+          projection={projection}
+          cropYearMonths="Apr–Mar"
+          realizedExports={realizedBrExports}
+          multiSource={toMultiSource(balanceSheet)}
+        />
       )}
 
       {subTab === "weather" && (

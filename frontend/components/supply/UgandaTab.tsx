@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
+import { buildRealizedExportsOverlay } from "@/lib/sdRealizedExports";
+import { toMultiSource, type BalanceSheetFile } from "@/lib/sdMultiSource";
 import UgandaAnnualTrendChart from "@/components/supply/uganda/UgandaAnnualTrendChart";
 import UgandaCumulativePaceChart from "@/components/supply/uganda/UgandaCumulativePaceChart";
 import UgandaDestinationChart from "@/components/supply/uganda/UgandaDestinationChart";
@@ -98,6 +100,7 @@ export default function UgandaTab() {
   const [subTab, setSubTab] = useState<SubTab>("exports");
   const [data, setData]     = useState<UgandaSupply | null>(null);
   const [monthly, setMonthly] = useState<UgandaMonthlyRow[] | null>(null);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheetFile | null>(null);
   const [error, setError]   = useState(false);
 
   useEffect(() => {
@@ -105,6 +108,12 @@ export default function UgandaTab() {
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then(setData)
       .catch(() => setError(true));
+    // Multi-source production estimates (USDA / UCDA / ICO) for the
+    // S&D card's equation strip + production spread block.
+    fetch("/data/ug_balance_sheet.json")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: BalanceSheetFile | null) => d && setBalanceSheet(d))
+      .catch(() => { /* absent → equation strip + spread block hide */ });
   }, []);
 
   // uganda_monthly.json — multi-year UCDA series (parsed by the scraper).
@@ -115,6 +124,27 @@ export default function UgandaTab() {
       .then((d: UgandaMonthlyFile | null) => d && setMonthly(d.series ?? []))
       .catch(() => { /* file absent → charts hidden gracefully */ });
   }, []);
+
+  // Realised UCDA exports per Ugandan crop year (Oct → Sep). Falls
+  // through to data.exports.monthly when uganda_monthly.json is absent
+  // so the overlay still kicks in for the legacy short-history feed.
+  // The multi-year UCDA file stores `total_bags` (raw 60-kg bags); the
+  // legacy uganda_supply feed ships pre-rounded `total_k_bags`. Both
+  // resolve to kbags before they reach the helper.
+  const realizedUgExports = useMemo(() => {
+    const src = monthly && monthly.length > 0
+      ? monthly
+          .filter(r => r.total_bags != null)
+          .map(r => ({ month: r.month, kbags: (r.total_bags ?? 0) / 1000 }))
+      : (data?.exports?.monthly ?? []).map(r => ({
+          month: r.month, kbags: r.total_k_bags,
+        }));
+    return buildRealizedExportsOverlay({
+      monthly:            src,
+      cropYearStartMonth: 10,
+      sourceLabel:        "UCDA",
+    });
+  }, [monthly, data]);
 
   return (
     <div className="space-y-4">
@@ -152,7 +182,15 @@ export default function UgandaTab() {
         </div>
       )}
 
-      {subTab === "supply-demand" && <SupplyDemandBalance origin="uganda" label="Uganda" />}
+      {subTab === "supply-demand" && (
+        <SupplyDemandBalance
+          origin="uganda"
+          label="Uganda"
+          cropYearMonths="Oct–Sep"
+          realizedExports={realizedUgExports}
+          multiSource={toMultiSource(balanceSheet)}
+        />
+      )}
       {subTab === "weather" && <WeatherCharts dataUrl="/data/uganda_weather.json" title="Weather · Uganda" />}
 
       {data && subTab === "exports" && (
