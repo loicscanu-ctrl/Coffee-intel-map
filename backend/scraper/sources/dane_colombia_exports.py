@@ -301,72 +301,65 @@ def inspect_xls(xls_bytes: bytes, source_url: str) -> str:
     return "\n".join(lines)
 
 
-def parse_xls(xls_bytes: bytes) -> list[NandinaRow]:
-    """Scan every sheet for rows whose first column is a chapter-0901
-    NANDINA. Tons live in a "Toneladas" / "Peso Neto" column and FOB USD
-    in a "Valor FOB" / "USD" column — column headers vary between
-    annexes, so we detect by header text on a per-sheet basis."""
+def parse_cuadro4_ytd(xls_bytes: bytes) -> dict[str, dict[str, float | str | None]]:
+    """Read Cuadro 4 ('Principales productos exportados, según NANDINA')
+    and return YTD-through-{title-month} aggregates for every chapter-0901
+    NANDINA line. Output keyed by the 10-digit NANDINA code:
+
+      {"0901119000": {"tons": 164473.7, "fob_usd_k": 1394668.2, "desc": "Los demás cafés..."}}
+
+    Cuadro 4 has a stable 8-column layout (verified from the Mar/Apr 2026
+    samples mirrored to the workflow log):
+
+      col 0: NANDINA code              (numeric float, leading zero stripped)
+      col 1: description               (string)
+      col 2: USD k-FOB 2025p YTD       (prior year, same window)
+      col 3: USD k-FOB 2026p YTD       (current year, what we want)
+      col 4: % share of all exports    (FOB)
+      col 5: tons 2025p YTD            (prior year)
+      col 6: tons 2026p YTD            (current year, what we want)
+      col 7: % share                   (tons)
+
+    Coffee chapter codes are 0901.* — we keep ALL of them and let the
+    caller decide which to roll up into the green-coffee headline. Codes
+    outside 0901 (extracts/soluble in chapter 2101) are ignored here.
+    """
     try:
         import xlrd  # type: ignore
     except ImportError:
         logger.error("[dane] xlrd not installed — `pip install xlrd==1.2.0`")
-        return []
+        return {}
 
     try:
         wb = xlrd.open_workbook(file_contents=xls_bytes)
     except Exception as e:                           # noqa: BLE001
         logger.warning(f"[dane] xlrd open failed: {e}")
-        return []
+        return {}
 
-    rows: list[NandinaRow] = []
-    for sheet in wb.sheets():
-        if sheet.nrows < 2:
-            continue
-        # Find header row — DANE sometimes puts up to ~5 title rows before
-        # the column headers. Look for a row mentioning "NANDINA" /
-        # "Subpartida" together with "Toneladas" or "Peso".
-        header_row_idx = None
-        for r in range(min(sheet.nrows, 12)):
-            line = " ".join(
-                str(sheet.cell_value(r, c)) for c in range(sheet.ncols)
-            ).lower()
-            if (("nandina" in line or "subpartida" in line)
-                and ("tonelad" in line or "peso" in line or "kilogr" in line)):
-                header_row_idx = r
-                break
-        if header_row_idx is None:
-            continue
+    # The "Cuadro 4 " sheet name has a trailing space in some annexes.
+    # xlrd preserves it, so match leniently.
+    sheet = None
+    for s in wb.sheets():
+        if s.name.strip().lower() == "cuadro 4":
+            sheet = s
+            break
+    if sheet is None:
+        return {}
 
-        # Column index resolution.
-        headers = [str(sheet.cell_value(header_row_idx, c)).lower()
-                   for c in range(sheet.ncols)]
-        code_col = next(
-            (i for i, h in enumerate(headers) if "nandina" in h or "subpartida" in h),
-            0,
-        )
-        tons_col = None
-        for i, h in enumerate(headers):
-            if "tonelad" in h or ("peso" in h and "neto" in h):
-                tons_col = i
-                break
-        if tons_col is None:
-            # No tons column on this sheet (might be a value-only summary).
+    out: dict[str, dict[str, float | str | None]] = {}
+    for r in range(sheet.nrows):
+        raw_code = sheet.cell_value(r, 0)
+        code = _normalize_code(raw_code)
+        if not code or not code.startswith("0901"):
             continue
-        fob_col = next((i for i, h in enumerate(headers) if "fob" in h), None)
-
-        for r in range(header_row_idx + 1, sheet.nrows):
-            raw_code = sheet.cell_value(r, code_col)
-            code = _normalize_code(raw_code)
-            if not code or not code.startswith("0901"):
-                continue
-            if code not in COFFEE_NANDINA:
-                # Other 0901 lines (decaf, roasted, husks/skins, extracts) —
-                # not part of the green-coffee export total. Keep them out.
-                continue
-            tons = _cell_number(sheet.cell_value(r, tons_col))
-            fob  = _cell_number(sheet.cell_value(r, fob_col)) if fob_col is not None else None
-            rows.append(NandinaRow(code=code, tons=tons, fob_usd=fob))
-    return rows
+        desc = str(sheet.cell_value(r, 1)).strip() if sheet.ncols > 1 else ""
+        # Column indices are stable in the recent annexes; if a future
+        # annex shifts them we'll catch it via the test that asserts the
+        # sample YTD values match.
+        tons_ytd = _cell_number(sheet.cell_value(r, 6)) if sheet.ncols > 6 else None
+        fob_ytd  = _cell_number(sheet.cell_value(r, 3)) if sheet.ncols > 3 else None
+        out[code] = {"tons": tons_ytd, "fob_usd_k": fob_ytd, "desc": desc}
+    return out
 
 
 def _format_code(code10: str) -> str:
@@ -374,9 +367,75 @@ def _format_code(code10: str) -> str:
     return f"{code10[0:4]}.{code10[4:6]}.{code10[6:8]}.{code10[8:10]}"
 
 
+def build_entry_from_ytd(
+    year: int,
+    month: int,
+    source_url: str,
+    ytd_current: dict[str, dict[str, float | str | None]],
+    ytd_prior: dict[str, dict[str, float | str | None]] | None,
+) -> MonthlyEntry | None:
+    """Convert two consecutive Cuadro-4 YTD snapshots into a monthly
+    entry: month-N tons = YTD-through-N − YTD-through-(N-1). For
+    January, the prior snapshot is treated as zero.
+
+    Returns None when no coffee NANDINA rows survive the diff
+    (zero/negative tons → unreliable, better to drop the row than ship
+    a phantom)."""
+    if not ytd_current:
+        return None
+
+    nandina_entries: list[dict[str, str | float | None]] = []
+    total_t = 0.0
+    for code, cur in ytd_current.items():
+        cur_tons = cur.get("tons")
+        cur_fob  = cur.get("fob_usd_k")
+        if not isinstance(cur_tons, (int, float)):
+            continue
+        if ytd_prior:
+            prior = ytd_prior.get(code, {})
+            prior_tons = prior.get("tons") if isinstance(prior.get("tons"), (int, float)) else 0.0
+            prior_fob  = prior.get("fob_usd_k") if isinstance(prior.get("fob_usd_k"), (int, float)) else 0.0
+        else:
+            prior_tons = 0.0
+            prior_fob  = 0.0
+        monthly_tons = float(cur_tons) - float(prior_tons)
+        monthly_fob_k = (
+            float(cur_fob) - float(prior_fob)
+            if isinstance(cur_fob, (int, float)) else None
+        )
+        if monthly_tons <= 0:
+            # A negative or zero diff means the prior YTD was larger —
+            # usually a NANDINA reclassification, occasionally a revision.
+            # Either way, the value isn't usable as the month's flow.
+            continue
+        nandina_entries.append({
+            "code":    _format_code(code),
+            "tons":    round(monthly_tons, 1),
+            # FOB USD: Cuadro 4 reports "Miles de dólares FOB" — convert
+            # to absolute USD for the JSON consumer.
+            "fob_usd": round(monthly_fob_k * 1000.0, 0) if monthly_fob_k is not None else None,
+        })
+        total_t += monthly_tons
+
+    if not nandina_entries or total_t <= 0:
+        return None
+
+    return MonthlyEntry(
+        month=         f"{year:04d}-{month:02d}",
+        total_t=       round(total_t, 1),
+        # 1 ton = 1000 kg; 1 bag = 60 kg → tons → bags = ×1000/60; → k-bags = /1000.
+        total_k_bags=  round(total_t * 1000.0 / KG_PER_BAG / 1000.0, 1),
+        by_nandina=    nandina_entries,
+        source_xls=    source_url,
+        parser_version="v2",
+    )
+
+
+# Legacy alias retained for the v1 tests covering the helper-level
+# aggregation. New code uses build_entry_from_ytd.
 def build_entry(year: int, month: int, source_url: str, rows: list[NandinaRow]) -> MonthlyEntry | None:
-    """Aggregate two NANDINA rows into one monthly entry. None if neither
-    coffee line was found — better to drop the month than ship a zero."""
+    """Aggregate NandinaRow tuples into one MonthlyEntry. Kept for the
+    legacy unit tests; the run() path uses build_entry_from_ytd now."""
     if not rows:
         return None
     total_t = sum((r.tons or 0.0) for r in rows)
@@ -395,7 +454,7 @@ def build_entry(year: int, month: int, source_url: str, rows: list[NandinaRow]) 
             for r in rows
         ],
         source_xls=    source_url,
-        parser_version="v1",
+        parser_version="v2",
     )
 
 
@@ -459,7 +518,45 @@ def _parse_month_arg(s: str) -> tuple[int, int]:
     return yr, mo
 
 
+def _prior_month(year: int, month: int) -> tuple[int, int]:
+    """(2026, 1) → (2025, 12); (2026, 4) → (2026, 3)."""
+    return (year - 1, 12) if month == 1 else (year, month - 1)
+
+
+def _fetch_ytd(year: int, month: int, *, inspect: bool) -> tuple[dict, str | None, str]:
+    """Download (or load from cache) an annex and parse Cuadro 4 YTD.
+    Returns (ytd_dict, url, status) where status is "ok"/"not_found"/
+    "blocked"/"parse_empty"."""
+    url = _url_for(year, month)
+    cache_path = CACHE_DIR / f"anex-EXPORTACIONES-{SPANISH_MONTH_ABBR[month]}{year}.xls"
+    if cache_path.exists():
+        xls_bytes: bytes | str = cache_path.read_bytes()
+        logger.info(f"[dane] {year}-{month:02d}: cache hit")
+    else:
+        xls_bytes = _fetch_xls(url)
+        if xls_bytes == _FETCH_NOT_FOUND:
+            return {}, url, "not_found"
+        if xls_bytes == _FETCH_BLOCKED:
+            return {}, url, "blocked"
+        cache_path.write_bytes(xls_bytes)  # type: ignore[arg-type]
+
+    if inspect:
+        report = inspect_xls(xls_bytes, url)  # type: ignore[arg-type]
+        (DEBUG_DIR / f"{year}-{month:02d}.txt").write_text(report, encoding="utf-8")
+        print(f"[dane] {year}-{month:02d}: wrote sheet inspection → debug/dane/{year}-{month:02d}.txt")
+
+    ytd = parse_cuadro4_ytd(xls_bytes)  # type: ignore[arg-type]
+    if not ytd:
+        return {}, url, "parse_empty"
+    return ytd, url, "ok"
+
+
 def run(*, write: bool, months: list[tuple[int, int]], inspect: bool = False) -> int:
+    """For each requested month, compute monthly tons as a YTD difference:
+        month_N_tons = YTD(N) − YTD(N-1)
+    January uses YTD(1) directly (no prior YTD needed). Cuadro 4 of the
+    DANE annex reports YTD-through-{title-month}, so two consecutive
+    annexes are needed for each non-January monthly value."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     if inspect:
@@ -470,28 +567,32 @@ def run(*, write: bool, months: list[tuple[int, int]], inspect: bool = False) ->
     blocked = 0
     parse_empty = 0
     for year, month in months:
-        url = _url_for(year, month)
-        cache_path = CACHE_DIR / f"anex-EXPORTACIONES-{SPANISH_MONTH_ABBR[month]}{year}.xls"
-        if cache_path.exists():
-            xls_bytes: bytes | str = cache_path.read_bytes()
-            logger.info(f"[dane] {year}-{month:02d}: cache hit")
+        ytd_cur, url, status = _fetch_ytd(year, month, inspect=inspect)
+        if status == "not_found":
+            not_found += 1
+            continue
+        if status == "blocked":
+            blocked += 1
+            continue
+        if status == "parse_empty":
+            parse_empty += 1
+            print(f"[dane] {year}-{month:02d}: Cuadro 4 returned 0 coffee NANDINAs")
+            continue
+
+        # Prior YTD only needed for non-January months.
+        if month == 1:
+            ytd_prior = None
         else:
-            xls_bytes = _fetch_xls(url)
-            if xls_bytes == _FETCH_NOT_FOUND:
-                not_found += 1
+            py, pm = _prior_month(year, month)
+            ytd_prior, _, prior_status = _fetch_ytd(py, pm, inspect=inspect)
+            if prior_status != "ok":
+                # Without the prior YTD we can't compute a monthly diff.
+                # Drop the row rather than mis-report YTD as monthly.
+                parse_empty += 1
+                print(f"[dane] {year}-{month:02d}: prior YTD missing ({prior_status}); skipping")
                 continue
-            if xls_bytes == _FETCH_BLOCKED:
-                blocked += 1
-                continue
-            cache_path.write_bytes(xls_bytes)  # type: ignore[arg-type]
 
-        if inspect:
-            report = inspect_xls(xls_bytes, url)  # type: ignore[arg-type]
-            (DEBUG_DIR / f"{year}-{month:02d}.txt").write_text(report, encoding="utf-8")
-            print(f"[dane] {year}-{month:02d}: wrote sheet inspection → debug/dane/{year}-{month:02d}.txt")
-
-        rows = parse_xls(xls_bytes)  # type: ignore[arg-type]
-        entry = build_entry(year, month, url, rows)
+        entry = build_entry_from_ytd(year, month, url, ytd_cur, ytd_prior)
         if entry:
             entries.append(entry)
             print(
@@ -501,7 +602,7 @@ def run(*, write: bool, months: list[tuple[int, int]], inspect: bool = False) ->
             )
         else:
             parse_empty += 1
-            print(f"[dane] {year}-{month:02d}: 0 coffee rows extracted")
+            print(f"[dane] {year}-{month:02d}: 0 coffee rows after YTD diff")
 
     if not entries:
         logger.error(

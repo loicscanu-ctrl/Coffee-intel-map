@@ -63,6 +63,26 @@ def test_fnc_parse_bulletin_emits_production_for_bulletin_month_and_exports_for_
         assert e.source_pdf     == url
 
 
+def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
+    """The March 2026 bulletin uses 'se ubicó en' instead of 'alcanzó',
+    and exports drop 'de café' filler ('exportaciones definitivas de
+    febrero...' instead of '...de café en febrero...'). v3 accepts both
+    verb constructions and either preposition for the month."""
+    text = (
+        "• En marzo, la producción de café se ubicó en 754 mil sacos, un 29,1%\n"
+        "  menos frente al mismo mes de 2025.\n"
+        "• Las exportaciones definitivas de febrero se ubicaron en 847 mil sacos de\n"
+        "  60 kg, un 28,5% menos frente al mismo mes de 2025.\n"
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/05/"
+           "3.-Informe-mensual-Marzo-2026-p-1.pdf")
+    by_month = {e.month: e for e in fnc.parse_bulletin(text, url)}
+    assert by_month["2026-03"].production_k_bags == 754.0
+    assert by_month["2026-03"].yoy_pct           == -29.1
+    assert by_month["2026-02"].total_k_bags      == 847.0
+    assert by_month["2026-02"].yoy_pct           == -28.5
+
+
 def test_fnc_parse_bulletin_rejects_non_bulletin_pdfs():
     """v1 bug: the daily precio_cafe.pdf and FEPCafé monthly reports lived
     on the same listing URL prefix and were treated as data sources.
@@ -148,6 +168,68 @@ def test_dane_build_entry_aggregates_two_nandina_rows():
     assert entry.total_k_bags == 1050.0
     codes = {b["code"] for b in entry.by_nandina}
     assert codes == {"0901.11.10.00", "0901.11.90.00"}
+
+
+def test_dane_build_entry_from_ytd_computes_monthly_diff():
+    """Cuadro 4 reports YTD-through-{title-month}, so March monthly tons
+    are March YTD minus February YTD. Real numbers from the diag run:
+    Apr-2026 XLS YTD = 194,432.64 t; Mar-2026 XLS YTD = 164,473.74 t
+    → April monthly = 29,958.9 t."""
+    ytd_april = {
+        "0901119000": {"tons": 194432.64, "fob_usd_k": 1624275.14, "desc": "Los demás cafés..."},
+    }
+    ytd_march = {
+        "0901119000": {"tons": 164473.74, "fob_usd_k": 1394668.17, "desc": "Los demás cafés..."},
+    }
+    entry = dane.build_entry_from_ytd(2026, 4, "u", ytd_april, ytd_march)
+    assert entry is not None
+    assert entry.month   == "2026-04"
+    assert entry.total_t == 29958.9
+    # 29958.9 t × 1000 kg / 60 kg = 499,315 bags = 499.3 k-bags.
+    assert entry.total_k_bags == 499.3
+    by_code = {b["code"]: b for b in entry.by_nandina}
+    assert by_code["0901.11.90.00"]["tons"] == 29958.9
+    # FOB USD: (1,624,275.14 − 1,394,668.17) thousand × 1000 = 229,606,970 USD.
+    assert by_code["0901.11.90.00"]["fob_usd"] == 229606970.0
+    assert entry.parser_version == "v2"
+
+
+def test_dane_build_entry_from_ytd_january_no_prior_needed():
+    """January is the first month of the YTD window — its YTD value
+    equals the monthly value, no prior snapshot required."""
+    ytd_jan = {
+        "0901119000": {"tons": 60000.0, "fob_usd_k": 480000.0, "desc": "Los demás cafés..."},
+    }
+    entry = dane.build_entry_from_ytd(2026, 1, "u", ytd_jan, None)
+    assert entry is not None
+    assert entry.total_t == 60000.0
+
+
+def test_dane_build_entry_from_ytd_drops_negative_diffs():
+    """A NANDINA reclassification or a customs revision can make the
+    prior YTD exceed the current YTD. The diff is meaningless then; we
+    drop the line rather than ship a negative tonnage."""
+    ytd_cur = {
+        "0901119000": {"tons": 100000.0, "fob_usd_k": 500000.0, "desc": "demás"},
+        "0901111000": {"tons": 50000.0,  "fob_usd_k": 250000.0, "desc": "suave"},
+    }
+    ytd_prior = {
+        "0901119000": {"tons": 80000.0,  "fob_usd_k": 400000.0, "desc": "demás"},
+        # suave was higher in the prior YTD → negative diff, drop.
+        "0901111000": {"tons": 90000.0,  "fob_usd_k": 450000.0, "desc": "suave"},
+    }
+    entry = dane.build_entry_from_ytd(2026, 3, "u", ytd_cur, ytd_prior)
+    assert entry is not None
+    by_code = {b["code"]: b for b in entry.by_nandina}
+    # Only the demás line survives; the suave diff was negative.
+    assert list(by_code.keys()) == ["0901.11.90.00"]
+    assert by_code["0901.11.90.00"]["tons"] == 20000.0
+    assert entry.total_t == 20000.0
+
+
+def test_dane_prior_month_handles_january_rollover():
+    assert dane._prior_month(2026, 1) == (2025, 12)
+    assert dane._prior_month(2026, 4) == (2026, 3)
 
 
 def test_dane_build_entry_returns_none_when_no_rows():

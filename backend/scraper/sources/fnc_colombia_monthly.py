@@ -127,16 +127,30 @@ SPANISH_MONTHS = {
 #      bulletin) — the bullet names the month so we can read it back from
 #      the body.
 
-# "893 mil sacos" or "1,1 millones de sacos de 60 kg".
+# Real bulletins use TWO different verb constructions interchangeably:
+#   • "la producción de café **alcanzó** 893 mil sacos"          (Jan 2026)
+#   • "la producción de café **se ubicó en** 754 mil sacos"      (Mar 2026)
+# and exports drop the "de café" filler in some months:
+#   • "Las exportaciones definitivas **de café en** diciembre se ubicaron en…"  (Jan)
+#   • "Las exportaciones definitivas **de** febrero se ubicaron en…"            (Mar)
+# So both regexes accept either verb and treat "de café" as optional.
+
+# Production: "alcanzó N" or "se ubicó en N" + "mil sacos" / "millones de sacos".
 _PROD_BULLET_RE = re.compile(
-    r"producci[oó]n\s+de\s+caf[eé]\s+alcanz[oó]\s+(?P<num>[\d.,]+)\s+"
-    r"(?P<unit>mil(?:lones)?)\s+(?:de\s+)?sacos",
+    r"producci[oó]n\s+de\s+caf[eé]\s+"
+    r"(?:alcanz[oó]|se\s+ubic[oó]\s+en)\s+"
+    r"(?P<num>[\d.,]+)\s+(?P<unit>mil(?:lones)?)\s+(?:de\s+)?sacos",
     re.I,
 )
+# Exports: optional "de café", then either "en <month>" (Jan-style) or
+# bare "de <month>" (Mar-style). The bulletin always reports a single
+# previous month here, so the month token is mandatory.
 _EXP_BULLET_RE = re.compile(
-    r"exportaciones\s+definitivas\s+de\s+caf[eé]\s+en\s+(?P<month>"
-    + "|".join(SPANISH_MONTHS)
-    + r")(?:\s+(?:de\s+)?(?P<yr>20\d{2}))?\s+se\s+ubicaron\s+en\s+"
+    r"exportaciones\s+definitivas\s+"
+    r"(?:de\s+caf[eé]\s+)?(?:en|de)\s+"
+    r"(?P<month>" + "|".join(SPANISH_MONTHS) + r")"
+    r"(?:\s+(?:de\s+)?(?P<yr>20\d{2}))?\s+"
+    r"se\s+ubicaron\s+en\s+"
     r"(?P<num>[\d.,]+)\s+(?P<unit>mil(?:lones)?)\s+(?:de\s+)?sacos",
     re.I,
 )
@@ -144,14 +158,18 @@ _EXP_BULLET_RE = re.compile(
 # with the variación anual right after. Capture the sign by keyword so
 # we don't depend on a leading minus sign (the bulletin says "caída de
 # 19,0%" / "variación anual negativa del 34,2 %" instead).
-# YoY % regex. We scan the tail for the percent first, then look for a
-# Spanish sign keyword anywhere in the same window — the lazy regex
-# approach can't bind the keyword and the percent together reliably
-# because the bulletin can put 30+ chars of filler between them
-# ("variación anual negativa del 34,2 %").
+# YoY % regex. Spanish sign keywords sit on EITHER side of the percent
+# in real bulletins:
+#   "una variación anual negativa del 34,2 %"     (keyword BEFORE)
+#   "un 29,1% menos frente al mismo mes"          (keyword AFTER)
+# We scan a window starting at the volume end through the percent, and
+# also peek a short distance after the percent, for any of the negative
+# keywords. "menos" alone is added because the Mar bulletin pairs it
+# with the percent immediately after.
 _YOY_PCT_RE = re.compile(r"(?P<pct>\d+(?:[.,]\d+)?)\s*%")
 _YOY_NEG_KW_RE = re.compile(
-    r"negativ[ao]|ca[ií]da|disminuci[oó]n|reducci[oó]n", re.I,
+    r"\b(negativ[ao]|ca[ií]da|disminuci[oó]n|reducci[oó]n|menos)\b",
+    re.I,
 )
 
 # URL filter: only the actual monthly statistical bulletin carries the
@@ -333,8 +351,11 @@ def _yoy_near(text: str, end_idx: int) -> float | None:
     pct = _fnc_number(pct_m.group("pct"))
     if pct is None:
         return None
-    # Sign keyword has to appear before the percent in the same tail.
-    window = tail[: pct_m.start()]
+    # Sign keyword can appear either before the percent ("variación
+    # negativa del 34,2 %") or after it ("29,1 % menos"). Search both
+    # sides of the percent: the full window from volume end up to ~50
+    # chars after the percent.
+    window = tail[: pct_m.end() + 50]
     if _YOY_NEG_KW_RE.search(window):
         return -pct
     return pct
