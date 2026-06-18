@@ -9,7 +9,6 @@ from __future__ import annotations
 from scraper.sources import dane_colombia_exports as dane
 from scraper.sources import fnc_colombia_monthly as fnc
 
-
 # ── FNC ─────────────────────────────────────────────────────────────────────
 
 

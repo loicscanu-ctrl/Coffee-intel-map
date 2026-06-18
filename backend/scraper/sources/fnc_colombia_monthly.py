@@ -51,7 +51,7 @@ import logging
 import re
 import sys
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -223,7 +223,7 @@ def _extract_text(pdf_bytes: bytes) -> str:
     if it can't parse a page (occasional FNC bulletins have rasterised
     pages from scanner workflows) we skip that page rather than crash."""
     try:
-        import pdfplumber                       # type: ignore
+        import pdfplumber  # type: ignore
     except ImportError:
         logger.error("[fnc] pdfplumber not installed — `pip install pdfplumber`")
         return ""
@@ -368,7 +368,7 @@ def _merge_into_supply(monthly: list[MonthlyEntry]) -> dict:
     }
     out = dict(doc)
     out["country"] = "colombia"
-    out["scraped_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    out["scraped_at"] = datetime.now(UTC).isoformat(timespec="seconds")
     out["exports"] = new_exports
     return out
 

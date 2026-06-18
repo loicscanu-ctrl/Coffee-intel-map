@@ -56,14 +56,12 @@ Usage
 from __future__ import annotations
 
 import argparse
-import calendar
-import io
 import json
 import logging
 import re
 import sys
 from dataclasses import asdict, dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import requests
@@ -240,7 +238,7 @@ def parse_xls(xls_bytes: bytes) -> list[NandinaRow]:
     in a "Valor FOB" / "USD" column — column headers vary between
     annexes, so we detect by header text on a per-sheet basis."""
     try:
-        import xlrd                                  # type: ignore
+        import xlrd  # type: ignore
     except ImportError:
         logger.error("[dane] xlrd not installed — `pip install xlrd==1.2.0`")
         return []
@@ -372,7 +370,7 @@ def _merge_into_supply(monthly: list[MonthlyEntry]) -> dict:
     }
     out = dict(doc)
     out["country"] = "colombia"
-    out["scraped_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    out["scraped_at"] = datetime.now(UTC).isoformat(timespec="seconds")
     out["exports"] = new_exports
     return out
 
