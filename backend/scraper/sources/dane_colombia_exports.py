@@ -71,6 +71,7 @@ logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR  = ROOT / "frontend" / "public" / "data"
 CACHE_DIR = ROOT / "backend"  / "scraper" / "cache" / "dane"
+DEBUG_DIR = ROOT / "backend"  / "scraper" / "debug" / "dane"
 OUT_PATH  = DATA_DIR / "colombia_supply.json"
 
 DANE_BASE = "https://www.dane.gov.co/files/operaciones/EXPORTACIONES"
@@ -232,6 +233,30 @@ def _cell_number(raw: object) -> float | None:
         return None
 
 
+def inspect_xls(xls_bytes: bytes, source_url: str) -> str:
+    """Dump every sheet's name + first 30 rows so the operator can
+    re-derive the real header structure when parse_xls returns nothing.
+    Output is a text report we'll upload as a workflow artifact."""
+    try:
+        import xlrd  # type: ignore
+    except ImportError:
+        return "xlrd not installed"
+    try:
+        wb = xlrd.open_workbook(file_contents=xls_bytes)
+    except Exception as e:                           # noqa: BLE001
+        return f"xlrd open failed: {e}"
+    lines: list[str] = [
+        f"=== {source_url}",
+        f"sheets: {[s.name for s in wb.sheets()]}",
+    ]
+    for sheet in wb.sheets():
+        lines.append(f"\n── sheet: {sheet.name!r}  ({sheet.nrows} rows × {sheet.ncols} cols)")
+        for r in range(min(sheet.nrows, 30)):
+            cells = [str(sheet.cell_value(r, c))[:40] for c in range(sheet.ncols)]
+            lines.append(f"  r{r:02d}: " + " | ".join(cells))
+    return "\n".join(lines)
+
+
 def parse_xls(xls_bytes: bytes) -> list[NandinaRow]:
     """Scan every sheet for rows whose first column is a chapter-0901
     NANDINA. Tons live in a "Toneladas" / "Peso Neto" column and FOB USD
@@ -390,9 +415,11 @@ def _parse_month_arg(s: str) -> tuple[int, int]:
     return yr, mo
 
 
-def run(*, write: bool, months: list[tuple[int, int]]) -> int:
+def run(*, write: bool, months: list[tuple[int, int]], inspect: bool = False) -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    if inspect:
+        DEBUG_DIR.mkdir(parents=True, exist_ok=True)
 
     entries: list[MonthlyEntry] = []
     not_found = 0
@@ -413,6 +440,11 @@ def run(*, write: bool, months: list[tuple[int, int]]) -> int:
                 blocked += 1
                 continue
             cache_path.write_bytes(xls_bytes)  # type: ignore[arg-type]
+
+        if inspect:
+            report = inspect_xls(xls_bytes, url)  # type: ignore[arg-type]
+            (DEBUG_DIR / f"{year}-{month:02d}.txt").write_text(report, encoding="utf-8")
+            print(f"[dane] {year}-{month:02d}: wrote sheet inspection → debug/dane/{year}-{month:02d}.txt")
 
         rows = parse_xls(xls_bytes)  # type: ignore[arg-type]
         entry = build_entry(year, month, url, rows)
@@ -454,10 +486,14 @@ def main() -> int:
         "--history", type=int, default=3,
         help="When --month is not given, fetch the last N months (default 3).",
     )
+    ap.add_argument(
+        "--inspect", action="store_true",
+        help="Dump per-sheet header inspection to debug/dane/ for parser iteration.",
+    )
     args = ap.parse_args()
 
     months = args.month if args.month else _recent_months(args.history)
-    return run(write=args.write, months=months)
+    return run(write=args.write, months=months, inspect=args.inspect)
 
 
 if __name__ == "__main__":
