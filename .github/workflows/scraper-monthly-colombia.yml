@@ -23,9 +23,12 @@ name: "0.10 – Colombia coffee exports (monthly · DANE + FNC)"
 # blocked and (b) request a specific historical month or count.
 
 on:
-  schedule:
-    # 06:30 UTC daily — covers M+1 (FNC) and M+2 (DANE) publication.
-    - cron: '30 6 * * *'
+  # Cron disabled while the FNC parser is being iterated (PR #375's first
+  # run shipped wrong numbers because the regexes captured page numbers /
+  # the year). Re-enable once parse_bulletin v2 is verified and DANE's
+  # header detection is fixed. Until then: manual-dispatch only.
+  # schedule:
+  #   - cron: '30 6 * * *'
   workflow_dispatch:
     inputs:
       run_fnc:
@@ -50,6 +53,12 @@ on:
         required: false
         default: ""
         type: string
+      diag_only:
+        description: "Diagnostic: dump raw PDF text + DANE sheet structure as artifact, do NOT write data"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
 
 concurrency:
   group: scraper-monthly-colombia
@@ -82,7 +91,12 @@ jobs:
         working-directory: backend
         run: |
           set +e
-          ARGS="--write --history ${{ inputs.dane_history || '3' }}"
+          # In diag mode: skip --write, add --inspect for sheet-header dump.
+          if [ "${{ inputs.diag_only }}" = "true" ]; then
+            ARGS="--history ${{ inputs.dane_history || '3' }} --inspect"
+          else
+            ARGS="--write --history ${{ inputs.dane_history || '3' }}"
+          fi
           PYTHONPATH=. python -m scraper.sources.dane_colombia_exports $ARGS
           echo "rc=$?" >> "$GITHUB_OUTPUT"
 
@@ -92,18 +106,35 @@ jobs:
         working-directory: backend
         run: |
           set +e
-          ARGS="--write"
+          if [ "${{ inputs.diag_only }}" = "true" ]; then
+            # --diag dumps raw extracted PDF text under debug/fnc/
+            ARGS="--diag"
+          else
+            ARGS="--write"
+          fi
           if [ -n "${{ inputs.fnc_max }}" ]; then
             ARGS="$ARGS --max ${{ inputs.fnc_max }}"
           fi
           PYTHONPATH=. python -m scraper.sources.fnc_colombia_monthly $ARGS
           echo "rc=$?" >> "$GITHUB_OUTPUT"
 
+      - name: Upload parser diagnostics
+        if: ${{ inputs.diag_only == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: colombia-parser-diag-${{ github.run_id }}
+          path: |
+            backend/scraper/debug/fnc/
+            backend/scraper/debug/dane/
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Commit updated colombia_supply.json if changed
         # Run even when one source failed — the other may have updated
         # the file. The two scrapers merge into the same `exports.monthly`
         # block; DANE rows win when both touch the same month.
-        if: always() && (steps.dane.outputs.rc == '0' || steps.fnc.outputs.rc == '0')
+        # Skipped in diag mode (no --write was requested).
+        if: ${{ inputs.diag_only != 'true' && always() && (steps.dane.outputs.rc == '0' || steps.fnc.outputs.rc == '0') }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
