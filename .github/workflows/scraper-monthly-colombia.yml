@@ -23,9 +23,12 @@ name: "0.10 – Colombia coffee exports (monthly · DANE + FNC)"
 # blocked and (b) request a specific historical month or count.
 
 on:
-  schedule:
-    # 06:30 UTC daily — covers M+1 (FNC) and M+2 (DANE) publication.
-    - cron: '30 6 * * *'
+  # Cron disabled while the FNC parser is being iterated (PR #375's first
+  # run shipped wrong numbers because the regexes captured page numbers /
+  # the year). Re-enable once parse_bulletin v2 is verified and DANE's
+  # header detection is fixed. Until then: manual-dispatch only.
+  # schedule:
+  #   - cron: '30 6 * * *'
   workflow_dispatch:
     inputs:
       run_fnc:
