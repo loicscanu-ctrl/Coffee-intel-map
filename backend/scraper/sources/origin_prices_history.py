@@ -44,32 +44,52 @@ HTTP_HEADERS = {
 
 ORIGINS = {
     "vietnam": {
-        "name":     "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
-        "source":   "Giacaphe.com",
-        "currency": "VND",
-        "unit":     "per_kg",
-        "color":    "#06b6d4",
-    },
-    "brazil_arabica": {
-        "name":     "Brazil Arabica (CEPEA/ESALQ)",
-        "source":   "BCB SGS 4332 (CEPEA daily mirror)",
-        "currency": "BRL",
-        "unit":     "per_saca_60kg",
-        "color":    "#a855f7",
+        "name":      "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
+        "source":    "Giacaphe.com",
+        "currency":  "VND",
+        "unit":      "per_kg",
+        "color":     "#06b6d4",
+        "commodity": "robusta",
     },
     "brazil_conilon": {
-        "name":     "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
-        "source":   "BCB SGS 4333 (CEPEA daily mirror)",
-        "currency": "BRL",
-        "unit":     "per_saca_60kg",
-        "color":    "#10b981",
+        "name":      "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
+        "source":    "BCB SGS 4333 (CEPEA daily mirror)",
+        "currency":  "BRL",
+        "unit":      "per_saca_60kg",
+        "color":     "#10b981",
+        "commodity": "robusta",
     },
     "uganda": {
-        "name":     "Uganda Robusta Screen 15 (UCDA)",
-        "source":   "Uganda Coffee Development Authority",
-        "currency": "USD",
-        "unit":     "per_cwt",
-        "color":    "#f59e0b",
+        "name":      "Uganda Robusta Screen 15 (UCDA)",
+        "source":    "Uganda Coffee Development Authority",
+        "currency":  "USD",
+        "unit":      "per_cwt",
+        "color":     "#f59e0b",
+        "commodity": "robusta",
+    },
+    "brazil_arabica": {
+        "name":      "Brazil Arabica (CEPEA/ESALQ)",
+        "source":    "BCB SGS 4332 (CEPEA daily mirror)",
+        "currency":  "BRL",
+        "unit":      "per_saca_60kg",
+        "color":     "#a855f7",
+        "commodity": "arabica",
+    },
+    "uganda_drugar": {
+        "name":      "Uganda Drugar (UCDA)",
+        "source":    "Uganda Coffee Development Authority",
+        "currency":  "USD",
+        "unit":      "per_kg",
+        "color":     "#ec4899",
+        "commodity": "arabica",
+    },
+    "uganda_wugar": {
+        "name":      "Uganda Wugar (UCDA)",
+        "source":    "Uganda Coffee Development Authority",
+        "currency":  "USD",
+        "unit":      "per_kg",
+        "color":     "#14b8a6",
+        "commodity": "arabica",
     },
 }
 
@@ -230,6 +250,26 @@ def _today_uganda_price() -> float | None:
         return None
 
 
+def _today_uganda_arabica_price(grade_names: list[str]) -> float | None:
+    """Read a UCDA arabica grade farmgate price (USD/kg) from uganda_supply.json
+    → ucda_detail.grades. Used for Drugar / Wugar. Returns None when the grade
+    isn't in the latest monthly table (UCDA reports arabica grades seasonally)."""
+    p = ROOT / "frontend" / "public" / "data" / "uganda_supply.json"
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        grades = (d.get("ucda_detail") or {}).get("grades") or []
+        wanted = {g.lower() for g in grade_names}
+        for g in grades:
+            if str(g.get("grade", "")).lower() in wanted:
+                v = g.get("price_usd_kg")
+                return float(v) if v else None
+        return None
+    except Exception as e:
+        print(f"[origin_prices_history] uganda arabica price unavailable from {p}: {e}",
+              file=sys.stderr, flush=True)
+        return None
+
+
 def _append_today(history: list[dict], today_iso: str, price: float | None) -> list[dict]:
     if price is None:
         return history
@@ -252,12 +292,13 @@ def export_origin_prices_history(db) -> None:
     # Seed origin slots with their static metadata; preserve existing history.
     for key, cfg in ORIGINS.items():
         slot = origins.get(key) or {}
-        slot["name"]     = cfg["name"]
-        slot["source"]   = cfg["source"]
-        slot["currency"] = cfg["currency"]
-        slot["unit"]     = cfg["unit"]
-        slot["color"]    = cfg["color"]
-        slot["history"]  = slot.get("history") or []
+        slot["name"]      = cfg["name"]
+        slot["source"]    = cfg["source"]
+        slot["currency"]  = cfg["currency"]
+        slot["unit"]      = cfg["unit"]
+        slot["color"]     = cfg["color"]
+        slot["commodity"] = cfg["commodity"]
+        slot["history"]   = slot.get("history") or []
         origins[key] = slot
 
     # Drop any obsolete keys (e.g. the migrated-away "brazil") to keep file clean.
@@ -291,9 +332,15 @@ def export_origin_prices_history(db) -> None:
         origins["brazil_arabica"]["history"], SGS_ARABICA, "brazil_arabica"
     )
 
-    # Uganda — append today's UCDA Screen 15.
+    # Uganda — append today's UCDA Screen 15 (robusta) + Drugar / Wugar (arabica).
     origins["uganda"]["history"] = _append_today(
         origins["uganda"]["history"], today, _today_uganda_price()
+    )
+    origins["uganda_drugar"]["history"] = _append_today(
+        origins["uganda_drugar"]["history"], today, _today_uganda_arabica_price(["Drugar"])
+    )
+    origins["uganda_wugar"]["history"] = _append_today(
+        origins["uganda_wugar"]["history"], today, _today_uganda_arabica_price(["Wugar"])
     )
 
     payload = {

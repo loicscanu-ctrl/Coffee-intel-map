@@ -148,7 +148,8 @@
           "date": "2026-06-17",
           "price": 89300.0
         }
-      ]
+      ],
+      "commodity": "robusta"
     },
     "uganda": {
       "name": "Uganda Robusta Screen 15 (UCDA)",
@@ -297,7 +298,8 @@
           "date": "2026-06-17",
           "price": 171.41
         }
-      ]
+      ],
+      "commodity": "robusta"
     },
     "brazil_conilon": {
       "name": "Brazil Conilon Tipo 7 (CEPEA/ESALQ)",
@@ -446,7 +448,8 @@
           "date": "2026-06-17",
           "price": 950.0
         }
-      ]
+      ],
+      "commodity": "robusta"
     },
     "brazil_arabica": {
       "name": "Brazil Arabica (CEPEA/ESALQ)",
@@ -454,7 +457,31 @@
       "currency": "BRL",
       "unit": "per_saca_60kg",
       "color": "#a855f7",
+      "history": [],
+      "commodity": "arabica"
+    },
+    "uganda_drugar": {
+      "name": "Uganda Drugar (UCDA)",
+      "source": "Uganda Coffee Development Authority",
+      "currency": "USD",
+      "unit": "per_kg",
+      "color": "#ec4899",
+      "commodity": "arabica",
       "history": []
+    },
+    "uganda_wugar": {
+      "name": "Uganda Wugar (UCDA)",
+      "source": "Uganda Coffee Development Authority",
+      "currency": "USD",
+      "unit": "per_kg",
+      "color": "#14b8a6",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-17",
+          "price": 6.37
+        }
+      ]
     }
   }
 }
