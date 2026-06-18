@@ -109,8 +109,9 @@ def _parse_vietnam(row14: dict) -> dict:
     hcm = re.search(r"HCM bid ([\d]+-[\d]+)\s*/\s*offer\s+([\d]+-[\d]+)", raw)
     # R2 FOB differential
     r2  = re.search(r"R2 FOB.*?bid\s*([+-]?\d+)\s*/\s*offer\s*([+-]?\d+)", raw)
-    # Pepper
-    pep = re.search(r"Pepper[^(]*([\d]+-[\d,]+)", raw)
+    # Pepper. Non-greedy gap so [^(]* doesn't swallow the leading digits of the
+    # first number (greedy "Pepper[^(]*" turned "136-138000" into "6-138000").
+    pep = re.search(r"Pepper[^(]*?([\d]+-[\d,]+)", raw)
 
     # USD/VND from whenldclose: "87326(163976)" → first number
     vc  = str(row14.get("whenldclose", "") or "")
