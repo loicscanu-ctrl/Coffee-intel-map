@@ -137,7 +137,7 @@ export default function UgandaExportPanel({
             ) : ucda_price?.usd_cwt ? (
               <>
                 <div className="text-amber-400 font-bold">{ucda_price.usd_cwt.toFixed(2)}</div>
-                <div className="text-[9px] text-slate-600">USD/cwt S15</div>
+                <div className="text-[9px] text-slate-600">US¢/lb S15</div>
                 <div className="text-[9px] text-slate-500">${usdMT?.toLocaleString()}/MT</div>
               </>
             ) : (

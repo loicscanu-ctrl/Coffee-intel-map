@@ -58,7 +58,7 @@ def _price_str(data) -> str | None:
         return f"ECX {p['etb_per_kg']} ETB/kg"
     p = (data or {}).get("ucda_price")
     if isinstance(p, dict) and p.get("usd_cwt"):
-        return f"UCDA ${p['usd_cwt']}/cwt"
+        return f"UCDA {p['usd_cwt']} ¢/lb"
     p = (data or {}).get("ihcafe_price")
     if isinstance(p, dict) and p.get("usd_cwt"):
         return f"IHCAFE ${p['usd_cwt']}/cwt"
