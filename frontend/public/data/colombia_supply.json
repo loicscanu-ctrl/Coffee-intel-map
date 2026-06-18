@@ -1,11 +1,105 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-06-18T07:21:13.208123Z",
+  "scraped_at": "2026-06-18T16:59:26+00:00",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-06-16",
-    "unit": "thousand 60-kg bags (marketing year)",
-    "monthly": [],
+    "last_updated": "2026-04",
+    "unit": "thousand 60-kg bags",
+    "monthly": [
+      {
+        "month": "2025-01",
+        "total_k_bags": 1153.0,
+        "yoy_pct": 23.1,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-Febrero-2025-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2025-02",
+        "total_k_bags": 1184.0,
+        "yoy_pct": 13.3,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-p-Marzo-2025.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2025-12",
+        "total_k_bags": 1300.0,
+        "yoy_pct": 22.2,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-enero-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2026-01",
+        "production_k_bags": 893.0,
+        "yoy_pct": -19.8,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/04/1.-Informe-mensual-Febrero-2026-p.pdf",
+        "parser_version": "v2",
+        "total_k_bags": 925.0
+      },
+      {
+        "month": "2026-02",
+        "total_t": 47380.5,
+        "total_k_bags": 847.0,
+        "by_nandina": [
+          {
+            "code": "0901.11.90.00",
+            "tons": 46863.7,
+            "fob_usd": 403169919.0
+          },
+          {
+            "code": "0901.12.00.00",
+            "tons": 516.7,
+            "fob_usd": 5256496.0
+          }
+        ],
+        "source_xls": "https://www.dane.gov.co/files/operaciones/EXPORTACIONES/anex-EXPORTACIONES-feb2026.xls",
+        "parser_version": "v2",
+        "yoy_pct": -28.5,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/04/3.-Informe-mensual-Marzo-2026-p-1.pdf"
+      },
+      {
+        "month": "2026-03",
+        "total_t": 47756.6,
+        "total_k_bags": 796.0,
+        "by_nandina": [
+          {
+            "code": "0901.11.90.00",
+            "tons": 47024.9,
+            "fob_usd": 374147010.0
+          },
+          {
+            "code": "0901.12.00.00",
+            "tons": 731.7,
+            "fob_usd": 6903644.0
+          }
+        ],
+        "source_xls": "https://www.dane.gov.co/files/operaciones/EXPORTACIONES/anex-EXPORTACIONES-mar2026.xls",
+        "parser_version": "v2",
+        "production_k_bags": 754.0,
+        "yoy_pct": -36.4,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/05/4.-Informe-mensual-Abril-2026-p.pdf"
+      },
+      {
+        "month": "2026-04",
+        "total_t": 30571.0,
+        "total_k_bags": 693.0,
+        "by_nandina": [
+          {
+            "code": "0901.11.90.00",
+            "tons": 29958.9,
+            "fob_usd": 229606973.0
+          },
+          {
+            "code": "0901.12.00.00",
+            "tons": 612.1,
+            "fob_usd": 5633377.0
+          }
+        ],
+        "source_xls": "https://www.dane.gov.co/files/operaciones/EXPORTACIONES/anex-EXPORTACIONES-abr2026.xls",
+        "parser_version": "v2",
+        "yoy_pct": -13.6,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/06/5.-Informe-mensual-Mayo-2026-p-1.pdf"
+      }
+    ],
     "annual": [
       {
         "year": "1960",
