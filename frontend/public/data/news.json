@@ -1,5 +1,396 @@
 [
   {
+    "id": 7160,
+    "title": "World Bank Population \u2013 2026-06-18",
+    "body": "Tracked 15 countries for demand-tab per-capita normalization.",
+    "source": "World Bank",
+    "category": "demand",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "population",
+      "demand",
+      "world-bank"
+    ],
+    "meta": "{\"source\": \"World Bank API (SP.POP.TOTL)\", \"last_updated\": \"2026-06-18\", \"countries\": {\"eu\": {\"name\": \"European Union\", \"iso3\": \"EUU\", \"annual\": [{\"year\": \"2000\", \"population\": 429339162}, {\"year\": \"2001\", \"population\": 429909307}, {\"year\": \"2002\", \"population\": 430924112}, {\"year\": \"2003\", \"population\": 432512916}, {\"year\": \"2004\", \"population\": 434193248}, {\"year\": \"2005\", \"population\": 435789139}, {\"year\": \"2006\", \"population\": 437263803}, {\"year\": \"2007\", \"population\": 438796003}, {\"year\": \"2008\", \"population\": 440270719}, {\"year\": \"2009\", \"population\": 441388573}, {\"year\": \"2010\", \"population\": 442088310}, {\"year\": \"2011\", \"population\": 441414078}, {\"year\": \"2012\", \"population\": 442069839}, {\"year\": \"2013\", \"population\": 442425741}, {\"year\": \"2014\", \"population\": 442920819}, {\"year\": \"2015\", \"population\": 443793218}, {\"year\": \"2016\", \"population\": 444676652}, {\"year\": \"2017\", \"population\": 445321060}, {\"year\": \"2018\", \"population\": 446329890}, {\"year\": \"2019\", \"population\": 446910453}, {\"year\": \"2020\", \"population\": 446870959}, {\"year\": \"2021\", \"population\": 446227358}, {\"year\": \"2022\", \"population\": 447202673}, {\"year\": \"2023\", \"population\": 448897545}, {\"year\": \"2024\", \"population\": 450228188}], \"latest_year\": \"2024\", \"latest_population\": 450228188}, \"japan\": {\"name\": \"Japan\", \"iso3\": \"JPN\", \"annual\": [{\"year\": \"2000\", \"population\": 126843000}, {\"year\": \"2001\", \"population\": 127149000}, {\"year\": \"2002\", \"population\": 127445000}, {\"year\": \"2003\", \"population\": 127718000}, {\"year\": \"2004\", \"population\": 127761000}, {\"year\": \"2005\", \"population\": 127773000}, {\"year\": \"2006\", \"population\": 127854000}, {\"year\": \"2007\", \"population\": 128001000}, {\"year\": \"2008\", \"population\": 128063000}, {\"year\": \"2009\", \"population\": 128047000}, {\"year\": \"2010\", \"population\": 128070000}, {\"year\": \"2011\", \"population\": 127833000}, {\"year\": \"2012\", \"population\": 127629000}, {\"year\": \"2013\", \"population\": 127445000}, {\"year\": \"2014\", \"population\": 127276000}, {\"year\": \"2015\", \"population\": 127141000}, {\"year\": \"2016\", \"population\": 127076000}, {\"year\": \"2017\", \"population\": 126972000}, {\"year\": \"2018\", \"population\": 126811000}, {\"year\": \"2019\", \"population\": 126633000}, {\"year\": \"2020\", \"population\": 126261000}, {\"year\": \"2021\", \"population\": 125681593}, {\"year\": \"2022\", \"population\": 125124989}, {\"year\": \"2023\", \"population\": 124516650}, {\"year\": \"2024\", \"population\": 123975371}], \"latest_year\": \"2024\", \"latest_population\": 123975371}, \"usa\": {\"name\": \"United States\", \"iso3\": \"USA\", \"annual\": [{\"year\": \"2000\", \"population\": 282162411}, {\"year\": \"2001\", \"population\": 284968955}, {\"year\": \"2002\", \"population\": 287625193}, {\"year\": \"2003\", \"population\": 290107933}, {\"year\": \"2004\", \"population\": 292805298}, {\"year\": \"2005\", \"population\": 295516599}, {\"year\": \"2006\", \"population\": 298379912}, {\"year\": \"2007\", \"population\": 301231207}, {\"year\": \"2008\", \"population\": 304093966}, {\"year\": \"2009\", \"population\": 306771529}, {\"year\": \"2010\", \"population\": 309378227}, {\"year\": \"2011\", \"population\": 311839461}, {\"year\": \"2012\", \"population\": 314339099}, {\"year\": \"2013\", \"population\": 316726282}, {\"year\": \"2014\", \"population\": 319257560}, {\"year\": \"2015\", \"population\": 321815121}, {\"year\": \"2016\", \"population\": 324353340}, {\"year\": \"2017\", \"population\": 326608609}, {\"year\": \"2018\", \"population\": 328529577}, {\"year\": \"2019\", \"population\": 330226227}, {\"year\": \"2020\", \"population\": 331577720}, {\"year\": \"2021\", \"population\": 332099760}, {\"year\": \"2022\", \"population\": 334017321}, {\"year\": \"2023\", \"population\": 336806231}, {\"year\": \"2024\", \"population\": 340110988}], \"latest_year\": \"2024\", \"latest_population\": 340110988}, \"china\": {\"name\": \"China\", \"iso3\": \"CHN\", \"annual\": [{\"year\": \"2000\", \"population\": 1262645000}, {\"year\": \"2001\", \"population\": 1271850000}, {\"year\": \"2002\", \"population\": 1280400000}, {\"year\": \"2003\", \"population\": 1288400000}, {\"year\": \"2004\", \"population\": 1296075000}, {\"year\": \"2005\", \"population\": 1303720000}, {\"year\": \"2006\", \"population\": 1311020000}, {\"year\": \"2007\", \"population\": 1317885000}, {\"year\": \"2008\", \"population\": 1324655000}, {\"year\": \"2009\", \"population\": 1331260000}, {\"year\": \"2010\", \"population\": 1337705000}, {\"year\": \"2011\", \"population\": 1345035000}, {\"year\": \"2012\", \"population\": 1354190000}, {\"year\": \"2013\", \"population\": 1363240000}, {\"year\": \"2014\", \"population\": 1371860000}, {\"year\": \"2015\", \"population\": 1379860000}, {\"year\": \"2016\", \"population\": 1387790000}, {\"year\": \"2017\", \"population\": 1396215000}, {\"year\": \"2018\", \"population\": 1402760000}, {\"year\": \"2019\", \"population\": 1407745000}, {\"year\": \"2020\", \"population\": 1411100000}, {\"year\": \"2021\", \"population\": 1412360000}, {\"year\": \"2022\", \"population\": 1412175000}, {\"year\": \"2023\", \"population\": 1410710000}, {\"year\": \"2024\", \"population\": 1408975000}], \"latest_year\": \"2024\", \"latest_population\": 1408975000}, \"india\": {\"name\": \"India\", \"iso3\": \"IND\", \"annual\": [{\"year\": \"2000\", \"population\": 1057922733}, {\"year\": \"2001\", \"population\": 1077898575}, {\"year\": \"2002\", \"population\": 1097600380}, {\"year\": \"2003\", \"population\": 1116803006}, {\"year\": \"2004\", \"population\": 1135991513}, {\"year\": \"2005\", \"population\": 1154676322}, {\"year\": \"2006\", \"population\": 1172878890}, {\"year\": \"2007\", \"population\": 1190676021}, {\"year\": \"2008\", \"population\": 1207930964}, {\"year\": \"2009\", \"population\": 1225524753}, {\"year\": \"2010\", \"population\": 1243481564}, {\"year\": \"2011\", \"population\": 1261224954}, {\"year\": \"2012\", \"population\": 1278674502}, {\"year\": \"2013\", \"population\": 1295829511}, {\"year\": \"2014\", \"population\": 1312277191}, {\"year\": \"2015\", \"population\": 1328024498}, {\"year\": \"2016\", \"population\": 1343944296}, {\"year\": \"2017\", \"population\": 1359657400}, {\"year\": \"2018\", \"population\": 1374659064}, {\"year\": \"2019\", \"population\": 1389030312}, {\"year\": \"2020\", \"population\": 1402617695}, {\"year\": \"2021\", \"population\": 1414203896}, {\"year\": \"2022\", \"population\": 1425423212}, {\"year\": \"2023\", \"population\": 1438069596}, {\"year\": \"2024\", \"population\": 1450935791}], \"latest_year\": \"2024\", \"latest_population\": 1450935791}, \"brazil\": {\"name\": \"Brazil\", \"iso3\": \"BRA\", \"annual\": [{\"year\": \"2000\", \"population\": 174018282}, {\"year\": \"2001\", \"population\": 176301203}, {\"year\": \"2002\", \"population\": 178503484}, {\"year\": \"2003\", \"population\": 180622688}, {\"year\": \"2004\", \"population\": 182675143}, {\"year\": \"2005\", \"population\": 184688101}, {\"year\": \"2006\", \"population\": 186653106}, {\"year\": \"2007\", \"population\": 188552320}, {\"year\": \"2008\", \"population\": 190367302}, {\"year\": \"2009\", \"population\": 192079951}, {\"year\": \"2010\", \"population\": 193701929}, {\"year\": \"2011\", \"population\": 195284734}, {\"year\": \"2012\", \"population\": 196876111}, {\"year\": \"2013\", \"population\": 198478299}, {\"year\": \"2014\", \"population\": 200085127}, {\"year\": \"2015\", \"population\": 201675532}, {\"year\": \"2016\", \"population\": 203218114}, {\"year\": \"2017\", \"population\": 204703445}, {\"year\": \"2018\", \"population\": 206107261}, {\"year\": \"2019\", \"population\": 207455459}, {\"year\": \"2020\", \"population\": 208660842}, {\"year\": \"2021\", \"population\": 209550294}, {\"year\": \"2022\", \"population\": 210306415}, {\"year\": \"2023\", \"population\": 211140729}, {\"year\": \"2024\", \"population\": 211998573}], \"latest_year\": \"2024\", \"latest_population\": 211998573}, \"indonesia\": {\"name\": \"Indonesia\", \"iso3\": \"IDN\", \"annual\": [{\"year\": \"2000\", \"population\": 216077790}, {\"year\": \"2001\", \"population\": 219097902}, {\"year\": \"2002\", \"population\": 222088495}, {\"year\": \"2003\", \"population\": 225048008}, {\"year\": \"2004\", \"population\": 227926649}, {\"year\": \"2005\", \"population\": 230871650}, {\"year\": \"2006\", \"population\": 233951652}, {\"year\": \"2007\", \"population\": 237062337}, {\"year\": \"2008\", \"population\": 240157903}, {\"year\": \"2009\", \"population\": 243220028}, {\"year\": \"2010\", \"population\": 246305322}, {\"year\": \"2011\", \"population\": 249470032}, {\"year\": \"2012\", \"population\": 252698525}, {\"year\": \"2013\", \"population\": 255852467}, {\"year\": \"2014\", \"population\": 258877399}, {\"year\": \"2015\", \"population\": 261799249}, {\"year\": \"2016\", \"population\": 264627418}, {\"year\": \"2017\", \"population\": 267346658}, {\"year\": \"2018\", \"population\": 269951846}, {\"year\": \"2019\", \"population\": 272489381}, {\"year\": \"2020\", \"population\": 274814866}, {\"year\": \"2021\", \"population\": 276758053}, {\"year\": \"2022\", \"population\": 278830529}, {\"year\": \"2023\", \"population\": 281190067}, {\"year\": \"2024\", \"population\": 283487931}], \"latest_year\": \"2024\", \"latest_population\": 283487931}, \"vietnam\": {\"name\": \"Vietnam\", \"iso3\": \"VNM\", \"annual\": [{\"year\": \"2000\", \"population\": 77154011}, {\"year\": \"2001\", \"population\": 77969361}, {\"year\": \"2002\", \"population\": 78772224}, {\"year\": \"2003\", \"population\": 79563777}, {\"year\": \"2004\", \"population\": 80338971}, {\"year\": \"2005\", \"population\": 81088313}, {\"year\": \"2006\", \"population\": 82167897}, {\"year\": \"2007\", \"population\": 83633375}, {\"year\": \"2008\", \"population\": 85175788}, {\"year\": \"2009\", \"population\": 86460018}, {\"year\": \"2010\", \"population\": 87455152}, {\"year\": \"2011\", \"population\": 88468314}, {\"year\": \"2012\", \"population\": 89510356}, {\"year\": \"2013\", \"population\": 90573104}, {\"year\": \"2014\", \"population\": 91679578}, {\"year\": \"2015\", \"population\": 92823254}, {\"year\": \"2016\", \"population\": 94000117}, {\"year\": \"2017\", \"population\": 95176977}, {\"year\": \"2018\", \"population\": 96237319}, {\"year\": \"2019\", \"population\": 97173776}, {\"year\": \"2020\", \"population\": 98079191}, {\"year\": \"2021\", \"population\": 98935098}, {\"year\": \"2022\", \"population\": 99680655}, {\"year\": \"2023\", \"population\": 100352192}, {\"year\": \"2024\", \"population\": 100987686}], \"latest_year\": \"2024\", \"latest_population\": 100987686}, \"russia\": {\"name\": \"Russia\", \"iso3\": \"RUS\", \"annual\": [{\"year\": \"2000\", \"population\": 146596869}, {\"year\": \"2001\", \"population\": 145976482}, {\"year\": \"2002\", \"population\": 145306497}, {\"year\": \"2003\", \"population\": 144648618}, {\"year\": \"2004\", \"population\": 144067316}, {\"year\": \"2005\", \"population\": 143518814}, {\"year\": \"2006\", \"population\": 143049637}, {\"year\": \"2007\", \"population\": 142805114}, {\"year\": \"2008\", \"population\": 142742366}, {\"year\": \"2009\", \"population\": 142785348}, {\"year\": \"2010\", \"population\": 142849468}, {\"year\": \"2011\", \"population\": 143018195}, {\"year\": \"2012\", \"population\": 143378447}, {\"year\": \"2013\", \"population\": 143805638}, {\"year\": \"2014\", \"population\": 144237223}, {\"year\": \"2015\", \"population\": 144640716}, {\"year\": \"2016\", \"population\": 145015460}, {\"year\": \"2017\", \"population\": 145293260}, {\"year\": \"2018\", \"population\": 145398106}, {\"year\": \"2019\", \"population\": 145453291}, {\"year\": \"2020\", \"population\": 145245148}, {\"year\": \"2021\", \"population\": 144746762}, {\"year\": \"2022\", \"population\": 144236933}, {\"year\": \"2023\", \"population\": 143826130}, {\"year\": \"2024\", \"population\": 143533851}], \"latest_year\": \"2024\", \"latest_population\": 143533851}, \"mexico\": {\"name\": \"Mexico\", \"iso3\": \"MEX\", \"annual\": [{\"year\": \"2000\", \"population\": 98625552}, {\"year\": \"2001\", \"population\": 100099099}, {\"year\": \"2002\", \"population\": 101548624}, {\"year\": \"2003\", \"population\": 102978515}, {\"year\": \"2004\", \"population\": 104394131}, {\"year\": \"2005\", \"population\": 105811504}, {\"year\": \"2006\", \"population\": 107253666}, {\"year\": \"2007\", \"population\": 108774360}, {\"year\": \"2008\", \"population\": 110374288}, {\"year\": \"2009\", \"population\": 111999721}, {\"year\": \"2010\", \"population\": 113623895}, {\"year\": \"2011\", \"population\": 115243504}, {\"year\": \"2012\", \"population\": 116818208}, {\"year\": \"2013\", \"population\": 118343573}, {\"year\": \"2014\", \"population\": 119784261}, {\"year\": \"2015\", \"population\": 121072306}, {\"year\": \"2016\", \"population\": 122251351}, {\"year\": \"2017\", \"population\": 123400057}, {\"year\": \"2018\", \"population\": 124573711}, {\"year\": \"2019\", \"population\": 125762982}, {\"year\": \"2020\", \"population\": 126799054}, {\"year\": \"2021\", \"population\": 127648148}, {\"year\": \"2022\", \"population\": 128613117}, {\"year\": \"2023\", \"population\": 129739759}, {\"year\": \"2024\", \"population\": 130861007}], \"latest_year\": \"2024\", \"latest_population\": 130861007}, \"turkey\": {\"name\": \"Turkey\", \"iso3\": \"TUR\", \"annual\": [{\"year\": \"2000\", \"population\": 65425961}, {\"year\": \"2001\", \"population\": 66245128}, {\"year\": \"2002\", \"population\": 67048795}, {\"year\": \"2003\", \"population\": 67831730}, {\"year\": \"2004\", \"population\": 68592617}, {\"year\": \"2005\", \"population\": 69329557}, {\"year\": \"2006\", \"population\": 70045349}, {\"year\": \"2007\", \"population\": 70158112}, {\"year\": \"2008\", \"population\": 71051678}, {\"year\": \"2009\", \"population\": 72039206}, {\"year\": \"2010\", \"population\": 73142150}, {\"year\": \"2011\", \"population\": 74223629}, {\"year\": \"2012\", \"population\": 75175827}, {\"year\": \"2013\", \"population\": 76147624}, {\"year\": \"2014\", \"population\": 77181884}, {\"year\": \"2015\", \"population\": 78218479}, {\"year\": \"2016\", \"population\": 79277962}, {\"year\": \"2017\", \"population\": 80312698}, {\"year\": \"2018\", \"population\": 81407204}, {\"year\": \"2019\", \"population\": 82579440}, {\"year\": \"2020\", \"population\": 83384680}, {\"year\": \"2021\", \"population\": 84147318}, {\"year\": \"2022\", \"population\": 84979913}, {\"year\": \"2023\", \"population\": 85325965}, {\"year\": \"2024\", \"population\": 85518661}], \"latest_year\": \"2024\", \"latest_population\": 85518661}, \"philippines\": {\"name\": \"Philippines\", \"iso3\": \"PHL\", \"annual\": [{\"year\": \"2000\", \"population\": 79625397}, {\"year\": \"2001\", \"population\": 81401488}, {\"year\": \"2002\", \"population\": 83068889}, {\"year\": \"2003\", \"population\": 84731835}, {\"year\": \"2004\", \"population\": 86394504}, {\"year\": \"2005\", \"population\": 88015962}, {\"year\": \"2006\", \"population\": 89508986}, {\"year\": \"2007\", \"population\": 91075184}, {\"year\": \"2008\", \"population\": 92699095}, {\"year\": \"2009\", \"population\": 94384250}, {\"year\": \"2010\", \"population\": 96337125}, {\"year\": \"2011\", \"population\": 98248614}, {\"year\": \"2012\", \"population\": 100175512}, {\"year\": \"2013\", \"population\": 102076336}, {\"year\": \"2014\", \"population\": 103767130}, {\"year\": \"2015\", \"population\": 105312992}, {\"year\": \"2016\", \"population\": 106735719}, {\"year\": \"2017\", \"population\": 108119693}, {\"year\": \"2018\", \"population\": 109465287}, {\"year\": \"2019\", \"population\": 110804683}, {\"year\": \"2020\", \"population\": 112081264}, {\"year\": \"2021\", \"population\": 113100950}, {\"year\": \"2022\", \"population\": 113964338}, {\"year\": \"2023\", \"population\": 114891199}, {\"year\": \"2024\", \"population\": 115843670}], \"latest_year\": \"2024\", \"latest_population\": 115843670}, \"egypt\": {\"name\": \"Egypt\", \"iso3\": \"EGY\", \"annual\": [{\"year\": \"2000\", \"population\": 73083284}, {\"year\": \"2001\", \"population\": 74652029}, {\"year\": \"2002\", \"population\": 76239137}, {\"year\": \"2003\", \"population\": 77853548}, {\"year\": \"2004\", \"population\": 79477443}, {\"year\": \"2005\", \"population\": 81101004}, {\"year\": \"2006\", \"population\": 82700403}, {\"year\": \"2007\", \"population\": 84276225}, {\"year\": \"2008\", \"population\": 85864789}, {\"year\": \"2009\", \"population\": 87501636}, {\"year\": \"2010\", \"population\": 89196072}, {\"year\": \"2011\", \"population\": 91093059}, {\"year\": \"2012\", \"population\": 93161001}, {\"year\": \"2013\", \"population\": 95333553}, {\"year\": \"2014\", \"population\": 97528654}, {\"year\": \"2015\", \"population\": 99597342}, {\"year\": \"2016\", \"population\": 101644589}, {\"year\": \"2017\", \"population\": 103696057}, {\"year\": \"2018\", \"population\": 105682094}, {\"year\": \"2019\", \"population\": 107553158}, {\"year\": \"2020\", \"population\": 109315124}, {\"year\": \"2021\", \"population\": 110957008}, {\"year\": \"2022\", \"population\": 112618250}, {\"year\": \"2023\", \"population\": 114535772}, {\"year\": \"2024\", \"population\": 116538258}], \"latest_year\": \"2024\", \"latest_population\": 116538258}, \"korea\": {\"name\": \"South Korea\", \"iso3\": \"KOR\", \"annual\": [{\"year\": \"2000\", \"population\": 47008111}, {\"year\": \"2001\", \"population\": 47370164}, {\"year\": \"2002\", \"population\": 47644736}, {\"year\": \"2003\", \"population\": 47892330}, {\"year\": \"2004\", \"population\": 48082519}, {\"year\": \"2005\", \"population\": 48184561}, {\"year\": \"2006\", \"population\": 48438292}, {\"year\": \"2007\", \"population\": 48683638}, {\"year\": \"2008\", \"population\": 49054708}, {\"year\": \"2009\", \"population\": 49307835}, {\"year\": \"2010\", \"population\": 49554112}, {\"year\": \"2011\", \"population\": 49936638}, {\"year\": \"2012\", \"population\": 50199853}, {\"year\": \"2013\", \"population\": 50428893}, {\"year\": \"2014\", \"population\": 50746659}, {\"year\": \"2015\", \"population\": 51014947}, {\"year\": \"2016\", \"population\": 51217803}, {\"year\": \"2017\", \"population\": 51361911}, {\"year\": \"2018\", \"population\": 51585058}, {\"year\": \"2019\", \"population\": 51764822}, {\"year\": \"2020\", \"population\": 51836239}, {\"year\": \"2021\", \"population\": 51769539}, {\"year\": \"2022\", \"population\": 51672569}, {\"year\": \"2023\", \"population\": 51712619}, {\"year\": \"2024\", \"population\": 51751065}], \"latest_year\": \"2024\", \"latest_population\": 51751065}, \"ethiopia\": {\"name\": \"Ethiopia\", \"iso3\": \"ETH\", \"annual\": [{\"year\": \"2000\", \"population\": 67411494}, {\"year\": \"2001\", \"population\": 69487762}, {\"year\": \"2002\", \"population\": 71635517}, {\"year\": \"2003\", \"population\": 73832663}, {\"year\": \"2004\", \"population\": 76077206}, {\"year\": \"2005\", \"population\": 78367470}, {\"year\": \"2006\", \"population\": 80703490}, {\"year\": \"2007\", \"population\": 83103217}, {\"year\": \"2008\", \"population\": 85543668}, {\"year\": \"2009\", \"population\": 88007636}, {\"year\": \"2010\", \"population\": 90538514}, {\"year\": \"2011\", \"population\": 93149970}, {\"year\": \"2012\", \"population\": 95798767}, {\"year\": \"2013\", \"population\": 98438751}, {\"year\": \"2014\", \"population\": 101115610}, {\"year\": \"2015\", \"population\": 103867135}, {\"year\": \"2016\", \"population\": 106718162}, {\"year\": \"2017\", \"population\": 109666481}, {\"year\": \"2018\", \"population\": 112664152}, {\"year\": \"2019\", \"population\": 115737383}, {\"year\": \"2020\", \"population\": 118917671}, {\"year\": \"2021\", \"population\": 122138588}, {\"year\": \"2022\", \"population\": 125384287}, {\"year\": \"2023\", \"population\": 128691692}, {\"year\": \"2024\", \"population\": 132059767}], \"latest_year\": \"2024\", \"latest_population\": 132059767}}}",
+    "pub_date": "2026-06-18T03:05:30.235567"
+  },
+  {
+    "id": 7159,
+    "title": "Fertilizer Prices \u2013 2026-06",
+    "body": null,
+    "source": "World Bank",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "fertilizer",
+      "price",
+      "supply",
+      "brazil"
+    ],
+    "meta": "{\"urea_monthly\": [409.25, 392.5, 415.4, 472.0, 725.63, 856.88, 770.5], \"dap_monthly\": [708.25, 627.5, 619.2, 626.5, 658.25, 725.25, 769.5], \"kcl_monthly\": [353.75, 358.33, 366.0, 372.5, 380.63, 401.25, 405.0], \"urea_history\": [{\"month\": \"2021-06\", \"price\": 393.2}, {\"month\": \"2021-07\", \"price\": 441.5}, {\"month\": \"2021-08\", \"price\": 446.9}, {\"month\": \"2021-09\", \"price\": 418.8}, {\"month\": \"2021-10\", \"price\": 695.0}, {\"month\": \"2021-11\", \"price\": 900.5}, {\"month\": \"2021-12\", \"price\": 890.0}, {\"month\": \"2022-01\", \"price\": 846.4}, {\"month\": \"2022-02\", \"price\": 744.2}, {\"month\": \"2022-03\", \"price\": 872.5}, {\"month\": \"2022-04\", \"price\": 925.0}, {\"month\": \"2022-05\", \"price\": 707.5}, {\"month\": \"2022-06\", \"price\": 690.0}, {\"month\": \"2022-07\", \"price\": 601.0}, {\"month\": \"2022-08\", \"price\": 591.2}, {\"month\": \"2022-09\", \"price\": 678.0}, {\"month\": \"2022-10\", \"price\": 636.2}, {\"month\": \"2022-11\", \"price\": 588.8}, {\"month\": \"2022-12\", \"price\": 519.4}, {\"month\": \"2023-01\", \"price\": 443.8}, {\"month\": \"2023-02\", \"price\": 357.5}, {\"month\": \"2023-03\", \"price\": 313.5}, {\"month\": \"2023-04\", \"price\": 313.4}, {\"month\": \"2023-05\", \"price\": 329.2}, {\"month\": \"2023-06\", \"price\": 287.5}, {\"month\": \"2023-07\", \"price\": 334.6}, {\"month\": \"2023-08\", \"price\": 385.6}, {\"month\": \"2023-09\", \"price\": 380.0}, {\"month\": \"2023-10\", \"price\": 411.4}, {\"month\": \"2023-11\", \"price\": 385.5}, {\"month\": \"2023-12\", \"price\": 354.0}, {\"month\": \"2024-01\", \"price\": 335.4}, {\"month\": \"2024-02\", \"price\": 351.2}, {\"month\": \"2024-03\", \"price\": 330.0}, {\"month\": \"2024-04\", \"price\": 320.0}, {\"month\": \"2024-05\", \"price\": 284.8}, {\"month\": \"2024-06\", \"price\": 336.2}, {\"month\": \"2024-07\", \"price\": 342.5}, {\"month\": \"2024-08\", \"price\": 342.5}, {\"month\": \"2024-09\", \"price\": 337.5}, {\"month\": \"2024-10\", \"price\": 374.8}, {\"month\": \"2024-11\", \"price\": 352.3}, {\"month\": \"2024-12\", \"price\": 352.0}, {\"month\": \"2025-01\", \"price\": 380.5}, {\"month\": \"2025-02\", \"price\": 436.5}, {\"month\": \"2025-03\", \"price\": 394.5}, {\"month\": \"2025-04\", \"price\": 386.9}, {\"month\": \"2025-05\", \"price\": 392.0}, {\"month\": \"2025-06\", \"price\": 420.5}, {\"month\": \"2025-07\", \"price\": 496.0}, {\"month\": \"2025-08\", \"price\": 507.7}, {\"month\": \"2025-09\", \"price\": 461.1}, {\"month\": \"2025-10\", \"price\": 394.4}, {\"month\": \"2025-11\", \"price\": 409.2}, {\"month\": \"2025-12\", \"price\": 392.5}, {\"month\": \"2026-01\", \"price\": 415.4}, {\"month\": \"2026-02\", \"price\": 472.0}, {\"month\": \"2026-03\", \"price\": 725.6}, {\"month\": \"2026-04\", \"price\": 856.9}, {\"month\": \"2026-05\", \"price\": 770.5}], \"dap_history\": [{\"month\": \"2021-06\", \"price\": 604.8}, {\"month\": \"2021-07\", \"price\": 613.0}, {\"month\": \"2021-08\", \"price\": 603.1}, {\"month\": \"2021-09\", \"price\": 643.8}, {\"month\": \"2021-10\", \"price\": 672.9}, {\"month\": \"2021-11\", \"price\": 726.7}, {\"month\": \"2021-12\", \"price\": 745.0}, {\"month\": \"2022-01\", \"price\": 699.4}, {\"month\": \"2022-02\", \"price\": 747.1}, {\"month\": \"2022-03\", \"price\": 938.1}, {\"month\": \"2022-04\", \"price\": 954.0}, {\"month\": \"2022-05\", \"price\": 842.5}, {\"month\": \"2022-06\", \"price\": 783.8}, {\"month\": \"2022-07\", \"price\": 784.0}, {\"month\": \"2022-08\", \"price\": 749.4}, {\"month\": \"2022-09\", \"price\": 752.0}, {\"month\": \"2022-10\", \"price\": 725.0}, {\"month\": \"2022-11\", \"price\": 665.6}, {\"month\": \"2022-12\", \"price\": 625.0}, {\"month\": \"2023-01\", \"price\": 631.0}, {\"month\": \"2023-02\", \"price\": 612.5}, {\"month\": \"2023-03\", \"price\": 606.0}, {\"month\": \"2023-04\", \"price\": 637.0}, {\"month\": \"2023-05\", \"price\": 510.0}, {\"month\": \"2023-06\", \"price\": 454.6}, {\"month\": \"2023-07\", \"price\": 458.8}, {\"month\": \"2023-08\", \"price\": 528.8}, {\"month\": \"2023-09\", \"price\": 527.9}, {\"month\": \"2023-10\", \"price\": 534.8}, {\"month\": \"2023-11\", \"price\": 535.6}, {\"month\": \"2023-12\", \"price\": 563.8}, {\"month\": \"2024-01\", \"price\": 596.2}, {\"month\": \"2024-02\", \"price\": 583.8}, {\"month\": \"2024-03\", \"price\": 617.5}, {\"month\": \"2024-04\", \"price\": 545.0}, {\"month\": \"2024-05\", \"price\": 522.0}, {\"month\": \"2024-06\", \"price\": 543.0}, {\"month\": \"2024-07\", \"price\": 539.4}, {\"month\": \"2024-08\", \"price\": 546.0}, {\"month\": \"2024-09\", \"price\": 554.8}, {\"month\": \"2024-10\", \"price\": 573.4}, {\"month\": \"2024-11\", \"price\": 574.5}, {\"month\": \"2024-12\", \"price\": 568.3}, {\"month\": \"2025-01\", \"price\": 582.7}, {\"month\": \"2025-02\", \"price\": 603.8}, {\"month\": \"2025-03\", \"price\": 615.1}, {\"month\": \"2025-04\", \"price\": 635.0}, {\"month\": \"2025-05\", \"price\": 669.2}, {\"month\": \"2025-06\", \"price\": 715.4}, {\"month\": \"2025-07\", \"price\": 736.0}, {\"month\": \"2025-08\", \"price\": 795.1}, {\"month\": \"2025-09\", \"price\": 780.6}, {\"month\": \"2025-10\", \"price\": 754.0}, {\"month\": \"2025-11\", \"price\": 708.2}, {\"month\": \"2025-12\", \"price\": 627.5}, {\"month\": \"2026-01\", \"price\": 619.2}, {\"month\": \"2026-02\", \"price\": 626.5}, {\"month\": \"2026-03\", \"price\": 658.2}, {\"month\": \"2026-04\", \"price\": 725.2}, {\"month\": \"2026-05\", \"price\": 769.5}], \"kcl_history\": [{\"month\": \"2021-06\", \"price\": 462.5}, {\"month\": \"2021-07\", \"price\": 633.0}, {\"month\": \"2021-08\", \"price\": 695.0}, {\"month\": \"2021-09\", \"price\": 736.2}, {\"month\": \"2021-10\", \"price\": 782.0}, {\"month\": \"2021-11\", \"price\": 806.9}, {\"month\": \"2021-12\", \"price\": 807.5}, {\"month\": \"2022-01\", \"price\": 785.6}, {\"month\": \"2022-02\", \"price\": 791.9}, {\"month\": \"2022-03\", \"price\": 977.5}, {\"month\": \"2022-04\", \"price\": 1202.0}, {\"month\": \"2022-05\", \"price\": 1170.0}, {\"month\": \"2022-06\", \"price\": 1101.9}, {\"month\": \"2022-07\", \"price\": 1013.0}, {\"month\": \"2022-08\", \"price\": 888.8}, {\"month\": \"2022-09\", \"price\": 731.0}, {\"month\": \"2022-10\", \"price\": 622.5}, {\"month\": \"2022-11\", \"price\": 563.1}, {\"month\": \"2022-12\", \"price\": 513.8}, {\"month\": \"2023-01\", \"price\": 508.8}, {\"month\": \"2023-02\", \"price\": 496.9}, {\"month\": \"2023-03\", \"price\": 453.0}, {\"month\": \"2023-04\", \"price\": 407.5}, {\"month\": \"2023-05\", \"price\": 372.5}, {\"month\": \"2023-06\", \"price\": 328.0}, {\"month\": \"2023-07\", \"price\": 341.2}, {\"month\": \"2023-08\", \"price\": 353.1}, {\"month\": \"2023-09\", \"price\": 352.0}, {\"month\": \"2023-10\", \"price\": 341.9}, {\"month\": \"2023-11\", \"price\": 331.9}, {\"month\": \"2023-12\", \"price\": 311.9}, {\"month\": \"2024-01\", \"price\": 296.2}, {\"month\": \"2024-02\", \"price\": 289.4}, {\"month\": \"2024-03\", \"price\": 300.5}, {\"month\": \"2024-04\", \"price\": 305.0}, {\"month\": \"2024-05\", \"price\": 307.0}, {\"month\": \"2024-06\", \"price\": 310.0}, {\"month\": \"2024-07\", \"price\": 300.6}, {\"month\": \"2024-08\", \"price\": 294.0}, {\"month\": \"2024-09\", \"price\": 286.9}, {\"month\": \"2024-10\", \"price\": 278.1}, {\"month\": \"2024-11\", \"price\": 281.0}, {\"month\": \"2024-12\", \"price\": 292.5}, {\"month\": \"2025-01\", \"price\": 302.0}, {\"month\": \"2025-02\", \"price\": 318.8}, {\"month\": \"2025-03\", \"price\": 336.2}, {\"month\": \"2025-04\", \"price\": 351.9}, {\"month\": \"2025-05\", \"price\": 362.5}, {\"month\": \"2025-06\", \"price\": 363.1}, {\"month\": \"2025-07\", \"price\": 362.5}, {\"month\": \"2025-08\", \"price\": 356.5}, {\"month\": \"2025-09\", \"price\": 352.5}, {\"month\": \"2025-10\", \"price\": 352.0}, {\"month\": \"2025-11\", \"price\": 353.8}, {\"month\": \"2025-12\", \"price\": 358.3}, {\"month\": \"2026-01\", \"price\": 366.0}, {\"month\": \"2026-02\", \"price\": 372.5}, {\"month\": \"2026-03\", \"price\": 380.6}, {\"month\": \"2026-04\", \"price\": 401.2}, {\"month\": \"2026-05\", \"price\": 405.0}], \"last_data_month\": \"May-2026\"}",
+    "pub_date": "2026-06-18T03:05:25.265102"
+  },
+  {
+    "id": 7158,
+    "title": "ENSO ONI \u2013 2026-06",
+    "body": null,
+    "source": "NOAA CPC",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "enso",
+      "supply",
+      "brazil"
+    ],
+    "meta": "{\"oni_history\": [{\"month\": \"Nov-24\", \"value\": -0.3}, {\"month\": \"Dec-24\", \"value\": -0.42}, {\"month\": \"Jan-25\", \"value\": -0.45}, {\"month\": \"Feb-25\", \"value\": -0.24}, {\"month\": \"Mar-25\", \"value\": -0.06}, {\"month\": \"Apr-25\", \"value\": 0.02}, {\"month\": \"May-25\", \"value\": -0.02}, {\"month\": \"Jun-25\", \"value\": -0.04}, {\"month\": \"Jul-25\", \"value\": -0.14}, {\"month\": \"Aug-25\", \"value\": -0.28}, {\"month\": \"Sep-25\", \"value\": -0.4}, {\"month\": \"Oct-25\", \"value\": -0.51}, {\"month\": \"Nov-25\", \"value\": -0.55}, {\"month\": \"Dec-25\", \"value\": -0.54}, {\"month\": \"Jan-26\", \"value\": -0.37}, {\"month\": \"Feb-26\", \"value\": -0.14, \"preliminary\": true}, {\"month\": \"Mar-26\", \"value\": 0.13, \"preliminary\": true}, {\"month\": \"Apr-26\", \"value\": 0.48, \"preliminary\": true}]}",
+    "pub_date": "2026-06-18T03:05:23.134528"
+  },
+  {
+    "id": 7157,
+    "title": "Ethiopia ECX Coffee Price \u2013 2026-06-18",
+    "body": "ECX auction price: 300.00 ETB/kg as of 2026-06-18.",
+    "source": "ECX",
+    "category": "supply",
+    "lat": 9.145,
+    "lng": 40.489,
+    "tags": [
+      "price",
+      "ethiopia",
+      "ecx",
+      "arabica"
+    ],
+    "meta": "{\"etb_per_kg\": 300.0, \"as_of\": \"2026-06-18\", \"source\": \"ECX\", \"grade\": \"All grades avg\"}",
+    "pub_date": "2026-06-18T03:03:52.478230"
+  },
+  {
+    "id": 7156,
+    "title": "Colombia FNC Precio Interno \u2013 2026-06-18",
+    "body": "FNC internal purchase price: 2,140,000 COP/carga (125 kg) as of 2026-06-18.",
+    "source": "FNC",
+    "category": "supply",
+    "lat": 4.571,
+    "lng": -74.297,
+    "tags": [
+      "price",
+      "colombia",
+      "fnc",
+      "precio-interno"
+    ],
+    "meta": "{\"cop_per_carga\": 2140000, \"as_of\": \"2026-06-18\", \"source\": \"FNC\"}",
+    "pub_date": "2026-06-18T03:03:34.453408"
+  },
+  {
+    "id": 7155,
+    "title": "Uganda Screen 15 \u2013 2026-06-18",
+    "body": "Uganda Fine Robusta Screen 15 price: 174.54 USD/cwt",
+    "source": "UCDA",
+    "category": "supply",
+    "lat": 1.3733,
+    "lng": 32.2903,
+    "tags": [
+      "price",
+      "robusta",
+      "uganda"
+    ],
+    "meta": "{\"usd_cwt\": 174.54, \"as_of\": \"2026-06-18\", \"grade\": \"Screen 15\"}",
+    "pub_date": "2026-06-18T03:03:21.241888"
+  },
+  {
+    "id": 7154,
+    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-18",
+    "body": "B3 Arabica 4/5 settlement: 336.85 USD/sac | OI: 81 contracts | Expiry: 2026-07-23",
+    "source": "B3",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "futures",
+      "brazil",
+      "arabica",
+      "b3"
+    ],
+    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 336.85, \"oi\": 81, \"mty\": \"2026-07-23\"}",
+    "pub_date": "2026-06-18T03:03:19.889130"
+  },
+  {
+    "id": 7151,
+    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-18",
+    "body": "Ocean freight market: FCL \u202220'ST",
+    "source": "Searates",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "logistics",
+      "freight"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:03:16.662032"
+  },
+  {
+    "id": 7150,
+    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-18",
+    "body": "Brazil coffee export data: Issuance | 1,729,283 | -4.6",
+    "source": "Cecafe",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "exports",
+      "brazil"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:03:15.893208"
+  },
+  {
+    "id": 7149,
+    "title": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-18",
+    "body": "Arabica coffee price: R$ 5.11",
+    "source": "Noticiasagricolas",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "brazil",
+      "arabica"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:03:15.435366"
+  },
+  {
+    "id": 7148,
+    "title": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-18",
+    "body": "Conilon Tipo 7 price: R$ 960,00/saca (17/06/2026)",
+    "source": "Cooabriel",
+    "category": "supply",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "price",
+      "brazil",
+      "conilon"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:03:14.507267"
+  },
+  {
+    "id": 7147,
+    "title": "ICE COT Robusta Coffee (London) \u2013 2026-06-09",
+    "body": "Report: 2026-06-09 | OI: 96,975 | MM net: +14,373 (L:31,939 S:17,566 Sp:12,231 \u0394L:-2,990 \u0394S:+2,971) | PMPU L:26,235 S:39,796 | Swap L:4,033 S:8,741 | Other L:7,125 S:5,029 | NR L:8,200 S:6,400",
+    "source": "ICE",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "cot",
+      "robusta"
+    ],
+    "meta": "{\"report_date\": \"2026-06-09\", \"open_interest\": 96975, \"pmpu\": {\"long\": 26235, \"short\": 39796, \"d_long\": 4519, \"d_short\": -3216}, \"swap\": {\"long\": 4033, \"short\": 8741, \"spread\": 1016, \"d_long\": 277, \"d_short\": -1636}, \"mm\": {\"long\": 31939, \"short\": 17566, \"spread\": 12231, \"d_long\": -2990, \"d_short\": 2971, \"d_spread\": -1482}, \"other\": {\"long\": 7125, \"short\": 5029, \"spread\": 6196, \"d_long\": -1927, \"d_short\": 827}, \"nr\": {\"long\": 8200, \"short\": 6400, \"d_long\": -111, \"d_short\": 822}, \"_commentary\": {\"text\": \"CFTC Release for London Robusta (RC):\\n  \\u2022 Total OI down -2,208 WoW\\n  \\u2022 Industry Long increased by 4,519 lots\\n  \\u2022 Industry Short decreased by 3,216 lots\\n  \\u2022 Managed Money decreased their net exposure by 5,961 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
+    "pub_date": "2026-06-18T03:03:10.654941",
+    "commentary": {
+      "text": "CFTC Release for London Robusta (RC):\n  \u2022 Total OI down -2,208 WoW\n  \u2022 Industry Long increased by 4,519 lots\n  \u2022 Industry Short decreased by 3,216 lots\n  \u2022 Managed Money decreased their net exposure by 5,961 contracts.",
+      "hasUpdate": true,
+      "isLatestTradingDay": false
+    }
+  },
+  {
+    "id": 7146,
+    "title": "CFTC COT Coffee C (NY Arabica) \u2013 2026-06-09",
+    "body": "Report: 2026-06-09 | OI: 213,519 | MM net: +11,863 (L:41,186 S:29,323 Sp:39,634 \u0394L:-1,344 \u0394S:+6,417) | PMPU L:59,198 S:68,506 | Swap L:25,425 S:21,902 | Other L:10,254 S:15,941 | NR L:8,747 S:9,138",
+    "source": "CFTC",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "cot",
+      "arabica"
+    ],
+    "meta": "{\"report_date\": \"2026-06-09\", \"open_interest\": 213519, \"pmpu\": {\"long\": 59198, \"short\": 68506, \"d_long\": 7771, \"d_short\": 814}, \"swap\": {\"long\": 25425, \"short\": 21902, \"spread\": 3829, \"d_long\": -408, \"d_short\": -1171}, \"mm\": {\"long\": 41186, \"short\": 29323, \"spread\": 39634, \"d_long\": -1344, \"d_short\": 6417, \"d_spread\": 3768}, \"other\": {\"long\": 10254, \"short\": 15941, \"spread\": 25246, \"d_long\": 435, \"d_short\": -114}, \"nr\": {\"long\": 8747, \"short\": 9138, \"d_long\": -944, \"d_short\": -436}, \"_commentary\": {\"text\": \"CFTC Release for NY Arabica (KC):\\n  \\u2022 Total OI up +10,664 WoW\\n  \\u2022 Industry Long increased by 7,771 lots\\n  \\u2022 Industry Short increased by 814 lots\\n  \\u2022 Managed Money decreased their net exposure by 7,761 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
+    "pub_date": "2026-06-18T03:03:10.197792",
+    "commentary": {
+      "text": "CFTC Release for NY Arabica (KC):\n  \u2022 Total OI up +10,664 WoW\n  \u2022 Industry Long increased by 7,771 lots\n  \u2022 Industry Short increased by 814 lots\n  \u2022 Managed Money decreased their net exposure by 7,761 contracts.",
+      "hasUpdate": true,
+      "isLatestTradingDay": false
+    }
+  },
+  {
+    "id": 7145,
+    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-16",
+    "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,680.00 (+11) OI:18,709 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,622.00 (+24) OI:60,041",
+    "source": "Barchart",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "price",
+      "robusta"
+    ],
+    "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3680, \"chg\": 11, \"oi\": 18709, \"volume\": 7208, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3622, \"chg\": 24, \"oi\": 60041, \"volume\": 21116, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3574, \"chg\": 29, \"oi\": 15322, \"volume\": 6277, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3525, \"chg\": 31, \"oi\": 7125, \"volume\": 1385, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3494, \"chg\": 35, \"oi\": 3060, \"volume\": 431, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3474, \"chg\": 37, \"oi\": 1468, \"volume\": 114, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3459, \"chg\": 36, \"oi\": 798, \"volume\": 13, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3444, \"chg\": 36, \"oi\": 407, \"volume\": 1, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3428, \"chg\": 36, \"oi\": 399, \"volume\": 0, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-17\"}",
+    "pub_date": "2026-06-18T03:03:09.288154"
+  },
+  {
+    "id": 7144,
+    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-16",
+    "body": "Front (Coffee (Jul '26)): 277.85 (+0.6) OI:8,766 | 2nd (Coffee (Sep '26)): 271.90 (-0.9) OI:96,109",
+    "source": "Barchart",
+    "category": "general",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "futures",
+      "price",
+      "arabica"
+    ],
+    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 277.85, \"chg\": 0.6, \"oi\": 8766, \"volume\": 5413, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 271.9, \"chg\": -0.9, \"oi\": 96109, \"volume\": 26342, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 263.15, \"chg\": -0.45, \"oi\": 51949, \"volume\": 12516, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 259.85, \"chg\": 0.1, \"oi\": 17584, \"volume\": 4425, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 259.8, \"chg\": 0.4, \"oi\": 7235, \"volume\": 1618, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 260.25, \"chg\": 0.5, \"oi\": 4824, \"volume\": 601, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 259.85, \"chg\": 0.7, \"oi\": 2179, \"volume\": 257, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 258.55, \"chg\": 0.35, \"oi\": 3599, \"volume\": 102, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 258.05, \"chg\": 0.1, \"oi\": 774, \"volume\": 16, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-17\"}",
+    "pub_date": "2026-06-18T03:03:08.375432"
+  },
+  {
+    "id": 7143,
+    "title": "USD/UGX FX Rate \u2013 2026-06-18",
+    "body": "USD/UGX FX Rate price: 3650",
+    "source": "ExchangeRate-API",
+    "category": "general",
+    "lat": 1.3733,
+    "lng": 32.2903,
+    "tags": [
+      "fx",
+      "uganda"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:49.892755"
+  },
+  {
+    "id": 7142,
+    "title": "USD/HNL FX Rate \u2013 2026-06-18",
+    "body": "USD/HNL FX Rate price: 26.7469",
+    "source": "ExchangeRate-API",
+    "category": "general",
+    "lat": 15.2,
+    "lng": -86.242,
+    "tags": [
+      "fx",
+      "honduras"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:48.985282"
+  },
+  {
+    "id": 7141,
+    "title": "USD/IDR FX Rate \u2013 2026-06-18",
+    "body": "USD/IDR FX Rate price: 17797",
+    "source": "ExchangeRate-API",
+    "category": "general",
+    "lat": -0.789,
+    "lng": 113.921,
+    "tags": [
+      "fx",
+      "indonesia"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:48.078111"
+  },
+  {
+    "id": 7140,
+    "title": "USD/VND FX Rate \u2013 2026-06-18",
+    "body": "USD/VND FX Rate price: 26228",
+    "source": "ExchangeRate-API",
+    "category": "general",
+    "lat": 14.058,
+    "lng": 108.277,
+    "tags": [
+      "fx",
+      "vietnam"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:47.171365"
+  },
+  {
+    "id": 7139,
+    "title": "USD/BRL FX Rate \u2013 2026-06-18",
+    "body": "USD/BRL FX Rate price: 5.0800",
+    "source": "ExchangeRate-API",
+    "category": "general",
+    "lat": -14.235,
+    "lng": -51.925,
+    "tags": [
+      "fx",
+      "brazil"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:46.259768"
+  },
+  {
+    "id": 7138,
+    "title": "Vietnam Robusta \u2013 2026-06-18",
+    "body": "Vietnam Robusta price: 89.700 VND/kg",
+    "source": "Giacaphe",
+    "category": "supply",
+    "lat": 14.058,
+    "lng": 108.277,
+    "tags": [
+      "price",
+      "robusta",
+      "vietnam"
+    ],
+    "meta": null,
+    "pub_date": "2026-06-18T03:02:43.499698"
+  },
+  {
+    "id": 7152,
+    "title": "Here Is Everyone Competing At The 2026 US Barista Championship",
+    "body": "A schedule of competitors for Days One and Two of Round One of the 2026 US Barista Championship.",
+    "source": "Sprudge",
+    "category": "general",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "news",
+      "sprudge"
+    ],
+    "meta": "https://sprudge.com/here-is-everyone-competing-at-the-2026-us-barista-championship-1086574.html",
+    "pub_date": "2026-06-17T23:57:34"
+  },
+  {
+    "id": 7153,
+    "title": "Build-Outs Of Coffee: Partners Coffee In Brooklyn, NY",
+    "body": "Partners Coffee in Brooklyn, New York.",
+    "source": "Sprudge",
+    "category": "general",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "news",
+      "sprudge"
+    ],
+    "meta": "https://sprudge.com/build-outs-of-coffee-partners-coffee-in-brooklyn-ny-1041194.html",
+    "pub_date": "2026-06-17T12:00:42"
+  },
+  {
+    "id": 7137,
+    "title": "UN WPP 18+ Population \u2013 2026-06-17",
+    "body": "Tracked 4 countries for coffee-drinking-age cohort projection.",
+    "source": "UN WPP",
+    "category": "demand",
+    "lat": 0.0,
+    "lng": 0.0,
+    "tags": [
+      "population",
+      "demand",
+      "un-wpp",
+      "age-cohort"
+    ],
+    "meta": "{\"source\": \"UN WPP DataPortal API (5yr age groups, medium variant)\", \"last_updated\": \"2026-06-17\", \"age_threshold\": 18, \"countries\": {\"japan\": {\"name\": \"Japan\", \"location_id\": 392, \"annual\": [{\"year\": 2000, \"pop_18plus\": 104334162200}, {\"year\": 2001, \"pop_18plus\": 104831561700}, {\"year\": 2002, \"pop_18plus\": 105294060500}, {\"year\": 2003, \"pop_18plus\": 105718053400}, {\"year\": 2004, \"pop_18plus\": 106095815300}, {\"year\": 2005, \"pop_18plus\": 106413889600}, {\"year\": 2006, \"pop_18plus\": 106689739500}, {\"year\": 2007, \"pop_18plus\": 106937877000}, {\"year\": 2008, \"pop_18plus\": 107140473200}, {\"year\": 2009, \"pop_18plus\": 107301500100}, {\"year\": 2010, \"pop_18plus\": 107409503900}, {\"year\": 2011, \"pop_18plus\": 107434948100}, {\"year\": 2012, \"pop_18plus\": 107399168300}, {\"year\": 2013, \"pop_18plus\": 107337976900}, {\"year\": 2014, \"pop_18plus\": 107273297500}, {\"year\": 2015, \"pop_18plus\": 107241167400}, {\"year\": 2016, \"pop_18plus\": 107276943000}, {\"year\": 2017, \"pop_18plus\": 107334307300}, {\"year\": 2018, \"pop_18plus\": 107358636400}, {\"year\": 2019, \"pop_18plus\": 107348115800}, {\"year\": 2020, \"pop_18plus\": 107224338300}, {\"year\": 2021, \"pop_18plus\": 106946199000}, {\"year\": 2022, \"pop_18plus\": 106624847200}, {\"year\": 2023, \"pop_18plus\": 106360522900}, {\"year\": 2024, \"pop_18plus\": 53424591100}], \"latest_year\": 2024, \"latest_pop\": 53424591100}, \"egypt\": {\"name\": \"Egypt\", \"location_id\": 818, \"annual\": [{\"year\": 2000, \"pop_18plus\": 41313618600}, {\"year\": 2001, \"pop_18plus\": 42550749200}, {\"year\": 2002, \"pop_18plus\": 43809626400}, {\"year\": 2003, \"pop_18plus\": 45111072400}, {\"year\": 2004, \"pop_18plus\": 46433467100}, {\"year\": 2005, \"pop_18plus\": 47747195200}, {\"year\": 2006, \"pop_18plus\": 49016525000}, {\"year\": 2007, \"pop_18plus\": 50226274900}, {\"year\": 2008, \"pop_18plus\": 51402980900}, {\"year\": 2009, \"pop_18plus\": 52570862400}, {\"year\": 2010, \"pop_18plus\": 53722741800}, {\"year\": 2011, \"pop_18plus\": 54988187500}, {\"year\": 2012, \"pop_18plus\": 56332715300}, {\"year\": 2013, \"pop_18plus\": 57684857200}, {\"year\": 2014, \"pop_18plus\": 59003529000}, {\"year\": 2015, \"pop_18plus\": 60187762900}, {\"year\": 2016, \"pop_18plus\": 61389435600}, {\"year\": 2017, \"pop_18plus\": 62666291900}, {\"year\": 2018, \"pop_18plus\": 64016825900}, {\"year\": 2019, \"pop_18plus\": 65428197000}, {\"year\": 2020, \"pop_18plus\": 66796347500}, {\"year\": 2021, \"pop_18plus\": 68098513000}, {\"year\": 2022, \"pop_18plus\": 69476141800}, {\"year\": 2023, \"pop_18plus\": 71096904400}, {\"year\": 2024, \"pop_18plus\": 72800968800}, {\"year\": 2025, \"pop_18plus\": 74393217400}, {\"year\": 2026, \"pop_18plus\": 75952266000}, {\"year\": 2027, \"pop_18plus\": 77570546600}, {\"year\": 2028, \"pop_18plus\": 79263940300}, {\"year\": 2029, \"pop_18plus\": 81008145500}, {\"year\": 2030, \"pop_18plus\": 82791309400}, {\"year\": 2031, \"pop_18plus\": 84581495800}], \"latest_year\": 2031, \"latest_pop\": 84581495800}, \"korea\": {\"name\": \"South Korea\", \"location_id\": 410, \"annual\": [{\"year\": 2000, \"pop_18plus\": 34648858300}, {\"year\": 2001, \"pop_18plus\": 35108945900}, {\"year\": 2002, \"pop_18plus\": 35561387000}, {\"year\": 2003, \"pop_18plus\": 35980149000}, {\"year\": 2004, \"pop_18plus\": 36369012300}, {\"year\": 2005, \"pop_18plus\": 36744040700}, {\"year\": 2006, \"pop_18plus\": 37125583000}, {\"year\": 2007, \"pop_18plus\": 37511564300}, {\"year\": 2008, \"pop_18plus\": 37894981100}, {\"year\": 2009, \"pop_18plus\": 38281518500}, {\"year\": 2010, \"pop_18plus\": 38694035800}, {\"year\": 2011, \"pop_18plus\": 39263754100}, {\"year\": 2012, \"pop_18plus\": 39969202400}, {\"year\": 2013, \"pop_18plus\": 40671800200}, {\"year\": 2014, \"pop_18plus\": 41363626500}, {\"year\": 2015, \"pop_18plus\": 42027122400}, {\"year\": 2016, \"pop_18plus\": 42562797900}, {\"year\": 2017, \"pop_18plus\": 42975127600}, {\"year\": 2018, \"pop_18plus\": 43356803900}, {\"year\": 2019, \"pop_18plus\": 43715467700}, {\"year\": 2020, \"pop_18plus\": 44046814600}, {\"year\": 2021, \"pop_18plus\": 44292107900}, {\"year\": 2022, \"pop_18plus\": 44473926800}, {\"year\": 2023, \"pop_18plus\": 44675747900}, {\"year\": 2024, \"pop_18plus\": 44860802600}, {\"year\": 2025, \"pop_18plus\": 44998013500}, {\"year\": 2026, \"pop_18plus\": 45116518800}, {\"year\": 2027, \"pop_18plus\": 45233171100}, {\"year\": 2028, \"pop_18plus\": 45333354900}, {\"year\": 2029, \"pop_18plus\": 45401791200}, {\"year\": 2030, \"pop_18plus\": 45452435200}, {\"year\": 2031, \"pop_18plus\": 45344555500}], \"latest_year\": 2031, \"latest_pop\": 45344555500}, \"ethiopia\": {\"name\": \"Ethiopia\", \"location_id\": 231, \"annual\": [{\"year\": 2000, \"pop_18plus\": 31284397100}, {\"year\": 2001, \"pop_18plus\": 32183124800}, {\"year\": 2002, \"pop_18plus\": 33132061500}, {\"year\": 2003, \"pop_18plus\": 34119069100}, {\"year\": 2004, \"pop_18plus\": 35151538900}, {\"year\": 2005, \"pop_18plus\": 36241915900}, {\"year\": 2006, \"pop_18plus\": 37409735600}, {\"year\": 2007, \"pop_18plus\": 38681380100}], \"latest_year\": 2007, \"latest_pop\": 38681380100}}}",
+    "pub_date": "2026-06-17T07:57:43.216056"
+  },
+  {
     "id": 7136,
     "title": "Ethiopia Agronomic Status \u2013 2026-06-17",
     "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
@@ -220,22 +611,6 @@
     }
   },
   {
-    "id": 7126,
-    "title": "World Bank Population \u2013 2026-06-17",
-    "body": "Tracked 15 countries for demand-tab per-capita normalization.",
-    "source": "World Bank",
-    "category": "demand",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "population",
-      "demand",
-      "world-bank"
-    ],
-    "meta": "{\"source\": \"World Bank API (SP.POP.TOTL)\", \"last_updated\": \"2026-06-17\", \"countries\": {\"eu\": {\"name\": \"European Union\", \"iso3\": \"EUU\", \"annual\": [{\"year\": \"2000\", \"population\": 429339162}, {\"year\": \"2001\", \"population\": 429909307}, {\"year\": \"2002\", \"population\": 430924112}, {\"year\": \"2003\", \"population\": 432512916}, {\"year\": \"2004\", \"population\": 434193248}, {\"year\": \"2005\", \"population\": 435789139}, {\"year\": \"2006\", \"population\": 437263803}, {\"year\": \"2007\", \"population\": 438796003}, {\"year\": \"2008\", \"population\": 440270719}, {\"year\": \"2009\", \"population\": 441388573}, {\"year\": \"2010\", \"population\": 442088310}, {\"year\": \"2011\", \"population\": 441414078}, {\"year\": \"2012\", \"population\": 442069839}, {\"year\": \"2013\", \"population\": 442425741}, {\"year\": \"2014\", \"population\": 442920819}, {\"year\": \"2015\", \"population\": 443793218}, {\"year\": \"2016\", \"population\": 444676652}, {\"year\": \"2017\", \"population\": 445321060}, {\"year\": \"2018\", \"population\": 446329890}, {\"year\": \"2019\", \"population\": 446910453}, {\"year\": \"2020\", \"population\": 446870959}, {\"year\": \"2021\", \"population\": 446227358}, {\"year\": \"2022\", \"population\": 447202673}, {\"year\": \"2023\", \"population\": 448897545}, {\"year\": \"2024\", \"population\": 450228188}], \"latest_year\": \"2024\", \"latest_population\": 450228188}, \"japan\": {\"name\": \"Japan\", \"iso3\": \"JPN\", \"annual\": [{\"year\": \"2000\", \"population\": 126843000}, {\"year\": \"2001\", \"population\": 127149000}, {\"year\": \"2002\", \"population\": 127445000}, {\"year\": \"2003\", \"population\": 127718000}, {\"year\": \"2004\", \"population\": 127761000}, {\"year\": \"2005\", \"population\": 127773000}, {\"year\": \"2006\", \"population\": 127854000}, {\"year\": \"2007\", \"population\": 128001000}, {\"year\": \"2008\", \"population\": 128063000}, {\"year\": \"2009\", \"population\": 128047000}, {\"year\": \"2010\", \"population\": 128070000}, {\"year\": \"2011\", \"population\": 127833000}, {\"year\": \"2012\", \"population\": 127629000}, {\"year\": \"2013\", \"population\": 127445000}, {\"year\": \"2014\", \"population\": 127276000}, {\"year\": \"2015\", \"population\": 127141000}, {\"year\": \"2016\", \"population\": 127076000}, {\"year\": \"2017\", \"population\": 126972000}, {\"year\": \"2018\", \"population\": 126811000}, {\"year\": \"2019\", \"population\": 126633000}, {\"year\": \"2020\", \"population\": 126261000}, {\"year\": \"2021\", \"population\": 125681593}, {\"year\": \"2022\", \"population\": 125124989}, {\"year\": \"2023\", \"population\": 124516650}, {\"year\": \"2024\", \"population\": 123975371}], \"latest_year\": \"2024\", \"latest_population\": 123975371}, \"usa\": {\"name\": \"United States\", \"iso3\": \"USA\", \"annual\": [{\"year\": \"2000\", \"population\": 282162411}, {\"year\": \"2001\", \"population\": 284968955}, {\"year\": \"2002\", \"population\": 287625193}, {\"year\": \"2003\", \"population\": 290107933}, {\"year\": \"2004\", \"population\": 292805298}, {\"year\": \"2005\", \"population\": 295516599}, {\"year\": \"2006\", \"population\": 298379912}, {\"year\": \"2007\", \"population\": 301231207}, {\"year\": \"2008\", \"population\": 304093966}, {\"year\": \"2009\", \"population\": 306771529}, {\"year\": \"2010\", \"population\": 309378227}, {\"year\": \"2011\", \"population\": 311839461}, {\"year\": \"2012\", \"population\": 314339099}, {\"year\": \"2013\", \"population\": 316726282}, {\"year\": \"2014\", \"population\": 319257560}, {\"year\": \"2015\", \"population\": 321815121}, {\"year\": \"2016\", \"population\": 324353340}, {\"year\": \"2017\", \"population\": 326608609}, {\"year\": \"2018\", \"population\": 328529577}, {\"year\": \"2019\", \"population\": 330226227}, {\"year\": \"2020\", \"population\": 331577720}, {\"year\": \"2021\", \"population\": 332099760}, {\"year\": \"2022\", \"population\": 334017321}, {\"year\": \"2023\", \"population\": 336806231}, {\"year\": \"2024\", \"population\": 340110988}], \"latest_year\": \"2024\", \"latest_population\": 340110988}, \"china\": {\"name\": \"China\", \"iso3\": \"CHN\", \"annual\": [{\"year\": \"2000\", \"population\": 1262645000}, {\"year\": \"2001\", \"population\": 1271850000}, {\"year\": \"2002\", \"population\": 1280400000}, {\"year\": \"2003\", \"population\": 1288400000}, {\"year\": \"2004\", \"population\": 1296075000}, {\"year\": \"2005\", \"population\": 1303720000}, {\"year\": \"2006\", \"population\": 1311020000}, {\"year\": \"2007\", \"population\": 1317885000}, {\"year\": \"2008\", \"population\": 1324655000}, {\"year\": \"2009\", \"population\": 1331260000}, {\"year\": \"2010\", \"population\": 1337705000}, {\"year\": \"2011\", \"population\": 1345035000}, {\"year\": \"2012\", \"population\": 1354190000}, {\"year\": \"2013\", \"population\": 1363240000}, {\"year\": \"2014\", \"population\": 1371860000}, {\"year\": \"2015\", \"population\": 1379860000}, {\"year\": \"2016\", \"population\": 1387790000}, {\"year\": \"2017\", \"population\": 1396215000}, {\"year\": \"2018\", \"population\": 1402760000}, {\"year\": \"2019\", \"population\": 1407745000}, {\"year\": \"2020\", \"population\": 1411100000}, {\"year\": \"2021\", \"population\": 1412360000}, {\"year\": \"2022\", \"population\": 1412175000}, {\"year\": \"2023\", \"population\": 1410710000}, {\"year\": \"2024\", \"population\": 1408975000}], \"latest_year\": \"2024\", \"latest_population\": 1408975000}, \"india\": {\"name\": \"India\", \"iso3\": \"IND\", \"annual\": [{\"year\": \"2000\", \"population\": 1057922733}, {\"year\": \"2001\", \"population\": 1077898575}, {\"year\": \"2002\", \"population\": 1097600380}, {\"year\": \"2003\", \"population\": 1116803006}, {\"year\": \"2004\", \"population\": 1135991513}, {\"year\": \"2005\", \"population\": 1154676322}, {\"year\": \"2006\", \"population\": 1172878890}, {\"year\": \"2007\", \"population\": 1190676021}, {\"year\": \"2008\", \"population\": 1207930964}, {\"year\": \"2009\", \"population\": 1225524753}, {\"year\": \"2010\", \"population\": 1243481564}, {\"year\": \"2011\", \"population\": 1261224954}, {\"year\": \"2012\", \"population\": 1278674502}, {\"year\": \"2013\", \"population\": 1295829511}, {\"year\": \"2014\", \"population\": 1312277191}, {\"year\": \"2015\", \"population\": 1328024498}, {\"year\": \"2016\", \"population\": 1343944296}, {\"year\": \"2017\", \"population\": 1359657400}, {\"year\": \"2018\", \"population\": 1374659064}, {\"year\": \"2019\", \"population\": 1389030312}, {\"year\": \"2020\", \"population\": 1402617695}, {\"year\": \"2021\", \"population\": 1414203896}, {\"year\": \"2022\", \"population\": 1425423212}, {\"year\": \"2023\", \"population\": 1438069596}, {\"year\": \"2024\", \"population\": 1450935791}], \"latest_year\": \"2024\", \"latest_population\": 1450935791}, \"brazil\": {\"name\": \"Brazil\", \"iso3\": \"BRA\", \"annual\": [{\"year\": \"2000\", \"population\": 174018282}, {\"year\": \"2001\", \"population\": 176301203}, {\"year\": \"2002\", \"population\": 178503484}, {\"year\": \"2003\", \"population\": 180622688}, {\"year\": \"2004\", \"population\": 182675143}, {\"year\": \"2005\", \"population\": 184688101}, {\"year\": \"2006\", \"population\": 186653106}, {\"year\": \"2007\", \"population\": 188552320}, {\"year\": \"2008\", \"population\": 190367302}, {\"year\": \"2009\", \"population\": 192079951}, {\"year\": \"2010\", \"population\": 193701929}, {\"year\": \"2011\", \"population\": 195284734}, {\"year\": \"2012\", \"population\": 196876111}, {\"year\": \"2013\", \"population\": 198478299}, {\"year\": \"2014\", \"population\": 200085127}, {\"year\": \"2015\", \"population\": 201675532}, {\"year\": \"2016\", \"population\": 203218114}, {\"year\": \"2017\", \"population\": 204703445}, {\"year\": \"2018\", \"population\": 206107261}, {\"year\": \"2019\", \"population\": 207455459}, {\"year\": \"2020\", \"population\": 208660842}, {\"year\": \"2021\", \"population\": 209550294}, {\"year\": \"2022\", \"population\": 210306415}, {\"year\": \"2023\", \"population\": 211140729}, {\"year\": \"2024\", \"population\": 211998573}], \"latest_year\": \"2024\", \"latest_population\": 211998573}, \"indonesia\": {\"name\": \"Indonesia\", \"iso3\": \"IDN\", \"annual\": [{\"year\": \"2000\", \"population\": 216077790}, {\"year\": \"2001\", \"population\": 219097902}, {\"year\": \"2002\", \"population\": 222088495}, {\"year\": \"2003\", \"population\": 225048008}, {\"year\": \"2004\", \"population\": 227926649}, {\"year\": \"2005\", \"population\": 230871650}, {\"year\": \"2006\", \"population\": 233951652}, {\"year\": \"2007\", \"population\": 237062337}, {\"year\": \"2008\", \"population\": 240157903}, {\"year\": \"2009\", \"population\": 243220028}, {\"year\": \"2010\", \"population\": 246305322}, {\"year\": \"2011\", \"population\": 249470032}, {\"year\": \"2012\", \"population\": 252698525}, {\"year\": \"2013\", \"population\": 255852467}, {\"year\": \"2014\", \"population\": 258877399}, {\"year\": \"2015\", \"population\": 261799249}, {\"year\": \"2016\", \"population\": 264627418}, {\"year\": \"2017\", \"population\": 267346658}, {\"year\": \"2018\", \"population\": 269951846}, {\"year\": \"2019\", \"population\": 272489381}, {\"year\": \"2020\", \"population\": 274814866}, {\"year\": \"2021\", \"population\": 276758053}, {\"year\": \"2022\", \"population\": 278830529}, {\"year\": \"2023\", \"population\": 281190067}, {\"year\": \"2024\", \"population\": 283487931}], \"latest_year\": \"2024\", \"latest_population\": 283487931}, \"vietnam\": {\"name\": \"Vietnam\", \"iso3\": \"VNM\", \"annual\": [{\"year\": \"2000\", \"population\": 77154011}, {\"year\": \"2001\", \"population\": 77969361}, {\"year\": \"2002\", \"population\": 78772224}, {\"year\": \"2003\", \"population\": 79563777}, {\"year\": \"2004\", \"population\": 80338971}, {\"year\": \"2005\", \"population\": 81088313}, {\"year\": \"2006\", \"population\": 82167897}, {\"year\": \"2007\", \"population\": 83633375}, {\"year\": \"2008\", \"population\": 85175788}, {\"year\": \"2009\", \"population\": 86460018}, {\"year\": \"2010\", \"population\": 87455152}, {\"year\": \"2011\", \"population\": 88468314}, {\"year\": \"2012\", \"population\": 89510356}, {\"year\": \"2013\", \"population\": 90573104}, {\"year\": \"2014\", \"population\": 91679578}, {\"year\": \"2015\", \"population\": 92823254}, {\"year\": \"2016\", \"population\": 94000117}, {\"year\": \"2017\", \"population\": 95176977}, {\"year\": \"2018\", \"population\": 96237319}, {\"year\": \"2019\", \"population\": 97173776}, {\"year\": \"2020\", \"population\": 98079191}, {\"year\": \"2021\", \"population\": 98935098}, {\"year\": \"2022\", \"population\": 99680655}, {\"year\": \"2023\", \"population\": 100352192}, {\"year\": \"2024\", \"population\": 100987686}], \"latest_year\": \"2024\", \"latest_population\": 100987686}, \"russia\": {\"name\": \"Russia\", \"iso3\": \"RUS\", \"annual\": [{\"year\": \"2000\", \"population\": 146596869}, {\"year\": \"2001\", \"population\": 145976482}, {\"year\": \"2002\", \"population\": 145306497}, {\"year\": \"2003\", \"population\": 144648618}, {\"year\": \"2004\", \"population\": 144067316}, {\"year\": \"2005\", \"population\": 143518814}, {\"year\": \"2006\", \"population\": 143049637}, {\"year\": \"2007\", \"population\": 142805114}, {\"year\": \"2008\", \"population\": 142742366}, {\"year\": \"2009\", \"population\": 142785348}, {\"year\": \"2010\", \"population\": 142849468}, {\"year\": \"2011\", \"population\": 143018195}, {\"year\": \"2012\", \"population\": 143378447}, {\"year\": \"2013\", \"population\": 143805638}, {\"year\": \"2014\", \"population\": 144237223}, {\"year\": \"2015\", \"population\": 144640716}, {\"year\": \"2016\", \"population\": 145015460}, {\"year\": \"2017\", \"population\": 145293260}, {\"year\": \"2018\", \"population\": 145398106}, {\"year\": \"2019\", \"population\": 145453291}, {\"year\": \"2020\", \"population\": 145245148}, {\"year\": \"2021\", \"population\": 144746762}, {\"year\": \"2022\", \"population\": 144236933}, {\"year\": \"2023\", \"population\": 143826130}, {\"year\": \"2024\", \"population\": 143533851}], \"latest_year\": \"2024\", \"latest_population\": 143533851}, \"mexico\": {\"name\": \"Mexico\", \"iso3\": \"MEX\", \"annual\": [{\"year\": \"2000\", \"population\": 98625552}, {\"year\": \"2001\", \"population\": 100099099}, {\"year\": \"2002\", \"population\": 101548624}, {\"year\": \"2003\", \"population\": 102978515}, {\"year\": \"2004\", \"population\": 104394131}, {\"year\": \"2005\", \"population\": 105811504}, {\"year\": \"2006\", \"population\": 107253666}, {\"year\": \"2007\", \"population\": 108774360}, {\"year\": \"2008\", \"population\": 110374288}, {\"year\": \"2009\", \"population\": 111999721}, {\"year\": \"2010\", \"population\": 113623895}, {\"year\": \"2011\", \"population\": 115243504}, {\"year\": \"2012\", \"population\": 116818208}, {\"year\": \"2013\", \"population\": 118343573}, {\"year\": \"2014\", \"population\": 119784261}, {\"year\": \"2015\", \"population\": 121072306}, {\"year\": \"2016\", \"population\": 122251351}, {\"year\": \"2017\", \"population\": 123400057}, {\"year\": \"2018\", \"population\": 124573711}, {\"year\": \"2019\", \"population\": 125762982}, {\"year\": \"2020\", \"population\": 126799054}, {\"year\": \"2021\", \"population\": 127648148}, {\"year\": \"2022\", \"population\": 128613117}, {\"year\": \"2023\", \"population\": 129739759}, {\"year\": \"2024\", \"population\": 130861007}], \"latest_year\": \"2024\", \"latest_population\": 130861007}, \"turkey\": {\"name\": \"Turkey\", \"iso3\": \"TUR\", \"annual\": [{\"year\": \"2000\", \"population\": 65425961}, {\"year\": \"2001\", \"population\": 66245128}, {\"year\": \"2002\", \"population\": 67048795}, {\"year\": \"2003\", \"population\": 67831730}, {\"year\": \"2004\", \"population\": 68592617}, {\"year\": \"2005\", \"population\": 69329557}, {\"year\": \"2006\", \"population\": 70045349}, {\"year\": \"2007\", \"population\": 70158112}, {\"year\": \"2008\", \"population\": 71051678}, {\"year\": \"2009\", \"population\": 72039206}, {\"year\": \"2010\", \"population\": 73142150}, {\"year\": \"2011\", \"population\": 74223629}, {\"year\": \"2012\", \"population\": 75175827}, {\"year\": \"2013\", \"population\": 76147624}, {\"year\": \"2014\", \"population\": 77181884}, {\"year\": \"2015\", \"population\": 78218479}, {\"year\": \"2016\", \"population\": 79277962}, {\"year\": \"2017\", \"population\": 80312698}, {\"year\": \"2018\", \"population\": 81407204}, {\"year\": \"2019\", \"population\": 82579440}, {\"year\": \"2020\", \"population\": 83384680}, {\"year\": \"2021\", \"population\": 84147318}, {\"year\": \"2022\", \"population\": 84979913}, {\"year\": \"2023\", \"population\": 85325965}, {\"year\": \"2024\", \"population\": 85518661}], \"latest_year\": \"2024\", \"latest_population\": 85518661}, \"philippines\": {\"name\": \"Philippines\", \"iso3\": \"PHL\", \"annual\": [{\"year\": \"2000\", \"population\": 79625397}, {\"year\": \"2001\", \"population\": 81401488}, {\"year\": \"2002\", \"population\": 83068889}, {\"year\": \"2003\", \"population\": 84731835}, {\"year\": \"2004\", \"population\": 86394504}, {\"year\": \"2005\", \"population\": 88015962}, {\"year\": \"2006\", \"population\": 89508986}, {\"year\": \"2007\", \"population\": 91075184}, {\"year\": \"2008\", \"population\": 92699095}, {\"year\": \"2009\", \"population\": 94384250}, {\"year\": \"2010\", \"population\": 96337125}, {\"year\": \"2011\", \"population\": 98248614}, {\"year\": \"2012\", \"population\": 100175512}, {\"year\": \"2013\", \"population\": 102076336}, {\"year\": \"2014\", \"population\": 103767130}, {\"year\": \"2015\", \"population\": 105312992}, {\"year\": \"2016\", \"population\": 106735719}, {\"year\": \"2017\", \"population\": 108119693}, {\"year\": \"2018\", \"population\": 109465287}, {\"year\": \"2019\", \"population\": 110804683}, {\"year\": \"2020\", \"population\": 112081264}, {\"year\": \"2021\", \"population\": 113100950}, {\"year\": \"2022\", \"population\": 113964338}, {\"year\": \"2023\", \"population\": 114891199}, {\"year\": \"2024\", \"population\": 115843670}], \"latest_year\": \"2024\", \"latest_population\": 115843670}, \"egypt\": {\"name\": \"Egypt\", \"iso3\": \"EGY\", \"annual\": [{\"year\": \"2000\", \"population\": 73083284}, {\"year\": \"2001\", \"population\": 74652029}, {\"year\": \"2002\", \"population\": 76239137}, {\"year\": \"2003\", \"population\": 77853548}, {\"year\": \"2004\", \"population\": 79477443}, {\"year\": \"2005\", \"population\": 81101004}, {\"year\": \"2006\", \"population\": 82700403}, {\"year\": \"2007\", \"population\": 84276225}, {\"year\": \"2008\", \"population\": 85864789}, {\"year\": \"2009\", \"population\": 87501636}, {\"year\": \"2010\", \"population\": 89196072}, {\"year\": \"2011\", \"population\": 91093059}, {\"year\": \"2012\", \"population\": 93161001}, {\"year\": \"2013\", \"population\": 95333553}, {\"year\": \"2014\", \"population\": 97528654}, {\"year\": \"2015\", \"population\": 99597342}, {\"year\": \"2016\", \"population\": 101644589}, {\"year\": \"2017\", \"population\": 103696057}, {\"year\": \"2018\", \"population\": 105682094}, {\"year\": \"2019\", \"population\": 107553158}, {\"year\": \"2020\", \"population\": 109315124}, {\"year\": \"2021\", \"population\": 110957008}, {\"year\": \"2022\", \"population\": 112618250}, {\"year\": \"2023\", \"population\": 114535772}, {\"year\": \"2024\", \"population\": 116538258}], \"latest_year\": \"2024\", \"latest_population\": 116538258}, \"korea\": {\"name\": \"South Korea\", \"iso3\": \"KOR\", \"annual\": [{\"year\": \"2000\", \"population\": 47008111}, {\"year\": \"2001\", \"population\": 47370164}, {\"year\": \"2002\", \"population\": 47644736}, {\"year\": \"2003\", \"population\": 47892330}, {\"year\": \"2004\", \"population\": 48082519}, {\"year\": \"2005\", \"population\": 48184561}, {\"year\": \"2006\", \"population\": 48438292}, {\"year\": \"2007\", \"population\": 48683638}, {\"year\": \"2008\", \"population\": 49054708}, {\"year\": \"2009\", \"population\": 49307835}, {\"year\": \"2010\", \"population\": 49554112}, {\"year\": \"2011\", \"population\": 49936638}, {\"year\": \"2012\", \"population\": 50199853}, {\"year\": \"2013\", \"population\": 50428893}, {\"year\": \"2014\", \"population\": 50746659}, {\"year\": \"2015\", \"population\": 51014947}, {\"year\": \"2016\", \"population\": 51217803}, {\"year\": \"2017\", \"population\": 51361911}, {\"year\": \"2018\", \"population\": 51585058}, {\"year\": \"2019\", \"population\": 51764822}, {\"year\": \"2020\", \"population\": 51836239}, {\"year\": \"2021\", \"population\": 51769539}, {\"year\": \"2022\", \"population\": 51672569}, {\"year\": \"2023\", \"population\": 51712619}, {\"year\": \"2024\", \"population\": 51751065}], \"latest_year\": \"2024\", \"latest_population\": 51751065}, \"ethiopia\": {\"name\": \"Ethiopia\", \"iso3\": \"ETH\", \"annual\": [{\"year\": \"2000\", \"population\": 67411494}, {\"year\": \"2001\", \"population\": 69487762}, {\"year\": \"2002\", \"population\": 71635517}, {\"year\": \"2003\", \"population\": 73832663}, {\"year\": \"2004\", \"population\": 76077206}, {\"year\": \"2005\", \"population\": 78367470}, {\"year\": \"2006\", \"population\": 80703490}, {\"year\": \"2007\", \"population\": 83103217}, {\"year\": \"2008\", \"population\": 85543668}, {\"year\": \"2009\", \"population\": 88007636}, {\"year\": \"2010\", \"population\": 90538514}, {\"year\": \"2011\", \"population\": 93149970}, {\"year\": \"2012\", \"population\": 95798767}, {\"year\": \"2013\", \"population\": 98438751}, {\"year\": \"2014\", \"population\": 101115610}, {\"year\": \"2015\", \"population\": 103867135}, {\"year\": \"2016\", \"population\": 106718162}, {\"year\": \"2017\", \"population\": 109666481}, {\"year\": \"2018\", \"population\": 112664152}, {\"year\": \"2019\", \"population\": 115737383}, {\"year\": \"2020\", \"population\": 118917671}, {\"year\": \"2021\", \"population\": 122138588}, {\"year\": \"2022\", \"population\": 125384287}, {\"year\": \"2023\", \"population\": 128691692}, {\"year\": \"2024\", \"population\": 132059767}], \"latest_year\": \"2024\", \"latest_population\": 132059767}}}",
-    "pub_date": "2026-06-17T03:06:17.543998"
-  },
-  {
     "id": 7125,
     "title": "AJCA Japan Coffee Data \u2013 2026-06-17",
     "body": "AJCA Japan 2025: imports=359382 MT, consumption=397272 MT",
@@ -250,73 +625,6 @@
     ],
     "meta": "{\"source\": \"AJCA\", \"source_url\": \"https://www.ajca.or.jp/data/\", \"last_updated\": \"2026-06-17\", \"latest_year\": \"2025\", \"latest_consumption_mt\": 397272, \"latest_imports_mt\": 359382, \"latest_stocks_mt\": null, \"prev_imports_mt\": null, \"prev_consumption_mt\": null, \"prev_stocks_mt\": null, \"imports_yoy_pct\": null, \"consumption_yoy_pct\": null, \"stocks_yoy_pct\": null, \"monthly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"monthly_exports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"supply_demand_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"yearly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"pdf_index\": [{\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}], \"latest_origin_breakdown\": [{\"country\": \"Vietnam\", \"imports_mt\": 110}, {\"country\": \"Indonesia\", \"imports_mt\": 118}, {\"country\": \"India\", \"imports_mt\": 123}, {\"country\": \"Yemen\", \"imports_mt\": 149}, {\"country\": \"Mexico\", \"imports_mt\": 305}, {\"country\": \"Guatemala\", \"imports_mt\": 306}, {\"country\": \"Honduras\", \"imports_mt\": 307}, {\"country\": \"El Salvador\", \"imports_mt\": 309}, {\"country\": \"Nicaragua\", \"imports_mt\": 310}, {\"country\": \"Costa Rica\", \"imports_mt\": 311}, {\"country\": \"Colombia\", \"imports_mt\": 401}, {\"country\": \"Peru\", \"imports_mt\": 407}, {\"country\": \"Brazil\", \"imports_mt\": 410}, {\"country\": \"Rwanda\", \"imports_mt\": 526}, {\"country\": \"Ethiopia\", \"imports_mt\": 538}, {\"country\": \"Kenya\", \"imports_mt\": 541}, {\"country\": \"Uganda\", \"imports_mt\": 542}, {\"country\": \"Tanzania\", \"imports_mt\": 543}, {\"country\": \"Papua New Guinea\", \"imports_mt\": 602}], \"latest_origin_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\"}",
     "pub_date": "2026-06-17T03:06:09.895634"
-  },
-  {
-    "id": 7124,
-    "title": "Fertilizer Prices \u2013 2026-06",
-    "body": null,
-    "source": "World Bank",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "fertilizer",
-      "price",
-      "supply",
-      "brazil"
-    ],
-    "meta": "{\"urea_monthly\": [409.25, 392.5, 415.4, 472.0, 725.63, 856.88, 770.5], \"dap_monthly\": [708.25, 627.5, 619.2, 626.5, 658.25, 725.25, 769.5], \"kcl_monthly\": [353.75, 358.33, 366.0, 372.5, 380.63, 401.25, 405.0], \"urea_history\": [{\"month\": \"2021-06\", \"price\": 393.2}, {\"month\": \"2021-07\", \"price\": 441.5}, {\"month\": \"2021-08\", \"price\": 446.9}, {\"month\": \"2021-09\", \"price\": 418.8}, {\"month\": \"2021-10\", \"price\": 695.0}, {\"month\": \"2021-11\", \"price\": 900.5}, {\"month\": \"2021-12\", \"price\": 890.0}, {\"month\": \"2022-01\", \"price\": 846.4}, {\"month\": \"2022-02\", \"price\": 744.2}, {\"month\": \"2022-03\", \"price\": 872.5}, {\"month\": \"2022-04\", \"price\": 925.0}, {\"month\": \"2022-05\", \"price\": 707.5}, {\"month\": \"2022-06\", \"price\": 690.0}, {\"month\": \"2022-07\", \"price\": 601.0}, {\"month\": \"2022-08\", \"price\": 591.2}, {\"month\": \"2022-09\", \"price\": 678.0}, {\"month\": \"2022-10\", \"price\": 636.2}, {\"month\": \"2022-11\", \"price\": 588.8}, {\"month\": \"2022-12\", \"price\": 519.4}, {\"month\": \"2023-01\", \"price\": 443.8}, {\"month\": \"2023-02\", \"price\": 357.5}, {\"month\": \"2023-03\", \"price\": 313.5}, {\"month\": \"2023-04\", \"price\": 313.4}, {\"month\": \"2023-05\", \"price\": 329.2}, {\"month\": \"2023-06\", \"price\": 287.5}, {\"month\": \"2023-07\", \"price\": 334.6}, {\"month\": \"2023-08\", \"price\": 385.6}, {\"month\": \"2023-09\", \"price\": 380.0}, {\"month\": \"2023-10\", \"price\": 411.4}, {\"month\": \"2023-11\", \"price\": 385.5}, {\"month\": \"2023-12\", \"price\": 354.0}, {\"month\": \"2024-01\", \"price\": 335.4}, {\"month\": \"2024-02\", \"price\": 351.2}, {\"month\": \"2024-03\", \"price\": 330.0}, {\"month\": \"2024-04\", \"price\": 320.0}, {\"month\": \"2024-05\", \"price\": 284.8}, {\"month\": \"2024-06\", \"price\": 336.2}, {\"month\": \"2024-07\", \"price\": 342.5}, {\"month\": \"2024-08\", \"price\": 342.5}, {\"month\": \"2024-09\", \"price\": 337.5}, {\"month\": \"2024-10\", \"price\": 374.8}, {\"month\": \"2024-11\", \"price\": 352.3}, {\"month\": \"2024-12\", \"price\": 352.0}, {\"month\": \"2025-01\", \"price\": 380.5}, {\"month\": \"2025-02\", \"price\": 436.5}, {\"month\": \"2025-03\", \"price\": 394.5}, {\"month\": \"2025-04\", \"price\": 386.9}, {\"month\": \"2025-05\", \"price\": 392.0}, {\"month\": \"2025-06\", \"price\": 420.5}, {\"month\": \"2025-07\", \"price\": 496.0}, {\"month\": \"2025-08\", \"price\": 507.7}, {\"month\": \"2025-09\", \"price\": 461.1}, {\"month\": \"2025-10\", \"price\": 394.4}, {\"month\": \"2025-11\", \"price\": 409.2}, {\"month\": \"2025-12\", \"price\": 392.5}, {\"month\": \"2026-01\", \"price\": 415.4}, {\"month\": \"2026-02\", \"price\": 472.0}, {\"month\": \"2026-03\", \"price\": 725.6}, {\"month\": \"2026-04\", \"price\": 856.9}, {\"month\": \"2026-05\", \"price\": 770.5}], \"dap_history\": [{\"month\": \"2021-06\", \"price\": 604.8}, {\"month\": \"2021-07\", \"price\": 613.0}, {\"month\": \"2021-08\", \"price\": 603.1}, {\"month\": \"2021-09\", \"price\": 643.8}, {\"month\": \"2021-10\", \"price\": 672.9}, {\"month\": \"2021-11\", \"price\": 726.7}, {\"month\": \"2021-12\", \"price\": 745.0}, {\"month\": \"2022-01\", \"price\": 699.4}, {\"month\": \"2022-02\", \"price\": 747.1}, {\"month\": \"2022-03\", \"price\": 938.1}, {\"month\": \"2022-04\", \"price\": 954.0}, {\"month\": \"2022-05\", \"price\": 842.5}, {\"month\": \"2022-06\", \"price\": 783.8}, {\"month\": \"2022-07\", \"price\": 784.0}, {\"month\": \"2022-08\", \"price\": 749.4}, {\"month\": \"2022-09\", \"price\": 752.0}, {\"month\": \"2022-10\", \"price\": 725.0}, {\"month\": \"2022-11\", \"price\": 665.6}, {\"month\": \"2022-12\", \"price\": 625.0}, {\"month\": \"2023-01\", \"price\": 631.0}, {\"month\": \"2023-02\", \"price\": 612.5}, {\"month\": \"2023-03\", \"price\": 606.0}, {\"month\": \"2023-04\", \"price\": 637.0}, {\"month\": \"2023-05\", \"price\": 510.0}, {\"month\": \"2023-06\", \"price\": 454.6}, {\"month\": \"2023-07\", \"price\": 458.8}, {\"month\": \"2023-08\", \"price\": 528.8}, {\"month\": \"2023-09\", \"price\": 527.9}, {\"month\": \"2023-10\", \"price\": 534.8}, {\"month\": \"2023-11\", \"price\": 535.6}, {\"month\": \"2023-12\", \"price\": 563.8}, {\"month\": \"2024-01\", \"price\": 596.2}, {\"month\": \"2024-02\", \"price\": 583.8}, {\"month\": \"2024-03\", \"price\": 617.5}, {\"month\": \"2024-04\", \"price\": 545.0}, {\"month\": \"2024-05\", \"price\": 522.0}, {\"month\": \"2024-06\", \"price\": 543.0}, {\"month\": \"2024-07\", \"price\": 539.4}, {\"month\": \"2024-08\", \"price\": 546.0}, {\"month\": \"2024-09\", \"price\": 554.8}, {\"month\": \"2024-10\", \"price\": 573.4}, {\"month\": \"2024-11\", \"price\": 574.5}, {\"month\": \"2024-12\", \"price\": 568.3}, {\"month\": \"2025-01\", \"price\": 582.7}, {\"month\": \"2025-02\", \"price\": 603.8}, {\"month\": \"2025-03\", \"price\": 615.1}, {\"month\": \"2025-04\", \"price\": 635.0}, {\"month\": \"2025-05\", \"price\": 669.2}, {\"month\": \"2025-06\", \"price\": 715.4}, {\"month\": \"2025-07\", \"price\": 736.0}, {\"month\": \"2025-08\", \"price\": 795.1}, {\"month\": \"2025-09\", \"price\": 780.6}, {\"month\": \"2025-10\", \"price\": 754.0}, {\"month\": \"2025-11\", \"price\": 708.2}, {\"month\": \"2025-12\", \"price\": 627.5}, {\"month\": \"2026-01\", \"price\": 619.2}, {\"month\": \"2026-02\", \"price\": 626.5}, {\"month\": \"2026-03\", \"price\": 658.2}, {\"month\": \"2026-04\", \"price\": 725.2}, {\"month\": \"2026-05\", \"price\": 769.5}], \"kcl_history\": [{\"month\": \"2021-06\", \"price\": 462.5}, {\"month\": \"2021-07\", \"price\": 633.0}, {\"month\": \"2021-08\", \"price\": 695.0}, {\"month\": \"2021-09\", \"price\": 736.2}, {\"month\": \"2021-10\", \"price\": 782.0}, {\"month\": \"2021-11\", \"price\": 806.9}, {\"month\": \"2021-12\", \"price\": 807.5}, {\"month\": \"2022-01\", \"price\": 785.6}, {\"month\": \"2022-02\", \"price\": 791.9}, {\"month\": \"2022-03\", \"price\": 977.5}, {\"month\": \"2022-04\", \"price\": 1202.0}, {\"month\": \"2022-05\", \"price\": 1170.0}, {\"month\": \"2022-06\", \"price\": 1101.9}, {\"month\": \"2022-07\", \"price\": 1013.0}, {\"month\": \"2022-08\", \"price\": 888.8}, {\"month\": \"2022-09\", \"price\": 731.0}, {\"month\": \"2022-10\", \"price\": 622.5}, {\"month\": \"2022-11\", \"price\": 563.1}, {\"month\": \"2022-12\", \"price\": 513.8}, {\"month\": \"2023-01\", \"price\": 508.8}, {\"month\": \"2023-02\", \"price\": 496.9}, {\"month\": \"2023-03\", \"price\": 453.0}, {\"month\": \"2023-04\", \"price\": 407.5}, {\"month\": \"2023-05\", \"price\": 372.5}, {\"month\": \"2023-06\", \"price\": 328.0}, {\"month\": \"2023-07\", \"price\": 341.2}, {\"month\": \"2023-08\", \"price\": 353.1}, {\"month\": \"2023-09\", \"price\": 352.0}, {\"month\": \"2023-10\", \"price\": 341.9}, {\"month\": \"2023-11\", \"price\": 331.9}, {\"month\": \"2023-12\", \"price\": 311.9}, {\"month\": \"2024-01\", \"price\": 296.2}, {\"month\": \"2024-02\", \"price\": 289.4}, {\"month\": \"2024-03\", \"price\": 300.5}, {\"month\": \"2024-04\", \"price\": 305.0}, {\"month\": \"2024-05\", \"price\": 307.0}, {\"month\": \"2024-06\", \"price\": 310.0}, {\"month\": \"2024-07\", \"price\": 300.6}, {\"month\": \"2024-08\", \"price\": 294.0}, {\"month\": \"2024-09\", \"price\": 286.9}, {\"month\": \"2024-10\", \"price\": 278.1}, {\"month\": \"2024-11\", \"price\": 281.0}, {\"month\": \"2024-12\", \"price\": 292.5}, {\"month\": \"2025-01\", \"price\": 302.0}, {\"month\": \"2025-02\", \"price\": 318.8}, {\"month\": \"2025-03\", \"price\": 336.2}, {\"month\": \"2025-04\", \"price\": 351.9}, {\"month\": \"2025-05\", \"price\": 362.5}, {\"month\": \"2025-06\", \"price\": 363.1}, {\"month\": \"2025-07\", \"price\": 362.5}, {\"month\": \"2025-08\", \"price\": 356.5}, {\"month\": \"2025-09\", \"price\": 352.5}, {\"month\": \"2025-10\", \"price\": 352.0}, {\"month\": \"2025-11\", \"price\": 353.8}, {\"month\": \"2025-12\", \"price\": 358.3}, {\"month\": \"2026-01\", \"price\": 366.0}, {\"month\": \"2026-02\", \"price\": 372.5}, {\"month\": \"2026-03\", \"price\": 380.6}, {\"month\": \"2026-04\", \"price\": 401.2}, {\"month\": \"2026-05\", \"price\": 405.0}], \"last_data_month\": \"May-2026\"}",
-    "pub_date": "2026-06-17T03:05:05.532818"
-  },
-  {
-    "id": 7123,
-    "title": "ENSO ONI \u2013 2026-06",
-    "body": null,
-    "source": "NOAA CPC",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "enso",
-      "supply",
-      "brazil"
-    ],
-    "meta": "{\"oni_history\": [{\"month\": \"Nov-24\", \"value\": -0.3}, {\"month\": \"Dec-24\", \"value\": -0.42}, {\"month\": \"Jan-25\", \"value\": -0.45}, {\"month\": \"Feb-25\", \"value\": -0.24}, {\"month\": \"Mar-25\", \"value\": -0.06}, {\"month\": \"Apr-25\", \"value\": 0.02}, {\"month\": \"May-25\", \"value\": -0.02}, {\"month\": \"Jun-25\", \"value\": -0.04}, {\"month\": \"Jul-25\", \"value\": -0.14}, {\"month\": \"Aug-25\", \"value\": -0.28}, {\"month\": \"Sep-25\", \"value\": -0.4}, {\"month\": \"Oct-25\", \"value\": -0.51}, {\"month\": \"Nov-25\", \"value\": -0.55}, {\"month\": \"Dec-25\", \"value\": -0.54}, {\"month\": \"Jan-26\", \"value\": -0.37}, {\"month\": \"Feb-26\", \"value\": -0.14, \"preliminary\": true}, {\"month\": \"Mar-26\", \"value\": 0.13, \"preliminary\": true}, {\"month\": \"Apr-26\", \"value\": 0.48, \"preliminary\": true}]}",
-    "pub_date": "2026-06-17T03:05:03.352625"
-  },
-  {
-    "id": 7122,
-    "title": "Ethiopia ECX Coffee Price \u2013 2026-06-17",
-    "body": "ECX auction price: 300.00 ETB/kg as of 2026-06-17.",
-    "source": "ECX",
-    "category": "supply",
-    "lat": 9.145,
-    "lng": 40.489,
-    "tags": [
-      "price",
-      "ethiopia",
-      "ecx",
-      "arabica"
-    ],
-    "meta": "{\"etb_per_kg\": 300.0, \"as_of\": \"2026-06-17\", \"source\": \"ECX\", \"grade\": \"All grades avg\"}",
-    "pub_date": "2026-06-17T03:03:45.220344"
-  },
-  {
-    "id": 7121,
-    "title": "Colombia FNC Precio Interno \u2013 2026-06-17",
-    "body": "FNC internal purchase price: 2,130,000 COP/carga (125 kg) as of 2026-06-17.",
-    "source": "FNC",
-    "category": "supply",
-    "lat": 4.571,
-    "lng": -74.297,
-    "tags": [
-      "price",
-      "colombia",
-      "fnc",
-      "precio-interno"
-    ],
-    "meta": "{\"cop_per_carga\": 2130000, \"as_of\": \"2026-06-17\", \"source\": \"FNC\"}",
-    "pub_date": "2026-06-17T03:03:20.830045"
   },
   {
     "id": 7120,
@@ -337,22 +645,6 @@
     "pub_date": "2026-06-17T03:03:06.624077"
   },
   {
-    "id": 7119,
-    "title": "Uganda Screen 15 \u2013 2026-06-17",
-    "body": "Uganda Fine Robusta Screen 15 price: 171.41 USD/cwt",
-    "source": "UCDA",
-    "category": "supply",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "price",
-      "robusta",
-      "uganda"
-    ],
-    "meta": "{\"usd_cwt\": 171.41, \"as_of\": \"2026-06-17\", \"grade\": \"Screen 15\"}",
-    "pub_date": "2026-06-17T03:03:04.953717"
-  },
-  {
     "id": 7116,
     "title": "Ocean Freight Rates (Searates) \u2013 2026-06-17",
     "body": "Ocean freight market: FCL \u202220'ST",
@@ -366,48 +658,6 @@
     ],
     "meta": null,
     "pub_date": "2026-06-17T03:03:00.162651"
-  },
-  {
-    "id": 7115,
-    "title": "ICE COT Robusta Coffee (London) \u2013 2026-06-09",
-    "body": "Report: 2026-06-09 | OI: 96,975 | MM net: +14,373 (L:31,939 S:17,566 Sp:12,231 \u0394L:-2,990 \u0394S:+2,971) | PMPU L:26,235 S:39,796 | Swap L:4,033 S:8,741 | Other L:7,125 S:5,029 | NR L:8,200 S:6,400",
-    "source": "ICE",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "cot",
-      "robusta"
-    ],
-    "meta": "{\"report_date\": \"2026-06-09\", \"open_interest\": 96975, \"pmpu\": {\"long\": 26235, \"short\": 39796, \"d_long\": 4519, \"d_short\": -3216}, \"swap\": {\"long\": 4033, \"short\": 8741, \"spread\": 1016, \"d_long\": 277, \"d_short\": -1636}, \"mm\": {\"long\": 31939, \"short\": 17566, \"spread\": 12231, \"d_long\": -2990, \"d_short\": 2971, \"d_spread\": -1482}, \"other\": {\"long\": 7125, \"short\": 5029, \"spread\": 6196, \"d_long\": -1927, \"d_short\": 827}, \"nr\": {\"long\": 8200, \"short\": 6400, \"d_long\": -111, \"d_short\": 822}, \"_commentary\": {\"text\": \"CFTC Release for London Robusta (RC):\\n  \\u2022 Total OI down -2,208 WoW\\n  \\u2022 Industry Long increased by 4,519 lots\\n  \\u2022 Industry Short decreased by 3,216 lots\\n  \\u2022 Managed Money decreased their net exposure by 5,961 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
-    "pub_date": "2026-06-17T03:02:57.297661",
-    "commentary": {
-      "text": "CFTC Release for London Robusta (RC):\n  \u2022 Total OI down -2,208 WoW\n  \u2022 Industry Long increased by 4,519 lots\n  \u2022 Industry Short decreased by 3,216 lots\n  \u2022 Managed Money decreased their net exposure by 5,961 contracts.",
-      "hasUpdate": true,
-      "isLatestTradingDay": false
-    }
-  },
-  {
-    "id": 7114,
-    "title": "CFTC COT Coffee C (NY Arabica) \u2013 2026-06-09",
-    "body": "Report: 2026-06-09 | OI: 213,519 | MM net: +11,863 (L:41,186 S:29,323 Sp:39,634 \u0394L:-1,344 \u0394S:+6,417) | PMPU L:59,198 S:68,506 | Swap L:25,425 S:21,902 | Other L:10,254 S:15,941 | NR L:8,747 S:9,138",
-    "source": "CFTC",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "cot",
-      "arabica"
-    ],
-    "meta": "{\"report_date\": \"2026-06-09\", \"open_interest\": 213519, \"pmpu\": {\"long\": 59198, \"short\": 68506, \"d_long\": 7771, \"d_short\": 814}, \"swap\": {\"long\": 25425, \"short\": 21902, \"spread\": 3829, \"d_long\": -408, \"d_short\": -1171}, \"mm\": {\"long\": 41186, \"short\": 29323, \"spread\": 39634, \"d_long\": -1344, \"d_short\": 6417, \"d_spread\": 3768}, \"other\": {\"long\": 10254, \"short\": 15941, \"spread\": 25246, \"d_long\": 435, \"d_short\": -114}, \"nr\": {\"long\": 8747, \"short\": 9138, \"d_long\": -944, \"d_short\": -436}, \"_commentary\": {\"text\": \"CFTC Release for NY Arabica (KC):\\n  \\u2022 Total OI up +10,664 WoW\\n  \\u2022 Industry Long increased by 7,771 lots\\n  \\u2022 Industry Short increased by 814 lots\\n  \\u2022 Managed Money decreased their net exposure by 7,761 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
-    "pub_date": "2026-06-17T03:02:56.847105",
-    "commentary": {
-      "text": "CFTC Release for NY Arabica (KC):\n  \u2022 Total OI up +10,664 WoW\n  \u2022 Industry Long increased by 7,771 lots\n  \u2022 Industry Short increased by 814 lots\n  \u2022 Managed Money decreased their net exposure by 7,761 contracts.",
-      "hasUpdate": true,
-      "isLatestTradingDay": false
-    }
   },
   {
     "id": 7113,
@@ -440,38 +690,6 @@
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 277.25, \"chg\": 14.3, \"oi\": 15292, \"volume\": 10419, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 272.8, \"chg\": 13.6, \"oi\": 95077, \"volume\": 30653, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 263.6, \"chg\": 11.85, \"oi\": 50936, \"volume\": 14085, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 259.75, \"chg\": 10.6, \"oi\": 17933, \"volume\": 5317, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 259.4, \"chg\": 10.3, \"oi\": 6979, \"volume\": 1755, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 259.75, \"chg\": 10.15, \"oi\": 4554, \"volume\": 894, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 259.15, \"chg\": 9.8, \"oi\": 2099, \"volume\": 357, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 258.2, \"chg\": 9.85, \"oi\": 3543, \"volume\": 339, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 257.95, \"chg\": 9.9, \"oi\": 737, \"volume\": 55, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-16\"}",
     "pub_date": "2026-06-17T03:02:55.024322"
-  },
-  {
-    "id": 7111,
-    "title": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-17",
-    "body": "Arabica coffee price: R$ 5.09",
-    "source": "Noticiasagricolas",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "brazil",
-      "arabica"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-17T03:02:46.290211"
-  },
-  {
-    "id": 7110,
-    "title": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-17",
-    "body": "Conilon Tipo 7 price: R$ 950,00/saca (16/06/2026)",
-    "source": "Cooabriel",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "brazil",
-      "conilon"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-17T03:02:45.385989"
   },
   {
     "id": 7109,
@@ -547,22 +765,6 @@
     ],
     "meta": null,
     "pub_date": "2026-06-17T03:02:34.220340"
-  },
-  {
-    "id": 7104,
-    "title": "Vietnam Robusta \u2013 2026-06-17",
-    "body": "Vietnam Robusta price: 89.300 VND/kg",
-    "source": "Giacaphe",
-    "category": "supply",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "price",
-      "robusta",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-17T03:02:29.800438"
   },
   {
     "id": 7103,
@@ -3351,240 +3553,5 @@
     ],
     "meta": null,
     "pub_date": "2026-06-10T04:07:28.609606"
-  },
-  {
-    "id": 6727,
-    "title": "USD/IDR FX Rate \u2013 2026-06-10",
-    "body": "USD/IDR FX Rate price: 17997",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -0.789,
-    "lng": 113.921,
-    "tags": [
-      "fx",
-      "indonesia"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-10T04:07:27.274669"
-  },
-  {
-    "id": 6726,
-    "title": "USD/VND FX Rate \u2013 2026-06-10",
-    "body": "USD/VND FX Rate price: 26217",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "fx",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-10T04:07:25.941204"
-  },
-  {
-    "id": 6725,
-    "title": "USD/BRL FX Rate \u2013 2026-06-10",
-    "body": "USD/BRL FX Rate price: 5.1736",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "fx",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-10T04:07:24.597580"
-  },
-  {
-    "id": 6738,
-    "title": "The Sprudge Guide To Mexico City\u2019s Condesa Neighborhood",
-    "body": "Where to drink coffee in the Condesa neighborhood of Mexico City, Mexico.",
-    "source": "Sprudge",
-    "category": "macro",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/the-sprudge-guide-to-mexico-citys-condesa-neighborhood-959844.html",
-    "pub_date": "2026-06-09T14:00:25"
-  },
-  {
-    "id": 6739,
-    "title": "A Colorado Cupping Of Competitive Congolese Cooperative Coffees",
-    "body": "The 2026 Best of Congo Cooperatives cupping takes place Friday, June 19th in Denver, Colorado.",
-    "source": "Sprudge",
-    "category": "general",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/a-colorado-cupping-of-competitive-congolese-cooperative-coffees-1061209.html",
-    "pub_date": "2026-06-09T12:00:25"
-  },
-  {
-    "id": 6719,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-09",
-    "body": "B3 Arabica 4/5 settlement: 304.50 USD/sac | OI: 119 contracts | Expiry: 2026-07-23",
-    "source": "B3",
-    "category": "supply",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "price",
-      "futures",
-      "brazil",
-      "arabica",
-      "b3"
-    ],
-    "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 304.5, \"oi\": 119, \"mty\": \"2026-07-23\"}",
-    "pub_date": "2026-06-09T10:39:06.326632"
-  },
-  {
-    "id": 6715,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-05",
-    "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,313.00 (-20) OI:27,006 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,244.00 (-16) OI:43,082",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "robusta"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3313, \"chg\": -20, \"oi\": 27006, \"volume\": 1035, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3244, \"chg\": -16, \"oi\": 43082, \"volume\": 2412, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3176, \"chg\": -13, \"oi\": 12724, \"volume\": 780, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3110, \"chg\": -13, \"oi\": 6983, \"volume\": 354, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3075, \"chg\": -12, \"oi\": 2800, \"volume\": 140, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3053, \"chg\": -10, \"oi\": 1198, \"volume\": 73, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3036, \"chg\": -8, \"oi\": 556, \"volume\": 37, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3021, \"chg\": -4, \"oi\": 334, \"volume\": 25, \"symbol\": \"RMU27\"}], \"quote_date\": \"2026-06-08\"}",
-    "pub_date": "2026-06-09T10:38:58.466515"
-  },
-  {
-    "id": 6714,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-05",
-    "body": "Front (Coffee (Jul '26)): 247.20 (+1.3) OI:63,436 | 2nd (Coffee (Sep '26)): 242.75 (+1.1) OI:73,584",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "arabica"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 247.2, \"chg\": 1.3, \"oi\": 63436, \"volume\": 2889, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 242.75, \"chg\": 1.1, \"oi\": 73584, \"volume\": 2933, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 235.25, \"chg\": 0.90000000000001, \"oi\": 45509, \"volume\": 869, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 232.8, \"chg\": 0.70000000000002, \"oi\": 15888, \"volume\": 502, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 231.75, \"chg\": -0.6, \"oi\": 726, \"volume\": 0, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-08\"}",
-    "pub_date": "2026-06-09T10:38:57.084380"
-  },
-  {
-    "id": 6696,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-09",
-    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 9.15,
-    "lng": 40.49,
-    "tags": [
-      "weather",
-      "ethiopia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-09T08:55:50.600621",
-    "commentary": {
-      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6695,
-    "title": "Uganda Agronomic Status \u2013 2026-06-09",
-    "body": "Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 130mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 38.8.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 1.37,
-    "lng": 32.29,
-    "tags": [
-      "weather",
-      "uganda",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 2, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 130mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 38.8.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-09T08:55:50.000088",
-    "commentary": {
-      "text": "Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 130mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 38.8.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6694,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-09",
-    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": -2.55,
-    "lng": 118.01,
-    "tags": [
-      "weather",
-      "indonesia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-09T08:55:49.403132",
-    "commentary": {
-      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6693,
-    "title": "Honduras Agronomic Status \u2013 2026-06-09",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 14.07,
-    "lng": -87.2,
-    "tags": [
-      "weather",
-      "honduras",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-09T08:55:48.802626",
-    "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 6692,
-    "title": "Colombia Agronomic Status \u2013 2026-06-09",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 4.71,
-    "lng": -74.07,
-    "tags": [
-      "weather",
-      "colombia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-09T08:55:48.205583",
-    "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
   }
 ]
