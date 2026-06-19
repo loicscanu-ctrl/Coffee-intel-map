@@ -101,13 +101,25 @@ COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")  # passed as a header 
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "coffee_imports.json"
 
-_N_YEARS = 12   # annual history depth
+_N_YEARS = 12        # annual history depth
+_N_MONTHS = 12       # monthly window (preview monthly endpoint caps at ~12 periods)
+_MONTHLY_TOP_N = 12  # cap monthly fetches to the largest RoW importers (rate limits)
 
 
 # ── Fetch + parse ──────────────────────────────────────────────────────────────
 
-def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
-    """One call: all HS-0901 subcodes × all periods, imports from World."""
+COMTRADE_MONTHLY = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
+
+# The public preview endpoint is aggressively rate-limited (HTTP 429) and the
+# monthly variant rejects long period lists (HTTP 400 above ~12 periods). Both
+# are handled here: cap periods at the call sites, and back off on 429.
+_MAX_RETRIES = 2
+_BACKOFF_S = (6, 14)   # waits after the 1st / 2nd 429
+
+
+def _comtrade_fetch(url: str, reporter_code: str, periods_csv: str, *, kind: str) -> list[dict]:
+    """Shared Comtrade preview GET (annual or monthly), retrying on HTTP 429
+    with a short backoff so transient throttling doesn't drop a reporter."""
     params = {
         "reporterCode": reporter_code,
         "cmdCode":      CMD_CSV,
@@ -117,13 +129,52 @@ def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
         "includeDesc":  "true",
     }
     headers = {"Ocp-Apim-Subscription-Key": COMTRADE_API_KEY} if COMTRADE_API_KEY else {}
-    try:
-        r = requests.get(COMTRADE_PREVIEW, params=params, headers=headers, timeout=25)
-        r.raise_for_status()
-        return r.json().get("data", []) or []
-    except Exception as e:
-        log.error("Comtrade fetch error reporter=%s: %s", reporter_code, e)
-        return []
+    for attempt in range(_MAX_RETRIES + 1):
+        try:
+            r = requests.get(url, params=params, headers=headers, timeout=30)
+            if r.status_code == 429 and attempt < _MAX_RETRIES:
+                time.sleep(_BACKOFF_S[attempt])
+                continue
+            r.raise_for_status()
+            return r.json().get("data", []) or []
+        except Exception as e:
+            if attempt < _MAX_RETRIES and "429" in str(e):
+                time.sleep(_BACKOFF_S[attempt])
+                continue
+            log.error("Comtrade %s fetch error reporter=%s: %s", kind, reporter_code, e)
+            return []
+    return []
+
+
+def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
+    """One call: all HS-0901 subcodes × all periods, imports from World."""
+    return _comtrade_fetch(COMTRADE_PREVIEW, reporter_code, periods_csv, kind="annual")
+
+
+def _comtrade_monthly(reporter_code: str, periods_csv: str) -> list[dict]:
+    """Monthly variant (C/M endpoint). Caller must keep the period list short
+    (≤12) — the preview monthly endpoint returns HTTP 400 on long lists."""
+    return _comtrade_fetch(COMTRADE_MONTHLY, reporter_code, periods_csv, kind="monthly")
+
+
+def parse_country_monthly(rows: list[dict]) -> dict:
+    """Monthly total (HS 0901) by month → {'YYYY-MM': mt} (kg→MT)."""
+    wgt: dict[str, dict[str, float]] = {}
+    for d in rows:
+        p = str(d.get("period", ""))            # 'YYYYMM'
+        if len(p) != 6 or not p.isdigit():
+            continue
+        nw = d.get("netWgt")
+        if nw not in (None, 0):
+            wgt.setdefault(f"{p[:4]}-{p[4:6]}", {})[str(d.get("cmdCode", ""))] = float(nw) / 1000.0
+    out: dict[str, float] = {}
+    for ym, w in wgt.items():
+        total = w.get("0901") if "0901" in w else (
+            w.get("090111", 0) + w.get("090112", 0) + w.get("090121", 0)
+            + w.get("090122", 0) + w.get("090190", 0))
+        if total:
+            out[ym] = round(total, 1)
+    return dict(sorted(out.items()))
 
 
 def parse_country_rows(rows: list[dict]) -> list[dict]:
@@ -211,6 +262,40 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
         log.warning("coffee_imports: dropped %d stale reporters (latest < %d): %s",
                     len(stale), fresh_cutoff, ", ".join(stale))
     log.info("coffee_imports: kept %d fresh countries", len(countries))
+
+    # Monthly momentum for the rest-of-world importers (recent 12 months — the
+    # preview monthly endpoint returns HTTP 400 on longer period lists). Skip
+    # the US + EU members (served better by USITC / Eurostat) and limit to the
+    # largest remaining importers so the rate-limited endpoint isn't hammered.
+    eu_members = {"deu", "ita", "fra", "esp", "nld", "bel", "swe", "pol", "aut",
+                  "prt", "fin", "dnk", "grc", "cze", "rou", "hun", "irl"}
+    skip_monthly = eu_members | {"usa"}
+    m_periods = []
+    y, m = now.year, now.month
+    for _ in range(_N_MONTHS):
+        m -= 1
+        if m == 0:
+            m, y = 12, y - 1
+        m_periods.append(f"{y}{m:02d}")
+    m_periods_csv = ",".join(reversed(m_periods))
+
+    def _latest_total(c: dict) -> float:
+        ly = c.get("latest_year")
+        return next((r.get("total_mt") or 0 for r in c["annual"] if r["year"] == ly), 0)
+
+    row_targets = sorted(
+        (kv for kv in countries.items() if kv[0] not in skip_monthly),
+        key=lambda kv: _latest_total(kv[1]), reverse=True,
+    )[:_MONTHLY_TOP_N]
+    n_monthly = 0
+    for _iso3, c in row_targets:
+        mt = parse_country_monthly(_comtrade_monthly(c["reporter_code"], m_periods_csv))
+        if mt:
+            c["monthly_total"] = mt
+            n_monthly += 1
+        time.sleep(1.5)   # space calls out — the preview endpoint 429s easily
+    log.info("coffee_imports: monthly added for %d of %d top rest-of-world importers",
+             n_monthly, len(row_targets))
 
     if not countries:
         # Network unavailable (e.g. egress sandbox) — keep any existing file.
