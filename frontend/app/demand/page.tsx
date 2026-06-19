@@ -140,6 +140,12 @@ function DemandPageInner() {
               blurb="Extra-EU coffee sourcing (Eurostat Comext ds-045409, HS 0901)"
             />
           </Section>
+          <Section>
+            <div className="p-4">
+              <MonthlyTrend src="/data/eu_coffee_imports.json"
+                heading="EU extra-EU imports — monthly (Eurostat)" color="#f59e0b" />
+            </div>
+          </Section>
         </>
       )}
 
