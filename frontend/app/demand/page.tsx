@@ -8,6 +8,7 @@ import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
+import ImportsPanel from "@/components/demand/ImportsPanel";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -16,13 +17,14 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "certified" | "destination" | "spot" | "demand" | "listed" | "test";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "certified",   label: "Certified stocks" },
   { id: "destination", label: "Destination stocks" },
   { id: "spot",        label: "Spot" },
   { id: "demand",      label: "Consumption" },
+  { id: "imports",     label: "Imports" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
 ];
@@ -105,6 +107,12 @@ function DemandPageInner() {
           <Section><RoastingMixPanel /></Section>
           <Section><KaffeesteuerChart /></Section>
         </>
+      )}
+
+      {tab === "imports" && (
+        <Section>
+          <ImportsPanel />
+        </Section>
       )}
 
       {tab === "listed" && (

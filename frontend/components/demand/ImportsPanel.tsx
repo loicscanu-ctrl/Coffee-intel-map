@@ -1,0 +1,242 @@
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import {
+  BarChart, Bar, ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  Legend, CartesianGrid,
+} from "recharts";
+
+interface ImpYear {
+  year: number;
+  total_mt: number | null;
+  green_mt: number | null;
+  roasted_mt: number | null;
+  decaf_mt: number | null;
+  husks_mt: number | null;
+  value_usd: number | null;
+}
+interface ImpCountry {
+  name: string;
+  iso3: string;
+  reporter_code: string;
+  annual: ImpYear[];
+  latest_year: number;
+}
+interface CoffeeImports {
+  updated: string;
+  source: string;
+  hs_codes: Record<string, string>;
+  is_seed?: boolean;
+  seed_note?: string;
+  countries: Record<string, ImpCountry>;
+}
+
+const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
+const GREEN = "#16a34a", ROASTED = "#b45309", DECAF = "#06b6d4";
+
+const kt = (mt: number | null | undefined) => (mt == null ? null : mt / 1000);
+const fmtKt = (v: number | null | undefined) => (v == null ? "—" : `${Math.round(v).toLocaleString()} kt`);
+
+function latest(c: ImpCountry): ImpYear | undefined {
+  return c.annual.find(a => a.year === c.latest_year) ?? c.annual[c.annual.length - 1];
+}
+
+export default function ImportsPanel() {
+  const [data, setData] = useState<CoffeeImports | null>(null);
+  const [error, setError] = useState(false);
+  const [sel, setSel] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/data/coffee_imports.json")
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: CoffeeImports) => {
+        setData(d);
+        // default selection: largest importer in the latest year
+        const top = Object.entries(d.countries)
+          .map(([k, c]) => [k, latest(c)?.total_mt ?? 0] as const)
+          .sort((a, b) => b[1] - a[1])[0];
+        if (top) setSel(top[0]);
+      })
+      .catch(() => setError(true));
+  }, []);
+
+  const countries = useMemo(() => data?.countries ?? {}, [data]);
+  const list = useMemo(() => Object.entries(countries), [countries]);
+
+  // Latest-year ranking (total) + form-of-import composition.
+  const ranking = useMemo(() =>
+    list.map(([k, c]) => {
+      const ly = latest(c);
+      return {
+        key: k, name: c.name,
+        total: kt(ly?.total_mt) ?? 0,
+        green: kt(ly?.green_mt) ?? 0,
+        roasted: kt(ly?.roasted_mt) ?? 0,
+        year: ly?.year,
+      };
+    }).filter(r => r.total > 0).sort((a, b) => b.total - a.total),
+  [list]);
+
+  const selCountry = countries[sel];
+  const trend = useMemo(() => (selCountry?.annual ?? []).map(a => ({
+    year: a.year,
+    green: kt(a.green_mt),
+    roasted: kt(a.roasted_mt),
+    decaf: kt(a.decaf_mt),
+  })), [selCountry]);
+
+  if (error) return null;
+  if (!data) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading coffee-import data…</div>;
+  if (ranking.length === 0) {
+    return <div className="p-4 text-xs text-slate-500">No coffee-import data yet — awaiting first UN Comtrade pull.</div>;
+  }
+
+  const worldTotal = ranking.reduce((s, r) => s + r.total, 0);
+  const topComposition = ranking.slice(0, 14);
+
+  return (
+    <div className="p-4 space-y-4">
+      <div className="flex items-baseline justify-between flex-wrap gap-2">
+        <div>
+          <h2 className="text-lg font-bold text-white">Coffee Imports by Country</h2>
+          <p className="text-xs text-slate-400">
+            HS 0901 imports from World · {ranking.length} markets · {data.source}
+          </p>
+        </div>
+        <div className="text-[10px] font-mono text-slate-400">
+          Σ tracked: <span className="text-white">{fmtKt(worldTotal)}</span>
+          <span className="text-slate-600"> · updated {data.updated.slice(0, 10)}</span>
+        </div>
+      </div>
+
+      {data.is_seed && (
+        <div className="rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+          ⚠ Preview/seed figures — replaced by the live UN Comtrade pull once network egress to
+          <code className="mx-1 px-1 rounded bg-slate-800 text-amber-300">comtradeapi.un.org</code>is enabled.
+          {data.seed_note ? <span className="text-amber-300/70"> {data.seed_note}</span> : null}
+        </div>
+      )}
+
+      {/* Ranking + composition */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
+          <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
+            Total coffee imports — latest year (kt/yr)
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ranking} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 8, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={84} interval={0} />
+                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`${Number(v).toLocaleString()} kt`, "Imports"]} />
+                <Bar dataKey="total" fill="#f59e0b" radius={[0, 2, 2, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
+          <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
+            Form of import — green vs roasted (top 14, kt/yr)
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={topComposition} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 8, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={84} interval={0} />
+                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => [`${Number(v).toLocaleString()} kt`, n === "green" ? "Green" : "Roasted"]} />
+                <Legend wrapperStyle={{ fontSize: 9 }} />
+                <Bar dataKey="green" stackId="a" fill={GREEN} radius={[0, 0, 0, 0]} />
+                <Bar dataKey="roasted" stackId="a" fill={ROASTED} radius={[0, 2, 2, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Per-country trend */}
+      <div className="bg-slate-800 rounded-lg border border-slate-700 p-3 space-y-3">
+        <div className="text-[10px] text-slate-400 uppercase tracking-wide">
+          Import trend by form — green / roasted (stacked) + decaffeinated
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {ranking.map(r => (
+            <button key={r.key} onClick={() => setSel(r.key)}
+              className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
+                r.key === sel ? "border-transparent bg-amber-500 text-slate-900 font-medium" : "border-slate-700 text-slate-400 hover:text-slate-200"
+              }`}>
+              {r.name}
+            </button>
+          ))}
+        </div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={trend} margin={{ top: 4, right: 12, left: -8, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} width={40} />
+              <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => {
+                if (v == null) return ["—", String(n)];
+                const lbl = n === "green" ? "Green" : n === "roasted" ? "Roasted" : "Decaf (of total)";
+                return [`${Number(v).toLocaleString()} kt`, lbl];
+              }} />
+              <Legend wrapperStyle={{ fontSize: 9 }} />
+              <Area dataKey="green" stackId="f" stroke={GREEN} fill={GREEN} fillOpacity={0.5} connectNulls />
+              <Area dataKey="roasted" stackId="f" stroke={ROASTED} fill={ROASTED} fillOpacity={0.5} connectNulls />
+              <Line dataKey="decaf" stroke={DECAF} strokeWidth={1.6} dot={false} connectNulls strokeDasharray="3 2" />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Detail table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="text-[9px] text-slate-400 uppercase tracking-wide border-b border-slate-700">
+              <th className="text-left  px-2 py-1.5">Market</th>
+              <th className="text-right px-2 py-1.5">Year</th>
+              <th className="text-right px-2 py-1.5">Total</th>
+              <th className="text-right px-2 py-1.5">Green</th>
+              <th className="text-right px-2 py-1.5">Roasted</th>
+              <th className="text-right px-2 py-1.5">Decaf</th>
+              <th className="text-right px-2 py-1.5">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ranking.map(r => {
+              const ly = latest(countries[r.key])!;
+              const pctRoasted = ly.total_mt && ly.roasted_mt ? (ly.roasted_mt / ly.total_mt) * 100 : null;
+              const pctDecaf = ly.total_mt && ly.decaf_mt ? (ly.decaf_mt / ly.total_mt) * 100 : null;
+              return (
+                <tr key={r.key} className={`border-b border-slate-800 hover:bg-slate-800/40 cursor-pointer ${r.key === sel ? "bg-slate-800/30" : ""}`}
+                  onClick={() => setSel(r.key)}>
+                  <td className="px-2 py-1 text-slate-200">{r.name}</td>
+                  <td className="px-2 py-1 text-right text-slate-500 font-mono">{ly.year}</td>
+                  <td className="px-2 py-1 text-right font-mono text-amber-300">{fmtKt(kt(ly.total_mt))}</td>
+                  <td className="px-2 py-1 text-right font-mono text-slate-300">{fmtKt(kt(ly.green_mt))}</td>
+                  <td className="px-2 py-1 text-right font-mono text-slate-300">
+                    {fmtKt(kt(ly.roasted_mt))}{pctRoasted != null && <span className="text-slate-600"> ({pctRoasted.toFixed(0)}%)</span>}
+                  </td>
+                  <td className="px-2 py-1 text-right font-mono text-slate-400">
+                    {pctDecaf != null ? `${pctDecaf.toFixed(0)}%` : "—"}
+                  </td>
+                  <td className="px-2 py-1 text-right font-mono text-slate-400">
+                    {ly.value_usd != null ? `$${(ly.value_usd / 1e9).toFixed(1)}bn` : "—"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="text-[9px] text-slate-500 italic">
+        Imports of HS 0901 (coffee) from World, UN Comtrade. Green = not-roasted (0901.11/.12); roasted = 0901.21/.22;
+        decaf (0901.12 + .22) is a cross-cut shown as a share of total. Weights net kg → MT → kt. Netherlands/Belgium
+        figures include substantial re-export hubs. Value is CIF import value where reported.
+      </div>
+    </div>
+  );
+}
