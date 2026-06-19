@@ -168,6 +168,84 @@ def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
     return {"years": years, "origins": origins, "total_by_year": total_by_year}
 
 
+def _month_code(t: str) -> str | None:
+    """Comext monthly time code → 'YYYY-MM' ('202401' / '2024-01' / '2024M01')."""
+    digs = re.sub(r"[^0-9]", "", str(t))
+    if len(digs) >= 6 and 1 <= int(digs[4:6]) <= 12:
+        return f"{digs[:4]}-{digs[4:6]}"
+    return None
+
+
+def _fetch_monthly(last_n: int) -> dict:
+    """Recent `last_n` months of monthly EU-bloc HS-0901 imports by partner.
+    Uses lastTimePeriod (annual time= doesn't expand to months); large windows
+    trip Comext's async 413, so the caller steps the window down."""
+    params = [("format", "JSON"), ("freq", "M"), ("reporter", REPORTER),
+              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
+              ("lastTimePeriod", str(last_n))]
+    try:
+        r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
+        if r.status_code != 200:
+            log.info("Eurostat monthly lastN=%d HTTP %s: %s", last_n, r.status_code, r.text[:160])
+            return {}
+        body = r.json()
+        tdim = body.get("dimension", {}).get("time", {}).get("category", {}).get("index", {})
+        log.info("Eurostat monthly lastN=%d size=%s nval=%d times=%s", last_n, body.get("size"),
+                 len(body.get("value", {}) or {}), list(tdim)[:3])
+        return body
+    except Exception as e:
+        log.error("Eurostat monthly fetch error lastN=%d: %s", last_n, e)
+        return {}
+
+
+def parse_monthly_total(body: dict) -> dict:
+    """Sum extra-EU partners per month → {'YYYY-MM': mt}. (Excludes EU members
+    and bloc aggregates, like the annual parse.)"""
+    try:
+        ids, sizes, dims, values = body["id"], body["size"], body["dimension"], body["value"]
+    except (KeyError, TypeError):
+        return {}
+    if not values:
+        return {}
+
+    def pos_to_code(dim: str) -> dict[int, str]:
+        idx = dims[dim]["category"]["index"]
+        return {v: k for k, v in idx.items()} if isinstance(idx, dict) else dict(enumerate(idx))
+
+    def find_dim(*cands: str) -> str | None:
+        for c in cands:
+            if c in ids:
+                return c
+        return next((d for d in ids if any(c in d.lower() for c in cands)), None)
+
+    pdim, tdim = find_dim("partner"), find_dim("time")
+    if not pdim or not tdim:
+        return {}
+    pcodes, tcodes = pos_to_code(pdim), pos_to_code(tdim)
+    strides = [1] * len(ids)
+    for i in range(len(ids) - 2, -1, -1):
+        strides[i] = strides[i + 1] * sizes[i + 1]
+    pi, ti = ids.index(pdim), ids.index(tdim)
+
+    out: dict[str, float] = {}
+    for flat, val in values.items():
+        if val is None:
+            continue
+        f = int(flat)
+        pcode = pcodes.get((f // strides[pi]) % sizes[pi])
+        tc = tcodes.get((f // strides[ti]) % sizes[ti])
+        if not pcode or pcode in SKIP_PARTNERS or pcode in EU_MEMBERS:
+            continue
+        mk = _month_code(tc) if tc else None
+        if not mk:
+            continue
+        try:
+            out[mk] = round(out.get(mk, 0.0) + float(val) * KG_PER_UNIT / 1000.0, 1)
+        except (TypeError, ValueError):
+            continue
+    return dict(sorted(out.items()))
+
+
 def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
@@ -181,6 +259,16 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         if OUT_PATH.exists():
             return json.loads(OUT_PATH.read_text(encoding="utf-8"))
 
+    # Monthly extra-EU total. Step the window down until Comext returns it
+    # synchronously (large windows trigger an async 413).
+    monthly: dict[str, float] = {}
+    for last_n in (36, 24, 12):
+        monthly = parse_monthly_total(_fetch_monthly(last_n))
+        log.info("Eurostat monthly lastN=%d → %d points", last_n, len(monthly))
+        if monthly:
+            break
+    monthly = {k: v for k, v in sorted(monthly.items()) if v > 0}
+
     out = {
         "updated":       now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source":        "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (100kg→MT)",
@@ -190,6 +278,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         "years":         parsed["years"],
         "origins":       parsed["origins"],
         "total_by_year": parsed["total_by_year"],
+        "monthly_total": monthly,
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")

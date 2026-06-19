@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scraper.sources.eurostat_imports import clean_name, parse_jsonstat
+from scraper.sources.eurostat_imports import _month_code, clean_name, parse_jsonstat, parse_monthly_total
 
 
 def _cube(partners, years, values, labels):
@@ -75,3 +75,19 @@ def test_clean_name_strips_parentheticals_and_renames():
     assert clean_name("Viet Nam (incl. North Viet Nam 'VD' from 1977)") == "Vietnam"
     assert clean_name("Ethiopia (incl. Eritrea 'ER' -> 1993)") == "Ethiopia"
     assert clean_name("Brazil") == "Brazil"
+
+
+def test_month_code_formats():
+    assert _month_code("202401") == "2024-01"
+    assert _month_code("2024-01") == "2024-01"
+    assert _month_code("2024M03") == "2024-03"
+    assert _month_code("2024") is None
+
+
+def test_parse_monthly_total_sums_extra_eu_partners():
+    # BR kept (extra-EU); DE excluded (EU member). 100-kg units → /10 MT.
+    cube = _cube(["BR", "DE"], ["2024-01", "2024-02"],
+                 {"0": 10_000, "1": 11_000, "2": 99_999, "3": 88_888},
+                 {"BR": "Brazil", "DE": "Germany"})
+    out = parse_monthly_total(cube)
+    assert out == {"2024-01": 1000.0, "2024-02": 1100.0}
