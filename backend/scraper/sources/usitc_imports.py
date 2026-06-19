@@ -191,7 +191,7 @@ def parse_monthly(resp: dict) -> dict:
                 continue
             for idx, mo in name_months:
                 kg = _num(row[idx]) if (mo and idx < len(row)) else None
-                if kg is not None:
+                if kg:   # 0 / blank ⇒ month not yet reported — skip
                     key = f"{ym.group(1)}-{mo:02d}"
                     by_month[key] = round(by_month.get(key, 0.0) + kg / 1000.0, 1)
     else:   # fallback: 'Jan 2024' / '2024-01' style columns
@@ -199,7 +199,7 @@ def parse_monthly(resp: dict) -> dict:
         for row in rows:
             for idx, mk in month_cols:
                 kg = _num(row[idx]) if idx < len(row) else None
-                if kg is not None:
+                if kg:
                     by_month[mk] = round(by_month.get(mk, 0.0) + kg / 1000.0, 1)
     return dict(sorted(by_month.items()))
 
