@@ -233,7 +233,7 @@ export default function ImportsPanel() {
         </div>
         {mode === "monthly" && (
           <div className="text-[9px] text-slate-500 italic">
-            Monthly total HS-0901 imports (kt), recent ~24 months, UN Comtrade. ● marks markets with a monthly series.
+            Monthly total HS-0901 imports (kt), recent ~12 months, UN Comtrade. ● marks markets with a monthly series.
             Gaps = months not yet reported. US &amp; EU monthly live in their own panels below (USITC / Eurostat).
           </div>
         )}
