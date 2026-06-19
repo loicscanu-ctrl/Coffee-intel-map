@@ -176,22 +176,25 @@ def _month_code(t: str) -> str | None:
     return None
 
 
-def _fetch_monthly(year: str) -> dict:
-    """One year of monthly EU-bloc HS-0901 imports by partner (freq=M)."""
+def _fetch_monthly(last_n: int) -> dict:
+    """Recent `last_n` months of monthly EU-bloc HS-0901 imports by partner.
+    Uses lastTimePeriod (annual time= doesn't expand to months); large windows
+    trip Comext's async 413, so the caller steps the window down."""
     params = [("format", "JSON"), ("freq", "M"), ("reporter", REPORTER),
-              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR), ("time", year)]
+              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
+              ("lastTimePeriod", str(last_n))]
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
         if r.status_code != 200:
-            log.info("Eurostat monthly %s HTTP %s: %s", year, r.status_code, r.text[:200])
+            log.info("Eurostat monthly lastN=%d HTTP %s: %s", last_n, r.status_code, r.text[:160])
             return {}
         body = r.json()
         tdim = body.get("dimension", {}).get("time", {}).get("category", {}).get("index", {})
-        log.info("Eurostat monthly %s size=%s nval=%d times=%s", year, body.get("size"),
-                 len(body.get("value", {}) or {}), list(tdim)[:4])
+        log.info("Eurostat monthly lastN=%d size=%s nval=%d times=%s", last_n, body.get("size"),
+                 len(body.get("value", {}) or {}), list(tdim)[:3])
         return body
     except Exception as e:
-        log.error("Eurostat monthly fetch error %s: %s", year, e)
+        log.error("Eurostat monthly fetch error lastN=%d: %s", last_n, e)
         return {}
 
 
@@ -256,13 +259,14 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         if OUT_PATH.exists():
             return json.loads(OUT_PATH.read_text(encoding="utf-8"))
 
-    # Monthly extra-EU total, recent window, fetched a year at a time to stay
-    # under Comext's async threshold. 0/unreported months are simply absent.
+    # Monthly extra-EU total. Step the window down until Comext returns it
+    # synchronously (large windows trigger an async 413).
     monthly: dict[str, float] = {}
-    for y in [str(now.year - i) for i in range(4)]:
-        mt = parse_monthly_total(_fetch_monthly(y))
-        log.info("Eurostat monthly %s → %d points", y, len(mt))
-        monthly.update(mt)
+    for last_n in (36, 24, 12):
+        monthly = parse_monthly_total(_fetch_monthly(last_n))
+        log.info("Eurostat monthly lastN=%d → %d points", last_n, len(monthly))
+        if monthly:
+            break
     monthly = {k: v for k, v in sorted(monthly.items()) if v > 0}
 
     out = {
