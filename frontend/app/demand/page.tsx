@@ -9,6 +9,7 @@ import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPan
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
+import UsImportsByOrigin from "@/components/demand/UsImportsByOrigin";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -110,9 +111,10 @@ function DemandPageInner() {
       )}
 
       {tab === "imports" && (
-        <Section>
-          <ImportsPanel />
-        </Section>
+        <>
+          <Section><ImportsPanel /></Section>
+          <Section><UsImportsByOrigin /></Section>
+        </>
       )}
 
       {tab === "listed" && (
