@@ -6,6 +6,8 @@ flaky from CI. We exercise only the pure-Python parsing primitives
 that determine output correctness."""
 from __future__ import annotations
 
+import json
+
 from scraper.sources import dane_colombia_exports as dane
 from scraper.sources import fnc_colombia_monthly as fnc
 
@@ -86,6 +88,67 @@ def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
     assert by_month["2026-02"].total_k_bags       == 847.0
     assert by_month["2026-02"].yoy_pct            == -28.5
     assert by_month["2026-02"].production_yoy_pct is None
+
+
+def test_fnc_parse_bulletin_drops_entries_dated_in_the_future(monkeypatch):
+    """v5 bug: stale bulletins whose body anchor uses a phrasing the
+    regex doesn't match fall back to filename/folder, which dates them
+    to the current year. Result: 2026-05 through 2026-10 rows from
+    2025 bulletins, all bogus. v6 hard-filters anything in the future."""
+    import datetime as _dt
+    class _Frozen(_dt.date):
+        @classmethod
+        def today(cls):
+            return _dt.date(2026, 6, 19)
+    monkeypatch.setattr(fnc, "date", _Frozen)
+    # Bulletin filename: "Informe-mensual-julio-p" in /2026/03/ folder.
+    # Body anchor missed (phrased differently). Filename mn=7 (Julio),
+    # folder year=2026 ⇒ data month 2026-07 — three weeks AFTER today.
+    text = (
+        "• Para este mes, la producción de café alcanzó 920 mil sacos, lo que\n"
+        "  representó una recuperación del 5,4 % respecto al año anterior.\n"
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/03/"
+           "Informe-mensual-julio-p.pdf")
+    assert fnc.parse_bulletin(text, url) == ()
+
+
+def test_fnc_merge_purges_existing_rows_violating_invariants(tmp_path, monkeypatch):
+    """The persisted JSON accumulates rows across runs. When earlier
+    versions of the parser shipped garbage (future months, 100x rows),
+    those values stick until something overwrites the exact key. v6
+    purges them at merge time so the JSON heals on the next run."""
+    import datetime as _dt
+    class _Frozen(_dt.date):
+        @classmethod
+        def today(cls):
+            return _dt.date(2026, 6, 19)
+    monkeypatch.setattr(fnc, "date", _Frozen)
+    monkeypatch.setattr(fnc, "OUT_PATH", tmp_path / "colombia_supply.json")
+    # Seed an existing JSON with two known-bad rows + one good DANE row.
+    existing = {
+        "exports": {
+            "source": "Test",
+            "monthly": [
+                # Good DANE-sourced row — keep.
+                {"month": "2026-02", "total_k_bags": 789.7,
+                 "total_t": 47380.5, "source_xls": "u1"},
+                # Bad: future month — purge.
+                {"month": "2026-11", "total_k_bags": 122000.0,
+                 "yoy_pct": 2.1, "source_pdf": "stale"},
+                # Bad: future month, modest value — still purge.
+                {"month": "2026-09", "total_k_bags": 1000.0,
+                 "yoy_pct": 18.8, "source_pdf": "stale"},
+                # Good historical — keep.
+                {"month": "2025-12", "total_k_bags": 1100.0,
+                 "yoy_pct": -19.0, "source_pdf": "legit"},
+            ],
+        },
+    }
+    fnc.OUT_PATH.write_text(json.dumps(existing), encoding="utf-8")
+    doc = fnc._merge_into_supply([])  # no new entries — purge only
+    months = {r["month"] for r in doc["exports"]["monthly"]}
+    assert months == {"2026-02", "2025-12"}
 
 
 def test_fnc_body_year_overrides_filename_for_re_uploaded_stale_bulletins():
