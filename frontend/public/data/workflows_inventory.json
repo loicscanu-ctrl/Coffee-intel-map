@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-19T12:08:25.696498Z",
-  "count": 54,
+  "generated_at": "2026-06-19T12:27:15.019521Z",
+  "count": 55,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -477,6 +477,20 @@
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
       "timeout_minutes": null
+    },
+    {
+      "file": "scraper-eurostat-imports.yml",
+      "name": "3.10 \u2013 EU Coffee Imports by Origin (Eurostat Comext)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 8 17 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
     },
     {
       "file": "scraper-freight.yml",
