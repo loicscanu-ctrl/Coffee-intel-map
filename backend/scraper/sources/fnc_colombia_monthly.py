@@ -173,13 +173,32 @@ _YOY_NEG_KW_RE = re.compile(
 )
 
 # Body-year anchor: every monthly bulletin pairs its YoY comparison with
-# an explicit "frente al mismo mes de YYYY" / "frente al mismo periodo
-# de YYYY" / "respecto a YYYY" phrase. The data year = YYYY + 1 (the
-# YoY anchor is always the year BEFORE the data month). This anchor is
-# the most reliable year signal we have — filenames and upload folders
-# both lie when FNC re-uploads stale bulletins into new year folders.
+# an explicit Spanish phrase + the comparison year. The data year =
+# YYYY + 1 (the YoY anchor is always the year BEFORE the data month).
+# This anchor is the most reliable year signal we have — filenames and
+# upload folders both lie when FNC re-uploads stale bulletins into new
+# year folders. v6 covered "frente al mismo (mes|periodo) de YYYY";
+# v7 also catches "respecto a YYYY", "respecto al año YYYY",
+# "comparado con YYYY", "vs YYYY", "del año YYYY", and "(el)
+# mismo mes de YYYY" (without the leading 'frente al').
 _BODY_YEAR_RE = re.compile(
-    r"frente\s+al\s+mismo\s+(?:mes|periodo)\s+de\s+(?P<yr>20\d{2})", re.I,
+    r"(?:frente\s+al\s+mismo\s+(?:mes|periodo)\s+de"
+    r"|mismo\s+mes\s+de"
+    r"|respecto\s+(?:a|al|del)(?:\s+(?:mismo\s+mes\s+(?:de|del)|a[ñn]o))?"
+    r"|comparado\s+con"
+    r"|vs\.?(?:\s+el\s+a[ñn]o)?"
+    r"|del\s+a[ñn]o"
+    r")\s+(?P<yr>20\d{2})", re.I,
+)
+
+# Title-year fallback: if no in-body anchor matches, scan the bulletin's
+# header block (first ~1000 chars) for an explicit month-year pair like
+# "ENERO 2026" / "Marzo de 2025". The title is usually the most
+# trustworthy year signal — FNC always types it in fresh for each
+# bulletin even when they re-use a filename template.
+_TITLE_YEAR_RE = re.compile(
+    r"(?:" + "|".join(SPANISH_MONTHS) + r")\b[^a-zA-Z0-9]{0,8}(?P<yr>20\d{2})",
+    re.I,
 )
 
 # Sanity bound — Colombia's monthly exports max out around 1300 k-bags;
@@ -402,6 +421,22 @@ _NEXT_BULLET_RE = re.compile(
 )
 
 
+def _title_bulletin_year(text: str, expected_month: int) -> int | None:
+    """Scan the bulletin header (first ~1000 chars) for a month-year
+    pair where the month matches `expected_month`. This is the year
+    backup when the body-year anchor misses — FNC always types the
+    bulletin month + year in the title block, even when they re-use
+    a year-less filename template like 'Informe-mensual-enero-p.pdf'."""
+    header = text[:1000]
+    for m in _TITLE_YEAR_RE.finditer(header):
+        # Resolve the matched month token to a number.
+        token = m.group(0).split()[0].lower().rstrip(",.;:")
+        base = re.split(r"[\s\-_]", token, maxsplit=1)[0]
+        if SPANISH_MONTHS.get(base) == expected_month:
+            return int(m.group("yr"))
+    return None
+
+
 def _body_data_year_near(text: str, end_idx: int) -> int | None:
     """Read the bullet's tail for 'frente al mismo mes de YYYY' and
     return YYYY+1 — the data year that comparison anchors to.
@@ -476,6 +511,14 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
         return ()
     bulletin_yr, bulletin_mn = fn_month
 
+    # Title-year override: when the filename has no year and we'd fall
+    # back to folder, the header block usually has a typed-in
+    # "ENERO 2026" pair that's far more trustworthy. Folder dates lie
+    # for re-uploaded stale bulletins; title text does not.
+    title_yr = _title_bulletin_year(text, bulletin_mn)
+    if title_yr is not None:
+        bulletin_yr = title_yr
+
     entries: list[MonthlyEntry] = []
 
     # ── Production: this is the bulletin month.
@@ -484,8 +527,8 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
         num = _fnc_number(prod_m.group("num"))
         if num is not None:
             k_bags = num * _unit_scale(prod_m.group("unit"))
-            # Body-year override: trust "frente al mismo mes de YYYY"
-            # over filename/folder inference when present.
+            # Body-year override: trust the in-bullet anchor over
+            # title/filename/folder inference when present.
             body_yr = _body_data_year_near(text, prod_m.end())
             prod_yr = body_yr if body_yr is not None else bulletin_yr
             month_key = f"{prod_yr:04d}-{bulletin_mn:02d}"

@@ -90,6 +90,53 @@ def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
     assert by_month["2026-02"].production_yoy_pct is None
 
 
+def test_fnc_title_year_overrides_folder_for_stale_re_uploads():
+    """v6 added a body-year anchor, but the regex only knew the
+    'frente al mismo (mes|periodo) de YYYY' phrasing. Some older
+    bulletins use 'respecto a YYYY' / 'comparado con YYYY' / nothing
+    explicit at all — those still misattributed.
+
+    v7 adds the title-block scan as a separate backstop: the bulletin
+    header always types in 'ENERO 2025' (or similar) regardless of
+    the YoY phrasing the bullet later uses. When the filename has no
+    year, the title is preferred over the upload folder."""
+    text = (
+        "INFORME MENSUAL\nENERO 2025\n"  # header — typed-in year 2025
+        "• Para este mes, la producción de café alcanzó 1.020 mil sacos,\n"
+        "  una recuperación del 5,4 % respecto al año anterior.\n"  # ← v6 regex misses this
+        "• Las exportaciones definitivas de café en diciembre se ubicaron\n"
+        "  en 1,3 millones de sacos, comparado con 2023 hubo crecimiento\n"
+        "  del 22,2%.\n"
+    )
+    # Filename has no year, folder is /2026/01/ — folder fallback would
+    # incorrectly say 2026. Title says 2025.
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/01/"
+           "1.-Informe-mensual-enero-p.pdf")
+    by_month = {e.month: e for e in fnc.parse_bulletin(text, url)}
+    # Title gave bulletin year = 2025; production data month = 2025-01.
+    assert "2025-01" in by_month
+    assert by_month["2025-01"].production_k_bags == 1020.0
+    # Exports for December — body anchor matches 'comparado con 2023'
+    # (v7 expanded regex) ⇒ data year 2024.
+    assert "2024-12" in by_month
+    assert by_month["2024-12"].total_k_bags == 1300.0
+    # The stuck 2025-12 = 1300 misattribution MUST NOT appear.
+    assert "2025-12" not in by_month
+    assert "2026-01" not in by_month
+
+
+def test_fnc_body_year_anchor_handles_respecto_and_comparado_phrasings():
+    """v7 expanded the body-year regex beyond 'frente al mismo mes de
+    YYYY' to also cover 'respecto a YYYY', 'comparado con YYYY',
+    'vs YYYY', 'del año YYYY' — common alternative Spanish phrasings."""
+    # 'respecto a YYYY'
+    assert fnc._body_data_year_near("X respecto a 2024 hubo", 1) == 2025
+    # 'comparado con YYYY'
+    assert fnc._body_data_year_near("X comparado con 2023", 1) == 2024
+    # 'vs YYYY'
+    assert fnc._body_data_year_near("X vs 2024", 1) == 2025
+
+
 def test_fnc_parse_bulletin_drops_entries_dated_in_the_future(monkeypatch):
     """v5 bug: stale bulletins whose body anchor uses a phrasing the
     regex doesn't match fall back to filename/folder, which dates them
