@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-19T13:42:05Z",
+  "updated": "2026-06-19T13:47:24Z",
   "source": "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (100kg→MT)",
   "hts": "0901",
   "measure": "quantity_mt",
@@ -26,7 +26,7 @@
       "latest_mt": 1005236.8
     },
     {
-      "name": "Viet Nam (incl. North Viet Nam 'VD' from 1977)",
+      "name": "Vietnam",
       "by_year": {
         "2020": 642070.1,
         "2021": 549075.8,
@@ -74,7 +74,7 @@
       "latest_mt": 136451.4
     },
     {
-      "name": "Ethiopia (incl. Eritrea 'ER' -> 1993)",
+      "name": "Ethiopia",
       "by_year": {
         "2020": 77621.8,
         "2021": 83457.6,
@@ -98,7 +98,7 @@
       "latest_mt": 110319.1
     },
     {
-      "name": "Indonesia (incl. East Timor 'TP' from 1977 -> 2000)",
+      "name": "Indonesia",
       "by_year": {
         "2020": 77380.5,
         "2021": 85949.8,
@@ -122,7 +122,7 @@
       "latest_mt": 82470.0
     },
     {
-      "name": "Switzerland (incl. Liechtenstein 'LI' -> 1994)",
+      "name": "Switzerland",
       "by_year": {
         "2020": 60765.6,
         "2021": 60986.7,
@@ -146,7 +146,7 @@
       "latest_mt": 48645.7
     },
     {
-      "name": "Tanzania, United Republic of",
+      "name": "Tanzania",
       "by_year": {
         "2020": 30631.9,
         "2021": 40187.2,
@@ -242,7 +242,7 @@
       "latest_mt": 10987.6
     },
     {
-      "name": "Côte d’Ivoire (Ivory Coast)",
+      "name": "Côte d’Ivoire",
       "by_year": {
         "2020": 25910.4,
         "2021": 13196.9,
@@ -314,7 +314,7 @@
       "latest_mt": 3872.5
     },
     {
-      "name": "Lao People’s Democratic Republic (Laos)",
+      "name": "Lao People’s Democratic Republic",
       "by_year": {
         "2020": 12936.2,
         "2021": 12196.1,
@@ -469,7 +469,7 @@
       "latest_mt": 837.6
     },
     {
-      "name": "Syrian Arab Republic (Syria)",
+      "name": "Syrian Arab Republic",
       "by_year": {
         "2020": 1026.9,
         "2021": 1045.3,
@@ -565,7 +565,7 @@
       "latest_mt": 506.9
     },
     {
-      "name": "United States (incl. Navassa Island (part of 'UM') from 1995 -> 2000)",
+      "name": "United States",
       "by_year": {
         "2020": 8282.6,
         "2021": 4529.3,
@@ -637,7 +637,7 @@
       "latest_mt": 252.0
     },
     {
-      "name": "Panama (incl. Panama Canal Zone 'PZ' from 1981)",
+      "name": "Panama",
       "by_year": {
         "2020": 420.6,
         "2021": 370.1,
@@ -673,7 +673,7 @@
       "latest_mt": 218.0
     },
     {
-      "name": "Myanmar (Burma)",
+      "name": "Myanmar",
       "by_year": {
         "2020": 118.2,
         "2021": 140.4,
@@ -721,7 +721,7 @@
       "latest_mt": 171.7
     },
     {
-      "name": "Norway (incl. Svalbard and Jan Mayen 'SJ' -> 1994 and again from 1997)",
+      "name": "Norway",
       "by_year": {
         "2020": 732.7,
         "2021": 592.2,
@@ -847,7 +847,7 @@
       "latest_mt": 36.1
     },
     {
-      "name": "Korea, Republic of (South Korea)",
+      "name": "South Korea",
       "by_year": {
         "2020": 3.5,
         "2021": 8.2,
@@ -871,7 +871,7 @@
       "latest_mt": 32.5
     },
     {
-      "name": "Yemen (incl. South Yemen 'YD' from 1991)",
+      "name": "Yemen",
       "by_year": {
         "2020": 17.8,
         "2021": 52.1,
@@ -983,7 +983,7 @@
       "latest_mt": 17.8
     },
     {
-      "name": "Russian Federation (Russia)",
+      "name": "Russia",
       "by_year": {
         "2020": 255.1,
         "2021": 150.9,
@@ -1027,7 +1027,7 @@
       "latest_mt": 7.6
     },
     {
-      "name": "Israel (incl. West Bank and Gaza Strip 'XP' -> 1994)",
+      "name": "Israel",
       "by_year": {
         "2020": 24.4,
         "2021": 9.5,
@@ -1106,7 +1106,7 @@
       "latest_mt": 3.8
     },
     {
-      "name": "South Africa (incl. Namibia 'NA' -> 1989)",
+      "name": "South Africa",
       "by_year": {
         "2020": 13.1,
         "2021": 441.2,
@@ -1172,7 +1172,7 @@
       "latest_mt": 1.7
     },
     {
-      "name": "Eswatini (Ngwane)",
+      "name": "Eswatini",
       "by_year": {
         "2021": 0.0,
         "2022": 0.0,
@@ -1287,7 +1287,7 @@
       "latest_mt": 0.6
     },
     {
-      "name": "Sudan (incl. South Sudan 'SS' -> 2012)",
+      "name": "Sudan",
       "by_year": {
         "2020": 0.0,
         "2021": 0.0,
@@ -1435,7 +1435,7 @@
       "latest_mt": 0.1
     },
     {
-      "name": "Occupied Palestinian Territory (West Bank (incl. East Jerusalem) and Gaza Strip)",
+      "name": "Occupied Palestinian Territory",
       "by_year": {
         "2020": 0.0,
         "2023": 0.0,
@@ -1476,7 +1476,7 @@
       "latest_mt": 0.1
     },
     {
-      "name": "Ceuta (incl. Melilla 'XL' -> 1998)",
+      "name": "Ceuta",
       "by_year": {
         "2020": 18.3,
         "2022": 0.1
@@ -1625,7 +1625,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Belarus (Belorussia)",
+      "name": "Belarus",
       "by_year": {
         "2020": 0.0,
         "2021": 0.4,
@@ -1713,7 +1713,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Falkland Islands (Malvinas)",
+      "name": "Falkland Islands",
       "by_year": {
         "2021": 0.0
       },
@@ -1806,7 +1806,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Comoros (incl. Mayotte 'YT' -> 1976)",
+      "name": "Comoros",
       "by_year": {
         "2022": 0.0
       },
@@ -1871,7 +1871,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Mauritania (incl. Spanish Sahara from 1977)",
+      "name": "Mauritania",
       "by_year": {
         "2025": 0.0
       },
@@ -1958,7 +1958,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Sint Maarten (Dutch part)",
+      "name": "Sint Maarten",
       "by_year": {
         "2020": 0.1,
         "2021": 1.3,
@@ -2040,7 +2040,7 @@
       "latest_mt": 0.0
     },
     {
-      "name": "Virgin Islands, British (incl. Montserrat 'MS' -> 1994)",
+      "name": "Virgin Islands, British",
       "by_year": {
         "2025": 0.0
       },
