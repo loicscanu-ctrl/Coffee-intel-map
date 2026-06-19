@@ -197,12 +197,15 @@ _FN_MONTH_RE = re.compile(
 
 @dataclass
 class MonthlyEntry:
-    month:              str                   # "YYYY-MM"
-    total_k_bags:       float | None = None   # exports — thousand 60-kg sacks
-    production_k_bags:  float | None = None   # production for the same month
-    yoy_pct:            float | None = None   # vs same month last year
-    source_pdf:         str  = ""             # remote URL we parsed
-    parser_version:     str  = "v2"
+    month:                str                   # "YYYY-MM"
+    total_k_bags:         float | None = None   # exports — thousand 60-kg sacks
+    production_k_bags:    float | None = None   # production for the same month
+    yoy_pct:              float | None = None   # exports YoY (frontend contract)
+    production_yoy_pct:   float | None = None   # production YoY (kept separate
+                                                # so an exports merge can't clobber
+                                                # it, and vice versa)
+    source_pdf:           str  = ""             # remote URL we parsed
+    parser_version:       str  = "v2"
 
 
 # ── HTTP fetching ───────────────────────────────────────────────────────────
@@ -227,12 +230,32 @@ def _fetch(url: str, *, binary: bool = False, timeout: int = 60) -> bytes | None
 # ── PDF discovery ───────────────────────────────────────────────────────────
 
 
+_UPLOAD_FOLDER_RE = re.compile(r"/uploads/(?P<yr>\d{4})/(?P<mn>\d{2})/", re.I)
+
+
+def _upload_sort_key(url: str) -> tuple[int, int, str]:
+    """Sort URLs by their /uploads/YYYY/MM/ folder ASCENDING (oldest
+    first). FNC's WordPress preserves the upload date in the URL path,
+    and when a stale bulletin gets re-uploaded into a new folder, the
+    re-upload is what we want to trust. Sorting oldest-first means the
+    newest-uploaded version is processed LAST and wins the merge's
+    last-write-wins semantics — fixing the bug where Jan-2024
+    bulletins (in /uploads/2024/01/) were clobbering Jan-2026 data."""
+    m = _UPLOAD_FOLDER_RE.search(url)
+    if m:
+        return (int(m.group("yr")), int(m.group("mn")), url)
+    return (0, 0, url)
+
+
 def discover_pdf_urls() -> list[str]:
     """Crawl FNC's three landing pages and return every PDF link they
-    surface, de-duplicated, in the order discovered. Filenames are
-    inconsistent enough that we don't try to parse the month out here —
-    that happens once we've actually downloaded the PDF and read the
-    body (or as a filename-fallback if the body parse fails)."""
+    surface, de-duplicated, sorted by upload-folder date ASCENDING.
+
+    Filenames are inconsistent enough that we don't try to parse the
+    data month out here — that happens once we've actually downloaded
+    the PDF and read the body (or as a filename-fallback if the body
+    parse fails). The sort order matters because the merge step uses
+    last-write-wins: newer uploads should overwrite older ones."""
     found: list[str] = []
     seen: set[str] = set()
     for listing in LISTING_URLS:
@@ -248,6 +271,7 @@ def discover_pdf_urls() -> list[str]:
                 continue
             seen.add(href)
             found.append(href)
+    found.sort(key=_upload_sort_key)
     logger.info(f"[fnc] discovered {len(found)} PDF link(s) across {len(LISTING_URLS)} listing(s)")
     return found
 
@@ -397,11 +421,11 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
             k_bags = num * _unit_scale(prod_m.group("unit"))
             yoy = _yoy_near(text, prod_m.end())
             entries.append(MonthlyEntry(
-                month=             f"{bulletin_yr:04d}-{bulletin_mn:02d}",
-                production_k_bags= round(k_bags, 1),
-                yoy_pct=           yoy,
-                source_pdf=        source_url,
-                parser_version=    "v2",
+                month=               f"{bulletin_yr:04d}-{bulletin_mn:02d}",
+                production_k_bags=   round(k_bags, 1),
+                production_yoy_pct=  yoy,
+                source_pdf=          source_url,
+                parser_version=      "v2",
             ))
 
     # ── Exports: bullet names the month explicitly (usually M-1).
@@ -424,14 +448,15 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
             yoy = _yoy_near(text, exp_m.end())
             # Same-month merge: when production already added a row for
             # this exact month, augment it instead of adding a duplicate.
+            # production_yoy_pct and yoy_pct (exports) are independent now
+            # — neither clobbers the other.
             target = next(
                 (e for e in entries if e.month == f"{exp_yr:04d}-{exp_mn:02d}"),
                 None,
             )
             if target is not None:
                 target.total_k_bags = round(k_bags, 1)
-                if target.yoy_pct is None:
-                    target.yoy_pct = yoy
+                target.yoy_pct = yoy
             else:
                 entries.append(MonthlyEntry(
                     month=          f"{exp_yr:04d}-{exp_mn:02d}",

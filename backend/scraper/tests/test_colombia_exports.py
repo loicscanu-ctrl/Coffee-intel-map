@@ -52,12 +52,15 @@ def test_fnc_parse_bulletin_emits_production_for_bulletin_month_and_exports_for_
     entries = fnc.parse_bulletin(text, url)
     by_month = {e.month: e for e in entries}
     # Production for the bulletin month, Jan 2026: 893 mil sacos = 893 k-bags.
-    assert by_month["2026-01"].production_k_bags == 893.0
-    assert by_month["2026-01"].yoy_pct           == -34.2
+    # production_yoy_pct is independent of exports yoy_pct (v3+).
+    assert by_month["2026-01"].production_k_bags  == 893.0
+    assert by_month["2026-01"].production_yoy_pct == -34.2
+    assert by_month["2026-01"].yoy_pct            is None
     # Exports for the named month December — year inferred as 2025 because
     # the bullet says "en diciembre" with no year, and Dec > Jan ⇒ prior year.
     assert by_month["2025-12"].total_k_bags == 1100.0     # 1.1 × 1000
     assert by_month["2025-12"].yoy_pct       == -19.0
+    assert by_month["2025-12"].production_yoy_pct is None
     for e in entries:
         assert e.parser_version == "v2"
         assert e.source_pdf     == url
@@ -77,10 +80,61 @@ def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
     url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/05/"
            "3.-Informe-mensual-Marzo-2026-p-1.pdf")
     by_month = {e.month: e for e in fnc.parse_bulletin(text, url)}
-    assert by_month["2026-03"].production_k_bags == 754.0
-    assert by_month["2026-03"].yoy_pct           == -29.1
-    assert by_month["2026-02"].total_k_bags      == 847.0
-    assert by_month["2026-02"].yoy_pct           == -28.5
+    assert by_month["2026-03"].production_k_bags  == 754.0
+    assert by_month["2026-03"].production_yoy_pct == -29.1
+    assert by_month["2026-03"].yoy_pct            is None
+    assert by_month["2026-02"].total_k_bags       == 847.0
+    assert by_month["2026-02"].yoy_pct            == -28.5
+    assert by_month["2026-02"].production_yoy_pct is None
+
+
+def test_fnc_upload_sort_key_orders_by_folder_year_month():
+    """Discovered PDFs are sorted by /uploads/YYYY/MM/ ASCENDING so the
+    merge's last-write-wins picks the NEWEST upload. v3 bug: a stale
+    Jan-2024 bulletin (uploaded into /2024/02/) was clobbering legit
+    Jan-2026 data (uploaded into /2025/12/) because the merge processed
+    in discovery order. v4: sort by upload path → older bulletin runs
+    first, newer one overwrites it."""
+    urls = [
+        "https://federaciondecafeteros.org/wp-content/uploads/2025/12/1.-Informe-mensual-enero-p-1.pdf",
+        "https://federaciondecafeteros.org/wp-content/uploads/2024/02/1.-Informe-mensual-enero-p.pdf",
+        "https://federaciondecafeteros.org/wp-content/uploads/2026/03/1.-Informe-mensual-Marzo-2026-p-1.pdf",
+    ]
+    urls_sorted = sorted(urls, key=fnc._upload_sort_key)
+    # Oldest first → newest last (so it wins last-write-wins in the merge).
+    assert urls_sorted[0].endswith("/2024/02/1.-Informe-mensual-enero-p.pdf")
+    assert urls_sorted[1].endswith("/2025/12/1.-Informe-mensual-enero-p-1.pdf")
+    assert urls_sorted[2].endswith("/2026/03/1.-Informe-mensual-Marzo-2026-p-1.pdf")
+
+
+def test_fnc_merge_preserves_production_yoy_when_exports_bullet_arrives_separately(tmp_path, monkeypatch):
+    """When the production bulletin (Jan 2026) lands first with its own
+    YoY, and a LATER bulletin (Feb 2026) reports Jan 2026 exports + its
+    own export-YoY, the merge keeps BOTH YoYs distinct: production_yoy_pct
+    from the production bulletin, yoy_pct (exports) from the exports
+    bulletin."""
+    monkeypatch.setattr(fnc, "OUT_PATH", tmp_path / "colombia_supply.json")
+    # Jan 2026 bulletin → Jan production with prod_yoy = -34.2.
+    e1 = fnc.MonthlyEntry(
+        month="2026-01",
+        production_k_bags=893.0,
+        production_yoy_pct=-34.2,
+        source_pdf="u1",
+    )
+    # Feb 2026 bulletin → Jan exports with exports_yoy = -19.8.
+    e2 = fnc.MonthlyEntry(
+        month="2026-01",
+        total_k_bags=925.0,
+        yoy_pct=-19.8,
+        source_pdf="u2",
+    )
+    doc = fnc._merge_into_supply([e1, e2])
+    by_month = {r["month"]: r for r in doc["exports"]["monthly"]}
+    row = by_month["2026-01"]
+    assert row["production_k_bags"]  == 893.0
+    assert row["production_yoy_pct"] == -34.2   # NOT clobbered by export merge
+    assert row["total_k_bags"]       == 925.0
+    assert row["yoy_pct"]            == -19.8   # exports YoY survives
 
 
 def test_fnc_parse_bulletin_rejects_non_bulletin_pdfs():
