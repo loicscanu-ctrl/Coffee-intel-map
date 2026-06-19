@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-19T11:03:27.631441Z",
-  "count": 53,
+  "generated_at": "2026-06-19T11:20:31.306340Z",
+  "count": 54,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -686,6 +686,20 @@
       ],
       "crons": [
         "0 6 * * 1"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-usitc-imports.yml",
+      "name": "3.9 \u2013 US Coffee Imports by Origin (USITC DataWeb)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 7 16 * *"
       ],
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
