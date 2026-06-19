@@ -763,6 +763,39 @@ def _merge_into_supply(monthly: list[MonthlyEntry]) -> dict:
         merged = {**existing, **{k: v for k, v in asdict(e).items() if v is not None and v != ""}}
         by_month[e.month] = merged
 
+    # Duplicate-value purge: when v8 strict mode re-dates a previously
+    # mis-attributed stale bulletin to its correct year, the OLD wrong-year
+    # row (from earlier runs) stays in the JSON because no fresh emission
+    # touches that exact month key. The signature is unambiguous though:
+    # the two rows carry identical (total_k_bags, yoy_pct) tuples. Round
+    # values to 1 decimal — Colombia's monthly volumes don't collide at
+    # that resolution in real data, so an exact match is almost always
+    # the misattribution. Keep the EARLIER row (corresponds to the actual
+    # bulletin year), drop the LATER duplicate. DANE-backed rows are
+    # exempt: their tonnage is from customs declarations, not FNC parsing.
+    def _value_sig(row: dict) -> tuple | None:
+        if row.get("source_xls"):  # DANE-backed → exempt
+            return None
+        kb = row.get("total_k_bags")
+        yy = row.get("yoy_pct")
+        if isinstance(kb, (int, float)) and isinstance(yy, (int, float)):
+            return (round(kb, 1), round(yy, 2))
+        return None
+
+    seen_sigs: dict[tuple, str] = {}
+    drop_months: set[str] = set()
+    for month in sorted(by_month):  # earliest first → keeps earlier on collision
+        sig = _value_sig(by_month[month])
+        if sig is None:
+            continue
+        if sig in seen_sigs:
+            drop_months.add(month)
+            logger.info(f"[fnc] purging dup-value row {month} (matches {seen_sigs[sig]})")
+        else:
+            seen_sigs[sig] = month
+    for m in drop_months:
+        by_month.pop(m, None)
+
     monthly_out = sorted(by_month.values(), key=lambda r: r.get("month") or "")
     last_updated = monthly_out[-1].get("month") if monthly_out else (existing_exports.get("last_updated") or "")
     # Source label combines whatever was there before with FNC — keeps

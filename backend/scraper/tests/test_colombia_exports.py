@@ -216,6 +216,44 @@ def test_fnc_parse_bulletin_drops_entries_dated_in_the_future(monkeypatch):
     assert fnc.parse_bulletin(text, url) == ()
 
 
+def test_fnc_merge_purges_duplicate_value_misattributions(tmp_path, monkeypatch):
+    """v9 dup-value purge: when v8 strict mode re-dates a stale bulletin
+    to its correct year, the OLD wrong-year row from earlier runs no
+    longer gets overwritten (the new emission targets a different month
+    key). Signature is unambiguous: identical (total_k_bags, yoy_pct).
+    Keep the earlier row (the real bulletin year); drop the later one."""
+    monkeypatch.setattr(fnc, "OUT_PATH", tmp_path / "colombia_supply.json")
+    existing = {
+        "exports": {
+            "monthly": [
+                # The CORRECT entry — v8 strict mode re-dated the stale
+                # bulletin here.
+                {"month": "2024-05", "total_k_bags": 935.0,
+                 "yoy_pct": 10.6, "source_pdf": "u_real"},
+                # The STALE wrong-year row — same exact values, planted
+                # by a pre-v8 run before strict mode shipped.
+                {"month": "2026-05", "total_k_bags": 935.0,
+                 "yoy_pct": 10.6, "source_pdf": "u_stale"},
+                # A real distinct row — must survive.
+                {"month": "2024-12", "total_k_bags": 1300.0,
+                 "yoy_pct": 22.2, "source_pdf": "u_dec"},
+                # A DANE-backed row that coincidentally has identical
+                # numbers — exempt from the dup-value purge.
+                {"month": "2026-04", "total_k_bags": 935.0,
+                 "yoy_pct": 10.6, "source_xls": "dane_url"},
+            ],
+        },
+    }
+    fnc.OUT_PATH.write_text(json.dumps(existing), encoding="utf-8")
+    doc = fnc._merge_into_supply([])  # no new entries — purge only
+    months = {r["month"] for r in doc["exports"]["monthly"]}
+    # 2024-05 kept (earlier), 2026-05 dropped (later dup), DANE row exempt.
+    assert "2024-05" in months
+    assert "2026-05" not in months
+    assert "2024-12" in months
+    assert "2026-04" in months
+
+
 def test_fnc_merge_purges_existing_rows_violating_invariants(tmp_path, monkeypatch):
     """The persisted JSON accumulates rows across runs. When earlier
     versions of the parser shipped garbage (future months, 100x rows),
