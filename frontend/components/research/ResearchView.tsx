@@ -7,23 +7,24 @@ import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "certstocks" | "demand";
+type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "certstocks" | "demand";
 const CATS: { id: Cat; label: string }[] = [
-  { id: "cot",        label: "COT & positioning" },
-  { id: "weather",    label: "Weather" },
-  { id: "fertilizer", label: "Fertilizer" },
-  { id: "contracts",  label: "Contract rules" },
-  { id: "agronomy",   label: "Agronomy" },
-  { id: "logistics",  label: "Origin Logistics" },
-  { id: "certstocks", label: "Certified stocks" },
-  { id: "demand",     label: "Demand modelling" },
+  { id: "cot",         label: "COT & positioning" },
+  { id: "weather",     label: "Weather" },
+  { id: "fertilizer",  label: "Fertilizer" },
+  { id: "contracts",   label: "Contract rules" },
+  { id: "agronomy",    label: "Agronomy" },
+  { id: "logistics",   label: "Origin Logistics" },
+  { id: "destination", label: "Destination In-store" },
+  { id: "certstocks",  label: "Certified stocks" },
+  { id: "demand",      label: "Demand modelling" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
   return <h4 className="text-sm font-bold text-amber-400 mt-5 mb-2">{children}</h4>;
 }
-function P({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs text-slate-300 leading-relaxed mb-2">{children}</p>;
+function P({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={`text-xs text-slate-300 leading-relaxed mb-2${className ? ` ${className}` : ""}`}>{children}</p>;
 }
 function LI({ children }: { children: React.ReactNode }) {
   return (
@@ -717,6 +718,293 @@ function OriginLogistics() {
   );
 }
 
+// Destination-side cost table. Like CostTable but the cost column carries its
+// own unit (€/t, $/t, % of value) so heterogeneous lines read faithfully.
+function DestCostTable({ children }: { children: React.ReactNode }) {
+  return (
+    <table className="w-full text-xs mt-3 mb-4">
+      <thead>
+        <tr className="border-b border-slate-700 text-left text-[10px] uppercase tracking-wider text-slate-500">
+          <th className="pb-1.5 pr-4">Component</th>
+          <th className="pb-1.5 pr-4 text-right">Cost</th>
+          <th className="pb-1.5">Basis / notes</th>
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </table>
+  );
+}
+
+function DestTotal({ label, cost, note }: { label: string; cost: string; note?: string }) {
+  return (
+    <tr className="border-t border-slate-600 font-semibold">
+      <td className="pt-2 text-slate-200">{label}</td>
+      <td className="pt-2 text-right font-mono text-amber-300 whitespace-nowrap">{cost}</td>
+      <td className="pt-2 text-slate-500 text-[11px]">{note}</td>
+    </tr>
+  );
+}
+
+// Warehouse sub-heading inside a multi-warehouse port card.
+function WhHead({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-300/90 mt-3 mb-0.5">{children}</div>
+  );
+}
+
+function PortCard({ region, title, children, span }: {
+  region: string; title: string; children: React.ReactNode; span?: boolean;
+}) {
+  return (
+    <div className={`bg-slate-900 border border-slate-800 rounded-xl p-5 ${span ? "lg:col-span-2" : ""}`}>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{region}</div>
+      <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+function DestinationInstore() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+
+      {/* Intro */}
+      <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <H>What is a CIF-to-in-store cost?</H>
+        <P>
+          A <strong>CIF</strong> price covers the coffee delivered to the destination port — cost, insurance and ocean
+          freight to the quay. But a roaster buys coffee <strong>in-store</strong>: green resting in a destination
+          warehouse, customs-cleared, reweighed and (where required) re-bagged, ready to call off. The{" "}
+          <strong>CIF-to-in-store</strong> cost is the chain of expenses that bridges those two points — the mirror
+          image of the <Code>FOBbing cost</Code> on the origin side. It is what a trader adds to a CIF offer to land a
+          true delivered-warehouse parity.
+        </P>
+        <div className="font-mono text-xs bg-slate-800 rounded px-3 py-2 text-amber-300 mb-2">
+          in-store_parity = CIF + DTHC/DO + haulage + in-store handling (+ re-bag) + storage + weight-loss
+        </div>
+        <ul className="space-y-1">
+          <LI><strong>DTHC + DO</strong> — destination terminal handling charge and the delivery-order release at the
+            discharge port. Quoted per container; here normalised over a <Code>21.6 mt</Code> box.</LI>
+          <LI><strong>Haulage / drayage</strong> — moving the box from the port to the bonded warehouse.</LI>
+          <LI><strong>In-store handling</strong> — unstuffing, weighing and tipping bulk to silo (or stripping bags);
+            sometimes <strong>re-bagging</strong> into 1.2 mt big-bags for storage and call-off.</LI>
+          <LI><strong>Storage / rent</strong> — a <em>carry</em> cost that accrues per week or per month the coffee
+            rests in store, not a one-off.</LI>
+          <LI><strong>Weight-loss &amp; insurance</strong> — <em>value-based</em> lines: the natural moisture loss on
+            arrival / re-bagging and the in-store cover are charged as a <strong>% of the goods value</strong>, so they
+            scale with the coffee price rather than the tonnage.</LI>
+        </ul>
+        <P className="text-[11px] text-slate-500">
+          Headline figures below are the one-off <strong>move-in stack</strong> (CIF → in-store), shown{" "}
+          <em>excluding storage</em> (a time-based carry) and <em>excluding the value-based weight-loss / insurance</em>,
+          which depend on price and holding period. Container basis 21.6 mt throughout. Figures are indicative warehouse
+          quotes, not contractual.
+        </P>
+      </div>
+
+      {/* Bremen */}
+      <PortCard region="North Europe · Germany" title="Bremen · Vollers — CIF→in-store ~€73/t">
+        <P>
+          Bremen tips the container to <strong>silo in bulk</strong> and delivers ex-silo FCA Bremen, so the chain
+          carries two handling legs (in to silo, then out) plus a reweighing. OTA sampling and one delivery-month&rsquo;s
+          rent are included as standard.
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO" cost="17.22 €/t" note="372 €/container ÷ 21.6 mt" />
+          <CostRow label="Haulage" cost="10.87 €/t" note="235 €/container ÷ 21.6 mt" />
+          <CostRow label="Import bulk container (docs &amp; free to silo)" cost="18.25 €/t" note="unstuff + tip to silo" />
+          <CostRow label="OTA sampling" cost="6.71 €/t" note="145 €/container ÷ 21.6 mt" />
+          <CostRow label="Delivery ex silo to FCA Bremen (bulk)" cost="14.05 €/t" note="call-off / load-out" />
+          <CostRow label="Reweighing" cost="6.05 €/t" note="weight certificate" />
+          <DestTotal label="Move-in subtotal" cost="~€73.15/t" note="ex storage &amp; weight-loss" />
+        </DestCostTable>
+        <DestCostTable>
+          <CostRow label="Warehouse rent (1 delivery month)" cost="6.00 €/t·mo" note="carry — accrues per month in store" />
+          <CostRow label="Weight-loss on arrival" cost="0.50% of value" note="value-based — moisture loss" />
+        </DestCostTable>
+      </PortCard>
+
+      {/* Le Havre */}
+      <PortCard region="North Europe · France" title="Le Havre · Sealogis — CIF→in-store ~€49/t">
+        <P>
+          Le Havre bundles the inland move, weighing and bulk handling into a single <strong>CIF-to-in-store</strong>{" "}
+          line on top of DTHC/DO. Storage is billed per week, and the warehouse charges an in-store insurance that
+          accrues weekly on the goods value.
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO" cost="16.43 €/t" note="355 €/container ÷ 21.6 mt" />
+          <CostRow label="CIF to in-store (haulage, weighing, bulk)" cost="32.97 €/t" note="bundled in-store handling" />
+          <DestTotal label="Move-in subtotal" cost="~€49.40/t" note="ex storage, insurance &amp; weight-loss" />
+        </DestCostTable>
+        <DestCostTable>
+          <CostRow label="Storage" cost="2.80 €/t·wk" note="carry — per week in store" />
+          <CostRow label="In-store insurance" cost="0.03% of value/wk" note="value-based — accrues weekly" />
+          <CostRow label="Weight-loss re-bagging" cost="0.10% of value" note="value-based" />
+        </DestCostTable>
+      </PortCard>
+
+      {/* Barcelona */}
+      <PortCard region="South Europe · Spain" title="Barcelona · Molenberg — CIF→in-store ~€29/t">
+        <P>
+          Barcelona is the leanest of the European stacks: DTHC/DO plus a single combined haulage-and-weight line. The
+          arrival weight-loss is the larger of the value-based allowances at 0.50% of goods value.
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO" cost="18.56 €/t" note="401 €/container ÷ 21.6 mt" />
+          <CostRow label="Haulage + weight" cost="10.19 €/t" note="220 €/container ÷ 21.6 mt" />
+          <DestTotal label="Move-in subtotal" cost="~€28.75/t" note="ex weight-loss" />
+        </DestCostTable>
+        <DestCostTable>
+          <CostRow label="Weight-loss on arrival" cost="0.50% of value" note="value-based — moisture loss" />
+        </DestCostTable>
+      </PortCard>
+
+      {/* Melbourne */}
+      <PortCard region="Oceania · Australia" title="Melbourne · Geodis — CIF→in-store ~$94/t">
+        <P>
+          Melbourne is quoted in <strong>USD</strong> and folds customs and docs into the terminal charge. Import
+          drayage (the haulage-and-delivery leg) is the dominant line — well above any European haulage — reflecting
+          Australian inland transport costs.
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO + customs + docs" cost="30.14 $/t" note="651 $/container ÷ 21.6 mt" />
+          <CostRow label="Import drayage (haulage) — delivery" cost="64.26 $/t" note="1,388 $/container ÷ 21.6 mt" />
+          <DestTotal label="Move-in subtotal" cost="~$94.40/t" note="USD basis" />
+        </DestCostTable>
+      </PortCard>
+
+      {/* Genoa — two warehouses */}
+      <PortCard span region="South Europe · Italy" title="Genoa — CIF→in-store ~€57–65/t">
+        <P>
+          Genoa shares a port-level DTHC/DO and a 0.10% re-bagging weight-loss, then splits across two warehouses —{" "}
+          <strong>Romani</strong> and <strong>Pacorini</strong> — each bundling haulage, weighing and bulk into one
+          CIF-to-in-store line, with re-bagging into 1.2 mt big-bags and storage billed per 15 days.
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO (port-level)" cost="12.27 €/t" note="265 €/container ÷ 21.6 mt" />
+          <CostRow label="Weight-loss re-bagging (port-level)" cost="0.10% of value" note="value-based" />
+        </DestCostTable>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+          <div>
+            <WhHead>Romani Genoa</WhHead>
+            <DestCostTable>
+              <CostRow label="CIF to in-store (haulage, weighing, bulk)" cost="30.00 €/t" />
+              <CostRow label="Re-bagging into 1.2 mt big-bags" cost="15.00 €/t" />
+              <DestTotal label="Move-in (+DTHC/DO)" cost="~€57.27/t" note="ex storage &amp; weight-loss" />
+              <CostRow label="Storage" cost="3.00 €/t / 15d" note="carry — €6/t·mo" />
+            </DestCostTable>
+          </div>
+          <div>
+            <WhHead>Pacorini Genoa</WhHead>
+            <DestCostTable>
+              <CostRow label="CIF to in-store (haulage, weighing, bulk)" cost="35.00 €/t" />
+              <CostRow label="Re-bagging into 1.2 mt big-bags" cost="18.00 €/t" />
+              <DestTotal label="Move-in (+DTHC/DO)" cost="~€65.27/t" note="ex storage &amp; weight-loss" />
+              <CostRow label="Storage" cost="3.20 €/t / 15d" note="carry — €6.4/t·mo" />
+            </DestCostTable>
+          </div>
+        </div>
+      </PortCard>
+
+      {/* Trieste — two warehouses */}
+      <PortCard span region="South Europe · Italy" title="Trieste — CIF→in-store ~€62/t">
+        <P>
+          Trieste mirrors Genoa&rsquo;s structure — a shared DTHC/DO and 0.10% re-bagging weight-loss, then{" "}
+          <strong>Romani</strong> and <strong>Pacorini</strong> warehouses. Storage here is quoted per week (≈ €6 /
+          €6.4 per tonne per month).
+        </P>
+        <DestCostTable>
+          <CostRow label="DTHC + DO (port-level)" cost="16.94 €/t" note="366 €/container ÷ 21.6 mt" />
+          <CostRow label="Weight-loss re-bagging (port-level)" cost="0.10% of value" note="value-based" />
+        </DestCostTable>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+          <div>
+            <WhHead>Romani Trieste</WhHead>
+            <DestCostTable>
+              <CostRow label="CIF to in-store (haulage, weighing, bulk)" cost="27.59 €/t" />
+              <CostRow label="Re-bagging into 1.2 mt big-bags" cost="17.25 €/t" />
+              <DestTotal label="Move-in (+DTHC/DO)" cost="~€61.78/t" note="ex storage &amp; weight-loss" />
+              <CostRow label="Storage" cost="1.45 €/t·wk" note="carry — €6/t·mo" />
+            </DestCostTable>
+          </div>
+          <div>
+            <WhHead>Pacorini Trieste</WhHead>
+            <DestCostTable>
+              <CostRow label="CIF to in-store (haulage, weighing, bulk)" cost="26.56 €/t" />
+              <CostRow label="Re-bagging into 1.2 mt big-bags" cost="18.00 €/t" />
+              <DestTotal label="Move-in (+DTHC/DO)" cost="~€61.50/t" note="ex storage &amp; weight-loss" />
+              <CostRow label="Storage" cost="1.60 €/t·wk" note="carry — €6.4/t·mo" />
+            </DestCostTable>
+          </div>
+        </div>
+      </PortCard>
+
+      {/* Cross-port comparison */}
+      <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <H>Cross-port comparison (move-in stack)</H>
+        <table className="w-full text-xs mt-2">
+          <thead>
+            <tr className="border-b border-slate-700 text-left text-[10px] uppercase tracking-wider text-slate-500">
+              <th className="pb-1.5 pr-4">Port · warehouse</th>
+              <th className="pb-1.5 pr-4 text-right">Move-in CIF→in-store</th>
+              <th className="pb-1.5 pr-4 text-right">Storage (carry)</th>
+              <th className="pb-1.5">Value-based lines</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Barcelona · Molenberg</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~€29/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">—</td>
+              <td className="py-1.5 text-slate-400">Weight-loss 0.50%</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Le Havre · Sealogis</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~€49/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">€2.8/t·wk</td>
+              <td className="py-1.5 text-slate-400">Insurance 0.03%/wk · weight-loss 0.10%</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Genoa · Romani / Pacorini</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~€57 / €65/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">€6 / €6.4/t·mo</td>
+              <td className="py-1.5 text-slate-400">Weight-loss 0.10%</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Trieste · Romani / Pacorini</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~€62 / €62/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">€6 / €6.4/t·mo</td>
+              <td className="py-1.5 text-slate-400">Weight-loss 0.10%</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Bremen · Vollers</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~€73/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">€6/t·mo</td>
+              <td className="py-1.5 text-slate-400">Weight-loss 0.50%</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">Melbourne · Geodis</td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">~$94/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">—</td>
+              <td className="py-1.5 text-slate-400">USD basis</td>
+            </tr>
+          </tbody>
+        </table>
+        <P className="mt-3">
+          The move-in column is the one-off cost to land coffee in store from CIF; <strong>storage</strong> is the carry
+          you add per week/month it rests; the <strong>value-based</strong> lines scale with the coffee price. European
+          stacks run <strong>€29–73/t</strong>, widest at Bremen (two bulk handling legs + sampling) and tightest at
+          Barcelona. Melbourne&rsquo;s <strong>~$94/t</strong> is dominated by inland drayage. The Italian ports offer a
+          warehouse choice (Romani vs Pacorini) trading a few €/t of move-in against marginally different storage rates.
+        </P>
+      </div>
+
+    </div>
+  );
+}
+
 function CertifiedStocksMethodology() {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
@@ -1004,6 +1292,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "contracts" && <ContractRules />}
       {cat === "agronomy"  && <AgronomyArticles />}
       {cat === "logistics" && <OriginLogistics />}
+      {cat === "destination" && <DestinationInstore />}
       {cat === "certstocks" && <CertifiedStocksMethodology />}
       {cat === "demand" && <DemandArticles />}
     </>
