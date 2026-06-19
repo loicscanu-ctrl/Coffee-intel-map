@@ -1,0 +1,70 @@
+name: "3.9 – US Coffee Imports by Origin (USITC DataWeb)"
+
+on:
+  schedule:
+    # 16th of each month, 07:30 UTC — USITC trade data lags ~6 weeks.
+    - cron: "30 7 16 * *"
+  workflow_dispatch:   # manual trigger (used to validate against the live API)
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run USITC coffee-imports scraper (3 attempts)
+        env:
+          USITC_API_KEY: ${{ secrets.USITC_API_KEY }}
+          PYTHONPATH: backend
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.sources.usitc_imports && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 2m..." && sleep 120 || exit 1
+          done
+
+      - name: Validate output (≥5 origins, not a seed)
+        run: |
+          python -c "
+          import json, subprocess
+          d = json.load(open('frontend/public/data/us_coffee_imports.json'))
+          n = len(d.get('origins', []))
+          if d.get('is_seed') or n < 5:
+              print(f'[validate] FAILED: is_seed={d.get(\"is_seed\")} origins={n} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/us_coffee_imports.json'])
+          else:
+              print(f'[validate] OK: {n} origins, total_by_year={d.get(\"total_by_year\")}')
+          "
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/us_coffee_imports.json
+          git diff --cached --quiet \
+            && echo "No changes — JSON already up to date." \
+            || (git commit -m "data: update us_coffee_imports.json [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
