@@ -501,3 +501,54 @@ export const REPORT_CATEGORIES: ReportCategory[] = ["Futures", "Freight", "Suppl
 export const REPORT_BY_ID: Record<string, ReportChartDef> = Object.fromEntries(
   REPORT_REGISTRY.map((d) => [d.id, d]),
 );
+
+/**
+ * One-click report packages. Each preset resolves to a set of registry chart
+ * ids — defined as a predicate over REPORT_REGISTRY where possible, so adding a
+ * new chart to a group automatically folds it into the matching package (no
+ * second list to keep in sync). The "Demand" preset is a hand-picked key subset
+ * rather than the whole (large) Demand category.
+ */
+export interface ReportPreset {
+  id: string;
+  label: string;
+  description: string;
+  ids: string[];
+}
+
+const idsWhere = (pred: (d: ReportChartDef) => boolean): string[] =>
+  REPORT_REGISTRY.filter(pred).map((d) => d.id);
+
+export const REPORT_PRESETS: ReportPreset[] = [
+  {
+    id: "brazil",
+    label: "Brazil",
+    description: "All Brazil visuals — exports, supply & demand, weather and analogs",
+    ids: idsWhere((d) => d.group === "Brazil"),
+  },
+  {
+    id: "weather",
+    label: "Weather & ENSO",
+    description: "Every origin's weather pack plus the analog scenarios and ENSO/ONI",
+    ids: idsWhere((d) => d.subgroup === "Weather" || d.id === "enso_oni"),
+  },
+  {
+    id: "cot",
+    label: "COT",
+    description: "The full COT positioning suite",
+    ids: idsWhere((d) => d.group === "COT"),
+  },
+  {
+    id: "demand",
+    label: "Demand",
+    description: "Key demand visuals — certified stocks, spot offers, EU port stocks and the German coffee-tax proxy",
+    ids: [
+      "certified_stocks_tiles",
+      "certified_stocks_flow",
+      "spot_tiles",
+      "spot_square_map",
+      "ecf_port_stocks",
+      "kaffeesteuer",
+    ],
+  },
+];

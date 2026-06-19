@@ -9,7 +9,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { REPORT_REGISTRY, REPORT_CATEGORIES } from "@/lib/report/registry";
+import { REPORT_REGISTRY, REPORT_CATEGORIES, REPORT_PRESETS } from "@/lib/report/registry";
 import { useReportStore } from "@/lib/report/store";
 import { PRINT_CSS_LIGHT, PRINT_CSS_DARK } from "@/lib/report/printStyles";
 import ReportCanvas from "./ReportCanvas";
@@ -32,7 +32,17 @@ function orderedBy<T>(arr: T[], key: (t: T) => string | undefined): [string | un
 export default function ReportBuilder() {
   const selectedIds = useReportStore((s) => s.selectedIds);
   const toggle = useReportStore((s) => s.toggle);
+  const addMany = useReportStore((s) => s.addMany);
+  const removeMany = useReportStore((s) => s.removeMany);
   const clear = useReportStore((s) => s.clear);
+
+  // A package is "applied" once all its charts are in the cart; clicking then
+  // removes the whole set, otherwise it tops the cart up to the full package.
+  const applyPreset = (ids: string[]) => {
+    const allIn = ids.every((id) => selectedIds.includes(id));
+    if (allIn) removeMany(ids);
+    else addMany(ids);
+  };
 
   // Avoid a hydration mismatch: the persisted cart only exists client-side, so
   // gate the selection-dependent UI until after mount.
@@ -105,6 +115,38 @@ export default function ReportBuilder() {
             → subgroup (Exports / S&D / Weather) → visual. Descriptions are
             dropped to keep the list compact. */}
         <div className="space-y-4">
+          {/* One-click report packages — tick a whole themed bundle at once.
+              Highlighted when every chart in the package is already in the cart
+              (click again to remove the set). */}
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">Quick packages</div>
+            <div className="flex flex-wrap gap-1.5">
+              {REPORT_PRESETS.map((p) => {
+                const applied = mounted && p.ids.every((id) => selectedIds.includes(id));
+                const partial = mounted && !applied && p.ids.some((id) => selectedIds.includes(id));
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => applyPreset(p.ids)}
+                    aria-pressed={applied}
+                    title={p.description}
+                    className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors
+                      ${applied
+                        ? "border-amber-600/60 bg-amber-500/15 text-amber-200"
+                        : partial
+                        ? "border-amber-700/40 bg-amber-500/5 text-amber-300/90"
+                        : "border-slate-700 bg-slate-950/40 text-slate-300 hover:border-slate-600 hover:text-slate-100"}`}
+                  >
+                    <span>{p.label}</span>
+                    <span className="rounded px-1 py-0.5 text-[8.5px] font-mono uppercase tracking-wider bg-black/25">
+                      {applied ? "✓" : `+${p.ids.length}`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {REPORT_CATEGORIES.map((cat) => {
             const items = REPORT_REGISTRY.filter((d) => d.category === cat);
             if (items.length === 0) return null;
