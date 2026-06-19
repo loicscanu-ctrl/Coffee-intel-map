@@ -1,11 +1,67 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-06-19T10:27:52+00:00",
+  "scraped_at": "2026-06-19T10:44:31+00:00",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-05",
     "unit": "thousand 60-kg bags",
     "monthly": [
+      {
+        "month": "2024-01",
+        "total_k_bags": 937.0,
+        "yoy_pct": 12.6,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-febrero-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-02",
+        "total_k_bags": 1045.0,
+        "yoy_pct": 12.46,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-marzo-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-04",
+        "total_k_bags": 792.0,
+        "yoy_pct": 9.5,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-mayo-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-05",
+        "total_k_bags": 935.0,
+        "yoy_pct": 10.6,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-junio-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-07",
+        "total_k_bags": 1020.0,
+        "yoy_pct": 36.0,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-julio-p-2.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-08",
+        "total_k_bags": 1030.0,
+        "yoy_pct": 26.1,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-septiembre-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-09",
+        "total_k_bags": 998.0,
+        "yoy_pct": 18.8,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-octubre-p.pdf",
+        "parser_version": "v2"
+      },
+      {
+        "month": "2024-10",
+        "total_k_bags": 1039.0,
+        "yoy_pct": 14.4,
+        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-noviembre-p.pdf",
+        "parser_version": "v2"
+      },
       {
         "month": "2025-01",
         "total_k_bags": 1153.0,
