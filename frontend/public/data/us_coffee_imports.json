@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-19T11:36:46Z",
+  "updated": "2026-06-19T16:07:55Z",
   "source": "USITC DataWeb — HTS 0901, Imports for Consumption, quantity (kg→MT)",
   "hts": "0901",
   "measure": "quantity_mt",
@@ -1641,5 +1641,6 @@
     "2023": 1389048.4,
     "2024": 1475618.5,
     "2025": 1485953.0
-  }
+  },
+  "monthly_total": {}
 }
