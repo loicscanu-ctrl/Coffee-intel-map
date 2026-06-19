@@ -141,9 +141,14 @@ function DemandPageInner() {
             />
           </Section>
           <Section>
-            <div className="p-4">
+            <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
               <MonthlyTrend src="/data/eu_coffee_imports.json"
                 heading="EU extra-EU imports — monthly (Eurostat)" color="#f59e0b" />
+              <SourceReconciliation primarySrc="/data/eu_coffee_imports.json"
+                primaryLabel="Eurostat" comtradeSrc="/data/eu_coffee_imports.json"
+                comtradeField="comtrade_total_by_year"
+                heading="EU — Eurostat vs UN Comtrade (extra-EU)"
+                emptyNote="UN Comtrade has no usable EU-bloc series — the EU isn't a sovereign Comtrade reporter (member states report individually, and the public endpoint's EU member data is stale/incomplete). For the US the two agree to ~0.1%, since Comtrade re-publishes the national source; for the EU, treat Eurostat as authoritative and read Comtrade's EU figures with caution." />
             </div>
           </Section>
         </>
