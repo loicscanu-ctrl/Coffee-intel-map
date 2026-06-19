@@ -9,7 +9,7 @@ import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPan
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
-import UsImportsByOrigin from "@/components/demand/UsImportsByOrigin";
+import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -113,7 +113,21 @@ function DemandPageInner() {
       {tab === "imports" && (
         <>
           <Section><ImportsPanel /></Section>
-          <Section><UsImportsByOrigin /></Section>
+          <Section>
+            <ImportsByOrigin
+              src="/data/us_coffee_imports.json"
+              heading="US Coffee Imports by Origin"
+              blurb="Where the US sources its coffee (USITC DataWeb, HTS 0901)"
+              seedKey="USITC_API_KEY"
+            />
+          </Section>
+          <Section>
+            <ImportsByOrigin
+              src="/data/eu_coffee_imports.json"
+              heading="EU Coffee Imports by Origin"
+              blurb="Extra-EU coffee sourcing (Eurostat Comext ds-045409, HS 0901)"
+            />
+          </Section>
         </>
       )}
 
