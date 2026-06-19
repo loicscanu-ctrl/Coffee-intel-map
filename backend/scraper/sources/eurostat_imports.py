@@ -28,12 +28,12 @@ log = logging.getLogger(__name__)
 
 BASE = "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/ds-045409"
 PRODUCT = "0901"
-INDICATOR = "QUANTITY_IN_KG"
 N_YEARS = 6
 
-# Candidate codes for the EU reporter (geonomenclature differs across vintages);
-# tried in order until one returns data.
+# Candidate codes (the _probe_codes() diagnostic logs the real ones from the
+# API codelists; these are tried until one returns data).
 REPORTER_CANDIDATES = ["EU27_2020", "EU", "EU27", "EU28"]
+INDICATOR_CANDIDATES = ["QUANTITY_IN_KG", "QUANTITY_IN_100KG", "QUANTITY_KG", "VALUE_IN_EUR"]
 
 # EU member geo codes — excluded from "origins" so the view is extra-EU only
 # (reporter=EU bloc + intra-EU partner would otherwise show member states).
@@ -50,24 +50,44 @@ OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coff
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(reporter: str, freq: str, time_params: list[tuple[str, str]]) -> dict:
-    params = [
-        ("format", "JSON"), ("freq", freq), ("reporter", reporter),
-        ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
-    ]
-    params += time_params
+def _codelist(body: dict, dim: str) -> dict[str, str]:
+    """The {code: label} codelist the API returned for a dimension (full list
+    when the dim was not pinned in the query)."""
+    cat = (body.get("dimension", {}).get(dim, {}) or {}).get("category", {}) or {}
+    idx, lab = cat.get("index", {}) or {}, cat.get("label", {}) or {}
+    codes = list(idx.keys()) if isinstance(idx, dict) else list(idx)
+    return {c: lab.get(c, c) for c in codes}
+
+
+def _raw(params: list[tuple[str, str]]) -> dict:
     try:
-        r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
+        r = requests.get(BASE, params=[("format", "JSON"), *params], headers=_HEADERS, timeout=60)
         if r.status_code != 200:
-            log.info("Eurostat r=%s freq=%s HTTP %s body: %s", reporter, freq, r.status_code, r.text[:300])
+            log.info("Eurostat %s → HTTP %s %s", params, r.status_code, r.text[:200])
             return {}
-        body = r.json()
-        log.info("Eurostat r=%s freq=%s HTTP 200 dims=%s size=%s nval=%d",
-                 reporter, freq, body.get("id"), body.get("size"), len(body.get("value", {}) or {}))
-        return body
+        return r.json()
     except Exception as e:
-        log.error("Eurostat fetch error reporter=%s freq=%s: %s", reporter, freq, e)
+        log.error("Eurostat fetch error %s: %s", params, e)
         return {}
+
+
+def _probe_codes() -> None:
+    """One-off: omit reporter & indicators so the API returns their full
+    codelists, revealing the correct EU-reporter and quantity-indicator codes."""
+    body = _raw([("freq", "A"), ("product", PRODUCT), ("flow", "1"), ("time", "2023")])
+    log.info("PROBE dims=%s size=%s nval=%d", body.get("id"), body.get("size"), len(body.get("value", {}) or {}))
+    for dim in ("reporter", "indicators", "flow"):
+        cl = _codelist(body, dim)
+        items = list(cl.items())
+        log.info("PROBE %s (%d): %s", dim, len(cl), items[:30])
+
+
+def _fetch(reporter: str, freq: str, indicator: str, time_params: list[tuple[str, str]]) -> dict:
+    body = _raw([("freq", freq), ("reporter", reporter), ("product", PRODUCT),
+                 ("flow", "1"), ("indicators", indicator), *time_params])
+    log.info("Eurostat r=%s freq=%s ind=%s size=%s nval=%d",
+             reporter, freq, indicator, body.get("size"), len(body.get("value", {}) or {}))
+    return body
 
 
 def parse_jsonstat(body: dict) -> dict:
@@ -162,21 +182,17 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
     years = list(reversed(years))
 
-    # Comext ds-045409 is monthly; annual freq usually returns no observations.
-    # Try annual first (cheap if it exists), then monthly with year-aggregation.
-    n_months = N_YEARS * 12
-    freq_variants = [
-        ("A", [("time", y) for y in years]),
-        ("M", [("lastTimePeriod", str(n_months))]),
-    ]
+    _probe_codes()   # diagnostic: reveals valid reporter & indicator codes
+
+    tparams = [("time", y) for y in years]
     parsed = {"years": [], "origins": [], "total_by_year": {}}
     for reporter in REPORTER_CANDIDATES:
-        for freq, tparams in freq_variants:
-            cand = parse_jsonstat(_fetch(reporter, freq, tparams))
-            log.info("Eurostat reporter=%s freq=%s → %d origins", reporter, freq, len(cand["origins"]))
+        for indicator in INDICATOR_CANDIDATES:
+            cand = parse_jsonstat(_fetch(reporter, "A", indicator, tparams))
+            log.info("Eurostat reporter=%s ind=%s → %d origins", reporter, indicator, len(cand["origins"]))
             if cand["origins"]:
                 parsed = cand
-                log.info("Eurostat reporter=%s freq=%s WORKS", reporter, freq)
+                log.info("Eurostat reporter=%s ind=%s WORKS", reporter, indicator)
                 break
         if parsed["origins"]:
             break
