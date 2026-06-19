@@ -172,6 +172,22 @@ _YOY_NEG_KW_RE = re.compile(
     re.I,
 )
 
+# Body-year anchor: every monthly bulletin pairs its YoY comparison with
+# an explicit "frente al mismo mes de YYYY" / "frente al mismo periodo
+# de YYYY" / "respecto a YYYY" phrase. The data year = YYYY + 1 (the
+# YoY anchor is always the year BEFORE the data month). This anchor is
+# the most reliable year signal we have — filenames and upload folders
+# both lie when FNC re-uploads stale bulletins into new year folders.
+_BODY_YEAR_RE = re.compile(
+    r"frente\s+al\s+mismo\s+(?:mes|periodo)\s+de\s+(?P<yr>20\d{2})", re.I,
+)
+
+# Sanity bound — Colombia's monthly exports max out around 1300 k-bags;
+# Brazil tops out near 3500. Anything above 5000 k-bags from a single
+# bulletin is a parser failure (number misread, table misalignment, etc).
+# We drop the entry rather than ship a phantom row.
+_MAX_PLAUSIBLE_K_BAGS = 5000.0
+
 # URL filter: only the actual monthly statistical bulletin carries the
 # headline numbers we want. The other PDFs the FNC site links from the
 # same landing pages — FEPCafé reports, ad-hoc reports, daily
@@ -360,6 +376,39 @@ def _unit_scale(unit: str) -> float:
     return 1000.0 if unit.lower().startswith("millon") else 1.0
 
 
+_NEXT_BULLET_RE = re.compile(
+    # Stop the body-year scan at the next bullet so production can't pick
+    # up exports' body-year anchor (the bulletins always pair production
+    # FIRST, then exports — the production bullet may not have its OWN
+    # body year, in which case we want to fall back to filename, not
+    # bleed into the next bullet).
+    r"(?:•|▪|·|•|Las\s+(?:exportaciones|importaciones|ventas))", re.I,
+)
+
+
+def _body_data_year_near(text: str, end_idx: int) -> int | None:
+    """Read the bullet's tail for 'frente al mismo mes de YYYY' and
+    return YYYY+1 — the data year that comparison anchors to.
+
+    Filenames lie when FNC re-uploads stale bulletins into a new year
+    folder (the live bug behind the 2025-12 = 1300 collision: a Jan-2025
+    bulletin sitting in /2026/01/ was being mis-dated as Jan-2026).
+    The body text doesn't lie — every bullet pairs its volume with a
+    YoY comparison year, and that year is always exactly one less than
+    the data year. So when the body text gives us a comparison year,
+    we trust it over the filename/folder heuristic."""
+    tail = text[end_idx: end_idx + 250]
+    # Truncate at the next bullet so a production scan can't leak into
+    # the exports bullet's body-year anchor.
+    stop = _NEXT_BULLET_RE.search(tail)
+    if stop:
+        tail = tail[: stop.start()]
+    m = _BODY_YEAR_RE.search(tail)
+    if not m:
+        return None
+    return int(m.group("yr")) + 1
+
+
 def _yoy_near(text: str, end_idx: int) -> float | None:
     """Pull the variación anual percentage from the bullet's tail. The
     bulletin pairs the volume with the YoY directly after, e.g.
@@ -419,14 +468,22 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
         num = _fnc_number(prod_m.group("num"))
         if num is not None:
             k_bags = num * _unit_scale(prod_m.group("unit"))
-            yoy = _yoy_near(text, prod_m.end())
-            entries.append(MonthlyEntry(
-                month=               f"{bulletin_yr:04d}-{bulletin_mn:02d}",
-                production_k_bags=   round(k_bags, 1),
-                production_yoy_pct=  yoy,
-                source_pdf=          source_url,
-                parser_version=      "v2",
-            ))
+            # Body-year override: trust "frente al mismo mes de YYYY"
+            # over filename/folder inference when present.
+            body_yr = _body_data_year_near(text, prod_m.end())
+            prod_yr = body_yr if body_yr is not None else bulletin_yr
+            # Sanity bound — drop the entry rather than ship a row that
+            # would distort the chart. Cause is always a number parse
+            # failure (table misalignment, decimal/thousands confusion).
+            if k_bags <= _MAX_PLAUSIBLE_K_BAGS:
+                yoy = _yoy_near(text, prod_m.end())
+                entries.append(MonthlyEntry(
+                    month=               f"{prod_yr:04d}-{bulletin_mn:02d}",
+                    production_k_bags=   round(k_bags, 1),
+                    production_yoy_pct=  yoy,
+                    source_pdf=          source_url,
+                    parser_version=      "v2",
+                ))
 
     # ── Exports: bullet names the month explicitly (usually M-1).
     exp_m = _EXP_BULLET_RE.search(text)
@@ -434,17 +491,23 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
         num = _fnc_number(exp_m.group("num"))
         exp_mn = SPANISH_MONTHS.get(exp_m.group("month").lower())
         if num is not None and exp_mn is not None:
-            # Year: explicit if the bullet carries it, else fall back to
-            # the bulletin year — adjusted backward by one year if the
-            # exports month is later in the calendar than the bulletin's
-            # (e.g. Jan bulletin reports Dec → previous year).
+            k_bags = num * _unit_scale(exp_m.group("unit"))
+            # Year resolution priority:
+            #   1. Explicit year in the bullet ("...en diciembre de 2025...")
+            #   2. Body-year anchor ("frente al mismo mes de 2024" ⇒ 2025)
+            #   3. Filename/folder year ± month rollover (legacy fallback)
             if exp_m.group("yr"):
                 exp_yr = int(exp_m.group("yr"))
-            elif exp_mn > bulletin_mn:
-                exp_yr = bulletin_yr - 1
             else:
-                exp_yr = bulletin_yr
-            k_bags = num * _unit_scale(exp_m.group("unit"))
+                body_yr = _body_data_year_near(text, exp_m.end())
+                if body_yr is not None:
+                    exp_yr = body_yr
+                elif exp_mn > bulletin_mn:
+                    exp_yr = bulletin_yr - 1
+                else:
+                    exp_yr = bulletin_yr
+            if k_bags > _MAX_PLAUSIBLE_K_BAGS:
+                return tuple(entries)
             yoy = _yoy_near(text, exp_m.end())
             # Same-month merge: when production already added a row for
             # this exact month, augment it instead of adding a duplicate.
@@ -549,7 +612,12 @@ def run(*, write: bool, diag: bool, max_pdfs: int | None) -> int:
         logger.error("[fnc] FATAL: discovered 0 PDF links from the listing pages")
         return 1
     if max_pdfs:
-        pdf_urls = pdf_urls[:max_pdfs]
+        # Discovery is sorted by /uploads/YYYY/MM/ ascending so the
+        # NEWEST bulletins live at the end of the list. Slice from the
+        # tail: under --max we want the most recent N, not the oldest.
+        # (v4 took the first N and accidentally dropped the Mar 2026
+        # bulletin off the end of the processing window.)
+        pdf_urls = pdf_urls[-max_pdfs:]
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     entries: list[MonthlyEntry] = []
