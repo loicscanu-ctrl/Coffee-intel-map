@@ -62,6 +62,9 @@ export default function UsImportsByOrigin() {
 
   const latestYear = data.years[data.years.length - 1];
   const total = data.total_by_year[String(latestYear)];
+  const TOP_BAR = 20, TOP_TABLE = 30;     // 100+ origins → show the meaningful head
+  const rankBar = ranking.slice(0, TOP_BAR);
+  const rankTable = ranking.slice(0, TOP_TABLE);
 
   return (
     <div className="p-4 space-y-4">
@@ -87,17 +90,17 @@ export default function UsImportsByOrigin() {
         {/* Ranking */}
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
           <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
-            Imports by country of origin — {latestYear} (kt)
+            Imports by country of origin — {latestYear} · top {TOP_BAR} of {ranking.length} (kt)
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ranking} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
+              <BarChart data={rankBar} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={84} interval={0} />
                 <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`${Number(v).toFixed(0)} kt`, "Imports"]} />
                 <Bar dataKey="kt" radius={[0, 2, 2, 0]}>
-                  {ranking.map((_, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}
+                  {rankBar.map((_, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -137,7 +140,7 @@ export default function UsImportsByOrigin() {
             </tr>
           </thead>
           <tbody>
-            {ranking.map((r, i) => (
+            {rankTable.map((r, i) => (
               <tr key={r.name} className="border-b border-slate-800 hover:bg-slate-800/40">
                 <td className="px-2 py-1 text-slate-200 flex items-center gap-1.5">
                   <span className="inline-block w-2 h-2 rounded-sm" style={{ background: PALETTE[i % PALETTE.length] }} />

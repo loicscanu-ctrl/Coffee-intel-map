@@ -80,7 +80,12 @@ BASIC_QUERY: dict = {
 }
 
 
-def build_query(years: list[str]) -> dict:
+# Candidate values for the commodity-selection "tab" (DataWeb rejects unknown
+# ones with a step-4 validation error). Tried in order until one returns data.
+COMMODITY_SELECT_TYPES = ["list", "search", "manual", "specific", "number"]
+
+
+def build_query(years: list[str], commodity_select_type: str = "list") -> dict:
     """Coffee (HTS 0901) imports for consumption, quantity, by country, annual."""
     q = copy.deepcopy(BASIC_QUERY)
     q["reportOptions"]["tradeType"] = "Import"            # Imports for Consumption
@@ -92,7 +97,7 @@ def build_query(years: list[str]) -> dict:
     cs["timeframeSelectType"] = "fullYears"
     # Filter to HTS-4 0901 (coffee), aggregated to one commodity line.
     com = q["searchOptions"]["commodities"]
-    com["commoditySelectType"] = "manual"
+    com["commoditySelectType"] = commodity_select_type
     com["commodities"] = [HTS]
     com["commoditiesManual"] = HTS
     com["commoditiesExpanded"] = [{"name": HTS, "value": HTS}]
@@ -194,16 +199,38 @@ def _run_report(query: dict) -> dict:
         r = requests.post(RUN_REPORT, headers=headers, json=query, timeout=90, verify=False)
         log.info("USITC runReport HTTP %s (%d bytes)", r.status_code, len(r.content))
         r.raise_for_status()
-        return r.json()
+        body = r.json()
+        # Diagnostic: when the parsed result is empty the body is usually a
+        # validation message or an empty table — surface it in the logs.
+        if len(r.content) < 2000:
+            log.info("USITC runReport raw body: %s", r.text[:1500])
+        return body
     except Exception as e:
         log.error("USITC runReport failed: %s", e)
         return {}
 
 
+def _fetch_parsed(years: list[str]) -> dict:
+    """Try each candidate commodity-select tab until one returns data, logging
+    the validation error for the ones that fail."""
+    for st in COMMODITY_SELECT_TYPES:
+        resp = _run_report(build_query(years, st))
+        dto = resp.get("dto") or {}
+        errors = dto.get("errors") or []
+        tables = dto.get("tables") or []
+        log.info("commodity selectType=%s → tables=%d errors=%s", st, len(tables), errors)
+        if tables and not errors:
+            parsed = parse_report(resp)
+            if parsed["origins"]:
+                log.info("commodity selectType=%s WORKS (%d origins)", st, len(parsed["origins"]))
+                return parsed
+    return {"years": [], "origins": [], "total_by_year": {}}
+
+
 def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
-    parsed = parse_report(_run_report(build_query(list(reversed(years)))))
+    parsed = _fetch_parsed(list(reversed(years)))
 
     if not parsed["origins"]:
         log.warning("usitc_imports: no origins parsed; retaining existing file")
