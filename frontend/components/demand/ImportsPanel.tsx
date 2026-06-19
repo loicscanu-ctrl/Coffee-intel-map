@@ -20,6 +20,7 @@ interface ImpCountry {
   reporter_code: string;
   annual: ImpYear[];
   latest_year: number;
+  monthly_total?: Record<string, number>;
 }
 interface CoffeeImports {
   updated: string;
@@ -44,6 +45,7 @@ export default function ImportsPanel() {
   const [data, setData] = useState<CoffeeImports | null>(null);
   const [error, setError] = useState(false);
   const [sel, setSel] = useState<string>("");
+  const [trendMode, setTrendMode] = useState<"annual" | "monthly">("annual");
 
   useEffect(() => {
     fetch("/data/coffee_imports.json")
@@ -83,6 +85,19 @@ export default function ImportsPanel() {
     roasted: kt(a.roasted_mt),
     decaf: kt(a.decaf_mt),
   })), [selCountry]);
+
+  // Monthly total series (kt) for the selected market, where UN Comtrade
+  // publishes it (rest-of-world importers; US→USITC, EU→Eurostat have their
+  // own monthly panels). `{ "YYYY-MM": mt }` → sorted points.
+  const monthlyTrend = useMemo(() =>
+    Object.entries(selCountry?.monthly_total ?? {})
+      .filter(([, v]) => v > 0)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([m, mt]) => ({ m, total: mt / 1000 })),
+  [selCountry]);
+  const hasMonthly = monthlyTrend.length > 0;
+  // Don't strand the toggle on "monthly" for a market without a monthly series.
+  const mode = hasMonthly ? trendMode : "annual";
 
   if (error) return null;
   if (!data) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading coffee-import data…</div>;
@@ -157,8 +172,24 @@ export default function ImportsPanel() {
 
       {/* Per-country trend */}
       <div className="bg-slate-800 rounded-lg border border-slate-700 p-3 space-y-3">
-        <div className="text-[10px] text-slate-400 uppercase tracking-wide">
-          Import trend by form — green / roasted (stacked) + decaffeinated
+        <div className="flex items-baseline justify-between flex-wrap gap-2">
+          <div className="text-[10px] text-slate-400 uppercase tracking-wide">
+            {mode === "monthly"
+              ? "Monthly import momentum — total (kt)"
+              : "Import trend by form — green / roasted (stacked) + decaffeinated"}
+          </div>
+          {/* Annual/Monthly toggle — monthly only where Comtrade publishes it */}
+          <div className="flex rounded border border-slate-700 overflow-hidden text-[10px]">
+            <button onClick={() => setTrendMode("annual")}
+              className={`px-2 py-0.5 transition-colors ${mode === "annual" ? "bg-amber-500 text-slate-900 font-medium" : "text-slate-400 hover:text-slate-200"}`}>
+              Annual
+            </button>
+            <button onClick={() => setTrendMode("monthly")} disabled={!hasMonthly}
+              title={hasMonthly ? "" : "No monthly series for this market"}
+              className={`px-2 py-0.5 transition-colors ${mode === "monthly" ? "bg-amber-500 text-slate-900 font-medium" : hasMonthly ? "text-slate-400 hover:text-slate-200" : "text-slate-600 cursor-not-allowed"}`}>
+              Monthly
+            </button>
+          </div>
         </div>
         <div className="flex flex-wrap gap-1">
           {ranking.map(r => (
@@ -167,27 +198,45 @@ export default function ImportsPanel() {
                 r.key === sel ? "border-transparent bg-amber-500 text-slate-900 font-medium" : "border-slate-700 text-slate-400 hover:text-slate-200"
               }`}>
               {r.name}
+              {countries[r.key]?.monthly_total ? <span className="ml-1 text-[8px] opacity-60">●</span> : null}
             </button>
           ))}
         </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={trend} margin={{ top: 4, right: 12, left: -8, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-              <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} width={40} />
-              <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => {
-                if (v == null) return ["—", String(n)];
-                const lbl = n === "green" ? "Green" : n === "roasted" ? "Roasted" : "Decaf (of total)";
-                return [`${Number(v).toLocaleString()} kt`, lbl];
-              }} />
-              <Legend wrapperStyle={{ fontSize: 9 }} />
-              <Area dataKey="green" stackId="f" stroke={GREEN} fill={GREEN} fillOpacity={0.5} connectNulls />
-              <Area dataKey="roasted" stackId="f" stroke={ROASTED} fill={ROASTED} fillOpacity={0.5} connectNulls />
-              <Line dataKey="decaf" stroke={DECAF} strokeWidth={1.6} dot={false} connectNulls strokeDasharray="3 2" />
-            </ComposedChart>
+            {mode === "monthly" ? (
+              <ComposedChart data={monthlyTrend} margin={{ top: 4, right: 12, left: -8, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="m" tick={{ fontSize: 8, fill: "#64748b" }} axisLine={false} tickLine={false}
+                  minTickGap={28} tickFormatter={(m: string) => m.slice(0, 7)} />
+                <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} width={40} />
+                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`${Number(v).toFixed(1)} kt`, "Total"]} />
+                <Area dataKey="total" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.25} strokeWidth={1.6} />
+              </ComposedChart>
+            ) : (
+              <ComposedChart data={trend} margin={{ top: 4, right: 12, left: -8, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} width={40} />
+                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => {
+                  if (v == null) return ["—", String(n)];
+                  const lbl = n === "green" ? "Green" : n === "roasted" ? "Roasted" : "Decaf (of total)";
+                  return [`${Number(v).toLocaleString()} kt`, lbl];
+                }} />
+                <Legend wrapperStyle={{ fontSize: 9 }} />
+                <Area dataKey="green" stackId="f" stroke={GREEN} fill={GREEN} fillOpacity={0.5} connectNulls />
+                <Area dataKey="roasted" stackId="f" stroke={ROASTED} fill={ROASTED} fillOpacity={0.5} connectNulls />
+                <Line dataKey="decaf" stroke={DECAF} strokeWidth={1.6} dot={false} connectNulls strokeDasharray="3 2" />
+              </ComposedChart>
+            )}
           </ResponsiveContainer>
         </div>
+        {mode === "monthly" && (
+          <div className="text-[9px] text-slate-500 italic">
+            Monthly total HS-0901 imports (kt), recent ~24 months, UN Comtrade. ● marks markets with a monthly series.
+            Gaps = months not yet reported. US &amp; EU monthly live in their own panels below (USITC / Eurostat).
+          </div>
+        )}
       </div>
 
       {/* Detail table */}
