@@ -6,6 +6,7 @@ import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import AjcaPanel from "@/components/demand/AjcaPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
+import ImportsVisualsLab from "@/components/demand/imports-lab/ImportsVisualsLab";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
@@ -138,9 +139,10 @@ function DemandPageInner() {
       )}
 
       {tab === "test" && (
-        <Section>
-          <CertifiedStocksTestPanel />
-        </Section>
+        <>
+          <Section><ImportsVisualsLab /></Section>
+          <Section><CertifiedStocksTestPanel /></Section>
+        </>
       )}
 
       <div className="flex-1 overflow-hidden">
