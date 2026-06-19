@@ -46,7 +46,11 @@ export default function OriginExportPanel({
   barColor: string;
   originNote?: string;
 }) {
-  const recent    = exp.monthly.slice(-24);
+  // Show the last 36 months. Vietnam already had ≥36 monthly rows
+  // that were getting silently truncated at 24; Colombia/Uganda are
+  // climbing past 24 as their historical FNC/UCDA backfills land.
+  // The 12-mo / YTD KPIs still only look at the most recent slice.
+  const recent    = exp.monthly.slice(-36);
   const chartData = recent.map(m => ({
     month: fmtMonth(m.month),
     mt:    toMT(m.total_k_bags),

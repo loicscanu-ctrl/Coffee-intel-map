@@ -41,8 +41,12 @@ def test_fnc_parse_bulletin_emits_production_for_bulletin_month_and_exports_for_
     """Real Jan-2026 bulletin sample (paraphrased from the live PDF).
     Production line names no month (it's THIS bulletin's month), exports
     bullet names December — so we must emit two rows, one for Jan and one
-    for Dec, the latter dated to year-1."""
+    for Dec, the latter dated to year-1.
+
+    Includes the actual title block — v8 strict mode requires at least
+    one trusted year source (filename, title, or body anchor)."""
     text = (
+        "INFORME MENSUAL\nENERO 2026\n"  # title block — real bulletins have this
         "• Para este mes, la producción de café alcanzó 893 mil sacos, lo que\n"
         "  representa una variación anual negativa del 34,2 %.\n"
         "• Las exportaciones definitivas de café en diciembre se ubicaron en 1,1\n"
@@ -88,6 +92,58 @@ def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
     assert by_month["2026-02"].total_k_bags       == 847.0
     assert by_month["2026-02"].yoy_pct            == -28.5
     assert by_month["2026-02"].production_yoy_pct is None
+
+
+def test_fnc_title_regex_accepts_de_and_del_between_month_and_year():
+    """v7 missed 'MAYO DE 2025' / 'Marzo del 2024' titles — the regex
+    required pure non-alphanumeric padding between month and year,
+    and `de`/`del` are alphanumeric. v8 makes the de/del optional.
+    Real consequence: the 2026-05 = 935 stuck row that wouldn't drain."""
+    # Title style 1: "MAYO DE 2025"
+    text1 = "INFORME MENSUAL\nMAYO DE 2025\nContenido..."
+    assert fnc._title_bulletin_year(text1, 5) == 2025  # mayo
+    # Title style 2: "Marzo del 2024"
+    text2 = "Reporte FNC\nMarzo del 2024\n..."
+    assert fnc._title_bulletin_year(text2, 3) == 2024  # marzo
+    # Title style 3: bare "ENERO 2026" still works (no de/del).
+    text3 = "INFORME MENSUAL ENERO 2026\n..."
+    assert fnc._title_bulletin_year(text3, 1) == 2026
+
+
+def test_fnc_parse_bulletin_strict_mode_drops_year_less_uploads():
+    """v8 strict mode: when filename has NO year, title-year scan
+    misses, AND body anchor misses, drop the bulletin instead of
+    falling back to the upload-folder year. Stale 2024-vintage
+    bulletins re-uploaded into /2026/ folders no longer pollute the
+    monthly series with current-year-misdated rows."""
+    # Year-less filename, body uses a YoY phrasing nothing matches,
+    # title has no month-year pair the regex can anchor to.
+    text = (
+        "Café para todos.\n"
+        "• Para este mes, la producción de café alcanzó 920 mil sacos,\n"
+        "  una recuperación del 5,4 % respecto al año anterior.\n"
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/03/"
+           "Informe-mensual-julio-p.pdf")
+    # Production drops (no trusted year), exports bullet absent → empty.
+    assert fnc.parse_bulletin(text, url) == ()
+
+
+def test_fnc_filename_month_year_parts_separates_filename_from_folder():
+    """v8 splits the year-source channels so the caller can treat
+    folder fallback as untrusted while still using filename year."""
+    # Filename year present.
+    mn, fn_yr, folder_yr = fnc._filename_month_year_parts(
+        "https://federaciondecafeteros.org/wp-content/uploads/2026/04/"
+        "3.-Informe-mensual-Marzo-2026-p.pdf"
+    )
+    assert (mn, fn_yr, folder_yr) == (3, 2026, 2026)
+    # Filename year absent — only folder year available.
+    mn, fn_yr, folder_yr = fnc._filename_month_year_parts(
+        "https://federaciondecafeteros.org/wp-content/uploads/2026/01/"
+        "1.-Informe-mensual-enero-p.pdf"
+    )
+    assert (mn, fn_yr, folder_yr) == (1, None, 2026)
 
 
 def test_fnc_title_year_overrides_folder_for_stale_re_uploads():
