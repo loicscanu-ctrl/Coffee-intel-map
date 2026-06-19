@@ -11,6 +11,8 @@ import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
 import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
+import MonthlyTrend from "@/components/demand/MonthlyTrend";
+import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -121,6 +123,15 @@ function DemandPageInner() {
               blurb="Where the US sources its coffee (USITC DataWeb, HTS 0901)"
               seedKey="USITC_API_KEY"
             />
+          </Section>
+          <Section>
+            <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <MonthlyTrend src="/data/us_coffee_imports.json"
+                heading="US imports — monthly (USITC)" color="#0ea5e9" />
+              <SourceReconciliation primarySrc="/data/us_coffee_imports.json"
+                primaryLabel="USITC" comtradeKey="usa"
+                heading="US — USITC vs UN Comtrade" />
+            </div>
           </Section>
           <Section>
             <ImportsByOrigin
