@@ -141,9 +141,13 @@ function DemandPageInner() {
             />
           </Section>
           <Section>
-            <div className="p-4">
+            <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
               <MonthlyTrend src="/data/eu_coffee_imports.json"
                 heading="EU extra-EU imports — monthly (Eurostat)" color="#f59e0b" />
+              <SourceReconciliation primarySrc="/data/eu_coffee_imports.json"
+                primaryLabel="Eurostat" comtradeSrc="/data/eu_coffee_imports.json"
+                comtradeField="comtrade_total_by_year"
+                heading="EU — Eurostat vs UN Comtrade (extra-EU)" />
             </div>
           </Section>
         </>

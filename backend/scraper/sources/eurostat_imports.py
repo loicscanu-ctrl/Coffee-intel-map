@@ -246,6 +246,47 @@ def parse_monthly_total(body: dict) -> dict:
     return dict(sorted(out.items()))
 
 
+# ── Comtrade EU-bloc (for the EU↔Comtrade reconciliation) ─────────────────────
+# Comtrade re-publishes national stats with a lag; for the EU bloc, imports
+# "from World" are extra-EU (intra-EU is internal). We pull that here so the UI
+# can show the systematic gap vs Eurostat. Kept on this (reliable) workflow as a
+# single reporter pull, rather than the throttled 42-country coffee_imports run.
+_COMTRADE_REF = "https://comtradeapi.un.org/files/v1/app/reference/Reporters.json"
+
+
+def _comtrade_eu_total_by_year() -> dict:
+    try:
+        ref = requests.get(_COMTRADE_REF, headers=_HEADERS, timeout=30)
+        ref.raise_for_status()
+        rows = ref.json().get("results") or ref.json()
+    except Exception as e:
+        log.warning("Comtrade EU reporter ref failed: %s", e)
+        return {}
+    cands = []
+    for x in rows:
+        code = str(x.get("id") or x.get("reporterCode") or "").strip()
+        text = str(x.get("text") or x.get("reporterDesc") or "")
+        if code and ("european union" in text.lower() or text.strip() in ("EU", "EU-27", "EU-28", "EU27_2020")):
+            cands.append((code, text))
+    log.info("Comtrade EU reporter candidates: %s", cands[:6])
+    if not cands:
+        return {}
+    # Prefer the EU27_2020 / newest "European Union" entry.
+    cands.sort(key=lambda c: ("27_2020" in c[1], "27" in c[1], "european union" in c[1].lower()), reverse=True)
+    eu_code = cands[0][0]
+    try:
+        from scraper.sources import coffee_imports as ci
+        now = datetime.utcnow()
+        periods = ",".join(reversed([str(now.year - 1 - i) for i in range(12)]))
+        annual = ci.parse_country_rows(ci._comtrade_annual(eu_code, periods))  # noqa: SLF001
+        by_year = {str(r["year"]): r["total_mt"] for r in annual if r.get("total_mt")}
+        log.info("Comtrade EU-bloc (reporter=%s) → %d years", eu_code, len(by_year))
+        return by_year
+    except Exception as e:
+        log.warning("Comtrade EU-bloc fetch failed: %s", e)
+        return {}
+
+
 def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
@@ -268,6 +309,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         if monthly:
             break
     monthly = {k: v for k, v in sorted(monthly.items()) if v > 0}
+    comtrade_by_year = _comtrade_eu_total_by_year()
 
     out = {
         "updated":       now.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -279,6 +321,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         "origins":       parsed["origins"],
         "total_by_year": parsed["total_by_year"],
         "monthly_total": monthly,
+        "comtrade_total_by_year": comtrade_by_year,   # EU-bloc extra-EU, for reconciliation
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")

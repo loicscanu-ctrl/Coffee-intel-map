@@ -13,10 +13,11 @@ interface CtCountry { annual: { year: number; total_mt: number | null }[] }
 // read with that systematic gap in mind. `comtradeKey` is the country key in
 // coffee_imports.json (e.g. "usa"); for the EU bloc pass `comtradeSrc` instead.
 export default function SourceReconciliation({
-  primarySrc, primaryField = "total_by_year", primaryLabel, comtradeKey, comtradeSrc, heading,
+  primarySrc, primaryField = "total_by_year", primaryLabel,
+  comtradeKey, comtradeSrc, comtradeField = "total_by_year", heading,
 }: {
   primarySrc: string; primaryField?: string; primaryLabel: string;
-  comtradeKey?: string; comtradeSrc?: string; heading: string;
+  comtradeKey?: string; comtradeSrc?: string; comtradeField?: string; heading: string;
 }) {
   const [primary, setPrimary] = useState<Record<string, number> | null>(null);
   const [comtrade, setComtrade] = useState<Record<string, number> | null>(null);
@@ -27,7 +28,7 @@ export default function SourceReconciliation({
       .then(d => setPrimary((d?.[primaryField] as Record<string, number>) ?? {})).catch(() => setErr(true));
     if (comtradeSrc) {
       fetch(comtradeSrc).then(r => r.json())
-        .then(d => setComtrade(d?.total_by_year ?? {})).catch(() => setErr(true));
+        .then(d => setComtrade((d?.[comtradeField] as Record<string, number>) ?? {})).catch(() => setErr(true));
     } else {
       fetch("/data/coffee_imports.json").then(r => r.json())
         .then(d => {
@@ -37,7 +38,7 @@ export default function SourceReconciliation({
           setComtrade(by);
         }).catch(() => setErr(true));
     }
-  }, [primarySrc, primaryField, comtradeKey, comtradeSrc]);
+  }, [primarySrc, primaryField, comtradeKey, comtradeSrc, comtradeField]);
 
   const { rows, meanGap } = useMemo(() => {
     const p = primary ?? {}, c = comtrade ?? {};
