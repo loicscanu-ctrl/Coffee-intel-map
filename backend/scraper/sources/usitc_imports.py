@@ -194,7 +194,12 @@ def _run_report(query: dict) -> dict:
         r = requests.post(RUN_REPORT, headers=headers, json=query, timeout=90, verify=False)
         log.info("USITC runReport HTTP %s (%d bytes)", r.status_code, len(r.content))
         r.raise_for_status()
-        return r.json()
+        body = r.json()
+        # Diagnostic: when the parsed result is empty the body is usually a
+        # validation message or an empty table — surface it in the logs.
+        if len(r.content) < 2000:
+            log.info("USITC runReport raw body: %s", r.text[:1500])
+        return body
     except Exception as e:
         log.error("USITC runReport failed: %s", e)
         return {}
