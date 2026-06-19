@@ -91,13 +91,13 @@ COUNTRIES: dict[str, tuple[str, str]] = {
     "isr": ("Israel", "376"),
 }
 
-# Endpoints: the keyless public PREVIEW truncates/returns stale slices for some
-# reporters (e.g. Germany came back as 2014@0). The authenticated DATA endpoint
-# returns complete series — used automatically when COMTRADE_API_KEY is set
-# (free key at comtradedeveloper.un.org).
+# Keyless public PREVIEW endpoint (fast). It truncates/returns stale slices for
+# some reporters (e.g. Germany → 2014@0); the freshness guard in build() drops
+# those rather than surface them. (The authenticated /data/v1 endpoint returns
+# complete series but rate-limits hard in batch — it stalled all 42 calls — so
+# we stay on the preview, which reliably covers ~20 importer markets.)
 COMTRADE_PREVIEW = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
-COMTRADE_AUTH    = "https://comtradeapi.un.org/data/v1/get/C/A/HS"
-COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")
+COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")  # passed as a header if set
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "coffee_imports.json"
 
@@ -107,8 +107,7 @@ _N_YEARS = 12   # annual history depth
 # ── Fetch + parse ──────────────────────────────────────────────────────────────
 
 def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
-    """One call: all HS-0901 subcodes × all periods, imports from World.
-    Uses the authenticated endpoint when a key is configured, else the preview."""
+    """One call: all HS-0901 subcodes × all periods, imports from World."""
     params = {
         "reporterCode": reporter_code,
         "cmdCode":      CMD_CSV,
@@ -117,12 +116,9 @@ def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
         "partnerCode":  "0",        # world aggregate
         "includeDesc":  "true",
     }
-    if COMTRADE_API_KEY:
-        url, headers = COMTRADE_AUTH, {"Ocp-Apim-Subscription-Key": COMTRADE_API_KEY}
-    else:
-        url, headers = COMTRADE_PREVIEW, {}
+    headers = {"Ocp-Apim-Subscription-Key": COMTRADE_API_KEY} if COMTRADE_API_KEY else {}
     try:
-        r = requests.get(url, params=params, headers=headers, timeout=40)
+        r = requests.get(COMTRADE_PREVIEW, params=params, headers=headers, timeout=25)
         r.raise_for_status()
         return r.json().get("data", []) or []
     except Exception as e:
@@ -185,7 +181,6 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
     periods_csv = ",".join(reversed(years))
     fresh_cutoff = now.year - 3   # drop reporters whose newest real datum is older
 
-    log.info("coffee_imports: endpoint=%s", "AUTH" if COMTRADE_API_KEY else "PREVIEW (keyless)")
     countries: dict[str, dict] = {}
     stale: list[str] = []
     for iso3, (name, code) in COUNTRIES.items():
