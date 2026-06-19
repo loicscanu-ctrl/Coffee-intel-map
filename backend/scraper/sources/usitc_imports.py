@@ -21,6 +21,7 @@ import copy
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -85,15 +86,18 @@ BASIC_QUERY: dict = {
 COMMODITY_SELECT_TYPES = ["list", "search", "manual", "specific", "number"]
 
 
-def build_query(years: list[str], commodity_select_type: str = "list") -> dict:
-    """Coffee (HTS 0901) imports for consumption, quantity, by country, annual."""
+def build_query(years: list[str], commodity_select_type: str = "list",
+                timeline: str = "Annual", break_countries: bool = True) -> dict:
+    """Coffee (HTS 0901) imports for consumption, quantity. `timeline` is
+    Annual or Monthly; `break_countries` splits partners into rows (else the
+    US total)."""
     q = copy.deepcopy(BASIC_QUERY)
     q["reportOptions"]["tradeType"] = "Import"            # Imports for Consumption
     q["reportOptions"]["classificationSystem"] = "HTS"
     cs = q["searchOptions"]["componentSettings"]
     cs["dataToReport"] = [MEASURE]
     cs["years"] = years
-    cs["yearsTimeline"] = "Annual"
+    cs["yearsTimeline"] = timeline
     cs["timeframeSelectType"] = "fullYears"
     # Filter to HTS-4 0901 (coffee), aggregated to one commodity line.
     com = q["searchOptions"]["commodities"]
@@ -103,8 +107,8 @@ def build_query(years: list[str], commodity_select_type: str = "list") -> dict:
     com["commoditiesExpanded"] = [{"name": HTS, "value": HTS}]
     com["granularity"] = "4"
     com["aggregation"] = "Aggregate Commodities"
-    # Break the partner countries out into one row each.
-    q["searchOptions"]["countries"]["aggregation"] = "Break Out Countries"
+    q["searchOptions"]["countries"]["aggregation"] = (
+        "Break Out Countries" if break_countries else "Aggregate Countries")
     return q
 
 
@@ -139,6 +143,45 @@ def _num(v):
 
 
 _TOTAL_LABELS = {"total", "grand total", "all countries", "world"}
+
+_MONTHS = {m: i for i, m in enumerate(
+    ["january", "february", "march", "april", "may", "june", "july", "august",
+     "september", "october", "november", "december"], start=1)}
+_MONTHS_ABBR = {m[:3]: i for m, i in _MONTHS.items()}
+
+
+def _month_key(label: str) -> str | None:
+    """Normalise a USITC time-column label to 'YYYY-MM' (or None if not monthly).
+    Handles '2024-01', '202401', 'Jan 2024', 'January 2024', '2024 January'."""
+    s = str(label).strip()
+    m = re.match(r"^(\d{4})[-/ ]?(\d{2})$", s)
+    if m and 1 <= int(m.group(2)) <= 12:
+        return f"{m.group(1)}-{int(m.group(2)):02d}"
+    toks = re.split(r"[\s,/-]+", s.lower())
+    yr = next((t for t in toks if re.fullmatch(r"\d{4}", t)), None)
+    mo = next((_MONTHS.get(t) or _MONTHS_ABBR.get(t[:3]) for t in toks
+               if t[:3] in _MONTHS_ABBR), None)
+    return f"{yr}-{mo:02d}" if yr and mo else None
+
+
+def parse_monthly(resp: dict) -> dict:
+    """USITC monthly report → {'YYYY-MM': mt}. kg→MT. Aggregates all rows
+    (expected single US-total row). Logs the raw column labels for diagnosis."""
+    try:
+        table = resp["dto"]["tables"][0]
+        cols = _get_columns(table["column_groups"])
+        rows = _get_rows(table["row_groups"][0]["rowsNew"])
+    except (KeyError, IndexError, TypeError):
+        return {}
+    month_cols = [(i, _month_key(c)) for i, c in enumerate(cols) if _month_key(c)]
+    log.info("USITC monthly columns=%s → %d month cols", cols[:8], len(month_cols))
+    by_month: dict[str, float] = {}
+    for row in rows:
+        for idx, mk in month_cols:
+            kg = _num(row[idx]) if idx < len(row) else None
+            if kg is not None:
+                by_month[mk] = round(by_month.get(mk, 0.0) + kg / 1000.0, 1)
+    return dict(sorted(by_month.items()))
 
 
 def parse_report(resp: dict) -> dict:
@@ -227,6 +270,9 @@ def _fetch_parsed(years: list[str]) -> dict:
     return {"years": [], "origins": [], "total_by_year": {}}
 
 
+_N_MONTHLY_YEARS = 4   # recent-window depth for the monthly national total
+
+
 def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
@@ -237,19 +283,28 @@ def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
         if OUT_PATH.exists():
             return json.loads(OUT_PATH.read_text(encoding="utf-8"))
 
+    # Monthly national total (recent window) for the momentum/trend view.
+    m_years = [str(now.year - i) for i in range(_N_MONTHLY_YEARS)]
+    monthly = parse_monthly(_run_report(
+        build_query(list(reversed(m_years)), timeline="Monthly", break_countries=False)))
+    log.info("usitc_imports: %d monthly points (%s … %s)", len(monthly),
+             next(iter(monthly), "—"), next(reversed(monthly), "—") if monthly else "—")
+
     out = {
-        "updated":       now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source":        "USITC DataWeb — HTS 0901, Imports for Consumption, quantity (kg→MT)",
-        "hts":           HTS,
-        "measure":       "quantity_mt",
-        "is_seed":       False,
-        "years":         parsed["years"],
-        "origins":       parsed["origins"],
-        "total_by_year": parsed["total_by_year"],
+        "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source":         "USITC DataWeb — HTS 0901, Imports for Consumption, quantity (kg→MT)",
+        "hts":            HTS,
+        "measure":        "quantity_mt",
+        "is_seed":        False,
+        "years":          parsed["years"],
+        "origins":        parsed["origins"],
+        "total_by_year":  parsed["total_by_year"],
+        "monthly_total":  monthly,   # {"YYYY-MM": mt} US total
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("us_coffee_imports.json written: %d origins", len(parsed["origins"]))
+    log.info("us_coffee_imports.json written: %d origins, %d monthly pts",
+             len(parsed["origins"]), len(monthly))
     return out
 
 
