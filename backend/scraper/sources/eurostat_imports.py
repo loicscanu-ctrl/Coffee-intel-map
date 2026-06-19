@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -67,6 +68,17 @@ def _fetch(years: list[str]) -> dict:
     except Exception as e:
         log.error("Eurostat fetch error: %s", e)
         return {}
+
+
+_RENAME = {"Viet Nam": "Vietnam", "Korea, Republic of": "South Korea",
+           "Russian Federation": "Russia", "Tanzania, United Republic of": "Tanzania"}
+
+
+def clean_name(label: str) -> str:
+    """Eurostat partner labels carry verbose parentheticals, e.g.
+    "Viet Nam (incl. North Viet Nam 'VD' from 1977)" → "Vietnam"."""
+    s = re.sub(r"\s*\(.*", "", str(label)).strip() or str(label)
+    return _RENAME.get(s, s)
 
 
 def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
@@ -146,7 +158,7 @@ def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
     origins = []
     total_by_year: dict[str, float] = {}
     for pcode, by_year in acc.items():
-        name = partner_labels.get(pcode, pcode)
+        name = clean_name(partner_labels.get(pcode, pcode))
         latest = max(by_year) if by_year else None
         origins.append({"name": name, "by_year": by_year,
                         "latest_mt": by_year.get(latest) if latest else None})

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scraper.sources.eurostat_imports import parse_jsonstat
+from scraper.sources.eurostat_imports import clean_name, parse_jsonstat
 
 
 def _cube(partners, years, values, labels):
@@ -69,3 +69,9 @@ def test_parse_100kg_units_to_mt():
     cube = _cube(["BR"], ["2023"], {"0": 10_000}, {"BR": "Brazil"})
     out = parse_jsonstat(cube)            # default kg_per_unit=100
     assert out["origins"][0]["by_year"] == {"2023": 1000.0}
+
+
+def test_clean_name_strips_parentheticals_and_renames():
+    assert clean_name("Viet Nam (incl. North Viet Nam 'VD' from 1977)") == "Vietnam"
+    assert clean_name("Ethiopia (incl. Eritrea 'ER' -> 1993)") == "Ethiopia"
+    assert clean_name("Brazil") == "Brazil"
