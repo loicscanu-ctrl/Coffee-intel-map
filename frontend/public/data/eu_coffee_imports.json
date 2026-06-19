@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-19T13:47:24Z",
+  "updated": "2026-06-19T16:26:56Z",
   "source": "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (100kg→MT)",
   "hts": "0901",
   "measure": "quantity_mt",
@@ -2077,5 +2077,6 @@
     "2023": 2746118.2,
     "2024": 2990884.4,
     "2025": 2936379.3
-  }
+  },
+  "monthly_total": {}
 }
