@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scraper.sources.usitc_imports import build_query, parse_report
+from scraper.sources.usitc_imports import build_query, parse_monthly, parse_report
 
 
 def _resp(columns, rows):
@@ -71,3 +71,54 @@ def test_build_query_targets_coffee_imports_by_country():
     assert cs["dataToReport"] == ["CONS_FIR_UNIT_QUANT"]
     assert cs["years"] == ["2022", "2023", "2024"]
     assert cs["yearsTimeline"] == "Annual"
+
+
+def _resp_monthly(columns, row):
+    return {"dto": {"tables": [{
+        "column_groups": [
+            {"columns": [{"label": columns[0]}]},
+            {"columns": [{"label": c} for c in columns[1:]]},
+        ],
+        "row_groups": [{"rowsNew": [{"rowEntries": [{"value": v} for v in row]}]}],
+    }]}}
+
+
+def _resp_crosstab(columns, rows):
+    return {"dto": {"tables": [{
+        "column_groups": [
+            {"columns": [{"label": columns[0]}]},
+            {"columns": [{"label": c} for c in columns[1:]]},
+        ],
+        "row_groups": [{"rowsNew": [{"rowEntries": [{"value": v} for v in r]} for r in rows]}],
+    }]}}
+
+
+def test_parse_monthly_crosstab_year_plus_month_names():
+    # Real USITC layout: a 'Year' column + bare month-name columns, one row/year.
+    resp = _resp_crosstab(
+        ["Year", "Quantity Description", "January", "February", "March"],
+        [["2024", "First Unit of Quantity", "1,000,000", "1,100,000", "900,000"],
+         ["2025", "First Unit of Quantity", "1,050,000", "950,000", "--"]],
+    )
+    out = parse_monthly(resp)
+    assert out == {"2024-01": 1000.0, "2024-02": 1100.0, "2024-03": 900.0,
+                   "2025-01": 1050.0, "2025-02": 950.0}
+
+
+def test_parse_monthly_fallback_mon_year_labels():
+    resp = _resp_monthly(
+        ["Country", "Jan 2024", "February 2024", "2024-03", "202404"],
+        ["All Countries", "1,000,000", "1,100,000", "900,000", "950,000"],
+    )
+    out = parse_monthly(resp)
+    assert out == {"2024-01": 1000.0, "2024-02": 1100.0, "2024-03": 900.0, "2024-04": 950.0}
+
+
+def test_parse_monthly_empty():
+    assert parse_monthly({}) == {}
+
+
+def test_build_query_monthly_aggregates_countries():
+    q = build_query(["2024"], timeline="Monthly", break_countries=False)
+    assert q["searchOptions"]["componentSettings"]["yearsTimeline"] == "Monthly"
+    assert q["searchOptions"]["countries"]["aggregation"] == "Aggregate Countries"
