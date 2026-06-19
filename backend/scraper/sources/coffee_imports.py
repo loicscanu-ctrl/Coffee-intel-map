@@ -126,6 +126,46 @@ def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
         return []
 
 
+COMTRADE_MONTHLY = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
+
+
+def _comtrade_monthly(reporter_code: str, periods_csv: str) -> list[dict]:
+    """Monthly variant of _comtrade_annual (C/M endpoint). Short timeout so a
+    throttled call fails fast instead of stalling the whole run."""
+    params = {
+        "reporterCode": reporter_code, "cmdCode": CMD_CSV, "flowCode": "M",
+        "period": periods_csv, "partnerCode": "0", "includeDesc": "true",
+    }
+    headers = {"Ocp-Apim-Subscription-Key": COMTRADE_API_KEY} if COMTRADE_API_KEY else {}
+    try:
+        r = requests.get(COMTRADE_MONTHLY, params=params, headers=headers, timeout=15)
+        r.raise_for_status()
+        return r.json().get("data", []) or []
+    except Exception as e:
+        log.error("Comtrade monthly fetch error reporter=%s: %s", reporter_code, e)
+        return []
+
+
+def parse_country_monthly(rows: list[dict]) -> dict:
+    """Monthly total (HS 0901) by month → {'YYYY-MM': mt} (kg→MT)."""
+    wgt: dict[str, dict[str, float]] = {}
+    for d in rows:
+        p = str(d.get("period", ""))            # 'YYYYMM'
+        if len(p) != 6 or not p.isdigit():
+            continue
+        nw = d.get("netWgt")
+        if nw not in (None, 0):
+            wgt.setdefault(f"{p[:4]}-{p[4:6]}", {})[str(d.get("cmdCode", ""))] = float(nw) / 1000.0
+    out: dict[str, float] = {}
+    for ym, w in wgt.items():
+        total = w.get("0901") if "0901" in w else (
+            w.get("090111", 0) + w.get("090112", 0) + w.get("090121", 0)
+            + w.get("090122", 0) + w.get("090190", 0))
+        if total:
+            out[ym] = round(total, 1)
+    return dict(sorted(out.items()))
+
+
 def parse_country_rows(rows: list[dict]) -> list[dict]:
     """Fold raw Comtrade rows (one country) into a per-year series.
 
@@ -211,6 +251,30 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
         log.warning("coffee_imports: dropped %d stale reporters (latest < %d): %s",
                     len(stale), fresh_cutoff, ", ".join(stale))
     log.info("coffee_imports: kept %d fresh countries", len(countries))
+
+    # Monthly momentum for the rest-of-world importers (recent ~24 months).
+    # Skip the US + EU members — those are served better by USITC / Eurostat.
+    eu_members = {"deu", "ita", "fra", "esp", "nld", "bel", "swe", "pol", "aut",
+                  "prt", "fin", "dnk", "grc", "cze", "rou", "hun", "irl"}
+    skip_monthly = eu_members | {"usa"}
+    m_periods = []
+    y, m = now.year, now.month
+    for _ in range(24):
+        m -= 1
+        if m == 0:
+            m, y = 12, y - 1
+        m_periods.append(f"{y}{m:02d}")
+    m_periods_csv = ",".join(reversed(m_periods))
+    n_monthly = 0
+    for iso3, c in countries.items():
+        if iso3 in skip_monthly:
+            continue
+        mt = parse_country_monthly(_comtrade_monthly(c["reporter_code"], m_periods_csv))
+        if mt:
+            c["monthly_total"] = mt
+            n_monthly += 1
+        time.sleep(0.4)
+    log.info("coffee_imports: monthly added for %d rest-of-world importers", n_monthly)
 
     if not countries:
         # Network unavailable (e.g. egress sandbox) — keep any existing file.

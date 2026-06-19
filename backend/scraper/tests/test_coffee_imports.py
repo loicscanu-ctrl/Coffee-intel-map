@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scraper.sources.coffee_imports import parse_country_rows
+from scraper.sources.coffee_imports import parse_country_monthly, parse_country_rows
 
 
 def _row(period, cmd, net_wgt=None, value=None):
@@ -61,3 +61,14 @@ def test_parse_sorts_years_and_skips_junk():
 
 def test_parse_empty():
     assert parse_country_rows([]) == []
+
+
+def test_parse_country_monthly():
+    rows = [
+        _row("202401", "0901", net_wgt=1_000_000),
+        _row("202402", "090111", net_wgt=600_000),
+        _row("202402", "090121", net_wgt=200_000),
+        _row("bad",    "0901", net_wgt=9_000_000),   # bad period skipped
+    ]
+    out = parse_country_monthly(rows)
+    assert out == {"2024-01": 1000.0, "2024-02": 800.0}
