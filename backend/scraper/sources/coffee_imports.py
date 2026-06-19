@@ -91,9 +91,13 @@ COUNTRIES: dict[str, tuple[str, str]] = {
     "isr": ("Israel", "376"),
 }
 
-# Public preview endpoint (annual). No key needed; ≤500 rows/call.
-COMTRADE_PUBLIC_BASE = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
-COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")  # optional, paid tier
+# Keyless public PREVIEW endpoint (fast). It truncates/returns stale slices for
+# some reporters (e.g. Germany → 2014@0); the freshness guard in build() drops
+# those rather than surface them. (The authenticated /data/v1 endpoint returns
+# complete series but rate-limits hard in batch — it stalled all 42 calls — so
+# we stay on the preview, which reliably covers ~20 importer markets.)
+COMTRADE_PREVIEW = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
+COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")  # passed as a header if set
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "coffee_imports.json"
 
@@ -114,7 +118,7 @@ def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
     }
     headers = {"Ocp-Apim-Subscription-Key": COMTRADE_API_KEY} if COMTRADE_API_KEY else {}
     try:
-        r = requests.get(COMTRADE_PUBLIC_BASE, params=params, headers=headers, timeout=40)
+        r = requests.get(COMTRADE_PREVIEW, params=params, headers=headers, timeout=25)
         r.raise_for_status()
         return r.json().get("data", []) or []
     except Exception as e:
@@ -175,21 +179,38 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
     years = [str(now.year - 1 - i) for i in range(_N_YEARS)]   # last N complete years
     periods_csv = ",".join(reversed(years))
+    fresh_cutoff = now.year - 3   # drop reporters whose newest real datum is older
 
     countries: dict[str, dict] = {}
+    stale: list[str] = []
     for iso3, (name, code) in COUNTRIES.items():
         annual = parse_country_rows(_comtrade_annual(code, periods_csv))
-        if not annual:
-            log.info("coffee_imports: no data for %s", iso3)
+        # latest year that actually carries a total volume
+        real_years = [r["year"] for r in annual if r.get("total_mt") is not None]
+        if not real_years:
+            log.info("coffee_imports: no usable data for %s", iso3)
+            time.sleep(0.4)
+            continue
+        latest = max(real_years)
+        if latest < fresh_cutoff:
+            # Stale slice (the preview endpoint does this for some reporters) —
+            # exclude rather than surface a misleading old/zero value.
+            stale.append(f"{iso3}:{latest}")
+            time.sleep(0.4)
             continue
         countries[iso3] = {
             "name":         name,
             "iso3":         iso3.upper(),
             "reporter_code": code,
-            "annual":       annual,
-            "latest_year":  annual[-1]["year"],
+            "annual":       [r for r in annual if r.get("total_mt") is not None],
+            "latest_year":  latest,
         }
-        time.sleep(0.4)   # be gentle on the public endpoint
+        time.sleep(0.4)   # be gentle on the endpoint
+
+    if stale:
+        log.warning("coffee_imports: dropped %d stale reporters (latest < %d): %s",
+                    len(stale), fresh_cutoff, ", ".join(stale))
+    log.info("coffee_imports: kept %d fresh countries", len(countries))
 
     if not countries:
         # Network unavailable (e.g. egress sandbox) — keep any existing file.
