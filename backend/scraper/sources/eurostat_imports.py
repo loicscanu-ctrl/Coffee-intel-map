@@ -50,21 +50,23 @@ OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coff
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(reporter: str, years: list[str]) -> dict:
+def _fetch(reporter: str, freq: str, time_params: list[tuple[str, str]]) -> dict:
     params = [
-        ("format", "JSON"), ("freq", "A"), ("reporter", reporter),
+        ("format", "JSON"), ("freq", freq), ("reporter", reporter),
         ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
     ]
-    params += [("time", y) for y in years]
+    params += time_params
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
-        log.info("Eurostat reporter=%s HTTP %s (%d bytes)", reporter, r.status_code, len(r.content))
         if r.status_code != 200:
-            log.info("Eurostat reporter=%s body: %s", reporter, r.text[:400])
+            log.info("Eurostat r=%s freq=%s HTTP %s body: %s", reporter, freq, r.status_code, r.text[:300])
             return {}
-        return r.json()
+        body = r.json()
+        log.info("Eurostat r=%s freq=%s HTTP 200 dims=%s size=%s nval=%d",
+                 reporter, freq, body.get("id"), body.get("size"), len(body.get("value", {}) or {}))
+        return body
     except Exception as e:
-        log.error("Eurostat fetch error reporter=%s: %s", reporter, e)
+        log.error("Eurostat fetch error reporter=%s freq=%s: %s", reporter, freq, e)
         return {}
 
 
@@ -91,19 +93,35 @@ def parse_jsonstat(body: dict) -> dict:
             return {v: k for k, v in idx.items()}
         return dict(enumerate(idx))
 
-    partner_codes = pos_to_code("partner") if "partner" in dims else {}
-    time_codes = pos_to_code("time") if "time" in dims else {}
-    partner_labels = dims.get("partner", {}).get("category", {}).get("label", {})
+    # Dimension ids vary in case/spelling — find the partner & time dims robustly.
+    def find_dim(*cands: str) -> str | None:
+        for c in cands:
+            if c in ids:
+                return c
+        for d in ids:
+            if any(c in d.lower() for c in cands):
+                return d
+        return None
+
+    pdim = find_dim("partner")
+    tdim = find_dim("time")
+    if not pdim or not tdim:
+        log.warning("Eurostat parse: partner/time dim not found in ids=%s", ids)
+        return {"years": [], "origins": [], "total_by_year": {}}
+
+    partner_codes = pos_to_code(pdim)
+    time_codes = pos_to_code(tdim)
+    partner_labels = dims.get(pdim, {}).get("category", {}).get("label", {})
 
     # strides for flat-index decoding (row-major over `ids`)
     strides = [1] * len(ids)
     for i in range(len(ids) - 2, -1, -1):
         strides[i] = strides[i + 1] * sizes[i + 1]
-    pi = ids.index("partner") if "partner" in ids else -1
-    ti = ids.index("time") if "time" in ids else -1
-    if pi < 0 or ti < 0:
-        return {"years": [], "origins": [], "total_by_year": {}}
+    pi = ids.index(pdim)
+    ti = ids.index(tdim)
 
+    # Accumulate by YEAR (sum) — handles annual ("2023") and monthly ("2023-01"/
+    # "202301") time codes alike via the 4-digit year prefix.
     acc: dict[str, dict[str, float]] = {}
     for flat, val in values.items():
         if val is None:
@@ -117,11 +135,13 @@ def parse_jsonstat(body: dict) -> dict:
             continue
         if pcode in SKIP_PARTNERS or pcode in EU_MEMBERS:
             continue
+        year = str(ycode)[:4]
         try:
             mt = float(val) / 1000.0
         except (TypeError, ValueError):
             continue
-        acc.setdefault(pcode, {})[ycode] = round(mt, 1)
+        d = acc.setdefault(pcode, {})
+        d[year] = round(d.get(year, 0.0) + mt, 1)
 
     years = sorted({int(y) for d in acc.values() for y in d}) if acc else []
     origins = []
@@ -142,14 +162,23 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
     years = list(reversed(years))
 
+    # Comext ds-045409 is monthly; annual freq usually returns no observations.
+    # Try annual first (cheap if it exists), then monthly with year-aggregation.
+    n_months = N_YEARS * 12
+    freq_variants = [
+        ("A", [("time", y) for y in years]),
+        ("M", [("lastTimePeriod", str(n_months))]),
+    ]
     parsed = {"years": [], "origins": [], "total_by_year": {}}
     for reporter in REPORTER_CANDIDATES:
-        body = _fetch(reporter, years)
-        cand = parse_jsonstat(body)
-        log.info("Eurostat reporter=%s → %d origins", reporter, len(cand["origins"]))
-        if cand["origins"]:
-            parsed = cand
-            log.info("Eurostat reporter=%s WORKS", reporter)
+        for freq, tparams in freq_variants:
+            cand = parse_jsonstat(_fetch(reporter, freq, tparams))
+            log.info("Eurostat reporter=%s freq=%s → %d origins", reporter, freq, len(cand["origins"]))
+            if cand["origins"]:
+                parsed = cand
+                log.info("Eurostat reporter=%s freq=%s WORKS", reporter, freq)
+                break
+        if parsed["origins"]:
             break
 
     if not parsed["origins"]:

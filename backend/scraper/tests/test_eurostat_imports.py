@@ -47,6 +47,18 @@ def test_parse_excludes_eu_members_and_aggregates():
     assert out["total_by_year"] == {"2023": 1400.0}
 
 
+def test_parse_aggregates_monthly_to_year():
+    # Monthly time codes for one partner → summed into the calendar year.
+    cube = _cube(
+        ["BR"], ["2023-01", "2023-02", "2023-03"],
+        {"0": 600_000, "1": 400_000, "2": 500_000},
+        {"BR": "Brazil"},
+    )
+    out = parse_jsonstat(cube)
+    assert out["years"] == [2023]
+    assert out["origins"][0]["by_year"] == {"2023": 1500.0}   # (600+400+500)k kg → 1500 MT
+
+
 def test_parse_empty_or_malformed():
     assert parse_jsonstat({})["origins"] == []
     assert parse_jsonstat({"id": [], "size": [], "dimension": {}, "value": {}})["origins"] == []
