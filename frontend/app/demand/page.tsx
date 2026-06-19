@@ -10,6 +10,7 @@ import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
 import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
+import ImportsVisualsLab from "@/components/demand/imports-lab/ImportsVisualsLab";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -138,9 +139,10 @@ function DemandPageInner() {
       )}
 
       {tab === "test" && (
-        <Section>
-          <CertifiedStocksTestPanel />
-        </Section>
+        <>
+          <Section><ImportsVisualsLab /></Section>
+          <Section><CertifiedStocksTestPanel /></Section>
+        </>
       )}
 
       <div className="flex-1 overflow-hidden">
