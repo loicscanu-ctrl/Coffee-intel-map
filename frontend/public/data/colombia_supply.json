@@ -1,9 +1,9 @@
 {
   "country": "colombia",
-  "scraped_at": "2026-06-19T16:53:33+00:00",
+  "scraped_at": "2026-06-19T17:28:14+00:00",
   "exports": {
     "source": "USDA FAS PSD",
-    "last_updated": "2026-05",
+    "last_updated": "2026-04",
     "unit": "thousand 60-kg bags",
     "monthly": [
       {
@@ -219,13 +219,6 @@
         "parser_version": "v2",
         "yoy_pct": -13.6,
         "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/06/5.-Informe-mensual-Mayo-2026-p.pdf"
-      },
-      {
-        "month": "2026-05",
-        "total_k_bags": 935.0,
-        "yoy_pct": 10.6,
-        "source_pdf": "https://federaciondecafeteros.org/wp-content/uploads/2026/03/Informe-mensual-junio-p.pdf",
-        "parser_version": "v2"
       }
     ],
     "annual": [
