@@ -27,7 +27,7 @@ def test_parse_basic_two_partners_two_years():
         {"0": 1_000_000, "1": 1_100_000, "2": 500_000, "3": 450_000},
         {"BR": "Brazil", "CO": "Colombia"},
     )
-    out = parse_jsonstat(cube)
+    out = parse_jsonstat(cube, kg_per_unit=1)
     assert out["years"] == [2022, 2023]
     assert [o["name"] for o in out["origins"]] == ["Brazil", "Colombia"]   # sorted desc
     assert out["origins"][0]["by_year"] == {"2022": 1000.0, "2023": 1100.0}  # kg→MT
@@ -41,12 +41,31 @@ def test_parse_excludes_eu_members_and_aggregates():
         {"0": 800_000, "1": 600_000, "2": 999_000, "3": 9_000_000},
         {"BR": "Brazil", "CO": "Colombia", "DE": "Germany", "WORLD": "World"},
     )
-    out = parse_jsonstat(cube)
+    out = parse_jsonstat(cube, kg_per_unit=1)
     names = [o["name"] for o in out["origins"]]
     assert names == ["Brazil", "Colombia"]          # DE (intra-EU) + WORLD dropped
     assert out["total_by_year"] == {"2023": 1400.0}
 
 
+def test_parse_aggregates_monthly_to_year():
+    # Monthly time codes for one partner → summed into the calendar year.
+    cube = _cube(
+        ["BR"], ["2023-01", "2023-02", "2023-03"],
+        {"0": 600_000, "1": 400_000, "2": 500_000},
+        {"BR": "Brazil"},
+    )
+    out = parse_jsonstat(cube, kg_per_unit=1)
+    assert out["years"] == [2023]
+    assert out["origins"][0]["by_year"] == {"2023": 1500.0}   # (600+400+500)k kg → 1500 MT
+
+
 def test_parse_empty_or_malformed():
     assert parse_jsonstat({})["origins"] == []
     assert parse_jsonstat({"id": [], "size": [], "dimension": {}, "value": {}})["origins"] == []
+
+
+def test_parse_100kg_units_to_mt():
+    # Comext quantity is in 100-kg units → MT = value * 100 / 1000 = value/10.
+    cube = _cube(["BR"], ["2023"], {"0": 10_000}, {"BR": "Brazil"})
+    out = parse_jsonstat(cube)            # default kg_per_unit=100
+    assert out["origins"][0]["by_year"] == {"2023": 1000.0}

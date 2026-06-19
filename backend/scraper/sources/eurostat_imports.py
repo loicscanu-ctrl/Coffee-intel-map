@@ -28,12 +28,10 @@ log = logging.getLogger(__name__)
 
 BASE = "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/ds-045409"
 PRODUCT = "0901"
-INDICATOR = "QUANTITY_IN_KG"
 N_YEARS = 6
-
-# Candidate codes for the EU reporter (geonomenclature differs across vintages);
-# tried in order until one returns data.
-REPORTER_CANDIDATES = ["EU27_2020", "EU", "EU27", "EU28"]
+REPORTER = "EU27_2020"          # confirmed valid EU-bloc reporter code
+INDICATOR = "QUANTITY_IN_100KG"  # the only quantity indicator (units = 100 kg)
+KG_PER_UNIT = 100                # 100-kg units → MT = value × 100 / 1000
 
 # EU member geo codes — excluded from "origins" so the view is extra-EU only
 # (reporter=EU bloc + intra-EU partner would otherwise show member states).
@@ -42,37 +40,40 @@ EU_MEMBERS = {
     "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI",
     "ES", "SE",
 }
-# Non-country partner aggregates to skip.
-SKIP_PARTNERS = {"EU27_2020", "EU", "EU27", "EU28", "WORLD", "EXT_EU27_2020", "TOTAL"}
+# Non-country partner aggregates / blocs to skip.
+SKIP_PARTNERS = {
+    "EU27_2020", "EU", "EU27", "EU28", "EA", "EA21", "EA20", "EA19", "WORLD",
+    "EXT_EU27_2020", "EXT_EU", "INT_EU27_2020", "INTRA_EU", "EXTRA_EU", "TOTAL",
+}
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coffee_imports.json"
 
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(reporter: str, years: list[str]) -> dict:
-    params = [
-        ("format", "JSON"), ("freq", "A"), ("reporter", reporter),
-        ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
-    ]
+def _fetch(years: list[str]) -> dict:
+    """EU-bloc imports of HS 0901 by partner, annual, quantity (100-kg units)."""
+    params = [("format", "JSON"), ("freq", "A"), ("reporter", REPORTER),
+              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR)]
     params += [("time", y) for y in years]
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
-        log.info("Eurostat reporter=%s HTTP %s (%d bytes)", reporter, r.status_code, len(r.content))
         if r.status_code != 200:
-            log.info("Eurostat reporter=%s body: %s", reporter, r.text[:400])
+            log.info("Eurostat HTTP %s body: %s", r.status_code, r.text[:300])
             return {}
-        return r.json()
+        body = r.json()
+        log.info("Eurostat HTTP 200 size=%s nval=%d", body.get("size"), len(body.get("value", {}) or {}))
+        return body
     except Exception as e:
-        log.error("Eurostat fetch error reporter=%s: %s", reporter, e)
+        log.error("Eurostat fetch error: %s", e)
         return {}
 
 
-def parse_jsonstat(body: dict) -> dict:
-    """Decode a JSON-stat cube → {years, origins[], total_by_year} (kg→MT).
+def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
+    """Decode a JSON-stat cube → {years, origins[], total_by_year} in MT.
 
-    Handles the multi-dimensional value map: only `partner` and `time` vary
-    (reporter/product/flow/indicators are filtered to one value each). Pure —
+    `kg_per_unit` converts the raw measure to kg (Comext quantity is in 100-kg
+    units). Only `partner` and `time` vary (other dims are pinned). Pure —
     unit-tested."""
     try:
         ids = body["id"]
@@ -91,19 +92,35 @@ def parse_jsonstat(body: dict) -> dict:
             return {v: k for k, v in idx.items()}
         return dict(enumerate(idx))
 
-    partner_codes = pos_to_code("partner") if "partner" in dims else {}
-    time_codes = pos_to_code("time") if "time" in dims else {}
-    partner_labels = dims.get("partner", {}).get("category", {}).get("label", {})
+    # Dimension ids vary in case/spelling — find the partner & time dims robustly.
+    def find_dim(*cands: str) -> str | None:
+        for c in cands:
+            if c in ids:
+                return c
+        for d in ids:
+            if any(c in d.lower() for c in cands):
+                return d
+        return None
+
+    pdim = find_dim("partner")
+    tdim = find_dim("time")
+    if not pdim or not tdim:
+        log.warning("Eurostat parse: partner/time dim not found in ids=%s", ids)
+        return {"years": [], "origins": [], "total_by_year": {}}
+
+    partner_codes = pos_to_code(pdim)
+    time_codes = pos_to_code(tdim)
+    partner_labels = dims.get(pdim, {}).get("category", {}).get("label", {})
 
     # strides for flat-index decoding (row-major over `ids`)
     strides = [1] * len(ids)
     for i in range(len(ids) - 2, -1, -1):
         strides[i] = strides[i + 1] * sizes[i + 1]
-    pi = ids.index("partner") if "partner" in ids else -1
-    ti = ids.index("time") if "time" in ids else -1
-    if pi < 0 or ti < 0:
-        return {"years": [], "origins": [], "total_by_year": {}}
+    pi = ids.index(pdim)
+    ti = ids.index(tdim)
 
+    # Accumulate by YEAR (sum) — handles annual ("2023") and monthly ("2023-01"/
+    # "202301") time codes alike via the 4-digit year prefix.
     acc: dict[str, dict[str, float]] = {}
     for flat, val in values.items():
         if val is None:
@@ -117,11 +134,13 @@ def parse_jsonstat(body: dict) -> dict:
             continue
         if pcode in SKIP_PARTNERS or pcode in EU_MEMBERS:
             continue
+        year = str(ycode)[:4]
         try:
-            mt = float(val) / 1000.0
+            mt = float(val) * kg_per_unit / 1000.0
         except (TypeError, ValueError):
             continue
-        acc.setdefault(pcode, {})[ycode] = round(mt, 1)
+        d = acc.setdefault(pcode, {})
+        d[year] = round(d.get(year, 0.0) + mt, 1)
 
     years = sorted({int(y) for d in acc.values() for y in d}) if acc else []
     origins = []
@@ -142,15 +161,8 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     years = [str(now.year - 1 - i) for i in range(N_YEARS)]
     years = list(reversed(years))
 
-    parsed = {"years": [], "origins": [], "total_by_year": {}}
-    for reporter in REPORTER_CANDIDATES:
-        body = _fetch(reporter, years)
-        cand = parse_jsonstat(body)
-        log.info("Eurostat reporter=%s → %d origins", reporter, len(cand["origins"]))
-        if cand["origins"]:
-            parsed = cand
-            log.info("Eurostat reporter=%s WORKS", reporter)
-            break
+    parsed = parse_jsonstat(_fetch(years))
+    log.info("Eurostat → %d origins", len(parsed["origins"]))
 
     if not parsed["origins"]:
         log.warning("eurostat_imports: no origins parsed; retaining existing file")
@@ -159,7 +171,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
 
     out = {
         "updated":       now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source":        "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (kg→MT)",
+        "source":        "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (100kg→MT)",
         "hts":           PRODUCT,
         "measure":       "quantity_mt",
         "is_seed":       False,
