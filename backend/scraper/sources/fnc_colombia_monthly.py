@@ -193,11 +193,17 @@ _BODY_YEAR_RE = re.compile(
 
 # Title-year fallback: if no in-body anchor matches, scan the bulletin's
 # header block (first ~1000 chars) for an explicit month-year pair like
-# "ENERO 2026" / "Marzo de 2025". The title is usually the most
+# "ENERO 2026" / "Marzo de 2025" / "Mayo del 2024". The title is the most
 # trustworthy year signal — FNC always types it in fresh for each
-# bulletin even when they re-use a filename template.
+# bulletin even when they re-use a filename template. The optional
+# " de "/" del " gap between month and year matters: v7 missed
+# "MAYO DE 2025"-style titles because the regex required pure
+# non-alphanumeric padding, and `de`/`del` are alphanumeric.
 _TITLE_YEAR_RE = re.compile(
-    r"(?:" + "|".join(SPANISH_MONTHS) + r")\b[^a-zA-Z0-9]{0,8}(?P<yr>20\d{2})",
+    r"(?:" + "|".join(SPANISH_MONTHS) + r")\b"
+    r"(?:\s+del?)?"           # optional " de" / " del" between month and year
+    r"[^a-zA-Z0-9]{0,8}"
+    r"(?P<yr>20\d{2})",
     re.I,
 )
 
@@ -298,32 +304,101 @@ def _upload_sort_key(url: str) -> tuple[int, int, str]:
     return (0, 0, url)
 
 
-def discover_pdf_urls() -> list[str]:
-    """Crawl FNC's three landing pages and return every PDF link they
-    surface, de-duplicated, sorted by upload-folder date ASCENDING.
+# WP REST API: returns the full media library, paginated. The default
+# headline-landing pages only surface ~60 recent PDFs; the media endpoint
+# gives access to everything FNC has ever uploaded, which is how we extend
+# the monthly history back through 2022-2023.
+_WP_MEDIA_URL = f"{FNC_BASE}/wp-json/wp/v2/media"
 
-    Filenames are inconsistent enough that we don't try to parse the
-    data month out here — that happens once we've actually downloaded
-    the PDF and read the body (or as a filename-fallback if the body
-    parse fails). The sort order matters because the merge step uses
-    last-write-wins: newer uploads should overwrite older ones."""
+# Paginated archive listings — WordPress auto-paginates the
+# /wp/informe-mensual-de-cifras/ page index, so /page/2/, /page/3/ etc.
+# surface older bulletins that the first page no longer shows.
+_LISTING_PAGES = 6  # 1..6 — empirically covers ~3y of monthly bulletins
+
+
+def _fetch_wp_media_pdfs() -> list[str]:
+    """Page through WP's REST API media endpoint and collect every PDF
+    whose filename looks like a monthly bulletin. The endpoint returns
+    100 items/page and exposes the X-WP-TotalPages header so we know
+    when to stop. Returns [] if the endpoint is disabled (some WP
+    installs lock /wp-json behind auth) — caller still has the HTML
+    listings to fall back on."""
+    found: list[str] = []
+    for page in range(1, 20):  # hard cap on pagination; FNC has < 2000 media items total
+        url = f"{_WP_MEDIA_URL}?per_page=100&page={page}&media_type=application"
+        body = _fetch(url)
+        if not body:
+            break
+        try:
+            items = json.loads(body.decode("utf-8", errors="ignore"))
+        except json.JSONDecodeError:
+            logger.warning(f"[fnc] wp-json page {page}: not JSON, stopping")
+            break
+        if not isinstance(items, list) or not items:
+            break
+        for it in items:
+            src = it.get("source_url") if isinstance(it, dict) else None
+            if not isinstance(src, str) or not src.lower().endswith(".pdf"):
+                continue
+            if _BULLETIN_FILENAME_RE.search(src):
+                found.append(src)
+        if len(items) < 100:
+            break  # last page
+    logger.info(f"[fnc] wp-json: {len(found)} bulletin PDF(s)")
+    return found
+
+
+def _fetch_html_listing_pdfs() -> list[str]:
+    """Crawl FNC's three landing pages PLUS paginated /page/N/ variants
+    of each. The headline page is one snapshot; pagination exposes
+    older entries the headline page hides."""
+    found: list[str] = []
+    for listing in LISTING_URLS:
+        for page in range(1, _LISTING_PAGES + 1):
+            url = listing if page == 1 else f"{listing.rstrip('/')}/page/{page}/"
+            html_bytes = _fetch(url)
+            if not html_bytes:
+                if page == 1:
+                    continue  # next listing
+                break  # past last page for this listing
+            html = html_bytes.decode("utf-8", errors="ignore")
+            page_pdfs = []
+            for m in _PDF_LINK_RE.finditer(html):
+                href = m.group("href")
+                if href.startswith("/"):
+                    href = f"{FNC_BASE}{href}"
+                page_pdfs.append(href)
+            if not page_pdfs and page > 1:
+                break  # listing exhausted
+            found.extend(page_pdfs)
+    return found
+
+
+def discover_pdf_urls() -> list[str]:
+    """Discover every monthly-bulletin PDF FNC publishes, sorted by
+    /uploads/YYYY/MM/ folder ASCENDING. Two discovery channels:
+
+      1. WP REST API media endpoint — paginated, returns the full
+         upload history. Best signal when available.
+      2. HTML listing pages + their /page/N/ pagination — fallback
+         when WP-JSON is disabled. Now crawls multiple pages instead
+         of just the headline snapshot.
+
+    Both feed the same de-dup set, so we don't double-process bulletins
+    that appear in both channels. Sort order matters because the merge
+    step uses last-write-wins: newer uploads should overwrite older
+    ones (v4 mechanism)."""
     found: list[str] = []
     seen: set[str] = set()
-    for listing in LISTING_URLS:
-        html_bytes = _fetch(listing)
-        if not html_bytes:
+
+    for url in _fetch_wp_media_pdfs() + _fetch_html_listing_pdfs():
+        if url in seen:
             continue
-        html = html_bytes.decode("utf-8", errors="ignore")
-        for m in _PDF_LINK_RE.finditer(html):
-            href = m.group("href")
-            if href.startswith("/"):
-                href = f"{FNC_BASE}{href}"
-            if href in seen:
-                continue
-            seen.add(href)
-            found.append(href)
+        seen.add(url)
+        found.append(url)
+
     found.sort(key=_upload_sort_key)
-    logger.info(f"[fnc] discovered {len(found)} PDF link(s) across {len(LISTING_URLS)} listing(s)")
+    logger.info(f"[fnc] discovered {len(found)} unique PDF link(s)")
     return found
 
 
@@ -376,7 +451,8 @@ def _extract_text(pdf_bytes: bytes) -> str:
 
 
 def _month_from_filename(url: str) -> tuple[int, int] | None:
-    """Recover (year, month) from the PDF URL.
+    """Recover (year, month) from the PDF URL — legacy entry point that
+    folds explicit-filename-year and folder-fallback-year together.
 
     Format A — filename carries both: 'Informe-mensual-Marzo-2026-p.pdf'.
     Format B — filename carries the month only: '1.-Informe-mensual-enero-p-1.pdf'.
@@ -385,6 +461,24 @@ def _month_from_filename(url: str) -> tuple[int, int] | None:
 
     The upload-folder MONTH is never used — recon confirmed the folder
     upload month doesn't track the data month."""
+    parts = _filename_month_year_parts(url)
+    if parts is None:
+        return None
+    mn, fn_yr, folder_yr = parts
+    yr = fn_yr if fn_yr is not None else folder_yr
+    if yr is None:
+        return None
+    return yr, mn
+
+
+def _filename_month_year_parts(url: str) -> tuple[int, int | None, int | None] | None:
+    """Like _month_from_filename but exposes which year channel matched.
+
+    Returns (month, filename_year, folder_year), where each year is
+    None when its channel didn't find one. Lets the caller treat
+    filename-year + body-year + title-year as 'trusted' signals and
+    folder-year as a lower-confidence fallback that strict mode can
+    reject independently."""
     slug = url.rsplit("/", 1)[-1].lower()
     m = _FN_MONTH_RE.search(slug)
     if not m:
@@ -394,15 +488,15 @@ def _month_from_filename(url: str) -> tuple[int, int] | None:
     mn = SPANISH_MONTHS.get(base)
     if not mn:
         return None
-    # Year: prefer one in the filename slug, fall back to the
-    # /YYYY/MM/ upload-folder year.
+    fn_yr = None
     yr_match = re.search(r"20\d{2}", slug)
     if yr_match:
-        return int(yr_match.group(0)), mn
+        fn_yr = int(yr_match.group(0))
+    folder_yr = None
     folder_match = re.search(r"/uploads/(20\d{2})/\d{2}/", url, re.I)
     if folder_match:
-        return int(folder_match.group(1)), mn
-    return None
+        folder_yr = int(folder_match.group(1))
+    return mn, fn_yr, folder_yr
 
 
 def _unit_scale(unit: str) -> float:
@@ -504,20 +598,32 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
     if not _BULLETIN_FILENAME_RE.search(source_url):
         return ()
 
-    # Bulletin date (from filename) — used as the production month +
-    # fallback year for the exports month.
-    fn_month = _month_from_filename(source_url)
-    if not fn_month:
+    # Bulletin date — resolved through three trusted year channels:
+    #   1. Year in the filename     (e.g. 'Informe-mensual-Marzo-2026-p.pdf')
+    #   2. Year in the title block  (e.g. 'INFORME MENSUAL · MAYO DE 2024')
+    #   3. Year in the body anchor  (e.g. 'frente al mismo mes de 2024')
+    # If none of these matches, we used to fall back to the upload-folder
+    # year — but folder fallback gets stale re-uploads wrong (a 2024
+    # bulletin re-uploaded into /2026/01/ would be misdated to 2026).
+    # v8 strict mode: drop the bulletin rather than ship a guessed year.
+    parts = _filename_month_year_parts(source_url)
+    if parts is None:
         return ()
-    bulletin_yr, bulletin_mn = fn_month
-
-    # Title-year override: when the filename has no year and we'd fall
-    # back to folder, the header block usually has a typed-in
-    # "ENERO 2026" pair that's far more trustworthy. Folder dates lie
-    # for re-uploaded stale bulletins; title text does not.
+    bulletin_mn, fn_yr, folder_yr = parts
     title_yr = _title_bulletin_year(text, bulletin_mn)
-    if title_yr is not None:
+    if fn_yr is not None:
+        bulletin_yr = fn_yr
+    elif title_yr is not None:
         bulletin_yr = title_yr
+    else:
+        # Body-year is per-bullet; we check it inside the production /
+        # exports blocks below. The bulletin_yr remains None here so
+        # the prod block knows it has to consult its own body anchor
+        # to commit. If neither succeeds, prod entry is dropped.
+        # For the exports block, the bullet itself may carry the year
+        # ("...en diciembre de 2025...") which bypasses this.
+        bulletin_yr = None
+    _folder_yr = folder_yr  # kept for telemetry only — never trusted
 
     entries: list[MonthlyEntry] = []
 
@@ -528,26 +634,28 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
         if num is not None:
             k_bags = num * _unit_scale(prod_m.group("unit"))
             # Body-year override: trust the in-bullet anchor over
-            # title/filename/folder inference when present.
+            # title/filename inference when present. v8 strict mode:
+            # if neither body anchor nor the upstream bulletin_yr (from
+            # filename/title) gave us a year, DROP the production entry
+            # rather than guess from the upload folder.
             body_yr = _body_data_year_near(text, prod_m.end())
             prod_yr = body_yr if body_yr is not None else bulletin_yr
-            month_key = f"{prod_yr:04d}-{bulletin_mn:02d}"
-            # Sanity bound — drop the entry rather than ship a row that
-            # would distort the chart. Cause is always a number parse
-            # failure (table misalignment, decimal/thousands confusion).
-            # Future-month filter: a stale bulletin whose body-year
-            # anchor missed and whose filename/folder year fell back to
-            # the current year will produce a month in the future.
-            # FNC can't report a month that hasn't ended yet.
-            if k_bags <= _MAX_PLAUSIBLE_K_BAGS and not _is_future_month(month_key):
-                yoy = _yoy_near(text, prod_m.end())
-                entries.append(MonthlyEntry(
-                    month=               month_key,
-                    production_k_bags=   round(k_bags, 1),
-                    production_yoy_pct=  yoy,
-                    source_pdf=          source_url,
-                    parser_version=      "v2",
-                ))
+            if prod_yr is not None:
+                month_key = f"{prod_yr:04d}-{bulletin_mn:02d}"
+                # Sanity bound — drop the entry rather than ship a row
+                # that would distort the chart (number parse failure,
+                # table misalignment, decimal/thousands confusion).
+                # Future-month filter: FNC can't report a month that
+                # hasn't ended yet.
+                if k_bags <= _MAX_PLAUSIBLE_K_BAGS and not _is_future_month(month_key):
+                    yoy = _yoy_near(text, prod_m.end())
+                    entries.append(MonthlyEntry(
+                        month=               month_key,
+                        production_k_bags=   round(k_bags, 1),
+                        production_yoy_pct=  yoy,
+                        source_pdf=          source_url,
+                        parser_version=      "v2",
+                    ))
 
     # ── Exports: bullet names the month explicitly (usually M-1).
     exp_m = _EXP_BULLET_RE.search(text)
@@ -559,17 +667,23 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
             # Year resolution priority:
             #   1. Explicit year in the bullet ("...en diciembre de 2025...")
             #   2. Body-year anchor ("frente al mismo mes de 2024" ⇒ 2025)
-            #   3. Filename/folder year ± month rollover (legacy fallback)
+            #   3. Filename/title bulletin year ± month rollover
+            #      (Dec exports in a Jan bulletin → year - 1).
+            # v8 strict mode: no folder fallback — if all three above
+            # fail, drop the entry.
+            exp_yr: int | None
             if exp_m.group("yr"):
                 exp_yr = int(exp_m.group("yr"))
             else:
                 body_yr = _body_data_year_near(text, exp_m.end())
                 if body_yr is not None:
                     exp_yr = body_yr
-                elif exp_mn > bulletin_mn:
-                    exp_yr = bulletin_yr - 1
+                elif bulletin_yr is not None:
+                    exp_yr = bulletin_yr - 1 if exp_mn > bulletin_mn else bulletin_yr
                 else:
-                    exp_yr = bulletin_yr
+                    exp_yr = None
+            if exp_yr is None:
+                return tuple(entries)
             exp_month_key = f"{exp_yr:04d}-{exp_mn:02d}"
             if k_bags > _MAX_PLAUSIBLE_K_BAGS or _is_future_month(exp_month_key):
                 return tuple(entries)
