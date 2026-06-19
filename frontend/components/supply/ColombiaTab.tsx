@@ -19,11 +19,14 @@ interface ColombiaSupply {
     monthly: {
       month: string;
       total_k_bags: number;
-      yoy_pct: number | null;
+      yoy_pct: number | null;             // exports YoY (DANE/FNC)
       // Optional fields populated by DANE (NANDINA breakdown + FOB USD)
       // and FNC (national production). All tabs degrade gracefully when
       // absent so the older USDA-PSD-only seed still renders.
       production_k_bags?: number | null;
+      production_yoy_pct?: number | null; // production YoY (FNC, kept separate
+                                          // from yoy_pct so neither clobbers
+                                          // the other during a same-month merge)
       total_t?: number | null;
       by_nandina?: { code: string; tons: number | null; fob_usd: number | null }[];
     }[];
