@@ -51,7 +51,7 @@ import logging
 import re
 import sys
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import requests
@@ -187,6 +187,22 @@ _BODY_YEAR_RE = re.compile(
 # bulletin is a parser failure (number misread, table misalignment, etc).
 # We drop the entry rather than ship a phantom row.
 _MAX_PLAUSIBLE_K_BAGS = 5000.0
+
+
+def _is_future_month(month_str: str) -> bool:
+    """True if 'YYYY-MM' is later than the current calendar month. FNC
+    publishes the production bulletin in early M+1 (Jan-2026 bulletin
+    out by mid-Feb-2026); exports inside that bulletin are for M-1.
+    So the latest valid data month for FNC is `today.month - 1`.
+    Anything in the future is a stale bulletin whose year got
+    misattributed by the filename/folder fallback (the body-year
+    anchor missed because the bulletin uses different phrasing)."""
+    try:
+        yr, mn = (int(p) for p in month_str.split("-"))
+    except (ValueError, AttributeError):
+        return False
+    today = date.today()
+    return (yr, mn) > (today.year, today.month)
 
 # URL filter: only the actual monthly statistical bulletin carries the
 # headline numbers we want. The other PDFs the FNC site links from the
@@ -472,13 +488,18 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
             # over filename/folder inference when present.
             body_yr = _body_data_year_near(text, prod_m.end())
             prod_yr = body_yr if body_yr is not None else bulletin_yr
+            month_key = f"{prod_yr:04d}-{bulletin_mn:02d}"
             # Sanity bound — drop the entry rather than ship a row that
             # would distort the chart. Cause is always a number parse
             # failure (table misalignment, decimal/thousands confusion).
-            if k_bags <= _MAX_PLAUSIBLE_K_BAGS:
+            # Future-month filter: a stale bulletin whose body-year
+            # anchor missed and whose filename/folder year fell back to
+            # the current year will produce a month in the future.
+            # FNC can't report a month that hasn't ended yet.
+            if k_bags <= _MAX_PLAUSIBLE_K_BAGS and not _is_future_month(month_key):
                 yoy = _yoy_near(text, prod_m.end())
                 entries.append(MonthlyEntry(
-                    month=               f"{prod_yr:04d}-{bulletin_mn:02d}",
+                    month=               month_key,
                     production_k_bags=   round(k_bags, 1),
                     production_yoy_pct=  yoy,
                     source_pdf=          source_url,
@@ -506,7 +527,8 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
                     exp_yr = bulletin_yr - 1
                 else:
                     exp_yr = bulletin_yr
-            if k_bags > _MAX_PLAUSIBLE_K_BAGS:
+            exp_month_key = f"{exp_yr:04d}-{exp_mn:02d}"
+            if k_bags > _MAX_PLAUSIBLE_K_BAGS or _is_future_month(exp_month_key):
                 return tuple(entries)
             yoy = _yoy_near(text, exp_m.end())
             # Same-month merge: when production already added a row for
@@ -514,7 +536,7 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
             # production_yoy_pct and yoy_pct (exports) are independent now
             # — neither clobbers the other.
             target = next(
-                (e for e in entries if e.month == f"{exp_yr:04d}-{exp_mn:02d}"),
+                (e for e in entries if e.month == exp_month_key),
                 None,
             )
             if target is not None:
@@ -522,7 +544,7 @@ def parse_bulletin(text: str, source_url: str) -> tuple[MonthlyEntry, ...]:
                 target.yoy_pct = yoy
             else:
                 entries.append(MonthlyEntry(
-                    month=          f"{exp_yr:04d}-{exp_mn:02d}",
+                    month=          exp_month_key,
                     total_k_bags=   round(k_bags, 1),
                     yoy_pct=        yoy,
                     source_pdf=     source_url,
@@ -556,7 +578,26 @@ def _merge_into_supply(monthly: list[MonthlyEntry]) -> dict:
     existing_exports = doc.get("exports") or {}
     existing_monthly = existing_exports.get("monthly") or []
 
-    by_month: dict[str, dict] = {row.get("month"): row for row in existing_monthly if row.get("month")}
+    # One-shot purge of existing rows that violate the v6 invariants:
+    #   • future months (a stale bulletin slipped through v5)
+    #   • implausibly large k_bags (the 122,000 row from earlier runs)
+    # DANE-only rows survive even if they fail the purge — DANE rows
+    # carry a source_xls and their tonnage comes from customs declarations,
+    # not the FNC bullet regex. The purge targets FNC-source artefacts.
+    def _purge(row: dict) -> bool:
+        if not isinstance(row, dict) or not row.get("month"):
+            return False
+        if _is_future_month(row["month"]):
+            return False
+        for k in ("total_k_bags", "production_k_bags"):
+            v = row.get(k)
+            if isinstance(v, (int, float)) and v > _MAX_PLAUSIBLE_K_BAGS:
+                return False
+        return True
+
+    by_month: dict[str, dict] = {
+        row["month"]: row for row in existing_monthly if _purge(row)
+    }
     for e in monthly:
         existing = by_month.get(e.month, {})
         # Only overwrite a key when this run actually has a value for
