@@ -165,22 +165,42 @@ def _month_key(label: str) -> str | None:
 
 
 def parse_monthly(resp: dict) -> dict:
-    """USITC monthly report → {'YYYY-MM': mt}. kg→MT. Aggregates all rows
-    (expected single US-total row). Logs the raw column labels for diagnosis."""
+    """USITC monthly report → {'YYYY-MM': mt}. kg→MT.
+
+    DataWeb returns a cross-tab: each row is a year (in a 'Year' column) and the
+    month columns are bare names ('January', …). Falls back to 'Mon YYYY'-style
+    labels if a future layout uses those. Logs the raw columns for diagnosis."""
     try:
         table = resp["dto"]["tables"][0]
         cols = _get_columns(table["column_groups"])
         rows = _get_rows(table["row_groups"][0]["rowsNew"])
     except (KeyError, IndexError, TypeError):
         return {}
-    month_cols = [(i, _month_key(c)) for i, c in enumerate(cols) if _month_key(c)]
-    log.info("USITC monthly columns=%s → %d month cols", cols[:8], len(month_cols))
+    low = [str(c).strip().lower() for c in cols]
+    year_idx = low.index("year") if "year" in low else None
+    name_months = [(i, _MONTHS.get(lc) or _MONTHS_ABBR.get(lc[:3]))
+                   for i, lc in enumerate(low) if lc in _MONTHS or lc[:3] in _MONTHS_ABBR]
+    log.info("USITC monthly columns=%s → year_idx=%s, %d month cols",
+             cols[:6], year_idx, len(name_months))
+
     by_month: dict[str, float] = {}
-    for row in rows:
-        for idx, mk in month_cols:
-            kg = _num(row[idx]) if idx < len(row) else None
-            if kg is not None:
-                by_month[mk] = round(by_month.get(mk, 0.0) + kg / 1000.0, 1)
+    if year_idx is not None and name_months:
+        for row in rows:
+            ym = re.match(r"(\d{4})", str(row[year_idx]).strip()) if year_idx < len(row) else None
+            if not ym:
+                continue
+            for idx, mo in name_months:
+                kg = _num(row[idx]) if (mo and idx < len(row)) else None
+                if kg is not None:
+                    key = f"{ym.group(1)}-{mo:02d}"
+                    by_month[key] = round(by_month.get(key, 0.0) + kg / 1000.0, 1)
+    else:   # fallback: 'Jan 2024' / '2024-01' style columns
+        month_cols = [(i, _month_key(c)) for i, c in enumerate(cols) if _month_key(c)]
+        for row in rows:
+            for idx, mk in month_cols:
+                kg = _num(row[idx]) if idx < len(row) else None
+                if kg is not None:
+                    by_month[mk] = round(by_month.get(mk, 0.0) + kg / 1000.0, 1)
     return dict(sorted(by_month.items()))
 
 

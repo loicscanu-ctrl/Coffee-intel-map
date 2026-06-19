@@ -83,7 +83,29 @@ def _resp_monthly(columns, row):
     }]}}
 
 
-def test_parse_monthly_various_label_formats():
+def _resp_crosstab(columns, rows):
+    return {"dto": {"tables": [{
+        "column_groups": [
+            {"columns": [{"label": columns[0]}]},
+            {"columns": [{"label": c} for c in columns[1:]]},
+        ],
+        "row_groups": [{"rowsNew": [{"rowEntries": [{"value": v} for v in r]} for r in rows]}],
+    }]}}
+
+
+def test_parse_monthly_crosstab_year_plus_month_names():
+    # Real USITC layout: a 'Year' column + bare month-name columns, one row/year.
+    resp = _resp_crosstab(
+        ["Year", "Quantity Description", "January", "February", "March"],
+        [["2024", "First Unit of Quantity", "1,000,000", "1,100,000", "900,000"],
+         ["2025", "First Unit of Quantity", "1,050,000", "950,000", "--"]],
+    )
+    out = parse_monthly(resp)
+    assert out == {"2024-01": 1000.0, "2024-02": 1100.0, "2024-03": 900.0,
+                   "2025-01": 1050.0, "2025-02": 950.0}
+
+
+def test_parse_monthly_fallback_mon_year_labels():
     resp = _resp_monthly(
         ["Country", "Jan 2024", "February 2024", "2024-03", "202404"],
         ["All Countries", "1,000,000", "1,100,000", "900,000", "950,000"],
