@@ -147,7 +147,8 @@ function DemandPageInner() {
               <SourceReconciliation primarySrc="/data/eu_coffee_imports.json"
                 primaryLabel="Eurostat" comtradeSrc="/data/eu_coffee_imports.json"
                 comtradeField="comtrade_total_by_year"
-                heading="EU — Eurostat vs UN Comtrade (extra-EU)" />
+                heading="EU — Eurostat vs UN Comtrade (extra-EU)"
+                emptyNote="UN Comtrade has no usable EU-bloc series — the EU isn't a sovereign Comtrade reporter (member states report individually, and the public endpoint's EU member data is stale/incomplete). For the US the two agree to ~0.1%, since Comtrade re-publishes the national source; for the EU, treat Eurostat as authoritative and read Comtrade's EU figures with caution." />
             </div>
           </Section>
         </>

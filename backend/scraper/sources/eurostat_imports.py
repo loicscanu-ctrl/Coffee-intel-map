@@ -280,6 +280,13 @@ def _comtrade_eu_total_by_year() -> dict:
         periods = ",".join(reversed([str(now.year - 1 - i) for i in range(12)]))
         annual = ci.parse_country_rows(ci._comtrade_annual(eu_code, periods))  # noqa: SLF001
         by_year = {str(r["year"]): r["total_mt"] for r in annual if r.get("total_mt")}
+        # The EU is not a sovereign Comtrade reporter, so the aggregate carries
+        # little/no data (members report individually). Treat a near-empty
+        # series (≪ EU's ~3 Mt) as "unavailable" rather than store noise.
+        if not by_year or max(by_year.values()) < 100_000:
+            log.info("Comtrade EU-bloc (reporter=%s) negligible (%s) — no usable EU series",
+                     eu_code, {k: round(v) for k, v in by_year.items()})
+            return {}
         log.info("Comtrade EU-bloc (reporter=%s) → %d years", eu_code, len(by_year))
         return by_year
     except Exception as e:

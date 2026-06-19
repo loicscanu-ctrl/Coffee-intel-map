@@ -14,10 +14,11 @@ interface CtCountry { annual: { year: number; total_mt: number | null }[] }
 // coffee_imports.json (e.g. "usa"); for the EU bloc pass `comtradeSrc` instead.
 export default function SourceReconciliation({
   primarySrc, primaryField = "total_by_year", primaryLabel,
-  comtradeKey, comtradeSrc, comtradeField = "total_by_year", heading,
+  comtradeKey, comtradeSrc, comtradeField = "total_by_year", heading, emptyNote,
 }: {
   primarySrc: string; primaryField?: string; primaryLabel: string;
   comtradeKey?: string; comtradeSrc?: string; comtradeField?: string; heading: string;
+  emptyNote?: string;
 }) {
   const [primary, setPrimary] = useState<Record<string, number> | null>(null);
   const [comtrade, setComtrade] = useState<Record<string, number> | null>(null);
@@ -42,7 +43,8 @@ export default function SourceReconciliation({
 
   const { rows, meanGap } = useMemo(() => {
     const p = primary ?? {}, c = comtrade ?? {};
-    const years = Object.keys(p).filter(y => y in c).sort();
+    // only reconcile years where Comtrade actually has a (non-zero) figure
+    const years = Object.keys(p).filter(y => (c[y] ?? 0) > 0).sort();
     const rows = years.map(y => {
       const pk = p[y] / 1000, ck = c[y] / 1000;
       return { year: y, primary: Math.round(pk), comtrade: Math.round(ck),
@@ -56,7 +58,14 @@ export default function SourceReconciliation({
   if (err) return null;
   if (!primary || !comtrade) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading reconciliation…</div>;
   if (rows.length === 0) {
-    return <div className="p-4 text-xs text-slate-500">No overlapping years to reconcile {primaryLabel} vs Comtrade.</div>;
+    return (
+      <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
+        <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">{heading}</div>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          {emptyNote ?? `No overlapping UN Comtrade figures to reconcile against ${primaryLabel}.`}
+        </p>
+      </div>
+    );
   }
 
   const tone = Math.abs(meanGap) < 2 ? "text-emerald-300" : Math.abs(meanGap) < 8 ? "text-amber-300" : "text-red-300";
