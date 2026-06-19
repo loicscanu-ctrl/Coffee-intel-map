@@ -88,6 +88,56 @@ def test_fnc_parse_bulletin_accepts_se_ubico_verb_variant():
     assert by_month["2026-02"].production_yoy_pct is None
 
 
+def test_fnc_body_year_overrides_filename_for_re_uploaded_stale_bulletins():
+    """v4 bug: a stale Jan-2025 bulletin re-uploaded into /2026/01/ was
+    misdated as a Jan-2026 bulletin (folder year fallback), then
+    reported Dec 2024 exports as '2025-12 = 1300 +22%' — clobbering the
+    real Dec 2025 row written by the legit Jan-2026 bulletin.
+
+    v5 fix: trust the body's 'frente al mismo mes de YYYY' anchor over
+    filename/folder inference. For the stale bulletin, the body says
+    'frente al mismo mes de 2023' (Dec 2024 vs Dec 2023), so the data
+    year is 2024 — correctly keying the row as 2024-12, not 2025-12."""
+    # Stale Jan 2025 bulletin re-uploaded into a 2026 folder. Filename
+    # carries no year, so the folder fallback would say bulletin_yr=2026.
+    text = (
+        "• Para este mes, la producción de café alcanzó 1.050 mil sacos, lo que\n"
+        "  representa una variación anual positiva del 8,5 % frente al mismo\n"
+        "  mes de 2024.\n"
+        "• Las exportaciones definitivas de café en diciembre se ubicaron en 1,3\n"
+        "  millones de sacos de 60 kg, un crecimiento del 22,2% frente al mismo\n"
+        "  mes de 2023.\n"
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/01/"
+           "1.-Informe-mensual-enero-p.pdf")  # no year in filename
+    by_month = {e.month: e for e in fnc.parse_bulletin(text, url)}
+    # Production: body says vs 2024 ⇒ data year 2025, NOT 2026.
+    assert "2025-01" in by_month
+    assert by_month["2025-01"].production_k_bags == 1050.0
+    # Exports: body says vs 2023 ⇒ data year 2024, NOT 2025.
+    assert "2024-12" in by_month
+    assert by_month["2024-12"].total_k_bags == 1300.0
+    # And the misattributed key MUST NOT appear.
+    assert "2025-12" not in by_month
+    assert "2026-01" not in by_month
+
+
+def test_fnc_parse_bulletin_rejects_implausibly_large_volumes():
+    """v4 bug: a parsing failure produced '2026-11 exp=122,000 k-bags'
+    — 100× larger than Colombia's entire annual export. v5 caps at
+    5000 k-bags per bulletin entry (Brazil monthly tops out near 3500,
+    Colombia at ~1300, so 5000 is a comfortable upper bound)."""
+    text = (
+        "• Las exportaciones definitivas de noviembre se ubicaron en 122.000\n"
+        "  mil sacos, una variación anual positiva del 2,1 %.\n"
+    )
+    url = ("https://federaciondecafeteros.org/wp-content/uploads/2026/03/"
+           "1.-Informe-mensual-Noviembre-p.pdf")
+    entries = fnc.parse_bulletin(text, url)
+    # The exports bullet should be dropped (122,000 k-bags is impossible).
+    assert all(e.total_k_bags is None or e.total_k_bags <= 5000.0 for e in entries)
+
+
 def test_fnc_upload_sort_key_orders_by_folder_year_month():
     """Discovered PDFs are sorted by /uploads/YYYY/MM/ ASCENDING so the
     merge's last-write-wins picks the NEWEST upload. v3 bug: a stale
