@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T07:21:16.712787Z",
+  "generated_at": "2026-06-19T08:20:06.737217Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-18",
+    "last_updated": "2026-06-19",
     "countries": {
       "eu": {
         "name": "European Union",
