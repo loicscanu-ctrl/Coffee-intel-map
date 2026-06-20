@@ -199,20 +199,26 @@ export default function MarketTicker() {
     ? Math.round(kcFront.last * KC_CENTS_TO_USD_MT) : null;
 
   // Rewrite physical value strings to show the at-port USD (spot + FOBbing) and
-  // its differential vs the relevant front: RC for robusta origins, KC (NY 'C')
-  // for arabica origins (e.g. Guatemala). "$3,522, N-72" / "$5,708, U-12".
+  // its differential vs the relevant front. The differential is quoted in the
+  // front contract's native metric: USD/MT for robusta origins (RC is quoted
+  // per tonne) and US¢/lb for arabica origins (KC / NY 'C' is quoted per lb),
+  // so a Guatemala diff reads like a real trade differential, not a ~22× USD/MT
+  // figure. "$3,522, N-72" / "$5,708, KC+24.3¢".
   const formatPhysical = (value: string, label: string): string => {
     const isArabica = ARABICA_PHYSICAL.has(label);
-    const ref    = isArabica ? kcPrice  : rcPrice;
+    const ref    = isArabica ? kcPrice  : rcPrice;   // both USD/MT
     const letter = isArabica ? kcLetter : rcLetter;
     if (ref == null) return value;
     const usdMatch = value.match(/\$([0-9,]+)/);
     if (!usdMatch) return value;
     const usd = parseInt(usdMatch[1].replace(/,/g, ""), 10);
     const atPort = usd + (FOBBING_USD[label] ?? 0);
-    const diff = atPort - ref;
-    const sign = diff >= 0 ? "+" : "";
-    return value.replace(/\$[0-9,]+(?=\))/, `$${atPort.toLocaleString()}, ${letter}${sign}${diff}`);
+    const diffUsdMt = atPort - ref;
+    // Arabica: express the NY differential in US¢/lb (KC's native unit).
+    const diff = isArabica
+      ? `${diffUsdMt >= 0 ? "+" : "-"}${(Math.abs(diffUsdMt) / KC_CENTS_TO_USD_MT).toFixed(1)}¢`
+      : `${diffUsdMt >= 0 ? "+" : ""}${diffUsdMt}`;
+    return value.replace(/\$[0-9,]+(?=\))/, `$${atPort.toLocaleString()}, ${letter}${diff}`);
   };
 
   const futuresTs  = acaphe?.fetched_at ?? null;
