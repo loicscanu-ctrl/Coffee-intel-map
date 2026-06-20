@@ -1,21 +1,29 @@
 """
-Diagnostic probe: where does IHCAFE publish the Honduras average export price?
+Diagnostic probe: pin down IHCAFE's weekly export-price bulletin + a way to
+discover the latest one programmatically.
 
-Newspapers (El Heraldo, La Prensa, La Tribuna) all quote IHCAFE's "precio
-promedio de exportación por saco de 46 kilogramos" — a genuine Honduras export
-price (NY 'C' + country differential), updated through the harvest. We need to
-find the live source on ihcafe.hn so we can scrape it weekly.
+Findings so far:
+  * The IHCAFE homepage shows only the NY 'C' close + FX (not a HN price).
+  * The site sits behind Cloudflare Turnstile, so HTML page navigations are
+    flaky — BUT direct wp-content/uploads/*.pdf assets download fine (HTTP 200).
+  * The genuine "precio promedio de exportación por saco de 46 kg" lives inside
+    the periodic "Boletín Estadístico de Comercialización" PDFs at
+    https://www.ihcafe.hn/wp-content/uploads/YYYY/MM/Boletin-Estadistico-Comercializacion-DD-MM-YYYY.pdf
 
-This probe renders the IHCAFE homepage and /exportaciones/ page in Chromium,
-captures every XHR/admin-ajax response body, and dumps the full visible text +
-every price-like number with context — so we can see exactly where and how the
-per-46kg-sack price is published.
+This probe:
+  1. Queries the WordPress REST media API for the newest "Comercializacion"
+     bulletin (programmatic discovery for the real scraper).
+  2. Downloads the discovered bulletin + a couple of known ones and dumps their
+     text + price-ish lines, so we can see exactly how the per-46kg price is
+     written and build the parser.
 
 Pure diagnostic — no DB, no commits. Run via the "Probe: IHCAFE" workflow.
 """
 from __future__ import annotations
 
 import asyncio
+import io
+import json
 import re
 import sys
 from pathlib import Path
@@ -28,96 +36,119 @@ DEBUG.mkdir(parents=True, exist_ok=True)
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
-URLS = [
-    "https://ihcafe.hn/",
-    "https://ihcafe.hn/exportaciones/",
-    "https://ihcafe.hn/precios/",
-    "https://ihcafe.hn/comercializacion-de-cafe/",
+# WordPress REST endpoints to try for discovery (newest media first).
+API_URLS = [
+    "https://www.ihcafe.hn/wp-json/wp/v2/media?search=Comercializacion&per_page=20&orderby=date&order=desc",
+    "https://www.ihcafe.hn/wp-json/wp/v2/media?search=Boletin&per_page=20&orderby=date&order=desc",
+    "https://www.ihcafe.hn/wp-json/wp/v2/media?per_page=30&orderby=date&order=desc",
+    "https://www.ihcafe.hn/wp-json/wp/v2/search?search=comercializacion&per_page=20",
 ]
 
-# Keywords that mark a line as worth a closer look.
+# Known bulletins (confirmed to exist) — fallback so we can always see the layout.
+KNOWN_BULLETINS = [
+    "https://www.ihcafe.hn/wp-content/uploads/2023/02/Boletin-Estadistico-ComercializaciA%CC%83%C2%B3n-07-02-2023.pdf",
+    "https://www.ihcafe.hn/wp-content/uploads/2022/02/Boletin-Estadistico-Comercializacion-09-02-2022.pdf",
+    "https://www.ihcafe.hn/wp-content/uploads/2021/12/Boletin-Estadistico-Comercializacion-09-12-2021.pdf",
+]
+
 PRICE_HINT = re.compile(
-    r"(saco|46|export|precio|referencia|diferencial|quintal|qq|US\$|L\.|lempira|promedio)",
+    r"(precio|promedio|saco|46|export|referencia|diferencial|quintal|qq|US\$|valor)",
     re.I,
 )
 
 
-async def render(page, url: str, captured: list) -> None:
-    print(f"\n{'=' * 70}\n[probe] {url}\n{'=' * 70}")
+async def fetch(page, url: str, timeout=40_000):
+    resp = await page.request.get(url, timeout=timeout)
+    return resp
+
+
+async def discover(page) -> list[str]:
+    """Hit the WP REST API; return any bulletin PDF source_urls found, newest first."""
+    found: list[str] = []
+    for url in API_URLS:
+        print(f"\n[api] GET {url}")
+        try:
+            resp = await fetch(page, url)
+            print(f"   HTTP {resp.status}  {resp.headers.get('content-type','')}")
+            if resp.status != 200:
+                body = (await resp.text())[:300]
+                print(f"   body[:300]: {body!r}")
+                continue
+            data = json.loads(await resp.text())
+        except Exception as e:  # noqa: BLE001
+            print(f"   failed: {type(e).__name__}: {e}")
+            continue
+
+        items = data if isinstance(data, list) else data.get("items", data)
+        if not isinstance(items, list):
+            print(f"   unexpected JSON shape: {str(data)[:200]}")
+            continue
+        print(f"   {len(items)} items")
+        for it in items:
+            src = it.get("source_url") or it.get("url") or it.get("link") or ""
+            title = it.get("title")
+            if isinstance(title, dict):
+                title = title.get("rendered", "")
+            date = it.get("date") or it.get("modified") or ""
+            if src.lower().endswith(".pdf") or "comercializ" in (src + str(title)).lower():
+                print(f"      {date}  {src}   «{str(title)[:60]}»")
+                if src.lower().endswith(".pdf"):
+                    found.append(src)
+    return found
+
+
+async def parse_pdf(page, url: str) -> None:
+    import pdfplumber
+    print(f"\n[pdf] download {url}")
     try:
-        await page.goto(url, wait_until="networkidle", timeout=45_000)
+        resp = await fetch(page, url)
+        content = await resp.body()
+        print(f"   HTTP {resp.status}  {len(content)} bytes  {resp.headers.get('content-type','')}")
+        if content[:4] != b"%PDF":
+            print(f"   not a PDF (starts {content[:16]!r})")
+            return
+        fn = re.sub(r"[^0-9A-Za-z]+", "_", url)[-48:]
+        (DEBUG / f"{fn}.pdf").write_bytes(content)
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
+            text = "\n".join((p.extract_text() or "") for p in pdf.pages)
+        print(f"   pages parsed; {len(text)} chars")
+        print("   === price-ish lines ===")
+        for ln in text.splitlines():
+            s = ln.strip()
+            if PRICE_HINT.search(s) and re.search(r"\d", s):
+                print(f"      {s[:170]}")
     except Exception as e:  # noqa: BLE001
-        print(f"[probe] goto error: {type(e).__name__}: {e}")
-    await page.wait_for_timeout(4_000)
-
-    try:
-        html = await page.content()
-    except Exception as e:  # noqa: BLE001
-        print(f"[probe] content error: {e}")
-        return
-
-    from bs4 import BeautifulSoup
-    soup = BeautifulSoup(html, "html.parser")
-    fn = re.sub(r"[^0-9a-zA-Z]+", "_", url).strip("_")[:48] or "root"
-    (DEBUG / f"{fn}.html").write_text(html, encoding="utf-8")
-
-    text = soup.get_text("\n", strip=True)
-    print(f"\n--- lines mentioning price/saco/export ({len(text)} chars total) ---")
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    for i, ln in enumerate(lines):
-        if PRICE_HINT.search(ln) and (re.search(r"\d", ln) or len(ln) < 60):
-            # print the hit plus a little surrounding context
-            print(f"   {ln[:160]}")
-
-    # Every price-like number with context.
-    nums = list(re.finditer(r"(?:US?\$|L\.?)?\s?\d[\d,]*\.\d{2}", text))
-    print(f"\n--- {len(nums)} price-like numbers (showing up to 30) ---")
-    for m in nums[:30]:
-        s = m.start()
-        ctx = text[max(0, s - 60):s].replace("\n", " ")
-        print(f"   {m.group()!r}  ⟵  {ctx!r}")
-
-    # Links that might lead to a price page / bulletin.
-    print("\n--- candidate links ---")
-    for a in soup.find_all("a", href=True):
-        h = a["href"]
-        txt = a.get_text(" ", strip=True)[:60]
-        if re.search(r"(precio|export|comercial|boletin|mdocs|\.pdf)", (h + " " + txt), re.I):
-            print(f"   {h}   «{txt}»")
+        print(f"   fetch/parse failed: {type(e).__name__}: {e}")
 
 
 async def main() -> None:
     from playwright.async_api import async_playwright
 
-    captured: list = []
-
-    async def _grab(resp) -> None:
-        u = resp.url
-        if "admin-ajax" in u or "/wp-json/" in u or "api" in u.lower():
-            try:
-                body = await resp.text()
-            except Exception:  # noqa: BLE001
-                return
-            if body and any(k in body.lower() for k in ("precio", "saco", "export", "46")):
-                captured.append((resp.status, u, body))
-
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         ctx = await browser.new_context(user_agent=UA, locale="es-HN")
         page = await ctx.new_page()
-        page.on("response", lambda r: asyncio.create_task(_grab(r)))
+        # Visit homepage first to pick up any Cloudflare clearance cookie.
+        try:
+            await page.goto("https://www.ihcafe.hn/", wait_until="domcontentloaded", timeout=45_000)
+            await page.wait_for_timeout(5_000)
+        except Exception as e:  # noqa: BLE001
+            print(f"[probe] homepage goto: {type(e).__name__}: {e}")
 
-        for url in URLS:
-            await render(page, url, captured)
+        discovered = await discover(page)
+        print(f"\n[probe] discovered {len(discovered)} bulletin PDFs via API")
+
+        # Parse the newest discovered bulletin (if any), else the known ones.
+        targets = (discovered[:1] or []) + KNOWN_BULLETINS
+        seen = set()
+        for url in targets:
+            if url in seen:
+                continue
+            seen.add(url)
+            await parse_pdf(page, url)
 
         await ctx.close()
         await browser.close()
-
-    print(f"\n{'=' * 70}\n=== XHR/api responses with price keywords: {len(captured)} ===")
-    for i, (status, url, body) in enumerate(captured):
-        (DEBUG / f"xhr_{i}.txt").write_text(body, encoding="utf-8")
-        print(f"\n[xhr {i}] HTTP {status}  {url}")
-        print(body[:1500])
 
 
 if __name__ == "__main__":
