@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from scraper.sources.coffee_imports import parse_country_monthly, parse_country_rows
+from scraper.sources.coffee_imports import (
+    drop_implausible_years,
+    parse_country_monthly,
+    parse_country_rows,
+)
 
 
 def _row(period, cmd, net_wgt=None, value=None):
@@ -72,3 +76,33 @@ def test_parse_country_monthly():
     ]
     out = parse_country_monthly(rows)
     assert out == {"2024-01": 1000.0, "2024-02": 800.0}
+
+
+def test_drop_implausible_years_removes_partial_year():
+    # Italy-style: a ~570 kt norm with one 8 kt partial-reporting year.
+    rows = [{"year": y, "total_mt": v} for y, v in
+            [(2014, 560_000), (2015, 575_000), (2016, 8_000), (2017, 580_000), (2018, 590_000)]]
+    out = drop_implausible_years(rows, "ita")
+    years = [r["year"] for r in out]
+    assert 2016 not in years            # dropped as <20% of median
+    assert years == [2014, 2015, 2017, 2018]
+
+
+def test_drop_implausible_years_keeps_real_dips_and_short_series():
+    # A genuine ~30% dip is kept (not an extreme outlier).
+    rows = [{"year": y, "total_mt": v} for y, v in
+            [(2014, 100_000), (2015, 95_000), (2016, 70_000), (2017, 98_000), (2018, 102_000)]]
+    assert len(drop_implausible_years(rows, "x")) == 5
+    # <4 non-zero years → no reference level, untouched.
+    short = [{"year": 2017, "total_mt": 5}, {"year": 2018, "total_mt": 500}]
+    assert drop_implausible_years(short, "x") == short
+
+
+def test_drop_implausible_years_robust_when_most_years_garbage():
+    # Greece-style: majority of years are near-zero garbage; the upper-half
+    # reference keeps the real ~15–65 kt years instead of flagging them as highs.
+    rows = [{"year": y, "total_mt": v} for y, v in
+            [(2014, 41_388), (2015, 44_856), (2016, 65_152), (2017, 2), (2018, 2),
+             (2019, 77), (2020, 14_896)]]
+    years = [r["year"] for r in drop_implausible_years(rows, "grc")]
+    assert years == [2014, 2015, 2016, 2020]   # near-zero years dropped, real kept
