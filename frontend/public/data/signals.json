@@ -191,6 +191,28 @@
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
+      "id": "CS1",
+      "name": "Backwardation Incentive",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "LDN",
+      "severity": "info",
+      "score": 1,
+      "magnitude": "large",
+      "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS6",
+      "name": "Inversion Easing",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "LDN",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "large",
+      "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
+    },
+    {
       "id": "OB7",
       "name": "Oversold Divergence",
       "category": "OB",
@@ -200,66 +222,6 @@
       "score": 2,
       "magnitude": "medium",
       "text": "RC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=184.3]"
-    },
-    {
-      "id": "AGRO_ethiopia_Kaffa_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.2, forecast_7d_rain=60.3]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=63.7]"
-    },
-    {
-      "id": "AGRO_vn_Dak_Nong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=57.5]"
-    },
-    {
-      "id": "AGRO_vn_Kon_Tum_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=61.2]"
     }
   ],
   "history": [
@@ -2570,6 +2532,28 @@
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
+          "id": "CS1",
+          "name": "Backwardation Incentive",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "LDN",
+          "severity": "info",
+          "score": 1,
+          "magnitude": "large",
+          "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS6",
+          "name": "Inversion Easing",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "LDN",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "large",
+          "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
+        },
+        {
           "id": "OB7",
           "name": "Oversold Divergence",
           "category": "OB",
@@ -2587,5 +2571,5 @@
       "priceLDN": 3598
     }
   ],
-  "generatedAt": "2026-06-20T06:12:40.313Z"
+  "generatedAt": "2026-06-20T06:51:11.100Z"
 }
