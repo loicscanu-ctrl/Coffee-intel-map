@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import statistics
 import time
 from datetime import datetime
 from pathlib import Path
@@ -224,6 +225,42 @@ def parse_country_rows(rows: list[dict]) -> list[dict]:
     return out
 
 
+# ── Sanity checks ──────────────────────────────────────────────────────────────
+
+_OUTLIER_LOW = 0.2     # drop years below 20% of the typical level …
+_OUTLIER_HIGH = 8.0    # … or above 8× (double-counted / spurious revisions)
+_ABS_FLOOR_MT = 500.0  # …and any year under 0.5 kt (clearly incomplete reporting)
+
+
+def drop_implausible_years(rows: list[dict], iso3: str = "") -> list[dict]:
+    """Remove calendar years whose total import volume is implausible for the
+    country — partial/incomplete Comtrade reporting (e.g. Italy 2016 at ~8 kt vs
+    a ~570 kt norm, or near-zero 0/2/58 MT years), not real collapses.
+
+    The reference level is the median of the *upper half* of non-zero totals, so
+    it stays robust even when most years are garbage-low (which would wreck a
+    plain median). A year is dropped if it's below 0.5 kt, below 20% of that
+    level, or above 8×. Needs ≥4 non-zero years. Pure — unit-tested."""
+    nz = sorted(t for t in (r.get("total_mt") for r in rows) if t)
+    if len(nz) < 4:
+        return rows
+    ref = statistics.median(nz[len(nz) // 2:])   # median of the top half
+    if ref <= 0:
+        return rows
+    low, high = max(_ABS_FLOOR_MT, _OUTLIER_LOW * ref), _OUTLIER_HIGH * ref
+    kept, dropped = [], []
+    for r in rows:
+        t = r.get("total_mt")
+        if t is not None and (t < low or t > high):
+            dropped.append(f"{r['year']}:{round(t)}")
+            continue
+        kept.append(r)
+    if dropped:
+        log.warning("coffee_imports: %s dropped %d implausible year(s) (level ~%d MT): %s",
+                    iso3 or "?", len(dropped), round(ref), ", ".join(dropped))
+    return kept
+
+
 # ── Build ────────────────────────────────────────────────────────────────────
 
 def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
@@ -235,7 +272,7 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
     countries: dict[str, dict] = {}
     stale: list[str] = []
     for iso3, (name, code) in COUNTRIES.items():
-        annual = parse_country_rows(_comtrade_annual(code, periods_csv))
+        annual = drop_implausible_years(parse_country_rows(_comtrade_annual(code, periods_csv)), iso3)
         # latest year that actually carries a total volume
         real_years = [r["year"] for r in annual if r.get("total_mt") is not None]
         if not real_years:

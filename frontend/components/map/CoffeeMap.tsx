@@ -5,7 +5,25 @@ import { PORTS, HUB_PORTS, ROUTES, BASEMAPS } from "@/lib/mapData";
 import { cachedFetchStatic } from "@/lib/api";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
+import { centroidFor, DEST } from "@/components/demand/imports-lab/centroids";
 import { useUrlState } from "@/lib/useUrlState";
+
+// Curved arc (quadratic bezier sampled to a polyline) between two [lat,lng]
+// points, so import-flow lines fan out instead of overlapping.
+function flowArc(a: [number, number], b: [number, number], bend = 0.18): [number, number][] {
+  const [la, loa] = a, [lb, lob] = b;
+  const mx = (la + lb) / 2, my = (loa + lob) / 2;
+  const dx = lb - la, dy = lob - loa;
+  const cx = mx - dy * bend, cy = my + dx * bend;
+  const pts: [number, number][] = [];
+  for (let t = 0; t <= 1.0001; t += 0.05) {
+    pts.push([
+      (1 - t) ** 2 * la + 2 * (1 - t) * t * cx + t * t * lb,
+      (1 - t) ** 2 * loa + 2 * (1 - t) * t * cy + t * t * lob,
+    ]);
+  }
+  return pts;
+}
 
 const VALID_BASEMAP_IDS = BASEMAPS.map(b => b.id);
 
@@ -229,6 +247,10 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
     VALID_BASEMAP_IDS.includes(raw) ? raw : "dark"
   );
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
+  // Import-sourcing flow overlay: arcs from origin countries to the US/EU bloc.
+  const flowLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const [flowDest, setFlowDest] = useUrlState<string>("flows", "off", (raw) =>
+    ["off", "US", "EU"].includes(raw) ? raw : "off");
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
   const [freightData, setFreightData] = useState<{ routes: { id: string; rate: number; prev: number }[] } | null>(null);
 
@@ -622,6 +644,43 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
     });
   }, [activeBasemap]);
 
+  // ── Import-sourcing flow arcs (origins → US/EU bloc) ──────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let cancelled = false;
+    if (flowLayerRef.current) { flowLayerRef.current.remove(); flowLayerRef.current = null; }
+    if (flowDest === "off") return;
+    import("leaflet").then(async (L) => {
+      if (cancelled) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+      const url = flowDest === "US" ? "/data/us_coffee_imports.json" : "/data/eu_coffee_imports.json";
+      let data: { origins?: { name: string; latest_mt: number | null }[] } | null = null;
+      try { data = await fetch(url).then(r => (r.ok ? r.json() : null)); } catch { data = null; }
+      if (cancelled || !data || !mapInstanceRef.current) return;
+      const dest = DEST[flowDest];
+      const color = flowDest === "US" ? "#0ea5e9" : "#f59e0b";
+      const ranked = (data.origins ?? []).filter(o => o.latest_mt).slice(0, 25);
+      const maxV = Math.max(...ranked.map(o => o.latest_mt ?? 0), 1);
+      const lg = Leaflet.layerGroup();
+      const destDot = Leaflet.circleMarker(dest.ll, { radius: 7, color, weight: 2, fillColor: color, fillOpacity: 0.9 });
+      destDot.bindTooltip(`${dest.name} — coffee imports by origin`, { direction: "top" }).addTo(lg);
+      for (const o of ranked) {
+        const c = centroidFor(o.name);
+        if (!c) continue;
+        const w = 1 + 6 * Math.sqrt((o.latest_mt ?? 0) / maxV);
+        Leaflet.polyline(flowArc(c, dest.ll), { color, weight: w, opacity: 0.55, lineCap: "round" })
+          .bindTooltip(`${o.name}: ${Math.round((o.latest_mt ?? 0) / 1000).toLocaleString()} kt`, { sticky: true })
+          .addTo(lg);
+        Leaflet.circleMarker(c, { radius: 2 + 4 * Math.sqrt((o.latest_mt ?? 0) / maxV), color, weight: 1, fillColor: color, fillOpacity: 0.65 })
+          .bindTooltip(o.name, { direction: "top" }).addTo(lg);
+      }
+      lg.addTo(map);
+      flowLayerRef.current = lg;
+    });
+    return () => { cancelled = true; };
+  }, [flowDest]);
+
   // Origin-price permanent labels: standalone markers at hardcoded
   // producer-region coordinates. Independent of the CountryIntel pins,
   // so labels appear even if that DB table is empty or uses unexpected
@@ -733,6 +792,29 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
         >
           🗺 Map Style
         </button>
+
+        {/* Import-sourcing flow toggle */}
+        <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 4, background: "#1e293b", border: "1px solid #475569", borderRadius: 4, padding: "3px 6px", fontFamily: "monospace" }}>
+          <span style={{ fontSize: 9, color: "#64748b" }}>Import flows</span>
+          {(["off", "US", "EU"] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setFlowDest(d)}
+              style={{
+                fontSize: 9,
+                padding: "2px 6px",
+                borderRadius: 3,
+                cursor: "pointer",
+                border: "1px solid " + (flowDest === d ? (d === "EU" ? "#f59e0b" : d === "US" ? "#0ea5e9" : "#64748b") : "transparent"),
+                background: flowDest === d ? "#0f172a" : "transparent",
+                color: flowDest === d ? (d === "EU" ? "#f59e0b" : d === "US" ? "#38bdf8" : "#cbd5e1") : "#94a3b8",
+                fontFamily: "monospace",
+              }}
+            >
+              {d === "off" ? "Off" : d}
+            </button>
+          ))}
+        </div>
 
         {showBasemapPanel && (
           <div

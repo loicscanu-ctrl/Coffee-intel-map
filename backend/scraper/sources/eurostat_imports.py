@@ -34,6 +34,20 @@ REPORTER = "EU27_2020"          # confirmed valid EU-bloc reporter code
 INDICATOR = "QUANTITY_IN_100KG"  # the only quantity indicator (units = 100 kg)
 KG_PER_UNIT = 100                # 100-kg units → MT = value × 100 / 1000
 
+# Reporters broken out individually (bloc + the major EU coffee importers). For
+# members we keep intra-EU origins (re-export hubs like NL/BE matter); only the
+# bloc view is extra-EU. Codes are Comext `reporter` geo codes.
+EU_BLOC_CODES = {"EU27_2020", "EU", "EU27", "EU28"}
+EU_MEMBER_CODES = ["DE", "IT", "FR", "NL", "BE", "ES", "SE", "PL",
+                   "AT", "PT", "FI", "DK", "GR", "CZ", "RO"]
+REPORTER_NAMES = {
+    "EU27_2020": "European Union", "DE": "Germany", "IT": "Italy", "FR": "France",
+    "NL": "Netherlands", "BE": "Belgium", "ES": "Spain", "SE": "Sweden",
+    "PL": "Poland", "AT": "Austria", "PT": "Portugal", "FI": "Finland",
+    "DK": "Denmark", "GR": "Greece", "EL": "Greece", "CZ": "Czechia", "RO": "Romania",
+}
+MONTHLY_TOP_ORIGINS = 12        # cap monthly-by-origin rows per reporter
+
 # EU member geo codes — excluded from "origins" so the view is extra-EU only
 # (reporter=EU bloc + intra-EU partner would otherwise show member states).
 EU_MEMBERS = {
@@ -41,20 +55,31 @@ EU_MEMBERS = {
     "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI",
     "ES", "SE",
 }
-# Non-country partner aggregates / blocs to skip.
+# Non-country partner aggregates / blocs to skip (by code).
 SKIP_PARTNERS = {
     "EU27_2020", "EU", "EU27", "EU28", "EA", "EA21", "EA20", "EA19", "WORLD",
     "EXT_EU27_2020", "EXT_EU", "INT_EU27_2020", "INTRA_EU", "EXTRA_EU", "TOTAL",
 }
+# Comext also returns aggregate "partners" whose codes vary by reporter (e.g.
+# "Extra-euro area", "European Union", "Not specified") — catch them by name so
+# they don't outrank real origins, especially for member-state reporters.
+_AGG_RE = re.compile(
+    r"(euro area|european union|extra[- ]?eu|intra[- ]?eu|extra[- ]?euro|intra[- ]?euro"
+    r"|\bworld\b|not specified|not declared|stores and provisions|bunkers"
+    r"|countries and territories|free zones|^total$|^all\b)", re.I)
+
+
+def _is_aggregate(name: str) -> bool:
+    return bool(_AGG_RE.search(str(name)))
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coffee_imports.json"
 
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(years: list[str]) -> dict:
-    """EU-bloc imports of HS 0901 by partner, annual, quantity (100-kg units)."""
-    params = [("format", "JSON"), ("freq", "A"), ("reporter", REPORTER),
+def _fetch(years: list[str], reporter: str = REPORTER) -> dict:
+    """One reporter's imports of HS 0901 by partner, annual, quantity (100-kg units)."""
+    params = [("format", "JSON"), ("freq", "A"), ("reporter", reporter),
               ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR)]
     params += [("time", y) for y in years]
     try:
@@ -81,12 +106,16 @@ def clean_name(label: str) -> str:
     return _RENAME.get(s, s)
 
 
-def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
+def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT,
+                   reporter_code: str = REPORTER) -> dict:
     """Decode a JSON-stat cube → {years, origins[], total_by_year} in MT.
 
     `kg_per_unit` converts the raw measure to kg (Comext quantity is in 100-kg
-    units). Only `partner` and `time` vary (other dims are pinned). Pure —
+    units). For the EU bloc, intra-EU partners are excluded (extra-EU view); for
+    an individual member, intra-EU origins are kept and only the member itself is
+    dropped. Only `partner` and `time` vary (other dims are pinned). Pure —
     unit-tested."""
+    bloc = reporter_code in EU_BLOC_CODES
     try:
         ids = body["id"]
         sizes = body["size"]
@@ -144,7 +173,9 @@ def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT) -> dict:
         ycode = time_codes.get(t_pos)
         if not pcode or not ycode:
             continue
-        if pcode in SKIP_PARTNERS or pcode in EU_MEMBERS:
+        if pcode in SKIP_PARTNERS or (bloc and pcode in EU_MEMBERS) or (not bloc and pcode == reporter_code):
+            continue
+        if _is_aggregate(partner_labels.get(pcode, pcode)):
             continue
         year = str(ycode)[:4]
         try:
@@ -176,11 +207,11 @@ def _month_code(t: str) -> str | None:
     return None
 
 
-def _fetch_monthly(last_n: int) -> dict:
-    """Recent `last_n` months of monthly EU-bloc HS-0901 imports by partner.
+def _fetch_monthly(last_n: int, reporter: str = REPORTER) -> dict:
+    """Recent `last_n` months of one reporter's monthly HS-0901 imports by partner.
     Uses lastTimePeriod (annual time= doesn't expand to months); large windows
     trip Comext's async 413, so the caller steps the window down."""
-    params = [("format", "JSON"), ("freq", "M"), ("reporter", REPORTER),
+    params = [("format", "JSON"), ("freq", "M"), ("reporter", reporter),
               ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
               ("lastTimePeriod", str(last_n))]
     try:
@@ -246,6 +277,69 @@ def parse_monthly_total(body: dict) -> dict:
     return dict(sorted(out.items()))
 
 
+def parse_monthly_origins(body: dict, reporter_code: str = REPORTER,
+                          top_n: int = MONTHLY_TOP_ORIGINS) -> dict:
+    """Monthly imports broken out by origin → {origin: {'YYYY-MM': mt}} for the
+    top-`top_n` origins, plus a '__total__' key with the all-origin monthly sum.
+    Bloc = extra-EU; member keeps intra-EU origins (drops only self)."""
+    bloc = reporter_code in EU_BLOC_CODES
+    try:
+        ids, sizes, dims, values = body["id"], body["size"], body["dimension"], body["value"]
+    except (KeyError, TypeError):
+        return {}
+    if not values:
+        return {}
+
+    def pos_to_code(dim: str) -> dict[int, str]:
+        idx = dims[dim]["category"]["index"]
+        return {v: k for k, v in idx.items()} if isinstance(idx, dict) else dict(enumerate(idx))
+
+    def find_dim(*cands: str) -> str | None:
+        for c in cands:
+            if c in ids:
+                return c
+        return next((d for d in ids if any(c in d.lower() for c in cands)), None)
+
+    pdim, tdim = find_dim("partner"), find_dim("time")
+    if not pdim or not tdim:
+        return {}
+    pcodes, tcodes = pos_to_code(pdim), pos_to_code(tdim)
+    plabels = dims.get(pdim, {}).get("category", {}).get("label", {})
+    strides = [1] * len(ids)
+    for i in range(len(ids) - 2, -1, -1):
+        strides[i] = strides[i + 1] * sizes[i + 1]
+    pi, ti = ids.index(pdim), ids.index(tdim)
+
+    by_origin: dict[str, dict[str, float]] = {}
+    total: dict[str, float] = {}
+    for flat, val in values.items():
+        if val is None:
+            continue
+        f = int(flat)
+        pcode = pcodes.get((f // strides[pi]) % sizes[pi])
+        tc = tcodes.get((f // strides[ti]) % sizes[ti])
+        if not pcode or pcode in SKIP_PARTNERS or (bloc and pcode in EU_MEMBERS) or (not bloc and pcode == reporter_code):
+            continue
+        if _is_aggregate(plabels.get(pcode, pcode)):
+            continue
+        mk = _month_code(tc) if tc else None
+        if not mk:
+            continue
+        try:
+            mt = round(float(val) * KG_PER_UNIT / 1000.0, 1)
+        except (TypeError, ValueError):
+            continue
+        name = clean_name(plabels.get(pcode, pcode))
+        by_origin.setdefault(name, {})[mk] = round(by_origin.get(name, {}).get(mk, 0.0) + mt, 1)
+        total[mk] = round(total.get(mk, 0.0) + mt, 1)
+
+    ranked = sorted(by_origin.items(),
+                    key=lambda kv: sum(kv[1].values()), reverse=True)[:top_n]
+    out = {name: dict(sorted(m.items())) for name, m in ranked}
+    out["__total__"] = dict(sorted(total.items()))
+    return out
+
+
 # ── Comtrade EU-bloc (for the EU↔Comtrade reconciliation) ─────────────────────
 # Comtrade re-publishes national stats with a lag; for the EU bloc, imports
 # "from World" are extra-EU (intra-EU is internal). We pull that here so the UI
@@ -294,45 +388,79 @@ def _comtrade_eu_total_by_year() -> dict:
         return {}
 
 
+def _build_reporter(code: str, years: list[str], monthly_steps: tuple[int, ...]) -> dict | None:
+    """One reporter's block: annual origins (with monthly attached to the top
+    origins) + monthly_total. Returns None if the reporter has no usable data."""
+    parsed = parse_jsonstat(_fetch(years, code), reporter_code=code)
+    if not parsed["origins"]:
+        log.info("Eurostat reporter=%s: no origins", code)
+        return None
+
+    mo: dict = {}
+    for last_n in monthly_steps:
+        mo = parse_monthly_origins(_fetch_monthly(last_n, code), reporter_code=code)
+        if len(mo) > 1:   # more than just __total__
+            break
+    monthly_total = {k: v for k, v in sorted(mo.pop("__total__", {}).items()) if v > 0}
+
+    origins = []
+    for o in parsed["origins"]:
+        oo = dict(o)
+        m = mo.get(o["name"])
+        if m:
+            oo["monthly"] = m
+        origins.append(oo)
+
+    log.info("Eurostat reporter=%s → %d origins, %d monthly pts, %d monthly origins",
+             code, len(origins), len(monthly_total), len(mo))
+    return {
+        "name":          REPORTER_NAMES.get(code, clean_name(parsed.get("name", code))),
+        "years":         parsed["years"],
+        "origins":       origins,
+        "total_by_year": parsed["total_by_year"],
+        "monthly_total": monthly_total,
+    }
+
+
 def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
-    years = [str(now.year - 1 - i) for i in range(N_YEARS)]
-    years = list(reversed(years))
+    years = list(reversed([str(now.year - 1 - i) for i in range(N_YEARS)]))
 
-    parsed = parse_jsonstat(_fetch(years))
-    log.info("Eurostat → %d origins", len(parsed["origins"]))
-
-    if not parsed["origins"]:
-        log.warning("eurostat_imports: no origins parsed; retaining existing file")
+    # EU bloc (extra-EU) — also the backward-compatible top-level series.
+    bloc = _build_reporter(REPORTER, years, (36, 24, 12))
+    if bloc is None:
+        log.warning("eurostat_imports: no bloc origins parsed; retaining existing file")
         if OUT_PATH.exists():
             return json.loads(OUT_PATH.read_text(encoding="utf-8"))
 
-    # Monthly extra-EU total. Step the window down until Comext returns it
-    # synchronously (large windows trigger an async 413).
-    monthly: dict[str, float] = {}
-    for last_n in (36, 24, 12):
-        monthly = parse_monthly_total(_fetch_monthly(last_n))
-        log.info("Eurostat monthly lastN=%d → %d points", last_n, len(monthly))
-        if monthly:
-            break
-    monthly = {k: v for k, v in sorted(monthly.items()) if v > 0}
+    reporters: dict[str, dict] = {REPORTER: bloc}
+    for code in EU_MEMBER_CODES:
+        block = _build_reporter(code, years, (24, 12))
+        if block:
+            reporters[code] = block
+    log.info("Eurostat: %d reporters (bloc + %d members)", len(reporters), len(reporters) - 1)
+
     comtrade_by_year = _comtrade_eu_total_by_year()
 
     out = {
         "updated":       now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source":        "Eurostat Comext ds-045409 — HS 0901 imports, extra-EU by origin, quantity (100kg→MT)",
+        "source":        "Eurostat Comext ds-045409 — HS 0901 imports by origin, quantity (100kg→MT)",
         "hts":           PRODUCT,
         "measure":       "quantity_mt",
         "is_seed":       False,
-        "years":         parsed["years"],
-        "origins":       parsed["origins"],
-        "total_by_year": parsed["total_by_year"],
-        "monthly_total": monthly,
+        # Top-level = EU bloc (extra-EU), kept for backward compatibility.
+        "years":         bloc["years"],
+        "origins":       bloc["origins"],
+        "total_by_year": bloc["total_by_year"],
+        "monthly_total": bloc["monthly_total"],
         "comtrade_total_by_year": comtrade_by_year,   # EU-bloc extra-EU, for reconciliation
+        # Per-reporter breakdown: bloc + individual member states.
+        "reporters":     reporters,
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("eu_coffee_imports.json written: %d origins", len(parsed["origins"]))
+    log.info("eu_coffee_imports.json written: %d reporters, bloc %d origins",
+             len(reporters), len(bloc["origins"]))
     return out
 
 

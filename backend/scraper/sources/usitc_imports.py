@@ -204,6 +204,47 @@ def parse_monthly(resp: dict) -> dict:
     return dict(sorted(by_month.items()))
 
 
+def parse_monthly_by_origin(resp: dict) -> dict:
+    """USITC monthly report broken out by country → {origin: {'YYYY-MM': mt}}.
+
+    Same cross-tab as parse_monthly (a 'Year' column + bare month-name columns)
+    but with an extra leading country column, one block of rows per origin."""
+    try:
+        table = resp["dto"]["tables"][0]
+        cols = _get_columns(table["column_groups"])
+        rows = _get_rows(table["row_groups"][0]["rowsNew"])
+    except (KeyError, IndexError, TypeError):
+        return {}
+    low = [str(c).strip().lower() for c in cols]
+    year_idx = low.index("year") if "year" in low else None
+    name_months = [(i, _MONTHS.get(lc) or _MONTHS_ABBR.get(lc[:3]))
+                   for i, lc in enumerate(low) if lc in _MONTHS or lc[:3] in _MONTHS_ABBR]
+    month_idxs = {i for i, _ in name_months}
+    # Origin column: first column that is neither Year, a month, nor a 4-digit year.
+    origin_idx = next((i for i, lc in enumerate(low)
+                       if i != year_idx and i not in month_idxs and not re.fullmatch(r"\d{4}", lc)), 0)
+    if year_idx is None or not name_months:
+        return {}
+
+    out: dict[str, dict[str, float]] = {}
+    for row in rows:
+        if origin_idx >= len(row):
+            continue
+        name = str(row[origin_idx]).strip()
+        if not name or name.lower() in _TOTAL_LABELS:
+            continue
+        ym = re.match(r"(\d{4})", str(row[year_idx]).strip()) if year_idx < len(row) else None
+        if not ym:
+            continue
+        for idx, mo in name_months:
+            kg = _num(row[idx]) if (mo and idx < len(row)) else None
+            if kg:   # 0 / blank ⇒ not yet reported
+                key = f"{ym.group(1)}-{mo:02d}"
+                d = out.setdefault(name, {})
+                d[key] = round(d.get(key, 0.0) + kg / 1000.0, 1)
+    return {n: dict(sorted(m.items())) for n, m in out.items()}
+
+
 def parse_report(resp: dict) -> dict:
     """USITC report JSON → {years, origins[], total_by_year}. Quantities kg→MT.
 
@@ -310,6 +351,11 @@ def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
     log.info("usitc_imports: %d monthly points (%s … %s)", len(monthly),
              next(iter(monthly), "—"), next(reversed(monthly), "—") if monthly else "—")
 
+    # Monthly broken out by origin (recent window) — powers the monthly heatmap.
+    monthly_origins = parse_monthly_by_origin(_run_report(
+        build_query(list(reversed(m_years)), timeline="Monthly", break_countries=True)))
+    log.info("usitc_imports: monthly-by-origin for %d origins", len(monthly_origins))
+
     out = {
         "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source":         "USITC DataWeb — HTS 0901, Imports for Consumption, quantity (kg→MT)",
@@ -319,7 +365,8 @@ def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
         "years":          parsed["years"],
         "origins":        parsed["origins"],
         "total_by_year":  parsed["total_by_year"],
-        "monthly_total":  monthly,   # {"YYYY-MM": mt} US total
+        "monthly_total":  monthly,            # {"YYYY-MM": mt} US total
+        "monthly_origins": monthly_origins,   # {origin: {"YYYY-MM": mt}}
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
