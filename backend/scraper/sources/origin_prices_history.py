@@ -91,6 +91,37 @@ ORIGINS = {
         "color":     "#14b8a6",
         "commodity": "arabica",
     },
+    "guatemala_prima_lavado": {
+        "name":      "Guatemala Prima Lavado (ANACAFE)",
+        "source":    "ANACAFE precios de referencia",
+        "currency":  "USD",
+        "unit":      "per_quintal_100lb",
+        "color":     "#f97316",
+        "commodity": "arabica",
+    },
+    "guatemala_duro": {
+        "name":      "Guatemala Duro (ANACAFE)",
+        "source":    "ANACAFE precios de referencia",
+        "currency":  "USD",
+        "unit":      "per_quintal_100lb",
+        "color":     "#eab308",
+        "commodity": "arabica",
+    },
+    "guatemala_estrictamente_duro": {
+        "name":      "Guatemala Estrictamente Duro / SHB (ANACAFE)",
+        "source":    "ANACAFE precios de referencia",
+        "currency":  "USD",
+        "unit":      "per_quintal_100lb",
+        "color":     "#ef4444",
+        "commodity": "arabica",
+    },
+}
+
+# Guatemala origin key → ANACAFE grade key in the NewsItem meta.
+_GUATEMALA_GRADES = {
+    "guatemala_prima_lavado":       "prima_lavado",
+    "guatemala_duro":               "duro",
+    "guatemala_estrictamente_duro": "estrictamente_duro",
 }
 
 
@@ -270,6 +301,23 @@ def _today_uganda_arabica_price(grade_names: list[str]) -> float | None:
         return None
 
 
+def _today_guatemala_grades(db) -> dict:
+    """Read today's ANACAFE grade reference prices (USD per 100-lb quintal) from
+    the latest ANACAFE NewsItem meta → grades_usd_quintal."""
+    try:
+        from models import NewsItem
+        item = (db.query(NewsItem)
+                  .filter(NewsItem.source == "ANACAFE")
+                  .order_by(NewsItem.pub_date.desc()).first())
+        if not item:
+            return {}
+        return (json.loads(item.meta or "{}").get("grades_usd_quintal") or {})
+    except Exception as e:
+        print(f"[origin_prices_history] guatemala prices unavailable from ANACAFE NewsItem: {e}",
+              file=sys.stderr, flush=True)
+        return {}
+
+
 def _append_today(history: list[dict], today_iso: str, price: float | None) -> list[dict]:
     if price is None:
         return history
@@ -342,6 +390,13 @@ def export_origin_prices_history(db) -> None:
     origins["uganda_wugar"]["history"] = _append_today(
         origins["uganda_wugar"]["history"], today, _today_uganda_arabica_price(["Wugar"])
     )
+
+    # Guatemala — ANACAFE reference prices per grade (USD per 100-lb quintal).
+    gua_grades = _today_guatemala_grades(db)
+    for origin_key, grade_key in _GUATEMALA_GRADES.items():
+        origins[origin_key]["history"] = _append_today(
+            origins[origin_key]["history"], today, gua_grades.get(grade_key)
+        )
 
     payload = {
         "scraped_at": datetime.utcnow().isoformat() + "Z",
