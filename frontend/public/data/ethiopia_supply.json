@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-06-19T08:20:06.186309Z",
+  "scraped_at": "2026-06-20T06:51:03.433493Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -340,13 +340,13 @@
     ]
   },
   "ecx_price": {
-    "etb_per_kg": 404.0,
-    "as_of": "2026-06-19",
+    "etb_per_kg": 300.0,
+    "as_of": "2026-06-20",
     "source": "ECX",
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-06-19T03:13:42.879492Z",
+    "scraped_at": "2026-06-20T03:14:29.983577Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -355,15 +355,15 @@
         "csi_60d": 0.046,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW",
-        "rain_mtd_mm": 212.5,
-        "rain_hist_min": 59.2,
-        "rain_hist_max": 219.5
+        "rain_mtd_mm": 218.4,
+        "rain_hist_min": 61.1,
+        "rain_hist_max": 232.8
       },
       {
         "name": "Harrar",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.164,
+        "csi_60d": 0.186,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW"
       },
@@ -371,7 +371,7 @@
         "name": "Kaffa",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.14,
+        "csi_60d": 0.21,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW"
       },
@@ -449,7 +449,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -458,9 +457,10 @@
           "L",
           "-",
           "-",
-          "-",
-          "-",
-          "-",
+          "L",
+          "L",
+          "L",
+          "L",
           "L",
           "-"
         ]
@@ -488,7 +488,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "-",
           "-",
@@ -530,7 +529,8 @@
           "M",
           "M",
           "M",
-          "M",
+          "L",
+          "L",
           "M",
           "M",
           "M",
@@ -574,9 +574,6 @@
           "-",
           "-",
           "-",
-          "-",
-          "-",
-          "-",
           "L",
           "-",
           "-",
@@ -606,7 +603,10 @@
           "M",
           "M",
           "M",
-          "M"
+          "M",
+          "L",
+          "L",
+          "-"
         ]
       },
       {
@@ -800,7 +800,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-06-19"
+    "last_updated": "2026-06-20"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",

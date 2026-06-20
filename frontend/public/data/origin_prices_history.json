@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-19T08:20:09.860495Z",
+  "scraped_at": "2026-06-20T06:51:06.790980Z",
   "origins": {
     "vietnam": {
       "name": "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
@@ -155,6 +155,10 @@
         {
           "date": "2026-06-19",
           "price": 89600.0
+        },
+        {
+          "date": "2026-06-20",
+          "price": 89900.0
         }
       ],
       "commodity": "robusta"
@@ -313,6 +317,10 @@
         {
           "date": "2026-06-19",
           "price": 175.63
+        },
+        {
+          "date": "2026-06-20",
+          "price": 172.75
         }
       ],
       "commodity": "robusta"
@@ -471,6 +479,10 @@
         {
           "date": "2026-06-19",
           "price": 975.0
+        },
+        {
+          "date": "2026-06-20",
+          "price": 975.0
         }
       ],
       "commodity": "robusta"
@@ -499,6 +511,10 @@
         {
           "date": "2026-06-19",
           "price": 245.9
+        },
+        {
+          "date": "2026-06-20",
+          "price": 249.1
         }
       ]
     },
@@ -517,6 +533,52 @@
         {
           "date": "2026-06-19",
           "price": 264.9
+        },
+        {
+          "date": "2026-06-20",
+          "price": 268.1
+        }
+      ]
+    },
+    "guatemala_prima_lavado": {
+      "name": "Guatemala Prima Lavado (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#f97316",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 237.19
+        }
+      ]
+    },
+    "guatemala_duro": {
+      "name": "Guatemala Duro (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#eab308",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 243.19
+        }
+      ]
+    },
+    "guatemala_estrictamente_duro": {
+      "name": "Guatemala Estrictamente Duro / SHB (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#ef4444",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 246.19
         }
       ]
     },
