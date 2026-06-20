@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-13T23:57:47+00:00",
+  "generated_at": "2026-06-20T23:58:40+00:00",
   "country_iso3": "UGA",
   "year_window": [
     2023,
@@ -9,19 +9,15 @@
     "Masaka": {
       "province_id": 47,
       "noaa_name": "Masaka",
-      "weeks_in_window": 178,
+      "weeks_in_window": 179,
       "vhi_latest": {
         "year": 2026,
-        "week": 23,
-        "iso_week": "2026-W23",
-        "vhi": 46.48,
-        "severity": "fair"
+        "week": 24,
+        "iso_week": "2026-W24",
+        "vhi": 39.21,
+        "severity": "stress"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W12",
-          "vhi": 70.86
-        },
         {
           "iso_week": "2026-W13",
           "vhi": 70.66
@@ -44,46 +40,46 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 57.4
+          "vhi": 56.52
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 51.64
+          "vhi": 50.36
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 46.67
+          "vhi": 44.86
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 44.28
+          "vhi": 41.61
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 44.58
+          "vhi": 40.45
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 46.48
+          "vhi": 40.51
+        },
+        {
+          "iso_week": "2026-W24",
+          "vhi": 39.21
         }
       ]
     },
     "Kasese": {
       "province_id": 45,
       "noaa_name": "Kasese",
-      "weeks_in_window": 178,
+      "weeks_in_window": 179,
       "vhi_latest": {
         "year": 2026,
-        "week": 23,
-        "iso_week": "2026-W23",
-        "vhi": 50.08,
+        "week": 24,
+        "iso_week": "2026-W24",
+        "vhi": 43.55,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W12",
-          "vhi": 85.62
-        },
         {
           "iso_week": "2026-W13",
           "vhi": 84.85
@@ -106,46 +102,46 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 71.74
+          "vhi": 70.85
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 67.62
+          "vhi": 66.53
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 61.59
+          "vhi": 60.06
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 56.0
+          "vhi": 53.72
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 52.64
+          "vhi": 49.17
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 50.08
+          "vhi": 45.76
+        },
+        {
+          "iso_week": "2026-W24",
+          "vhi": 43.55
         }
       ]
     },
     "Rwenzori": {
       "province_id": 45,
       "noaa_name": "Kasese",
-      "weeks_in_window": 178,
+      "weeks_in_window": 179,
       "vhi_latest": {
         "year": 2026,
-        "week": 23,
-        "iso_week": "2026-W23",
-        "vhi": 50.08,
+        "week": 24,
+        "iso_week": "2026-W24",
+        "vhi": 43.55,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W12",
-          "vhi": 85.62
-        },
         {
           "iso_week": "2026-W13",
           "vhi": 84.85
@@ -168,46 +164,46 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 71.74
+          "vhi": 70.85
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 67.62
+          "vhi": 66.53
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 61.59
+          "vhi": 60.06
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 56.0
+          "vhi": 53.72
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 52.64
+          "vhi": 49.17
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 50.08
+          "vhi": 45.76
+        },
+        {
+          "iso_week": "2026-W24",
+          "vhi": 43.55
         }
       ]
     },
     "Mbale": {
       "province_id": 27,
       "noaa_name": "Mbale",
-      "weeks_in_window": 178,
+      "weeks_in_window": 179,
       "vhi_latest": {
         "year": 2026,
-        "week": 23,
-        "iso_week": "2026-W23",
-        "vhi": 41.82,
+        "week": 24,
+        "iso_week": "2026-W24",
+        "vhi": 41.24,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W12",
-          "vhi": 78.07
-        },
         {
           "iso_week": "2026-W13",
           "vhi": 75.78
@@ -230,46 +226,46 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 62.55
+          "vhi": 62.72
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 56.35
+          "vhi": 56.49
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 50.65
+          "vhi": 50.86
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 45.84
+          "vhi": 46.12
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 41.97
+          "vhi": 42.26
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 41.82
+          "vhi": 41.3
+        },
+        {
+          "iso_week": "2026-W24",
+          "vhi": 41.24
         }
       ]
     },
     "Mt Elgon": {
       "province_id": 27,
       "noaa_name": "Mbale",
-      "weeks_in_window": 178,
+      "weeks_in_window": 179,
       "vhi_latest": {
         "year": 2026,
-        "week": 23,
-        "iso_week": "2026-W23",
-        "vhi": 41.82,
+        "week": 24,
+        "iso_week": "2026-W24",
+        "vhi": 41.24,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W12",
-          "vhi": 78.07
-        },
         {
           "iso_week": "2026-W13",
           "vhi": 75.78
@@ -292,27 +288,31 @@
         },
         {
           "iso_week": "2026-W18",
-          "vhi": 62.55
+          "vhi": 62.72
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 56.35
+          "vhi": 56.49
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 50.65
+          "vhi": 50.86
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 45.84
+          "vhi": 46.12
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 41.97
+          "vhi": 42.26
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 41.82
+          "vhi": 41.3
+        },
+        {
+          "iso_week": "2026-W24",
+          "vhi": 41.24
         }
       ]
     }
