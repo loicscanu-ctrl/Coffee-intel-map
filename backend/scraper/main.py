@@ -33,6 +33,7 @@ from scraper.sources import (
 )
 from scraper.sources import colombia as _colombia
 from scraper.sources import colombia_weather as _colombia_weather
+from scraper.sources import guatemala as _guatemala
 from scraper.sources import dry_bulk as _dry_bulk
 from scraper.sources import ethiopia as _ethiopia
 from scraper.sources import ethiopia_weather as _ethiopia_weather
@@ -44,7 +45,7 @@ from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import population as _population
 from scraper.sources import uganda_weather as _uganda_weather
 
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia, _guatemala]
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 
