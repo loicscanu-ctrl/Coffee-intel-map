@@ -25,6 +25,8 @@ from pathlib import Path
 
 import requests
 
+from scraper.sources._imports_util import merge_monthly, merge_origin_monthly
+
 log = logging.getLogger(__name__)
 
 BASE = "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/ds-045409"
@@ -442,6 +444,19 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         if block:
             reporters[code] = block
     log.info("Eurostat: %d reporters (bloc + %d members)", len(reporters), len(reporters) - 1)
+
+    # Archive: merge each reporter's monthly series (per-reporter total + per
+    # origin) into the previously-committed history so old months persist as the
+    # lastTimePeriod window rolls forward.
+    if OUT_PATH.exists():
+        try:
+            prev_reporters = json.loads(OUT_PATH.read_text(encoding="utf-8")).get("reporters", {})
+        except Exception:
+            prev_reporters = {}
+        for code, rep in reporters.items():
+            prev = prev_reporters.get(code) or {}
+            rep["monthly_total"] = merge_monthly(prev.get("monthly_total"), rep.get("monthly_total"))
+            merge_origin_monthly(prev.get("origins"), rep["origins"])
 
     comtrade_by_year = _comtrade_eu_total_by_year()
 

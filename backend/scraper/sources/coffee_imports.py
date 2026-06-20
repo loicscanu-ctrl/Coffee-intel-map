@@ -30,6 +30,8 @@ from pathlib import Path
 
 import requests
 
+from scraper.sources._imports_util import merge_monthly
+
 log = logging.getLogger(__name__)
 
 # ── Config ───────────────────────────────────────────────────────────────────
@@ -333,6 +335,20 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
         time.sleep(1.5)   # space calls out — the preview endpoint 429s easily
     log.info("coffee_imports: monthly added for %d of %d top rest-of-world importers",
              n_monthly, len(row_targets))
+
+    # Archive: the monthly fetch only covers the recent ~12 months, so merge it
+    # into the previously-committed history — old months are kept, new/revised
+    # ones are added. Without this the RoW monthly series would never grow.
+    if OUT_PATH.exists():
+        try:
+            prev_countries = json.loads(OUT_PATH.read_text(encoding="utf-8")).get("countries", {})
+        except Exception:
+            prev_countries = {}
+        for iso3, c in countries.items():
+            merged = merge_monthly((prev_countries.get(iso3) or {}).get("monthly_total"),
+                                   c.get("monthly_total"))
+            if merged:
+                c["monthly_total"] = merged
 
     if not countries:
         # Network unavailable (e.g. egress sandbox) — keep any existing file.
