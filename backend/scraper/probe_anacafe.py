@@ -138,7 +138,7 @@ def main() -> None:
         print(f"[diag] render diagnostic errored: {e}")
     print("\n=== Guatemala scraper (render + formula fallback) ===")
     meta = asyncio.run(scraper_probe())
-    grades = (meta or {}).get("grades_usd_quintal") or {}
+    grades = (meta or {}).get("grades_gtq_quintal") or {}
     print(f"\nRESULT: {'PASS' if grades else 'FAIL'} — {len(grades)} grades, "
           f"method={meta.get('method') if meta else None}")
     sys.exit(0 if grades else 1)
