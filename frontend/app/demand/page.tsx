@@ -11,6 +11,7 @@ import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
 import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
+import OriginExplorer from "@/components/demand/imports-lab/OriginExplorer";
 import MonthlyTrend from "@/components/demand/MonthlyTrend";
 import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
@@ -149,6 +150,13 @@ function DemandPageInner() {
                 comtradeField="comtrade_total_by_year"
                 heading="EU — Eurostat vs UN Comtrade (extra-EU)"
                 emptyNote="UN Comtrade has no usable EU-bloc series — the EU isn't a sovereign Comtrade reporter (member states report individually, and the public endpoint's EU member data is stale/incomplete). For the US the two agree to ~0.1%, since Comtrade re-publishes the national source; for the EU, treat Eurostat as authoritative and read Comtrade's EU figures with caution." />
+            </div>
+          </Section>
+          {/* Origin explorer: rank/concentration, origins→blocs Sankey, change
+              heatmap — destination (US / EU bloc / EU member) × annual or monthly. */}
+          <Section>
+            <div className="p-4">
+              <OriginExplorer />
             </div>
           </Section>
         </>

@@ -399,6 +399,9 @@ def _build_reporter(code: str, years: list[str], monthly_steps: tuple[int, ...])
     mo: dict = {}
     for last_n in monthly_steps:
         mo = parse_monthly_origins(_fetch_monthly(last_n, code), reporter_code=code)
+        tot = mo.get("__total__", {})
+        log.info("Eurostat reporter=%s monthly lastN=%d → %d origins, %d months",
+                 code, last_n, max(0, len(mo) - 1), len(tot))
         if len(mo) > 1:   # more than just __total__
             break
     monthly_total = {k: v for k, v in sorted(mo.pop("__total__", {}).items()) if v > 0}
@@ -427,7 +430,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     years = list(reversed([str(now.year - 1 - i) for i in range(N_YEARS)]))
 
     # EU bloc (extra-EU) — also the backward-compatible top-level series.
-    bloc = _build_reporter(REPORTER, years, (36, 24, 12))
+    bloc = _build_reporter(REPORTER, years, (40, 36, 30, 24, 18, 12))
     if bloc is None:
         log.warning("eurostat_imports: no bloc origins parsed; retaining existing file")
         if OUT_PATH.exists():
@@ -435,7 +438,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
 
     reporters: dict[str, dict] = {REPORTER: bloc}
     for code in EU_MEMBER_CODES:
-        block = _build_reporter(code, years, (24, 12))
+        block = _build_reporter(code, years, (40, 36, 30, 24, 18, 12))
         if block:
             reporters[code] = block
     log.info("Eurostat: %d reporters (bloc + %d members)", len(reporters), len(reporters) - 1)
