@@ -11,6 +11,8 @@ export const FOBBING_USD: Record<string, number> = {
   "VN FAQ":  100,
   "CON T7":  200,
   "UGA S15": 265,
+  "GT SHB":  280,   // Guatemala washed Arabica (full milling + Pacific-port export)
+  "HN HG":   250,   // Honduras washed Arabica (milling + Puerto Cortés export)
 };
 
 export const VN_FAQ_FOBBING_USD = FOBBING_USD["VN FAQ"];

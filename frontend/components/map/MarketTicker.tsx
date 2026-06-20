@@ -76,7 +76,15 @@ async function fetchAcaphe(): Promise<AcapheData | null> {
 // so all tickers are comparable at port/exchange parity.
 
 interface ChainContract { symbol: string; last: number; oi: number }
-interface ChainData { robusta: { contracts: ChainContract[] } | null }
+interface ChainData {
+  robusta: { contracts: ChainContract[] } | null;
+  arabica: { contracts: ChainContract[] } | null;
+}
+
+// KC arabica ¢/lb → USD/MT (1 MT = 2204.62 lb, 1¢ = $0.01). Physical labels that
+// are Arabica and therefore quote their N±diff against NY 'C' (KC), not RC.
+const KC_CENTS_TO_USD_MT = 2204.62 / 100;
+const ARABICA_PHYSICAL = new Set(["GT SHB"]);
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -104,7 +112,7 @@ export default function MarketTicker() {
         setTickers(prices?.tickers ?? []);
         setGeneratedAt(prices?.generated_at ?? null);
         if (live?.arabica && live?.robusta) setAcaphe(live);
-        if (chainData?.robusta) setChain(chainData);
+        if (chainData?.robusta || chainData?.arabica) setChain(chainData);
       });
     };
     load();
@@ -176,17 +184,35 @@ export default function MarketTicker() {
     return null;
   })();
 
+  // KC reference (NY 'C') = Barchart arabica contract with the highest OI, in
+  // USD/MT. Arabica physical origins (Guatemala) quote their N±diff against this.
+  const kcFront = (() => {
+    const cs = chain?.arabica?.contracts;
+    if (!cs?.length) return null;
+    return cs.reduce((best, c) => (c.oi ?? 0) > (best.oi ?? 0) ? c : best, cs[0]);
+  })();
+  const kcLetter: string = (() => {
+    const m = kcFront?.symbol.match(/^KC([FGHJKMNQUVXZ])\d{2}$/i);
+    return m ? m[1].toUpperCase() : "N";
+  })();
+  const kcPrice: number | null = kcFront?.last != null
+    ? Math.round(kcFront.last * KC_CENTS_TO_USD_MT) : null;
+
   // Rewrite physical value strings to show the at-port USD (spot + FOBbing) and
-  // its differential vs the Barchart front: "$3,522, N-72". diff = at-port − RC.
+  // its differential vs the relevant front: RC for robusta origins, KC (NY 'C')
+  // for arabica origins (e.g. Guatemala). "$3,522, N-72" / "$5,708, U-12".
   const formatPhysical = (value: string, label: string): string => {
-    if (rcPrice == null) return value;
+    const isArabica = ARABICA_PHYSICAL.has(label);
+    const ref    = isArabica ? kcPrice  : rcPrice;
+    const letter = isArabica ? kcLetter : rcLetter;
+    if (ref == null) return value;
     const usdMatch = value.match(/\$([0-9,]+)/);
     if (!usdMatch) return value;
     const usd = parseInt(usdMatch[1].replace(/,/g, ""), 10);
     const atPort = usd + (FOBBING_USD[label] ?? 0);
-    const diff = atPort - rcPrice;
+    const diff = atPort - ref;
     const sign = diff >= 0 ? "+" : "";
-    return value.replace(/\$[0-9,]+(?=\))/, `$${atPort.toLocaleString()}, ${rcLetter}${sign}${diff}`);
+    return value.replace(/\$[0-9,]+(?=\))/, `$${atPort.toLocaleString()}, ${letter}${sign}${diff}`);
   };
 
   const futuresTs  = acaphe?.fetched_at ?? null;
