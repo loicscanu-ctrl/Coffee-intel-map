@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T16:41:09.913343Z",
+  "generated_at": "2026-06-20T17:42:54.351006Z",
   "count": 56,
   "workflows": [
     {
@@ -769,5 +769,152 @@
       "concurrency_group": "weather-fetch",
       "timeout_minutes": 20
     }
-  ]
+  ],
+  "drift": {
+    "uncovered_workflows": [
+      {
+        "file": "poll-acaphe-quotes.yml",
+        "name": "0.1 \u2013 Acaphe Live Quotes Poll",
+        "version": "0.1"
+      },
+      {
+        "file": "backfill-vhi.yml",
+        "name": "0.10 \u2013 One-shot \u2014 Backfill VHI long-form history (NOAA STAR)",
+        "version": "0.10"
+      },
+      {
+        "file": "scraper-monthly-colombia.yml",
+        "name": "0.10 \u2013 Colombia coffee exports (monthly \u00b7 DANE + FNC)",
+        "version": "0.10"
+      },
+      {
+        "file": "build-workflow-inventory.yml",
+        "name": "0.2 \u2013 Refresh Workflow Inventory",
+        "version": "0.2"
+      },
+      {
+        "file": "scraper-vn-water-levels.yml",
+        "name": "0.8 \u2013 VN River Flow (NCHMF daily bulletin)",
+        "version": "0.8"
+      },
+      {
+        "file": "ucda-monthly-backfill.yml",
+        "name": "0.8 \u2013 One-shot \u2014 UCDA Uganda monthly reports backfill",
+        "version": "0.8"
+      },
+      {
+        "file": "backfill-30yr-history.yml",
+        "name": "0.9 \u2013 One-shot \u2014 Backfill 30Y daily weather history (1995-2024)",
+        "version": "0.9"
+      },
+      {
+        "file": "bps-indonesia-exim.yml",
+        "name": "0.9 \u2013 BPS Indonesia coffee exports (monthly)",
+        "version": "0.9"
+      },
+      {
+        "file": "weather-fetch.yml",
+        "name": "1.10 \u2013 Daily Weather Fetch & Accumulate",
+        "version": "1.10"
+      },
+      {
+        "file": "scraper-port-activity.yml",
+        "name": "1.11 \u2013 Port Activity Scraper (PortWatch)",
+        "version": "1.11"
+      },
+      {
+        "file": "scraper-slow-data.yml",
+        "name": "1.11 \u2013 Monthly Slow-Data Scraper (USDA PSD)",
+        "version": "1.11"
+      },
+      {
+        "file": "redeploy-vercel.yml",
+        "name": "1.12 \u2013 Daily Publish (Vercel redeploy)",
+        "version": "1.12"
+      },
+      {
+        "file": "scraper-cpi.yml",
+        "name": "1.15 \u2013 Monthly CPI Scraper (US CPI \u00b7 Retail Coffee CPI)",
+        "version": "1.15"
+      },
+      {
+        "file": "brazil-export-forecast.yml",
+        "name": "1.8 \u2013 Brazil Export Forecast (SSOT projection)",
+        "version": "1.8"
+      },
+      {
+        "file": "check-live-quotes.yml",
+        "name": "1.8 \u2013 Check Live Quotes Freshness",
+        "version": "1.8"
+      },
+      {
+        "file": "scraper-eurostat-imports.yml",
+        "name": "3.10 \u2013 EU Coffee Imports by Origin (Eurostat Comext)",
+        "version": "3.10"
+      },
+      {
+        "file": "refresh-balance-sheets.yml",
+        "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/CO/ID/UG)",
+        "version": "3.4"
+      },
+      {
+        "file": "scraper-ecf-stocks.yml",
+        "name": "3.4 \u2013 ECF stocks",
+        "version": "3.4"
+      },
+      {
+        "file": "scraper-japan-stocks.yml",
+        "name": "3.5 \u2013 AJCA (Japan)",
+        "version": "3.5"
+      },
+      {
+        "file": "scraper-spot-coffee.yml",
+        "name": "3.6 \u2013 Spot Coffee (ATTE)",
+        "version": "3.6"
+      },
+      {
+        "file": "scraper-annual-un-wpp.yml",
+        "name": "3.7 \u2013 Annual Scraper \u00b7 UN WPP age structure",
+        "version": "3.7"
+      },
+      {
+        "file": "scraper-coffee-imports.yml",
+        "name": "3.8 \u2013 Coffee Imports (UN Comtrade)",
+        "version": "3.8"
+      },
+      {
+        "file": "scraper-usitc-imports.yml",
+        "name": "3.9 \u2013 US Coffee Imports by Origin (USITC DataWeb)",
+        "version": "3.9"
+      },
+      {
+        "file": "ci-tests.yml",
+        "name": "9.1 \u2013 CI Tests",
+        "version": "9.1"
+      },
+      {
+        "file": "lint-backend.yml",
+        "name": "9.2 \u2013 Backend Lint",
+        "version": "9.2"
+      },
+      {
+        "file": "lint-smart-quotes.yml",
+        "name": "9.3 \u2013 Smart-quote guard (TS/TSX)",
+        "version": "9.3"
+      }
+    ],
+    "stale_curation": [],
+    "non_workflow_entries": [
+      "Acaphe poll",
+      "1.3b Slow-data",
+      "various / manual",
+      "various / manual",
+      "various / manual",
+      "various / manual",
+      "various / manual",
+      "various / manual"
+    ],
+    "uncovered_workflows_count": 26,
+    "stale_curation_count": 0
+  }
 }

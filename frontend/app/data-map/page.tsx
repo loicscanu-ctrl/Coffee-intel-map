@@ -1072,10 +1072,18 @@ interface InventoryWorkflow {
   concurrency_group: string | null;
   timeout_minutes:   number | null;
 }
+interface DriftReport {
+  uncovered_workflows:       { file: string; name: string; version: string }[];
+  stale_curation:            string[];
+  non_workflow_entries:      string[];
+  uncovered_workflows_count: number;
+  stale_curation_count:      number;
+}
 interface InventoryPayload {
   generated_at: string;
   count:        number;
   workflows:    InventoryWorkflow[];
+  drift?:       DriftReport;
 }
 
 const TRIGGER_COLORS: Record<string, string> = {
@@ -1093,6 +1101,76 @@ function TriggerChip({ kind }: { kind: string }) {
       {kind}
     </span>
   );
+}
+
+// Drift warning — surfaces workflows that exist in the YAML but have no
+// curated row in the "Per-workflow → exact dashboard visual" table above.
+// The auto inventory now self-detects this gap (see backend/scripts/
+// build_workflow_inventory.py::compute_drift) so the page nags us instead
+// of silently aging out of sync.
+function WorkflowDriftPanel({ drift }: { drift: DriftReport | undefined }) {
+  if (!drift) return null;
+  const { uncovered_workflows, stale_curation } = drift;
+  if (uncovered_workflows.length === 0 && stale_curation.length === 0) {
+    return (
+      <div className="text-[11px] text-emerald-400/80 bg-emerald-950/30 border border-emerald-800/40 rounded-lg px-3 py-2">
+        ✓ Curated table is in sync with the workflow YAML — no drift.
+      </div>
+    );
+  }
+  return (
+    <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-4 space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold text-amber-200">
+          Curated table drift — needs attention
+        </h2>
+        <p className="text-[11px] text-amber-300/80 mt-0.5">
+          Comparison between <code>.github/workflows/*.yml</code> and the curated{" "}
+          <code>ROWS</code> table in <code>app/data-map/page.tsx</code>. Refreshed on every push
+          that changes a workflow file (see <code>0.2 Refresh Workflow Inventory</code>).
+        </p>
+      </div>
+
+      {uncovered_workflows.length > 0 && (
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-amber-300/70 mb-1.5">
+            {uncovered_workflows.length} workflow{uncovered_workflows.length === 1 ? "" : "s"} without a curated row
+          </div>
+          <ul className="text-[11px] font-mono space-y-0.5">
+            {uncovered_workflows.map((w) => (
+              <li key={w.file} className="text-amber-100">
+                <span className="text-amber-400 inline-block w-12">{w.version}</span>
+                <span className="text-amber-300/80 inline-block w-44">{w.file}</span>
+                <span className="text-amber-100/70">{w.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {stale_curation.length > 0 && (
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-rose-300/80 mb-1.5">
+            {stale_curation.length} curated row{stale_curation.length === 1 ? "" : "s"} pointing to a workflow that no longer exists
+          </div>
+          <ul className="text-[11px] font-mono text-rose-200 space-y-0.5">
+            {stale_curation.map((v) => <li key={v}>{v}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Wrapper that fetches the inventory JSON once for both the drift panel
+// (above the curated table) and the live inventory table itself.
+function WorkflowDriftCheck() {
+  const { data, loading, error } =
+    useFetchJson<InventoryPayload>("/data/workflows_inventory.json");
+  if (loading) return <div className="text-[11px] text-slate-500">Checking for drift…</div>;
+  if (error)   return <div className="text-[11px] text-red-400">Drift check failed: {error.message}</div>;
+  if (!data)   return null;
+  return <WorkflowDriftPanel drift={data.drift} />;
 }
 
 function LiveWorkflowInventory() {
@@ -1194,6 +1272,8 @@ export default function DataMapPage() {
             <Mermaid chart={chart} />
           </Card>
         ))}
+
+        <WorkflowDriftCheck />
 
         <Card title="Per-workflow → exact dashboard visual">
           <WorkflowTable />
