@@ -122,16 +122,116 @@ def build_inventory() -> list[dict]:
     return workflows
 
 
+# ── Drift detection ──────────────────────────────────────────────────────────
+# The /data-map page also renders a hand-curated "Per-workflow → exact dashboard
+# visual" table (the ROWS array in frontend/app/data-map/page.tsx). It maps
+# each workflow to the chart/component it drives, which the YAML can't tell us
+# on its own. The risk: ship a new workflow without adding a row → the
+# table silently lags behind reality.
+#
+# This module's drift report flags that gap so the page can render a "needs
+# curation" warning. Matching key is the leading version prefix in both the
+# workflow's `name:` field ("1.3 – Daily OI Snapshot") and the row's `wf:`
+# value ("1.3 Daily OI" / "1.3 → 2.3 rebuild") — the prefix is stable across
+# both conventions while the trailing text varies. Rows whose `wf:` doesn't
+# carry a version prefix are non-workflow features (Telegram commands,
+# sub-tab descriptions, "various / manual" rollups) — they're valid but out
+# of scope for drift.
+
+import re
+
+CURATED_SOURCE = ROOT / "frontend" / "app" / "data-map" / "page.tsx"
+_VERSION_PREFIX = re.compile(r"^([0-9]+\.[0-9]+(?:\.[0-9]+)?)\b")
+
+
+def _version_prefix(name: str) -> str | None:
+    m = _VERSION_PREFIX.match(name)
+    return m.group(1) if m else None
+
+
+def _read_curated_wf_refs() -> tuple[set[str], list[str]]:
+    """Scan ROWS in data-map/page.tsx for `wf: "..."` values.
+
+    Returns (prefixes, non_workflow_labels):
+      prefixes              — set of version prefixes that ROWS references
+      non_workflow_labels   — `wf:` values that don't carry a version prefix
+                              (informational entries like /cot Telegram,
+                              "various / manual", sub-tab descriptions).
+
+    Returns ({}, []) if the source file is missing — the drift report
+    degrades gracefully on environments that don't have the frontend
+    checked out alongside the script.
+    """
+    if not CURATED_SOURCE.exists():
+        return set(), []
+    text = CURATED_SOURCE.read_text(encoding="utf-8")
+    refs = re.findall(r'wf:\s*"([^"]+)"', text)
+    prefixes: set[str] = set()
+    non_workflow: list[str] = []
+    for r in refs:
+        p = _version_prefix(r)
+        if p:
+            prefixes.add(p)
+        else:
+            non_workflow.append(r)
+    return prefixes, non_workflow
+
+
+def compute_drift(workflows: list[dict]) -> dict:
+    """Cross-reference the auto-inventory against the curated ROWS table.
+
+    Output schema:
+      uncovered_workflows   — workflows with no ROWS entry (each: {file, name, version})
+      stale_curation        — ROWS prefixes that no workflow file matches
+      non_workflow_entries  — sample of curated `wf:` values without version prefix
+                              (kept short for the UI; full list lives in the source).
+    """
+    curated_prefixes, non_workflow = _read_curated_wf_refs()
+    workflows_by_prefix: dict[str, list[dict]] = {}
+    no_version: list[dict] = []
+    for w in workflows:
+        p = _version_prefix(w["name"])
+        if p:
+            workflows_by_prefix.setdefault(p, []).append(w)
+        else:
+            no_version.append(w)
+
+    uncovered = []
+    for prefix, group in sorted(workflows_by_prefix.items()):
+        if prefix in curated_prefixes:
+            continue
+        for w in group:
+            uncovered.append({"file": w["file"], "name": w["name"], "version": prefix})
+
+    stale = sorted(curated_prefixes - set(workflows_by_prefix))
+
+    return {
+        "uncovered_workflows":   uncovered,
+        "stale_curation":        stale,
+        # First few non-workflow entries — enough to confirm the system
+        # recognised them; not a comprehensive list.
+        "non_workflow_entries":  non_workflow[:8],
+        "uncovered_workflows_count": len(uncovered),
+        "stale_curation_count":      len(stale),
+    }
+
+
 def main() -> None:
     workflows = build_inventory()
+    drift = compute_drift(workflows)
     payload = {
         "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "count": len(workflows),
         "workflows": workflows,
+        "drift": drift,
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"[workflow-inventory] wrote {OUT_PATH.relative_to(ROOT)} ({len(workflows)} workflows)")
+    print(
+        f"[workflow-inventory] wrote {OUT_PATH.relative_to(ROOT)} "
+        f"({len(workflows)} workflows, {len(drift['uncovered_workflows'])} uncovered, "
+        f"{len(drift['stale_curation'])} stale)",
+    )
 
 
 if __name__ == "__main__":
