@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-17T20:16:36.227016Z",
-  "count": 51,
+  "generated_at": "2026-06-19T12:27:15.019521Z",
+  "count": 55,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -338,7 +338,7 @@
     },
     {
       "file": "refresh-balance-sheets.yml",
-      "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/ID/UG)",
+      "name": "3.4 \u2013 Semi-annual \u00b7 Multi-source balance sheets (BR/CO/ID/UG)",
       "triggers": [
         "schedule",
         "workflow_dispatch"
@@ -387,6 +387,20 @@
       ],
       "crons": [
         "0 8 15 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-coffee-imports.yml",
+      "name": "3.8 \u2013 Coffee Imports (UN Comtrade)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 7 15 * *"
       ],
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
@@ -463,6 +477,20 @@
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
       "timeout_minutes": null
+    },
+    {
+      "file": "scraper-eurostat-imports.yml",
+      "name": "3.10 \u2013 EU Coffee Imports by Origin (Eurostat Comext)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 8 17 * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
     },
     {
       "file": "scraper-freight.yml",
@@ -550,6 +578,20 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 30
+    },
+    {
+      "file": "scraper-monthly-colombia.yml",
+      "name": "0.10 \u2013 Colombia coffee exports (monthly \u00b7 DANE + FNC)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 6 * * *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "scraper-monthly-colombia",
+      "timeout_minutes": 25
     },
     {
       "file": "scraper-monthly-conab.yml",
@@ -658,6 +700,20 @@
       ],
       "crons": [
         "0 6 * * 1"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
+    },
+    {
+      "file": "scraper-usitc-imports.yml",
+      "name": "3.9 \u2013 US Coffee Imports by Origin (USITC DataWeb)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 7 16 * *"
       ],
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",

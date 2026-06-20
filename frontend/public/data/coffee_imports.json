@@ -1,0 +1,2113 @@
+{
+  "updated": "2026-06-19T17:13:47Z",
+  "source": "UN Comtrade (public preview, HS 0901, imports from World)",
+  "hs_codes": {
+    "0901": "Coffee, total (HS 0901)",
+    "090111": "Green, not decaffeinated",
+    "090112": "Green, decaffeinated",
+    "090121": "Roasted, not decaffeinated",
+    "090122": "Roasted, decaffeinated",
+    "090190": "Husks, skins & substitutes"
+  },
+  "is_seed": false,
+  "countries": {
+    "usa": {
+      "name": "United States",
+      "iso3": "USA",
+      "reporter_code": "842",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 1524987.4,
+          "green_mt": 1457102.3,
+          "roasted_mt": 67766.2,
+          "decaf_mt": 116731.7,
+          "husks_mt": 118.9,
+          "value_usd": 6013015226
+        },
+        {
+          "year": 2015,
+          "total_mt": 1538551.6,
+          "green_mt": 1462569.9,
+          "roasted_mt": 75794.8,
+          "decaf_mt": 111385.8,
+          "husks_mt": 186.9,
+          "value_usd": 6034025090
+        },
+        {
+          "year": 2016,
+          "total_mt": 1603574.6,
+          "green_mt": 1518241.7,
+          "roasted_mt": 85160.5,
+          "decaf_mt": 107594.4,
+          "husks_mt": 172.4,
+          "value_usd": 5746616720
+        },
+        {
+          "year": 2017,
+          "total_mt": 1624476.1,
+          "green_mt": 1531320.7,
+          "roasted_mt": 93020.1,
+          "decaf_mt": 107421.1,
+          "husks_mt": 135.3,
+          "value_usd": 6314186617
+        },
+        {
+          "year": 2018,
+          "total_mt": 1582022.3,
+          "green_mt": 1493441.6,
+          "roasted_mt": 88381.2,
+          "decaf_mt": 109718.2,
+          "husks_mt": 199.5,
+          "value_usd": 5719420655
+        },
+        {
+          "year": 2019,
+          "total_mt": 1695023.8,
+          "green_mt": 1592250.2,
+          "roasted_mt": 102482.6,
+          "decaf_mt": 114205.3,
+          "husks_mt": 291.1,
+          "value_usd": 5841573100
+        },
+        {
+          "year": 2020,
+          "total_mt": 1525262.8,
+          "green_mt": 1427849.4,
+          "roasted_mt": 97226.3,
+          "decaf_mt": 100949.5,
+          "husks_mt": 187.2,
+          "value_usd": 5677018278
+        },
+        {
+          "year": 2021,
+          "total_mt": 1580309.0,
+          "green_mt": 1470261.3,
+          "roasted_mt": 109721.8,
+          "decaf_mt": 99157.3,
+          "husks_mt": 326.0,
+          "value_usd": 6920017773
+        },
+        {
+          "year": 2022,
+          "total_mt": 1625155.5,
+          "green_mt": 1512849.4,
+          "roasted_mt": 111940.8,
+          "decaf_mt": 97891.8,
+          "husks_mt": 365.3,
+          "value_usd": 9786287034
+        },
+        {
+          "year": 2023,
+          "total_mt": 1389262.7,
+          "green_mt": 1276122.5,
+          "roasted_mt": 112887.9,
+          "decaf_mt": 83566.8,
+          "husks_mt": 252.3,
+          "value_usd": 8201729476
+        },
+        {
+          "year": 2024,
+          "total_mt": 1476856.5,
+          "green_mt": 1348037.6,
+          "roasted_mt": 128462.2,
+          "decaf_mt": 85429.5,
+          "husks_mt": 356.7,
+          "value_usd": 8991203537
+        },
+        {
+          "year": 2025,
+          "total_mt": 1486857.7,
+          "green_mt": 1370909.6,
+          "roasted_mt": 115688.4,
+          "decaf_mt": 83958.1,
+          "husks_mt": 259.6,
+          "value_usd": 12799351326
+        }
+      ],
+      "latest_year": 2025
+    },
+    "ita": {
+      "name": "Italy",
+      "iso3": "ITA",
+      "reporter_code": "380",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 546762.5,
+          "green_mt": 534486.9,
+          "roasted_mt": 12265.2,
+          "decaf_mt": 8609.0,
+          "husks_mt": 10.5,
+          "value_usd": 1707942326
+        },
+        {
+          "year": 2015,
+          "total_mt": 546885.2,
+          "green_mt": 533174.5,
+          "roasted_mt": 13191.0,
+          "decaf_mt": 6399.8,
+          "husks_mt": 519.7,
+          "value_usd": 1778548252
+        },
+        {
+          "year": 2017,
+          "total_mt": 585786.5,
+          "green_mt": 569916.8,
+          "roasted_mt": 15365.4,
+          "decaf_mt": 7970.8,
+          "husks_mt": 504.3,
+          "value_usd": 1795155608
+        },
+        {
+          "year": 2018,
+          "total_mt": 623692.8,
+          "green_mt": 606994.5,
+          "roasted_mt": 16256.9,
+          "decaf_mt": 3789.0,
+          "husks_mt": 441.4,
+          "value_usd": 1749159564
+        },
+        {
+          "year": 2019,
+          "total_mt": 637907.6,
+          "green_mt": 614837.9,
+          "roasted_mt": 23017.0,
+          "decaf_mt": 5723.9,
+          "husks_mt": 52.8,
+          "value_usd": 1622808169
+        },
+        {
+          "year": 2020,
+          "total_mt": 591470.2,
+          "green_mt": 569006.1,
+          "roasted_mt": 22443.6,
+          "decaf_mt": 5618.4,
+          "husks_mt": 20.5,
+          "value_usd": 1515839585
+        },
+        {
+          "year": 2021,
+          "total_mt": 645158.4,
+          "green_mt": 620554.1,
+          "roasted_mt": 24563.3,
+          "decaf_mt": 5684.3,
+          "husks_mt": 41.0,
+          "value_usd": 1765941494
+        },
+        {
+          "year": 2022,
+          "total_mt": 698324.5,
+          "green_mt": 674849.1,
+          "roasted_mt": 23396.3,
+          "decaf_mt": 4994.5,
+          "husks_mt": 79.2,
+          "value_usd": 2607846343
+        },
+        {
+          "year": 2023,
+          "total_mt": 666876.8,
+          "green_mt": 645025.6,
+          "roasted_mt": 21731.5,
+          "decaf_mt": 5261.4,
+          "husks_mt": 119.7,
+          "value_usd": 2484604702
+        },
+        {
+          "year": 2024,
+          "total_mt": 677829.8,
+          "green_mt": 655698.0,
+          "roasted_mt": 22000.9,
+          "decaf_mt": 5467.4,
+          "husks_mt": 130.9,
+          "value_usd": 3112607609
+        },
+        {
+          "year": 2025,
+          "total_mt": 667343.1,
+          "green_mt": 641234.1,
+          "roasted_mt": 25976.8,
+          "decaf_mt": 5567.4,
+          "husks_mt": 132.3,
+          "value_usd": 4559392565
+        }
+      ],
+      "latest_year": 2025
+    },
+    "nld": {
+      "name": "Netherlands",
+      "iso3": "NLD",
+      "reporter_code": "528",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 232315.0,
+          "green_mt": 168468.1,
+          "roasted_mt": 62596.1,
+          "decaf_mt": 9784.2,
+          "husks_mt": 1250.9,
+          "value_usd": 1129416387
+        },
+        {
+          "year": 2015,
+          "total_mt": 239404.2,
+          "green_mt": 169661.8,
+          "roasted_mt": 68838.6,
+          "decaf_mt": 14110.7,
+          "husks_mt": 903.8,
+          "value_usd": 1069966983
+        },
+        {
+          "year": 2016,
+          "total_mt": 250595.4,
+          "green_mt": 182889.3,
+          "roasted_mt": 66951.1,
+          "decaf_mt": 13588.4,
+          "husks_mt": 755.0,
+          "value_usd": 1029239870
+        },
+        {
+          "year": 2017,
+          "total_mt": 260161.3,
+          "green_mt": 189563.6,
+          "roasted_mt": 69648.8,
+          "decaf_mt": 14962.9,
+          "husks_mt": 948.9,
+          "value_usd": 1243426291
+        },
+        {
+          "year": 2018,
+          "total_mt": 277628.1,
+          "green_mt": 202150.6,
+          "roasted_mt": 73926.2,
+          "decaf_mt": 14088.0,
+          "husks_mt": 1551.3,
+          "value_usd": 1288930239
+        },
+        {
+          "year": 2019,
+          "total_mt": 276294.4,
+          "green_mt": 204569.1,
+          "roasted_mt": 70267.2,
+          "decaf_mt": 15175.4,
+          "husks_mt": 1458.2,
+          "value_usd": 1156953003
+        },
+        {
+          "year": 2020,
+          "total_mt": 259872.8,
+          "green_mt": 186962.7,
+          "roasted_mt": 71767.8,
+          "decaf_mt": 14458.4,
+          "husks_mt": 1142.3,
+          "value_usd": 1188565546
+        },
+        {
+          "year": 2021,
+          "total_mt": 268630.2,
+          "green_mt": 191366.7,
+          "roasted_mt": 76216.6,
+          "decaf_mt": 12935.6,
+          "husks_mt": 1046.9,
+          "value_usd": 1312609111
+        },
+        {
+          "year": 2022,
+          "total_mt": 319609.7,
+          "green_mt": 237857.3,
+          "roasted_mt": 80556.5,
+          "decaf_mt": 11553.9,
+          "husks_mt": 1195.9,
+          "value_usd": 1668868249
+        },
+        {
+          "year": 2023,
+          "total_mt": 252724.4,
+          "green_mt": 183400.3,
+          "roasted_mt": 68855.0,
+          "decaf_mt": 10061.9,
+          "husks_mt": 469.0,
+          "value_usd": 1464979535
+        },
+        {
+          "year": 2024,
+          "total_mt": 248121.5,
+          "green_mt": 174288.5,
+          "roasted_mt": 73354.3,
+          "decaf_mt": 10315.8,
+          "husks_mt": 478.6,
+          "value_usd": 1527900894
+        },
+        {
+          "year": 2025,
+          "total_mt": 252828.3,
+          "green_mt": 177204.8,
+          "roasted_mt": 75289.6,
+          "decaf_mt": 8794.8,
+          "husks_mt": 333.8,
+          "value_usd": 2208064244
+        }
+      ],
+      "latest_year": 2025
+    },
+    "bel": {
+      "name": "Belgium",
+      "iso3": "BEL",
+      "reporter_code": "56",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 100579.0,
+          "green_mt": 81876.9,
+          "roasted_mt": 18595.7,
+          "decaf_mt": 4330.2,
+          "husks_mt": 106.3,
+          "value_usd": 440492925
+        },
+        {
+          "year": 2015,
+          "total_mt": 140975.9,
+          "green_mt": 118149.7,
+          "roasted_mt": 22791.3,
+          "decaf_mt": 4505.8,
+          "husks_mt": 34.9,
+          "value_usd": 550327968
+        },
+        {
+          "year": 2016,
+          "total_mt": 126910.4,
+          "green_mt": 102803.0,
+          "roasted_mt": 24025.8,
+          "decaf_mt": 5945.7,
+          "husks_mt": 81.5,
+          "value_usd": 468348137
+        },
+        {
+          "year": 2017,
+          "total_mt": 123540.2,
+          "green_mt": 94156.7,
+          "roasted_mt": 29144.2,
+          "decaf_mt": 2938.8,
+          "husks_mt": 239.3,
+          "value_usd": 504230313
+        },
+        {
+          "year": 2018,
+          "total_mt": 164599.9,
+          "green_mt": 131663.7,
+          "roasted_mt": 32048.0,
+          "decaf_mt": 2229.3,
+          "husks_mt": 323.5,
+          "value_usd": 601113685
+        },
+        {
+          "year": 2019,
+          "total_mt": 179061.7,
+          "green_mt": 148990.8,
+          "roasted_mt": 29947.7,
+          "decaf_mt": 3119.0,
+          "husks_mt": 123.3,
+          "value_usd": 598544325
+        },
+        {
+          "year": 2020,
+          "total_mt": 173779.2,
+          "green_mt": 146215.0,
+          "roasted_mt": 26638.4,
+          "decaf_mt": 3011.0,
+          "husks_mt": 925.8,
+          "value_usd": 608048982
+        },
+        {
+          "year": 2021,
+          "total_mt": 162658.7,
+          "green_mt": 136638.8,
+          "roasted_mt": 25904.3,
+          "decaf_mt": 2479.3,
+          "husks_mt": 115.6,
+          "value_usd": 679815947
+        },
+        {
+          "year": 2022,
+          "total_mt": 168142.7,
+          "green_mt": 141464.2,
+          "roasted_mt": 25848.1,
+          "decaf_mt": 2272.7,
+          "husks_mt": 830.4,
+          "value_usd": 872481454
+        },
+        {
+          "year": 2023,
+          "total_mt": 169341.1,
+          "green_mt": 133105.9,
+          "roasted_mt": 31701.1,
+          "decaf_mt": 3077.3,
+          "husks_mt": 4534.2,
+          "value_usd": 877593393
+        },
+        {
+          "year": 2024,
+          "total_mt": 171108.6,
+          "green_mt": 134258.9,
+          "roasted_mt": 30791.3,
+          "decaf_mt": 3430.4,
+          "husks_mt": 6058.3,
+          "value_usd": 947009250
+        },
+        {
+          "year": 2025,
+          "total_mt": 171732.3,
+          "green_mt": 140564.7,
+          "roasted_mt": 31084.3,
+          "decaf_mt": 4326.6,
+          "husks_mt": 83.3,
+          "value_usd": 1446148375
+        }
+      ],
+      "latest_year": 2025
+    },
+    "pol": {
+      "name": "Poland",
+      "iso3": "POL",
+      "reporter_code": "616",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 114915.3,
+          "green_mt": 78420.0,
+          "roasted_mt": 35799.3,
+          "decaf_mt": 1782.3,
+          "husks_mt": 696.0,
+          "value_usd": 405440719
+        },
+        {
+          "year": 2015,
+          "total_mt": 141143.8,
+          "green_mt": 104124.2,
+          "roasted_mt": 36248.9,
+          "decaf_mt": 3728.6,
+          "husks_mt": 770.6,
+          "value_usd": 457180634
+        },
+        {
+          "year": 2016,
+          "total_mt": 144414.2,
+          "green_mt": 102098.9,
+          "roasted_mt": 41185.1,
+          "decaf_mt": 3847.3,
+          "husks_mt": 1130.3,
+          "value_usd": 437860429
+        },
+        {
+          "year": 2017,
+          "total_mt": 153213.0,
+          "green_mt": 113853.9,
+          "roasted_mt": 38547.6,
+          "decaf_mt": 2738.7,
+          "husks_mt": 811.5,
+          "value_usd": 515340322
+        },
+        {
+          "year": 2018,
+          "total_mt": 173988.4,
+          "green_mt": 122983.1,
+          "roasted_mt": 50298.2,
+          "decaf_mt": 801.3,
+          "husks_mt": 707.1,
+          "value_usd": 583598376
+        },
+        {
+          "year": 2019,
+          "total_mt": 181085.9,
+          "green_mt": 123427.9,
+          "roasted_mt": 56949.5,
+          "decaf_mt": 919.4,
+          "husks_mt": 708.5,
+          "value_usd": 577955784
+        },
+        {
+          "year": 2020,
+          "total_mt": 188221.0,
+          "green_mt": 128712.8,
+          "roasted_mt": 59132.5,
+          "decaf_mt": 819.3,
+          "husks_mt": 375.7,
+          "value_usd": 648534517
+        },
+        {
+          "year": 2021,
+          "total_mt": 194842.5,
+          "green_mt": 128876.6,
+          "roasted_mt": 65660.3,
+          "decaf_mt": 857.1,
+          "husks_mt": 305.7,
+          "value_usd": 737237410
+        },
+        {
+          "year": 2022,
+          "total_mt": 194807.2,
+          "green_mt": 120037.9,
+          "roasted_mt": 74414.5,
+          "decaf_mt": 1881.0,
+          "husks_mt": 354.8,
+          "value_usd": 966105953
+        },
+        {
+          "year": 2023,
+          "total_mt": 197406.7,
+          "green_mt": 122707.4,
+          "roasted_mt": 74510.9,
+          "decaf_mt": 1729.9,
+          "husks_mt": 188.4,
+          "value_usd": 1004019509
+        },
+        {
+          "year": 2024,
+          "total_mt": 210268.5,
+          "green_mt": 123936.1,
+          "roasted_mt": 86047.7,
+          "decaf_mt": 1136.9,
+          "husks_mt": 284.7,
+          "value_usd": 1237634311
+        },
+        {
+          "year": 2025,
+          "total_mt": 222174.9,
+          "green_mt": 133118.4,
+          "roasted_mt": 88728.3,
+          "decaf_mt": 1070.5,
+          "husks_mt": 328.2,
+          "value_usd": 1866180006
+        }
+      ],
+      "latest_year": 2025
+    },
+    "aut": {
+      "name": "Austria",
+      "iso3": "AUT",
+      "reporter_code": "40",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 66289.2,
+          "green_mt": 17654.7,
+          "roasted_mt": 48398.2,
+          "decaf_mt": 1977.1,
+          "husks_mt": 236.3,
+          "value_usd": 481071738
+        },
+        {
+          "year": 2015,
+          "total_mt": 65103.0,
+          "green_mt": 16435.6,
+          "roasted_mt": 48513.7,
+          "decaf_mt": 1847.5,
+          "husks_mt": 153.7,
+          "value_usd": 428555645
+        },
+        {
+          "year": 2016,
+          "total_mt": 64056.1,
+          "green_mt": 16134.6,
+          "roasted_mt": 47808.1,
+          "decaf_mt": 1750.3,
+          "husks_mt": 113.4,
+          "value_usd": 422531749
+        },
+        {
+          "year": 2017,
+          "total_mt": 64044.2,
+          "green_mt": 16939.4,
+          "roasted_mt": 46992.2,
+          "decaf_mt": 1634.2,
+          "husks_mt": 112.7,
+          "value_usd": 445612464
+        },
+        {
+          "year": 2018,
+          "total_mt": 63117.9,
+          "green_mt": 16976.1,
+          "roasted_mt": 46062.8,
+          "decaf_mt": 1716.7,
+          "husks_mt": 79.0,
+          "value_usd": 443568759
+        },
+        {
+          "year": 2019,
+          "total_mt": 66281.1,
+          "green_mt": 18091.0,
+          "roasted_mt": 48124.1,
+          "decaf_mt": 1731.2,
+          "husks_mt": 66.0,
+          "value_usd": 430640916
+        },
+        {
+          "year": 2020,
+          "total_mt": 62278.9,
+          "green_mt": 15234.6,
+          "roasted_mt": 46993.0,
+          "decaf_mt": 1880.6,
+          "husks_mt": 51.2,
+          "value_usd": 424973657
+        },
+        {
+          "year": 2021,
+          "total_mt": 62625.4,
+          "green_mt": 13038.3,
+          "roasted_mt": 49500.7,
+          "decaf_mt": 2015.0,
+          "husks_mt": 86.3,
+          "value_usd": 465552072
+        },
+        {
+          "year": 2022,
+          "total_mt": 60809.4,
+          "green_mt": 14427.3,
+          "roasted_mt": 46332.9,
+          "decaf_mt": 1892.4,
+          "husks_mt": 49.2,
+          "value_usd": 483110753
+        },
+        {
+          "year": 2023,
+          "total_mt": 61723.2,
+          "green_mt": 13382.6,
+          "roasted_mt": 48300.0,
+          "decaf_mt": 1975.2,
+          "husks_mt": 40.6,
+          "value_usd": 517693653
+        },
+        {
+          "year": 2024,
+          "total_mt": 60392.2,
+          "green_mt": 12605.2,
+          "roasted_mt": 47746.7,
+          "decaf_mt": 1539.1,
+          "husks_mt": 40.3,
+          "value_usd": 531520213
+        }
+      ],
+      "latest_year": 2024
+    },
+    "dnk": {
+      "name": "Denmark",
+      "iso3": "DNK",
+      "reporter_code": "208",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 39244.8,
+          "green_mt": 17491.3,
+          "roasted_mt": 21698.5,
+          "decaf_mt": 1120.4,
+          "husks_mt": 55.1,
+          "value_usd": 200314937
+        },
+        {
+          "year": 2015,
+          "total_mt": 38940.1,
+          "green_mt": 17254.1,
+          "roasted_mt": 21630.3,
+          "decaf_mt": 575.2,
+          "husks_mt": 55.7,
+          "value_usd": 183823492
+        },
+        {
+          "year": 2016,
+          "total_mt": 42037.7,
+          "green_mt": 19954.0,
+          "roasted_mt": 22030.8,
+          "decaf_mt": 611.1,
+          "husks_mt": 52.9,
+          "value_usd": 174786843
+        },
+        {
+          "year": 2017,
+          "total_mt": 37997.6,
+          "green_mt": 15484.3,
+          "roasted_mt": 22471.9,
+          "decaf_mt": 496.3,
+          "husks_mt": 41.4,
+          "value_usd": 184884304
+        },
+        {
+          "year": 2018,
+          "total_mt": 39066.4,
+          "green_mt": 17541.1,
+          "roasted_mt": 21506.5,
+          "decaf_mt": 630.6,
+          "husks_mt": 18.9,
+          "value_usd": 179372334
+        },
+        {
+          "year": 2019,
+          "total_mt": 39685.0,
+          "green_mt": 17456.6,
+          "roasted_mt": 22221.9,
+          "decaf_mt": 368.7,
+          "husks_mt": 6.4,
+          "value_usd": 168156836
+        },
+        {
+          "year": 2020,
+          "total_mt": 35945.5,
+          "green_mt": 14708.3,
+          "roasted_mt": 21227.2,
+          "decaf_mt": 145.7,
+          "husks_mt": 10.0,
+          "value_usd": 170270509
+        },
+        {
+          "year": 2021,
+          "total_mt": 39911.3,
+          "green_mt": 14906.0,
+          "roasted_mt": 24021.7,
+          "decaf_mt": 240.1,
+          "husks_mt": 983.6,
+          "value_usd": 208317862
+        },
+        {
+          "year": 2022,
+          "total_mt": 43201.5,
+          "green_mt": 16274.2,
+          "roasted_mt": 26617.8,
+          "decaf_mt": 273.3,
+          "husks_mt": 309.5,
+          "value_usd": 304551633
+        },
+        {
+          "year": 2023,
+          "total_mt": 41775.6,
+          "green_mt": 16604.8,
+          "roasted_mt": 25120.8,
+          "decaf_mt": 191.0,
+          "husks_mt": 50.0,
+          "value_usd": 300755232
+        },
+        {
+          "year": 2024,
+          "total_mt": 41877.6,
+          "green_mt": 17367.7,
+          "roasted_mt": 24448.9,
+          "decaf_mt": 191.6,
+          "husks_mt": 61.0,
+          "value_usd": 320383870
+        },
+        {
+          "year": 2025,
+          "total_mt": 46751.9,
+          "green_mt": 21185.3,
+          "roasted_mt": 25519.3,
+          "decaf_mt": 190.0,
+          "husks_mt": 47.3,
+          "value_usd": 483069971
+        }
+      ],
+      "latest_year": 2025
+    },
+    "grc": {
+      "name": "Greece",
+      "iso3": "GRC",
+      "reporter_code": "300",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 41388.5,
+          "green_mt": 30149.7,
+          "roasted_mt": 11035.7,
+          "decaf_mt": 474.8,
+          "husks_mt": 203.1,
+          "value_usd": 211201725
+        },
+        {
+          "year": 2015,
+          "total_mt": 44855.8,
+          "green_mt": 32113.8,
+          "roasted_mt": 12625.2,
+          "decaf_mt": 557.7,
+          "husks_mt": 116.8,
+          "value_usd": 207147849
+        },
+        {
+          "year": 2016,
+          "total_mt": 65152.2,
+          "green_mt": 49243.5,
+          "roasted_mt": 15693.5,
+          "decaf_mt": 729.1,
+          "husks_mt": 215.1,
+          "value_usd": 280255122
+        },
+        {
+          "year": 2024,
+          "total_mt": 14896.4,
+          "green_mt": 356.0,
+          "roasted_mt": 11380.2,
+          "decaf_mt": 78.0,
+          "husks_mt": 1.8,
+          "value_usd": 156240774
+        }
+      ],
+      "latest_year": 2024
+    },
+    "hun": {
+      "name": "Hungary",
+      "iso3": "HUN",
+      "reporter_code": "348",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 32904.8,
+          "green_mt": 15718.3,
+          "roasted_mt": 17184.0,
+          "decaf_mt": 165.4,
+          "husks_mt": 2.5,
+          "value_usd": 126947216
+        },
+        {
+          "year": 2015,
+          "total_mt": 25020.4,
+          "green_mt": 4338.1,
+          "roasted_mt": 20675.3,
+          "decaf_mt": 144.2,
+          "husks_mt": 6.9,
+          "value_usd": 101201625
+        },
+        {
+          "year": 2023,
+          "total_mt": 23978.7,
+          "green_mt": 4953.1,
+          "roasted_mt": 19024.4,
+          "decaf_mt": 210.7,
+          "husks_mt": 0.0,
+          "value_usd": 142335911
+        }
+      ],
+      "latest_year": 2023
+    },
+    "irl": {
+      "name": "Ireland",
+      "iso3": "IRL",
+      "reporter_code": "372",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 9758.2,
+          "green_mt": 5995.6,
+          "roasted_mt": 3732.1,
+          "decaf_mt": 176.9,
+          "husks_mt": 30.4,
+          "value_usd": 66021228
+        },
+        {
+          "year": 2015,
+          "total_mt": 11776.4,
+          "green_mt": 8231.1,
+          "roasted_mt": 3507.5,
+          "decaf_mt": 297.6,
+          "husks_mt": 37.9,
+          "value_usd": 74610205
+        },
+        {
+          "year": 2016,
+          "total_mt": 14327.3,
+          "green_mt": 10592.6,
+          "roasted_mt": 3675.1,
+          "decaf_mt": 714.4,
+          "husks_mt": 59.6,
+          "value_usd": 83022837
+        },
+        {
+          "year": 2017,
+          "total_mt": 16647.9,
+          "green_mt": 12518.9,
+          "roasted_mt": 4027.9,
+          "decaf_mt": 616.5,
+          "husks_mt": 101.0,
+          "value_usd": 97254563
+        },
+        {
+          "year": 2018,
+          "total_mt": 17896.0,
+          "green_mt": 12490.0,
+          "roasted_mt": 5345.8,
+          "decaf_mt": 478.6,
+          "husks_mt": 60.2,
+          "value_usd": 106951462
+        },
+        {
+          "year": 2019,
+          "total_mt": 18535.3,
+          "green_mt": 11724.5,
+          "roasted_mt": 6724.7,
+          "decaf_mt": 386.0,
+          "husks_mt": 86.2,
+          "value_usd": 117386463
+        },
+        {
+          "year": 2020,
+          "total_mt": 26742.9,
+          "green_mt": 9699.5,
+          "roasted_mt": 16949.5,
+          "decaf_mt": 296.0,
+          "husks_mt": 93.9,
+          "value_usd": 110637927
+        },
+        {
+          "year": 2021,
+          "total_mt": 14459.3,
+          "green_mt": 7160.8,
+          "roasted_mt": 7252.6,
+          "decaf_mt": 309.6,
+          "husks_mt": 45.8,
+          "value_usd": 122936403
+        },
+        {
+          "year": 2022,
+          "total_mt": 20924.6,
+          "green_mt": 9468.0,
+          "roasted_mt": 11419.8,
+          "decaf_mt": 360.7,
+          "husks_mt": 36.9,
+          "value_usd": 137010637
+        },
+        {
+          "year": 2023,
+          "total_mt": 21658.5,
+          "green_mt": 8463.3,
+          "roasted_mt": 13153.6,
+          "decaf_mt": 413.0,
+          "husks_mt": 41.6,
+          "value_usd": 141865515
+        },
+        {
+          "year": 2024,
+          "total_mt": 19213.7,
+          "green_mt": 8036.2,
+          "roasted_mt": 11138.4,
+          "decaf_mt": 253.3,
+          "husks_mt": 39.1,
+          "value_usd": 140204474
+        },
+        {
+          "year": 2025,
+          "total_mt": 21268.5,
+          "green_mt": 8708.8,
+          "roasted_mt": 12532.8,
+          "decaf_mt": 490.6,
+          "husks_mt": 26.8,
+          "value_usd": 179454834
+        }
+      ],
+      "latest_year": 2025
+    },
+    "jpn": {
+      "name": "Japan",
+      "iso3": "JPN",
+      "reporter_code": "392",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 416845.3,
+          "green_mt": 409372.0,
+          "roasted_mt": 7463.2,
+          "decaf_mt": 2210.7,
+          "husks_mt": 10.1,
+          "value_usd": 1442250659
+        },
+        {
+          "year": 2015,
+          "total_mt": 442310.7,
+          "green_mt": 435261.0,
+          "roasted_mt": 6918.5,
+          "decaf_mt": 2281.0,
+          "husks_mt": 131.2,
+          "value_usd": 1581142038
+        },
+        {
+          "year": 2016,
+          "total_mt": 442647.8,
+          "green_mt": 435140.1,
+          "roasted_mt": 7499.2,
+          "decaf_mt": 2826.8,
+          "husks_mt": 8.5,
+          "value_usd": 1415348978
+        },
+        {
+          "year": 2017,
+          "total_mt": 414075.1,
+          "green_mt": 406330.1,
+          "roasted_mt": 7742.6,
+          "decaf_mt": 2796.3,
+          "husks_mt": 2.4,
+          "value_usd": 1431601136
+        },
+        {
+          "year": 2018,
+          "total_mt": 409747.9,
+          "green_mt": 401144.1,
+          "roasted_mt": 7141.6,
+          "decaf_mt": 2445.7,
+          "husks_mt": 1462.3,
+          "value_usd": 1261194761
+        },
+        {
+          "year": 2019,
+          "total_mt": 445635.3,
+          "green_mt": 436546.0,
+          "roasted_mt": 7128.2,
+          "decaf_mt": 2528.5,
+          "husks_mt": 1961.1,
+          "value_usd": 1248015383
+        },
+        {
+          "year": 2020,
+          "total_mt": 399205.9,
+          "green_mt": 391611.2,
+          "roasted_mt": 7367.4,
+          "decaf_mt": 2330.1,
+          "husks_mt": 227.2,
+          "value_usd": 1178119827
+        },
+        {
+          "year": 2021,
+          "total_mt": 409844.6,
+          "green_mt": 402100.0,
+          "roasted_mt": 7660.9,
+          "decaf_mt": 3120.9,
+          "husks_mt": 83.7,
+          "value_usd": 1318671522
+        },
+        {
+          "year": 2022,
+          "total_mt": 397880.9,
+          "green_mt": 390032.5,
+          "roasted_mt": 7844.3,
+          "decaf_mt": 3886.6,
+          "husks_mt": 4.0,
+          "value_usd": 1774390488
+        },
+        {
+          "year": 2023,
+          "total_mt": 362565.8,
+          "green_mt": 355651.5,
+          "roasted_mt": 6910.7,
+          "decaf_mt": 3604.8,
+          "husks_mt": 3.6,
+          "value_usd": 1560657642
+        },
+        {
+          "year": 2024,
+          "total_mt": 366365.7,
+          "green_mt": 360287.0,
+          "roasted_mt": 6011.5,
+          "decaf_mt": 3223.5,
+          "husks_mt": 67.1,
+          "value_usd": 1714414413
+        },
+        {
+          "year": 2025,
+          "total_mt": 365808.3,
+          "green_mt": 359381.9,
+          "roasted_mt": 6340.7,
+          "decaf_mt": 5297.9,
+          "husks_mt": 85.7,
+          "value_usd": 2554507507
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 34766.3,
+        "2025-07": 29257.7,
+        "2025-08": 30755.1,
+        "2025-09": 30475.4,
+        "2025-10": 32663.4,
+        "2025-11": 22482.8,
+        "2025-12": 29481.0,
+        "2026-01": 30746.8,
+        "2026-02": 29768.3,
+        "2026-03": 28203.9
+      }
+    },
+    "kor": {
+      "name": "South Korea",
+      "iso3": "KOR",
+      "reporter_code": "410",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 132519.0,
+          "green_mt": 121983.2,
+          "roasted_mt": 10524.9,
+          "decaf_mt": 987.0,
+          "husks_mt": 11.0,
+          "value_usd": 527286883
+        },
+        {
+          "year": 2015,
+          "total_mt": 137794.7,
+          "green_mt": 129566.9,
+          "roasted_mt": 8194.6,
+          "decaf_mt": 1175.6,
+          "husks_mt": 33.3,
+          "value_usd": 547094396
+        },
+        {
+          "year": 2016,
+          "total_mt": 153029.5,
+          "green_mt": 142860.4,
+          "roasted_mt": 10095.2,
+          "decaf_mt": 1153.3,
+          "husks_mt": 73.9,
+          "value_usd": 562774034
+        },
+        {
+          "year": 2017,
+          "total_mt": 159309.3,
+          "green_mt": 147501.1,
+          "roasted_mt": 11795.3,
+          "decaf_mt": 1312.8,
+          "husks_mt": 13.0,
+          "value_usd": 655344131
+        },
+        {
+          "year": 2018,
+          "total_mt": 158385.4,
+          "green_mt": 145051.1,
+          "roasted_mt": 13332.9,
+          "decaf_mt": 1724.4,
+          "husks_mt": 1.4,
+          "value_usd": 637287841
+        },
+        {
+          "year": 2019,
+          "total_mt": 167654.9,
+          "green_mt": 152014.1,
+          "roasted_mt": 15565.2,
+          "decaf_mt": 2487.2,
+          "husks_mt": 75.6,
+          "value_usd": 661673379
+        },
+        {
+          "year": 2020,
+          "total_mt": 176648.0,
+          "green_mt": 159748.1,
+          "roasted_mt": 16796.4,
+          "decaf_mt": 3712.6,
+          "husks_mt": 103.5,
+          "value_usd": 737794503
+        },
+        {
+          "year": 2021,
+          "total_mt": 189502.4,
+          "green_mt": 165059.7,
+          "roasted_mt": 19707.7,
+          "decaf_mt": 4755.2,
+          "husks_mt": 4735.1,
+          "value_usd": 916480095
+        },
+        {
+          "year": 2022,
+          "total_mt": 205064.8,
+          "green_mt": 181641.0,
+          "roasted_mt": 20666.3,
+          "decaf_mt": 6932.9,
+          "husks_mt": 2757.5,
+          "value_usd": 1304982184
+        },
+        {
+          "year": 2023,
+          "total_mt": 192623.3,
+          "green_mt": 166474.7,
+          "roasted_mt": 17792.6,
+          "decaf_mt": 6520.6,
+          "husks_mt": 8356.1,
+          "value_usd": 1111110715
+        },
+        {
+          "year": 2024,
+          "total_mt": 201924.4,
+          "green_mt": 174873.8,
+          "roasted_mt": 19935.9,
+          "decaf_mt": 7023.0,
+          "husks_mt": 7114.7,
+          "value_usd": 1243041589
+        },
+        {
+          "year": 2025,
+          "total_mt": 201293.9,
+          "green_mt": 175697.6,
+          "roasted_mt": 18942.4,
+          "decaf_mt": 10039.9,
+          "husks_mt": 6653.9,
+          "value_usd": 1699151318
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 18568.7,
+        "2025-07": 18294.1,
+        "2025-08": 16195.6,
+        "2025-09": 17589.2,
+        "2025-10": 14826.0,
+        "2025-11": 13869.4,
+        "2025-12": 13821.3
+      }
+    },
+    "aus": {
+      "name": "Australia",
+      "iso3": "AUS",
+      "reporter_code": "36",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 91452.1,
+          "green_mt": 75323.2,
+          "roasted_mt": 15935.5,
+          "decaf_mt": 1803.2,
+          "husks_mt": 193.4,
+          "value_usd": 478209113
+        },
+        {
+          "year": 2015,
+          "total_mt": 99976.0,
+          "green_mt": 82255.7,
+          "roasted_mt": 17428.9,
+          "decaf_mt": 2229.7,
+          "husks_mt": 291.4,
+          "value_usd": 481127037
+        },
+        {
+          "year": 2016,
+          "total_mt": 99252.3,
+          "green_mt": 83039.3,
+          "roasted_mt": 15750.2,
+          "decaf_mt": 1867.7,
+          "husks_mt": 462.8,
+          "value_usd": 453150663
+        },
+        {
+          "year": 2017,
+          "total_mt": 103206.1,
+          "green_mt": 91335.4,
+          "roasted_mt": 11693.2,
+          "decaf_mt": 1367.4,
+          "husks_mt": 177.5,
+          "value_usd": 514923949
+        },
+        {
+          "year": 2018,
+          "total_mt": 101912.2,
+          "green_mt": 92049.4,
+          "roasted_mt": 9766.2,
+          "decaf_mt": 1165.9,
+          "husks_mt": 96.6,
+          "value_usd": 480812365
+        },
+        {
+          "year": 2020,
+          "total_mt": 102351.1,
+          "green_mt": 90244.5,
+          "roasted_mt": 11905.4,
+          "decaf_mt": 1459.1,
+          "husks_mt": 201.2,
+          "value_usd": 473501145
+        },
+        {
+          "year": 2021,
+          "total_mt": 109005.1,
+          "green_mt": 97806.4,
+          "roasted_mt": 11144.6,
+          "decaf_mt": 1269.5,
+          "husks_mt": 54.1,
+          "value_usd": 527169871
+        },
+        {
+          "year": 2022,
+          "total_mt": 117434.3,
+          "green_mt": 105271.4,
+          "roasted_mt": 12102.4,
+          "decaf_mt": 2099.0,
+          "husks_mt": 60.4,
+          "value_usd": 709801681
+        },
+        {
+          "year": 2023,
+          "total_mt": 107230.6,
+          "green_mt": 95736.9,
+          "roasted_mt": 11431.0,
+          "decaf_mt": 1599.0,
+          "husks_mt": 62.6,
+          "value_usd": 636440249
+        },
+        {
+          "year": 2025,
+          "total_mt": 122731.8,
+          "green_mt": 113539.4,
+          "roasted_mt": 9119.3,
+          "decaf_mt": 2037.9,
+          "husks_mt": 73.0,
+          "value_usd": 1018097679
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 9847.0,
+        "2025-07": 10393.9,
+        "2025-08": 10130.1,
+        "2025-09": 11135.4,
+        "2025-10": 10616.5,
+        "2025-11": 8105.4,
+        "2025-12": 9728.5,
+        "2026-01": 8760.7,
+        "2026-02": 6364.7,
+        "2026-03": 8625.3,
+        "2026-04": 8511.2
+      }
+    },
+    "sau": {
+      "name": "Saudi Arabia",
+      "iso3": "SAU",
+      "reporter_code": "682",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 49439.0,
+          "green_mt": 42575.0,
+          "roasted_mt": 1836.0,
+          "decaf_mt": 1738.0,
+          "husks_mt": 5028.0,
+          "value_usd": 193232908
+        },
+        {
+          "year": 2015,
+          "total_mt": 57673.1,
+          "green_mt": 51163.3,
+          "roasted_mt": 2357.4,
+          "decaf_mt": 1306.3,
+          "husks_mt": 4152.4,
+          "value_usd": 199056372
+        },
+        {
+          "year": 2016,
+          "total_mt": 49337.1,
+          "green_mt": 44106.1,
+          "roasted_mt": 2010.0,
+          "decaf_mt": 935.1,
+          "husks_mt": 3221.0,
+          "value_usd": 164557806
+        },
+        {
+          "year": 2017,
+          "total_mt": 57822.9,
+          "green_mt": 52354.0,
+          "roasted_mt": 3204.0,
+          "decaf_mt": 2100.5,
+          "husks_mt": 2264.9,
+          "value_usd": 221507247
+        },
+        {
+          "year": 2018,
+          "total_mt": 60889.6,
+          "green_mt": 55591.2,
+          "roasted_mt": 3992.0,
+          "decaf_mt": 1866.6,
+          "husks_mt": 1306.4,
+          "value_usd": 213636603
+        },
+        {
+          "year": 2019,
+          "total_mt": 67281.1,
+          "green_mt": 54210.3,
+          "roasted_mt": 7594.6,
+          "decaf_mt": 2306.1,
+          "husks_mt": 5476.1,
+          "value_usd": 251162778
+        },
+        {
+          "year": 2020,
+          "total_mt": 72812.4,
+          "green_mt": 54816.2,
+          "roasted_mt": 12018.8,
+          "decaf_mt": 4512.8,
+          "husks_mt": 5977.3,
+          "value_usd": 288569114
+        },
+        {
+          "year": 2021,
+          "total_mt": 80303.2,
+          "green_mt": 66002.7,
+          "roasted_mt": 11677.1,
+          "decaf_mt": 4169.4,
+          "husks_mt": 2623.4,
+          "value_usd": 352546618
+        },
+        {
+          "year": 2022,
+          "total_mt": 79914.4,
+          "green_mt": 63204.1,
+          "roasted_mt": 14314.5,
+          "decaf_mt": 3008.2,
+          "husks_mt": 2395.9,
+          "value_usd": 466568320
+        },
+        {
+          "year": 2023,
+          "total_mt": 85701.6,
+          "green_mt": 71650.3,
+          "roasted_mt": 12796.6,
+          "decaf_mt": 1961.2,
+          "husks_mt": 1254.7,
+          "value_usd": 489825573
+        },
+        {
+          "year": 2024,
+          "total_mt": 89132.7,
+          "green_mt": 84517.6,
+          "roasted_mt": 872.2,
+          "decaf_mt": 1673.2,
+          "husks_mt": 3742.8,
+          "value_usd": 606008302
+        }
+      ],
+      "latest_year": 2024,
+      "monthly_total": {
+        "2025-06": 7782.5,
+        "2025-07": 12311.1
+      }
+    },
+    "are": {
+      "name": "UAE",
+      "iso3": "ARE",
+      "reporter_code": "784",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 12909.3,
+          "green_mt": 8658.8,
+          "roasted_mt": 3726.6,
+          "decaf_mt": 998.1,
+          "husks_mt": 523.9,
+          "value_usd": 71935309
+        },
+        {
+          "year": 2015,
+          "total_mt": 14430.3,
+          "green_mt": 9970.3,
+          "roasted_mt": 4240.4,
+          "decaf_mt": 953.6,
+          "husks_mt": 219.5,
+          "value_usd": 82547258
+        },
+        {
+          "year": 2016,
+          "total_mt": 13865.5,
+          "green_mt": 9108.2,
+          "roasted_mt": 4689.9,
+          "decaf_mt": 1219.7,
+          "husks_mt": 67.4,
+          "value_usd": 81785402
+        },
+        {
+          "year": 2017,
+          "total_mt": 22867.5,
+          "green_mt": 17307.7,
+          "roasted_mt": 5471.1,
+          "decaf_mt": 889.5,
+          "husks_mt": 88.7,
+          "value_usd": 101762678
+        },
+        {
+          "year": 2018,
+          "total_mt": 19374.3,
+          "green_mt": 13720.9,
+          "roasted_mt": 5246.7,
+          "decaf_mt": 1263.5,
+          "husks_mt": 406.7,
+          "value_usd": 103936425
+        },
+        {
+          "year": 2019,
+          "total_mt": 21333.2,
+          "green_mt": 15733.7,
+          "roasted_mt": 5449.1,
+          "decaf_mt": 1445.1,
+          "husks_mt": 150.3,
+          "value_usd": 111065928
+        },
+        {
+          "year": 2020,
+          "total_mt": 21527.8,
+          "green_mt": 14890.1,
+          "roasted_mt": 6497.1,
+          "decaf_mt": 1773.6,
+          "husks_mt": 140.6,
+          "value_usd": 124994104
+        },
+        {
+          "year": 2021,
+          "total_mt": 28762.9,
+          "green_mt": 19917.6,
+          "roasted_mt": 8798.5,
+          "decaf_mt": 1904.2,
+          "husks_mt": 46.8,
+          "value_usd": 168506517
+        },
+        {
+          "year": 2022,
+          "total_mt": 42610.0,
+          "green_mt": 32407.5,
+          "roasted_mt": 10133.2,
+          "decaf_mt": 1550.3,
+          "husks_mt": 69.3,
+          "value_usd": 253660815
+        },
+        {
+          "year": 2023,
+          "total_mt": 51813.8,
+          "green_mt": 41155.9,
+          "roasted_mt": 10567.3,
+          "decaf_mt": 1425.8,
+          "husks_mt": 90.5,
+          "value_usd": 300746860
+        }
+      ],
+      "latest_year": 2023
+    },
+    "dza": {
+      "name": "Algeria",
+      "iso3": "DZA",
+      "reporter_code": "12",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 128787.1,
+          "green_mt": 128236.7,
+          "roasted_mt": 458.4,
+          "decaf_mt": 69.4,
+          "husks_mt": 92.0,
+          "value_usd": 307131966
+        },
+        {
+          "year": 2015,
+          "total_mt": 129203.6,
+          "green_mt": 128732.8,
+          "roasted_mt": 393.9,
+          "decaf_mt": 39.8,
+          "husks_mt": 76.9,
+          "value_usd": 297869352
+        },
+        {
+          "year": 2016,
+          "total_mt": 138697.3,
+          "green_mt": 138298.0,
+          "roasted_mt": 342.6,
+          "decaf_mt": 16.4,
+          "husks_mt": 56.6,
+          "value_usd": 305943561
+        },
+        {
+          "year": 2017,
+          "total_mt": 130843.6,
+          "green_mt": 130311.9,
+          "roasted_mt": 523.4,
+          "decaf_mt": 86.8,
+          "husks_mt": 8.4,
+          "value_usd": 331501676
+        },
+        {
+          "year": 2024,
+          "total_mt": 86642.3,
+          "green_mt": 86418.4,
+          "roasted_mt": 221.8,
+          "decaf_mt": 6.0,
+          "husks_mt": 2.1,
+          "value_usd": 427820897
+        }
+      ],
+      "latest_year": 2024
+    },
+    "egy": {
+      "name": "Egypt",
+      "iso3": "EGY",
+      "reporter_code": "818",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 24778.5,
+          "green_mt": 23942.6,
+          "roasted_mt": 835.0,
+          "decaf_mt": 78.5,
+          "husks_mt": 0.9,
+          "value_usd": 62944611
+        },
+        {
+          "year": 2015,
+          "total_mt": 22004.1,
+          "green_mt": 20782.9,
+          "roasted_mt": 1211.6,
+          "decaf_mt": 65.3,
+          "husks_mt": 9.6,
+          "value_usd": 82424393
+        },
+        {
+          "year": 2016,
+          "total_mt": 26341.5,
+          "green_mt": 25292.3,
+          "roasted_mt": 1048.6,
+          "decaf_mt": 52.5,
+          "husks_mt": 0.5,
+          "value_usd": 87440330
+        },
+        {
+          "year": 2017,
+          "total_mt": 30220.9,
+          "green_mt": 28948.5,
+          "roasted_mt": 1272.0,
+          "decaf_mt": 252.5,
+          "husks_mt": 0.5,
+          "value_usd": 101749692
+        },
+        {
+          "year": 2018,
+          "total_mt": 36373.7,
+          "green_mt": 34642.6,
+          "roasted_mt": 1724.4,
+          "decaf_mt": 141.4,
+          "husks_mt": 6.7,
+          "value_usd": 119669301
+        },
+        {
+          "year": 2019,
+          "total_mt": 40171.2,
+          "green_mt": 38306.9,
+          "roasted_mt": 1827.2,
+          "decaf_mt": 83.7,
+          "husks_mt": 37.0,
+          "value_usd": 118007561
+        },
+        {
+          "year": 2020,
+          "total_mt": 40120.0,
+          "green_mt": 38154.7,
+          "roasted_mt": 1959.4,
+          "decaf_mt": 103.2,
+          "husks_mt": 6.0,
+          "value_usd": 130496220
+        },
+        {
+          "year": 2021,
+          "total_mt": 47002.0,
+          "green_mt": 44001.0,
+          "roasted_mt": 2998.5,
+          "decaf_mt": 38.6,
+          "husks_mt": 2.5,
+          "value_usd": 181292419
+        },
+        {
+          "year": 2022,
+          "total_mt": 40793.9,
+          "green_mt": 38676.8,
+          "roasted_mt": 2115.5,
+          "decaf_mt": 41.0,
+          "husks_mt": 1.5,
+          "value_usd": 218648140
+        },
+        {
+          "year": 2023,
+          "total_mt": 44024.8,
+          "green_mt": 42008.8,
+          "roasted_mt": 2014.8,
+          "decaf_mt": 3.5,
+          "husks_mt": 1.2,
+          "value_usd": 217390424
+        },
+        {
+          "year": 2024,
+          "total_mt": 68002.7,
+          "green_mt": 65469.0,
+          "roasted_mt": 2533.4,
+          "decaf_mt": 328.2,
+          "husks_mt": 0.3,
+          "value_usd": 307942472
+        },
+        {
+          "year": 2025,
+          "total_mt": 62825.9,
+          "green_mt": 60116.1,
+          "roasted_mt": 2709.8,
+          "decaf_mt": 104.4,
+          "husks_mt": 0.1,
+          "value_usd": 432967900
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 5265.1,
+        "2025-07": 6239.9,
+        "2025-08": 5776.3,
+        "2025-09": 5426.9,
+        "2025-10": 5362.4,
+        "2025-11": 5396.2,
+        "2025-12": 4918.9,
+        "2026-01": 4861.8,
+        "2026-02": 4619.4
+      }
+    },
+    "mex": {
+      "name": "Mexico",
+      "iso3": "MEX",
+      "reporter_code": "484",
+      "annual": [
+        {
+          "year": 2015,
+          "total_mt": 3361.5,
+          "green_mt": 1230.0,
+          "roasted_mt": 2131.5,
+          "decaf_mt": null,
+          "husks_mt": null,
+          "value_usd": 23909225
+        },
+        {
+          "year": 2016,
+          "total_mt": 3904.3,
+          "green_mt": 1525.1,
+          "roasted_mt": 2379.2,
+          "decaf_mt": 103.7,
+          "husks_mt": null,
+          "value_usd": 25354485
+        },
+        {
+          "year": 2017,
+          "total_mt": 5655.0,
+          "green_mt": 2730.5,
+          "roasted_mt": 2924.5,
+          "decaf_mt": 161.9,
+          "husks_mt": null,
+          "value_usd": 24803157
+        },
+        {
+          "year": 2018,
+          "total_mt": 2985.7,
+          "green_mt": 241.5,
+          "roasted_mt": 2744.2,
+          "decaf_mt": 136.8,
+          "husks_mt": null,
+          "value_usd": 24050158
+        },
+        {
+          "year": 2019,
+          "total_mt": 3228.9,
+          "green_mt": 173.3,
+          "roasted_mt": 3055.6,
+          "decaf_mt": 144.1,
+          "husks_mt": null,
+          "value_usd": 27121352
+        },
+        {
+          "year": 2021,
+          "total_mt": 15043.3,
+          "green_mt": 12410.5,
+          "roasted_mt": 2632.9,
+          "decaf_mt": 122.3,
+          "husks_mt": null,
+          "value_usd": 25548296
+        },
+        {
+          "year": 2022,
+          "total_mt": 9746.6,
+          "green_mt": 9123.2,
+          "roasted_mt": 623.3,
+          "decaf_mt": 12.9,
+          "husks_mt": null,
+          "value_usd": 58035103
+        },
+        {
+          "year": 2023,
+          "total_mt": 13520.3,
+          "green_mt": 12481.2,
+          "roasted_mt": 1039.2,
+          "decaf_mt": 15.8,
+          "husks_mt": null,
+          "value_usd": 100069277
+        },
+        {
+          "year": 2024,
+          "total_mt": 35284.6,
+          "green_mt": 33712.4,
+          "roasted_mt": 1572.2,
+          "decaf_mt": 22.5,
+          "husks_mt": null,
+          "value_usd": 176635084
+        },
+        {
+          "year": 2025,
+          "total_mt": 29227.5,
+          "green_mt": 28342.4,
+          "roasted_mt": 885.0,
+          "decaf_mt": 19.9,
+          "husks_mt": null,
+          "value_usd": 223830464
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 397.6,
+        "2025-07": 0.2,
+        "2025-08": 232.6,
+        "2025-09": 523.3,
+        "2025-10": 4603.5,
+        "2025-11": 3779.8,
+        "2025-12": 0.2,
+        "2026-01": 0.0,
+        "2026-02": 1.0,
+        "2026-03": 2113.6
+      }
+    },
+    "phl": {
+      "name": "Philippines",
+      "iso3": "PHL",
+      "reporter_code": "608",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 9926.6,
+          "green_mt": 7661.4,
+          "roasted_mt": 1351.6,
+          "decaf_mt": 99.9,
+          "husks_mt": 913.6,
+          "value_usd": 21627398
+        },
+        {
+          "year": 2015,
+          "total_mt": 16420.1,
+          "green_mt": 15060.9,
+          "roasted_mt": 1028.5,
+          "decaf_mt": 125.5,
+          "husks_mt": 330.8,
+          "value_usd": 33419001
+        },
+        {
+          "year": 2016,
+          "total_mt": 45141.3,
+          "green_mt": 43313.7,
+          "roasted_mt": 1731.1,
+          "decaf_mt": 159.8,
+          "husks_mt": 96.5,
+          "value_usd": 83515250
+        },
+        {
+          "year": 2017,
+          "total_mt": 25036.1,
+          "green_mt": 22778.7,
+          "roasted_mt": 2023.6,
+          "decaf_mt": 915.0,
+          "husks_mt": 233.8,
+          "value_usd": 58541468
+        },
+        {
+          "year": 2018,
+          "total_mt": 41964.7,
+          "green_mt": 40434.2,
+          "roasted_mt": 1434.4,
+          "decaf_mt": 141.4,
+          "husks_mt": 96.1,
+          "value_usd": 91453299
+        },
+        {
+          "year": 2019,
+          "total_mt": 36801.2,
+          "green_mt": 35141.9,
+          "roasted_mt": 1642.4,
+          "decaf_mt": 193.4,
+          "husks_mt": 16.8,
+          "value_usd": 74062231
+        },
+        {
+          "year": 2020,
+          "total_mt": 26002.0,
+          "green_mt": 25127.2,
+          "roasted_mt": 873.0,
+          "decaf_mt": 169.0,
+          "husks_mt": 1.8,
+          "value_usd": 83089791
+        },
+        {
+          "year": 2021,
+          "total_mt": 20235.0,
+          "green_mt": 18865.5,
+          "roasted_mt": 1353.0,
+          "decaf_mt": 48.9,
+          "husks_mt": 16.5,
+          "value_usd": 78599650
+        },
+        {
+          "year": 2022,
+          "total_mt": 23850.4,
+          "green_mt": 21895.4,
+          "roasted_mt": 1954.4,
+          "decaf_mt": 259.6,
+          "husks_mt": 0.6,
+          "value_usd": 132384946
+        },
+        {
+          "year": 2023,
+          "total_mt": 29412.0,
+          "green_mt": 27095.1,
+          "roasted_mt": 2303.7,
+          "decaf_mt": 386.1,
+          "husks_mt": 13.2,
+          "value_usd": 153033493
+        },
+        {
+          "year": 2024,
+          "total_mt": 53990.1,
+          "green_mt": 50942.6,
+          "roasted_mt": 2953.1,
+          "decaf_mt": 553.7,
+          "husks_mt": 94.4,
+          "value_usd": 233408191
+        }
+      ],
+      "latest_year": 2024,
+      "monthly_total": {
+        "2025-06": 4394.8,
+        "2025-07": 5243.0,
+        "2025-08": 2336.7,
+        "2025-09": 2051.0,
+        "2025-11": 1775.8,
+        "2025-12": 2542.7,
+        "2026-01": 3352.2,
+        "2026-02": 3113.9,
+        "2026-03": 3712.2
+      }
+    },
+    "isr": {
+      "name": "Israel",
+      "iso3": "ISR",
+      "reporter_code": "376",
+      "annual": [
+        {
+          "year": 2014,
+          "total_mt": 22684.0,
+          "green_mt": 16724.9,
+          "roasted_mt": 5774.7,
+          "decaf_mt": 231.6,
+          "husks_mt": 184.4,
+          "value_usd": 99170000
+        },
+        {
+          "year": 2015,
+          "total_mt": 27245.1,
+          "green_mt": 21045.7,
+          "roasted_mt": 6022.4,
+          "decaf_mt": 258.8,
+          "husks_mt": 176.9,
+          "value_usd": 108976000
+        },
+        {
+          "year": 2016,
+          "total_mt": 21087.8,
+          "green_mt": 13864.2,
+          "roasted_mt": 7054.9,
+          "decaf_mt": 327.0,
+          "husks_mt": 168.7,
+          "value_usd": 109033000
+        },
+        {
+          "year": 2017,
+          "total_mt": 27675.1,
+          "green_mt": 19501.2,
+          "roasted_mt": 8151.0,
+          "decaf_mt": 288.4,
+          "husks_mt": 22.9,
+          "value_usd": 123698000
+        },
+        {
+          "year": 2018,
+          "total_mt": 27820.5,
+          "green_mt": 18688.0,
+          "roasted_mt": 9024.1,
+          "decaf_mt": 183.8,
+          "husks_mt": 108.4,
+          "value_usd": 132767000
+        },
+        {
+          "year": 2019,
+          "total_mt": 31037.4,
+          "green_mt": 21074.4,
+          "roasted_mt": 9953.9,
+          "decaf_mt": 611.3,
+          "husks_mt": 9.2,
+          "value_usd": 127599000
+        },
+        {
+          "year": 2020,
+          "total_mt": 26882.1,
+          "green_mt": 15936.6,
+          "roasted_mt": 10938.8,
+          "decaf_mt": 178.1,
+          "husks_mt": 6.7,
+          "value_usd": 139944000
+        },
+        {
+          "year": 2021,
+          "total_mt": 31605.8,
+          "green_mt": 18124.2,
+          "roasted_mt": 13460.5,
+          "decaf_mt": 183.2,
+          "husks_mt": 21.0,
+          "value_usd": 180413000
+        },
+        {
+          "year": 2022,
+          "total_mt": 27131.3,
+          "green_mt": 16920.1,
+          "roasted_mt": 10200.7,
+          "decaf_mt": 307.6,
+          "husks_mt": 10.4,
+          "value_usd": 188556000
+        },
+        {
+          "year": 2023,
+          "total_mt": 24705.1,
+          "green_mt": 15255.9,
+          "roasted_mt": 9408.8,
+          "decaf_mt": 226.9,
+          "husks_mt": 40.4,
+          "value_usd": 172764000
+        },
+        {
+          "year": 2024,
+          "total_mt": 27258.2,
+          "green_mt": 17524.7,
+          "roasted_mt": 9717.9,
+          "decaf_mt": 210.6,
+          "husks_mt": 15.6,
+          "value_usd": 194257000
+        },
+        {
+          "year": 2025,
+          "total_mt": 31518.6,
+          "green_mt": 21202.8,
+          "roasted_mt": 10313.7,
+          "decaf_mt": 222.0,
+          "husks_mt": 2.2,
+          "value_usd": 272450000
+        }
+      ],
+      "latest_year": 2025,
+      "monthly_total": {
+        "2025-06": 3406.2,
+        "2025-07": 2815.3,
+        "2025-08": 2560.8,
+        "2025-09": 2352.2,
+        "2025-10": 2609.0,
+        "2025-11": 2631.5,
+        "2025-12": 2400.2,
+        "2026-01": 2418.4,
+        "2026-03": 2795.8,
+        "2026-04": 2635.6
+      }
+    }
+  }
+}

@@ -20,6 +20,8 @@ interface ReportState {
   toggle: (id: string) => void;
   add: (id: string) => void;
   remove: (id: string) => void;
+  addMany: (ids: string[]) => void;
+  removeMany: (ids: string[]) => void;
   setComment: (id: string, text: string) => void;
   clear: () => void;
 }
@@ -45,6 +47,26 @@ export const useReportStore = create<ReportState>()(
             Object.entries(s.comments).filter(([k]) => k !== id && !k.startsWith(`${id}__`)),
           );
           return { selectedIds: s.selectedIds.filter((x) => x !== id), comments: rest };
+        }),
+      // Bulk variants used by the report-package presets — a single store write
+      // (and one re-render) instead of looping add/remove per id.
+      addMany: (ids) =>
+        set((s) => {
+          const have = new Set(s.selectedIds);
+          const next = [...s.selectedIds];
+          for (const id of ids) if (!have.has(id)) next.push(id);
+          return { selectedIds: next };
+        }),
+      removeMany: (ids) =>
+        set((s) => {
+          const drop = new Set(ids);
+          // Drop each removed chart's notes too (single + split `${id}__*`).
+          const rest = Object.fromEntries(
+            Object.entries(s.comments).filter(
+              ([k]) => !ids.some((id) => k === id || k.startsWith(`${id}__`)),
+            ),
+          );
+          return { selectedIds: s.selectedIds.filter((x) => !drop.has(x)), comments: rest };
         }),
       setComment: (id, text) => set((s) => ({ comments: { ...s.comments, [id]: text } })),
       clear: () => set({ selectedIds: [], comments: {} }),

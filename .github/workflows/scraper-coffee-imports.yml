@@ -1,0 +1,85 @@
+name: "3.8 – Coffee Imports (UN Comtrade)"
+
+on:
+  schedule:
+    # 15th of each month, 07:00 UTC. Comtrade annual data trickles in as
+    # countries report; monthly is ample cadence.
+    - cron: "0 7 15 * *"
+  workflow_dispatch:   # allow manual trigger
+
+concurrency:
+  group: data-commit          # serialize all main-pushers
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Connectivity probe (Comtrade releases endpoint)
+        run: |
+          curl -sS -m 25 -o /dev/null \
+            -w "PROBE → HTTP %{http_code} | time=%{time_total}s\n" \
+            "https://comtradeapi.un.org/public/v1/getComtradeReleases" || echo "PROBE → curl exit $?"
+
+      - name: Run coffee-imports scraper (3 attempts)
+        env:
+          # Optional — only needed for the paid tier / higher limits. The public
+          # preview endpoint works without it.
+          COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
+          PYTHONPATH: backend
+        run: |
+          for attempt in 1 2 3; do
+            python -m scraper.sources.coffee_imports && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 3m..." && sleep 180 || exit 1
+          done
+
+      - name: Validate output (≥10 countries, not a seed)
+        run: |
+          python -c "
+          import json, subprocess
+          d = json.load(open('frontend/public/data/coffee_imports.json'))
+          n = len(d.get('countries', {}))
+          if d.get('is_seed') or n < 10:
+              print(f'[validate] FAILED: is_seed={d.get(\"is_seed\")} countries={n} — restoring HEAD version')
+              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/coffee_imports.json'])
+          else:
+              print(f'[validate] OK: {n} countries')
+          "
+
+      - name: Commit updated JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/coffee_imports.json
+          if git diff --cached --quiet; then
+            echo "No changes — JSON already up to date."
+          else
+            git commit -m "data: update coffee_imports.json [skip ci]"
+            # Push to the branch this run is on (main for the scheduled job; the
+            # dispatch ref otherwise) so manual branch dispatches don't false-fail.
+            git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

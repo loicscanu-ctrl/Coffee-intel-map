@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-17T13:38:46Z",
+  "updated": "2026-06-19T13:32:06Z",
   "source": "NCHMF – Bản tin dự báo nguồn nước thời hạn ngắn",
   "source_url": "https://nchmf.gov.vn/kttv/vi-VN/1/nguon-nuoc-21-18.html",
   "rivers": [
@@ -42,7 +42,7 @@
       "signal": "low"
     }
   ],
-  "bulletin_date": "2026-06-17",
+  "bulletin_date": "2026-06-19",
   "has_live_data": true,
   "pdf_url": "https://kttv.gov.vn//upload/thuyvan2/2026/6/15/dbqg_nnhn_20260615_1500.pdf"
 }

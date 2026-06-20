@@ -1,0 +1,192 @@
+name: "0.10 – Colombia coffee exports (monthly · DANE + FNC)"
+
+# Two Colombian export feeds, both monthly:
+#
+#   FNC   — Federación Nacional de Cafeteros. Headline production +
+#           exports + YoY %, published in PDF bulletins around M+1.
+#           Site is WordPress on Cloudflare — runner IP gets challenged
+#           occasionally; we fail loud rather than swallow a 403.
+#
+#   DANE  — Departamento Administrativo Nacional de Estadística. Official
+#           customs annex with NANDINA-line granularity (0901.11.10.00
+#           suave lavado + 0901.11.90.00 los demás), published in XLS
+#           around M+1 to M+2. The download host has been observed
+#           returning `x-deny-reason: host_not_allowed` to non-Colombia
+#           IPs; if that happens from CI, route through the existing
+#           Cloudflare-Worker proxy (cf-worker/bps-proxy.js pattern) or
+#           wait for the operator to refresh manually.
+#
+# Cadence: daily 06:30 UTC during the publication window (5th–20th).
+# DANE 404s are silent (file not posted yet) so most polls are cheap.
+#
+# Workflow-dispatch inputs let the operator (a) skip one source if it's
+# blocked and (b) request a specific historical month or count.
+
+on:
+  schedule:
+    # 06:30 UTC daily — covers M+1 (FNC) and M+2 (DANE) publication.
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+    inputs:
+      run_fnc:
+        description: "Run FNC scraper?"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      run_dane:
+        description: "Run DANE scraper?"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      dane_history:
+        description: "DANE: last N months to try (default 3)"
+        required: false
+        default: "3"
+        type: string
+      fnc_max:
+        description: "FNC: max PDFs to walk (blank = all on listing)"
+        required: false
+        default: ""
+        type: string
+      diag_only:
+        description: "Diagnostic: dump raw PDF text + DANE sheet structure as artifact, do NOT write data"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+concurrency:
+  group: scraper-monthly-colombia
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/scraper/requirements.txt
+
+      - name: Install dependencies
+        # pdfplumber → FNC PDF parsing; xlrd 1.2.0 → DANE legacy .xls
+        # BIFF (xlrd 2.x dropped XLS, and DANE doesn't ship XLSX yet).
+        run: pip install requests pdfplumber 'xlrd==1.2.0'
+
+      - name: Run DANE scraper (NANDINA breakdown)
+        id: dane
+        if: ${{ inputs.run_dane != 'false' }}
+        working-directory: backend
+        run: |
+          set +e
+          # In diag mode: skip --write, add --inspect for sheet-header dump.
+          if [ "${{ inputs.diag_only }}" = "true" ]; then
+            ARGS="--history ${{ inputs.dane_history || '3' }} --inspect"
+          else
+            ARGS="--write --history ${{ inputs.dane_history || '3' }}"
+          fi
+          PYTHONPATH=. python -m scraper.sources.dane_colombia_exports $ARGS
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Run FNC scraper (production + headline exports)
+        id: fnc
+        if: ${{ inputs.run_fnc != 'false' }}
+        working-directory: backend
+        run: |
+          set +e
+          if [ "${{ inputs.diag_only }}" = "true" ]; then
+            # --diag dumps raw extracted PDF text under debug/fnc/
+            ARGS="--diag"
+          else
+            ARGS="--write"
+          fi
+          if [ -n "${{ inputs.fnc_max }}" ]; then
+            ARGS="$ARGS --max ${{ inputs.fnc_max }}"
+          fi
+          PYTHONPATH=. python -m scraper.sources.fnc_colombia_monthly $ARGS
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Upload parser diagnostics
+        if: ${{ inputs.diag_only == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: colombia-parser-diag-${{ github.run_id }}
+          path: |
+            backend/scraper/debug/fnc/
+            backend/scraper/debug/dane/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Dump diagnostics to job log
+        # The artifact host (Azure blob storage) is sometimes unreachable
+        # from the dev sandbox; the workflow log is always reachable via
+        # the GitHub MCP / API, so we mirror the debug files inline.
+        # set +e because cat-of-empty-glob would otherwise crash the step
+        # on a no-data day.
+        if: ${{ inputs.diag_only == 'true' }}
+        working-directory: backend
+        run: |
+          set +e
+          echo "================ FNC samples ================"
+          for f in scraper/debug/fnc/*.txt; do
+            [ -f "$f" ] || continue
+            echo "── $f ──"
+            head -c 4000 "$f"
+            echo
+            echo "────────"
+          done
+          echo "================ DANE samples ================"
+          for f in scraper/debug/dane/*.txt; do
+            [ -f "$f" ] || continue
+            echo "── $f ──"
+            head -c 8000 "$f"
+            echo
+            echo "────────"
+          done
+
+      - name: Commit updated colombia_supply.json if changed
+        # Run even when one source failed — the other may have updated
+        # the file. The two scrapers merge into the same `exports.monthly`
+        # block; DANE rows win when both touch the same month.
+        # Skipped in diag mode (no --write was requested).
+        if: ${{ inputs.diag_only != 'true' && always() && (steps.dane.outputs.rc == '0' || steps.fnc.outputs.rc == '0') }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f frontend/public/data/colombia_supply.json ]; then
+            git add frontend/public/data/colombia_supply.json
+            if git diff --cached --quiet; then
+              echo "No Colombia exports change."
+            else
+              CURRENT=$(git rev-parse --abbrev-ref HEAD)
+              git commit -m "data: Colombia exports refresh $(date -u +%Y-%m-%d) [skip ci]"
+              if [ "$CURRENT" = "main" ]; then
+                git pull --rebase --autostash --strategy-option=theirs origin main
+                git push
+              else
+                git push origin "HEAD:$CURRENT"
+              fi
+            fi
+          fi
+
+      - name: Notify on hard failure
+        # Soft-fail: DANE 404 and FNC empty-listing are normal during
+        # off-window days. Only escalate when BOTH scrapers crashed AND
+        # nothing was committed — that points to a deeper outage.
+        if: failure() && steps.dane.outputs.rc != '0' && steps.fnc.outputs.rc != '0'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} — both DANE and FNC failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

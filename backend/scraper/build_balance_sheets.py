@@ -46,6 +46,7 @@ DEMAND_STOCKS = DATA / "demand_stocks.json"
 # sub-path below.
 ORIGINS = {
     "brazil":    "br_balance_sheet.json",
+    "colombia":  "co_balance_sheet.json",
     "indonesia": "id_balance_sheet.json",
     "uganda":    "ug_balance_sheet.json",
     "vietnam":   "vn_farmer_economics.json::balance_sheet",
@@ -57,6 +58,10 @@ MANUAL_SOURCE_REFS = {
     "brazil": [
         ("CONAB", "https://www.conab.gov.br/info-agro/safras/cafe — Acomp. da Safra Café (4 surveys/yr)"),
         ("ICO",   "https://www.ico.org/coffee-market-report — Coffee Market Report (monthly)"),
+    ],
+    "colombia": [
+        ("FNC", "https://federaciondecafeteros.org/wp/informe-mensual-de-cifras/ — Informe Mensual (monthly)"),
+        ("ICO", "https://www.ico.org/coffee-market-report — Coffee Market Report (monthly)"),
     ],
     "indonesia": [
         ("GAEKI", "https://gaeki.or.id/en/areal-dan-produksi/ — Areal & Produksi table"),

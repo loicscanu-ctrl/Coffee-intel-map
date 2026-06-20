@@ -12,9 +12,10 @@
  * <textarea> values don't survive react-to-print, so we swap via Tailwind's
  * `print:` variants instead.
  */
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { REPORT_BY_ID } from "@/lib/report/registry";
 import { useReportStore } from "@/lib/report/store";
+import { getInsight } from "@/lib/report/insights";
 import Markdown from "@/lib/report/markdown";
 
 const PRINT_DATE = () =>
@@ -25,30 +26,51 @@ const PRINT_DATE = () =>
  * Markdown in print (cloned textarea values don't survive react-to-print). An
  * optional label distinguishes split notes (e.g. "NY" vs "London"); in print the
  * label is hidden when the note is empty so blank halves leave no orphaned title.
+ *
+ * The box is SEEDED with an auto-generated, rule-based comment (see lib/report/
+ * insights). While the user hasn't typed anything (store has no entry for this
+ * note) the auto text shows and refreshes with the data; once they edit, their
+ * text takes over. Clearing back to empty falls through to the auto seed again.
  */
 function NoteField({ noteId, label }: { noteId: string; label?: string }) {
-  const note = useReportStore((s) => s.comments[noteId] ?? "");
+  const userNote = useReportStore((s) => s.comments[noteId]); // string | undefined
   const setComment = useReportStore((s) => s.setComment);
+  const [auto, setAuto] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    getInsight(noteId).then((t) => { if (alive) setAuto(t); });
+    return () => { alive = false; };
+  }, [noteId]);
+
+  // User text wins; otherwise seed with the auto comment. `undefined` (no store
+  // entry) means "untouched" → use auto; an explicit "" means the user cleared it.
+  const value = userNote !== undefined ? userNote : (auto ?? "");
+  const isAuto = userNote === undefined && !!auto;
+
   return (
     <div>
       {label && (
-        <div className={`text-[9px] uppercase tracking-wider text-slate-500 mb-1 ${note.trim() ? "" : "print:hidden"}`}>
+        <div className={`text-[9px] uppercase tracking-wider text-slate-500 mb-1 ${value.trim() ? "" : "print:hidden"}`}>
           {label}
         </div>
       )}
       <textarea
-        value={note}
+        value={value}
         onChange={(e) => setComment(noteId, e.target.value)}
         placeholder="Add your executive summary… Markdown supported: **bold**, *italic*, `code`, - bullets"
         rows={3}
         className="print:hidden w-full resize-y rounded-md bg-slate-950 border border-slate-700 px-2 py-1.5
                    text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60"
       />
-      {note.trim() && (
+      {isAuto && (
+        <div className="print:hidden text-[8px] text-slate-600 mt-0.5">✨ auto-generated — edit to override</div>
+      )}
+      {value.trim() && (
         // Rendered Markdown — live preview on screen, the only note shown in
         // print (the editable textarea is print:hidden).
         <Markdown className="text-xs text-slate-200 leading-relaxed space-y-1 mt-2 print:mt-0">
-          {note}
+          {value}
         </Markdown>
       )}
     </div>

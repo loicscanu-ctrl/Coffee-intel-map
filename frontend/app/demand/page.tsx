@@ -6,8 +6,13 @@ import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import AjcaPanel from "@/components/demand/AjcaPanel";
 import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
 import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
+import ImportsVisualsLab from "@/components/demand/imports-lab/ImportsVisualsLab";
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
+import ImportsPanel from "@/components/demand/ImportsPanel";
+import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
+import MonthlyTrend from "@/components/demand/MonthlyTrend";
+import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
@@ -16,13 +21,14 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "certified" | "destination" | "spot" | "demand" | "listed" | "test";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "certified",   label: "Certified stocks" },
   { id: "destination", label: "Destination stocks" },
   { id: "spot",        label: "Spot" },
   { id: "demand",      label: "Consumption" },
+  { id: "imports",     label: "Imports" },
   { id: "listed",      label: "Listed stocks" },
   { id: "test",        label: "Test ✦" },
 ];
@@ -107,6 +113,47 @@ function DemandPageInner() {
         </>
       )}
 
+      {tab === "imports" && (
+        <>
+          <Section><ImportsPanel /></Section>
+          <Section>
+            <ImportsByOrigin
+              src="/data/us_coffee_imports.json"
+              heading="US Coffee Imports by Origin"
+              blurb="Where the US sources its coffee (USITC DataWeb, HTS 0901)"
+              seedKey="USITC_API_KEY"
+            />
+          </Section>
+          <Section>
+            <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <MonthlyTrend src="/data/us_coffee_imports.json"
+                heading="US imports — monthly (USITC)" color="#0ea5e9" />
+              <SourceReconciliation primarySrc="/data/us_coffee_imports.json"
+                primaryLabel="USITC" comtradeKey="usa"
+                heading="US — USITC vs UN Comtrade" />
+            </div>
+          </Section>
+          <Section>
+            <ImportsByOrigin
+              src="/data/eu_coffee_imports.json"
+              heading="EU Coffee Imports by Origin"
+              blurb="Extra-EU coffee sourcing (Eurostat Comext ds-045409, HS 0901)"
+            />
+          </Section>
+          <Section>
+            <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <MonthlyTrend src="/data/eu_coffee_imports.json"
+                heading="EU extra-EU imports — monthly (Eurostat)" color="#f59e0b" />
+              <SourceReconciliation primarySrc="/data/eu_coffee_imports.json"
+                primaryLabel="Eurostat" comtradeSrc="/data/eu_coffee_imports.json"
+                comtradeField="comtrade_total_by_year"
+                heading="EU — Eurostat vs UN Comtrade (extra-EU)"
+                emptyNote="UN Comtrade has no usable EU-bloc series — the EU isn't a sovereign Comtrade reporter (member states report individually, and the public endpoint's EU member data is stale/incomplete). For the US the two agree to ~0.1%, since Comtrade re-publishes the national source; for the EU, treat Eurostat as authoritative and read Comtrade's EU figures with caution." />
+            </div>
+          </Section>
+        </>
+      )}
+
       {tab === "listed" && (
         <Section>
           <EarningsTable />
@@ -114,9 +161,10 @@ function DemandPageInner() {
       )}
 
       {tab === "test" && (
-        <Section>
-          <CertifiedStocksTestPanel />
-        </Section>
+        <>
+          <Section><ImportsVisualsLab /></Section>
+          <Section><CertifiedStocksTestPanel /></Section>
+        </>
       )}
 
       <div className="flex-1 overflow-hidden">
