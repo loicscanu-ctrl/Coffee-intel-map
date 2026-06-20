@@ -1,63 +1,73 @@
 """
-Diagnostic probe (decisive): nail down how to DISCOVER the latest IHCAFE
-comercialización bulletin, working around intermittent Cloudflare Turnstile.
+Diagnostic probe (final discovery): use page.goto (which clears Cloudflare
+Turnstile — run #6 proved homepage goto → HTTP 200) to RENDER the IHCAFE listing
+pages and harvest the newest comercialización bulletin link.
 
-Known good:
-  * page.request.get() on a wp-content/uploads/*.pdf returns 200 + real PDF
-    (proven run #4) and parses with pdfplumber; carries "El precio promedio de
-    exportación por saco de 46kg ... es de $NNN.NN".
-Open questions this run answers:
-  1. Does request.get() on the HTML index pages (/publicaciones/,
-     /comercializacion-de-cafe/) return usable HTML with bulletin links?
-  2. Date-probe via GET (not HEAD): for each candidate, what status do we get
-     (403 = Cloudflare, 404 = no such file, 200 = bulletin)? → reveals the real
-     current filename + whether date-probing is viable.
+Recap of what we know:
+  * Static /wp-content/uploads/*.pdf GET fine (200) and parse — the bulletin
+    carries "El precio promedio de exportación por saco de 46kg ... es de $NNN".
+  * HTML routes are Turnstile-gated for request.get (403) but OK for page.goto.
+  * WP REST API is locked (401).
 
-Pure diagnostic — no DB, no commits.
+This run renders the likely listing pages and dumps every bulletin/mdocs/pdf
+link + a slice of visible text, so we can see exactly where the latest bulletin
+is linked and build discovery on it.
 """
 from __future__ import annotations
 
 import asyncio
 import re
 import sys
-from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # → backend/
 
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
-BASE = "https://www.ihcafe.hn"
-HTML_PAGES = [f"{BASE}/publicaciones/", f"{BASE}/comercializacion-de-cafe/", f"{BASE}/"]
+LISTING_PAGES = [
+    "https://www.ihcafe.hn/publicaciones/",
+    "https://www.ihcafe.hn/mdocuments-library/?mdocs-cat=mdocs-cat-2",
+    "https://ihcafe.hn/comercializacion-de-cafe/",
+    "https://www.ihcafe.hn/estadisticas-de-comercializacion/",
+    "https://www.ihcafe.hn/category/comercializacion/",
+]
+
+LINK_HINT = re.compile(r"(boletin|comercializ|mdocs-file|\.pdf)", re.I)
 
 
-def candidate_urls(d: date) -> list[str]:
-    dd, mm, yyyy = f"{d.day:02d}", f"{d.month:02d}", d.year
-    folder = f"{BASE}/wp-content/uploads/{yyyy}/{mm}"
-    stems = [
-        f"Boletin-Estadistico-Comercializacion-{dd}-{mm}-{yyyy}",
-        f"Boletin-Estadistico-Comercializaci{quote('ó')}n-{dd}-{mm}-{yyyy}",
-        f"Boletin-Estadistico-de-Comercializacion-{dd}-{mm}-{yyyy}",
-        f"Boletin-Comercializacion-{dd}-{mm}-{yyyy}",
-    ]
-    return [f"{folder}/{s}.pdf" for s in stems]
+async def render(page, url: str) -> None:
+    print(f"\n{'=' * 66}\n[goto] {url}")
+    try:
+        resp = await page.goto(url, wait_until="domcontentloaded", timeout=40_000)
+        st = resp.status if resp else "?"
+    except Exception as e:  # noqa: BLE001
+        print(f"   goto error: {type(e).__name__}: {e}")
+        return
+    await page.wait_for_timeout(6_000)  # let any mdocs JS render
+    try:
+        html = await page.content()
+    except Exception as e:  # noqa: BLE001
+        print(f"   content error: {e}")
+        return
 
-
-async def warmup(page) -> None:
-    """Try to clear Cloudflare Turnstile by loading the homepage a few times."""
-    for attempt in range(4):
-        try:
-            resp = await page.goto(BASE + "/", wait_until="domcontentloaded", timeout=30_000)
-            st = resp.status if resp else "?"
-            print(f"[warmup {attempt}] homepage HTTP {st}")
-            await page.wait_for_timeout(5_000)
-            if st == 200:
-                return
-        except Exception as e:  # noqa: BLE001
-            print(f"[warmup {attempt}] {type(e).__name__}")
-        await page.wait_for_timeout(3_000)
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    anchors = soup.find_all("a", href=True)
+    hits = [(a["href"], a.get_text(" ", strip=True)[:70]) for a in anchors if LINK_HINT.search(a["href"] + " " + a.get_text(" ", strip=True))]
+    print(f"   HTTP {st}  ({len(anchors)} links, {len(hits)} candidate)")
+    for h, t in hits[:25]:
+        print(f"      {h}   «{t}»")
+    # also raw-scan the HTML for bulletin pdf URLs not in anchors
+    raw = set(re.findall(r'https?://[^\s"\'<>]*?[Bb]oletin[^\s"\'<>]*?\.pdf', html))
+    raw |= set(re.findall(r'wp-content/uploads/20\d\d/\d\d/[^\s"\'<>]*?\.pdf', html))
+    extra = [r for r in raw if not any(r in h for h, _ in hits)]
+    if extra:
+        print("   --- raw HTML pdf URLs ---")
+        for r in sorted(extra)[:25]:
+            print(f"      {r}")
+    text = soup.get_text(" ", strip=True)
+    print(f"   --- visible text[:600] ---\n   {text[:600]}")
 
 
 async def main() -> None:
@@ -67,49 +77,16 @@ async def main() -> None:
         browser = await pw.chromium.launch(headless=True)
         ctx = await browser.new_context(user_agent=UA, locale="es-HN")
         page = await ctx.new_page()
-        await warmup(page)
+        # warm up Turnstile
+        try:
+            r = await page.goto("https://www.ihcafe.hn/", wait_until="domcontentloaded", timeout=40_000)
+            print(f"[warmup] homepage HTTP {r.status if r else '?'}")
+            await page.wait_for_timeout(5_000)
+        except Exception as e:  # noqa: BLE001
+            print(f"[warmup] {type(e).__name__}")
 
-        # ---- (1) request.get the HTML index pages, harvest bulletin links ----
-        print("\n========== (1) request.get HTML PAGES ==========")
-        for url in HTML_PAGES:
-            try:
-                resp = await page.request.get(url, timeout=30_000)
-                body = await resp.text()
-                print(f"  [{resp.status}] {url}  ({len(body)} bytes)")
-                links = set(re.findall(r'https?://[^\s"\'<>]*?[Bb]oletin[^\s"\'<>]*?\.pdf', body))
-                links |= set(re.findall(r'https?://[^\s"\'<>]*?[Cc]omercializ[^\s"\'<>]*?\.pdf', body))
-                for l in sorted(links)[:15]:
-                    print(f"        {l}")
-                if resp.status == 200 and not links:
-                    # show any mdocs-file refs as a fallback discovery hook
-                    mdocs = set(re.findall(r'mdocs-file=\d+', body))
-                    print(f"        (no pdf links; mdocs refs: {sorted(mdocs)[:10]})")
-            except Exception as e:  # noqa: BLE001
-                print(f"  ERR {type(e).__name__} {url}")
-
-        # ---- (2) date-probe via GET, print real statuses --------------------
-        print("\n========== (2) DATE-PROBE via GET (newest first) ==========")
-        today = date.today()
-        found = []
-        for delta in range(0, 21):
-            d = today - timedelta(days=delta)
-            for url in candidate_urls(d):
-                try:
-                    resp = await page.request.get(url, timeout=20_000)
-                    st = resp.status
-                    if st == 200:
-                        body = await resp.body()
-                        is_pdf = body[:4] == b"%PDF"
-                        print(f"  {st} {'PDF' if is_pdf else body[:8]!r}  {url}")
-                        if is_pdf:
-                            found.append(url)
-                    elif st != 404:
-                        print(f"  {st}  {url}")
-                except Exception as e:  # noqa: BLE001
-                    print(f"  ERR {type(e).__name__}  {url}")
-            if found:
-                break
-        print(f"\n[probe] date-probe found: {found}")
+        for url in LISTING_PAGES:
+            await render(page, url)
 
         await ctx.close()
         await browser.close()
