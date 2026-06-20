@@ -71,16 +71,16 @@ async def render_diag() -> None:
             print(f"[diag] goto error: {e}")
 
         html = ""
+        gtq: dict = {}
         for i in range(15):  # poll up to 15s while the SPA hydrates
             await page.wait_for_timeout(1_000)
             html = await page.content()
             low = html.lower()
-            gtq, fx = parse_rendered_grades(html)
-            print(f"[diag] t={i + 1:>2}s len={len(html):>6} parser_grades={len(gtq)} fx={fx} "
-                  f"| lavado={'lavado' in low} quintal={'quintal' in low} "
-                  f"oro={'café oro' in low or 'cafe oro' in low} "
-                  f"Q#={'q1,' in low or 'q2,' in low} tipo={'tipo de cambio' in low}")
-            if gtq and fx:
+            gtq = parse_rendered_grades(html)
+            print(f"[diag] t={i + 1:>2}s len={len(html):>6} parser_grades={len(gtq)} {gtq} "
+                  f"| oro={'café oro' in low or 'cafe oro' in low} "
+                  f"Q#={'q1,' in low or 'q2,' in low}")
+            if gtq:
                 break
 
         (DEBUG / "calculator_rendered.html").write_text(html, encoding="utf-8")
@@ -132,10 +132,13 @@ def main() -> None:
     print("=== RAW endpoint reachability (egress check) ===")
     raw_probe()
     print("\n=== RENDER DIAGNOSTIC (calculator DOM) ===")
-    asyncio.run(render_diag())
+    try:
+        asyncio.run(render_diag())
+    except Exception as e:  # noqa: BLE001 — diagnostic must not abort the scraper check
+        print(f"[diag] render diagnostic errored: {e}")
     print("\n=== Guatemala scraper (render + formula fallback) ===")
     meta = asyncio.run(scraper_probe())
-    grades = (meta or {}).get("grades_usd_quintal") or {}
+    grades = (meta or {}).get("grades_gtq_quintal") or {}
     print(f"\nRESULT: {'PASS' if grades else 'FAIL'} — {len(grades)} grades, "
           f"method={meta.get('method') if meta else None}")
     sys.exit(0 if grades else 1)
