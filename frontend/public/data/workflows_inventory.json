@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-20T06:59:04.638072Z",
-  "count": 56,
+  "generated_at": "2026-06-20T14:31:35.867888Z",
+  "count": 58,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -304,8 +304,30 @@
       "timeout_minutes": 10
     },
     {
+      "file": "probe-honduras.yml",
+      "name": "Z \u2013 Probe: Honduras coffee price source (test)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
       "file": "probe-ice-egress.yml",
       "name": "Z \u2013 Probe: ICE certified-stocks egress (diagnostic)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "probe-ihcafe.yml",
+      "name": "Z \u2013 Probe: IHCAFE comercializaci\u00f3n bulletin (test)",
       "triggers": [
         "workflow_dispatch"
       ],
