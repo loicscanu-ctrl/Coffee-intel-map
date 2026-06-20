@@ -1,14 +1,13 @@
 """
-Diagnostic probe #10: find IHCAFE's bulletin index via XML SITEMAPS.
+Diagnostic probe #11: walk the WORKING sitemap (www host, request.get only).
 
-Rationale: every IHCAFE *HTML* page is Cloudflare-Turnstile-gated in headless CI,
-and the WP REST API is locked — but XML sitemaps are built for crawlers and are
-frequently served without the challenge. WordPress core emits /wp-sitemap.xml;
-Yoast emits /sitemap_index.xml. They enumerate every published URL incl. the
-mdocs document-library entries, which is where recent comercialización bulletins
-live. Walk the sitemap index → child sitemaps → collect bulletin/mdocs/pdf URLs.
-
-Bounded + line-buffered so it can never hang to the job timeout with no output.
+Run #10 found: https://www.ihcafe.hn/sitemap.xml → 200 (static XML, NOT gated),
+a Google-XML-Sitemaps index listing child sitemaps:
+    sitemap-misc.xml | page-sitemap.xml | archives-sitemap.xml
+The children 403'd only because they were on the non-www host and we fell back
+to page.goto. Static XML via request.get on the www host is NOT gated, so rewrite
+every sitemap URL to www and fetch with request.get only. Dump child bodies +
+every <loc>, and surface any bulletin/comercializacion/mdocs/pdf URL.
 """
 from __future__ import annotations
 
@@ -19,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # → backend/
 try:
-    sys.stdout.reconfigure(line_buffering=True)  # never lose output on a hang
+    sys.stdout.reconfigure(line_buffering=True)
 except Exception:  # noqa: BLE001
     pass
 
@@ -27,27 +26,20 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
 BASE = "https://www.ihcafe.hn"
-SITEMAP_SEEDS = [
-    f"{BASE}/wp-sitemap.xml",
-    f"{BASE}/sitemap_index.xml",
-    f"{BASE}/sitemap.xml",
-    f"{BASE}/wp-sitemap-posts-page-1.xml",
-    f"{BASE}/mdocs-sitemap.xml",
-]
-HINT = re.compile(r"(boletin|comercializ|mdocs|\.pdf|publicacion|estadistic)", re.I)
+HINT = re.compile(r"(boletin|comercializ|mdocs|\.pdf)", re.I)
 
 
-async def fetch(page, url: str) -> tuple[int, str]:
-    """request.get first (works for static assets); fall back to page.goto."""
+def www(u: str) -> str:
+    u = u.strip()
+    if u.startswith("http://"):
+        u = "https://" + u[7:]
+    return u.replace("://ihcafe.hn", "://www.ihcafe.hn")
+
+
+async def get(page, url: str) -> tuple[int, str]:
     try:
-        resp = await page.request.get(url, timeout=20_000)
-        body = await resp.text()
-        if resp.status == 200:
-            return resp.status, body
-        # Cloudflare-gated → try a real navigation
-        nav = await page.goto(url, wait_until="domcontentloaded", timeout=25_000)
-        await page.wait_for_timeout(2_500)
-        return (nav.status if nav else resp.status), await page.content()
+        resp = await page.request.get(www(url), timeout=20_000)
+        return resp.status, await resp.text()
     except Exception as e:  # noqa: BLE001
         return -1, f"<{type(e).__name__}: {e}>"
 
@@ -70,37 +62,38 @@ async def main() -> None:
         except Exception as e:  # noqa: BLE001
             print(f"[warmup] {type(e).__name__}")
 
-        child_sitemaps: list[str] = []
-        interesting: list[str] = []
+        st, body = await get(page, f"{BASE}/sitemap.xml")
+        children = locs(body)
+        print(f"[index] {st}  sitemap.xml  → {len(children)} children: {children}")
 
-        for seed in SITEMAP_SEEDS:
-            st, body = await fetch(page, seed)
-            ls = locs(body) if st == 200 else []
-            print(f"\n[seed] {st}  {seed}  ({len(body)} bytes, {len(ls)} <loc>)")
-            if st != 200:
-                print(f"   head: {body[:160]!r}")
-                continue
-            for l in ls:
-                if l.endswith(".xml"):
-                    child_sitemaps.append(l)
-                if HINT.search(l):
-                    interesting.append(l)
-            for l in ls[:20]:
-                print(f"   loc: {l}")
-
-        # walk child sitemaps (bounded)
-        print(f"\n[walk] {len(child_sitemaps)} child sitemaps")
-        for sm in child_sitemaps[:20]:
-            st, body = await fetch(page, sm)
-            ls = locs(body) if st == 200 else []
+        all_hits: list[str] = []
+        # also peek at the misc sitemap's raw body to learn the plugin layout
+        for child in children:
+            st, body = await get(page, child)
+            ls = locs(body)
             hits = [l for l in ls if HINT.search(l)]
-            print(f"   [{st}] {sm}  ({len(ls)} urls, {len(hits)} hits)")
-            interesting.extend(hits)
+            all_hits += hits
+            print(f"\n[child] {st}  {www(child)}  ({len(body)} bytes, {len(ls)} locs, {len(hits)} hits)")
+            if st != 200:
+                print(f"   head: {body[:140]!r}")
+                continue
+            # print newest-looking 25 locs so we see structure + any CPT sitemaps
+            for l in ls[:25]:
+                print(f"   {l}")
+            # any nested sitemaps?
+            nested = [l for l in ls if l.endswith(".xml")]
+            for sm in nested[:10]:
+                st2, body2 = await get(page, sm)
+                ls2 = locs(body2)
+                h2 = [l for l in ls2 if HINT.search(l)]
+                all_hits += h2
+                print(f"   [nested] {st2} {www(sm)}  ({len(ls2)} locs, {len(h2)} hits)")
+                for l in h2[:15]:
+                    print(f"        {l}")
 
-        # report
-        uniq = sorted(set(interesting), reverse=True)
-        print(f"\n[result] {len(uniq)} interesting URLs (bulletin/mdocs/pdf):")
-        for u in uniq[:40]:
+        uniq = sorted(set(all_hits), reverse=True)
+        print(f"\n[RESULT] {len(uniq)} bulletin/comercializ/mdocs/pdf URLs:")
+        for u in uniq[:50]:
             print(f"   {u}")
 
         await ctx.close()
@@ -108,4 +101,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(asyncio.wait_for(main(), timeout=480))
+    asyncio.run(asyncio.wait_for(main(), timeout=420))
