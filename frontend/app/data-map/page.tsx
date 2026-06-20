@@ -900,6 +900,197 @@ const ROWS: FlowMetadata[] = [
     storage: { target: "—" },
     resiliency: { onMissing: "falls back to last-good per-contract OI rather than the bugged exch_oi_ldn aggregate" },
   },
+
+  // ── 0.x — Low-level pollers + one-shot backfills ─────────────────────────
+  {
+    wf: "0.1 Acaphe poll", output: "live_quotes (Upstash Redis)", component: "AcapheLiveQuotes", visual: "Futures · live ACAPHE quotes ticker",
+    cadence: { recurrence: "every 15 min Mon-Fri 08:00-19:00 UTC", window: "RC London + KC NY trading overlap", trigger: "cron" },
+    transport: { provider: "acaphe.com", method: "BeautifulSoup HTML parse → Upstash REST set" },
+    storage: { target: "Upstash live_quotes key (no file)", footprint: "~1KB single snapshot" },
+    resiliency: { onMissing: "next tick overwrites; freshness check (1.8) flags >6h stale", debounce: "concurrency: cancel-in-progress → fresh tick wins" },
+    runtime: { duration: "~30s" },
+  },
+  {
+    wf: "0.2 Refresh inventory", output: "workflows_inventory.json", component: "LiveWorkflowInventory + WorkflowDriftPanel", visual: "Data Platform Map · live inventory + drift panel",
+    cadence: { recurrence: "on push to .github/workflows/** or the build script", trigger: "edge" },
+    transport: { method: "yaml.safe_load over every workflow file" },
+    storage: { target: "workflows_inventory.json", footprint: "~17KB / 56 workflows", units: "structural metadata + drift report" },
+    resiliency: { onMissing: "keeps last good JSON (auto-commit only when content changes)" },
+    runtime: { duration: "~10s" },
+  },
+  {
+    wf: "0.8 VN River Flow", output: "vn_river_flow.json", component: "VnWaterLevels (VietnamTab)", visual: "Supply · Vietnam · water-level + dam alerts",
+    cadence: { recurrence: "10:00 UTC daily (after 08:00 UTC NCHMF publish)", trigger: "cron" },
+    transport: { provider: "NCHMF Vietnam Hydromet", method: "daily bulletin scrape" },
+    storage: { target: "vn_river_flow.json (rolling)" },
+    resiliency: { onMissing: "keep last good JSON" },
+  },
+  {
+    wf: "0.8 UCDA monthly backfill", output: "uganda_monthly.json", component: "Uganda monthly report panels (when wired)", visual: "Supply · Uganda · monthly PDF backfill (one-shot)",
+    cadence: { recurrence: "manual workflow_dispatch only", trigger: "manual" },
+    transport: { provider: "UCDA monthly PDF index", method: "patchright stealth + pdfplumber extract", bypass: "Cloudflare bypass via patchright (GH IPs blocked)" },
+    storage: { target: "uganda_monthly.json (~80 PDFs back to ~2018)", footprint: "~few hundred KB" },
+    resiliency: { onMissing: "set +e + rc capture → commits only on rc=0; retry 3× preserves the contract" },
+  },
+  {
+    wf: "0.9 30Y weather backfill", output: "backend/seed/weather_history/{origin}.json", component: "WeatherCharts climatology bands", visual: "Supply · weather · 30-year baseline + bands (one-shot)",
+    cadence: { recurrence: "manual workflow_dispatch only", trigger: "manual" },
+    transport: { provider: "Open-Meteo archive API", method: "per-origin batch fetch 1995-2024" },
+    storage: { target: "backend/seed/weather_history/{origin}.json", footprint: "~MBs per origin seed" },
+    resiliency: { onMissing: "daily 1.10 fetch accumulates new actuals on top of the seed" },
+  },
+  {
+    wf: "0.9 BPS Indonesia exim", output: "indonesia_exports.json", component: "IndonesiaTab export panels", visual: "Supply · Indonesia · BPS exports",
+    cadence: { recurrence: "workflow_dispatch only (cron commented out pending Xvfb proof)", trigger: "manual" },
+    transport: { provider: "Indonesia BPS exim portal", method: "headless browser scrape" },
+    storage: { target: "indonesia_exports.json" },
+  },
+  {
+    wf: "0.10 VHI backfill", output: "backend/seed/vhi_history.json", component: "(seeds the weekly 0.5 VHI fetch)", visual: "Supply · weather · VHI long-form history (one-shot)",
+    cadence: { recurrence: "manual workflow_dispatch only", trigger: "manual" },
+    transport: { provider: "NOAA STAR VHI text endpoint", method: "Direct GET" },
+    storage: { target: "backend/seed/vhi_history.json" },
+    resiliency: { onMissing: "weekly 0.5 fetch grows the file forward from where this one-shot stops" },
+  },
+  {
+    wf: "0.10 Colombia exports", output: "colombia_exports.json", component: "OriginExportPanel (ColombiaTab)", visual: "Supply · Colombia · monthly exports + NANDINA breakdown",
+    cadence: { recurrence: "06:30 UTC daily (DANE + FNC publish irregularly; daily catch-up)", trigger: "cron" },
+    transport: { provider: "DANE (NANDINA) + FNC headline", method: "FNC + DANE scrapers in sequence" },
+    storage: { target: "colombia_exports.json", units: "60kg bags (FNC) + USD value (DANE NANDINA)" },
+    resiliency: { onMissing: "per-source failures logged; rest of run proceeds" },
+  },
+
+  // ── 1.x — Daily + ops layer ──────────────────────────────────────────────
+  {
+    wf: "1.8 Brazil export forecast", output: "brazil_export_projection.json", component: "BrazilTab forecast block", visual: "Supply · Brazil · SSOT export projection",
+    cadence: { recurrence: "18:00 UTC daily", trigger: "cron" },
+    transport: { method: "compute over the historical Cecafé monthlies (local, no network)" },
+    storage: { target: "brazil_export_projection.json" },
+    resiliency: { onMissing: "no upstream network — fails only if the compute itself breaks" },
+  },
+  {
+    wf: "1.8 Check live quotes", output: "—", component: "—", visual: "Telegram alert · live-quotes freshness",
+    cadence: { recurrence: "hourly :15 Mon-Fri 09:15-20:15 UTC", window: "poll window", trigger: "cron" },
+    transport: { method: "Upstash GET live_quotes → parse fetched_at" },
+    resiliency: { onMissing: "Telegram alert when live_quotes.fetched_at >6h old (poller dead)" },
+  },
+  {
+    wf: "1.10 Weather fetch", output: "{origin}_weather.json", component: "WeatherCharts (all origin tabs)", visual: "Supply · weather · actuals / forecast / climatology",
+    cadence: { recurrence: "01:53 UTC daily (ahead of every other data-commit job)", trigger: "cron" },
+    transport: { provider: "Open-Meteo forecast API", method: "Direct GET per origin region" },
+    storage: { target: "backend/seed/weather_history/{origin}.json (accumulator) → {origin}_weather.json (export)", footprint: "growing daily" },
+    resiliency: { onMissing: "keeps last good seed; daily appends are idempotent" },
+    runtime: { duration: "~10min" },
+  },
+  {
+    wf: "1.10 Weather fetch", output: "agronomic_alerts.json + merged into signals.json", component: "AgronomicTicker + signals consumers", visual: "Map · IPHM agronomic alerts ticker",
+    cadence: { recurrence: "tail step of 1.10", trigger: "cron" },
+    transport: { method: "SPI/SPEI/forecast inputs → IPHM rule eval" },
+    storage: { target: "agronomic_alerts.json + flattened into signals.json" },
+  },
+  {
+    wf: "1.10 Weather fetch", output: "weather_analogs_brazil.json", component: "BrazilWeatherAnalogs", visual: "Supply · Brazil · analog years (production forecast)",
+    cadence: { recurrence: "tail step of 1.10", trigger: "cron" },
+    transport: { method: "Euclidean distance over per-phenology-stage signatures vs historical Brazil seed" },
+    storage: { target: "weather_analogs_brazil.json" },
+  },
+  {
+    wf: "1.11 Port activity", output: "frontend/public/data/port_activity/", component: "PortActivity (FreightTab)", visual: "Freight · per-port seasonal + monthly charts",
+    cadence: { recurrence: "Wed 06:17 UTC (PortWatch refreshes Tue ~13:00-14:00 UTC)", trigger: "cron" },
+    transport: { provider: "IMF PortWatch", method: "Direct GET per port" },
+    storage: { target: "port_activity/index.json + {port}.json", footprint: "~8MB total / ~30 ports" },
+    resiliency: { onMissing: "keep last good index + per-port files" },
+  },
+  {
+    wf: "1.11 Slow-data scraper", output: "Postgres PSD tables → psd_coffee.json (in 1.4 export)", component: "Demand · PSD-derived widgets", visual: "Demand · USDA PSD monthly (consumption / production)",
+    cadence: { recurrence: "12th of each month 03:00 UTC", trigger: "cron" },
+    transport: { provider: "USDA PSD", method: "Direct fetch + parse" },
+    storage: { target: "psd_coffee.json slice" },
+  },
+  {
+    wf: "1.12 Vercel redeploy", output: "—", component: "—", visual: "Vercel deploy (the act of publishing)",
+    cadence: { recurrence: "03:41 + 10:00 UTC + workflow_run chain off 1.4 / 1.13", trigger: "composite" },
+    transport: { method: "POST to Vercel deploy hook (VERCEL_DEPLOY_HOOK secret)" },
+    resiliency: { onMissing: "dedup guard skips duplicate fires within the same SHA (PR #314)", debounce: "concurrency group serialises overlap; Vercel itself dedups identical builds" },
+    runtime: { duration: "~5-10s per fire" },
+  },
+  {
+    wf: "1.15 CPI", output: "us_cpi.json + retail_cpi.json", component: "UsCpiPanel + RetailCpiPanel", visual: "Macro · US CPI + retail-coffee CPI panels",
+    cadence: { recurrence: "11th-16th of month 13:40 UTC + 1st 03:00 UTC catch-up", trigger: "cron" },
+    transport: { provider: "BLS API (key optional · keyless = 25 queries/day)", method: "Direct API GET" },
+    storage: { target: "us_cpi.json + retail_cpi.json" },
+    resiliency: { onMissing: "keep last good JSON; freshness threshold 35 days per 1.5" },
+  },
+
+  // ── 3.x — Demand / imports (monthly + semi-annual) ───────────────────────
+  {
+    wf: "3.4 ECF stocks", output: "ecf_stocks.json", component: "Demand · ECF panel", visual: "Demand · ECF stocks (bi-monthly)",
+    cadence: { recurrence: "5th of each month 04:00 UTC", trigger: "cron" },
+    transport: { provider: "ECF", method: "index page → per-post PDF extract" },
+    storage: { target: "ecf_stocks.json", footprint: "bi-monthly; debug dumps retained 14d" },
+  },
+  {
+    wf: "3.4 Balance sheets", output: "frontend/public/data/balance_sheets/", component: "SupplyDemandBalance (per origin)", visual: "Supply · per-origin S/D balance sheets",
+    cadence: { recurrence: "06:00 UTC on 20 Jun + 20 Dec (semi-annual)", trigger: "cron" },
+    transport: { method: "multi-source synthesis (BR / CO / ID / UG)" },
+    storage: { target: "balance_sheets/{origin}.json" },
+  },
+  {
+    wf: "3.5 AJCA Japan", output: "ajca.json", component: "Demand · AJCA panel", visual: "Demand · Japan AJCA stocks (monthly)",
+    cadence: { recurrence: "monthly", trigger: "cron" },
+    transport: { provider: "AJCA Japan", method: "Direct fetch + PDF parse (country breakdown)" },
+    storage: { target: "ajca.json", footprint: "monthly" },
+    resiliency: { onMissing: "YoY relies on ajca_history.json accumulator (cache wipe = year-long gap, see #132)" },
+  },
+  {
+    wf: "3.6 Spot Coffee (ATTE)", output: "spot_coffee.json", component: "Macro · ATTE spot panel", visual: "Macro · ATTE Brazilian spot prices (daily)",
+    cadence: { recurrence: "daily", trigger: "cron" },
+    transport: { provider: "ATTE", method: "BeautifulSoup HTML parse" },
+    storage: { target: "spot_coffee.json" },
+  },
+  {
+    wf: "3.7 UN WPP age", output: "un_wpp_age.json (via 1.4 export)", component: "AgeCohortPanel + CohortExplainer", visual: "Demand · age cohort population pyramid (annual)",
+    cadence: { recurrence: "15 July 03:00 UTC (annual)", trigger: "cron" },
+    transport: { provider: "UN World Population Prospects", method: "Playwright + DB upsert" },
+    storage: { target: "un_wpp_age.json (annual snapshot)" },
+  },
+  {
+    wf: "3.8 UN Comtrade imports", output: "coffee_imports_comtrade.json", component: "Demand · imports panel", visual: "Demand · global green-coffee imports (UN Comtrade)",
+    cadence: { recurrence: "15th of each month 07:00 UTC", trigger: "cron" },
+    transport: { provider: "UN Comtrade", method: "Direct API GET" },
+    storage: { target: "coffee_imports_comtrade.json" },
+  },
+  {
+    wf: "3.9 USITC imports", output: "us_coffee_imports.json", component: "Demand · US imports panel", visual: "Demand · US imports by origin (USITC DataWeb)",
+    cadence: { recurrence: "16th of each month 07:30 UTC", trigger: "cron" },
+    transport: { provider: "USITC DataWeb", method: "Direct fetch" },
+    storage: { target: "us_coffee_imports.json" },
+  },
+  {
+    wf: "3.10 Eurostat imports", output: "eu_coffee_imports.json", component: "Demand · EU imports panel", visual: "Demand · EU imports by origin (Eurostat Comext)",
+    cadence: { recurrence: "17th of each month 08:00 UTC", trigger: "cron" },
+    transport: { provider: "Eurostat Comext", method: "Direct fetch" },
+    storage: { target: "eu_coffee_imports.json" },
+  },
+
+  // ── 9.x — CI / hygiene ──────────────────────────────────────────────────
+  {
+    wf: "9.1 CI Tests", output: "—", component: "—", visual: "Required PR status check",
+    cadence: { recurrence: "every push + PR + daily 06:00 UTC", trigger: "composite" },
+    transport: { method: "pytest backend + vitest / tsc frontend" },
+    resiliency: { onMissing: "blocks PR merge until green" },
+  },
+  {
+    wf: "9.2 Backend lint", output: "—", component: "—", visual: "Required PR status check",
+    cadence: { recurrence: "every push + PR", trigger: "composite" },
+    transport: { method: "ruff (+ mypy where wired)" },
+  },
+  {
+    wf: "9.3 Smart-quote guard", output: "—", component: "—", visual: "Required PR status check",
+    cadence: { recurrence: "every push + PR", trigger: "composite" },
+    transport: { method: "grep for curly quotes / em-dashes in TS/TSX strings" },
+    resiliency: { onMissing: "fails the PR if a smart quote slips into a TypeScript string" },
+  },
 ];
 
 // ── Operational metadata card view ──────────────────────────────────────────
