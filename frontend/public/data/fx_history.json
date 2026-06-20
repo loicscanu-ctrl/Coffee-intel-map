@@ -17557,6 +17557,17 @@
           "close": 0.759353
         }
       ]
+    },
+    "GTQ=X": {
+      "name": "USD/GTQ",
+      "type": "reference",
+      "weight": 0.0,
+      "history": [
+        {
+          "date": "2026-06-18",
+          "close": 7.61946
+        }
+      ]
     }
   }
 }

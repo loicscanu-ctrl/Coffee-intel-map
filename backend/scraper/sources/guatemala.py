@@ -2,22 +2,21 @@
 guatemala.py — Guatemala coffee reference prices (ANACAFE).
 
 ANACAFE publishes daily "Precios de referencia locales" per quality grade, in
-GTQ per quintal (100 lb) of café oro. Those grade prices are computed in the
-calculator's JavaScript from the NY 'C' close + USD→GTQ rate + a per-grade
-differential; only the C closes and the FX are exposed as JSON endpoints.
+GTQ per quintal (100 lb) of café oro, at
+https://pro.anacafe.org/preciosReferencia/calculator/ (a React app).
 
-We try two ways (per the "try both" decision) and keep whichever works:
-  A) Render the calculator with Playwright and scrape the displayed GTQ grade
-     prices (always current with ANACAFE's own differential), then GTQ→USD.
-  B) Fall back to the formula: fetch the C close from the Precios endpoint and
-     subtract ANACAFE's per-grade deduction (reverse-engineered from their
-     published prices). Always yields a number from a reliable endpoint.
+Primary path — RENDER: load the calculator and read the rendered
+"Precio por quintal café oro" row directly. The page lays the grades out as a
+header row (Prima lavado | Duro | Estrictamente duro) and a values row
+(Q1,807.29 | Q1,853.01 | Q1,875.87), so we map the three quetzal values to the
+grades by column order. This is the *true* published price — no assumptions.
 
-Both paths produce USD per quintal (100 lb), which == US¢/lb numerically, so the
-origin table converts ×22.0462 → USD/MT with no FX needed.
+Fallback — FORMULA: if the render doesn't yield the row, reconstruct it from the
+NY 'C' close (Precios endpoint) and the USD→GTQ rate (TasaCambio endpoint) minus
+ANACAFE's per-grade deduction: GTQ = (C_close − deduction) × rate.
 
 NOTE: pro.anacafe.org / whatsapp.anacafe.org must be on the network egress
-allowlist for this to fetch (works on the CI runner; this sandbox blocks them).
+allowlist (works on the CI runner; this dev sandbox blocks them).
 """
 from __future__ import annotations
 
@@ -33,30 +32,20 @@ def _today() -> str:
 _LAT, _LNG = 14.6349, -90.5069   # Guatemala City
 _CALC_URL    = "https://pro.anacafe.org/preciosReferencia/calculator/"
 _PRECIOS_URL = "https://whatsapp.anacafe.org/Comunes/Precios"
+_TASA_URL    = "https://whatsapp.anacafe.org/Comunes/TasaCambio"
 
-# Per-grade deduction vs the NY 'C' close, in US¢/lb (== USD per 100-lb quintal),
-# reverse-engineered from ANACAFE's published quetzal prices on 2026-06-18:
-#   grade_usd_per_qq = C_close − deduction.   e.g. 275.10 − 28.91 = 246.19 (SHB).
-# The relative quality steps (ED 0 / Duro +3 / Prima +9) are stable; the base
-# tracks ANACAFE's cost stack and may need occasional recalibration.
-ANACAFE_DEDUCTION_CENTS = {
-    "prima_lavado":       37.91,
-    "duro":               31.91,
-    "estrictamente_duro": 28.91,
-}
+# café oro column order on the calculator → grade key.
+_GRADE_KEYS = ["prima_lavado", "duro", "estrictamente_duro"]
 
-# Rendered-page grade label → grade key (longest label matched first).
-_GRADE_LABELS = [
-    ("estrictamente_duro", "estrictamente duro"),
-    ("duro",               "duro"),
-    ("prima_lavado",       "prima lavado"),
-]
+# Fallback only: per-grade deduction vs the NY 'C' close, in US¢/lb
+# (== USD per 100-lb quintal), reverse-engineered from ANACAFE's published
+# prices. Used only when the render path fails.
+_DEDUCTION_CENTS = {"prima_lavado": 37.91, "duro": 31.91, "estrictamente_duro": 28.91}
 
 
 def parse_precios_close(result_text: str) -> float | None:
-    """Front-position NY 'C' close from the Precios endpoint's `result` blob
-    (the first 'Cierre:  NNN.NN'). Requires a decimal so it skips the
-    'Ultimo Cierre: DD/MM/YYYY' date line."""
+    """Front-position NY 'C' close from the Precios `result` blob. Requires a
+    decimal so it skips the 'Ultimo Cierre: DD/MM/YYYY' date line."""
     m = re.search(r"Cierre:\s*(\d+\.\d+)", result_text or "")
     try:
         return float(m.group(1)) if m else None
@@ -64,44 +53,37 @@ def parse_precios_close(result_text: str) -> float | None:
         return None
 
 
-def parse_rendered_grades(html: str) -> tuple[dict[str, float], float | None]:
-    """Scrape the rendered calculator: GTQ/quintal per grade + the USD→GTQ rate."""
+def parse_rendered_grades(html: str) -> dict[str, float]:
+    """Read the rendered 'Precio por quintal café oro' row → {grade: GTQ}.
+    The three quetzal values are taken in column order (Prima / Duro / SHB)."""
     from bs4 import BeautifulSoup
     text = BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
-
-    fx_m = re.search(r"[Tt]ipo de cambio[^0-9]*([0-9]+\.[0-9]+)", text)
-    fx = float(fx_m.group(1)) if fx_m else None
-
-    # Mask the longer label so "duro" can't match inside "estrictamente duro".
-    masked = re.sub(r"estrictamente\s+duro", "ESTRICTODURO", text, flags=re.I)
-    gtq: dict[str, float] = {}
-    label_to_token = {"estrictamente_duro": "ESTRICTODURO", "duro": "duro", "prima_lavado": "prima lavado"}
-    for key, token in label_to_token.items():
-        m = re.search(re.escape(token) + r"\D*Q?\s*([0-9][0-9,]*\.[0-9]{2})", masked, re.I)
-        if m:
-            try:
-                gtq[key] = float(m.group(1).replace(",", ""))
-            except ValueError:
-                pass
-    return gtq, fx
+    m = re.search(r"caf[eé]\s+oro\s+((?:Q?\s?[\d,]+\.\d{2}\s*){3})", text, re.I)
+    if not m:
+        return {}
+    nums = re.findall(r"[\d,]+\.\d{2}", m.group(1))
+    if len(nums) < 3:
+        return {}
+    return {k: float(nums[i].replace(",", "")) for i, k in enumerate(_GRADE_KEYS)}
 
 
-def _make_item(grades_usd_qq: dict[str, float], close: float | None, method: str) -> dict:
-    pretty = ", ".join(f"{k.replace('_', ' ').title()} {v:.2f}" for k, v in grades_usd_qq.items())
+def _make_item(grades_gtq: dict[str, float], usd_gtq_rate: float | None,
+               close: float | None, method: str) -> dict:
+    pretty = ", ".join(f"{k.replace('_', ' ').title()} Q{v:,.2f}" for k, v in grades_gtq.items())
     return {
         "title":    f"Guatemala ANACAFE Precios de Referencia – {_today()}",
-        "body":     (
-            f"ANACAFE reference prices (USD/quintal, 100 lb): {pretty}."
-            + (f" NY 'C' close {close:.2f}." if close is not None else "")
-            + f" [{method}]"
-        ),
+        "body":     (f"ANACAFE café oro reference prices (GTQ/quintal): {pretty}."
+                     + (f" USD→GTQ {usd_gtq_rate}." if usd_gtq_rate else "")
+                     + (f" NY 'C' {close:.2f}." if close is not None else "")
+                     + f" [{method}]"),
         "source":   "ANACAFE",
         "category": "supply",
         "lat":      _LAT,
         "lng":      _LNG,
         "tags":     ["price", "guatemala", "anacafe", "arabica", "precio-referencia"],
         "meta":     json.dumps({
-            "grades_usd_quintal": grades_usd_qq,   # USD per 100-lb quintal
+            "grades_gtq_quintal": grades_gtq,      # GTQ per 100-lb quintal (the published price)
+            "usd_gtq_rate":       usd_gtq_rate,    # USD→GTQ (TasaCambio)
             "ny_c_close":         close,
             "as_of":              _today(),
             "method":             method,
@@ -110,45 +92,52 @@ def _make_item(grades_usd_qq: dict[str, float], close: float | None, method: str
     }
 
 
+async def _get_json(page, url: str) -> dict | None:
+    try:
+        resp = await page.request.get(url, timeout=20_000)
+        if resp.ok:
+            return await resp.json()
+    except Exception as e:  # noqa: BLE001
+        print(f"[guatemala] {url} failed: {e}")
+    return None
+
+
 async def run(page) -> list[dict]:
-    grades_usd: dict[str, float] = {}
-    close: float | None = None
+    grades_gtq: dict[str, float] = {}
     method = ""
 
-    # A) Render the calculator and scrape the displayed grade prices. The page
-    # shows a loading spinner then fills the prices in asynchronously, so poll
-    # the DOM for a few seconds rather than grabbing the content immediately.
+    # A) Render the calculator and read the café-oro row directly.
     try:
-        await page.goto(_CALC_URL, wait_until="networkidle", timeout=30_000)
-        gtq: dict[str, float] = {}
-        fx: float | None = None
-        for _ in range(8):  # up to ~8s after networkidle for the spinner to clear
+        await page.goto(_CALC_URL, wait_until="domcontentloaded", timeout=45_000)
+        for _ in range(15):  # poll while the React app hydrates the prices
             await page.wait_for_timeout(1_000)
-            gtq, fx = parse_rendered_grades(await page.content())
-            if gtq and fx:
+            grades_gtq = parse_rendered_grades(await page.content())
+            if grades_gtq:
                 break
-        if gtq and fx:
-            grades_usd = {k: round(v / fx, 2) for k, v in gtq.items()}
+        if grades_gtq:
             method = "rendered"
-            print(f"[guatemala] scraped {len(grades_usd)} ANACAFE grades from the calculator")
-    except Exception as e:
+            print(f"[guatemala] scraped {len(grades_gtq)} café-oro grades from the calculator")
+    except Exception as e:  # noqa: BLE001
         print(f"[guatemala] calculator render failed: {e}")
 
-    # B) Fetch the NY 'C' close (always — for the stored value + the fallback).
-    try:
-        resp = await page.request.get(_PRECIOS_URL, timeout=20_000)
-        if resp.ok:
-            close = parse_precios_close((await resp.json()).get("result", ""))
-    except Exception as e:
-        print(f"[guatemala] Precios endpoint failed: {e}")
+    # USD→GTQ rate (for the USD value) and the C close (reference + fallback).
+    tasa = await _get_json(page, _TASA_URL)
+    usd_gtq_rate = None
+    if tasa and tasa.get("tasaCambioMember"):
+        try:
+            usd_gtq_rate = float(tasa["tasaCambioMember"])
+        except (TypeError, ValueError):
+            pass
+    precios = await _get_json(page, _PRECIOS_URL)
+    close = parse_precios_close((precios or {}).get("result", "")) if precios else None
 
-    # Fallback: compute grades from the close + ANACAFE deductions.
-    if not grades_usd and close is not None:
-        grades_usd = {k: round(close - d, 2) for k, d in ANACAFE_DEDUCTION_CENTS.items()}
+    # B) Fallback: reconstruct the GTQ prices from the close + rate − deduction.
+    if not grades_gtq and close is not None and usd_gtq_rate is not None:
+        grades_gtq = {k: round((close - d) * usd_gtq_rate, 2) for k, d in _DEDUCTION_CENTS.items()}
         method = "computed"
-        print("[guatemala] using computed ANACAFE grades (C close − deduction)")
+        print("[guatemala] using computed café-oro grades ((C − deduction) × rate)")
 
-    if not grades_usd:
+    if not grades_gtq:
         print("[guatemala] no ANACAFE prices available")
         return []
-    return [_make_item(grades_usd, close, method)]
+    return [_make_item(grades_gtq, usd_gtq_rate, close, method)]

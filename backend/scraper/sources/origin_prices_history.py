@@ -94,7 +94,7 @@ ORIGINS = {
     "guatemala_prima_lavado": {
         "name":      "Guatemala Prima Lavado (ANACAFE)",
         "source":    "ANACAFE precios de referencia",
-        "currency":  "USD",
+        "currency":  "GTQ",
         "unit":      "per_quintal_100lb",
         "color":     "#f97316",
         "commodity": "arabica",
@@ -102,7 +102,7 @@ ORIGINS = {
     "guatemala_duro": {
         "name":      "Guatemala Duro (ANACAFE)",
         "source":    "ANACAFE precios de referencia",
-        "currency":  "USD",
+        "currency":  "GTQ",
         "unit":      "per_quintal_100lb",
         "color":     "#eab308",
         "commodity": "arabica",
@@ -110,7 +110,7 @@ ORIGINS = {
     "guatemala_estrictamente_duro": {
         "name":      "Guatemala Estrictamente Duro / SHB (ANACAFE)",
         "source":    "ANACAFE precios de referencia",
-        "currency":  "USD",
+        "currency":  "GTQ",
         "unit":      "per_quintal_100lb",
         "color":     "#ef4444",
         "commodity": "arabica",
@@ -302,8 +302,8 @@ def _today_uganda_arabica_price(grade_names: list[str]) -> float | None:
 
 
 def _today_guatemala_grades(db) -> dict:
-    """Read today's ANACAFE grade reference prices (USD per 100-lb quintal) from
-    the latest ANACAFE NewsItem meta → grades_usd_quintal."""
+    """Read today's ANACAFE café-oro reference prices (GTQ per 100-lb quintal)
+    from the latest ANACAFE NewsItem meta → grades_gtq_quintal."""
     try:
         from models import NewsItem
         item = (db.query(NewsItem)
@@ -311,7 +311,7 @@ def _today_guatemala_grades(db) -> dict:
                   .order_by(NewsItem.pub_date.desc()).first())
         if not item:
             return {}
-        return (json.loads(item.meta or "{}").get("grades_usd_quintal") or {})
+        return (json.loads(item.meta or "{}").get("grades_gtq_quintal") or {})
     except Exception as e:
         print(f"[origin_prices_history] guatemala prices unavailable from ANACAFE NewsItem: {e}",
               file=sys.stderr, flush=True)
