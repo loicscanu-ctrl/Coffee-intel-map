@@ -97,7 +97,10 @@ function toUsdMtOnDate(price: number, unit: string, currency: string, date: stri
 
 function fmtNative(price: number, unit: string, currency: string): string {
   if (unit === "cents_lb") return `${price.toFixed(2)} ¢/lb`;
-  if (unit === "per_quintal_100lb") return `$${price.toFixed(2)}/qq`;
+  if (unit === "per_quintal_100lb") {
+    const n = price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return currency === "GTQ" ? `Q${n}/qq` : `$${n}/qq`;
+  }
   const big = Math.abs(price) >= 1000;
   const n = big
     ? price.toLocaleString(undefined, { maximumFractionDigits: 0 })

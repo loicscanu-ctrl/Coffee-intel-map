@@ -390,6 +390,26 @@ def main():
             ],
         }
 
+    # GTQ (Guatemala) — fetched standalone, NOT part of the CCI exporter/importer
+    # weights, so the Origin Farmgate panel can convert ANACAFE's quetzal café-oro
+    # prices to USD/MT per day.
+    try:
+        gtq_closes = _fetch_all_closes(["GTQ=X"]).get("GTQ=X")
+        if gtq_closes is not None and not gtq_closes.empty:
+            tail = gtq_closes.tail(FX_HISTORY_DAYS)
+            fx_pairs["GTQ=X"] = {
+                "name":    "USD/GTQ",
+                "type":    "reference",
+                "weight":  0.0,
+                "history": [
+                    {"date": dt.date().isoformat(), "close": _safe_float(val)}
+                    for dt, val in tail.items()
+                    if _safe_float(val) is not None
+                ],
+            }
+    except Exception as e:  # noqa: BLE001
+        print(f"  GTQ=X (reference) fetch failed: {e}")
+
     fx_output = {
         "scraped_at":   scraped_at,
         "history_days": FX_HISTORY_DAYS,
