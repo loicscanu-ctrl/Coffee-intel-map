@@ -115,11 +115,18 @@ async def run(page) -> list[dict]:
     close: float | None = None
     method = ""
 
-    # A) Render the calculator and scrape the displayed grade prices.
+    # A) Render the calculator and scrape the displayed grade prices. The page
+    # shows a loading spinner then fills the prices in asynchronously, so poll
+    # the DOM for a few seconds rather than grabbing the content immediately.
     try:
         await page.goto(_CALC_URL, wait_until="networkidle", timeout=30_000)
-        await page.wait_for_timeout(3_000)
-        gtq, fx = parse_rendered_grades(await page.content())
+        gtq: dict[str, float] = {}
+        fx: float | None = None
+        for _ in range(8):  # up to ~8s after networkidle for the spinner to clear
+            await page.wait_for_timeout(1_000)
+            gtq, fx = parse_rendered_grades(await page.content())
+            if gtq and fx:
+                break
         if gtq and fx:
             grades_usd = {k: round(v / fx, 2) for k, v in gtq.items()}
             method = "rendered"

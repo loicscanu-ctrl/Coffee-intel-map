@@ -581,6 +581,48 @@
           "price": 246.19
         }
       ]
+    },
+    "guatemala_prima_lavado": {
+      "name": "Guatemala Prima Lavado (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#f97316",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 237.19
+        }
+      ]
+    },
+    "guatemala_duro": {
+      "name": "Guatemala Duro (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#eab308",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 243.19
+        }
+      ]
+    },
+    "guatemala_estrictamente_duro": {
+      "name": "Guatemala Estrictamente Duro / SHB (ANACAFE)",
+      "source": "ANACAFE precios de referencia",
+      "currency": "USD",
+      "unit": "per_quintal_100lb",
+      "color": "#ef4444",
+      "commodity": "arabica",
+      "history": [
+        {
+          "date": "2026-06-18",
+          "price": 246.19
+        }
+      ]
     }
   }
 }
