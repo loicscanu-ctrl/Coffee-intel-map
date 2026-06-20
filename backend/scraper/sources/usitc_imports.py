@@ -27,6 +27,8 @@ from pathlib import Path
 
 import requests
 
+from scraper.sources._imports_util import merge_monthly
+
 log = logging.getLogger(__name__)
 
 BASE_URL = "https://datawebws.usitc.gov/dataweb"
@@ -355,6 +357,21 @@ def build_us_coffee_imports(db=None) -> dict:  # noqa: ARG001
     monthly_origins = parse_monthly_by_origin(_run_report(
         build_query(list(reversed(m_years)), timeline="Monthly", break_countries=True)))
     log.info("usitc_imports: monthly-by-origin for %d origins", len(monthly_origins))
+
+    # Archive: merge the recent monthly window into the previously-committed
+    # history so the series grows over time instead of being capped to the
+    # rolling fetch window.
+    if OUT_PATH.exists():
+        try:
+            prev = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            prev = {}
+        monthly = merge_monthly(prev.get("monthly_total"), monthly)
+        prev_mo = prev.get("monthly_origins") or {}
+        for name in set(prev_mo) | set(monthly_origins):
+            merged = merge_monthly(prev_mo.get(name), monthly_origins.get(name))
+            if merged:
+                monthly_origins[name] = merged
 
     out = {
         "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
