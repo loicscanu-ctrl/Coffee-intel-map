@@ -671,6 +671,78 @@ function OriginLogistics() {
         </P>
       </div>
 
+      {/* Guatemala */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Guatemala · Huehuetenango / Antigua / Atitlán</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+          GT SHB Washed Arabica — FOBbing cost ~${FOBBING_USD["GT SHB"]}/t
+        </h3>
+        <P>
+          Guatemala is the first <strong>Arabica</strong> origin in this table, so its cost stack is benched against
+          ICE New York (KC), not London. Guatemalan SHB (Strictly Hard Bean, grown above ~1,350 m) is fully washed,
+          which front-loads the cost into <strong>milling</strong>: parchment is dry-milled, hulled, density- and
+          screen-graded, and hand/electronically sorted to export grade. ANACAFE publishes the daily
+          <Code>Precio de referencia</Code> for café oro per quality (Prima lavado / Duro / Estrictamente duro) that
+          feeds the GT SHB ticker. Export runs through the Pacific (Puerto Quetzal) or, for Atlantic-routed lots,
+          Santo Tomás de Castilla.
+        </P>
+        <CostTable>
+          <CostRow label="Dry milling & export prep" cost="85–95" note="Hulling, density + screen grading, colour/defect sorting to SHB spec" />
+          <CostRow label="L1 — Farm → wet mill (beneficio)" cost="20–25" note="Smallholder/cooperative aggregation in the highlands" />
+          <CostRow label="L2 — Mill → port" cost="28–32" note="Highlands → Puerto Quetzal / Santo Tomás de Castilla" />
+          <CostRow label="THC + port docs + B/L" cost="28–30" note="Terminal handling, export documentation, bill of lading" />
+          <CostRow label="ANACAFE cess + Decreto 19-69" cost="~25" note="Export contribution levies on green coffee" />
+          <CostRow label="Financing" cost="~18" note="~0.4% on a ~$5,900 reference price × 3-week float" />
+          <CostRow label="Exporter margin" cost="~60" note="~1% of FOB value on a ~$5,900 SHB reference price" />
+          <tr className="border-t border-slate-600 font-semibold">
+            <td className="pt-2 text-slate-200">Total</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~{FOBBING_USD["GT SHB"]}</td>
+            <td className="pt-2 text-slate-500 text-[11px]">~4.7% of $5,900 reference price</td>
+          </tr>
+        </CostTable>
+        <P>
+          <strong>Trader note:</strong> Milling and exporter margin are the swing lines — washed-Arabica prep cost is
+          quality-elastic (cleaner parchment mills cheaper). Because the ANACAFE reference is itself derived from the
+          NY &apos;C&apos; close, the GT SHB ticker N-diff hovers near the negative of ANACAFE&#39;s built-in deduction; a move
+          toward zero signals the physical bidding up toward C parity (tight prompt highland supply or a quality bid).
+        </P>
+      </div>
+
+      {/* Honduras */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">Honduras · Marcala / Copán / Montecillos</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-1 pb-2 border-b-2 border-double border-slate-600">
+          HN HG Washed Arabica — FOBbing cost ~${FOBBING_USD["HN HG"]}/t
+        </h3>
+        <P>
+          Honduras is the largest Central American producer and, like Guatemala, an <strong>Arabica</strong> origin
+          benched against NY (KC). HG (High Grown, ~1,000–1,200 m) washed coffee carries a slightly lower milling and
+          margin load than Guatemalan SHB, and the country&#39;s Atlantic port (Puerto Cortés) is close to the main
+          growing belts (Marcala, Copán, Comayagua), keeping inland freight moderate. IHCAFE publishes the reference
+          <Code>precio</Code>, though its site is less machine-readable than ANACAFE&#39;s.
+        </P>
+        <CostTable>
+          <CostRow label="Dry milling & export prep" cost="70–80" note="Hulling, grading and sorting to HG export spec" />
+          <CostRow label="L1 — Farm → wet mill" cost="18–22" note="Smallholder collection (Marcala / Copán / Montecillos)" />
+          <CostRow label="L2 — Mill → Puerto Cortés" cost="28–32" note="Shorter haul than GT — port sits near the growing belt" />
+          <CostRow label="THC + port docs + B/L" cost="26–28" note="Terminal handling, export documentation, bill of lading" />
+          <CostRow label="IHCAFE levies" cost="~25" note="IHCAFE export contribution + fixed cess" />
+          <CostRow label="Financing" cost="~18" note="~0.4% on a ~$5,800 reference price × 3-week float" />
+          <CostRow label="Exporter margin" cost="~55" note="~1% of FOB value on a ~$5,800 HG reference price" />
+          <tr className="border-t border-slate-600 font-semibold">
+            <td className="pt-2 text-slate-200">Total</td>
+            <td className="pt-2 text-right font-mono text-amber-300">~{FOBBING_USD["HN HG"]}</td>
+            <td className="pt-2 text-slate-500 text-[11px]">~4.3% of $5,800 reference price</td>
+          </tr>
+        </CostTable>
+        <P>
+          <strong>Trader note:</strong> Honduras competes on price-for-cup and shorter logistics, so its effective FOB
+          floor sits a touch below Guatemala&#39;s. The variable to watch is the milling/prep line during a wet harvest
+          (drying delays raise defect rates and re-sorting cost), and the IHCAFE levy, which scales with the reference
+          price.
+        </P>
+      </div>
+
       {/* Summary comparison */}
       <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
         <H>Cross-origin comparison</H>
@@ -696,11 +768,23 @@ function OriginLogistics() {
               <td className="py-1.5 pr-4 text-right text-slate-400">~6.5%</td>
               <td className="py-1.5 text-slate-400">Quality-prep cost (varies by lot cleanliness)</td>
             </tr>
-            <tr>
+            <tr className="border-b border-slate-800">
               <td className="py-1.5 pr-4 text-slate-200 font-semibold">UGA S15</td>
               <td className="py-1.5 pr-4 text-right font-mono text-amber-300">$265/t</td>
               <td className="py-1.5 pr-4 text-right text-slate-400">~7%</td>
               <td className="py-1.5 text-slate-400">Northern Corridor freight rate (most volatile)</td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">GT SHB <span className="text-[9px] text-amber-500/70">vs NY</span></td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">${FOBBING_USD["GT SHB"]}/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">~4.7%</td>
+              <td className="py-1.5 text-slate-400">Washed-Arabica milling/prep + exporter margin</td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-4 text-slate-200 font-semibold">HN HG <span className="text-[9px] text-amber-500/70">vs NY</span></td>
+              <td className="py-1.5 pr-4 text-right font-mono text-amber-300">${FOBBING_USD["HN HG"]}/t</td>
+              <td className="py-1.5 pr-4 text-right text-slate-400">~4.3%</td>
+              <td className="py-1.5 text-slate-400">Milling during wet harvest + IHCAFE levy</td>
             </tr>
           </tbody>
         </table>

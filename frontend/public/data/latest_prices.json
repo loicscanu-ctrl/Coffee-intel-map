@@ -32,6 +32,11 @@
       "category": "physical"
     },
     {
+      "label": "GT SHB",
+      "value": "Q1,875.87 ($5,428)",
+      "category": "physical"
+    },
+    {
       "label": "USD/BRL",
       "value": "5.1557",
       "category": "fx"

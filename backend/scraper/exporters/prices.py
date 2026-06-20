@@ -120,6 +120,21 @@ def export_latest_prices(db) -> None:
         usd_mt = round(cwt * 22.046)
         tickers.append({"label": "UGA S15", "value": f"{cwt:.2f} (${usd_mt:,})", "category": "physical"})
 
+    # GT SHB — Guatemala Estrictamente Duro (SHB) café oro green price, from the
+    # ANACAFE NewsItem meta (GTQ/quintal + USD→GTQ rate). USD/MT = GTQ/rate×22.0462
+    # (1 quintal = 100 lb). Diffed vs NY 'C' (KC), not RC, in the frontend.
+    gt = next((it for it in recent_news if it.source == "ANACAFE"), None)
+    if gt:
+        try:
+            gm   = _json.loads(gt.meta or "{}")
+            gtq  = (gm.get("grades_gtq_quintal") or {}).get("estrictamente_duro")
+            rate = gm.get("usd_gtq_rate")
+            if gtq and rate:
+                usd_mt = round(gtq / rate * 22.0462)
+                tickers.append({"label": "GT SHB", "value": f"Q{gtq:,.2f} (${usd_mt:,})", "category": "physical"})
+        except Exception:
+            pass
+
     # FX rates
     for sym, lbl in [("USD_BRL", "USD/BRL"), ("USD_VND", "USD/VND"),
                      ("USD_IDR", "USD/IDR"), ("USD_HNL", "USD/HNL"), ("USD_UGX", "USD/UGX")]:
