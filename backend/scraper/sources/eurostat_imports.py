@@ -55,11 +55,22 @@ EU_MEMBERS = {
     "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI",
     "ES", "SE",
 }
-# Non-country partner aggregates / blocs to skip.
+# Non-country partner aggregates / blocs to skip (by code).
 SKIP_PARTNERS = {
     "EU27_2020", "EU", "EU27", "EU28", "EA", "EA21", "EA20", "EA19", "WORLD",
     "EXT_EU27_2020", "EXT_EU", "INT_EU27_2020", "INTRA_EU", "EXTRA_EU", "TOTAL",
 }
+# Comext also returns aggregate "partners" whose codes vary by reporter (e.g.
+# "Extra-euro area", "European Union", "Not specified") — catch them by name so
+# they don't outrank real origins, especially for member-state reporters.
+_AGG_RE = re.compile(
+    r"(euro area|european union|extra[- ]?eu|intra[- ]?eu|extra[- ]?euro|intra[- ]?euro"
+    r"|\bworld\b|not specified|not declared|stores and provisions|bunkers"
+    r"|countries and territories|free zones|^total$|^all\b)", re.I)
+
+
+def _is_aggregate(name: str) -> bool:
+    return bool(_AGG_RE.search(str(name)))
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coffee_imports.json"
 
@@ -163,6 +174,8 @@ def parse_jsonstat(body: dict, kg_per_unit: int = KG_PER_UNIT,
         if not pcode or not ycode:
             continue
         if pcode in SKIP_PARTNERS or (bloc and pcode in EU_MEMBERS) or (not bloc and pcode == reporter_code):
+            continue
+        if _is_aggregate(partner_labels.get(pcode, pcode)):
             continue
         year = str(ycode)[:4]
         try:
@@ -306,6 +319,8 @@ def parse_monthly_origins(body: dict, reporter_code: str = REPORTER,
         pcode = pcodes.get((f // strides[pi]) % sizes[pi])
         tc = tcodes.get((f // strides[ti]) % sizes[ti])
         if not pcode or pcode in SKIP_PARTNERS or (bloc and pcode in EU_MEMBERS) or (not bloc and pcode == reporter_code):
+            continue
+        if _is_aggregate(plabels.get(pcode, pcode)):
             continue
         mk = _month_code(tc) if tc else None
         if not mk:
