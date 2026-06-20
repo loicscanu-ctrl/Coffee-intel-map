@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from scraper.sources.eurostat_imports import _month_code, clean_name, parse_jsonstat, parse_monthly_total
+from scraper.sources.eurostat_imports import (
+    _month_code,
+    clean_name,
+    parse_jsonstat,
+    parse_monthly_origins,
+    parse_monthly_total,
+)
 
 
 def _cube(partners, years, values, labels):
@@ -82,6 +88,28 @@ def test_month_code_formats():
     assert _month_code("2024-01") == "2024-01"
     assert _month_code("2024M03") == "2024-03"
     assert _month_code("2024") is None
+
+
+def test_parse_member_keeps_intra_eu_drops_self():
+    # For an individual member, intra-EU origins (e.g. NL re-exports) are kept;
+    # only the member's own code is dropped. (Bloc behaviour is unchanged.)
+    cube = _cube(["BR", "DE", "NL"], ["2023"],
+                 {"0": 800_000, "1": 600_000, "2": 700_000},
+                 {"BR": "Brazil", "DE": "Germany", "NL": "Netherlands"})
+    out = parse_jsonstat(cube, kg_per_unit=1, reporter_code="DE")
+    names = [o["name"] for o in out["origins"]]
+    assert "Brazil" in names and "Netherlands" in names   # intra-EU NL kept
+    assert "Germany" not in names                          # self dropped
+
+
+def test_parse_monthly_origins_top_n_and_total():
+    cube = _cube(["BR", "CO", "DE"], ["2024-01", "2024-02"],
+                 {"0": 10_000, "1": 11_000, "2": 5_000, "3": 6_000, "4": 99_999, "5": 88_888},
+                 {"BR": "Brazil", "CO": "Colombia", "DE": "Germany"})
+    out = parse_monthly_origins(cube, reporter_code="EU27_2020", top_n=1)
+    assert set(out) == {"Brazil", "__total__"}            # bloc drops DE; top_n=1 keeps Brazil
+    assert out["Brazil"] == {"2024-01": 1000.0, "2024-02": 1100.0}   # 100kg→MT (/10)
+    assert out["__total__"] == {"2024-01": 1500.0, "2024-02": 1700.0}  # BR+CO, DE excluded
 
 
 def test_parse_monthly_total_sums_extra_eu_partners():

@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from scraper.sources.usitc_imports import build_query, parse_monthly, parse_report
+from scraper.sources.usitc_imports import (
+    build_query,
+    parse_monthly,
+    parse_monthly_by_origin,
+    parse_report,
+)
 
 
 def _resp(columns, rows):
@@ -122,3 +127,22 @@ def test_build_query_monthly_aggregates_countries():
     q = build_query(["2024"], timeline="Monthly", break_countries=False)
     assert q["searchOptions"]["componentSettings"]["yearsTimeline"] == "Monthly"
     assert q["searchOptions"]["countries"]["aggregation"] == "Aggregate Countries"
+
+
+def test_parse_monthly_by_origin_crosstab():
+    # Country column + Year column + bare month names; one row per (country, year).
+    resp = _resp_crosstab(
+        ["Country", "Year", "January", "February"],
+        [["Brazil", "2024", "1,000,000", "1,100,000"],
+         ["Brazil", "2025", "1,050,000", "--"],
+         ["Colombia", "2024", "500,000", "600,000"],
+         ["Total", "2024", "1,500,000", "1,700,000"]],
+    )
+    out = parse_monthly_by_origin(resp)
+    assert out["Brazil"] == {"2024-01": 1000.0, "2024-02": 1100.0, "2025-01": 1050.0}
+    assert out["Colombia"] == {"2024-01": 500.0, "2024-02": 600.0}
+    assert "Total" not in out          # total row excluded
+
+
+def test_parse_monthly_by_origin_empty():
+    assert parse_monthly_by_origin({}) == {}
