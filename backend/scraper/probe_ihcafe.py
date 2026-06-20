@@ -28,11 +28,8 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
 INDEX_URLS = [
+    "https://ihcafe.hn/comercializacion-de-cafe/",
     "https://www.ihcafe.hn/mdocuments-library/?mdocs-cat=mdocs-cat-2",
-    "https://www.ihcafe.hn/mdocuments-library-2/",
-    "https://www.ihcafe.hn/publicaciones/",
-    "https://ihcafe.hn/exportaciones/",
-    "https://www.ihcafe.hn/",
 ]
 
 
@@ -50,7 +47,7 @@ async def main() -> None:
     from bs4 import BeautifulSoup
     from playwright.async_api import async_playwright
 
-    all_links: set[str] = set()
+    candidates: list[str] = []
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         ctx = await browser.new_context(user_agent=UA, locale="es-HN")
@@ -59,48 +56,50 @@ async def main() -> None:
         for url in INDEX_URLS:
             try:
                 await page.goto(url, wait_until="domcontentloaded", timeout=45_000)
-                await page.wait_for_timeout(2_500)
+                await page.wait_for_timeout(4_000)
                 html = await page.content()
             except Exception as e:  # noqa: BLE001
                 print(f"[probe] {url} → {type(e).__name__}: {e}")
                 continue
-            links = [a.get("href") for a in BeautifulSoup(html, "html.parser").find_all("a", href=True)]
-            cand = sorted({h for h in links if h and (".pdf" in h.lower()
-                          or "mdocs-file" in h or "comercializ" in h.lower())})
-            print(f"\n[probe] {url}\n        {len(links)} links, {len(cand)} candidate price/doc links")
-            for h in cand[:30]:
-                print("   ", h)
-            all_links.update(cand)
+            anchors = BeautifulSoup(html, "html.parser").find_all("a", href=True)
+            print(f"\n[probe] {url}  ({len(anchors)} links)")
+            for a in anchors:
+                h = a["href"]
+                txt = a.get_text(" ", strip=True)[:80]
+                if "mdocs-file" in h or ".pdf" in h.lower() or "comercializ" in (h + txt).lower():
+                    print(f"   {h}   «{txt}»")
+                    if "mdocs-file" in h or ".pdf" in h.lower():
+                        candidates.append(h if h.startswith("http") else "https://ihcafe.hn" + h)
 
-        bols = [h for h in all_links if "comercializ" in h.lower() and ".pdf" in h.lower()]
-        bols.sort(key=_date_key, reverse=True)
-        print(f"\n[probe] {len(bols)} 'Comercializacion' bulletin PDFs found:")
-        for h in bols[:12]:
-            print("   BOL", h)
+        # de-dup, keep order; always include the known recent doc.
+        seen, ordered = set(), []
+        for h in ["https://ihcafe.hn/?mdocs-file=6940", *candidates]:
+            if h not in seen:
+                seen.add(h); ordered.append(h)
 
-        if bols:
-            pdf_url = bols[0] if bols[0].startswith("http") else "https://www.ihcafe.hn" + bols[0]
-            print(f"\n[probe] downloading latest bulletin: {pdf_url}")
+        import pdfplumber
+        for url in ordered[:4]:
+            print(f"\n[probe] download {url}")
             try:
-                resp = await page.request.get(pdf_url, timeout=40_000)
+                resp = await page.request.get(url, timeout=40_000)
                 content = await resp.body()
-                (DEBUG / "latest_boletin.pdf").write_bytes(content)
-                print(f"[probe] PDF {len(content)} bytes (HTTP {resp.status})")
-                import pdfplumber
+                ctype = resp.headers.get("content-type", "")
+                print(f"   HTTP {resp.status}  {len(content)} bytes  {ctype}")
+                if content[:4] != b"%PDF":
+                    print(f"   not a PDF (starts {content[:16]!r}) — skipping parse")
+                    continue
+                fn = re.sub(r"[^0-9a-zA-Z]+", "_", url)[-40:]
+                (DEBUG / f"{fn}.pdf").write_bytes(content)
                 with pdfplumber.open(io.BytesIO(content)) as pdf:
                     text = "\n".join((p.extract_text() or "") for p in pdf.pages[:4])
-                (DEBUG / "latest_boletin.txt").write_text(text, encoding="utf-8")
-                print(f"\n=== BULLETIN TEXT (first 3500 chars of {len(text)}) ===")
-                print(text[:3500])
-                # Lines that look like a price (saco / 46 / $ / precio).
-                print("\n=== price-ish lines ===")
+                print(f"   === PDF TEXT (first 2500 of {len(text)}) ===")
+                print(text[:2500])
+                print("   === price-ish lines ===")
                 for ln in text.splitlines():
                     if re.search(r"(precio|saco|46|export|US\$|\$|qq|quintal)", ln, re.I) and re.search(r"\d", ln):
-                        print("   ", ln.strip()[:160])
+                        print("     ", ln.strip()[:160])
             except Exception as e:  # noqa: BLE001
-                print(f"[probe] PDF fetch/parse failed: {type(e).__name__}: {e}")
-        else:
-            print("[probe] no comercializacion bulletin PDF link found on the index pages")
+                print(f"   fetch/parse failed: {type(e).__name__}: {e}")
 
         await ctx.close()
         await browser.close()
