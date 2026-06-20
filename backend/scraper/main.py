@@ -34,6 +34,7 @@ from scraper.sources import (
 from scraper.sources import colombia as _colombia
 from scraper.sources import colombia_weather as _colombia_weather
 from scraper.sources import dry_bulk as _dry_bulk
+from scraper.sources import guatemala as _guatemala
 from scraper.sources import ethiopia as _ethiopia
 from scraper.sources import ethiopia_weather as _ethiopia_weather
 from scraper.sources import farmer_economics as _farmer_economics
@@ -44,10 +45,10 @@ from scraper.sources import macro_cot as _macro_cot
 from scraper.sources import population as _population
 from scraper.sources import uganda_weather as _uganda_weather
 
-# NOTE: _guatemala (ANACAFE) is intentionally NOT in the daily pipeline yet —
-# it's exercised by the standalone "Probe: ANACAFE" workflow until the live
-# fetch is proven, then it gets added here.
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia]
+# _guatemala (ANACAFE) proven live via the "Probe: ANACAFE" workflow (run #1:
+# egress 200, RESULT PASS — 3 grades via the formula fallback), now in the daily
+# suite. The standalone probe-anacafe.yml workflow stays for ad-hoc re-checks.
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia, _guatemala]
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 
