@@ -18,8 +18,18 @@ from scraper.validate_export import (
 )
 
 
-def export_health(db) -> None:
-    """Write health.json: last successful DB write timestamp per scraper."""
+def export_health(db, *, exporters_published_at: dict[str, str] | None = None) -> None:
+    """Write health.json: last successful DB write per scraper + last
+    successful publish per exporter topic.
+
+    `exporters_published_at` is the map the orchestrator builds during
+    its per-topic loop ({topic: iso_ts} for topics that published on
+    this run). Topics that didn't run on this invocation (because the
+    --only slice excluded them, or because they raised) keep their
+    previous timestamp from the existing health.json — preserved by a
+    defensive merge below, so a 1-topic --only run doesn't blow away
+    the other topics' freshness signals.
+    """
 
     def _ts(val) -> str | None:
         if val is None:
@@ -205,10 +215,29 @@ def export_health(db) -> None:
     _aa = (_cr.get("monthly") or {}).get("age_allowance") or []
     scrapers["ice_robusta_age_allowance"] = _aa[-1].get("month_end") if _aa else None
 
-    healthy = sum(1 for v in scrapers.values() if v)
+    # Per-exporter timestamps — when did each topic in workflow 1.4 last
+    # publish successfully? Merge-with-previous, so a partial (--only) run
+    # or a single-topic failure doesn't blow away the rest of the map.
+    # Fresh successes overwrite; previous values survive when the topic
+    # didn't run or failed on this invocation.
+    existing_exporters: dict[str, str | None] = {}
+    try:
+        prev = json.loads((OUT_DIR / "health.json").read_text(encoding="utf-8"))
+        existing_exporters = prev.get("exporters") or {}
+    except Exception:
+        # First run, file missing/unreadable → empty baseline.
+        pass
+    exporters_map: dict[str, str | None] = {
+        **existing_exporters,
+        **(exporters_published_at or {}),
+    }
+
+    healthy   = sum(1 for v in scrapers.values() if v)
+    published = sum(1 for v in exporters_map.values() if v)
     result = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "scrapers":     scrapers,
+        "exporters":    exporters_map,
     }
     # Phase 3 sunset signal — present only when latest_prices had to use the
     # legacy regex fallback. CI/ops can alert on this; once it stays absent we
@@ -218,4 +247,7 @@ def export_health(db) -> None:
 
     path = OUT_DIR / "health.json"
     safe_write_json(path, result, validate_health)
-    print(f"  health.json → {healthy}/{len(scrapers)} scrapers have data")
+    print(
+        f"  health.json → {healthy}/{len(scrapers)} scrapers + "
+        f"{published}/{len(exporters_map)} exporters tracked"
+    )
