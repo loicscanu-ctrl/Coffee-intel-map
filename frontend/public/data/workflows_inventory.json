@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T17:51:47.809938Z",
+  "generated_at": "2026-06-21T14:49:10.270282Z",
   "count": 56,
   "workflows": [
     {
@@ -160,7 +160,7 @@
     },
     {
       "file": "check-scrapers-freshness.yml",
-      "name": "1.5 \u2013 Check Scrapers Freshness",
+      "name": "1.5 \u2013 Check Data Pipeline Freshness",
       "triggers": [
         "schedule",
         "workflow_dispatch"
