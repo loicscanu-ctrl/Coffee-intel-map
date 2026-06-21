@@ -4,13 +4,24 @@ export_static_json.py — thin orchestrator.
 Queries the database and exports static JSON files consumed directly by the
 Vercel frontend (no live Render API call at page load). The per-topic exporters
 live in scraper/exporters/<domain>.py; this module only owns the topic registry
-(`_exporters`) and the run loop (`main`, with `--only` topic slicing).
+(`_exporters`) and the run loop (`_run_exporters`, with `--only` topic slicing
+and per-topic failure isolation).
 
     cd backend
     python -m scraper.export_static_json [--only cot,latest_prices,…]
+
+Failure isolation
+=================
+Every topic exporter is invoked inside a try/except. A broken `cot` exporter
+will no longer abort `news`, `freight`, `weather`, etc. — each topic runs
+independently and the orchestrator logs which ones skipped. The `health`
+exporter then runs last with the per-topic success map (`exporters_published_at`)
+so a silently-failed topic shows up as stale in `health.json` and the daily
+freshness workflow (1.5) raises a Telegram alert on the next cycle.
 """
 
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -46,30 +57,24 @@ def _exporters(db):
     the topics it actually affects, avoiding a full 22-topic re-export on every
     run. `health` always runs so the freshness manifest stays current.
 
+    The exporters here raise on failure; the orchestrator's _run_exporters
+    catches and reports per-topic. That replaces the older pattern of inline
+    try/except wrappers around individual entries (news, country_pins,
+    enso) — those entries no longer special-case their failures because the
+    outer loop handles every topic uniformly.
+
     oi_history.json is owned solely by the Daily OI workflow (1.3) and is NOT
     exported here (avoids clobbering 1.3's fresher copy with a stale one).
     """
     from scraper.sources.origin_prices_history import export_origin_prices_history
 
-    def _news():  # map feed — defensive: must not abort the rest of the publish
-        try:
-            export_news(db)
-        except Exception as e:  # noqa: BLE001
-            print(f"  news.json → skipped ({e})")
-
     def _country_pins():
-        try:
-            from scraper.build_country_pins import export_country_pins
-            export_country_pins()
-        except Exception as e:  # noqa: BLE001
-            print(f"  countries.json → skipped ({e})")
+        from scraper.build_country_pins import export_country_pins
+        export_country_pins()
 
     def _enso_intel():
-        try:
-            from scraper.build_enso_intel import export_enso_intel
-            export_enso_intel()
-        except Exception as e:  # noqa: BLE001
-            print(f"  enso.json → skipped ({e})")
+        from scraper.build_enso_intel import export_enso_intel
+        export_enso_intel()
 
     return [
         ("futures_chain",         lambda: export_futures_chain(db)),
@@ -93,11 +98,34 @@ def _exporters(db):
         ("latest_prices",         lambda: export_latest_prices(db)),
         ("vn_physical_prices",    lambda: export_vn_physical_prices(db)),
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
-        ("news",                  _news),
+        ("news",                  lambda: export_news(db)),
         ("country_pins",          _country_pins),
         ("enso",                  _enso_intel),
-        ("health",                lambda: export_health(db)),
+        # `health` is intentionally absent — main() runs it after the loop so
+        # it can see which other topics published successfully on this run.
     ]
+
+
+def _run_exporters(db, only_set: set[str] | None) -> dict[str, str]:
+    """Run each topic exporter inside a try/except. Returns {topic: iso_ts}
+    for the topics that published successfully on this invocation.
+
+    A topic that raises is logged to stderr and omitted from the returned
+    map — the remaining topics still run. The outer caller passes the map
+    to export_health so health.json's per-exporter timestamps reflect what
+    actually published.
+    """
+    published_at: dict[str, str] = {}
+    for key, fn in _exporters(db):
+        if only_set is not None and key not in only_set:
+            continue
+        try:
+            fn()
+        except Exception as e:  # noqa: BLE001 — isolate one topic from the rest
+            print(f"  {key} → skipped ({type(e).__name__}: {e})", file=sys.stderr)
+            continue
+        published_at[key] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+    return published_at
 
 
 def main(only=None):
@@ -105,18 +133,18 @@ def main(only=None):
     if only_set is not None:
         # Validate before opening a DB session (building the registry with a
         # None db only reads the keys — the exporters aren't invoked).
-        known = [k for k, _ in _exporters(None)]
-        unknown = only_set - set(known)
+        known = {k for k, _ in _exporters(None)} | {"health"}
+        unknown = only_set - known
         if unknown:
-            raise SystemExit(f"Unknown export topic(s): {', '.join(sorted(unknown))}. Known: {', '.join(known)}")
+            raise SystemExit(f"Unknown export topic(s): {', '.join(sorted(unknown))}. Known: {', '.join(sorted(known))}")
     print(f"Exporting static JSON files... [{'full' if only_set is None else ','.join(sorted(only_set))}]")
     db = SessionLocal()
     try:
-        for key, fn in _exporters(db):
-            # `health` always runs so the freshness manifest reflects this publish.
-            if only_set is not None and key != "health" and key not in only_set:
-                continue
-            fn()
+        published_at = _run_exporters(db, only_set)
+        # health always runs last — its freshness manifest reflects the topics
+        # that just published. Passing exporters_published_at lets it record
+        # per-topic success/failure independently of the per-scraper signal.
+        export_health(db, exporters_published_at=published_at)
     finally:
         db.close()
     print(f"Done → {OUT_DIR}")
