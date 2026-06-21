@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-06-20T06:51:02.603372+00:00",
+  "scraped_at": "2026-06-21T07:20:58.797300+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-04",
@@ -753,7 +753,7 @@
   },
   "ucda_price": {
     "usd_cwt": 172.75,
-    "as_of": "2026-06-20",
+    "as_of": "2026-06-21",
     "grade": "Screen 15",
     "grades": {
       "Screen 15": 172.75,
@@ -762,13 +762,13 @@
     }
   },
   "weather": {
-    "scraped_at": "2026-06-20T03:11:54.077923Z",
+    "scraped_at": "2026-06-21T03:10:38.701952Z",
     "regions": [
       {
         "name": "Kasese",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.606,
+        "csi_60d": 0.63,
         "csi_30d_level": "OK",
         "csi_60d_level": "HIGH"
       },
@@ -776,7 +776,7 @@
         "name": "Mbale",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.046,
+        "csi_60d": 0.094,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW"
       },
@@ -787,15 +787,15 @@
         "csi_60d": 0.0,
         "csi_30d_level": "OK",
         "csi_60d_level": "OK",
-        "rain_mtd_mm": 52.7,
-        "rain_hist_min": 110.7,
-        "rain_hist_max": 377.9
+        "rain_mtd_mm": 61.0,
+        "rain_hist_min": 126.0,
+        "rain_hist_max": 386.3
       },
       {
         "name": "Rwenzori",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.56,
+        "csi_60d": 0.584,
         "csi_30d_level": "OK",
         "csi_60d_level": "HIGH"
       },
@@ -803,7 +803,7 @@
         "name": "Masaka",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.326,
+        "csi_60d": 0.35,
         "csi_30d_level": "OK",
         "csi_60d_level": "MED"
       }
@@ -812,7 +812,6 @@
       {
         "region": "Kasese",
         "days": [
-          "-",
           "-",
           "-",
           "-",
@@ -875,7 +874,8 @@
           "M",
           "H",
           "H",
-          "H",
+          "M",
+          "M",
           "H",
           "H",
           "H"
@@ -917,8 +917,6 @@
           "-",
           "-",
           "-",
-          "-",
-          "-",
           "L",
           "L",
           "L",
@@ -948,9 +946,11 @@
           "M",
           "M",
           "M",
+          "M",
+          "M",
           "L",
-          "L",
-          "L"
+          "M",
+          "M"
         ]
       },
       {
@@ -989,7 +989,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -1019,7 +1018,8 @@
           "L",
           "L",
           "L",
-          "-",
+          "L",
+          "L",
           "-",
           "-",
           "-"
@@ -1061,38 +1061,38 @@
           "-",
           "-",
           "-",
+          "L",
+          "L",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
+          "M",
           "-",
-          "L",
-          "L",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
-          "M",
+          "-",
           "M",
           "M"
         ]
@@ -1133,7 +1133,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "M",
           "M",
@@ -1152,6 +1151,7 @@
           "L",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -1288,7 +1288,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Uganda coffee output expected",
-    "last_updated": "2026-06-20"
+    "last_updated": "2026-06-21"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Feb",
