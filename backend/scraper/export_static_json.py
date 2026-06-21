@@ -110,10 +110,30 @@ def _run_exporters(db, only_set: set[str] | None) -> dict[str, str]:
     """Run each topic exporter inside a try/except. Returns {topic: iso_ts}
     for the topics that published successfully on this invocation.
 
-    A topic that raises is logged to stderr and omitted from the returned
+    A topic that raises is logged + annotated and omitted from the returned
     map — the remaining topics still run. The outer caller passes the map
     to export_health so health.json's per-exporter timestamps reflect what
     actually published.
+
+    DB session safety
+    =================
+    SQLAlchemy leaves a Session in an aborted-transaction state after a
+    query raises — the next query attempt then fails with "This Session's
+    transaction has been rolled back due to a previous exception" until
+    rollback() is called. Without an explicit rollback per failure, this
+    function's "isolation" would cascade the failure to every subsequent
+    DB-touching exporter. The rollback() is always safe: no-op when no
+    transaction is active, and we swallow any rollback-itself error so
+    the loop continues even if the DB is unreachable mid-run.
+
+    Failure surfacing
+    =================
+    Each failure prints a GitHub Actions error annotation in addition to
+    the stderr log line. The annotation shows red in the Actions UI but
+    does NOT change the job's exit code — so downstream workflow_run
+    chains (redeploy-vercel, morning-brief) still fire normally with the
+    topics that did publish. The persistent-failure signal lives in
+    health.json["exporters"] and the daily 1.5 freshness check.
     """
     published_at: dict[str, str] = {}
     for key, fn in _exporters(db):
@@ -122,7 +142,16 @@ def _run_exporters(db, only_set: set[str] | None) -> dict[str, str]:
         try:
             fn()
         except Exception as e:  # noqa: BLE001 — isolate one topic from the rest
+            # GitHub Actions annotation — red in the UI, doesn't fail the job.
+            print(f"::error title=Exporter {key} failed::{type(e).__name__}: {e}", file=sys.stderr)
+            # Human-readable log line for raw stderr / non-GHA runs.
             print(f"  {key} → skipped ({type(e).__name__}: {e})", file=sys.stderr)
+            # Reset the session so the NEXT exporter's queries don't fail
+            # against an aborted transaction (see docstring).
+            try:
+                db.rollback()
+            except Exception:  # noqa: BLE001 — best-effort; loop must continue
+                pass
             continue
         published_at[key] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     return published_at
