@@ -52,13 +52,29 @@ ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 OUT_PATH = DATA_DIR / "enso_thermocline.json"
 
-ERDDAP_BASE = "https://upwell.pmel.noaa.gov/erddap/tabledap"
+# Multiple ERDDAP HOSTS — the v1 dispatch on 22 Jun 2026 surfaced
+# that `upwell.pmel.noaa.gov` no longer resolves (PMEL decommissioned
+# their ERDDAP instance ~2024 and the TAO/TRITON data migrated to
+# OSMC and the NMFS PFEG mirrors). Walk all known equivalent hosts.
+ERDDAP_HOSTS = [
+    # OSMC (Ocean Systems Monitoring Center) — took over TAO data
+    # management from PMEL ~2014. Most likely current home.
+    "https://osmc.noaa.gov/erddap",
+    # CoastWatch West Coast — long-running mirror of many PMEL datasets.
+    "https://coastwatch.pfeg.noaa.gov/erddap",
+    # NMFS PFEG Santa Cruz — sibling mirror to CoastWatch.
+    "https://upwell.pfeg.noaa.gov/erddap",
+    # Pacific Coastal & Marine ERDDAP — another candidate mirror.
+    "https://erddap.aoml.noaa.gov/hdb/erddap",
+    # Legacy PMEL — kept in case NOAA brings the service back.
+    "https://upwell.pmel.noaa.gov/erddap",
+]
 
-# Multiple PMEL ERDDAP dataset IDs to try in order. NOAA renames
-# datasets occasionally (the v1 PMEL WWV path 404'd because of just
-# such a rename); the URL-candidate pattern rides through that.
-# Monthly resolution is plenty for the Kelvin-wave horizon and keeps
-# the CSV small enough to parse fast.
+# Multiple PMEL ERDDAP dataset IDs to try in order. The IDs survived
+# the host migration on most mirrors (they kept the same names for
+# backward compatibility), so the cross-product host × dataset
+# (5 × 5 = 25 candidates) covers a wide search space without a code
+# change when NOAA next reshuffles.
 DATASET_CANDIDATES = [
     "pmelTaoMonT",       # Monthly subsurface T — most common ID
     "pmelTaoMonsT",      # Variant naming
@@ -149,7 +165,7 @@ def _fetch(url: str, *, timeout: int = 60) -> str | None:
     return resp.text
 
 
-def _build_query(dataset_id: str) -> str:
+def _build_query(host: str, dataset_id: str) -> str:
     """ERDDAP tabledap CSV query for equatorial Pacific subsurface T.
 
     Each filter is a constraint expression (NOT a key=value param).
@@ -158,24 +174,34 @@ def _build_query(dataset_id: str) -> str:
     column this dataset uses (variants: T_25, T_20, T, temperature).
     """
     return (
-        f"{ERDDAP_BASE}/{dataset_id}.csv"
+        f"{host}/tabledap/{dataset_id}.csv"
         f"?&latitude>=-1&latitude<=1"
         f"&depth>={DEPTH_LOWER}&depth<={DEPTH_UPPER}"
         f"&time>={HISTORY_START_DATE}"
     )
 
 
-def _fetch_first_ok(datasets: list[str]) -> tuple[str | None, str | None]:
-    """Walk the dataset-ID candidate list, return (csv_text, winning_id)
-    for the first 200 response. (None, None) when all fail. Logs the
-    winner — operator should see which PMEL dataset NOAA is currently
-    serving without diffing the JSON."""
-    for ds in datasets:
-        url = _build_query(ds)
-        text = _fetch(url)
-        if text:
-            logger.info(f"[therm] fetched OK: {ds} ({len(text):,} bytes)")
-            return text, ds
+def _fetch_first_ok(
+    hosts: list[str],
+    datasets: list[str],
+) -> tuple[str | None, str | None]:
+    """Walk the host × dataset cross-product, return (csv_text,
+    "host/dataset_id") for the first 200 response. (None, None) when
+    all fail. Logs the winner so the operator sees which ERDDAP
+    server NOAA is currently serving TAO data from — useful when
+    PMEL/OSMC/NMFS reshuffle ownership again.
+
+    Outer loop is hosts (we'd rather find an alive ERDDAP server
+    that happens to use a less-preferred dataset ID than waste time
+    checking dead hosts with five different IDs each)."""
+    for host in hosts:
+        for ds in datasets:
+            url = _build_query(host, ds)
+            text = _fetch(url)
+            if text:
+                tag = f"{host}/{ds}"
+                logger.info(f"[therm] fetched OK: {tag} ({len(text):,} bytes)")
+                return text, tag
     return None, None
 
 
@@ -412,7 +438,7 @@ def run(*, write: bool, backfill: bool, diag: bool = False) -> int:
     mode = "backfill" if backfill else "refresh"
     logger.info(f"[therm] mode={mode}")
 
-    text, dataset_id = _fetch_first_ok(DATASET_CANDIDATES)
+    text, dataset_id = _fetch_first_ok(ERDDAP_HOSTS, DATASET_CANDIDATES)
 
     if diag:
         if text:
