@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-22T15:16:03.823441Z",
-  "count": 58,
+  "generated_at": "2026-06-22T16:50:39.403023Z",
+  "count": 59,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -512,6 +512,20 @@
       ],
       "crons": [
         "45 6 * * 2"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "scraper-enso-thermocline.yml",
+      "name": "0.9 \u2013 Weekly \u2014 ENSO thermocline (TAO/TRITON 150m \u00b7 NOAA PMEL ERDDAP)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0 7 * * 2"
       ],
       "workflow_run_deps": [],
       "concurrency_group": null,
