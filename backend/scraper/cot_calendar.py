@@ -141,6 +141,21 @@ def release_due_on(today: date) -> tuple[bool, date | None, str]:
     return False, None, f"no CFTC COT release expected on {today}"
 
 
+def next_report_overdue(last_ingested_tuesday: date, today: date) -> bool:
+    """Is the report *after* `last_ingested_tuesday` genuinely overdue?
+
+    The COT scraper no-ops while CFTC hasn't published the next report yet
+    (normal mid-week, or a holiday delay). It should only hard-fail / alert on a
+    real CFTC outage. We compute the holiday-aware expected release date of the
+    next report and consider it overdue once `today` is more than one day past
+    it — that one-day grace absorbs the 15:30-ET publish time and same-day
+    runs, so a normal holiday shift (e.g. Juneteenth pushing Fri→Mon) never
+    trips the alert, while a release that's genuinely days late still does.
+    """
+    next_tue = last_ingested_tuesday + timedelta(days=7)
+    return today > cot_release_date(next_tue) + timedelta(days=1)
+
+
 def main(argv: list[str] | None = None) -> int:
     """Workflow gate. Prints status and writes `due`/`report_tuesday` to
     GITHUB_OUTPUT so the COT scraper steps can run only on a real release day.

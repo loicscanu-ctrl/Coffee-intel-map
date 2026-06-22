@@ -715,27 +715,33 @@ def _fetch_and_upsert(db) -> None:
     print(f"[macro_cot] report dates in this run: {dates_seen}", file=sys.stderr)
 
     # Guard: if downloaded arabica date is not newer than DB, CFTC hasn't
-    # published yet. This is the normal state Mon/Tue/Wed/Thu — CFTC posts
-    # Friday-afternoon for the prior Tuesday's positions, so any run before
-    # Friday afternoon will see "no new data". Don't fail — just no-op the
-    # upsert phase. We only escalate if the gap exceeds 12 days, which would
-    # mean a real CFTC outage worth alerting on.
+    # published yet. This is the normal state mid-week — CFTC posts ~15:30 ET on
+    # the report week's Friday (or, when a US federal holiday falls in that week,
+    # on the holiday-shifted business day). Don't fail — just no-op the upsert
+    # phase. We only escalate to a hard error when the *next* report is genuinely
+    # overdue against its holiday-aware expected release date, so a normal
+    # holiday delay (e.g. Juneteenth pushing Fri→Mon, a legit ~13-day gap) no
+    # longer false-alarms the way a fixed day-count threshold did.
     new_arabica_date = cot_data.get("arabica", (None,))[0]
     if prev_arabica_date is not None and new_arabica_date is not None and new_arabica_date <= prev_arabica_date:
-        try:
-            gap_days = (date.today() - prev_arabica_date).days
-        except Exception:
-            gap_days = 0
-        if gap_days > 12:
+        from scraper.cot_calendar import cot_release_date, next_report_overdue
+
+        today = date.today()
+        gap_days = (today - prev_arabica_date).days
+        next_report_tue = prev_arabica_date + timedelta(days=7)
+        expected_release = cot_release_date(next_report_tue)
+        if next_report_overdue(prev_arabica_date, today):
             raise ValueError(
                 f"[macro_cot] DB COT data is {gap_days} days stale "
-                f"(latest={prev_arabica_date}, downloaded={new_arabica_date}). "
-                "CFTC may be having a real outage — investigate."
+                f"(latest={prev_arabica_date}, downloaded={new_arabica_date}); "
+                f"the {next_report_tue} report was due {expected_release} and is "
+                "still missing — CFTC may be having a real outage, investigate."
             )
         print(
             f"[macro_cot] no new COT data yet — DB has {prev_arabica_date}, "
-            f"downloaded {new_arabica_date} (gap {gap_days} d). "
-            "Normal mid-week; CFTC publishes Fridays. Skipping upsert.",
+            f"downloaded {new_arabica_date} (gap {gap_days} d). Next report "
+            f"({next_report_tue}) is due {expected_release}; not published yet. "
+            "Skipping upsert.",
             file=sys.stderr,
         )
         return

@@ -6,6 +6,7 @@ from scraper.cot_calendar import (
     add_business_days,
     cot_release_date,
     holiday_name,
+    next_report_overdue,
     release_due_on,
     us_federal_holidays,
 )
@@ -74,3 +75,29 @@ def test_weekend_holiday_observance_shift():
 
 def test_eleven_federal_holidays_per_year():
     assert len(us_federal_holidays(2026)) == 11
+
+
+# ── Staleness guard: holiday-aware "genuinely overdue?" check ──────────────────
+
+def test_juneteenth_delay_not_flagged_overdue():
+    # The false-alarm case. DB has 2026-06-09; next report (2026-06-16) is due
+    # 2026-06-22 (Juneteenth-shifted). On 06-22 it's not yet overdue, so the
+    # scraper should no-op rather than raise — even though the raw gap is 13 days.
+    assert next_report_overdue(date(2026, 6, 9), date(2026, 6, 22)) is False
+    assert (date(2026, 6, 22) - date(2026, 6, 9)).days == 13  # old >12 threshold would have fired
+
+
+def test_overdue_when_release_genuinely_late():
+    # Two days past the Juneteenth-shifted release with still no data → real outage.
+    assert next_report_overdue(date(2026, 6, 9), date(2026, 6, 24)) is True
+
+
+def test_not_overdue_midweek_normal():
+    # DB has Tue 2026-07-07 (released Fri 07-10). Mid-week Wed 07-15 the next
+    # report (07-14, due 07-17) isn't out yet — normal, not overdue.
+    assert next_report_overdue(date(2026, 7, 7), date(2026, 7, 15)) is False
+
+
+def test_overdue_normal_week_two_days_late():
+    # Next report 2026-07-14 due Fri 07-17; by Mon 07-20 it's >1 day late → overdue.
+    assert next_report_overdue(date(2026, 7, 7), date(2026, 7, 20)) is True
