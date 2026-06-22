@@ -2,9 +2,14 @@ name: "2.3 – COT Scraper"
 
 on:
   schedule:
-    # 20:00 UTC Friday = 3:00 PM ET winter / 4:00 PM ET summer
-    # CFTC releases every Friday at 3:30 PM ET — run at 20:00 UTC, retry manually if data not yet published.
-    - cron: '0 20 * * 5'
+    # Run every weekday at 21:00 UTC. CFTC releases the COT at 15:30 ET, which
+    # is 19:30 UTC (summer) / 20:30 UTC (winter) — 21:00 clears both. The
+    # "Decide" step below gates the actual pull to the real release day using a
+    # US-federal-holiday calendar, so on a normal week only Friday runs, and a
+    # holiday-delayed release (e.g. Juneteenth on a Friday → release shifts to
+    # Monday) is picked up automatically on the day it lands instead of waiting
+    # a full week. Non-release weekdays are cheap no-op skips.
+    - cron: '0 21 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -23,12 +28,22 @@ jobs:
           cache: 'pip'
           cache-dependency-path: backend/scraper/requirements.txt
 
+      # Gate: only pull on the day the CFTC report is actually due — the normal
+      # Friday, or the holiday-shifted business day (stdlib-only, no deps yet).
+      # Manual workflow_dispatch always proceeds (used for backfills/re-runs).
+      - name: Decide whether a COT release is due today
+        id: decide
+        working-directory: backend
+        run: python -m scraper.cot_calendar
+
       - name: Install Python dependencies
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.decide.outputs.due == 'true' }}
         working-directory: backend
         # jinja2 added so `_cot_commentary` can render the news-feed badge.
         run: pip install sqlalchemy psycopg2-binary pandas requests yfinance python-dotenv jinja2
 
       - name: Run macro COT scraper (3 attempts)
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.decide.outputs.due == 'true' }}
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -39,6 +54,7 @@ jobs:
           done
 
       - name: Run Coffee COT scraper (3 attempts)
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.decide.outputs.due == 'true' }}
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -54,6 +70,7 @@ jobs:
       # OI + price into the archive, so the rebuild sets the latest COT-Tuesday
       # price here. Idempotent; only changed rows are written.
       - name: Rebuild COT prices from archive (true max-OI)
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.decide.outputs.due == 'true' }}
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
