@@ -7,6 +7,7 @@ import { cachedFetchStatic } from "@/lib/api";
 import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
+import EnsoExplainer from "./EnsoExplainer";
 
 type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "certstocks" | "demand";
 const CATS: { id: Cat; label: string }[] = [
@@ -1529,7 +1530,12 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <CotBacktestReport />
         </div>
       )}
-      {cat === "weather" && <FrostRiskMethodology />}
+      {cat === "weather" && (
+        <div className="space-y-4">
+          <EnsoExplainer />
+          <FrostRiskMethodology />
+        </div>
+      )}
       {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
       {cat === "agronomy"  && <AgronomyArticles />}
