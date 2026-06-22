@@ -884,13 +884,19 @@ interface DestPort {
   weightLossPct: number;            // one-off, % of goods value
   insurancePctPerWeek?: number;     // % of goods value per week in store
   defaultTransitDays: number;       // Vietnam → port (editable)
+  // Ocean freight (VN → port) is derived from the Freight tab's FBX11
+  // North-Europe base × this multiplier — same FBX-multiplier method the
+  // freight section uses for its estimated corridors. Marked proxy where the
+  // lane deviates from the FBX11 basket (Mediterranean, Oceania).
+  freightMult: number;
+  freightProxy?: boolean;
 }
 
 // Indicative warehouse quotes. Per-container lines are pre-divided by 21.6 mt.
 const DEST_PORTS: DestPort[] = [
   {
     key: "bremen", region: "North Europe · Germany", port: "Bremen", warehouseLabel: "Vollers",
-    currency: "EUR", weightLossPct: 0.50, defaultTransitDays: 42,
+    currency: "EUR", weightLossPct: 0.50, defaultTransitDays: 42, freightMult: 1.02,
     blurb: "Bremen tips the box to silo in bulk and delivers ex-silo FCA Bremen, so the chain carries two handling legs plus OTA sampling and a reweighing.",
     portLines: [],
     warehouses: [{
@@ -907,7 +913,7 @@ const DEST_PORTS: DestPort[] = [
   },
   {
     key: "lehavre", region: "North Europe · France", port: "Le Havre", warehouseLabel: "Sealogis",
-    currency: "EUR", weightLossPct: 0.10, insurancePctPerWeek: 0.03, defaultTransitDays: 38,
+    currency: "EUR", weightLossPct: 0.10, insurancePctPerWeek: 0.03, defaultTransitDays: 38, freightMult: 1.00,
     blurb: "Le Havre bundles the inland move, weighing and bulk handling into one CIF-to-in-store line on top of DTHC/DO; storage and an in-store insurance accrue weekly.",
     portLines: [],
     warehouses: [{
@@ -920,7 +926,7 @@ const DEST_PORTS: DestPort[] = [
   },
   {
     key: "barcelona", region: "South Europe · Spain", port: "Barcelona", warehouseLabel: "Molenberg",
-    currency: "EUR", weightLossPct: 0.50, defaultTransitDays: 45,
+    currency: "EUR", weightLossPct: 0.50, defaultTransitDays: 45, freightMult: 1.08, freightProxy: true,
     blurb: "Barcelona is the leanest European stack — DTHC/DO plus a single combined haulage-and-weight line. No storage quoted.",
     portLines: [],
     warehouses: [{
@@ -932,7 +938,7 @@ const DEST_PORTS: DestPort[] = [
   },
   {
     key: "genoa", region: "South Europe · Italy", port: "Genoa",
-    currency: "EUR", weightLossPct: 0.10, defaultTransitDays: 53,
+    currency: "EUR", weightLossPct: 0.10, defaultTransitDays: 53, freightMult: 1.10, freightProxy: true,
     blurb: "Genoa shares a port-level DTHC/DO and a 0.10% re-bagging weight-loss, then splits across the Romani and Pacorini warehouses — each bundling haulage, weighing and bulk into one line, with re-bagging into 1.2 mt big-bags and storage per 15 days.",
     portLines: [{ label: "DTHC + DO (port)", v: 12.27, note: "€265/container ÷ 21.6 mt" }],
     warehouses: [
@@ -948,7 +954,7 @@ const DEST_PORTS: DestPort[] = [
   },
   {
     key: "trieste", region: "South Europe · Italy", port: "Trieste",
-    currency: "EUR", weightLossPct: 0.10, defaultTransitDays: 55,
+    currency: "EUR", weightLossPct: 0.10, defaultTransitDays: 55, freightMult: 1.12, freightProxy: true,
     blurb: "Trieste mirrors Genoa's structure — a shared DTHC/DO and 0.10% re-bagging weight-loss, then Romani and Pacorini warehouses with storage quoted per week.",
     portLines: [{ label: "DTHC + DO (port)", v: 16.94, note: "€366/container ÷ 21.6 mt" }],
     warehouses: [
@@ -964,7 +970,7 @@ const DEST_PORTS: DestPort[] = [
   },
   {
     key: "melbourne", region: "Oceania · Australia", port: "Melbourne", warehouseLabel: "Geodis",
-    currency: "USD", weightLossPct: 0, defaultTransitDays: 18,
+    currency: "USD", weightLossPct: 0, defaultTransitDays: 18, freightMult: 0.30, freightProxy: true,
     blurb: "Melbourne is quoted natively in USD (no EUR conversion) and folds customs and docs into the terminal charge; import drayage is the dominant line.",
     portLines: [],
     warehouses: [{
@@ -995,10 +1001,11 @@ function DestinationInstore() {
   const [vnPrice, setVnPrice] = useState(3411);   // today's VN FAQ, USD/t
   const [eurUsd, setEurUsd]   = useState(1.16);    // USD per 1 EUR
   const [rate, setRate]       = useState(8);       // financing interest, % p.a.
+  const [freightBase, setFreightBase] = useState(4741);  // FBX11 VN→N.Europe, USD/FEU (Freight tab)
   const [transit, setTransit] = useState<Record<string, number>>(
     () => Object.fromEntries(DEST_PORTS.map(p => [p.key, p.defaultTransitDays])),
   );
-  const [src, setSrc] = useState<{ vn?: string; fx?: string }>({});
+  const [src, setSrc] = useState<{ vn?: string; fx?: string; fr?: string }>({});
 
   useEffect(() => {
     let alive = true;
@@ -1025,6 +1032,13 @@ function DestinationInstore() {
         const last = h && h.length ? h[h.length - 1] : null;
         if (alive && last?.close) { setEurUsd(Number(last.close.toFixed(4))); setSrc(s => ({ ...s, fx: last.date })); }
       } catch { /* keep default */ }
+      try {
+        // FBX11 North-Europe base = the vn-eu (VN→Rotterdam ×1.00) route the
+        // Freight tab calculates; every destination scales off it by multiplier.
+        const fr = await cachedFetchStatic<{ updated?: string; routes?: { id: string; rate: number }[] }>("/data/freight.json");
+        const base = fr.routes?.find(r => r.id === "vn-eu")?.rate;
+        if (alive && base) { setFreightBase(base); setSrc(s => ({ ...s, fr: fr.updated })); }
+      } catch { /* keep default */ }
     })();
     return () => { alive = false; };
   }, []);
@@ -1034,20 +1048,25 @@ function DestinationInstore() {
   const insUsd = (pct?: number) => (pct ? (vnPrice * pct) / 100 * inStoreWeeks : 0);
   const finDays = (t: number)   => t + PRE_DELIVERY_DAYS + DELIVERY_MONTH_DAYS;
   const finUsd  = (t: number)   => vnPrice * (rate / 100) * (finDays(t) / 365);
+  // Ocean freight VN → port, USD/t: FBX11 base × port multiplier ÷ container.
+  const freightUsd = (mult: number) => (freightBase * mult) / CONTAINER_MT;
   const fmt2 = (n: number) => `$${n.toFixed(2)}/t`;
   const fmt0 = (n: number) => `$${Math.round(n).toLocaleString()}/t`;
 
   // Per-warehouse USD economics for a port (move-in handling, 45-day storage,
-  // and the shared value-based + financing add-on).
+  // the shared value-based + financing add-on, and the ocean-freight leg). The
+  // "delivered" total adds freight to give a full FOB-VN → in-store logistics cost.
   function whTotals(p: DestPort) {
     const k = p.currency === "EUR" ? eurUsd : 1;
     const t = transit[p.key] ?? p.defaultTransitDays;
     const shared = wlUsd(p.weightLossPct) + insUsd(p.insurancePctPerWeek) + finUsd(t);
+    const freight = freightUsd(p.freightMult);
     const portHandling = p.portLines.reduce((a, l) => a + l.v, 0);
     return p.warehouses.map(wh => {
       const moveIn  = (portHandling + wh.lines.reduce((a, l) => a + l.v, 0)) * k;
       const storage = storageNativePerHold(wh.storage) * k;
-      return { wh, moveIn, storage, total: moveIn + storage + shared };
+      const total   = moveIn + storage + shared;
+      return { wh, moveIn, storage, total, freight, delivered: total + freight };
     });
   }
 
@@ -1056,6 +1075,7 @@ function DestinationInstore() {
     const sym = p.currency === "EUR" ? "€" : "$";
     const t = transit[p.key] ?? p.defaultTransitDays;
     const wl = wlUsd(p.weightLossPct), ins = insUsd(p.insurancePctPerWeek), fin = finUsd(t);
+    const freight = freightUsd(p.freightMult);
     const calc = whTotals(p);
     const totals = calc.map(c => c.total);
     const head = totals.length > 1
@@ -1070,7 +1090,7 @@ function DestinationInstore() {
     return (
       <PortCard key={p.key} span={p.warehouses.length > 1}
         region={p.region}
-        title={`${p.port}${p.warehouseLabel ? ` · ${p.warehouseLabel}` : ""} — in-store ≈ ${head}`}>
+        title={`${p.port}${p.warehouseLabel ? ` · ${p.warehouseLabel}` : ""} — in-store ≈ ${head} · +freight ${fmt0(freight)}`}>
         <P>{p.blurb}</P>
 
         {/* Value-based + financing (port-level, in USD off the FAQ price) */}
@@ -1088,11 +1108,13 @@ function DestinationInstore() {
             <CostRow label="In-store insurance" cost={fmt2(ins)} note={`${p.insurancePctPerWeek}%/wk × ${inStoreWeeks.toFixed(1)} wk in store`} />
           )}
           <CostRow label="Financing (cost of money)" cost={fmt2(fin)} note={`${finDays(t)}d × ${rate}% × $${vnPrice.toLocaleString()} ÷ 365`} />
+          <CostRow label={`Ocean freight (VN→${p.port})`} cost={fmt2(freight)}
+            note={`${p.freightProxy ? "~est · " : ""}FBX11 $${freightBase.toLocaleString()}/FEU ×${p.freightMult} ÷ ${CONTAINER_MT} mt`} />
         </DestCostTable>
 
         {/* Per-warehouse handling + all-in total */}
         <div className={p.warehouses.length > 1 ? "grid grid-cols-1 sm:grid-cols-2 gap-x-6" : ""}>
-          {calc.map(({ wh, moveIn, storage, total }, wi) => (
+          {calc.map(({ wh, moveIn, storage, total, delivered }, wi) => (
             <div key={wi}>
               {p.warehouses.length > 1 && wh.name && <WhHead>{wh.name}</WhHead>}
               <DestCostTable>
@@ -1104,6 +1126,7 @@ function DestinationInstore() {
                 )}
                 <DestTotal label="Total CIF→in-store" cost={fmt0(total)}
                   note={`+ financing ${fmt2(fin)}${wl ? ` + weight-loss ${fmt2(wl)}` : ""}${ins ? ` + ins ${fmt2(ins)}` : ""}`} />
+                <DestTotal label="Delivered FOB→in-store" cost={fmt0(delivered)} note={`incl. ocean freight ${fmt2(freight)}`} />
               </DestCostTable>
             </div>
           ))}
@@ -1131,8 +1154,17 @@ function DestinationInstore() {
           the <strong>financing</strong> are computed off today&rsquo;s <strong>Vietnam FAQ</strong> price as the goods
           value. As the daily FAQ print and EUR/USD move, every figure re-prices.
         </P>
+        <P>
+          Each port also carries the <strong>ocean freight</strong> leg (Vietnam → port), pulled from the{" "}
+          <strong>Freight tab</strong>: its <Code>FBX11</Code> North-Europe base (the VN→Rotterdam route) scaled by a
+          per-destination multiplier — the same FBX-multiplier method the freight section uses for its estimated
+          corridors — then divided over the {CONTAINER_MT} mt container to a per-tonne rate. North-range ports
+          (Rotterdam/Hamburg/Le&nbsp;Havre/Bremen) sit on the base; Mediterranean and Oceania lanes are scaled proxies
+          (flagged <em>~est</em>). The <strong>delivered</strong> total adds freight to the in-store stack for a full
+          FOB-Vietnam → in-store logistics cost.
+        </P>
         <div className="font-mono text-xs bg-slate-800 rounded px-3 py-2 text-amber-300 mb-3">
-          total_in-store = (DTHC/DO + haulage + in-store handling + storage) × EUR/USD + weight-loss + financing
+          in-store = (DTHC/DO + haulage + handling + storage)×EUR/USD + weight-loss + financing &nbsp;·&nbsp; delivered = in-store + freight
         </div>
 
         {/* Editable assumptions */}
@@ -1149,8 +1181,12 @@ function DestinationInstore() {
             <span className="font-semibold text-amber-300">Interest</span>
             <NumInput value={rate} step={0.5} onChange={setRate} width="w-16" /> % p.a.
           </label>
+          <label className="flex items-center gap-2 text-[11px] text-slate-300">
+            <span className="font-semibold text-amber-300">Freight FBX11</span> $
+            <NumInput value={freightBase} step={50} onChange={setFreightBase} width="w-24" /> /FEU
+          </label>
           <div className="text-[10px] text-slate-500 flex items-center">
-            live: {src.vn ? `FAQ ${src.vn}` : "FAQ (default)"} · {src.fx ? `EUR/USD ${src.fx}` : "EUR/USD (default)"}
+            live: {src.vn ? `FAQ ${src.vn}` : "FAQ (default)"} · {src.fx ? `EUR/USD ${src.fx}` : "EUR/USD (default)"} · {src.fr ? `freight ${src.fr}` : "freight (default)"}
           </div>
         </div>
 
@@ -1167,42 +1203,43 @@ function DestinationInstore() {
 
       {/* Cross-port comparison — dynamic, all-in USD */}
       <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
-        <H>Cross-port comparison — all-in CIF→in-store (USD/t)</H>
+        <H>Cross-port comparison — freight + in-store, delivered (USD/t)</H>
         <table className="w-full text-xs mt-2">
           <thead>
             <tr className="border-b border-slate-700 text-left text-[10px] uppercase tracking-wider text-slate-500">
               <th className="pb-1.5 pr-4">Port · warehouse</th>
-              <th className="pb-1.5 pr-4 text-right">Move-in</th>
-              <th className="pb-1.5 pr-4 text-right">Storage</th>
-              <th className="pb-1.5 pr-4 text-right">Financing</th>
-              <th className="pb-1.5 text-right">Total in-store</th>
+              <th className="pb-1.5 pr-4 text-right">Ocean freight</th>
+              <th className="pb-1.5 pr-4 text-right">In-store (CIF→)</th>
+              <th className="pb-1.5 text-right">Delivered FOB→in-store</th>
             </tr>
           </thead>
           <tbody>
-            {DEST_PORTS.flatMap(p => {
-              const fin = finUsd(transit[p.key] ?? p.defaultTransitDays);
-              return whTotals(p).map((c, i) => {
+            {DEST_PORTS.flatMap(p =>
+              whTotals(p).map((c, i) => {
                 const whName = c.wh.name ? c.wh.name.replace(` ${p.port}`, "") : p.warehouseLabel ?? "";
                 return (
                   <tr key={`${p.key}-${i}`} className="border-b border-slate-800">
-                    <td className="py-1.5 pr-4 text-slate-200 font-semibold">{p.port}{whName ? ` · ${whName}` : ""}</td>
-                    <td className="py-1.5 pr-4 text-right font-mono text-slate-400">{fmt2(c.moveIn)}</td>
-                    <td className="py-1.5 pr-4 text-right font-mono text-slate-400">{c.storage ? fmt2(c.storage) : "—"}</td>
-                    <td className="py-1.5 pr-4 text-right font-mono text-slate-400">{fmt2(fin)}</td>
-                    <td className="py-1.5 text-right font-mono text-amber-300">{fmt0(c.total)}</td>
+                    <td className="py-1.5 pr-4 text-slate-200 font-semibold">
+                      {p.port}{whName ? ` · ${whName}` : ""}
+                      {p.freightProxy && <span className="ml-1 text-[9px] text-slate-500">~est</span>}
+                    </td>
+                    <td className="py-1.5 pr-4 text-right font-mono text-sky-300">{fmt2(c.freight)}</td>
+                    <td className="py-1.5 pr-4 text-right font-mono text-slate-400">{fmt0(c.total)}</td>
+                    <td className="py-1.5 text-right font-mono text-amber-300">{fmt0(c.delivered)}</td>
                   </tr>
                 );
-              });
-            })}
+              }),
+            )}
           </tbody>
         </table>
         <P className="mt-3">
-          <strong>Move-in</strong> is the one-off handling to land coffee in store (EUR quotes ×&nbsp;EUR/USD);{" "}
-          <strong>storage</strong> is the {IN_STORE_DAYS}-day carry; <strong>financing</strong> is the cost of money over
-          the transit + {PRE_DELIVERY_DAYS + DELIVERY_MONTH_DAYS}-day window. At ${vnPrice.toLocaleString()}/t FAQ and{" "}
-          {eurUsd.toFixed(4)} EUR/USD, financing is the largest single line at the longer-haul Mediterranean ports
-          (Genoa/Trieste) — it scales with both the coffee price and transit time, so it moves most as the FAQ rallies or
-          shipping is re-routed. Edit the assumptions above to re-price the whole table.
+          <strong>Ocean freight</strong> (VN→port) is the dominant single line — at ${freightBase.toLocaleString()}/FEU
+          FBX11 it runs <strong>~${Math.round(freightUsd(1.0))}/t</strong> to the North range and proportionally more to
+          the Mediterranean, dwarfing the in-store stack. <strong>In-store</strong> is everything added on top of CIF
+          (handling + storage + weight-loss + financing); <strong>delivered</strong> sums the two for a full FOB-Vietnam
+          → in-store logistics cost. At ${vnPrice.toLocaleString()}/t FAQ, {eurUsd.toFixed(4)} EUR/USD and{" "}
+          ${freightBase.toLocaleString()}/FEU freight, edit any assumption above to re-price the whole table. Freight is
+          the ocean leg already embedded in a CIF quote, shown here to decompose the full landed cost.
         </P>
       </div>
 
