@@ -1,0 +1,118 @@
+name: "0.8 – Weekly — ENSO subsurface (WWV · NOAA PMEL)"
+
+# Fetches the Warm Water Volume monthly index — the subsurface heat
+# signal that LEADS Niño 3.4 surface SST + ONI by 4-6 months. The
+# existing ENSO tab shows the SST + SOI coupling (the present); WWV
+# shows what's coming next.
+#
+# WHY a workflow: NOAA PMEL/PSL/CPC are reachable from GitHub Actions
+# runners but NOT from the Claude Code sandbox (403 outbound). Same
+# pattern as enso_indices and the ONI history seed builder. The
+# endpoint serves the full history every request (small text file),
+# so the same code path covers backfill + weekly refresh — the `mode`
+# input is operator intent for the run log.
+#
+# WWV updates roughly mid-month for the previous month. Tuesday
+# weekly cron picks up the update reliably without burning runner
+# minutes on no-op fetches.
+
+on:
+  schedule:
+    - cron: '45 6 * * 2'    # Tuesday 06:45 UTC — 15min after enso_indices to avoid coincident commits
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode — backfill (seed) or refresh (incremental). Functionally identical for this endpoint."
+        required: false
+        default: refresh
+        type: choice
+        options:
+          - refresh
+          - backfill
+      dry_run:
+        description: "Preview only (no commit). Default false = apply."
+        required: false
+        default: false
+        type: boolean
+      diag:
+        description: "Dump head/tail of fetched NOAA text to the log (debug format drift)."
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  fetch-enso-subsurface:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch WWV (3 retry attempts)
+        id: fetch
+        env:
+          MODE: ${{ inputs.mode || 'refresh' }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          DIAG: ${{ inputs.diag }}
+        run: |
+          set -e
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS=""    # no --write
+          else
+            ARGS="--write"
+          fi
+          if [ "$MODE" = "backfill" ]; then
+            ARGS="$ARGS --backfill"
+          fi
+          if [ "$DIAG" = "true" ]; then
+            ARGS="$ARGS --diag"
+          fi
+          cd backend
+          for attempt in 1 2 3; do
+            PYTHONPATH=. python -m scraper.sources.enso_subsurface $ARGS && break
+            if [ $attempt -lt 3 ]; then
+              echo "[wwv] attempt $attempt failed — retrying in 5m..."
+              sleep 300
+            else
+              echo "[wwv] all 3 attempts failed — leaving JSON untouched"
+              exit 1
+            fi
+          done
+
+      - name: Commit updated enso_subsurface.json if changed
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ ! -f frontend/public/data/enso_subsurface.json ]; then
+            echo "No enso_subsurface.json produced — nothing to commit."
+            exit 0
+          fi
+          git add frontend/public/data/enso_subsurface.json
+          if git diff --cached --quiet; then
+            echo "No WWV change."
+            exit 0
+          fi
+          git commit -m "data: ENSO subsurface (WWV) refresh $(date -u +%Y-%m-%d) [skip ci]"
+          git pull --rebase --autostash --strategy-option=theirs origin main
+          git push origin main
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed (NOAA PMEL likely unreachable) — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
