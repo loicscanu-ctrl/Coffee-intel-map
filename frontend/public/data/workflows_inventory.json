@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-22T10:55:39.645340Z",
+  "generated_at": "2026-06-22T12:45:59.739355Z",
   "count": 57,
   "workflows": [
     {
@@ -425,7 +425,7 @@
         "workflow_dispatch"
       ],
       "crons": [
-        "0 20 * * 5"
+        "0 21 * * 1-5"
       ],
       "workflow_run_deps": [],
       "concurrency_group": null,
