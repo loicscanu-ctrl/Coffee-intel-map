@@ -225,21 +225,35 @@ def test_build_payload_handles_empty_input():
 # ── fetch-fallback resilience ─────────────────────────────────────────────
 
 
-def test_fetch_first_ok_walks_dataset_candidates(monkeypatch):
+def test_fetch_first_ok_walks_host_x_dataset_cross_product(monkeypatch):
+    """v2 fix: cross host candidates with dataset candidates. The v1
+    dispatch surfaced that `upwell.pmel.noaa.gov` no longer resolves
+    (PMEL decommissioned their ERDDAP) — so we now walk OSMC, NMFS,
+    and CoastWatch mirrors before falling back to the legacy host."""
     seen: list[str] = []
     def fake_fetch(url, *, timeout=60):
         seen.append(url)
-        return "fake csv" if "pmelTaoMonT" in url else None
+        # Only the OSMC host + pmelTaoMonT combo "succeeds" — that's
+        # the most likely current home of the TAO data.
+        if "osmc" in url and "pmelTaoMonT" in url:
+            return "fake csv"
+        return None
     monkeypatch.setattr(therm, "_fetch", fake_fetch)
-    text, ds = therm._fetch_first_ok(["pmelTaoDyT", "pmelTaoMonT", "pmelTaoMonsT"])
+    text, tag = therm._fetch_first_ok(
+        hosts=["https://upwell.pmel.noaa.gov/erddap",  # legacy first to test fallback
+               "https://osmc.noaa.gov/erddap"],
+        datasets=["pmelTaoDyT", "pmelTaoMonT"],
+    )
     assert text == "fake csv"
-    assert ds   == "pmelTaoMonT"
-    # The third candidate was never probed.
-    assert len(seen) == 2
+    assert tag.endswith("/pmelTaoMonT")
+    assert "osmc" in tag
+    # Probed pmel/Dy, pmel/Mon (both fail), then osmc/Dy (fail),
+    # then osmc/Mon (success). Total = 4 probes.
+    assert len(seen) == 4
 
 
 def test_fetch_first_ok_returns_none_when_all_candidates_fail(monkeypatch):
     monkeypatch.setattr(therm, "_fetch", lambda url, **_: None)
-    text, ds = therm._fetch_first_ok(["a", "b"])
+    text, tag = therm._fetch_first_ok(hosts=["h1", "h2"], datasets=["a", "b"])
     assert text is None
-    assert ds   is None
+    assert tag  is None
