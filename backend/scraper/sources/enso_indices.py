@@ -109,11 +109,24 @@ _MONTH_ABBR_TO_NUM = {
     "SEP":  9, "OCT": 10, "NOV": 11, "DEC": 12,
 }
 
-# A Niño 3.4 line starts with a DDMMMYYYY token (e.g. "03JAN1990").
-_NINO34_DATE_RE = re.compile(r"^(?P<dd>\d{2})(?P<mon>[A-Z]{3})(?P<yyyy>\d{4})\s+")
+# A Niño 3.4 data line starts with a DDMMMYYYY token, optionally preceded
+# by a single leading space (NOAA pads data lines with one space but
+# header lines without). Anchored at line-start with optional space.
+_NINO34_DATE_RE = re.compile(r"^\s*(?P<dd>\d{2})(?P<mon>[A-Z]{3})(?P<yyyy>\d{4})\b")
 
 # SOI: rows start with a 4-digit year followed by 12 numeric columns.
-_SOI_ROW_RE = re.compile(r"^\s*(?P<yr>(?:19|20)\d{2})\s+(?P<rest>[\-\d. ]+)\s*$")
+# NOAA fixed-width formatting fuses negative numbers with adjacent fields
+# (e.g. ` -0.9-999.9-999.9`), so we can't rely on whitespace separation
+# — we extract numbers via _SIGNED_DECIMAL_RE on the row tail.
+_SOI_ROW_RE = re.compile(r"^\s*(?P<yr>(?:19|20)\d{2})\b(?P<rest>.*)$")
+
+# Robust signed-decimal extractor used by BOTH parsers. NOAA pads its
+# fixed-width files with single-space gaps that get visually swallowed
+# by a leading minus sign (`20.6-0.1`, `-0.9-999.9`). `.split()` then
+# returns half the columns it should. Walking the row with a regex
+# that matches signed-decimal tokens recovers all of them in order,
+# regardless of whether spaces survived between them.
+_SIGNED_DECIMAL_RE = re.compile(r"-?\d+\.\d+")
 
 
 # ── data model ──────────────────────────────────────────────────────────────
@@ -168,37 +181,43 @@ def _fetch_first_ok(urls: list[str]) -> tuple[str | None, str | None]:
 
 def parse_nino34(text: str) -> list[Nino34Weekly]:
     """Read the Niño-region weekly file and return the Niño 3.4 anomaly
-    series. The file's data lines look like:
+    series. The file's data lines look like (real format, with one
+    leading space and NEGATIVE NUMBERS FUSED to the preceding SST):
 
-        03JAN1990     24.7 -0.5     25.0 -0.6    25.7 -0.4   28.6 -0.7
+         02SEP1981     20.6-0.1     24.8-0.1     26.5-0.2     28.3-0.3
+         17JUN2026     26.1 3.0     28.5 1.9     29.3 1.7     30.2 1.3
 
-    Column layout after split():
-        [0]  DDMMMYYYY date
-        [1]  SST Niño 1+2     [2]  SSTA Niño 1+2
-        [3]  SST Niño 3       [4]  SSTA Niño 3
-        [5]  SST Niño 3.4     [6]  SSTA Niño 3.4  ← target
-        [7]  SST Niño 4       [8]  SSTA Niño 4
+    After date strip + _SIGNED_DECIMAL_RE the row yields 8 numbers,
+    one (SST, SSTA) pair per region in left-to-right order:
+        [0,1]  SST + SSTA Niño 1+2
+        [2,3]  SST + SSTA Niño 3
+        [4,5]  SST + SSTA Niño 3.4  ← target = index 5
+        [6,7]  SST + SSTA Niño 4
 
-    Header rows (column titles, blank lines, anything that doesn't start
-    with a date token) are skipped. Lines with fewer than 9 fields are
-    treated as malformed and dropped — better to lose one week than to
-    misalign the series."""
+    Header rows skipped via the date regex; rows yielding fewer than 8
+    numbers dropped. The .split()-based v1 parser missed everything in
+    weeks where SSTA Niño 1+2 was negative because the space ahead of
+    `-0.1` was eaten by the minus sign."""
     out: list[Nino34Weekly] = []
     for raw_line in text.splitlines():
         line = raw_line.rstrip()
-        if not _NINO34_DATE_RE.match(line):
+        m = _NINO34_DATE_RE.match(line)
+        if not m:
             continue
-        parts = line.split()
-        if len(parts) < 9:
-            logger.debug(f"[enso] nino34: short line dropped: {line!r}")
-            continue
-        date_tok = parts[0]
-        dd, mon, yyyy = date_tok[0:2], date_tok[2:5], date_tok[5:9]
+        dd, mon, yyyy = m.group("dd"), m.group("mon"), m.group("yyyy")
         mn = _MONTH_ABBR_TO_NUM.get(mon)
         if mn is None:
             continue
+        # Extract the eight signed decimals from the line tail (after
+        # the date token). NOAA pads with leading whitespace and fuses
+        # negative numbers — re.findall ignores both.
+        tail = line[m.end():]
+        nums = _SIGNED_DECIMAL_RE.findall(tail)
+        if len(nums) < 8:
+            logger.debug(f"[enso] nino34: only {len(nums)} numbers on line {line!r}")
+            continue
         try:
-            ssta_34 = float(parts[6])
+            ssta_34 = float(nums[5])
         except ValueError:
             continue
         out.append(Nino34Weekly(
@@ -246,7 +265,11 @@ def parse_soi(text: str) -> list[SoiMonthly]:
         if not m:
             continue
         yr = int(m.group("yr"))
-        cols = m.group("rest").split()
+        # Same negative-number fusion bug as Niño 3.4: a v1 .split() on
+        # `1.1   1.4   1.2  -0.6  -0.9-999.9-999.9` returned 5 tokens
+        # because the leading minus sign ate the gap. Use re.findall to
+        # walk the row and extract all 12 signed decimals in order.
+        cols = _SIGNED_DECIMAL_RE.findall(m.group("rest"))
         if len(cols) < 12:
             logger.debug(f"[enso] soi: short row for year {yr}: {len(cols)} cols")
             continue
