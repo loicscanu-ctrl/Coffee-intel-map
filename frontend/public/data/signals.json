@@ -1,8 +1,19 @@
 {
   "date": "2026-06-16",
-  "scoreNY": 2,
-  "scoreLDN": -1,
+  "scoreNY": 4,
+  "scoreLDN": 1,
   "signals": [
+    {
+      "id": "CP3",
+      "name": "Bullish De-hedging",
+      "category": "CP",
+      "categoryLabel": "Producer",
+      "market": "NY",
+      "severity": "warn",
+      "score": 2,
+      "magnitude": "medium",
+      "text": "Producers lifting hedges into rising price — signals expectation of further upside."
+    },
     {
       "id": "CP1",
       "name": "Normal Hedging",
@@ -26,15 +37,15 @@
       "text": "Producers near fully hedged (>75th pct, 52-week) — limited additional selling capacity from this actor."
     },
     {
-      "id": "CR6",
-      "name": "Roaster Dry Powder",
+      "id": "CR4",
+      "name": "Unusual Liquidation",
       "category": "CR",
       "categoryLabel": "Roaster",
       "market": "NY",
       "severity": "warn",
       "score": -2,
       "magnitude": "large",
-      "text": "Roasters near fully covered (>75th pct) — limited additional buying capacity from this actor."
+      "text": "Roasters reducing coverage into rising price — may signal demand destruction or blend substitution toward Robusta."
     },
     {
       "id": "CR4",
@@ -59,17 +70,6 @@
       "text": "Roasters dangerously under-covered (<25th pct) into rising price — high risk of being forced to buy at unfavorable levels."
     },
     {
-      "id": "CI4",
-      "name": "Commercial Vacuum",
-      "category": "CI",
-      "categoryLabel": "Commercial",
-      "market": "NY",
-      "severity": "alert",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "No commercial activity — market driven purely by speculative flow. Highly fragile, vulnerable to sharp reversal when commercials re-engage."
-    },
-    {
       "id": "CI2",
       "name": "Commercial Convergence Bearish",
       "category": "CI",
@@ -79,6 +79,23 @@
       "score": -3,
       "magnitude": "large",
       "text": "Both commercials aligned bearish — strong fundamental supply pressure signal."
+    },
+    {
+      "id": "ML5",
+      "name": "Fund Long Exit",
+      "category": "ML",
+      "categoryLabel": "MM Longs",
+      "market": "NY",
+      "severity": "warn",
+      "score": -2,
+      "magnitude": "small",
+      "links": [
+        {
+          "label": "Global Flow",
+          "href": "#cot-section-1"
+        }
+      ],
+      "text": "Funds reducing longs despite rising price — may reflect lack of conviction or profit taking after a strong rally."
     },
     {
       "id": "ML2",
@@ -92,26 +109,26 @@
       "text": "Funds adding longs but near capacity (>75th pct) — bullish momentum likely limited, reversal risk increasing."
     },
     {
-      "id": "ML7",
-      "name": "Long Concentration",
-      "category": "ML",
-      "categoryLabel": "MM Longs",
-      "market": "LDN",
-      "severity": "warn",
-      "score": -1,
-      "magnitude": "large",
-      "text": "MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade."
-    },
-    {
-      "id": "MS6W",
-      "name": "Fund Short Squeeze (Watch)",
+      "id": "MS4",
+      "name": "Fund Short Covering",
       "category": "MS",
       "categoryLabel": "MM Shorts",
       "market": "NY",
-      "severity": "warn",
-      "score": 2,
-      "magnitude": "large",
-      "text": "Large speculative short position (>75th pct) with price stalling — bears failing to push through, squeeze risk if price reverses."
+      "severity": "info",
+      "score": 1,
+      "magnitude": "medium",
+      "text": "Funds covering shorts into rising price — adds fuel to bullish momentum. MM longs falling: funds may be reducing coffee exposure overall."
+    },
+    {
+      "id": "MS6",
+      "name": "Fund Short Squeeze Risk",
+      "category": "MS",
+      "categoryLabel": "MM Shorts",
+      "market": "NY",
+      "severity": "alert",
+      "score": 3,
+      "magnitude": "medium",
+      "text": "Large speculative short position (>75th pct) with price already rising — short squeeze underway, covering pressure accelerating."
     },
     {
       "id": "MS4",
@@ -123,6 +140,23 @@
       "score": 1,
       "magnitude": "large",
       "text": "Funds covering shorts into rising price — adds fuel to bullish momentum. MM longs also rising: strong bullish conviction."
+    },
+    {
+      "id": "MI4",
+      "name": "Speculative Retreat",
+      "category": "MI",
+      "categoryLabel": "MM Interaction",
+      "market": "NY",
+      "severity": "info",
+      "score": 0,
+      "magnitude": "medium",
+      "links": [
+        {
+          "label": "Global Flow",
+          "href": "#cot-section-1"
+        }
+      ],
+      "text": "Both sides reducing — net change will reveal whether this is coffee-specific or broader deleveraging."
     },
     {
       "id": "MI6",
@@ -158,6 +192,17 @@
       "text": "MM net long position near 52-week high (>75th pct) — speculative net longs at extreme, limited room to add. Mean-reversion risk elevated."
     },
     {
+      "id": "MPI5",
+      "name": "Divergence Signal",
+      "category": "MPI",
+      "categoryLabel": "MM × Producer",
+      "market": "NY",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "medium",
+      "text": "Funds reducing longs while producers lift hedges into rising price — neither actor convinced by the rally. Check if funds are near historical max (profit taking) or early in rally (lack of conviction)."
+    },
+    {
       "id": "MPI1",
       "name": "Classic Bullish Flow",
       "category": "MPI",
@@ -184,17 +229,6 @@
       "name": "Backwardation Incentive",
       "category": "CS",
       "categoryLabel": "Curve Structure",
-      "market": "NY",
-      "severity": "info",
-      "score": 1,
-      "magnitude": "small",
-      "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-    },
-    {
-      "id": "CS1",
-      "name": "Backwardation Incentive",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
       "market": "LDN",
       "severity": "info",
       "score": 1,
@@ -213,6 +247,28 @@
       "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
+      "id": "OB3",
+      "name": "Oversold Opportunity",
+      "category": "OB",
+      "categoryLabel": "OB/OS",
+      "market": "NY",
+      "severity": "warn",
+      "score": 2,
+      "magnitude": "medium",
+      "text": "KC technically oversold (≤25th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst."
+    },
+    {
+      "id": "OB7",
+      "name": "Oversold Divergence",
+      "category": "OB",
+      "categoryLabel": "OB/OS",
+      "market": "NY",
+      "severity": "warn",
+      "score": 2,
+      "magnitude": "large",
+      "text": "KC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
+    },
+    {
       "id": "OB7",
       "name": "Oversold Divergence",
       "category": "OB",
@@ -222,6 +278,17 @@
       "score": 2,
       "magnitude": "medium",
       "text": "RC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
+    },
+    {
+      "id": "SP2",
+      "name": "Spreading Decrease",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "NY",
+      "severity": "info",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
     }
   ],
   "history": [
@@ -2345,6 +2412,17 @@
       "date": "2026-06-16",
       "signals": [
         {
+          "id": "CP3",
+          "name": "Bullish De-hedging",
+          "category": "CP",
+          "categoryLabel": "Producer",
+          "market": "NY",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "medium",
+          "text": "Producers lifting hedges into rising price — signals expectation of further upside."
+        },
+        {
           "id": "CP1",
           "name": "Normal Hedging",
           "category": "CP",
@@ -2367,15 +2445,15 @@
           "text": "Producers near fully hedged (>75th pct, 52-week) — limited additional selling capacity from this actor."
         },
         {
-          "id": "CR6",
-          "name": "Roaster Dry Powder",
+          "id": "CR4",
+          "name": "Unusual Liquidation",
           "category": "CR",
           "categoryLabel": "Roaster",
           "market": "NY",
           "severity": "warn",
           "score": -2,
           "magnitude": "large",
-          "text": "Roasters near fully covered (>75th pct) — limited additional buying capacity from this actor."
+          "text": "Roasters reducing coverage into rising price — may signal demand destruction or blend substitution toward Robusta."
         },
         {
           "id": "CR4",
@@ -2400,17 +2478,6 @@
           "text": "Roasters dangerously under-covered (<25th pct) into rising price — high risk of being forced to buy at unfavorable levels."
         },
         {
-          "id": "CI4",
-          "name": "Commercial Vacuum",
-          "category": "CI",
-          "categoryLabel": "Commercial",
-          "market": "NY",
-          "severity": "alert",
-          "score": 0,
-          "magnitude": "medium",
-          "text": "No commercial activity — market driven purely by speculative flow. Highly fragile, vulnerable to sharp reversal when commercials re-engage."
-        },
-        {
           "id": "CI2",
           "name": "Commercial Convergence Bearish",
           "category": "CI",
@@ -2420,6 +2487,23 @@
           "score": -3,
           "magnitude": "large",
           "text": "Both commercials aligned bearish — strong fundamental supply pressure signal."
+        },
+        {
+          "id": "ML5",
+          "name": "Fund Long Exit",
+          "category": "ML",
+          "categoryLabel": "MM Longs",
+          "market": "NY",
+          "severity": "warn",
+          "score": -2,
+          "magnitude": "small",
+          "links": [
+            {
+              "label": "Global Flow",
+              "href": "#cot-section-1"
+            }
+          ],
+          "text": "Funds reducing longs despite rising price — may reflect lack of conviction or profit taking after a strong rally."
         },
         {
           "id": "ML2",
@@ -2433,26 +2517,26 @@
           "text": "Funds adding longs but near capacity (>75th pct) — bullish momentum likely limited, reversal risk increasing."
         },
         {
-          "id": "ML7",
-          "name": "Long Concentration",
-          "category": "ML",
-          "categoryLabel": "MM Longs",
-          "market": "LDN",
-          "severity": "warn",
-          "score": -1,
-          "magnitude": "large",
-          "text": "MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade."
-        },
-        {
-          "id": "MS6W",
-          "name": "Fund Short Squeeze (Watch)",
+          "id": "MS4",
+          "name": "Fund Short Covering",
           "category": "MS",
           "categoryLabel": "MM Shorts",
           "market": "NY",
-          "severity": "warn",
-          "score": 2,
-          "magnitude": "large",
-          "text": "Large speculative short position (>75th pct) with price stalling — bears failing to push through, squeeze risk if price reverses."
+          "severity": "info",
+          "score": 1,
+          "magnitude": "medium",
+          "text": "Funds covering shorts into rising price — adds fuel to bullish momentum. MM longs falling: funds may be reducing coffee exposure overall."
+        },
+        {
+          "id": "MS6",
+          "name": "Fund Short Squeeze Risk",
+          "category": "MS",
+          "categoryLabel": "MM Shorts",
+          "market": "NY",
+          "severity": "alert",
+          "score": 3,
+          "magnitude": "medium",
+          "text": "Large speculative short position (>75th pct) with price already rising — short squeeze underway, covering pressure accelerating."
         },
         {
           "id": "MS4",
@@ -2464,6 +2548,23 @@
           "score": 1,
           "magnitude": "large",
           "text": "Funds covering shorts into rising price — adds fuel to bullish momentum. MM longs also rising: strong bullish conviction."
+        },
+        {
+          "id": "MI4",
+          "name": "Speculative Retreat",
+          "category": "MI",
+          "categoryLabel": "MM Interaction",
+          "market": "NY",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "links": [
+            {
+              "label": "Global Flow",
+              "href": "#cot-section-1"
+            }
+          ],
+          "text": "Both sides reducing — net change will reveal whether this is coffee-specific or broader deleveraging."
         },
         {
           "id": "MI6",
@@ -2499,6 +2600,17 @@
           "text": "MM net long position near 52-week high (>75th pct) — speculative net longs at extreme, limited room to add. Mean-reversion risk elevated."
         },
         {
+          "id": "MPI5",
+          "name": "Divergence Signal",
+          "category": "MPI",
+          "categoryLabel": "MM × Producer",
+          "market": "NY",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "medium",
+          "text": "Funds reducing longs while producers lift hedges into rising price — neither actor convinced by the rally. Check if funds are near historical max (profit taking) or early in rally (lack of conviction)."
+        },
+        {
           "id": "MPI1",
           "name": "Classic Bullish Flow",
           "category": "MPI",
@@ -2525,17 +2637,6 @@
           "name": "Backwardation Incentive",
           "category": "CS",
           "categoryLabel": "Curve Structure",
-          "market": "NY",
-          "severity": "info",
-          "score": 1,
-          "magnitude": "small",
-          "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
-        },
-        {
-          "id": "CS1",
-          "name": "Backwardation Incentive",
-          "category": "CS",
-          "categoryLabel": "Curve Structure",
           "market": "LDN",
           "severity": "info",
           "score": 1,
@@ -2554,6 +2655,28 @@
           "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
+          "id": "OB3",
+          "name": "Oversold Opportunity",
+          "category": "OB",
+          "categoryLabel": "OB/OS",
+          "market": "NY",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "medium",
+          "text": "KC technically oversold (≤25th pct) with funds near minimum exposure — high potential for mean-reversion rally. If contango is deep, re-entry incentive for funds is reduced. Watch for catalyst."
+        },
+        {
+          "id": "OB7",
+          "name": "Oversold Divergence",
+          "category": "OB",
+          "categoryLabel": "OB/OS",
+          "market": "NY",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "large",
+          "text": "KC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
+        },
+        {
           "id": "OB7",
           "name": "Oversold Divergence",
           "category": "OB",
@@ -2563,13 +2686,24 @@
           "score": 2,
           "magnitude": "medium",
           "text": "RC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
+        },
+        {
+          "id": "SP2",
+          "name": "Spreading Decrease",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "NY",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
         }
       ],
-      "scoreNY": 2,
-      "scoreLDN": -1,
-      "priceNY": 240.9,
+      "scoreNY": 4,
+      "scoreLDN": 1,
+      "priceNY": 272.8,
       "priceLDN": 3598
     }
   ],
-  "generatedAt": "2026-06-22T08:47:34.872Z"
+  "generatedAt": "2026-06-22T22:50:39.300Z"
 }
