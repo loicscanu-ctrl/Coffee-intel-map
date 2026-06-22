@@ -34,10 +34,10 @@ from scraper.sources import (
 from scraper.sources import colombia as _colombia
 from scraper.sources import colombia_weather as _colombia_weather
 from scraper.sources import dry_bulk as _dry_bulk
-from scraper.sources import guatemala as _guatemala
 from scraper.sources import ethiopia as _ethiopia
 from scraper.sources import ethiopia_weather as _ethiopia_weather
 from scraper.sources import farmer_economics as _farmer_economics
+from scraper.sources import guatemala as _guatemala
 from scraper.sources import honduras as _honduras
 from scraper.sources import honduras_weather as _honduras_weather
 from scraper.sources import indonesia_weather as _indonesia_weather
