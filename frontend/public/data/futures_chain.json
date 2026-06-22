@@ -6,34 +6,34 @@
         "contract": "Coffee (Jul '26)",
         "expiry": "2026-07-21",
         "last": 275.1,
-        "chg": 0,
+        "chg": -2.75,
         "oi": 5036,
-        "volume": 5292,
+        "volume": 5284,
         "symbol": "KCN26"
       },
       {
         "contract": "Coffee (Sep '26)",
         "expiry": "2026-09-18",
         "last": 267.8,
-        "chg": 0,
+        "chg": -4.1,
         "oi": 96140,
-        "volume": 25522,
+        "volume": 25520,
         "symbol": "KCU26"
       },
       {
         "contract": "Coffee (Dec '26)",
         "expiry": "2026-12-18",
         "last": 257.9,
-        "chg": 0,
+        "chg": -5.25,
         "oi": 52180,
-        "volume": 12328,
+        "volume": 12319,
         "symbol": "KCZ26"
       },
       {
         "contract": "Coffee (Mar '27)",
         "expiry": "2027-03-18",
         "last": 254.4,
-        "chg": 0,
+        "chg": -5.45,
         "oi": 17611,
         "volume": 4631,
         "symbol": "KCH27"
@@ -42,7 +42,7 @@
         "contract": "Coffee (May '27)",
         "expiry": "2027-05-18",
         "last": 254.55,
-        "chg": 0,
+        "chg": -5.25,
         "oi": 7342,
         "volume": 2428,
         "symbol": "KCK27"
@@ -51,7 +51,7 @@
         "contract": "Coffee (Jul '27)",
         "expiry": "2027-07-20",
         "last": 255.2,
-        "chg": 0,
+        "chg": -5.05,
         "oi": 4869,
         "volume": 1986,
         "symbol": "KCN27"
@@ -60,7 +60,7 @@
         "contract": "Coffee (Sep '27)",
         "expiry": "2027-09-20",
         "last": 255.5,
-        "chg": 0,
+        "chg": -4.35,
         "oi": 2183,
         "volume": 612,
         "symbol": "KCU27"
@@ -69,16 +69,16 @@
         "contract": "Coffee (Dec '27)",
         "expiry": "2027-12-20",
         "last": 254.5,
-        "chg": 0,
+        "chg": -4.05,
         "oi": 3629,
-        "volume": 288,
+        "volume": 278,
         "symbol": "KCZ27"
       },
       {
         "contract": "Coffee (Mar '28)",
         "expiry": "2028-03-21",
         "last": 253.95,
-        "chg": 0,
+        "chg": -4.1,
         "oi": 779,
         "volume": 32,
         "symbol": "KCH28"
