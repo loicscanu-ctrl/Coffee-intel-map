@@ -56,18 +56,36 @@ OUT_PATH = DATA_DIR / "enso_subsurface.json"
 
 # Multiple WWV URL candidates — NOAA hosts the same index under several
 # paths and the canonical location shifts over time. The same pattern
-# saved us on enso_indices v1, where the initially-chosen URL 404'd
-# and v2 had to add a fallback list. The fetcher walks these in order
+# saved us on enso_indices v1 (where the initially-chosen URL 404'd
+# and v2 added a fallback list). The fetcher walks these in order
 # and uses the first 200 response, logging the winner.
+#
+# The v1 dispatch on 22 Jun 2026 showed all the PMEL/PSL/CPC paths I
+# initially guessed returned 404. v2 expands the list with paths
+# derived from IRI/LDEO Climate Data Library (Columbia U. — they
+# maintain authoritative mirrors of the PMEL ENSO indices) plus
+# additional PMEL endpoints that have appeared in NOAA documentation.
 WWV_URL_CANDIDATES = [
-    # PMEL (Pacific Marine Environmental Laboratory) — the authoritative source.
+    # IRI/LDEO Climate Data Library — Columbia U. maintains stable
+    # mirrors with CSV/text export endpoints. Their `data.tsv`
+    # endpoint format reliably serves a header line + two columns
+    # (year-month-fraction, value). Most likely to be live today.
+    "https://iridl.ldeo.columbia.edu/SOURCES/.PMEL/.WWV/dods.tsv",
+    "https://iridl.ldeo.columbia.edu/SOURCES/.PMEL/.WWV/data.tsv",
+    "https://iridl.ldeo.columbia.edu/SOURCES/.PMEL/.WWV/wwv/T/firstgridcenter/T/lastgridcenter/RANGE/data.tsv",
+    # PMEL paths under the active /tao/ tree (different from the
+    # legacy /elnino/sites/ path that 404'd in v1).
+    "https://www.pmel.noaa.gov/tao/wwv/data/wwv.dat",
+    "https://www.pmel.noaa.gov/tao/elnino/wwv/data/wwv.dat",
+    # CPC published "T-300m anomaly" is a related subsurface index
+    # if WWV proper isn't accessible — the OC indices file bundles
+    # multiple subsurface monitoring metrics including heat content.
+    "https://www.cpc.ncep.noaa.gov/products/precip/CWlink/MJO/oc_indices.txt",
+    # Legacy paths kept for completeness — if NOAA restores any of
+    # them, we'll pick them up automatically without a code change.
     "https://www.pmel.noaa.gov/elnino/sites/default/files/wwv.dat",
     "https://www.pmel.noaa.gov/sites/default/files/tao/wwv.dat",
-    # NOAA PSL (Physical Sciences Laboratory) — mirror.
     "https://www.psl.noaa.gov/data/correlation/wwv.data",
-    "https://psl.noaa.gov/data/correlation/wwv.data",
-    # CPC fallback.
-    "https://www.cpc.ncep.noaa.gov/data/indices/wwv",
 ]
 
 _BROWSER_HEADERS = {
