@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import EnsoForecastPlume from "@/components/enso/EnsoForecastPlume";
 import EnsoAnalogChart from "@/components/enso/EnsoAnalogChart";
 import EnsoDivergenceChart from "@/components/enso/EnsoDivergenceChart";
+import EnsoSubsurfaceCard from "@/components/enso/EnsoSubsurfaceCard";
 import EnsoRiskTable from "@/components/enso/EnsoRiskTable";
 import { PHASE_META, phaseLabel, type EnsoData } from "@/lib/enso";
 
@@ -76,6 +77,7 @@ export default function SupplyEnsoTab() {
         <>
           <PhaseSummary data={data} />
           <EnsoDivergenceChart />
+          <EnsoSubsurfaceCard />
           <EnsoForecastPlume forecast={data.oni_forecast} />
           <EnsoAnalogChart current={data.current_window} analogs={data.analogs} />
           <EnsoRiskMap pins={data.risk.pins} />
