@@ -2,6 +2,7 @@
 import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import Mermaid from "@/components/Mermaid";
+import DataDownloads from "@/components/data-map/DataDownloads";
 import { useFetchJson } from "@/lib/useFetchJson";
 
 // Shared class definitions appended to every per-tab diagram. `vis` (the tab's
@@ -1465,6 +1466,10 @@ export default function DataMapPage() {
         ))}
 
         <WorkflowDriftCheck />
+
+        <Card title="Data downloads — export any dataset to CSV">
+          <DataDownloads />
+        </Card>
 
         <Card title="Per-workflow → exact dashboard visual">
           <WorkflowTable />
