@@ -61,8 +61,27 @@ ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 OUT_PATH = DATA_DIR / "enso_indices.json"
 
-NINO34_URL = "https://www.cpc.ncep.noaa.gov/data/indices/wksst8110.for"
-SOI_URL    = "https://www.cpc.ncep.noaa.gov/data/indices/soi"
+# Multiple URL candidates per index — NOAA has moved files over the years
+# and serves several variants concurrently. We try each in order and use
+# the first that returns 200. The dry-run on 22 Jun 2026 surfaced that
+# one of the original URLs returned no usable text; URL fallback covers
+# the silent-move case without needing a code change.
+NINO34_URL_CANDIDATES = [
+    # 1991-2020 climatology — NOAA's current default base period.
+    "https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for",
+    # 1981-2010 climatology — older base period, still served.
+    "https://www.cpc.ncep.noaa.gov/data/indices/wksst8110.for",
+    # `.bnd` extension served alongside `.for` historically.
+    "https://www.cpc.ncep.noaa.gov/data/indices/wksst8110.bnd",
+    # No-www variant (some NOAA mirrors omit the subdomain).
+    "https://cpc.ncep.noaa.gov/data/indices/wksst9120.for",
+    "https://cpc.ncep.noaa.gov/data/indices/wksst8110.for",
+]
+SOI_URL_CANDIDATES = [
+    "https://www.cpc.ncep.noaa.gov/data/indices/soi",
+    "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/soi.txt",
+    "https://cpc.ncep.noaa.gov/data/indices/soi",
+]
 
 _BROWSER_HEADERS = {
     "User-Agent": "coffee-intel-map/enso-indices (https://github.com/loicscanu-ctrl/coffee-intel-map)",
@@ -128,6 +147,20 @@ def _fetch(url: str, *, timeout: int = 30) -> str | None:
         logger.warning(f"[enso] GET {url} → HTTP {resp.status_code}")
         return None
     return resp.text
+
+
+def _fetch_first_ok(urls: list[str]) -> tuple[str | None, str | None]:
+    """Walk the URL candidate list in order, return (text, winning_url)
+    for the first 200 response. Returns (None, None) if all candidates
+    fail. We log the winner explicitly so the workflow operator can
+    see which mirror NOAA is actually serving from this week without
+    spelunking the diff."""
+    for url in urls:
+        text = _fetch(url)
+        if text:
+            logger.info(f"[enso] fetched OK: {url} ({len(text):,} bytes)")
+            return text, url
+    return None, None
 
 
 # ── parsers ─────────────────────────────────────────────────────────────────
@@ -258,7 +291,7 @@ def build_payload(
         "scraped_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "nino34": {
             "source":        "NOAA CPC weekly SST anomalies (wksst8110.for)",
-            "source_url":    NINO34_URL,
+            "source_url":    NINO34_URL_CANDIDATES[0],
             "unit":          "°C SST anomaly vs 1991-2020 climatology",
             "thresholds":    {"el_nino": NINO34_EL_NINO_THRESHOLD,
                               "la_nina": NINO34_LA_NINA_THRESHOLD},
@@ -271,7 +304,7 @@ def build_payload(
         },
         "soi": {
             "source":        "NOAA CPC monthly standardized SOI",
-            "source_url":    SOI_URL,
+            "source_url":    SOI_URL_CANDIDATES[0],
             "unit":          "standardized index (BOM convention × 10)",
             "thresholds":    {"el_nino": SOI_EL_NINO_THRESHOLD,
                               "la_nina": SOI_LA_NINA_THRESHOLD},
@@ -289,41 +322,74 @@ def _persist(doc: dict) -> None:
     OUT_PATH.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
 
 
-def run(*, write: bool, backfill: bool) -> int:
+def _fmt_signed(v: float | None, fmt: str = "+.2f") -> str:
+    """Format a number with an explicit sign, or '—' when None. Lets
+    the summary log line tolerate a partial fetch (one endpoint
+    succeeded, the other came back empty) instead of crashing the
+    workflow on the format call — the v1 dry-run failure mode."""
+    if v is None:
+        return "—"
+    return f"{v:{fmt}}"
+
+
+def run(*, write: bool, backfill: bool, diag: bool = False) -> int:
     """Fetch both indices, build the JSON, optionally persist.
 
     backfill is informational — both endpoints return the full history
     every request, so backfill vs incremental refresh exercises the
     same code path. The flag is kept for operator clarity and parity
-    with FNC's pattern."""
+    with FNC's pattern.
+
+    `diag` dumps a head/tail snippet of each fetched text to the log
+    so the operator can confirm the file format hasn't drifted when
+    debugging from a workflow run."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     mode = "backfill" if backfill else "refresh"
     logger.info(f"[enso] mode={mode}")
 
-    n34_text = _fetch(NINO34_URL)
-    soi_text = _fetch(SOI_URL)
+    n34_text, n34_url = _fetch_first_ok(NINO34_URL_CANDIDATES)
+    soi_text, soi_url = _fetch_first_ok(SOI_URL_CANDIDATES)
+
+    if diag:
+        for name, text in [("nino34", n34_text), ("soi", soi_text)]:
+            if text:
+                lines = text.splitlines()
+                head = "\n".join(lines[:5])
+                tail = "\n".join(lines[-5:])
+                logger.info(f"[enso] --diag {name} ({len(lines)} lines)\n--- head ---\n{head}\n--- tail ---\n{tail}")
+            else:
+                logger.info(f"[enso] --diag {name}: <no text fetched>")
+
     if not n34_text and not soi_text:
-        logger.error("[enso] FATAL: both NOAA endpoints unreachable")
+        logger.error("[enso] FATAL: both NOAA endpoints unreachable across all URL candidates")
         return 1
 
     nino34 = parse_nino34(n34_text) if n34_text else []
     soi    = parse_soi(soi_text)    if soi_text    else []
 
     if not nino34 and not soi:
-        logger.error("[enso] FATAL: 0 rows parsed from both endpoints")
+        logger.error("[enso] FATAL: 0 rows parsed from both endpoints — format may have drifted; re-run with --diag")
         return 1
+    # Partial success is allowed — we ship whichever index parsed and
+    # log a warning so the operator notices the asymmetry.
+    if not nino34:
+        logger.warning(f"[enso] nino34: 0 rows from {n34_url or 'no successful URL'} — re-run with --diag")
+    if not soi:
+        logger.warning(f"[enso] soi: 0 rows from {soi_url or 'no successful URL'} — re-run with --diag")
 
     doc = build_payload(nino34, soi)
     latest_n34 = doc["nino34"]["latest"]
     latest_soi = doc["soi"]["latest"]
     logger.info(
         f"[enso] nino34: {len(nino34)} weekly rows "
-        f"(latest {latest_n34['week_ending']} = {latest_n34['sst_anomaly']:+.2f} °C, "
+        f"(latest {latest_n34['week_ending'] or '—'} = "
+        f"{_fmt_signed(latest_n34['sst_anomaly'])} °C, "
         f"phase={latest_n34['phase']})"
     )
     logger.info(
         f"[enso] soi:    {len(soi)} monthly rows "
-        f"(latest {latest_soi['month']} = {latest_soi['soi']:+.2f})"
+        f"(latest {latest_soi['month'] or '—'} = "
+        f"{_fmt_signed(latest_soi['soi'])})"
     )
 
     if write:
@@ -341,8 +407,11 @@ def main() -> int:
                     help="Operator-intent flag for the full-history seed run. "
                          "Functionally identical to the default refresh — the "
                          "endpoints always serve the full series.")
+    ap.add_argument("--diag", action="store_true",
+                    help="Log head/tail of each fetched text so the operator "
+                         "can confirm NOAA's file format from the workflow log.")
     args = ap.parse_args()
-    return run(write=args.write, backfill=args.backfill)
+    return run(write=args.write, backfill=args.backfill, diag=args.diag)
 
 
 if __name__ == "__main__":

@@ -36,6 +36,11 @@ on:
         required: false
         default: false
         type: boolean
+      diag:
+        description: "Dump head/tail of fetched NOAA text to the log (debug format drift)."
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   fetch-enso-indices:
@@ -59,6 +64,7 @@ jobs:
         env:
           MODE: ${{ inputs.mode || 'refresh' }}
           DRY_RUN: ${{ inputs.dry_run }}
+          DIAG: ${{ inputs.diag }}
         run: |
           set -e
           if [ "$DRY_RUN" = "true" ]; then
@@ -68,6 +74,9 @@ jobs:
           fi
           if [ "$MODE" = "backfill" ]; then
             ARGS="$ARGS --backfill"
+          fi
+          if [ "$DIAG" = "true" ]; then
+            ARGS="$ARGS --diag"
           fi
           cd backend
           for attempt in 1 2 3; do

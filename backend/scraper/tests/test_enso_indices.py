@@ -144,3 +144,53 @@ def test_build_payload_handles_empty_inputs_without_crashing():
     assert doc["soi"]["latest"]["soi"]           is None
     assert doc["nino34"]["weekly"] == []
     assert doc["soi"]["monthly"]   == []
+
+
+# ── partial-failure resilience (v2 fixes from dry-run feedback) ─────────────
+
+
+def test_fmt_signed_tolerates_none_for_partial_fetch_logging():
+    """v1 dry-run crashed with TypeError when one endpoint returned 0
+    rows because the log line did `{value:+.2f}` against a None.
+    v2 routes summary numbers through _fmt_signed, which prints '—'
+    for None instead of crashing — so partial success (1 of 2
+    endpoints worked) still produces a usable log + JSON."""
+    assert enso._fmt_signed( 1.25) == "+1.25"
+    assert enso._fmt_signed(-0.50) == "-0.50"
+    assert enso._fmt_signed(None)  == "—"
+
+
+def test_fetch_first_ok_walks_candidate_list(monkeypatch):
+    """v2 tries multiple URL variants per index — NOAA serves several
+    concurrent file formats (wksst9120 / wksst8110, .for / .bnd, www /
+    no-www). When the first URL 404s we want the second to be tried
+    automatically, without a code change."""
+    seen: list[str] = []
+    def fake_fetch(url, *, timeout=30):
+        seen.append(url)
+        # Pretend the first two URLs 404; the third succeeds.
+        if "wksst9120" in url or url.endswith(".bnd"):
+            return None
+        return "fake noaa text"
+    monkeypatch.setattr(enso, "_fetch", fake_fetch)
+
+    text, winning = enso._fetch_first_ok([
+        "https://example.test/wksst9120.for",
+        "https://example.test/wksst8110.bnd",
+        "https://example.test/wksst8110.for",
+    ])
+    assert text == "fake noaa text"
+    assert winning.endswith("wksst8110.for")
+    # All three candidates probed in order.
+    assert seen == [
+        "https://example.test/wksst9120.for",
+        "https://example.test/wksst8110.bnd",
+        "https://example.test/wksst8110.for",
+    ]
+
+
+def test_fetch_first_ok_returns_none_when_all_candidates_fail(monkeypatch):
+    monkeypatch.setattr(enso, "_fetch", lambda url, **kw: None)
+    text, winning = enso._fetch_first_ok(["a", "b", "c"])
+    assert text    is None
+    assert winning is None
