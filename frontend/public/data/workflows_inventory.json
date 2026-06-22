@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-22T12:45:59.739355Z",
-  "count": 57,
+  "generated_at": "2026-06-22T14:31:39.911229Z",
+  "count": 58,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -498,6 +498,20 @@
       ],
       "crons": [
         "30 6 * * 2"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "scraper-enso-subsurface.yml",
+      "name": "0.8 \u2013 Weekly \u2014 ENSO subsurface (WWV \u00b7 NOAA PMEL)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "45 6 * * 2"
       ],
       "workflow_run_deps": [],
       "concurrency_group": null,
