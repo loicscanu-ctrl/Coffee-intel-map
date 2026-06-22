@@ -180,8 +180,8 @@ export default function EnsoDivergenceChart() {
             <ReferenceLine yAxisId="sst" y={-0.5} stroke="#1e3a8a" strokeDasharray="1 4" />
             <Tooltip
               contentStyle={TT_STYLE}
-              labelFormatter={(_l: string, payload) => {
-                const p = payload?.[0]?.payload as { week?: string } | undefined;
+              labelFormatter={(_label, payload) => {
+                const p = (payload?.[0]?.payload ?? null) as { week?: string } | null;
                 return p?.week ?? "";
               }}
               formatter={(v: unknown, name?: string | number) => {
