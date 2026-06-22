@@ -16,8 +16,19 @@ name: "0.9 – Weekly — ENSO thermocline (TAO/TRITON 150m · NOAA PMEL ERDDAP)
 # Fetcher runs on runner; sandbox can only inspect what's committed.
 
 on:
-  schedule:
-    - cron: '0 7 * * 2'     # Tuesday 07:00 UTC — 15min after the WWV workflow
+  # Cron DISABLED — Phase 3 v1+v2 dispatches surfaced that NOAA's
+  # remaining ERDDAP servers (OSMC, AOML, PFEG mirrors) either
+  # blacklist GitHub Actions egress IPs (HTTP 403) or don't host
+  # the PMEL TAO datasets (HTTP 404 "unknown datasetID"). The
+  # canonical PMEL ERDDAP (upwell.pmel.noaa.gov) is decommissioned
+  # (DNS NXDOMAIN). Without a Cloudflare-Worker proxy to route
+  # around the IP blacklist, ERDDAP-based TAO fetching is blocked.
+  #
+  # The workflow stays as workflow_dispatch-only so the operator
+  # can experiment with new ERDDAP host/dataset combos manually
+  # without firing the Telegram alert on every scheduled run.
+  # schedule:
+  #   - cron: '0 7 * * 2'
   workflow_dispatch:
     inputs:
       mode:
