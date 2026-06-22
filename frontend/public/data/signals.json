@@ -222,54 +222,6 @@
       "score": 2,
       "magnitude": "medium",
       "text": "RC technically oversold but price already recovering — short covering likely driving the move. Sustainable only if commercial buyers confirm with increased coverage."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=149.9]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=73.1]"
-    },
-    {
-      "id": "AGRO_vn_Dak_Nong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=56.8]"
-    },
-    {
-      "id": "AGRO_vn_Kon_Tum_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=52.5]"
     }
   ],
   "history": [
@@ -2619,5 +2571,5 @@
       "priceLDN": 3598
     }
   ],
-  "generatedAt": "2026-06-22T07:14:15.091Z"
+  "generatedAt": "2026-06-22T08:47:34.872Z"
 }
