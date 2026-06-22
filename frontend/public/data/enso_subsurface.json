@@ -1,0 +1,1368 @@
+{
+  "scraped_at": "2026-06-22T16:08:14+00:00",
+  "wwv": {
+    "source": "NOAA PMEL \u2014 Warm Water Volume (5\u00b0N-5\u00b0S, 120\u00b0E-80\u00b0W, above 20 \u00b0C isotherm)",
+    "source_url": "https://www.pmel.noaa.gov/tao/wwv/data/wwv.dat",
+    "unit": "10^14 m\u00b3 anomaly vs climatology",
+    "thresholds": {
+      "el_nino_lead": 1.0,
+      "la_nina_lead": -1.0
+    },
+    "lead_months": "4\u20136",
+    "latest": {
+      "month": "2026-05",
+      "wwv_anomaly": 2.701,
+      "lead_signal": "el-nino-pending"
+    },
+    "monthly": [
+      {
+        "month": "1980-01",
+        "wwv_anomaly": 0.812
+      },
+      {
+        "month": "1980-02",
+        "wwv_anomaly": 0.947
+      },
+      {
+        "month": "1980-03",
+        "wwv_anomaly": 1.229
+      },
+      {
+        "month": "1980-04",
+        "wwv_anomaly": 0.916
+      },
+      {
+        "month": "1980-05",
+        "wwv_anomaly": 1.547
+      },
+      {
+        "month": "1980-06",
+        "wwv_anomaly": 1.85
+      },
+      {
+        "month": "1980-07",
+        "wwv_anomaly": 0.914
+      },
+      {
+        "month": "1980-08",
+        "wwv_anomaly": 0.784
+      },
+      {
+        "month": "1980-09",
+        "wwv_anomaly": 0.845
+      },
+      {
+        "month": "1980-10",
+        "wwv_anomaly": 1.328
+      },
+      {
+        "month": "1980-11",
+        "wwv_anomaly": 1.684
+      },
+      {
+        "month": "1980-12",
+        "wwv_anomaly": 1.699
+      },
+      {
+        "month": "1981-01",
+        "wwv_anomaly": 1.371
+      },
+      {
+        "month": "1981-02",
+        "wwv_anomaly": 1.211
+      },
+      {
+        "month": "1981-03",
+        "wwv_anomaly": 2.053
+      },
+      {
+        "month": "1981-04",
+        "wwv_anomaly": 1.691
+      },
+      {
+        "month": "1981-05",
+        "wwv_anomaly": 1.172
+      },
+      {
+        "month": "1981-06",
+        "wwv_anomaly": 0.774
+      },
+      {
+        "month": "1981-07",
+        "wwv_anomaly": 0.581
+      },
+      {
+        "month": "1981-08",
+        "wwv_anomaly": 0.703
+      },
+      {
+        "month": "1981-09",
+        "wwv_anomaly": 1.606
+      },
+      {
+        "month": "1981-10",
+        "wwv_anomaly": 1.394
+      },
+      {
+        "month": "1981-11",
+        "wwv_anomaly": 0.905
+      },
+      {
+        "month": "1981-12",
+        "wwv_anomaly": 0.935
+      },
+      {
+        "month": "1982-01",
+        "wwv_anomaly": 1.153
+      },
+      {
+        "month": "1982-02",
+        "wwv_anomaly": 1.966
+      },
+      {
+        "month": "1982-03",
+        "wwv_anomaly": 2.153
+      },
+      {
+        "month": "1982-04",
+        "wwv_anomaly": 1.762
+      },
+      {
+        "month": "1982-05",
+        "wwv_anomaly": 1.505
+      },
+      {
+        "month": "1982-06",
+        "wwv_anomaly": 1.723
+      },
+      {
+        "month": "1982-07",
+        "wwv_anomaly": 1.756
+      },
+      {
+        "month": "1982-08",
+        "wwv_anomaly": 2.336
+      },
+      {
+        "month": "1982-09",
+        "wwv_anomaly": 2.596
+      },
+      {
+        "month": "1982-10",
+        "wwv_anomaly": 2.879
+      },
+      {
+        "month": "1982-11",
+        "wwv_anomaly": 2.48
+      },
+      {
+        "month": "1982-12",
+        "wwv_anomaly": 1.403
+      },
+      {
+        "month": "1985-01",
+        "wwv_anomaly": 0.253
+      },
+      {
+        "month": "1985-04",
+        "wwv_anomaly": 0.432
+      },
+      {
+        "month": "1985-05",
+        "wwv_anomaly": 0.858
+      },
+      {
+        "month": "1985-06",
+        "wwv_anomaly": 0.709
+      },
+      {
+        "month": "1985-07",
+        "wwv_anomaly": 0.628
+      },
+      {
+        "month": "1985-08",
+        "wwv_anomaly": 0.914
+      },
+      {
+        "month": "1985-09",
+        "wwv_anomaly": 0.515
+      },
+      {
+        "month": "1985-10",
+        "wwv_anomaly": 0.31
+      },
+      {
+        "month": "1985-11",
+        "wwv_anomaly": 0.712
+      },
+      {
+        "month": "1985-12",
+        "wwv_anomaly": 0.869
+      },
+      {
+        "month": "1986-01",
+        "wwv_anomaly": 0.878
+      },
+      {
+        "month": "1986-02",
+        "wwv_anomaly": 1.477
+      },
+      {
+        "month": "1986-03",
+        "wwv_anomaly": 1.248
+      },
+      {
+        "month": "1986-04",
+        "wwv_anomaly": 0.726
+      },
+      {
+        "month": "1986-05",
+        "wwv_anomaly": 1.341
+      },
+      {
+        "month": "1986-06",
+        "wwv_anomaly": 1.384
+      },
+      {
+        "month": "1986-07",
+        "wwv_anomaly": 1.309
+      },
+      {
+        "month": "1986-08",
+        "wwv_anomaly": 0.97
+      },
+      {
+        "month": "1986-09",
+        "wwv_anomaly": 1.077
+      },
+      {
+        "month": "1986-10",
+        "wwv_anomaly": 1.455
+      },
+      {
+        "month": "1986-11",
+        "wwv_anomaly": 1.201
+      },
+      {
+        "month": "1986-12",
+        "wwv_anomaly": 1.563
+      },
+      {
+        "month": "1987-01",
+        "wwv_anomaly": 0.951
+      },
+      {
+        "month": "1987-02",
+        "wwv_anomaly": 0.084
+      },
+      {
+        "month": "1989-01",
+        "wwv_anomaly": 0.229
+      },
+      {
+        "month": "1989-02",
+        "wwv_anomaly": 1.298
+      },
+      {
+        "month": "1989-03",
+        "wwv_anomaly": 1.641
+      },
+      {
+        "month": "1989-04",
+        "wwv_anomaly": 1.484
+      },
+      {
+        "month": "1989-05",
+        "wwv_anomaly": 1.815
+      },
+      {
+        "month": "1989-06",
+        "wwv_anomaly": 1.923
+      },
+      {
+        "month": "1989-07",
+        "wwv_anomaly": 1.818
+      },
+      {
+        "month": "1989-08",
+        "wwv_anomaly": 1.603
+      },
+      {
+        "month": "1989-09",
+        "wwv_anomaly": 1.537
+      },
+      {
+        "month": "1989-10",
+        "wwv_anomaly": 0.713
+      },
+      {
+        "month": "1989-11",
+        "wwv_anomaly": 0.556
+      },
+      {
+        "month": "1989-12",
+        "wwv_anomaly": 1.467
+      },
+      {
+        "month": "1990-01",
+        "wwv_anomaly": 1.957
+      },
+      {
+        "month": "1990-02",
+        "wwv_anomaly": 2.483
+      },
+      {
+        "month": "1990-03",
+        "wwv_anomaly": 2.023
+      },
+      {
+        "month": "1990-04",
+        "wwv_anomaly": 1.076
+      },
+      {
+        "month": "1990-05",
+        "wwv_anomaly": 0.557
+      },
+      {
+        "month": "1990-06",
+        "wwv_anomaly": 0.225
+      },
+      {
+        "month": "1990-07",
+        "wwv_anomaly": 0.696
+      },
+      {
+        "month": "1990-08",
+        "wwv_anomaly": 0.805
+      },
+      {
+        "month": "1990-09",
+        "wwv_anomaly": 0.763
+      },
+      {
+        "month": "1990-10",
+        "wwv_anomaly": 0.82
+      },
+      {
+        "month": "1990-11",
+        "wwv_anomaly": 0.753
+      },
+      {
+        "month": "1990-12",
+        "wwv_anomaly": 0.933
+      },
+      {
+        "month": "1991-01",
+        "wwv_anomaly": 1.066
+      },
+      {
+        "month": "1991-02",
+        "wwv_anomaly": 0.715
+      },
+      {
+        "month": "1991-03",
+        "wwv_anomaly": 0.216
+      },
+      {
+        "month": "1991-04",
+        "wwv_anomaly": 0.415
+      },
+      {
+        "month": "1991-05",
+        "wwv_anomaly": 0.771
+      },
+      {
+        "month": "1991-06",
+        "wwv_anomaly": 1.048
+      },
+      {
+        "month": "1991-07",
+        "wwv_anomaly": 1.223
+      },
+      {
+        "month": "1991-08",
+        "wwv_anomaly": 0.845
+      },
+      {
+        "month": "1991-09",
+        "wwv_anomaly": 0.889
+      },
+      {
+        "month": "1991-10",
+        "wwv_anomaly": 1.7
+      },
+      {
+        "month": "1991-11",
+        "wwv_anomaly": 1.272
+      },
+      {
+        "month": "1991-12",
+        "wwv_anomaly": 1.432
+      },
+      {
+        "month": "1992-01",
+        "wwv_anomaly": 0.957
+      },
+      {
+        "month": "1992-02",
+        "wwv_anomaly": 1.229
+      },
+      {
+        "month": "1992-03",
+        "wwv_anomaly": 0.174
+      },
+      {
+        "month": "1994-10",
+        "wwv_anomaly": 0.187
+      },
+      {
+        "month": "1994-11",
+        "wwv_anomaly": 0.662
+      },
+      {
+        "month": "1995-12",
+        "wwv_anomaly": 0.048
+      },
+      {
+        "month": "1996-01",
+        "wwv_anomaly": 0.33
+      },
+      {
+        "month": "1996-02",
+        "wwv_anomaly": 0.332
+      },
+      {
+        "month": "1996-03",
+        "wwv_anomaly": 0.624
+      },
+      {
+        "month": "1996-04",
+        "wwv_anomaly": 0.412
+      },
+      {
+        "month": "1996-05",
+        "wwv_anomaly": 0.28
+      },
+      {
+        "month": "1996-06",
+        "wwv_anomaly": 0.746
+      },
+      {
+        "month": "1996-07",
+        "wwv_anomaly": 0.261
+      },
+      {
+        "month": "1996-08",
+        "wwv_anomaly": 0.465
+      },
+      {
+        "month": "1996-09",
+        "wwv_anomaly": 0.267
+      },
+      {
+        "month": "1996-10",
+        "wwv_anomaly": 0.452
+      },
+      {
+        "month": "1996-11",
+        "wwv_anomaly": 0.491
+      },
+      {
+        "month": "1996-12",
+        "wwv_anomaly": 0.852
+      },
+      {
+        "month": "1997-01",
+        "wwv_anomaly": 1.635
+      },
+      {
+        "month": "1997-02",
+        "wwv_anomaly": 2.144
+      },
+      {
+        "month": "1997-03",
+        "wwv_anomaly": 2.208
+      },
+      {
+        "month": "1997-04",
+        "wwv_anomaly": 3.117
+      },
+      {
+        "month": "1997-05",
+        "wwv_anomaly": 2.887
+      },
+      {
+        "month": "1997-06",
+        "wwv_anomaly": 3.075
+      },
+      {
+        "month": "1997-07",
+        "wwv_anomaly": 2.197
+      },
+      {
+        "month": "1997-08",
+        "wwv_anomaly": 1.514
+      },
+      {
+        "month": "1997-09",
+        "wwv_anomaly": 1.8
+      },
+      {
+        "month": "1997-10",
+        "wwv_anomaly": 1.582
+      },
+      {
+        "month": "1997-11",
+        "wwv_anomaly": 0.663
+      },
+      {
+        "month": "2000-02",
+        "wwv_anomaly": 0.199
+      },
+      {
+        "month": "2000-03",
+        "wwv_anomaly": 0.773
+      },
+      {
+        "month": "2000-04",
+        "wwv_anomaly": 1.025
+      },
+      {
+        "month": "2000-05",
+        "wwv_anomaly": 1.329
+      },
+      {
+        "month": "2000-06",
+        "wwv_anomaly": 1.054
+      },
+      {
+        "month": "2000-07",
+        "wwv_anomaly": 0.805
+      },
+      {
+        "month": "2000-08",
+        "wwv_anomaly": 0.231
+      },
+      {
+        "month": "2000-09",
+        "wwv_anomaly": 0.33
+      },
+      {
+        "month": "2000-10",
+        "wwv_anomaly": 0.183
+      },
+      {
+        "month": "2000-11",
+        "wwv_anomaly": 0.273
+      },
+      {
+        "month": "2001-01",
+        "wwv_anomaly": 0.398
+      },
+      {
+        "month": "2001-02",
+        "wwv_anomaly": 0.341
+      },
+      {
+        "month": "2001-03",
+        "wwv_anomaly": 0.637
+      },
+      {
+        "month": "2001-04",
+        "wwv_anomaly": 0.645
+      },
+      {
+        "month": "2001-05",
+        "wwv_anomaly": 0.169
+      },
+      {
+        "month": "2001-06",
+        "wwv_anomaly": 0.358
+      },
+      {
+        "month": "2001-07",
+        "wwv_anomaly": 0.692
+      },
+      {
+        "month": "2001-08",
+        "wwv_anomaly": 0.242
+      },
+      {
+        "month": "2001-09",
+        "wwv_anomaly": 0.549
+      },
+      {
+        "month": "2001-10",
+        "wwv_anomaly": 0.392
+      },
+      {
+        "month": "2001-11",
+        "wwv_anomaly": 0.519
+      },
+      {
+        "month": "2001-12",
+        "wwv_anomaly": 0.751
+      },
+      {
+        "month": "2002-01",
+        "wwv_anomaly": 1.064
+      },
+      {
+        "month": "2002-02",
+        "wwv_anomaly": 0.951
+      },
+      {
+        "month": "2002-03",
+        "wwv_anomaly": 0.686
+      },
+      {
+        "month": "2002-04",
+        "wwv_anomaly": 0.231
+      },
+      {
+        "month": "2002-06",
+        "wwv_anomaly": 0.453
+      },
+      {
+        "month": "2002-07",
+        "wwv_anomaly": 0.813
+      },
+      {
+        "month": "2002-08",
+        "wwv_anomaly": 1.249
+      },
+      {
+        "month": "2002-09",
+        "wwv_anomaly": 1.78
+      },
+      {
+        "month": "2002-10",
+        "wwv_anomaly": 1.807
+      },
+      {
+        "month": "2002-11",
+        "wwv_anomaly": 1.103
+      },
+      {
+        "month": "2002-12",
+        "wwv_anomaly": 0.054
+      },
+      {
+        "month": "2003-06",
+        "wwv_anomaly": 0.445
+      },
+      {
+        "month": "2003-07",
+        "wwv_anomaly": 1.109
+      },
+      {
+        "month": "2003-08",
+        "wwv_anomaly": 0.656
+      },
+      {
+        "month": "2003-09",
+        "wwv_anomaly": 0.684
+      },
+      {
+        "month": "2003-10",
+        "wwv_anomaly": 0.772
+      },
+      {
+        "month": "2003-11",
+        "wwv_anomaly": 0.859
+      },
+      {
+        "month": "2003-12",
+        "wwv_anomaly": 0.557
+      },
+      {
+        "month": "2004-01",
+        "wwv_anomaly": 0.186
+      },
+      {
+        "month": "2004-05",
+        "wwv_anomaly": 0.065
+      },
+      {
+        "month": "2004-06",
+        "wwv_anomaly": 0.412
+      },
+      {
+        "month": "2004-07",
+        "wwv_anomaly": 1.059
+      },
+      {
+        "month": "2004-08",
+        "wwv_anomaly": 1.088
+      },
+      {
+        "month": "2004-09",
+        "wwv_anomaly": 1.493
+      },
+      {
+        "month": "2004-10",
+        "wwv_anomaly": 1.414
+      },
+      {
+        "month": "2004-11",
+        "wwv_anomaly": 1.258
+      },
+      {
+        "month": "2004-12",
+        "wwv_anomaly": 1.016
+      },
+      {
+        "month": "2005-01",
+        "wwv_anomaly": 0.712
+      },
+      {
+        "month": "2005-02",
+        "wwv_anomaly": 0.604
+      },
+      {
+        "month": "2005-03",
+        "wwv_anomaly": 1.131
+      },
+      {
+        "month": "2005-04",
+        "wwv_anomaly": 0.537
+      },
+      {
+        "month": "2005-05",
+        "wwv_anomaly": 0.496
+      },
+      {
+        "month": "2005-06",
+        "wwv_anomaly": 0.478
+      },
+      {
+        "month": "2005-07",
+        "wwv_anomaly": 0.309
+      },
+      {
+        "month": "2005-08",
+        "wwv_anomaly": 0.218
+      },
+      {
+        "month": "2006-01",
+        "wwv_anomaly": 0.122
+      },
+      {
+        "month": "2006-02",
+        "wwv_anomaly": 0.264
+      },
+      {
+        "month": "2006-03",
+        "wwv_anomaly": 0.61
+      },
+      {
+        "month": "2006-04",
+        "wwv_anomaly": 0.914
+      },
+      {
+        "month": "2006-05",
+        "wwv_anomaly": 1.141
+      },
+      {
+        "month": "2006-06",
+        "wwv_anomaly": 1.276
+      },
+      {
+        "month": "2006-07",
+        "wwv_anomaly": 1.117
+      },
+      {
+        "month": "2006-08",
+        "wwv_anomaly": 1.448
+      },
+      {
+        "month": "2006-09",
+        "wwv_anomaly": 1.328
+      },
+      {
+        "month": "2006-10",
+        "wwv_anomaly": 1.045
+      },
+      {
+        "month": "2006-11",
+        "wwv_anomaly": 1.031
+      },
+      {
+        "month": "2006-12",
+        "wwv_anomaly": 0.381
+      },
+      {
+        "month": "2008-01",
+        "wwv_anomaly": 0.462
+      },
+      {
+        "month": "2008-02",
+        "wwv_anomaly": 0.89
+      },
+      {
+        "month": "2008-03",
+        "wwv_anomaly": 1.934
+      },
+      {
+        "month": "2008-04",
+        "wwv_anomaly": 2.298
+      },
+      {
+        "month": "2008-05",
+        "wwv_anomaly": 2.729
+      },
+      {
+        "month": "2008-06",
+        "wwv_anomaly": 2.262
+      },
+      {
+        "month": "2008-07",
+        "wwv_anomaly": 1.485
+      },
+      {
+        "month": "2008-08",
+        "wwv_anomaly": 0.666
+      },
+      {
+        "month": "2008-09",
+        "wwv_anomaly": 0.135
+      },
+      {
+        "month": "2008-10",
+        "wwv_anomaly": 0.107
+      },
+      {
+        "month": "2009-01",
+        "wwv_anomaly": 0.035
+      },
+      {
+        "month": "2009-02",
+        "wwv_anomaly": 0.284
+      },
+      {
+        "month": "2009-03",
+        "wwv_anomaly": 0.277
+      },
+      {
+        "month": "2009-04",
+        "wwv_anomaly": 0.589
+      },
+      {
+        "month": "2009-05",
+        "wwv_anomaly": 1.02
+      },
+      {
+        "month": "2009-06",
+        "wwv_anomaly": 1.171
+      },
+      {
+        "month": "2009-07",
+        "wwv_anomaly": 1.003
+      },
+      {
+        "month": "2009-08",
+        "wwv_anomaly": 0.839
+      },
+      {
+        "month": "2009-09",
+        "wwv_anomaly": 0.837
+      },
+      {
+        "month": "2009-10",
+        "wwv_anomaly": 1.061
+      },
+      {
+        "month": "2009-11",
+        "wwv_anomaly": 1.42
+      },
+      {
+        "month": "2009-12",
+        "wwv_anomaly": 1.123
+      },
+      {
+        "month": "2010-01",
+        "wwv_anomaly": 0.489
+      },
+      {
+        "month": "2010-02",
+        "wwv_anomaly": 0.338
+      },
+      {
+        "month": "2010-03",
+        "wwv_anomaly": 0.056
+      },
+      {
+        "month": "2011-01",
+        "wwv_anomaly": 0.436
+      },
+      {
+        "month": "2011-02",
+        "wwv_anomaly": 1.569
+      },
+      {
+        "month": "2011-03",
+        "wwv_anomaly": 2.055
+      },
+      {
+        "month": "2011-04",
+        "wwv_anomaly": 2.215
+      },
+      {
+        "month": "2011-05",
+        "wwv_anomaly": 2.045
+      },
+      {
+        "month": "2011-06",
+        "wwv_anomaly": 1.517
+      },
+      {
+        "month": "2011-07",
+        "wwv_anomaly": 0.994
+      },
+      {
+        "month": "2011-08",
+        "wwv_anomaly": 0.486
+      },
+      {
+        "month": "2011-11",
+        "wwv_anomaly": 0.033
+      },
+      {
+        "month": "2012-01",
+        "wwv_anomaly": 0.137
+      },
+      {
+        "month": "2012-02",
+        "wwv_anomaly": 0.715
+      },
+      {
+        "month": "2012-03",
+        "wwv_anomaly": 0.904
+      },
+      {
+        "month": "2012-04",
+        "wwv_anomaly": 1.21
+      },
+      {
+        "month": "2012-05",
+        "wwv_anomaly": 1.348
+      },
+      {
+        "month": "2012-06",
+        "wwv_anomaly": 1.435
+      },
+      {
+        "month": "2012-07",
+        "wwv_anomaly": 1.273
+      },
+      {
+        "month": "2012-08",
+        "wwv_anomaly": 1.18
+      },
+      {
+        "month": "2012-09",
+        "wwv_anomaly": 0.718
+      },
+      {
+        "month": "2012-10",
+        "wwv_anomaly": 0.612
+      },
+      {
+        "month": "2012-11",
+        "wwv_anomaly": 0.487
+      },
+      {
+        "month": "2012-12",
+        "wwv_anomaly": 0.062
+      },
+      {
+        "month": "2013-01",
+        "wwv_anomaly": 0.19
+      },
+      {
+        "month": "2013-02",
+        "wwv_anomaly": 0.394
+      },
+      {
+        "month": "2013-03",
+        "wwv_anomaly": 0.348
+      },
+      {
+        "month": "2013-04",
+        "wwv_anomaly": 0.222
+      },
+      {
+        "month": "2013-05",
+        "wwv_anomaly": 0.369
+      },
+      {
+        "month": "2013-06",
+        "wwv_anomaly": 0.806
+      },
+      {
+        "month": "2013-07",
+        "wwv_anomaly": 0.835
+      },
+      {
+        "month": "2013-08",
+        "wwv_anomaly": 0.904
+      },
+      {
+        "month": "2013-09",
+        "wwv_anomaly": 1.146
+      },
+      {
+        "month": "2013-10",
+        "wwv_anomaly": 1.049
+      },
+      {
+        "month": "2013-11",
+        "wwv_anomaly": 1.247
+      },
+      {
+        "month": "2013-12",
+        "wwv_anomaly": 1.251
+      },
+      {
+        "month": "2014-01",
+        "wwv_anomaly": 0.783
+      },
+      {
+        "month": "2014-02",
+        "wwv_anomaly": 1.123
+      },
+      {
+        "month": "2014-03",
+        "wwv_anomaly": 2.05
+      },
+      {
+        "month": "2014-04",
+        "wwv_anomaly": 1.835
+      },
+      {
+        "month": "2014-05",
+        "wwv_anomaly": 1.324
+      },
+      {
+        "month": "2014-06",
+        "wwv_anomaly": 0.657
+      },
+      {
+        "month": "2014-07",
+        "wwv_anomaly": 0.585
+      },
+      {
+        "month": "2014-08",
+        "wwv_anomaly": 1.491
+      },
+      {
+        "month": "2014-09",
+        "wwv_anomaly": 1.571
+      },
+      {
+        "month": "2014-10",
+        "wwv_anomaly": 1.237
+      },
+      {
+        "month": "2014-11",
+        "wwv_anomaly": 1.305
+      },
+      {
+        "month": "2014-12",
+        "wwv_anomaly": 0.853
+      },
+      {
+        "month": "2015-01",
+        "wwv_anomaly": 0.311
+      },
+      {
+        "month": "2015-02",
+        "wwv_anomaly": 0.631
+      },
+      {
+        "month": "2015-03",
+        "wwv_anomaly": 0.955
+      },
+      {
+        "month": "2015-04",
+        "wwv_anomaly": 1.116
+      },
+      {
+        "month": "2015-05",
+        "wwv_anomaly": 1.246
+      },
+      {
+        "month": "2015-06",
+        "wwv_anomaly": 1.123
+      },
+      {
+        "month": "2015-07",
+        "wwv_anomaly": 1.021
+      },
+      {
+        "month": "2015-08",
+        "wwv_anomaly": 1.117
+      },
+      {
+        "month": "2015-09",
+        "wwv_anomaly": 1.126
+      },
+      {
+        "month": "2015-10",
+        "wwv_anomaly": 1.07
+      },
+      {
+        "month": "2015-11",
+        "wwv_anomaly": 0.499
+      },
+      {
+        "month": "2017-05",
+        "wwv_anomaly": 0.211
+      },
+      {
+        "month": "2018-02",
+        "wwv_anomaly": 0.781
+      },
+      {
+        "month": "2018-03",
+        "wwv_anomaly": 0.975
+      },
+      {
+        "month": "2018-04",
+        "wwv_anomaly": 1.185
+      },
+      {
+        "month": "2018-05",
+        "wwv_anomaly": 1.617
+      },
+      {
+        "month": "2018-06",
+        "wwv_anomaly": 1.818
+      },
+      {
+        "month": "2018-07",
+        "wwv_anomaly": 1.959
+      },
+      {
+        "month": "2018-08",
+        "wwv_anomaly": 2.167
+      },
+      {
+        "month": "2018-09",
+        "wwv_anomaly": 2.23
+      },
+      {
+        "month": "2018-10",
+        "wwv_anomaly": 2.184
+      },
+      {
+        "month": "2018-11",
+        "wwv_anomaly": 1.672
+      },
+      {
+        "month": "2018-12",
+        "wwv_anomaly": 1.341
+      },
+      {
+        "month": "2019-01",
+        "wwv_anomaly": 0.889
+      },
+      {
+        "month": "2019-02",
+        "wwv_anomaly": 0.9
+      },
+      {
+        "month": "2019-03",
+        "wwv_anomaly": 0.753
+      },
+      {
+        "month": "2019-10",
+        "wwv_anomaly": 0.266
+      },
+      {
+        "month": "2019-11",
+        "wwv_anomaly": 0.459
+      },
+      {
+        "month": "2019-12",
+        "wwv_anomaly": 0.447
+      },
+      {
+        "month": "2020-01",
+        "wwv_anomaly": 0.202
+      },
+      {
+        "month": "2020-02",
+        "wwv_anomaly": 0.028
+      },
+      {
+        "month": "2020-08",
+        "wwv_anomaly": 0.024
+      },
+      {
+        "month": "2020-12",
+        "wwv_anomaly": 0.454
+      },
+      {
+        "month": "2021-01",
+        "wwv_anomaly": 0.527
+      },
+      {
+        "month": "2021-02",
+        "wwv_anomaly": 0.913
+      },
+      {
+        "month": "2021-03",
+        "wwv_anomaly": 1.375
+      },
+      {
+        "month": "2021-04",
+        "wwv_anomaly": 1.105
+      },
+      {
+        "month": "2021-05",
+        "wwv_anomaly": 0.987
+      },
+      {
+        "month": "2021-06",
+        "wwv_anomaly": 0.633
+      },
+      {
+        "month": "2021-07",
+        "wwv_anomaly": 0.496
+      },
+      {
+        "month": "2021-08",
+        "wwv_anomaly": 0.322
+      },
+      {
+        "month": "2021-11",
+        "wwv_anomaly": 0.11
+      },
+      {
+        "month": "2021-12",
+        "wwv_anomaly": 0.287
+      },
+      {
+        "month": "2022-01",
+        "wwv_anomaly": 1.249
+      },
+      {
+        "month": "2022-02",
+        "wwv_anomaly": 1.521
+      },
+      {
+        "month": "2022-03",
+        "wwv_anomaly": 0.985
+      },
+      {
+        "month": "2022-04",
+        "wwv_anomaly": 1.415
+      },
+      {
+        "month": "2022-05",
+        "wwv_anomaly": 1.498
+      },
+      {
+        "month": "2022-06",
+        "wwv_anomaly": 2.019
+      },
+      {
+        "month": "2022-07",
+        "wwv_anomaly": 1.595
+      },
+      {
+        "month": "2022-08",
+        "wwv_anomaly": 1.553
+      },
+      {
+        "month": "2022-09",
+        "wwv_anomaly": 1.604
+      },
+      {
+        "month": "2022-10",
+        "wwv_anomaly": 1.41
+      },
+      {
+        "month": "2022-11",
+        "wwv_anomaly": 1.779
+      },
+      {
+        "month": "2022-12",
+        "wwv_anomaly": 2.153
+      },
+      {
+        "month": "2023-01",
+        "wwv_anomaly": 2.196
+      },
+      {
+        "month": "2023-02",
+        "wwv_anomaly": 1.924
+      },
+      {
+        "month": "2023-03",
+        "wwv_anomaly": 2.446
+      },
+      {
+        "month": "2023-04",
+        "wwv_anomaly": 2.48
+      },
+      {
+        "month": "2023-05",
+        "wwv_anomaly": 2.321
+      },
+      {
+        "month": "2023-06",
+        "wwv_anomaly": 2.328
+      },
+      {
+        "month": "2023-07",
+        "wwv_anomaly": 1.487
+      },
+      {
+        "month": "2023-08",
+        "wwv_anomaly": 1.187
+      },
+      {
+        "month": "2023-09",
+        "wwv_anomaly": 1.041
+      },
+      {
+        "month": "2023-10",
+        "wwv_anomaly": 1.071
+      },
+      {
+        "month": "2023-11",
+        "wwv_anomaly": 0.734
+      },
+      {
+        "month": "2025-04",
+        "wwv_anomaly": 0.019
+      },
+      {
+        "month": "2025-12",
+        "wwv_anomaly": 0.202
+      },
+      {
+        "month": "2026-01",
+        "wwv_anomaly": 1.019
+      },
+      {
+        "month": "2026-02",
+        "wwv_anomaly": 1.491
+      },
+      {
+        "month": "2026-03",
+        "wwv_anomaly": 1.868
+      },
+      {
+        "month": "2026-04",
+        "wwv_anomaly": 2.838
+      },
+      {
+        "month": "2026-05",
+        "wwv_anomaly": 2.701
+      }
+    ]
+  }
+}
