@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch WWV (3 retry attempts)
+      - name: Fetch WWV
         id: fetch
         env:
           MODE: ${{ inputs.mode || 'refresh' }}
@@ -77,16 +77,13 @@ jobs:
             ARGS="$ARGS --diag"
           fi
           cd backend
-          for attempt in 1 2 3; do
-            PYTHONPATH=. python -m scraper.sources.enso_subsurface $ARGS && break
-            if [ $attempt -lt 3 ]; then
-              echo "[wwv] attempt $attempt failed — retrying in 5m..."
-              sleep 300
-            else
-              echo "[wwv] all 3 attempts failed — leaving JSON untouched"
-              exit 1
-            fi
-          done
+          # Single attempt — the Python already walks the URL-candidate
+          # list internally and fails fast on deterministic 404s.
+          # Re-dispatching after a transient outage is cheap; burning
+          # 10 minutes on 5-min sleeps when the failure is structural
+          # (the v1 dispatch experience) is not. Weekly cron handles
+          # the next-attempt cadence.
+          PYTHONPATH=. python -m scraper.sources.enso_subsurface $ARGS
 
       - name: Commit updated enso_subsurface.json if changed
         if: ${{ inputs.dry_run != true }}
