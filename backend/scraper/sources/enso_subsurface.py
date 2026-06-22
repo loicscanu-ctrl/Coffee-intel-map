@@ -104,20 +104,32 @@ WWV_EL_NINO_LEAD_THRESHOLD = 1.0
 WWV_LA_NINA_LEAD_THRESHOLD = -1.0
 
 # Robust signed-decimal extractor — same approach that fixed enso_indices
-# v3. NOAA pads fixed-width text with single-space gaps that get eaten
-# by leading minus signs (`1.2-3.4`). re.findall recovers all values
-# regardless of whether spaces survived between them.
-_SIGNED_DECIMAL_RE = re.compile(r"-?\d+\.\d+")
+# v3, extended in v3 here to support scientific notation. The PMEL WWV
+# file at /tao/wwv/data/wwv.dat serves values like `0.2700635E+15`
+# (volume in m³). Without the exponent capture, the parser truncates
+# to the mantissa `0.27` and shows a wildly wrong anomaly value.
+_SIGNED_DECIMAL_RE = re.compile(r"-?\d+\.\d+(?:[Ee][+-]?\d+)?")
 
 # A WWV row in PSL year-matrix format: 4-digit year followed by 12
 # monthly columns (and optional annual column).
 _YEAR_ROW_RE = re.compile(r"^\s*(?P<yr>(?:19|20)\d{2})\b(?P<rest>.*)$")
 
-# A WWV row in flat YYYYMM HHH.H format: 6-digit yearmonth + one value.
-# Some PMEL exports use this layout instead of the year-matrix.
+# A WWV row in flat YYYYMM ... format. PMEL's wwv.dat actually serves:
+#   YYYYMM   VOLUME      ANOMALY
+#   202605   0.2671554E+16  0.2700635E+15
+# We want the ANOMALY (3rd column), not the absolute volume (2nd).
+# v2 captured only the first decimal it found (the volume) and shipped
+# nonsensical +0.27 values; v3 walks all decimals on the row and picks
+# the second one explicitly.
 _YYYYMM_FLAT_RE = re.compile(
-    r"^\s*(?P<yyyymm>(?:19|20)\d{2}(?:0[1-9]|1[0-2]))\s+(?P<val>-?\d+\.\d+)"
+    r"^\s*(?P<yyyymm>(?:19|20)\d{2}(?:0[1-9]|1[0-2]))\s+(?P<rest>.*)$"
 )
+
+# WWV anomaly normalization factor — PMEL reports the anomaly in m³;
+# the literature (and the trader-relevant ±1.0 threshold) uses
+# 10^14 m³ as the unit. Divide raw values by this to land in those
+# units. 0.2700635E+15 m³ / 1e14 = 2.70 (× 10^14 m³).
+_WWV_UNIT_DIVISOR = 1e14
 
 
 # ── data model ──────────────────────────────────────────────────────────────
@@ -207,23 +219,34 @@ def parse_wwv_year_matrix(text: str) -> list[WwvMonthly]:
 
 
 def parse_wwv_yyyymm_flat(text: str) -> list[WwvMonthly]:
-    """Parse the flat PMEL format: each line is `YYYYMM   VALUE`
-    (sometimes followed by additional columns we ignore)."""
+    """Parse PMEL's flat format. Each data line is:
+        YYYYMM    VOLUME (m³)        ANOMALY (m³)
+        202605    0.2671554E+16      0.2700635E+15
+    We want the ANOMALY (column 3). The volume column is a slowly-
+    drifting absolute value around 2.6 × 10^16 m³ — not the signal
+    a trader cares about; the anomaly relative to climatology is.
+    Anomaly values divide by 1e14 to land in the trader-convention
+    "× 10^14 m³" units (so a +2.7 reading matches PMEL's published
+    charts and the ±1.0 threshold the literature uses)."""
     out: list[WwvMonthly] = []
     for raw_line in text.splitlines():
         m = _YYYYMM_FLAT_RE.match(raw_line)
         if not m:
             continue
         yyyymm = m.group("yyyymm")
+        nums = _SIGNED_DECIMAL_RE.findall(m.group("rest"))
+        if len(nums) < 2:
+            # File has only volume column (no anomaly) — can't use it.
+            continue
         try:
-            v = float(m.group("val"))
+            v_raw = float(nums[1])    # column 3 in the file (index 1 in `nums`)
         except ValueError:
             continue
-        if _is_missing(v):
+        if _is_missing(v_raw):
             continue
         out.append(WwvMonthly(
             month=f"{yyyymm[:4]}-{yyyymm[4:6]}",
-            wwv_anomaly=round(v, 3),
+            wwv_anomaly=round(v_raw / _WWV_UNIT_DIVISOR, 3),
         ))
     out.sort(key=lambda r: r.month)
     return out

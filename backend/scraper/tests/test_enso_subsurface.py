@@ -18,15 +18,21 @@ _YEAR_MATRIX_SAMPLE = """\
 2026     0.20   0.60   1.10   1.40   1.80-999.9 -999.9 -999.9 -999.9 -999.9 -999.9 -999.9
 """
 
-# Flat YYYYMM layout — PMEL convention. Each row: 6-digit yearmonth
-# followed by the value. Often has additional columns we ignore.
+# Flat YYYYMM layout — PMEL convention from the live wwv.dat fetched
+# on 22 Jun 2026. Each data row: `YYYYMM   VOLUME   ANOMALY` in
+# scientific notation. The volume column is ~2.6 × 10^16 m³ (slowly
+# drifting absolute total); the anomaly column is the trader signal.
+# Threshold ±1.0 × 10^14 m³ matches PMEL's published charts after
+# the anomaly is divided by 1e14.
 _FLAT_SAMPLE = """\
-WWV monthly anomaly — 10^14 m³
-198001    -0.50
-198002    -0.30
-202504     2.10
-202505     1.80
-202605     1.80
+Warm Water Volume (m**3,5N-5S,120E-80W)
+GTMBA Project Office/NOAA/PMEL/Seattle
+
+ date     Volume       Anomaly
+198001 0.2609619E+16 0.8121139E+14
+198002 0.2574077E+16 0.9472282E+14
+202604 0.2714248E+16 0.2838388E+15
+202605 0.2671554E+16 0.2700635E+15
 """
 
 
@@ -64,13 +70,32 @@ def test_parse_year_matrix_handles_fused_negative_numbers():
     # Remaining 11 sentinels filtered, no spurious rows.
 
 
-def test_parse_flat_yyyymm_layout():
+def test_parse_flat_yyyymm_layout_picks_anomaly_column_and_normalizes_units():
+    """The PMEL wwv.dat serves YYYYMM | VOLUME | ANOMALY in
+    scientific notation (real format captured from the v2 dispatch).
+    v3 must:
+      • Pick column 3 (anomaly), not column 2 (volume) — the v2
+        parser shipped +0.27 instead of +2.70 because it grabbed
+        the wrong column AND truncated the exponent.
+      • Parse scientific notation (`0.2700635E+15`).
+      • Divide by 1e14 to land in the trader-convention units
+        (so the ±1.0 threshold matches PMEL's published charts)."""
     rows = wwv.parse_wwv_yyyymm_flat(_FLAT_SAMPLE)
-    assert len(rows) == 5
+    assert len(rows) == 4
+    # 1980-01: anomaly = 0.8121139E+14 / 1e14 = 0.812
     assert rows[0].month       == "1980-01"
-    assert rows[0].wwv_anomaly == -0.5
+    assert rows[0].wwv_anomaly == 0.812
+    # 2026-05: anomaly = 0.2700635E+15 / 1e14 = 2.701 (strong El Niño signal)
     assert rows[-1].month      == "2026-05"
-    assert rows[-1].wwv_anomaly == 1.8
+    assert rows[-1].wwv_anomaly == 2.701
+
+
+def test_signed_decimal_re_matches_scientific_notation():
+    """Regression guard for the v2 truncation bug — `0.2700635E+15`
+    must round-trip as the float 2.700635e+14, not 0.2700635."""
+    matches = wwv._SIGNED_DECIMAL_RE.findall("0.2671554E+16 0.2700635E+15")
+    assert matches == ["0.2671554E+16", "0.2700635E+15"]
+    assert float(matches[1]) == 2.700635e+14
 
 
 def test_parse_wwv_picks_strategy_with_more_rows():
@@ -84,7 +109,7 @@ def test_parse_wwv_picks_strategy_with_more_rows():
     assert len(rows_via_orchestrator) == 29
     # Reverse direction — flat fixture should pick the flat parser.
     rows_flat = wwv.parse_wwv(_FLAT_SAMPLE)
-    assert len(rows_flat) == 5
+    assert len(rows_flat) == 4
 
 
 # ── lead-signal classification ─────────────────────────────────────────────
