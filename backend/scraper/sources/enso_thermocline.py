@@ -110,9 +110,12 @@ LAT_UPPER =  3.0
 LON_LOWER_E = 185.0
 LON_UPPER_E = 225.0
 
-# Time window — pull 90 days to compute the 30-day delta with room
-# to spare for any timing offset between buoy reports.
-HISTORY_DAYS = 90
+# Time window — Δ-30d needs 37 days minimum (recent 7d window + 30d
+# offset to the baseline window). 50 days gives buffer for ~2 weeks
+# of upstream latency. Was 90 originally but ~200KB daily responses
+# routinely hit Cloudflare Worker's 30s wall-clock on slow PFEG load;
+# halving the request size keeps the fetch under the wall on bad days.
+HISTORY_DAYS = 50
 
 # Kelvin-wave thresholds, °C — unchanged from v3/v4. Δ-30d = mean of
 # last 7 days minus mean of 30-37 days ago at the same site/depth band.
