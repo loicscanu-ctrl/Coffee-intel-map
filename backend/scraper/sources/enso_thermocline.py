@@ -321,19 +321,26 @@ def _classify_kelvin(delta_c: float | None) -> str:
 
 
 def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
-    """Unchanged from v4 — Δ-30d signal = mean(last 7 days at this
-    site/depth band) - mean(30-37 days ago, same). |Δ| ≥ 1.0 °C
+    """Δ-30d signal = mean(last 7 days of available data at this
+    site/depth band) − mean(30-37 days before that). |Δ| ≥ 1.0 °C
     qualifies as a downwelling (warm) or upwelling (cold) Kelvin
-    event. Climatology-free; works on whatever the array reports."""
+    event. Climatology-free; works on whatever the array reports.
+
+    Anchor on the latest observation rather than 'now' so the signal
+    survives whatever upstream latency the buoy is currently running.
+    TAO daily data routinely lags 2-3 weeks; anchoring to wall-clock
+    'now' would leave the recent-7d window empty and force every
+    site to no-data even when there's plenty of usable data.
+    """
     if not obs:
         return BuoyAnalysis(site, 0, None, None, None, None, "no-data")
     obs_sorted = sorted(obs, key=lambda o: o.timestamp, reverse=True)
     latest = obs_sorted[0]
-    now = datetime.now(UTC)
+    anchor = latest.timestamp
 
     def _mean_in_window(start_days_ago: int, end_days_ago: int) -> float | None:
-        cutoff_end   = now - timedelta(days=start_days_ago)
-        cutoff_start = now - timedelta(days=end_days_ago)
+        cutoff_end   = anchor - timedelta(days=start_days_ago)
+        cutoff_start = anchor - timedelta(days=end_days_ago)
         vals = [o.temp_c for o in obs if cutoff_start <= o.timestamp <= cutoff_end]
         return sum(vals) / len(vals) if vals else None
 
