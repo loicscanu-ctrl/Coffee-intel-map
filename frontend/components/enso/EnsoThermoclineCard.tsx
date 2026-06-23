@@ -238,7 +238,7 @@ export default function EnsoThermoclineCard() {
         (warm) or upwelling (cold) Kelvin wave. Surface SST response expected ~{t.lead_weeks} weeks
         later. The Phase 2 WWV card above shows the depth-integrated reservoir (4–6 month lead);
         this card shows the specific slugs of heat breaching the thermocline now. Source: NOAA NDBC
-        realtime2 .ocean feeds — each buoy's lat/lon also pinned on the ENSO risk map below.
+        realtime2 .ocean feeds — each buoy&apos;s lat/lon also pinned on the ENSO risk map below.
       </div>
     </div>
   );
